@@ -18,7 +18,7 @@ use modrinth_content_management::{
 use std::path::{Path, PathBuf};
 
 use super::content_mutation::{
-    ContentOrigin, InstallContent, install_content_blob, remove_project,
+    ContentOrigin, InstallContent, install_stored_file, remove_project,
     toggle_disable_project,
 };
 
@@ -473,8 +473,8 @@ pub(crate) async fn add_downloaded_project_version_with_enabled(
             "Invalid project filename",
         ));
     }
-    let blob = downloaded.file.store_blob(state).await?;
-    install_content_blob(
+    let stored_file = downloaded.file.store_file(state).await?;
+    install_stored_file(
         instance_id,
         InstallContent {
             requested_path: &format!(
@@ -482,7 +482,7 @@ pub(crate) async fn add_downloaded_project_version_with_enabled(
                 downloaded.project_type.get_folder(),
                 downloaded.file_name
             ),
-            blob: &blob,
+            stored_file: &stored_file,
             project_type: downloaded.project_type,
             source_kind,
             origin: Some(ContentOrigin {
@@ -521,8 +521,8 @@ pub(crate) async fn add_project_from_path(
                 .await?
         }
     };
-    let blob = state.content_store.ingest_local_file(path, state).await?;
-    install_content_blob(
+    let stored_file = state.content_store.import_file(path, state).await?;
+    install_stored_file(
         instance_id,
         InstallContent {
             requested_path: &format!(
@@ -530,7 +530,7 @@ pub(crate) async fn add_project_from_path(
                 project_type.get_folder(),
                 file_name
             ),
-            blob: &blob,
+            stored_file: &stored_file,
             project_type,
             source_kind: ContentSourceKind::Local,
             origin: None,
@@ -574,11 +574,9 @@ pub(crate) async fn add_project_bytes(
     }
     let temporary = state.content_store.temporary().await?;
     tokio::fs::write(&temporary, &bytes).await?;
-    let blob = state
-        .content_store
-        .ingest_local_file(&temporary, state)
-        .await?;
-    install_content_blob(
+    let stored_file =
+        state.content_store.import_file(&temporary, state).await?;
+    install_stored_file(
         instance_id,
         InstallContent {
             requested_path: &format!(
@@ -586,7 +584,7 @@ pub(crate) async fn add_project_bytes(
                 project_type.get_folder(),
                 file_name
             ),
-            blob: &blob,
+            stored_file: &stored_file,
             project_type,
             source_kind,
             origin: project_id.zip(version_id).map(

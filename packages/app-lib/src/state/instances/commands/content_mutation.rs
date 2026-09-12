@@ -2,7 +2,7 @@ use super::apply_content_install::{
     ContentScope, require_stopped_for_content, upsert_entry_for_file,
 };
 use crate::state::content_store::{
-    BlobLease, ContentProjectionStatus, FileContent, content_file_path, input,
+    FileContent, InstanceFileStatus, StoredFileHandle, content_file_path, input,
 };
 use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use crate::state::instances::{ContentSourceKind, InstanceFile};
@@ -23,7 +23,7 @@ pub(crate) struct ContentOrigin<'a> {
 
 pub(crate) struct InstallContent<'a> {
     pub requested_path: &'a str,
-    pub blob: &'a BlobLease,
+    pub stored_file: &'a StoredFileHandle,
     pub project_type: ProjectType,
     pub source_kind: ContentSourceKind,
     pub origin: Option<ContentOrigin<'a>>,
@@ -31,7 +31,7 @@ pub(crate) struct InstallContent<'a> {
     pub previous_path: Option<&'a str>,
 }
 
-pub(super) enum ContentMutation<'a> {
+pub(super) enum ContentChange<'a> {
     Install(InstallContent<'a>),
     Toggle {
         project_path: &'a str,
@@ -45,7 +45,7 @@ pub(super) enum ContentMutation<'a> {
     },
 }
 
-pub(super) enum ContentMutationResult {
+pub(super) enum ContentChangeResult {
     File(InstanceFile),
     Removed,
     Deferred { reason: String },
@@ -56,7 +56,7 @@ enum PreparedChange {
         relative_path: String,
         rename_from: Option<String>,
         enabled: bool,
-        blob: BlobLease,
+        stored_file: StoredFileHandle,
         project_type: ProjectType,
         source_kind: ContentSourceKind,
         origin: Option<(String, String)>,
@@ -84,12 +84,12 @@ fn adoption_can_be_deferred(error: &crate::Error) -> bool {
     )
 }
 
-struct PreparedMutation {
-    projection: crate::state::content_store::PreparedProjection,
+struct PendingContentChange {
+    file_change: crate::state::content_store::PendingFileChange,
     change: PreparedChange,
 }
 
-pub(super) struct ContentMutationExecutor<'a> {
+pub(super) struct InstanceContent<'a> {
     state: &'a State,
     instance: crate::state::Instance,
     content_set_id: Option<String>,
@@ -97,7 +97,7 @@ pub(super) struct ContentMutationExecutor<'a> {
     _store_lock: MutexGuard<'a, ()>,
 }
 
-impl<'a> ContentMutationExecutor<'a> {
+impl<'a> InstanceContent<'a> {
     pub(super) async fn lock(
         instance_id: &str,
         state: &'a State,
@@ -135,47 +135,47 @@ impl<'a> ContentMutationExecutor<'a> {
         })
     }
 
-    pub(super) async fn execute(
+    pub(super) async fn apply_change(
         &self,
-        request: ContentMutation<'_>,
-    ) -> crate::Result<ContentMutationResult> {
-        let adopting = matches!(&request, ContentMutation::Adopt { .. });
+        request: ContentChange<'_>,
+    ) -> crate::Result<ContentChangeResult> {
+        let adopting = matches!(&request, ContentChange::Adopt { .. });
         let mut prepared = match request {
-            ContentMutation::Adopt { file } => {
+            ContentChange::Adopt { file } => {
                 match self.prepare_adopt(file).await {
                     Ok(Some(prepared)) => prepared,
-                    Ok(None) => return Ok(ContentMutationResult::Deferred {
+                    Ok(None) => return Ok(ContentChangeResult::Deferred {
                         reason:
                             "Content links are unavailable in this directory"
                                 .to_string(),
                     }),
                     Err(error) if adoption_can_be_deferred(&error) => {
-                        return Ok(ContentMutationResult::Deferred {
+                        return Ok(ContentChangeResult::Deferred {
                             reason: error.to_string(),
                         });
                     }
                     Err(error) => return Err(error),
                 }
             }
-            ContentMutation::Install(request) => {
+            ContentChange::Install(request) => {
                 self.prepare_install(request).await?
             }
-            ContentMutation::Toggle {
+            ContentChange::Toggle {
                 project_path,
                 desired_enabled,
             } => self.prepare_toggle(project_path, desired_enabled).await?,
-            ContentMutation::Remove { project_path } => {
+            ContentChange::Remove { project_path } => {
                 self.prepare_remove(project_path).await?
             }
         };
         if let Err(error) =
-            prepared.projection.apply(&self.state.content_store).await
+            prepared.file_change.apply(&self.state.content_store).await
         {
             if adopting
-                && prepared.projection.safe_to_defer
+                && prepared.file_change.safe_to_defer
                 && adoption_can_be_deferred(&error)
             {
-                return Ok(ContentMutationResult::Deferred {
+                return Ok(ContentChangeResult::Deferred {
                     reason: error.to_string(),
                 });
             }
@@ -185,7 +185,7 @@ impl<'a> ContentMutationExecutor<'a> {
             Ok(output) => output,
             Err(error) => {
                 prepared
-                    .projection
+                    .file_change
                     .rollback(&self.state.content_store)
                     .await?;
                 return Err(error);
@@ -198,7 +198,7 @@ impl<'a> ContentMutationExecutor<'a> {
             origin,
             ..
         } = &prepared.change
-            && let ContentMutationResult::File(file) = &output
+            && let ContentChangeResult::File(file) = &output
         {
             self.cache_install(file, *project_type, origin.as_ref())
                 .await?;
@@ -209,7 +209,7 @@ impl<'a> ContentMutationExecutor<'a> {
     async fn prepare_install(
         &self,
         request: InstallContent<'_>,
-    ) -> crate::Result<PreparedMutation> {
+    ) -> crate::Result<PendingContentChange> {
         self.content_scope()?;
         require_stopped_for_content(
             &self.instance.id,
@@ -222,17 +222,22 @@ impl<'a> ContentMutationExecutor<'a> {
             return Err(input("Unsupported content destination"));
         }
         let previous_path = request.previous_path.map(canonical_content_path);
-		for file in content_rows::get_instance_files(&self.instance.id, &self.state.pool).await? {
-			let registered = canonical_content_path(&file.relative_path);
-			if registered != relative_path
-				&& registered.eq_ignore_ascii_case(relative_path)
-				&& Some(registered) != previous_path
-			{
-				return Err(input(format!(
-					"Content destination {relative_path} differs only in case from the registered file {registered}; rename or remove that file first",
-				)));
-			}
-		}
+        for file in content_rows::get_instance_files(
+            &self.instance.id,
+            &self.state.pool,
+        )
+        .await?
+        {
+            let registered = canonical_content_path(&file.relative_path);
+            if registered != relative_path
+                && registered.eq_ignore_ascii_case(relative_path)
+                && Some(registered) != previous_path
+            {
+                return Err(input(format!(
+                    "Content destination {relative_path} differs only in case from the registered file {registered}; rename or remove that file first",
+                )));
+            }
+        }
         let lookup_path = previous_path.unwrap_or(relative_path);
         let existing = content_rows::get_instance_file_by_relative_path(
             &self.instance.id,
@@ -281,13 +286,13 @@ impl<'a> ContentMutationExecutor<'a> {
             } else {
                 None
             };
-        let projection = self
+        let file_change = self
             .state
             .content_store
-            .prepare(
+            .prepare_file_change(
                 &self.instance,
                 relative_path,
-                Some(request.blob),
+                Some(request.stored_file),
                 enabled,
                 legacy_path,
                 None,
@@ -298,13 +303,13 @@ impl<'a> ContentMutationExecutor<'a> {
             .map(|file| file.relative_path.as_str())
             .filter(|path| *path != relative_path)
             .map(str::to_string);
-        Ok(PreparedMutation {
-            projection,
+        Ok(PendingContentChange {
+            file_change,
             change: PreparedChange::Install {
                 relative_path: relative_path.to_string(),
                 rename_from,
                 enabled,
-                blob: request.blob.clone(),
+                stored_file: request.stored_file.clone(),
                 project_type: request.project_type,
                 source_kind: request.source_kind,
                 origin: request.origin.map(|origin| {
@@ -321,7 +326,7 @@ impl<'a> ContentMutationExecutor<'a> {
         &self,
         project_path: &str,
         desired_enabled: Option<bool>,
-    ) -> crate::Result<PreparedMutation> {
+    ) -> crate::Result<PendingContentChange> {
         self.content_scope()?;
         let canonical_path = canonical_content_path(project_path);
         let file = content_rows::get_instance_file_by_relative_path(
@@ -345,29 +350,26 @@ impl<'a> ContentMutationExecutor<'a> {
         )
         .await?;
         let enabled = desired_enabled.unwrap_or(!file.enabled);
-        let projection = match self
+        let file_change = match self
             .state
             .content_store
             .file_content(&file)
             .await?
         {
-            FileContent::Stored(blob) => {
-                let binding = crate::state::content_store::catalog::binding(
-                    &self.state.pool,
-                    &file.id,
-                )
-                .await?
-                .ok_or_else(|| input("Content binding disappeared"))?;
+            FileContent::Stored {
+                storage: binding,
+                stored_file,
+            } => {
                 match self
                     .state
                     .content_store
-                    .inspect_projection(&self.instance, &file, &binding)
+                    .check_instance_file(&self.instance, &file, &binding)
                     .await?
                 {
-                    ContentProjectionStatus::Healthy => {
+                    InstanceFileStatus::Healthy => {
                         self.state
                             .content_store
-                            .prepare_move(
+                            .prepare_file_move(
                                 &self.instance,
                                 &file,
                                 &binding,
@@ -375,20 +377,20 @@ impl<'a> ContentMutationExecutor<'a> {
                             )
                             .await?
                     }
-                    ContentProjectionStatus::Missing => {
+                    InstanceFileStatus::Missing => {
                         self.state
                             .content_store
-                            .prepare(
+                            .prepare_file_change(
                                 &self.instance,
                                 canonical_path,
-                                Some(&blob),
+                                Some(&stored_file),
                                 enabled,
                                 None,
                                 None,
                             )
                             .await?
                     }
-                    ContentProjectionStatus::Conflict => {
+                    InstanceFileStatus::Conflict => {
                         return Err(input(
                             "Content was changed outside the app; resolve the conflict first",
                         ));
@@ -398,7 +400,7 @@ impl<'a> ContentMutationExecutor<'a> {
             FileContent::Damaged(binding) if !enabled => {
                 self.state
                     .content_store
-                    .prepare_move(&self.instance, &file, &binding, false)
+                    .prepare_file_move(&self.instance, &file, &binding, false)
                     .await?
             }
             FileContent::Damaged(_) => {
@@ -416,22 +418,23 @@ impl<'a> ContentMutationExecutor<'a> {
                 if fs::symlink_metadata(&path).await?.file_type().is_symlink() {
                     return Err(input("Cannot adopt an external symlink"));
                 }
-                let blob = self.state.content_store.ingest_file(&path).await?;
+                let stored_file =
+                    self.state.content_store.store_file(&path).await?;
                 self.state
                     .content_store
-                    .prepare(
+                    .prepare_file_change(
                         &self.instance,
                         canonical_path,
-                        Some(&blob),
+                        Some(&stored_file),
                         enabled,
                         Some(&physical_path),
-                        Some(&blob),
+                        Some(&stored_file),
                     )
                     .await?
             }
         };
-        Ok(PreparedMutation {
-            projection,
+        Ok(PendingContentChange {
+            file_change,
             change: PreparedChange::Toggle { file, enabled },
         })
     }
@@ -439,7 +442,7 @@ impl<'a> ContentMutationExecutor<'a> {
     async fn prepare_remove(
         &self,
         project_path: &str,
-    ) -> crate::Result<PreparedMutation> {
+    ) -> crate::Result<PendingContentChange> {
         self.content_scope()?;
         let relative_path = canonical_content_path(project_path);
         let project_type = ProjectType::get_from_parent_folder(relative_path)
@@ -457,10 +460,10 @@ impl<'a> ContentMutationExecutor<'a> {
         )
         .await?;
         let legacy_path = file.is_none().then_some(project_path);
-        let projection = self
+        let file_change = self
             .state
             .content_store
-            .prepare(
+            .prepare_file_change(
                 &self.instance,
                 relative_path,
                 None,
@@ -469,8 +472,8 @@ impl<'a> ContentMutationExecutor<'a> {
                 None,
             )
             .await?;
-        Ok(PreparedMutation {
-            projection,
+        Ok(PendingContentChange {
+            file_change,
             change: PreparedChange::Remove {
                 relative_path: relative_path.to_string(),
                 file,
@@ -481,7 +484,7 @@ impl<'a> ContentMutationExecutor<'a> {
     async fn prepare_adopt(
         &self,
         file: &InstanceFile,
-    ) -> crate::Result<Option<PreparedMutation>> {
+    ) -> crate::Result<Option<PendingContentChange>> {
         let canonical = canonical_content_path(&file.relative_path);
         if !crate::state::content_store::eligible(canonical) {
             return Err(input("Unsupported managed content path"));
@@ -506,7 +509,8 @@ impl<'a> ContentMutationExecutor<'a> {
         {
             return Ok(None);
         }
-        let blob = self.state.content_store.ingest_file(&source_path).await?;
+        let stored_file =
+            self.state.content_store.store_file(&source_path).await?;
         let enabled = file.enabled && canonical == file.relative_path;
         let canonical_record =
             content_rows::get_instance_file_by_relative_path(
@@ -533,16 +537,16 @@ impl<'a> ContentMutationExecutor<'a> {
                 "Both enabled and disabled records exist for {canonical}; preserve both files and resolve the duplicate first"
             )));
         }
-        let projection = self
+        let file_change = self
             .state
             .content_store
-            .prepare(
+            .prepare_file_change(
                 &self.instance,
                 canonical,
-                Some(&blob),
+                Some(&stored_file),
                 enabled,
                 Some(&file.relative_path),
-                Some(&blob),
+                Some(&stored_file),
             )
             .await?;
         let mut adopted = source_record
@@ -551,14 +555,14 @@ impl<'a> ContentMutationExecutor<'a> {
         adopted.relative_path = canonical.to_string();
         adopted.file_name = canonical_file_name(canonical)?.to_string();
         adopted.enabled = enabled;
-        adopted.sha1 = blob.blob.sha1.clone();
-        adopted.size = blob.blob.size as u64;
+        adopted.sha1 = stored_file.metadata.sha1.clone();
+        adopted.size = stored_file.metadata.size as u64;
         adopted.missing = false;
         adopted.modified_at = Utc::now();
         let rename_from = (file.relative_path != canonical)
             .then(|| file.relative_path.clone());
-        Ok(Some(PreparedMutation {
-            projection,
+        Ok(Some(PendingContentChange {
+            file_change,
             change: PreparedChange::Adopt {
                 file: adopted,
                 rename_from,
@@ -568,8 +572,8 @@ impl<'a> ContentMutationExecutor<'a> {
 
     async fn commit(
         &self,
-        prepared: &PreparedMutation,
-    ) -> crate::Result<ContentMutationResult> {
+        prepared: &PendingContentChange,
+    ) -> crate::Result<ContentChangeResult> {
         let mut tx = self.state.pool.begin().await?;
         let content_scope = match &prepared.change {
             PreparedChange::Adopt { .. } => None,
@@ -580,7 +584,7 @@ impl<'a> ContentMutationExecutor<'a> {
                 relative_path,
                 rename_from,
                 enabled,
-                blob,
+                stored_file,
                 project_type,
                 source_kind,
                 origin,
@@ -604,8 +608,8 @@ impl<'a> ContentMutationExecutor<'a> {
                         relative_path,
                         file_name,
                         enabled: *enabled,
-                        sha1: &blob.blob.sha1,
-                        size: blob.blob.size as u64,
+                        sha1: &stored_file.metadata.sha1,
+                        size: stored_file.metadata.size as u64,
                         missing: false,
                     },
                     &mut tx,
@@ -623,8 +627,8 @@ impl<'a> ContentMutationExecutor<'a> {
                     &mut tx,
                 )
                 .await?;
-                prepared.projection.commit(&mut tx, Some(&file.id)).await?;
-                ContentMutationResult::File(file)
+                prepared.file_change.commit(&mut tx, Some(&file.id)).await?;
+                ContentChangeResult::File(file)
             }
             PreparedChange::Toggle { file, enabled } => {
                 let mut updated = file.clone();
@@ -645,10 +649,10 @@ impl<'a> ContentMutationExecutor<'a> {
                 )
                 .await?;
                 prepared
-                    .projection
+                    .file_change
                     .commit(&mut tx, Some(&updated.id))
                     .await?;
-                ContentMutationResult::File(updated)
+                ContentChangeResult::File(updated)
             }
             PreparedChange::Remove {
                 relative_path,
@@ -671,8 +675,8 @@ impl<'a> ContentMutationExecutor<'a> {
                     )
                     .await?;
                 }
-                prepared.projection.commit(&mut tx, None).await?;
-                ContentMutationResult::Removed
+                prepared.file_change.commit(&mut tx, None).await?;
+                ContentChangeResult::Removed
             }
             PreparedChange::Adopt { file, rename_from } => {
                 if let Some(rename_from) = rename_from {
@@ -698,10 +702,10 @@ impl<'a> ContentMutationExecutor<'a> {
                     .await?;
                 }
                 prepared
-                    .projection
+                    .file_change
                     .commit(&mut tx, Some(&adopted.id))
                     .await?;
-                ContentMutationResult::File(adopted)
+                ContentChangeResult::File(adopted)
             }
         };
         tx.commit().await?;
@@ -739,14 +743,17 @@ impl<'a> ContentMutationExecutor<'a> {
     }
 }
 
-pub(crate) async fn install_content_blob(
+pub(crate) async fn install_stored_file(
     instance_id: &str,
     request: InstallContent<'_>,
     state: &State,
 ) -> crate::Result<String> {
-    let executor = ContentMutationExecutor::lock(instance_id, state).await?;
-    match executor.execute(ContentMutation::Install(request)).await? {
-        ContentMutationResult::File(file) => Ok(file.relative_path),
+    let instance_content = InstanceContent::lock(instance_id, state).await?;
+    match instance_content
+        .apply_change(ContentChange::Install(request))
+        .await?
+    {
+        ContentChangeResult::File(file) => Ok(file.relative_path),
         _ => unreachable!("install mutations return a content path"),
     }
 }
@@ -757,15 +764,15 @@ pub(crate) async fn toggle_disable_project(
     desired_enabled: Option<bool>,
     state: &State,
 ) -> crate::Result<String> {
-    let executor = ContentMutationExecutor::lock(instance_id, state).await?;
-    match executor
-        .execute(ContentMutation::Toggle {
+    let instance_content = InstanceContent::lock(instance_id, state).await?;
+    match instance_content
+        .apply_change(ContentChange::Toggle {
             project_path,
             desired_enabled,
         })
         .await?
     {
-        ContentMutationResult::File(file) => Ok(file.relative_path),
+        ContentChangeResult::File(file) => Ok(file.relative_path),
         _ => unreachable!("toggle mutations return a content path"),
     }
 }
@@ -775,12 +782,12 @@ pub(crate) async fn remove_project(
     project_path: &str,
     state: &State,
 ) -> crate::Result<()> {
-    let executor = ContentMutationExecutor::lock(instance_id, state).await?;
-    match executor
-        .execute(ContentMutation::Remove { project_path })
+    let instance_content = InstanceContent::lock(instance_id, state).await?;
+    match instance_content
+        .apply_change(ContentChange::Remove { project_path })
         .await?
     {
-        ContentMutationResult::Removed => Ok(()),
+        ContentChangeResult::Removed => Ok(()),
         _ => unreachable!("remove mutations return no content"),
     }
 }

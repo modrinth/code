@@ -6,8 +6,7 @@ mod runtime;
 
 pub use maintenance::{StoreUsage, StoreVerification};
 pub(crate) use operations::{
-    ContentProjectionStatus, PreparedProjection, content_file_path,
-    materialized_content_path,
+    InstanceFileStatus, PendingFileChange, content_file_path, file_path_on_disk,
 };
 
 use crate::state::{DirectoryInfo, InstanceFile, file_modified_at_ns};
@@ -25,32 +24,32 @@ use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::sync::{Mutex, OwnedRwLockReadGuard, RwLock};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub(crate) struct Blob {
+pub(crate) struct StoredFile {
     pub sha512: String,
     pub sha1: String,
     pub size: i64,
     pub relative_path: String,
-    pub status: BlobStatus,
+    pub status: StoredFileStatus,
     pub modified_at_ns: i64,
     pub last_used_at: i64,
     pub sources: String,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub(crate) struct Binding {
+pub(crate) struct InstanceFileStorage {
     pub file_id: String,
     pub blob_sha512: String,
-    pub materialization_kind: MaterializationKind,
+    pub materialization_kind: InstanceFileKind,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
-pub(crate) enum MaterializationKind {
+pub(crate) enum InstanceFileKind {
     Symlink,
     Copy,
 }
 
-impl MaterializationKind {
+impl InstanceFileKind {
     pub(crate) const fn as_str(self) -> &'static str {
         match self {
             Self::Symlink => "symlink",
@@ -69,13 +68,13 @@ impl MaterializationKind {
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
-pub(crate) enum BlobStatus {
+pub(crate) enum StoredFileStatus {
     Ready,
     Quarantined,
     Deleting,
 }
 
-impl BlobStatus {
+impl StoredFileStatus {
     pub(crate) const fn as_str(self) -> &'static str {
         match self {
             Self::Ready => "ready",
@@ -94,16 +93,18 @@ impl BlobStatus {
     }
 }
 
+/// A healthy stored file. Keeping this handle alive prevents cache cleanup.
 #[derive(Clone, Debug)]
-pub(crate) struct BlobLease {
-    pub blob: Blob,
+pub(crate) struct StoredFileHandle {
+    pub metadata: StoredFile,
     pub path: PathBuf,
     _guard: Arc<OwnedRwLockReadGuard<()>>,
 }
 
+/// A stored-file record for recovery. Its bytes may be missing or damaged.
 #[derive(Clone, Debug)]
-pub(crate) struct CatalogBlob {
-    pub blob: Blob,
+pub(crate) struct StoredFileRecord {
+    pub metadata: StoredFile,
     pub path: PathBuf,
     _guard: Arc<OwnedRwLockReadGuard<()>>,
 }
@@ -111,27 +112,30 @@ pub(crate) struct CatalogBlob {
 #[derive(Clone, Debug)]
 pub(crate) enum FileContent {
     Unmanaged,
-    Stored(BlobLease),
-    Damaged(Binding),
+    Stored {
+        storage: InstanceFileStorage,
+        stored_file: StoredFileHandle,
+    },
+    Damaged(InstanceFileStorage),
 }
 
 #[derive(Clone, Debug)]
 pub(crate) enum ReadableContent {
     Local(PathBuf),
-    Stored(BlobLease),
+    Stored(StoredFileHandle),
 }
 
 impl ReadableContent {
     pub(crate) fn path(&self) -> &Path {
         match self {
             Self::Local(path) => path,
-            Self::Stored(blob) => &blob.path,
+            Self::Stored(stored_file) => &stored_file.path,
         }
     }
 }
 
-pub(crate) struct AcquireResult {
-    pub blob: BlobLease,
+pub(crate) struct GetFileResult {
+    pub stored_file: StoredFileHandle,
     pub reused: bool,
 }
 
@@ -141,7 +145,7 @@ pub struct ContentStore {
     pub(crate) profiles: PathBuf,
     pub(crate) pool: SqlitePool,
     gate: Arc<RwLock<()>>,
-	pub(crate) runtime_gate: RwLock<()>,
+    pub(crate) runtime_gate: RwLock<()>,
     acquisitions: [Mutex<()>; 64],
     publications: [Mutex<()>; 64],
     pub(crate) files_lock: Mutex<()>,
@@ -192,7 +196,7 @@ impl ContentStore {
             profiles: fs::canonicalize(dirs.instances_dir()).await?,
             pool,
             gate: Arc::new(RwLock::new(())),
-			runtime_gate: RwLock::new(()),
+            runtime_gate: RwLock::new(()),
             acquisitions: std::array::from_fn(|_| Mutex::new(())),
             publications: std::array::from_fn(|_| Mutex::new(())),
             files_lock: Mutex::new(()),
@@ -219,19 +223,22 @@ impl ContentStore {
         &self.publications[hasher.finish() as usize % self.publications.len()]
     }
 
-    fn path(&self, blob: &Blob) -> crate::Result<PathBuf> {
-        validate_digest(&blob.sha512, 128)?;
-        let prefix =
-            format!("objects/sha512/{}/{}/", &blob.sha512[..2], blob.sha512);
-        if !blob.relative_path.starts_with(&prefix)
+    fn path(&self, stored_file: &StoredFile) -> crate::Result<PathBuf> {
+        validate_digest(&stored_file.sha512, 128)?;
+        let prefix = format!(
+            "objects/sha512/{}/{}/",
+            &stored_file.sha512[..2],
+            stored_file.sha512
+        );
+        if !stored_file.relative_path.starts_with(&prefix)
             || !matches!(
-                blob.relative_path.strip_prefix(&prefix),
+                stored_file.relative_path.strip_prefix(&prefix),
                 Some("payload.jar" | "payload.bin")
             )
         {
             return Err(input("Invalid content store object path"));
         }
-        Ok(self.root.join(&blob.relative_path))
+        Ok(self.root.join(&stored_file.relative_path))
     }
 
     pub(crate) async fn lookup(
@@ -239,7 +246,7 @@ impl ContentStore {
         sha512: Option<&str>,
         sha1: Option<&str>,
         size: Option<u64>,
-    ) -> crate::Result<Option<BlobLease>> {
+    ) -> crate::Result<Option<StoredFileHandle>> {
         if let Some(hash) = sha512 {
             validate_digest(hash, 128)?;
         }
@@ -256,79 +263,82 @@ impl ContentStore {
         sha1: Option<&str>,
         size: Option<u64>,
         guard: Arc<OwnedRwLockReadGuard<()>>,
-    ) -> crate::Result<Option<BlobLease>> {
-        let candidates = catalog::find(&self.pool, sha512, sha1)
+    ) -> crate::Result<Option<StoredFileHandle>> {
+        let candidates = catalog::find_files(&self.pool, sha512, sha1)
             .await?
             .into_iter()
-            .filter(|blob| sha1.is_none_or(|expected| blob.sha1 == expected))
-            .filter(|blob| {
+            .filter(|stored_file| {
+                sha1.is_none_or(|expected| stored_file.sha1 == expected)
+            })
+            .filter(|stored_file| {
                 sha512.is_some()
-                    || size.is_none_or(|size| blob.size as u64 == size)
+                    || size.is_none_or(|size| stored_file.size as u64 == size)
             })
             .collect::<Vec<_>>();
         if candidates.len() != 1 {
             return Ok(None);
         }
-        let blob = candidates
+        let stored_file = candidates
             .into_iter()
             .next()
             .ok_or_else(|| input("Missing content object"))?;
-        if !self.is_healthy(&blob, false).await? {
+        if !self.is_healthy(&stored_file, false).await? {
             return Ok(None);
         }
         if let Some(expected_size) = size
-            && expected_size != blob.size as u64
+            && expected_size != stored_file.size as u64
         {
             tracing::warn!(
                 expected_size,
-                actual_size = blob.size,
-                sha512 = %blob.sha512,
+                actual_size = stored_file.size,
+                sha512 = %stored_file.sha512,
                 "Cached content matches SHA-512 but differs from the declared size; using its actual size"
             );
         }
-        catalog::touch(&self.pool, &blob.sha512).await?;
-        Ok(Some(BlobLease {
-            path: self.path(&blob)?,
-            blob,
+        catalog::mark_file_used(&self.pool, &stored_file.sha512).await?;
+        Ok(Some(StoredFileHandle {
+            path: self.path(&stored_file)?,
+            metadata: stored_file,
             _guard: guard,
         }))
     }
 
     pub(crate) async fn is_healthy(
         &self,
-        blob: &Blob,
+        stored_file: &StoredFile,
         verify: bool,
     ) -> crate::Result<bool> {
-		self.is_healthy_with_progress(blob, verify, &|_| {}).await
-	}
+        self.is_healthy_with_progress(stored_file, verify, &|_| {})
+            .await
+    }
 
-	pub(crate) async fn is_healthy_with_progress(
-		&self,
-		blob: &Blob,
-		verify: bool,
-		on_read: &(dyn Fn(u64) + Send + Sync),
-	) -> crate::Result<bool> {
-        if blob.status != BlobStatus::Ready && !verify {
+    pub(crate) async fn is_healthy_with_progress(
+        &self,
+        stored_file: &StoredFile,
+        verify: bool,
+        on_read: &(dyn Fn(u64) + Send + Sync),
+    ) -> crate::Result<bool> {
+        if stored_file.status != StoredFileStatus::Ready && !verify {
             return Ok(false);
         }
-        let path = self.path(blob)?;
+        let path = self.path(stored_file)?;
         self.validate_object_parent(&path).await?;
         let metadata = match fs::symlink_metadata(&path).await {
             Ok(metadata) if metadata.is_file() => metadata,
             Ok(_) => {
-                catalog::set_status(
+                catalog::set_file_status(
                     &self.pool,
-                    &blob.sha512,
-                    BlobStatus::Quarantined,
+                    &stored_file.sha512,
+                    StoredFileStatus::Quarantined,
                 )
                 .await?;
                 return Ok(false);
             }
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
-                catalog::set_status(
+                catalog::set_file_status(
                     &self.pool,
-                    &blob.sha512,
-                    BlobStatus::Quarantined,
+                    &stored_file.sha512,
+                    StoredFileStatus::Quarantined,
                 )
                 .await?;
                 return Ok(false);
@@ -337,31 +347,31 @@ impl ContentStore {
         };
         let modified_at_ns = file_modified_at_ns(&metadata)? as i64;
         if !verify
-            && metadata.len() == blob.size as u64
-            && modified_at_ns == blob.modified_at_ns
+            && metadata.len() == stored_file.size as u64
+            && modified_at_ns == stored_file.modified_at_ns
         {
             return Ok(true);
         }
         let hashes = hash_file_with_progress(&path, on_read).await?;
-        if hashes.0 != blob.sha512
-            || hashes.1 != blob.sha1
-            || hashes.2 != blob.size as u64
+        if hashes.0 != stored_file.sha512
+            || hashes.1 != stored_file.sha1
+            || hashes.2 != stored_file.size as u64
         {
-            catalog::set_status(
+            catalog::set_file_status(
                 &self.pool,
-                &blob.sha512,
-                BlobStatus::Quarantined,
+                &stored_file.sha512,
+                StoredFileStatus::Quarantined,
             )
             .await?;
             return Ok(false);
         }
-        let mut verified = blob.clone();
+        let mut verified = stored_file.clone();
         verified.modified_at_ns = modified_at_ns;
-        catalog::put(&self.pool, &verified).await?;
+        catalog::save_file(&self.pool, &verified).await?;
         Ok(true)
     }
 
-    pub(crate) async fn acquire(
+    pub(crate) async fn get_or_download_file(
         &self,
         mirrors: &[&str],
         sha512: Option<&str>,
@@ -370,7 +380,7 @@ impl ContentStore {
         download_meta: Option<&DownloadMeta>,
         semaphore: &FetchSemaphore,
         progress: Option<&mut FetchProgressFn<'_>>,
-    ) -> crate::Result<AcquireResult> {
+    ) -> crate::Result<GetFileResult> {
         let key = sha512
             .map(|hash| format!("sha512:{hash}"))
             .or_else(|| sha1.map(|hash| format!("sha1:{hash}")));
@@ -379,8 +389,11 @@ impl ContentStore {
         } else {
             None
         };
-        if let Some(blob) = self.lookup(sha512, sha1, size).await? {
-            return Ok(AcquireResult { blob, reused: true });
+        if let Some(stored_file) = self.lookup(sha512, sha1, size).await? {
+            return Ok(GetFileResult {
+                stored_file,
+                reused: true,
+            });
         }
         let download = fetch::fetch_file_mirrors_in(
             mirrors,
@@ -428,39 +441,39 @@ impl ContentStore {
                 .then(|| source.to_string())
             })
             .collect::<Vec<_>>();
-        let blob = self
-            .publish_staged(download.into_staged()?, &sources)
+        let stored_file = self
+            .save_staged_file(download.into_staged()?, &sources)
             .await?;
-        Ok(AcquireResult {
-            blob,
+        Ok(GetFileResult {
+            stored_file,
             reused: false,
         })
     }
 
-    pub(crate) async fn ingest_file(
+    pub(crate) async fn store_file(
         &self,
         source: &Path,
-    ) -> crate::Result<BlobLease> {
-        self.ingest_file_with_sources(source, &[]).await
+    ) -> crate::Result<StoredFileHandle> {
+        self.store_file_with_sources(source, &[]).await
     }
 
-    async fn ingest_file_with_sources(
+    async fn store_file_with_sources(
         &self,
         source: &Path,
         sources: &[String],
-    ) -> crate::Result<BlobLease> {
-        if let Some(blob) = self.owned_path(source).await? {
-            return Ok(blob);
+    ) -> crate::Result<StoredFileHandle> {
+        if let Some(stored_file) = self.find_file_by_path(source).await? {
+            return Ok(stored_file);
         }
         let (sha512, sha1, size) = hash_file(source).await?;
-        if let Some(blob) =
+        if let Some(stored_file) =
             self.lookup(Some(&sha512), Some(&sha1), Some(size)).await?
         {
-            return Ok(blob);
+            return Ok(stored_file);
         }
         self.require_staging_space(size)?;
         let staged = self.stage_file(source).await?;
-        self.publish_staged(staged, sources).await
+        self.save_staged_file(staged, sources).await
     }
 
     pub(crate) fn require_staging_space(&self, size: u64) -> crate::Result<()> {
@@ -526,11 +539,11 @@ impl ContentStore {
         })
     }
 
-    pub(super) async fn publish_staged(
+    pub(super) async fn save_staged_file(
         &self,
         staged: fetch::StagedDownload,
         sources: &[String],
-    ) -> crate::Result<BlobLease> {
+    ) -> crate::Result<StoredFileHandle> {
         if staged.path.parent() != Some(self.staging.as_path()) {
             return Err(input("Content was not staged in the shared store"));
         }
@@ -584,33 +597,33 @@ impl ContentStore {
         permissions.set_readonly(true);
         fs::set_permissions(&destination, permissions).await?;
         sync_directory(parent).await?;
-        let blob = Blob {
+        let stored_file = StoredFile {
             sha512: hash,
             sha1,
             size: size
                 .try_into()
                 .map_err(|_| input("Content file is too large"))?,
             relative_path,
-            status: BlobStatus::Ready,
+            status: StoredFileStatus::Ready,
             modified_at_ns: file_modified_at_ns(
                 &fs::metadata(&destination).await?,
             )? as i64,
             last_used_at: chrono::Utc::now().timestamp(),
             sources: serde_json::to_string(sources)?,
         };
-        catalog::put(&self.pool, &blob).await?;
-        Ok(BlobLease {
-            blob,
+        catalog::save_file(&self.pool, &stored_file).await?;
+        Ok(StoredFileHandle {
+            metadata: stored_file,
             path: destination,
             _guard: guard,
         })
     }
 
-    pub(crate) async fn ingest_bytes(
+    pub(crate) async fn store_bytes(
         &self,
         bytes: &[u8],
         expected_sha1: Option<&str>,
-    ) -> crate::Result<BlobLease> {
+    ) -> crate::Result<StoredFileHandle> {
         let sha1 = sha1_smol::Sha1::from(bytes).hexdigest();
         if let Some(expected) = expected_sha1 {
             validate_digest(expected, 40)?;
@@ -625,7 +638,7 @@ impl ContentStore {
         file.write_all(bytes).await?;
         file.sync_all().await?;
         drop(file);
-        self.publish_staged(
+        self.save_staged_file(
             fetch::StagedDownload {
                 path: temporary,
                 size: bytes.len() as u64,
@@ -647,10 +660,10 @@ impl ContentStore {
         .await??)
     }
 
-    pub(crate) async fn owned_path(
+    pub(crate) async fn find_file_by_path(
         &self,
         path: &Path,
-    ) -> crate::Result<Option<BlobLease>> {
+    ) -> crate::Result<Option<StoredFileHandle>> {
         let canonical = match fs::canonicalize(path).await {
             Ok(path) => path,
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
@@ -673,25 +686,29 @@ impl ContentStore {
         {
             return Ok(None);
         }
-        let Some(blob) = self.lookup(Some(hash), None, None).await? else {
+        let Some(stored_file) = self.lookup(Some(hash), None, None).await?
+        else {
             return Ok(None);
         };
-        Ok((blob.path == canonical).then_some(blob))
+        Ok((stored_file.path == canonical).then_some(stored_file))
     }
 
     pub(crate) async fn file_content(
         &self,
         file: &InstanceFile,
     ) -> crate::Result<FileContent> {
-        let Some(binding) = catalog::binding(&self.pool, &file.id).await?
+        let Some(binding) = catalog::file_storage(&self.pool, &file.id).await?
         else {
             return Ok(FileContent::Unmanaged);
         };
-        let blob = self
+        let stored_file = self
             .lookup(Some(&binding.blob_sha512), None, Some(file.size))
             .await?;
-        Ok(match blob {
-            Some(blob) => FileContent::Stored(blob),
+        Ok(match stored_file {
+            Some(stored_file) => FileContent::Stored {
+                storage: binding,
+                stored_file,
+            },
             None => FileContent::Damaged(binding),
         })
     }
@@ -702,8 +719,8 @@ impl ContentStore {
         instance_path: &str,
     ) -> crate::Result<ReadableContent> {
         match self.file_content(file).await? {
-            FileContent::Stored(blob) => {
-                return Ok(ReadableContent::Stored(blob));
+            FileContent::Stored { stored_file, .. } => {
+                return Ok(ReadableContent::Stored(stored_file));
             }
             FileContent::Damaged(_) => {
                 return Err(input(format!(
@@ -763,8 +780,8 @@ impl ContentStore {
     ) -> crate::Result<()> {
         let _lease = self.lease().await;
         let mut tx = self.pool.begin().await?;
-        for blob in blobs {
-            catalog::retain(&mut tx, kind, owner, blob).await?;
+        for stored_file in blobs {
+            catalog::retain(&mut tx, kind, owner, stored_file).await?;
         }
         tx.commit().await?;
         Ok(())
@@ -779,29 +796,30 @@ impl ContentStore {
         let _lease = self.lease().await;
         let mut tx = self.pool.begin().await?;
         catalog::release(&mut tx, kind, owner).await?;
-        for blob in blobs {
-            catalog::retain(&mut tx, kind, owner, blob).await?;
+        for stored_file in blobs {
+            catalog::retain(&mut tx, kind, owner, stored_file).await?;
         }
         tx.commit().await?;
         Ok(())
     }
 
-    pub(crate) async fn catalog_blob(
+    pub(crate) async fn get_file_record(
         &self,
         sha512: &str,
-    ) -> crate::Result<Option<CatalogBlob>> {
+    ) -> crate::Result<Option<StoredFileRecord>> {
         let guard = self.lease().await;
-        let Some(blob) = catalog::find(&self.pool, Some(sha512), None)
-            .await?
-            .into_iter()
-            .next()
+        let Some(stored_file) =
+            catalog::find_files(&self.pool, Some(sha512), None)
+                .await?
+                .into_iter()
+                .next()
         else {
             return Ok(None);
         };
-        let path = self.path(&blob)?;
+        let path = self.path(&stored_file)?;
         self.validate_object_parent(&path).await?;
-        Ok(Some(CatalogBlob {
-            blob,
+        Ok(Some(StoredFileRecord {
+            metadata: stored_file,
             path,
             _guard: guard,
         }))
@@ -893,7 +911,7 @@ pub(crate) fn eligible(path: &str) -> bool {
     match parts[0] {
         "mods" => extension.eq_ignore_ascii_case("jar"),
         "resourcepacks" | "shaderpacks" | "datapacks" => {
-			extension.eq_ignore_ascii_case("zip")
+            extension.eq_ignore_ascii_case("zip")
         }
         _ => false,
     }
@@ -902,12 +920,12 @@ pub(crate) fn eligible(path: &str) -> bool {
 pub(crate) async fn hash_file(
     path: &Path,
 ) -> crate::Result<(String, String, u64)> {
-	hash_file_with_progress(path, &|_| {}).await
+    hash_file_with_progress(path, &|_| {}).await
 }
 
 async fn hash_file_with_progress(
-	path: &Path,
-	on_read: &(dyn Fn(u64) + Send + Sync),
+    path: &Path,
+    on_read: &(dyn Fn(u64) + Send + Sync),
 ) -> crate::Result<(String, String, u64)> {
     let mut file = File::open(path).await?;
     let mut sha512 = Sha512::new();
@@ -922,7 +940,7 @@ async fn hash_file_with_progress(
         sha512.update(&buffer[..count]);
         sha1.update(&buffer[..count]);
         size += count as u64;
-		on_read(count as u64);
+        on_read(count as u64);
     }
     Ok((format!("{:x}", sha512.finalize()), sha1.hexdigest(), size))
 }

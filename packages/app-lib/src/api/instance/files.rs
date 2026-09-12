@@ -63,7 +63,8 @@ async fn resolve(
             ));
         }
         let prefix = format!("{}/", path.to_lowercase());
-        let bindings = catalog::bindings(&state.pool, instance_id).await?;
+        let bindings =
+            catalog::instance_storage(&state.pool, instance_id).await?;
         let files =
             content_rows::get_instance_files(instance_id, &state.pool).await?;
         if files.iter().any(|file| {
@@ -101,21 +102,21 @@ async fn resolve(
                 "The content link is not at its registered path",
             ));
         }
-        let FileContent::Stored(blob) =
+        let FileContent::Stored { stored_file, .. } =
             state.content_store.file_content(&file).await?
         else {
             return Err(input("Managed content needs repair"));
         };
         if !state
             .content_store
-            .matches(&destination, &blob.blob.sha512)
+            .instance_file_matches(&destination, &stored_file.metadata.sha512)
             .await?
         {
             return Err(input(
                 "The content link points to an unexpected target",
             ));
         }
-        return Ok(ReadableContent::Stored(blob));
+        return Ok(ReadableContent::Stored(stored_file));
     }
     Ok(ReadableContent::Local(destination))
 }

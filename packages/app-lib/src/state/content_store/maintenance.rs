@@ -1,6 +1,6 @@
 use super::{
-    BlobStatus, ContentProjectionStatus, ContentStore, FileContent,
-    MaterializationKind, catalog, content_file_path, input, sync_directory,
+    ContentStore, FileContent, InstanceFileKind, InstanceFileStatus,
+    StoredFileStatus, catalog, content_file_path, input, sync_directory,
 };
 use crate::State;
 use crate::state::instances::adapters::sqlite::instance_rows;
@@ -35,16 +35,16 @@ pub struct StoreVerification {
 }
 
 impl ContentStore {
-    pub(crate) async fn ingest_local_file(
+    pub(crate) async fn import_file(
         &self,
         source: &std::path::Path,
         state: &State,
-    ) -> crate::Result<super::BlobLease> {
+    ) -> crate::Result<super::StoredFileHandle> {
         let staged = self.stage_file(source).await?;
         let hash = staged.sha512.clone();
         let _files_lock = self.files_lock.lock().await;
-        if let Some(blob) = self.catalog_blob(&hash).await?
-            && !self.is_healthy(&blob.blob, true).await?
+        if let Some(stored_file) = self.get_file_record(&hash).await?
+            && !self.is_healthy(&stored_file.metadata, true).await?
         {
             for instance in instance_rows::list_instances(&self.pool).await? {
                 if crate::state::instance_has_running_process(
@@ -58,11 +58,11 @@ impl ContentStore {
                     ));
                 }
             }
-            if fs::symlink_metadata(&blob.path).await.is_ok() {
+            if fs::symlink_metadata(&stored_file.path).await.is_ok() {
                 let quarantine = self.root.join("quarantine");
                 fs::create_dir_all(&quarantine).await?;
                 fs::rename(
-                    &blob.path,
+                    &stored_file.path,
                     quarantine.join(format!(
                         "{}-{}",
                         hash,
@@ -72,15 +72,15 @@ impl ContentStore {
                 .await?;
             }
         }
-        self.publish_staged(staged, &[]).await
+        self.save_staged_file(staged, &[]).await
     }
 
     pub async fn usage(&self, state: &State) -> crate::Result<StoreUsage> {
         let _lease = self.lease().await;
-		let _runtime_lease = self.runtime_gate.read().await;
-		let runtime = super::runtime::RuntimeStorage::read(state).await?;
-        let blobs = catalog::blobs(&self.pool).await?;
-        let roots = catalog::roots(&self.pool)
+        let _runtime_lease = self.runtime_gate.read().await;
+        let runtime = super::runtime::RuntimeStorage::read(state).await?;
+        let blobs = catalog::stored_files(&self.pool).await?;
+        let roots = catalog::referenced_files(&self.pool)
             .await?
             .into_iter()
             .collect::<HashSet<_>>();
@@ -97,19 +97,21 @@ impl ContentStore {
             .iter()
             .filter(|placement| {
                 placement.materialization_kind
-                    == MaterializationKind::Copy.as_str()
+                    == InstanceFileKind::Copy.as_str()
             })
             .map(|placement| placement.size.max(0) as u64)
             .sum::<u64>();
         let referenced_unique = blobs
             .iter()
-            .filter(|blob| installed.contains(blob.sha512.as_str()))
-            .map(|blob| blob.size as u64)
+            .filter(|stored_file| {
+                installed.contains(stored_file.sha512.as_str())
+            })
+            .map(|stored_file| stored_file.size as u64)
             .sum::<u64>();
         let mut shared_placements = HashMap::new();
         for placement in &placements {
             if placement.materialization_kind
-                == MaterializationKind::Symlink.as_str()
+                == InstanceFileKind::Symlink.as_str()
             {
                 *shared_placements
                     .entry(placement.blob_sha512.as_str())
@@ -117,23 +119,29 @@ impl ContentStore {
             }
         }
         Ok(StoreUsage {
-            unique_bytes: blobs.iter().map(|blob| blob.size as u64).sum::<u64>() + runtime.total_bytes(),
+            unique_bytes: blobs
+                .iter()
+                .map(|stored_file| stored_file.size as u64)
+                .sum::<u64>()
+                + runtime.total_bytes(),
             shared_bytes: blobs
                 .iter()
-                .filter(|blob| {
+                .filter(|stored_file| {
                     shared_placements
-                        .get(blob.sha512.as_str())
+                        .get(stored_file.sha512.as_str())
                         .copied()
                         .unwrap_or(0)
                         > 1
                 })
-                .map(|blob| blob.size as u64)
-                .sum::<u64>() + runtime.shared_bytes(),
+                .map(|stored_file| stored_file.size as u64)
+                .sum::<u64>()
+                + runtime.shared_bytes(),
             unused_cache_bytes: blobs
                 .iter()
-                .filter(|blob| !roots.contains(&blob.sha512))
-                .map(|blob| blob.size as u64)
-                .sum::<u64>() + runtime.unused_bytes(),
+                .filter(|stored_file| !roots.contains(&stored_file.sha512))
+                .map(|stored_file| stored_file.size as u64)
+                .sum::<u64>()
+                + runtime.unused_bytes(),
             estimated_saved_bytes: logical_bytes.saturating_sub(
                 referenced_unique.saturating_add(private_copy_bytes),
             ) + runtime.saved_bytes(),
@@ -141,7 +149,9 @@ impl ContentStore {
             object_count: blobs.len(),
             damaged_objects: blobs
                 .iter()
-                .filter(|blob| blob.status == BlobStatus::Quarantined)
+                .filter(|stored_file| {
+                    stored_file.status == StoredFileStatus::Quarantined
+                })
                 .count(),
             cache_limit_bytes: self.cache_limit().await?,
         })
@@ -168,7 +178,11 @@ impl ContentStore {
     }
 
     /// Removes unreferenced content objects and managed game and Java cache files.
-    pub async fn cleanup(&self, state: &State, purge_unused: bool) -> crate::Result<u64> {
+    pub async fn cleanup(
+        &self,
+        state: &State,
+        purge_unused: bool,
+    ) -> crate::Result<u64> {
         let _exclusive = self.gate.clone().try_write_owned().map_err(|_| input("The shared store is busy; try cleanup again after content operations finish"))?;
         if catalog::setting(&self.pool, "store_layout_version")
             .await?
@@ -179,42 +193,51 @@ impl ContentStore {
                 "Finish shared-store migration before cleaning its cache",
             ));
         }
-		let _runtime_exclusive = self.runtime_gate.try_write()
+        let _runtime_exclusive = self.runtime_gate.try_write()
 			.map_err(|_| input("Game or Java files are in use; try cleanup again after the operation finishes"))?;
-		let runtime = super::runtime::RuntimeStorage::read(state).await?;
-        let roots = catalog::roots(&self.pool)
+        let runtime = super::runtime::RuntimeStorage::read(state).await?;
+        let roots = catalog::referenced_files(&self.pool)
             .await?
             .into_iter()
             .collect::<HashSet<_>>();
-        let mut candidates = catalog::blobs(&self.pool)
+        let mut candidates = catalog::stored_files(&self.pool)
             .await?
             .into_iter()
-            .filter(|blob| !roots.contains(&blob.sha512))
+            .filter(|stored_file| !roots.contains(&stored_file.sha512))
             .collect::<Vec<_>>();
-        candidates.sort_by_key(|blob| blob.last_used_at);
-        let mut unused =
-            candidates.iter().map(|blob| blob.size as u64).sum::<u64>() + runtime.unused_bytes();
+        candidates.sort_by_key(|stored_file| stored_file.last_used_at);
+        let mut unused = candidates
+            .iter()
+            .map(|stored_file| stored_file.size as u64)
+            .sum::<u64>()
+            + runtime.unused_bytes();
         let limit = if purge_unused {
             0
         } else {
             self.cache_limit().await?
         };
         let mut reclaimed = 0;
-        for blob in candidates {
-            if unused <= limit && blob.status != BlobStatus::Deleting {
+        for stored_file in candidates {
+            if unused <= limit
+                && stored_file.status != StoredFileStatus::Deleting
+            {
                 continue;
             }
             if !purge_unused
                 && chrono::Utc::now()
                     .timestamp()
-                    .saturating_sub(blob.last_used_at)
+                    .saturating_sub(stored_file.last_used_at)
                     < 60
             {
                 continue;
             }
-            catalog::set_status(&self.pool, &blob.sha512, BlobStatus::Deleting)
-                .await?;
-            let path = self.path(&blob)?;
+            catalog::set_file_status(
+                &self.pool,
+                &stored_file.sha512,
+                StoredFileStatus::Deleting,
+            )
+            .await?;
+            let path = self.path(&stored_file)?;
             self.validate_object_parent(&path).await?;
             match fs::symlink_metadata(&path).await {
                 Ok(metadata) => {
@@ -239,36 +262,52 @@ impl ContentStore {
                 Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
                 Err(error) => return Err(error.into()),
             }
-            catalog::delete(&self.pool, &blob.sha512).await?;
-            unused = unused.saturating_sub(blob.size as u64);
-            reclaimed += blob.size as u64;
+            catalog::delete_file(&self.pool, &stored_file.sha512).await?;
+            unused = unused.saturating_sub(stored_file.size as u64);
+            reclaimed += stored_file.size as u64;
         }
-		for instance in instance_rows::list_instances(&self.pool).await? {
-			if crate::state::instance_has_running_process(&instance.id, state).await? {
-				return Ok(reclaimed);
-			}
-		}
-		for job in crate::install::store::list(false, state).await? {
-			if matches!(job.status, crate::install::InstallJobStatus::Queued | crate::install::InstallJobStatus::Running) {
-				return Ok(reclaimed);
-			}
-			if let Some(backup) = job.state.paths.staging_dir
-				&& fs::try_exists(backup).await?
-			{
-				return Ok(reclaimed);
-			}
-		}
-		let mut unused_runtime = runtime.files.into_iter()
-			.filter(|file| file.references == 0).collect::<Vec<_>>();
-		unused_runtime.sort_by_key(|file| file.last_used_at);
-		for file in unused_runtime {
-			if !purge_unused && (unused <= limit || chrono::Utc::now().timestamp().saturating_sub(file.last_used_at) < 60) {
-				continue;
-			}
-			let removed = super::runtime::remove_file(&file, &runtime.root).await?;
-			unused = unused.saturating_sub(removed);
-			reclaimed += removed;
-		}
+        for instance in instance_rows::list_instances(&self.pool).await? {
+            if crate::state::instance_has_running_process(&instance.id, state)
+                .await?
+            {
+                return Ok(reclaimed);
+            }
+        }
+        for job in crate::install::store::list(false, state).await? {
+            if matches!(
+                job.status,
+                crate::install::InstallJobStatus::Queued
+                    | crate::install::InstallJobStatus::Running
+            ) {
+                return Ok(reclaimed);
+            }
+            if let Some(backup) = job.state.paths.staging_dir
+                && fs::try_exists(backup).await?
+            {
+                return Ok(reclaimed);
+            }
+        }
+        let mut unused_runtime = runtime
+            .files
+            .into_iter()
+            .filter(|file| file.references == 0)
+            .collect::<Vec<_>>();
+        unused_runtime.sort_by_key(|file| file.last_used_at);
+        for file in unused_runtime {
+            if !purge_unused
+                && (unused <= limit
+                    || chrono::Utc::now()
+                        .timestamp()
+                        .saturating_sub(file.last_used_at)
+                        < 60)
+            {
+                continue;
+            }
+            let removed =
+                super::runtime::remove_file(&file, &runtime.root).await?;
+            unused = unused.saturating_sub(removed);
+            reclaimed += removed;
+        }
         Ok(reclaimed)
     }
 
@@ -277,15 +316,15 @@ impl ContentStore {
         state: &State,
         repair: bool,
     ) -> crate::Result<StoreVerification> {
-		self.verify_with_progress(state, repair, &|_, _| {}).await
-	}
+        self.verify_with_progress(state, repair, &|_, _| {}).await
+    }
 
-	pub async fn verify_with_progress(
-		&self,
-		state: &State,
-		repair: bool,
-		on_progress: &(dyn Fn(u64, u64) + Send + Sync),
-	) -> crate::Result<StoreVerification> {
+    pub async fn verify_with_progress(
+        &self,
+        state: &State,
+        repair: bool,
+        on_progress: &(dyn Fn(u64, u64) + Send + Sync),
+    ) -> crate::Result<StoreVerification> {
         let _files_lock = self.files_lock.lock().await;
         let _lease = self.lease().await;
         if repair {
@@ -302,31 +341,39 @@ impl ContentStore {
                 }
             }
         }
-        let blobs = catalog::blobs(&self.pool).await?;
-		let total = blobs.iter().map(|blob| blob.size as u64).sum::<u64>();
-		let bytes_read = std::sync::atomic::AtomicU64::new(0);
-		let on_read = |bytes| {
-			let current = bytes_read.fetch_add(bytes, std::sync::atomic::Ordering::Relaxed) + bytes;
-			on_progress(current, total);
-		};
-		on_progress(0, total);
+        let blobs = catalog::stored_files(&self.pool).await?;
+        let total = blobs
+            .iter()
+            .map(|stored_file| stored_file.size as u64)
+            .sum::<u64>();
+        let bytes_read = std::sync::atomic::AtomicU64::new(0);
+        let on_read = |bytes| {
+            let current = bytes_read
+                .fetch_add(bytes, std::sync::atomic::Ordering::Relaxed)
+                + bytes;
+            on_progress(current, total);
+        };
+        on_progress(0, total);
         let mut report = StoreVerification {
             checked: 0,
             repaired: 0,
             issues: Vec::new(),
         };
-        for blob in blobs {
+        for stored_file in blobs {
             report.checked += 1;
-            if self.is_healthy_with_progress(&blob, true, &on_read).await? {
+            if self
+                .is_healthy_with_progress(&stored_file, true, &on_read)
+                .await?
+            {
                 continue;
             }
             let mut message = "Stored content is missing or damaged; re-import the original file".to_string();
             if repair {
                 let mut sources: Vec<String> =
-                    serde_json::from_str(&blob.sources)?;
+                    serde_json::from_str(&stored_file.sources)?;
                 if sources.is_empty()
                     && let Ok(files) = crate::state::CachedEntry::get_file_many(
-                        &[blob.sha1.as_str()],
+                        &[stored_file.sha1.as_str()],
                         None,
                         &self.pool,
                         &state.api_semaphore,
@@ -345,7 +392,7 @@ impl ContentStore {
                         {
                             for candidate in version.files {
                                 if candidate.hashes.get("sha512")
-                                    == Some(&blob.sha512)
+                                    == Some(&stored_file.sha512)
                                 {
                                     sources.push(candidate.url);
                                 }
@@ -356,15 +403,15 @@ impl ContentStore {
                 if !sources.is_empty() {
                     let result = async {
 						let mirrors = sources.iter().map(String::as_str).collect::<Vec<_>>();
-						let downloaded = crate::util::fetch::fetch_file_mirrors_in(&mirrors, Some(&blob.sha1), None, None, &state.fetch_semaphore, &self.pool, None, Some(&self.staging)).await?;
-						if downloaded.sha512 != blob.sha512 || downloaded.size != blob.size as u64 { return Err(input("Repair download has an unexpected hash or size")); }
-						let path = self.path(&blob)?;
+						let downloaded = crate::util::fetch::fetch_file_mirrors_in(&mirrors, Some(&stored_file.sha1), None, None, &state.fetch_semaphore, &self.pool, None, Some(&self.staging)).await?;
+						if downloaded.sha512 != stored_file.sha512 || downloaded.size != stored_file.size as u64 { return Err(input("Repair download has an unexpected hash or size")); }
+						let path = self.path(&stored_file)?;
 						if fs::symlink_metadata(&path).await.is_ok() {
 							let quarantine = self.root.join("quarantine");
 							fs::create_dir_all(&quarantine).await?;
-							fs::rename(&path, quarantine.join(format!("{}-{}", blob.sha512, uuid::Uuid::new_v4()))).await?;
+							fs::rename(&path, quarantine.join(format!("{}-{}", stored_file.sha512, uuid::Uuid::new_v4()))).await?;
 						}
-						self.publish_staged(downloaded.into_staged()?, &sources).await?;
+						self.save_staged_file(downloaded.into_staged()?, &sources).await?;
 						Ok::<(), crate::Error>(())
 					}.await;
                     match result {
@@ -378,39 +425,39 @@ impl ContentStore {
                     }
                 }
             }
-            let instance_ids = sqlx::query_scalar!("SELECT DISTINCT file.instance_id FROM instance_files file INNER JOIN store_instance_files binding ON binding.file_id = file.id WHERE binding.blob_sha512 = ?", blob.sha512).fetch_all(&self.pool).await?;
+            let instance_ids = sqlx::query_scalar!("SELECT DISTINCT file.instance_id FROM instance_files file INNER JOIN store_instance_files binding ON binding.file_id = file.id WHERE binding.blob_sha512 = ?", stored_file.sha512).fetch_all(&self.pool).await?;
             report.issues.push(StoreIssue {
-                sha512: blob.sha512,
+                sha512: stored_file.sha512,
                 instance_ids,
                 message,
             });
         }
         for instance in instance_rows::list_instances(&self.pool).await? {
             for mut file in crate::state::instances::adapters::sqlite::content_rows::get_instance_files(&instance.id, &self.pool).await? {
-				let Some(binding) = catalog::binding(&self.pool, &file.id).await? else { continue; };
-				let projection = self.inspect_projection(&instance, &file, &binding).await?;
+				let Some(binding) = catalog::file_storage(&self.pool, &file.id).await? else { continue; };
+				let file_status = self.check_instance_file(&instance, &file, &binding).await?;
 				let content = self.file_content(&file).await?;
-				if projection == ContentProjectionStatus::Healthy
-					&& matches!(&content, FileContent::Stored(_))
+				if file_status == InstanceFileStatus::Healthy
+					&& matches!(&content, FileContent::Stored { .. })
 					&& !file.missing
 				{
 					continue;
 				}
 				let mut fixed = false;
 				if repair {
-					if let FileContent::Stored(blob) = &content
-						&& projection == ContentProjectionStatus::Missing
+					if let FileContent::Stored { stored_file, .. } = &content
+						&& file_status == InstanceFileStatus::Missing
 					{
 						let path = self.instance_path(&instance.path, &content_file_path(&file)).await?;
-						let mode = self.materialize(blob, &path, binding.materialization_kind == MaterializationKind::Copy).await?;
+						let mode = self.create_instance_file(stored_file, &path, binding.materialization_kind == InstanceFileKind::Copy).await?;
 						let mut tx = self.pool.begin().await?;
 						file.missing = false;
 						crate::state::instances::adapters::sqlite::content_rows::upsert_instance_file(&file, &mut tx).await?;
-						catalog::bind(&mut tx, &file.id, &binding.blob_sha512, mode).await?;
+						catalog::set_file_storage(&mut tx, &file.id, &binding.blob_sha512, mode).await?;
 						tx.commit().await?;
 						fixed = true;
-					} else if matches!(&content, FileContent::Stored(_))
-						&& projection == ContentProjectionStatus::Healthy
+					} else if matches!(&content, FileContent::Stored { .. })
+						&& file_status == InstanceFileStatus::Healthy
 						&& file.missing
 					{
 						let mut tx = self.pool.begin().await?;
@@ -422,11 +469,11 @@ impl ContentStore {
 				}
 				if fixed { report.repaired += 1; }
 				else {
-					let reason = match (&content, projection) {
+					let reason = match (&content, file_status) {
 						(FileContent::Damaged(_), _) => "the stored content is missing or damaged",
-						(_, ContentProjectionStatus::Conflict) => "the instance path contains different content; preserve it and resolve the conflict",
-						(_, ContentProjectionStatus::Missing) => "the instance projection is missing",
-						(_, ContentProjectionStatus::Healthy) => "the instance projection metadata needs repair",
+						(_, InstanceFileStatus::Conflict) => "the instance path contains different content; preserve it and resolve the conflict",
+						(_, InstanceFileStatus::Missing) => "the instance file is missing",
+						(_, InstanceFileStatus::Healthy) => "the instance file metadata needs repair",
 					};
 					report.issues.push(StoreIssue {
 						sha512: binding.blob_sha512, instance_ids: vec![instance.id.clone()],
@@ -451,62 +498,85 @@ impl ContentStore {
         Ok(())
     }
 
-	/// Registers payloads published before a crash interrupted their catalog write.
-	pub(crate) async fn recover_published_blobs(&self) -> crate::Result<()> {
-		let known = catalog::blobs(&self.pool).await?
-			.into_iter().map(|blob| blob.sha512).collect::<HashSet<_>>();
-		let objects = self.root.join("objects/sha512");
-		self.validate_object_parent(&objects.join("payload.jar")).await?;
-		let mut prefixes = match fs::read_dir(&objects).await {
-			Ok(entries) => entries,
-			Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(()),
-			Err(error) => return Err(error.into()),
-		};
-		while let Some(prefix) = prefixes.next_entry().await? {
-			let name = prefix.file_name().to_string_lossy().into_owned();
-			if super::validate_digest(&name, 2).is_err() || !prefix.file_type().await?.is_dir() {
-				continue;
-			}
-			let mut entries = fs::read_dir(prefix.path()).await?;
-			while let Some(entry) = entries.next_entry().await? {
-				let hash = entry.file_name().to_string_lossy().into_owned();
-				if super::validate_digest(&hash, 128).is_err()
-					|| !hash.starts_with(&name)
-					|| known.contains(&hash)
-					|| !entry.file_type().await?.is_dir()
-				{
-					continue;
-				}
-				for filename in ["payload.jar", "payload.bin"] {
-					let path = entry.path().join(filename);
-					let metadata = match fs::symlink_metadata(&path).await {
-						Ok(metadata) if metadata.is_file() => metadata,
-						Ok(_) => continue,
-						Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
-						Err(error) => return Err(error.into()),
-					};
-					let (sha512, sha1, size) = super::hash_file(&path).await?;
-					if sha512 != hash {
-						tracing::warn!(path = %path.display(), "Preserving an unregistered store object with an unexpected hash");
-						continue;
-					}
-					let mut permissions = metadata.permissions();
-					permissions.set_readonly(true);
-					fs::set_permissions(&path, permissions).await?;
-					catalog::put(&self.pool, &super::Blob {
-						sha512,
-						sha1,
-						size: size.try_into().map_err(|_| input("Content file is too large"))?,
-						relative_path: format!("objects/sha512/{name}/{hash}/{filename}"),
-						status: BlobStatus::Ready,
-						modified_at_ns: crate::state::file_modified_at_ns(&metadata)? as i64,
-						last_used_at: chrono::Utc::now().timestamp(),
-						sources: "[]".to_string(),
-					}).await?;
-					break;
-				}
-			}
-		}
-		Ok(())
-	}
+    /// Registers payloads published before a crash interrupted their catalog write.
+    pub(crate) async fn recover_unregistered_files(&self) -> crate::Result<()> {
+        let known = catalog::stored_files(&self.pool)
+            .await?
+            .into_iter()
+            .map(|stored_file| stored_file.sha512)
+            .collect::<HashSet<_>>();
+        let objects = self.root.join("objects/sha512");
+        self.validate_object_parent(&objects.join("payload.jar"))
+            .await?;
+        let mut prefixes = match fs::read_dir(&objects).await {
+            Ok(entries) => entries,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                return Ok(());
+            }
+            Err(error) => return Err(error.into()),
+        };
+        while let Some(prefix) = prefixes.next_entry().await? {
+            let name = prefix.file_name().to_string_lossy().into_owned();
+            if super::validate_digest(&name, 2).is_err()
+                || !prefix.file_type().await?.is_dir()
+            {
+                continue;
+            }
+            let mut entries = fs::read_dir(prefix.path()).await?;
+            while let Some(entry) = entries.next_entry().await? {
+                let hash = entry.file_name().to_string_lossy().into_owned();
+                if super::validate_digest(&hash, 128).is_err()
+                    || !hash.starts_with(&name)
+                    || known.contains(&hash)
+                    || !entry.file_type().await?.is_dir()
+                {
+                    continue;
+                }
+                for filename in ["payload.jar", "payload.bin"] {
+                    let path = entry.path().join(filename);
+                    let metadata = match fs::symlink_metadata(&path).await {
+                        Ok(metadata) if metadata.is_file() => metadata,
+                        Ok(_) => continue,
+                        Err(error)
+                            if error.kind() == std::io::ErrorKind::NotFound =>
+                        {
+                            continue;
+                        }
+                        Err(error) => return Err(error.into()),
+                    };
+                    let (sha512, sha1, size) = super::hash_file(&path).await?;
+                    if sha512 != hash {
+                        tracing::warn!(path = %path.display(), "Preserving an unregistered store object with an unexpected hash");
+                        continue;
+                    }
+                    let mut permissions = metadata.permissions();
+                    permissions.set_readonly(true);
+                    fs::set_permissions(&path, permissions).await?;
+                    catalog::save_file(
+                        &self.pool,
+                        &super::StoredFile {
+                            sha512,
+                            sha1,
+                            size: size.try_into().map_err(|_| {
+                                input("Content file is too large")
+                            })?,
+                            relative_path: format!(
+                                "objects/sha512/{name}/{hash}/{filename}"
+                            ),
+                            status: StoredFileStatus::Ready,
+                            modified_at_ns: crate::state::file_modified_at_ns(
+                                &metadata,
+                            )?
+                                as i64,
+                            last_used_at: chrono::Utc::now().timestamp(),
+                            sources: "[]".to_string(),
+                        },
+                    )
+                    .await?;
+                    break;
+                }
+            }
+        }
+        Ok(())
+    }
 }

@@ -1,7 +1,6 @@
 use crate::State;
 use crate::state::content_store::{
-    ContentProjectionStatus, FileContent, content_file_path,
-    materialized_content_path,
+    FileContent, InstanceFileStatus, content_file_path, file_path_on_disk,
 };
 use crate::state::instances::adapters::{filesystem, sqlite};
 use crate::state::instances::{Instance, InstanceFile};
@@ -13,7 +12,7 @@ use std::collections::{HashMap, HashSet};
 use uuid::Uuid;
 
 use super::content_mutation::{
-    ContentMutation, ContentMutationExecutor, ContentMutationResult,
+    ContentChange, ContentChangeResult, InstanceContent,
 };
 
 pub(crate) async fn sync_content_files(
@@ -35,9 +34,9 @@ pub(crate) async fn sync_instance_content_files(
     state: &State,
 ) -> crate::Result<Vec<InstanceFile>> {
     let (snapshot, known_files, known_bindings) = {
-        let executor =
-            ContentMutationExecutor::lock(&instance.id, state).await?;
-        let instance = executor.instance();
+        let instance_content =
+            InstanceContent::lock(&instance.id, state).await?;
+        let instance = instance_content.instance();
         let snapshot = filesystem::scan_content_files(
             &state.directories.instances_dir(),
             &instance.path,
@@ -48,14 +47,15 @@ pub(crate) async fn sync_instance_content_files(
         let known_files =
             sqlite::content_rows::get_instance_files(&instance.id, &state.pool)
                 .await?;
-        let known_bindings = crate::state::content_store::catalog::bindings(
-            &state.pool,
-            &instance.id,
-        )
-        .await?
-        .into_iter()
-        .map(|binding| binding.file_id)
-        .collect::<HashSet<_>>();
+        let known_bindings =
+            crate::state::content_store::catalog::instance_storage(
+                &state.pool,
+                &instance.id,
+            )
+            .await?
+            .into_iter()
+            .map(|binding| binding.file_id)
+            .collect::<HashSet<_>>();
         (snapshot, known_files, known_bindings)
     };
     let managed_paths = known_files
@@ -92,12 +92,12 @@ pub(crate) async fn sync_instance_content_files(
         })
         .collect::<HashMap<_, _>>();
 
-    let executor = ContentMutationExecutor::lock(&instance.id, state).await?;
-    let instance = executor.instance();
+    let instance_content = InstanceContent::lock(&instance.id, state).await?;
+    let instance = instance_content.instance();
     let mut existing =
         sqlite::content_rows::get_instance_files(&instance.id, &state.pool)
             .await?;
-    let bindings = crate::state::content_store::catalog::bindings(
+    let bindings = crate::state::content_store::catalog::instance_storage(
         &state.pool,
         &instance.id,
     )
@@ -138,37 +138,36 @@ pub(crate) async fn sync_instance_content_files(
     let running =
         crate::state::instance_has_running_process(&instance.id, state).await?;
     let mut files = Vec::new();
-    let mut stored_by_executor = HashSet::new();
+    let mut saved_files = HashSet::new();
     for previous in &existing {
         let Some(binding) = bindings.get(&previous.id) else {
             continue;
         };
         let mut file = previous.clone();
         let content = state.content_store.file_content(previous).await?;
-        let stored = matches!(content, FileContent::Stored(_));
-        let projection = state
+        let stored = matches!(content, FileContent::Stored { .. });
+        let file_status = state
             .content_store
-            .inspect_projection(instance, previous, binding)
+            .check_instance_file(instance, previous, binding)
             .await?;
-        file.missing =
-            !stored || projection != ContentProjectionStatus::Healthy;
+        file.missing = !stored || file_status != InstanceFileStatus::Healthy;
         if !file.enabled
             && file.missing
             && stored
-            && projection == ContentProjectionStatus::Missing
+            && file_status == InstanceFileStatus::Missing
             && !running
         {
-            file = match executor
-                .execute(ContentMutation::Toggle {
+            file = match instance_content
+                .apply_change(ContentChange::Toggle {
                     project_path: &file.relative_path,
                     desired_enabled: Some(false),
                 })
                 .await?
             {
-                ContentMutationResult::File(file) => file,
+                ContentChangeResult::File(file) => file,
                 _ => unreachable!("repair mutations return a content file"),
             };
-            stored_by_executor.insert(file.id.clone());
+            saved_files.insert(file.id.clone());
         }
         if file.missing != previous.missing {
             file.modified_at = Utc::now();
@@ -272,7 +271,7 @@ pub(crate) async fn sync_instance_content_files(
     }
     let mut stored = Vec::new();
     for file in files {
-        if stored_by_executor.contains(&file.id) {
+        if saved_files.contains(&file.id) {
             stored.push(file);
         } else {
             stored.push(
@@ -301,9 +300,9 @@ pub(crate) async fn migrate_legacy_content(
         } else {
             None
         };
-        let executor =
-            ContentMutationExecutor::lock(instance_id, state).await?;
-        let instance = executor.instance();
+        let instance_content =
+            InstanceContent::lock(instance_id, state).await?;
+        let instance = instance_content.instance();
         if instance.install_stage != InstanceInstallStage::Installed
             || crate::state::instance_has_running_process(instance_id, state)
                 .await?
@@ -318,7 +317,7 @@ pub(crate) async fn migrate_legacy_content(
         let existing =
             sqlite::content_rows::get_instance_files(instance_id, &state.pool)
                 .await?;
-        let bindings = crate::state::content_store::catalog::bindings(
+        let bindings = crate::state::content_store::catalog::instance_storage(
             &state.pool,
             instance_id,
         )
@@ -363,9 +362,9 @@ pub(crate) async fn migrate_legacy_content(
         } else {
             None
         };
-        let executor =
-            ContentMutationExecutor::lock(instance_id, state).await?;
-        let instance = executor.instance();
+        let instance_content =
+            InstanceContent::lock(instance_id, state).await?;
+        let instance = instance_content.instance();
         if instance.install_stage != InstanceInstallStage::Installed
             || crate::state::instance_has_running_process(instance_id, state)
                 .await?
@@ -386,7 +385,7 @@ pub(crate) async fn migrate_legacy_content(
             )
             .await?;
         if let Some(previous) = &previous
-            && crate::state::content_store::catalog::binding(
+            && crate::state::content_store::catalog::file_storage(
                 &state.pool,
                 &previous.id,
             )
@@ -395,7 +394,7 @@ pub(crate) async fn migrate_legacy_content(
         {
             continue;
         }
-        let inactive = materialized_content_path(canonical, !scanned.enabled);
+        let inactive = file_path_on_disk(canonical, !scanned.enabled);
         let inactive = state
             .content_store
             .instance_path(&instance.path, &inactive)
@@ -439,16 +438,16 @@ pub(crate) async fn migrate_legacy_content(
                 .unwrap_or_else(Utc::now),
             modified_at: Utc::now(),
         };
-        match executor
-            .execute(ContentMutation::Adopt { file: &file })
+        match instance_content
+            .apply_change(ContentChange::Adopt { file: &file })
             .await?
         {
-            ContentMutationResult::File(_) => changed = true,
-            ContentMutationResult::Deferred { reason } => tracing::warn!(
+            ContentChangeResult::File(_) => changed = true,
+            ContentChangeResult::Deferred { reason } => tracing::warn!(
                 instance_id, path = %file.relative_path, reason,
                 "Legacy file adoption deferred",
             ),
-            ContentMutationResult::Removed => {
+            ContentChangeResult::Removed => {
                 unreachable!("adoption cannot remove content")
             }
         }
@@ -468,7 +467,10 @@ pub(crate) async fn migrate_legacy_content(
 async fn normalize_legacy_content_files(
     instance: &Instance,
     existing: &[InstanceFile],
-    bindings: &HashMap<String, crate::state::content_store::Binding>,
+    bindings: &HashMap<
+        String,
+        crate::state::content_store::InstanceFileStorage,
+    >,
     scanned: &[filesystem::ScannedContentFile],
     state: &State,
 ) -> crate::Result<bool> {
@@ -490,7 +492,7 @@ async fn normalize_legacy_content_files(
         {
             continue;
         }
-        let opposite = materialized_content_path(canonical, !scanned.enabled);
+        let opposite = file_path_on_disk(canonical, !scanned.enabled);
         let opposite = state
             .directories
             .instances_dir()

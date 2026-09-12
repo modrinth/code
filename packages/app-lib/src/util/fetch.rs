@@ -393,28 +393,31 @@ pub struct DownloadedFile {
 #[derive(Clone, Debug)]
 enum DownloadedFilePath {
     Temporary(Arc<tempfile::TempPath>),
-    Stored(crate::state::content_store::BlobLease),
+    Stored(crate::state::content_store::StoredFileHandle),
 }
 
 impl DownloadedFile {
     pub fn path(&self) -> &Path {
         match &self.path {
             DownloadedFilePath::Temporary(path) => path.as_ref().as_ref(),
-            DownloadedFilePath::Stored(blob) => &blob.path,
+            DownloadedFilePath::Stored(stored_file) => &stored_file.path,
         }
     }
 
-    pub(crate) fn from_blob(
-        blob: crate::state::content_store::BlobLease,
+    pub(crate) fn from_stored_file(
+        stored_file: crate::state::content_store::StoredFileHandle,
         reused: bool,
     ) -> Self {
         Self {
             reused,
-            size: blob.blob.size as u64,
-            sha1: blob.blob.sha1.clone(),
-            sha512: blob.blob.sha512.clone(),
-            archive: blob.blob.relative_path.ends_with("/payload.jar"),
-            path: DownloadedFilePath::Stored(blob),
+            size: stored_file.metadata.size as u64,
+            sha1: stored_file.metadata.sha1.clone(),
+            sha512: stored_file.metadata.sha512.clone(),
+            archive: stored_file
+                .metadata
+                .relative_path
+                .ends_with("/payload.jar"),
+            path: DownloadedFilePath::Stored(stored_file),
         }
     }
 
@@ -440,14 +443,14 @@ impl DownloadedFile {
         })
     }
 
-    pub(crate) async fn store_blob(
+    pub(crate) async fn store_file(
         &self,
         state: &crate::State,
-    ) -> crate::Result<crate::state::content_store::BlobLease> {
+    ) -> crate::Result<crate::state::content_store::StoredFileHandle> {
         match &self.path {
-            DownloadedFilePath::Stored(blob) => Ok(blob.clone()),
+            DownloadedFilePath::Stored(stored_file) => Ok(stored_file.clone()),
             DownloadedFilePath::Temporary(_) => {
-                state.content_store.ingest_file(self.path()).await
+                state.content_store.store_file(self.path()).await
             }
         }
     }
@@ -664,7 +667,7 @@ pub(crate) async fn fetch_content_file(
 ) -> crate::Result<DownloadedFile> {
     let acquired = state
         .content_store
-        .acquire(
+        .get_or_download_file(
             mirrors,
             sha512,
             sha1,
@@ -674,7 +677,10 @@ pub(crate) async fn fetch_content_file(
             progress,
         )
         .await?;
-    Ok(DownloadedFile::from_blob(acquired.blob, acquired.reused))
+    Ok(DownloadedFile::from_stored_file(
+        acquired.stored_file,
+        acquired.reused,
+    ))
 }
 
 async fn read_memory_response(

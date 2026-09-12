@@ -110,15 +110,17 @@ pub(crate) async fn edit_instance(
     patch: EditInstance,
     pool: &SqlitePool,
 ) -> crate::Result<Instance> {
-	let state = crate::State::get_if_initialized();
-	let _runtime_lease = if patch.launch_overrides.is_some() || patch.content_set_patch.is_some() {
-		match state.as_ref() {
-			Some(state) => Some(state.content_store.runtime_gate.read().await),
-			None => None,
-		}
-	} else {
-		None
-	};
+    let state = crate::State::get_if_initialized();
+    let _runtime_lease = if patch.launch_overrides.is_some()
+        || patch.content_set_patch.is_some()
+    {
+        match state.as_ref() {
+            Some(state) => Some(state.content_store.runtime_gate.read().await),
+            None => None,
+        }
+    } else {
+        None
+    };
     let modifies_content =
         patch.link.is_some() || patch.content_set_patch.is_some();
     let should_mark_shared_instance_stale = patch.link.is_some()

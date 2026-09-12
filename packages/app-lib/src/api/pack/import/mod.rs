@@ -5,7 +5,7 @@ use std::{
 
 use crate::state::content_store::{FileContent, content_file_path};
 use crate::state::instances::commands::{
-    ContentOrigin, InstallContent, install_content_blob,
+    ContentOrigin, InstallContent, install_stored_file,
 };
 use io::IOError;
 use serde::{Deserialize, Serialize};
@@ -374,27 +374,27 @@ pub(crate) async fn copy_dotminecraft_with_reporter(
 ) -> crate::Result<()> {
     let state = crate::State::get().await?;
     let _lease = state.content_store.lease().await;
-	let dotminecraft = tokio::fs::canonicalize(&dotminecraft).await?;
-	let subfiles = get_all_subfiles(&dotminecraft, false).await?;
-	let mut content_paths = std::collections::HashSet::new();
-	let mut duplicate_content_paths = std::collections::HashSet::new();
-	for source in &subfiles {
-		let relative = source
-			.strip_prefix(&dotminecraft)?
-			.components()
-			.map(|part| part.as_os_str().to_string_lossy())
-			.collect::<Vec<_>>()
-			.join("/");
-		if crate::state::content_store::eligible(&relative) {
-			let canonical = relative.trim_end_matches(".disabled").to_string();
-			if !content_paths.insert(canonical.clone()) {
-				duplicate_content_paths.insert(canonical);
-			}
-		}
-	}
+    let dotminecraft = tokio::fs::canonicalize(&dotminecraft).await?;
+    let subfiles = get_all_subfiles(&dotminecraft, false).await?;
+    let mut content_paths = std::collections::HashSet::new();
+    let mut duplicate_content_paths = std::collections::HashSet::new();
+    for source in &subfiles {
+        let relative = source
+            .strip_prefix(&dotminecraft)?
+            .components()
+            .map(|part| part.as_os_str().to_string_lossy())
+            .collect::<Vec<_>>()
+            .join("/");
+        if crate::state::content_store::eligible(&relative) {
+            let canonical = relative.trim_end_matches(".disabled").to_string();
+            if !content_paths.insert(canonical.clone()) {
+                duplicate_content_paths.insert(canonical);
+            }
+        }
+    }
     let profiles =
         tokio::fs::canonicalize(state.directories.instances_dir()).await?;
-	let source_instance = if let Ok(path) = dotminecraft.strip_prefix(&profiles)
+    let source_instance = if let Ok(path) = dotminecraft.strip_prefix(&profiles)
     {
         crate::state::instances::adapters::sqlite::instance_rows::get_instance_by_path(&path.to_string_lossy(), &state.pool).await?
     } else {
@@ -426,16 +426,19 @@ pub(crate) async fn copy_dotminecraft_with_reporter(
                     file.relative_path
                 )));
             }
-            let blob = match state.content_store.file_content(&file).await? {
-                FileContent::Stored(blob) => blob,
-                FileContent::Unmanaged => continue,
-                FileContent::Damaged(_) => {
-                    return Err(crate::state::content_store::input(format!(
-                        "Repair {} before duplicating this instance",
-                        file.relative_path
-                    )));
-                }
-            };
+            let stored_file =
+                match state.content_store.file_content(&file).await? {
+                    FileContent::Stored { stored_file, .. } => stored_file,
+                    FileContent::Unmanaged => continue,
+                    FileContent::Damaged(_) => {
+                        return Err(crate::state::content_store::input(
+                            format!(
+                                "Repair {} before duplicating this instance",
+                                file.relative_path
+                            ),
+                        ));
+                    }
+                };
             managed_paths.insert(content_file_path(&file));
             let project_type =
                 crate::state::ProjectType::get_from_parent_folder(
@@ -447,11 +450,11 @@ pub(crate) async fn copy_dotminecraft_with_reporter(
             let entry = entries.iter().find(|entry| {
                 entry.file_id.as_deref() == Some(file.id.as_str())
             });
-            install_content_blob(
+            install_stored_file(
                 instance_id,
                 InstallContent {
                     requested_path: &file.relative_path,
-                    blob: &blob,
+                    stored_file: &stored_file,
                     project_type,
                     source_kind: entry.map_or(
                         crate::state::ContentSourceKind::Local,
@@ -511,9 +514,10 @@ pub(crate) async fn copy_dotminecraft_with_reporter(
             continue;
         }
         if crate::state::content_store::eligible(&relative)
-			&& !duplicate_content_paths.contains(relative.trim_end_matches(".disabled"))
-		{
-            let blob = state.content_store.ingest_file(&source).await?;
+            && !duplicate_content_paths
+                .contains(relative.trim_end_matches(".disabled"))
+        {
+            let stored_file = state.content_store.store_file(&source).await?;
             let project_type =
                 crate::state::ProjectType::get_from_parent_folder(&relative)
                     .ok_or_else(|| {
@@ -521,11 +525,11 @@ pub(crate) async fn copy_dotminecraft_with_reporter(
                             "Invalid imported content path",
                         )
                     })?;
-            install_content_blob(
+            install_stored_file(
                 instance_id,
                 InstallContent {
                     requested_path: &relative,
-                    blob: &blob,
+                    stored_file: &stored_file,
                     project_type,
                     source_kind: crate::state::ContentSourceKind::Local,
                     origin: None,

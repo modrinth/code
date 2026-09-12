@@ -524,11 +524,14 @@ async fn export_content(
 ) -> crate::Result<Option<ReadableContent>> {
     if let Some(file) = file {
         match state.content_store.file_content(file).await? {
-            FileContent::Stored(blob) => {
+            FileContent::Stored { stored_file, .. } => {
                 if file.missing
                     || !state
                         .content_store
-                        .matches(path, &blob.blob.sha512)
+                        .instance_file_matches(
+                            path,
+                            &stored_file.metadata.sha512,
+                        )
                         .await?
                 {
                     return Err(input(format!(
@@ -536,7 +539,7 @@ async fn export_content(
                         file.relative_path
                     )));
                 }
-                return Ok(Some(ReadableContent::Stored(blob)));
+                return Ok(Some(ReadableContent::Stored(stored_file)));
             }
             FileContent::Damaged(_) => {
                 return Err(input(format!(

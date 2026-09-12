@@ -505,10 +505,13 @@ pub async fn generate_pack_from_file(
         path.file_name().map(|x| x.to_string_lossy().to_string());
 
     let state = State::get().await?;
-    let blob = state.content_store.ingest_file(&path).await?;
+    let stored_file = state.content_store.store_file(&path).await?;
     Ok(CreatePack {
         file: CreatePackFile::Downloaded(
-            crate::util::fetch::DownloadedFile::from_blob(blob, true),
+            crate::util::fetch::DownloadedFile::from_stored_file(
+                stored_file,
+                true,
+            ),
         ),
         description: CreatePackDescription {
             icon: None,

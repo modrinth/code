@@ -219,7 +219,9 @@ impl State {
                 {
                     tracing::warn!("Synced-pack migration deferred: {error}");
                 }
-                if let Err(error) = state.content_store.cleanup(state, false).await {
+                if let Err(error) =
+                    state.content_store.cleanup(state, false).await
+                {
                     tracing::debug!(
                         "Shared content cache cleanup deferred: {error}"
                     );

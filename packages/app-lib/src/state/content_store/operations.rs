@@ -1,7 +1,7 @@
 use super::{
-    Binding, BlobLease, CatalogBlob, ContentStore, FileContent,
-    MaterializationKind, catalog, hash_file, input, normalize, relative_link,
-    sync_directory, writable_copy,
+    ContentStore, FileContent, InstanceFileKind, InstanceFileStorage,
+    StoredFileHandle, StoredFileRecord, catalog, hash_file, input, normalize,
+    relative_link, sync_directory, writable_copy,
 };
 use crate::state::instances::adapters::sqlite::content_rows;
 use crate::state::{Instance, InstanceFile};
@@ -11,13 +11,10 @@ use std::path::Path;
 use tokio::fs;
 
 pub(crate) fn content_file_path(file: &InstanceFile) -> String {
-    materialized_content_path(&file.relative_path, file.enabled)
+    file_path_on_disk(&file.relative_path, file.enabled)
 }
 
-pub(crate) fn materialized_content_path(
-    relative_path: &str,
-    enabled: bool,
-) -> String {
+pub(crate) fn file_path_on_disk(relative_path: &str, enabled: bool) -> String {
     let canonical = relative_path.trim_end_matches(".disabled");
     if enabled {
         canonical.to_string()
@@ -27,33 +24,33 @@ pub(crate) fn materialized_content_path(
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub(crate) enum ContentProjectionStatus {
+pub(crate) enum InstanceFileStatus {
     Healthy,
     Missing,
     Conflict,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-struct Projection {
+struct FileState {
     relative_path: String,
     sha512: String,
     present: bool,
-    mode: MaterializationKind,
+    mode: InstanceFileKind,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-struct ProjectionJournal {
+struct FileChangeJournal {
     id: String,
     instance_id: String,
     instance_path: String,
-    before: Option<Projection>,
-    after: Option<Projection>,
+    before: Option<FileState>,
+    after: Option<FileState>,
 }
 
-pub(crate) struct PreparedProjection {
-    journal: ProjectionJournal,
-    pub(crate) blob: Option<BlobLease>,
-    _before: Option<BlobLease>,
+pub(crate) struct PendingFileChange {
+    journal: FileChangeJournal,
+    pub(crate) stored_file: Option<StoredFileHandle>,
+    _before: Option<StoredFileHandle>,
     /// Set only after a failed apply has cleared its journal and preserved or restored the file.
     pub(crate) safe_to_defer: bool,
 }
@@ -91,20 +88,20 @@ impl ContentStore {
         }
     }
 
-    pub(crate) async fn inspect_projection(
+    pub(crate) async fn check_instance_file(
         &self,
         instance: &Instance,
         file: &InstanceFile,
-        binding: &super::Binding,
-    ) -> crate::Result<ContentProjectionStatus> {
+        binding: &super::InstanceFileStorage,
+    ) -> crate::Result<InstanceFileStatus> {
         let opposite = self
             .instance_path(
                 &instance.path,
-                &materialized_content_path(&file.relative_path, !file.enabled),
+                &file_path_on_disk(&file.relative_path, !file.enabled),
             )
             .await?;
         match fs::symlink_metadata(&opposite).await {
-            Ok(_) => return Ok(ContentProjectionStatus::Conflict),
+            Ok(_) => return Ok(InstanceFileStatus::Conflict),
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
             Err(error) => return Err(error.into()),
         }
@@ -112,12 +109,16 @@ impl ContentStore {
             .instance_path(&instance.path, &content_file_path(file))
             .await?;
         match fs::symlink_metadata(&path).await {
-            Ok(_) if self.matches(&path, &binding.blob_sha512).await? => {
-                Ok(ContentProjectionStatus::Healthy)
+            Ok(_)
+                if self
+                    .instance_file_matches(&path, &binding.blob_sha512)
+                    .await? =>
+            {
+                Ok(InstanceFileStatus::Healthy)
             }
-            Ok(_) => Ok(ContentProjectionStatus::Conflict),
+            Ok(_) => Ok(InstanceFileStatus::Conflict),
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
-                Ok(ContentProjectionStatus::Missing)
+                Ok(InstanceFileStatus::Missing)
             }
             Err(error) => Err(error.into()),
         }
@@ -139,7 +140,8 @@ impl ContentStore {
         for file in
             content_rows::get_instance_files(&instance.id, &self.pool).await?
         {
-            let Some(binding) = catalog::binding(&self.pool, &file.id).await?
+            let Some(binding) =
+                catalog::file_storage(&self.pool, &file.id).await?
             else {
                 continue;
             };
@@ -147,7 +149,7 @@ impl ContentStore {
                 let active_path = self
                     .instance_path(
                         &instance.path,
-                        &materialized_content_path(&file.relative_path, true),
+                        &file_path_on_disk(&file.relative_path, true),
                     )
                     .await?;
                 match fs::symlink_metadata(&active_path).await {
@@ -164,10 +166,10 @@ impl ContentStore {
                 continue;
             }
             let content = self.file_content(&file).await?;
-            let projection =
-                self.inspect_projection(instance, &file, &binding).await?;
-            if !matches!(content, FileContent::Stored(_))
-                || projection != ContentProjectionStatus::Healthy
+            let file_status =
+                self.check_instance_file(instance, &file, &binding).await?;
+            if !matches!(content, FileContent::Stored { .. })
+                || file_status != InstanceFileStatus::Healthy
             {
                 return Err(input(format!(
                     "{} needs repair or re-import before launching this instance",
@@ -178,11 +180,11 @@ impl ContentStore {
         Ok(())
     }
 
-    pub(crate) async fn restore_bindings(
+    pub(crate) async fn restore_instance_files(
         &self,
         instance: &Instance,
         files: &[InstanceFile],
-        bindings: &[super::Binding],
+        bindings: &[super::InstanceFileStorage],
     ) -> crate::Result<()> {
         let mut restored = Vec::new();
         for binding in bindings {
@@ -192,7 +194,7 @@ impl ContentStore {
                 .ok_or_else(|| {
                     input("Rollback content reference has no file record")
                 })?;
-            let blob = self
+            let stored_file = self
                 .lookup(Some(&binding.blob_sha512), None, Some(file.size))
                 .await?
                 .ok_or_else(|| {
@@ -202,41 +204,43 @@ impl ContentStore {
                 .instance_path(&instance.path, &content_file_path(file))
                 .await?;
             if fs::symlink_metadata(&path).await.is_ok() {
-                if !self.matches(&path, &blob.blob.sha512).await? {
+                if !self
+                    .instance_file_matches(&path, &stored_file.metadata.sha512)
+                    .await?
+                {
                     return Err(input(
                         "Rollback destination contains different content",
                     ));
                 }
-                remove_projection(&path).await?;
+                remove_instance_file(&path).await?;
             }
             let mode = self
-                .materialize(
-                    &blob,
+                .create_instance_file(
+                    &stored_file,
                     &path,
-                    binding.materialization_kind == MaterializationKind::Copy,
+                    binding.materialization_kind == InstanceFileKind::Copy,
                 )
                 .await?;
             restored.push((&binding.file_id, &binding.blob_sha512, mode));
         }
         let mut tx = self.pool.begin().await?;
-        for (id, blob, mode) in restored {
-            catalog::bind(&mut tx, id, blob, mode).await?;
+        for (id, stored_file, mode) in restored {
+            catalog::set_file_storage(&mut tx, id, stored_file, mode).await?;
         }
         tx.commit().await?;
         Ok(())
     }
 
-    /// The caller holds the instance content lock until the SQL transaction commits.
-    pub(crate) async fn prepare(
+    /// The caller has recovered pending changes and holds the instance and store locks until commit.
+    pub(crate) async fn prepare_file_change(
         &self,
         instance: &Instance,
         relative_path: &str,
-        blob: Option<&BlobLease>,
+        stored_file: Option<&StoredFileHandle>,
         enabled: bool,
         legacy_path: Option<&str>,
-        known_source_blob: Option<&BlobLease>,
-    ) -> crate::Result<PreparedProjection> {
-        self.recover(Some(&instance.id)).await?;
+        source_file: Option<&StoredFileHandle>,
+    ) -> crate::Result<PendingFileChange> {
         if !super::eligible(relative_path) {
             return Err(input("Unsupported managed content path"));
         }
@@ -256,7 +260,7 @@ impl ContentStore {
             )
             .await?;
         }
-        let source_relative = if known_source_blob.is_some() {
+        let source_relative = if source_file.is_some() {
             requested_source.to_string()
         } else {
             existing
@@ -264,8 +268,7 @@ impl ContentStore {
                 .map(content_file_path)
                 .unwrap_or_else(|| requested_source.to_string())
         };
-        let target_relative =
-            materialized_content_path(canonical_path, enabled);
+        let target_relative = file_path_on_disk(canonical_path, enabled);
         let source =
             self.instance_path(&instance.path, &source_relative).await?;
         let target =
@@ -276,7 +279,7 @@ impl ContentStore {
             )));
         }
         let binding = match &existing {
-            Some(file) => catalog::binding(&self.pool, &file.id).await?,
+            Some(file) => catalog::file_storage(&self.pool, &file.id).await?,
             None => None,
         };
         let metadata = match fs::symlink_metadata(&source).await {
@@ -284,7 +287,7 @@ impl ContentStore {
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => None,
             Err(error) => return Err(error.into()),
         };
-        if known_source_blob.is_some() && metadata.is_none() {
+        if source_file.is_some() && metadata.is_none() {
             return Err(input(
                 "Legacy content disappeared before it could be adopted",
             ));
@@ -297,52 +300,59 @@ impl ContentStore {
 						"The content symlink is unowned; import it explicitly before changing it",
 					)
 				})?;
-                if !self.matches(&source, &binding.blob_sha512).await? {
+                if !self
+                    .instance_file_matches(&source, &binding.blob_sha512)
+                    .await?
+                {
                     return Err(input(
                         "The content link was changed outside the app; resolve the conflict first",
                     ));
                 }
-                self.catalog_blob(&binding.blob_sha512).await?.ok_or_else(
-                    || input("Managed content is missing from the catalog"),
-                )?;
-                Some(Projection {
+                self.get_file_record(&binding.blob_sha512)
+                    .await?
+                    .ok_or_else(|| {
+                        input("Managed content is missing from the catalog")
+                    })?;
+                Some(FileState {
                     relative_path: source_relative.clone(),
                     sha512: binding.blob_sha512.clone(),
                     present: true,
-                    mode: MaterializationKind::Symlink,
+                    mode: InstanceFileKind::Symlink,
                 })
             } else if metadata.is_file() {
-                let previous = if let Some(known) = known_source_blob {
+                let previous = if let Some(known) = source_file {
                     known.clone()
                 } else {
-                    self.ingest_file(&source).await?
+                    self.store_file(&source).await?
                 };
                 if let Some(file) = &existing
                     && binding.is_some()
-                    && previous.blob.sha1 != file.sha1
+                    && previous.metadata.sha1 != file.sha1
                 {
                     return Err(input(
                         "The content file was changed outside the app; preserve or re-import it before continuing",
                     ));
                 }
-                let projection = Projection {
+                let file_status = FileState {
                     relative_path: source_relative.clone(),
-                    sha512: previous.blob.sha512.clone(),
+                    sha512: previous.metadata.sha512.clone(),
                     present: true,
-                    mode: MaterializationKind::Copy,
+                    mode: InstanceFileKind::Copy,
                 };
                 previous_lease = Some(previous);
-                Some(projection)
+                Some(file_status)
             } else {
                 return Err(input(
                     "A managed content file was replaced by a directory",
                 ));
             }
         } else if let Some(binding) = &binding {
-            self.catalog_blob(&binding.blob_sha512).await?.ok_or_else(
-                || input("Managed content is missing from the catalog"),
-            )?;
-            Some(Projection {
+            self.get_file_record(&binding.blob_sha512)
+                .await?
+                .ok_or_else(|| {
+                    input("Managed content is missing from the catalog")
+                })?;
+            Some(FileState {
                 relative_path: source_relative.clone(),
                 sha512: binding.blob_sha512.clone(),
                 present: false,
@@ -351,24 +361,24 @@ impl ContentStore {
         } else {
             None
         };
-        let after = blob.map(|blob| {
+        let after = stored_file.map(|stored_file| {
             let mode = before
                 .as_ref()
                 .filter(|previous| {
                     previous.present
-                        && previous.sha512 == blob.blob.sha512
+                        && previous.sha512 == stored_file.metadata.sha512
                         && previous.relative_path != target_relative
                 })
                 .map(|previous| previous.mode)
-                .unwrap_or(MaterializationKind::Symlink);
-            Projection {
+                .unwrap_or(InstanceFileKind::Symlink);
+            FileState {
                 relative_path: target_relative,
-                sha512: blob.blob.sha512.clone(),
+                sha512: stored_file.metadata.sha512.clone(),
                 present: true,
                 mode,
             }
         });
-        let journal = ProjectionJournal {
+        let journal = FileChangeJournal {
             id: uuid::Uuid::new_v4().to_string(),
             instance_id: instance.id.clone(),
             instance_path: instance.path.clone(),
@@ -376,46 +386,45 @@ impl ContentStore {
             after,
         };
         self.save_journal(&journal).await?;
-        Ok(PreparedProjection {
+        Ok(PendingFileChange {
             journal,
-            blob: blob.cloned(),
+            stored_file: stored_file.cloned(),
             _before: previous_lease,
             safe_to_defer: false,
         })
     }
 
-    pub(crate) async fn prepare_move(
+    /// The caller has recovered pending changes and holds the instance and store locks until commit.
+    pub(crate) async fn prepare_file_move(
         &self,
         instance: &Instance,
         file: &InstanceFile,
-        binding: &Binding,
+        binding: &InstanceFileStorage,
         enabled: bool,
-    ) -> crate::Result<PreparedProjection> {
-        self.recover(Some(&instance.id)).await?;
+    ) -> crate::Result<PendingFileChange> {
         if binding.file_id != file.id || !super::eligible(&file.relative_path) {
             return Err(input("Invalid managed content move"));
         }
-        if self.inspect_projection(instance, file, binding).await?
-            != ContentProjectionStatus::Healthy
+        if self.check_instance_file(instance, file, binding).await?
+            != InstanceFileStatus::Healthy
         {
             return Err(input(
                 "Content cannot be toggled because its instance path is missing or changed",
             ));
         }
         let source_relative = content_file_path(file);
-        let target_relative =
-            materialized_content_path(&file.relative_path, enabled);
-        let journal = ProjectionJournal {
+        let target_relative = file_path_on_disk(&file.relative_path, enabled);
+        let journal = FileChangeJournal {
             id: uuid::Uuid::new_v4().to_string(),
             instance_id: instance.id.clone(),
             instance_path: instance.path.clone(),
-            before: Some(Projection {
+            before: Some(FileState {
                 relative_path: source_relative,
                 sha512: binding.blob_sha512.clone(),
                 present: true,
                 mode: binding.materialization_kind,
             }),
-            after: Some(Projection {
+            after: Some(FileState {
                 relative_path: target_relative,
                 sha512: binding.blob_sha512.clone(),
                 present: true,
@@ -423,9 +432,9 @@ impl ContentStore {
             }),
         };
         self.save_journal(&journal).await?;
-        Ok(PreparedProjection {
+        Ok(PendingFileChange {
             journal,
-            blob: None,
+            stored_file: None,
             _before: None,
             safe_to_defer: false,
         })
@@ -433,21 +442,21 @@ impl ContentStore {
 
     async fn save_journal(
         &self,
-        journal: &ProjectionJournal,
+        journal: &FileChangeJournal,
     ) -> crate::Result<()> {
         let mut tx = self.pool.begin().await?;
-        for projection in
+        for file_status in
             [&journal.before, &journal.after].into_iter().flatten()
         {
             catalog::retain(
                 &mut tx,
                 "operation",
                 &journal.id,
-                &projection.sha512,
+                &file_status.sha512,
             )
             .await?;
         }
-        catalog::operation(
+        catalog::save_file_change(
             &mut tx,
             &journal.id,
             &journal.instance_id,
@@ -462,8 +471,10 @@ impl ContentStore {
         &self,
         instance_id: Option<&str>,
     ) -> crate::Result<()> {
-        for payload in catalog::operations(&self.pool, instance_id).await? {
-            let journal: ProjectionJournal =
+        for payload in
+            catalog::pending_file_changes(&self.pool, instance_id).await?
+        {
+            let journal: FileChangeJournal =
                 match serde_json::from_str(&payload) {
                     Ok(journal) => journal,
                     Err(error) if instance_id.is_none() => {
@@ -489,23 +500,23 @@ impl ContentStore {
 
     async fn finish_journal(
         &self,
-        journal: &ProjectionJournal,
+        journal: &FileChangeJournal,
     ) -> crate::Result<()> {
         let mut tx = self.pool.begin().await?;
-        catalog::finish(&mut tx, &journal.id).await?;
+        catalog::finish_file_change(&mut tx, &journal.id).await?;
         tx.commit().await?;
         Ok(())
     }
 
     async fn rollback_journal(
         &self,
-        journal: &ProjectionJournal,
+        journal: &FileChangeJournal,
     ) -> crate::Result<()> {
         if let (Some(before), Some(after)) = (&journal.before, &journal.after)
             && before.present
             && after.present
-            && before.mode == MaterializationKind::Copy
-            && after.mode == MaterializationKind::Symlink
+            && before.mode == InstanceFileKind::Copy
+            && after.mode == InstanceFileKind::Symlink
             && before.relative_path == after.relative_path
             && before.sha512 == after.sha512
         {
@@ -517,7 +528,7 @@ impl ContentStore {
             .await?;
             let unmanaged = match file {
                 Some(file) => {
-                    catalog::binding(&self.pool, &file.id).await?.is_none()
+                    catalog::file_storage(&self.pool, &file.id).await?.is_none()
                 }
                 None => true,
             };
@@ -538,10 +549,7 @@ impl ContentStore {
             }
         }
         if journal_noop(journal) {
-            let mut tx = self.pool.begin().await?;
-            catalog::finish(&mut tx, &journal.id).await?;
-            tx.commit().await?;
-            return Ok(());
+            return self.finish_journal(journal).await;
         }
         if let Some((before, after)) = journal_move(journal) {
             let before_path = self
@@ -552,7 +560,10 @@ impl ContentStore {
                 .await?;
             match fs::symlink_metadata(&before_path).await {
                 Ok(_) => {
-                    if !self.matches(&before_path, &before.sha512).await? {
+                    if !self
+                        .instance_file_matches(&before_path, &before.sha512)
+                        .await?
+                    {
                         return Err(input(format!(
                             "Cannot recover {}: its contents were changed outside the app",
                             before.relative_path
@@ -560,29 +571,29 @@ impl ContentStore {
                     }
                 }
                 Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
-                    if !self.matches(&after_path, &after.sha512).await? {
+                    if !self
+                        .instance_file_matches(&after_path, &after.sha512)
+                        .await?
+                    {
                         return Err(input(format!(
                             "Cannot recover {}: the toggled content is missing or changed",
                             after.relative_path
                         )));
                     }
-                    rename_projection(&after_path, &before_path).await?;
+                    move_instance_file(&after_path, &before_path).await?;
                 }
                 Err(error) => return Err(error.into()),
             }
-            let mut tx = self.pool.begin().await?;
-            catalog::finish(&mut tx, &journal.id).await?;
-            tx.commit().await?;
-            return Ok(());
+            return self.finish_journal(journal).await;
         }
         if let Some(after) = &journal.after {
             let path = self
                 .instance_path(&journal.instance_path, &after.relative_path)
                 .await?;
             if fs::symlink_metadata(&path).await.is_ok() {
-                if self.matches(&path, &after.sha512).await? {
-                    remove_projection(&path).await?;
-                } else if !matches!(&journal.before, Some(before) if before.relative_path == after.relative_path && self.matches(&path, &before.sha512).await?)
+                if self.instance_file_matches(&path, &after.sha512).await? {
+                    remove_instance_file(&path).await?;
+                } else if !matches!(&journal.before, Some(before) if before.relative_path == after.relative_path && self.instance_file_matches(&path, &before.sha512).await?)
                 {
                     return Err(input(format!(
                         "Cannot recover {}: its contents were changed outside the app",
@@ -597,26 +608,29 @@ impl ContentStore {
                 .await?;
             if before.present {
                 if fs::symlink_metadata(&path).await.is_ok() {
-                    if !self.matches(&path, &before.sha512).await? {
+                    if !self
+                        .instance_file_matches(&path, &before.sha512)
+                        .await?
+                    {
                         return Err(input(
                             "Recovery would overwrite externally changed content",
                         ));
                     }
                 } else {
                     match before.mode {
-                        MaterializationKind::Symlink => {
-                            let blob = self
-								.catalog_blob(&before.sha512)
+                        InstanceFileKind::Symlink => {
+                            let stored_file = self
+								.get_file_record(&before.sha512)
 								.await?
 								.ok_or_else(|| {
 									input(
 										"Recovery content is missing from the catalog",
 									)
 								})?;
-                            materialize_catalog_symlink(&blob, &path).await?;
+                            create_recovery_link(&stored_file, &path).await?;
                         }
-                        MaterializationKind::Copy => {
-                            let blob = self
+                        InstanceFileKind::Copy => {
+                            let stored_file = self
 								.lookup(Some(&before.sha512), None, None)
 								.await?
 								.ok_or_else(|| {
@@ -624,19 +638,21 @@ impl ContentStore {
 										"Recovery content needs repair or re-import",
 									)
 								})?;
-                            self.materialize(&blob, &path, true).await?;
+                            self.create_instance_file(
+                                &stored_file,
+                                &path,
+                                true,
+                            )
+                            .await?;
                         }
                     }
                 }
             }
         }
-        let mut tx = self.pool.begin().await?;
-        catalog::finish(&mut tx, &journal.id).await?;
-        tx.commit().await?;
-        Ok(())
+        self.finish_journal(journal).await
     }
 
-    pub(crate) async fn matches(
+    pub(crate) async fn instance_file_matches(
         &self,
         path: &Path,
         sha512: &str,
@@ -649,8 +665,9 @@ impl ContentStore {
             Err(error) => return Err(error.into()),
         };
         if metadata.file_type().is_symlink() {
-            let rows = catalog::find(&self.pool, Some(sha512), None).await?;
-            let Some(blob) = rows.first() else {
+            let rows =
+                catalog::find_files(&self.pool, Some(sha512), None).await?;
+            let Some(stored_file) = rows.first() else {
                 return Ok(false);
             };
             let link = fs::read_link(path).await?;
@@ -660,17 +677,17 @@ impl ContentStore {
                     .ok_or_else(|| input("Invalid link path"))?
                     .join(link),
             );
-            return Ok(resolved == self.path(blob)?);
+            return Ok(resolved == self.path(stored_file)?);
         }
         Ok(metadata.is_file() && hash_file(path).await?.0 == sha512)
     }
 
-    pub(crate) async fn materialize(
+    pub(crate) async fn create_instance_file(
         &self,
-        blob: &BlobLease,
+        stored_file: &StoredFileHandle,
         target: &Path,
         force_copy: bool,
-    ) -> crate::Result<MaterializationKind> {
+    ) -> crate::Result<InstanceFileKind> {
         let parent = target
             .parent()
             .ok_or_else(|| input("Content destination has no parent"))?;
@@ -681,24 +698,24 @@ impl ContentStore {
         let temporary =
             parent.join(format!(".modrinth-{}.tmp", uuid::Uuid::new_v4()));
         let mode = if force_copy {
-            writable_copy(&blob.path, &temporary).await?;
-            MaterializationKind::Copy
+            writable_copy(&stored_file.path, &temporary).await?;
+            InstanceFileKind::Copy
         } else {
-            let source = relative_link(&blob.path, parent);
+            let source = relative_link(&stored_file.path, parent);
             #[cfg(unix)]
             let result = fs::symlink(&source, &temporary).await;
             #[cfg(windows)]
             let result = fs::symlink_file(&source, &temporary).await;
             match result {
-                Ok(()) => MaterializationKind::Symlink,
+                Ok(()) => InstanceFileKind::Symlink,
                 Err(error) if link_unavailable(&error) => {
-                    writable_copy(&blob.path, &temporary).await?;
-                    MaterializationKind::Copy
+                    writable_copy(&stored_file.path, &temporary).await?;
+                    InstanceFileKind::Copy
                 }
                 Err(error) => return Err(error.into()),
             }
         };
-        if mode == MaterializationKind::Copy {
+        if mode == InstanceFileKind::Copy {
             fs::File::options()
                 .write(true)
                 .open(&temporary)
@@ -715,7 +732,7 @@ impl ContentStore {
     }
 }
 
-impl PreparedProjection {
+impl PendingFileChange {
     pub(crate) async fn apply(
         &mut self,
         store: &ContentStore,
@@ -754,7 +771,7 @@ impl PreparedProjection {
                     &after.relative_path,
                 )
                 .await?;
-            if !store.matches(&source, &before.sha512).await? {
+            if !store.instance_file_matches(&source, &before.sha512).await? {
                 return Err(input(
                     "Content changed before the toggle could be applied",
                 ));
@@ -765,7 +782,7 @@ impl PreparedProjection {
                 ));
             }
             *mutation_started = true;
-            rename_projection(&source, &target).await?;
+            move_instance_file(&source, &target).await?;
             return Ok(());
         }
         if let Some(before) = &self.journal.before {
@@ -777,13 +794,16 @@ impl PreparedProjection {
                 .await?;
             match fs::symlink_metadata(&path).await {
                 Ok(_) => {
-                    if !store.matches(&path, &before.sha512).await? {
+                    if !store
+                        .instance_file_matches(&path, &before.sha512)
+                        .await?
+                    {
                         return Err(input(
                             "Content changed before the operation could be applied",
                         ));
                     }
                     *mutation_started = true;
-                    remove_projection(&path).await?;
+                    remove_instance_file(&path).await?;
                 }
                 Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
                     if before.present {
@@ -798,8 +818,8 @@ impl PreparedProjection {
         if let Some(after) = &mut self.journal.after
             && after.present
         {
-            let blob = self
-                .blob
+            let stored_file = self
+                .stored_file
                 .as_ref()
                 .ok_or_else(|| input("Missing content lease"))?;
             let path = store
@@ -809,7 +829,9 @@ impl PreparedProjection {
                 )
                 .await?;
             *mutation_started = true;
-            after.mode = store.materialize(blob, &path, false).await?;
+            after.mode = store
+                .create_instance_file(stored_file, &path, false)
+                .await?;
         }
         Ok(())
     }
@@ -820,9 +842,10 @@ impl PreparedProjection {
         file_id: Option<&str>,
     ) -> crate::Result<()> {
         if let (Some(file_id), Some(after)) = (file_id, &self.journal.after) {
-            catalog::bind(tx, file_id, &after.sha512, after.mode).await?;
+            catalog::set_file_storage(tx, file_id, &after.sha512, after.mode)
+                .await?;
         }
-        catalog::finish(tx, &self.journal.id).await
+        catalog::finish_file_change(tx, &self.journal.id).await
     }
 
     pub(crate) async fn rollback(
@@ -834,8 +857,8 @@ impl PreparedProjection {
 }
 
 fn journal_move(
-    journal: &ProjectionJournal,
-) -> Option<(&Projection, &Projection)> {
+    journal: &FileChangeJournal,
+) -> Option<(&FileState, &FileState)> {
     let before = journal.before.as_ref()?;
     let after = journal.after.as_ref()?;
     (before.present
@@ -846,7 +869,7 @@ fn journal_move(
         .then_some((before, after))
 }
 
-fn journal_noop(journal: &ProjectionJournal) -> bool {
+fn journal_noop(journal: &FileChangeJournal) -> bool {
     matches!(
         (&journal.before, &journal.after),
         (Some(before), Some(after))
@@ -857,7 +880,7 @@ fn journal_noop(journal: &ProjectionJournal) -> bool {
     )
 }
 
-async fn rename_projection(source: &Path, target: &Path) -> crate::Result<()> {
+async fn move_instance_file(source: &Path, target: &Path) -> crate::Result<()> {
     let metadata = fs::symlink_metadata(source).await?;
     if metadata.is_dir() && !metadata.file_type().is_symlink() {
         return Err(input("Refusing to move a directory as content"));
@@ -879,8 +902,8 @@ async fn rename_projection(source: &Path, target: &Path) -> crate::Result<()> {
     Ok(())
 }
 
-async fn materialize_catalog_symlink(
-    blob: &CatalogBlob,
+async fn create_recovery_link(
+    stored_file: &StoredFileRecord,
     target: &Path,
 ) -> crate::Result<()> {
     let parent = target
@@ -892,7 +915,7 @@ async fn materialize_catalog_symlink(
     }
     let temporary =
         parent.join(format!(".modrinth-{}.tmp", uuid::Uuid::new_v4()));
-    let source = relative_link(&blob.path, parent);
+    let source = relative_link(&stored_file.path, parent);
     #[cfg(unix)]
     let result = fs::symlink(&source, &temporary).await;
     #[cfg(windows)]
@@ -914,7 +937,7 @@ pub(super) fn link_unavailable(error: &std::io::Error) -> bool {
     ) || cfg!(windows) && matches!(error.raw_os_error(), Some(1 | 50 | 1314))
 }
 
-pub(crate) async fn remove_projection(path: &Path) -> crate::Result<()> {
+pub(crate) async fn remove_instance_file(path: &Path) -> crate::Result<()> {
     let metadata = fs::symlink_metadata(path).await?;
     #[cfg(windows)]
     if metadata.is_file() && metadata.permissions().readonly() {

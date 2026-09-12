@@ -33,17 +33,25 @@ pub async fn store_set_cache_limit(bytes: u64) -> Result<()> {
 
 #[tauri::command]
 pub async fn store_verify(
-	repair: bool,
-	on_progress: tauri::ipc::Channel<(u64, u64)>,
+    repair: bool,
+    on_progress: tauri::ipc::Channel<(u64, u64)>,
 ) -> Result<settings::StoreVerification> {
-	let last_sent = std::sync::Mutex::new(std::time::Instant::now() - std::time::Duration::from_secs(1));
-	Ok(settings::store_verify_with_progress(repair, &|current, total| {
-		let mut last = last_sent.lock().unwrap();
-		if current == 0 || current >= total || last.elapsed() >= std::time::Duration::from_millis(200) {
-			let _ = on_progress.send((current, total));
-			*last = std::time::Instant::now();
-		}
-	}).await?)
+    let last_sent = std::sync::Mutex::new(
+        std::time::Instant::now() - std::time::Duration::from_secs(1),
+    );
+    Ok(
+        settings::store_verify_with_progress(repair, &|current, total| {
+            let mut last = last_sent.lock().unwrap();
+            if current == 0
+                || current >= total
+                || last.elapsed() >= std::time::Duration::from_millis(200)
+            {
+                let _ = on_progress.send((current, total));
+                *last = std::time::Instant::now();
+            }
+        })
+        .await?,
+    )
 }
 
 // Get full settings

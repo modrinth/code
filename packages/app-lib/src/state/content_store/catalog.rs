@@ -1,17 +1,21 @@
-use super::{Binding, Blob, BlobStatus, MaterializationKind};
+use super::{
+    InstanceFileKind, InstanceFileStorage, StoredFile, StoredFileStatus,
+};
 use sqlx::{Sqlite, SqlitePool, Transaction};
 
-pub(super) async fn blobs(pool: &SqlitePool) -> crate::Result<Vec<Blob>> {
+pub(super) async fn stored_files(
+    pool: &SqlitePool,
+) -> crate::Result<Vec<StoredFile>> {
     let rows = sqlx::query!("SELECT sha512, sha1, size, relative_path, status, modified_at_ns, last_used_at, sources FROM store_blobs")
 		.fetch_all(pool).await?;
     rows.into_iter()
         .map(|row| {
-            Ok(Blob {
+            Ok(StoredFile {
                 sha512: row.sha512,
                 sha1: row.sha1,
                 size: row.size,
                 relative_path: row.relative_path,
-                status: BlobStatus::from_db(&row.status)?,
+                status: StoredFileStatus::from_db(&row.status)?,
                 modified_at_ns: row.modified_at_ns,
                 last_used_at: row.last_used_at,
                 sources: row.sources,
@@ -20,21 +24,21 @@ pub(super) async fn blobs(pool: &SqlitePool) -> crate::Result<Vec<Blob>> {
         .collect()
 }
 
-pub(super) async fn find(
+pub(super) async fn find_files(
     pool: &SqlitePool,
     sha512: Option<&str>,
     sha1: Option<&str>,
-) -> crate::Result<Vec<Blob>> {
+) -> crate::Result<Vec<StoredFile>> {
     let rows = sqlx::query!("SELECT sha512, sha1, size, relative_path, status, modified_at_ns, last_used_at, sources FROM store_blobs WHERE (? IS NOT NULL AND sha512 = ?) OR (? IS NULL AND sha1 = ?)", sha512, sha512, sha512, sha1)
 		.fetch_all(pool).await?;
     rows.into_iter()
         .map(|row| {
-            Ok(Blob {
+            Ok(StoredFile {
                 sha512: row.sha512,
                 sha1: row.sha1,
                 size: row.size,
                 relative_path: row.relative_path,
-                status: BlobStatus::from_db(&row.status)?,
+                status: StoredFileStatus::from_db(&row.status)?,
                 modified_at_ns: row.modified_at_ns,
                 last_used_at: row.last_used_at,
                 sources: row.sources,
@@ -43,14 +47,17 @@ pub(super) async fn find(
         .collect()
 }
 
-pub(super) async fn put(pool: &SqlitePool, blob: &Blob) -> crate::Result<()> {
+pub(super) async fn save_file(
+    pool: &SqlitePool,
+    stored_file: &StoredFile,
+) -> crate::Result<()> {
     sqlx::query!("INSERT INTO store_blobs (sha512, sha1, size, relative_path, status, modified_at_ns, sources) VALUES (?, ?, ?, ?, 'ready', ?, ?) ON CONFLICT(sha512) DO UPDATE SET status = 'ready', modified_at_ns = excluded.modified_at_ns, last_used_at = unixepoch(), verified_at = unixepoch(), sources = CASE WHEN excluded.sources = '[]' THEN store_blobs.sources ELSE excluded.sources END",
-		blob.sha512, blob.sha1, blob.size, blob.relative_path, blob.modified_at_ns, blob.sources)
+		stored_file.sha512, stored_file.sha1, stored_file.size, stored_file.relative_path, stored_file.modified_at_ns, stored_file.sources)
 		.execute(pool).await?;
     Ok(())
 }
 
-pub(super) async fn touch(
+pub(super) async fn mark_file_used(
     pool: &SqlitePool,
     sha512: &str,
 ) -> crate::Result<()> {
@@ -63,10 +70,10 @@ pub(super) async fn touch(
     Ok(())
 }
 
-pub(super) async fn set_status(
+pub(super) async fn set_file_status(
     pool: &SqlitePool,
     sha512: &str,
-    status: BlobStatus,
+    status: StoredFileStatus,
 ) -> crate::Result<()> {
     let status = status.as_str();
     sqlx::query!(
@@ -79,18 +86,18 @@ pub(super) async fn set_status(
     Ok(())
 }
 
-pub(crate) async fn bindings(
+pub(crate) async fn instance_storage(
     pool: &SqlitePool,
     instance_id: &str,
-) -> crate::Result<Vec<Binding>> {
+) -> crate::Result<Vec<InstanceFileStorage>> {
     let rows = sqlx::query!("SELECT binding.file_id, binding.blob_sha512, binding.materialization_kind FROM store_instance_files binding INNER JOIN instance_files file ON file.id = binding.file_id WHERE file.instance_id = ?", instance_id)
 		.fetch_all(pool).await?;
     rows.into_iter()
         .map(|row| {
-            Ok(Binding {
+            Ok(InstanceFileStorage {
                 file_id: row.file_id,
                 blob_sha512: row.blob_sha512,
-                materialization_kind: MaterializationKind::from_db(
+                materialization_kind: InstanceFileKind::from_db(
                     &row.materialization_kind,
                 )?,
             })
@@ -98,16 +105,16 @@ pub(crate) async fn bindings(
         .collect()
 }
 
-pub(crate) async fn binding(
+pub(crate) async fn file_storage(
     pool: &SqlitePool,
     file_id: &str,
-) -> crate::Result<Option<Binding>> {
+) -> crate::Result<Option<InstanceFileStorage>> {
     let row = sqlx::query!("SELECT file_id, blob_sha512, materialization_kind FROM store_instance_files WHERE file_id = ?", file_id).fetch_optional(pool).await?;
     row.map(|row| {
-        Ok(Binding {
+        Ok(InstanceFileStorage {
             file_id: row.file_id,
             blob_sha512: row.blob_sha512,
-            materialization_kind: MaterializationKind::from_db(
+            materialization_kind: InstanceFileKind::from_db(
                 &row.materialization_kind,
             )?,
         })
@@ -115,11 +122,11 @@ pub(crate) async fn binding(
     .transpose()
 }
 
-pub(super) async fn bind(
+pub(super) async fn set_file_storage(
     tx: &mut Transaction<'_, Sqlite>,
     file_id: &str,
     sha512: &str,
-    mode: MaterializationKind,
+    mode: InstanceFileKind,
 ) -> crate::Result<()> {
     let mode = mode.as_str();
     sqlx::query!("INSERT INTO store_instance_files (file_id, blob_sha512, materialization_kind) VALUES (?, ?, ?) ON CONFLICT(file_id) DO UPDATE SET blob_sha512 = excluded.blob_sha512, materialization_kind = excluded.materialization_kind", file_id, sha512, mode)
@@ -152,7 +159,7 @@ pub(super) async fn release(
     Ok(())
 }
 
-pub(super) async fn operation(
+pub(super) async fn save_file_change(
     tx: &mut Transaction<'_, Sqlite>,
     id: &str,
     instance_id: &str,
@@ -162,14 +169,14 @@ pub(super) async fn operation(
     Ok(())
 }
 
-pub(super) async fn operations(
+pub(super) async fn pending_file_changes(
     pool: &SqlitePool,
     instance_id: Option<&str>,
 ) -> crate::Result<Vec<String>> {
     Ok(sqlx::query_scalar!("SELECT payload FROM store_operations WHERE ? IS NULL OR instance_id = ? ORDER BY created_at, id", instance_id, instance_id).fetch_all(pool).await?)
 }
 
-pub(super) async fn finish(
+pub(super) async fn finish_file_change(
     tx: &mut Transaction<'_, Sqlite>,
     id: &str,
 ) -> crate::Result<()> {
@@ -179,11 +186,13 @@ pub(super) async fn finish(
     release(tx, "operation", id).await
 }
 
-pub(super) async fn roots(pool: &SqlitePool) -> crate::Result<Vec<String>> {
+pub(super) async fn referenced_files(
+    pool: &SqlitePool,
+) -> crate::Result<Vec<String>> {
     Ok(sqlx::query_scalar!("SELECT blob_sha512 FROM store_instance_files UNION SELECT blob_sha512 FROM store_retained_refs").fetch_all(pool).await?)
 }
 
-pub(super) async fn delete(
+pub(super) async fn delete_file(
     pool: &SqlitePool,
     sha512: &str,
 ) -> crate::Result<()> {

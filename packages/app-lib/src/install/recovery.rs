@@ -28,7 +28,7 @@ struct SharedInstanceUpdateRollback {
     files: Vec<InstanceFile>,
     entries: Vec<ContentEntry>,
     #[serde(default)]
-    bindings: Vec<crate::state::content_store::Binding>,
+    bindings: Vec<crate::state::content_store::InstanceFileStorage>,
 }
 
 pub(super) async fn prepare_instance_update_backup(
@@ -40,11 +40,13 @@ pub(super) async fn prepare_instance_update_backup(
     let _content_lock =
         state.lock_instance_content(&metadata.instance.id).await;
     let _store_lock = state.content_store.files_lock.lock().await;
-	if crate::state::instance_has_running_process(&metadata.instance.id, state).await? {
-		return Err(crate::state::content_store::input(
-			"Stop this instance before backing it up for an update",
-		));
-	}
+    if crate::state::instance_has_running_process(&metadata.instance.id, state)
+        .await?
+    {
+        return Err(crate::state::content_store::input(
+            "Stop this instance before backing it up for an update",
+        ));
+    }
     let owner = job_id.to_string();
     let staging_dir = instance_update_backup_dir(job_id, state);
     if tokio::fs::try_exists(&staging_dir).await? {
@@ -63,7 +65,7 @@ pub(super) async fn prepare_instance_update_backup(
             &state.pool,
         )
         .await?;
-        let bindings = crate::state::content_store::catalog::bindings(
+        let bindings = crate::state::content_store::catalog::instance_storage(
             &state.pool,
             &metadata.instance.id,
         )
@@ -77,11 +79,11 @@ pub(super) async fn prepare_instance_update_backup(
 						"Backup content reference has no file record",
 					)
 				})?;
-			let projection = state.content_store
-				.inspect_projection(&metadata.instance, file, binding).await?;
+			let file_status = state.content_store
+				.check_instance_file(&metadata.instance, file, binding).await?;
 			let content = state.content_store.file_content(file).await?;
-			if projection != crate::state::content_store::ContentProjectionStatus::Healthy
-				|| !matches!(content, crate::state::content_store::FileContent::Stored(_))
+			if file_status != crate::state::content_store::InstanceFileStatus::Healthy
+				|| !matches!(content, crate::state::content_store::FileContent::Stored { .. })
 			{
 				return Err(crate::state::content_store::input(format!(
 					"Restore or repair {} before updating this instance; its current content cannot be backed up safely",
@@ -232,28 +234,29 @@ async fn restore_instance_update(
         .directories
         .instances_dir()
         .join(&rollback.instance.instance.path);
-	let backup_path = staging_dir.join(SHARED_INSTANCE_ROLLBACK_INSTANCE_DIR);
-	if !tokio::fs::symlink_metadata(&backup_path).await?.is_dir() {
-		return Err(crate::state::content_store::input(
-			"The instance backup is missing or is not a directory",
-		));
-	}
-	for binding in &snapshot.bindings {
-		if state.content_store
-			.lookup(Some(&binding.blob_sha512), None, None)
-			.await?
-			.is_none()
-		{
-			return Err(crate::state::content_store::input(
-				"Repair the backup's shared content before restoring this instance",
-			));
-		}
-	}
+    let backup_path = staging_dir.join(SHARED_INSTANCE_ROLLBACK_INSTANCE_DIR);
+    if !tokio::fs::symlink_metadata(&backup_path).await?.is_dir() {
+        return Err(crate::state::content_store::input(
+            "The instance backup is missing or is not a directory",
+        ));
+    }
+    for binding in &snapshot.bindings {
+        if state
+            .content_store
+            .lookup(Some(&binding.blob_sha512), None, None)
+            .await?
+            .is_none()
+        {
+            return Err(crate::state::content_store::input(
+                "Repair the backup's shared content before restoring this instance",
+            ));
+        }
+    }
     if tokio::fs::try_exists(&instance_path).await? {
         crate::util::io::remove_dir_all(&instance_path).await?;
     }
     copy_directory(
-		&backup_path,
+        &backup_path,
         &instance_path,
         &std::collections::HashSet::new(),
         state,
@@ -269,7 +272,7 @@ async fn restore_instance_update(
     restore_instance_metadata(&rollback.instance, state).await?;
     state
         .content_store
-        .restore_bindings(
+        .restore_instance_files(
             &rollback.instance.instance,
             &snapshot.files,
             &snapshot.bindings,

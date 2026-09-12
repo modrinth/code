@@ -1,6 +1,6 @@
 use super::{PackLibrary, SyncedPack};
 use crate::state::content_store::{
-    BlobLease, content_file_path, hash_file, input, validate_digest,
+    StoredFileHandle, content_file_path, hash_file, input, validate_digest,
     validate_relative,
 };
 use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
@@ -65,7 +65,7 @@ pub(super) async fn write_library(
                 && (pack.migration_error.is_some()
                     || previous.blob_sha512.is_none())
         });
-        let blob = match state
+        let stored_file = match state
             .content_store
             .lookup(
                 pack.blob_sha512.as_deref(),
@@ -74,7 +74,7 @@ pub(super) async fn write_library(
             )
             .await
         {
-            Ok(Some(blob)) => blob,
+            Ok(Some(stored_file)) => stored_file,
             Ok(None) | Err(_) if deferred => continue,
             Ok(None) => {
                 return Err(input(
@@ -83,11 +83,15 @@ pub(super) async fn write_library(
             }
             Err(error) => return Err(error),
         };
-        pack.blob_sha512 = Some(blob.blob.sha512.clone());
+        pack.blob_sha512 = Some(stored_file.metadata.sha512.clone());
         pack.migration_error = None;
         state
             .content_store
-            .retain("synced-pack", id, std::slice::from_ref(&blob.blob.sha512))
+            .retain(
+                "synced-pack",
+                id,
+                std::slice::from_ref(&stored_file.metadata.sha512),
+            )
             .await?;
     }
     io::create_dir_all(directory(state)).await?;
@@ -131,23 +135,23 @@ pub(super) async fn cache_bytes(
     bytes: Bytes,
     state: &State,
 ) -> crate::Result<String> {
-    let blob = state.content_store.ingest_bytes(&bytes, None).await?;
+    let stored_file = state.content_store.store_bytes(&bytes, None).await?;
     state
         .content_store
         .retain(
             "synced-cache",
-            &blob.blob.sha1,
-            std::slice::from_ref(&blob.blob.sha512),
+            &stored_file.metadata.sha1,
+            std::slice::from_ref(&stored_file.metadata.sha512),
         )
         .await?;
-    Ok(blob.blob.sha1.clone())
+    Ok(stored_file.metadata.sha1.clone())
 }
 
-pub(super) async fn read_blob(
+pub(super) async fn read_stored_file(
     pack: &SyncedPack,
     state: &State,
-) -> crate::Result<BlobLease> {
-    if let Some(blob) = state
+) -> crate::Result<StoredFileHandle> {
+    if let Some(stored_file) = state
         .content_store
         .lookup(
             pack.blob_sha512.as_deref(),
@@ -156,7 +160,7 @@ pub(super) async fn read_blob(
         )
         .await?
     {
-        return Ok(blob);
+        return Ok(stored_file);
     }
     let library = read_library(state).await?;
     let id = library
@@ -165,7 +169,7 @@ pub(super) async fn read_blob(
         .find(|(_, candidate)| candidate.sha1 == pack.sha1)
         .map(|(id, _)| id.as_str());
     match recover_legacy_pack(id, pack, &library, state).await {
-        Ok(blob) => return Ok(blob),
+        Ok(stored_file) => return Ok(stored_file),
         Err(error) => {
             tracing::debug!("Local synced-pack recovery deferred: {error}")
         }
@@ -203,7 +207,7 @@ pub(super) async fn read_blob(
         .require_staging_space(u64::from(file.size))?;
     Ok(state
         .content_store
-        .acquire(
+        .get_or_download_file(
             &[file.url.as_str()],
             file.hashes.get("sha512").map(String::as_str),
             Some(&pack.sha1),
@@ -213,7 +217,7 @@ pub(super) async fn read_blob(
             None,
         )
         .await?
-        .blob)
+        .stored_file)
 }
 
 pub(crate) async fn migrate_store(state: &State) -> crate::Result<()> {
@@ -249,9 +253,9 @@ pub(crate) async fn migrate_store(state: &State) -> crate::Result<()> {
         }
         let mut pack = previous.clone();
         match &recovered {
-            Ok(blob) => {
-                pack.blob_sha512 = Some(blob.blob.sha512.clone());
-                pack.item.size = blob.blob.size as u64;
+            Ok(stored_file) => {
+                pack.blob_sha512 = Some(stored_file.metadata.sha512.clone());
+                pack.item.size = stored_file.metadata.size as u64;
                 pack.migration_error = None;
             }
             Err(error) => {
@@ -317,9 +321,9 @@ async fn recover_legacy_pack(
     pack: &SyncedPack,
     library: &PackLibrary,
     state: &State,
-) -> crate::Result<BlobLease> {
+) -> crate::Result<StoredFileHandle> {
     validate_digest(&pack.sha1, 40)?;
-    if let Some(blob) = state
+    if let Some(stored_file) = state
         .content_store
         .lookup(
             pack.blob_sha512.as_deref(),
@@ -328,11 +332,13 @@ async fn recover_legacy_pack(
         )
         .await?
     {
-        return Ok(blob);
+        return Ok(stored_file);
     }
     let legacy = directory(state).join("files").join(&pack.sha1);
-    if let Some(blob) = import_matching_pack(&legacy, pack, state).await? {
-        return Ok(blob);
+    if let Some(stored_file) =
+        import_matching_pack(&legacy, pack, state).await?
+    {
+        return Ok(stored_file);
     }
     for instance in instance_rows::list_instances(&state.pool).await? {
         validate_relative(&instance.path)?;
@@ -344,16 +350,15 @@ async fn recover_legacy_pack(
             && !placement.path.is_empty()
             && validate_relative(&placement.path).is_ok()
         {
-            let source = base.join(
-                crate::state::content_store::materialized_content_path(
+            let source =
+                base.join(crate::state::content_store::file_path_on_disk(
                     &placement.path,
                     placement.enabled,
-                ),
-            );
-            if let Some(blob) =
+                ));
+            if let Some(stored_file) =
                 import_matching_pack(&source, pack, state).await?
             {
-                return Ok(blob);
+                return Ok(stored_file);
             }
         }
         for file in
@@ -361,14 +366,14 @@ async fn recover_legacy_pack(
         {
             if file.sha1 == pack.sha1
                 && validate_relative(&file.relative_path).is_ok()
-                && let Some(blob) = import_matching_pack(
+                && let Some(stored_file) = import_matching_pack(
                     &base.join(content_file_path(&file)),
                     pack,
                     state,
                 )
                 .await?
             {
-                return Ok(blob);
+                return Ok(stored_file);
             }
         }
     }
@@ -382,7 +387,7 @@ async fn import_matching_pack(
     source: &std::path::Path,
     pack: &SyncedPack,
     state: &State,
-) -> crate::Result<Option<BlobLease>> {
+) -> crate::Result<Option<StoredFileHandle>> {
     let Ok((sha512, sha1, _)) = hash_file(source).await else {
         return Ok(None);
     };
@@ -394,13 +399,13 @@ async fn import_matching_pack(
     {
         return Ok(None);
     }
-    let blob = state.content_store.ingest_file(source).await?;
-    if blob.blob.sha512 != sha512 {
+    let stored_file = state.content_store.store_file(source).await?;
+    if stored_file.metadata.sha512 != sha512 {
         return Err(input(
             "The synced pack changed while it was being migrated; retry after closing the instance",
         ));
     }
-    Ok(Some(blob))
+    Ok(Some(stored_file))
 }
 
 async fn cleanup_legacy_cache(state: &State) -> crate::Result<bool> {
@@ -439,7 +444,7 @@ async fn cleanup_legacy_cache(state: &State) -> crate::Result<bool> {
                 )
                 .await?;
             } else {
-                state.content_store.ingest_file(&entry.path()).await?;
+                state.content_store.store_file(&entry.path()).await?;
                 tokio::fs::remove_file(entry.path()).await?;
             }
             Ok(())

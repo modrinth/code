@@ -1,10 +1,10 @@
-use super::storage::{read_blob, read_library, write_library};
+use super::storage::{read_library, read_stored_file, write_library};
 use super::{
     PackLibrary, PackPlacement, SyncedPack, pack_option, pack_path, same_path,
     version_compatible,
 };
 use crate::event::{InstancePayloadType, emit::emit_instance};
-use crate::state::content_store::materialized_content_path;
+use crate::state::content_store::file_path_on_disk;
 use crate::state::instances::commands;
 use crate::state::{
     CacheBehaviour, CachedEntry, ContentItem, ContentItemVersion,
@@ -125,10 +125,7 @@ pub(super) async fn capture(
             placement.sha1 = item.id.clone();
             placement.enabled = item.enabled;
         } else if !instance_dir(metadata, state)
-            .join(materialized_content_path(
-                &placement.path,
-                placement.enabled,
-            ))
+            .join(file_path_on_disk(&placement.path, placement.enabled))
             .exists()
         {
             placement.excluded = true;
@@ -170,17 +167,18 @@ async fn owns_file(
     if file.sha1 != placement.sha1 {
         return Ok(false);
     }
-    let crate::state::content_store::FileContent::Stored(blob) =
-        state.content_store.file_content(&file).await?
+    let crate::state::content_store::FileContent::Stored {
+        stored_file, ..
+    } = state.content_store.file_content(&file).await?
     else {
         return Ok(false);
     };
     state
         .content_store
-        .matches(
+        .instance_file_matches(
             &instance_dir(metadata, state)
                 .join(crate::state::content_store::content_file_path(&file)),
-            &blob.blob.sha512,
+            &stored_file.metadata.sha512,
         )
         .await
 }
@@ -412,7 +410,7 @@ async fn apply_pack(
             }
         }
     }
-    let blob = if let Some(file) = file
+    let stored_file = if let Some(file) = file
         && file.hashes.get("sha1") != Some(&pack.sha1)
     {
         let downloaded = fetch::fetch_content_file(
@@ -425,12 +423,12 @@ async fn apply_pack(
             None,
         )
         .await?;
-        downloaded.store_blob(state).await?
+        downloaded.store_file(state).await?
     } else {
-        read_blob(pack, state).await?
+        read_stored_file(pack, state).await?
     };
-    let bytes = bytes::Bytes::from(tokio::fs::read(&blob.path).await?);
-    let sha1 = blob.blob.sha1.clone();
+    let bytes = bytes::Bytes::from(tokio::fs::read(&stored_file.path).await?);
+    let sha1 = stored_file.metadata.sha1.clone();
     super::operations::validate_pack(&bytes, pack.item.project_type)?;
     let mut pending = previous.clone().unwrap_or_default();
     pending.pending = true;
@@ -475,11 +473,11 @@ async fn apply_pack(
         }
     }
     let size = bytes.len() as u64;
-    let path = commands::install_content_blob(
+    let path = commands::install_stored_file(
         instance_id,
         commands::InstallContent {
             requested_path: &target_path,
-            blob: &blob,
+            stored_file: &stored_file,
             project_type: pack.item.project_type,
             source_kind: ContentSourceKind::Local,
             origin: pack.item.project.as_ref().zip(version.as_ref()).map(
@@ -595,7 +593,7 @@ async fn apply_instance_inner(
                 || previous_placements.get(id).is_some_and(|placement| {
                     !placement.path.is_empty()
                         && instance_dir(metadata, state)
-                            .join(materialized_content_path(
+                            .join(file_path_on_disk(
                                 &placement.path,
                                 placement.enabled,
                             ))
