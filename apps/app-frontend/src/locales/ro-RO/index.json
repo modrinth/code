@@ -95,9 +95,6 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "Actualizând conținutul partajat"
   },
-  "app.action-bar.installs": {
-    "message": "Instalări"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "Setează ca instanță principală"
   },

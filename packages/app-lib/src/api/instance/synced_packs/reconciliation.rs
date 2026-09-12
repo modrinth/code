@@ -1,11 +1,10 @@
-use super::storage::{
-    cache_bytes, read_bytes, read_cached_bytes, read_library, write_library,
-};
+use super::storage::{read_library, read_stored_file, write_library};
 use super::{
     PackLibrary, PackPlacement, SyncedPack, pack_option, pack_path, same_path,
     version_compatible,
 };
 use crate::event::{InstancePayloadType, emit::emit_instance};
+use crate::state::content_store::{StoredFileHandle, file_path_on_disk};
 use crate::state::instances::commands;
 use crate::state::{
     CacheBehaviour, CachedEntry, ContentItem, ContentItemVersion,
@@ -106,7 +105,9 @@ async fn capture_items(
             placement.path = item.file_path.clone();
             placement.sha1 = item.id.clone();
             placement.enabled = item.enabled;
-        } else if !instance_dir(metadata, state).join(&placement.path).exists()
+        } else if !instance_dir(metadata, state)
+            .join(file_path_on_disk(&placement.path, placement.enabled))
+            .exists()
         {
             placement.excluded = true;
         }
@@ -134,10 +135,7 @@ async fn owns_file(
     if placement.path.is_empty() {
         return Ok(false);
     }
-    let path = instance_dir(metadata, state).join(&placement.path);
-    if !path.exists() {
-        return Ok(false);
-    }
+    let Some(file) = crate::state::instances::adapters::sqlite::content_rows::get_instance_file_by_relative_path(&metadata.instance.id, &placement.path, &state.pool).await? else { return Ok(false); };
     let kind = commands::content_source_kind_for_project_path(
         &metadata.instance.id,
         &placement.path,
@@ -147,8 +145,23 @@ async fn owns_file(
     if kind.is_some_and(|kind| kind != ContentSourceKind::Local) {
         return Ok(false);
     }
-    let (_, hash) = fetch::sha1_file_async(&path).await?;
-    Ok(hash == placement.sha1)
+    if file.sha1 != placement.sha1 {
+        return Ok(false);
+    }
+    let crate::state::content_store::FileContent::Stored {
+        stored_file, ..
+    } = state.content_store.file_content(&file).await?
+    else {
+        return Ok(false);
+    };
+    state
+        .content_store
+        .instance_file_matches(
+            &instance_dir(metadata, state)
+                .join(crate::state::content_store::content_file_path(&file)),
+            &stored_file.metadata.sha512,
+        )
+        .await
 }
 
 async fn toggle_pack(
@@ -157,20 +170,6 @@ async fn toggle_pack(
     enabled: bool,
     state: &State,
 ) -> crate::Result<String> {
-    let path = format!(
-        "{}{}",
-        item.file_path.trim_end_matches(".disabled"),
-        if enabled { "" } else { ".disabled" },
-    );
-    if path != item.file_path
-        && instance_dir(metadata, state).join(&path).exists()
-    {
-        return Err(crate::ErrorKind::InputError(
-            "Another pack already uses this file name in the instance."
-                .to_string(),
-        )
-        .into());
-    }
     commands::toggle_disable_project(
         &metadata.instance.id,
         &item.file_path,
@@ -184,7 +183,7 @@ async fn toggle_pack(
 struct PreparedPack {
     compatible: bool,
     version: Option<Version>,
-    contents: Option<(bytes::Bytes, String)>,
+	stored_file: Option<StoredFileHandle>,
     dependencies: Vec<commands::DownloadedProjectVersion>,
     conflict: bool,
     deferred: bool,
@@ -301,39 +300,30 @@ async fn prepare_pack(
         prepared.conflict = true;
         return Ok(prepared);
     }
-    let contents = if let Some(file) = file {
-        let cached = if let Some(sha1) = file.hashes.get("sha1") {
-            read_cached_bytes(sha1, state)
-                .await?
-                .map(|bytes| (bytes, sha1.clone()))
-        } else {
-            None
-        };
-        if let Some(cached) = cached {
-            cached
-        } else {
-            let bytes = fetch::fetch(
-                &file.url,
-                file.hashes.get("sha1").map(String::as_str),
-                None,
-                None,
-                &state.fetch_semaphore,
-                &state.pool,
-            )
-            .await?;
-            let sha1 = cache_bytes(bytes.clone(), state).await?;
-            (bytes, sha1)
-        }
-    } else {
-        (read_bytes(pack, state).await?, pack.sha1.clone())
-    };
-    let bytes = contents.0.clone();
+	let stored_file = if let Some(file) = file
+		&& file.hashes.get("sha1") != Some(&pack.sha1)
+	{
+		let downloaded = fetch::fetch_content_file(
+			state,
+			&[file.url.as_str()],
+			file.hashes.get("sha512").map(String::as_str),
+			file.hashes.get("sha1").map(String::as_str),
+			Some(u64::from(file.size)),
+			None,
+			None,
+		)
+		.await?;
+		downloaded.store_file(state).await?
+	} else {
+		read_stored_file(pack, state).await?
+	};
+	let bytes = bytes::Bytes::from(tokio::fs::read(&stored_file.path).await?);
     let project_type = pack.item.project_type;
     tokio::task::spawn_blocking(move || {
         super::operations::validate_pack(&bytes, project_type)
     })
     .await??;
-    prepared.contents = Some(contents);
+	prepared.stored_file = Some(stored_file);
     if let (Some(project), Some(version)) =
         (&pack.item.project, &prepared.version)
         && !version.dependencies.is_empty()
@@ -549,7 +539,9 @@ async fn apply_pack(
     for path in [target_base.to_string(), format!("{target_base}.disabled")] {
         if instance_dir(metadata, state).join(&path).exists() {
             let owned = if let Some(previous) = &previous {
-                previous.path == path && prepared.owned_previous
+                same_path(&previous.path, &path)
+                    && previous.enabled != path.ends_with(".disabled")
+					&& prepared.owned_previous
             } else {
                 false
             };
@@ -561,7 +553,7 @@ async fn apply_pack(
             }
         }
     }
-    let (bytes, sha1) = prepared.contents.take().ok_or_else(|| {
+	let stored_file = prepared.stored_file.take().ok_or_else(|| {
         crate::ErrorKind::InputError(
             "Pack contents were not prepared.".to_owned(),
         )
@@ -592,24 +584,24 @@ async fn apply_pack(
             prepared.owned_previous = false;
         }
     }
-    let file_name = if pack.item.enabled {
-        file_name.to_string()
-    } else {
-        format!("{file_name}.disabled")
-    };
-    let size = bytes.len() as u64;
-    let path = commands::add_project_bytes(
+	let size = stored_file.metadata.size as u64;
+	let sha1 = stored_file.metadata.sha1.clone();
+    let path = commands::install_stored_file(
         instance_id,
-        &file_name,
-        bytes,
-        Some(&sha1),
-        Some(pack.item.project_type),
-        ContentSourceKind::Local,
-        pack.item
-            .project
-            .as_ref()
-            .map(|project| project.id.as_str()),
-        version.as_ref().map(|version| version.id.as_str()),
+        commands::InstallContent {
+            requested_path: &target_path,
+            stored_file: &stored_file,
+            project_type: pack.item.project_type,
+            source_kind: ContentSourceKind::Local,
+            origin: pack.item.project.as_ref().zip(version.as_ref()).map(
+                |(project, version)| commands::ContentOrigin {
+                    project_id: &project.id,
+                    version_id: &version.id,
+                },
+            ),
+            enabled_override: Some(pack.item.enabled),
+            previous_path: None,
+        },
         state,
     )
     .await?;
@@ -623,7 +615,7 @@ async fn apply_pack(
     let mut installed = pack.item.clone();
     installed.id = sha1.clone();
     installed.file_path = path.clone();
-    installed.file_name = file_name;
+    installed.file_name = file_name.to_string();
     installed.size = size;
     installed.source_kind = Some(ContentSourceKind::Local);
     installed.version = version.as_ref().map(|version| ContentItemVersion {
@@ -769,7 +761,10 @@ async fn apply_instance_inner(
                 || previous_placements.get(id).is_some_and(|placement| {
                     !placement.path.is_empty()
                         && instance_dir(metadata, state)
-                            .join(&placement.path)
+                            .join(file_path_on_disk(
+                                &placement.path,
+                                placement.enabled,
+                            ))
                             .exists()
                 })
                 || items.iter().any(|item| {
@@ -1235,7 +1230,8 @@ pub(in crate::api::instance) async fn decorate_content(
                     instance_ids: synced_instance_ids(
                         id, &library, &instances, global,
                     ),
-                    update_pending: placement.pending
+                    update_pending: pack.migration_error.is_some()
+                        || placement.pending
                         || item.enabled != pack.item.enabled
                         || placement.error.is_some(),
                 });

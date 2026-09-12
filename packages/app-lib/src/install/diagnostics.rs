@@ -214,9 +214,11 @@ fn write_content_summary(details: &mut String, events: &[InstallJobEvent]) {
     let completed = events
         .iter()
         .filter_map(|event| match &event.kind {
-            InstallJobEventKind::ContentFileCompleted { path, bytes } => {
-                Some((path.as_str(), *bytes))
-            }
+            InstallJobEventKind::ContentFileCompleted {
+                path,
+                bytes,
+                reused,
+            } => Some((path.as_str(), *bytes, *reused)),
             _ => None,
         })
         .collect::<Vec<_>>();
@@ -262,8 +264,17 @@ fn write_content_summary(details: &mut String, events: &[InstallJobEvent]) {
     if !completed.is_empty() {
         let _ = writeln!(details);
         let _ = writeln!(details, "Recently completed files");
-        for (path, bytes) in completed.iter().rev().take(20) {
-            let _ = writeln!(details, "- {path} ({})", format_bytes(*bytes));
+        for (path, bytes, reused) in completed.iter().rev().take(20) {
+            if *reused {
+                let _ =
+                    writeln!(details, "- {path} (reused from shared store)");
+            } else {
+                let _ = writeln!(
+                    details,
+                    "- {path} ({} downloaded)",
+                    format_bytes(*bytes)
+                );
+            }
         }
         if completed.len() > 20 {
             let _ = writeln!(details, "- ... {} more", completed.len() - 20);

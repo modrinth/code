@@ -1,10 +1,19 @@
 use crate::State;
+use crate::state::content_store::{
+    FileContent, InstanceFileStatus, content_file_path, file_path_on_disk,
+};
 use crate::state::instances::adapters::{filesystem, sqlite};
 use crate::state::instances::{Instance, InstanceFile};
-use crate::state::{CachedEntry, ProjectType, file_hash_cache_key};
+use crate::state::{
+    CachedEntry, InstanceInstallStage, ProjectType, file_hash_cache_key,
+};
 use chrono::Utc;
 use std::collections::{HashMap, HashSet};
 use uuid::Uuid;
+
+use super::content_mutation::{
+    ContentChange, ContentChangeResult, InstanceContent,
+};
 
 pub(crate) async fn sync_content_files(
     instance_id: &str,
@@ -24,13 +33,42 @@ pub(crate) async fn sync_instance_content_files(
     instance: &Instance,
     state: &State,
 ) -> crate::Result<Vec<InstanceFile>> {
-    let _content_lock = state.lock_instance_content(&instance.id).await;
-    let scanned = filesystem::scan_content_files(
-        &state.directories.instances_dir(),
-        &instance.path,
-    )?;
-    let cache_keys = scanned
+    let (snapshot, known_files, known_bindings) = {
+        let instance_content =
+            InstanceContent::lock(&instance.id, state).await?;
+        let instance = instance_content.instance();
+        let snapshot = filesystem::scan_content_files(
+            &state.directories.instances_dir(),
+            &instance.path,
+        )?
+        .into_iter()
+        .map(|file| (file.relative_path.clone(), file))
+        .collect::<HashMap<_, _>>();
+        let known_files =
+            sqlite::content_rows::get_instance_files(&instance.id, &state.pool)
+                .await?;
+        let known_bindings =
+            crate::state::content_store::catalog::instance_storage(
+                &state.pool,
+                &instance.id,
+            )
+            .await?
+            .into_iter()
+            .map(|binding| binding.file_id)
+            .collect::<HashSet<_>>();
+        (snapshot, known_files, known_bindings)
+    };
+    let managed_paths = known_files
         .iter()
+        .filter(|file| known_bindings.contains(&file.id))
+        .map(|file| file.relative_path.trim_end_matches(".disabled"))
+        .collect::<HashSet<_>>();
+    let cache_keys = snapshot
+        .values()
+        .filter(|file| {
+            !managed_paths
+                .contains(file.relative_path.trim_end_matches(".disabled"))
+        })
         .map(|file| file.hash_cache_key.as_str())
         .collect::<Vec<_>>();
     let hashes = CachedEntry::get_file_hash_many(
@@ -53,103 +91,452 @@ pub(crate) async fn sync_instance_content_files(
             )
         })
         .collect::<HashMap<_, _>>();
-    let existing_files =
+
+    let instance_content = InstanceContent::lock(&instance.id, state).await?;
+    let instance = instance_content.instance();
+    let mut existing =
         sqlite::content_rows::get_instance_files(&instance.id, &state.pool)
             .await?;
-    let scanned_paths = scanned
+    let bindings = crate::state::content_store::catalog::instance_storage(
+        &state.pool,
+        &instance.id,
+    )
+    .await?
+    .into_iter()
+    .map(|binding| (binding.file_id.clone(), binding))
+    .collect::<HashMap<_, _>>();
+    let scanned = filesystem::scan_content_files(
+        &state.directories.instances_dir(),
+        &instance.path,
+    )?;
+    let normalized = normalize_legacy_content_files(
+        instance, &existing, &bindings, &scanned, state,
+    )
+    .await?;
+    if normalized {
+        existing =
+            sqlite::content_rows::get_instance_files(&instance.id, &state.pool)
+                .await?;
+    }
+    let existing_by_path = existing
         .iter()
-        .map(|file| file.relative_path.clone())
-        .collect::<HashSet<_>>();
-    let missing_file_ids = existing_files
-        .iter()
-        .filter(|file| {
-            !file.missing && !scanned_paths.contains(&file.relative_path)
-        })
-        .map(|file| file.id.clone())
-        .collect::<Vec<_>>();
-    let existing_files_by_path = existing_files
-        .into_iter()
-        .map(|file| (file.relative_path.clone(), file))
+        .map(|file| (file.relative_path.as_str(), file))
         .collect::<HashMap<_, _>>();
-
-    let now = Utc::now();
+    let managed_by_path = existing
+        .iter()
+        .filter(|file| bindings.contains_key(&file.id))
+        .map(|file| (file.relative_path.trim_end_matches(".disabled"), file))
+        .collect::<HashMap<_, _>>();
+    let mut canonical_paths = HashSet::new();
+    let mut duplicate_paths = HashSet::new();
+    for file in &scanned {
+        let canonical = file.relative_path.trim_end_matches(".disabled");
+        if !canonical_paths.insert(canonical) {
+            duplicate_paths.insert(canonical);
+        }
+    }
+    let running =
+        crate::state::instance_has_running_process(&instance.id, state).await?;
     let mut files = Vec::new();
-    let mut present_without_hash_ids = Vec::new();
-    let mut restored_without_hash = false;
-
-    for file in scanned {
-        let hash_key = file.hash_cache_key.trim_end_matches(".disabled");
-        let existing_file = existing_files_by_path.get(&file.relative_path);
-        let Some(hash) = hashes_by_key.get(hash_key) else {
-            if let Some(existing_file) = existing_file {
-                present_without_hash_ids.push(existing_file.id.clone());
-                restored_without_hash |= existing_file.missing;
+    let mut saved_files = HashSet::new();
+    for previous in &existing {
+        let Some(binding) = bindings.get(&previous.id) else {
+            continue;
+        };
+        let mut file = previous.clone();
+        let content = state.content_store.file_content(previous).await?;
+        let stored = matches!(content, FileContent::Stored { .. });
+        let file_status = state
+            .content_store
+            .check_instance_file(instance, previous, binding)
+            .await?;
+        file.missing = !stored || file_status != InstanceFileStatus::Healthy;
+        if !file.enabled
+            && file.missing
+            && stored
+            && file_status == InstanceFileStatus::Missing
+            && !running
+        {
+            file = match instance_content
+                .apply_change(ContentChange::Toggle {
+                    project_path: &file.relative_path,
+                    desired_enabled: Some(false),
+                })
+                .await?
+            {
+                ContentChangeResult::File(file) => file,
+                _ => unreachable!("repair mutations return a content file"),
+            };
+            saved_files.insert(file.id.clone());
+        }
+        if file.missing != previous.missing {
+            file.modified_at = Utc::now();
+        }
+        files.push(file);
+    }
+    for scanned in &scanned {
+        let canonical_path =
+            scanned.relative_path.trim_end_matches(".disabled");
+        let previous = existing_by_path
+            .get(scanned.relative_path.as_str())
+            .or_else(|| {
+                (!duplicate_paths.contains(canonical_path))
+                    .then(|| existing_by_path.get(canonical_path))
+                    .flatten()
+            })
+            .copied();
+        if let Some(file) = managed_by_path.get(canonical_path) {
+            if content_file_path(file) != scanned.relative_path {
+                tracing::warn!(
+                    instance_id = %instance.id,
+                    path = %scanned.relative_path,
+                    "Ignoring content at the inactive form of a managed path"
+                );
+            }
+            continue;
+        }
+        let Some(hash) = hashes_by_key
+            .get(scanned.hash_cache_key.trim_end_matches(".disabled"))
+            .filter(|_| {
+                snapshot
+                    .get(&scanned.relative_path)
+                    .is_some_and(|previous| {
+                        previous.hash_cache_key == scanned.hash_cache_key
+                            && previous.is_symlink == scanned.is_symlink
+                            && previous.has_linked_parent
+                                == scanned.has_linked_parent
+                    })
+            })
+        else {
+            if let Some(previous) = previous {
+                let mut file = previous.clone();
+                file.missing = false;
+                files.push(file);
             }
             continue;
         };
-
-        files.push(InstanceFile {
-            id: existing_file
+        let mut file = InstanceFile {
+            id: previous
                 .map(|file| file.id.clone())
                 .unwrap_or_else(instance_file_id),
             instance_id: instance.id.clone(),
-            relative_path: file.relative_path,
-            file_name: file.file_name,
-            enabled: file.enabled,
+            relative_path: scanned.relative_path.clone(),
+            file_name: scanned.file_name.clone(),
+            enabled: scanned.enabled,
             sha1: hash.hash.clone(),
-            size: file.size,
+            size: scanned.size,
             missing: false,
-            added_at: existing_file.map(|file| file.added_at).unwrap_or(now),
-            modified_at: now,
-        });
+            added_at: previous
+                .map(|file| file.added_at)
+                .unwrap_or_else(Utc::now),
+            modified_at: Utc::now(),
+        };
+        if let Some(previous) = previous {
+            file.relative_path.clone_from(&previous.relative_path);
+            file.file_name.clone_from(&previous.file_name);
+        } else if !duplicate_paths.contains(canonical_path) {
+            file.relative_path = canonical_path.to_string();
+            file.file_name =
+                scanned.file_name.trim_end_matches(".disabled").to_string();
+        }
+        files.push(file);
     }
-
-    let content_changed = !missing_file_ids.is_empty()
-        || restored_without_hash
+    let present_ids = files
+        .iter()
+        .map(|file| file.id.as_str())
+        .collect::<HashSet<_>>();
+    let missing = existing
+        .iter()
+        .filter(|file| !present_ids.contains(file.id.as_str()) && !file.missing)
+        .collect::<Vec<_>>();
+    let changed = normalized
+        || !missing.is_empty()
         || files.iter().any(|file| {
-            existing_files_by_path.get(&file.relative_path).is_none_or(
-                |existing| {
-                    existing.missing
-                        || existing.enabled != file.enabled
-                        || existing.sha1 != file.sha1
-                        || existing.size != file.size
-                },
-            )
+            existing
+                .iter()
+                .find(|previous| previous.id == file.id)
+                .is_none_or(|previous| {
+                    previous.missing != file.missing
+                        || previous.enabled != file.enabled
+                        || previous.sha1 != file.sha1
+                        || previous.relative_path != file.relative_path
+                })
         });
-
     let mut tx = state.pool.begin().await?;
-    for file_id in missing_file_ids {
+    for file in missing {
         sqlite::content_rows::set_instance_file_missing(
-            &file_id, true, &mut tx,
+            &file.id, true, &mut tx,
         )
         .await?;
     }
-
-    let mut stored_files =
-        Vec::with_capacity(files.len() + present_without_hash_ids.len());
-    for file_id in present_without_hash_ids {
-        if let Some(file) = sqlite::content_rows::set_instance_file_missing(
-            &file_id, false, &mut tx,
-        )
-        .await?
-        {
-            stored_files.push(file);
+    let mut stored = Vec::new();
+    for file in files {
+        if saved_files.contains(&file.id) {
+            stored.push(file);
+        } else {
+            stored.push(
+                sqlite::content_rows::upsert_instance_file(&file, &mut tx)
+                    .await?,
+            );
         }
     }
-    for file in &files {
-        stored_files.push(
-            sqlite::content_rows::upsert_instance_file(file, &mut tx).await?,
-        );
-    }
-
     tx.commit().await?;
-
-    if content_changed {
+    if changed {
         super::mark_shared_instance_stale(&instance.id, &state.pool).await?;
         crate::api::instance::queue_game_locale_index();
     }
+    Ok(stored)
+}
 
-    Ok(stored_files)
+/// Background migration releases its priority permit and content locks between files.
+pub(crate) async fn migrate_legacy_content(
+    instance_id: &str,
+    state: &State,
+    background: bool,
+) -> crate::Result<()> {
+    let (scanned, mut changed) = {
+        let _turn = if background {
+            Some(state.content_store.legacy_migration_priority.read().await)
+        } else {
+            None
+        };
+        let instance_content =
+            InstanceContent::lock(instance_id, state).await?;
+        let instance = instance_content.instance();
+        if instance.install_stage != InstanceInstallStage::Installed
+            || crate::state::instance_has_running_process(instance_id, state)
+                .await?
+            || sqlite::instance_rows::is_instance_quarantined(
+                instance_id,
+                &state.pool,
+            )
+            .await?
+        {
+            return Ok(());
+        }
+        let existing =
+            sqlite::content_rows::get_instance_files(instance_id, &state.pool)
+                .await?;
+        let bindings = crate::state::content_store::catalog::instance_storage(
+            &state.pool,
+            instance_id,
+        )
+        .await?
+        .into_iter()
+        .map(|binding| (binding.file_id.clone(), binding))
+        .collect::<HashMap<_, _>>();
+        let mut scanned = filesystem::scan_content_files(
+            &state.directories.instances_dir(),
+            &instance.path,
+        )?;
+        let normalized = normalize_legacy_content_files(
+            instance, &existing, &bindings, &scanned, state,
+        )
+        .await?;
+        let managed_paths = existing
+            .iter()
+            .filter(|file| bindings.contains_key(&file.id))
+            .map(|file| file.relative_path.trim_end_matches(".disabled"))
+            .collect::<HashSet<_>>();
+        let mut canonical_paths = HashSet::new();
+        let mut duplicates = HashSet::new();
+        for file in &scanned {
+            let canonical = file.relative_path.trim_end_matches(".disabled");
+            if !canonical_paths.insert(canonical.to_string()) {
+                duplicates.insert(canonical.to_string());
+            }
+        }
+        scanned.retain(|file| {
+            let canonical = file.relative_path.trim_end_matches(".disabled");
+            !file.is_symlink
+                && !file.has_linked_parent
+                && crate::state::content_store::eligible(&file.relative_path)
+                && !duplicates.contains(canonical)
+                && !managed_paths.contains(canonical)
+        });
+        (scanned, normalized)
+    };
+    for scanned in scanned {
+        let _turn = if background {
+            Some(state.content_store.legacy_migration_priority.read().await)
+        } else {
+            None
+        };
+        let instance_content =
+            InstanceContent::lock(instance_id, state).await?;
+        let instance = instance_content.instance();
+        if instance.install_stage != InstanceInstallStage::Installed
+            || crate::state::instance_has_running_process(instance_id, state)
+                .await?
+            || sqlite::instance_rows::is_instance_quarantined(
+                instance_id,
+                &state.pool,
+            )
+            .await?
+        {
+            break;
+        }
+        let canonical = scanned.relative_path.trim_end_matches(".disabled");
+        let previous =
+            sqlite::content_rows::get_instance_file_by_relative_path(
+                instance_id,
+                canonical,
+                &state.pool,
+            )
+            .await?;
+        if let Some(previous) = &previous
+            && crate::state::content_store::catalog::file_storage(
+                &state.pool,
+                &previous.id,
+            )
+            .await?
+            .is_some()
+        {
+            continue;
+        }
+        let inactive = file_path_on_disk(canonical, !scanned.enabled);
+        let inactive = state
+            .content_store
+            .instance_path(&instance.path, &inactive)
+            .await?;
+        match tokio::fs::symlink_metadata(inactive).await {
+            Ok(_) => continue,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+            Err(error) => return Err(error.into()),
+        }
+        let source = state
+            .content_store
+            .instance_path(&instance.path, &scanned.relative_path)
+            .await?;
+        let metadata = match tokio::fs::symlink_metadata(source).await {
+            Ok(metadata)
+                if metadata.is_file() && !metadata.file_type().is_symlink() =>
+            {
+                metadata
+            }
+            Ok(_) => continue,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                continue;
+            }
+            Err(error) => return Err(error.into()),
+        };
+        let file = InstanceFile {
+            id: previous
+                .as_ref()
+                .map(|file| file.id.clone())
+                .unwrap_or_else(instance_file_id),
+            instance_id: instance_id.to_string(),
+            relative_path: scanned.relative_path,
+            file_name: scanned.file_name,
+            enabled: scanned.enabled,
+            sha1: String::new(),
+            size: metadata.len(),
+            missing: false,
+            added_at: previous
+                .as_ref()
+                .map(|file| file.added_at)
+                .unwrap_or_else(Utc::now),
+            modified_at: Utc::now(),
+        };
+        match instance_content
+            .apply_change(ContentChange::Adopt { file: &file })
+            .await?
+        {
+            ContentChangeResult::File(_) => changed = true,
+            ContentChangeResult::Deferred { reason } => tracing::warn!(
+                instance_id, path = %file.relative_path, reason,
+                "Legacy file adoption deferred",
+            ),
+            ContentChangeResult::Removed => {
+                unreachable!("adoption cannot remove content")
+            }
+        }
+    }
+    if changed {
+        super::mark_shared_instance_stale(instance_id, &state.pool).await?;
+        crate::api::instance::queue_game_locale_index();
+        crate::event::emit::emit_instance(
+            instance_id,
+            crate::event::InstancePayloadType::Synced,
+        )
+        .await?;
+    }
+    Ok(())
+}
+
+async fn normalize_legacy_content_files(
+    instance: &Instance,
+    existing: &[InstanceFile],
+    bindings: &HashMap<
+        String,
+        crate::state::content_store::InstanceFileStorage,
+    >,
+    scanned: &[filesystem::ScannedContentFile],
+    state: &State,
+) -> crate::Result<bool> {
+    let mut renames = Vec::new();
+    for scanned in scanned {
+        let canonical = scanned.relative_path.trim_end_matches(".disabled");
+        let disabled = format!("{canonical}.disabled");
+        let source =
+            existing.iter().find(|file| file.relative_path == disabled);
+        let target =
+            existing.iter().find(|file| file.relative_path == canonical);
+        let Some(source) = source.or(target) else {
+            continue;
+        };
+        if bindings.contains_key(&source.id)
+            || target.is_some_and(|file| bindings.contains_key(&file.id))
+            || source.relative_path == canonical
+                && source.enabled == scanned.enabled
+        {
+            continue;
+        }
+        let opposite = file_path_on_disk(canonical, !scanned.enabled);
+        let opposite = state
+            .directories
+            .instances_dir()
+            .join(&instance.path)
+            .join(opposite);
+        match tokio::fs::symlink_metadata(opposite).await {
+            Ok(_) => continue,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+            Err(error) => return Err(error.into()),
+        }
+        renames.push((
+            source,
+            canonical,
+            scanned.file_name.trim_end_matches(".disabled"),
+            scanned.enabled,
+        ));
+    }
+    if renames.is_empty() {
+        return Ok(false);
+    }
+    let mut tx = state.pool.begin().await?;
+    for (source, canonical, file_name, enabled) in renames {
+        if let Some(file) = sqlite::content_rows::rename_instance_file(
+            &instance.id,
+            &source.relative_path,
+            canonical,
+            file_name,
+            enabled,
+            &mut tx,
+        )
+        .await?
+            && let Some(content_set_id) = &instance.applied_content_set_id
+        {
+            sqlite::content_rows::set_content_entry_enabled_for_file(
+                content_set_id,
+                &file.id,
+                enabled,
+                &mut tx,
+            )
+            .await?;
+        }
+    }
+    tx.commit().await?;
+    Ok(true)
 }
 
 pub(crate) fn project_type_for_file(

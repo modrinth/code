@@ -2288,15 +2288,16 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<ServerStackIcon />
 			</NavButton>
 			<suspense>
-				<QuickInstanceSwitcher />
+				<QuickInstanceSwitcher>
+					<NavButton
+						v-tooltip.right="formatMessage(messages.createNewInstance)"
+						:to="() => installationModal?.show()"
+						:disabled="offline"
+					>
+						<PlusIcon />
+					</NavButton>
+				</QuickInstanceSwitcher>
 			</suspense>
-			<NavButton
-				v-tooltip.right="formatMessage(messages.createNewInstance)"
-				:to="() => installationModal?.show()"
-				:disabled="offline"
-			>
-				<PlusIcon />
-			</NavButton>
 			<NavButton
 				v-tooltip.right="formatMessage(commonMessages.settingsLabel)"
 				:to="() => appSettingsModal?.show()"

@@ -45,6 +45,8 @@ export interface FileManagerContext {
 	isBusy?: Ref<boolean> | ComputedRef<boolean>
 	busyTooltip?: Ref<string | undefined> | ComputedRef<string | undefined>
 	busyWarning?: Ref<string | null> | ComputedRef<string | null>
+	isReadOnly?: (path: string) => boolean
+	readOnlyReason?: Ref<string> | ComputedRef<string>
 
 	extractFile?: (
 		path: string,

@@ -2,11 +2,9 @@
 use crate::LoadingBarType;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::state::LAUNCHER_STATE;
-use crate::state::{JavaVersion, Settings};
+use crate::state::Settings;
 use crate::util::fetch::IoSemaphore;
-use dashmap::DashSet;
-use std::path::{Path, PathBuf};
-use std::sync::Arc;
+use std::path::PathBuf;
 use tokio::fs;
 
 pub const CACHES_FOLDER_NAME: &str = "caches";
@@ -14,8 +12,9 @@ pub const LAUNCHER_LOGS_FOLDER_NAME: &str = "launcher_logs";
 pub const INSTANCES_FOLDER_NAME: &str = "profiles";
 pub const METADATA_FOLDER_NAME: &str = "meta";
 pub const SYNCED_OPTIONS_FOLDER_NAME: &str = "synced-options";
+pub const STORE_FOLDER_NAME: &str = "store";
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct DirectoryInfo {
     pub settings_dir: PathBuf, // Base settings directory- app database
     pub config_dir: PathBuf, // Base config directory- instances, minecraft downloads, etc. Changeable as a setting.
@@ -65,10 +64,26 @@ impl DirectoryInfo {
         })
     }
 
+    pub fn store_dir(&self) -> PathBuf {
+        self.config_dir.join(STORE_FOLDER_NAME)
+    }
+
+    pub fn content_store_dir(&self) -> PathBuf {
+        self.store_dir().join("content")
+    }
+
+    pub fn store_staging_dir(&self) -> PathBuf {
+        self.store_dir().join("staging")
+    }
+
     /// Get the Minecraft instance metadata directory
     #[inline]
     pub fn metadata_dir(&self) -> PathBuf {
         self.config_dir.join(METADATA_FOLDER_NAME)
+    }
+
+    pub fn install_backups_dir(&self) -> PathBuf {
+        self.metadata_dir().join("install_job_backups")
     }
 
     /// Get the Minecraft java versions metadata directory
@@ -198,332 +213,105 @@ impl DirectoryInfo {
         std::env::var_os(name).map(PathBuf::from)
     }
 
-    #[tracing::instrument(skip(settings, exec, io_semaphore))]
-    pub async fn move_launcher_directory<'a, E>(
+    #[tracing::instrument(skip(settings, pool, _io_semaphore))]
+    pub async fn move_launcher_directory(
         settings: &mut Settings,
-        exec: E,
-        io_semaphore: &IoSemaphore,
+        pool: &sqlx::SqlitePool,
+        _io_semaphore: &IoSemaphore,
         app_identifier: &str,
-    ) -> crate::Result<()>
-    where
-        E: sqlx::Executor<'a, Database = sqlx::Sqlite> + Copy,
-    {
-        let app_dir = DirectoryInfo::initial_settings_dir_path(app_identifier)
-            .ok_or(crate::ErrorKind::FSError(
-                "Could not find valid config dir".to_string(),
-            ))?;
-
-        if let Some(ref prev_custom_dir) = settings.prev_custom_dir {
-            let prev_dir = PathBuf::from(prev_custom_dir);
-
-            let move_dir = settings
-                .custom_dir
-                .as_ref()
-                .map_or_else(|| app_dir.clone(), PathBuf::from);
-
-            async fn is_dir_writable(
-                new_config_dir: &Path,
-            ) -> crate::Result<bool> {
-                let temp_path = new_config_dir.join(".tmp");
-                match fs::write(temp_path.clone(), "test").await {
-                    Ok(_) => {
-                        fs::remove_file(temp_path).await?;
-                        Ok(true)
-                    }
-                    Err(e) => {
-                        tracing::error!(
-                            "Error writing to new config dir: {}",
-                            e
-                        );
-                        Ok(false)
-                    }
-                }
-            }
-
-            fn get_disk_usage(path: &Path) -> crate::Result<Option<u64>> {
-                let path = crate::util::io::canonicalize(path)?;
-
-                let disks = sysinfo::Disks::new_with_refreshed_list();
-
-                for disk in &disks {
-                    if path.starts_with(disk.mount_point()) {
-                        return Ok(Some(disk.available_space()));
-                    }
-                }
-
-                Ok(None)
-            }
-
-            let new_dir = move_dir.to_string_lossy().to_string();
-
-            if prev_dir != move_dir {
-                let loader_bar_id = init_loading(
-                    LoadingBarType::DirectoryMove {
-                        old: prev_dir.to_string_lossy().into_owned(),
-                        new: move_dir.to_string_lossy().into_owned(),
-                    },
-                    100.0,
-                    "Moving launcher directory",
+    ) -> crate::Result<()> {
+        let initial = DirectoryInfo::initial_settings_dir_path(app_identifier)
+            .ok_or_else(|| {
+                crate::ErrorKind::FSError(
+                    "Could not find the app directory".to_string(),
                 )
-                .await?;
-
-                if !is_dir_writable(&move_dir).await? {
-                    return Err(crate::ErrorKind::DirectoryMoveError(format!("Cannot move directory to {}: directory is not writable", move_dir.display())).into());
-                }
-
-                const MOVE_DIRS: &[&str] = &[
-                    CACHES_FOLDER_NAME,
-                    INSTANCES_FOLDER_NAME,
-                    METADATA_FOLDER_NAME,
-                    SYNCED_OPTIONS_FOLDER_NAME,
-                ];
-
-                struct MovePath {
-                    old: PathBuf,
-                    new: PathBuf,
-                    size: u64,
-                }
-
-                async fn add_paths(
-                    source: &Path,
-                    destination: &Path,
-                    paths: &mut Vec<MovePath>,
-                    total_size: &mut u64,
-                ) -> crate::Result<()> {
-                    if !source.exists() {
-                        crate::util::io::create_dir_all(source).await?;
-                    }
-
-                    if !destination.exists() {
-                        crate::util::io::create_dir_all(destination).await?;
-                    }
-
-                    for entry_path in
-                        crate::pack::import::get_all_subfiles(source, false)
-                            .await?
-                    {
-                        let relative_path = entry_path.strip_prefix(source)?;
-                        let new_path = destination.join(relative_path);
-                        let path_size =
-                            entry_path.metadata().map(|x| x.len()).unwrap_or(0);
-
-                        *total_size += path_size;
-
-                        paths.push(MovePath {
-                            old: entry_path,
-                            new: new_path,
-                            size: path_size,
-                        });
-                    }
-
-                    Ok(())
-                }
-
-                let mut paths: Vec<MovePath> = vec![];
-                let mut total_size = 0;
-
-                for dir in MOVE_DIRS {
-                    add_paths(
-                        &prev_dir.join(dir),
-                        &move_dir.join(dir),
-                        &mut paths,
-                        &mut total_size,
-                    )
-                    .await?;
-                    emit_loading(
-                        &loader_bar_id,
-                        10.0 / (MOVE_DIRS.len() as f64),
-                        None,
-                    )?;
-                }
-
-                let paths_len = paths.len();
-
-                if crate::util::io::is_same_disk(&prev_dir, &move_dir)
-                    .unwrap_or(false)
-                {
-                    let success_idxs = Arc::new(DashSet::new());
-
-                    let loader_bar_id = Arc::new(&loader_bar_id);
-                    let res =
-                        futures::future::try_join_all(paths.iter().enumerate().map(|(idx, x)| {
-                            let loader_bar_id = loader_bar_id.clone();
-                            let success_idxs = success_idxs.clone();
-
-                            async move {
-                                let _permit = io_semaphore.0.acquire().await?;
-
-                                if let Some(parent) = x.new.parent() {
-                                    crate::util::io::create_dir_all(parent).await.map_err(|e| {
-                                        crate::Error::from(crate::ErrorKind::DirectoryMoveError(
-                                            format!(
-                                                "Failed to create directory {}: {}",
-                                                parent.display(),
-                                                e
-                                            )
-                                        ))
-                                    })?;
-                                }
-
-                                crate::util::io::rename_or_move(
-                                    &x.old,
-                                    &x.new,
-                                )
-                                .await
-                                    .map_err(|e| {
-                                        crate::Error::from(crate::ErrorKind::DirectoryMoveError(
-                                            format!(
-                                                "Failed to move directory from {} to {}: {e:?}",
-                                                x.old.display(),
-                                                x.new.display(),
-                                            ),
-                                        ))
-                                    })?;
-
-                                let _ = emit_loading(
-                                    &loader_bar_id,
-                                    90.0 / paths_len as f64,
-                                    None,
-                                );
-
-                                success_idxs.insert(idx);
-
-                                Ok::<(), crate::Error>(())
-                            }
-                        }))
-                        .await;
-
-                    if let Err(e) = res {
-                        for idx in success_idxs.iter() {
-                            let path = &paths[*idx.key()];
-
-                            let res =
-                                tokio::fs::rename(&path.new, &path.old).await;
-
-                            if let Err(e) = res {
-                                tracing::warn!(
-                                    "Failed to rollback directory {}: {}",
-                                    path.new.display(),
-                                    e
-                                );
-                            }
-                        }
-
-                        return Err(e);
-                    }
-                } else {
-                    if let Some(disk_usage) = get_disk_usage(&move_dir)?
-                        && total_size > disk_usage
-                    {
-                        return Err(crate::ErrorKind::DirectoryMoveError(format!("Not enough space to move directory to {}: only {} bytes available", app_dir.display(), disk_usage)).into());
-                    }
-
-                    let loader_bar_id = Arc::new(&loader_bar_id);
-                    futures::future::try_join_all(paths.iter().map(|x| {
-                        let loader_bar_id = loader_bar_id.clone();
-
-                        async move {
-                            crate::util::fetch::copy(
-                                &x.old,
-                                &x.new,
-                                io_semaphore,
-                            )
-                            .await.map_err(|e| { crate::Error::from(
-                                crate::ErrorKind::DirectoryMoveError(format!("Failed to move directory from {} to {}: {e:?}", x.old.display(), x.new.display())))
-                            })?;
-
-                            let _ = emit_loading(
-                                &loader_bar_id,
-                                ((x.size as f64) / (total_size as f64)) * 60.0,
-                                None,
-                            );
-
-                            Ok::<(), crate::Error>(())
-                        }
-                    }))
-                    .await?;
-
-                    futures::future::join_all(paths.iter().map(|x| {
-                        let loader_bar_id = loader_bar_id.clone();
-
-                        async move {
-                            let res = async {
-                                let _permit = io_semaphore.0.acquire().await?;
-                                crate::util::io::remove_file(&x.old).await?;
-
-                                emit_loading(
-                                    &loader_bar_id,
-                                    30.0 / paths_len as f64,
-                                    None,
-                                )?;
-
-                                Ok::<(), crate::Error>(())
-                            };
-
-                            if let Err(e) = res.await {
-                                tracing::warn!(
-                                    "Failed to remove old file {}: {}",
-                                    x.old.display(),
-                                    e
-                                );
-                            }
-                        }
-                    }))
-                    .await;
-                }
-
-                let java_versions = JavaVersion::get_all(exec).await?;
-                for (_, mut java_version) in java_versions {
-                    java_version.path = java_version.path.replace(
-                        prev_custom_dir,
-                        new_dir.trim_end_matches('/').trim_end_matches('\\'),
-                    );
-                    java_version.upsert(exec).await?
-                }
-
-                let new_dir = new_dir
-                    .trim_end_matches('/')
-                    .trim_end_matches('\\')
-                    .to_string();
-                let new_dir = new_dir.as_str();
-                sqlx::query!(
-                    "
-                    UPDATE instances
-                    SET icon_path = replace(icon_path, ?, ?)
-                    WHERE icon_path IS NOT NULL
-                    ",
-                    prev_custom_dir,
-                    new_dir,
-                )
-                .execute(exec)
-                .await?;
-                sqlx::query!(
-                    "
-                    UPDATE instance_launch_overrides
-                    SET overrides = jsonb(json_set(
-                        overrides,
-                        '$.java_path',
-                        replace(json_extract(overrides, '$.java_path'), ?, ?)
-                    ))
-                    WHERE json_type(overrides, '$.java_path') = 'text'
-                    ",
-                    prev_custom_dir,
-                    new_dir,
-                )
-                .execute(exec)
-                .await?;
+            })?;
+        let destination = settings
+            .custom_dir
+            .as_ref()
+            .map(PathBuf::from)
+            .unwrap_or_else(|| initial.clone());
+        let previous = settings.prev_custom_dir.as_ref().map(PathBuf::from);
+        let previous_root = match &previous {
+            Some(previous) => Some(fs::canonicalize(previous).await?),
+            None => None,
+        };
+        fs::create_dir_all(&destination).await?;
+        let destination_root = fs::canonicalize(&destination).await?;
+        let moving = previous_root
+            .as_ref()
+            .is_some_and(|root| root != &destination_root);
+        let pending_move = super::content_store::catalog::setting(
+            pool,
+            "store_directory_move",
+        )
+        .await?
+        .filter(|checkpoint| !checkpoint.is_empty())
+        .map(|checkpoint| {
+            serde_json::from_str::<(PathBuf, PathBuf)>(&checkpoint)
+        })
+        .transpose()?;
+        let settings_root = fs::canonicalize(&initial).await?;
+        let mut locked_roots = std::collections::HashSet::from([settings_root]);
+        let mut move_locks = Vec::new();
+        let pending_roots = pending_move
+            .as_ref()
+            .into_iter()
+            .flat_map(|(from, to)| [from, to]);
+        for root in previous
+            .iter()
+            .chain(std::iter::once(&destination))
+            .chain(pending_roots)
+        {
+            let root = fs::canonicalize(root).await?;
+            if locked_roots.insert(root.clone()) {
+                move_locks.push(
+                    super::content_store::ContentStore::lock_process(&root)
+                        .await?,
+                );
             }
-
-            settings.custom_dir = Some(new_dir);
         }
-
+        if let Some(previous) = &previous
+            && moving
+        {
+            let loading = init_loading(
+                LoadingBarType::DirectoryMove {
+                    old: previous.to_string_lossy().into_owned(),
+                    new: destination.to_string_lossy().into_owned(),
+                },
+                100.0,
+                "Moving launcher directory",
+            )
+            .await?;
+            super::content_store::migration::move_app_directory(
+                previous,
+                &destination,
+                pool,
+            )
+            .await?;
+            emit_loading(&loading, 100.0, None)?;
+        }
+        if !moving {
+            super::content_store::migration::resume_completed_move(
+                &destination,
+                pool,
+            )
+            .await?;
+        }
+        settings.custom_dir = Some(destination.to_string_lossy().into_owned());
         settings.prev_custom_dir.clone_from(&settings.custom_dir);
-        if settings.custom_dir.is_none() {
-            settings.custom_dir = Some(app_dir.to_string_lossy().to_string());
+        settings.update(pool).await?;
+        if let Some(previous) = &previous
+            && moving
+        {
+            super::content_store::migration::finish_app_directory_move(
+                previous,
+                &destination,
+                pool,
+            )
+            .await?;
         }
-
-        settings.update(exec).await?;
-
+        drop(move_locks);
         Ok(())
     }
 }

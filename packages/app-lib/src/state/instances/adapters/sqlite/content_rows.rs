@@ -947,6 +947,14 @@ pub(crate) async fn rename_instance_file(
         && source_id != target_id
     {
         sqlx::query!(
+			"INSERT INTO instance_content_locks (file_id) SELECT ? WHERE EXISTS (SELECT 1 FROM instance_content_locks WHERE file_id = ?) ON CONFLICT (file_id) DO NOTHING",
+			source_id,
+			target_id,
+		)
+		.execute(&mut **tx)
+		.await?;
+
+        sqlx::query!(
             "
 				DELETE FROM instance_content_entries
 				WHERE id IN (

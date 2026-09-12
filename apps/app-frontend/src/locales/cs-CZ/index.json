@@ -95,9 +95,6 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "Aktualizace sdíleného obsahu"
   },
-  "app.action-bar.installs": {
-    "message": "Instalace"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "Nastavit jako primární instanci"
   },

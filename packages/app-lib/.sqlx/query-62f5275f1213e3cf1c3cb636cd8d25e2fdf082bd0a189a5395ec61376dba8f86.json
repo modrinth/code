@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT pid, start_time FROM processes",
+  "describe": {
+    "columns": [
+      {
+        "name": "pid",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "start_time",
+        "ordinal": 1,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "62f5275f1213e3cf1c3cb636cd8d25e2fdf082bd0a189a5395ec61376dba8f86"
+}

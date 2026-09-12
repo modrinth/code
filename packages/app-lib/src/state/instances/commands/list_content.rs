@@ -15,9 +15,7 @@ use crate::state::{
     ProjectType, ReleaseChannel, TeamMember, Version, VersionEnvironment,
     VersionV3,
 };
-use crate::util::fetch::{
-    DownloadMeta, DownloadReason, FetchSemaphore, fetch_file_mirrors,
-};
+use crate::util::fetch::{DownloadMeta, DownloadReason, FetchSemaphore};
 use async_zip::tokio::read::fs::ZipFileReader;
 use dashmap::DashMap;
 use sqlx::SqlitePool;
@@ -331,6 +329,7 @@ pub(crate) async fn list_linked_modpack_content(
     let modpack_ids = match get_modpack_identifiers(
         &version_id,
         &resolved.content_set,
+        state,
         &state.pool,
         &state.api_semaphore,
     )
@@ -1336,6 +1335,7 @@ async fn get_cached_modpack_identifiers(
 async fn get_modpack_identifiers(
     version_id: &str,
     content_set: &ContentSet,
+    state: &State,
     pool: &SqlitePool,
     fetch_semaphore: &FetchSemaphore,
 ) -> crate::Result<ModpackIdentifiers> {
@@ -1402,13 +1402,13 @@ async fn get_modpack_identifiers(
         loader: content_set.loader.as_str().to_string(),
         dependent_on: Some(version_id.to_string()),
     };
-    let mrpack_file = fetch_file_mirrors(
+    let mrpack_file = crate::util::fetch::fetch_content_file(
+        state,
         &[&primary_file.url],
+        primary_file.hashes.get("sha512").map(String::as_str),
         primary_file.hashes.get("sha1").map(String::as_str),
+        Some(u64::from(primary_file.size)),
         Some(&download_meta),
-        None,
-        fetch_semaphore,
-        pool,
         None,
     )
     .await?;

@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT binding.blob_sha512, binding.materialization_kind, file.size FROM store_instance_files binding INNER JOIN instance_files file ON file.id = binding.file_id WHERE file.missing = 0",
+  "describe": {
+    "columns": [
+      {
+        "name": "blob_sha512",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "materialization_kind",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "size",
+        "ordinal": 2,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "4a61be9c9656ac5e0017a64752670625caa1412a520c41351c7d38f94dae7bda"
+}

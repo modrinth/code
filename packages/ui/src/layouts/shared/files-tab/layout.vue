@@ -90,8 +90,10 @@
 									:index="visibleRange.start + idx"
 									:is-last="visibleRange.start + idx === filteredItems.length - 1"
 									:selected="selectedItems.has(item.path)"
-									:write-disabled="isBusy"
-									:write-disabled-tooltip="busyTooltip"
+									:write-disabled="isBusy || !!ctx.isReadOnly?.(item.path)"
+									:write-disabled-tooltip="
+										ctx.isReadOnly?.(item.path) ? ctx.readOnlyReason?.value : busyTooltip
+									"
 									@extract="() => handleExtractItem(item)"
 									@delete="() => showDeleteModal(item)"
 									@rename="() => showRenameModal(item)"
@@ -188,7 +190,7 @@
 					v-tooltip="busyTooltip"
 					type="quiet"
 					color="red"
-					:disabled="isBusy"
+					:disabled="isBusy || selectionReadOnly"
 					class="hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
 					@click="showBulkDeleteModal"
 				>
@@ -306,8 +308,12 @@ const baseId = `files-${Math.random().toString(36).slice(2, 9)}`
 
 const items = computed(() => ctx.items.value)
 const isEditing = computed(() => ctx.editingFile.value !== null)
-const isBusy = computed(() => ctx.isBusy?.value ?? false)
-const busyTooltip = computed(() => ctx.busyTooltip?.value)
+const isBusy = computed(
+	() => (ctx.isBusy?.value ?? false) || (ctx.isReadOnly?.(ctx.currentPath.value) ?? false),
+)
+const busyTooltip = computed(() =>
+	ctx.isReadOnly?.(ctx.currentPath.value) ? ctx.readOnlyReason?.value : ctx.busyTooltip?.value,
+)
 
 const breadcrumbSegments = computed(() => {
 	const path = ctx.currentPath.value
@@ -335,6 +341,10 @@ const {
 	allSelected,
 	someSelected,
 } = useFileSelection(filteredItems)
+
+const selectionReadOnly = computed(() =>
+	[...selectedItems.value].some((path) => ctx.isReadOnly?.(path)),
+)
 
 const { recordOperation, onKeydown } = useFileUndoRedo(
 	(path, newName) => ctx.renameItem(path, newName),
@@ -571,25 +581,25 @@ function showUnzipFromUrlModal(cf: boolean) {
 }
 
 function showRenameModal(item: FileItem) {
-	if (isBusy.value) return
+	if (isBusy.value || ctx.isReadOnly?.(item.path)) return
 	selectedItem.value = item
 	renameItemModal.value?.show(item)
 }
 
 function showMoveModal(item: FileItem) {
-	if (isBusy.value) return
+	if (isBusy.value || ctx.isReadOnly?.(item.path)) return
 	selectedItem.value = item
 	moveItemModal.value?.show()
 }
 
 function showDeleteModal(item: FileItem) {
-	if (isBusy.value) return
+	if (isBusy.value || ctx.isReadOnly?.(item.path)) return
 	selectedItem.value = item
 	deleteItemModal.value?.show()
 }
 
 function showBulkDeleteModal() {
-	if (isBusy.value) return
+	if (isBusy.value || selectionReadOnly.value) return
 	if (selectedItems.value.size === 0) return
 
 	const itemsToDelete = Array.from(selectedItems.value)

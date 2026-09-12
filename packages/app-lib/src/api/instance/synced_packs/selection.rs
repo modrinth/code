@@ -59,33 +59,31 @@ async fn local_sources(
     }
     Ok(files
         .into_iter()
-        .filter_map(|file| {
-            kinds
-                .get(&file.id)
-                .copied()
-                .map(|kind| (file.relative_path, kind))
-        })
+		.filter(|file| !file.missing)
+		.map(|file| {
+			let kind = kinds
+				.get(&file.id)
+				.copied()
+				.unwrap_or(ContentSourceKind::Local);
+			(file.relative_path, kind)
+		})
         .collect())
 }
 
 fn local_file(
-    metadata: &InstanceMetadata,
     path: &str,
-    state: &State,
     sources: &BTreeMap<String, ContentSourceKind>,
 ) -> bool {
     !path.is_empty()
-        && instance_dir(metadata, state).join(path).exists()
         && sources
             .get(path)
-            .is_none_or(|kind| *kind == ContentSourceKind::Local)
+			.is_some_and(|kind| *kind == ContentSourceKind::Local)
 }
 
 fn can_capture(
     metadata: &InstanceMetadata,
     pack: &SyncedPack,
     placement: &PackPlacement,
-    state: &State,
     sources: &BTreeMap<String, ContentSourceKind>,
 ) -> bool {
     if pack.item.project_type != ProjectType::ResourcePack
@@ -95,12 +93,11 @@ fn can_capture(
         || placement.suspended
         || placement.pending
         || placement.error.is_some()
-        || placement.path.ends_with(".disabled")
         || placement.content_set_id != metadata.applied_content_set.id
     {
         return false;
     }
-    local_file(metadata, &placement.path, state, sources)
+	local_file(&placement.path, sources)
 }
 
 pub(super) async fn selected_in_instance(
@@ -140,7 +137,7 @@ pub(super) async fn capture_source_order(
         };
         if pack.selected != Some(true)
             || placement.resource_pack_selection_pending
-            || !can_capture(metadata, pack, placement, state, &sources)
+			|| !can_capture(metadata, pack, placement, &sources)
         {
             continue;
         }
@@ -224,7 +221,7 @@ pub(super) async fn capture(
             continue;
         };
         if !participating(metadata, pack, global)
-            || !can_capture(metadata, pack, &placement, state, &sources)
+			|| !can_capture(metadata, pack, &placement, &sources)
         {
             continue;
         }
@@ -461,7 +458,7 @@ pub(super) async fn apply(
             || placement.pending
             || placement.error.is_some()
             || placement.content_set_id != metadata.applied_content_set.id
-            || !local_file(metadata, &placement.path, state, &sources)
+			|| !local_file(&placement.path, &sources)
         {
             continue;
         }

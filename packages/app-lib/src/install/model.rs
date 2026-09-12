@@ -134,6 +134,8 @@ pub enum InstallJobEventKind {
     ContentFileCompleted {
         path: String,
         bytes: u64,
+        #[serde(default)]
+        reused: bool,
     },
     Interrupted {
         reason: InstallInterruptReason,
@@ -699,6 +701,10 @@ pub struct InstallJobSnapshot {
     pub instance_id: Option<String>,
     pub kind: InstallJobKind,
     pub status: InstallJobStatus,
+    pub paused: bool,
+    pub canceling: bool,
+    pub can_pause: bool,
+    pub can_cancel: bool,
     pub target: InstallTarget,
     pub phase: InstallPhaseId,
     pub progress: Option<InstallProgress>,

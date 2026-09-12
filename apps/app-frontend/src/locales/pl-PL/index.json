@@ -95,9 +95,6 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "Aktualizowanie udostępnionych zasobów"
   },
-  "app.action-bar.installs": {
-    "message": "Instalacje"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "Ustaw jako główną instancję"
   },

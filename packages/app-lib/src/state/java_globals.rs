@@ -29,15 +29,25 @@ impl JavaVersion {
         .fetch_optional(exec)
         .await?;
 
-        Ok(res.map(|x| JavaVersion {
-            parsed_version: major_version,
-            version: x.full_version,
-            architecture: x.architecture,
-            path: x.path,
-        }))
+        Ok(res
+            .filter(|version| std::path::Path::new(&version.path).is_file())
+            .map(|x| JavaVersion {
+                parsed_version: major_version,
+                version: x.full_version,
+                architecture: x.architecture,
+                path: x.path,
+            }))
     }
 
     pub async fn get_all(
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<DashMap<u32, Self>> {
+        let res = Self::get_all_registered(exec).await?;
+        res.retain(|_, java| std::path::Path::new(&java.path).is_file());
+        Ok(res)
+    }
+
+    pub(crate) async fn get_all_registered(
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<DashMap<u32, Self>> {
         let res = sqlx::query!(

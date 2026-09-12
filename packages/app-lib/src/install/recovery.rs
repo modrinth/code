@@ -27,18 +27,28 @@ const SHARED_INSTANCE_ROLLBACK_INSTANCE_DIR: &str = "instance";
 struct SharedInstanceUpdateRollback {
     files: Vec<InstanceFile>,
     entries: Vec<ContentEntry>,
+    #[serde(default)]
+    bindings: Vec<crate::state::content_store::InstanceFileStorage>,
 }
 
-pub(super) async fn prepare_shared_instance_update_backup(
+pub(super) async fn prepare_instance_update_backup(
     job_id: Uuid,
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<PathBuf> {
-    let staging_dir = state
-        .directories
-        .metadata_dir()
-        .join("install_job_backups")
-        .join(job_id.to_string());
+    let _lease = state.content_store.lease().await;
+    let _content_lock =
+        state.lock_instance_content(&metadata.instance.id).await;
+    let _store_lock = state.content_store.files_lock.lock().await;
+    if crate::state::instance_has_running_process(&metadata.instance.id, state)
+        .await?
+    {
+        return Err(crate::state::content_store::input(
+            "Stop this instance before backing it up for an update",
+        ));
+    }
+    let owner = job_id.to_string();
+    let staging_dir = instance_update_backup_dir(job_id, state);
     if tokio::fs::try_exists(&staging_dir).await? {
         crate::util::io::remove_dir_all(&staging_dir).await?;
     }
@@ -55,7 +65,48 @@ pub(super) async fn prepare_shared_instance_update_backup(
             &state.pool,
         )
         .await?;
-        let snapshot = SharedInstanceUpdateRollback { files, entries };
+        let bindings = crate::state::content_store::catalog::instance_storage(
+            &state.pool,
+            &metadata.instance.id,
+        )
+        .await?;
+		for binding in &bindings {
+			let file = files
+				.iter()
+				.find(|file| file.id == binding.file_id)
+				.ok_or_else(|| {
+					crate::state::content_store::input(
+						"Backup content reference has no file record",
+					)
+				})?;
+			let file_status = state.content_store
+				.check_instance_file(&metadata.instance, file, binding).await?;
+			let content = state.content_store.file_content(file).await?;
+			if file_status != crate::state::content_store::InstanceFileStatus::Healthy
+				|| !matches!(content, crate::state::content_store::FileContent::Stored { .. })
+			{
+				return Err(crate::state::content_store::input(format!(
+					"Restore or repair {} before updating this instance; its current content cannot be backed up safely",
+					file.relative_path,
+				)));
+			}
+		}
+        let skipped = files
+            .iter()
+            .filter(|file| {
+                bindings.iter().any(|binding| binding.file_id == file.id)
+            })
+            .map(crate::state::content_store::content_file_path)
+            .collect();
+        let retained = bindings
+            .iter()
+            .map(|binding| binding.blob_sha512.clone())
+            .collect::<Vec<_>>();
+        let snapshot = SharedInstanceUpdateRollback {
+            files,
+            entries,
+            bindings,
+        };
         let instance_path = state
             .directories
             .instances_dir()
@@ -63,6 +114,7 @@ pub(super) async fn prepare_shared_instance_update_backup(
         copy_directory(
             &instance_path,
             &staging_dir.join(SHARED_INSTANCE_ROLLBACK_INSTANCE_DIR),
+            &skipped,
             state,
         )
         .await?;
@@ -71,6 +123,10 @@ pub(super) async fn prepare_shared_instance_update_backup(
             serde_json::to_vec(&snapshot)?,
         )
         .await?;
+        state
+            .content_store
+            .retain("rollback", &owner, &retained)
+            .await?;
 
         Ok::<(), crate::Error>(())
     }
@@ -78,9 +134,57 @@ pub(super) async fn prepare_shared_instance_update_backup(
 
     if result.is_err() {
         let _ = crate::util::io::remove_dir_all(&staging_dir).await;
+        let _ = state.content_store.release("rollback", &owner).await;
     }
     result?;
     Ok(staging_dir)
+}
+
+fn instance_update_backup_dir(job_id: Uuid, state: &State) -> PathBuf {
+    state
+        .directories
+        .install_backups_dir()
+        .join(job_id.to_string())
+}
+
+async fn recover_unrecorded_instance_update_backup(
+    job: &mut store::InstallJobRecord,
+    state: &State,
+) -> crate::Result<()> {
+    if job.state.paths.staging_dir.is_some()
+        || !matches!(
+            &job.state.request,
+            InstallRequest::UpdateSharedInstance { .. }
+                | InstallRequest::InstallPackToExistingInstance { .. }
+        )
+    {
+        return Ok(());
+    }
+    let staging_dir = instance_update_backup_dir(job.id, state);
+    if !tokio::fs::try_exists(&staging_dir).await? {
+        return Ok(());
+    }
+    let snapshot = match crate::util::io::read(
+        staging_dir.join(SHARED_INSTANCE_ROLLBACK_FILE),
+    )
+    .await
+    {
+        Ok(bytes) => {
+            serde_json::from_slice::<SharedInstanceUpdateRollback>(&bytes).ok()
+        }
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => None,
+        Err(error) => return Err(error.into()),
+    };
+    if snapshot.is_some() {
+        job.state.paths.staging_dir = Some(staging_dir);
+    } else {
+        crate::util::io::remove_dir_all(&staging_dir).await?;
+        state
+            .content_store
+            .release("rollback", &job.id.to_string())
+            .await?;
+    }
+    Ok(())
 }
 
 pub(super) async fn clear_staging_dir(job_state: &InstallJobState) {
@@ -94,14 +198,34 @@ pub(super) async fn clear_staging_dir(job_state: &InstallJobState) {
             path = %staging_dir.display(),
             "Failed to remove install rollback backup: {error}"
         );
+        return;
+    }
+    if let Some(state) = State::get_if_initialized()
+        && let Some(owner) =
+            staging_dir.file_name().and_then(|name| name.to_str())
+        && let Err(error) = state.content_store.release("rollback", owner).await
+    {
+        tracing::warn!(
+            "Could not release rollback content references: {error}"
+        );
     }
 }
 
-async fn restore_shared_instance_update(
+async fn restore_instance_update(
     staging_dir: &Path,
     rollback: &super::model::InstallRollbackState,
     state: &State,
 ) -> crate::Result<()> {
+    let instance_id = &rollback.instance.instance.id;
+    let _content_lock = state.lock_instance_content(instance_id).await;
+    let _store_lock = state.content_store.files_lock.lock().await;
+    let _lease = state.content_store.lease().await;
+    if crate::state::instance_has_running_process(instance_id, state).await? {
+        return Err(crate::state::content_store::input(
+            "Stop this instance before restoring its content",
+        ));
+    }
+    state.content_store.recover(Some(instance_id)).await?;
     let snapshot = serde_json::from_slice::<SharedInstanceUpdateRollback>(
         &crate::util::io::read(staging_dir.join(SHARED_INSTANCE_ROLLBACK_FILE))
             .await?,
@@ -110,12 +234,31 @@ async fn restore_shared_instance_update(
         .directories
         .instances_dir()
         .join(&rollback.instance.instance.path);
+    let backup_path = staging_dir.join(SHARED_INSTANCE_ROLLBACK_INSTANCE_DIR);
+    if !tokio::fs::symlink_metadata(&backup_path).await?.is_dir() {
+        return Err(crate::state::content_store::input(
+            "The instance backup is missing or is not a directory",
+        ));
+    }
+    for binding in &snapshot.bindings {
+        if state
+            .content_store
+            .lookup(Some(&binding.blob_sha512), None, None)
+            .await?
+            .is_none()
+        {
+            return Err(crate::state::content_store::input(
+                "Repair the backup's shared content before restoring this instance",
+            ));
+        }
+    }
     if tokio::fs::try_exists(&instance_path).await? {
         crate::util::io::remove_dir_all(&instance_path).await?;
     }
     copy_directory(
-        &staging_dir.join(SHARED_INSTANCE_ROLLBACK_INSTANCE_DIR),
+        &backup_path,
         &instance_path,
+        &std::collections::HashSet::new(),
         state,
     )
     .await?;
@@ -127,6 +270,14 @@ async fn restore_shared_instance_update(
     )
     .await?;
     restore_instance_metadata(&rollback.instance, state).await?;
+    state
+        .content_store
+        .restore_instance_files(
+            &rollback.instance.instance,
+            &snapshot.files,
+            &snapshot.bindings,
+        )
+        .await?;
 
     Ok(())
 }
@@ -206,6 +357,7 @@ async fn restore_instance_metadata(
 async fn copy_directory(
     source: &Path,
     target: &Path,
+    skipped: &std::collections::HashSet<String>,
     state: &State,
 ) -> crate::Result<()> {
     crate::util::io::create_dir_all(target).await?;
@@ -218,6 +370,14 @@ async fn copy_directory(
         })?;
         let entry_path = entry.path();
         let relative_path = entry_path.strip_prefix(source)?;
+        let relative = relative_path
+            .components()
+            .map(|part| part.as_os_str().to_string_lossy())
+            .collect::<Vec<_>>()
+            .join("/");
+        if skipped.contains(&relative) {
+            continue;
+        }
         let target_path = target.join(relative_path);
         let file_type = entry.file_type().await?;
         if file_type.is_dir() {
@@ -242,6 +402,20 @@ async fn copy_symlink(source: &Path, target: &Path) -> crate::Result<()> {
         crate::util::io::create_dir_all(parent).await?;
     }
     let link_target = tokio::fs::read_link(source).await?;
+    let absolute = crate::state::content_store::normalize(
+        &source
+            .parent()
+            .ok_or_else(|| {
+                crate::state::content_store::input("Invalid backup symlink")
+            })?
+            .join(link_target),
+    );
+    let link_target = crate::state::content_store::relative_link(
+        &absolute,
+        target.parent().ok_or_else(|| {
+            crate::state::content_store::input("Invalid backup target")
+        })?,
+    );
 
     #[cfg(unix)]
     tokio::fs::symlink(link_target, target).await?;
@@ -278,6 +452,7 @@ async fn recover_interrupted_job(
     mut job: store::InstallJobRecord,
     state: &State,
 ) -> crate::Result<()> {
+    recover_unrecorded_instance_update_backup(&mut job, state).await?;
     if job.state.display.is_none() {
         job.state.display = display_from_request(&job.state);
     }
@@ -461,17 +636,9 @@ pub async fn apply_cleanup(
         }
         InstallCleanup::RestoreExistingInstance { instance_id } => {
             if let Some(rollback) = &job_state.rollback {
-                if matches!(
-                    &job_state.request,
-                    InstallRequest::UpdateSharedInstance { .. }
-                ) && let Some(staging_dir) = &job_state.paths.staging_dir
-                {
-                    restore_shared_instance_update(
-                        staging_dir,
-                        rollback,
-                        state,
-                    )
-                    .await?;
+                if let Some(staging_dir) = &job_state.paths.staging_dir {
+                    restore_instance_update(staging_dir, rollback, state)
+                        .await?;
                 } else {
                     crate::state::instances::commands::set_instance_install_stage(
                         instance_id,

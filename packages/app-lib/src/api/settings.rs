@@ -1,9 +1,63 @@
 //! Theseus settings management interface
 
+pub use crate::state::content_store::{StoreUsage, StoreVerification};
 pub use crate::{
     State,
     state::{Hooks, MemorySettings, Settings, WindowSize},
 };
+
+pub async fn store_usage() -> crate::Result<StoreUsage> {
+    let state = State::get().await?;
+    state.content_store.usage(&state).await
+}
+
+pub async fn store_cleanup() -> crate::Result<u64> {
+    let state = State::get().await?;
+    state.content_store.cleanup(&state, true).await
+}
+
+pub async fn store_set_cache_limit(bytes: u64) -> crate::Result<()> {
+    State::get()
+        .await?
+        .content_store
+        .set_cache_limit(bytes)
+        .await
+}
+
+pub async fn store_verify(repair: bool) -> crate::Result<StoreVerification> {
+    let state = State::get().await?;
+    state.content_store.verify(&state, repair).await
+}
+
+pub async fn store_verify_with_progress(
+    repair: bool,
+    on_progress: &(dyn Fn(u64, u64) + Send + Sync),
+) -> crate::Result<StoreVerification> {
+    let state = State::get().await?;
+    if repair {
+        let processes = state.process_manager.get_all();
+        for process in &processes {
+            state.process_manager.kill(process.uuid).await?;
+        }
+        let deadline =
+            tokio::time::Instant::now() + std::time::Duration::from_secs(10);
+        while state.process_manager.get_all().iter().any(|running| {
+            processes.iter().any(|process| process.uuid == running.uuid)
+        }) {
+            if tokio::time::Instant::now() >= deadline {
+                return Err(crate::ErrorKind::InputError(
+                    "Timed out closing running instances".into(),
+                )
+                .as_error());
+            }
+            tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+        }
+    }
+    state
+        .content_store
+        .verify_with_progress(&state, repair, on_progress)
+        .await
+}
 
 /// Gets entire settings
 #[tracing::instrument]
@@ -73,6 +127,7 @@ pub async fn cancel_directory_change(
     // failing, so fetching a DB connection pool from `State::get` is not reliable here
     let pool = crate::state::db::connect(app_identifier).await?;
     let mut settings = Settings::get(&pool).await?;
+    crate::state::content_store::migration::cancel_move(&pool).await?;
 
     if let Some(prev_custom_dir) = settings.prev_custom_dir {
         settings.prev_custom_dir = None;

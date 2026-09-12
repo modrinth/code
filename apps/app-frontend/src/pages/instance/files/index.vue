@@ -12,17 +12,6 @@ import {
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { invoke } from '@tauri-apps/api/core'
-import {
-	mkdir,
-	readDir,
-	readFile as readFileBytes,
-	readTextFile,
-	remove,
-	rename,
-	stat,
-	writeFile as writeFileBytes,
-	writeTextFile,
-} from '@tauri-apps/plugin-fs'
 import { computed, ref, watch } from 'vue'
 
 import { useAppEvent } from '@/composables/use-app-event'
@@ -40,6 +29,11 @@ const { addNotification } = injectNotificationManager()
 const debug = useDebugLogger('Files')
 
 const messages = defineMessages({
+	readOnly: {
+		id: 'instance.files.managed-content-read-only',
+		defaultMessage:
+			'Managed content is read-only here. Add, disable, update, or remove it from the Content tab.',
+	},
 	saveAs: {
 		id: 'instance.files.save-as',
 		defaultMessage: 'Save as...',
@@ -69,48 +63,25 @@ const editingFile = ref<EditingFile | null>(null)
 
 debug('setup: start, instance.id =', instanceId.value)
 
-function resolvePath(relativePath: string): string {
-	return relativePath ? `${instanceRoot.value}/${relativePath}` : instanceRoot.value
+async function listDirectory(dirPath: string): Promise<FileItem[]> {
+	return invoke('plugin:files|file_list', { instanceId: instanceId.value, path: dirPath })
 }
 
-async function listDirectory(dirPath: string): Promise<FileItem[]> {
-	const absPath = resolvePath(dirPath)
-	debug('listDirectory: dirPath =', dirPath, 'absPath =', absPath)
-	const entries = await readDir(absPath)
-	debug('listDirectory: got', entries.length, 'entries')
-
-	const results = await Promise.all(
-		entries.map(async (entry) => {
-			const entryAbsPath = `${absPath}/${entry.name}`
-			let metadata
-			try {
-				metadata = await stat(entryAbsPath)
-			} catch {
-				debug('listDirectory: stat failed for', entry.name, '- skipping')
-				return null
-			}
-			const item: FileItem = {
-				name: entry.name,
-				type: entry.isDirectory ? 'directory' : 'file',
-				path: dirPath ? `${dirPath}/${entry.name}` : entry.name,
-				modified: metadata.mtime ? Math.floor(metadata.mtime.getTime() / 1000) : 0,
-				created: metadata.birthtime ? Math.floor(metadata.birthtime.getTime() / 1000) : 0,
-			}
-			if (!entry.isDirectory) {
-				item.size = metadata.size
-			}
-			if (entry.isDirectory) {
-				try {
-					const children = await readDir(entryAbsPath)
-					item.count = children.length
-				} catch {
-					item.count = 0
-				}
-			}
-			return item
-		}),
+function isReadOnly(path: string): boolean {
+	const normalized = path.startsWith('/') ? path.slice(1) : path
+	return (
+		normalized.split('/')[0].toLowerCase() === 'mods' ||
+		items.value.some((item) => item.path === normalized && item.readOnly === true)
 	)
-	return results.filter((item): item is FileItem => item !== null)
+}
+
+async function writeBytes(path: string, bytes: Uint8Array, createOnly = false) {
+	await invoke('plugin:files|file_write', {
+		instanceId: instanceId.value,
+		path,
+		bytes: Array.from(bytes),
+		createOnly,
+	})
 }
 
 const directoryQuery = useQuery(
@@ -164,12 +135,14 @@ function stopEditing() {
 
 async function handleCreateItem(name: string, type: 'file' | 'directory') {
 	const targetPath = currentPath.value ? `${currentPath.value}/${name}` : name
-	const absPath = resolvePath(targetPath)
 	try {
 		if (type === 'directory') {
-			await mkdir(absPath)
+			await invoke('plugin:files|file_create_directory', {
+				instanceId: instanceId.value,
+				path: targetPath,
+			})
 		} else {
-			await writeTextFile(absPath, '')
+			await writeBytes(targetPath, new Uint8Array(), true)
 		}
 		await refresh()
 	} catch (e) {
@@ -182,12 +155,14 @@ async function handleCreateItem(name: string, type: 'file' | 'directory') {
 }
 
 async function handleRenameItem(path: string, newName: string) {
-	const oldAbs = resolvePath(path)
 	const parentDir = path.includes('/') ? path.substring(0, path.lastIndexOf('/')) : ''
 	const newPath = parentDir ? `${parentDir}/${newName}` : newName
-	const newAbs = resolvePath(newPath)
 	try {
-		await rename(oldAbs, newAbs)
+		await invoke('plugin:files|file_rename', {
+			instanceId: instanceId.value,
+			source: path,
+			destination: newPath,
+		})
 		await refresh()
 	} catch (e) {
 		addNotification({
@@ -200,7 +175,7 @@ async function handleRenameItem(path: string, newName: string) {
 
 async function handleMoveItem(source: string, destination: string) {
 	try {
-		await rename(resolvePath(source), resolvePath(destination))
+		await invoke('plugin:files|file_rename', { instanceId: instanceId.value, source, destination })
 		await refresh()
 	} catch (e) {
 		addNotification({
@@ -213,7 +188,7 @@ async function handleMoveItem(source: string, destination: string) {
 
 async function handleDeleteItem(path: string, recursive: boolean) {
 	try {
-		await remove(resolvePath(path), { recursive })
+		await invoke('plugin:files|file_delete', { instanceId: instanceId.value, path, recursive })
 		await refresh()
 	} catch (e) {
 		addNotification({
@@ -225,16 +200,23 @@ async function handleDeleteItem(path: string, recursive: boolean) {
 }
 
 async function handleReadFile(path: string): Promise<string> {
-	return await readTextFile(resolvePath(path))
+	const bytes = await invoke<number[]>('plugin:files|file_read', {
+		instanceId: instanceId.value,
+		path,
+	})
+	return new TextDecoder().decode(new Uint8Array(bytes))
 }
 
 async function handleReadFileAsBlob(path: string): Promise<Blob> {
-	const bytes = await readFileBytes(resolvePath(path))
-	return new Blob([bytes])
+	const bytes = await invoke<number[]>('plugin:files|file_read', {
+		instanceId: instanceId.value,
+		path,
+	})
+	return new Blob([new Uint8Array(bytes)])
 }
 
 async function handleWriteFile(path: string, content: string) {
-	await writeTextFile(resolvePath(path), content)
+	await writeBytes(path, new TextEncoder().encode(content))
 }
 
 async function handleDownloadFile(path: string, _fileName: string) {
@@ -270,10 +252,8 @@ async function handleUploadFiles(files: File[]) {
 		for (const file of files) {
 			uploadState.value.currentFileName = file.name
 			const buffer = await file.arrayBuffer()
-			const targetPath = resolvePath(
-				currentPath.value ? `${currentPath.value}/${file.name}` : file.name,
-			)
-			await writeFileBytes(targetPath, new Uint8Array(buffer))
+			const targetPath = currentPath.value ? `${currentPath.value}/${file.name}` : file.name
+			await writeBytes(targetPath, new Uint8Array(buffer))
 			uploadState.value.completedFiles++
 			uploadState.value.uploadedBytes += file.size
 			uploadState.value.currentFileProgress = 1
@@ -324,6 +304,8 @@ watch(instanceId, async () => {
 })
 
 provideFileManager({
+	isReadOnly,
+	readOnlyReason: computed(() => formatMessage(messages.readOnly)),
 	items,
 	loading,
 	error,
@@ -354,6 +336,11 @@ provideFileManager({
 
 <template>
 	<ReadyTransition :pending="firstPaintPending">
-		<FilePageLayout :show-refresh-button="true" />
+		<div>
+			<p v-if="isReadOnly(currentPath)" class="m-0 mb-4 text-sm text-secondary">
+				{{ formatMessage(messages.readOnly) }}
+			</p>
+			<FilePageLayout :show-refresh-button="true" />
+		</div>
 	</ReadyTransition>
 </template>

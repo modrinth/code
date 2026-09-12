@@ -2,6 +2,12 @@
 
 mod content;
 mod export_mrpack;
+mod files;
+pub use files::{
+    InstanceFileItem, create_instance_directory, delete_instance_file,
+    list_instance_files, read_instance_file, rename_instance_file,
+    save_instance_file_as, validate_instance_file_write, write_instance_file,
+};
 mod get;
 mod groups;
 mod icon;
@@ -14,7 +20,7 @@ mod screenshot_groups;
 mod screenshots;
 mod shared;
 mod synced_options;
-mod synced_packs;
+pub(crate) mod synced_packs;
 pub(crate) mod synced_servers;
 
 pub use self::content::{

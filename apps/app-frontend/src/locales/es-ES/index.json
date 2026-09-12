@@ -95,9 +95,6 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "Actualizando contenido compartido"
   },
-  "app.action-bar.installs": {
-    "message": "Instalaciones"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "Establecer como instancia principal"
   },
