@@ -4,7 +4,6 @@
 			<ButtonLink
 				v-if="linkFunction"
 				v-tooltip="formatMessage(messages.previousPage)"
-				:aria-label="formatMessage(messages.previousPage)"
 				:href="linkFunction(page - 1)"
 				type="quiet"
 				class="!w-9 !px-0 !rounded-full"
@@ -52,7 +51,6 @@
 					<button
 						v-tooltip="formatMessage(messages.goToPage)"
 						type="button"
-						:aria-label="formatMessage(messages.goToPage)"
 						class="grid place-content-center"
 						@click="openPageInput(index)"
 					>
@@ -91,7 +89,6 @@
 			<ButtonLink
 				v-if="linkFunction"
 				v-tooltip="formatMessage(messages.nextPage)"
-				:aria-label="formatMessage(messages.nextPage)"
 				:href="linkFunction(page + 1)"
 				type="quiet"
 				class="!w-9 !px-0 !rounded-full"

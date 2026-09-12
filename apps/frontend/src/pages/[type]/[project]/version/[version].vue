@@ -152,7 +152,6 @@
 							v-tooltip="`Open in Slicer`"
 							target="_blank"
 							:href="`https://slicer.run/?url=${encodeURIComponent(primaryFile?.url)}`"
-							aria-label="Open in Slicer"
 						>
 							<ExternalIcon aria-hidden="true" />
 							Slicer
@@ -377,11 +376,6 @@
 								!getDependencyPrimaryFile(
 									dependency.version ?? getDependencyVersion(dependency.dependency),
 								)?.url
-							"
-							:aria-label="
-								getDependencyPrimaryFileTooltip(
-									dependency.version ?? getDependencyVersion(dependency.dependency),
-								)
 							"
 							class="!w-9 !rounded-full !px-0 !text-brand [&>svg]:!text-brand"
 						>

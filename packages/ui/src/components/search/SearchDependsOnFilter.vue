@@ -42,11 +42,6 @@
 								? 'text-red opacity-100 bg-highlight-red'
 								: 'text-secondary [@media(hover:hover)]:opacity-0 group-hover:opacity-100 bg-transparent hover:bg-button-bg hover:text-red active:scale-[0.96]'
 						"
-						:aria-label="
-							excludedProjectIds.has(projectId)
-								? formatMessage(messages.excluded)
-								: formatMessage(messages.exclude)
-						"
 						@click="toggleProjectExcluded(projectId)"
 					>
 						<BanIcon class="size-4" aria-hidden="true" />

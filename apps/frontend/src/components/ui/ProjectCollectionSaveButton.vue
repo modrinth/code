@@ -49,7 +49,6 @@
 		v-tooltip="formatMessage(commonMessages.saveButton)"
 		size="xl"
 		:to="signInRoute"
-		:aria-label="formatMessage(commonMessages.saveButton)"
 		class="!w-12 !rounded-full !px-0"
 	>
 		<BookmarkIcon aria-hidden="true" />

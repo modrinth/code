@@ -506,7 +506,6 @@ function openContextMenu(event: MouseEvent) {
 						<span
 							v-if="world.type === 'server' && world.source === 'user_synced'"
 							v-tooltip="formatMessage(messages.syncedServer)"
-							:aria-label="formatMessage(messages.syncedServer)"
 							role="img"
 							tabindex="0"
 							class="inline-flex shrink-0 cursor-help items-center justify-center rounded-full border border-solid border-brand-blue bg-highlight-blue px-2.5 py-1 text-brand-blue smart-clickable:allow-pointer-events focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow"

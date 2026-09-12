@@ -14,7 +14,6 @@
 								:to="settingsBackDestination.to"
 								size="lg"
 								class="!w-10 !rounded-full !px-0"
-								:aria-label="settingsBackDestination.label"
 							>
 								<LeftArrowIcon />
 							</ButtonLink>
@@ -357,7 +356,6 @@
 									v-tooltip="formatMessage(commonMessages.followButton)"
 									size="xl"
 									:to="signInRouteObj"
-									:aria-label="formatMessage(commonMessages.followButton)"
 									class="!w-12 !rounded-full !px-0"
 								>
 									<HeartIcon aria-hidden="true" />
@@ -367,7 +365,6 @@
 										v-tooltip="formatMessage(commonMessages.followButton)"
 										size="xl"
 										:to="signInRouteObj"
-										:aria-label="formatMessage(commonMessages.followButton)"
 										class="!w-12 !rounded-full !px-0"
 									>
 										<HeartIcon aria-hidden="true" />

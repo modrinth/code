@@ -27,7 +27,7 @@
 					</span>
 				</div>
 
-				<Button v-tooltip="'Replace file'" aria-label="Replace file" @click="fileInput?.click()">
+				<Button v-tooltip="'Replace file'" @click="fileInput?.click()">
 					<ArrowLeftRightIcon aria-hidden="true" />
 					<input
 						ref="fileInput"
