@@ -7,6 +7,8 @@ export interface StoreVerification {
 	issues: { sha512: string; message: string }[]
 }
 
+export const storeVerificationReport = ref<StoreVerification | null>(null)
+
 export const storeVerificationTask = ref<{
 	id: string
 	status: 'running' | 'succeeded' | 'failed'
@@ -29,6 +31,7 @@ export async function verifyStore(): Promise<StoreVerification> {
 		lastRead: performance.now(),
 	}
 	storeVerificationTask.value = task
+	storeVerificationReport.value = null
 	let previousBytes = 0
 	let previousTime = performance.now()
 	const onProgress = new Channel<[number, number]>()
@@ -50,6 +53,7 @@ export async function verifyStore(): Promise<StoreVerification> {
 			repair: true,
 			onProgress,
 		})
+		storeVerificationReport.value = report
 		storeVerificationTask.value!.status = report.issues.length ? 'failed' : 'succeeded'
 		return report
 	} catch (error) {

@@ -222,6 +222,17 @@ impl<'a> ContentMutationExecutor<'a> {
             return Err(input("Unsupported content destination"));
         }
         let previous_path = request.previous_path.map(canonical_content_path);
+		for file in content_rows::get_instance_files(&self.instance.id, &self.state.pool).await? {
+			let registered = canonical_content_path(&file.relative_path);
+			if registered != relative_path
+				&& registered.eq_ignore_ascii_case(relative_path)
+				&& Some(registered) != previous_path
+			{
+				return Err(input(format!(
+					"Content destination {relative_path} differs only in case from the registered file {registered}; rename or remove that file first",
+				)));
+			}
+		}
         let lookup_path = previous_path.unwrap_or(relative_path);
         let existing = content_rows::get_instance_file_by_relative_path(
             &self.instance.id,

@@ -243,6 +243,21 @@ impl ContentStore {
             unused = unused.saturating_sub(blob.size as u64);
             reclaimed += blob.size as u64;
         }
+		for instance in instance_rows::list_instances(&self.pool).await? {
+			if crate::state::instance_has_running_process(&instance.id, state).await? {
+				return Ok(reclaimed);
+			}
+		}
+		for job in crate::install::store::list(false, state).await? {
+			if matches!(job.status, crate::install::InstallJobStatus::Queued | crate::install::InstallJobStatus::Running) {
+				return Ok(reclaimed);
+			}
+			if let Some(backup) = job.state.paths.staging_dir
+				&& fs::try_exists(backup).await?
+			{
+				return Ok(reclaimed);
+			}
+		}
 		let mut unused_runtime = runtime.files.into_iter()
 			.filter(|file| file.references == 0).collect::<Vec<_>>();
 		unused_runtime.sort_by_key(|file| file.last_used_at);
@@ -435,4 +450,63 @@ impl ContentStore {
         }
         Ok(())
     }
+
+	/// Registers payloads published before a crash interrupted their catalog write.
+	pub(crate) async fn recover_published_blobs(&self) -> crate::Result<()> {
+		let known = catalog::blobs(&self.pool).await?
+			.into_iter().map(|blob| blob.sha512).collect::<HashSet<_>>();
+		let objects = self.root.join("objects/sha512");
+		self.validate_object_parent(&objects.join("payload.jar")).await?;
+		let mut prefixes = match fs::read_dir(&objects).await {
+			Ok(entries) => entries,
+			Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+			Err(error) => return Err(error.into()),
+		};
+		while let Some(prefix) = prefixes.next_entry().await? {
+			let name = prefix.file_name().to_string_lossy().into_owned();
+			if super::validate_digest(&name, 2).is_err() || !prefix.file_type().await?.is_dir() {
+				continue;
+			}
+			let mut entries = fs::read_dir(prefix.path()).await?;
+			while let Some(entry) = entries.next_entry().await? {
+				let hash = entry.file_name().to_string_lossy().into_owned();
+				if super::validate_digest(&hash, 128).is_err()
+					|| !hash.starts_with(&name)
+					|| known.contains(&hash)
+					|| !entry.file_type().await?.is_dir()
+				{
+					continue;
+				}
+				for filename in ["payload.jar", "payload.bin"] {
+					let path = entry.path().join(filename);
+					let metadata = match fs::symlink_metadata(&path).await {
+						Ok(metadata) if metadata.is_file() => metadata,
+						Ok(_) => continue,
+						Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
+						Err(error) => return Err(error.into()),
+					};
+					let (sha512, sha1, size) = super::hash_file(&path).await?;
+					if sha512 != hash {
+						tracing::warn!(path = %path.display(), "Preserving an unregistered store object with an unexpected hash");
+						continue;
+					}
+					let mut permissions = metadata.permissions();
+					permissions.set_readonly(true);
+					fs::set_permissions(&path, permissions).await?;
+					catalog::put(&self.pool, &super::Blob {
+						sha512,
+						sha1,
+						size: size.try_into().map_err(|_| input("Content file is too large"))?,
+						relative_path: format!("objects/sha512/{name}/{hash}/{filename}"),
+						status: BlobStatus::Ready,
+						modified_at_ns: crate::state::file_modified_at_ns(&metadata)? as i64,
+						last_used_at: chrono::Utc::now().timestamp(),
+						sources: "[]".to_string(),
+					}).await?;
+					break;
+				}
+			}
+		}
+		Ok(())
+	}
 }

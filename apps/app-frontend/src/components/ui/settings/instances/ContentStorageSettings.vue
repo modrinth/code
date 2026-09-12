@@ -13,7 +13,7 @@ import { invoke } from '@tauri-apps/api/core'
 import { computed, inject, ref } from 'vue'
 
 import {
-	type StoreVerification,
+	storeVerificationReport as report,
 	verifyStore,
 	verifyingStore,
 } from '@/components/ui/download-manager/store-verification'
@@ -42,7 +42,6 @@ const storeUsage = ref(
 	}),
 )
 const activeAction = ref<'clear' | 'repair' | 'limit' | null>(null)
-const report = ref<StoreVerification | null>(null)
 const clearedBytes = ref<number | null>(null)
 const cacheLimitGiB = ref<number | undefined>(
 	(storeUsage.value?.cache_limit_bytes ?? 5 * gibibyte) / gibibyte,
@@ -104,9 +103,8 @@ const messages = defineMessages({
 		defaultMessage: 'Verifying and repairing…',
 	},
 	repairDescription: {
-		id: 'app.settings.resource-management.store.repair.description',
-		defaultMessage:
-			'Check for missing or damaged files and repair them.',
+		id: 'app.settings.resource-management.store.repair.verify-description',
+		defaultMessage: 'Check for missing or damaged files and repair them.',
 	},
 	repairRunningDescription: {
 		id: 'app.settings.resource-management.store.repair.running-description',
@@ -190,7 +188,7 @@ async function runAction(action: 'clear' | 'repair') {
 		if (action === 'repair') {
 			const verification = verifyStore()
 			settingsModal?.close()
-			report.value = await verification
+			await verification
 		} else {
 			clearedBytes.value = await invoke<number>('plugin:settings|store_cleanup')
 		}

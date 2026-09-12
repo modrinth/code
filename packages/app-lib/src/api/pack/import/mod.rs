@@ -374,10 +374,27 @@ pub(crate) async fn copy_dotminecraft_with_reporter(
 ) -> crate::Result<()> {
     let state = crate::State::get().await?;
     let _lease = state.content_store.lease().await;
-    let source_root = tokio::fs::canonicalize(&dotminecraft).await?;
+	let dotminecraft = tokio::fs::canonicalize(&dotminecraft).await?;
+	let subfiles = get_all_subfiles(&dotminecraft, false).await?;
+	let mut content_paths = std::collections::HashSet::new();
+	let mut duplicate_content_paths = std::collections::HashSet::new();
+	for source in &subfiles {
+		let relative = source
+			.strip_prefix(&dotminecraft)?
+			.components()
+			.map(|part| part.as_os_str().to_string_lossy())
+			.collect::<Vec<_>>()
+			.join("/");
+		if crate::state::content_store::eligible(&relative) {
+			let canonical = relative.trim_end_matches(".disabled").to_string();
+			if !content_paths.insert(canonical.clone()) {
+				duplicate_content_paths.insert(canonical);
+			}
+		}
+	}
     let profiles =
         tokio::fs::canonicalize(state.directories.instances_dir()).await?;
-    let source_instance = if let Ok(path) = source_root.strip_prefix(&profiles)
+	let source_instance = if let Ok(path) = dotminecraft.strip_prefix(&profiles)
     {
         crate::state::instances::adapters::sqlite::instance_rows::get_instance_by_path(&path.to_string_lossy(), &state.pool).await?
     } else {
@@ -474,7 +491,6 @@ pub(crate) async fn copy_dotminecraft_with_reporter(
             }
         }
     }
-    let subfiles = get_all_subfiles(&dotminecraft, false).await?;
     let total = subfiles.len() as u64;
     for (index, source) in subfiles.into_iter().enumerate() {
         let relative = source
@@ -494,7 +510,9 @@ pub(crate) async fn copy_dotminecraft_with_reporter(
             tracing::warn!(path = %source.display(), "Skipping an unmanaged symlink while importing an instance");
             continue;
         }
-        if crate::state::content_store::eligible(&relative) {
+        if crate::state::content_store::eligible(&relative)
+			&& !duplicate_content_paths.contains(relative.trim_end_matches(".disabled"))
+		{
             let blob = state.content_store.ingest_file(&source).await?;
             let project_type =
                 crate::state::ProjectType::get_from_parent_folder(&relative)

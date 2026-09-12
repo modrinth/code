@@ -232,11 +232,31 @@ impl DirectoryInfo {
             .map(PathBuf::from)
             .unwrap_or_else(|| initial.clone());
         let previous = settings.prev_custom_dir.as_ref().map(PathBuf::from);
+		let previous_root = match &previous {
+			Some(previous) => Some(fs::canonicalize(previous).await?),
+			None => None,
+		};
+		fs::create_dir_all(&destination).await?;
+		let destination_root = fs::canonicalize(&destination).await?;
+		let moving = previous_root.as_ref()
+			.is_some_and(|root| root != &destination_root);
+		let pending_move =
+			super::content_store::catalog::setting(pool, "store_directory_move")
+				.await?
+				.filter(|checkpoint| !checkpoint.is_empty())
+				.map(|checkpoint| {
+					serde_json::from_str::<(PathBuf, PathBuf)>(&checkpoint)
+				})
+				.transpose()?;
         let settings_root = fs::canonicalize(&initial).await?;
         let mut locked_roots = std::collections::HashSet::from([settings_root]);
         let mut move_locks = Vec::new();
-        for root in previous.iter().chain(std::iter::once(&destination)) {
-            fs::create_dir_all(root).await?;
+		let pending_roots = pending_move.as_ref().into_iter()
+			.flat_map(|(from, to)| [from, to]);
+		for root in previous.iter()
+			.chain(std::iter::once(&destination))
+			.chain(pending_roots)
+		{
             let root = fs::canonicalize(root).await?;
             if locked_roots.insert(root.clone()) {
                 move_locks.push(
@@ -246,7 +266,7 @@ impl DirectoryInfo {
             }
         }
         if let Some(previous) = &previous
-            && previous != &destination
+            && moving
         {
             let loading = init_loading(
                 LoadingBarType::DirectoryMove {
@@ -265,10 +285,7 @@ impl DirectoryInfo {
             .await?;
             emit_loading(&loading, 100.0, None)?;
         }
-        if previous
-            .as_ref()
-            .is_some_and(|previous| previous == &destination)
-        {
+        if !moving {
             super::content_store::migration::resume_completed_move(
                 &destination,
                 pool,
@@ -279,7 +296,7 @@ impl DirectoryInfo {
         settings.prev_custom_dir.clone_from(&settings.custom_dir);
         settings.update(pool).await?;
         if let Some(previous) = &previous
-            && previous != &destination
+            && moving
         {
             super::content_store::migration::finish_app_directory_move(
                 previous,

@@ -47,6 +47,7 @@ pub(crate) async fn migrate(state: &State) -> crate::Result<()> {
         }
     }
     store.remove_abandoned_staging().await?;
+	store.recover_published_blobs().await?;
     Ok(())
 }
 
@@ -207,12 +208,45 @@ async fn create_link(
 }
 
 fn remap(path: &Path, mappings: &[(PathBuf, PathBuf)]) -> PathBuf {
-    mappings
-        .iter()
-        .find_map(|(from, to)| {
-            path.strip_prefix(from).ok().map(|suffix| to.join(suffix))
-        })
-        .unwrap_or_else(|| path.to_path_buf())
+	let map = |path: &Path| {
+		mappings.iter().find_map(|(from, to)| {
+			strip_directory_prefix(path, from).map(|suffix| to.join(suffix))
+		})
+	};
+	map(&normalize(path))
+		.or_else(|| {
+			std::fs::canonicalize(path).ok().and_then(|path| map(&path))
+		})
+		.unwrap_or_else(|| path.to_path_buf())
+}
+
+fn strip_directory_prefix<'a>(path: &'a Path, directory: &Path) -> Option<&'a Path> {
+	let mut components = path.components();
+	for expected in directory.components() {
+		let actual = components.next()?;
+		#[cfg(windows)]
+		let matches = {
+			use std::path::{Component, Prefix};
+			match (actual, expected) {
+				(Component::Prefix(actual), Component::Prefix(expected)) => {
+					match (actual.kind(), expected.kind()) {
+						(Prefix::Disk(a) | Prefix::VerbatimDisk(a), Prefix::Disk(b) | Prefix::VerbatimDisk(b)) => a.eq_ignore_ascii_case(&b),
+						(Prefix::UNC(a, share_a) | Prefix::VerbatimUNC(a, share_a), Prefix::UNC(b, share_b) | Prefix::VerbatimUNC(b, share_b)) => {
+							a.eq_ignore_ascii_case(b) && share_a.eq_ignore_ascii_case(share_b)
+						}
+						_ => actual == expected,
+					}
+				}
+				_ => actual == expected,
+			}
+		};
+		#[cfg(not(windows))]
+		let matches = actual == expected;
+		if !matches {
+			return None;
+		}
+	}
+	Some(components.as_path())
 }
 
 fn rewrite_value(value: &mut Value, mappings: &[(PathBuf, PathBuf)]) {
@@ -220,7 +254,9 @@ fn rewrite_value(value: &mut Value, mappings: &[(PathBuf, PathBuf)]) {
         Value::String(value) => {
             let path = Path::new(value);
             if path.is_absolute() {
-                *value = remap(path, mappings).to_string_lossy().into_owned();
+				*value = dunce::simplified(&remap(path, mappings))
+					.to_string_lossy()
+					.into_owned();
             }
         }
         Value::Array(values) => {
@@ -241,8 +277,8 @@ async fn rewrite_database_paths(
     pool: &SqlitePool,
     mappings: &[(PathBuf, PathBuf)],
 ) -> crate::Result<()> {
-    for (_, mut java) in JavaVersion::get_all(pool).await? {
-        java.path = remap(Path::new(&java.path), mappings)
+    for (_, mut java) in JavaVersion::get_all_registered(pool).await? {
+        java.path = dunce::simplified(&remap(Path::new(&java.path), mappings))
             .to_string_lossy()
             .into_owned();
         java.upsert(pool).await?;
@@ -292,6 +328,7 @@ pub(crate) async fn move_app_directory(
     to: &Path,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
+	let original_from = normalize(from);
     fs::create_dir_all(to).await?;
     let from = fs::canonicalize(from).await?;
     let to = fs::canonicalize(to).await?;
@@ -319,10 +356,15 @@ pub(crate) async fn move_app_directory(
             "Close Minecraft instances before moving the app directory",
         ));
     }
-    let mappings = MOVED_APP_DIRECTORIES
-        .iter()
-        .map(|directory| (from.join(directory), to.join(directory)))
-        .collect::<Vec<_>>();
+	let mappings = [&from, &original_from]
+		.into_iter()
+		.flat_map(|source| {
+			let destination = &to;
+			MOVED_APP_DIRECTORIES.iter().map(move |directory| {
+				(source.join(directory), destination.join(directory))
+			})
+		})
+		.collect::<Vec<_>>();
     let checkpoint = serde_json::to_string(&(from.clone(), to.clone()))?;
     if let Some(previous) =
         catalog::setting(pool, "store_directory_move").await?
@@ -337,6 +379,17 @@ pub(crate) async fn move_app_directory(
     let mut required = 0_u64;
     for directory in MOVED_APP_DIRECTORIES {
         let source = from.join(directory);
+		match fs::symlink_metadata(&source).await {
+			Ok(metadata) if !metadata.is_dir() || metadata.file_type().is_symlink() => {
+				return Err(input(format!(
+					"The shared-data root {} must be a directory without a symbolic link before moving the app directory",
+					source.display(),
+				)));
+			}
+			Ok(_) => {}
+			Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
+			Err(error) => return Err(error.into()),
+		}
         if fs::try_exists(&source).await? {
             required = required.saturating_add(
                 required_copy_bytes(&source, &to.join(directory)).await?,
@@ -438,9 +491,11 @@ pub(crate) async fn cancel_move(pool: &SqlitePool) -> crate::Result<()> {
     {
         let (from, to): (PathBuf, PathBuf) = serde_json::from_str(&checkpoint)?;
         let settings = crate::state::Settings::get(pool).await?;
-        if settings.prev_custom_dir.as_deref()
-            == Some(to.to_string_lossy().as_ref())
-        {
+		let committed = match settings.prev_custom_dir.as_deref() {
+			Some(previous) => fs::canonicalize(previous).await? == to,
+			None => false,
+		};
+        if committed {
             return Err(input(
                 "The move has committed; finish its cleanup before moving back",
             ));

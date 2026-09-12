@@ -893,8 +893,7 @@ pub(crate) fn eligible(path: &str) -> bool {
     match parts[0] {
         "mods" => extension.eq_ignore_ascii_case("jar"),
         "resourcepacks" | "shaderpacks" | "datapacks" => {
-            extension.eq_ignore_ascii_case("jar")
-                || extension.eq_ignore_ascii_case("zip")
+			extension.eq_ignore_ascii_case("zip")
         }
         _ => false,
     }
