@@ -202,6 +202,14 @@ impl<'a> InstanceContent<'a> {
         {
             self.cache_install(file, *project_type, origin.as_ref())
                 .await?;
+			if matches!(
+				project_type,
+				ProjectType::ResourcePack | ProjectType::DataPack
+			) {
+				crate::api::instance::queue_synced_pack_reconciliation(
+					&self.instance.id,
+				);
+			}
         }
         Ok(output)
     }

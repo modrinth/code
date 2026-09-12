@@ -41,12 +41,6 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Salvează conținut care îți place și primește actualizări cu un singur click."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Urmărește proiecte"
-  },
   "app-marketing.features.importing.description": {
     "message": "Importă toate profilurile tale favorite de pe aplicația pe care o foloseai înainte, și începe cu Modrinth App în secunde!"
   },
@@ -83,12 +77,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Versiune"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Joacă-te cu modurile tale, indiferent dacă ești conectat la internet sau nu."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Modul offline"
-  },
   "app-marketing.features.open-source.description": {
     "message": "Lansatorul Modrinth este complet cu sursă deschisă. Poți vedea codul sursă pe <github-link>GitHub</github-link>-ul nostru!"
   },
@@ -109,12 +97,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"

@@ -578,12 +578,6 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Зберігайте вміст, який вам подобається, та отримуйте оновлення за одне натискання."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Відстежуйте проєкти"
-  },
   "app-marketing.features.importing.description": {
     "message": "Імпортуйте ваші улюблені профілі з минулого запускача та почніть користуватися Modrinth App за лічені секунди!"
   },
@@ -620,12 +614,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Версія"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Грайте з модами навіть попри відсутність з’єднання з інтернетом."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Працює без мережі"
-  },
   "app-marketing.features.open-source.description": {
     "message": "Modrinth є повністю відкритим. Ви можете переглянути відкритий код на нашому <github-link>GitHub</github-link>!"
   },
@@ -649,15 +637,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ МБ"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ МБ"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 МБ"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"

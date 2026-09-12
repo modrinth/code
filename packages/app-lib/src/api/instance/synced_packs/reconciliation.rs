@@ -4,12 +4,12 @@ use super::{
     version_compatible,
 };
 use crate::event::{InstancePayloadType, emit::emit_instance};
-use crate::state::content_store::file_path_on_disk;
+use crate::state::content_store::{StoredFileHandle, file_path_on_disk};
 use crate::state::instances::commands;
 use crate::state::{
     CacheBehaviour, CachedEntry, ContentItem, ContentItemVersion,
     ContentSourceKind, InstanceMetadata, ProjectType, State, SyncedOption,
-    SyncedPackInfo,
+    SyncedPackInfo, Version,
 };
 use crate::util::fetch;
 use modrinth_content_management::ResolutionPreferences;
@@ -63,33 +63,14 @@ fn current_item<'a>(
         })
 }
 
-pub(super) async fn capture(
+async fn capture_items(
     metadata: &InstanceMetadata,
     library: &mut PackLibrary,
     state: &State,
+    placements: BTreeMap<String, PackPlacement>,
+    global: GlobalSyncedOptions,
+    items: &[ContentItem],
 ) -> crate::Result<bool> {
-    if super::super::synced_options::pending::contains(
-        &metadata.instance.id,
-        SyncedOption::ResourcePacks,
-        state,
-    )
-    .await?
-    {
-        return Ok(false);
-    }
-    let Some(placements) =
-        library.instances.get(&metadata.instance.id).cloned()
-    else {
-        return Ok(false);
-    };
-    if sync_files_are_protected(metadata)
-        || instance_is_running(metadata, state).await?
-    {
-        return Ok(false);
-    }
-    let global = get_global_options().await?;
-    let items =
-        commands::list_pack_content(&metadata.instance.id, state).await?;
     let mut shared_changed = false;
     for (id, mut placement) in placements {
         let Some(pack) = library.packs.get(&id).cloned() else {
@@ -105,7 +86,7 @@ pub(super) async fn capture(
         {
             continue;
         }
-        if let Some(item) = current_item(&items, &pack, &placement) {
+        if let Some(item) = current_item(items, &pack, &placement) {
             if !local(item) {
                 continue;
             }
@@ -198,6 +179,188 @@ async fn toggle_pack(
     .await
 }
 
+#[derive(Default)]
+struct PreparedPack {
+    compatible: bool,
+    version: Option<Version>,
+	stored_file: Option<StoredFileHandle>,
+    dependencies: Vec<commands::DownloadedProjectVersion>,
+    conflict: bool,
+    deferred: bool,
+    owned_previous: bool,
+}
+
+fn matching_item<'a>(
+    items: &'a [ContentItem],
+    pack: &SyncedPack,
+    previous: Option<&PackPlacement>,
+) -> Option<&'a ContentItem> {
+    previous
+        .filter(|placement| !placement.path.is_empty())
+        .and_then(|placement| current_item(items, pack, placement))
+        .or_else(|| {
+            items.iter().find(|item| {
+                local(item)
+                    && item.id == pack.sha1
+                    && item.project_type == pack.item.project_type
+            })
+        })
+}
+
+fn local_conflict(
+    items: &[ContentItem],
+    pack: &SyncedPack,
+    previous: Option<&PackPlacement>,
+    target_path: &str,
+) -> bool {
+    previous.is_none_or(|placement| placement.path.is_empty())
+        && matching_item(items, pack, previous).is_none()
+        && items.iter().any(|item| {
+            same_path(&item.file_path, target_path)
+                || pack.item.project.as_ref().is_some_and(|project| {
+                    item.project
+                        .as_ref()
+                        .is_some_and(|candidate| candidate.id == project.id)
+                })
+        })
+}
+
+async fn prepare_pack(
+    metadata: &InstanceMetadata,
+    id: &str,
+    pack: &SyncedPack,
+    library: &PackLibrary,
+    items: &[ContentItem],
+    state: &State,
+) -> crate::Result<PreparedPack> {
+    let mut prepared = PreparedPack::default();
+    let previous = library
+        .instances
+        .get(&metadata.instance.id)
+        .and_then(|placements| placements.get(id));
+    if local_conflict(
+        items,
+        pack,
+        previous,
+        &pack_path(pack, &pack.item.file_name),
+    ) {
+        prepared.conflict = true;
+        return Ok(prepared);
+    }
+    prepared.owned_previous = if let Some(previous) = previous {
+        owns_file(metadata, previous, state).await?
+    } else {
+        false
+    };
+    prepared.version = if let Some(project) = &pack.item.project {
+        let versions = CachedEntry::get_project_versions(
+			&project.id,
+			Some(CacheBehaviour::MustRevalidate),
+			&state.pool,
+			&state.api_semaphore,
+		).await?.ok_or_else(|| {
+			crate::ErrorKind::InputError(
+				"Pack versions are temporarily unavailable; keeping the installed pack.".to_owned(),
+			)
+		})?;
+        versions
+            .into_iter()
+            .filter(|version| {
+                version_compatible(pack, version, metadata)
+                    && !version.files.is_empty()
+            })
+            .max_by_key(|version| version.date_published)
+    } else {
+        None
+    };
+    if (pack.item.project.is_some() && prepared.version.is_none())
+        || (pack.item.project.is_none()
+            && !pack
+                .game_versions
+                .contains(&metadata.applied_content_set.game_version))
+    {
+        return Ok(prepared);
+    }
+    let file = prepared.version.as_ref().and_then(|version| {
+        version
+            .files
+            .iter()
+            .find(|file| file.primary)
+            .or_else(|| version.files.first())
+    });
+    let file_name = file
+        .map_or(pack.item.file_name.as_str(), |file| file.filename.as_str());
+    if !path_util::is_safe_file_name(file_name) {
+        return Err(crate::ErrorKind::InputError(
+            "Invalid pack filename.".to_owned(),
+        )
+        .into());
+    }
+    if local_conflict(items, pack, previous, &pack_path(pack, file_name)) {
+        prepared.conflict = true;
+        return Ok(prepared);
+    }
+	let stored_file = if let Some(file) = file
+		&& file.hashes.get("sha1") != Some(&pack.sha1)
+	{
+		let downloaded = fetch::fetch_content_file(
+			state,
+			&[file.url.as_str()],
+			file.hashes.get("sha512").map(String::as_str),
+			file.hashes.get("sha1").map(String::as_str),
+			Some(u64::from(file.size)),
+			None,
+			None,
+		)
+		.await?;
+		downloaded.store_file(state).await?
+	} else {
+		read_stored_file(pack, state).await?
+	};
+	let bytes = bytes::Bytes::from(tokio::fs::read(&stored_file.path).await?);
+    let project_type = pack.item.project_type;
+    tokio::task::spawn_blocking(move || {
+        super::operations::validate_pack(&bytes, project_type)
+    })
+    .await??;
+	prepared.stored_file = Some(stored_file);
+    if let (Some(project), Some(version)) =
+        (&pack.item.project, &prepared.version)
+        && !version.dependencies.is_empty()
+    {
+        let plan = commands::resolve_install_plan(
+            &metadata.instance.id,
+            commands::InstanceInstallProjectRequest {
+                project_id: project.id.clone(),
+                version_id: Some(version.id.clone()),
+                content_type: pack.item.project_type.into(),
+                selected: ResolutionPreferences::default(),
+            },
+            state,
+        )
+        .await?;
+        if !plan.dependencies.is_empty()
+            && instance_is_running(metadata, state).await?
+        {
+            prepared.deferred = true;
+            return Ok(prepared);
+        }
+        for dependency in plan.dependencies {
+            prepared.dependencies.push(
+                commands::download_project_version(
+                    &metadata.instance.id,
+                    &dependency.version_id,
+                    fetch::DownloadReason::Dependency,
+                    dependency.dependent_on_version_id,
+                    state,
+                )
+                .await?,
+            );
+        }
+    }
+    Ok(prepared)
+}
+
 async fn apply_pack(
     metadata: &InstanceMetadata,
     id: &str,
@@ -205,6 +368,7 @@ async fn apply_pack(
     library: &mut PackLibrary,
     items: &mut Vec<ContentItem>,
     state: &State,
+    mut prepared: PreparedPack,
 ) -> crate::Result<()> {
     let instance_id = &metadata.instance.id;
     let previous = library
@@ -212,6 +376,22 @@ async fn apply_pack(
         .get(instance_id)
         .and_then(|items| items.get(id))
         .cloned();
+    if prepared.conflict {
+        let message = "A local copy of this pack already exists. Sync it from the content tab to include it.";
+        let placement = library
+            .instances
+            .entry(instance_id.clone())
+            .or_default()
+            .entry(id.to_owned())
+            .or_default();
+        if placement.error.as_deref() != Some(message) {
+            tracing::warn!(
+                "Could not sync pack {id} to {instance_id}: {message}"
+            );
+            placement.error = Some(message.to_owned());
+        }
+        return Ok(());
+    }
     let resource_pack_selection_path =
         previous.as_ref().and_then(|placement| {
             placement.resource_pack_selection_path.clone().or_else(|| {
@@ -249,27 +429,7 @@ async fn apply_pack(
         let is_source = previous
             .as_ref()
             .is_some_and(|placement| placement.is_source);
-        let compatible = if is_source {
-            true
-        } else if pack.item.project.is_some() {
-            if let Some(version) = &item.version {
-                CachedEntry::get_version(
-                    &version.id,
-                    None,
-                    &state.pool,
-                    &state.api_semaphore,
-                )
-                .await?
-                .is_some_and(|version| {
-                    version_compatible(pack, &version, metadata)
-                })
-            } else {
-                false
-            }
-        } else {
-            pack.game_versions
-                .contains(&metadata.applied_content_set.game_version)
-        };
+        let compatible = is_source || prepared.compatible;
         if compatible || item.locked {
             let changed = item.enabled != pack.item.enabled;
             let joined = previous
@@ -311,24 +471,7 @@ async fn apply_pack(
             return Ok(());
         }
     }
-    let version = if let Some(project) = &pack.item.project {
-        CachedEntry::get_project_versions(
-            &project.id,
-            Some(CacheBehaviour::MustRevalidate),
-            &state.pool,
-            &state.api_semaphore,
-        )
-        .await?
-        .unwrap_or_default()
-        .into_iter()
-        .filter(|version| {
-            version_compatible(pack, version, metadata)
-                && !version.files.is_empty()
-        })
-        .max_by_key(|version| version.date_published)
-    } else {
-        None
-    };
+    let version = prepared.version.take();
     let compatible = if pack.item.project.is_some() {
         version.is_some()
     } else {
@@ -337,7 +480,7 @@ async fn apply_pack(
     };
     if !compatible {
         if let Some(previous) = &previous
-            && owns_file(metadata, previous, state).await?
+            && prepared.owned_previous
         {
             commands::remove_project(instance_id, &previous.path, state)
                 .await?;
@@ -398,7 +541,7 @@ async fn apply_pack(
             let owned = if let Some(previous) = &previous {
                 same_path(&previous.path, &path)
                     && previous.enabled != path.ends_with(".disabled")
-                    && owns_file(metadata, previous, state).await?
+					&& prepared.owned_previous
             } else {
                 false
             };
@@ -410,26 +553,11 @@ async fn apply_pack(
             }
         }
     }
-    let stored_file = if let Some(file) = file
-        && file.hashes.get("sha1") != Some(&pack.sha1)
-    {
-        let downloaded = fetch::fetch_content_file(
-            state,
-            &[file.url.as_str()],
-            file.hashes.get("sha512").map(String::as_str),
-            file.hashes.get("sha1").map(String::as_str),
-            Some(u64::from(file.size)),
-            None,
-            None,
+	let stored_file = prepared.stored_file.take().ok_or_else(|| {
+        crate::ErrorKind::InputError(
+            "Pack contents were not prepared.".to_owned(),
         )
-        .await?;
-        downloaded.store_file(state).await?
-    } else {
-        read_stored_file(pack, state).await?
-    };
-    let bytes = bytes::Bytes::from(tokio::fs::read(&stored_file.path).await?);
-    let sha1 = stored_file.metadata.sha1.clone();
-    super::operations::validate_pack(&bytes, pack.item.project_type)?;
+    })?;
     let mut pending = previous.clone().unwrap_or_default();
     pending.pending = true;
     library
@@ -438,41 +566,26 @@ async fn apply_pack(
         .or_default()
         .insert(id.to_string(), pending);
     write_library(library, state).await?;
-    if let (Some(project), Some(version)) = (&pack.item.project, &version)
-        && !version.dependencies.is_empty()
-    {
-        let plan = commands::resolve_install_plan(
+    if prepared.deferred {
+        return Ok(());
+    }
+    for dependency in prepared.dependencies {
+        let dependency_path = commands::add_downloaded_project_version(
             instance_id,
-            commands::InstanceInstallProjectRequest {
-                project_id: project.id.clone(),
-                version_id: Some(version.id.clone()),
-                content_type: pack.item.project_type.into(),
-                selected: ResolutionPreferences::default(),
-            },
+            dependency,
+            ContentSourceKind::Local,
             state,
         )
         .await?;
-        if !plan.dependencies.is_empty()
-            && instance_is_running(metadata, state).await?
+        if previous
+            .as_ref()
+            .is_some_and(|placement| placement.path == dependency_path)
         {
-            return Ok(());
-        }
-        for dependency in &plan.dependencies {
-            commands::add_project_from_version(
-                instance_id,
-                &dependency.version_id,
-                fetch::DownloadReason::Dependency,
-                dependency.dependent_on_version_id.clone(),
-                ContentSourceKind::Local,
-                state,
-            )
-            .await?;
-        }
-        if !plan.dependencies.is_empty() {
-            *items = commands::list_pack_content(instance_id, state).await?;
+            prepared.owned_previous = false;
         }
     }
-    let size = bytes.len() as u64;
+	let size = stored_file.metadata.size as u64;
+	let sha1 = stored_file.metadata.sha1.clone();
     let path = commands::install_stored_file(
         instance_id,
         commands::InstallContent {
@@ -494,7 +607,7 @@ async fn apply_pack(
     .await?;
     if let Some(previous) = previous
         && previous.path != path
-        && owns_file(metadata, &previous, state).await?
+        && prepared.owned_previous
     {
         commands::remove_project(instance_id, &previous.path, state).await?;
         items.retain(|item| item.file_path != previous.path);
@@ -533,12 +646,32 @@ async fn apply_pack(
     Ok(())
 }
 
-pub(super) async fn apply_instance(
-    metadata: &InstanceMetadata,
-    library: &mut PackLibrary,
+pub(super) async fn run_queued(
+    instance_id: &str,
     state: &State,
 ) -> crate::Result<()> {
-    apply_instance_inner(metadata, library, state, None).await
+    let Some(metadata) =
+        crate::state::get_instance(instance_id, &state.pool).await?
+    else {
+        return Ok(());
+    };
+    let mut preparation =
+        super::worker::Preparation::new(state, &metadata).await;
+    let mut library = preparation.library().await?;
+    if library.packs.is_empty() && library.instances.is_empty() {
+        return Ok(());
+    }
+    apply_instance_inner(
+        &metadata,
+        &mut library,
+        state,
+        None,
+        &mut preparation,
+    )
+    .await?;
+    write_library(&library, state).await?;
+    emit_instance(instance_id, InstancePayloadType::Synced).await?;
+    Ok(())
 }
 
 async fn apply_instance_inner(
@@ -546,6 +679,7 @@ async fn apply_instance_inner(
     library: &mut PackLibrary,
     state: &State,
     removed_pack_id: Option<&str>,
+    preparation: &mut super::worker::Preparation<'_>,
 ) -> crate::Result<()> {
     if super::super::synced_options::pending::contains(
         &metadata.instance.id,
@@ -564,16 +698,50 @@ async fn apply_instance_inner(
     }
     let running = instance_is_running(metadata, state).await?;
     let global = get_global_options().await?;
-    let mut items = if removed_pack_id.is_none()
+    let has_packs = removed_pack_id.is_none()
         && library
             .packs
             .values()
-            .any(|pack| participating(metadata, pack, global))
-    {
-        commands::list_pack_content(&metadata.instance.id, state).await?
+            .any(|pack| participating(metadata, pack, global));
+    let (mut items, versions) = if has_packs {
+        preparation
+            .run(library, async {
+                let items =
+                    commands::list_pack_content(&metadata.instance.id, state)
+                        .await?;
+                let ids = items
+                    .iter()
+                    .filter_map(|item| {
+                        item.version.as_ref().map(|version| version.id.as_str())
+                    })
+                    .collect::<Vec<_>>();
+                let versions = CachedEntry::get_version_many(
+                    &ids,
+                    None,
+                    &state.pool,
+                    &state.api_semaphore,
+                )
+                .await?;
+                super::selection_compatibility::warm(metadata, &items, state)
+                    .await?;
+                Ok((items, versions))
+            })
+            .await?
     } else {
-        Vec::new()
+        (Vec::new(), Vec::new())
     };
+    if has_packs && !running {
+        let placements = library
+            .instances
+            .get(&metadata.instance.id)
+            .cloned()
+            .unwrap_or_default();
+        if capture_items(metadata, library, state, placements, global, &items)
+            .await?
+        {
+            super::worker::queue_all();
+        }
+    }
     let previous_placements = library
         .instances
         .get(&metadata.instance.id)
@@ -617,8 +785,85 @@ async fn apply_instance_inner(
         {
             continue;
         }
+        let previous = library
+            .instances
+            .get(&metadata.instance.id)
+            .and_then(|placements| placements.get(id));
+        if previous.is_some_and(|placement| placement.excluded) {
+            continue;
+        }
+        let matching = matching_item(&items, pack, previous);
+        let compatible = matching.is_some_and(|item| {
+            previous.is_some_and(|placement| placement.is_source)
+                || if pack.item.project.is_some() {
+                    item.version.as_ref().is_some_and(|installed| {
+                        versions.iter().any(|version| {
+                            version.id == installed.id
+                                && version_compatible(pack, version, metadata)
+                        })
+                    })
+                } else {
+                    pack.game_versions
+                        .contains(&metadata.applied_content_set.game_version)
+                }
+        });
+        let prepared = if local_conflict(
+            &items,
+            pack,
+            previous,
+            &pack_path(pack, &pack.item.file_name),
+        ) {
+            PreparedPack {
+                conflict: true,
+                ..Default::default()
+            }
+        } else if compatible
+            || matching.is_some_and(|item| item.locked || !local(item))
+        {
+            PreparedPack {
+                compatible,
+                ..Default::default()
+            }
+        } else {
+            match preparation
+                .run(
+                    library,
+                    prepare_pack(metadata, id, pack, library, &items, state),
+                )
+                .await
+            {
+                Ok(prepared) => prepared,
+                Err(error)
+                    if matches!(
+                        error.raw.as_ref(),
+                        crate::ErrorKind::PackSyncChanged
+                            | crate::ErrorKind::Ratelimited { .. }
+                    ) =>
+                {
+                    return Err(error);
+                }
+                Err(error) => {
+                    let placement = library
+                        .instances
+                        .entry(metadata.instance.id.clone())
+                        .or_default()
+                        .entry(id.clone())
+                        .or_default();
+                    let message = error.to_string();
+                    if placement.error.as_ref() != Some(&message) {
+                        tracing::warn!(
+                            "Could not prepare synced pack {id}: {error}"
+                        );
+                        placement.error = Some(message);
+                    }
+                    continue;
+                }
+            }
+        };
+        let mut refresh = !prepared.dependencies.is_empty();
         if let Err(error) =
-            apply_pack(metadata, id, pack, library, &mut items, state).await
+            apply_pack(metadata, id, pack, library, &mut items, state, prepared)
+                .await
         {
             tracing::warn!(
                 "Could not sync pack {id} to {}: {error}",
@@ -631,7 +876,14 @@ async fn apply_instance_inner(
                 .entry(id.clone())
                 .or_default();
             placement.error = Some(error.to_string());
-            items = commands::list_pack_content(&metadata.instance.id, state)
+            refresh = true;
+        }
+        if refresh {
+            items = preparation
+                .run(
+                    library,
+                    commands::list_pack_content(&metadata.instance.id, state),
+                )
                 .await?;
         }
     }
@@ -640,6 +892,7 @@ async fn apply_instance_inner(
         .get(&metadata.instance.id)
         .cloned()
         .unwrap_or_default();
+    let mut removed_ids = Vec::new();
     for (id, placement) in placements {
         if running
             || library.packs.contains_key(&id)
@@ -655,7 +908,9 @@ async fn apply_instance_inner(
         if included
             && !placement.excluded
             && !placement.suspended
-            && owns_file(metadata, &placement, state).await?
+            && preparation
+                .run(library, owns_file(metadata, &placement, state))
+                .await?
         {
             commands::remove_project(
                 &metadata.instance.id,
@@ -666,11 +921,15 @@ async fn apply_instance_inner(
             emit_instance(&metadata.instance.id, InstancePayloadType::Synced)
                 .await?;
         }
-        if let Some(placements) =
-            library.instances.get_mut(&metadata.instance.id)
-        {
-            placements.remove(&id);
-        }
+        removed_ids.push(id);
+    }
+    if has_packs {
+        preparation
+            .run(
+                library,
+                super::selection_compatibility::warm(metadata, &items, state),
+            )
+            .await?;
     }
     let selection_result = if let Some(pack_id) = removed_pack_id {
         super::selection::apply_removal(
@@ -684,11 +943,21 @@ async fn apply_instance_inner(
         super::selection::apply(metadata, library, &previous_placements, state)
             .await
     };
-    if let Err(error) = selection_result {
-        tracing::warn!(
+    match selection_result {
+        Ok(true) => {
+            if let Some(placements) =
+                library.instances.get_mut(&metadata.instance.id)
+            {
+                for id in removed_ids {
+                    placements.remove(&id);
+                }
+            }
+        }
+        Ok(false) => {}
+        Err(error) => tracing::warn!(
             "Could not apply resource-pack selection for {}: {error}",
             metadata.instance.id
-        );
+        ),
     }
     Ok(())
 }
@@ -699,33 +968,7 @@ pub(super) async fn apply_removal(
     state: &State,
 ) -> crate::Result<()> {
     library.resource_pack_order.retain(|id| id != pack_id);
-    write_library(library, state).await?;
-    let instance_ids: Vec<_> = library
-        .instances
-        .iter()
-        .filter(|(_, placements)| placements.contains_key(pack_id))
-        .map(|(id, _)| id.clone())
-        .collect();
-    for instance_id in instance_ids {
-        let Some(metadata) =
-            crate::state::get_instance(&instance_id, &state.pool).await?
-        else {
-            library.instances.remove(&instance_id);
-            library.resource_pack_observations.remove(&instance_id);
-            library
-                .resource_pack_incompatible_observations
-                .remove(&instance_id);
-            continue;
-        };
-        if let Err(error) =
-            apply_instance_inner(&metadata, library, state, Some(pack_id)).await
-        {
-            tracing::warn!(
-                "Could not remove synced pack {pack_id} from {instance_id}: {error}"
-            );
-        }
-    }
-    write_library(library, state).await
+    apply_all(library, state).await
 }
 
 pub(super) async fn apply_all(
@@ -733,111 +976,114 @@ pub(super) async fn apply_all(
     state: &State,
 ) -> crate::Result<()> {
     let instances = crate::state::list_instances(&state.pool).await?;
-    library.instances.retain(|id, _| {
-        instances.iter().any(|metadata| &metadata.instance.id == id)
-    });
-    library.resource_pack_observations.retain(|id, _| {
-        instances.iter().any(|metadata| &metadata.instance.id == id)
-    });
+    let ids = instances
+        .iter()
+        .map(|metadata| &metadata.instance.id)
+        .collect::<std::collections::BTreeSet<_>>();
+    library.instances.retain(|id, _| ids.contains(id));
+    library
+        .resource_pack_observations
+        .retain(|id, _| ids.contains(id));
     library
         .resource_pack_incompatible_observations
-        .retain(|id, _| {
-            instances.iter().any(|metadata| &metadata.instance.id == id)
-        });
+        .retain(|id, _| ids.contains(id));
     library
         .resource_pack_order
         .retain(|id| library.packs.contains_key(id));
-    for metadata in &instances {
-        if sync_files_are_protected(metadata) {
-            continue;
-        }
-        if let Err(error) =
-            super::selection::capture(metadata, library, state).await
-        {
-            tracing::warn!(
-                "Could not capture resource-pack selection for {} before syncing: {error}",
-                metadata.instance.id
-            );
-        }
-    }
     write_library(library, state).await?;
-    for metadata in instances {
-        if let Err(error) = apply_instance(&metadata, library, state).await {
-            tracing::warn!(
-                "Could not reconcile synced packs for {}: {error}",
-                metadata.instance.id
-            );
-        }
-    }
-    write_library(library, state).await
+    super::worker::queue_all();
+    Ok(())
 }
 
 pub(in crate::api::instance) async fn reconcile(
     metadata: &InstanceMetadata,
     _option: SyncedOption,
-    state: &State,
+    _state: &State,
 ) -> crate::Result<()> {
-    let mut library = read_library(state).await?;
-    if library.packs.is_empty() && library.instances.is_empty() {
-        return Ok(());
-    }
-    let metadata =
-        crate::state::get_instance(&metadata.instance.id, &state.pool)
-            .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError("Unknown instance".to_string())
-            })?;
-    if capture(&metadata, &mut library, state).await? {
-        apply_all(&mut library, state).await
-    } else {
-        apply_instance(&metadata, &mut library, state).await?;
-        write_library(&library, state).await
-    }
+    super::worker::queue_reconciliation(&metadata.instance.id);
+    Ok(())
 }
 
-pub(crate) async fn reconcile_after_change(
-    instance_id: &str,
-) -> crate::Result<()> {
+async fn capture_after_change(instance_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
+            crate::ErrorKind::InputError("Unknown instance".to_owned())
         })?;
-    reconcile(&metadata, SyncedOption::ResourcePacks, &state).await
+    let mut preparation =
+        super::worker::Preparation::new(&state, &metadata).await;
+    let mut library = preparation.library().await?;
+    let Some(placements) = library.instances.get(instance_id).cloned() else {
+        super::worker::queue_reconciliation(instance_id);
+        return Ok(());
+    };
+    if sync_files_are_protected(&metadata)
+        || instance_is_running(&metadata, &state).await?
+        || super::super::synced_options::pending::contains(
+            instance_id,
+            SyncedOption::ResourcePacks,
+            &state,
+        )
+        .await?
+    {
+        super::worker::queue_reconciliation(instance_id);
+        return Ok(());
+    }
+    let items = preparation
+        .run(&library, async {
+            let items =
+                commands::list_pack_content(instance_id, &state).await?;
+            super::selection_compatibility::warm(&metadata, &items, &state)
+                .await?;
+            Ok(items)
+        })
+        .await?;
+    let global = get_global_options().await?;
+    if capture_items(
+        &metadata,
+        &mut library,
+        &state,
+        placements,
+        global,
+        &items,
+    )
+    .await?
+    {
+        apply_all(&mut library, &state).await?;
+    } else {
+        write_library(&library, &state).await?;
+        super::worker::queue_reconciliation(instance_id);
+    }
+    Ok(())
 }
 
 pub(in crate::api::instance) fn schedule_reconciliation() {
-    tokio::spawn(async {
-        let result: crate::Result<()> = async {
-			let state = State::get().await?;
-			let instances = crate::state::list_instances(&state.pool).await?;
-			for metadata in instances {
-				let instance_id = &metadata.instance.id;
-				if let Err(error) = reconcile_after_change(instance_id).await {
-					tracing::warn!(
-						"Could not reconcile synced packs for {instance_id}: {error}"
-					);
-				}
-				emit_instance(instance_id, InstancePayloadType::Synced).await?;
-			}
-			Ok(())
-		}
-		.await;
-        if let Err(error) = result {
-            tracing::warn!("Could not finish syncing packs: {error}");
-        }
-    });
+    super::worker::queue_all();
 }
 
 pub(in crate::api::instance) async fn reconcile_after_content_change(
     instance_id: &str,
 ) {
-    if let Err(error) = reconcile_after_change(instance_id).await {
-        tracing::warn!(
-            "Content changed in {instance_id}, but synced packs could not be reconciled: {error}"
-        );
+    loop {
+        match capture_after_change(instance_id).await {
+            Err(error)
+                if matches!(
+                    error.raw.as_ref(),
+                    crate::ErrorKind::PackSyncChanged
+                ) =>
+            {
+                tokio::task::yield_now().await;
+            }
+            Err(error) => {
+                tracing::warn!(
+                    "Could not capture pack changes for {instance_id}: {error}"
+                );
+                super::worker::queue_reconciliation(instance_id);
+                return;
+            }
+            Ok(()) => return,
+        }
     }
 }
 

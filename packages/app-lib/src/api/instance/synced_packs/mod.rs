@@ -3,6 +3,9 @@ mod reconciliation;
 mod selection;
 mod selection_compatibility;
 mod storage;
+mod worker;
+
+pub(crate) use worker::{PackSyncWorker, queue_reconciliation};
 
 pub(crate) use storage::migrate_store;
 
@@ -11,12 +14,12 @@ pub use operations::{
     set_synced_pack_enabled, sync_pack, upload_synced_pack,
 };
 pub(super) use operations::{seed_from_instance, sync_new_pack};
-pub(crate) use reconciliation::reconcile_after_change;
 pub(super) use reconciliation::{
     capture_resource_pack_selection_change, decorate_content, detach,
     prepare_instance_update, reconcile, reconcile_after_content_change,
     schedule_reconciliation,
 };
+pub(crate) use worker::flush;
 
 use crate::state::{
     ContentItem, InstanceMetadata, ProjectType, SyncedOption, Version,
@@ -131,4 +134,12 @@ fn same_path(left: &str, right: &str) -> bool {
 
 fn pack_path(pack: &SyncedPack, file_name: &str) -> String {
     format!("{}/{}", pack.item.project_type.get_folder(), file_name,)
+}
+
+/// Whether a changed content path can affect pack syncing.
+pub(super) fn is_pack_path(path: &str) -> bool {
+    matches!(
+        ProjectType::get_from_parent_folder(path),
+        Some(ProjectType::ResourcePack | ProjectType::DataPack)
+    )
 }

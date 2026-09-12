@@ -96,17 +96,27 @@ pub(super) async fn write_library(
     }
     io::create_dir_all(directory(state)).await?;
     let destination = directory(state).join("packs.json");
-    let temporary =
-        directory(state).join(format!(".packs-{}.tmp", uuid::Uuid::new_v4()));
-    io::write(&temporary, serde_json::to_vec(&library)?).await?;
-    tokio::fs::File::options()
-        .write(true)
-        .open(&temporary)
-        .await?
-        .sync_all()
-        .await?;
-    tokio::fs::rename(&temporary, &destination).await?;
-    crate::state::content_store::sync_directory(&directory(state)).await?;
+	let bytes = serde_json::to_vec(&library)?;
+	if !io::read(&destination)
+		.await
+		.is_ok_and(|current| current == bytes)
+	{
+		let temporary =
+			directory(state).join(format!(".packs-{}.tmp", uuid::Uuid::new_v4()));
+		io::write(&temporary, bytes).await?;
+		tokio::fs::File::options()
+			.write(true)
+			.open(&temporary)
+			.await?
+			.sync_all()
+			.await?;
+		tokio::fs::rename(&temporary, &destination).await?;
+		state
+			.pack_sync_worker
+			.revision
+			.fetch_add(1, std::sync::atomic::Ordering::Release);
+		crate::state::content_store::sync_directory(&directory(state)).await?;
+	}
     for id in previous
         .packs
         .keys()

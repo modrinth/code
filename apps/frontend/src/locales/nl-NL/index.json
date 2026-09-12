@@ -581,12 +581,6 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Bewaar je favoriete content en krijg real-time updates met één click."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Volg projecten"
-  },
   "app-marketing.features.importing.description": {
     "message": "Importeer al je favoriete profielen vanuit de launcher die je eerder gebruikte, en ga binnen enkele seconden aan de slag met de Modrinth-app!"
   },
@@ -623,12 +617,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Versie"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Speel met je mods, zonder dat je online hoeft te zijn."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Offline-modus"
-  },
   "app-marketing.features.open-source.description": {
     "message": "De launcher van Modrinth is volledig open source. Je kunt de broncode bekijken op onze <github-link>GitHub</github-link>!"
   },
@@ -652,15 +640,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth-app"

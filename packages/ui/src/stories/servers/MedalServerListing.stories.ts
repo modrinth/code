@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { fn } from 'storybook/test'
 
 import MedalServerListing from '../../components/servers/marketing/MedalServerListing.vue'
 
@@ -74,6 +75,7 @@ export const SuspendedCancelled: Story = {
 		name: 'Expired Trial Server',
 		status: 'suspended',
 		suspension_reason: 'cancelled',
+		onDownloadWorld: fn(),
 	},
 }
 

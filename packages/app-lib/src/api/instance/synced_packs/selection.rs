@@ -6,7 +6,7 @@ use super::super::synced_options::{get_global_options, instance_dir};
 use super::reconciliation::participating;
 use super::selection_compatibility;
 use super::{PackLibrary, PackPlacement, SyncedPack};
-use crate::state::instances::commands;
+use crate::state::instances::adapters::sqlite::content_rows;
 use crate::state::{
     ContentSourceKind, InstanceMetadata, ProjectType, State, SyncedOption,
 };
@@ -40,33 +40,52 @@ fn target_entry(metadata: &InstanceMetadata, entry: String) -> String {
     }
 }
 
-async fn local_file(
+async fn local_sources(
     metadata: &InstanceMetadata,
-    path: &str,
     state: &State,
-) -> crate::Result<bool> {
-    if path.is_empty() {
-        return Ok(false);
+) -> crate::Result<BTreeMap<String, ContentSourceKind>> {
+    let (files, entries) = tokio::try_join!(
+        content_rows::get_instance_files(&metadata.instance.id, &state.pool),
+        content_rows::get_content_entries(
+            &metadata.applied_content_set.id,
+            &state.pool
+        ),
+    )?;
+    let mut kinds = BTreeMap::new();
+    for entry in entries {
+        if let Some(id) = entry.file_id {
+            kinds.entry(id).or_insert(entry.source_kind);
+        }
     }
-    let file = crate::state::instances::adapters::sqlite::content_rows::get_instance_file_by_relative_path(&metadata.instance.id, path, &state.pool).await?;
-    if file.is_none_or(|file| file.missing) {
-        return Ok(false);
-    }
-    let kind = commands::content_source_kind_for_project_path(
-        &metadata.instance.id,
-        path,
-        state,
-    )
-    .await?;
-    Ok(kind.is_none_or(|kind| kind == ContentSourceKind::Local))
+    Ok(files
+        .into_iter()
+		.filter(|file| !file.missing)
+		.map(|file| {
+			let kind = kinds
+				.get(&file.id)
+				.copied()
+				.unwrap_or(ContentSourceKind::Local);
+			(file.relative_path, kind)
+		})
+        .collect())
 }
 
-async fn can_capture(
+fn local_file(
+    path: &str,
+    sources: &BTreeMap<String, ContentSourceKind>,
+) -> bool {
+    !path.is_empty()
+        && sources
+            .get(path)
+			.is_some_and(|kind| *kind == ContentSourceKind::Local)
+}
+
+fn can_capture(
     metadata: &InstanceMetadata,
     pack: &SyncedPack,
     placement: &PackPlacement,
-    state: &State,
-) -> crate::Result<bool> {
+    sources: &BTreeMap<String, ContentSourceKind>,
+) -> bool {
     if pack.item.project_type != ProjectType::ResourcePack
         || !pack.item.enabled
         || !placement.enabled
@@ -76,9 +95,9 @@ async fn can_capture(
         || placement.error.is_some()
         || placement.content_set_id != metadata.applied_content_set.id
     {
-        return Ok(false);
+        return false;
     }
-    local_file(metadata, &placement.path, state).await
+	local_file(&placement.path, sources)
 }
 
 pub(super) async fn selected_in_instance(
@@ -105,6 +124,7 @@ pub(super) async fn capture_source_order(
     else {
         return Ok(());
     };
+    let sources = local_sources(metadata, state).await?;
     let mut known_entries = BTreeMap::new();
     for (id, placement) in library
         .instances
@@ -117,7 +137,7 @@ pub(super) async fn capture_source_order(
         };
         if pack.selected != Some(true)
             || placement.resource_pack_selection_pending
-            || !can_capture(metadata, pack, placement, state).await?
+			|| !can_capture(metadata, pack, placement, &sources)
         {
             continue;
         }
@@ -180,6 +200,7 @@ pub(super) async fn capture(
     else {
         return Ok(None);
     };
+    let sources = local_sources(metadata, state).await?;
     let entries = options.entries;
     let mut game_format = None;
     let previous = library
@@ -200,7 +221,7 @@ pub(super) async fn capture(
             continue;
         };
         if !participating(metadata, pack, global)
-            || !can_capture(metadata, pack, &placement, state).await?
+			|| !can_capture(metadata, pack, &placement, &sources)
         {
             continue;
         }
@@ -323,14 +344,15 @@ pub(super) async fn capture(
     Ok((shared_changed || observation_changed).then_some(shared_changed))
 }
 
+/// Returns false when the selection update must be deferred.
 pub(super) async fn apply_removal(
     metadata: &InstanceMetadata,
     library: &mut PackLibrary,
     placement: Option<&PackPlacement>,
     state: &State,
-) -> crate::Result<()> {
+) -> crate::Result<bool> {
     let Some(placement) = placement else {
-        return Ok(());
+        return Ok(true);
     };
     if placement.excluded
         || placement.suspended
@@ -338,7 +360,7 @@ pub(super) async fn apply_removal(
         || !metadata.synced_options.resource_packs
         || !get_global_options().await?.get(SyncedOption::ResourcePacks)
     {
-        return Ok(());
+        return Ok(true);
     }
     let directory = instance_dir(metadata, state);
     let mut managed = BTreeSet::new();
@@ -364,24 +386,29 @@ pub(super) async fn apply_removal(
         library
             .resource_pack_incompatible_observations
             .remove(&metadata.instance.id);
-        merge_resource_pack_entries(metadata, &managed, &[], state).await?;
+        return Ok(matches!(
+            merge_resource_pack_entries(metadata, &managed, &[], state).await?,
+            ResourcePackOptionsUpdate::Applied(_)
+        ));
     }
-    Ok(())
+    Ok(true)
 }
 
+/// Returns false when the selection update must be deferred.
 pub(super) async fn apply(
     metadata: &InstanceMetadata,
     library: &mut PackLibrary,
     previous_placements: &BTreeMap<String, PackPlacement>,
     state: &State,
-) -> crate::Result<()> {
+) -> crate::Result<bool> {
     let directory = instance_dir(metadata, state);
     let global = get_global_options().await?;
     if !global.get(SyncedOption::ResourcePacks)
         || !metadata.synced_options.resource_packs
     {
-        return Ok(());
+        return Ok(true);
     }
+    let sources = local_sources(metadata, state).await?;
     let mut managed = BTreeSet::new();
     for placement in previous_placements.values() {
         if placement.excluded
@@ -431,7 +458,7 @@ pub(super) async fn apply(
             || placement.pending
             || placement.error.is_some()
             || placement.content_set_id != metadata.applied_content_set.id
-            || !local_file(metadata, &placement.path, state).await?
+			|| !local_file(&placement.path, &sources)
         {
             continue;
         }
@@ -470,7 +497,7 @@ pub(super) async fn apply(
         tracked.push(id.clone());
     }
     if managed.is_empty() {
-        return Ok(());
+        return Ok(true);
     }
     let mut selected = Vec::new();
     for id in &library.resource_pack_order {
@@ -518,5 +545,5 @@ pub(super) async fn apply(
             }
         }
     }
-    Ok(())
+    Ok(!pending)
 }

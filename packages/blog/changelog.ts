@@ -11,6 +11,37 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-09-11T19:36:35+00:00`,
+		product: 'web',
+		body: `## Changed
+- The random project carousels on the home page and app landing page now pull from the [Featured projects](https://modrinth.com/collection/YV97U1kk) collection.
+- Updated screenshots on the app landing page.
+- Changed some callouts on app landing page to highlight newer features like the skin manager and settings syncing.
+- Removed claims about RAM usage of Modrinth App on app landing page.
+- Switched some projects out on app landing page to freshen it up.`,
+	},
+	{
+		date: `2026-09-11T19:36:35+00:00`,
+		product: 'app',
+		version: '0.20.4',
+		body: `## Fixed
+- Fixed server projects not showing in Jump In properly.`,
+	},
+	{
+		date: `2026-09-11T16:02:39+00:00`,
+		product: 'app',
+		version: '0.20.3',
+		body: `## Fixed
+- Fixed issues with resource pack syncing causing delays when launching instances or the app.
+- Fixed issue with the "Sync your settings" notification appearing even though it's been dismissed already.`,
+	},
+	{
+		date: `2026-09-11T16:02:39+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed "Download files" action not being available for suspended Medal promo servers.`,
+	},
+	{
 		date: `2026-09-10T16:31:31+00:00`,
 		product: 'app',
 		version: '0.20.2',

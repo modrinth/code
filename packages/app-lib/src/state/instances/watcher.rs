@@ -42,7 +42,8 @@ fn queue_content_sync(instance_id: String) {
             let result: crate::Result<()> = async {
                 let state = State::get().await?;
                 crate::state::sync_content_files(&instance_id, &state).await?;
-                crate::api::instance::reconcile_synced_packs(&instance_id).await
+				crate::api::instance::queue_synced_pack_reconciliation(&instance_id);
+				Ok(())
             }
             .await;
             if let Err(error) = result {
@@ -90,6 +91,7 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                     let instance_ids = event_instance_ids.read().await;
                     let mut visited_instances = Vec::new();
                     let mut visited_screenshot_instances = Vec::new();
+                    let mut pack_instances = HashSet::new();
                     let mut synced_option_files =
                         HashMap::<String, HashSet<String>>::new();
 
@@ -124,6 +126,11 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                 .skip_while(|x| x.as_os_str() != instance_path)
                                 .nth(1)
                                 .map(|x| x.as_os_str());
+                            if first_file_name.as_ref().is_some_and(|name| {
+                                *name == "resourcepacks" || *name == "datapacks"
+                            }) {
+                                pack_instances.insert(instance_id.clone());
+                            }
                             let is_screenshot_event = first_file_name
                                 .as_ref()
                                 .is_some_and(|name| *name == "screenshots");
@@ -241,28 +248,28 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                                 },
                                             )
                                         });
-                                    if sync_content {
-                                        queue_content_sync(emit_instance_id);
-                                    } else {
-                                        tokio::spawn(async move {
-                                            if reconcile_screenshots
-                                            && let Err(error) =
-                                                crate::api::instance::reconcile_screenshots(
-                                                    &emit_instance_id,
-                                                )
-                                                .await
-                                        {
-                                            tracing::error!(
-                                                "Failed to reconcile screenshots after filesystem change: {error}"
-                                            );
-                                        }
-                                            let _ = emit_instance(
-                                                &emit_instance_id,
-                                                event,
-                                            )
-                                            .await;
-                                        });
-                                    }
+									if sync_content {
+										queue_content_sync(emit_instance_id);
+									} else {
+										tokio::spawn(async move {
+											if reconcile_screenshots
+												&& let Err(error) =
+													crate::api::instance::reconcile_screenshots(
+														&emit_instance_id,
+													)
+													.await
+											{
+												tracing::error!(
+													"Failed to reconcile screenshots after filesystem change: {error}"
+												);
+											}
+											let _ = emit_instance(
+												&emit_instance_id,
+												event,
+											)
+											.await;
+										});
+									}
                                     if is_screenshot_event {
                                         visited_screenshot_instances
                                             .push(instance_id);
@@ -274,6 +281,11 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                         }
                     }
 
+                    for instance_id in pack_instances {
+                        crate::api::instance::queue_synced_pack_reconciliation(
+                            &instance_id,
+                        );
+                    }
                     for (instance_id, file_names) in synced_option_files {
                         tokio::spawn(async move {
                             for file_name in file_names {

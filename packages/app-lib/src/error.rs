@@ -46,6 +46,9 @@ impl std::fmt::Display for SharedInstanceUnavailableReason {
 
 #[derive(thiserror::Error, Debug)]
 pub enum ErrorKind {
+    #[error("Pack sync inputs changed during preparation")]
+    PackSyncChanged,
+
     #[error("{0:?}")]
     Any(eyre::Report),
 

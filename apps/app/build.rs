@@ -451,6 +451,7 @@ fn main() {
                         "backup_world",
                         "delete_world",
                         "add_server_to_instance",
+                        "ensure_managed_server_in_instance",
                         "edit_server_in_instance",
                         "remove_server_from_instance",
                         "desync_server",

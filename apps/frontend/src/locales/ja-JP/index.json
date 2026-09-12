@@ -581,12 +581,6 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "お気に入りのコンテンツを保存し、ワンクリックで更新情報を受け取ります。"
-  },
-  "app-marketing.features.follow.title": {
-    "message": "プロジェクトをフォローする"
-  },
   "app-marketing.features.importing.description": {
     "message": "以前使用していたランチャーからお気に入りのプロファイルをすべてインポートし、Modrinth Appをすぐに使い始めましょう！"
   },
@@ -623,12 +617,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "バージョン"
   },
-  "app-marketing.features.offline.description": {
-    "message": "インターネットに接続しているかどうかに関係なく、Modをプレイできます。"
-  },
-  "app-marketing.features.offline.title": {
-    "message": "オフラインモード"
-  },
   "app-marketing.features.open-source.description": {
     "message": "Modrinthのランチャーは完全にオープンソースです。ソースコードは<github-link>GitHub</github-link>にてご覧いただけます！"
   },
@@ -652,15 +640,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"

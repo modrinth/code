@@ -581,12 +581,6 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Salve o conteúdo que você gosta e receba atualizações em um só clique."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Siga os projetos"
-  },
   "app-marketing.features.importing.description": {
     "message": "Importe todos os perfis favoritos do launcher que você usou antes e comece a usar o Modrinth App em segundos!"
   },
@@ -623,12 +617,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Versão"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Jogue com mods, sem ou com internet."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Modo offline"
-  },
   "app-marketing.features.open-source.description": {
     "message": "O launcher do Modrinth é de código aberto. Você pode ver o código-fonte em nosso <github-link>GitHub</github-link>!"
   },
@@ -652,15 +640,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"

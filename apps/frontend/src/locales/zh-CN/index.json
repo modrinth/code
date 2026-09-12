@@ -581,12 +581,6 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "一键保存你喜爱的内容，并及时获取更新。"
-  },
-  "app-marketing.features.follow.title": {
-    "message": "关注项目"
-  },
   "app-marketing.features.importing.description": {
     "message": "轻松导入你在其他启动器上的所有配置，仅需数秒，即可快速上手 Modrinth App！"
   },
@@ -623,12 +617,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "版本"
   },
-  "app-marketing.features.offline.description": {
-    "message": "无论联网与否，皆可畅玩你的模组。"
-  },
-  "app-marketing.features.offline.title": {
-    "message": "离线模式"
-  },
   "app-marketing.features.open-source.description": {
     "message": "Modrinth 的启动器是完全开源的。你可以在我们的 <github-link>GitHub</github-link> 上查看源代码！"
   },
@@ -652,15 +640,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"

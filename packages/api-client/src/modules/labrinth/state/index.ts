@@ -1,9 +1,32 @@
 import { AbstractModule } from '../../../core/abstract-module'
 import type { Labrinth } from '../types'
 
+const FEATURED_PROJECTS_COLLECTION_ID = 'YV97U1kk'
+const HOME_PAGE_PROJECT_COUNT = 60
+
+function shuffledSample<T>(items: T[], count: number): T[] {
+	const sample = items.slice()
+	for (let i = sample.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1))
+		const current = sample[i]
+		sample[i] = sample[j]
+		sample[j] = current
+	}
+	return sample.slice(0, count)
+}
+
 export class LabrinthStateModule extends AbstractModule {
 	public getModuleID(): string {
 		return 'labrinth_state'
+	}
+
+	private async fetchHomePageProjects(): Promise<Labrinth.Projects.v2.Project[]> {
+		const collection = await this.client.labrinth.collections.get(FEATURED_PROJECTS_COLLECTION_ID)
+		const ids = shuffledSample(collection.projects ?? [], HOME_PAGE_PROJECT_COUNT)
+		if (ids.length === 0) {
+			return []
+		}
+		return this.client.labrinth.projects_v2.getMultiple(ids)
 	}
 
 	/**
@@ -77,14 +100,9 @@ export class LabrinthStateModule extends AbstractModule {
 				.catch((err) => handleError(err, [], '/v2/tag/report_type')),
 
 			// Homepage data
-			this.client
-				.request<Labrinth.Projects.v2.Project[]>('/projects_random', {
-					api: 'labrinth',
-					version: 2,
-					method: 'GET',
-					params: { count: '60' },
-				})
-				.catch((err) => handleError(err, [], '/v2/projects_random')),
+			this.fetchHomePageProjects().catch((err) =>
+				handleError(err, [], `/v3/collection/${FEATURED_PROJECTS_COLLECTION_ID}`),
+			),
 			this.client
 				.request<Labrinth.Search.v2.SearchResults>('/search', {
 					api: 'labrinth',
