@@ -73,7 +73,7 @@
 									nag.status === 'suggestion' && 'text-purple',
 								]"
 							/>
-							{{ getFormattedMessage(nag.title) }}
+							{{ getFormattedMessage(nag.title, nag.values) }}
 						</span>
 						<span>
 							<span
@@ -550,11 +550,14 @@ function getNagDescriptionSegments(nag: Nag): { text: string; isUrl: boolean }[]
 		.map((text) => ({ text, isUrl: /^https?:\/\//i.test(text) }))
 }
 
-function getFormattedMessage(message: string | MessageDescriptor): string {
+function getFormattedMessage(
+	message: string | MessageDescriptor,
+	values?: Nag['values'],
+): string {
 	if (typeof message === 'string') {
 		return message
 	}
-	return formatMessage(message)
+	return formatMessage(message, values)
 }
 </script>
 
