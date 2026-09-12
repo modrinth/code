@@ -1,7 +1,7 @@
 import { type KeybindDefinition, Keybinds, Settings } from '@modrinth/moderation'
 import { computed } from 'vue'
 
-import type { CookieOptions } from '#app'
+import type {CookieOptions, CookieRef} from '#app'
 import { FrontendNotificationManager } from '~/providers/frontend-notifications'
 
 const moderationKeybindsId = 'moderation-keybinds'
@@ -9,10 +9,12 @@ const moderationSettingsId = 'moderation-settings'
 
 type StoredKeybinds = { [id: string]: KeybindDefinition[] }
 type StoredSettings = { [id: string]: any }
-type StoredOptions = {
+type PartialStoredOptions = {
 	keybinds: Partial<StoredKeybinds>
 	settings: Partial<StoredSettings>
 }
+
+type StoredOptions = { keybinds: StoredKeybinds; settings: StoredSettings };
 
 const getCookieOptions = <T>() =>
 	({
@@ -21,53 +23,76 @@ const getCookieOptions = <T>() =>
 		secure: useRuntimeConfig().public.cookieSecure,
 		httpOnly: false,
 		path: '/',
-	}) satisfies CookieOptions<T>
+		watch: true
+	}) satisfies CookieOptions<T>;
 
-const useModerationCookies = () => {
-	const keybindCookie = useCookie<Partial<StoredKeybinds> | null>(
-		moderationKeybindsId,
-		getCookieOptions(),
-	)
-	const optionsCookie = useCookie<Partial<StoredOptions> | null>(
-		moderationSettingsId,
-		getCookieOptions(),
-	)
+let keybindCookie: CookieRef<Partial<StoredKeybinds> | null> | null = null;
+let optionsCookie: CookieRef<Partial<PartialStoredOptions> | null> | null = null
 
-	if (keybindCookie.value && !optionsCookie.value) {
-		optionsCookie.value = {
-			keybinds: keybindCookie.value,
-			settings: {},
-		}
-		keybindCookie.value = null
-	} else if (keybindCookie.value && optionsCookie.value) {
-		keybindCookie.value = null // options is the new cookie so it will override the existing keybinds.
+const keybindCookieGetter = () => {
+	if (keybindCookie == null) {
+		keybindCookie = useCookie<Partial<StoredKeybinds> | null>(
+			moderationKeybindsId,
+			getCookieOptions(),
+		);
 	}
-
-	return optionsCookie
+	return keybindCookie!;
 }
 
-const useModerationOptions = () =>
-	useState<{ keybinds: StoredKeybinds; settings: StoredSettings }>(moderationKeybindsId, () => {
-		const cookie = useModerationCookies()
-		const stored = cookie.value ?? {}
+const optionsCookieGetter = () => {
+	if (optionsCookie == null) {
+		optionsCookie = useCookie<Partial<PartialStoredOptions> | null>(
+			moderationSettingsId,
+			getCookieOptions(),
+		)
+	}
+	return optionsCookie!;
+}
 
-		const keybindOutput: StoredKeybinds = {}
+const useModerationCookies = computed(
+	() => {
+		const keybindCookieRef = keybindCookieGetter();
+		const optionsCookieRef = optionsCookieGetter();
 
-		for (const [id, definition] of Object.entries(stored.keybinds || {})) {
-			if (!definition) continue
-			keybindOutput[id] = definition
+		const options: Partial<PartialStoredOptions> = optionsCookieRef.value ?? { keybinds: {}, settings: {} };
+
+		if (keybindCookieRef.value) {
+			options.keybinds = keybindCookieRef.value;
+			keybindCookieRef.value = null
 		}
 
-		const settingsOutput: StoredSettings = {}
-		for (const [id, setting] of Object.entries(stored.settings || {})) {
-			settingsOutput[id] = setting
-		}
+		return options;
+	}
+)
 
-		return {
-			keybinds: keybindOutput,
-			settings: settingsOutput,
-		}
-	})
+let moderationOptions: ComputedRef<StoredOptions> | null = null;
+
+const useModerationOptions = () => {
+	if (moderationOptions == null) {
+		moderationOptions = computed<{ keybinds: StoredKeybinds; settings: StoredSettings }>( () => {
+			const stored = useModerationCookies.value;
+
+			const keybindOutput: StoredKeybinds = {}
+
+			for (const [id, definition] of Object.entries(stored.keybinds || {})) {
+				if (!definition) continue
+				keybindOutput[id] = definition
+			}
+
+			const settingsOutput: StoredSettings = {}
+			for (const [id, setting] of Object.entries(stored.settings || {})) {
+				settingsOutput[id] = setting
+			}
+
+			return {
+				keybinds: keybindOutput,
+				settings: settingsOutput,
+			}
+		})
+	}
+
+	return moderationOptions!;
+}
 
 export const useModerationKeybinds = () =>
 	computed(() => new Keybinds(useModerationOptions().value.keybinds))
@@ -76,13 +101,14 @@ export const useModerationSettings = () =>
 	computed(() => new Settings(useModerationOptions().value.settings, saveModerationOptions))
 
 export const saveModerationOptions = () => {
-	const options = useModerationOptions()
-	const cookie = useModerationCookies()
+	const options = useModerationOptions();
 
-	cookie.value = {
+	optionsCookieGetter().value = {
 		keybinds: options.value.keybinds,
 		settings: options.value.settings,
 	}
+
+	refreshCookie(moderationSettingsId);
 }
 
 let copyNotificationManager: FrontendNotificationManager | undefined

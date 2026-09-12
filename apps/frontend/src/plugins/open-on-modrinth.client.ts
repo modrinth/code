@@ -13,9 +13,9 @@ function getOfficialOrigin(apiBaseUrl: string): string {
 	return 'https://modrinth.com'
 }
 
-function getAlternativeOrigin(hostname: string | null | undefined): string | null {
-	const trimmed = hostname?.trim()
-	if (!trimmed) {
+function getAlternativeOrigin(hostname: string): string | null {
+	const trimmed = hostname.trim()
+	if (trimmed.length <= 0) {
 		return null
 	}
 

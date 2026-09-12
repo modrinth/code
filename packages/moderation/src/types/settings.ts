@@ -29,12 +29,12 @@ export type SettingDefinitionTypes = SettingDefinitions['type']
 
 export const setting = {
 	asEnum: <const E extends ReadonlyArray<{ label: string; value: string }>>(
-		data: EnumSettingDefinition<E[number]['value']> & { entries: E },
+		data: Omit<EnumSettingDefinition<E[number]['value']>, 'type'> & { entries: E },
 	): EnumSettingDefinition<E[number]['value']> => {
-		return data as EnumSettingDefinition<E[number]['value']>
+		return { type: "enum", ...data } as EnumSettingDefinition<E[number]['value']>
 	},
-	asToggle: (data: ToggleSettingDefinition) => data,
-	asString: (data: StringSettingDefinition) => data,
+	asToggle: (data: Omit<ToggleSettingDefinition, 'type'>) => { return {type: 'toggle', ...data } as ToggleSettingDefinition },
+	asString: (data: Omit<StringSettingDefinition, 'type'>) => { return {type: 'string', ...data } as StringSettingDefinition },
 }
 
 export function isValidFor(
