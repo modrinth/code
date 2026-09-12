@@ -62,6 +62,7 @@ postcard-bindgen = { workspace = true, features = ["generating", "std"], optiona
 quartz_nbt = { workspace = true, features = ["serde"] }
 quick-xml = { workspace = true, features = ["async-tokio"] }
 rand = { workspace = true }
+reflink-copy = { workspace = true }
 regex = { workspace = true }
 reqwest = { workspace = true, features = [
   "brotli",
@@ -76,6 +77,7 @@ reqwest = { workspace = true, features = [
   "stream",
 ] }
 rgb = { workspace = true }
+same-file = { workspace = true }
 serde = { workspace = true, features = ["derive", "rc"] }
 serde-binhum = { workspace = true }
 serde_ini = { workspace = true }
@@ -130,7 +132,7 @@ dunce = { workspace = true }
 cidre = { workspace = true, features = ["blocks", "nw"] }
 
 [target."cfg(windows)".dependencies]
-windows = { workspace = true, features = ["Networking_Connectivity"] }
+windows = { workspace = true, features = ["Networking_Connectivity", "Win32_Storage_FileSystem"] }
 windows-core = { workspace = true }
 winreg = { workspace = true }
 

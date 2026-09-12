@@ -1,7 +1,7 @@
 use super::{
     ContentStore, FileContent, InstanceFileKind, InstanceFileStorage,
     StoredFileHandle, StoredFileRecord, catalog, hash_file, input, normalize,
-    relative_link, sync_directory, writable_copy,
+    relative_link, sync_directory, try_reflink, writable_copy,
 };
 use crate::state::instances::adapters::sqlite::content_rows;
 use crate::state::{Instance, InstanceFile};
@@ -67,6 +67,14 @@ impl ContentStore {
         if let Some(supported) = supported.get(parent) {
             return Ok(*supported);
         }
+        let probe = self
+            .staging
+            .join(format!(".modrinth-reflink-{}.tmp", uuid::Uuid::new_v4()));
+        if try_reflink(source, &probe).await? {
+            fs::remove_file(probe).await?;
+            supported.insert(parent.to_path_buf(), true);
+            return Ok(true);
+        }
         let temporary =
             parent.join(format!(".modrinth-link-{}.tmp", uuid::Uuid::new_v4()));
         let target = relative_link(source, parent);
@@ -81,8 +89,12 @@ impl ContentStore {
                 Ok(true)
             }
             Err(error) if link_unavailable(&error) => {
-                supported.insert(parent.to_path_buf(), false);
-                Ok(false)
+                let available = try_hardlink(source, &probe).await?;
+                if available {
+                    remove_instance_file(&probe).await?;
+                }
+                supported.insert(parent.to_path_buf(), available);
+                Ok(available)
             }
             Err(error) => Err(error.into()),
         }
@@ -218,7 +230,8 @@ impl ContentStore {
                 .create_instance_file(
                     &stored_file,
                     &path,
-                    binding.materialization_kind == InstanceFileKind::Copy,
+                    (binding.materialization_kind == InstanceFileKind::Copy)
+                        .then_some(InstanceFileKind::Copy),
                 )
                 .await?;
             restored.push((&binding.file_id, &binding.blob_sha512, mode));
@@ -337,7 +350,11 @@ impl ContentStore {
                     relative_path: source_relative.clone(),
                     sha512: previous.metadata.sha512.clone(),
                     present: true,
-                    mode: InstanceFileKind::Copy,
+                    mode: binding
+                        .as_ref()
+                        .map_or(InstanceFileKind::Copy, |binding| {
+                            binding.materialization_kind
+                        }),
                 };
                 previous_lease = Some(previous);
                 Some(file_status)
@@ -629,7 +646,9 @@ impl ContentStore {
 								})?;
                             create_recovery_link(&stored_file, &path).await?;
                         }
-                        InstanceFileKind::Copy => {
+                        InstanceFileKind::Copy
+                        | InstanceFileKind::Reflink
+                        | InstanceFileKind::Hardlink => {
                             let stored_file = self
 								.lookup(Some(&before.sha512), None, None)
 								.await?
@@ -641,7 +660,7 @@ impl ContentStore {
                             self.create_instance_file(
                                 &stored_file,
                                 &path,
-                                true,
+                                Some(before.mode),
                             )
                             .await?;
                         }
@@ -686,7 +705,7 @@ impl ContentStore {
         &self,
         stored_file: &StoredFileHandle,
         target: &Path,
-        force_copy: bool,
+        required_kind: Option<InstanceFileKind>,
     ) -> crate::Result<InstanceFileKind> {
         let parent = target
             .parent()
@@ -697,9 +716,20 @@ impl ContentStore {
         }
         let temporary =
             parent.join(format!(".modrinth-{}.tmp", uuid::Uuid::new_v4()));
-        let mode = if force_copy {
+        let mode = if required_kind == Some(InstanceFileKind::Copy) {
             writable_copy(&stored_file.path, &temporary).await?;
             InstanceFileKind::Copy
+        } else if required_kind == Some(InstanceFileKind::Hardlink) {
+            fs::hard_link(&stored_file.path, &temporary).await?;
+            InstanceFileKind::Hardlink
+        } else if required_kind != Some(InstanceFileKind::Symlink)
+            && try_reflink(&stored_file.path, &temporary).await?
+        {
+            InstanceFileKind::Reflink
+        } else if required_kind == Some(InstanceFileKind::Reflink) {
+            return Err(input(
+                "The filesystem no longer supports restoring this reflink",
+            ));
         } else {
             let source = relative_link(&stored_file.path, parent);
             #[cfg(unix)]
@@ -708,14 +738,20 @@ impl ContentStore {
             let result = fs::symlink_file(&source, &temporary).await;
             match result {
                 Ok(()) => InstanceFileKind::Symlink,
-                Err(error) if link_unavailable(&error) => {
-                    writable_copy(&stored_file.path, &temporary).await?;
-                    InstanceFileKind::Copy
+                Err(error)
+                    if required_kind.is_none() && link_unavailable(&error) =>
+                {
+                    if try_hardlink(&stored_file.path, &temporary).await? {
+                        InstanceFileKind::Hardlink
+                    } else {
+                        writable_copy(&stored_file.path, &temporary).await?;
+                        InstanceFileKind::Copy
+                    }
                 }
                 Err(error) => return Err(error.into()),
             }
         };
-        if mode == InstanceFileKind::Copy {
+        if matches!(mode, InstanceFileKind::Copy | InstanceFileKind::Reflink) {
             fs::File::options()
                 .write(true)
                 .open(&temporary)
@@ -724,7 +760,7 @@ impl ContentStore {
                 .await?;
         }
         if let Err(error) = fs::rename(&temporary, target).await {
-            let _ = fs::remove_file(&temporary).await;
+            let _ = remove_instance_file(&temporary).await;
             return Err(error.into());
         }
         sync_directory(parent).await?;
@@ -829,9 +865,8 @@ impl PendingFileChange {
                 )
                 .await?;
             *mutation_started = true;
-            after.mode = store
-                .create_instance_file(stored_file, &path, false)
-                .await?;
+            after.mode =
+                store.create_instance_file(stored_file, &path, None).await?;
         }
         Ok(())
     }
@@ -937,17 +972,50 @@ pub(super) fn link_unavailable(error: &std::io::Error) -> bool {
     ) || cfg!(windows) && matches!(error.raw_os_error(), Some(1 | 50 | 1314))
 }
 
+async fn try_hardlink(source: &Path, target: &Path) -> crate::Result<bool> {
+    match fs::hard_link(source, target).await {
+        Ok(()) => Ok(true),
+        Err(error)
+            if link_unavailable(&error)
+                || error.kind() == std::io::ErrorKind::CrossesDevices
+                || cfg!(unix) && error.raw_os_error() == Some(31)
+                || cfg!(windows) && error.raw_os_error() == Some(1142) =>
+        {
+            Ok(false)
+        }
+        Err(error) => Err(error.into()),
+    }
+}
+
 pub(crate) async fn remove_instance_file(path: &Path) -> crate::Result<()> {
     let metadata = fs::symlink_metadata(path).await?;
-    #[cfg(windows)]
-    if metadata.is_file() && metadata.permissions().readonly() {
-        let mut permissions = metadata.permissions();
-        permissions.set_readonly(false);
-        fs::set_permissions(path, permissions).await?;
-    }
     if metadata.is_dir() && !metadata.file_type().is_symlink() {
         return Err(input("Refusing to remove a directory as content"));
     }
+    #[cfg(windows)]
+    if metadata.is_file() && metadata.permissions().readonly() {
+        let path = path.to_path_buf();
+        tokio::task::spawn_blocking(move || -> std::io::Result<()> {
+            use std::os::windows::fs::OpenOptionsExt;
+            use windows::Win32::Storage::FileSystem::{
+                FILE_READ_ATTRIBUTES, FILE_WRITE_ATTRIBUTES,
+            };
+            let file = std::fs::OpenOptions::new()
+                .access_mode(FILE_READ_ATTRIBUTES.0 | FILE_WRITE_ATTRIBUTES.0)
+                .open(&path)?;
+            let original = file.metadata()?.permissions();
+            let mut writable = original.clone();
+            writable.set_readonly(false);
+            file.set_permissions(writable)?;
+            let removed = std::fs::remove_file(path);
+            file.set_permissions(original)?;
+            removed
+        })
+        .await??;
+    } else {
+        fs::remove_file(path).await?;
+    }
+    #[cfg(not(windows))]
     fs::remove_file(path).await?;
     if let Some(parent) = path.parent() {
         sync_directory(parent).await?;

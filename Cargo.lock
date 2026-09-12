@@ -8664,6 +8664,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "reflink-copy"
+version = "0.1.30"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d9dd7ab4af0363d5ccfd2838d782a28196cf32a5cc2e4fe3c5dc83f2be588b8b"
+dependencies = [
+ "cfg-if",
+ "libc",
+ "rustix 1.1.2",
+ "windows",
+]
+
+[[package]]
 name = "regex"
 version = "1.12.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -11398,9 +11410,11 @@ dependencies = [
  "quartz_nbt",
  "quick-xml 0.38.3",
  "rand 0.8.5",
+ "reflink-copy",
  "regex",
  "reqwest 0.12.24",
  "rgb",
+ "same-file",
  "serde",
  "serde-binhum",
  "serde_ini",

@@ -59,14 +59,14 @@ async fn local_sources(
     }
     Ok(files
         .into_iter()
-		.filter(|file| !file.missing)
-		.map(|file| {
-			let kind = kinds
-				.get(&file.id)
-				.copied()
-				.unwrap_or(ContentSourceKind::Local);
-			(file.relative_path, kind)
-		})
+        .filter(|file| !file.missing)
+        .map(|file| {
+            let kind = kinds
+                .get(&file.id)
+                .copied()
+                .unwrap_or(ContentSourceKind::Local);
+            (file.relative_path, kind)
+        })
         .collect())
 }
 
@@ -77,7 +77,7 @@ fn local_file(
     !path.is_empty()
         && sources
             .get(path)
-			.is_some_and(|kind| *kind == ContentSourceKind::Local)
+            .is_some_and(|kind| *kind == ContentSourceKind::Local)
 }
 
 fn can_capture(
@@ -97,7 +97,7 @@ fn can_capture(
     {
         return false;
     }
-	local_file(&placement.path, sources)
+    local_file(&placement.path, sources)
 }
 
 pub(super) async fn selected_in_instance(
@@ -137,7 +137,7 @@ pub(super) async fn capture_source_order(
         };
         if pack.selected != Some(true)
             || placement.resource_pack_selection_pending
-			|| !can_capture(metadata, pack, placement, &sources)
+            || !can_capture(metadata, pack, placement, &sources)
         {
             continue;
         }
@@ -221,7 +221,7 @@ pub(super) async fn capture(
             continue;
         };
         if !participating(metadata, pack, global)
-			|| !can_capture(metadata, pack, &placement, &sources)
+            || !can_capture(metadata, pack, &placement, &sources)
         {
             continue;
         }
@@ -458,7 +458,7 @@ pub(super) async fn apply(
             || placement.pending
             || placement.error.is_some()
             || placement.content_set_id != metadata.applied_content_set.id
-			|| !local_file(&placement.path, &sources)
+            || !local_file(&placement.path, &sources)
         {
             continue;
         }

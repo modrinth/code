@@ -43,9 +43,11 @@ impl ContentStore {
         let staged = self.stage_file(source).await?;
         let hash = staged.sha512.clone();
         let _files_lock = self.files_lock.lock().await;
+        let mut repaired = false;
         if let Some(stored_file) = self.get_file_record(&hash).await?
             && !self.is_healthy(&stored_file.metadata, true).await?
         {
+            repaired = true;
             for instance in instance_rows::list_instances(&self.pool).await? {
                 if crate::state::instance_has_running_process(
                     &instance.id,
@@ -72,7 +74,117 @@ impl ContentStore {
                 .await?;
             }
         }
-        self.save_staged_file(staged, &[]).await
+        let stored_file = self.save_staged_file(staged, &[]).await?;
+        if repaired {
+            self.restore_quarantined_hardlinks(&stored_file).await?;
+        }
+        Ok(stored_file)
+    }
+
+    async fn restore_quarantined_hardlinks(
+        &self,
+        stored_file: &super::StoredFileHandle,
+    ) -> crate::Result<()> {
+        use crate::state::instances::adapters::sqlite::content_rows;
+        let mut entries = match fs::read_dir(self.root.join("quarantine")).await
+        {
+            Ok(entries) => entries,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                return Ok(());
+            }
+            Err(error) => return Err(error.into()),
+        };
+        let prefix = format!("{}-", stored_file.metadata.sha512);
+        let mut quarantined = Vec::new();
+        while let Some(entry) = entries.next_entry().await? {
+            if entry.file_name().to_string_lossy().starts_with(&prefix)
+                && entry.file_type().await?.is_file()
+            {
+                quarantined.push(entry.path());
+            }
+        }
+        if quarantined.is_empty() {
+            return Ok(());
+        }
+        for instance in instance_rows::list_instances(&self.pool).await? {
+            for mut file in
+                content_rows::get_instance_files(&instance.id, &self.pool)
+                    .await?
+            {
+                let Some(binding) =
+                    catalog::file_storage(&self.pool, &file.id).await?
+                else {
+                    continue;
+                };
+                if binding.materialization_kind != InstanceFileKind::Hardlink
+                    || binding.blob_sha512 != stored_file.metadata.sha512
+                {
+                    continue;
+                }
+                let status = self
+                    .check_instance_file(&instance, &file, &binding)
+                    .await?;
+                if status == InstanceFileStatus::Healthy {
+                    continue;
+                }
+                let path = self
+                    .instance_path(&instance.path, &content_file_path(&file))
+                    .await?;
+                if status == InstanceFileStatus::Conflict {
+                    let opposite = self
+                        .instance_path(
+                            &instance.path,
+                            &super::file_path_on_disk(
+                                &file.relative_path,
+                                !file.enabled,
+                            ),
+                        )
+                        .await?;
+                    match fs::symlink_metadata(opposite).await {
+                        Ok(_) => continue,
+                        Err(error)
+                            if error.kind() == std::io::ErrorKind::NotFound => {
+                        }
+                        Err(error) => return Err(error.into()),
+                    }
+                    if !fs::symlink_metadata(&path).await?.is_file() {
+                        continue;
+                    }
+                    let candidate = path.clone();
+                    let originals = quarantined.clone();
+                    let is_quarantined =
+                        tokio::task::spawn_blocking(move || {
+                            for original in originals {
+                                if same_file::is_same_file(
+                                    &candidate, original,
+                                )? {
+                                    return Ok::<_, std::io::Error>(true);
+                                }
+                            }
+                            Ok(false)
+                        })
+                        .await??;
+                    if !is_quarantined {
+                        continue;
+                    }
+                    super::operations::remove_instance_file(&path).await?;
+                }
+                let mode =
+                    self.create_instance_file(stored_file, &path, None).await?;
+                let mut tx = self.pool.begin().await?;
+                file.missing = false;
+                content_rows::upsert_instance_file(&file, &mut tx).await?;
+                catalog::set_file_storage(
+                    &mut tx,
+                    &file.id,
+                    &binding.blob_sha512,
+                    mode,
+                )
+                .await?;
+                tx.commit().await?;
+            }
+        }
+        Ok(())
     }
 
     pub async fn usage(&self, state: &State) -> crate::Result<StoreUsage> {
@@ -112,6 +224,10 @@ impl ContentStore {
         for placement in &placements {
             if placement.materialization_kind
                 == InstanceFileKind::Symlink.as_str()
+                || placement.materialization_kind
+                    == InstanceFileKind::Reflink.as_str()
+                || placement.materialization_kind
+                    == InstanceFileKind::Hardlink.as_str()
             {
                 *shared_placements
                     .entry(placement.blob_sha512.as_str())
@@ -247,13 +363,7 @@ impl ContentStore {
                             "An unreferenced store object was replaced by an unexpected filesystem entry",
                         ));
                     }
-                    #[cfg(windows)]
-                    {
-                        let mut permissions = metadata.permissions();
-                        permissions.set_readonly(false);
-                        fs::set_permissions(&path, permissions).await?;
-                    }
-                    fs::remove_file(&path).await?;
+                    super::operations::remove_instance_file(&path).await?;
                     if let Some(parent) = path.parent() {
                         sync_directory(parent).await?;
                         let _ = fs::remove_dir(parent).await;
@@ -365,6 +475,13 @@ impl ContentStore {
                 .is_healthy_with_progress(&stored_file, true, &on_read)
                 .await?
             {
+                if repair
+                    && let Some(healthy) = self
+                        .lookup(Some(&stored_file.sha512), None, None)
+                        .await?
+                {
+                    self.restore_quarantined_hardlinks(&healthy).await?;
+                }
                 continue;
             }
             let mut message = "Stored content is missing or damaged; re-import the original file".to_string();
@@ -411,7 +528,8 @@ impl ContentStore {
 							fs::create_dir_all(&quarantine).await?;
 							fs::rename(&path, quarantine.join(format!("{}-{}", stored_file.sha512, uuid::Uuid::new_v4()))).await?;
 						}
-						self.save_staged_file(downloaded.into_staged()?, &sources).await?;
+						let repaired = self.save_staged_file(downloaded.into_staged()?, &sources).await?;
+						self.restore_quarantined_hardlinks(&repaired).await?;
 						Ok::<(), crate::Error>(())
 					}.await;
                     match result {
@@ -449,7 +567,7 @@ impl ContentStore {
 						&& file_status == InstanceFileStatus::Missing
 					{
 						let path = self.instance_path(&instance.path, &content_file_path(&file)).await?;
-						let mode = self.create_instance_file(stored_file, &path, binding.materialization_kind == InstanceFileKind::Copy).await?;
+						let mode = self.create_instance_file(stored_file, &path, (binding.materialization_kind == InstanceFileKind::Copy).then_some(InstanceFileKind::Copy)).await?;
 						let mut tx = self.pool.begin().await?;
 						file.missing = false;
 						crate::state::instances::adapters::sqlite::content_rows::upsert_instance_file(&file, &mut tx).await?;

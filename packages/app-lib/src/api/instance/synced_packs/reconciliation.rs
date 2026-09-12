@@ -183,7 +183,7 @@ async fn toggle_pack(
 struct PreparedPack {
     compatible: bool,
     version: Option<Version>,
-	stored_file: Option<StoredFileHandle>,
+    stored_file: Option<StoredFileHandle>,
     dependencies: Vec<commands::DownloadedProjectVersion>,
     conflict: bool,
     deferred: bool,
@@ -300,30 +300,30 @@ async fn prepare_pack(
         prepared.conflict = true;
         return Ok(prepared);
     }
-	let stored_file = if let Some(file) = file
-		&& file.hashes.get("sha1") != Some(&pack.sha1)
-	{
-		let downloaded = fetch::fetch_content_file(
-			state,
-			&[file.url.as_str()],
-			file.hashes.get("sha512").map(String::as_str),
-			file.hashes.get("sha1").map(String::as_str),
-			Some(u64::from(file.size)),
-			None,
-			None,
-		)
-		.await?;
-		downloaded.store_file(state).await?
-	} else {
-		read_stored_file(pack, state).await?
-	};
-	let bytes = bytes::Bytes::from(tokio::fs::read(&stored_file.path).await?);
+    let stored_file = if let Some(file) = file
+        && file.hashes.get("sha1") != Some(&pack.sha1)
+    {
+        let downloaded = fetch::fetch_content_file(
+            state,
+            &[file.url.as_str()],
+            file.hashes.get("sha512").map(String::as_str),
+            file.hashes.get("sha1").map(String::as_str),
+            Some(u64::from(file.size)),
+            None,
+            None,
+        )
+        .await?;
+        downloaded.store_file(state).await?
+    } else {
+        read_stored_file(pack, state).await?
+    };
+    let bytes = bytes::Bytes::from(tokio::fs::read(&stored_file.path).await?);
     let project_type = pack.item.project_type;
     tokio::task::spawn_blocking(move || {
         super::operations::validate_pack(&bytes, project_type)
     })
     .await??;
-	prepared.stored_file = Some(stored_file);
+    prepared.stored_file = Some(stored_file);
     if let (Some(project), Some(version)) =
         (&pack.item.project, &prepared.version)
         && !version.dependencies.is_empty()
@@ -541,7 +541,7 @@ async fn apply_pack(
             let owned = if let Some(previous) = &previous {
                 same_path(&previous.path, &path)
                     && previous.enabled != path.ends_with(".disabled")
-					&& prepared.owned_previous
+                    && prepared.owned_previous
             } else {
                 false
             };
@@ -553,7 +553,7 @@ async fn apply_pack(
             }
         }
     }
-	let stored_file = prepared.stored_file.take().ok_or_else(|| {
+    let stored_file = prepared.stored_file.take().ok_or_else(|| {
         crate::ErrorKind::InputError(
             "Pack contents were not prepared.".to_owned(),
         )
@@ -584,8 +584,8 @@ async fn apply_pack(
             prepared.owned_previous = false;
         }
     }
-	let size = stored_file.metadata.size as u64;
-	let sha1 = stored_file.metadata.sha1.clone();
+    let size = stored_file.metadata.size as u64;
+    let sha1 = stored_file.metadata.sha1.clone();
     let path = commands::install_stored_file(
         instance_id,
         commands::InstallContent {

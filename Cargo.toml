@@ -160,6 +160,7 @@ rand = "=0.8.5"  # Locked on 0.8 until argon2 and p256 update to 0.9
 rand_chacha = "=0.3.1"  # Locked on 0.3 until we can update rand to 0.9
 rdkafka = { version = "0.36.2", features = ["cmake-build"] }
 redis = "1.4.1"
+reflink-copy = "0.1.30"
 regex = "1.12.2"
 reqwest = { version = "0.12.24", default-features = false }
 rgb = "0.8.52"
@@ -174,6 +175,7 @@ rustls = "0.23.32"
 rustrict = { version = "0.7.39", default-features = false, features = ["censor"] }
 rusty-money = "0.4.1"
 scalar_api_reference = { version = "0.2.2", default-features = false }
+same-file = "1.0.6"
 secrecy = "0.10.3"
 sentry = { version = "0.45.0", default-features = false, features = [
   "backtrace",

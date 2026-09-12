@@ -42,8 +42,10 @@ fn queue_content_sync(instance_id: String) {
             let result: crate::Result<()> = async {
                 let state = State::get().await?;
                 crate::state::sync_content_files(&instance_id, &state).await?;
-				crate::api::instance::queue_synced_pack_reconciliation(&instance_id);
-				Ok(())
+                crate::api::instance::queue_synced_pack_reconciliation(
+                    &instance_id,
+                );
+                Ok(())
             }
             .await;
             if let Err(error) = result {
@@ -248,11 +250,11 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                                 },
                                             )
                                         });
-									if sync_content {
-										queue_content_sync(emit_instance_id);
-									} else {
-										tokio::spawn(async move {
-											if reconcile_screenshots
+                                    if sync_content {
+                                        queue_content_sync(emit_instance_id);
+                                    } else {
+                                        tokio::spawn(async move {
+                                            if reconcile_screenshots
 												&& let Err(error) =
 													crate::api::instance::reconcile_screenshots(
 														&emit_instance_id,
@@ -263,13 +265,13 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
 													"Failed to reconcile screenshots after filesystem change: {error}"
 												);
 											}
-											let _ = emit_instance(
-												&emit_instance_id,
-												event,
-											)
-											.await;
-										});
-									}
+                                            let _ = emit_instance(
+                                                &emit_instance_id,
+                                                event,
+                                            )
+                                            .await;
+                                        });
+                                    }
                                     if is_screenshot_event {
                                         visited_screenshot_instances
                                             .push(instance_id);

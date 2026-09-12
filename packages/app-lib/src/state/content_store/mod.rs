@@ -45,6 +45,8 @@ pub(crate) struct InstanceFileStorage {
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub(crate) enum InstanceFileKind {
+    Reflink,
+    Hardlink,
     Symlink,
     Copy,
 }
@@ -52,6 +54,8 @@ pub(crate) enum InstanceFileKind {
 impl InstanceFileKind {
     pub(crate) const fn as_str(self) -> &'static str {
         match self {
+            Self::Reflink => "reflink",
+            Self::Hardlink => "hardlink",
             Self::Symlink => "symlink",
             Self::Copy => "copy",
         }
@@ -59,6 +63,8 @@ impl InstanceFileKind {
 
     fn from_db(value: &str) -> crate::Result<Self> {
         match value {
+            "reflink" => Ok(Self::Reflink),
+            "hardlink" => Ok(Self::Hardlink),
             "symlink" => Ok(Self::Symlink),
             "copy" => Ok(Self::Copy),
             _ => Err(input("Invalid content materialization kind")),
@@ -993,6 +999,61 @@ pub(crate) async fn writable_copy(
     destination: &Path,
 ) -> crate::Result<()> {
     fs::copy(source, destination).await?;
+    make_writable(destination).await
+}
+
+/// Attempts a copy-on-write clone, returning false when cloning is unavailable.
+pub(crate) async fn try_reflink(
+    source: &Path,
+    destination: &Path,
+) -> crate::Result<bool> {
+    let source = source.to_path_buf();
+    let target = destination.to_path_buf();
+    let result = tokio::task::spawn_blocking(move || {
+        reflink_copy::reflink(source, target)
+    })
+    .await?;
+    match result {
+        Ok(()) => {
+            make_writable(destination).await?;
+            Ok(true)
+        }
+        Err(error) => {
+            // Windows bindings can return HRESULT-wrapped Win32 errors.
+            let error = match error.raw_os_error().map(|code| code as u32) {
+                Some(code)
+                    if cfg!(windows) && code & 0xffff0000 == 0x80070000 =>
+                {
+                    std::io::Error::from_raw_os_error((code & 0xffff) as i32)
+                }
+                _ => error,
+            };
+            if error.kind() == std::io::ErrorKind::AlreadyExists {
+                return Err(error.into());
+            }
+            match fs::symlink_metadata(destination).await {
+                Ok(_) => operations::remove_instance_file(destination).await?,
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+                Err(error) => return Err(error.into()),
+            }
+            if matches!(
+                error.kind(),
+                std::io::ErrorKind::Unsupported
+                    | std::io::ErrorKind::CrossesDevices
+                    | std::io::ErrorKind::InvalidInput
+                    | std::io::ErrorKind::PermissionDenied
+            ) || cfg!(unix) && error.raw_os_error() == Some(25)
+                || cfg!(windows) && matches!(error.raw_os_error(), Some(1 | 50))
+            {
+                Ok(false)
+            } else {
+                Err(error.into())
+            }
+        }
+    }
+}
+
+async fn make_writable(destination: &Path) -> crate::Result<()> {
     let mut permissions = fs::metadata(destination).await?.permissions();
     #[cfg(unix)]
     {
