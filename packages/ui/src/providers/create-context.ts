@@ -24,8 +24,7 @@
  * @source https://github.com/unovue/reka-ui/blob/53b4734734f8ebef9a344b1e62db291177c59bfe/packages/core/src/shared/createContext.ts
  */
 
-import type { InjectionKey } from 'vue'
-import { inject, provide } from 'vue'
+import { inject, type InjectionKey, provide } from 'vue'
 
 /**
  * @param providerComponentName - The name(s) of the component(s) providing the context.
@@ -59,9 +58,9 @@ export function createContext<ContextValue>(
 		const context = inject(injectionKey, fallback)
 		if (context) return context
 
-		if (context === null)
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			return context as any
+		if (context === null) {
+			return context as T extends null ? ContextValue | null : ContextValue
+		}
 
 		throw new Error(
 			`Injection \`${injectionKey.toString()}\` not found. Component must be used within ${

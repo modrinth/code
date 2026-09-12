@@ -62,15 +62,11 @@
 						{{ legendEntry.name }}
 					</span>
 				</button>
-				<Dropdown
+				<FloatingMenu
 					v-if="showUnmonetizedInfo && legendEntry.id === 'breakdown:unmonetized'"
-					theme="analytics-monetization-popover"
-					:triggers="['hover', 'focus']"
-					:popper-triggers="['hover', 'focus']"
-					:delay="{ show: 0, hide: 250 }"
+					bare
+					trigger="hover"
 					placement="top"
-					:aria-id="monetizationPopoverId"
-					no-auto-focus
 				>
 					<InfoIcon
 						class="-ml-1 mt-px inline-flex size-4 items-center justify-center rounded-full border-0 bg-transparent p-0 text-secondary transition-all hover:text-contrast focus-visible:text-contrast"
@@ -85,7 +81,7 @@
 							{{ formatMessage(analyticsChartMessages.monetizedAnalyticsDetailsDescription) }}
 						</div>
 					</template>
-				</Dropdown>
+				</FloatingMenu>
 			</div>
 		</div>
 
@@ -107,8 +103,7 @@
 
 <script setup lang="ts">
 import { InfoIcon } from '@modrinth/assets'
-import { useScrollIndicator, useVIntl } from '@modrinth/ui'
-import { Dropdown } from 'floating-vue'
+import { FloatingMenu, useScrollIndicator, useVIntl } from '@modrinth/ui'
 
 import { analyticsChartMessages } from '../../analytics-messages'
 import type { AnalyticsChartLegendEntry } from '../analytics-chart-types'
@@ -125,7 +120,6 @@ const emit = defineEmits<{
 	'entry-click': [event: MouseEvent, datasetId: string]
 }>()
 
-const monetizationPopoverId = useId()
 const legendContainer = ref<HTMLElement | null>(null)
 const isShiftKeyPressed = ref(false)
 const { formatMessage } = useVIntl()
@@ -172,17 +166,3 @@ onBeforeUnmount(() => {
 	window.removeEventListener('blur', clearShiftKeyState)
 })
 </script>
-
-<style>
-.v-popper--theme-analytics-monetization-popover .v-popper__inner {
-	overflow: visible !important;
-	background: transparent !important;
-	padding: 0 !important;
-	border: 0 !important;
-	box-shadow: none !important;
-}
-
-.v-popper--theme-analytics-monetization-popover .v-popper__arrow-container {
-	display: none;
-}
-</style>

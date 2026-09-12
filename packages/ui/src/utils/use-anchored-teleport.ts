@@ -1,6 +1,8 @@
 import type { CSSProperties, Ref } from 'vue'
 import { nextTick, onUnmounted, ref, watch } from 'vue'
 
+import { dismissTooltip } from '../providers/tooltip'
+
 export type AnchoredTeleportPlacement =
 	| 'bottom-start'
 	| 'bottom-end'
@@ -171,6 +173,7 @@ export function useAnchoredTeleport(
 
 	async function open() {
 		if (isOpen.value) return
+		dismissTooltip()
 		panelStyle.value = { top: '0px', left: '0px', visibility: 'hidden' }
 		isOpen.value = true
 		await nextTick()

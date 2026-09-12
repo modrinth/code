@@ -7,11 +7,11 @@ import {
 	defineMessages,
 	IconButton,
 	SkinLikeTextButton,
+	Tooltip,
 	useScrollViewport,
 	useVIntl,
 } from '@modrinth/ui'
 import { useElementSize, useWindowSize } from '@vueuse/core'
-import { Tooltip } from 'floating-vue'
 import { computed, nextTick, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 import Draggable from 'vuedraggable'
 
@@ -388,12 +388,7 @@ defineExpose({ getAddSkinButtonElement })
 					<span class="min-w-0 text-xl font-semibold leading-7 text-primary">
 						{{ section.title }}
 					</span>
-					<Tooltip
-						v-if="section.infoTooltip"
-						theme="dismissable-prompt"
-						placement="top"
-						:triggers="['hover', 'focus']"
-					>
+					<Tooltip v-if="section.infoTooltip" theme="dismissable-prompt" placement="top">
 						<span
 							class="inline-flex size-6 shrink-0 items-center justify-center text-secondary transition-colors group-hover:text-primary"
 							@click.stop

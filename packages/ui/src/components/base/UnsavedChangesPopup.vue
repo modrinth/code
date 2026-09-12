@@ -6,7 +6,7 @@ import { type Component, computed, ref } from 'vue'
 import { Button } from '#ui/components/base/buttons'
 
 import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'
-import { commonMessages } from '../../utils'
+import { commonMessages } from '../../utils/common-messages'
 import FloatingActionBar from './FloatingActionBar.vue'
 
 const { formatMessage } = useVIntl()
@@ -112,8 +112,7 @@ defineExpose({ nudge })
 </template>
 
 <style lang="scss">
-/* unscoped because floating-vue teleports the tooltip outside of scope */
-.v-popper__popper.v-popper--theme-tooltip.unsaved-changes-save-tooltip .v-popper__inner {
+.v-popper__inner.v-popper--theme-tooltip.unsaved-changes-save-tooltip {
 	max-width: 22rem;
 	white-space: pre-line;
 	line-height: 1.4;

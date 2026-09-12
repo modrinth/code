@@ -132,11 +132,11 @@
 				>
 					<span class="min-w-0 truncate">{{ gameVersionGroup.label }}</span>
 				</TagItem>
-				<Menu
+				<FloatingMenu
 					v-if="getDisplayGameVersions(version).length > MAX_GAME_VERSION_TAGS"
+					trigger="hover"
+					placement="bottom"
 					data-no-row-click
-					:delay="{ hide: 50, show: 0 }"
-					no-auto-focus
 					class="w-full min-w-0 cursor-default"
 				>
 					<TagItem class="w-fit max-w-full truncate" tabindex="0">
@@ -160,7 +160,7 @@
 							</TagItem>
 						</div>
 					</template>
-				</Menu>
+				</FloatingMenu>
 			</div>
 		</template>
 
@@ -184,11 +184,11 @@
 						<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
 						<span class="min-w-0 truncate">{{ getPlatformLabel(platform) }}</span>
 					</TagItem>
-					<Menu
+					<FloatingMenu
 						v-if="version.loaders.length > MAX_PLATFORM_TAGS"
+						trigger="hover"
+						placement="bottom"
 						data-no-row-click
-						:delay="{ hide: 50, show: 0 }"
-						no-auto-focus
 						class="w-full min-w-0 cursor-default"
 					>
 						<TagItem class="w-fit max-w-full truncate" tabindex="0">
@@ -211,7 +211,7 @@
 								</TagItem>
 							</div>
 						</template>
-					</Menu>
+					</FloatingMenu>
 				</template>
 			</div>
 		</template>
@@ -338,10 +338,10 @@
 							>
 								{{ gameVersionGroup.label }}
 							</TagItem>
-							<Menu
+							<FloatingMenu
 								v-if="getDisplayGameVersions(version).length > MAX_GAME_VERSION_TAGS"
-								:delay="{ hide: 50, show: 0 }"
-								no-auto-focus
+								trigger="hover"
+								placement="bottom"
 								class="cursor-default smart-clickable:allow-pointer-events"
 							>
 								<TagItem tabindex="0">
@@ -363,7 +363,7 @@
 										</TagItem>
 									</div>
 								</template>
-							</Menu>
+							</FloatingMenu>
 							<template v-if="version.noModLoader">
 								<TagItem class="border !border-solid border-surface-5"> No mod loader </TagItem>
 							</template>
@@ -379,10 +379,10 @@
 									<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
 									{{ getPlatformLabel(platform) }}
 								</TagItem>
-								<Menu
+								<FloatingMenu
 									v-if="version.loaders.length > MAX_PLATFORM_TAGS"
-									:delay="{ hide: 50, show: 0 }"
-									no-auto-focus
+									trigger="hover"
+									placement="bottom"
 									class="cursor-default smart-clickable:allow-pointer-events"
 								>
 									<TagItem tabindex="0">
@@ -402,7 +402,7 @@
 											</TagItem>
 										</div>
 									</template>
-								</Menu>
+								</FloatingMenu>
 							</template>
 							<template v-if="showEnvironmentColumn">
 								<TagItem
@@ -480,7 +480,6 @@ import {
 	getVersionGroupsForDisplay,
 	type VersionDisplayGroup,
 } from '@modrinth/utils'
-import { Menu } from 'floating-vue'
 import { computed, type Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -489,6 +488,7 @@ import { Button } from '#ui/components/base/buttons'
 import { useRelativeTime } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { formatTag } from '../../utils/tag-messages'
+import FloatingMenu from '../floating/FloatingMenu.vue'
 import { getEnvironmentFilterValue, getEnvironmentTags } from './settings/environment/environments'
 
 const { formatMessage } = useVIntl()

@@ -172,63 +172,62 @@ defineExpose({ open: openMenu, close: closeMenu })
 		@mouseleave="handleMouseLeave"
 	>
 		<slot />
-	</component>
+		<Teleport v-if="isClient" to="body">
+			<ButtonMenuPanel
+				ref="panel"
+				:open="isOpen"
+				:panel-id="menuId"
+				:label="props.label"
+				:panel-style="panelStyle"
+				:side="resolvedSide"
+				:anchor-style="anchorStyle"
+				:origin="expandOrigin"
+				@keydown="handleKeydown"
+				@mouseenter="handleMouseEnter"
+				@mouseleave="handleMouseLeave"
+			>
+				<template v-for="(option, index) in options" :key="option.id ?? `${option.type}-${index}`">
+					<div v-if="isDivider(option)" role="separator" class="my-1 h-px bg-surface-5" />
 
-	<Teleport v-if="isClient" to="body">
-		<ButtonMenuPanel
-			ref="panel"
-			:open="isOpen"
-			:panel-id="menuId"
-			:label="props.label"
-			:panel-style="panelStyle"
-			:side="resolvedSide"
-			:anchor-style="anchorStyle"
-			:origin="expandOrigin"
-			@keydown="handleKeydown"
-			@mouseenter="handleMouseEnter"
-			@mouseleave="handleMouseLeave"
-		>
-			<template v-for="(option, index) in options" :key="option.id ?? `${option.type}-${index}`">
-				<div v-if="isDivider(option)" role="separator" class="my-1 h-px bg-surface-5" />
+					<div
+						v-else-if="isHeading(option)"
+						class="px-3 pb-1 pt-2 text-xs font-bold uppercase tracking-wide text-secondary first:pt-1"
+					>
+						{{ option.label }}
+					</div>
 
-				<div
-					v-else-if="isHeading(option)"
-					class="px-3 pb-1 pt-2 text-xs font-bold uppercase tracking-wide text-secondary first:pt-1"
-				>
-					{{ option.label }}
-				</div>
+					<ButtonMenuSubmenu
+						v-else-if="isSubmenu(option)"
+						:option="option"
+						@select="handleSubmenuSelect"
+					>
+						<template #trigger>
+							<slot :name="option.id" :option="option">
+								<component :is="option.icon" v-if="option.icon" aria-hidden="true" />
+								{{ option.label }}
+							</slot>
+						</template>
+						<template #item="{ option: child }">
+							<slot :name="child.id" :option="child">
+								<component :is="child.icon" v-if="child.icon" aria-hidden="true" />
+								{{ child.label }}
+							</slot>
+						</template>
+					</ButtonMenuSubmenu>
 
-				<ButtonMenuSubmenu
-					v-else-if="isSubmenu(option)"
-					:option="option"
-					@select="handleSubmenuSelect"
-				>
-					<template #trigger>
+					<ButtonMenuItem
+						v-else
+						:option="option"
+						@select="handleItemSelect"
+						@focus="focusedIndex = getItems().indexOf($event)"
+					>
 						<slot :name="option.id" :option="option">
 							<component :is="option.icon" v-if="option.icon" aria-hidden="true" />
 							{{ option.label }}
 						</slot>
-					</template>
-					<template #item="{ option: child }">
-						<slot :name="child.id" :option="child">
-							<component :is="child.icon" v-if="child.icon" aria-hidden="true" />
-							{{ child.label }}
-						</slot>
-					</template>
-				</ButtonMenuSubmenu>
-
-				<ButtonMenuItem
-					v-else
-					:option="option"
-					@select="handleItemSelect"
-					@focus="focusedIndex = getItems().indexOf($event)"
-				>
-					<slot :name="option.id" :option="option">
-						<component :is="option.icon" v-if="option.icon" aria-hidden="true" />
-						{{ option.label }}
-					</slot>
-				</ButtonMenuItem>
-			</template>
-		</ButtonMenuPanel>
-	</Teleport>
+					</ButtonMenuItem>
+				</template>
+			</ButtonMenuPanel>
+		</Teleport>
+	</component>
 </template>

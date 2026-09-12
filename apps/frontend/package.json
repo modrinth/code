@@ -60,7 +60,7 @@
 		"chart.js": "^4.5.1",
 		"dayjs": "^1.11.7",
 		"dompurify": "^3.1.7",
-		"floating-vue": "^5.2.2",
+		"@floating-ui/vue": "^2.0.1",
 		"fuse.js": "^6.6.2",
 		"highlight.js": "^11.7.0",
 		"intl-messageformat": "^10.7.7",

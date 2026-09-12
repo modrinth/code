@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
-import { useModalStack } from '../../composables/modal-stack'
+import {
+	getModalStackZBase,
+	MODAL_CONTAINER_Z_OFFSET,
+	useModalStack,
+} from '../../composables/modal-stack'
 import { injectPageContext } from '../../providers'
 
 const visibleFloatingActionBars = new Set<symbol>()
@@ -12,13 +16,18 @@ function updateFloatingActionBarBodyClass() {
 	document.body.classList.toggle('floating-action-bar-shown', visibleFloatingActionBars.size > 0)
 }
 
-const props = defineProps<{
-	shown: boolean
-	ariaLabel?: string
-	belowModal?: boolean
-	hideWhenModalOpen?: boolean
-	inline?: boolean
-}>()
+const props = withDefaults(
+	defineProps<{
+		shown: boolean
+		ariaLabel?: string
+		belowModal?: boolean
+		hideWhenModalOpen?: boolean
+		inline?: boolean
+	}>(),
+	{
+		belowModal: true,
+	},
+)
 
 const INTERCOM_BUBBLE_GAP = 8
 
@@ -32,7 +41,14 @@ const pageContext = injectPageContext(null)
 const shown = computed(() => props.shown && (!props.hideWhenModalOpen || stackCount.value === 0))
 const floatingActionBarId = Symbol('floating-action-bar')
 const intercomBubbleClearanceRequestId = Symbol('floating-action-bar')
-const zIndex = computed(() => 100 + stackCount.value * 10 + 8 + (!props.belowModal ? 1 : 0))
+const BELOW_MODAL_Z_OFFSET = 8
+const zIndex = computed(() => {
+	if (props.belowModal || stackCount.value === 0) {
+		return getModalStackZBase(stackCount.value) + BELOW_MODAL_Z_OFFSET
+	}
+
+	return getModalStackZBase(stackCount.value - 1) + MODAL_CONTAINER_Z_OFFSET + 1
+})
 const leftOffset = computed(() =>
 	stackCount.value > 0
 		? '0px'

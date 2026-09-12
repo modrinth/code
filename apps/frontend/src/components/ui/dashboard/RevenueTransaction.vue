@@ -48,12 +48,7 @@
 					>{{ isIncome ? '' : '-' }}{{ formatMoney(transaction.amount) }}</span
 				>
 				<template v-if="transaction.type === 'withdrawal' && transaction.status === 'in-transit'">
-					<Tooltip
-						theme="dismissable-prompt"
-						class="inline-flex shrink-0"
-						:triggers="['hover', 'focus']"
-						no-auto-focus
-					>
+					<Tooltip theme="dismissable-prompt" class="inline-flex shrink-0">
 						<span class="my-auto align-middle"
 							><IconButton
 								type="outlined"
@@ -89,12 +84,12 @@ import {
 	getCurrencyIcon,
 	IconButton,
 	injectNotificationManager,
+	Tooltip,
 	useFormatDateTime,
 	useFormatMoney,
 	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
-import { Tooltip } from 'floating-vue'
 
 import { tremendousIdMap } from '~/generated/state.json'
 import { findRail } from '~/utils/muralpay-rails'

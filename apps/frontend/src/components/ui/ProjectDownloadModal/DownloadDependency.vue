@@ -62,7 +62,6 @@
 				type="quiet"
 				:href="dependency.downloadHref"
 				:download="dependency.filename"
-				:aria-label="downloadTooltip"
 				class="!w-9 !rounded-full !px-0"
 				@click="emit('download')"
 			>

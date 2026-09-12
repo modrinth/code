@@ -1,8 +1,7 @@
-import 'floating-vue/dist/style.css'
 import 'overlayscrollbars/overlayscrollbars.css'
 
+import { installTooltipDirective } from '@modrinth/ui'
 import { VueQueryPlugin } from '@tanstack/vue-query'
-import FloatingVue from 'floating-vue'
 import { createApp } from 'vue'
 
 import App from '@/App.vue'
@@ -22,22 +21,9 @@ app.use(router)
 if (import.meta.env.DEV) {
 	void traceStartupStep('Initial router readiness', () => router.isReady()).catch(() => {})
 }
-app.use(FloatingVue, {
-	themes: {
-		'ribbit-popout': {
-			$extend: 'dropdown',
-			placement: 'bottom-end',
-			instantMove: true,
-			distance: 8,
-		},
-		'dismissable-prompt': {
-			$extend: 'dropdown',
-			placement: 'bottom-start',
-		},
-	},
-})
 app.use(i18nPlugin)
 app.use(i18nDebugPlugin)
+installTooltipDirective(app)
 app.directive('overlay-scrollbars', overlayScrollbarsDirective)
 
 async function mount() {

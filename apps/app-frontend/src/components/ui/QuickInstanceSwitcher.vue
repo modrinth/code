@@ -89,6 +89,17 @@ const setLimit = (count) => {
 	}
 }
 
+const nudgeLimit = (delta) => {
+	if (!canDrag.value) {
+		return
+	}
+	const target = visibleCount.value + delta
+	if (target < 0 || target > maxVisible.value) {
+		flashOverdrag()
+	}
+	setLimit(target)
+}
+
 let dragStartY = 0
 let dragStartCount = 0
 let wasOverdragging = false
@@ -196,6 +207,10 @@ const messages = defineMessages({
 		id: 'app.quick-instance-switcher.instance-locked',
 		defaultMessage: 'This instance has been locked',
 	},
+	title: {
+		id: 'app.quick-instance-switcher.title',
+		defaultMessage: 'Recent instances',
+	},
 })
 
 const dividerTooltip = computed(() => {
@@ -279,15 +294,16 @@ function openContextMenu(event, instance) {
 				<div class="h-px w-8 bg-surface-5 shrink-0"></div>
 			</div>
 		</Transition>
-		<TransitionGroup name="quick-instance" tag="div" class="flex shrink-0 flex-col items-center">
-			<div
-				v-for="instance in recentInstances"
-				:key="instance.id"
-				v-tooltip.right="instance.name"
-				class="quick-instance-item"
-				@contextmenu.prevent.stop="(event) => openContextMenu(event, instance)"
-			>
-				<NavButton :to="`/instance/${encodeURIComponent(instance.id)}`" class="relative">
+		<div :aria-label="formatMessage(messages.title)">
+			<TransitionGroup name="quick-instance" tag="div" class="flex shrink-0 flex-col items-center">
+				<NavButton
+					v-for="instance in recentInstances"
+					:key="instance.id"
+					v-tooltip.right="instance.name"
+					class="quick-instance-item relative"
+					:to="`/instance/${encodeURIComponent(instance.id)}`"
+					@contextmenu.prevent.stop="(event) => openContextMenu(event, instance)"
+				>
 					<Avatar
 						:src="getInstanceIconUrl(instance.icon_path)"
 						size="28px"
@@ -302,17 +318,25 @@ function openContextMenu(event, instance) {
 						<SpinnerIcon class="animate-spin w-4 h-4" />
 					</div>
 				</NavButton>
-			</div>
-		</TransitionGroup>
+			</TransitionGroup>
+		</div>
 		<ContextMenu ref="instanceOptions" :label="formatMessage(messages.instanceActions)" />
 		<div
 			v-tooltip.right="dividerTooltip"
+			role="separator"
+			aria-orientation="horizontal"
+			:tabindex="canDrag ? 0 : undefined"
+			:aria-valuemin="canDrag ? 0 : undefined"
+			:aria-valuemax="canDrag ? maxVisible : undefined"
+			:aria-valuenow="canDrag ? visibleCount : undefined"
 			class="flex shrink-0 items-center justify-center py-2 select-none"
 			:class="canDrag ? 'cursor-ns-resize touch-none group' : ''"
 			@pointerdown="onDividerPointerDown"
 			@pointermove="onDividerPointerMove"
 			@pointerup="onDividerPointerUp"
 			@pointercancel="onDividerPointerUp"
+			@keydown.up.prevent="nudgeLimit(-1)"
+			@keydown.down.prevent="nudgeLimit(1)"
 		>
 			<div
 				class="h-px w-8 transition-colors duration-200"
@@ -320,11 +344,12 @@ function openContextMenu(event, instance) {
 					showOverdrag
 						? 'bg-red'
 						: canDrag
-							? 'bg-surface-5 group-hover:bg-secondary'
+							? 'bg-surface-5 group-hover:bg-secondary group-focus-visible:bg-secondary'
 							: 'bg-surface-5'
 				"
 			></div>
 		</div>
+		<slot />
 	</div>
 </template>
 
