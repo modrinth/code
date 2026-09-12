@@ -21,7 +21,7 @@ use super::{
 
 use super::{database::USER_USER_ID, get_json_val_str};
 
-pub const DUMMY_DATA_UPDATE: i64 = 8;
+pub const DUMMY_DATA_UPDATE: i64 = 9;
 
 pub const DUMMY_CATEGORIES: &[&str] = &[
     "combat",
@@ -47,6 +47,8 @@ pub enum TestFile {
     // and BasicModRandom.bytes() will return a different file each time.
     BasicModRandom { filename: String, bytes: Vec<u8> },
     BasicModpackRandom { filename: String, bytes: Vec<u8> },
+    BasicPluginRandom { filename: String, bytes: Vec<u8> },
+    BasicDatapackRandom { filename: String, bytes: Vec<u8> },
 }
 
 impl TestFile {
@@ -162,6 +164,59 @@ impl TestFile {
         let bytes = cursor.into_inner();
 
         TestFile::BasicModpackRandom { filename, bytes }
+    }
+
+    pub fn build_random_plugin() -> Self {
+        let filename = format!("random-plugin-{}.jar", rand::random::<u64>());
+        let plugin_yml =
+            "name: TestPlugin\nversion: 1.0.0\nmain: com.example.TestPlugin\n";
+
+        let mut cursor = Cursor::new(Vec::new());
+        {
+            let mut zip = ZipWriter::new(&mut cursor);
+            zip.start_file(
+                "plugin.yml",
+                FileOptions::<()>::default()
+                    .compression_method(CompressionMethod::Stored),
+            )
+            .unwrap();
+            zip.write_all(plugin_yml.as_bytes()).unwrap();
+            zip.finish().unwrap();
+        }
+
+        TestFile::BasicPluginRandom {
+            filename,
+            bytes: cursor.into_inner(),
+        }
+    }
+
+    pub fn build_random_datapack() -> Self {
+        let filename = format!("random-datapack-{}.zip", rand::random::<u64>());
+        let pack_mcmeta = serde_json::json!({
+            "pack": {
+                "pack_format": 15,
+                "description": "Test datapack"
+            }
+        })
+        .to_string();
+
+        let mut cursor = Cursor::new(Vec::new());
+        {
+            let mut zip = ZipWriter::new(&mut cursor);
+            zip.start_file(
+                "pack.mcmeta",
+                FileOptions::<()>::default()
+                    .compression_method(CompressionMethod::Stored),
+            )
+            .unwrap();
+            zip.write_all(pack_mcmeta.as_bytes()).unwrap();
+            zip.finish().unwrap();
+        }
+
+        TestFile::BasicDatapackRandom {
+            filename,
+            bytes: cursor.into_inner(),
+        }
     }
 }
 
@@ -472,6 +527,8 @@ impl TestFile {
             TestFile::BasicModDifferent => "basic-mod-different.jar",
             TestFile::BasicModRandom { filename, .. } => filename,
             TestFile::BasicModpackRandom { filename, .. } => filename,
+            TestFile::BasicPluginRandom { filename, .. } => filename,
+            TestFile::BasicDatapackRandom { filename, .. } => filename,
         }
         .to_string()
     }
@@ -498,6 +555,8 @@ impl TestFile {
             }
             TestFile::BasicModRandom { bytes, .. } => bytes.clone(),
             TestFile::BasicModpackRandom { bytes, .. } => bytes.clone(),
+            TestFile::BasicPluginRandom { bytes, .. } => bytes.clone(),
+            TestFile::BasicDatapackRandom { bytes, .. } => bytes.clone(),
         }
     }
 
@@ -512,6 +571,8 @@ impl TestFile {
             TestFile::BasicZip => "resourcepack",
 
             TestFile::BasicModpackRandom { .. } => "modpack",
+            TestFile::BasicPluginRandom { .. } => "plugin",
+            TestFile::BasicDatapackRandom { .. } => "datapack",
         }
         .to_string()
     }
@@ -529,6 +590,10 @@ impl TestFile {
             TestFile::BasicModpackRandom { .. } => {
                 Some("application/x-modrinth-modpack+zip")
             }
+            TestFile::BasicPluginRandom { .. } => {
+                Some("application/java-archive")
+            }
+            TestFile::BasicDatapackRandom { .. } => Some("application/zip"),
         }
         .map(|s| s.to_string())
     }

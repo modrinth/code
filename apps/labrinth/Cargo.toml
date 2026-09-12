@@ -82,6 +82,7 @@ paste = { workspace = true }
 path-util = { workspace = true }
 postcard = { workspace = true }
 prometheus = { workspace = true }
+pulldown-cmark = { workspace = true }
 psl = { workspace = true }
 quick-xml = { workspace = true }
 rand = { workspace = true }
