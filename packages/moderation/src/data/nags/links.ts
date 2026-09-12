@@ -18,7 +18,7 @@ const messages = defineMessages({
 	gplTitle: { id: 'nags.gpl-license-source-required.title', defaultMessage: 'Provide source code' },
 	gpl: {
 		id: 'nags.gpl-license-source-required.description',
-		defaultMessage: `Your {type}'s license requires source code to be published. Please provide a source code link, add sources files, or change license.`,
+		defaultMessage: `Your {type}'s license requires source code to be published. Please provide a source code link, add sources files, or change the selected license.`,
 	},
 	linkTitle: { id: 'nags.link-validation.title', defaultMessage: 'Review this link' },
 	global_blocklist_matchTitle: {
@@ -43,7 +43,7 @@ const messages = defineMessages({
 	},
 	not_in_allowlistTitle: {
 		id: 'nags.link-validation.not-in-allowlist.title',
-		defaultMessage: 'Check link correctness',
+		defaultMessage: 'Check link accuracy',
 	},
 	duplicateTitle: {
 		id: 'nags.link-validation.duplicate.title',
@@ -78,7 +78,7 @@ const messages = defineMessages({
 	external_blocklist_match: {
 		id: 'nags.link-validation.external-blocklist-match',
 		defaultMessage:
-			'Your {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} link is not allowed. Remove or replace it with an appropriate link.',
+			'Your {linkField} link is not allowed. Please remove this link, or replace it with something appropriate for the {linkField} link type.',
 	},
 	wrong_field: {
 		id: 'nags.link-validation.wrong-field',
@@ -98,7 +98,7 @@ const messages = defineMessages({
 	not_in_allowlist: {
 		id: 'nags.link-validation.not-in-allowlist',
 		defaultMessage:
-			'Your {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} link may not be appropriate for the link type. Check that it leads to the intended destination.',
+			'Your {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} link may not be appropriate for the link type. Please ensure that it is suitable for its intended purpose.',
 	},
 	duplicate: {
 		id: 'nags.link-validation.duplicate',
@@ -113,22 +113,22 @@ const messages = defineMessages({
 	download: {
 		id: 'nags.link-validation.download',
 		defaultMessage:
-			'Links which start a download are not allowed. Remove or replace this link in your description.',
+			'Links that start a download are not allowed. Please remove any such links from your description.',
 	},
 	discord_invite: {
 		id: 'nags.link-validation.discord-invite',
 		defaultMessage:
-			'Your Discord invite is invalid, expired, or does not invite users to a server. Replace it with a working server invite.',
+			'Your Discord invite is invalid, expired, or does not invite users to a server. Replace it with an active server invite.',
 	},
 	source_repository: {
 		id: 'nags.link-validation.source-repository',
 		defaultMessage:
-			'Your source code link must lead to a repository on a supported host or a self-hosted Gitea/Forgejo service.',
+			'Your source code link must lead to a repository on a supported host platform, or to a self-hosted Gitea/Forgejo service.',
 	},
 	repository_feature: {
 		id: 'nags.link-validation.repository-feature',
 		defaultMessage:
-			'{linkField, select, issues {Your issue tracker link leads to a repository with issues disabled. Enable issues or replace this link.} wiki {Your wiki link leads to a repository with its wiki disabled. Enable the wiki or replace this link.} other {Your source code link leads to a private repository. Use a public repository.}}',
+			'{linkField, select, issues {Your issue tracker link leads to a repository with issues disabled. Please enable issues on the repository or remove this link.} wiki {Your wiki link leads to a repository with the wiki disabled. Enable the wiki on the repository or remove this link.} other {Your source code link leads to a private repository. Please ensure your linked repository is publicly accessible.}}',
 	},
 	visitLinks: { id: 'nags.visit-links-settings.title', defaultMessage: 'Visit links settings' },
 })
