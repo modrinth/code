@@ -12,14 +12,14 @@
 				v-if="collapsed"
 				class="flex gap-2 "
 			>
-				<div
-					v-if="lockBanner"
-					class="flex items-center gap-2 rounded-md bg-bg px-2 py-1.5 text-xs text-orange"
+				<Button
+					size="xs"
+					v-tooltip="'Toggle View back to default view'"
+					aria-label="Toggle View back to default view"
+					@click="settings.set(moderationSettings.Experimental.ExperimentalModerationView, false)"
 				>
-					<LockIcon class="size-3.5 shrink-0" />
-					{{ lockBanner }}
-				</div>
-
+					<ToggleLeftIcon /> Toggle View
+				</Button>
 				<Button
 					size="xs"
 					:disabled="engine.isOnFirstStage.value && !engine.checklistHasState.value"
@@ -27,7 +27,7 @@
 				>
 					<BrushCleaningIcon /> Reset
 				</Button>
-				<Button size="xs" @click="layout.setChecklistConnected(!layout.checklistConnected.value)">
+				<Button v-if="showWalkthrough" size="xs" @click="layout.setChecklistConnected(!layout.checklistConnected.value)">
 					<LinkIcon v-if="layout.checklistConnected.value" />
 					<UnlinkIcon v-else />
 					{{ layout.checklistConnected.value ? 'Unlink tabs' : 'Relink tabs' }}
@@ -45,6 +45,14 @@
 				<Button size="xs" color="red" type="colored" @click="engine.handleExit()">
 					<XIcon /> Exit
 				</Button>
+
+				<div
+					v-if="lockBanner"
+					class="flex items-center gap-2 rounded-md bg-bg px-2 py-1.5 text-xs text-orange"
+				>
+					<LockIcon class="size-3.5 shrink-0" />
+					{{ lockBanner }}
+				</div>
 			</div>
 
 			<div v-if="queuePosition" :class="['flex items-center gap-4', showWalkthrough ? 'mx-auto' : 'ml-auto']">
@@ -145,6 +153,7 @@
 
 <script setup lang="ts">
 import {
+	ToggleLeftIcon,
 	BrushCleaningIcon,
 	ChevronDownIcon,
 	ChevronUpIcon,

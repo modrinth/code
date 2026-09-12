@@ -9,7 +9,10 @@
 				:current-member="currentMember ?? undefined"
 				:auth="auth"
 				hide-actions
-				@update-thread="() => invalidate()"
+				@update-thread="(thread: Labrinth.Threads.v3.Thread | null | undefined) => {
+					updateThread(thread)
+					invalidate()
+				}"
 			/>
 			<div v-else class="flex items-center gap-2 py-6 text-secondary">
 				<SpinnerIcon class="size-4 animate-spin" /> Loading thread…
@@ -206,54 +209,74 @@
 					</template>
 
 					<template v-else>
-						<Button
-							type="colored"
-							color="red"
-							size="sm"
-							class="flex-1"
-							:disabled="engine.loadingModerationDecision.value || engine.loadingMessage.value"
-							@click="handleDecision('rejected')"
+						<div
+							v-if="lockBanner"
+							class="flex items-center w-full gap-2 rounded-md bg-bg px-2 py-1.5 text-xs text-orange"
 						>
-							<SpinnerIcon
-								v-if="engine.moderationDecision.value === 'rejected' || engine.loadingMessage.value"
-								class="animate-spin"
-							/>
-							<XIcon v-else />
-							Reject
-						</Button>
-						<Button
-							type="colored"
-							color="orange"
-							size="sm"
-							class="flex-1"
-							:disabled="engine.loadingModerationDecision.value || engine.loadingMessage.value"
-							@click="handleDecision('withheld')"
-						>
-							<SpinnerIcon
-								v-if="engine.moderationDecision.value === 'withheld' || engine.loadingMessage.value"
-								class="animate-spin"
-							/>
-							<EyeOffIcon v-else />
-							Withhold
-						</Button>
-						<Button
-							type="colored"
-							color="green"
-							size="sm"
-							class="flex-1"
-							:disabled="engine.loadingModerationDecision.value || engine.loadingMessage.value"
-							@click="handleDecision(engine.approveSendStatus.value)"
-						>
-							<SpinnerIcon
-								v-if="
+							<LockIcon class="size-3.5 shrink-0" />
+							{{ lockBanner }}
+							<Button
+								type="colored"
+								color="orange"
+								size="sm"
+								class="ml-auto"
+								:disabled="engine.loadingModerationDecision.value || engine.loadingMessage.value"
+								@click="engine.requestTakeOver"
+							>
+								<LockOpenIcon />
+								{{engine.alreadyReviewed.value ? 'Review Anyways' : 'Take over'}}
+							</Button>
+						</div>
+						<template v-else>
+							<Button
+								type="colored"
+								color="red"
+								size="sm"
+								class="flex-1"
+								:disabled="engine.loadingModerationDecision.value || engine.loadingMessage.value"
+								@click="handleDecision('rejected')"
+							>
+								<SpinnerIcon
+									v-if="engine.moderationDecision.value === 'rejected' || engine.loadingMessage.value"
+									class="animate-spin"
+								/>
+								<XIcon v-else />
+								Reject
+							</Button>
+							<Button
+								type="colored"
+								color="orange"
+								size="sm"
+								class="flex-1"
+								:disabled="engine.loadingModerationDecision.value || engine.loadingMessage.value"
+								@click="handleDecision('withheld')"
+							>
+								<SpinnerIcon
+									v-if="engine.moderationDecision.value === 'withheld' || engine.loadingMessage.value"
+									class="animate-spin"
+								/>
+								<EyeOffIcon v-else />
+								Withhold
+							</Button>
+							<Button
+								type="colored"
+								color="green"
+								size="sm"
+								class="flex-1"
+								:disabled="engine.loadingModerationDecision.value || engine.loadingMessage.value"
+								@click="handleDecision(engine.approveSendStatus.value)"
+							>
+								<SpinnerIcon
+									v-if="
 									engine.moderationDecision.value === engine.approveSendStatus.value ||
 									engine.loadingMessage.value
 								"
-								class="animate-spin"
-							/>
-							<CheckIcon v-else />
-							Approve
-						</Button>
+									class="animate-spin"
+								/>
+								<CheckIcon v-else />
+								Approve
+							</Button>
+						</template>
 					</template>
 				</div>
 			</div>
@@ -276,15 +299,19 @@ import {
 	TrashIcon,
 	UndoIcon,
 	XIcon,
+	LockIcon,
+	LockOpenIcon,
 } from '@modrinth/assets'
 import { Button, injectProjectPageContext, MarkdownEditor, Textarea } from '@modrinth/ui'
 import { computed, nextTick, ref, watch } from 'vue'
 
 import { injectModerationChecklist } from '~/components/ui/moderation/checklist/checklist-context'
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
+import type {Labrinth} from "@modrinth/api-client";
+import {useQueryClient} from "@tanstack/vue-query";
 
 const engine = injectModerationChecklist()
-const { projectV2, thread, currentMember, invalidate } = injectProjectPageContext()
+const { projectV3: project, projectV2, thread, currentMember, invalidate } = injectProjectPageContext()
 const auth = await useAuth()
 
 const MODES = [
@@ -369,7 +396,7 @@ watch(
 	() => engine.generatedMessage.value,
 	(has) => {
 		if (has) {
-			mode.value = 'decision'
+			//mode.value = 'decision'
 			composerOpen.value = true
 		}
 	},
@@ -406,4 +433,28 @@ async function sendReply() {
 	sending.value = false
 	if (ok) engine.message.value = null
 }
+
+const lockBanner = computed(() => {
+	const s = engine.lockStatus.value
+	if (engine.isLockedByOther.value && s?.lockedBy?.username) {
+		return `Locked by @${s.lockedBy.username}${engine.lockTimeRemaining.value ? ` — ${engine.lockTimeRemaining.value}` : ''}`
+	}
+	if (engine.alreadyReviewed.value && !engine.reviewedAnyway.value) {
+		return 'This project was already moderated.'
+	}
+	return null
+})
+
+const queryClient = useQueryClient()
+
+function updateThread(newThread: Labrinth.Threads.v3.Thread | null | undefined) {
+	const threadId = newThread?.id ?? project.value?.thread_id
+	if (!threadId) return
+
+	queryClient.setQueryData<Labrinth.Threads.v3.Thread | null | undefined>(
+		['thread', threadId],
+		newThread,
+	)
+}
+
 </script>
