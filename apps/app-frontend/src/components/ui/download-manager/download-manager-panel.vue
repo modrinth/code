@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { DropdownIcon } from '@modrinth/assets'
 import {
+	Button,
 	Collapsible,
 	defineMessages,
 	injectPageContext,
@@ -26,6 +27,7 @@ defineEmits<{
 	togglePause: [id: string]
 	dismiss: [id: string]
 	copyDetails: [id: string]
+	clearCompleted: []
 	open: []
 }>()
 
@@ -36,6 +38,11 @@ const messages = defineMessages({
 	tasks: { id: 'app.download-manager.tasks', defaultMessage: 'Tasks' },
 	active: { id: 'app.download-manager.active', defaultMessage: 'Active' },
 	attention: { id: 'app.download-manager.attention', defaultMessage: 'Needs attention' },
+	clearAll: { id: 'app.download-manager.clear-all', defaultMessage: 'Clear all' },
+	clearCompleted: {
+		id: 'app.download-manager.clear-completed',
+		defaultMessage: 'Clear all completed tasks',
+	},
 	complete: { id: 'app.download-manager.complete', defaultMessage: 'Complete' },
 	empty: { id: 'app.download-manager.empty', defaultMessage: 'No installation tasks' },
 	rate: { id: 'app.download-manager.estimated-rate', defaultMessage: 'Estimated download speed' },
@@ -107,24 +114,38 @@ defineExpose({ focus: () => panel.value?.focus() })
 					<template v-for="(section, index) in sections" :key="section.id">
 						<div v-if="index" class="h-px shrink-0 bg-surface-5" />
 						<section class="flex flex-col">
-							<button
-								type="button"
-								class="flex w-full items-center justify-between gap-2 rounded-md border-0 bg-transparent px-1.5 text-sm font-medium leading-5 text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+							<div class="flex items-center gap-2"
 								:class="{
 									'pt-1.5': index === 0,
 									'pb-1.5': index === sections.length - 1,
-								}"
-								:aria-expanded="!collapsed.has(section.id)"
-								:aria-controls="`${sectionId}-${section.id}`"
-								@click="toggleSection(section.id)"
-							>
-								{{ section.label }}
-								<DropdownIcon
-									class="size-4 shrink-0 transition-transform"
-									:class="{ 'rotate-180': !collapsed.has(section.id) }"
-									aria-hidden="true"
-								/>
-							</button>
+								}">
+								<button
+									type="button"
+									class="flex min-w-0 flex-1 items-center gap-2 rounded-md border-0 bg-transparent px-1.5 text-sm font-medium leading-5 text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+									:aria-expanded="!collapsed.has(section.id)"
+									:aria-controls="`${sectionId}-${section.id}`"
+									@click="toggleSection(section.id)"
+								>
+									<DropdownIcon
+										class="size-4 shrink-0 transition-transform"
+										:class="{ '-rotate-90': collapsed.has(section.id) }"
+										aria-hidden="true"
+									/>
+									{{ section.label }}
+								</button>
+								<Button
+									v-if="section.id === 'complete'"
+									v-tooltip="formatMessage(messages.clearCompleted)"
+									:aria-label="formatMessage(messages.clearCompleted)"
+									type="quiet"
+									size="xs"
+									class="shrink-0"
+									:disabled="completedJobs.some((job) => job.busy)"
+									@click="$emit('clearCompleted')"
+								>
+									{{ formatMessage(messages.clearAll) }}
+								</Button>
+							</div>
 							<Collapsible
 								:id="`${sectionId}-${section.id}`"
 								:collapsed="collapsed.has(section.id)"

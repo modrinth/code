@@ -7,11 +7,13 @@ pub use crate::{
 };
 
 pub async fn store_usage() -> crate::Result<StoreUsage> {
-    State::get().await?.content_store.usage().await
+    let state = State::get().await?;
+	state.content_store.usage(&state).await
 }
 
 pub async fn store_cleanup() -> crate::Result<u64> {
-    State::get().await?.content_store.cleanup(true).await
+    let state = State::get().await?;
+	state.content_store.cleanup(&state, true).await
 }
 
 pub async fn store_set_cache_limit(bytes: u64) -> crate::Result<()> {
@@ -25,6 +27,29 @@ pub async fn store_set_cache_limit(bytes: u64) -> crate::Result<()> {
 pub async fn store_verify(repair: bool) -> crate::Result<StoreVerification> {
     let state = State::get().await?;
     state.content_store.verify(&state, repair).await
+}
+
+pub async fn store_verify_with_progress(
+	repair: bool,
+	on_progress: &(dyn Fn(u64, u64) + Send + Sync),
+) -> crate::Result<StoreVerification> {
+	let state = State::get().await?;
+	if repair {
+		let processes = state.process_manager.get_all();
+		for process in &processes {
+			state.process_manager.kill(process.uuid).await?;
+		}
+		let deadline = tokio::time::Instant::now() + std::time::Duration::from_secs(10);
+		while state.process_manager.get_all().iter().any(|running| {
+			processes.iter().any(|process| process.uuid == running.uuid)
+		}) {
+			if tokio::time::Instant::now() >= deadline {
+				return Err(crate::ErrorKind::InputError("Timed out closing running instances".into()).as_error());
+			}
+			tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+		}
+	}
+	state.content_store.verify_with_progress(&state, repair, on_progress).await
 }
 
 /// Gets entire settings

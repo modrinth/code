@@ -31,6 +31,7 @@ pub async fn get_java_versions() -> crate::Result<DashMap<u32, JavaVersion>> {
 
 pub async fn set_java_version(java_version: JavaVersion) -> crate::Result<()> {
     let state = State::get().await?;
+	let _runtime_lease = state.content_store.runtime_gate.read().await;
     java_version.upsert(&state.pool).await?;
     Ok(())
 }
@@ -116,6 +117,7 @@ async fn auto_install_java_inner(
     reporter: Option<InstallProgressReporter>,
 ) -> crate::Result<PathBuf> {
     let state = State::get().await?;
+	let _runtime_lease = state.content_store.runtime_gate.read().await;
 
     let loading_bar = if show_loading {
         Some(

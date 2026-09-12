@@ -218,6 +218,7 @@ pub(crate) async fn resolve_java_for_launch(
     context: &InstanceLaunchContext,
 ) -> crate::Result<JavaVersion> {
     let state = State::get().await?;
+	let _runtime_lease = state.content_store.runtime_gate.read().await;
     let content_set = &context.applied_content_set;
     let (minecraft, version_index) =
         resolve_minecraft_manifest(&content_set.game_version, &state).await?;
@@ -355,6 +356,7 @@ async fn install_minecraft_inner(
     };
 
     let state = State::get().await?;
+	let _runtime_lease = state.content_store.runtime_gate.read().await;
     let previous_install_stage = instance.install_stage;
 
     crate::state::instances::commands::set_instance_install_stage(
@@ -844,6 +846,7 @@ pub async fn launch_minecraft(
     }
 
     let state = State::get().await?;
+	let _runtime_lease = state.content_store.runtime_gate.read().await;
 
     let instance_path = get_instance_full_path(&instance.path).await?;
 

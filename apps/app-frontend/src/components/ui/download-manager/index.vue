@@ -17,6 +17,7 @@ const {
 	cancel,
 	togglePause,
 	dismiss,
+	clearCompleted,
 	copyDetails,
 } = useDownloadManager()
 const { task, completing } = useDownloadBarState({
@@ -106,6 +107,7 @@ function close() {
 				@cancel="cancel"
 				@toggle-pause="togglePause"
 				@dismiss="dismiss"
+				@clear-completed="clearCompleted"
 				@copy-details="copyDetails"
 				@open="shown = false"
 				@keydown.esc.stop.prevent="close"

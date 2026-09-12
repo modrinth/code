@@ -29,7 +29,7 @@ impl JavaVersion {
         .fetch_optional(exec)
         .await?;
 
-        Ok(res.map(|x| JavaVersion {
+        Ok(res.filter(|version| std::path::Path::new(&version.path).is_file()).map(|x| JavaVersion {
             parsed_version: major_version,
             version: x.full_version,
             architecture: x.architecture,
@@ -63,6 +63,7 @@ impl JavaVersion {
         })
         .await?;
 
+		res.retain(|_, java| std::path::Path::new(&java.path).is_file());
         Ok(res)
     }
 

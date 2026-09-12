@@ -10,7 +10,16 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { invoke } from '@tauri-apps/api/core'
-import { computed, ref } from 'vue'
+import { computed, inject, ref } from 'vue'
+
+import {
+	type StoreVerification,
+	verifyStore,
+	verifyingStore,
+} from '@/components/ui/download-manager/store-verification'
+import { useAppEvent } from '@/composables/use-app-event'
+import { get_all as getRunningProcesses } from '@/helpers/process'
+import { appSettingsModalContextKey } from '@/providers/app-settings-modal'
 
 type StoreUsage = {
 	unique_bytes: number
@@ -21,13 +30,8 @@ type StoreUsage = {
 	cache_limit_bytes: number
 }
 
-type StoreVerification = {
-	checked: number
-	repaired: number
-	issues: { sha512: string; message: string }[]
-}
-
 const { handleError } = injectNotificationManager()
+const settingsModal = inject(appSettingsModalContextKey, null)
 const { formatMessage } = useVIntl()
 const formatBytes = useFormatBytes()
 const gibibyte = 1024 ** 3
@@ -43,7 +47,13 @@ const clearedBytes = ref<number | null>(null)
 const cacheLimitGiB = ref<number | undefined>(
 	(storeUsage.value?.cache_limit_bytes ?? 5 * gibibyte) / gibibyte,
 )
-const busy = computed(() => activeAction.value !== null)
+const busy = computed(() => activeAction.value !== null || verifyingStore.value)
+const hasRunningInstances = ref(false)
+async function refreshRunningInstances() {
+	hasRunningInstances.value = (await getRunningProcesses()).length > 0
+}
+useAppEvent('process', () => refreshRunningInstances().catch(handleError))
+await refreshRunningInstances().catch(handleError)
 const totalBytes = computed(
 	() => (storeUsage.value?.unique_bytes ?? 0) + (storeUsage.value?.private_copy_bytes ?? 0),
 )
@@ -55,7 +65,7 @@ const messages = defineMessages({
 	},
 	description: {
 		id: 'app.settings.resource-management.store.description',
-		defaultMessage: 'Save space by reusing mods and packs across your instances.',
+		defaultMessage: 'Save space by reusing game installs, mods and packs across your instances.',
 	},
 	stored: {
 		id: 'app.settings.resource-management.store.total',
@@ -96,16 +106,24 @@ const messages = defineMessages({
 	repairDescription: {
 		id: 'app.settings.resource-management.store.repair.description',
 		defaultMessage:
-			'Check for missing or damaged files and repair them. Close running instances first.',
+			'Check for missing or damaged files and repair them.',
+	},
+	repairRunningDescription: {
+		id: 'app.settings.resource-management.store.repair.running-description',
+		defaultMessage: 'This will close any running instances.',
+	},
+	clearDescription: {
+		id: 'app.settings.resource-management.store.clear.description',
+		defaultMessage: 'Delete unused downloaded content',
 	},
 	limit: {
 		id: 'app.settings.resource-management.store.cache-limit.label',
-		defaultMessage: 'Unused content cache limit',
+		defaultMessage: 'Keep unused downloads',
 	},
 	limitDescription: {
 		id: 'app.settings.resource-management.store.cache-limit.description',
 		defaultMessage:
-			'Maximum space used for unused content that can be reused without downloading it again.',
+			'Keep up to this much unused content for future installs. Keeping more can save download time.',
 	},
 	limitUnit: {
 		id: 'app.settings.resource-management.store.cache-limit.unit',
@@ -170,9 +188,9 @@ async function runAction(action: 'clear' | 'repair') {
 	clearedBytes.value = null
 	try {
 		if (action === 'repair') {
-			report.value = await invoke<StoreVerification>('plugin:settings|store_verify', {
-				repair: true,
-			})
+			const verification = verifyStore()
+			settingsModal?.close()
+			report.value = await verification
 		} else {
 			clearedBytes.value = await invoke<number>('plugin:settings|store_cleanup')
 		}
@@ -255,20 +273,27 @@ async function saveCacheLimit() {
 
 		<div class="flex flex-wrap items-center gap-2">
 			<Button
-				v-tooltip="formatMessage(messages.repairDescription)"
+				v-tooltip="
+					formatMessage(
+						hasRunningInstances ? messages.repairRunningDescription : messages.repairDescription,
+					)
+				"
+				:type="hasRunningInstances ? 'colored' : 'base'"
+				:color="hasRunningInstances ? 'orange' : undefined"
 				:disabled="busy || storeUsage.object_count === 0"
-				:loading="activeAction === 'repair'"
+				:loading="verifyingStore"
 				@click="runAction('repair')"
 			>
 				<LoaderCircleIcon
-					v-if="activeAction === 'repair'"
+					v-if="verifyingStore"
 					class="motion-safe:animate-spin"
 					aria-hidden="true"
 				/>
 				<ShieldCheckIcon v-else aria-hidden="true" />
-				{{ formatMessage(activeAction === 'repair' ? messages.repairing : messages.repair) }}
+				{{ formatMessage(verifyingStore ? messages.repairing : messages.repair) }}
 			</Button>
 			<Button
+				v-tooltip="formatMessage(messages.clearDescription)"
 				type="colored"
 				color="red"
 				:disabled="busy || storeUsage.unused_cache_bytes === 0"

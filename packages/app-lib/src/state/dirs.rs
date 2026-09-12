@@ -14,7 +14,7 @@ pub const METADATA_FOLDER_NAME: &str = "meta";
 pub const SYNCED_OPTIONS_FOLDER_NAME: &str = "synced-options";
 pub const STORE_FOLDER_NAME: &str = "store";
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct DirectoryInfo {
     pub settings_dir: PathBuf, // Base settings directory- app database
     pub config_dir: PathBuf, // Base config directory- instances, minecraft downloads, etc. Changeable as a setting.

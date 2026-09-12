@@ -1,4 +1,4 @@
-import { injectNotificationManager } from '@modrinth/ui'
+import { defineMessages, injectNotificationManager, useFormatBytes, useVIntl } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, onMounted, onScopeDispose, ref, watch } from 'vue'
 
@@ -19,6 +19,7 @@ import { get_many as getInstances } from '@/helpers/instance'
 import { injectAppEvents } from '@/providers/app-events'
 
 import { createDownloadTransferTracker } from './download-transfer'
+import { storeVerificationTask } from './store-verification'
 import { createInstallJobProgressTracker } from './install-job-progress'
 import { useInstallJobDisplay } from './use-install-job-display'
 
@@ -38,6 +39,7 @@ export interface DownloadManagerJob {
 	progressLabel: string
 	waiting: boolean
 	eta: string
+	canRetry?: boolean
 	canCopyDetails: boolean
 	copied: boolean
 	busy: boolean
@@ -53,6 +55,58 @@ export function useDownloadManager() {
 	const { handleError } = injectNotificationManager()
 	const appSettings = useAppSettings()
 	const display = useInstallJobDisplay()
+	const { formatMessage } = useVIntl()
+	const formatBytes = useFormatBytes()
+	const verificationMessages = defineMessages({
+		verifying: { id: 'app.download-manager.verifying', defaultMessage: 'Verifying' },
+		title: { id: 'app.settings.resource-management.store.title', defaultMessage: 'Content storage' },
+		complete: {
+			id: 'app.settings.resource-management.store.verified',
+			defaultMessage: 'Verification complete',
+		},
+		failed: {
+			id: 'app.settings.resource-management.store.attention',
+			defaultMessage: 'Some files still need attention',
+		},
+	})
+	const verificationRow = computed<DownloadManagerJob[]>(() => {
+		const task = storeVerificationTask.value
+		if (!task) return []
+		const progress = task.total ? Math.min(0.99, task.current / task.total) : 0
+		const rate = task.status === 'running' && now.value - task.lastRead < 2000 ? task.rate : 0
+		return [
+			{
+				id: task.id,
+				instanceId: null,
+				status: task.status,
+				paused: false,
+				canceling: false,
+				canPause: false,
+				canCancel: false,
+				canRetry: false,
+				title: formatMessage(verificationMessages.title),
+				iconUrl: null,
+				text: formatMessage(
+					task.status === 'running'
+						? verificationMessages.verifying
+						: task.status === 'succeeded'
+							? verificationMessages.complete
+							: verificationMessages.failed,
+				),
+				progress,
+				overallProgress: task.status === 'succeeded' ? 1 : progress,
+				progressLabel:
+					task.status === 'running'
+						? `${formatBytes(task.current)} / ${formatBytes(task.total)} · ${display.formatRate(rate) || '0 B/s'}`
+						: '',
+				waiting: task.total === 0 || task.current >= task.total,
+				eta: '',
+				canCopyDetails: false,
+				copied: false,
+				busy: false,
+			},
+		]
+	})
 	const jobs = ref(new Map<string, InstallJobSnapshot>())
 	const initialized = ref(false)
 	const instances = ref(new Map<string, { name: string; icon: string | null }>())
@@ -185,25 +239,26 @@ export function useDownloadManager() {
 	function newestFirst(a: DownloadManagerJob, b: DownloadManagerJob) {
 		const first = jobs.value.get(a.id)!
 		const second = jobs.value.get(b.id)!
+		if (!first || !second) return Number(!second) - Number(!first)
 		return (second.finished ?? second.modified).localeCompare(first.finished ?? first.modified)
 	}
 
 	const activeJobs = computed(() =>
-		rows.value
+		[...rows.value, ...verificationRow.value]
 			.filter((job) => job.status === 'queued' || job.status === 'running')
 			.sort(
 				(a, b) =>
 					Number(a.status === 'queued') - Number(b.status === 'queued') ||
-					jobs.value.get(a.id)!.created.localeCompare(jobs.value.get(b.id)!.created),
+					(jobs.value.get(a.id)?.created ?? '').localeCompare(jobs.value.get(b.id)?.created ?? ''),
 			),
 	)
 	const attentionJobs = computed(() =>
-		rows.value
+		[...rows.value, ...verificationRow.value]
 			.filter((job) => job.status === 'failed' || job.status === 'interrupted')
 			.sort(newestFirst),
 	)
 	const completedJobs = computed(() =>
-		rows.value
+		[...rows.value, ...verificationRow.value]
 			.filter((job) => job.status === 'succeeded' || job.status === 'canceled')
 			.sort(newestFirst),
 	)
@@ -226,6 +281,7 @@ export function useDownloadManager() {
 					}, 1000)
 				: undefined
 		},
+		{ immediate: true },
 	)
 
 	async function runAction(id: string, action: () => Promise<unknown>) {
@@ -268,6 +324,10 @@ export function useDownloadManager() {
 	}
 
 	async function dismiss(id: string) {
+		if (storeVerificationTask.value?.id === id) {
+			if (storeVerificationTask.value.status !== 'running') storeVerificationTask.value = null
+			return
+		}
 		const job = jobs.value.get(id)
 		if (!job || job.status === 'queued' || job.status === 'running') return
 		await runAction(id, async () => {
@@ -277,6 +337,10 @@ export function useDownloadManager() {
 			transfer.remove(id)
 			overallProgress.remove(id)
 		})
+	}
+
+	async function clearCompleted() {
+		await Promise.all(completedJobs.value.map((job) => dismiss(job.id)))
 	}
 
 	async function copyDetails(id: string) {
@@ -322,6 +386,7 @@ export function useDownloadManager() {
 		cancel,
 		togglePause,
 		dismiss,
+		clearCompleted,
 		copyDetails,
 	}
 }

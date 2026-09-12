@@ -2,6 +2,7 @@ pub(crate) mod catalog;
 mod maintenance;
 pub(crate) mod migration;
 mod operations;
+mod runtime;
 
 pub use maintenance::{StoreUsage, StoreVerification};
 pub(crate) use operations::{
@@ -140,6 +141,7 @@ pub struct ContentStore {
     pub(crate) profiles: PathBuf,
     pub(crate) pool: SqlitePool,
     gate: Arc<RwLock<()>>,
+	pub(crate) runtime_gate: RwLock<()>,
     acquisitions: [Mutex<()>; 64],
     publications: [Mutex<()>; 64],
     pub(crate) files_lock: Mutex<()>,
@@ -190,6 +192,7 @@ impl ContentStore {
             profiles: fs::canonicalize(dirs.instances_dir()).await?,
             pool,
             gate: Arc::new(RwLock::new(())),
+			runtime_gate: RwLock::new(()),
             acquisitions: std::array::from_fn(|_| Mutex::new(())),
             publications: std::array::from_fn(|_| Mutex::new(())),
             files_lock: Mutex::new(()),
@@ -296,6 +299,15 @@ impl ContentStore {
         blob: &Blob,
         verify: bool,
     ) -> crate::Result<bool> {
+		self.is_healthy_with_progress(blob, verify, &|_| {}).await
+	}
+
+	pub(crate) async fn is_healthy_with_progress(
+		&self,
+		blob: &Blob,
+		verify: bool,
+		on_read: &(dyn Fn(u64) + Send + Sync),
+	) -> crate::Result<bool> {
         if blob.status != BlobStatus::Ready && !verify {
             return Ok(false);
         }
@@ -330,7 +342,7 @@ impl ContentStore {
         {
             return Ok(true);
         }
-        let hashes = hash_file(&path).await?;
+        let hashes = hash_file_with_progress(&path, on_read).await?;
         if hashes.0 != blob.sha512
             || hashes.1 != blob.sha1
             || hashes.2 != blob.size as u64
@@ -891,6 +903,13 @@ pub(crate) fn eligible(path: &str) -> bool {
 pub(crate) async fn hash_file(
     path: &Path,
 ) -> crate::Result<(String, String, u64)> {
+	hash_file_with_progress(path, &|_| {}).await
+}
+
+async fn hash_file_with_progress(
+	path: &Path,
+	on_read: &(dyn Fn(u64) + Send + Sync),
+) -> crate::Result<(String, String, u64)> {
     let mut file = File::open(path).await?;
     let mut sha512 = Sha512::new();
     let mut sha1 = sha1_smol::Sha1::new();
@@ -904,6 +923,7 @@ pub(crate) async fn hash_file(
         sha512.update(&buffer[..count]);
         sha1.update(&buffer[..count]);
         size += count as u64;
+		on_read(count as u64);
     }
     Ok((format!("{:x}", sha512.finalize()), sha1.hexdigest(), size))
 }

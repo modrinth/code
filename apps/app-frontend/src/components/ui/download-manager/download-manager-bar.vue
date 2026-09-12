@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CheckIcon, CircleAlertIcon, DownloadIcon, PauseIcon } from '@modrinth/assets'
+import { CheckIcon, CircleAlertIcon, DownloadIcon, LoaderSpinnerIcon, PauseIcon } from '@modrinth/assets'
 import { defineMessages, truncatedTooltip, useFormatNumber, useVIntl } from '@modrinth/ui'
 import {
 	refDebounced,
@@ -10,7 +10,6 @@ import {
 import { Motion } from 'motion-v'
 import { computed, nextTick, onMounted, onScopeDispose, ref, useTemplateRef, watch } from 'vue'
 
-import DownloadManagerSpinner from './download-manager-spinner.svg'
 import type { DownloadManagerJob } from './use-download-manager'
 
 const props = defineProps<{
@@ -244,10 +243,10 @@ defineExpose({ focus: () => trigger.value?.focus() })
 								class="absolute size-4 text-orange"
 								aria-hidden="true"
 							/>
-							<DownloadManagerSpinner
+							<LoaderSpinnerIcon
 								v-else-if="icon === 'running'"
 								key="running"
-								class="absolute size-5 motion-safe:animate-spin [&_path]:stroke-current"
+								class="absolute size-5 motion-safe:animate-spin"
 								aria-hidden="true"
 							/>
 							<PauseIcon

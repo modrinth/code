@@ -116,40 +116,42 @@ const instanceLink = computed(() =>
 					</span>
 				</div>
 			</component>
-			<IconButton
-				v-if="job.canPause"
-				v-tooltip="formatMessage(job.paused ? messages.resume : messages.pause)"
-				:label="formatMessage(job.paused ? messages.resume : messages.pause)"
-				type="quiet"
-				size="sm"
-				:disabled="job.busy"
-				@click="$emit('togglePause', job.id)"
-			>
-				<PlayIcon v-if="job.paused" />
-				<PauseIcon v-else />
-			</IconButton>
-			<IconButton
-				v-if="job.canCancel || job.canceling || needsAttention"
-				v-tooltip="formatMessage(needsAttention ? messages.dismiss : messages.cancel)"
-				:label="formatMessage(needsAttention ? messages.dismiss : messages.cancel)"
-				type="quiet"
-				size="sm"
-				:disabled="job.busy || job.canceling"
-				@click="needsAttention ? $emit('dismiss', job.id) : $emit('cancel', job.id)"
-			>
-				<XIcon class="text-primary" />
-			</IconButton>
-			<IconButton
-				v-else-if="complete"
-				v-tooltip="formatMessage(messages.remove)"
-				:label="formatMessage(messages.remove)"
-				type="quiet"
-				size="sm"
-				:disabled="job.busy"
-				@click="$emit('dismiss', job.id)"
-			>
-				<TrashIcon />
-			</IconButton>
+			<div class="flex items-center gap-0.5">
+				<IconButton
+					v-if="job.canPause"
+					v-tooltip="formatMessage(job.paused ? messages.resume : messages.pause)"
+					:label="formatMessage(job.paused ? messages.resume : messages.pause)"
+					type="quiet"
+					size="sm"
+					:disabled="job.busy"
+					@click="$emit('togglePause', job.id)"
+				>
+					<PlayIcon v-if="job.paused" />
+					<PauseIcon v-else />
+				</IconButton>
+				<IconButton
+					v-if="job.canCancel || job.canceling || needsAttention"
+					v-tooltip="formatMessage(needsAttention ? messages.dismiss : messages.cancel)"
+					:label="formatMessage(needsAttention ? messages.dismiss : messages.cancel)"
+					type="quiet"
+					size="sm"
+					:disabled="job.busy || job.canceling"
+					@click="needsAttention ? $emit('dismiss', job.id) : $emit('cancel', job.id)"
+				>
+					<XIcon class="text-primary" />
+				</IconButton>
+				<IconButton
+					v-else-if="complete"
+					v-tooltip="formatMessage(messages.remove)"
+					:label="formatMessage(messages.remove)"
+					type="quiet"
+					size="sm"
+					:disabled="job.busy"
+					@click="$emit('dismiss', job.id)"
+				>
+					<TrashIcon />
+				</IconButton>
+			</div>
 		</div>
 
 		<div v-if="job.status === 'running'" class="flex flex-col gap-2">
@@ -171,7 +173,10 @@ const instanceLink = computed(() =>
 			</div>
 		</div>
 
-		<div v-if="needsAttention || job.canCopyDetails" class="flex flex-wrap items-center gap-1">
+		<div
+			v-if="(needsAttention && job.canRetry !== false) || job.canCopyDetails"
+			class="flex flex-wrap items-center gap-1"
+		>
 			<Button
 				v-if="job.canCopyDetails"
 				type="outlined"
@@ -184,7 +189,7 @@ const instanceLink = computed(() =>
 				{{ formatMessage(job.copied ? messages.copied : messages.copyDetails) }}
 			</Button>
 			<Button
-				v-if="needsAttention"
+				v-if="needsAttention && job.canRetry !== false"
 				type="colored"
 				color="brand"
 				size="xs"

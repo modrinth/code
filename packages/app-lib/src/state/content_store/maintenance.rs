@@ -75,8 +75,10 @@ impl ContentStore {
         self.publish_staged(staged, &[]).await
     }
 
-    pub async fn usage(&self) -> crate::Result<StoreUsage> {
+    pub async fn usage(&self, state: &State) -> crate::Result<StoreUsage> {
         let _lease = self.lease().await;
+		let _runtime_lease = self.runtime_gate.read().await;
+		let runtime = super::runtime::RuntimeStorage::read(state).await?;
         let blobs = catalog::blobs(&self.pool).await?;
         let roots = catalog::roots(&self.pool)
             .await?
@@ -115,7 +117,7 @@ impl ContentStore {
             }
         }
         Ok(StoreUsage {
-            unique_bytes: blobs.iter().map(|blob| blob.size as u64).sum(),
+            unique_bytes: blobs.iter().map(|blob| blob.size as u64).sum::<u64>() + runtime.total_bytes(),
             shared_bytes: blobs
                 .iter()
                 .filter(|blob| {
@@ -126,15 +128,15 @@ impl ContentStore {
                         > 1
                 })
                 .map(|blob| blob.size as u64)
-                .sum(),
+                .sum::<u64>() + runtime.shared_bytes(),
             unused_cache_bytes: blobs
                 .iter()
                 .filter(|blob| !roots.contains(&blob.sha512))
                 .map(|blob| blob.size as u64)
-                .sum(),
+                .sum::<u64>() + runtime.unused_bytes(),
             estimated_saved_bytes: logical_bytes.saturating_sub(
                 referenced_unique.saturating_add(private_copy_bytes),
-            ),
+            ) + runtime.saved_bytes(),
             private_copy_bytes,
             object_count: blobs.len(),
             damaged_objects: blobs
@@ -165,8 +167,8 @@ impl ContentStore {
         .await
     }
 
-    /// Only unreferenced content objects are disposable; other store directories have separate owners.
-    pub async fn cleanup(&self, purge_unused: bool) -> crate::Result<u64> {
+    /// Removes unreferenced content objects and managed game and Java cache files.
+    pub async fn cleanup(&self, state: &State, purge_unused: bool) -> crate::Result<u64> {
         let _exclusive = self.gate.clone().try_write_owned().map_err(|_| input("The shared store is busy; try cleanup again after content operations finish"))?;
         if catalog::setting(&self.pool, "store_layout_version")
             .await?
@@ -177,6 +179,9 @@ impl ContentStore {
                 "Finish shared-store migration before cleaning its cache",
             ));
         }
+		let _runtime_exclusive = self.runtime_gate.try_write()
+			.map_err(|_| input("Game or Java files are in use; try cleanup again after the operation finishes"))?;
+		let runtime = super::runtime::RuntimeStorage::read(state).await?;
         let roots = catalog::roots(&self.pool)
             .await?
             .into_iter()
@@ -188,7 +193,7 @@ impl ContentStore {
             .collect::<Vec<_>>();
         candidates.sort_by_key(|blob| blob.last_used_at);
         let mut unused =
-            candidates.iter().map(|blob| blob.size as u64).sum::<u64>();
+            candidates.iter().map(|blob| blob.size as u64).sum::<u64>() + runtime.unused_bytes();
         let limit = if purge_unused {
             0
         } else {
@@ -238,6 +243,17 @@ impl ContentStore {
             unused = unused.saturating_sub(blob.size as u64);
             reclaimed += blob.size as u64;
         }
+		let mut unused_runtime = runtime.files.into_iter()
+			.filter(|file| file.references == 0).collect::<Vec<_>>();
+		unused_runtime.sort_by_key(|file| file.last_used_at);
+		for file in unused_runtime {
+			if !purge_unused && (unused <= limit || chrono::Utc::now().timestamp().saturating_sub(file.last_used_at) < 60) {
+				continue;
+			}
+			let removed = super::runtime::remove_file(&file, &runtime.root).await?;
+			unused = unused.saturating_sub(removed);
+			reclaimed += removed;
+		}
         Ok(reclaimed)
     }
 
@@ -246,6 +262,15 @@ impl ContentStore {
         state: &State,
         repair: bool,
     ) -> crate::Result<StoreVerification> {
+		self.verify_with_progress(state, repair, &|_, _| {}).await
+	}
+
+	pub async fn verify_with_progress(
+		&self,
+		state: &State,
+		repair: bool,
+		on_progress: &(dyn Fn(u64, u64) + Send + Sync),
+	) -> crate::Result<StoreVerification> {
         let _files_lock = self.files_lock.lock().await;
         let _lease = self.lease().await;
         if repair {
@@ -263,6 +288,13 @@ impl ContentStore {
             }
         }
         let blobs = catalog::blobs(&self.pool).await?;
+		let total = blobs.iter().map(|blob| blob.size as u64).sum::<u64>();
+		let bytes_read = std::sync::atomic::AtomicU64::new(0);
+		let on_read = |bytes| {
+			let current = bytes_read.fetch_add(bytes, std::sync::atomic::Ordering::Relaxed) + bytes;
+			on_progress(current, total);
+		};
+		on_progress(0, total);
         let mut report = StoreVerification {
             checked: 0,
             repaired: 0,
@@ -270,7 +302,7 @@ impl ContentStore {
         };
         for blob in blobs {
             report.checked += 1;
-            if self.is_healthy(&blob, true).await? {
+            if self.is_healthy_with_progress(&blob, true, &on_read).await? {
                 continue;
             }
             let mut message = "Stored content is missing or damaged; re-import the original file".to_string();
