@@ -181,7 +181,7 @@ const menu = ref<{ x: number; y: number } | null>(null)
 
 function onContextMenu(event: MouseEvent) {
 	if (menuGroups.value.length === 0) return
-	if (settings.value.get(moderationSettings.General.InlineChecklistMenu) !== true) return
+	if (settings.value.get(moderationSettings.Experimental.InlineChecklistMenu) !== true) return
 	event.preventDefault()
 	event.stopPropagation()
 	const view = (event.view as Window | null) ?? window

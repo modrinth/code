@@ -1,5 +1,7 @@
 import { useLocalStorage } from '@vueuse/core'
 import { computed, type ComputedRef, type Ref } from 'vue'
+import {useModerationSettings} from "~/composables/moderation.ts";
+import {moderationSettings} from "@modrinth/moderation";
 
 /**
  * Shared state for the moderation "review view" — the VS Code / Slicer style shell that
@@ -23,6 +25,7 @@ export type ReviewTabId =
 	| 'permissions'
 	| 'thread'
 	| 'settings'
+	| 'moderation_settings'
 export type ReviewDockId = 'main' | 'pip'
 export type SplitDirection = 'row' | 'column'
 
@@ -39,6 +42,7 @@ export const REVIEW_TAB_ORDER: readonly ReviewTabId[] = [
 	'permissions',
 	'thread',
 	'settings',
+	'moderation_settings'
 ]
 
 interface DockState {
@@ -81,10 +85,12 @@ function clamp(value: number, min: number, max: number): number {
 
 const STORAGE_KEY = 'moderation-review-layout-v1'
 
+const settings = useModerationSettings()
+
 function defaultState(): ReviewLayoutState {
 	return {
 		sidebarCollapsed: false,
-		checklistConnected: true,
+		checklistConnected: !settings.value.get(moderationSettings.Experimental.UnlinkChecklistInReview),
 		pipOpen: false,
 		docks: {
 			main: {
@@ -291,6 +297,7 @@ function create(): ModerationReviewLayout {
 
 	function setChecklistConnected(value: boolean) {
 		state.value.checklistConnected = value
+		settings.value.set(moderationSettings.Experimental.UnlinkChecklistInReview, !value)
 	}
 
 	function setSidebarWidth(px: number) {

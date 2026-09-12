@@ -26,7 +26,7 @@
 
 		<div class="flex min-h-0 min-w-0 flex-1 flex-col">
 			<ModerationReviewPanels dock="main" class="min-h-0 flex-1" />
-			<ModerationChecklistWalkthrough v-if="showWalkthrough" />
+			<ModerationChecklistWalkthrough />
 		</div>
 
 		<div
@@ -58,9 +58,6 @@ const reviewData = injectReviewLayoutData()
 const settings = useModerationSettings()
 
 const pipOpen = computed(() => layout.pipOpen.value)
-const showWalkthrough = computed(
-	() => settings.value.get(moderationSettings.General.ShowChecklistWalkthrough) !== false,
-)
 
 const resizing = ref<'sidebar' | 'panel' | null>(null)
 

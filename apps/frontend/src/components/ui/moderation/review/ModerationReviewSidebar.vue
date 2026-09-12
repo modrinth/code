@@ -34,46 +34,6 @@
 
 		<!-- Expanded -->
 		<template v-else>
-			<dl
-				class="m-0 grid grid-cols-2 gap-x-3 gap-y-1 border-0 border-y border-solid border-divider px-3 py-2 text-sm"
-			>
-				<dt class="">
-					<Avatar
-						:src="project.icon_url"
-						:raw-src="project.raw_icon_url"
-						:tint-by="project.id"
-						size="88px"
-					/>
-				</dt>
-				<dd class="m-0 text-contrast"></dd>
-
-				<template v-if="queuePosition">
-					<dt class="text-secondary">Queue</dt>
-					<dd class="m-0 text-contrast">{{ queuePosition }}</dd>
-				</template>
-
-				<dt class="text-secondary">Submitted</dt>
-				<dd class="m-0 text-contrast">{{ submittedRelative }}</dd>
-
-				<dt class="text-secondary">Created</dt>
-				<dd class="m-0 text-contrast">{{ createdRelative }}</dd>
-
-				<template v-if="project.updated">
-					<dt class="text-secondary">Updated</dt>
-					<dd class="m-0 text-contrast">{{ updatedRelative }}</dd>
-				</template>
-
-				<dt class="text-secondary">Applying for:</dt>
-				<dd class="m-0 text-contrast">
-					<ProjectStatusBadge :status="requestedStatus" />
-				</dd>
-
-				<dt class="text-secondary">Status:</dt>
-				<dd class="m-0 text-contrast">
-					<ProjectStatusBadge :status="currentStatus" />
-				</dd>
-			</dl>
-
 			<div class="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-2">
 				<ChecklistStageButtons stage-id="title-slug">
 					<div class="grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1.5">
@@ -84,16 +44,67 @@
 						<code class="min-w-0 break-all text-primary">{{ project.slug || '—' }}</code>
 					</div>
 				</ChecklistStageButtons>
-				<div class="my-1 h-px w-full flex-shrink-0 bg-divider" />
+				<div class="my-1 h-[2px] w-full flex-shrink-0 bg-divider" />
+				<dl class="m-0 grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
+					<dt class="items-center justify-center flex">
+						<Avatar
+							:src="project.icon_url"
+							:raw-src="project.raw_icon_url"
+							:tint-by="project.id"
+							size="105px"
+						/>
+					</dt>
+					<dd class="m-0 text-contrast h-full ">
+						<div class="flex flex-col h-full justify-evenly">
+							<div class="flex flex-col">
+								<span class="text-secondary">Applying for:</span>
+								<ProjectStatusBadge :status="requestedStatus" />
+							</div>
+
+							<div class="flex flex-col">
+								<span class="text-secondary">Status:</span>
+								<ProjectStatusBadge :status="currentStatus" />
+							</div>
+						</div>
+					</dd>
+
+					<template v-if="project.approved">
+						<dt class="text-secondary">
+							<CalendarIcon aria-hidden="true" /> Published
+						</dt>
+						<dd class="m-0 text-contrast" v-tooltip="formatDateTime(project.approved)">{{ publishedRelative }}</dd>
+					</template>
+					<template v-else>
+						<dt class="text-secondary">
+							<CalendarIcon aria-hidden="true" /> Created
+						</dt>
+						<dd class="m-0 text-contrast" v-tooltip="props.project.published ? formatDateTime(props.project.published) : 'unknown'">{{ createdRelative }}</dd>
+					</template>
+
+					<dt class="text-secondary">
+						<ScaleIcon aria-hidden="true" /> Submitted
+					</dt>
+					<dd class="m-0 text-contrast" v-tooltip="formatDateTime(project.queued ?? project.published)">{{ submittedRelative }}</dd>
+
+					<template v-if="project.versions.length > 0 && project.updated">
+						<dt class="text-secondary">
+							<VersionIcon aria-hidden="true" /> Updated
+						</dt>
+						<dd class="m-0 text-contrast" v-tooltip="project.updated ? formatDateTime(project.updated) : 'unknown'">{{ updatedRelative }}</dd>
+					</template>
+
+				</dl>
+				<div class="my-1 h-[2px] w-full flex-shrink-0 bg-divider" />
 				<ProjectSidebarCreators
 					:organization="organization"
 					:members="members"
 					:loading="creatorsLoading"
 					:org-link="(slug) => `/organization/${slug}`"
 					:user-link="(username) => `/user/${username}`"
+					:disable-header="true"
 					class="flex-card-reduced"
 				/>
-				<div class="my-1 h-px w-full flex-shrink-0 bg-divider" />
+				<div class="my-1 h-[2px] w-full flex-shrink-0 bg-divider" />
 				<ProjectSidebarServerInfo
 					v-if="isServerProject"
 					:loading="!serverDataLoaded"
@@ -104,26 +115,41 @@
 					:supported-versions="serverSupportedVersions"
 					:loaders="serverModpackLoaders"
 					:status-online="projectV3?.minecraft_java_server?.ping?.data != null"
+					:disable-header="true"
 					class="flex-card-reduced"
 				/>
-				<div v-if="isServerProject" class="my-1 h-px w-full flex-shrink-0 bg-divider" />
+				<div v-if="isServerProject" class="my-1 h-[2px] w-full flex-shrink-0 bg-divider" />
 
 				<ChecklistStageButtons stage-id="links" variant="inline" inline-node-mode="full" />
 
-				<div class="my-1 h-px w-full flex-shrink-0 bg-divider" />
+				<div class="my-1 h-[2px] w-full flex-shrink-0 bg-divider" />
 
 				<ChecklistStageButtons stage-id="tags" variant="inline">
 					<ProjectSidebarTags :project="project" :disable-header="true" class="flex-card-reduced" />
 				</ChecklistStageButtons>
 
-				<div class="my-1 h-px w-full flex-shrink-0 bg-divider" />
+				<div class="my-1 h-[2px] w-full flex-shrink-0 bg-divider" />
 
+				<ChecklistStageButtons stage-id="metadata" variant="inline">
+					<ProjectSidebarCompatibility
+						:project="project"
+						:tags="tags"
+						:project-v3="projectV3"
+						:compact-mode="true"
+					/>
+				</ChecklistStageButtons>
+
+				<div class="my-1 h-[2px] w-full flex-shrink-0 bg-divider" />
+
+				<ChecklistStageButtons stage-id="license" variant="inline" />
 				<ProjectSidebarDetails
 					:project="project"
 					link-target="_blank"
 					:hide-license="isServerProject"
 					:show-followers="isServerProject"
 					class="flex-card-reduced"
+					:disable-header="true"
+					:remove-time-info="true"
 				/>
 			</div>
 		</template>
@@ -132,15 +158,15 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ChevronRightIcon } from '@modrinth/assets'
+import {CalendarIcon, ChevronRightIcon, ScaleIcon, VersionIcon} from '@modrinth/assets'
 import {
-	Avatar,
+	Avatar, commonMessages, ProjectSidebarCompatibility,
 	ProjectSidebarCreators,
 	ProjectSidebarDetails,
 	ProjectSidebarServerInfo,
 	ProjectSidebarTags,
-	ProjectStatusBadge,
-	useRelativeTime,
+	ProjectStatusBadge, useFormatDateTime,
+	useRelativeTime, useVIntl,
 } from '@modrinth/ui'
 import { computed } from 'vue'
 
@@ -149,6 +175,14 @@ import { REVIEW_TAB_ORDER, useModerationReviewLayout } from '~/services/moderati
 
 import ChecklistStageButtons from './ChecklistStageButtons.vue'
 import { reviewTab, selectableReviewTabs } from './review-tabs'
+import {capitalizeString} from "@modrinth/utils";
+
+const { formatMessage, locale } = useVIntl()
+
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 type LooseProject = Labrinth.Projects.v2.Project & Record<string, unknown>
 
@@ -182,7 +216,6 @@ const props = withDefaults(
 )
 
 const layout = useModerationReviewLayout()
-const moderationQueue = useModerationQueue()
 const formatRelativeTime = useRelativeTime()
 const tags = useGeneratedState()
 
@@ -202,6 +235,9 @@ const submittedRelative = computed(() => {
 const createdRelative = computed(() =>
 	props.project.published ? formatRelativeTime(props.project.published as string) : 'unknown',
 )
+const publishedRelative = computed(() =>
+	props.project.approved ? formatRelativeTime(props.project.approved) : 'unknown',
+)
 const updatedRelative = computed(() =>
 	props.project.updated ? formatRelativeTime(props.project.updated as string) : 'unknown',
 )
@@ -209,14 +245,6 @@ const updatedRelative = computed(() =>
 const requestedStatus = computed(() => props.project.requested_status ?? 'unknown')
 
 const currentStatus = computed(() => props.project.status ?? 'unknown')
-
-const queuePosition = computed(() => {
-	if (!moderationQueue.isQueueMode) return null
-	const items = moderationQueue.currentQueue.items
-	const index = items.indexOf(props.project.id)
-	if (index < 0) return null
-	return `${index + 1} / ${items.length}`
-})
 </script>
 
 <style scoped>

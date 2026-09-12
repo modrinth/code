@@ -19,7 +19,7 @@
 			</template>
 			<div class="markdown-body" v-html="licenseHtml" />
 		</NewModal>
-		<h2 class="text-lg m-0">{{ formatMessage(commonMessages.detailsLabel) }}</h2>
+		<h2 v-if="!disableHeader" class="text-lg m-0">{{ formatMessage(commonMessages.detailsLabel) }}</h2>
 		<div
 			class="flex flex-col gap-3 [&>div>svg]:shrink-0 [&>div>svg]:mt-[1px] [&>div]:flex [&>div]:gap-2 [&>div]:items-start [&>div>div]:min-w-0"
 		>
@@ -195,7 +195,7 @@
 					{{ formatMessage(commonMessages.projectFollowers, { count: project.followers }) }}
 				</div>
 			</div>
-			<div v-if="project.approved" v-tooltip="formatDateTime(project.approved)">
+			<div v-if="project.approved && !removeTimeInfo" v-tooltip="formatDateTime(project.approved)">
 				<CalendarIcon aria-hidden="true" />
 				<div>
 					{{
@@ -205,7 +205,7 @@
 					}}
 				</div>
 			</div>
-			<div v-else v-tooltip="formatDateTime(project.published)">
+			<div v-else-if="!removeTimeInfo" v-tooltip="formatDateTime(project.published)">
 				<CalendarIcon aria-hidden="true" />
 				<div>
 					{{
@@ -214,7 +214,7 @@
 				</div>
 			</div>
 			<div
-				v-if="project.status === 'processing' && project.queued"
+				v-if="project.status === 'processing' && project.queued && !removeTimeInfo"
 				v-tooltip="formatDateTime(project.queued)"
 			>
 				<ScaleIcon aria-hidden="true" />
@@ -227,7 +227,7 @@
 				</div>
 			</div>
 			<div
-				v-if="project.versions.length > 0 && project.updated"
+				v-if="project.versions.length > 0 && project.updated && !removeTimeInfo"
 				v-tooltip="formatDateTime(project.updated)"
 			>
 				<VersionIcon aria-hidden="true" />
@@ -289,6 +289,8 @@ const props = defineProps<{
 	linkTarget: string
 	hideLicense?: boolean
 	showFollowers?: boolean
+	disableHeader?: boolean
+	removeTimeInfo?: boolean
 }>()
 
 const modalLicense = useTemplateRef('modalLicense')

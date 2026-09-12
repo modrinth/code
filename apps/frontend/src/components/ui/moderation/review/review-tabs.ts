@@ -7,6 +7,7 @@ import {
 	KeyIcon,
 	LinkIcon,
 	MessageIcon,
+	ScaleIcon,
 	SettingsIcon,
 	ShieldIcon,
 	TagsIcon,
@@ -109,6 +110,12 @@ export const REVIEW_TABS: Record<ReviewTabId, ReviewTabDef> = {
 		icon: SettingsIcon,
 		component: defineAsyncComponent(() => import('./ReviewSettingsTab.vue')),
 	},
+	moderation_settings: {
+		id: 'moderation_settings',
+		label: 'Moderation Settings',
+		icon: ScaleIcon,
+		component: defineAsyncComponent(() => import('../settings/ModerationSettings.vue'))
+	}
 }
 
 export function isReviewTab(id: string): id is ReviewTabId {

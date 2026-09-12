@@ -18,30 +18,6 @@ const settings = {
 			description: 'Weather certain keybinds should work without the checklist visible.',
 			default: false,
 		}),
-		InlineChecklistMenu: setting.asToggle({
-			type: 'toggle',
-			id: 'inline-checklist-menu',
-			title: 'Right-click checklist menu',
-			description:
-				'In the review view, right-click a section to open its checklist buttons in a context menu.',
-			default: true,
-		}),
-		ShowChecklistWalkthrough: setting.asToggle({
-			type: 'toggle',
-			id: 'show-checklist-walkthrough',
-			title: 'Show the checklist walkthrough',
-			description:
-				'In the review view, show the collapsible stage-by-stage walkthrough helper at the bottom.',
-			default: true,
-		}),
-		ShowFloatingChecklistInReview: setting.asToggle({
-			type: 'toggle',
-			id: 'show-floating-checklist-in-review',
-			title: 'Keep the floating checklist in the review view',
-			description:
-				'Keep the original floating checklist widget available (collapsed) while the review view is active.',
-			default: false,
-		}),
 		PrivateMessageHighlight: setting.asToggle({
 			id: 'private-message-highlight',
 			title: 'Highlight private messages',
@@ -74,6 +50,42 @@ const settings = {
 			default: '',
 		}),
 	},
+	Experimental: {
+		ExperimentalModerationView: setting.asToggle({
+			id: "experimental-moderation-view",
+			title: 'Experimental Moderation View',
+			description: 'Enable the WIP Moderation view concept',
+			default: false
+		}),
+		InlineChecklistMenu: setting.asToggle({
+			id: 'inline-checklist-menu',
+			title: 'Right-click checklist menu',
+			description:
+				'In the review view, right-click a section to open its checklist buttons in a context menu.',
+			default: false,
+		}),
+		ShowChecklistWalkthrough: setting.asToggle({
+			id: 'show-checklist-walkthrough',
+			title: 'Show the checklist walkthrough',
+			description:
+				'In the review view, show the collapsible stage-by-stage walkthrough helper at the bottom.',
+			default: true,
+		}),
+		ShowFloatingChecklistInReview: setting.asToggle({
+			id: 'show-floating-checklist-in-review',
+			title: 'Keep the floating checklist in the review view',
+			description:
+				'Keep the original floating checklist widget available (collapsed) while the review view is active.',
+			default: false,
+		}),
+		UnlinkChecklistInReview: setting.asToggle({
+			id: 'unlink-checklist-in-review',
+			title: 'Unlink the checklist guide tab navigation',
+			description:
+				'Unlink the checklist guide from review view preventing navigation to given section tab as the active tab',
+			default: false,
+		}),
+	}
 } as const
 
 export default settings

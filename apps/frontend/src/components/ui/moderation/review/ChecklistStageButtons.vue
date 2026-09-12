@@ -20,6 +20,7 @@
 				class="max-w-fit"
 				:flex="true"
 				:title-depth="3"
+				button-size="xs"
 			>
 				<button
 					v-if="!hideHeading"
@@ -80,6 +81,7 @@
 				:global-state="engine.nodeStates.value"
 				:on-image-upload="engine.onUploadHandler"
 				:app-components="engine.appComponents"
+				button-size="xs"
 			/>
 		</ChecklistDetailsPanel>
 	</div>
@@ -96,7 +98,7 @@ import {
 	resolveChildren,
 } from '@modrinth/moderation/src/types/node'
 import NodeRenderer from '@modrinth/moderation/src/types/node/components/NodeRenderer.vue'
-import { injectProjectPageContext } from '@modrinth/ui'
+import {type ButtonSize, injectProjectPageContext} from '@modrinth/ui'
 import { renderHighlightedString } from '@modrinth/utils'
 import { computed, onBeforeUnmount, provide, ref, watchEffect } from 'vue'
 

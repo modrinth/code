@@ -1,6 +1,6 @@
 <template>
 	<div v-if="loading || hasContent" class="flex flex-col gap-3">
-		<h2 class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
+		<h2 v-if="!disableHeader" class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
 
 		<div
 			v-if="ipAddress"
@@ -136,6 +136,7 @@ interface Props {
 	ping?: number
 	statusOnline?: boolean
 	loading?: boolean
+	disableHeader?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {

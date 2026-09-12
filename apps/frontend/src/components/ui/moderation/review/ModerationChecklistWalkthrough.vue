@@ -2,11 +2,73 @@
 	<div class="shrink-0 border-0 border-t border-solid border-divider bg-surface-1 text-sm">
 		<!-- Header row (always visible) -->
 		<div class="flex items-center gap-2 px-3 py-2">
-			<component :is="stage?._icon ?? ScaleIcon" class="size-4 shrink-0 text-orange" />
-			<span class="font-semibold text-contrast">{{ stageTitle }}</span>
-			<span v-if="stagePosition" class="text-xs text-secondary">{{ stagePosition }}</span>
+			<div class="flex items-center gap-2 pr-1" v-if="showWalkthrough">
+				<component :is="stage?._icon ?? ScaleIcon" class="size-4 shrink-0 text-orange" />
+				<span class="font-semibold text-contrast">{{ stageTitle }}</span>
+				<span v-if="stagePosition" class="text-xs text-secondary">{{ stagePosition }}</span>
+			</div>
 
-			<div class="ml-auto flex items-center gap-1">
+			<div
+				v-if="collapsed"
+				class="flex gap-2 "
+			>
+				<div
+					v-if="lockBanner"
+					class="flex items-center gap-2 rounded-md bg-bg px-2 py-1.5 text-xs text-orange"
+				>
+					<LockIcon class="size-3.5 shrink-0" />
+					{{ lockBanner }}
+				</div>
+
+				<Button
+					size="xs"
+					:disabled="engine.isOnFirstStage.value && !engine.checklistHasState.value"
+					@click="engine.resetProgress()"
+				>
+					<BrushCleaningIcon /> Reset
+				</Button>
+				<Button size="xs" @click="layout.setChecklistConnected(!layout.checklistConnected.value)">
+					<LinkIcon v-if="layout.checklistConnected.value" />
+					<UnlinkIcon v-else />
+					{{ layout.checklistConnected.value ? 'Unlink tabs' : 'Relink tabs' }}
+				</Button>
+				<Button v-if="canSkip" size="xs" @click="engine.skipCurrentProject()">
+					<RightArrowIcon /> Skip project
+				</Button>
+				<Button
+					v-if="engine.alreadyReviewed.value && !engine.reviewedAnyway.value"
+					size="xs"
+					@click="engine.reviewAnyway()"
+				>
+					<ScaleIcon /> Review anyway
+				</Button>
+				<Button size="xs" color="red" type="colored" @click="engine.handleExit()">
+					<XIcon /> Exit
+				</Button>
+			</div>
+
+			<div v-if="queuePosition" :class="['flex items-center gap-4', showWalkthrough ? 'mx-auto' : 'ml-auto']">
+				<span>
+					Completed: {{ queuePosition.completed }}
+				</span>
+				<span>
+					Skipped: {{ queuePosition.skipped }}
+				</span>
+				<span>
+					Total: {{ queuePosition.total }}
+				</span>
+			</div>
+
+			<div v-if="showWalkthrough" class="ml-auto flex items-center gap-1">
+				<ButtonLink
+					v-if="stage?._guidanceUrl"
+					size="xs"
+					type="quiet"
+					target="_blank"
+					:href="stage._guidanceUrl"
+				>
+					<FileTextIcon /> Guidance
+				</ButtonLink>
 				<button
 					v-tooltip="'Previous stage'"
 					class="rounded p-1 text-secondary hover:bg-button-bg hover:text-contrast"
@@ -51,15 +113,6 @@
 			</div>
 
 			<div class="flex flex-wrap items-center gap-1.5">
-				<ButtonLink
-					v-if="stage?._guidanceUrl"
-					size="xs"
-					type="quiet"
-					target="_blank"
-					:href="stage._guidanceUrl"
-				>
-					<FileTextIcon /> Guidance
-				</ButtonLink>
 				<Button
 					size="xs"
 					:disabled="engine.isOnFirstStage.value && !engine.checklistHasState.value"
@@ -71,10 +124,6 @@
 					<LinkIcon v-if="layout.checklistConnected.value" />
 					<UnlinkIcon v-else />
 					{{ layout.checklistConnected.value ? 'Unlink tabs' : 'Relink tabs' }}
-				</Button>
-				<Button size="xs" @click="toggleContextMenu">
-					<MousePointer2Icon :class="contextMenuEnabled ? '' : 'opacity-40'" />
-					{{ contextMenuEnabled ? 'Right-click menu on' : 'Right-click menu off' }}
 				</Button>
 				<Button v-if="canSkip" size="xs" @click="engine.skipCurrentProject()">
 					<RightArrowIcon /> Skip project
@@ -115,19 +164,40 @@ import { computed } from 'vue'
 
 import { injectModerationChecklist } from '~/components/ui/moderation/checklist/checklist-context'
 import { useModerationReviewLayout } from '~/services/moderation/review-layout'
+import {useModerationQueue} from "~/services/moderation/queue.ts";
 
 const engine = injectModerationChecklist()
 const layout = useModerationReviewLayout()
 const settings = useModerationSettings()
 
 const contextMenuEnabled = computed(
-	() => settings.value.get(moderationSettings.General.InlineChecklistMenu) === true,
+	() => settings.value.get(moderationSettings.Experimental.InlineChecklistMenu),
 )
 function toggleContextMenu() {
-	settings.value.set(moderationSettings.General.InlineChecklistMenu, !contextMenuEnabled.value)
+	settings.value.set(moderationSettings.Experimental.InlineChecklistMenu, !contextMenuEnabled.value)
 }
 
-const collapsed = computed(() => layout.walkthroughCollapsed.value)
+const moderationQueue = useModerationQueue()
+
+const queuePosition = computed(() => {
+	if (!moderationQueue.isQueueMode) return null;
+
+	const items = moderationQueue.currentQueue.items
+	const completed = moderationQueue.currentQueue.completed;
+	const skipped = moderationQueue.currentQueue.skipped;
+
+	return {
+		completed: `${completed.length}`,
+		skipped: `${skipped.length}`,
+		total: `${items.length}`
+	}
+})
+
+const showWalkthrough = computed(
+	() => settings.value.get(moderationSettings.Experimental.ShowChecklistWalkthrough),
+)
+
+const collapsed = computed(() => !showWalkthrough.value ? true : layout.walkthroughCollapsed.value)
 
 const stage = computed(() => engine.currentStageObj.value)
 const stageTitle = computed(() => stage.value?.label ?? stage.value?.id ?? 'Moderation')

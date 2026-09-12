@@ -72,6 +72,15 @@
 					</button>
 				</h1>
 				<IconButton
+					v-tooltip="`Toggle Experimental Moderation View`"
+					type="quiet"
+					:label="`Toggle Experimental Moderation View`"
+					class="!bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
+					@click="toggleReviewLayout"
+				>
+					<BlocksIcon />
+				</IconButton>
+				<IconButton
 					v-if="!isPseudoStage && stageNavigateTarget"
 					v-tooltip="`Navigate to ${stageNavigateLabel}`"
 					type="quiet"
@@ -435,6 +444,7 @@ import {
 	LinkIcon,
 	ListBulletedIcon,
 	LockIcon,
+	BlocksIcon,
 	MapPinIcon,
 	RightArrowIcon,
 	ScaleIcon,
@@ -527,17 +537,18 @@ import {
 	STAGE_ELEMENT,
 	STATE_KEY,
 } from './checklist-context'
+import {useModerationSettings} from "~/composables/moderation.ts";
 
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
 const debug = useDebugLogger('ModerationChecklist')
 const keybinds = useModerationKeybinds()
 const settings = useModerationSettings()
-const flags = useFeatureFlags()
 const reviewLayout = useModerationReviewLayout()
 
 /** Whether the VS Code-style review shell is driving the page instead of routes. */
-const reviewLayoutActive = computed(() => flags.value.moderationReviewLayout)
+const reviewLayoutActive = computed(() => settings.value.get(moderationSettings.Experimental.ExperimentalModerationView))
+const toggleReviewLayout = () => settings.value.set(moderationSettings.Experimental.ExperimentalModerationView, true);
 
 /**
  * Open the review tab that hosts a stage. Phase 2 maps stages to tabs by id
@@ -2158,7 +2169,7 @@ const stageOptions = computed<StageOption[]>(() => {
 
 const showFloatingWidget = computed(() => {
 	if (!reviewLayoutActive.value) return true
-	return settings.value.get(moderationSettings.General.ShowFloatingChecklistInReview) === true
+	return settings.value.get(moderationSettings.Experimental.ShowFloatingChecklistInReview) === true
 })
 
 provideModerationChecklist({

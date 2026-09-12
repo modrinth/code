@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Button, IconButton } from '@modrinth/ui'
+import {Button, type ButtonSize, IconButton} from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
 import type { Component } from 'vue'
 import { computed, inject, watchEffect } from 'vue'
@@ -52,7 +52,10 @@ const props = defineProps<{
 	 */
 	mode?: 'full' | 'buttons'
 	stageId?: string
+	buttonSize?: ButtonSize
 }>()
+
+const buttonSize = computed(() => props.buttonSize ?? 'md');
 
 const buttonsOnly = computed(() => props.mode === 'buttons')
 
@@ -299,7 +302,7 @@ watchEffect(() => {
 </script>
 
 <template>
-	<div :class="[flex ? 'flex flex-wrap gap-2' : 'space-y-4', mode ? 'contents' : 'w-full']">
+	<div :class="[flex ? 'flex flex-wrap gap-2' : 'space-y-4', mode == 'buttons' ? 'contents' : 'w-full']">
 		<slot />
 		<template v-for="(item, idx) in nodes" :key="nodeKey(item, idx)">
 			<template v-if="typeof item !== 'object' || item === null">
@@ -342,6 +345,7 @@ watchEffect(() => {
 							:mode="mode"
 							:flex="(item as any)._layout !== 'column'"
 							:title-depth="getTitle(item) !== undefined ? (titleDepth ?? 0) + 1 : titleDepth"
+							:button-size="buttonSize"
 						/>
 					</template>
 
@@ -358,7 +362,7 @@ watchEffect(() => {
 							:[modelProp(item)]="
 								getEffectiveValue(item as RenderableValueNode, state[item.id], wrappedState)
 							"
-							size="xs"
+							:size="buttonSize"
 							@[updateEvent(item)]="(v: unknown) => updateValue(item as RenderableValueNode, v)"
 						>
 							<!-- Bars render top-level buttons only (no inline sub-tree), so a toggle
@@ -443,6 +447,7 @@ watchEffect(() => {
 				:app-components="appComponents"
 				:global-state="globalState"
 				:title-depth="getTitle(item) !== undefined ? (titleDepth ?? 0) + 1 : titleDepth"
+				:button-size="buttonSize"
 			/>
 		</template>
 	</div>

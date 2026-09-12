@@ -648,7 +648,7 @@ import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
-import { notifyCopied } from '~/composables/moderation.ts'
+import {notifyCopied, useModerationSettings} from '~/composables/moderation.ts'
 import { STALE_TIME, STALE_TIME_LONG, warmProjectCheckCaches } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { useServerInstallContent } from '~/composables/use-server-install-content'
@@ -2301,13 +2301,17 @@ const collapsedChecklist = useLocalStorage(`project-checklist-collapsed-${projec
 const showModerationChecklist = ref(false)
 const collapsedModerationChecklist = useLocalStorage('collapsed-moderation-checklist', false)
 
+const settings = useModerationSettings()
+
+const toggleExperimentalView = computed(() => settings.value.get(moderationSettings.Experimental.ExperimentalModerationView))
+
 const reviewLayoutActive = computed(
 	() =>
 		import.meta.client &&
 		!!auth.value.user &&
 		tags.value.staffRoles.includes(auth.value.user.role) &&
 		showModerationChecklist.value &&
-		flags.value.moderationReviewLayout,
+		toggleExperimentalView.value
 )
 
 function consumeShowChecklistHistoryState() {

@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-col gap-3">
-		<h2 class="text-lg font-semibold m-0">{{ formatMessage(messages.title) }}</h2>
+		<h2 v-if="!disableHeader" class="text-lg font-semibold m-0">{{ formatMessage(messages.title) }}</h2>
 		<div class="flex flex-col gap-3 font-semibold">
 			<template v-if="loading">
 				<div v-for="i in 2" :key="`creator-skeleton-${i}`" class="flex gap-2 items-center">
@@ -95,6 +95,7 @@ const props = defineProps<{
 	linkTarget?: string
 	userLinkTarget?: string | null
 	loading?: boolean
+	disableHeader: true
 }>()
 
 function resolveLinkTarget(target: string | null | undefined): string | null {
