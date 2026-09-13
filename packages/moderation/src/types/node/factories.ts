@@ -2,7 +2,7 @@ import { Checkbox, Combobox, Input, MarkdownEditor, Toggle } from '@modrinth/ui'
 import { markRaw } from 'vue'
 
 import { withAutoProps, withChildren } from './builder'
-import type { ComponentNodePropsContext, Configurable } from './capabilities'
+import type {ComponentNodePropsContext, Configurable, HasValueBase} from './capabilities'
 import {
 	withComponent,
 	withEditable,
@@ -29,6 +29,7 @@ import {
 import ActionButton from './components/ActionButton.vue'
 import { pipe } from './pipe'
 import type { NodeState, NodeStateWithChildren } from './state'
+import type { Component, ComponentPublicInstance } from "@vue/runtime-core";
 
 function getBooleanValue(raw: NodeState): boolean {
 	if (typeof raw === 'boolean') return raw
@@ -215,7 +216,7 @@ const dropdownValue = {
 	_getValue: getStringValue,
 	_setValue: setStringValue,
 	_isActive: (v: string) => v !== '',
-}
+} as HasValueBase<string>
 
 export function dropdown(id: string) {
 	return pipe(
@@ -339,7 +340,7 @@ const stringValueBehavior = {
 	_isActive: (v: string) => v !== '',
 }
 
-export function appComponent(id: string, rendererKey: string) {
+export function appComponent<T extends Component = { new (): ComponentPublicInstance; }>(id: string, component: T) {
 	const node = pipe(
 		{} as Record<string, never>,
 		(n) => withId(n, id),
@@ -353,18 +354,18 @@ export function appComponent(id: string, rendererKey: string) {
 		withFix,
 		withEnabled,
 		(n) => withValue(n, stringValueBehavior),
-		(n) => withComponent(n, { rendererKey }),
+		(n) => withComponent(n, { component: markRaw(component) }),
 		withExtraProps,
 	)
 	return Object.assign(node, {
-		valueKind(this: Configurable, kind: 'boolean' | 'string' | 'set') {
+		valueKind(this: typeof node, kind: 'boolean' | 'string' | 'set') {
 			Object.assign(
 				this,
 				kind === 'boolean' ? booleanValue : kind === 'set' ? setValue : stringValueBehavior,
 			)
 			return this
 		},
-		props(this: Configurable, fn: (ctx: ComponentNodePropsContext) => Record<string, unknown>) {
+		props(this: typeof node, fn: (ctx: ComponentNodePropsContext) => Partial<T>) {
 			this._extraProps = fn
 			return this
 		},

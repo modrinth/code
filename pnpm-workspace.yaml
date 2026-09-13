@@ -2,3 +2,5 @@ packages:
   - 'apps/*'
   - 'packages/*'
 minimumReleaseAge: 10080 # 7 days
+minimumReleaseAgeExclude:
+  - floating-vue

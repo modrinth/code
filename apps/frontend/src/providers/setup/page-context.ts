@@ -15,6 +15,7 @@ export function setupPageContextProvider() {
 			serverRamAsBytesAlwaysOn: computed(() => featureFlags.value.serverRamAsBytesAlwaysOn),
 		},
 		openExternalUrl: (url) => window.open(url, '_blank'),
+		topBarCollapsed: ref(false)
 	})
 	provideModalBehavior({
 		noblur: computed(() => !(cosmetics.value?.advancedRendering ?? true)),

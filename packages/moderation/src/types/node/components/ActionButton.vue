@@ -1,13 +1,4 @@
 <template>
-	<!-- A toggle with sub-options gets a hover menu instead of a plain tooltip, so a reason can
-	     be picked straight from the hover without first clicking the toggle itself active. It
-	     opens on hover but never auto-closes on mouse-leave (`hideTriggers`/`popperHideTriggers`
-	     left empty) — a sub-option can itself be a dropdown (e.g. Combobox) whose own listbox
-	     teleports elsewhere in the DOM, so moving the cursor towards it would otherwise register
-	     as "left the menu" mid-click and close it before a pick lands. Only an outside click
-	     (`autoHide`) or opening a *different* menu (forced below, `onMenuShow`) closes it.
-	     These are plain component props (not a custom theme) so their values are unambiguous —
-	     floating-vue's theme-level config resolution for these specific keys isn't reliable. -->
 	<Dropdown
 		v-if="$slots.menu"
 		ref="dropdownRef"

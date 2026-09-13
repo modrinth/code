@@ -1,0 +1,247 @@
+diff --git a/dist/floating-vue.mjs b/dist/floating-vue.mjs
+index dadfa0ae5b1244f60834caa566ac411cadfb257b..aa9c3024ed42fea11c96cf06f16e5414b81e792a 100644
+--- a/dist/floating-vue.mjs
++++ b/dist/floating-vue.mjs
+@@ -183,6 +183,27 @@ function defaultPropFactory(prop) {
+ 		return getDefaultConfig(props.theme, prop);
+ 	};
+ }
++/**
++* Resolve the `Window` that should own a popper's base DOM plumbing: the
++* global click/touch/resize listeners and the shared mousemove tracker.
++*
++* A popper's `container` can teleport it into another browsing context - a
++* `window.open()` popup, an Electron `BrowserWindow`, a Document
++* Picture-in-Picture window, etc. When that happens, the top-level
++* `window`/`document` this module was evaluated in is the *wrong* target:
++* input events firing in the other window never reach a listener bound to
++* this one. `boundary` is a second, weaker signal of the same kind.
++*
++* Priority: an explicit `container` element wins (it's where the popper
++* actually gets mounted), then an explicit `boundary` element, then any
++* already-known DOM node for the popper, finally the global `window`.
++*/
++function resolvePopperWindow(container, boundary, fallbackNode) {
++	return elementWindow(typeof container === "object" ? container : null) || elementWindow(typeof boundary === "object" ? boundary : null) || elementWindow(fallbackNode) || window;
++}
++function elementWindow(node) {
++	return node && node.ownerDocument && node.ownerDocument.defaultView || null;
++}
+ const PROVIDE_KEY = "__floating-vue__popper";
+ const createPopper = () => defineComponent({
+ 	name: "VPopper",
+@@ -460,11 +481,18 @@ const createPopper = () => defineComponent({
+ 			else this.init();
+ 		},
+ 		async container() {
++			this.$_refreshTargetWindow();
+ 			if (this.isShown) {
+ 				this.$_ensureTeleport();
+ 				await this.$_computePosition();
+ 			}
+ 		},
++		// `boundary` doesn't affect teleporting, but it's a signal for which
++		// window this popper belongs to just like `container` is.
++		boundary() {
++			this.$_refreshTargetWindow();
++			this.$_computePosition();
++		},
+ 		triggers: {
+ 			handler: "$_refreshListeners",
+ 			deep: true
+@@ -474,7 +502,6 @@ const createPopper = () => defineComponent({
+ 			"placement",
+ 			"distance",
+ 			"skidding",
+-			"boundary",
+ 			"strategy",
+ 			"overflowPadding",
+ 			"arrowPadding",
+@@ -515,7 +542,7 @@ const createPopper = () => defineComponent({
+ 				this.$_scheduleShow(event, skipDelay);
+ 				this.$emit("show");
+ 				this.$_showFrameLocked = true;
+-				requestAnimationFrame(() => {
++				(this.$_targetWindow || window).requestAnimationFrame(() => {
+ 					this.$_showFrameLocked = false;
+ 				});
+ 			}
+@@ -561,6 +588,7 @@ const createPopper = () => defineComponent({
+ 			this.$_arrowNode = this.$_popperNode.querySelector(".v-popper__arrow-container");
+ 			this.$_swapTargetAttrs("title", "data-original-title");
+ 			this.$_detachPopperNode();
++			this.$_refreshTargetWindow();
+ 			if (this.triggers.length) this.$_addEventListeners();
+ 			if (this.shown) this.show();
+ 		},
+@@ -733,10 +761,10 @@ const createPopper = () => defineComponent({
+ 				}
+ 			}
+ 			shownPoppers.push(this);
+-			document.body.classList.add("v-popper--some-open");
++			(this.$_targetWindow || window).document.body.classList.add("v-popper--some-open");
+ 			for (const theme of getAllParentThemes(this.theme)) {
+ 				getShownPoppersByTheme(theme).push(this);
+-				document.body.classList.add(`v-popper--some-open--${theme}`);
++				(this.$_targetWindow || window).document.body.classList.add(`v-popper--some-open--${theme}`);
+ 			}
+ 			this.$emit("apply-show");
+ 			this.classes.showFrom = true;
+@@ -758,11 +786,16 @@ const createPopper = () => defineComponent({
+ 			if (!this.isShown) return;
+ 			this.skipTransition = skipTransition;
+ 			removeFromArray(shownPoppers, this);
+-			if (shownPoppers.length === 0) document.body.classList.remove("v-popper--some-open");
++			// `shownPoppers`/theme lists are shared across every window's
++			// poppers, so "empty" alone isn't enough to clear this window's
++			// classes - another window's popper may still be shown.
++			const targetWin = this.$_targetWindow || window;
++			const sameWindow = (popper) => (popper.$_targetWindow || window) === targetWin;
++			if (!shownPoppers.some(sameWindow)) targetWin.document.body.classList.remove("v-popper--some-open");
+ 			for (const theme of getAllParentThemes(this.theme)) {
+ 				const list = getShownPoppersByTheme(theme);
+ 				removeFromArray(list, this);
+-				if (list.length === 0) document.body.classList.remove(`v-popper--some-open--${theme}`);
++				if (!list.some(sameWindow)) targetWin.document.body.classList.remove(`v-popper--some-open--${theme}`);
+ 			}
+ 			if (hidingPopper === this) hidingPopper = null;
+ 			this.isShown = false;
+@@ -792,10 +825,20 @@ const createPopper = () => defineComponent({
+ 			if (this.shown) this.show();
+ 			else this.hide();
+ 		},
++		$_refreshTargetWindow() {
++			if (this.isDisposed) return;
++			this.$_targetWindow = resolvePopperWindow(this.container, this.boundary, this.$_referenceNode || this.$_targetNodes[0] || this.$el);
++			ensureBaseListeners(this.$_targetWindow);
++			ensureMouseTracking(this.$_targetWindow);
++		},
+ 		$_ensureTeleport() {
+ 			if (this.isDisposed) return;
+ 			let container = this.container;
+-			if (typeof container === "string") container = window.document.querySelector(container);
++			if (typeof container === "string")
++			// resolved against this popper's own window (e.g. set via
++			// `boundary` pointing into a Document Picture-in-Picture window)
++			// rather than always the global `window`
++			container = (this.$_targetWindow || window).document.querySelector(container);
+ 			else if (container === false) container = this.$_targetNodes[0].parentNode;
+ 			if (!container) throw new Error(`No container for popover: ${this.container}`);
+ 			container.appendChild(this.$_popperNode);
+@@ -890,15 +933,22 @@ const createPopper = () => defineComponent({
+ 			}
+ 		},
+ 		$_isAimingPopper() {
++			// The reference node's own window is the one whose mouse position
++			// is relevant, regardless of which window this module happens to
++			// run in.
++			const referenceWindow = this.$_referenceNode && this.$_referenceNode.ownerDocument && this.$_referenceNode.ownerDocument.defaultView;
++			const win = referenceWindow || this.$_targetWindow || window;
++			const position = mousePositions.get(win);
++			if (!position) return false;
+ 			const referenceBounds = this.$_referenceNode.getBoundingClientRect();
+-			if (mouseX >= referenceBounds.left && mouseX <= referenceBounds.right && mouseY >= referenceBounds.top && mouseY <= referenceBounds.bottom) {
++			if (position.x >= referenceBounds.left && position.x <= referenceBounds.right && position.y >= referenceBounds.top && position.y <= referenceBounds.bottom) {
+ 				const popperBounds = this.$_popperNode.getBoundingClientRect();
+-				const vectorX = mouseX - mousePreviousX;
+-				const vectorY = mouseY - mousePreviousY;
+-				const newVectorLength = popperBounds.left + popperBounds.width / 2 - mousePreviousX + (popperBounds.top + popperBounds.height / 2) - mousePreviousY + popperBounds.width + popperBounds.height;
+-				const edgeX = mousePreviousX + vectorX * newVectorLength;
+-				const edgeY = mousePreviousY + vectorY * newVectorLength;
+-				return lineIntersectsLine(mousePreviousX, mousePreviousY, edgeX, edgeY, popperBounds.left, popperBounds.top, popperBounds.left, popperBounds.bottom) || lineIntersectsLine(mousePreviousX, mousePreviousY, edgeX, edgeY, popperBounds.left, popperBounds.top, popperBounds.right, popperBounds.top) || lineIntersectsLine(mousePreviousX, mousePreviousY, edgeX, edgeY, popperBounds.right, popperBounds.top, popperBounds.right, popperBounds.bottom) || lineIntersectsLine(mousePreviousX, mousePreviousY, edgeX, edgeY, popperBounds.left, popperBounds.bottom, popperBounds.right, popperBounds.bottom);
++				const vectorX = position.x - position.previousX;
++				const vectorY = position.y - position.previousY;
++				const newVectorLength = popperBounds.left + popperBounds.width / 2 - position.previousX + (popperBounds.top + popperBounds.height / 2) - position.previousY + popperBounds.width + popperBounds.height;
++				const edgeX = position.previousX + vectorX * newVectorLength;
++				const edgeY = position.previousY + vectorY * newVectorLength;
++				return lineIntersectsLine(position.previousX, position.previousY, edgeX, edgeY, popperBounds.left, popperBounds.top, popperBounds.left, popperBounds.bottom) || lineIntersectsLine(position.previousX, position.previousY, edgeX, edgeY, popperBounds.left, popperBounds.top, popperBounds.right, popperBounds.top) || lineIntersectsLine(position.previousX, position.previousY, edgeX, edgeY, popperBounds.right, popperBounds.top, popperBounds.right, popperBounds.bottom) || lineIntersectsLine(position.previousX, position.previousY, edgeX, edgeY, popperBounds.left, popperBounds.bottom, popperBounds.right, popperBounds.bottom);
+ 			}
+ 			return false;
+ 		}
+@@ -907,20 +957,30 @@ const createPopper = () => defineComponent({
+ 		return this.$slots.default(this.slotData);
+ 	}
+ });
+-if (typeof document !== "undefined" && typeof window !== "undefined") {
++// Base click/touch/resize listeners are bound per-window rather than only
++// to the window this module happens to execute in: a popper's `container`
++// or `boundary` can point into another browsing context (a `window.open()`
++// popup, an Electron `BrowserWindow`, a Document Picture-in-Picture window),
++// and input events there never reach a listener bound to the wrong window.
++const windowsWithBaseListeners = /* @__PURE__ */ new WeakSet();
++function ensureBaseListeners(win) {
++	if (typeof win === "undefined" || windowsWithBaseListeners.has(win)) return;
++	windowsWithBaseListeners.add(win);
++	const doc = win.document;
+ 	if (isIOS) {
+ 		const options = supportsPassive ? {
+ 			passive: true,
+ 			capture: true
+ 		} : true;
+-		document.addEventListener("touchstart", (event) => handleGlobalPointerDown(event, true), options);
+-		document.addEventListener("touchend", (event) => handleGlobalPointerUp(event, true), options);
++		doc.addEventListener("touchstart", (event) => handleGlobalPointerDown(event, true), options);
++		doc.addEventListener("touchend", (event) => handleGlobalPointerUp(event, true), options);
+ 	} else {
+-		window.addEventListener("mousedown", (event) => handleGlobalPointerDown(event, false), true);
+-		window.addEventListener("click", (event) => handleGlobalPointerUp(event, false), true);
++		win.addEventListener("mousedown", (event) => handleGlobalPointerDown(event, false), true);
++		win.addEventListener("click", (event) => handleGlobalPointerUp(event, false), true);
+ 	}
+-	window.addEventListener("resize", recomputeAllPoppers);
++	win.addEventListener("resize", recomputeAllPoppers);
+ }
++if (typeof document !== "undefined" && typeof window !== "undefined") ensureBaseListeners(window);
+ function handleGlobalPointerDown(event, touch) {
+ 	if (config.autoHideOnMousedown) handleGlobalClose(event, touch);
+ 	else for (let i = 0; i < shownPoppers.length; i++) {
+@@ -944,7 +1004,7 @@ function handleGlobalClose(event, touch) {
+ 			});
+ 			const contains = popper.containsGlobalTarget = popper.mouseDownContains || popper.popperNode().contains(event.target) || childrenContains;
+ 			popper.pendingHide = false;
+-			requestAnimationFrame(() => {
++			(popper.$_targetWindow || window).requestAnimationFrame(() => {
+ 				popper.pendingHide = false;
+ 				if (preventClose[popper.randomId]) return;
+ 				if (shouldAutoHide(popper, contains, event)) {
+@@ -985,16 +1045,30 @@ function recomputeAllPoppers() {
+ function hideAllPoppers() {
+ 	for (let i = 0; i < shownPoppers.length; i++) shownPoppers[i].hide();
+ }
+-let mousePreviousX = 0;
+-let mousePreviousY = 0;
+-let mouseX = 0;
+-let mouseY = 0;
+-if (typeof window !== "undefined") window.addEventListener("mousemove", (event) => {
+-	mousePreviousX = mouseX;
+-	mousePreviousY = mouseY;
+-	mouseX = event.clientX;
+-	mouseY = event.clientY;
+-}, supportsPassive ? { passive: true } : void 0);
++// Keyed by window: a popper's reference/popper nodes can live in another
++// browsing context (see `resolvePopperWindow`), and `clientX`/`clientY` are
++// only meaningful relative to the window that reported them, so tracking
++// must be per-window rather than a single shared position.
++const mousePositions = /* @__PURE__ */ new Map();
++const windowsWithMouseTracking = /* @__PURE__ */ new WeakSet();
++function ensureMouseTracking(win) {
++	if (typeof win === "undefined" || windowsWithMouseTracking.has(win)) return;
++	windowsWithMouseTracking.add(win);
++	const position = {
++		previousX: 0,
++		previousY: 0,
++		x: 0,
++		y: 0
++	};
++	mousePositions.set(win, position);
++	win.addEventListener("mousemove", (event) => {
++		position.previousX = position.x;
++		position.previousY = position.y;
++		position.x = event.clientX;
++		position.y = event.clientY;
++	}, supportsPassive ? { passive: true } : void 0);
++}
++if (typeof window !== "undefined") ensureMouseTracking(window);
+ function lineIntersectsLine(x1, y1, x2, y2, x3, y3, x4, y4) {
+ 	const uA = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
+ 	const uB = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));

@@ -3,8 +3,8 @@
 		class="flex shrink-0 flex-col overflow-hidden border-0 border-l border-solid border-divider bg-surface-1 text-sm"
 	>
 		<!-- Project-wide (no on-screen element) checks -->
-		<div v-if="globalStages.length > 0" class="flex shrink-0 flex-col gap-2 p-2">
-			<section class="rounded-lg border border-solid border-divider bg-surface-2">
+		<div v-if="globalStages.length > 0" class="flex shrink-0 flex-col gap-2">
+			<section class="">
 				<h2
 					class="m-0 px-2.5 pt-1.5 text-[0.7rem] font-semibold uppercase tracking-wide text-secondary"
 				>

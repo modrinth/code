@@ -2,6 +2,10 @@ import { ModrinthApiError } from '@modrinth/api-client'
 import { injectModrinthClient } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { type MaybeRefOrGetter, onScopeDispose, ref, toValue, watch } from 'vue'
+import { generateUrlSlug, generateProjectSlugSuggestions } from '@modrinth/utils/projects'
+
+/** @deprecated Use {@link @modrinth/utils/projects.generateUrlSlug} */
+export { generateUrlSlug }
 
 const STALE_TIME = 1000 * 60 * 5
 const CHECK_DEBOUNCE = 300
@@ -13,40 +17,6 @@ interface ProjectSlugSuggestionOptions {
 	username?: MaybeRefOrGetter<string | null | undefined>
 	currentProjectId?: MaybeRefOrGetter<string | null | undefined>
 	enabled?: MaybeRefOrGetter<boolean>
-}
-
-export function generateUrlSlug(value: string) {
-	return value
-		.trim()
-		.toLowerCase()
-		.replaceAll(' ', '-')
-		.replaceAll(PROJECT_SLUG_UNSAFE_CHARS, '')
-		.replaceAll(/--+/gm, '-')
-}
-
-function isValidProjectSlug(value: string) {
-	return PROJECT_SLUG_REGEX.test(value)
-}
-
-function generateProjectSlugSuggestions(title: string, username?: string | null) {
-	const titleSlug = generateUrlSlug(title)
-	const titleWords = title
-		.trim()
-		.split(/\s+/)
-		.map((word) => generateUrlSlug(word))
-		.filter(Boolean)
-	const acronym = titleWords.length > 1 ? titleWords.map((word) => word[0]).join('') : ''
-	const withoutDashes = titleSlug.replaceAll('-', '')
-	const usernameSlug = username ? generateUrlSlug(username) : ''
-	let withUsername = ''
-
-	if (titleSlug && usernameSlug) {
-		const availableTitleLength = 64 - usernameSlug.length - 1
-		const truncatedTitle = titleSlug.slice(0, availableTitleLength).replace(/-+$/, '')
-		if (truncatedTitle) withUsername = `${truncatedTitle}-${usernameSlug}`
-	}
-
-	return [...new Set([titleSlug, acronym, withoutDashes, withUsername])].filter(isValidProjectSlug)
 }
 
 export function useSlugSuggestionVisibility() {

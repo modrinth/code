@@ -15,6 +15,7 @@ import {
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
+import { generateUrlSlug } from '@modrinth/utils/projects'
 
 import { check, fix, group, md, stage, text, toggle } from '../../types/node'
 
@@ -22,17 +23,6 @@ const STALE_TIME = 1000 * 60 * 5
 
 type AutoSlugStatus = 'loading' | 'available' | 'unavailable'
 type SlugValidation = 'checking' | 'available' | 'unchanged' | 'taken' | 'empty' | 'invalid' | null
-
-//TODO: make this not a copy of frontend/src/utils/slugs.generateUrlSlug
-// (as in move the other one so we can use it here)
-function generateUrlSlug(value: string) {
-	return value
-		.trim()
-		.toLowerCase()
-		.replaceAll(' ', '-')
-		.replaceAll(/[^a-zA-Z0-9._-]/g, '')
-		.replaceAll(/--+/gm, '-')
-}
 
 function hasCustomSlug(project: Labrinth.Projects.v3.Project) {
 	return generateUrlSlug(project.name) !== project.slug
@@ -213,11 +203,11 @@ export default function () {
 			group('title')
 				.title('Title Issues?')
 				.children(
-					toggle('useless-info', 'Contains Useless Info').suggestedStatus('flagged').message(),
+					toggle('useless-info', 'Useless Info').suggestedStatus('flagged').message(),
 
-					toggle('minecraft-branding', 'Minecraft Title').suggestedStatus('flagged').message(),
+					toggle('minecraft-branding', 'Minecraft').suggestedStatus('flagged').message(),
 
-					toggle('similarities', 'Title Similarities')
+					toggle('similarities', 'Similarities')
 						.suggestedStatus('flagged')
 						.message()
 						.children(
@@ -241,7 +231,7 @@ export default function () {
 				.shown(computed(() => hasCustomSlug(project.value)))
 				.children(
 					group().children(
-						toggle('misused', 'Misused')
+						toggle('misused', 'Misused Slug')
 							.children(
 								group()
 									.title('Correct Slug')

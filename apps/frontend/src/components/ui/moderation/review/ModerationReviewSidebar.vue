@@ -34,28 +34,36 @@
 
 		<!-- Expanded -->
 		<template v-else>
+			<div class="flex border-0 border-solid border-divider border-b">
+				<button
+					v-tooltip="'Expand sidebar'"
+					class="flex ml-auto h-6 w-6 items-center justify-center text-secondary hover:bg-button-bg hover:text-contrast"
+					aria-label="Expand sidebar"
+					@click="layout.toggleSidebar()"
+				>
+					<ChevronLeftIcon class="size-5" />
+				</button>
+			</div>
 			<div class="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-2">
 				<ChecklistStageButtons stage-id="title-slug">
-					<div class="grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1.5">
-						<span class="text-xs font-semibold uppercase tracking-wide text-secondary">Title</span>
-						<span class="min-w-0 text-primary">{{ project.title || project.name || '—' }}</span>
+					<div class="flex flex-col  gap-x-3 gap-y-1.5">
+						<h1 class="min-w-0 p-0 m-0 max-w-full text-2xl font-semibold leading-none text-contrast">{{ projectV3.name || '—' }}</h1>
 
-						<span class="text-xs font-semibold uppercase tracking-wide text-secondary">Slug</span>
-						<code class="min-w-0 break-all text-primary">{{ project.slug || '—' }}</code>
+						<pre v-if="hasCustomSlug" class="min-w-0 p-1 m-0 max-w-full text-xl  break-all text-primary" style="border-radius: 0.5em !important">{{ projectV3.slug || '—' }}</pre>
 					</div>
 				</ChecklistStageButtons>
 				<div class="my-1 h-[2px] w-full flex-shrink-0 bg-divider" />
 				<dl class="m-0 grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
-					<dt class="items-center justify-center flex">
+					<dt class="flex items-center justify-center">
 						<Avatar
-							:src="project.icon_url"
-							:raw-src="project.raw_icon_url"
-							:tint-by="project.id"
+							:src="projectV3.icon_url"
+							:raw-src="projectV3.raw_icon_url"
+							:tint-by="projectV3.id"
 							size="105px"
 						/>
 					</dt>
-					<dd class="m-0 text-contrast h-full ">
-						<div class="flex flex-col h-full justify-evenly">
+					<dd class="m-0 h-full text-contrast">
+						<div class="flex h-full flex-col justify-evenly">
 							<div class="flex flex-col">
 								<span class="text-secondary">Applying for:</span>
 								<ProjectStatusBadge :status="requestedStatus" />
@@ -68,31 +76,41 @@
 						</div>
 					</dd>
 
-					<template v-if="project.approved">
-						<dt class="text-secondary">
-							<CalendarIcon aria-hidden="true" /> Published
-						</dt>
-						<dd class="m-0 text-contrast" v-tooltip="formatDateTime(project.approved)">{{ publishedRelative }}</dd>
+					<template v-if="projectV3.approved">
+						<dt class="text-secondary"><CalendarIcon aria-hidden="true" /> Published</dt>
+						<dd v-tooltip="formatDateTime(projectV3.approved)" class="m-0 text-contrast">
+							{{ publishedRelative }}
+						</dd>
 					</template>
 					<template v-else>
-						<dt class="text-secondary">
-							<CalendarIcon aria-hidden="true" /> Created
-						</dt>
-						<dd class="m-0 text-contrast" v-tooltip="props.project.published ? formatDateTime(props.project.published) : 'unknown'">{{ createdRelative }}</dd>
+						<dt class="text-secondary"><CalendarIcon aria-hidden="true" /> Created</dt>
+						<dd
+							v-tooltip="
+								projectV3.published ? formatDateTime(projectV3.published) : 'unknown'
+							"
+							class="m-0 text-contrast"
+						>
+							{{ createdRelative }}
+						</dd>
 					</template>
 
-					<dt class="text-secondary">
-						<ScaleIcon aria-hidden="true" /> Submitted
-					</dt>
-					<dd class="m-0 text-contrast" v-tooltip="formatDateTime(project.queued ?? project.published)">{{ submittedRelative }}</dd>
+					<dt class="text-secondary"><ScaleIcon aria-hidden="true" /> Submitted</dt>
+					<dd
+						v-tooltip="formatDateTime(projectV3.queued ?? projectV3.published)"
+						class="m-0 text-contrast"
+					>
+						{{ submittedRelative }}
+					</dd>
 
-					<template v-if="project.versions.length > 0 && project.updated">
-						<dt class="text-secondary">
-							<VersionIcon aria-hidden="true" /> Updated
-						</dt>
-						<dd class="m-0 text-contrast" v-tooltip="project.updated ? formatDateTime(project.updated) : 'unknown'">{{ updatedRelative }}</dd>
+					<template v-if="projectV3.versions.length > 0 && projectV3.updated">
+						<dt class="text-secondary"><VersionIcon aria-hidden="true" /> Updated</dt>
+						<dd
+							v-tooltip="projectV3.updated ? formatDateTime(projectV3.updated) : 'unknown'"
+							class="m-0 text-contrast"
+						>
+							{{ updatedRelative }}
+						</dd>
 					</template>
-
 				</dl>
 				<div class="my-1 h-[2px] w-full flex-shrink-0 bg-divider" />
 				<ProjectSidebarCreators
@@ -125,14 +143,14 @@
 				<div class="my-1 h-[2px] w-full flex-shrink-0 bg-divider" />
 
 				<ChecklistStageButtons stage-id="tags" variant="inline">
-					<ProjectSidebarTags :project="project" :disable-header="true" class="flex-card-reduced" />
+					<ProjectSidebarTags :project="projectV3" :disable-header="true" class="flex-card-reduced" />
 				</ChecklistStageButtons>
 
 				<div class="my-1 h-[2px] w-full flex-shrink-0 bg-divider" />
 
 				<ChecklistStageButtons stage-id="metadata" variant="inline">
 					<ProjectSidebarCompatibility
-						:project="project"
+						:project="projectV2"
 						:tags="tags"
 						:project-v3="projectV3"
 						:compact-mode="true"
@@ -143,7 +161,7 @@
 
 				<ChecklistStageButtons stage-id="license" variant="inline" />
 				<ProjectSidebarDetails
-					:project="project"
+					:project="projectV2"
 					link-target="_blank"
 					:hide-license="isServerProject"
 					:show-followers="isServerProject"
@@ -158,37 +176,34 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import {CalendarIcon, ChevronRightIcon, ScaleIcon, VersionIcon} from '@modrinth/assets'
+import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon, ScaleIcon, VersionIcon } from '@modrinth/assets'
 import {
-	Avatar, commonMessages, ProjectSidebarCompatibility,
+	Avatar,
+	ProjectSidebarCompatibility,
 	ProjectSidebarCreators,
 	ProjectSidebarDetails,
 	ProjectSidebarServerInfo,
 	ProjectSidebarTags,
-	ProjectStatusBadge, useFormatDateTime,
-	useRelativeTime, useVIntl,
+	ProjectStatusBadge,
+	useFormatDateTime,
+	useRelativeTime,
 } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { useModerationQueue } from '~/services/moderation/queue.ts'
 import { REVIEW_TAB_ORDER, useModerationReviewLayout } from '~/services/moderation/review-layout'
 
 import ChecklistStageButtons from './ChecklistStageButtons.vue'
 import { reviewTab, selectableReviewTabs } from './review-tabs'
-import {capitalizeString} from "@modrinth/utils";
-
-const { formatMessage, locale } = useVIntl()
+import {generateUrlSlug} from "@modrinth/utils";
 
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
 	dateStyle: 'long',
 })
 
-type LooseProject = Labrinth.Projects.v2.Project & Record<string, unknown>
-
 const props = withDefaults(
 	defineProps<{
-		project: LooseProject
+		projectV2: Labrinth.Projects.v2.Project
 		projectV3: Labrinth.Projects.v3.Project
 		organization?: Record<string, unknown> | null
 		members?: unknown[]
@@ -229,22 +244,24 @@ const railTabs = computed(() =>
 )
 
 const submittedRelative = computed(() => {
-	const date = (props.project.queued ?? props.project.published) as string | undefined
+	const date = (props.projectV3.queued ?? props.projectV3.published) as string | undefined
 	return date ? formatRelativeTime(date) : 'unknown'
 })
 const createdRelative = computed(() =>
-	props.project.published ? formatRelativeTime(props.project.published as string) : 'unknown',
+	props.projectV3.published ? formatRelativeTime(props.projectV3.published as string) : 'unknown',
 )
 const publishedRelative = computed(() =>
-	props.project.approved ? formatRelativeTime(props.project.approved) : 'unknown',
+	props.projectV3.approved ? formatRelativeTime(props.projectV3.approved) : 'unknown',
 )
 const updatedRelative = computed(() =>
-	props.project.updated ? formatRelativeTime(props.project.updated as string) : 'unknown',
+	props.projectV3.updated ? formatRelativeTime(props.projectV3.updated as string) : 'unknown',
 )
 
-const requestedStatus = computed(() => props.project.requested_status ?? 'unknown')
+const requestedStatus = computed(() => props.projectV3.requested_status ?? 'unknown')
 
-const currentStatus = computed(() => props.project.status ?? 'unknown')
+const currentStatus = computed(() => props.projectV3.status ?? 'unknown')
+
+const hasCustomSlug = computed(() => generateUrlSlug(props.projectV3.name) !== props.projectV3.slug)
 </script>
 
 <style scoped>

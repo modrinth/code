@@ -9,10 +9,12 @@
 				:current-member="currentMember ?? undefined"
 				:auth="auth"
 				hide-actions
-				@update-thread="(thread: Labrinth.Threads.v3.Thread | null | undefined) => {
-					updateThread(thread)
-					invalidate()
-				}"
+				@update-thread="
+					(thread: Labrinth.Threads.v3.Thread | null | undefined) => {
+						updateThread(thread)
+						invalidate()
+					}
+				"
 			/>
 			<div v-else class="flex items-center gap-2 py-6 text-secondary">
 				<SpinnerIcon class="size-4 animate-spin" /> Loading thread…
@@ -128,9 +130,7 @@
 						<button
 							v-for="node in grp.nodes"
 							:key="node.key"
-							v-tooltip="
-								node.tooltip ?? (node.active ? 'Active — click to clear' : 'Click to flag')
-							"
+							v-tooltip="chipTooltip(node)"
 							class="rounded-full border border-solid px-2 py-0.5 text-xs transition-colors"
 							:class="
 								node.active
@@ -211,7 +211,7 @@
 					<template v-else>
 						<div
 							v-if="lockBanner"
-							class="flex items-center w-full gap-2 rounded-md bg-bg px-2 py-1.5 text-xs text-orange"
+							class="flex w-full items-center gap-2 rounded-md bg-bg px-2 py-1.5 text-xs text-orange"
 						>
 							<LockIcon class="size-3.5 shrink-0" />
 							{{ lockBanner }}
@@ -224,7 +224,7 @@
 								@click="engine.requestTakeOver"
 							>
 								<LockOpenIcon />
-								{{engine.alreadyReviewed.value ? 'Review Anyways' : 'Take over'}}
+								{{ engine.alreadyReviewed.value ? 'Review Anyways' : 'Take over' }}
 							</Button>
 						</div>
 						<template v-else>
@@ -237,7 +237,9 @@
 								@click="handleDecision('rejected')"
 							>
 								<SpinnerIcon
-									v-if="engine.moderationDecision.value === 'rejected' || engine.loadingMessage.value"
+									v-if="
+										engine.moderationDecision.value === 'rejected' || engine.loadingMessage.value
+									"
 									class="animate-spin"
 								/>
 								<XIcon v-else />
@@ -252,29 +254,39 @@
 								@click="handleDecision('withheld')"
 							>
 								<SpinnerIcon
-									v-if="engine.moderationDecision.value === 'withheld' || engine.loadingMessage.value"
+									v-if="
+										engine.moderationDecision.value === 'withheld' || engine.loadingMessage.value
+									"
 									class="animate-spin"
 								/>
 								<EyeOffIcon v-else />
 								Withhold
 							</Button>
 							<Button
+								v-tooltip="
+									isPostApprovalReview
+										? 'Already approved — this posts the message as a thread reply instead of re-approving'
+										: undefined
+								"
 								type="colored"
-								color="green"
+								:color="isPostApprovalReview ? 'blue' : 'green'"
 								size="sm"
 								class="flex-1"
-								:disabled="engine.loadingModerationDecision.value || engine.loadingMessage.value"
-								@click="handleDecision(engine.approveSendStatus.value)"
+								:disabled="
+									engine.loadingModerationDecision.value || engine.loadingMessage.value || sending
+								"
+								@click="handleApproveOrWarn"
 							>
 								<SpinnerIcon
 									v-if="
-									engine.moderationDecision.value === engine.approveSendStatus.value ||
-									engine.loadingMessage.value
-								"
+										sending ||
+										engine.moderationDecision.value === engine.approveSendStatus.value ||
+										engine.loadingMessage.value
+									"
 									class="animate-spin"
 								/>
-								<CheckIcon v-else />
-								Approve
+								<component :is="isPostApprovalReview ? ReplyIcon : CheckIcon" v-else />
+								{{ isPostApprovalReview ? 'Send warning' : 'Approve' }}
 							</Button>
 						</template>
 					</template>
@@ -285,11 +297,14 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	CheckIcon,
 	ChevronDownIcon,
 	ChevronUpIcon,
 	EyeOffIcon,
+	LockIcon,
+	LockOpenIcon,
 	RedoIcon,
 	ReplyIcon,
 	RightArrowIcon,
@@ -299,19 +314,29 @@ import {
 	TrashIcon,
 	UndoIcon,
 	XIcon,
-	LockIcon,
-	LockOpenIcon,
 } from '@modrinth/assets'
+import { expandVariables } from '@modrinth/moderation'
+import {
+	collectMessageNodes,
+	evalActiveAction,
+	resolveChildren,
+} from '@modrinth/moderation/src/types/node'
 import { Button, injectProjectPageContext, MarkdownEditor, Textarea } from '@modrinth/ui'
-import { computed, nextTick, ref, watch } from 'vue'
+import { renderHighlightedString } from '@modrinth/utils'
+import { useQueryClient } from '@tanstack/vue-query'
+import { computed, nextTick, ref, watch, watchEffect } from 'vue'
 
 import { injectModerationChecklist } from '~/components/ui/moderation/checklist/checklist-context'
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
-import type {Labrinth} from "@modrinth/api-client";
-import {useQueryClient} from "@tanstack/vue-query";
 
 const engine = injectModerationChecklist()
-const { projectV3: project, projectV2, thread, currentMember, invalidate } = injectProjectPageContext()
+const {
+	projectV3: project,
+	projectV2,
+	thread,
+	currentMember,
+	invalidate,
+} = injectProjectPageContext()
 const auth = await useAuth()
 
 const MODES = [
@@ -357,6 +382,45 @@ const flaggedGroups = computed(() => {
 })
 
 /**
+ * The message each touched issue would actually contribute — including any sub-inputs typed
+ * into it (a reupload's "original project"/"original author" fields, say) — keyed by the same
+ * `statePath.join('/')` string `flaggedGroups` uses. Mirrors `ChecklistStageButtons.vue`'s
+ * per-stage tooltip computation, just across every stage that has a touched issue instead of one.
+ */
+const messagePreviewMap = ref(new Map<string, string>())
+
+watchEffect(async () => {
+	const stageIds = new Set(flaggedGroups.value.map((g) => g.stageId))
+	const newMap = new Map<string, string>()
+	await Promise.all(
+		[...stageIds].map(async (stageId) => {
+			const stage = engine.resolvedStages.value.find((s) => s.id === stageId)
+			if (!stage) return
+			const stageState = engine.nodeStates.value[stageId] ?? {}
+			const nodes = resolveChildren(stage, stageState)
+			const actions = collectMessageNodes(nodes, stageState, [stageId])
+			await Promise.all(
+				actions.map(async (entry) => {
+					try {
+						const raw = await evalActiveAction(entry, actions, new Set())
+						const expanded = expandVariables(raw, projectV2.value, project.value).trim()
+						if (expanded) {
+							newMap.set(
+								entry.statePath.join('/'),
+								`<div class="markdown-body moderation-tooltip-markdown">${renderHighlightedString(expanded)}</div>`,
+							)
+						}
+					} catch {
+						// Leave unset — falls back to the static tooltip / generic label below.
+					}
+				}),
+			)
+		}),
+	)
+	messagePreviewMap.value = newMap
+})
+
+/**
  * What's actually rendered: while hovering, every touched stage/issue shows (active or not) so
  * they can be picked back up. Once the cursor leaves, anything not active drops out — inactive
  * entries disappear, and a section left with nothing active in it disappears entirely.
@@ -373,6 +437,12 @@ const hasStaleIssues = computed(() =>
 	flaggedGroups.value.some((grp) => grp.nodes.some((n) => !n.active)),
 )
 
+function chipTooltip(node: { key: string; active: boolean; tooltip?: string }) {
+	const preview = messagePreviewMap.value.get(node.key)
+	if (preview) return { content: preview, html: true }
+	return node.tooltip ?? (node.active ? 'Active — click to clear' : 'Click to flag')
+}
+
 function goToStage(stageId: string) {
 	engine.setStage(stageId)
 	engine.focusStage(engine.resolvedStages.value.find((s) => s.id === stageId))
@@ -383,6 +453,24 @@ function goToStage(stageId: string) {
 async function handleDecision(status: Parameters<typeof engine.sendMessage>[0]) {
 	if (!engine.generatedMessage.value) await engine.generateMessage()
 	await engine.sendMessage(status)
+}
+
+/** Matches `post-approval.tsx`'s own visibility condition — that stage's toggles ("Issue
+ *  warning", "Missed due date", etc.) are for a project that's *already* approved, so "Approve"
+ *  there would just try to re-approve it (a meaningless, possibly erroring status change). */
+const isPostApprovalReview = computed(() => project.value?.status === 'approved')
+
+async function handleApproveOrWarn() {
+	if (!isPostApprovalReview.value) {
+		await handleDecision(engine.approveSendStatus.value)
+		return
+	}
+	if (!engine.generatedMessage.value) await engine.generateMessage()
+	if (!engine.message.value?.trim()) return
+	sending.value = true
+	const ok = await engine.postThreadReply(engine.message.value)
+	sending.value = false
+	if (ok) engine.message.value = null
 }
 
 const text = computed({
@@ -456,5 +544,4 @@ function updateThread(newThread: Labrinth.Threads.v3.Thread | null | undefined) 
 		newThread,
 	)
 }
-
 </script>

@@ -22,38 +22,40 @@
 				:title-depth="3"
 				button-size="xs"
 			>
-				<button
-					v-if="!hideHeading"
-					ref="anchorEl"
-					v-tooltip="stage?._hint"
-					class="flex min-w-0 items-center gap-1 rounded px-1 text-left text-[0.7rem] font-semibold uppercase tracking-wide text-secondary hover:text-contrast"
-					@click="openStage"
-					@pointerenter="onEnter"
-					@pointerleave="onLeave"
-				>
-					<component :is="stage?._icon" v-if="stage?._icon" class="size-3.5 shrink-0 text-orange" />
-					<span class="truncate">{{ heading }}</span>
-				</button>
-				<button
-					v-tooltip="
-						hideHeading && stage?._hint
-							? stage._hint
-							: panelOpen
-								? 'Hide checklist details'
-								: 'Show checklist details'
-					"
-					class="shrink-0 rounded p-0.5 hover:bg-button-bg"
-					:class="panelOpen ? 'text-brand' : 'text-secondary hover:text-contrast'"
-					:aria-label="`${heading} checklist details`"
-					@click="() => {}"
-					@pointerenter="onEnter"
-					@pointerleave="onLeave"
-				>
-					<ChevronDownIcon
-						class="size-3.5 transition-transform"
-						:class="{ 'rotate-180': panelOpen }"
-					/>
-				</button>
+				<!-- Always present (even when the label is hidden) so `ChecklistDetailsPanel` always
+				     has a real anchor to derive its window/document from — it may be teleported into
+				     the review's Picture-in-Picture window. -->
+				<span ref="anchorEl" class="flex flex-wrap">
+					<button
+						v-if="!hideHeading"
+						v-tooltip="stageHintTooltip"
+						class="flex min-w-0 items-center gap-1 rounded px-1 text-left text-[0.7rem] font-semibold uppercase tracking-wide text-secondary hover:text-contrast"
+						@click="openStage"
+						@pointerenter="onEnter"
+						@pointerleave="onLeave"
+					>
+						<component
+							:is="stage?._icon"
+							v-if="stage?._icon"
+							class="size-3.5 shrink-0 text-orange"
+						/>
+						<span class="truncate">{{ heading }}</span>
+					</button>
+					<button
+						v-tooltip="chevronTooltip"
+						class="shrink-0 rounded p-0.5 hover:bg-button-bg"
+						:class="panelOpen ? 'text-brand' : 'text-secondary hover:text-contrast'"
+						:aria-label="`${heading} checklist details`"
+						@click="() => {}"
+						@pointerenter="onEnter"
+						@pointerleave="onLeave"
+					>
+						<ChevronDownIcon
+							class="size-3.5 transition-transform"
+							:class="{ 'rotate-180': panelOpen }"
+						/>
+					</button>
+				</span>
 			</NodeRenderer>
 		</div>
 
@@ -98,9 +100,9 @@ import {
 	resolveChildren,
 } from '@modrinth/moderation/src/types/node'
 import NodeRenderer from '@modrinth/moderation/src/types/node/components/NodeRenderer.vue'
-import {type ButtonSize, injectProjectPageContext} from '@modrinth/ui'
+import { injectProjectPageContext } from '@modrinth/ui'
 import { renderHighlightedString } from '@modrinth/utils'
-import { computed, onBeforeUnmount, provide, ref, watchEffect } from 'vue'
+import { computed, inject, onBeforeUnmount, provide, ref, watchEffect } from 'vue'
 
 import {
 	elementForStage,
@@ -136,6 +138,18 @@ const heading = computed(() => stage.value?.label ?? props.stageId)
 const stageState = computed(() => engine.nodeStates.value[props.stageId] ?? {})
 const writer = computed(() => engine.writerForStage(props.stageId))
 const topNodes = computed(() => (stage.value ? resolveChildren(stage.value, stageState.value) : []))
+
+const stageHintTooltip = computed(() =>
+	stage.value?._hint ? { content: stage.value._hint } : undefined,
+)
+const chevronTooltip = computed(() => ({
+	content:
+		props.hideHeading && stage.value?._hint
+			? stage.value._hint
+			: panelOpen.value
+				? 'Hide checklist details'
+				: 'Show checklist details',
+}))
 
 /**
  * The floating checklist widget only ever renders `currentStageObj`, so it can afford one

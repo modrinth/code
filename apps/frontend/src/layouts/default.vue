@@ -71,30 +71,34 @@
 			:api-url="config.public.apiBaseUrl"
 		/>
 		<ViewOnModrinthBanner />
-		<header
-			class="desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
-		>
-			<div>
-				<NuxtLink
-					to="/"
-					:aria-label="formatMessage(messages.modrinthHomePage)"
-					class="group hover:brightness-[--hover-brightness] focus-visible:brightness-[--hover-brightness]"
-				>
-					<TextLogo
-						aria-hidden="true"
-						class="h-7 w-auto text-contrast transition-transform group-active:scale-[0.98]"
-					/>
-				</NuxtLink>
-			</div>
-			<div
-				class="col-span-2 row-start-2 flex justify-center lg:col-span-1 lg:row-start-auto"
-				:class="{ 'gap-4': !flags.projectTypesPrimaryNav }"
+		<template v-if="pageContext.topBarCollapsed.value">
+			<header></header>
+		</template>
+		<template v-else >
+			<header
+				class="desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
 			>
-				<template v-if="flags.projectTypesPrimaryNav">
-					<ButtonLink
-						type="quiet"
-						to="/discover/mods"
-						:class="
+				<div>
+					<NuxtLink
+						to="/"
+						:aria-label="formatMessage(messages.modrinthHomePage)"
+						class="group hover:brightness-[--hover-brightness] focus-visible:brightness-[--hover-brightness]"
+					>
+						<TextLogo
+							aria-hidden="true"
+							class="h-7 w-auto text-contrast transition-transform group-active:scale-[0.98]"
+						/>
+					</NuxtLink>
+				</div>
+				<div
+					class="col-span-2 row-start-2 flex justify-center lg:col-span-1 lg:row-start-auto"
+					:class="{ 'gap-4': !flags.projectTypesPrimaryNav }"
+				>
+					<template v-if="flags.projectTypesPrimaryNav">
+						<ButtonLink
+							type="quiet"
+							to="/discover/mods"
+							:class="
 							route.name === 'discover-mods' || route.path.startsWith('/mod/')
 								? (route.name === 'discover-mods' ? 'main-nav-primary' : 'main-nav-secondary') ===
 									'main-nav-primary'
@@ -102,14 +106,14 @@
 									: '!bg-[var(--color-button-bg)] !text-contrast'
 								: ''
 						"
-					>
-						<BoxIcon aria-hidden="true" />
-						{{ formatMessage(commonProjectTypeCategoryMessages.mod) }}
-					</ButtonLink>
-					<ButtonLink
-						type="quiet"
-						to="/discover/resourcepacks"
-						:class="
+						>
+							<BoxIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.mod) }}
+						</ButtonLink>
+						<ButtonLink
+							type="quiet"
+							to="/discover/resourcepacks"
+							:class="
 							route.name === 'discover-resourcepacks' || route.path.startsWith('/resourcepack/')
 								? (route.name === 'discover-resourcepacks'
 										? 'main-nav-primary'
@@ -118,14 +122,14 @@
 									: '!bg-[var(--color-button-bg)] !text-contrast'
 								: ''
 						"
-					>
-						<PaintbrushIcon aria-hidden="true" />
-						{{ formatMessage(commonProjectTypeCategoryMessages.resourcepack) }}
-					</ButtonLink>
-					<ButtonLink
-						type="quiet"
-						to="/discover/datapacks"
-						:class="
+						>
+							<PaintbrushIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.resourcepack) }}
+						</ButtonLink>
+						<ButtonLink
+							type="quiet"
+							to="/discover/datapacks"
+							:class="
 							route.name === 'discover-datapacks' || route.path.startsWith('/datapack/')
 								? (route.name === 'discover-datapacks'
 										? 'main-nav-primary'
@@ -134,14 +138,14 @@
 									: '!bg-[var(--color-button-bg)] !text-contrast'
 								: ''
 						"
-					>
-						<BracesIcon aria-hidden="true" />
-						{{ formatMessage(commonProjectTypeCategoryMessages.datapack) }}
-					</ButtonLink>
-					<ButtonLink
-						type="quiet"
-						to="/discover/shaders"
-						:class="
+						>
+							<BracesIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.datapack) }}
+						</ButtonLink>
+						<ButtonLink
+							type="quiet"
+							to="/discover/shaders"
+							:class="
 							route.name === 'discover-shaders' || route.path.startsWith('/shader/')
 								? (route.name === 'discover-shaders'
 										? 'main-nav-primary'
@@ -150,14 +154,14 @@
 									: '!bg-[var(--color-button-bg)] !text-contrast'
 								: ''
 						"
-					>
-						<GlassesIcon aria-hidden="true" />
-						{{ formatMessage(commonProjectTypeCategoryMessages.shader) }}
-					</ButtonLink>
-					<ButtonLink
-						type="quiet"
-						to="/discover/modpacks"
-						:class="
+						>
+							<GlassesIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.shader) }}
+						</ButtonLink>
+						<ButtonLink
+							type="quiet"
+							to="/discover/modpacks"
+							:class="
 							route.name === 'discover-modpacks' || route.path.startsWith('/modpack/')
 								? (route.name === 'discover-modpacks'
 										? 'main-nav-primary'
@@ -166,14 +170,14 @@
 									: '!bg-[var(--color-button-bg)] !text-contrast'
 								: ''
 						"
-					>
-						<PackageOpenIcon aria-hidden="true" />
-						{{ formatMessage(commonProjectTypeCategoryMessages.modpack) }}
-					</ButtonLink>
-					<ButtonLink
-						type="quiet"
-						to="/discover/plugins"
-						:class="
+						>
+							<PackageOpenIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.modpack) }}
+						</ButtonLink>
+						<ButtonLink
+							type="quiet"
+							to="/discover/plugins"
+							:class="
 							route.name === 'discover-plugins' || route.path.startsWith('/plugin/')
 								? (route.name === 'discover-plugins'
 										? 'main-nav-primary'
@@ -182,14 +186,14 @@
 									: '!bg-[var(--color-button-bg)] !text-contrast'
 								: ''
 						"
-					>
-						<PlugIcon aria-hidden="true" />
-						{{ formatMessage(commonProjectTypeCategoryMessages.plugin) }}
-					</ButtonLink>
-					<ButtonLink
-						type="quiet"
-						to="/discover/servers"
-						:class="
+						>
+							<PlugIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.plugin) }}
+						</ButtonLink>
+						<ButtonLink
+							type="quiet"
+							to="/discover/servers"
+							:class="
 							route.name === 'discover-servers' || route.path.startsWith('/server/')
 								? (route.name === 'discover-servers'
 										? 'main-nav-primary'
@@ -198,17 +202,17 @@
 									: '!bg-[var(--color-button-bg)] !text-contrast'
 								: ''
 						"
-					>
-						<ServerIcon aria-hidden="true" />
-						{{ formatMessage(commonProjectTypeCategoryMessages.server) }}
-					</ButtonLink>
-				</template>
-				<template v-else>
-					<TeleportOverflowMenu
-						type="quiet"
-						:label="formatMessage(commonMessages.moreOptionsButton)"
-						hoverable
-						:options="[
+						>
+							<ServerIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.server) }}
+						</ButtonLink>
+					</template>
+					<template v-else>
+						<TeleportOverflowMenu
+							type="quiet"
+							:label="formatMessage(commonMessages.moreOptionsButton)"
+							hoverable
+							:options="[
 							{
 								id: 'mods',
 								label: formatMessage(commonProjectTypeCategoryMessages.mod),
@@ -252,7 +256,7 @@
 								to: '/discover/servers',
 							},
 						]"
-						:class="[
+							:class="[
 							'!w-auto !rounded-xl !px-2.5',
 							isDiscovering
 								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
@@ -260,77 +264,77 @@
 									? '!bg-[var(--color-button-bg)] !text-contrast'
 									: '',
 						]"
-					>
-						<BoxIcon
-							v-if="route.name === 'discover-mods' || route.path.startsWith('/mod/')"
-							aria-hidden="true"
-						/>
-						<PaintbrushIcon
-							v-else-if="
+						>
+							<BoxIcon
+								v-if="route.name === 'discover-mods' || route.path.startsWith('/mod/')"
+								aria-hidden="true"
+							/>
+							<PaintbrushIcon
+								v-else-if="
 								route.name === 'discover-resourcepacks' || route.path.startsWith('/resourcepack/')
 							"
-							aria-hidden="true"
-						/>
-						<BracesIcon
-							v-else-if="route.name === 'discover-datapacks' || route.path.startsWith('/datapack/')"
-							aria-hidden="true"
-						/>
-						<PackageOpenIcon
-							v-else-if="route.name === 'discover-modpacks' || route.path.startsWith('/modpack/')"
-							aria-hidden="true"
-						/>
-						<GlassesIcon
-							v-else-if="route.name === 'discover-shaders' || route.path.startsWith('/shader/')"
-							aria-hidden="true"
-						/>
-						<PlugIcon
-							v-else-if="route.name === 'discover-plugins' || route.path.startsWith('/plugin/')"
-							aria-hidden="true"
-						/>
-						<ServerIcon
-							v-else-if="route.name === 'discover-servers' || route.path.startsWith('/server/')"
-							aria-hidden="true"
-						/>
-						<CompassIcon v-else aria-hidden="true" />
-						<span class="hidden md:contents">{{
-							formatMessage(commonMessages.discoverContentLabel)
-						}}</span>
-						<span class="contents md:hidden">{{ formatMessage(navMenuMessages.discover) }}</span>
-						<DropdownIcon aria-hidden="true" class="h-5 w-5" />
+								aria-hidden="true"
+							/>
+							<BracesIcon
+								v-else-if="route.name === 'discover-datapacks' || route.path.startsWith('/datapack/')"
+								aria-hidden="true"
+							/>
+							<PackageOpenIcon
+								v-else-if="route.name === 'discover-modpacks' || route.path.startsWith('/modpack/')"
+								aria-hidden="true"
+							/>
+							<GlassesIcon
+								v-else-if="route.name === 'discover-shaders' || route.path.startsWith('/shader/')"
+								aria-hidden="true"
+							/>
+							<PlugIcon
+								v-else-if="route.name === 'discover-plugins' || route.path.startsWith('/plugin/')"
+								aria-hidden="true"
+							/>
+							<ServerIcon
+								v-else-if="route.name === 'discover-servers' || route.path.startsWith('/server/')"
+								aria-hidden="true"
+							/>
+							<CompassIcon v-else aria-hidden="true" />
+							<span class="hidden md:contents">{{
+									formatMessage(commonMessages.discoverContentLabel)
+								}}</span>
+							<span class="contents md:hidden">{{ formatMessage(navMenuMessages.discover) }}</span>
+							<DropdownIcon aria-hidden="true" class="h-5 w-5" />
 
-						<template #mods>
-							<BoxIcon aria-hidden="true" />
-							{{ formatMessage(commonProjectTypeCategoryMessages.mod) }}
-						</template>
-						<template #resourcepacks>
-							<PaintbrushIcon aria-hidden="true" />
-							{{ formatMessage(commonProjectTypeCategoryMessages.resourcepack) }}
-						</template>
-						<template #datapacks>
-							<BracesIcon aria-hidden="true" />
-							{{ formatMessage(commonProjectTypeCategoryMessages.datapack) }}
-						</template>
-						<template #plugins>
-							<PlugIcon aria-hidden="true" />
-							{{ formatMessage(commonProjectTypeCategoryMessages.plugin) }}
-						</template>
-						<template #shaders>
-							<GlassesIcon aria-hidden="true" />
-							{{ formatMessage(commonProjectTypeCategoryMessages.shader) }}
-						</template>
-						<template #modpacks>
-							<PackageOpenIcon aria-hidden="true" />
-							{{ formatMessage(commonProjectTypeCategoryMessages.modpack) }}
-						</template>
-						<template #servers>
-							<ServerIcon aria-hidden="true" />
-							{{ formatMessage(commonProjectTypeCategoryMessages.server) }}
-						</template>
-					</TeleportOverflowMenu>
-					<ButtonLink
-						type="quiet"
-						to="/hosting"
-						:class="
+							<template #mods>
+								<BoxIcon aria-hidden="true" />
+								{{ formatMessage(commonProjectTypeCategoryMessages.mod) }}
+							</template>
+							<template #resourcepacks>
+								<PaintbrushIcon aria-hidden="true" />
+								{{ formatMessage(commonProjectTypeCategoryMessages.resourcepack) }}
+							</template>
+							<template #datapacks>
+								<BracesIcon aria-hidden="true" />
+								{{ formatMessage(commonProjectTypeCategoryMessages.datapack) }}
+							</template>
+							<template #plugins>
+								<PlugIcon aria-hidden="true" />
+								{{ formatMessage(commonProjectTypeCategoryMessages.plugin) }}
+							</template>
+							<template #shaders>
+								<GlassesIcon aria-hidden="true" />
+								{{ formatMessage(commonProjectTypeCategoryMessages.shader) }}
+							</template>
+							<template #modpacks>
+								<PackageOpenIcon aria-hidden="true" />
+								{{ formatMessage(commonProjectTypeCategoryMessages.modpack) }}
+							</template>
+							<template #servers>
+								<ServerIcon aria-hidden="true" />
+								{{ formatMessage(commonProjectTypeCategoryMessages.server) }}
+							</template>
+						</TeleportOverflowMenu>
+						<ButtonLink
+							type="quiet"
+							to="/hosting"
+							:class="
 							route.name?.startsWith('hosting') ||
 							(route.name?.startsWith('discover-') && !!route.query.sid)
 								? (route.name === 'hosting' ? 'main-nav-primary' : 'main-nav-secondary') ===
@@ -339,37 +343,37 @@
 									: '!bg-[var(--color-button-bg)] !text-contrast'
 								: ''
 						"
-					>
-						<ServerStackIcon aria-hidden="true" />
-						{{ formatMessage(navMenuMessages.hostAServer) }}
-					</ButtonLink>
-					<ButtonLink
-						type="quiet"
-						to="/app"
-						:class="
+						>
+							<ServerStackIcon aria-hidden="true" />
+							{{ formatMessage(navMenuMessages.hostAServer) }}
+						</ButtonLink>
+						<ButtonLink
+							type="quiet"
+							to="/app"
+							:class="
 							route.name === 'app'
 								? true
 									? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
 									: '!bg-[var(--color-button-bg)] !text-contrast'
 								: ''
 						"
-					>
-						<DownloadIcon aria-hidden="true" />
-						<span class="hidden md:contents">{{
-							formatMessage(navMenuMessages.getModrinthApp)
-						}}</span>
-						<span class="contents md:hidden">{{ formatMessage(navMenuMessages.modrinthApp) }}</span>
-					</ButtonLink>
-				</template>
-			</div>
-			<div class="flex items-center gap-1">
-				<TeleportOverflowMenu
-					v-if="auth.user && isStaff(auth.user)"
-					type="quiet"
-					:icon-only="false"
-					:label="formatMessage(messages.createNew)"
-					class="btn-dropdown-animation !gap-1 !rounded-xl !px-2"
-					:options="[
+						>
+							<DownloadIcon aria-hidden="true" />
+							<span class="hidden md:contents">{{
+									formatMessage(navMenuMessages.getModrinthApp)
+								}}</span>
+							<span class="contents md:hidden">{{ formatMessage(navMenuMessages.modrinthApp) }}</span>
+						</ButtonLink>
+					</template>
+				</div>
+				<div class="flex items-center gap-1">
+					<TeleportOverflowMenu
+						v-if="auth.user && isStaff(auth.user)"
+						type="quiet"
+						:icon-only="false"
+						:label="formatMessage(messages.createNew)"
+						class="btn-dropdown-animation !gap-1 !rounded-xl !px-2"
+						:options="[
 						{
 							id: 'review-projects',
 							label: formatMessage(messages.reviewProjects),
@@ -505,17 +509,17 @@
 							to: '/admin/docs',
 						},
 					]"
-				>
-					<ModrinthIcon aria-hidden="true" />
-					<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-				</TeleportOverflowMenu>
-				<TeleportOverflowMenu
-					v-if="auth.user"
-					type="quiet"
-					:icon-only="false"
-					:label="formatMessage(messages.createNew)"
-					class="btn-dropdown-animation !gap-1 !rounded-xl !px-2"
-					:options="[
+					>
+						<ModrinthIcon aria-hidden="true" />
+						<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+					</TeleportOverflowMenu>
+					<TeleportOverflowMenu
+						v-if="auth.user"
+						type="quiet"
+						:icon-only="false"
+						:label="formatMessage(messages.createNew)"
+						class="btn-dropdown-animation !gap-1 !rounded-xl !px-2"
+						:options="[
 						{
 							id: 'new-project',
 							label: formatMessage(messages.newProject),
@@ -545,45 +549,22 @@
 								requireVerifiedEmail(() => $refs.modal_organization_creation.show(event)),
 						},
 					]"
-				>
-					<PlusIcon aria-hidden="true" />
-					{{ formatMessage(messages.publish) }}
-				</TeleportOverflowMenu>
-				<TeleportOverflowMenu
-					v-if="auth.user"
-					type="quiet"
-					size="lg"
-					interaction="none"
-					:icon-only="false"
-					:label="formatMessage(commonMessages.moreOptionsButton)"
-					class="btn-dropdown-animation !gap-1 !rounded-xl !px-2 !pr-1"
-					:options="userMenuOptions"
-				>
-					<Avatar :src="auth.user.avatar_url" aria-hidden="true" circle />
-					<DropdownIcon class="h-5 w-5 text-secondary" />
-					<template
-						v-for="account in accountSwitcherAccounts"
-						:key="account.id"
-						#[account.optionId]
 					>
-						<Avatar :src="account.avatarUrl" size="1.25rem" aria-hidden="true" circle />
-						{{ account.username }}
-						<UserRoleIcon :role="account.role" />
-					</template>
-				</TeleportOverflowMenu>
-				<template v-else>
+						<PlusIcon aria-hidden="true" />
+						{{ formatMessage(messages.publish) }}
+					</TeleportOverflowMenu>
 					<TeleportOverflowMenu
-						v-if="accountSwitcherAccounts.length > 0"
-						type="colored"
-						color="brand"
+						v-if="auth.user"
+						type="quiet"
+						size="lg"
+						interaction="none"
 						:icon-only="false"
-						:label="formatMessage(commonMessages.signInButton)"
-						class="btn-dropdown-animation !gap-1 !pr-1"
-						:options="accountSwitcherOptions"
+						:label="formatMessage(commonMessages.moreOptionsButton)"
+						class="btn-dropdown-animation !gap-1 !rounded-xl !px-2 !pr-1"
+						:options="userMenuOptions"
 					>
-						<LogInIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.signInButton) }}
-						<DropdownIcon class="h-5 w-5" />
+						<Avatar :src="auth.user.avatar_url" aria-hidden="true" circle />
+						<DropdownIcon class="h-5 w-5 text-secondary" />
 						<template
 							v-for="account in accountSwitcherAccounts"
 							:key="account.id"
@@ -594,211 +575,235 @@
 							<UserRoleIcon :role="account.role" />
 						</template>
 					</TeleportOverflowMenu>
-					<ButtonLink v-else type="colored" color="brand" :to="signInRouteObj">
-						<LogInIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.signInButton) }}
-					</ButtonLink>
-					<ButtonLink
-						v-tooltip="formatMessage(commonMessages.settingsLabel)"
-						to="/settings"
-						class="!w-9 !rounded-full !px-0"
-					>
-						<SettingsIcon :aria-label="formatMessage(commonMessages.settingsLabel)" />
-					</ButtonLink>
-				</template>
-			</div>
-		</header>
-		<header class="mobile-navigation mobile-only">
-			<div
-				class="nav-menu nav-menu-browse"
-				:class="{ expanded: isBrowseMenuOpen }"
-				@focusin="isBrowseMenuOpen = true"
-				@focusout="isBrowseMenuOpen = false"
-			>
-				<div class="links cascade-links">
-					<ButtonLink
-						v-for="navRoute in navRoutes"
-						:key="navRoute.href"
-						:to="navRoute.href"
-						class="!h-auto !whitespace-normal"
-					>
-						{{ navRoute.label }}
-					</ButtonLink>
-				</div>
-			</div>
-			<div
-				class="nav-menu nav-menu-mobile"
-				:class="{ expanded: isMobileMenuOpen }"
-				@focusin="isMobileMenuOpen = true"
-				@focusout="isMobileMenuOpen = false"
-			>
-				<div class="account-container">
-					<ButtonLink
-						v-if="auth.user"
-						:to="`/user/${auth.user.username}`"
-						class="account-button !h-auto !whitespace-normal"
-					>
-						<Avatar
-							:src="auth.user.avatar_url"
-							class="user-icon"
-							:alt="formatMessage(messages.yourAvatarAlt)"
-							aria-hidden="true"
-							circle
-						/>
-						<div class="account-text">
-							<div>@{{ auth.user.username }}</div>
-							<div>{{ formatMessage(commonMessages.visitYourProfile) }}</div>
-						</div>
-					</ButtonLink>
-					<ButtonLink
-						v-else
-						type="colored"
-						color="brand"
-						:to="signInRouteObj"
-						class="!h-auto !whitespace-normal"
-					>
-						<LogInIcon aria-hidden="true" /> {{ formatMessage(commonMessages.signInButton) }}
-					</ButtonLink>
-				</div>
-				<div class="links">
-					<template v-if="auth.user">
-						<Button
+					<template v-else>
+						<TeleportOverflowMenu
+							v-if="accountSwitcherAccounts.length > 0"
 							type="colored"
-							color="red"
-							class="!h-auto !whitespace-normal"
-							@click="logoutUser()"
+							color="brand"
+							:icon-only="false"
+							:label="formatMessage(commonMessages.signInButton)"
+							class="btn-dropdown-animation !gap-1 !pr-1"
+							:options="accountSwitcherOptions"
 						>
-							<LogOutIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.signOutButton) }}
-						</Button>
-						<Button class="!h-auto !whitespace-normal" @click="$refs.modal_creation.show()">
-							<PlusIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.createAProjectButton) }}
-						</Button>
-						<ButtonLink class="!h-auto !whitespace-normal" to="/dashboard/collections">
-							<LibraryIcon class="icon" />
-							{{ formatMessage(commonMessages.collectionsLabel) }}
-						</ButtonLink>
-						<ButtonLink class="!h-auto !whitespace-normal" to="/hosting/manage">
-							<ServerIcon class="icon" />
-							{{ formatMessage(commonMessages.serversLabel) }}
-						</ButtonLink>
-						<ButtonLink
-							v-if="auth.user.role === 'moderator' || auth.user.role === 'admin'"
-							class="!h-auto !whitespace-normal"
-							to="/moderation"
-						>
-							<ScaleIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.moderationLabel) }}
+							<LogInIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.signInButton) }}
+							<DropdownIcon class="h-5 w-5" />
+							<template
+								v-for="account in accountSwitcherAccounts"
+								:key="account.id"
+								#[account.optionId]
+							>
+								<Avatar :src="account.avatarUrl" size="1.25rem" aria-hidden="true" circle />
+								{{ account.username }}
+								<UserRoleIcon :role="account.role" />
+							</template>
+						</TeleportOverflowMenu>
+						<ButtonLink v-else type="colored" color="brand" :to="signInRouteObj">
+							<LogInIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.signInButton) }}
 						</ButtonLink>
 						<ButtonLink
-							v-if="flags.developerMode"
-							class="!h-auto !whitespace-normal"
-							to="/settings/flags"
+							v-tooltip="formatMessage(commonMessages.settingsLabel)"
+							to="/settings"
+							class="!w-9 !rounded-full !px-0"
 						>
-							<ToggleRightIcon aria-hidden="true" />
-							{{ formatMessage(commonSettingsMessages.featureFlags) }}
+							<SettingsIcon :aria-label="formatMessage(commonMessages.settingsLabel)" />
 						</ButtonLink>
 					</template>
-					<ButtonLink class="!h-auto !whitespace-normal" to="/settings">
-						<SettingsIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.settingsLabel) }}
-					</ButtonLink>
-					<Button class="!h-auto !whitespace-normal" @click="changeTheme">
-						<MoonIcon v-if="$theme.active === 'light'" class="icon" />
-						<SunIcon v-else class="icon" />
-						<span class="dropdown-item__text">
+				</div>
+			</header>
+			<header class="mobile-navigation mobile-only">
+				<div
+					class="nav-menu nav-menu-browse"
+					:class="{ expanded: isBrowseMenuOpen }"
+					@focusin="isBrowseMenuOpen = true"
+					@focusout="isBrowseMenuOpen = false"
+				>
+					<div class="links cascade-links">
+						<ButtonLink
+							v-for="navRoute in navRoutes"
+							:key="navRoute.href"
+							:to="navRoute.href"
+							class="!h-auto !whitespace-normal"
+						>
+							{{ navRoute.label }}
+						</ButtonLink>
+					</div>
+				</div>
+				<div
+					class="nav-menu nav-menu-mobile"
+					:class="{ expanded: isMobileMenuOpen }"
+					@focusin="isMobileMenuOpen = true"
+					@focusout="isMobileMenuOpen = false"
+				>
+					<div class="account-container">
+						<ButtonLink
+							v-if="auth.user"
+							:to="`/user/${auth.user.username}`"
+							class="account-button !h-auto !whitespace-normal"
+						>
+							<Avatar
+								:src="auth.user.avatar_url"
+								class="user-icon"
+								:alt="formatMessage(messages.yourAvatarAlt)"
+								aria-hidden="true"
+								circle
+							/>
+							<div class="account-text">
+								<div>@{{ auth.user.username }}</div>
+								<div>{{ formatMessage(commonMessages.visitYourProfile) }}</div>
+							</div>
+						</ButtonLink>
+						<ButtonLink
+							v-else
+							type="colored"
+							color="brand"
+							:to="signInRouteObj"
+							class="!h-auto !whitespace-normal"
+						>
+							<LogInIcon aria-hidden="true" /> {{ formatMessage(commonMessages.signInButton) }}
+						</ButtonLink>
+					</div>
+					<div class="links">
+						<template v-if="auth.user">
+							<Button
+								type="colored"
+								color="red"
+								class="!h-auto !whitespace-normal"
+								@click="logoutUser()"
+							>
+								<LogOutIcon aria-hidden="true" />
+								{{ formatMessage(commonMessages.signOutButton) }}
+							</Button>
+							<Button class="!h-auto !whitespace-normal" @click="$refs.modal_creation.show()">
+								<PlusIcon aria-hidden="true" />
+								{{ formatMessage(commonMessages.createAProjectButton) }}
+							</Button>
+							<ButtonLink class="!h-auto !whitespace-normal" to="/dashboard/collections">
+								<LibraryIcon class="icon" />
+								{{ formatMessage(commonMessages.collectionsLabel) }}
+							</ButtonLink>
+							<ButtonLink class="!h-auto !whitespace-normal" to="/hosting/manage">
+								<ServerIcon class="icon" />
+								{{ formatMessage(commonMessages.serversLabel) }}
+							</ButtonLink>
+							<ButtonLink
+								v-if="auth.user.role === 'moderator' || auth.user.role === 'admin'"
+								class="!h-auto !whitespace-normal"
+								to="/moderation"
+							>
+								<ScaleIcon aria-hidden="true" />
+								{{ formatMessage(commonMessages.moderationLabel) }}
+							</ButtonLink>
+							<ButtonLink
+								v-if="flags.developerMode"
+								class="!h-auto !whitespace-normal"
+								to="/settings/flags"
+							>
+								<ToggleRightIcon aria-hidden="true" />
+								{{ formatMessage(commonSettingsMessages.featureFlags) }}
+							</ButtonLink>
+						</template>
+						<ButtonLink class="!h-auto !whitespace-normal" to="/settings">
+							<SettingsIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.settingsLabel) }}
+						</ButtonLink>
+						<Button class="!h-auto !whitespace-normal" @click="changeTheme">
+							<MoonIcon v-if="$theme.active === 'light'" class="icon" />
+							<SunIcon v-else class="icon" />
+							<span class="dropdown-item__text">
 							{{ formatMessage(messages.changeTheme) }}
 						</span>
-					</Button>
+						</Button>
+					</div>
 				</div>
-			</div>
-			<div class="mobile-navbar" :class="{ expanded: isBrowseMenuOpen || isMobileMenuOpen }">
-				<ButtonLink
-					to="/"
-					type="quiet"
-					interaction="none"
-					class="tab !h-auto !rounded-none !px-0"
-					:title="formatMessage(navMenuMessages.home)"
-					:aria-label="formatMessage(navMenuMessages.home)"
-				>
-					<HomeIcon aria-hidden="true" />
-				</ButtonLink>
-				<Button
-					type="quiet"
-					interaction="none"
-					class="tab !h-auto !rounded-none !px-0"
-					:class="{ 'router-link-exact-active': isBrowseMenuOpen }"
-					:title="formatMessage(navMenuMessages.search)"
-					:aria-label="formatMessage(navMenuMessages.search)"
-					@click="toggleBrowseMenu()"
-				>
-					<template v-if="auth.user">
-						<SearchIcon aria-hidden="true" />
-					</template>
-					<template v-else>
-						<SearchIcon aria-hidden="true" class="smaller" />
-						{{ formatMessage(navMenuMessages.search) }}
-					</template>
-				</Button>
-				<template v-if="auth.user">
+				<div class="mobile-navbar" :class="{ expanded: isBrowseMenuOpen || isMobileMenuOpen }">
 					<ButtonLink
-						to="/dashboard/notifications"
+						to="/"
 						type="quiet"
 						interaction="none"
 						class="tab !h-auto !rounded-none !px-0"
-						:aria-label="formatMessage(commonMessages.notificationsLabel)"
-						:class="{
+						:title="formatMessage(navMenuMessages.home)"
+						:aria-label="formatMessage(navMenuMessages.home)"
+					>
+						<HomeIcon aria-hidden="true" />
+					</ButtonLink>
+					<Button
+						type="quiet"
+						interaction="none"
+						class="tab !h-auto !rounded-none !px-0"
+						:class="{ 'router-link-exact-active': isBrowseMenuOpen }"
+						:title="formatMessage(navMenuMessages.search)"
+						:aria-label="formatMessage(navMenuMessages.search)"
+						@click="toggleBrowseMenu()"
+					>
+						<template v-if="auth.user">
+							<SearchIcon aria-hidden="true" />
+						</template>
+						<template v-else>
+							<SearchIcon aria-hidden="true" class="smaller" />
+							{{ formatMessage(navMenuMessages.search) }}
+						</template>
+					</Button>
+					<template v-if="auth.user">
+						<ButtonLink
+							to="/dashboard/notifications"
+							type="quiet"
+							interaction="none"
+							class="tab !h-auto !rounded-none !px-0"
+							:aria-label="formatMessage(commonMessages.notificationsLabel)"
+							:class="{
 							'no-active': isMobileMenuOpen || isBrowseMenuOpen,
 						}"
-						:title="formatMessage(commonMessages.notificationsLabel)"
-						@click="
+							:title="formatMessage(commonMessages.notificationsLabel)"
+							@click="
 							() => {
 								isMobileMenuOpen = false
 								isBrowseMenuOpen = false
 							}
 						"
-					>
-						<BellIcon aria-hidden="true" />
-					</ButtonLink>
-					<ButtonLink
-						to="/dashboard"
+						>
+							<BellIcon aria-hidden="true" />
+						</ButtonLink>
+						<ButtonLink
+							to="/dashboard"
+							type="quiet"
+							interaction="none"
+							class="tab !h-auto !rounded-none !px-0"
+							:aria-label="formatMessage(commonMessages.dashboardLabel)"
+							:title="formatMessage(commonMessages.dashboardLabel)"
+						>
+							<ChartIcon aria-hidden="true" />
+						</ButtonLink>
+					</template>
+					<Button
 						type="quiet"
 						interaction="none"
 						class="tab !h-auto !rounded-none !px-0"
-						:aria-label="formatMessage(commonMessages.dashboardLabel)"
-						:title="formatMessage(commonMessages.dashboardLabel)"
-					>
-						<ChartIcon aria-hidden="true" />
-					</ButtonLink>
-				</template>
-				<Button
-					type="quiet"
-					interaction="none"
-					class="tab !h-auto !rounded-none !px-0"
-					:title="formatMessage(messages.toggleMenu)"
-					:aria-label="
+						:title="formatMessage(messages.toggleMenu)"
+						:aria-label="
 						isMobileMenuOpen ? formatMessage(messages.closeMenu) : formatMessage(messages.openMenu)
 					"
-					@click="toggleMobileMenu()"
-				>
-					<template v-if="!auth.user">
-						<HamburgerIcon v-if="!isMobileMenuOpen" aria-hidden="true" />
-						<XIcon v-else aria-hidden="true" />
-					</template>
-					<template v-else>
-						<Avatar
-							:src="auth.user.avatar_url"
-							class="user-icon"
-							:class="{ expanded: isMobileMenuOpen }"
-							:alt="formatMessage(messages.yourAvatarAlt)"
-							aria-hidden="true"
-							circle
-						/>
-					</template>
-				</Button>
-			</div>
-		</header>
+						@click="toggleMobileMenu()"
+					>
+						<template v-if="!auth.user">
+							<HamburgerIcon v-if="!isMobileMenuOpen" aria-hidden="true" />
+							<XIcon v-else aria-hidden="true" />
+						</template>
+						<template v-else>
+							<Avatar
+								:src="auth.user.avatar_url"
+								class="user-icon"
+								:class="{ expanded: isMobileMenuOpen }"
+								:alt="formatMessage(messages.yourAvatarAlt)"
+								aria-hidden="true"
+								circle
+							/>
+						</template>
+					</Button>
+				</div>
+			</header>
+		</template>
 		<main class="min-h-[calc(100vh-4.5rem-310.59px)]">
 			<ProjectCreateModal v-if="auth.user" ref="modal_creation" />
 			<CollectionCreateModal ref="modal_collection_creation" />
@@ -820,6 +825,8 @@ import {
 	BoxPlusIcon,
 	BracesIcon,
 	ChartIcon,
+	ChevronUpIcon,
+	ChevronDownIcon,
 	CollectionPlusIcon,
 	CompassIcon,
 	CurrencyIcon,

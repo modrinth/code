@@ -436,6 +436,7 @@
 
 <script lang="ts" setup>
 import {
+	BlocksIcon,
 	BrushCleaningIcon,
 	CheckIcon,
 	DropdownIcon,
@@ -444,7 +445,6 @@ import {
 	LinkIcon,
 	ListBulletedIcon,
 	LockIcon,
-	BlocksIcon,
 	MapPinIcon,
 	RightArrowIcon,
 	ScaleIcon,
@@ -478,6 +478,7 @@ import {
 	setMessageProject,
 	setMissingMdHandler,
 } from '@modrinth/moderation/src/types/node'
+import ModrinthProjectSearch from '@modrinth/moderation/src/types/node/components/ModrinthProjectSearch.vue'
 import NodeRenderer from '@modrinth/moderation/src/types/node/components/NodeRenderer.vue'
 import type { FixBuilder } from '@modrinth/moderation/src/types/node/fix'
 import type { Writer } from '@modrinth/moderation/src/types/node/mutate'
@@ -508,6 +509,7 @@ import McVersionPicker from '~/components/ui/create-project-version/components/M
 import ModerationReviewLayout from '~/components/ui/moderation/review/ModerationReviewLayout.vue'
 import { useGeneratedState } from '~/composables/generated'
 import { useImageUpload } from '~/composables/image-upload.ts'
+import { useModerationSettings } from '~/composables/moderation.ts'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
 import {
 	clearSessionChecklistState,
@@ -537,7 +539,6 @@ import {
 	STAGE_ELEMENT,
 	STATE_KEY,
 } from './checklist-context'
-import {useModerationSettings} from "~/composables/moderation.ts";
 
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
@@ -547,8 +548,11 @@ const settings = useModerationSettings()
 const reviewLayout = useModerationReviewLayout()
 
 /** Whether the VS Code-style review shell is driving the page instead of routes. */
-const reviewLayoutActive = computed(() => settings.value.get(moderationSettings.Experimental.ExperimentalModerationView))
-const toggleReviewLayout = () => settings.value.set(moderationSettings.Experimental.ExperimentalModerationView, true);
+const reviewLayoutActive = computed(() =>
+	settings.value.get(moderationSettings.Experimental.ExperimentalModerationView),
+)
+const toggleReviewLayout = () =>
+	settings.value.set(moderationSettings.Experimental.ExperimentalModerationView, true)
 
 /**
  * Open the review tab that hosts a stage. Phase 2 maps stages to tabs by id
@@ -1576,6 +1580,7 @@ const stageMeta = computed(() => {
 const appComponentsByKey: Record<string, Component> = {
 	'loader-picker': LoaderPicker,
 	'game-version-picker': McVersionPicker,
+	'modrinth-project-search': ModrinthProjectSearch,
 }
 
 const stageState = computed(

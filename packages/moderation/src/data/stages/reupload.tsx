@@ -1,8 +1,10 @@
 import { CopyrightIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
-import { computed } from 'vue'
+import {computed, defineAsyncComponent} from 'vue'
 
-import { check, group, markdown, stage, text, toggle } from '../../types/node'
+import { appComponent, check, group, markdown, stage, text, toggle } from '../../types/node'
+
+const ModrinthProjectSearch = defineAsyncComponent(async () => import("../../types/node/components/ModrinthProjectSearch.vue"));
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
@@ -31,6 +33,15 @@ export default function () {
 						ORIGINAL_AUTHOR: state['original-author'],
 					}))
 					.children(
+						appComponent('original-project-search', ModrinthProjectSearch)
+							.title('Modrinth Search')
+							.props((ctx) => ({
+								onSelect: (hit: { title: string; author: string; projectId: string }) => {
+									console.log(hit)
+									ctx.writeSibling?.('original-project', hit.title)
+									ctx.writeSibling?.('original-author', hit.author)
+								}
+							})),
 						text('original-project').title('Original Project Title').required(),
 						text('original-author').title('Original project Author').required(),
 					),

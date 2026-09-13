@@ -2,19 +2,16 @@
 	<div class="shrink-0 border-0 border-t border-solid border-divider bg-surface-1 text-sm">
 		<!-- Header row (always visible) -->
 		<div class="flex items-center gap-2 px-3 py-2">
-			<div class="flex items-center gap-2 pr-1" v-if="showWalkthrough">
+			<div v-if="showWalkthrough" class="flex items-center gap-2 pr-1">
 				<component :is="stage?._icon ?? ScaleIcon" class="size-4 shrink-0 text-orange" />
 				<span class="font-semibold text-contrast">{{ stageTitle }}</span>
 				<span v-if="stagePosition" class="text-xs text-secondary">{{ stagePosition }}</span>
 			</div>
 
-			<div
-				v-if="collapsed"
-				class="flex gap-2 "
-			>
+			<div v-if="collapsed" class="flex gap-2">
 				<Button
-					size="xs"
 					v-tooltip="'Toggle View back to default view'"
+					size="xs"
 					aria-label="Toggle View back to default view"
 					@click="settings.set(moderationSettings.Experimental.ExperimentalModerationView, false)"
 				>
@@ -27,7 +24,11 @@
 				>
 					<BrushCleaningIcon /> Reset
 				</Button>
-				<Button v-if="showWalkthrough" size="xs" @click="layout.setChecklistConnected(!layout.checklistConnected.value)">
+				<Button
+					v-if="showWalkthrough"
+					size="xs"
+					@click="layout.setChecklistConnected(!layout.checklistConnected.value)"
+				>
 					<LinkIcon v-if="layout.checklistConnected.value" />
 					<UnlinkIcon v-else />
 					{{ layout.checklistConnected.value ? 'Unlink tabs' : 'Relink tabs' }}
@@ -55,16 +56,13 @@
 				</div>
 			</div>
 
-			<div v-if="queuePosition" :class="['flex items-center gap-4', showWalkthrough ? 'mx-auto' : 'ml-auto']">
-				<span>
-					Completed: {{ queuePosition.completed }}
-				</span>
-				<span>
-					Skipped: {{ queuePosition.skipped }}
-				</span>
-				<span>
-					Total: {{ queuePosition.total }}
-				</span>
+			<div
+				v-if="queuePosition"
+				:class="['flex items-center gap-4', showWalkthrough ? 'mx-auto' : 'ml-auto']"
+			>
+				<span> Completed: {{ queuePosition.completed }} </span>
+				<span> Skipped: {{ queuePosition.skipped }} </span>
+				<span> Total: {{ queuePosition.total }} </span>
 			</div>
 
 			<div v-if="showWalkthrough" class="ml-auto flex items-center gap-1">
@@ -153,7 +151,6 @@
 
 <script setup lang="ts">
 import {
-	ToggleLeftIcon,
 	BrushCleaningIcon,
 	ChevronDownIcon,
 	ChevronUpIcon,
@@ -161,9 +158,9 @@ import {
 	LeftArrowIcon,
 	LinkIcon,
 	LockIcon,
-	MousePointer2Icon,
 	RightArrowIcon,
 	ScaleIcon,
+	ToggleLeftIcon,
 	UnlinkIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -172,41 +169,36 @@ import { Button, ButtonLink } from '@modrinth/ui'
 import { computed } from 'vue'
 
 import { injectModerationChecklist } from '~/components/ui/moderation/checklist/checklist-context'
+import { useModerationQueue } from '~/services/moderation/queue.ts'
 import { useModerationReviewLayout } from '~/services/moderation/review-layout'
-import {useModerationQueue} from "~/services/moderation/queue.ts";
 
 const engine = injectModerationChecklist()
 const layout = useModerationReviewLayout()
 const settings = useModerationSettings()
 
-const contextMenuEnabled = computed(
-	() => settings.value.get(moderationSettings.Experimental.InlineChecklistMenu),
-)
-function toggleContextMenu() {
-	settings.value.set(moderationSettings.Experimental.InlineChecklistMenu, !contextMenuEnabled.value)
-}
-
 const moderationQueue = useModerationQueue()
 
 const queuePosition = computed(() => {
-	if (!moderationQueue.isQueueMode) return null;
+	if (!moderationQueue.isQueueMode) return null
 
 	const items = moderationQueue.currentQueue.items
-	const completed = moderationQueue.currentQueue.completed;
-	const skipped = moderationQueue.currentQueue.skipped;
+	const completed = moderationQueue.currentQueue.completed
+	const skipped = moderationQueue.currentQueue.skipped
 
 	return {
 		completed: `${completed.length}`,
 		skipped: `${skipped.length}`,
-		total: `${items.length}`
+		total: `${items.length}`,
 	}
 })
 
-const showWalkthrough = computed(
-	() => settings.value.get(moderationSettings.Experimental.ShowChecklistWalkthrough),
+const showWalkthrough = computed(() =>
+	settings.value.get(moderationSettings.Experimental.ShowChecklistWalkthrough),
 )
 
-const collapsed = computed(() => !showWalkthrough.value ? true : layout.walkthroughCollapsed.value)
+const collapsed = computed(() =>
+	!showWalkthrough.value ? true : layout.walkthroughCollapsed.value,
+)
 
 const stage = computed(() => engine.currentStageObj.value)
 const stageTitle = computed(() => stage.value?.label ?? stage.value?.id ?? 'Moderation')

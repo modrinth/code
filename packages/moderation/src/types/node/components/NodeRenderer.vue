@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import {Button, type ButtonSize, IconButton} from '@modrinth/ui'
+import { Button, type ButtonSize, IconButton } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
 import type { Component } from 'vue'
-import { computed, inject, watchEffect } from 'vue'
+import { computed, inject, ref, watchEffect } from 'vue'
 
 import type { AnyNode, ChildNode, HasChildren } from '../builder'
 import type {
@@ -55,7 +55,7 @@ const props = defineProps<{
 	buttonSize?: ButtonSize
 }>()
 
-const buttonSize = computed(() => props.buttonSize ?? 'md');
+const buttonSize = computed(() => props.buttonSize ?? 'md')
 
 const buttonsOnly = computed(() => props.mode === 'buttons')
 
@@ -156,6 +156,9 @@ function componentProps(node: RenderableValueNode): Record<string, unknown> {
 		toggleSetValue: (value) => toggleSetValue(node, value),
 		nodeFacts: { needsAttention: needsAttention(node), fixActionable: isFixActionable(node) },
 		tooltip: resolveTooltip(node),
+		// Siblings of `node` share this same container's state/write, so writing another id here
+		// is exactly how `node`'s own value gets written.
+		writeSibling: (id, value) => props.write(id, value),
 	}
 	const dropdownStyle = hasOptionsCap(node)
 		? {
@@ -195,10 +198,12 @@ function valueScope(node: HasValue & Identified): {
 	return { state, write: childWriter(props.state, props.write, node.id) }
 }
 
-const TOOLTIP_BASE = {
-	delay: { show: 500, hide: 0 },
-	triggers: ['hover', 'focus'],
-	placement: 'top',
+function tooltipBase(): Record<string, unknown> {
+	return {
+		delay: { show: 500, hide: 0 },
+		triggers: ['hover', 'focus'],
+		placement: 'top',
+	}
 }
 
 function resolveTooltip(node: object): Record<string, unknown> | undefined {
@@ -209,12 +214,12 @@ function resolveTooltip(node: object): Record<string, unknown> | undefined {
 			| undefined
 		if (t !== undefined) {
 			const content = typeof t === 'function' ? t(wrappedState.value) : resolve(t)
-			if (content) return { ...TOOLTIP_BASE, content }
+			if (content) return { ...tooltipBase(), content }
 		}
 	}
 	const hasSegments = hasCap(node, '_segments')
 	const html = hasSegments ? metaCtx?.value.tooltipHtml.get(node) : undefined
-	return html ? { ...TOOLTIP_BASE, content: html, html: true } : undefined
+	return html ? { ...tooltipBase(), content: html, html: true } : undefined
 }
 
 function clickButton(node: object): void {
@@ -241,7 +246,7 @@ function tweakTooltip(
 ): Record<string, unknown> | undefined {
 	if (!tweakEnabled(tweak, node)) return undefined
 	const content = tweakResult(tweak, node)
-	return content ? { ...TOOLTIP_BASE, content: String(content) } : undefined
+	return content ? { ...tooltipBase(), content: String(content) } : undefined
 }
 
 function tweakLabel(tweak: TweakDef, node: RenderableValueNode): string {
@@ -302,7 +307,12 @@ watchEffect(() => {
 </script>
 
 <template>
-	<div :class="[flex ? 'flex flex-wrap gap-2' : 'space-y-4', mode == 'buttons' ? 'contents' : 'w-full']">
+	<div
+		:class="[
+			flex ? 'flex flex-wrap gap-2' : 'space-y-4',
+			mode == 'buttons' ? 'contents' : 'w-full',
+		]"
+	>
 		<slot />
 		<template v-for="(item, idx) in nodes" :key="nodeKey(item, idx)">
 			<template v-if="typeof item !== 'object' || item === null">

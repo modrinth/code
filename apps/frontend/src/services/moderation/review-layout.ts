@@ -1,7 +1,8 @@
+import { moderationSettings } from '@modrinth/moderation'
 import { useLocalStorage } from '@vueuse/core'
 import { computed, type ComputedRef, type Ref } from 'vue'
-import {useModerationSettings} from "~/composables/moderation.ts";
-import {moderationSettings} from "@modrinth/moderation";
+
+import { useModerationSettings } from '~/composables/moderation.ts'
 
 /**
  * Shared state for the moderation "review view" — the VS Code / Slicer style shell that
@@ -42,8 +43,21 @@ export const REVIEW_TAB_ORDER: readonly ReviewTabId[] = [
 	'permissions',
 	'thread',
 	'settings',
-	'moderation_settings'
+	'moderation_settings',
 ]
+
+/**
+ * A saved, named split — "which tabs, laid out which way" — that can be restored in one click
+ * instead of re-adding each tab to the split every time. Restoring a group doesn't stop you from
+ * switching away to look at one other tab; the group's own membership is untouched until you
+ * explicitly save over it or delete it, so it's always there to jump back to.
+ */
+export interface TabGroup {
+	id: string
+	label: string
+	tabs: ReviewTabId[]
+	direction: SplitDirection
+}
 
 interface DockState {
 	/** Open tabs in this dock, in the order they were opened. */
@@ -72,6 +86,8 @@ interface ReviewLayoutState {
 	checklistPanelWidth: number
 	/** Whether the bottom checklist walkthrough widget is collapsed to its slim bar. */
 	walkthroughCollapsed: boolean
+	/** Saved splits, restorable in either dock regardless of which dock they were saved from. */
+	tabGroups: TabGroup[]
 }
 
 export const SIDEBAR_WIDTH_MIN = 220
@@ -90,7 +106,9 @@ const settings = useModerationSettings()
 function defaultState(): ReviewLayoutState {
 	return {
 		sidebarCollapsed: false,
-		checklistConnected: !settings.value.get(moderationSettings.Experimental.UnlinkChecklistInReview),
+		checklistConnected: !settings.value.get(
+			moderationSettings.Experimental.UnlinkChecklistInReview,
+		),
 		pipOpen: false,
 		docks: {
 			main: {
@@ -106,6 +124,7 @@ function defaultState(): ReviewLayoutState {
 		sidebarWidth: 304,
 		checklistPanelWidth: 400,
 		walkthroughCollapsed: false,
+		tabGroups: [],
 	}
 }
 
@@ -152,6 +171,15 @@ export interface ModerationReviewLayout {
 	openPip: () => void
 	closePip: () => void
 	reclaimPipTabs: () => void
+	tabGroups: ComputedRef<TabGroup[]>
+	/** Save the dock's current split (2+ active tabs) as a group. Returns its id, or null if the
+	 *  dock isn't currently split. */
+	saveTabGroup: (dock: ReviewDockId, label: string) => string | null
+	/** Open every tab in the group (in `dock`, pulling them out of the other dock if needed) as
+	 *  its saved split — the group itself is left untouched, so it stays restorable. */
+	activateTabGroup: (dock: ReviewDockId, groupId: string) => void
+	renameTabGroup: (groupId: string, label: string) => void
+	deleteTabGroup: (groupId: string) => void
 	reset: () => void
 }
 
@@ -168,6 +196,15 @@ function create(): ModerationReviewLayout {
 		return { ...dock, tabs, active }
 	}
 
+	/** Drop stale tab ids and any group left with fewer than 2 valid tabs — a "group" of one
+	 *  wouldn't be a split. */
+	function sanitizeTabGroups(groups: TabGroup[] | undefined): TabGroup[] {
+		if (!groups) return []
+		return groups
+			.map((g) => ({ ...g, tabs: g.tabs.filter((t) => KNOWN_TABS.has(t)) }))
+			.filter((g) => g.tabs.length >= 2)
+	}
+
 	const state = useLocalStorage<ReviewLayoutState>(STORAGE_KEY, defaultState(), {
 		mergeDefaults: (storageValue, defaults) => {
 			const stored = storageValue as Partial<ReviewLayoutState> | null
@@ -178,6 +215,7 @@ function create(): ModerationReviewLayout {
 					main: sanitizeDock({ ...defaults.docks.main, ...stored?.docks?.main }, ['description']),
 					pip: sanitizeDock({ ...defaults.docks.pip, ...stored?.docks?.pip }, []),
 				},
+				tabGroups: sanitizeTabGroups(stored?.tabGroups),
 			}
 		},
 	})
@@ -345,6 +383,49 @@ function create(): ModerationReviewLayout {
 		state.value.pipOpen = false
 	}
 
+	function saveTabGroup(dock: ReviewDockId, label: string): string | null {
+		const d = state.value.docks[dock]
+		if (d.active.length < 2) return null
+		const id = `group-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`
+		state.value.tabGroups = [
+			...state.value.tabGroups,
+			{
+				id,
+				label: label.trim() || 'Untitled group',
+				tabs: [...d.active],
+				direction: d.splitDirection,
+			},
+		]
+		return id
+	}
+
+	function activateTabGroup(dock: ReviewDockId, groupId: string) {
+		const group = state.value.tabGroups.find((g) => g.id === groupId)
+		if (!group || group.tabs.length === 0) return
+		for (const tab of group.tabs) {
+			const existing = dockContaining(tab)
+			if (existing && existing !== dock) removeFromDock(tab, existing)
+			const target = state.value.docks[dock]
+			if (!target.tabs.includes(tab)) target.tabs.push(tab)
+		}
+		const d = state.value.docks[dock]
+		d.active = group.tabs.filter((t) => d.tabs.includes(t))
+		d.splitDirection = group.direction
+		normalizeActive(dock)
+	}
+
+	function renameTabGroup(groupId: string, label: string) {
+		const trimmed = label.trim()
+		if (!trimmed) return
+		state.value.tabGroups = state.value.tabGroups.map((g) =>
+			g.id === groupId ? { ...g, label: trimmed } : g,
+		)
+	}
+
+	function deleteTabGroup(groupId: string) {
+		state.value.tabGroups = state.value.tabGroups.filter((g) => g.id !== groupId)
+	}
+
 	function reset() {
 		state.value = defaultState()
 	}
@@ -382,6 +463,11 @@ function create(): ModerationReviewLayout {
 		openPip,
 		closePip,
 		reclaimPipTabs,
+		tabGroups: computed(() => state.value.tabGroups),
+		saveTabGroup,
+		activateTabGroup,
+		renameTabGroup,
+		deleteTabGroup,
 		reset,
 	}
 }

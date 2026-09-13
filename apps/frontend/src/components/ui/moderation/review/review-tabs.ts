@@ -114,8 +114,8 @@ export const REVIEW_TABS: Record<ReviewTabId, ReviewTabDef> = {
 		id: 'moderation_settings',
 		label: 'Moderation Settings',
 		icon: ScaleIcon,
-		component: defineAsyncComponent(() => import('../settings/ModerationSettings.vue'))
-	}
+		component: defineAsyncComponent(() => import('../settings/ModerationSettings.vue')),
+	},
 }
 
 export function isReviewTab(id: string): id is ReviewTabId {

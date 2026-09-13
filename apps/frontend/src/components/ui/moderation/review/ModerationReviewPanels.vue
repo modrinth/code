@@ -1,5 +1,5 @@
 <template>
-	<div class="flex min-h-0 min-w-0 flex-1 flex-col bg-bg">
+	<div ref="rootEl" class="flex min-h-0 min-w-0 flex-1 flex-col bg-bg">
 		<!-- Tab strip -->
 		<div
 			class="relative z-10 flex shrink-0 border-0 border-b border-solid border-divider bg-surface-2"
@@ -54,6 +54,71 @@
 					<SplitIcon class="size-4" :class="{ 'rotate-90': splitDir === 'column' }" />
 				</button>
 				<button
+					v-if="activeOrdered.length > 1"
+					v-tooltip="'Save this split as a tab group'"
+					class="rounded p-1.5 text-secondary hover:bg-button-bg hover:text-contrast"
+					aria-label="Save as tab group"
+					@click="openSaveGroupPrompt"
+				>
+					<SaveIcon class="size-4" />
+				</button>
+				<div v-if="saveGroupPrompt" class="fixed inset-0 z-40" @click="saveGroupPrompt = null" />
+				<div
+					v-if="saveGroupPrompt"
+					class="absolute right-1 top-full z-50 mt-1 flex w-56 flex-col gap-2 rounded-lg border border-solid border-divider bg-bg-raised p-2 shadow-lg"
+				>
+					<input
+						ref="groupNameInput"
+						v-model="saveGroupPrompt.label"
+						type="text"
+						placeholder="Group name"
+						class="w-full rounded border border-solid border-divider bg-bg px-2 py-1 text-sm text-primary"
+						@keydown.enter="confirmSaveGroup"
+						@keydown.escape="saveGroupPrompt = null"
+					/>
+					<Button size="xs" @click="confirmSaveGroup">Save group</Button>
+				</div>
+				<button
+					v-tooltip="'Tab groups'"
+					class="rounded p-1.5 text-secondary hover:bg-button-bg hover:text-contrast"
+					:class="{ 'text-contrast': groupsMenuOpen }"
+					aria-label="Tab groups"
+					@click="toggleGroupsMenu"
+				>
+					<LayersIcon class="size-4" />
+				</button>
+				<div v-if="groupsMenuOpen" class="fixed inset-0 z-40" @click="groupsMenuOpen = false" />
+				<div
+					v-if="groupsMenuOpen"
+					class="absolute right-1 top-full z-50 mt-1 flex min-w-48 flex-col rounded-lg border border-solid border-divider bg-bg-raised p-1 shadow-lg"
+				>
+					<div v-for="group in layout.tabGroups.value" :key="group.id" class="flex">
+						<button
+							class="group/item flex items-center gap-2 rounded px-2 py-1.5 text-left text-sm text-primary hover:bg-button-bg"
+							@click="activateGroup(group.id)"
+						>
+							<LayersIcon class="size-4 shrink-0 text-secondary" />
+							<span class="min-w-0 flex-1 truncate">{{ group.label }}</span>
+							<span class="shrink-0 text-xs text-secondary">{{ group.tabs.length }}</span>
+						</button>
+						<button
+							v-tooltip="'Delete group'"
+							class="shrink-0 rounded p-0.5 text-secondary hover:bg-button-bg hover:text-red group-hover/item:opacity-100"
+							aria-label="Delete group"
+							@click.stop="layout.deleteTabGroup(group.id)"
+						>
+							<XIcon class="size-4" />
+						</button>
+					</div>
+
+					<p
+						v-if="layout.tabGroups.value.length === 0"
+						class="m-0 px-2 py-1.5 text-sm text-secondary"
+					>
+						No saved groups yet — split two or more tabs, then save them as a group.
+					</p>
+				</div>
+				<button
 					v-if="dock === 'main' && (shiftHeld || layout.pipOpen.value)"
 					:title="
 						!pipSupported
@@ -74,9 +139,18 @@
 					title="Open section"
 					class="rounded p-1.5 text-secondary hover:bg-button-bg hover:text-contrast"
 					aria-label="Open section"
-					@click="addMenuOpen = !addMenuOpen"
+					@click="toggleAddMenu"
 				>
 					<PlusIcon class="size-4" />
+				</button>
+				<button
+					v-tooltip="topBarCollapsed ? 'Expand Topbar' : 'Collapse Topbar'"
+					class="rounded p-1.5 text-secondary hover:bg-button-bg hover:text-contrast"
+					:aria-label="topBarCollapsed ? 'Expand Topbar' : 'Collapse Topbar'"
+					@click="topBarCollapsed = !topBarCollapsed"
+				>
+					<ChevronDownIcon v-if="topBarCollapsed" class="size-4" />
+					<ChevronUpIcon v-else class="size-4" />
 				</button>
 				<div v-if="addMenuOpen" class="fixed inset-0 z-40" @click="addMenuOpen = false" />
 				<div
@@ -202,9 +276,20 @@
 </template>
 
 <script setup lang="ts">
-import { ExternalIcon, PlusIcon, SpinnerIcon, SplitIcon, WindowIcon, XIcon } from '@modrinth/assets'
-import { Button, injectProjectPageContext } from '@modrinth/ui'
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import {
+	ChevronUpIcon,
+	ChevronDownIcon,
+	ExternalIcon,
+	LayersIcon,
+	PlusIcon,
+	SaveIcon,
+	SpinnerIcon,
+	SplitIcon,
+	WindowIcon,
+	XIcon,
+} from '@modrinth/assets'
+import { Button, injectProjectPageContext, injectPageContext } from '@modrinth/ui'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import type { ChecklistElementKey } from '~/components/ui/moderation/checklist/checklist-context'
 import {
@@ -217,6 +302,9 @@ import {
 import ModerationElementFrame from './ModerationElementFrame.vue'
 import { pipSupported } from './pip-window'
 import { reviewTab, selectableReviewTabs } from './review-tabs'
+
+const pageContext = injectPageContext();
+const topBarCollapsed = pageContext.topBarCollapsed;
 
 const props = defineProps<{ dock: ReviewDockId }>()
 
@@ -243,13 +331,20 @@ const selectableTabs = computed(() => selectableReviewTabs(REVIEW_TAB_ORDER, isM
 
 const isPip = computed(() => props.dock === 'pip')
 
+// This instance renders inside the review's Picture-in-Picture window when `dock === 'pip'` —
+// that window shares the main window's JS realm, so the bare `window` global here always means
+// the *main* window. A dock's own keyboard/blur handling (closing its own menus on Escape, in
+// particular) has to listen on whichever window this instance actually lives in.
+const rootEl = ref<HTMLElement | null>(null)
+const ownerWindow = computed<Window>(() => rootEl.value?.ownerDocument?.defaultView ?? window)
+
 // The PiP toggle only appears while Shift is held (or while a PiP window is already open).
 const shiftHeld = ref(false)
 function onKeyDown(e: KeyboardEvent) {
 	if (e.key === 'Shift') shiftHeld.value = true
 	if (e.key === 'Escape') {
 		contextMenu.value = null
-		addMenuOpen.value = false
+		closeMenus()
 	}
 }
 function onKeyUp(e: KeyboardEvent) {
@@ -258,15 +353,18 @@ function onKeyUp(e: KeyboardEvent) {
 function onWindowBlur() {
 	shiftHeld.value = false
 }
+/** The window `onKeyDown`/`onKeyUp`/`onWindowBlur` were registered against — matched on cleanup. */
+let listenerWindow: Window = window
 onMounted(() => {
-	window.addEventListener('keydown', onKeyDown)
-	window.addEventListener('keyup', onKeyUp)
-	window.addEventListener('blur', onWindowBlur)
+	listenerWindow = ownerWindow.value
+	listenerWindow.addEventListener('keydown', onKeyDown)
+	listenerWindow.addEventListener('keyup', onKeyUp)
+	listenerWindow.addEventListener('blur', onWindowBlur)
 })
 onBeforeUnmount(() => {
-	window.removeEventListener('keydown', onKeyDown)
-	window.removeEventListener('keyup', onKeyUp)
-	window.removeEventListener('blur', onWindowBlur)
+	listenerWindow.removeEventListener('keydown', onKeyDown)
+	listenerWindow.removeEventListener('keyup', onKeyUp)
+	listenerWindow.removeEventListener('blur', onWindowBlur)
 })
 
 function togglePip() {
@@ -287,9 +385,48 @@ const activeOrdered = computed(() =>
 const splitDir = computed(() => dockState.value.splitDirection ?? 'row')
 
 const addMenuOpen = ref(false)
+const groupsMenuOpen = ref(false)
+const saveGroupPrompt = ref<{ label: string } | null>(null)
+const groupNameInput = ref<HTMLInputElement | null>(null)
 
 function tabDef(id: ReviewTabId) {
 	return reviewTab(id)
+}
+
+function closeMenus() {
+	addMenuOpen.value = false
+	groupsMenuOpen.value = false
+	saveGroupPrompt.value = null
+}
+
+function toggleAddMenu() {
+	const next = !addMenuOpen.value
+	closeMenus()
+	addMenuOpen.value = next
+}
+
+function toggleGroupsMenu() {
+	const next = !groupsMenuOpen.value
+	closeMenus()
+	groupsMenuOpen.value = next
+}
+
+function openSaveGroupPrompt() {
+	const label = activeOrdered.value.map((id) => tabDef(id).label).join(' + ')
+	closeMenus()
+	saveGroupPrompt.value = { label }
+	nextTick(() => groupNameInput.value?.focus())
+}
+
+function confirmSaveGroup() {
+	if (!saveGroupPrompt.value) return
+	layout.saveTabGroup(props.dock, saveGroupPrompt.value.label)
+	saveGroupPrompt.value = null
+}
+
+function activateGroup(groupId: string) {
+	layout.activateTabGroup(props.dock, groupId)
+	groupsMenuOpen.value = false
 }
 
 function isInSplit(id: ReviewTabId) {
@@ -308,7 +445,7 @@ const contextMenu = ref<{ id: ReviewTabId; x: number; y: number } | null>(null)
 const menuTargetId = computed<ReviewTabId>(() => contextMenu.value?.id ?? REVIEW_TAB_ORDER[0])
 
 function openContextMenu(id: ReviewTabId, event: MouseEvent) {
-	addMenuOpen.value = false
+	closeMenus()
 	const view = (event.view as Window | null) ?? window
 	const x = Math.min(event.clientX, view.innerWidth - 208)
 	const y = Math.min(event.clientY, view.innerHeight - 176)

@@ -1,10 +1,11 @@
 <template>
 	<div
-		class="mod-review-shell sticky top-0 flex overflow-hidden border-0 border-t border-solid border-divider"
+		class="sticky top-0 flex overflow-hidden border-0 border-t border-solid border-divider"
 		:class="{ 'select-none': resizing }"
+		:style="{ height: height }"
 	>
 		<ModerationReviewSidebar
-			:project="reviewData.project.value"
+			:projectV2="reviewData.project.value"
 			:project-v3="reviewData.projectV3.value"
 			:organization="reviewData.organization.value"
 			:members="reviewData.members.value"
@@ -36,13 +37,15 @@
 		/>
 		<ModerationChecklistPanel :style="{ width: `${layout.checklistPanelWidth.value}px` }" />
 
-		<ModerationReviewPipHost v-if="pipOpen" />
+		<!-- Always mounted — it watches `pipOpen` itself rather than being created/destroyed by
+		     it, so a stray reactive flip can't tear down (and fail to properly reopen) the real
+		     PiP window. See ModerationReviewPipHost.vue's own doc comment. -->
+		<ModerationReviewPipHost />
 	</div>
 </template>
 
 <script setup lang="ts">
-import { moderationSettings } from '@modrinth/moderation'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 
 import { injectReviewLayoutData } from '~/components/ui/moderation/checklist/checklist-context'
 import { useModerationReviewLayout } from '~/services/moderation/review-layout'
@@ -52,12 +55,15 @@ import ModerationChecklistWalkthrough from './ModerationChecklistWalkthrough.vue
 import ModerationReviewPanels from './ModerationReviewPanels.vue'
 import ModerationReviewPipHost from './ModerationReviewPipHost.vue'
 import ModerationReviewSidebar from './ModerationReviewSidebar.vue'
+import { injectPageContext } from "@modrinth/ui"
 
 const layout = useModerationReviewLayout()
 const reviewData = injectReviewLayoutData()
-const settings = useModerationSettings()
+const pageContext = injectPageContext();
 
-const pipOpen = computed(() => layout.pipOpen.value)
+const collapsed = pageContext.topBarCollapsed;
+
+const height = computed(() => collapsed.value ? '100dvh' : `calc(100dvh - 4.5rem)`)
 
 const resizing = ref<'sidebar' | 'panel' | null>(null)
 

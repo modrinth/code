@@ -14,6 +14,7 @@ export default function () {
 	type LinkSectionBuilder = GroupNode & {
 		children(...extras: ChildEntry[]): LinkSectionBuilder
 		label(badge: Ref<boolean>): LinkSectionBuilder
+		multiLine(value: Ref<boolean>): LinkSectionBuilder
 	}
 
 	function linkSection(id: string, name: string): LinkSectionBuilder {
@@ -31,14 +32,14 @@ export default function () {
 			.shown(computed(() => !!url.value))
 			.children(
 				() => (
-					<div class="markdown-body w-full">
+					<div class="markdown-body w-full flex flex-wrap gap-1">
 						{showBadge?.value && (
 							<>
-								<strong>[📜]</strong>{' '}
+								<strong class="w-max">[📜]</strong>{' '}
 							</>
 						)}
-						<strong>{name}:</strong>{' '}
-						<a href={url.value} target="_blank" class="underline">
+						<strong class="w-max">{name}:</strong>{' '}
+						<a href={url.value} target="_blank" class="underline w-max">
 							{url.value}
 						</a>
 					</div>

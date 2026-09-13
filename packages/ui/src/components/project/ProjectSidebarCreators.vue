@@ -95,7 +95,7 @@ const props = defineProps<{
 	linkTarget?: string
 	userLinkTarget?: string | null
 	loading?: boolean
-	disableHeader: true
+	disableHeader?: boolean
 }>()
 
 function resolveLinkTarget(target: string | null | undefined): string | null {

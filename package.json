@@ -53,6 +53,7 @@
 	},
 	"pnpm": {
 		"patchedDependencies": {
+			"floating-vue@5.4.0": "patches/floating-vue@5.4.0.patch",
 			"readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"
 		},
 		"peerDependencyRules": {

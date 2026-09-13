@@ -21,6 +21,7 @@ export interface PageContext {
 		serverRamAsBytesAlwaysOn?: Ref<boolean>
 	}
 	openExternalUrl: (url: string) => void
+	topBarCollapsed: Ref<boolean>
 }
 
 export const [injectPageContext, providePageContext] = createContext<PageContext>(

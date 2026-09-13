@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
+  floating-vue@5.4.0:
+    hash: 183706a8c64e48e2b530102b0fb384df4f9a0dd1a33cd733bb58b2bca3cbcd3f
+    path: patches/floating-vue@5.4.0.patch
   readable-stream@2.3.8:
     hash: 3045f7adf989b4e668a4a13819b7285b0de186b79bbf22408acaf2a41c6eaa86
     path: patches/readable-stream@2.3.8.patch
@@ -43,6 +46,9 @@ importers:
       chalk:
         specifier: ^5.6.2
         version: 5.6.2
+      cross-env:
+        specifier: ^10.1.0
+        version: 10.1.0
       if-ci:
         specifier: ^3.0.0
         version: 3.0.0
@@ -141,8 +147,8 @@ importers:
         specifier: ^1.11.10
         version: 1.11.19
       floating-vue:
-        specifier: ^5.2.2
-        version: 5.2.2(@nuxt/kit@3.21.0(magicast@0.5.1))(vue@3.5.27(typescript@5.9.3))
+        specifier: ^5.4.0
+        version: 5.4.0(patch_hash=183706a8c64e48e2b530102b0fb384df4f9a0dd1a33cd733bb58b2bca3cbcd3f)(@nuxt/kit@4.3.0(magicast@0.5.1))(vue@3.5.27(typescript@5.9.3))
       fuse.js:
         specifier: ^6.6.2
         version: 6.6.2
@@ -336,8 +342,8 @@ importers:
         specifier: ^3.1.7
         version: 3.3.1
       floating-vue:
-        specifier: ^5.2.2
-        version: 5.2.2(@nuxt/kit@3.21.0(magicast@0.5.1))(vue@3.5.27(typescript@5.9.3))
+        specifier: ^5.4.0
+        version: 5.4.0(patch_hash=183706a8c64e48e2b530102b0fb384df4f9a0dd1a33cd733bb58b2bca3cbcd3f)(@nuxt/kit@4.3.0(magicast@0.5.1))(vue@3.5.27(typescript@5.9.3))
       fuse.js:
         specifier: ^6.6.2
         version: 6.6.2
@@ -566,6 +572,9 @@ importers:
       '@tanstack/vue-query':
         specifier: 5.101.4
         version: 5.101.4(vue@3.5.27(typescript@5.9.3))
+      floating-vue:
+        specifier: ^5.2.2
+        version: 5.2.2(@nuxt/kit@3.21.0(magicast@0.5.1))(vue@3.5.27(typescript@5.9.3))
       vue:
         specifier: ^3.5.13
         version: 3.5.27(typescript@5.9.3)
@@ -1352,6 +1361,9 @@ packages:
 
   '@emnapi/wasi-threads@1.1.0':
     resolution: {integrity: sha512-WI0DdZ8xFSbgMjR1sFsKABJ/C5OnRrjT06JXbZKexJGrDuPTzZdDYfFlsgcCXCyf+suG5QU2e/y1Wo2V/OapLQ==}
+
+  '@epic-web/invariant@1.0.0':
+    resolution: {integrity: sha512-lrTPqgvfFQtR/eY/qkIzp98OGdNJu0m5ji3q/nJI8v3SXkRKEnWiOxMmbvcSoAIzv/cGiuvRy57k4suKQSAdwA==}
 
   '@es-joy/jsdoccomment@0.50.2':
     resolution: {integrity: sha512-YAdE/IJSpwbOTiaURNCKECdAwqrJuFiZhylmesBcIRawtYKnBR2wxPhoIewMg+Yu+QuYvHfJNReWpoxGBKOChA==}
@@ -2181,11 +2193,20 @@ packages:
   '@floating-ui/core@1.7.4':
     resolution: {integrity: sha512-C3HlIdsBxszvm5McXlB8PeOEWfBhcGBTZGkGlWc2U0KFY5IwG5OQEuQ8rq52DZmcHDlPLd+YFBK+cZcytwIFWg==}
 
+  '@floating-ui/core@1.8.0':
+    resolution: {integrity: sha512-0CIZ5itps/8x7BG8dEIhs53BvCUH2PCoogtakwRTut+Arm58sJooJ0AuZhLw2HJYIR5cMLNPBSS728sPho2khQ==}
+
   '@floating-ui/dom@1.1.1':
     resolution: {integrity: sha512-TpIO93+DIujg3g7SykEAGZMDtbJRrmnYRCNYSjJlvIbGhBjRSNTLVbNeDQBrzy9qDgUbiWdc7KA0uZHZ2tJmiw==}
 
+  '@floating-ui/dom@1.8.0':
+    resolution: {integrity: sha512-yXSrzeHZBTZadLOlfyhCkJHNeLJnHRnRInwdZ40L7ZiaAtrBwoYlsDrX3v5zB1Utk7CLfzcOVnVVWoXEky7Ceg==}
+
   '@floating-ui/utils@0.2.10':
     resolution: {integrity: sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==}
+
+  '@floating-ui/utils@0.2.12':
+    resolution: {integrity: sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==}
 
   '@formatjs/cli@6.12.2':
     resolution: {integrity: sha512-y215aarLZXei3u1WDRAiet/VajgvUXzvz4ifPENDSPXfIog0aBJKtFvIU7EWbcFWy7rstbn5GcwwQW4F1G3TJg==}
@@ -5905,6 +5926,11 @@ packages:
     resolution: {integrity: sha512-p9nwwR4qyT5W996vBZhdvBCnMhicY5ytZkR4D1Xj0wuTDEiMnjwR57Q3RXYY/s0EpX6Ay3vgIcfaR+ewGHsi+g==}
     engines: {node: '>=18.0'}
 
+  cross-env@10.1.0:
+    resolution: {integrity: sha512-GsYosgnACZTADcmEyJctkJIoqAhHjttw7RsFrVoJNXbsWWqaq6Ym+7kZjq6mS45O0jij6vtiReppKQEtqWy6Dw==}
+    engines: {node: '>=20'}
+    hasBin: true
+
   cross-spawn@6.0.6:
     resolution: {integrity: sha512-VqCUuhcd1iB+dsv8gxPttb5iZh/D0iubSP21g36KXdEuf6I5JiioesUVjpCdHV9MZRUfVFlvwtIUyPfxo5trtw==}
     engines: {node: '>=4.8'}
@@ -6650,6 +6676,15 @@ packages:
     resolution: {integrity: sha512-afW+h2CFafo+7Y9Lvw/xsqjaQlKLdJV7h1fCHfcYQ1C4SVMlu7OAekqWgu5d4SgvkBVU0pVpLlVsrSTBURFRkg==}
     peerDependencies:
       '@nuxt/kit': ^3.2.0
+      vue: ^3.2.0
+    peerDependenciesMeta:
+      '@nuxt/kit':
+        optional: true
+
+  floating-vue@5.4.0:
+    resolution: {integrity: sha512-hb5y5N8sXs9Dy4iZfWBKLzf3FkUkqhbkQREhRulAEvIihMlSGxc/7pXGrIDetoqXm/RRHNVjvN6lql9IhMM+tQ==}
+    peerDependencies:
+      '@nuxt/kit': ^3.2.0 || ^4.0.0 || ^5.0.0-0
       vue: ^3.2.0
     peerDependenciesMeta:
       '@nuxt/kit':
@@ -11413,6 +11448,8 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
+  '@epic-web/invariant@1.0.0': {}
+
   '@es-joy/jsdoccomment@0.50.2':
     dependencies:
       '@types/estree': 1.0.8
@@ -11894,11 +11931,22 @@ snapshots:
     dependencies:
       '@floating-ui/utils': 0.2.10
 
+  '@floating-ui/core@1.8.0':
+    dependencies:
+      '@floating-ui/utils': 0.2.12
+
   '@floating-ui/dom@1.1.1':
     dependencies:
       '@floating-ui/core': 1.7.4
 
+  '@floating-ui/dom@1.8.0':
+    dependencies:
+      '@floating-ui/core': 1.8.0
+      '@floating-ui/utils': 0.2.12
+
   '@floating-ui/utils@0.2.10': {}
+
+  '@floating-ui/utils@0.2.12': {}
 
   '@formatjs/cli@6.12.2(@vue/compiler-core@3.5.27)(vue@3.5.27(typescript@5.9.3))':
     optionalDependencies:
@@ -15989,6 +16037,11 @@ snapshots:
 
   croner@9.1.0: {}
 
+  cross-env@10.1.0:
+    dependencies:
+      '@epic-web/invariant': 1.0.0
+      cross-spawn: 7.0.6
+
   cross-spawn@6.0.6:
     dependencies:
       nice-try: 1.0.5
@@ -17020,6 +17073,13 @@ snapshots:
       vue-resize: 2.0.0-alpha.1(vue@3.5.27(typescript@5.9.3))
     optionalDependencies:
       '@nuxt/kit': 3.21.0(magicast@0.5.1)
+
+  floating-vue@5.4.0(patch_hash=183706a8c64e48e2b530102b0fb384df4f9a0dd1a33cd733bb58b2bca3cbcd3f)(@nuxt/kit@4.3.0(magicast@0.5.1))(vue@3.5.27(typescript@5.9.3)):
+    dependencies:
+      '@floating-ui/dom': 1.8.0
+      vue: 3.5.27(typescript@5.9.3)
+    optionalDependencies:
+      '@nuxt/kit': 4.3.0(magicast@0.5.1)
 
   follow-redirects@1.16.0: {}
 
