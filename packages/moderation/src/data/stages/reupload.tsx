@@ -1,10 +1,12 @@
 import { CopyrightIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
-import {computed, defineAsyncComponent} from 'vue'
+import { computed, defineAsyncComponent } from 'vue'
 
 import { appComponent, check, group, markdown, stage, text, toggle } from '../../types/node'
 
-const ModrinthProjectSearch = defineAsyncComponent(async () => import("../../types/node/components/ModrinthProjectSearch.vue"));
+const ModrinthProjectSearch = defineAsyncComponent(
+	async () => import('../../types/node/components/ModrinthProjectSearch.vue'),
+)
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
@@ -40,7 +42,7 @@ export default function () {
 									console.log(hit)
 									ctx.writeSibling?.('original-project', hit.title)
 									ctx.writeSibling?.('original-author', hit.author)
-								}
+								},
 							})),
 						text('original-project').title('Original Project Title').required(),
 						text('original-author').title('Original project Author').required(),

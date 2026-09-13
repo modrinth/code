@@ -16,7 +16,11 @@ const queryClient = useQueryClient()
 const route = useRoute()
 const keybinds = useModerationKeybinds()
 
-const projectId = String(useRouteId('project'))
+const props = defineProps<{
+	projectId?: string
+}>()
+
+const projectId = props.projectId ?? String(useRouteId('project'))
 
 useHead({ title: () => `Tech review - ${projectId} - Modrinth` })
 
@@ -143,13 +147,13 @@ function handleKeybinds(event: KeyboardEvent) {
 		scope: 'tech-review',
 		actions: {
 			goToTop: () => {
-				window.scrollTo({
+				win.value.scrollTo({
 					top: 0,
 					behavior: 'smooth',
 				})
 			},
 			goToBottom: () => {
-				window.scrollTo({
+				win.value.scrollTo({
 					top: document.body.scrollHeight,
 					behavior: 'smooth',
 				})
@@ -158,18 +162,21 @@ function handleKeybinds(event: KeyboardEvent) {
 	})
 }
 
+const rootComponent = ref<HTMLElement | null>(null);
+const win = computed(() => rootComponent.value?.ownerDocument.defaultView ?? window);
+
 onMounted(() => {
-	window.addEventListener('keydown', handleKeybinds)
+	win.value.addEventListener('keydown', handleKeybinds)
 })
 
 onUnmounted(() => {
-	window.removeEventListener('keydown', handleKeybinds)
+	win.value.removeEventListener('keydown', handleKeybinds)
 })
 </script>
 
 <template>
-	<div class="flex flex-col">
-		<BackToParentLink :to="'/moderation/technical-review'"> Back to queue </BackToParentLink>
+	<div ref="rootComponent" class="flex flex-col">
+		<BackToParentLink v-if="props.projectId == undefined" :to="'/moderation/technical-review'"> Back to queue </BackToParentLink>
 
 		<div v-if="isLoading" class="flex flex-col gap-4">
 			<div class="universal-card flex h-48 items-center justify-center">

@@ -12,8 +12,6 @@ export interface PersistedChecklistState {
 	activatedStages?: string[]
 	/** Every stage that has ever held a selection this project (drives the review summary). */
 	touchedStages?: string[]
-	/** Every issue node that has ever been active (drives the toggleable flagged-issue list). */
-	touchedNodes?: { statePath: string[]; stageId: string; label: string; tooltip?: string }[]
 }
 
 const STORE = 'checklist'
@@ -108,7 +106,11 @@ export async function saveChecklistState(
 	try {
 		await enqueueOp(projectId, () => dbPut(STORE, projectId, record))
 	} catch (error) {
-		console.debug('Failed to save checklist state to IndexedDB:', error)
+		console.log(state)
+		// Was debug-only before, which is exactly why a DataCloneError here (see
+		// serializeNodeState's doc comment) could silently break persistence with no visible
+		// signal — this is the one failure a moderator actually needs to notice.
+		console.error('Failed to save checklist state to IndexedDB:', error)
 	}
 }
 

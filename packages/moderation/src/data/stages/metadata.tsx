@@ -1,19 +1,24 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { DatabaseIcon } from '@modrinth/assets'
 import { ENVIRONMENTS_COPY, injectProjectPageContext, injectTags } from '@modrinth/ui'
-import { computed } from 'vue'
+import { computed, defineAsyncComponent } from 'vue'
 
 import {
-	appComponent as _appComponent,
+	appComponent,
 	dropdown,
 	fix,
 	group,
 	md,
 	option,
 	stage,
+	text,
 	toggle,
 } from '../../types/node'
 import { requiresEnvironmentInfo } from '../../utils'
+
+const ModrinthProjectSearch = defineAsyncComponent(
+	async () => import('../../types/node/components/ModrinthProjectSearch.vue'),
+)
 
 const loaderLabels: Record<string, string> = {
 	neoforge: 'NeoForge',
@@ -30,6 +35,43 @@ function _formatLoaderLabel(id: string): string {
 			.map((w) => w.charAt(0).toUpperCase() + w.slice(1))
 			.join(' ')
 	)
+}
+
+interface SearchedDependency {
+	title?: string
+	slug?: string
+	projectType?: string
+}
+
+/**
+ * The search picker (when used) always resolves to real Modrinth links; the plain name/link
+ * fields stay as a manual fallback for a dependency that isn't on Modrinth, used only when
+ * nothing was added via search.
+ */
+function formatDependencyLinks(state: Record<string, unknown>): string {
+	const links: string[] = []
+
+	const raw = state['dependency-search']
+	if (typeof raw === 'string' && raw) {
+		try {
+			const parsed: unknown = JSON.parse(raw)
+			if (Array.isArray(parsed)) {
+				for (const dep of parsed as SearchedDependency[]) {
+					if (dep?.title && dep.slug && dep.projectType) {
+						links.push(`[${dep.title}](https://modrinth.com/${dep.projectType}/${dep.slug})`)
+					}
+				}
+			}
+		} catch {
+			// Malformed JSON — ignore and fall back to the manual fields below.
+		}
+	}
+
+	if (links.length === 0 && state['name'] && state['link']) {
+		links.push(`[${state['name']}](${state['link']})`)
+	}
+
+	return links.join(', ')
 }
 
 export default function () {
@@ -116,13 +158,38 @@ export default function () {
 								),
 						),
 
-					toggle('dependencies', 'Dependencies').suggestedStatus('flagged').message(),
-					// good enough for now.
-					toggle('game-versions', 'Game Versions').suggestedStatus('flagged').message(),
+					toggle('dependencies', 'Dependencies')
+						.suggestedStatus('flagged')
+						.message((state) => ({
+							DEPENDENCIES: formatDependencyLinks(state),
+						}))
+						.children(
+							appComponent('dependency-search', ModrinthProjectSearch)
+								.title('On Modrinth: ')
+								.props(() => ({ multiple: true })),
+							(
+								<h2>External Dependencies</h2>
+							), // TODO: ADD FUNCTION FOR ADDING MULTIPLE ENTRIES
+							text('name').title('Dependency name'),
+							text('link').title('Dependency link'),
+						),
+
+					toggle('game-versions', 'Game Versions')
+						.suggestedStatus('flagged')
+						.message((state) => ({
+							SPECIFICS: state.specifics,
+						}))
+						.children(text('specifics').title('More details about the game versions issue?')),
+
 					toggle('loaders', 'Loaders')
 						.suggestedStatus('rejected')
 						.shown(!project.value.minecraft_server)
-						.message(),
+						.message((state) => ({
+							SPECIFICS: state.specifics,
+						}))
+						.children(text('specifics').title('More details about the loaders issue?')),
+
+					toggle('license', 'Licensing').suggestedStatus('flagged').message(),
 					// toggle('loader', 'Loaders (WIP)')
 					// 	.suggestedStatus('flagged')
 					// 	.rawMessage(async (state) => {

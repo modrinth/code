@@ -277,8 +277,8 @@
 
 <script setup lang="ts">
 import {
-	ChevronUpIcon,
 	ChevronDownIcon,
+	ChevronUpIcon,
 	ExternalIcon,
 	LayersIcon,
 	PlusIcon,
@@ -288,7 +288,7 @@ import {
 	WindowIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Button, injectProjectPageContext, injectPageContext } from '@modrinth/ui'
+import { Button, injectPageContext, injectProjectPageContext } from '@modrinth/ui'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import type { ChecklistElementKey } from '~/components/ui/moderation/checklist/checklist-context'
@@ -303,8 +303,8 @@ import ModerationElementFrame from './ModerationElementFrame.vue'
 import { pipSupported } from './pip-window'
 import { reviewTab, selectableReviewTabs } from './review-tabs'
 
-const pageContext = injectPageContext();
-const topBarCollapsed = pageContext.topBarCollapsed;
+const pageContext = injectPageContext()
+const topBarCollapsed = pageContext.topBarCollapsed
 
 const props = defineProps<{ dock: ReviewDockId }>()
 

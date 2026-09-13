@@ -23,7 +23,7 @@ export function childWriter(
 		const container: Record<string, NodeState> =
 			existing && typeof existing === 'object' && !(existing instanceof Set)
 				? { ...(existing as Record<string, NodeState>) }
-				: { value: existing !== undefined ? existing : true }
+				: existing !== undefined ? { value: existing } : { }
 		if (value === undefined) Reflect.deleteProperty(container, childId)
 		else container[childId] = value
 		parentWrite(containerId, Object.keys(container).length === 0 ? undefined : container)

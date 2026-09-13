@@ -219,9 +219,9 @@ export function withEnabled<T extends object>(node: T): T & Enableable {
 	})
 }
 
-export type HasValueBase<V> = Pick<HasValue<V>, '_getValue' | '_setValue' | '_isActive'>;
+export type HasValueBase<V> = Pick<HasValue<V>, '_getValue' | '_setValue' | '_isActive'>
 
-export interface HasValue<V = unknown> {
+export interface HasValue<V = any> {
 	_defaultValue?: V | ((state: Record<string, NodeState>) => V)
 	_getValue: (raw: NodeState) => V
 	_setValue: (raw: NodeState, next: V, isDefault?: boolean) => NodeState
@@ -413,12 +413,12 @@ export function withEditable<T extends object>(node: T): T & Editable {
 	})
 }
 
-export interface TweakDef<V = unknown> {
+export interface TweakDef<V = any> {
 	icon: FunctionalComponent<SVGAttributes>
 	compute: (current: V, state: Record<string, NodeState>) => V | null | undefined
 }
 
-export interface Tweakable<V = unknown> {
+export interface Tweakable<V = any> {
 	_tweaks: TweakDef<V>[]
 	tweak(this: this, icon: FunctionalComponent<SVGAttributes>, compute: TweakDef<V>['compute']): this
 }
@@ -426,11 +426,7 @@ export interface Tweakable<V = unknown> {
 export function withTweak<T extends HasValue<V>, V = any>(node: T): T & Tweakable<V> {
 	return Object.assign(node, {
 		_tweaks: [],
-		tweak(
-			this,
-			icon,
-			compute,
-		) {
+		tweak(this, icon, compute) {
 			this._tweaks.push({ icon: markRaw(icon), compute })
 			return this
 		},

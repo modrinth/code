@@ -56,7 +56,6 @@ export const STAGE_ELEMENT: Record<string, ChecklistElementKey> = {
 	rules: 'global',
 	're-review': 'global',
 	'status-alerts': 'global',
-	'post-approval': 'global',
 }
 
 export function elementForStage(stageId: string | undefined): ChecklistElementKey | undefined {

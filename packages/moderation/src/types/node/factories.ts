@@ -1,8 +1,9 @@
 import { Checkbox, Combobox, Input, MarkdownEditor, Toggle } from '@modrinth/ui'
+import type { Component, ComponentPublicInstance } from '@vue/runtime-core'
 import { markRaw } from 'vue'
 
 import { withAutoProps, withChildren } from './builder'
-import type {ComponentNodePropsContext, Configurable, HasValueBase} from './capabilities'
+import type { ComponentNodePropsContext, HasValueBase } from './capabilities'
 import {
 	withComponent,
 	withEditable,
@@ -29,7 +30,6 @@ import {
 import ActionButton from './components/ActionButton.vue'
 import { pipe } from './pipe'
 import type { NodeState, NodeStateWithChildren } from './state'
-import type { Component, ComponentPublicInstance } from "@vue/runtime-core";
 
 function getBooleanValue(raw: NodeState): boolean {
 	if (typeof raw === 'boolean') return raw
@@ -340,7 +340,10 @@ const stringValueBehavior = {
 	_isActive: (v: string) => v !== '',
 }
 
-export function appComponent<T extends Component = { new (): ComponentPublicInstance; }>(id: string, component: T) {
+export function appComponent<T extends Component = { new (): ComponentPublicInstance }>(
+	id: string,
+	component: T,
+) {
 	const node = pipe(
 		{} as Record<string, never>,
 		(n) => withId(n, id),

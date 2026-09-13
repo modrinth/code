@@ -478,7 +478,6 @@ import {
 	setMessageProject,
 	setMissingMdHandler,
 } from '@modrinth/moderation/src/types/node'
-import ModrinthProjectSearch from '@modrinth/moderation/src/types/node/components/ModrinthProjectSearch.vue'
 import NodeRenderer from '@modrinth/moderation/src/types/node/components/NodeRenderer.vue'
 import type { FixBuilder } from '@modrinth/moderation/src/types/node/fix'
 import type { Writer } from '@modrinth/moderation/src/types/node/mutate'
@@ -1127,9 +1126,15 @@ function computeStageLiveNode(stage: StageNode, stageState: Record<string, NodeS
 	const stageChildren = resolveChildren(stage, stageState)
 	const metaMap = computeNodeMeta(stageChildren, stageState, isFixActionable)
 	const attentionMap = computeAttentionMap(stageChildren, stageState, metaMap)
-	const actions = collectActiveActions(stageChildren, stageState, [stage.id])
+	const actions = collectActiveActions(stageChildren, stageState, metaMap, [stage.id])
 
-	if (stage._segments.length > 0) {
+	// A stage-level `.message()`/`.rawMessage()` (e.g. links.tsx, which builds its whole message
+	// from the raw state of all its link sections at once) is meant to *summarize* whatever the
+	// stage's own children have flagged, not to be its own permanently-active entry — `_segments`
+	// is a static property of the stage's definition, so gating on it alone made a stage with
+	// `.rawMessage()` read as "active" (and worth saving/messaging) forever, even completely
+	// untouched. Only include it once the stage actually holds some real state.
+	if (stage._segments.length > 0 && Object.keys(stageState).length > 0) {
 		actions.unshift({ node: stage, state: stageState, statePath: [stage.id], active: true })
 	}
 
@@ -1275,8 +1280,6 @@ function savePersistedState(open: boolean, resetReviewAnyway = false) {
 	const stateVal = Object.keys(rawState).length > 0 ? rawState : undefined
 	const activatedStagesVal = activatedStages.value.size > 0 ? [...activatedStages.value] : undefined
 	const touchedStagesVal = touchedStages.value.size > 0 ? [...touchedStages.value] : undefined
-	const touchedNodesArr = Object.values(touchedNodes.value)
-	const touchedNodesVal = touchedNodesArr.length > 0 ? touchedNodesArr : undefined
 	if (
 		!openVal &&
 		!reviewAnywayVal &&
@@ -1284,8 +1287,7 @@ function savePersistedState(open: boolean, resetReviewAnyway = false) {
 		!messageVal &&
 		!stateVal &&
 		!activatedStagesVal &&
-		!touchedStagesVal &&
-		!touchedNodesVal
+		!touchedStagesVal
 	) {
 		return clearChecklistState(checklistPersistenceProjectId)
 	}
@@ -1297,7 +1299,6 @@ function savePersistedState(open: boolean, resetReviewAnyway = false) {
 		...(stateVal && { state: stateVal }),
 		...(activatedStagesVal && { activatedStages: activatedStagesVal }),
 		...(touchedStagesVal && { touchedStages: touchedStagesVal }),
-		...(touchedNodesVal && { touchedNodes: touchedNodesVal }),
 	})
 }
 
@@ -1528,7 +1529,13 @@ async function assembleFullMessage() {
 		}
 	}
 
-	parts.sort((a, b) => byPriority(a.entry, b.entry))
+	parts.sort((a, b) => byPriority(a.entry, b.entry)).sort((a, b) => {
+		if (a.entry.isFixed && b.entry.isFixed) return 0;
+		else if (a.entry.isFixed) return 1;
+		else return -1;
+	});
+
+	console.log(parts)
 
 	return expandVariables(
 		parts
@@ -1580,7 +1587,6 @@ const stageMeta = computed(() => {
 const appComponentsByKey: Record<string, Component> = {
 	'loader-picker': LoaderPicker,
 	'game-version-picker': McVersionPicker,
-	'modrinth-project-search': ModrinthProjectSearch,
 }
 
 const stageState = computed(
@@ -1616,9 +1622,8 @@ interface TouchedNode {
 	/** Static tooltip text off the node itself, so the summary chip can show the same hint. */
 	tooltip?: string
 }
-const touchedNodes = ref<Record<string, TouchedNode>>(
-	Object.fromEntries((persistedState?.touchedNodes ?? []).map((n) => [n.statePath.join('/'), n])),
-)
+// Not persisted (see checklist-storage.ts) — starts fresh each session.
+const touchedNodes = ref<Record<string, TouchedNode>>({})
 
 /** Only static (string) tooltips resolve here — function tooltips need live render-time state. */
 function resolveStaticTooltip(node: object): string | undefined {
@@ -1662,8 +1667,6 @@ watch(
 	},
 	{ deep: true, immediate: true },
 )
-
-watch(touchedNodes, persistState, { deep: true })
 
 /**
  * A toggle-with-children stores its own on/off as a `value` key alongside its children's
@@ -1918,7 +1921,14 @@ async function sendMessage(status: ProjectStatus) {
 		return
 	}
 
-	const active = [...(generatedActiveActions.value ?? collectAllActiveActions())].sort(byPriority)
+	const active = [...(generatedActiveActions.value ?? collectAllActiveActions())]
+		.sort(byPriority)
+		.sort((a, b) => {
+			if (a.isFixed && b.isFixed) return 0;
+			else if (a.isFixed) return -1;
+			else return 1;
+		});
+	console.log(active)
 	const shouldApplyFixes = active.some((a) => (a.node as any)._applyFixes)
 
 	moderationDecision.value = status

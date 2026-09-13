@@ -44,7 +44,7 @@ export default function (
 						() => `corrections-applied${project.value.status === 'approved' ? '-approved' : ''}`,
 					)
 					//TODO this is temporary
-					.priority(Priorities.alerts)
+					.priority(Priorities.note)
 					.applyFixes()
 					.children(
 						computed<AnyNode | null>(() => {

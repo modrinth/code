@@ -102,7 +102,7 @@ import {
 import NodeRenderer from '@modrinth/moderation/src/types/node/components/NodeRenderer.vue'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { renderHighlightedString } from '@modrinth/utils'
-import { computed, inject, onBeforeUnmount, provide, ref, watchEffect } from 'vue'
+import { computed, onBeforeUnmount, provide, ref, watchEffect } from 'vue'
 
 import {
 	elementForStage,

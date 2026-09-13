@@ -611,11 +611,6 @@ const devInfoCollapsed = computed({
 const props = defineProps<{
 	version?: Labrinth.Versions.v3.Version
 	onBackRoute?: () => void,
-	//enrichment?: Labrinth.Projects.v2.DependencyInfo
-	//enrichmentLoading?: boolean
-	//dependencyLinkCreator?: (context: DependencyContext) => string | undefined
-	//members?: Labrinth.Projects.v3.TeamMember[]
-	//userLinkCreator?: (user: Labrinth.Users.v3.User) => string | undefined
 }>()
 
 const signInRouteObj = computed(() => getSignInRouteObj(route))

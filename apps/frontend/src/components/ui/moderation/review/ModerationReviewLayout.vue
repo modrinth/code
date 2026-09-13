@@ -5,7 +5,7 @@
 		:style="{ height: height }"
 	>
 		<ModerationReviewSidebar
-			:projectV2="reviewData.project.value"
+			:project-v2="reviewData.project.value"
 			:project-v3="reviewData.projectV3.value"
 			:organization="reviewData.organization.value"
 			:members="reviewData.members.value"
@@ -45,7 +45,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { injectPageContext } from '@modrinth/ui'
+import { computed, ref } from 'vue'
 
 import { injectReviewLayoutData } from '~/components/ui/moderation/checklist/checklist-context'
 import { useModerationReviewLayout } from '~/services/moderation/review-layout'
@@ -55,15 +56,14 @@ import ModerationChecklistWalkthrough from './ModerationChecklistWalkthrough.vue
 import ModerationReviewPanels from './ModerationReviewPanels.vue'
 import ModerationReviewPipHost from './ModerationReviewPipHost.vue'
 import ModerationReviewSidebar from './ModerationReviewSidebar.vue'
-import { injectPageContext } from "@modrinth/ui"
 
 const layout = useModerationReviewLayout()
 const reviewData = injectReviewLayoutData()
-const pageContext = injectPageContext();
+const pageContext = injectPageContext()
 
-const collapsed = pageContext.topBarCollapsed;
+const collapsed = pageContext.topBarCollapsed
 
-const height = computed(() => collapsed.value ? '100dvh' : `calc(100dvh - 4.5rem)`)
+const height = computed(() => (collapsed.value ? '100dvh' : `calc(100dvh - 4.5rem)`))
 
 const resizing = ref<'sidebar' | 'panel' | null>(null)
 

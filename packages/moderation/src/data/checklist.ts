@@ -9,7 +9,6 @@ import useLicenseStage from './stages/license'
 import useLinksStage from './stages/links'
 import useMetadataStage from './stages/metadata'
 import usePermissionsStage from './stages/permissions'
-import usePostApprovalStage from './stages/post-approval'
 import useReReviewStage from './stages/re-review'
 import useReuploadsStage from './stages/reupload'
 import useRulesStage from './stages/rules'
@@ -23,7 +22,6 @@ export function useStages(
 	globalState: Ref<Record<string, Record<string, NodeState>>>,
 ): StageNode[] {
 	const mainStages: StageNode[] = [
-		usePostApprovalStage(),
 		useUndefinedProjectStage(),
 		useReReviewStage(),
 		useTitleSlugStage(),

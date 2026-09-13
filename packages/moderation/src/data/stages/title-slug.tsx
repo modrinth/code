@@ -13,9 +13,9 @@ import {
 	injectProjectPageContext,
 	ProjectStatusLink,
 } from '@modrinth/ui'
+import { generateUrlSlug } from '@modrinth/utils/projects'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
-import { generateUrlSlug } from '@modrinth/utils/projects'
 
 import { check, fix, group, md, stage, text, toggle } from '../../types/node'
 

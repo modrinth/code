@@ -2,17 +2,20 @@ import type { ChildNode } from './builder'
 import { evalSegment } from './messages'
 import { hasCap, isNodeActive, resolveActionState, walkNodes } from './resolve'
 import type { MessageSegment, NodeState } from './state'
+import type { NodeMeta } from './node-meta'
 
 export interface ActiveAction {
 	node: object
 	state: Record<string, NodeState>
 	statePath: string[]
-	active: boolean
+	active: boolean,
+	isFixed?: boolean,
 }
 
 export function collectActiveActions(
 	children: ChildNode[],
 	stageState: Record<string, NodeState>,
+	nodeToMetaData: Map<object, NodeMeta>,
 	basePath: string[] = [],
 ): ActiveAction[] {
 	const actions: ActiveAction[] = []
@@ -29,6 +32,7 @@ export function collectActiveActions(
 				state: resolveActionState(node, nodeState, localState),
 				statePath: path,
 				active: true,
+				isFixed: nodeToMetaData.get(node)!.isFixActionable
 			})
 		},
 		basePath,

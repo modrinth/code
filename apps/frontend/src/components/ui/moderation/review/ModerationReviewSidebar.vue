@@ -34,10 +34,10 @@
 
 		<!-- Expanded -->
 		<template v-else>
-			<div class="flex border-0 border-solid border-divider border-b">
+			<div class="flex border-0 border-b border-solid border-divider">
 				<button
 					v-tooltip="'Expand sidebar'"
-					class="flex ml-auto h-6 w-6 items-center justify-center text-secondary hover:bg-button-bg hover:text-contrast"
+					class="ml-auto flex h-6 w-6 items-center justify-center text-secondary hover:bg-button-bg hover:text-contrast"
 					aria-label="Expand sidebar"
 					@click="layout.toggleSidebar()"
 				>
@@ -46,10 +46,19 @@
 			</div>
 			<div class="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-2">
 				<ChecklistStageButtons stage-id="title-slug">
-					<div class="flex flex-col  gap-x-3 gap-y-1.5">
-						<h1 class="min-w-0 p-0 m-0 max-w-full text-2xl font-semibold leading-none text-contrast">{{ projectV3.name || '—' }}</h1>
+					<div class="flex flex-col gap-x-3 gap-y-1.5">
+						<h1
+							class="m-0 min-w-0 max-w-full p-0 text-2xl font-semibold leading-none text-contrast"
+						>
+							{{ projectV3.name || '—' }}
+						</h1>
 
-						<pre v-if="hasCustomSlug" class="min-w-0 p-1 m-0 max-w-full text-xl  break-all text-primary" style="border-radius: 0.5em !important">{{ projectV3.slug || '—' }}</pre>
+						<pre
+							v-if="hasCustomSlug"
+							class="m-0 min-w-0 max-w-full break-all p-1 text-xl text-primary"
+							style="border-radius: 0.5em !important"
+							>{{ projectV3.slug || '—' }}</pre
+						>
 					</div>
 				</ChecklistStageButtons>
 				<div class="my-1 h-[2px] w-full flex-shrink-0 bg-divider" />
@@ -85,9 +94,7 @@
 					<template v-else>
 						<dt class="text-secondary"><CalendarIcon aria-hidden="true" /> Created</dt>
 						<dd
-							v-tooltip="
-								projectV3.published ? formatDateTime(projectV3.published) : 'unknown'
-							"
+							v-tooltip="projectV3.published ? formatDateTime(projectV3.published) : 'unknown'"
 							class="m-0 text-contrast"
 						>
 							{{ createdRelative }}
@@ -143,7 +150,11 @@
 				<div class="my-1 h-[2px] w-full flex-shrink-0 bg-divider" />
 
 				<ChecklistStageButtons stage-id="tags" variant="inline">
-					<ProjectSidebarTags :project="projectV3" :disable-header="true" class="flex-card-reduced" />
+					<ProjectSidebarTags
+						:project="projectV3"
+						:disable-header="true"
+						class="flex-card-reduced"
+					/>
 				</ChecklistStageButtons>
 
 				<div class="my-1 h-[2px] w-full flex-shrink-0 bg-divider" />
@@ -176,7 +187,13 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon, ScaleIcon, VersionIcon } from '@modrinth/assets'
+import {
+	CalendarIcon,
+	ChevronLeftIcon,
+	ChevronRightIcon,
+	ScaleIcon,
+	VersionIcon,
+} from '@modrinth/assets'
 import {
 	Avatar,
 	ProjectSidebarCompatibility,
@@ -188,13 +205,13 @@ import {
 	useFormatDateTime,
 	useRelativeTime,
 } from '@modrinth/ui'
+import { generateUrlSlug } from '@modrinth/utils'
 import { computed } from 'vue'
 
 import { REVIEW_TAB_ORDER, useModerationReviewLayout } from '~/services/moderation/review-layout'
 
 import ChecklistStageButtons from './ChecklistStageButtons.vue'
 import { reviewTab, selectableReviewTabs } from './review-tabs'
-import {generateUrlSlug} from "@modrinth/utils";
 
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',

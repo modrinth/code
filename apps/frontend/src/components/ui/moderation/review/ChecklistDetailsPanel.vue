@@ -91,7 +91,6 @@ function clamp(x: number, y: number) {
 
 function anchorToPos() {
 	if (detached.value) return
-	console.log(props.anchor)
 	const rect = props.anchor?.getBoundingClientRect()
 	const next = rect
 		? clamp(rect.left, rect.bottom + 6)

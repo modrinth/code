@@ -234,7 +234,7 @@
 								size="sm"
 								class="flex-1"
 								:disabled="engine.loadingModerationDecision.value || engine.loadingMessage.value"
-								@click="handleDecision('rejected')"
+								@click="handleRejectOrWithhold('rejected')"
 							>
 								<SpinnerIcon
 									v-if="
@@ -251,7 +251,7 @@
 								size="sm"
 								class="flex-1"
 								:disabled="engine.loadingModerationDecision.value || engine.loadingMessage.value"
-								@click="handleDecision('withheld')"
+								@click="handleRejectOrWithhold('withheld')"
 							>
 								<SpinnerIcon
 									v-if="
@@ -319,9 +319,11 @@ import { expandVariables } from '@modrinth/moderation'
 import {
 	collectMessageNodes,
 	evalActiveAction,
+	md,
 	resolveChildren,
 } from '@modrinth/moderation/src/types/node'
 import { Button, injectProjectPageContext, MarkdownEditor, Textarea } from '@modrinth/ui'
+import type { ProjectStatus } from '@modrinth/utils'
 import { renderHighlightedString } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref, watch, watchEffect } from 'vue'
@@ -455,10 +457,25 @@ async function handleDecision(status: Parameters<typeof engine.sendMessage>[0]) 
 	await engine.sendMessage(status)
 }
 
-/** Matches `post-approval.tsx`'s own visibility condition — that stage's toggles ("Issue
- *  warning", "Missed due date", etc.) are for a project that's *already* approved, so "Approve"
- *  there would just try to re-approve it (a meaningless, possibly erroring status change). */
+/** A project that's *already* approved has nothing left for "Approve" to do — re-approving would
+ *  just be a meaningless (possibly erroring) status change — so flagged issues there are instead
+ *  issued as a warning, and Reject/Withhold become "missed the deadline" once a warning exists. */
 const isPostApprovalReview = computed(() => project.value?.status === 'approved')
+
+/** Distinctive sentence from `post-approval/issue-warning.md` — its presence in a public thread
+ *  reply is how a prior warning is detected, since the warning is only ever posted, never stored
+ *  as separate state. */
+const WARNING_MARKER = 'failure to address these concerns in a timely manner'
+
+const wasPreviouslyWarned = computed(() =>
+	(thread.value?.messages ?? []).some(
+		(m) =>
+			m.body.type === 'text' &&
+			!m.body.private &&
+			typeof m.body.body === 'string' &&
+			m.body.body.includes(WARNING_MARKER),
+	),
+)
 
 async function handleApproveOrWarn() {
 	if (!isPostApprovalReview.value) {
@@ -468,9 +485,29 @@ async function handleApproveOrWarn() {
 	if (!engine.generatedMessage.value) await engine.generateMessage()
 	if (!engine.message.value?.trim()) return
 	sending.value = true
-	const ok = await engine.postThreadReply(engine.message.value)
+	const ok = await engine.postThreadReply(
+		`${engine.message.value}\n\n${await md('checklist/messages/post-approval/issue-warning')({})}`,
+	)
 	sending.value = false
 	if (ok) engine.message.value = null
+}
+
+/** Reject/Withhold on an already-approved project: if it was already warned via
+ *  `handleApproveOrWarn` above, this is treated as a missed deadline — the (possibly updated)
+ *  flagged-issue message is wrapped with the missed-deadline notice and the status change goes
+ *  through as normal. Otherwise it's an ordinary decision. */
+async function handleRejectOrWithhold(status: ProjectStatus) {
+	if (!isPostApprovalReview.value || !wasPreviouslyWarned.value) {
+		await handleDecision(status)
+		return
+	}
+	if (!engine.generatedMessage.value) await engine.generateMessage()
+	const base = engine.message.value?.trim() ?? ''
+	const notice = await md('checklist/messages/post-approval/missed-deadline', () => ({
+		STATUS: status,
+	}))({})
+	engine.message.value = base ? `${base}\n\n${notice}` : notice
+	await handleDecision(status)
 }
 
 const text = computed({

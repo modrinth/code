@@ -27,6 +27,8 @@ export type ReviewTabId =
 	| 'thread'
 	| 'settings'
 	| 'moderation_settings'
+	| 'tech_review'
+
 export type ReviewDockId = 'main' | 'pip'
 export type SplitDirection = 'row' | 'column'
 
@@ -44,6 +46,7 @@ export const REVIEW_TAB_ORDER: readonly ReviewTabId[] = [
 	'thread',
 	'settings',
 	'moderation_settings',
+	'tech_review',
 ]
 
 /**

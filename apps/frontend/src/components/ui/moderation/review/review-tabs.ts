@@ -8,7 +8,7 @@ import {
 	LinkIcon,
 	MessageIcon,
 	ScaleIcon,
-	SettingsIcon,
+	SettingsIcon, ShieldAlertIcon,
 	ShieldIcon,
 	TagsIcon,
 } from '@modrinth/assets'
@@ -17,6 +17,7 @@ import { type Component, defineAsyncComponent } from 'vue'
 import type { ReviewTabId } from '~/services/moderation/review-layout'
 
 import ReviewDescriptionTab from './ReviewDescriptionTab.vue'
+import ReviewSettingsTab from "~/components/ui/moderation/review/ReviewSettingsTab.vue";
 
 export interface ReviewTabDef {
 	id: ReviewTabId
@@ -108,13 +109,19 @@ export const REVIEW_TABS: Record<ReviewTabId, ReviewTabDef> = {
 		id: 'settings',
 		label: 'Settings',
 		icon: SettingsIcon,
-		component: defineAsyncComponent(() => import('./ReviewSettingsTab.vue')),
+		component: ReviewSettingsTab,
 	},
 	moderation_settings: {
 		id: 'moderation_settings',
 		label: 'Moderation Settings',
 		icon: ScaleIcon,
 		component: defineAsyncComponent(() => import('../settings/ModerationSettings.vue')),
+	},
+	tech_review:  {
+		id: 'tech_review',
+		label: 'Tech Review',
+		icon: ShieldAlertIcon,
+		component: defineAsyncComponent(() => import('./ReviewTechTab.vue')),
 	},
 }
 

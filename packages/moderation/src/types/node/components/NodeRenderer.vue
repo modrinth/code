@@ -2,7 +2,7 @@
 import { Button, type ButtonSize, IconButton } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
 import type { Component } from 'vue'
-import { computed, inject, ref, watchEffect } from 'vue'
+import { computed, inject, watchEffect } from 'vue'
 
 import type { AnyNode, ChildNode, HasChildren } from '../builder'
 import type {
