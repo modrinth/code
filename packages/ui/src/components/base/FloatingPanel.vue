@@ -4,6 +4,8 @@ import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
 
+import { dismissTooltip } from '../../providers/tooltip'
+
 const PANEL_VIEWPORT_MARGIN = 8
 
 const props = withDefaults(
@@ -152,6 +154,7 @@ function focusPanelContent() {
 async function open() {
 	if (props.disabled || isOpen.value) return
 
+	dismissTooltip()
 	isOpen.value = true
 	emit('open')
 

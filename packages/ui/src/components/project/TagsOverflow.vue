@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import { Menu } from 'floating-vue'
-import { useId } from 'vue'
-
-import { TagItem, TagTagItem } from '../base'
-
-const id = useId()
+import TagItem from '../base/TagItem.vue'
+import TagTagItem from '../base/TagTagItem.vue'
+import Tooltip from '../floating/Tooltip.vue'
 
 defineProps<{
 	tags: string[]
@@ -16,7 +13,7 @@ defineOptions({
 </script>
 
 <template>
-	<Menu :delay="{ hide: 50, show: 0 }" no-auto-focus :aria-id="id">
+	<Tooltip placement="bottom" panel-class="!rounded-2xl !p-2">
 		<TagItem v-if="tags.length > 0" v-bind="$attrs" tabindex="0"> +{{ tags.length }} </TagItem>
 		<template #popper>
 			<div class="flex gap-1 flex-wrap max-w-[20rem]">
@@ -28,5 +25,5 @@ defineOptions({
 				/>
 			</div>
 		</template>
-	</Menu>
+	</Tooltip>
 </template>

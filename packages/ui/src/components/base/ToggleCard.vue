@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { SmartClickable, Toggle } from '@modrinth/ui'
 import { computed, useId } from 'vue'
+
+import SmartClickable from './SmartClickable.vue'
+import Toggle from './Toggle.vue'
 
 const props = defineProps<{
 	disabled?: boolean

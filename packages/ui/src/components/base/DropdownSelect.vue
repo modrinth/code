@@ -70,6 +70,8 @@
 import { DropdownIcon } from '@modrinth/assets'
 import { computed, ref, watch } from 'vue'
 
+import { dismissTooltip } from '../../providers/tooltip'
+
 const props = defineProps({
 	options: {
 		type: Array,
@@ -144,6 +146,9 @@ watch(
 
 const toggleDropdown = () => {
 	if (!props.disabled) {
+		if (!dropdownVisible.value) {
+			dismissTooltip()
+		}
 		dropdownVisible.value = !dropdownVisible.value
 		dropdown.value.focus()
 	}
@@ -158,6 +163,9 @@ const selectOption = (option, index) => {
 const onFocus = () => {
 	if (!props.disabled) {
 		focusedOptionIndex.value = props.options.findIndex((option) => option === selectedValue.value)
+		if (!dropdownVisible.value) {
+			dismissTooltip()
+		}
 		dropdownVisible.value = true
 	}
 }

@@ -1385,6 +1385,9 @@
   "app.quick-instance-switcher.instance-locked": {
     "message": "This instance has been locked"
   },
+  "app.quick-instance-switcher.title": {
+    "message": "Recent instances"
+  },
   "app.quick-instance-switcher.view-instance": {
     "message": "View instance"
   },

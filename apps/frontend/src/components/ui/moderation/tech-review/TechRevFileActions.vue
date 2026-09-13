@@ -30,7 +30,6 @@ const formatBytes = useFormatBytes()
 			type="outlined"
 			:target="file.file_id"
 			:href="`https://slicer.run/?url=${encodeURIComponent(file.download_url)}`"
-			aria-label="Open in Slicer"
 		>
 			<ExternalIcon aria-hidden="true" /> Slicer
 		</ButtonLink>

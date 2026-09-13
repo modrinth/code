@@ -1947,36 +1947,35 @@ const stageOptions = computed<StageOption[]>(() => {
 }
 
 // Tooltip styling for button action message previews.
-// Must use :global since floating-vue teleports tooltips outside the component DOM.
-:global(.v-popper--theme-tooltip .v-popper__inner) {
+:global(.v-popper__inner.v-popper--theme-tooltip) {
 	max-width: 400px;
 	word-wrap: break-word;
 	overflow-wrap: break-word;
 	white-space: normal;
 }
 
-:global(.v-popper--theme-tooltip .moderation-tooltip-markdown) {
+:global(.v-popper__inner.v-popper--theme-tooltip .moderation-tooltip-markdown) {
 	line-height: 1.45;
 	font-size: 0.9rem;
 }
 
-:global(.v-popper--theme-tooltip .moderation-tooltip-markdown p) {
+:global(.v-popper__inner.v-popper--theme-tooltip .moderation-tooltip-markdown p) {
 	margin: 0.35rem 0;
 }
 
-:global(.v-popper--theme-tooltip .moderation-tooltip-markdown ul),
-:global(.v-popper--theme-tooltip .moderation-tooltip-markdown ol) {
+:global(.v-popper__inner.v-popper--theme-tooltip .moderation-tooltip-markdown ul),
+:global(.v-popper__inner.v-popper--theme-tooltip .moderation-tooltip-markdown ol) {
 	margin: 0.35rem 0;
 	padding-left: 1.15rem;
 }
 
-:global(.v-popper--theme-tooltip .moderation-tooltip-markdown pre) {
+:global(.v-popper__inner.v-popper--theme-tooltip .moderation-tooltip-markdown pre) {
 	max-width: 100%;
 	overflow-x: auto;
 	margin: 0.4rem 0;
 }
 
-:global(.v-popper--theme-tooltip .moderation-tooltip-markdown code) {
+:global(.v-popper__inner.v-popper--theme-tooltip .moderation-tooltip-markdown code) {
 	background-color: rgba(255, 255, 255, 0.15);
 	padding: 0.1rem 0.3rem;
 	border-radius: 0.25rem;
@@ -1984,11 +1983,11 @@ const stageOptions = computed<StageOption[]>(() => {
 	font-size: 0.85em;
 }
 
-:global(.v-popper--theme-tooltip .moderation-tooltip-markdown strong) {
+:global(.v-popper__inner.v-popper--theme-tooltip .moderation-tooltip-markdown strong) {
 	font-weight: 700;
 }
 
-:global(.v-popper--theme-tooltip .moderation-tooltip-markdown em) {
+:global(.v-popper__inner.v-popper--theme-tooltip .moderation-tooltip-markdown em) {
 	font-style: italic;
 }
 </style>

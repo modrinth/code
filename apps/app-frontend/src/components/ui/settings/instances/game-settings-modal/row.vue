@@ -256,7 +256,6 @@ function updateValue(value: string | number | boolean | undefined) {
 					v-tooltip="validationMessage"
 					tabindex="0"
 					role="img"
-					:aria-label="validationMessage"
 					class="flex shrink-0 rounded-md text-orange outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow"
 				>
 					<UnknownIcon class="size-4" aria-hidden="true" />

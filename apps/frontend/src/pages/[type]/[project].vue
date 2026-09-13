@@ -14,7 +14,6 @@
 								:to="settingsBackDestination.to"
 								size="lg"
 								class="!w-10 !rounded-full !px-0"
-								:aria-label="settingsBackDestination.label"
 							>
 								<LeftArrowIcon />
 							</ButtonLink>
@@ -270,9 +269,7 @@
 								"
 								theme="dismissable-prompt"
 								class="inline-flex"
-								:triggers="[]"
-								:shown="flags.showProjectPageCreateServersTooltip"
-								:auto-hide="false"
+								open
 								placement="bottom-start"
 							>
 								<ButtonLink
@@ -359,7 +356,6 @@
 									v-tooltip="formatMessage(commonMessages.followButton)"
 									size="xl"
 									:to="signInRouteObj"
-									:aria-label="formatMessage(commonMessages.followButton)"
 									class="!w-12 !rounded-full !px-0"
 								>
 									<HeartIcon aria-hidden="true" />
@@ -369,7 +365,6 @@
 										v-tooltip="formatMessage(commonMessages.followButton)"
 										size="xl"
 										:to="signInRouteObj"
-										:aria-label="formatMessage(commonMessages.followButton)"
 										class="!w-12 !rounded-full !px-0"
 									>
 										<HeartIcon aria-hidden="true" />
@@ -621,6 +616,7 @@ import {
 	provideProjectPageContext,
 	SelectedProjectsFloatingBar,
 	TeleportOverflowMenu,
+	Tooltip,
 	useDebugLogger,
 	useFormatPrice,
 	useRelativeTime,
@@ -630,7 +626,6 @@ import {
 import { formatProjectType, isStaff } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
-import { Tooltip } from 'floating-vue'
 import { onScopeDispose, readonly, ref, useTemplateRef, watch, watchEffect } from 'vue'
 
 import { navigateTo } from '#app'

@@ -38,11 +38,6 @@
 			"
 			class="flex border-none cursor-pointer items-center justify-center gap-2 rounded-xl bg-transparent px-2 py-1 text-sm font-semibold text-secondary transition-all hover:bg-button-bg hover:text-contrast focus-visible:bg-button-bg focus-visible:text-contrast active:scale-[0.96]"
 			:aria-expanded="expanded"
-			:aria-label="
-				expanded
-					? formatMessage(messages.collapseSubOptionsTooltip)
-					: formatMessage(messages.expandSubOptionsTooltip)
-			"
 			@click.stop="emit('toggleExpand')"
 		>
 			<DropdownIcon

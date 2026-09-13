@@ -55,6 +55,7 @@ import {
 	providePopupNotificationManager,
 	TeleportOverflowMenu,
 	TextLogo,
+	TooltipDirective,
 	useDebugLogger,
 	useFormatBytes,
 	useHostingIntercom,
@@ -2189,6 +2190,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 </script>
 
 <template>
+	<TooltipDirective />
 	<SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
 	<div id="teleports"></div>
 	<AccountSwitchOverlay :show="isSwitchingAccount" />
@@ -2288,84 +2290,86 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<ServerStackIcon />
 			</NavButton>
 			<suspense>
-				<QuickInstanceSwitcher />
+				<QuickInstanceSwitcher>
+					<NavButton
+						v-tooltip.right="formatMessage(messages.createNewInstance)"
+						:to="() => installationModal?.show()"
+						:disabled="offline"
+					>
+						<PlusIcon />
+					</NavButton>
+				</QuickInstanceSwitcher>
 			</suspense>
-			<NavButton
-				v-tooltip.right="formatMessage(messages.createNewInstance)"
-				:to="() => installationModal?.show()"
-				:disabled="offline"
-			>
-				<PlusIcon />
-			</NavButton>
 			<NavButton
 				v-tooltip.right="formatMessage(commonMessages.settingsLabel)"
 				:to="() => appSettingsModal?.show()"
 			>
 				<SettingsIcon />
 			</NavButton>
-			<span v-tooltip.right="profileButtonTooltip" class="inline-flex">
-				<IconButton
-					v-if="credentials === undefined"
-					type="quiet"
-					size="xl"
-					disabled
-					class="pointer-events-none"
-					:label="formatMessage(messages.loadingProfile)"
+			<IconButton
+				v-if="credentials === undefined"
+				v-tooltip.right="profileButtonTooltip"
+				type="quiet"
+				size="xl"
+				disabled
+				class="pointer-events-none"
+				:label="formatMessage(messages.loadingProfile)"
+			>
+				<SpinnerIcon class="animate-spin" />
+			</IconButton>
+			<TeleportOverflowMenu
+				v-else-if="credentials?.user"
+				v-tooltip.right="profileButtonTooltip"
+				type="quiet"
+				size="xl"
+				:label="formatMessage(messages.modrinthAccount)"
+				:options="modrinthAccountMenuOptions"
+				placement="right-end"
+				:distance="4"
+				class="brightness-100 hover:!brightness-100 focus-visible:!brightness-100"
+			>
+				<Avatar
+					:src="credentials?.user?.avatar_url"
+					alt=""
+					size="32px"
+					circle
+					no-shadow
+					class="pointer-events-none !size-8"
+				/>
+				<template
+					v-for="account in accountSwitcherAccounts"
+					:key="account.user_id"
+					#[account.optionId]
 				>
-					<SpinnerIcon class="animate-spin" />
-				</IconButton>
-				<TeleportOverflowMenu
-					v-else-if="credentials?.user"
-					type="quiet"
-					size="xl"
-					:label="formatMessage(messages.modrinthAccount)"
-					:options="modrinthAccountMenuOptions"
-					placement="right-end"
-					:distance="4"
-					class="brightness-100 hover:!brightness-100 focus-visible:!brightness-100"
+					<Avatar :src="account.user.avatar_url" size="1.25rem" aria-hidden="true" circle />
+					{{ account.user.username }}
+					<UserRoleIcon :role="account.user.role" />
+				</template>
+			</TeleportOverflowMenu>
+			<TeleportOverflowMenu
+				v-else-if="accountSwitcherAccounts.length > 0"
+				v-tooltip.right="profileButtonTooltip"
+				type="quiet"
+				size="xl"
+				:label="formatMessage(messages.signInToModrinthAccount)"
+				:options="accountSwitcherOptions"
+				placement="right-end"
+				:distance="4"
+			>
+				<LogInIcon class="!text-brand" />
+				<template
+					v-for="account in accountSwitcherAccounts"
+					:key="account.user_id"
+					#[account.optionId]
 				>
-					<Avatar
-						:src="credentials?.user?.avatar_url"
-						alt=""
-						size="32px"
-						circle
-						no-shadow
-						class="pointer-events-none !size-8"
-					/>
-					<template
-						v-for="account in accountSwitcherAccounts"
-						:key="account.user_id"
-						#[account.optionId]
-					>
-						<Avatar :src="account.user.avatar_url" size="1.25rem" aria-hidden="true" circle />
-						{{ account.user.username }}
-						<UserRoleIcon :role="account.user.role" />
-					</template>
-				</TeleportOverflowMenu>
-				<TeleportOverflowMenu
-					v-else-if="accountSwitcherAccounts.length > 0"
-					type="quiet"
-					size="xl"
-					:label="formatMessage(messages.signInToModrinthAccount)"
-					:options="accountSwitcherOptions"
-					placement="right-end"
-					:distance="4"
-				>
-					<LogInIcon class="!text-brand" />
-					<template
-						v-for="account in accountSwitcherAccounts"
-						:key="account.user_id"
-						#[account.optionId]
-					>
-						<Avatar :src="account.user.avatar_url" size="1.25rem" aria-hidden="true" circle />
-						{{ account.user.username }}
-						<UserRoleIcon :role="account.user.role" />
-					</template>
-				</TeleportOverflowMenu>
-				<NavButton v-else :to="() => requestSignIn()">
-					<LogInIcon class="text-brand" />
-				</NavButton>
-			</span>
+					<Avatar :src="account.user.avatar_url" size="1.25rem" aria-hidden="true" circle />
+					{{ account.user.username }}
+					<UserRoleIcon :role="account.user.role" />
+				</template>
+			</TeleportOverflowMenu>
+			<NavButton v-else v-tooltip.right="profileButtonTooltip" :to="() => requestSignIn()">
+				<LogInIcon class="text-brand" />
+			</NavButton>
 		</div>
 		<div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
 			<div data-tauri-drag-region class="flex min-w-0 flex-1 items-center overflow-hidden p-2">
