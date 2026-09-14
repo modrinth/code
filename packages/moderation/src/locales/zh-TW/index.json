@@ -81,7 +81,7 @@
     "defaultMessage": "內容揭露資訊不應包含 HTML，因為該欄位僅能顯示行內 Markdown 與純文字。"
   },
   "nags.disclosures-special-formatting.title": {
-    "defaultMessage": "修正揭露資訊的格式"
+    "defaultMessage": "修正揭露資訊格式"
   },
   "nags.edit-description.title": {
     "defaultMessage": "編輯描述"

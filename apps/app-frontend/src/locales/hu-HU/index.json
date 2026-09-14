@@ -180,7 +180,7 @@
     "message": "Játékidő megjelenítése"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Megerősítés kihagyása az alacsony kockázatú műveletek – például az ismételt telepítések, a szokásos tartalomtörlések, a tömeges frissítések, a leválasztás és a javítások esetében. A veszélyes műveletekre vonatkozó figyelmeztetéseket mindig megjeleníti a rendszer."
+    "message": "Megerősítés kihagyása az alacsony kockázatú műveletek – például az ismételt telepítések, a szokásos tartalomtörlések, a tömeges frissítések, a leválasztás és a javítások – esetében. A veszélyes műveletekre vonatkozó figyelmeztetéseket mindig megjeleníti a rendszer."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Lényegtelen figyelmeztetések kihagyása"
@@ -284,6 +284,21 @@
   "app.content-install.no-compatible-versions": {
     "message": "Nincs olyan elérhető verzió, amely kompatibilis a(z) {compatibilityLabel} értékkel. Válassz ki egy verziót a telepítés mindenképp történő folytatásához. A függőségek nem lesznek automatikusan telepítve."
   },
+  "app.content.desync-pack": {
+    "message": "Szinkronizálás megszüntetése"
+  },
+  "app.content.sync-data-packs-disabled": {
+    "message": "Először kapcsold be az adatcsomagok szinkronizálását az alkalmazás beállításaiban."
+  },
+  "app.content.sync-pack": {
+    "message": "Szinkronizálás"
+  },
+  "app.content.sync-packs-override": {
+    "message": "Először kapcsold ki a csomagszinkronizálás felülírását ennek a példánynak a beállításaiban."
+  },
+  "app.content.sync-resource-packs-disabled": {
+    "message": "Először kapcsold be az erőforráscsomagok szinkronizálását az alkalmazás beállításaiban."
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "A biztonsági mentések mappájának megnyitása"
   },
@@ -313,6 +328,57 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.features-settings.instance-pages.title": {
+    "message": "Példányok"
+  },
+  "app.features-settings.play-page.title": {
+    "message": "Játék oldal"
+  },
+  "app.features-settings.quick-instances.description": {
+    "message": "Válaszd ki, hogy legfeljebb hány legutóbb használt példány jelenjen meg a bal oldali oldalsávban. Ezt az elválasztó húzásával is módosíthatod."
+  },
+  "app.features-settings.quick-instances.title": {
+    "message": "Gyors példányok az oldalsávban"
+  },
+  "app.features-settings.show-all-screenshots.description": {
+    "message": "Jeleníts meg egy gombot a bal oldali oldalsávban, amellyel megtekintheted az összes példányod képernyőképeit."
+  },
+  "app.features-settings.show-all-screenshots.title": {
+    "message": "Összes képernyőkép megjelenítése az oldalsávban"
+  },
+  "app.features-settings.show-files-tab.title": {
+    "message": "Fájlok lap megjelenítése a példányokban"
+  },
+  "app.features-settings.show-jump-in.description": {
+    "message": "Jelenítsd meg a legutóbb játszott világokat és példányokat a Játék oldal tetején."
+  },
+  "app.features-settings.show-jump-in.title": {
+    "message": "„Ugrás ide” szakasz megjelenítése"
+  },
+  "app.features-settings.show-screenshots-tab.title": {
+    "message": "Képernyőképek lap megjelenítése a példányokban"
+  },
+  "app.features-settings.show-skin-selector.description": {
+    "message": "Jeleníts meg egy gombot a bal oldali oldalsávban a kinézetválasztó megnyitásához."
+  },
+  "app.features-settings.show-skin-selector.title": {
+    "message": "Kinézetválasztó megjelenítése az oldalsávban"
+  },
+  "app.features-settings.show-worlds-tab.title": {
+    "message": "Világok lap megjelenítése a példányokban"
+  },
+  "app.features-settings.sidebar.title": {
+    "message": "Oldalsáv"
+  },
+  "app.features-settings.sync-across-devices.description": {
+    "message": "Használd ezeket a funkcióbeállításokat minden olyan helyen, ahol be vagy jelentkezve. Kapcsold ki ezt, ha külön beállításokat szeretnél használni ezen az eszközön."
+  },
+  "app.features-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Jelentkezz be egy Modrinth-fiókba a beállítások szinkronizálásához."
+  },
+  "app.features-settings.sync-across-devices.title": {
+    "message": "Funkciók szinkronizálása az eszközök között"
   },
   "app.home.jump-back-in.actions.label": {
     "message": "Példány-műveletek"
@@ -393,7 +459,7 @@
     "message": "A modcsomag leírófájljának beolvasása..."
   },
   "app.install.phase.resolving_loader": {
-    "message": "A betöltő meghatározása..."
+    "message": "A betöltő meghatározása"
   },
   "app.install.phase.resolving_minecraft": {
     "message": "A Minecraft-verzió meghatározása..."
@@ -760,6 +826,18 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Szerver eltávolítása"
+  },
+  "app.instance.worlds.remove-server-modal.remove-everywhere": {
+    "message": "Eltávolítás mindenhol"
+  },
+  "app.instance.worlds.remove-server-modal.remove-here": {
+    "message": "Eltávolítás innen"
+  },
+  "app.instance.worlds.remove-server-modal.synced-description": {
+    "message": "Eltávolíthatod csak ebből a példányból, vagy az összes szinkronizált példányból."
+  },
+  "app.instance.worlds.remove-server-modal.synced-header": {
+    "message": "Ez a szerver szinkronizálva van"
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Szerver eltávolítása"
@@ -1338,7 +1416,7 @@
     "message": "A játékban készített képernyőképek itt fognak megjelenni."
   },
   "app.screenshots.empty-heading": {
-    "message": "Nincsenek még képernyőképek"
+    "message": "Még nincsenek képernyőképek"
   },
   "app.screenshots.error-heading": {
     "message": "Nem sikerült betölteni a képernyőképeket"
@@ -1562,6 +1640,1014 @@
   "app.settings.downloading": {
     "message": "v{version} letöltése"
   },
+  "app.settings.game-options.category.accessibility.description": {
+    "message": "Kisegítő lehetőségek beállításai"
+  },
+  "app.settings.game-options.category.accessibility.label": {
+    "message": "Kisegítő lehetőségek"
+  },
+  "app.settings.game-options.category.chat.description": {
+    "message": "Csevegés megjelenése és láthatósága"
+  },
+  "app.settings.game-options.category.chat.label": {
+    "message": "Csevegés"
+  },
+  "app.settings.game-options.category.controls.description": {
+    "message": "Egér, mozgás és billentyűzetkiosztás"
+  },
+  "app.settings.game-options.category.controls.label": {
+    "message": "Irányítás"
+  },
+  "app.settings.game-options.category.custom.description": {
+    "message": "Modok által hozzáadott beállítások"
+  },
+  "app.settings.game-options.category.custom.label": {
+    "message": "Egyéni beállítások"
+  },
+  "app.settings.game-options.category.language.description": {
+    "message": "Játék nyelve"
+  },
+  "app.settings.game-options.category.language.label": {
+    "message": "Nyelv"
+  },
+  "app.settings.game-options.category.music-and-sound.description": {
+    "message": "Hangerő- és hangbeállítások"
+  },
+  "app.settings.game-options.category.music-and-sound.label": {
+    "message": "Zene és hang"
+  },
+  "app.settings.game-options.category.online.description": {
+    "message": "Online és Realms beállítások"
+  },
+  "app.settings.game-options.category.online.label": {
+    "message": "Online"
+  },
+  "app.settings.game-options.category.skin-customization.description": {
+    "message": "Kinézet-rétegek és főkéz"
+  },
+  "app.settings.game-options.category.skin-customization.label": {
+    "message": "Kinézet szerkesztése"
+  },
+  "app.settings.game-options.category.video.description": {
+    "message": "Kamera és képernyőbeállítások"
+  },
+  "app.settings.game-options.category.video.label": {
+    "message": "Videó"
+  },
+  "app.settings.game-options.choice.all": {
+    "message": "Összes"
+  },
+  "app.settings.game-options.choice.balanced": {
+    "message": "Kiegyensúlyozott"
+  },
+  "app.settings.game-options.choice.by-player": {
+    "message": "Játékos által"
+  },
+  "app.settings.game-options.choice.chat": {
+    "message": "Csevegés"
+  },
+  "app.settings.game-options.choice.commands-only": {
+    "message": "Csak parancsok"
+  },
+  "app.settings.game-options.choice.constant": {
+    "message": "Folytonos"
+  },
+  "app.settings.game-options.choice.crosshair": {
+    "message": "Célkereszt"
+  },
+  "app.settings.game-options.choice.custom": {
+    "message": "Egyéni"
+  },
+  "app.settings.game-options.choice.decreased": {
+    "message": "Csökkentett"
+  },
+  "app.settings.game-options.choice.default": {
+    "message": "Alapértelmezett"
+  },
+  "app.settings.game-options.choice.fabulous": {
+    "message": "Csodálatos"
+  },
+  "app.settings.game-options.choice.fancy": {
+    "message": "Csicsás"
+  },
+  "app.settings.game-options.choice.far": {
+    "message": "Nagy"
+  },
+  "app.settings.game-options.choice.fast": {
+    "message": "Gyors"
+  },
+  "app.settings.game-options.choice.frequent": {
+    "message": "Gyakori"
+  },
+  "app.settings.game-options.choice.hidden": {
+    "message": "Elrejtett"
+  },
+  "app.settings.game-options.choice.hotbar": {
+    "message": "Gyorselérési sáv"
+  },
+  "app.settings.game-options.choice.left": {
+    "message": "Bal"
+  },
+  "app.settings.game-options.choice.limited": {
+    "message": "Korlátozott"
+  },
+  "app.settings.game-options.choice.max-fps": {
+    "message": "Maximum FPS"
+  },
+  "app.settings.game-options.choice.maximum": {
+    "message": "Maximum"
+  },
+  "app.settings.game-options.choice.minimal": {
+    "message": "Kevés"
+  },
+  "app.settings.game-options.choice.minimum": {
+    "message": "Minimum"
+  },
+  "app.settings.game-options.choice.nearby": {
+    "message": "Közeli"
+  },
+  "app.settings.game-options.choice.never": {
+    "message": "Soha"
+  },
+  "app.settings.game-options.choice.none": {
+    "message": "Egyik se"
+  },
+  "app.settings.game-options.choice.normal": {
+    "message": "Normál"
+  },
+  "app.settings.game-options.choice.off": {
+    "message": "Ki"
+  },
+  "app.settings.game-options.choice.on": {
+    "message": "Be"
+  },
+  "app.settings.game-options.choice.opengl": {
+    "message": "OpenGL"
+  },
+  "app.settings.game-options.choice.pause": {
+    "message": "Játékszünet-menü"
+  },
+  "app.settings.game-options.choice.pause-and-toast": {
+    "message": "Játékszünet-menü és értesítés"
+  },
+  "app.settings.game-options.choice.power-saver": {
+    "message": "Energiatakarékos"
+  },
+  "app.settings.game-options.choice.right": {
+    "message": "Jobb"
+  },
+  "app.settings.game-options.choice.short": {
+    "message": "Rövid"
+  },
+  "app.settings.game-options.choice.shown": {
+    "message": "Megjelenítve"
+  },
+  "app.settings.game-options.choice.system": {
+    "message": "Rendszer"
+  },
+  "app.settings.game-options.choice.tiny": {
+    "message": "Apró"
+  },
+  "app.settings.game-options.choice.vulkan": {
+    "message": "Vulkan"
+  },
+  "app.settings.game-options.choice.when-minimized": {
+    "message": "Ha le van kicsinítve"
+  },
+  "app.settings.game-options.choice.while-afk": {
+    "message": "Amíg AFK"
+  },
+  "app.settings.game-options.compatibility.none": {
+    "message": "Pár példányod nem tudja ezt a beállítást alkalmazni"
+  },
+  "app.settings.game-options.compatibility.reason.launcher-controlled": {
+    "message": "Ezt a beállítást a Modrinth indítási beállításai kezelik."
+  },
+  "app.settings.game-options.custom-value.placeholder": {
+    "message": "Adj meg egy értéket"
+  },
+  "app.settings.game-options.keybind.assigned-status": {
+    "message": "A(z) {setting} mostantól a {binding} gombhoz van rendelve."
+  },
+  "app.settings.game-options.keybind.cancelled-status": {
+    "message": "A billentyű-hozzárendelés megváltoztatása meg lett szakítva."
+  },
+  "app.settings.game-options.keybind.change": {
+    "message": "{setting}: {binding}. Aktiváld a megváltoztatásához."
+  },
+  "app.settings.game-options.keybind.choose": {
+    "message": "Billentyű kiválasztása"
+  },
+  "app.settings.game-options.keybind.conflict-description": {
+    "message": "Ezt már használja a {settings}."
+  },
+  "app.settings.game-options.keybind.key.arrow-down": {
+    "message": "Lefele nyíl"
+  },
+  "app.settings.game-options.keybind.key.arrow-left": {
+    "message": "Balra nyíl"
+  },
+  "app.settings.game-options.keybind.key.arrow-right": {
+    "message": "Jobbra nyíl"
+  },
+  "app.settings.game-options.keybind.key.arrow-up": {
+    "message": "Felfele nyíl"
+  },
+  "app.settings.game-options.keybind.key.backspace": {
+    "message": "Backspace"
+  },
+  "app.settings.game-options.keybind.key.caps-lock": {
+    "message": "Caps Lock"
+  },
+  "app.settings.game-options.keybind.key.delete": {
+    "message": "Delete"
+  },
+  "app.settings.game-options.keybind.key.end": {
+    "message": "End"
+  },
+  "app.settings.game-options.keybind.key.enter": {
+    "message": "Enter"
+  },
+  "app.settings.game-options.keybind.key.escape": {
+    "message": "Escape"
+  },
+  "app.settings.game-options.keybind.key.home": {
+    "message": "Home"
+  },
+  "app.settings.game-options.keybind.key.insert": {
+    "message": "Insert"
+  },
+  "app.settings.game-options.keybind.key.keypad-key": {
+    "message": "Numerikus billentyűzet {key}"
+  },
+  "app.settings.game-options.keybind.key.left-alt": {
+    "message": "Bal Alt"
+  },
+  "app.settings.game-options.keybind.key.left-command": {
+    "message": "Bal Command"
+  },
+  "app.settings.game-options.keybind.key.left-control": {
+    "message": "Bal Ctrl"
+  },
+  "app.settings.game-options.keybind.key.left-shift": {
+    "message": "Bal Shift"
+  },
+  "app.settings.game-options.keybind.key.left-super": {
+    "message": "Bal Super"
+  },
+  "app.settings.game-options.keybind.key.menu": {
+    "message": "Menu"
+  },
+  "app.settings.game-options.keybind.key.num-lock": {
+    "message": "Num Lock"
+  },
+  "app.settings.game-options.keybind.key.page-down": {
+    "message": "Page Down"
+  },
+  "app.settings.game-options.keybind.key.page-up": {
+    "message": "Page Up"
+  },
+  "app.settings.game-options.keybind.key.pause": {
+    "message": "Pause"
+  },
+  "app.settings.game-options.keybind.key.print-screen": {
+    "message": "Print Screen"
+  },
+  "app.settings.game-options.keybind.key.right-alt": {
+    "message": "Jobb Alt"
+  },
+  "app.settings.game-options.keybind.key.right-command": {
+    "message": "Jobb Command"
+  },
+  "app.settings.game-options.keybind.key.right-control": {
+    "message": "Jobb Ctrl"
+  },
+  "app.settings.game-options.keybind.key.right-shift": {
+    "message": "Jobb Shift"
+  },
+  "app.settings.game-options.keybind.key.right-super": {
+    "message": "Jobb Super"
+  },
+  "app.settings.game-options.keybind.key.scroll-lock": {
+    "message": "Scroll Lock"
+  },
+  "app.settings.game-options.keybind.key.space": {
+    "message": "Szóköz"
+  },
+  "app.settings.game-options.keybind.key.tab": {
+    "message": "Tab"
+  },
+  "app.settings.game-options.keybind.key.unbound": {
+    "message": "Nincs hozzárendelve"
+  },
+  "app.settings.game-options.keybind.key.unknown": {
+    "message": "Ismeretlen billentyű"
+  },
+  "app.settings.game-options.keybind.listen": {
+    "message": "Üss le egy billentyűt…"
+  },
+  "app.settings.game-options.keybind.listening-status": {
+    "message": "Várakozás egy billentyűre vagy egérgombra. Nyomd meg az Escape-t hogy kiürítsd ezt a hozzárendelést."
+  },
+  "app.settings.game-options.keybind.mixed": {
+    "message": "Más-más példányok között"
+  },
+  "app.settings.game-options.keybind.modifier.alt": {
+    "message": "Alt"
+  },
+  "app.settings.game-options.keybind.modifier.command": {
+    "message": "Command"
+  },
+  "app.settings.game-options.keybind.modifier.control": {
+    "message": "Ctrl"
+  },
+  "app.settings.game-options.keybind.modifier.shift": {
+    "message": "Shift"
+  },
+  "app.settings.game-options.keybind.modifier.super": {
+    "message": "Super"
+  },
+  "app.settings.game-options.keybind.mouse.button": {
+    "message": "Egérgomb {button}"
+  },
+  "app.settings.game-options.keybind.mouse.left": {
+    "message": "Bal egérgomb"
+  },
+  "app.settings.game-options.keybind.mouse.middle": {
+    "message": "Középső egérgomb"
+  },
+  "app.settings.game-options.keybind.mouse.right": {
+    "message": "Jobb egérgomb"
+  },
+  "app.settings.game-options.keybind.recording-label": {
+    "message": "{setting}: várakozás egy billentyűre vagy egérgombra. Nyomd meg az Escape-t hogy kiürítsd ezt a hozzárendelést."
+  },
+  "app.settings.game-options.keybind.scancode": {
+    "message": "Scankód {code}"
+  },
+  "app.settings.game-options.keybind.unsupported-status": {
+    "message": "Ezt a bemenetet a Minecraft nem képes használni. Válassz egy másikat."
+  },
+  "app.settings.game-options.setting.advanced-opengl.label": {
+    "message": "Fejlett OpenGL"
+  },
+  "app.settings.game-options.setting.allow-cursor-changes.label": {
+    "message": "Kurzorváltozások engedélyezése"
+  },
+  "app.settings.game-options.setting.allow-server-listing.description": {
+    "message": "Játékos nevének megjelenésének engedélyezése a szerverlistákban."
+  },
+  "app.settings.game-options.setting.allow-server-listing.label": {
+    "message": "Szerverlisták"
+  },
+  "app.settings.game-options.setting.alternate-blocks.label": {
+    "message": "Alternatív blokkok"
+  },
+  "app.settings.game-options.setting.ambient-occlusion.label": {
+    "message": "Sima világítás"
+  },
+  "app.settings.game-options.setting.ambient-volume.label": {
+    "message": "Környezeti hangok"
+  },
+  "app.settings.game-options.setting.anaglyph-3d.label": {
+    "message": "3D anaglif"
+  },
+  "app.settings.game-options.setting.anisotropic-filtering.label": {
+    "message": "Anizotrop szűrés"
+  },
+  "app.settings.game-options.setting.anisotropy.label": {
+    "message": "Anizotrópia"
+  },
+  "app.settings.game-options.setting.attack-indicator.label": {
+    "message": "Támadásjelző"
+  },
+  "app.settings.game-options.setting.auto-jump.description": {
+    "message": "Automatikusan megugrik egy blokk magas akadályokat."
+  },
+  "app.settings.game-options.setting.auto-jump.label": {
+    "message": "Automatikus ugrás"
+  },
+  "app.settings.game-options.setting.auto-suggestions.label": {
+    "message": "Parancs-javaslatok"
+  },
+  "app.settings.game-options.setting.autosave-indicator.label": {
+    "message": "Mentést jelző ikon"
+  },
+  "app.settings.game-options.setting.biome-blend-radius.description": {
+    "message": "A távolság amin a biom színei átmenetet alkotnak."
+  },
+  "app.settings.game-options.setting.biome-blend-radius.label": {
+    "message": "Biomok közti átmenet"
+  },
+  "app.settings.game-options.setting.blocks-volume.label": {
+    "message": "Blokkok"
+  },
+  "app.settings.game-options.setting.brightness.label": {
+    "message": "Fényerő"
+  },
+  "app.settings.game-options.setting.cape.description": {
+    "message": "Megjeleníti a játékos köpenyét, beleértve a kitinszárny textúráját is."
+  },
+  "app.settings.game-options.setting.cape.label": {
+    "message": "Köpeny"
+  },
+  "app.settings.game-options.setting.chat-background-only.label": {
+    "message": "Csak a csevegés háttere"
+  },
+  "app.settings.game-options.setting.chat-colors.label": {
+    "message": "Csevegés színei"
+  },
+  "app.settings.game-options.setting.chat-delay.label": {
+    "message": "Csevegéskésleltetés"
+  },
+  "app.settings.game-options.setting.chat-line-spacing.label": {
+    "message": "Csevegés sorköze"
+  },
+  "app.settings.game-options.setting.chat-links-prompt.description": {
+    "message": "Mindig kérdezzen meg mielőtt megnyit linkeket a csevegésből."
+  },
+  "app.settings.game-options.setting.chat-links-prompt.label": {
+    "message": "Hivatkozások megerősítése"
+  },
+  "app.settings.game-options.setting.chat-links.description": {
+    "message": "Csevegésből származó weblinkek megnyitásának engedélyezése."
+  },
+  "app.settings.game-options.setting.chat-links.label": {
+    "message": "Weblinkek"
+  },
+  "app.settings.game-options.setting.chat-opacity.description": {
+    "message": "A csevegés szövegének áttetszősége."
+  },
+  "app.settings.game-options.setting.chat-opacity.label": {
+    "message": "Csevegés áttetszőség"
+  },
+  "app.settings.game-options.setting.chat-preview.label": {
+    "message": "Csevegés előnézet"
+  },
+  "app.settings.game-options.setting.chat-scale.label": {
+    "message": "Csevegés mérete"
+  },
+  "app.settings.game-options.setting.chat-visibility.label": {
+    "message": "Csevegés megjelenése"
+  },
+  "app.settings.game-options.setting.chat-width.label": {
+    "message": "Csevegés szélessége"
+  },
+  "app.settings.game-options.setting.chunk-fade-time.label": {
+    "message": "Chunkok beúszásának ideje"
+  },
+  "app.settings.game-options.setting.cloud-range.label": {
+    "message": "Felhőtávolság"
+  },
+  "app.settings.game-options.setting.clouds.label": {
+    "message": "Felhők"
+  },
+  "app.settings.game-options.setting.ctrl-click-right-click.label": {
+    "message": "Control-kattintás jobb kattintásként"
+  },
+  "app.settings.game-options.setting.cutout-leaves.label": {
+    "message": "Átlátszó levelek"
+  },
+  "app.settings.game-options.setting.damage-tilt.label": {
+    "message": "Sebzésbillentés"
+  },
+  "app.settings.game-options.setting.dark-splash.description": {
+    "message": "Megváltoztatja a Mojang Studios betöltőképernyőt vörösről feketére."
+  },
+  "app.settings.game-options.setting.dark-splash.label": {
+    "message": "Egyárnyalatú logó"
+  },
+  "app.settings.game-options.setting.darkness-pulsing.label": {
+    "message": "Sötétség pulzálása"
+  },
+  "app.settings.game-options.setting.debug-gui-scale.label": {
+    "message": "Hibakeresési felület méretezése"
+  },
+  "app.settings.game-options.setting.directional-audio.label": {
+    "message": "Irányított hang"
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.description": {
+    "message": "Minden egérgörgő-bemenetet egyetlen görgetési lépésként kezel."
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.label": {
+    "message": "Lépésenkénti görgetés"
+  },
+  "app.settings.game-options.setting.entity-distance.label": {
+    "message": "Entitástávolság"
+  },
+  "app.settings.game-options.setting.entity-shadows.label": {
+    "message": "Entitások árnyéka"
+  },
+  "app.settings.game-options.setting.exclusive-fullscreen.label": {
+    "message": "Kizárólagos teljes képernyő"
+  },
+  "app.settings.game-options.setting.extra-telemetry.label": {
+    "message": "Opcionális telemetria"
+  },
+  "app.settings.game-options.setting.focused-chat-height.label": {
+    "message": "Fókuszált csevegés magassága"
+  },
+  "app.settings.game-options.setting.force-unicode-font.label": {
+    "message": "Unicode-betűtípus kényszerítése"
+  },
+  "app.settings.game-options.setting.fov-effects.label": {
+    "message": "FOV effektusok"
+  },
+  "app.settings.game-options.setting.fov.label": {
+    "message": "Látómező"
+  },
+  "app.settings.game-options.setting.fullscreen.label": {
+    "message": "Teljes képernyő"
+  },
+  "app.settings.game-options.setting.glint-speed.label": {
+    "message": "Csillogás sebessége"
+  },
+  "app.settings.game-options.setting.glint-strength.label": {
+    "message": "Csillogás erőssége"
+  },
+  "app.settings.game-options.setting.graphics-backend.label": {
+    "message": "Grafikus keretrendszer"
+  },
+  "app.settings.game-options.setting.graphics.description": {
+    "message": "A megjelenítés minőségét és teljesítményét szabályozza."
+  },
+  "app.settings.game-options.setting.graphics.label": {
+    "message": "Grafika"
+  },
+  "app.settings.game-options.setting.gui-scale.description": {
+    "message": "A játék kezelőfelületének és HUD-jának mérete."
+  },
+  "app.settings.game-options.setting.gui-scale.label": {
+    "message": "Kezelőfelület méretezése"
+  },
+  "app.settings.game-options.setting.hat.description": {
+    "message": "Sapka mutatása a kinézet-rétegen."
+  },
+  "app.settings.game-options.setting.hat.label": {
+    "message": "Sapka"
+  },
+  "app.settings.game-options.setting.held-item-tooltips.label": {
+    "message": "Tárgytippletek megjelenítése"
+  },
+  "app.settings.game-options.setting.hide-lightning-flashes.label": {
+    "message": "Villámfelvillanások elrejtése"
+  },
+  "app.settings.game-options.setting.hide-matched-names.label": {
+    "message": "Egyező nevek elrejtése"
+  },
+  "app.settings.game-options.setting.hide-server-address.label": {
+    "message": "Szervercím elrejtése"
+  },
+  "app.settings.game-options.setting.hide-splash-texts.label": {
+    "message": "Üdvözlőszövegek elrejtése"
+  },
+  "app.settings.game-options.setting.high-contrast-outline.label": {
+    "message": "Nagy kontrasztú blokkkörvonal"
+  },
+  "app.settings.game-options.setting.high-contrast.description": {
+    "message": "A kezelőfelület elemeinek kontrasztjának növelése."
+  },
+  "app.settings.game-options.setting.high-contrast.label": {
+    "message": "Nagy kontraszt"
+  },
+  "app.settings.game-options.setting.hostile-volume.label": {
+    "message": "Ellenséges lények"
+  },
+  "app.settings.game-options.setting.improved-transparency.label": {
+    "message": "Továbbfejlesztett átlátszóság"
+  },
+  "app.settings.game-options.setting.in-game-notifications.label": {
+    "message": "Játékon belüli értesítések"
+  },
+  "app.settings.game-options.setting.inactivity-framerate-limit.label": {
+    "message": "Csökkentétt képkoca-ráta"
+  },
+  "app.settings.game-options.setting.invert-horizontal-mouse.label": {
+    "message": "Vízszintes egérmozgás megfordítása"
+  },
+  "app.settings.game-options.setting.invert-mouse.description": {
+    "message": "Megfordítja a függőleges egérmozgást."
+  },
+  "app.settings.game-options.setting.invert-mouse.label": {
+    "message": "Egérmozgás megfordítása"
+  },
+  "app.settings.game-options.setting.jacket.description": {
+    "message": "Dzseki mutatása a kinézet-rétegen."
+  },
+  "app.settings.game-options.setting.jacket.label": {
+    "message": "Dzseki"
+  },
+  "app.settings.game-options.setting.japanese-glyph-variants.label": {
+    "message": "Japán karakterváltozatok"
+  },
+  "app.settings.game-options.setting.key-advancements.label": {
+    "message": "Előrelépések"
+  },
+  "app.settings.game-options.setting.key-attack.label": {
+    "message": "Támadás"
+  },
+  "app.settings.game-options.setting.key-back.label": {
+    "message": "Mozgás hátra"
+  },
+  "app.settings.game-options.setting.key-chat.label": {
+    "message": "Csevegés megnyitása"
+  },
+  "app.settings.game-options.setting.key-command.label": {
+    "message": "Parancs"
+  },
+  "app.settings.game-options.setting.key-debug-advanced-tooltips.label": {
+    "message": "Speciális súgók megjelenítése"
+  },
+  "app.settings.game-options.setting.key-debug-chunk-borders.label": {
+    "message": "Chunk-határok megjelenítése"
+  },
+  "app.settings.game-options.setting.key-debug-clear-chat.label": {
+    "message": "Csevegés kiürítése"
+  },
+  "app.settings.game-options.setting.key-debug-copy-location.label": {
+    "message": "Helyzet kimásolása"
+  },
+  "app.settings.game-options.setting.key-debug-copy-recreate-command.label": {
+    "message": "Újraalkotási parancs másolása"
+  },
+  "app.settings.game-options.setting.key-debug-crash.label": {
+    "message": "Hibakeresési összeomlás kiváltása"
+  },
+  "app.settings.game-options.setting.key-debug-dump-dynamic-textures.label": {
+    "message": "Dinamikus textúrák kiíratása"
+  },
+  "app.settings.game-options.setting.key-debug-dump-version.label": {
+    "message": "Verzió kiíratása"
+  },
+  "app.settings.game-options.setting.key-debug-focus-pause.label": {
+    "message": "Szüneteltetés fókuszvesztéskor"
+  },
+  "app.settings.game-options.setting.key-debug-fps-charts.label": {
+    "message": "FPS-diagramok"
+  },
+  "app.settings.game-options.setting.key-debug-hitboxes.label": {
+    "message": "Hitboxok megjelenítése"
+  },
+  "app.settings.game-options.setting.key-debug-improved-transparency.label": {
+    "message": "Továbbfejlesztett átlátszósági hibakeresési nézet"
+  },
+  "app.settings.game-options.setting.key-debug-lightmap-texture.label": {
+    "message": "Fényességtérkép-textúra"
+  },
+  "app.settings.game-options.setting.key-debug-modifier.label": {
+    "message": "Hibakeresési módosító"
+  },
+  "app.settings.game-options.setting.key-debug-network-charts.label": {
+    "message": "Hálózati diagramok"
+  },
+  "app.settings.game-options.setting.key-debug-options.label": {
+    "message": "Hibakeresési beállítások"
+  },
+  "app.settings.game-options.setting.key-debug-overlay.label": {
+    "message": "Hibakeresési fedvény"
+  },
+  "app.settings.game-options.setting.key-debug-profiling-chart.label": {
+    "message": "Profilozási diagram"
+  },
+  "app.settings.game-options.setting.key-debug-profiling.label": {
+    "message": "Profilozás indítása"
+  },
+  "app.settings.game-options.setting.key-debug-reload-chunks.label": {
+    "message": "Chunkok újratöltése"
+  },
+  "app.settings.game-options.setting.key-debug-reload-resource-packs.label": {
+    "message": "Erőforráscsomagok újratöltése"
+  },
+  "app.settings.game-options.setting.key-debug-spectate.label": {
+    "message": "Entitás megfigyelése"
+  },
+  "app.settings.game-options.setting.key-debug-switch-game-mode.label": {
+    "message": "Játékmód váltása"
+  },
+  "app.settings.game-options.setting.key-drop.label": {
+    "message": "Tárgy elejtése"
+  },
+  "app.settings.game-options.setting.key-forward.label": {
+    "message": "Mozgás előre"
+  },
+  "app.settings.game-options.setting.key-friends.label": {
+    "message": "Barátok"
+  },
+  "app.settings.game-options.setting.key-fullscreen.label": {
+    "message": "Teljesképernyős mód bekapcsolása"
+  },
+  "app.settings.game-options.setting.key-hotbar-1.label": {
+    "message": "Gyorselérési sáv 1"
+  },
+  "app.settings.game-options.setting.key-hotbar-2.label": {
+    "message": "Gyorselérési sáv 2"
+  },
+  "app.settings.game-options.setting.key-hotbar-3.label": {
+    "message": "Gyorselérési sáv 3"
+  },
+  "app.settings.game-options.setting.key-hotbar-4.label": {
+    "message": "Gyorselérési sáv 4"
+  },
+  "app.settings.game-options.setting.key-hotbar-5.label": {
+    "message": "Gyorselérési sáv 5"
+  },
+  "app.settings.game-options.setting.key-hotbar-6.label": {
+    "message": "Gyorselérési sáv 6"
+  },
+  "app.settings.game-options.setting.key-hotbar-7.label": {
+    "message": "Gyorselérési sáv 7"
+  },
+  "app.settings.game-options.setting.key-hotbar-8.label": {
+    "message": "Gyorselérési sáv 8"
+  },
+  "app.settings.game-options.setting.key-hotbar-9.label": {
+    "message": "Gyorselérési sáv 9"
+  },
+  "app.settings.game-options.setting.key-inventory.label": {
+    "message": "Eszköztár"
+  },
+  "app.settings.game-options.setting.key-jump.label": {
+    "message": "Ugrás"
+  },
+  "app.settings.game-options.setting.key-left.label": {
+    "message": "Balra lépés"
+  },
+  "app.settings.game-options.setting.key-load-toolbar.label": {
+    "message": "Eszköztár betöltése"
+  },
+  "app.settings.game-options.setting.key-perspective.label": {
+    "message": "Nézet váltása"
+  },
+  "app.settings.game-options.setting.key-pick-item.label": {
+    "message": "Blokk kiválasztása"
+  },
+  "app.settings.game-options.setting.key-player-list.label": {
+    "message": "Játékoslista"
+  },
+  "app.settings.game-options.setting.key-quick-actions.label": {
+    "message": "Gyorsműveletek"
+  },
+  "app.settings.game-options.setting.key-right.label": {
+    "message": "Jobbra lépés"
+  },
+  "app.settings.game-options.setting.key-save-toolbar.label": {
+    "message": "Eszköztár mentése"
+  },
+  "app.settings.game-options.setting.key-screenshot.label": {
+    "message": "Képernyőkép"
+  },
+  "app.settings.game-options.setting.key-smooth-camera.label": {
+    "message": "Cinematikus kamera váltása"
+  },
+  "app.settings.game-options.setting.key-sneak.label": {
+    "message": "Lopakodás"
+  },
+  "app.settings.game-options.setting.key-social-interactions.label": {
+    "message": "Közösségi interakciók"
+  },
+  "app.settings.game-options.setting.key-spectator-hotbar.label": {
+    "message": "Megfigyelő gyorselérési sáv"
+  },
+  "app.settings.game-options.setting.key-spectator-outlines.label": {
+    "message": "Megfigyelők kiemelése"
+  },
+  "app.settings.game-options.setting.key-sprint.label": {
+    "message": "Sprint"
+  },
+  "app.settings.game-options.setting.key-swap-offhand.label": {
+    "message": "Másodlagos kéz cseréje"
+  },
+  "app.settings.game-options.setting.key-toggle-gui.label": {
+    "message": "HUD váltása"
+  },
+  "app.settings.game-options.setting.key-toggle-spectator-shader.label": {
+    "message": "Megfigyelő shader váltása"
+  },
+  "app.settings.game-options.setting.key-use.label": {
+    "message": "Tárgy használata"
+  },
+  "app.settings.game-options.setting.language.label": {
+    "message": "Nyelv"
+  },
+  "app.settings.game-options.setting.left-pants-leg.label": {
+    "message": "Bal lábszár"
+  },
+  "app.settings.game-options.setting.left-sleeve.label": {
+    "message": "Bal kabátujj"
+  },
+  "app.settings.game-options.setting.legacy-framerate-limit.label": {
+    "message": "Képfrissítési korlát"
+  },
+  "app.settings.game-options.setting.legacy-view-distance.label": {
+    "message": "Látótávolság"
+  },
+  "app.settings.game-options.setting.mac-fullscreen-menu.label": {
+    "message": "macOS menü megjelenítése teljes képernyős módban"
+  },
+  "app.settings.game-options.setting.main-hand.description": {
+    "message": "Válaszd ki hogy a bal vagy a jobb kezed legyen az elsődleges."
+  },
+  "app.settings.game-options.setting.main-hand.label": {
+    "message": "Elsődleges kéz"
+  },
+  "app.settings.game-options.setting.master-volume.label": {
+    "message": "Fő hangerő"
+  },
+  "app.settings.game-options.setting.max-framerate.label": {
+    "message": "Maximum képkockasebesség"
+  },
+  "app.settings.game-options.setting.menu-background-blur.label": {
+    "message": "Menü hátterének elmosása"
+  },
+  "app.settings.game-options.setting.mipmap-levels.description": {
+    "message": "Textúrák simítása a távolban."
+  },
+  "app.settings.game-options.setting.mipmap-levels.label": {
+    "message": "Mipmap-szintek"
+  },
+  "app.settings.game-options.setting.mouse-wheel-sensitivity.label": {
+    "message": "Az egérgörgő érzékenysége"
+  },
+  "app.settings.game-options.setting.music-frequency.label": {
+    "message": "Zenék gyakorisága"
+  },
+  "app.settings.game-options.setting.music-toast.description": {
+    "message": "Válaszd ki, hogy a zeneszámok címei megjelenjenek-e a játékszünet menüben és értesítésként."
+  },
+  "app.settings.game-options.setting.music-toast.label": {
+    "message": "Zene értesítései"
+  },
+  "app.settings.game-options.setting.music-volume.label": {
+    "message": "Zene"
+  },
+  "app.settings.game-options.setting.narrator-hotkey.label": {
+    "message": "Narrátor gyorsgomb"
+  },
+  "app.settings.game-options.setting.narrator.description": {
+    "message": "Válaszd ki hogy a narrátor mikor olvasson."
+  },
+  "app.settings.game-options.setting.narrator.label": {
+    "message": "Narrátor"
+  },
+  "app.settings.game-options.setting.neutral-volume.label": {
+    "message": "Barátságos lények"
+  },
+  "app.settings.game-options.setting.notification-time.description": {
+    "message": "Mennyi ideig jelenjenek meg az értesítések."
+  },
+  "app.settings.game-options.setting.notification-time.label": {
+    "message": "Értesítések megjelenési ideje"
+  },
+  "app.settings.game-options.setting.operator-items-tab.label": {
+    "message": "Operátor fül"
+  },
+  "app.settings.game-options.setting.panorama-speed.label": {
+    "message": "Panoráma sebessége"
+  },
+  "app.settings.game-options.setting.particles.label": {
+    "message": "Részecskék"
+  },
+  "app.settings.game-options.setting.players-volume.label": {
+    "message": "Játékosok"
+  },
+  "app.settings.game-options.setting.prioritize-chunk-updates.label": {
+    "message": "Chunkfrissítések előnyben részesítése"
+  },
+  "app.settings.game-options.setting.quit-shortcuts.label": {
+    "message": "Kilépési hivatkozások"
+  },
+  "app.settings.game-options.setting.raw-mouse-input.label": {
+    "message": "Nyers egérbemenet"
+  },
+  "app.settings.game-options.setting.realms-notifications.label": {
+    "message": "Realms-értesítések"
+  },
+  "app.settings.game-options.setting.record-volume.label": {
+    "message": "Zenegép/hangblokkok"
+  },
+  "app.settings.game-options.setting.reduced-debug-info.label": {
+    "message": "Csökkentétt hibakeresési információk"
+  },
+  "app.settings.game-options.setting.render-distance.label": {
+    "message": "Látótávolság"
+  },
+  "app.settings.game-options.setting.right-pants-leg.label": {
+    "message": "Jobb lábszár"
+  },
+  "app.settings.game-options.setting.right-sleeve.label": {
+    "message": "Jobb kabátujj"
+  },
+  "app.settings.game-options.setting.rotate-with-minecart.label": {
+    "message": "Fordulás csillével"
+  },
+  "app.settings.game-options.setting.save-chat-drafts.label": {
+    "message": "Csevegésvázlatok mentése"
+  },
+  "app.settings.game-options.setting.screen-effects.label": {
+    "message": "Képernyő-effektusok"
+  },
+  "app.settings.game-options.setting.secure-chat-only.label": {
+    "message": "Csak a biztonságos csevegés mutatása"
+  },
+  "app.settings.game-options.setting.sensitivity.label": {
+    "message": "Egér érzékenység"
+  },
+  "app.settings.game-options.setting.server-textures.label": {
+    "message": "Szerver textúrái"
+  },
+  "app.settings.game-options.setting.share-presence.label": {
+    "message": "Jelenlét megosztása"
+  },
+  "app.settings.game-options.setting.simulation-distance.description": {
+    "message": "Milyen távolságra frissüljenek az entitások, illetve legyenek tickelve a blokkok és folyadékok."
+  },
+  "app.settings.game-options.setting.simulation-distance.label": {
+    "message": "Szimulációs távolság"
+  },
+  "app.settings.game-options.setting.snooper.label": {
+    "message": "Adatgyűjtő"
+  },
+  "app.settings.game-options.setting.sprint-window.label": {
+    "message": "Sprintablak"
+  },
+  "app.settings.game-options.setting.subtitles.description": {
+    "message": "Feliratok megjelenítése a játékban lejátszott hangokhoz."
+  },
+  "app.settings.game-options.setting.subtitles.label": {
+    "message": "Feliratok"
+  },
+  "app.settings.game-options.setting.text-background-opacity.label": {
+    "message": "Szövegháttér átlátszósága"
+  },
+  "app.settings.game-options.setting.texture-filtering.label": {
+    "message": "Textúra-szűrés"
+  },
+  "app.settings.game-options.setting.toggle-attack.label": {
+    "message": "Támadás váltása"
+  },
+  "app.settings.game-options.setting.toggle-crouch.description": {
+    "message": "Nyomd meg egyszer a guggolás folytatásához."
+  },
+  "app.settings.game-options.setting.toggle-crouch.label": {
+    "message": "Guggolás váltása"
+  },
+  "app.settings.game-options.setting.toggle-sprint.description": {
+    "message": "Nyomd meg egyszer a futás folytatásához."
+  },
+  "app.settings.game-options.setting.toggle-sprint.label": {
+    "message": "Sprint váltása"
+  },
+  "app.settings.game-options.setting.toggle-use.label": {
+    "message": "Használat váltása"
+  },
+  "app.settings.game-options.setting.touchscreen.label": {
+    "message": "Érintőképernyős mód"
+  },
+  "app.settings.game-options.setting.ui-volume.label": {
+    "message": "UI"
+  },
+  "app.settings.game-options.setting.unfocused-chat-height.label": {
+    "message": "Kifókuszált csevegés magasság"
+  },
+  "app.settings.game-options.setting.use-vbo.label": {
+    "message": "VBO-k használata"
+  },
+  "app.settings.game-options.setting.view-bobbing.description": {
+    "message": "A kamera billegni fog sétálás közben."
+  },
+  "app.settings.game-options.setting.view-bobbing.label": {
+    "message": "Kamera billegése"
+  },
+  "app.settings.game-options.setting.vignette.label": {
+    "message": "Vignetta"
+  },
+  "app.settings.game-options.setting.voice-volume.label": {
+    "message": "Beszéd és hang"
+  },
+  "app.settings.game-options.setting.vsync.description": {
+    "message": "Korlátozza a képkockasebességet a kijelző frissítési frekvenciájára a képtörés megelőzése érdekében."
+  },
+  "app.settings.game-options.setting.vsync.label": {
+    "message": "VSync"
+  },
+  "app.settings.game-options.setting.weather-radius.label": {
+    "message": "Időjárási sugár"
+  },
+  "app.settings.game-options.setting.weather-volume.label": {
+    "message": "Időjárás"
+  },
+  "app.settings.game-options.validation.changed-since-opened": {
+    "message": "Ez a beállítás valahol meg van változtatva. Ellenőrizd majd próbáld újra."
+  },
+  "app.settings.game-options.validation.invalid-value": {
+    "message": "Válassz egy érvényes értéket."
+  },
+  "app.settings.game-options.validation.missing-value": {
+    "message": "Válassz előbb egy értéket."
+  },
+  "app.settings.game-options.validation.no-compatible-instances": {
+    "message": "Pár példányod nem tudja ezt a beállítást alkalmazni"
+  },
   "app.settings.java-installations.location.title": {
     "message": "A Java {version, number} helye"
   },
@@ -1641,16 +2727,46 @@
     "message": "Példányok"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
-    "message": "Válaszd ki azt a példányt, amelynek parancselőzménye lesz a megosztott változat."
+    "message": "Válaszd ki, hogy melyik példányból másolja át a parancselőzményeidet. Az előzményeket csak a kezdeti szinkronizáláshoz használja, ezt követően bármelyik példányból szerkesztheted őket."
+  },
+  "app.settings.synced-options.choose-sync-source.command-history-title": {
+    "message": "Parancselőzmények forrásának kiválasztása"
   },
   "app.settings.synced-options.choose-sync-source.creative-hotbars-description": {
-    "message": "Válaszd ki azt a példányt, amelynek mentett kreatív gyorssávjai lesznek a megosztott változat."
+    "message": "Válaszd ki, hogy melyik példányból másolja át a mentett kreatív eszköztáraidat. Ezeket az eszköztárakat csak a kezdeti szinkronizáláshoz használja, ezt követően bármelyik példányból szerkesztheted őket."
+  },
+  "app.settings.synced-options.choose-sync-source.creative-hotbars-title": {
+    "message": "Kreatív gyorselérési sávok forrásának kiválasztása"
+  },
+  "app.settings.synced-options.choose-sync-source.data-packs-title": {
+    "message": "Adatcsomagok forrásának kiválasztása"
+  },
+  "app.settings.synced-options.choose-sync-source.game-settings-description": {
+    "message": "Válaszd ki, hogy melyik példányból másolja át a játékbeállításaidat. Ezeket a beállításokat csak a kezdeti szinkronizáláshoz használja, ezt követően bármelyik példányból szerkesztheted őket."
+  },
+  "app.settings.synced-options.choose-sync-source.game-settings-title": {
+    "message": "Játékbeállítások forrásának kiválasztása"
+  },
+  "app.settings.synced-options.choose-sync-source.ineligible": {
+    "message": "Ezt a példányt nem választhatod szinkronizálási forrásként"
+  },
+  "app.settings.synced-options.choose-sync-source.load-error": {
+    "message": "Nem sikerült betölteni a szinkronizálási forrásokat. Próbáld újra."
   },
   "app.settings.synced-options.choose-sync-source.multiplayer-servers-description": {
-    "message": "Válaszd ki azt a példányt, amelynek többjátékos szerverei lesznek a megosztott változat."
+    "message": "Válaszd ki, hogy melyik példányból másolja át a többjátékos szervereket. Ezeket a szervereket csak a kezdeti szinkronizáláshoz használja, ezt követően bármelyik példányból szerkesztheted őket."
+  },
+  "app.settings.synced-options.choose-sync-source.multiplayer-servers-title": {
+    "message": "Többjátékos szerverek forrásának kiválasztása"
   },
   "app.settings.synced-options.choose-sync-source.no-instances-found": {
     "message": "Nem találhatók példányok"
+  },
+  "app.settings.synced-options.choose-sync-source.resource-packs-title": {
+    "message": "Erőforráscsomagok forrásának kiválasztása"
+  },
+  "app.settings.synced-options.choose-sync-source.retry": {
+    "message": "Próbáld újra"
   },
   "app.settings.synced-options.choose-sync-source.search-placeholder": {
     "message": "Példány keresése"
@@ -1673,11 +2789,116 @@
   "app.settings.synced-options.creative-hotbars.description": {
     "message": "Használd ugyanazokat a mentett kreatív gyorselérési sávokat az összes példányodban."
   },
+  "app.settings.synced-options.data-packs": {
+    "message": "Adatcsomagok szinkronizálása"
+  },
+  "app.settings.synced-options.data-packs.description": {
+    "message": "Használd ugyanazokat az adatcsomagokat az összes példányodban"
+  },
+  "app.settings.synced-options.data-packs.none-synced-yet": {
+    "message": "Nem szinkronizáltál még adatcsomagokat"
+  },
+  "app.settings.synced-options.edit.no-instances": {
+    "message": "Adj hozzá egy példányt a szinkronizált adatok szerkesztése előtt."
+  },
+  "app.settings.synced-options.edit.no-synced-data": {
+    "message": "Válassz egy szinkronizálási forrást mielőtt szerkeszted ezt."
+  },
+  "app.settings.synced-options.game-settings": {
+    "message": "Játékbeállítások szinkronizálása"
+  },
+  "app.settings.synced-options.game-settings.button": {
+    "message": "Játékbeállítások szerkesztése"
+  },
+  "app.settings.synced-options.game-settings.conflict-text": {
+    "message": "Betöltöttük neked a legújabb beállításoka. Ellenőrizd a változásokat és ments újra."
+  },
+  "app.settings.synced-options.game-settings.conflict-title": {
+    "message": "Ezek a beállítások valahol máshol módosultak"
+  },
+  "app.settings.synced-options.game-settings.custom-empty": {
+    "message": "A modok által regisztrált beállítások itt fognak megjelenni amint a Modrinth érzékeli őket az egyik példányodban."
+  },
+  "app.settings.synced-options.game-settings.description": {
+    "message": "Használd ugyanazokat a játékbeállításokat az összes példányodban."
+  },
+  "app.settings.synced-options.game-settings.disable-all": {
+    "message": "Összes szinkronizálásának megszüntetése"
+  },
+  "app.settings.synced-options.game-settings.disabled-tooltip": {
+    "message": "Kapcsold be a játékbeállítások szinkronizálását mielőtt egyedülálló beállításokat módosítanál."
+  },
+  "app.settings.synced-options.game-settings.empty": {
+    "message": "Nem egyezik egy beállítás se a kereséseddel vagy szűreseddel."
+  },
+  "app.settings.synced-options.game-settings.enable-all": {
+    "message": "Összes szinkronizálása"
+  },
+  "app.settings.synced-options.game-settings.load-failed": {
+    "message": "Nem tudtuk betölteni a játékbeállításaidat."
+  },
+  "app.settings.synced-options.game-settings.loading": {
+    "message": "Beállítások betöltése..."
+  },
+  "app.settings.synced-options.game-settings.no-options-to-edit": {
+    "message": "Még nincsenek szerkeszthető beállításaid"
+  },
+  "app.settings.synced-options.game-settings.not-being-synced": {
+    "message": "Nincs szinkronizálva"
+  },
+  "app.settings.synced-options.game-settings.retry": {
+    "message": "Újra"
+  },
+  "app.settings.synced-options.game-settings.save": {
+    "message": "Beállítások mentése"
+  },
+  "app.settings.synced-options.game-settings.search": {
+    "message": "Beállítások keresése..."
+  },
+  "app.settings.synced-options.game-settings.sync-description": {
+    "message": "A szinkronizált beállítások minden példányra alkalmazva vannak, és felülírják a modpackban megadott értékeket."
+  },
+  "app.settings.synced-options.game-settings.sync-setting": {
+    "message": "{setting} szinkronizálása a példányok között"
+  },
+  "app.settings.synced-options.game-settings.sync-title": {
+    "message": "Játékbeállítások szinkronizálása"
+  },
+  "app.settings.synced-options.game-settings.synced-across-instances": {
+    "message": "Példányok között szinkronizálva"
+  },
+  "app.settings.synced-options.game-settings.title": {
+    "message": "Játékbeállítások"
+  },
+  "app.settings.synced-options.game-settings.unsaved-changes": {
+    "message": "Vannak nem mentett módosításaid."
+  },
+  "app.settings.synced-options.game-settings.unsync-setting": {
+    "message": "{setting} szinkronizálásának megszüntetése a példányok között"
+  },
+  "app.settings.synced-options.game-settings.value-mixed": {
+    "message": "Más a példányok között"
+  },
+  "app.settings.synced-options.game-settings.value-off": {
+    "message": "Ki"
+  },
+  "app.settings.synced-options.game-settings.value-on": {
+    "message": "Be"
+  },
+  "app.settings.synced-options.game-settings.value-unset": {
+    "message": "Válassz egy értéket"
+  },
   "app.settings.synced-options.multiplayer-servers": {
     "message": "Többjátékos szerverek szinkronizálása"
   },
   "app.settings.synced-options.multiplayer-servers.address": {
     "message": "Szervercím"
+  },
+  "app.settings.synced-options.multiplayer-servers.copy-address": {
+    "message": "Cím másolása"
+  },
+  "app.settings.synced-options.multiplayer-servers.count": {
+    "message": "{count, plural, one {# szerver} other {# szerverek}}"
   },
   "app.settings.synced-options.multiplayer-servers.description": {
     "message": "Használd ugyanazokat a többjátékos szervereket az összes példányodban."
@@ -1688,17 +2909,53 @@
   "app.settings.synced-options.multiplayer-servers.empty": {
     "message": "Jelenleg egyetlen felhasználó által hozzáadott szerver sincs szinkronizálva."
   },
+  "app.settings.synced-options.multiplayer-servers.filter-offline": {
+    "message": "Offline"
+  },
+  "app.settings.synced-options.multiplayer-servers.filter-online": {
+    "message": "Online"
+  },
+  "app.settings.synced-options.multiplayer-servers.more-options": {
+    "message": "Több szerverbeállítás"
+  },
   "app.settings.synced-options.multiplayer-servers.name": {
     "message": "Szervernév"
   },
+  "app.settings.synced-options.multiplayer-servers.no-results": {
+    "message": "Nem egyezik egy beállítás se a kereséseddel vagy szűréseddel."
+  },
   "app.settings.synced-options.multiplayer-servers.none-synced-yet": {
-    "message": "Nincsenek szinkronizált szerverek"
+    "message": "Nem szinkronizáltán még szervereket"
+  },
+  "app.settings.synced-options.multiplayer-servers.players-online": {
+    "message": "{count, number} online"
+  },
+  "app.settings.synced-options.multiplayer-servers.search": {
+    "message": "Keresés {count, number} {count, plural, one {szinkronizált szerver} other {szinkronizált szerver}} között..."
+  },
+  "app.settings.synced-options.multiplayer-servers.status": {
+    "message": "Státusz"
+  },
+  "app.settings.synced-options.packs.disabled": {
+    "message": "Engedélyezd a szinkronizálást mielőtt szerkeszted a megosztott csomagokat."
+  },
+  "app.settings.synced-options.resource-packs": {
+    "message": "Erőforrácsomagok szinkronizálása"
+  },
+  "app.settings.synced-options.resource-packs.description": {
+    "message": "Használd ugyanaokat az erőforráscsomagokat a példányaid között."
+  },
+  "app.settings.synced-options.resource-packs.none-synced-yet": {
+    "message": "Nem szinkronizáltál még erőforráscsomagokat"
   },
   "app.settings.tabs.appearance": {
     "message": "Megjelenés"
   },
   "app.settings.tabs.behavior": {
     "message": "Működés"
+  },
+  "app.settings.tabs.features": {
+    "message": "Funkciók"
   },
   "app.settings.tabs.java-installations": {
     "message": "Telepített Java példányok"
@@ -1737,10 +2994,10 @@
     "message": "Biztosan törölni szeretnéd ezt a kinézetet?"
   },
   "app.skins.demo.apply-tooltip": {
-    "message": "Jelentkezz be a skinek alkalmazásához."
+    "message": "Jelentkezz be a kinézetek alkalmazásához."
   },
   "app.skins.demo.description": {
-    "message": "Jelentkezz be a Minecraft fiókodba a skinek mentéséhez és alkalmazásához!"
+    "message": "Jelentkezz be a Minecraft fiókodba a kinézetek mentéséhez és alkalmazásához!"
   },
   "app.skins.demo.title": {
     "message": "Egy demófiókkal szerkesztesz"
@@ -1894,6 +3151,135 @@
   },
   "app.survey.title": {
     "message": "Hali, Modrinth-felhasználó!"
+  },
+  "app.sync-instances-update.badge": {
+    "message": "Új ebben a frissítésben"
+  },
+  "app.sync-instances-update.choose-source.all": {
+    "message": "Válaszd ki, hogy melyik példányból másolja át a játékbeállításokat, erőforráscsomagokat, parancselőzményeket, kreatív gyorselérési sávokat és többjátékos szervereket. Ezeket a beállításokat csak a kezdeti szinkronizáláshoz használja, ezt követően bármelyik példányból szerkesztheted őket."
+  },
+  "app.sync-instances-update.choose-source.all-title": {
+    "message": "Szinkronizálási forrás kiválasztása"
+  },
+  "app.sync-instances-update.choose-source.data-packs": {
+    "message": "Válaszd ki, hogy melyik példányból másolja át az adatcsomagjaidat. Ezeket a csomagokat csak a kezdeti szinkronizáláshoz használja, ezt követően bármelyik példányból szerkesztheted őket."
+  },
+  "app.sync-instances-update.choose-source.resource-packs": {
+    "message": "Válaszd ki, hogy melyik példányból másolja át az erőforráscsomagjaidat. Ezeket a csomagokat csak a kezdeti szinkronizáláshoz használja, ezt követően bármelyik példányból szerkesztheted őket."
+  },
+  "app.sync-instances-update.creative-hotbars": {
+    "message": "Kreatív gyorselérési sávok szinkronizálása"
+  },
+  "app.sync-instances-update.description": {
+    "message": "Mostantól szinkronizálhatod a példányaid között az olyan beállításokat, mint a játékbeállítások, szerverek, erőforráscsomagok és még sok más, így minden alkalommal ugyanazokkal a beállításokkal játszhatsz!"
+  },
+  "app.sync-instances-update.load-error": {
+    "message": "Nem sikerült betölteni a szinkronizálási beállításaidat. Próbáld újra."
+  },
+  "app.sync-instances-update.manage-later": {
+    "message": "Most engedélyezheted a szinkronizálást, később pedig kezelheted az alkalmazás beállításaiban."
+  },
+  "app.sync-instances-update.notification.description": {
+    "message": "Tartsd szinkronban a játékbeállításokat, szervereket, erőforráscsomagokat és még sok mást a példányaid között."
+  },
+  "app.sync-instances-update.notification.dismiss": {
+    "message": "Elvétés"
+  },
+  "app.sync-instances-update.notification.title": {
+    "message": "Példányok szinkronizálása"
+  },
+  "app.sync-instances-update.notification.view-update": {
+    "message": "Frissítés megtekintése"
+  },
+  "app.sync-instances-update.retry": {
+    "message": "Próbáld újra"
+  },
+  "app.sync-instances-update.skip": {
+    "message": "Kihagyás"
+  },
+  "app.sync-instances-update.sync-all": {
+    "message": "Összes szinkronizálása"
+  },
+  "app.sync-instances-update.title": {
+    "message": "Példányaid szinkronizálása"
+  },
+  "app.synced-content.change.disable-description": {
+    "message": "Letiltás az összes szinkronizált példányban, vagy csak ebben a példányban. Ha csak itt tiltod le, engedélyezve lesznek a felülbírálások ennél a példánynál."
+  },
+  "app.synced-content.change.disable-everywhere": {
+    "message": "Letiltás mindenhol"
+  },
+  "app.synced-content.change.disable-everywhere-description": {
+    "message": "Tiltsd le ezt a tartalmat az összes szinkronizált példányban."
+  },
+  "app.synced-content.change.disable-here": {
+    "message": "Letiltás itt"
+  },
+  "app.synced-content.change.disable-title": {
+    "message": "Tartalom letiltása?"
+  },
+  "app.synced-content.change.enable-description": {
+    "message": "Engedélyezés az összes szinkronizált példányban, vagy csak ebben a példányban. Ha csak itt engedélyezed, engedélyezve lesznek a felülbírálások ennél a példánynál."
+  },
+  "app.synced-content.change.enable-everywhere": {
+    "message": "Engedélyezés mindenhol"
+  },
+  "app.synced-content.change.enable-everywhere-description": {
+    "message": "Engedélyezd ezt a tartalmat az összes szinkronizált példányban."
+  },
+  "app.synced-content.change.enable-here": {
+    "message": "Engedélyezés itt"
+  },
+  "app.synced-content.change.enable-title": {
+    "message": "Tartalom engedélyezése?"
+  },
+  "app.synced-content.delete.delete-everywhere": {
+    "message": "Törlés mindenhol"
+  },
+  "app.synced-content.delete.delete-here": {
+    "message": "Törlés itt"
+  },
+  "app.synced-content.delete.description": {
+    "message": "Ha kitörlöd ezt a tartalmat akkor a többi példanyidból is el lesz távolítva"
+  },
+  "app.synced-content.delete.mixed": {
+    "message": "A kiválasztott tartalom ami nincs szinkronizálva csak ebből a példányból lesz eltávolítva."
+  },
+  "app.synced-content.delete.override-description": {
+    "message": "Válaszd ki, hogy csak ebből a példányból szeretnéd eltávolítani, vagy az összes szinkronizált példányból. Ha csak ebből a példányból távolítod el, engedélyezve lesznek a felülírások, és ez a példány a továbbiakban nem kap szinkronizált módosításokat ezekhez a tartalomtípusokhoz."
+  },
+  "app.synced-content.delete.resource-pack-description": {
+    "message": "{count, plural, one {Ezt} other {Ezeket}} csak ebből a példányból szeretnéd eltávolítani, vagy az összes szinkronizált példányból? Ha csak ebből a példányból távolítod el {count, plural, one {ezt} other {ezeket}}, engedélyezve lesznek a felülírások, és ez a példány a továbbiakban nem kap szinkronizált erőforráscsomag-módosításokat."
+  },
+  "app.synced-content.delete.resource-pack-header": {
+    "message": "{count, plural, one {Ez az erőforráscsomag szinkronizálva van} other {Ezek az erőforráscsomagok szinkronizálva vannak}}"
+  },
+  "app.synced-content.desync.description": {
+    "message": "Ez a példány megtartja a saját példányát. Szeretnéd, hogy ez a tartalom szinkronizálva maradjon a többi példányban, vagy eltávolítod onnan?"
+  },
+  "app.synced-content.desync.keep": {
+    "message": "Megtartás"
+  },
+  "app.synced-content.desync.remove": {
+    "message": "Eltávolítás"
+  },
+  "app.synced-content.desync.title": {
+    "message": "Tartalom szinkroniálásának megszüntetése"
+  },
+  "app.synced-content.warning.title": {
+    "message": "Ez a tartalom szinkronizálva van"
+  },
+  "app.synced-packs.data-packs.title": {
+    "message": "Szinkronizált adatcsomagok"
+  },
+  "app.synced-packs.empty": {
+    "message": "Adj hozzá csomagokat a példány \"Tartalmak\" lapjáról hogy elkezdd a szinkronizálást."
+  },
+  "app.synced-packs.load-failed": {
+    "message": "A csomagokat nem sikerült betölteni. Próbálkozz egy újratöltéssel."
+  },
+  "app.synced-packs.resource-packs.title": {
+    "message": "Szinkronizált erőforráscsomagok"
   },
   "app.update-popup.body.download-complete": {
     "message": "A Modrinth App v{version} letöltése befejeződött. Válaszd a Frissítés lehetőséget a frissítéshez, vagy az alkalmazás bezárásakor automatikusan frissül."
@@ -2453,6 +3839,33 @@
   "instance.settings.sharing.revoke-invite.header": {
     "message": "Meghívó törlése"
   },
+  "instance.settings.synced-options.data-override": {
+    "message": "Kapcsold ki ezt a felülírást hogy szerkeszthető legyen a szinkronizált adat."
+  },
+  "instance.settings.synced-options.data-packs": {
+    "message": "Adatcsomagok szinkronizálásának megszüntetése"
+  },
+  "instance.settings.synced-options.data-packs.description": {
+    "message": "Tartsd külön ennek a példánynak az adatcsomagjait a szinkronizált csomagoktól."
+  },
+  "instance.settings.synced-options.data-packs.disabled": {
+    "message": "Az adatcsomagok szinkronizálása ki van kapcsolva a beállításokban."
+  },
+  "instance.settings.synced-options.edit-packs": {
+    "message": "Szinkronizált csomagok szerkesztése"
+  },
+  "instance.settings.synced-options.packs-override": {
+    "message": "Kapcsold ki ezt a felülírást hogy szerkeszdhesd a szinkronizált csomagokat. Az egyedülálló csomagokat kezelheted ugyanúgy a \"Tartalmak\" lapon."
+  },
+  "instance.settings.synced-options.resource-packs": {
+    "message": "Erőforráscsomagok szinkronizálásának megszüntetése"
+  },
+  "instance.settings.synced-options.resource-packs.description": {
+    "message": "Tartsd külön ennek a példánynak az erőforráscsomagjait a szinkronizált csomagoktól."
+  },
+  "instance.settings.synced-options.resource-packs.disabled": {
+    "message": "Az erőforráscsomagok szinkronizálása ki van kapcsolva a beállításokban."
+  },
   "instance.settings.tabs.behavior.description": {
     "message": "Válaszd ki, mely lapok jelenjenek meg ezen a példányon."
   },
@@ -2666,6 +4079,15 @@
   "instance.settings.tabs.synced-options.creative-hotbars.override-description": {
     "message": "Tartsd külön ennek a példánynak a mentett kreatív gyorselérési sávjait a szinkronizált gyorssávoktól."
   },
+  "instance.settings.tabs.synced-options.game-settings": {
+    "message": "Játékbeállítások szinkronizálásának megszüntetése"
+  },
+  "instance.settings.tabs.synced-options.game-settings.description": {
+    "message": "Tartsd külön ennek a példánynak az options.txt fájlját a szinkronizált másolattól."
+  },
+  "instance.settings.tabs.synced-options.game-settings.disabled-in-app": {
+    "message": "A játékbeállítások szinkronizálása ki van kapcsolva a beállításokban."
+  },
   "instance.settings.tabs.synced-options.hotbars-conflict.backup-description": {
     "message": "A lecserélendő verzió a módosítások előtt el lesz mentve egy biztonsági mentésbe."
   },
@@ -2694,7 +4116,7 @@
     "message": "Szinkronizált beállítások kezelése"
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
-    "message": "Engedélyezz egy felülbírálást, hogy egy szinkronizált beállítás külön legyen kezelve ennél a példánynál."
+    "message": "Engedélyezz egy felülírást, hogy egy szinkronizált beállítás külön legyen kezelve ennél a példánynál."
   },
   "instance.settings.tabs.window": {
     "message": "Egyéni ablakbeállítások"
@@ -2854,6 +4276,9 @@
   },
   "instance.worlds.shortcut-creation-failed": {
     "message": "A parancsikon létrehozása sikertelen volt"
+  },
+  "instance.worlds.synced_server": {
+    "message": "Példányok között szinkronizálva"
   },
   "instance.worlds.view_instance": {
     "message": "Példány megtekintése"

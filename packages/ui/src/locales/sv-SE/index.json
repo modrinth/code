@@ -200,6 +200,9 @@
   "button.download": {
     "defaultMessage": "Ladda ner"
   },
+  "button.download-files": {
+    "defaultMessage": "Ladda ner filer"
+  },
   "button.downloading": {
     "defaultMessage": "Laddar ner"
   },
@@ -359,6 +362,15 @@
   "collections.label.private": {
     "defaultMessage": "Privat"
   },
+  "console.actions.collapse": {
+    "defaultMessage": "Fäll ihop"
+  },
+  "console.actions.expand": {
+    "defaultMessage": "Expandera"
+  },
+  "console.actions.share": {
+    "defaultMessage": "Dela"
+  },
   "content-type.content.lowercase": {
     "defaultMessage": "innehåll"
   },
@@ -367,6 +379,9 @@
   },
   "content.card.select-project": {
     "defaultMessage": "Välj {project}"
+  },
+  "content.card.synced": {
+    "defaultMessage": "Synkroniserade mellan instanser"
   },
   "content.card.uploaded": {
     "defaultMessage": "Uppladdad"
@@ -2240,11 +2255,17 @@
   "instances.content-install.show-unavailable": {
     "defaultMessage": "Visa otillgängliga"
   },
+  "instances.managed-content-modal.disabled": {
+    "defaultMessage": "Inaktiverad"
+  },
   "instances.managed-content-modal.download-file": {
     "defaultMessage": "Ladda ner fil"
   },
   "instances.managed-content-modal.empty-title": {
     "defaultMessage": "Inget innehåll hittades"
+  },
+  "instances.managed-content-modal.enabled": {
+    "defaultMessage": "Aktiverad"
   },
   "instances.managed-content-modal.external-content": {
     "defaultMessage": "Extern"
@@ -2263,6 +2284,9 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Sök {count} projekt"
+  },
+  "instances.managed-content-modal.warnings": {
+    "defaultMessage": "Varningar"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nuvarande"
@@ -4850,6 +4874,12 @@
   "servers.busy.installing": {
     "defaultMessage": "Servern installeras"
   },
+  "servers.download.failed.title": {
+    "defaultMessage": "Nedladdning misslyckades"
+  },
+  "servers.download.unavailable.title": {
+    "defaultMessage": "Nedladdning otillgänglig"
+  },
   "servers.files.zip-created": {
     "defaultMessage": "ZIP skapad"
   },
@@ -4909,6 +4939,9 @@
   },
   "servers.installing-banner.description.applying": {
     "defaultMessage": "Tillämpar dina installationsändringar..."
+  },
+  "servers.installing-banner.description.controls": {
+    "defaultMessage": "Serverkontroller kommer att låsas upp när installationen slutförs."
   },
   "servers.installing-banner.description.duration": {
     "defaultMessage": "Den här installationen kan ta flera minuter..."

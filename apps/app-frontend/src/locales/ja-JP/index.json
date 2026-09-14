@@ -284,6 +284,18 @@
   "app.content-install.no-compatible-versions": {
     "message": "{compatibilityLabel} に一致する利用可能なバージョンがありません。このままインストールしますか？依存関係は自動的にインストールされません。"
   },
+  "app.content.desync-pack": {
+    "message": "同期を解除"
+  },
+  "app.content.sync-data-packs-disabled": {
+    "message": "アプリの設定で最初にデータパックの同期をオンにしてください。"
+  },
+  "app.content.sync-pack": {
+    "message": "同期"
+  },
+  "app.content.sync-packs-override": {
+    "message": "このインスタンスの設定でパックの同期を無効にしてください。"
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "バックアップフォルダーを開く"
   },
@@ -1562,6 +1574,9 @@
   "app.settings.downloading": {
     "message": "v{version}をダウンロード中"
   },
+  "app.settings.game-options.category.online.label": {
+    "message": "オンライン"
+  },
   "app.settings.java-installations.location.title": {
     "message": "Java {version, number} の場所"
   },
@@ -1640,15 +1655,6 @@
   "app.settings.sidebar.label.instances": {
     "message": "インスタンス"
   },
-  "app.settings.synced-options.choose-sync-source.command-history-description": {
-    "message": "コマンド履歴が共有コピーとなるインスタンスを選択します。"
-  },
-  "app.settings.synced-options.choose-sync-source.creative-hotbars-description": {
-    "message": "保存したクリエイティブホットバーが共有コピーになるインスタンスを選択します。"
-  },
-  "app.settings.synced-options.choose-sync-source.multiplayer-servers-description": {
-    "message": "マルチプレイヤーサーバーが共有コピーになるインスタンスを選択します。"
-  },
   "app.settings.synced-options.choose-sync-source.no-instances-found": {
     "message": "インスタンスが見つかりません"
   },
@@ -1690,9 +1696,6 @@
   },
   "app.settings.synced-options.multiplayer-servers.name": {
     "message": "サーバー名"
-  },
-  "app.settings.synced-options.multiplayer-servers.none-synced-yet": {
-    "message": "まだ同期されているサーバーがありません"
   },
   "app.settings.tabs.appearance": {
     "message": "表示設定"

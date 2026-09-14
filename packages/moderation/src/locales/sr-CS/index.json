@@ -1,4 +1,7 @@
 {
+  "nags.add-description.description": {
+    "defaultMessage": "Potreban je opis koji jasno opisuje sadržaj, svrhu i privlačnost vašeg projekta."
+  },
   "nags.add-description.title": {
     "defaultMessage": "Dodaj opis"
   },
@@ -20,11 +23,23 @@
   "nags.add-license-details.title": {
     "defaultMessage": "Dodaj detalje licence"
   },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Dodajte sve relevantne veze ka spoljnim resursima, kao što su veb-sajt, prodavnica ili trajna pozivnica za Discord."
+  },
   "nags.add-links-server.title": {
     "defaultMessage": "Dodaj spoljne linkove"
   },
+  "nags.add-links.description": {
+    "defaultMessage": "Dodajte sve relevantne veze ka spoljnim resursima, kao što su veb-sajt, prodavnica ili trajna pozivnica za Discord."
+  },
   "nags.add-links.title": {
     "defaultMessage": "Dodaj spoljne linkove"
+  },
+  "nags.adjacent-headers.description": {
+    "defaultMessage": "Naslovi istog nivoa ne treba da se postavljaju jedan pored drugog."
+  },
+  "nags.adjacent-headers.title": {
+    "defaultMessage": "Ukloni susedne zaglavlje"
   },
   "nags.all-languages.description": {
     "defaultMessage": "Izabrao si sve dostupne jezičke opcije. Molimo ti da navedeš samo one jezike koje tvoj server aktivno podržava."
@@ -32,17 +47,47 @@
   "nags.all-languages.title": {
     "defaultMessage": "Izaberi tačne jezike"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Izabrali ste svih {totalAvailableTags, plural, one {# dostupan tag} few {# dostupna taga} other {# dostupnih tagova}}. Tagovi treba da pomognu korisnicima da pronađu relevantne projekte. Molimo vas da birate samo relevantne tagove."
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Izaberi tačne oznake"
+  },
+  "nags.banned-link-usage.description": {
+    "defaultMessage": "Link \"{url}\" nije dozvoljen kao eksterni link."
+  },
+  "nags.banned-link-usage.title": {
+    "defaultMessage": "Ukloni zabranjene linkove"
   },
   "nags.check-disclosures.description": {
     "defaultMessage": "Uverite se da su korisnici svesni svih važnih detalja tako što ćete popuniti obaveštenja o sadržaju koja se odnose na vaš {type}."
   },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "Pregled obaveštenja"
+  },
+  "nags.description-ends-with-header.description": {
+    "defaultMessage": "Opis vašeg projekta ne bi trebalo da se završava naslovom iza kojeg ne sledi nikakav tekst."
+  },
+  "nags.description-ends-with-header.title": {
+    "defaultMessage": "Ukloni završno zaglavlje"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Opis vašeg projekta je prekratak. Dodajte više detalja kako biste jasno opisali sadržaj, svrhu i privlačnost projekta."
+  },
   "nags.description-too-short.title": {
     "defaultMessage": "Proširi opis"
   },
+  "nags.disclosures-special-formatting.description": {
+    "defaultMessage": "Sadržaj upozorenja (disclosures) ne bi trebalo da sadrži HTML, jer mogu da prikažu samo inline Markdown i običan tekst."
+  },
+  "nags.disclosures-special-formatting.title": {
+    "defaultMessage": "Ispravi formatiranje upozorenja"
+  },
   "nags.edit-description.title": {
     "defaultMessage": "Promeni opis"
+  },
+  "nags.edit-gallery.title": {
+    "defaultMessage": "Izmeni galeriju"
   },
   "nags.edit-license.title": {
     "defaultMessage": "Promeni licencu"
@@ -53,11 +98,17 @@
   "nags.edit-tags.title": {
     "defaultMessage": "Promeni oznake"
   },
+  "nags.edit-title.title": {
+    "defaultMessage": "Izmeni ime"
+  },
   "nags.feature-gallery-image.description": {
     "defaultMessage": "Istaknuta slika iz galerije je često način na koji tvoj projekat ostavlja prvi utisak."
   },
   "nags.feature-gallery-image.title": {
     "defaultMessage": "Istakni sliku iz galerije"
+  },
+  "nags.gallery-text-non-standard.description": {
+    "defaultMessage": "Nestandardni znaci, kao što su „Fancy text” ili „Zalgo”, nisu dozvoljeni u naslovima ili opisima slika u galeriji."
   },
   "nags.gallery.title": {
     "defaultMessage": "Posjeti stranicu galerije"

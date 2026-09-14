@@ -254,6 +254,9 @@
   "app.browse.hide-installed-modpacks": {
     "message": "Ẩn modpacks đã cài đặt"
   },
+  "app.browse.project-actions.label": {
+    "message": "Hành động cho dự án"
+  },
   "app.browse.project-type.data-packs": {
     "message": "Các gói dữ liệu"
   },
@@ -280,6 +283,12 @@
   },
   "app.content-install.no-compatible-versions": {
     "message": "Không có phiên bản nào phù hợp với {compatibilityLabel}. Nếu vẫn chọn một phiên bản để cài đặt, các gói phụ thuộc sẽ không được tải tự động."
+  },
+  "app.content.desync-pack": {
+    "message": "Bỏ đồng bộ"
+  },
+  "app.content.sync-pack": {
+    "message": "Đồng bộ"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Mở thư mục sao lưu"
@@ -310,6 +319,12 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.features-settings.show-skin-selector.title": {
+    "message": "Hiển thị phần chọn skin ở thanh bên"
+  },
+  "app.features-settings.sidebar.title": {
+    "message": "Thanh bên"
   },
   "app.home.jump-back-in.instance-locked": {
     "message": "Phiên bản này đã bị khóa"
@@ -418,6 +433,9 @@
   },
   "app.instance.confirm-delete.header": {
     "message": "Xoá hồ sơ"
+  },
+  "app.instance.content.managed-content.modpack-header": {
+    "message": "Nội dung modpack"
   },
   "app.instance.content.managed-content.shared-header": {
     "message": "Nội dung được chia sẻ"
@@ -598,6 +616,39 @@
   },
   "app.project.versions.already-installed": {
     "message": "Đã có sẵn"
+  },
+  "app.settings.default-instance-options.fullscreen.title": {
+    "message": "Toàn màn hình"
+  },
+  "app.settings.default-instance-options.java-arguments.placeholder": {
+    "message": "Nhập đối số Java..."
+  },
+  "app.settings.default-instance-options.memory-allocation.title": {
+    "message": "Cấp phát bộ nhớ"
+  },
+  "app.settings.default-instance-options.post-exit-hook.description": {
+    "message": "Chạy sau khi trò chơi đóng lại."
+  },
+  "app.settings.default-instance-options.post-exit-hook.placeholder": {
+    "message": "Nhập lệnh sau khi thoát..."
+  },
+  "app.settings.default-instance-options.width.placeholder": {
+    "message": "Nhập chiều rộng..."
+  },
+  "app.settings.default-instance-options.width.title": {
+    "message": "Chiều rộng"
+  },
+  "app.settings.default-instance-options.window.title": {
+    "message": "Cửa sổ"
+  },
+  "app.settings.default-instance-options.wrapper-hook.description": {
+    "message": "Lệnh dùng để bọc tiến trình chạy Minecraft."
+  },
+  "app.settings.default-instance-options.wrapper-hook.placeholder": {
+    "message": "Nhập lệnh bọc..."
+  },
+  "app.settings.developer-mode-button.label": {
+    "message": "Bật tắt chế độ nhà phát triển"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Chế độ nhà phát triển đã được bật."

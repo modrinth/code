@@ -101,6 +101,12 @@
   "nags.invalid-license-url.title": {
     "defaultMessage": "Lägg till en giltig licenslänk"
   },
+  "nags.invalid-project-name.title": {
+    "defaultMessage": "Ändra projektnamn"
+  },
+  "nags.invalid-project-summary.title": {
+    "defaultMessage": "Ändra sammanfattningen"
+  },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# rubrik} other {# rubriker}} i din beskrivning är för {count, plural, one {lång} other {långa}}. Rubriker ska vara korta och fungera som titlar till olika delar, inte hela meningar."
   },
@@ -137,11 +143,32 @@
   "nags.project-description-banned-link.description": {
     "defaultMessage": "Länken ”{fullUrl}” är inte tillåten i projektbeskrivningar."
   },
+  "nags.project-description-non-english.description": {
+    "defaultMessage": "Din projektbeskrivning måste vara skriven på engelska eller inkludera en engelsk översättning."
+  },
   "nags.project-description-non-english.title": {
     "defaultMessage": "Överrätt beskrivningen"
   },
+  "nags.project-description-profanity.description": {
+    "defaultMessage": "Din projektbeskrivning ska inte innehålla överdriven användning av svordomar. Upptäckte: ”{value}”."
+  },
+  "nags.project-description-slur.description": {
+    "defaultMessage": "Din projektbeskrivning får inte innehålla kränkande termer. Upptäckte: ”{value}”."
+  },
+  "nags.project-name-slur.description": {
+    "defaultMessage": "Ditt projektnamn får inte innehålla kränkande termer. Upptäckte: ”{value}”."
+  },
+  "nags.project-name-version.title": {
+    "defaultMessage": "Ändra projektnamn"
+  },
   "nags.project-summary-content.title": {
     "defaultMessage": "Granska sammanfattningen"
+  },
+  "nags.project-summary-links.description": {
+    "defaultMessage": "Länkar, URL:er och IP-adresser ska inte finnas med i beskrivningen. Upptäckte: ”{value}”"
+  },
+  "nags.project-summary-links.title": {
+    "defaultMessage": "Ta bort länkar i sammanfattningen"
   },
   "nags.project-summary-non-english.title": {
     "defaultMessage": "Översätt sammanfattningen"

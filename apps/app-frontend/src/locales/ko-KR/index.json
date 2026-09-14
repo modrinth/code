@@ -281,6 +281,9 @@
   "app.content-install.no-compatible-versions": {
     "message": "{compatibilityLabel} 버전과 일치하는 버전이 없습니다. 설치할 버전을 선택하세요. 종속성은 자동으로 설치되지 않습니다."
   },
+  "app.error.state-init.open-backups-folder": {
+    "message": "백업 폴더 열기"
+  },
   "app.export-modal.description-placeholder": {
     "message": "모드팩 설명 입력..."
   },
@@ -1142,6 +1145,9 @@
   "app.nav.modrinth-hosting": {
     "message": "Modrinth 호스팅"
   },
+  "app.nav.screenshots": {
+    "message": "스크린샷들"
+  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Modrinth+ 로 업그레이드"
   },
@@ -1192,6 +1198,9 @@
   },
   "app.restarting": {
     "message": "재시작 중..."
+  },
+  "app.screenshots.search": {
+    "message": "검색"
   },
   "app.settings.app-version": {
     "message": "Modrinth 앱 {version}"

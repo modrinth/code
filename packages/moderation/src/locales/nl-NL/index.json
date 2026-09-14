@@ -1,45 +1,54 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "Een beschrijving die het doel en de functie van het project duidelijk weergeeft is vereist."
+    "defaultMessage": "Een beschrijving die het doel en de functie van uw project duidelijk weergeeft is vereist."
   },
   "nags.add-description.title": {
     "defaultMessage": "Voeg een beschrijving toe"
   },
   "nags.add-icon.description": {
-    "defaultMessage": "Door een uniek, relevant en aantrekkelijk icoon toe te voegen, wordt je project herkenbaar en valt het beter op."
+    "defaultMessage": "Door een uniek, relevant en aantrekkelijk icoon toe te voegen, wordt uw project herkenbaar en valt het beter op."
   },
   "nags.add-icon.title": {
     "defaultMessage": "Voeg een icoon toe"
   },
   "nags.add-java-address.description": {
-    "defaultMessage": "Voeg het IP-adres en de poort toe die spelers van Java-editie kunnen gebruiken om verbinding te maken met je server."
+    "defaultMessage": "Voeg het IP-adres en de poort toe die spelers van Java-editie kunnen gebruiken om verbinding te maken met uw server."
   },
   "nags.add-java-address.title": {
-    "defaultMessage": "Java-adres toevoegen"
+    "defaultMessage": "Voeg een Java adres toe"
   },
   "nags.add-license-details.description": {
     "defaultMessage": "Voer een geldige URL en een naam of SPDX-identificatie in voor je aangepaste licentie."
   },
   "nags.add-license-details.title": {
-    "defaultMessage": "Licentiegegevens toevoegen"
+    "defaultMessage": "Voeg licentiegegevens toe"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "Voeg relevante links toe aan externe bronnen, zoals een website, winkel of een permanente Discord-uitnodiging."
+    "defaultMessage": "Voeg relevante links toe naar externe bronnen, zoals een website, winkel of een permanente Discord-uitnodiging."
   },
   "nags.add-links-server.title": {
     "defaultMessage": "Voeg externe links toe"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Voeg relevante links toe aan externe bronnen, zoals een website, winkel of een permanente Discord-uitnodiging."
+    "defaultMessage": "Voeg relevante links toe naar externe bronnen, zoals een website, winkel of een permanente Discord-uitnodiging."
   },
   "nags.add-links.title": {
     "defaultMessage": "Voeg externe links toe"
   },
+  "nags.adjacent-headers.description": {
+    "defaultMessage": "Koppen van hetzelfde niveau kunnen niet naast elkaar worden geplaatst."
+  },
+  "nags.adjacent-headers.title": {
+    "defaultMessage": "Verwijder aangrenzende koppen"
+  },
   "nags.all-languages.description": {
-    "defaultMessage": "Je hebt alle beschikbare taalopties geselecteerd. Geef alleen de talen op die je server daadwerkelijk ondersteunt."
+    "defaultMessage": "U heeft alle beschikbare taalopties geselecteerd. Geef alleen de talen op die uw server daadwerkelijk ondersteunt."
   },
   "nags.all-languages.title": {
     "defaultMessage": "Selecteer relevante talen"
+  },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "U heeft alle {totalAvailableTags, plural, one {# bechikbare tag} other {# beschikbare tags}} geselecteerd. Tags zijn bedoeld om gebruikers relevante projecten te laten zien. Selecteer a.u.b. alleen relevante tags."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selecteer relevante tags"
@@ -48,19 +57,31 @@
     "defaultMessage": "De link \"{url}\" is niet toegestaan als externe link."
   },
   "nags.banned-link-usage.title": {
-    "defaultMessage": "Verwijder verboden koppelingen"
+    "defaultMessage": "Verwijder verboden links"
   },
   "nags.check-disclosures.description": {
-    "defaultMessage": "Zorg ervoor dat gebruikers op de hoogte zijn van belangrijke details door informatie over inhoud die van toepassing is op jouw {type} in te vullen."
+    "defaultMessage": "Zorg ervoor dat gebruikers op de hoogte zijn van belangrijke details door bekendmakingen over inhoud die van toepassing is op uw {type} in te vullen."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "Check bekendmakingen"
+  },
+  "nags.description-ends-with-header.description": {
+    "defaultMessage": "Uw projectbeschrijvingen moet niet eindigen op een kop zonder text er onder."
   },
   "nags.description-ends-with-header.title": {
     "defaultMessage": "Verwijder eindkop"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Uw projectbeschrijving is te kort. Voeg meer details toe om beter de inhoud en het doel van uw project uit te leggen."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Verleng de beschrijving"
   },
   "nags.disclosures-special-formatting.description": {
     "defaultMessage": "Publicaties van inhoud mogen geen HTML bevatten, omdat ze alleen inline Markdown en platte tekst kunnen weergeven."
+  },
+  "nags.disclosures-special-formatting.title": {
+    "defaultMessage": "Fix opmaak van bekendmakingen"
   },
   "nags.edit-description.title": {
     "defaultMessage": "Pas de beschrijving aan"
@@ -87,22 +108,25 @@
     "defaultMessage": "Afbeelding uit de galerij uitlichten"
   },
   "nags.gallery-text-non-standard.description": {
-    "defaultMessage": "Niet-standaard tekst tekens, zoals \"Fancy text\" of \"Zalgo\", zijn niet toegestaan in galerie-afbeeldingen titels of beschrijvingen."
+    "defaultMessage": "Niet-standaard tekst tekens, zoals \"Fancy text\" of \"Zalgo\", zijn niet toegestaan in galerie-afbeelding titels of beschrijvingen."
   },
   "nags.gallery-text-profanity.description": {
-    "defaultMessage": "Je galerijafbeeldingen en omschrijvingen mogen geen buitensporige profaniteit bevatten. Gedetecteerd: \"{value}\"."
+    "defaultMessage": "Uw galerijafbeeldingen en omschrijvingen mogen geen buitensporige profaniteit bevatten. Gedetecteerd: \"{value}\"."
   },
   "nags.gallery-text-slur.description": {
-    "defaultMessage": "Je galerijafbeeldingen en omschrijvingen mogen geen buitensporige profaniteit bevatten. Gedetecteerd: \"{value}\"."
+    "defaultMessage": "Uw galerijafbeeldingen en omschrijvingen mogen geen buitensporige profaniteit bevatten. Gedetecteerd: \"{value}\"."
   },
   "nags.gallery.title": {
     "defaultMessage": "Galerijpagina bekijken"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Uw {type}'s vergunning vereist u om uw broncode publiek te maken. Voeg een link naar de broncode toe, voeg bronfiles toe, of verander de vergunning."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Bied bron code aan"
   },
   "nags.identical-links.description": {
-    "defaultMessage": "Sommige van je externe links lijken identiek te zijn, elke link moet maar een keer worden ingevuld met de juiste link type."
+    "defaultMessage": "Sommige van uw externe links lijken identiek te zijn. Elke link hoort maar één keer ingevuld te worden, met de juiste linksoort."
   },
   "nags.identical-links.title": {
     "defaultMessage": "Identieke links opschonen"
@@ -114,10 +138,10 @@
     "defaultMessage": "Licentie URL is ongeldig."
   },
   "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "Je licentie URL leidt naar {domain}, wat niet geschikt is voor licentieinformatie. Licentie URL's moeten direct naar je licentie bestand wijzen, niet social media, gaming platforms, etc."
+    "defaultMessage": "Uw licentie URL leidt naar {domain}, welke niet geschikt is voor licentieinformatie. Licentie URL's moeten direct naar uw licentie bestand wijzen."
   },
   "nags.invalid-license-url.description.malformed": {
-    "defaultMessage": "Het ziet ernaar uit dat je licentie URL ongeldig is. Gebruik graag een geldige URL naar je licentietekst."
+    "defaultMessage": "Het lijkt er op dat uw licentie URL ongeldig is. Gebruik graag een geldige URL naar uw licentietekst."
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Voeg een geldige licentie link toe"
@@ -164,14 +188,44 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "Feedback beoordelen"
   },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "U heeft {count, plural, one {# resolutietag} other {# resolutietags}} ({tags}) geselekteerd. Resource packs hebben typisch alleen één resolutietag die overeenkomt met hun primaire resolutie."
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Selecteer juiste resolutie"
   },
   "nags.project-description-banned-link.description": {
     "defaultMessage": "De link \"{fullUrl}\" is niet toegestaan in projectbeschrijvingen."
   },
+  "nags.project-description-non-english.description": {
+    "defaultMessage": "Uw projectbeschrijvingen moeten in het Engels geschreven worden, of een Engelse vertaling hebben."
+  },
+  "nags.project-description-non-english.title": {
+    "defaultMessage": "Vertaal de beschrijving"
+  },
+  "nags.project-description-non-standard-text.description": {
+    "defaultMessage": "Buitensporig gebruik van nonstandaarde tekstkarakters, zoals \"fancy text\" of \"Zalgo\", is niet toegestaan in projectbeschrijvingen."
+  },
+  "nags.project-description-profanity.description": {
+    "defaultMessage": "Uw projectbeschrijving mag geen buitensporige profaniteit bevatten. Gedetecteerd: \"{value}\"."
+  },
+  "nags.project-description-slur.description": {
+    "defaultMessage": "Uw projectbeschrijving mag geen beledigende termen bevatten. Gedetecteerd: \"{value}\"."
+  },
+  "nags.project-description-spam.description": {
+    "defaultMessage": "Herhaalde tekens, woorden, of zinnen kunnen niet worden gebruikt om uw beschrijving langer te maken."
+  },
+  "nags.project-description-spam.title": {
+    "defaultMessage": "Verwijder spam in beschrijving"
+  },
   "nags.project-name-non-standard-text.description": {
     "defaultMessage": "Niet-standaard tekst tekens, zoals \"Fancy text\" of \"Zalgo\", zijn niet toegestaan in galerie-afbeeldingen titels of beschrijvingen."
+  },
+  "nags.project-name-profanity.description": {
+    "defaultMessage": "Uw projectbeschrijving mag geen grof taalgebruik bevatten. Gedetecteerd: \"{value}\"."
+  },
+  "nags.project-name-slur.description": {
+    "defaultMessage": "Uw projectbeschrijving mag geen beledigende termen bevatten. Gedetecteerd: \"{value}\"."
   },
   "nags.project-name-version.title": {
     "defaultMessage": "Projectnaam wijzigen"
@@ -179,11 +233,38 @@
   "nags.project-summary-content.title": {
     "defaultMessage": "Samenvatting bekijken"
   },
+  "nags.project-summary-links.description": {
+    "defaultMessage": "Links, URL's, of IP's horen niet in de samenvatting. Gedetecteerd: \"{value}\""
+  },
+  "nags.project-summary-links.title": {
+    "defaultMessage": "Verwijder links uit samenvatting"
+  },
+  "nags.project-summary-non-english.description": {
+    "defaultMessage": "De samenvatting van uw project moet in het Engels, of een Engelse vertaling bevatten."
+  },
   "nags.project-summary-non-english.title": {
     "defaultMessage": "Samenvatting vertalen"
   },
   "nags.project-summary-non-standard-text.description": {
     "defaultMessage": "Niet-standaard tekst tekens, zoals \"Fancy text\" of \"Zalgo\", zijn niet toegestaan in galerie-afbeeldingen titels of beschrijvingen."
+  },
+  "nags.project-summary-profanity.description": {
+    "defaultMessage": "De samenvatting van uw project mag geen grof taalgebruik bevatten. Gedetecteerd: \"{value}\"."
+  },
+  "nags.project-summary-slur.description": {
+    "defaultMessage": "De samenvatting van uw project mag geen beledigende termen bevatten. Gedetecteerd: \"{value}\"."
+  },
+  "nags.project-summary-spam.description": {
+    "defaultMessage": "Herhaalde tekens, woorden, of zinnen kunnen niet worden gebruikt om de samenvatting van je project langer te maken."
+  },
+  "nags.project-summary-spam.title": {
+    "defaultMessage": "Verwijder spam uit samenvatting"
+  },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Zorg ervoor dat U bewijs heeft van uw toestemming om externe content te delen in uw Modpack."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Check content toestemming"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "Selecteer welke versies je server ondersteunt, kies een Modpack, of upload je eigen."
@@ -260,8 +341,14 @@
   "nags.too-many-languages.title": {
     "defaultMessage": "Selecteer relevante talen"
   },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "U heeft {tagCount, plural, one {# tag} other {# tags}} geselecteerd. Verminder dit naar {maxTagCount} of minder om zeker te weten dat uw project in relevante zoekopdrachten verschijnt."
+  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Selecteer relevante tags"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "U heeft {tagCount, plural, one {# tag} other {# tags}} geselecteerd. Verminder dit naar {maxTagCount} of minder om zeker te weten dat uw project in relevante zoekopdrachten verschijnt."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Selecteer relevante tags"
@@ -292,6 +379,9 @@
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Bezoek linkjes instellingen"
+  },
+  "project.text-validation.summary-matches-title": {
+    "defaultMessage": "De samenvatting van uw project hoort unieke informatie te bevatten, en niet alleen de naam van uw project."
   },
   "project.text-validation.summary-too-short": {
     "defaultMessage": "Je samenvatting is te kort. Voeg een of twee zinnen toe waarin je je project beschrijft."
