@@ -33,7 +33,9 @@ pub(crate) use self::remove_instance::*;
 mod refresh_instances;
 pub(crate) use self::refresh_instances::*;
 
+mod migrate_legacy_content;
 mod sync_content_files;
+pub(crate) use self::migrate_legacy_content::migrate_legacy_content;
 pub(crate) use self::sync_content_files::sync_content_files;
 
 mod launch_context;
@@ -41,6 +43,12 @@ pub(crate) use self::launch_context::*;
 
 mod apply_content_install;
 pub(crate) use self::apply_content_install::*;
+
+mod content_mutation;
+pub(crate) use self::content_mutation::{
+    ContentOrigin, InstallContent, install_stored_file, remove_project,
+    toggle_disable_project,
+};
 
 mod check_content_updates;
 pub(crate) use self::check_content_updates::refresh_content_updates;

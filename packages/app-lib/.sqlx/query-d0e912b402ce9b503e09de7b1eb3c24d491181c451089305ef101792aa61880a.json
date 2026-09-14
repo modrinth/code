@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT payload FROM store_operations WHERE ? IS NULL OR instance_id = ? ORDER BY created_at, id",
+  "describe": {
+    "columns": [
+      {
+        "name": "payload",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "d0e912b402ce9b503e09de7b1eb3c24d491181c451089305ef101792aa61880a"
+}

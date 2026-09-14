@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT file_id, blob_sha512, materialization_kind AS \"storage_kind: _\" FROM store_instance_files WHERE file_id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "file_id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "blob_sha512",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "storage_kind: _",
+        "ordinal": 2,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "82437489976c0820a454402ae19566b5617050abb5be7003b48a0dd90a1927e9"
+}

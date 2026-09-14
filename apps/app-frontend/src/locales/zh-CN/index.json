@@ -95,9 +95,6 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "更新共享内容"
   },
-  "app.action-bar.installs": {
-    "message": "安装"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "设为主实例"
   },
