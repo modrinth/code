@@ -1,8 +1,7 @@
 use super::super::DesyncServerMode;
 use super::super::synced_options::{
-    get_global_options, instance_dir, instance_is_running,
-    instance_option_enabled, option_can_apply_while_running,
-    sync_files_are_protected,
+    get_global_options, instance_is_running, instance_option_enabled,
+    option_can_apply_while_running, sync_files_are_protected,
 };
 use super::reconciliation::{
     apply_all, apply_removal, participating, synced_instance_ids,
@@ -83,9 +82,14 @@ pub(super) async fn pack_from_item(
         )
         .into());
     }
-    let bytes = Bytes::from(
-        io::read(instance_dir(metadata, state).join(&item.file_path)).await?,
-    );
+    let file = crate::state::instances::adapters::sqlite::content_rows::get_instance_file_by_relative_path(&metadata.instance.id, &item.file_path, &state.pool).await?
+		.ok_or_else(|| crate::state::content_store::input("The pack is not registered"))?;
+    let source = state
+        .content_store
+        .read_path(&file, &metadata.instance.path)
+        .await?;
+    let bytes = Bytes::from(io::read(source.path()).await?);
+    drop(source);
     let validation_bytes = bytes.clone();
     let project_type = item.project_type;
     tokio::task::spawn_blocking(move || {
@@ -109,7 +113,8 @@ pub(super) async fn pack_from_item(
     } else {
         vec![metadata.applied_content_set.game_version.clone()]
     };
-    let sha1 = cache_bytes(bytes, state).await?;
+    let sha1 = crate::util::fetch::sha1_async(bytes.clone()).await?;
+    let sha512 = cache_bytes(bytes, state).await?;
     let selected = if item.project_type == ProjectType::ResourcePack {
         match super::selection::selected_in_instance(
             metadata,
@@ -137,6 +142,8 @@ pub(super) async fn pack_from_item(
     item.has_update = false;
     item.update_version_id = None;
     Ok(SyncedPack {
+        blob_sha512: Some(sha512),
+        migration_error: None,
         item,
         sha1,
         game_versions,
@@ -531,17 +538,18 @@ pub async fn list_synced_packs(
                 instance_ids: synced_instance_ids(
                     id, &library, &instances, global,
                 ),
-                update_pending: library
-                    .instances
-                    .values()
-                    .filter_map(|placements| placements.get(id))
-                    .any(|placement| {
-                        !placement.excluded
-                            && !placement.suspended
-                            && (placement.pending
-                                || placement.error.is_some()
-                                || placement.enabled != pack.item.enabled)
-                    }),
+                update_pending: pack.migration_error.is_some()
+                    || library
+                        .instances
+                        .values()
+                        .filter_map(|placements| placements.get(id))
+                        .any(|placement| {
+                            !placement.excluded
+                                && !placement.suspended
+                                && (placement.pending
+                                    || placement.error.is_some()
+                                    || placement.enabled != pack.item.enabled)
+                        }),
             });
             item
         })
@@ -582,7 +590,8 @@ pub async fn upload_synced_pack(
     })
     .await??;
     let size = bytes.len() as u64;
-    let sha1 = cache_bytes(bytes, &state).await?;
+    let sha1 = crate::util::fetch::sha1_async(bytes.clone()).await?;
+    let sha512 = cache_bytes(bytes, &state).await?;
     let _guard = state.lock_synced_options().await;
     if !get_global_options().await?.get(option) {
         return Err(crate::ErrorKind::InputError(
@@ -602,6 +611,8 @@ pub async fn upload_synced_pack(
     library.packs.insert(
         id.clone(),
         SyncedPack {
+            blob_sha512: Some(sha512),
+            migration_error: None,
             sha1,
             game_versions,
             selected: (project_type == ProjectType::ResourcePack)

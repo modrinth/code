@@ -32,6 +32,21 @@ enum ModMetadataKind {
     LegacyForge,
 }
 
+pub(crate) async fn infer_project_type_path(
+    path: &Path,
+) -> crate::Result<ProjectType> {
+    let path = path.to_path_buf();
+    tokio::task::spawn_blocking(move || {
+        let mut archive = ZipArchive::new(File::open(path)?).map_err(|_| {
+            crate::ErrorKind::InputError(
+                "Unable to infer project type for input file".to_string(),
+            )
+        })?;
+        infer_project_type(&mut archive)
+    })
+    .await?
+}
+
 pub(crate) fn infer_project_type_bytes(
     bytes: &Bytes,
 ) -> crate::Result<ProjectType> {
@@ -478,28 +493,31 @@ pub(crate) async fn resolve_embedded_content_metadata(
     files: &[(String, ContentFile)],
     state: &State,
 ) -> crate::Result<HashMap<String, EmbeddedContentMetadata>> {
-    let candidates = files
-        .iter()
-        .filter(|(_, file)| {
-            file.metadata.is_none()
-                && matches!(
-                    file.project_type,
-                    ProjectType::Mod
-                        | ProjectType::DataPack
-                        | ProjectType::ResourcePack
-                )
-        })
-        .map(|(relative_path, file)| {
-            (
-                file.hash.clone(),
-                state
-                    .directories
-                    .instances_dir()
-                    .join(&instance.path)
-                    .join(relative_path),
+    let tracked = crate::state::instances::adapters::sqlite::content_rows::get_instance_files(&instance.id, &state.pool).await?;
+    let mut candidates = HashMap::new();
+    for (relative_path, file) in files {
+        if file.metadata.is_some()
+            || !matches!(
+                file.project_type,
+                ProjectType::Mod
+                    | ProjectType::DataPack
+                    | ProjectType::ResourcePack
             )
-        })
-        .collect::<HashMap<_, _>>();
+        {
+            continue;
+        }
+        let Some(tracked) = tracked
+            .iter()
+            .find(|tracked| &tracked.relative_path == relative_path)
+        else {
+            continue;
+        };
+        if let Ok(path) =
+            state.content_store.read_path(tracked, &instance.path).await
+        {
+            candidates.insert(file.hash.clone(), path);
+        }
+    }
     if candidates.is_empty() {
         return Ok(HashMap::new());
     }
@@ -540,7 +558,7 @@ pub(crate) async fn resolve_embedded_content_metadata(
     let inspected_metadata = stream::iter(pending)
         .map(|(hash, path)| async move {
             let inspection = tokio::task::spawn_blocking(move || {
-                inspect_content_file(&path, loader)
+                inspect_content_file(path.path(), loader)
             })
             .await;
             let (mut metadata, icon) = match inspection {

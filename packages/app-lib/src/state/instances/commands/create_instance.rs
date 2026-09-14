@@ -161,6 +161,7 @@ async fn resolve_instance_path(
     let base_path = path
         .map(ToOwned::to_owned)
         .unwrap_or_else(|| sanitize_instance_name(name));
+    crate::state::content_store::validate_relative(&base_path)?;
     let mut path = base_path.clone();
     let mut full_path = state.directories.instances_dir().join(&path);
 
