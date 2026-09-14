@@ -436,6 +436,13 @@ const managedContent = computed<ManagedContentData | null>(() => {
 	const isSharedOwner = attachment?.role === 'owner'
 
 	if (
+		(linkType === 'server_project' || linkType === 'server_project_modpack') &&
+		managedContentItems.value.length === 0
+	) {
+		return null
+	}
+
+	if (
 		!isSharedOwner &&
 		(attachment || linkType === 'server_project' || linkType === 'server_project_modpack')
 	) {
