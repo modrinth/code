@@ -42,7 +42,9 @@ async-stripe = { version = "0.41.0", default-features = false, features = [
   "runtime-tokio-hyper-rustls",
 ] }
 async-trait = "0.1.89"
-async-tungstenite = { version = "0.31.0", default-features = false, features = ["futures-03-sink"] }
+async-tungstenite = { version = "0.31.0", default-features = false, features = [
+  "futures-03-sink"
+] }
 async-walkdir = "2.1.0"
 async_zip = "0.0.18"
 aws-sdk-s3 = { version = "=1.122.0", default-features = false, features = [
@@ -55,12 +57,17 @@ bitflags = "2.9.4"
 bon = "3.9.3"
 bytemuck = "1.24.0"
 bytes = "1.10.1"
-cel = { version = "0.14.0", default-features = false, features = ["json", "regex"] }
+cel = { version = "0.14.0", default-features = false, features = [
+  "json",
+  "regex"
+] }
 censor = "0.3.0"
 chardetng = "0.1.17"
 chrono = "0.4.42"
 chumsky = "0.9.3"
-cidre = { version = "0.15.0", default-features = false, features = ["macos_15_0"] }
+cidre = { version = "0.15.0", default-features = false, features = [
+  "macos_15_0"
+] }
 clap = "4.5.48"
 clickhouse = "0.14.0"
 color-eyre = "0.6.5"
@@ -163,7 +170,10 @@ redis = "1.4.1"
 regex = "1.12.2"
 reqwest = { version = "0.12.24", default-features = false }
 rgb = "0.8.52"
-rust_decimal = { version = "1.39.0", features = ["serde-with-float", "serde-with-str"] }
+rust_decimal = { version = "1.39.0", features = [
+  "serde-with-float",
+  "serde-with-str"
+] }
 rust_iso3166 = "0.1.14"
 rust-s3 = { version = "0.37.0", default-features = false, features = [
   "fail-on-err",
@@ -261,17 +271,6 @@ zip = { version = "6.0.0", default-features = false, features = [
 ] }
 zxcvbn = "3.1.0"
 
-# Pin the upstream Tao 0.36 upgrade until a Tauri release includes the Windows input deadlock fix.
-# https://github.com/tauri-apps/tauri/pull/15307
-[patch.crates-io]
-tauri = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
-tauri-build = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
-tauri-codegen = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
-tauri-macros = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
-tauri-runtime = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
-tauri-runtime-wry = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
-tauri-utils = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
-
 [workspace.lints.clippy]
 bool_to_int_with_if = "warn"
 borrow_as_ptr = "warn"
@@ -309,6 +308,17 @@ type_complexity = "allow"
 uninlined_format_args = "warn"
 unnested_or_patterns = "warn"
 wildcard_dependencies = "warn"
+
+# Pin the upstream Tao 0.36 upgrade until a Tauri release includes the Windows input deadlock fix.
+# https://github.com/tauri-apps/tauri/pull/15307
+[patch.crates-io]
+tauri = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
+tauri-build = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
+tauri-codegen = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
+tauri-macros = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
+tauri-runtime = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
+tauri-runtime-wry = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
+tauri-utils = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
 
 [profile.dev.package.sqlx-macros]
 opt-level = 3
