@@ -3,7 +3,27 @@ import { LRUCache } from 'lru-cache'
 import { injectI18n } from '../providers/i18n'
 
 const formatterCache = new LRUCache<string, Intl.NumberFormat>({ max: 10 })
-const maxDigitsCache = new LRUCache<string, number>({ max: 10 })
+// Billing amounts use Stripe's minor units, which can differ from Intl's display defaults
+// (for example, COP displays without decimals in some runtimes but stores centavos).
+// ISK and UGX also use two-decimal amounts for Stripe compatibility.
+// https://docs.stripe.com/currencies#zero-decimal
+const zeroDecimalCurrencies = new Set([
+	'BIF',
+	'CLP',
+	'DJF',
+	'GNF',
+	'JPY',
+	'KMF',
+	'KRW',
+	'MGA',
+	'PYG',
+	'RWF',
+	'VND',
+	'VUV',
+	'XAF',
+	'XOF',
+	'XPF',
+])
 
 // `formatMoney(1234.56, 'USD')` → `$1,234.56`
 export function useFormatMoney() {
@@ -26,13 +46,13 @@ export function useFormatPrice() {
 	const { locale } = injectI18n()
 
 	function format(price: number, currency: string, trimZeros = false): string {
-		const maxDigits = getMaxDigits(currency)
+		const maxDigits = zeroDecimalCurrencies.has(currency.toUpperCase()) ? 0 : 2
 		const convertedPrice = price / Math.pow(10, maxDigits)
 
-		const minimumFractionDigits = trimZeros && Number.isInteger(convertedPrice) ? 0 : undefined
+		const minimumFractionDigits = trimZeros && Number.isInteger(convertedPrice) ? 0 : maxDigits
 
 		try {
-			const formatter = getFormatter(locale.value, currency, minimumFractionDigits)
+			const formatter = getFormatter(locale.value, currency, minimumFractionDigits, maxDigits)
 			return formatter.format(convertedPrice)
 		} catch {
 			return `${currency} ${convertedPrice}`
@@ -46,33 +66,18 @@ function getFormatter(
 	locale: string,
 	currency: string,
 	minimumFractionDigits?: number,
+	maximumFractionDigits?: number,
 ): Intl.NumberFormat {
-	const cacheKey = `${locale}:${currency}:${minimumFractionDigits}`
+	const cacheKey = `${locale}:${currency}:${minimumFractionDigits}:${maximumFractionDigits}`
 	let formatter = formatterCache.get(cacheKey)
 	if (!formatter) {
 		formatter = new Intl.NumberFormat(locale, {
 			style: 'currency',
 			currency,
 			minimumFractionDigits,
+			maximumFractionDigits,
 		})
 		formatterCache.set(cacheKey, formatter)
 	}
 	return formatter
-}
-
-function getMaxDigits(currency: string): number {
-	let maxDigits = maxDigitsCache.get(currency)
-	if (!maxDigits) {
-		try {
-			const formatter = new Intl.NumberFormat(undefined, {
-				style: 'currency',
-				currency,
-			})
-			maxDigits = formatter.resolvedOptions().maximumFractionDigits ?? 2
-		} catch {
-			maxDigits = 2
-		}
-		maxDigitsCache.set(currency, maxDigits)
-	}
-	return maxDigits
 }
