@@ -50,14 +50,13 @@ pub(super) async fn prepare(
                 })?;
             let relative_path = content_file_path(file);
             validate_relative(&relative_path)?;
-            let Some(stored) = content_store::find_file(
-                pool,
-                &binding.blob_sha512,
-            )
-            .await? else {
+            let Some(stored) =
+                content_store::find_file(pool, &binding.blob_sha512).await?
+            else {
                 return Err(input("Managed content has no stored file record"));
             };
-            validate_relative(&stored.relative_path)?;
+            let stored_path =
+                content_store::object_relative_path(&stored.sha512)?;
             moves.push(ManagedContentMove {
                 source: from
                     .join("profiles")
@@ -67,9 +66,7 @@ pub(super) async fn prepare(
                     .join("profiles")
                     .join(&instance.path)
                     .join(relative_path),
-                stored_path: to
-                    .join("store/content")
-                    .join(stored.relative_path),
+                stored_path: to.join("store/content").join(stored_path),
                 binding: MovedFileBinding {
                     file_id: binding.file_id,
                     sha512: binding.blob_sha512,

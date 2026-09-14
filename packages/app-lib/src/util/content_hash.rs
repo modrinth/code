@@ -20,13 +20,12 @@ impl ContentHasher {
         self.sha512.update(bytes);
     }
 
-	pub(crate) fn finish(self, size: u64) -> FileHashes {
-		FileHashes {
-			sha512: format!("{:x}", self.sha512.finalize()),
-			size,
-		}
-	}
-
+    pub(crate) fn finish(self, size: u64) -> FileHashes {
+        FileHashes {
+            sha512: format!("{:x}", self.sha512.finalize()),
+            size,
+        }
+    }
 }
 
 pub(crate) async fn temporary_file(
@@ -53,7 +52,7 @@ pub(crate) async fn hash_file_with_progress(
     on_read: &(dyn Fn(u64) + Send + Sync),
 ) -> crate::Result<FileHashes> {
     let file = File::open(path).await?;
-	copy_and_hash(file, &mut tokio::io::sink(), on_read).await
+    copy_and_hash(file, &mut tokio::io::sink(), on_read).await
 }
 
 pub(crate) async fn copy_and_hash(

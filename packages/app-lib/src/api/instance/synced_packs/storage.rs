@@ -57,87 +57,97 @@ pub(super) async fn write_library(
 ) -> crate::Result<()> {
     let _lease = state.content_store.lease().await;
     let previous = read_library(state).await?;
-    let mut library = library.clone();
-    for (id, pack) in &mut library.packs {
-        let deferred = previous.packs.get(id).is_some_and(|previous| {
-            previous.sha1 == pack.sha1
-                && previous.blob_sha512 == pack.blob_sha512
-                && (pack.migration_error.is_some()
-                    || previous.blob_sha512.is_none())
-        });
-        let stored_file = match state
-            .content_store
-            .lookup(
-                pack.blob_sha512.as_deref(),
-                Some(pack.item.size),
-            )
-            .await
-        {
-            Ok(Some(stored_file)) => stored_file,
-            Ok(None) | Err(_) if deferred => continue,
-            Ok(None) => {
-                return Err(input(
-                    "A synced pack needs repair or re-import before its library can be saved",
-                ));
+    let mut renamed = false;
+    let result: crate::Result<()> = async {
+		let mut library = library.clone();
+		for (id, pack) in &mut library.packs {
+			let deferred = previous.packs.get(id).is_some_and(|previous| {
+				previous.sha1 == pack.sha1
+					&& previous.blob_sha512 == pack.blob_sha512
+					&& (pack.migration_error.is_some()
+						|| previous.blob_sha512.is_none())
+			});
+			let stored_file = match state.content_store.lookup(
+				pack.blob_sha512.as_deref(),
+				Some(pack.item.size),
+			).await {
+				Ok(Some(stored_file)) => stored_file,
+				Ok(None) | Err(_) if deferred => continue,
+				Ok(None) => return Err(input(
+					"A synced pack needs repair or re-import before its library can be saved",
+				)),
+				Err(error) => return Err(error),
+			};
+			pack.blob_sha512 = Some(stored_file.metadata.sha512.clone());
+			pack.migration_error = None;
+			state.content_store.retain(
+				"synced-pack",
+				id,
+				std::slice::from_ref(&stored_file.metadata.sha512),
+			).await?;
+		}
+		io::create_dir_all(directory(state)).await?;
+		let destination = directory(state).join("packs.json");
+		let bytes = serde_json::to_vec(&library)?;
+		if !io::read(&destination).await.is_ok_and(|current| current == bytes) {
+			let temporary = directory(state)
+				.join(format!(".packs-{}.tmp", uuid::Uuid::new_v4()));
+			io::write(&temporary, bytes).await?;
+			tokio::fs::File::options()
+				.write(true)
+				.open(&temporary)
+				.await?
+				.sync_all()
+				.await?;
+			tokio::fs::rename(&temporary, &destination).await?;
+			renamed = true;
+			state.pack_sync_worker.revision
+				.fetch_add(1, std::sync::atomic::Ordering::Release);
+		}
+		crate::state::content_store::sync_directory(&directory(state)).await?;
+		for id in previous.packs.keys().filter(|id| !library.packs.contains_key(*id)) {
+			state.content_store.release("synced-pack", id).await?;
+		}
+		for (id, pack) in &library.packs {
+			if let Some(hash) = &pack.blob_sha512
+				&& pack.migration_error.is_none()
+			{
+				state.content_store.replace_retained(
+					"synced-pack", id, std::slice::from_ref(hash),
+				).await?;
+				state.content_store.release("synced-cache", hash).await?;
+			}
+		}
+		Ok(())
+	}.await;
+    if result.is_err() {
+        let repair: crate::Result<()> = async {
+            // Keep both versions retained until the renamed library is durable.
+            if renamed {
+                crate::state::content_store::sync_directory(&directory(state))
+                    .await?;
             }
-            Err(error) => return Err(error),
-        };
-        pack.blob_sha512 = Some(stored_file.metadata.sha512.clone());
-        pack.migration_error = None;
-        state
-            .content_store
-            .retain(
-                "synced-pack",
-                id,
-                std::slice::from_ref(&stored_file.metadata.sha512),
-            )
-            .await?;
-    }
-    io::create_dir_all(directory(state)).await?;
-    let destination = directory(state).join("packs.json");
-    let bytes = serde_json::to_vec(&library)?;
-    if !io::read(&destination)
-        .await
-        .is_ok_and(|current| current == bytes)
-    {
-        let temporary = directory(state)
-            .join(format!(".packs-{}.tmp", uuid::Uuid::new_v4()));
-        io::write(&temporary, bytes).await?;
-        tokio::fs::File::options()
-            .write(true)
-            .open(&temporary)
-            .await?
-            .sync_all()
-            .await?;
-        tokio::fs::rename(&temporary, &destination).await?;
-        state
-            .pack_sync_worker
-            .revision
-            .fetch_add(1, std::sync::atomic::Ordering::Release);
-        crate::state::content_store::sync_directory(&directory(state)).await?;
-    }
-    for id in previous
-        .packs
-        .keys()
-        .filter(|id| !library.packs.contains_key(*id))
-    {
-        state.content_store.release("synced-pack", id).await?;
-    }
-    for (id, pack) in &library.packs {
-        if let Some(hash) = &pack.blob_sha512
-            && pack.migration_error.is_none()
-        {
-            state
-                .content_store
-                .replace_retained("synced-pack", id, std::slice::from_ref(hash))
-                .await?;
-            state
-                .content_store
-                .release("synced-cache", hash)
-                .await?;
+            let durable = read_library(state).await?;
+            for id in previous.packs.keys().chain(library.packs.keys()) {
+                let hashes = durable
+                    .packs
+                    .get(id)
+                    .and_then(|pack| pack.blob_sha512.clone())
+                    .into_iter()
+                    .collect::<Vec<_>>();
+                state
+                    .content_store
+                    .replace_retained("synced-pack", id, &hashes)
+                    .await?;
+            }
+            Ok(())
+        }
+        .await;
+        if let Err(error) = repair {
+            tracing::warn!(%error, "Synced pack retention will be reconciled on the next migration");
         }
     }
-    Ok(())
+    result
 }
 
 pub(super) async fn cache_bytes(
@@ -162,10 +172,7 @@ pub(super) async fn read_stored_file(
 ) -> crate::Result<StoredFileHandle> {
     if let Some(stored_file) = state
         .content_store
-        .lookup(
-            pack.blob_sha512.as_deref(),
-            Some(pack.item.size),
-        )
+        .lookup(pack.blob_sha512.as_deref(), Some(pack.item.size))
         .await?
     {
         return Ok(stored_file);
@@ -198,11 +205,9 @@ pub(super) async fn read_stored_file(
     let file = version
         .files
         .iter()
-        .find(|file| {
-			match &pack.blob_sha512 {
-				Some(hash) => file.hashes.get("sha512") == Some(hash),
-				None => file.hashes.get("sha1") == Some(&pack.sha1),
-			}
+        .find(|file| match &pack.blob_sha512 {
+            Some(hash) => file.hashes.get("sha512") == Some(hash),
+            None => file.hashes.get("sha1") == Some(&pack.sha1),
         })
         .ok_or_else(|| {
             input(
@@ -288,14 +293,24 @@ pub(crate) async fn migrate_store(state: &State) -> crate::Result<()> {
     }
     let cache_complete = cleanup_legacy_cache(state).await?;
     let _guard = state.lock_synced_options().await;
+    if tokio::fs::try_exists(directory(state)).await? {
+        crate::state::content_store::sync_directory(&directory(state)).await?;
+    }
     let library = read_library(state).await?;
     for owner in
         crate::state::content_store::retained_owners(&state.pool, "synced-pack")
             .await?
     {
-        if !library.packs.contains_key(&owner) {
-            state.content_store.release("synced-pack", &owner).await?;
-        }
+        let hashes = library
+            .packs
+            .get(&owner)
+            .and_then(|pack| pack.blob_sha512.clone())
+            .into_iter()
+            .collect::<Vec<_>>();
+        state
+            .content_store
+            .replace_retained("synced-pack", &owner, &hashes)
+            .await?;
     }
     for owner in crate::state::content_store::retained_owners(
         &state.pool,
@@ -303,9 +318,11 @@ pub(crate) async fn migrate_store(state: &State) -> crate::Result<()> {
     )
     .await?
     {
-		if !library.packs.values().any(|pack| {
-			pack.blob_sha512.as_deref() == Some(owner.as_str())
-		}) {
+        if !library
+            .packs
+            .values()
+            .any(|pack| pack.blob_sha512.as_deref() == Some(owner.as_str()))
+        {
             state.content_store.release("synced-cache", &owner).await?;
         }
     }
@@ -331,10 +348,7 @@ async fn recover_legacy_pack(
     validate_digest(&pack.sha1, 40)?;
     if let Some(stored_file) = state
         .content_store
-        .lookup(
-            pack.blob_sha512.as_deref(),
-            Some(pack.item.size),
-        )
+        .lookup(pack.blob_sha512.as_deref(), Some(pack.item.size))
         .await?
     {
         return Ok(stored_file);
@@ -398,11 +412,13 @@ async fn import_matching_pack(
     else {
         return Ok(None);
     };
-	let matches = match &pack.blob_sha512 {
-		Some(expected) => expected == &sha512,
-		None => crate::util::fetch::sha1_file_async(source).await?.1 == pack.sha1,
-	};
-	if !matches {
+    let matches = match &pack.blob_sha512 {
+        Some(expected) => expected == &sha512,
+        None => {
+            crate::util::fetch::sha1_file_async(source).await?.1 == pack.sha1
+        }
+    };
+    if !matches {
         return Ok(None);
     }
     let stored_file = state.content_store.store_file(source).await?;
@@ -441,7 +457,9 @@ async fn cleanup_legacy_cache(state: &State) -> crate::Result<bool> {
             continue;
         }
         let result: crate::Result<()> = async {
-            if crate::util::fetch::sha1_file_async(entry.path()).await?.1 != name {
+            if crate::util::fetch::sha1_file_async(entry.path()).await?.1
+                != name
+            {
                 let quarantine = directory(state).join("quarantine");
                 tokio::fs::create_dir_all(&quarantine).await?;
                 tokio::fs::rename(

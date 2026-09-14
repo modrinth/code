@@ -28,9 +28,50 @@ use crate::state::{
     ModLoader, State,
 };
 use crate::util::fetch::DownloadReason;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
+use std::sync::{Arc, LazyLock, Mutex, Weak};
+use tokio::sync::{Mutex as AsyncMutex, MutexGuard, OwnedMutexGuard};
 use uuid::Uuid;
+
+/// Admission covers setup and deletion. A target reservation stays with its worker
+/// until cleanup finishes, so backups and rollback cannot overlap another install.
+static INSTALL_ADMISSION: AsyncMutex<()> = AsyncMutex::const_new(());
+static INSTALL_TARGETS: LazyLock<Mutex<HashMap<String, Weak<AsyncMutex<()>>>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
+fn target_lock(instance_id: &str) -> Arc<AsyncMutex<()>> {
+    let mut targets = INSTALL_TARGETS
+        .lock()
+        .unwrap_or_else(|error| error.into_inner());
+    targets.retain(|_, lock| lock.strong_count() > 0);
+    if let Some(lock) = targets.get(instance_id).and_then(Weak::upgrade) {
+        return lock;
+    }
+    let lock = Arc::new(AsyncMutex::new(()));
+    targets.insert(instance_id.to_string(), Arc::downgrade(&lock));
+    lock
+}
+
+fn reserve_target(
+    target: &InstallTarget,
+) -> crate::Result<Option<OwnedMutexGuard<()>>> {
+    let instance_id = match target {
+        InstallTarget::ExistingInstance { instance_id }
+        | InstallTarget::NewInstance {
+            instance_id: Some(instance_id),
+        } => instance_id,
+        InstallTarget::NewInstance { instance_id: None } => return Ok(None),
+    };
+    target_lock(instance_id)
+        .try_lock_owned()
+        .map(Some)
+        .map_err(|_| {
+            crate::state::content_store::input(
+                "This instance already has an active install job",
+            )
+        })
+}
 
 pub async fn create_instance(
     name: String,
@@ -139,6 +180,7 @@ pub async fn job_support_details(job_id: Uuid) -> crate::Result<String> {
 }
 
 pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
+    let _admission = INSTALL_ADMISSION.lock().await;
     let state = State::get().await?;
     let mut job = store::get_required(job_id, &state).await?;
 
@@ -153,11 +195,15 @@ pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
         .into());
     }
 
+    let cleanup_target_guard = reserve_target(&job.state.target)?;
+
     if job.state.rollback_error.is_some() {
         recovery::apply_cleanup(&job.state, &state).await?;
         recovery::clear_staging_dir(&job.state).await;
     }
 
+    drop(cleanup_target_guard);
+    let mut target_guard = reserve_target(&job.state.request.target())?;
     job.state.target = job.state.request.target();
     job.state.cleanup = job.state.request.cleanup();
     job.state.rollback = None;
@@ -230,6 +276,9 @@ pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
             return Err(error);
         }
     };
+    if target_guard.is_none() {
+        target_guard = reserve_target(&job.state.target)?;
+    }
     if let Err(error) = lock_install_target(&job.state, &state).await {
         let error_view = install_error_view(
             job.state.progress.phase,
@@ -247,7 +296,7 @@ pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     }
     let registration = super::control::register(job_id);
     emit_install_job(&record.snapshot()).await?;
-    spawn_job(job_id, registration);
+    spawn_job(job_id, registration, target_guard);
 
     Ok(record.snapshot())
 }
@@ -302,10 +351,21 @@ pub async fn cancel_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     Ok(snapshot)
 }
 
+/// The caller must retain both guards until the instance has been removed.
+/// This prevents a new install from starting after cancellation has finished.
 pub(crate) async fn cancel_jobs_for_instance_deletion(
     instance_id: &str,
     state: &State,
-) -> crate::Result<()> {
+) -> crate::Result<(MutexGuard<'static, ()>, OwnedMutexGuard<()>)> {
+    let admission = INSTALL_ADMISSION.lock().await;
+    let jobs = store::list_active_for_instance(instance_id, state).await?;
+    for job in &jobs {
+        if let Some(control) = super::control::get(job.id) {
+            // A finishing worker cannot be canceled, but must still finish before deletion.
+            let _ = control.cancel();
+        }
+    }
+    let target_guard = target_lock(instance_id).lock_owned().await;
     for mut job in store::list_active_for_instance(instance_id, state).await? {
         let canceled_phase = job.state.progress.phase;
         job.state.error = Some(InstallErrorView::from_message(
@@ -332,7 +392,10 @@ pub(crate) async fn cancel_jobs_for_instance_deletion(
         emit_install_job(&record.snapshot()).await?;
     }
 
-    Ok(())
+    for job in jobs {
+        store::dismiss(job.id, state).await?;
+    }
+    Ok((admission, target_guard))
 }
 
 pub async fn dismiss_job(job_id: Uuid) -> crate::Result<()> {
@@ -341,6 +404,8 @@ pub async fn dismiss_job(job_id: Uuid) -> crate::Result<()> {
 }
 
 async fn start(request: InstallRequest) -> crate::Result<InstallJobSnapshot> {
+    let _admission = INSTALL_ADMISSION.lock().await;
+    let mut target_guard = reserve_target(&request.target())?;
     let state = State::get().await?;
     let id = Uuid::new_v4();
     let mut job_state = InstallJobState::new(request);
@@ -384,6 +449,9 @@ async fn start(request: InstallRequest) -> crate::Result<InstallJobSnapshot> {
             return Err(error);
         }
     };
+    if target_guard.is_none() {
+        target_guard = reserve_target(&job_state.target)?;
+    }
     if let Err(error) = lock_install_target(&job_state, &state).await {
         let error_view = install_error_view(
             job_state.progress.phase,
@@ -401,7 +469,7 @@ async fn start(request: InstallRequest) -> crate::Result<InstallJobSnapshot> {
     }
     let registration = super::control::register(id);
     emit_install_job(&record.snapshot()).await?;
-    spawn_job(id, registration);
+    spawn_job(id, registration, target_guard);
     Ok(record.snapshot())
 }
 
@@ -590,8 +658,13 @@ async fn prepare_initial_instance(
     Ok(())
 }
 
-fn spawn_job(job_id: Uuid, registration: super::control::Registration) {
+fn spawn_job(
+    job_id: Uuid,
+    registration: super::control::Registration,
+    target_guard: Option<OwnedMutexGuard<()>>,
+) {
     tokio::spawn(async move {
+        let _target_guard = target_guard;
         if let Err(error) =
             Box::pin(run_job(job_id, &registration.control)).await
         {

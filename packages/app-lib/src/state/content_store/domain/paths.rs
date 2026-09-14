@@ -13,6 +13,11 @@ pub(crate) fn validate_digest(hash: &str, length: usize) -> crate::Result<()> {
     Ok(())
 }
 
+pub(crate) fn object_relative_path(sha512: &str) -> crate::Result<String> {
+    validate_digest(sha512, 128)?;
+    Ok(format!("objects/{}/{}", &sha512[..2], sha512))
+}
+
 pub(crate) fn validate_relative(path: &str) -> crate::Result<()> {
     if path.is_empty()
         || path.contains('\\')
@@ -48,6 +53,7 @@ pub(crate) fn is_managed_content_path(path: &str) -> bool {
         "mods" => extension.eq_ignore_ascii_case("jar"),
         "resourcepacks" | "shaderpacks" | "datapacks" => {
             extension.eq_ignore_ascii_case("zip")
+                || extension.eq_ignore_ascii_case("jar")
         }
         _ => false,
     }

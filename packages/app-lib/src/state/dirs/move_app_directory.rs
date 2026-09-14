@@ -274,21 +274,30 @@ fn rewrite_value(value: &mut Value, mappings: &[(PathBuf, PathBuf)]) {
 async fn rewrite_database_paths(
     pool: &SqlitePool,
     mappings: &[(PathBuf, PathBuf)],
+    checkpoint: &str,
 ) -> crate::Result<()> {
-    for (_, mut java) in JavaVersion::get_all_registered(pool).await? {
+    let java_versions = JavaVersion::get_all_registered(pool).await?;
+    let instances = instance_rows::list_instances(pool).await?;
+    let mut overrides_by_instance = std::collections::HashMap::new();
+    for instance in &instances {
+        overrides_by_instance.insert(
+            instance.id.clone(),
+            instance_rows::get_instance_launch_overrides(&instance.id, pool)
+                .await?,
+        );
+    }
+    let mut tx = pool.begin().await?;
+    for (_, mut java) in java_versions {
         java.path = dunce::simplified(&remap(Path::new(&java.path), mappings))
             .to_string_lossy()
             .into_owned();
-        java.upsert(pool).await?;
+        java.upsert(&mut *tx).await?;
     }
-    for instance in instance_rows::list_instances(pool).await? {
+    for instance in instances {
         let mut value = serde_json::to_value(&instance)?;
         rewrite_value(&mut value, mappings);
         let updated: Instance = serde_json::from_value(value)?;
-        let overrides =
-            instance_rows::get_instance_launch_overrides(&instance.id, pool)
-                .await?;
-        let mut tx = pool.begin().await?;
+        let overrides = overrides_by_instance.remove(&instance.id).flatten();
         instance_rows::update_instance(&updated, &mut tx).await?;
         if let Some(overrides) = overrides {
             let mut value = serde_json::to_value(&overrides)?;
@@ -299,12 +308,11 @@ async fn rewrite_database_paths(
             )
             .await?;
         }
-        tx.commit().await?;
     }
     let jobs = sqlx::query!(
         "SELECT id, json(state) AS \"state!: String\" FROM install_jobs"
     )
-    .fetch_all(pool)
+    .fetch_all(&mut *tx)
     .await?;
     for job in jobs {
         let mut state: Value = serde_json::from_str(&job.state)?;
@@ -315,9 +323,16 @@ async fn rewrite_database_paths(
             state,
             job.id
         )
-        .execute(pool)
+        .execute(&mut *tx)
         .await?;
     }
+    content_store::set_setting(
+        &mut *tx,
+        "store_directory_move_copied",
+        checkpoint,
+    )
+    .await?;
+    tx.commit().await?;
     Ok(())
 }
 
@@ -419,13 +434,7 @@ pub(crate) async fn move_app_directory(
     }
     managed_content::copy_and_checkpoint(pool, managed_files, &from, &to)
         .await?;
-    rewrite_database_paths(pool, &mappings).await?;
-    content_store::set_setting(
-        pool,
-        "store_directory_move_copied",
-        &checkpoint,
-    )
-    .await?;
+    rewrite_database_paths(pool, &mappings, &checkpoint).await?;
     Ok(())
 }
 
@@ -540,7 +549,13 @@ pub(crate) async fn cancel_move(pool: &SqlitePool) -> crate::Result<()> {
             .iter()
             .map(|directory| (to.join(directory), from.join(directory)))
             .collect::<Vec<_>>();
-        rewrite_database_paths(pool, &mappings).await?;
+        if content_store::setting(pool, "store_directory_move_copied")
+            .await?
+            .as_deref()
+            == Some(checkpoint.as_str())
+        {
+            rewrite_database_paths(pool, &mappings, "").await?;
+        }
         content_store::set_setting(pool, "store_directory_move", "").await?;
         content_store::set_setting(pool, "store_directory_move_copied", "")
             .await?;

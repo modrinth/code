@@ -1074,7 +1074,9 @@ async fn fetch_advanced_with_target(
                             FetchBody::Memory(bytes) => {
                                 sha1_async(bytes.clone()).await?
                             }
-                            FetchBody::File(file) => sha1_file_async(file.path()).await?.1,
+                            FetchBody::File(file) => {
+                                sha1_file_async(file.path()).await?.1
+                            }
                         };
                         if &*hash != sha1 {
                             if attempt <= FETCH_ATTEMPTS {

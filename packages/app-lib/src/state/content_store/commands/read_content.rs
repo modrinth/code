@@ -19,16 +19,11 @@ impl ContentStore {
         &self,
         stored_file: &StoredFileMetadata,
     ) -> crate::Result<PathBuf> {
-        validate_digest(&stored_file.sha512, 128)?;
-		let relative_path = format!(
-			"objects/{}/{}",
-			&stored_file.sha512[..2],
-			stored_file.sha512
-		);
-		if stored_file.relative_path != relative_path {
-            return Err(input("Invalid content store object path"));
-        }
-        Ok(self.root.join(&stored_file.relative_path))
+        Ok(self
+            .root
+            .join(crate::state::content_store::object_relative_path(
+                &stored_file.sha512,
+            )?))
     }
 
     pub(crate) async fn lookup(
@@ -49,12 +44,13 @@ impl ContentStore {
         size: Option<u64>,
         guard: Arc<OwnedRwLockReadGuard<()>>,
     ) -> crate::Result<Option<StoredFileHandle>> {
-		let Some(sha512) = sha512 else {
-			return Ok(None);
-		};
-		let Some(stored_file) = catalog::find_file(&self.pool, sha512).await? else {
-			return Ok(None);
-		};
+        let Some(sha512) = sha512 else {
+            return Ok(None);
+        };
+        let Some(stored_file) = catalog::find_file(&self.pool, sha512).await?
+        else {
+            return Ok(None);
+        };
         if !self.is_healthy(&stored_file, false).await? {
             return Ok(None);
         }
@@ -105,7 +101,7 @@ impl ContentStore {
         let modified_at_ns = file_modified_at_ns(&metadata)? as i64;
         if !verify
             && metadata.len() == stored_file.size as u64
-            && modified_at_ns == stored_file.modified_at_ns
+            && modified_at_ns == stored_file.modified_as
         {
             return Ok(true);
         }
@@ -116,7 +112,7 @@ impl ContentStore {
             return self.quarantine(stored_file).await;
         }
         let mut verified = stored_file.clone();
-        verified.modified_at_ns = modified_at_ns;
+        verified.modified_as = modified_at_ns;
         catalog::save_file(&self.pool, &verified).await?;
         Ok(true)
     }
@@ -136,21 +132,21 @@ impl ContentStore {
         else {
             return Ok(None);
         };
-		if objects.as_os_str() != "objects" {
+        if objects.as_os_str() != "objects" {
             return Ok(None);
         }
         let Some(hash) = hash.as_os_str().to_str() else {
             return Ok(None);
         };
-        if validate_digest(prefix.as_os_str().to_str().unwrap_or_default(), 2).is_err()
-			|| validate_digest(hash, 128).is_err()
+        if validate_digest(prefix.as_os_str().to_str().unwrap_or_default(), 2)
+            .is_err()
+            || validate_digest(hash, 128).is_err()
             || !hash
                 .starts_with(prefix.as_os_str().to_str().unwrap_or_default())
         {
             return Ok(None);
         }
-        let Some(stored_file) = self.lookup(Some(hash), None).await?
-        else {
+        let Some(stored_file) = self.lookup(Some(hash), None).await? else {
             return Ok(None);
         };
         Ok((stored_file.path == canonical).then_some(stored_file))
@@ -204,8 +200,8 @@ impl ContentStore {
         validate_relative(instance_path)?;
         let relative_path = content_file_path(file);
         validate_relative(&relative_path)?;
-        let path = self.profiles.join(instance_path).join(relative_path);
-        if !filesystem::is_regular_file(&path, true).await? {
+        let path = self.instance_path(instance_path, &relative_path).await?;
+        if !filesystem::is_regular_file(&path, false).await? {
             return Err(input("Only regular content files can be read"));
         }
         Ok(ReadableContent::Local(path))
@@ -217,7 +213,9 @@ impl ContentStore {
         relative_path: &str,
     ) -> crate::Result<PathBuf> {
         validate_relative(instance_path)?;
-        validate_relative(relative_path)?;
+        if !relative_path.is_empty() {
+            validate_relative(relative_path)?;
+        }
         let base = self.profiles.join(instance_path);
         let destination = base.join(relative_path);
         validate_parent_directories(&self.profiles, &destination).await?;

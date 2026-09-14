@@ -26,25 +26,32 @@ pub(in crate::state::content_store) async fn download(
 }
 
 pub(in crate::state::content_store) async fn repair_sources(
-	pool: &SqlitePool,
-	sha512: &str,
-	state: &crate::State,
+    pool: &SqlitePool,
+    sha512: &str,
+    state: &crate::State,
 ) -> Vec<String> {
-	let version = fetch::fetch_json::<crate::state::Version>(
-		reqwest::Method::GET,
-		&format!("{}version_file/{sha512}?algorithm=sha512", env!("MODRINTH_API_URL")),
-		None,
-		None,
-		Some("/v2/version_file/:hash"),
-		&state.api_semaphore,
-		pool,
-	)
-	.await;
-	match version {
-		Ok(version) => version.files.into_iter()
-			.filter(|file| file.hashes.get("sha512").map(String::as_str) == Some(sha512))
-			.map(|file| file.url)
-			.collect(),
-		Err(_) => Vec::new(),
-	}
+    let version = fetch::fetch_json::<crate::state::Version>(
+        reqwest::Method::GET,
+        &format!(
+            "{}version_file/{sha512}?algorithm=sha512",
+            env!("MODRINTH_API_URL")
+        ),
+        None,
+        None,
+        Some("/v2/version_file/:hash"),
+        &state.api_semaphore,
+        pool,
+    )
+    .await;
+    match version {
+        Ok(version) => version
+            .files
+            .into_iter()
+            .filter(|file| {
+                file.hashes.get("sha512").map(String::as_str) == Some(sha512)
+            })
+            .map(|file| file.url)
+            .collect(),
+        Err(_) => Vec::new(),
+    }
 }

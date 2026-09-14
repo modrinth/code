@@ -33,7 +33,7 @@ pub(crate) use adapters::sqlite::{
 pub(crate) use commands::{PendingFileChange, migrate};
 pub(crate) use domain::{
     content_file_path, file_path_on_disk, is_managed_content_path, normalize,
-    relative_link, validate_digest, validate_relative,
+    object_relative_path, relative_link, validate_digest, validate_relative,
 };
 use model::StoreIssue;
 pub(crate) use model::{

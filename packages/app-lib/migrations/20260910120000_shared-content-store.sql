@@ -1,9 +1,8 @@
 CREATE TABLE store_blobs (
 	sha512 TEXT PRIMARY KEY NOT NULL,
 	size INTEGER NOT NULL CHECK (size >= 0),
-	relative_path TEXT NOT NULL UNIQUE,
 	status TEXT NOT NULL DEFAULT 'ready' CHECK (status IN ('ready', 'quarantined', 'deleting')),
-	modified_at_ns INTEGER NOT NULL,
+	modified_as INTEGER NOT NULL,
 	created_at INTEGER NOT NULL DEFAULT (unixepoch()),
 	last_used_at INTEGER NOT NULL DEFAULT (unixepoch()),
 	verified_at INTEGER NOT NULL DEFAULT (unixepoch()),

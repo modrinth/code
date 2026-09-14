@@ -584,7 +584,9 @@ async fn apply_pack(
         }
     }
     let size = stored_file.metadata.size as u64;
-    let sha1 = crate::util::fetch::sha1_file_async(&stored_file.path).await?.1;
+    let sha1 = crate::util::fetch::sha1_file_async(&stored_file.path)
+        .await?
+        .1;
     let path = commands::install_stored_file(
         instance_id,
         commands::InstallContent {

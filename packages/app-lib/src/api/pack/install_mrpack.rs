@@ -281,6 +281,48 @@ pub(crate) async fn get_external_files_from_mrpack(
 
     let manifest = zip_reader.read_entry_to_string(manifest_idx).await?;
     let pack: PackFormat = serde_json::from_str(&manifest)?;
+    let mut destinations = HashMap::<String, String>::new();
+    for file in &pack.files {
+        if file.env.as_ref().is_some_and(|env| {
+            env.get(&EnvType::Client) == Some(&SideType::Unsupported)
+        }) {
+            continue;
+        }
+        let path = file.path.as_str();
+        if crate::state::content_store::is_managed_content_path(path) {
+            let canonical = path.trim_end_matches(".disabled").to_string();
+            if let Some(previous) =
+                destinations.insert(canonical, path.to_string())
+            {
+                return Err(crate::state::content_store::input(format!(
+                    "Modpack content paths {previous} and {path} refer to the same file"
+                )));
+            }
+        }
+    }
+    for entry in zip_reader.file().entries() {
+        let name = entry.filename().as_str()?;
+        let Some(path) = name
+            .strip_prefix("overrides/")
+            .or_else(|| name.strip_prefix("client-overrides/"))
+        else {
+            continue;
+        };
+        if crate::state::content_store::is_managed_content_path(path) {
+            let canonical = path.trim_end_matches(".disabled").to_string();
+            if let Some(previous) =
+                destinations.insert(canonical, path.to_string())
+            {
+                // Overrides may replace the same physical path, but must not change its enabled form.
+                if previous != path {
+                    return Err(crate::state::content_store::input(format!(
+                        "Modpack content paths {previous} and {path} refer to the same file"
+                    )));
+                }
+            }
+        }
+    }
+
     let mut candidates = pack
         .files
         .into_iter()
@@ -882,8 +924,10 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                                     "Unsupported content path",
                                 )
                             })?;
-					let file_info = project.hashes.get(&PackFileHash::Sha1)
-						.and_then(|hash| content_context.file_infos_by_hash.get(hash));
+                    let file_info =
+                        project.hashes.get(&PackFileHash::Sha1).and_then(
+                            |hash| content_context.file_infos_by_hash.get(hash),
+                        );
                     let stored_file = file.store_file(state).await?;
                     content_context
                         .reporter

@@ -5,7 +5,7 @@ use crate::state::content_store::{
 use crate::state::instances::adapters::{filesystem, sqlite};
 use crate::state::instances::{Instance, InstanceFile};
 use crate::state::{
-	CachedEntry, InstanceInstallStage, ProjectType, file_hash_cache_key,
+    CachedEntry, InstanceInstallStage, ProjectType, file_hash_cache_key,
 };
 use chrono::Utc;
 use std::collections::{HashMap, HashSet};
@@ -37,17 +37,17 @@ pub(crate) async fn sync_instance_content_files(
         let instance_content =
             InstanceContent::lock(&instance.id, state).await?;
         let instance = instance_content.instance();
-		if matches!(
-			instance.install_stage,
-			InstanceInstallStage::MinecraftInstalling
-				| InstanceInstallStage::PackInstalling
-		) {
-			return sqlite::content_rows::get_instance_files(
-				&instance.id,
-				&state.pool,
-			)
-			.await;
-		}
+        if matches!(
+            instance.install_stage,
+            InstanceInstallStage::MinecraftInstalling
+                | InstanceInstallStage::PackInstalling
+        ) {
+            return sqlite::content_rows::get_instance_files(
+                &instance.id,
+                &state.pool,
+            )
+            .await;
+        }
         let snapshot = filesystem::scan_content_files(
             &state.directories.instances_dir(),
             &instance.path,
@@ -64,13 +64,13 @@ pub(crate) async fn sync_instance_content_files(
         )
         .await?
         .into_iter()
-		.map(|binding| (binding.file_id.clone(), binding))
-		.collect::<HashMap<_, _>>();
+        .map(|binding| (binding.file_id.clone(), binding))
+        .collect::<HashMap<_, _>>();
         (snapshot, known_files, known_bindings)
     };
     let managed_paths = known_files
         .iter()
-		.filter(|file| known_bindings.contains_key(&file.id))
+        .filter(|file| known_bindings.contains_key(&file.id))
         .map(|file| file.relative_path.trim_end_matches(".disabled"))
         .collect::<HashSet<_>>();
     let cache_keys = snapshot
@@ -102,29 +102,29 @@ pub(crate) async fn sync_instance_content_files(
         })
         .collect::<HashMap<_, _>>();
 
-	// Warm hashes without the store lock; their stamps are checked again below.
-	for file in &known_files {
-		if let Some(binding) = known_bindings.get(&file.id) {
-			let _ = state
-				.content_store
-				.check_instance_file_cached(instance, file, binding)
-				.await;
-		}
-	}
+    // Warm hashes without the store lock; their stamps are checked again below.
+    for file in &known_files {
+        if let Some(binding) = known_bindings.get(&file.id) {
+            let _ = state
+                .content_store
+                .check_instance_file_cached(instance, file, binding)
+                .await;
+        }
+    }
 
     let instance_content = InstanceContent::lock(&instance.id, state).await?;
     let instance = instance_content.instance();
-	if matches!(
-		instance.install_stage,
-		InstanceInstallStage::MinecraftInstalling
-			| InstanceInstallStage::PackInstalling
-	) {
-		return sqlite::content_rows::get_instance_files(
-			&instance.id,
-			&state.pool,
-		)
-		.await;
-	}
+    if matches!(
+        instance.install_stage,
+        InstanceInstallStage::MinecraftInstalling
+            | InstanceInstallStage::PackInstalling
+    ) {
+        return sqlite::content_rows::get_instance_files(
+            &instance.id,
+            &state.pool,
+        )
+        .await;
+    }
     let mut existing =
         sqlite::content_rows::get_instance_files(&instance.id, &state.pool)
             .await?;

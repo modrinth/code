@@ -37,7 +37,10 @@ async fn resolve(
     let instance = instance_rows::get_instance_by_id(instance_id, &state.pool)
         .await?
         .ok_or_else(|| input("Unknown instance"))?;
-    let base = state.directories.instances_dir().join(&instance.path);
+    let base = state
+        .content_store
+        .instance_path(&instance.path, "")
+        .await?;
     if path.is_empty() {
         if writing {
             return Err(input(

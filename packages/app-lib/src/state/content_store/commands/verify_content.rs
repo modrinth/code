@@ -52,6 +52,7 @@ impl ContentStore {
         if quarantined.is_empty() {
             return Ok(());
         }
+        let mut restoration_pending = false;
         for instance in instances::load_instance_rows(&self.pool).await? {
             for (mut file, binding) in
                 self.instance_files_with_storage(&instance).await?
@@ -81,15 +82,18 @@ impl ContentStore {
                         )
                         .await?;
                     if symlink_metadata_if_exists(&opposite).await?.is_some() {
+                        restoration_pending = true;
                         continue;
                     }
                     if !filesystem::is_regular_file(&path, false).await? {
+                        restoration_pending = true;
                         continue;
                     }
                     let is_quarantined =
                         filesystem::matches_any_file(&path, &quarantined)
                             .await?;
                     if !is_quarantined {
+                        restoration_pending = true;
                         continue;
                     }
                     crate::state::content_store::adapters::filesystem::remove_instance_file(&path).await?;
@@ -107,6 +111,11 @@ impl ContentStore {
                     storage_kind,
                 )
                 .await?;
+            }
+        }
+        if !restoration_pending {
+            for path in quarantined {
+                filesystem::remove_unused_file(&path).await?;
             }
         }
         Ok(())
@@ -158,9 +167,8 @@ impl ContentStore {
                 .await?
             {
                 if repair
-                    && let Some(healthy) = self
-                        .lookup(Some(&stored_file.sha512), None)
-                        .await?
+                    && let Some(healthy) =
+                        self.lookup(Some(&stored_file.sha512), None).await?
                 {
                     self.restore_quarantined_hardlinks(&healthy).await?;
                 }

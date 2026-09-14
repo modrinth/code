@@ -1,5 +1,5 @@
 use super::filesystem::{
-	symlink_metadata_if_exists, validate_parent_directories,
+    symlink_metadata_if_exists, validate_parent_directories,
 };
 use crate::state::content_store::{
     StoredFileMetadata, StoredFileStatus, input, validate_digest,
@@ -54,39 +54,35 @@ impl UnregisteredFiles {
                     {
                         continue;
                     }
-					let path = entry.path();
-					let Some(metadata) = symlink_metadata_if_exists(&path).await? else {
-						continue;
-					};
-					if !metadata.is_file() {
-						continue;
-					}
-					let FileHashes { sha512, size } =
-						hash_file(&path).await?;
-					if sha512 != hash {
-						tracing::warn!(path = %path.display(), "Preserving an unregistered store object with an unexpected hash");
-						continue;
-					}
-					let mut permissions = metadata.permissions();
-					permissions.set_readonly(true);
-					fs::set_permissions(&path, permissions).await?;
-					return Ok(Some(StoredFileMetadata {
-						sha512,
-						size: size.try_into().map_err(|_| {
-							input("Content file is too large")
-						})?,
-						relative_path: format!(
-							"objects/{}/{hash}",
-							self.prefix
-						),
-						status: StoredFileStatus::Ready,
-						modified_at_ns: crate::state::file_modified_at_ns(
-							&metadata,
-						)?
-							as i64,
-						last_used_at: chrono::Utc::now().timestamp(),
-						sources: "[]".to_string(),
-					}));
+                    let path = entry.path();
+                    let Some(metadata) =
+                        symlink_metadata_if_exists(&path).await?
+                    else {
+                        continue;
+                    };
+                    if !metadata.is_file() {
+                        continue;
+                    }
+                    let FileHashes { sha512, size } = hash_file(&path).await?;
+                    if sha512 != hash {
+                        tracing::warn!(path = %path.display(), "Preserving an unregistered store object with an unexpected hash");
+                        continue;
+                    }
+                    let mut permissions = metadata.permissions();
+                    permissions.set_readonly(true);
+                    fs::set_permissions(&path, permissions).await?;
+                    return Ok(Some(StoredFileMetadata {
+                        sha512,
+                        size: size
+                            .try_into()
+                            .map_err(|_| input("Content file is too large"))?,
+                        status: StoredFileStatus::Ready,
+                        modified_as: crate::state::file_modified_at_ns(
+                            &metadata,
+                        )? as i64,
+                        last_used_at: chrono::Utc::now().timestamp(),
+                        sources: "[]".to_string(),
+                    }));
                 }
                 self.entries = None;
             }

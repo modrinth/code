@@ -114,7 +114,7 @@ pub(super) async fn pack_from_item(
         vec![metadata.applied_content_set.game_version.clone()]
     };
     let sha1 = crate::util::fetch::sha1_async(bytes.clone()).await?;
-	let sha512 = cache_bytes(bytes, state).await?;
+    let sha512 = cache_bytes(bytes, state).await?;
     let selected = if item.project_type == ProjectType::ResourcePack {
         match super::selection::selected_in_instance(
             metadata,
@@ -591,7 +591,7 @@ pub async fn upload_synced_pack(
     .await??;
     let size = bytes.len() as u64;
     let sha1 = crate::util::fetch::sha1_async(bytes.clone()).await?;
-	let sha512 = cache_bytes(bytes, &state).await?;
+    let sha512 = cache_bytes(bytes, &state).await?;
     let _guard = state.lock_synced_options().await;
     if !get_global_options().await?.get(option) {
         return Err(crate::ErrorKind::InputError(

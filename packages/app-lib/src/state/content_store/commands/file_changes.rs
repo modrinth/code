@@ -60,7 +60,8 @@ impl ContentStore {
                 canonical_path,
                 &self.pool,
             )
-            .await?;
+            .await?
+            .filter(|file| content_file_path(file) == requested_source);
         }
         let source_relative = if previous_content.is_some() {
             requested_source.to_string()
@@ -75,7 +76,8 @@ impl ContentStore {
             self.instance_path(&instance.path, &source_relative).await?;
         let target =
             self.instance_path(&instance.path, &target_relative).await?;
-        if source != target
+        if stored_file.is_some()
+            && source != target
             && symlink_metadata_if_exists(&target).await?.is_some()
         {
             return Err(input(format!(

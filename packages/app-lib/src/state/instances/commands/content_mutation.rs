@@ -192,8 +192,7 @@ impl<'a> InstanceContent<'a> {
                 return Err(error);
             }
         };
-        super::mark_shared_instance_stale(&self.instance.id, &self.state.pool)
-            .await?;
+
         if let PreparedChange::Install {
             project_type,
             origin,
@@ -201,8 +200,12 @@ impl<'a> InstanceContent<'a> {
         } = &prepared.change
             && let ContentChangeResult::File(file) = &output
         {
-            self.cache_install(file, *project_type, origin.as_ref())
-                .await?;
+            if let Err(error) = self
+                .cache_install(file, *project_type, origin.as_ref())
+                .await
+            {
+                tracing::warn!(instance_id = %self.instance.id, %error, "Content installed, but metadata caching failed");
+            }
             if matches!(
                 project_type,
                 ProjectType::ResourcePack | ProjectType::DataPack
@@ -460,8 +463,8 @@ impl<'a> InstanceContent<'a> {
         project_path: &str,
     ) -> crate::Result<PendingContentChange> {
         self.content_scope()?;
-        let relative_path = canonical_content_path(project_path);
-        let project_type = ProjectType::get_from_parent_folder(relative_path)
+        let canonical_path = canonical_content_path(project_path);
+        let project_type = ProjectType::get_from_parent_folder(canonical_path)
             .ok_or_else(|| input("Unsupported content type"))?;
         require_stopped_for_content(
             &self.instance.id,
@@ -469,23 +472,35 @@ impl<'a> InstanceContent<'a> {
             self.state,
         )
         .await?;
-        let file = content_rows::get_instance_file_by_relative_path(
+        let mut file = content_rows::get_instance_file_by_relative_path(
             &self.instance.id,
-            relative_path,
+            project_path,
             &self.state.pool,
         )
         .await?;
-        let legacy_path = file.is_none().then_some(project_path);
+        if file.is_none() && project_path != canonical_path {
+            file = content_rows::get_instance_file_by_relative_path(
+                &self.instance.id,
+                canonical_path,
+                &self.state.pool,
+            )
+            .await?
+            .filter(|file| content_file_path(file) == project_path);
+        }
+        let relative_path = file
+            .as_ref()
+            .map_or(project_path, |file| file.relative_path.as_str())
+            .to_string();
         let file_change = self
             .state
             .content_store
             .prepare_file_change(
                 &self.instance,
                 FileChangeRequest {
-                    relative_path,
+                    relative_path: &relative_path,
                     replacement: None,
                     enabled: false,
-                    legacy_path,
+                    legacy_path: Some(project_path),
                     previous_content: None,
                 },
             )
@@ -493,7 +508,7 @@ impl<'a> InstanceContent<'a> {
         Ok(PendingContentChange {
             file_change,
             change: PreparedChange::Remove {
-                relative_path: relative_path.to_string(),
+                relative_path,
                 file,
             },
         })
@@ -575,9 +590,9 @@ impl<'a> InstanceContent<'a> {
         adopted.relative_path = canonical.to_string();
         adopted.file_name = canonical_file_name(canonical)?.to_string();
         adopted.enabled = enabled;
-		adopted.sha1 = crate::util::fetch::sha1_file_async(&stored_file.path)
-			.await?
-			.1;
+        adopted.sha1 = crate::util::fetch::sha1_file_async(&stored_file.path)
+            .await?
+            .1;
         adopted.size = stored_file.metadata.size as u64;
         adopted.missing = false;
         adopted.modified_at = Utc::now();
@@ -596,12 +611,19 @@ impl<'a> InstanceContent<'a> {
         &self,
         prepared: &PendingContentChange,
     ) -> crate::Result<ContentChangeResult> {
-		let legacy_sha1 = match &prepared.change {
-			PreparedChange::Install { stored_file, .. } => {
-				Some(crate::util::fetch::sha1_file_async(&stored_file.path).await?.1)
-			}
-			_ => None,
-		};
+        let legacy_sha1 = match &prepared.change {
+            PreparedChange::Install { stored_file, .. } => Some(
+                crate::util::fetch::sha1_file_async(&stored_file.path)
+                    .await?
+                    .1,
+            ),
+            _ => None,
+        };
+        let stale_state = super::shared_instance::stale_sync_state(
+            &self.instance.id,
+            &self.state.pool,
+        )
+        .await?;
         let mut tx = self.state.pool.begin().await?;
         let content_scope = match &prepared.change {
             PreparedChange::Adopt { .. } => None,
@@ -636,7 +658,9 @@ impl<'a> InstanceContent<'a> {
                         relative_path,
                         file_name,
                         enabled: *enabled,
-						sha1: legacy_sha1.as_deref().expect("install requires a legacy file hash"),
+                        sha1: legacy_sha1
+                            .as_deref()
+                            .expect("install requires a legacy file hash"),
                         size: stored_file.metadata.size as u64,
                         missing: false,
                     },
@@ -736,6 +760,10 @@ impl<'a> InstanceContent<'a> {
                 ContentChangeResult::File(adopted)
             }
         };
+        if let Some(sync_state) = stale_state {
+            content_rows::upsert_content_set_sync_state(&sync_state, &mut tx)
+                .await?;
+        }
         tx.commit().await?;
         Ok(result)
     }
