@@ -248,7 +248,7 @@ function getCategoryName(category: Category): string {
 			class="flex flex-col gap-1"
 		>
 			<template v-for="[category, categoryLocales] in $displayCategories" :key="category">
-				<strong class="mt-4 py-4 font-semibold text-contrast">
+				<strong class="pt-3 pb-1 font-semibold text-contrast">
 					{{ getCategoryName(category) }}
 				</strong>
 
