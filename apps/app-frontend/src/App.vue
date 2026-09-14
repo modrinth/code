@@ -2849,6 +2849,12 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	}
 }
 
+:not(.mac-traffic-lights) {
+	.app-grid-statusbar {
+		padding-left: 0.25rem;
+	}
+}
+
 .windows {
 	.fake-appbar {
 		height: 2.5rem !important;
