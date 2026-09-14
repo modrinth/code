@@ -1,3 +1,4 @@
+pub(crate) mod control;
 mod diagnostics;
 pub mod events;
 pub mod model;
@@ -20,5 +21,5 @@ pub use runner::{
     create_shared_instance, dismiss_job, duplicate_instance, get_job,
     import_instance, install_existing_instance,
     install_pack_to_existing_instance, job_support_details, list_jobs,
-    retry_job, update_shared_instance,
+    pause_job, resume_job, retry_job, update_shared_instance,
 };

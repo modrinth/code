@@ -109,12 +109,18 @@ pub async fn remove(instance_id: &str) -> crate::Result<()> {
     let instance =
         instance_rows::get_instance_display_info(instance_id, &state.pool)
             .await?;
-    crate::install::runner::cancel_jobs_for_instance_deletion(
-        instance_id,
-        &state,
-    )
-    .await?;
-    crate::state::remove_instance(instance_id, &state).await?;
+    let _install_guards =
+        crate::install::runner::cancel_jobs_for_instance_deletion(
+            instance_id,
+            &state,
+        )
+        .await?;
+    if instance_rows::get_instance_by_id(instance_id, &state.pool)
+        .await?
+        .is_some()
+    {
+        crate::state::remove_instance(instance_id, &state).await?;
+    }
 
     if let Some(instance) = instance {
         emit_instance(&instance.id, InstancePayloadType::Removed).await?;

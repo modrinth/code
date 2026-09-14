@@ -1,0 +1,50 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT sha512, size, status AS \"status: _\", modified_as, last_used_at, sources FROM store_blobs WHERE sha512 = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "sha512",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "size",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "status: _",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "modified_as",
+        "ordinal": 3,
+        "type_info": "Integer"
+      },
+      {
+        "name": "last_used_at",
+        "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "sources",
+        "ordinal": 5,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "2e2ed9e9ad4f976aeec0beb20dbe5d2ba93a2f7ab22645c855d26c0f516c2abd"
+}

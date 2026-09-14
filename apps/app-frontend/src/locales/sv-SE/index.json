@@ -92,9 +92,6 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "Uppdaterar delat innehåll"
   },
-  "app.action-bar.installs": {
-    "message": "Installationer"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "Gör till primärinstans"
   },

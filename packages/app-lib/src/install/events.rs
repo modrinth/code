@@ -50,6 +50,7 @@ impl InstallProgressReporter {
         &self,
         context: InstallErrorContext,
     ) -> crate::Result<()> {
+        super::control::checkpoint(self.job_id).await?;
         self.update_context(Some(context), true).await
     }
 
@@ -57,6 +58,7 @@ impl InstallProgressReporter {
         &self,
         context: InstallErrorContext,
     ) -> crate::Result<()> {
+        super::control::checkpoint(self.job_id).await?;
         self.update_context(Some(context), false).await
     }
 
@@ -128,6 +130,7 @@ impl InstallProgressReporter {
         details: InstallPhaseDetails,
         events: Vec<InstallJobEventKind>,
     ) -> crate::Result<()> {
+        super::control::checkpoint(self.job_id).await?;
         let app_state = crate::State::get().await?;
         let mut state = self.state.lock().await;
         let phase_started = state.job.progress.phase != phase

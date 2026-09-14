@@ -36,6 +36,7 @@ const runningInstances = ref([])
 const { formatMessage } = useVIntl()
 
 const container = ref()
+const footer = ref()
 let resizeObserver
 const maxAuto = ref(0)
 const allInstances = computed(() =>
@@ -74,9 +75,12 @@ const updateMaxAuto = () => {
 	const rem = Number.parseFloat(getComputedStyle(document.documentElement).fontSize)
 	const dividerHeight = rem + 1
 	const gap = rem / 4
+	const footerHeight = (footer.value?.clientHeight ?? 0) + gap
 	maxAuto.value = Math.max(
 		0,
-		Math.floor((container.value.clientHeight - 2 * dividerHeight - gap) / (3 * rem + gap)),
+		Math.floor(
+			(container.value.clientHeight - footerHeight - 2 * dividerHeight - gap) / (3 * rem + gap),
+		),
 	)
 }
 
@@ -176,6 +180,7 @@ useAppEvent('process', checkProcesses)
 onMounted(() => {
 	resizeObserver = new ResizeObserver(updateMaxAuto)
 	resizeObserver.observe(container.value)
+	resizeObserver.observe(footer.value)
 	updateMaxAuto()
 	checkProcesses()
 })
@@ -349,7 +354,9 @@ function openContextMenu(event, instance) {
 				"
 			></div>
 		</div>
-		<slot />
+		<div ref="footer" class="flex shrink-0 flex-col items-center">
+			<slot />
+		</div>
 	</div>
 </template>
 
