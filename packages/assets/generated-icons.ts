@@ -206,6 +206,7 @@ import _MegaphoneIcon from './icons/megaphone.svg?component'
 import _MemoryStickIcon from './icons/memory-stick.svg?component'
 import _MessageIcon from './icons/message.svg?component'
 import _MessagesSquareIcon from './icons/messages-square.svg?component'
+import _MicrochipIcon from './icons/microchip.svg?component'
 import _MicrophoneIcon from './icons/microphone.svg?component'
 import _MinimizeIcon from './icons/minimize.svg?component'
 import _MinusIcon from './icons/minus.svg?component'
@@ -671,6 +672,7 @@ export const MegaphoneIcon = _MegaphoneIcon
 export const MemoryStickIcon = _MemoryStickIcon
 export const MessageIcon = _MessageIcon
 export const MessagesSquareIcon = _MessagesSquareIcon
+export const MicrochipIcon = _MicrochipIcon
 export const MicrophoneIcon = _MicrophoneIcon
 export const MinimizeIcon = _MinimizeIcon
 export const MinusIcon = _MinusIcon
