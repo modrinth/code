@@ -36,6 +36,16 @@ pub async fn run(
         )
         .into());
     }
+    {
+        let _priority =
+            state.content_store.legacy_migration_priority.write().await;
+        crate::state::instances::commands::migrate_legacy_content(
+            instance_id,
+            &state,
+            false,
+        )
+        .await?;
+    }
     super::shared::check_shared_instance_availability_before_launch(
         instance_id,
         &state,

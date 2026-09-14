@@ -653,6 +653,7 @@ pub(super) async fn publish_current_content(
     config_paths: &[String],
     state: &State,
 ) -> crate::Result<i32> {
+    let _store_lease = state.content_store.lease().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or_else(|| {
@@ -1081,13 +1082,17 @@ pub(super) async fn upload_external_files(
                 ))
             })?;
         let path = match &candidate.source {
-            ExternalFileSource::InstanceFile(file_path) => state
-                .directories
-                .instances_dir()
-                .join(instance_path)
-                .join(file_path),
+            ExternalFileSource::InstanceFile(file_path) => {
+                let instance = crate::state::instances::adapters::sqlite::instance_rows::get_instance_by_path(instance_path, &state.pool).await?
+					.ok_or_else(|| crate::state::content_store::input("Unknown instance"))?;
+                let file = crate::state::instances::adapters::sqlite::content_rows::get_instance_file_by_relative_path(&instance.id, file_path, &state.pool).await?
+					.ok_or_else(|| crate::state::content_store::input("Shared content file is not registered"))?;
+                state.content_store.read_path(&file, instance_path).await?
+            }
             ExternalFileSource::ConfigBundle(path) => {
-                path.as_ref().to_path_buf()
+                crate::state::content_store::ReadableContent::Local(
+                    path.as_ref().to_path_buf(),
+                )
             }
         };
         let upload_url = url::Url::parse(&upload.url).map_err(|error| {
@@ -1095,7 +1100,7 @@ pub(super) async fn upload_external_files(
                 "Invalid shared instance external file upload URL: {error}"
             ))
         })?;
-        let mut file = tokio::fs::File::open(&path).await?;
+        let mut file = tokio::fs::File::open(path.path()).await?;
         let mut hasher = sha2::Sha512::new();
         let mut buffer = vec![0_u8; 64 * 1024];
         let mut size = 0_u64;

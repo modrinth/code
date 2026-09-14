@@ -14,6 +14,7 @@ import { open } from '@tauri-apps/plugin-dialog'
 import { ref, watch } from 'vue'
 
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
+import ContentStorageSettings from '@/components/ui/settings/instances/ContentStorageSettings.vue'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { purge_cache_types } from '@/helpers/cache.js'
 import { get, set } from '@/helpers/settings.ts'
@@ -172,6 +173,7 @@ async function findLauncherDir() {
 
 <template>
 	<div class="flex flex-col gap-6">
+		<ContentStorageSettings />
 		<div class="flex flex-col gap-2.5">
 			<h2 class="m-0 text-lg font-semibold text-contrast">
 				{{ formatMessage(messages.appDirectoryTitle) }}

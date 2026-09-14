@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT sha512 FROM store_blobs",
+  "describe": {
+    "columns": [
+      {
+        "name": "sha512",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "6c4e4329e4cdc336ae03b968e3bf29ad24326915cecc3a2d427914c1083fdfb2"
+}

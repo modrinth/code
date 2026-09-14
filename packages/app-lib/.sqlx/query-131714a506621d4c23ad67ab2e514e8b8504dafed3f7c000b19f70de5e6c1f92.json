@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT blob_sha512 FROM store_instance_files UNION SELECT blob_sha512 FROM store_retained_refs",
+  "describe": {
+    "columns": [
+      {
+        "name": "blob_sha512",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "131714a506621d4c23ad67ab2e514e8b8504dafed3f7c000b19f70de5e6c1f92"
+}
