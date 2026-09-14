@@ -1,5 +1,4 @@
-use std::collections::{HashMap, VecDeque};
-use std::sync::{Arc, LazyLock, Mutex};
+use std::sync::LazyLock;
 
 use lingua::{Language, LanguageDetector, LanguageDetectorBuilder};
 use regex::Regex;
@@ -15,67 +14,8 @@ const MIN_DESCRIPTION_ENGLISH_PROPORTION: f64 = 0.2;
 const MIN_PASSAGE_WORDS: usize = 4;
 const MIN_PASSAGE_CHARS: usize = 25;
 
-static DETECTOR: LazyLock<DetectorState> =
-	LazyLock::new(|| DetectorState::new());
-
-struct BoundedCache<T> {
-	entries: HashMap<Arc<str>, (T, usize)>,
-	order: VecDeque<Arc<str>>,
-	bytes: usize,
-}
-
-impl<T: Clone> BoundedCache<T> {
-	fn new() -> Self {
-		Self {
-			entries: HashMap::new(),
-			order: VecDeque::new(),
-			bytes: 0,
-		}
-	}
-
-	fn get(&self, text: &str) -> Option<T> {
-		self.entries.get(text).map(|(value, _)| value.clone())
-	}
-
-	fn insert(&mut self, text: &str, value: T, value_bytes: usize) {
-		const MAX_BYTES: usize = 2 * 1024 * 1024;
-		const MAX_ENTRIES: usize = 2048;
-		let bytes = text.len() + value_bytes;
-		if bytes > MAX_BYTES || self.entries.contains_key(text) {
-			return;
-		}
-		while self.bytes + bytes > MAX_BYTES
-			|| self.entries.len() >= MAX_ENTRIES
-		{
-			let Some(key) = self.order.pop_front() else {
-				break;
-			};
-			if let Some((_, bytes)) = self.entries.remove(&key) {
-				self.bytes -= bytes;
-			}
-		}
-		let key: Arc<str> = text.into();
-		self.order.push_back(key.clone());
-		self.entries.insert(key, (value, bytes));
-		self.bytes += bytes;
-	}
-}
-
-struct DetectorState {
-	detector: LanguageDetector,
-	scores: Mutex<BoundedCache<Detection>>,
-	spans: Mutex<BoundedCache<Arc<[(usize, usize)]>>>,
-}
-
-impl DetectorState {
-	fn new() -> Self {
-		Self {
-			detector: LanguageDetectorBuilder::from_all_languages().build(),
-			scores: Mutex::new(BoundedCache::new()),
-			spans: Mutex::new(BoundedCache::new()),
-		}
-	}
-}
+static DETECTOR: LazyLock<LanguageDetector> =
+	LazyLock::new(|| LanguageDetectorBuilder::from_all_languages().build());
 
 static WORD: LazyLock<Regex> =
 	LazyLock::new(|| Regex::new(r"[\p{L}\p{M}\p{N}]+").unwrap());
@@ -135,63 +75,31 @@ impl Detection {
 	}
 }
 
-fn detect(text: &str, detector: &DetectorState) -> Detection {
-	if let Some(value) = detector
-		.scores
-		.lock()
-		.unwrap_or_else(|error| error.into_inner())
-		.get(text)
-	{
-		return value;
-	}
-	let scores = detector.detector.compute_language_confidence_values(text);
+fn detect(text: &str, detector: &LanguageDetector) -> Detection {
+	let scores = detector.compute_language_confidence_values(text);
 	let english_confidence = scores
 		.iter()
 		.find(|(language, _)| *language == Language::English)
 		.map_or(0.0, |(_, confidence)| *confidence);
 	let best = scores.first().filter(|(_, confidence)| *confidence > 0.0);
-	let detection = Detection {
+	Detection {
 		runner_up_confidence: scores.get(1).map_or(0.0, |(_, score)| *score),
 		language: best.map(|(language, _)| *language),
 		confidence: best.map_or(0.0, |(_, confidence)| *confidence),
 		english_confidence,
-	};
-	detector
-		.scores
-		.lock()
-		.unwrap_or_else(|error| error.into_inner())
-		.insert(text, detection, std::mem::size_of::<Detection>());
-	detection
+	}
 }
 
 /// Use Lingua's inferred boundaries, then rescore each span independently so
 /// English can qualify even when another language has the highest score.
 fn mixed_language_passages(
 	text: &str,
-	detector: &DetectorState,
+	detector: &LanguageDetector,
 ) -> Vec<String> {
-	let cached = detector
-		.spans
-		.lock()
-		.unwrap_or_else(|error| error.into_inner())
-		.get(text);
-	let spans = cached.unwrap_or_else(|| {
-		let spans: Arc<[(usize, usize)]> = detector
-			.detector
-			.detect_multiple_languages_of(text)
-			.into_iter()
-			.map(|span| (span.start_index(), span.end_index()))
-			.collect();
-		detector
-			.spans
-			.lock()
-			.unwrap_or_else(|error| error.into_inner())
-			.insert(text, spans.clone(), std::mem::size_of_val(spans.as_ref()));
-		spans
-	});
-	spans
-		.iter()
-		.map(|(start, end)| text[*start..*end].trim().to_owned())
+	detector
+		.detect_multiple_languages_of(text)
+		.into_iter()
+		.map(|span| text[span.start_index()..span.end_index()].trim().to_owned())
 		.collect()
 }
 
@@ -360,7 +268,7 @@ fn classify_passage(
 	text: String,
 	eligible: bool,
 	minimum_ratio: f64,
-	detector: &DetectorState,
+	detector: &LanguageDetector,
 	should_detect: bool,
 ) -> Passage {
 	let detection = if should_detect {
