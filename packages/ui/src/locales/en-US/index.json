@@ -1400,6 +1400,12 @@
   "external-project-license-status.yes": {
     "defaultMessage": "Yes"
   },
+  "file-button.file-too-large.description": {
+    "defaultMessage": "File {filename} is too big. The maximum file size is {maxSize}."
+  },
+  "file-button.file-too-large.title": {
+    "defaultMessage": "File too large"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "Extract summary"
   },
