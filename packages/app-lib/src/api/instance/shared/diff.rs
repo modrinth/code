@@ -57,8 +57,12 @@ pub(super) async fn shared_instance_publish_diffs(
         if snapshot.disabled_version_ids.is_empty() {
             Ok(HashMap::new())
         } else {
-            shared_versions_by_project(&snapshot.disabled_version_ids, state)
-                .await
+            shared_versions_by_project(
+                &snapshot.disabled_version_ids,
+                true,
+                state,
+            )
+            .await
         }
     };
     let ((version_ids, external_files), disabled_versions) = tokio::try_join!(
@@ -285,6 +289,8 @@ fn shared_loader_label(loader: &LoaderReference) -> String {
     }
 }
 
+/// Missing historical versions appear as removals so owners can publish a
+/// revision that replaces them, even without their project metadata.
 async fn shared_content_diffs(
     before: &SharedContentSnapshot,
     after: &SharedContentSnapshot,
@@ -294,8 +300,8 @@ async fn shared_content_diffs(
     state: &State,
 ) -> crate::Result<Vec<SharedInstanceUpdateDiff>> {
     let (before_versions, after_versions) = tokio::try_join!(
-        shared_versions_by_project(&before.version_ids, state),
-        shared_versions_by_project(&after.version_ids, state),
+        shared_versions_by_project(&before.version_ids, true, state),
+        shared_versions_by_project(&after.version_ids, false, state),
     )?;
     let to_snapshot =
         |source: &SharedContentSnapshot,
@@ -321,7 +327,16 @@ async fn shared_content_diffs(
         &before.configuration,
         &after.configuration,
     ));
-    if !diff.has_changes() {
+    let resolved_before_ids = before_versions
+        .values()
+        .map(|version| version.id.as_str())
+        .collect::<HashSet<_>>();
+    let missing_before_ids = before
+        .version_ids
+        .iter()
+        .filter(|id| !resolved_before_ids.contains(id.as_str()))
+        .collect::<BTreeSet<_>>();
+    if !diff.has_changes() && missing_before_ids.is_empty() {
         return Ok(Vec::new());
     }
     let project_ids = diff
@@ -335,7 +350,19 @@ async fn shared_content_diffs(
         })
         .collect::<HashSet<_>>();
     let project_names = shared_project_names(&project_ids, state).await?;
-    let mut content_diffs = Vec::new();
+    let mut content_diffs = missing_before_ids
+        .into_iter()
+        .map(|id| SharedInstanceUpdateDiff {
+            type_: SharedInstanceUpdateDiffType::Removed,
+            project_id: None,
+            project_name: Some(id.clone()),
+            file_name: None,
+            current_version_name: Some(id.clone()),
+            new_version_name: None,
+            config_file_count: None,
+            disabled: false,
+        })
+        .collect::<Vec<_>>();
     for entry in diff.content {
         match entry {
             ContentSetDiffEntry::Project { project_id, change } => {
