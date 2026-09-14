@@ -216,7 +216,7 @@ image: "![](/missing-alt.png)"
             format!("```yaml\n{long_comment}\n```"),
             format!("~~~yaml\n{long_comment}\n~~~"),
             format!("````yaml\n```\n{long_comment}\n````"),
-            format!("Example: ```yaml\n{long_comment}\n```"),
+			format!("Example:\n\n```yaml\n{long_comment}\n```"),
             format!("```yaml\n{long_comment}"),
             format!("    {long_comment}"),
         ] {
