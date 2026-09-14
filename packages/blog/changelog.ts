@@ -11,6 +11,13 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-09-14T17:25:37+00:00`,
+		product: 'app',
+		version: '0.21.2',
+		body: `## Fixed
+- Fixed logo on macOS appearing below traffic light buttons.`,
+	},
+	{
 		date: `2026-09-14T16:37:42+00:00`,
 		product: 'app',
 		version: '0.21.1',
