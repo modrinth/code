@@ -206,6 +206,9 @@
   "button.download": {
     "defaultMessage": "Herunterladen"
   },
+  "button.download-files": {
+    "defaultMessage": "Dateien herunterladen"
+  },
   "button.downloading": {
     "defaultMessage": "Wird heruntergeladen"
   },
@@ -365,6 +368,15 @@
   "collections.label.private": {
     "defaultMessage": "Privat"
   },
+  "console.actions.collapse": {
+    "defaultMessage": "Einklappen"
+  },
+  "console.actions.expand": {
+    "defaultMessage": "Ausklappen"
+  },
+  "console.actions.share": {
+    "defaultMessage": "Teilen"
+  },
   "content-type.content.lowercase": {
     "defaultMessage": "Inhalt"
   },
@@ -376,6 +388,12 @@
   },
   "content.card.select-project": {
     "defaultMessage": "{project} auswählen"
+  },
+  "content.card.sync-update-pending": {
+    "defaultMessage": "Einige synchronisierte Dateien warten auf Änderungen. Eine Instanz könnte laufen, die entweder eine festgesetzte oder falsche Version hat oder eine die bereits ihre eigene Kopie besitzt."
+  },
+  "content.card.synced": {
+    "defaultMessage": "Über Instanzen synchronisiert"
   },
   "content.card.uploaded": {
     "defaultMessage": "Hochgeladen"
@@ -2390,6 +2408,9 @@
   "instances.content-install.show-unavailable": {
     "defaultMessage": "Nicht verfügbare anzeigen"
   },
+  "instances.managed-content-modal.disabled": {
+    "defaultMessage": "Deaktiviert"
+  },
   "instances.managed-content-modal.download-file": {
     "defaultMessage": "Datei herunterladen"
   },
@@ -2398,6 +2419,9 @@
   },
   "instances.managed-content-modal.empty-title": {
     "defaultMessage": "Keine Inhalte gefunden"
+  },
+  "instances.managed-content-modal.enabled": {
+    "defaultMessage": "Aktiviert"
   },
   "instances.managed-content-modal.external-content": {
     "defaultMessage": "Extern"
@@ -2419,6 +2443,9 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Durchsuche {count, number} {count, plural, one {Projekt} other {Projekte}}"
+  },
+  "instances.managed-content-modal.warnings": {
+    "defaultMessage": "Warnungen"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Aktuell"
@@ -3596,6 +3623,9 @@
   "project.disclosure.advertising.title": {
     "defaultMessage": "Enthält Werbung"
   },
+  "project.disclosure.ai-functionality.title": {
+    "defaultMessage": "Generative KI-Funktionalität"
+  },
   "project.disclosure.ai-generated-content.title": {
     "defaultMessage": "Enthält KI-generierte(n) {types}"
   },
@@ -4348,6 +4378,9 @@
   },
   "search.filter_type.advanced.disclosure.ai_content.usage": {
     "defaultMessage": "KI-{usage}"
+  },
+  "search.filter_type.advanced.disclosure.ai_functionality": {
+    "defaultMessage": "Generative KI-Funktionalität"
   },
   "search.filter_type.advanced.disclosure.archived": {
     "defaultMessage": "Archiviert"
@@ -5156,6 +5189,18 @@
   "servers.busy.installing": {
     "defaultMessage": "Server wird installiert"
   },
+  "servers.download.failed.description": {
+    "defaultMessage": "Beim Herunterladen der Dateien dieser Welt ist ein Fehler aufgetreten."
+  },
+  "servers.download.failed.title": {
+    "defaultMessage": "Herunterladen fehlgeschlagen"
+  },
+  "servers.download.unavailable.description": {
+    "defaultMessage": "Die Dateien dieser Welt können derzeit nicht heruntergeladen werden."
+  },
+  "servers.download.unavailable.title": {
+    "defaultMessage": "Herunterladen gerade nicht verfügbar"
+  },
   "servers.files.zip-created": {
     "defaultMessage": "ZIP-Datei wurde erstellt"
   },
@@ -5676,13 +5721,13 @@
     "defaultMessage": "Was passiert?"
   },
   "servers.settings.advanced.sftp.roll-credentials": {
-    "defaultMessage": "Die Werte rotieren"
+    "defaultMessage": "Die Zugangsdaten rotieren"
   },
   "servers.settings.advanced.sftp.roll-credentials-error-text": {
     "defaultMessage": "Bitte versuche es später erneut."
   },
   "servers.settings.advanced.sftp.roll-credentials-error-title": {
-    "defaultMessage": "Fehlgeschlagen die SFTP Werte zu rotieren"
+    "defaultMessage": "SFTP-Zugangsdaten konnten nicht rotiert werden"
   },
   "servers.settings.advanced.sftp.roll-credentials-modal-description": {
     "defaultMessage": "Der vorherige Benutzername und das vorherige Passwort funktionieren danach nicht mehr."
@@ -5694,7 +5739,7 @@
     "defaultMessage": "Dein SFTP-Benutzername und Passwort wurden neu generiert."
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
-    "defaultMessage": "SFTP Werte wurden rotiert"
+    "defaultMessage": "SFTP-Zugangsdaten wurden rotiert"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Bei der Installation ist ein unerwarteter Fehler aufgetreten. Bitte versuche es später erneut."
@@ -6939,3 +6984,4 @@
     "defaultMessage": "Typ"
   }
 }
+

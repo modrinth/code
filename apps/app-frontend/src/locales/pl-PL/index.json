@@ -251,6 +251,9 @@
   "app.browse.hide-installed-modpacks": {
     "message": "Ukryj już zainstalowane"
   },
+  "app.browse.project-actions.label": {
+    "message": "Opcje projektu"
+  },
   "app.browse.project-type.data-packs": {
     "message": "Paczki danych"
   },
@@ -277,6 +280,21 @@
   },
   "app.content-install.no-compatible-versions": {
     "message": "Nie znaleziono żadnych wersji pasujących do {compatibilityLabel}. Wybierz wersję, by zainstalować ją mimo tego. Zależności nie zostaną zainstalowane automatycznie."
+  },
+  "app.content.desync-pack": {
+    "message": "Wyłącz synchronizację"
+  },
+  "app.content.sync-data-packs-disabled": {
+    "message": "Najpierw włącz synchronizację paczek danych w ustawieniach aplikacji."
+  },
+  "app.content.sync-pack": {
+    "message": "Synchronizuj"
+  },
+  "app.content.sync-packs-override": {
+    "message": "Najpierw wyłącz wyjątek synchronizacji paczek w ustawieniach tej instancji."
+  },
+  "app.content.sync-resource-packs-disabled": {
+    "message": "Najpierw włącz synchronizację paczek zasobów w ustawieniach aplikacji."
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Otwórz folder kopii zapasowych"
@@ -307,6 +325,60 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.features-settings.instance-pages.title": {
+    "message": "Instancje"
+  },
+  "app.features-settings.play-page.title": {
+    "message": "Strona Graj"
+  },
+  "app.features-settings.quick-instances.description": {
+    "message": "Wybierz maksymalną liczbę ostatnich instancji wyświetlanych na lewym pasku bocznym. Możesz ją też zmienić, przeciągając separator."
+  },
+  "app.features-settings.quick-instances.title": {
+    "message": "Szybki dostęp do instancji na pasku bocznym"
+  },
+  "app.features-settings.show-all-screenshots.description": {
+    "message": "Pokaż na lewym pasku bocznym przycisk otwierający zrzuty ekranu ze wszystkich instancji."
+  },
+  "app.features-settings.show-all-screenshots.title": {
+    "message": "Pokaż wszystkie zrzuty ekranu na pasku bocznym"
+  },
+  "app.features-settings.show-files-tab.title": {
+    "message": "Pokaż kartę Pliki w instancjach"
+  },
+  "app.features-settings.show-jump-in.description": {
+    "message": "Pokaż ostatnio uruchamiane światy i instancje u góry strony Graj."
+  },
+  "app.features-settings.show-jump-in.title": {
+    "message": "Pokaż sekcję Wskocz do gry"
+  },
+  "app.features-settings.show-screenshots-tab.title": {
+    "message": "Pokaż kartę Zrzuty ekranu w instancjach"
+  },
+  "app.features-settings.show-skin-selector.description": {
+    "message": "Pokaż na lewym pasku bocznym przycisk otwierający wybór skórki."
+  },
+  "app.features-settings.show-skin-selector.title": {
+    "message": "Pokaż wybór skórki na pasku bocznym"
+  },
+  "app.features-settings.show-worlds-tab.title": {
+    "message": "Pokaż kartę Światy w instancjach"
+  },
+  "app.features-settings.sidebar.title": {
+    "message": "Pasek boczny"
+  },
+  "app.features-settings.sync-across-devices.description": {
+    "message": "Używaj tych ustawień funkcji na wszystkich urządzeniach, na których się logujesz. Wyłącz tę opcję, aby zachować osobne ustawienia na tym urządzeniu."
+  },
+  "app.features-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Zaloguj się na konto Modrinth, aby synchronizować ustawienia."
+  },
+  "app.features-settings.sync-across-devices.title": {
+    "message": "Synchronizuj funkcje między urządzeniami"
+  },
+  "app.home.jump-back-in.actions.label": {
+    "message": "Opcje instancji"
   },
   "app.home.jump-back-in.instance-locked": {
     "message": "Ta instancja została zablokowana"
@@ -415,6 +487,9 @@
   },
   "app.instance.action.stop": {
     "message": "Stop"
+  },
+  "app.instance.actions.label": {
+    "message": "Opcje instancji"
   },
   "app.instance.add-server.add": {
     "message": "Dodaj"
@@ -737,6 +812,18 @@
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Usuń serwer"
   },
+  "app.instance.worlds.remove-server-modal.remove-everywhere": {
+    "message": "Usuń wszędzie"
+  },
+  "app.instance.worlds.remove-server-modal.remove-here": {
+    "message": "Usuń tutaj"
+  },
+  "app.instance.worlds.remove-server-modal.synced-description": {
+    "message": "Możesz usunąć go tylko z tej instancji lub ze wszystkich synchronizowanych instancji. Usunięcie go tylko z tej instancji włączy wyjątki i ta instancja przestanie otrzymywać synchronizowane zmiany serwerów."
+  },
+  "app.instance.worlds.remove-server-modal.synced-header": {
+    "message": "Ten serwer jest synchronizowany"
+  },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Usuń serwer"
   },
@@ -794,6 +881,9 @@
   "app.java-selector.test-installation": {
     "message": "Testuj instalację Java"
   },
+  "app.library.actions.label": {
+    "message": "Opcje biblioteki"
+  },
   "app.library.context-menu.create-instance": {
     "message": "Nowa instancja"
   },
@@ -841,6 +931,9 @@
   },
   "app.library.group-by.none": {
     "message": "Bez grupowania"
+  },
+  "app.library.group.actions.label": {
+    "message": "Opcje grupy"
   },
   "app.library.group.collapse": {
     "message": "Zwiń grupę"
@@ -964,6 +1057,9 @@
   },
   "app.library.instance.action.view-instance": {
     "message": "Pokaż instancję"
+  },
+  "app.library.instance.actions.label": {
+    "message": "Opcje instancji"
   },
   "app.library.instance.deselect": {
     "message": "Odznacz instancję"
@@ -1262,6 +1358,9 @@
   "app.project.versions.already-installed": {
     "message": "Już zainstalowano"
   },
+  "app.quick-instance-switcher.actions.label": {
+    "message": "Opcje instancji"
+  },
   "app.quick-instance-switcher.drag-show-tooltip": {
     "message": "Przeciągnij, aby wyświetlić ostatnie instancje"
   },
@@ -1270,6 +1369,9 @@
   },
   "app.quick-instance-switcher.instance-locked": {
     "message": "Ta instancja jest zablokowana"
+  },
+  "app.quick-instance-switcher.title": {
+    "message": "Ostatnie instancje"
   },
   "app.quick-instance-switcher.view-instance": {
     "message": "Zobacz instalacje"
@@ -1387,6 +1489,12 @@
   },
   "app.screenshots.selection.aria-label": {
     "message": "Wybrane zrzuty ekranu"
+  },
+  "app.screenshots.selection.delete-description": {
+    "message": "Usunąć {count, plural, one {# zrzut ekranu} few {# zrzuty ekranu} many {# zrzutów ekranu} other {# zrzutu ekranu}}? Tej czynności nie można cofnąć."
+  },
+  "app.screenshots.selection.delete-success": {
+    "message": "{count, plural, one {Usunięto # zrzut ekranu} few {Usunięto # zrzuty ekranu} many {Usunięto # zrzutów ekranu} other {Usunięto # zrzutu ekranu}}"
   },
   "app.screenshots.selection.delete-title": {
     "message": "Usuń wybrane zrzuty ekranu"
@@ -1520,6 +1628,1014 @@
   "app.settings.downloading": {
     "message": "Pobieranie v{version}"
   },
+  "app.settings.game-options.category.accessibility.description": {
+    "message": "Preferencje ułatwień dostępu"
+  },
+  "app.settings.game-options.category.accessibility.label": {
+    "message": "Ułatwienia dostępu"
+  },
+  "app.settings.game-options.category.chat.description": {
+    "message": "Widoczność i wygląd czatu"
+  },
+  "app.settings.game-options.category.chat.label": {
+    "message": "Czat"
+  },
+  "app.settings.game-options.category.controls.description": {
+    "message": "Mysz, poruszanie się i przypisania klawiszy"
+  },
+  "app.settings.game-options.category.controls.label": {
+    "message": "Sterowanie"
+  },
+  "app.settings.game-options.category.custom.description": {
+    "message": "Ustawienia dodane przez mody"
+  },
+  "app.settings.game-options.category.custom.label": {
+    "message": "Niestandardowe ustawienia"
+  },
+  "app.settings.game-options.category.language.description": {
+    "message": "Język gry"
+  },
+  "app.settings.game-options.category.language.label": {
+    "message": "Język"
+  },
+  "app.settings.game-options.category.music-and-sound.description": {
+    "message": "Głośność i preferencje dźwięku"
+  },
+  "app.settings.game-options.category.music-and-sound.label": {
+    "message": "Muzyka i dźwięk"
+  },
+  "app.settings.game-options.category.online.description": {
+    "message": "Ustawienia sieciowe i Realms"
+  },
+  "app.settings.game-options.category.online.label": {
+    "message": "Sieć"
+  },
+  "app.settings.game-options.category.skin-customization.description": {
+    "message": "Warstwy skórki i główna ręka"
+  },
+  "app.settings.game-options.category.skin-customization.label": {
+    "message": "Dostosowywanie skórki"
+  },
+  "app.settings.game-options.category.video.description": {
+    "message": "Ustawienia kamery i wyświetlania"
+  },
+  "app.settings.game-options.category.video.label": {
+    "message": "Grafika"
+  },
+  "app.settings.game-options.choice.all": {
+    "message": "Wszystkie"
+  },
+  "app.settings.game-options.choice.balanced": {
+    "message": "Zrównoważone"
+  },
+  "app.settings.game-options.choice.by-player": {
+    "message": "Blok. części"
+  },
+  "app.settings.game-options.choice.chat": {
+    "message": "Czat"
+  },
+  "app.settings.game-options.choice.commands-only": {
+    "message": "Jedynie polecenia"
+  },
+  "app.settings.game-options.choice.constant": {
+    "message": "Stała"
+  },
+  "app.settings.game-options.choice.crosshair": {
+    "message": "Celownik"
+  },
+  "app.settings.game-options.choice.custom": {
+    "message": "Niestandardowe"
+  },
+  "app.settings.game-options.choice.decreased": {
+    "message": "Ograniczone"
+  },
+  "app.settings.game-options.choice.default": {
+    "message": "Domyślne"
+  },
+  "app.settings.game-options.choice.fabulous": {
+    "message": "Bajeczna!"
+  },
+  "app.settings.game-options.choice.fancy": {
+    "message": "Dokładna"
+  },
+  "app.settings.game-options.choice.far": {
+    "message": "Daleka"
+  },
+  "app.settings.game-options.choice.fast": {
+    "message": "Szybka"
+  },
+  "app.settings.game-options.choice.frequent": {
+    "message": "Wysoka"
+  },
+  "app.settings.game-options.choice.hidden": {
+    "message": "Ukryty"
+  },
+  "app.settings.game-options.choice.hotbar": {
+    "message": "Pasek narzędzi"
+  },
+  "app.settings.game-options.choice.left": {
+    "message": "Lewa"
+  },
+  "app.settings.game-options.choice.limited": {
+    "message": "Ograniczona"
+  },
+  "app.settings.game-options.choice.max-fps": {
+    "message": "Maksymalne FPS"
+  },
+  "app.settings.game-options.choice.maximum": {
+    "message": "Maksimum"
+  },
+  "app.settings.game-options.choice.minimal": {
+    "message": "Minimalne"
+  },
+  "app.settings.game-options.choice.minimum": {
+    "message": "Minimum"
+  },
+  "app.settings.game-options.choice.nearby": {
+    "message": "Blok. całości"
+  },
+  "app.settings.game-options.choice.never": {
+    "message": "Nigdy"
+  },
+  "app.settings.game-options.choice.none": {
+    "message": "Brak"
+  },
+  "app.settings.game-options.choice.normal": {
+    "message": "Normalna"
+  },
+  "app.settings.game-options.choice.off": {
+    "message": "Wył."
+  },
+  "app.settings.game-options.choice.on": {
+    "message": "Wł."
+  },
+  "app.settings.game-options.choice.opengl": {
+    "message": "OpenGL"
+  },
+  "app.settings.game-options.choice.pause": {
+    "message": "Menu pauzy"
+  },
+  "app.settings.game-options.choice.pause-and-toast": {
+    "message": "Menu pauzy i dymki"
+  },
+  "app.settings.game-options.choice.power-saver": {
+    "message": "Oszczędzanie energii"
+  },
+  "app.settings.game-options.choice.right": {
+    "message": "Prawa"
+  },
+  "app.settings.game-options.choice.short": {
+    "message": "Krótka"
+  },
+  "app.settings.game-options.choice.shown": {
+    "message": "Widoczny"
+  },
+  "app.settings.game-options.choice.system": {
+    "message": "System"
+  },
+  "app.settings.game-options.choice.tiny": {
+    "message": "Niewielka"
+  },
+  "app.settings.game-options.choice.vulkan": {
+    "message": "Vulkan"
+  },
+  "app.settings.game-options.choice.when-minimized": {
+    "message": "Po zminimalizowaniu"
+  },
+  "app.settings.game-options.choice.while-afk": {
+    "message": "Podczas bezczynności"
+  },
+  "app.settings.game-options.compatibility.none": {
+    "message": "Niektóre instancje nie obsługują tego ustawienia"
+  },
+  "app.settings.game-options.compatibility.reason.launcher-controlled": {
+    "message": "Tym ustawieniem zarządzają opcje uruchamiania Modrinth."
+  },
+  "app.settings.game-options.custom-value.placeholder": {
+    "message": "Wpisz wartość"
+  },
+  "app.settings.game-options.keybind.assigned-status": {
+    "message": "Do ustawienia {setting} przypisano teraz {binding}."
+  },
+  "app.settings.game-options.keybind.cancelled-status": {
+    "message": "Anulowano zmianę przypisania klawisza."
+  },
+  "app.settings.game-options.keybind.change": {
+    "message": "{setting}: {binding}. Aktywuj, aby zmienić przypisanie."
+  },
+  "app.settings.game-options.keybind.choose": {
+    "message": "Wybierz klawisz"
+  },
+  "app.settings.game-options.keybind.conflict-description": {
+    "message": "To przypisanie jest już używane przez: {settings}."
+  },
+  "app.settings.game-options.keybind.key.arrow-down": {
+    "message": "Strzałka w dół"
+  },
+  "app.settings.game-options.keybind.key.arrow-left": {
+    "message": "Strzałka w lewo"
+  },
+  "app.settings.game-options.keybind.key.arrow-right": {
+    "message": "Strzałka w prawo"
+  },
+  "app.settings.game-options.keybind.key.arrow-up": {
+    "message": "Strzałka w górę"
+  },
+  "app.settings.game-options.keybind.key.backspace": {
+    "message": "Backspace"
+  },
+  "app.settings.game-options.keybind.key.caps-lock": {
+    "message": "Caps Lock"
+  },
+  "app.settings.game-options.keybind.key.delete": {
+    "message": "Delete"
+  },
+  "app.settings.game-options.keybind.key.end": {
+    "message": "End"
+  },
+  "app.settings.game-options.keybind.key.enter": {
+    "message": "Enter"
+  },
+  "app.settings.game-options.keybind.key.escape": {
+    "message": "Escape"
+  },
+  "app.settings.game-options.keybind.key.home": {
+    "message": "Home"
+  },
+  "app.settings.game-options.keybind.key.insert": {
+    "message": "Insert"
+  },
+  "app.settings.game-options.keybind.key.keypad-key": {
+    "message": "Klawisz numeryczny {key}"
+  },
+  "app.settings.game-options.keybind.key.left-alt": {
+    "message": "Lewy Alt"
+  },
+  "app.settings.game-options.keybind.key.left-command": {
+    "message": "Lewy klawisz Command"
+  },
+  "app.settings.game-options.keybind.key.left-control": {
+    "message": "Lewy Ctrl"
+  },
+  "app.settings.game-options.keybind.key.left-shift": {
+    "message": "Lewy Shift"
+  },
+  "app.settings.game-options.keybind.key.left-super": {
+    "message": "Lewy Super"
+  },
+  "app.settings.game-options.keybind.key.menu": {
+    "message": "Menu"
+  },
+  "app.settings.game-options.keybind.key.num-lock": {
+    "message": "Num Lock"
+  },
+  "app.settings.game-options.keybind.key.page-down": {
+    "message": "Page Down"
+  },
+  "app.settings.game-options.keybind.key.page-up": {
+    "message": "Page Up"
+  },
+  "app.settings.game-options.keybind.key.pause": {
+    "message": "Pause"
+  },
+  "app.settings.game-options.keybind.key.print-screen": {
+    "message": "Print Screen"
+  },
+  "app.settings.game-options.keybind.key.right-alt": {
+    "message": "Prawy Alt"
+  },
+  "app.settings.game-options.keybind.key.right-command": {
+    "message": "Prawy klawisz Command"
+  },
+  "app.settings.game-options.keybind.key.right-control": {
+    "message": "Prawy Ctrl"
+  },
+  "app.settings.game-options.keybind.key.right-shift": {
+    "message": "Prawy Shift"
+  },
+  "app.settings.game-options.keybind.key.right-super": {
+    "message": "Prawy Super"
+  },
+  "app.settings.game-options.keybind.key.scroll-lock": {
+    "message": "Scroll Lock"
+  },
+  "app.settings.game-options.keybind.key.space": {
+    "message": "Spacja"
+  },
+  "app.settings.game-options.keybind.key.tab": {
+    "message": "Tab"
+  },
+  "app.settings.game-options.keybind.key.unbound": {
+    "message": "Nieprzypisany"
+  },
+  "app.settings.game-options.keybind.key.unknown": {
+    "message": "Nieznany klawisz"
+  },
+  "app.settings.game-options.keybind.listen": {
+    "message": "Naciśnij klawisz…"
+  },
+  "app.settings.game-options.keybind.listening-status": {
+    "message": "Oczekiwanie na klawisz lub przycisk myszy. Naciśnij Escape, aby usunąć to przypisanie."
+  },
+  "app.settings.game-options.keybind.mixed": {
+    "message": "Różne w poszczególnych instancjach"
+  },
+  "app.settings.game-options.keybind.modifier.alt": {
+    "message": "Alt"
+  },
+  "app.settings.game-options.keybind.modifier.command": {
+    "message": "Command"
+  },
+  "app.settings.game-options.keybind.modifier.control": {
+    "message": "Ctrl"
+  },
+  "app.settings.game-options.keybind.modifier.shift": {
+    "message": "Shift"
+  },
+  "app.settings.game-options.keybind.modifier.super": {
+    "message": "Super"
+  },
+  "app.settings.game-options.keybind.mouse.button": {
+    "message": "Przycisk myszy {button}"
+  },
+  "app.settings.game-options.keybind.mouse.left": {
+    "message": "Lewy przycisk myszy"
+  },
+  "app.settings.game-options.keybind.mouse.middle": {
+    "message": "Środkowy przycisk myszy"
+  },
+  "app.settings.game-options.keybind.mouse.right": {
+    "message": "Prawy przycisk myszy"
+  },
+  "app.settings.game-options.keybind.recording-label": {
+    "message": "{setting}: oczekiwanie na klawisz lub przycisk myszy. Naciśnij Escape, aby usunąć to przypisanie."
+  },
+  "app.settings.game-options.keybind.scancode": {
+    "message": "Kod skanowania {code}"
+  },
+  "app.settings.game-options.keybind.unsupported-status": {
+    "message": "Minecraft nie obsługuje tego przycisku. Naciśnij inny klawisz."
+  },
+  "app.settings.game-options.setting.advanced-opengl.label": {
+    "message": "Zaawansowany OpenGL"
+  },
+  "app.settings.game-options.setting.allow-cursor-changes.label": {
+    "message": "Zezwalaj na zmiany kursora"
+  },
+  "app.settings.game-options.setting.allow-server-listing.description": {
+    "message": "Zezwalaj na wyświetlanie nazwy gracza na listach graczy udostępnianych przez serwery."
+  },
+  "app.settings.game-options.setting.allow-server-listing.label": {
+    "message": "Pokazuj na listach"
+  },
+  "app.settings.game-options.setting.alternate-blocks.label": {
+    "message": "Alternatywne bloki"
+  },
+  "app.settings.game-options.setting.ambient-occlusion.label": {
+    "message": "Gładkie oświetlenie"
+  },
+  "app.settings.game-options.setting.ambient-volume.label": {
+    "message": "Otoczenie/środowisko"
+  },
+  "app.settings.game-options.setting.anaglyph-3d.label": {
+    "message": "Anaglifowe 3D"
+  },
+  "app.settings.game-options.setting.anisotropic-filtering.label": {
+    "message": "Filtrowanie anizotropowe"
+  },
+  "app.settings.game-options.setting.anisotropy.label": {
+    "message": "Anizotropia"
+  },
+  "app.settings.game-options.setting.attack-indicator.label": {
+    "message": "Wskaźnik ataku"
+  },
+  "app.settings.game-options.setting.auto-jump.description": {
+    "message": "Automatycznie wskakuj na przeszkody o wysokości jednego bloku."
+  },
+  "app.settings.game-options.setting.auto-jump.label": {
+    "message": "Automatyczne skakanie"
+  },
+  "app.settings.game-options.setting.auto-suggestions.label": {
+    "message": "Sugestie poleceń"
+  },
+  "app.settings.game-options.setting.autosave-indicator.label": {
+    "message": "Wskaźnik autozapisu"
+  },
+  "app.settings.game-options.setting.biome-blend-radius.description": {
+    "message": "Odległość, na której kolory biomów płynnie przechodzą jeden w drugi."
+  },
+  "app.settings.game-options.setting.biome-blend-radius.label": {
+    "message": "Przenikanie biomów"
+  },
+  "app.settings.game-options.setting.blocks-volume.label": {
+    "message": "Bloki"
+  },
+  "app.settings.game-options.setting.brightness.label": {
+    "message": "Jasność"
+  },
+  "app.settings.game-options.setting.cape.description": {
+    "message": "Pokazuj pelerynę gracza, w tym jej teksturę elytr."
+  },
+  "app.settings.game-options.setting.cape.label": {
+    "message": "Peleryna"
+  },
+  "app.settings.game-options.setting.chat-background-only.label": {
+    "message": "Tło tylko na czacie"
+  },
+  "app.settings.game-options.setting.chat-colors.label": {
+    "message": "Kolory czatu"
+  },
+  "app.settings.game-options.setting.chat-delay.label": {
+    "message": "Opóźnienie czatu"
+  },
+  "app.settings.game-options.setting.chat-line-spacing.label": {
+    "message": "Interlinia czatu"
+  },
+  "app.settings.game-options.setting.chat-links-prompt.description": {
+    "message": "Pytaj przed otwarciem odnośnika z czatu."
+  },
+  "app.settings.game-options.setting.chat-links-prompt.label": {
+    "message": "Ostrzegaj przy otwieraniu linków"
+  },
+  "app.settings.game-options.setting.chat-links.description": {
+    "message": "Zezwalaj na otwieranie odnośników do stron z czatu."
+  },
+  "app.settings.game-options.setting.chat-links.label": {
+    "message": "Odnośniki do stron"
+  },
+  "app.settings.game-options.setting.chat-opacity.description": {
+    "message": "Określa, jak nieprzezroczysty jest tekst czatu."
+  },
+  "app.settings.game-options.setting.chat-opacity.label": {
+    "message": "Przezroczystość tekstu czatu"
+  },
+  "app.settings.game-options.setting.chat-preview.label": {
+    "message": "Podgląd czatu"
+  },
+  "app.settings.game-options.setting.chat-scale.label": {
+    "message": "Rozmiar tekstu czatu"
+  },
+  "app.settings.game-options.setting.chat-visibility.label": {
+    "message": "Widoczność czatu"
+  },
+  "app.settings.game-options.setting.chat-width.label": {
+    "message": "Szerokość czatu"
+  },
+  "app.settings.game-options.setting.chunk-fade-time.label": {
+    "message": "Czas pojawiania się chunków"
+  },
+  "app.settings.game-options.setting.cloud-range.label": {
+    "message": "Odległość chmur"
+  },
+  "app.settings.game-options.setting.clouds.label": {
+    "message": "Chmury"
+  },
+  "app.settings.game-options.setting.ctrl-click-right-click.label": {
+    "message": "Emulacja prawego przycisku myszy"
+  },
+  "app.settings.game-options.setting.cutout-leaves.label": {
+    "message": "Prześwitujące liście"
+  },
+  "app.settings.game-options.setting.damage-tilt.label": {
+    "message": "Zadrżenie od obrażeń"
+  },
+  "app.settings.game-options.setting.dark-splash.description": {
+    "message": "Zmień kolor ekranu ładowania Mojang Studios z czerwonego na czarny."
+  },
+  "app.settings.game-options.setting.dark-splash.label": {
+    "message": "Czarno-białe logo"
+  },
+  "app.settings.game-options.setting.darkness-pulsing.label": {
+    "message": "Miganie mroku"
+  },
+  "app.settings.game-options.setting.debug-gui-scale.label": {
+    "message": "Wielkość interfejsu debugowania"
+  },
+  "app.settings.game-options.setting.directional-audio.label": {
+    "message": "Dźwięk przestrzenny"
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.description": {
+    "message": "Traktuj każdy sygnał kółka myszy jako pojedynczy krok przewijania."
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.label": {
+    "message": "Przewijanie zrównoważone"
+  },
+  "app.settings.game-options.setting.entity-distance.label": {
+    "message": "Odległość renderowania bytów"
+  },
+  "app.settings.game-options.setting.entity-shadows.label": {
+    "message": "Cienie bytów"
+  },
+  "app.settings.game-options.setting.exclusive-fullscreen.label": {
+    "message": "Pełny ekran na wyłączność"
+  },
+  "app.settings.game-options.setting.extra-telemetry.label": {
+    "message": "Opcjonalna telemetria"
+  },
+  "app.settings.game-options.setting.focused-chat-height.label": {
+    "message": "Wysokość aktywnego czatu"
+  },
+  "app.settings.game-options.setting.force-unicode-font.label": {
+    "message": "Czcionka unikodowa"
+  },
+  "app.settings.game-options.setting.fov-effects.label": {
+    "message": "Efekty pola widzenia"
+  },
+  "app.settings.game-options.setting.fov.label": {
+    "message": "Pole widzenia"
+  },
+  "app.settings.game-options.setting.fullscreen.label": {
+    "message": "Pełny ekran"
+  },
+  "app.settings.game-options.setting.glint-speed.label": {
+    "message": "Prędkość poświaty"
+  },
+  "app.settings.game-options.setting.glint-strength.label": {
+    "message": "Siła poświaty"
+  },
+  "app.settings.game-options.setting.graphics-backend.label": {
+    "message": "API graficzne"
+  },
+  "app.settings.game-options.setting.graphics.description": {
+    "message": "Określa jakość obrazu i wydajność."
+  },
+  "app.settings.game-options.setting.graphics.label": {
+    "message": "Jakość grafiki"
+  },
+  "app.settings.game-options.setting.gui-scale.description": {
+    "message": "Rozmiar interfejsu gry i elementów HUD."
+  },
+  "app.settings.game-options.setting.gui-scale.label": {
+    "message": "Wielkość interfejsu"
+  },
+  "app.settings.game-options.setting.hat.description": {
+    "message": "Pokazuj warstwę skórki z nakryciem głowy."
+  },
+  "app.settings.game-options.setting.hat.label": {
+    "message": "Nakrycie głowy"
+  },
+  "app.settings.game-options.setting.held-item-tooltips.label": {
+    "message": "Etykiety trzymanych przedmiotów"
+  },
+  "app.settings.game-options.setting.hide-lightning-flashes.label": {
+    "message": "Wyłącz rozbłyski nieba"
+  },
+  "app.settings.game-options.setting.hide-matched-names.label": {
+    "message": "Ukryj według nazwy"
+  },
+  "app.settings.game-options.setting.hide-server-address.label": {
+    "message": "Ukryj adres serwera"
+  },
+  "app.settings.game-options.setting.hide-splash-texts.label": {
+    "message": "Ukryj przytytuły"
+  },
+  "app.settings.game-options.setting.high-contrast-outline.label": {
+    "message": "Kontrastowe obrysy bloków"
+  },
+  "app.settings.game-options.setting.high-contrast.description": {
+    "message": "Zwiększ kontrast elementów interfejsu."
+  },
+  "app.settings.game-options.setting.high-contrast.label": {
+    "message": "Wysoki kontrast"
+  },
+  "app.settings.game-options.setting.hostile-volume.label": {
+    "message": "Wrogie stworzenia"
+  },
+  "app.settings.game-options.setting.improved-transparency.label": {
+    "message": "Ulepszona przejrzystość"
+  },
+  "app.settings.game-options.setting.in-game-notifications.label": {
+    "message": "Powiadomienia w grze"
+  },
+  "app.settings.game-options.setting.inactivity-framerate-limit.label": {
+    "message": "Zmniejszanie liczby FPS"
+  },
+  "app.settings.game-options.setting.invert-horizontal-mouse.label": {
+    "message": "Odwróć oś myszy w poziomie"
+  },
+  "app.settings.game-options.setting.invert-mouse.description": {
+    "message": "Odwróć kierunek pionowego ruchu myszy."
+  },
+  "app.settings.game-options.setting.invert-mouse.label": {
+    "message": "Odwróć oś myszy"
+  },
+  "app.settings.game-options.setting.jacket.description": {
+    "message": "Pokazuj warstwę skórki z kurtką."
+  },
+  "app.settings.game-options.setting.jacket.label": {
+    "message": "Kurtka"
+  },
+  "app.settings.game-options.setting.japanese-glyph-variants.label": {
+    "message": "Japońskie warianty glifów"
+  },
+  "app.settings.game-options.setting.key-advancements.label": {
+    "message": "Postępy"
+  },
+  "app.settings.game-options.setting.key-attack.label": {
+    "message": "Atakuj/niszcz"
+  },
+  "app.settings.game-options.setting.key-back.label": {
+    "message": "Idź do tyłu"
+  },
+  "app.settings.game-options.setting.key-chat.label": {
+    "message": "Otwórz czat"
+  },
+  "app.settings.game-options.setting.key-command.label": {
+    "message": "Wpisywanie polecenia"
+  },
+  "app.settings.game-options.setting.key-debug-advanced-tooltips.label": {
+    "message": "Pokaż zaawansowane etykiety"
+  },
+  "app.settings.game-options.setting.key-debug-chunk-borders.label": {
+    "message": "Pokaż granice chunków"
+  },
+  "app.settings.game-options.setting.key-debug-clear-chat.label": {
+    "message": "Wyczyść czat"
+  },
+  "app.settings.game-options.setting.key-debug-copy-location.label": {
+    "message": "Kopiuj lokalizację"
+  },
+  "app.settings.game-options.setting.key-debug-copy-recreate-command.label": {
+    "message": "Kopiuj dane"
+  },
+  "app.settings.game-options.setting.key-debug-crash.label": {
+    "message": "Awaria dla debugowania"
+  },
+  "app.settings.game-options.setting.key-debug-dump-dynamic-textures.label": {
+    "message": "Utwórz zrzut dynamicznych tekstur"
+  },
+  "app.settings.game-options.setting.key-debug-dump-version.label": {
+    "message": "Zrzuć informacje o wersji"
+  },
+  "app.settings.game-options.setting.key-debug-focus-pause.label": {
+    "message": "Przełącz pauzę po opuszczeniu okna gry"
+  },
+  "app.settings.game-options.setting.key-debug-fps-charts.label": {
+    "message": "Wykresy FPS"
+  },
+  "app.settings.game-options.setting.key-debug-hitboxes.label": {
+    "message": "Pokaż hitboxy"
+  },
+  "app.settings.game-options.setting.key-debug-improved-transparency.label": {
+    "message": "Przełącz ulepszoną przejrzystość"
+  },
+  "app.settings.game-options.setting.key-debug-lightmap-texture.label": {
+    "message": "Tekstura mapy świateł"
+  },
+  "app.settings.game-options.setting.key-debug-modifier.label": {
+    "message": "Klawisz modyfikatora debugowania"
+  },
+  "app.settings.game-options.setting.key-debug-network-charts.label": {
+    "message": "Wykresy sieciowe"
+  },
+  "app.settings.game-options.setting.key-debug-options.label": {
+    "message": "Opcje debugowania"
+  },
+  "app.settings.game-options.setting.key-debug-overlay.label": {
+    "message": "Przełącz nakładkę"
+  },
+  "app.settings.game-options.setting.key-debug-profiling-chart.label": {
+    "message": "Wykres profilowania"
+  },
+  "app.settings.game-options.setting.key-debug-profiling.label": {
+    "message": "Uruchom/zatrzymaj profilowanie"
+  },
+  "app.settings.game-options.setting.key-debug-reload-chunks.label": {
+    "message": "Przeładuj chunki"
+  },
+  "app.settings.game-options.setting.key-debug-reload-resource-packs.label": {
+    "message": "Przeładuj paczki zasobów"
+  },
+  "app.settings.game-options.setting.key-debug-spectate.label": {
+    "message": "Przełącz tryb widza"
+  },
+  "app.settings.game-options.setting.key-debug-switch-game-mode.label": {
+    "message": "Przełącznik trybu gry"
+  },
+  "app.settings.game-options.setting.key-drop.label": {
+    "message": "Upuść wybrany przedmiot"
+  },
+  "app.settings.game-options.setting.key-forward.label": {
+    "message": "Idź do przodu"
+  },
+  "app.settings.game-options.setting.key-friends.label": {
+    "message": "Panel znajomych"
+  },
+  "app.settings.game-options.setting.key-fullscreen.label": {
+    "message": "Przełącz na pełny ekran"
+  },
+  "app.settings.game-options.setting.key-hotbar-1.label": {
+    "message": "Pole 1 paska szybkiego wyboru"
+  },
+  "app.settings.game-options.setting.key-hotbar-2.label": {
+    "message": "Pole 2 paska szybkiego wyboru"
+  },
+  "app.settings.game-options.setting.key-hotbar-3.label": {
+    "message": "Pole 3 paska szybkiego wyboru"
+  },
+  "app.settings.game-options.setting.key-hotbar-4.label": {
+    "message": "Pole 4 paska szybkiego wyboru"
+  },
+  "app.settings.game-options.setting.key-hotbar-5.label": {
+    "message": "Pole 5 paska szybkiego wyboru"
+  },
+  "app.settings.game-options.setting.key-hotbar-6.label": {
+    "message": "Pole 6 paska szybkiego wyboru"
+  },
+  "app.settings.game-options.setting.key-hotbar-7.label": {
+    "message": "Pole 7 paska szybkiego wyboru"
+  },
+  "app.settings.game-options.setting.key-hotbar-8.label": {
+    "message": "Pole 8 paska szybkiego wyboru"
+  },
+  "app.settings.game-options.setting.key-hotbar-9.label": {
+    "message": "Pole 9 paska szybkiego wyboru"
+  },
+  "app.settings.game-options.setting.key-inventory.label": {
+    "message": "Otwórz/Zamknij ekwipunek"
+  },
+  "app.settings.game-options.setting.key-jump.label": {
+    "message": "Skok"
+  },
+  "app.settings.game-options.setting.key-left.label": {
+    "message": "Idź w lewo"
+  },
+  "app.settings.game-options.setting.key-load-toolbar.label": {
+    "message": "Załaduj pasek szybkiego wyboru"
+  },
+  "app.settings.game-options.setting.key-perspective.label": {
+    "message": "Przełącz perspektywę"
+  },
+  "app.settings.game-options.setting.key-pick-item.label": {
+    "message": "Wybierz blok"
+  },
+  "app.settings.game-options.setting.key-player-list.label": {
+    "message": "Lista graczy"
+  },
+  "app.settings.game-options.setting.key-quick-actions.label": {
+    "message": "Szybkie akcje"
+  },
+  "app.settings.game-options.setting.key-right.label": {
+    "message": "Idź w prawo"
+  },
+  "app.settings.game-options.setting.key-save-toolbar.label": {
+    "message": "Zapisz pasek szybkiego wyboru"
+  },
+  "app.settings.game-options.setting.key-screenshot.label": {
+    "message": "Zrób zrzut ekranu"
+  },
+  "app.settings.game-options.setting.key-smooth-camera.label": {
+    "message": "Przełącz tryb kamery filmowej"
+  },
+  "app.settings.game-options.setting.key-sneak.label": {
+    "message": "Skradanie się"
+  },
+  "app.settings.game-options.setting.key-social-interactions.label": {
+    "message": "Ekran interakcji społecznych"
+  },
+  "app.settings.game-options.setting.key-spectator-hotbar.label": {
+    "message": "Wybierz na pasku szybkiego wyboru"
+  },
+  "app.settings.game-options.setting.key-spectator-outlines.label": {
+    "message": "Podświetlaj graczy"
+  },
+  "app.settings.game-options.setting.key-sprint.label": {
+    "message": "Bieg"
+  },
+  "app.settings.game-options.setting.key-swap-offhand.label": {
+    "message": "Przerzuć przedmiot do drugiej ręki"
+  },
+  "app.settings.game-options.setting.key-toggle-gui.label": {
+    "message": "Przełącz interfejs graficzny"
+  },
+  "app.settings.game-options.setting.key-toggle-spectator-shader.label": {
+    "message": "Przełącz efekty shaderów widza"
+  },
+  "app.settings.game-options.setting.key-use.label": {
+    "message": "Użyj przedmiotu/umieść blok"
+  },
+  "app.settings.game-options.setting.language.label": {
+    "message": "Język"
+  },
+  "app.settings.game-options.setting.left-pants-leg.label": {
+    "message": "Lewa nogawka"
+  },
+  "app.settings.game-options.setting.left-sleeve.label": {
+    "message": "Lewy rękaw"
+  },
+  "app.settings.game-options.setting.legacy-framerate-limit.label": {
+    "message": "Limit liczby FPS"
+  },
+  "app.settings.game-options.setting.legacy-view-distance.label": {
+    "message": "Odległość renderowania"
+  },
+  "app.settings.game-options.setting.mac-fullscreen-menu.label": {
+    "message": "Pokazuj menu macOS na pełnym ekranie"
+  },
+  "app.settings.game-options.setting.main-hand.description": {
+    "message": "Wybierz, czy główną ręką ma być lewa, czy prawa."
+  },
+  "app.settings.game-options.setting.main-hand.label": {
+    "message": "Główna ręka"
+  },
+  "app.settings.game-options.setting.master-volume.label": {
+    "message": "Ogólny poziom głośności"
+  },
+  "app.settings.game-options.setting.max-framerate.label": {
+    "message": "Maksymalne FPS"
+  },
+  "app.settings.game-options.setting.menu-background-blur.label": {
+    "message": "Rozmycie tła w menu"
+  },
+  "app.settings.game-options.setting.mipmap-levels.description": {
+    "message": "Wygładzanie tekstur oglądanych z daleka."
+  },
+  "app.settings.game-options.setting.mipmap-levels.label": {
+    "message": "Poziomy mipmappingu"
+  },
+  "app.settings.game-options.setting.mouse-wheel-sensitivity.label": {
+    "message": "Czułość przewijania"
+  },
+  "app.settings.game-options.setting.music-frequency.label": {
+    "message": "Częstość muzyki"
+  },
+  "app.settings.game-options.setting.music-toast.description": {
+    "message": "Wybierz, czy tytuły utworów mają być wyświetlane w menu pauzy i w dymkach."
+  },
+  "app.settings.game-options.setting.music-toast.label": {
+    "message": "Dymek muzyczny"
+  },
+  "app.settings.game-options.setting.music-volume.label": {
+    "message": "Muzyka"
+  },
+  "app.settings.game-options.setting.narrator-hotkey.label": {
+    "message": "Klawisz skrótu narratora"
+  },
+  "app.settings.game-options.setting.narrator.description": {
+    "message": "Wybierz, co odczytuje narrator."
+  },
+  "app.settings.game-options.setting.narrator.label": {
+    "message": "Narrator"
+  },
+  "app.settings.game-options.setting.neutral-volume.label": {
+    "message": "Przyjazne stworzenia"
+  },
+  "app.settings.game-options.setting.notification-time.description": {
+    "message": "Czas, przez jaki dymki powiadomień pozostają widoczne."
+  },
+  "app.settings.game-options.setting.notification-time.label": {
+    "message": "Czas wyświetlania powiadomień"
+  },
+  "app.settings.game-options.setting.operator-items-tab.label": {
+    "message": "Przybory operatora"
+  },
+  "app.settings.game-options.setting.panorama-speed.label": {
+    "message": "Prędkość obrotu panoramy"
+  },
+  "app.settings.game-options.setting.particles.label": {
+    "message": "Cząstki"
+  },
+  "app.settings.game-options.setting.players-volume.label": {
+    "message": "Gracze"
+  },
+  "app.settings.game-options.setting.prioritize-chunk-updates.label": {
+    "message": "Kreator chunków"
+  },
+  "app.settings.game-options.setting.quit-shortcuts.label": {
+    "message": "Skróty szybkiego zamykania"
+  },
+  "app.settings.game-options.setting.raw-mouse-input.label": {
+    "message": "Bezpośredni odczyt myszy"
+  },
+  "app.settings.game-options.setting.realms-notifications.label": {
+    "message": "Nowości i zaproszenia Realms"
+  },
+  "app.settings.game-options.setting.record-volume.label": {
+    "message": "Szafy grające/bloki dźwiękowe"
+  },
+  "app.settings.game-options.setting.reduced-debug-info.label": {
+    "message": "Ograniczone informacje o debugowaniu"
+  },
+  "app.settings.game-options.setting.render-distance.label": {
+    "message": "Zasięg renderowania"
+  },
+  "app.settings.game-options.setting.right-pants-leg.label": {
+    "message": "Prawa nogawka"
+  },
+  "app.settings.game-options.setting.right-sleeve.label": {
+    "message": "Prawy rękaw"
+  },
+  "app.settings.game-options.setting.rotate-with-minecart.label": {
+    "message": "Obrót z wagonikiem"
+  },
+  "app.settings.game-options.setting.save-chat-drafts.label": {
+    "message": "Zapisuj niewysłane wiadomości"
+  },
+  "app.settings.game-options.setting.screen-effects.label": {
+    "message": "Efekty zniekształcenia"
+  },
+  "app.settings.game-options.setting.secure-chat-only.label": {
+    "message": "Tylko bezpieczny czat"
+  },
+  "app.settings.game-options.setting.sensitivity.label": {
+    "message": "Czułość myszy"
+  },
+  "app.settings.game-options.setting.server-textures.label": {
+    "message": "Tekstury serwera"
+  },
+  "app.settings.game-options.setting.share-presence.label": {
+    "message": "Widoczność"
+  },
+  "app.settings.game-options.setting.simulation-distance.description": {
+    "message": "Odległość, w której aktualizowane są byty oraz przetwarzane są tiki bloków i płynów."
+  },
+  "app.settings.game-options.setting.simulation-distance.label": {
+    "message": "Zasięg symulacji"
+  },
+  "app.settings.game-options.setting.snooper.label": {
+    "message": "Snooper"
+  },
+  "app.settings.game-options.setting.sprint-window.label": {
+    "message": "Interwał biegu"
+  },
+  "app.settings.game-options.setting.subtitles.description": {
+    "message": "Pokazuj napisy opisujące dźwięki odtwarzane w grze."
+  },
+  "app.settings.game-options.setting.subtitles.label": {
+    "message": "Napisy"
+  },
+  "app.settings.game-options.setting.text-background-opacity.label": {
+    "message": "Nieprzezroczystość tła tekstu"
+  },
+  "app.settings.game-options.setting.texture-filtering.label": {
+    "message": "Filtrowanie tekstur"
+  },
+  "app.settings.game-options.setting.toggle-attack.label": {
+    "message": "Przełączanie ataku"
+  },
+  "app.settings.game-options.setting.toggle-crouch.description": {
+    "message": "Naciśnij raz, aby skradać się bez przytrzymywania klawisza."
+  },
+  "app.settings.game-options.setting.toggle-crouch.label": {
+    "message": "Przełączanie skradania się"
+  },
+  "app.settings.game-options.setting.toggle-sprint.description": {
+    "message": "Naciśnij raz, aby biec bez przytrzymywania klawisza."
+  },
+  "app.settings.game-options.setting.toggle-sprint.label": {
+    "message": "Przełączanie biegu"
+  },
+  "app.settings.game-options.setting.toggle-use.label": {
+    "message": "Przełączanie używania"
+  },
+  "app.settings.game-options.setting.touchscreen.label": {
+    "message": "Tryb ekranu dotykowego"
+  },
+  "app.settings.game-options.setting.ui-volume.label": {
+    "message": "Interfejs"
+  },
+  "app.settings.game-options.setting.unfocused-chat-height.label": {
+    "message": "Wysokość nieaktywnego czatu"
+  },
+  "app.settings.game-options.setting.use-vbo.label": {
+    "message": "Używaj VBO"
+  },
+  "app.settings.game-options.setting.view-bobbing.description": {
+    "message": "Dodaj kołysanie kamery podczas chodzenia."
+  },
+  "app.settings.game-options.setting.view-bobbing.label": {
+    "message": "Animacja chodzenia"
+  },
+  "app.settings.game-options.setting.vignette.label": {
+    "message": "Winieta"
+  },
+  "app.settings.game-options.setting.voice-volume.label": {
+    "message": "Narrator/Głos"
+  },
+  "app.settings.game-options.setting.vsync.description": {
+    "message": "Ogranicz liczbę klatek na sekundę do częstotliwości odświeżania ekranu, aby zapobiec rozrywaniu obrazu."
+  },
+  "app.settings.game-options.setting.vsync.label": {
+    "message": "Synchronizacja pionowa"
+  },
+  "app.settings.game-options.setting.weather-radius.label": {
+    "message": "Promień efektów pogodowych"
+  },
+  "app.settings.game-options.setting.weather-volume.label": {
+    "message": "Pogoda"
+  },
+  "app.settings.game-options.validation.changed-since-opened": {
+    "message": "To ustawienie zmieniono w innym miejscu. Sprawdź je i spróbuj ponownie."
+  },
+  "app.settings.game-options.validation.invalid-value": {
+    "message": "Wybierz prawidłową wartość."
+  },
+  "app.settings.game-options.validation.missing-value": {
+    "message": "Najpierw wybierz wartość."
+  },
+  "app.settings.game-options.validation.no-compatible-instances": {
+    "message": "Niektóre instancje nie obsługują tego ustawienia"
+  },
   "app.settings.java-installations.location.title": {
     "message": "Ścieżka do Java {version, number}"
   },
@@ -1599,16 +2715,49 @@
     "message": "Instancje"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
-    "message": "Wybierz instancję, której historia komend stanie się współdzieloną kopią."
+    "message": "Wybierz instancję, z której zostanie skopiowana historia poleceń. Posłuży ona jako punkt wyjścia do synchronizacji. Później możesz ją edytować w dowolnej instancji."
+  },
+  "app.settings.synced-options.choose-sync-source.command-history-title": {
+    "message": "Wybierz źródło historii poleceń"
   },
   "app.settings.synced-options.choose-sync-source.creative-hotbars-description": {
-    "message": "Wybierz instancję, której zapisane kreatywne paski dostępu staną się udostępnioną kopią."
+    "message": "Wybierz instancję, z której zostaną skopiowane zapisane paski szybkiego wyboru trybu kreatywnego. Posłużą one jako punkt wyjścia do synchronizacji. Później możesz je edytować w dowolnej instancji."
+  },
+  "app.settings.synced-options.choose-sync-source.creative-hotbars-title": {
+    "message": "Wybierz źródło pasków szybkiego wyboru trybu kreatywnego"
+  },
+  "app.settings.synced-options.choose-sync-source.data-packs-title": {
+    "message": "Wybierz źródło paczek danych"
+  },
+  "app.settings.synced-options.choose-sync-source.game-settings-description": {
+    "message": "Wybierz instancję, z której zostaną skopiowane ustawienia gry. Posłużą one jako punkt wyjścia do synchronizacji. Później możesz je edytować w dowolnej instancji."
+  },
+  "app.settings.synced-options.choose-sync-source.game-settings-title": {
+    "message": "Wybierz źródło ustawień gry"
+  },
+  "app.settings.synced-options.choose-sync-source.ineligible": {
+    "message": "Nie można wybrać tej instancji jako źródła synchronizacji"
+  },
+  "app.settings.synced-options.choose-sync-source.load-error": {
+    "message": "Nie udało się wczytać źródeł synchronizacji. Spróbuj ponownie."
   },
   "app.settings.synced-options.choose-sync-source.multiplayer-servers-description": {
-    "message": "Wybierz instancję, której serwery wieloosobowe staną się współdzieloną kopią."
+    "message": "Wybierz instancję, z której zostanie skopiowana lista serwerów trybu wieloosobowego. Posłuży ona jako punkt wyjścia do synchronizacji. Później możesz ją edytować w dowolnej instancji."
+  },
+  "app.settings.synced-options.choose-sync-source.multiplayer-servers-title": {
+    "message": "Wybierz źródło serwerów trybu wieloosobowego"
   },
   "app.settings.synced-options.choose-sync-source.no-instances-found": {
     "message": "Nie znaleziono żadnych instancji"
+  },
+  "app.settings.synced-options.choose-sync-source.resource-packs-title": {
+    "message": "Wybierz źródło paczek zasobów"
+  },
+  "app.settings.synced-options.choose-sync-source.retry": {
+    "message": "Spróbuj ponownie"
+  },
+  "app.settings.synced-options.choose-sync-source.search-placeholder": {
+    "message": "Wyszukaj instancję"
   },
   "app.settings.synced-options.choose-sync-source.sync": {
     "message": "Synchronizuj"
@@ -1625,11 +2774,119 @@
   "app.settings.synced-options.creative-hotbars": {
     "message": "Zsynchronizuj zapisane paski szybkiego wyboru trybu kreatywnego"
   },
+  "app.settings.synced-options.creative-hotbars.description": {
+    "message": "Używaj tych samych zapisanych pasków szybkiego wyboru trybu kreatywnego we wszystkich instancjach."
+  },
+  "app.settings.synced-options.data-packs": {
+    "message": "Synchronizuj paczki danych"
+  },
+  "app.settings.synced-options.data-packs.description": {
+    "message": "Używaj tych samych paczek danych we wszystkich instancjach"
+  },
+  "app.settings.synced-options.data-packs.none-synced-yet": {
+    "message": "Żadne paczki danych nie są jeszcze synchronizowane"
+  },
+  "app.settings.synced-options.edit.no-instances": {
+    "message": "Dodaj instancję, aby móc edytować synchronizowane dane."
+  },
+  "app.settings.synced-options.edit.no-synced-data": {
+    "message": "Wybierz źródło synchronizacji, aby móc edytować to ustawienie."
+  },
+  "app.settings.synced-options.game-settings": {
+    "message": "Synchronizuj ustawienia gry"
+  },
+  "app.settings.synced-options.game-settings.button": {
+    "message": "Edytuj ustawienia gry"
+  },
+  "app.settings.synced-options.game-settings.conflict-text": {
+    "message": "Wczytano najnowsze ustawienia. Sprawdź swoje zmiany i zapisz je ponownie."
+  },
+  "app.settings.synced-options.game-settings.conflict-title": {
+    "message": "Te ustawienia zmieniono w innym miejscu"
+  },
+  "app.settings.synced-options.game-settings.custom-empty": {
+    "message": "Ustawienia dodane przez mody pojawią się tutaj, gdy Modrinth znajdzie je w jednej z twoich instancji."
+  },
+  "app.settings.synced-options.game-settings.description": {
+    "message": "Używaj tych samych ustawień gry we wszystkich instancjach."
+  },
+  "app.settings.synced-options.game-settings.disable-all": {
+    "message": "Wyłącz synchronizację wszystkich"
+  },
+  "app.settings.synced-options.game-settings.disabled-tooltip": {
+    "message": "Włącz synchronizację ustawień gry, aby móc wybrać poszczególne ustawienia."
+  },
+  "app.settings.synced-options.game-settings.empty": {
+    "message": "Żadne ustawienia nie pasują do wyszukiwania lub filtra."
+  },
+  "app.settings.synced-options.game-settings.enable-all": {
+    "message": "Synchronizuj wszystkie"
+  },
+  "app.settings.synced-options.game-settings.load-failed": {
+    "message": "Nie udało się wczytać ustawień gry."
+  },
+  "app.settings.synced-options.game-settings.loading": {
+    "message": "Wczytywanie ustawień..."
+  },
+  "app.settings.synced-options.game-settings.no-options-to-edit": {
+    "message": "Nie ma jeszcze żadnych ustawień do edycji"
+  },
+  "app.settings.synced-options.game-settings.not-being-synced": {
+    "message": "Niesynchronizowane"
+  },
+  "app.settings.synced-options.game-settings.retry": {
+    "message": "Ponów próbę"
+  },
+  "app.settings.synced-options.game-settings.save": {
+    "message": "Zapisz ustawienia"
+  },
+  "app.settings.synced-options.game-settings.search": {
+    "message": "Wyszukaj ustawienia..."
+  },
+  "app.settings.synced-options.game-settings.sync-description": {
+    "message": "Synchronizowane ustawienia są stosowane w każdej instancji i zastępują wartości dołączone do paczki modów."
+  },
+  "app.settings.synced-options.game-settings.sync-setting": {
+    "message": "Synchronizuj ustawienie „{setting}” między instancjami"
+  },
+  "app.settings.synced-options.game-settings.sync-title": {
+    "message": "Synchronizuj ustawienia gry"
+  },
+  "app.settings.synced-options.game-settings.synced-across-instances": {
+    "message": "Synchronizowane między instancjami"
+  },
+  "app.settings.synced-options.game-settings.title": {
+    "message": "Ustawienia gry"
+  },
+  "app.settings.synced-options.game-settings.unsaved-changes": {
+    "message": "Masz niezapisane zmiany."
+  },
+  "app.settings.synced-options.game-settings.unsync-setting": {
+    "message": "Wyłącz synchronizację ustawienia „{setting}” między instancjami"
+  },
+  "app.settings.synced-options.game-settings.value-mixed": {
+    "message": "Różne w poszczególnych instancjach"
+  },
+  "app.settings.synced-options.game-settings.value-off": {
+    "message": "Wył."
+  },
+  "app.settings.synced-options.game-settings.value-on": {
+    "message": "Wł."
+  },
+  "app.settings.synced-options.game-settings.value-unset": {
+    "message": "Wybierz wartość"
+  },
   "app.settings.synced-options.multiplayer-servers": {
     "message": "Synchronizuj serwery wieloosobowe"
   },
   "app.settings.synced-options.multiplayer-servers.address": {
     "message": "Adres serwera"
+  },
+  "app.settings.synced-options.multiplayer-servers.copy-address": {
+    "message": "Kopiuj adres"
+  },
+  "app.settings.synced-options.multiplayer-servers.count": {
+    "message": "{count, plural, one {# serwer} few {# serwery} many {# serwerów} other {# serwera}}"
   },
   "app.settings.synced-options.multiplayer-servers.description": {
     "message": "Użyj tych samych serwerów wieloosobowych we wszystkich swoich instancjach."
@@ -1637,14 +2894,56 @@
   "app.settings.synced-options.multiplayer-servers.editor-title": {
     "message": "Edytuj zsynchronizowane serwery"
   },
+  "app.settings.synced-options.multiplayer-servers.empty": {
+    "message": "Żadne serwery dodane przez użytkownika nie są obecnie synchronizowane."
+  },
+  "app.settings.synced-options.multiplayer-servers.filter-offline": {
+    "message": "Offline"
+  },
+  "app.settings.synced-options.multiplayer-servers.filter-online": {
+    "message": "Online"
+  },
+  "app.settings.synced-options.multiplayer-servers.more-options": {
+    "message": "Więcej opcji serwera"
+  },
   "app.settings.synced-options.multiplayer-servers.name": {
     "message": "Nazwa serwera"
+  },
+  "app.settings.synced-options.multiplayer-servers.no-results": {
+    "message": "Żadne synchronizowane serwery nie pasują do wyszukiwania lub filtrów."
+  },
+  "app.settings.synced-options.multiplayer-servers.none-synced-yet": {
+    "message": "Żadne serwery nie są jeszcze synchronizowane"
+  },
+  "app.settings.synced-options.multiplayer-servers.players-online": {
+    "message": "{count, number} online"
+  },
+  "app.settings.synced-options.multiplayer-servers.search": {
+    "message": "Szukaj wśród {count, number} {count, plural, one {synchronizowanego serwera} few {synchronizowanych serwerów} many {synchronizowanych serwerów} other {synchronizowanego serwera}}..."
+  },
+  "app.settings.synced-options.multiplayer-servers.status": {
+    "message": "Status"
+  },
+  "app.settings.synced-options.packs.disabled": {
+    "message": "Włącz synchronizację, aby móc edytować współdzielone paczki."
+  },
+  "app.settings.synced-options.resource-packs": {
+    "message": "Synchronizuj paczki zasobów"
+  },
+  "app.settings.synced-options.resource-packs.description": {
+    "message": "Użyj tych samych paczek zasobów pomiędzy swoimi instancjami."
+  },
+  "app.settings.synced-options.resource-packs.none-synced-yet": {
+    "message": "Żadne paczki zasobów nie są jeszcze synchronizowane"
   },
   "app.settings.tabs.appearance": {
     "message": "Wygląd"
   },
   "app.settings.tabs.behavior": {
     "message": "Zachowanie"
+  },
+  "app.settings.tabs.features": {
+    "message": "Funkcje"
   },
   "app.settings.tabs.java-installations": {
     "message": "Instalacje Java"
@@ -1657,6 +2956,9 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Zarządzanie zasobami"
+  },
+  "app.settings.tabs.synced-options": {
+    "message": "Synchronizowane ustawienia"
   },
   "app.sidebar.playing-as": {
     "message": "Graj jako"
@@ -1838,6 +3140,135 @@
   "app.survey.title": {
     "message": "Cześć, użytkowniku Modrinth!"
   },
+  "app.sync-instances-update.badge": {
+    "message": "Nowość w tej aktualizacji"
+  },
+  "app.sync-instances-update.choose-source.all": {
+    "message": "Wybierz instancję, z której zostaną skopiowane ustawienia gry, paczki zasobów, historia poleceń, paski szybkiego wyboru trybu kreatywnego i serwery trybu wieloosobowego. Posłużą one jako punkt wyjścia do synchronizacji. Później możesz je edytować w dowolnej instancji."
+  },
+  "app.sync-instances-update.choose-source.all-title": {
+    "message": "Wybierz źródło synchronizacji"
+  },
+  "app.sync-instances-update.choose-source.data-packs": {
+    "message": "Wybierz instancję, z której zostaną skopiowane paczki danych. Posłużą one jako punkt wyjścia do synchronizacji. Później możesz je edytować w dowolnej instancji."
+  },
+  "app.sync-instances-update.choose-source.resource-packs": {
+    "message": "Wybierz instancję, z której zostaną skopiowane paczki zasobów. Posłużą one jako punkt wyjścia do synchronizacji. Później możesz je edytować w dowolnej instancji."
+  },
+  "app.sync-instances-update.creative-hotbars": {
+    "message": "Synchronizuj paski szybkiego wyboru trybu kreatywnego"
+  },
+  "app.sync-instances-update.description": {
+    "message": "Możesz teraz synchronizować ustawienia gry, serwery, paczki zasobów i inne elementy między instancjami, aby przy każdej rozgrywce korzystać z tych samych ustawień i zasobów!"
+  },
+  "app.sync-instances-update.load-error": {
+    "message": "Nie udało się wczytać ustawień synchronizacji. Spróbuj ponownie."
+  },
+  "app.sync-instances-update.manage-later": {
+    "message": "Możesz włączyć synchronizację teraz i zarządzać nią później w ustawieniach aplikacji."
+  },
+  "app.sync-instances-update.notification.description": {
+    "message": "Synchronizuj ustawienia gry, serwery, paczki zasobów i inne elementy między instancjami."
+  },
+  "app.sync-instances-update.notification.dismiss": {
+    "message": "Zamknij"
+  },
+  "app.sync-instances-update.notification.title": {
+    "message": "Synchronizuj instancje"
+  },
+  "app.sync-instances-update.notification.view-update": {
+    "message": "Zobacz nowości"
+  },
+  "app.sync-instances-update.retry": {
+    "message": "Spróbuj ponownie"
+  },
+  "app.sync-instances-update.skip": {
+    "message": "Pomiń"
+  },
+  "app.sync-instances-update.sync-all": {
+    "message": "Synchronizuj wszystko"
+  },
+  "app.sync-instances-update.title": {
+    "message": "Synchronizuj instancje"
+  },
+  "app.synced-content.change.disable-description": {
+    "message": "Wyłącz tę zawartość we wszystkich synchronizowanych instancjach lub tylko w tej instancji. Wyłączenie jej tylko tutaj włączy wyjątki synchronizacji dla tej instancji."
+  },
+  "app.synced-content.change.disable-everywhere": {
+    "message": "Wyłącz wszędzie"
+  },
+  "app.synced-content.change.disable-everywhere-description": {
+    "message": "Wyłącz tę zawartość we wszystkich synchronizowanych instancjach."
+  },
+  "app.synced-content.change.disable-here": {
+    "message": "Wyłącz tutaj"
+  },
+  "app.synced-content.change.disable-title": {
+    "message": "Wyłączyć zawartość?"
+  },
+  "app.synced-content.change.enable-description": {
+    "message": "Włącz tę zawartość we wszystkich synchronizowanych instancjach lub tylko w tej instancji. Włączenie jej tylko tutaj włączy wyjątki synchronizacji dla tej instancji."
+  },
+  "app.synced-content.change.enable-everywhere": {
+    "message": "Włącz wszędzie"
+  },
+  "app.synced-content.change.enable-everywhere-description": {
+    "message": "Włącz tę zawartość we wszystkich synchronizowanych instancjach."
+  },
+  "app.synced-content.change.enable-here": {
+    "message": "Włącz tutaj"
+  },
+  "app.synced-content.change.enable-title": {
+    "message": "Włączyć zawartość?"
+  },
+  "app.synced-content.delete.delete-everywhere": {
+    "message": "Usuń wszędzie"
+  },
+  "app.synced-content.delete.delete-here": {
+    "message": "Usuń tutaj"
+  },
+  "app.synced-content.delete.description": {
+    "message": "Ta zawartość zostanie usunięta ze wszystkich twoich instancji"
+  },
+  "app.synced-content.delete.mixed": {
+    "message": "Wybrane elementy, które nie są synchronizowane, zostaną usunięte tylko z tej instancji."
+  },
+  "app.synced-content.delete.override-description": {
+    "message": "Możesz usunąć tę zawartość tylko z tej instancji lub ze wszystkich synchronizowanych instancji. Usunięcie jej tylko z tej instancji włączy wyjątki synchronizacji. Ta instancja przestanie wówczas otrzymywać synchronizowane zmiany dotyczące tych typów zawartości."
+  },
+  "app.synced-content.delete.resource-pack-description": {
+    "message": "Możesz usunąć {count, plural, one {ją} few {je} many {je} other {je}} tylko z tej instancji lub ze wszystkich synchronizowanych instancji. Usunięcie {count, plural, one {jej} few {ich} many {ich} other {ich}} tylko z tej instancji włączy wyjątki synchronizacji. Ta instancja przestanie wówczas otrzymywać synchronizowane zmiany paczek zasobów."
+  },
+  "app.synced-content.delete.resource-pack-header": {
+    "message": "{count, plural, one {Ta paczka zasobów jest synchronizowana} few {Te paczki zasobów są synchronizowane} many {Te paczki zasobów są synchronizowane} other {Te paczki zasobów są synchronizowane}}"
+  },
+  "app.synced-content.desync.description": {
+    "message": "Ta instancja zachowa własną kopię. Czy chcesz pozostawić tę zawartość zsynchronizowaną w innych instancjach, czy ją z nich usunąć?"
+  },
+  "app.synced-content.desync.keep": {
+    "message": "Zachowaj"
+  },
+  "app.synced-content.desync.remove": {
+    "message": "Usuń"
+  },
+  "app.synced-content.desync.title": {
+    "message": "Wyłącz synchronizację zawartości"
+  },
+  "app.synced-content.warning.title": {
+    "message": "Ta zawartość jest synchronizowana"
+  },
+  "app.synced-packs.data-packs.title": {
+    "message": "Synchronizowane paczki danych"
+  },
+  "app.synced-packs.empty": {
+    "message": "Dodaj paczki na stronie zawartości instancji, aby rozpocząć synchronizację."
+  },
+  "app.synced-packs.load-failed": {
+    "message": "Nie udało się wczytać paczek. Spróbuj odświeżyć."
+  },
+  "app.synced-packs.resource-packs.title": {
+    "message": "Synchronizowane paczki zasobów"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Wersja Modrinth App v{version} została pobrana. Załaduj ponownie, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz Modrinth App."
   },
@@ -1966,6 +3397,9 @@
   },
   "friends.add-friends-to-share": {
     "message": "<link>Dodaj znajomych</link> by widzieć, w co grają!"
+  },
+  "friends.friend.actions.label": {
+    "message": "Opcje znajomego"
   },
   "friends.friend.cancel-request": {
     "message": "Anuluj zaproszenie"
@@ -2238,10 +3672,10 @@
     "message": "Silnik"
   },
   "instance.icon-editor.symbol.fabric": {
-    "message": "Płótno"
+    "message": "Fabric"
   },
   "instance.icon-editor.symbol.forge": {
-    "message": "Kuźnia"
+    "message": "Forge"
   },
   "instance.icon-editor.symbol.furnace": {
     "message": "Piec"
@@ -2393,6 +3827,48 @@
   "instance.settings.sharing.revoke-invite.header": {
     "message": "Cofnij zaproszenie"
   },
+  "instance.settings.synced-options.data-override": {
+    "message": "Wyłącz ten wyjątek synchronizacji, aby móc edytować synchronizowane dane."
+  },
+  "instance.settings.synced-options.data-packs": {
+    "message": "Wyłącz synchronizację paczek danych"
+  },
+  "instance.settings.synced-options.data-packs.description": {
+    "message": "Przechowuj paczki danych tej instancji oddzielnie od synchronizowanych paczek."
+  },
+  "instance.settings.synced-options.data-packs.disabled": {
+    "message": "Synchronizacja paczek danych jest wyłączona w ustawieniach aplikacji."
+  },
+  "instance.settings.synced-options.edit-packs": {
+    "message": "Edytuj synchronizowane paczki"
+  },
+  "instance.settings.synced-options.packs-override": {
+    "message": "Wyłącz ten wyjątek synchronizacji, aby móc edytować synchronizowane paczki. Niezależnymi paczkami możesz zarządzać na karcie zawartości."
+  },
+  "instance.settings.synced-options.resource-packs": {
+    "message": "Wyłącz synchronizację paczek zasobów"
+  },
+  "instance.settings.synced-options.resource-packs.description": {
+    "message": "Przechowuj paczki zasobów tej instancji oddzielnie od synchronizowanych paczek."
+  },
+  "instance.settings.synced-options.resource-packs.disabled": {
+    "message": "Synchronizacja paczek zasobów jest wyłączona w ustawieniach aplikacji."
+  },
+  "instance.settings.tabs.behavior.description": {
+    "message": "Wybierz karty widoczne w tej instancji."
+  },
+  "instance.settings.tabs.behavior.files": {
+    "message": "Pokaż kartę Pliki"
+  },
+  "instance.settings.tabs.behavior.screenshots": {
+    "message": "Pokaż kartę Zrzuty ekranu"
+  },
+  "instance.settings.tabs.behavior.screenshots.required": {
+    "message": "Nie można ukryć karty Zrzuty ekranu, gdy ogólna strona Zrzuty ekranu jest wyłączona."
+  },
+  "instance.settings.tabs.behavior.worlds": {
+    "message": "Pokaż kartę Światy"
+  },
   "instance.settings.tabs.general": {
     "message": "Ogólne"
   },
@@ -2468,6 +3944,9 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Wybierz kanał aktualizacji"
   },
+  "instance.settings.tabs.hooks.description": {
+    "message": "Uruchamiaj polecenia systemowe właściwe dla tej instancji przed uruchomieniem gry i po jej zakończeniu."
+  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Po wyjściu"
   },
@@ -2485,6 +3964,9 @@
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Wpisz komendę przed uruchomieniem..."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "Niestandardowe polecenia uruchamiania gry"
   },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Haki uruchamiane w katalogu roboczym instancji, z następującymi zmiennymi:"
@@ -2525,11 +4007,26 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Ustawienia instalacji są niedostępne, gdy ta instancja jest zablokowana."
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Ustaw zmienne środowiskowe osobno dla tej instancji."
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Ustaw argumenty Javy osobno dla tej instancji."
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Wybierz inną instalację Javy dla tej instancji."
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Ustaw przydział pamięci osobno dla tej instancji."
+  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Zmienne środowiskowe..."
   },
   "instance.settings.tabs.java.enter-java-arguments": {
     "message": "Argumenty Java..."
+  },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "Niestandardowe zmienne środowiskowe"
   },
   "instance.settings.tabs.java.hooks": {
     "message": "Hooki"
@@ -2546,8 +4043,74 @@
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
   },
+  "instance.settings.tabs.settings-overrides": {
+    "message": "Wyjątki synchronizacji"
+  },
   "instance.settings.tabs.sharing": {
     "message": "Udostępnianie"
+  },
+  "instance.settings.tabs.synced-options.command-history": {
+    "message": "Wyłącz synchronizację historii poleceń"
+  },
+  "instance.settings.tabs.synced-options.command-history.disabled-in-app": {
+    "message": "Synchronizacja historii poleceń jest wyłączona w ustawieniach aplikacji."
+  },
+  "instance.settings.tabs.synced-options.command-history.override-description": {
+    "message": "Przechowuj historię poleceń tej instancji oddzielnie od synchronizowanej historii poleceń."
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars": {
+    "message": "Wyłącz synchronizację zapisanych pasków szybkiego wyboru trybu kreatywnego"
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars.disabled-in-app": {
+    "message": "Synchronizacja zapisanych pasków szybkiego wyboru trybu kreatywnego jest wyłączona w ustawieniach aplikacji."
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars.override-description": {
+    "message": "Przechowuj zapisane paski szybkiego wyboru trybu kreatywnego tej instancji oddzielnie od synchronizowanych pasków."
+  },
+  "instance.settings.tabs.synced-options.game-settings": {
+    "message": "Wyłącz synchronizację ustawień gry"
+  },
+  "instance.settings.tabs.synced-options.game-settings.description": {
+    "message": "Przechowuj plik options.txt tej instancji oddzielnie od synchronizowanej kopii."
+  },
+  "instance.settings.tabs.synced-options.game-settings.disabled-in-app": {
+    "message": "Synchronizacja ustawień gry jest wyłączona w ustawieniach aplikacji."
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.backup-description": {
+    "message": "Przed wprowadzeniem zmian zostanie utworzona kopia zapasowa zastępowanej wersji."
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.description": {
+    "message": "Instancja {instance} i zsynchronizowana wersja mają różne paski szybkiego wyboru trybu kreatywnego. Wybierz, których używać we wszystkich instancjach."
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.title": {
+    "message": "Wybierz paski szybkiego wyboru trybu kreatywnego"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.use-instance": {
+    "message": "Nadpisz pozostałe"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.use-synced": {
+    "message": "Użyj zsynchronizowanych"
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers": {
+    "message": "Wyłącz synchronizację serwerów trybu wieloosobowego"
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers.disabled-in-app": {
+    "message": "Synchronizacja serwerów trybu wieloosobowego jest wyłączona w ustawieniach aplikacji."
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers.override-description": {
+    "message": "Przechowuj serwery trybu wieloosobowego tej instancji oddzielnie od synchronizowanych serwerów."
+  },
+  "instance.settings.tabs.synced-options.open-app-settings": {
+    "message": "Zarządzaj synchronizowanymi ustawieniami"
+  },
+  "instance.settings.tabs.synced-options.shared-settings.description": {
+    "message": "Włącz wyjątek, aby dana opcja miała osobne ustawienie dla tej instancji."
+  },
+  "instance.settings.tabs.window": {
+    "message": "Niestandardowe ustawienia okna"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Ustaw tryb pełnoekranowy i rozdzielczość uruchamiania osobno dla tej instancji."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Pełny ekran"
@@ -2633,6 +4196,9 @@
   "instance.worlds.a_minecraft_server": {
     "message": "Serwer Minecraft"
   },
+  "instance.worlds.actions.label": {
+    "message": "Opcje świata"
+  },
   "instance.worlds.cant_connect": {
     "message": "Nie można połączyć się z serwerem"
   },
@@ -2642,11 +4208,20 @@
   "instance.worlds.create_shortcut": {
     "message": "Utwórz skrót"
   },
+  "instance.worlds.desync-server.description": {
+    "message": "Czy chcesz zachować ten serwer w innych synchronizowanych instancjach, czy go z nich usunąć?"
+  },
   "instance.worlds.desync-server.keep": {
     "message": "Zachowaj"
   },
   "instance.worlds.desync-server.remove": {
     "message": "Usuń"
+  },
+  "instance.worlds.desync-server.title": {
+    "message": "Wyłącz synchronizację serwera"
+  },
+  "instance.worlds.desync_server": {
+    "message": "Wyłącz synchronizację"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Nie pokazuj na stronie głównej"
@@ -2681,11 +4256,17 @@
   "instance.worlds.play_instance": {
     "message": "Zagraj"
   },
+  "instance.worlds.play_world": {
+    "message": "Graj w tym świecie"
+  },
   "instance.worlds.shortcut-created": {
     "message": "Skrót utworzony"
   },
   "instance.worlds.shortcut-creation-failed": {
     "message": "Nie udało się utworzyć skrótu"
+  },
+  "instance.worlds.synced_server": {
+    "message": "Synchronizowane między instancjami"
   },
   "instance.worlds.view_instance": {
     "message": "Zobacz instancję"

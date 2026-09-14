@@ -104,6 +104,15 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "בחר רזולוציה נכונה"
   },
+  "nags.project-summary-spam.title": {
+    "defaultMessage": "מחק ספאם מהסיכום"
+  },
+  "nags.review-permissions.description": {
+    "defaultMessage": "ודא שסיפקת הוכחה לכך שיש לך אישור להפיץ כל תוכן חיצוני ב-Modpack שלך."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "בדוק אישור תוכן"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "בחר באילו גרסאות השרת שלך תומך, בחר חבילת מודדים, או העלה משלך."
   },
@@ -116,11 +125,20 @@
   "nags.select-country.title": {
     "defaultMessage": "בחר אזור"
   },
+  "nags.select-environment.description": {
+    "defaultMessage": "ציין את הסביבה שבו הפרויקט שלך יכול לרוץ."
+  },
+  "nags.select-environment.title": {
+    "defaultMessage": "בחר סביבה"
+  },
   "nags.select-language.description": {
     "defaultMessage": "רשום את השפה או השפות הנתמכות על ידי השרת שלך."
   },
   "nags.select-language.title": {
     "defaultMessage": "בחירת שפה"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "בחר את הרישיון שלפיו מופץ ה-{type} שלך."
   },
   "nags.select-license.title": {
     "defaultMessage": "בחירת רישיון"
@@ -134,11 +152,17 @@
   "nags.server.title": {
     "defaultMessage": "בקר בהגדרות השרת"
   },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "עבור אל הגדרות החשיפה"
+  },
   "nags.settings.license.title": {
     "defaultMessage": "בקר בהגדרות הרישיון"
   },
   "nags.settings.links.title": {
     "defaultMessage": "בקר בהגדרות הקישורים"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "עובר אל הגדרות הגישות"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "בקר בהגדרות התגיות"
@@ -146,14 +170,41 @@
   "nags.settings.title": {
     "defaultMessage": "בקר בהגדרות כלליות"
   },
+  "nags.settings.versions.title": {
+    "defaultMessage": "עבור אל הגדרות הגרסאות"
+  },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "הסיכום שלך לא צריך לכלול Markdown או HTML, מכיוון שניתן להציג בו רק טקסט פשוט."
+  },
+  "nags.summary-special-formatting.title": {
+    "defaultMessage": "תקן פורמט סיכום"
+  },
   "nags.summary-too-short.title": {
     "defaultMessage": "הארך את התקציר"
+  },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "בחרת {languageCount, plural, one {שפה #} other {# שפות}}. אנא ציין רק את השפות שהשרת שלך תומך בהן באופן פעיל."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "בחר שפות מדויקות"
+  },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "בחרת {tagCount, plural, one {תגית #} other {# תגיות}}. אנא צמצם את המספר ל-{maxTagCount} או פחות, כדי להבטיח שהשרת שלך יופיע בתוצאות חיפוש רלוונטיות."
   },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "בחר תגים מדוייקים"
   },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "בחרת {tagCount, plural, one {תגית #} other {# תגיות}}. אנא צמצם את המספר ל-{maxTagCount} או פחות, כדי להבטיח שהפרויקט שלך יופיע בתוצאות חיפוש רלוונטיות."
+  },
   "nags.too-many-tags.title": {
     "defaultMessage": "בחר תגים מדוייקים"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "נדרש לפחות תמונה אחת כדי להראות את תוכן ה{type} שלך."
+  },
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "נדרש לפחות תמונת גלריה אחת כדי להראות את תוכן הטקסטורה, חוץ מטקסטורות סאונד או התאמה מקומית. אם זה מתאר את הטקסטורה, בבקשה תבחר\\י את התגית הנכונה."
   },
   "nags.upload-gallery-image.description-shader": {
     "defaultMessage": "צריך לעלות אפילו שלוש תמונות כדי לרואת את השיידר בסיטואציות שונות."
@@ -166,6 +217,12 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "העלה גרסה"
+  },
+  "nags.verify-external-links.description": {
+    "defaultMessage": "חלק מהקישורים החיצוניים שלך מובילים לדומיינים שאינם מתאימים לסוג הקישור הזה."
+  },
+  "nags.verify-external-links.title": {
+    "defaultMessage": "ראה קישורים חיצוניים"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "בקר בהגדרות הקישורים"

@@ -15,10 +15,10 @@
     "message": "Gestionar preferencias"
   },
   "ads-consent.reject": {
-    "message": "Rechazar todas"
+    "message": "Rechazar todo"
   },
   "ads-consent.title": {
-    "message": "Tu privacidad y como los anuncios apoyan a Modrinth"
+    "message": "Tu privacidad y cómo los anuncios apoyan a Modrinth"
   },
   "analytics.action.add": {
     "message": "Añadir"
@@ -582,7 +582,7 @@
     "message": "Windows"
   },
   "app-marketing.features.importing.description": {
-    "message": "Importa todos tus perfiles favoritos desde el launcher que usabas antes ¡y empieza a usar la Modrinth App en segundos!"
+    "message": "Importa todas tus instancias desde el launcher que usabas antes, ¡Y empieza a usar Modrinth en segundos!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -591,7 +591,13 @@
     "message": "MultiMC"
   },
   "app-marketing.features.importing.title": {
-    "message": "Importación de perfiles"
+    "message": "Importar instancia"
+  },
+  "app-marketing.features.manage-skins.description": {
+    "message": "Cambia de entre todas tus skins de Minecraft directamente desde la aplicación."
+  },
+  "app-marketing.features.manage-skins.title": {
+    "message": "Selector de skin"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Acciones"
@@ -618,7 +624,7 @@
     "message": "Versión"
   },
   "app-marketing.features.open-source.description": {
-    "message": "El launcher de Modrinth es completamente de código abierto. ¡Puedes ver el código fuente en nuestro <github-link>GitHub</github-link>!"
+    "message": "Modrinth es enteramente de código abierto. ¡Puedes ver el código fuente en nuestro <github-link>GitHub</github-link>!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Código abierto"
@@ -630,7 +636,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App tiene un mejor rendimiento que muchos de los gestores de mods más populares, ¡usando solo 150 MB de RAM!"
+    "message": "¡Modrinth tiene un mejor rendimiento que muchos de los launchers populares!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -664,6 +670,12 @@
   },
   "app-marketing.features.play.title": {
     "message": "Juega con tus mods favoritos"
+  },
+  "app-marketing.features.settings-sync.description": {
+    "message": "Utilizar las mismas opciones, paquetes de recursos, y más en todas tus instancias."
+  },
+  "app-marketing.features.settings-sync.title": {
+    "message": "Sincroniza tus ajustes"
   },
   "app-marketing.features.sharing.description": {
     "message": "Crea, comparte y juega modpacks con cualquiera de los miles de mods y modpacks alojados aquí en Modrinth."
@@ -884,6 +896,9 @@
   "auth.sign-in.last-sign-in": {
     "message": "Último inicio de sesión"
   },
+  "auth.sign-in.launcher.callback.title": {
+    "message": "Devolver inicio de sesión en Modrinth"
+  },
   "auth.sign-in.launcher.complete.description": {
     "message": "Te estamos devolviendo a la aplicación Modrinth. Si nada sucede, usa el botón de abajo."
   },
@@ -895,6 +910,12 @@
   },
   "auth.sign-in.launcher.complete.title": {
     "message": "Has iniciado sesión"
+  },
+  "auth.sign-in.launcher.opening.description": {
+    "message": "Si la aplicación no se abre, utilice el botón de abajo para terminar de iniciar sesión."
+  },
+  "auth.sign-in.launcher.opening.title": {
+    "message": "Abriendo en la aplicación de Modrinth..."
   },
   "auth.sign-in.no-account": {
     "message": "¿No tienes una cuenta?"
@@ -928,6 +949,9 @@
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Crear una cuenta"
+  },
+  "auth.two-factor.incorrect-code": {
+    "message": "El código de dos factores es incorrecto. Intenta de nuevo o utiliza un código de copia de seguridad."
   },
   "auth.verify-email.action.account-settings": {
     "message": "Configuración de cuenta"
@@ -3861,7 +3885,10 @@
     "message": "Eliminar proyecto"
   },
   "project.settings.disclosures.advertising.description.1": {
-    "message": "Debes habilitar esta opción si tu proyecto contiene anuncios, patrocinios o promociones de otras obras."
+    "message": "Habilitar si este proyecto contiene anuncios, patrocinios, o promociones de otros trabajos."
+  },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "Esto no afecta a la promoción discreta de contenido relevante sin valor monetario directo (como un enlace a un perfil de Modrinth en tu propio menú de configuración), y no afecta a los anuncios en la página del proyecto como banners patrocinados en la descripción."
   },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "ej. Añadir el servidor Modrinth SMP a tu listado de servidores automáticamente."
@@ -3869,17 +3896,32 @@
   "project.settings.disclosures.advertising.title": {
     "message": "Contiene publicidad"
   },
+  "project.settings.disclosures.ai-functionality.description": {
+    "message": "Debe habilitarse si el proyecto tiene funcionalidad que hace uso de IA generativa, como un chatbot en el juego o texturas generadas dinámicamente."
+  },
+  "project.settings.disclosures.ai-functionality.note-placeholder": {
+    "message": "ej. Los NPCs utilizan la IA generativa para las opciones de diálogo."
+  },
+  "project.settings.disclosures.ai-functionality.title": {
+    "message": "Contiene funciones de IA generativa"
+  },
   "project.settings.disclosures.ai.description": {
-    "message": "Debes habilitar esto si este proyecto contiene una cantidad sustancial de código generado por IA, si\n\t\t\t\talgún recurso es sustancialmente generado por IA, si la funcionalidad del proyecto depende del uso de\n\t\t\t\tIA generativa, o si algún elemento de la página de su proyecto, como la descripción o la publicación,\n\t\t\t\tdepende de la IA generativa."
+    "message": "Habilitarse si este proyecto tiene configuraciones o texto generado por IA, o si una buena cantidad del código está generado por IA."
+  },
+  "project.settings.disclosures.ai.description.2": {
+    "message": "Es importante ser honesto si es que la IA generativa desempeñó un papel importante en la producción o publicación de este contenido. En otras palabras, si consideras a la IA generativa un co-autor de este proyecto, deberías mencionarlo aquí."
   },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "ej. Las traducciones a Chino y Árabe son generados por IA."
+  },
+  "project.settings.disclosures.ai.still-unsure": {
+    "message": "¿Aún no está seguro? Consulte nuestra guía para la <faq-link>Divulgación y Uso de IA</faq-link> y la sección 6 de las <rules>Reglas de Contenido de Modrinth</rules> para más información."
   },
   "project.settings.disclosures.ai.title": {
     "message": "Contiene contenido generada por IA"
   },
   "project.settings.disclosures.ai.types-description": {
-    "message": "¿En qué se utiliza la IA generativa?"
+    "message": "¿Qué tipos de contenido se han generado con IA?"
   },
   "project.settings.disclosures.archived.banner-preview": {
     "message": "Previsualizar el banner"
@@ -3917,11 +3959,20 @@
   "project.settings.disclosures.derivative.note-label": {
     "message": "Explica cómo tu proyecto está basado en el proyecto original"
   },
+  "project.settings.disclosures.derivative.note-placeholder": {
+    "message": "Este es un fork que añade algunos nuevos biomas y lo adapta a las nuevas versiones de Minecraft."
+  },
   "project.settings.disclosures.derivative.title": {
     "message": "Contiene contenido derivado"
   },
   "project.settings.disclosures.description": {
     "message": "Debes agregar cualquier divulgación de contenido aplicable a su proyecto de acuerdo con <rules>Modrinth's Content Rules</rules>."
+  },
+  "project.settings.disclosures.description.2": {
+    "message": "¿No está seguro de cómo aplicar la Divulgación de Contenido en su proyecto? Échele un vistazo a las <faq-link>Preguntas Frecuentes sobre la Divulgación de Contenido</faq-link>."
+  },
+  "project.settings.disclosures.info-tooltip": {
+    "message": "Haga clic para aprender más sobre cuándo usar esta divulgación."
   },
   "project.settings.disclosures.last-updated": {
     "message": "Última actualización el {date} por {user}"
@@ -3939,7 +3990,7 @@
     "message": "Por favor, <contact-support-link>contacta al soporte</contact-support-link> si esta divulgación necesita ser editada o removida."
   },
   "project.settings.disclosures.paid-features.description": {
-    "message": "Debes activar esto si tu proyecto contiene características que se pueden obtener gastando dinero del mundo real."
+    "message": "Habilitar si este proyecto contiene características que se desbloquean al gastar dinero real."
   },
   "project.settings.disclosures.paid-features.feature-placeholder": {
     "message": "ej. Cosméticos disponibles como recompensa de Patreon"
@@ -4989,7 +5040,7 @@
     "message": "¡El código introducido es incorrecto!"
   },
   "settings.account.two-factor.field.code.description": {
-    "message": "Por favor, introduce un código de verificación en dos pasos para continuar."
+    "message": "Introduzca un código de su aplicación de autenticación, o utilice uno de sus códigos de copia de seguridad."
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Introduce el código de verificación en dos pasos"
@@ -5464,6 +5515,21 @@
   },
   "ui.newsletter-button.tooltip": {
     "message": "Suscríbete a las noticias de Modrinth"
+  },
+  "ui.two-factor-code.authentication-code": {
+    "message": "Código de autenticación de seis dígitos"
+  },
+  "ui.two-factor-code.backup-code": {
+    "message": "Código de respaldo"
+  },
+  "ui.two-factor-code.backup-code.placeholder": {
+    "message": "Introduzca un código de respaldo"
+  },
+  "ui.two-factor-code.use-authentication-code": {
+    "message": "Usar un código de autenticación"
+  },
+  "ui.two-factor-code.use-backup-code": {
+    "message": "Usar un código de respaldo"
   },
   "version.all-versions": {
     "message": "Todas las versiones"

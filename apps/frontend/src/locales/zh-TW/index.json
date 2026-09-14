@@ -582,7 +582,7 @@
     "message": "Windows"
   },
   "app-marketing.features.importing.description": {
-    "message": "從你之前使用的啟動器匯入所有喜愛的設定檔，幾秒鐘內即可輕鬆上手 Modrinth App！"
+    "message": "從你之前使用的啟動器匯入你所有既有的遊戲實例，幾秒鐘內即可輕鬆上手 Modrinth App！"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -591,7 +591,13 @@
     "message": "MultiMC"
   },
   "app-marketing.features.importing.title": {
-    "message": "匯入設定檔"
+    "message": "匯入實例"
+  },
+  "app-marketing.features.manage-skins.description": {
+    "message": "直接在 Modrinth App 中切換所有 Minecraft 外觀。"
+  },
+  "app-marketing.features.manage-skins.title": {
+    "message": "外觀選擇工具"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "動作"
@@ -630,7 +636,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App 的效能優於許多主流的模組管理員，且僅使用 150 MB 記憶體！"
+    "message": "Modrinth App 的效能表現優於許多主流的模組管理器！"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -664,6 +670,12 @@
   },
   "app-marketing.features.play.title": {
     "message": "遊玩你喜愛的模組"
+  },
+  "app-marketing.features.settings-sync.description": {
+    "message": "在所有實例中使用相同的選項、資源包等。"
+  },
+  "app-marketing.features.settings-sync.title": {
+    "message": "同步你的設定"
   },
   "app-marketing.features.sharing.description": {
     "message": "透過 Modrinth 上託管的數千種模組與模組包，建立、分享並遊玩你的模組包。"
@@ -884,6 +896,9 @@
   "auth.sign-in.last-sign-in": {
     "message": "上次使用"
   },
+  "auth.sign-in.launcher.callback.title": {
+    "message": "Modrinth App 登入回呼"
+  },
   "auth.sign-in.launcher.complete.description": {
     "message": "我們正在帶你返回 Modrinth App。如果沒有出現任何反應，請點擊下方的按鈕。"
   },
@@ -895,6 +910,12 @@
   },
   "auth.sign-in.launcher.complete.title": {
     "message": "你已登入"
+  },
+  "auth.sign-in.launcher.opening.description": {
+    "message": "如果應用程式沒有開啟，請使用下方按鈕完成登入。"
+  },
+  "auth.sign-in.launcher.opening.title": {
+    "message": "正在開啟 Modrinth App..."
   },
   "auth.sign-in.no-account": {
     "message": "還沒有帳號嗎？"
@@ -928,6 +949,9 @@
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "建立帳號"
+  },
+  "auth.two-factor.incorrect-code": {
+    "message": "雙重驗證碼不正確。請再試一次或使用備用碼。"
   },
   "auth.verify-email.action.account-settings": {
     "message": "帳號設定"
@@ -3717,7 +3741,7 @@
     "message": "你的專案目前設為私人，這代表只有你和你邀請的人才能存取。"
   },
   "project.moderation.admonition.approved.body.public": {
-    "message": "你的專案已在 Modrinth 上發布並可供他人搜尋探索。"
+    "message": "你的專案已在 Modrinth 上發布並可被搜尋到。"
   },
   "project.moderation.admonition.approved.body.unlisted": {
     "message": "你的專案目前設為不公開，這代表專案只能透過直接連結存取，無法在 Modrinth 上被搜尋到。"
@@ -3789,7 +3813,7 @@
     "message": "這是你與 Modrinth 管理員之間的私人討論串。他們可能會就專案的相關問題向你傳送訊息。"
   },
   "project.moderation.thread.title": {
-    "message": "審核訊息"
+    "message": "審查訊息"
   },
   "project.moderation.title": {
     "message": "審查"
@@ -3863,23 +3887,41 @@
   "project.settings.disclosures.advertising.description.1": {
     "message": "如果這個專案包含其他作品的廣告、贊助或宣傳，則必須啟用這個選項。"
   },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "這不適用於對相關內容、無直接金錢價值的不顯眼宣傳（例如在你自己的設定選單中加入 Modrinth 個人檔案連結），亦不適用於專案頁面中的廣告（例如描述中的贊助橫幅）。"
+  },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "例如：Adds the Modrinth SMP server to your server list automatically."
   },
   "project.settings.disclosures.advertising.title": {
     "message": "包含廣告宣傳"
   },
+  "project.settings.disclosures.ai-functionality.description": {
+    "message": "如果這個專案具有運用生成式 AI 的功能（例如遊戲內聊天機器人或動態生成的紋理），則必須啟用這個選項。"
+  },
+  "project.settings.disclosures.ai-functionality.note-placeholder": {
+    "message": "例如：The NPCs uses generative AI for dialogue options."
+  },
+  "project.settings.disclosures.ai-functionality.title": {
+    "message": "包含生成式 AI 功能"
+  },
   "project.settings.disclosures.ai.description": {
-    "message": "如果這個專案包含大量由 AI 生成的程式碼、任何主要由 AI 生成的資源、專案的功能仰賴生成式 AI，或是專案頁面的任何元素（例如描述或發布）仰賴生成式 AI，則必須啟用這個選項。"
+    "message": "如果這個專案包含任何由 AI 生成的資源或文字，或包含大量由 AI 生成的程式碼，則必須啟用這個選項。"
+  },
+  "project.settings.disclosures.ai.description.2": {
+    "message": "若生成式 AI 在內容的製作或發布過程中扮演了重要角色，請務必誠實揭露。一個簡單的判斷方式是：如果你會將 AI 視為專案的共同作者，就應在這裡予以揭露。"
   },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "例如：The Chinese and Arabic translations are AI-generated."
+  },
+  "project.settings.disclosures.ai.still-unsure": {
+    "message": "還是不確定嗎？請參閱我們的《<faq-link>AI 揭露與使用指南</faq-link>》以及 Modrinth 的《<rules>內容規範</rules>》第 6 節以取得更多資訊。"
   },
   "project.settings.disclosures.ai.title": {
     "message": "包含 AI 生成的內容"
   },
   "project.settings.disclosures.ai.types-description": {
-    "message": "生成式 AI 被用於製作哪些內容？"
+    "message": "生成式 AI 被用於製作哪些類型的內容？"
   },
   "project.settings.disclosures.archived.banner-preview": {
     "message": "橫幅預覽"
@@ -3917,11 +3959,20 @@
   "project.settings.disclosures.derivative.note-label": {
     "message": "請說明你的專案如何使用原始作品"
   },
+  "project.settings.disclosures.derivative.note-placeholder": {
+    "message": "This is a fork that adds a few new biomes and ports it to newer Minecraft versions."
+  },
   "project.settings.disclosures.derivative.title": {
     "message": "包含衍生內容"
   },
   "project.settings.disclosures.description": {
     "message": "你必須按照 Modrinth 的《<rules>內容規範</rules>》，在專案中加入任何適用的內容揭露資訊。"
+  },
+  "project.settings.disclosures.description.2": {
+    "message": "不確定該如何填寫專案的內容揭露資訊嗎？請參閱我們的《<faq-link>內容揭露資訊常見問題集</faq-link>》。"
+  },
+  "project.settings.disclosures.info-tooltip": {
+    "message": "按這裡了解什麼時候該填寫這項揭露資訊。"
   },
   "project.settings.disclosures.last-updated": {
     "message": "最後於{date}由 {user} 更新"
@@ -3939,7 +3990,7 @@
     "message": "如果要移除或編輯這項揭露資訊，請<contact-support-link>聯絡客服</contact-support-link>。"
   },
   "project.settings.disclosures.paid-features.description": {
-    "message": "如果這個專案包含需要花費真實金錢才能獲得的功能，則必須啟用這個選項。"
+    "message": "如果這個專案包含需要花費真實金錢解鎖的功能，則必須啟用這個選項。"
   },
   "project.settings.disclosures.paid-features.feature-placeholder": {
     "message": "例如：Cosmetics available as Patreon reward"
@@ -4989,7 +5040,7 @@
     "message": "輸入的驗證碼不正確！"
   },
   "settings.account.two-factor.field.code.description": {
-    "message": "請輸入兩步驟驗證碼以繼續。"
+    "message": "請輸入驗證應用程式中的驗證碼，或使用其中一個備用碼。"
   },
   "settings.account.two-factor.field.code.label": {
     "message": "輸入雙重驗證碼"
@@ -5464,6 +5515,21 @@
   },
   "ui.newsletter-button.tooltip": {
     "message": "訂閱 Modrinth 的最新消息"
+  },
+  "ui.two-factor-code.authentication-code": {
+    "message": "6 位數驗證碼"
+  },
+  "ui.two-factor-code.backup-code": {
+    "message": "備用碼"
+  },
+  "ui.two-factor-code.backup-code.placeholder": {
+    "message": "輸入備用碼"
+  },
+  "ui.two-factor-code.use-authentication-code": {
+    "message": "使用驗證碼"
+  },
+  "ui.two-factor-code.use-backup-code": {
+    "message": "使用備用碼"
   },
   "version.all-versions": {
     "message": "所有版本"

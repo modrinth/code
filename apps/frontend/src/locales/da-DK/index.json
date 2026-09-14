@@ -389,17 +389,11 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.importing.description": {
-    "message": "Importer alle dine favorit profiler fra launcher du brugte før, og kom i gang med Modrinth inde for få sekunder!"
-  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
-  },
-  "app-marketing.features.importing.title": {
-    "message": "Profil importering"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Handlinger"
@@ -425,9 +419,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Version"
   },
-  "app-marketing.features.open-source.description": {
-    "message": "Modrinths launcher er fuldt open source. Du kan se kildekoden på vores <github-link>GitHub</github-link>!"
-  },
   "app-marketing.features.open-source.title": {
     "message": "Open source"
   },
@@ -436,9 +427,6 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
-  },
-  "app-marketing.features.performance.description": {
-    "message": "Modrinth App præsterer bedre end mange af de førende mod-håndteringsværktøjer og bruger kun 150 MB RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
