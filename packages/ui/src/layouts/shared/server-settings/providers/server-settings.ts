@@ -14,6 +14,10 @@ export interface ServerSettingsContext {
 	currentUserRole: Ref<string | null>
 	browseModpacks: (args: ServerSettingsBrowseModpacksArgs) => void | Promise<void>
 	closeModal?: () => void
+	saveBanner?: {
+		target: Ref<HTMLElement | null>
+		shown: Ref<boolean>
+	}
 }
 
 export const [injectServerSettings, provideServerSettings] = createContext<ServerSettingsContext>(

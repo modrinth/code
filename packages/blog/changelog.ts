@@ -11,6 +11,55 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-09-14T15:44:10+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed the unsaved changes banner not showing up in Hosting settings.
+- Fixed non-USD currencies appearing broken in pricing for Modrinth Hosting.
+- Fixed issue on the invite modal for the Access tab where the friends list would overflow out of the modal container.`,
+	},
+	{
+		date: `2026-09-14T15:44:10+00:00`,
+		product: 'app',
+		version: '0.21.0',
+		body: `## Added
+- Added a download manager showing installation progress, download speeds, estimated time remaining, and groups for active, completed, and failed tasks.
+- Added controls to pause, resume, and cancel ongoing installations in the download manager.
+- Added a Content storage section in Resource management showing disk usage for unique, shared, and unused content.
+- Added controls to limit or clear unused downloads in Resource management, including mods, packs, Minecraft files, and Java installations.
+- Added automatic cleanup of unused downloads when the cache exceeds its configured limit.
+- Added "Verify and repair" in Content storage to check for missing or damaged files, repair recoverable files, and report remaining problems.
+
+## Changed
+- Consolidated identical mods, resource packs, shader packs, and data packs across new and existing instances to reduce disk usage.
+- Improved repeat modpack installations by reusing cached mrpack downloads.
+- Updated the Files tab to make managed mods and packs read-only, with changes handled through the Content tab. If you are adding custom content you must do it through the Upload button on the Content tab.
+- Improved recovery from interrupted app directory moves to preserve instances and shared content.
+- The "Managed content" card will not be shown for server project linked instances which do not have any content, e.g they are a vanilla server.
+
+## Fixed
+- Fixed issue with shared instances where an installed project which has been deleted from Modrinth would block you from pushing an update. It will now be treated as an external file.
+- Fixed issue with resource pack syncing where resource packs with missing \`pack.mcmeta\` files would completely block syncing from happening for all packs.
+- Fixed issue in the content tab for uploaded resource packs having mc color codes in their names. Now they are removed.
+- Fixed "Minimise on launch" setting not working as intended.
+- Fixed Alt + Tab causing Modrinth App to crash on windows for some users.
+- Fixed spacing on language group headers
+- Fixed failed or interrupted modpack updates leaving instance files partially replaced by restoring the previous content.
+- Fixed duplicated instances losing content update locks.
+- Fixed formatting codes showing in world names.
+- Fixed file size limit for profile pictures not being correctly notified about in the profile settings page.
+- Fixed non-USD currencies appearing broken in pricing for Modrinth Hosting.
+- Fixed issue with Allocated memory setting not saving correctly.
+- Fixed issue on Share modal for shared instances where the friends list would overflow out of the modal container.`,
+	},
+	{
+		date: `2026-09-14T15:44:10+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed spacing on language group headers
+- Fixed non-USD currencies appearing broken in pricing for Modrinth Hosting and Modrinth+.`,
+	},
+	{
 		date: `2026-09-14T02:29:42+00:00`,
 		product: 'web',
 		body: `## Fixed
