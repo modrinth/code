@@ -47,14 +47,16 @@ import { useRouter } from 'vue-router'
 
 import { getInstanceIconUrl } from '@/helpers/instance'
 import { copyToClipboard, createInstanceShortcut } from '@/helpers/utils'
-import type {
-	ProtocolVersion,
-	ServerStatus,
-	ServerWorld,
-	SingleplayerWorld,
-	World,
+import {
+	getWorldDisplayName,
+	getWorldIdentifier,
+	type ProtocolVersion,
+	type ServerStatus,
+	type ServerWorld,
+	set_world_display_status,
+	type SingleplayerWorld,
+	type World,
 } from '@/helpers/worlds.ts'
-import { getWorldIdentifier, set_world_display_status } from '@/helpers/worlds.ts'
 
 import { LockIcon } from '../../../../../../packages/assets/generated-icons'
 
@@ -154,7 +156,7 @@ async function createShortcut() {
 
 	try {
 		const shortcutPath = await createInstanceShortcut(
-			props.world.name,
+			getWorldDisplayName(props.world),
 			shortcutInstanceId.value,
 			props.world.type === 'server'
 				? { server: (props.world as ServerWorld).address }
@@ -493,7 +495,7 @@ function openContextMenu(event: MouseEvent) {
 				<div class="flex flex-col justify-center gap-0.5 h-full">
 					<div class="flex items-center gap-1.5">
 						<div class="text-base text-contrast font-semibold truncate">
-							{{ world.name }}
+							{{ getWorldDisplayName(world) }}
 						</div>
 						<TagItem
 							v-if="managed"
