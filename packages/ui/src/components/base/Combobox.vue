@@ -60,7 +60,7 @@
 			:class="[
 				'min-w-full w-full !justify-between overflow-hidden text-left',
 				props.triggerClass,
-				{ 'z-[9999]': isOpen },
+				{ 'z-[100005]': isOpen },
 			]"
 			:aria-expanded="isOpen"
 			:aria-haspopup="listbox ? 'listbox' : 'menu'"
@@ -95,12 +95,12 @@
 			</div>
 		</ButtonFrame>
 
-		<Teleport v-if="isClient" to="#teleports">
+		<Teleport v-if="isClient" to="body">
 			<Transition name="floating-expand">
 				<div
 					v-if="shouldRenderDropdown"
 					ref="dropdownRef"
-					class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-surface-4 border border-solid border-surface-5"
+					class="fixed z-[100005] flex flex-col overflow-hidden rounded-[14px] bg-surface-4 border border-solid border-surface-5"
 					:class="[
 						props.dropdownClass,
 						openDirection === 'up' ? 'shadow-[0_-25px_50px_-12px_rgb(0,0,0,0.25)]' : 'shadow-2xl',

@@ -145,7 +145,6 @@
 								<Combobox
 									v-model="currentReportTargetFilter"
 									class="!w-full"
-									dropdown-class="!z-[10000]"
 									:options="reportTargetFilterTypes"
 									:placeholder="formatMessage(commonMessages.filterByLabel)"
 									@select="goToPage(1)"
@@ -157,7 +156,6 @@
 									<Combobox
 										v-model="currentReportIssueFilter"
 										class="!w-full"
-										dropdown-class="!z-[10000]"
 										:options="reportIssueFilterTypes"
 										:placeholder="formatMessage(commonMessages.filterByLabel)"
 										@select="goToPage(1)"
@@ -169,7 +167,6 @@
 								<Combobox
 									v-model="currentProjectTypeFilter"
 									class="!w-full"
-									dropdown-class="!z-[10000]"
 									:options="projectTypeFilterTypes"
 									:placeholder="formatMessage(commonMessages.filterByLabel)"
 									@select="goToPage(1)"
