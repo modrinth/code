@@ -78,7 +78,9 @@ const updateMaxAuto = () => {
 	const footerHeight = (footer.value?.clientHeight ?? 0) + gap
 	maxAuto.value = Math.max(
 		0,
-		Math.floor((container.value.clientHeight - footerHeight - 2 * dividerHeight - gap) / (3 * rem + gap)),
+		Math.floor(
+			(container.value.clientHeight - footerHeight - 2 * dividerHeight - gap) / (3 * rem + gap),
+		),
 	)
 }
 

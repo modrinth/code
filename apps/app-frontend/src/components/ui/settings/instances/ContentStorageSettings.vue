@@ -14,8 +14,8 @@ import { computed, inject, ref } from 'vue'
 
 import {
 	storeVerificationReport as report,
-	verifyStore,
 	verifyingStore,
+	verifyStore,
 } from '@/components/ui/download-manager/store-verification'
 import { useAppEvent } from '@/composables/use-app-event'
 import { get_all as getRunningProcesses } from '@/helpers/process'

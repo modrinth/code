@@ -19,8 +19,8 @@ import { get_many as getInstances } from '@/helpers/instance'
 import { injectAppEvents } from '@/providers/app-events'
 
 import { createDownloadTransferTracker } from './download-transfer'
-import { storeVerificationTask } from './store-verification'
 import { createInstallJobProgressTracker } from './install-job-progress'
+import { storeVerificationTask } from './store-verification'
 import { useInstallJobDisplay } from './use-install-job-display'
 
 export interface DownloadManagerJob {
@@ -39,11 +39,24 @@ export interface DownloadManagerJob {
 	progressLabel: string
 	waiting: boolean
 	eta: string
-	canRetry?: boolean
+	canRetry: boolean
 	canCopyDetails: boolean
 	copied: boolean
 	busy: boolean
 }
+
+const verificationMessages = defineMessages({
+	verifying: { id: 'app.download-manager.verifying', defaultMessage: 'Verifying' },
+	title: { id: 'app.settings.resource-management.store.title', defaultMessage: 'Content storage' },
+	complete: {
+		id: 'app.settings.resource-management.store.verified',
+		defaultMessage: 'Verification complete',
+	},
+	failed: {
+		id: 'app.settings.resource-management.store.attention',
+		defaultMessage: 'Some files still need attention',
+	},
+})
 
 function getIconUrl(icon: string | null | undefined): string | null {
 	if (!icon) return null
@@ -57,56 +70,6 @@ export function useDownloadManager() {
 	const display = useInstallJobDisplay()
 	const { formatMessage } = useVIntl()
 	const formatBytes = useFormatBytes()
-	const verificationMessages = defineMessages({
-		verifying: { id: 'app.download-manager.verifying', defaultMessage: 'Verifying' },
-		title: { id: 'app.settings.resource-management.store.title', defaultMessage: 'Content storage' },
-		complete: {
-			id: 'app.settings.resource-management.store.verified',
-			defaultMessage: 'Verification complete',
-		},
-		failed: {
-			id: 'app.settings.resource-management.store.attention',
-			defaultMessage: 'Some files still need attention',
-		},
-	})
-	const verificationRow = computed<DownloadManagerJob[]>(() => {
-		const task = storeVerificationTask.value
-		if (!task) return []
-		const progress = task.total ? Math.min(0.99, task.current / task.total) : 0
-		const rate = task.status === 'running' && now.value - task.lastRead < 2000 ? task.rate : 0
-		return [
-			{
-				id: task.id,
-				instanceId: null,
-				status: task.status,
-				paused: false,
-				canceling: false,
-				canPause: false,
-				canCancel: false,
-				canRetry: false,
-				title: formatMessage(verificationMessages.title),
-				iconUrl: null,
-				text: formatMessage(
-					task.status === 'running'
-						? verificationMessages.verifying
-						: task.status === 'succeeded'
-							? verificationMessages.complete
-							: verificationMessages.failed,
-				),
-				progress,
-				overallProgress: task.status === 'succeeded' ? 1 : progress,
-				progressLabel:
-					task.status === 'running'
-						? `${formatBytes(task.current)} / ${formatBytes(task.total)} · ${display.formatRate(rate) || '0 B/s'}`
-						: '',
-				waiting: task.total === 0 || task.current >= task.total,
-				eta: '',
-				canCopyDetails: false,
-				copied: false,
-				busy: false,
-			},
-		]
-	})
 	const jobs = ref(new Map<string, InstallJobSnapshot>())
 	const initialized = ref(false)
 	const instances = ref(new Map<string, { name: string; icon: string | null }>())
@@ -123,6 +86,128 @@ export function useDownloadManager() {
 	let metadataRequest = 0
 	let disposed = false
 	let clock: ReturnType<typeof setInterval> | undefined
+
+	const instanceIds = computed(() =>
+		Array.from(
+			new Set(
+				[...jobs.value.values()].map(installJobInstanceId).filter((id): id is string => !!id),
+			),
+		).sort(),
+	)
+
+	const rows = computed(() =>
+		[...jobs.value.values()].map((job): DownloadManagerJob => {
+			const instanceId = installJobInstanceId(job)
+			const instance = instanceId ? instances.value.get(instanceId) : undefined
+			const progress = display.getEffectiveProgress(job)
+			return {
+				id: job.job_id,
+				instanceId: instance && instanceId ? instanceId : null,
+				status: job.status,
+				paused: job.paused,
+				canceling: job.canceling,
+				canPause: job.can_pause,
+				canCancel: job.can_cancel,
+				title: display.getTitle(job, instance?.name),
+				iconUrl: getIconUrl(job.display?.icon) ?? instance?.icon ?? null,
+				text: display.getText(job),
+				progress: display.getProgress(job),
+				overallProgress: overallProgress.get(job.job_id),
+				progressLabel: display.getProgressLabel(job),
+				waiting: !progress || progress.total <= 0,
+				eta:
+					job.paused || job.canceling
+						? ''
+						: display.formatEta(transfer.get(job.job_id, now.value).eta),
+				canRetry: job.status === 'failed' || job.status === 'interrupted',
+				canCopyDetails:
+					job.status === 'failed' ||
+					job.status === 'interrupted' ||
+					appSettings.getFeatureFlag('always_show_copy_details'),
+				copied: copiedJobs.value.has(job.job_id),
+				busy: busyJobs.value.has(job.job_id),
+			}
+		}),
+	)
+
+	const verificationRows = computed(() => {
+		const task = storeVerificationTask.value
+		return task ? [buildVerificationRow(task)] : []
+	})
+	const allRows = computed(() => [...rows.value, ...verificationRows.value])
+
+	const activeJobs = computed(() =>
+		allRows.value
+			.filter((job) => job.status === 'queued' || job.status === 'running')
+			.sort(
+				(a, b) =>
+					Number(a.status === 'queued') - Number(b.status === 'queued') ||
+					(jobs.value.get(a.id)?.created ?? '').localeCompare(jobs.value.get(b.id)?.created ?? ''),
+			),
+	)
+	const attentionJobs = computed(() =>
+		allRows.value
+			.filter((job) => job.status === 'failed' || job.status === 'interrupted')
+			.sort(newestFirst),
+	)
+	const completedJobs = computed(() =>
+		allRows.value
+			.filter((job) => job.status === 'succeeded' || job.status === 'canceled')
+			.sort(newestFirst),
+	)
+	const rate = computed(() =>
+		display.formatRate(
+			activeJobs.value.reduce(
+				(total, job) => total + (transfer.get(job.id, now.value).rate ?? 0),
+				0,
+			),
+		),
+	)
+
+	function buildVerificationRow(
+		task: NonNullable<typeof storeVerificationTask.value>,
+	): DownloadManagerJob {
+		const progress = task.total ? Math.min(0.99, task.current / task.total) : 0
+		const rate = task.status === 'running' && now.value - task.lastRead < 2000 ? task.rate : 0
+
+		return {
+			id: task.id,
+			instanceId: null,
+			status: task.status,
+			paused: false,
+			canceling: false,
+			canPause: false,
+			canCancel: false,
+			canRetry: false,
+			title: formatMessage(verificationMessages.title),
+			iconUrl: null,
+			text: formatMessage(
+				task.status === 'running'
+					? verificationMessages.verifying
+					: task.status === 'succeeded'
+						? verificationMessages.complete
+						: verificationMessages.failed,
+			),
+			progress,
+			overallProgress: task.status === 'succeeded' ? 1 : progress,
+			progressLabel:
+				task.status === 'running'
+					? `${formatBytes(task.current)} / ${formatBytes(task.total)} · ${display.formatRate(rate) || '0 B/s'}`
+					: '',
+			waiting: task.total === 0 || task.current >= task.total,
+			eta: '',
+			canCopyDetails: false,
+			copied: false,
+			busy: false,
+		}
+	}
+
+	function newestFirst(a: DownloadManagerJob, b: DownloadManagerJob) {
+		const first = jobs.value.get(a.id)!
+		const second = jobs.value.get(b.id)!
+		if (!first || !second) return Number(!second) - Number(!first)
+		return (second.finished ?? second.modified).localeCompare(first.finished ?? first.modified)
+	}
 
 	function reportError(error: unknown) {
 		if (!disposed) handleError(toError(error))
@@ -176,14 +261,6 @@ export function useDownloadManager() {
 		}
 	}
 
-	const instanceIds = computed(() =>
-		Array.from(
-			new Set(
-				[...jobs.value.values()].map(installJobInstanceId).filter((id): id is string => !!id),
-			),
-		).sort(),
-	)
-
 	async function refreshMetadata() {
 		const request = ++metadataRequest
 		try {
@@ -200,90 +277,6 @@ export function useDownloadManager() {
 		}
 	}
 
-	watch(() => instanceIds.value.join('\n'), refreshMetadata)
-
-	const rows = computed(() =>
-		[...jobs.value.values()].map((job): DownloadManagerJob => {
-			const instanceId = installJobInstanceId(job)
-			const instance = instanceId ? instances.value.get(instanceId) : undefined
-			const progress = display.getEffectiveProgress(job)
-			return {
-				id: job.job_id,
-				instanceId: instance && instanceId ? instanceId : null,
-				status: job.status,
-				paused: job.paused,
-				canceling: job.canceling,
-				canPause: job.can_pause,
-				canCancel: job.can_cancel,
-				title: display.getTitle(job, instance?.name),
-				iconUrl: getIconUrl(job.display?.icon) ?? instance?.icon ?? null,
-				text: display.getText(job),
-				progress: display.getProgress(job),
-				overallProgress: overallProgress.get(job.job_id),
-				progressLabel: display.getProgressLabel(job),
-				waiting: !progress || progress.total <= 0,
-				eta:
-					job.paused || job.canceling
-						? ''
-						: display.formatEta(transfer.get(job.job_id, now.value).eta),
-				canCopyDetails:
-					job.status === 'failed' ||
-					job.status === 'interrupted' ||
-					appSettings.getFeatureFlag('always_show_copy_details'),
-				copied: copiedJobs.value.has(job.job_id),
-				busy: busyJobs.value.has(job.job_id),
-			}
-		}),
-	)
-
-	function newestFirst(a: DownloadManagerJob, b: DownloadManagerJob) {
-		const first = jobs.value.get(a.id)!
-		const second = jobs.value.get(b.id)!
-		if (!first || !second) return Number(!second) - Number(!first)
-		return (second.finished ?? second.modified).localeCompare(first.finished ?? first.modified)
-	}
-
-	const activeJobs = computed(() =>
-		[...rows.value, ...verificationRow.value]
-			.filter((job) => job.status === 'queued' || job.status === 'running')
-			.sort(
-				(a, b) =>
-					Number(a.status === 'queued') - Number(b.status === 'queued') ||
-					(jobs.value.get(a.id)?.created ?? '').localeCompare(jobs.value.get(b.id)?.created ?? ''),
-			),
-	)
-	const attentionJobs = computed(() =>
-		[...rows.value, ...verificationRow.value]
-			.filter((job) => job.status === 'failed' || job.status === 'interrupted')
-			.sort(newestFirst),
-	)
-	const completedJobs = computed(() =>
-		[...rows.value, ...verificationRow.value]
-			.filter((job) => job.status === 'succeeded' || job.status === 'canceled')
-			.sort(newestFirst),
-	)
-	const rate = computed(() =>
-		display.formatRate(
-			activeJobs.value.reduce(
-				(total, job) => total + (transfer.get(job.id, now.value).rate ?? 0),
-				0,
-			),
-		),
-	)
-
-	watch(
-		() => activeJobs.value.length > 0,
-		(active) => {
-			if (clock) clearInterval(clock)
-			clock = active
-				? setInterval(() => {
-						now.value = performance.now()
-					}, 1000)
-				: undefined
-		},
-		{ immediate: true },
-	)
-
 	async function runAction(id: string, action: () => Promise<unknown>) {
 		if (disposed || busyJobs.value.has(id)) return
 		busyJobs.value.add(id)
@@ -296,31 +289,28 @@ export function useDownloadManager() {
 		}
 	}
 
-	async function retry(id: string) {
+	/** Job events received while an action is pending take precedence over its response. */
+	async function runJobAction(id: string, action: () => Promise<InstallJobSnapshot>) {
 		await runAction(id, async () => {
 			const before = revision
-			const job = await install_job_retry(id)
+			const job = await action()
 			if ((revisions.get(id) ?? 0) <= before) applyJobUpdate(job)
 		})
 	}
 
+	async function retry(id: string) {
+		await runJobAction(id, () => install_job_retry(id))
+	}
+
 	async function cancel(id: string) {
 		if (!jobs.value.get(id)?.can_cancel) return
-		await runAction(id, async () => {
-			const before = revision
-			const job = await install_job_cancel(id)
-			if ((revisions.get(id) ?? 0) <= before) applyJobUpdate(job)
-		})
+		await runJobAction(id, () => install_job_cancel(id))
 	}
 
 	async function togglePause(id: string) {
 		const current = jobs.value.get(id)
 		if (!current?.can_pause) return
-		await runAction(id, async () => {
-			const before = revision
-			const job = await (current.paused ? install_job_resume(id) : install_job_pause(id))
-			if ((revisions.get(id) ?? 0) <= before) applyJobUpdate(job)
-		})
+		await runJobAction(id, () => (current.paused ? install_job_resume(id) : install_job_pause(id)))
 	}
 
 	async function dismiss(id: string) {
@@ -360,6 +350,20 @@ export function useDownloadManager() {
 			)
 		})
 	}
+
+	watch(() => instanceIds.value.join('\n'), refreshMetadata)
+	watch(
+		() => activeJobs.value.length > 0,
+		(active) => {
+			if (clock) clearInterval(clock)
+			clock = active
+				? setInterval(() => {
+						now.value = performance.now()
+					}, 1000)
+				: undefined
+		},
+		{ immediate: true },
+	)
 
 	const unlisten = events.on('install_job', applyJobUpdate)
 	const unlistenInstance = events.on('instance', () => {

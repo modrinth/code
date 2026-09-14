@@ -173,10 +173,7 @@ const instanceLink = computed(() =>
 			</div>
 		</div>
 
-		<div
-			v-if="(needsAttention && job.canRetry !== false) || job.canCopyDetails"
-			class="flex flex-wrap items-center gap-1"
-		>
+		<div v-if="job.canRetry || job.canCopyDetails" class="flex flex-wrap items-center gap-1">
 			<Button
 				v-if="job.canCopyDetails"
 				type="outlined"
@@ -189,7 +186,7 @@ const instanceLink = computed(() =>
 				{{ formatMessage(job.copied ? messages.copied : messages.copyDetails) }}
 			</Button>
 			<Button
-				v-if="needsAttention && job.canRetry !== false"
+				v-if="job.canRetry"
 				type="colored"
 				color="brand"
 				size="xs"

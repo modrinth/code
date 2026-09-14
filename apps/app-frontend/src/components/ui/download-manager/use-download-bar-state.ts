@@ -8,11 +8,11 @@ export function useDownloadBarState(options: {
 	completedJobs: Ref<DownloadManagerJob[]>
 	initialized: Ref<boolean>
 }) {
-	const task = shallowRef<DownloadManagerJob | null>(null)
+	const selectedJob = shallowRef<DownloadManagerJob | null>(null)
 	const completing = ref(false)
 	let hydrated = false
 	let completionTimer: ReturnType<typeof setTimeout> | undefined
-	let queuedAtCompletion = new Set<string>()
+	let activeJobIdsAtCompletion = new Set<string>()
 
 	function clearCompletion() {
 		clearTimeout(completionTimer)
@@ -20,31 +20,46 @@ export function useDownloadBarState(options: {
 		completing.value = false
 	}
 
-	function selectTask() {
-		task.value = options.activeJobs.value[0] ?? options.attentionJobs.value[0] ?? null
+	function selectJob() {
+		selectedJob.value = options.activeJobs.value[0] ?? options.attentionJobs.value[0] ?? null
+	}
+
+	function showCompletion(job: DownloadManagerJob) {
+		selectedJob.value = job
+		completing.value = true
+		activeJobIdsAtCompletion = new Set(options.activeJobs.value.map((job) => job.id))
+		completionTimer = setTimeout(
+			() => {
+				clearCompletion()
+				selectJob()
+			},
+			options.activeJobs.value.length ? 500 : 1000,
+		)
 	}
 
 	function reconcile() {
 		if (!options.initialized.value || !hydrated) {
 			hydrated = options.initialized.value
-			selectTask()
+			selectJob()
 			return
 		}
 
-		const current = task.value
+		const current = selectedJob.value
 		const active = options.activeJobs.value.find((job) => job.id === current?.id)
 		if (active) {
 			clearCompletion()
-			task.value = active
+			selectedJob.value = active
 			return
 		}
 
 		if (completing.value) {
-			const hasNewTask = options.activeJobs.value.some((job) => !queuedAtCompletion.has(job.id))
+			const hasNewJob = options.activeJobs.value.some(
+				(job) => !activeJobIdsAtCompletion.has(job.id),
+			)
 			const completed = options.completedJobs.value.find((job) => job.id === current?.id)
-			if (hasNewTask || !completed || completed.status !== 'succeeded') {
+			if (hasNewJob || !completed || completed.status !== 'succeeded') {
 				clearCompletion()
-				selectTask()
+				selectJob()
 			}
 			return
 		}
@@ -54,21 +69,12 @@ export function useDownloadBarState(options: {
 				(job) => job.id === current.id && job.status === 'succeeded',
 			)
 			if (completed) {
-				task.value = completed
-				completing.value = true
-				queuedAtCompletion = new Set(options.activeJobs.value.map((job) => job.id))
-				completionTimer = setTimeout(
-					() => {
-						clearCompletion()
-						selectTask()
-					},
-					options.activeJobs.value.length ? 500 : 1000,
-				)
+				showCompletion(completed)
 				return
 			}
 		}
 
-		selectTask()
+		selectJob()
 	}
 
 	watch(
@@ -78,5 +84,5 @@ export function useDownloadBarState(options: {
 	)
 	onScopeDispose(clearCompletion)
 
-	return { task, completing }
+	return { selectedJob, completing }
 }

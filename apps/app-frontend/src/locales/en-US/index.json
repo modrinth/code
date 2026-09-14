@@ -308,6 +308,12 @@
   "app.download-manager.canceling": {
     "message": "Canceling installation…"
   },
+  "app.download-manager.clear-all": {
+    "message": "Clear all"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Clear all completed tasks"
+  },
   "app.download-manager.complete": {
     "message": "Complete"
   },
@@ -364,6 +370,9 @@
   },
   "app.download-manager.tasks": {
     "message": "Tasks"
+  },
+  "app.download-manager.verifying": {
+    "message": "Verifying"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Open backups folder"
@@ -2796,16 +2805,19 @@
     "message": "Some files still need attention"
   },
   "app.settings.resource-management.store.cache-limit.description": {
-    "message": "Maximum space used for unused content that can be reused without downloading it again."
+    "message": "Keep up to this much unused content for future installs. Keeping more can save download time."
   },
   "app.settings.resource-management.store.cache-limit.label": {
-    "message": "Unused content cache limit"
+    "message": "Keep unused downloads"
   },
   "app.settings.resource-management.store.cache-limit.unit": {
     "message": "GiB"
   },
   "app.settings.resource-management.store.clear": {
     "message": "Clear unused"
+  },
+  "app.settings.resource-management.store.clear.description": {
+    "message": "Delete unused downloaded content"
   },
   "app.settings.resource-management.store.cleared": {
     "message": "Freed {size} of disk space."
@@ -2814,7 +2826,7 @@
     "message": "Clearing…"
   },
   "app.settings.resource-management.store.description": {
-    "message": "Save space by reusing mods and packs across your instances."
+    "message": "Save space by reusing game installs, mods and packs across your instances."
   },
   "app.settings.resource-management.store.empty": {
     "message": "Install mods or packs to see your storage usage here."
@@ -2828,8 +2840,11 @@
   "app.settings.resource-management.store.repair": {
     "message": "Verify and repair"
   },
-  "app.settings.resource-management.store.repair.description": {
-    "message": "Check for missing or damaged files and repair them. Close running instances first."
+  "app.settings.resource-management.store.repair.running-description": {
+    "message": "This will close any running instances."
+  },
+  "app.settings.resource-management.store.repair.verify-description": {
+    "message": "Check for missing or damaged files and repair them."
   },
   "app.settings.resource-management.store.repairing": {
     "message": "Verifying and repairing…"

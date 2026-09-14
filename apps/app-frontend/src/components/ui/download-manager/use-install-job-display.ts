@@ -1,7 +1,7 @@
 import { defineMessages, useFormatNumber, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import type { InstallJobSnapshot, InstallPhaseId, InstallProgress } from '@/helpers/install'
+import type { InstallJobSnapshot, InstallProgress } from '@/helpers/install'
 
 const messages = defineMessages({
 	paused: { id: 'app.download-manager.paused', defaultMessage: 'Paused' },
@@ -206,6 +206,36 @@ const failureSummaryMessages = defineMessages({
 	},
 })
 
+const failureMessagesByCode = new Map([
+	['api_error', failureSummaryMessages.modrinthUnreachable],
+	['archive_error', failureSummaryMessages.badModpackFile],
+	['parse_error', failureSummaryMessages.invalidModpack],
+	['content_error', failureSummaryMessages.invalidModpackFiles],
+	['hash_error', failureSummaryMessages.corruptDownload],
+	['filesystem_error', failureSummaryMessages.couldNotSaveFiles],
+	['path_error', failureSummaryMessages.invalidFilePath],
+	['instance_error', failureSummaryMessages.instanceNotFound],
+	['java_error', failureSummaryMessages.javaSetupFailed],
+	['loader_error', failureSummaryMessages.loaderSetupFailed],
+	['processor_error', failureSummaryMessages.loaderSetupFailed],
+	['database_error', failureSummaryMessages.localDataError],
+])
+
+const failureMessagesByPhase = new Map([
+	['downloading_pack_file', failureSummaryMessages.packDownloadFailed],
+	['resolving_pack', failureSummaryMessages.invalidModpack],
+	['reading_pack_manifest', failureSummaryMessages.invalidModpack],
+	['downloading_content', failureSummaryMessages.contentDownloadFailed],
+	['extracting_overrides', failureSummaryMessages.couldNotSaveFiles],
+	['resolving_minecraft', failureSummaryMessages.minecraftSetupFailed],
+	['downloading_minecraft', failureSummaryMessages.minecraftSetupFailed],
+	['resolving_loader', failureSummaryMessages.loaderSetupFailed],
+	['running_loader_processors', failureSummaryMessages.loaderSetupFailed],
+	['preparing_java', failureSummaryMessages.javaSetupFailed],
+	['preparing_instance', failureSummaryMessages.instanceNotFound],
+	['rolling_back', failureSummaryMessages.cleanupIncomplete],
+])
+
 export function useInstallJobDisplay() {
 	const { formatMessage, locale } = useVIntl()
 	const formatNumber = useFormatNumber()
@@ -292,76 +322,25 @@ export function useInstallJobDisplay() {
 			return formatMessage(failureSummaryMessages.noWritePermission)
 		}
 
-		switch (code) {
-			case 'network_error':
-				return formatMessage(
-					phase === 'downloading_pack_file'
-						? failureSummaryMessages.packDownloadFailed
-						: failureSummaryMessages.downloadFailed,
-				)
-			case 'api_error':
-				return formatMessage(failureSummaryMessages.modrinthUnreachable)
-			case 'pack_error':
-				return formatMessage(
-					phase === 'downloading_pack_file'
-						? failureSummaryMessages.packDownloadFailed
-						: failureSummaryMessages.invalidModpack,
-				)
-			case 'archive_error':
-				return formatMessage(failureSummaryMessages.badModpackFile)
-			case 'parse_error':
-				return formatMessage(failureSummaryMessages.invalidModpack)
-			case 'content_error':
-				return formatMessage(failureSummaryMessages.invalidModpackFiles)
-			case 'hash_error':
-				return formatMessage(failureSummaryMessages.corruptDownload)
-			case 'filesystem_error':
-				return formatMessage(failureSummaryMessages.couldNotSaveFiles)
-			case 'path_error':
-				return formatMessage(failureSummaryMessages.invalidFilePath)
-			case 'instance_error':
-				return formatMessage(failureSummaryMessages.instanceNotFound)
-			case 'java_error':
-				return formatMessage(failureSummaryMessages.javaSetupFailed)
-			case 'loader_error':
-			case 'processor_error':
-				return formatMessage(failureSummaryMessages.loaderSetupFailed)
-			case 'database_error':
-				return formatMessage(failureSummaryMessages.localDataError)
-			case 'launcher_error':
-			case 'metadata_error':
-				return getFailureSummaryForPhase(phase)
-			default:
-				return getFailureSummaryForPhase(phase)
+		if (code === 'network_error') {
+			return formatMessage(
+				phase === 'downloading_pack_file'
+					? failureSummaryMessages.packDownloadFailed
+					: failureSummaryMessages.downloadFailed,
+			)
 		}
-	}
+		if (code === 'pack_error') {
+			return formatMessage(
+				phase === 'downloading_pack_file'
+					? failureSummaryMessages.packDownloadFailed
+					: failureSummaryMessages.invalidModpack,
+			)
+		}
 
-	function getFailureSummaryForPhase(phase: InstallPhaseId): string {
-		switch (phase) {
-			case 'downloading_pack_file':
-				return formatMessage(failureSummaryMessages.packDownloadFailed)
-			case 'resolving_pack':
-			case 'reading_pack_manifest':
-				return formatMessage(failureSummaryMessages.invalidModpack)
-			case 'downloading_content':
-				return formatMessage(failureSummaryMessages.contentDownloadFailed)
-			case 'extracting_overrides':
-				return formatMessage(failureSummaryMessages.couldNotSaveFiles)
-			case 'resolving_minecraft':
-			case 'downloading_minecraft':
-				return formatMessage(failureSummaryMessages.minecraftSetupFailed)
-			case 'resolving_loader':
-			case 'running_loader_processors':
-				return formatMessage(failureSummaryMessages.loaderSetupFailed)
-			case 'preparing_java':
-				return formatMessage(failureSummaryMessages.javaSetupFailed)
-			case 'preparing_instance':
-				return formatMessage(failureSummaryMessages.instanceNotFound)
-			case 'rolling_back':
-				return formatMessage(failureSummaryMessages.cleanupIncomplete)
-			default:
-				return formatMessage(failureSummaryMessages.unexpectedError)
-		}
+		const message = code ? failureMessagesByCode.get(code) : undefined
+		return formatMessage(
+			message ?? failureMessagesByPhase.get(phase) ?? failureSummaryMessages.unexpectedError,
+		)
 	}
 
 	function hasPermissionError(job: InstallJobSnapshot): boolean {

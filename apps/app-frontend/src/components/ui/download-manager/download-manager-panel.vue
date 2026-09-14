@@ -114,11 +114,13 @@ defineExpose({ focus: () => panel.value?.focus() })
 					<template v-for="(section, index) in sections" :key="section.id">
 						<div v-if="index" class="h-px shrink-0 bg-surface-5" />
 						<section class="flex flex-col">
-							<div class="flex items-center gap-2"
+							<div
+								class="flex items-center gap-2"
 								:class="{
 									'pt-1.5': index === 0,
 									'pb-1.5': index === sections.length - 1,
-								}">
+								}"
+							>
 								<button
 									type="button"
 									class="flex min-w-0 flex-1 items-center gap-2 rounded-md border-0 bg-transparent px-1.5 text-sm font-medium leading-5 text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
