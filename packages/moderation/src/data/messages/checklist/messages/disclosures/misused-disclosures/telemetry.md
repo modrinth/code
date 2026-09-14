@@ -1,0 +1,1 @@
+- [Telemetry](%DISCLOSURES_FAQ_TELEMETRY_LINK%), or any instances of data being sent to a remote server that the user did not connect to.

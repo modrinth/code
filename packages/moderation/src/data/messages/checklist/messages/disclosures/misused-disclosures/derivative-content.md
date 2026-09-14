@@ -1,0 +1,1 @@
+- [Derivative content](%DISCLOSURES_FAQ_DERIVATIVE_LINK%), such as code or assets from another project or creator.

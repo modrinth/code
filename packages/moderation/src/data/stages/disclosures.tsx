@@ -75,7 +75,54 @@ export default function () {
 					)
 					.collect(undefined, 'missing-disclosures/list-intro'),
 
-				toggle('misused', 'Misused').suggestedStatus('flagged').message(),
+				toggle('misused-disclosures', 'Misused').suggestedStatus('flagged')
+					.message('misused-disclosures/misused-disclosures-header')
+					.children(
+						group()
+							.title('Which content disclosures are misused?')
+							.children(
+								toggle('ai', 'AI Usage')
+									.suggestedStatus('flagged')
+									.message('ai/ai')
+									.children(
+										group()
+											.title('What kind of AI content is misused?')
+											.children(
+												toggle('code', 'Code').message('ai-usages/code'),
+												toggle('assets', 'Assets').message('ai-usages/assets'),
+												toggle('text', 'Text').message('ai-usages/text'),
+											),
+									)
+									.collect(undefined, 'ai/list-intro'),
+
+								toggle('ai-functionality', 'AI Functionality')
+									.suggestedStatus('flagged')
+									.message('ai/ai-functionality'),
+
+								toggle('ads', 'Advertisements').suggestedStatus('flagged').message(),
+
+								toggle('paid-features', 'Paid Features').suggestedStatus('flagged').message(),
+
+								toggle('telemetry', 'Telemetry')
+									.suggestedStatus('rejected')
+									.message(),
+
+								toggle('derivative-content', 'Derivative Content')
+									.suggestedStatus('rejected')
+									.message(),
+
+								toggle('photosensitivity', 'Photosensitivity')
+									.suggestedStatus('rejected')
+									.message(),
+
+								toggle('system-interactions', 'System Interactions')
+									.suggestedStatus('rejected')
+									.message(),
+
+								toggle('archive', 'Archive').message(),
+							),
+					)
+					.collect(undefined, 'misused-disclosures/list-intro'),
 				toggle('non-english', 'Non-English').suggestedStatus('flagged').message(),
 			),
 		)
