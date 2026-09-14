@@ -11,6 +11,18 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-09-14T16:37:42+00:00`,
+		product: 'app',
+		version: '0.21.1',
+		body: `## Changed
+- Changed resource management icon to microchip.
+
+## Fixed
+- Fixed the alignment of the Modrinth logo on windows and linux
+- Fixed issue with Resource management tab not loading when calculating storage usage.
+- Fixed issue with Sync overrides toggles not showing true state until clicked on.`,
+	},
+	{
 		date: `2026-09-14T15:44:10+00:00`,
 		product: 'hosting',
 		body: `## Fixed
