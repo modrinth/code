@@ -660,7 +660,7 @@ async fn test_leaving_review_skips_validation() {
 
 #[actix_rt::test]
 async fn test_description_similarity_to_summary() {
-	with_test_environment(
+    with_test_environment(
 		None,
 		|test_env: TestEnvironment<ApiV3>| async move {
 			let api = &test_env.api;

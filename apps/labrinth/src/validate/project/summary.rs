@@ -1,11 +1,10 @@
 use serde_json::json;
 
 use super::text::{
-	ProfanityKind, contains_spam, find_link_or_ip, has_non_standard_text,
-	has_summary_formatting, is_confidently_non_english_short_text,
-	is_likely_english_summary, js_string_length,
-	normalize_project_field_text, profanity_matches, project_requires_english,
-	project_text_similarity,
+    ProfanityKind, contains_spam, find_link_or_ip, has_non_standard_text,
+    has_summary_formatting, is_confidently_non_english_short_text,
+    is_likely_english_summary, js_string_length, normalize_project_field_text,
+    profanity_matches, project_requires_english, project_text_similarity,
 };
 use super::{ProjectNag, ProjectNagKind, ProjectNagSeverity};
 
@@ -123,12 +122,12 @@ pub(super) fn is_non_english(project: &Project) -> bool {
 }
 
 fn is_non_english_text(project: &Project, normalized_summary: &str) -> bool {
-	let length = js_string_length(normalized_summary);
-	project_requires_english(project)
-		&& length >= MIN_SUMMARY_LANGUAGE_CHARS
-		&& (length >= MIN_SUMMARY_CHARS
-			|| is_confidently_non_english_short_text(normalized_summary))
-		&& !is_likely_english_summary(normalized_summary)
+    let length = js_string_length(normalized_summary);
+    project_requires_english(project)
+        && length >= MIN_SUMMARY_LANGUAGE_CHARS
+        && (length >= MIN_SUMMARY_CHARS
+            || is_confidently_non_english_short_text(normalized_summary))
+        && !is_likely_english_summary(normalized_summary)
 }
 
 fn requires_language_nag(

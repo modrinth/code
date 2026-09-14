@@ -69,7 +69,7 @@ pub enum ProjectNagKind {
     ProjectDescriptionProfanity,
     ProjectDescriptionNonStandardText,
     ProjectDescriptionNonEnglish,
-	ProjectDescriptionMatchesSummary,
+    ProjectDescriptionMatchesSummary,
     AddDescription,
     DescriptionTooShort,
     ProjectDescriptionSpam,
