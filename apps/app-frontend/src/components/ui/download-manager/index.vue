@@ -79,6 +79,7 @@ function close() {
 		ref="menu"
 		bare
 		:arrow="false"
+		:distance="4"
 		placement="bottom-end"
 		panel-class="download-manager-popper"
 		@open="onOpen"

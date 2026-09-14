@@ -371,6 +371,9 @@
   "app.download-manager.tasks": {
     "message": "Tasks"
   },
+  "app.download-manager.title": {
+    "message": "Download manager"
+  },
   "app.download-manager.verifying": {
     "message": "Verifying"
   },

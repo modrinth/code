@@ -32,6 +32,7 @@ const props = defineProps<{
 defineEmits<{ close: [] }>()
 
 const messages = defineMessages({
+	title: { id: 'app.download-manager.title', defaultMessage: 'Download manager' },
 	show: { id: 'app.download-manager.show', defaultMessage: 'Show installation tasks' },
 	hide: { id: 'app.download-manager.hide', defaultMessage: 'Hide installation tasks' },
 	attention: { id: 'app.download-manager.attention', defaultMessage: 'Needs attention' },
@@ -213,6 +214,7 @@ defineExpose({ focus: () => trigger.value?.focus() })
 		</span>
 		<button
 			ref="trigger"
+			v-tooltip="formatMessage(messages.title)"
 			type="button"
 			class="relative isolate flex h-full w-full min-w-0 items-center overflow-hidden rounded-[inherit] border border-solid bg-transparent p-0 text-sm font-medium leading-5 text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
 			:class="[appearance.borderClass, { 'hover:bg-surface-4': !appearance.highlighted }]"

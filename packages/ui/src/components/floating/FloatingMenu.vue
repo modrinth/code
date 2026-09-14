@@ -24,6 +24,7 @@ const props = withDefaults(
 	defineProps<{
 		trigger?: 'click' | 'hover'
 		placement?: Placement
+		distance?: number
 		theme?: string
 		disabled?: boolean
 		bare?: boolean
@@ -33,6 +34,7 @@ const props = withDefaults(
 	{
 		trigger: 'click',
 		placement: 'bottom',
+		distance: 8,
 		theme: 'dropdown',
 		disabled: false,
 		bare: false,
@@ -66,7 +68,7 @@ const { floatingStyles, middlewareData, placement, x, y, isPositioned } = useFlo
 		},
 		open: isOpen,
 		middleware: [
-			offset(8),
+			offset(() => props.distance),
 			flip(),
 			shift({ padding: 8 }),
 			floatingArrow({ element: arrowEl, padding: 12 }),

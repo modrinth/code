@@ -34,6 +34,7 @@ export interface DownloadManagerJob {
 	title: string
 	iconUrl: string | null
 	text: string
+	finishedAt?: string
 	progress: number
 	overallProgress: number
 	progressLabel: string
@@ -111,6 +112,7 @@ export function useDownloadManager() {
 				title: display.getTitle(job, instance?.name),
 				iconUrl: getIconUrl(job.display?.icon) ?? instance?.icon ?? null,
 				text: display.getText(job),
+				finishedAt: job.finished ?? job.modified,
 				progress: display.getProgress(job),
 				overallProgress: overallProgress.get(job.job_id),
 				progressLabel: display.getProgressLabel(job),

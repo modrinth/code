@@ -11,11 +11,13 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
+	BulletDivider,
 	Button,
 	defineMessages,
 	IconButton,
 	ProgressBar,
 	truncatedTooltip,
+	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, useTemplateRef } from 'vue'
@@ -34,6 +36,7 @@ defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
+const formatRelativeTime = useRelativeTime({ style: 'narrow', numeric: 'always' })
 const titleRef = useTemplateRef('title')
 const textRef = useTemplateRef('text')
 const messages = defineMessages({
@@ -100,10 +103,8 @@ const instanceLink = computed(() =>
 					>
 						{{ job.title }}
 					</span>
-					<span
-						ref="text"
-						v-tooltip="truncatedTooltip(textRef, job.text)"
-						class="truncate text-xs font-medium leading-4"
+					<div
+						class="flex min-w-0 items-center gap-1 text-xs font-medium leading-4"
 						:class="
 							needsAttention
 								? job.status === 'failed'
@@ -112,8 +113,16 @@ const instanceLink = computed(() =>
 								: 'text-primary'
 						"
 					>
-						{{ job.text }}
-					</span>
+						<template v-if="complete && job.finishedAt">
+							<time :datetime="job.finishedAt" class="shrink-0">
+								{{ formatRelativeTime(job.finishedAt) }}
+							</time>
+							<BulletDivider class="shrink-0" />
+						</template>
+						<span ref="text" v-tooltip="truncatedTooltip(textRef, job.text)" class="truncate">
+							{{ job.text }}
+						</span>
+					</div>
 				</div>
 			</component>
 			<div class="flex items-center gap-0.5">
