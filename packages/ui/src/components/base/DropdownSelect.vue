@@ -273,7 +273,7 @@ const isChildOfDropdown = (element) => {
 	}
 
 	.options {
-		z-index: 10;
+		z-index: 100005;
 		max-height: v-bind('maxVisibleOptions ? `calc(${maxVisibleOptions} * 3rem)` : "18.75rem"');
 		overflow-y: auto;
 		box-shadow:
@@ -344,7 +344,7 @@ const isChildOfDropdown = (element) => {
 	position: absolute;
 	width: 100%;
 	overflow: auto;
-	z-index: 9;
+	z-index: 100005;
 
 	&.up {
 		top: 0;

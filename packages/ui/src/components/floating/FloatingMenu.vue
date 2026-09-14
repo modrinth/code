@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-	arrow,
+	arrow as floatingArrow,
 	autoUpdate,
 	flip,
 	offset,
@@ -27,6 +27,7 @@ const props = withDefaults(
 		theme?: string
 		disabled?: boolean
 		bare?: boolean
+		arrow?: boolean
 		panelClass?: string
 	}>(),
 	{
@@ -35,6 +36,7 @@ const props = withDefaults(
 		theme: 'dropdown',
 		disabled: false,
 		bare: false,
+		arrow: true,
 	},
 )
 
@@ -63,7 +65,12 @@ const { floatingStyles, middlewareData, placement, x, y, isPositioned } = useFlo
 			})
 		},
 		open: isOpen,
-		middleware: [offset(8), flip(), shift({ padding: 8 }), arrow({ element: arrowEl })],
+		middleware: [
+			offset(8),
+			flip(),
+			shift({ padding: 8 }),
+			floatingArrow({ element: arrowEl, padding: 12 }),
+		],
 	},
 )
 
@@ -229,20 +236,21 @@ defineExpose({ show, hide: close })
 				>
 					<div
 						:class="[
-							bare
-								? 'overflow-y-auto'
-								: 'v-popper__inner overflow-y-auto text-sm font-medium text-contrast',
+							'relative overflow-visible',
+							bare ? undefined : 'v-popper__inner text-sm font-medium text-contrast',
 							panelClass,
 						]"
 					>
-						<slot name="popper" :hide="close" />
+						<div class="overflow-y-auto">
+							<slot name="popper" :hide="close" />
+						</div>
+						<div
+							v-if="arrow"
+							ref="arrowEl"
+							class="tooltip-arrow pointer-events-none absolute z-10 size-2 border-b border-r border-0 border-solid border-surface-5 bg-surface-3"
+							:style="arrowStyles"
+						/>
 					</div>
-					<div
-						v-if="!bare"
-						ref="arrowEl"
-						class="tooltip-arrow pointer-events-none absolute size-2 border-b border-r border-0 border-solid border-surface-5 bg-surface-3"
-						:style="arrowStyles"
-					/>
 				</div>
 			</Transition>
 		</Teleport>
