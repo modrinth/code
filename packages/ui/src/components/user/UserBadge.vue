@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ExternalIcon } from '@modrinth/assets'
-import { Tooltip } from 'floating-vue'
-import { type Component, useId } from 'vue'
+import type { Component } from 'vue'
 
+import { Tooltip } from '#ui/components/floating'
 import { type MessageDescriptor, useVIntl } from '#ui/composables/i18n.ts'
 
 import AutoLink from '../base/AutoLink.vue'
@@ -19,11 +19,9 @@ defineProps<{
 		message: MessageDescriptor
 	}
 }>()
-
-const baseId = useId()
 </script>
 <template>
-	<Tooltip theme="tooltip" :triggers="['hover', 'focus']" :aria-id="`${baseId}-${name.id}`">
+	<Tooltip class="flex">
 		<AutoLink
 			:to="link?.href"
 			class="rounded-2xl flex"

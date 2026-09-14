@@ -11,6 +11,35 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-09-14T02:29:42+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed project 404 errors.`,
+	},
+	{
+		date: `2026-09-14T00:11:58+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated the images on the Modrinth Hosting landing page.
+- Tooltips now appear only after a delay, no longer re-open when quickly moving to another nearby tooltip, smoothly animate between positions, and have a slight delay before closing to bring them closer to typical tooltip guidelines. Tooltip animations have also been improved to be smoother.
+- Added a slight selection animation to selecting the different tabs of the app.
+
+## Fixed
+- Fixed focus trapping of modal menus.
+- Fixed many screen reader issues. A lot more work still needs to be done here, but certain parts of the app should be much better with screen readers now.`,
+	},
+	{
+		date: `2026-09-14T00:11:58+00:00`,
+		product: 'app',
+		version: '0.20.5',
+		body: `## Changed
+- Tooltips now appear only after a delay, no longer re-open when quickly moving to another nearby tooltip, smoothly animate between positions, and have a slight delay before closing to bring them closer to typical tooltip guidelines. Tooltip animations have also been improved to be smoother.
+
+## Fixed
+- Fixed focus trapping of modal menus.
+- Fixed the action bar in the modpack content modal displaying below the modal.`,
+	},
+	{
 		date: `2026-09-11T19:36:35+00:00`,
 		product: 'web',
 		body: `## Changed

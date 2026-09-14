@@ -187,6 +187,7 @@ const bulkProgressMessage = computed(() => {
 		:shown="shown"
 		:aria-label="ariaLabel"
 		:hide-when-modal-open="hideWhenModalOpen"
+		:below-modal="hideWhenModalOpen"
 	>
 		<div class="flex items-center gap-0.5">
 			<div

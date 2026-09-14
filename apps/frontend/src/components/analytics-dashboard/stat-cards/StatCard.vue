@@ -38,7 +38,7 @@
 
 		<div class="flex flex-col gap-2.5">
 			<div
-				v-tooltip="!disabled ? statTooltip : undefined"
+				v-tooltip="!disabled && statTooltip !== statLabel ? statTooltip : undefined"
 				class="w-fit text-2xl font-semibold leading-none md:text-4xl"
 				:class="{
 					'text-primary': disabled,

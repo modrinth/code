@@ -239,7 +239,6 @@ const installTooltip = computed(() => {
 						<span
 							v-if="synced && hideActions"
 							v-tooltip="syncStatusLabel"
-							:aria-label="syncStatusLabel"
 							role="img"
 							class="inline-flex shrink-0 cursor-help items-center justify-center rounded-full border border-solid border-brand-blue bg-highlight-blue px-2.5 py-1 text-brand-blue"
 							tabindex="0"
@@ -373,7 +372,6 @@ const installTooltip = computed(() => {
 			<span
 				v-if="synced"
 				v-tooltip="syncStatusLabel"
-				:aria-label="syncStatusLabel"
 				role="img"
 				tabindex="0"
 				class="inline-flex shrink-0 cursor-help items-center justify-center rounded-full border border-solid border-brand-blue bg-highlight-blue px-2.5 py-1 text-brand-blue focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow"

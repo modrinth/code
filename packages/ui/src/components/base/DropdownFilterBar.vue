@@ -432,6 +432,7 @@ import { Button, type ButtonElementHandle, type ButtonSize } from '#ui/component
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { useVirtualScroll } from '../../composables/virtual-scroll'
+import { dismissTooltip } from '../../providers/tooltip'
 import Input from './inputs/Input.vue'
 import MultiSelect, { type MultiSelectItem } from './MultiSelect.vue'
 
@@ -987,6 +988,7 @@ function openAddMenu() {
 		return
 	}
 
+	dismissTooltip()
 	commitPreviewFilterDrafts()
 	resetAddMenuDraft()
 	syncMobileAddMenuLayout()

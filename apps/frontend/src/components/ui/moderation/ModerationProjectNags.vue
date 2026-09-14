@@ -72,7 +72,6 @@
 									nag.status === 'warning' && 'text-orange',
 									nag.status === 'suggestion' && 'text-purple',
 								]"
-								:aria-label="getStatusTooltip(nag.status)"
 							/>
 							{{ getFormattedMessage(nag.title) }}
 						</span>

@@ -192,7 +192,6 @@ defineExpose({
 						v-if="link"
 						v-tooltip="'Copy Link'"
 						type="button"
-						aria-label="Copy Link"
 						class="flex h-10 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border-none bg-button-bg px-3 pr-1.5 text-primary transition-all hover:bg-button-bg-hover hover:brightness-125 active:scale-95"
 						@click="copyText"
 					>
@@ -222,7 +221,6 @@ defineExpose({
 							v-tooltip="'Send as an email'"
 							:href="sendEmail"
 							:target="targetParameter"
-							aria-label="Send as an email"
 							class="!w-9 !px-0 !rounded-full"
 						>
 							<MailIcon aria-hidden="true" />
@@ -232,7 +230,6 @@ defineExpose({
 							v-tooltip="'Open link in browser'"
 							:target="targetParameter"
 							:href="url"
-							aria-label="Open link in browser"
 							class="!w-9 !px-0 !rounded-full"
 						>
 							<GlobeIcon aria-hidden="true" />
@@ -241,7 +238,6 @@ defineExpose({
 							v-tooltip="'Toot about it'"
 							:target="targetParameter"
 							:href="sendToot"
-							aria-label="Toot about it"
 							class="!w-9 !px-0 !rounded-full"
 						>
 							<MastodonIcon aria-hidden="true" />
@@ -250,7 +246,6 @@ defineExpose({
 							v-tooltip="'Tweet about it'"
 							:target="targetParameter"
 							:href="sendTweet"
-							aria-label="Tweet about it"
 							class="!w-9 !px-0 !rounded-full"
 						>
 							<TwitterIcon aria-hidden="true" />
@@ -259,7 +254,6 @@ defineExpose({
 							v-tooltip="'Share on Reddit'"
 							:target="targetParameter"
 							:href="postOnReddit"
-							aria-label="Share on Reddit"
 							class="!w-9 !px-0 !rounded-full"
 						>
 							<RedditIcon aria-hidden="true" />
