@@ -2775,6 +2775,7 @@ dependencies = [
  "futures",
  "indexmap 2.14.2",
  "itertools 0.14.0",
+ "md5",
  "quick-xml 0.38.3",
  "reqwest 0.12.24",
  "rust-s3",

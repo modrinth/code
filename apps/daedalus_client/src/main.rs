@@ -101,13 +101,16 @@ async fn main() -> Result<()> {
             "Writing local metadata files"
         );
 
-        futures::future::try_join_all(upload_files.iter().map(|entry| {
+        futures::future::join_all(upload_files.iter().map(|entry| {
             let path = entry.key().clone();
             let file = entry.value().file.clone();
             let written_files = written_files.clone();
 
             async move {
-                write_file_to_local_output(&path, file).await?;
+                if let Err(err) = write_file_to_local_output(&path, file).await
+                {
+                    tracing::error!(error = ?err, %path, "Failed to write local metadata file");
+                }
                 let written = written_files.fetch_add(1, Ordering::Relaxed) + 1;
 
                 if written.is_multiple_of(100) || written == upload_file_total {
@@ -119,11 +122,9 @@ async fn main() -> Result<()> {
                         "Wrote local metadata files"
                     );
                 }
-
-                Ok::<_, Error>(())
             }
         }))
-        .await?;
+        .await;
 
         let written_mirror_files = Arc::new(AtomicUsize::new(0));
 
@@ -132,7 +133,7 @@ async fn main() -> Result<()> {
             "Writing local mirror files"
         );
 
-        futures::future::try_join_all(mirror_artifacts.iter().map(|entry| {
+        futures::future::join_all(mirror_artifacts.iter().map(|entry| {
             let path = format!("maven/{}", entry.key());
             let mirrors = entry
                 .value()
@@ -151,10 +152,16 @@ async fn main() -> Result<()> {
             let semaphore = semaphore.clone();
 
             async move {
-                write_url_to_local_output_mirrors(
-                    path, mirrors, sha1, &semaphore,
+                if let Err(err) = write_url_to_local_output_mirrors(
+                    path.clone(),
+                    mirrors,
+                    sha1,
+                    &semaphore,
                 )
-                .await?;
+                .await
+                {
+                    tracing::error!(error = ?err, %path, "Failed to write local mirror file");
+                }
                 let written =
                     written_mirror_files.fetch_add(1, Ordering::Relaxed) + 1;
 
@@ -167,11 +174,9 @@ async fn main() -> Result<()> {
                         "Wrote local mirror files"
                     );
                 }
-
-                Ok::<_, Error>(())
             }
         }))
-        .await?;
+        .await;
     } else {
         let uploaded_files = Arc::new(AtomicUsize::new(0));
 
@@ -180,7 +185,7 @@ async fn main() -> Result<()> {
             "Uploading metadata files"
         );
 
-        futures::future::try_join_all(upload_files.iter().map(|entry| {
+        futures::future::join_all(upload_files.iter().map(|entry| {
             let path = entry.key().clone();
             let file = entry.value().file.clone();
             let content_type = entry.value().content_type.clone();
@@ -188,8 +193,16 @@ async fn main() -> Result<()> {
             let semaphore = semaphore.clone();
 
             async move {
-                upload_file_to_bucket(path, file, content_type, &semaphore)
-                    .await?;
+                if let Err(err) = upload_file_to_bucket(
+                    path.clone(),
+                    file,
+                    content_type,
+                    &semaphore,
+                )
+                .await
+                {
+                    tracing::error!(error = ?err, %path, "Failed to upload metadata file");
+                }
                 let uploaded =
                     uploaded_files.fetch_add(1, Ordering::Relaxed) + 1;
 
@@ -203,11 +216,9 @@ async fn main() -> Result<()> {
                         "Uploaded metadata files"
                     );
                 }
-
-                Ok::<_, Error>(())
             }
         }))
-        .await?;
+        .await;
 
         let uploaded_mirror_files = Arc::new(AtomicUsize::new(0));
 
@@ -216,7 +227,7 @@ async fn main() -> Result<()> {
             "Uploading mirror files"
         );
 
-        futures::future::try_join_all(mirror_artifacts.iter().map(|entry| {
+        futures::future::join_all(mirror_artifacts.iter().map(|entry| {
             let path = format!("maven/{}", entry.key());
             let mirrors = entry
                 .value()
@@ -235,8 +246,16 @@ async fn main() -> Result<()> {
             let semaphore = semaphore.clone();
 
             async move {
-                upload_url_to_bucket_mirrors(path, mirrors, sha1, &semaphore)
-                    .await?;
+                if let Err(err) = upload_url_to_bucket_mirrors(
+                    path.clone(),
+                    mirrors,
+                    sha1,
+                    &semaphore,
+                )
+                .await
+                {
+                    tracing::error!(error = ?err, %path, "Failed to upload mirror file");
+                }
                 let uploaded =
                     uploaded_mirror_files.fetch_add(1, Ordering::Relaxed) + 1;
 
@@ -250,11 +269,9 @@ async fn main() -> Result<()> {
                         "Uploaded mirror files"
                     );
                 }
-
-                Ok::<_, Error>(())
             }
         }))
-        .await?;
+        .await;
     }
 
     if dotenvy::var("CLOUDFLARE_INTEGRATION")
