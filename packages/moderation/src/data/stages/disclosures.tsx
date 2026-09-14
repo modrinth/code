@@ -75,7 +75,8 @@ export default function () {
 					)
 					.collect(undefined, 'missing-disclosures/list-intro'),
 
-				toggle('misused-disclosures', 'Misused').suggestedStatus('flagged')
+				toggle('misused-disclosures', 'Misused')
+					.suggestedStatus('flagged')
 					.message('misused-disclosures/misused-disclosures-header')
 					.children(
 						group()
@@ -103,9 +104,7 @@ export default function () {
 
 								toggle('paid-features', 'Paid Features').suggestedStatus('flagged').message(),
 
-								toggle('telemetry', 'Telemetry')
-									.suggestedStatus('rejected')
-									.message(),
+								toggle('telemetry', 'Telemetry').suggestedStatus('rejected').message(),
 
 								toggle('derivative-content', 'Derivative Content')
 									.suggestedStatus('rejected')
