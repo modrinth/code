@@ -2843,15 +2843,13 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	--os-handle-bg-active: var(--color-scrollbar) !important;
 }
 
+.app-grid-statusbar {
+	padding-left: 0.25rem;
+}
+
 .mac-traffic-lights {
 	.app-grid-statusbar {
 		padding-left: 5rem;
-	}
-}
-
-:not(.mac-traffic-lights) {
-	.app-grid-statusbar {
-		padding-left: 0.25rem;
 	}
 }
 
