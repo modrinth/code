@@ -221,6 +221,18 @@ impl DirectoryInfo {
         _io_semaphore: &IoSemaphore,
         app_identifier: &str,
     ) -> crate::Result<()> {
+        Self::try_move_launcher_directory(settings, pool, app_identifier)
+            .await
+            .map_err(|error| {
+                crate::ErrorKind::DirectoryMoveError(error.to_string()).into()
+            })
+    }
+
+    async fn try_move_launcher_directory(
+        settings: &mut Settings,
+        pool: &sqlx::SqlitePool,
+        app_identifier: &str,
+    ) -> crate::Result<()> {
         let initial = DirectoryInfo::initial_settings_dir_path(app_identifier)
             .ok_or_else(|| {
                 crate::ErrorKind::FSError(
@@ -242,16 +254,14 @@ impl DirectoryInfo {
         let moving = previous_root
             .as_ref()
             .is_some_and(|root| root != &destination_root);
-        let pending_move = super::content_store::catalog::setting(
-            pool,
-            "store_directory_move",
-        )
-        .await?
-        .filter(|checkpoint| !checkpoint.is_empty())
-        .map(|checkpoint| {
-            serde_json::from_str::<(PathBuf, PathBuf)>(&checkpoint)
-        })
-        .transpose()?;
+        let pending_move =
+            super::content_store::setting(pool, "store_directory_move")
+                .await?
+                .filter(|checkpoint| !checkpoint.is_empty())
+                .map(|checkpoint| {
+                    serde_json::from_str::<(PathBuf, PathBuf)>(&checkpoint)
+                })
+                .transpose()?;
         let settings_root = fs::canonicalize(&initial).await?;
         let mut locked_roots = std::collections::HashSet::from([settings_root]);
         let mut move_locks = Vec::new();

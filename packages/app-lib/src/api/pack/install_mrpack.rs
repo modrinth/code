@@ -1067,7 +1067,9 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
             relative_override_file_path.as_str(),
         );
         let temporary = if managed {
-            Some(state.content_store.temporary().await?)
+            let (file, path) = state.content_store.temporary().await?;
+            drop(file);
+            Some(path)
         } else {
             None
         };

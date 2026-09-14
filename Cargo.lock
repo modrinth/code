@@ -11403,6 +11403,7 @@ dependencies = [
  "parking_lot",
  "paste",
  "path-util",
+ "pathdiff",
  "phf 0.13.1",
  "png 0.18.0",
  "postcard",

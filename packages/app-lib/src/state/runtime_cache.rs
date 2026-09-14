@@ -268,7 +268,8 @@ impl References {
             .as_ref()
             .is_some_and(|processors| !processors.is_empty())
         {
-            // Processor outputs can use arbitrary paths in the shared library directory.
+            // Loader installers can generate libraries that the version metadata does not list.
+            // Keep the whole library directory so cleanup does not remove those dependencies.
             self.tree(&dirs.libraries_dir(), owner);
         }
         if let Some(logging) = &version.logging {

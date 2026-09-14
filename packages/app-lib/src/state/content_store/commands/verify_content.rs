@@ -1,18 +1,22 @@
-use super::{
-    ContentStore, FileContent, FileStorageKind, InstanceFileStatus, StoreIssue,
-    StoreVerification, StoredFileMetadata, catalog, content_file_path, input,
-};
 use crate::State;
-use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
+use crate::state::content_store::adapters::downloads;
+use crate::state::content_store::adapters::filesystem;
+use crate::state::content_store::adapters::filesystem::symlink_metadata_if_exists;
+use crate::state::content_store::adapters::sqlite as catalog;
+use crate::state::content_store::{
+    ContentStore, FileContent, FileStorageKind, FileStoragePolicy,
+    InstanceFileStatus, InstanceFileStorage, StoreIssue, StoreVerification,
+    StoredFileHandle, StoredFileMetadata, content_file_path, input,
+};
+use crate::state::instances;
 use crate::state::{Instance, InstanceFile};
-use tokio::fs;
 
 impl ContentStore {
     pub(crate) async fn import_file(
         &self,
         source: &std::path::Path,
         state: &State,
-    ) -> crate::Result<super::StoredFileHandle> {
+    ) -> crate::Result<StoredFileHandle> {
         let staged = self.stage_file(source).await?;
         let hash = staged.sha512.clone();
         let _files_lock = self.files_lock.lock().await;
@@ -21,31 +25,13 @@ impl ContentStore {
             && !self.is_healthy(&stored_file.metadata, true).await?
         {
             repaired = true;
-            for instance in instance_rows::list_instances(&self.pool).await? {
-                if crate::state::instance_has_running_process(
-                    &instance.id,
-                    state,
-                )
-                .await?
-                {
-                    return Err(input(
-                        "Stop Minecraft instances before re-importing damaged shared content",
-                    ));
-                }
+            if self.any_instance_running(state).await? {
+                return Err(input(
+                    "Stop Minecraft instances before re-importing damaged shared content",
+                ));
             }
-            if fs::symlink_metadata(&stored_file.path).await.is_ok() {
-                let quarantine = self.root.join("quarantine");
-                fs::create_dir_all(&quarantine).await?;
-                fs::rename(
-                    &stored_file.path,
-                    quarantine.join(format!(
-                        "{}-{}",
-                        hash,
-                        uuid::Uuid::new_v4()
-                    )),
-                )
+            filesystem::quarantine_file(&self.root, &stored_file.path, &hash)
                 .await?;
-            }
         }
         let stored_file = self.save_staged_file(staged, &[]).await?;
         if repaired {
@@ -54,40 +40,22 @@ impl ContentStore {
         Ok(stored_file)
     }
 
-    pub(super) async fn restore_quarantined_hardlinks(
+    pub(in crate::state::content_store) async fn restore_quarantined_hardlinks(
         &self,
-        stored_file: &super::StoredFileHandle,
+        stored_file: &StoredFileHandle,
     ) -> crate::Result<()> {
-        let mut entries = match fs::read_dir(self.root.join("quarantine")).await
-        {
-            Ok(entries) => entries,
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
-                return Ok(());
-            }
-            Err(error) => return Err(error.into()),
-        };
-        let prefix = format!("{}-", stored_file.metadata.sha512);
-        let mut quarantined = Vec::new();
-        while let Some(entry) = entries.next_entry().await? {
-            if entry.file_name().to_string_lossy().starts_with(&prefix)
-                && entry.file_type().await?.is_file()
-            {
-                quarantined.push(entry.path());
-            }
-        }
+        let quarantined = filesystem::quarantined_files(
+            &self.root,
+            &stored_file.metadata.sha512,
+        )
+        .await?;
         if quarantined.is_empty() {
             return Ok(());
         }
-        for instance in instance_rows::list_instances(&self.pool).await? {
-            for mut file in
-                content_rows::get_instance_files(&instance.id, &self.pool)
-                    .await?
+        for instance in instances::load_instance_rows(&self.pool).await? {
+            for (mut file, binding) in
+                self.instance_files_with_storage(&instance).await?
             {
-                let Some(binding) =
-                    catalog::file_storage(&self.pool, &file.id).await?
-                else {
-                    continue;
-                };
                 if binding.storage_kind != FileStorageKind::Hardlink
                     || binding.blob_sha512 != stored_file.metadata.sha512
                 {
@@ -106,59 +74,39 @@ impl ContentStore {
                     let opposite = self
                         .instance_path(
                             &instance.path,
-                            &super::file_path_on_disk(
+                            &crate::state::content_store::file_path_on_disk(
                                 &file.relative_path,
                                 !file.enabled,
                             ),
                         )
                         .await?;
-                    match fs::symlink_metadata(opposite).await {
-                        Ok(_) => continue,
-                        Err(error)
-                            if error.kind() == std::io::ErrorKind::NotFound => {
-                        }
-                        Err(error) => return Err(error.into()),
-                    }
-                    if !fs::symlink_metadata(&path).await?.is_file() {
+                    if symlink_metadata_if_exists(&opposite).await?.is_some() {
                         continue;
                     }
-                    let candidate = path.clone();
-                    let originals = quarantined.clone();
+                    if !filesystem::is_regular_file(&path, false).await? {
+                        continue;
+                    }
                     let is_quarantined =
-                        tokio::task::spawn_blocking(move || {
-                            for original in originals {
-                                if same_file::is_same_file(
-                                    &candidate, original,
-                                )? {
-                                    return Ok::<_, std::io::Error>(true);
-                                }
-                            }
-                            Ok(false)
-                        })
-                        .await??;
+                        filesystem::matches_any_file(&path, &quarantined)
+                            .await?;
                     if !is_quarantined {
                         continue;
                     }
-                    super::file_io::remove_instance_file(&path).await?;
+                    crate::state::content_store::adapters::filesystem::remove_instance_file(&path).await?;
                 }
                 let storage_kind = self
                     .create_instance_file(
                         stored_file,
                         &path,
-                        super::FileStoragePolicy::Shared,
+                        FileStoragePolicy::Shared,
                     )
                     .await?;
-                let mut tx = self.pool.begin().await?;
-                file.missing = false;
-                content_rows::upsert_instance_file(&file, &mut tx).await?;
-                catalog::set_file_storage(
-                    &mut tx,
-                    &file.id,
+                self.save_repaired_instance_file(
+                    &mut file,
                     &binding.blob_sha512,
                     storage_kind,
                 )
                 .await?;
-                tx.commit().await?;
             }
         }
         Ok(())
@@ -180,19 +128,10 @@ impl ContentStore {
     ) -> crate::Result<StoreVerification> {
         let _files_lock = self.files_lock.lock().await;
         let _lease = self.lease().await;
-        if repair {
-            for instance in instance_rows::list_instances(&self.pool).await? {
-                if crate::state::instance_has_running_process(
-                    &instance.id,
-                    state,
-                )
-                .await?
-                {
-                    return Err(input(
-                        "Stop Minecraft instances before repairing shared content",
-                    ));
-                }
-            }
+        if repair && self.any_instance_running(state).await? {
+            return Err(input(
+                "Stop Minecraft instances before repairing shared content",
+            ));
         }
         let stored_files = catalog::stored_files(&self.pool).await?;
         let total = stored_files
@@ -230,35 +169,15 @@ impl ContentStore {
             let mut message = "Stored content is missing or damaged; re-import the original file".to_string();
             if repair {
                 let mut sources: Vec<String> =
-                    serde_json::from_str(&stored_file.sources)?;
-                if sources.is_empty()
-                    && let Ok(files) = crate::state::CachedEntry::get_file_many(
-                        &[stored_file.sha1.as_str()],
-                        None,
+                    catalog::file_sources(&stored_file)?;
+                if sources.is_empty() {
+                    sources = downloads::repair_sources(
                         &self.pool,
-                        &state.api_semaphore,
+                        stored_file.sha1.as_str(),
+                        &stored_file.sha512,
+                        state,
                     )
-                    .await
-                {
-                    for file in files {
-                        if let Ok(Some(version)) =
-                            crate::state::CachedEntry::get_version(
-                                &file.version_id,
-                                None,
-                                &self.pool,
-                                &state.api_semaphore,
-                            )
-                            .await
-                        {
-                            for candidate in version.files {
-                                if candidate.hashes.get("sha512")
-                                    == Some(&stored_file.sha512)
-                                {
-                                    sources.push(candidate.url);
-                                }
-                            }
-                        }
-                    }
+                    .await;
                 }
                 if !sources.is_empty() {
                     let result = self
@@ -275,22 +194,30 @@ impl ContentStore {
                     }
                 }
             }
-            let instance_ids = sqlx::query_scalar!("SELECT DISTINCT file.instance_id FROM instance_files file INNER JOIN store_instance_files binding ON binding.file_id = file.id WHERE binding.blob_sha512 = ?", stored_file.sha512).fetch_all(&self.pool).await?;
+            let instance_ids =
+                catalog::instances_using_file(&self.pool, &stored_file.sha512)
+                    .await?;
             report.issues.push(StoreIssue {
                 sha512: stored_file.sha512,
                 instance_ids,
                 message,
             });
         }
-        for instance in instance_rows::list_instances(&self.pool).await? {
-            for file in
-                content_rows::get_instance_files(&instance.id, &self.pool)
-                    .await?
+        for instance in instances::load_instance_rows(&self.pool).await? {
+            for (file, binding) in
+                self.instance_files_with_storage(&instance).await?
             {
-                self.verify_instance_file(&instance, file, repair, &mut report)
-                    .await?;
+                self.verify_instance_file(
+                    &instance,
+                    file,
+                    binding,
+                    repair,
+                    &mut report,
+                )
+                .await?;
             }
         }
+
         Ok(report)
     }
 
@@ -301,15 +228,14 @@ impl ContentStore {
         state: &State,
     ) -> crate::Result<()> {
         let mirrors = sources.iter().map(String::as_str).collect::<Vec<_>>();
-        let downloaded = crate::util::fetch::fetch_file_mirrors_in(
+        let downloaded = downloads::download(
+            &self.staging,
+            &self.pool,
             &mirrors,
             Some(&stored_file.sha1),
             None,
-            None,
             &state.fetch_semaphore,
-            &self.pool,
             None,
-            Some(&self.staging),
         )
         .await?;
         if downloaded.sha512 != stored_file.sha512
@@ -320,19 +246,8 @@ impl ContentStore {
             ));
         }
         let path = self.path(stored_file)?;
-        if fs::symlink_metadata(&path).await.is_ok() {
-            let quarantine = self.root.join("quarantine");
-            fs::create_dir_all(&quarantine).await?;
-            fs::rename(
-                &path,
-                quarantine.join(format!(
-                    "{}-{}",
-                    stored_file.sha512,
-                    uuid::Uuid::new_v4()
-                )),
-            )
+        filesystem::quarantine_file(&self.root, &path, &stored_file.sha512)
             .await?;
-        }
         let repaired = self
             .save_staged_file(downloaded.into_staged()?, sources)
             .await?;
@@ -343,16 +258,15 @@ impl ContentStore {
         &self,
         instance: &Instance,
         mut file: InstanceFile,
+        binding: InstanceFileStorage,
         repair: bool,
         report: &mut StoreVerification,
     ) -> crate::Result<()> {
-        let Some(binding) = catalog::file_storage(&self.pool, &file.id).await?
-        else {
-            return Ok(());
-        };
         let file_status =
             self.check_instance_file(instance, &file, &binding).await?;
-        let content = self.file_content(&file).await?;
+        let content = self
+            .file_content_with_binding(&file, binding.clone())
+            .await?;
         if file_status == InstanceFileStatus::Healthy
             && matches!(&content, FileContent::Stored { .. })
             && !file.missing
@@ -381,17 +295,12 @@ impl ContentStore {
                 InstanceFileStatus::Conflict => None,
             };
             if let Some(storage_kind) = storage_kind {
-                let mut tx = self.pool.begin().await?;
-                file.missing = false;
-                content_rows::upsert_instance_file(&file, &mut tx).await?;
-                catalog::set_file_storage(
-                    &mut tx,
-                    &file.id,
+                self.save_repaired_instance_file(
+                    &mut file,
                     &binding.blob_sha512,
                     storage_kind,
                 )
                 .await?;
-                tx.commit().await?;
                 report.repaired += 1;
                 return Ok(());
             }

@@ -1,17 +1,21 @@
-use super::file_io::validate_parent_directories;
-use super::{
-    ContentStore, FileContent, ReadableContent, StoredFileHandle,
-    StoredFileMetadata, StoredFileRecord, StoredFileStatus, catalog,
+use crate::state::content_store::adapters::filesystem;
+use crate::state::content_store::adapters::filesystem::{
+    symlink_metadata_if_exists, validate_parent_directories,
+};
+use crate::state::content_store::adapters::sqlite as catalog;
+use crate::state::content_store::{
+    ContentStore, FileContent, InstanceFileStorage, ReadableContent,
+    StoredFileHandle, StoredFileMetadata, StoredFileRecord, StoredFileStatus,
     content_file_path, hash_file_with_progress, input, validate_digest,
     validate_relative,
 };
 use crate::state::{InstanceFile, file_modified_at_ns};
+use itertools::Itertools;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-use tokio::fs;
 use tokio::sync::OwnedRwLockReadGuard;
 impl ContentStore {
-    pub(super) fn path(
+    pub(in crate::state::content_store) fn path(
         &self,
         stored_file: &StoredFileMetadata,
     ) -> crate::Result<PathBuf> {
@@ -21,12 +25,10 @@ impl ContentStore {
             &stored_file.sha512[..2],
             stored_file.sha512
         );
-        if !stored_file.relative_path.starts_with(&prefix)
-            || !matches!(
-                stored_file.relative_path.strip_prefix(&prefix),
-                Some("payload.jar" | "payload.bin")
-            )
-        {
+        if !matches!(
+            stored_file.relative_path.strip_prefix(&prefix),
+            Some("payload.jar" | "payload.bin")
+        ) {
             return Err(input("Invalid content store object path"));
         }
         Ok(self.root.join(&stored_file.relative_path))
@@ -48,7 +50,7 @@ impl ContentStore {
         self.lookup_with_guard(sha512, sha1, size, guard).await
     }
 
-    pub(super) async fn lookup_with_guard(
+    pub(in crate::state::content_store) async fn lookup_with_guard(
         &self,
         sha512: Option<&str>,
         sha1: Option<&str>,
@@ -65,14 +67,10 @@ impl ContentStore {
                 sha512.is_some()
                     || size.is_none_or(|size| stored_file.size as u64 == size)
             })
-            .collect::<Vec<_>>();
-        if candidates.len() != 1 {
+            .exactly_one();
+        let Ok(stored_file) = candidates else {
             return Ok(None);
-        }
-        let stored_file = candidates
-            .into_iter()
-            .next()
-            .ok_or_else(|| input("Missing content object"))?;
+        };
         if !self.is_healthy(&stored_file, false).await? {
             return Ok(None);
         }
@@ -114,28 +112,12 @@ impl ContentStore {
         }
         let path = self.path(stored_file)?;
         self.validate_object_parent(&path).await?;
-        let metadata = match fs::symlink_metadata(&path).await {
-            Ok(metadata) if metadata.is_file() => metadata,
-            Ok(_) => {
-                catalog::set_file_status(
-                    &self.pool,
-                    &stored_file.sha512,
-                    StoredFileStatus::Quarantined,
-                )
-                .await?;
-                return Ok(false);
-            }
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
-                catalog::set_file_status(
-                    &self.pool,
-                    &stored_file.sha512,
-                    StoredFileStatus::Quarantined,
-                )
-                .await?;
-                return Ok(false);
-            }
-            Err(error) => return Err(error.into()),
+        let Some(metadata) = symlink_metadata_if_exists(&path).await? else {
+            return self.quarantine(stored_file).await;
         };
+        if !metadata.is_file() {
+            return self.quarantine(stored_file).await;
+        }
         let modified_at_ns = file_modified_at_ns(&metadata)? as i64;
         if !verify
             && metadata.len() == stored_file.size as u64
@@ -148,13 +130,7 @@ impl ContentStore {
             || hashes.sha1 != stored_file.sha1
             || hashes.size != stored_file.size as u64
         {
-            catalog::set_file_status(
-                &self.pool,
-                &stored_file.sha512,
-                StoredFileStatus::Quarantined,
-            )
-            .await?;
-            return Ok(false);
+            return self.quarantine(stored_file).await;
         }
         let mut verified = stored_file.clone();
         verified.modified_at_ns = modified_at_ns;
@@ -166,25 +142,32 @@ impl ContentStore {
         &self,
         path: &Path,
     ) -> crate::Result<Option<StoredFileHandle>> {
-        let canonical = match fs::canonicalize(path).await {
-            Ok(path) => path,
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
-                return Ok(None);
-            }
-            Err(error) => return Err(error.into()),
+        let Some(canonical) = filesystem::canonical_path(path).await? else {
+            return Ok(None);
         };
         let Ok(relative) = canonical.strip_prefix(&self.root) else {
             return Ok(None);
         };
-        let components = relative.components().collect::<Vec<_>>();
-        if components.len() != 5 {
-            return Ok(None);
-        }
-        let Some(hash) = components[3].as_os_str().to_str() else {
+        let Some((objects, algorithm, prefix, hash, payload)) =
+            relative.components().collect_tuple()
+        else {
             return Ok(None);
         };
-        if hash.len() != 128
-            || !hash.bytes().all(|byte| byte.is_ascii_hexdigit())
+        if objects.as_os_str() != "objects"
+            || algorithm.as_os_str() != "sha512"
+            || !matches!(
+                payload.as_os_str().to_str(),
+                Some("payload.jar" | "payload.bin")
+            )
+        {
+            return Ok(None);
+        }
+        let Some(hash) = hash.as_os_str().to_str() else {
+            return Ok(None);
+        };
+        if validate_digest(hash, 128).is_err()
+            || !hash
+                .starts_with(prefix.as_os_str().to_str().unwrap_or_default())
         {
             return Ok(None);
         }
@@ -203,6 +186,14 @@ impl ContentStore {
         else {
             return Ok(FileContent::Unmanaged);
         };
+        self.file_content_with_binding(file, binding).await
+    }
+
+    pub(crate) async fn file_content_with_binding(
+        &self,
+        file: &InstanceFile,
+        binding: InstanceFileStorage,
+    ) -> crate::Result<FileContent> {
         let stored_file = self
             .lookup(Some(&binding.blob_sha512), None, Some(file.size))
             .await?;
@@ -236,7 +227,7 @@ impl ContentStore {
         let relative_path = content_file_path(file);
         validate_relative(&relative_path)?;
         let path = self.profiles.join(instance_path).join(relative_path);
-        if !fs::metadata(&path).await?.is_file() {
+        if !filesystem::is_regular_file(&path, true).await? {
             return Err(input("Only regular content files can be read"));
         }
         Ok(ReadableContent::Local(path))
@@ -260,11 +251,7 @@ impl ContentStore {
         sha512: &str,
     ) -> crate::Result<Option<StoredFileRecord>> {
         let guard = self.lease().await;
-        let Some(stored_file) =
-            catalog::find_files(&self.pool, Some(sha512), None)
-                .await?
-                .into_iter()
-                .next()
+        let Some(stored_file) = catalog::find_file(&self.pool, sha512).await?
         else {
             return Ok(None);
         };
@@ -277,10 +264,23 @@ impl ContentStore {
         }))
     }
 
-    pub(super) async fn validate_object_parent(
+    pub(in crate::state::content_store) async fn validate_object_parent(
         &self,
         path: &Path,
     ) -> crate::Result<()> {
         validate_parent_directories(&self.root, path).await
+    }
+
+    async fn quarantine(
+        &self,
+        stored_file: &StoredFileMetadata,
+    ) -> crate::Result<bool> {
+        catalog::set_file_status(
+            &self.pool,
+            &stored_file.sha512,
+            StoredFileStatus::Quarantined,
+        )
+        .await?;
+        Ok(false)
     }
 }

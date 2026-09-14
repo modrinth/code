@@ -1,7 +1,8 @@
+use crate::state::content_store;
 mod managed_content;
 
 use crate::state::content_store::{
-    catalog, hash_file, input, normalize, relative_link, sync_directory,
+    hash_file, input, normalize, relative_link, sync_directory,
 };
 use crate::state::instances::adapters::sqlite::instance_rows;
 use crate::state::{Instance, JavaVersion};
@@ -163,23 +164,30 @@ async fn create_link(
             fs::symlink_dir(link, target).await?;
         } else {
             match fs::symlink_file(link, target).await {
-				Ok(()) => {}
-				Err(error) if crate::state::content_store::file_io::link_unavailable(&error) => {
-					crate::state::content_store::writable_copy(original, target).await?;
-					fs::File::options()
-						.write(true)
-						.open(target)
-						.await?
-						.sync_all()
-						.await?;
-					if hash_file(original).await? != hash_file(target).await? {
-						return Err(input(
-							"Symlink fallback copy changed during migration",
-						));
-					}
-				}
-				Err(error) => return Err(error.into()),
-			}
+                Ok(()) => {}
+                Err(error)
+                    if crate::state::content_store::link_unavailable(
+                        &error,
+                    ) =>
+                {
+                    crate::state::content_store::writable_copy(
+                        original, target,
+                    )
+                    .await?;
+                    fs::File::options()
+                        .write(true)
+                        .open(target)
+                        .await?
+                        .sync_all()
+                        .await?;
+                    if hash_file(original).await? != hash_file(target).await? {
+                        return Err(input(
+                            "Symlink fallback copy changed during migration",
+                        ));
+                    }
+                }
+                Err(error) => return Err(error.into()),
+            }
         }
     }
     Ok(())
@@ -357,7 +365,7 @@ pub(crate) async fn move_app_directory(
         .collect::<Vec<_>>();
     let checkpoint = serde_json::to_string(&(from.clone(), to.clone()))?;
     if let Some(previous) =
-        catalog::setting(pool, "store_directory_move").await?
+        content_store::setting(pool, "store_directory_move").await?
         && !previous.is_empty()
         && previous != checkpoint
     {
@@ -365,7 +373,13 @@ pub(crate) async fn move_app_directory(
             "Finish or cancel the previous app-directory move before choosing another destination",
         ));
     }
-    catalog::set_setting(pool, "store_directory_move", &checkpoint).await?;
+    content_store::set_setting(pool, "store_directory_move", &checkpoint)
+        .await?;
+    let managed_files = managed_content::prepare(pool, &from, &to).await?;
+    let managed_paths = managed_files
+        .iter()
+        .map(|file| file.source.clone())
+        .collect();
     let mut required = 0_u64;
     for directory in MOVED_APP_DIRECTORIES {
         let source = from.join(directory);
@@ -386,20 +400,16 @@ pub(crate) async fn move_app_directory(
         }
         if fs::try_exists(&source).await? {
             required = required.saturating_add(
-                required_copy_bytes(&source, &to.join(directory)).await?,
+                required_copy_bytes(
+                    &source,
+                    &to.join(directory),
+                    &managed_paths,
+                )
+                .await?,
             );
         }
     }
-    if fs4::available_space(&to)? < required.saturating_add(64 * 1024 * 1024) {
-        return Err(input(format!(
-            "The destination needs at least {required} bytes plus working space for the app-directory move"
-        )));
-    }
-    let managed_files = managed_content::prepare(pool, &from, &to).await?;
-    let managed_paths = managed_files
-        .iter()
-        .map(|file| file.source.clone())
-        .collect();
+    ensure_move_space(&to, required)?;
     for directory in MOVED_APP_DIRECTORIES {
         let source = from.join(directory);
         if fs::try_exists(&source).await? {
@@ -410,8 +420,12 @@ pub(crate) async fn move_app_directory(
     managed_content::copy_and_checkpoint(pool, managed_files, &from, &to)
         .await?;
     rewrite_database_paths(pool, &mappings).await?;
-    catalog::set_setting(pool, "store_directory_move_copied", &checkpoint)
-        .await?;
+    content_store::set_setting(
+        pool,
+        "store_directory_move_copied",
+        &checkpoint,
+    )
+    .await?;
     Ok(())
 }
 
@@ -429,7 +443,7 @@ pub(crate) async fn finish_app_directory_move(
         return Err(input("Invalid app-directory cleanup roots"));
     }
     let expected = serde_json::to_string(&(from.clone(), to.clone()))?;
-    if catalog::setting(pool, "store_directory_move_copied")
+    if content_store::setting(pool, "store_directory_move_copied")
         .await?
         .as_deref()
         != Some(expected.as_str())
@@ -447,16 +461,34 @@ pub(crate) async fn finish_app_directory_move(
             remove_migrated_tree(&source).await?;
         }
     }
-    catalog::set_setting(pool, "store_directory_move", "").await?;
-    catalog::set_setting(pool, "store_directory_move_copied", "").await?;
+    content_store::set_setting(pool, "store_directory_move", "").await?;
+    content_store::set_setting(pool, "store_directory_move_copied", "").await?;
     managed_content::clear_checkpoint(pool).await?;
     Ok(())
 }
 
-async fn required_copy_bytes(from: &Path, to: &Path) -> crate::Result<u64> {
+fn ensure_move_space(destination: &Path, required: u64) -> crate::Result<()> {
+    if fs4::available_space(destination)?
+        < required.saturating_add(64 * 1024 * 1024)
+    {
+        return Err(input(format!(
+            "Not enough space: the destination needs at least {required} bytes plus working space for the app-directory move"
+        )));
+    }
+    Ok(())
+}
+
+async fn required_copy_bytes(
+    from: &Path,
+    to: &Path,
+    managed_paths: &std::collections::HashSet<PathBuf>,
+) -> crate::Result<u64> {
     let mut pending = vec![(from.to_path_buf(), to.to_path_buf())];
     let mut bytes = 0_u64;
     while let Some((source, target)) = pending.pop() {
+        if managed_paths.contains(&source) {
+            continue;
+        }
         let metadata = fs::symlink_metadata(&source).await?;
         if metadata.is_dir() && !metadata.file_type().is_symlink() {
             let mut entries = fs::read_dir(&source).await?;
@@ -477,7 +509,7 @@ pub(crate) async fn resume_completed_move(
     pool: &SqlitePool,
 ) -> crate::Result<()> {
     if let Some(checkpoint) =
-        catalog::setting(pool, "store_directory_move").await?
+        content_store::setting(pool, "store_directory_move").await?
         && !checkpoint.is_empty()
     {
         let (from, to): (PathBuf, PathBuf) = serde_json::from_str(&checkpoint)?;
@@ -490,7 +522,7 @@ pub(crate) async fn resume_completed_move(
 
 pub(crate) async fn cancel_move(pool: &SqlitePool) -> crate::Result<()> {
     if let Some(checkpoint) =
-        catalog::setting(pool, "store_directory_move").await?
+        content_store::setting(pool, "store_directory_move").await?
         && !checkpoint.is_empty()
     {
         let (from, to): (PathBuf, PathBuf) = serde_json::from_str(&checkpoint)?;
@@ -509,8 +541,9 @@ pub(crate) async fn cancel_move(pool: &SqlitePool) -> crate::Result<()> {
             .map(|directory| (to.join(directory), from.join(directory)))
             .collect::<Vec<_>>();
         rewrite_database_paths(pool, &mappings).await?;
-        catalog::set_setting(pool, "store_directory_move", "").await?;
-        catalog::set_setting(pool, "store_directory_move_copied", "").await?;
+        content_store::set_setting(pool, "store_directory_move", "").await?;
+        content_store::set_setting(pool, "store_directory_move_copied", "")
+            .await?;
         managed_content::clear_checkpoint(pool).await?;
     }
     Ok(())

@@ -184,7 +184,7 @@ impl State {
         }
         state.content_store.recover(None).await?;
         crate::install::recovery::recover_interrupted_jobs(state).await?;
-        content_store::migration::migrate(state).await?;
+        content_store::migrate(state).await?;
         state
             .startup_complete
             .store(true, std::sync::atomic::Ordering::Release);

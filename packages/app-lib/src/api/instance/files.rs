@@ -1,6 +1,7 @@
 use crate::State;
+use crate::state::content_store;
 use crate::state::content_store::{
-    ReadableContent, catalog, content_file_path, input, validate_relative,
+    ReadableContent, content_file_path, input, validate_relative,
 };
 use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use serde::Serialize;
@@ -63,7 +64,7 @@ async fn resolve(
         }
         let prefix = format!("{}/", path.to_lowercase());
         let bindings =
-            catalog::instance_storage(&state.pool, instance_id).await?;
+            content_store::instance_storage(&state.pool, instance_id).await?;
         let files =
             content_rows::get_instance_files(instance_id, &state.pool).await?;
         if files.iter().any(|file| {

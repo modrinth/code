@@ -55,6 +55,7 @@ p256 = { workspace = true, features = ["ecdsa"] }
 parking_lot = { workspace = true }
 paste = { workspace = true }
 path-util = { workspace = true }
+pathdiff = { workspace = true }
 phf = { workspace = true }
 png = { workspace = true }
 postcard = { workspace = true, optional = true }

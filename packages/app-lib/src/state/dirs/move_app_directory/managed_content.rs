@@ -1,10 +1,11 @@
-use crate::state::content_store::file_io::{
-    create_content_file, remove_instance_file, validate_parent_directories,
-    writable_copy,
+use crate::state::content_store;
+use crate::state::content_store::{
+    FileStorageKind, content_file_path, hash_file, input, sync_directory,
+    validate_relative,
 };
 use crate::state::content_store::{
-    FileStorageKind, catalog, content_file_path, hash_file, input,
-    sync_directory, validate_relative,
+    remove_instance_file, try_shared_file, validate_parent_directories,
+    writable_copy,
 };
 use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use serde::{Deserialize, Serialize};
@@ -38,7 +39,9 @@ pub(super) async fn prepare(
         validate_relative(&instance.path)?;
         let files =
             content_rows::get_instance_files(&instance.id, pool).await?;
-        for binding in catalog::instance_storage(pool, &instance.id).await? {
+        for binding in
+            content_store::instance_storage(pool, &instance.id).await?
+        {
             let file = files
                 .iter()
                 .find(|file| file.id == binding.file_id)
@@ -47,12 +50,14 @@ pub(super) async fn prepare(
                 })?;
             let relative_path = content_file_path(file);
             validate_relative(&relative_path)?;
-            let Some(stored) =
-                catalog::find_files(pool, Some(&binding.blob_sha512), None)
-                    .await?
-                    .into_iter()
-                    .next()
-            else {
+            let Some(stored) = content_store::find_files(
+                pool,
+                Some(&binding.blob_sha512),
+                None,
+            )
+            .await?
+            .into_iter()
+            .next() else {
                 return Err(input("Managed content has no stored file record"));
             };
             validate_relative(&stored.relative_path)?;
@@ -116,14 +121,20 @@ pub(super) async fn copy_and_checkpoint(
                     .await
                     .is_ok_and(|metadata| metadata.is_file())
                 && hash_file(&file.stored_path).await? == hashes;
-            let storage_kind = if stored_matches {
-                create_content_file(
+            let shared_kind = if stored_matches {
+                try_shared_file(
                     &file.stored_path,
                     &temporary,
                     file.binding.storage_kind.restore_policy(),
                 )
                 .await?
             } else {
+                None
+            };
+            let storage_kind = if let Some(kind) = shared_kind {
+                kind
+            } else {
+                super::ensure_move_space(parent, hashes.size)?;
                 writable_copy(&file.source, &temporary).await?;
                 FileStorageKind::Copy
             };
@@ -167,7 +178,7 @@ pub(super) async fn copy_and_checkpoint(
         file.binding.storage_kind = result?;
         bindings.push(file.binding);
     }
-    catalog::set_setting(
+    content_store::set_setting(
         pool,
         CHECKPOINT_KEY,
         &serde_json::to_string(&bindings)?,
@@ -175,9 +186,11 @@ pub(super) async fn copy_and_checkpoint(
     .await
 }
 
-/// Storage records switch only after the application has committed to the destination.
+/// Records how files are stored on the destination filesystem after the app switches to it.
+/// Until then, the records must describe the original files so cancelling the move leaves
+/// storage accounting and recovery consistent with the directory the app still uses.
 pub(super) async fn commit(pool: &SqlitePool) -> crate::Result<()> {
-    let Some(checkpoint) = catalog::setting(pool, CHECKPOINT_KEY)
+    let Some(checkpoint) = content_store::setting(pool, CHECKPOINT_KEY)
         .await?
         .filter(|value| !value.is_empty())
     else {
@@ -186,7 +199,7 @@ pub(super) async fn commit(pool: &SqlitePool) -> crate::Result<()> {
     let bindings: Vec<MovedFileBinding> = serde_json::from_str(&checkpoint)?;
     let mut tx = pool.begin().await?;
     for binding in bindings {
-        catalog::set_file_storage(
+        content_store::set_file_storage(
             &mut tx,
             &binding.file_id,
             &binding.sha512,
@@ -199,5 +212,5 @@ pub(super) async fn commit(pool: &SqlitePool) -> crate::Result<()> {
 }
 
 pub(super) async fn clear_checkpoint(pool: &SqlitePool) -> crate::Result<()> {
-    catalog::set_setting(pool, CHECKPOINT_KEY, "").await
+    content_store::set_setting(pool, CHECKPOINT_KEY, "").await
 }

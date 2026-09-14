@@ -45,15 +45,14 @@ pub(crate) async fn sync_instance_content_files(
         let known_files =
             sqlite::content_rows::get_instance_files(&instance.id, &state.pool)
                 .await?;
-        let known_bindings =
-            crate::state::content_store::catalog::instance_storage(
-                &state.pool,
-                &instance.id,
-            )
-            .await?
-            .into_iter()
-            .map(|binding| binding.file_id)
-            .collect::<HashSet<_>>();
+        let known_bindings = crate::state::content_store::instance_storage(
+            &state.pool,
+            &instance.id,
+        )
+        .await?
+        .into_iter()
+        .map(|binding| binding.file_id)
+        .collect::<HashSet<_>>();
         (snapshot, known_files, known_bindings)
     };
     let managed_paths = known_files
@@ -95,7 +94,7 @@ pub(crate) async fn sync_instance_content_files(
     let mut existing =
         sqlite::content_rows::get_instance_files(&instance.id, &state.pool)
             .await?;
-    let bindings = crate::state::content_store::catalog::instance_storage(
+    let bindings = crate::state::content_store::instance_storage(
         &state.pool,
         &instance.id,
     )

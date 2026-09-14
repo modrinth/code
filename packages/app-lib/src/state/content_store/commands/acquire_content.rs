@@ -1,14 +1,15 @@
-use super::{
+use crate::state::content_store::adapters::downloads;
+use crate::state::content_store::adapters::filesystem;
+use crate::state::content_store::adapters::sqlite as catalog;
+use crate::state::content_store::{
     ContentStore, GetFileResult, StoredFileHandle, StoredFileMetadata,
-    StoredFileStatus, catalog, hash_file, input, sync_directory,
-    validate_digest,
+    StoredFileStatus, input, validate_digest,
 };
-use crate::state::file_modified_at_ns;
+use crate::util::content_hash::{hash_file, temporary_file};
 use crate::util::fetch::{self, DownloadMeta, FetchProgressFn, FetchSemaphore};
 use sha2::{Digest, Sha512};
 use std::path::Path;
-use tokio::fs::{self, File};
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
+use tokio::fs::File;
 
 impl ContentStore {
     pub(crate) async fn get_or_download_file(
@@ -35,15 +36,14 @@ impl ContentStore {
                 reused: true,
             });
         }
-        let download = fetch::fetch_file_mirrors_in(
+        let download = downloads::download(
+            &self.staging,
+            &self.pool,
             mirrors,
             sha1,
             download_meta,
-            None,
             semaphore,
-            &self.pool,
             progress,
-            Some(&self.staging),
         )
         .await?;
         if let Some(expected_sha512) = sha512
@@ -94,93 +94,25 @@ impl ContentStore {
         &self,
         source: &Path,
     ) -> crate::Result<StoredFileHandle> {
-        self.store_file_with_sources(source, &[]).await
-    }
-
-    async fn store_file_with_sources(
-        &self,
-        source: &Path,
-        sources: &[String],
-    ) -> crate::Result<StoredFileHandle> {
         if let Some(stored_file) = self.find_file_by_path(source).await? {
             return Ok(stored_file);
         }
-        let super::FileHashes { sha512, sha1, size } =
-            hash_file(source).await?;
-        if let Some(stored_file) =
-            self.lookup(Some(&sha512), Some(&sha1), Some(size)).await?
-        {
-            return Ok(stored_file);
-        }
-        self.require_staging_space(size)?;
+		let hashes = hash_file(source).await?;
+		if let Some(stored_file) = self
+			.lookup(
+				Some(&hashes.sha512),
+				Some(&hashes.sha1),
+				Some(hashes.size),
+			)
+			.await?
+		{
+			return Ok(stored_file);
+		}
         let staged = self.stage_file(source).await?;
-        self.save_staged_file(staged, sources).await
+        self.save_staged_file(staged, &[]).await
     }
 
-    pub(crate) fn require_staging_space(&self, size: u64) -> crate::Result<()> {
-        if fs4::available_space(&self.staging)?
-            < size.saturating_add(64 * 1024 * 1024)
-        {
-            return Err(std::io::Error::new(
-				std::io::ErrorKind::StorageFull,
-				"There is not enough space to import this file into the shared content store",
-			).into());
-        }
-        Ok(())
-    }
-
-    pub(super) async fn stage_file(
-        &self,
-        source: &Path,
-    ) -> crate::Result<fetch::StagedDownload> {
-        let mut input_file = File::open(source).await?;
-        let before = input_file.metadata().await?;
-        if !before.is_file() {
-            return Err(input("Only regular content files can be stored"));
-        }
-        let temporary = self.temporary().await?;
-        let mut output = File::create(&temporary).await?;
-        let mut sha512 = Sha512::new();
-        let mut sha1 = sha1_smol::Sha1::new();
-        let mut buffer = vec![0; 256 * 1024];
-        let mut size = 0_u64;
-        let mut prefix = [0_u8; 2];
-        let mut prefix_len = 0;
-        loop {
-            let count = input_file.read(&mut buffer).await?;
-            if count == 0 {
-                break;
-            }
-            let prefix_count = (prefix.len() - prefix_len).min(count);
-            prefix[prefix_len..prefix_len + prefix_count]
-                .copy_from_slice(&buffer[..prefix_count]);
-            prefix_len += prefix_count;
-            output.write_all(&buffer[..count]).await?;
-            sha512.update(&buffer[..count]);
-            sha1.update(&buffer[..count]);
-            size += count as u64;
-        }
-        output.sync_all().await?;
-        drop(output);
-        let after = input_file.metadata().await?;
-        if before.len() != after.len()
-            || before.modified()? != after.modified()?
-            || size != after.len()
-        {
-            return Err(input(
-                "Content changed while it was being imported; try again after closing the instance",
-            ));
-        }
-        Ok(fetch::StagedDownload {
-            path: temporary,
-            size,
-            sha1: sha1.hexdigest(),
-            sha512: format!("{:x}", sha512.finalize()),
-            archive: prefix_len == prefix.len() && prefix == *b"PK",
-        })
-    }
-
-    pub(super) async fn save_staged_file(
+    pub(in crate::state::content_store) async fn save_staged_file(
         &self,
         staged: fetch::StagedDownload,
         sources: &[String],
@@ -210,34 +142,13 @@ impl ContentStore {
             if archive { "jar" } else { "bin" }
         );
         let destination = self.root.join(&relative_path);
-        let parent = destination
-            .parent()
-            .ok_or_else(|| input("Invalid store path"))?;
-        self.validate_object_parent(&destination).await?;
-        fs::create_dir_all(parent).await?;
-        self.validate_object_parent(&destination).await?;
-        if let Ok(metadata) = fs::symlink_metadata(&destination).await {
-            if !metadata.is_file()
-                || metadata.file_type().is_symlink()
-                || hash_file(&destination).await?.sha512 != hash
-            {
-                return Err(input(format!(
-                    "Content object {hash} needs repair before it can be replaced"
-                )));
-            }
-        } else {
-            let destination_copy = destination.clone();
-            tokio::task::spawn_blocking(move || {
-                temporary
-                    .persist_noclobber(destination_copy)
-                    .map_err(|error| error.error)
-            })
-            .await??;
-        }
-        let mut permissions = fs::metadata(&destination).await?.permissions();
-        permissions.set_readonly(true);
-        fs::set_permissions(&destination, permissions).await?;
-        sync_directory(parent).await?;
+        filesystem::publish_staged_file(
+            &self.root,
+            &destination,
+            temporary,
+            &hash,
+        )
+        .await?;
         let stored_file = StoredFileMetadata {
             sha512: hash,
             sha1,
@@ -246,11 +157,9 @@ impl ContentStore {
                 .map_err(|_| input("Content file is too large"))?,
             relative_path,
             status: StoredFileStatus::Ready,
-            modified_at_ns: file_modified_at_ns(
-                &fs::metadata(&destination).await?,
-            )? as i64,
+            modified_at_ns: filesystem::modified_at_ns(&destination).await?,
             last_used_at: chrono::Utc::now().timestamp(),
-            sources: serde_json::to_string(sources)?,
+            sources: catalog::encode_sources(sources)?,
         };
         catalog::save_file(&self.pool, &stored_file).await?;
         Ok(StoredFileHandle {
@@ -274,10 +183,8 @@ impl ContentStore {
                 ));
             }
         }
-        let temporary = self.temporary().await?;
-        let mut file = File::create(&temporary).await?;
-        file.write_all(bytes).await?;
-        file.sync_all().await?;
+        let (mut file, temporary) = self.temporary().await?;
+        filesystem::write_staged_bytes(&mut file, bytes).await?;
         drop(file);
         self.save_staged_file(
             fetch::StagedDownload {
@@ -292,12 +199,19 @@ impl ContentStore {
         .await
     }
 
-    pub(crate) async fn temporary(&self) -> crate::Result<tempfile::TempPath> {
-        let staging = self.staging.clone();
-        Ok(tokio::task::spawn_blocking(move || {
-            tempfile::NamedTempFile::new_in(staging)
-                .map(|file| file.into_temp_path())
-        })
-        .await??)
+    pub(crate) async fn temporary(
+        &self,
+    ) -> crate::Result<(File, tempfile::TempPath)> {
+        temporary_file(Some(&self.staging)).await
+    }
+    pub(crate) fn require_staging_space(&self, size: u64) -> crate::Result<()> {
+        filesystem::require_staging_space(&self.staging, size)
+    }
+
+    pub(in crate::state::content_store) async fn stage_file(
+        &self,
+        source: &Path,
+    ) -> crate::Result<fetch::StagedDownload> {
+        filesystem::stage_file(&self.staging, source).await
     }
 }

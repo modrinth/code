@@ -65,7 +65,7 @@ pub(super) async fn prepare_instance_update_backup(
             &state.pool,
         )
         .await?;
-        let bindings = crate::state::content_store::catalog::instance_storage(
+        let bindings = crate::state::content_store::instance_storage(
             &state.pool,
             &metadata.instance.id,
         )

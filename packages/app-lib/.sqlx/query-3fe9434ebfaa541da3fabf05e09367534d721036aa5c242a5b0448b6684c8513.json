@@ -1,0 +1,62 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT sha512, sha1, size, relative_path, status AS \"status: _\", modified_at_ns, last_used_at, sources FROM store_blobs WHERE (? IS NOT NULL AND sha512 = ?) OR (? IS NULL AND sha1 = ?)",
+  "describe": {
+    "columns": [
+      {
+        "name": "sha512",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "sha1",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "size",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "relative_path",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "status: _",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "modified_at_ns",
+        "ordinal": 5,
+        "type_info": "Integer"
+      },
+      {
+        "name": "last_used_at",
+        "ordinal": 6,
+        "type_info": "Integer"
+      },
+      {
+        "name": "sources",
+        "ordinal": 7,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "3fe9434ebfaa541da3fabf05e09367534d721036aa5c242a5b0448b6684c8513"
+}

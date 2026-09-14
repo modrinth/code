@@ -1,4 +1,4 @@
-use super::input;
+use super::{InstanceFileStorage, StoredFileMetadata, input};
 use crate::state::DirectoryInfo;
 use fs4::tokio::AsyncFileExt;
 use sqlx::SqlitePool;
@@ -18,7 +18,7 @@ pub struct ContentStore {
     pub(super) download_locks: [Mutex<()>; 64],
     pub(super) publish_locks: [Mutex<()>; 64],
     pub(crate) files_lock: Mutex<()>,
-    /// Background migration takes a reader per file; Play takes the writer to pause it.
+    /// Lets Play prioritize the selected instance over migration of other instances.
     pub(crate) legacy_migration_priority: RwLock<()>,
     _process_lock: File,
     _content_process_lock: Option<File>,
@@ -79,15 +79,64 @@ impl ContentStore {
     }
 
     pub(super) fn download_lock(&self, key: &str) -> &Mutex<()> {
-        let mut hasher = DefaultHasher::new();
-        key.hash(&mut hasher);
-        &self.download_locks
-            [hasher.finish() as usize % self.download_locks.len()]
+        Self::key_lock(&self.download_locks, key)
     }
 
     pub(super) fn publish_lock(&self, sha512: &str) -> &Mutex<()> {
-        let mut hasher = DefaultHasher::new();
-        sha512.hash(&mut hasher);
-        &self.publish_locks[hasher.finish() as usize % self.publish_locks.len()]
+        Self::key_lock(&self.publish_locks, sha512)
     }
+
+    fn key_lock<'a>(locks: &'a [Mutex<()>], key: &str) -> &'a Mutex<()> {
+        let mut hasher = DefaultHasher::new();
+        key.hash(&mut hasher);
+        &locks[hasher.finish() as usize % locks.len()]
+    }
+}
+
+/// Content ready to read or install. Keep the handle while using the file so cache
+/// cleanup cannot delete it midway through the operation.
+#[derive(Clone, Debug)]
+pub(crate) struct StoredFileHandle {
+    pub metadata: StoredFileMetadata,
+    pub path: PathBuf,
+    pub(super) _guard: Arc<OwnedRwLockReadGuard<()>>,
+}
+
+/// Locates content for repair, including files that are missing or damaged.
+/// Unlike `StoredFileHandle`, this does not guarantee that the file is usable.
+#[derive(Clone, Debug)]
+pub(crate) struct StoredFileRecord {
+    pub metadata: StoredFileMetadata,
+    pub path: PathBuf,
+    pub(super) _guard: Arc<OwnedRwLockReadGuard<()>>,
+}
+
+#[derive(Clone, Debug)]
+pub(crate) enum FileContent {
+    Unmanaged,
+    Stored {
+        storage: InstanceFileStorage,
+        stored_file: StoredFileHandle,
+    },
+    Damaged(InstanceFileStorage),
+}
+
+#[derive(Clone, Debug)]
+pub(crate) enum ReadableContent {
+    Local(PathBuf),
+    Stored(StoredFileHandle),
+}
+
+impl ReadableContent {
+    pub(crate) fn path(&self) -> &Path {
+        match self {
+            Self::Local(path) => path,
+            Self::Stored(stored_file) => &stored_file.path,
+        }
+    }
+}
+
+pub(crate) struct GetFileResult {
+    pub stored_file: StoredFileHandle,
+    pub reused: bool,
 }

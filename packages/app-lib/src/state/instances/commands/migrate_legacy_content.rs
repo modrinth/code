@@ -9,7 +9,10 @@ use crate::state::{InstanceFile, InstanceInstallStage, State};
 use chrono::Utc;
 use std::collections::{HashMap, HashSet};
 
-/// Background migration releases its priority permit and content locks between files.
+/// Moves existing mods and packs into shared storage while preserving their enabled state.
+///
+/// Background migration pauses between files when Play needs to prepare an instance.
+/// Running instances are skipped so migration does not replace files Minecraft is using.
 pub(crate) async fn migrate_legacy_content(
     instance_id: &str,
     state: &State,
@@ -38,7 +41,7 @@ pub(crate) async fn migrate_legacy_content(
         let existing =
             sqlite::content_rows::get_instance_files(instance_id, &state.pool)
                 .await?;
-        let bindings = crate::state::content_store::catalog::instance_storage(
+        let bindings = crate::state::content_store::instance_storage(
             &state.pool,
             instance_id,
         )
@@ -108,7 +111,7 @@ pub(crate) async fn migrate_legacy_content(
             )
             .await?;
         if let Some(previous) = &previous
-            && crate::state::content_store::catalog::file_storage(
+            && crate::state::content_store::file_storage(
                 &state.pool,
                 &previous.id,
             )

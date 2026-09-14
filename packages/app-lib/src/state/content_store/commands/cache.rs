@@ -1,11 +1,10 @@
-use super::{
-    ContentStore, FileStorageKind, StoreUsage, StoredFileStatus, catalog,
-    input, sync_directory,
-};
 use crate::State;
-use crate::state::instances::adapters::sqlite::instance_rows;
+use crate::state::content_store::adapters::filesystem;
+use crate::state::content_store::adapters::sqlite as catalog;
+use crate::state::content_store::{
+    ContentStore, FileStorageKind, StoreUsage, StoredFileStatus, input,
+};
 use std::collections::{HashMap, HashSet};
-use tokio::fs;
 
 impl ContentStore {
     pub(crate) async fn retain(
@@ -59,7 +58,8 @@ impl ContentStore {
             .await?
             .into_iter()
             .collect::<HashSet<_>>();
-        let instance_file_bindings = sqlx::query!("SELECT binding.blob_sha512, binding.materialization_kind, file.size FROM store_instance_files binding INNER JOIN instance_files file ON file.id = binding.file_id WHERE file.missing = 0").fetch_all(&self.pool).await?;
+        let instance_file_bindings =
+            catalog::installed_storage(&self.pool).await?;
         let installed = instance_file_bindings
             .iter()
             .map(|binding| binding.blob_sha512.as_str())
@@ -71,7 +71,7 @@ impl ContentStore {
         let private_copy_bytes = instance_file_bindings
             .iter()
             .filter(|binding| {
-                binding.materialization_kind == FileStorageKind::Copy.as_str()
+                binding.materialization_kind == FileStorageKind::Copy
             })
             .map(|binding| binding.size.max(0) as u64)
             .sum::<u64>();
@@ -84,9 +84,8 @@ impl ContentStore {
             .sum::<u64>();
         let mut shared_placements = HashMap::new();
         for binding in &instance_file_bindings {
-            if binding.materialization_kind == FileStorageKind::Reflink.as_str()
-                || binding.materialization_kind
-                    == FileStorageKind::Hardlink.as_str()
+            if binding.materialization_kind == FileStorageKind::Reflink
+                || binding.materialization_kind == FileStorageKind::Hardlink
             {
                 *shared_placements
                     .entry(binding.blob_sha512.as_str())
@@ -135,11 +134,12 @@ impl ContentStore {
     }
 
     async fn cache_limit(&self) -> crate::Result<u64> {
-        catalog::setting(&self.pool, "store_cache_limit_bytes")
-            .await?
-            .unwrap_or_else(|| "5368709120".to_string())
-            .parse()
-            .map_err(|_| input("The shared content cache limit is invalid"))
+        match catalog::setting(&self.pool, "store_cache_limit_bytes").await? {
+            Some(value) => value.parse().map_err(|_| {
+                input("The shared content cache limit is invalid")
+            }),
+            None => Ok(5_368_709_120),
+        }
     }
 
     pub async fn set_cache_limit(&self, bytes: u64) -> crate::Result<()> {
@@ -154,13 +154,15 @@ impl ContentStore {
         .await
     }
 
-    /// Removes unreferenced content objects and managed game and Java cache files.
+    /// Removes unused downloads, starting with the oldest content, to meet the cache limit.
+    /// Installed content and files needed for rollback remain available. `purge_unused`
+    /// also removes recent unused downloads instead of keeping them for another install.
     pub async fn cleanup(
         &self,
         state: &State,
         purge_unused: bool,
     ) -> crate::Result<u64> {
-        let _exclusive = self.cleanup_lock.clone().try_write_owned().map_err(|_| input("The shared store is busy; try cleanup again after content operations finish"))?;
+        let _exclusive = self.cleanup_lock.try_write().map_err(|_| input("The shared store is busy; try cleanup again after content operations finish"))?;
         if catalog::setting(&self.pool, "store_layout_version")
             .await?
             .as_deref()
@@ -174,18 +176,7 @@ impl ContentStore {
 			.map_err(|_| input("Game or Java files are in use; try cleanup again after the operation finishes"))?;
         let runtime =
             crate::state::runtime_cache::RuntimeStorage::read(state).await?;
-        let referenced_hashes = catalog::referenced_files(&self.pool)
-            .await?
-            .into_iter()
-            .collect::<HashSet<_>>();
-        let mut candidates = catalog::stored_files(&self.pool)
-            .await?
-            .into_iter()
-            .filter(|stored_file| {
-                !referenced_hashes.contains(&stored_file.sha512)
-            })
-            .collect::<Vec<_>>();
-        candidates.sort_by_key(|stored_file| stored_file.last_used_at);
+        let candidates = catalog::cleanup_candidates(&self.pool).await?;
         let mut unused = candidates
             .iter()
             .map(|stored_file| stored_file.size as u64)
@@ -219,33 +210,13 @@ impl ContentStore {
             .await?;
             let path = self.path(&stored_file)?;
             self.validate_object_parent(&path).await?;
-            match fs::symlink_metadata(&path).await {
-                Ok(metadata) => {
-                    if !metadata.is_file() || metadata.file_type().is_symlink()
-                    {
-                        return Err(input(
-                            "An unreferenced store object was replaced by an unexpected filesystem entry",
-                        ));
-                    }
-                    super::file_io::remove_instance_file(&path).await?;
-                    if let Some(parent) = path.parent() {
-                        sync_directory(parent).await?;
-                        let _ = fs::remove_dir(parent).await;
-                    }
-                }
-                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
-                Err(error) => return Err(error.into()),
-            }
+            filesystem::remove_unused_file(&path).await?;
             catalog::delete_file(&self.pool, &stored_file.sha512).await?;
             unused = unused.saturating_sub(stored_file.size as u64);
             reclaimed += stored_file.size as u64;
         }
-        for instance in instance_rows::list_instances(&self.pool).await? {
-            if crate::state::instance_has_running_process(&instance.id, state)
-                .await?
-            {
-                return Ok(reclaimed);
-            }
+        if self.any_instance_running(state).await? {
+            return Ok(reclaimed);
         }
         for job in crate::install::store::list(false, state).await? {
             if matches!(
@@ -256,7 +227,7 @@ impl ContentStore {
                 return Ok(reclaimed);
             }
             if let Some(backup) = job.state.paths.staging_dir
-                && fs::try_exists(backup).await?
+                && filesystem::path_exists(&backup).await?
             {
                 return Ok(reclaimed);
             }

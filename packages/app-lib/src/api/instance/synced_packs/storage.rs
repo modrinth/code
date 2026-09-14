@@ -293,17 +293,15 @@ pub(crate) async fn migrate_store(state: &State) -> crate::Result<()> {
     let cache_complete = cleanup_legacy_cache(state).await?;
     let _guard = state.lock_synced_options().await;
     let library = read_library(state).await?;
-    for owner in crate::state::content_store::catalog::retained_owners(
-        &state.pool,
-        "synced-pack",
-    )
-    .await?
+    for owner in
+        crate::state::content_store::retained_owners(&state.pool, "synced-pack")
+            .await?
     {
         if !library.packs.contains_key(&owner) {
             state.content_store.release("synced-pack", &owner).await?;
         }
     }
-    for owner in crate::state::content_store::catalog::retained_owners(
+    for owner in crate::state::content_store::retained_owners(
         &state.pool,
         "synced-cache",
     )
@@ -317,7 +315,7 @@ pub(crate) async fn migrate_store(state: &State) -> crate::Result<()> {
         && library.packs.values().all(|pack| {
             pack.blob_sha512.is_some() && pack.migration_error.is_none()
         });
-    crate::state::content_store::catalog::set_setting(
+    crate::state::content_store::set_setting(
         &state.pool,
         "store_synced_packs_migrated",
         if complete { "1" } else { "0" },

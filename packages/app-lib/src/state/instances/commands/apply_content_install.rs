@@ -18,8 +18,7 @@ use modrinth_content_management::{
 use std::path::{Path, PathBuf};
 
 use super::content_mutation::{
-    ContentOrigin, InstallContent, install_stored_file, remove_project,
-    toggle_disable_project,
+    ContentOrigin, InstallContent, install_stored_file,
 };
 
 pub(crate) struct ContentScope {
@@ -265,22 +264,23 @@ pub(crate) async fn switch_project_version_with_dependencies(
     )
     .await?;
 
-    let was_disabled = project_path.ends_with(".disabled");
-    let mut new_path = add_project_from_version(
+    let downloaded = download_project_version(
         instance_id,
         &plan.primary.version_id,
         DownloadReason::Update,
         None,
-        ContentSourceKind::Local,
         state,
     )
     .await?;
-
-    if was_disabled {
-        new_path =
-            toggle_disable_project(instance_id, &new_path, Some(false), state)
-                .await?;
-    }
+    let new_path = add_downloaded_project_version_with_enabled(
+        instance_id,
+        downloaded,
+        ContentSourceKind::Local,
+        None,
+        Some(project_path),
+        state,
+    )
+    .await?;
 
     for dependency in &plan.dependencies {
         add_resolved_content(
@@ -300,7 +300,6 @@ pub(crate) async fn switch_project_version_with_dependencies(
             state,
         )
         .await?;
-        remove_project(instance_id, project_path, state).await?;
     }
 
     Ok(new_path)
@@ -572,8 +571,10 @@ pub(crate) async fn add_project_bytes(
             ));
         }
     }
-    let temporary = state.content_store.temporary().await?;
-    tokio::fs::write(&temporary, &bytes).await?;
+    let (mut output, temporary) = state.content_store.temporary().await?;
+    tokio::io::AsyncWriteExt::write_all(&mut output, &bytes).await?;
+    output.sync_all().await?;
+    drop(output);
     let stored_file =
         state.content_store.import_file(&temporary, state).await?;
     install_stored_file(

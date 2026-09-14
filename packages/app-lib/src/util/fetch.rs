@@ -2,6 +2,7 @@
 use super::io::{self, IOError};
 use crate::event::LoadingBarId;
 use crate::event::emit::emit_loading;
+use crate::util::content_hash::{ContentHasher, temporary_file};
 use crate::{ErrorKind, LabrinthError};
 use bytes::Bytes;
 use chrono::{DateTime, TimeDelta, Utc};
@@ -13,7 +14,6 @@ use rand::Rng;
 use reqwest::Method;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
-use sha2::{Digest, Sha512};
 use std::collections::{HashMap, VecDeque};
 use std::future::Future;
 use std::num::NonZeroU32;
@@ -473,7 +473,8 @@ impl DownloadedFile {
                 .map(|file| file.into_temp_path())
         })
         .await??;
-        io::copy(self.path(), &temporary).await?;
+        crate::state::content_store::writable_copy(self.path(), &temporary)
+            .await?;
         let path = path.to_path_buf();
         tokio::task::spawn_blocking(move || {
             temporary
@@ -612,33 +613,17 @@ async fn read_file_response(
         crate::State::get_if_initialized()
             .map(|state| state.directories.store_staging_dir())
     });
-    let path = tokio::task::spawn_blocking(move || {
-        match staging {
-            Some(staging) => tempfile::NamedTempFile::new_in(staging),
-            None => tempfile::NamedTempFile::new(),
-        }
-        .map(|file| file.into_temp_path())
-    })
-    .await??;
-    let mut file = File::create(&path).await?;
+    let (mut file, path) = temporary_file(staging.as_deref()).await?;
     let total = response.content_length().unwrap_or(0);
     let mut stream = response.bytes_stream();
-    let mut hasher = sha1_smol::Sha1::new();
-    let mut sha512 = Sha512::new();
+    let mut hasher = ContentHasher::default();
     let mut size = 0_u64;
-    let mut prefix = [0_u8; 2];
-    let mut prefix_len = 0;
     while let Some(chunk) =
         crate::install::control::download_step(stream.next()).await?
     {
         let chunk = chunk?;
-        let prefix_count = (prefix.len() - prefix_len).min(chunk.len());
-        prefix[prefix_len..prefix_len + prefix_count]
-            .copy_from_slice(&chunk[..prefix_count]);
-        prefix_len += prefix_count;
         file.write_all(&chunk).await?;
         hasher.update(&chunk);
-        sha512.update(&chunk);
         size += chunk.len() as u64;
         if let Some(progress) = progress.as_mut() {
             progress(size, total).await?;
@@ -646,13 +631,14 @@ async fn read_file_response(
     }
     file.sync_all().await?;
     drop(file);
+    let (hashes, archive) = hasher.finish(size);
     Ok(DownloadedFile {
         path: DownloadedFilePath::Temporary(Arc::new(path)),
         reused: false,
         size,
-        sha1: hasher.hexdigest(),
-        sha512: format!("{:x}", sha512.finalize()),
-        archive: prefix_len == prefix.len() && prefix == *b"PK",
+        sha1: hashes.sha1,
+        sha512: hashes.sha512,
+        archive,
     })
 }
 

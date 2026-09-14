@@ -1,49 +1,35 @@
-use super::file_io::{move_instance_file, remove_instance_file};
-use super::{
-    ContentStore, FileStorageKind, InstanceFileStatus, InstanceFileStorage,
-    StoredFileHandle, catalog, content_file_path, file_path_on_disk, input,
+use crate::state::content_store::adapters::filesystem::symlink_metadata_if_exists;
+use crate::state::content_store::adapters::filesystem::{
+    move_instance_file, remove_instance_file,
 };
-use crate::state::instances::adapters::sqlite::content_rows;
+use crate::state::content_store::adapters::sqlite as catalog;
+use crate::state::content_store::domain::{journal_move, journal_noop};
+use crate::state::content_store::model::{
+    FileChangeJournal, FileChangeRequest, FileState,
+};
+use crate::state::content_store::{
+    ContentStore, FileStorageKind, FileStoragePolicy, InstanceFileStatus,
+    InstanceFileStorage, StoredFileHandle, content_file_path,
+    file_path_on_disk, input,
+};
+use crate::state::instances as content_rows;
 use crate::state::{Instance, InstanceFile};
-use serde::{Deserialize, Serialize};
 use sqlx::{Sqlite, Transaction};
-use tokio::fs;
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub(super) struct FileState {
-    pub(super) relative_path: String,
-    pub(super) sha512: String,
-    pub(super) present: bool,
-    pub(super) storage_kind: Option<FileStorageKind>,
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub(super) struct FileChangeJournal {
-    pub(super) id: String,
-    pub(super) instance_id: String,
-    pub(super) instance_path: String,
-    pub(super) before: Option<FileState>,
-    pub(super) after: Option<FileState>,
-}
-
-pub(crate) struct FileChangeRequest<'a> {
-    pub relative_path: &'a str,
-    pub replacement: Option<&'a StoredFileHandle>,
-    pub enabled: bool,
-    pub legacy_path: Option<&'a str>,
-    pub previous_content: Option<&'a StoredFileHandle>,
-}
 
 pub(crate) struct PendingFileChange {
     journal: FileChangeJournal,
     pub(crate) stored_file: Option<StoredFileHandle>,
     _previous_file_lease: Option<StoredFileHandle>,
-    /// Set only after a failed apply has cleared its journal and preserved or restored the file.
+    /// The failed change needs no further recovery and has preserved or restored the original file.
+    /// Background migration can skip this file and continue with the remaining files.
     pub(crate) safe_to_defer: bool,
 }
 
 impl ContentStore {
-    /// The caller holds the instance and store locks until this change is committed.
+    /// Saves the original file so a failed install, replacement, or removal can be undone.
+    ///
+    /// Recover earlier changes first. Hold the instance and store locks until commit or
+    /// rollback so another content operation cannot invalidate the saved original.
     pub(crate) async fn prepare_file_change(
         &self,
         instance: &Instance,
@@ -56,7 +42,8 @@ impl ContentStore {
             legacy_path,
             previous_content,
         } = request;
-        if !super::is_managed_content_path(relative_path) {
+        if !crate::state::content_store::is_managed_content_path(relative_path)
+        {
             return Err(input("Unsupported managed content path"));
         }
         let canonical_path = relative_path.trim_end_matches(".disabled");
@@ -88,7 +75,9 @@ impl ContentStore {
             self.instance_path(&instance.path, &source_relative).await?;
         let target =
             self.instance_path(&instance.path, &target_relative).await?;
-        if source != target && fs::symlink_metadata(&target).await.is_ok() {
+        if source != target
+            && symlink_metadata_if_exists(&target).await?.is_some()
+        {
             return Err(input(format!(
                 "Both {source_relative} and {target_relative} exist; resolve the duplicate before continuing"
             )));
@@ -97,11 +86,7 @@ impl ContentStore {
             Some(file) => catalog::file_storage(&self.pool, &file.id).await?,
             None => None,
         };
-        let metadata = match fs::symlink_metadata(&source).await {
-            Ok(metadata) => Some(metadata),
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => None,
-            Err(error) => return Err(error.into()),
-        };
+        let metadata = symlink_metadata_if_exists(&source).await?;
         if previous_content.is_some() && metadata.is_none() {
             return Err(input(
                 "Legacy content disappeared before it could be adopted",
@@ -193,7 +178,8 @@ impl ContentStore {
         })
     }
 
-    /// The caller has recovered pending changes and holds the instance and store locks until commit.
+    /// Records an enable/disable rename so recovery can undo an interrupted toggle.
+    /// Uses the same recovery and locking requirements as `prepare_file_change`.
     pub(crate) async fn prepare_file_move(
         &self,
         instance: &Instance,
@@ -202,7 +188,9 @@ impl ContentStore {
         enabled: bool,
     ) -> crate::Result<PendingFileChange> {
         if binding.file_id != file.id
-            || !super::is_managed_content_path(&file.relative_path)
+            || !crate::state::content_store::is_managed_content_path(
+                &file.relative_path,
+            )
         {
             return Err(input("Invalid managed content move"));
         }
@@ -241,7 +229,7 @@ impl ContentStore {
         })
     }
 
-    pub(super) async fn save_journal(
+    pub(in crate::state::content_store) async fn save_journal(
         &self,
         journal: &FileChangeJournal,
     ) -> crate::Result<()> {
@@ -261,7 +249,7 @@ impl ContentStore {
             &mut tx,
             &journal.id,
             &journal.instance_id,
-            &serde_json::to_string(journal)?,
+            journal,
         )
         .await?;
         tx.commit().await?;
@@ -286,7 +274,7 @@ impl PendingFileChange {
         result
     }
 
-    pub(super) async fn apply_inner(
+    pub(in crate::state::content_store) async fn apply_inner(
         &mut self,
         store: &ContentStore,
         mutation_started: &mut bool,
@@ -312,7 +300,7 @@ impl PendingFileChange {
                     "Content changed before the toggle could be applied",
                 ));
             }
-            if fs::symlink_metadata(&target).await.is_ok() {
+            if symlink_metadata_if_exists(&target).await?.is_some() {
                 return Err(input(
                     "The content toggle destination already exists",
                 ));
@@ -328,29 +316,25 @@ impl PendingFileChange {
                     &before.relative_path,
                 )
                 .await?;
-            match fs::symlink_metadata(&path).await {
-                Ok(_) => {
-                    if !store
-                        .instance_file_matches(&path, &before.sha512)
-                        .await?
-                    {
-                        return Err(input(
-                            "Content changed before the operation could be applied",
-                        ));
-                    }
+            match store.check_instance_path(&path, &before.sha512).await? {
+                InstanceFileStatus::Healthy => {
                     *mutation_started = true;
                     remove_instance_file(&path).await?;
                 }
-                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
-                    if before.present {
-                        return Err(input(
-                            "Content disappeared before the operation could be applied",
-                        ));
-                    }
+                InstanceFileStatus::Missing if !before.present => {}
+                InstanceFileStatus::Missing => {
+                    return Err(input(
+                        "Content disappeared before the operation could be applied",
+                    ));
                 }
-                Err(error) => return Err(error.into()),
+                InstanceFileStatus::Conflict => {
+                    return Err(input(
+                        "Content changed before the operation could be applied",
+                    ));
+                }
             }
         }
+
         if let Some(after) = &mut self.journal.after
             && after.present
         {
@@ -370,7 +354,7 @@ impl PendingFileChange {
                     .create_instance_file(
                         stored_file,
                         &path,
-                        super::FileStoragePolicy::Shared,
+                        FileStoragePolicy::Shared,
                     )
                     .await?,
             );
@@ -399,28 +383,4 @@ impl PendingFileChange {
     ) -> crate::Result<()> {
         store.rollback_journal(&self.journal).await
     }
-}
-
-pub(super) fn journal_move(
-    journal: &FileChangeJournal,
-) -> Option<(&FileState, &FileState)> {
-    let before = journal.before.as_ref()?;
-    let after = journal.after.as_ref()?;
-    (before.present
-        && after.present
-        && before.sha512 == after.sha512
-        && before.storage_kind == after.storage_kind
-        && before.relative_path != after.relative_path)
-        .then_some((before, after))
-}
-
-pub(super) fn journal_noop(journal: &FileChangeJournal) -> bool {
-    matches!(
-        (&journal.before, &journal.after),
-        (Some(before), Some(after))
-            if before.present == after.present
-                && before.sha512 == after.sha512
-                && before.storage_kind == after.storage_kind
-                && before.relative_path == after.relative_path
-    )
 }
