@@ -243,7 +243,7 @@ async fn restore_instance_update(
     for binding in &snapshot.bindings {
         if state
             .content_store
-            .lookup(Some(&binding.blob_sha512), None, None)
+            .lookup(Some(&binding.blob_sha512), None)
             .await?
             .is_none()
         {

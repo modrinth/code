@@ -6,7 +6,6 @@ use std::collections::HashSet;
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub(crate) struct StoredFileMetadata {
     pub sha512: String,
-    pub sha1: String,
     pub size: i64,
     pub relative_path: String,
     pub status: StoredFileStatus,
@@ -20,29 +19,17 @@ pub(in crate::state::content_store) async fn stored_files(
 ) -> crate::Result<Vec<StoredFileMetadata>> {
     Ok(sqlx::query_as!(
 		StoredFileMetadata,
-		r#"SELECT sha512, sha1, size, relative_path, status AS "status: _", modified_at_ns, last_used_at, sources FROM store_blobs"#
+		r#"SELECT sha512, size, relative_path, status AS "status: _", modified_at_ns, last_used_at, sources FROM store_blobs"#
 	).fetch_all(pool).await?)
 }
 
-pub(crate) async fn find_files(
-    pool: &SqlitePool,
-    sha512: Option<&str>,
-    sha1: Option<&str>,
-) -> crate::Result<Vec<StoredFileMetadata>> {
-    Ok(sqlx::query_as!(
-		StoredFileMetadata,
-		r#"SELECT sha512, sha1, size, relative_path, status AS "status: _", modified_at_ns, last_used_at, sources FROM store_blobs WHERE (? IS NOT NULL AND sha512 = ?) OR (? IS NULL AND sha1 = ?)"#,
-		sha512, sha512, sha512, sha1
-	).fetch_all(pool).await?)
-}
-
-pub(in crate::state::content_store) async fn find_file(
+pub(crate) async fn find_file(
     pool: &SqlitePool,
     sha512: &str,
 ) -> crate::Result<Option<StoredFileMetadata>> {
     Ok(sqlx::query_as!(
 		StoredFileMetadata,
-		r#"SELECT sha512, sha1, size, relative_path, status AS "status: _", modified_at_ns, last_used_at, sources FROM store_blobs WHERE sha512 = ?"#,
+		r#"SELECT sha512, size, relative_path, status AS "status: _", modified_at_ns, last_used_at, sources FROM store_blobs WHERE sha512 = ?"#,
 		sha512
 	).fetch_optional(pool).await?)
 }
@@ -62,7 +49,7 @@ pub(in crate::state::content_store) async fn cleanup_candidates(
 ) -> crate::Result<Vec<StoredFileMetadata>> {
     Ok(sqlx::query_as!(
 		StoredFileMetadata,
-		r#"SELECT sha512, sha1, size, relative_path, status AS "status: _", modified_at_ns, last_used_at, sources FROM store_blobs WHERE NOT EXISTS (SELECT 1 FROM store_instance_files WHERE blob_sha512 = store_blobs.sha512) AND NOT EXISTS (SELECT 1 FROM store_retained_refs WHERE blob_sha512 = store_blobs.sha512) ORDER BY last_used_at"#
+		r#"SELECT sha512, size, relative_path, status AS "status: _", modified_at_ns, last_used_at, sources FROM store_blobs WHERE NOT EXISTS (SELECT 1 FROM store_instance_files WHERE blob_sha512 = store_blobs.sha512) AND NOT EXISTS (SELECT 1 FROM store_retained_refs WHERE blob_sha512 = store_blobs.sha512) ORDER BY last_used_at"#
 	).fetch_all(pool).await?)
 }
 
@@ -70,8 +57,8 @@ pub(in crate::state::content_store) async fn save_file(
     pool: &SqlitePool,
     stored_file: &StoredFileMetadata,
 ) -> crate::Result<()> {
-    sqlx::query!("INSERT INTO store_blobs (sha512, sha1, size, relative_path, status, modified_at_ns, sources) VALUES (?, ?, ?, ?, 'ready', ?, ?) ON CONFLICT(sha512) DO UPDATE SET status = 'ready', modified_at_ns = excluded.modified_at_ns, last_used_at = unixepoch(), verified_at = unixepoch(), sources = CASE WHEN excluded.sources = '[]' THEN store_blobs.sources ELSE excluded.sources END",
-		stored_file.sha512, stored_file.sha1, stored_file.size, stored_file.relative_path, stored_file.modified_at_ns, stored_file.sources)
+    sqlx::query!("INSERT INTO store_blobs (sha512, size, relative_path, status, modified_at_ns, sources) VALUES (?, ?, ?, 'ready', ?, ?) ON CONFLICT(sha512) DO UPDATE SET status = 'ready', modified_at_ns = excluded.modified_at_ns, last_used_at = unixepoch(), verified_at = unixepoch(), sources = CASE WHEN excluded.sources = '[]' THEN store_blobs.sources ELSE excluded.sources END",
+		stored_file.sha512, stored_file.size, stored_file.relative_path, stored_file.modified_at_ns, stored_file.sources)
 		.execute(pool).await?;
     Ok(())
 }

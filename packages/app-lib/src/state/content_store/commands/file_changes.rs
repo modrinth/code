@@ -104,9 +104,8 @@ impl ContentStore {
                 } else {
                     self.store_file(&source).await?
                 };
-                if let Some(file) = &existing
-                    && binding.is_some()
-                    && previous.metadata.sha1 != file.sha1
+                if let Some(binding) = &binding
+                    && previous.metadata.sha512 != binding.blob_sha512
                 {
                     return Err(input(
                         "The content file was changed outside the app; preserve or re-import it before continuing",

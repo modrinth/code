@@ -384,10 +384,8 @@ pub type FetchProgressFn<'a> = dyn FnMut(
 pub struct DownloadedFile {
     path: DownloadedFilePath,
     pub size: u64,
-    pub sha1: String,
     pub sha512: String,
     pub reused: bool,
-    archive: bool,
 }
 
 #[derive(Clone, Debug)]
@@ -411,12 +409,7 @@ impl DownloadedFile {
         Self {
             reused,
             size: stored_file.metadata.size as u64,
-            sha1: stored_file.metadata.sha1.clone(),
             sha512: stored_file.metadata.sha512.clone(),
-            archive: stored_file
-                .metadata
-                .relative_path
-                .ends_with("/payload.jar"),
             path: DownloadedFilePath::Stored(stored_file),
         }
     }
@@ -437,9 +430,7 @@ impl DownloadedFile {
         Ok(StagedDownload {
             path,
             size: self.size,
-            sha1: self.sha1,
             sha512: self.sha512,
-            archive: self.archive,
         })
     }
 
@@ -490,9 +481,7 @@ impl DownloadedFile {
 pub(crate) struct StagedDownload {
     pub(crate) path: tempfile::TempPath,
     pub(crate) size: u64,
-    pub(crate) sha1: String,
     pub(crate) sha512: String,
-    pub(crate) archive: bool,
 }
 
 enum FetchBody {
@@ -631,14 +620,12 @@ async fn read_file_response(
     }
     file.sync_all().await?;
     drop(file);
-    let (hashes, archive) = hasher.finish(size);
+    let hashes = hasher.finish(size);
     Ok(DownloadedFile {
         path: DownloadedFilePath::Temporary(Arc::new(path)),
         reused: false,
         size,
-        sha1: hashes.sha1,
         sha512: hashes.sha512,
-        archive,
     })
 }
 
@@ -646,7 +633,6 @@ pub(crate) async fn fetch_content_file(
     state: &crate::State,
     mirrors: &[&str],
     sha512: Option<&str>,
-    sha1: Option<&str>,
     size: Option<u64>,
     download_meta: Option<&DownloadMeta>,
     progress: Option<&mut FetchProgressFn<'_>>,
@@ -656,7 +642,6 @@ pub(crate) async fn fetch_content_file(
         .get_or_download_file(
             mirrors,
             sha512,
-            sha1,
             size,
             download_meta,
             &state.fetch_semaphore,
@@ -1089,7 +1074,7 @@ async fn fetch_advanced_with_target(
                             FetchBody::Memory(bytes) => {
                                 sha1_async(bytes.clone()).await?
                             }
-                            FetchBody::File(file) => file.sha1.clone(),
+                            FetchBody::File(file) => sha1_file_async(file.path()).await?.1,
                         };
                         if &*hash != sha1 {
                             if attempt <= FETCH_ATTEMPTS {

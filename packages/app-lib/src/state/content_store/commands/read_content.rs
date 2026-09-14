@@ -20,15 +20,12 @@ impl ContentStore {
         stored_file: &StoredFileMetadata,
     ) -> crate::Result<PathBuf> {
         validate_digest(&stored_file.sha512, 128)?;
-        let prefix = format!(
-            "objects/sha512/{}/{}/",
-            &stored_file.sha512[..2],
-            stored_file.sha512
-        );
-        if !matches!(
-            stored_file.relative_path.strip_prefix(&prefix),
-            Some("payload.jar" | "payload.bin")
-        ) {
+		let relative_path = format!(
+			"objects/{}/{}",
+			&stored_file.sha512[..2],
+			stored_file.sha512
+		);
+		if stored_file.relative_path != relative_path {
             return Err(input("Invalid content store object path"));
         }
         Ok(self.root.join(&stored_file.relative_path))
@@ -37,40 +34,27 @@ impl ContentStore {
     pub(crate) async fn lookup(
         &self,
         sha512: Option<&str>,
-        sha1: Option<&str>,
         size: Option<u64>,
     ) -> crate::Result<Option<StoredFileHandle>> {
         if let Some(hash) = sha512 {
             validate_digest(hash, 128)?;
         }
-        if let Some(hash) = sha1 {
-            validate_digest(hash, 40)?;
-        }
         let guard = self.lease().await;
-        self.lookup_with_guard(sha512, sha1, size, guard).await
+        self.lookup_with_guard(sha512, size, guard).await
     }
 
     pub(in crate::state::content_store) async fn lookup_with_guard(
         &self,
         sha512: Option<&str>,
-        sha1: Option<&str>,
         size: Option<u64>,
         guard: Arc<OwnedRwLockReadGuard<()>>,
     ) -> crate::Result<Option<StoredFileHandle>> {
-        let candidates = catalog::find_files(&self.pool, sha512, sha1)
-            .await?
-            .into_iter()
-            .filter(|stored_file| {
-                sha1.is_none_or(|expected| stored_file.sha1 == expected)
-            })
-            .filter(|stored_file| {
-                sha512.is_some()
-                    || size.is_none_or(|size| stored_file.size as u64 == size)
-            })
-            .exactly_one();
-        let Ok(stored_file) = candidates else {
-            return Ok(None);
-        };
+		let Some(sha512) = sha512 else {
+			return Ok(None);
+		};
+		let Some(stored_file) = catalog::find_file(&self.pool, sha512).await? else {
+			return Ok(None);
+		};
         if !self.is_healthy(&stored_file, false).await? {
             return Ok(None);
         }
@@ -127,7 +111,6 @@ impl ContentStore {
         }
         let hashes = hash_file_with_progress(&path, on_read).await?;
         if hashes.sha512 != stored_file.sha512
-            || hashes.sha1 != stored_file.sha1
             || hashes.size != stored_file.size as u64
         {
             return self.quarantine(stored_file).await;
@@ -148,30 +131,25 @@ impl ContentStore {
         let Ok(relative) = canonical.strip_prefix(&self.root) else {
             return Ok(None);
         };
-        let Some((objects, algorithm, prefix, hash, payload)) =
+        let Some((objects, prefix, hash)) =
             relative.components().collect_tuple()
         else {
             return Ok(None);
         };
-        if objects.as_os_str() != "objects"
-            || algorithm.as_os_str() != "sha512"
-            || !matches!(
-                payload.as_os_str().to_str(),
-                Some("payload.jar" | "payload.bin")
-            )
-        {
+		if objects.as_os_str() != "objects" {
             return Ok(None);
         }
         let Some(hash) = hash.as_os_str().to_str() else {
             return Ok(None);
         };
-        if validate_digest(hash, 128).is_err()
+        if validate_digest(prefix.as_os_str().to_str().unwrap_or_default(), 2).is_err()
+			|| validate_digest(hash, 128).is_err()
             || !hash
                 .starts_with(prefix.as_os_str().to_str().unwrap_or_default())
         {
             return Ok(None);
         }
-        let Some(stored_file) = self.lookup(Some(hash), None, None).await?
+        let Some(stored_file) = self.lookup(Some(hash), None).await?
         else {
             return Ok(None);
         };
@@ -195,7 +173,7 @@ impl ContentStore {
         binding: InstanceFileStorage,
     ) -> crate::Result<FileContent> {
         let stored_file = self
-            .lookup(Some(&binding.blob_sha512), None, Some(file.size))
+            .lookup(Some(&binding.blob_sha512), Some(file.size))
             .await?;
         Ok(match stored_file {
             Some(stored_file) => FileContent::Stored {

@@ -575,7 +575,9 @@ impl<'a> InstanceContent<'a> {
         adopted.relative_path = canonical.to_string();
         adopted.file_name = canonical_file_name(canonical)?.to_string();
         adopted.enabled = enabled;
-        adopted.sha1 = stored_file.metadata.sha1.clone();
+		adopted.sha1 = crate::util::fetch::sha1_file_async(&stored_file.path)
+			.await?
+			.1;
         adopted.size = stored_file.metadata.size as u64;
         adopted.missing = false;
         adopted.modified_at = Utc::now();
@@ -594,6 +596,12 @@ impl<'a> InstanceContent<'a> {
         &self,
         prepared: &PendingContentChange,
     ) -> crate::Result<ContentChangeResult> {
+		let legacy_sha1 = match &prepared.change {
+			PreparedChange::Install { stored_file, .. } => {
+				Some(crate::util::fetch::sha1_file_async(&stored_file.path).await?.1)
+			}
+			_ => None,
+		};
         let mut tx = self.state.pool.begin().await?;
         let content_scope = match &prepared.change {
             PreparedChange::Adopt { .. } => None,
@@ -628,7 +636,7 @@ impl<'a> InstanceContent<'a> {
                         relative_path,
                         file_name,
                         enabled: *enabled,
-                        sha1: &stored_file.metadata.sha1,
+						sha1: legacy_sha1.as_deref().expect("install requires a legacy file hash"),
                         size: stored_file.metadata.size as u64,
                         missing: false,
                     },

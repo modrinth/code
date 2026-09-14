@@ -432,7 +432,6 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
             .find(|file| file.url == url)
             .and_then(|file| file.hashes.get("sha512"))
             .map(String::as_str),
-        hash.map(|x| &**x),
         version
             .files
             .iter()

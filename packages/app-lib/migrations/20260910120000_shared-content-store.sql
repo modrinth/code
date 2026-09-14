@@ -1,6 +1,5 @@
 CREATE TABLE store_blobs (
 	sha512 TEXT PRIMARY KEY NOT NULL,
-	sha1 TEXT NOT NULL,
 	size INTEGER NOT NULL CHECK (size >= 0),
 	relative_path TEXT NOT NULL UNIQUE,
 	status TEXT NOT NULL DEFAULT 'ready' CHECK (status IN ('ready', 'quarantined', 'deleting')),
@@ -10,8 +9,6 @@ CREATE TABLE store_blobs (
 	verified_at INTEGER NOT NULL DEFAULT (unixepoch()),
 	sources TEXT NOT NULL DEFAULT '[]'
 );
-
-CREATE INDEX store_blobs_sha1_size ON store_blobs (sha1, size);
 
 CREATE TABLE store_instance_files (
 	file_id TEXT PRIMARY KEY NOT NULL REFERENCES instance_files(id) ON DELETE CASCADE,

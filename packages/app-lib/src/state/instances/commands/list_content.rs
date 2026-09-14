@@ -1406,7 +1406,6 @@ async fn get_modpack_identifiers(
         state,
         &[&primary_file.url],
         primary_file.hashes.get("sha512").map(String::as_str),
-        primary_file.hashes.get("sha1").map(String::as_str),
         Some(u64::from(primary_file.size)),
         Some(&download_meta),
         None,

@@ -50,14 +50,11 @@ pub(super) async fn prepare(
                 })?;
             let relative_path = content_file_path(file);
             validate_relative(&relative_path)?;
-            let Some(stored) = content_store::find_files(
+            let Some(stored) = content_store::find_file(
                 pool,
-                Some(&binding.blob_sha512),
-                None,
+                &binding.blob_sha512,
             )
-            .await?
-            .into_iter()
-            .next() else {
+            .await? else {
                 return Err(input("Managed content has no stored file record"));
             };
             validate_relative(&stored.relative_path)?;

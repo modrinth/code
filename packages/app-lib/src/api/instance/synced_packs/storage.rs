@@ -69,7 +69,6 @@ pub(super) async fn write_library(
             .content_store
             .lookup(
                 pack.blob_sha512.as_deref(),
-                Some(&pack.sha1),
                 Some(pack.item.size),
             )
             .await
@@ -134,7 +133,7 @@ pub(super) async fn write_library(
                 .await?;
             state
                 .content_store
-                .release("synced-cache", &pack.sha1)
+                .release("synced-cache", hash)
                 .await?;
         }
     }
@@ -145,16 +144,16 @@ pub(super) async fn cache_bytes(
     bytes: Bytes,
     state: &State,
 ) -> crate::Result<String> {
-    let stored_file = state.content_store.store_bytes(&bytes, None).await?;
+    let stored_file = state.content_store.store_bytes(&bytes).await?;
     state
         .content_store
         .retain(
             "synced-cache",
-            &stored_file.metadata.sha1,
+            &stored_file.metadata.sha512,
             std::slice::from_ref(&stored_file.metadata.sha512),
         )
         .await?;
-    Ok(stored_file.metadata.sha1.clone())
+    Ok(stored_file.metadata.sha512.clone())
 }
 
 pub(super) async fn read_stored_file(
@@ -165,7 +164,6 @@ pub(super) async fn read_stored_file(
         .content_store
         .lookup(
             pack.blob_sha512.as_deref(),
-            Some(&pack.sha1),
             Some(pack.item.size),
         )
         .await?
@@ -201,11 +199,10 @@ pub(super) async fn read_stored_file(
         .files
         .iter()
         .find(|file| {
-            file.hashes.get("sha1") == Some(&pack.sha1)
-                && pack
-                    .blob_sha512
-                    .as_ref()
-                    .is_none_or(|hash| file.hashes.get("sha512") == Some(hash))
+			match &pack.blob_sha512 {
+				Some(hash) => file.hashes.get("sha512") == Some(hash),
+				None => file.hashes.get("sha1") == Some(&pack.sha1),
+			}
         })
         .ok_or_else(|| {
             input(
@@ -220,7 +217,6 @@ pub(super) async fn read_stored_file(
         .get_or_download_file(
             &[file.url.as_str()],
             file.hashes.get("sha512").map(String::as_str),
-            Some(&pack.sha1),
             Some(u64::from(file.size)),
             None,
             &state.fetch_semaphore,
@@ -307,7 +303,9 @@ pub(crate) async fn migrate_store(state: &State) -> crate::Result<()> {
     )
     .await?
     {
-        if !library.packs.values().any(|pack| pack.sha1 == owner) {
+		if !library.packs.values().any(|pack| {
+			pack.blob_sha512.as_deref() == Some(owner.as_str())
+		}) {
             state.content_store.release("synced-cache", &owner).await?;
         }
     }
@@ -335,7 +333,6 @@ async fn recover_legacy_pack(
         .content_store
         .lookup(
             pack.blob_sha512.as_deref(),
-            Some(&pack.sha1),
             Some(pack.item.size),
         )
         .await?
@@ -396,17 +393,16 @@ async fn import_matching_pack(
     pack: &SyncedPack,
     state: &State,
 ) -> crate::Result<Option<StoredFileHandle>> {
-    let Ok(crate::state::content_store::FileHashes { sha512, sha1, .. }) =
+    let Ok(crate::state::content_store::FileHashes { sha512, .. }) =
         hash_file(source).await
     else {
         return Ok(None);
     };
-    if sha1 != pack.sha1
-        || pack
-            .blob_sha512
-            .as_ref()
-            .is_some_and(|expected| expected != &sha512)
-    {
+	let matches = match &pack.blob_sha512 {
+		Some(expected) => expected == &sha512,
+		None => crate::util::fetch::sha1_file_async(source).await?.1 == pack.sha1,
+	};
+	if !matches {
         return Ok(None);
     }
     let stored_file = state.content_store.store_file(source).await?;
@@ -445,7 +441,7 @@ async fn cleanup_legacy_cache(state: &State) -> crate::Result<bool> {
             continue;
         }
         let result: crate::Result<()> = async {
-            if hash_file(&entry.path()).await?.sha1 != name {
+            if crate::util::fetch::sha1_file_async(entry.path()).await?.1 != name {
                 let quarantine = directory(state).join("quarantine");
                 tokio::fs::create_dir_all(&quarantine).await?;
                 tokio::fs::rename(

@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT sha512, sha1, size, relative_path, status AS \"status: _\", modified_at_ns, last_used_at, sources FROM store_blobs",
+  "query": "SELECT sha512, size, relative_path, status AS \"status: _\", modified_at_ns, last_used_at, sources FROM store_blobs",
   "describe": {
     "columns": [
       {
@@ -9,38 +9,33 @@
         "type_info": "Text"
       },
       {
-        "name": "sha1",
-        "ordinal": 1,
-        "type_info": "Text"
-      },
-      {
         "name": "size",
-        "ordinal": 2,
+        "ordinal": 1,
         "type_info": "Integer"
       },
       {
         "name": "relative_path",
-        "ordinal": 3,
+        "ordinal": 2,
         "type_info": "Text"
       },
       {
         "name": "status: _",
-        "ordinal": 4,
+        "ordinal": 3,
         "type_info": "Text"
       },
       {
         "name": "modified_at_ns",
-        "ordinal": 5,
+        "ordinal": 4,
         "type_info": "Integer"
       },
       {
         "name": "last_used_at",
-        "ordinal": 6,
+        "ordinal": 5,
         "type_info": "Integer"
       },
       {
         "name": "sources",
-        "ordinal": 7,
+        "ordinal": 6,
         "type_info": "Text"
       }
     ],
@@ -54,9 +49,8 @@
       false,
       false,
       false,
-      false,
       false
     ]
   },
-  "hash": "31a95183ef56d4fbcdca09ed45f7aa2084780e71c7c0ae347fb6578714e42ca7"
+  "hash": "1a95f3615a089934da823eeeac740d5493ef90334b869e971f9a8a2058f67557"
 }

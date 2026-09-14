@@ -16,21 +16,17 @@ impl ContentStore {
         &self,
         mirrors: &[&str],
         sha512: Option<&str>,
-        sha1: Option<&str>,
         size: Option<u64>,
         download_meta: Option<&DownloadMeta>,
         semaphore: &FetchSemaphore,
         progress: Option<&mut FetchProgressFn<'_>>,
     ) -> crate::Result<GetFileResult> {
-        let key = sha512
-            .map(|hash| format!("sha512:{hash}"))
-            .or_else(|| sha1.map(|hash| format!("sha1:{hash}")));
-        let _acquisition = if let Some(key) = &key {
-            Some(self.download_lock(key).lock().await)
-        } else {
-            None
-        };
-        if let Some(stored_file) = self.lookup(sha512, sha1, size).await? {
+		let sha512 = sha512.ok_or_else(|| {
+			input("Content download is missing a SHA-512 hash")
+		})?;
+		validate_digest(sha512, 128)?;
+		let _acquisition = self.download_lock(sha512).lock().await;
+        if let Some(stored_file) = self.lookup(Some(sha512), size).await? {
             return Ok(GetFileResult {
                 stored_file,
                 reused: true,
@@ -40,29 +36,20 @@ impl ContentStore {
             &self.staging,
             &self.pool,
             mirrors,
-            sha1,
             download_meta,
             semaphore,
             progress,
         )
         .await?;
-        if let Some(expected_sha512) = sha512
-            && expected_sha512 != download.sha512
-        {
+		if sha512 != download.sha512 {
             return Err(input(format!(
-                "Downloaded content SHA-512 mismatch: expected {expected_sha512}, got {}",
+                "Downloaded content SHA-512 mismatch: expected {sha512}, got {}",
                 download.sha512,
             )));
         }
         if let Some(expected_size) = size
             && expected_size != download.size
         {
-            if sha512.is_none() {
-                return Err(input(format!(
-                    "Downloaded content size mismatch: expected {expected_size} bytes, got {} bytes",
-                    download.size,
-                )));
-            }
             tracing::warn!(
                 expected_size,
                 actual_size = download.size,
@@ -101,7 +88,6 @@ impl ContentStore {
 		if let Some(stored_file) = self
 			.lookup(
 				Some(&hashes.sha512),
-				Some(&hashes.sha1),
 				Some(hashes.size),
 			)
 			.await?
@@ -123,24 +109,17 @@ impl ContentStore {
         let fetch::StagedDownload {
             path: temporary,
             size,
-            sha1,
             sha512: hash,
-            archive,
         } = staged;
         let guard = self.lease().await;
         let _publication = self.publish_lock(&hash).lock().await;
         if let Some(existing) = self
-            .lookup_with_guard(Some(&hash), None, Some(size), guard.clone())
+            .lookup_with_guard(Some(&hash), Some(size), guard.clone())
             .await?
         {
             return Ok(existing);
         }
-        let relative_path = format!(
-            "objects/sha512/{}/{}/payload.{}",
-            &hash[..2],
-            hash,
-            if archive { "jar" } else { "bin" }
-        );
+		let relative_path = format!("objects/{}/{}", &hash[..2], hash);
         let destination = self.root.join(&relative_path);
         filesystem::publish_staged_file(
             &self.root,
@@ -151,7 +130,6 @@ impl ContentStore {
         .await?;
         let stored_file = StoredFileMetadata {
             sha512: hash,
-            sha1,
             size: size
                 .try_into()
                 .map_err(|_| input("Content file is too large"))?,
@@ -172,17 +150,7 @@ impl ContentStore {
     pub(crate) async fn store_bytes(
         &self,
         bytes: &[u8],
-        expected_sha1: Option<&str>,
     ) -> crate::Result<StoredFileHandle> {
-        let sha1 = sha1_smol::Sha1::from(bytes).hexdigest();
-        if let Some(expected) = expected_sha1 {
-            validate_digest(expected, 40)?;
-            if sha1 != expected {
-                return Err(input(
-                    "Content bytes do not match the expected hash",
-                ));
-            }
-        }
         let (mut file, temporary) = self.temporary().await?;
         filesystem::write_staged_bytes(&mut file, bytes).await?;
         drop(file);
@@ -190,9 +158,7 @@ impl ContentStore {
             fetch::StagedDownload {
                 path: temporary,
                 size: bytes.len() as u64,
-                sha1,
                 sha512: format!("{:x}", Sha512::digest(bytes)),
-                archive: bytes.starts_with(b"PK"),
             },
             &[],
         )

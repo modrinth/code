@@ -257,7 +257,7 @@ pub(in crate::state::content_store) async fn stage_file(
     }
     require_staging_space(staging, before.len())?;
     let (mut output, temporary) = temporary_file(Some(staging)).await?;
-    let (FileHashes { sha512, sha1, size }, archive) =
+    let FileHashes { sha512, size } =
         copy_and_hash(&mut input_file, &mut output, &|_| {}).await?;
     output.sync_all().await?;
     drop(output);
@@ -273,9 +273,7 @@ pub(in crate::state::content_store) async fn stage_file(
     Ok(fetch::StagedDownload {
         path: temporary,
         size,
-        sha1,
         sha512,
-        archive,
     })
 }
 

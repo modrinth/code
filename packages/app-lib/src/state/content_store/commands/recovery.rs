@@ -88,7 +88,7 @@ impl ContentStore {
                     .is_some_and(|metadata| metadata.is_file())
             {
                 if let Some(stored_file) =
-                    self.lookup(Some(&before.sha512), None, None).await?
+                    self.lookup(Some(&before.sha512), None).await?
                 {
                     let shared = filesystem::matches_any_file(
                         &path,
@@ -191,7 +191,7 @@ impl ContentStore {
                 }
                 if status == InstanceFileStatus::Missing {
                     let stored_file = self
-                        .lookup(Some(&before.sha512), None, None)
+                        .lookup(Some(&before.sha512), None)
                         .await?
                         .ok_or_else(|| {
                             input("Recovery content needs repair or re-import")

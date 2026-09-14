@@ -847,7 +847,6 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                         .hashes
                         .get(&PackFileHash::Sha512)
                         .map(String::as_str),
-                    project.hashes.get(&PackFileHash::Sha1).map(|x| &**x),
                     Some(project_size),
                     Some(&content_context.download_meta),
                     Some(progress),
@@ -883,8 +882,8 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                                     "Unsupported content path",
                                 )
                             })?;
-                    let file_info =
-                        content_context.file_infos_by_hash.get(&file.sha1);
+					let file_info = project.hashes.get(&PackFileHash::Sha1)
+						.and_then(|hash| content_context.file_infos_by_hash.get(hash));
                     let stored_file = file.store_file(state).await?;
                     content_context
                         .reporter

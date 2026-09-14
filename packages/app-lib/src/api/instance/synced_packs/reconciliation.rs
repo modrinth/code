@@ -307,7 +307,6 @@ async fn prepare_pack(
             state,
             &[file.url.as_str()],
             file.hashes.get("sha512").map(String::as_str),
-            file.hashes.get("sha1").map(String::as_str),
             Some(u64::from(file.size)),
             None,
             None,
@@ -585,7 +584,7 @@ async fn apply_pack(
         }
     }
     let size = stored_file.metadata.size as u64;
-    let sha1 = stored_file.metadata.sha1.clone();
+    let sha1 = crate::util::fetch::sha1_file_async(&stored_file.path).await?.1;
     let path = commands::install_stored_file(
         instance_id,
         commands::InstallContent {

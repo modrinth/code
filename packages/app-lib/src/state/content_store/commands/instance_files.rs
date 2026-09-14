@@ -98,7 +98,7 @@ impl ContentStore {
                     input("Rollback content reference has no file record")
                 })?;
             let stored_file = self
-                .lookup(Some(&binding.blob_sha512), None, Some(file.size))
+                .lookup(Some(&binding.blob_sha512), Some(file.size))
                 .await?
                 .ok_or_else(|| {
                     input("Rollback content needs repair or re-import")

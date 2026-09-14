@@ -159,7 +159,7 @@ impl ContentStore {
             {
                 if repair
                     && let Some(healthy) = self
-                        .lookup(Some(&stored_file.sha512), None, None)
+                        .lookup(Some(&stored_file.sha512), None)
                         .await?
                 {
                     self.restore_quarantined_hardlinks(&healthy).await?;
@@ -173,7 +173,6 @@ impl ContentStore {
                 if sources.is_empty() {
                     sources = downloads::repair_sources(
                         &self.pool,
-                        stored_file.sha1.as_str(),
                         &stored_file.sha512,
                         state,
                     )
@@ -232,7 +231,6 @@ impl ContentStore {
             &self.staging,
             &self.pool,
             &mirrors,
-            Some(&stored_file.sha1),
             None,
             &state.fetch_semaphore,
             None,

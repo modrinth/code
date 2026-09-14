@@ -7,35 +7,26 @@ use tokio_util::io::InspectReader;
 #[derive(Debug, Eq, PartialEq)]
 pub(crate) struct FileHashes {
     pub sha512: String,
-    pub sha1: String,
     pub size: u64,
 }
 
 #[derive(Default)]
 pub(crate) struct ContentHasher {
     sha512: Sha512,
-    sha1: sha1_smol::Sha1,
-    prefix: Vec<u8>,
 }
 
 impl ContentHasher {
     pub(crate) fn update(&mut self, bytes: &[u8]) {
         self.sha512.update(bytes);
-        self.sha1.update(bytes);
-        self.prefix
-            .extend(bytes.iter().take(2 - self.prefix.len()).copied());
     }
 
-    pub(crate) fn finish(self, size: u64) -> (FileHashes, bool) {
-        (
-            FileHashes {
-                sha512: format!("{:x}", self.sha512.finalize()),
-                sha1: self.sha1.hexdigest(),
-                size,
-            },
-            self.prefix.as_slice() == b"PK",
-        )
-    }
+	pub(crate) fn finish(self, size: u64) -> FileHashes {
+		FileHashes {
+			sha512: format!("{:x}", self.sha512.finalize()),
+			size,
+		}
+	}
+
 }
 
 pub(crate) async fn temporary_file(
@@ -62,16 +53,14 @@ pub(crate) async fn hash_file_with_progress(
     on_read: &(dyn Fn(u64) + Send + Sync),
 ) -> crate::Result<FileHashes> {
     let file = File::open(path).await?;
-    Ok(copy_and_hash(file, &mut tokio::io::sink(), on_read)
-        .await?
-        .0)
+	copy_and_hash(file, &mut tokio::io::sink(), on_read).await
 }
 
 pub(crate) async fn copy_and_hash(
     input: impl AsyncRead + Unpin,
     output: &mut (impl AsyncWrite + Unpin),
     on_read: &(dyn Fn(u64) + Send + Sync),
-) -> crate::Result<(FileHashes, bool)> {
+) -> crate::Result<FileHashes> {
     let mut hashes = ContentHasher::default();
     let size = {
         let reader = InspectReader::new(input, |bytes| {
