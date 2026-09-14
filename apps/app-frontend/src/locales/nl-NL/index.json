@@ -108,7 +108,7 @@
     "message": "Hoofdinstantie"
   },
   "app.action-bar.reload-to-update": {
-    "message": "Herlaadt om te updaten"
+    "message": "Herlaad om bij te werken"
   },
   "app.action-bar.show-downloads": {
     "message": "Actieve downloads weergeven"
@@ -144,10 +144,10 @@
     "message": "Alles afwijzen"
   },
   "app.ads-consent.title": {
-    "message": "Je privacy en hoe advertenties Modrinth ondersteunen"
+    "message": "Uw privacy en hoe advertenties Modrinth ondersteunen"
   },
   "app.appearance-settings.compact-mode.description": {
-    "message": "Toon bibliotheek instanties in een compacte row lay-out"
+    "message": "Toon bibliotheek instanties in een compacte row lay-out."
   },
   "app.appearance-settings.compact-mode.title": {
     "message": "Compacte modus"
@@ -159,7 +159,7 @@
     "message": "Bibliotheek"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Verberg je gebruikersnaam boven het voorbeeld van de speler op de Skinkiezer-pagina."
+    "message": "Verberg uw gebruikersnaam boven het voorbeeld van de speler op de Skinkiezer-pagina."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Verberg nametag"
@@ -281,6 +281,21 @@
   "app.content-install.no-compatible-versions": {
     "message": "Er zijn geen beschikbare versies die overeenkomen met {compatibilityLabel}. Selecteer toch een versie om te installeren. Afhankelijkheden worden niet automatisch geïnstalleerd."
   },
+  "app.content.desync-pack": {
+    "message": "Desync"
+  },
+  "app.content.sync-data-packs-disabled": {
+    "message": "Schakel eerst datapack-syncen aan in de appinstellingen."
+  },
+  "app.content.sync-pack": {
+    "message": "Sync"
+  },
+  "app.content.sync-packs-override": {
+    "message": "Schakel de overschrijving van de pakketsynchronisatie eerst uit in de instellingen van deze instantie."
+  },
+  "app.content.sync-resource-packs-disabled": {
+    "message": "Schakel eerst resource pakket syncen aan in de appinstellingen."
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "Open back-up-map"
   },
@@ -310,6 +325,57 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.features-settings.instance-pages.title": {
+    "message": "Instanties"
+  },
+  "app.features-settings.play-page.title": {
+    "message": "Speel-pagina"
+  },
+  "app.features-settings.quick-instances.description": {
+    "message": "Kies het maximale aantal recente instanties die te zien zijn in de linker zijbalk. U kan dit ook aanpassen door de divider te slepen."
+  },
+  "app.features-settings.quick-instances.title": {
+    "message": "Snelle instanties in zijbalk"
+  },
+  "app.features-settings.show-all-screenshots.description": {
+    "message": "Toon een knop in de linker zijbalk om all uw schermopnames van al uw instanties te zien."
+  },
+  "app.features-settings.show-all-screenshots.title": {
+    "message": "Toon alle schermopnames in zijbalk"
+  },
+  "app.features-settings.show-files-tab.title": {
+    "message": "Toon Bestanden tabblad in instanties"
+  },
+  "app.features-settings.show-jump-in.description": {
+    "message": "Toon onlangs gespeelde werelden en instanties bovenaan de Speel-pagina."
+  },
+  "app.features-settings.show-jump-in.title": {
+    "message": "Toon Onlangs Gespeeld"
+  },
+  "app.features-settings.show-screenshots-tab.title": {
+    "message": "Toon schermopname tabblad in instanties"
+  },
+  "app.features-settings.show-skin-selector.description": {
+    "message": "Toon een knop in de linker zijbalk om de Skin-selector te openen."
+  },
+  "app.features-settings.show-skin-selector.title": {
+    "message": "Toon Skin-selector in zijbalk"
+  },
+  "app.features-settings.show-worlds-tab.title": {
+    "message": "Toon Werelden tabblad in instanties"
+  },
+  "app.features-settings.sidebar.title": {
+    "message": "Zijbalk"
+  },
+  "app.features-settings.sync-across-devices.description": {
+    "message": "Gebruik deze instellingen overal waar u ingelogd bent. Zet dit uit om uw instellingen apart te houden op dit apparaat."
+  },
+  "app.features-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Log in up uw Modrinth-account om instellingen te synchroniseren."
+  },
+  "app.features-settings.sync-across-devices.title": {
+    "message": "Synchroniseer instellingen tussen apparaten"
   },
   "app.home.jump-back-in.actions.label": {
     "message": "Instellingen voor instantie"
@@ -757,6 +823,18 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Server verwijderen"
+  },
+  "app.instance.worlds.remove-server-modal.remove-everywhere": {
+    "message": "Verwijder overal"
+  },
+  "app.instance.worlds.remove-server-modal.remove-here": {
+    "message": "Verwijder hier"
+  },
+  "app.instance.worlds.remove-server-modal.synced-description": {
+    "message": "U kan dit verwijderen van alleen deze instantie, of overal. Als U deze server verwijderd alleen uit deze instantie, word serversynchronizatie automatisch uitgezet voor deze instantie, en zal deze instantie geen synchronizatieupdates meer krijgen."
+  },
+  "app.instance.worlds.remove-server-modal.synced-header": {
+    "message": "Deze server is gesynchroniseerd"
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Server verwijderen"
@@ -1559,6 +1637,879 @@
   "app.settings.downloading": {
     "message": "v{version} wordt gedownload"
   },
+  "app.settings.game-options.category.accessibility.description": {
+    "message": "Toegankelijkheid-voorkeuren"
+  },
+  "app.settings.game-options.category.accessibility.label": {
+    "message": "Toegankelijkheid"
+  },
+  "app.settings.game-options.category.chat.description": {
+    "message": "Chat-zichtbaarheid en uiterlijk"
+  },
+  "app.settings.game-options.category.chat.label": {
+    "message": "Chat"
+  },
+  "app.settings.game-options.category.controls.description": {
+    "message": "Muis, beweging, en toetsen"
+  },
+  "app.settings.game-options.category.controls.label": {
+    "message": "Besturing"
+  },
+  "app.settings.game-options.category.custom.description": {
+    "message": "Instellingen toegevoegd vanuit Mods"
+  },
+  "app.settings.game-options.category.custom.label": {
+    "message": "Instellingen op maat"
+  },
+  "app.settings.game-options.category.language.description": {
+    "message": "Gametaal"
+  },
+  "app.settings.game-options.category.language.label": {
+    "message": "Taal"
+  },
+  "app.settings.game-options.category.music-and-sound.description": {
+    "message": "Volume en audiovoorkeuren"
+  },
+  "app.settings.game-options.category.music-and-sound.label": {
+    "message": "Muziek en geluid"
+  },
+  "app.settings.game-options.category.online.description": {
+    "message": "Online en Realms voorkeuren"
+  },
+  "app.settings.game-options.category.online.label": {
+    "message": "Online"
+  },
+  "app.settings.game-options.category.skin-customization.description": {
+    "message": "Skin-lagen en standaardhand"
+  },
+  "app.settings.game-options.category.skin-customization.label": {
+    "message": "Skin aanpassingen"
+  },
+  "app.settings.game-options.category.video.description": {
+    "message": "Camera en weergave"
+  },
+  "app.settings.game-options.category.video.label": {
+    "message": "Video"
+  },
+  "app.settings.game-options.choice.all": {
+    "message": "Alles"
+  },
+  "app.settings.game-options.choice.balanced": {
+    "message": "Gebalanceerd"
+  },
+  "app.settings.game-options.choice.by-player": {
+    "message": "Bij speler"
+  },
+  "app.settings.game-options.choice.chat": {
+    "message": "Chat"
+  },
+  "app.settings.game-options.choice.commands-only": {
+    "message": "Alleen opdrachten"
+  },
+  "app.settings.game-options.choice.constant": {
+    "message": "Constant"
+  },
+  "app.settings.game-options.choice.crosshair": {
+    "message": "Vizier"
+  },
+  "app.settings.game-options.choice.custom": {
+    "message": "Op maat"
+  },
+  "app.settings.game-options.choice.decreased": {
+    "message": "Verminderd"
+  },
+  "app.settings.game-options.choice.default": {
+    "message": "Standaard"
+  },
+  "app.settings.game-options.choice.fabulous": {
+    "message": "Fantastisch"
+  },
+  "app.settings.game-options.choice.fancy": {
+    "message": "Fraai"
+  },
+  "app.settings.game-options.choice.far": {
+    "message": "Ver"
+  },
+  "app.settings.game-options.choice.fast": {
+    "message": "Snel"
+  },
+  "app.settings.game-options.choice.frequent": {
+    "message": "Frequent"
+  },
+  "app.settings.game-options.choice.hidden": {
+    "message": "Verstopt"
+  },
+  "app.settings.game-options.choice.hotbar": {
+    "message": "Hotbar"
+  },
+  "app.settings.game-options.choice.left": {
+    "message": "Links"
+  },
+  "app.settings.game-options.choice.limited": {
+    "message": "Verminderd"
+  },
+  "app.settings.game-options.choice.max-fps": {
+    "message": "Maximaal FPS"
+  },
+  "app.settings.game-options.choice.maximum": {
+    "message": "Maximum"
+  },
+  "app.settings.game-options.choice.minimal": {
+    "message": "Minimaal"
+  },
+  "app.settings.game-options.choice.minimum": {
+    "message": "Minimum"
+  },
+  "app.settings.game-options.choice.nearby": {
+    "message": "Vlakbij"
+  },
+  "app.settings.game-options.choice.never": {
+    "message": "Nooit"
+  },
+  "app.settings.game-options.choice.none": {
+    "message": "Geen"
+  },
+  "app.settings.game-options.choice.normal": {
+    "message": "Normaal"
+  },
+  "app.settings.game-options.choice.off": {
+    "message": "Uit"
+  },
+  "app.settings.game-options.choice.on": {
+    "message": "Aan"
+  },
+  "app.settings.game-options.choice.opengl": {
+    "message": "OpenGL"
+  },
+  "app.settings.game-options.choice.pause": {
+    "message": "Pauzemenu"
+  },
+  "app.settings.game-options.choice.pause-and-toast": {
+    "message": "Pauzemenu en toast"
+  },
+  "app.settings.game-options.choice.power-saver": {
+    "message": "Stroombesparing"
+  },
+  "app.settings.game-options.choice.right": {
+    "message": "Rechts"
+  },
+  "app.settings.game-options.choice.short": {
+    "message": "Kort"
+  },
+  "app.settings.game-options.choice.shown": {
+    "message": "Zichtbaar"
+  },
+  "app.settings.game-options.choice.system": {
+    "message": "Systeem"
+  },
+  "app.settings.game-options.choice.tiny": {
+    "message": "Mini"
+  },
+  "app.settings.game-options.choice.vulkan": {
+    "message": "Vulkan"
+  },
+  "app.settings.game-options.choice.when-minimized": {
+    "message": "Wanneer geminimaliseerd"
+  },
+  "app.settings.game-options.choice.while-afk": {
+    "message": "Terwijl U AFK bent"
+  },
+  "app.settings.game-options.compatibility.none": {
+    "message": "Sommige van uw instanties kunnen deze instelling niet gebruiken."
+  },
+  "app.settings.game-options.compatibility.reason.launcher-controlled": {
+    "message": "Deze instelling is door Modrinth's startinstellingen beheerd."
+  },
+  "app.settings.game-options.custom-value.placeholder": {
+    "message": "Voer een waarde in"
+  },
+  "app.settings.game-options.keybind.assigned-status": {
+    "message": "{setting} is nu gekoppeld aan {binding}."
+  },
+  "app.settings.game-options.keybind.cancelled-status": {
+    "message": "Toetswijzingen geannuleerd."
+  },
+  "app.settings.game-options.keybind.change": {
+    "message": "{setting}: {binding}. Activeer om de binding te wijzigen."
+  },
+  "app.settings.game-options.keybind.choose": {
+    "message": "Kies een toets"
+  },
+  "app.settings.game-options.keybind.conflict-description": {
+    "message": "Dit wordt al gebruikt door {settings}."
+  },
+  "app.settings.game-options.keybind.key.arrow-down": {
+    "message": "Pijl omlaag"
+  },
+  "app.settings.game-options.keybind.key.arrow-left": {
+    "message": "Pijl links"
+  },
+  "app.settings.game-options.keybind.key.arrow-right": {
+    "message": "Pijl rechts"
+  },
+  "app.settings.game-options.keybind.key.arrow-up": {
+    "message": "Pijl omhoog"
+  },
+  "app.settings.game-options.keybind.key.backspace": {
+    "message": "Backspace"
+  },
+  "app.settings.game-options.keybind.key.caps-lock": {
+    "message": "Caps Lock"
+  },
+  "app.settings.game-options.keybind.key.delete": {
+    "message": "Wis"
+  },
+  "app.settings.game-options.keybind.key.end": {
+    "message": "Eind"
+  },
+  "app.settings.game-options.keybind.key.enter": {
+    "message": "Enter"
+  },
+  "app.settings.game-options.keybind.key.escape": {
+    "message": "Escape"
+  },
+  "app.settings.game-options.keybind.key.home": {
+    "message": "Home"
+  },
+  "app.settings.game-options.keybind.key.insert": {
+    "message": "Invoegen"
+  },
+  "app.settings.game-options.keybind.key.keypad-key": {
+    "message": "Numpad {key}"
+  },
+  "app.settings.game-options.keybind.key.left-alt": {
+    "message": "Alt-links"
+  },
+  "app.settings.game-options.keybind.key.left-command": {
+    "message": "Cmd-links"
+  },
+  "app.settings.game-options.keybind.key.left-control": {
+    "message": "Ctrl-links"
+  },
+  "app.settings.game-options.keybind.key.left-shift": {
+    "message": "Shift-links"
+  },
+  "app.settings.game-options.keybind.key.left-super": {
+    "message": "Super-links"
+  },
+  "app.settings.game-options.keybind.key.menu": {
+    "message": "Menu"
+  },
+  "app.settings.game-options.keybind.key.num-lock": {
+    "message": "Num Lock"
+  },
+  "app.settings.game-options.keybind.key.page-down": {
+    "message": "PgDn"
+  },
+  "app.settings.game-options.keybind.key.page-up": {
+    "message": "PgUp"
+  },
+  "app.settings.game-options.keybind.key.pause": {
+    "message": "Pauze"
+  },
+  "app.settings.game-options.keybind.key.print-screen": {
+    "message": "PrtScr"
+  },
+  "app.settings.game-options.keybind.key.right-alt": {
+    "message": "Alt-rechts"
+  },
+  "app.settings.game-options.keybind.key.right-command": {
+    "message": "Cmd-rechts"
+  },
+  "app.settings.game-options.keybind.key.right-control": {
+    "message": "Ctrl-rechts"
+  },
+  "app.settings.game-options.keybind.key.right-shift": {
+    "message": "Shift-rechts"
+  },
+  "app.settings.game-options.keybind.key.right-super": {
+    "message": "Super-rechts"
+  },
+  "app.settings.game-options.keybind.key.scroll-lock": {
+    "message": "Scroll Lock"
+  },
+  "app.settings.game-options.keybind.key.space": {
+    "message": "Spatie"
+  },
+  "app.settings.game-options.keybind.key.tab": {
+    "message": "Tab"
+  },
+  "app.settings.game-options.keybind.key.unbound": {
+    "message": "Niet gebonden"
+  },
+  "app.settings.game-options.keybind.key.unknown": {
+    "message": "Onbekende toets"
+  },
+  "app.settings.game-options.keybind.listen": {
+    "message": "Druk op een toets…"
+  },
+  "app.settings.game-options.keybind.listening-status": {
+    "message": "Aan het luisteren voor een toets of muisknop. Druk op Escape om te ontkoppelen."
+  },
+  "app.settings.game-options.keybind.mixed": {
+    "message": "Verschilt tussen instanties"
+  },
+  "app.settings.game-options.keybind.modifier.alt": {
+    "message": "Alt"
+  },
+  "app.settings.game-options.keybind.modifier.command": {
+    "message": "Cmd"
+  },
+  "app.settings.game-options.keybind.modifier.control": {
+    "message": "Ctrl"
+  },
+  "app.settings.game-options.keybind.modifier.shift": {
+    "message": "Shift"
+  },
+  "app.settings.game-options.keybind.modifier.super": {
+    "message": "Super"
+  },
+  "app.settings.game-options.keybind.mouse.button": {
+    "message": "Muis {button}"
+  },
+  "app.settings.game-options.keybind.mouse.left": {
+    "message": "Muis links"
+  },
+  "app.settings.game-options.keybind.mouse.middle": {
+    "message": "Middel muis"
+  },
+  "app.settings.game-options.keybind.mouse.right": {
+    "message": "Muis rechts"
+  },
+  "app.settings.game-options.keybind.recording-label": {
+    "message": "{setting}: Aan het luisteren voor een toets of muisknop. Druk op Escape om te ontkoppelen."
+  },
+  "app.settings.game-options.keybind.scancode": {
+    "message": "Scancode {code}"
+  },
+  "app.settings.game-options.keybind.unsupported-status": {
+    "message": "Deze invoer kan niet worden gebruikt door Minecraft. Druk op een andere toets."
+  },
+  "app.settings.game-options.setting.advanced-opengl.label": {
+    "message": "Geavanceerde OpenGL"
+  },
+  "app.settings.game-options.setting.allow-cursor-changes.label": {
+    "message": "Wijzigingen in cursor toestaan"
+  },
+  "app.settings.game-options.setting.allow-server-listing.description": {
+    "message": "Sta het toe om uw spelernaam in serverlijsten te laten zien."
+  },
+  "app.settings.game-options.setting.allow-server-listing.label": {
+    "message": "Serverlijsten"
+  },
+  "app.settings.game-options.setting.alternate-blocks.label": {
+    "message": "Alternatieve blokken"
+  },
+  "app.settings.game-options.setting.ambient-occlusion.label": {
+    "message": "Zachte verlichting"
+  },
+  "app.settings.game-options.setting.ambient-volume.label": {
+    "message": "Omgevingsgeluiden"
+  },
+  "app.settings.game-options.setting.anaglyph-3d.label": {
+    "message": "3D-anaglyph"
+  },
+  "app.settings.game-options.setting.anisotropic-filtering.label": {
+    "message": "Anisotrope filtering"
+  },
+  "app.settings.game-options.setting.anisotropy.label": {
+    "message": "Anisotropie"
+  },
+  "app.settings.game-options.setting.attack-indicator.label": {
+    "message": "Aanvalsindicator"
+  },
+  "app.settings.game-options.setting.auto-jump.description": {
+    "message": "Spring automatisch op één-blok-hoge obstakels."
+  },
+  "app.settings.game-options.setting.auto-jump.label": {
+    "message": "Auto-sprong"
+  },
+  "app.settings.game-options.setting.auto-suggestions.label": {
+    "message": "Opdrachtsuggesties"
+  },
+  "app.settings.game-options.setting.autosave-indicator.label": {
+    "message": "Autosave indicator"
+  },
+  "app.settings.game-options.setting.biome-blend-radius.description": {
+    "message": "De afstand waarin bioomkleuren mengen."
+  },
+  "app.settings.game-options.setting.biome-blend-radius.label": {
+    "message": "Bioomblend"
+  },
+  "app.settings.game-options.setting.blocks-volume.label": {
+    "message": "Blokken"
+  },
+  "app.settings.game-options.setting.brightness.label": {
+    "message": "Helderheid"
+  },
+  "app.settings.game-options.setting.cape.description": {
+    "message": "Toon uw cape, inclusief de elytratextuur."
+  },
+  "app.settings.game-options.setting.cape.label": {
+    "message": "Cape"
+  },
+  "app.settings.game-options.setting.chat-background-only.label": {
+    "message": "Alleen chatachtergrond"
+  },
+  "app.settings.game-options.setting.chat-colors.label": {
+    "message": "Chatkleuren"
+  },
+  "app.settings.game-options.setting.chat-delay.label": {
+    "message": "Chatvertraging"
+  },
+  "app.settings.game-options.setting.chat-line-spacing.label": {
+    "message": "Chat lijnafstand"
+  },
+  "app.settings.game-options.setting.chat-links-prompt.description": {
+    "message": "Vraag voordat links vanuit chat worden geopend"
+  },
+  "app.settings.game-options.setting.chat-links-prompt.label": {
+    "message": "Waarschuw op links"
+  },
+  "app.settings.game-options.setting.chat-links.description": {
+    "message": "Laat het toe om links in chat te openen."
+  },
+  "app.settings.game-options.setting.chat-links.label": {
+    "message": "Web links"
+  },
+  "app.settings.game-options.setting.chat-opacity.description": {
+    "message": "De ondoorzichtigheid van chattekst."
+  },
+  "app.settings.game-options.setting.chat-opacity.label": {
+    "message": "Chat transparantie"
+  },
+  "app.settings.game-options.setting.chat-preview.label": {
+    "message": "Chat voorbeeld"
+  },
+  "app.settings.game-options.setting.chat-scale.label": {
+    "message": "Chat schaal"
+  },
+  "app.settings.game-options.setting.chat-visibility.label": {
+    "message": "Chat zichtbaarheid"
+  },
+  "app.settings.game-options.setting.chat-width.label": {
+    "message": "Chat breedte"
+  },
+  "app.settings.game-options.setting.chunk-fade-time.label": {
+    "message": "Chunk vervagingstijd"
+  },
+  "app.settings.game-options.setting.cloud-range.label": {
+    "message": "Wolken afstand"
+  },
+  "app.settings.game-options.setting.clouds.label": {
+    "message": "Wolken"
+  },
+  "app.settings.game-options.setting.ctrl-click-right-click.label": {
+    "message": "Ctrl-klik als rechtermuisklik"
+  },
+  "app.settings.game-options.setting.cutout-leaves.label": {
+    "message": "Bladeren uitsnijding"
+  },
+  "app.settings.game-options.setting.damage-tilt.label": {
+    "message": "Schade-kanteling"
+  },
+  "app.settings.game-options.setting.dark-splash.description": {
+    "message": "Verander het Mojang Studios laadscherm van rood naar zwart."
+  },
+  "app.settings.game-options.setting.dark-splash.label": {
+    "message": "Monochroom logo"
+  },
+  "app.settings.game-options.setting.darkness-pulsing.label": {
+    "message": "Duisternis-pulsen"
+  },
+  "app.settings.game-options.setting.debug-gui-scale.label": {
+    "message": "Debug GUI-schaal"
+  },
+  "app.settings.game-options.setting.directional-audio.label": {
+    "message": "Directioneel geluid"
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.description": {
+    "message": "Behandel elke muiswiel-input als een enkele scrollstap."
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.label": {
+    "message": "Afzonderlijk scrollen"
+  },
+  "app.settings.game-options.setting.entity-distance.label": {
+    "message": "Entiteit-afstand"
+  },
+  "app.settings.game-options.setting.entity-shadows.label": {
+    "message": "Entiteit schaduwen"
+  },
+  "app.settings.game-options.setting.exclusive-fullscreen.label": {
+    "message": "Exclusief volledig scherm"
+  },
+  "app.settings.game-options.setting.extra-telemetry.label": {
+    "message": "Optionele telemetrie"
+  },
+  "app.settings.game-options.setting.focused-chat-height.label": {
+    "message": "Gefocusde chat-hoogte"
+  },
+  "app.settings.game-options.setting.force-unicode-font.label": {
+    "message": "Forceer Unicode-lettertype"
+  },
+  "app.settings.game-options.setting.fov-effects.label": {
+    "message": "Zichtveld-effecten"
+  },
+  "app.settings.game-options.setting.fov.label": {
+    "message": "Zichtveld"
+  },
+  "app.settings.game-options.setting.fullscreen.label": {
+    "message": "Volledig scherm"
+  },
+  "app.settings.game-options.setting.glint-speed.label": {
+    "message": "Glinsteringsnelheid"
+  },
+  "app.settings.game-options.setting.glint-strength.label": {
+    "message": "Glinsteringsterkte"
+  },
+  "app.settings.game-options.setting.graphics-backend.label": {
+    "message": "Grafische backend"
+  },
+  "app.settings.game-options.setting.graphics.description": {
+    "message": "Bepaalt visuele kwaliteit en prestatie."
+  },
+  "app.settings.game-options.setting.graphics.label": {
+    "message": "Grafisch"
+  },
+  "app.settings.game-options.setting.gui-scale.description": {
+    "message": "De grootte van de spelinterface en HUD."
+  },
+  "app.settings.game-options.setting.gui-scale.label": {
+    "message": "GUI-schaal"
+  },
+  "app.settings.game-options.setting.hat.description": {
+    "message": "Toon de Hoed-laag van de skin."
+  },
+  "app.settings.game-options.setting.hat.label": {
+    "message": "Hoed"
+  },
+  "app.settings.game-options.setting.held-item-tooltips.label": {
+    "message": "Tooltips op vastgehouden items"
+  },
+  "app.settings.game-options.setting.hide-lightning-flashes.label": {
+    "message": "Verberg bliksem flitsen"
+  },
+  "app.settings.game-options.setting.hide-matched-names.label": {
+    "message": "Verberg overeenkomstige namen"
+  },
+  "app.settings.game-options.setting.hide-server-address.label": {
+    "message": "Verberg serveradres"
+  },
+  "app.settings.game-options.setting.hide-splash-texts.label": {
+    "message": "Verberg splashteksten"
+  },
+  "app.settings.game-options.setting.high-contrast-outline.label": {
+    "message": "Hoog-contrast blokuitlijnen"
+  },
+  "app.settings.game-options.setting.high-contrast.description": {
+    "message": "Verbeter het contrast tussen interface elementen."
+  },
+  "app.settings.game-options.setting.high-contrast.label": {
+    "message": "Hoge contrast"
+  },
+  "app.settings.game-options.setting.hostile-volume.label": {
+    "message": "Vijandige wezens"
+  },
+  "app.settings.game-options.setting.improved-transparency.label": {
+    "message": "Verbeterde transparantie"
+  },
+  "app.settings.game-options.setting.in-game-notifications.label": {
+    "message": "In-game meldingen"
+  },
+  "app.settings.game-options.setting.inactivity-framerate-limit.label": {
+    "message": "Verminderde framerate"
+  },
+  "app.settings.game-options.setting.invert-horizontal-mouse.label": {
+    "message": "Keer muis horizontaal om"
+  },
+  "app.settings.game-options.setting.invert-mouse.description": {
+    "message": "Keer muis verticaal om."
+  },
+  "app.settings.game-options.setting.invert-mouse.label": {
+    "message": "Keer muis om"
+  },
+  "app.settings.game-options.setting.jacket.description": {
+    "message": "Toon de Jas-laag van de skin."
+  },
+  "app.settings.game-options.setting.jacket.label": {
+    "message": "Jas"
+  },
+  "app.settings.game-options.setting.japanese-glyph-variants.label": {
+    "message": "Japanse glyph varianten"
+  },
+  "app.settings.game-options.setting.key-advancements.label": {
+    "message": "Vooruitgang"
+  },
+  "app.settings.game-options.setting.key-attack.label": {
+    "message": "Aanvallen"
+  },
+  "app.settings.game-options.setting.key-back.label": {
+    "message": "Beweeg naar achteren"
+  },
+  "app.settings.game-options.setting.key-chat.label": {
+    "message": "Open chat"
+  },
+  "app.settings.game-options.setting.key-command.label": {
+    "message": "Opdracht"
+  },
+  "app.settings.game-options.setting.key-debug-advanced-tooltips.label": {
+    "message": "Toon geavanceerde tooltips"
+  },
+  "app.settings.game-options.setting.key-debug-chunk-borders.label": {
+    "message": "Took chunk-randen"
+  },
+  "app.settings.game-options.setting.key-debug-clear-chat.label": {
+    "message": "Wis chat"
+  },
+  "app.settings.game-options.setting.key-debug-copy-location.label": {
+    "message": "Kopieer locatie"
+  },
+  "app.settings.game-options.setting.key-debug-copy-recreate-command.label": {
+    "message": "Kopieer recreatie opdracht"
+  },
+  "app.settings.game-options.setting.key-debug-crash.label": {
+    "message": "Trigger foutopsporings-crash"
+  },
+  "app.settings.game-options.setting.key-debug-dump-dynamic-textures.label": {
+    "message": "Dump dynamische texturen"
+  },
+  "app.settings.game-options.setting.key-debug-dump-version.label": {
+    "message": "Dump versie"
+  },
+  "app.settings.game-options.setting.key-debug-focus-pause.label": {
+    "message": "Pauzeer op weggevallen focus"
+  },
+  "app.settings.game-options.setting.key-debug-fps-charts.label": {
+    "message": "FPS-grafieken"
+  },
+  "app.settings.game-options.setting.key-debug-hitboxes.label": {
+    "message": "Toon hitboxes"
+  },
+  "app.settings.game-options.setting.key-debug-improved-transparency.label": {
+    "message": "Verbeterde transparantie in debugweergave"
+  },
+  "app.settings.game-options.setting.key-debug-lightmap-texture.label": {
+    "message": "Lightmap textuur"
+  },
+  "app.settings.game-options.setting.key-debug-modifier.label": {
+    "message": "Debug modifier"
+  },
+  "app.settings.game-options.setting.key-debug-network-charts.label": {
+    "message": "Netwerk grafieken"
+  },
+  "app.settings.game-options.setting.key-debug-options.label": {
+    "message": "Debug opties"
+  },
+  "app.settings.game-options.setting.key-debug-overlay.label": {
+    "message": "Debug overlay"
+  },
+  "app.settings.game-options.setting.key-debug-profiling-chart.label": {
+    "message": "Profilering grafiek"
+  },
+  "app.settings.game-options.setting.key-debug-profiling.label": {
+    "message": "Start profilering"
+  },
+  "app.settings.game-options.setting.key-debug-reload-chunks.label": {
+    "message": "Chunks opnieuw laden"
+  },
+  "app.settings.game-options.setting.key-debug-reload-resource-packs.label": {
+    "message": "Herlaad resourcepakketen"
+  },
+  "app.settings.game-options.setting.key-debug-spectate.label": {
+    "message": "Entiteit toeschouwen"
+  },
+  "app.settings.game-options.setting.key-debug-switch-game-mode.label": {
+    "message": "Verander game-modus"
+  },
+  "app.settings.game-options.setting.key-drop.label": {
+    "message": "Geselecteerde voorwerp laten vallen"
+  },
+  "app.settings.game-options.setting.key-forward.label": {
+    "message": "Vooruit lopen"
+  },
+  "app.settings.game-options.setting.key-friends.label": {
+    "message": "Vrienden"
+  },
+  "app.settings.game-options.setting.key-fullscreen.label": {
+    "message": "Volledig scherm omschakelen"
+  },
+  "app.settings.game-options.setting.key-hotbar-1.label": {
+    "message": "Werkbalk 1"
+  },
+  "app.settings.game-options.setting.key-hotbar-2.label": {
+    "message": "Werkbalk 2"
+  },
+  "app.settings.game-options.setting.key-hotbar-3.label": {
+    "message": "Werkbalk 3"
+  },
+  "app.settings.game-options.setting.key-hotbar-4.label": {
+    "message": "Werkbalk 4"
+  },
+  "app.settings.game-options.setting.key-hotbar-5.label": {
+    "message": "Werkbalk 5"
+  },
+  "app.settings.game-options.setting.key-hotbar-6.label": {
+    "message": "Werkbalk 6"
+  },
+  "app.settings.game-options.setting.key-hotbar-7.label": {
+    "message": "Werkbalk 7"
+  },
+  "app.settings.game-options.setting.key-hotbar-8.label": {
+    "message": "Werkbalk 8"
+  },
+  "app.settings.game-options.setting.key-hotbar-9.label": {
+    "message": "Werkbalk 9"
+  },
+  "app.settings.game-options.setting.key-inventory.label": {
+    "message": "Inventaris openen/sluiten"
+  },
+  "app.settings.game-options.setting.key-jump.label": {
+    "message": "Springen"
+  },
+  "app.settings.game-options.setting.key-left.label": {
+    "message": "Zijwaarts naar links"
+  },
+  "app.settings.game-options.setting.key-load-toolbar.label": {
+    "message": "Plaktoets om werkbalk te laden"
+  },
+  "app.settings.game-options.setting.key-perspective.label": {
+    "message": "Perspectief omschakelen"
+  },
+  "app.settings.game-options.setting.key-pick-item.label": {
+    "message": "Blok kiezen"
+  },
+  "app.settings.game-options.setting.key-player-list.label": {
+    "message": "Spelerslijst"
+  },
+  "app.settings.game-options.setting.key-quick-actions.label": {
+    "message": "Snelle acties"
+  },
+  "app.settings.game-options.setting.key-right.label": {
+    "message": "Zijwaarts naar rechts"
+  },
+  "app.settings.game-options.setting.key-save-toolbar.label": {
+    "message": "Plaktoets om werkbalk op te slaan"
+  },
+  "app.settings.game-options.setting.key-screenshot.label": {
+    "message": "Schermafbeelding maken"
+  },
+  "app.settings.game-options.setting.key-smooth-camera.label": {
+    "message": "Filmische camera omschakelen"
+  },
+  "app.settings.game-options.setting.key-sneak.label": {
+    "message": "Sluipen"
+  },
+  "app.settings.game-options.setting.key-social-interactions.label": {
+    "message": "Sociale interacties"
+  },
+  "app.settings.game-options.setting.key-spectator-hotbar.label": {
+    "message": "Werkbalk toeschouwers"
+  },
+  "app.settings.game-options.setting.key-spectator-outlines.label": {
+    "message": "Spelers markeren (toeschouwers)"
+  },
+  "app.settings.game-options.setting.key-sprint.label": {
+    "message": "Sprinten"
+  },
+  "app.settings.game-options.setting.key-swap-offhand.label": {
+    "message": "Voorwerpen met andere hand wisselen"
+  },
+  "app.settings.game-options.setting.key-toggle-gui.label": {
+    "message": "Schakel HUD om"
+  },
+  "app.settings.game-options.setting.key-toggle-spectator-shader.label": {
+    "message": "Schakel toeschouwer-shader om"
+  },
+  "app.settings.game-options.setting.key-use.label": {
+    "message": "Gebruik voorwerp"
+  },
+  "app.settings.game-options.setting.language.label": {
+    "message": "Taal"
+  },
+  "app.settings.game-options.setting.left-pants-leg.label": {
+    "message": "Linkerbroekspijp"
+  },
+  "app.settings.game-options.setting.left-sleeve.label": {
+    "message": "Linkermouw"
+  },
+  "app.settings.game-options.setting.legacy-framerate-limit.label": {
+    "message": "Frameratelimiet"
+  },
+  "app.settings.game-options.setting.legacy-view-distance.label": {
+    "message": "Zicht"
+  },
+  "app.settings.game-options.setting.mac-fullscreen-menu.label": {
+    "message": "Toon MacOS menu in volledig scherm"
+  },
+  "app.settings.game-options.setting.main-hand.description": {
+    "message": "Kies of je hoodhand je linker- of rechterhand is."
+  },
+  "app.settings.game-options.setting.main-hand.label": {
+    "message": "Hoofdhand"
+  },
+  "app.settings.game-options.setting.master-volume.label": {
+    "message": "Hoofdvolume"
+  },
+  "app.settings.game-options.setting.max-framerate.label": {
+    "message": "Max. framerate"
+  },
+  "app.settings.game-options.setting.menu-background-blur.label": {
+    "message": "Menu achtergrondblur"
+  },
+  "app.settings.game-options.setting.mouse-wheel-sensitivity.label": {
+    "message": "Scrollgevoeligheid"
+  },
+  "app.settings.game-options.setting.music-frequency.label": {
+    "message": "Muziekfrequentie"
+  },
+  "app.settings.game-options.setting.music-toast.description": {
+    "message": "Kies of je muziek titels wil zien in het pauzemenu als pop-ups."
+  },
+  "app.settings.game-options.setting.music-volume.label": {
+    "message": "Muziek"
+  },
+  "app.settings.game-options.setting.narrator.description": {
+    "message": "Kies wat de Verteller voorleest."
+  },
+  "app.settings.game-options.setting.narrator.label": {
+    "message": "Verteller"
+  },
+  "app.settings.game-options.setting.neutral-volume.label": {
+    "message": "Vriendelijke wezens"
+  },
+  "app.settings.game-options.setting.panorama-speed.label": {
+    "message": "Panorama snelheid"
+  },
+  "app.settings.game-options.setting.particles.label": {
+    "message": "Particles"
+  },
+  "app.settings.game-options.setting.players-volume.label": {
+    "message": "Spelers"
+  },
+  "app.settings.game-options.setting.raw-mouse-input.label": {
+    "message": "Onbewerkte invoer"
+  },
+  "app.settings.game-options.setting.record-volume.label": {
+    "message": "Platenspeler/nootblokken"
+  },
+  "app.settings.game-options.setting.subtitles.label": {
+    "message": "Ondertiteling"
+  },
+  "app.settings.game-options.setting.toggle-sprint.description": {
+    "message": "Druk één keer om te blijven sprinten."
+  },
+  "app.settings.game-options.setting.vsync.label": {
+    "message": "VSync"
+  },
+  "app.settings.game-options.setting.weather-volume.label": {
+    "message": "Weer"
+  },
+  "app.settings.game-options.validation.changed-since-opened": {
+    "message": "Deze instelling is ergens anders veranderd. Controleer dit en probeer het opnieuw."
+  },
+  "app.settings.game-options.validation.missing-value": {
+    "message": "Kies eerst een optie."
+  },
   "app.settings.java-installations.location.title": {
     "message": "Java {version, number} locatie"
   },
@@ -1637,15 +2588,6 @@
   "app.settings.sidebar.label.instances": {
     "message": "Instanties"
   },
-  "app.settings.synced-options.choose-sync-source.command-history-description": {
-    "message": "Kies de instantie waarvan de opdrachtgeschiedenis de gedeelde kopie wordt."
-  },
-  "app.settings.synced-options.choose-sync-source.creative-hotbars-description": {
-    "message": "Kies de instantie waarvan de opdrachtgeschiedenis de gedeelde kopie wordt."
-  },
-  "app.settings.synced-options.choose-sync-source.multiplayer-servers-description": {
-    "message": "Kies de instantie waarvan de opdrachtgeschiedenis de gedeelde kopie wordt."
-  },
   "app.settings.synced-options.choose-sync-source.no-instances-found": {
     "message": "Geen instanties gevonden"
   },
@@ -1670,6 +2612,12 @@
   "app.settings.synced-options.creative-hotbars.description": {
     "message": "Gebruik dezelfde opgeslagen creatieve hotbars tussen uw instanties."
   },
+  "app.settings.synced-options.game-settings.value-off": {
+    "message": "Uit"
+  },
+  "app.settings.synced-options.game-settings.value-on": {
+    "message": "Aan"
+  },
   "app.settings.synced-options.multiplayer-servers": {
     "message": "Desynchroniseer multiplayerservers"
   },
@@ -1685,11 +2633,23 @@
   "app.settings.synced-options.multiplayer-servers.empty": {
     "message": "Er zijn momenteel geen toegevoegde servers gesynchroniseerd."
   },
+  "app.settings.synced-options.multiplayer-servers.filter-offline": {
+    "message": "Offline"
+  },
+  "app.settings.synced-options.multiplayer-servers.filter-online": {
+    "message": "Online"
+  },
+  "app.settings.synced-options.multiplayer-servers.more-options": {
+    "message": "Meer server-opties"
+  },
   "app.settings.synced-options.multiplayer-servers.name": {
     "message": "Servernaam"
   },
-  "app.settings.synced-options.multiplayer-servers.none-synced-yet": {
-    "message": "Nog geen servers gesynchroniseerd"
+  "app.settings.synced-options.resource-packs": {
+    "message": "Synchroniseer bronpakketten"
+  },
+  "app.settings.synced-options.resource-packs.none-synced-yet": {
+    "message": "U heeft nog geen bronpakketten gesynchroniseerd"
   },
   "app.settings.tabs.appearance": {
     "message": "Uiterlijk"
@@ -1891,6 +2851,78 @@
   },
   "app.survey.title": {
     "message": "Hoi, Modrinth-gebruiker!"
+  },
+  "app.sync-instances-update.badge": {
+    "message": "Nieuw deze update"
+  },
+  "app.sync-instances-update.choose-source.all": {
+    "message": "Kies vanuit welke instantie uw spelinstellingen, bronpakketten, opdrachtgeschiedenis, creatieve werkbalken, en multiplayer servers gekopieerd worden. Deze instellingen worden alleen gebruikt voor de initiële synchronisatie, en U kunt deze hierna vanuit elke instantie aanpassen."
+  },
+  "app.sync-instances-update.choose-source.all-title": {
+    "message": "Kies synchronisatiebron"
+  },
+  "app.sync-instances-update.creative-hotbars": {
+    "message": "Sync creatieve werkbalken"
+  },
+  "app.sync-instances-update.description": {
+    "message": "U kunt nu opties zoals spelinstellingen, servers, bronpakketten, en meer synchroniseren tussen uw instanties, zodat alles hetzelfde blijft elke keer dat u speelt!"
+  },
+  "app.sync-instances-update.load-error": {
+    "message": "Kon uw synchronisatieinstellingen niet laden. Probeer het opnieuw."
+  },
+  "app.sync-instances-update.manage-later": {
+    "message": "Je kunt nu synchroniseren inschakelen en het later beheren in je app-instellingen."
+  },
+  "app.sync-instances-update.notification.description": {
+    "message": "Houd spelinstellingen, servers, bronpakketten en meer gesynchroniseerd over je instanties."
+  },
+  "app.sync-instances-update.notification.dismiss": {
+    "message": "Negeer"
+  },
+  "app.sync-instances-update.notification.title": {
+    "message": "Synchroniseer uw instanties"
+  },
+  "app.sync-instances-update.notification.view-update": {
+    "message": "Bekijk de update"
+  },
+  "app.sync-instances-update.retry": {
+    "message": "Probeer opnieuw"
+  },
+  "app.sync-instances-update.skip": {
+    "message": "Sla over"
+  },
+  "app.sync-instances-update.sync-all": {
+    "message": "Synchroniseer alles"
+  },
+  "app.sync-instances-update.title": {
+    "message": "Synchroniseer uw instanties"
+  },
+  "app.synced-content.change.disable-everywhere": {
+    "message": "Overal uitschakelen"
+  },
+  "app.synced-content.change.disable-everywhere-description": {
+    "message": "Schakel deze inhoud uit voor alle gesynchroniseerde instanties."
+  },
+  "app.synced-content.change.disable-here": {
+    "message": "Hier uitschakelen"
+  },
+  "app.synced-content.change.disable-title": {
+    "message": "Schakel uit?"
+  },
+  "app.synced-content.change.enable-description": {
+    "message": "Schakel het in op alle gesynchroniseerde instanties, of alleen in deze instantie. Als je het alleen hier inschakelt, worden overrides voor deze instantie ingeschakeld."
+  },
+  "app.synced-content.desync.keep": {
+    "message": "Behouden"
+  },
+  "app.synced-content.desync.remove": {
+    "message": "Verwijderen"
+  },
+  "app.synced-content.warning.title": {
+    "message": "Deze content is gesynchroniseerd"
+  },
+  "app.synced-packs.load-failed": {
+    "message": "Pakketten konden niet worden geladen. Probeer deze te herladen."
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} is klaar met downloaden. Herlaad om nu te updaten, of automatisch wanneer je de Modrinth App afsluit."

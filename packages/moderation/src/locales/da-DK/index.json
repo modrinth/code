@@ -17,6 +17,9 @@
   "nags.add-links-server.title": {
     "defaultMessage": "Tilføj eksterne links"
   },
+  "nags.add-links.description": {
+    "defaultMessage": "Tilføj relevante links til eksterne ressourcer, såsom kildekode, et issue-tracker-system eller et permanent Discord-invitationslink."
+  },
   "nags.add-links.title": {
     "defaultMessage": "Tilføj eksterne links"
   },

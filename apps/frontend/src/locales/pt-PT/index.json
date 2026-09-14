@@ -581,17 +581,11 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.importing.description": {
-    "message": "Importa os teus perfis favoritos do launcher que utilizavas antes e começa a usar a Modrinth App em segundos!"
-  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
-  },
-  "app-marketing.features.importing.title": {
-    "message": "Importação de perfis"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Ações"
@@ -617,9 +611,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Versão"
   },
-  "app-marketing.features.open-source.description": {
-    "message": "O launcher do Modrinth é totalmente código-aberto. Podes ver o código-fonte no nosso <github-link>GitHub</github-link>!"
-  },
   "app-marketing.features.open-source.title": {
     "message": "Código aberto"
   },
@@ -628,9 +619,6 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
-  },
-  "app-marketing.features.performance.description": {
-    "message": "A Modrinth App tem um desempenho melhor do que muitos dos principais gestores de mods, usando apenas 150 MB de RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -3640,9 +3628,6 @@
   },
   "settings.account.two-factor.error.incorrect-code": {
     "message": "O código inserido está incorreto!"
-  },
-  "settings.account.two-factor.field.code.description": {
-    "message": "Insere um código de dois fatores para continuar."
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Autenticação de dois fatores"

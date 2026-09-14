@@ -281,6 +281,12 @@
   "app.content-install.no-compatible-versions": {
     "message": "لا توجد إصدارات متاحة تتوافق مع {compatibilityLabel}. اختر إصدارًا لتثبيته على أي حال. لن يتم تثبيت التبعيات تلقائيًا."
   },
+  "app.content.desync-pack": {
+    "message": "إلغاء المزامنة"
+  },
+  "app.content.sync-pack": {
+    "message": "مزامنة"
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "فتح مجلد النسخ الاحتياطية"
   },
@@ -1556,6 +1562,42 @@
   "app.settings.downloading": {
     "message": "جار تنزيل الإصدار {version}"
   },
+  "app.settings.game-options.category.chat.label": {
+    "message": "المحادثة"
+  },
+  "app.settings.game-options.category.controls.label": {
+    "message": "عناصر التحكم"
+  },
+  "app.settings.game-options.category.custom.label": {
+    "message": "الإعدادات المخصصة"
+  },
+  "app.settings.game-options.category.language.description": {
+    "message": "لغة اللعبة"
+  },
+  "app.settings.game-options.category.language.label": {
+    "message": "اللغة"
+  },
+  "app.settings.game-options.category.online.label": {
+    "message": "متصل"
+  },
+  "app.settings.game-options.category.video.label": {
+    "message": "الفيديو"
+  },
+  "app.settings.game-options.choice.all": {
+    "message": "الكل"
+  },
+  "app.settings.game-options.choice.chat": {
+    "message": "المحادثة"
+  },
+  "app.settings.game-options.choice.commands-only": {
+    "message": "الأوامر فقط"
+  },
+  "app.settings.game-options.choice.constant": {
+    "message": "ثابت"
+  },
+  "app.settings.game-options.choice.max-fps": {
+    "message": "الحد الأقصى لعدد الإطارات في الثانية"
+  },
   "app.settings.java-installations.location.title": {
     "message": "موقع Java {version, number}"
   },
@@ -1634,15 +1676,6 @@
   "app.settings.sidebar.label.instances": {
     "message": "نسخ"
   },
-  "app.settings.synced-options.choose-sync-source.command-history-description": {
-    "message": "اختر النسخة التي يصبح تاريخ الأوامر الخاصة بها النسخة المشتركة."
-  },
-  "app.settings.synced-options.choose-sync-source.creative-hotbars-description": {
-    "message": "اختر النسخة التي ستصبح أشرطة الوصول السريع الإبداعية المحفوظة فيها هي النسخة المشتركة."
-  },
-  "app.settings.synced-options.choose-sync-source.multiplayer-servers-description": {
-    "message": "اختر النسخة التي خوادم اللاعبين المتعددة لديها هي النسخة المشتركة."
-  },
   "app.settings.synced-options.choose-sync-source.no-instances-found": {
     "message": "لم يتم العثور على أي نسخ"
   },
@@ -1684,9 +1717,6 @@
   },
   "app.settings.synced-options.multiplayer-servers.name": {
     "message": "اسم الخادم"
-  },
-  "app.settings.synced-options.multiplayer-servers.none-synced-yet": {
-    "message": "لا توجد خوادم متزامنة بعد"
   },
   "app.settings.tabs.appearance": {
     "message": "المظهر"

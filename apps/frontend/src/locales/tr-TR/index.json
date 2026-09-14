@@ -581,17 +581,11 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.importing.description": {
-    "message": "Sevdiğin profilleri önceden kullandığın başlatıcıdan buraya aktar, saniyeler içinde Modrinth App'i kullanmaya başla!"
-  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
-  },
-  "app-marketing.features.importing.title": {
-    "message": "Profil aktarma"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Eylemler"
@@ -617,9 +611,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Sürüm"
   },
-  "app-marketing.features.open-source.description": {
-    "message": "Modrinth'in başlatıcısı tamamen açık kaynak kodludur. <github-link>GitHub</github-link> sayfamızda kaynak kodunu inceleyebilirsin!"
-  },
   "app-marketing.features.open-source.title": {
     "message": "Açık kaynak"
   },
@@ -628,9 +619,6 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
-  },
-  "app-marketing.features.performance.description": {
-    "message": "Modrinth Uygulaması, yalnızca 150 MB RAM kullanarak birçok önde gelen mod yöneticisinden daha iyi performans gösterir!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -884,6 +872,9 @@
   "auth.sign-in.last-sign-in": {
     "message": "Son kullanılan hesap"
   },
+  "auth.sign-in.launcher.callback.title": {
+    "message": "Modrinth Uygulaması oturum açma geri çağırma"
+  },
   "auth.sign-in.launcher.complete.description": {
     "message": "Sizi Modrinth App'e yönlendiriyoruz. Eğer hiçbir şey yaşanmazsa, aşağıdaki butonu kullanın."
   },
@@ -895,6 +886,12 @@
   },
   "auth.sign-in.launcher.complete.title": {
     "message": "Oturum açtınız"
+  },
+  "auth.sign-in.launcher.opening.description": {
+    "message": "Uygulama açılmazsa, oturum açma işlemini tamamlamak için aşağıdaki düğmeyi kullanın."
+  },
+  "auth.sign-in.launcher.opening.title": {
+    "message": "Modrinth Uygulaması açılıyor..."
   },
   "auth.sign-in.no-account": {
     "message": "Hesabınız yok mu?"
@@ -928,6 +925,9 @@
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Hesap oluştur"
+  },
+  "auth.two-factor.incorrect-code": {
+    "message": "İki faktörlü kod hatalı. Tekrar deneyin veya bir yedek kod kullanın."
   },
   "auth.verify-email.action.account-settings": {
     "message": "Hesap ayarları"
@@ -2330,6 +2330,9 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "Modrinth Hosting sunucuları ne tür işlemcilerle çalışır?"
   },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Modrinth Hosting sunucuları, DDR5 bellek ile AMD Ryzen 7950X veya 9950X eşdeğeri işlemcilerle çalıştırılır."
+  },
   "hosting-marketing.faq.currency": {
     "message": "Fiyatlar hangi para birimindedir?"
   },
@@ -2990,6 +2993,9 @@
   "moderation.moderate": {
     "message": "Yönet"
   },
+  "moderation.page.delphi-rules": {
+    "message": "Delphi kuralları"
+  },
   "moderation.page.external-projects": {
     "message": "Harici projeler"
   },
@@ -3391,6 +3397,9 @@
   },
   "project-member-header.success-join": {
     "message": "Proje ekibine katıldınız"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Projeniz değerlendirme için gönderilmiştir!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Yayımlama kontrol listesi"
@@ -3800,6 +3809,12 @@
   "project.notification.icon-updated.title": {
     "message": "Proje simgesi güncellendi"
   },
+  "project.notification.review-save-failed.description": {
+    "message": "Doğrulamanın başarısız olmasına neden olan düzenlemeleri projenize kaydedemezsiniz."
+  },
+  "project.notification.review-save-failed.title": {
+    "message": "İncelemedeki proje kaydedilemedi"
+  },
   "project.notification.updated.message": {
     "message": "Projeniz güncellendi."
   },
@@ -3845,17 +3860,11 @@
   "project.settings.disclosures.advertising.title": {
     "message": "Reklam içerir"
   },
-  "project.settings.disclosures.ai.description": {
-    "message": "Bu proje önemli miktarda yapay zeka tarafından oluşturulan kod içeriyorsa, büyük ölçüde yapay zeka tarafından oluşturulan herhangi bir varlık içeriyorsa, projenin işlevselliği üretken yapay zeka kullanımına dayanıyorsa veya projenizin sayfasının açıklama veya yayınlama gibi herhangi bir şeyi üretken yapay zekaya dayanıyorsa bunu etkinleştirmeniz gerekir."
-  },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "örn. AI tarafından oluşturulmuş Çince ve Arapça çeviriler."
   },
   "project.settings.disclosures.ai.title": {
     "message": "AI tarafından oluşturulmuş içerik"
-  },
-  "project.settings.disclosures.ai.types-description": {
-    "message": "AI ne için kullanılıyor?"
   },
   "project.settings.disclosures.archived.banner-preview": {
     "message": "Afiş önizlemesi"
@@ -3910,9 +3919,6 @@
   },
   "project.settings.disclosures.lock-status.fully-locked.warning": {
     "message": "Bu bilgilendirme metninin düzenlenmesi veya kaldırılması gerekiyorsa lütfen <contact-support-link>destek ekibiyle iletişime geçin</contact-support-link>."
-  },
-  "project.settings.disclosures.paid-features.description": {
-    "message": "Projeniz gerçek parayla satın alınabilecek özellikler içeriyorsa bunu etkinleştirmeniz gerekir."
   },
   "project.settings.disclosures.paid-features.feature-placeholder": {
     "message": "örn. Patreon üyelerine ödül olarak sunulan kozmetik ürünler"
@@ -4037,6 +4043,12 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.links.donation.duplicate-type": {
+    "message": "Zaten başka bir {platform} bağlantınız var."
+  },
+  "project.settings.links.donation.no-type": {
+    "message": "Lütfen bu bağış bağlantısı için bir platform seçin."
+  },
   "project.settings.monetization.description": {
     "message": "Modrinth’teki projeler otomatik olarak <rewards-program-link>Ödül Programı</rewards-program-link>’na kaydedilir. Bu projeden gelir elde etmek istemiyorsanız (veya yasal nedenlerle edemiyorsanız), buradan kapatabilirsiniz."
   },
@@ -4075,6 +4087,15 @@
   },
   "project.settings.permissions.delete-all-groups-confirmation.description": {
     "message": "Bu işlem, bu proje için {count, plural, one {# atıf grubunu} other {# atıf grubunu}} ve içindeki tüm dosyaları kalıcı olarak silecektir. Bu işlem geri alınamaz."
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.title": {
+    "message": "Tüm atıf gruplarını sil?"
+  },
+  "project.settings.permissions.delete-all-groups-error": {
+    "message": "Tüm atıf grupları silinemedi"
+  },
+  "project.settings.permissions.delete-all-groups-success": {
+    "message": "Tüm atıf grupları silindi."
   },
   "project.settings.permissions.empty-state.description": {
     "message": "Projenizin hiçbir sürümü harici içerik içermiyor, bu nedenle bu bölümü doldurmanıza gerek yoktur."
@@ -4186,6 +4207,9 @@
   },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select,yes {{types} kategorileri}other {Kategoriler}}"
+  },
+  "project.settings.tags.group-title.features": {
+    "message": "{showType, select, yes {{types} özellikler} other {Özellikler}}"
   },
   "project.settings.tags.resolutions-description": {
     "message": "{type} içindeki dokuların çözünürlüğünü seçin."
@@ -4900,9 +4924,6 @@
   },
   "settings.account.two-factor.error.incorrect-code": {
     "message": "Girilen kod yanlış!"
-  },
-  "settings.account.two-factor.field.code.description": {
-    "message": "Devam etmek için iki aşamalı doğrulama kodunuzu girin."
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Çift aşamalı kodu girin"

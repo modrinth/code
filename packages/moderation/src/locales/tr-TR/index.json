@@ -12,7 +12,7 @@
     "defaultMessage": "Java Sürümü oyuncularının sunucunuza girmek için kullanabileceği IP adresi ve portu girin."
   },
   "nags.add-java-address.title": {
-    "defaultMessage": "Java adresleri ekle"
+    "defaultMessage": "Java adresi ekle"
   },
   "nags.add-license-details.description": {
     "defaultMessage": "Özel lisansınız için geçerli bir URL ve isim veya SPDX tanımlayıcısı ekleyin."

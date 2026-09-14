@@ -8,6 +8,9 @@
   "app.action-bar.downloads": {
     "message": "Downloads"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "Ocultar transferências ativas"
+  },
   "app.action-bar.hide-more-running-instances": {
     "message": "Esconder mais instâncias a correr"
   },
@@ -107,6 +110,9 @@
   "app.action-bar.reload-to-update": {
     "message": "Recarregar para atualizar"
   },
+  "app.action-bar.show-downloads": {
+    "message": "Mostrar transferências ativas"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Mostrar mais instâncias a correr"
   },
@@ -139,6 +145,12 @@
   },
   "app.ads-consent.title": {
     "message": "A sua privacidade e como os anúncios são financiados pela Modrinth"
+  },
+  "app.appearance-settings.compact-mode.description": {
+    "message": "Exibir instâncias da biblioteca numa disposição de linhas compacta."
+  },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "Modo compacto"
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Início"
@@ -197,6 +209,15 @@
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Inicialização e navegação"
   },
+  "app.behavior-settings.sync-across-devices.description": {
+    "message": "Use estas configurações de comportamento em todos os lugares em que estiver conectado. Desative esta opção para manter configurações separadas neste dispositivo."
+  },
+  "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Registe-se com uma conta Modrinth para sincronizar as definições."
+  },
+  "app.behavior-settings.sync-across-devices.title": {
+    "message": "Sincronizar o comportamento entre dispositivos"
+  },
   "app.browse.add-servers-to-instance": {
     "message": "Adicionando servidor a instância"
   },
@@ -230,8 +251,29 @@
   "app.browse.hide-installed-modpacks": {
     "message": "Esconder já instalados"
   },
+  "app.browse.project-actions.label": {
+    "message": "Ações do projeto"
+  },
+  "app.browse.project-type.data-packs": {
+    "message": "Data Packs"
+  },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
+  },
+  "app.browse.project-type.mods": {
+    "message": "Mods"
+  },
+  "app.browse.project-type.resource-packs": {
+    "message": "Pacotes de recursos"
+  },
+  "app.browse.project-type.servers": {
+    "message": "Servidores"
+  },
+  "app.browse.project-type.shaders": {
+    "message": "Shaders"
+  },
+  "app.browse.server-instance-content-warning": {
+    "message": "Adicionar conteúdo pode impedi-lo de entrar neste servidor. Qualquer conteúdo que adicione será removido quando o conteúdo do servidor gerido for atualizado."
   },
   "app.browse.server.installing": {
     "message": "Instalando.."
@@ -239,11 +281,35 @@
   "app.content-install.no-compatible-versions": {
     "message": "Nenhuma versão disponível corresponde a {compatibilityLabel}. Selecione uma versão para instalar mesmo assim. As dependências não serão instaladas automaticamente."
   },
+  "app.content.desync-pack": {
+    "message": "Dessincronizar"
+  },
+  "app.content.sync-data-packs-disabled": {
+    "message": "Primeiro, ative a sincronização de pacotes de dados em definições de aplicação."
+  },
+  "app.content.sync-pack": {
+    "message": "Sincronizar"
+  },
+  "app.content.sync-packs-override": {
+    "message": "Primeiro, desative a sobreposição da sincronização do pacote nas definições desta instância."
+  },
+  "app.content.sync-resource-packs-disabled": {
+    "message": "Ative a sincronização de resource pack nas configurações do app primeiro."
+  },
+  "app.error.state-init.open-backups-folder": {
+    "message": "Abrir pasta de backups"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Insere a descrição do modpack..."
   },
   "app.export-modal.export-button": {
     "message": "Exportar"
+  },
+  "app.export-modal.export-complete": {
+    "message": "Exportação concluída"
+  },
+  "app.export-modal.export-complete-description": {
+    "message": "{name} foi exportado com sucesso."
   },
   "app.export-modal.header": {
     "message": "Exportar modpack"
@@ -259,6 +325,9 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.features-settings.instance-pages.title": {
+    "message": "Instâncias"
   },
   "app.install.phase.downloading_content": {
     "message": "Baixando conteúdo"

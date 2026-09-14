@@ -63,10 +63,10 @@
     "defaultMessage": "İptal"
   },
   "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} Paylaşılan CPUlar"
+    "defaultMessage": "{sharedCpus} Paylaşılan işlemciler"
   },
   "billing.resubscribe-modal.description": {
-    "defaultMessage": "Şu anda <server-name>{serverName}</server-name> için yeniden abonelik işlemini başlatıyorsunuz. Aboneliğiniz tekrar etkinleştirilecek ve sunucunuz kesintisiz olarak çalışmaya devam edecektir."
+    "defaultMessage": "Şu anda <server-name>{serverName}</server-name> için yeniden abonelik işlemini başlatmak üzeresiniz. Aboneliğiniz tekrar etkinleştirilecek ve sunucunuz kesintisiz olarak çalışmaya devam edecektir."
   },
   "billing.resubscribe-modal.error.text": {
     "defaultMessage": "Yeniden abone olunamıyor, abonelik ayrıntıları yüklenemedi."
@@ -205,6 +205,9 @@
   },
   "button.download": {
     "defaultMessage": "İndir"
+  },
+  "button.download-files": {
+    "defaultMessage": "Dosyaları indir"
   },
   "button.downloading": {
     "defaultMessage": "İndiriliyor"
@@ -365,6 +368,15 @@
   "collections.label.private": {
     "defaultMessage": "Gizli"
   },
+  "console.actions.collapse": {
+    "defaultMessage": "Daralt"
+  },
+  "console.actions.expand": {
+    "defaultMessage": "Genişlet"
+  },
+  "console.actions.share": {
+    "defaultMessage": "Paylaş"
+  },
   "content-type.content.lowercase": {
     "defaultMessage": "içerik"
   },
@@ -376,6 +388,12 @@
   },
   "content.card.select-project": {
     "defaultMessage": "{project} seçin"
+  },
+  "content.card.sync-update-pending": {
+    "defaultMessage": "Bazı senkronize edilmiş kopyalar değişiklik bekliyor. Bir süreç çalışıyor olabilir, dondurulmuş ya da uyumsuz bir sürümde olabilir, ya da zaten kendi kopyasını içeriyor olabilir."
+  },
+  "content.card.synced": {
+    "defaultMessage": "Süreçler arası senkronize edildi"
   },
   "content.card.uploaded": {
     "defaultMessage": "Yüklendi"
@@ -2387,6 +2405,9 @@
   "instances.content-install.show-unavailable": {
     "defaultMessage": "Kullanılmayanları görüntüle"
   },
+  "instances.managed-content-modal.disabled": {
+    "defaultMessage": "Devre dışı"
+  },
   "instances.managed-content-modal.download-file": {
     "defaultMessage": "Dosya İndir"
   },
@@ -2395,6 +2416,9 @@
   },
   "instances.managed-content-modal.empty-title": {
     "defaultMessage": "İçerik bulunamadı"
+  },
+  "instances.managed-content-modal.enabled": {
+    "defaultMessage": "Etkin"
   },
   "instances.managed-content-modal.external-content": {
     "defaultMessage": "Harici"
@@ -2416,6 +2440,9 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "{count, number} {count, plural, one {projede} other {projede}} ara"
+  },
+  "instances.managed-content-modal.warnings": {
+    "defaultMessage": "Uyarılar"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Şu anki"
@@ -3590,6 +3617,9 @@
   "project.disclosure.advertising.title": {
     "defaultMessage": "Reklam içerir"
   },
+  "project.disclosure.ai-functionality.title": {
+    "defaultMessage": "Üretken yapay zeka işlevselliği"
+  },
   "project.disclosure.ai-generated-content.title": {
     "defaultMessage": "Yapay zeka tarafından üretilmiş {types} içerir"
   },
@@ -4342,6 +4372,9 @@
   },
   "search.filter_type.advanced.disclosure.ai_content.usage": {
     "defaultMessage": "AI {usage}"
+  },
+  "search.filter_type.advanced.disclosure.ai_functionality": {
+    "defaultMessage": "Üretken yapay zeka işlevselliği"
   },
   "search.filter_type.advanced.disclosure.archived": {
     "defaultMessage": "Arşivlenmiş"
@@ -5144,6 +5177,18 @@
   "servers.busy.installing": {
     "defaultMessage": "Sunucu kuruluyor"
   },
+  "servers.download.failed.description": {
+    "defaultMessage": "Dünyanın dosyalarını indirmeye çalışırken bir hata oluştu."
+  },
+  "servers.download.failed.title": {
+    "defaultMessage": "İndirme başarısız"
+  },
+  "servers.download.unavailable.description": {
+    "defaultMessage": "Bu dünyanın dosyaları şu anda indirilemiyor."
+  },
+  "servers.download.unavailable.title": {
+    "defaultMessage": "İndirme kullanılamıyor"
+  },
   "servers.files.zip-created": {
     "defaultMessage": "ZIP oluşturuldu"
   },
@@ -5537,6 +5582,9 @@
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Başla"
   },
+  "servers.purchase.step.plan.hardware-subtitle": {
+    "defaultMessage": "AMD Ryzen 7950X, 9950X veya eşdeğeri işlemci ve DDR5 bellek tarafından desteklenmektedir."
+  },
   "servers.purchase.step.plan.large": {
     "defaultMessage": "Büyük"
   },
@@ -5654,11 +5702,26 @@
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "Ne olur?"
   },
+  "servers.settings.advanced.sftp.roll-credentials": {
+    "defaultMessage": "Kimlik bilgilerini döndür"
+  },
   "servers.settings.advanced.sftp.roll-credentials-error-text": {
     "defaultMessage": "Lütfen daha sonra tekrar deneyin."
   },
+  "servers.settings.advanced.sftp.roll-credentials-error-title": {
+    "defaultMessage": "SFTP kimlik bilgileri döndürülemedi"
+  },
   "servers.settings.advanced.sftp.roll-credentials-modal-description": {
     "defaultMessage": "Önceki kullanıcı adı ve şifre çalışmayı durduracaktır."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-title": {
+    "defaultMessage": "Kimlik bilgilerini döndür"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-text": {
+    "defaultMessage": "SFTP kullanıcı adınız ve şifreniz yeniden oluşturuldu."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-title": {
+    "defaultMessage": "SFTP kimlik bilgileri döndürüldü"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Kurulum sırasında beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin."

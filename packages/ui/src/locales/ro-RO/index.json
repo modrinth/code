@@ -194,6 +194,9 @@
   "button.hide-snapshots": {
     "defaultMessage": "Ascunde snapshoturile"
   },
+  "button.i-understand": {
+    "defaultMessage": "Înțeleg"
+  },
   "button.install": {
     "defaultMessage": "Instalează"
   },
@@ -211,6 +214,9 @@
   },
   "button.open-folder": {
     "defaultMessage": "Deschide folder-ul"
+  },
+  "button.open-in-browser": {
+    "defaultMessage": "Deschide în browser"
   },
   "button.open-in-folder": {
     "defaultMessage": "Deschide în folder"
@@ -277,6 +283,9 @@
   },
   "button.stop": {
     "defaultMessage": "Stop"
+  },
+  "button.switch-to-version": {
+    "defaultMessage": "Schimba la versiune"
   },
   "button.switch-version": {
     "defaultMessage": "Schimbă versiunea"
@@ -359,8 +368,20 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Delinkare"
   },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "Ștergere"
+  },
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "{project} este instalată ca dependență. Ștergând-ul poate strica {context} al tău sau să oprească conținut-ul să nu pornească corect."
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "Ce se întâmpla?"
+  },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} adăugat"
+  },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "File de configurare schimbate"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Adăugat (dependentă)"
@@ -370,6 +391,12 @@
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Actualizat"
+  },
+  "content.diff-modal.dont-install": {
+    "defaultMessage": "Nu instala"
+  },
+  "content.diff-modal.external-diff-type.added": {
+    "defaultMessage": "Adăugat"
   },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} îndepărtat"

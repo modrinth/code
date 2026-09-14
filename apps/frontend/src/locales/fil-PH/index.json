@@ -182,17 +182,11 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.importing.description": {
-    "message": "I-import ang lahat ng mga paboritong profile mo galing sa launcher na dating ginagamit mo, at magsimula na sa Modrinth App is iilang segundo!"
-  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
-  },
-  "app-marketing.features.importing.title": {
-    "message": "Pag-import ng profile"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Mga Aksiyon"
@@ -218,9 +212,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Bersiyon"
   },
-  "app-marketing.features.open-source.description": {
-    "message": "Buong naka-open-source ang launcher ng Modrinth. Maaari mong matingnan ang source code sa aming <github-link>GitHub</github-link>!"
-  },
   "app-marketing.features.open-source.title": {
     "message": "Open source"
   },
@@ -229,9 +220,6 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
-  },
-  "app-marketing.features.performance.description": {
-    "message": "Ang Modrinth App ay mas mahusay mag-perform kaysa sa maraming nangungunang mod manager, gumagamit lamang ng 150 MB ng RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"

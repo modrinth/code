@@ -273,13 +273,28 @@
     "message": "光影包"
   },
   "app.browse.server-instance-content-warning": {
-    "message": "添加内容可能会阻止你加入此服务器，当管理服务器内容更新时，您添加的所有内容都会被删除"
+    "message": "添加内容可能会阻止你加入此服务器，当管理服务器内容更新时，您添加的所有内容都会被删除。"
   },
   "app.browse.server.installing": {
     "message": "安装中"
   },
   "app.content-install.no-compatible-versions": {
     "message": "没有与 {compatibilityLabel} 匹配的可用版本。如果仍要安装，请选择一个版本。依赖项将不会自动安装。"
+  },
+  "app.content.desync-pack": {
+    "message": "取消同步"
+  },
+  "app.content.sync-data-packs-disabled": {
+    "message": "首先在应用设置中打开数据包同步。"
+  },
+  "app.content.sync-pack": {
+    "message": "同步"
+  },
+  "app.content.sync-packs-override": {
+    "message": "在此实例设置中首先关闭包同步覆盖。"
+  },
+  "app.content.sync-resource-packs-disabled": {
+    "message": "首先在应用设置中打开资源包同步。"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "打开备份文件夹"
@@ -310,6 +325,45 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.features-settings.instance-pages.title": {
+    "message": "实例"
+  },
+  "app.features-settings.play-page.title": {
+    "message": "游玩界面"
+  },
+  "app.features-settings.quick-instances.title": {
+    "message": "侧边栏中的快速实例"
+  },
+  "app.features-settings.show-all-screenshots.description": {
+    "message": "在左侧边栏显示一个按钮来查看所有实例的截图。"
+  },
+  "app.features-settings.show-all-screenshots.title": {
+    "message": "在侧边栏显示所有截图"
+  },
+  "app.features-settings.show-files-tab.title": {
+    "message": "在实例中显示文件栏"
+  },
+  "app.features-settings.show-jump-in.description": {
+    "message": "在游戏页面顶部显示最近播放的世界和实例。"
+  },
+  "app.features-settings.show-screenshots-tab.title": {
+    "message": "在实例中显示截图栏"
+  },
+  "app.features-settings.show-skin-selector.title": {
+    "message": "在侧边栏显示皮肤选择器"
+  },
+  "app.features-settings.show-worlds-tab.title": {
+    "message": "在实例中显示世界栏"
+  },
+  "app.features-settings.sidebar.title": {
+    "message": "侧边栏"
+  },
+  "app.features-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "登录到一个Modrinth账号以同步设置。"
+  },
+  "app.features-settings.sync-across-devices.title": {
+    "message": "跨设备同步功能"
   },
   "app.home.jump-back-in.actions.label": {
     "message": "实例操作"
@@ -507,7 +561,7 @@
     "message": "此操作无法撤销"
   },
   "app.instance.confirm-delete.bulk-admonition-body": {
-    "message": "这{count}个实例中的世界、配置与其他已安装的内容将被永久删除。（真的很久）"
+    "message": "这{count}个实例中的世界、配置与其他已安装的内容将被永久删除。"
   },
   "app.instance.confirm-delete.bulk-delete-button": {
     "message": "确认删除{count}个实例"
@@ -757,6 +811,18 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "删除服务器"
+  },
+  "app.instance.worlds.remove-server-modal.remove-everywhere": {
+    "message": "在每一处都移除"
+  },
+  "app.instance.worlds.remove-server-modal.remove-here": {
+    "message": "在这里移除"
+  },
+  "app.instance.worlds.remove-server-modal.synced-description": {
+    "message": "你可以从此实例或所有同步实例中删除它。 仅从此实例中删除它将启用重写，此实例将不再接收同步服务器更改。"
+  },
+  "app.instance.worlds.remove-server-modal.synced-header": {
+    "message": "此服务器已同步"
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "删除服务器"
@@ -1559,6 +1625,978 @@
   "app.settings.downloading": {
     "message": "正在下载 v{version}"
   },
+  "app.settings.game-options.category.accessibility.description": {
+    "message": "辅助功能首选项"
+  },
+  "app.settings.game-options.category.accessibility.label": {
+    "message": "辅助功能"
+  },
+  "app.settings.game-options.category.chat.description": {
+    "message": "聊天可见度和外观"
+  },
+  "app.settings.game-options.category.chat.label": {
+    "message": "聊天"
+  },
+  "app.settings.game-options.category.controls.description": {
+    "message": "鼠标、移动和按键绑定"
+  },
+  "app.settings.game-options.category.controls.label": {
+    "message": "控制"
+  },
+  "app.settings.game-options.category.custom.description": {
+    "message": "由模组添加的设置"
+  },
+  "app.settings.game-options.category.custom.label": {
+    "message": "自定义设置"
+  },
+  "app.settings.game-options.category.language.description": {
+    "message": "游戏语言"
+  },
+  "app.settings.game-options.category.language.label": {
+    "message": "语言"
+  },
+  "app.settings.game-options.category.music-and-sound.description": {
+    "message": "音量和音频首选项"
+  },
+  "app.settings.game-options.category.music-and-sound.label": {
+    "message": "音乐和音效"
+  },
+  "app.settings.game-options.category.online.description": {
+    "message": "在线和Relams首选项"
+  },
+  "app.settings.game-options.category.online.label": {
+    "message": "在线"
+  },
+  "app.settings.game-options.category.skin-customization.description": {
+    "message": "皮肤层和主手"
+  },
+  "app.settings.game-options.category.skin-customization.label": {
+    "message": "自定义皮肤"
+  },
+  "app.settings.game-options.category.video.description": {
+    "message": "相机和显示设置"
+  },
+  "app.settings.game-options.category.video.label": {
+    "message": "视频"
+  },
+  "app.settings.game-options.choice.all": {
+    "message": "全部"
+  },
+  "app.settings.game-options.choice.balanced": {
+    "message": "平衡"
+  },
+  "app.settings.game-options.choice.by-player": {
+    "message": "按玩家"
+  },
+  "app.settings.game-options.choice.chat": {
+    "message": "聊天"
+  },
+  "app.settings.game-options.choice.commands-only": {
+    "message": "只有命令"
+  },
+  "app.settings.game-options.choice.constant": {
+    "message": "持续"
+  },
+  "app.settings.game-options.choice.crosshair": {
+    "message": "十字"
+  },
+  "app.settings.game-options.choice.custom": {
+    "message": "自定义"
+  },
+  "app.settings.game-options.choice.decreased": {
+    "message": "较低"
+  },
+  "app.settings.game-options.choice.default": {
+    "message": "默认"
+  },
+  "app.settings.game-options.choice.fabulous": {
+    "message": "高品质"
+  },
+  "app.settings.game-options.choice.fancy": {
+    "message": "高品质"
+  },
+  "app.settings.game-options.choice.far": {
+    "message": "远"
+  },
+  "app.settings.game-options.choice.fast": {
+    "message": "快速"
+  },
+  "app.settings.game-options.choice.frequent": {
+    "message": "频繁"
+  },
+  "app.settings.game-options.choice.hidden": {
+    "message": "隐藏"
+  },
+  "app.settings.game-options.choice.hotbar": {
+    "message": "快捷栏"
+  },
+  "app.settings.game-options.choice.left": {
+    "message": "左"
+  },
+  "app.settings.game-options.choice.limited": {
+    "message": "受限"
+  },
+  "app.settings.game-options.choice.max-fps": {
+    "message": "最大帧数"
+  },
+  "app.settings.game-options.choice.maximum": {
+    "message": "最大"
+  },
+  "app.settings.game-options.choice.minimal": {
+    "message": "最小"
+  },
+  "app.settings.game-options.choice.minimum": {
+    "message": "最小"
+  },
+  "app.settings.game-options.choice.nearby": {
+    "message": "附近"
+  },
+  "app.settings.game-options.choice.never": {
+    "message": "从不"
+  },
+  "app.settings.game-options.choice.none": {
+    "message": "无"
+  },
+  "app.settings.game-options.choice.normal": {
+    "message": "正常"
+  },
+  "app.settings.game-options.choice.off": {
+    "message": "关闭"
+  },
+  "app.settings.game-options.choice.on": {
+    "message": "打开"
+  },
+  "app.settings.game-options.choice.opengl": {
+    "message": "OpenGL"
+  },
+  "app.settings.game-options.choice.pause": {
+    "message": "暂停界面"
+  },
+  "app.settings.game-options.choice.pause-and-toast": {
+    "message": "暂停菜单和弹窗"
+  },
+  "app.settings.game-options.choice.power-saver": {
+    "message": "节能模式"
+  },
+  "app.settings.game-options.choice.right": {
+    "message": "右手"
+  },
+  "app.settings.game-options.choice.short": {
+    "message": "短"
+  },
+  "app.settings.game-options.choice.shown": {
+    "message": "显示"
+  },
+  "app.settings.game-options.choice.system": {
+    "message": "系统"
+  },
+  "app.settings.game-options.choice.tiny": {
+    "message": "最小"
+  },
+  "app.settings.game-options.choice.vulkan": {
+    "message": "Vulkan"
+  },
+  "app.settings.game-options.choice.when-minimized": {
+    "message": "当最小化时"
+  },
+  "app.settings.game-options.choice.while-afk": {
+    "message": "在挂机时"
+  },
+  "app.settings.game-options.compatibility.none": {
+    "message": "您的一些实例无法使用此设置"
+  },
+  "app.settings.game-options.compatibility.reason.launcher-controlled": {
+    "message": "此设置由Modrinth的启动设置管理。"
+  },
+  "app.settings.game-options.custom-value.placeholder": {
+    "message": "输入一个值"
+  },
+  "app.settings.game-options.keybind.assigned-status": {
+    "message": "{setting} 现在绑定到了 {binding}。"
+  },
+  "app.settings.game-options.keybind.cancelled-status": {
+    "message": "按键绑定更改取消。"
+  },
+  "app.settings.game-options.keybind.change": {
+    "message": "{setting}: {binding}。激活以更改按键绑定。"
+  },
+  "app.settings.game-options.keybind.choose": {
+    "message": "选择一个按键"
+  },
+  "app.settings.game-options.keybind.conflict-description": {
+    "message": "这个已经被 {settings} 使用了。"
+  },
+  "app.settings.game-options.keybind.key.arrow-down": {
+    "message": "下方向键"
+  },
+  "app.settings.game-options.keybind.key.arrow-left": {
+    "message": "左方向键"
+  },
+  "app.settings.game-options.keybind.key.arrow-right": {
+    "message": "右方向键"
+  },
+  "app.settings.game-options.keybind.key.arrow-up": {
+    "message": "上方向键"
+  },
+  "app.settings.game-options.keybind.key.backspace": {
+    "message": "退格"
+  },
+  "app.settings.game-options.keybind.key.caps-lock": {
+    "message": "大写锁定"
+  },
+  "app.settings.game-options.keybind.key.delete": {
+    "message": "Delete"
+  },
+  "app.settings.game-options.keybind.key.end": {
+    "message": "End"
+  },
+  "app.settings.game-options.keybind.key.enter": {
+    "message": "Enter"
+  },
+  "app.settings.game-options.keybind.key.escape": {
+    "message": "Esc"
+  },
+  "app.settings.game-options.keybind.key.home": {
+    "message": "Home"
+  },
+  "app.settings.game-options.keybind.key.insert": {
+    "message": "插入"
+  },
+  "app.settings.game-options.keybind.key.keypad-key": {
+    "message": "数字小键盘 {key}"
+  },
+  "app.settings.game-options.keybind.key.left-alt": {
+    "message": "左Alt"
+  },
+  "app.settings.game-options.keybind.key.left-command": {
+    "message": "左Command"
+  },
+  "app.settings.game-options.keybind.key.left-control": {
+    "message": "左Ctrl"
+  },
+  "app.settings.game-options.keybind.key.left-shift": {
+    "message": "左Shift"
+  },
+  "app.settings.game-options.keybind.key.left-super": {
+    "message": "左Super"
+  },
+  "app.settings.game-options.keybind.key.menu": {
+    "message": "Menu"
+  },
+  "app.settings.game-options.keybind.key.num-lock": {
+    "message": "Num Lock"
+  },
+  "app.settings.game-options.keybind.key.page-down": {
+    "message": "Page Down"
+  },
+  "app.settings.game-options.keybind.key.page-up": {
+    "message": "Page Up"
+  },
+  "app.settings.game-options.keybind.key.pause": {
+    "message": "Pause"
+  },
+  "app.settings.game-options.keybind.key.print-screen": {
+    "message": "Print Screen"
+  },
+  "app.settings.game-options.keybind.key.right-alt": {
+    "message": "右Alt"
+  },
+  "app.settings.game-options.keybind.key.right-command": {
+    "message": "右Command"
+  },
+  "app.settings.game-options.keybind.key.right-control": {
+    "message": "右Ctrl"
+  },
+  "app.settings.game-options.keybind.key.right-shift": {
+    "message": "右Shift"
+  },
+  "app.settings.game-options.keybind.key.right-super": {
+    "message": "右Super"
+  },
+  "app.settings.game-options.keybind.key.scroll-lock": {
+    "message": "Sscroll Lock"
+  },
+  "app.settings.game-options.keybind.key.space": {
+    "message": "空格"
+  },
+  "app.settings.game-options.keybind.key.tab": {
+    "message": "Tab"
+  },
+  "app.settings.game-options.keybind.key.unbound": {
+    "message": "未绑定"
+  },
+  "app.settings.game-options.keybind.key.unknown": {
+    "message": "未知按键"
+  },
+  "app.settings.game-options.keybind.listen": {
+    "message": "选择一个按键…"
+  },
+  "app.settings.game-options.keybind.listening-status": {
+    "message": "正在监听按键或鼠标按钮。按 Esc来关闭此绑定。"
+  },
+  "app.settings.game-options.keybind.mixed": {
+    "message": "不同的实例"
+  },
+  "app.settings.game-options.keybind.modifier.alt": {
+    "message": "Alt"
+  },
+  "app.settings.game-options.keybind.modifier.command": {
+    "message": "Command"
+  },
+  "app.settings.game-options.keybind.modifier.control": {
+    "message": "Ctrl"
+  },
+  "app.settings.game-options.keybind.modifier.shift": {
+    "message": "Shift"
+  },
+  "app.settings.game-options.keybind.modifier.super": {
+    "message": "Super"
+  },
+  "app.settings.game-options.keybind.mouse.button": {
+    "message": "鼠标 {button}"
+  },
+  "app.settings.game-options.keybind.mouse.left": {
+    "message": "鼠标左键"
+  },
+  "app.settings.game-options.keybind.mouse.middle": {
+    "message": "鼠标中键"
+  },
+  "app.settings.game-options.keybind.mouse.right": {
+    "message": "鼠标右键"
+  },
+  "app.settings.game-options.keybind.recording-label": {
+    "message": "{setting}: 正在监听按键或鼠标按钮。按 Esc来关闭此绑定。"
+  },
+  "app.settings.game-options.keybind.scancode": {
+    "message": "扫描码 {code}"
+  },
+  "app.settings.game-options.keybind.unsupported-status": {
+    "message": "Minecraft无法使用此输入。请按另一个键。"
+  },
+  "app.settings.game-options.setting.advanced-opengl.label": {
+    "message": "高级OpenGL"
+  },
+  "app.settings.game-options.setting.allow-cursor-changes.label": {
+    "message": "允许鼠标改动"
+  },
+  "app.settings.game-options.setting.allow-server-listing.description": {
+    "message": "允许玩家名字出现在服务器列表中。"
+  },
+  "app.settings.game-options.setting.allow-server-listing.label": {
+    "message": "服务器列表"
+  },
+  "app.settings.game-options.setting.alternate-blocks.label": {
+    "message": "交替方块"
+  },
+  "app.settings.game-options.setting.ambient-occlusion.label": {
+    "message": "平滑光照"
+  },
+  "app.settings.game-options.setting.ambient-volume.label": {
+    "message": "环境"
+  },
+  "app.settings.game-options.setting.anaglyph-3d.label": {
+    "message": "3D效果"
+  },
+  "app.settings.game-options.setting.anisotropic-filtering.label": {
+    "message": "各向异性过滤"
+  },
+  "app.settings.game-options.setting.anisotropy.label": {
+    "message": "各向异性"
+  },
+  "app.settings.game-options.setting.attack-indicator.label": {
+    "message": "攻击指示器"
+  },
+  "app.settings.game-options.setting.auto-jump.description": {
+    "message": "自动向单格方块障碍跳跃。"
+  },
+  "app.settings.game-options.setting.auto-jump.label": {
+    "message": "自动跳跃"
+  },
+  "app.settings.game-options.setting.auto-suggestions.label": {
+    "message": "命令提示"
+  },
+  "app.settings.game-options.setting.autosave-indicator.label": {
+    "message": "自动保存指示器"
+  },
+  "app.settings.game-options.setting.biome-blend-radius.description": {
+    "message": "生物群系颜色过渡距离。"
+  },
+  "app.settings.game-options.setting.biome-blend-radius.label": {
+    "message": "生物群系过渡"
+  },
+  "app.settings.game-options.setting.blocks-volume.label": {
+    "message": "方块"
+  },
+  "app.settings.game-options.setting.brightness.label": {
+    "message": "亮度"
+  },
+  "app.settings.game-options.setting.cape.label": {
+    "message": "披风"
+  },
+  "app.settings.game-options.setting.chat-background-only.label": {
+    "message": "仅聊天背景"
+  },
+  "app.settings.game-options.setting.chat-colors.label": {
+    "message": "聊天颜色"
+  },
+  "app.settings.game-options.setting.chat-delay.label": {
+    "message": "聊天延迟"
+  },
+  "app.settings.game-options.setting.chat-line-spacing.label": {
+    "message": "聊天行间距"
+  },
+  "app.settings.game-options.setting.chat-links-prompt.description": {
+    "message": "在打开聊天链接之前询问。"
+  },
+  "app.settings.game-options.setting.chat-links-prompt.label": {
+    "message": "链接显示"
+  },
+  "app.settings.game-options.setting.chat-links.description": {
+    "message": "允许打开聊天中的网页链接。"
+  },
+  "app.settings.game-options.setting.chat-links.label": {
+    "message": "网页链接"
+  },
+  "app.settings.game-options.setting.chat-opacity.description": {
+    "message": "聊天文字的不透明度。"
+  },
+  "app.settings.game-options.setting.chat-opacity.label": {
+    "message": "聊天不透明度"
+  },
+  "app.settings.game-options.setting.chat-preview.label": {
+    "message": "聊天预览"
+  },
+  "app.settings.game-options.setting.chat-scale.label": {
+    "message": "聊天界面尺寸"
+  },
+  "app.settings.game-options.setting.chat-visibility.label": {
+    "message": "聊天可见度"
+  },
+  "app.settings.game-options.setting.chat-width.label": {
+    "message": "聊天宽度"
+  },
+  "app.settings.game-options.setting.chunk-fade-time.label": {
+    "message": "区块淡入时间"
+  },
+  "app.settings.game-options.setting.cloud-range.label": {
+    "message": "云层距离"
+  },
+  "app.settings.game-options.setting.clouds.label": {
+    "message": "云"
+  },
+  "app.settings.game-options.setting.ctrl-click-right-click.label": {
+    "message": "Control + 单击 = 右键"
+  },
+  "app.settings.game-options.setting.cutout-leaves.label": {
+    "message": "透视树叶"
+  },
+  "app.settings.game-options.setting.damage-tilt.label": {
+    "message": "受伤抖动效果"
+  },
+  "app.settings.game-options.setting.dark-splash.description": {
+    "message": "把Mojang Studios的加载界面更换为黑色。"
+  },
+  "app.settings.game-options.setting.dark-splash.label": {
+    "message": "黑白徽标"
+  },
+  "app.settings.game-options.setting.darkness-pulsing.label": {
+    "message": "黑暗脉动效果"
+  },
+  "app.settings.game-options.setting.debug-gui-scale.label": {
+    "message": "调试界面尺寸"
+  },
+  "app.settings.game-options.setting.directional-audio.label": {
+    "message": "定向音频"
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.label": {
+    "message": "离散滚动"
+  },
+  "app.settings.game-options.setting.entity-distance.label": {
+    "message": "实体渲染距离"
+  },
+  "app.settings.game-options.setting.entity-shadows.label": {
+    "message": "生物阴影"
+  },
+  "app.settings.game-options.setting.exclusive-fullscreen.label": {
+    "message": "独占全屏"
+  },
+  "app.settings.game-options.setting.extra-telemetry.label": {
+    "message": "数据收集"
+  },
+  "app.settings.game-options.setting.focused-chat-height.label": {
+    "message": "聊天栏聚焦高度"
+  },
+  "app.settings.game-options.setting.force-unicode-font.label": {
+    "message": "强制使用Unicode字体"
+  },
+  "app.settings.game-options.setting.fov-effects.label": {
+    "message": "视场角效果"
+  },
+  "app.settings.game-options.setting.fov.label": {
+    "message": "视场角"
+  },
+  "app.settings.game-options.setting.fullscreen.label": {
+    "message": "全屏"
+  },
+  "app.settings.game-options.setting.glint-speed.label": {
+    "message": "附魔光效闪烁速度"
+  },
+  "app.settings.game-options.setting.glint-strength.label": {
+    "message": "附魔光效闪烁强度"
+  },
+  "app.settings.game-options.setting.graphics-backend.label": {
+    "message": "图形API"
+  },
+  "app.settings.game-options.setting.graphics.description": {
+    "message": "控制视觉品质和性能。"
+  },
+  "app.settings.game-options.setting.graphics.label": {
+    "message": "图像品质"
+  },
+  "app.settings.game-options.setting.gui-scale.description": {
+    "message": "游戏界面和HUD的大小。"
+  },
+  "app.settings.game-options.setting.gui-scale.label": {
+    "message": "界面尺寸"
+  },
+  "app.settings.game-options.setting.hat.description": {
+    "message": "显示皮肤的帽子层。"
+  },
+  "app.settings.game-options.setting.hat.label": {
+    "message": "帽子"
+  },
+  "app.settings.game-options.setting.held-item-tooltips.label": {
+    "message": "手持物品提示"
+  },
+  "app.settings.game-options.setting.hide-lightning-flashes.label": {
+    "message": "隐藏闪电的闪烁效果"
+  },
+  "app.settings.game-options.setting.hide-matched-names.label": {
+    "message": "隐藏匹配的名称"
+  },
+  "app.settings.game-options.setting.hide-server-address.label": {
+    "message": "隐藏服务器地址"
+  },
+  "app.settings.game-options.setting.hide-splash-texts.label": {
+    "message": "隐藏闪烁标语"
+  },
+  "app.settings.game-options.setting.high-contrast-outline.label": {
+    "message": "高对比度方块轮廓"
+  },
+  "app.settings.game-options.setting.high-contrast.description": {
+    "message": "提高交互元素的对比度。"
+  },
+  "app.settings.game-options.setting.high-contrast.label": {
+    "message": "高对比度"
+  },
+  "app.settings.game-options.setting.hostile-volume.label": {
+    "message": "敌对生物"
+  },
+  "app.settings.game-options.setting.improved-transparency.label": {
+    "message": "改进透明显示"
+  },
+  "app.settings.game-options.setting.in-game-notifications.label": {
+    "message": "游戏内通知"
+  },
+  "app.settings.game-options.setting.inactivity-framerate-limit.label": {
+    "message": "限制帧率"
+  },
+  "app.settings.game-options.setting.invert-horizontal-mouse.label": {
+    "message": "反转鼠标水平移动"
+  },
+  "app.settings.game-options.setting.invert-mouse.description": {
+    "message": "反转鼠标垂直移动。"
+  },
+  "app.settings.game-options.setting.invert-mouse.label": {
+    "message": "反转鼠标"
+  },
+  "app.settings.game-options.setting.jacket.description": {
+    "message": "显示皮肤的外套层。"
+  },
+  "app.settings.game-options.setting.jacket.label": {
+    "message": "外套"
+  },
+  "app.settings.game-options.setting.japanese-glyph-variants.label": {
+    "message": "日本字形变体"
+  },
+  "app.settings.game-options.setting.key-advancements.label": {
+    "message": "进度"
+  },
+  "app.settings.game-options.setting.key-attack.label": {
+    "message": "攻击"
+  },
+  "app.settings.game-options.setting.key-back.label": {
+    "message": "向后移动"
+  },
+  "app.settings.game-options.setting.key-chat.label": {
+    "message": "打开聊天"
+  },
+  "app.settings.game-options.setting.key-command.label": {
+    "message": "Command"
+  },
+  "app.settings.game-options.setting.key-debug-advanced-tooltips.label": {
+    "message": "显示高级提示框"
+  },
+  "app.settings.game-options.setting.key-debug-chunk-borders.label": {
+    "message": "显示区块边框"
+  },
+  "app.settings.game-options.setting.key-debug-clear-chat.label": {
+    "message": "清除聊天记录"
+  },
+  "app.settings.game-options.setting.key-debug-copy-location.label": {
+    "message": "复制位置"
+  },
+  "app.settings.game-options.setting.key-debug-copy-recreate-command.label": {
+    "message": "复制重新创建命令"
+  },
+  "app.settings.game-options.setting.key-debug-crash.label": {
+    "message": "触发调试崩溃"
+  },
+  "app.settings.game-options.setting.key-debug-dump-dynamic-textures.label": {
+    "message": "转储动态纹理"
+  },
+  "app.settings.game-options.setting.key-debug-dump-version.label": {
+    "message": "转储版本信息"
+  },
+  "app.settings.game-options.setting.key-debug-focus-pause.label": {
+    "message": "失去焦点后暂停"
+  },
+  "app.settings.game-options.setting.key-debug-fps-charts.label": {
+    "message": "FPS图表"
+  },
+  "app.settings.game-options.setting.key-debug-hitboxes.label": {
+    "message": "显示碰撞箱"
+  },
+  "app.settings.game-options.setting.key-debug-improved-transparency.label": {
+    "message": "改进透明度调试视图"
+  },
+  "app.settings.game-options.setting.key-debug-lightmap-texture.label": {
+    "message": "光照贴图纹理"
+  },
+  "app.settings.game-options.setting.key-debug-modifier.label": {
+    "message": "调试修饰键"
+  },
+  "app.settings.game-options.setting.key-debug-network-charts.label": {
+    "message": "网络图标"
+  },
+  "app.settings.game-options.setting.key-debug-options.label": {
+    "message": "调试选项"
+  },
+  "app.settings.game-options.setting.key-debug-overlay.label": {
+    "message": "调试界面"
+  },
+  "app.settings.game-options.setting.key-debug-profiling-chart.label": {
+    "message": "分析图表"
+  },
+  "app.settings.game-options.setting.key-debug-profiling.label": {
+    "message": "开始解析"
+  },
+  "app.settings.game-options.setting.key-debug-reload-chunks.label": {
+    "message": "重新加载区块"
+  },
+  "app.settings.game-options.setting.key-debug-reload-resource-packs.label": {
+    "message": "重新加载资源包"
+  },
+  "app.settings.game-options.setting.key-debug-spectate.label": {
+    "message": "旁观实体"
+  },
+  "app.settings.game-options.setting.key-debug-switch-game-mode.label": {
+    "message": "切换游戏模式"
+  },
+  "app.settings.game-options.setting.key-drop.label": {
+    "message": "丢弃物品"
+  },
+  "app.settings.game-options.setting.key-forward.label": {
+    "message": "向前移动"
+  },
+  "app.settings.game-options.setting.key-friends.label": {
+    "message": "好友"
+  },
+  "app.settings.game-options.setting.key-fullscreen.label": {
+    "message": "切换全屏显示"
+  },
+  "app.settings.game-options.setting.key-hotbar-1.label": {
+    "message": "快捷栏1"
+  },
+  "app.settings.game-options.setting.key-hotbar-2.label": {
+    "message": "快捷栏2"
+  },
+  "app.settings.game-options.setting.key-hotbar-3.label": {
+    "message": "快捷栏3"
+  },
+  "app.settings.game-options.setting.key-hotbar-4.label": {
+    "message": "快捷栏4"
+  },
+  "app.settings.game-options.setting.key-hotbar-5.label": {
+    "message": "快捷栏5"
+  },
+  "app.settings.game-options.setting.key-hotbar-6.label": {
+    "message": "快捷栏6"
+  },
+  "app.settings.game-options.setting.key-hotbar-7.label": {
+    "message": "快捷栏7"
+  },
+  "app.settings.game-options.setting.key-hotbar-8.label": {
+    "message": "快捷栏8"
+  },
+  "app.settings.game-options.setting.key-hotbar-9.label": {
+    "message": "快捷栏9"
+  },
+  "app.settings.game-options.setting.key-inventory.label": {
+    "message": "物品栏"
+  },
+  "app.settings.game-options.setting.key-jump.label": {
+    "message": "跳跃"
+  },
+  "app.settings.game-options.setting.key-left.label": {
+    "message": "向左移动"
+  },
+  "app.settings.game-options.setting.key-load-toolbar.label": {
+    "message": "加载快捷栏"
+  },
+  "app.settings.game-options.setting.key-perspective.label": {
+    "message": "切换视角"
+  },
+  "app.settings.game-options.setting.key-pick-item.label": {
+    "message": "捡起方块"
+  },
+  "app.settings.game-options.setting.key-player-list.label": {
+    "message": "玩家列表"
+  },
+  "app.settings.game-options.setting.key-quick-actions.label": {
+    "message": "快捷操作"
+  },
+  "app.settings.game-options.setting.key-right.label": {
+    "message": "向右移动"
+  },
+  "app.settings.game-options.setting.key-save-toolbar.label": {
+    "message": "保存快捷栏"
+  },
+  "app.settings.game-options.setting.key-screenshot.label": {
+    "message": "截图"
+  },
+  "app.settings.game-options.setting.key-smooth-camera.label": {
+    "message": "切换电影视角"
+  },
+  "app.settings.game-options.setting.key-sneak.label": {
+    "message": "蹲下"
+  },
+  "app.settings.game-options.setting.key-social-interactions.label": {
+    "message": "社交互动"
+  },
+  "app.settings.game-options.setting.key-spectator-hotbar.label": {
+    "message": "旁观者快捷键"
+  },
+  "app.settings.game-options.setting.key-spectator-outlines.label": {
+    "message": "高亮旁观者"
+  },
+  "app.settings.game-options.setting.key-sprint.label": {
+    "message": "冲刺"
+  },
+  "app.settings.game-options.setting.key-swap-offhand.label": {
+    "message": "与副手交换物品"
+  },
+  "app.settings.game-options.setting.key-toggle-gui.label": {
+    "message": "切换HUD"
+  },
+  "app.settings.game-options.setting.key-toggle-spectator-shader.label": {
+    "message": "切换旁观者着色器"
+  },
+  "app.settings.game-options.setting.key-use.label": {
+    "message": "使用物品"
+  },
+  "app.settings.game-options.setting.language.label": {
+    "message": "语言"
+  },
+  "app.settings.game-options.setting.left-pants-leg.label": {
+    "message": "左裤腿"
+  },
+  "app.settings.game-options.setting.left-sleeve.label": {
+    "message": "左袖"
+  },
+  "app.settings.game-options.setting.legacy-framerate-limit.label": {
+    "message": "帧率限制"
+  },
+  "app.settings.game-options.setting.legacy-view-distance.label": {
+    "message": "渲染距离"
+  },
+  "app.settings.game-options.setting.mac-fullscreen-menu.label": {
+    "message": "在全屏中显示macOS的菜单"
+  },
+  "app.settings.game-options.setting.main-hand.description": {
+    "message": "选择主手是左手还是右手。"
+  },
+  "app.settings.game-options.setting.main-hand.label": {
+    "message": "主手"
+  },
+  "app.settings.game-options.setting.master-volume.label": {
+    "message": "主音量"
+  },
+  "app.settings.game-options.setting.max-framerate.label": {
+    "message": "最大帧率"
+  },
+  "app.settings.game-options.setting.menu-background-blur.label": {
+    "message": "菜单背景模糊程度"
+  },
+  "app.settings.game-options.setting.mipmap-levels.description": {
+    "message": "将远距离纹理平滑化。"
+  },
+  "app.settings.game-options.setting.mipmap-levels.label": {
+    "message": "Mipmap 级别"
+  },
+  "app.settings.game-options.setting.mouse-wheel-sensitivity.label": {
+    "message": "鼠标滚轮灵敏度"
+  },
+  "app.settings.game-options.setting.music-frequency.label": {
+    "message": "音乐播放频率"
+  },
+  "app.settings.game-options.setting.music-toast.label": {
+    "message": "音乐弹窗"
+  },
+  "app.settings.game-options.setting.music-volume.label": {
+    "message": "音乐"
+  },
+  "app.settings.game-options.setting.narrator-hotkey.label": {
+    "message": "复述功能快捷键"
+  },
+  "app.settings.game-options.setting.narrator.description": {
+    "message": "选择复述内容。"
+  },
+  "app.settings.game-options.setting.narrator.label": {
+    "message": "旁白"
+  },
+  "app.settings.game-options.setting.neutral-volume.label": {
+    "message": "友好生物"
+  },
+  "app.settings.game-options.setting.notification-time.description": {
+    "message": "通知可见时间。"
+  },
+  "app.settings.game-options.setting.notification-time.label": {
+    "message": "通知时间"
+  },
+  "app.settings.game-options.setting.operator-items-tab.label": {
+    "message": "管理员用品标签页"
+  },
+  "app.settings.game-options.setting.panorama-speed.label": {
+    "message": "全景图滚动速度"
+  },
+  "app.settings.game-options.setting.particles.label": {
+    "message": "粒子"
+  },
+  "app.settings.game-options.setting.players-volume.label": {
+    "message": "玩家"
+  },
+  "app.settings.game-options.setting.quit-shortcuts.label": {
+    "message": "退出游戏快捷键"
+  },
+  "app.settings.game-options.setting.realms-notifications.label": {
+    "message": "Relams通知"
+  },
+  "app.settings.game-options.setting.reduced-debug-info.label": {
+    "message": "减少调试信息"
+  },
+  "app.settings.game-options.setting.render-distance.label": {
+    "message": "渲染距离"
+  },
+  "app.settings.game-options.setting.right-sleeve.label": {
+    "message": "右袖"
+  },
+  "app.settings.game-options.setting.save-chat-drafts.label": {
+    "message": "保存聊天草稿"
+  },
+  "app.settings.game-options.setting.screen-effects.label": {
+    "message": "屏幕效果"
+  },
+  "app.settings.game-options.setting.sensitivity.label": {
+    "message": "鼠标灵敏度"
+  },
+  "app.settings.game-options.setting.server-textures.label": {
+    "message": "服务器材质包"
+  },
+  "app.settings.game-options.setting.share-presence.label": {
+    "message": "分享游玩信息"
+  },
+  "app.settings.game-options.setting.simulation-distance.label": {
+    "message": "模拟距离"
+  },
+  "app.settings.game-options.setting.snooper.label": {
+    "message": "数据收集"
+  },
+  "app.settings.game-options.setting.sprint-window.label": {
+    "message": "冲刺间隔"
+  },
+  "app.settings.game-options.setting.subtitles.description": {
+    "message": "显示游戏中播放声音的字幕。"
+  },
+  "app.settings.game-options.setting.subtitles.label": {
+    "message": "字幕"
+  },
+  "app.settings.game-options.setting.text-background-opacity.label": {
+    "message": "文字背景不透明度"
+  },
+  "app.settings.game-options.setting.texture-filtering.label": {
+    "message": "纹理过滤"
+  },
+  "app.settings.game-options.setting.toggle-attack.label": {
+    "message": "切换攻击"
+  },
+  "app.settings.game-options.setting.toggle-crouch.description": {
+    "message": "按一次即可保持蹲伏。"
+  },
+  "app.settings.game-options.setting.toggle-crouch.label": {
+    "message": "切换蹲伏"
+  },
+  "app.settings.game-options.setting.toggle-sprint.description": {
+    "message": "按一次即可保持冲刺。"
+  },
+  "app.settings.game-options.setting.toggle-sprint.label": {
+    "message": "切换冲刺"
+  },
+  "app.settings.game-options.setting.toggle-use.label": {
+    "message": "切换使用"
+  },
+  "app.settings.game-options.setting.touchscreen.label": {
+    "message": "触屏模式"
+  },
+  "app.settings.game-options.setting.ui-volume.label": {
+    "message": "用户界面"
+  },
+  "app.settings.game-options.setting.unfocused-chat-height.label": {
+    "message": "聊天栏淡化高度"
+  },
+  "app.settings.game-options.setting.use-vbo.label": {
+    "message": "使用VBO"
+  },
+  "app.settings.game-options.setting.view-bobbing.label": {
+    "message": "视角摇晃"
+  },
+  "app.settings.game-options.setting.vignette.label": {
+    "message": "晕影"
+  },
+  "app.settings.game-options.setting.voice-volume.label": {
+    "message": "复述功能/语音"
+  },
+  "app.settings.game-options.setting.vsync.label": {
+    "message": "垂直同步"
+  },
+  "app.settings.game-options.setting.weather-radius.label": {
+    "message": "天气半径"
+  },
+  "app.settings.game-options.setting.weather-volume.label": {
+    "message": "天气"
+  },
+  "app.settings.game-options.validation.changed-since-opened": {
+    "message": "此设置已在别处改变，请检查后重试。"
+  },
+  "app.settings.game-options.validation.invalid-value": {
+    "message": "选择一个有效的值。"
+  },
+  "app.settings.game-options.validation.missing-value": {
+    "message": "先选择一个值。"
+  },
+  "app.settings.game-options.validation.no-compatible-instances": {
+    "message": "你的一些实例无法使用此设置"
+  },
   "app.settings.java-installations.location.title": {
     "message": "Java {version, number} 位置"
   },
@@ -1637,8 +2675,38 @@
   "app.settings.sidebar.label.instances": {
     "message": "实例"
   },
+  "app.settings.synced-options.choose-sync-source.command-history-description": {
+    "message": "选择要从哪个实例复制你的命令历史记录。 此历史仅用于初始同步，您可以在其后从任何实例编辑它。"
+  },
+  "app.settings.synced-options.choose-sync-source.command-history-title": {
+    "message": "选择命令历史来源"
+  },
+  "app.settings.synced-options.choose-sync-source.creative-hotbars-title": {
+    "message": "选择创造模式快捷栏来源"
+  },
+  "app.settings.synced-options.choose-sync-source.data-packs-title": {
+    "message": "选择数据包来源"
+  },
+  "app.settings.synced-options.choose-sync-source.game-settings-title": {
+    "message": "选择游戏设置源"
+  },
+  "app.settings.synced-options.choose-sync-source.ineligible": {
+    "message": "您不能选择这个实例作为同步源"
+  },
+  "app.settings.synced-options.choose-sync-source.load-error": {
+    "message": "无法加载同步源。请稍后再试。"
+  },
+  "app.settings.synced-options.choose-sync-source.multiplayer-servers-title": {
+    "message": "选择多人服务器资源包"
+  },
   "app.settings.synced-options.choose-sync-source.no-instances-found": {
     "message": "没有找到实例"
+  },
+  "app.settings.synced-options.choose-sync-source.resource-packs-title": {
+    "message": "选择资源包"
+  },
+  "app.settings.synced-options.choose-sync-source.retry": {
+    "message": "重新尝试"
   },
   "app.settings.synced-options.choose-sync-source.search-placeholder": {
     "message": "搜索实例"
@@ -1661,11 +2729,89 @@
   "app.settings.synced-options.creative-hotbars.description": {
     "message": "在不同的实例之间同步创造模式物品栏。"
   },
+  "app.settings.synced-options.data-packs": {
+    "message": "同步数据包"
+  },
+  "app.settings.synced-options.data-packs.none-synced-yet": {
+    "message": "你尚未同步任何数据包"
+  },
+  "app.settings.synced-options.game-settings": {
+    "message": "同步游戏设置"
+  },
+  "app.settings.synced-options.game-settings.button": {
+    "message": "编辑游戏设置"
+  },
+  "app.settings.synced-options.game-settings.conflict-text": {
+    "message": "我们加载了最新设置。请检查您的更改，然后再次保存。"
+  },
+  "app.settings.synced-options.game-settings.disable-all": {
+    "message": "取消全部同步"
+  },
+  "app.settings.synced-options.game-settings.empty": {
+    "message": "没有符合搜索或筛选条件的设置。"
+  },
+  "app.settings.synced-options.game-settings.enable-all": {
+    "message": "同步所有"
+  },
+  "app.settings.synced-options.game-settings.load-failed": {
+    "message": "我们无法加载你的游戏设置。"
+  },
+  "app.settings.synced-options.game-settings.loading": {
+    "message": "加载设置中……"
+  },
+  "app.settings.synced-options.game-settings.no-options-to-edit": {
+    "message": "你还没有任何可供编辑的选项"
+  },
+  "app.settings.synced-options.game-settings.not-being-synced": {
+    "message": "未同步"
+  },
+  "app.settings.synced-options.game-settings.retry": {
+    "message": "重新尝试"
+  },
+  "app.settings.synced-options.game-settings.save": {
+    "message": "保存设置"
+  },
+  "app.settings.synced-options.game-settings.search": {
+    "message": "搜索设置……"
+  },
+  "app.settings.synced-options.game-settings.sync-setting": {
+    "message": "在各实例间同步 {setting}"
+  },
+  "app.settings.synced-options.game-settings.sync-title": {
+    "message": "同步游戏设置"
+  },
+  "app.settings.synced-options.game-settings.synced-across-instances": {
+    "message": "跨实例同步"
+  },
+  "app.settings.synced-options.game-settings.title": {
+    "message": "游戏设置"
+  },
+  "app.settings.synced-options.game-settings.unsaved-changes": {
+    "message": "你有未保存的改动。"
+  },
+  "app.settings.synced-options.game-settings.unsync-setting": {
+    "message": "停止在各实例间同步 {setting}"
+  },
+  "app.settings.synced-options.game-settings.value-off": {
+    "message": "关闭"
+  },
+  "app.settings.synced-options.game-settings.value-on": {
+    "message": "打开"
+  },
+  "app.settings.synced-options.game-settings.value-unset": {
+    "message": "选择一个值"
+  },
   "app.settings.synced-options.multiplayer-servers": {
     "message": "同步多人模式服务器列表"
   },
   "app.settings.synced-options.multiplayer-servers.address": {
     "message": "服务器地址"
+  },
+  "app.settings.synced-options.multiplayer-servers.copy-address": {
+    "message": "复制地址"
+  },
+  "app.settings.synced-options.multiplayer-servers.count": {
+    "message": "{count, plural, other {#个服务器}}"
   },
   "app.settings.synced-options.multiplayer-servers.description": {
     "message": "在不同的实例直接同步多人模式服务器列表。"
@@ -1676,17 +2822,47 @@
   "app.settings.synced-options.multiplayer-servers.empty": {
     "message": "当前未同步任何用户添加的服务器。"
   },
+  "app.settings.synced-options.multiplayer-servers.filter-offline": {
+    "message": "离线"
+  },
+  "app.settings.synced-options.multiplayer-servers.filter-online": {
+    "message": "在线"
+  },
+  "app.settings.synced-options.multiplayer-servers.more-options": {
+    "message": "更多服务器设置"
+  },
   "app.settings.synced-options.multiplayer-servers.name": {
     "message": "服务器名称"
   },
+  "app.settings.synced-options.multiplayer-servers.no-results": {
+    "message": "没有符合搜索或筛选条件的服务器。"
+  },
   "app.settings.synced-options.multiplayer-servers.none-synced-yet": {
-    "message": "暂无已同步的服务器"
+    "message": "你尚未同步任何服务器"
+  },
+  "app.settings.synced-options.multiplayer-servers.players-online": {
+    "message": "{count, number}人在线"
+  },
+  "app.settings.synced-options.multiplayer-servers.search": {
+    "message": "搜索{count, number}{count, plural,one {同步服务器}other {同步服务器}}……"
+  },
+  "app.settings.synced-options.multiplayer-servers.status": {
+    "message": "在线人数"
+  },
+  "app.settings.synced-options.resource-packs": {
+    "message": "同步材质包"
+  },
+  "app.settings.synced-options.resource-packs.none-synced-yet": {
+    "message": "你尚未同步任何资源包"
   },
   "app.settings.tabs.appearance": {
     "message": "外观"
   },
   "app.settings.tabs.behavior": {
     "message": "行为"
+  },
+  "app.settings.tabs.features": {
+    "message": "功能"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java 管理"
@@ -1882,6 +3058,99 @@
   },
   "app.survey.title": {
     "message": "嗨，Modrinth用户！"
+  },
+  "app.sync-instances-update.badge": {
+    "message": "本次更新的新功能"
+  },
+  "app.sync-instances-update.choose-source.all-title": {
+    "message": "选择同步源"
+  },
+  "app.sync-instances-update.creative-hotbars": {
+    "message": "同步创造模式快捷栏"
+  },
+  "app.sync-instances-update.load-error": {
+    "message": "无法加载同步设置。请稍后再试。"
+  },
+  "app.sync-instances-update.notification.dismiss": {
+    "message": "忽略"
+  },
+  "app.sync-instances-update.notification.title": {
+    "message": "同步你的实例"
+  },
+  "app.sync-instances-update.notification.view-update": {
+    "message": "查看更新"
+  },
+  "app.sync-instances-update.retry": {
+    "message": "重新尝试"
+  },
+  "app.sync-instances-update.skip": {
+    "message": "跳过"
+  },
+  "app.sync-instances-update.sync-all": {
+    "message": "同步所有"
+  },
+  "app.sync-instances-update.title": {
+    "message": "同步你的实例"
+  },
+  "app.synced-content.change.disable-everywhere": {
+    "message": "在每一处都禁用"
+  },
+  "app.synced-content.change.disable-here": {
+    "message": "在此禁用"
+  },
+  "app.synced-content.change.disable-title": {
+    "message": "禁用内容？"
+  },
+  "app.synced-content.change.enable-everywhere": {
+    "message": "在每一处都启用"
+  },
+  "app.synced-content.change.enable-here": {
+    "message": "在此启用"
+  },
+  "app.synced-content.change.enable-title": {
+    "message": "启用内容？"
+  },
+  "app.synced-content.delete.delete-everywhere": {
+    "message": "在每一处都删除"
+  },
+  "app.synced-content.delete.delete-here": {
+    "message": "在此处删除"
+  },
+  "app.synced-content.delete.mixed": {
+    "message": "未同步的选定内容只会从此实例中删除。"
+  },
+  "app.synced-content.delete.override-description": {
+    "message": "您可以从这个实例或所有同步实例中删除它。 从这个实例中删除它将启用重写，此实例将不再收到这些内容类型的同步更改。"
+  },
+  "app.synced-content.delete.resource-pack-description": {
+    "message": "你可以从这个实例或所有同步实例中删除 {count, plural, other {它们}} 正在删除 {count, plural, other {他们}} 只有此实例将启用重写，此实例将不再收到同步材质包更改。"
+  },
+  "app.synced-content.delete.resource-pack-header": {
+    "message": "{count, plural, other {这些资源包已同步}}"
+  },
+  "app.synced-content.desync.keep": {
+    "message": "保留"
+  },
+  "app.synced-content.desync.remove": {
+    "message": "移除"
+  },
+  "app.synced-content.desync.title": {
+    "message": "取消同步内容"
+  },
+  "app.synced-content.warning.title": {
+    "message": "这个内容已经同步了"
+  },
+  "app.synced-packs.data-packs.title": {
+    "message": "已同步的数据包"
+  },
+  "app.synced-packs.empty": {
+    "message": "从实例内容页面添加包以开始同步。"
+  },
+  "app.synced-packs.load-failed": {
+    "message": "无法加载包。请尝试刷新。"
+  },
+  "app.synced-packs.resource-packs.title": {
+    "message": "同步的资源包"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} 更新已下载完成！立即重启更新，或退出时自动安装。"
@@ -2441,6 +3710,33 @@
   "instance.settings.sharing.revoke-invite.header": {
     "message": "撤销邀请"
   },
+  "instance.settings.synced-options.data-override": {
+    "message": "关闭此覆盖以编辑同步数据。"
+  },
+  "instance.settings.synced-options.data-packs": {
+    "message": "未同步的数据包"
+  },
+  "instance.settings.synced-options.data-packs.description": {
+    "message": "将此实例的数据包与同步包分开。"
+  },
+  "instance.settings.synced-options.data-packs.disabled": {
+    "message": "数据包同步功能已在应用设置中关闭。"
+  },
+  "instance.settings.synced-options.edit-packs": {
+    "message": "编辑已同步的包"
+  },
+  "instance.settings.synced-options.packs-override": {
+    "message": "关闭此覆盖以编辑同步的包。可以在内容选项卡中管理独立包。"
+  },
+  "instance.settings.synced-options.resource-packs": {
+    "message": "取消同步材质包"
+  },
+  "instance.settings.synced-options.resource-packs.description": {
+    "message": "将此实例的资源包与材质包分开。"
+  },
+  "instance.settings.synced-options.resource-packs.disabled": {
+    "message": "材质包同步功能已在应用设置中关闭。"
+  },
   "instance.settings.tabs.behavior.description": {
     "message": "选择在实例页面要显示的标签页。"
   },
@@ -2654,6 +3950,15 @@
   "instance.settings.tabs.synced-options.creative-hotbars.override-description": {
     "message": "让此实例保存的创造模式快捷栏与同步的快捷栏保持独立。"
   },
+  "instance.settings.tabs.synced-options.game-settings": {
+    "message": "未同步的游戏设置"
+  },
+  "instance.settings.tabs.synced-options.game-settings.description": {
+    "message": "保持此实例的options.txt与同步副本分开。"
+  },
+  "instance.settings.tabs.synced-options.game-settings.disabled-in-app": {
+    "message": "游戏设置同步功能已在应用设置中关闭。"
+  },
   "instance.settings.tabs.synced-options.hotbars-conflict.backup-description": {
     "message": "在进行任何变更前，被替换的版本将被自动备份。"
   },
@@ -2842,6 +4147,9 @@
   },
   "instance.worlds.shortcut-creation-failed": {
     "message": "未能创建快捷方式"
+  },
+  "instance.worlds.synced_server": {
+    "message": "跨实例同步"
   },
   "instance.worlds.view_instance": {
     "message": "查看实例"
