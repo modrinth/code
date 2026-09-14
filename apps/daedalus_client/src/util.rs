@@ -71,6 +71,16 @@ pub async fn upload_file_to_bucket(
     let _permit = semaphore.acquire().await?;
     let key = path.clone();
 
+    // A single-part upload's ETag is the MD5 of its content
+    let md5 = format!("{:x}", md5::compute(&bytes));
+
+    if let Ok((head, _)) = BUCKET.head_object(&key).await
+        && head.e_tag.is_some_and(|etag| etag.trim_matches('"') == md5)
+    {
+        tracing::trace!("Skipping unchanged file");
+        return Ok(());
+    }
+
     const RETRIES: i32 = 3;
     for attempt in 1..=(RETRIES + 1) {
         tracing::trace!("Attempting file upload, attempt {attempt}");
@@ -110,6 +120,11 @@ pub async fn upload_url_to_bucket_mirrors(
         .into());
     }
 
+    if bucket_file_matches_mirror(&upload_path, &mirrors, semaphore).await? {
+        tracing::trace!(upload_path, "Skipping unchanged mirror file");
+        return Ok(());
+    }
+
     for (index, mirror) in mirrors.iter().enumerate() {
         let result = upload_url_to_bucket(
             upload_path.clone(),
@@ -141,11 +156,91 @@ pub async fn upload_url_to_bucket(
     Ok(())
 }
 
+// Maven repositories publish the MD5 of each artifact as a `.md5` sidecar, which matches the uploaded object's ETag
+async fn bucket_file_matches_mirror(
+    path: &str,
+    mirrors: &[String],
+    semaphore: &Arc<Semaphore>,
+) -> Result<bool, Error> {
+    let _permit = semaphore.acquire().await?;
+
+    let Ok((head, _)) = BUCKET.head_object(path).await else {
+        return Ok(false);
+    };
+    let Some(etag) = head.e_tag else {
+        return Ok(false);
+    };
+    let Some(md5) = fetch_mirror_checksum(mirrors, "md5").await else {
+        return Ok(false);
+    };
+
+    Ok(etag.trim_matches('"') == md5)
+}
+
+async fn local_file_matches_mirror(
+    path: &str,
+    mirrors: &[String],
+    sha1: Option<&str>,
+    semaphore: &Arc<Semaphore>,
+) -> Result<bool, Error> {
+    let _permit = semaphore.acquire().await?;
+
+    let Ok(existing) = tokio::fs::read(local_output_path(path)?).await else {
+        return Ok(false);
+    };
+    let expected_sha1 = match sha1 {
+        Some(sha1) => Some(sha1.to_string()),
+        None => fetch_mirror_checksum(mirrors, "sha1").await,
+    };
+    let Some(expected_sha1) = expected_sha1 else {
+        return Ok(false);
+    };
+
+    Ok(sha1_async(Bytes::from(existing)).await? == expected_sha1)
+}
+
+async fn fetch_mirror_checksum(
+    mirrors: &[String],
+    extension: &str,
+) -> Option<String> {
+    for mirror in mirrors {
+        let response = REQWEST_CLIENT
+            .get(format!(
+                "{}.{extension}",
+                mirror.replace("http://", "https://")
+            ))
+            .send()
+            .await
+            .and_then(|x| x.error_for_status());
+
+        let Ok(response) = response else {
+            continue;
+        };
+        let Ok(body) = response.text().await else {
+            continue;
+        };
+
+        // Some repositories append the file name after the checksum
+        if let Some(checksum) = body.split_whitespace().next() {
+            return Some(checksum.to_ascii_lowercase());
+        }
+    }
+
+    None
+}
+
 pub async fn write_file_to_local_output(
     path: &str,
     bytes: Bytes,
 ) -> Result<(), Error> {
     let output_path = local_output_path(path)?;
+
+    if tokio::fs::read(&output_path)
+        .await
+        .is_ok_and(|existing| existing == bytes)
+    {
+        return Ok(());
+    }
 
     if let Some(parent) = output_path.parent() {
         tokio::fs::create_dir_all(parent).await?;
@@ -167,6 +262,17 @@ pub async fn write_url_to_local_output_mirrors(
             "No mirrors provided!".to_string(),
         )
         .into());
+    }
+
+    if local_file_matches_mirror(
+        &output_path,
+        &mirrors,
+        sha1.as_deref(),
+        semaphore,
+    )
+    .await?
+    {
+        return Ok(());
     }
 
     for (index, mirror) in mirrors.iter().enumerate() {
