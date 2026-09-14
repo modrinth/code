@@ -1,6 +1,5 @@
 mod description;
 mod network;
-mod nsfw;
 
 use std::collections::HashMap;
 
@@ -340,7 +339,21 @@ pub(super) async fn validate_input(
 
 pub(super) fn globally_blocked(url: &Url) -> bool {
     from_domains(url, GLOBAL_BLOCKS)
-        || url.host_str().is_some_and(nsfw::contains)
+        || url.host_str().is_some_and(is_nsfw_host)
+}
+
+fn is_nsfw_host(host: &str) -> bool {
+	let normalized = host.trim_end_matches('.').to_ascii_lowercase();
+	let mut suffix = normalized.as_str();
+	loop {
+		if blocklist::is_porn(suffix) {
+			return true;
+		}
+		let Some((_, rest)) = suffix.split_once('.') else {
+			return false;
+		};
+		suffix = rest;
+	}
 }
 
 fn host(url: &Url) -> &str {

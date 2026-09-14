@@ -16,13 +16,15 @@ use url::Url;
 use super::{LinkTarget, ProjectNag, ProjectNagSeverity, SOURCE_DOMAINS};
 
 const CACHE_TTL: Duration = Duration::from_secs(600);
+const HTTP_FAILURE_CACHE_TTL: Duration = Duration::from_secs(60);
+const UNVERIFIABLE_CACHE_TTL: Duration = Duration::from_secs(5);
 const MAX_CACHE_ENTRIES: usize = 4096;
 const CHECK_TIMEOUT: Duration = Duration::from_secs(25);
 const RETRY_DELAY: Duration = Duration::from_millis(200);
 const MAX_REDIRECTS: usize = 5;
 const MAX_JSON_BYTES: usize = 65536;
 
-type CacheEntry = (Instant, Arc<OnceCell<Probe>>);
+type CacheEntry = (Instant, Arc<OnceCell<(Instant, Probe)>>);
 static CACHE: LazyLock<Mutex<HashMap<String, CacheEntry>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 static REQUESTS: Semaphore = Semaphore::const_new(16);
@@ -62,6 +64,8 @@ impl Resolve for PublicResolver {
     }
 }
 
+/// Restricts user-supplied link checks to public IPs to prevent SSRF against
+/// local services, private networks, and cloud metadata endpoints.
 fn public_ip(ip: IpAddr) -> bool {
     match ip {
         IpAddr::V4(ip) => {
@@ -127,14 +131,38 @@ impl Probe {
     fn accessible(&self) -> bool {
         self.status.is_some_and(|status| status.is_success())
     }
+
+    fn cache_ttl(&self, json: bool) -> Duration {
+        match self.status {
+            Some(status)
+                if status.is_client_error() || status.is_server_error() =>
+            {
+                HTTP_FAILURE_CACHE_TTL
+            }
+            Some(status)
+                if (status.is_success() || status.is_redirection())
+                    && (!json || self.json.is_some()) =>
+            {
+                CACHE_TTL
+            }
+            _ => UNVERIFIABLE_CACHE_TTL,
+        }
+    }
 }
 
-async fn probe(url: &Url, json: bool, follow_redirects: bool) -> Probe {
-	let key = format!("{json}:{follow_redirects}:{url}");
+async fn get_or_probe(url: &Url, json: bool) -> Probe {
+    let key = format!("{json}:{url}");
+    // Remove expired cache entries and get or create the shared slot for this URL.
     let cell = {
         let mut cache = CACHE.lock().await;
-        cache.retain(|_, (created, _)| created.elapsed() < CACHE_TTL);
-        if cache.len() >= MAX_CACHE_ENTRIES
+        cache.retain(|_, (created, cell)| {
+            cell.get().map_or_else(
+                || created.elapsed() < CACHE_TTL,
+                |(expires, _)| Instant::now() < *expires,
+            )
+        });
+        if !cache.contains_key(&key)
+            && cache.len() >= MAX_CACHE_ENTRIES
             && let Some(oldest) = cache
                 .iter()
                 .min_by_key(|(_, (created, _))| *created)
@@ -148,71 +176,57 @@ async fn probe(url: &Url, json: bool, follow_redirects: bool) -> Probe {
             .1
             .clone()
     };
+
+    // Reuse the cached result or probe url
     cell.get_or_init(|| async {
-        tokio::time::timeout(
-			CHECK_TIMEOUT,
-			probe_with_client(&CLIENT, url.clone(), json, follow_redirects),
-		)
-		.await
-		.unwrap_or_default()
+        let result = tokio::time::timeout(
+            CHECK_TIMEOUT,
+            probe_with_client(&CLIENT, url.clone(), json),
+        )
+        .await
+        .unwrap_or_default();
+        (Instant::now() + result.cache_ttl(json), result)
     })
     .await
+    .1
     .clone()
 }
 
-async fn probe_with_client(
-	client: &Client,
-	mut url: Url,
-	json: bool,
-	follow_redirects: bool,
-) -> Probe {
+// only allow redirect if
+// - hostname stays the same, i.e. github.com → api.github.com is rejected
+// - https is not downgraded to http
+fn redirect_allowed(current: &Url, next: &Url) -> bool {
+    super::host(current).eq_ignore_ascii_case(super::host(next))
+        && !(current.scheme() == "https" && next.scheme() != "https")
+}
+
+fn login_destination(url: &Url) -> bool {
+    matches!(
+        url.path().trim_end_matches('/'),
+        "/login"
+            | "/signin"
+            | "/sign-in"
+            | "/users/sign_in"
+            | "/user/login"
+            | "/session/new"
+    )
+}
+
+async fn probe_with_client(client: &Client, mut url: Url, json: bool) -> Probe {
     let mut result = Probe::default();
     for _ in 0..=MAX_REDIRECTS {
         result.hops.push(url.clone());
         if super::globally_blocked(&url) || !fetchable(&url) {
             return result;
         }
-        let mut response = None;
-        for attempt in 0..4 {
-            if attempt > 0 {
-                tokio::time::sleep(RETRY_DELAY).await;
-            }
-            let Ok(_permit) = REQUESTS.acquire().await else {
-                return result;
-            };
-            let method = if json { Method::GET } else { Method::HEAD };
-            let mut request = client.request(method, url.clone());
-            if json {
-                request = request.header(header::ACCEPT, "application/json");
-            }
-            let mut received = request.send().await;
-            if !json
-                && received.as_ref().is_ok_and(|response| {
-                    matches!(
-                        response.status(),
-                        StatusCode::METHOD_NOT_ALLOWED
-                            | StatusCode::NOT_IMPLEMENTED
-                    )
-                })
-            {
-                received = client.get(url.clone()).send().await;
-            }
-            match received {
-                Ok(received) => {
-                    let done = received.status().is_success()
-                        || received.status().is_redirection();
-                    response = Some(received);
-                    if done {
-                        break;
-                    }
-                }
-                Err(_) => response = None,
-            }
-        }
-        let Some(mut response) = response else {
+
+        let Some(response) = request_with_retries(client, &url, json).await
+        else {
             return result;
         };
-        if follow_redirects && response.status().is_redirection() {
+
+        // probe again for redirect, if allowed
+        if response.status().is_redirection() {
             let Some(next) = response
                 .headers()
                 .get(header::LOCATION)
@@ -221,219 +235,339 @@ async fn probe_with_client(
             else {
                 return result;
             };
-            if result.hops.contains(&next) {
+            if result.hops.contains(&next) || !redirect_allowed(&url, &next) {
                 return result;
             }
             url = next;
-            continue;
+        } else {
+            read_probe_response(&mut result, response, json).await;
+            return result;
         }
-        result.status = Some(response.status());
-        result.content_type = response
-            .headers()
-            .get(header::CONTENT_TYPE)
-            .and_then(|value| value.to_str().ok())
-            .unwrap_or_default()
-            .into();
-        result.disposition = response
-            .headers()
-            .get(header::CONTENT_DISPOSITION)
-            .and_then(|value| value.to_str().ok())
-            .unwrap_or_default()
-            .into();
-        if json && result.accessible() {
-            let mut bytes = Vec::new();
-            while let Ok(Some(chunk)) = response.chunk().await {
-                if bytes.len() + chunk.len() > MAX_JSON_BYTES {
-                    return result;
-                }
-                bytes.extend_from_slice(&chunk);
-            }
-            result.json = serde_json::from_slice(&bytes).ok();
-        }
-        return result;
     }
     result
 }
 
-pub(super) async fn validate(targets: Vec<LinkTarget>) -> Vec<ProjectNag> {
-    let targets = targets
-        .into_iter()
-        .filter(|target| {
-            super::validate_target(target)
-                .is_none_or(|nag| nag.severity != ProjectNagSeverity::Required)
-        })
-        .collect::<Vec<_>>();
-    let mut pending =
-        stream::iter(targets.iter().enumerate().map(
-            |(index, target)| async move { (index, check(target).await) },
-        ))
-        .buffer_unordered(8);
-    let deadline = tokio::time::Instant::now() + CHECK_TIMEOUT;
-    let mut completed = std::collections::HashSet::new();
-    let mut nags = Vec::new();
-    while let Ok(Some((index, found))) =
-        tokio::time::timeout_at(deadline, pending.next()).await
-    {
-        completed.insert(index);
-        nags.extend(found);
-    }
-    for (index, target) in targets.iter().enumerate() {
-        if !completed.contains(&index) {
-            nags.push(target.warning("unverifiable"));
+async fn request_with_retries(
+    client: &Client,
+    url: &Url,
+    json: bool,
+) -> Option<reqwest::Response> {
+    for attempt in 0..4 {
+        if attempt > 0 {
+            tokio::time::sleep(RETRY_DELAY).await;
+        }
+        let Ok(_permit) = REQUESTS.acquire().await else {
+            return None;
+        };
+        let method = if json { Method::GET } else { Method::HEAD };
+        let mut request = client.request(method, url.clone());
+        if json {
+            request = request.header(header::ACCEPT, "application/json");
+        }
+        let mut received = request.send().await;
+        if !json
+            && received.as_ref().is_ok_and(|response| {
+                matches!(
+                    response.status(),
+                    StatusCode::METHOD_NOT_ALLOWED
+                        | StatusCode::NOT_IMPLEMENTED
+                )
+            })
+        {
+            received = client.get(url.clone()).send().await;
+        }
+
+        let should_retry = match &received {
+            Ok(response) => response.status().is_server_error(),
+            Err(_) => true,
+        };
+        if !should_retry || attempt == 3 {
+            return received.ok();
         }
     }
-    nags.sort_by(|a, b| a.details.to_string().cmp(&b.details.to_string()));
-    nags.dedup();
-    nags
+    None
 }
 
-async fn check(target: &LinkTarget) -> Vec<ProjectNag> {
-    let Ok(url) = Url::parse(&target.url) else {
-        return Vec::new();
-    };
-    let observed = probe(&url, false, target.field == "discord").await;
-    let mut nags = Vec::new();
+async fn read_probe_response(
+    result: &mut Probe,
+    mut response: reqwest::Response,
+    json: bool,
+) {
+    result.status = Some(response.status());
+    result.content_type = response
+        .headers()
+        .get(header::CONTENT_TYPE)
+        .and_then(|value| value.to_str().ok())
+        .unwrap_or_default()
+        .into();
+    result.disposition = response
+        .headers()
+        .get(header::CONTENT_DISPOSITION)
+        .and_then(|value| value.to_str().ok())
+        .unwrap_or_default()
+        .into();
+    if json && result.accessible() {
+        let mut bytes = Vec::new();
+        while let Ok(Some(chunk)) = response.chunk().await {
+            if bytes.len() + chunk.len() > MAX_JSON_BYTES {
+                return;
+            }
+            bytes.extend_from_slice(&chunk);
+        }
+        result.json = serde_json::from_slice(&bytes).ok();
+    }
+}
+
+pub(super) async fn validate(targets: Vec<LinkTarget>) -> Vec<ProjectNag> {
+	let targets = targets.into_iter().filter(needs_network_check);
+	let deadline = tokio::time::Instant::now() + CHECK_TIMEOUT;
+	let mut pending = stream::iter(targets)
+		.map(|target| check_with_deadline(target, deadline))
+		.buffer_unordered(8);
+	let mut nags = Vec::new();
+	while let Some(found) = pending.next().await {
+		nags.extend(found);
+	}
+	nags.sort_by(|a, b| a.details.to_string().cmp(&b.details.to_string()));
+	nags.dedup();
+	nags
+}
+
+fn needs_network_check(target: &LinkTarget) -> bool {
+	super::validate_target(target)
+		.is_none_or(|nag| nag.severity != ProjectNagSeverity::Required)
+}
+
+/// Validates a link within the batch deadline, warning if it cannot finish in time.
+async fn check_with_deadline(
+	target: LinkTarget,
+	deadline: tokio::time::Instant,
+) -> Vec<ProjectNag> {
+	if tokio::time::Instant::now() >= deadline {
+		return vec![target.warning("unverifiable")];
+	}
+	match tokio::time::timeout_at(deadline, validate_link(&target)).await {
+		Ok(nags) => nags,
+		Err(_) => vec![target.warning("unverifiable")],
+	}
+}
+
+async fn validate_link(target: &LinkTarget) -> Vec<ProjectNag> {
+	let Ok(url) = Url::parse(&target.url) else {
+		return Vec::new();
+	};
+	let observed = get_or_probe(&url, false).await;
+	if let Some(nag) = check_hops(target, &url, &observed) {
+		return vec![nag];
+	}
+
+	let mut nags = Vec::new();
+	if !observed.accessible() {
+		nags.push(target.warning("unverifiable"));
+	}
+	let final_url = observed.hops.last().unwrap_or(&url);
+	nags.extend(validate_link_field(target, final_url, &observed).await);
+	nags
+}
+
+async fn validate_link_field(
+	target: &LinkTarget,
+	final_url: &Url,
+	observed: &Probe,
+) -> Option<ProjectNag> {
+	match target.field.as_str() {
+		"description" => check_description_response(target, observed),
+		"discord" => check_discord_invite(target, final_url, observed).await,
+		"source" | "issues" | "wiki" if is_github_repository(final_url) => {
+			check_github_repository(target, final_url).await
+		}
+		"source" => {
+			if observed.accessible()
+				&& !super::from_domains(final_url, SOURCE_DOMAINS)
+			{
+				check_source_repository(target, final_url).await
+			} else {
+				None
+			}
+		}
+		_ => {
+			if observed.accessible()
+				&& !super::from_domains(final_url, SOURCE_DOMAINS)
+				&& !super::allowed(&target.field, final_url)
+			{
+				check_repository_field(target, final_url).await
+			} else {
+				None
+			}
+		}
+	}
+}
+
+fn is_github_repository(url: &Url) -> bool {
+	super::from_domains(url, &["github.com"]) && super::repository_path(url)
+}
+
+/// Checks visited URLs for blocked hosts, IP addresses, misplaced links,
+/// downloads, and redirects to login pages.
+fn check_hops(
+    target: &LinkTarget,
+    original_url: &Url,
+    observed: &Probe,
+) -> Option<ProjectNag> {
     for hop in &observed.hops {
         if super::globally_blocked(hop) {
-            return vec![target.required("global_blocklist_match")];
+            return Some(target.required("global_blocklist_match"));
+        }
+        if hop != original_url && login_destination(hop) {
+            return Some(target.warning("unverifiable"));
         }
         if target.field != "description" {
             if !matches!(hop.host(), Some(url::Host::Domain(_))) {
-                return vec![target.required("ip_address")];
+                return Some(target.required("ip_address"));
             }
             if let Some(reason) = super::field_block(&target.field, hop) {
-                return vec![target.required(reason)];
+                return Some(target.required(reason));
             }
         } else if super::description::known_download(hop, target.image) {
-            return vec![target.required("download")];
+            return Some(target.required("download"));
         }
     }
-    if !observed.accessible()
-		&& !observed.status.is_some_and(|status| status.is_redirection())
-	{
-        nags.push(target.warning("unverifiable"));
+    None
+}
+
+/// Checks response headers for downloads and unverifiable description images.
+fn check_description_response(
+    target: &LinkTarget,
+    observed: &Probe,
+) -> Option<ProjectNag> {
+    if !observed.accessible() {
+        return None;
     }
-    let final_url = observed.hops.last().unwrap_or(&url);
-    if target.field == "description" {
-        let mime = observed
-            .content_type
-            .split(';')
-            .next()
-            .unwrap_or_default()
-            .trim();
-        if target.image
-            && observed.accessible()
-            && matches!(mime, "" | "application/octet-stream" | "text/html")
-        {
-            nags.push(target.warning("unverifiable"));
-            return nags;
-        }
-        if observed.accessible()
-            && super::description::response_is_download(
-                &observed.content_type,
-                &observed.disposition,
-                target.image,
-            )
-        {
-            nags.push(target.required("download"));
-        }
-        return nags;
+    let mime = observed
+        .content_type
+        .split(';')
+        .next()
+        .unwrap_or_default()
+        .trim();
+    if target.image
+        && matches!(mime, "" | "application/octet-stream" | "text/html")
+    {
+        return Some(target.warning("unverifiable"));
     }
-    if target.field == "discord" {
-        if let Some(code) = super::discord_code(final_url) {
-            let api = Url::parse(&format!(
-                "https://discord.com/api/v10/invites/{code}"
-            ))
+    if super::description::response_is_download(
+        &observed.content_type,
+        &observed.disposition,
+        target.image,
+    ) {
+        return Some(target.required("download"));
+    }
+    None
+}
+
+/// Checks that the URL identifies an existing, unexpired Discord server invite.
+async fn check_discord_invite(
+    target: &LinkTarget,
+    url: &Url,
+    observed: &Probe,
+) -> Option<ProjectNag> {
+    let Some(code) = super::discord_code(url) else {
+        return observed
+            .accessible()
+            .then(|| target.required("discord_invite"));
+    };
+    let api =
+        Url::parse(&format!("https://discord.com/api/v10/invites/{code}"))
             .unwrap();
-            let invite = probe(&api, true, false).await;
-            let nag = if invite.status == Some(StatusCode::NOT_FOUND)
-                || invite.json.as_ref().is_some_and(|body| {
-                    body.get("guild").is_none()
-                        || body["guild"].is_null()
-                        || body["expires_at"]
-                            .as_str()
-                            .and_then(|date| {
-                                chrono::DateTime::parse_from_rfc3339(date).ok()
-                            })
-                            .is_some_and(|expiry| expiry < chrono::Utc::now())
-                }) {
-                Some(target.required("discord_invite"))
-            } else if invite.json.is_none() {
-                Some(target.warning("unverifiable"))
-            } else {
-                None
-            };
-            if let Some(nag) = nag {
-                nags.push(nag);
-            }
-        } else if observed.accessible() {
-            nags.push(target.required("discord_invite"));
-        }
-    }
-    if matches!(target.field.as_str(), "source" | "issues" | "wiki")
-        && super::from_domains(final_url, &["github.com"])
-        && super::repository_path(final_url)
+    let invite = get_or_probe(&api, true).await;
+    if invite.status == Some(StatusCode::NOT_FOUND)
+        || invite.json.as_ref().is_some_and(|body| {
+            body.get("guild").is_none()
+                || body["guild"].is_null()
+                || body["expires_at"]
+                    .as_str()
+                    .and_then(|date| {
+                        chrono::DateTime::parse_from_rfc3339(date).ok()
+                    })
+                    .is_some_and(|expiry| expiry < chrono::Utc::now())
+        })
     {
-        let parts = super::path(final_url);
-        let api = Url::parse(&format!(
-            "https://api.github.com/repos/{}/{}",
-            parts[0], parts[1]
-        ))
-        .unwrap();
-        let repository = probe(&api, true, false).await;
-        if let Some(body) = repository.json {
-            let enabled = match target.field.as_str() {
-                "issues" => body["has_issues"].as_bool(),
-                "wiki" => body["has_wiki"].as_bool(),
-                _ => body["private"].as_bool().map(|private| !private),
-            };
-            match enabled {
-                Some(false) => nags.push(target.required("repository_feature")),
-                None => nags.push(target.warning("unverifiable")),
-                _ => {}
-            }
-        } else {
-            nags.push(target.warning("unverifiable"));
-        }
+        Some(target.required("discord_invite"))
+    } else if invite.json.is_none() {
+        Some(target.warning("unverifiable"))
+    } else {
+        None
     }
-    if target.field == "source"
-        && !super::from_domains(final_url, SOURCE_DOMAINS)
+}
+
+/// Checks GitHub repository visibility for source links, or whether issues/wiki
+/// are enabled for links in those fields.
+async fn check_github_repository(
+    target: &LinkTarget,
+    url: &Url,
+) -> Option<ProjectNag> {
+    let parts = super::path(url);
+    let api = Url::parse(&format!(
+        "https://api.github.com/repos/{}/{}",
+        parts[0], parts[1]
+    ))
+    .unwrap();
+    let repository = get_or_probe(&api, true).await;
+    let Some(body) = repository.json else {
+        return Some(target.warning("unverifiable"));
+    };
+    let enabled = match target.field.as_str() {
+        "issues" => body["has_issues"].as_bool(),
+        "wiki" => body["has_wiki"].as_bool(),
+        _ => body["private"].as_bool().map(|private| !private),
+    };
+    match enabled {
+        Some(false) => Some(target.required("repository_feature")),
+        None => Some(target.warning("unverifiable")),
+        Some(true) => None,
+    }
+}
+
+/// Checks an unrecognized source host's Forgejo-style API for a public repository.
+async fn check_source_repository(
+    target: &LinkTarget,
+    url: &Url,
+) -> Option<ProjectNag> {
+    let Some(api) = forgejo_api(url) else {
+        return Some(target.required("source_repository"));
+    };
+    let repository = get_or_probe(&api, true).await;
+    if repository.status == Some(StatusCode::NOT_FOUND)
+        || repository.json.as_ref().is_some_and(|body| {
+            body["full_name"].as_str().is_none()
+                || body["clone_url"].as_str().is_none()
+                || body["private"].as_bool() != Some(false)
+        })
     {
-        if !observed.accessible() {
-            return nags;
-        }
-        if let Some(api) = forgejo_api(final_url) {
-            let repository = probe(&api, true, false).await;
-            if repository.status == Some(StatusCode::NOT_FOUND)
-                || repository.json.as_ref().is_some_and(|body| {
-                    body["full_name"].as_str().is_none()
-                        || body["clone_url"].as_str().is_none()
-                        || body["private"].as_bool() != Some(false)
-                })
-            {
-                nags.push(target.required("source_repository"));
-            } else if repository.json.is_none() {
-                nags.push(target.warning("unverifiable"));
-            }
-        } else {
-            nags.push(target.required("source_repository"));
-        }
+        Some(target.required("source_repository"))
+    } else if repository.json.is_none() {
+        Some(target.warning("unverifiable"))
+    } else {
+        None
     }
-    if !matches!(target.field.as_str(), "source" | "discord")
-        && observed.accessible()
-        && !super::from_domains(final_url, SOURCE_DOMAINS)
-        && !super::allowed(&target.field, final_url)
-        && let Some(api) = forgejo_api(final_url)
-        && let Some(repository) = probe(&api, true, false).await.json
-        && repository["full_name"].is_string()
+}
+
+/// Detects Forgejo-style repository links in the wrong field, allowing matching
+/// issues and wiki sections in their respective fields.
+async fn check_repository_field(
+    target: &LinkTarget,
+    url: &Url,
+) -> Option<ProjectNag> {
+    let api = forgejo_api(url)?;
+    let repository = get_or_probe(&api, true).await.json?;
+    if repository["full_name"].is_string()
         && repository["clone_url"].is_string()
         && !(matches!(target.field.as_str(), "wiki" | "issues")
-            && super::repo_section(final_url, &target.field))
+            && super::repo_section(url, &target.field))
     {
-        nags.push(target.required("wrong_field"));
+        Some(target.required("wrong_field"))
+    } else {
+        None
     }
-    nags.dedup();
-    nags
 }
 
 fn forgejo_api(url: &Url) -> Option<Url> {
@@ -496,24 +630,20 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn retries_three_times_and_preserves_final_404() {
+    async fn preserves_404_without_retrying() {
         let (client, task) = mock_client(vec![
-			"HTTP/1.1 404 Not Found\r\nConnection: close\r\nContent-Length: 0\r\n\r\n";
-			4
+			"HTTP/1.1 404 Not Found\r\nConnection: close\r\nContent-Length: 0\r\n\r\n",
 		])
 		.await;
-        let start = Instant::now();
         let result = probe_with_client(
             &client,
             Url::parse("http://checks.modrinth.com/page").unwrap(),
             false,
-			false,
         )
         .await;
         assert_eq!(result.status, Some(StatusCode::NOT_FOUND));
         assert!(!result.accessible());
-        assert_eq!(task.await.unwrap(), vec!["HEAD"; 4]);
-        assert!(start.elapsed() >= RETRY_DELAY * 3);
+        assert_eq!(task.await.unwrap(), vec!["HEAD"]);
     }
 
     #[tokio::test]
@@ -526,7 +656,6 @@ mod tests {
             &client,
             Url::parse("http://checks.modrinth.com/file").unwrap(),
             false,
-			false,
         )
         .await;
         assert!(result.accessible());
@@ -536,29 +665,59 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn prohibited_redirect_is_recorded_without_being_fetched() {
-        let (client, task) = mock_client(vec!["HTTP/1.1 302 Found\r\nLocation: https://bit.ly/prohibited\r\nConnection: close\r\nContent-Length: 0\r\n\r\n"]).await;
-        let result = probe_with_client(
-            &client,
-            Url::parse("http://checks.modrinth.com/invite").unwrap(),
-            false,
-			true,
-        )
-        .await;
-        assert_eq!(result.hops.len(), 2);
-        assert!(super::super::globally_blocked(result.hops.last().unwrap()));
+    async fn same_hostname_redirect_reaches_final_page() {
+        let (client, task) = mock_client(vec![
+			"HTTP/1.1 301 Moved Permanently\r\nLocation: /owner/renamed/wiki\r\nConnection: close\r\nContent-Length: 0\r\n\r\n",
+			"HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: 0\r\n\r\n",
+		]).await;
+        let url =
+            Url::parse("http://checks.modrinth.com/owner/old/wiki").unwrap();
+        let result = probe_with_client(&client, url, false).await;
+        assert!(result.accessible());
+        assert_eq!(result.hops.last().unwrap().path(), "/owner/renamed/wiki");
+        assert_eq!(task.await.unwrap(), vec!["HEAD", "HEAD"]);
+    }
+
+    #[tokio::test]
+    async fn cross_hostname_redirect_is_not_fetched_or_verified() {
+        let (client, task) = mock_client(vec!["HTTP/1.1 302 Found\r\nLocation: https://other.modrinth.com/page\r\nConnection: close\r\nContent-Length: 0\r\n\r\n"]).await;
+        let url = Url::parse("http://checks.modrinth.com/page").unwrap();
+        let result = probe_with_client(&client, url.clone(), false).await;
+        assert!(!result.accessible());
+        assert_eq!(result.hops, vec![url]);
         assert_eq!(task.await.unwrap(), vec!["HEAD"]);
     }
 
-	#[tokio::test]
-	async fn redirects_are_not_followed_when_disabled() {
-		let (client, task) = mock_client(vec!["HTTP/1.1 302 Found\r\nLocation: https://bit.ly/prohibited\r\nConnection: close\r\nContent-Length: 0\r\n\r\n"]).await;
-		let url = Url::parse("http://checks.modrinth.com/sponsors/creator").unwrap();
-		let result = probe_with_client(&client, url.clone(), false, false).await;
-		assert_eq!(result.status, Some(StatusCode::FOUND));
-		assert_eq!(result.hops, vec![url]);
-		assert_eq!(task.await.unwrap(), vec!["HEAD"]);
-	}
+    #[test]
+    fn redirect_policy_preserves_hostname_and_https() {
+        let url = Url::parse("https://github.com/owner/old/wiki").unwrap();
+        for destination in [
+            "http://github.com/owner/new/wiki",
+            "https://api.github.com/owner/new/wiki",
+            "https://github.com.evil.org/owner/new/wiki",
+        ] {
+            assert!(!redirect_allowed(&url, &Url::parse(destination).unwrap()));
+        }
+        assert!(redirect_allowed(
+            &url,
+            &url.join("/owner/new/wiki").unwrap()
+        ));
+    }
+
+    #[test]
+    fn redirected_wiki_homepage_is_wrong_field() {
+        let url = Url::parse("https://github.com/owner/repository").unwrap();
+        assert_eq!(
+            super::super::field_block("wiki", &url),
+            Some("wrong_field")
+        );
+        assert!(login_destination(
+            &url.join("/login?return_to=/owner/repository/wiki").unwrap()
+        ));
+        assert!(!login_destination(
+            &url.join("/owner/repository/wiki/Login").unwrap()
+        ));
+    }
 
     #[test]
     fn network_requests_only_connect_to_public_addresses() {

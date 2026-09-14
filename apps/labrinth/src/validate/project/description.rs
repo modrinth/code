@@ -5,11 +5,10 @@ use serde_json::json;
 use self::markdown::DescriptionMarkdown;
 use super::text::{
     ProfanityKind, contains_description_spam, extract_description_blocks,
-    extract_description_text, find_banned_description_link,
-    has_image_without_alt_text, has_sufficient_english_blocks,
-    is_confidently_non_english_short_text, js_string_length,
-    non_standard_text_ratio, normalize_project_field_text, profanity_matches,
-    project_requires_english, project_text_similarity,
+    extract_description_text, has_image_without_alt_text,
+    has_sufficient_english_blocks, is_confidently_non_english_short_text,
+    js_string_length, non_standard_text_ratio, normalize_project_field_text,
+    profanity_matches, project_requires_english, project_text_similarity,
 };
 use super::{ProjectNag, ProjectNagKind, ProjectNagSeverity};
 
