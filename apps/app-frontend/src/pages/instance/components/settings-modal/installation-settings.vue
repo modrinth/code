@@ -465,7 +465,7 @@ provideInstallationSettings({
 
 	updaterModalProps: computed(() => ({
 		isApp: true,
-		currentVersionId: modpackInfo.value?.update_version_id ?? instance.value.link?.version_id ?? '',
+		currentVersionId: instance.value.link?.version_id ?? '',
 		projectIconUrl: modpackInfo.value?.project?.icon_url,
 		projectName: modpackInfo.value?.project?.title ?? 'Modpack',
 		currentGameVersion: instance.value.game_version,
