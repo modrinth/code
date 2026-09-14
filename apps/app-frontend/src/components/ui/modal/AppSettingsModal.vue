@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import {
 	CoffeeIcon,
-	GaugeIcon,
 	HeartHandshakeIcon,
 	LanguagesIcon,
 	LightBulbIcon,
+	MicrochipIcon,
 	ModrinthIcon,
 	PaintbrushIcon,
 	RefreshCwIcon,
@@ -167,7 +167,7 @@ const tabs = [
 			defaultMessage: 'Resource management',
 		}),
 		category: tabCategories.instances,
-		icon: GaugeIcon,
+		icon: MicrochipIcon,
 		content: ResourceManagementSettings,
 	},
 ]

@@ -452,7 +452,15 @@ const mutation = useMutation({
 })
 
 async function setExcluded(option: InstanceSyncedOption, nextExcluded: boolean) {
-	if (!isSyncedOptionAvailable(option)) return
+	if (
+		!isSyncedOptionAvailable(option) ||
+		!overviewQuery.data.value ||
+		disabledReason(option) ||
+		previewingOption.value !== null ||
+		mutation.isPending.value
+	) {
+		return
+	}
 	const enabled = !nextExcluded
 	if (!enabled || option !== 'creative_hotbars') {
 		mutation.mutate({ option, enabled })
@@ -654,8 +662,9 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 							:model-value="excluded(row.option)"
 							:disabled="
 								previewingOption !== null ||
-								overviewQuery.isPending.value ||
-								(!!disabledReason(row.option) && !enabled(row.option))
+								!overviewQuery.data.value ||
+								mutation.isPending.value ||
+								!!disabledReason(row.option)
 							"
 							@update:model-value="(excluded) => setExcluded(row.option, excluded)"
 						/>

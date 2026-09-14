@@ -2816,6 +2816,9 @@
   "app.settings.resource-management.store.cache-limit.unit": {
     "message": "GiB"
   },
+  "app.settings.resource-management.store.calculating": {
+    "message": "Calculating"
+  },
   "app.settings.resource-management.store.clear": {
     "message": "Clear unused"
   },
@@ -2865,7 +2868,7 @@
     "message": "Unique"
   },
   "app.settings.resource-management.store.unused.label": {
-    "message": "Unused"
+    "message": "Orphaned"
   },
   "app.settings.resource-management.store.verification-result": {
     "message": "Checked {checked, plural, one {# file} other {# files}} and made {repaired, plural, one {# repair} other {# repairs}}."

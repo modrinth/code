@@ -6,11 +6,13 @@ import {
 	defineMessages,
 	injectNotificationManager,
 	Input,
+	ProgressBar,
 	useFormatBytes,
 	useVIntl,
 } from '@modrinth/ui'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { invoke } from '@tauri-apps/api/core'
-import { computed, inject, ref } from 'vue'
+import { computed, inject, ref, watch } from 'vue'
 
 import {
 	storeVerificationReport as report,
@@ -35,24 +37,54 @@ const settingsModal = inject(appSettingsModalContextKey, null)
 const { formatMessage } = useVIntl()
 const formatBytes = useFormatBytes()
 const gibibyte = 1024 ** 3
-const storeUsage = ref(
-	await invoke<StoreUsage>('plugin:settings|store_usage').catch((error) => {
-		handleError(error)
-		return null
-	}),
+const queryClient = useQueryClient()
+const storeUsageKey = ['content-store', 'usage'] as const
+const {
+	data: storeUsage,
+	isPending: calculating,
+	error: storeUsageError,
+} = useQuery({
+	queryKey: storeUsageKey,
+	queryFn: async () => {
+		const [usage] = await Promise.all([
+			invoke<StoreUsage>('plugin:settings|store_usage'),
+			new Promise<void>((resolve) => setTimeout(resolve, 1000)),
+		])
+		return usage
+	},
+})
+const cacheLimitGiB = ref<number | undefined>()
+watch(
+	() => storeUsage.value?.cache_limit_bytes,
+	(bytes) => {
+		cacheLimitGiB.value = (bytes ?? 5 * gibibyte) / gibibyte
+	},
+	{ immediate: true },
 )
-const activeAction = ref<'clear' | 'repair' | 'limit' | null>(null)
-const clearedBytes = ref<number | null>(null)
-const cacheLimitGiB = ref<number | undefined>(
-	(storeUsage.value?.cache_limit_bytes ?? 5 * gibibyte) / gibibyte,
+watch(storeUsageError, (error) => {
+	if (error) handleError(error)
+})
+const runningProcessesKey = ['processes', 'running'] as const
+const { data: runningProcesses, error: runningProcessesError } = useQuery({
+	queryKey: runningProcessesKey,
+	queryFn: getRunningProcesses,
+})
+const hasRunningInstances = computed(() => (runningProcesses.value?.length ?? 0) > 0)
+watch(runningProcessesError, (error) => {
+	if (error) handleError(error)
+})
+useAppEvent('process', () => queryClient.invalidateQueries({ queryKey: runningProcessesKey }))
+const busy = computed(
+	() =>
+		calculating.value ||
+		actionMutation.isPending.value ||
+		cacheLimitMutation.isPending.value ||
+		verifyingStore.value,
 )
-const busy = computed(() => activeAction.value !== null || verifyingStore.value)
-const hasRunningInstances = ref(false)
-async function refreshRunningInstances() {
-	hasRunningInstances.value = (await getRunningProcesses()).length > 0
-}
-useAppEvent('process', () => refreshRunningInstances().catch(handleError))
-await refreshRunningInstances().catch(handleError)
+const clearing = computed(
+	() => actionMutation.isPending.value && actionMutation.variables.value === 'clear',
+)
+const clearedBytes = computed(() => actionMutation.data.value ?? null)
 const totalBytes = computed(
 	() => (storeUsage.value?.unique_bytes ?? 0) + (storeUsage.value?.private_copy_bytes ?? 0),
 )
@@ -65,6 +97,10 @@ const messages = defineMessages({
 	description: {
 		id: 'app.settings.resource-management.store.description',
 		defaultMessage: 'Save space by reusing game installs, mods and packs across your instances.',
+	},
+	calculating: {
+		id: 'app.settings.resource-management.store.calculating',
+		defaultMessage: 'Calculating',
 	},
 	stored: {
 		id: 'app.settings.resource-management.store.total',
@@ -80,7 +116,7 @@ const messages = defineMessages({
 	},
 	unused: {
 		id: 'app.settings.resource-management.store.unused.label',
-		defaultMessage: 'Unused',
+		defaultMessage: 'Orphaned',
 	},
 	empty: {
 		id: 'app.settings.resource-management.store.empty',
@@ -179,50 +215,56 @@ const categories = computed(() => {
 	]
 })
 
-async function runAction(action: 'clear' | 'repair') {
-	if (busy.value) return
-	activeAction.value = action
-	report.value = null
-	clearedBytes.value = null
-	try {
+const actionMutation = useMutation({
+	mutationFn: async (action: 'clear' | 'repair') => {
 		if (action === 'repair') {
 			const verification = verifyStore()
 			settingsModal?.close()
 			await verification
-		} else {
-			clearedBytes.value = await invoke<number>('plugin:settings|store_cleanup')
+			return null
 		}
-		storeUsage.value = await invoke<StoreUsage>('plugin:settings|store_usage')
-	} catch (error) {
-		handleError(error)
-	} finally {
-		activeAction.value = null
-	}
+		return invoke<number>('plugin:settings|store_cleanup')
+	},
+	onMutate: () => {
+		report.value = null
+	},
+	onSuccess: () => queryClient.invalidateQueries({ queryKey: storeUsageKey }),
+	onError: handleError,
+})
+
+function runAction(action: 'clear' | 'repair') {
+	if (busy.value) return
+	actionMutation.reset()
+	actionMutation.mutate(action)
 }
 
-async function saveCacheLimit() {
+const cacheLimitMutation = useMutation({
+	mutationFn: (bytes: number) => invoke('plugin:settings|store_set_cache_limit', { bytes }),
+	onSuccess: (_result, bytes) => {
+		queryClient.setQueryData<StoreUsage>(storeUsageKey, (usage) =>
+			usage ? { ...usage, cache_limit_bytes: bytes } : usage,
+		)
+	},
+	onError: (error) => {
+		cacheLimitGiB.value = (storeUsage.value?.cache_limit_bytes ?? 5 * gibibyte) / gibibyte
+		handleError(error)
+	},
+})
+
+function saveCacheLimit() {
 	if (busy.value) return
 	const bytes = Math.round(Number(cacheLimitGiB.value) * gibibyte)
 	if (!Number.isSafeInteger(bytes) || bytes < 0) {
 		cacheLimitGiB.value = (storeUsage.value?.cache_limit_bytes ?? 5 * gibibyte) / gibibyte
 		return
 	}
-	activeAction.value = 'limit'
-	try {
-		await invoke('plugin:settings|store_set_cache_limit', { bytes })
-		if (storeUsage.value) storeUsage.value.cache_limit_bytes = bytes
-	} catch (error) {
-		cacheLimitGiB.value = (storeUsage.value?.cache_limit_bytes ?? 5 * gibibyte) / gibibyte
-		handleError(error)
-	} finally {
-		activeAction.value = null
-	}
+	cacheLimitMutation.mutate(bytes)
 }
 </script>
 
 <template>
 	<section
-		v-if="storeUsage"
+		v-if="calculating || storeUsage"
 		class="@container flex flex-col gap-4"
 		aria-labelledby="content-storage-title"
 	>
@@ -231,15 +273,31 @@ async function saveCacheLimit() {
 				<h2 id="content-storage-title" class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.title) }}
 				</h2>
-				<span class="font-semibold tabular-nums text-contrast">
-					{{ formatMessage(messages.stored, { size: formatBytes(totalBytes, 1) }) }}
+				<span class="font-semibold tabular-nums text-contrast" aria-live="polite">
+					{{
+						calculating
+							? formatMessage(messages.calculating)
+							: formatMessage(messages.stored, { size: formatBytes(totalBytes, 1) })
+					}}
 				</span>
 			</div>
 			<p class="m-0 text-secondary">{{ formatMessage(messages.description) }}</p>
 		</div>
 
 		<div class="flex flex-col gap-3">
-			<div aria-hidden="true" class="flex h-3.5 gap-0.5 overflow-hidden rounded-full bg-surface-4">
+			<ProgressBar
+				v-if="calculating"
+				:progress="0"
+				waiting
+				full-width
+				class="[&>div:last-child]:h-3.5 [&>div:last-child]:bg-surface-4 [&>div:last-child>div]:bg-[--color-base]"
+				aria-hidden="true"
+			/>
+			<div
+				v-else
+				aria-hidden="true"
+				class="flex h-3.5 gap-0.5 overflow-hidden rounded-full bg-surface-4"
+			>
 				<template v-for="category in categories" :key="category.id">
 					<div
 						v-if="category.bytes > 0"
@@ -249,7 +307,7 @@ async function saveCacheLimit() {
 					/>
 				</template>
 			</div>
-			<dl class="m-0 grid grid-cols-1 gap-3 @lg:grid-cols-3 @lg:gap-4">
+			<dl v-if="storeUsage" class="m-0 grid grid-cols-1 gap-3 @lg:grid-cols-3 @lg:gap-4">
 				<div
 					v-for="category in categories"
 					:key="category.id"
@@ -264,7 +322,7 @@ async function saveCacheLimit() {
 					</dd>
 				</div>
 			</dl>
-			<p v-if="totalBytes === 0" class="m-0 text-sm text-secondary">
+			<p v-if="storeUsage && totalBytes === 0" class="m-0 text-sm text-secondary">
 				{{ formatMessage(messages.empty) }}
 			</p>
 		</div>
@@ -278,7 +336,7 @@ async function saveCacheLimit() {
 				"
 				:type="hasRunningInstances ? 'colored' : 'base'"
 				:color="hasRunningInstances ? 'orange' : undefined"
-				:disabled="busy || storeUsage.object_count === 0"
+				:disabled="busy || !storeUsage || storeUsage.object_count === 0"
 				:loading="verifyingStore"
 				@click="runAction('repair')"
 			>
@@ -294,17 +352,13 @@ async function saveCacheLimit() {
 				v-tooltip="formatMessage(messages.clearDescription)"
 				type="colored"
 				color="red"
-				:disabled="busy || storeUsage.unused_cache_bytes === 0"
-				:loading="activeAction === 'clear'"
+				:disabled="busy || !storeUsage || storeUsage.unused_cache_bytes === 0"
+				:loading="clearing"
 				@click="runAction('clear')"
 			>
-				<LoaderCircleIcon
-					v-if="activeAction === 'clear'"
-					class="motion-safe:animate-spin"
-					aria-hidden="true"
-				/>
+				<LoaderCircleIcon v-if="clearing" class="motion-safe:animate-spin" aria-hidden="true" />
 				<TrashIcon v-else aria-hidden="true" />
-				{{ formatMessage(activeAction === 'clear' ? messages.clearing : messages.clear) }}
+				{{ formatMessage(clearing ? messages.clearing : messages.clear) }}
 			</Button>
 		</div>
 
