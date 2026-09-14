@@ -4,12 +4,19 @@ name = "theseus"
 version = "1.0.0-local"
 edition.workspace = true
 
+[[bin]]
+name = "export_app_events"
+required-features = ["export-ts"]
+
 [dependencies]
 ariadne = { workspace = true }
 async-minecraft-ping = { workspace = true, features = ["srv"] }
 async-recursion = { workspace = true }
 async-trait = { workspace = true }
-async-tungstenite = { workspace = true, features = ["tokio-runtime", "tokio-rustls-webpki-roots"] }
+async-tungstenite = { workspace = true, features = [
+  "tokio-runtime",
+  "tokio-rustls-webpki-roots"
+] }
 async-walkdir = { workspace = true }
 async_zip = { workspace = true, features = [
   "bzip2",
@@ -133,7 +140,10 @@ dunce = { workspace = true }
 cidre = { workspace = true, features = ["blocks", "nw"] }
 
 [target."cfg(windows)".dependencies]
-windows = { workspace = true, features = ["Networking_Connectivity", "Win32_Storage_FileSystem"] }
+windows = { workspace = true, features = [
+  "Networking_Connectivity",
+  "Win32_Storage_FileSystem"
+] }
 windows-core = { workspace = true }
 winreg = { workspace = true }
 
@@ -141,10 +151,6 @@ winreg = { workspace = true }
 cli = ["dep:indicatif"]
 export-ts = ["dep:postcard-bindgen", "dep:ts-rs"]
 tauri = ["dep:postcard", "dep:tauri"]
-
-[[bin]]
-name = "export_app_events"
-required-features = ["export-ts"]
 
 [lints]
 workspace = true
