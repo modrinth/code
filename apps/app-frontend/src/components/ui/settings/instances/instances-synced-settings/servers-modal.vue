@@ -33,10 +33,12 @@ import { remove_synced_server, type SyncedServer, update_synced_server } from '@
 import { syncedOptionsKeys, syncedServersQueryOptions } from '@/helpers/synced-options'
 import { copyToClipboard } from '@/helpers/utils'
 import {
+	getWorldDisplayName,
 	refreshServerData,
 	refreshServers,
 	type ServerData,
 	type ServerWorld,
+	worldNameMatchesQuery,
 } from '@/helpers/worlds'
 
 const { handleError } = injectNotificationManager()
@@ -172,7 +174,7 @@ const syncedServerFilterOptions = computed(() => [
 const syncedServerRows = computed<SyncedServerTableRow[]>(() =>
 	syncedServers.value.map((server) => ({
 		...server,
-		server: server.name,
+		server: getWorldDisplayName(server),
 		status: serverData.value[server.address]?.status ? 'online' : 'offline',
 		version: serverData.value[server.address]?.status?.version?.name ?? '',
 		actions: null,
@@ -191,7 +193,7 @@ const filteredSyncedServerRows = computed(() => {
 	if (!search) return statusFilteredSyncedServerRows.value
 	return statusFilteredSyncedServerRows.value.filter(
 		(server) =>
-			server.name.toLocaleLowerCase().includes(search) ||
+			worldNameMatchesQuery(server.name, search) ||
 			server.address.toLocaleLowerCase().includes(search),
 	)
 })
@@ -367,14 +369,16 @@ defineExpose({ show })
 							<div class="flex min-w-0 items-center gap-3">
 								<Avatar
 									:src="serverData[row.address]?.status?.favicon"
-									:alt="row.name"
+									:alt="getWorldDisplayName(row)"
 									:tint-by="row.address"
 									size="32px"
 									no-shadow
 									class="shrink-0 !rounded-lg"
 								/>
 								<div class="flex min-w-0 flex-col">
-									<span class="truncate font-semibold text-contrast">{{ row.name }}</span>
+									<span class="truncate font-semibold text-contrast">
+										{{ getWorldDisplayName(row) }}
+									</span>
 									<span class="truncate text-sm text-secondary">{{ row.address }}</span>
 								</div>
 							</div>
