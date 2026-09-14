@@ -69,10 +69,7 @@
 			</div>
 
 			<div class="relative flex min-h-0 flex-col bg-surface-2">
-				<div
-					ref="friendsScrollContainer"
-					class="min-h-0 overflow-y-auto px-6 py-4"
-				>
+				<div ref="friendsScrollContainer" class="min-h-0 overflow-y-auto px-6 py-4">
 					<div class="mb-2 text-base font-semibold text-primary">
 						{{ friendsHeading }}
 					</div>
