@@ -6,10 +6,10 @@ use regex::Regex;
 use unicode_segmentation::UnicodeSegmentation;
 
 static HTML_HEADER: LazyLock<Regex> = LazyLock::new(|| {
-	Regex::new(r"(?is)<h[1-6]\b[^>]*>(.*?)</h[1-6]>").unwrap()
+    Regex::new(r"(?is)<h[1-6]\b[^>]*>(.*?)</h[1-6]>").unwrap()
 });
 static ADJACENT_HTML_HEADERS: LazyLock<Regex> =
-	LazyLock::new(|| Regex::new(r"(?is)</h([1-6])>\s*<h([1-6])\b").unwrap());
+    LazyLock::new(|| Regex::new(r"(?is)</h([1-6])>\s*<h([1-6])\b").unwrap());
 static TRAILING_HTML_HEADER: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"(?is)</h[1-6]>\s*(?:</[a-z][^>]*>\s*)*$").unwrap()
 });
@@ -129,7 +129,7 @@ impl<'a> DescriptionMarkdown<'a> {
                 let [previous, current] = headings else {
                     return false;
                 };
-				previous.level == current.level
+                previous.level == current.level
                     && self.markdown[previous.range.end..current.range.start]
                         .trim()
                         .is_empty()
@@ -242,37 +242,43 @@ image: "![](/missing-alt.png)"
         );
     }
 
-	#[test]
-	fn all_heading_levels_are_validated() {
-		for level in 1..=6 {
-			let prefix = "#".repeat(level);
-			let long_text = "heading ".repeat(12);
-			for (long_header, adjacent_headers, separated_headers) in [
-				(
-					format!("{prefix} {long_text}"),
-					format!("{prefix} First\n\n{prefix} Second"),
-					format!("{prefix} First\n\n```yaml\n# comment\n```\n\n{prefix} Second"),
-				),
-				(
-					format!("<h{level}>{long_text}</h{level}>"),
-					format!("<h{level}>First</h{level}>\n\n<h{level}>Second</h{level}>"),
-					format!("<h{level}>First</h{level}>\n\n```yaml\n# comment\n```\n\n<h{level}>Second</h{level}>"),
-				),
-			] {
-				let markdown = DescriptionMarkdown::parse(&long_header);
-				assert_eq!(markdown.long_header_count(), 1, "{long_header}");
-				assert!(markdown.ends_with_header(), "{long_header}");
-				assert!(
-					DescriptionMarkdown::parse(&adjacent_headers)
-						.has_adjacent_same_level_headers(),
-					"{adjacent_headers}"
-				);
-				assert!(
-					!DescriptionMarkdown::parse(&separated_headers)
-						.has_adjacent_same_level_headers(),
-					"{separated_headers}"
-				);
-			}
-		}
-	}
+    #[test]
+    fn all_heading_levels_are_validated() {
+        for level in 1..=6 {
+            let prefix = "#".repeat(level);
+            let long_text = "heading ".repeat(12);
+            for (long_header, adjacent_headers, separated_headers) in [
+                (
+                    format!("{prefix} {long_text}"),
+                    format!("{prefix} First\n\n{prefix} Second"),
+                    format!(
+                        "{prefix} First\n\n```yaml\n# comment\n```\n\n{prefix} Second"
+                    ),
+                ),
+                (
+                    format!("<h{level}>{long_text}</h{level}>"),
+                    format!(
+                        "<h{level}>First</h{level}>\n\n<h{level}>Second</h{level}>"
+                    ),
+                    format!(
+                        "<h{level}>First</h{level}>\n\n```yaml\n# comment\n```\n\n<h{level}>Second</h{level}>"
+                    ),
+                ),
+            ] {
+                let markdown = DescriptionMarkdown::parse(&long_header);
+                assert_eq!(markdown.long_header_count(), 1, "{long_header}");
+                assert!(markdown.ends_with_header(), "{long_header}");
+                assert!(
+                    DescriptionMarkdown::parse(&adjacent_headers)
+                        .has_adjacent_same_level_headers(),
+                    "{adjacent_headers}"
+                );
+                assert!(
+                    !DescriptionMarkdown::parse(&separated_headers)
+                        .has_adjacent_same_level_headers(),
+                    "{separated_headers}"
+                );
+            }
+        }
+    }
 }
