@@ -1,6 +1,6 @@
 <template>
-	<Teleport to="body">
-		<FloatingActionBar :shown="props.isVisible">
+	<Teleport v-if="!saveBanner || saveBanner.target.value" :to="saveBanner?.target.value ?? 'body'">
+		<FloatingActionBar :shown="props.isVisible" :inline="!!saveBanner">
 			<p class="m-0 font-semibold text-sm md:text-base">You have unsaved changes.</p>
 			<div class="ml-auto flex gap-2">
 				<Button type="quiet" :disabled="props.isUpdating" @click="props.reset"
@@ -33,10 +33,11 @@
 
 <script setup lang="ts">
 import { HistoryIcon, SaveIcon, SpinnerIcon } from '@modrinth/assets'
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, watch } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
+import { injectServerSettings } from '#ui/layouts/shared/server-settings/providers/server-settings'
 import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
 
 const props = defineProps<{
@@ -47,6 +48,20 @@ const props = defineProps<{
 	isVisible: boolean
 	serverId: string
 }>()
+
+const saveBanner = injectServerSettings(null)?.saveBanner
+
+watch(
+	() => props.isVisible,
+	(shown) => {
+		if (saveBanner) saveBanner.shown.value = shown
+	},
+	{ immediate: true },
+)
+
+onBeforeUnmount(() => {
+	if (saveBanner) saveBanner.shown.value = false
+})
 
 const client = injectModrinthClient()
 
