@@ -13,10 +13,7 @@ ariadne = { workspace = true }
 async-minecraft-ping = { workspace = true, features = ["srv"] }
 async-recursion = { workspace = true }
 async-trait = { workspace = true }
-async-tungstenite = { workspace = true, features = [
-  "tokio-runtime",
-  "tokio-rustls-webpki-roots"
-] }
+async-tungstenite = { workspace = true, features = ["tokio-runtime", "tokio-rustls-webpki-roots"] }
 async-walkdir = { workspace = true }
 async_zip = { workspace = true, features = [
   "bzip2",
@@ -140,10 +137,7 @@ dunce = { workspace = true }
 cidre = { workspace = true, features = ["blocks", "nw"] }
 
 [target."cfg(windows)".dependencies]
-windows = { workspace = true, features = [
-  "Networking_Connectivity",
-  "Win32_Storage_FileSystem"
-] }
+windows = { workspace = true, features = ["Networking_Connectivity", "Win32_Storage_FileSystem"] }
 windows-core = { workspace = true }
 winreg = { workspace = true }
 
