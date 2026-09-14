@@ -6,8 +6,10 @@ use crate::state::{
     DirectoryInfo, InstanceInstallStage, ProjectType, attached_world_data,
 };
 use crate::worlds::WorldType;
+use dashmap::{DashMap, mapref::entry::Entry};
 use notify::{RecommendedWatcher, RecursiveMode};
 use notify_debouncer_mini::{DebounceEventResult, Debouncer, new_debouncer};
+use std::sync::LazyLock;
 use std::{
     collections::{HashMap, HashSet},
     sync::Arc,
@@ -20,6 +22,74 @@ use super::adapters::sqlite::instance_rows;
 pub struct FileWatcher {
     watcher: RwLock<Debouncer<RecommendedWatcher>>,
     instance_ids: Arc<RwLock<HashMap<String, String>>>,
+}
+
+static CONTENT_SYNCS: LazyLock<DashMap<String, bool>> =
+    LazyLock::new(DashMap::new);
+
+fn queue_content_sync(instance_id: String) {
+    match CONTENT_SYNCS.entry(instance_id.clone()) {
+        Entry::Occupied(mut entry) => {
+            *entry.get_mut() = true;
+            return;
+        }
+        Entry::Vacant(entry) => {
+            entry.insert(false);
+        }
+    }
+    tokio::spawn(async move {
+        loop {
+            let result: crate::Result<bool> = async {
+                let state = State::get().await?;
+                let Some(instance) = instance_rows::get_instance_by_id(
+                    &instance_id,
+                    &state.pool,
+                )
+                .await?
+                else {
+                    return Ok(true);
+                };
+                if matches!(
+                    instance.install_stage,
+                    InstanceInstallStage::MinecraftInstalling
+                        | InstanceInstallStage::PackInstalling
+                ) {
+                    return Ok(false);
+                }
+                if let Some(mut queued) = CONTENT_SYNCS.get_mut(&instance_id) {
+                    *queued = false;
+                }
+                crate::state::sync_content_files(&instance_id, &state).await?;
+                crate::api::instance::queue_synced_pack_reconciliation(
+                    &instance_id,
+                );
+                Ok(true)
+            }
+            .await;
+            if matches!(result, Ok(false)) {
+                tokio::time::sleep(Duration::from_secs(1)).await;
+                continue;
+            }
+            if let Err(error) = result {
+                tracing::warn!(
+                    instance_id,
+                    "Content reconciliation deferred: {error}"
+                );
+            }
+            let _ =
+                emit_instance(&instance_id, InstancePayloadType::Synced).await;
+            match CONTENT_SYNCS.entry(instance_id.clone()) {
+                Entry::Occupied(mut entry) if *entry.get() => {
+                    *entry.get_mut() = false
+                }
+                Entry::Occupied(entry) => {
+                    entry.remove();
+                    break;
+                }
+                Entry::Vacant(_) => break,
+            }
+        }
+    });
 }
 
 pub async fn init_watcher() -> crate::Result<FileWatcher> {
@@ -202,38 +272,28 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                                 },
                                             )
                                         });
-                                    tokio::spawn(async move {
-                                        if sync_content
-                                            && let Ok(state) =
-                                                State::get().await
-                                            && let Err(error) =
-                                                crate::state::sync_content_files(
-                                                    &emit_instance_id,
-                                                    &state,
-                                                )
-                                                .await
-										{
-                                            tracing::error!(
-                                                "Failed to sync instance content after filesystem change: {error}"
-                                            );
-										}
-                                        if reconcile_screenshots
-                                            && let Err(error) =
-                                                crate::api::instance::reconcile_screenshots(
-                                                    &emit_instance_id,
-                                                )
-                                                .await
-                                        {
-                                            tracing::error!(
-                                                "Failed to reconcile screenshots after filesystem change: {error}"
-                                            );
-                                        }
-                                        let _ = emit_instance(
-                                            &emit_instance_id,
-                                            event,
-                                        )
-                                        .await;
-                                    });
+                                    if sync_content {
+                                        queue_content_sync(emit_instance_id);
+                                    } else {
+                                        tokio::spawn(async move {
+                                            if reconcile_screenshots
+												&& let Err(error) =
+													crate::api::instance::reconcile_screenshots(
+														&emit_instance_id,
+													)
+													.await
+											{
+												tracing::error!(
+													"Failed to reconcile screenshots after filesystem change: {error}"
+												);
+											}
+                                            let _ = emit_instance(
+                                                &emit_instance_id,
+                                                event,
+                                            )
+                                            .await;
+                                        });
+                                    }
                                     if is_screenshot_event {
                                         visited_screenshot_instances
                                             .push(instance_id);

@@ -57,7 +57,7 @@ pub(super) async fn mod_projects(
 pub(super) fn root(state: &State) -> PathBuf {
     state
         .directories
-        .metadata_dir()
+        .caches_dir()
         .join("game-locales")
         .join("v1")
 }

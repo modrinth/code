@@ -95,9 +95,6 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "Обновление совместного контента"
   },
-  "app.action-bar.installs": {
-    "message": "Установки"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "Сделать основной сборкой"
   },

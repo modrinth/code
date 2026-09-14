@@ -170,6 +170,8 @@ fn main() {
                         "install_job_list",
                         "install_job_get",
                         "install_job_retry",
+                        "install_job_pause",
+                        "install_job_resume",
                         "install_job_cancel",
                         "install_job_dismiss",
                         "install_job_support_details",
@@ -311,6 +313,10 @@ fn main() {
                     .commands(&[
                         "settings_get",
                         "settings_set",
+                        "store_usage",
+                        "store_cleanup",
+                        "store_set_cache_limit",
+                        "store_verify",
                         "cancel_directory_change",
                     ])
                     .default_permission(
@@ -406,6 +412,12 @@ fn main() {
                 InlinedPlugin::new()
                     .commands(&[
                         "file_extract_zip",
+                        "file_list",
+                        "file_read",
+                        "file_write",
+                        "file_create_directory",
+                        "file_rename",
+                        "file_delete",
                         "file_save_as",
                         "file_read_dragged_file",
                     ])

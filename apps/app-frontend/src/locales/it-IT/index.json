@@ -95,9 +95,6 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "Aggiornamento dei contenuti condivisi"
   },
-  "app.action-bar.installs": {
-    "message": "Installazioni"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "Rendi principale"
   },
