@@ -98,7 +98,7 @@ const envVars = ref(
 )
 
 const overrideMemorySettings = ref(!!instance.value.memory)
-const memory = ref(instance.value.memory ?? { ...globalSettings.memory })
+const memory = ref({ ...(instance.value.memory ?? globalSettings.memory) })
 const { maxMemory, snapPoints, memoryQuery } = useMemorySlider()
 
 watch(overrideJavaArgs, (enabled) => {
