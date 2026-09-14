@@ -20,6 +20,27 @@ impl ContentStore {
         file: &InstanceFile,
         binding: &InstanceFileStorage,
     ) -> crate::Result<InstanceFileStatus> {
+		self.check_instance_file_inner(instance, file, binding, false)
+			.await
+	}
+
+	pub(crate) async fn check_instance_file_cached(
+		&self,
+		instance: &Instance,
+		file: &InstanceFile,
+		binding: &InstanceFileStorage,
+	) -> crate::Result<InstanceFileStatus> {
+		self.check_instance_file_inner(instance, file, binding, true)
+			.await
+	}
+
+	async fn check_instance_file_inner(
+		&self,
+		instance: &Instance,
+		file: &InstanceFile,
+		binding: &InstanceFileStorage,
+		use_cached_hash: bool,
+	) -> crate::Result<InstanceFileStatus> {
         let opposite = self
             .instance_path(
                 &instance.path,
@@ -32,6 +53,18 @@ impl ContentStore {
         let path = self
             .instance_path(&instance.path, &content_file_path(file))
             .await?;
+		if use_cached_hash {
+			let content = match symlink_metadata_if_exists(&path).await? {
+				None => InstancePathContent::Missing,
+				Some(metadata) if metadata.is_file() => {
+					InstancePathContent::File(
+						self.verified_files.hash_file(&path).await?,
+					)
+				}
+				Some(_) => InstancePathContent::Conflict,
+			};
+			return Ok(content.status(&binding.blob_sha512));
+		}
         self.check_instance_path(&path, &binding.blob_sha512).await
     }
 

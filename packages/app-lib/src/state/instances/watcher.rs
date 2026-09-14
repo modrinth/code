@@ -39,15 +39,37 @@ fn queue_content_sync(instance_id: String) {
     }
     tokio::spawn(async move {
         loop {
-            let result: crate::Result<()> = async {
+			let result: crate::Result<bool> = async {
                 let state = State::get().await?;
+				let Some(instance) = instance_rows::get_instance_by_id(
+					&instance_id,
+					&state.pool,
+				)
+				.await?
+				else {
+					return Ok(true);
+				};
+				if matches!(
+					instance.install_stage,
+					InstanceInstallStage::MinecraftInstalling
+						| InstanceInstallStage::PackInstalling
+				) {
+					return Ok(false);
+				}
+				if let Some(mut queued) = CONTENT_SYNCS.get_mut(&instance_id) {
+					*queued = false;
+				}
                 crate::state::sync_content_files(&instance_id, &state).await?;
                 crate::api::instance::queue_synced_pack_reconciliation(
                     &instance_id,
                 );
-                Ok(())
+				Ok(true)
             }
             .await;
+			if matches!(result, Ok(false)) {
+				tokio::time::sleep(Duration::from_secs(1)).await;
+				continue;
+			}
             if let Err(error) = result {
                 tracing::warn!(
                     instance_id,

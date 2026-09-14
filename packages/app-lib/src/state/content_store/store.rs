@@ -18,6 +18,7 @@ pub struct ContentStore {
     pub(super) download_locks: [Mutex<()>; 64],
     pub(super) publish_locks: [Mutex<()>; 64],
     pub(crate) files_lock: Mutex<()>,
+	pub(super) verified_files: super::adapters::verified_files::VerifiedFiles,
     /// Lets Play prioritize the selected instance over migration of other instances.
     pub(crate) legacy_migration_priority: RwLock<()>,
     _process_lock: File,
@@ -68,6 +69,7 @@ impl ContentStore {
             download_locks: std::array::from_fn(|_| Mutex::new(())),
             publish_locks: std::array::from_fn(|_| Mutex::new(())),
             files_lock: Mutex::new(()),
+			verified_files: Default::default(),
             legacy_migration_priority: RwLock::new(()),
             _process_lock: process_lock,
             _content_process_lock: content_process_lock,
