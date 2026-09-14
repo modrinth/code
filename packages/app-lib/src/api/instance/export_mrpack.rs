@@ -7,7 +7,8 @@ use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
 use crate::state::content_store::{
-    FileContent, ReadableContent, content_file_path, eligible, input,
+    FileContent, ReadableContent, content_file_path, input,
+    is_managed_content_path,
 };
 use crate::state::instances::adapters::sqlite::content_rows;
 use crate::state::{
@@ -507,7 +508,7 @@ async fn build_pack_export_candidate(
 fn logical_content_path(
     path: &SafeRelativeUtf8UnixPathBuf,
 ) -> crate::Result<SafeRelativeUtf8UnixPathBuf> {
-    if eligible(path.as_str()) {
+    if is_managed_content_path(path.as_str()) {
         Ok(SafeRelativeUtf8UnixPathBuf::try_from(
             path.as_str().trim_end_matches(".disabled").to_string(),
         )?)

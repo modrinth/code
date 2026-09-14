@@ -115,7 +115,9 @@ pub(crate) async fn edit_instance(
         || patch.content_set_patch.is_some()
     {
         match state.as_ref() {
-            Some(state) => Some(state.content_store.runtime_gate.read().await),
+            Some(state) => {
+                Some(state.content_store.runtime_cache_lock.read().await)
+            }
             None => None,
         }
     } else {

@@ -127,7 +127,7 @@ pub async fn cancel_directory_change(
     // failing, so fetching a DB connection pool from `State::get` is not reliable here
     let pool = crate::state::db::connect(app_identifier).await?;
     let mut settings = Settings::get(&pool).await?;
-    crate::state::content_store::migration::cancel_move(&pool).await?;
+    crate::state::move_app_directory::cancel_move(&pool).await?;
 
     if let Some(prev_custom_dir) = settings.prev_custom_dir {
         settings.prev_custom_dir = None;

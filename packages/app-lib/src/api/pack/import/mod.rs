@@ -385,7 +385,7 @@ pub(crate) async fn copy_dotminecraft_with_reporter(
             .map(|part| part.as_os_str().to_string_lossy())
             .collect::<Vec<_>>()
             .join("/");
-        if crate::state::content_store::eligible(&relative) {
+        if crate::state::content_store::is_managed_content_path(&relative) {
             let canonical = relative.trim_end_matches(".disabled").to_string();
             if !content_paths.insert(canonical.clone()) {
                 duplicate_content_paths.insert(canonical);
@@ -513,7 +513,7 @@ pub(crate) async fn copy_dotminecraft_with_reporter(
             tracing::warn!(path = %source.display(), "Skipping an unmanaged symlink while importing an instance");
             continue;
         }
-        if crate::state::content_store::eligible(&relative)
+        if crate::state::content_store::is_managed_content_path(&relative)
             && !duplicate_content_paths
                 .contains(relative.trim_end_matches(".disabled"))
         {

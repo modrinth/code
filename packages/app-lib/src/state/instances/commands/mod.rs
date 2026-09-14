@@ -33,10 +33,10 @@ pub(crate) use self::remove_instance::*;
 mod refresh_instances;
 pub(crate) use self::refresh_instances::*;
 
+mod migrate_legacy_content;
 mod sync_content_files;
-pub(crate) use self::sync_content_files::{
-    migrate_legacy_content, sync_content_files,
-};
+pub(crate) use self::migrate_legacy_content::migrate_legacy_content;
+pub(crate) use self::sync_content_files::sync_content_files;
 
 mod launch_context;
 pub(crate) use self::launch_context::*;

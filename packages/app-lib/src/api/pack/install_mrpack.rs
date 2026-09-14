@@ -873,7 +873,9 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                 };
                 let downloaded_bytes = if file.reused { 0 } else { file.size };
 
-                if crate::state::content_store::eligible(&project_path) {
+                if crate::state::content_store::is_managed_content_path(
+                    &project_path,
+                ) {
                     let project_type =
                         ProjectType::get_from_parent_folder(&project_path)
                             .ok_or_else(|| {
@@ -1061,7 +1063,7 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                 ))
             })?;
 
-        let managed = crate::state::content_store::eligible(
+        let managed = crate::state::content_store::is_managed_content_path(
             relative_override_file_path.as_str(),
         );
         let temporary = if managed {
@@ -1327,7 +1329,9 @@ pub async fn remove_all_related_files(
     // Iterate over all Modrinth project file paths in the json, and remove them
     // (There should be few, but this removes any files the .mrpack intended as Modrinth projects but were unrecognized)
     for file in pack.files {
-        if crate::state::content_store::eligible(file.path.as_str()) {
+        if crate::state::content_store::is_managed_content_path(
+            file.path.as_str(),
+        ) {
             crate::state::instances::commands::remove_project(
                 &instance_id,
                 file.path.as_str(),
@@ -1369,7 +1373,7 @@ pub async fn remove_all_related_files(
         if relative_override_file_path.as_str() == "options.txt" {
             continue;
         }
-        if crate::state::content_store::eligible(
+        if crate::state::content_store::is_managed_content_path(
             relative_override_file_path.as_str(),
         ) {
             crate::state::instances::commands::remove_project(

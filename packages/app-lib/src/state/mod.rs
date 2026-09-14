@@ -48,6 +48,7 @@ mod cache;
 pub use self::cache::*;
 
 pub mod content_store;
+pub(crate) mod runtime_cache;
 
 mod friends;
 pub use self::friends::*;

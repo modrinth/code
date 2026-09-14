@@ -1,4 +1,4 @@
-use super::{input, normalize};
+use super::content_store::{input, normalize};
 use crate::State;
 use crate::state::instances::adapters::sqlite::instance_rows;
 use crate::state::{
@@ -11,7 +11,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::UNIX_EPOCH;
 
-pub(super) struct RuntimeFile {
+pub(crate) struct RuntimeFile {
     pub path: PathBuf,
     pub size: u64,
     pub last_used_at: i64,
@@ -19,7 +19,7 @@ pub(super) struct RuntimeFile {
     pub directory: bool,
 }
 
-pub(super) struct RuntimeStorage {
+pub(crate) struct RuntimeStorage {
     pub root: PathBuf,
     pub files: Vec<RuntimeFile>,
 }
@@ -321,7 +321,7 @@ fn read_json<T: DeserializeOwned>(path: &Path) -> crate::Result<T> {
     ))?)
 }
 
-pub(super) async fn remove_file(
+pub(crate) async fn remove_file(
     file: &RuntimeFile,
     root: &Path,
 ) -> crate::Result<u64> {

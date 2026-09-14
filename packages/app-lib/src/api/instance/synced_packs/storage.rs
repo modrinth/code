@@ -398,7 +398,9 @@ async fn import_matching_pack(
     pack: &SyncedPack,
     state: &State,
 ) -> crate::Result<Option<StoredFileHandle>> {
-    let Ok((sha512, sha1, _)) = hash_file(source).await else {
+    let Ok(crate::state::content_store::FileHashes { sha512, sha1, .. }) =
+        hash_file(source).await
+    else {
         return Ok(None);
     };
     if sha1 != pack.sha1
@@ -445,7 +447,7 @@ async fn cleanup_legacy_cache(state: &State) -> crate::Result<bool> {
             continue;
         }
         let result: crate::Result<()> = async {
-            if hash_file(&entry.path()).await?.1 != name {
+            if hash_file(&entry.path()).await?.sha1 != name {
                 let quarantine = directory(state).join("quarantine");
                 tokio::fs::create_dir_all(&quarantine).await?;
                 tokio::fs::rename(

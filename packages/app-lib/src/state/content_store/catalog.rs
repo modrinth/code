@@ -1,16 +1,16 @@
 use super::{
-    InstanceFileKind, InstanceFileStorage, StoredFile, StoredFileStatus,
+    FileStorageKind, InstanceFileStorage, StoredFileMetadata, StoredFileStatus,
 };
 use sqlx::{Sqlite, SqlitePool, Transaction};
 
 pub(super) async fn stored_files(
     pool: &SqlitePool,
-) -> crate::Result<Vec<StoredFile>> {
+) -> crate::Result<Vec<StoredFileMetadata>> {
     let rows = sqlx::query!("SELECT sha512, sha1, size, relative_path, status, modified_at_ns, last_used_at, sources FROM store_blobs")
 		.fetch_all(pool).await?;
     rows.into_iter()
         .map(|row| {
-            Ok(StoredFile {
+            Ok(StoredFileMetadata {
                 sha512: row.sha512,
                 sha1: row.sha1,
                 size: row.size,
@@ -24,16 +24,16 @@ pub(super) async fn stored_files(
         .collect()
 }
 
-pub(super) async fn find_files(
+pub(crate) async fn find_files(
     pool: &SqlitePool,
     sha512: Option<&str>,
     sha1: Option<&str>,
-) -> crate::Result<Vec<StoredFile>> {
+) -> crate::Result<Vec<StoredFileMetadata>> {
     let rows = sqlx::query!("SELECT sha512, sha1, size, relative_path, status, modified_at_ns, last_used_at, sources FROM store_blobs WHERE (? IS NOT NULL AND sha512 = ?) OR (? IS NULL AND sha1 = ?)", sha512, sha512, sha512, sha1)
 		.fetch_all(pool).await?;
     rows.into_iter()
         .map(|row| {
-            Ok(StoredFile {
+            Ok(StoredFileMetadata {
                 sha512: row.sha512,
                 sha1: row.sha1,
                 size: row.size,
@@ -49,7 +49,7 @@ pub(super) async fn find_files(
 
 pub(super) async fn save_file(
     pool: &SqlitePool,
-    stored_file: &StoredFile,
+    stored_file: &StoredFileMetadata,
 ) -> crate::Result<()> {
     sqlx::query!("INSERT INTO store_blobs (sha512, sha1, size, relative_path, status, modified_at_ns, sources) VALUES (?, ?, ?, ?, 'ready', ?, ?) ON CONFLICT(sha512) DO UPDATE SET status = 'ready', modified_at_ns = excluded.modified_at_ns, last_used_at = unixepoch(), verified_at = unixepoch(), sources = CASE WHEN excluded.sources = '[]' THEN store_blobs.sources ELSE excluded.sources END",
 		stored_file.sha512, stored_file.sha1, stored_file.size, stored_file.relative_path, stored_file.modified_at_ns, stored_file.sources)
@@ -97,7 +97,7 @@ pub(crate) async fn instance_storage(
             Ok(InstanceFileStorage {
                 file_id: row.file_id,
                 blob_sha512: row.blob_sha512,
-                materialization_kind: InstanceFileKind::from_db(
+                storage_kind: FileStorageKind::from_db(
                     &row.materialization_kind,
                 )?,
             })
@@ -114,22 +114,20 @@ pub(crate) async fn file_storage(
         Ok(InstanceFileStorage {
             file_id: row.file_id,
             blob_sha512: row.blob_sha512,
-            materialization_kind: InstanceFileKind::from_db(
-                &row.materialization_kind,
-            )?,
+            storage_kind: FileStorageKind::from_db(&row.materialization_kind)?,
         })
     })
     .transpose()
 }
 
-pub(super) async fn set_file_storage(
+pub(crate) async fn set_file_storage(
     tx: &mut Transaction<'_, Sqlite>,
     file_id: &str,
     sha512: &str,
-    mode: InstanceFileKind,
+    storage_kind: FileStorageKind,
 ) -> crate::Result<()> {
-    let mode = mode.as_str();
-    sqlx::query!("INSERT INTO store_instance_files (file_id, blob_sha512, materialization_kind) VALUES (?, ?, ?) ON CONFLICT(file_id) DO UPDATE SET blob_sha512 = excluded.blob_sha512, materialization_kind = excluded.materialization_kind", file_id, sha512, mode)
+    let storage_kind = storage_kind.as_str();
+    sqlx::query!("INSERT INTO store_instance_files (file_id, blob_sha512, materialization_kind) VALUES (?, ?, ?) ON CONFLICT(file_id) DO UPDATE SET blob_sha512 = excluded.blob_sha512, materialization_kind = excluded.materialization_kind", file_id, sha512, storage_kind)
 		.execute(&mut **tx).await?;
     Ok(())
 }

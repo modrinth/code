@@ -16,7 +16,7 @@ CREATE INDEX store_blobs_sha1_size ON store_blobs (sha1, size);
 CREATE TABLE store_instance_files (
 	file_id TEXT PRIMARY KEY NOT NULL REFERENCES instance_files(id) ON DELETE CASCADE,
 	blob_sha512 TEXT NOT NULL REFERENCES store_blobs(sha512) ON DELETE RESTRICT,
-	materialization_kind TEXT NOT NULL CHECK (materialization_kind IN ('reflink', 'symlink', 'hardlink', 'copy'))
+	materialization_kind TEXT NOT NULL CHECK (materialization_kind IN ('reflink', 'hardlink', 'copy'))
 );
 
 CREATE INDEX store_instance_files_blob ON store_instance_files(blob_sha512);

@@ -1,4 +1,5 @@
 //! Theseus directory information
+pub(crate) mod move_app_directory;
 use crate::LoadingBarType;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::state::LAUNCHER_STATE;
@@ -283,7 +284,7 @@ impl DirectoryInfo {
                 "Moving launcher directory",
             )
             .await?;
-            super::content_store::migration::move_app_directory(
+            move_app_directory::move_app_directory(
                 previous,
                 &destination,
                 pool,
@@ -292,11 +293,8 @@ impl DirectoryInfo {
             emit_loading(&loading, 100.0, None)?;
         }
         if !moving {
-            super::content_store::migration::resume_completed_move(
-                &destination,
-                pool,
-            )
-            .await?;
+            move_app_directory::resume_completed_move(&destination, pool)
+                .await?;
         }
         settings.custom_dir = Some(destination.to_string_lossy().into_owned());
         settings.prev_custom_dir.clone_from(&settings.custom_dir);
@@ -304,7 +302,7 @@ impl DirectoryInfo {
         if let Some(previous) = &previous
             && moving
         {
-            super::content_store::migration::finish_app_directory_move(
+            move_app_directory::finish_app_directory_move(
                 previous,
                 &destination,
                 pool,

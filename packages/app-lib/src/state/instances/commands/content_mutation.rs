@@ -2,7 +2,8 @@ use super::apply_content_install::{
     ContentScope, require_stopped_for_content, upsert_entry_for_file,
 };
 use crate::state::content_store::{
-    FileContent, InstanceFileStatus, StoredFileHandle, content_file_path, input,
+    FileChangeRequest, FileContent, InstanceFileStatus, StoredFileHandle,
+    content_file_path, input,
 };
 use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use crate::state::instances::{ContentSourceKind, InstanceFile};
@@ -226,7 +227,8 @@ impl<'a> InstanceContent<'a> {
         )
         .await?;
         let relative_path = canonical_content_path(request.requested_path);
-        if !crate::state::content_store::eligible(relative_path) {
+        if !crate::state::content_store::is_managed_content_path(relative_path)
+        {
             return Err(input("Unsupported content destination"));
         }
         let previous_path = request.previous_path.map(canonical_content_path);
@@ -299,11 +301,13 @@ impl<'a> InstanceContent<'a> {
             .content_store
             .prepare_file_change(
                 &self.instance,
-                relative_path,
-                Some(request.stored_file),
-                enabled,
-                legacy_path,
-                None,
+                FileChangeRequest {
+                    relative_path,
+                    replacement: Some(request.stored_file),
+                    enabled,
+                    legacy_path,
+                    previous_content: None,
+                },
             )
             .await?;
         let rename_from = existing
@@ -390,11 +394,13 @@ impl<'a> InstanceContent<'a> {
                             .content_store
                             .prepare_file_change(
                                 &self.instance,
-                                canonical_path,
-                                Some(&stored_file),
-                                enabled,
-                                None,
-                                None,
+                                FileChangeRequest {
+                                    relative_path: canonical_path,
+                                    replacement: Some(&stored_file),
+                                    enabled,
+                                    legacy_path: None,
+                                    previous_content: None,
+                                },
                             )
                             .await?
                     }
@@ -432,11 +438,13 @@ impl<'a> InstanceContent<'a> {
                     .content_store
                     .prepare_file_change(
                         &self.instance,
-                        canonical_path,
-                        Some(&stored_file),
-                        enabled,
-                        Some(&physical_path),
-                        Some(&stored_file),
+                        FileChangeRequest {
+                            relative_path: canonical_path,
+                            replacement: Some(&stored_file),
+                            enabled,
+                            legacy_path: Some(&physical_path),
+                            previous_content: Some(&stored_file),
+                        },
                     )
                     .await?
             }
@@ -473,11 +481,13 @@ impl<'a> InstanceContent<'a> {
             .content_store
             .prepare_file_change(
                 &self.instance,
-                relative_path,
-                None,
-                false,
-                legacy_path,
-                None,
+                FileChangeRequest {
+                    relative_path,
+                    replacement: None,
+                    enabled: false,
+                    legacy_path,
+                    previous_content: None,
+                },
             )
             .await?;
         Ok(PendingContentChange {
@@ -494,7 +504,7 @@ impl<'a> InstanceContent<'a> {
         file: &InstanceFile,
     ) -> crate::Result<Option<PendingContentChange>> {
         let canonical = canonical_content_path(&file.relative_path);
-        if !crate::state::content_store::eligible(canonical) {
+        if !crate::state::content_store::is_managed_content_path(canonical) {
             return Err(input("Unsupported managed content path"));
         }
         let source_path = self
@@ -512,7 +522,7 @@ impl<'a> InstanceContent<'a> {
         if !self
             .state
             .content_store
-            .supports_content_links(&source_path)
+            .can_share_content(&source_path)
             .await?
         {
             return Ok(None);
@@ -550,11 +560,13 @@ impl<'a> InstanceContent<'a> {
             .content_store
             .prepare_file_change(
                 &self.instance,
-                canonical,
-                Some(&stored_file),
-                enabled,
-                Some(&file.relative_path),
-                Some(&stored_file),
+                FileChangeRequest {
+                    relative_path: canonical,
+                    replacement: Some(&stored_file),
+                    enabled,
+                    legacy_path: Some(&file.relative_path),
+                    previous_content: Some(&stored_file),
+                },
             )
             .await?;
         let mut adopted = source_record

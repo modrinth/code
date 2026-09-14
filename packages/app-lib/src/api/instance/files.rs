@@ -1,7 +1,6 @@
 use crate::State;
 use crate::state::content_store::{
-    FileContent, ReadableContent, catalog, content_file_path, input,
-    validate_relative,
+    ReadableContent, catalog, content_file_path, input, validate_relative,
 };
 use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use serde::Serialize;
@@ -85,38 +84,7 @@ async fn resolve(
     if let Ok(metadata) = fs::symlink_metadata(&destination).await
         && metadata.file_type().is_symlink()
     {
-        if writing {
-            return Err(input(
-                "Files cannot modify a symbolic link or its target",
-            ));
-        }
-        let file = content_rows::get_instance_file_by_relative_path(
-            instance_id,
-            path.trim_end_matches(".disabled"),
-            &state.pool,
-        )
-        .await?
-        .ok_or_else(|| input("Files cannot read an unmanaged symbolic link"))?;
-        if content_file_path(&file) != path {
-            return Err(input(
-                "The content link is not at its registered path",
-            ));
-        }
-        let FileContent::Stored { stored_file, .. } =
-            state.content_store.file_content(&file).await?
-        else {
-            return Err(input("Managed content needs repair"));
-        };
-        if !state
-            .content_store
-            .instance_file_matches(&destination, &stored_file.metadata.sha512)
-            .await?
-        {
-            return Err(input(
-                "The content link points to an unexpected target",
-            ));
-        }
-        return Ok(ReadableContent::Stored(stored_file));
+        return Err(input("Files cannot access a symbolic link or its target"));
     }
     Ok(ReadableContent::Local(destination))
 }
