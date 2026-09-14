@@ -721,7 +721,7 @@ const baseId = useId()
 
 const serverProject = computed(() => {
 	if (!project.value) {
-	return undefined
+		return undefined
 	}
 	return {
 		name: project.value.title,
