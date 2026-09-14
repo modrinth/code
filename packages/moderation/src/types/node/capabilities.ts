@@ -259,7 +259,6 @@ export interface ComponentNodePropsContext {
 	onImageUpload?: (file: File) => Promise<string>
 	toggleSetValue?: (value: string) => void
 	nodeFacts?: { needsAttention: boolean; fixActionable: boolean }
-	tooltip?: Record<string, unknown>
 }
 
 export interface Renderable {
