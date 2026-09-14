@@ -1957,6 +1957,8 @@ const stageOptions = computed<StageOption[]>(() => {
 :global(.v-popper__inner.v-popper--theme-tooltip .moderation-tooltip-markdown) {
 	line-height: 1.45;
 	font-size: 0.9rem;
+	font-weight: 400;
+	color: var(--color-text);
 }
 
 :global(.v-popper__inner.v-popper--theme-tooltip .moderation-tooltip-markdown p) {

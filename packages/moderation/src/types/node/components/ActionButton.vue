@@ -1,6 +1,5 @@
 <template>
 	<Button
-		v-tooltip="tooltip"
 		:type="color === 'standard' ? 'base' : 'colored'"
 		:color="color === 'standard' ? undefined : color"
 		:disabled="disabled"
@@ -24,7 +23,6 @@ const props = defineProps<{
 	disabled?: boolean
 	needsAttention?: boolean
 	fixActionable?: boolean
-	tooltip?: Record<string, unknown>
 }>()
 
 const emit = defineEmits<{
