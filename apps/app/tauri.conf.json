@@ -45,7 +45,11 @@
 		"shortDescription": "",
 		"linux": {
 			"deb": {
-				"depends": []
+				"depends": [],
+				"desktopTemplate": "linux/ModrinthApp.desktop"
+			},
+			"rpm": {
+				"desktopTemplate": "linux/ModrinthApp.desktop"
 			}
 		},
 		"fileAssociations": [

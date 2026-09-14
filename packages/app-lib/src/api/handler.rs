@@ -7,7 +7,7 @@ use crate::{
     },
     util::io,
 };
-use url::form_urlencoded;
+use url::{Url, form_urlencoded};
 use urlencoding::decode;
 
 /// Handles external functions (such as through URL deep linkage)
@@ -110,6 +110,17 @@ pub async fn handle_url(sublink: &str) -> crate::Result<CommandPayload> {
     })
 }
 
+/// Converts a local `file://` URL into a path.
+///
+/// The Linux desktop entry uses the `%U` field code, which allows launchers to
+/// pass opened files as `file://` URLs instead of paths.
+fn file_url_to_path(command_string: &str) -> Option<PathBuf> {
+    Url::parse(command_string)
+        .ok()
+        .filter(|url| url.scheme() == "file")
+        .and_then(|url| url.to_file_path().ok())
+}
+
 pub async fn parse_command(
     command_string: &str,
 ) -> crate::Result<CommandPayload> {
@@ -121,7 +132,8 @@ pub async fn parse_command(
         Ok(handle_url(sublink).await?)
     } else {
         // We assume anything else is a filepath to an .mrpack file
-        let path = PathBuf::from(command_string);
+        let path = file_url_to_path(command_string)
+            .unwrap_or_else(|| PathBuf::from(command_string));
         let path = io::canonicalize(path)?;
         if let Some(ext) = path.extension()
             && ext == "mrpack"
@@ -147,4 +159,46 @@ pub async fn parse_and_emit_command(command_string: &str) -> crate::Result<()> {
     let command = parse_command(command_string).await?;
     emit_command(command).await?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{file_url_to_path, parse_command};
+    use crate::event::CommandPayload;
+    use crate::util::io;
+    use url::Url;
+
+    #[test]
+    fn file_url_to_path_only_converts_local_file_urls() {
+        assert_eq!(file_url_to_path("modrinth://mod/sodium"), None);
+        assert_eq!(file_url_to_path("pack.mrpack"), None);
+        assert_eq!(
+            file_url_to_path("file://example.com/tmp/pack.mrpack"),
+            None
+        );
+    }
+
+    #[tokio::test]
+    async fn parse_command_accepts_mrpack_file_urls() {
+        let dir = tempfile::tempdir().unwrap();
+        let pack = dir.path().join("my pack.mrpack");
+        std::fs::write(&pack, b"").unwrap();
+        let expected = io::canonicalize(&pack)
+            .unwrap()
+            .to_string_lossy()
+            .into_owned();
+
+        let file_url = Url::from_file_path(&pack).unwrap().to_string();
+        assert!(file_url.contains("my%20pack.mrpack"));
+
+        for command in [pack.to_string_lossy().into_owned(), file_url] {
+            match parse_command(&command).await {
+                Ok(CommandPayload::RunMRPack { path }) => {
+                    assert_eq!(path, expected, "for {command}");
+                }
+                Ok(_) => panic!("unexpected command for {command}"),
+                Err(e) => panic!("failed to parse {command}: {e}"),
+            }
+        }
+    }
 }
