@@ -16,6 +16,12 @@ export default [
 		private: false,
 	},
 	{
+		label: '🦺 Unsafe Functionality',
+		message: async () =>
+			(await import('../messages/quick-replies/tech-review/unsafe-functionality.md?raw')).default,
+		private: false,
+	},
+	{
 		label: '📝 Request Source',
 		message: async () =>
 			(await import('../messages/quick-replies/tech-review/request-source.md?raw')).default,
