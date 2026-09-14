@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { fileIsValid } from '@modrinth/utils'
-
-import { useFormatBytes } from '../../../composables'
+import { defineMessages, useFormatBytes, useVIntl } from '../../../composables'
+import { injectNotificationManager } from '../../../providers'
 import ButtonFrame from './ButtonFrame.vue'
 import type { ButtonColor, ButtonInteraction, ButtonSize, ButtonType } from './types'
 
@@ -35,14 +34,36 @@ const emit = defineEmits<{
 }>()
 
 const formatBytes = useFormatBytes()
+const { formatMessage } = useVIntl()
+const notificationManager = injectNotificationManager()
+const messages = defineMessages({
+	fileTooLarge: {
+		id: 'file-button.file-too-large.title',
+		defaultMessage: 'File too large',
+	},
+	fileTooLargeDescription: {
+		id: 'file-button.file-too-large.description',
+		defaultMessage: 'File {filename} is too big. The maximum file size is {maxSize}.',
+	},
+})
 
 function selectFiles(incoming: FileList) {
 	if (props.disabled) return
 
-	const validationOptions = { maxSize: props.maxSize, alertOnInvalid: true }
-	const validFiles = Array.from(incoming).filter((file) =>
-		fileIsValid(file, validationOptions, formatBytes),
-	)
+	const validFiles = Array.from(incoming).filter((file) => {
+		if (props.maxSize != null && file.size > props.maxSize) {
+			notificationManager.addNotification({
+				type: 'error',
+				title: formatMessage(messages.fileTooLarge),
+				text: formatMessage(messages.fileTooLargeDescription, {
+					filename: file.name,
+					maxSize: formatBytes(props.maxSize),
+				}),
+			})
+			return false
+		}
+		return true
+	})
 
 	if (validFiles.length > 0) emit('change', validFiles)
 }
