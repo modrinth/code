@@ -305,10 +305,12 @@ pub(in crate::api::instance) async fn seed_from_instance(
                 if matches!(
                     error.raw.as_ref(),
                     crate::ErrorKind::JSONError(_)
+                        | crate::ErrorKind::InputError(_)
+                        | crate::ErrorKind::StdIOError(_)
                 ) =>
             {
                 tracing::warn!(
-                    "Skipping pack {} from instance {instance_id} while initializing pack sync because its JSON metadata could not be parsed: {error}",
+                    "Skipping pack {} from instance {instance_id} while initializing pack sync: {error}",
                     item.file_path
                 );
                 continue;
