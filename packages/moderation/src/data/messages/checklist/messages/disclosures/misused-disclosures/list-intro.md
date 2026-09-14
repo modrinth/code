@@ -1,2 +1,3 @@
 </br>
-Currently, your %PROJECT_TYPE_FORMATTED_LOWER% appears to be misusing disclosure of:
+Currently, the following disclosures appear to be misused, or provide inaccurate or unnecessary information. \
+Please remove or modify each.

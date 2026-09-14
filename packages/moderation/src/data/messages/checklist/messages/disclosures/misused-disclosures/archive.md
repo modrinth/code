@@ -1,1 +1,1 @@
-- [Being archived](%DISCLOSURES_FAQ_ARCHIVE_LINK%), or otherwise no longer receiving updates.
+- [Archive Project](%DISCLOSURES_FAQ_ARCHIVE_LINK%).

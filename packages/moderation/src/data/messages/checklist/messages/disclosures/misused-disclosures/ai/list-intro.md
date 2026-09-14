@@ -1,2 +1,2 @@
     </br>
-    Specifically, the inclusion of:
+    Specifically:

@@ -1,1 +1,1 @@
-- [Features locked behind a paywall](%DISCLOSURES_FAQ_PAID_LINK%), donation, or other monetary exchange.
+- [Paid Features](%DISCLOSURES_FAQ_PAID_LINK%).
