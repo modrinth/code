@@ -12,7 +12,8 @@ use crate::models::exp::minecraft::Language;
 use crate::models::projects::Project;
 
 pub(super) use super::language::{
-    has_sufficient_english_blocks, is_likely_english_summary,
+	has_sufficient_english_blocks, is_confidently_non_english_short_text,
+	is_likely_english_summary,
 };
 
 static WORD: LazyLock<Regex> =
@@ -982,52 +983,74 @@ fn strip_technical_syntax(line: &str) -> String {
 	}
 }
 
+fn strip_loaders(text: &str) -> String {
+	static LOADER_WORD: LazyLock<Regex> = LazyLock::new(|| {
+		Regex::new(r"(?i)\b(?:fabric|forge|quilt|neoforge|liteloader)\b").unwrap()
+	});
+
+	LOADER_WORD.replace_all(text, " ").into_owned()
+}
+
 fn description_language_input(markdown: &str) -> String {
-    let readable = strip_description_markup(markdown);
-    let readable = text_without_explicit_links(&readable);
-    readable
-        .lines()
-        .map(strip_technical_syntax)
-        .collect::<Vec<_>>()
-        .join("\n")
+	let readable = strip_description_markup(markdown);
+	let readable = text_without_explicit_links(&readable);
+	let readable = strip_loaders(&readable);
+	readable
+		.lines()
+		.map(strip_technical_syntax)
+		.collect::<Vec<_>>()
+		.join("\n")
 }
 
 pub(super) fn extract_description_blocks(markdown: &str) -> Vec<String> {
-    let readable = description_language_input(markdown);
-    let mut blocks = Vec::new();
-    let mut paragraph = Vec::new();
-    let mut heading_only = false;
-    let mut blank = false;
-    for line in readable.lines() {
-        let line = line.trim();
-        if line.is_empty() {
-            blank = true;
-            continue;
-        }
-        let heading = line.starts_with('#');
-        let metadata_list = line
-            .split_once(':')
-            .is_some_and(|(_, values)| values.matches(',').count() >= 3);
-        if (heading
-            || metadata_list
-            || (blank
-                && !heading_only
-                && (WORD.find_iter(&paragraph.join(" ")).count() >= 8
-                    || WORD.find_iter(line).count() >= 8)))
-            && !paragraph.is_empty()
-        {
-            blocks.push(extract_description_text(&paragraph.join("\n")));
-            paragraph.clear();
-        }
-        paragraph.push(line);
-        heading_only = heading;
-        blank = false;
-    }
-    if !paragraph.is_empty() {
-        blocks.push(extract_description_text(&paragraph.join("\n")));
-    }
-    blocks.retain(|block| !block.is_empty());
-    blocks
+	const MIN_PARAGRAPH_WORDS: usize = 8;
+
+	let readable = description_language_input(markdown);
+	let mut blocks = Vec::new();
+	let mut paragraph = Vec::new();
+	let mut previous_line_was_heading = false;
+	let mut follows_blank_line = false;
+
+	for line in readable.lines() {
+		let line = line.trim();
+		if line.is_empty() {
+			follows_blank_line = true;
+			continue;
+		}
+
+		let is_heading = line.starts_with('#');
+		let starts_new_paragraph = follows_blank_line
+			&& !previous_line_was_heading
+			&& (has_minimum_word_count(&paragraph.join(" "), MIN_PARAGRAPH_WORDS)
+				|| has_minimum_word_count(line, MIN_PARAGRAPH_WORDS));
+
+		if is_heading || starts_new_paragraph {
+			push_description_block(&mut blocks, &mut paragraph);
+		}
+
+		paragraph.push(line);
+		previous_line_was_heading = is_heading;
+		follows_blank_line = false;
+	}
+
+	push_description_block(&mut blocks, &mut paragraph);
+	blocks
+}
+
+fn has_minimum_word_count(text: &str, minimum: usize) -> bool {
+	WORD.find_iter(text).take(minimum).count() == minimum
+}
+
+fn push_description_block(blocks: &mut Vec<String>, paragraph: &mut Vec<&str>) {
+	if paragraph.is_empty() {
+		return;
+	}
+
+	let block = extract_description_text(&paragraph.join("\n"));
+	if !block.is_empty() {
+		blocks.push(block);
+	}
+	paragraph.clear();
 }
 
 pub(super) fn has_image_without_alt_text(markdown: &str) -> bool {
