@@ -210,7 +210,8 @@
 							</template>
 						</template>
 					</div>
-					<div class="flex flex-wrap items-center gap-2">
+					<div class="ml-auto flex flex-wrap items-center gap-2">
+						<slot name="actions" />
 						<template v-if="report">
 							<Button
 								v-if="isStaff(auth.user) && replyBody"

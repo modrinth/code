@@ -1,5 +1,14 @@
 <template>
 	<template v-if="canAccess">
+		<ConfirmModal
+			ref="withdrawModal"
+			:title="formatMessage(messages.withdrawTitle)"
+			:description="formatMessage(messages.withdrawDescription)"
+			:proceed-label="formatMessage(messages.withdrawButton)"
+			:proceed-icon="XCircleIcon"
+			:markdown="false"
+			@proceed="handleWithdrawSubmission"
+		/>
 		<Admonition
 			v-if="userFacingUiVisible && moderationAdmonition"
 			:type="moderationAdmonition.type"
@@ -117,7 +126,18 @@
 				:auth="auth"
 				class="overflow-clip rounded-b-2xl border-0 border-t border-solid border-surface-4 bg-surface-2"
 				@update-thread="updateThread"
-			/>
+			>
+				<template #actions>
+					<Button
+						v-if="canWithdrawSubmission"
+						:disabled="withdrawingSubmission"
+						@click="withdrawModal?.show()"
+					>
+						<XCircleIcon />
+						{{ formatMessage(messages.withdrawButton) }}
+					</Button>
+				</template>
+			</ConversationThread>
 			<div
 				v-else
 				class="flex items-center justify-center gap-2 rounded-b-2xl border-0 border-t border-solid border-surface-4 bg-surface-2 py-12"
@@ -134,10 +154,12 @@
 </template>
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { IssuesIcon, SpinnerIcon } from '@modrinth/assets'
+import { IssuesIcon, SpinnerIcon, XCircleIcon } from '@modrinth/assets'
 import {
 	Admonition,
+	Button,
 	commonMessages,
+	ConfirmModal,
 	defineMessage,
 	defineMessages,
 	injectModrinthClient,
@@ -152,7 +174,7 @@ import {
 import { isStaff } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
 import { getProjectLink, isApproved, isRejected, isUnderReview } from '~/helpers/projects.js'
@@ -173,6 +195,23 @@ type ModerationAdmonitionSection =
 	  }
 
 const messages = defineMessages({
+	withdrawTitle: {
+		id: 'project.moderation.withdraw.title',
+		defaultMessage: 'Un-submit your project',
+	},
+	withdrawDescription: {
+		id: 'project.moderation.withdraw.description',
+		defaultMessage:
+			'If your project is not ready, or you no longer want it to be reviewed, you can withdraw it from the review queue. When you submit your project again, you will not retain your current position in the moderation queue.',
+	},
+	withdrawButton: {
+		id: 'project.moderation.withdraw.button',
+		defaultMessage: 'Un-submit from review',
+	},
+	submissionWithdrawn: {
+		id: 'project-moderation-nags.submission-withdrawn',
+		defaultMessage: 'Your submission has been withdrawn. ',
+	},
 	admonitionRejectedSpamNotice: {
 		id: 'project.moderation.admonition.rejected.spam-notice',
 		defaultMessage:
@@ -216,6 +255,7 @@ const {
 	invalidate,
 	allMembers,
 	thread,
+	withdrawSubmission,
 } = injectProjectPageContext()
 
 const THREADS_RELEASE_DATE = '2023-08-05T12:00:00-07:00'
@@ -243,6 +283,31 @@ const staff = computed(() => isStaff(currentMember.value?.user))
 const userFacingUiVisible = computed(
 	() => !!currentMember.value && (!staff.value || moderatorSeeUserUi.value),
 )
+
+const withdrawModal = ref<InstanceType<typeof ConfirmModal>>()
+const withdrawingSubmission = ref(false)
+const canWithdrawSubmission = computed(
+	() =>
+		userFacingUiVisible.value &&
+		project.value.status === 'processing' &&
+		(staff.value || ((currentMember.value?.permissions ?? 0) & (1 << 2)) !== 0),
+)
+
+async function handleWithdrawSubmission() {
+	if (!canWithdrawSubmission.value || withdrawingSubmission.value) return
+
+	withdrawingSubmission.value = true
+	try {
+		if (!(await withdrawSubmission())) return
+		addNotification({
+			type: 'success',
+			title: formatMessage(commonMessages.successLabel),
+			text: formatMessage(messages.submissionWithdrawn),
+		})
+	} finally {
+		withdrawingSubmission.value = false
+	}
+}
 
 const approvedAdmonitionMessage = computed<MessageDescriptor | null>(() => {
 	switch (project.value?.status) {

@@ -1455,10 +1455,12 @@ const patchStatusMutation = useMutation({
 
 		const previousProject = queryClient.getQueryData(['project', 'v2', projectId])
 
-		queryClient.setQueryData(['project', 'v2', projectId], (old) => {
-			if (!old) return old
-			return { ...old, status }
-		})
+		if (status !== 'draft') {
+			queryClient.setQueryData(['project', 'v2', projectId], (old) => {
+				if (!old) return old
+				return { ...old, status }
+			})
+		}
 
 		return { previousProject, projectId }
 	},
@@ -2153,6 +2155,24 @@ watch(
 	{ immediate: true },
 )
 
+async function withdrawSubmission() {
+	if (patchStatusMutation.isPending.value || project.value.status !== 'processing') return false
+
+	startLoading()
+	try {
+		await patchStatusMutation.mutateAsync({
+			projectId: project.value.id,
+			status: 'draft',
+			threadId: project.value.thread_id,
+		})
+		return true
+	} catch {
+		return false
+	} finally {
+		stopLoading()
+	}
+}
+
 async function setProcessing() {
 	// Guard against multiple submissions while mutation is pending
 	if (patchStatusMutation.isPending.value) return
@@ -2490,6 +2510,7 @@ provideProjectPageContext({
 	patchProjectV3,
 	patchIcon,
 	setProcessing,
+	withdrawSubmission,
 
 	// Gallery mutation functions
 	createGalleryItem,
