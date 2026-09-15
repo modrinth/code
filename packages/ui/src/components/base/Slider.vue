@@ -2,7 +2,8 @@
 	<div class="flex w-full items-center gap-4">
 		<span
 			v-if="currentValue !== null"
-			class="shrink-0 whitespace-nowrap py-2 text-sm leading-5 text-secondary"
+			class="shrink-0 whitespace-nowrap py-2 leading-5 text-secondary"
+			:class="labelSizeClass"
 		>
 			{{ minLabel ?? min }}
 		</span>
@@ -72,7 +73,8 @@
 
 		<span
 			v-if="currentValue !== null"
-			class="shrink-0 whitespace-nowrap py-2 text-sm leading-5 text-secondary"
+			class="shrink-0 whitespace-nowrap py-2 leading-5 text-secondary"
+			:class="labelSizeClass"
 		>
 			{{ maxLabel ?? formatValue(max) }}
 		</span>
@@ -143,6 +145,7 @@ const heightClass = computed(
 			large: 'h-12',
 		})[props.size],
 )
+const labelSizeClass = computed(() => (props.size === 'small' ? 'text-sm' : 'text-base'))
 const valueFieldChars = computed(() => {
 	const decimals = (String(props.step).split('.')[1] ?? '').length
 
