@@ -1,12 +1,14 @@
+mod markdown;
+
 use serde_json::json;
 
+use self::markdown::DescriptionMarkdown;
 use super::text::{
-    ProfanityKind, contains_description_spam, description_ends_with_header,
-    extract_description_blocks, extract_description_text,
-    find_banned_description_link, has_adjacent_same_level_headers,
+    ProfanityKind, contains_description_spam, extract_description_blocks,
+    extract_description_text, find_banned_description_link,
     has_image_without_alt_text, has_sufficient_english_blocks,
-    js_string_length, long_header_count, non_standard_text_ratio,
-    normalize_project_field_text, profanity_matches, project_requires_english,
+    js_string_length, non_standard_text_ratio, normalize_project_field_text,
+    profanity_matches, project_requires_english,
 };
 use super::{ProjectNag, ProjectNagKind, ProjectNagSeverity};
 
@@ -19,11 +21,15 @@ const NON_STANDARD_TEXT_FAILURE_THRESHOLD: f64 = 0.05;
 pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
     let mut nags = Vec::new();
     let description = project.description.as_str();
+    let markdown = DescriptionMarkdown::parse(description);
+    let description_without_code = markdown.without_code();
     let normalized_description = normalize_project_field_text(description);
-    let text = extract_description_text(description);
-    let has_spam = has_description_spam(description);
-    let normalized_text = extract_description_text(&normalized_description);
-    let blocks = extract_description_blocks(description);
+    let text = extract_description_text(&description_without_code);
+    let has_spam = has_description_spam(&description_without_code);
+    let normalized_text =
+        normalize_project_field_text(&description_without_code);
+    let normalized_text = extract_description_text(&normalized_text);
+    let blocks = extract_description_blocks(&description_without_code);
     let profanity = profanity_matches(description);
 
     if let Some(matched) = profanity
@@ -51,7 +57,7 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
             .with_details(json!({ "value": matched.raw_text })),
         );
     }
-    if non_standard_text_ratio(description)
+    if non_standard_text_ratio(&description_without_code)
         >= NON_STANDARD_TEXT_FAILURE_THRESHOLD
     {
         nags.push(ProjectNag::new(
@@ -91,7 +97,7 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
             ProjectNagSeverity::Required,
         ));
     }
-    if let Some(url) = find_banned_description_link(description) {
+    if let Some(url) = find_banned_description_link(&description_without_code) {
         nags.push(
             ProjectNag::new(
                 ProjectNagKind::ProjectDescriptionBannedLink,
@@ -100,7 +106,7 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
             .with_details(json!({ "full_url": url })),
         );
     }
-    let long_headers = long_header_count(description);
+    let long_headers = markdown.long_header_count();
     if long_headers > 0 {
         nags.push(
             ProjectNag::new(
@@ -110,19 +116,19 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
             .with_details(json!({ "count": long_headers })),
         );
     }
-    if description_ends_with_header(description) {
+    if markdown.ends_with_header() {
         nags.push(ProjectNag::new(
             ProjectNagKind::DescriptionEndsWithHeader,
             ProjectNagSeverity::Required,
         ));
     }
-    if has_adjacent_same_level_headers(description) {
+    if markdown.has_adjacent_same_level_headers() {
         nags.push(ProjectNag::new(
             ProjectNagKind::AdjacentHeaders,
             ProjectNagSeverity::Required,
         ));
     }
-    if has_image_without_alt_text(description) {
+    if has_image_without_alt_text(&description_without_code) {
         nags.push(ProjectNag::new(
             ProjectNagKind::MissingAltText,
             ProjectNagSeverity::Warning,
@@ -133,8 +139,10 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
 }
 
 pub(super) fn is_non_english(project: &Project) -> bool {
-    let text = extract_description_text(&project.description);
-    let blocks = extract_description_blocks(&project.description);
+    let markdown = DescriptionMarkdown::parse(&project.description);
+    let description_without_code = markdown.without_code();
+    let text = extract_description_text(&description_without_code);
+    let blocks = extract_description_blocks(&description_without_code);
     is_non_english_text(project, &text, &blocks)
 }
 
