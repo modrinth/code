@@ -160,7 +160,7 @@ interface Props {
 	validationNags?: Labrinth.Projects.v3.ProjectNag[]
 	validationLoading?: boolean
 	validationAvailable?: boolean
-	refreshValidation?: () => Promise<Labrinth.Projects.v3.ProjectValidationResponse | null>
+	submitProject: () => Promise<boolean>
 	currentMember?: Labrinth.Projects.v3.TeamMember | null
 	collapsed?: boolean
 	disableHorizontalScroll?: boolean
@@ -238,7 +238,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
 	toggleCollapsed: []
-	setProcessing: [processing: boolean]
 }>()
 
 const isProcessing = computed(() => props.project.status === 'processing')
@@ -384,10 +383,8 @@ const canSubmitForReview = computed(() => {
 
 async function submitForReview() {
 	if (!canSubmitForReview.value) return
-	const validation = await props.refreshValidation?.()
-	if (!validation || validation.nags.some((nag) => nag.severity === 'required')) return
+	if (!(await props.submitProject())) return
 	if (!props.collapsed) emit('toggleCollapsed')
-	emit('setProcessing', true)
 	await navigateTo(
 		`/${props.project.project_type}/${props.project.slug ?? props.project.id}/${nagDestinations.moderation.path}`,
 	)

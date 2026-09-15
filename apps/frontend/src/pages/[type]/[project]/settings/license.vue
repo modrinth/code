@@ -224,7 +224,6 @@ import {
 	commonProjectSettingsMessages,
 	ConfirmLeaveModal,
 	defineMessages,
-	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	Input,
@@ -242,9 +241,8 @@ import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import { normalizeProjectUrl } from '~/helpers/project-url'
 
-const { projectV2: project, currentMember, invalidate } = injectProjectPageContext()
+const { projectV2: project, currentMember, patchProjectV3 } = injectProjectPageContext()
 
-const { labrinth } = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
@@ -342,10 +340,6 @@ const messages = defineMessages({
 		id: 'project.settings.license.updated-text',
 		defaultMessage: 'Your license has been updated.',
 	},
-	failed: {
-		id: 'project.settings.license.failed',
-		defaultMessage: 'Failed to update license',
-	},
 })
 useProjectSettingsHeadTitle(commonProjectSettingsMessages.license)
 
@@ -414,8 +408,7 @@ const {
 			payload.license_url = normalizeProjectUrl(current.value.licenseUrl) || null
 		}
 
-		await labrinth.projects_v3.edit(project.value.id, payload)
-		await invalidate()
+		await patchProjectV3(payload, true, true)
 	},
 )
 
@@ -478,11 +471,6 @@ async function save() {
 		})
 	} catch (error) {
 		saveValidation.capture(error, submittedState)
-		addNotification({
-			title: formatMessage(messages.failed),
-			text: error instanceof Error ? error.message : String(error),
-			type: 'error',
-		})
 	}
 }
 

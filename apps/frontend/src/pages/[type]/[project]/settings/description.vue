@@ -44,7 +44,6 @@ import {
 	commonProjectSettingsMessages,
 	ConfirmLeaveModal,
 	defineMessages,
-	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	IntlFormatted,
@@ -64,8 +63,7 @@ import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import { fileDeclaresAi } from '~/helpers/c2pa'
 
-const { projectV2: project, currentMember, invalidate } = injectProjectPageContext()
-const { labrinth } = injectModrinthClient()
+const { projectV2: project, currentMember, patchProjectV3 } = injectProjectPageContext()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
@@ -79,10 +77,6 @@ const messages = defineMessages({
 	updatedText: {
 		id: 'project.settings.description.updated-text',
 		defaultMessage: 'Your description has been updated.',
-	},
-	failed: {
-		id: 'project.settings.description.failed',
-		defaultMessage: 'Failed to update description',
 	},
 })
 const aiImageWarningModal = useTemplateRef('aiImageWarningModal')
@@ -99,8 +93,7 @@ const {
 } = useSavable(
 	() => ({ description: project.value.body }),
 	async ({ description }) => {
-		await labrinth.projects_v3.edit(project.value.id, { description })
-		await invalidate()
+		await patchProjectV3({ description }, true, true)
 	},
 )
 
@@ -135,11 +128,6 @@ async function save() {
 		})
 	} catch (error) {
 		saveValidation.capture(error, submittedState)
-		addNotification({
-			title: formatMessage(messages.failed),
-			text: error instanceof Error ? error.message : String(error),
-			type: 'error',
-		})
 	}
 }
 

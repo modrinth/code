@@ -155,11 +155,10 @@
 							:route-name="route.name"
 							:tags="tags"
 							:validation-nags="projectValidation?.nags ?? []"
-							:validation-loading="projectValidationLoading"
+							:validation-loading="reviewSubmissionLoading"
 							:validation-available="projectValidation !== null"
-							:refresh-validation="refreshProjectValidation"
+							:submit-project="setProcessing"
 							@toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
-							@set-processing="setProcessing"
 						/>
 					</div>
 					<ProjectPageHeader
@@ -626,7 +625,7 @@ import {
 import { formatProjectType, isStaff } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
-import { onScopeDispose, readonly, ref, useTemplateRef, watch, watchEffect } from 'vue'
+import { nextTick, onScopeDispose, readonly, ref, useTemplateRef, watch, watchEffect } from 'vue'
 
 import { navigateTo } from '#app'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
@@ -638,7 +637,11 @@ import ProjectCollectionSaveButton from '~/components/ui/ProjectCollectionSaveBu
 import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
-import { useDiscordInviteValidation } from '~/composables/discord-invite-validation'
+import { useProjectLinkValidation } from '~/composables/link-network-validation'
+import {
+	canSubmitProjectForReview,
+	PROJECT_REVIEW_VALIDATION_ERROR,
+} from '~/composables/link-network-validation/submission'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { notifyCopied } from '~/composables/moderation.ts'
 import { STALE_TIME, STALE_TIME_LONG, warmProjectCheckCaches } from '~/composables/queries/project'
@@ -1378,9 +1381,6 @@ function mergeV3ProjectPatch(old, data) {
 	return merged
 }
 
-const PROJECT_REVIEW_VALIDATION_ERROR =
-	'project must have no required validation nags before or while under review'
-
 function addProjectMutationErrorNotification(error) {
 	const description =
 		error?.v1Error?.description ??
@@ -1413,6 +1413,15 @@ const patchProjectMutation = useMutation({
 	},
 
 	onMutate: async ({ projectId, data, optimistic = true }) => {
+		await linkValidation.validateSave({
+			description: data.body,
+			license_url: data.license_url,
+			link_urls: Object.fromEntries(
+				['issues', 'source', 'wiki', 'discord']
+					.filter((field) => data[`${field}_url`] !== undefined)
+					.map((field) => [field, data[`${field}_url`]]),
+			),
+		})
 		if (!optimistic) return
 		await queryClient.cancelQueries({ queryKey: ['project', 'v2', projectId] })
 		await queryClient.cancelQueries({ queryKey: ['project', 'v3', projectId] })
@@ -1494,6 +1503,7 @@ const patchProjectV3Mutation = useMutation({
 	},
 
 	onMutate: async ({ projectId, data, optimistic = true }) => {
+		await linkValidation.validateSave(data)
 		if (!optimistic) return
 		await queryClient.cancelQueries({ queryKey: ['project', 'v3', projectId] })
 		await queryClient.cancelQueries({ queryKey: ['project', 'v2', projectId] })
@@ -1742,6 +1752,7 @@ const currentMember = computed(() => {
 const {
 	data: projectValidationResponse,
 	isFetching: projectValidationLoading,
+	isError: backendValidationError,
 	refetch: refetchProjectValidation,
 } = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'validation', 'v3']),
@@ -1750,36 +1761,42 @@ const {
 	enabled: computed(() => !!projectId.value && !!currentMember.value?.accepted),
 })
 
-const discordInviteValidation = useDiscordInviteValidation(() =>
-	currentMember.value?.accepted ? (projectV3.value?.link_urls?.discord?.url ?? '') : '',
+const linkValidation = useProjectLinkValidation(
+	projectId,
+	projectV3,
+	() => !!currentMember.value?.accepted,
+)
+const projectLinksNetworkValidationLoading = linkValidation.isChecking
+const reviewSubmissionPending = ref(false)
+const reviewSubmissionLoading = computed(
+	() =>
+		projectValidationLoading.value ||
+		projectLinksNetworkValidationLoading.value ||
+		reviewSubmissionPending.value,
 )
 const projectValidation = computed(() => {
 	const validation = projectValidationResponse.value
-	if (!validation) return null
-	return {
-		...validation,
-		nags: [
-			...validation.nags,
-			...(discordInviteValidation.value
-				? [
-					{
-						kind: 'link_validation',
-						severity: 'required',
-						details: {
-							field: 'discord',
-							url: projectV3.value?.link_urls?.discord?.url,
-							reason: 'discord_invite',
-						},
-					},
-				]
-				: []),
-		],
-	}
+	if (!validation || backendValidationError.value || linkValidation.isError.value) return null
+	return { ...validation, nags: [...validation.nags, ...linkValidation.nags.value] }
 })
 
 async function refreshProjectValidation() {
-	const result = await refetchProjectValidation()
-	return result.data ? projectValidation.value : null
+	const projectIdAtStart = projectId.value
+	const [result, network] = await Promise.all([
+		refetchProjectValidation({ cancelRefetch: false }),
+		linkValidation.refresh(),
+	])
+	await nextTick()
+	if (
+		!result.isSuccess ||
+		!network.isSuccess ||
+		projectId.value !== projectIdAtStart ||
+		projectValidationLoading.value ||
+		projectLinksNetworkValidationLoading.value
+	) {
+		return null
+	}
+	return projectValidation.value
 }
 
 const canAccessSettings = computed(() => !!currentMember.value?.accepted)
@@ -2184,18 +2201,29 @@ watch(
 )
 
 async function setProcessing() {
-	// Guard against multiple submissions while mutation is pending
-	if (patchStatusMutation.isPending.value || discordInviteValidation.value) return
-
+	if (
+		patchStatusMutation.isPending.value ||
+		!canSubmitProjectForReview(projectValidation.value, reviewSubmissionLoading.value)
+	) {
+		return false
+	}
+	reviewSubmissionPending.value = true
 	startLoading()
-	patchStatusMutation.mutate(
-		{
+	try {
+		const validation = await refreshProjectValidation()
+		if (!canSubmitProjectForReview(validation, false)) return false
+		await patchStatusMutation.mutateAsync({
 			projectId: project.value.id,
 			status: 'processing',
 			threadId: project.value.thread_id,
-		},
-		{ onSettled: () => stopLoading() },
-	)
+		})
+		return true
+	} catch {
+		return false
+	} finally {
+		reviewSubmissionPending.value = false
+		stopLoading()
+	}
 }
 
 async function patchProject(resData, quiet = false, throwOnError = false) {
@@ -2524,6 +2552,7 @@ provideProjectPageContext({
 	organization,
 	projectValidation,
 	projectValidationLoading,
+	projectLinksNetworkValidationLoading,
 	// Lazy version loading
 	versions,
 	versionsLoading,

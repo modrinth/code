@@ -111,11 +111,6 @@
 						<div class="mt-2.5 empty:hidden">
 							<template v-if="row.field">
 								<ValidationMessage
-									v-if="row.field === 'discord'"
-									:check="discordInviteValidation"
-									:debounce="0"
-								/>
-								<ValidationMessage
 									:check="savedFieldMessages(row.field)"
 									:project-field="saved[row.field]"
 									:current-field="current[row.field]"
@@ -149,7 +144,6 @@ import {
 	defineMessages,
 	EmptyState,
 	IconButton,
-	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	Input,
@@ -166,7 +160,6 @@ import {
 import { isAdmin } from '@modrinth/utils'
 
 import ValidationMessage from '@/components/ValidationMessage.vue'
-import { useDiscordInviteValidation } from '~/composables/discord-invite-validation'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import {
@@ -280,7 +273,6 @@ const messages = defineMessages({
 		id: 'project.settings.links.server-updated',
 		defaultMessage: 'Your server links have been updated.',
 	},
-	failed: { id: 'project.settings.links.failed', defaultMessage: 'Failed to update links' },
 })
 
 const fieldMessages = computed(() => ({
@@ -300,8 +292,7 @@ const fieldMessages = computed(() => ({
 
 const { formatMessage } = useVIntl()
 const tags = useGeneratedState()
-const { projectV3: project, currentMember, invalidate } = injectProjectPageContext()
-const { labrinth } = injectModrinthClient()
+const { projectV3: project, currentMember, patchProjectV3 } = injectProjectPageContext()
 const { addNotification } = injectNotificationManager()
 useProjectSettingsHeadTitle(commonProjectSettingsMessages.links)
 
@@ -327,8 +318,6 @@ const {
 		),
 	() => {},
 )
-
-const discordInviteValidation = useDiscordInviteValidation(() => current.value.discord ?? '')
 
 let nextRowKey = 0
 
@@ -459,11 +448,7 @@ const sourceRequirement = useProjectNagMessages('source-availability', 'source')
 
 function savedFieldMessages(field: string) {
 	return [
-		...fieldValidation.value.filter(
-			(message) =>
-				message.values?.field === field &&
-				message.message.id !== 'nags.link-validation.discord-invite',
-		),
+		...fieldValidation.value.filter((message) => message.values?.field === field),
 		...(field === 'source' ? sourceRequirement.value : []),
 	]
 }
@@ -554,7 +539,6 @@ const canSave = computed(
 		hasPermission.value &&
 		hasChanges.value &&
 		Object.keys(patchData.value).length > 0 &&
-		!discordInviteValidation.value &&
 		!saveValidation.messages.value.some((message) => message.severity === 'error'),
 )
 const saving = ref(false)
@@ -564,8 +548,7 @@ async function save() {
 	const submittedState = saveValidation.snapshot()
 	saving.value = true
 	try {
-		await labrinth.projects_v3.edit(project.value.id, { link_urls: patchData.value })
-		await invalidate()
+		await patchProjectV3({ link_urls: patchData.value }, true, true)
 		reset()
 		addNotification({
 			title: formatMessage(messages.updatedTitle),
@@ -574,11 +557,6 @@ async function save() {
 		})
 	} catch (error) {
 		saveValidation.capture(error, submittedState)
-		addNotification({
-			title: formatMessage(messages.failed),
-			text: error instanceof Error ? error.message : String(error),
-			type: 'error',
-		})
 	} finally {
 		saving.value = false
 	}

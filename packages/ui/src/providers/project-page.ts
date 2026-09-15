@@ -16,6 +16,7 @@ export interface ProjectPageContext {
 	organization: Ref<Labrinth.Projects.v3.Organization | null>
 	projectValidation: Ref<Labrinth.Projects.v3.ProjectValidationResponse | null>
 	projectValidationLoading: Ref<boolean>
+	projectLinksNetworkValidationLoading: Ref<boolean>
 	// Lazy version loading (client-side only)
 	versions: Ref<Labrinth.Versions.v3.Version[] | null>
 	versionsLoading: Ref<boolean>
@@ -48,7 +49,7 @@ export interface ProjectPageContext {
 		throwOnError?: boolean,
 	) => Promise<boolean>
 	patchIcon: (icon: File) => Promise<boolean>
-	setProcessing: () => Promise<void>
+	setProcessing: () => Promise<boolean>
 	createGalleryItem: (
 		file: File,
 		title?: string,
