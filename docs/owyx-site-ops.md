@@ -1,41 +1,37 @@
 # Owyx site — email, admin, Discord RPC, updater, roadmap
 
-## Регистрация и подтверждение email
+## Cloudflare Turnstile («я не робот»)
 
-После `POST /api/auth/register` бэкенд создаёт пользователя и пытается отправить письмо
-(`email_verification_tokens` → `/verify?token=…`).
+Сейчас на проде капча **выключена**, пока в `.env` стоят заглушки `obt-pend…`.
+Регистрация работает без виджета.
 
-Пароль: минимум 8 символов, **1 заглавная**, **1 цифра**, **1 спецсимвол**.
+Чтобы включить:
 
-### Mailjet (прод)
-
-На VPS в `/opt/owyx/owyxsite/.env`:
+1. [Cloudflare Dashboard](https://dash.cloudflare.com/) → Turnstile → Add site → `owyx.site`
+2. Скопируй **Site Key** и **Secret Key** в `/opt/owyx/owyxsite/.env`:
 
 ```env
-SMTP_HOST=in-v3.mailjet.com
-SMTP_PORT=587
-SMTP_SECURE=false
-SMTP_USER=<Mailjet API key>
-SMTP_PASS=<Mailjet Secret key>
-EMAIL_FROM=noreply@owyx.site
+TURNSTILE_SITE_KEY=0x...
+TURNSTILE_SECRET_KEY=0x...
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=0x...   # тот же Site Key
+TURNSTILE_SKIP=false
 ```
 
-`EMAIL_FROM` должен быть **verified sender** в Mailjet (или адрес на домене `owyx.site`).
+3. `bash owyxsite/deploy/vps-up.sh` (frontend пересоберёт `NEXT_PUBLIC_*`).
 
-#### Дальше по Mailjet / DNS
+Виджет «Я не робот» появится на `/register` и `/login`.
 
-1. В Mailjet: **Domains and senders** → домен `owyx.site` = Active (уже есть).
-2. Вкладка **SPF/DKIM Authentication** — скопируй TXT-записи в Cloudflare DNS для `owyx.site`.
-3. Добавь sender `noreply@owyx.site` (или `hello@owyx.site`) и дождись Active.
-4. Пока SPF/DKIM не зелёный — можно временно слать с verified Gmail sender (`shadowgamesblacktube@gmail.com`), но лучше доменный From.
-5. После смены `.env`:
+## Почта (Mailjet) — чеклист
 
-```bash
-ssh owyxsite
-cd /opt/owyx/owyxsite && docker compose up -d --force-recreate backend
-```
+Правильно, если:
 
-Проверка: зарегистрируй тестовый аккаунт → письмо в inbox/spam.
+- Domain `owyx.site` = **Active**
+- Sender `noreply@owyx.site` = **Active**
+- SPF/DKIM для `owyx.site` = **OK**
+- **Page Domains** — не нужно (это Premium для лендингов Mailjet, не для SMTP)
+
+`EMAIL_FROM` на сервере должен быть `noreply@owyx.site`.
+
 
 ## Выдать себе админку
 

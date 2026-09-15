@@ -2,9 +2,21 @@
 
 const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 
+function isUsableSecret(secret) {
+  if (!secret || typeof secret !== 'string') return false;
+  const s = secret.trim();
+  if (!s) return false;
+  // OBT / scaffold placeholders — never call Cloudflare with these
+  if (/^obt[-_]?pend/i.test(s)) return false;
+  if (/placeholder|changeme|your[-_]?secret|xxx+/i.test(s)) return false;
+  // Cloudflare secrets are typically 32+ chars; keep a soft floor
+  return s.length >= 20;
+}
+
 /**
  * Verify Cloudflare Turnstile token.
  * Set TURNSTILE_SECRET_KEY in env. When TURNSTILE_SKIP=true (local/dev), always pass.
+ * Placeholder secrets (obt-pend…) are treated as "not configured" so register/login work.
  */
 async function verifyTurnstile(token, remoteip = null) {
   const production = process.env.NODE_ENV === 'production';
@@ -16,16 +28,16 @@ async function verifyTurnstile(token, remoteip = null) {
   }
 
   const secret = process.env.TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET;
-  if (!secret) {
-    if (production) {
-      console.error('TURNSTILE_SECRET_KEY is required in production');
-      return {
-        success: false,
-        message: 'Проверка капчи временно недоступна',
-        misconfigured: true,
-      };
+  if (!isUsableSecret(secret)) {
+    if (production && secret && !isUsableSecret(secret)) {
+      console.warn(
+        'TURNSTILE_SECRET_KEY looks like a placeholder — skipping captcha until real Cloudflare keys are set',
+      );
+    } else if (!secret && production) {
+      console.warn('TURNSTILE_SECRET_KEY not set — skipping Turnstile in production (set real keys to enable)');
+    } else if (!secret) {
+      console.warn('TURNSTILE_SECRET_KEY not set — skipping Turnstile verification in development');
     }
-    console.warn('TURNSTILE_SECRET_KEY not set — skipping Turnstile verification in development');
     return { success: true, skipped: true };
   }
 
@@ -69,4 +81,4 @@ async function verifyTurnstile(token, remoteip = null) {
   }
 }
 
-module.exports = { verifyTurnstile };
+module.exports = { verifyTurnstile, isUsableSecret };
