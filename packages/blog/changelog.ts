@@ -11,6 +11,22 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-09-15T17:44:10+00:00`,
+		product: 'app',
+		version: '0.21.3',
+		body: `## Added
+- Added validation of Minecraft libraries on launch.
+
+## Changed
+- Reverted usage of links instead of duplicated content due to issues with a couple mods.`,
+	},
+	{
+		date: `2026-09-15T17:44:10+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Make analytics chart tooltips render crisper on Chromium browsers.`,
+	},
+	{
 		date: `2026-09-14T17:25:37+00:00`,
 		product: 'app',
 		version: '0.21.2',
