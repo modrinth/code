@@ -60,8 +60,7 @@ jobs:
         shell: bash
         env:
           V: ${{ steps.ver.outputs.version }}
-        run: |
-          node -e "const fs=require('fs');const p='apps/app/Cargo.toml';let t=fs.readFileSync(p,'utf8');const v=process.env.V;const n=t.replace(/(?m)^version = \".*\"$/,'version = \"'+v+'\"');if(n===t)throw new Error('version patch failed');fs.writeFileSync(p,n);console.log('Cargo.toml',v);"
+        run: node scripts/set-app-version.js "$V"
 
       - name: Build NSIS installer
         shell: bash
@@ -117,8 +116,7 @@ jobs:
       - name: Set Cargo package version
         env:
           V: ${{ steps.ver.outputs.version }}
-        run: |
-          node -e "const fs=require('fs');const p='apps/app/Cargo.toml';let t=fs.readFileSync(p,'utf8');const v=process.env.V;const n=t.replace(/(?m)^version = \".*\"$/,'version = \"'+v+'\"');if(n===t)throw new Error('version patch failed');fs.writeFileSync(p,n);console.log('Cargo.toml',v);"
+        run: node scripts/set-app-version.js "$V"
 
       - name: Build AppImage
         working-directory: apps/app
