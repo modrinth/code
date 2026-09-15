@@ -47,7 +47,6 @@ import tinyPotato from '@/assets/instance-icons/tiny-potato.png'
 import tire from '@/assets/instance-icons/tire.png'
 import tnt from '@/assets/instance-icons/tnt.png'
 import wrench from '@/assets/instance-icons/wrench.png'
-import wrenchRinth from '@/assets/instance-icons/wrench-rinth.png'
 import zombie from '@/assets/instance-icons/zombie.png'
 
 const names = defineMessages({
@@ -196,10 +195,6 @@ const names = defineMessages({
 	},
 	tire: { id: 'instance.icon-editor.symbol.tire', defaultMessage: 'Tire' },
 	wrench: { id: 'instance.icon-editor.symbol.create-wrench', defaultMessage: 'Wrench' },
-	wrenchRinth: {
-		id: 'instance.icon-editor.symbol.wrenth-rinth',
-		defaultMessage: 'Modrinth Wrench',
-	},
 	zombie: { id: 'instance.icon-editor.symbol.zombie', defaultMessage: 'Zombie' },
 	fabric: { id: 'instance.icon-editor.symbol.fabric', defaultMessage: 'Fabric' },
 	forge: { id: 'instance.icon-editor.symbol.forge', defaultMessage: 'Forge' },
@@ -439,8 +434,7 @@ export const symbolOptions = [
 	{ id: 'gizmo', name: names.gizmo, asset: gizmo, category: 'modded' },
 	{ id: 'terminal', name: names.terminal, asset: terminal, category: 'modded' },
 
-	// Miscellaneous: Modrinth Wrench, Mr Pack
-	{ id: 'wrenth_rinth', name: names.wrenchRinth, asset: wrenchRinth, category: 'modded' },
+	// Miscellaneous: Mr Pack
 	{ id: 'mr_pack', name: names.mrPack, asset: mrPack, category: 'modded' },
 
 	/////////////////////////
