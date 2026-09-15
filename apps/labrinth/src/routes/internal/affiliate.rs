@@ -1,3 +1,4 @@
+use crate::auth::validate::get_maybe_user_from_headers;
 use std::{collections::HashMap, net::Ipv4Addr, sync::Arc};
 use xredis::RedisPool;
 
@@ -53,7 +54,7 @@ pub async fn ingest_click(
     session_queue: web::Data<AuthQueue>,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
 ) -> Result<(), ApiError> {
-    let user = get_user_from_headers(
+    let user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -61,8 +62,8 @@ pub async fn ingest_click(
         Scopes::empty(),
     )
     .await
-    .map(|(_, user)| user)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|(_, user)| user);
     let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
 
     let url = ingest_click.url;

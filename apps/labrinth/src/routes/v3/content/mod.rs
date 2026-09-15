@@ -2,7 +2,7 @@ use super::ApiError;
 use crate::auth::checks::{
     filter_visible_versions, is_visible_project, is_visible_version,
 };
-use crate::auth::get_user_from_headers;
+use crate::auth::validate::get_maybe_user_from_headers;
 use crate::database::models::ids::DBVersionId;
 use crate::database::models::version_item::VersionQueryResult;
 use crate::database::models::{DBProject, DBVersion};
@@ -12,6 +12,7 @@ use crate::models::projects::{DependencyType, Version};
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
 use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
 use actix_web::{HttpRequest, post, web};
 use ariadne::ids::base62_impl::parse_base62;
 use async_trait::async_trait;
@@ -48,7 +49,7 @@ pub async fn resolve_content(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<ResolveContentPlan>, ApiError> {
-    let user_option = get_user_from_headers(
+    let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -56,8 +57,8 @@ pub async fn resolve_content(
         Scopes::PROJECT_READ | Scopes::VERSION_READ,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
     let cache_public_result = user_option.is_none();
     let mut provider = LabrinthContentProvider {
         pool: pool.get_ref(),
