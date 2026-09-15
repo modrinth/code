@@ -129,7 +129,7 @@ fn push_compacted_log_run(
 ) {
     if count >= LOG_COMPACTION_THRESHOLD {
         output.push_str(line);
-        let _ = write!(output, " (x{count} times - compacted by Modrinth App)");
+        let _ = write!(output, " (x{count} times - compacted by Owyx)");
         output.push_str(line_ending);
         stats.compacted_runs += 1;
         stats.compacted_lines += count;
@@ -226,7 +226,7 @@ async fn maybe_emit_log_compaction_warning(
     }
 
     let _ = crate::event::emit::emit_warning(&format!(
-        "Modrinth App has compacted {} repeated log lines in {} before displaying it for performance reasons.",
+        "Owyx has compacted {} repeated log lines in {} before displaying it for performance reasons.",
         format_count(stats.compacted_lines),
         file_name,
     ))

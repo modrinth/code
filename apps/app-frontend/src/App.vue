@@ -2040,31 +2040,7 @@ async function checkUpdates() {
 }
 
 async function checkLinuxUpdates() {
-	try {
-		const [response, currentVersion] = await Promise.all([
-			fetch('https://launcher-files.modrinth.com/updates.json'),
-			getVersion(),
-		])
-		const updates = await response.json()
-		const latestVersion = updates?.version
-
-		if (latestVersion && latestVersion !== currentVersion) {
-			markAppUpdateActionable(latestVersion)
-			const nextPopupTime = getNextAppUpdatePopupTime(latestVersion)
-			if (nextPopupTime !== null && Date.now() >= nextPopupTime) {
-				addPopupNotification({
-					contentType: 'standard',
-					title: formatMessage(updatePopupMessages.updateAvailable),
-					text: formatMessage(updatePopupMessages.linuxBody, { version: latestVersion }),
-					type: 'info',
-					autoCloseMs: null,
-				})
-				markAppUpdatePopupShown(latestVersion)
-			}
-		}
-	} catch (e) {
-		console.error('Failed to check for updates:', e)
-	}
+	// Owyx ships updates via GitHub Releases — do not poll Modrinth launcher-files CDN.
 }
 
 async function downloadAvailableUpdate() {

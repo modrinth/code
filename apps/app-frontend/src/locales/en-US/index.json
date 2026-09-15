@@ -135,7 +135,7 @@
 		"message": "Accept all"
 	},
 	"app.ads-consent.body": {
-		"message": "Ads make Modrinth possible and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance."
+		"message": "Ads were part of upstream Modrinth; Owyx does not rely on them and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance."
 	},
 	"app.ads-consent.manage": {
 		"message": "Manage preferences"
@@ -144,7 +144,7 @@
 		"message": "Reject all"
 	},
 	"app.ads-consent.title": {
-		"message": "Your privacy and how ads support Modrinth"
+		"message": "Your privacy and ads"
 	},
 	"app.appearance-settings.compact-mode.description": {
 		"message": "Display library instances in a compact row layout."
@@ -486,13 +486,13 @@
 		"message": "View instance"
 	},
 	"app.hosting.update-required.description": {
-		"message": "You need to update to use Modrinth Hosting through the Owyx"
+		"message": "You need to update to use hosting through Owyx"
 	},
 	"app.hosting.update-required.download": {
 		"message": "Download to update"
 	},
 	"app.hosting.update-required.rinthbot-alt": {
-		"message": "Excited Modrinth Bot"
+		"message": "Excited Owyx Bot"
 	},
 	"app.hosting.update-required.title": {
 		"message": "Owyx update required"
@@ -831,13 +831,13 @@
 		"message": "Sign in as"
 	},
 	"app.instance.shared-instance-wrong-account.signed-out-header": {
-		"message": "You need to sign in to Modrinth"
+		"message": "You need to sign in to Owyx"
 	},
 	"app.instance.shared-instance-wrong-account.user-admonition-body-v2": {
 		"message": "to receive updates for this shared instance."
 	},
 	"app.instance.shared-instance-wrong-account.warning-header": {
-		"message": "You are using the wrong Modrinth account"
+		"message": "You are using the wrong Owyx account"
 	},
 	"app.instance.shortcut.created": {
 		"message": "Shortcut created"
@@ -1374,7 +1374,7 @@
 		"message": "Screenshots"
 	},
 	"app.nav.sign-in-to-modrinth-account": {
-		"message": "Sign into Modrinth"
+		"message": "Sign into Owyx"
 	},
 	"app.nav.switch-account": {
 		"message": "Switch account"
@@ -1902,7 +1902,7 @@
 		"message": "Some of your instances cannot use this setting"
 	},
 	"app.settings.game-options.compatibility.reason.launcher-controlled": {
-		"message": "This setting is managed by Modrinth’s launch settings."
+		"message": "This setting is managed by Owyx launch settings."
 	},
 	"app.settings.game-options.custom-value.placeholder": {
 		"message": "Enter a value"
@@ -2736,7 +2736,7 @@
 		"message": "macOS"
 	},
 	"app.settings.privacy.ads-consent.intro": {
-		"message": "Ads make Modrinth possible and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance. You can opt out or manage your preferences below."
+		"message": "Ads were part of upstream Modrinth; Owyx does not rely on them and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance. You can opt out or manage your preferences below."
 	},
 	"app.settings.privacy.discord-rich-presence.description": {
 		"message": "Show Owyx as your current activity on Discord. This does not affect Rich Presence added to instances by mods. Requires an app restart."
@@ -2763,7 +2763,7 @@
 		"message": "Purge the app cache?"
 	},
 	"app.settings.resource-management.app-cache.description": {
-		"message": "Clear cached data and download it again from Modrinth. The app may load more slowly until the cache is rebuilt."
+		"message": "Clear cached data and download it again from the content API. The app may load more slowly until the cache is rebuilt."
 	},
 	"app.settings.resource-management.app-cache.purge": {
 		"message": "Purge cache"
@@ -2970,7 +2970,7 @@
 		"message": "These settings changed elsewhere"
 	},
 	"app.settings.synced-options.game-settings.custom-empty": {
-		"message": "Settings added by mods will appear here after Modrinth finds them in one of your instances."
+		"message": "Settings added by mods will appear here after Owyx finds them in one of your instances."
 	},
 	"app.settings.synced-options.game-settings.description": {
 		"message": "Use the same game options across your instances."
@@ -3252,7 +3252,7 @@
 		"message": "MINECON Earth 2017"
 	},
 	"app.skins.section.modrinth": {
-		"message": "Modrinth"
+		"message": "Owyx"
 	},
 	"app.skins.section.modrinth-pride": {
 		"message": "Modrinth Pride"
@@ -3294,7 +3294,7 @@
 		"message": "Would you mind answering a few questions about your experience with Owyx?"
 	},
 	"app.survey.footer": {
-		"message": "This feedback will go directly to the Modrinth team and help guide future updates!"
+		"message": "This feedback will go directly to the Owyx maintainers and help guide future updates!"
 	},
 	"app.survey.no-thanks": {
 		"message": "No thanks"
@@ -3303,7 +3303,7 @@
 		"message": "Take survey"
 	},
 	"app.survey.title": {
-		"message": "Hey there Modrinth user!"
+		"message": "Hey there Owyx user!"
 	},
 	"app.sync-instances-update.badge": {
 		"message": "New this update"
@@ -3486,7 +3486,7 @@
 		"message": "Press <shortcut>N</shortcut> to quick create an instance"
 	},
 	"app.welcome-screen.title": {
-		"message": "Welcome to Modrinth"
+		"message": "Welcome to Owyx"
 	},
 	"app.world.server-modal.placeholder-address": {
 		"message": "example.modrinth.gg"
@@ -3555,10 +3555,10 @@
 		"message": "It may be different from their Minecraft username!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "Enter Modrinth username..."
+		"message": "Enter Owyx username..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "What's your friend's Modrinth username?"
+		"message": "What's your friend's Owyx username?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>Add friends</link> to see what they're playing!"
@@ -3924,7 +3924,7 @@
 		"message": "TNT"
 	},
 	"instance.icon-editor.symbol.wrenth-rinth": {
-		"message": "Modrinth Wrench"
+		"message": "Wrench"
 	},
 	"instance.icon-editor.symbol.zombie": {
 		"message": "Zombie"

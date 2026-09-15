@@ -1,0 +1,195 @@
+# Build Owyx installers and publish a GitHub Release.
+# github-hosted runners only — safe on this fork (no Modrinth CDN / Namespace runners).
+name: Owyx GitHub Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Semver without v prefix (e.g. 0.1.0)'
+        required: true
+        default: '0.1.0'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: owyx-github-release-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+jobs:
+  build-windows:
+    name: Windows NSIS
+    runs-on: windows-latest
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: ver
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            V="${{ inputs.version }}"; V="${V#v}"
+          else
+            V="${GITHUB_REF_NAME#v}"
+          fi
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          echo "version=$V"
+
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install dependencies
+        shell: bash
+        run: pnpm install --frozen-lockfile
+
+      - name: Set Cargo package version
+        shell: bash
+        env:
+          V: ${{ steps.ver.outputs.version }}
+        run: |
+          node -e "const fs=require('fs');const p='apps/app/Cargo.toml';let t=fs.readFileSync(p,'utf8');const v=process.env.V;const n=t.replace(/(?m)^version = \".*\"$/,'version = \"'+v+'\"');if(n===t)throw new Error('version patch failed');fs.writeFileSync(p,n);console.log('Cargo.toml',v);"
+
+      - name: Build NSIS installer
+        shell: bash
+        working-directory: apps/app
+        run: pnpm exec tauri build --config tauri-owyx-release.conf.json --bundles nsis
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: owyx-windows-nsis
+          path: |
+            target/release/bundle/nsis/*.exe
+            apps/app/target/release/bundle/nsis/*.exe
+          if-no-files-found: error
+
+  build-linux:
+    name: Linux AppImage
+    runs-on: ubuntu-22.04
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: ver
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            V="${{ inputs.version }}"; V="${V#v}"
+          else
+            V="${GITHUB_REF_NAME#v}"
+          fi
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+
+      - name: Install WebKit deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Set Cargo package version
+        env:
+          V: ${{ steps.ver.outputs.version }}
+        run: |
+          node -e "const fs=require('fs');const p='apps/app/Cargo.toml';let t=fs.readFileSync(p,'utf8');const v=process.env.V;const n=t.replace(/(?m)^version = \".*\"$/,'version = \"'+v+'\"');if(n===t)throw new Error('version patch failed');fs.writeFileSync(p,n);console.log('Cargo.toml',v);"
+
+      - name: Build AppImage
+        working-directory: apps/app
+        run: pnpm exec tauri build --config tauri-owyx-release.conf.json --bundles appimage
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: owyx-linux-appimage
+          path: |
+            target/release/bundle/appimage/*.AppImage
+            apps/app/target/release/bundle/appimage/*.AppImage
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub Release
+    needs: [build-windows, build-linux]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: ver
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            V="${{ inputs.version }}"; V="${V#v}"; TAG="v$V"
+          else
+            TAG="${GITHUB_REF_NAME}"; V="${TAG#v}"
+          fi
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+
+      - name: Create tag + release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.ver.outputs.tag }}
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          set -euo pipefail
+          NOTES=$(cat <<EOF
+          ## Owyx ${VERSION}
+
+          Public fork/rebrand of [modrinth/code](https://github.com/modrinth/code). Product branding is **Owyx**; source license remains **GPL-3** (\`LICENSE\` / \`COPYING.md\`).
+
+          - Windows: NSIS \`.exe\`
+          - Linux: \`.AppImage\`
+
+          Not affiliated with Modrinth / Rinth, Inc. Auto-update CDN from Modrinth is disabled in this build.
+          EOF
+          )
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git fetch --tags origin
+            if ! git rev-parse "refs/tags/$TAG" >/dev/null 2>&1; then
+              git tag -a "$TAG" -m "Owyx $VERSION"
+              git push origin "refs/tags/$TAG"
+            fi
+          fi
+          mapfile -t FILES < <(find dist -type f \( -name '*.exe' -o -name '*.AppImage' \) | sort)
+          echo "Files:"; printf '%s\n' "${FILES[@]}"
+          test "${#FILES[@]}" -gt 0
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "${FILES[@]}" --clobber
+            gh release edit "$TAG" --notes "$NOTES"
+          else
+            gh release create "$TAG" "${FILES[@]}" --title "Owyx ${VERSION}" --notes "$NOTES"
+          fi

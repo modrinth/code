@@ -68,7 +68,7 @@ const toTransparent = computed(() => {
 				'background-image': `url(${
 					project.featured_gallery ??
 					project.gallery[0] ??
-					'https://launcher-files.modrinth.com/assets/maze-bg.png'
+					'/owyx-hero-bg.jpg'
 				})`,
 			}"
 		>

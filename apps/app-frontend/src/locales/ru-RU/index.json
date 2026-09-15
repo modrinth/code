@@ -3075,7 +3075,7 @@
 		"message": "MINECON Earth 2017"
 	},
 	"app.skins.section.modrinth": {
-		"message": "Modrinth"
+		"message": "Owyx"
 	},
 	"app.skins.section.modrinth-pride": {
 		"message": "Modrinth Pride"
@@ -3309,7 +3309,7 @@
 		"message": "Нажмите <shortcut>Т</shortcut> быстрого создания сборки"
 	},
 	"app.welcome-screen.title": {
-		"message": "Добро пожаловать в Modrinth"
+		"message": "Добро пожаловать в Owyx"
 	},
 	"app.world.server-modal.placeholder-address": {
 		"message": "example.modrinth.gg"

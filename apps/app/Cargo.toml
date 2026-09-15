@@ -3,8 +3,8 @@ name = "theseus_gui"
 # The actual version is set by the theseus-build workflow on tagging
 version = "1.0.0-local"
 edition.workspace = true
-description = "The Modrinth App is a desktop application for managing your Minecraft mods"
-repository = "https://github.com/modrinth/code/apps/app/"
+description = "Owyx — desktop Minecraft launcher (fork of Modrinth App / Theseus, GPL-3)"
+repository = "https://github.com/ebluffy/Owyx"
 license = "GPL-3.0-only"
 
 [dependencies]

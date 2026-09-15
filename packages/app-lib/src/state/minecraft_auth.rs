@@ -890,7 +890,7 @@ const MICROSOFT_CLIENT_ID: &str = "00000000402b5328";
 const AUTH_REPLY_URL: &str = "https://login.live.com/oauth20_desktop.srf";
 const REQUESTED_SCOPE: &str = "service::user.auth.xboxlive.com::MBI_SSL";
 pub const MINECRAFT_SERVICES_USER_AGENT: &str =
-    "Modrinth App (support@modrinth.com; https://modrinth.com/app)";
+    "Owyx (https://github.com/ebluffy/Owyx; fork of modrinth/code)";
 
 pub struct RequestWithDate<T> {
     pub date: DateTime<Utc>,

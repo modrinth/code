@@ -1,29 +1,16 @@
-# ![Modrinth App](/.github/assets/app_cover.png)
+# Owyx desktop app (Tauri)
 
-## Modrinth App
+Part of the **[ebluffy/Owyx](https://github.com/ebluffy/Owyx)** monorepo — a public fork/rebrand of [modrinth/code](https://github.com/modrinth/code).
 
-The Modrinth App is a desktop application for managing your Minecraft mods. It is built with [Tauri](https://tauri.app/) and [Vue](https://vuejs.org/).
+Product name: **Owyx**. Source license: **GPL-3** (same as upstream). See root [`LICENSE`](../../LICENSE) and [`COPYING.md`](../../COPYING.md).
 
-If you're not a developer and you've stumbled upon this repository, you can download the latest release of the app from the [Modrinth website](https://modrinth.com/app).
+## Dev
 
-## Development
-
-### Pre-requisites
-
-Before you begin, ensure you have the following installed on your machine:
-
-- [Node.js](https://nodejs.org/en/)
-- [pnpm](https://pnpm.io/)
-- [Rust](https://www.rust-lang.org/tools/install)
-- [Tauri](https://v2.tauri.app/start/prerequisites/)
-
-### Setup
-
-Follow these steps to set up your development environment:
+From the monorepo root:
 
 ```bash
 pnpm install
 pnpm app:dev
 ```
 
-You should now have a development build of the app running with hot-reloading enabled. Any changes you make to the code will automatically refresh the app.
+Release bundles (CI): `.github/workflows/owyx-github-release.yml` using `tauri-owyx-release.conf.json` (no Modrinth updater CDN / code signing).
