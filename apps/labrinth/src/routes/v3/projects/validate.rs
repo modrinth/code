@@ -36,7 +36,7 @@ pub(crate) fn require_valid_project(
     Ok(())
 }
 
-pub(crate) async fn validate_link_changes(
+pub(crate) fn validate_link_changes(
     project: &Project,
     changes: &super::EditProject,
     force: bool,
@@ -67,7 +67,7 @@ pub(crate) async fn validate_link_changes(
         description: force || description_changed,
     };
     let nags =
-        crate::validate::project::validate_link_fields(&candidate, scope).await;
+        crate::validate::project::validate_link_fields(&candidate, scope);
     require_valid_project(nags)
 }
 
@@ -309,20 +309,17 @@ pub async fn validate(
     .collect::<Vec<_>>();
     let project = Project::from(project);
 
-    let network_nags =
-        crate::validate::project::validate_link_network(&project).await;
-    let mut nags = web::block(move || {
-        validate_project(
-            &project,
-            &versions,
-            &available_categories,
-            &disclosures,
-        )
-    })
-    .await
-    .wrap_internal_err("validating project")?;
-    nags.extend(network_nags);
-    Ok(web::Json(ProjectValidationResponse { nags }))
+	let nags = web::block(move || {
+		validate_project(
+			&project,
+			&versions,
+			&available_categories,
+			&disclosures,
+		)
+	})
+	.await
+	.wrap_internal_err("validating project")?;
+	Ok(web::Json(ProjectValidationResponse { nags }))
 }
 
 #[cfg(test)]

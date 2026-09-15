@@ -1,5 +1,4 @@
 mod description;
-mod network;
 
 use std::collections::HashMap;
 
@@ -75,9 +74,9 @@ const CURSEFORGE_DOMAINS: &[&str] = &["curseforge.com"];
 const GOOGLE_FORMS_DOMAINS: &[&str] = &["docs.google.com"];
 const GOOGLE_FORMS_SHORT_DOMAINS: &[&str] = &["forms.gle"];
 const MICROSOFT_FORMS_DOMAINS: &[&str] = &[
-	"forms.office.com",
-	"forms.microsoft.com",
-	"forms.cloud.microsoft",
+    "forms.office.com",
+    "forms.microsoft.com",
+    "forms.cloud.microsoft",
 ];
 const TYPEFORM_DOMAINS: &[&str] = &["typeform.com"];
 const DISCORD_INVITE_DOMAINS: &[&str] = &["discord.com", "discordapp.com"];
@@ -245,12 +244,11 @@ pub(super) fn validate_targets_static(
     }
     for group in seen.values().filter(|group| group.len() > 1) {
         for target in group {
-			let Some(other) = group
-				.iter()
-				.find(|other| other.field != target.field)
-			else {
-				continue;
-			};
+            let Some(other) =
+                group.iter().find(|other| other.field != target.field)
+            else {
+                continue;
+            };
             let mut nag = target.required("duplicate");
             nag.details["other_field"] = json!(other.field);
             nags.push(nag);
@@ -300,7 +298,7 @@ pub(super) fn validate_target(target: &LinkTarget) -> Option<ProjectNag> {
     }
     if !matches!(
         target.field.as_str(),
-		"site" | "store" | "other" | "source" | "discord" | "wiki"
+        "site" | "store" | "other" | "source" | "discord" | "wiki"
     ) && !allowed(&target.field, &url)
     {
         return Some(target.warning("not_in_allowlist"));
@@ -308,24 +306,7 @@ pub(super) fn validate_target(target: &LinkTarget) -> Option<ProjectNag> {
     None
 }
 
-pub(super) async fn validate_network(project: &Project) -> Vec<ProjectNag> {
-    validate_network_fields(project, super::LinkValidationScope::all()).await
-}
-
-pub(super) async fn validate_network_fields(
-    project: &Project,
-    scope: super::LinkValidationScope,
-) -> Vec<ProjectNag> {
-    network::validate(
-        targets(project)
-            .into_iter()
-            .filter(|target| scope.includes(&target.field))
-            .collect(),
-    )
-    .await
-}
-
-pub(super) async fn validate_input(
+pub(super) fn validate_input(
     links: &HashMap<String, String>,
     license_url: Option<&str>,
     description: &str,
@@ -346,28 +327,25 @@ pub(super) async fn validate_input(
         });
     }
     targets.extend(self::description::extract(description));
-    let mut nags = validate_targets_static(&targets);
-    nags.extend(network::validate(targets).await);
-    nags
+    validate_targets_static(&targets)
 }
 
 pub(super) fn globally_blocked(url: &Url) -> bool {
-    from_domains(url, GLOBAL_BLOCKS)
-        || url.host_str().is_some_and(is_nsfw_host)
+    from_domains(url, GLOBAL_BLOCKS) || url.host_str().is_some_and(is_nsfw_host)
 }
 
 fn is_nsfw_host(host: &str) -> bool {
-	let normalized = host.trim_end_matches('.').to_ascii_lowercase();
-	let mut suffix = normalized.as_str();
-	loop {
-		if blocklist::is_porn(suffix) {
-			return true;
-		}
-		let Some((_, rest)) = suffix.split_once('.') else {
-			return false;
-		};
-		suffix = rest;
-	}
+    let normalized = host.trim_end_matches('.').to_ascii_lowercase();
+    let mut suffix = normalized.as_str();
+    loop {
+        if blocklist::is_porn(suffix) {
+            return true;
+        }
+        let Some((_, rest)) = suffix.split_once('.') else {
+            return false;
+        };
+        suffix = rest;
+    }
 }
 
 fn host(url: &Url) -> &str {
@@ -409,17 +387,17 @@ fn repo_section(url: &Url, section: &str) -> bool {
     let parts = path(url);
     repository_path(url)
         && (parts.get(2) == Some(&section)
-			|| (from_domains(url, GITLAB_DOMAINS)
+            || (from_domains(url, GITLAB_DOMAINS)
                 && parts.windows(2).any(|pair| pair == ["-", section])))
 }
 
 pub(super) fn discord_code(url: &Url) -> Option<&str> {
     let parts = path(url);
-	let code = if from_domains(url, DISCORD_SHORT_INVITE_DOMAINS)
-		&& parts.len() == 1
-	{
+    let code = if from_domains(url, DISCORD_SHORT_INVITE_DOMAINS)
+        && parts.len() == 1
+    {
         parts[0]
-	} else if from_domains(url, DISCORD_INVITE_DOMAINS)
+    } else if from_domains(url, DISCORD_INVITE_DOMAINS)
         && parts.len() == 2
         && parts[0] == "invite"
     {
@@ -445,17 +423,17 @@ fn allowed(field: &str, url: &Url) -> bool {
         }
         "issues" => {
             (from_domains(url, SOURCE_DOMAINS) && repo_section(url, "issues"))
-				|| (from_domains(url, CURSEFORGE_DOMAINS)
+                || (from_domains(url, CURSEFORGE_DOMAINS)
                     && parts.len() == 4
                     && parts[0] == "minecraft"
                     && parts[3] == "issues")
-				|| (from_domains(url, GOOGLE_FORMS_DOMAINS)
+                || (from_domains(url, GOOGLE_FORMS_DOMAINS)
                     && parts.first() == Some(&"forms"))
-				|| (from_domains(url, GOOGLE_FORMS_SHORT_DOMAINS)
-					&& !parts.is_empty())
-				|| (from_domains(url, MICROSOFT_FORMS_DOMAINS)
-					&& !parts.is_empty())
-				|| (from_domains(url, TYPEFORM_DOMAINS)
+                || (from_domains(url, GOOGLE_FORMS_SHORT_DOMAINS)
+                    && !parts.is_empty())
+                || (from_domains(url, MICROSOFT_FORMS_DOMAINS)
+                    && !parts.is_empty())
+                || (from_domains(url, TYPEFORM_DOMAINS)
                     && parts.first() == Some(&"to")
                     && parts.len() >= 2)
         }
@@ -464,15 +442,15 @@ fn allowed(field: &str, url: &Url) -> bool {
         }
         "discord" => discord_code(url).is_some(),
         "github" => {
-			from_domains(url, GITHUB_DOMAINS)
+            from_domains(url, GITHUB_DOMAINS)
                 && parts.first() == Some(&"sponsors")
                 && (parts.len() == 2
                     || (parts.len() == 3 && parts[2] == "sponsorships"))
         }
-		"license" => {
-			from_domains(url, LICENSE_DOMAINS)
-				|| (from_domains(url, GITHUB_DOMAINS) && allowed("source", url))
-		}
+        "license" => {
+            from_domains(url, LICENSE_DOMAINS)
+                || (from_domains(url, GITHUB_DOMAINS) && allowed("source", url))
+        }
         _ => DONATION_DOMAINS.iter().any(|(platform, domains)| {
             *platform == field && from_domains(url, domains)
         }),
@@ -480,35 +458,36 @@ fn allowed(field: &str, url: &Url) -> bool {
 }
 
 fn field_block(field: &str, url: &Url) -> Option<&'static str> {
-	if field == "wiki" && from_domains(url, SOURCE_DOMAINS) {
-		return None;
-	}
+    if field == "wiki" && from_domains(url, SOURCE_DOMAINS) {
+        return None;
+    }
     let own_pattern = allowed(field, url);
     for other in [
         "issues", "wiki", "discord", "github", "patreon", "bmac", "paypal",
         "ko-fi", "license",
     ] {
-		let matches_other = if other == "license" {
-			from_domains(url, LICENSE_DOMAINS)
-		} else {
-			allowed(other, url)
-		};
-		if other != field && matches_other {
+        let matches_other = if other == "license" {
+            from_domains(url, LICENSE_DOMAINS)
+        } else {
+            allowed(other, url)
+        };
+        if other != field && matches_other {
             return Some("wrong_field");
         }
     }
     if field != "source" && from_domains(url, SOURCE_DOMAINS) && !own_pattern {
         return Some("wrong_field");
     }
-	if field != "discord" && from_domains(url, DISCORD_REDIRECT_DOMAINS) {
+    if field != "discord" && from_domains(url, DISCORD_REDIRECT_DOMAINS) {
         return Some("wrong_field");
     }
-	let explicit_exception =
-		matches!(field, "source" | "issues" | "wiki" | "github" | "discord" | "license")
-			&& own_pattern;
-	if from_domains(url, EXTERNAL_BLOCKS) && !explicit_exception {
-		return Some("external_blocklist_match");
-	}
+    let explicit_exception = matches!(
+        field,
+        "source" | "issues" | "wiki" | "github" | "discord" | "license"
+    ) && own_pattern;
+    if from_domains(url, EXTERNAL_BLOCKS) && !explicit_exception {
+        return Some("external_blocklist_match");
+    }
     None
 }
 
@@ -553,13 +532,22 @@ mod tests {
         for (field, url) in [
             ("issues", "https://github.com/modrinth/code/issues"),
             ("wiki", "https://github.com/modrinth/code/wiki"),
-			("wiki", "https://github.com/modrinth/code"),
-			("wiki", "https://github.com/modrinth/code/blob/main/README.md"),
-			("wiki", "https://github.com/modrinth/code/issues"),
-			("wiki", "https://gitlab.com/group/repo/-/blob/main/README.md"),
+            ("wiki", "https://github.com/modrinth/code"),
+            (
+                "wiki",
+                "https://github.com/modrinth/code/blob/main/README.md",
+            ),
+            ("wiki", "https://github.com/modrinth/code/issues"),
+            (
+                "wiki",
+                "https://gitlab.com/group/repo/-/blob/main/README.md",
+            ),
             ("source", "https://github.com/modrinth/code"),
-			("license", "https://github.com/modrinth/code"),
-			("license", "https://github.com/modrinth/code/blob/main/LICENSE"),
+            ("license", "https://github.com/modrinth/code"),
+            (
+                "license",
+                "https://github.com/modrinth/code/blob/main/LICENSE",
+            ),
             ("github", "https://github.com/sponsors/modrinth"),
             (
                 "issues",
@@ -571,10 +559,13 @@ mod tests {
             assert!(check(field, url).is_none(), "{field}: {url}");
         }
         for (field, url) in [
-			("license", "https://github.com/modrinth"),
-			("license", "https://gitlab.com/group/repo/-/blob/main/LICENSE"),
-			("license", "https://github.com/modrinth/code/issues"),
-			("license", "https://github.com/modrinth/code/wiki"),
+            ("license", "https://github.com/modrinth"),
+            (
+                "license",
+                "https://gitlab.com/group/repo/-/blob/main/LICENSE",
+            ),
+            ("license", "https://github.com/modrinth/code/issues"),
+            ("license", "https://github.com/modrinth/code/wiki"),
             ("source", "https://github.com/modrinth/code/issues"),
             ("site", "https://discord.gg/modrinth"),
             ("other", "https://ko-fi.com/modrinth"),
@@ -589,20 +580,32 @@ mod tests {
         }
     }
 
-	#[test]
-	fn misplaced_links_take_precedence_over_external_blocklist_matches() {
-		for (field, url, reason) in [
-			("site", "https://discord.gg/modrinth", "wrong_field"),
-			("source", "https://github.com/sponsors/modrinth", "wrong_field"),
-			("source", "https://github.com/modrinth/code/issues", "wrong_field"),
-			("site", "https://youtube.com/@modrinth", "external_blocklist_match"),
-			("site", "https://bit.ly/project", "global_blocklist_match"),
-		] {
-			let nag = check(field, url).unwrap();
-			assert_eq!(nag.details["reason"], reason, "{field}: {url}");
-			assert_eq!(nag.severity, ProjectNagSeverity::Required);
-		}
-	}
+    #[test]
+    fn misplaced_links_take_precedence_over_external_blocklist_matches() {
+        for (field, url, reason) in [
+            ("site", "https://discord.gg/modrinth", "wrong_field"),
+            (
+                "source",
+                "https://github.com/sponsors/modrinth",
+                "wrong_field",
+            ),
+            (
+                "source",
+                "https://github.com/modrinth/code/issues",
+                "wrong_field",
+            ),
+            (
+                "site",
+                "https://youtube.com/@modrinth",
+                "external_blocklist_match",
+            ),
+            ("site", "https://bit.ly/project", "global_blocklist_match"),
+        ] {
+            let nag = check(field, url).unwrap();
+            assert_eq!(nag.details["reason"], reason, "{field}: {url}");
+            assert_eq!(nag.severity, ProjectNagSeverity::Required);
+        }
+    }
 
     #[test]
     fn ip_addresses_cannot_be_external_fields() {
@@ -643,35 +646,37 @@ mod tests {
         assert!(!duplicates.iter().any(|nag| nag.details["field"] == "wiki"));
     }
 
-	#[test]
-	fn repeated_fields_only_report_duplicates_with_other_fields() {
-		let license = LinkTarget {
-			field: "license".into(),
-			url: "https://project.dev/license".into(),
-			image: false,
-		};
-		let mut targets = vec![license.clone(), license];
-		let nags = validate_targets_static(&targets);
-		assert!(!nags.iter().any(|nag| nag.details["reason"] == "duplicate"));
+    #[test]
+    fn repeated_fields_only_report_duplicates_with_other_fields() {
+        let license = LinkTarget {
+            field: "license".into(),
+            url: "https://project.dev/license".into(),
+            image: false,
+        };
+        let mut targets = vec![license.clone(), license];
+        let nags = validate_targets_static(&targets);
+        assert!(!nags.iter().any(|nag| nag.details["reason"] == "duplicate"));
 
-		targets.push(LinkTarget {
-			field: "site".into(),
-			url: "https://project.dev/license".into(),
-			image: false,
-		});
-		let nags = validate_targets_static(&targets);
-		let duplicates = nags
-			.iter()
-			.filter(|nag| nag.details["reason"] == "duplicate")
-			.collect::<Vec<_>>();
-		assert_eq!(duplicates.len(), 2);
-		assert!(duplicates.iter().any(|nag| {
-			nag.details["field"] == "license" && nag.details["other_field"] == "site"
-		}));
-		assert!(duplicates.iter().any(|nag| {
-			nag.details["field"] == "site" && nag.details["other_field"] == "license"
-		}));
-	}
+        targets.push(LinkTarget {
+            field: "site".into(),
+            url: "https://project.dev/license".into(),
+            image: false,
+        });
+        let nags = validate_targets_static(&targets);
+        let duplicates = nags
+            .iter()
+            .filter(|nag| nag.details["reason"] == "duplicate")
+            .collect::<Vec<_>>();
+        assert_eq!(duplicates.len(), 2);
+        assert!(duplicates.iter().any(|nag| {
+            nag.details["field"] == "license"
+                && nag.details["other_field"] == "site"
+        }));
+        assert!(duplicates.iter().any(|nag| {
+            nag.details["field"] == "site"
+                && nag.details["other_field"] == "license"
+        }));
+    }
 
     #[test]
     fn donation_aliases_and_unknown_hosts() {
@@ -683,7 +688,7 @@ mod tests {
         ] {
             assert!(check(field, url).is_none());
         }
-		assert!(check("wiki", "https://docs.myproject.dev").is_none());
+        assert!(check("wiki", "https://docs.myproject.dev").is_none());
         assert!(
             check("source", "https://git.myproject.dev/owner/repo").is_none()
         );

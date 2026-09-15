@@ -552,8 +552,7 @@ async fn prepare_project_creation(
             &create_data.license_id,
             create_data.license_url.as_deref(),
             &create_data.description,
-        )
-        .await,
+        ),
     )?;
 
     Ok((current_user, create_data))

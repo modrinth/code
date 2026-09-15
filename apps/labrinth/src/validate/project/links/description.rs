@@ -131,28 +131,6 @@ pub(super) fn known_download(url: &Url, image: bool) -> bool {
     download_route || download_query
 }
 
-pub(super) fn response_is_download(
-    content_type: &str,
-    disposition: &str,
-    image: bool,
-) -> bool {
-    let mime = content_type
-        .split(';')
-        .next()
-        .unwrap_or_default()
-        .trim()
-        .to_ascii_lowercase();
-    if image && mime.starts_with("image/") {
-        return false;
-    }
-    disposition
-        .split(';')
-        .next()
-        .is_some_and(|value| value.trim().eq_ignore_ascii_case("attachment"))
-        || (!mime.is_empty()
-            && !matches!(mime.as_str(), "text/html" | "application/xhtml+xml"))
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -212,7 +190,7 @@ https://ignored.project.dev
     }
 
     #[test]
-    fn download_routes_headers_and_images() {
+    fn download_routes_and_images() {
         assert!(known_download(
             &Url::parse(
                 "https://github.com/owner/repo/releases/download/v1/file"
@@ -228,15 +206,6 @@ https://ignored.project.dev
             &Url::parse("https://project.dev/badge.svg").unwrap(),
             true
         ));
-        assert!(response_is_download("application/octet-stream", "", false));
-        assert!(response_is_download("application/pdf", "", false));
-        assert!(response_is_download(
-            "text/html",
-            "attachment; filename=file",
-            false
-        ));
-        assert!(!response_is_download("image/png", "attachment", true));
-        assert!(!response_is_download("text/html; charset=utf-8", "", false));
         assert_eq!(
             extract("[file](file:///tmp/file.jar)")[0].url,
             "file:///tmp/file.jar"
