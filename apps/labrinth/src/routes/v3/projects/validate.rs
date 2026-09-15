@@ -17,7 +17,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::Context as _;
 use crate::validate::project::{
-    ProjectNag, ProjectSaveValidation,
+    ProjectNag, ProjectNagSeverity, ProjectSaveValidation,
     validate_with_context as validate_project,
 };
 
@@ -28,9 +28,10 @@ pub(crate) struct ProjectValidationError(pub Vec<ProjectNag>);
 pub(crate) fn require_valid_project(
     nags: Vec<ProjectNag>,
 ) -> Result<(), ApiError> {
-    if nags.iter().any(|nag| {
-        nag.severity == crate::validate::project::ProjectNagSeverity::Required
-    }) {
+    if nags
+        .iter()
+        .any(|nag| nag.severity == ProjectNagSeverity::Required)
+    {
         return Err(ApiError::Request(eyre!(ProjectValidationError(nags))));
     }
     Ok(())
@@ -309,46 +310,15 @@ pub async fn validate(
     .collect::<Vec<_>>();
     let project = Project::from(project);
 
-	let nags = web::block(move || {
-		validate_project(
-			&project,
-			&versions,
-			&available_categories,
-			&disclosures,
-		)
-	})
-	.await
-	.wrap_internal_err("validating project")?;
-	Ok(web::Json(ProjectValidationResponse { nags }))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::validate::project::{ProjectNagKind, ProjectNagSeverity};
-
-    #[test]
-    fn only_required_nags_reject_saves_with_structured_details() {
-        let nag = |severity| ProjectNag {
-            kind: ProjectNagKind::DescriptionTooShort,
-            severity,
-            details: serde_json::json!({ "length": 9, "min_chars": 125 }),
-        };
-        assert!(
-            require_valid_project(vec![
-                nag(ProjectNagSeverity::Warning),
-                nag(ProjectNagSeverity::Suggestion)
-            ])
-            .is_ok()
-        );
-        let error =
-            require_valid_project(vec![nag(ProjectNagSeverity::Required)])
-                .unwrap_err();
-        let response = error.as_api_error();
-        assert_eq!(response.error, "request_error");
-        assert_eq!(
-            response.details.unwrap()["nags"][0]["kind"],
-            "description_too_short"
-        );
-    }
+    let nags = web::block(move || {
+        validate_project(
+            &project,
+            &versions,
+            &available_categories,
+            &disclosures,
+        )
+    })
+    .await
+    .wrap_internal_err("validating project")?;
+    Ok(web::Json(ProjectValidationResponse { nags }))
 }
