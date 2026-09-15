@@ -3035,6 +3035,54 @@
   "moderation.page.technicalReview": {
     "message": "Tech review"
   },
+  "moderation.project-review.bottom": {
+    "message": "Review summary"
+  },
+  "moderation.project-review.description": {
+    "message": "Description"
+  },
+  "moderation.project-review.disclosures": {
+    "message": "Disclosures"
+  },
+  "moderation.project-review.empty": {
+    "message": "No project selected."
+  },
+  "moderation.project-review.gallery": {
+    "message": "Gallery"
+  },
+  "moderation.project-review.hideLeft": {
+    "message": "Hide project details"
+  },
+  "moderation.project-review.hideRight": {
+    "message": "Hide review issues"
+  },
+  "moderation.project-review.history": {
+    "message": "History"
+  },
+  "moderation.project-review.left": {
+    "message": "Project details"
+  },
+  "moderation.project-review.loading": {
+    "message": "Loading review workspace…"
+  },
+  "moderation.project-review.right": {
+    "message": "Review issues"
+  },
+  "moderation.project-review.showLeft": {
+    "message": "Show project details"
+  },
+  "moderation.project-review.showRight": {
+    "message": "Show review issues"
+  },
+  "moderation.project-review.tech-review": {
+    "message": "Tech Review"
+  },
+  "moderation.project-review.title": {
+    "message": "Project review"
+  },
+  "moderation.project-review.versions": {
+    "message": "Versions"
+  },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} per batch"
   },

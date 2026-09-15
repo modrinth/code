@@ -338,6 +338,9 @@ importers:
       dayjs:
         specifier: ^1.11.7
         version: 1.11.19
+      dockview-vue:
+        specifier: ^8.2.0
+        version: 8.2.0(vue@3.5.27(typescript@5.9.3))
       dompurify:
         specifier: ^3.1.7
         version: 3.3.1
@@ -905,6 +908,18 @@ importers:
         version: link:../tooling-config
 
 packages:
+
+  dockview-core@8.2.0:
+    resolution: {integrity: sha512-+L+xdvmO1b4in8rVkFtQM13IkPDKqDLoHJvq5HtAIsMxsPptSVveKeViYBqquaoHF+t0xb9f6692gTeKnjCKGw==}
+
+  dockview-vue@8.2.0:
+    resolution: {integrity: sha512-Mr5lFrDJ4cD6IoDz7fPo7TE/lQ8h7ed2gP6Cb0Ii460nw1ES94iEx/HBIYO1HlM0vdU052/d5aCzlky4jauF1Q==}
+    peerDependencies:
+      vue: ^3.4.0
+
+  dockview@8.2.0:
+    resolution: {integrity: sha512-Jj+fnFWSrdEhF+1DmpGNYjEvyqf7J0FHkDqsD98wL4WOYB2CSKavDCL49B3LHIGYvWNN7Q1O1j4p7Pts38CM5A==}
+
 
   '@adobe/css-tools@4.4.4':
     resolution: {integrity: sha512-Elp+iwUx5rN5+Y8xLt5/GRoG20WGoDCQ/1Fb+1LiGtvwbDavuSk0jhD/eZdckHAuzcDzccnkv+rEjyWfRx18gg==}
@@ -10775,6 +10790,18 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
 snapshots:
+
+  dockview-core@8.2.0: {}
+
+  dockview-vue@8.2.0(vue@3.5.27(typescript@5.9.3)):
+    dependencies:
+      dockview: 8.2.0
+      vue: 3.5.27(typescript@5.9.3)
+
+  dockview@8.2.0:
+    dependencies:
+      dockview-core: 8.2.0
+
 
   '@adobe/css-tools@4.4.4': {}
 
