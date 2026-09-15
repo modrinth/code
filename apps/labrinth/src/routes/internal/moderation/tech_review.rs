@@ -3,7 +3,7 @@ use std::{collections::HashMap, fmt};
 use xredis::RedisPool;
 
 use crate::database::PgPool;
-use actix_web::{HttpRequest, get, patch, post, put, web};
+use actix_web::{HttpRequest, get, patch, post, web};
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -17,14 +17,12 @@ use crate::{
     auth::check_is_moderator_from_headers,
     database::{
         DBProject,
-        advisory_lock::AdvisoryLock,
         models::{
             DBFileId, DBProjectId, DBThread, DBThreadId, DBUser, DBUserId,
             DBVersion, DBVersionId, DelphiReportId, DelphiReportIssueDetailsId,
             DelphiReportIssueId,
             delphi_report_item::{
-                DBDelphiReport, DelphiSeverity, DelphiStatus, DelphiVerdict,
-                ReportIssueDetail,
+                DelphiSeverity, DelphiStatus, DelphiVerdict, ReportIssueDetail,
             },
             thread_item::ThreadMessageBuilder,
             version_item::VersionQueryResult,
@@ -63,7 +61,6 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(submit_report)
         .service(update_issue_details)
         .service(update_global_issue_details)
-        .service(add_report)
         .service(get_user_flagged_projects)
         .service(get_users_flagged_projects)
         .service(get_organization_flagged_projects)
@@ -1590,88 +1587,6 @@ pub async fn update_global_issue_details(
         .wrap_internal_err("failed to commit transaction")?;
 
     Ok(())
-}
-
-/// See [`add_report`].
-#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct AddReport {
-    pub file_id: FileId,
-}
-
-/// Add a technical review report.
-/// does not already exist for it.
-#[utoipa::path(
-	context_path = "/moderation/tech-review",
-	tag = "moderation",
-	responses((status = OK, body = DelphiReportId))
-)]
-#[put("/report")]
-pub async fn add_report(
-    req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    web::Json(add_report): web::Json<AddReport>,
-) -> Result<web::Json<DelphiReportId>, ApiError> {
-    check_is_moderator_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::PROJECT_WRITE,
-    )
-    .await
-    .wrap_auth_err("inserting database records for `add_report`")?;
-    let file_id = add_report.file_id;
-
-    let mut txn = pool
-        .begin()
-        .await
-        .wrap_internal_err("failed to begin transaction")?;
-    let db_file_id = DBFileId::from(file_id);
-
-    AdvisoryLock::DelphiFile(db_file_id)
-        .acquire(&mut txn)
-        .await
-        .wrap_internal_err("failed to lock file for Delphi report insertion")?;
-
-    let record = sqlx::query!(
-        r#"
-        SELECT
-            f.url,
-            COUNT(dr.id) AS "report_count!"
-        FROM files f
-        LEFT JOIN delphi_reports dr ON dr.file_id = f.id
-        WHERE f.id = $1
-        GROUP BY f.url
-        "#,
-        db_file_id as _,
-    )
-    .fetch_one(&mut txn)
-    .await
-    .wrap_internal_err("failed to fetch file")?;
-
-    if record.report_count > 0 {
-        return Err(ApiError::Request(eyre!("file already has reports")));
-    }
-
-    let report_id = DBDelphiReport {
-        id: DelphiReportId(0),
-        file_id: Some(db_file_id),
-        delphi_version: -1, // TODO
-        artifact_url: record.url,
-        created: Utc::now(),
-        severity: DelphiSeverity::Low, // TODO
-    }
-    .upsert(&mut txn)
-    .await
-    .wrap_internal_err("failed to insert report")?;
-
-    txn.commit()
-        .await
-        .wrap_internal_err("failed to commit transaction")?;
-
-    Ok(web::Json(report_id))
 }
 
 /// A user's project that is stuck in `processing` or `rejected` because the
