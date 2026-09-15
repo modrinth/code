@@ -4,6 +4,7 @@ import { Suspense, useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import CabinetShell, { Toast } from "@/components/layout/CabinetShell";
 import { useAuth } from "@/hooks/useAuth";
 import CatalogAdmin from "@/components/admin/CatalogAdmin";
 
@@ -18,12 +19,14 @@ interface AdminUser {
 
 const ROLES = ["user", "helper", "moderator", "admin"] as const;
 
+type Section = "users" | "catalog" | "news";
+
 export default function AdminPage() {
   return (
     <Suspense
       fallback={
         <div className="min-h-screen flex items-center justify-center">
-          <p className="text-muted">Загрузка...</p>
+          <p className="text-muted">Загрузка…</p>
         </div>
       }
     >
@@ -40,9 +43,9 @@ function AdminPageInner() {
 
   const [users, setUsers] = useState<AdminUser[] | null>(null);
   const [search, setSearch] = useState("");
-  const [msg, setMsg] = useState<{ text: string; type: "success" | "error" } | null>(null);
+  const [toast, setToast] = useState<{ text: string; type: "success" | "error" } | null>(null);
   const [siteInfo, setSiteInfo] = useState<{ name?: string; ip?: string; online?: boolean } | null>(null);
-  const [section, setSection] = useState<"users" | "catalog" | "news">("users");
+  const [section, setSection] = useState<Section>("users");
 
   const isAdmin = user?.role === "admin";
   const dataLoading = users === null;
@@ -56,8 +59,8 @@ function AdminPageInner() {
   );
 
   const showMessage = useCallback((text: string, type: "success" | "error") => {
-    setMsg({ text, type });
-    setTimeout(() => setMsg(null), 4000);
+    setToast({ text, type });
+    window.setTimeout(() => setToast(null), 4000);
   }, []);
 
   useEffect(() => {
@@ -70,9 +73,7 @@ function AdminPageInner() {
           if (res.ok) {
             const data = await res.json();
             setUsers(data.users ?? data ?? []);
-          } else {
-            setUsers([]);
-          }
+          } else setUsers([]);
         }
       } catch {
         if (!cancelled) setUsers([]);
@@ -84,7 +85,11 @@ function AdminPageInner() {
         if (res.ok) {
           const d = await res.json();
           if (!cancelled) {
-            setSiteInfo({ name: d.serverName ?? d.name, ip: d.serverIp ?? d.ip, online: d.online });
+            setSiteInfo({
+              name: d.serverName ?? d.name,
+              ip: d.serverIp ?? d.ip,
+              online: d.online,
+            });
           }
         }
       } catch {
@@ -132,7 +137,7 @@ function AdminPageInner() {
 
   async function deleteUser(u: AdminUser) {
     const reason = window.prompt(
-      `Удалить аккаунт ${u.nickname || u.email}? Причина (мин. 5 символов). Это может сломать связку с плагином.`
+      `Удалить ${u.nickname || u.email}? Причина (мин. 5 символов). Может сломать связку с плагином.`
     );
     if (!reason || reason.trim().length < 5) {
       if (reason !== null) showMessage("Нужна причина (мин. 5 символов)", "error");
@@ -162,7 +167,7 @@ function AdminPageInner() {
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted">Загрузка...</p>
+        <p className="text-muted">Загрузка…</p>
       </div>
     );
   }
@@ -171,15 +176,14 @@ function AdminPageInner() {
     return (
       <>
         <Header />
-        <main id="main-content" className="relative z-10 flex-1 pt-24 pb-12">
-          <div className="max-w-md mx-auto px-4">
-            <div className="rounded-2xl border border-line bg-panel p-8 text-center">
-              <h1 className="font-display text-2xl font-bold text-text mb-3">Доступ запрещён</h1>
-              <p className="text-muted mb-6">Нужны права администратора.</p>
-              <button onClick={() => router.push("/profile")} className="btn btn-primary">
-                В профиль
-              </button>
-            </div>
+        <main id="main-content" className="relative min-h-[calc(100vh-64px)]">
+          <div className="owyx-space" aria-hidden />
+          <div className="relative z-10 mx-auto max-w-md px-4 py-24 text-center">
+            <h1 className="font-display text-2xl font-bold tracking-tight">Доступ запрещён</h1>
+            <p className="mt-2 text-muted">Нужны права администратора.</p>
+            <button type="button" onClick={() => router.push("/profile")} className="btn btn-primary mt-6">
+              В личный кабинет
+            </button>
           </div>
         </main>
         <Footer />
@@ -187,204 +191,163 @@ function AdminPageInner() {
     );
   }
 
-  const nav = [
-    { id: "users" as const, label: "Аккаунты" },
-    { id: "catalog" as const, label: "Каталог" },
-    { id: "news" as const, label: "Новости" },
-  ];
-
   return (
     <>
       <Header />
-      <main id="main-content" className="relative min-h-[calc(100vh-64px)] overflow-hidden">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 60% 45% at 10% 0%, rgba(0,229,255,0.10), transparent 50%), radial-gradient(ellipse 40% 35% at 100% 10%, rgba(255,92,108,0.06), transparent 45%)",
-          }}
-        />
-        <div className="relative z-10 mx-auto max-w-5xl px-4 py-10 sm:px-6">
-          <header className="mb-8">
-            <p className="text-xs uppercase tracking-[0.14em] text-muted">Control plane</p>
-            <h1 className="font-display text-3xl font-bold tracking-tight text-text mt-1">Панель управления</h1>
-            <p className="mt-2 text-sm text-muted max-w-xl">
-              Каталог серверов и паков, роли аккаунтов, новости. Без заявок и модерации чата.
-            </p>
-          </header>
-
-          {msg && (
-            <div className={`form-msg ${msg.type === "success" ? "form-msg-ok" : "form-msg-err"} mb-5`}>
-              {msg.text}
-            </div>
-          )}
-
-          <div className="mb-6 grid gap-3 sm:grid-cols-3">
-            <StatCard label="Сервер" value={siteInfo?.name ?? "Owyx"} />
-            <StatCard label="IP" value={siteInfo?.ip ?? "—"} mono />
-            <StatCard
-              label="Пользователи"
-              value={String(users?.length ?? "…")}
-              hint={siteInfo?.online ? "статус: онлайн" : "статус: оффлайн"}
-              hintOk={Boolean(siteInfo?.online)}
-            />
+      <CabinetShell
+        eyebrow="Control plane"
+        title="Панель управления"
+        subtitle="Аккаунты, каталог лаунчера и новости на главной."
+        actions={
+          <div className="flex flex-wrap items-center gap-2 text-sm">
+            <span className="badge">{siteInfo?.name ?? "Owyx"}</span>
+            <span className="badge font-mono text-xs">{siteInfo?.ip ?? "—"}</span>
+            <span className={`badge ${siteInfo?.online ? "badge-ok" : ""}`}>
+              {siteInfo?.online ? "онлайн" : "оффлайн"}
+            </span>
           </div>
-
-          <div className="overflow-hidden rounded-2xl border border-line bg-panel/90 backdrop-blur-sm">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4">
-              <nav className="flex gap-1" aria-label="Разделы админки">
-                {nav.map((n) => (
-                  <button
-                    key={n.id}
-                    type="button"
-                    onClick={() => setSection(n.id)}
-                    className={`relative px-4 py-3.5 text-sm font-medium transition-colors ${
-                      section === n.id ? "text-accent" : "text-muted hover:text-text"
-                    }`}
-                  >
-                    {n.label}
-                    {section === n.id && (
-                      <span className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-accent" />
-                    )}
-                  </button>
-                ))}
-              </nav>
-            </div>
-
-            <div className="p-5 sm:p-6">
-              {section === "users" && (
-                <div className="space-y-5">
-                  <div className="field max-w-sm">
-                    <label className="field-label" htmlFor="user-search">
-                      Поиск по нику или email
-                    </label>
-                    <input
-                      id="user-search"
-                      className="input"
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      placeholder="ник или email"
-                    />
-                  </div>
-
-                  <div className="overflow-hidden rounded-xl border border-line">
-                    {dataLoading ? (
-                      <p className="text-center text-muted py-10">Загрузка аккаунтов...</p>
-                    ) : filtered.length === 0 ? (
-                      <p className="text-center text-muted py-10">Ничего не найдено</p>
-                    ) : (
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                          <thead>
-                            <tr className="text-left text-muted border-b border-line bg-panel-2/50">
-                              <th className="px-4 py-3 font-medium">Ник</th>
-                              <th className="px-4 py-3 font-medium">Email</th>
-                              <th className="px-4 py-3 font-medium">Роль</th>
-                              {advanced && <th className="px-4 py-3 font-medium">Опасная зона</th>}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {filtered.map((u) => (
-                              <tr
-                                key={u.id}
-                                className="border-b border-line last:border-0 hover:bg-panel-2/40"
-                              >
-                                <td className="px-4 py-3 text-text font-medium">{u.nickname || "—"}</td>
-                                <td className="px-4 py-3 text-muted">{u.email}</td>
-                                <td className="px-4 py-3">
-                                  <select
-                                    className="select !py-1.5 max-w-[10rem]"
-                                    value={ROLES.includes(u.role as (typeof ROLES)[number]) ? u.role : "user"}
-                                    onChange={(e) => changeRole(u.id, e.target.value)}
-                                    disabled={u.id === user?.id}
-                                    title={u.id === user?.id ? "Нельзя изменить свою роль" : "Сменить роль"}
-                                  >
-                                    {ROLES.map((r) => (
-                                      <option key={r} value={r}>
-                                        {r}
-                                      </option>
-                                    ))}
-                                  </select>
-                                </td>
-                                {advanced && (
-                                  <td className="px-4 py-3">
-                                    {u.id === user?.id ? (
-                                      <span className="text-xs text-muted">—</span>
-                                    ) : (
-                                      <div className="flex gap-2">
-                                        <button
-                                          onClick={() => toggleBan(u)}
-                                          className="btn btn-secondary !py-1.5 !px-3 text-xs"
-                                        >
-                                          {u.status === "banned" ? "Разбан" : "Бан"}
-                                        </button>
-                                        <button
-                                          onClick={() => deleteUser(u)}
-                                          className="btn btn-danger !py-1.5 !px-3 text-xs"
-                                        >
-                                          Удалить
-                                        </button>
-                                      </div>
-                                    )}
-                                  </td>
-                                )}
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    )}
-                  </div>
-                  {!advanced && (
-                    <p className="text-xs text-muted">
-                      Бан/удаление: открой{" "}
-                      <a className="text-accent hover:underline" href="/admin?advanced=1">
-                        /admin?advanced=1
-                      </a>
-                      .
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {section === "catalog" && (
-                <CatalogAdmin authHeaders={authHeaders} showMessage={showMessage} />
-              )}
-
-              {section === "news" && (
-                <NewsAdmin authHeaders={authHeaders} showMessage={showMessage} />
-              )}
-            </div>
-          </div>
-        </div>
-      </main>
+        }
+        nav={[
+          { id: "users", label: "Аккаунты", hint: `${users?.length ?? "…"} чел.` },
+          { id: "catalog", label: "Каталог", hint: "Серверы и паки" },
+          { id: "news", label: "Новости", hint: "Главная сайта" },
+        ]}
+        activeId={section}
+        onNav={(id) => setSection(id as Section)}
+      >
+        {section === "users" && (
+          <UsersPane
+            filtered={filtered}
+            search={search}
+            setSearch={setSearch}
+            dataLoading={dataLoading}
+            advanced={advanced}
+            selfId={user?.id}
+            changeRole={changeRole}
+            toggleBan={toggleBan}
+            deleteUser={deleteUser}
+          />
+        )}
+        {section === "catalog" && (
+          <CatalogAdmin authHeaders={authHeaders} showMessage={showMessage} />
+        )}
+        {section === "news" && (
+          <NewsAdmin authHeaders={authHeaders} showMessage={showMessage} />
+        )}
+      </CabinetShell>
+      {toast && <Toast text={toast.text} type={toast.type} />}
       <Footer />
     </>
   );
 }
 
-function StatCard({
-  label,
-  value,
-  hint,
-  hintOk,
-  mono,
+function UsersPane({
+  filtered,
+  search,
+  setSearch,
+  dataLoading,
+  advanced,
+  selfId,
+  changeRole,
+  toggleBan,
+  deleteUser,
 }: {
-  label: string;
-  value: string;
-  hint?: string;
-  hintOk?: boolean;
-  mono?: boolean;
+  filtered: AdminUser[];
+  search: string;
+  setSearch: (v: string) => void;
+  dataLoading: boolean;
+  advanced: boolean;
+  selfId?: number;
+  changeRole: (id: number, role: string) => void;
+  toggleBan: (u: AdminUser) => void;
+  deleteUser: (u: AdminUser) => void;
 }) {
   return (
-    <div className="rounded-xl border border-line bg-panel/80 px-4 py-3">
-      <p className="text-xs uppercase tracking-wide text-muted">{label}</p>
-      <p className={`mt-1 text-lg font-semibold text-text truncate ${mono ? "font-mono text-base" : ""}`}>
-        {value}
-      </p>
-      {hint && (
-        <p className={`mt-0.5 text-xs ${hintOk ? "text-ok" : "text-muted"}`}>{hint}</p>
+    <div className="space-y-5">
+      <div>
+        <h2 className="font-display text-lg font-bold tracking-tight">Аккаунты</h2>
+        <p className="mt-1 text-sm text-muted">Роли для сайта и лаунчера. Бан/удаление — только advanced.</p>
+      </div>
+
+      <div className="field max-w-md">
+        <label className="field-label" htmlFor="user-search">
+          Поиск
+        </label>
+        <input
+          id="user-search"
+          className="input"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="ник или email"
+          autoComplete="off"
+        />
+      </div>
+
+      <div className="overflow-hidden rounded-xl border border-line">
+        {dataLoading ? (
+          <p className="py-12 text-center text-muted text-sm">Загрузка аккаунтов…</p>
+        ) : filtered.length === 0 ? (
+          <div className="empty-surface m-4">
+            <h3>Никого не нашли</h3>
+            <p>Сбрось поиск или проверь написание ника.</p>
+          </div>
+        ) : (
+          <div>
+            <div className="hidden sm:grid grid-cols-[minmax(0,1.1fr)_minmax(0,1.4fr)_auto] gap-4 border-b border-line bg-panel-2/50 px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-muted">
+              <span>Ник</span>
+              <span>Email</span>
+              <span className="text-right">Роль</span>
+            </div>
+            {filtered.map((u) => (
+              <div key={u.id} className="admin-user-row">
+                <div className="min-w-0">
+                  <p className="font-medium text-text truncate">{u.nickname || "—"}</p>
+                  {u.status === "banned" && <span className="badge badge-danger mt-1">бан</span>}
+                </div>
+                <p className="text-sm text-muted truncate">{u.email}</p>
+                <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                  <select
+                    className="select !py-2 !min-h-10 max-w-[9.5rem]"
+                    value={ROLES.includes(u.role as (typeof ROLES)[number]) ? u.role : "user"}
+                    onChange={(e) => changeRole(u.id, e.target.value)}
+                    disabled={u.id === selfId}
+                    title={u.id === selfId ? "Нельзя изменить свою роль" : "Сменить роль"}
+                    aria-label={`Роль ${u.nickname || u.email}`}
+                  >
+                    {ROLES.map((r) => (
+                      <option key={r} value={r}>
+                        {r}
+                      </option>
+                    ))}
+                  </select>
+                  {advanced && u.id !== selfId && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => toggleBan(u)}
+                        className="btn btn-secondary btn-sm"
+                      >
+                        {u.status === "banned" ? "Разбан" : "Бан"}
+                      </button>
+                      <button type="button" onClick={() => deleteUser(u)} className="btn btn-danger btn-sm">
+                        Удалить
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {!advanced && (
+        <p className="text-xs text-muted">
+          Опасные действия:{" "}
+          <a className="link-accent" href="/admin?advanced=1">
+            /admin?advanced=1
+          </a>
+        </p>
       )}
     </div>
   );
@@ -423,7 +386,7 @@ function NewsAdmin({
   }, [authHeaders]);
 
   useEffect(() => {
-    load();
+    void load();
   }, [load]);
 
   async function create(e: React.FormEvent) {
@@ -473,55 +436,81 @@ function NewsAdmin({
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <div>
         <h2 className="font-display text-lg font-bold tracking-tight">Новости</h2>
-        <p className="text-muted text-sm mt-1">Появляются на главной. Сними публикацию, чтобы скрыть.</p>
+        <p className="mt-1 text-sm text-muted">Блок на главной. Сними публикацию, чтобы скрыть.</p>
       </div>
 
-      <form onSubmit={create} className="rounded-xl border border-line bg-panel-2/40 p-4 grid gap-3 sm:grid-cols-[1fr_auto]">
-        <div className="space-y-3">
+      <form
+        onSubmit={create}
+        className="rounded-xl border border-line bg-panel-2/40 p-4 space-y-3"
+      >
+        <div className="field">
+          <label className="field-label" htmlFor="news-title">
+            Заголовок
+          </label>
           <input
+            id="news-title"
             className="input"
-            placeholder="Заголовок"
             value={form.title}
             onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+            placeholder="Что нового"
           />
-          <div className="flex gap-3">
+        </div>
+        <div className="grid gap-3 sm:grid-cols-[8rem_1fr]">
+          <div className="field">
+            <label className="field-label" htmlFor="news-tag">
+              Тег
+            </label>
             <input
-              className="input max-w-[10rem]"
-              placeholder="Тег"
+              id="news-tag"
+              className="input"
               value={form.tag}
               onChange={(e) => setForm((f) => ({ ...f, tag: e.target.value }))}
             />
+          </div>
+          <div className="field">
+            <label className="field-label" htmlFor="news-summary">
+              Кратко
+            </label>
             <input
-              className="input flex-1"
-              placeholder="Кратко"
+              id="news-summary"
+              className="input"
               value={form.summary}
               onChange={(e) => setForm((f) => ({ ...f, summary: e.target.value }))}
+              placeholder="Одна фраза"
             />
           </div>
         </div>
-        <button type="submit" disabled={busy} className="btn btn-primary self-start">
-          {busy ? "..." : "Добавить"}
-        </button>
+        <div className="flex justify-end">
+          <button type="submit" disabled={busy} className="btn btn-primary">
+            {busy ? "…" : "Добавить"}
+          </button>
+        </div>
       </form>
 
       <div className="space-y-2">
         {items.length === 0 ? (
-          <p className="text-muted text-sm">Пока нет новостей.</p>
+          <div className="empty-surface">
+            <h3>Пока пусто</h3>
+            <p>Добавь первую новость — она появится на главной.</p>
+          </div>
         ) : (
           items.map((n) => (
-            <div key={n.id} className="flex items-center gap-3 rounded-xl border border-line px-3 py-3">
+            <div
+              key={n.id}
+              className="flex flex-wrap items-center gap-3 rounded-xl border border-line px-3 py-3"
+            >
               <span className={`badge ${n.published ? "badge-accent" : ""}`}>{n.tag}</span>
-              <div className="flex-1 min-w-0">
-                <div className="text-text text-sm font-medium truncate">{n.title}</div>
-                <div className="text-muted text-xs truncate">{n.summary}</div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-text truncate">{n.title}</p>
+                <p className="text-xs text-muted truncate">{n.summary}</p>
               </div>
-              <button onClick={() => togglePublish(n)} className="btn btn-secondary !py-1.5 !px-3 text-xs">
+              <button type="button" onClick={() => togglePublish(n)} className="btn btn-secondary btn-sm">
                 {n.published ? "Скрыть" : "Опубликовать"}
               </button>
-              <button onClick={() => remove(n.id)} className="btn btn-danger !py-1.5 !px-3 text-xs">
+              <button type="button" onClick={() => remove(n.id)} className="btn btn-danger btn-sm">
                 Удалить
               </button>
             </div>

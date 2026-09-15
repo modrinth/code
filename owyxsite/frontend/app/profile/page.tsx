@@ -1,21 +1,32 @@
 "use client";
 
 import { useState, useEffect, useSyncExternalStore } from "react";
+import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import CabinetShell, {
+  SettingsSection,
+  SettingsRow,
+  Toast,
+} from "@/components/layout/CabinetShell";
 import { useAuth } from "@/hooks/useAuth";
 
 const authHeader = () => ({ Authorization: `Bearer ${localStorage.getItem("auth_token")}` });
 
 function formatDate(dateStr?: string): string {
   if (!dateStr) return "—";
-  return new Date(dateStr).toLocaleDateString("ru-RU", { day: "2-digit", month: "long", year: "numeric" });
+  return new Date(dateStr).toLocaleDateString("ru-RU", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
 }
 
-function roleBadge(role?: string) {
-  if (role === "admin") return <span className="badge badge-danger">ADMIN</span>;
-  if (role === "moderator") return <span className="badge badge-accent">MOD</span>;
-  return <span className="badge">Игрок</span>;
+function roleLabel(role?: string) {
+  if (role === "admin") return { text: "Админ", cls: "badge-danger" };
+  if (role === "moderator") return { text: "Модератор", cls: "badge-accent" };
+  if (role === "helper") return { text: "Хелпер", cls: "badge-violet" };
+  return { text: "Игрок", cls: "" };
 }
 
 type Tab = "overview" | "settings";
@@ -33,144 +44,126 @@ function useStableNow(intervalMs = 60_000) {
 
 export default function ProfilePage() {
   const { user, loading, logout } = useAuth({ requireAuth: true });
-  const [tab, setTab] = useState<Tab>("settings");
+  const [tab, setTab] = useState<Tab>("overview");
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted">Загрузка профиля...</p>
+        <p className="text-muted">Загрузка…</p>
       </div>
     );
   }
 
-  const tabs: { id: Tab; label: string }[] = [
-    { id: "overview", label: "Обзор" },
-    { id: "settings", label: "Настройки" },
-  ];
-
+  const role = roleLabel(user?.role);
   const initial = (user?.nickname || user?.email || "?").slice(0, 1).toUpperCase();
 
   return (
     <>
       <Header />
-      <main id="main-content" className="relative min-h-[calc(100vh-64px)] overflow-hidden">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-80"
-          style={{
-            background:
-              "radial-gradient(ellipse 70% 50% at 15% 0%, rgba(0,229,255,0.12), transparent 55%), radial-gradient(ellipse 50% 40% at 90% 20%, rgba(139,92,246,0.08), transparent 50%)",
-          }}
-        />
-        <div className="relative z-10 mx-auto max-w-3xl px-4 py-10 sm:px-6">
-          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-            <div className="flex items-center gap-4 min-w-0">
-              <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl border border-line bg-panel text-xl font-bold text-accent">
-                {user?.avatar_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={user.avatar_url} alt="" className="h-full w-full rounded-2xl object-cover" />
-                ) : (
-                  initial
-                )}
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs uppercase tracking-[0.14em] text-muted">Личный кабинет</p>
-                <h1 className="font-display truncate text-3xl font-bold tracking-tight text-text">
-                  {user?.nickname || "Игрок"}
-                </h1>
-                <div className="mt-1.5 flex flex-wrap items-center gap-2">
-                  {roleBadge(user?.role)}
-                  <span className={`badge ${user?.status === "banned" ? "badge-danger" : "badge-ok"}`}>
-                    {user?.status === "banned" ? "Заблокирован" : "Активен"}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <button onClick={logout} className="btn btn-danger" id="profile-logout-btn">
+      <CabinetShell
+        eyebrow="Аккаунт Owyx"
+        title={user?.nickname || "Игрок"}
+        subtitle="Тот же логин — на сайте и в лаунчере."
+        actions={
+          <>
+            <Link href="/download" className="btn btn-primary">
+              Скачать лаунчер
+            </Link>
+            <button type="button" onClick={logout} className="btn btn-ghost" id="profile-logout-btn">
               Выйти
             </button>
-          </div>
-
-          <div className="overflow-hidden rounded-2xl border border-line bg-panel/90 backdrop-blur-sm">
-            <div className="border-b border-line px-4">
-              <nav className="flex gap-1" aria-label="Разделы кабинета">
-                {tabs.map((t) => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => setTab(t.id)}
-                    className={`relative px-4 py-3.5 text-sm font-medium transition-colors ${
-                      tab === t.id ? "text-accent" : "text-muted hover:text-text"
-                    }`}
-                  >
-                    {t.label}
-                    {tab === t.id && (
-                      <span className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-accent" />
-                    )}
-                  </button>
-                ))}
-              </nav>
-            </div>
-            <div className="p-6 sm:p-8">
-              {tab === "overview" && <OverviewTab user={user} />}
-              {tab === "settings" && <SettingsTab user={user} />}
-            </div>
-          </div>
-
-          <p className="mt-6 text-center text-xs text-muted">
-            Скины и «Внешний вид» временно скрыты — выбор скина будет в лаунчере.
-          </p>
-        </div>
-      </main>
+          </>
+        }
+        nav={[
+          { id: "overview", label: "Обзор", hint: "Кто вы в Owyx" },
+          { id: "settings", label: "Настройки", hint: "Почта, ник, пароль" },
+        ]}
+        activeId={tab}
+        onNav={(id) => setTab(id as Tab)}
+        footerNote="Скины на сайте скрыты — выбор скина будет в лаунчере."
+      >
+        {tab === "overview" && <OverviewPane user={user} role={role} initial={initial} />}
+        {tab === "settings" && <SettingsPane user={user} />}
+      </CabinetShell>
       <Footer />
     </>
   );
 }
 
-function OverviewTab({ user }: { user: ReturnType<typeof useAuth>["user"] }) {
+function OverviewPane({
+  user,
+  role,
+  initial,
+}: {
+  user: ReturnType<typeof useAuth>["user"];
+  role: { text: string; cls: string };
+  initial: string;
+}) {
   const now = useStableNow();
   if (!user) return null;
   const daysWithUs = user.created_at
     ? Math.max(0, Math.floor((now - new Date(user.created_at).getTime()) / 86400000))
     : 0;
+
   const rows = [
     { label: "Логин", value: user.nickname || "—" },
     { label: "Имя", value: user.first_name || "—" },
     { label: "Email", value: user.email || "—" },
     { label: "Discord", value: user.discord || "—" },
-    { label: "Роль", value: user.role || "user" },
     { label: "Регистрация", value: formatDate(user.created_at) },
     { label: "Дней с нами", value: String(daysWithUs) },
   ];
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="font-display text-xl font-bold tracking-tight">Обзор аккаунта</h2>
-        <p className="mt-1 text-sm text-muted">Тот же логин потом в лаунчере Owyx.</p>
+    <div className="space-y-7">
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl border border-line bg-panel-2 font-display text-2xl font-bold text-accent">
+          {user.avatar_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={user.avatar_url} alt="" className="h-full w-full rounded-2xl object-cover" />
+          ) : (
+            initial
+          )}
+        </div>
+        <div className="min-w-0">
+          <p className="font-display text-xl font-bold tracking-tight truncate">{user.nickname}</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <span className={`badge ${role.cls}`}>{role.text}</span>
+            <span className={`badge ${user.status === "banned" ? "badge-danger" : "badge-ok"}`}>
+              {user.status === "banned" ? "Заблокирован" : "Активен"}
+            </span>
+          </div>
+        </div>
       </div>
-      <dl className="divide-y divide-line rounded-xl border border-line bg-panel-2/40">
+
+      <div className="cabinet-kv">
         {rows.map((r) => (
-          <div key={r.label} className="flex items-center justify-between gap-4 px-4 py-3">
-            <dt className="text-sm text-muted">{r.label}</dt>
-            <dd className="truncate text-sm font-medium text-text">{r.value}</dd>
+          <div key={r.label} className="cabinet-kv-row">
+            <span className="text-sm text-muted shrink-0">{r.label}</span>
+            <span className="text-sm font-medium text-text truncate text-right">{r.value}</span>
           </div>
         ))}
-      </dl>
+      </div>
+
+      <div className="rounded-xl border border-line bg-panel-2/50 px-4 py-4">
+        <p className="text-sm font-medium text-text">Дальше</p>
+        <p className="mt-1 text-sm text-muted leading-relaxed">
+          Скачай лаунчер и войди тем же логином — сборки и Play подтянутся с сайта.
+        </p>
+        <Link href="/download" className="btn btn-primary mt-4">
+          Перейти к загрузке
+        </Link>
+      </div>
     </div>
   );
 }
 
-function SettingsTab({ user }: { user: ReturnType<typeof useAuth>["user"] }) {
+function SettingsPane({ user }: { user: ReturnType<typeof useAuth>["user"] }) {
   return (
-    <div className="space-y-10 max-w-xl">
-      <div>
-        <h2 className="font-display text-xl font-bold tracking-tight">Настройки</h2>
-        <p className="mt-1 text-sm text-muted">Почта, ник, профиль и пароль.</p>
-      </div>
+    <div className="space-y-10 max-w-2xl">
       <EmailSection currentEmail={user?.email} />
       <NicknameSection currentNick={user?.nickname} />
-      <PasswordAndFieldsSection user={user} />
-      <NotificationsSection />
+      <ProfileSecuritySection user={user} />
     </div>
   );
 }
@@ -181,15 +174,15 @@ function EmailSection({ currentEmail }: { currentEmail?: string }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <section>
-      <h3 className="text-base font-semibold tracking-tight mb-1">Почта</h3>
-      <p className="text-sm text-muted mb-3">Вход и восстановление доступа.</p>
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-panel-2/50 px-4 py-3">
-        <span className="font-medium break-all text-text">{email || "—"}</span>
-        <button type="button" className="btn btn-secondary" onClick={() => setOpen(true)}>
-          Сменить почту
-        </button>
-      </div>
+    <SettingsSection title="Почта" description="Вход и восстановление доступа.">
+      <SettingsRow label="Текущий адрес" hint="На него приходят подтверждения и сброс пароля.">
+        <div className="flex w-full flex-col gap-2 sm:items-end">
+          <span className="text-sm font-medium text-text break-all text-right">{email || "—"}</span>
+          <button type="button" className="btn btn-secondary btn-sm self-end" onClick={() => setOpen(true)}>
+            Сменить почту
+          </button>
+        </div>
+      </SettingsRow>
       {open && (
         <EmailChangeModal
           onClose={() => setOpen(false)}
@@ -199,11 +192,17 @@ function EmailSection({ currentEmail }: { currentEmail?: string }) {
           }}
         />
       )}
-    </section>
+    </SettingsSection>
   );
 }
 
-function EmailChangeModal({ onClose, onDone }: { onClose: () => void; onDone: (email: string) => void }) {
+function EmailChangeModal({
+  onClose,
+  onDone,
+}: {
+  onClose: () => void;
+  onDone: (email: string) => void;
+}) {
   const [step, setStep] = useState<"email" | "code">("email");
   const [newEmail, setNewEmail] = useState("");
   const [code, setCode] = useState("");
@@ -257,17 +256,33 @@ function EmailChangeModal({ onClose, onDone }: { onClose: () => void; onDone: (e
   }
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60" onClick={onClose}>
-      <div className="panel w-full max-w-sm p-6" onClick={(e) => e.stopPropagation()}>
-        <h4 className="text-lg font-bold mb-1">Смена почты</h4>
-        <p className="text-sm text-muted mb-4">
-          {step === "email" ? "Введите новую почту — на неё придёт код." : `Введите код, отправленный на ${newEmail}.`}
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/65"
+      onClick={onClose}
+      role="presentation"
+    >
+      <div
+        className="w-full max-w-sm rounded-2xl border border-line bg-panel p-6 shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="email-change-title"
+      >
+        <h3 id="email-change-title" className="font-display text-lg font-bold tracking-tight">
+          Смена почты
+        </h3>
+        <p className="mt-1 text-sm text-muted">
+          {step === "email"
+            ? "Введите новый адрес — придёт код подтверждения."
+            : `Код отправлен на ${newEmail}.`}
         </p>
         {msg && (
-          <div className={`form-msg ${msg.type === "success" ? "form-msg-ok" : "form-msg-err"} mb-4`}>{msg.text}</div>
+          <div className={`form-msg mt-4 ${msg.type === "success" ? "form-msg-ok" : "form-msg-err"}`}>
+            {msg.text}
+          </div>
         )}
         {step === "email" ? (
-          <form onSubmit={requestCode} className="space-y-4">
+          <form onSubmit={requestCode} className="mt-5 space-y-4">
             <div className="field">
               <label className="field-label" htmlFor="new-email">
                 Новая почта
@@ -279,12 +294,13 @@ function EmailChangeModal({ onClose, onDone }: { onClose: () => void; onDone: (e
                 className="input"
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
-                placeholder="new@owyx.site"
+                placeholder="you@example.com"
+                autoComplete="email"
               />
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-2">
               <button type="submit" disabled={busy} className="btn btn-primary">
-                {busy ? "Отправка..." : "Отправить код"}
+                {busy ? "Отправка…" : "Отправить код"}
               </button>
               <button type="button" onClick={onClose} className="btn btn-ghost">
                 Отмена
@@ -292,7 +308,7 @@ function EmailChangeModal({ onClose, onDone }: { onClose: () => void; onDone: (e
             </div>
           </form>
         ) : (
-          <form onSubmit={confirmCode} className="space-y-4">
+          <form onSubmit={confirmCode} className="mt-5 space-y-4">
             <div className="field">
               <label className="field-label" htmlFor="email-code">
                 Код из письма
@@ -302,15 +318,16 @@ function EmailChangeModal({ onClose, onDone }: { onClose: () => void; onDone: (e
                 inputMode="numeric"
                 maxLength={6}
                 required
-                className="input tracking-[0.4em]"
+                className="input tracking-[0.35em]"
                 value={code}
                 onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
                 placeholder="123456"
+                autoComplete="one-time-code"
               />
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-2">
               <button type="submit" disabled={busy} className="btn btn-primary">
-                {busy ? "Проверка..." : "Подтвердить"}
+                {busy ? "Проверка…" : "Подтвердить"}
               </button>
               <button type="button" onClick={() => setStep("email")} className="btn btn-ghost">
                 Назад
@@ -327,7 +344,7 @@ function NicknameSection({ currentNick }: { currentNick?: string }) {
   const [nick, setNick] = useState(currentNick || "");
   const [changedAt, setChangedAt] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<{ text: string; type: "success" | "error" } | null>(null);
+  const [toast, setToast] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -352,7 +369,7 @@ function NicknameSection({ currentNick }: { currentNick?: string }) {
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
-    setMsg(null);
+    setToast(null);
     try {
       const res = await fetch("/api/profile/nickname", {
         method: "PUT",
@@ -361,48 +378,46 @@ function NicknameSection({ currentNick }: { currentNick?: string }) {
       });
       const data = await res.json();
       if (res.ok) {
-        setMsg({ text: "Ник изменён. Следующая смена — через 30 дней.", type: "success" });
+        setToast({ text: "Ник обновлён. Следующая смена — через 30 дней.", type: "success" });
         setChangedAt(data.nickname_changed_at ?? new Date().toISOString());
-      } else setMsg({ text: data.error || "Не удалось изменить ник", type: "error" });
+      } else setToast({ text: data.error || "Не удалось изменить ник", type: "error" });
     } catch {
-      setMsg({ text: "Не удалось связаться с сервером.", type: "error" });
+      setToast({ text: "Не удалось связаться с сервером.", type: "error" });
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <section className="border-t border-line pt-8">
-      <h3 className="text-base font-semibold tracking-tight mb-1">Никнейм</h3>
-      <p className="text-sm text-muted mb-3">Менять можно не чаще одного раза в 30 дней.</p>
-      {msg && (
-        <div className={`form-msg ${msg.type === "success" ? "form-msg-ok" : "form-msg-err"} mb-4`}>{msg.text}</div>
-      )}
-      <form onSubmit={save} className="space-y-4">
-        <div className="field">
-          <label className="field-label" htmlFor="acc-nick">
-            Ник
-          </label>
-          <input
-            id="acc-nick"
-            className="input"
-            value={nick}
-            onChange={(e) => setNick(e.target.value)}
-            maxLength={32}
-            placeholder="YourNickname"
-            disabled={onCooldown}
-          />
-          {onCooldown && <span className="field-hint">Следующая смена доступна через {daysLeft} дн.</span>}
-        </div>
-        <button type="submit" className="btn btn-primary" disabled={busy || onCooldown}>
-          {busy ? "Сохранение..." : "Сменить ник"}
-        </button>
+    <SettingsSection title="Никнейм" description="Менять можно не чаще одного раза в 30 дней.">
+      <form onSubmit={save} className="space-y-1">
+        <SettingsRow
+          label="Ник"
+          hint={onCooldown ? `Следующая смена через ${daysLeft} дн.` : "Отображается на сайте и в лаунчере."}
+        >
+          <div className="flex w-full flex-col gap-2 sm:items-end">
+            <input
+              id="acc-nick"
+              className="input sm:max-w-xs"
+              value={nick}
+              onChange={(e) => setNick(e.target.value)}
+              maxLength={32}
+              placeholder="YourNickname"
+              disabled={onCooldown}
+              autoComplete="username"
+            />
+            <button type="submit" className="btn btn-primary btn-sm self-end" disabled={busy || onCooldown}>
+              {busy ? "Сохранение…" : "Сменить ник"}
+            </button>
+          </div>
+        </SettingsRow>
       </form>
-    </section>
+      {toast && <Toast text={toast.text} type={toast.type} />}
+    </SettingsSection>
   );
 }
 
-function PasswordAndFieldsSection({ user }: { user: ReturnType<typeof useAuth>["user"] }) {
+function ProfileSecuritySection({ user }: { user: ReturnType<typeof useAuth>["user"] }) {
   const [form, setForm] = useState({
     first_name: user?.first_name || "",
     discord_username: user?.discord || "",
@@ -410,7 +425,7 @@ function PasswordAndFieldsSection({ user }: { user: ReturnType<typeof useAuth>["
     new_password: "",
   });
   const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<{ text: string; type: "success" | "error" } | null>(null);
+  const [toast, setToast] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -433,7 +448,7 @@ function PasswordAndFieldsSection({ user }: { user: ReturnType<typeof useAuth>["
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
-    setMsg(null);
+    setToast(null);
     try {
       const body: Record<string, unknown> = {
         first_name: form.first_name,
@@ -450,87 +465,63 @@ function PasswordAndFieldsSection({ user }: { user: ReturnType<typeof useAuth>["
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        setMsg({ text: data.message || "Сохранено", type: "success" });
+        setToast({ text: data.message || "Сохранено", type: "success" });
         setForm((f) => ({ ...f, current_password: "", new_password: "" }));
-      } else setMsg({ text: data.error || "Ошибка сохранения", type: "error" });
+      } else setToast({ text: data.error || "Ошибка сохранения", type: "error" });
     } catch {
-      setMsg({ text: "Не удалось связаться с сервером.", type: "error" });
+      setToast({ text: "Не удалось связаться с сервером.", type: "error" });
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <section className="border-t border-line pt-8">
-      <h3 className="text-base font-semibold tracking-tight mb-4">Профиль и безопасность</h3>
-      {msg && (
-        <div className={`form-msg ${msg.type === "success" ? "form-msg-ok" : "form-msg-err"} mb-4`}>{msg.text}</div>
-      )}
-      <form onSubmit={save} className="space-y-4">
-        <div className="field">
-          <label className="field-label" htmlFor="acc-name">
-            Имя
-          </label>
+    <SettingsSection title="Профиль и безопасность" description="Имя, Discord и смена пароля.">
+      <form onSubmit={save} className="space-y-1">
+        <SettingsRow label="Имя">
           <input
             id="acc-name"
-            className="input"
+            className="input sm:max-w-xs"
             value={form.first_name}
             onChange={(e) => setForm((f) => ({ ...f, first_name: e.target.value }))}
+            autoComplete="given-name"
           />
-        </div>
-        <div className="field">
-          <label className="field-label" htmlFor="acc-discord">
-            Discord
-          </label>
+        </SettingsRow>
+        <SettingsRow label="Discord" hint="Ник в Discord, без #тега.">
           <input
             id="acc-discord"
-            className="input"
+            className="input sm:max-w-xs"
             value={form.discord_username}
             onChange={(e) => setForm((f) => ({ ...f, discord_username: e.target.value }))}
           />
+        </SettingsRow>
+        <SettingsRow label="Текущий пароль" hint="Нужен только если меняете пароль.">
+          <input
+            id="acc-cur-pass"
+            type="password"
+            className="input sm:max-w-xs"
+            autoComplete="current-password"
+            value={form.current_password}
+            onChange={(e) => setForm((f) => ({ ...f, current_password: e.target.value }))}
+          />
+        </SettingsRow>
+        <SettingsRow label="Новый пароль" hint="Оставьте пустым, если не меняете.">
+          <input
+            id="acc-new-pass"
+            type="password"
+            className="input sm:max-w-xs"
+            autoComplete="new-password"
+            value={form.new_password}
+            onChange={(e) => setForm((f) => ({ ...f, new_password: e.target.value }))}
+          />
+        </SettingsRow>
+        <div className="pt-4 flex justify-end">
+          <button type="submit" className="btn btn-primary" disabled={busy}>
+            {busy ? "Сохранение…" : "Сохранить"}
+          </button>
         </div>
-        <div className="rounded-xl border border-line bg-panel-2/40 p-4 space-y-3">
-          <p className="text-sm font-medium text-text">Смена пароля (необязательно)</p>
-          <div className="field">
-            <label className="field-label" htmlFor="acc-cur-pass">
-              Текущий пароль
-            </label>
-            <input
-              id="acc-cur-pass"
-              type="password"
-              className="input"
-              autoComplete="current-password"
-              value={form.current_password}
-              onChange={(e) => setForm((f) => ({ ...f, current_password: e.target.value }))}
-            />
-          </div>
-          <div className="field">
-            <label className="field-label" htmlFor="acc-new-pass">
-              Новый пароль
-            </label>
-            <input
-              id="acc-new-pass"
-              type="password"
-              className="input"
-              autoComplete="new-password"
-              value={form.new_password}
-              onChange={(e) => setForm((f) => ({ ...f, new_password: e.target.value }))}
-            />
-          </div>
-        </div>
-        <button type="submit" className="btn btn-primary" disabled={busy}>
-          {busy ? "Сохранение..." : "Сохранить"}
-        </button>
       </form>
-    </section>
-  );
-}
-
-function NotificationsSection() {
-  return (
-    <section className="border-t border-line pt-8">
-      <h3 className="text-base font-semibold tracking-tight mb-1">Уведомления</h3>
-      <p className="text-sm text-muted">Скоро — письма о важных событиях аккаунта.</p>
-    </section>
+      {toast && <Toast text={toast.text} type={toast.type} />}
+    </SettingsSection>
   );
 }

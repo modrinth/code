@@ -1,24 +1,21 @@
 # Owyx site — ops (сейчас)
 
-## Сделать сейчас: DMARC (письма в спаме)
+## DMARC (сделано)
 
-Cloudflare → **DNS** (не только Email → DMARC Management) для `owyx.site`.
+Запись `_dmarc.owyx.site` уже есть (через CF DMARC Management + `rua` на Cloudflare). Сейчас `p=none` — мониторинг. Дальше: `p=quarantine` → `p=reject` после чистых отчётов.
 
-Добавь TXT:
+`EMAIL_FROM=noreply@owyx.site` на VPS. SPF/DKIM — Mailjet.
 
-| Name | Content |
-|------|---------|
-| `_dmarc` | `v=DMARC1; p=none; rua=mailto:noreply@owyx.site; fo=1` |
+### Аватарка отправителя (BIMI) — не сейчас
 
-Проверка: `dig +short TXT _dmarc.owyx.site` — должна вернуть запись.
+Зелёный «O» в Mail.ru/Gmail ≠ favicon сайта. Бренд в инбоксе = **BIMI**:
 
-SPF/DKIM уже через Mailjet. Через 1–2 недели при чистых отчётах: `p=quarantine`, потом `p=reject`.
+1. DMARC минимум `p=quarantine` (лучше `p=reject`) — при `p=none` логотип не покажут.
+2. Публичный SVG по HTTPS (профиль **SVG Tiny PS**, квадрат, без скриптов/внешних ссылок) — например `https://owyx.site/.well-known/bimi/owyx.svg` из упрощённого `brand/v2/owyx-icon-*.svg`.
+3. DNS TXT `default._bimi.owyx.site` → `v=BIMI1; l=https://owyx.site/.well-known/bimi/owyx.svg;`
+4. Для **Gmail / Apple Mail** почти всегда нужен платный **VMC** (Verified Mark Certificate, сотни–тысячи $/год, trademark на логотип). Без VMC BIMI иногда виден у Yahoo и части клиентов; **Mail.ru часто игнорит BIMI** и рисует свою букву.
 
-Аватарка отправителя (зелёный «O») — не favicon. Брендовый логотип в инбоксе = **BIMI** (нужен строгий DMARC + SVG + часто платный VMC). Пока можно жить без него.
-
-`EMAIL_FROM=noreply@owyx.site` на VPS.
-
-Опционально: Cloudflare → Email → **Enable DMARC Management** — удобные отчёты, не замена DNS-записи.
+Практично для ОБТ: DMARC уже ок → позже quarantine; BIMI/VMC отложить. Пока «Не спам» + контакт с `noreply@owyx.site`.
 
 ## Turnstile (уже на проде)
 

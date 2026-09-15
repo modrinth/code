@@ -323,3 +323,74 @@ select:focus:not(:focus-visible) {
   margin: 0 0 0.4rem;
 }
 .empty-surface p { margin: 0; color: var(--color-muted); font-size: 0.95rem; }
+
+/* ===== Cabinet (profile / admin) — launcher rail parity ===== */
+/* Hallmark · pre-emit critique: P5 H5 E4 S4 R5 V4 */
+.cabinet-rail-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: var(--radius-control);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+}
+.cabinet-rail-item:hover {
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-panel) 80%, transparent);
+}
+.cabinet-rail-item.is-active {
+  color: var(--color-accent);
+  background: rgba(0, 229, 255, 0.08);
+  border-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
+.overflow-wrap-anywhere {
+  overflow-wrap: anywhere;
+}
+
+.cabinet-kv {
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--color-panel-2) 70%, transparent);
+}
+.cabinet-kv-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--color-line);
+  min-width: 0;
+}
+.cabinet-kv-row:last-child { border-bottom: 0; }
+
+.admin-user-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr) auto;
+  gap: 0.75rem 1rem;
+  align-items: center;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--color-line);
+  min-width: 0;
+}
+.admin-user-row:last-child { border-bottom: 0; }
+.admin-user-row:hover { background: color-mix(in srgb, var(--color-panel-2) 55%, transparent); }
+@media (max-width: 640px) {
+  .admin-user-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem;
+  }
+}

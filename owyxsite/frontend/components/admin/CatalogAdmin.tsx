@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 
 type SourceType = "http_zip" | "http_manifest" | "google_drive" | "mrpack" | "sftp" | "local_ingest";
 
@@ -91,6 +91,7 @@ export default function CatalogAdmin({
   const [openPack, setOpenPack] = useState(false);
   const [openServer, setOpenServer] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -108,6 +109,8 @@ export default function CatalogAdmin({
       }
     } catch {
       /* ignore */
+    } finally {
+      setLoaded(true);
     }
   }, [authHeaders]);
 
@@ -248,11 +251,14 @@ export default function CatalogAdmin({
         published: serverForm.published,
         sortOrder: parseInt(serverForm.sortOrder, 10) || 0,
       };
-      const res = await fetch(editServerId ? `/api/admin/servers/${editServerId}` : "/api/admin/servers", {
-        method: editServerId ? "PUT" : "POST",
-        headers: authHeaders(),
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        editServerId ? `/api/admin/servers/${editServerId}` : "/api/admin/servers",
+        {
+          method: editServerId ? "PUT" : "POST",
+          headers: authHeaders(),
+          body: JSON.stringify(payload),
+        }
+      );
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         showMessage(data.error || "Не удалось сохранить сервер", "error");
@@ -292,7 +298,11 @@ export default function CatalogAdmin({
     const fd = new FormData();
     fd.append("archive", file);
     const headers = { Authorization: authHeaders().Authorization };
-    const res = await fetch(`/api/admin/packs/${p.id}/ingest`, { method: "POST", headers, body: fd });
+    const res = await fetch(`/api/admin/packs/${p.id}/ingest`, {
+      method: "POST",
+      headers,
+      body: fd,
+    });
     const data = await res.json().catch(() => ({}));
     if (res.ok) {
       showMessage("Архив принят, downloadUrl обновлён", "success");
@@ -303,180 +313,468 @@ export default function CatalogAdmin({
   }
 
   return (
-    <div>
-      <h2 className="text-xl font-bold tracking-tight mb-1">Серверы и сборки</h2>
-      <p className="text-[#9aa0a8] text-sm mb-4">
-        Каталог для лаунчера. Игрокам уходит HTTP zip/манифест; SFTP остаётся только у админа.
-      </p>
-
-      <div className="flex gap-2 mb-4">
-        <button type="button" className={`btn ${tab === "servers" ? "btn-primary" : "btn-secondary"}`} onClick={() => setTab("servers")}>
-          Серверы
-        </button>
-        <button type="button" className={`btn ${tab === "packs" ? "btn-primary" : "btn-secondary"}`} onClick={() => setTab("packs")}>
-          Сборки
-        </button>
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="font-display text-lg font-bold tracking-tight">Каталог лаунчера</h2>
+          <p className="mt-1 text-sm text-muted">
+            Серверы и сборки, которые видит лаунчер. SFTP — только для админа.
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            className={`cabinet-rail-item ${tab === "servers" ? "is-active" : ""}`}
+            onClick={() => setTab("servers")}
+          >
+            Серверы
+          </button>
+          <button
+            type="button"
+            className={`cabinet-rail-item ${tab === "packs" ? "is-active" : ""}`}
+            onClick={() => setTab("packs")}
+          >
+            Сборки
+          </button>
+        </div>
       </div>
 
-      {tab === "servers" ? (
-        <div>
-          <button type="button" className="btn btn-primary mb-4" onClick={startCreateServer}>Добавить сервер</button>
-          <div className="space-y-2">
-            {servers.length === 0 ? (
-              <p className="text-[#9aa0a8] text-sm">Пока нет серверов. Создайте карточку — лаунчер подхватит список.</p>
-            ) : servers.map((s) => (
-              <div key={s.id} className="panel p-3 flex flex-wrap items-center gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="text-white text-sm font-medium truncate">{s.name}</div>
-                  <div className="text-[#9aa0a8] text-xs truncate">
-                    {s.address}:{s.port} · {s.minecraft || "—"} {s.loader || ""} · пак {s.packId || "нет"}
+      {!loaded ? (
+        <p className="text-sm text-muted py-8 text-center">Загрузка каталога…</p>
+      ) : tab === "servers" ? (
+        <div className="space-y-4">
+          <button type="button" className="btn btn-primary" onClick={startCreateServer}>
+            Добавить сервер
+          </button>
+          {servers.length === 0 ? (
+            <div className="empty-surface">
+              <h3>Серверов пока нет</h3>
+              <p>Создай карточку — лаунчер подхватит список.</p>
+            </div>
+          ) : (
+            <ul className="space-y-2">
+              {servers.map((s) => (
+                <li
+                  key={s.id}
+                  className="flex flex-wrap items-center gap-3 rounded-xl border border-line px-3 py-3"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-text truncate">{s.name}</p>
+                    <p className="text-xs text-muted truncate font-mono">
+                      {s.address}:{s.port}
+                      <span className="text-muted"> · </span>
+                      {s.minecraft || "—"} {s.loader || ""}
+                    </p>
                   </div>
-                </div>
-                <span className={`badge ${s.published ? "badge-accent" : ""}`}>{s.published ? "опубл." : "скрыт"}</span>
-                <button type="button" className="btn btn-secondary !py-1.5 !px-3 text-xs" onClick={() => startEditServer(s)}>Изменить</button>
-                <button type="button" className="btn btn-secondary !py-1.5 !px-3 text-xs" onClick={() => void toggleServer(s)}>
-                  {s.published ? "Скрыть" : "Показать"}
-                </button>
-              </div>
-            ))}
-          </div>
+                  <span className={`badge ${s.published ? "badge-accent" : ""}`}>
+                    {s.published ? "опубл." : "скрыт"}
+                  </span>
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => startEditServer(s)}
+                  >
+                    Изменить
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => void toggleServer(s)}
+                  >
+                    {s.published ? "Скрыть" : "Показать"}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       ) : (
-        <div>
-          <button type="button" className="btn btn-primary mb-4" onClick={startCreatePack}>Добавить пак</button>
-          <div className="space-y-2">
-            {packs.length === 0 ? (
-              <p className="text-[#9aa0a8] text-sm">Пока нет сборок.</p>
-            ) : packs.map((p) => (
-              <div key={p.id} className="panel p-3 flex flex-wrap items-center gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="text-white text-sm font-medium truncate">{p.name}</div>
-                  <div className="text-[#9aa0a8] text-xs truncate">
-                    {p.minecraft} {p.loader} · {p.sourceType}
+        <div className="space-y-4">
+          <button type="button" className="btn btn-primary" onClick={startCreatePack}>
+            Добавить пак
+          </button>
+          {packs.length === 0 ? (
+            <div className="empty-surface">
+              <h3>Сборок пока нет</h3>
+              <p>Добавь пак и привяжи его к серверу.</p>
+            </div>
+          ) : (
+            <ul className="space-y-2">
+              {packs.map((p) => (
+                <li
+                  key={p.id}
+                  className="flex flex-wrap items-center gap-3 rounded-xl border border-line px-3 py-3"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-text truncate">{p.name}</p>
+                    <p className="text-xs text-muted truncate">
+                      {p.minecraft} {p.loader} · {p.sourceType}
+                    </p>
                   </div>
-                </div>
-                <span className={`badge ${p.published ? "badge-accent" : ""}`}>{p.published ? "опубл." : "скрыт"}</span>
-                <label className="btn btn-secondary !py-1.5 !px-3 text-xs cursor-pointer">
-                  Залить zip
-                  <input
-                    type="file"
-                    accept=".zip,.mrpack"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) void ingestPack(p, file);
-                      e.target.value = "";
-                    }}
-                  />
-                </label>
-                <button type="button" className="btn btn-secondary !py-1.5 !px-3 text-xs" onClick={() => startEditPack(p)}>Изменить</button>
-                <button type="button" className="btn btn-secondary !py-1.5 !px-3 text-xs" onClick={() => void togglePack(p)}>
-                  {p.published ? "Скрыть" : "Показать"}
-                </button>
-              </div>
-            ))}
-          </div>
+                  <span className={`badge ${p.published ? "badge-accent" : ""}`}>
+                    {p.published ? "опубл." : "скрыт"}
+                  </span>
+                  <label className="btn btn-secondary btn-sm cursor-pointer">
+                    Залить zip
+                    <input
+                      type="file"
+                      accept=".zip,.mrpack"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) void ingestPack(p, file);
+                        e.target.value = "";
+                      }}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => startEditPack(p)}
+                  >
+                    Изменить
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => void togglePack(p)}
+                  >
+                    {p.published ? "Скрыть" : "Показать"}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
 
       {openPack && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-start justify-center overflow-y-auto py-10 px-4">
-          <form onSubmit={savePack} className="panel p-5 w-full max-w-xl space-y-3">
-            <h3 className="text-lg font-bold">{editPackId ? "Изменить пак" : "Добавить пак"}</h3>
-            <input className="input" placeholder="Название" value={packForm.name} onChange={(e) => setPackForm((f) => ({ ...f, name: e.target.value }))} />
+        <ModalShell title={editPackId ? "Изменить пак" : "Добавить пак"} onClose={() => setOpenPack(false)}>
+          <form onSubmit={savePack} className="space-y-3">
+            <Field label="Название">
+              <input
+                className="input"
+                required
+                value={packForm.name}
+                onChange={(e) => setPackForm((f) => ({ ...f, name: e.target.value }))}
+              />
+            </Field>
             <div className="grid grid-cols-2 gap-3">
-              <input className="input" placeholder="Minecraft" value={packForm.minecraft} onChange={(e) => setPackForm((f) => ({ ...f, minecraft: e.target.value }))} />
-              <select className="select" value={packForm.loader} onChange={(e) => setPackForm((f) => ({ ...f, loader: e.target.value }))}>
-                {LOADERS.map((l) => <option key={l} value={l}>{l}</option>)}
-              </select>
+              <Field label="Minecraft">
+                <input
+                  className="input"
+                  value={packForm.minecraft}
+                  onChange={(e) => setPackForm((f) => ({ ...f, minecraft: e.target.value }))}
+                />
+              </Field>
+              <Field label="Лоадер">
+                <select
+                  className="select"
+                  value={packForm.loader}
+                  onChange={(e) => setPackForm((f) => ({ ...f, loader: e.target.value }))}
+                >
+                  {LOADERS.map((l) => (
+                    <option key={l} value={l}>
+                      {l}
+                    </option>
+                  ))}
+                </select>
+              </Field>
             </div>
-            <input className="input" placeholder="Иконка (URL)" value={packForm.iconUrl} onChange={(e) => setPackForm((f) => ({ ...f, iconUrl: e.target.value }))} />
-            <textarea className="input min-h-20" placeholder="Описание" value={packForm.description} onChange={(e) => setPackForm((f) => ({ ...f, description: e.target.value }))} />
-            <select className="select" value={packForm.sourceType} onChange={(e) => setPackForm((f) => ({ ...f, sourceType: e.target.value as SourceType }))}>
-              {SOURCE_TYPES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
-            </select>
-            {(packForm.sourceType === "http_zip" || packForm.sourceType === "local_ingest" || packForm.sourceType === "google_drive" || packForm.sourceType === "mrpack") && (
+            <Field label="Иконка (URL)">
+              <input
+                className="input"
+                value={packForm.iconUrl}
+                onChange={(e) => setPackForm((f) => ({ ...f, iconUrl: e.target.value }))}
+              />
+            </Field>
+            <Field label="Описание">
+              <textarea
+                className="textarea"
+                value={packForm.description}
+                onChange={(e) => setPackForm((f) => ({ ...f, description: e.target.value }))}
+              />
+            </Field>
+            <Field label="Источник">
+              <select
+                className="select"
+                value={packForm.sourceType}
+                onChange={(e) =>
+                  setPackForm((f) => ({ ...f, sourceType: e.target.value as SourceType }))
+                }
+              >
+                {SOURCE_TYPES.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.label}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            {(packForm.sourceType === "http_zip" ||
+              packForm.sourceType === "local_ingest" ||
+              packForm.sourceType === "google_drive" ||
+              packForm.sourceType === "mrpack") && (
               <>
-                <input className="input" placeholder="URL архива" value={packForm.url} onChange={(e) => setPackForm((f) => ({ ...f, url: e.target.value }))} />
-                <input className="input" placeholder="sha256 (необязательно)" value={packForm.sha256} onChange={(e) => setPackForm((f) => ({ ...f, sha256: e.target.value }))} />
+                <Field label="URL архива">
+                  <input
+                    className="input"
+                    value={packForm.url}
+                    onChange={(e) => setPackForm((f) => ({ ...f, url: e.target.value }))}
+                  />
+                </Field>
+                <Field label="sha256 (необязательно)">
+                  <input
+                    className="input font-mono text-sm"
+                    value={packForm.sha256}
+                    onChange={(e) => setPackForm((f) => ({ ...f, sha256: e.target.value }))}
+                  />
+                </Field>
               </>
             )}
             {packForm.sourceType === "http_manifest" && (
-              <input className="input" placeholder="URL манифеста" value={packForm.manifestUrl} onChange={(e) => setPackForm((f) => ({ ...f, manifestUrl: e.target.value }))} />
+              <Field label="URL манифеста">
+                <input
+                  className="input"
+                  value={packForm.manifestUrl}
+                  onChange={(e) => setPackForm((f) => ({ ...f, manifestUrl: e.target.value }))}
+                />
+              </Field>
             )}
             {packForm.sourceType === "sftp" && (
               <>
-                <p className="text-xs text-[#9aa0a8]">Игрокам не отдаётся. После заливки на склад укажите HTTP zip.</p>
-                <input className="input" placeholder="host" value={packForm.host} onChange={(e) => setPackForm((f) => ({ ...f, host: e.target.value }))} />
+                <p className="text-xs text-muted">
+                  Игрокам не отдаётся. После склада укажи HTTP zip.
+                </p>
+                <Field label="host">
+                  <input
+                    className="input"
+                    value={packForm.host}
+                    onChange={(e) => setPackForm((f) => ({ ...f, host: e.target.value }))}
+                  />
+                </Field>
                 <div className="grid grid-cols-2 gap-3">
-                  <input className="input" placeholder="port" value={packForm.port} onChange={(e) => setPackForm((f) => ({ ...f, port: e.target.value }))} />
-                  <input className="input" placeholder="user" value={packForm.user} onChange={(e) => setPackForm((f) => ({ ...f, user: e.target.value }))} />
+                  <Field label="port">
+                    <input
+                      className="input"
+                      value={packForm.port}
+                      onChange={(e) => setPackForm((f) => ({ ...f, port: e.target.value }))}
+                    />
+                  </Field>
+                  <Field label="user">
+                    <input
+                      className="input"
+                      value={packForm.user}
+                      onChange={(e) => setPackForm((f) => ({ ...f, user: e.target.value }))}
+                    />
+                  </Field>
                 </div>
-                <input className="input" placeholder="path" value={packForm.path} onChange={(e) => setPackForm((f) => ({ ...f, path: e.target.value }))} />
-                <input className="input" type="password" placeholder="пароль (не показывается в GET)" value={packForm.password} onChange={(e) => setPackForm((f) => ({ ...f, password: e.target.value }))} />
+                <Field label="path">
+                  <input
+                    className="input"
+                    value={packForm.path}
+                    onChange={(e) => setPackForm((f) => ({ ...f, path: e.target.value }))}
+                  />
+                </Field>
+                <Field label="пароль">
+                  <input
+                    className="input"
+                    type="password"
+                    value={packForm.password}
+                    onChange={(e) => setPackForm((f) => ({ ...f, password: e.target.value }))}
+                  />
+                </Field>
               </>
             )}
-            <label className="flex items-center gap-2 text-sm text-[#9aa0a8]">
-              <input type="checkbox" checked={packForm.published} onChange={(e) => setPackForm((f) => ({ ...f, published: e.target.checked }))} />
+            <label className="flex items-center gap-2 text-sm text-muted min-h-11">
+              <input
+                type="checkbox"
+                className="accent-[var(--color-accent)] h-4 w-4"
+                checked={packForm.published}
+                onChange={(e) => setPackForm((f) => ({ ...f, published: e.target.checked }))}
+              />
               Опубликован
             </label>
-            <div className="flex gap-2 justify-end">
-              <button type="button" className="btn btn-secondary" onClick={() => setOpenPack(false)}>Отмена</button>
-              <button type="submit" disabled={busy} className="btn btn-primary">{busy ? "…" : "Сохранить"}</button>
+            <div className="flex justify-end gap-2 pt-2">
+              <button type="button" className="btn btn-ghost" onClick={() => setOpenPack(false)}>
+                Отмена
+              </button>
+              <button type="submit" disabled={busy} className="btn btn-primary">
+                {busy ? "…" : "Сохранить"}
+              </button>
             </div>
           </form>
-        </div>
+        </ModalShell>
       )}
 
       {openServer && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-start justify-center overflow-y-auto py-10 px-4">
-          <form onSubmit={saveServer} className="panel p-5 w-full max-w-xl space-y-3">
-            <h3 className="text-lg font-bold">{editServerId ? "Изменить сервер" : "Добавить сервер"}</h3>
-            <input className="input" placeholder="Название" value={serverForm.name} onChange={(e) => setServerForm((f) => ({ ...f, name: e.target.value }))} />
-            <input className="input" placeholder="Иконка (URL)" value={serverForm.iconUrl} onChange={(e) => setServerForm((f) => ({ ...f, iconUrl: e.target.value }))} />
+        <ModalShell
+          title={editServerId ? "Изменить сервер" : "Добавить сервер"}
+          onClose={() => setOpenServer(false)}
+        >
+          <form onSubmit={saveServer} className="space-y-3">
+            <Field label="Название">
+              <input
+                className="input"
+                required
+                value={serverForm.name}
+                onChange={(e) => setServerForm((f) => ({ ...f, name: e.target.value }))}
+              />
+            </Field>
+            <Field label="Иконка (URL)">
+              <input
+                className="input"
+                value={serverForm.iconUrl}
+                onChange={(e) => setServerForm((f) => ({ ...f, iconUrl: e.target.value }))}
+              />
+            </Field>
             <div className="grid grid-cols-[1fr_7rem] gap-3">
-              <input className="input" placeholder="IP / хост" value={serverForm.address} onChange={(e) => setServerForm((f) => ({ ...f, address: e.target.value }))} />
-              <input className="input" placeholder="порт" value={serverForm.port} onChange={(e) => setServerForm((f) => ({ ...f, port: e.target.value }))} />
+              <Field label="IP / хост">
+                <input
+                  className="input"
+                  value={serverForm.address}
+                  onChange={(e) => setServerForm((f) => ({ ...f, address: e.target.value }))}
+                />
+              </Field>
+              <Field label="Порт">
+                <input
+                  className="input"
+                  value={serverForm.port}
+                  onChange={(e) => setServerForm((f) => ({ ...f, port: e.target.value }))}
+                />
+              </Field>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <select className="select" value={serverForm.kind} onChange={(e) => setServerForm((f) => ({ ...f, kind: e.target.value as "owyx" | "community" }))}>
-                <option value="owyx">owyx</option>
-                <option value="community">community</option>
-              </select>
-              <select className="select" value={serverForm.packId} onChange={(e) => {
-                const pack = packs.find((p) => p.id === e.target.value);
-                setServerForm((f) => ({
-                  ...f,
-                  packId: e.target.value,
-                  minecraft: pack?.minecraft || f.minecraft,
-                  loader: pack?.loader || f.loader,
-                }));
-              }}>
-                <option value="">без пака</option>
-                {packs.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-              </select>
+              <Field label="Тип">
+                <select
+                  className="select"
+                  value={serverForm.kind}
+                  onChange={(e) =>
+                    setServerForm((f) => ({
+                      ...f,
+                      kind: e.target.value as "owyx" | "community",
+                    }))
+                  }
+                >
+                  <option value="owyx">owyx</option>
+                  <option value="community">community</option>
+                </select>
+              </Field>
+              <Field label="Пак">
+                <select
+                  className="select"
+                  value={serverForm.packId}
+                  onChange={(e) => {
+                    const pack = packs.find((p) => p.id === e.target.value);
+                    setServerForm((f) => ({
+                      ...f,
+                      packId: e.target.value,
+                      minecraft: pack?.minecraft || f.minecraft,
+                      loader: pack?.loader || f.loader,
+                    }));
+                  }}
+                >
+                  <option value="">без пака</option>
+                  {packs.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </Field>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <input className="input" placeholder="Minecraft" value={serverForm.minecraft} onChange={(e) => setServerForm((f) => ({ ...f, minecraft: e.target.value }))} />
-              <select className="select" value={serverForm.loader} onChange={(e) => setServerForm((f) => ({ ...f, loader: e.target.value }))}>
-                {LOADERS.map((l) => <option key={l} value={l}>{l}</option>)}
-              </select>
+              <Field label="Minecraft">
+                <input
+                  className="input"
+                  value={serverForm.minecraft}
+                  onChange={(e) => setServerForm((f) => ({ ...f, minecraft: e.target.value }))}
+                />
+              </Field>
+              <Field label="Лоадер">
+                <select
+                  className="select"
+                  value={serverForm.loader}
+                  onChange={(e) => setServerForm((f) => ({ ...f, loader: e.target.value }))}
+                >
+                  {LOADERS.map((l) => (
+                    <option key={l} value={l}>
+                      {l}
+                    </option>
+                  ))}
+                </select>
+              </Field>
             </div>
-            <label className="flex items-center gap-2 text-sm text-[#9aa0a8]">
-              <input type="checkbox" checked={serverForm.requiresAccount} onChange={(e) => setServerForm((f) => ({ ...f, requiresAccount: e.target.checked }))} />
+            <label className="flex items-center gap-2 text-sm text-muted min-h-11">
+              <input
+                type="checkbox"
+                className="accent-[var(--color-accent)] h-4 w-4"
+                checked={serverForm.requiresAccount}
+                onChange={(e) =>
+                  setServerForm((f) => ({ ...f, requiresAccount: e.target.checked }))
+                }
+              />
               Нужен аккаунт Owyx
             </label>
-            <label className="flex items-center gap-2 text-sm text-[#9aa0a8]">
-              <input type="checkbox" checked={serverForm.published} onChange={(e) => setServerForm((f) => ({ ...f, published: e.target.checked }))} />
+            <label className="flex items-center gap-2 text-sm text-muted min-h-11">
+              <input
+                type="checkbox"
+                className="accent-[var(--color-accent)] h-4 w-4"
+                checked={serverForm.published}
+                onChange={(e) => setServerForm((f) => ({ ...f, published: e.target.checked }))}
+              />
               Опубликован
             </label>
-            <div className="flex gap-2 justify-end">
-              <button type="button" className="btn btn-secondary" onClick={() => setOpenServer(false)}>Отмена</button>
-              <button type="submit" disabled={busy} className="btn btn-primary">{busy ? "…" : "Сохранить"}</button>
+            <div className="flex justify-end gap-2 pt-2">
+              <button type="button" className="btn btn-ghost" onClick={() => setOpenServer(false)}>
+                Отмена
+              </button>
+              <button type="submit" disabled={busy} className="btn btn-primary">
+                {busy ? "…" : "Сохранить"}
+              </button>
             </div>
           </form>
-        </div>
+        </ModalShell>
       )}
+    </div>
+  );
+}
+
+function Field({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="field">
+      <span className="field-label">{label}</span>
+      {children}
+    </div>
+  );
+}
+
+function ModalShell({
+  title,
+  onClose,
+  children,
+}: {
+  title: string;
+  onClose: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/65 py-10 px-4"
+      onClick={onClose}
+      role="presentation"
+    >
+      <div
+        className="w-full max-w-xl rounded-2xl border border-line bg-panel p-5 sm:p-6 shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="catalog-modal-title"
+      >
+        <h3 id="catalog-modal-title" className="font-display text-lg font-bold tracking-tight mb-4">
+          {title}
+        </h3>
+        {children}
+      </div>
     </div>
   );
 }
