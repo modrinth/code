@@ -581,23 +581,11 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "마음에 드는 콘텐츠를 저장하고 한 번의 클릭으로 업데이트를 받아보세요."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "프로젝트 팔로우"
-  },
-  "app-marketing.features.importing.description": {
-    "message": "이전 런처에서 사용하던 모든 즐겨찾기 프로필을 가져오고, Modrinth App에서 바로 시작하세요!"
-  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
-  },
-  "app-marketing.features.importing.title": {
-    "message": "프로필 가져오기"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "작업"
@@ -623,15 +611,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "버전"
   },
-  "app-marketing.features.offline.description": {
-    "message": "인터넷에 연결되어 있든 아니든, 언제든지 모드를 플레이하세요."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "오프라인 모드"
-  },
-  "app-marketing.features.open-source.description": {
-    "message": "Modrinth의 런처는 완전히 오픈 소스입니다. <github-link>Github</github-link>에서 소스 코드를 확인하세요!"
-  },
   "app-marketing.features.open-source.title": {
     "message": "오픈 소스"
   },
@@ -641,9 +620,6 @@
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
   },
-  "app-marketing.features.performance.description": {
-    "message": "Modrinth App은 대다수 모드 매니저들보다 빠릅니다, 150 MB의 메모리만 사용하죠!"
-  },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
   },
@@ -652,15 +628,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"
@@ -3860,26 +3827,17 @@
   "project.settings.delete-project.title": {
     "message": "프로젝트 삭제"
   },
-  "project.settings.disclosures.advertising.description.1": {
-    "message": "이 프로젝트에 다른 콘텐츠의 광고, 스폰서십 또는 홍보가 포함된 경우 활성화해야 합니다."
-  },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "예: 사용자의 서버 목록에 Modrinth SMP 서버를 추가합니다."
   },
   "project.settings.disclosures.advertising.title": {
     "message": "광고 포함"
   },
-  "project.settings.disclosures.ai.description": {
-    "message": "이 프로젝트의 코드 상당 부분 또는 에셋이 AI로 생성되었거나, 프로젝트의 기능이 생성형 AI의 사용에 의존하거나, 설명이나 게시 등 프로젝트 페이지의 요소가 생성형 AI에 의존하는 경우 활성화해야 합니다."
-  },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "예: 중국어 및 아랍어 번역이 AI로 생성되었습니다."
   },
   "project.settings.disclosures.ai.title": {
     "message": "AI 생성 콘텐츠 포함"
-  },
-  "project.settings.disclosures.ai.types-description": {
-    "message": "어느 요소에 생성형 AI가 사용되었나요?"
   },
   "project.settings.disclosures.archived.banner-preview": {
     "message": "배너 미리보기"
@@ -3937,9 +3895,6 @@
   },
   "project.settings.disclosures.lock-status.fully-locked.warning": {
     "message": "고지 사항을 수정 또는 삭제해야 하는 경우 <contact-support-link>지원팀에 문의하세요</contact-support-link>."
-  },
-  "project.settings.disclosures.paid-features.description": {
-    "message": "이 프로젝트에 실제 화폐를 사용하여 얻을 수 있는 기능이 포함된 경우 활성화해야 합니다."
   },
   "project.settings.disclosures.paid-features.feature-placeholder": {
     "message": "예: Patreon 후원으로 치장품을 얻을 수 있습니다"
@@ -4978,9 +4933,6 @@
   },
   "settings.account.two-factor.error.incorrect-code": {
     "message": "입력한 코드가 맞지 않습니다!"
-  },
-  "settings.account.two-factor.field.code.description": {
-    "message": "진행하려면 2단계 인증 코드를 입력해 주세요."
   },
   "settings.account.two-factor.field.code.label": {
     "message": "2단계 인증 코드 입력"

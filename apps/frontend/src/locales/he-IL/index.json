@@ -101,23 +101,11 @@
   "app-marketing.download.windows": {
     "message": "ווינדוס"
   },
-  "app-marketing.features.follow.description": {
-    "message": "שמור תוכן שאתה אוהב וקבל עדכונים בלחיצה אחת."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "עקוב אחר פרויקטים"
-  },
-  "app-marketing.features.importing.description": {
-    "message": "ייבא את כל הפרופילים המועדפים עליך מהמפעיל שבו השתמשת לפני כן, והתחל להשתמש באפליקציית מודרינת' תוך שניות!"
-  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
-  },
-  "app-marketing.features.importing.title": {
-    "message": "ייבוא פרופילים"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "פעולות"
@@ -143,15 +131,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "גרסה"
   },
-  "app-marketing.features.offline.description": {
-    "message": "שחק עם המודים שלך, בין אם אתה מחובר לאינטרנט ובין אם לאו."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "מצב לא מקוון"
-  },
-  "app-marketing.features.open-source.description": {
-    "message": "המפעיל של מודרינת' הוא קוד פתוח לחלוטין. באפשרותך לצפות בקוד המקור ב<github-link>GitHub</github-link>!"
-  },
   "app-marketing.features.open-source.title": {
     "message": "קוד פתוח"
   },
@@ -161,9 +140,6 @@
   "app-marketing.features.performance.cpu-percent": {
     "message": "% מעבד"
   },
-  "app-marketing.features.performance.description": {
-    "message": "אפליקציית Modrinth מציגה ביצועים טובים יותר מרוב מנהלי המודים המובילים, תוך שימוש ב 150 MB של RAM בלבד!"
-  },
   "app-marketing.features.performance.discord": {
     "message": "דיסקורד"
   },
@@ -172,12 +148,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "גוגל כרום"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ מגה-בייט"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "פחות מ-150 מגה-בייט"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"

@@ -3,14 +3,12 @@
 		v-if="role === 'admin'"
 		v-tooltip="formatMessage(messages.modrinthTeamLabel)"
 		role="img"
-		:aria-label="formatMessage(messages.modrinthTeamLabel)"
 		class="size-4 shrink-0 !text-green"
 	/>
 	<ScaleIcon
 		v-else-if="role === 'moderator'"
 		v-tooltip="formatMessage(messages.moderatorLabel)"
 		role="img"
-		:aria-label="formatMessage(messages.moderatorLabel)"
 		class="size-4 shrink-0 !text-orange"
 	/>
 </template>

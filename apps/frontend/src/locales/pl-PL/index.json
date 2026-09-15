@@ -578,23 +578,11 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Zapisuj ulubione treści i otrzymuj aktualizacje jednym kliknięciem."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Obserwuj projekty"
-  },
-  "app-marketing.features.importing.description": {
-    "message": "Zaimportuj wszystkie swoje ulubione profile z launchera, którego używałeś wcześniej, i zacznij korzystać z Modrinth App w kilka sekund!"
-  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
-  },
-  "app-marketing.features.importing.title": {
-    "message": "Importowanie profili"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Akcje"
@@ -620,15 +608,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Wersja"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Graj w swoje mody, niezależnie od tego, czy masz połączenie z internetem, czy nie."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Tryb offline"
-  },
-  "app-marketing.features.open-source.description": {
-    "message": "Modrinth Launcher jest w pełni otwarto-źródłowy. Kod źródłowy możesz zobaczyć na naszym <github-link>GitHubie</github-link>!"
-  },
   "app-marketing.features.open-source.title": {
     "message": "Otwarte oprogramowanie"
   },
@@ -638,9 +617,6 @@
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
   },
-  "app-marketing.features.performance.description": {
-    "message": "Modrinth App działa wydajniej niż wiele popularnych menedżerów modów, zużywając zaledwie 150 MB pamięci RAM!"
-  },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
   },
@@ -649,15 +625,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"
@@ -791,6 +758,9 @@
   "auth.create-account.date-of-birth.required.title": {
     "message": "Wymagana data urodzenia"
   },
+  "auth.create-account.date-of-birth.under13-helper": {
+    "message": "Nie możesz utworzyć konta w Modrinth, jeśli nie masz więcej niż 13 lat."
+  },
   "auth.create-account.info-panel.source-code-link": {
     "message": "Kod źródłowy funkcji"
   },
@@ -815,8 +785,17 @@
   "auth.create-account.username.placeholder": {
     "message": "Wprowadź nazwę użytkownika"
   },
+  "auth.reauthenticate.2fa.description": {
+    "message": "Wpisz 6-cyfrowy kod z aplikacji uwierzytelniającej lub jeden z kodów zapasowych."
+  },
   "auth.reauthenticate.2fa.label": {
     "message": "Uwierzytelnianie dwuskładnikowe"
+  },
+  "auth.reauthenticate.continue-with-passkey": {
+    "message": "Kontynuuj przy użyciu klucza dostępu"
+  },
+  "auth.reauthenticate.last-signed-in-with": {
+    "message": "Ostatnie logowanie na to konto odbyło się przy użyciu {method, select, password {hasła} passkey {klucza dostępu} github {konta GitHub} discord {konta Discord} google {konta Google} microsoft {konta Microsoft} gitlab {konta GitLab} steam {konta Steam} paypal {konta PayPal} other {{method}} }."
   },
   "auth.reauthenticate.page-title": {
     "message": "Ponownie uwierzytelnij"
@@ -890,6 +869,9 @@
   "auth.sign-in.last-sign-in": {
     "message": "Ostatnio użyty"
   },
+  "auth.sign-in.launcher.callback.title": {
+    "message": "Przekazanie wyniku logowania do aplikacji Modrinth"
+  },
   "auth.sign-in.launcher.complete.description": {
     "message": "Wracamy Cię do aplikacji Modrint. Jeśli nic się nie stanie, użyj przycisku poniżej."
   },
@@ -901,6 +883,12 @@
   },
   "auth.sign-in.launcher.complete.title": {
     "message": "Jesteś zalogowany"
+  },
+  "auth.sign-in.launcher.opening.description": {
+    "message": "Jeśli aplikacja się nie otworzy, użyj poniższego przycisku, aby dokończyć logowanie."
+  },
+  "auth.sign-in.launcher.opening.title": {
+    "message": "Otwieranie aplikacji Modrinth..."
   },
   "auth.sign-in.no-account": {
     "message": "Nie masz konta?"
@@ -934,6 +922,9 @@
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Utwórz konto"
+  },
+  "auth.two-factor.incorrect-code": {
+    "message": "Kod uwierzytelniania dwuskładnikowego jest nieprawidłowy. Spróbuj ponownie lub użyj kodu zapasowego."
   },
   "auth.verify-email.action.account-settings": {
     "message": "Ustawienia konta"
@@ -2333,6 +2324,9 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "Na jakich procesorach działają serwery Modrinth Hosting?"
   },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Serwery Modrinth Hosting korzystają z procesorów AMD Ryzen 7950X, 9950X lub równoważnych oraz pamięci DDR5."
+  },
   "hosting-marketing.faq.currency": {
     "message": "W jakiej walucie są podane ceny?"
   },
@@ -2705,6 +2699,9 @@
   "layout.action.tech-review": {
     "message": "Przegląd techniczny"
   },
+  "layout.action.user-lookup": {
+    "message": "Wyszukiwanie użytkowników"
+  },
   "layout.avatar.alt": {
     "message": "Twój awatar"
   },
@@ -2989,6 +2986,9 @@
   },
   "moderation.moderate": {
     "message": "Moderuj"
+  },
+  "moderation.page.delphi-rules": {
+    "message": "Reguły Delphi"
   },
   "moderation.page.external-projects": {
     "message": "Zewnętrzne projekty"
@@ -3391,6 +3391,9 @@
   },
   "project-member-header.success-join": {
     "message": "Zaakceptowano zaproszenie do zespołu"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Twój projekt został przesłany do sprawdzenia!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Lista kontrolna publikacji"
@@ -3806,6 +3809,12 @@
   "project.notification.icon-updated.title": {
     "message": "Ikona projektu zaktualizowana"
   },
+  "project.notification.review-save-failed.description": {
+    "message": "Nie możesz zapisać zmian w projekcie, które powodują błędy walidacji."
+  },
+  "project.notification.review-save-failed.title": {
+    "message": "Nie udało się zapisać projektu będącego w trakcie sprawdzania"
+  },
   "project.notification.updated.message": {
     "message": "Twój projekt został zaktualizowany."
   },
@@ -3843,7 +3852,10 @@
     "message": "Usuń projekt"
   },
   "project.settings.disclosures.advertising.description.1": {
-    "message": "Musisz to włączyć, jeśli twój projekt zawiera reklamy, sponsorowanie lub promocje innych utworów."
+    "message": "Musi być włączone, jeśli ten projekt zawiera reklamy, sponsorowanie lub promocje innych dzieł."
+  },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "Nie dotyczy to nieprzeszkadzającej promocji istotnych treści bez bezpośredniej wartości pieniężnej (takich jak link do profilu Modrinth w menu konfiguracyjnym), i nie odnosi się do reklam na stronie projektu, takich jak sponsorowane banery w opisie."
   },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "np. automatycznie dodaje serwer SMP Modrinth do listy serwerów."
@@ -3851,8 +3863,8 @@
   "project.settings.disclosures.advertising.title": {
     "message": "Zawiera reklamy"
   },
-  "project.settings.disclosures.ai.description": {
-    "message": "Musisz to włączyć, jeśli ten projekt zawiera znaczną ilość kodu wygenerowanego przez AI, każdy\n\t\t\t\tFunkcjonowanie projektu opiera się na korzystaniu z\n\t\t\t\to charakterze generycznym, lub jeśli jakikolwiek element strony projektu, taki jak opis lub publikacja, opiera się na ogólnej AI."
+  "project.settings.disclosures.ai-functionality.description": {
+    "message": "Musi być włączone, jeśli projekt posiada funkcjonalność używającą generatywnego AI, takiej jak chatbot w grze lub dynamicznie generowane tekstury."
   },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "np. chińskie i arabskie tłumaczenia zostały wygenerowane przez sztuczną inteligencję."
@@ -3861,7 +3873,7 @@
     "message": "Zawiera treści wygenerowane przez sztuczną inteligencję"
   },
   "project.settings.disclosures.ai.types-description": {
-    "message": "W jaki sposób użyto sztucznej inteligencji?"
+    "message": "Jakie typy treści zostały wygenerowane przez AI?"
   },
   "project.settings.disclosures.archived.banner-preview": {
     "message": "Podgląd baneru"
@@ -3899,6 +3911,9 @@
   "project.settings.disclosures.derivative.note-label": {
     "message": "Wyjaśnij, jak Twój projekt jest oparty na oryginalnej pracy"
   },
+  "project.settings.disclosures.derivative.note-placeholder": {
+    "message": "To jest fork, który dodaje kilka nowych biomów i przenosi je do nowszych wersji Minecraft."
+  },
   "project.settings.disclosures.derivative.title": {
     "message": "Zawiera zawartość pochodną"
   },
@@ -3919,9 +3934,6 @@
   },
   "project.settings.disclosures.lock-status.fully-locked.warning": {
     "message": "Proszę <contact-support-link>skontaktować się ze wsparciem technicznym</contact-support-link>, jeśli ujawnienie to wymaga usunięcia."
-  },
-  "project.settings.disclosures.paid-features.description": {
-    "message": "Musisz to włączyć, jeśli twój projekt zawiera funkcje, które, można uzyskać wydając pieniądze na świecie rzeczywistym."
   },
   "project.settings.disclosures.paid-features.feature-placeholder": {
     "message": "np. Kosmetyki dostępne jako nagroda Patreona"
@@ -4045,6 +4057,12 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.links.donation.duplicate-type": {
+    "message": "Masz już inny link do platformy {platform}."
+  },
+  "project.settings.links.donation.no-type": {
+    "message": "Wybierz platformę dla tego linku do darowizn."
   },
   "project.settings.monetization.description": {
     "message": "Projekty na Modrinth są automatycznie przyjęte w <rewards-program-link>Programie Nagród</rewards-program-link>. Jeśli ty nie chcesz (lub nie możesz z powodów prawnych) zarabiać z tego projektu, możesz wyłączyć to tutaj."
@@ -4249,6 +4267,9 @@
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Prześlij wersje przed dodaniem tagów"
+  },
+  "project.slug-suggestions.label": {
+    "message": "Sugestie:"
   },
   "project.versions.copy-id-option": {
     "message": "Kopiuj ID"
@@ -4962,7 +4983,7 @@
     "message": "Podany kod jest nieprawidłowy!"
   },
   "settings.account.two-factor.field.code.description": {
-    "message": "Wprowadź otrzymany kod weryfikacyjny, aby kontynuować."
+    "message": "Wpisz kod z aplikacji uwierzytelniającej lub użyj jednego z kodów zapasowych."
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Wprowadź otrzymany kod"
@@ -5210,6 +5231,9 @@
   "settings.billing.plan.title": {
     "message": "{size} plan"
   },
+  "settings.billing.price.includes-tax": {
+    "message": "W tym podatek: {amount}"
+  },
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
@@ -5434,6 +5458,21 @@
   },
   "ui.newsletter-button.tooltip": {
     "message": "Subskrybuj do newslettera Modrinth"
+  },
+  "ui.two-factor-code.authentication-code": {
+    "message": "Sześciocyfrowy kod uwierzytelniający"
+  },
+  "ui.two-factor-code.backup-code": {
+    "message": "Kod zapasowy"
+  },
+  "ui.two-factor-code.backup-code.placeholder": {
+    "message": "Wpisz kod zapasowy"
+  },
+  "ui.two-factor-code.use-authentication-code": {
+    "message": "Użyj kodu z aplikacji uwierzytelniającej"
+  },
+  "ui.two-factor-code.use-backup-code": {
+    "message": "Użyj kodu zapasowego"
   },
   "version.all-versions": {
     "message": "Wszystkie wersje"

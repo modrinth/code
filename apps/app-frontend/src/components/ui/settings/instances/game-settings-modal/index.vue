@@ -10,7 +10,6 @@ import {
 	SearchIcon,
 	SettingsIcon,
 	ShirtIcon,
-	SpinnerIcon,
 	TagCategoryAudioIcon,
 	TagCategoryGamepad2Icon,
 	UnlinkIcon,
@@ -29,7 +28,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import type { Component } from 'vue'
-import { computed, inject, ref } from 'vue'
+import { computed, inject, ref, watch } from 'vue'
 import { type RouteLocationRaw, useRouter } from 'vue-router'
 
 import type { EditableGameSetting, GameSettingCategory } from '@/helpers/game-options'
@@ -137,7 +136,7 @@ const {
 	loading,
 	loadError,
 	saving,
-	load: loadSettings,
+	load,
 	reset: resetEditor,
 	cancelChanges,
 	setSyncEnabled,
@@ -284,21 +283,24 @@ function changeCategory(_fromIndex: number, toIndex: number): boolean {
 	return true
 }
 
-async function load() {
-	if (!(await loadSettings())) return
-	if (!categories.value.some((category) => category.id === activeCategoryId.value)) {
-		activeCategoryId.value = categories.value[0]?.id ?? 'custom_settings'
-	}
-	const index = categories.value.findIndex((category) => category.id === activeCategoryId.value)
-	if (index >= 0) modal.value?.setTab(index)
-}
+watch(
+	categories,
+	() => {
+		if (!categories.value.some((category) => category.id === activeCategoryId.value)) {
+			activeCategoryId.value = categories.value[0]?.id ?? 'custom_settings'
+		}
+		const index = categories.value.findIndex((category) => category.id === activeCategoryId.value)
+		if (index >= 0) modal.value?.setTab(index)
+	},
+	{ flush: 'sync' },
+)
 
 function show() {
 	opened.value = true
 	allowClose = false
 	search.value = ''
-	modal.value?.show()
 	void load()
+	modal.value?.show()
 }
 
 function hide() {
@@ -355,6 +357,7 @@ defineExpose({ show, hide })
 		:header="modalTitle"
 		:before-hide="beforeHide"
 		:before-tab-change="changeCategory"
+		:hide-tab-selection="search.trim().length > 0"
 		:on-after-hide="reset"
 		:floating-action-bar-shown="isDirty"
 		max-width="min(1080px, calc(95vw - 2rem))"
@@ -404,10 +407,16 @@ defineExpose({ show, hide })
 
 				<div
 					v-if="loading"
-					class="flex min-h-40 flex-1 items-center justify-center gap-2 text-secondary"
+					role="status"
+					:aria-label="formatMessage(messages.loading)"
+					class="flex flex-1 flex-col gap-4"
 				>
-					<SpinnerIcon class="size-5 animate-spin" aria-hidden="true" />
-					{{ formatMessage(messages.loading) }}
+					<div
+						v-for="row in 5"
+						:key="row"
+						class="h-20 animate-pulse rounded-xl bg-surface-3"
+						aria-hidden="true"
+					/>
 				</div>
 				<div
 					v-else-if="loadError"

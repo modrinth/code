@@ -203,6 +203,9 @@
   "button.download": {
     "defaultMessage": "Скачать"
   },
+  "button.download-files": {
+    "defaultMessage": "Скачать файлы"
+  },
   "button.downloading": {
     "defaultMessage": "Скачивание"
   },
@@ -362,6 +365,15 @@
   "collections.label.private": {
     "defaultMessage": "Приватная"
   },
+  "console.actions.collapse": {
+    "defaultMessage": "Свернуть"
+  },
+  "console.actions.expand": {
+    "defaultMessage": "Раскрыть"
+  },
+  "console.actions.share": {
+    "defaultMessage": "Поделиться"
+  },
   "content-type.content.lowercase": {
     "defaultMessage": "контент"
   },
@@ -373,6 +385,12 @@
   },
   "content.card.select-project": {
     "defaultMessage": "Выбрать {project}"
+  },
+  "content.card.sync-update-pending": {
+    "defaultMessage": "Некоторые синхронизированные копии ожидают изменений. Сборка может быть запущена, замороженная или несовместимая версия, или уже содержит собственную копию."
+  },
+  "content.card.synced": {
+    "defaultMessage": "Синхронизировано между сборками"
   },
   "content.card.uploaded": {
     "defaultMessage": "Загружено"
@@ -2309,6 +2327,9 @@
   "instances.content-install.show-unavailable": {
     "defaultMessage": "Показать недоступные"
   },
+  "instances.managed-content-modal.disabled": {
+    "defaultMessage": "Отключено"
+  },
   "instances.managed-content-modal.download-file": {
     "defaultMessage": "Скачать файл"
   },
@@ -2316,7 +2337,10 @@
     "defaultMessage": "Этот источник не содержит управляемый контент."
   },
   "instances.managed-content-modal.empty-title": {
-    "defaultMessage": "Сборка пуста"
+    "defaultMessage": "Ничего не найдено"
+  },
+  "instances.managed-content-modal.enabled": {
+    "defaultMessage": "Включен"
   },
   "instances.managed-content-modal.external-content": {
     "defaultMessage": "Сторонний"
@@ -2338,6 +2362,9 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Поиск по {count, number} {count, plural, one {проекту} other {проектам}}"
+  },
+  "instances.managed-content-modal.warnings": {
+    "defaultMessage": "Предупреждения"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Текущая"
@@ -3512,6 +3539,9 @@
   "project.disclosure.advertising.title": {
     "defaultMessage": "Есть реклама"
   },
+  "project.disclosure.ai-functionality.title": {
+    "defaultMessage": "Функциональность на ИИ"
+  },
   "project.disclosure.ai-generated-content.title": {
     "defaultMessage": "Есть {types} от ИИ"
   },
@@ -4261,6 +4291,9 @@
   },
   "search.filter_type.advanced.disclosure.ai_content.usage": {
     "defaultMessage": "{usage} от ИИ"
+  },
+  "search.filter_type.advanced.disclosure.ai_functionality": {
+    "defaultMessage": "Функциональность на ИИ"
   },
   "search.filter_type.advanced.disclosure.archived": {
     "defaultMessage": "Архивированные"
@@ -5068,6 +5101,18 @@
   },
   "servers.busy.installing": {
     "defaultMessage": "Сервер устанавливается"
+  },
+  "servers.download.failed.description": {
+    "defaultMessage": "Произошла ошибка при попытке скачивания файлов мира."
+  },
+  "servers.download.failed.title": {
+    "defaultMessage": "Скачивание не удалось"
+  },
+  "servers.download.unavailable.description": {
+    "defaultMessage": "Файлы данного мира недоступны для скачивания в данный момент."
+  },
+  "servers.download.unavailable.title": {
+    "defaultMessage": "Скачивание недоступно"
   },
   "servers.files.zip-created": {
     "defaultMessage": "Архив создан"

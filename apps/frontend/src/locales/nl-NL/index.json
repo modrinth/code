@@ -581,23 +581,11 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Bewaar je favoriete content en krijg real-time updates met één click."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Volg projecten"
-  },
-  "app-marketing.features.importing.description": {
-    "message": "Importeer al je favoriete profielen vanuit de launcher die je eerder gebruikte, en ga binnen enkele seconden aan de slag met de Modrinth-app!"
-  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
-  },
-  "app-marketing.features.importing.title": {
-    "message": "Laat je profielen importeren"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Acties"
@@ -623,15 +611,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Versie"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Speel met je mods, zonder dat je online hoeft te zijn."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Offline-modus"
-  },
-  "app-marketing.features.open-source.description": {
-    "message": "De launcher van Modrinth is volledig open source. Je kunt de broncode bekijken op onze <github-link>GitHub</github-link>!"
-  },
   "app-marketing.features.open-source.title": {
     "message": "Open Source"
   },
@@ -641,9 +620,6 @@
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
   },
-  "app-marketing.features.performance.description": {
-    "message": "De Modrinth-app presteert beter dan veel van de toonaangevende mod-managers, en verbruikt daarbij slechts 150 MB RAM!"
-  },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
   },
@@ -652,15 +628,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth-app"
@@ -916,6 +883,9 @@
   },
   "auth.sign-in.launcher.complete.title": {
     "message": "Je bent aangemeld"
+  },
+  "auth.sign-in.launcher.opening.title": {
+    "message": "Modrinth-app aan het openen..."
   },
   "auth.sign-in.no-account": {
     "message": "Heb je nog geen account?"
@@ -3878,26 +3848,17 @@
   "project.settings.delete-project.title": {
     "message": "Verwijder project"
   },
-  "project.settings.disclosures.advertising.description.1": {
-    "message": "Je moet dit inschakelen als je project advertenties, sponsoring of promoties van andere werken bevat."
-  },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "bijv: voegt de Modrinth SMP-server automatisch toe aan je serverlijst."
   },
   "project.settings.disclosures.advertising.title": {
     "message": "Bevat advertenties"
   },
-  "project.settings.disclosures.ai.description": {
-    "message": "Je moet deze optie inschakelen als dit project een aanzienlijke hoeveelheid door AI gegenereerde code bevat, als er\n\t\t\t\tbronnen zijn die grotendeels door AI zijn gegenereerd, als de functionaliteit van het project afhankelijk is van het gebruik van\n\t\t\t\tgeneratieve AI, of als een onderdeel van de pagina van uw project, zoals de beschrijving of de publicatie,\n\t\t\t\tafhankelijk is van generatieve AI."
-  },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "Bijvoorbeeld: De Chinese en Arabische vertalingen zijn door AI gegenereerd."
   },
   "project.settings.disclosures.ai.title": {
     "message": "Bevat ai-gegenereerde content"
-  },
-  "project.settings.disclosures.ai.types-description": {
-    "message": "Waarvoor wordt generatieve AI gebruikt?"
   },
   "project.settings.disclosures.archived.banner-preview": {
     "message": "Voorbeeld van de banner"
@@ -3955,9 +3916,6 @@
   },
   "project.settings.disclosures.lock-status.fully-locked.warning": {
     "message": "Neem contact op met de <contact-support-link>supportafdeling</contact-support-link> als deze verklaring moet worden bewerkt of verwijderd."
-  },
-  "project.settings.disclosures.paid-features.description": {
-    "message": "Je moet dit inschakelen als je project functies bevat die je kunt verkrijgen door geld uit de echte wereld te besteden."
   },
   "project.settings.disclosures.paid-features.feature-placeholder": {
     "message": "bijvoorbeeld: cosmetische producten beschikbaar als Patreon-beloning"
@@ -5005,9 +4963,6 @@
   },
   "settings.account.two-factor.error.incorrect-code": {
     "message": "De ingevoerde code is onjuist!"
-  },
-  "settings.account.two-factor.field.code.description": {
-    "message": "Voer een twee factor authenticatie code in om door te gaan."
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Voer de twee factor authenticatie code in"

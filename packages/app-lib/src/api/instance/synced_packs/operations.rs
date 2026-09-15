@@ -1,8 +1,7 @@
 use super::super::DesyncServerMode;
 use super::super::synced_options::{
-    get_global_options, instance_dir, instance_is_running,
-    instance_option_enabled, option_can_apply_while_running,
-    sync_files_are_protected,
+    get_global_options, instance_is_running, instance_option_enabled,
+    option_can_apply_while_running, sync_files_are_protected,
 };
 use super::reconciliation::{
     apply_all, apply_removal, participating, synced_instance_ids,
@@ -83,10 +82,20 @@ pub(super) async fn pack_from_item(
         )
         .into());
     }
-    let bytes = Bytes::from(
-        io::read(instance_dir(metadata, state).join(&item.file_path)).await?,
-    );
-    validate_pack(&bytes, item.project_type)?;
+    let file = crate::state::instances::adapters::sqlite::content_rows::get_instance_file_by_relative_path(&metadata.instance.id, &item.file_path, &state.pool).await?
+		.ok_or_else(|| crate::state::content_store::input("The pack is not registered"))?;
+    let source = state
+        .content_store
+        .read_path(&file, &metadata.instance.path)
+        .await?;
+    let bytes = Bytes::from(io::read(source.path()).await?);
+    drop(source);
+    let validation_bytes = bytes.clone();
+    let project_type = item.project_type;
+    tokio::task::spawn_blocking(move || {
+        validate_pack(&validation_bytes, project_type)
+    })
+    .await??;
     let game_versions = if let Some(version) = &item.version {
         CachedEntry::get_version(
             &version.id,
@@ -104,7 +113,8 @@ pub(super) async fn pack_from_item(
     } else {
         vec![metadata.applied_content_set.game_version.clone()]
     };
-    let sha1 = cache_bytes(bytes, state).await?;
+    let sha1 = crate::util::fetch::sha1_async(bytes.clone()).await?;
+    let sha512 = cache_bytes(bytes, state).await?;
     let selected = if item.project_type == ProjectType::ResourcePack {
         match super::selection::selected_in_instance(
             metadata,
@@ -132,6 +142,8 @@ pub(super) async fn pack_from_item(
     item.has_update = false;
     item.update_version_id = None;
     Ok(SyncedPack {
+        blob_sha512: Some(sha512),
+        migration_error: None,
         item,
         sha1,
         game_versions,
@@ -210,7 +222,6 @@ pub async fn get_pack_sync_preview(
     project_path: &str,
 ) -> crate::Result<PackSyncPreview> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
     let (metadata, item) = source(instance_id, project_path, &state).await?;
     let candidate = pack_from_item(item, &metadata, &state).await?;
     let library = read_library(&state).await?;
@@ -301,10 +312,12 @@ pub(in crate::api::instance) async fn seed_from_instance(
                 if matches!(
                     error.raw.as_ref(),
                     crate::ErrorKind::JSONError(_)
+                        | crate::ErrorKind::InputError(_)
+                        | crate::ErrorKind::StdIOError(_)
                 ) =>
             {
                 tracing::warn!(
-                    "Skipping pack {} from instance {instance_id} while initializing pack sync because its JSON metadata could not be parsed: {error}",
+                    "Skipping pack {} from instance {instance_id} while initializing pack sync: {error}",
                     item.file_path
                 );
                 continue;
@@ -383,8 +396,34 @@ async fn sync_pack_inner(
     project_path: &str,
     automatic: bool,
 ) -> crate::Result<()> {
+    loop {
+        match sync_pack_once(instance_id, project_path, automatic).await {
+            Err(error)
+                if matches!(
+                    error.raw.as_ref(),
+                    crate::ErrorKind::PackSyncChanged
+                ) =>
+            {
+                tokio::task::yield_now().await;
+            }
+            result => return result,
+        }
+    }
+}
+
+async fn sync_pack_once(
+    instance_id: &str,
+    project_path: &str,
+    automatic: bool,
+) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let initial_metadata = crate::state::get_instance(instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError("Unknown instance".to_owned())
+        })?;
+    let mut preparation =
+        super::worker::Preparation::new(&state, &initial_metadata).await;
     let global = get_global_options().await?;
     if automatic {
         let metadata = crate::state::get_instance(instance_id, &state.pool)
@@ -400,9 +439,16 @@ async fn sync_pack_inner(
             return Ok(());
         }
     }
-    let (metadata, item) = source(instance_id, project_path, &state).await?;
-    let candidate = pack_from_item(item.clone(), &metadata, &state).await?;
-    let mut library = read_library(&state).await?;
+    let mut library = preparation.library().await?;
+    let (metadata, item, candidate) = preparation
+        .run(&library, async {
+            let (metadata, item) =
+                source(instance_id, project_path, &state).await?;
+            let candidate =
+                pack_from_item(item.clone(), &metadata, &state).await?;
+            Ok((metadata, item, candidate))
+        })
+        .await?;
     if let Err(error) =
         super::selection::capture(&metadata, &mut library, &state).await
     {
@@ -494,17 +540,18 @@ pub async fn list_synced_packs(
                 instance_ids: synced_instance_ids(
                     id, &library, &instances, global,
                 ),
-                update_pending: library
-                    .instances
-                    .values()
-                    .filter_map(|placements| placements.get(id))
-                    .any(|placement| {
-                        !placement.excluded
-                            && !placement.suspended
-                            && (placement.pending
-                                || placement.error.is_some()
-                                || placement.enabled != pack.item.enabled)
-                    }),
+                update_pending: pack.migration_error.is_some()
+                    || library
+                        .instances
+                        .values()
+                        .filter_map(|placements| placements.get(id))
+                        .any(|placement| {
+                            !placement.excluded
+                                && !placement.suspended
+                                && (placement.pending
+                                    || placement.error.is_some()
+                                    || placement.enabled != pack.item.enabled)
+                        }),
             });
             item
         })
@@ -524,7 +571,6 @@ pub async fn upload_synced_pack(
         .into());
     }
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
     if !get_global_options().await?.get(option) {
         return Err(crate::ErrorKind::InputError(
             "Enable pack syncing before adding packs.".to_string(),
@@ -540,9 +586,21 @@ pub async fn upload_synced_pack(
         })?
         .to_string();
     let bytes = Bytes::from(io::read(path).await?);
-    validate_pack(&bytes, project_type)?;
+    let validation_bytes = bytes.clone();
+    tokio::task::spawn_blocking(move || {
+        validate_pack(&validation_bytes, project_type)
+    })
+    .await??;
     let size = bytes.len() as u64;
-    let sha1 = cache_bytes(bytes, &state).await?;
+    let sha1 = crate::util::fetch::sha1_async(bytes.clone()).await?;
+    let sha512 = cache_bytes(bytes, &state).await?;
+    let _guard = state.lock_synced_options().await;
+    if !get_global_options().await?.get(option) {
+        return Err(crate::ErrorKind::InputError(
+            "Pack syncing was disabled while preparing the upload.".to_owned(),
+        )
+        .into());
+    }
     let mut library = read_library(&state).await?;
     if library
         .packs
@@ -555,6 +613,8 @@ pub async fn upload_synced_pack(
     library.packs.insert(
         id.clone(),
         SyncedPack {
+            blob_sha512: Some(sha512),
+            migration_error: None,
             sha1,
             game_versions,
             selected: (project_type == ProjectType::ResourcePack)

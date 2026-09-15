@@ -20,6 +20,7 @@ dotenvy = { workspace = true }
 futures = { workspace = true }
 indexmap = { workspace = true, features = ["serde"] }
 itertools = { workspace = true }
+md5 = { workspace = true }
 quick-xml = { workspace = true }
 reqwest = { workspace = true, features = ["json", "rustls-tls-native-roots", "stream"] }
 rust-s3 = { workspace = true }

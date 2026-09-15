@@ -1,6 +1,8 @@
 <template>
 	<NuxtLayout>
-		<LoadingBar />
+		<ClientOnly>
+			<LoadingBar />
+		</ClientOnly>
 		<NotificationPanel />
 		<AccountSwitchOverlay :show="isSwitchingAccount" />
 		<div class="main">

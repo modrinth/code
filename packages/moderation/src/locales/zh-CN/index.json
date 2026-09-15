@@ -62,6 +62,9 @@
   "nags.check-disclosures.description": {
     "defaultMessage": "请通过填写适用于你 {type} 的内容披露信息，确保用户充分了解所有重要信息"
   },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "审查披露"
+  },
   "nags.description-ends-with-header.description": {
     "defaultMessage": "您的项目描述不应以标题结尾。"
   },
@@ -73,6 +76,12 @@
   },
   "nags.description-too-short.title": {
     "defaultMessage": "扩展描述"
+  },
+  "nags.disclosures-special-formatting.description": {
+    "defaultMessage": "内容披露不应包含 HTML，因为它们只能显示内联 Markdown 和纯文本。"
+  },
+  "nags.disclosures-special-formatting.title": {
+    "defaultMessage": "修复披露格式"
   },
   "nags.edit-description.title": {
     "defaultMessage": "编辑描述"

@@ -32,7 +32,6 @@
 			:href="organizationHref"
 			:target="organizationHref ? '_blank' : undefined"
 			:rel="organizationHref ? 'noopener noreferrer' : undefined"
-			:aria-label="organizationTooltip"
 			class="flex size-4 shrink-0 items-center text-primary"
 			:class="{ 'hover:underline': organizationHref }"
 		>

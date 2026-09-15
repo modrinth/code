@@ -1,0 +1,1 @@
+- [Photosensitivity warning](%DISCLOSURES_FAQ_PHOTOSENSITIVITY_LINK%).

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE store_blobs SET status = ? WHERE sha512 = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "6c6aff291dec03280e3de1f2aa1f7c97ce8b6fc24c7266acf1a321465bb75964"
+}

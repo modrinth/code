@@ -158,12 +158,13 @@ import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3 } from '@/helpers/cache.js'
 import { set_synced_option } from '@/helpers/instance'
 import { get_game_versions } from '@/helpers/tags'
-import { ensureManagedServerWorldExists, getServerAddress } from '@/helpers/worlds'
 import {
 	delete_world,
 	desync_server,
 	type DesyncServerMode,
+	ensureManagedServerWorldExists,
 	get_instance_protocol_version,
+	getServerAddress,
 	getWorldIdentifier,
 	handleDefaultInstanceUpdateEvent,
 	hasServerQuickPlaySupport,
@@ -183,6 +184,7 @@ import {
 	start_join_server,
 	start_join_singleplayer_world,
 	type World,
+	worldNameMatchesQuery,
 } from '@/helpers/worlds.ts'
 import { injectServerInstall } from '@/providers/server-install'
 
@@ -657,7 +659,7 @@ watch(filterOptions, (options) => {
 
 const filteredWorlds = computed(() =>
 	dedupedWorlds.value.filter((x) => {
-		if (searchFilter.value && !x.name.toLowerCase().includes(searchFilter.value.toLowerCase())) {
+		if (searchFilter.value && !worldNameMatchesQuery(x.name, searchFilter.value)) {
 			return false
 		}
 

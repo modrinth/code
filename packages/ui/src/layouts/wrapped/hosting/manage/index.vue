@@ -179,6 +179,7 @@
 								v-for="server in ownedFilteredData.filter((s) => s.is_medal)"
 								:key="`owned-medal-${server.server_id}`"
 								v-bind="server"
+								:on-download-world="getWorldDownload(server.server_id, serverFullList)"
 								@upgrade="openMedalUpgradeModal"
 							/>
 							<ServerListing

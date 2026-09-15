@@ -8,10 +8,11 @@ LABEL org.opencontainers.image.description="Modrinth game metadata query client"
 LABEL org.opencontainers.image.licenses=MIT
 
 RUN apt-get update \
-	&& apt-get install -y --no-install-recommends ca-certificates openssl \
+	&& apt-get install -y --no-install-recommends ca-certificates openssl dumb-init \
 	&& rm -rf /var/lib/apt/lists/*
 
-COPY daedalus_client /daedalus/daedalus_client
+COPY --chmod=0755 daedalus_client /daedalus/daedalus_client
 
 WORKDIR /daedalus_client
+ENTRYPOINT ["dumb-init", "--"]
 CMD ["/daedalus/daedalus_client"]

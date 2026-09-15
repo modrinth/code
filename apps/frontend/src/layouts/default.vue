@@ -1,4 +1,6 @@
 <template>
+	<TooltipDirective />
+
 	<div
 		ref="main_page"
 		class="layout"
@@ -70,6 +72,7 @@
 			:errors="generatedStateErrors"
 			:api-url="config.public.apiBaseUrl"
 		/>
+
 		<ViewOnModrinthBanner />
 		<header
 			class="desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
@@ -875,6 +878,7 @@ import {
 	injectUserPreferences,
 	providePageContext,
 	TeleportOverflowMenu,
+	TooltipDirective,
 	useHostingIntercom,
 	UserRoleIcon,
 	useVIntl,
@@ -904,7 +908,7 @@ import {
 	switchToStoredAccount,
 	useStoredAccounts,
 } from '~/composables/accounts.ts'
-import { getAddAccountRouteObj, getSignInRouteObj } from '~/composables/auth.ts'
+import { getSignInRouteObj } from '~/composables/auth.ts'
 import { logout } from '~/composables/user.js'
 import { errors as generatedStateErrors, taxComplianceThresholds } from '~/generated/state.json'
 import { provideCurrentProjectId } from '~/providers/current-project.ts'
@@ -927,7 +931,6 @@ const config = useRuntimeConfig()
 const route = useNativeRoute()
 const router = useNativeRouter()
 const signInRouteObj = computed(() => getSignInRouteObj(route))
-const addAccountRouteObj = computed(() => getAddAccountRouteObj(route))
 const storedAccounts = useStoredAccounts()
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
 const client = injectModrinthClient()
@@ -1290,7 +1293,7 @@ const accountSwitcherOptions = computed(() => [
 		label: formatMessage(messages.addAccount),
 		icon: PlusIcon,
 		type: 'link',
-		to: addAccountRouteObj.value,
+		to: signInRouteObj.value,
 	},
 ])
 

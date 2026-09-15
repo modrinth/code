@@ -581,14 +581,8 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Save content you love and receive updates with one click."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Follow projects"
-  },
   "app-marketing.features.importing.description": {
-    "message": "Import all your favorite profiles from the launcher you were using before, and get started with Modrinth App in seconds!"
+    "message": "Import all your existing game instances from the launcher you were using before, and get started with Modrinth App in seconds!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -597,7 +591,13 @@
     "message": "MultiMC"
   },
   "app-marketing.features.importing.title": {
-    "message": "Profile importing"
+    "message": "Instance importing"
+  },
+  "app-marketing.features.manage-skins.description": {
+    "message": "Switch between all of your Minecraft skins right from the app."
+  },
+  "app-marketing.features.manage-skins.title": {
+    "message": "Skin selector"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Actions"
@@ -623,14 +623,8 @@
   "app-marketing.features.mod-management.version": {
     "message": "Version"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Play your mods, whether you are connected to the internet, or not."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Offline mode"
-  },
   "app-marketing.features.open-source.description": {
-    "message": "Modrinth's launcher is fully open source. You can view the source code on our <github-link>GitHub</github-link>!"
+    "message": "Modrinth App is fully open source. You can view the source code on our <github-link>GitHub</github-link>!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Open source"
@@ -642,7 +636,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App performs better than many of the leading mod managers, using just 150 MB of RAM!"
+    "message": "Modrinth App performs better than many of the leading mod managers!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -652,15 +646,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"
@@ -685,6 +670,12 @@
   },
   "app-marketing.features.play.title": {
     "message": "Play with your favorite mods"
+  },
+  "app-marketing.features.settings-sync.description": {
+    "message": "Use the same options, resource packs, and more across all your instances."
+  },
+  "app-marketing.features.settings-sync.title": {
+    "message": "Sync your settings"
   },
   "app-marketing.features.sharing.description": {
     "message": "Build, share, and play modpacks with any of the thousands of mods and modpacks hosted here on Modrinth."

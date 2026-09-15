@@ -1,0 +1,1 @@
+- [External system interactions](%DISCLOSURES_FAQ_EXTERNAL_LINK%).

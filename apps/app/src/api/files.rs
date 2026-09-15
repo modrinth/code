@@ -4,7 +4,6 @@ use serde::Serialize;
 use std::io::Cursor;
 use tauri::Runtime;
 use tauri_plugin_dialog::DialogExt;
-use theseus::instance::get_full_path;
 
 pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("files")
@@ -12,6 +11,12 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
             file_extract_zip,
             file_save_as,
             file_read_dragged_file,
+            file_list,
+            file_read,
+            file_write,
+            file_create_directory,
+            file_rename,
+            file_delete,
         ])
         .build()
 }
@@ -42,105 +47,152 @@ pub async fn file_extract_zip(
     override_conflicts: bool,
     dry_run: bool,
 ) -> Result<Option<ExtractDryRunResult>> {
-    let base = get_full_path(instance_id).await?;
-    let zip_path = base.join(file_path);
-    let canonical_zip = tokio::fs::canonicalize(&zip_path).await?;
-    let canonical_base = tokio::fs::canonicalize(&base).await?;
-    if !canonical_zip.starts_with(&canonical_base) {
-        return Err(theseus::Error::from(theseus::ErrorKind::OtherError(
-            "file_path escapes the instance directory".to_string(),
-        ))
-        .into());
-    }
-    let extract_dir = zip_path
-        .parent()
-        .map(|p| p.to_path_buf())
-        .unwrap_or_else(|| base.clone());
-
-    let file_bytes = tokio::fs::read(&zip_path).await?;
-    let reader = Cursor::new(file_bytes);
-
-    let zip_reader = ZipFileReader::with_tokio(reader).await.map_err(|e| {
+    theseus::instance::validate_instance_file_write(instance_id, file_path)
+        .await?;
+    let parent = file_path
+        .trim_start_matches('/')
+        .rsplit_once('/')
+        .map_or("", |(parent, _)| parent);
+    let file_bytes =
+        theseus::instance::read_instance_file(instance_id, file_path).await?;
+    let zip_reader = ZipFileReader::with_tokio(Cursor::new(file_bytes))
+        .await
+        .map_err(|error| {
         theseus::Error::from(theseus::ErrorKind::OtherError(format!(
-            "Failed to read zip file: {e}"
+            "Failed to read zip file: {error}"
         )))
     })?;
-
-    let entries: Vec<(usize, String)> = zip_reader
-        .file()
-        .entries()
-        .iter()
-        .enumerate()
-        .filter_map(|(i, entry)| {
-            let name = entry.filename().as_str().ok()?.to_string();
-            if name.ends_with('/') {
-                None
-            } else {
-                Some((i, name))
-            }
-        })
-        .collect();
-
-    if dry_run {
-        let mut conflicting_files = Vec::new();
-        let canonical_extract = tokio::fs::canonicalize(&extract_dir).await?;
-        for (_, name) in &entries {
-            let target = extract_dir.join(name);
-            if let Some(parent) = target.parent() {
-                let normalized = parent
-                    .canonicalize()
-                    .unwrap_or_else(|_| extract_dir.join(parent));
-                if !normalized.starts_with(&canonical_extract) {
-                    continue;
-                }
-            }
-            if target.exists() {
-                conflicting_files.push(name.clone());
-            }
+    let mut entries = Vec::new();
+    for (index, entry) in zip_reader.file().entries().iter().enumerate() {
+        let name = entry.filename().as_str().map_err(|error| {
+            theseus::Error::from(theseus::ErrorKind::InputError(
+                error.to_string(),
+            ))
+        })?;
+        if name.ends_with('/') {
+            continue;
         }
+        if name.starts_with('/') || name.contains('\\') {
+            return Err(theseus::Error::from(theseus::ErrorKind::InputError(
+                "Invalid archive path".to_string(),
+            ))
+            .into());
+        }
+        let target = if parent.is_empty() {
+            name.to_string()
+        } else {
+            format!("{parent}/{name}")
+        };
+        let resolved = theseus::instance::validate_instance_file_write(
+            instance_id,
+            &target,
+        )
+        .await?;
+        entries.push((index, target, resolved));
+    }
+    if dry_run {
+        let conflicting_files = entries
+            .iter()
+            .filter(|(_, _, path)| path.exists())
+            .map(|(_, name, _)| name.clone())
+            .collect();
         return Ok(Some(ExtractDryRunResult {
             modpack_name: None,
             conflicting_files,
         }));
     }
-
-    let canonical_extract_dir = tokio::fs::canonicalize(&extract_dir).await?;
     let mut zip_reader = zip_reader;
-    for (index, name) in &entries {
-        let target = extract_dir.join(name);
-
-        if !override_conflicts && target.exists() {
+    for (index, path, resolved) in entries {
+        if !override_conflicts && resolved.exists() {
             continue;
         }
-
-        if let Some(parent) = target.parent() {
-            tokio::fs::create_dir_all(parent).await?;
-            let canonical_parent = tokio::fs::canonicalize(parent).await?;
-            if !canonical_parent.starts_with(&canonical_extract_dir) {
-                continue;
-            }
-        }
-
-        let mut file_bytes = Vec::new();
-        let mut entry_reader =
-            zip_reader.reader_with_entry(*index).await.map_err(|e| {
-                theseus::Error::from(theseus::ErrorKind::OtherError(format!(
-                    "Failed to read zip entry: {e}"
-                )))
+        let mut bytes = Vec::new();
+        let mut reader =
+            zip_reader.reader_with_entry(index).await.map_err(|error| {
+                theseus::Error::from(theseus::ErrorKind::OtherError(
+                    error.to_string(),
+                ))
             })?;
-        entry_reader
-            .read_to_end_checked(&mut file_bytes)
+        reader
+            .read_to_end_checked(&mut bytes)
             .await
-            .map_err(|e| {
-                theseus::Error::from(theseus::ErrorKind::OtherError(format!(
-                    "Failed to extract zip entry: {e}"
-                )))
+            .map_err(|error| {
+                theseus::Error::from(theseus::ErrorKind::OtherError(
+                    error.to_string(),
+                ))
             })?;
-
-        tokio::fs::write(&target, &file_bytes).await?;
+        theseus::instance::write_instance_file(
+            instance_id,
+            &path,
+            &bytes,
+            !override_conflicts,
+        )
+        .await?;
     }
-
     Ok(None)
+}
+
+#[tauri::command]
+pub async fn file_list(
+    instance_id: &str,
+    path: &str,
+) -> Result<Vec<theseus::instance::InstanceFileItem>> {
+    Ok(theseus::instance::list_instance_files(instance_id, path).await?)
+}
+
+#[tauri::command]
+pub async fn file_read(instance_id: &str, path: &str) -> Result<Vec<u8>> {
+    Ok(theseus::instance::read_instance_file(instance_id, path).await?)
+}
+
+#[tauri::command]
+pub async fn file_write(
+    instance_id: &str,
+    path: &str,
+    bytes: Vec<u8>,
+    create_only: bool,
+) -> Result<()> {
+    Ok(theseus::instance::write_instance_file(
+        instance_id,
+        path,
+        &bytes,
+        create_only,
+    )
+    .await?)
+}
+
+#[tauri::command]
+pub async fn file_create_directory(
+    instance_id: &str,
+    path: &str,
+) -> Result<()> {
+    Ok(theseus::instance::create_instance_directory(instance_id, path).await?)
+}
+
+#[tauri::command]
+pub async fn file_rename(
+    instance_id: &str,
+    source: &str,
+    destination: &str,
+) -> Result<()> {
+    Ok(theseus::instance::rename_instance_file(
+        instance_id,
+        source,
+        destination,
+    )
+    .await?)
+}
+
+#[tauri::command]
+pub async fn file_delete(
+    instance_id: &str,
+    path: &str,
+    recursive: bool,
+) -> Result<()> {
+    Ok(
+        theseus::instance::delete_instance_file(instance_id, path, recursive)
+            .await?,
+    )
 }
 
 #[tauri::command]
@@ -149,8 +201,7 @@ pub async fn file_save_as<R: Runtime>(
     instance_id: &str,
     file_path: &str,
 ) -> Result<()> {
-    let base = get_full_path(instance_id).await?;
-    let source = base.join(file_path);
+    let source = std::path::Path::new(file_path);
     let file_name = source
         .file_name()
         .unwrap_or_default()
@@ -171,7 +222,12 @@ pub async fn file_save_as<R: Runtime>(
                 "Invalid save path: {e}"
             )))
         })?;
-        tokio::fs::copy(&source, &dest_path).await?;
+        theseus::instance::save_instance_file_as(
+            instance_id,
+            file_path,
+            &dest_path,
+        )
+        .await?;
     }
 
     Ok(())

@@ -206,6 +206,9 @@
   "button.download": {
     "defaultMessage": "下载"
   },
+  "button.download-files": {
+    "defaultMessage": "下载文件"
+  },
   "button.downloading": {
     "defaultMessage": "下载中"
   },
@@ -365,6 +368,15 @@
   "collections.label.private": {
     "defaultMessage": "私有"
   },
+  "console.actions.collapse": {
+    "defaultMessage": "折叠"
+  },
+  "console.actions.expand": {
+    "defaultMessage": "展开"
+  },
+  "console.actions.share": {
+    "defaultMessage": "分享"
+  },
   "content-type.content.lowercase": {
     "defaultMessage": "内容"
   },
@@ -376,6 +388,12 @@
   },
   "content.card.select-project": {
     "defaultMessage": "选择 {project}"
+  },
+  "content.card.sync-update-pending": {
+    "defaultMessage": "一些同步的副本正在等待更改。一个实例可能正在运行，一个冻结或不兼容的版本，或者已经包含自己的副本。"
+  },
+  "content.card.synced": {
+    "defaultMessage": "在不同实例之间同步"
   },
   "content.card.uploaded": {
     "defaultMessage": "已上传"
@@ -2390,6 +2408,9 @@
   "instances.content-install.show-unavailable": {
     "defaultMessage": "显示不可用内容"
   },
+  "instances.managed-content-modal.disabled": {
+    "defaultMessage": "禁用"
+  },
   "instances.managed-content-modal.download-file": {
     "defaultMessage": "下载文件"
   },
@@ -2398,6 +2419,9 @@
   },
   "instances.managed-content-modal.empty-title": {
     "defaultMessage": "未找到内容"
+  },
+  "instances.managed-content-modal.enabled": {
+    "defaultMessage": "启用"
   },
   "instances.managed-content-modal.external-content": {
     "defaultMessage": "外部储存"
@@ -2419,6 +2443,9 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "搜索到了 {count, number} {count, plural, other {个项目}}"
+  },
+  "instances.managed-content-modal.warnings": {
+    "defaultMessage": "警告"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "当前"
@@ -3596,6 +3623,9 @@
   "project.disclosure.advertising.title": {
     "defaultMessage": "包含广告推广内容"
   },
+  "project.disclosure.ai-functionality.title": {
+    "defaultMessage": "生成 AI 功能"
+  },
   "project.disclosure.ai-generated-content.title": {
     "defaultMessage": "包含AI所生成的{types}"
   },
@@ -4348,6 +4378,9 @@
   },
   "search.filter_type.advanced.disclosure.ai_content.usage": {
     "defaultMessage": "AI {usage}"
+  },
+  "search.filter_type.advanced.disclosure.ai_functionality": {
+    "defaultMessage": "生成 AI 功能"
   },
   "search.filter_type.advanced.disclosure.archived": {
     "defaultMessage": "已归档"
@@ -5155,6 +5188,18 @@
   },
   "servers.busy.installing": {
     "defaultMessage": "正在安装服务器"
+  },
+  "servers.download.failed.description": {
+    "defaultMessage": "尝试下载世界文件时出错。"
+  },
+  "servers.download.failed.title": {
+    "defaultMessage": "下载失败"
+  },
+  "servers.download.unavailable.description": {
+    "defaultMessage": "当前无法下载这个世界的文件。"
+  },
+  "servers.download.unavailable.title": {
+    "defaultMessage": "下载不可用"
   },
   "servers.files.zip-created": {
     "defaultMessage": "ZIP 已创建"

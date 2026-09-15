@@ -42,6 +42,7 @@ const props = withDefaults(
 		onShow?: () => void
 		beforeHide?: () => boolean
 		beforeTabChange?: (fromIndex: number, toIndex: number) => boolean
+		hideTabSelection?: boolean
 		floatingActionBarShown?: boolean
 		disableClose?: boolean
 	}>(),
@@ -55,6 +56,7 @@ const props = withDefaults(
 		onShow: undefined,
 		beforeHide: undefined,
 		beforeTabChange: undefined,
+		hideTabSelection: false,
 		floatingActionBarShown: false,
 		disableClose: false,
 	},
@@ -95,7 +97,7 @@ const {
 const modal = ref<InstanceType<typeof NewModal> | null>(null)
 
 function setTab(index: number) {
-	if (index === selectedTab.value) return
+	if (index === selectedTab.value && !props.hideTabSelection) return
 	if (props.beforeTabChange?.(selectedTab.value, index) === false) return
 	selectedTab.value = index
 	nextTick(() => forceCheck())
@@ -171,7 +173,7 @@ defineExpose({ show, hide, selectedTab, setTab })
 								:href="tab.href ?? undefined"
 								:target="tab.href ? '_blank' : undefined"
 								:rel="tab.href ? 'noopener noreferrer' : undefined"
-								:class="`flex min-w-0 shrink-0 gap-2 items-center text-left rounded-xl px-4 py-2 border-none font-semibold cursor-pointer active:scale-[0.97] transition-all no-underline ${!tab.href && selectedTab === index ? 'bg-button-bgSelected text-button-textSelected' : 'bg-transparent text-button-text hover:bg-button-bg hover:text-contrast'}`"
+								:class="`flex min-w-0 shrink-0 gap-2 items-center text-left rounded-xl px-4 py-2 border-none font-semibold cursor-pointer active:scale-[0.97] transition-all no-underline ${!tab.href && !hideTabSelection && selectedTab === index ? 'bg-button-bgSelected text-button-textSelected' : 'bg-transparent text-button-text hover:bg-button-bg hover:text-contrast'}`"
 								@click="!tab.href && setTab(index)"
 							>
 								<component :is="tab.icon" class="w-4 h-4 flex-shrink-0" />

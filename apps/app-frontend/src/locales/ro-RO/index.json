@@ -69,7 +69,7 @@
     "message": "Configurarea Java nu s-a putut finaliza"
   },
   "app.action-bar.install.summary.loader-setup-failed": {
-    "message": "Configurarea leaderului"
+    "message": "Configurarea loader-ului a eșuat"
   },
   "app.action-bar.install.summary.local-data-error": {
     "message": "Datele locale nu au putut fi actualizate"
@@ -95,9 +95,6 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "Actualizând conținutul partajat"
   },
-  "app.action-bar.installs": {
-    "message": "Instalări"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "Setează ca instanță principală"
   },
@@ -112,6 +109,15 @@
   },
   "app.action-bar.reload-to-update": {
     "message": "Reîncarcă pentru a actualiza"
+  },
+  "app.action-bar.show-downloads": {
+    "message": "Vezi descărcările active"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Arată mai multe instanţe care rulează"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Oprește instanța"
   },
   "app.action-bar.update": {
     "message": "Actualizează"
@@ -128,14 +134,101 @@
   "app.ads-consent.accept": {
     "message": "Acceptă tot"
   },
+  "app.ads-consent.body": {
+    "message": "Anunțurile fac posibil Modrinth și finanțează plățile creatorilor. Partenerii noștri pot stoca sau accesa cookie-uri în aplicație pentru a personaliza reclamele și a măsura performanța."
+  },
+  "app.ads-consent.manage": {
+    "message": "Gestionează preferințele"
+  },
   "app.ads-consent.reject": {
     "message": "Refuză tot"
+  },
+  "app.ads-consent.title": {
+    "message": "Confidențialitatea ta și modul în care anunțurile susțin Modrinth"
+  },
+  "app.appearance-settings.compact-mode.description": {
+    "message": "Afișează instanțele bibliotecii într-un layout compact."
+  },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "Mod compact"
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Acasă"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Librărie"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Ascunde numele tău de utilizator deasupra previzualizării jucătorului de pe pagina selectare Skin."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "Ascunde nametag-ul"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Minimizează aplicația Modrinth atunci când Minecraft pornește."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Minimizează aplicația"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Arată cât timp te-ai pe jucat fiecare instanță."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Arată timpul jucat"
+  },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Sari peste confirmările pentru acțiuni cu risc scăzut, precum instalări duplicate, ștergere normala a conținutului, actualizări in masa, deconectare si reparații. Avertismente pentru acțiunile periculoase sunt mereu afișate."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Sari peste avertismentele neesențiale"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Ascundeți implicit bara laterală dreapta si adaugați un buton pentru a o afișa sau a o ascunde."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Ascundeți bara laterală dreapta"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Afișați un avertisment de siguranța înainte de a instala un Modrinth Pack (.mrpack) care nu este găzduit de Modrinth."
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "Avertizează-ma înainte de a instala modpackuri necunoscute"
   },
   "app.auth-servers.unreachable.body": {
     "message": "Serverele de autentificare Minecraft pot fi indisponibile în acest moment. Verificați conexiunea la internet și încercați din nou mai târziu."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Nu se pot accesa serverele de autentificare"
+  },
+  "app.behavior-settings.confirmations.title": {
+    "message": "Confirmări"
+  },
+  "app.behavior-settings.content.title": {
+    "message": "Acasă și conținut"
+  },
+  "app.behavior-settings.startup-and-navigation.title": {
+    "message": "Pornire și navigare"
+  },
+  "app.behavior-settings.sync-across-devices.description": {
+    "message": "Utilizați aceste setări de comportament pretutindeni unde sunteți conectat. Dezactivați această opțiune pentru a păstra setări separate pe acest dispozitiv."
+  },
+  "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Conectează-te la un cont Modrinth pentru a sincroniza setările."
+  },
+  "app.behavior-settings.sync-across-devices.title": {
+    "message": "Sincronizați comportamentul între dispozitive"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Adaugă server la instanță"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Adaugă la o instanță"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Adăugați la instanță"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Adaugă la {instanceName}"
   },
   "app.browse.added": {
     "message": "Adăugat"
@@ -155,17 +248,128 @@
   "app.browse.hide-added-servers": {
     "message": "Ascunde serverele deja adăugate"
   },
+  "app.browse.hide-installed-modpacks": {
+    "message": "Ascunde conținutul deja instalat"
+  },
+  "app.browse.project-actions.label": {
+    "message": "Acțiuni de proiect"
+  },
+  "app.browse.project-type.data-packs": {
+    "message": "Data Pack-uri"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "Modpack-uri"
+  },
+  "app.browse.project-type.mods": {
+    "message": "Moduri"
+  },
+  "app.browse.project-type.resource-packs": {
+    "message": "Resource Pack-uri"
+  },
+  "app.browse.project-type.servers": {
+    "message": "Servere"
+  },
+  "app.browse.project-type.shaders": {
+    "message": "Shadere"
+  },
+  "app.browse.server-instance-content-warning": {
+    "message": "Adăugarea de conținut poate împiedica conectarea la acest server. Orice conținut adăugat va fi eliminat atunci când conținutul serverului gestionat este actualizat."
+  },
   "app.browse.server.installing": {
     "message": "Se instalează"
+  },
+  "app.content-install.no-compatible-versions": {
+    "message": "Nicio versiune disponibilă nu corespunde cu {compatibilityLabel}. Selectați o versiune pentru a o instala oricum. Dependențele nu vor fi instalate automat."
+  },
+  "app.content.desync-pack": {
+    "message": "Desincronizare"
+  },
+  "app.content.sync-pack": {
+    "message": "Sincronizeaza"
+  },
+  "app.error.state-init.open-backups-folder": {
+    "message": "Deschideți folderul de copii de rezervă"
+  },
+  "app.export-modal.description-placeholder": {
+    "message": "Introduceți descrierea modpack-ului..."
   },
   "app.export-modal.export-button": {
     "message": "Exportă"
   },
+  "app.export-modal.export-complete": {
+    "message": "Exportare completă"
+  },
+  "app.export-modal.export-complete-description": {
+    "message": "{name} a fost exportat cu succes."
+  },
+  "app.export-modal.header": {
+    "message": "Exportă modpack"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Numele modpack-ului"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Numele modpack-ului"
+  },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.features-settings.instance-pages.title": {
+    "message": "Instanțe"
+  },
+  "app.features-settings.play-page.title": {
+    "message": "Joacă pagină"
+  },
+  "app.features-settings.quick-instances.description": {
+    "message": "Alegeți numărul maxim de instanțe recente afișate în bara laterală din stânga. Puteți ajusta acest lucru și trăgând de separator."
+  },
+  "app.features-settings.quick-instances.title": {
+    "message": "Instanțe rapide în bara laterală"
+  },
+  "app.features-settings.show-all-screenshots.description": {
+    "message": "Afișați un buton în bara laterală din stânga pentru a vizualiza capturile de ecran din toate instanțele dvs."
+  },
+  "app.features-settings.show-all-screenshots.title": {
+    "message": "Afișați toate capturile de ecran în bara laterală"
+  },
+  "app.features-settings.show-jump-in.description": {
+    "message": "Afișați lumile și instanțele jucate recent în partea de sus a paginii Joacă."
+  },
+  "app.features-settings.show-jump-in.title": {
+    "message": "Afișează salt in secțiune"
+  },
+  "app.features-settings.show-screenshots-tab.title": {
+    "message": "Afișează fila Capturi de ecran în instanțe"
+  },
+  "app.features-settings.sidebar.title": {
+    "message": "Bară laterală"
+  },
+  "app.features-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Conectează-te la un cont Modrinth pentru a sincroniza setările."
+  },
+  "app.home.jump-back-in.more-options": {
+    "message": "Mai multe opțiuni"
+  },
+  "app.home.jump-back-in.never-played": {
+    "message": "Niciodată jucat"
+  },
+  "app.home.jump-back-in.new-instance": {
+    "message": "Instanță nouă"
+  },
   "app.install.phase.finalizing": {
     "message": "Se finalizează"
+  },
+  "app.instance.action.play": {
+    "message": "Joacă"
+  },
+  "app.instance.action.stop": {
+    "message": "Oprește"
+  },
+  "app.instance.add-server.add": {
+    "message": "Adaugă"
+  },
+  "app.instance.add-server.added": {
+    "message": "Adăugat"
   },
   "app.instance.admonitions.shared-instance.added-label": {
     "message": "Adăugat"

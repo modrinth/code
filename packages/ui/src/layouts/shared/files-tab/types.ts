@@ -4,9 +4,10 @@ export interface FileItem {
 	path: string
 	modified: number
 	created: number
-	size?: number
-	count?: number
+	size?: number | null
+	count?: number | null
 	target?: string
+	readOnly?: boolean
 }
 
 export interface EditingFile {

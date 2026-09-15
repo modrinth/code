@@ -2,6 +2,7 @@
 use super::io::{self, IOError};
 use crate::event::LoadingBarId;
 use crate::event::emit::emit_loading;
+use crate::util::content_hash::{ContentHasher, temporary_file};
 use crate::{ErrorKind, LabrinthError};
 use bytes::Bytes;
 use chrono::{DateTime, TimeDelta, Utc};
@@ -381,14 +382,68 @@ pub type FetchProgressFn<'a> = dyn FnMut(
 
 #[derive(Clone, Debug)]
 pub struct DownloadedFile {
-    path: Arc<tempfile::TempPath>,
+    path: DownloadedFilePath,
     pub size: u64,
-    pub sha1: String,
+    pub sha512: String,
+    pub reused: bool,
+}
+
+#[derive(Clone, Debug)]
+enum DownloadedFilePath {
+    Temporary(Arc<tempfile::TempPath>),
+    Stored(crate::state::content_store::StoredFileHandle),
 }
 
 impl DownloadedFile {
     pub fn path(&self) -> &Path {
-        self.path.as_ref().as_ref()
+        match &self.path {
+            DownloadedFilePath::Temporary(path) => path.as_ref().as_ref(),
+            DownloadedFilePath::Stored(stored_file) => &stored_file.path,
+        }
+    }
+
+    pub(crate) fn from_stored_file(
+        stored_file: crate::state::content_store::StoredFileHandle,
+        reused: bool,
+    ) -> Self {
+        Self {
+            reused,
+            size: stored_file.metadata.size as u64,
+            sha512: stored_file.metadata.sha512.clone(),
+            path: DownloadedFilePath::Stored(stored_file),
+        }
+    }
+
+    pub(crate) fn into_staged(self) -> crate::Result<StagedDownload> {
+        let DownloadedFilePath::Temporary(path) = self.path else {
+            return Err(ErrorKind::InputError(
+                "Stored content cannot be staged again".to_string(),
+            )
+            .into());
+        };
+        let path = Arc::try_unwrap(path).map_err(|_| {
+            ErrorKind::InputError(
+                "Downloaded content is still in use and cannot be published"
+                    .to_string(),
+            )
+        })?;
+        Ok(StagedDownload {
+            path,
+            size: self.size,
+            sha512: self.sha512,
+        })
+    }
+
+    pub(crate) async fn store_file(
+        &self,
+        state: &crate::State,
+    ) -> crate::Result<crate::state::content_store::StoredFileHandle> {
+        match &self.path {
+            DownloadedFilePath::Stored(stored_file) => Ok(stored_file.clone()),
+            DownloadedFilePath::Temporary(_) => {
+                state.content_store.store_file(self.path()).await
+            }
+        }
     }
 
     pub async fn copy_to(
@@ -409,7 +464,8 @@ impl DownloadedFile {
                 .map(|file| file.into_temp_path())
         })
         .await??;
-        io::copy(self.path(), &temporary).await?;
+        crate::state::content_store::writable_copy(self.path(), &temporary)
+            .await?;
         let path = path.to_path_buf();
         tokio::task::spawn_blocking(move || {
             temporary
@@ -419,6 +475,13 @@ impl DownloadedFile {
         .await??;
         Ok(())
     }
+}
+
+#[derive(Debug)]
+pub(crate) struct StagedDownload {
+    pub(crate) path: tempfile::TempPath,
+    pub(crate) size: u64,
+    pub(crate) sha512: String,
 }
 
 enum FetchBody {
@@ -451,6 +514,7 @@ pub async fn fetch_file(
         &INSECURE_REQWEST_CLIENT,
         progress,
         true,
+        None,
     )
     .await?;
     match body {
@@ -466,7 +530,31 @@ pub async fn fetch_file_mirrors(
     uri_path: Option<&'static str>,
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+    progress: Option<&mut FetchProgressFn<'_>>,
+) -> crate::Result<DownloadedFile> {
+    fetch_file_mirrors_in(
+        mirrors,
+        sha1,
+        download_meta,
+        uri_path,
+        semaphore,
+        exec,
+        progress,
+        None,
+    )
+    .await
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(crate) async fn fetch_file_mirrors_in(
+    mirrors: &[&str],
+    sha1: Option<&str>,
+    download_meta: Option<&DownloadMeta>,
+    uri_path: Option<&'static str>,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
     mut progress: Option<&mut FetchProgressFn<'_>>,
+    staging: Option<&Path>,
 ) -> crate::Result<DownloadedFile> {
     if mirrors.is_empty() {
         return Err(
@@ -489,6 +577,7 @@ pub async fn fetch_file_mirrors(
             &REQWEST_CLIENT,
             progress.as_deref_mut(),
             true,
+            staging,
         )
         .await;
         match body {
@@ -506,18 +595,21 @@ pub async fn fetch_file_mirrors(
 async fn read_file_response(
     response: reqwest::Response,
     mut progress: Option<&mut FetchProgressFn<'_>>,
+    staging: Option<&Path>,
 ) -> crate::Result<DownloadedFile> {
     use futures::StreamExt;
-    let path = tokio::task::spawn_blocking(|| {
-        tempfile::NamedTempFile::new().map(|file| file.into_temp_path())
-    })
-    .await??;
-    let mut file = File::create(&path).await?;
+    let staging = staging.map(Path::to_path_buf).or_else(|| {
+        crate::State::get_if_initialized()
+            .map(|state| state.directories.store_staging_dir())
+    });
+    let (mut file, path) = temporary_file(staging.as_deref()).await?;
     let total = response.content_length().unwrap_or(0);
     let mut stream = response.bytes_stream();
-    let mut hasher = sha1_smol::Sha1::new();
+    let mut hasher = ContentHasher::default();
     let mut size = 0_u64;
-    while let Some(chunk) = stream.next().await {
+    while let Some(chunk) =
+        crate::install::control::download_step(stream.next()).await?
+    {
         let chunk = chunk?;
         file.write_all(&chunk).await?;
         hasher.update(&chunk);
@@ -526,13 +618,40 @@ async fn read_file_response(
             progress(size, total).await?;
         }
     }
-    file.flush().await?;
+    file.sync_all().await?;
     drop(file);
+    let hashes = hasher.finish(size);
     Ok(DownloadedFile {
-        path: Arc::new(path),
+        path: DownloadedFilePath::Temporary(Arc::new(path)),
+        reused: false,
         size,
-        sha1: hasher.hexdigest(),
+        sha512: hashes.sha512,
     })
+}
+
+pub(crate) async fn fetch_content_file(
+    state: &crate::State,
+    mirrors: &[&str],
+    sha512: Option<&str>,
+    size: Option<u64>,
+    download_meta: Option<&DownloadMeta>,
+    progress: Option<&mut FetchProgressFn<'_>>,
+) -> crate::Result<DownloadedFile> {
+    let acquired = state
+        .content_store
+        .get_or_download_file(
+            mirrors,
+            sha512,
+            size,
+            download_meta,
+            &state.fetch_semaphore,
+            progress,
+        )
+        .await?;
+    Ok(DownloadedFile::from_stored_file(
+        acquired.stored_file,
+        acquired.reused,
+    ))
 }
 
 async fn read_memory_response(
@@ -542,7 +661,11 @@ async fn read_memory_response(
     mut progress: Option<&mut FetchProgressFn<'_>>,
 ) -> crate::Result<Bytes> {
     let total_size = response.content_length();
-    if (loading_bar.is_none() && progress.is_none()) || total_size.is_none() {
+    if ((loading_bar.is_none() && progress.is_none()) || total_size.is_none())
+        && crate::install::control::CURRENT_INSTALL
+            .try_with(|_| ())
+            .is_err()
+    {
         return response
             .bytes()
             .await
@@ -553,7 +676,9 @@ async fn read_memory_response(
     let total_size = total_size.unwrap_or(0);
     let mut stream = response.bytes_stream();
     let mut bytes = Vec::new();
-    while let Some(chunk) = stream.next().await {
+    while let Some(chunk) =
+        crate::install::control::download_step(stream.next()).await?
+    {
         let chunk = chunk.wrap_err_with(|| {
             eyre!("failed to read response body from {url}")
         })?;
@@ -808,6 +933,7 @@ async fn fetch_advanced_with_client_and_progress(
         client,
         progress,
         false,
+        None,
     )
     .await?;
     match body {
@@ -831,8 +957,10 @@ async fn fetch_advanced_with_target(
     client: &reqwest::Client,
     mut progress: Option<&mut FetchProgressFn<'_>>,
     to_file: bool,
+    file_staging: Option<&Path>,
 ) -> crate::Result<FetchBody> {
-    let _permit = semaphore.0.acquire().await?;
+    let _permit =
+        crate::install::control::download_step(semaphore.0.acquire()).await??;
 
     let is_api_url = url.starts_with(env!("MODRINTH_API_URL"))
         || url.starts_with(env!("MODRINTH_API_URL_V3"));
@@ -886,7 +1014,7 @@ async fn fetch_advanced_with_target(
             req = req.header(name.as_str(), value.as_str());
         }
 
-        let result = req.send().await;
+        let result = crate::install::control::download_step(req.send()).await?;
         match result {
             Ok(resp) => {
                 if is_api_url
@@ -922,9 +1050,13 @@ async fn fetch_advanced_with_target(
                 }
 
                 let bytes = if to_file {
-                    read_file_response(resp, progress.as_deref_mut())
-                        .await
-                        .map(FetchBody::File)
+                    read_file_response(
+                        resp,
+                        progress.as_deref_mut(),
+                        file_staging,
+                    )
+                    .await
+                    .map(FetchBody::File)
                 } else {
                     read_memory_response(
                         resp,
@@ -942,7 +1074,9 @@ async fn fetch_advanced_with_target(
                             FetchBody::Memory(bytes) => {
                                 sha1_async(bytes.clone()).await?
                             }
-                            FetchBody::File(file) => file.sha1.clone(),
+                            FetchBody::File(file) => {
+                                sha1_file_async(file.path()).await?.1
+                            }
                         };
                         if &*hash != sha1 {
                             if attempt <= FETCH_ATTEMPTS {

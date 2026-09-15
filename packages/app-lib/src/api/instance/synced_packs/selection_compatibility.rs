@@ -1,6 +1,41 @@
 use crate::state::{InstanceMetadata, State};
+use parking_lot::Mutex;
 use serde_json::Value;
-use std::path::Path;
+use std::collections::HashMap;
+use std::path::{Path, PathBuf};
+use std::sync::LazyLock;
+use std::time::{Instant, SystemTime};
+
+#[derive(Clone, PartialEq)]
+struct FileIdentity {
+    size: u64,
+    modified: SystemTime,
+    created: Option<SystemTime>,
+}
+
+impl FileIdentity {
+    async fn read(path: &Path) -> crate::Result<Self> {
+        let metadata = tokio::fs::metadata(path).await?;
+        Ok(Self {
+            size: metadata.len(),
+            modified: metadata.modified()?,
+            created: metadata.created().ok(),
+        })
+    }
+}
+
+struct CachedMetadata {
+    identity: FileIdentity,
+    value: Option<Value>,
+    bytes: usize,
+    used: Instant,
+}
+
+static METADATA_CACHE: LazyLock<
+    Mutex<HashMap<(PathBuf, String), CachedMetadata>>,
+> = LazyLock::new(Default::default);
+const METADATA_CACHE_BYTES: usize = 16 * 1024 * 1024;
+const METADATA_CACHE_ENTRIES: usize = 1024;
 
 #[derive(Clone, Copy, Eq, Ord, PartialEq, PartialOrd)]
 pub(super) struct PackFormat {
@@ -12,21 +47,70 @@ async fn read_zip_json(
     path: &Path,
     name: &str,
 ) -> crate::Result<Option<Value>> {
+    let identity = FileIdentity::read(path).await?;
+    let key = (path.to_path_buf(), name.to_owned());
+    {
+        let mut cache = METADATA_CACHE.lock();
+        if let Some(cached) = cache.get_mut(&key)
+            && cached.identity == identity
+        {
+            cached.used = Instant::now();
+            return Ok(cached.value.clone());
+        }
+        cache.remove(&key);
+    }
+    let (value, bytes) = read_zip_json_uncached(path, name).await?;
+    if FileIdentity::read(path).await? == identity
+        && bytes <= METADATA_CACHE_BYTES
+    {
+        let mut cache = METADATA_CACHE.lock();
+        let mut total = cache.values().map(|entry| entry.bytes).sum::<usize>();
+        while cache.len() >= METADATA_CACHE_ENTRIES
+            || total + bytes > METADATA_CACHE_BYTES
+        {
+            let Some(oldest) = cache
+                .iter()
+                .min_by_key(|(_, entry)| entry.used)
+                .map(|(key, _)| key.clone())
+            else {
+                break;
+            };
+            if let Some(entry) = cache.remove(&oldest) {
+                total -= entry.bytes;
+            }
+        }
+        cache.insert(
+            key,
+            CachedMetadata {
+                identity,
+                value: value.clone(),
+                bytes,
+                used: Instant::now(),
+            },
+        );
+    }
+    Ok(value)
+}
+
+async fn read_zip_json_uncached(
+    path: &Path,
+    name: &str,
+) -> crate::Result<(Option<Value>, usize)> {
     let zip = async_zip::tokio::read::fs::ZipFileReader::new(path).await?;
     let Some(index) = zip.file().entries().iter().position(|entry| {
         entry.filename().as_str().is_ok_and(|value| value == name)
     }) else {
-        return Ok(None);
+        return Ok((None, 0));
     };
     if zip.file().entries()[index].uncompressed_size() > 1024 * 1024 {
-        return Ok(None);
+        return Ok((None, 0));
     }
     let mut bytes = Vec::new();
     zip.reader_with_entry(index)
         .await?
         .read_to_end_checked(&mut bytes)
         .await?;
-    Ok(Some(serde_json::from_slice(&bytes)?))
+    Ok((Some(serde_json::from_slice(&bytes)?), bytes.len()))
 }
 
 pub(super) async fn game_format(
@@ -164,4 +248,24 @@ pub(super) async fn compatible(path: &Path, game: Option<PackFormat>) -> bool {
             false
         }
     }
+}
+
+/// Populates archive metadata before the worker acquires the synced-option lock.
+pub(super) async fn warm(
+    metadata: &InstanceMetadata,
+    items: &[crate::state::ContentItem],
+    state: &State,
+) -> crate::Result<()> {
+    if game_format(metadata, state).await.ok().flatten().is_some() {
+        let directory =
+            super::super::synced_options::instance_dir(metadata, state);
+        for item in items.iter().filter(|item| {
+            item.project_type == crate::state::ProjectType::ResourcePack
+        }) {
+            let _ =
+                read_zip_json(&directory.join(&item.file_path), "pack.mcmeta")
+                    .await;
+        }
+    }
+    Ok(())
 }
