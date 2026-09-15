@@ -377,10 +377,7 @@ async fn validate_link_field(
 ) -> Option<ProjectNag> {
 	match target.field.as_str() {
 		"description" => check_description_response(target, observed),
-		"discord" => check_discord_invite(target, final_url, observed).await,
-		"source" | "issues" | "wiki" if is_github_repository(final_url) => {
-			check_github_repository(target, final_url).await
-		}
+		"discord" => None,
 		"source" => {
 			if observed.accessible()
 				&& !super::from_domains(final_url, SOURCE_DOMAINS)
@@ -401,10 +398,6 @@ async fn validate_link_field(
 			}
 		}
 	}
-}
-
-fn is_github_repository(url: &Url) -> bool {
-	super::from_domains(url, &["github.com"]) && super::repository_path(url)
 }
 
 /// Checks visited URLs for blocked hosts, IP addresses, misplaced links,
@@ -462,69 +455,6 @@ fn check_description_response(
         return Some(target.required("download"));
     }
     None
-}
-
-/// Checks that the URL identifies an existing, unexpired Discord server invite.
-async fn check_discord_invite(
-    target: &LinkTarget,
-    url: &Url,
-    observed: &Probe,
-) -> Option<ProjectNag> {
-    let Some(code) = super::discord_code(url) else {
-        return observed
-            .accessible()
-            .then(|| target.required("discord_invite"));
-    };
-    let api =
-        Url::parse(&format!("https://discord.com/api/v10/invites/{code}"))
-            .unwrap();
-    let invite = get_or_probe(&api, true).await;
-    if invite.status == Some(StatusCode::NOT_FOUND)
-        || invite.json.as_ref().is_some_and(|body| {
-            body.get("guild").is_none()
-                || body["guild"].is_null()
-                || body["expires_at"]
-                    .as_str()
-                    .and_then(|date| {
-                        chrono::DateTime::parse_from_rfc3339(date).ok()
-                    })
-                    .is_some_and(|expiry| expiry < chrono::Utc::now())
-        })
-    {
-        Some(target.required("discord_invite"))
-    } else if invite.json.is_none() {
-        Some(target.warning("unverifiable"))
-    } else {
-        None
-    }
-}
-
-/// Checks GitHub repository visibility for source links, or whether issues/wiki
-/// are enabled for links in those fields.
-async fn check_github_repository(
-    target: &LinkTarget,
-    url: &Url,
-) -> Option<ProjectNag> {
-    let parts = super::path(url);
-    let api = Url::parse(&format!(
-        "https://api.github.com/repos/{}/{}",
-        parts[0], parts[1]
-    ))
-    .unwrap();
-    let repository = get_or_probe(&api, true).await;
-    let Some(body) = repository.json else {
-        return Some(target.warning("unverifiable"));
-    };
-    let enabled = match target.field.as_str() {
-        "issues" => body["has_issues"].as_bool(),
-        "wiki" => body["has_wiki"].as_bool(),
-        _ => body["private"].as_bool().map(|private| !private),
-    };
-    match enabled {
-        Some(false) => Some(target.required("repository_feature")),
-        None => Some(target.warning("unverifiable")),
-        Some(true) => None,
-    }
 }
 
 /// Checks an unrecognized source host's Forgejo-style API for a public repository.
