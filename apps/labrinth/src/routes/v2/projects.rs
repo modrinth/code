@@ -665,7 +665,7 @@ pub async fn project_edit(
         categories: v2_new_project.categories,
         additional_categories: v2_new_project.additional_categories,
         license_url: v2_new_project.license_url,
-        link_urls: Some(new_links),
+		link_urls: (!new_links.is_empty()).then_some(new_links),
         license_id: v2_new_project.license_id,
         slug: v2_new_project.slug,
         status: v2_new_project.status,
