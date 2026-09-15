@@ -25,6 +25,7 @@ pub mod atlauncher;
 pub mod curseforge;
 pub mod gdlauncher;
 pub mod mmc;
+pub mod modrinth;
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[cfg_attr(
@@ -37,6 +38,8 @@ pub enum ImportLauncherType {
     ATLauncher,
     GDLauncher,
     Curseforge,
+    /// Official Modrinth App (Theseus) profiles directory.
+    Modrinth,
     #[serde(other)]
     Unknown,
 }
@@ -49,6 +52,7 @@ impl fmt::Display for ImportLauncherType {
             ImportLauncherType::ATLauncher => write!(f, "ATLauncher"),
             ImportLauncherType::GDLauncher => write!(f, "GDLauncher"),
             ImportLauncherType::Curseforge => write!(f, "Curseforge"),
+            ImportLauncherType::Modrinth => write!(f, "Modrinth"),
             ImportLauncherType::Unknown => write!(f, "Unknown"),
         }
     }
@@ -65,6 +69,7 @@ pub async fn get_importable_instances(
             "instances".to_string()
         }
         ImportLauncherType::Curseforge => "Instances".to_string(),
+        ImportLauncherType::Modrinth => "profiles".to_string(),
         ImportLauncherType::MultiMC => {
             mmc::get_instances_subpath(base_path.clone().join("multimc.cfg"))
                 .await
@@ -82,6 +87,7 @@ pub async fn get_importable_instances(
                 ImportLauncherType::ATLauncher,
                 ImportLauncherType::GDLauncher,
                 ImportLauncherType::Curseforge,
+                ImportLauncherType::Modrinth,
             ];
             for lt in types {
                 if let Ok(instances) =
@@ -190,6 +196,16 @@ async fn import_instance_inner(
             )
             .await
         }
+        ImportLauncherType::Modrinth => {
+            modrinth::import_modrinth(
+                base_path,
+                instance_folder,
+                instance_id,
+                reporter.clone(),
+                details.clone(),
+            )
+            .await
+        }
         ImportLauncherType::Unknown => {
             let types = [
                 ImportLauncherType::MultiMC,
@@ -197,6 +213,7 @@ async fn import_instance_inner(
                 ImportLauncherType::ATLauncher,
                 ImportLauncherType::GDLauncher,
                 ImportLauncherType::Curseforge,
+                ImportLauncherType::Modrinth,
             ];
             let mut matched = false;
             for lt in types {
@@ -267,6 +284,11 @@ pub fn get_default_launcher_path(
                 return Some(primary);
             }
             Some(dirs::document_dir()?.join("curseforge").join("minecraft"))
+        }
+        ImportLauncherType::Modrinth => {
+            return modrinth::default_modrinth_paths()
+                .into_iter()
+                .find(|p| p.exists());
         }
         ImportLauncherType::Unknown => None,
     };
@@ -341,6 +363,9 @@ pub async fn is_valid_importable_instance(
         }
         ImportLauncherType::Curseforge => {
             curseforge::is_valid_curseforge(instance_path).await
+        }
+        ImportLauncherType::Modrinth => {
+            modrinth::is_valid_modrinth(instance_path).await
         }
         ImportLauncherType::Unknown => false,
     }

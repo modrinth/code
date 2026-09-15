@@ -68,7 +68,7 @@ const tabCategories = defineMessages({
 	},
 	account: {
 		id: 'settings.sidebar.label.account',
-		defaultMessage: 'Account',
+		defaultMessage: 'Settings',
 	},
 	instances: {
 		id: 'app.settings.sidebar.label.instances',

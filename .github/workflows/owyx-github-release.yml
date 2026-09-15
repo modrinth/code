@@ -187,7 +187,7 @@ jobs:
           - Release pipeline: idempotent version patch, Discord app ID, Tauri auto-update via GitHub \`latest.json\`
           - Site: collapsible brand palette, password strength on register, Mailjet SMTP ready
           - Launcher: Microsoft account preferred over offline nick; Owyx Servers / API settings admin-only; Discord RPC → Owyx app
-          - Data dir: \`%AppData%\\Roaming\\owyx\` (identifier \`app.owyx\`)
+          - Data dir: \`%AppData%\\Roaming\\Owyx\` (Tauri identifier \`Owyx\`)
 
           Installers: Windows NSIS, Linux AppImage. GPL-3 fork of [modrinth/code](https://github.com/modrinth/code); not affiliated with Modrinth / Rinth, Inc.
           EOF

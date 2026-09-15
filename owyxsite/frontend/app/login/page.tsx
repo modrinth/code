@@ -17,10 +17,16 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileReset, setTurnstileReset] = useState(0);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const onToken = useCallback((t: string | null) => setTurnstileToken(t), []);
+
+  function refreshTurnstile() {
+    setTurnstileToken(null);
+    setTurnstileReset((n) => n + 1);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -46,9 +52,11 @@ export default function LoginPage() {
         router.replace("/profile");
       } else {
         setError(result.error || "Не удалось войти. Проверьте данные.");
+        refreshTurnstile();
       }
     } catch {
       setError("Ошибка сети. Попробуйте позже.");
+      refreshTurnstile();
     } finally {
       setLoading(false);
     }
@@ -104,7 +112,9 @@ export default function LoginPage() {
           Запомнить меня
         </label>
 
-        {SITE_KEY && <Turnstile siteKey={SITE_KEY} onToken={onToken} />}
+        {SITE_KEY && (
+          <Turnstile siteKey={SITE_KEY} onToken={onToken} resetKey={turnstileReset} />
+        )}
 
         {error && <p className="text-sm text-danger">{error}</p>}
 

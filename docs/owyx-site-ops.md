@@ -1,39 +1,35 @@
-# Owyx site — email, admin, Discord RPC, updater, roadmap
+# Owyx site — ops (сейчас)
 
-## Cloudflare Turnstile («я не робот»)
+## Сделать сейчас: DMARC (письма в спаме)
 
-Сейчас на проде капча **выключена**, пока в `.env` стоят заглушки `obt-pend…`.
-Регистрация работает без виджета.
+Cloudflare → **DNS** (не только Email → DMARC Management) для `owyx.site`.
 
-Чтобы включить:
+Добавь TXT:
 
-1. [Cloudflare Dashboard](https://dash.cloudflare.com/) → Turnstile → Add site → `owyx.site`
-2. Скопируй **Site Key** и **Secret Key** в `/opt/owyx/owyxsite/.env`:
+| Name | Content |
+|------|---------|
+| `_dmarc` | `v=DMARC1; p=none; rua=mailto:noreply@owyx.site; fo=1` |
 
-```env
-TURNSTILE_SITE_KEY=0x...
-TURNSTILE_SECRET_KEY=0x...
-NEXT_PUBLIC_TURNSTILE_SITE_KEY=0x...   # тот же Site Key
-TURNSTILE_SKIP=false
-```
+Проверка: `dig +short TXT _dmarc.owyx.site` — должна вернуть запись.
 
-3. `bash owyxsite/deploy/vps-up.sh` (frontend пересоберёт `NEXT_PUBLIC_*`).
+SPF/DKIM уже через Mailjet. Через 1–2 недели при чистых отчётах: `p=quarantine`, потом `p=reject`.
 
-Виджет «Я не робот» появится на `/register` и `/login`.
+Аватарка отправителя (зелёный «O») — не favicon. Брендовый логотип в инбоксе = **BIMI** (нужен строгий DMARC + SVG + часто платный VMC). Пока можно жить без него.
 
-## Почта (Mailjet) — чеклист
+`EMAIL_FROM=noreply@owyx.site` на VPS.
 
-Правильно, если:
+Опционально: Cloudflare → Email → **Enable DMARC Management** — удобные отчёты, не замена DNS-записи.
 
-- Domain `owyx.site` = **Active**
-- Sender `noreply@owyx.site` = **Active**
-- SPF/DKIM для `owyx.site` = **OK**
-- **Page Domains** — не нужно (это Premium для лендингов Mailjet, не для SMTP)
+## Turnstile (уже на проде)
 
-`EMAIL_FROM` на сервере должен быть `noreply@owyx.site`.
+Ключи в `/opt/owyx/owyxsite/.env`:
 
+- `TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY`
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (тот же site key, bake при build frontend)
 
-## Выдать себе админку
+После смены ключей: `cd /opt/owyx/owyxsite && bash deploy/vps-up.sh`.
+
+## Админка
 
 ```bash
 ssh owyxsite
@@ -41,36 +37,28 @@ docker exec -i owyx-postgres psql -U owyx_user -d owyx_db -c \
   "UPDATE users SET role = 'admin' WHERE LOWER(email) = LOWER('you@example.com');"
 ```
 
-Перелогинься. В шапке сайта — **Админ-панель**. В лаунчере вкладка **Owyx Servers** (API settings) видна только staff (`admin` / `moderator`).
-
-## Discord RPC
-
-Application ID (зашит в сборку): `1549541256370323527`.
-
-1. Discord Developer Portal → Rich Presence → Art Assets.
-2. Загрузи PNG **1024×1024** (не SVG). Ключ ассета: **`owyx`**.
-3. Файл для загрузки: `brand/v2/discord-rpc/owyx.png` (сгенерирован из бренд-кристалла).
-4. Опционально второй ассет `owyx_playing` для статуса «в игре».
-
-После загрузки ассета перезапусти Discord и лаунчер (кэш ассетов бывает долгим).
+Перелогинься → **Админ-панель** в шапке.
 
 ## Автообновление лаунчера
 
 Включено в `apps/app/tauri-owyx-release.conf.json`:
 
-- `createUpdaterArtifacts: true`
 - endpoint: `https://github.com/ebluffy/Owyx/releases/latest/download/latest.json`
-- pubkey + secret `TAURI_SIGNING_PRIVATE_KEY` в GitHub Actions
+- артефакты `.sig` + `latest.json` кладёт `owyx-github-release`
 
-Релизный workflow кладёт в Release: установщики, `.sig`, `latest.json`.
+Версии: SemVer от базы **0.2.0** (см. `.cursor/rules/semver.mdc`).
 
-## Аккаунты: MS приоритетнее offline/Owyx-ника
+## Data dir лаунчера
 
-- Вход на сайте → лаунчер создаёт offline-профиль с логином сайта.
-- Если есть **Microsoft (лицензия)** — он всегда active по умолчанию (ник/скин Mojang).
-- Offline-ник остаётся в списке аккаунтов для offline-mode серверов.
+Identifier / папка данных: **`Owyx`** → `%AppData%\Roaming\Owyx`.  
+Установщик (NSIS) по-прежнему в `%LocalAppData%\Owyx` — так и задумано (как у upstream).
 
-## Roadmap (не в этом релизе)
+## Discord RPC
 
-- [ ] Скины без лицензии (идея TLSkins / локальный skin apply для offline-профиля). **Сейчас скины только через Microsoft / Mojang API.**
-- [ ] Кастомный Discord Application Icon в портале (иконка приложения ≠ Rich Presence asset).
+App ID: `1549541256370323527`. Art asset key: `owyx` (PNG 1024×1024 из `brand/v2/discord-rpc/`).
+
+## Roadmap
+
+- [ ] Скины на сайте/в ЛК — скрыты; выбор скина позже в лаунчере.
+- [ ] Вкладка «Внешний вид» на сайте — кандидат на удаление.
+- [ ] BIMI / брендовый avatar в почте (после DMARC quarantine/reject).

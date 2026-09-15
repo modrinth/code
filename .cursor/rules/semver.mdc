@@ -1,0 +1,34 @@
+---
+description: Semantic Versioning (SemVer) for Owyx releases and any versioned software in this workspace
+alwaysApply: true
+---
+
+# Semantic Versioning (SemVer)
+
+Canonical scheme: **MAJOR.MINOR.PATCH** (example `2.5.1`). Spec: https://semver.org/
+
+## Meaning
+
+| Part | When to bump |
+|------|----------------|
+| **MAJOR** | Breaking / incompatible changes |
+| **MINOR** | New features, backward compatible |
+| **PATCH** | Bug fixes only, no new features |
+
+## Pre-release and build metadata
+
+- Pre-release: hyphen suffix — `1.0.0-alpha`, `2.1.0-beta.2`, `1.2.0-rc.1`
+- Build metadata: plus suffix — `1.0.0+20260916` (informational; does not affect precedence)
+
+Do **not** use ad-hoc suffixes like `-local` for public GitHub releases.
+
+## Owyx launcher baseline
+
+- Public release baseline: **`0.2.0`** (first OBT line).
+- Next releases: choose bump from the table above (`0.2.1` for fixes, `0.3.0` for features, `1.0.0` when stable API/UX promises begin).
+- Tag as `vMAJOR.MINOR.PATCH` (e.g. `v0.2.1`).
+- Drive builds via `owyx-github-release` workflow with that version; keep Cargo / frontend / `latest.json` in sync through `scripts/set-app-version.js`.
+
+## General (other tools in this workspace)
+
+Same SemVer rules apply whenever you cut versions for site packages, scripts, or side projects unless a file explicitly documents a different scheme.

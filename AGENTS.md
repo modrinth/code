@@ -32,5 +32,6 @@ This repo is a **fork of modrinth/code** — same package licenses (GPL-3 for th
 | Site ↔ launcher contract | `owyxsite/LAUNCHER_SITE_CONTRACT.md` |
 | Owyx Servers client | `apps/app-frontend/src/helpers/owyx-api.ts` |
 | Offline accounts | `Credentials::create_offline` in `packages/app-lib/src/state/minecraft_auth.rs` |
+| SemVer releases | `.cursor/rules/semver.mdc` — baseline `0.2.0`, bump MAJOR/MINOR/PATCH per https://semver.org/ |
 
 Cloud task paste (local only): `promt.md` (gitignored).

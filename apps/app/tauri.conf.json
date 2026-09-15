@@ -58,7 +58,7 @@
 	"productName": "Owyx",
 	"version": "../app-frontend/package.json",
 	"mainBinaryName": "Owyx",
-	"identifier": "app.owyx",
+	"identifier": "Owyx",
 	"plugins": {
 		"deep-link": {
 			"desktop": {

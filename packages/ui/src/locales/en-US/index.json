@@ -5997,10 +5997,10 @@
     "defaultMessage": "An error occurred while updating your profile. Please try again."
   },
   "settings.profile.sign-in-required.description": {
-    "defaultMessage": "Sign in with a Modrinth account to customize your public profile."
+    "defaultMessage": "Sign in with your Owyx site account from the profile button in the launcher sidebar."
   },
   "settings.profile.sign-in-required.title": {
-    "defaultMessage": "Modrinth account required"
+    "defaultMessage": "Owyx account required"
   },
   "settings.profile.username.description": {
     "defaultMessage": "A unique case-insensitive name to identify your profile."
@@ -6093,10 +6093,10 @@
     "defaultMessage": "Shared instance invites"
   },
   "settings.social.sign-in-required.description": {
-    "defaultMessage": "You can control who can interact with you, and manage blocked users with a Modrinth Account"
+    "defaultMessage": "Friend lists and shared-instance invites use your Owyx account once you are signed in."
   },
   "settings.social.sign-in-required.title": {
-    "defaultMessage": "Modrinth account required"
+    "defaultMessage": "Owyx account required"
   },
   "settings.social.title": {
     "defaultMessage": "Social"

@@ -19,6 +19,26 @@ const createTransporter = () => {
   });
 };
 
+/** Rough HTML → plain text for multipart/alternative (helps spam filters). */
+const htmlToText = (html) =>
+  String(html || '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<\/tr>/gi, '\n')
+    .replace(/<a\s+[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, '$2 ($1)')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&#39;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
 const getEmailTemplate = async (id) => {
   const result = await db.query(
     `SELECT template_subject, template_html, template_variables FROM email_templates WHERE id = $1`,
@@ -121,12 +141,20 @@ const sendEmail = async (to, id, customVariables = {}) => {
 
   const transporter = createTransporter();
   const fromAddress = process.env.EMAIL_FROM || smtpUser;
+  const siteUrl = process.env.FRONTEND_URL || 'https://owyx.site';
 
   const info = await transporter.sendMail({
     from: `"${serverSettings.serverName}" <${fromAddress}>`,
+    replyTo: process.env.EMAIL_REPLY_TO || fromAddress,
     to,
     subject,
     html,
+    text: htmlToText(html),
+    headers: {
+      'List-Unsubscribe': `<${siteUrl}/login>`,
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+      'X-Auto-Response-Suppress': 'OOF, AutoReply',
+    },
   });
 
   return {
@@ -154,11 +182,19 @@ const sendTemplate = async (to, key, vars = {}) => {
 
   const transporter = createTransporter();
   const fromAddress = process.env.EMAIL_FROM || smtpUser;
+  const siteUrl = process.env.FRONTEND_URL || 'https://owyx.site';
   const info = await transporter.sendMail({
     from: `"${serverSettings.serverName}" <${fromAddress}>`,
+    replyTo: process.env.EMAIL_REPLY_TO || fromAddress,
     to,
     subject,
     html,
+    text: htmlToText(html),
+    headers: {
+      'List-Unsubscribe': `<${siteUrl}/login>`,
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+      'X-Auto-Response-Suppress': 'OOF, AutoReply',
+    },
   });
   return { success: true, messageId: info.messageId, simulated: false };
 };

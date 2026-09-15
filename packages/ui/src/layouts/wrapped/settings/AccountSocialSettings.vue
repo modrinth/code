@@ -543,12 +543,12 @@ const messages = defineMessages({
 	},
 	signInRequiredTitle: {
 		id: 'settings.social.sign-in-required.title',
-		defaultMessage: 'Modrinth account required',
+		defaultMessage: 'Owyx account required',
 	},
 	signInRequiredDescription: {
 		id: 'settings.social.sign-in-required.description',
 		defaultMessage:
-			'You can control who can interact with you, and manage blocked users with a Modrinth Account',
+			'Friend lists and shared-instance invites use your Owyx account once you are signed in.',
 	},
 	loadError: {
 		id: 'settings.social.blocked-users.load-error',

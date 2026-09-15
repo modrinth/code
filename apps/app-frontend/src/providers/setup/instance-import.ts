@@ -12,7 +12,14 @@ export function setupInstanceImportProvider(notificationManager: AbstractWebNoti
 
 	provideInstanceImport({
 		async getDetectedLaunchers() {
-			const launcherNames = ['MultiMC', 'GDLauncher', 'ATLauncher', 'Curseforge', 'PrismLauncher']
+			const launcherNames = [
+				'Modrinth',
+				'MultiMC',
+				'GDLauncher',
+				'ATLauncher',
+				'Curseforge',
+				'PrismLauncher',
+			]
 			const launchers = []
 			for (const name of launcherNames) {
 				try {

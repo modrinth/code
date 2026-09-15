@@ -22,9 +22,12 @@ declare global {
 export default function Turnstile({
   siteKey,
   onToken,
+  resetKey = 0,
 }: {
   siteKey: string;
   onToken: (token: string | null) => void;
+  /** Change to force a fresh widget (e.g. after failed login). */
+  resetKey?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const widgetId = useRef<string | null>(null);
@@ -72,7 +75,7 @@ export default function Turnstile({
         delete window.onOwyxTurnstileLoad;
       }
     };
-  }, [siteKey]);
+  }, [siteKey, resetKey]);
 
   if (!siteKey) return null;
 

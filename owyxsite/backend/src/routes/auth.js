@@ -223,12 +223,18 @@ const requireRole = (roles) => {
     };
 };
 
-// Функция для записи попытки входа
-const logLoginAttempt = async (email, ip, userAgent, success) => {
+// Функция для записи попытки входа (identifier = email или логин)
+const logLoginAttempt = async (identifier, ip, userAgent, success) => {
     try {
         await db.query(
-            'INSERT INTO login_logs (user_id, ip_address, user_agent, success) VALUES ((SELECT id FROM users WHERE email = $1), $2, $3, $4)',
-            [email, ip, userAgent, success]
+            `INSERT INTO login_logs (user_id, ip_address, user_agent, success)
+             VALUES (
+               (SELECT id FROM users
+                WHERE LOWER(email) = LOWER($1) OR LOWER(nickname) = LOWER($1)
+                LIMIT 1),
+               $2, $3, $4
+             )`,
+            [identifier, ip, userAgent, success]
         );
     } catch (error) {
         console.error('Ошибка записи попытки входа:', error);
@@ -236,13 +242,20 @@ const logLoginAttempt = async (email, ip, userAgent, success) => {
 };
 
 // Функция для проверки ограничений на попытки входа
-const checkLoginAttempts = async (ip, email) => {
+const checkLoginAttempts = async (ip, identifier) => {
     const result = await db.query(
-        `SELECT COUNT(*) as attempts FROM login_logs 
-         WHERE (ip_address = $1 OR user_id = (SELECT id FROM users WHERE email = $2)) 
-         AND login_time > NOW() - INTERVAL '1 hour' 
+        `SELECT COUNT(*) as attempts FROM login_logs
+         WHERE (
+           ip_address = $1
+           OR user_id = (
+             SELECT id FROM users
+             WHERE LOWER(email) = LOWER($2) OR LOWER(nickname) = LOWER($2)
+             LIMIT 1
+           )
+         )
+         AND login_time > NOW() - INTERVAL '1 hour'
          AND success = false`,
-        [ip, email]
+        [ip, identifier]
     );
 
     return parseInt(result.rows[0].attempts);
@@ -349,7 +362,7 @@ router.post('/register', [
         `, [newUser.id]);
 
         // Логируем успешную регистрацию
-        await logLoginAttempt(newUser.id, clientIp, req.get('User-Agent'), true);
+        await logLoginAttempt(newUser.email || loginName, clientIp, req.get('User-Agent'), true);
 
         // Автоматически отправляем email подтверждения
         try {
@@ -533,7 +546,7 @@ router.post('/login', [
         );
 
         // Записываем успешную попытку входа
-        await logLoginAttempt(email, ip, userAgent, true);
+        await logLoginAttempt(user.email || loginKey, ip, userAgent, true);
 
         // Записываем активность
         await db.query(

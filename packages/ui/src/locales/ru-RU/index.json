@@ -5904,10 +5904,10 @@
     "defaultMessage": "Произошла ошибка при обновлении профиля. Попробуйте снова."
   },
   "settings.profile.sign-in-required.description": {
-    "defaultMessage": "Войдите в Modrinth, чтобы настраивать публичный профиль."
+    "defaultMessage": "Войдите в аккаунт Owyx через кнопку профиля в боковой панели лаунчера."
   },
   "settings.profile.sign-in-required.title": {
-    "defaultMessage": "Требуется аккаунт Modrinth"
+    "defaultMessage": "Требуется аккаунт Owyx"
   },
   "settings.profile.username.description": {
     "defaultMessage": "Уникальное имя для идентификации профиля."
@@ -6000,10 +6000,10 @@
     "defaultMessage": "Приглашения в совместные сборки"
   },
   "settings.social.sign-in-required.description": {
-    "defaultMessage": "Войдите в Modrinth, чтобы настраивать доступ к общению и список заблокированных пользователей."
+    "defaultMessage": "Друзья и приглашения в совместные сборки работают после входа в аккаунт Owyx."
   },
   "settings.social.sign-in-required.title": {
-    "defaultMessage": "Требуется аккаунт Modrinth"
+    "defaultMessage": "Требуется аккаунт Owyx"
   },
   "settings.social.title": {
     "defaultMessage": "Общение"

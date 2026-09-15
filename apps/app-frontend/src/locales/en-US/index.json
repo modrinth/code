@@ -4542,7 +4542,7 @@
 		"message": "Only client-side mods can be added to the server instance"
 	},
 	"settings.sidebar.label.account": {
-		"message": "Account"
+		"message": "Settings"
 	},
 	"settings.sidebar.label.display": {
 		"message": "Display"

@@ -828,6 +828,10 @@ function deserialize_IMPORT_LAUNCHER_TYPE(d) {
         };
     case 5:
         return {
+            tag: "Modrinth"
+        };
+    case 6:
+        return {
             tag: "Unknown"
         };
     default:

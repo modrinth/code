@@ -74,18 +74,6 @@ export default function Header() {
                   {user.avatar_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={user.avatar_url} alt="" className="h-full w-full object-cover" />
-                  ) : user.skin_url ? (
-                    <span
-                      className="h-full w-full"
-                      style={{
-                        backgroundImage: `url(${user.skin_url})`,
-                        backgroundRepeat: "no-repeat",
-                        backgroundSize: `${64 * (28 / 8)}px ${64 * (28 / 8)}px`,
-                        backgroundPosition: `-${8 * (28 / 8)}px -${8 * (28 / 8)}px`,
-                        imageRendering: "pixelated",
-                      }}
-                      aria-hidden="true"
-                    />
                   ) : (
                     (user.nickname || user.email || "?").slice(0, 1).toUpperCase()
                   )}

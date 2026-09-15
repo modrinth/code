@@ -4359,7 +4359,7 @@
 		"message": "В серверной сборке доступны только клиентские моды"
 	},
 	"settings.sidebar.label.account": {
-		"message": "Аккаунт"
+		"message": "Настройки"
 	},
 	"settings.sidebar.label.display": {
 		"message": "Отображение"
