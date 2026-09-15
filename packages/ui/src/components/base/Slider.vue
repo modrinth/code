@@ -194,13 +194,17 @@ function inputValueValid(inputValue: number) {
 
 function onInputWithSnap(value: string) {
 	const parsedValue = Number.parseFloat(value)
+	const previousValue = currentValue.value ?? props.min
 
 	let snappedValue = parsedValue
 	let closestDistance = props.snapRange
 
 	for (const snapPoint of props.snapPoints) {
 		const distance = Math.abs(snapPoint - parsedValue)
-		if (distance < closestDistance) {
+		const previousDistance = Math.abs(snapPoint - previousValue)
+
+		// Only pull toward a snap point while approaching it, not while moving away
+		if (distance < closestDistance && distance < previousDistance) {
 			closestDistance = distance
 			snappedValue = snapPoint
 		}
