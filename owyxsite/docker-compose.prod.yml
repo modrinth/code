@@ -1,0 +1,28 @@
+# Production / VPS override. Used by deploy/vps-up.sh (not --dev).
+#
+# Bind app ports on loopback so host nginx can terminate TLS for owyx.site.
+# Do not publish Postgres on a public interface. Adminer is debug-only.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Set TRUST_PROXY_HOPS=1 in .env when nginx sits in front.
+
+services:
+  postgres:
+    ports: !override
+      - "${POSTGRES_BIND:-127.0.0.1}:${POSTGRES_PORT:-5432}:5432"
+
+  backend:
+    ports: !override
+      - "${API_BIND:-127.0.0.1}:${API_PORT:-3001}:3001"
+    environment:
+      TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-1}
+
+  frontend:
+    ports: !override
+      - "${FRONTEND_BIND:-127.0.0.1}:${FRONTEND_PORT:-3000}:3000"
+
+  adminer:
+    profiles: ["debug"]
+    ports: !override
+      - "${ADMINER_BIND:-127.0.0.1}:${ADMINER_PORT:-8080}:8080"

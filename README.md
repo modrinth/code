@@ -14,6 +14,7 @@ Old private monorepo (site / old launcher / plugin archive): **https://github.co
 | `apps/app-frontend` | Launcher UI (Vue) |
 | `packages/app-lib` | Launcher core (Rust) |
 | `brand/` | Owyx logos, hero art, design tokens |
+| `owyxsite/` | Owyx control-plane (site + API + deploy) — our code, not upstream |
 | `apps/frontend`, `apps/labrinth`, … | Upstream packages kept for sync |
 
 ## Branding
