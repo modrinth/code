@@ -970,15 +970,13 @@ pub async fn delete_file(
         database::models::version_item::cleanup_unused_attribution_files_and_groups(&mut transaction)
             .await.wrap_internal_err("deleting version item from database")?;
 
-        delphi::tech_review_queue::remove_projects_without_details(
+        delphi::tech_review_queue::sync_projects(
             &[row.project_id],
             delphi::tech_review_queue::TechReviewRemovalReason::FileDeleted,
             &mut transaction,
         )
         .await
-        .wrap_api_err(
-            "executing `tech_review_sync::sync_project_tech_review_state`",
-        )?;
+        .wrap_api_err("executing `tech_review_queue::sync_projects`")?;
 
         transaction
             .commit()

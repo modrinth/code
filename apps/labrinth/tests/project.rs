@@ -1,13 +1,14 @@
 use actix_http::StatusCode;
 use actix_web::test;
 use common::api_v3::ApiV3;
+use common::api_v3::request_data::get_public_project_creation_data;
 use common::database::*;
 use common::dummy_data::DUMMY_CATEGORIES;
 
 use crate::common::api_common::models::CommonProject;
 use crate::common::api_common::request_data::ProjectCreationRequestData;
 use crate::common::api_common::{
-    Api, ApiProject, ApiTeams, ApiVersion, AppendsOptionalPat,
+    Api, ApiProject, ApiTags, ApiTeams, ApiVersion, AppendsOptionalPat,
 };
 use crate::common::dummy_data::{
     DummyImage, DummyOrganizationZeta, DummyProjectAlpha, DummyProjectBeta,
@@ -652,6 +653,161 @@ async fn test_leaving_review_skips_validation() {
                 assert_eq!(project.status, expected_status);
                 assert!(project.description.is_empty());
             }
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
+async fn test_description_similarity_to_summary() {
+    with_test_environment(
+		None,
+		|test_env: TestEnvironment<ApiV3>| async move {
+			let api = &test_env.api;
+			let project_slug = &test_env.dummy.project_alpha.project_slug;
+			let summary = "Explore new worlds with configurable tools and adventures.";
+			let response = api
+				.edit_project(
+					project_slug,
+					json!({ "status": "draft", "summary": summary }),
+					ADMIN_USER_PAT,
+				)
+				.await;
+			assert_status!(&response, StatusCode::NO_CONTENT);
+
+			for (description, expected_match) in [
+				(summary.to_string(), true),
+				(format!("**{}**\n\n```yaml\nsetting: true\n```", summary.to_uppercase()), true),
+				(format!("{summary} Players can discover custom structures, configure individual features, and follow detailed installation instructions for their preferred loader."), false),
+				(String::new(), false),
+			] {
+				let response = api
+					.edit_project(
+						project_slug,
+						json!({ "description": description }),
+						USER_USER_PAT,
+					)
+					.await;
+				assert_status!(&response, StatusCode::NO_CONTENT);
+
+				let request = test::TestRequest::get()
+					.uri(&format!("/v3/project/{project_slug}/validate"))
+					.append_pat(USER_USER_PAT)
+					.to_request();
+				let response = api.call(request).await;
+				assert_status!(&response, StatusCode::OK);
+				let validation: serde_json::Value = test::read_body_json(response).await;
+				let matching_nag = validation["nags"]
+					.as_array()
+					.unwrap()
+					.iter()
+					.find(|nag| nag["kind"] == "project_description_matches_summary");
+				assert_eq!(matching_nag.is_some(), expected_match, "{description}");
+				if let Some(nag) = matching_nag {
+					assert_eq!(nag["severity"], "required");
+				}
+			}
+		},
+	)
+	.await;
+}
+
+#[actix_rt::test]
+async fn test_plugin_and_datapack_validation_use_mod_tags() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let mod_categories = api
+                .get_categories_deserialized_common()
+                .await
+                .into_iter()
+                .filter(|category| category.project_type == "mod")
+                .map(|category| category.name)
+                .collect::<Vec<_>>();
+            assert!(mod_categories.len() > 3);
+
+            for (project_type, loader, file) in [
+                ("plugin", "bukkit", TestFile::build_random_plugin()),
+                (
+                    "datapack",
+                    "datapack",
+                    TestFile::build_random_datapack(),
+                ),
+            ] {
+                let slug = format!("all-tags-selected-{project_type}");
+                let modify_json = serde_json::from_value(json!([
+                    { "op": "replace", "path": "/is_draft", "value": true },
+                    { "op": "replace", "path": "/categories", "value": mod_categories[..3] },
+                    { "op": "add", "path": "/additional_categories", "value": mod_categories[3..] },
+                    { "op": "replace", "path": "/initial_versions/0/loaders", "value": [loader] },
+                ]))
+                .unwrap();
+                let creation_data = get_public_project_creation_data(
+                    &slug,
+                    Some(file),
+                    Some(modify_json),
+                );
+                let response =
+                    api.create_project(creation_data, USER_USER_PAT).await;
+                assert_status!(&response, StatusCode::OK);
+
+                let request = test::TestRequest::get()
+                    .uri(&format!("/v3/project/{slug}/validate"))
+                    .append_pat(USER_USER_PAT)
+                    .to_request();
+                let response = api.call(request).await;
+                assert_status!(&response, StatusCode::OK);
+                let validation: serde_json::Value =
+                    test::read_body_json(response).await;
+                let all_tags_selected = validation["nags"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .find(|nag| nag["kind"] == "all_tags_selected")
+                    .expect("all shared mod tags should be detected as selected");
+
+                assert_eq!(
+                    all_tags_selected["details"]["total_available_tags"],
+                    mod_categories.len()
+                );
+            }
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
+async fn test_zero_available_tags_are_not_all_selected() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let creation_data = get_public_project_creation_data(
+                "project-without-an-inferred-type",
+                None,
+                None,
+            );
+            let response =
+                api.create_project(creation_data, USER_USER_PAT).await;
+            assert_status!(&response, StatusCode::OK);
+
+            let request = test::TestRequest::get()
+                .uri("/v3/project/project-without-an-inferred-type/validate")
+                .append_pat(USER_USER_PAT)
+                .to_request();
+            let response = api.call(request).await;
+            assert_status!(&response, StatusCode::OK);
+            let validation: serde_json::Value =
+                test::read_body_json(response).await;
+
+            assert!(
+                validation["nags"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .all(|nag| nag["kind"] != "all_tags_selected")
+            );
         },
     )
     .await;

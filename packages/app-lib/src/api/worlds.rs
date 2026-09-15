@@ -33,7 +33,42 @@ use std::time::Instant;
 use tokio::io::AsyncWriteExt;
 use tokio::task::JoinSet;
 use tokio_util::compat::FuturesAsyncWriteCompatExt;
+use tracing::Instrument;
 use url::Url;
+
+struct WorldLoadTiming {
+    stage: &'static str,
+    started_at: Instant,
+}
+
+impl WorldLoadTiming {
+    fn start(stage: &'static str) -> Self {
+        tracing::info!(target: "theseus::worlds::timing", stage, "World load stage started");
+        Self {
+            stage,
+            started_at: Instant::now(),
+        }
+    }
+}
+
+impl Drop for WorldLoadTiming {
+    fn drop(&mut self) {
+        tracing::info!(
+            target: "theseus::worlds::timing",
+            stage = self.stage,
+            elapsed_ms = self.started_at.elapsed().as_secs_f64() * 1000.0,
+            "World load stage ended"
+        );
+    }
+}
+
+pub(crate) async fn time_world_load<T>(
+    stage: &'static str,
+    work: impl std::future::Future<Output = T>,
+) -> T {
+    let _timing = WorldLoadTiming::start(stage);
+    work.await
+}
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct WorldWithInstance {
@@ -190,14 +225,26 @@ impl From<ServerPackStatus> for Option<bool> {
     }
 }
 
+#[tracing::instrument(
+	name = "recent_worlds",
+	skip_all,
+	fields(request_id = %uuid::Uuid::new_v4(), limit)
+)]
 pub async fn get_recent_worlds(
     limit: usize,
     display_statuses: EnumSet<DisplayStatus>,
 ) -> Result<Vec<WorldWithInstance>> {
-    let state = State::get().await?;
+    let _timing = WorldLoadTiming::start("recent_worlds_total");
+    let state = time_world_load("backend_state", State::get()).await?;
     let instances_dir = state.directories.instances_dir();
 
-    let mut instances = crate::state::list_instances(&state.pool).await?;
+    let mut instances = time_world_load(
+        "list_instances",
+        crate::state::list_instances(&state.pool),
+    )
+    .await?;
+    tracing::info!(target: "theseus::worlds::timing", instance_count = instances.len(), "Recent world scan enumerated instances");
+    let mut scanned_instances = 0;
     instances.sort_by_key(|x| Reverse(x.instance.last_played));
 
     let mut result = Vec::with_capacity(limit);
@@ -209,6 +256,7 @@ pub async fn get_recent_worlds(
         {
             break;
         }
+        scanned_instances += 1;
         let instance_id = &instance.instance.id;
         let instance_path = &instance.instance.path;
         let instance_dir = instances_dir.join(instance_path);
@@ -248,6 +296,7 @@ pub async fn get_recent_worlds(
     if result.len() <= limit {
         result.sort_by_key(|x| Reverse(x.world.last_played));
     }
+    tracing::info!(target: "theseus::worlds::timing", scanned_instances, result_count = result.len(), "Recent world scan succeeded");
     Ok(result)
 }
 
@@ -290,20 +339,31 @@ async fn resolve_instance_identity(
     Ok((row.id, row.path))
 }
 
+#[tracing::instrument(name = "worlds_instance", skip_all, fields(instance_id))]
 async fn get_all_worlds_in_instance(
     instance_id: &str,
     instance_dir: &Path,
 ) -> Result<Vec<World>> {
+    let _timing = WorldLoadTiming::start("instance_total");
     let mut worlds = vec![];
-    get_singleplayer_worlds_in_instance(instance_dir, &mut worlds).await?;
-    let state = State::get().await?;
+    time_world_load(
+        "singleplayer_worlds",
+        get_singleplayer_worlds_in_instance(instance_dir, &mut worlds),
+    )
+    .await?;
+    let state = time_world_load("backend_state", State::get()).await?;
 
-    get_server_worlds_in_instance(instance_id, instance_dir, &mut worlds)
-        .await?;
+    time_world_load(
+        "server_worlds",
+        get_server_worlds_in_instance(instance_id, instance_dir, &mut worlds),
+    )
+    .await?;
 
-    let attached_data =
-        AttachedWorldData::get_all_for_instance(instance_id, &state.pool)
-            .await?;
+    let attached_data = time_world_load(
+        "attached_world_metadata",
+        AttachedWorldData::get_all_for_instance(instance_id, &state.pool),
+    )
+    .await?;
     if !attached_data.is_empty() {
         for world in &mut worlds {
             if let Some(data) = attached_data
@@ -314,6 +374,7 @@ async fn get_all_worlds_in_instance(
         }
     }
 
+    tracing::info!(target: "theseus::worlds::timing", world_count = worlds.len(), "Instance world scan succeeded");
     Ok(worlds)
 }
 
@@ -321,6 +382,7 @@ async fn get_singleplayer_worlds_in_instance(
     instance_dir: &Path,
     worlds: &mut Vec<World>,
 ) -> Result<()> {
+    let enumeration_timing = WorldLoadTiming::start("enumerate_saves");
     let saves_dir = instance_dir.join("saves");
     if !saves_dir.exists() {
         return Ok(());
@@ -332,8 +394,11 @@ async fn get_singleplayer_worlds_in_instance(
         if !world_path.join("level.dat").exists() {
             continue;
         }
-        tasks.spawn(read_singleplayer_world(world_path));
+        tasks.spawn(read_singleplayer_world(world_path).in_current_span());
     }
+    tracing::info!(target: "theseus::worlds::timing", world_count = tasks.len(), "Save enumeration succeeded");
+    drop(enumeration_timing);
+    let _timing = WorldLoadTiming::start("wait_for_world_reads");
     while let Some(result) = tasks.join_next().await {
         match result {
             Ok(Ok(world)) => worlds.push(world),
@@ -373,7 +438,13 @@ pub async fn get_singleplayer_world(
     Ok(world)
 }
 
+#[tracing::instrument(
+	name = "singleplayer_world",
+	skip_all,
+	fields(world = %world_path.file_name().unwrap_or_default().to_string_lossy())
+)]
 async fn read_singleplayer_world(world_path: PathBuf) -> Result<World> {
+    let _timing = WorldLoadTiming::start("singleplayer_world_total");
     if let Some(_lock) = try_get_world_session_lock(&world_path).await? {
         read_singleplayer_world_maybe_locked(world_path, false).await
     } else {
@@ -385,11 +456,18 @@ async fn read_singleplayer_world_maybe_locked(
     world_path: PathBuf,
     locked: bool,
 ) -> Result<World> {
-    let raw = io::read(world_path.join("level.dat")).await?;
+    let raw = time_world_load(
+        "read_level_dat",
+        io::read(world_path.join("level.dat")),
+    )
+    .await?;
+    tracing::info!(target: "theseus::worlds::timing", compressed_bytes = raw.len(), "World metadata read");
+    let parse_timing = WorldLoadTiming::start("decode_level_dat");
     let (root, _) = quartz_nbt::io::read_nbt(
         &mut Cursor::new(raw),
         quartz_nbt::io::Flavor::GzCompressed,
     )?;
+    drop(parse_timing);
 
     let data = root.get::<_, &NbtCompound>("Data").map_err(|_| {
         Error::from(ErrorKind::InputError(
@@ -405,9 +483,12 @@ async fn read_singleplayer_world_maybe_locked(
     let game_type = data.get::<_, i32>("GameType").unwrap_or(0);
     let hardcore = read_hardcore(data);
 
-    let icon = if tokio::fs::try_exists(world_path.join("icon.png"))
-        .await
-        .unwrap_or(false)
+    let icon = if time_world_load(
+        "check_world_icon",
+        tokio::fs::try_exists(world_path.join("icon.png")),
+    )
+    .await
+    .unwrap_or(false)
     {
         Some(Either::Left(world_path.join("icon.png")))
     } else {
@@ -453,21 +534,28 @@ async fn get_server_worlds_in_instance(
     _instance_dir: &Path,
     worlds: &mut Vec<World>,
 ) -> Result<()> {
-    let state = State::get().await?;
-    let metadata = crate::state::get_instance(instance_id, &state.pool)
-        .await?
-        .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
+    let state = time_world_load("backend_state", State::get()).await?;
+    let metadata = time_world_load(
+        "server_instance_metadata",
+        crate::state::get_instance(instance_id, &state.pool),
+    )
+    .await?
+    .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
     let servers = crate::api::instance::synced_servers::list_server_records(
         &metadata, &state,
     )
     .await?;
+    tracing::info!(target: "theseus::worlds::timing", server_count = servers.len(), "Server records loaded");
     if servers.is_empty() {
         return Ok(());
     }
 
-    let join_log = server_join_log::get_joins(instance_id, &state.pool)
-        .await
-        .ok();
+    let join_log = time_world_load(
+        "server_join_history",
+        server_join_log::get_joins(instance_id, &state.pool),
+    )
+    .await
+    .ok();
 
     for (index, server) in servers.into_iter().enumerate() {
         if server.hidden() {
@@ -758,13 +846,16 @@ async fn get_world_session_lock(world: &Path) -> Result<tokio::fs::File> {
 async fn try_get_world_session_lock(
     world: &Path,
 ) -> Result<Option<tokio::fs::File>> {
+    let open_timing = WorldLoadTiming::start("open_session_lock");
     let file = tokio::fs::File::options()
         .create(true)
         .write(true)
         .truncate(false)
         .open(world.join("session.lock"))
         .await?;
-    file.sync_all().await?;
+    drop(open_timing);
+    time_world_load("sync_session_lock", file.sync_all()).await?;
+    let _timing = WorldLoadTiming::start("try_session_lock");
     let locked = file.try_lock_exclusive()?;
     Ok(locked.then_some(file))
 }

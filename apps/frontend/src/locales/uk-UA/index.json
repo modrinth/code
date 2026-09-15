@@ -99,13 +99,13 @@
     "message": "Примітки"
   },
   "analytics.chart.controls.aria": {
-    "message": "Настройки відображення графіку, {activeCount}"
+    "message": "Налаштування графіку аналітики, {activeCount}"
   },
   "analytics.chart.controls.button": {
-    "message": "Настройки"
+    "message": "Налаштування"
   },
   "analytics.chart.controls.dialog-aria": {
-    "message": "Настройки відображення графіку"
+    "message": "Налаштування показу графіку"
   },
   "analytics.chart.controls.display": {
     "message": "Перегляд"
@@ -225,7 +225,7 @@
     "message": "Оновлення"
   },
   "analytics.download-source.app": {
-    "message": "Modrinth App"
+    "message": "Застосунок Modrinth"
   },
   "analytics.download-source.website": {
     "message": "Сайт Modrinth"
@@ -387,7 +387,7 @@
     "message": "Значок {name}"
   },
   "analytics.project.select": {
-    "message": "Обрати проєкти"
+    "message": "Вибрати проєкти"
   },
   "analytics.project.user": {
     "message": "Проєкти {username}"
@@ -414,7 +414,7 @@
     "message": "Завантаження"
   },
   "analytics.stat.monetization-banner.body": {
-    "message": "Для монетизації зараховуються лише перегляди та завантаження, здійснені через Modrinth, щоб уникнути фальшувань. Завантаження через Modrinth App зараховуються, лише якщо користувач зареєстрований. Оскільки всі проєкти мають схоже відношення монетизованих завантажень, ваш прибуток не зміниться суттєво, якщо враховувати всі завантаження."
+    "message": "Для монетизації зараховуються лише перегляди та завантаження, здійснені через Modrinth, щоб уникнути фальшувань. Завантаження через застосунок Modrinth зараховуються, лише якщо користувач зареєстрований. Оскільки всі проєкти мають схоже відношення монетизованих завантажень, ваш прибуток не зміниться суттєво, якщо враховувати всі завантаження."
   },
   "analytics.stat.monetization-banner.learn-more": {
     "message": "Дізнатися більше"
@@ -459,7 +459,7 @@
     "message": "Ігровий час (сек.)"
   },
   "analytics.table.csv.selected-range": {
-    "message": "Обраний проміжок"
+    "message": "Вибраний проміжок"
   },
   "analytics.table.duration.days": {
     "message": "{count, plural, one {# день} few {# дні} many {# днів} other {# дня}}"
@@ -578,14 +578,8 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Зберігайте вміст, який вам подобається, та отримуйте оновлення за одне натискання."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Відстежуйте проєкти"
-  },
   "app-marketing.features.importing.description": {
-    "message": "Імпортуйте ваші улюблені профілі з минулого запускача та почніть користуватися Modrinth App за лічені секунди!"
+    "message": "Імпортуйте всі ваші улюблені примірники з минулого запускача та почніть користуватися Modrinth App за лічені секунди!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -594,7 +588,13 @@
     "message": "MultiMC"
   },
   "app-marketing.features.importing.title": {
-    "message": "Імпортування профілів"
+    "message": "Імпорт примірника"
+  },
+  "app-marketing.features.manage-skins.description": {
+    "message": "Перемикайтеся між усіма вашими скінами Minecraft прямо в застосунку."
+  },
+  "app-marketing.features.manage-skins.title": {
+    "message": "Вибір скіну"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Дії"
@@ -620,14 +620,8 @@
   "app-marketing.features.mod-management.version": {
     "message": "Версія"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Грайте з модами навіть попри відсутність з’єднання з інтернетом."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Працює без мережі"
-  },
   "app-marketing.features.open-source.description": {
-    "message": "Modrinth є повністю відкритим. Ви можете переглянути відкритий код на нашому <github-link>GitHub</github-link>!"
+    "message": "Modrinth App є повністю відкритим. Ви можете переглянути вихідний код на нашому <github-link>GitHub</github-link>!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Відкритий код"
@@ -639,7 +633,7 @@
     "message": "% ЦП"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App працює краще, ніж інші менеджери модів, використовуючи лише 150 МБ оперативної пам’яті!"
+    "message": "Modrinth App — один з найбільш оптимізованих менеджерів модів!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -649,15 +643,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ МБ"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ МБ"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 МБ"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"
@@ -682,6 +667,12 @@
   },
   "app-marketing.features.play.title": {
     "message": "Грайте з вашими улюбленими модами"
+  },
+  "app-marketing.features.settings-sync.description": {
+    "message": "Застосовуйте однакові налаштування, пакети ресурсів та інше до всіх ваших примірників."
+  },
+  "app-marketing.features.settings-sync.title": {
+    "message": "Синхронізуйте ваші налаштування"
   },
   "app-marketing.features.sharing.description": {
     "message": "Створюйте, діліться й грайте в які завгодно збірки, використовуючи тисячі модів та збірок, які є на Modrinth."
@@ -711,7 +702,7 @@
     "message": "Знімок екрана з Modrinth App зі збіркою Cobblemon, відкритою на сторінці «Уміст»."
   },
   "app-marketing.hero.description": {
-    "message": "Modrinth App — це особливий запускач із відкритим кодом, що дає змогу грати з вашими улюбленими модами та швидко оновлювати їх в одному застосункові."
+    "message": "Modrinth App — це особливий запускач із відкритим кодом, що дає змогу грати з вашими улюбленими модами та швидко оновлювати їх в одному застосунку."
   },
   "app-marketing.hero.download-button": {
     "message": "Завантажити Modrinth App"
@@ -902,6 +893,9 @@
   "auth.sign-in.last-sign-in": {
     "message": "Востаннє використано"
   },
+  "auth.sign-in.launcher.callback.title": {
+    "message": "Виклик Modrinth App"
+  },
   "auth.sign-in.launcher.complete.description": {
     "message": "Ми повертаємо вас до Modrinth App. Якщо нічого не відбудеться, натисніть на кнопку нижче."
   },
@@ -914,11 +908,17 @@
   "auth.sign-in.launcher.complete.title": {
     "message": "Вхід виконано"
   },
+  "auth.sign-in.launcher.opening.description": {
+    "message": "Якщо застосунок не відкривається, натисніть на кнопку нижче."
+  },
+  "auth.sign-in.launcher.opening.title": {
+    "message": "Відкриваємо Modrinth App…"
+  },
   "auth.sign-in.no-account": {
     "message": "Не маєте облікового запису?"
   },
   "auth.sign-in.sign-in-with": {
-    "message": "Увійти в Modrinth"
+    "message": "Увійти до Modrinth"
   },
   "auth.sign-in.title": {
     "message": "Вхід"
@@ -946,6 +946,9 @@
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Створити обліковий запис"
+  },
+  "auth.two-factor.incorrect-code": {
+    "message": "Код неправильний. Спробуйте знову або використайте резервний код."
   },
   "auth.verify-email.action.account-settings": {
     "message": "Налаштування облікового запису"
@@ -1200,7 +1203,7 @@
     "message": "Завантажити основний та додаткові файли"
   },
   "create-project-version.create-modal.stage.add-files.upload-secondary-prompt": {
-    "message": "Перетягніть або натисніть, щоб обрати"
+    "message": "Перетягніть або натисніть, щоб вибрати"
   },
   "create-project-version.create-modal.stage.details.details-tab": {
     "message": "Деталі"
@@ -1275,13 +1278,13 @@
     "message": "Немає встановленого середовища."
   },
   "create-project-version.create-modal.stage.metadata.no-loaders-selected": {
-    "message": "Немає обраного завантажувача."
+    "message": "Немає вибраного завантажувача."
   },
   "create-project-version.create-modal.stage.metadata.no-mod-loader": {
     "message": "Немає завантажувача"
   },
   "create-project-version.create-modal.stage.metadata.no-versions-selected": {
-    "message": "Немає обраної версії."
+    "message": "Немає вибраної версії."
   },
   "create-project-version.create-modal.stage.metadata.prefilled-environment-tooltip": {
     "message": "Заповнено від попередньої схожої версії"
@@ -1776,7 +1779,7 @@
     "message": "Пошук {category}…"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-category-placeholder": {
-    "message": "Обрати {category}"
+    "message": "Вибрати {category}"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
     "message": "Виберіть номінал:"
@@ -1794,7 +1797,7 @@
     "message": "Доступні нижчі комісії"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
-    "message": "Ви обрали долари США для PayPal International. <direct-paypal-link>Перейдіть на прямий PayPal</direct-paypal-link> для отримання кращих комісій (≈2% замість ≈6%)."
+    "message": "Ви вибрали долари США для PayPal International. <direct-paypal-link>Перейдіть на прямий PayPal</direct-paypal-link> для отримання кращих комісій (≈2% замість ≈6%)."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-max": {
     "message": "Можна вивести від {min} до {max}."
@@ -1956,10 +1959,10 @@
     "message": "Перегляньте метадані середовища"
   },
   "dashboard.projects.selection-bar.aria-label": {
-    "message": "Обрані дії проєкту"
+    "message": "Вибрані дії проєкту"
   },
   "dashboard.projects.selection-bar.selected-count": {
-    "message": "Обрано {count, plural, one {# проєкт} few {# проєкти} many {# проєктів} other {# проєкту}}"
+    "message": "Вибрано {count, plural, one {# проєкт} few {# проєкти} many {# проєктів} other {# проєкту}}"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -2348,6 +2351,9 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "На яких ЦП працюють сервери Modrinth Hosting?"
   },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Сервери Modrinth Hosting обладнані процесорами AMD Ryzen 7950X або 9950X та оперативною памʼяттю DDR5."
+  },
   "hosting-marketing.faq.currency": {
     "message": "У якій валюті вказані ціни?"
   },
@@ -2478,7 +2484,7 @@
     "message": "Виникла помилка під час отримання даних платежу"
   },
   "hosting-marketing.notification.invalid-product-text": {
-    "message": "Обраний продукт знайдено, але він не має необхідних даних. Зв'яжіться з підтримкою."
+    "message": "Вибраний продукт знайдено, але він не має необхідних даних. Зв'яжіться з підтримкою."
   },
   "hosting-marketing.notification.invalid-product-title": {
     "message": "Недійсний продукт"
@@ -2970,7 +2976,7 @@
     "message": "Не вдалося змінити обліковий запис. Спробуйте ще раз."
   },
   "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "Оновитись до Modrinth+"
+    "message": "Покращитись до Modrinth+"
   },
   "layout.publish.email-verification-required.description": {
     "message": "Підтвердьте свою електронну пошту, перш ніж публікувати на Modrinth."
@@ -3413,6 +3419,9 @@
   "project-member-header.success-join": {
     "message": "Ви доєдналися до команди проєкту"
   },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Проєкт відправлено на перевірку!"
+  },
   "project-moderation-nags.publishing-checklist": {
     "message": "Контрольний список для публікації"
   },
@@ -3822,13 +3831,19 @@
     "message": "Для цього проєкту не знайдено файлів .mrpack."
   },
   "project.notification.check-modpack-archives.success": {
-    "message": "{count, plural, one {Файл модпака можна розпакувати.} few {Усі # файли модпака можна розпакувати.} many {Усі # файлів модпака можна розпакувати.} other {Усі # файлів модпака можна розпакувати.}}"
+    "message": "{count, plural, one {Файл збірки можна розпакувати.} few {Усі # файли збірки можна розпакувати.} other {Усі # файлів збірки можна розпакувати.}}"
   },
   "project.notification.icon-updated.message": {
     "message": "Значок вашого проєкту оновлено."
   },
   "project.notification.icon-updated.title": {
     "message": "Значок проєкту оновлено"
+  },
+  "project.notification.review-save-failed.description": {
+    "message": "Не можна зберігати зміни проєкту, які призведуть до помилки перевірки."
+  },
+  "project.notification.review-save-failed.title": {
+    "message": "Не вдалося зберегти проєкт в огляді"
   },
   "project.notification.updated.message": {
     "message": "Ваш проєкт оновлено."
@@ -3867,7 +3882,10 @@
     "message": "Видалити проєкт"
   },
   "project.settings.disclosures.advertising.description.1": {
-    "message": "Ви повинні увімкнути це, якщо ваш проєкт містить рекламу, спонсорство або просування інших робіт."
+    "message": "Необхідно ввімкнути, якщо цей проєкт містить рекламу, спонсорства чи просування інших робіт."
+  },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "Це не стосується ненавʼязливого просування релевантного вмісту без грошової вигоди, як-от посилання на профіль Modrinth у власному меню конфігурації, та не стосується реклами на сторінці проєкту, як-от спонсорованих банерів в описі."
   },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "напр. Додає сервер Modrinth-SMP до вашого списку серверів автоматично."
@@ -3875,17 +3893,32 @@
   "project.settings.disclosures.advertising.title": {
     "message": "Містить рекламу"
   },
+  "project.settings.disclosures.ai-functionality.description": {
+    "message": "Необхідно ввімкнути, якщо цей проєкт містить функціонал із використанням генеративного ШІ, як-от чатбот чи динамічно генеровані текстури."
+  },
+  "project.settings.disclosures.ai-functionality.note-placeholder": {
+    "message": "наприклад, NPC використовують генеративний ШІ для діалогів."
+  },
+  "project.settings.disclosures.ai-functionality.title": {
+    "message": "Містить функціонал із використанням генеративного ШІ"
+  },
   "project.settings.disclosures.ai.description": {
-    "message": "Ви повинні увімкнути це, якщо проєкт містить значний обсяг коду, згенерованого ШІ, будь-які\n\t\t\t\tресурси, значною мірою згенеровані ШІ, функціональність проєкту базується на\n                                використанні генеративного ШІ, або якщо будь-який елемент сторінки вашого\n                                проєкту, як от опис чи публікація, базується на генеративному ШІ."
+    "message": "Необхідно ввімкнути, якщо цей проєкт містить медіафайли чи значну частину коду, які згенеровано ШІ."
+  },
+  "project.settings.disclosures.ai.description.2": {
+    "message": "Важливо бути відвертими щодо значного використання генеративного ШІ під час створення чи публікування цього вмісту. Якщо ШІ можна вважати співавтором цього проєкту, ви повинні оголосити про його використання тут."
   },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "Наприклад: The Chinese and Arabic translations are AI-generated."
+  },
+  "project.settings.disclosures.ai.still-unsure": {
+    "message": "Досі не впевнені? Зверніться до нашого довідника <faq-link>Розкриття інформації та використання ШІ</faq-link> та розділу 6 <rules>Правил умісту Modrinth</rules> для детальнішої інформації."
   },
   "project.settings.disclosures.ai.title": {
     "message": "Містить уміст, згенерований ШІ"
   },
   "project.settings.disclosures.ai.types-description": {
-    "message": "Що саме було згенеровано ШІ?"
+    "message": "Який уміст було згенеровано ШІ?"
   },
   "project.settings.disclosures.archived.banner-preview": {
     "message": "Попередній перегляд банера"
@@ -3923,11 +3956,20 @@
   "project.settings.disclosures.derivative.note-label": {
     "message": "Поясніть, як ваш проєкт базується на оригінальній праці"
   },
+  "project.settings.disclosures.derivative.note-placeholder": {
+    "message": "Це форк, який додає декілька нових біомів та портує їх на нові версії Minecraft."
+  },
   "project.settings.disclosures.derivative.title": {
     "message": "Містить похідний уміст"
   },
   "project.settings.disclosures.description": {
     "message": "Ви повинні промаркувати кожен з придатних пунктів до свого проєкту у відповідності <rules>Правилам умісту Modrinth</rules>."
+  },
+  "project.settings.disclosures.description.2": {
+    "message": "Не впевнені, як застосувати вимоги щодо розкриття інформації у вашому проєкті? Перегляньте наші <faq-link>ЧаПи «Розкриття інформації»</faq-link>."
+  },
+  "project.settings.disclosures.info-tooltip": {
+    "message": "Натисніть, щоб дізнатися більше про те, коли використовувати це розкриття."
   },
   "project.settings.disclosures.last-updated": {
     "message": "Востаннє оновлено {date} {user}"
@@ -3945,7 +3987,7 @@
     "message": "Будь ласка, зверніться до <contact-support-link>служби підтримки</contact-support-link>, якщо це маркування повинно бути змінене чи зняте."
   },
   "project.settings.disclosures.paid-features.description": {
-    "message": "Ви повинні увімкнути це, якщо ваш проєкт містить функції, користуватися якими можна лише витративши реальні гроші."
+    "message": "Необхідно ввімкнути, якщо цей проєкт містить платний функціонал."
   },
   "project.settings.disclosures.paid-features.feature-placeholder": {
     "message": "напр. Косметичні елементи, доступні прихильникам на Patreon"
@@ -4069,6 +4111,12 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.links.donation.duplicate-type": {
+    "message": "Ви вже маєте ще одне посилання {platform}."
+  },
+  "project.settings.links.donation.no-type": {
+    "message": "Будь ласка, оберіть платформу для цього посилання для пожертви."
   },
   "project.settings.monetization.description": {
     "message": "Проєкти на Modrinth автоматично реєструються в <rewards-program-link>Програмі винагород</rewards-program-link>. Якщо ви не хочете (або не можете з юридичних причин) отримувати дохід від цього проєкту, ви можете вимкнути його тут."
@@ -4218,7 +4266,7 @@
     "message": "Уведена адреса може містити записи DNS SRV _minecraft._tcp.(ваш домен), який указує на вашу адресу сервера Minecraft та порт."
   },
   "project.settings.tags.all-tags-selected-warning": {
-    "message": "Ви обрали всі {count} можливих позначок. Виберіть лише ті, які дійсно підходять вашому проєктові."
+    "message": "Ви вибрали всі {count} можливих позначок. Виберіть лише ті, які дійсно підходять вашому проєктові."
   },
   "project.settings.tags.categories-description": {
     "message": "Оберіть усі категорії, які описують тему чи функціонал {type}."
@@ -4273,6 +4321,9 @@
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Завантажте версії, перш ніж додавати позначки"
+  },
+  "project.slug-suggestions.label": {
+    "message": "Пропозиції:"
   },
   "project.versions.copy-id-option": {
     "message": "Копіювати ID"
@@ -4980,7 +5031,7 @@
     "message": "Указаний код неправильний!"
   },
   "settings.account.two-factor.field.code.description": {
-    "message": "Укажіть код двофакторної автентифікації, щоб продовжити."
+    "message": "Уведіть код зі свого автентифікатора або використайте один із резервних кодів."
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Укажіть код двофакторної автентифікації"
@@ -5046,7 +5097,7 @@
     "message": "Опис"
   },
   "settings.applications.field.description.placeholder": {
-    "message": "Уведіть опис застосунку…"
+    "message": "Уведіть опис застосунку..."
   },
   "settings.applications.field.icon": {
     "message": "Значок"
@@ -5055,7 +5106,7 @@
     "message": "Назва"
   },
   "settings.applications.field.name.placeholder": {
-    "message": "Уведіть назву застосунку…"
+    "message": "Уведіть назву застосунку..."
   },
   "settings.applications.field.redirect-uri.placeholder": {
     "message": "https://example.com/auth/callback"
@@ -5094,7 +5145,7 @@
     "message": "Створено {user}"
   },
   "settings.authorizations.description": {
-    "message": "Коли ви авторизуєтеся у застосунку за допомогою Modrinth, ви надаєте йому доступ до вашого облікового запису. Ви завжди можете переглядати й керувати доступом до свого облікового запису тут."
+    "message": "Коли ви авторизуєтеся в застосунку за допомогою Modrinth, ви надаєте йому доступ до вашого облікового запису. Ви завжди можете переглядати й керувати доступом до свого облікового запису тут."
   },
   "settings.authorizations.empty-state.description": {
     "message": "Авторизовані вами застосунки зʼявляться тут."
@@ -5227,6 +5278,9 @@
   },
   "settings.billing.plan.title": {
     "message": "{size} план"
+  },
+  "settings.billing.price.includes-tax": {
+    "message": "Податок: {amount}"
   },
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
@@ -5453,6 +5507,21 @@
   "ui.newsletter-button.tooltip": {
     "message": "Підписатися на розсилку новин Modrinth"
   },
+  "ui.two-factor-code.authentication-code": {
+    "message": "Шестизначний код автентифікації"
+  },
+  "ui.two-factor-code.backup-code": {
+    "message": "Резервний код"
+  },
+  "ui.two-factor-code.backup-code.placeholder": {
+    "message": "Уведіть резервний код"
+  },
+  "ui.two-factor-code.use-authentication-code": {
+    "message": "Використати код автентифікатора"
+  },
+  "ui.two-factor-code.use-backup-code": {
+    "message": "Використати резервний код"
+  },
   "version.all-versions": {
     "message": "Усі версії"
   },
@@ -5472,7 +5541,7 @@
     "message": "Переглянути версію"
   },
   "version.download.download-dependency": {
-    "message": "Обрати версію для завантаження"
+    "message": "Вибрати версію для завантаження"
   },
   "version.download.no-primary-file": {
     "message": "Помилка: Не знайдено основного файлу"
@@ -5526,7 +5595,7 @@
     "message": "Зібрати в мод"
   },
   "version.package-as-mod.description": {
-    "message": "Це створить нову версію з підтримкою обраних завантажувачів. Вас буде перенаправлено на нову версію, яку зможете редагувати на свій смак."
+    "message": "Це створить нову версію з підтримкою вибраних завантажувачів. Вас буде перенаправлено на нову версію, яку зможете редагувати на свій смак."
   },
   "version.package-as-mod.header": {
     "message": "Спакувати пакет даних як мод"

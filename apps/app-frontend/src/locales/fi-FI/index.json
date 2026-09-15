@@ -35,9 +35,6 @@
   "app.action-bar.install.unknown-instance": {
     "message": "Tuntematon instanssi"
   },
-  "app.action-bar.installs": {
-    "message": "Asennukset"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "Aseta ensisijaiseksi instanssiksi"
   },

@@ -1,30 +1,24 @@
 <template>
-	<RouterLink
-		v-if="typeof to === 'string'"
-		:to="to"
+	<component
+		:is="isLink ? RouterLink : 'button'"
+		:to="isLink ? to : undefined"
 		v-bind="$attrs"
-		:active-class="isSubpage ? '' : undefined"
+		:disabled="isLink ? undefined : disabled"
+		:active-class="isLink && isSubpage ? '' : undefined"
 		:class="{
 			'router-link-active': isPrimary && isPrimary(route),
 			'subpage-active': isSubpage && isSubpage(route),
 			disabled: disabled,
 		}"
-		class="w-12 h-12 text-primary rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast"
+		class="nav-button border-none text-primary cursor-pointer w-12 rounded-full h-12 flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast"
+		@click="onClick"
 	>
 		<slot />
-	</RouterLink>
-	<button
-		v-else
-		v-bind="$attrs"
-		class="button-animation border-none text-primary cursor-pointer w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast"
-		:disabled="disabled"
-		@click="to"
-	>
-		<slot />
-	</button>
+	</component>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { RouteLocationNormalizedLoaded } from 'vue-router'
 import { RouterLink, useRoute } from 'vue-router'
 
@@ -32,7 +26,7 @@ const route = useRoute()
 
 type RouteFunction = (route: RouteLocationNormalizedLoaded) => boolean
 
-withDefaults(
+const props = withDefaults(
 	defineProps<{
 		to: (() => void) | string
 		isPrimary?: RouteFunction
@@ -45,12 +39,38 @@ withDefaults(
 	},
 )
 
+const isLink = computed(() => typeof props.to === 'string')
+
+function onClick() {
+	if (typeof props.to === 'function') {
+		props.to()
+	}
+}
+
 defineOptions({
 	inheritAttrs: false,
 })
 </script>
 
 <style lang="scss" scoped>
+.nav-button {
+	position: relative;
+
+	&::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background-color: var(--color-button-bg-selected);
+		border-radius: 50%;
+		opacity: 0;
+		scale: 0.4;
+		z-index: -1;
+		transition:
+			opacity 0.25s var(--ease-out-expo),
+			scale 0.25s var(--ease-out-expo);
+	}
+}
+
 .router-link-active,
 .subpage-active {
 	svg {
@@ -59,7 +79,12 @@ defineOptions({
 }
 
 .router-link-active {
-	@apply text-[--color-button-text-selected] bg-[--color-button-bg-selected];
+	@apply text-[--color-button-text-selected];
+	&::before {
+		background-color: var(--color-button-bg-selected);
+		scale: 1;
+		opacity: 1;
+	}
 }
 
 .subpage-active {

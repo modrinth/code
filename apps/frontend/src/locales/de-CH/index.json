@@ -581,14 +581,8 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Speicher Inhalte die du magst und erhalte updates mit einem klick."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Folge Projekten"
-  },
   "app-marketing.features.importing.description": {
-    "message": "Importiere alle deine Lieblingsprofile von Launchern welche du vorher verwendet hast, und starte mit Modrinth App in Sekundenschnelle!"
+    "message": "Importiere all deine existierenden Instanzen von einem zuvor benutzten Launcher und starte in Sekunden!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -597,7 +591,13 @@
     "message": "MultiMC"
   },
   "app-marketing.features.importing.title": {
-    "message": "Profile importieren"
+    "message": "Importieren von Instanzen"
+  },
+  "app-marketing.features.manage-skins.description": {
+    "message": "Wechsle direkt in der App zwischen all deinen Minecraft-Skins."
+  },
+  "app-marketing.features.manage-skins.title": {
+    "message": "Skin-Auswahl"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Aktionen"
@@ -623,14 +623,8 @@
   "app-marketing.features.mod-management.version": {
     "message": "Version"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Spiele mit deinen Mods, egal ob du mit dem Internet verbunden bist oder nicht."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Offline Modus"
-  },
   "app-marketing.features.open-source.description": {
-    "message": "Modrinth's Launcher ist komplett quelloffen. Du kannst den Quellcode auf unserem <github-link>GitHub</github-link> finden!"
+    "message": "Die Modrinth App ist vollständig Open Source. Den Quellcode kannst du auf unserem <github-link>GitHub</github-link> einsehen!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Quelloffen"
@@ -642,7 +636,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App läuft besser als viele der führenden Mod Manager. Es verwendet nur 150 MB Arbeitsspeicher!"
+    "message": "Die Modrinth App läuft besser als viele der führenden Mod-Manager!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -652,15 +646,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"
@@ -685,6 +670,12 @@
   },
   "app-marketing.features.play.title": {
     "message": "Spiele mit deinen Lieblings-Mods"
+  },
+  "app-marketing.features.settings-sync.description": {
+    "message": "Verwende dieselben Optionen, Ressourcenpakete und vieles mehr in allen deinen Instanzen."
+  },
+  "app-marketing.features.settings-sync.title": {
+    "message": "Einstellungen synchronisieren"
   },
   "app-marketing.features.sharing.description": {
     "message": "Erstelle, teile und Spiele mit Modpaketen mit tausenden von Mods und Modpaketen auf Modrinth."
@@ -905,6 +896,9 @@
   "auth.sign-in.last-sign-in": {
     "message": "Zuletzt benutzt"
   },
+  "auth.sign-in.launcher.callback.title": {
+    "message": "Callback für die Anmeldung bei der Modrinth App"
+  },
   "auth.sign-in.launcher.complete.description": {
     "message": "Wir leiten dich zurück zur Modrinth-App. Sollte nichts passieren, klicke bitte auf die Schaltfläche unten."
   },
@@ -916,6 +910,12 @@
   },
   "auth.sign-in.launcher.complete.title": {
     "message": "Du bist angemeldet"
+  },
+  "auth.sign-in.launcher.opening.description": {
+    "message": "Falls sich die App nicht öffnet, klicke auf den Button unten, um die Anmeldung abzuschließen."
+  },
+  "auth.sign-in.launcher.opening.title": {
+    "message": "Modrinth App wird geöffnet..."
   },
   "auth.sign-in.no-account": {
     "message": "Du hast kein Konto?"
@@ -949,6 +949,9 @@
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Ein Konto erstellen"
+  },
+  "auth.two-factor.incorrect-code": {
+    "message": "Der Zwei-Faktor-Code ist falsch. Versuche es erneut oder verwende einen Sicherungscode."
   },
   "auth.verify-email.action.account-settings": {
     "message": "Kontoeinstellungen"
@@ -3882,7 +3885,10 @@
     "message": "Projekt löschen"
   },
   "project.settings.disclosures.advertising.description.1": {
-    "message": "Du musst dies aktivieren, wenn dein Projekt Werbung, Sponsoren oder Werbeaktionen für andere Werke enthält."
+    "message": "Muss aktiviert werden, wenn dieses Projekt Werbung, Sponsoring oder Werbeaktionen anderer Werke enthält."
+  },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "Dies bezieht sich nicht auf unaufdringliche Werbung relevanter Inhalte ohne direkten Geldwert (z. B. ein Link zu einem Modrinth-Profil in eigenen Konfigurationsmenüs) und bezieht sich nicht auf Werbungen auf der Projektseite wie gesponserte Banner in der Beschreibung."
   },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "z.B: Fügt den SMP-Server von Modrinth automatisch zu deiner Serverliste hinzu."
@@ -3890,17 +3896,32 @@
   "project.settings.disclosures.advertising.title": {
     "message": "Enthält Werbung"
   },
+  "project.settings.disclosures.ai-functionality.description": {
+    "message": "Muss aktiviert werden, wenn das Projekt über Funktionen verfügt, die generative KI nutzen, wie z. B. einen In-Game-Chatbot oder dynamisch generierte Texturen."
+  },
+  "project.settings.disclosures.ai-functionality.note-placeholder": {
+    "message": "z. B. NPCs, die generative KI für Dialogoptionen verwenden."
+  },
+  "project.settings.disclosures.ai-functionality.title": {
+    "message": "Enthält generative KI-Funktionalität"
+  },
   "project.settings.disclosures.ai.description": {
-    "message": "Du musst dies aktivieren, wenn dieses Projekt einen erheblichen Anteil an KI-generiertem Code enthält, wenn Assets vorhanden sind, die zu einem wesentlichen Teil KI-generiert sind, wenn die Funktionalität des Projekts auf dem Einsatz von generativer KI beruht oder wenn Elemente der Projektseite wie die Beschreibung oder die Veröffentlichung generativer KI basieren."
+    "message": "Muss aktiviert werden, wenn dieses Projekt irgendwelche von KI generierten Assets oder Texte enthält oder wenn es eine beträchtliche Menge von KI generierten Code enthält."
+  },
+  "project.settings.disclosures.ai.description.2": {
+    "message": "Es ist wichtig, ehrlich zu sein, wenn generative KI eine wichtige Rolle bei der Erstellung oder Veröffentlichung dieser Inhalte gespielt hat. Eine einfache Möglichkeit, darüber nachzudenken, ist, wenn man die KI als Co-Autor des Projekts betrachten würden, sollten man es hier offen legen."
   },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "z. B. Die chinesische und arabische Übersetzung wurden mit KI generiert."
+  },
+  "project.settings.disclosures.ai.still-unsure": {
+    "message": "Noch unsicher? Weitere Informationen gibt es in unserem Guide zur <faq-link>Offenlegung und Nutzung von KI</faq-link> und in Abschnitt 6 von <rules>Modrinths Inhaltsregeln</rules>."
   },
   "project.settings.disclosures.ai.title": {
     "message": "Enthält KI-generierte Inhalte"
   },
   "project.settings.disclosures.ai.types-description": {
-    "message": "Wofür wird generative KI verwendet?"
+    "message": "Welche Arten von Inhalten wurden mit KI generiert?"
   },
   "project.settings.disclosures.archived.banner-preview": {
     "message": "Bannervorschau"
@@ -3938,11 +3959,20 @@
   "project.settings.disclosures.derivative.note-label": {
     "message": "Erkläre, inwiefern dein Projekt auf dem Originalwerk basiert"
   },
+  "project.settings.disclosures.derivative.note-placeholder": {
+    "message": "Dies ist ein Fork, welcher ein paar neue Biome hinzufügt und auf neuere Minecraft-Versionen aktualisiert."
+  },
   "project.settings.disclosures.derivative.title": {
     "message": "Enthält abgeleitete Inhalte"
   },
   "project.settings.disclosures.description": {
     "message": "Du musst deinem Projekt alle erforderlichen Angaben zum Inhalt hinzufügen, die den <rules>Inhaltsrichtlinien von Modrinth</rules> entsprechen."
+  },
+  "project.settings.disclosures.description.2": {
+    "message": "Unsicher, wie die Offenlegung von Inhalten auf das Projekt angewendet werden soll? Schau in unsere <faq-link>FAQ zu Inhaltsangeben</faq-link>."
+  },
+  "project.settings.disclosures.info-tooltip": {
+    "message": "Klicke, um mehr darüber zu erfahren, wann Offenlegungen verwendet werden sollen."
   },
   "project.settings.disclosures.last-updated": {
     "message": "Zuletzt aktualisiert {date} von {user}"
@@ -3960,7 +3990,7 @@
     "message": "Bitte <contact-support-link>wende dich an den Support</contact-support-link>, falls diese Angabe bearbeitet oder entfernt werden soll."
   },
   "project.settings.disclosures.paid-features.description": {
-    "message": "Du musst dies aktivieren, falls dein Projekt Funktionen enthält, die gegen echtes Geld erworben werden können."
+    "message": "Muss aktiviert werden, wenn dieses Projekt Funktionen enthält, die durch das Ausgeben von echtem Geld freigeschaltet werden können."
   },
   "project.settings.disclosures.paid-features.feature-placeholder": {
     "message": "z.B. Cosmetics als Patreon-Belohnung"
@@ -5010,7 +5040,7 @@
     "message": "Der eingegebene Code ist ungültig!"
   },
   "settings.account.two-factor.field.code.description": {
-    "message": "Bitte gib einen Zwei-Faktor-Code ein, um fortzufahren."
+    "message": "Gin einen Code aus deiner Authentifizierungs-App ein oder verwende einen deiner Sicherungscodes."
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Zwei-Faktor-Code eingeben"
@@ -5485,6 +5515,21 @@
   },
   "ui.newsletter-button.tooltip": {
     "message": "Abonniere den Modrinth Newsletter"
+  },
+  "ui.two-factor-code.authentication-code": {
+    "message": "Sechsstelliger Authentifizierungscode"
+  },
+  "ui.two-factor-code.backup-code": {
+    "message": "Sicherungscode"
+  },
+  "ui.two-factor-code.backup-code.placeholder": {
+    "message": "Sicherungscode eingeben"
+  },
+  "ui.two-factor-code.use-authentication-code": {
+    "message": "Verwende einen Authentifizierungscode"
+  },
+  "ui.two-factor-code.use-backup-code": {
+    "message": "Verwende einen Sicherungscode"
   },
   "version.all-versions": {
     "message": "Alle Versionen"

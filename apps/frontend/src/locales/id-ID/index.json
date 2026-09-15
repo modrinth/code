@@ -5,6 +5,18 @@
   "action.continue": {
     "message": "Lanjutkan"
   },
+  "ads-consent.accept": {
+    "message": "Terima semua"
+  },
+  "ads-consent.manage": {
+    "message": "Kelola preferensi"
+  },
+  "ads-consent.reject": {
+    "message": "Tolak semua"
+  },
+  "ads-consent.title": {
+    "message": "Privasi Anda dan bagaimana iklan-iklan mendukung Modrinth"
+  },
   "analytics.action.add": {
     "message": "Tambah"
   },
@@ -20,6 +32,15 @@
   "analytics.breakdown.country": {
     "message": "Negara"
   },
+  "analytics.breakdown.dependent-on": {
+    "message": "Terikat pada"
+  },
+  "analytics.breakdown.dependent-project-download": {
+    "message": "Proyek terikat"
+  },
+  "analytics.breakdown.dependent-project-type": {
+    "message": "Jenis proyek terikat"
+  },
   "analytics.breakdown.download-reason": {
     "message": "Alasan pengunduhan"
   },
@@ -34,6 +55,9 @@
   },
   "analytics.breakdown.loader": {
     "message": "Pemuat"
+  },
+  "analytics.breakdown.members": {
+    "message": "Anggota"
   },
   "analytics.breakdown.monetization": {
     "message": "Monetisasi"
@@ -130,6 +154,9 @@
   },
   "analytics.chart.tooltip.hide-entry": {
     "message": "Sembunyikan {name} di grafik"
+  },
+  "analytics.chart.tooltip.no-data": {
+    "message": "Tidak ada data"
   },
   "analytics.chart.tooltip.pinned-aria": {
     "message": "Disematkan"
@@ -263,23 +290,11 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Simpan konten yang Anda suka dan dapatkan pembaruan dengan satu klik saja."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Ikuti proyek"
-  },
-  "app-marketing.features.importing.description": {
-    "message": "Impor semua profil favorit Anda dari launcher yang telah Anda gunakan sebelumnya, dan mulai menggunakan Modrinth App dalam hitungan detik!"
-  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
-  },
-  "app-marketing.features.importing.title": {
-    "message": "Pengimporan profil"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Tindakan"
@@ -305,15 +320,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Versi"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Mainkan mod Anda, baik saat daring maupun luring."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Mode luring"
-  },
-  "app-marketing.features.open-source.description": {
-    "message": "Peluncur Modrinth sepenuhnya bersumber terbuka. Anda dapat melihat kode sumber pada <github-link>GitHub</github-link> kami!"
-  },
   "app-marketing.features.open-source.title": {
     "message": "Sumber terbuka"
   },
@@ -323,9 +329,6 @@
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
   },
-  "app-marketing.features.performance.description": {
-    "message": "Modrinth App bekerja lebih baik daripada pengelola mod ternama lainnya, dengan menggunakan hanya 150 MB RAM!"
-  },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
   },
@@ -334,12 +337,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"
@@ -891,19 +888,19 @@
     "message": "Nomor identitas penduduk"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder": {
-    "message": "Masukan nomor identitas penduduk"
+    "message": "Masukkan nomor identitas penduduk"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc": {
     "message": "Nomor RUC"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
-    "message": "Masukan nomor RUC"
+    "message": "Masukkan nomor RUC"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
     "message": "Nomor identitas pajak"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
-    "message": "Masukan nomor identitas pajak"
+    "message": "Masukkan nomor identitas pajak"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.network": {
     "message": "Jaringan"

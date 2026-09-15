@@ -193,6 +193,7 @@ import _ListOrderedIcon from './icons/list-ordered.svg?component'
 import _ListPlusIcon from './icons/list-plus.svg?component'
 import _LoaderIcon from './icons/loader.svg?component'
 import _LoaderCircleIcon from './icons/loader-circle.svg?component'
+import _LoaderSpinnerIcon from './icons/loader-spinner.svg?component'
 import _LockIcon from './icons/lock.svg?component'
 import _LockOpenIcon from './icons/lock-open.svg?component'
 import _LogInIcon from './icons/log-in.svg?component'
@@ -205,6 +206,7 @@ import _MegaphoneIcon from './icons/megaphone.svg?component'
 import _MemoryStickIcon from './icons/memory-stick.svg?component'
 import _MessageIcon from './icons/message.svg?component'
 import _MessagesSquareIcon from './icons/messages-square.svg?component'
+import _MicrochipIcon from './icons/microchip.svg?component'
 import _MicrophoneIcon from './icons/microphone.svg?component'
 import _MinimizeIcon from './icons/minimize.svg?component'
 import _MinusIcon from './icons/minus.svg?component'
@@ -657,6 +659,7 @@ export const ListOrderedIcon = _ListOrderedIcon
 export const ListPlusIcon = _ListPlusIcon
 export const LoaderIcon = _LoaderIcon
 export const LoaderCircleIcon = _LoaderCircleIcon
+export const LoaderSpinnerIcon = _LoaderSpinnerIcon
 export const LockIcon = _LockIcon
 export const LockOpenIcon = _LockOpenIcon
 export const LogInIcon = _LogInIcon
@@ -669,6 +672,7 @@ export const MegaphoneIcon = _MegaphoneIcon
 export const MemoryStickIcon = _MemoryStickIcon
 export const MessageIcon = _MessageIcon
 export const MessagesSquareIcon = _MessagesSquareIcon
+export const MicrochipIcon = _MicrochipIcon
 export const MicrophoneIcon = _MicrophoneIcon
 export const MinimizeIcon = _MinimizeIcon
 export const MinusIcon = _MinusIcon

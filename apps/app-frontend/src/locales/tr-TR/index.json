@@ -95,9 +95,6 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "Paylaşılmış içerik güncelleniyor"
   },
-  "app.action-bar.installs": {
-    "message": "Yüklenenler"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "Birincil kurulum yap"
   },
@@ -284,6 +281,21 @@
   "app.content-install.no-compatible-versions": {
     "message": "Kullanılabilir sürümler {compatibilityLabel} ile eşleşmiyor. Yine de kurulacak bir sürüm seçin. Bağımlılıklar otomatik olarak yüklenmeyecektir."
   },
+  "app.content.desync-pack": {
+    "message": "Sekronizasyonu devre dışı bırak"
+  },
+  "app.content.sync-data-packs-disabled": {
+    "message": "İlk önce uygulama ayarlarından paket sekronizasyonunu aç."
+  },
+  "app.content.sync-pack": {
+    "message": "Sekronize et"
+  },
+  "app.content.sync-packs-override": {
+    "message": "İlk önce uygulama ayarlarından paket senkronizasyonunu kapat."
+  },
+  "app.content.sync-resource-packs-disabled": {
+    "message": "Öncelikle uygulama ayarlarından Kaynak Paketi eşitlemeyi açın."
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "Yedekler klasörünü aç"
   },
@@ -314,6 +326,57 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.features-settings.instance-pages.title": {
+    "message": "Profiller"
+  },
+  "app.features-settings.play-page.title": {
+    "message": "Başlatma Sayfası"
+  },
+  "app.features-settings.quick-instances.description": {
+    "message": "Sol menüde kaç tane profilin gözükeceğini seçin. Bunu aynı zamanda ayarlayıcıyı sürükleyerek de yapabilirsiniz."
+  },
+  "app.features-settings.quick-instances.title": {
+    "message": "Yan menüde hızlı profiller"
+  },
+  "app.features-settings.show-all-screenshots.description": {
+    "message": "Sol menüde tüm profillerinizdeki ekran görüntülerini gösterecek düğmeyi göster."
+  },
+  "app.features-settings.show-all-screenshots.title": {
+    "message": "Yan menüde tüm ekran görüntülerini göster"
+  },
+  "app.features-settings.show-files-tab.title": {
+    "message": "Profilde \"Dosyalar\" sekmesini göster"
+  },
+  "app.features-settings.show-jump-in.description": {
+    "message": "Başlatma Sayfası'nnda en son oynaılan dünyaları ve profilleri göster."
+  },
+  "app.features-settings.show-jump-in.title": {
+    "message": "Hızlı Oyna kısmını göster"
+  },
+  "app.features-settings.show-screenshots-tab.title": {
+    "message": "Profilde \"Ekran Görüntüleri\" sekmesini göster"
+  },
+  "app.features-settings.show-skin-selector.description": {
+    "message": "Yan menüde kıyafet seçici için düğme göster."
+  },
+  "app.features-settings.show-skin-selector.title": {
+    "message": "Yan menüde Kıyafet seçiciyi göster"
+  },
+  "app.features-settings.show-worlds-tab.title": {
+    "message": "Profilde \"Dünyalar\" sekmesini göster"
+  },
+  "app.features-settings.sidebar.title": {
+    "message": "Yan Menü"
+  },
+  "app.features-settings.sync-across-devices.description": {
+    "message": "Bu özellik ayarlarını oturumunuzun açık olduğu her yerde kullanın. Bu cihazda farklı ayarlar tutmak için bu özelliği kapatın."
+  },
+  "app.features-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Ayarları eşitlemek için bir Modrinth Hesabı'yla oturum açın."
+  },
+  "app.features-settings.sync-across-devices.title": {
+    "message": "Cihazlar arası özellikleri eşitle"
+  },
   "app.home.jump-back-in.actions.label": {
     "message": "Kurulum eylemleri"
   },
@@ -342,7 +405,7 @@
     "message": "Kurulumu göster"
   },
   "app.hosting.update-required.description": {
-    "message": "Modrinth Hosting'i Modrinth App'ten kullanmak için güncelleyin"
+    "message": "Modrinth Hosting'i Modrinth App'ten kullanmak için güncellemeniz gerekiyor"
   },
   "app.hosting.update-required.download": {
     "message": "Güncellemeyi indir"
@@ -760,6 +823,18 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Sunucuyu kaldır"
+  },
+  "app.instance.worlds.remove-server-modal.remove-everywhere": {
+    "message": "Her yerdenn sil"
+  },
+  "app.instance.worlds.remove-server-modal.remove-here": {
+    "message": "Bu profilden sil"
+  },
+  "app.instance.worlds.remove-server-modal.synced-description": {
+    "message": "Sadece bu profilde veya eşitlenmiş tüm profillerden kaldırabilirsiniz. Sadece bu profilden silmek, eşitlemeden çıkacak; gelecekteki eşitlenmiş sunucu  değişikliklerinden faydalanamayacaktır."
+  },
+  "app.instance.worlds.remove-server-modal.synced-header": {
+    "message": "Bu sunucu eşitlendi"
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Sunucuyu kaldır"
@@ -1562,6 +1637,345 @@
   "app.settings.downloading": {
     "message": "v{version} indiriliyor"
   },
+  "app.settings.game-options.category.accessibility.description": {
+    "message": "Erişilebilirlik seçenekleri"
+  },
+  "app.settings.game-options.category.accessibility.label": {
+    "message": "Erişebilirlik"
+  },
+  "app.settings.game-options.category.chat.description": {
+    "message": "Sohbet görünürlüğü ve görünümü"
+  },
+  "app.settings.game-options.category.chat.label": {
+    "message": "Sohbet"
+  },
+  "app.settings.game-options.category.controls.description": {
+    "message": "Fare, hareket ve tuş atamaları"
+  },
+  "app.settings.game-options.category.controls.label": {
+    "message": "Kontroller"
+  },
+  "app.settings.game-options.category.custom.description": {
+    "message": "Modlar tarafından eklenen seçenekler"
+  },
+  "app.settings.game-options.category.custom.label": {
+    "message": "Özel seçenekler"
+  },
+  "app.settings.game-options.category.language.description": {
+    "message": "Oyun dili"
+  },
+  "app.settings.game-options.category.language.label": {
+    "message": "Dil"
+  },
+  "app.settings.game-options.category.music-and-sound.description": {
+    "message": "Ses seviyesi ve ses seçenekleri"
+  },
+  "app.settings.game-options.category.music-and-sound.label": {
+    "message": "Müzik ve ses"
+  },
+  "app.settings.game-options.category.online.description": {
+    "message": "Çevrimiçi ve Realm seçenekleri"
+  },
+  "app.settings.game-options.category.online.label": {
+    "message": "Çevrimiçi"
+  },
+  "app.settings.game-options.category.skin-customization.description": {
+    "message": "Kıyafet katmanları ve ana el"
+  },
+  "app.settings.game-options.category.skin-customization.label": {
+    "message": "Kıyafet kişiselleştirme"
+  },
+  "app.settings.game-options.category.video.description": {
+    "message": "Kamera ve görüntü seçenekleri"
+  },
+  "app.settings.game-options.category.video.label": {
+    "message": "Video"
+  },
+  "app.settings.game-options.choice.all": {
+    "message": "Hepsi"
+  },
+  "app.settings.game-options.choice.balanced": {
+    "message": "Dengeli"
+  },
+  "app.settings.game-options.choice.by-player": {
+    "message": "Önce oyuncu"
+  },
+  "app.settings.game-options.choice.chat": {
+    "message": "Sohbet"
+  },
+  "app.settings.game-options.choice.commands-only": {
+    "message": "Sadece komutlar"
+  },
+  "app.settings.game-options.choice.constant": {
+    "message": "Sürekli"
+  },
+  "app.settings.game-options.choice.crosshair": {
+    "message": "Nişangah"
+  },
+  "app.settings.game-options.choice.custom": {
+    "message": "Özel"
+  },
+  "app.settings.game-options.choice.decreased": {
+    "message": "Azaltılmış"
+  },
+  "app.settings.game-options.choice.default": {
+    "message": "Varsayılan"
+  },
+  "app.settings.game-options.choice.fabulous": {
+    "message": "Mükemmel"
+  },
+  "app.settings.game-options.choice.fancy": {
+    "message": "Şık"
+  },
+  "app.settings.game-options.choice.far": {
+    "message": "Uzak"
+  },
+  "app.settings.game-options.choice.fast": {
+    "message": "Hızlı"
+  },
+  "app.settings.game-options.choice.frequent": {
+    "message": "Sık"
+  },
+  "app.settings.game-options.choice.hidden": {
+    "message": "Gizli"
+  },
+  "app.settings.game-options.choice.hotbar": {
+    "message": "Hotbar"
+  },
+  "app.settings.game-options.choice.left": {
+    "message": "Sol"
+  },
+  "app.settings.game-options.choice.limited": {
+    "message": "Sınırlı"
+  },
+  "app.settings.game-options.choice.max-fps": {
+    "message": "Max FPS"
+  },
+  "app.settings.game-options.choice.maximum": {
+    "message": "Maksimum"
+  },
+  "app.settings.game-options.choice.minimal": {
+    "message": "Minimal"
+  },
+  "app.settings.game-options.choice.minimum": {
+    "message": "Minimum"
+  },
+  "app.settings.game-options.choice.nearby": {
+    "message": "Yakınlar"
+  },
+  "app.settings.game-options.choice.never": {
+    "message": "Asla"
+  },
+  "app.settings.game-options.choice.none": {
+    "message": "Hiç"
+  },
+  "app.settings.game-options.choice.normal": {
+    "message": "Normal"
+  },
+  "app.settings.game-options.choice.off": {
+    "message": "Kapalı"
+  },
+  "app.settings.game-options.choice.on": {
+    "message": "Açık"
+  },
+  "app.settings.game-options.choice.opengl": {
+    "message": "OpenGL"
+  },
+  "app.settings.game-options.choice.pause": {
+    "message": "Duraklatma menüsü"
+  },
+  "app.settings.game-options.choice.pause-and-toast": {
+    "message": "Duraklatma menüsü ve "
+  },
+  "app.settings.game-options.choice.power-saver": {
+    "message": "Enerji Tasarrufu"
+  },
+  "app.settings.game-options.choice.right": {
+    "message": "Sağ"
+  },
+  "app.settings.game-options.choice.short": {
+    "message": "Kısa"
+  },
+  "app.settings.game-options.choice.shown": {
+    "message": "Göster"
+  },
+  "app.settings.game-options.choice.system": {
+    "message": "Sistem"
+  },
+  "app.settings.game-options.choice.tiny": {
+    "message": "Minik"
+  },
+  "app.settings.game-options.choice.vulkan": {
+    "message": "Vulkan"
+  },
+  "app.settings.game-options.choice.when-minimized": {
+    "message": "Simge durumuna küçültüldüğünde"
+  },
+  "app.settings.game-options.choice.while-afk": {
+    "message": "AFK kalındığında"
+  },
+  "app.settings.game-options.compatibility.none": {
+    "message": "Bazı profilleriniz bu ayarı kullanamaz"
+  },
+  "app.settings.game-options.compatibility.reason.launcher-controlled": {
+    "message": "Bu ayar Modrinth'in başlatma seçenekleri tarafından yönetiliyor"
+  },
+  "app.settings.game-options.custom-value.placeholder": {
+    "message": "Bir değer gir"
+  },
+  "app.settings.game-options.keybind.assigned-status": {
+    "message": "{setting} artık {binding}"
+  },
+  "app.settings.game-options.keybind.cancelled-status": {
+    "message": "Tuş atama değişikliği iptal edildi."
+  },
+  "app.settings.game-options.keybind.change": {
+    "message": "{setting}: {binding}. Atamayı değiştirmek için etkinleştirin."
+  },
+  "app.settings.game-options.keybind.choose": {
+    "message": "Tuş seçin"
+  },
+  "app.settings.game-options.keybind.conflict-description": {
+    "message": "Bu tuş zaten {settings} tarafından kullanılıyor."
+  },
+  "app.settings.game-options.keybind.key.arrow-down": {
+    "message": "Aşağı ok"
+  },
+  "app.settings.game-options.keybind.key.arrow-left": {
+    "message": "Sol ok"
+  },
+  "app.settings.game-options.keybind.key.arrow-right": {
+    "message": "Sağ ok"
+  },
+  "app.settings.game-options.keybind.key.arrow-up": {
+    "message": "Yukarı ok"
+  },
+  "app.settings.game-options.keybind.key.backspace": {
+    "message": "Geri silme tuşu"
+  },
+  "app.settings.game-options.keybind.key.caps-lock": {
+    "message": "Caps Lock"
+  },
+  "app.settings.game-options.keybind.key.delete": {
+    "message": "Sil"
+  },
+  "app.settings.game-options.keybind.key.end": {
+    "message": "End"
+  },
+  "app.settings.game-options.keybind.key.enter": {
+    "message": "Enter"
+  },
+  "app.settings.game-options.keybind.key.escape": {
+    "message": "Escape"
+  },
+  "app.settings.game-options.keybind.key.home": {
+    "message": "Home"
+  },
+  "app.settings.game-options.keybind.key.insert": {
+    "message": "Insert"
+  },
+  "app.settings.game-options.keybind.key.keypad-key": {
+    "message": "Numpad {key}"
+  },
+  "app.settings.game-options.keybind.key.left-alt": {
+    "message": "Sol Alt"
+  },
+  "app.settings.game-options.keybind.key.left-command": {
+    "message": "Sol Command"
+  },
+  "app.settings.game-options.keybind.key.left-control": {
+    "message": "Sol Ctrl"
+  },
+  "app.settings.game-options.keybind.key.left-shift": {
+    "message": "Sol Shift"
+  },
+  "app.settings.game-options.keybind.key.left-super": {
+    "message": "Sol Super"
+  },
+  "app.settings.game-options.keybind.key.menu": {
+    "message": "Menu"
+  },
+  "app.settings.game-options.keybind.key.num-lock": {
+    "message": "Num Lock"
+  },
+  "app.settings.game-options.keybind.key.page-down": {
+    "message": "Page Down"
+  },
+  "app.settings.game-options.keybind.key.page-up": {
+    "message": "Page Up"
+  },
+  "app.settings.game-options.keybind.key.pause": {
+    "message": "Pause"
+  },
+  "app.settings.game-options.keybind.key.print-screen": {
+    "message": "Print Screen"
+  },
+  "app.settings.game-options.keybind.key.right-alt": {
+    "message": "Sağ Alt"
+  },
+  "app.settings.game-options.keybind.key.right-command": {
+    "message": "Sağ Command"
+  },
+  "app.settings.game-options.keybind.key.right-control": {
+    "message": "Sağ Ctrl"
+  },
+  "app.settings.game-options.keybind.key.right-shift": {
+    "message": "Sağ Shift"
+  },
+  "app.settings.game-options.keybind.key.right-super": {
+    "message": "Sağ Super"
+  },
+  "app.settings.game-options.keybind.key.scroll-lock": {
+    "message": "Scroll Lock"
+  },
+  "app.settings.game-options.keybind.key.space": {
+    "message": "Boşluk"
+  },
+  "app.settings.game-options.keybind.key.tab": {
+    "message": "Tab"
+  },
+  "app.settings.game-options.keybind.key.unbound": {
+    "message": "Atanmamış"
+  },
+  "app.settings.game-options.keybind.key.unknown": {
+    "message": "Bilinmeyen tuş"
+  },
+  "app.settings.game-options.keybind.listen": {
+    "message": "Tuşa basın…"
+  },
+  "app.settings.game-options.keybind.listening-status": {
+    "message": "Bir tuşa veya fare düğmesine basılması bekleniyor. Bu atamayı temizlemek için Escape'e basın."
+  },
+  "app.settings.game-options.keybind.mixed": {
+    "message": "Profillere göre farklılık gösterir"
+  },
+  "app.settings.game-options.keybind.modifier.alt": {
+    "message": "Alt"
+  },
+  "app.settings.game-options.keybind.modifier.command": {
+    "message": "Command"
+  },
+  "app.settings.game-options.keybind.modifier.control": {
+    "message": "Ctrl"
+  },
+  "app.settings.game-options.keybind.modifier.shift": {
+    "message": "Shift"
+  },
+  "app.settings.game-options.keybind.modifier.super": {
+    "message": "Super"
+  },
+  "app.settings.game-options.keybind.mouse.button": {
+    "message": "Fare {button}"
+  },
+  "app.settings.game-options.keybind.mouse.left": {
+    "message": "Sol Fare"
+  },
+  "app.settings.game-options.keybind.mouse.middle": {
+    "message": "Orta Fare"
+  },
+  "app.settings.game-options.keybind.mouse.right": {
+    "message": "Sağ Fare"
+  },
   "app.settings.java-installations.location.title": {
     "message": "Java {version, number} konumu"
   },
@@ -1640,15 +2054,6 @@
   "app.settings.sidebar.label.instances": {
     "message": "Örnekler"
   },
-  "app.settings.synced-options.choose-sync-source.command-history-description": {
-    "message": "Komut geçmişi paylaşılan kopya haline gelen örneği seçin."
-  },
-  "app.settings.synced-options.choose-sync-source.creative-hotbars-description": {
-    "message": "Çok oyunculu sunucuları paylaşılan kopya haline gelen örneği seçin."
-  },
-  "app.settings.synced-options.choose-sync-source.multiplayer-servers-description": {
-    "message": "Çok oyunculu sunucuları paylaşılan kopya haline gelen örneği seçin."
-  },
   "app.settings.synced-options.choose-sync-source.no-instances-found": {
     "message": "Hiçbir örnek bulunamadı"
   },
@@ -1690,9 +2095,6 @@
   },
   "app.settings.synced-options.multiplayer-servers.name": {
     "message": "Sunucu adı"
-  },
-  "app.settings.synced-options.multiplayer-servers.none-synced-yet": {
-    "message": "Henüz hiçbir sunucu senkronize edilmedi"
   },
   "app.settings.tabs.appearance": {
     "message": "Görünüm"
@@ -1894,6 +2296,9 @@
   },
   "app.survey.title": {
     "message": "Merhaba Modrinth kullanıcısı!"
+  },
+  "app.sync-instances-update.skip": {
+    "message": "Atla"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} indirildi. Güncellemek için yeniden başlatın veya Modrinth App’i kapattığınızda otomatik olarak güncellenecektir."

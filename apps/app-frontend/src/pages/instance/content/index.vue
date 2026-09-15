@@ -436,6 +436,13 @@ const managedContent = computed<ManagedContentData | null>(() => {
 	const isSharedOwner = attachment?.role === 'owner'
 
 	if (
+		(linkType === 'server_project' || linkType === 'server_project_modpack') &&
+		managedContentItems.value.length === 0
+	) {
+		return null
+	}
+
+	if (
 		!isSharedOwner &&
 		(attachment || linkType === 'server_project' || linkType === 'server_project_modpack')
 	) {
@@ -842,7 +849,7 @@ async function toggleDisableMod(
 		}
 		const newPath = await toggle_disable_project(instance.value.id, mod.file_path, desiredEnabled)
 		const newFileName = fileNameFromPath(newPath)
-		const enabled = !newPath.endsWith('.disabled')
+		const enabled = desiredEnabled ?? !mod.enabled
 		mod.file_path = newPath
 		mod.file_name = newFileName
 		mod.enabled = enabled

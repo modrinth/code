@@ -560,23 +560,11 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Spara innehåll du gillar och få uppdateringar med ett klick."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Följ projekt"
-  },
-  "app-marketing.features.importing.description": {
-    "message": "Importera alla dina favoritprofiler från ditt tidigare startprogram och kom igång med Modrinth App på ett ögonblick!"
-  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
-  },
-  "app-marketing.features.importing.title": {
-    "message": "Profilimportering"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Åtgärder"
@@ -602,15 +590,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Version"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Spela dina moddar oavsett om du har en internetuppkoppling eller inte."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Offlineläge"
-  },
-  "app-marketing.features.open-source.description": {
-    "message": "Modrinths startprogram har helt öppen källkod. Du kan se källkoden på vår <github-link>GitHub</github-link>!"
-  },
   "app-marketing.features.open-source.title": {
     "message": "Öppen källkod"
   },
@@ -620,9 +599,6 @@
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
   },
-  "app-marketing.features.performance.description": {
-    "message": "Modrinth App presterar bättre än många av de ledande modhanterarna och använder bara 150 MB RAM!"
-  },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
   },
@@ -631,15 +607,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"
@@ -889,6 +856,9 @@
   },
   "auth.sign-in.launcher.complete.title": {
     "message": "Du är inloggad"
+  },
+  "auth.sign-in.launcher.opening.title": {
+    "message": "Öppnar Modrinth App..."
   },
   "auth.sign-in.no-account": {
     "message": "Har du inget konto?"
@@ -3512,26 +3482,17 @@
   "project.settings.delete-project.title": {
     "message": "Radera projekt"
   },
-  "project.settings.disclosures.advertising.description.1": {
-    "message": "Du måste aktivera detta om ditt projekt innehåller annonser, sponsorer eller kampanjer för andra verk."
-  },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "t.ex. Lägger automatiskt till Modrinth SMP-servern till din serverlista."
   },
   "project.settings.disclosures.advertising.title": {
     "message": "Innehåller marknadsföring"
   },
-  "project.settings.disclosures.ai.description": {
-    "message": "Du måste aktivera detta om projektet innehåller en betydande mängd AI-genererad kod, om det finns tillgångar som till stor del är AI-genererade, om projektets funktionalitet bygger på användning av generativ AI, eller om någon del av projektets sida som beskrivningen eller publiceringen bygger på generativ AI."
-  },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "t.ex. De kinesiska och arabiska översättningarna är AI-genererade."
   },
   "project.settings.disclosures.ai.title": {
     "message": "Innehåller AI-genererat innehåll"
-  },
-  "project.settings.disclosures.ai.types-description": {
-    "message": "Vad är det som generativ AI används för?"
   },
   "project.settings.disclosures.archived.description.1": {
     "message": "Märk ditt projekt som arkiverat för att upplysa användare om att du inte längre arbetar på det."
@@ -3580,9 +3541,6 @@
   },
   "project.settings.disclosures.lock-status.fully-locked.warning": {
     "message": "Vänligen <contact-support-link>kontakta support</contact-support-link> ifall den här upplysningen behöver ändras eller tas bort."
-  },
-  "project.settings.disclosures.paid-features.description": {
-    "message": "Du måste aktivera detta om ditt projekt innehåller funktioner som kan erhållas genom att spendera verkliga pengar."
   },
   "project.settings.disclosures.paid-features.title": {
     "message": "Innehåller betalda funktioner"
@@ -3790,6 +3748,9 @@
   },
   "project.settings.tags.title": {
     "message": "Taggar"
+  },
+  "project.slug-suggestions.label": {
+    "message": "Förslag:"
   },
   "project.versions.copy-id-option": {
     "message": "Kopiera ID"
@@ -4432,9 +4393,6 @@
   },
   "settings.account.two-factor.error.incorrect-code": {
     "message": "Koden du angav är inkorrekt!"
-  },
-  "settings.account.two-factor.field.code.description": {
-    "message": "Vänligen ange din tvåfaktorskod för att fortsätta."
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Ange tvåfaktorskod"

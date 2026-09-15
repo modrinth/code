@@ -11,6 +11,169 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-09-15T17:44:10+00:00`,
+		product: 'app',
+		version: '0.21.3',
+		body: `## Added
+- Added validation of Minecraft libraries on launch.
+
+## Changed
+- Reverted usage of links instead of duplicated content due to issues with a couple mods.`,
+	},
+	{
+		date: `2026-09-15T17:44:10+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Make analytics chart tooltips render crisper on Chromium browsers.`,
+	},
+	{
+		date: `2026-09-14T17:25:37+00:00`,
+		product: 'app',
+		version: '0.21.2',
+		body: `## Fixed
+- Fixed logo on macOS appearing below traffic light buttons.`,
+	},
+	{
+		date: `2026-09-14T16:37:42+00:00`,
+		product: 'app',
+		version: '0.21.1',
+		body: `## Changed
+- Changed resource management icon to microchip.
+
+## Fixed
+- Fixed the alignment of the Modrinth logo on windows and linux
+- Fixed issue with Resource management tab not loading when calculating storage usage.
+- Fixed issue with Sync overrides toggles not showing true state until clicked on.`,
+	},
+	{
+		date: `2026-09-14T15:44:10+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed the unsaved changes banner not showing up in Hosting settings.
+- Fixed non-USD currencies appearing broken in pricing for Modrinth Hosting.
+- Fixed issue on the invite modal for the Access tab where the friends list would overflow out of the modal container.`,
+	},
+	{
+		date: `2026-09-14T15:44:10+00:00`,
+		product: 'app',
+		version: '0.21.0',
+		body: `## Added
+- Added a download manager showing installation progress, download speeds, estimated time remaining, and groups for active, completed, and failed tasks.
+- Added controls to pause, resume, and cancel ongoing installations in the download manager.
+- Added a Content storage section in Resource management showing disk usage for unique, shared, and unused content.
+- Added controls to limit or clear unused downloads in Resource management, including mods, packs, Minecraft files, and Java installations.
+- Added automatic cleanup of unused downloads when the cache exceeds its configured limit.
+- Added "Verify and repair" in Content storage to check for missing or damaged files, repair recoverable files, and report remaining problems.
+
+## Changed
+- Consolidated identical mods, resource packs, shader packs, and data packs across new and existing instances to reduce disk usage.
+- Improved repeat modpack installations by reusing cached mrpack downloads.
+- Updated the Files tab to make managed mods and packs read-only, with changes handled through the Content tab. If you are adding custom content you must do it through the Upload button on the Content tab.
+- Improved recovery from interrupted app directory moves to preserve instances and shared content.
+- The "Managed content" card will not be shown for server project linked instances which do not have any content, e.g they are a vanilla server.
+
+## Fixed
+- Fixed issue with shared instances where an installed project which has been deleted from Modrinth would block you from pushing an update. It will now be treated as an external file.
+- Fixed issue with resource pack syncing where resource packs with missing \`pack.mcmeta\` files would completely block syncing from happening for all packs.
+- Fixed issue in the content tab for uploaded resource packs having mc color codes in their names. Now they are removed.
+- Fixed "Minimise on launch" setting not working as intended.
+- Fixed Alt + Tab causing Modrinth App to crash on windows for some users.
+- Fixed spacing on language group headers
+- Fixed failed or interrupted modpack updates leaving instance files partially replaced by restoring the previous content.
+- Fixed duplicated instances losing content update locks.
+- Fixed formatting codes showing in world names.
+- Fixed file size limit for profile pictures not being correctly notified about in the profile settings page.
+- Fixed non-USD currencies appearing broken in pricing for Modrinth Hosting.
+- Fixed issue with Allocated memory setting not saving correctly.
+- Fixed issue on Share modal for shared instances where the friends list would overflow out of the modal container.`,
+	},
+	{
+		date: `2026-09-14T15:44:10+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed spacing on language group headers
+- Fixed non-USD currencies appearing broken in pricing for Modrinth Hosting and Modrinth+.`,
+	},
+	{
+		date: `2026-09-14T02:29:42+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed project 404 errors.`,
+	},
+	{
+		date: `2026-09-14T00:11:58+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated the images on the Modrinth Hosting landing page.
+- Tooltips now appear only after a delay, no longer re-open when quickly moving to another nearby tooltip, smoothly animate between positions, and have a slight delay before closing to bring them closer to typical tooltip guidelines. Tooltip animations have also been improved to be smoother.
+- Added a slight selection animation to selecting the different tabs of the app.
+
+## Fixed
+- Fixed focus trapping of modal menus.
+- Fixed many screen reader issues. A lot more work still needs to be done here, but certain parts of the app should be much better with screen readers now.`,
+	},
+	{
+		date: `2026-09-14T00:11:58+00:00`,
+		product: 'app',
+		version: '0.20.5',
+		body: `## Changed
+- Tooltips now appear only after a delay, no longer re-open when quickly moving to another nearby tooltip, smoothly animate between positions, and have a slight delay before closing to bring them closer to typical tooltip guidelines. Tooltip animations have also been improved to be smoother.
+
+## Fixed
+- Fixed focus trapping of modal menus.
+- Fixed the action bar in the modpack content modal displaying below the modal.`,
+	},
+	{
+		date: `2026-09-11T19:36:35+00:00`,
+		product: 'web',
+		body: `## Changed
+- The random project carousels on the home page and app landing page now pull from the [Featured projects](https://modrinth.com/collection/YV97U1kk) collection.
+- Updated screenshots on the app landing page.
+- Changed some callouts on app landing page to highlight newer features like the skin manager and settings syncing.
+- Removed claims about RAM usage of Modrinth App on app landing page.
+- Switched some projects out on app landing page to freshen it up.`,
+	},
+	{
+		date: `2026-09-11T19:36:35+00:00`,
+		product: 'app',
+		version: '0.20.4',
+		body: `## Fixed
+- Fixed server projects not showing in Jump In properly.`,
+	},
+	{
+		date: `2026-09-11T16:02:39+00:00`,
+		product: 'app',
+		version: '0.20.3',
+		body: `## Fixed
+- Fixed issues with resource pack syncing causing delays when launching instances or the app.
+- Fixed issue with the "Sync your settings" notification appearing even though it's been dismissed already.`,
+	},
+	{
+		date: `2026-09-11T16:02:39+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed "Download files" action not being available for suspended Medal promo servers.`,
+	},
+	{
+		date: `2026-09-10T16:31:31+00:00`,
+		product: 'app',
+		version: '0.20.2',
+		body: `## Changed
+- Fixed slow loading issues when opening the app settings modal.
+- Fixed slow loading of the app on launch.
+- Fixed issue where the "New update" notification would keep showing up even if you've already seen it and dismissed it.
+- Updated design of slider elements`,
+	},
+	{
+		date: `2026-09-10T16:31:31+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated design of slider elements
+
+## Fixed
+- Fixed sign up page redirecting you to your profile when adding a new account.`,
+	},
+	{
 		date: `2026-09-09T22:47:33+00:00`,
 		product: 'app',
 		version: '0.20.1',

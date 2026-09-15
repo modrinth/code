@@ -1,4 +1,7 @@
 {
+  "nags.add-description.description": {
+    "defaultMessage": "Se requiere una descripción que describa el contenido, el propósito y el atractivo de tu proyecto."
+  },
   "nags.add-description.title": {
     "defaultMessage": "Añadir una descripción"
   },
@@ -20,11 +23,23 @@
   "nags.add-license-details.title": {
     "defaultMessage": "Agregar detalles de la licencia"
   },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Añade cualquier enlace relevante a recursos externos, como un sitio web, tienda, o una invitación permanente a Discord."
+  },
   "nags.add-links-server.title": {
     "defaultMessage": "Añade enlaces externos"
   },
+  "nags.add-links.description": {
+    "defaultMessage": "Añade cualquier enlace relevante a recursos externos, como el código fuente, un rastreador de incidencias o una invitación permanente a Discord."
+  },
   "nags.add-links.title": {
     "defaultMessage": "Añadir enlaces externos"
+  },
+  "nags.adjacent-headers.description": {
+    "defaultMessage": "Los encabezados del mismo nivel no deben colocarse uno al lado del otro."
+  },
+  "nags.adjacent-headers.title": {
+    "defaultMessage": "Quitar encabezados consecutivos"
   },
   "nags.all-languages.description": {
     "defaultMessage": "Has elegido todos los idiomas. Por favor elige solo a los que tu servidor de soporte activamente."
@@ -32,11 +47,23 @@
   "nags.all-languages.title": {
     "defaultMessage": "Selecciona los idiomas correspondientes"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Seleccionaste todos los {totalAvailableTags, plural, one {# tag disponible} other {# tags disponibles}}. Las tags deben usarse únicamente para ayudar a usuarios a buscar proyectos relevantes. Por favor selecciona solo tags relevantes."
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selecciona etiquetas precisas"
   },
+  "nags.banned-link-usage.description": {
+    "defaultMessage": "El link \"{url}\" no está permitido como enlace externo."
+  },
+  "nags.banned-link-usage.title": {
+    "defaultMessage": "Eliminar links prohibidos"
+  },
   "nags.check-disclosures.description": {
     "defaultMessage": "Asegúrate de que los usuarios estén al tanto de cualquier detalle importante rellenando las divulgaciones de contenido que se aplican a tu {type}."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "Revisar divulgaciones"
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Amplíe la descripción"

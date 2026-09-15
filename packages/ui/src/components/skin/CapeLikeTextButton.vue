@@ -20,7 +20,6 @@ withDefaults(
 		v-tooltip="tooltip"
 		type="button"
 		class="cape-like-text-button group m-0 block cursor-pointer border-0 bg-transparent p-0"
-		:aria-label="tooltip"
 		:aria-pressed="highlighted"
 		@click="emit('click')"
 	>

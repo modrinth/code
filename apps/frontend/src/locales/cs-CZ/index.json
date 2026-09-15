@@ -506,23 +506,11 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Uložte si oblíbený obsah a dostávejte aktualizace jedním kliknutím."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Sledovat projekty"
-  },
-  "app-marketing.features.importing.description": {
-    "message": "Importujte všechny své oblíbené profily z launcheru, které jste používali předtím, a začněte s Modrinth App během několika sekund!"
-  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
-  },
-  "app-marketing.features.importing.title": {
-    "message": "Importování profilů"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Akce"
@@ -548,15 +536,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Verze"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Hrajte se svými módy, ať už jste připojeni k internetu, nebo ne."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Offline režim"
-  },
-  "app-marketing.features.open-source.description": {
-    "message": "Launcher Modrinthu je plně open source. Zdrojový kód si můžete prohlédnout na našem <github-link>GitHubu</github-link>!"
-  },
   "app-marketing.features.open-source.title": {
     "message": "Otevřený zdroj"
   },
@@ -566,9 +545,6 @@
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
   },
-  "app-marketing.features.performance.description": {
-    "message": "Modrinth App má lepší výkon než mnoho předních správců modů a využívá jen 150 MB RAM!"
-  },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
   },
@@ -577,15 +553,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"

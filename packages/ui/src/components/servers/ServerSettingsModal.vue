@@ -79,12 +79,16 @@ const serverSettingsTabComponentMap = {
 	advanced: ServerSettingsAdvancedPage,
 } as const
 
+const saveBannerTarget = ref<HTMLElement | null>(null)
+const saveBannerShown = ref(false)
+
 provideServerSettings({
 	isApp,
 	currentUserId,
 	currentUserRole,
 	browseModpacks: props.browseModpacks ?? (() => {}),
 	closeModal: () => hide(),
+	saveBanner: { target: saveBannerTarget, shown: saveBannerShown },
 })
 
 const ownerId = computed(() => server.value?.owner_id ?? 'Ghost')
@@ -221,9 +225,13 @@ defineExpose({ show, hide })
 	<TabbedModal
 		ref="modal"
 		:tabs="tabs"
+		:floating-action-bar-shown="saveBannerShown"
 		:max-width="'min(980px, calc(95vw - 2rem))'"
 		:width="'min(980px, calc(95vw - 2rem))'"
 	>
+		<template #floating-action-bar>
+			<div ref="saveBannerTarget" />
+		</template>
 		<template #title>
 			<span class="flex items-center gap-2 text-lg font-semibold text-primary">
 				{{ server.name || 'Server' }} <ChevronRightIcon />

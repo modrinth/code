@@ -85,12 +85,13 @@ impl EventState {
         Ok(value.loading_bars.clone())
     }
 
+    /// The ads child webview makes the main window a multi-webview window,
+    /// so Tauri's single-webview window lookup no longer returns it.
     #[cfg(feature = "tauri")]
-    pub async fn get_main_window() -> crate::Result<Option<tauri::WebviewWindow>>
-    {
+    pub async fn get_main_window() -> crate::Result<Option<tauri::Window>> {
         use tauri::Manager;
         let value = Self::get();
-        Ok(value.app.get_webview_window("main"))
+        Ok(value.app.get_window("main"))
     }
 }
 

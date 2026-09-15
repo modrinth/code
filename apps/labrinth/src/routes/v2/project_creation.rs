@@ -12,7 +12,7 @@ use crate::routes::v3::project_creation::default_project_type;
 use crate::routes::v3::project_creation::{CreateError, NewGalleryItem};
 use crate::routes::{v2_reroute, v3};
 use crate::search::SearchState;
-use crate::util::http::HttpClient;
+use crate::util::kafka::KafkaClientState;
 use actix_multipart::Multipart;
 use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, post};
@@ -134,7 +134,7 @@ struct ProjectCreateData {
     pub organization_id: Option<models::ids::OrganizationId>,
 }
 
-/// Create a new project with initial versions.  
+/// Create a new project with initial versions.
 #[utoipa::path(
 	tag = "project creation",
     post,
@@ -161,7 +161,7 @@ pub async fn project_create(
     redis: Data<RedisPool>,
     file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
-    http: Data<HttpClient>,
+    kafka_client: Data<KafkaClientState>,
     search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
     // Convert V2 multipart payload to V3 multipart payload
@@ -280,7 +280,7 @@ pub async fn project_create(
         redis.clone(),
         file_host,
         session_queue,
-        http,
+        kafka_client,
         search_state,
     )
     .await?;

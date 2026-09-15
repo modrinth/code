@@ -206,6 +206,9 @@
   "button.download": {
     "defaultMessage": "下載"
   },
+  "button.download-files": {
+    "defaultMessage": "下載檔案"
+  },
   "button.downloading": {
     "defaultMessage": "下載中"
   },
@@ -365,6 +368,15 @@
   "collections.label.private": {
     "defaultMessage": "私人"
   },
+  "console.actions.collapse": {
+    "defaultMessage": "摺疊"
+  },
+  "console.actions.expand": {
+    "defaultMessage": "展開"
+  },
+  "console.actions.share": {
+    "defaultMessage": "分享"
+  },
   "content-type.content.lowercase": {
     "defaultMessage": "內容"
   },
@@ -376,6 +388,12 @@
   },
   "content.card.select-project": {
     "defaultMessage": "選取「{project}」"
+  },
+  "content.card.sync-update-pending": {
+    "defaultMessage": "部分同步複本正在等待變更。某個實例可能正在執行、版本遭凍結或不相容，或者已包含其獨立複本。"
+  },
+  "content.card.synced": {
+    "defaultMessage": "已跨實例同步"
   },
   "content.card.uploaded": {
     "defaultMessage": "上傳內容"
@@ -759,10 +777,10 @@
     "defaultMessage": "上傳檔案"
   },
   "content.selection-bar.all-already-disabled": {
-    "defaultMessage": "所有已選擇的內容已經停用"
+    "defaultMessage": "所有已選取的內容均已停用"
   },
   "content.selection-bar.all-already-enabled": {
-    "defaultMessage": "所有已選擇的內容已經啟用"
+    "defaultMessage": "所有已選取的內容均已啟用"
   },
   "content.selection-bar.bulk.deleting": {
     "defaultMessage": "正在刪除 {progress}/{total} {contentType}..."
@@ -2100,7 +2118,7 @@
     "defaultMessage": "重做"
   },
   "image-viewer.editor.save-as-new": {
-    "defaultMessage": "儲存副本"
+    "defaultMessage": "儲存複本"
   },
   "image-viewer.editor.save-image": {
     "defaultMessage": "儲存圖片"
@@ -2346,7 +2364,7 @@
     "defaultMessage": "{count} 個相容{count, plural, other {實例}}"
   },
   "instances.content-install.existing-tab": {
-    "defaultMessage": "已有實例"
+    "defaultMessage": "現有實例"
   },
   "instances.content-install.game-version-placeholder": {
     "defaultMessage": "選擇遊戲版本"
@@ -2379,7 +2397,7 @@
     "defaultMessage": "輸入實例名稱"
   },
   "instances.content-install.new-tab": {
-    "defaultMessage": "新的實例"
+    "defaultMessage": "新實例"
   },
   "instances.content-install.no-instances": {
     "defaultMessage": "找不到相容的實例"
@@ -2390,6 +2408,9 @@
   "instances.content-install.show-unavailable": {
     "defaultMessage": "顯示不可用內容"
   },
+  "instances.managed-content-modal.disabled": {
+    "defaultMessage": "已停用"
+  },
   "instances.managed-content-modal.download-file": {
     "defaultMessage": "下載檔案"
   },
@@ -2398,6 +2419,9 @@
   },
   "instances.managed-content-modal.empty-title": {
     "defaultMessage": "找不到內容"
+  },
+  "instances.managed-content-modal.enabled": {
+    "defaultMessage": "已啟用"
   },
   "instances.managed-content-modal.external-content": {
     "defaultMessage": "外部"
@@ -2419,6 +2443,9 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "搜尋 {count, number} {count, plural, other {個專案}}"
+  },
+  "instances.managed-content-modal.warnings": {
+    "defaultMessage": "警告"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "目前"
@@ -3596,6 +3623,9 @@
   "project.disclosure.advertising.title": {
     "defaultMessage": "包含廣告宣傳"
   },
+  "project.disclosure.ai-functionality.title": {
+    "defaultMessage": "生成式 AI 功能"
+  },
   "project.disclosure.ai-generated-content.title": {
     "defaultMessage": "包含 AI 生成的{types}"
   },
@@ -4348,6 +4378,9 @@
   },
   "search.filter_type.advanced.disclosure.ai_content.usage": {
     "defaultMessage": "AI {usage}"
+  },
+  "search.filter_type.advanced.disclosure.ai_functionality": {
+    "defaultMessage": "生成式 AI 功能"
   },
   "search.filter_type.advanced.disclosure.archived": {
     "defaultMessage": "已封存"
@@ -5155,6 +5188,18 @@
   },
   "servers.busy.installing": {
     "defaultMessage": "正在安裝伺服器"
+  },
+  "servers.download.failed.description": {
+    "defaultMessage": "下載世界檔案時發生錯誤。"
+  },
+  "servers.download.failed.title": {
+    "defaultMessage": "下載失敗"
+  },
+  "servers.download.unavailable.description": {
+    "defaultMessage": "目前無法下載世界檔案。"
+  },
+  "servers.download.unavailable.title": {
+    "defaultMessage": "無法下載"
   },
   "servers.files.zip-created": {
     "defaultMessage": "已建立 ZIP"
@@ -5979,7 +6024,7 @@
     "defaultMessage": "傳送好友邀請給你"
   },
   "settings.social.blocked-users.restriction.hosting": {
-    "defaultMessage": "邀請你管理 Modrinth Hosting 伺服器。"
+    "defaultMessage": "邀請你管理 Modrinth Hosting 伺服器"
   },
   "settings.social.blocked-users.restriction.shared-instances": {
     "defaultMessage": "邀請你加入共用實例"
@@ -6264,7 +6309,7 @@
     "defaultMessage": "裝飾"
   },
   "tag.category.dungeons": {
-    "defaultMessage": "副本"
+    "defaultMessage": "地下城"
   },
   "tag.category.economy": {
     "defaultMessage": "經濟"

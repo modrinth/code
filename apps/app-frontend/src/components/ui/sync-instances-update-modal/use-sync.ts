@@ -2,6 +2,7 @@ import { injectNotificationManager } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
+import { gameSettingsKeys } from '@/helpers/game-options'
 import { isSyncedOptionAvailable, set_global_synced_option } from '@/helpers/instance'
 import {
 	canSourceMultiplayerServers,
@@ -152,6 +153,7 @@ export function useSyncInstancesUpdate() {
 				queryClient.invalidateQueries({ queryKey: syncedOptionsKeys.global }),
 				queryClient.invalidateQueries({ queryKey: syncedOptionsKeys.initialized }),
 				queryClient.invalidateQueries({ queryKey: syncedOptionsKeys.gameSources }),
+				queryClient.invalidateQueries({ queryKey: gameSettingsKeys.synced }),
 				queryClient.invalidateQueries({ queryKey: ['instance-synced-options'] }),
 				queryClient.invalidateQueries({ queryKey: instanceKeys.all }),
 				queryClient.invalidateQueries({ queryKey: ['worlds'] }),

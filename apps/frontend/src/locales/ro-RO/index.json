@@ -5,6 +5,240 @@
   "action.continue": {
     "message": "Continuă"
   },
+  "ads-consent.accept": {
+    "message": "Acceptă tot"
+  },
+  "ads-consent.body": {
+    "message": "Anunțurile fac posibil Modrinth și finanțează plățile creatorilor. Partenerii noștri pot stoca sau accesa cookie-uri în aplicație pentru a personaliza reclamele și a măsura performanța."
+  },
+  "ads-consent.manage": {
+    "message": "Gestionează preferințele"
+  },
+  "ads-consent.reject": {
+    "message": "Refuză tot"
+  },
+  "ads-consent.title": {
+    "message": "Confidențialitatea ta și modul în care anunțurile susțin Modrinth"
+  },
+  "analytics.action.add": {
+    "message": "Adaugă"
+  },
+  "analytics.action.cancel": {
+    "message": "Anuleaza"
+  },
+  "analytics.action.refresh": {
+    "message": "Reîmprospătează"
+  },
+  "analytics.action.reset": {
+    "message": "Resetează"
+  },
+  "analytics.breakdown.country": {
+    "message": "Țară"
+  },
+  "analytics.breakdown.dependent-on": {
+    "message": "Depinde de"
+  },
+  "analytics.breakdown.dependent-project-download": {
+    "message": "Proiect dependent"
+  },
+  "analytics.breakdown.dependent-project-type": {
+    "message": "Tip proiect dependent"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "Motivul descărcării"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Versiune joc"
+  },
+  "analytics.breakdown.generic": {
+    "message": "Detaliere"
+  },
+  "analytics.breakdown.members": {
+    "message": "Membru"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "Monetizare"
+  },
+  "analytics.breakdown.none.selected": {
+    "message": "Nicio detaliere"
+  },
+  "analytics.breakdown.project": {
+    "message": "Proiect"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Starea proiectului"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Versiunea proiectului"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "Afișează tot"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "Afișează limitat"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "Afișează top 8"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} ore"
+  },
+  "analytics.chart.controls.display": {
+    "message": "Afișează"
+  },
+  "analytics.chart.controls.modrinth-events": {
+    "message": "Evenimente Modrinth"
+  },
+  "analytics.chart.events.see-announcement": {
+    "message": "Vezi anunțul"
+  },
+  "analytics.chart.legend.previous-period-suffix": {
+    "message": "{name} (Precedent)"
+  },
+  "analytics.chart.tooltip.hide-entry": {
+    "message": "Ascunde {name} în grafic"
+  },
+  "analytics.chart.tooltip.pinned": {
+    "message": "Tooltip-ul graficului fixat"
+  },
+  "analytics.filter.dependent-project-search-failed-title": {
+    "message": "Proiectele dependente nu s-au încărcat"
+  },
+  "analytics.filter.game-version-type": {
+    "message": "Tipul versiunii jocului"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "Toate"
+  },
+  "analytics.filter.game-version-type.release": {
+    "message": "Lansare"
+  },
+  "analytics.filter.search.countries": {
+    "message": "Caută țări..."
+  },
+  "analytics.filter.search.dependent-projects": {
+    "message": "Caută proiecte..."
+  },
+  "analytics.filter.search.download-sources": {
+    "message": "Caută surse de descărcare..."
+  },
+  "analytics.filter.search.project-versions": {
+    "message": "Caută versiuni ale proiectului..."
+  },
+  "analytics.filter.search.versions": {
+    "message": "Caută versiuni..."
+  },
+  "analytics.graph.title.downloads": {
+    "message": "Descărcări de-a lungul timpului"
+  },
+  "analytics.graph.title.revenue": {
+    "message": "Venituri în timp"
+  },
+  "analytics.graph.title.views": {
+    "message": "Vizualizări în timp"
+  },
+  "analytics.group-by.1h": {
+    "message": "1 oră"
+  },
+  "analytics.group-by.6h": {
+    "message": "6 ore"
+  },
+  "analytics.group-by.date": {
+    "message": "Dată"
+  },
+  "analytics.group-by.day": {
+    "message": "Zi"
+  },
+  "analytics.group-by.month": {
+    "message": "Lună"
+  },
+  "analytics.group-by.selected.day": {
+    "message": "Grupare după zi"
+  },
+  "analytics.group-by.selected.hour": {
+    "message": "Grupare după oră"
+  },
+  "analytics.group-by.selected.month": {
+    "message": "Grupare după lună"
+  },
+  "analytics.group-by.selected.six-hours": {
+    "message": "Grupare după 6 ore"
+  },
+  "analytics.group-by.selected.week": {
+    "message": "Grupare după săptămână"
+  },
+  "analytics.group-by.selected.year": {
+    "message": "Grupare după an"
+  },
+  "analytics.group-by.week": {
+    "message": "Săptămână"
+  },
+  "analytics.group-by.year": {
+    "message": "An"
+  },
+  "analytics.options.loading": {
+    "message": "Se încarcă..."
+  },
+  "analytics.project-event.project-approved": {
+    "message": "Proiect aprobat"
+  },
+  "analytics.project-event.version-released": {
+    "message": "{version} lansat"
+  },
+  "analytics.project-event.version-uploaded": {
+    "message": "Versiune încărcată"
+  },
+  "analytics.project-status.approved": {
+    "message": "Aprobat"
+  },
+  "analytics.project-status.archived": {
+    "message": "Arhivat"
+  },
+  "analytics.project-status.draft": {
+    "message": "Schițe"
+  },
+  "analytics.project-status.other": {
+    "message": "Altele"
+  },
+  "analytics.project-status.private": {
+    "message": "Privat"
+  },
+  "analytics.project-status.rejected": {
+    "message": "Respins"
+  },
+  "analytics.project-status.unlisted": {
+    "message": "Nelistat"
+  },
+  "analytics.project-status.withheld": {
+    "message": "Reținut"
+  },
+  "analytics.project.all": {
+    "message": "Toate proiectele"
+  },
+  "analytics.project.select": {
+    "message": "Selectează proiecte"
+  },
+  "analytics.project.user": {
+    "message": "Proiectele lui {username}"
+  },
+  "analytics.project.your": {
+    "message": "Proiectele tale"
+  },
+  "analytics.query.filter.add": {
+    "message": "Adaugă filtru"
+  },
+  "analytics.value.none": {
+    "message": "Niciunul"
+  },
+  "analytics.value.other": {
+    "message": "Altele"
+  },
+  "analytics.value.unknown": {
+    "message": "Necunoscut"
+  },
+  "analytics.value.unmonetized": {
+    "message": "Nemonetizat"
+  },
   "app-marketing.download.description": {
     "message": "Aplicația noastră de desktop este disponibilă pe toate platformele, alege versiunea ta favorită."
   },
@@ -41,23 +275,11 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Salvează conținut care îți place și primește actualizări cu un singur click."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Urmărește proiecte"
-  },
-  "app-marketing.features.importing.description": {
-    "message": "Importă toate profilurile tale favorite de pe aplicația pe care o foloseai înainte, și începe cu Modrinth App în secunde!"
-  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
-  },
-  "app-marketing.features.importing.title": {
-    "message": "Importare de profil"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Acțiuni"
@@ -83,15 +305,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Versiune"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Joacă-te cu modurile tale, indiferent dacă ești conectat la internet sau nu."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Modul offline"
-  },
-  "app-marketing.features.open-source.description": {
-    "message": "Lansatorul Modrinth este complet cu sursă deschisă. Poți vedea codul sursă pe <github-link>GitHub</github-link>-ul nostru!"
-  },
   "app-marketing.features.open-source.title": {
     "message": "Sursă deschisă"
   },
@@ -109,12 +322,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"

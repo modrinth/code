@@ -95,9 +95,6 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "מעדכן תוכן משותף"
   },
-  "app.action-bar.installs": {
-    "message": "התקנות"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "הפוך למקרה ראשי"
   },
@@ -284,6 +281,21 @@
   "app.content-install.no-compatible-versions": {
     "message": "אין גרסאות זמינות התואמות ל-{compatibilityLabel}. בחר גרסה להתקנה בכל זאת. תלויות לא יותקנו באופן אוטומטי."
   },
+  "app.content.desync-pack": {
+    "message": "בטל סנכרון"
+  },
+  "app.content.sync-data-packs-disabled": {
+    "message": "הפעל סנכרון חבילת נתונים בהדרות האפליקציה קודם."
+  },
+  "app.content.sync-pack": {
+    "message": "סנכרן"
+  },
+  "app.content.sync-packs-override": {
+    "message": "כבה את העקיפה של סנכרון החבילות בהגדרות של התקן זה קודם."
+  },
+  "app.content.sync-resource-packs-disabled": {
+    "message": "הפעל סנכרון טקסטורות בהדרות האפליקציה קודם."
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "לפתוח תיקיית גיבויים"
   },
@@ -313,6 +325,57 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.features-settings.instance-pages.title": {
+    "message": "התקנים"
+  },
+  "app.features-settings.play-page.title": {
+    "message": "עמוד משחק"
+  },
+  "app.features-settings.quick-instances.description": {
+    "message": "בחר כמה התקנים ששיחקת לאחרונה להראות בסרגל צד. אפשר גם לשנות עם גרירת הסליידר."
+  },
+  "app.features-settings.quick-instances.title": {
+    "message": "התקנים מהירים בסרגל צד"
+  },
+  "app.features-settings.show-all-screenshots.description": {
+    "message": "הראה כפתור בסרגל צד השמאלי כדי לראות את כל הצילומי מסך מכל ההתקנים שלך."
+  },
+  "app.features-settings.show-all-screenshots.title": {
+    "message": "הראה כל הצילומי מסך בסרגל צד"
+  },
+  "app.features-settings.show-files-tab.title": {
+    "message": "הראה כפתור קבצים בהתקנים"
+  },
+  "app.features-settings.show-jump-in.description": {
+    "message": "הראה עולמות והתקנים ששיחקת לאחרונה למעלה בעמוד משחק."
+  },
+  "app.features-settings.show-jump-in.title": {
+    "message": "הראה סעיף של קפיצה למשחק"
+  },
+  "app.features-settings.show-screenshots-tab.title": {
+    "message": "הראה כפתור צילומי מסך בהתקנים"
+  },
+  "app.features-settings.show-skin-selector.description": {
+    "message": "הראה כפתור בחירת סקין בסרגל השמאלי."
+  },
+  "app.features-settings.show-skin-selector.title": {
+    "message": "הראה בחירת סקין בסרגל צד"
+  },
+  "app.features-settings.show-worlds-tab.title": {
+    "message": "הראה כפתור עולמות בהתקנים"
+  },
+  "app.features-settings.sidebar.title": {
+    "message": "סרגל צד"
+  },
+  "app.features-settings.sync-across-devices.description": {
+    "message": "שמור הגדרות הפיצ'רים האלה בכל מקום שאתה מחובר. כבה הגדרה זאת כדי להשאיר הגדרות שונות במכשיר זה."
+  },
+  "app.features-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "התחבר לחשבון Modrinth כדי לסנכרן הגדרות."
+  },
+  "app.features-settings.sync-across-devices.title": {
+    "message": "סנכרן פיצ'רים בין מכשירים"
   },
   "app.home.jump-back-in.actions.label": {
     "message": "פעולות אקסמפלר"
@@ -761,6 +824,18 @@
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "הסר שרת"
   },
+  "app.instance.worlds.remove-server-modal.remove-everywhere": {
+    "message": "מחק בכל התקן"
+  },
+  "app.instance.worlds.remove-server-modal.remove-here": {
+    "message": "מחק כאן"
+  },
+  "app.instance.worlds.remove-server-modal.synced-description": {
+    "message": "ניתן להסיר רק מהתקן זה או מכל ההתקנים המסונכרנים. הסרתו מהתקן זה בלבד תאפשר שינויים, וההתקן הזה לא יקבל שינויים יותר מהשרת."
+  },
+  "app.instance.worlds.remove-server-modal.synced-header": {
+    "message": "השרת מסונכרן"
+  },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "הסר שרת"
   },
@@ -938,26 +1013,458 @@
   "app.library.group.name-placeholder": {
     "message": "הזן שם קבוצה"
   },
+  "app.library.group.name-reserved": {
+    "message": "\"None\" שמור ולא ניתן להשתמש בו כשם קבוצה."
+  },
+  "app.library.group.name-too-long": {
+    "message": "שם קבוצה לא יכול להיות גדול יותר מ{maxLength} אותיות."
+  },
+  "app.library.group.new": {
+    "message": "קבוצה חדשה"
+  },
+  "app.library.group.no-instances-found": {
+    "message": "לא נמצאו התקנים"
+  },
+  "app.library.group.rename-failed": {
+    "message": "לא ניתן לשנות שם קבוצה"
+  },
+  "app.library.group.search-instance": {
+    "message": "חפש התקן"
+  },
+  "app.library.group.ungrouped": {
+    "message": "לא מקובץ"
+  },
+  "app.library.group.unknown": {
+    "message": "קבוצה לא ידועה"
+  },
+  "app.library.instance.action.add-content": {
+    "message": "הוסף תוכן"
+  },
+  "app.library.instance.action.add-to-favorites": {
+    "message": "הוסף למועדפים"
+  },
+  "app.library.instance.action.copy-path": {
+    "message": "העתק מיקום"
+  },
+  "app.library.instance.action.delete": {
+    "message": "מחק"
+  },
+  "app.library.instance.action.duplicate": {
+    "message": "שכפל התקן"
+  },
+  "app.library.instance.action.open-folder": {
+    "message": "פתח תיקייה"
+  },
+  "app.library.instance.action.play": {
+    "message": "שחק"
+  },
+  "app.library.instance.action.remove-from-favorites": {
+    "message": "מחק ממועדפים"
+  },
+  "app.library.instance.action.remove-from-group": {
+    "message": "מחק מהקבוצה"
+  },
+  "app.library.instance.action.stop": {
+    "message": "עצור"
+  },
+  "app.library.instance.action.view-instance": {
+    "message": "ראה התקן"
+  },
+  "app.library.instance.actions.label": {
+    "message": "פעולות התקן"
+  },
+  "app.library.instance.deselect": {
+    "message": "בטל בחירה"
+  },
+  "app.library.instance.deselect-with-name": {
+    "message": "בטל בחירת {name}"
+  },
+  "app.library.instance.installing": {
+    "message": "מתקין..."
+  },
+  "app.library.instance.loading": {
+    "message": "התקן נטען..."
+  },
+  "app.library.instance.new": {
+    "message": "התקן חדש"
+  },
+  "app.library.instance.open-with-name": {
+    "message": "פתח {name}"
+  },
+  "app.library.instance.play": {
+    "message": "שחק"
+  },
+  "app.library.instance.repair": {
+    "message": "תקן"
+  },
+  "app.library.instance.select": {
+    "message": "בחר התקן"
+  },
+  "app.library.instance.select-with-name": {
+    "message": "בחר {name}"
+  },
+  "app.library.instance.stop": {
+    "message": "עצור"
+  },
+  "app.library.search.no-results.title": {
+    "message": "שום התקן מתאים לחיפוש שלך."
+  },
+  "app.library.search.placeholder": {
+    "message": "חפש"
+  },
+  "app.library.selection.aria-label": {
+    "message": "התקנים בחורים"
+  },
+  "app.library.selection.deleting": {
+    "message": "מחק כל ההתקנים שבחרת"
+  },
+  "app.library.selection.new-group": {
+    "message": "קבוצה חדשה"
+  },
+  "app.library.selection.remove-from-group": {
+    "message": "מחק מקבוצה"
+  },
+  "app.library.selection.selected-count": {
+    "message": "{count} נבחרו"
+  },
+  "app.library.sort.date-created": {
+    "message": "תאריך יצירה"
+  },
+  "app.library.sort.date-modified": {
+    "message": "תאריך שינוי"
+  },
+  "app.library.sort.game-version": {
+    "message": "גרסת משחק"
+  },
+  "app.library.sort.hours-played": {
+    "message": "שעות משחק"
+  },
+  "app.library.sort.label": {
+    "message": "סדר לפי"
+  },
+  "app.library.sort.last-played": {
+    "message": "אחרון ששוחק"
+  },
+  "app.library.sort.loader": {
+    "message": "טוען"
+  },
+  "app.library.sort.name": {
+    "message": "שם"
+  },
+  "app.library.title": {
+    "message": "ספרייה"
+  },
+  "app.modal.install-to-play.additional-context": {
+    "message": "הוספת הקשר"
+  },
   "app.modal.install-to-play.additional-context-placeholder": {
     "message": "כלול קישורים ותמונות אם אפשר ורלוונטי"
+  },
+  "app.modal.install-to-play.block-user": {
+    "message": "חסום משתמש"
+  },
+  "app.modal.install-to-play.content-you-are-reporting": {
+    "message": "התקן מדווח"
+  },
+  "app.modal.install-to-play.delete-instance": {
+    "message": "מחק התקן"
+  },
+  "app.modal.install-to-play.external-files-dont-install": {
+    "message": "אל תתקין"
   },
   "app.modal.install-to-play.header": {
     "message": "צריך להתקין כדי לשחק"
   },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "התקן בכל זאת"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "התקנה"
+  },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "הזמנה זאת נוצרה על ידי משתמש \"Modrinth\" לא \"Modrinth\" עצמו. תאשר\\י הזמנות רק מאנשים שאפשר לסמוך עליהם."
+  },
+  "app.modal.install-to-play.invite-warning-with-creator": {
+    "message": "הזמנה זאת נוצרה על ידי <creator>{username}</creator> לא \"Modrinth\". תאשר\\י הזמנות רק מאנשים שאפשר לסמוך עליהם."
+  },
+  "app.modal.install-to-play.managed-content.modpack-header": {
+    "message": "תוכן החבילת מודים"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {מוד אחד} other {# מודים}}"
   },
+  "app.modal.install-to-play.report-description": {
+    "message": "השתמש בפורום זה כדי לדווח על התקנים העלולים להפר את <rules-link>החוקים</rules-link> או <terms-link>תנאי השימוש</terms-link> שלנו."
+  },
+  "app.modal.install-to-play.report-image-invalid-type": {
+    "message": "קובץ זה לא מקובל סוג תמונה"
+  },
+  "app.modal.install-to-play.report-image-too-large": {
+    "message": "קובץ עבר את הגבלת הגדול 1 MiB"
+  },
+  "app.modal.install-to-play.report-legal-claims": {
+    "message": "עבור הודעות DMCA או תביעות משפטיות אחרות, עיינו ב<copyright-link>מדיניות זכויות היוצרים</copyright-link> שלנו."
+  },
+  "app.modal.install-to-play.report-reason": {
+    "message": "איזה חוק ההתקן הזה הפר?"
+  },
+  "app.modal.install-to-play.report-shared-instance-header": {
+    "message": "דווח התקן משותף"
+  },
+  "app.modal.install-to-play.report-submitted": {
+    "message": "דיווח נשלח"
+  },
+  "app.modal.install-to-play.report-support-and-bugs": {
+    "message": "לפניות בנושא תמיכה, צרו קשר עם <support-link>צוות התמיכה</support-link> שלנו. לדיווח על באגים, פתחו <github-link>בעיית Github</github-link>."
+  },
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "קבצים שלא עלו בModrinth לא מקבלים בדיקה."
+  },
   "app.modal.install-to-play.shared-instance": {
     "message": "התקנה משותפת"
+  },
+  "app.modal.install-to-play.shared-instance-content": {
+    "message": "שתף תוכן ההתקן"
+  },
+  "app.modal.install-to-play.shared-instance-unknown-files-description": {
+    "message": "התקן משותף זה מכיל קבצים שאינם מפורסמים ב-Modrinth. אנו ממליצים בחום להתקין קבצים אך ורק ממקורות שאתם סומכים עליהם."
+  },
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "שרת חבילת מודים זה מכיל קבצים שאינם מפורסמים ב-Modrinth. אנו ממליצים בחום להתקין קבצים אך ורק ממקורות שאתם סומכים עליהם."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "הזהרת קבצים לא ידועים"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "קבצים לא מוכרים"
+  },
+  "app.modal.install-to-play.user-blocked": {
+    "message": "משתמש נחסם"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "הצג תוכן"
   },
   "app.modal.update-to-play.header": {
     "message": "צריך לעדכן כדי לשחק"
+  },
+  "app.modal.update-to-play.removed": {
+    "message": "נמחק"
+  },
+  "app.modal.update-to-play.server-modpack-unknown-files-description": {
+    "message": "עדכון שרת חבילת מודים זה מכיל קבצים שאינם מפורסמים ב-Modrinth. אנו ממליצים בחום להתקין קבצים אך ורק ממקורות שאתם סומכים עליהם."
+  },
+  "app.modal.update-to-play.shared-instance-added-label": {
+    "message": "נוסף"
+  },
+  "app.modal.update-to-play.shared-instance-removed-label": {
+    "message": "נמחק"
+  },
+  "app.modal.update-to-play.shared-instance-unknown-files-description": {
+    "message": "עדכון התקן משותף זה מכיל קבצים שאינם מפורסמים ב-Modrinth. אנו ממליצים בחום להתקין קבצים אך ורק ממקורות שאתם סומכים עליהם."
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "נדרש עדכון"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "עדכון נדרש בשביל לשחק {name}. בבקשה עדכן לגרסה האחרונה בשביל להפעיל את המשחק."
+  },
+  "app.nav.add-account": {
+    "message": "הוסף חשבון"
+  },
+  "app.nav.create-new-instance": {
+    "message": "צור התקן חדש"
+  },
+  "app.nav.home": {
+    "message": "בית"
+  },
+  "app.nav.loading-profile": {
+    "message": "טוען פרופיל..."
+  },
+  "app.nav.modrinth-account": {
+    "message": "משתמש Modrinth"
+  },
+  "app.nav.modrinth-hosting": {
+    "message": "שרתי Modrinth"
+  },
+  "app.nav.remove-account": {
+    "message": "מחק חשבון"
+  },
+  "app.nav.screenshots": {
+    "message": "צילומי מסך"
+  },
+  "app.nav.sign-in-to-modrinth-account": {
+    "message": "התחבר לModrinth"
+  },
+  "app.nav.switch-account": {
+    "message": "החלף חשבון"
+  },
+  "app.nav.upgrade-to-modrinth-plus": {
+    "message": "שדרג לModrinth+"
+  },
+  "app.nav.view-profile": {
+    "message": "ראה פרופיל"
+  },
+  "app.navigation.go-back": {
+    "message": "חזור"
+  },
+  "app.navigation.go-forward": {
+    "message": "התקדם"
+  },
+  "app.navigation.home": {
+    "message": "בית"
+  },
+  "app.navigation.next-image": {
+    "message": "תמונה הבאה"
+  },
+  "app.news.title": {
+    "message": "חדשות"
+  },
+  "app.news.view-all": {
+    "message": "ראה את כל החדשות"
+  },
+  "app.notification.warning": {
+    "message": "אזהרה"
+  },
+  "app.project.actions.label": {
+    "message": "פעולות פרויקט"
+  },
+  "app.project.coming-soon": {
+    "message": "יגיעה בקרוב"
+  },
+  "app.project.install-button.already-installed": {
+    "message": "פרויקט זה כבר מותקן"
+  },
+  "app.project.install-button.switch-version": {
+    "message": "החלף גרסה"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "חזור לגלה"
+  },
+  "app.project.install-context.back-to-instance": {
+    "message": "חזור"
+  },
+  "app.project.load-error": {
+    "message": "מידע הפרויקט לא יכל להיטען."
+  },
+  "app.project.more-options": {
+    "message": "עוד אפשרויות"
+  },
+  "app.project.tab.description": {
+    "message": "תיאור"
+  },
+  "app.project.tab.gallery": {
+    "message": "גלריה"
+  },
+  "app.project.tab.versions": {
+    "message": "גרסאות"
+  },
+  "app.project.version.all-versions": {
+    "message": "כל הגרסאות"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "הורד בדפדפן"
+  },
+  "app.project.version.installing": {
+    "message": "מתקין"
+  },
+  "app.project.versions.already-installed": {
+    "message": "כבר מותקן"
+  },
+  "app.quick-instance-switcher.actions.label": {
+    "message": "פעולות התקן"
+  },
+  "app.quick-instance-switcher.drag-show-tooltip": {
+    "message": "גרור כדי להראות התקנים אחרונים"
+  },
+  "app.quick-instance-switcher.drag-tooltip": {
+    "message": "גרור כדי לשנות גודל"
+  },
+  "app.quick-instance-switcher.instance-locked": {
+    "message": "התקן זה ננעל"
+  },
+  "app.quick-instance-switcher.view-instance": {
+    "message": "ראה התקן"
+  },
+  "app.restarting": {
+    "message": "מפעיל מחדש..."
+  },
+  "app.screenshots.copied": {
+    "message": "מועתק"
+  },
+  "app.screenshots.copy": {
+    "message": "העתק תמונה"
+  },
+  "app.screenshots.delete-description": {
+    "message": "מחק {name} לתמיד? אי אפשר להחזיר פעולה זו."
+  },
+  "app.screenshots.delete-success": {
+    "message": "צילום מסך נמחק"
+  },
+  "app.screenshots.delete-title": {
+    "message": "מחק צילום מסך"
+  },
+  "app.screenshots.deselect": {
+    "message": "בטל בחירת {name}"
+  },
+  "app.screenshots.edit": {
+    "message": "ערוך צילום מסך"
+  },
+  "app.screenshots.empty-description": {
+    "message": "צילומי מסך שתיקח\\י בתוך המשחק יופיעו כאן."
+  },
+  "app.screenshots.empty-heading": {
+    "message": "אין עדיין צילומי מסך"
+  },
+  "app.screenshots.error-heading": {
+    "message": "טעינת הגרסה נכשלה"
+  },
+  "app.screenshots.go-to-instance": {
+    "message": "חזור"
+  },
+  "app.screenshots.group-by": {
+    "message": "קבץ לפי"
+  },
+  "app.settings.default-instance-options.height.placeholder": {
+    "message": "הכנס גובה..."
+  },
+  "app.settings.default-instance-options.height.title": {
+    "message": "גובה"
+  },
+  "app.settings.default-instance-options.java-and-memory.title": {
+    "message": "Java וזיכרון"
+  },
+  "app.settings.default-instance-options.java-arguments.description": {
+    "message": "פקודות המועברות לJava כשמפעילים התקן."
+  },
+  "app.settings.default-instance-options.java-arguments.placeholder": {
+    "message": "הכנס פקודות Java..."
+  },
+  "app.settings.default-instance-options.java-arguments.title": {
+    "message": "פקודות Java"
+  },
+  "app.settings.default-instance-options.launch-hooks.title": {
+    "message": "Hook בהפעלה"
+  },
+  "app.settings.default-instance-options.memory-allocation.description": {
+    "message": "הגבלת זיכרון לכל התקן."
+  },
+  "app.settings.default-instance-options.memory-allocation.title": {
+    "message": "הקצאת זיכרון"
+  },
+  "app.settings.default-instance-options.post-exit-hook.description": {
+    "message": "פועל אחרי שהמשחק נכבה."
+  },
+  "app.settings.default-instance-options.post-exit-hook.placeholder": {
+    "message": "הכנס פקודת לפני-יציאה..."
+  },
+  "app.settings.default-instance-options.post-exit-hook.title": {
+    "message": "Hook לפני-יציאה"
+  },
+  "app.settings.default-instance-options.pre-launch-hook.description": {
+    "message": "פועל לפני שההתקן מתחיל."
+  },
+  "app.settings.default-instance-options.pre-launch-hook.placeholder": {
+    "message": "הכנס פקודת לפני-הפעלה..."
   },
   "app.settings.developer-mode-enabled": {
     "message": "מצב מפתח מופעל."
@@ -979,6 +1486,9 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "ניהול משאבים"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "שמור סקין"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} סיימה את תהליך ההורדה. יש לרענן כדי לעדכן עכשיו, או באופן אוטומטי בעת סגירת האפליקציה."

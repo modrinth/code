@@ -95,9 +95,6 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "Oppdaterer delt innhold"
   },
-  "app.action-bar.installs": {
-    "message": "Installeringer"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "Gjør om til primærtilfelle"
   },
@@ -161,6 +158,9 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Bibliotek"
   },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Skjul brukernavnet ditt over spillerforhåndsvisningen på skinnvelgersiden."
+  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Gjøm navnelapp"
   },
@@ -218,17 +218,26 @@
   "app.content-install.no-compatible-versions": {
     "message": "Ingen tilgjengelige versjoner matcher {compatibilityLabel}. Velg en versjon for å installere uansett. Avhengigheter vil ikke bli installert automatisk."
   },
+  "app.content.sync-resource-packs-disabled": {
+    "message": "Slå på synkronisering av ressurspakker i appinstillingene først."
+  },
   "app.export-modal.description-placeholder": {
     "message": "Skriv en modpakkebeskrivelse..."
   },
   "app.export-modal.export-button": {
     "message": "Eksperter"
   },
+  "app.export-modal.export-complete": {
+    "message": "Eksportering fullført"
+  },
   "app.export-modal.header": {
     "message": "Eksperter modpakke"
   },
   "app.export-modal.modpack-name-label": {
     "message": "Navn på modpakke"
+  },
+  "app.features-settings.quick-instances.description": {
+    "message": "Velg maksimal antall av installasjoner vist i venstre sidebar. Du kan også justere dette med å dra på divideren."
   },
   "app.install.phase.preparing_java.validating": {
     "message": "Validerer Java {version}"

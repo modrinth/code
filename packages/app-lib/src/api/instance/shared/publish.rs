@@ -237,8 +237,8 @@ async fn extend_shared_modpack_dependencies(
     let dependency_ids =
         modpack_dependency_version_ids(modpack_id, state).await?;
     let (explicit, inherited) = tokio::try_join!(
-        shared_versions_by_project(version_ids, state),
-        shared_versions_by_project(&dependency_ids, state),
+        shared_versions_by_project(version_ids, false, state),
+        shared_versions_by_project(&dependency_ids, false, state),
     )?;
     version_ids.extend(
         inherited
@@ -367,6 +367,8 @@ pub(super) struct CurrentPublishSnapshot {
     pub(super) config_files: Vec<ConfigFile>,
 }
 
+/// Cached metadata can outlive a deleted or hidden version. Only publish version
+/// IDs that other members can resolve; retain installed files as uploads.
 pub(super) async fn collect_publish_snapshot(
     metadata: &crate::state::InstanceMetadata,
     state: &State,
@@ -397,6 +399,23 @@ pub(super) async fn collect_publish_snapshot(
             Vec::new(),
         )
     };
+    let installed_version_ids = items
+        .iter()
+        .filter(|item| item.enabled)
+        .filter_map(|item| {
+            item.version.as_ref().map(|version| version.id.as_str())
+        })
+        .collect::<Vec<_>>();
+    let available_version_ids = CachedEntry::get_version_many(
+        &installed_version_ids,
+        Some(CacheBehaviour::Bypass),
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?
+    .into_iter()
+    .map(|version| version.id)
+    .collect::<HashSet<_>>();
     let modpack_id = shared_modpack_id(&metadata.link);
     let mut version_ids = Vec::new();
     let mut seen_version_ids = HashSet::new();
@@ -409,9 +428,11 @@ pub(super) async fn collect_publish_snapshot(
 
     for item in items {
         if item.enabled {
-            if let Some(version) = item.version {
+            if let Some(version) = item.version.as_ref()
+                && available_version_ids.contains(&version.id)
+            {
                 if seen_version_ids.insert(version.id.clone()) {
-                    version_ids.push(version.id);
+                    version_ids.push(version.id.clone());
                 }
                 continue;
             }
@@ -472,6 +493,7 @@ pub(super) async fn collect_publish_snapshot(
 
 pub(super) async fn shared_versions_by_project(
     version_ids: &[String],
+    allow_missing: bool,
     state: &State,
 ) -> crate::Result<HashMap<String, crate::state::Version>> {
     let version_id_refs =
@@ -488,9 +510,10 @@ pub(super) async fn shared_versions_by_project(
         .iter()
         .map(|version| version.id.as_str())
         .collect::<HashSet<_>>();
-    if let Some(missing) = version_ids
-        .iter()
-        .find(|id| !fetched_ids.contains(id.as_str()))
+    if !allow_missing
+        && let Some(missing) = version_ids
+            .iter()
+            .find(|id| !fetched_ids.contains(id.as_str()))
     {
         return Err(crate::ErrorKind::InputError(format!(
             "Shared content version {missing} was not found"
@@ -653,6 +676,7 @@ pub(super) async fn publish_current_content(
     config_paths: &[String],
     state: &State,
 ) -> crate::Result<i32> {
+    let _store_lease = state.content_store.lease().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or_else(|| {
@@ -1081,13 +1105,17 @@ pub(super) async fn upload_external_files(
                 ))
             })?;
         let path = match &candidate.source {
-            ExternalFileSource::InstanceFile(file_path) => state
-                .directories
-                .instances_dir()
-                .join(instance_path)
-                .join(file_path),
+            ExternalFileSource::InstanceFile(file_path) => {
+                let instance = crate::state::instances::adapters::sqlite::instance_rows::get_instance_by_path(instance_path, &state.pool).await?
+					.ok_or_else(|| crate::state::content_store::input("Unknown instance"))?;
+                let file = crate::state::instances::adapters::sqlite::content_rows::get_instance_file_by_relative_path(&instance.id, file_path, &state.pool).await?
+					.ok_or_else(|| crate::state::content_store::input("Shared content file is not registered"))?;
+                state.content_store.read_path(&file, instance_path).await?
+            }
             ExternalFileSource::ConfigBundle(path) => {
-                path.as_ref().to_path_buf()
+                crate::state::content_store::ReadableContent::Local(
+                    path.as_ref().to_path_buf(),
+                )
             }
         };
         let upload_url = url::Url::parse(&upload.url).map_err(|error| {
@@ -1095,7 +1123,7 @@ pub(super) async fn upload_external_files(
                 "Invalid shared instance external file upload URL: {error}"
             ))
         })?;
-        let mut file = tokio::fs::File::open(&path).await?;
+        let mut file = tokio::fs::File::open(path.path()).await?;
         let mut hasher = sha2::Sha512::new();
         let mut buffer = vec![0_u8; 64 * 1024];
         let mut size = 0_u64;

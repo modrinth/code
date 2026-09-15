@@ -12,7 +12,7 @@ use crate::models::projects::{
     MonetizationStatus, ProjectStatus, SideTypesMigrationReviewStatus,
 };
 use crate::routes::ApiError;
-use crate::util::error::Context;
+use crate::util::{error::Context, kafka::KafkaClientState};
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
@@ -191,7 +191,7 @@ impl ProjectBuilder {
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
         file_host: &dyn FileHost,
-        http: &reqwest::Client,
+        kafka_client: &KafkaClientState,
     ) -> Result<DBProjectId, DatabaseError> {
         let project_struct = DBProject {
             id: self.project_id,
@@ -239,7 +239,9 @@ impl ProjectBuilder {
 
         for mut version in self.initial_versions {
             version.project_id = self.project_id;
-            version.insert(transaction, redis, file_host, http).await?;
+            version
+                .insert(transaction, redis, file_host, kafka_client)
+                .await?;
         }
 
         LinkUrl::insert_many_projects(

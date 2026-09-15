@@ -10,8 +10,8 @@ use crate::models::exp;
 use xredis::RedisPool;
 
 use crate::models::projects::{FileType, VersionStatus};
-use crate::queue::file_scan::scan_file;
-use crate::routes::internal::delphi::DelphiRunParameters;
+use crate::queue::{delphi_scan, file_scan::scan_file};
+use crate::util::kafka::KafkaClientState;
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
 use futures::TryStreamExt;
@@ -179,7 +179,7 @@ impl VersionFileBuilder {
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
         file_host: &dyn FileHost,
-        http: &reqwest::Client,
+        kafka_client: &KafkaClientState,
     ) -> Result<DBFileId, DatabaseError> {
         let file_id = generate_file_id(&mut *transaction).await?;
 
@@ -229,18 +229,6 @@ impl VersionFileBuilder {
         .execute(&mut *transaction)
         .await?;
 
-        if let Err(err) = crate::routes::internal::delphi::run(
-            &mut *transaction,
-            DelphiRunParameters {
-                file_id: file_id.into(),
-            },
-            http,
-        )
-        .await
-        {
-            error!("Error submitting new file to Delphi: {err:?}");
-        }
-
         if attribution_scan.rows_affected() > 0
             && let Err(err) = scan_file(
                 &mut *transaction,
@@ -254,6 +242,10 @@ impl VersionFileBuilder {
         {
             error!("Error scanning new file {file_id:?}: {err:?}");
         }
+
+        delphi_scan::enqueue_file(transaction, kafka_client, file_id)
+            .await
+            .map_err(DatabaseError::Internal)?;
 
         Ok(file_id)
     }
@@ -271,7 +263,7 @@ impl VersionBuilder {
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
         file_host: &dyn FileHost,
-        http: &reqwest::Client,
+        kafka_client: &KafkaClientState,
     ) -> Result<DBVersionId, DatabaseError> {
         let version = DBVersion {
             id: self.version_id,
@@ -318,7 +310,7 @@ impl VersionBuilder {
                 transaction,
                 redis,
                 file_host,
-                http,
+                kafka_client,
             )
             .await?;
         }

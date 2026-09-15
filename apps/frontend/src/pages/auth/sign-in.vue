@@ -176,10 +176,6 @@ const launcherAccountChoices = computed(() => {
 	return choosableAccounts.value.length >= minimumAccounts ? choosableAccounts.value : []
 })
 
-if (auth.value.user && !isAddingAccount && !isLauncherSignIn) {
-	await finishSignIn()
-}
-
 onMounted(async () => {
 	if (!isLauncherSignIn) {
 		return

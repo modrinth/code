@@ -2,6 +2,12 @@
 
 mod content;
 mod export_mrpack;
+mod files;
+pub use files::{
+    InstanceFileItem, create_instance_directory, delete_instance_file,
+    list_instance_files, read_instance_file, rename_instance_file,
+    save_instance_file_as, validate_instance_file_write, write_instance_file,
+};
 mod get;
 mod groups;
 mod icon;
@@ -14,7 +20,7 @@ mod screenshot_groups;
 mod screenshots;
 mod shared;
 mod synced_options;
-mod synced_packs;
+pub(crate) mod synced_packs;
 pub(crate) mod synced_servers;
 
 pub use self::content::{
@@ -141,9 +147,12 @@ pub use self::synced_servers::{
     list_synced_servers, remove_synced_server, update_synced_server,
 };
 
-pub(crate) use self::synced_packs::reconcile_after_change as reconcile_synced_packs;
 pub use self::synced_packs::{
     PackSyncPreview, PackSyncTarget, desync_pack, get_pack_sync_preview,
     list_synced_packs, remove_synced_pack, set_synced_pack_enabled, sync_pack,
     upload_synced_pack,
+};
+pub(crate) use self::synced_packs::{
+    PackSyncWorker, flush as reconcile_synced_packs,
+    queue_reconciliation as queue_synced_pack_reconciliation,
 };

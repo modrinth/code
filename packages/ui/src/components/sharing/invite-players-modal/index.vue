@@ -8,7 +8,7 @@
 		noblur
 	>
 		<div class="flex max-h-[calc(100vh-8rem)] min-h-0 flex-col">
-			<div class="border-0 border-b border-solid border-surface-5 p-6">
+			<div class="shrink-0 border-0 border-b border-solid border-surface-5 p-6">
 				<div class="flex items-start gap-2">
 					<Combobox
 						:key="searchInputKey"
@@ -68,36 +68,48 @@
 				</div>
 			</div>
 
-			<div class="min-h-[11rem] overflow-y-auto bg-surface-2 px-6 py-4">
-				<div class="mb-2 text-base font-semibold text-primary">
-					{{ friendsHeading }}
+			<div class="relative flex min-h-0 flex-col bg-surface-2">
+				<div ref="friendsScrollContainer" class="min-h-0 overflow-y-auto px-6 py-4">
+					<div class="mb-2 text-base font-semibold text-primary">
+						{{ friendsHeading }}
+					</div>
+					<div
+						v-if="friends.length === 0"
+						class="flex min-h-32 items-center justify-center text-secondary"
+					>
+						{{ emptyFriendsLabel }}
+					</div>
+					<div v-else class="-mx-6 flex flex-col">
+						<InvitePlayersModalUserRow
+							v-for="friend in sortedFriends"
+							:key="friend.id"
+							:user="friend"
+							:avatar-alt="formatMessage(messages.avatarAlt, { username: friend.username })"
+							:added-label="addedButtonLabel"
+							:cancel-label="cancelButtonLabel"
+							:invite-label="inviteButtonLabel"
+							:requested-label="requestedButtonLabel"
+							:requested-tooltip="requestedTooltip(friend.username)"
+							:user-profile-link="userProfileLink"
+							:disabled="!canInvite"
+							@invite="inviteFriend"
+							@cancel="cancelInvite"
+						/>
+					</div>
 				</div>
 				<div
-					v-if="friends.length === 0"
-					class="flex min-h-32 items-center justify-center text-secondary"
-				>
-					{{ emptyFriendsLabel }}
-				</div>
-				<div v-else class="-mx-6 flex flex-col">
-					<InvitePlayersModalUserRow
-						v-for="friend in sortedFriends"
-						:key="friend.id"
-						:user="friend"
-						:avatar-alt="formatMessage(messages.avatarAlt, { username: friend.username })"
-						:added-label="addedButtonLabel"
-						:cancel-label="cancelButtonLabel"
-						:invite-label="inviteButtonLabel"
-						:requested-label="requestedButtonLabel"
-						:requested-tooltip="requestedTooltip(friend.username)"
-						:user-profile-link="userProfileLink"
-						:disabled="!canInvite"
-						@invite="inviteFriend"
-						@cancel="cancelInvite"
-					/>
-				</div>
+					v-if="showTopFade"
+					aria-hidden="true"
+					class="pointer-events-none absolute inset-x-0 top-0 z-10 h-6 bg-gradient-to-b from-surface-2 to-transparent"
+				/>
+				<div
+					v-if="showBottomFade"
+					aria-hidden="true"
+					class="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-6 bg-gradient-to-t from-surface-2 to-transparent"
+				/>
 			</div>
 
-			<div v-if="link" class="border-0 border-t border-solid border-surface-5 p-6">
+			<div v-if="link" class="shrink-0 border-0 border-t border-solid border-surface-5 p-6">
 				<div class="flex flex-col gap-2">
 					<div class="text-base font-semibold text-contrast">
 						{{ inviteLinkHeading }}
@@ -146,6 +158,7 @@ import { computed, ref } from 'vue'
 import { Button } from '#ui/components/base/buttons'
 
 import { defineMessages, useVIntl } from '../../../composables/i18n'
+import { useScrollIndicator } from '../../../composables/scroll-indicator'
 import { injectNotificationManager } from '../../../providers'
 import { commonMessages } from '../../../utils/common-messages'
 import Avatar from '../../base/Avatar.vue'
@@ -204,6 +217,8 @@ const emit = defineEmits<{
 const { formatMessage } = useVIntl()
 const notificationManager = injectNotificationManager(null)
 const modal = ref<InstanceType<typeof NewModal> | null>(null)
+const friendsScrollContainer = ref<HTMLElement | null>(null)
+const { showTopFade, showBottomFade } = useScrollIndicator(friendsScrollContainer)
 const inviteLinkEditor = ref<InstanceType<typeof InvitePlayersModalInviteLinkEditor> | null>(null)
 
 const messages = defineMessages({

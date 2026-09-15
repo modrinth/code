@@ -78,7 +78,7 @@
     "message": "Versão do projeto"
   },
   "analytics.breakdown.selected": {
-    "message": "Agrupado por {breakdown}"
+    "message": "Detalhamento por {breakdown}"
   },
   "analytics.chart.action.show-all": {
     "message": "Exibir tudo"
@@ -543,7 +543,7 @@
     "message": "Não monetizado"
   },
   "app-marketing.download.description": {
-    "message": "Nosso aplicativo para desktop está disponível em todas as plataformas, escolha a versão desejada."
+    "message": "Nosso aplicativo para PC está disponível em todas as plataformas, escolha a versão desejada."
   },
   "app-marketing.download.download-appimage": {
     "message": "Baixar AppImage"
@@ -581,14 +581,8 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Salve o conteúdo que você gosta e receba atualizações em um só clique."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Siga os projetos"
-  },
   "app-marketing.features.importing.description": {
-    "message": "Importe todos os perfis favoritos do launcher que você usou antes e comece a usar o Modrinth App em segundos!"
+    "message": "Importe todas as suas instâncias de jogos existentes do launcher que você estava usando antes e comece a usar o Modrinth App em segundos!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -597,7 +591,13 @@
     "message": "MultiMC"
   },
   "app-marketing.features.importing.title": {
-    "message": "Importe seus perfis"
+    "message": "Importar instâncias"
+  },
+  "app-marketing.features.manage-skins.description": {
+    "message": "Alterne entre todas as suas skins do Minecraft diretamente do aplicativo."
+  },
+  "app-marketing.features.manage-skins.title": {
+    "message": "Seletor de skins"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Ações"
@@ -623,12 +623,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Versão"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Jogue com mods, sem ou com internet."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Modo offline"
-  },
   "app-marketing.features.open-source.description": {
     "message": "O launcher do Modrinth é de código aberto. Você pode ver o código-fonte em nosso <github-link>GitHub</github-link>!"
   },
@@ -642,7 +636,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "O Modrinth App desempenha melhor que muitos outros gerenciadores de mods, usando apenas 150 MB de RAM!"
+    "message": "O Modrinth App tem um desempenho melhor que muitos dos principais gerenciadores de mods!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -652,15 +646,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"
@@ -686,8 +671,14 @@
   "app-marketing.features.play.title": {
     "message": "Jogue com seus mods favoritos"
   },
+  "app-marketing.features.settings-sync.description": {
+    "message": "Use as mesmas opções, pacotes de recursos e mais em todas as suas instâncias."
+  },
+  "app-marketing.features.settings-sync.title": {
+    "message": "Sincronizar suas configurações"
+  },
   "app-marketing.features.sharing.description": {
-    "message": "Crie, compartilhe e jogue com pacotes de mods com qualquer um de milhares de mods e pacotes de mods hospedados aqui."
+    "message": "Crie, compartilhe e jogue pacotes de mods com qualquer um dos milhares de mods e pacotes de mods hospedados aqui no Modrinth."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Pacote de mods"
@@ -756,7 +747,7 @@
     "message": "Parâmetros de consulta OAuth necessários faltando."
   },
   "auth.authorize.error.no-redirect-url": {
-    "message": "Sem redirecionamento encontrado na resposta"
+    "message": "Nenhum redirecionamento encontrado na resposta"
   },
   "auth.authorize.errro-title": {
     "message": "Ocorreu um erro"
@@ -782,6 +773,9 @@
   "auth.create-account.date-of-birth.label": {
     "message": "Data de nascimento"
   },
+  "auth.create-account.date-of-birth.not-meet-age-requirement": {
+    "message": "Você não tem idade suficiente para criar uma conta no Modrinth."
+  },
   "auth.create-account.date-of-birth.placeholder": {
     "message": "Selecione sua data de nascimento"
   },
@@ -790,6 +784,9 @@
   },
   "auth.create-account.date-of-birth.required.title": {
     "message": "Data de nascimento necessária"
+  },
+  "auth.create-account.date-of-birth.under13-helper": {
+    "message": "Você não pode criar uma conta no Modrinth a menos que tenha 13 anos."
   },
   "auth.create-account.info-panel.source-code-link": {
     "message": "Código-fonte relevante"
@@ -814,6 +811,30 @@
   },
   "auth.create-account.username.placeholder": {
     "message": "Inserir nome de usuário"
+  },
+  "auth.reauthenticate.2fa.description": {
+    "message": "Insira o código de 6 dígitos do seu aplicativo de autenticação ou um dos códigos de backup."
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "Autenticação de dois fatores"
+  },
+  "auth.reauthenticate.continue-with-passkey": {
+    "message": "Continuar com chave de acesso"
+  },
+  "auth.reauthenticate.last-signed-in-with": {
+    "message": "Conectou-se a última vez com {method, select, password {uma senha} passkey {uma chave de acesso} github {GitHub} discord {Discord} google {Google} microsoft {Microsoft} gitlab {GitLab} steam {Steam} paypal {PayPal} other {{method}} }."
+  },
+  "auth.reauthenticate.page-title": {
+    "message": "Reautenticar"
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "Iniciar sessão de outra forma"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "Iniciar sessão com o {provider}"
+  },
+  "auth.reauthenticate.title": {
+    "message": "{name} precisa ser autenticado novamente."
   },
   "auth.reset-password.method-choice.action": {
     "message": "Enviar e-mail de recuperação"
@@ -854,6 +875,12 @@
   "auth.sign-in.2fa.label": {
     "message": "Autenticação de dois fatores"
   },
+  "auth.sign-in.add-account": {
+    "message": "Adicionar conta"
+  },
+  "auth.sign-in.choose-account": {
+    "message": "Escolher uma conta para entrar no Modrinth"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Continuar com e-mail"
   },
@@ -868,6 +895,27 @@
   },
   "auth.sign-in.last-sign-in": {
     "message": "Último uso"
+  },
+  "auth.sign-in.launcher.callback.title": {
+    "message": "Callback de conectar-se do Modrinth"
+  },
+  "auth.sign-in.launcher.complete.description": {
+    "message": "Retornando para o aplicativo Modrinth. Se nada acontecer, aperte o botão abaixo."
+  },
+  "auth.sign-in.launcher.complete.go-to-website": {
+    "message": "Vá para Modrinth.com"
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "Abrir Modrinth App"
+  },
+  "auth.sign-in.launcher.complete.title": {
+    "message": "Você está em sessão"
+  },
+  "auth.sign-in.launcher.opening.description": {
+    "message": "Se o aplicativo não abrir, pressione o botão abaixo para iniciar sessão."
+  },
+  "auth.sign-in.launcher.opening.title": {
+    "message": "Abrindo o aplicativo..."
   },
   "auth.sign-in.no-account": {
     "message": "Não possui uma conta?"
@@ -901,6 +949,9 @@
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Criar uma conta"
+  },
+  "auth.two-factor.incorrect-code": {
+    "message": "O código de dois fatores está incorreto. Tente novamente ou use um código de backup."
   },
   "auth.verify-email.action.account-settings": {
     "message": "Configuração da conta"
@@ -1018,6 +1069,9 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Aprovar com resposta"
+  },
+  "conversation-thread.action.close-report": {
+    "message": "Fechar denúncia"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Encerrar com resposta"
@@ -2183,6 +2237,12 @@
   "error.generic.401.signed-in-as": {
     "message": "Você está acessando como:"
   },
+  "error.generic.401.switch-account": {
+    "message": "Ou troque para outra conta:"
+  },
+  "error.generic.401.switch-account-failed": {
+    "message": "Impossível trocar acontes. Por favor, tente novamente."
+  },
   "error.generic.401.title": {
     "message": "Você não possui acesso a essa página"
   },
@@ -2293,6 +2353,9 @@
   },
   "hosting-marketing.faq.cpu-kind": {
     "message": "Que tipo de CPUs os servidores do Modrinth Hosting utilizam?"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Os servidores do Modrinth Hosting são equipados com AMD Ryzen 7900 ou 9950X equivalentes, combinadas com memória DDR5."
   },
   "hosting-marketing.faq.currency": {
     "message": "Em que moeda são os preços apresentados?"
@@ -2651,6 +2714,9 @@
   "layout.action.new-project": {
     "message": "Novo projeto"
   },
+  "layout.action.new-server-project": {
+    "message": "Novo projeto de servidor"
+  },
   "layout.action.publish": {
     "message": "Publicar"
   },
@@ -2662,6 +2728,9 @@
   },
   "layout.action.tech-review": {
     "message": "Revisão técnica"
+  },
+  "layout.action.user-lookup": {
+    "message": "Pesquisar usuário"
   },
   "layout.avatar.alt": {
     "message": "Seu avatar"
@@ -2858,6 +2927,9 @@
   "layout.nav.active-reports": {
     "message": "Relatórios ativos"
   },
+  "layout.nav.add-account": {
+    "message": "Adicionar conta"
+  },
   "layout.nav.discover": {
     "message": "Descubra"
   },
@@ -2888,6 +2960,9 @@
   "layout.nav.projects": {
     "message": "Projetos"
   },
+  "layout.nav.remove-account": {
+    "message": "Remover conta"
+  },
   "layout.nav.revenue": {
     "message": "Receita"
   },
@@ -2896,6 +2971,12 @@
   },
   "layout.nav.search": {
     "message": "Buscar"
+  },
+  "layout.nav.switch-account": {
+    "message": "Trocar conta"
+  },
+  "layout.nav.switch-account-failed": {
+    "message": "Não foi possível trocar as contas. Tente novamente."
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Assinar o Modrinth+"
@@ -2935,6 +3016,9 @@
   },
   "moderation.moderate": {
     "message": "Moderar"
+  },
+  "moderation.page.delphi-rules": {
+    "message": "Regras Delphi"
   },
   "moderation.page.external-projects": {
     "message": "Projetos externos"
@@ -3338,6 +3422,9 @@
   "project-member-header.success-join": {
     "message": "Você entrou na equipe do projeto"
   },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Seu projeto foi entregue para revisão!"
+  },
   "project-moderation-nags.publishing-checklist": {
     "message": "Tarefas de publicação"
   },
@@ -3466,6 +3553,15 @@
   },
   "project.actions.servers-promo.title": {
     "message": "Criar um servidor"
+  },
+  "project.actions.view-dependents": {
+    "message": "Ver dependências"
+  },
+  "project.actions.view-modpacks": {
+    "message": "Ver pacotes de mods"
+  },
+  "project.actions.view-project-type-dependents": {
+    "message": "Ver dependências de {projectType}"
   },
   "project.ai-image-warning-modal.body.1": {
     "message": "Não é permitido usar imagens geradas por IA para representar seu projeto. Tentar burlar a detecção pode resultar na suspensão da sua conta Modrinth."
@@ -3746,6 +3842,12 @@
   "project.notification.icon-updated.title": {
     "message": "Ícone do projeto atualizado"
   },
+  "project.notification.review-save-failed.description": {
+    "message": "Você não pode salvar as edições do seu projeto que resultem em falha na validação."
+  },
+  "project.notification.review-save-failed.title": {
+    "message": "Falha ao salvar projeto em revisão"
+  },
   "project.notification.updated.message": {
     "message": "Seu projeto foi atualizado."
   },
@@ -3783,7 +3885,10 @@
     "message": "Excluir projeto"
   },
   "project.settings.disclosures.advertising.description.1": {
-    "message": "Você deve habilitar isso se o seu projeto contém anúncios, patrocínios ou promoções de outras obras."
+    "message": "Precisa estar ativado se o projeto contiver anúncios, patrocinadores ou promoções de outros trabalhos."
+  },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "Isso não se refere a promoção discreta de conteúdo relevante sem valor monetário (como um link para um perfil do Modrinth no seu próprio menu de configuração), e não se refere a anúncios na página do projeto, como banners patrocinados na descrição."
   },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "ex: Adiciona o servidor Modrinth SMP à sua lista de servidores automaticamente."
@@ -3791,17 +3896,32 @@
   "project.settings.disclosures.advertising.title": {
     "message": "Contém propagandas"
   },
+  "project.settings.disclosures.ai-functionality.description": {
+    "message": "Deve ser habilidade se o projeto tiver funcionalidades que usam IA generativa, como um chatbot dentro do jogo ou texturas geradas dinamicamente."
+  },
+  "project.settings.disclosures.ai-functionality.note-placeholder": {
+    "message": "ex.: Os NPCs usam uma IA generativa para opções de diálogo."
+  },
+  "project.settings.disclosures.ai-functionality.title": {
+    "message": "Contém funcionalidade de IA generativa"
+  },
   "project.settings.disclosures.ai.description": {
-    "message": "Você deve habilitar esta opção se este projeto conter uma quantidade substancial de código gerado por IA, qualquer\n\t\t\t        ativo substancialmente gerado por IA, se a funcionalidade do projeto depende do uso de\n\t\t\t\tIA generativa, ou se qualquer elemento da página do seu projeto, como descrição ou publicação\n                                depender de IA generativa."
+    "message": "Deve ser habilidade se o projeto tiver qualquer recurso ou texto de IA generativa, ou se contiver uma quantia considerável de código gerado por ela."
+  },
+  "project.settings.disclosures.ai.description.2": {
+    "message": "É importante ser honesto se a IA desempenhou um papel significante na produção ou publicação desse conteúdo. Uma maneira fácil de pensar sobre isso é se você consideraria a IA um co-autor do projeto, você deve divulgá-lo aqui."
   },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "ex.: as traduções em chinês e árabe são geradas por IA."
+  },
+  "project.settings.disclosures.ai.still-unsure": {
+    "message": "Ainda incerto? Consulte nosso guia para <faq-link>Avisos de conteúdo e Uso de AI</faq-link> e a seção 6 das <rules>Regras de Conteúdo do Modrinth</rules> para obter mais informações."
   },
   "project.settings.disclosures.ai.title": {
     "message": "Contém conteúdo gerado por IA"
   },
   "project.settings.disclosures.ai.types-description": {
-    "message": "Para que está sendo usada a IA gerativa?"
+    "message": "Que o tipo de conteúdo foi gerado por IA?"
   },
   "project.settings.disclosures.archived.banner-preview": {
     "message": "Prévia do banner"
@@ -3839,11 +3959,20 @@
   "project.settings.disclosures.derivative.note-label": {
     "message": "Explique como seu projeto se baseia no trabalho original"
   },
+  "project.settings.disclosures.derivative.note-placeholder": {
+    "message": "Este é um fork que adiciona alguns novos biomas e os porta para as versões mais recentes do Minecraft."
+  },
   "project.settings.disclosures.derivative.title": {
     "message": "Contém conteúdo derivado"
   },
   "project.settings.disclosures.description": {
     "message": "Você deve adicionar todos os avisos de conteúdo aplicáveis ​​ao seu projeto em conformidade com as <rules>Regras de Conteúdo do Modrinth</rules>."
+  },
+  "project.settings.disclosures.description.2": {
+    "message": "Não tem certeza de como aplicar a divulgação do seu projeto? Confira nosso <faq-link>FAQ sobre Divulgação de Conteúdo</faq-link>"
+  },
+  "project.settings.disclosures.info-tooltip": {
+    "message": "Clique para aprender mais sobre quando usar essa divulgação."
   },
   "project.settings.disclosures.last-updated": {
     "message": "Última atualização em {date} por {user}"
@@ -3855,13 +3984,13 @@
     "message": "Por favor, entre em <contact-support-link>contato com o suporte</contact-support-link> caso precise remover esta informação."
   },
   "project.settings.disclosures.lock-status.disabled.warning": {
-    "message": "Esta divulgação foi bloqueada pelos moderadores. <contact-support-link>Entre em contato</contact-support-link> se acredita que foi um erro."
+    "message": "Este aviso de conteúdo foi bloqueado pelos moderadores. <contact-support-link>Entre em contato</contact-support-link> se acredita que foi um erro."
   },
   "project.settings.disclosures.lock-status.fully-locked.warning": {
-    "message": "<contact-support-link>Entre em contato com o suporte</contact-support-link> se esta divulgação precisa ser editada ou removida."
+    "message": "<contact-support-link>Entre em contato com o suporte</contact-support-link> se este aviso de conteúdo precisa ser editado ou removido."
   },
   "project.settings.disclosures.paid-features.description": {
-    "message": "Você deve ativar isso se seu projeto contém recursos que podem ser obtidos ao gastar dinheiro real."
+    "message": "Deve ser ativado se este projeto conter funcionalidades que podem ser desbloqueadas com dinheiro real."
   },
   "project.settings.disclosures.paid-features.feature-placeholder": {
     "message": "ex.: Cosméticos disponíveis como uma recompensa do Patreon"
@@ -3882,7 +4011,64 @@
     "message": "Alerta de fotossensibilidade"
   },
   "project.settings.disclosures.save-blocked.advertising-note": {
-    "message": "A explicação para a sua divulgação é obrigatória."
+    "message": "A explicação para o aviso de conteúdo é obrigatório."
+  },
+  "project.settings.disclosures.save-blocked.derivative-empty": {
+    "message": "O aviso de obras derivativas deve listar pelo menos uma obra de origem."
+  },
+  "project.settings.disclosures.save-blocked.derivative-source-label": {
+    "message": "As fontes de trabalho derivativas devem ter um nome."
+  },
+  "project.settings.disclosures.save-blocked.no-permission": {
+    "message": "Você não tem permissão para editar os avisos de conteúdo deste projeto."
+  },
+  "project.settings.disclosures.save-blocked.paid-features-empty": {
+    "message": "O aviso de conteúdo de recursos pagos deve listar pelo menos um deles."
+  },
+  "project.settings.disclosures.save-blocked.photosensitivity-note": {
+    "message": "O aviso de fotossensibilidade deve incluir uma descrição."
+  },
+  "project.settings.disclosures.save-blocked.system-interactions-note": {
+    "message": "O aviso sobre interações com sistemas externos deve incluir uma descrição."
+  },
+  "project.settings.disclosures.save-blocked.telemetry-empty": {
+    "message": "O aviso de telemetria deve listar ao menos um tipo dos dado coletado."
+  },
+  "project.settings.disclosures.system-interactions.description": {
+    "message": "Você deve habilitar isso se o seu projeto ler ou editar coisas no sistema do usuário fora do jogo."
+  },
+  "project.settings.disclosures.system-interactions.note-label": {
+    "message": "Descreve as interações no sistema externo"
+  },
+  "project.settings.disclosures.system-interactions.note-placeholder": {
+    "message": "ex.: Adiciona um arquivo à área de trabalho chamado wake_up.txt"
+  },
+  "project.settings.disclosures.system-interactions.title": {
+    "message": "Interações de sistema externo"
+  },
+  "project.settings.disclosures.telemetry.consent-description": {
+    "message": "Qual é o modelo de consentimento de sua telemetria?"
+  },
+  "project.settings.disclosures.telemetry.data-description": {
+    "message": "Você pode adicionar tanto uma política de privacidade quanto uma lista de tipos de dados coletados. Lembre-se de mencionar se for anônimo ou conter informações pessoas identificáveis (PII)."
+  },
+  "project.settings.disclosures.telemetry.data-label": {
+    "message": "Qual data é coletada?"
+  },
+  "project.settings.disclosures.telemetry.data-placeholder": {
+    "message": "ex.: Análise de inicialização anônima para acompanhar a versão do Minecraft e o uso do carregador do mod."
+  },
+  "project.settings.disclosures.telemetry.description": {
+    "message": "Você deve habilitar isso se seu projeto enviar dados de uso de volta para você mesmo ou para terceiros."
+  },
+  "project.settings.disclosures.telemetry.title": {
+    "message": "Contém telemetria"
+  },
+  "project.settings.disclosures.upload-version-first.heading": {
+    "message": "Enviar versões antes de adicionar avisos de conteúdo"
+  },
+  "project.settings.editing-project": {
+    "message": "Editando projeto {projectType}"
   },
   "project.settings.general.name.description": {
     "message": "Evite prefixos, sufixos, parênteses ou descrições. Use apenas o nome do projeto."
@@ -3928,6 +4114,21 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.links.donation.duplicate-type": {
+    "message": "Você já possui outro link de {platform}."
+  },
+  "project.settings.links.donation.no-type": {
+    "message": "Por favor, selecione uma plataforma para este link de Doação."
+  },
+  "project.settings.monetization.description": {
+    "message": "Projetos do Modrinth são automaticamente inscritos no <rewards-program-link>Programa de Recompensas</rewards-program-link>. Se você não quer (ou não pode por motivos legais) lucrar com o projeto, pode desativar aqui."
+  },
+  "project.settings.monetization.disabled-description": {
+    "message": "Esse projeto não é elegível para monetização. Se acreditar que é um engano, por favor <contact-support-link>contate o suporte</contact-support-link>."
+  },
+  "project.settings.monetization.title": {
+    "message": "Monetização"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "Forneça a prova que possui permissão para redistribuir todos os seguintes arquivos. Após a conclusão, as versões retidas serão publicadas automaticamente."
@@ -4121,6 +4322,12 @@
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "Você selecionou {count} etiquetas. Considere reduzir para 12 ou menos para manter seu projeto focado e mais fácil de encontrar."
   },
+  "project.settings.tags.upload-version-first.heading": {
+    "message": "Enviar versões antes de adicionar tags"
+  },
+  "project.slug-suggestions.label": {
+    "message": "Sugestões:"
+  },
   "project.versions.copy-id-option": {
     "message": "Copiar ID"
   },
@@ -4217,17 +4424,29 @@
   "report.not-for.dmca.description": {
     "message": "Veja a nossa <policy-link>Política de direitos autorais</policy-link>."
   },
+  "report.note.ai-images.1": {
+    "message": "Acabamos de atualizar nossas regras sobre o uso proibido de IA generativa em ícones, galerias e descrições. Estamos dando aos criadores um período para remover esses conteúdos de seus projetos antes de começar a aceitar relatórios."
+  },
+  "report.note.check-back-later": {
+    "message": "Verifique novamente mais tarde quando o período de invencibilidade terminar. Não aceitamos relatórios deste tipo no momento."
+  },
   "report.note.copyright.1": {
     "message": "Tenha em mente que você *não* está enviando uma solicitação de remoção de DMCA, mas sim uma denúncia de conteúdo republicado."
   },
   "report.note.copyright.2": {
     "message": "Se você pretendia registrar uma solicitação de remoção de DMCA (que é uma ação legal), consulte nossa <copyright-policy-link>Política de direitos autorais</copyright-policy-link>."
   },
+  "report.note.fully-ai-generated.1": {
+    "message": "Acabamos de atualizar nossas regras para projetos gerados por IA proibida. Estamos dando aos criadores um período para atualizar ou derrubar projetos totalmente gerados por IA antes de começar a aceitar relatórios para eles."
+  },
   "report.note.malicious.1": {
     "message": "As denúncias de conteúdo malicioso ou enganoso devem incluir evidências substanciais do comportamento, como exemplos de código."
   },
   "report.note.malicious.2": {
     "message": "Resumos do Microsoft Defender, VirusTotal ou detecção de malware por IA não são formas suficientes de evidência e não serão aceitos."
+  },
+  "report.note.missing-disclosure.1": {
+    "message": "Os avisos de conteúdos são um recurso novo que acabamos de adicionar. Estamos dando aos criadores um período para que seus avisos de conteúdo estejam atualizadas antes de começar a aceitar relatórios por avisos ausentes ou incorretos."
   },
   "report.please-report": {
     "message": "Denuncie apenas:"
@@ -4246,6 +4465,9 @@
   },
   "report.report-item": {
     "message": "Denunciar {title} aos moderadores"
+  },
+  "report.reported-for": {
+    "message": "Reportado por {type}"
   },
   "report.submit": {
     "message": "Enviar denúncia"
@@ -4818,7 +5040,7 @@
     "message": "O código inserido está incorreto!"
   },
   "settings.account.two-factor.field.code.description": {
-    "message": "Insira o código de dois fatores para prosseguir."
+    "message": "Insira o código de  dígitos do seu aplicativo de autenticação ou um dos códigos de backup."
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Insira o código de dois fatores"
@@ -5066,6 +5288,9 @@
   "settings.billing.plan.title": {
     "message": "Plano {size}"
   },
+  "settings.billing.price.includes-tax": {
+    "message": "Inclui {amount} de imposto"
+  },
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
@@ -5290,6 +5515,21 @@
   },
   "ui.newsletter-button.tooltip": {
     "message": "Inscreva-se no boletim informativo do Modrinth"
+  },
+  "ui.two-factor-code.authentication-code": {
+    "message": "Código de autenticação em seis dígitos"
+  },
+  "ui.two-factor-code.backup-code": {
+    "message": "Código de backup"
+  },
+  "ui.two-factor-code.backup-code.placeholder": {
+    "message": "Insira um código de backup"
+  },
+  "ui.two-factor-code.use-authentication-code": {
+    "message": "Use um código de autenticação"
+  },
+  "ui.two-factor-code.use-backup-code": {
+    "message": "Use um código de backup"
   },
   "version.all-versions": {
     "message": "Todas as versões"

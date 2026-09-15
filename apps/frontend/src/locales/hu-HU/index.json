@@ -581,14 +581,8 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Mentsd el a kedvenc tartalmaidat, és egy kattintással kapj frissítéseket."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Projektek követése"
-  },
   "app-marketing.features.importing.description": {
-    "message": "Importáld az összes kedvenc profilodat a korábban használt indítóból, és néhány másodperc alatt elindíthatod a Modrinth Appot!"
+    "message": "Importáld az összes meglévő játékpéldányodat a korábban használt indítóprogramból, és kezdd el használni a Modrinth Appot pillanatok alatt!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -597,7 +591,13 @@
     "message": "MultiMC"
   },
   "app-marketing.features.importing.title": {
-    "message": "Profil importálás"
+    "message": "Példányok importálása"
+  },
+  "app-marketing.features.manage-skins.description": {
+    "message": "Válts az összes Minecraftos kinézeted között közvetlenül az alkalmazásból."
+  },
+  "app-marketing.features.manage-skins.title": {
+    "message": "Kinézet-választó"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Műveletek"
@@ -623,14 +623,8 @@
   "app-marketing.features.mod-management.version": {
     "message": "Verzió"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Játssz a modjaiddal, attól függetlenül, hogy kapcsolódva vagy-e az internethez, vagy sem."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Offline mód"
-  },
   "app-marketing.features.open-source.description": {
-    "message": "A Modrinth inditója teljesen nyílt forráskódú. Ellenőrizheted a forráskódot a <github-link>GitHub</github-link> oldalunkon!"
+    "message": "A Modrinth App teljesen nyílt forráskódú. A forráskódot megtekintheted a <github-link>GitHubon</github-link>!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Nyílt forráskódú"
@@ -642,7 +636,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "A Modrinth App sok vezető modkezelőnél jobb teljesítményt nyújt, miközben mindössze 150 MB memóriát használ."
+    "message": "A Modrinth App jobb teljesítményt nyújt, mint számos vezető modkezelő!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -652,15 +646,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"
@@ -685,6 +670,12 @@
   },
   "app-marketing.features.play.title": {
     "message": "Játssz a kedvenc modjaiddal"
+  },
+  "app-marketing.features.settings-sync.description": {
+    "message": "Használd ugyanazokat a beállításokat, erőforráscsomagokat és még sok mást az összes példányodban."
+  },
+  "app-marketing.features.settings-sync.title": {
+    "message": "Beállítások szinkronizálása"
   },
   "app-marketing.features.sharing.description": {
     "message": "Készíts, ossz meg és játssz modcsomagokat a Modrinthon elérhető több ezer moddal és modcsomaggal!"
@@ -902,6 +893,9 @@
   "auth.sign-in.last-sign-in": {
     "message": "Utoljára használva"
   },
+  "auth.sign-in.launcher.callback.title": {
+    "message": "Modrinth App bejelentkezési visszahívás"
+  },
   "auth.sign-in.launcher.complete.description": {
     "message": "Visszatérünk a Modrinth Appba. Ha semmi sem történik, használd az alábbi lehetőséget."
   },
@@ -913,6 +907,12 @@
   },
   "auth.sign-in.launcher.complete.title": {
     "message": "Be vagy jelentkezve"
+  },
+  "auth.sign-in.launcher.opening.description": {
+    "message": "Ha az alkalmazás nem nyílik meg, az alábbi gombbal fejezheted be a bejelentkezést."
+  },
+  "auth.sign-in.launcher.opening.title": {
+    "message": "A Modrinth App megnyitása..."
   },
   "auth.sign-in.no-account": {
     "message": "Nincs fiókja?"
@@ -946,6 +946,9 @@
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Fiók létrehozása"
+  },
+  "auth.two-factor.incorrect-code": {
+    "message": "A kétlépcsős azonosítási kód helytelen. Próbáld újra, vagy használj biztonsági kódot."
   },
   "auth.verify-email.action.account-settings": {
     "message": "Fiókbeállítások"
@@ -2496,7 +2499,7 @@
     "message": "Kezeld mindezt a Modrinth-on"
   },
   "hosting-marketing.why.all-on-modrinth.description": {
-    "message": "A szervered, a modjaid, a játékosaid és még sok minden más egy helyen, a Modrinthen. Nincs szükség arra, hogy platformok között váltogass."
+    "message": "A szervered, a modjaid, a játékosaid és még sok minden más egy helyen, a Modrinthon. Nincs szükség arra, hogy platformok között váltogass."
   },
   "hosting-marketing.why.consistently-fast": {
     "message": "Állandóan gyors"
@@ -3726,10 +3729,10 @@
     "message": "A projekted privát, vagyis csak te és az általad meghívott személyek férhetnek hozzá."
   },
   "project.moderation.admonition.approved.body.public": {
-    "message": "A projekted publikus, és felfedezhető a Modrinthen."
+    "message": "A projekted közzétételre került, és megtalálható a Modrinthon."
   },
   "project.moderation.admonition.approved.body.unlisted": {
-    "message": "A projekted nem listázott, ami azt jelenti, hogy csak a linkjével érhető el, és nem felfedezhető a Modrinthen."
+    "message": "A projekted nem listázott, ami azt jelenti, hogy csak a linkjével érhető el, és nem található meg a Modrinthon."
   },
   "project.moderation.admonition.approved.body.visibility-message": {
     "message": "A projekt láthatóságát a projekt <visibility-settings-link>láthatósági beállításaiban</visibility-settings-link> módosíthatod."
@@ -3870,7 +3873,10 @@
     "message": "Prolyekt végleges törlése"
   },
   "project.settings.disclosures.advertising.description.1": {
-    "message": "Ezt akkor kell engedélyezned, ha a projekted reklámokat, szponzorációkat vagy más művek népszerűsítését tartalmazza."
+    "message": "Kötelező bekapcsolni ha a projekted tartalmaz hirdetéseket, szponzorációkat, vagy esetleg mások munkáit hirdeti."
+  },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "Ez nem vonatkozik a releváns tartalmak tolakodásmentes, közvetlen pénzbeli értékkel nem rendelkező népszerűsítésére (például a saját konfigurációs menüdben elhelyezett Modrinth-profilra mutató hivatkozásra), és nem vonatkozik a projektoldalon megjelenő hirdetésekre, például a leírásban elhelyezett szponzorált bannerekre."
   },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "pl. Automatikusan hozzáadja a Modrinth SMP-szerverét a szerverlistádhoz."
@@ -3878,17 +3884,32 @@
   "project.settings.disclosures.advertising.title": {
     "message": "Hirdetéseket tartalmaz"
   },
+  "project.settings.disclosures.ai-functionality.description": {
+    "message": "Akkor kell engedélyezni, ha a projekt generatív AI-t használó funkciókat tartalmaz, például játékon belüli chatbotot vagy dinamikusan generált textúrákat."
+  },
+  "project.settings.disclosures.ai-functionality.note-placeholder": {
+    "message": "pl. Az NJK-k generatív AI-t használnak a párbeszédlehetőségekhez."
+  },
+  "project.settings.disclosures.ai-functionality.title": {
+    "message": "Generatív AI-funkciókat tartalmaz"
+  },
   "project.settings.disclosures.ai.description": {
-    "message": "Ezt a lehetőséget kötelezően be kell kapcsolnod, ha a projekted jelentős mennyiségű, MI által generált kódot tartalmaz; ha bármely erőforrás nagyrészt MI-vel generált; ha a projekt funkciói generatív MI használatán alapszanak; vagy ha a projekted oldalának bármely eleme – például a leírás vagy a közzététel – generatív MI-re támaszkodik."
+    "message": "Akkor kell engedélyezni, ha ez a projekt bármilyen AI által generált eszközt vagy szöveget tartalmaz, vagy jelentős mennyiségű AI által generált kódot tartalmaz."
+  },
+  "project.settings.disclosures.ai.description.2": {
+    "message": "Fontos őszintének lenni abban, ha a generatív AI jelentős szerepet játszott a tartalom elkészítésében vagy közzétételében. Ennek egyszerű megközelítése, hogy ha a projekt AI-társszerzőjének tekintenéd, ezt itt fel kell tüntetned."
   },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "Pl.: A kínai és arab fordításokat MI generálta."
+  },
+  "project.settings.disclosures.ai.still-unsure": {
+    "message": "Még mindig bizonytalan vagy? További információért tekintsd meg az <faq-link>AI közzétételéről és használatáról szóló útmutatónkat</faq-link> és a <rules>Modrinth tartalmi szabályainak</rules> 6. szakaszát."
   },
   "project.settings.disclosures.ai.title": {
     "message": "MI által generált tartalmat tartalmaz"
   },
   "project.settings.disclosures.ai.types-description": {
-    "message": "Mire használtad a generatív MI-t?"
+    "message": "Milyen típusú tartalmak készültek AI segítségével?"
   },
   "project.settings.disclosures.archived.banner-preview": {
     "message": "Szalaghirdetés előnézete"
@@ -3926,11 +3947,20 @@
   "project.settings.disclosures.derivative.note-label": {
     "message": "Írd le, hogyan alapul a projekted az eredeti művön"
   },
+  "project.settings.disclosures.derivative.note-placeholder": {
+    "message": "Ez egy olyan fork, amely néhány új biomot ad hozzá, és újabb Minecraft-verziókra portolja a projektet."
+  },
   "project.settings.disclosures.derivative.title": {
     "message": "Újrafelhasznált tartalmat tartalmaz"
   },
   "project.settings.disclosures.description": {
     "message": "A projektedhez minden vonatkozó tartalmi nyilatkozatot hozzá kell adnod a <rules>Modrinth tartalmi szabályaival</rules> összhangban."
+  },
+  "project.settings.disclosures.description.2": {
+    "message": "Nem tudod, hogyan alkalmazd a tartalommal kapcsolatos közzétételt a projektedre? Tekintsd meg a <faq-link>Tartalommal kapcsolatos közzétételek – GYIK</faq-link> oldalt."
+  },
+  "project.settings.disclosures.info-tooltip": {
+    "message": "Kattints ide, hogy megtudd, mikor kell ezt a közzétételt használni."
   },
   "project.settings.disclosures.last-updated": {
     "message": "Utoljára frissítette: {user}, {date}"
@@ -3948,7 +3978,7 @@
     "message": "Kérjük, <contact-support-link>vedd fel a kapcsolatot az ügyfélszolgálattal</contact-support-link>, ha ezt a nyilatkozatot szerkeszteni vagy eltávolítani kell."
   },
   "project.settings.disclosures.paid-features.description": {
-    "message": "Ezt akkor kell engedélyezned, ha a projekted olyan funkciókat tartalmaz, amelyek valódi pénzért szerezhetők meg."
+    "message": "Akkor kell engedélyezni, ha a projekt olyan funkciókat tartalmaz, amelyek valódi pénz elköltésével oldhatók fel."
   },
   "project.settings.disclosures.paid-features.feature-placeholder": {
     "message": "pl. Patreon-jutalomként elérhető kozmetikai tárgyak"
@@ -4998,7 +5028,7 @@
     "message": "A megadott kód helytelen!"
   },
   "settings.account.two-factor.field.code.description": {
-    "message": "Kérjük, írja be a kétlépcsős hitelesítés kódját a folytatáshoz."
+    "message": "Adj meg egy kódot a hitelesítő alkalmazásodból, vagy használd az egyik biztonsági kódodat."
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Írd be a kétlépcsős hitelesítés kódját"
@@ -5473,6 +5503,21 @@
   },
   "ui.newsletter-button.tooltip": {
     "message": "Feliratkozás a Modrinth hírlevelére"
+  },
+  "ui.two-factor-code.authentication-code": {
+    "message": "Hat számjegyű hitelesítési kód"
+  },
+  "ui.two-factor-code.backup-code": {
+    "message": "Biztonsági kód"
+  },
+  "ui.two-factor-code.backup-code.placeholder": {
+    "message": "Adj meg egy biztonsági kódot"
+  },
+  "ui.two-factor-code.use-authentication-code": {
+    "message": "Használj hitelesítő kódot"
+  },
+  "ui.two-factor-code.use-backup-code": {
+    "message": "Használj biztonsági kódot"
   },
   "version.all-versions": {
     "message": "Minden egyes verzió"

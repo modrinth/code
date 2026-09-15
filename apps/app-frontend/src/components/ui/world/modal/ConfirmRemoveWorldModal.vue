@@ -10,7 +10,7 @@ import {
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
-import type { World } from '@/helpers/worlds.ts'
+import { getWorldDisplayName, type World } from '@/helpers/worlds.ts'
 
 const { formatMessage } = useVIntl()
 
@@ -140,7 +140,11 @@ defineExpose({ show, hide })
 			<Admonition
 				v-else
 				:type="isSyncedServer ? 'warning' : 'critical'"
-				:header="formatMessage(warningHeaderMessage, { name: world?.name })"
+				:header="
+					formatMessage(warningHeaderMessage, {
+						name: world ? getWorldDisplayName(world) : '',
+					})
+				"
 			>
 				{{ formatMessage(warningBodyMessage) }}
 			</Admonition>
