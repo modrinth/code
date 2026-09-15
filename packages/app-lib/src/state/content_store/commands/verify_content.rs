@@ -228,7 +228,7 @@ impl ContentStore {
         Ok(report)
     }
 
-    async fn repair_stored_file(
+    pub(in crate::state::content_store) async fn repair_stored_file(
         &self,
         stored_file: &StoredFileMetadata,
         sources: &[String],

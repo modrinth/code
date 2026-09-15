@@ -9,8 +9,6 @@ use std::collections::HashSet;
 use std::path::Path;
 use tokio::fs::{self, ReadDir};
 
-/// Visits objects in filesystem order so recovery can register each verified file
-/// before inspecting the next one. A later I/O error does not discard that progress.
 pub(in crate::state::content_store) struct UnregisteredFiles {
     prefixes: ReadDir,
     entries: Option<ReadDir>,

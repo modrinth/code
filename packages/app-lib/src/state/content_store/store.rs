@@ -22,7 +22,6 @@ pub struct ContentStore {
     pub(super) publish_locks: [Mutex<()>; 64],
     pub(crate) files_lock: Mutex<()>,
     pub(super) verified_files: VerifiedFiles,
-    /// Lets Play prioritize the selected instance over migration of other instances.
     pub(crate) legacy_migration_priority: RwLock<()>,
     _process_lock: File,
     _content_process_lock: Option<File>,
@@ -98,8 +97,6 @@ impl ContentStore {
     }
 }
 
-/// Content ready to read or install. Keep the handle while using the file so cache
-/// cleanup cannot delete it midway through the operation.
 #[derive(Clone, Debug)]
 pub(crate) struct StoredFileHandle {
     pub metadata: StoredFileMetadata,
@@ -107,8 +104,6 @@ pub(crate) struct StoredFileHandle {
     pub(super) _guard: Arc<OwnedRwLockReadGuard<()>>,
 }
 
-/// Locates content for repair, including files that are missing or damaged.
-/// Unlike `StoredFileHandle`, this does not guarantee that the file is usable.
 #[derive(Clone, Debug)]
 pub(crate) struct StoredFileRecord {
     pub metadata: StoredFileMetadata,

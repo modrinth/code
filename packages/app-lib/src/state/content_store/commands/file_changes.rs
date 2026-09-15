@@ -20,16 +20,10 @@ pub(crate) struct PendingFileChange {
     journal: FileChangeJournal,
     pub(crate) stored_file: Option<StoredFileHandle>,
     _previous_file_lease: Option<StoredFileHandle>,
-    /// The failed change needs no further recovery and has preserved or restored the original file.
-    /// Background migration can skip this file and continue with the remaining files.
     pub(crate) safe_to_defer: bool,
 }
 
 impl ContentStore {
-    /// Saves the original file so a failed install, replacement, or removal can be undone.
-    ///
-    /// Recover earlier changes first. Hold the instance and store locks until commit or
-    /// rollback so another content operation cannot invalidate the saved original.
     pub(crate) async fn prepare_file_change(
         &self,
         instance: &Instance,
@@ -179,8 +173,6 @@ impl ContentStore {
         })
     }
 
-    /// Records an enable/disable rename so recovery can undo an interrupted toggle.
-    /// Uses the same recovery and locking requirements as `prepare_file_change`.
     pub(crate) async fn prepare_file_move(
         &self,
         instance: &Instance,
