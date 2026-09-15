@@ -129,6 +129,10 @@ services:
       - DISCORD_CLIENT_SECRET=${DISCORD_CLIENT_SECRET:-}
       - PUBLIC_URL=${PUBLIC_URL:-http://localhost:3000}
       - TRUST_PROXY_HOPS=${TRUST_PROXY_HOPS:-0}
+      - LAUNCHER_CLIENT_KEY=${LAUNCHER_CLIENT_KEY:-}
+      - API_HOSTS=${API_HOSTS:-api.owyx.site}
+      - API_PUBLIC_URL=${API_PUBLIC_URL:-}
+      - API_URL=${API_URL:-}
     volumes:
       - ./backend/uploads:/app/uploads
       - ./backend/fixtures:/app/fixtures:ro
