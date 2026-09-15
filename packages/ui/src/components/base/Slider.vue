@@ -151,6 +151,7 @@ const valueFieldChars = computed(() => {
 	return Math.max(props.min.toFixed(decimals).length, props.max.toFixed(decimals).length, 2)
 })
 const currentValue = ref(props.modelValue === null ? null : normalizeValue(props.modelValue))
+const previousRawValue = ref<number | null>(null)
 const currentPercentage = computed(() => getPercentage(currentValue.value ?? props.min))
 const visibleSnapPoints = computed(() =>
 	props.snapPoints.filter((snapPoint) => snapPoint > props.min && snapPoint < props.max),
@@ -194,7 +195,7 @@ function inputValueValid(inputValue: number) {
 
 function onInputWithSnap(value: string) {
 	const parsedValue = Number.parseFloat(value)
-	const previousValue = currentValue.value ?? props.min
+	const previousValue = previousRawValue.value ?? currentValue.value ?? props.min
 
 	let snappedValue = parsedValue
 	let closestDistance = props.snapRange
@@ -210,6 +211,7 @@ function onInputWithSnap(value: string) {
 		}
 	}
 
+	previousRawValue.value = parsedValue
 	inputValueValid(snappedValue)
 }
 
