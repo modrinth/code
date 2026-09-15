@@ -342,11 +342,11 @@ const messages = defineMessages({
 	},
 	signInRequiredTitle: {
 		id: 'settings.profile.sign-in-required.title',
-		defaultMessage: 'Modrinth account required',
+		defaultMessage: 'Owyx account required',
 	},
 	signInRequiredDescription: {
 		id: 'settings.profile.sign-in-required.description',
-		defaultMessage: 'Sign in with a Modrinth account to customize your public profile.',
+		defaultMessage: 'Sign in with your Owyx site account from the profile button in the launcher sidebar.',
 	},
 	saveError: {
 		id: 'settings.profile.save-error',

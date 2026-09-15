@@ -249,12 +249,23 @@ const checkLoginAttempts = async (ip, email) => {
 };
 
 // POST /api/auth/register - Регистрация нового пользователя
+const loginFieldValidator = body('login')
+    .optional()
+    .isLength({ min: 3, max: 32 })
+    .withMessage('Логин должен быть от 3 до 32 символов')
+    .matches(/^[a-zA-Z0-9_]+$/)
+    .withMessage('Логин может содержать только буквы, цифры и подчеркивания');
+
+const legacyNickValidator = body('minecraft_nick')
+    .optional()
+    .isLength({ min: 3, max: 32 })
+    .withMessage('Логин должен быть от 3 до 32 символов')
+    .matches(/^[a-zA-Z0-9_]+$/)
+    .withMessage('Логин может содержать только буквы, цифры и подчеркивания');
+
 router.post('/register', [
-    body('minecraft_nick')
-        .isLength({ min: 3, max: 32 })
-        .withMessage('Minecraft ник должен быть от 3 до 32 символов')
-        .matches(/^[a-zA-Z0-9_]+$/)
-        .withMessage('Minecraft ник может содержать только буквы, цифры и подчеркивания'),
+    loginFieldValidator,
+    legacyNickValidator,
     body('email').isEmail().normalizeEmail().withMessage('Некорректный email'),
     body('password')
         .isLength({ min: 8 })
@@ -270,8 +281,16 @@ router.post('/register', [
     }
 
     try {
-        const { minecraft_nick, email, password, first_name, turnstileToken } = req.body;
+        const loginName = (req.body.login || req.body.minecraft_nick || '').trim();
+        const { email, password, first_name, turnstileToken } = req.body;
         const clientIp = req.clientIp || req.ip || req.connection.remoteAddress;
+
+        if (!loginName || !/^[a-zA-Z0-9_]{3,32}$/.test(loginName)) {
+            return res.status(400).json({
+                error: 'Ошибка валидации',
+                details: [{ msg: 'Укажите логин 3–32 символа (буквы, цифры, _)' }]
+            });
+        }
 
         // Проверка Cloudflare Turnstile
         const turnstileResult = await verifyTurnstile(turnstileToken, clientIp);
@@ -284,7 +303,7 @@ router.post('/register', [
         // Проверяем, не существует ли уже пользователь с таким email или ником
         const existingUser = await db.query(
             'SELECT id, email, nickname FROM users WHERE email = $1 OR nickname = $2',
-            [email, minecraft_nick]
+            [email, loginName]
         );
 
         if (existingUser.rows.length > 0) {
@@ -294,9 +313,9 @@ router.post('/register', [
                     error: 'Пользователь с таким email уже существует'
                 });
             }
-            if (existing.nickname === minecraft_nick) {
+            if (existing.nickname === loginName) {
                 return res.status(400).json({
-                    error: 'Пользователь с таким Minecraft ником уже существует'
+                    error: 'Пользователь с таким логином уже существует'
                 });
             }
         }
@@ -310,7 +329,7 @@ router.post('/register', [
             `INSERT INTO users (nickname, email, password_hash, first_name, registered_at) 
              VALUES ($1, $2, $3, $4, NOW()) 
              RETURNING id, nickname, email, first_name, registered_at`,
-            [minecraft_nick, email, passwordHash, first_name || null]
+            [loginName, email, passwordHash, first_name || null]
         );
 
         const newUser = result.rows[0];
@@ -340,7 +359,7 @@ router.post('/register', [
             const emailService = require('../utils/emailService');
             await emailService.sendVerificationEmail(
                 email,
-                minecraft_nick,
+                loginName,
                 verificationUrl
             );
         } catch (emailError) {
@@ -348,7 +367,7 @@ router.post('/register', [
             // Не прерываем регистрацию из-за ошибки отправки email
         }
 
-        console.log(`✅ Новая регистрация: ${minecraft_nick} (${email})`);
+        console.log(`✅ Новая регистрация: ${loginName} (${email})`);
 
         res.status(201).json({
             message: 'Регистрация прошла успешно! Проверьте email для подтверждения адреса.',
@@ -378,7 +397,8 @@ router.post('/register', [
 
 // POST /api/auth/login - Вход в систему
 router.post('/login', [
-    body('email').isEmail().normalizeEmail().withMessage('Некорректный email'),
+    body('login').optional().trim().isLength({ min: 1 }).withMessage('Укажите логин или email'),
+    body('email').optional().trim().isLength({ min: 1 }),
     body('password').isLength({ min: 6 }).withMessage('Пароль должен быть минимум 6 символов')
 ], async (req, res) => {
     try {
@@ -391,9 +411,19 @@ router.post('/login', [
             });
         }
 
-        const { email, password, remember = false, turnstileToken } = req.body;
+        const rawLogin = (req.body.login || req.body.email || '').trim();
+        const { password, remember = false, turnstileToken } = req.body;
         const ip = req.clientIp || req.ip || req.connection.remoteAddress;
         const userAgent = req.get('User-Agent') || '';
+
+        if (!rawLogin) {
+            return res.status(400).json({
+                error: 'Ошибка валидации',
+                details: [{ msg: 'Укажите логин или email' }]
+            });
+        }
+
+        const loginKey = rawLogin.includes('@') ? rawLogin.toLowerCase() : rawLogin;
 
         // Launcher clients: Host api.* + valid X-Owyx-Client-Key → skip Turnstile.
         // Browser Host (owyx.site) must still pass captcha even if someone replays the key.
@@ -415,23 +445,28 @@ router.post('/login', [
         }
 
         // Проверяем количество неудачных попыток
-        const failedAttempts = await checkLoginAttempts(ip, email);
+        const failedAttempts = await checkLoginAttempts(ip, loginKey);
         if (failedAttempts >= 5) {
-            await logLoginAttempt(email, ip, userAgent, false);
+            await logLoginAttempt(loginKey, ip, userAgent, false);
             return res.status(429).json({
                 error: 'Слишком много неудачных попыток входа. Попробуйте через час.'
             });
         }
 
-        // Находим пользователя
-        const userResult = await db.query(
-            'SELECT * FROM users WHERE email = $1 AND is_active = true',
-            [email]
-        );
+        // Находим пользователя по email или логину
+        const userResult = rawLogin.includes('@')
+            ? await db.query(
+                'SELECT * FROM users WHERE LOWER(email) = LOWER($1) AND is_active = true',
+                [loginKey]
+            )
+            : await db.query(
+                'SELECT * FROM users WHERE LOWER(nickname) = LOWER($1) AND is_active = true',
+                [loginKey]
+            );
 
         if (userResult.rows.length === 0) {
-            await logLoginAttempt(email, ip, userAgent, false);
-            return res.status(401).json({ error: 'Неверный email или пароль' });
+            await logLoginAttempt(loginKey, ip, userAgent, false);
+            return res.status(401).json({ error: 'Неверный логин или пароль' });
         }
 
         const user = userResult.rows[0];
@@ -439,8 +474,8 @@ router.post('/login', [
         // Проверяем пароль
         const isPasswordValid = await bcrypt.compare(password, user.password_hash);
         if (!isPasswordValid) {
-            await logLoginAttempt(email, ip, userAgent, false);
-            return res.status(401).json({ error: 'Неверный email или пароль' });
+            await logLoginAttempt(loginKey, ip, userAgent, false);
+            return res.status(401).json({ error: 'Неверный логин или пароль' });
         }
 
         // Создаём JWT токен

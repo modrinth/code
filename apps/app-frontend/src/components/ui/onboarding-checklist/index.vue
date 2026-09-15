@@ -43,10 +43,10 @@ const messages = defineMessages({
 
 const steps = computed(() => [
 	{
-		id: 'create-instance',
-		label: formatMessage(messages.createInstance),
-		complete: hasCreatedInstance.value,
-		action: () => emit('create-instance'),
+		id: 'login-modrinth',
+		label: formatMessage(messages.loginModrinth),
+		complete: hasLoggedIntoModrinth.value,
+		action: () => emit('login-modrinth'),
 	},
 	{
 		id: 'login-minecraft',
@@ -55,10 +55,10 @@ const steps = computed(() => [
 		action: () => emit('login-minecraft'),
 	},
 	{
-		id: 'login-modrinth',
-		label: formatMessage(messages.loginModrinth),
-		complete: hasLoggedIntoModrinth.value,
-		action: () => emit('login-modrinth'),
+		id: 'create-instance',
+		label: formatMessage(messages.createInstance),
+		complete: hasCreatedInstance.value,
+		action: () => emit('create-instance'),
 	},
 ])
 

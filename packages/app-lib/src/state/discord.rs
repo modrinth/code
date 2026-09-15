@@ -16,8 +16,14 @@ pub struct DiscordGuard {
 impl DiscordGuard {
     /// Initialize discord IPC client, and attempt to connect to it
     /// If it fails, it will still return a DiscordGuard, but the client will be unconnected
+    fn application_id() -> &'static str {
+        // Set at build time: OWYX_DISCORD_APP_ID=<your Discord application id>
+        // Without your own app, Discord shows the legacy Modrinth application name.
+        option_env!("OWYX_DISCORD_APP_ID").unwrap_or("1123683254248148992")
+    }
+
     pub fn init() -> crate::Result<DiscordGuard> {
-        let dipc = DiscordIpcClient::new("1123683254248148992");
+        let dipc = DiscordIpcClient::new(Self::application_id());
 
         Ok(DiscordGuard {
             client: Arc::new(RwLock::new(dipc)),

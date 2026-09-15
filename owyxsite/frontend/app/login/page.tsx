@@ -13,7 +13,7 @@ export default function LoginPage() {
   const router = useRouter();
   useAuth({ redirectIfAuth: true });
 
-  const [email, setEmail] = useState("");
+  const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
@@ -34,7 +34,7 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, remember, turnstileToken: turnstileToken || undefined }),
+        body: JSON.stringify({ login, password, remember, turnstileToken: turnstileToken || undefined }),
       });
       const result = await res.json();
       if (res.ok && result.token) {
@@ -69,16 +69,16 @@ export default function LoginPage() {
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="field-label" htmlFor="email">Email</label>
+          <label className="field-label" htmlFor="login">Логин или email</label>
           <input
-            id="email"
-            type="email"
-            autoComplete="email"
+            id="login"
+            type="text"
+            autoComplete="username"
             required
             className="input"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            placeholder="steve или you@example.com"
+            value={login}
+            onChange={(e) => setLogin(e.target.value)}
           />
         </div>
         <div>

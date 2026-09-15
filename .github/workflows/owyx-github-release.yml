@@ -11,7 +11,7 @@ on:
       version:
         description: 'Semver without v prefix (e.g. 0.1.0)'
         required: true
-        default: '0.1.0'
+        default: '0.2.0'
 
 permissions:
   contents: write
@@ -178,12 +178,12 @@ jobs:
           NOTES=$(cat <<EOF
           ## Owyx ${VERSION}
 
-          Public fork/rebrand of [modrinth/code](https://github.com/modrinth/code). Product branding is **Owyx**; source license remains **GPL-3** (\`LICENSE\` / \`COPYING.md\`).
+          ### Changes
+          - Site: brand backdrop, login-based registration, login or email sign-in, no public server IP on home, hidden Servers nav
+          - Launcher: welcome/home fix after deleting instances, sidebar scroll fade, news column removed, Owyx Servers tab hidden, settings say Owyx, data folder \`app.owyx\`, version aligned (no \`-local\` suffix)
+          - Discord RPC: set \`OWYX_DISCORD_APP_ID\` at build time for your own Discord app (see \`docs/owyx-site-ops.md\`)
 
-          - Windows: NSIS \`.exe\`
-          - Linux: \`.AppImage\`
-
-          Not affiliated with Modrinth / Rinth, Inc. Auto-update CDN from Modrinth is disabled in this build.
+          Installers: Windows NSIS \`Owyx_${VERSION}_x64-setup.exe\`, Linux AppImage. GPL-3 fork of [modrinth/code](https://github.com/modrinth/code); not affiliated with Modrinth / Rinth, Inc. GitHub-release auto-update is not enabled yet in \`tauri-owyx-release.conf.json\`.
           EOF
           )
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then

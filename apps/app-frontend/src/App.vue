@@ -877,21 +877,7 @@ async function setupApp() {
 			)
 		})
 
-	fetch(`https://modrinth.com/news/feed/articles.json`)
-		.then((response) => response.json())
-		.then((res) => {
-			if (res && res.articles) {
-				news.value = res.articles
-					.map((article) => ({
-						...article,
-						path: article.link,
-					}))
-					.slice(0, 4)
-			}
-		})
-		.catch((error) => {
-			console.error('Failed to fetch news articles', error)
-		})
+	// Owyx: Modrinth news feed removed from sidebar
 
 	traceStartupStep('Read opening command', get_opening_command).then(handleCommand)
 	traceStartupStep('Refresh startup credentials', fetchCredentials)
@@ -2292,14 +2278,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			>
 				<ImageIcon />
 			</NavButton>
-			<NavButton
-				v-tooltip.right="formatMessage(messages.modrinthHosting)"
-				to="/owyx-servers"
-				:is-primary="(r) => r.path === '/owyx-servers'"
-				:is-subpage="(r) => r.path.startsWith('/owyx-servers/')"
-			>
-				<ServerStackIcon />
-			</NavButton>
+			<!-- Owyx Servers nav hidden for release; catalog ships via instances / future entry -->
 			<suspense>
 				<QuickInstanceSwitcher>
 					<NavButton
@@ -2508,29 +2487,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 						v-if="prideFundraiserEnabled"
 						class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
 					/>
-					<div v-if="news && news.length > 0" class="p-4 flex flex-col items-center">
-						<h3 class="text-base mb-4 text-primary font-medium m-0 text-left w-full">
-							{{ formatMessage(messages.news) }}
-						</h3>
-						<div class="space-y-4 flex flex-col items-center w-full">
-							<NewsArticleCard
-								v-for="(item, index) in news"
-								:key="`news-${index}`"
-								:article="item"
-							/>
-							<ButtonLink
-								type="colored"
-								color="brand"
-								size="xl"
-								href="https://owyx.site"
-								target="_blank"
-								class="my-4"
-							>
-								<NewspaperIcon />
-								{{ formatMessage(messages.viewAllNews) }}
-							</ButtonLink>
-						</div>
-					</div>
 				</div>
 			</div>
 			<template v-if="false">
@@ -2676,14 +2632,21 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 }
 
 .app-sidebar::after {
+	display: none;
+}
+
+.app-sidebar-scrollable::after {
 	content: '';
-	position: absolute;
-	bottom: 250px;
+	position: sticky;
+	bottom: 0;
 	left: 0;
 	right: 0;
-	height: 5rem;
-	background: var(--brand-gradient-fade-out-color);
+	display: block;
+	height: 3.5rem;
+	margin-top: -3.5rem;
+	background: linear-gradient(to bottom, transparent, var(--brand-gradient-bg, #131319));
 	pointer-events: none;
+	z-index: 2;
 }
 
 .app-sidebar.has-plus::after {

@@ -7,7 +7,6 @@ import { useAuth } from "@/hooks/useAuth";
 
 const NAV = [
   { href: "/", label: "Главная" },
-  { href: "/servers", label: "Серверы" },
   { href: "/download", label: "Скачать" },
 ];
 

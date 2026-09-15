@@ -3,7 +3,7 @@ import { ImportIcon, PlusIcon } from '@modrinth/assets'
 import { Button, defineMessages, IntlFormatted, useVIntl } from '@modrinth/ui'
 import { inject, onMounted, onUnmounted, ref } from 'vue'
 
-import owyxWelcomeIcon from '../../assets/welcome/owyx-welcome-icon.svg'
+import owyxWelcomeIcon from '../../assets/welcome/owyx-welcome-icon.svg?url'
 
 const showCreationModal = inject<() => void>('showCreationModal')
 const showImportModal = inject<() => void>('showImportModal')

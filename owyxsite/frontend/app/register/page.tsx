@@ -11,7 +11,7 @@ const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
 export default function RegisterPage() {
   useAuth({ redirectIfAuth: true });
 
-  const [nick, setNick] = useState("");
+  const [login, setLogin] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -25,8 +25,8 @@ export default function RegisterPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    if (!/^[a-zA-Z0-9_]{3,32}$/.test(nick)) {
-      setError("Ник: 3–32 символа, только буквы, цифры и _.");
+    if (!/^[a-zA-Z0-9_]{3,32}$/.test(login)) {
+      setError("Логин: 3–32 символа, только буквы, цифры и _.");
       return;
     }
     if (password.length < 8) {
@@ -47,7 +47,7 @@ export default function RegisterPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          minecraft_nick: nick,
+          login,
           email,
           password,
           turnstileToken: turnstileToken || undefined,
@@ -88,17 +88,19 @@ export default function RegisterPage() {
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="field-label" htmlFor="nick">Minecraft-ник</label>
+          <label className="field-label" htmlFor="login">Логин</label>
           <input
-            id="nick"
+            id="login"
             className="input"
             required
             minLength={3}
             maxLength={32}
-            placeholder="Steve"
-            value={nick}
-            onChange={(e) => setNick(e.target.value)}
+            autoComplete="username"
+            placeholder="steve"
+            value={login}
+            onChange={(e) => setLogin(e.target.value)}
           />
+          <p className="field-hint mt-1.5">Этот же логин будет в лаунчере и в игре (если не входишь через Microsoft).</p>
         </div>
         <div>
           <label className="field-label" htmlFor="email">Email</label>

@@ -22,7 +22,7 @@ defineOptions({
 
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
-const { hasCreatedInstance, isReady } = injectOnboardingChecklist()
+const { isReady } = injectOnboardingChecklist()
 const showCreationModal = inject<() => void>('showCreationModal')
 const pageOptions = ref<InstanceType<typeof ContextMenu>>()
 const appSettings = useAppSettings()
@@ -55,11 +55,11 @@ useRootBreadcrumb({
 
 const instancesQuery = useQuery(instanceListQueryOptions())
 const instances = computed(() => instancesQuery.data.value ?? [])
-if (hasCreatedInstance.value) {
-	await traceStartupStep('Load library instances', () => instancesQuery.suspense()).catch(
-		handleError,
-	)
-}
+const showWelcome = computed(() => isReady.value && instances.value.length === 0)
+
+await traceStartupStep('Load library instances', () => instancesQuery.suspense()).catch(
+	handleError,
+)
 
 const recentInstances = computed(() =>
 	instances.value
@@ -89,7 +89,7 @@ function openPageContextMenu(event: MouseEvent) {
 </script>
 
 <template>
-	<WelcomeScreen v-if="isReady && !hasCreatedInstance" />
+	<WelcomeScreen v-if="showWelcome" />
 	<div
 		v-else-if="isReady"
 		data-library-page-background

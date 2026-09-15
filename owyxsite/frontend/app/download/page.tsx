@@ -11,12 +11,12 @@ const REPO_URL = "https://github.com/ebluffy/Owyx";
 const RELEASES_URL = `${REPO_URL}/releases`;
 const DOWNLOAD_URL =
   process.env.NEXT_PUBLIC_LAUNCHER_DOWNLOAD_URL ||
-  `${REPO_URL}/releases/latest/download/Owyx.exe`;
+  `${REPO_URL}/releases/latest/download/Owyx_0.2.0_x64-setup.exe`;
 
 const steps = [
-  { n: "1", title: "Скачай и запусти", text: "Один файл Owyx.exe для Windows. Установка не нужна." },
-  { n: "2", title: "Введи ник (или войди)", text: "Гостю хватит ника. Аккаунт Owyx — скин и плюшки." },
-  { n: "3", title: "Нажми Play", text: "Лаунчер сам скачает сборку и запустит игру." },
+  { n: "1", title: "Скачай установщик", text: "Файл Owyx_*_x64-setup.exe для Windows 10/11. Запусти и пройди мастер установки." },
+  { n: "2", title: "Создай аккаунт и войди", text: "Зарегистрируйся на owyx.site, затем войди тем же логином в лаунчере." },
+  { n: "3", title: "Создай сборку и играй", text: "Создай instance, нажми Play — лаунчер скачает Minecraft и запустит игру." },
 ];
 
 export default function DownloadPage() {
@@ -31,7 +31,7 @@ export default function DownloadPage() {
               Скачать Owyx
             </h1>
             <p className="text-lg text-muted max-w-2xl">
-              Свой лаунчер Minecraft. Скачал, ввёл ник — играешь. Дальше — сервера сообщества.
+              Десктоп-лаунчер Owyx (форк Modrinth App): установщик, аккаунт на сайте, Play в один клик.
             </p>
           </div>
 
@@ -40,7 +40,7 @@ export default function DownloadPage() {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
               </svg>
-              Скачать Owyx.exe
+              Скачать для Windows
             </a>
             <a href={REPO_URL} target="_blank" rel="noopener noreferrer" className="btn btn-ghost btn-lg" id="repo-link">
               Репозиторий

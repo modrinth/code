@@ -15,7 +15,10 @@
 				<p class="m-0 text-base leading-6 text-primary">
 					{{ formatMessage(messages.description) }}
 				</p>
-				<p class="m-0 text-sm leading-5 text-secondary">
+				<p
+					v-if="formatMessage(messages.clientKeyHint)"
+					class="m-0 text-sm leading-5 text-secondary"
+				>
 					{{ formatMessage(messages.clientKeyHint) }}
 				</p>
 			</div>
@@ -25,7 +28,7 @@
 					<span>{{ formatMessage(messages.emailLabel) }}</span>
 					<input
 						v-model="email"
-						type="email"
+						type="text"
 						autocomplete="username"
 						required
 						class="rounded-lg border border-solid border-surface-4 bg-bg px-3 py-2 text-base text-contrast outline-none focus:border-brand"
@@ -212,16 +215,15 @@ const messages = defineMessages({
 	description: {
 		id: 'modal.owyx-account-required.description',
 		defaultMessage:
-			'Use the same email and password as on owyx.site. Minecraft Offline and Microsoft profiles stay separate under Playing as.',
+			'Use the same login (or email) and password as on owyx.site. Microsoft sign-in is optional for licensed skins.',
 	},
 	clientKeyHint: {
 		id: 'modal.owyx-account-required.client-key-hint',
-		defaultMessage:
-			'Requires X-Owyx-Client-Key from Owyx Servers settings (same key as the catalog).',
+		defaultMessage: '',
 	},
 	emailLabel: {
 		id: 'modal.owyx-account-required.email',
-		defaultMessage: 'Email',
+		defaultMessage: 'Login or email',
 	},
 	passwordLabel: {
 		id: 'modal.owyx-account-required.password',

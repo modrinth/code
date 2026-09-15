@@ -82,18 +82,18 @@ function mapUser(raw: Record<string, unknown>): OwyxSiteUser {
 	}
 }
 
-export async function loginOwyxSite(email: string, password: string): Promise<OwyxSiteSession> {
+export async function loginOwyxSite(login: string, password: string): Promise<OwyxSiteSession> {
 	const base = apiBase()
 	const key = getOwyxClientKey()
 	if (!key.trim()) {
 		throw new Error(
-			'Missing X-Owyx-Client-Key. Open Owyx Servers → paste your client key, Save, then sign in again.',
+			'Launcher is missing X-Owyx-Client-Key. Reinstall from a current GitHub release or enable Developer mode to set the key.',
 		)
 	}
 	const res = await fetch(`${base.replace(/\/$/, '')}/api/auth/login`, {
 		method: 'POST',
 		headers: authHeaders(),
-		body: JSON.stringify({ email: email.trim(), password, remember: true }),
+		body: JSON.stringify({ login: login.trim(), password, remember: true }),
 		signal: AbortSignal.timeout(12000),
 	})
 	const data = (await res.json().catch(() => ({}))) as Record<string, unknown>
