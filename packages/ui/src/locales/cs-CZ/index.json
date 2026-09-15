@@ -1820,12 +1820,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Obsah se nepodařilo smazat"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Obsah se nepodařilo vypnout"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Obsah se nepodařilo zapnout"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Obsah se nepodařilo nahrát"
   },
@@ -1840,9 +1834,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Obsah se nepodařilo odebrat"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Nepodařilo se přepnout {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Modpack se nepodařilo odpojit"

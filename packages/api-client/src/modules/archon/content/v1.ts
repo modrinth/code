@@ -6,6 +6,18 @@ export class ArchonContentV1Module extends AbstractModule {
 		return 'archon_content_v1'
 	}
 
+	public async share(serverId: string, worldId: string): Promise<Archon.Content.v1.ShareWorldContentResponse> {
+		return this.client.request(`/servers/${encodeURIComponent(serverId)}/worlds/${encodeURIComponent(worldId)}/content/share`, {
+			api: 'archon', version: 1, method: 'POST', timeout: 600_000, retry: false,
+		})
+	}
+
+	public async getShareDiff(serverId: string, worldId: string): Promise<Archon.Content.v1.SharedInstancePublishDiff> {
+		return this.client.request(`/servers/${encodeURIComponent(serverId)}/worlds/${encodeURIComponent(worldId)}/content/share/diff`, {
+			api: 'archon', version: 1, method: 'GET',
+		})
+	}
+
 	/** GET /v1/:server_id/worlds/:world_id/addons */
 	public async getAddons(
 		serverId: string,
@@ -103,6 +115,57 @@ export class ArchonContentV1Module extends AbstractModule {
 			method: 'POST',
 			body: request,
 		})
+	}
+
+	/** POST /v1/:server_id/worlds/:world_id/addons/set-enabled-server */
+	public async setAddonEnabledServer(
+		serverId: string,
+		worldId: string,
+		request: Archon.Content.v1.SetAddonEnabledRequest,
+	): Promise<void> {
+		await this.client.request<void>(
+			`/servers/${serverId}/worlds/${worldId}/addons/set-enabled-server`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'POST',
+				body: request,
+			},
+		)
+	}
+
+	/** POST /v1/:server_id/worlds/:world_id/addons/set-enabled-player */
+	public async setAddonEnabledPlayer(
+		serverId: string,
+		worldId: string,
+		request: Archon.Content.v1.SetAddonEnabledRequest,
+	): Promise<void> {
+		await this.client.request<void>(
+			`/servers/${serverId}/worlds/${worldId}/addons/set-enabled-player`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'POST',
+				body: request,
+			},
+		)
+	}
+
+	/** POST /v1/:server_id/worlds/:world_id/addons/set-locked-side-toggle */
+	public async setAddonSideToggleLocked(
+		serverId: string,
+		worldId: string,
+		request: Archon.Content.v1.SetAddonSideToggleLockedRequest,
+	): Promise<void> {
+		await this.client.request<void>(
+			`/servers/${serverId}/worlds/${worldId}/addons/set-locked-side-toggle`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'POST',
+				body: request,
+			},
+		)
 	}
 
 	/** POST /v1/:server_id/worlds/:world_id/addons/delete-many */

@@ -160,6 +160,7 @@ export class NuxtModrinthClient extends XHRUploadClient {
 			// @ts-expect-error - $fetch is provided by Nuxt
 			const response = await $fetch<T>(url, {
 				method: options.method ?? 'GET',
+				responseType: options.responseType,
 				headers: options.headers,
 				body: options.body,
 				params: options.params,
