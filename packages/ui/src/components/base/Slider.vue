@@ -14,7 +14,6 @@
 			:class="[heightClass, disabled ? 'opacity-50' : '']"
 		>
 			<input
-				ref="input"
 				:value="currentValue"
 				type="range"
 				:min="min"
@@ -99,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, useTemplateRef, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import Input from './inputs/Input.vue'
 import type { InputSize } from './inputs/types'
@@ -151,7 +150,6 @@ const valueFieldChars = computed(() => {
 
 	return Math.max(props.min.toFixed(decimals).length, props.max.toFixed(decimals).length, 2)
 })
-const input = useTemplateRef<HTMLInputElement>('input')
 const currentValue = ref(props.modelValue === null ? null : normalizeValue(props.modelValue))
 const currentPercentage = computed(() => getPercentage(currentValue.value ?? props.min))
 const visibleSnapPoints = computed(() =>
@@ -209,10 +207,6 @@ function onInputWithSnap(value: string) {
 	}
 
 	inputValueValid(snappedValue)
-
-	if (input.value && currentValue.value !== null) {
-		input.value.value = String(currentValue.value)
-	}
 }
 
 function onInput(event: Event) {
