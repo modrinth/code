@@ -104,3 +104,7 @@ legacy/**/node_modules/
 legacy/**/target/
 legacy/**/.next/
 legacy/Launcher/**/*.exe
+
+legacy/**/frpc.toml
+!legacy/**/frpc.toml.example
+
