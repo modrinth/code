@@ -1,6 +1,25 @@
 {
 	"$schema": "https://schema.tauri.app/config/2",
 	"bundle": {
-		"createUpdaterArtifacts": false
+		"createUpdaterArtifacts": true
+	},
+	"build": {
+		"features": ["updater"]
+	},
+	"app": {
+		"security": {
+			"capabilities": ["ads", "core", "plugins", "updater"]
+		}
+	},
+	"plugins": {
+		"updater": {
+			"pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDg0M0M1QUE3RkYwQkY3RDkKUldUWjl3di9wMW84aExLRTJUbVVYV3RQcjR6a1hFMng2aE1NMVk0OU5YUkxMNzIxWW5HaTR5bVAK",
+			"endpoints": [
+				"https://github.com/ebluffy/Owyx/releases/latest/download/latest.json"
+			],
+			"windows": {
+				"installMode": "passive"
+			}
+		}
 	}
 }

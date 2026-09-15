@@ -1,5 +1,4 @@
-# Build Owyx installers and publish a GitHub Release.
-# github-hosted runners only — safe on this fork (no Modrinth CDN / Namespace runners).
+# Build Owyx installers and publish a GitHub Release (with updater artifacts).
 name: Owyx GitHub Release
 
 on:
@@ -9,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Semver without v prefix (e.g. 0.1.0)'
+        description: 'Semver without v prefix (e.g. 0.2.0)'
         required: true
         default: '0.2.0'
 
@@ -66,20 +65,23 @@ jobs:
         shell: bash
         run: cp packages/app-lib/.env.prod packages/app-lib/.env
 
-      - name: Build NSIS installer
+      - name: Build NSIS installer + updater
         shell: bash
         working-directory: apps/app
         env:
           VITE_OWYX_CLIENT_KEY: ${{ secrets.OWYX_CLIENT_KEY }}
           VITE_OWYX_API_BASE_URL: https://api.owyx.site
+          OWYX_DISCORD_APP_ID: ${{ secrets.OWYX_DISCORD_APP_ID }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         run: pnpm exec tauri build --config tauri-owyx-release.conf.json --bundles nsis
 
       - uses: actions/upload-artifact@v4
         with:
           name: owyx-windows-nsis
           path: |
-            target/release/bundle/nsis/*.exe
-            apps/app/target/release/bundle/nsis/*.exe
+            target/release/bundle/nsis/*
+            apps/app/target/release/bundle/nsis/*
           if-no-files-found: error
 
   build-linux:
@@ -128,19 +130,22 @@ jobs:
       - name: Prepare app-lib compile-time env (prod API hosts)
         run: cp packages/app-lib/.env.prod packages/app-lib/.env
 
-      - name: Build AppImage
+      - name: Build AppImage + updater
         working-directory: apps/app
         env:
           VITE_OWYX_CLIENT_KEY: ${{ secrets.OWYX_CLIENT_KEY }}
           VITE_OWYX_API_BASE_URL: https://api.owyx.site
+          OWYX_DISCORD_APP_ID: ${{ secrets.OWYX_DISCORD_APP_ID }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         run: pnpm exec tauri build --config tauri-owyx-release.conf.json --bundles appimage
 
       - uses: actions/upload-artifact@v4
         with:
           name: owyx-linux-appimage
           path: |
-            target/release/bundle/appimage/*.AppImage
-            apps/app/target/release/bundle/appimage/*.AppImage
+            target/release/bundle/appimage/*
+            apps/app/target/release/bundle/appimage/*
           if-no-files-found: error
 
   release:
@@ -168,7 +173,7 @@ jobs:
         with:
           path: dist
 
-      - name: Create tag + release
+      - name: Create tag + release + latest.json
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.ver.outputs.tag }}
@@ -179,11 +184,12 @@ jobs:
           ## Owyx ${VERSION}
 
           ### Changes
-          - Site: brand backdrop, login-based registration, login or email sign-in, no public server IP on home, hidden Servers nav
-          - Launcher: welcome/home fix after deleting instances, sidebar scroll fade, news column removed, Owyx Servers tab hidden, settings say Owyx, data folder \`app.owyx\`, version aligned (no \`-local\` suffix)
-          - Discord RPC: set \`OWYX_DISCORD_APP_ID\` at build time for your own Discord app (see \`docs/owyx-site-ops.md\`)
+          - Release pipeline: idempotent version patch, Discord app ID, Tauri auto-update via GitHub \`latest.json\`
+          - Site: collapsible brand palette, password strength on register, Mailjet SMTP ready
+          - Launcher: Microsoft account preferred over offline nick; Owyx Servers / API settings admin-only; Discord RPC → Owyx app
+          - Data dir: \`%AppData%\\Roaming\\owyx\` (identifier \`app.owyx\`)
 
-          Installers: Windows NSIS \`Owyx_${VERSION}_x64-setup.exe\`, Linux AppImage. GPL-3 fork of [modrinth/code](https://github.com/modrinth/code); not affiliated with Modrinth / Rinth, Inc. GitHub-release auto-update is not enabled yet in \`tauri-owyx-release.conf.json\`.
+          Installers: Windows NSIS, Linux AppImage. GPL-3 fork of [modrinth/code](https://github.com/modrinth/code); not affiliated with Modrinth / Rinth, Inc.
           EOF
           )
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
@@ -195,9 +201,54 @@ jobs:
               git push origin "refs/tags/$TAG"
             fi
           fi
-          mapfile -t FILES < <(find dist -type f \( -name '*.exe' -o -name '*.AppImage' \) | sort)
+
+          mapfile -t FILES < <(find dist -type f \( -name '*.exe' -o -name '*.AppImage' -o -name '*.sig' -o -name '*.zip' \) | sort)
           echo "Files:"; printf '%s\n' "${FILES[@]}"
           test "${#FILES[@]}" -gt 0
+
+          WIN_URL=""; WIN_SIG=""; LINUX_URL=""; LINUX_SIG=""
+          while IFS= read -r -d '' sigf; do
+            art="${sigf%.sig}"
+            [[ -f "$art" ]] || continue
+            b=$(basename "$art")
+            case "$b" in
+              *.nsis.zip)
+                WIN_URL="https://github.com/ebluffy/Owyx/releases/download/${TAG}/${b}"
+                WIN_SIG=$(cat "$sigf")
+                ;;
+              *.AppImage)
+                LINUX_URL="https://github.com/ebluffy/Owyx/releases/download/${TAG}/${b}"
+                LINUX_SIG=$(cat "$sigf")
+                ;;
+            esac
+          done < <(find dist -type f -name '*.sig' -print0)
+
+          export WIN_URL WIN_SIG LINUX_URL LINUX_SIG VERSION PUB_DATE
+          PUB_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          export PUB_DATE
+          python3 - <<'PY' > latest.json
+          import json, os, sys
+          platforms = {}
+          win_url, win_sig = os.environ.get("WIN_URL",""), os.environ.get("WIN_SIG","")
+          lin_url, lin_sig = os.environ.get("LINUX_URL",""), os.environ.get("LINUX_SIG","")
+          if win_url and win_sig:
+              platforms["windows-x86_64"] = {"url": win_url, "signature": win_sig.strip()}
+          if lin_url and lin_sig:
+              platforms["linux-x86_64"] = {"url": lin_url, "signature": lin_sig.strip()}
+          if not platforms:
+              print("WARNING: no signed updater artifacts; publishing installers only", file=sys.stderr)
+          print(json.dumps({
+              "version": os.environ["VERSION"],
+              "notes": f"Owyx {os.environ['VERSION']}",
+              "pub_date": os.environ.get("PUB_DATE",""),
+              "platforms": platforms,
+          }, indent=2))
+          PY
+          echo "latest.json:"; cat latest.json
+          if [[ -s latest.json ]] && grep -q '"platforms"' latest.json; then
+            FILES+=("$(pwd)/latest.json")
+          fi
+
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "${FILES[@]}" --clobber
             gh release edit "$TAG" --notes "$NOTES"

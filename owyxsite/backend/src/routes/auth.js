@@ -269,7 +269,13 @@ router.post('/register', [
     body('email').isEmail().normalizeEmail().withMessage('Некорректный email'),
     body('password')
         .isLength({ min: 8 })
-        .withMessage('Пароль должен быть минимум 8 символов'),
+        .withMessage('Пароль должен быть минимум 8 символов')
+        .matches(/[A-ZА-ЯЁ]/)
+        .withMessage('Пароль должен содержать хотя бы одну заглавную букву')
+        .matches(/\d/)
+        .withMessage('Пароль должен содержать хотя бы одну цифру')
+        .matches(/[^A-Za-zА-Яа-яЁё0-9]/)
+        .withMessage('Пароль должен содержать хотя бы один спецсимвол'),
     body('first_name').optional().isLength({ max: 50 }).withMessage('Имя не должно превышать 50 символов')
 ], async (req, res) => {
     const errors = validationResult(req);

@@ -1,34 +1,43 @@
-# Owyx site — email, admin, Discord RPC
+# Owyx site — email, admin, Discord RPC, updater, roadmap
 
 ## Регистрация и подтверждение email
 
-После `POST /api/auth/register` бэкенд **создаёт** пользователя и **пытается** отправить письмо с подтверждением (`email_verification_tokens`, ссылка на `/verify?token=…`).
+После `POST /api/auth/register` бэкенд создаёт пользователя и пытается отправить письмо
+(`email_verification_tokens` → `/verify?token=…`).
 
-Если SMTP не настроен, регистрация всё равно проходит, но письмо не уйдёт — смотри логи `owyx-backend`.
+Пароль: минимум 8 символов, **1 заглавная**, **1 цифра**, **1 спецсимвол**.
 
-Переменные в `owyxsite/.env` (на VPS: `/opt/owyx/owyxsite/.env`):
+### Mailjet (прод)
 
-| Переменная | Назначение |
-|------------|------------|
-| `SMTP_HOST` | Хост SMTP |
-| `SMTP_PORT` | Порт (`465` + `SMTP_SECURE=true` или `587` + STARTTLS) |
-| `SMTP_USER` / `SMTP_PASS` | Логин и пароль |
-| `EMAIL_FROM` | От кого (если задано в коде/шаблонах) |
+На VPS в `/opt/owyx/owyxsite/.env`:
 
-### Бесплатные / простые SMTP-варианты
+```env
+SMTP_HOST=in-v3.mailjet.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=<Mailjet API key>
+SMTP_PASS=<Mailjet Secret key>
+EMAIL_FROM=noreply@owyx.site
+```
 
-1. **Brevo (Sendinblue)** — бесплатный tier (~300 писем/день), SMTP `smtp-relay.brevo.com`, порт 587.
-2. **Resend** — бесплатный tier для dev; удобный API, есть SMTP на платных планах.
-3. **Mailgun** — trial, затем pay-as-you-go; SMTP `smtp.mailgun.org`.
-4. **Gmail** — только для теста: App Password + `smtp.gmail.com:465` (лимиты, не для продакшена).
-5. **Yandex 360 / обычный Ящик** — `smtp.yandex.ru:465` (дефолт в `emailService.js`).
+`EMAIL_FROM` должен быть **verified sender** в Mailjet (или адрес на домене `owyx.site`).
 
-После смены `.env` на VPS: `docker compose -f owyxsite/docker-compose.yml up -d --force-recreate backend`.
+#### Дальше по Mailjet / DNS
+
+1. В Mailjet: **Domains and senders** → домен `owyx.site` = Active (уже есть).
+2. Вкладка **SPF/DKIM Authentication** — скопируй TXT-записи в Cloudflare DNS для `owyx.site`.
+3. Добавь sender `noreply@owyx.site` (или `hello@owyx.site`) и дождись Active.
+4. Пока SPF/DKIM не зелёный — можно временно слать с verified Gmail sender (`shadowgamesblacktube@gmail.com`), но лучше доменный From.
+5. После смены `.env`:
+
+```bash
+ssh owyxsite
+cd /opt/owyx/owyxsite && docker compose up -d --force-recreate backend
+```
+
+Проверка: зарегистрируй тестовый аккаунт → письмо в inbox/spam.
 
 ## Выдать себе админку
-
-1. Зарегистрируйся на https://owyx.site/register  
-2. На VPS:
 
 ```bash
 ssh owyxsite
@@ -36,22 +45,36 @@ docker exec -i owyx-postgres psql -U owyx_user -d owyx_db -c \
   "UPDATE users SET role = 'admin' WHERE LOWER(email) = LOWER('you@example.com');"
 ```
 
-3. Перелогинься на сайте (или очисти JWT в браузере). В шапке появится **Админ-панель** (`/admin`).
+Перелогинься. В шапке сайта — **Админ-панель**. В лаунчере вкладка **Owyx Servers** (API settings) видна только staff (`admin` / `moderator`).
 
-Роли: `admin`, `moderator` (staff в UI).
+## Discord RPC
 
-## Discord RPC (лаунчер показывает «Modrinth»)
+Application ID (зашит в сборку): `1549541256370323527`.
 
-Discord берёт **название приложения** из [Discord Developer Portal](https://discord.com/developers/applications), не из текста в коде.
+1. Discord Developer Portal → Rich Presence → Art Assets.
+2. Загрузи PNG **1024×1024** (не SVG). Ключ ассета: **`owyx`**.
+3. Файл для загрузки: `brand/v2/discord-rpc/owyx.png` (сгенерирован из бренд-кристалла).
+4. Опционально второй ассет `owyx_playing` для статуса «в игре».
 
-1. Создай приложение **Owyx**, загрузи иконку из `brand/v2/`.
-2. Скопируй **Application ID**.
-3. Собери лаунчер с `OWYX_DISCORD_APP_ID=<id>` (GitHub Actions: добавь secret и env в workflow build step).
-4. В Rich Presence → Art Assets добавь ключ **`owyx`** (как в `packages/app-lib/src/state/discord.rs`).
-
-Пока ID не свой, в Discord будет отображаться старое приложение Modrinth.
+После загрузки ассета перезапусти Discord и лаунчер (кэш ассетов бывает долгим).
 
 ## Автообновление лаунчера
 
-Релизы публикуются через `.github/workflows/owyx-github-release.yml`.  
-Сборка использует `tauri-owyx-release.conf.json` с **`createUpdaterArtifacts: false`** — автообновление с GitHub **ещё не включено** (нужны signing pubkey + endpoint на `latest.json` релиза). Обновление вручную: скачать новый setup с Releases.
+Включено в `apps/app/tauri-owyx-release.conf.json`:
+
+- `createUpdaterArtifacts: true`
+- endpoint: `https://github.com/ebluffy/Owyx/releases/latest/download/latest.json`
+- pubkey + secret `TAURI_SIGNING_PRIVATE_KEY` в GitHub Actions
+
+Релизный workflow кладёт в Release: установщики, `.sig`, `latest.json`.
+
+## Аккаунты: MS приоритетнее offline/Owyx-ника
+
+- Вход на сайте → лаунчер создаёт offline-профиль с логином сайта.
+- Если есть **Microsoft (лицензия)** — он всегда active по умолчанию (ник/скин Mojang).
+- Offline-ник остаётся в списке аккаунтов для offline-mode серверов.
+
+## Roadmap (не в этом релизе)
+
+- [ ] Скины без лицензии (идея TLSkins / локальный skin apply для offline-профиля). **Сейчас скины только через Microsoft / Mojang API.**
+- [ ] Кастомный Discord Application Icon в портале (иконка приложения ≠ Rich Presence asset).

@@ -2,8 +2,9 @@
 import { PlayIcon, ServerStackIcon } from '@modrinth/assets'
 import { Button, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { getStoredOwyxSiteSession } from '@/helpers/owyx-site-auth'
 import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 import {
 	fetchOwyxCatalog,
@@ -22,8 +23,12 @@ import {
 
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
-const appSettings = useAppSettings()
-const showDevApiSettings = computed(() => appSettings.devMode)
+const router = useRouter()
+
+function isStaff() {
+	const role = getStoredOwyxSiteSession()?.user?.role
+	return role === 'admin' || role === 'moderator'
+}
 
 const messages = defineMessages({
 	title: {
@@ -155,6 +160,10 @@ function openPack(server: OwyxServerEntry) {
 }
 
 onMounted(() => {
+	if (!isStaff()) {
+		void router.replace('/')
+		return
+	}
 	void loadCatalog()
 })
 </script>
@@ -166,10 +175,7 @@ onMounted(() => {
 			<p class="m-0 text-secondary">{{ formatMessage(messages.subtitle) }}</p>
 		</header>
 
-		<section
-			v-if="showDevApiSettings"
-			class="flex flex-col gap-3 rounded-xl border border-solid border-surface-5 bg-surface-2 p-4"
-		>
+		<section class="flex flex-col gap-3 rounded-xl border border-solid border-surface-5 bg-surface-2 p-4">
 			<label class="flex flex-col gap-1 text-sm">
 				<span class="text-secondary">{{ formatMessage(messages.apiBase) }}</span>
 				<input

@@ -121,7 +121,7 @@ import {
 	take_ads_window_hold,
 } from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
-import { check_reachable } from '@/helpers/auth.js'
+import { check_reachable, login_offline } from '@/helpers/auth.js'
 import { get_user, get_user_many, get_version } from '@/helpers/cache.js'
 import { gameSettingsQueryOptions } from '@/helpers/game-options'
 import { install_create_modpack_instance, install_get_modpack_preview } from '@/helpers/install'
@@ -423,6 +423,10 @@ const {
 )
 const { hasLoggedIntoMinecraft, hasLoggedIntoModrinth, showChecklist } = onboardingChecklist
 const showFriendsList = computed(() => !showChecklist.value || hasLoggedIntoModrinth.value)
+const isOwyxSiteAdmin = computed(() => {
+	const role = owyxSiteSession.value?.user?.role
+	return role === 'admin' || role === 'moderator'
+})
 
 async function randomizeCreationIcon() {
 	const generated = await creationIconEditorModal.value?.randomizeAndSave()
@@ -1412,6 +1416,15 @@ async function refreshOwyxSiteSession() {
 		} catch {
 			/* checklist mark is best-effort */
 		}
+		// Sync site login → offline MC nickname (MS account stays preferred if present)
+		const nick = fresh.user?.nickname?.trim()
+		if (nick && nick.length <= 16) {
+			try {
+				await login_offline(nick)
+			} catch (e) {
+				console.warn('Could not sync Owyx nickname to offline profile', e)
+			}
+		}
 	}
 }
 
@@ -2278,7 +2291,16 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			>
 				<ImageIcon />
 			</NavButton>
-			<!-- Owyx Servers nav hidden for release; catalog ships via instances / future entry -->
+			<!-- Owyx Servers: admin-only catalog / API tools -->
+			<NavButton
+				v-if="isOwyxSiteAdmin"
+				v-tooltip.right="formatMessage(messages.modrinthHosting)"
+				to="/owyx-servers"
+				:is-primary="(r) => r.path === '/owyx-servers'"
+				:is-subpage="(r) => r.path.startsWith('/owyx-servers/')"
+			>
+				<ServerStackIcon />
+			</NavButton>
 			<suspense>
 				<QuickInstanceSwitcher>
 					<NavButton

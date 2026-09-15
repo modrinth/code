@@ -1,12 +1,34 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useMemo, useState, useCallback } from "react";
 import Link from "next/link";
 import AuthShell from "@/components/layout/AuthShell";
 import Turnstile from "@/components/ui/Turnstile";
 import { useAuth } from "@/hooks/useAuth";
 
 const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
+
+function passwordChecks(pw: string) {
+  return {
+    length: pw.length >= 8,
+    upper: /[A-ZА-ЯЁ]/.test(pw),
+    digit: /\d/.test(pw),
+    special: /[^A-Za-zА-Яа-яЁё0-9]/.test(pw),
+  };
+}
+
+function passwordScore(pw: string): 0 | 1 | 2 | 3 | 4 {
+  if (!pw) return 0;
+  const c = passwordChecks(pw);
+  const met = [c.length, c.upper, c.digit, c.special].filter(Boolean).length;
+  if (met <= 1) return 1;
+  if (met === 2) return 2;
+  if (met === 3) return 3;
+  return 4;
+}
+
+const STRENGTH_LABEL = ["", "Слабый", "Средний", "Хороший", "Надёжный"] as const;
+const STRENGTH_COLOR = ["", "bg-danger", "bg-orange-400", "bg-accent", "bg-ok"] as const;
 
 export default function RegisterPage() {
   useAuth({ redirectIfAuth: true });
@@ -21,6 +43,9 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
 
   const onToken = useCallback((t: string | null) => setTurnstileToken(t), []);
+  const checks = useMemo(() => passwordChecks(password), [password]);
+  const score = useMemo(() => passwordScore(password), [password]);
+  const strongEnough = checks.length && checks.upper && checks.digit && checks.special;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -29,8 +54,8 @@ export default function RegisterPage() {
       setError("Логин: 3–32 символа, только буквы, цифры и _.");
       return;
     }
-    if (password.length < 8) {
-      setError("Пароль должен быть минимум 8 символов.");
+    if (!strongEnough) {
+      setError("Пароль: минимум 8 символов, 1 заглавная буква, 1 цифра и 1 спецсимвол.");
       return;
     }
     if (password !== confirm) {
@@ -127,7 +152,38 @@ export default function RegisterPage() {
             placeholder="Минимум 8 символов"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            aria-describedby="password-hints"
           />
+          {password.length > 0 && (
+            <div className="mt-2 space-y-2" id="password-hints">
+              <div className="flex items-center gap-2">
+                <div className="flex-1 h-1.5 rounded-full bg-panel-2 overflow-hidden flex gap-0.5">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div
+                      key={i}
+                      className={`h-full flex-1 rounded-full transition-colors ${
+                        score >= i ? STRENGTH_COLOR[score] : "bg-transparent"
+                      }`}
+                    />
+                  ))}
+                </div>
+                <span className="font-mono text-[11px] text-muted shrink-0">
+                  {STRENGTH_LABEL[score]}
+                </span>
+              </div>
+              <ul className="text-xs text-muted space-y-1 m-0 pl-4 list-disc">
+                <li className={checks.length ? "text-ok" : undefined}>не меньше 8 символов</li>
+                <li className={checks.upper ? "text-ok" : undefined}>минимум 1 заглавная буква</li>
+                <li className={checks.digit ? "text-ok" : undefined}>минимум 1 цифра</li>
+                <li className={checks.special ? "text-ok" : undefined}>минимум 1 спецсимвол (!@#$…)</li>
+              </ul>
+            </div>
+          )}
+          {!password && (
+            <p className="field-hint mt-1.5">
+              Нужны: заглавная буква, цифра и спецсимвол (например Owyx!2026).
+            </p>
+          )}
         </div>
         <div>
           <label className="field-label" htmlFor="confirm">Повторите пароль</label>
@@ -147,7 +203,7 @@ export default function RegisterPage() {
 
         {error && <p className="text-sm text-danger">{error}</p>}
 
-        <button type="submit" className="btn btn-primary w-full" disabled={loading}>
+        <button type="submit" className="btn btn-primary w-full" disabled={loading || !strongEnough}>
           {loading ? "Создаём…" : "Создать аккаунт"}
         </button>
       </form>

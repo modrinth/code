@@ -11589,7 +11589,7 @@ dependencies = [
 
 [[package]]
 name = "theseus_gui"
-version = "1.0.0-local"
+version = "0.2.0"
 dependencies = [
  "async_zip",
  "chrono",
