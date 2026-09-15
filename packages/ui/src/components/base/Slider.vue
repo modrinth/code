@@ -34,6 +34,29 @@
 				@input="onInputWithSnap(($event.target as HTMLInputElement).value)"
 			/>
 			<div
+				v-if="visibleSnapPoints.length"
+				class="snap-points pointer-events-none absolute inset-x-0 top-1/2 h-[18px] -translate-y-1/2"
+			>
+				<span
+					v-for="snapPoint in visibleSnapPoints"
+					:key="snapPoint"
+					class="absolute top-0 h-[18px] w-1.5 -translate-x-1/2 rounded-full bg-surface-5"
+					:style="{ left: `${getPercentage(snapPoint)}%` }"
+				/>
+				<div
+					class="snap-points-filled absolute inset-0"
+					:style="{ clipPath: `inset(0 ${100 - currentPercentage}% 0 0)` }"
+				>
+					<span
+						v-for="snapPoint in visibleSnapPoints"
+						:key="`filled-${snapPoint}`"
+						class="absolute top-0 h-[18px] w-1.5 -translate-x-1/2 rounded-full bg-brand"
+						:style="{ left: `${getPercentage(snapPoint)}%` }"
+					/>
+				</div>
+			</div>
+
+			<div
 				class="slider-track pointer-events-none absolute inset-x-0 top-1/2 h-[6px] -translate-y-1/2 rounded-full bg-surface-5"
 			>
 				<div
@@ -44,19 +67,6 @@
 						class="slider-thumb absolute h-8 w-[10px] rounded-full bg-brand top-[-13px] right-[-5px]"
 					></div>
 				</div>
-			</div>
-
-			<div
-				v-if="visibleSnapPoints.length"
-				class="snap-points pointer-events-none absolute inset-x-0 top-1/2 h-[18px] -translate-y-1/2"
-			>
-				<span
-					v-for="snapPoint in visibleSnapPoints"
-					:key="snapPoint"
-					class="absolute top-0 h-[18px] w-1.5 -translate-x-1/2 rounded-full"
-					:class="snapPoint <= currentValue ? 'bg-brand brightness-on-hover' : 'bg-surface-5'"
-					:style="{ left: `${getPercentage(snapPoint)}%` }"
-				/>
 			</div>
 		</div>
 
@@ -258,15 +268,14 @@ function onInput(event: Event) {
 		opacity: 1;
 	}
 
-	&:focus-visible + .slider-track .slider-thumb {
+	&:focus-visible ~ .slider-track .slider-thumb {
 		outline: 3px solid var(--color-focus-ring);
 		outline-offset: 3px;
 	}
 
 	&:hover,
 	&:focus-visible {
-		& + .slider-track .filled-slider-track,
-		& ~ .snap-points .brightness-on-hover {
+		& ~ .slider-track .filled-slider-track {
 			filter: brightness(var(--hover-brightness));
 		}
 	}
@@ -286,6 +295,13 @@ function onInput(event: Event) {
 
 .filled-slider-track {
 	transition: width 0.25s var(--ease-out-expo);
+	@media (prefers-reduced-motion) {
+		transition: none;
+	}
+}
+
+.snap-points-filled {
+	transition: clip-path 0.25s var(--ease-out-expo);
 	@media (prefers-reduced-motion) {
 		transition: none;
 	}
