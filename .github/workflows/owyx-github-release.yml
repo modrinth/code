@@ -62,9 +62,16 @@ jobs:
           V: ${{ steps.ver.outputs.version }}
         run: node scripts/set-app-version.js "$V"
 
+      - name: Prepare app-lib compile-time env (prod API hosts)
+        shell: bash
+        run: cp packages/app-lib/.env.prod packages/app-lib/.env
+
       - name: Build NSIS installer
         shell: bash
         working-directory: apps/app
+        env:
+          VITE_OWYX_CLIENT_KEY: ${{ secrets.OWYX_CLIENT_KEY }}
+          VITE_OWYX_API_BASE_URL: https://api.owyx.site
         run: pnpm exec tauri build --config tauri-owyx-release.conf.json --bundles nsis
 
       - uses: actions/upload-artifact@v4
@@ -118,8 +125,14 @@ jobs:
           V: ${{ steps.ver.outputs.version }}
         run: node scripts/set-app-version.js "$V"
 
+      - name: Prepare app-lib compile-time env (prod API hosts)
+        run: cp packages/app-lib/.env.prod packages/app-lib/.env
+
       - name: Build AppImage
         working-directory: apps/app
+        env:
+          VITE_OWYX_CLIENT_KEY: ${{ secrets.OWYX_CLIENT_KEY }}
+          VITE_OWYX_API_BASE_URL: https://api.owyx.site
         run: pnpm exec tauri build --config tauri-owyx-release.conf.json --bundles appimage
 
       - uses: actions/upload-artifact@v4
