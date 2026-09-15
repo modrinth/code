@@ -278,7 +278,8 @@ function onInput(event: Event) {
 
 	&:hover,
 	&:focus-visible {
-		& ~ .slider-track .filled-slider-track {
+		& ~ .slider-track .filled-slider-track,
+		& ~ .snap-points .bg-brand {
 			filter: brightness(var(--hover-brightness));
 		}
 	}
