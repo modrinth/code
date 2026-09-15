@@ -28,6 +28,20 @@ INSERT INTO loaders_project_types (joining_loader_id, joining_project_type_id) V
 
 INSERT INTO loaders (id, loader, metadata) VALUES (7, 'bukkit', '{"platform":false}'::JSONB);
 INSERT INTO loaders (id, loader, metadata) VALUES (8, 'waterfall', '{"platform":true}'::JSONB);
+INSERT INTO loaders (id, loader) VALUES (9, 'datapack');
+
+INSERT INTO loaders_project_types (joining_loader_id, joining_project_type_id)
+SELECT l.id, pt.id
+FROM loaders l
+CROSS JOIN project_types pt
+WHERE
+	(l.loader IN ('bukkit', 'waterfall') AND pt.name = 'plugin')
+	OR (l.loader = 'datapack' AND pt.name = 'datapack');
+
+INSERT INTO loaders_project_types_games (loader_id, project_type_id, game_id)
+SELECT lpt.joining_loader_id, lpt.joining_project_type_id, 1
+FROM loaders_project_types lpt
+WHERE lpt.joining_loader_id IN (7, 8, 9);
 
 -- Adds dummies to mrpack_loaders
 INSERT INTO loader_field_enum_values (enum_id, value)
