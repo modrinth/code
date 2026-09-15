@@ -1,5 +1,6 @@
 import { defineMessages } from '@modrinth/ui'
 
+import { licenseLinkMessages } from './license.ts'
 import type { NagDefinitions } from './types.ts'
 
 const messages = defineMessages({
@@ -155,12 +156,20 @@ export const linkNags = {
 	'link-validation': {
 		title: ({ nag }) => {
 			const reason = nag.details.reason
+			if (nag.details.field === 'license') {
+				if (reason === 'malformed') return licenseLinkMessages.malformedTitle
+				if (reason === 'not_in_allowlist') return licenseLinkMessages.notInAllowlistTitle
+			}
 			return typeof reason === 'string' && reason in linkReasonTitles
 				? linkReasonTitles[reason as keyof typeof linkReasonTitles]
 				: messages.linkTitle
 		},
 		description: ({ nag }) => {
 			const reason = nag.details.reason
+			if (nag.details.field === 'license') {
+				if (reason === 'malformed') return licenseLinkMessages.malformed
+				if (reason === 'not_in_allowlist') return licenseLinkMessages.notInAllowlist
+			}
 			return typeof reason === 'string' && reason in linkReasons
 				? linkReasons[reason as keyof typeof linkReasons]
 				: messages.unverifiable

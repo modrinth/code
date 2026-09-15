@@ -44,9 +44,6 @@
   "nags.edit-gallery.title": {
     "defaultMessage": "Editează galerii"
   },
-  "nags.edit-license.title": {
-    "defaultMessage": "Editează licența"
-  },
   "nags.edit-summary.title": {
     "defaultMessage": "Editează sumarul"
   },
@@ -70,9 +67,6 @@
   },
   "nags.invalid-gallery-text.title": {
     "defaultMessage": "Modifică textul imagini galeriei"
-  },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "URL-ul licenței este invalid."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "URL-ul licenței tale pare a fi format greșit. Te rugăm să furnizezi un URL valid către textul licenței."

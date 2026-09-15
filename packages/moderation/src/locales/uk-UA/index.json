@@ -83,9 +83,6 @@
   "nags.edit-gallery.title": {
     "defaultMessage": "Відредагуйте галерею"
   },
-  "nags.edit-license.title": {
-    "defaultMessage": "Відредагуйте ліцензію"
-  },
   "nags.edit-summary.title": {
     "defaultMessage": "Відредагуйте короткий зміст"
   },
@@ -121,12 +118,6 @@
   },
   "nags.invalid-gallery-text.title": {
     "defaultMessage": "Модифікуйте текст зображення галереї"
-  },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "Посилання на ліцензію неправильне."
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "Ваше посилання відсилає на вебсайт {domain}, який не є прийнятним джерелом ліцензійної інформації. Посилання мають відсилати безпосередньо до тексту ліцензії."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "Посилання на ліцензію, схоже, має неправильний формат. Надайте дійсне посилання на текст вашої ліцензії."

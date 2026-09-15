@@ -83,9 +83,6 @@
   "nags.edit-gallery.title": {
     "defaultMessage": "Editar galería"
   },
-  "nags.edit-license.title": {
-    "defaultMessage": "Editar licencia"
-  },
   "nags.edit-summary.title": {
     "defaultMessage": "Editar resumen"
   },
@@ -121,12 +118,6 @@
   },
   "nags.invalid-gallery-text.title": {
     "defaultMessage": "Modificar texto de la imagen de la galería"
-  },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "La URL de la licencia no es válida."
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "La URL de tu licencia apunta a {domain}, lo cual no es adecuado para la información de la licencia. Las URL de licencia deben enlazar directamente con tu archivo de licencia, no con redes sociales, plataformas de juegos, etc."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "La URL de tu licencia parece estar mal formada. Proporciona una URL válida para el texto de tu licencia."

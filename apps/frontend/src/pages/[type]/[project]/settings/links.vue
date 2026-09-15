@@ -231,10 +231,6 @@ const messages = defineMessages({
 		id: 'project.settings.links.remove-donation-link',
 		defaultMessage: 'Remove donation link',
 	},
-	noDonationLinks: {
-		id: 'project.settings.links.no-donation-links',
-		defaultMessage: 'No donation links added',
-	},
 	donationsDescription: {
 		id: 'project.settings.links.donations-description',
 		defaultMessage: 'Add donation links for users to support you directly.',

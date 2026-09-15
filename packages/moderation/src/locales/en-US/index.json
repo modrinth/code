@@ -83,9 +83,6 @@
   "nags.edit-gallery.title": {
     "defaultMessage": "Edit gallery"
   },
-  "nags.edit-license.title": {
-    "defaultMessage": "Edit license"
-  },
   "nags.edit-summary.title": {
     "defaultMessage": "Edit summary"
   },
@@ -122,12 +119,6 @@
   "nags.invalid-gallery-text.title": {
     "defaultMessage": "Modify gallery image text"
   },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "License URL is invalid."
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "Your license URL points to {domain}, which is not appropriate for license information. License URLs should link directly to your license text."
-  },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "Your license URL appears to be malformed. Please provide a valid URL to your license text."
   },
@@ -142,6 +133,12 @@
   },
   "nags.invalid-project-summary.title": {
     "defaultMessage": "Modify the summary"
+  },
+  "nags.license-url.not-in-allowlist.description": {
+    "defaultMessage": "Your license URL is not a recognized license link. Please ensure it links directly to your license text."
+  },
+  "nags.license-url.not-in-allowlist.title": {
+    "defaultMessage": "Check your license link"
   },
   "nags.link-validation.discord-invite": {
     "defaultMessage": "Your Discord invite is invalid, expired, or does not invite users to a server. Replace it with an active server invite."
@@ -190,12 +187,6 @@
   },
   "nags.link-validation.not-in-allowlist.title": {
     "defaultMessage": "Check link accuracy"
-  },
-  "nags.link-validation.repository-feature": {
-    "defaultMessage": "{linkField, select, issues {Your issue tracker link leads to a repository with issues disabled. Please enable issues on the repository or remove this link.} wiki {Your wiki link leads to a repository with the wiki disabled. Enable the wiki on the repository or remove this link.} other {Your source code link leads to a private repository. Please ensure your linked repository is publicly accessible.}}"
-  },
-  "nags.link-validation.repository-feature.title": {
-    "defaultMessage": "{linkField, select, issues {Enable repository issues} wiki {Enable the repository wiki} other {Provide a public repository}}"
   },
   "nags.link-validation.source-repository": {
     "defaultMessage": "Your source code link must lead to a repository on a supported host platform, or to a self-hosted Gitea/Forgejo service."

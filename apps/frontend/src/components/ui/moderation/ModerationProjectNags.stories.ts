@@ -190,14 +190,6 @@ const nagVariants: Partial<
 		{ details: { reason: 'download', field: 'description' } },
 		{ details: { reason: 'discord_invite', field: 'discord' } },
 		{ details: { reason: 'source_repository', field: 'source' } },
-		...['issues', 'wiki', 'source'].map((field) => ({
-			details: { reason: 'repository_feature', field },
-		})),
-	],
-	'invalid-license-url': [
-		{},
-		{ details: { domain: 'example.com' } },
-		{ details: { reason: 'malformed' } },
 	],
 	'upload-gallery-image': [{}, { projectType: 'resourcepack' }, { projectType: 'shader' }],
 	'long-headers': [{}, { details: { count: 1 } }],

@@ -44,9 +44,6 @@
   "nags.edit-description.title": {
     "defaultMessage": "ערוך תיאור"
   },
-  "nags.edit-license.title": {
-    "defaultMessage": "ערוך רישיון"
-  },
   "nags.edit-summary.title": {
     "defaultMessage": "ערוך סיכום"
   },
@@ -64,9 +61,6 @@
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "ספק קוד מקור"
-  },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "כתובת ה-URL של הרישיון אינה חוקית."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "כתובת ה-URL של הרישיון נראית פגומה. אנא ספק כתובת URL חוקית לטקסט הרישיון שלך."

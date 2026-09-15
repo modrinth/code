@@ -59,9 +59,6 @@
   "nags.edit-gallery.title": {
     "defaultMessage": "Ändra galleriet"
   },
-  "nags.edit-license.title": {
-    "defaultMessage": "Redigera licens"
-  },
   "nags.edit-summary.title": {
     "defaultMessage": "Redigera sammanfattning"
   },
@@ -82,9 +79,6 @@
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Tillförse källkod"
-  },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "Licens-URL är ogiltig."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "Din licens-URL ser ut att vara söndrig. Vänligen ange en URL till din licenstext."

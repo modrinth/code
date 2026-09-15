@@ -1152,7 +1152,6 @@ export namespace Labrinth {
 				| 'project-description-slur'
 				| 'project-description-spam'
 				| 'add-custom-license-details'
-				| 'invalid-license-url'
 				| 'select-license'
 				| 'add-links'
 				| 'add-links-server'

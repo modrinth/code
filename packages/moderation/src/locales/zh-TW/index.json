@@ -83,9 +83,6 @@
   "nags.edit-gallery.title": {
     "defaultMessage": "編輯圖庫"
   },
-  "nags.edit-license.title": {
-    "defaultMessage": "編輯授權條款"
-  },
   "nags.edit-summary.title": {
     "defaultMessage": "編輯摘要"
   },
@@ -121,12 +118,6 @@
   },
   "nags.invalid-gallery-text.title": {
     "defaultMessage": "修改圖庫圖片文字"
-  },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "授權條款網址無效。"
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "你的授權條款網址指向 {domain}，這不適合用來提供授權條款資訊。授權條款網址應直接連結到你的授權條款文字。"
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "你的授權條款網址似乎格式不正確。請提供有效的授權條款網址。"

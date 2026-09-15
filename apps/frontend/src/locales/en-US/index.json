@@ -3884,9 +3884,6 @@
   "project.settings.delete-project.title": {
     "message": "Delete project"
   },
-  "project.settings.description.failed": {
-    "message": "Failed to update description"
-  },
   "project.settings.description.intro": {
     "message": "You can type an extended description of your project here. The description must clearly and honestly describe the purpose and function of the project. See section 2.1 of the <rules>Content Rules</rules> for the full requirements."
   },
@@ -4142,9 +4139,6 @@
   "project.settings.license.custom-url-description": {
     "message": "The web location of the full license text. You have to provide a link since this is a custom license."
   },
-  "project.settings.license.failed": {
-    "message": "Failed to update license"
-  },
   "project.settings.license.has-spdx": {
     "message": "Use SPDX identifier"
   },
@@ -4238,9 +4232,6 @@
   "project.settings.links.donations-description": {
     "message": "Add donation links for users to support you directly."
   },
-  "project.settings.links.failed": {
-    "message": "Failed to update links"
-  },
   "project.settings.links.issues": {
     "message": "Issue tracker"
   },
@@ -4249,9 +4240,6 @@
   },
   "project.settings.links.link-type": {
     "message": "Link type"
-  },
-  "project.settings.links.no-donation-links": {
-    "message": "No donation links added"
   },
   "project.settings.links.remove-donation-link": {
     "message": "Remove donation link"

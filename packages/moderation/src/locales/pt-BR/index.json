@@ -83,9 +83,6 @@
   "nags.edit-gallery.title": {
     "defaultMessage": "Editar galeria"
   },
-  "nags.edit-license.title": {
-    "defaultMessage": "Edite a licença"
-  },
   "nags.edit-summary.title": {
     "defaultMessage": "Edite o sumário"
   },
@@ -121,12 +118,6 @@
   },
   "nags.invalid-gallery-text.title": {
     "defaultMessage": "Modificar texto da imagem da galeria"
-  },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "O URL de licença é inválido."
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "O URL da sua licença aponta para {domain}, o que não é apropriado para informações de licença. Os URLs de licença devem direcionar diretamente para o texto da sua licença."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "O URL de licença parece estar incorreto. Forneça um URL válido para o texto de sua licença."

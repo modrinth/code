@@ -83,9 +83,6 @@
   "nags.edit-gallery.title": {
     "defaultMessage": "编辑相册"
   },
-  "nags.edit-license.title": {
-    "defaultMessage": "编辑许可证"
-  },
   "nags.edit-summary.title": {
     "defaultMessage": "编辑简介"
   },
@@ -121,12 +118,6 @@
   },
   "nags.invalid-gallery-text.title": {
     "defaultMessage": "修改相册图片文本"
-  },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "许可证 URL 不可用。"
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "你提供的许可证 URL 指向 {domain}，该地址不适合用于提供许可证信息。许可证 URL 应直接链接至你的许可证文件。"
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "你提供的许可证 URL 格式有误。请提供一个指向许可证文本的有效的 URL 地址。"

@@ -56,9 +56,6 @@
   "nags.edit-gallery.title": {
     "defaultMessage": "تحرير المعرض"
   },
-  "nags.edit-license.title": {
-    "defaultMessage": "تعديل الرخصة"
-  },
   "nags.edit-summary.title": {
     "defaultMessage": "تعديل الملخص"
   },
@@ -85,9 +82,6 @@
   },
   "nags.invalid-gallery-text.title": {
     "defaultMessage": "تعديل نص معرض الصور"
-  },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "رابط الرخصة غير صالح."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "رابط حقوقك يظهر على انه غير صحيح. يرجى توفير رابط حقوق صحيح."

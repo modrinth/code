@@ -17,7 +17,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::Context as _;
 use crate::validate::project::{
-    ProjectNag, ProjectNagSeverity, ProjectSaveValidation,
+    ProjectNag, ProjectNagSeverity,
     validate_with_context as validate_project,
 };
 
@@ -35,75 +35,6 @@ pub(crate) fn require_valid_project(
         return Err(ApiError::Request(eyre!(ProjectValidationError(nags))));
     }
     Ok(())
-}
-
-pub(crate) fn validate_link_changes(
-    project: &Project,
-    changes: &super::EditProject,
-    force: bool,
-) -> Result<(), ApiError> {
-    let links_changed = changes.link_urls.is_some();
-    let license_changed =
-        changes.license_id.is_some() || changes.license_url.is_some();
-    let description_changed = changes.description.is_some();
-    if !force && !links_changed && !license_changed && !description_changed {
-        return Ok(());
-    }
-    let mut candidate = project.clone();
-    if let Some(links) = &changes.link_urls {
-        apply_link_changes(&mut candidate, links);
-    }
-    if let Some(license) = &changes.license_id {
-        candidate.license.id = license.clone();
-    }
-    if let Some(url) = &changes.license_url {
-        candidate.license.url = url.clone();
-    }
-    if let Some(description) = &changes.description {
-        candidate.description = description.clone();
-    }
-    let scope = crate::validate::project::LinkValidationScope {
-        external: force || links_changed,
-        license: force || license_changed,
-        description: force || description_changed,
-    };
-    let nags =
-        crate::validate::project::validate_link_fields(&candidate, scope);
-    require_valid_project(nags)
-}
-
-pub(crate) fn save_validation_scope(
-    project: &Project,
-    changes: &super::EditProject,
-) -> ProjectSaveValidation {
-    let server = changes.minecraft_server.as_ref().and_then(Option::as_ref);
-    let java = changes
-        .minecraft_java_server
-        .as_ref()
-        .and_then(Option::as_ref);
-    ProjectSaveValidation {
-        name: changes.name.is_some(),
-        summary: changes.summary.is_some(),
-        description: changes.description.is_some(),
-        license: changes.license_id.is_some() || changes.license_url.is_some(),
-        links: changes.link_urls.is_some(),
-        tags: changes.categories.is_some()
-            || changes.additional_categories.is_some(),
-        region: server.is_some_and(|server| server.region.is_some()),
-        languages: server.is_some_and(|server| server.languages.is_some()),
-        java_address: changes.minecraft_java_server.as_ref().is_some_and(
-            |java| java.as_ref().is_none_or(|java| java.address.is_some()),
-        ),
-        compatibility: java.is_some_and(|java| java.content.is_some()),
-        language_requirements: changes
-            .minecraft_java_server
-            .as_ref()
-            .is_some_and(|java| {
-                java.is_some()
-                    != project.components.minecraft_java_server.is_some()
-            }),
-        ..Default::default()
-    }
 }
 
 pub(crate) fn apply_link_changes(
@@ -145,91 +76,52 @@ pub(crate) async fn ensure_project_is_valid_for_review(
     transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
 ) -> Result<ProjectQueryResult, ApiError> {
-    ensure_project_is_valid_for_save(
-        project_id,
-        pool,
-        transaction,
-        redis,
-        ProjectSaveValidation {
-            all: true,
-            ..Default::default()
-        },
-    )
-    .await
-}
-
-pub(crate) async fn ensure_project_is_valid_for_save(
-    project_id: DBProjectId,
-    pool: &PgPool,
-    transaction: &mut PgTransaction<'_>,
-    redis: &RedisPool,
-    scope: ProjectSaveValidation,
-) -> Result<ProjectQueryResult, ApiError> {
     let mut projects = db_models::DBProject::get_many_uncached(
         &[ProjectId::from(project_id)],
         &mut *transaction,
         redis,
     )
     .await
-    .wrap_internal_err("reloading project for save validation")?;
+    .wrap_internal_err("reloading project for review validation")?;
     let reloaded_project =
         projects.pop().wrap_not_found_err("resource not found")?;
-    let versions = if scope.all || scope.license || scope.links {
-        db_models::DBVersion::get_many_uncached(
-            &reloaded_project.versions,
-            &mut *transaction,
-            redis,
-        )
-        .await
-        .wrap_internal_err("reloading project versions for save validation")?
-        .into_iter()
-        .map(Version::from)
-        .collect::<Vec<_>>()
-    } else {
-        Vec::new()
-    };
-    let available_categories = if scope.all || scope.tags {
+    let versions = db_models::DBVersion::get_many_uncached(
+        &reloaded_project.versions,
+        &mut *transaction,
+        redis,
+    )
+    .await
+    .wrap_internal_err("reloading project versions for review validation")?
+    .into_iter()
+    .map(Version::from)
+    .collect::<Vec<_>>();
+    let available_categories =
         db_models::categories::Category::list(&**pool, redis)
             .await
-            .wrap_internal_err("fetching project categories")?
-    } else {
-        Vec::new()
-    };
-    let disclosures = if scope.all || scope.disclosures {
-        db_models::DBProjectDisclosure::get_many_for_project(
-            reloaded_project.inner.id,
-            false,
-            &mut *transaction,
-        )
-        .await
-        .wrap_internal_err("fetching project disclosures")?
-        .into_iter()
-        .map(|disclosure| disclosure.disclosure)
-        .collect::<Vec<_>>()
-    } else {
-        Vec::new()
-    };
+            .wrap_internal_err("fetching project categories")?;
+    let disclosures = db_models::DBProjectDisclosure::get_many_for_project(
+        reloaded_project.inner.id,
+        false,
+        &mut *transaction,
+    )
+    .await
+    .wrap_internal_err("fetching project disclosures")?
+    .into_iter()
+    .map(|disclosure| disclosure.disclosure)
+    .collect::<Vec<_>>();
     let project = Project::from(reloaded_project.clone());
 
-    let nags = web::block(move || {
-        let gallery_urls = project
-            .gallery
-            .iter()
-            .map(|item| item.url.as_str())
-            .collect::<Vec<_>>();
-        validate_project(
-            &project,
-            &versions,
-            &available_categories,
-            &disclosures,
-        )
-        .into_iter()
-        .filter(|nag| scope.includes(nag, &gallery_urls))
-        .collect()
-    })
-    .await
-    .wrap_internal_err("validating project save")?;
-    require_valid_project(nags)?;
+	let nags = web::block(move || {
+		validate_project(
+			&project,
+			&versions,
+			&available_categories,
+			&disclosures,
+		)
+	})
+	.await
+	.wrap_internal_err("validating project for review")?;
+	require_valid_project(nags)?;
 
     Ok(reloaded_project)
 }

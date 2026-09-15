@@ -15,10 +15,7 @@ mod links;
 mod moderation;
 mod name;
 mod permissions;
-mod save;
 mod server_settings;
-
-pub use save::ProjectSaveValidation;
 mod summary;
 mod tags;
 mod text;
@@ -84,7 +81,6 @@ pub enum ProjectNagKind {
     // License
     SelectLicense,
     AddCustomLicenseDetails,
-    InvalidLicenseUrl,
 
     // External links
     AddLinks,
@@ -266,15 +262,4 @@ pub fn validate_link_input(
     let mut nags = links::validate_input(links, license_url, description);
     nags.extend(license::validate_custom_license(license_id, license_url));
     nags
-}
-
-pub fn has_required_nags_with_context(
-    project: &Project,
-    versions: &[Version],
-    available_categories: &[Category],
-    disclosures: &[ProjectDisclosure],
-) -> bool {
-    validate_with_context(project, versions, available_categories, disclosures)
-        .iter()
-        .any(|nag| nag.severity == ProjectNagSeverity::Required)
 }

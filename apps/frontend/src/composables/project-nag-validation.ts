@@ -67,7 +67,7 @@ export const projectNagFields = {
 	'gallery-images': ['upload-gallery-image', 'feature-gallery-image'],
 	license: ['select-license'],
 	'custom-license': ['add-custom-license-details'],
-	'license-url': ['invalid-license-url', 'link-validation'],
+	'license-url': ['link-validation'],
 	'link-field': ['link-validation'],
 	'external-links': ['add-links', 'add-links-server'],
 	'source-availability': ['gpl-license-source-required'],

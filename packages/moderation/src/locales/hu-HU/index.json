@@ -83,9 +83,6 @@
   "nags.edit-gallery.title": {
     "defaultMessage": "Galéria szerkesztése"
   },
-  "nags.edit-license.title": {
-    "defaultMessage": "Licensz szerkesztése"
-  },
   "nags.edit-summary.title": {
     "defaultMessage": "Összegzés szerkesztése"
   },
@@ -121,12 +118,6 @@
   },
   "nags.invalid-gallery-text.title": {
     "defaultMessage": "Módosítsd a galériakép szövegét"
-  },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "A licensz linkje érvénytelen."
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "A licenced URL-je a(z) {domain} domainre mutat, amely nem megfelelő a licencinformációkhoz. A licenc URL-jének közvetlenül a licenc szövegére kell mutatnia."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "Úgy tűnik, hogy a licensz linkje hibás. Adj meg egy érvényes linket a licensz szövegéhez."

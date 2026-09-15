@@ -83,9 +83,6 @@
   "nags.edit-gallery.title": {
     "defaultMessage": "Galerij wijzigen"
   },
-  "nags.edit-license.title": {
-    "defaultMessage": "Pas de licentie aan"
-  },
   "nags.edit-summary.title": {
     "defaultMessage": "Pas de samenvatting aan"
   },
@@ -121,12 +118,6 @@
   },
   "nags.invalid-gallery-text.title": {
     "defaultMessage": "Wijzig galerijafbeelding tekst"
-  },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "Licentie URL is ongeldig."
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "Uw licentie URL leidt naar {domain}, welke niet geschikt is voor licentieinformatie. Licentie URL's moeten direct naar uw licentie bestand wijzen."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "Het lijkt er op dat uw licentie URL ongeldig is. Gebruik graag een geldige URL naar uw licentietekst."

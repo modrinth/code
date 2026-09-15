@@ -83,9 +83,6 @@
   "nags.edit-gallery.title": {
     "defaultMessage": "Изменить галерею"
   },
-  "nags.edit-license.title": {
-    "defaultMessage": "Изменить лицензию"
-  },
   "nags.edit-summary.title": {
     "defaultMessage": "Изменить сводку"
   },
@@ -121,12 +118,6 @@
   },
   "nags.invalid-gallery-text.title": {
     "defaultMessage": "Измените текст изображения"
-  },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "Ссылка на лицензию недействительна."
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "Домен {domain} не подходит для лицензий. Ссылка должна вести на текст лицензии."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "URL лицензии имеет неверный формат. Укажите действительную ссылку на текст лицензии."
