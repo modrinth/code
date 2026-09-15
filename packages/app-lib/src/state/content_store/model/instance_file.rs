@@ -5,8 +5,6 @@ pub(crate) enum InstanceFileStatus {
     Conflict,
 }
 
-/// Keeps one observation of a path so recovery can compare both journal hashes
-/// without reading the file twice. Non-file entries always remain conflicts.
 pub(in crate::state::content_store) enum InstancePathContent {
     Missing,
     File(String),

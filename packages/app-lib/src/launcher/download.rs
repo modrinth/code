@@ -219,6 +219,50 @@ fn should_download(path_exists: bool, force: bool) -> bool {
     !path_exists || force
 }
 
+/// Installed instances can outlive files in the shared runtime cache. Include
+/// processor-generated libraries so recovery also reruns the loader installer.
+pub(super) fn missing_runtime_file(
+    st: &State,
+    version: &GameVersionInfo,
+    java_arch: &str,
+    minecraft_updated: bool,
+) -> crate::Result<Option<std::path::PathBuf>> {
+    let client_path = st
+        .directories
+        .version_dir(&version.id)
+        .join(format!("{}.jar", version.id));
+    if !client_path.try_exists()? {
+        return Ok(Some(client_path));
+    }
+
+    for library in &version.libraries {
+        if let Some(rules) = &library.rules
+            && !parse_rules(
+                rules,
+                java_arch,
+                &QuickPlayType::None,
+                minecraft_updated,
+            )
+        {
+            continue;
+        }
+        if !library.include_in_classpath
+            || library.natives_os_key_and_classifiers(java_arch).is_some()
+        {
+            continue;
+        }
+        let path = st
+            .directories
+            .libraries_dir()
+            .join(d::get_path_from_artifact(&library.name)?);
+        if !path.try_exists()? {
+            return Ok(Some(path));
+        }
+    }
+
+    Ok(None)
+}
+
 fn missing_client_bytes(
     st: &State,
     version: &GameVersionInfo,
