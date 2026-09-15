@@ -69,6 +69,20 @@ const SOURCE_DOMAINS: &[&str] = &[
     "git.gay",
     "gitee.com",
 ];
+const GITHUB_DOMAINS: &[&str] = &["github.com"];
+const GITLAB_DOMAINS: &[&str] = &["gitlab.com"];
+const CURSEFORGE_DOMAINS: &[&str] = &["curseforge.com"];
+const GOOGLE_FORMS_DOMAINS: &[&str] = &["docs.google.com"];
+const GOOGLE_FORMS_SHORT_DOMAINS: &[&str] = &["forms.gle"];
+const MICROSOFT_FORMS_DOMAINS: &[&str] = &[
+	"forms.office.com",
+	"forms.microsoft.com",
+	"forms.cloud.microsoft",
+];
+const TYPEFORM_DOMAINS: &[&str] = &["typeform.com"];
+const DISCORD_INVITE_DOMAINS: &[&str] = &["discord.com", "discordapp.com"];
+const DISCORD_SHORT_INVITE_DOMAINS: &[&str] = &["discord.gg"];
+const DISCORD_REDIRECT_DOMAINS: &[&str] = &["dsc.gg"];
 const LICENSE_DOMAINS: &[&str] = &[
     "spdx.org",
     "opensource.org",
@@ -286,7 +300,7 @@ pub(super) fn validate_target(target: &LinkTarget) -> Option<ProjectNag> {
     }
     if !matches!(
         target.field.as_str(),
-        "site" | "store" | "other" | "source" | "discord"
+		"site" | "store" | "other" | "source" | "discord" | "wiki"
     ) && !allowed(&target.field, &url)
     {
         return Some(target.warning("not_in_allowlist"));
@@ -395,15 +409,17 @@ fn repo_section(url: &Url, section: &str) -> bool {
     let parts = path(url);
     repository_path(url)
         && (parts.get(2) == Some(&section)
-            || (from_domains(url, &["gitlab.com"])
+			|| (from_domains(url, GITLAB_DOMAINS)
                 && parts.windows(2).any(|pair| pair == ["-", section])))
 }
 
 pub(super) fn discord_code(url: &Url) -> Option<&str> {
     let parts = path(url);
-    let code = if from_domains(url, &["discord.gg"]) && parts.len() == 1 {
+	let code = if from_domains(url, DISCORD_SHORT_INVITE_DOMAINS)
+		&& parts.len() == 1
+	{
         parts[0]
-    } else if from_domains(url, &["discord.com", "discordapp.com"])
+	} else if from_domains(url, DISCORD_INVITE_DOMAINS)
         && parts.len() == 2
         && parts[0] == "invite"
     {
@@ -429,22 +445,17 @@ fn allowed(field: &str, url: &Url) -> bool {
         }
         "issues" => {
             (from_domains(url, SOURCE_DOMAINS) && repo_section(url, "issues"))
-                || (from_domains(url, &["curseforge.com"])
+				|| (from_domains(url, CURSEFORGE_DOMAINS)
                     && parts.len() == 4
                     && parts[0] == "minecraft"
                     && parts[3] == "issues")
-                || (from_domains(url, &["docs.google.com"])
+				|| (from_domains(url, GOOGLE_FORMS_DOMAINS)
                     && parts.first() == Some(&"forms"))
-                || (from_domains(url, &["forms.gle"]) && !parts.is_empty())
-                || (from_domains(
-                    url,
-                    &[
-                        "forms.office.com",
-                        "forms.microsoft.com",
-                        "forms.cloud.microsoft",
-                    ],
-                ) && !parts.is_empty())
-                || (from_domains(url, &["typeform.com"])
+				|| (from_domains(url, GOOGLE_FORMS_SHORT_DOMAINS)
+					&& !parts.is_empty())
+				|| (from_domains(url, MICROSOFT_FORMS_DOMAINS)
+					&& !parts.is_empty())
+				|| (from_domains(url, TYPEFORM_DOMAINS)
                     && parts.first() == Some(&"to")
                     && parts.len() >= 2)
         }
@@ -453,12 +464,15 @@ fn allowed(field: &str, url: &Url) -> bool {
         }
         "discord" => discord_code(url).is_some(),
         "github" => {
-            from_domains(url, &["github.com"])
+			from_domains(url, GITHUB_DOMAINS)
                 && parts.first() == Some(&"sponsors")
                 && (parts.len() == 2
                     || (parts.len() == 3 && parts[2] == "sponsorships"))
         }
-        "license" => from_domains(url, LICENSE_DOMAINS),
+		"license" => {
+			from_domains(url, LICENSE_DOMAINS)
+				|| (from_domains(url, GITHUB_DOMAINS) && allowed("source", url))
+		}
         _ => DONATION_DOMAINS.iter().any(|(platform, domains)| {
             *platform == field && from_domains(url, domains)
         }),
@@ -466,23 +480,31 @@ fn allowed(field: &str, url: &Url) -> bool {
 }
 
 fn field_block(field: &str, url: &Url) -> Option<&'static str> {
+	if field == "wiki" && from_domains(url, SOURCE_DOMAINS) {
+		return None;
+	}
     let own_pattern = allowed(field, url);
     for other in [
         "issues", "wiki", "discord", "github", "patreon", "bmac", "paypal",
         "ko-fi", "license",
     ] {
-        if other != field && allowed(other, url) {
+		let matches_other = if other == "license" {
+			from_domains(url, LICENSE_DOMAINS)
+		} else {
+			allowed(other, url)
+		};
+		if other != field && matches_other {
             return Some("wrong_field");
         }
     }
     if field != "source" && from_domains(url, SOURCE_DOMAINS) && !own_pattern {
         return Some("wrong_field");
     }
-    if field != "discord" && from_domains(url, &["dsc.gg"]) {
+	if field != "discord" && from_domains(url, DISCORD_REDIRECT_DOMAINS) {
         return Some("wrong_field");
     }
 	let explicit_exception =
-		matches!(field, "source" | "issues" | "wiki" | "github" | "discord")
+		matches!(field, "source" | "issues" | "wiki" | "github" | "discord" | "license")
 			&& own_pattern;
 	if from_domains(url, EXTERNAL_BLOCKS) && !explicit_exception {
 		return Some("external_blocklist_match");
@@ -531,7 +553,13 @@ mod tests {
         for (field, url) in [
             ("issues", "https://github.com/modrinth/code/issues"),
             ("wiki", "https://github.com/modrinth/code/wiki"),
+			("wiki", "https://github.com/modrinth/code"),
+			("wiki", "https://github.com/modrinth/code/blob/main/README.md"),
+			("wiki", "https://github.com/modrinth/code/issues"),
+			("wiki", "https://gitlab.com/group/repo/-/blob/main/README.md"),
             ("source", "https://github.com/modrinth/code"),
+			("license", "https://github.com/modrinth/code"),
+			("license", "https://github.com/modrinth/code/blob/main/LICENSE"),
             ("github", "https://github.com/sponsors/modrinth"),
             (
                 "issues",
@@ -543,12 +571,11 @@ mod tests {
             assert!(check(field, url).is_none(), "{field}: {url}");
         }
         for (field, url) in [
-            (
-                "license",
-                "https://github.com/modrinth/code/blob/main/LICENSE",
-            ),
+			("license", "https://github.com/modrinth"),
+			("license", "https://gitlab.com/group/repo/-/blob/main/LICENSE"),
+			("license", "https://github.com/modrinth/code/issues"),
+			("license", "https://github.com/modrinth/code/wiki"),
             ("source", "https://github.com/modrinth/code/issues"),
-            ("wiki", "https://github.com/modrinth/code"),
             ("site", "https://discord.gg/modrinth"),
             ("other", "https://ko-fi.com/modrinth"),
             ("issues", "https://www.google.com/search?q=forms"),
@@ -656,12 +683,7 @@ mod tests {
         ] {
             assert!(check(field, url).is_none());
         }
-        assert_eq!(
-            check("wiki", "https://docs.myproject.dev")
-                .unwrap()
-                .severity,
-            ProjectNagSeverity::Warning
-        );
+		assert!(check("wiki", "https://docs.myproject.dev").is_none());
         assert!(
             check("source", "https://git.myproject.dev/owner/repo").is_none()
         );

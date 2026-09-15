@@ -111,6 +111,11 @@
 						<div class="mt-2.5 empty:hidden">
 							<template v-if="row.field">
 								<ValidationMessage
+									v-if="row.field === 'discord'"
+									:check="discordInviteValidation"
+									:debounce="0"
+								/>
+								<ValidationMessage
 									:check="savedFieldMessages(row.field)"
 									:project-field="saved[row.field]"
 									:current-field="current[row.field]"
@@ -161,6 +166,7 @@ import {
 import { isAdmin } from '@modrinth/utils'
 
 import ValidationMessage from '@/components/ValidationMessage.vue'
+import { useDiscordInviteValidation } from '~/composables/discord-invite-validation'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import {
@@ -322,6 +328,8 @@ const {
 	() => {},
 )
 
+const discordInviteValidation = useDiscordInviteValidation(() => current.value.discord ?? '')
+
 let nextRowKey = 0
 
 function makeRow(id?: string, url = ''): DonationRow {
@@ -451,7 +459,11 @@ const sourceRequirement = useProjectNagMessages('source-availability', 'source')
 
 function savedFieldMessages(field: string) {
 	return [
-		...fieldValidation.value.filter((message) => message.values?.field === field),
+		...fieldValidation.value.filter(
+			(message) =>
+				message.values?.field === field &&
+				message.message.id !== 'nags.link-validation.discord-invite',
+		),
 		...(field === 'source' ? sourceRequirement.value : []),
 	]
 }
@@ -542,6 +554,7 @@ const canSave = computed(
 		hasPermission.value &&
 		hasChanges.value &&
 		Object.keys(patchData.value).length > 0 &&
+		!discordInviteValidation.value &&
 		!saveValidation.messages.value.some((message) => message.severity === 'error'),
 )
 const saving = ref(false)

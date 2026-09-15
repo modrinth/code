@@ -113,6 +113,7 @@
 				:thread="prefixedThread"
 				:project="project"
 				:set-status="setStatus"
+				:review-submission-disabled="discordInviteBlocked"
 				:current-member="currentMember ?? undefined"
 				:auth="auth"
 				class="overflow-clip rounded-b-2xl border-0 border-t border-solid border-surface-4 bg-surface-2"
@@ -212,11 +213,18 @@ const messages = defineMessages({
 const { addNotification } = injectNotificationManager()
 const {
 	projectV2: project,
+	projectValidation,
 	currentMember,
 	invalidate,
 	allMembers,
 	thread,
 } = injectProjectPageContext()
+
+const discordInviteBlocked = computed(() =>
+	projectValidation.value?.nags.some(
+		(nag) => nag.kind === 'link_validation' && nag.details.reason === 'discord_invite',
+	) ?? false,
+)
 
 const THREADS_RELEASE_DATE = '2023-08-05T12:00:00-07:00'
 
@@ -477,6 +485,7 @@ function updateThread(newThread: Labrinth.Threads.v3.Thread | null | undefined) 
 }
 
 async function setStatus(status: Labrinth.Projects.v2.ProjectStatus) {
+	if (status === 'processing' && discordInviteBlocked.value) return
 	startLoading()
 
 	try {

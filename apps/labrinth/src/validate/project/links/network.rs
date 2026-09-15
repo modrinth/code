@@ -150,8 +150,8 @@ impl Probe {
     }
 }
 
-async fn get_or_probe(url: &Url, json: bool) -> Probe {
-    let key = format!("{json}:{url}");
+async fn get_or_probe(url: &Url, json: bool, cross_host: bool) -> Probe {
+    let key = format!("{json}:{cross_host}:{url}");
     // Remove expired cache entries and get or create the shared slot for this URL.
     let cell = {
         let mut cache = CACHE.lock().await;
@@ -181,7 +181,7 @@ async fn get_or_probe(url: &Url, json: bool) -> Probe {
     cell.get_or_init(|| async {
         let result = tokio::time::timeout(
             CHECK_TIMEOUT,
-            probe_with_client(&CLIENT, url.clone(), json),
+            probe_with_client(&CLIENT, url.clone(), json, cross_host),
         )
         .await
         .unwrap_or_default();
@@ -192,12 +192,9 @@ async fn get_or_probe(url: &Url, json: bool) -> Probe {
     .clone()
 }
 
-// only allow redirect if
-// - hostname stays the same, i.e. github.com → api.github.com is rejected
-// - https is not downgraded to http
-fn redirect_allowed(current: &Url, next: &Url) -> bool {
-    super::host(current).eq_ignore_ascii_case(super::host(next))
-        && !(current.scheme() == "https" && next.scheme() != "https")
+fn redirect_allowed(current: &Url, next: &Url, cross_host: bool) -> bool {
+	(cross_host || super::host(current).eq_ignore_ascii_case(super::host(next)))
+		&& !(current.scheme() == "https" && next.scheme() != "https")
 }
 
 fn login_destination(url: &Url) -> bool {
@@ -212,7 +209,12 @@ fn login_destination(url: &Url) -> bool {
     )
 }
 
-async fn probe_with_client(client: &Client, mut url: Url, json: bool) -> Probe {
+async fn probe_with_client(
+	client: &Client,
+	mut url: Url,
+	json: bool,
+	cross_host: bool,
+) -> Probe {
     let mut result = Probe::default();
     for _ in 0..=MAX_REDIRECTS {
         result.hops.push(url.clone());
@@ -235,7 +237,7 @@ async fn probe_with_client(client: &Client, mut url: Url, json: bool) -> Probe {
             else {
                 return result;
             };
-            if result.hops.contains(&next) || !redirect_allowed(&url, &next) {
+            if result.hops.contains(&next) || !redirect_allowed(&url, &next, cross_host) {
                 return result;
             }
             url = next;
@@ -356,7 +358,7 @@ async fn validate_link(target: &LinkTarget) -> Vec<ProjectNag> {
 	let Ok(url) = Url::parse(&target.url) else {
 		return Vec::new();
 	};
-	let observed = get_or_probe(&url, false).await;
+	let observed = get_or_probe(&url, false, target.field == "discord").await;
 	if let Some(nag) = check_hops(target, &url, &observed) {
 		return vec![nag];
 	}
@@ -465,7 +467,7 @@ async fn check_source_repository(
     let Some(api) = forgejo_api(url) else {
         return Some(target.required("source_repository"));
     };
-    let repository = get_or_probe(&api, true).await;
+    let repository = get_or_probe(&api, true, false).await;
     if repository.status == Some(StatusCode::NOT_FOUND)
         || repository.json.as_ref().is_some_and(|body| {
             body["full_name"].as_str().is_none()
@@ -488,7 +490,7 @@ async fn check_repository_field(
     url: &Url,
 ) -> Option<ProjectNag> {
     let api = forgejo_api(url)?;
-    let repository = get_or_probe(&api, true).await.json?;
+    let repository = get_or_probe(&api, true, false).await.json?;
     if repository["full_name"].is_string()
         && repository["clone_url"].is_string()
         && !(matches!(target.field.as_str(), "wiki" | "issues")
@@ -569,6 +571,7 @@ mod tests {
             &client,
             Url::parse("http://checks.modrinth.com/page").unwrap(),
             false,
+			false,
         )
         .await;
         assert_eq!(result.status, Some(StatusCode::NOT_FOUND));
@@ -586,6 +589,7 @@ mod tests {
             &client,
             Url::parse("http://checks.modrinth.com/file").unwrap(),
             false,
+			false,
         )
         .await;
         assert!(result.accessible());
@@ -602,7 +606,7 @@ mod tests {
 		]).await;
         let url =
             Url::parse("http://checks.modrinth.com/owner/old/wiki").unwrap();
-        let result = probe_with_client(&client, url, false).await;
+        let result = probe_with_client(&client, url, false, false).await;
         assert!(result.accessible());
         assert_eq!(result.hops.last().unwrap().path(), "/owner/renamed/wiki");
         assert_eq!(task.await.unwrap(), vec!["HEAD", "HEAD"]);
@@ -612,7 +616,7 @@ mod tests {
     async fn cross_hostname_redirect_is_not_fetched_or_verified() {
         let (client, task) = mock_client(vec!["HTTP/1.1 302 Found\r\nLocation: https://other.modrinth.com/page\r\nConnection: close\r\nContent-Length: 0\r\n\r\n"]).await;
         let url = Url::parse("http://checks.modrinth.com/page").unwrap();
-        let result = probe_with_client(&client, url.clone(), false).await;
+        let result = probe_with_client(&client, url.clone(), false, false).await;
         assert!(!result.accessible());
         assert_eq!(result.hops, vec![url]);
         assert_eq!(task.await.unwrap(), vec!["HEAD"]);
@@ -626,20 +630,34 @@ mod tests {
             "https://api.github.com/owner/new/wiki",
             "https://github.com.evil.org/owner/new/wiki",
         ] {
-            assert!(!redirect_allowed(&url, &Url::parse(destination).unwrap()));
+            assert!(!redirect_allowed(&url, &Url::parse(destination).unwrap(), false));
         }
         assert!(redirect_allowed(
             &url,
-            &url.join("/owner/new/wiki").unwrap()
+            &url.join("/owner/new/wiki").unwrap(),
+			false
         ));
     }
 
+	#[test]
+	fn discord_redirect_policy_allows_cross_host_without_https_downgrade() {
+		let url = Url::parse("https://project.dev/discord").unwrap();
+		let invite = Url::parse("https://discord.gg/project").unwrap();
+		assert!(redirect_allowed(&url, &invite, true));
+		assert!(!redirect_allowed(&url, &invite, false));
+		assert!(!redirect_allowed(
+			&url,
+			&Url::parse("http://discord.gg/project").unwrap(),
+			true,
+		));
+	}
+
     #[test]
-    fn redirected_wiki_homepage_is_wrong_field() {
+	fn redirected_wiki_homepage_is_allowed() {
         let url = Url::parse("https://github.com/owner/repository").unwrap();
         assert_eq!(
             super::super::field_block("wiki", &url),
-            Some("wrong_field")
+			None
         );
         assert!(login_destination(
             &url.join("/login?return_to=/owner/repository/wiki").unwrap()

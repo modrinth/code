@@ -65,11 +65,6 @@ const messages = defineMessages({
 		id: 'nags.link-validation.source-repository.title',
 		defaultMessage: 'Link to a source repository',
 	},
-	repository_featureTitle: {
-		id: 'nags.link-validation.repository-feature.title',
-		defaultMessage:
-			'{linkField, select, issues {Enable repository issues} wiki {Enable the repository wiki} other {Provide a public repository}}',
-	},
 	global_blocklist_match: {
 		id: 'nags.link-validation.global-blocklist-match',
 		defaultMessage:
@@ -125,15 +120,11 @@ const messages = defineMessages({
 		defaultMessage:
 			'Your source code link must lead to a repository on a supported host platform, or to a self-hosted Gitea/Forgejo service.',
 	},
-	repository_feature: {
-		id: 'nags.link-validation.repository-feature',
-		defaultMessage:
-			'{linkField, select, issues {Your issue tracker link leads to a repository with issues disabled. Please enable issues on the repository or remove this link.} wiki {Your wiki link leads to a repository with the wiki disabled. Enable the wiki on the repository or remove this link.} other {Your source code link leads to a private repository. Please ensure your linked repository is publicly accessible.}}',
-	},
 	visitLinks: { id: 'nags.visit-links-settings.title', defaultMessage: 'Visit links settings' },
 })
 
 const linkReasons = {
+	discord_invite: messages.discord_invite,
 	global_blocklist_match: messages.global_blocklist_match,
 	external_blocklist_match: messages.external_blocklist_match,
 	wrong_field: messages.wrong_field,
@@ -143,12 +134,11 @@ const linkReasons = {
 	duplicate: messages.duplicate,
 	unverifiable: messages.unverifiable,
 	download: messages.download,
-	discord_invite: messages.discord_invite,
 	source_repository: messages.source_repository,
-	repository_feature: messages.repository_feature,
 }
 
 const linkReasonTitles = {
+	discord_invite: messages.discord_inviteTitle,
 	global_blocklist_match: messages.global_blocklist_matchTitle,
 	external_blocklist_match: messages.external_blocklist_matchTitle,
 	wrong_field: messages.wrong_fieldTitle,
@@ -158,9 +148,7 @@ const linkReasonTitles = {
 	duplicate: messages.duplicateTitle,
 	unverifiable: messages.unverifiableTitle,
 	download: messages.downloadTitle,
-	discord_invite: messages.discord_inviteTitle,
 	source_repository: messages.source_repositoryTitle,
-	repository_feature: messages.repository_featureTitle,
 }
 
 export const linkNags = {

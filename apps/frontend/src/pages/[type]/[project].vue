@@ -638,6 +638,7 @@ import ProjectCollectionSaveButton from '~/components/ui/ProjectCollectionSaveBu
 import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
+import { useDiscordInviteValidation } from '~/composables/discord-invite-validation'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { notifyCopied } from '~/composables/moderation.ts'
 import { STALE_TIME, STALE_TIME_LONG, warmProjectCheckCaches } from '~/composables/queries/project'
@@ -1749,11 +1750,36 @@ const {
 	enabled: computed(() => !!projectId.value && !!currentMember.value?.accepted),
 })
 
-const projectValidation = computed(() => projectValidationResponse.value ?? null)
+const discordInviteValidation = useDiscordInviteValidation(() =>
+	currentMember.value?.accepted ? (projectV3.value?.link_urls?.discord?.url ?? '') : '',
+)
+const projectValidation = computed(() => {
+	const validation = projectValidationResponse.value
+	if (!validation) return null
+	return {
+		...validation,
+		nags: [
+			...validation.nags,
+			...(discordInviteValidation.value
+				? [
+					{
+						kind: 'link_validation',
+						severity: 'required',
+						details: {
+							field: 'discord',
+							url: projectV3.value?.link_urls?.discord?.url,
+							reason: 'discord_invite',
+						},
+					},
+				]
+				: []),
+		],
+	}
+})
 
 async function refreshProjectValidation() {
 	const result = await refetchProjectValidation()
-	return result.data ?? null
+	return result.data ? projectValidation.value : null
 }
 
 const canAccessSettings = computed(() => !!currentMember.value?.accepted)
@@ -2159,7 +2185,7 @@ watch(
 
 async function setProcessing() {
 	// Guard against multiple submissions while mutation is pending
-	if (patchStatusMutation.isPending.value) return
+	if (patchStatusMutation.isPending.value || discordInviteValidation.value) return
 
 	startLoading()
 	patchStatusMutation.mutate(
