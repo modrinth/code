@@ -155,7 +155,7 @@ const input = useTemplateRef<HTMLInputElement>('input')
 const currentValue = ref(props.modelValue === null ? null : normalizeValue(props.modelValue))
 const currentPercentage = computed(() => getPercentage(currentValue.value ?? props.min))
 const visibleSnapPoints = computed(() =>
-	props.snapPoints.filter((snapPoint) => snapPoint >= props.min && snapPoint <= props.max),
+	props.snapPoints.filter((snapPoint) => snapPoint > props.min && snapPoint < props.max),
 )
 
 watch(
