@@ -82,8 +82,6 @@ impl FileStamp {
 }
 
 impl VerifiedFiles {
-    /// Reuses a hash only while identity, size, write time and change time match.
-    /// Filesystems without the required metadata are always read in full.
     pub(in crate::state::content_store) async fn hash_file(
         &self,
         path: &Path,

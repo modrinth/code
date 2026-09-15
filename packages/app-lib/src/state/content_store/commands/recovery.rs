@@ -231,8 +231,6 @@ impl ContentStore {
         self.finish_journal(journal).await
     }
 
-    /// Recovers stored files that reached disk before a crash prevented their database entry.
-    /// Checks each file against its expected hash before making it available for reuse.
     pub(crate) async fn recover_unregistered_files(&self) -> crate::Result<()> {
         let known = catalog::known_hashes(&self.pool).await?;
         let Some(mut files) =

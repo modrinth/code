@@ -3714,7 +3714,7 @@
     "message": "Adding files ({completed}/{total})"
   },
   "instance.files.managed-content-read-only": {
-    "message": "Managed content is read-only here. Add, disable, update, or remove it from the Content tab."
+    "message": "Manage your installed content via the Content tab"
   },
   "instance.files.save-as": {
     "message": "Save as..."

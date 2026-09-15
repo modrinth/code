@@ -154,9 +154,6 @@ impl ContentStore {
         .await
     }
 
-    /// Removes unused downloads, starting with the oldest content, to meet the cache limit.
-    /// Installed content and files needed for rollback remain available. `purge_unused`
-    /// also removes recent unused downloads instead of keeping them for another install.
     pub async fn cleanup(
         &self,
         state: &State,
