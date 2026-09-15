@@ -1,9 +1,0 @@
-node_modules
-dist
-uploads/*
-!uploads/.gitkeep
-.env
-*.log
-.git
-.gitignore
-README.md

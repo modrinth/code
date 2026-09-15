@@ -1,10 +1,12 @@
-# Agent notes — Owyx (Modrinth fork)
+# Agent notes — Owyx (Modrinth code fork)
 
-Canonical product: **Owyx launcher** = this monorepo (`apps/app` + `apps/app-frontend` + `packages/app-lib`), rebranded.
+Canonical product: **Owyx launcher** = `apps/app` + `apps/app-frontend` + `packages/app-lib`, rebranded.
 
-- **Do not** restore Modrinth logos / cover images / green brand primary.
-- **Do** keep following upstream `modrinth/code` for features/fixes.
-- **legacy/** = old private stack (site `owyxsite`, old `Launcher`, `owyxplugin`). Control-plane API `api.owyx.site` wiring lands here later or in app config.
-- Old git history: `ebluffy/OwyxOld`.
+- **Do not** ship Modrinth logos / cover images / green brand primary.
+- **Do** follow upstream `modrinth/code` for features/fixes; keep fork relationship.
+- Design + logos: **`brand/`** (`brand/DESIGN.md`, prefer `brand/v2/`).
+- Control-plane: `api.owyx.site` + `X-Owyx-Client-Key` (see cloud `promt.md` / site contract on OwyxOld).
+- Old stack archive: `ebluffy/OwyxOld` only — **no `legacy/` folder in this repo**.
+- Cloud task paste: `promt.md` (gitignored).
 
-Tokens: `legacy/DESIGN.md` (`#050508` / `#00e5ff`).
+Tokens: `#050508` / `#00e5ff` (see `brand/DESIGN.md`).

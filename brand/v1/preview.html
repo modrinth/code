@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Owyx — Brand Mark Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* Owyx design tokens (from DESIGN.md §3) */
+    :root {
+      --bg: #050508;
+      --panel: #131319;
+      --panel-2: #14141c;
+      --rail: #0e0e14;
+      --line: #2a2b30;
+      --text: #f3f4f6;
+      --muted: #9aa0a8;
+      --accent: #00e5ff;
+      --accent-ink: #041018;
+      --accent-violet: #8b5cf6;
+      --ok: #5eead4;
+      --danger: #ff5c6c;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: var(--bg); color: var(--text); }
+    body {
+      font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+      line-height: 1.5;
+      min-height: 100vh;
+      padding: 48px 32px;
+      background:
+        radial-gradient(ellipse 1200px 600px at 50% -100px, rgba(0, 229, 255, 0.08), transparent 70%),
+        radial-gradient(ellipse 800px 400px at 100% 100%, rgba(139, 92, 246, 0.05), transparent 70%),
+        var(--bg);
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 24px;
+      margin-bottom: 48px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .eyebrow {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    h1 .accent { color: var(--accent); }
+
+    .meta {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .meta span { color: var(--text); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card.hero {
+      grid-column: 1 / -1;
+      padding: 80px 48px;
+      min-height: 360px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background:
+        radial-gradient(ellipse 600px 300px at 50% 50%, rgba(0, 229, 255, 0.06), transparent 70%),
+        linear-gradient(180deg, var(--panel) 0%, var(--rail) 100%);
+    }
+
+    .card.hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,0.4), transparent),
+        radial-gradient(1px 1px at 23% 65%, rgba(255,255,255,0.3), transparent),
+        radial-gradient(1px 1px at 47% 30%, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1px 1px at 68% 72%, rgba(255,255,255,0.35), transparent),
+        radial-gradient(1px 1px at 84% 22%, rgba(255,255,255,0.4), transparent),
+        radial-gradient(1px 1px at 91% 88%, rgba(255,255,255,0.3), transparent);
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    .card .label {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .card .name {
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+    .card .sub {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 24px;
+    }
+
+    .card.hero .name { margin-bottom: 8px; font-size: 18px; }
+    .card.hero .label { margin-bottom: 0; }
+    .card.hero .hero-statement { font-size: 18px; color: var(--muted); margin-top: 16px; }
+
+    .logo-host {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .logo-host.large { padding: 32px; }
+    .logo-host img { max-width: 100%; height: auto; display: block; }
+
+    .scale-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .scale-row .item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .scale-row .item .px {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .icon-row {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* Light card for dark-on-light variant */
+    .card.light {
+      background: linear-gradient(180deg, #f3f4f6 0%, #e5e7eb 100%);
+      border-color: rgba(0,0,0,0.1);
+    }
+    .card.light .name { color: #0e0e14; }
+    .card.light .label { color: #6b7280; }
+    .card.light .sub { color: #6b7280; }
+
+    /* Token chips */
+    .tokens {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 24px;
+    }
+    .token {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+    .token strong { color: var(--text); font-weight: 500; }
+    .token.accent { border-color: var(--accent); color: var(--accent); }
+
+    footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 11px;
+      color: var(--muted);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <div class="eyebrow">owyx · brand mark</div>
+        <h1>Логотип <span class="accent">Owyx</span></h1>
+      </div>
+      <div class="meta">
+        v1 · 2026-09-15 · <span>matches DESIGN.md §3 tokens</span>
+      </div>
+    </header>
+
+    <!-- HERO: full lockup on dark with starfield -->
+    <section class="card hero">
+      <div class="label">HERO LOCKUP</div>
+      <div class="name">Полный логотип на тёмном фоне</div>
+      <div class="logo-host large" style="position: relative; z-index: 1;">
+        <img src="owyx-logo-horizontal.svg" alt="Owyx" style="width: 460px; max-width: 100%;" />
+      </div>
+      <div class="hero-statement" style="position: relative; z-index: 1;">Экосистема приватного Minecraft — сайт, лаунчер, плагин.</div>
+    </section>
+
+    <!-- HERO IN SITU: logo over atmospheric background -->
+    <section class="card hero-image" style="grid-column: 1 / -1; padding: 0; overflow: hidden; min-height: 420px; position: relative; background: #050508;">
+      <img src="owyx-hero-bg.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;" />
+      <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 48px;">
+        <div class="label" style="position: relative; z-index: 2; background: rgba(5,5,8,0.6); padding: 6px 12px; border-radius: 6px;">HERO · В СБОРЕ</div>
+        <div style="position: relative; z-index: 2; margin-top: 24px;">
+          <img src="owyx-logo-horizontal.svg" alt="Owyx" style="width: 520px; max-width: 90%; filter: drop-shadow(0 0 40px rgba(0, 229, 255, 0.4));" />
+        </div>
+        <div style="position: relative; z-index: 2; margin-top: 24px; font-size: 18px; color: var(--muted); background: rgba(5,5,8,0.5); padding: 8px 16px; border-radius: 8px;">Скачай лаунчер → вошёл → играешь.</div>
+      </div>
+    </section>
+
+    <div class="grid">
+      <!-- ICON -->
+      <section class="card">
+        <div class="label">01 · ICON</div>
+        <div class="name">Гекс-кристалл (фасеты, внутреннее свечение)</div>
+        <div class="logo-host">
+          <img src="owyx-icon.svg" alt="Owyx icon" style="width: 160px; height: 160px;" />
+        </div>
+        <div class="sub">viewBox 64×64 · используется в favicon, launcher app icon, server brand</div>
+      </section>
+
+      <!-- STACKED -->
+      <section class="card">
+        <div class="label">02 · STACKED</div>
+        <div class="name">Стек (icon over wordmark)</div>
+        <div class="logo-host">
+          <img src="owyx-logo-stacked.svg" alt="Owyx stacked" style="width: 200px;" />
+        </div>
+        <div class="sub">Для профиля, splash-экрана лаунчера, OG-картинок</div>
+      </section>
+
+      <!-- HORIZONTAL -->
+      <section class="card" style="grid-column: 1 / -1;">
+        <div class="label">03 · HORIZONTAL LOCKUP</div>
+        <div class="name">Горизонтальный (основной для nav, header, footer)</div>
+        <div class="logo-host">
+          <img src="owyx-logo-horizontal.svg" alt="Owyx horizontal" style="width: 520px; max-width: 100%;" />
+        </div>
+        <div class="sub">Стандартное использование на тёмных поверхностях</div>
+      </section>
+
+      <!-- MONO LIGHT (cyan on dark) -->
+      <section class="card">
+        <div class="label">04 · MONO LIGHT</div>
+        <div class="name">Моно · cyan на тёмном</div>
+        <div class="logo-host">
+          <img src="owyx-logo-mono-light.svg" alt="Owyx mono light" style="width: 320px;" />
+        </div>
+        <div class="sub">Один цвет (#00e5ff), без градиентов. Для мелких размеров и там, где важна скорость загрузки.</div>
+      </section>
+
+      <!-- MONO DARK (dark on light) -->
+      <section class="card light">
+        <div class="label">05 · MONO DARK</div>
+        <div class="name">Моно · тёмный на светлом</div>
+        <div class="logo-host">
+          <img src="owyx-logo-mono-dark.svg" alt="Owyx mono dark" style="width: 320px;" />
+        </div>
+        <div class="sub">Печать, документы, светлые секции сайта. Цвет #0e0e14 (как --rail).</div>
+      </section>
+
+      <!-- ICON SCALES -->
+      <section class="card" style="grid-column: 1 / -1;">
+        <div class="label">06 · ICON AT SCALE</div>
+        <div class="name">Иконка на разных размерах</div>
+        <div class="scale-row" style="padding: 16px 0;">
+          <div class="item">
+            <img src="owyx-icon-favicon.svg" alt="16" style="width: 16px; height: 16px;" />
+            <span class="px">favicon · 16</span>
+          </div>
+          <div class="item">
+            <img src="owyx-icon-favicon.svg" alt="24" style="width: 24px; height: 24px;" />
+            <span class="px">favicon · 24</span>
+          </div>
+          <div class="item">
+            <img src="owyx-icon.svg" alt="32" style="width: 32px; height: 32px;" />
+            <span class="px">main · 32</span>
+          </div>
+          <div class="item">
+            <img src="owyx-icon.svg" alt="48" style="width: 48px; height: 48px;" />
+            <span class="px">main · 48</span>
+          </div>
+          <div class="item">
+            <img src="owyx-icon.svg" alt="64" style="width: 64px; height: 64px;" />
+            <span class="px">main · 64</span>
+          </div>
+          <div class="item">
+            <img src="owyx-icon.svg" alt="128" style="width: 128px; height: 128px;" />
+            <span class="px">main · 128</span>
+          </div>
+        </div>
+        <div class="sub">До 24px — упрощённая иконка <code style="color: var(--accent); font-size: 10px;">owyx-icon-favicon.svg</code> (без фасет), от 32px — основная с фасетами и внутренним свечением</div>
+      </section>
+
+      <!-- TOKENS -->
+      <section class="card" style="grid-column: 1 / -1;">
+        <div class="label">07 · TOKENS</div>
+        <div class="name">Цвета, использованные в лого</div>
+        <div class="tokens">
+          <span class="token accent"><strong>--accent</strong> · #00e5ff</span>
+          <span class="token"><strong>--bg</strong> · #050508</span>
+          <span class="token"><strong>--panel</strong> · #131319</span>
+          <span class="token"><strong>--text</strong> · #f3f4f6</span>
+          <span class="token"><strong>highlight</strong> · #9ff7ff</span>
+          <span class="token"><strong>highlight</strong> · #7df9ff</span>
+          <span class="token"><strong>shadow</strong> · #0b7a96</span>
+          <span class="token"><strong>edge</strong> · #00b8d4</span>
+        </div>
+        <div class="sub">Все цвета лого — из палитры DESIGN.md §3. Никаких новых токенов.</div>
+      </section>
+    </div>
+
+    <footer>
+      <span>owyx · brand mark v1</span>
+      <span>SVG · scalable · 100% vector</span>
+    </footer>
+  </div>
+</body>
+</html>

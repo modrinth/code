@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 120" fill="none" role="img" aria-label="Owyx">
+  <title>Owyx — Ink — on light backgrounds (печать, документы) · LG</title>
+  
+  <g transform="translate(16,16) scale(1.0)"><g transform="translate(8,8)">
+    <polygon points="32,4 56,18 56,46 32,60 8,46 8,18"
+             fill="none" stroke="#0e0e14" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M32 4 L32 32 M56 18 L32 32 M56 46 L32 32 M32 60 L32 32 M8 46 L32 32 M8 18 L32 32"
+          stroke="#0e0e14" stroke-width="1.5" stroke-linecap="round" opacity="0.55"/>
+    <circle cx="32" cy="32" r="2" fill="#0e0e14"/>
+  </g></g>
+  <text x="104.0" y="84"
+        fill="#0e0e14"
+        font-family="'Sora','Space Grotesk','Outfit','Geist',system-ui,-apple-system,Segoe UI,Roboto,sans-serif"
+        font-weight="600"
+        font-size="68"
+        letter-spacing="-3"
+        style="font-feature-settings: 'ss01' on;">owyx</text>
+</svg>

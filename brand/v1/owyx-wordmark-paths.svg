@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 80" fill="none" role="img" aria-label="owyx wordmark">
+  <title>owyx</title>
+  <g fill="none" stroke="#00e5ff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <!-- o -->
+    <circle cx="25" cy="35" r="20"/>
+    <!-- w -->
+    <path d="M62 10 L77 60 L92 28 L107 60 L122 10"/>
+    <!-- y (two strokes: left arm + right arm with descender) -->
+    <path d="M140 10 L160 60"/>
+    <path d="M180 10 L160 60 L160 72"/>
+    <!-- x -->
+    <path d="M192 10 L232 60"/>
+    <path d="M232 10 L192 60"/>
+  </g>
+</svg>

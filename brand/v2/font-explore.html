@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Owyx — Font Exploration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;600;700&family=Geist:wght@500;600;700&family=Hanken+Grotesk:wght@500;600;700&family=Manrope:wght@500;600;700&family=Outfit:wght@500;600;700&family=Sora:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #050508;
+      --panel: #131319;
+      --panel-2: #14141c;
+      --line: #2a2b30;
+      --text: #f3f4f6;
+      --muted: #9aa0a8;
+      --accent: #00e5ff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: var(--bg); color: var(--text); }
+    body {
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      line-height: 1.5;
+      padding: 40px 32px;
+      background:
+        radial-gradient(ellipse 1200px 600px at 50% -100px, rgba(0, 229, 255, 0.06), transparent 70%),
+        var(--bg);
+    }
+    .container { max-width: 1400px; margin: 0 auto; }
+    header { border-bottom: 1px solid var(--line); padding-bottom: 20px; margin-bottom: 32px; }
+    h1 { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; }
+    h1 .accent { color: var(--accent); }
+    .sub { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted); margin-top: 8px; }
+
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    @media (max-width: 900px) { .row { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 28px 32px;
+    }
+    .card .label {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .card .name { font-size: 13px; color: var(--text); margin-bottom: 20px; }
+
+    .specimen {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 18px 0;
+      border-top: 1px solid var(--line);
+    }
+    .specimen .icon { width: 64px; height: 64px; flex-shrink: 0; }
+    .specimen .wordmark { font-size: 48px; line-height: 1; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Font <span class="accent">exploration</span></h1>
+      <div class="sub">5 минималистичных шрифтов × {400, 600, 700} рядом с иконкой-кристаллом. Цель — найти что сочетается с геометрией гекса.</div>
+    </header>
+
+    <div class="row">
+      <section class="card">
+        <div class="label">A · Space Grotesk (current baseline)</div>
+        <div class="name">Геометрический гротеск, слегка гуманистичный</div>
+        <div class="specimen">
+          <svg class="icon" viewBox="0 0 64 64" fill="none">
+            <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="#00e5ff" fill-opacity="0.85" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M32 4 L56 18 L32 32 Z" fill="#9ff7ff"/>
+            <path d="M32 60 L8 46 L32 32 Z" fill="#0b7a96"/>
+          </svg>
+          <span class="wordmark" style="font-family:'Space Grotesk'; font-weight:500; color:#00e5ff;">owyx</span>
+        </div>
+        <div class="specimen">
+          <svg class="icon" viewBox="0 0 64 64" fill="none">
+            <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="#00e5ff" fill-opacity="0.85" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M32 4 L56 18 L32 32 Z" fill="#9ff7ff"/>
+            <path d="M32 60 L8 46 L32 32 Z" fill="#0b7a96"/>
+          </svg>
+          <span class="wordmark" style="font-family:'Space Grotesk'; font-weight:600; color:#00e5ff;">owyx</span>
+        </div>
+        <div class="specimen">
+          <svg class="icon" viewBox="0 0 64 64" fill="none">
+            <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="#00e5ff" fill-opacity="0.85" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M32 4 L56 18 L32 32 Z" fill="#9ff7ff"/>
+            <path d="M32 60 L8 46 L32 32 Z" fill="#0b7a96"/>
+          </svg>
+          <span class="wordmark" style="font-family:'Space Grotesk'; font-weight:700; color:#00e5ff;">owyx</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="label">B · Sora</div>
+        <div class="name">Futuristic geometric, чистый tech-feel</div>
+        <div class="specimen">
+          <svg class="icon" viewBox="0 0 64 64" fill="none">
+            <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="#00e5ff" fill-opacity="0.85" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M32 4 L56 18 L32 32 Z" fill="#9ff7ff"/>
+            <path d="M32 60 L8 46 L32 32 Z" fill="#0b7a96"/>
+          </svg>
+          <span class="wordmark" style="font-family:'Sora'; font-weight:500; color:#00e5ff;">owyx</span>
+        </div>
+        <div class="specimen">
+          <svg class="icon" viewBox="0 0 64 64" fill="none">
+            <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="#00e5ff" fill-opacity="0.85" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M32 4 L56 18 L32 32 Z" fill="#9ff7ff"/>
+            <path d="M32 60 L8 46 L32 32 Z" fill="#0b7a96"/>
+          </svg>
+          <span class="wordmark" style="font-family:'Sora'; font-weight:600; color:#00e5ff;">owyx</span>
+        </div>
+        <div class="specimen">
+          <svg class="icon" viewBox="0 0 64 64" fill="none">
+            <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="#00e5ff" fill-opacity="0.85" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M32 4 L56 18 L32 32 Z" fill="#9ff7ff"/>
+            <path d="M32 60 L8 46 L32 32 Z" fill="#0b7a96"/>
+          </svg>
+          <span class="wordmark" style="font-family:'Sora'; font-weight:700; color:#00e5ff;">owyx</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="label">C · Geist</div>
+        <div class="name">Vercel-шрифт, современный, чистый</div>
+        <div class="specimen">
+          <svg class="icon" viewBox="0 0 64 64" fill="none">
+            <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="#00e5ff" fill-opacity="0.85" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M32 4 L56 18 L32 32 Z" fill="#9ff7ff"/>
+            <path d="M32 60 L8 46 L32 32 Z" fill="#0b7a96"/>
+          </svg>
+          <span class="wordmark" style="font-family:'Geist'; font-weight:500; color:#00e5ff;">owyx</span>
+        </div>
+        <div class="specimen">
+          <svg class="icon" viewBox="0 0 64 64" fill="none">
+            <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="#00e5ff" fill-opacity="0.85" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M32 4 L56 18 L32 32 Z" fill="#9ff7ff"/>
+            <path d="M32 60 L8 46 L32 32 Z" fill="#0b7a96"/>
+          </svg>
+          <span class="wordmark" style="font-family:'Geist'; font-weight:600; color:#00e5ff;">owyx</span>
+        </div>
+        <div class="specimen">
+          <svg class="icon" viewBox="0 0 64 64" fill="none">
+            <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="#00e5ff" fill-opacity="0.85" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M32 4 L56 18 L32 32 Z" fill="#9ff7ff"/>
+            <path d="M32 60 L8 46 L32 32 Z" fill="#0b7a96"/>
+          </svg>
+          <span class="wordmark" style="font-family:'Geist'; font-weight:700; color:#00e5ff;">owyx</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="label">D · Outfit</div>
+        <div class="name">Геометрический, мягче гротеска</div>
+        <div class="specimen">
+          <svg class="icon" viewBox="0 0 64 64" fill="none">
+            <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="#00e5ff" fill-opacity="0.85" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M32 4 L56 18 L32 32 Z" fill="#9ff7ff"/>
+            <path d="M32 60 L8 46 L32 32 Z" fill="#0b7a96"/>
+          </svg>
+          <span class="wordmark" style="font-family:'Outfit'; font-weight:500; color:#00e5ff;">owyx</span>
+        </div>
+        <div class="specimen">
+          <svg class="icon" viewBox="0 0 64 64" fill="none">
+            <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="#00e5ff" fill-opacity="0.85" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M32 4 L56 18 L32 32 Z" fill="#9ff7ff"/>
+            <path d="M32 60 L8 46 L32 32 Z" fill="#0b7a96"/>
+          </svg>
+          <span class="wordmark" style="font-family:'Outfit'; font-weight:600; color:#00e5ff;">owyx</span>
+        </div>
+        <div class="specimen">
+          <svg class="icon" viewBox="0 0 64 64" fill="none">
+            <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="#00e5ff" fill-opacity="0.85" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M32 4 L56 18 L32 32 Z" fill="#9ff7ff"/>
+            <path d="M32 60 L8 46 L32 32 Z" fill="#0b7a96"/>
+          </svg>
+          <span class="wordmark" style="font-family:'Outfit'; font-weight:700; color:#00e5ff;">owyx</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="label">E · DM Sans</div>
+        <div class="name">Низкоконтрастный гротеск, мягкий</div>
+        <div class="specimen">
+          <svg class="icon" viewBox="0 0 64 64" fill="none">
+            <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="#00e5ff" fill-opacity="0.85" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M32 4 L56 18 L32 32 Z" fill="#9ff7ff"/>
+            <path d="M32 60 L8 46 L32 32 Z" fill="#0b7a96"/>
+          </svg>
+          <span class="wordmark" style="font-family:'DM Sans'; font-weight:500; color:#00e5ff;">owyx</span>
+        </div>
+        <div class="specimen">
+          <svg class="icon" viewBox="0 0 64 64" fill="none">
+            <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="#00e5ff" fill-opacity="0.85" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M32 4 L56 18 L32 32 Z" fill="#9ff7ff"/>
+            <path d="M32 60 L8 46 L32 32 Z" fill="#0b7a96"/>
+          </svg>
+          <span class="wordmark" style="font-family:'DM Sans'; font-weight:600; color:#00e5ff;">owyx</span>
+        </div>
+        <div class="specimen">
+          <svg class="icon" viewBox="0 0 64 64" fill="none">
+            <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="#00e5ff" fill-opacity="0.85" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M32 4 L56 18 L32 32 Z" fill="#9ff7ff"/>
+            <path d="M32 60 L8 46 L32 32 Z" fill="#0b7a96"/>
+          </svg>
+          <span class="wordmark" style="font-family:'DM Sans'; font-weight:700; color:#00e5ff;">owyx</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="label">F · Manrope</div>
+        <div class="name">Геометрический с humanist подтоном</div>
+        <div class="specimen">
+          <svg class="icon" viewBox="0 0 64 64" fill="none">
+            <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="#00e5ff" fill-opacity="0.85" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M32 4 L56 18 L32 32 Z" fill="#9ff7ff"/>
+            <path d="M32 60 L8 46 L32 32 Z" fill="#0b7a96"/>
+          </svg>
+          <span class="wordmark" style="font-family:'Manrope'; font-weight:500; color:#00e5ff;">owyx</span>
+        </div>
+        <div class="specimen">
+          <svg class="icon" viewBox="0 0 64 64" fill="none">
+            <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="#00e5ff" fill-opacity="0.85" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M32 4 L56 18 L32 32 Z" fill="#9ff7ff"/>
+            <path d="M32 60 L8 46 L32 32 Z" fill="#0b7a96"/>
+          </svg>
+          <span class="wordmark" style="font-family:'Manrope'; font-weight:600; color:#00e5ff;">owyx</span>
+        </div>
+        <div class="specimen">
+          <svg class="icon" viewBox="0 0 64 64" fill="none">
+            <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="#00e5ff" fill-opacity="0.85" stroke="#00e5ff" stroke-width="0.85" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M32 4 L56 18 L32 32 Z" fill="#9ff7ff"/>
+            <path d="M32 60 L8 46 L32 32 Z" fill="#0b7a96"/>
+          </svg>
+          <span class="wordmark" style="font-family:'Manrope'; font-weight:700; color:#00e5ff;">owyx</span>
+        </div>
+      </section>
+    </div>
+  </div>
+</body>
+</html>

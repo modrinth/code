@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Owyx icons v2 — preview</title>
+  <style>
+    body {
+      background: #050508;
+      color: #f3f4f6;
+      font-family: 'Sora','Space Grotesk', system-ui, sans-serif;
+      padding: 32px;
+      margin: 0;
+    }
+    h1 { font-size: 24px; font-weight: 600; }
+    h1 .accent { color: #00e5ff; }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .card {
+      border: 1px solid #2a2b30;
+      border-radius: 14px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .card.dark { background: #131319; }
+    .card.light { background: #f3f4f6; color: #0e0e14; }
+    .card.neutral { background: #1e293b; }
+    .icon { width: 96px; height: 96px; }
+    .icon.sm { width: 32px; height: 32px; }
+    .icon.xs { width: 16px; height: 16px; }
+    .lbl { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.7; }
+    .sizes { display: flex; align-items: center; gap: 20px; margin-top: 8px; }
+    .size-group { display: flex; flex-direction: column; align-items: center; gap: 4px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10px; opacity: 0.6; }
+    .swatch-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 32px; }
+  </style>
+</head>
+<body>
+  <h1>Owyx icons — <span class="accent">3 цвета × 3 стиля</span></h1>
+
+  <div class="swatch-row">
+    <div class="card dark">
+      <div class="lbl">CYAN · gradient</div>
+      <img class="icon" src="owyx-icon-cyan-gradient.svg" alt="">
+      <div class="sizes">
+        <div class="size-group"><img class="icon sm" src="owyx-icon-cyan-gradient.svg"><span>32</span></div>
+        <div class="size-group"><img class="icon xs" src="owyx-icon-favicon-cyan.svg"><span>16</span></div>
+      </div>
+    </div>
+    <div class="card dark">
+      <div class="lbl">CYAN · solid</div>
+      <img class="icon" src="owyx-icon-cyan-solid.svg" alt="">
+      <div class="sizes">
+        <div class="size-group"><img class="icon sm" src="owyx-icon-cyan-solid.svg"><span>32</span></div>
+      </div>
+    </div>
+    <div class="card dark">
+      <div class="lbl">CYAN · outline</div>
+      <img class="icon" src="owyx-icon-cyan-outline.svg" alt="">
+      <div class="sizes">
+        <div class="size-group"><img class="icon sm" src="owyx-icon-cyan-outline.svg"><span>32</span></div>
+      </div>
+    </div>
+
+    <div class="card light">
+      <div class="lbl">INK · gradient</div>
+      <img class="icon" src="owyx-icon-ink-gradient.svg" alt="">
+      <div class="sizes">
+        <div class="size-group"><img class="icon sm" src="owyx-icon-ink-gradient.svg"><span>32</span></div>
+        <div class="size-group"><img class="icon xs" src="owyx-icon-favicon-ink.svg"><span>16</span></div>
+      </div>
+    </div>
+    <div class="card light">
+      <div class="lbl">INK · solid</div>
+      <img class="icon" src="owyx-icon-ink-solid.svg" alt="">
+      <div class="sizes">
+        <div class="size-group"><img class="icon sm" src="owyx-icon-ink-solid.svg"><span>32</span></div>
+      </div>
+    </div>
+    <div class="card light">
+      <div class="lbl">INK · outline</div>
+      <img class="icon" src="owyx-icon-ink-outline.svg" alt="">
+      <div class="sizes">
+        <div class="size-group"><img class="icon sm" src="owyx-icon-ink-outline.svg"><span>32</span></div>
+      </div>
+    </div>
+
+    <div class="card neutral">
+      <div class="lbl">SLATE · gradient</div>
+      <img class="icon" src="owyx-icon-slate-gradient.svg" alt="">
+      <div class="sizes">
+        <div class="size-group"><img class="icon sm" src="owyx-icon-slate-gradient.svg"><span>32</span></div>
+        <div class="size-group"><img class="icon xs" src="owyx-icon-favicon-slate.svg"><span>16</span></div>
+      </div>
+    </div>
+    <div class="card neutral">
+      <div class="lbl">SLATE · solid</div>
+      <img class="icon" src="owyx-icon-slate-solid.svg" alt="">
+      <div class="sizes">
+        <div class="size-group"><img class="icon sm" src="owyx-icon-slate-solid.svg"><span>32</span></div>
+      </div>
+    </div>
+    <div class="card neutral">
+      <div class="lbl">SLATE · outline</div>
+      <img class="icon" src="owyx-icon-slate-outline.svg" alt="">
+      <div class="sizes">
+        <div class="size-group"><img class="icon sm" src="owyx-icon-slate-outline.svg"><span>32</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h1 style="margin-top: 48px;">Slate · проверка нейтральности</h1>
+  <div class="swatch-row">
+    <div class="card dark">
+      <div class="lbl">SLATE на тёмном</div>
+      <img class="icon" src="owyx-icon-slate-gradient.svg" alt="">
+    </div>
+    <div class="card light">
+      <div class="lbl">SLATE на светлом</div>
+      <img class="icon" src="owyx-icon-slate-gradient.svg" alt="">
+    </div>
+    <div class="card neutral">
+      <div class="lbl">SLATE на нейтральном</div>
+      <img class="icon" src="owyx-icon-slate-gradient.svg" alt="">
+    </div>
+  </div>
+</body>
+</html>

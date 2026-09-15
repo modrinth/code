@@ -1,7 +1,0 @@
-node_modules/
-dist/
-uploads/*
-!uploads/.gitkeep
-.env
-*.log
-email-previews/

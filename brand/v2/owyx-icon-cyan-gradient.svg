@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="Owyx icon — cyan gradient">
+  <title>Owyx icon — cyan gradient</title>
+  <defs><linearGradient id="owyx-cyan-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#9ff7ff" stop-opacity="[]"/><stop offset="55%" stop-color="#00e5ff" stop-opacity="[]"/><stop offset="100%" stop-color="#0b7a96" stop-opacity="[]"/></linearGradient><linearGradient id="owyx-cyan-edge" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7df9ff" stop-opacity="[]"/><stop offset="100%" stop-color="#00b8d4" stop-opacity="[]"/></linearGradient><radialGradient id="owyx-cyan-core" cx="50%" cy="32%" r="38%"><stop offset="0%" stop-color="#ffffff" stop-opacity="0.85"/><stop offset="60%" stop-color="#7df9ff" stop-opacity="0.25"/><stop offset="100%" stop-color="#00e5ff" stop-opacity="0"/></radialGradient></defs>
+  <g stroke="url(#owyx-cyan-edge)" stroke-width="0.75" stroke-linejoin="round"><path d="M32 4 L56 18 L32 32 Z" fill="url(#owyx-cyan-fill)" fill-opacity="0.95"/><path d="M8 18 L32 4 L32 32 Z" fill="url(#owyx-cyan-fill)" fill-opacity="0.75"/><path d="M56 18 L56 46 L32 32 Z" fill="url(#owyx-cyan-fill)" fill-opacity="0.55"/><path d="M8 46 L8 18 L32 32 Z" fill="url(#owyx-cyan-fill)" fill-opacity="0.42"/><path d="M56 46 L32 60 L32 32 Z" fill="url(#owyx-cyan-fill)" fill-opacity="0.3"/><path d="M32 60 L8 46 L32 32 Z" fill="url(#owyx-cyan-fill)" fill-opacity="0.18"/></g>
+  <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle cx="32" cy="26" r="9" fill="url(#owyx-cyan-core)"/>
+  <circle cx="32" cy="32" r="1.4" fill="#bff8ff"/>
+</svg>

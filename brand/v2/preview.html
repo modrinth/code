@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Owyx v2 — Brand Mark Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Sora:wght@500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #050508;
+      --panel: #131319;
+      --panel-2: #14141c;
+      --rail: #0e0e14;
+      --line: #2a2b30;
+      --text: #f3f4f6;
+      --muted: #9aa0a8;
+      --accent: #00e5ff;
+      --light-bg: #f3f4f6;
+      --neutral-bg: #1e293b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: var(--bg); color: var(--text); }
+    body {
+      font-family: 'Sora', 'Space Grotesk', system-ui, sans-serif;
+      line-height: 1.5;
+      padding: 48px 32px;
+      background:
+        radial-gradient(ellipse 1200px 600px at 50% -100px, rgba(0, 229, 255, 0.08), transparent 70%),
+        var(--bg);
+    }
+    .container { max-width: 1280px; margin: 0 auto; }
+
+    header { border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 48px; display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.02em; }
+    h1 .accent { color: var(--accent); }
+    .eyebrow { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+    .meta { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted); }
+
+    .section { margin-bottom: 64px; }
+    .section-title {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .section-name { font-size: 22px; font-weight: 600; margin-bottom: 24px; letter-spacing: -0.01em; }
+
+    .grid { display: grid; gap: 16px; }
+    .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 900px) { .grid.cols-3, .grid.cols-2 { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .card.dark { background: var(--bg); }
+    .card.light { background: var(--light-bg); border-color: rgba(0,0,0,0.08); }
+    .card.neutral { background: var(--neutral-bg); }
+
+    .card .label { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    .card.light .label { color: #6b7280; }
+
+    .card .name { font-size: 14px; }
+    .card.light .name { color: #0e0e14; }
+
+    .card .sub { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10px; color: var(--muted); margin-top: auto; }
+    .card.light .sub { color: #6b7280; }
+
+    .logo-host { display: flex; align-items: center; justify-content: center; min-height: 90px; padding: 12px; }
+    .logo-host img { max-width: 100%; height: auto; display: block; }
+
+    .row-bg {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .row-bg > div {
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .row-bg > div.dark { background: var(--bg); }
+    .row-bg > div.light { background: var(--light-bg); }
+    .row-bg > div.neutral { background: var(--neutral-bg); }
+
+    .row-bg .lbl { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+    .row-bg > div.dark .lbl, .row-bg > div.neutral .lbl { color: var(--muted); }
+    .row-bg > div.light .lbl { color: #6b7280; }
+    .row-bg .logo-mount { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 90px; }
+    .row-bg .logo-mount img { max-width: 100%; }
+
+    .token {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+    .token strong { color: var(--text); font-weight: 500; }
+    .tokens { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 900px) { .compare-grid { grid-template-columns: 1fr; } }
+
+    .size-row {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      padding: 16px;
+    }
+    .size-row .item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .size-row .item .px {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 10px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <div class="eyebrow">owyx · brand mark v2</div>
+        <h1>Sora × crystal <span class="accent">/ 3 colors × gradient</span></h1>
+      </div>
+      <div class="meta">v2 · 2026-09-15 · matches DESIGN.md §3</div>
+    </header>
+
+    <!-- HERO IN SITU -->
+    <section class="card dark" style="padding: 0; overflow: hidden; position: relative; min-height: 480px; margin-bottom: 64px;">
+      <img src="../owyx-hero-bg.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;" />
+      <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 64px 32px; min-height: 480px;">
+        <div class="label" style="background: rgba(5,5,8,0.7); padding: 6px 14px; border-radius: 6px; margin-bottom: 28px;">BRAND · v2 · SORA</div>
+        <img src="owyx-logo-cyan-lg.svg" alt="Owyx" style="width: 480px; max-width: 85%; filter: drop-shadow(0 0 50px rgba(0,229,255,0.5));" />
+        <div style="margin-top: 24px; font-size: 17px; color: var(--muted); background: rgba(5,5,8,0.55); padding: 10px 18px; border-radius: 8px;">Скачай лаунчер → вошёл → играешь.</div>
+      </div>
+    </section>
+
+    <!-- ALL 3 COLOR VARIANTS · SIDE BY SIDE ON APPROPRIATE BG -->
+
+    <!-- ICON VARIANTS · 3 colors × 3 styles -->
+    <section class="section">
+      <div class="section-title">00 · ИКОНКА · ВАРИАНТЫ</div>
+      <div class="section-name">3 цвета × 3 стиля (gradient / solid / outline) + favicon</div>
+      <div class="grid cols-3">
+        <div class="card dark">
+          <div class="label">CYAN · GRADIENT</div>
+          <div class="logo-host"><img src="owyx-icon-cyan-gradient.svg" alt="" style="width: 96px;"></div>
+          <div class="size-row">
+            <div class="item"><img src="owyx-icon-cyan-gradient.svg" style="width:32px;height:32px;"><span class="px">32</span></div>
+            <div class="item"><img src="owyx-icon-favicon-cyan.svg" style="width:16px;height:16px;"><span class="px">fav · 16</span></div>
+          </div>
+        </div>
+        <div class="card dark">
+          <div class="label">CYAN · SOLID</div>
+          <div class="logo-host"><img src="owyx-icon-cyan-solid.svg" alt="" style="width: 96px;"></div>
+          <div class="size-row">
+            <div class="item"><img src="owyx-icon-cyan-solid.svg" style="width:32px;height:32px;"><span class="px">32</span></div>
+          </div>
+        </div>
+        <div class="card dark">
+          <div class="label">CYAN · OUTLINE</div>
+          <div class="logo-host"><img src="owyx-icon-cyan-outline.svg" alt="" style="width: 96px;"></div>
+          <div class="size-row">
+            <div class="item"><img src="owyx-icon-cyan-outline.svg" style="width:32px;height:32px;"><span class="px">32</span></div>
+          </div>
+        </div>
+
+        <div class="card light">
+          <div class="label">INK · GRADIENT</div>
+          <div class="logo-host"><img src="owyx-icon-ink-gradient.svg" alt="" style="width: 96px;"></div>
+          <div class="size-row">
+            <div class="item"><img src="owyx-icon-ink-gradient.svg" style="width:32px;height:32px;"><span class="px">32</span></div>
+            <div class="item"><img src="owyx-icon-favicon-ink.svg" style="width:16px;height:16px;"><span class="px">fav · 16</span></div>
+          </div>
+        </div>
+        <div class="card light">
+          <div class="label">INK · SOLID</div>
+          <div class="logo-host"><img src="owyx-icon-ink-solid.svg" alt="" style="width: 96px;"></div>
+          <div class="size-row">
+            <div class="item"><img src="owyx-icon-ink-solid.svg" style="width:32px;height:32px;"><span class="px">32</span></div>
+          </div>
+        </div>
+        <div class="card light">
+          <div class="label">INK · OUTLINE</div>
+          <div class="logo-host"><img src="owyx-icon-ink-outline.svg" alt="" style="width: 96px;"></div>
+          <div class="size-row">
+            <div class="item"><img src="owyx-icon-ink-outline.svg" style="width:32px;height:32px;"><span class="px">32</span></div>
+          </div>
+        </div>
+
+        <div class="card neutral">
+          <div class="label">SLATE · GRADIENT</div>
+          <div class="logo-host"><img src="owyx-icon-slate-gradient.svg" alt="" style="width: 96px;"></div>
+          <div class="size-row">
+            <div class="item"><img src="owyx-icon-slate-gradient.svg" style="width:32px;height:32px;"><span class="px">32</span></div>
+            <div class="item"><img src="owyx-icon-favicon-slate.svg" style="width:16px;height:16px;"><span class="px">fav · 16</span></div>
+          </div>
+        </div>
+        <div class="card neutral">
+          <div class="label">SLATE · SOLID</div>
+          <div class="logo-host"><img src="owyx-icon-slate-solid.svg" alt="" style="width: 96px;"></div>
+          <div class="size-row">
+            <div class="item"><img src="owyx-icon-slate-solid.svg" style="width:32px;height:32px;"><span class="px">32</span></div>
+          </div>
+        </div>
+        <div class="card neutral">
+          <div class="label">SLATE · OUTLINE</div>
+          <div class="logo-host"><img src="owyx-icon-slate-outline.svg" alt="" style="width: 96px;"></div>
+          <div class="size-row">
+            <div class="item"><img src="owyx-icon-slate-outline.svg" style="width:32px;height:32px;"><span class="px">32</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">01 · ЦВЕТОВЫЕ ВАРИАНТЫ</div>
+      <div class="section-name">3 цветовые схемы · на своих фонах</div>
+
+      <!-- Solid row -->
+      <div class="row-bg" style="margin-bottom: 16px;">
+        <div class="dark">
+          <div class="lbl">CYAN · SOLID · на тёмном</div>
+          <div class="logo-mount"><img src="owyx-logo-cyan-md.svg" alt="cyan solid"></div>
+        </div>
+        <div class="light">
+          <div class="lbl">INK · SOLID · на светлом</div>
+          <div class="logo-mount"><img src="owyx-logo-ink-md.svg" alt="ink solid"></div>
+        </div>
+        <div class="neutral">
+          <div class="lbl">SLATE · SOLID · нейтральный</div>
+          <div class="logo-mount"><img src="owyx-logo-slate-md.svg" alt="slate solid"></div>
+        </div>
+      </div>
+
+      <!-- Gradient row -->
+      <div class="row-bg">
+        <div class="dark">
+          <div class="lbl">CYAN · GRADIENT · на тёмном</div>
+          <div class="logo-mount"><img src="owyx-logo-cyan-md-gradient.svg" alt="cyan gradient"></div>
+        </div>
+        <div class="light">
+          <div class="lbl">INK · GRADIENT · на светлом</div>
+          <div class="logo-mount"><img src="owyx-logo-ink-md-gradient.svg" alt="ink gradient"></div>
+        </div>
+        <div class="neutral">
+          <div class="lbl">SLATE · GRADIENT · нейтральный</div>
+          <div class="logo-mount"><img src="owyx-logo-slate-md-gradient.svg" alt="slate gradient"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLATE · ON ALL THREE BACKGROUNDS · showing neutrality -->
+    <section class="section">
+      <div class="section-title">02 · NEUTRAL · проверка</div>
+      <div class="section-name">Slate-вариант на всех трёх типах фона</div>
+      <div class="row-bg">
+        <div class="dark">
+          <div class="lbl">SLATE · SOLID · на тёмном</div>
+          <div class="logo-mount"><img src="owyx-logo-slate-md.svg" alt="slate on dark"></div>
+        </div>
+        <div class="light">
+          <div class="lbl">SLATE · SOLID · на светлом</div>
+          <div class="logo-mount"><img src="owyx-logo-slate-md.svg" alt="slate on light"></div>
+        </div>
+        <div class="neutral">
+          <div class="lbl">SLATE · SOLID · на нейтральном</div>
+          <div class="logo-mount"><img src="owyx-logo-slate-md.svg" alt="slate on neutral"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SIZE LADDER -->
+    <section class="section">
+      <div class="section-title">03 · РАЗМЕРЫ</div>
+      <div class="section-name">Каждый вариант в трёх размерах</div>
+      <div class="grid cols-3">
+        <div class="card dark">
+          <div class="label">CYAN · GRADIENT · LG</div>
+          <div class="name">Hero / marketing — 480×120</div>
+          <div class="logo-host"><img src="owyx-logo-cyan-lg-gradient.svg" alt=""></div>
+          <div class="sub">wordmark 68px</div>
+        </div>
+        <div class="card dark">
+          <div class="label">CYAN · GRADIENT · MD</div>
+          <div class="name">Header / footer — 320×80</div>
+          <div class="logo-host"><img src="owyx-logo-cyan-md-gradient.svg" alt=""></div>
+          <div class="sub">wordmark 56px</div>
+        </div>
+        <div class="card dark">
+          <div class="label">CYAN · GRADIENT · SM</div>
+          <div class="name">Compact nav / inline — 200×50</div>
+          <div class="logo-host"><img src="owyx-logo-cyan-sm-gradient.svg" alt=""></div>
+          <div class="sub">wordmark 34px</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORDMARKS ONLY -->
+    <section class="section">
+      <div class="section-title">04 · WORDMARK ONLY</div>
+      <div class="section-name">Только текст — для inline использования</div>
+      <div class="grid cols-3">
+        <div class="card dark">
+          <div class="label">CYAN · SOLID</div>
+          <div class="logo-host"><img src="owyx-wordmark-cyan.svg" alt=""></div>
+        </div>
+        <div class="card dark">
+          <div class="label">CYAN · GRADIENT</div>
+          <div class="logo-host"><img src="owyx-wordmark-cyan-gradient.svg" alt=""></div>
+        </div>
+        <div class="card dark">
+          <div class="label">CYAN · GRADIENT · на атмо</div>
+          <div class="logo-host" style="background: url('../owyx-hero-bg.jpg') center/cover;"><img src="owyx-wordmark-cyan-gradient.svg" alt=""></div>
+        </div>
+
+        <div class="card light">
+          <div class="label">INK · SOLID</div>
+          <div class="logo-host"><img src="owyx-wordmark-ink.svg" alt=""></div>
+        </div>
+        <div class="card light">
+          <div class="label">INK · GRADIENT</div>
+          <div class="logo-host"><img src="owyx-wordmark-ink-gradient.svg" alt=""></div>
+        </div>
+        <div class="card light">
+          <div class="label">INK · GRADIENT · крупно</div>
+          <div class="logo-host"><img src="owyx-wordmark-ink-gradient.svg" alt="" style="width: 80%;"></div>
+        </div>
+
+        <div class="card neutral">
+          <div class="label">SLATE · SOLID</div>
+          <div class="logo-host"><img src="owyx-wordmark-slate.svg" alt=""></div>
+        </div>
+        <div class="card neutral">
+          <div class="label">SLATE · GRADIENT</div>
+          <div class="logo-host"><img src="owyx-wordmark-slate-gradient.svg" alt=""></div>
+        </div>
+        <div class="card neutral">
+          <div class="label">SLATE · на светлом</div>
+          <div class="logo-host" style="background: var(--light-bg); border-radius: 8px;"><img src="owyx-wordmark-slate.svg" alt=""></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SORA VS SPACE GROTESK · COMPARISON -->
+    <section class="section">
+      <div class="section-title">05 · SORA · ОБОСНОВАНИЕ</div>
+      <div class="section-name">Почему Sora, а не Space Grotesk</div>
+      <div class="grid cols-2">
+        <div class="card dark">
+          <div class="label">SPACE GROTESK · старое</div>
+          <div class="logo-host"><img src="../owyx-logo-horizontal.svg" alt="" style="width: 80%;"></div>
+          <div class="sub">чуть слябовый характер, "y" имеет выраженную кривую descender'а</div>
+        </div>
+        <div class="card dark">
+          <div class="label">SORA · новое</div>
+          <div class="logo-host"><img src="owyx-logo-cyan-md.svg" alt="" style="width: 80%;"></div>
+          <div class="sub">геометричнее, "o" — почти круг, "y" — ровный штрих → лучше гармонирует с кристаллом</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOKENS -->
+    <section class="section">
+      <div class="section-title">06 · ТОКЕНЫ v2</div>
+      <div class="section-name">Цвета, используемые в лого v2</div>
+      <div class="tokens">
+        <span class="token"><strong>Cyan solid</strong> · #00e5ff</span>
+        <span class="token"><strong>Cyan gradient</strong> · #bff8ff → #00e5ff → #0b7a96</span>
+        <span class="token"><strong>Ink solid</strong> · #0e0e14</span>
+        <span class="token"><strong>Ink gradient</strong> · #475569 → #0e0e14 → #020617</span>
+        <span class="token"><strong>Slate solid</strong> · #64748b</span>
+        <span class="token"><strong>Slate gradient</strong> · #cbd5e1 → #64748b → #334155</span>
+        <span class="token"><strong>Icon highlight</strong> · #9ff7ff</span>
+        <span class="token"><strong>Icon shadow</strong> · #0b7a96</span>
+        <span class="token"><strong>Icon core</strong> · #bff8ff</span>
+      </div>
+      <div class="sub" style="margin-top: 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted);">
+        Шрифт: <strong style="color: var(--text);">Sora 600</strong> · fallback: Space Grotesk, Outfit, Geist, system-ui. Подключение — Google Fonts CDN или локально через @font-face.
+      </div>
+    </section>
+  </div>
+</body>
+</html>

@@ -96,15 +96,11 @@ apps/frontend/src/public/robots.txt
 
 packages/tooling-config/script-utils/import-sort.js
 
-# Owyx legacy monorepo secrets / junk
-legacy/**/.env
-legacy/**/.env.*
-!legacy/**/.env.example
-legacy/**/node_modules/
-legacy/**/target/
-legacy/**/.next/
-legacy/Launcher/**/*.exe
+
 
 legacy/**/frpc.toml
 !legacy/**/frpc.toml.example
+
+
+promt.md
 
