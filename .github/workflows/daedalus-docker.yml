@@ -71,7 +71,8 @@ jobs:
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
 
-  docker:
+  build:
+    name: Build daedalus_client
     runs-on: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'namespace-profile-medium-amd64' || 'ubuntu-latest' }}
     needs: [skip-if-clean]
     if: ${{ needs.skip-if-clean.outputs.skip != 'true' }}
@@ -96,38 +97,30 @@ jobs:
           mkdir -p apps/daedalus_client/docker-stage
           cp target/release/daedalus_client apps/daedalus_client/docker-stage/daedalus_client
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
-
-      - name: Generate Docker image metadata
-        id: docker-meta
-        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
-        env:
-          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
+      - name: Upload Docker context
+        if: needs.skip-if-clean.outputs.internal == 'true'
+        uses: namespace-actions/upload-artifact@f6ccaacc655aec41b93af180d1d7eef21af862d2 # v1.0.3
         with:
-          images: ghcr.io/modrinth/daedalus
-          labels: |
-            org.opencontainers.image.title=daedalus
-            org.opencontainers.image.description=Modrinth game metadata query client
-            org.opencontainers.image.licenses=MIT
-          annotations: |
-            org.opencontainers.image.title=daedalus
-            org.opencontainers.image.description=Modrinth game metadata query client
-            org.opencontainers.image.licenses=MIT
+          name: daedalus-docker-context
+          retention-days: 1
+          path: apps/daedalus_client/docker-stage
 
-      - name: Login to GitHub Packages
-        uses: docker/login-action@abd2ef45e78c5afb21d64d4ca52ee8550d9572c7 # v4.5.1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+  docker-build:
+    needs: [skip-if-clean, build]
+    if: ${{ needs.skip-if-clean.outputs.internal == 'true' }}
+    uses: SparkUniverse/workflows/.github/workflows/docker-build.yaml@main
+    with:
+      image-name: daedalus
+      dockerfile-path: apps/daedalus_client/Dockerfile
+      artifacts-name: daedalus-docker-context
 
-      - name: Build and push
-        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
-        with:
-          context: ./apps/daedalus_client/docker-stage
-          file: ./apps/daedalus_client/Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.docker-meta.outputs.tags }}
-          labels: ${{ steps.docker-meta.outputs.labels }}
-          annotations: ${{ steps.docker-meta.outputs.annotations }}
+  deploy:
+    needs: [skip-if-clean, docker-build]
+    if: ${{ needs.skip-if-clean.outputs.internal == 'true' && github.ref == 'refs/heads/prod' && github.event_name == 'push' }}
+    uses: SparkUniverse/workflows/.github/workflows/argo-update.yaml@main
+    secrets:
+      ARGOCD_DEPLOY_KEY: ${{ secrets.ARGOCD_DEPLOY_KEY }}
+    with:
+      application-set: launcher-meta
+      branch: main
+      environment-name: production

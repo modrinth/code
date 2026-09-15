@@ -182,23 +182,11 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "I-save ang iyong minamahal na kontento at makapagtanggap ng mga update sa iisang pindot."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Sundan ang mga proyekto"
-  },
-  "app-marketing.features.importing.description": {
-    "message": "I-import ang lahat ng mga paboritong profile mo galing sa launcher na dating ginagamit mo, at magsimula na sa Modrinth App is iilang segundo!"
-  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
-  },
-  "app-marketing.features.importing.title": {
-    "message": "Pag-import ng profile"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Mga Aksiyon"
@@ -224,15 +212,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Bersiyon"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Laruin ang iyong mga mod, kung mapakonekta ka man sa internet, o hindi."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Offline mode"
-  },
-  "app-marketing.features.open-source.description": {
-    "message": "Buong naka-open-source ang launcher ng Modrinth. Maaari mong matingnan ang source code sa aming <github-link>GitHub</github-link>!"
-  },
   "app-marketing.features.open-source.title": {
     "message": "Open source"
   },
@@ -242,9 +221,6 @@
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
   },
-  "app-marketing.features.performance.description": {
-    "message": "Ang Modrinth App ay mas mahusay mag-perform kaysa sa maraming nangungunang mod manager, gumagamit lamang ng 150 MB ng RAM!"
-  },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
   },
@@ -253,12 +229,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"
@@ -388,9 +358,6 @@
   },
   "auth.reset-password.title.long": {
     "message": "Baguhin ang iyong password"
-  },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Ilagay ang code..."
   },
   "auth.sign-in.title": {
     "message": "Mag-sign In"
@@ -1304,9 +1271,6 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "Anong uri ng CPU pinatatakbo ang mga server ng Modrinth Hosting?"
   },
-  "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Ang mga server ng Modrinth Hosting ay pinapagana ng AMD Ryzen 7900 at 7950X3D katumbas na CPU sa 5+ GHz, pinares nang memoryang DDR5."
-  },
   "hosting-marketing.faq.currency": {
     "message": "Saang salapi pinipresyo ito?"
   },
@@ -1636,9 +1600,6 @@
   },
   "layout.action.new-project": {
     "message": "Bagong proyekto"
-  },
-  "layout.action.new-server-project": {
-    "message": "Bagong server"
   },
   "layout.action.publish": {
     "message": "Ilathala"

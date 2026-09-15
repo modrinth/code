@@ -2,9 +2,7 @@
 	"identifier": "plugins",
 	"description": "",
 	"local": true,
-	"windows": [
-		"main"
-	],
+	"windows": ["main"],
 	"permissions": [
 		"dialog:allow-open",
 		"dialog:allow-confirm",
@@ -60,15 +58,8 @@
 		"fs:allow-read-dir",
 		"fs:allow-read-file",
 		"fs:allow-read-text-file",
-		"fs:allow-write-file",
-		"fs:allow-write-text-file",
-		"fs:allow-create",
-		"fs:allow-remove",
-		"fs:allow-rename",
-		"fs:allow-copy-file",
 		"fs:allow-stat",
 		"fs:allow-exists",
-		"fs:allow-mkdir",
 		{
 			"identifier": "fs:scope",
 			"allow": [

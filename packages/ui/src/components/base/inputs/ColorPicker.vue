@@ -6,7 +6,6 @@
 		class="relative flex shrink-0 cursor-pointer items-center justify-center rounded-xl transition-[filter,box-shadow] hover:brightness-125 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:brightness-100"
 		:class="triggerSizeClass"
 		:disabled="disabled"
-		:aria-label="label"
 		:aria-expanded="isOpen"
 		:aria-controls="panelId"
 		aria-haspopup="dialog"

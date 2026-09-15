@@ -14,12 +14,15 @@ pub(crate) use self::get_instance::{
     get_instance, get_instance_metadata, get_instances_metadata, list_instances,
 };
 
+mod game_options;
+pub(crate) use self::game_options::*;
+
 mod list_content;
 pub(crate) use self::list_content::{
     dependencies_to_content_items, get_content_projects,
     get_installed_project_ids_for_instance, get_instance_install_candidates,
     get_linked_modpack_info, list_content, list_content_sets,
-    list_linked_modpack_content,
+    list_linked_modpack_content, list_pack_content,
 };
 
 mod embedded_content_metadata;
@@ -30,7 +33,9 @@ pub(crate) use self::remove_instance::*;
 mod refresh_instances;
 pub(crate) use self::refresh_instances::*;
 
+mod migrate_legacy_content;
 mod sync_content_files;
+pub(crate) use self::migrate_legacy_content::migrate_legacy_content;
 pub(crate) use self::sync_content_files::sync_content_files;
 
 mod launch_context;
@@ -38,6 +43,12 @@ pub(crate) use self::launch_context::*;
 
 mod apply_content_install;
 pub(crate) use self::apply_content_install::*;
+
+mod content_mutation;
+pub(crate) use self::content_mutation::{
+    ContentOrigin, InstallContent, install_stored_file, remove_project,
+    toggle_disable_project,
+};
 
 mod check_content_updates;
 pub(crate) use self::check_content_updates::refresh_content_updates;

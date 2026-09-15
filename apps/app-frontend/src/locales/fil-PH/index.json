@@ -494,9 +494,6 @@
   "instance.settings.tabs.general.update-channel.beta": {
     "message": "Beta"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Binibigyan-daan ng mga hook ang mga ekspertong tagagamit na makapagtakbo ng mga pansistemang utos o system command bago at pagkatapos ma-launch ang laro."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Post-exist"
   },
@@ -515,9 +512,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Ilagay ang pre-launch command..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Mga launch hook ng laro"
-  },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Wrapper"
   },
@@ -533,26 +527,8 @@
   "instance.settings.tabs.installation.loader-version": {
     "message": "Bersiyon ng {loader}"
   },
-  "instance.settings.tabs.java.environment-variables": {
-    "message": "Environment variables"
-  },
   "instance.settings.tabs.java.hooks": {
     "message": "Mga hook"
-  },
-  "instance.settings.tabs.java.java-arguments": {
-    "message": "Mga java argument"
-  },
-  "instance.settings.tabs.java.java-installation": {
-    "message": "Instalasyon ng Java"
-  },
-  "instance.settings.tabs.java.java-memory": {
-    "message": "Memoryang inilaan"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Window"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Mga setting sa pasadyang window"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Fullscreen"

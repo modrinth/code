@@ -21,7 +21,7 @@ export function setupProviders(
 	getGeneratedIconConfig?: (iconPath: string) => InstanceIconConfig | null,
 ) {
 	setupUserCountryProvider(client)
-	setupTagsProvider(notificationManager)
+	const tags = setupTagsProvider(notificationManager)
 	setupFileDropProvider()
 	setupFilePickerProvider()
 	setupImageViewerEditorProvider()
@@ -31,5 +31,6 @@ export function setupProviders(
 	return {
 		...setupCreationModal(notificationManager, getGeneratedIconConfig),
 		onboardingChecklist,
+		tags,
 	}
 }

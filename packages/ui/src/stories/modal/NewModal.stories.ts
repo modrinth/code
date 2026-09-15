@@ -73,9 +73,9 @@ export const Stacked: Story = {
 				<NewModal ref="parentModalRef" header="Parent Modal">
 					<p>The child modal should appear above this surface and backdrop.</p>
 					<Button type="colored" color="brand" @click="openChildModal">Open Child Modal</Button>
-				</NewModal>
-				<NewModal ref="childModalRef" header="Child Modal" max-width="500px">
-					<p>This modal is the topmost layer.</p>
+					<NewModal ref="childModalRef" header="Child Modal" max-width="500px">
+						<p>This modal is the topmost layer.</p>
+					</NewModal>
 				</NewModal>
 			</div>
 		`,

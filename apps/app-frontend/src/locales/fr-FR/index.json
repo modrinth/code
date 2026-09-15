@@ -21,7 +21,7 @@
     "message": "Copier les détails"
   },
   "app.action-bar.install.dismiss": {
-    "message": "Rejeter"
+    "message": "Ignorer"
   },
   "app.action-bar.install.open-instance": {
     "message": "Ouvrir l'instance"
@@ -51,7 +51,7 @@
     "message": "Impossible de sauvegarder les fichiers"
   },
   "app.action-bar.install.summary.download-failed": {
-    "message": "Impossible de terminer le téléchargement"
+    "message": "Le téléchargement n'a pas pu terminer"
   },
   "app.action-bar.install.summary.instance-not-found": {
     "message": "L'instance est introuvable"
@@ -94,9 +94,6 @@
   },
   "app.action-bar.install.updating-shared-content": {
     "message": "Mise à jour du contenu partagé"
-  },
-  "app.action-bar.installs": {
-    "message": "Installations"
   },
   "app.action-bar.make-primary-instance": {
     "message": "Définir en tant qu'instance principale"
@@ -166,12 +163,6 @@
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Cacher le pseudo"
-  },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Affiche les mondes récemment joués dans la section \"Lancement rapide\" de la page principale."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Lancement rapide dans les mondes ou les instances"
   },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimiser Modrinth App quand Minecraft se lance."
@@ -260,6 +251,9 @@
   "app.browse.hide-installed-modpacks": {
     "message": "Cacher ce qui est déjà installé"
   },
+  "app.browse.project-actions.label": {
+    "message": "Actions du projet"
+  },
   "app.browse.project-type.data-packs": {
     "message": "Packs de données"
   },
@@ -287,6 +281,24 @@
   "app.content-install.no-compatible-versions": {
     "message": "Aucune version disponible ne correspond à {compatibilityLabel}. Sélectionnez une version pour l'installer malgré tout. Les dépendances ne seront pas installées automatiquement."
   },
+  "app.content.desync-pack": {
+    "message": "Désynchroniser"
+  },
+  "app.content.sync-data-packs-disabled": {
+    "message": "Activez d'abord la synchronisation du pack de données dans les paramètres de l'application."
+  },
+  "app.content.sync-pack": {
+    "message": "Synchroniser"
+  },
+  "app.content.sync-packs-override": {
+    "message": "Désactivez d'abord la synchronisation personnalisée des packs dans les paramètres de cette instance."
+  },
+  "app.content.sync-resource-packs-disabled": {
+    "message": "Activez d'abord la synchronisation des packs de ressource dans les paramètres de l'application."
+  },
+  "app.error.state-init.open-backups-folder": {
+    "message": "Ouvrir le dossier de sauvegardes"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Saisir la description du modpack..."
   },
@@ -313,6 +325,60 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.features-settings.instance-pages.title": {
+    "message": "Instances"
+  },
+  "app.features-settings.play-page.title": {
+    "message": "Page de jeu"
+  },
+  "app.features-settings.quick-instances.description": {
+    "message": "Choisissez le nombre maximum d'instances récentes affichées dans la barre latérale gauche. Vous pouvez aussi ajuster ce paramètre en glissant le séparateur."
+  },
+  "app.features-settings.quick-instances.title": {
+    "message": "Instances rapides dans la barre latérale"
+  },
+  "app.features-settings.show-all-screenshots.description": {
+    "message": "Afficher un bouton dans la barre latérale gauche pour afficher les captures d'écran de toutes vos instances."
+  },
+  "app.features-settings.show-all-screenshots.title": {
+    "message": "Montrer toutes les captures d'écran dans la barre latérale gauche"
+  },
+  "app.features-settings.show-files-tab.title": {
+    "message": "Afficher l'onglet Fichiers dans les instances"
+  },
+  "app.features-settings.show-jump-in.description": {
+    "message": "Afficher les mondes et les instances récemment joués en haut de la page de jeu."
+  },
+  "app.features-settings.show-jump-in.title": {
+    "message": "Afficher la section « Accès rapide »"
+  },
+  "app.features-settings.show-screenshots-tab.title": {
+    "message": "Afficher l'onglet Captures d'Écran dans les instances"
+  },
+  "app.features-settings.show-skin-selector.description": {
+    "message": "Afficher un bouton dans la barre latérale gauche pour ouvrir le sélecteur de skins."
+  },
+  "app.features-settings.show-skin-selector.title": {
+    "message": "Afficher le sélecteur de skins dans la barre latérale"
+  },
+  "app.features-settings.show-worlds-tab.title": {
+    "message": "Afficher l'onglet Monde dans les instances"
+  },
+  "app.features-settings.sidebar.title": {
+    "message": "Barre latérale"
+  },
+  "app.features-settings.sync-across-devices.description": {
+    "message": "Appliquer ces paramètres partout où vous êtes connecté. Désactivez cette option pour conserver des paramètres distincts sur cet appareil."
+  },
+  "app.features-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Connectez-vous à un compte Modrinth pour synchroniser les paramètres."
+  },
+  "app.features-settings.sync-across-devices.title": {
+    "message": "Synchroniser les fonctionnalités entre les appareils"
+  },
+  "app.home.jump-back-in.actions.label": {
+    "message": "Actions de l'instance"
   },
   "app.home.jump-back-in.instance-locked": {
     "message": "Cette instance a été verrouillée"
@@ -342,55 +408,13 @@
     "message": "Vous avez besoin de mettre à jour pour utiliser Modrinth Hosting via Modrinth App"
   },
   "app.hosting.update-required.download": {
-    "message": "Télécharger la mise à jour"
+    "message": "Télécharger pour mettre à jour"
   },
   "app.hosting.update-required.rinthbot-alt": {
     "message": "Modrinth Bot excité"
   },
   "app.hosting.update-required.title": {
     "message": "Mise à jour de Modrinth App requise"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "Impossible d'appliquer des icônes aléatoires aux instances."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "Appliqué une icône aléatoire pour {num, plural,one {# instance} other {# instances}}."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "Nouveautés"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "Fermer"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "Créez des icônes personnalisées pour vos instances directement dans l'application Modrinth. Mélangez et associez des arrière-plans avec des symboles de Minecraft et des mods populaires !"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "{count, plural, one {Une instance n'a} other {# instances n'ont}} pas encore d'icône. Vous voulez qu'on {count, plural, one {lui} other {leur}} attribue {count, plural, one {une icône aléatoire} other {des icônes aléatoires}} pour commencer ?"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "Icônes aléatoires"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "Ignorer"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "Éditeur d'icônes personnalisées"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "Fermer"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "Personnalisez vos instances !"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "Ignorer"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "Nouvel éditeur d'icônes"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "Voir la mise à jour"
   },
   "app.install.phase.downloading_content": {
     "message": "Téléchargement du contenu"
@@ -444,7 +468,7 @@
     "message": "Annulation"
   },
   "app.install.phase.running_loader_processors": {
-    "message": "Exécution des processeurs du chargeur"
+    "message": "Exécution des processeurs du loader"
   },
   "app.instance.action.add-content": {
     "message": "Ajouter du contenu"
@@ -463,6 +487,9 @@
   },
   "app.instance.action.stop": {
     "message": "Stop"
+  },
+  "app.instance.actions.label": {
+    "message": "Actions de l'instance"
   },
   "app.instance.add-server.add": {
     "message": "Ajouter"
@@ -746,6 +773,9 @@
   "app.instance.tab.logs": {
     "message": "Journaux"
   },
+  "app.instance.tab.screenshots": {
+    "message": "Captures d'écran"
+  },
   "app.instance.tab.share": {
     "message": "Partager"
   },
@@ -793,6 +823,18 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Supprimer le serveur"
+  },
+  "app.instance.worlds.remove-server-modal.remove-everywhere": {
+    "message": "Supprimer partout"
+  },
+  "app.instance.worlds.remove-server-modal.remove-here": {
+    "message": "Supprimer ici"
+  },
+  "app.instance.worlds.remove-server-modal.synced-description": {
+    "message": "Vous pouvez le supprimer uniquement de cette instance ou de toutes les instances synchronisées. Le supprimer uniquement ici activera les modifications locales, et cette instance ne recevra plus les mises à jour du serveur."
+  },
+  "app.instance.worlds.remove-server-modal.synced-header": {
+    "message": "Ce serveur est synchronisé"
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Supprimer le serveur"
@@ -851,6 +893,9 @@
   "app.java-selector.test-installation": {
     "message": "Tester l'installation Java"
   },
+  "app.library.actions.label": {
+    "message": "Actions de la bibliothèque"
+  },
   "app.library.context-menu.create-instance": {
     "message": "Nouvelle instance"
   },
@@ -898,6 +943,9 @@
   },
   "app.library.group-by.none": {
     "message": "Aucun regroupement"
+  },
+  "app.library.group.actions.label": {
+    "message": "Actions du groupe"
   },
   "app.library.group.collapse": {
     "message": "Réduire le groupe"
@@ -965,11 +1013,29 @@
   "app.library.group.name-placeholder": {
     "message": "Saisir le nom du groupe"
   },
+  "app.library.group.name-reserved": {
+    "message": "\"None\" est restreint et ne peut pas être utilisé comme nom de groupe."
+  },
+  "app.library.group.name-too-long": {
+    "message": "Les noms de groupes ne peuvent pas être plus longs que {maxLength} caractères."
+  },
   "app.library.group.new": {
     "message": "Nouveau groupe"
   },
   "app.library.group.no-instances-found": {
     "message": "Aucune instance trouvée"
+  },
+  "app.library.group.rename-failed": {
+    "message": "Impossible de renommer le groupe"
+  },
+  "app.library.group.search-instance": {
+    "message": "Rechercher une instance"
+  },
+  "app.library.group.ungrouped": {
+    "message": "Sans groupe"
+  },
+  "app.library.group.unknown": {
+    "message": "Groupe inconnu"
   },
   "app.library.instance.action.add-content": {
     "message": "Ajouter du contenu"
@@ -995,11 +1061,17 @@
   "app.library.instance.action.remove-from-favorites": {
     "message": "Retirer des favoris"
   },
+  "app.library.instance.action.remove-from-group": {
+    "message": "Retirer du groupe"
+  },
   "app.library.instance.action.stop": {
     "message": "Arrêter"
   },
   "app.library.instance.action.view-instance": {
     "message": "Voir l'instance"
+  },
+  "app.library.instance.actions.label": {
+    "message": "Actions de l'instance"
   },
   "app.library.instance.deselect": {
     "message": "Désélectionner l'instance"
@@ -1009,6 +1081,9 @@
   },
   "app.library.instance.installing": {
     "message": "Installation..."
+  },
+  "app.library.instance.loading": {
+    "message": "L'instance est en cours de chargement..."
   },
   "app.library.instance.new": {
     "message": "Nouvelle instance"
@@ -1031,11 +1106,17 @@
   "app.library.instance.stop": {
     "message": "Arrêter"
   },
+  "app.library.search.no-results.title": {
+    "message": "Aucune instance ne correspond à votre recherche."
+  },
   "app.library.search.placeholder": {
     "message": "Rechercher"
   },
   "app.library.selection.aria-label": {
     "message": "Instances sélectionnées"
+  },
+  "app.library.selection.deleting": {
+    "message": "Suppression des instances sélectionnées"
   },
   "app.library.selection.new-group": {
     "message": "Nouveau groupe"
@@ -1048,6 +1129,9 @@
   },
   "app.library.sort.date-modified": {
     "message": "Date de modification"
+  },
+  "app.library.sort.game-version": {
+    "message": "Version du jeu"
   },
   "app.library.sort.hours-played": {
     "message": "Heures de jeu"
@@ -1181,11 +1265,17 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "Une mise à jour est requise pour jouer à {name}. Veuillez mettre à jour vers la dernière version pour lancer le jeu."
   },
+  "app.nav.add-account": {
+    "message": "Ajouter un compte"
+  },
   "app.nav.create-new-instance": {
     "message": "Créer une nouvelle instance"
   },
   "app.nav.home": {
     "message": "Accueil"
+  },
+  "app.nav.loading-profile": {
+    "message": "Chargement du profil..."
   },
   "app.nav.modrinth-account": {
     "message": "Compte Modrinth"
@@ -1193,11 +1283,23 @@
   "app.nav.modrinth-hosting": {
     "message": "Modrinth Hosting"
   },
+  "app.nav.remove-account": {
+    "message": "Retirer le compte"
+  },
+  "app.nav.screenshots": {
+    "message": "Captures d'écran"
+  },
   "app.nav.sign-in-to-modrinth-account": {
-    "message": "Se connecter à un compte Modrinth"
+    "message": "Se connecter à Modrinth"
+  },
+  "app.nav.switch-account": {
+    "message": "Changer de compte"
   },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Passer à Modrinth+"
+  },
+  "app.nav.view-profile": {
+    "message": "Voir le profil"
   },
   "app.navigation.go-back": {
     "message": "Retour"
@@ -1220,6 +1322,9 @@
   "app.notification.warning": {
     "message": "Avertissement"
   },
+  "app.project.actions.label": {
+    "message": "Actions du projet"
+  },
   "app.project.coming-soon": {
     "message": "Arrive bientôt"
   },
@@ -1234,6 +1339,9 @@
   },
   "app.project.install-context.back-to-instance": {
     "message": "Retour à l'instance"
+  },
+  "app.project.load-error": {
+    "message": "Les données du projet n'ont pas pu être chargées."
   },
   "app.project.more-options": {
     "message": "Plus d'options"
@@ -1259,14 +1367,176 @@
   "app.project.versions.already-installed": {
     "message": "Déjà installé"
   },
+  "app.quick-instance-switcher.actions.label": {
+    "message": "Actions de l'instance"
+  },
   "app.quick-instance-switcher.drag-show-tooltip": {
     "message": "Faites glisser pour montrer les instances récentes"
   },
   "app.quick-instance-switcher.drag-tooltip": {
     "message": "Faire glisser pour redimensionner"
   },
+  "app.quick-instance-switcher.instance-locked": {
+    "message": "Cette instance a été verrouillée"
+  },
+  "app.quick-instance-switcher.view-instance": {
+    "message": "Voir l'instance"
+  },
   "app.restarting": {
     "message": "Redémarrage..."
+  },
+  "app.screenshots.copied": {
+    "message": "Copié"
+  },
+  "app.screenshots.copy": {
+    "message": "Copier l'image"
+  },
+  "app.screenshots.delete-description": {
+    "message": "Supprimer définitivement \"{name}\" ? Cette action est irréversible."
+  },
+  "app.screenshots.delete-success": {
+    "message": "Capture d'écran supprimée"
+  },
+  "app.screenshots.delete-title": {
+    "message": "Supprimer la capture d'écran"
+  },
+  "app.screenshots.deselect": {
+    "message": "Désélectionner {name}"
+  },
+  "app.screenshots.edit": {
+    "message": "Modifier la capture d'écran"
+  },
+  "app.screenshots.empty-description": {
+    "message": "Les captures d'écran que vous prenez en jeu apparaîtront ici."
+  },
+  "app.screenshots.empty-heading": {
+    "message": "Aucune capture d'écran pour l'instant"
+  },
+  "app.screenshots.error-heading": {
+    "message": "Impossible de charger les captures d'écran"
+  },
+  "app.screenshots.go-to-instance": {
+    "message": "Aller à l'instance"
+  },
+  "app.screenshots.group-by": {
+    "message": "Grouper par"
+  },
+  "app.screenshots.group.all-screenshots": {
+    "message": "Toutes les captures d'écran"
+  },
+  "app.screenshots.group.collapse": {
+    "message": "Réduire le groupe"
+  },
+  "app.screenshots.group.custom": {
+    "message": "Groupe personnalisé"
+  },
+  "app.screenshots.group.date": {
+    "message": "Date"
+  },
+  "app.screenshots.group.delete": {
+    "message": "Supprimer le groupe"
+  },
+  "app.screenshots.group.delete-description": {
+    "message": "Les captures d'écran de ce groupe seront dégroupées."
+  },
+  "app.screenshots.group.edit": {
+    "message": "Modifier le nom du groupe"
+  },
+  "app.screenshots.group.empty": {
+    "message": "Glisser-déposer pour ajouter des captures d'écran."
+  },
+  "app.screenshots.group.expand": {
+    "message": "Développer le groupe"
+  },
+  "app.screenshots.group.instance": {
+    "message": "Instance"
+  },
+  "app.screenshots.group.new": {
+    "message": "Nouveau groupe"
+  },
+  "app.screenshots.group.none": {
+    "message": "Sans regroupement"
+  },
+  "app.screenshots.group.this-month": {
+    "message": "Ce mois"
+  },
+  "app.screenshots.group.this-week": {
+    "message": "Cette semaine"
+  },
+  "app.screenshots.group.today": {
+    "message": "Aujourd'hui"
+  },
+  "app.screenshots.group.ungrouped": {
+    "message": "Non groupé"
+  },
+  "app.screenshots.group.yesterday": {
+    "message": "Hier"
+  },
+  "app.screenshots.heading": {
+    "message": "Captures d'écran"
+  },
+  "app.screenshots.more-actions": {
+    "message": "Plus d'actions"
+  },
+  "app.screenshots.no-results-description": {
+    "message": "Essayez une recherche ou un filtre différent."
+  },
+  "app.screenshots.no-results-heading": {
+    "message": "Aucune capture d'écran correspondante"
+  },
+  "app.screenshots.preview.instance-and-date": {
+    "message": "{instance} · {date}"
+  },
+  "app.screenshots.search": {
+    "message": "Rechercher"
+  },
+  "app.screenshots.select": {
+    "message": "Sélectionner {name}"
+  },
+  "app.screenshots.selection.aria-label": {
+    "message": "Captures d'écran sélectionnées"
+  },
+  "app.screenshots.selection.delete-description": {
+    "message": "Supprimer {count, plural, one {# capture d'écran} other {# captures d'écran}}? Cette action est irréversible."
+  },
+  "app.screenshots.selection.delete-success": {
+    "message": "{count, plural, one {# projet a été sélectionné} other {# projets ont été sélectionnés}}"
+  },
+  "app.screenshots.selection.delete-title": {
+    "message": "Supprimer les captures d'écran sélectionnées"
+  },
+  "app.screenshots.selection.export-zip": {
+    "message": "Exporter en ZIP"
+  },
+  "app.screenshots.selection.global-export-filename": {
+    "message": "Captures d'écran Modrinth.zip"
+  },
+  "app.screenshots.selection.instance-export-filename": {
+    "message": "Captures d'écran {instance} .zip"
+  },
+  "app.screenshots.selection.remove-from-group": {
+    "message": "Supprimer du groupe"
+  },
+  "app.screenshots.selection.selected-count": {
+    "message": "{count} sélectionné"
+  },
+  "app.screenshots.selection.zip-archive": {
+    "message": "archive ZIP"
+  },
+  "app.screenshots.show-in-folder": {
+    "message": "Afficher dans le dossier"
+  },
+  "app.screenshots.sort-by": {
+    "message": "Trier par"
+  },
+  "app.screenshots.sort.name": {
+    "message": "Nom"
+  },
+  "app.screenshots.sort.newest": {
+    "message": "Les plus récents"
+  },
+  "app.screenshots.sort.oldest": {
+    "message": "Les plus anciens"
   },
   "app.settings.app-version": {
     "message": "Modrinth App {version}"
@@ -1295,6 +1565,9 @@
   "app.settings.default-instance-options.height.title": {
     "message": "Hauteur"
   },
+  "app.settings.default-instance-options.java-and-memory.title": {
+    "message": "Java et mémoire"
+  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "Arguments transmis à Java lors du lancement d'une instance."
   },
@@ -1303,6 +1576,9 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Arguments Java"
+  },
+  "app.settings.default-instance-options.launch-hooks.title": {
+    "message": "Lancer le crochet"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "Mémoire maximale disponible pour chaque instance."
@@ -1337,6 +1613,9 @@
   "app.settings.default-instance-options.width.title": {
     "message": "Largeur"
   },
+  "app.settings.default-instance-options.window.title": {
+    "message": "Fenêtre"
+  },
   "app.settings.default-instance-options.wrapper-hook.description": {
     "message": "Commande utilisée pour encapsuler le processus de lancement de Minecraft."
   },
@@ -1354,6 +1633,573 @@
   },
   "app.settings.downloading": {
     "message": "Téléchargement de la version {version}"
+  },
+  "app.settings.game-options.category.accessibility.description": {
+    "message": "Préférences d'accessibilité"
+  },
+  "app.settings.game-options.category.accessibility.label": {
+    "message": "Accessibilité"
+  },
+  "app.settings.game-options.category.chat.description": {
+    "message": "Visibilité du tchat et apparence"
+  },
+  "app.settings.game-options.category.chat.label": {
+    "message": "Tchat"
+  },
+  "app.settings.game-options.category.controls.description": {
+    "message": "Souris, mouvement et raccourcis clavier"
+  },
+  "app.settings.game-options.category.controls.label": {
+    "message": "Contrôles"
+  },
+  "app.settings.game-options.category.custom.description": {
+    "message": "Paramètres ajoutés par les mods"
+  },
+  "app.settings.game-options.category.custom.label": {
+    "message": "Paramètres personnalisés"
+  },
+  "app.settings.game-options.category.language.description": {
+    "message": "Langue du jeu"
+  },
+  "app.settings.game-options.category.language.label": {
+    "message": "Langue"
+  },
+  "app.settings.game-options.category.music-and-sound.description": {
+    "message": "Préférences du volume et de l'audio"
+  },
+  "app.settings.game-options.category.music-and-sound.label": {
+    "message": "Musique et son"
+  },
+  "app.settings.game-options.category.online.description": {
+    "message": "Préférences en ligne et Realms"
+  },
+  "app.settings.game-options.category.online.label": {
+    "message": "En ligne"
+  },
+  "app.settings.game-options.category.skin-customization.description": {
+    "message": "Couches de skin et main principale"
+  },
+  "app.settings.game-options.category.skin-customization.label": {
+    "message": "Personnalisation du Skin"
+  },
+  "app.settings.game-options.category.video.description": {
+    "message": "Paramètres de la caméra et de l'affichage"
+  },
+  "app.settings.game-options.category.video.label": {
+    "message": "Vidéo"
+  },
+  "app.settings.game-options.choice.all": {
+    "message": "Tous"
+  },
+  "app.settings.game-options.choice.balanced": {
+    "message": "Équilibré"
+  },
+  "app.settings.game-options.choice.by-player": {
+    "message": "Par joueur"
+  },
+  "app.settings.game-options.choice.chat": {
+    "message": "Chat"
+  },
+  "app.settings.game-options.choice.commands-only": {
+    "message": "Commandes seulement"
+  },
+  "app.settings.game-options.choice.constant": {
+    "message": "Constant"
+  },
+  "app.settings.game-options.choice.crosshair": {
+    "message": "Curseur"
+  },
+  "app.settings.game-options.choice.custom": {
+    "message": "Personnalisé"
+  },
+  "app.settings.game-options.choice.decreased": {
+    "message": "Réduites"
+  },
+  "app.settings.game-options.choice.default": {
+    "message": "Par défaut"
+  },
+  "app.settings.game-options.choice.fabulous": {
+    "message": "Fabuleux"
+  },
+  "app.settings.game-options.choice.fancy": {
+    "message": "Détaillés"
+  },
+  "app.settings.game-options.choice.far": {
+    "message": "Grande"
+  },
+  "app.settings.game-options.choice.fast": {
+    "message": "Rapides"
+  },
+  "app.settings.game-options.choice.frequent": {
+    "message": "Fréquente"
+  },
+  "app.settings.game-options.choice.hidden": {
+    "message": "Masqué"
+  },
+  "app.settings.game-options.choice.hotbar": {
+    "message": "Barre d'action"
+  },
+  "app.settings.game-options.choice.left": {
+    "message": "Gauche"
+  },
+  "app.settings.game-options.choice.limited": {
+    "message": "Limité"
+  },
+  "app.settings.game-options.choice.max-fps": {
+    "message": "FPS Max"
+  },
+  "app.settings.game-options.choice.maximum": {
+    "message": "Maximum"
+  },
+  "app.settings.game-options.choice.minimal": {
+    "message": "Minimales"
+  },
+  "app.settings.game-options.choice.minimum": {
+    "message": "Minimum"
+  },
+  "app.settings.game-options.choice.nearby": {
+    "message": "Parallèle"
+  },
+  "app.settings.game-options.choice.never": {
+    "message": "Jamais"
+  },
+  "app.settings.game-options.choice.none": {
+    "message": "Aucun"
+  },
+  "app.settings.game-options.choice.normal": {
+    "message": "Normale"
+  },
+  "app.settings.game-options.choice.off": {
+    "message": "Désactivé"
+  },
+  "app.settings.game-options.choice.on": {
+    "message": "Activé"
+  },
+  "app.settings.game-options.choice.opengl": {
+    "message": "OpenGL"
+  },
+  "app.settings.game-options.choice.pause": {
+    "message": "Menu de pause"
+  },
+  "app.settings.game-options.choice.pause-and-toast": {
+    "message": "Menu de pause et notification"
+  },
+  "app.settings.game-options.choice.power-saver": {
+    "message": "Économiseur de Batterie"
+  },
+  "app.settings.game-options.choice.right": {
+    "message": "Droite"
+  },
+  "app.settings.game-options.choice.short": {
+    "message": "Petite"
+  },
+  "app.settings.game-options.choice.shown": {
+    "message": "Visible"
+  },
+  "app.settings.game-options.choice.system": {
+    "message": "Système"
+  },
+  "app.settings.game-options.choice.tiny": {
+    "message": "Très petite"
+  },
+  "app.settings.game-options.choice.vulkan": {
+    "message": "Vulkan"
+  },
+  "app.settings.game-options.choice.when-minimized": {
+    "message": "Si fenêtre réduite"
+  },
+  "app.settings.game-options.choice.while-afk": {
+    "message": "Si inactif"
+  },
+  "app.settings.game-options.compatibility.none": {
+    "message": "Certaines de vos instances ne peuvent pas utiliser ce paramètre"
+  },
+  "app.settings.game-options.compatibility.reason.launcher-controlled": {
+    "message": "Ce réglage est géré par les paramètres de lancement de Modrinth."
+  },
+  "app.settings.game-options.custom-value.placeholder": {
+    "message": "Saisir une valeur"
+  },
+  "app.settings.game-options.keybind.assigned-status": {
+    "message": "{setting} est désormais associé à {binding}."
+  },
+  "app.settings.game-options.keybind.cancelled-status": {
+    "message": "Changement de touche annulé."
+  },
+  "app.settings.game-options.keybind.change": {
+    "message": "{setting} : {binding}. Activer pour modifier la touche."
+  },
+  "app.settings.game-options.keybind.choose": {
+    "message": "Choisir une touche"
+  },
+  "app.settings.game-options.keybind.conflict-description": {
+    "message": "Ceci est déjà utilisé par {settings}."
+  },
+  "app.settings.game-options.keybind.key.arrow-down": {
+    "message": "Flèche bas"
+  },
+  "app.settings.game-options.keybind.key.arrow-left": {
+    "message": "Flèche gauche"
+  },
+  "app.settings.game-options.keybind.key.arrow-right": {
+    "message": "Flèche droite"
+  },
+  "app.settings.game-options.keybind.key.arrow-up": {
+    "message": "Flèche haut"
+  },
+  "app.settings.game-options.keybind.key.backspace": {
+    "message": "Retour arrière"
+  },
+  "app.settings.game-options.keybind.key.caps-lock": {
+    "message": "Verrouillage majuscule"
+  },
+  "app.settings.game-options.keybind.key.delete": {
+    "message": "Suppr"
+  },
+  "app.settings.game-options.keybind.key.end": {
+    "message": "Fin"
+  },
+  "app.settings.game-options.keybind.key.enter": {
+    "message": "Entrée"
+  },
+  "app.settings.game-options.keybind.key.escape": {
+    "message": "Echap"
+  },
+  "app.settings.game-options.keybind.key.home": {
+    "message": "Début"
+  },
+  "app.settings.game-options.keybind.key.insert": {
+    "message": "Inser"
+  },
+  "app.settings.game-options.keybind.key.keypad-key": {
+    "message": "Pavé numérique {key}"
+  },
+  "app.settings.game-options.keybind.key.left-alt": {
+    "message": "Alt"
+  },
+  "app.settings.game-options.keybind.key.left-command": {
+    "message": "Cmd gauche"
+  },
+  "app.settings.game-options.keybind.key.left-control": {
+    "message": "Ctrl Gauche"
+  },
+  "app.settings.game-options.keybind.key.left-shift": {
+    "message": "Shift gauche"
+  },
+  "app.settings.game-options.keybind.key.left-super": {
+    "message": "Super gauche"
+  },
+  "app.settings.game-options.keybind.key.menu": {
+    "message": "Menu"
+  },
+  "app.settings.game-options.keybind.key.num-lock": {
+    "message": "Verrouillage numérique"
+  },
+  "app.settings.game-options.keybind.key.page-down": {
+    "message": "Page suivante"
+  },
+  "app.settings.game-options.keybind.key.page-up": {
+    "message": "Page précédente"
+  },
+  "app.settings.game-options.keybind.key.pause": {
+    "message": "Pause"
+  },
+  "app.settings.game-options.keybind.key.print-screen": {
+    "message": "Imprimer écran"
+  },
+  "app.settings.game-options.keybind.key.right-alt": {
+    "message": "Alt Gr"
+  },
+  "app.settings.game-options.keybind.key.right-command": {
+    "message": "Commande droite"
+  },
+  "app.settings.game-options.keybind.key.right-control": {
+    "message": "Ctrl droit"
+  },
+  "app.settings.game-options.keybind.key.right-shift": {
+    "message": "Majuscule droite"
+  },
+  "app.settings.game-options.keybind.key.right-super": {
+    "message": "Super droite"
+  },
+  "app.settings.game-options.keybind.key.scroll-lock": {
+    "message": "Arrêt défilement"
+  },
+  "app.settings.game-options.keybind.key.space": {
+    "message": "Espace"
+  },
+  "app.settings.game-options.keybind.key.tab": {
+    "message": "Tab"
+  },
+  "app.settings.game-options.keybind.key.unbound": {
+    "message": "Non assignée"
+  },
+  "app.settings.game-options.keybind.key.unknown": {
+    "message": "Touche inconnue"
+  },
+  "app.settings.game-options.keybind.listen": {
+    "message": "Appuyez sur une touche…"
+  },
+  "app.settings.game-options.keybind.listening-status": {
+    "message": "En attente d'une touche ou d'un bouton de la souris. Appuyer sur Échap pour effacer ce raccourci."
+  },
+  "app.settings.game-options.keybind.mixed": {
+    "message": "Variable selon les instances"
+  },
+  "app.settings.game-options.keybind.modifier.alt": {
+    "message": "Alt"
+  },
+  "app.settings.game-options.keybind.modifier.command": {
+    "message": "Commande"
+  },
+  "app.settings.game-options.keybind.modifier.control": {
+    "message": "Ctrl"
+  },
+  "app.settings.game-options.keybind.modifier.shift": {
+    "message": "Maj"
+  },
+  "app.settings.game-options.keybind.modifier.super": {
+    "message": "Super"
+  },
+  "app.settings.game-options.keybind.mouse.button": {
+    "message": "Bouton souris {button}"
+  },
+  "app.settings.game-options.keybind.mouse.left": {
+    "message": "Clic gauche"
+  },
+  "app.settings.game-options.keybind.mouse.middle": {
+    "message": "Clic molette"
+  },
+  "app.settings.game-options.keybind.mouse.right": {
+    "message": "Clic droit"
+  },
+  "app.settings.game-options.keybind.recording-label": {
+    "message": "{setting} : en attente d'une touche ou d'un bouton de la souris. Appuyer sur Échap pour effacer ce raccourci."
+  },
+  "app.settings.game-options.keybind.scancode": {
+    "message": "Code clavier {code}"
+  },
+  "app.settings.game-options.keybind.unsupported-status": {
+    "message": "Cette entrée ne peut pas être utilisée par Minecraft. Appuyer sur une autre touche."
+  },
+  "app.settings.game-options.setting.advanced-opengl.label": {
+    "message": "OpenGL avancé"
+  },
+  "app.settings.game-options.setting.allow-cursor-changes.label": {
+    "message": "Autoriser la modification du curseur"
+  },
+  "app.settings.game-options.setting.allow-server-listing.description": {
+    "message": "Autoriser l'apparition du nom du joueur dans les listes de serveurs."
+  },
+  "app.settings.game-options.setting.allow-server-listing.label": {
+    "message": "Liste des serveurs"
+  },
+  "app.settings.game-options.setting.alternate-blocks.label": {
+    "message": "Blocs alternatifs"
+  },
+  "app.settings.game-options.setting.ambient-occlusion.label": {
+    "message": "Éclairage adouci"
+  },
+  "app.settings.game-options.setting.ambient-volume.label": {
+    "message": "Environnement"
+  },
+  "app.settings.game-options.setting.anaglyph-3d.label": {
+    "message": "Anaglyphe 3D"
+  },
+  "app.settings.game-options.setting.anisotropic-filtering.label": {
+    "message": "Filtrage anisotrope"
+  },
+  "app.settings.game-options.setting.anisotropy.label": {
+    "message": "Anisotropie"
+  },
+  "app.settings.game-options.setting.attack-indicator.label": {
+    "message": "Indicateur d'attaque"
+  },
+  "app.settings.game-options.setting.auto-jump.description": {
+    "message": "Sauter automatiquement au-dessus des obstacles d'un bloc de hauteur."
+  },
+  "app.settings.game-options.setting.auto-jump.label": {
+    "message": "Saut automatique"
+  },
+  "app.settings.game-options.setting.auto-suggestions.label": {
+    "message": "Commandes assistées"
+  },
+  "app.settings.game-options.setting.autosave-indicator.label": {
+    "message": "Indicateur de sauvegarde"
+  },
+  "app.settings.game-options.setting.biome-blend-radius.description": {
+    "message": "La distance sur laquelle s'effectue le fondu des couleurs des biomes (en blocs)."
+  },
+  "app.settings.game-options.setting.biome-blend-radius.label": {
+    "message": "Fondu des biomes"
+  },
+  "app.settings.game-options.setting.blocks-volume.label": {
+    "message": "Blocs"
+  },
+  "app.settings.game-options.setting.brightness.label": {
+    "message": "Luminosité"
+  },
+  "app.settings.game-options.setting.cape.description": {
+    "message": "Afficher la cape du joueur, y compris la texture des élytres."
+  },
+  "app.settings.game-options.setting.cape.label": {
+    "message": "Cape"
+  },
+  "app.settings.game-options.setting.chat-background-only.label": {
+    "message": "Arrière-plan du tchat uniquement"
+  },
+  "app.settings.game-options.setting.chat-colors.label": {
+    "message": "Couleurs"
+  },
+  "app.settings.game-options.setting.chat-delay.label": {
+    "message": "Délai"
+  },
+  "app.settings.game-options.setting.chat-line-spacing.label": {
+    "message": "Interligne"
+  },
+  "app.settings.game-options.setting.chat-links-prompt.description": {
+    "message": "Demande avant d'ouvrir des liens depuis le tchat."
+  },
+  "app.settings.game-options.setting.chat-links-prompt.label": {
+    "message": "Avertir sur les liens"
+  },
+  "app.settings.game-options.setting.chat-links.description": {
+    "message": "Permettre l'ouverture des liens web dans le tchat."
+  },
+  "app.settings.game-options.setting.chat-links.label": {
+    "message": "Liens Internet"
+  },
+  "app.settings.game-options.setting.chat-opacity.description": {
+    "message": "L'opacité du texte du chat."
+  },
+  "app.settings.game-options.setting.chat-opacity.label": {
+    "message": "Opacité du chat"
+  },
+  "app.settings.game-options.setting.chat-preview.label": {
+    "message": "Prévisualisation du chat"
+  },
+  "app.settings.game-options.setting.chat-scale.label": {
+    "message": "Échelle du chat"
+  },
+  "app.settings.game-options.setting.chat-visibility.label": {
+    "message": "Visibilité du chat"
+  },
+  "app.settings.game-options.setting.chat-width.label": {
+    "message": "Largeur du chat"
+  },
+  "app.settings.game-options.setting.chunk-fade-time.label": {
+    "message": "Temps de disparition de tronçons"
+  },
+  "app.settings.game-options.setting.cloud-range.label": {
+    "message": "Distance des nuages"
+  },
+  "app.settings.game-options.setting.clouds.label": {
+    "message": "Nuages"
+  },
+  "app.settings.game-options.setting.ctrl-click-right-click.label": {
+    "message": "Contrôle - clique comme clique - droit"
+  },
+  "app.settings.game-options.setting.cutout-leaves.label": {
+    "message": "Feuilles découpées"
+  },
+  "app.settings.game-options.setting.damage-tilt.label": {
+    "message": "Inclinaison de dégâts"
+  },
+  "app.settings.game-options.setting.dark-splash.description": {
+    "message": "Changer l'écran de chargement de Mojang Studios du rouge au noir."
+  },
+  "app.settings.game-options.setting.dark-splash.label": {
+    "message": "Logo monochrome"
+  },
+  "app.settings.game-options.setting.darkness-pulsing.label": {
+    "message": "Pulsation de l'obscurité"
+  },
+  "app.settings.game-options.setting.debug-gui-scale.label": {
+    "message": "Échelle d'interface de débogage"
+  },
+  "app.settings.game-options.setting.directional-audio.label": {
+    "message": "Audio directionnel"
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.description": {
+    "message": "Traiter chaque entrée de molette de souris une seule étape."
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.label": {
+    "message": "Défilement discret"
+  },
+  "app.settings.game-options.setting.entity-distance.label": {
+    "message": "Distance des entités"
+  },
+  "app.settings.game-options.setting.entity-shadows.label": {
+    "message": "Ombre des entités"
+  },
+  "app.settings.game-options.setting.exclusive-fullscreen.label": {
+    "message": "Plein écran exclusif"
+  },
+  "app.settings.game-options.setting.extra-telemetry.label": {
+    "message": "Télémétrie optionnelle"
+  },
+  "app.settings.game-options.setting.focused-chat-height.label": {
+    "message": "Hauteur de chat ciblé"
+  },
+  "app.settings.game-options.setting.force-unicode-font.label": {
+    "message": "Forcer police Unicode"
+  },
+  "app.settings.game-options.setting.fov-effects.label": {
+    "message": "Effets de FOV"
+  },
+  "app.settings.game-options.setting.fov.label": {
+    "message": "Champ de vision"
+  },
+  "app.settings.game-options.setting.fullscreen.label": {
+    "message": "Plein-écran"
+  },
+  "app.settings.game-options.setting.glint-speed.label": {
+    "message": "Vitesse de scintillement"
+  },
+  "app.settings.game-options.setting.glint-strength.label": {
+    "message": "Puissance de scintillement"
+  },
+  "app.settings.game-options.setting.graphics-backend.label": {
+    "message": "Dorsale graphique"
+  },
+  "app.settings.game-options.setting.graphics.description": {
+    "message": "Contrôle la qualité visuelle et la performance."
+  },
+  "app.settings.game-options.setting.graphics.label": {
+    "message": "Graphiques"
+  },
+  "app.settings.game-options.setting.gui-scale.description": {
+    "message": "La taille de l'interface du jeu et de l'HUD."
+  },
+  "app.settings.game-options.setting.gui-scale.label": {
+    "message": "Échelle de l'interface"
+  },
+  "app.settings.game-options.setting.hat.description": {
+    "message": "Afficher la couche du chapeau."
+  },
+  "app.settings.game-options.setting.hat.label": {
+    "message": "Chapeau"
+  },
+  "app.settings.game-options.setting.held-item-tooltips.label": {
+    "message": "Infobulles de l’objet tenu"
+  },
+  "app.settings.game-options.setting.hide-lightning-flashes.label": {
+    "message": "Masquer les éclairs"
+  },
+  "app.settings.game-options.setting.high-contrast.label": {
+    "message": "Contraste élevé"
+  },
+  "app.settings.game-options.setting.hostile-volume.label": {
+    "message": "Créatures hostiles"
+  },
+  "app.settings.game-options.setting.improved-transparency.label": {
+    "message": "Transparence améliorée"
+  },
+  "app.settings.game-options.setting.key-debug-hitboxes.label": {
+    "message": "Afficher les hitboxes"
+  },
+  "app.settings.game-options.setting.key-debug-lightmap-texture.label": {
+    "message": "Texture de la carte lumineuse"
   },
   "app.settings.java-installations.location.title": {
     "message": "Emplacement de Java {version, number}"
@@ -1433,6 +2279,45 @@
   "app.settings.sidebar.label.instances": {
     "message": "Instance"
   },
+  "app.settings.synced-options.choose-sync-source.no-instances-found": {
+    "message": "Aucune instance trouvée"
+  },
+  "app.settings.synced-options.choose-sync-source.search-placeholder": {
+    "message": "Rechercher une instance"
+  },
+  "app.settings.synced-options.choose-sync-source.sync": {
+    "message": "Synchroniser"
+  },
+  "app.settings.synced-options.command-history": {
+    "message": "Synchroniser l'historique des commandes"
+  },
+  "app.settings.synced-options.command-history.description": {
+    "message": "Utiliser le même historique de commande à travers vos instances."
+  },
+  "app.settings.synced-options.command-history.editor-title": {
+    "message": "Modifier l'historique de commandes"
+  },
+  "app.settings.synced-options.creative-hotbars": {
+    "message": "Synchroniser les barres d'inventaire créatif"
+  },
+  "app.settings.synced-options.creative-hotbars.description": {
+    "message": "Utiliser la même barre d'inventaire créatif à travers vos instances."
+  },
+  "app.settings.synced-options.multiplayer-servers": {
+    "message": "Synchroniser les serveurs multijoueurs"
+  },
+  "app.settings.synced-options.multiplayer-servers.address": {
+    "message": "Adresse du serveur"
+  },
+  "app.settings.synced-options.multiplayer-servers.description": {
+    "message": "Utiliser les mêmes serveurs multijoueurs à travers vos instances."
+  },
+  "app.settings.synced-options.multiplayer-servers.editor-title": {
+    "message": "Modifier les serveurs synchronisés"
+  },
+  "app.settings.synced-options.multiplayer-servers.name": {
+    "message": "Nom du serveur"
+  },
   "app.settings.tabs.appearance": {
     "message": "Apparence"
   },
@@ -1450,6 +2335,9 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Gestion des ressources"
+  },
+  "app.settings.tabs.synced-options": {
+    "message": "Paramètres synchronisés"
   },
   "app.sidebar.playing-as": {
     "message": "Joue en tant que"
@@ -1664,6 +2552,18 @@
   "app.welcome-screen.create-instance": {
     "message": "Créer une nouvelle instance"
   },
+  "app.welcome-screen.description": {
+    "message": "Prêt à commencer à jouer ?"
+  },
+  "app.welcome-screen.import-from-launcher": {
+    "message": "Importer à partir d'un launcher"
+  },
+  "app.welcome-screen.quick-create-hint": {
+    "message": "Appuyez sur <shortcut>N</shortcut> pour rapidement créer une instance"
+  },
+  "app.welcome-screen.title": {
+    "message": "Bienvenue sur Modrinth"
+  },
   "app.world.server-modal.placeholder-address": {
     "message": "exemple.modrinth.gg"
   },
@@ -1738,6 +2638,9 @@
   },
   "friends.add-friends-to-share": {
     "message": "<link>Ajoutez des amis</link> pour voir à quoi ils jouent !"
+  },
+  "friends.friend.actions.label": {
+    "message": "Actions amicales"
   },
   "friends.friend.cancel-request": {
     "message": "Annuler la demande"
@@ -1907,11 +2810,23 @@
   "instance.icon-editor.background.green": {
     "message": "Vert"
   },
+  "instance.icon-editor.background.indigo": {
+    "message": "Indigo"
+  },
+  "instance.icon-editor.background.lavender": {
+    "message": "Lavande"
+  },
   "instance.icon-editor.background.light-gray": {
     "message": "Gris clair"
   },
+  "instance.icon-editor.background.lime": {
+    "message": "Citron"
+  },
   "instance.icon-editor.background.orange": {
     "message": "Orange"
+  },
+  "instance.icon-editor.background.pink": {
+    "message": "Rose"
   },
   "instance.icon-editor.background.purple": {
     "message": "Violet"
@@ -1925,6 +2840,12 @@
   "instance.icon-editor.background.yellow": {
     "message": "Jaune"
   },
+  "instance.icon-editor.description": {
+    "message": "Mélanger et faites correspondre des éléments pour créer des icônes customisées."
+  },
+  "instance.icon-editor.recents": {
+    "message": "Récents"
+  },
   "instance.icon-editor.save": {
     "message": "Enregistrer l'Icône"
   },
@@ -1937,6 +2858,18 @@
   "instance.icon-editor.symbol.backpack": {
     "message": "Sac à dos"
   },
+  "instance.icon-editor.symbol.beacon": {
+    "message": "Balise"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "message": "Requin Bleu"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "message": "Bibliothèque"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "message": "Ours Brun"
+  },
   "instance.icon-editor.symbol.cake": {
     "message": "Gâteau"
   },
@@ -1946,8 +2879,20 @@
   "instance.icon-editor.symbol.chest": {
     "message": "Coffre"
   },
+  "instance.icon-editor.symbol.cogwheel": {
+    "message": "Roue Crantée"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "message": "Bloc de Commande"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "message": "Marmite"
+  },
   "instance.icon-editor.symbol.couch": {
     "message": "Canapé"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "message": "Clé à Molette"
   },
   "instance.icon-editor.symbol.creeper": {
     "message": "Creeper"
@@ -1973,11 +2918,32 @@
   "instance.icon-editor.symbol.furnace": {
     "message": "Four"
   },
+  "instance.icon-editor.symbol.gizmo": {
+    "message": "Machin"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "message": "Globe"
+  },
   "instance.icon-editor.symbol.grass-block": {
     "message": "Bloc d'herbe"
   },
   "instance.icon-editor.symbol.lantern": {
     "message": "Lanterne"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "message": "Vache Champignon"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "message": "Mr Pack"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "message": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "message": "Orbe"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "message": "Distributeur d'Oxygène"
   },
   "instance.icon-editor.symbol.pancakes": {
     "message": "Pancakes"
@@ -1985,14 +2951,23 @@
   "instance.icon-editor.symbol.pickaxe": {
     "message": "Pioche"
   },
+  "instance.icon-editor.symbol.poke-ball": {
+    "message": "Poke Ball"
+  },
   "instance.icon-editor.symbol.quilt": {
     "message": "Quilt"
   },
   "instance.icon-editor.symbol.redstone-block": {
     "message": "Block de Redstone"
   },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "message": "Détecteur Sculk"
+  },
   "instance.icon-editor.symbol.skeleton": {
     "message": "Squelette"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "message": "Poêle"
   },
   "instance.icon-editor.symbol.slime-block": {
     "message": "Bloc de slime"
@@ -2000,11 +2975,17 @@
   "instance.icon-editor.symbol.space-helmet": {
     "message": "Casque d'Espace"
   },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "message": "Piston Collant"
+  },
   "instance.icon-editor.symbol.sword": {
     "message": "Épée"
   },
   "instance.icon-editor.symbol.terminal": {
     "message": "Console"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "message": "Petite Patate"
   },
   "instance.icon-editor.symbol.tire": {
     "message": "Pneu"
@@ -2081,6 +3062,9 @@
   "instance.settings.sharing.revoke-invite.header": {
     "message": "Révoquer l'invitation"
   },
+  "instance.settings.tabs.behavior.screenshots.required": {
+    "message": "L'onglet Captures d'écran ne peut pas être masqué lorsque la page globale des captures d'écran est désactivée."
+  },
   "instance.settings.tabs.general": {
     "message": "Général"
   },
@@ -2156,9 +3140,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Sélectionner le canal de mise à jour"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Les crochets permettent aux usagers avancés d'exécuter certaines commandes systèmes avant et après le lancement du jeu."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Post-fermeture"
   },
@@ -2176,9 +3157,6 @@
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Entrez la commande de pré-lancement..."
-  },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Crochets de lancement"
   },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Les hooks s’exécutent dans le répertoire de travail de l’instance et disposent des variables suivantes :"
@@ -2219,38 +3197,14 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Les paramètres d'installation ne sont pas disponible pendant que cette instance est verrouillée."
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Variables d'environnement personnalisé"
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Arguments Java personnalisée"
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Installation Java personnalisée"
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Allocation de mémoire personnalisée"
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Entrer une variable d'environnement..."
   },
   "instance.settings.tabs.java.enter-java-arguments": {
     "message": "Entrer un argument Java..."
   },
-  "instance.settings.tabs.java.environment-variables": {
-    "message": "Variables d'environnement"
-  },
   "instance.settings.tabs.java.hooks": {
     "message": "Hooks"
-  },
-  "instance.settings.tabs.java.java-arguments": {
-    "message": "Arguments Java"
-  },
-  "instance.settings.tabs.java.java-installation": {
-    "message": "Installations de Java"
-  },
-  "instance.settings.tabs.java.java-memory": {
-    "message": "Mémoire allouée"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/chemin/vers/java"
@@ -2258,11 +3212,11 @@
   "instance.settings.tabs.sharing": {
     "message": "Partage"
   },
-  "instance.settings.tabs.window": {
-    "message": "Fenêtre"
+  "instance.settings.tabs.synced-options.command-history": {
+    "message": "Désynchroniser l'historique des commandes"
   },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Paramètres de fenêtre personnalisés"
+  "instance.settings.tabs.synced-options.command-history.disabled-in-app": {
+    "message": "La synchronisation de l'historique des commandes est désactivée dans les paramètres de l'application."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Plein écran"
@@ -2357,6 +3311,18 @@
   "instance.worlds.create_shortcut": {
     "message": "Créer un raccourci"
   },
+  "instance.worlds.desync-server.keep": {
+    "message": "Garder"
+  },
+  "instance.worlds.desync-server.remove": {
+    "message": "Retirer"
+  },
+  "instance.worlds.desync-server.title": {
+    "message": "Désynchroniser le serveur"
+  },
+  "instance.worlds.desync_server": {
+    "message": "Désynchroniser"
+  },
   "instance.worlds.dont_show_on_home": {
     "message": "Ne pas montrer dans l'Accueil"
   },
@@ -2368,6 +3334,9 @@
   },
   "instance.worlds.incompatible_server": {
     "message": "Le serveur est incompatible"
+  },
+  "instance.worlds.instance-locked": {
+    "message": "Cette instance a été verrouillée"
   },
   "instance.worlds.linked_server": {
     "message": "Géré par le projet du serveur"
@@ -2386,6 +3355,9 @@
   },
   "instance.worlds.play_instance": {
     "message": "Jouer à l'instance"
+  },
+  "instance.worlds.play_world": {
+    "message": "Jouer au monde"
   },
   "instance.worlds.shortcut-created": {
     "message": "Raccourci créé"
@@ -2470,6 +3442,9 @@
   },
   "modal.modrinth-account-required.waiting-for-browser": {
     "message": "En attente de la confirmation du navigateur..."
+  },
+  "onboarding-checklist.create-instance": {
+    "message": "Créer votre première instance"
   },
   "onboarding-checklist.login-minecraft": {
     "message": "Se connecter à Minecraft"

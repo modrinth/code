@@ -60,6 +60,8 @@ export interface ContentManagerContext {
 	canToggleItem?: (item: ContentItem) => boolean
 	getDeleteWarning?: (items: ContentItem[]) => ContentActionWarning | null
 	getDisableWarning?: (items: ContentItem[]) => ContentActionWarning | null
+	confirmAction?: (action: 'enable' | 'disable', items: ContentItem[]) => Promise<boolean>
+	confirmDeleteItems?: (items: ContentItem[]) => Promise<boolean | undefined>
 	getDeleteDependencyWarning?: (
 		items: ContentItem[],
 	) => ContentDependencyWarning | null | Promise<ContentDependencyWarning | null>

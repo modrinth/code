@@ -41,6 +41,7 @@ import { article as skins_now_in_modrinth_app } from "./skins_now_in_modrinth_ap
 import { article as standing_by_our_values } from "./standing_by_our_values";
 import { article as standing_by_our_values_russian } from "./standing_by_our_values_russian";
 import { article as streamlined_version_creation } from "./streamlined_version_creation";
+import { article as sync_settings } from "./sync_settings";
 import { article as two_years_of_modrinth } from "./two_years_of_modrinth";
 import { article as two_years_of_modrinth_history } from "./two_years_of_modrinth_history";
 import { article as whats_modrinth } from "./whats_modrinth";
@@ -89,6 +90,7 @@ export const articles = [
   standing_by_our_values,
   standing_by_our_values_russian,
   streamlined_version_creation,
+  sync_settings,
   two_years_of_modrinth,
   two_years_of_modrinth_history,
   whats_modrinth,

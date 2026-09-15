@@ -1,13 +1,19 @@
 <template>
 	<div v-if="subtleLauncherRedirectUri">
-		<iframe :src="subtleLauncherRedirectUri" class="hidden"></iframe>
+		<iframe
+			:src="subtleLauncherRedirectUri"
+			class="hidden"
+			:title="formatMessage(messages.launcherCallbackTitle)"
+		></iframe>
 		<div
 			class="universal-card mx-auto flex w-full max-w-[27rem] flex-col gap-6 border border-solid border-surface-5 !p-6 text-center"
 		>
 			<div class="flex flex-col gap-2">
-				<h1 class="m-0 text-2xl font-semibold text-contrast">Opening Modrinth App...</h1>
+				<h1 class="m-0 text-2xl font-semibold text-contrast">
+					{{ formatMessage(messages.openingLauncherTitle) }}
+				</h1>
 				<p class="m-0 text-left text-primary">
-					If the app doesn’t open, use the button below to finish signing in.
+					{{ formatMessage(messages.openingLauncherDescription) }}
 				</p>
 			</div>
 			<div class="flex flex-col gap-2">
@@ -31,27 +37,35 @@
 		class="universal-card mx-auto flex w-full max-w-[27rem] flex-col gap-6 border border-solid border-surface-5 !p-6"
 	>
 		<template v-if="flow && !subtleLauncherRedirectUri">
-			<div class="flex flex-col items-end gap-4">
-				<div class="flex flex-col gap-1.5">
+			<div class="flex flex-col gap-4" :aria-busy="twoFactorPending">
+				<div class="flex w-full flex-col gap-1.5">
 					<label for="two-factor-code">
-						<span class="label__title">{{ formatMessage(messages.twoFactorCodeLabel) }}</span>
-						<span class="label__description">
+						<span id="two-factor-label" class="label__title">
+							{{ formatMessage(messages.twoFactorCodeLabel) }}
+						</span>
+						<span id="two-factor-description" class="label__description">
 							{{ formatMessage(messages.twoFactorCodeLabelDescription) }}
 						</span>
 					</label>
-					<Input
+					<TwoFactorAuthCodeInput
 						id="two-factor-code"
+						ref="twoFactorInput"
 						v-model="twoFactorCodeModel"
-						:maxlength="11"
-						inputmode="numeric"
-						:placeholder="formatMessage(messages.twoFactorCodeInputPlaceholder)"
-						autocomplete="one-time-code"
-						@keyup.enter="onTwoFactorSignIn()"
+						class="mx-auto mt-3"
+						allow-backup-code
+						autofocus
+						:readonly="twoFactorPending"
+						:error="twoFactorError"
+						aria-labelledby="two-factor-label"
+						:aria-describedby="
+							twoFactorError ? 'two-factor-description two-factor-error' : 'two-factor-description'
+						"
+						@complete="onTwoFactorSignIn"
 					/>
 				</div>
-				<Button type="colored" color="brand" @click="onTwoFactorSignIn()">
-					{{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon />
-				</Button>
+				<Admonition v-if="twoFactorError" id="two-factor-error" type="critical" role="alert">
+					{{ formatMessage(messages.twoFactorIncorrect) }}
+				</Admonition>
 			</div>
 		</template>
 		<template v-else>
@@ -204,6 +218,7 @@ import {
 import {
 	type AccountChoice,
 	AccountChoiceList,
+	Admonition,
 	Button,
 	ButtonLink,
 	commonMessages,
@@ -212,10 +227,11 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useStorage } from '@vueuse/core'
-import { ref } from 'vue'
+import { nextTick, ref, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
 
 import HCaptcha from '@/components/ui/auth/HCaptcha.vue'
+import TwoFactorAuthCodeInput from '@/components/ui/auth/TwoFactorAuthCodeInput.vue'
 import {
 	LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
 	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
@@ -245,7 +261,9 @@ interface Props {
 	routeQuery?: LocationQuery
 	globals?: AuthGlobals | null
 	onPasswordSignIn?: () => void
-	onTwoFactorSignIn?: () => void
+	onTwoFactorSignIn?: (code: string) => void
+	twoFactorPending?: boolean
+	twoFactorError?: boolean
 	onPasskeySignIn?: () => void
 	onSetCaptchaRef?: ((captchaRef: unknown) => void) | undefined
 	accounts?: AccountChoice[]
@@ -259,6 +277,8 @@ const {
 	globals = null,
 	onPasswordSignIn = () => {},
 	onTwoFactorSignIn = () => {},
+	twoFactorPending = false,
+	twoFactorError = false,
 	onPasskeySignIn = () => {},
 	onSetCaptchaRef = undefined,
 	accounts = [],
@@ -274,6 +294,17 @@ const emailModel = defineModel<string>('email', { default: '' })
 const passwordModel = defineModel<string>('password', { default: '' })
 const tokenModel = defineModel<string>('token', { default: '' })
 const twoFactorCodeModel = defineModel<string>('twoFactorCode', { default: '' })
+const twoFactorInput = ref<InstanceType<typeof TwoFactorAuthCodeInput>>()
+
+watch(
+	() => twoFactorPending,
+	async (pending) => {
+		if (!pending && twoFactorError) {
+			await nextTick()
+			twoFactorInput.value?.focus()
+		}
+	},
+)
 
 const lastSignInOAuthProvider = useStorage<AuthProvider | null>(
 	LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
@@ -298,6 +329,22 @@ async function sendLauncherCallback() {
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	twoFactorIncorrect: {
+		id: 'auth.two-factor.incorrect-code',
+		defaultMessage: 'The two-factor code is incorrect. Try again or use a backup code.',
+	},
+	launcherCallbackTitle: {
+		id: 'auth.sign-in.launcher.callback.title',
+		defaultMessage: 'Modrinth App sign-in callback',
+	},
+	openingLauncherTitle: {
+		id: 'auth.sign-in.launcher.opening.title',
+		defaultMessage: 'Opening Modrinth App...',
+	},
+	openingLauncherDescription: {
+		id: 'auth.sign-in.launcher.opening.description',
+		defaultMessage: 'If the app doesn’t open, use the button below to finish signing in.',
+	},
 	forgotPasswordLabel: {
 		id: 'auth.sign-in.forgot-password',
 		defaultMessage: 'Forgot password',
@@ -321,10 +368,6 @@ const messages = defineMessages({
 	addAccountLabel: {
 		id: 'auth.sign-in.add-account',
 		defaultMessage: 'Add account',
-	},
-	twoFactorCodeInputPlaceholder: {
-		id: 'auth.sign-in.2fa.placeholder',
-		defaultMessage: 'Enter code...',
 	},
 	twoFactorCodeLabel: {
 		id: 'auth.sign-in.2fa.label',

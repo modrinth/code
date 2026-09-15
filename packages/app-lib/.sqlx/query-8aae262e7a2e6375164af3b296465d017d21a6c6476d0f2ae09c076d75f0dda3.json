@@ -3,7 +3,9 @@
   "query": "\n\t\tUPDATE screenshots\n\t\tSET\n\t\t\tinstance_id = ?,\n\t\t\tfile_name = ?,\n\t\t\tcontent_hash = ?,\n\t\t\tfile_size = ?,\n\t\t\tmodified_at = ?,\n\t\t\tcreated_at = ?\n\t\tWHERE id = ?\n\t\t",
   "describe": {
     "columns": [],
-    "parameters": { "Right": 7 },
+    "parameters": {
+      "Right": 7
+    },
     "nullable": []
   },
   "hash": "8aae262e7a2e6375164af3b296465d017d21a6c6476d0f2ae09c076d75f0dda3"

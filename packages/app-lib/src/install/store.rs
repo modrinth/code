@@ -33,11 +33,21 @@ struct InstallJobRow {
 
 impl InstallJobRecord {
     pub fn snapshot(&self) -> InstallJobSnapshot {
+        let (paused, canceling, controllable) =
+            super::control::snapshot(self.id);
+        let active = matches!(
+            self.status,
+            InstallJobStatus::Queued | InstallJobStatus::Running
+        );
         InstallJobSnapshot {
             job_id: self.id.to_string(),
             instance_id: self.instance_id.clone(),
             kind: self.kind,
             status: self.status,
+            paused: active && paused,
+            canceling: active && canceling,
+            can_pause: active && controllable,
+            can_cancel: active && controllable,
             target: self.state.target.clone(),
             phase: self.state.progress.phase,
             progress: self.state.progress.progress.clone(),
@@ -427,6 +437,7 @@ pub async fn complete_success(
     }
 
     transaction.commit().await?;
+    crate::api::instance::queue_game_locale_index();
     get_required(id, app_state).await.map(Some)
 }
 

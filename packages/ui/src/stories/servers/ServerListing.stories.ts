@@ -109,7 +109,7 @@ export const SetToCancel: Story = {
 		name: 'Survival SMP',
 		cancellationDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
 		onResubscribe: () => alert('Resubscribe clicked'),
-		onDownloadBackup: () => alert('Download backup clicked'),
+		onDownloadWorld: () => alert('Download world clicked'),
 	},
 }
 
@@ -121,19 +121,19 @@ export const SuspendedCancelled: Story = {
 		suspension_reason: 'cancelled',
 		cancellationDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
 		onResubscribe: () => alert('Resubscribe clicked'),
-		onDownloadBackup: () => alert('Download backup clicked'),
+		onDownloadWorld: () => alert('Download world clicked'),
 	},
 }
 
-export const SuspendedCancelledFilesExpired: Story = {
+export const SuspendedCancelledAfterResubscribeWindow: Story = {
 	args: {
 		...baseServer,
-		onDownloadBackup: null,
+		onDownloadWorld: () => alert('Download world clicked'),
 		name: 'Old Event Server',
 		status: 'suspended',
 		suspension_reason: 'cancelled',
 		cancellationDate: new Date(2025, 1, 17).toISOString(),
-		onResubscribe: () => alert('Resubscribe clicked'),
+		onResubscribe: null,
 	},
 }
 
@@ -144,7 +144,7 @@ export const SuspendedPaymentFailed: Story = {
 		status: 'suspended',
 		suspension_reason: 'paymentfailed',
 		cancellationDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-		onDownloadBackup: () => alert('Download backup clicked'),
+		onDownloadWorld: () => alert('Download world clicked'),
 	},
 }
 
@@ -154,7 +154,7 @@ export const SuspendedModerated: Story = {
 		name: 'Banned Server',
 		status: 'suspended',
 		suspension_reason: 'moderated',
-		onDownloadBackup: () => alert('Download backup clicked'),
+		onDownloadWorld: () => alert('Download world clicked'),
 	},
 }
 
@@ -163,6 +163,6 @@ export const SuspendedGeneric: Story = {
 		...baseServer,
 		name: 'Server with other suspension reason',
 		status: 'suspended',
-		onDownloadBackup: () => alert('Download backup clicked'),
+		onDownloadWorld: () => alert('Download world clicked'),
 	},
 }

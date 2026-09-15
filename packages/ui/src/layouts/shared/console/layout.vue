@@ -98,7 +98,7 @@
 <script setup lang="ts">
 import { SearchIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import type { Terminal } from '@xterm/xterm'
-import { computed, isRef, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, isRef, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import BaseTerminal from '#ui/components/base/BaseTerminal.vue'
@@ -109,6 +109,7 @@ import Combobox from '#ui/components/base/Combobox.vue'
 import Input from '#ui/components/base/inputs/Input.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import ShareModal from '#ui/components/modal/ShareModal.vue'
+import { useModalStack } from '#ui/composables/modal-stack'
 import { injectModrinthClient } from '#ui/providers'
 import { injectModalBehavior } from '#ui/providers/modal-behavior'
 import { injectPageContext } from '#ui/providers/page-context'
@@ -133,6 +134,7 @@ const client = injectModrinthClient()
 const modalBehavior = injectModalBehavior()
 const pageContext = injectPageContext(null)
 const { addNotification } = injectNotificationManager()
+const { hasModal } = useModalStack()
 
 const crashHeader = computed(() => {
 	const problems = ctx.crashAnalysis?.value?.analysis.problems ?? []
@@ -192,7 +194,12 @@ function buildCombinedPredicate(): ((line: LogLine) => boolean) | null {
 	}
 }
 
+onMounted(() => {
+	window.addEventListener('keydown', handleWindowKeyDown, true)
+})
+
 onBeforeUnmount(() => {
+	window.removeEventListener('keydown', handleWindowKeyDown, true)
 	if (isFullscreen.value) {
 		document.body.style.overflow = ''
 		document.body.classList.remove(fullscreenBodyClass)
@@ -296,6 +303,12 @@ function rewriteFiltered() {
 	const predicate = buildCombinedPredicate()
 	rewriteTerminal(term, lines, predicate, activeSearchQuery())
 	lastWrittenIndex = lines.length
+}
+
+function handleWindowKeyDown(event: KeyboardEvent) {
+	if (event.key !== 'Escape' || !isFullscreen.value || hasModal.value) return
+	event.preventDefault()
+	toggleFullscreen()
 }
 
 function toggleFullscreen() {

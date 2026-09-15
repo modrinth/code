@@ -2,6 +2,7 @@
 use super::io::{self, IOError};
 use crate::event::LoadingBarId;
 use crate::event::emit::emit_loading;
+use crate::util::content_hash::{ContentHasher, temporary_file};
 use crate::{ErrorKind, LabrinthError};
 use bytes::Bytes;
 use chrono::{DateTime, TimeDelta, Utc};
@@ -379,6 +380,325 @@ pub type FetchProgressFn<'a> = dyn FnMut(
     + Send
     + 'a;
 
+#[derive(Clone, Debug)]
+pub struct DownloadedFile {
+    path: DownloadedFilePath,
+    pub size: u64,
+    pub sha512: String,
+    pub reused: bool,
+}
+
+#[derive(Clone, Debug)]
+enum DownloadedFilePath {
+    Temporary(Arc<tempfile::TempPath>),
+    Stored(crate::state::content_store::StoredFileHandle),
+}
+
+impl DownloadedFile {
+    pub fn path(&self) -> &Path {
+        match &self.path {
+            DownloadedFilePath::Temporary(path) => path.as_ref().as_ref(),
+            DownloadedFilePath::Stored(stored_file) => &stored_file.path,
+        }
+    }
+
+    pub(crate) fn from_stored_file(
+        stored_file: crate::state::content_store::StoredFileHandle,
+        reused: bool,
+    ) -> Self {
+        Self {
+            reused,
+            size: stored_file.metadata.size as u64,
+            sha512: stored_file.metadata.sha512.clone(),
+            path: DownloadedFilePath::Stored(stored_file),
+        }
+    }
+
+    pub(crate) fn into_staged(self) -> crate::Result<StagedDownload> {
+        let DownloadedFilePath::Temporary(path) = self.path else {
+            return Err(ErrorKind::InputError(
+                "Stored content cannot be staged again".to_string(),
+            )
+            .into());
+        };
+        let path = Arc::try_unwrap(path).map_err(|_| {
+            ErrorKind::InputError(
+                "Downloaded content is still in use and cannot be published"
+                    .to_string(),
+            )
+        })?;
+        Ok(StagedDownload {
+            path,
+            size: self.size,
+            sha512: self.sha512,
+        })
+    }
+
+    pub(crate) async fn store_file(
+        &self,
+        state: &crate::State,
+    ) -> crate::Result<crate::state::content_store::StoredFileHandle> {
+        match &self.path {
+            DownloadedFilePath::Stored(stored_file) => Ok(stored_file.clone()),
+            DownloadedFilePath::Temporary(_) => {
+                state.content_store.store_file(self.path()).await
+            }
+        }
+    }
+
+    pub async fn copy_to(
+        &self,
+        path: &Path,
+        semaphore: &IoSemaphore,
+    ) -> crate::Result<()> {
+        let _permit = semaphore.0.acquire().await?;
+        let parent = path.parent().ok_or_else(|| {
+            ErrorKind::InputError(
+                "Download destination has no parent directory".to_string(),
+            )
+        })?;
+        io::create_dir_all(parent).await?;
+        let parent = parent.to_path_buf();
+        let temporary = tokio::task::spawn_blocking(move || {
+            tempfile::NamedTempFile::new_in(parent)
+                .map(|file| file.into_temp_path())
+        })
+        .await??;
+        crate::state::content_store::writable_copy(self.path(), &temporary)
+            .await?;
+        let path = path.to_path_buf();
+        tokio::task::spawn_blocking(move || {
+            temporary
+                .persist(&path)
+                .map_err(|error| IOError::with_path(error.error, &path))
+        })
+        .await??;
+        Ok(())
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct StagedDownload {
+    pub(crate) path: tempfile::TempPath,
+    pub(crate) size: u64,
+    pub(crate) sha512: String,
+}
+
+enum FetchBody {
+    Memory(Bytes),
+    File(DownloadedFile),
+}
+
+/// Downloads and verifies a temporary file, which is removed when its last owner is dropped.
+pub async fn fetch_file(
+    url: &str,
+    sha1: Option<&str>,
+    download_meta: Option<&DownloadMeta>,
+    uri_path: Option<&'static str>,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    progress: Option<&mut FetchProgressFn<'_>>,
+) -> crate::Result<DownloadedFile> {
+    let body = fetch_advanced_with_target(
+        Method::GET,
+        url,
+        sha1,
+        None,
+        None,
+        None,
+        download_meta,
+        None,
+        uri_path,
+        semaphore,
+        exec,
+        &INSECURE_REQWEST_CLIENT,
+        progress,
+        true,
+        None,
+    )
+    .await?;
+    match body {
+        FetchBody::File(file) => Ok(file),
+        FetchBody::Memory(_) => unreachable!("requested a file download"),
+    }
+}
+
+pub async fn fetch_file_mirrors(
+    mirrors: &[&str],
+    sha1: Option<&str>,
+    download_meta: Option<&DownloadMeta>,
+    uri_path: Option<&'static str>,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+    progress: Option<&mut FetchProgressFn<'_>>,
+) -> crate::Result<DownloadedFile> {
+    fetch_file_mirrors_in(
+        mirrors,
+        sha1,
+        download_meta,
+        uri_path,
+        semaphore,
+        exec,
+        progress,
+        None,
+    )
+    .await
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(crate) async fn fetch_file_mirrors_in(
+    mirrors: &[&str],
+    sha1: Option<&str>,
+    download_meta: Option<&DownloadMeta>,
+    uri_path: Option<&'static str>,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+    mut progress: Option<&mut FetchProgressFn<'_>>,
+    staging: Option<&Path>,
+) -> crate::Result<DownloadedFile> {
+    if mirrors.is_empty() {
+        return Err(
+            ErrorKind::InputError("No mirrors provided!".to_string()).into()
+        );
+    }
+    for (index, mirror) in mirrors.iter().enumerate() {
+        let body = fetch_advanced_with_target(
+            Method::GET,
+            mirror,
+            sha1,
+            None,
+            None,
+            None,
+            download_meta,
+            None,
+            uri_path,
+            semaphore,
+            exec,
+            &REQWEST_CLIENT,
+            progress.as_deref_mut(),
+            true,
+            staging,
+        )
+        .await;
+        match body {
+            Ok(FetchBody::File(file)) => return Ok(file),
+            Ok(FetchBody::Memory(_)) => {
+                unreachable!("requested a file download")
+            }
+            Err(error) if index + 1 == mirrors.len() => return Err(error),
+            Err(_) => {}
+        }
+    }
+    unreachable!()
+}
+
+async fn read_file_response(
+    response: reqwest::Response,
+    mut progress: Option<&mut FetchProgressFn<'_>>,
+    staging: Option<&Path>,
+) -> crate::Result<DownloadedFile> {
+    use futures::StreamExt;
+    let staging = staging.map(Path::to_path_buf).or_else(|| {
+        crate::State::get_if_initialized()
+            .map(|state| state.directories.store_staging_dir())
+    });
+    let (mut file, path) = temporary_file(staging.as_deref()).await?;
+    let total = response.content_length().unwrap_or(0);
+    let mut stream = response.bytes_stream();
+    let mut hasher = ContentHasher::default();
+    let mut size = 0_u64;
+    while let Some(chunk) =
+        crate::install::control::download_step(stream.next()).await?
+    {
+        let chunk = chunk?;
+        file.write_all(&chunk).await?;
+        hasher.update(&chunk);
+        size += chunk.len() as u64;
+        if let Some(progress) = progress.as_mut() {
+            progress(size, total).await?;
+        }
+    }
+    file.sync_all().await?;
+    drop(file);
+    let hashes = hasher.finish(size);
+    Ok(DownloadedFile {
+        path: DownloadedFilePath::Temporary(Arc::new(path)),
+        reused: false,
+        size,
+        sha512: hashes.sha512,
+    })
+}
+
+pub(crate) async fn fetch_content_file(
+    state: &crate::State,
+    mirrors: &[&str],
+    sha512: Option<&str>,
+    size: Option<u64>,
+    download_meta: Option<&DownloadMeta>,
+    progress: Option<&mut FetchProgressFn<'_>>,
+) -> crate::Result<DownloadedFile> {
+    let acquired = state
+        .content_store
+        .get_or_download_file(
+            mirrors,
+            sha512,
+            size,
+            download_meta,
+            &state.fetch_semaphore,
+            progress,
+        )
+        .await?;
+    Ok(DownloadedFile::from_stored_file(
+        acquired.stored_file,
+        acquired.reused,
+    ))
+}
+
+async fn read_memory_response(
+    response: reqwest::Response,
+    url: &str,
+    loading_bar: Option<(&LoadingBarId, f64)>,
+    mut progress: Option<&mut FetchProgressFn<'_>>,
+) -> crate::Result<Bytes> {
+    let total_size = response.content_length();
+    if ((loading_bar.is_none() && progress.is_none()) || total_size.is_none())
+        && crate::install::control::CURRENT_INSTALL
+            .try_with(|_| ())
+            .is_err()
+    {
+        return response
+            .bytes()
+            .await
+            .wrap_err_with(|| eyre!("failed to read response body from {url}"))
+            .map_err(Into::into);
+    }
+    use futures::StreamExt;
+    let total_size = total_size.unwrap_or(0);
+    let mut stream = response.bytes_stream();
+    let mut bytes = Vec::new();
+    while let Some(chunk) =
+        crate::install::control::download_step(stream.next()).await?
+    {
+        let chunk = chunk.wrap_err_with(|| {
+            eyre!("failed to read response body from {url}")
+        })?;
+        bytes.extend_from_slice(&chunk);
+        if let Some((bar, total)) = loading_bar
+            && total_size > 0
+        {
+            emit_loading(
+                bar,
+                chunk.len() as f64 / total_size as f64 * total,
+                None,
+            )?;
+        }
+        if let Some(progress) = progress.as_mut() {
+            progress(bytes.len() as u64, total_size).await?;
+        }
+    }
+    Ok(Bytes::from(bytes))
+}
+
 #[tracing::instrument(skip(semaphore))]
 pub async fn fetch(
     url: &str,
@@ -425,35 +745,6 @@ pub async fn fetch_with_client(
         semaphore,
         exec,
         client,
-    )
-    .await
-}
-
-#[tracing::instrument(skip(semaphore, progress))]
-pub async fn fetch_with_client_progress(
-    url: &str,
-    sha1: Option<&str>,
-    download_meta: Option<&DownloadMeta>,
-    uri_path: Option<&'static str>,
-    semaphore: &FetchSemaphore,
-    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
-    client: &reqwest::Client,
-    progress: Option<&mut FetchProgressFn<'_>>,
-) -> crate::Result<Bytes> {
-    fetch_advanced_with_client_and_progress(
-        Method::GET,
-        url,
-        sha1,
-        None,
-        None,
-        None,
-        download_meta,
-        None,
-        uri_path,
-        semaphore,
-        exec,
-        client,
-        progress,
     )
     .await
 }
@@ -625,9 +916,51 @@ async fn fetch_advanced_with_client_and_progress(
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     client: &reqwest::Client,
-    mut progress: Option<&mut FetchProgressFn<'_>>,
+    progress: Option<&mut FetchProgressFn<'_>>,
 ) -> crate::Result<Bytes> {
-    let _permit = semaphore.0.acquire().await?;
+    let body = fetch_advanced_with_target(
+        method,
+        url,
+        sha1,
+        json_body,
+        bytes_body,
+        header,
+        download_meta,
+        loading_bar,
+        uri_path,
+        semaphore,
+        exec,
+        client,
+        progress,
+        false,
+        None,
+    )
+    .await?;
+    match body {
+        FetchBody::Memory(bytes) => Ok(bytes),
+        FetchBody::File(_) => unreachable!("requested an in-memory response"),
+    }
+}
+
+async fn fetch_advanced_with_target(
+    method: Method,
+    url: &str,
+    sha1: Option<&str>,
+    json_body: Option<serde_json::Value>,
+    bytes_body: Option<Bytes>,
+    header: Option<(&str, &str)>,
+    download_meta: Option<&DownloadMeta>,
+    loading_bar: Option<(&LoadingBarId, f64)>,
+    uri_path: Option<&'static str>,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    client: &reqwest::Client,
+    mut progress: Option<&mut FetchProgressFn<'_>>,
+    to_file: bool,
+    file_staging: Option<&Path>,
+) -> crate::Result<FetchBody> {
+    let _permit =
+        crate::install::control::download_step(semaphore.0.acquire()).await??;
 
     let is_api_url = url.starts_with(env!("MODRINTH_API_URL"))
         || url.starts_with(env!("MODRINTH_API_URL_V3"));
@@ -662,8 +995,8 @@ async fn fetch_advanced_with_client_and_progress(
 
         let mut req = client.request(method.clone(), url);
 
-        if let Some(body) = json_body.clone() {
-            req = req.json(&body);
+        if let Some(body) = &json_body {
+            req = req.json(body);
         } else if let Some(body) = bytes_body.clone() {
             req = req.body(body);
         }
@@ -681,7 +1014,7 @@ async fn fetch_advanced_with_client_and_progress(
             req = req.header(name.as_str(), value.as_str());
         }
 
-        let result = req.send().await;
+        let result = crate::install::control::download_step(req.send()).await?;
         match result {
             Ok(resp) => {
                 if is_api_url
@@ -716,60 +1049,35 @@ async fn fetch_advanced_with_client_and_progress(
                     return Err(backup_error.into());
                 }
 
-                let bytes: eyre::Result<Bytes> = if loading_bar.is_some()
-                    || progress.is_some()
-                {
-                    let length = resp.content_length();
-                    if let Some(total_size) = length {
-                        use futures::StreamExt;
-                        let mut stream = resp.bytes_stream();
-
-                        async {
-                            let mut bytes = Vec::new();
-                            let mut downloaded = 0_u64;
-
-                            while let Some(item) = stream.next().await {
-                                let chunk = item.wrap_err_with(|| {
-                                    eyre!(
-                                        "failed to read response body from {url}"
-                                    )
-                                })?;
-
-                                downloaded += chunk.len() as u64;
-                                bytes.extend_from_slice(&chunk);
-
-                                if let Some((bar, total)) = &loading_bar {
-                                    emit_loading(
-                                        bar,
-                                        (chunk.len() as f64
-                                            / total_size as f64)
-                                            * total,
-                                        None,
-                                    )?;
-                                }
-
-                                if let Some(progress) = progress.as_mut() {
-                                    progress(downloaded, total_size).await?;
-                                }
-                            }
-
-                            Ok(Bytes::from(bytes))
-                        }
-                        .await
-                    } else {
-                        resp.bytes().await.wrap_err_with(|| {
-                            eyre!("failed to read response body from {url}")
-                        })
-                    }
+                let bytes = if to_file {
+                    read_file_response(
+                        resp,
+                        progress.as_deref_mut(),
+                        file_staging,
+                    )
+                    .await
+                    .map(FetchBody::File)
                 } else {
-                    resp.bytes().await.wrap_err_with(|| {
-                        eyre!("failed to read response body from {url}")
-                    })
+                    read_memory_response(
+                        resp,
+                        url,
+                        loading_bar,
+                        progress.as_deref_mut(),
+                    )
+                    .await
+                    .map(FetchBody::Memory)
                 };
 
                 if let Ok(bytes) = bytes {
                     if let Some(sha1) = sha1 {
-                        let hash = sha1_async(bytes.clone()).await?;
+                        let hash = match &bytes {
+                            FetchBody::Memory(bytes) => {
+                                sha1_async(bytes.clone()).await?
+                            }
+                            FetchBody::File(file) => {
+                                sha1_file_async(file.path()).await?.1
+                            }
+                        };
                         if &*hash != sha1 {
                             if attempt <= FETCH_ATTEMPTS {
                                 continue;
@@ -792,8 +1100,8 @@ async fn fetch_advanced_with_client_and_progress(
                     return Ok(bytes);
                 } else if attempt <= FETCH_ATTEMPTS {
                     continue;
-                } else if let Err(err) = bytes {
-                    return Err(err.into());
+                } else {
+                    bytes?;
                 }
             }
             Err(_) if attempt <= FETCH_ATTEMPTS => continue,
@@ -831,43 +1139,6 @@ pub async fn fetch_mirrors(
             semaphore,
             exec,
             &REQWEST_CLIENT,
-        )
-        .await;
-
-        if result.is_ok() || (result.is_err() && index == (mirrors.len() - 1)) {
-            return result;
-        }
-    }
-
-    unreachable!()
-}
-
-#[tracing::instrument(skip(semaphore, progress))]
-pub async fn fetch_mirrors_with_progress(
-    mirrors: &[&str],
-    sha1: Option<&str>,
-    download_meta: Option<&DownloadMeta>,
-    uri_path: Option<&'static str>,
-    semaphore: &FetchSemaphore,
-    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
-    mut progress: Option<&mut FetchProgressFn<'_>>,
-) -> crate::Result<Bytes> {
-    if mirrors.is_empty() {
-        return Err(
-            ErrorKind::InputError("No mirrors provided!".to_string()).into()
-        );
-    }
-
-    for (index, mirror) in mirrors.iter().enumerate() {
-        let result = fetch_with_client_progress(
-            mirror,
-            sha1,
-            download_meta,
-            uri_path,
-            semaphore,
-            exec,
-            &REQWEST_CLIENT,
-            progress.as_deref_mut(),
         )
         .await;
 

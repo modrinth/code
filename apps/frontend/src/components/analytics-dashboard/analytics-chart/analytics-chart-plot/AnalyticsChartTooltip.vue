@@ -472,7 +472,6 @@ const positionStyle = computed(() => {
 	min-width: min(14rem, var(--analytics-chart-tooltip-max-width, calc(100vw - 1rem)));
 	max-width: var(--analytics-chart-tooltip-max-width, min(26rem, calc(100vw - 1rem)));
 	transition: transform 750ms cubic-bezier(0.22, 1, 0.36, 1);
-	will-change: transform;
 }
 
 .analytics-chart-tooltip-entries {

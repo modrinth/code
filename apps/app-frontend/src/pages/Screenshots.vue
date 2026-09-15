@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ImagesIcon } from '@modrinth/assets'
+import { ImageIcon } from '@modrinth/assets'
 import { defineMessages, useVIntl } from '@modrinth/ui'
 import { onActivated } from 'vue'
 
@@ -17,7 +17,7 @@ const breadcrumb = useRootBreadcrumb({
 	id: 'screenshots',
 	label: formatMessage(messages.screenshots),
 	to: '/screenshots',
-	visual: { type: 'icon', component: ImagesIcon },
+	visual: { type: 'icon', component: ImageIcon },
 })
 onActivated(breadcrumb.reset)
 </script>

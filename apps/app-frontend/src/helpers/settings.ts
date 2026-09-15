@@ -3,6 +3,7 @@
  * So, for example, addDefaultInstance creates a blank instance object, where the Rust struct is serialized,
  *  and deserialized into a usable JS object.
  */
+import { queryOptions } from '@tanstack/vue-query'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { FeatureFlag } from '@/composables/use-app-settings.ts'
@@ -46,6 +47,11 @@ export type AppSettings = {
 	toggle_sidebar: boolean
 	sync_theme_across_devices: boolean
 	sync_behavior_across_devices: boolean
+	sync_features_across_devices: boolean
+	show_files_tab_in_instances: boolean
+	show_worlds_tab_in_instances: boolean
+	show_screenshots_tab_in_instances: boolean
+	show_skin_selector_in_sidebar: boolean
 
 	telemetry: boolean
 	discord_rpc: boolean
@@ -71,6 +77,19 @@ export type AppSettings = {
 	auto_download_updates: boolean | null
 
 	version: number
+}
+
+export const appSettingsKeys = {
+	all: ['app-settings'] as const,
+	update: ['app-settings', 'update'] as const,
+}
+
+export function appSettingsQueryOptions() {
+	return queryOptions({
+		queryKey: appSettingsKeys.all,
+		queryFn: get,
+		staleTime: 0,
+	})
 }
 
 export function serializeEnvVars(vars: [string, string][] | undefined | null): string {

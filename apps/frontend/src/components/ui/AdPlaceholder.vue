@@ -48,7 +48,6 @@ useHead({
 		},
 		{
 			src: '/inmobi.js',
-			async: true,
 		},
 	],
 	link: [

@@ -16,6 +16,10 @@ import { useRouter } from 'vue-router'
 import NavButton from '@/components/ui/NavButton.vue'
 import { useAppEvent } from '@/composables/use-app-event'
 import { handleSevereError } from '@/composables/use-error.js'
+import {
+	QUICK_INSTANCE_LIMIT_MAX,
+	useQuickInstanceLimit,
+} from '@/composables/use-quick-instance-limit.ts'
 import { trackEvent } from '@/helpers/analytics'
 import { getInstanceIconUrl, kill, run } from '@/helpers/instance'
 import { get_all } from '@/helpers/process'
@@ -23,9 +27,6 @@ import { showInstanceInFolder } from '@/helpers/utils'
 import { instanceListQueryOptions } from '@/pages/instance/query-options'
 
 const ITEM_SIZE = 52
-const APPROX_USED_VERTICAL_SPACE = 475 // doesn't need to be exact lol just close enough so there's a little gap and no overflow
-const STORAGE_KEY = 'modrinth-quick-instance-count'
-
 const { handleError } = injectNotificationManager()
 const instancesQuery = useQuery(instanceListQueryOptions())
 const router = useRouter()
@@ -34,6 +35,9 @@ const runningInstances = ref([])
 
 const { formatMessage } = useVIntl()
 
+const container = ref()
+const footer = ref()
+let resizeObserver
 const maxAuto = ref(0)
 const allInstances = computed(() =>
 	(instancesQuery.data.value ?? []).slice().sort((a, b) => {
@@ -54,32 +58,50 @@ const allInstances = computed(() =>
 	}),
 )
 const dragging = ref(false)
+const quickInstances = useQuickInstanceLimit()
 
-const stored = localStorage.getItem(STORAGE_KEY)
-const userLimit = ref(stored === null ? null : Number(stored))
-
-const maxVisible = computed(() => Math.min(maxAuto.value, allInstances.value.length))
-const visibleCount = computed(() => Math.min(userLimit.value ?? maxVisible.value, maxVisible.value))
+const maxVisible = computed(() =>
+	Math.min(maxAuto.value, allInstances.value.length, QUICK_INSTANCE_LIMIT_MAX),
+)
+const visibleCount = computed(() =>
+	Math.min(quickInstances.limit.value ?? maxVisible.value, maxVisible.value),
+)
 const recentInstances = computed(() => allInstances.value.slice(0, visibleCount.value))
 const canDrag = computed(() => maxVisible.value > 0)
 const showOverdrag = ref(false)
 
 const updateMaxAuto = () => {
+	if (!container.value) return
+	const rem = Number.parseFloat(getComputedStyle(document.documentElement).fontSize)
+	const dividerHeight = rem + 1
+	const gap = rem / 4
+	const footerHeight = (footer.value?.clientHeight ?? 0) + gap
 	maxAuto.value = Math.max(
 		0,
-		Math.floor((window.innerHeight - APPROX_USED_VERTICAL_SPACE) / ITEM_SIZE),
+		Math.floor(
+			(container.value.clientHeight - footerHeight - 2 * dividerHeight - gap) / (3 * rem + gap),
+		),
 	)
 }
 
 const setLimit = (count) => {
 	const clamped = Math.max(0, Math.min(count, maxVisible.value))
 	if (clamped >= maxVisible.value) {
-		userLimit.value = null
-		localStorage.removeItem(STORAGE_KEY)
+		quickInstances.setLimit(null)
 	} else {
-		userLimit.value = clamped
-		localStorage.setItem(STORAGE_KEY, String(clamped))
+		quickInstances.setLimit(clamped)
 	}
+}
+
+const nudgeLimit = (delta) => {
+	if (!canDrag.value) {
+		return
+	}
+	const target = visibleCount.value + delta
+	if (target < 0 || target > maxVisible.value) {
+		flashOverdrag()
+	}
+	setLimit(target)
 }
 
 let dragStartY = 0
@@ -152,17 +174,19 @@ const onDividerPointerUp = (event) => {
 }
 
 await instancesQuery.suspense().catch(handleError)
-updateMaxAuto()
 
 useAppEvent('process', checkProcesses)
 
 onMounted(() => {
-	window.addEventListener('resize', updateMaxAuto)
+	resizeObserver = new ResizeObserver(updateMaxAuto)
+	resizeObserver.observe(container.value)
+	resizeObserver.observe(footer.value)
+	updateMaxAuto()
 	checkProcesses()
 })
 
 onUnmounted(() => {
-	window.removeEventListener('resize', updateMaxAuto)
+	resizeObserver?.disconnect()
 	document.body.classList.remove('quick-instance-dragging')
 	clearOverdragFlash()
 })
@@ -187,6 +211,10 @@ const messages = defineMessages({
 	instanceLocked: {
 		id: 'app.quick-instance-switcher.instance-locked',
 		defaultMessage: 'This instance has been locked',
+	},
+	title: {
+		id: 'app.quick-instance-switcher.title',
+		defaultMessage: 'Recent instances',
 	},
 })
 
@@ -262,55 +290,73 @@ function openContextMenu(event, instance) {
 </script>
 
 <template>
-	<Transition name="top-divider">
-		<div
-			v-if="recentInstances.length > 0"
-			class="top-divider flex items-center justify-center overflow-hidden"
-		>
-			<div class="h-px w-8 bg-surface-5 shrink-0"></div>
-		</div>
-	</Transition>
-	<TransitionGroup name="quick-instance" tag="div" class="flex flex-col items-center">
-		<div
-			v-for="instance in recentInstances"
-			:key="instance.id"
-			v-tooltip.right="instance.name"
-			class="quick-instance-item"
-			@contextmenu.prevent.stop="(event) => openContextMenu(event, instance)"
-		>
-			<NavButton :to="`/instance/${encodeURIComponent(instance.id)}`" class="relative">
-				<Avatar
-					:src="getInstanceIconUrl(instance.icon_path)"
-					size="28px"
-					:tint-by="instance.id"
-					:class="`transition-all ${instance.install_stage !== 'installed' ? `brightness-[0.25] scale-[0.85]` : `group-hover:brightness-75`}`"
-					pad-transparent-corners
-				/>
-				<div
-					v-if="instance.install_stage !== 'installed'"
-					class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none"
+	<div ref="container" class="flex min-h-0 flex-1 flex-col gap-1">
+		<Transition name="top-divider">
+			<div
+				v-if="recentInstances.length > 0"
+				class="top-divider shrink-0 flex items-center justify-center overflow-hidden"
+			>
+				<div class="h-px w-8 bg-surface-5 shrink-0"></div>
+			</div>
+		</Transition>
+		<div :aria-label="formatMessage(messages.title)">
+			<TransitionGroup name="quick-instance" tag="div" class="flex shrink-0 flex-col items-center">
+				<NavButton
+					v-for="instance in recentInstances"
+					:key="instance.id"
+					v-tooltip.right="instance.name"
+					class="quick-instance-item relative"
+					:to="`/instance/${encodeURIComponent(instance.id)}`"
+					@contextmenu.prevent.stop="(event) => openContextMenu(event, instance)"
 				>
-					<SpinnerIcon class="animate-spin w-4 h-4" />
-				</div>
-			</NavButton>
+					<Avatar
+						:src="getInstanceIconUrl(instance.icon_path)"
+						size="28px"
+						:tint-by="instance.id"
+						:class="`transition-all ${instance.install_stage !== 'installed' ? `brightness-[0.25] scale-[0.85]` : `group-hover:brightness-75`}`"
+						pad-transparent-corners
+					/>
+					<div
+						v-if="instance.install_stage !== 'installed'"
+						class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none"
+					>
+						<SpinnerIcon class="animate-spin w-4 h-4" />
+					</div>
+				</NavButton>
+			</TransitionGroup>
 		</div>
-	</TransitionGroup>
-	<ContextMenu ref="instanceOptions" :label="formatMessage(messages.instanceActions)" />
-	<div
-		v-tooltip.right="dividerTooltip"
-		class="flex items-center justify-center py-2 select-none"
-		:class="canDrag ? 'cursor-ns-resize touch-none group' : ''"
-		@pointerdown="onDividerPointerDown"
-		@pointermove="onDividerPointerMove"
-		@pointerup="onDividerPointerUp"
-		@pointercancel="onDividerPointerUp"
-	>
+		<ContextMenu ref="instanceOptions" :label="formatMessage(messages.instanceActions)" />
 		<div
-			class="h-px w-8 transition-colors duration-200"
-			:class="
-				showOverdrag ? 'bg-red' : canDrag ? 'bg-surface-5 group-hover:bg-secondary' : 'bg-surface-5'
-			"
-		></div>
+			v-tooltip.right="dividerTooltip"
+			role="separator"
+			aria-orientation="horizontal"
+			:tabindex="canDrag ? 0 : undefined"
+			:aria-valuemin="canDrag ? 0 : undefined"
+			:aria-valuemax="canDrag ? maxVisible : undefined"
+			:aria-valuenow="canDrag ? visibleCount : undefined"
+			class="flex shrink-0 items-center justify-center py-2 select-none"
+			:class="canDrag ? 'cursor-ns-resize touch-none group' : ''"
+			@pointerdown="onDividerPointerDown"
+			@pointermove="onDividerPointerMove"
+			@pointerup="onDividerPointerUp"
+			@pointercancel="onDividerPointerUp"
+			@keydown.up.prevent="nudgeLimit(-1)"
+			@keydown.down.prevent="nudgeLimit(1)"
+		>
+			<div
+				class="h-px w-8 transition-colors duration-200"
+				:class="
+					showOverdrag
+						? 'bg-red'
+						: canDrag
+							? 'bg-surface-5 group-hover:bg-secondary group-focus-visible:bg-secondary'
+							: 'bg-surface-5'
+				"
+			></div>
+		</div>
+		<div ref="footer" class="flex shrink-0 flex-col items-center">
+			<slot />
+		</div>
 	</div>
 </template>
 

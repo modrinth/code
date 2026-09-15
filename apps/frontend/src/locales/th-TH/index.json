@@ -317,23 +317,11 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "บันทึกคอนเทนต์ที่คุณชอบ และรับการอัปเดตได้ในคลิกเดียว"
-  },
-  "app-marketing.features.follow.title": {
-    "message": "ติดตามโปรเจค"
-  },
-  "app-marketing.features.importing.description": {
-    "message": "นำเข้าโปรไฟล์โปรดทั้งหมดของคุณจากลอนเชอร์ที่คุณเคยใช้ก่อนหน้านี้ และเริ่มต้นใช้งาน Modrinth App ได้ภายในไม่กี่วินาที!"
-  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
-  },
-  "app-marketing.features.importing.title": {
-    "message": "การนำเข้าโปรไฟล์"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "การกระทำ"
@@ -359,15 +347,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "เวอร์ชัน"
   },
-  "app-marketing.features.offline.description": {
-    "message": "เล่นม็อดของคุณแม้ไม่ได้เชื่อมต่อกับอินเตอร์เน็ต\n"
-  },
-  "app-marketing.features.offline.title": {
-    "message": "โหมดออฟไลน์"
-  },
-  "app-marketing.features.open-source.description": {
-    "message": "ลอนเชอร์ของ Modrinth เป็นโอเพนซอร์สแบบเต็มรูปแบบ คุณสามารถดูซอร์สโค้ดได้ที่ <github-link>GitHub</github-link>ของเรา!"
-  },
   "app-marketing.features.open-source.title": {
     "message": "โอเพนซอร์ส"
   },
@@ -382,12 +361,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "แอป Modrinth"
@@ -490,9 +463,6 @@
   },
   "auth.reset-password.title.long": {
     "message": "ตั้งรหัสผ่านของคุณใหม่"
-  },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "ป้อนรหัส"
   },
   "auth.sign-in.title": {
     "message": "ลงชื่อเข้าใช้"

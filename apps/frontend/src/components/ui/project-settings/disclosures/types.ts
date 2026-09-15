@@ -44,6 +44,7 @@ export type DerivativeDisclosure = {
 
 export type DisclosureFormState = {
 	ai: AiDisclosure
+	aiFunctionality: NoteDisclosure
 	advertising: NoteDisclosure
 	paidFeatures: PaidFeaturesDisclosure
 	telemetry: TelemetryDisclosure

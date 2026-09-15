@@ -176,6 +176,9 @@
   "button.continue": {
     "defaultMessage": "Weiter"
   },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "In Zwischenablage kopiert"
+  },
   "button.copy-filename": {
     "defaultMessage": "Dateinamen kopieren"
   },
@@ -202,6 +205,9 @@
   },
   "button.download": {
     "defaultMessage": "Herunterladen"
+  },
+  "button.download-files": {
+    "defaultMessage": "Dateien herunterladen"
   },
   "button.downloading": {
     "defaultMessage": "Lade herunter"
@@ -362,6 +368,15 @@
   "collections.label.private": {
     "defaultMessage": "Privat"
   },
+  "console.actions.collapse": {
+    "defaultMessage": "Einklappen"
+  },
+  "console.actions.expand": {
+    "defaultMessage": "Ausklappen"
+  },
+  "console.actions.share": {
+    "defaultMessage": "Teilen"
+  },
   "content-type.content.lowercase": {
     "defaultMessage": "Inhalt"
   },
@@ -373,6 +388,12 @@
   },
   "content.card.select-project": {
     "defaultMessage": "{project} auswählen"
+  },
+  "content.card.sync-update-pending": {
+    "defaultMessage": "Einige synchronisierte Dateien warten auf Änderungen. Eine Instanz könnte laufen, die entweder eine festgesetzte oder falsche Version hat oder eine die bereits ihre eigene Kopie besitzt."
+  },
+  "content.card.synced": {
+    "defaultMessage": "Über Instanzen synchronisiert"
   },
   "content.card.uploaded": {
     "defaultMessage": "Hochgeladen"
@@ -1412,6 +1433,27 @@
   "files.create-modal.placeholder-file": {
     "defaultMessage": "z. B. config.yml"
   },
+  "files.create-zip-modal.already-exists": {
+    "defaultMessage": "Eine Datei mit diesem Namen existiert bereits."
+  },
+  "files.create-zip-modal.check-failed": {
+    "defaultMessage": "Es konnte nicht geprüft werden, ob diese Datei bereits vorhanden ist."
+  },
+  "files.create-zip-modal.create-button": {
+    "defaultMessage": "ZIP-Datei erstellen"
+  },
+  "files.create-zip-modal.header": {
+    "defaultMessage": "ZIP-Datei erstellen"
+  },
+  "files.create-zip-modal.invalid": {
+    "defaultMessage": "Der Archivname muss ein einzelner Dateiname sein."
+  },
+  "files.create-zip-modal.name-label": {
+    "defaultMessage": "Archivname"
+  },
+  "files.create-zip-modal.required": {
+    "defaultMessage": "Gebe einen Archivnamen ein."
+  },
   "files.delete-modal.deleting-name": {
     "defaultMessage": "„{name}“ wird gelöscht"
   },
@@ -1523,6 +1565,9 @@
   "files.layout.busy-warning": {
     "defaultMessage": "Dateioperationen sind während des Vorgangs deaktiviert."
   },
+  "files.layout.create-zip": {
+    "defaultMessage": "ZIP-Datei erstellen"
+  },
   "files.layout.dry-run-failed-text": {
     "defaultMessage": "Fehler beim Testlauf"
   },
@@ -1604,6 +1649,18 @@
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Aus .zip-URL hochladen"
   },
+  "files.operations.compressed": {
+    "defaultMessage": "{progress}% komprimiert"
+  },
+  "files.operations.compressing": {
+    "defaultMessage": "{source} wird erstellt"
+  },
+  "files.operations.compressing-completed": {
+    "defaultMessage": "{source} wurde erstellt"
+  },
+  "files.operations.compressing-failed": {
+    "defaultMessage": "{source} konnte nicht erstellt werden"
+  },
   "files.operations.current-file": {
     "defaultMessage": "Aktuelle Datei: {file}"
   },
@@ -1627,6 +1684,9 @@
   },
   "files.rename-modal.new-name-label": {
     "defaultMessage": "Neuer Name"
+  },
+  "files.row.create-zip": {
+    "defaultMessage": "ZIP-Datei erstellen"
   },
   "files.row.item-count": {
     "defaultMessage": "{count, plural, one {# Element} other {# Elemente}}"
@@ -2018,6 +2078,108 @@
   "icon-select.select": {
     "defaultMessage": "Icon wählen"
   },
+  "image-viewer.close": {
+    "defaultMessage": "Schließen"
+  },
+  "image-viewer.edit": {
+    "defaultMessage": "Bearbeiten"
+  },
+  "image-viewer.editor.colour": {
+    "defaultMessage": "Farbe"
+  },
+  "image-viewer.editor.crop.dimensions": {
+    "defaultMessage": "{width} × {height} px"
+  },
+  "image-viewer.editor.crop.reset": {
+    "defaultMessage": "Zuschneiden zurücksetzen"
+  },
+  "image-viewer.editor.delete-selection": {
+    "defaultMessage": "Ausgewählte Anmerkung löschen"
+  },
+  "image-viewer.editor.eraser.area": {
+    "defaultMessage": "Fläche"
+  },
+  "image-viewer.editor.eraser.element": {
+    "defaultMessage": "Element"
+  },
+  "image-viewer.editor.eraser.mode": {
+    "defaultMessage": "Radiermodus"
+  },
+  "image-viewer.editor.image-editing-tools": {
+    "defaultMessage": "Werkzeuge zur Bildbearbeitung"
+  },
+  "image-viewer.editor.more-save-options": {
+    "defaultMessage": "Weitere Speicheroptionen"
+  },
+  "image-viewer.editor.overwrite": {
+    "defaultMessage": "Überschreiben"
+  },
+  "image-viewer.editor.redo": {
+    "defaultMessage": "Wiederholen"
+  },
+  "image-viewer.editor.save-as-new": {
+    "defaultMessage": "Kopie speichern"
+  },
+  "image-viewer.editor.save-image": {
+    "defaultMessage": "Bild speichern"
+  },
+  "image-viewer.editor.size": {
+    "defaultMessage": "Größe"
+  },
+  "image-viewer.editor.tool.arrow": {
+    "defaultMessage": "Pfeil"
+  },
+  "image-viewer.editor.tool.censor": {
+    "defaultMessage": "Zensieren"
+  },
+  "image-viewer.editor.tool.crop": {
+    "defaultMessage": "Zuschneiden"
+  },
+  "image-viewer.editor.tool.ellipse": {
+    "defaultMessage": "Ellipse"
+  },
+  "image-viewer.editor.tool.eraser": {
+    "defaultMessage": "Radierer"
+  },
+  "image-viewer.editor.tool.highlight": {
+    "defaultMessage": "Markieren"
+  },
+  "image-viewer.editor.tool.pen": {
+    "defaultMessage": "Stift"
+  },
+  "image-viewer.editor.tool.rectangle": {
+    "defaultMessage": "Rechteck"
+  },
+  "image-viewer.editor.tool.select": {
+    "defaultMessage": "Auswählen"
+  },
+  "image-viewer.editor.tool.text": {
+    "defaultMessage": "Text"
+  },
+  "image-viewer.editor.undo": {
+    "defaultMessage": "Rückgängig"
+  },
+  "image-viewer.editor.width": {
+    "defaultMessage": "Breite"
+  },
+  "image-viewer.editor.zoom-fit": {
+    "defaultMessage": "Anpassen"
+  },
+  "image-viewer.editor.zoom-fit-workspace": {
+    "defaultMessage": "An Arbeitsbereich anpassen"
+  },
+  "image-viewer.editor.zoom-in": {
+    "defaultMessage": "Vergrößern"
+  },
+  "image-viewer.editor.zoom-out": {
+    "defaultMessage": "Verkleinern"
+  },
+  "image-viewer.next": {
+    "defaultMessage": "Nächstes Bild"
+  },
+  "image-viewer.previous": {
+    "defaultMessage": "Vorheriges Bild"
+  },
   "input.search-version.placeholder": {
     "defaultMessage": "Version suchen..."
   },
@@ -2246,6 +2408,9 @@
   "instances.content-install.show-unavailable": {
     "defaultMessage": "Nicht verfügbare anzeigen"
   },
+  "instances.managed-content-modal.disabled": {
+    "defaultMessage": "Deaktiviert"
+  },
   "instances.managed-content-modal.download-file": {
     "defaultMessage": "Datei herunterladen"
   },
@@ -2254,6 +2419,9 @@
   },
   "instances.managed-content-modal.empty-title": {
     "defaultMessage": "Keine Inhalte gefunden"
+  },
+  "instances.managed-content-modal.enabled": {
+    "defaultMessage": "Aktiviert"
   },
   "instances.managed-content-modal.external-content": {
     "defaultMessage": "Extern"
@@ -2275,6 +2443,9 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Durchsuche {count, number} {count, plural, one {Projekt} other {Projekte}}"
+  },
+  "instances.managed-content-modal.warnings": {
+    "defaultMessage": "Warnungen"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Aktuell"
@@ -2608,6 +2779,9 @@
   },
   "label.yes": {
     "defaultMessage": "Ja"
+  },
+  "layout.account-switcher.switching": {
+    "defaultMessage": "Konten werden gewechselt..."
   },
   "locale.cs-CZ": {
     "defaultMessage": "Tschechisch"
@@ -3113,6 +3287,9 @@
   "profile.button.set-affiliate": {
     "defaultMessage": "Als Partner festlegen"
   },
+  "profile.button.shared-instances": {
+    "defaultMessage": "Geteilte Instanzen ansehen"
+  },
   "profile.button.unblock": {
     "defaultMessage": "Freigeben"
   },
@@ -3446,23 +3623,23 @@
   "project.disclosure.advertising.title": {
     "defaultMessage": "Enthält Werbung"
   },
+  "project.disclosure.ai-functionality.title": {
+    "defaultMessage": "Generative KI-Funktionalität"
+  },
   "project.disclosure.ai-generated-content.title": {
-    "defaultMessage": "Enthält KI-generierte {types}"
+    "defaultMessage": "Enthält KI-generierte(n) {types}"
   },
   "project.disclosure.ai-generated-content.use.assets": {
-    "defaultMessage": "e Ressourcen"
+    "defaultMessage": "Ressourcen"
   },
   "project.disclosure.ai-generated-content.use.code": {
-    "defaultMessage": "en Code"
+    "defaultMessage": "Code"
   },
   "project.disclosure.ai-generated-content.use.content": {
-    "defaultMessage": "e Inhalte"
-  },
-  "project.disclosure.ai-generated-content.use.functionality": {
-    "defaultMessage": "e Funktionen"
+    "defaultMessage": "Inhalte"
   },
   "project.disclosure.ai-generated-content.use.text": {
-    "defaultMessage": "en Text"
+    "defaultMessage": "Text"
   },
   "project.disclosure.derivative-work.show-fewer": {
     "defaultMessage": "Weniger anzeigen"
@@ -3854,9 +4031,6 @@
   "project.settings.disclosures.ai.types-code": {
     "defaultMessage": "Code"
   },
-  "project.settings.disclosures.ai.types-functionality": {
-    "defaultMessage": "Funktionen"
-  },
   "project.settings.disclosures.ai.types-text": {
     "defaultMessage": "Text"
   },
@@ -4015,6 +4189,12 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
+  },
+  "project.versions.filter.channel": {
+    "defaultMessage": "Kanal"
+  },
+  "project.versions.filter.selected-count": {
+    "defaultMessage": "{count, number} ausgewählt"
   },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "Filter für {filter} umschalten"
@@ -4198,6 +4378,9 @@
   },
   "search.filter_type.advanced.disclosure.ai_content.usage": {
     "defaultMessage": "KI-{usage}"
+  },
+  "search.filter_type.advanced.disclosure.ai_functionality": {
+    "defaultMessage": "Generative KI-Funktionalität"
   },
   "search.filter_type.advanced.disclosure.archived": {
     "defaultMessage": "Archiviert"
@@ -5006,6 +5189,24 @@
   "servers.busy.installing": {
     "defaultMessage": "Server wird installiert"
   },
+  "servers.download.failed.description": {
+    "defaultMessage": "Beim Herunterladen der Dateien dieser Welt ist ein Fehler aufgetreten."
+  },
+  "servers.download.failed.title": {
+    "defaultMessage": "Herunterladen fehlgeschlagen"
+  },
+  "servers.download.unavailable.description": {
+    "defaultMessage": "Die Dateien dieser Welt können derzeit nicht heruntergeladen werden."
+  },
+  "servers.download.unavailable.title": {
+    "defaultMessage": "Herunterladen gerade nicht verfügbar"
+  },
+  "servers.files.zip-created": {
+    "defaultMessage": "ZIP-Datei wurde erstellt"
+  },
+  "servers.files.zip-created-description": {
+    "defaultMessage": "{destination} wurde erstellt"
+  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Auch eine Freundschaftsanfrage senden"
   },
@@ -5152,9 +5353,6 @@
   },
   "servers.listing.copy-id-label": {
     "defaultMessage": "ID kopieren"
-  },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "Neueste Sicherung herunterladen"
   },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "Abrechnung verwalten"
@@ -5402,6 +5600,9 @@
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Loslegen"
   },
+  "servers.purchase.step.plan.hardware-subtitle": {
+    "defaultMessage": "Angetrieben von AMD Ryzen 7950X, 9950X oder einem gleichwertigen Prozessor mit DDR5-Speicher."
+  },
   "servers.purchase.step.plan.large": {
     "defaultMessage": "Gross"
   },
@@ -5518,6 +5719,27 @@
   },
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "Was passiert?"
+  },
+  "servers.settings.advanced.sftp.roll-credentials": {
+    "defaultMessage": "Die Zugangsdaten rotieren"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-error-text": {
+    "defaultMessage": "Bitte versuche es später erneut."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-error-title": {
+    "defaultMessage": "SFTP-Zugangsdaten konnten nicht rotiert werden"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-description": {
+    "defaultMessage": "Der vorherige Benutzername und das vorherige Passwort funktionieren danach nicht mehr."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-title": {
+    "defaultMessage": "Zugangsdaten rotieren"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-text": {
+    "defaultMessage": "Dein SFTP-Benutzername und Passwort wurden neu generiert."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-title": {
+    "defaultMessage": "SFTP-Zugangsdaten wurden rotiert"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Bei der Installation ist ein unerwarteter Fehler aufgetreten. Bitte versuche es später erneut."
@@ -6665,6 +6887,12 @@
   "user.profile.badge.staff.name": {
     "defaultMessage": "Modrinth-Team"
   },
+  "user.role.moderator": {
+    "defaultMessage": "Inhaltsmoderator"
+  },
+  "user.role.modrinth-team": {
+    "defaultMessage": "Modrinth-Team"
+  },
   "version.content.name": {
     "defaultMessage": "Name"
   },
@@ -6675,7 +6903,7 @@
     "defaultMessage": "Dev-JAR"
   },
   "version.file-type.javadoc-jar": {
-    "defaultMessage": "Javadoc-JAR"
+    "defaultMessage": "Javadocs-JAR"
   },
   "version.file-type.optional-resource-pack": {
     "defaultMessage": "Optionales Ressourcenpaket"
@@ -6690,7 +6918,7 @@
     "defaultMessage": "Signaturdatei"
   },
   "version.file-type.sources-jar": {
-    "defaultMessage": "Quellen-JAR"
+    "defaultMessage": "Quell-JAR"
   },
   "version.file-type.unknown": {
     "defaultMessage": "Andere"
@@ -6756,3 +6984,4 @@
     "defaultMessage": "Typ"
   }
 }
+

@@ -322,7 +322,7 @@ const formattedSize = computed(() => {
 		return formatMessage(messages.itemCount, { count: props.count ?? 0 })
 	}
 
-	if (props.size === undefined) return ''
+	if (props.size == null) return ''
 	return formatBytes(props.size)
 })
 

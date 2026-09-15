@@ -246,6 +246,32 @@ export function isServerWorld(world: World): world is ServerWorld {
 	return world.type === 'server'
 }
 
+const MINECRAFT_FORMATTING_CODE = /\u00A7[0-9A-FK-ORX]/gi
+
+export function stripMinecraftFormatting(text: string): string {
+	return text.replace(MINECRAFT_FORMATTING_CODE, '').replace(/\u00A7/g, '')
+}
+
+export function getWorldDisplayName(world: World): string {
+	const name = stripMinecraftFormatting(world.name).trim()
+	if (name) {
+		return name
+	}
+	if (world.type === 'server') {
+		return world.address
+	}
+	return world.path
+}
+
+export function worldNameMatchesQuery(name: string, query: string): boolean {
+	const normalizedQuery = query.trim().toLocaleLowerCase()
+	if (!normalizedQuery) return true
+	return (
+		name.toLocaleLowerCase().includes(normalizedQuery) ||
+		stripMinecraftFormatting(name).toLocaleLowerCase().includes(normalizedQuery)
+	)
+}
+
 const DEFAULT_MINECRAFT_SERVER_PORT = 25565
 
 function parseServerPort(port: string): number | null {
@@ -345,16 +371,16 @@ export function getServerAddress(javaServer?: { address?: string | null } | null
 
 export async function ensureManagedServerWorldExists(
 	instanceId: string,
-	serverName: string,
+	serverName: string | null,
 	serverAddress: string | null,
 ) {
-	if (!instanceId || !serverAddress) return
+	if (!instanceId || !serverName || !serverAddress) return
 	try {
-		const worlds = await get_instance_worlds(instanceId)
-		const managedWorld = resolveManagedServerWorld(worlds, serverName, serverAddress)
-		if (!managedWorld) {
-			await add_server_to_instance(instanceId, serverName, serverAddress, 'prompt')
-		}
+		await invoke('plugin:worlds|ensure_managed_server_in_instance', {
+			instanceId,
+			name: serverName,
+			address: serverAddress,
+		})
 	} catch (err) {
 		console.error('Failed to ensure managed server world exists:', err)
 	}

@@ -35,16 +35,7 @@
 					<template #header-world="{ column }">
 						<span class="inline-flex min-w-0 max-w-full items-center gap-1 font-semibold">
 							<span class="min-w-0 truncate">{{ column.label }}</span>
-							<Tooltip
-								theme="dismissable-prompt"
-								class="inline-flex shrink-0"
-								:triggers="['hover', 'focus']"
-								:popper-triggers="['hover', 'focus']"
-								popper-class="v-popper--interactive"
-								placement="top"
-								:delay="{ show: 200, hide: 100 }"
-								no-auto-focus
-							>
+							<Tooltip theme="dismissable-prompt" class="inline-flex shrink-0" placement="top">
 								<button
 									type="button"
 									:aria-label="formatMessage(messages.instanceTooltipTitle)"
@@ -188,16 +179,7 @@
 						>
 							<span class="inline-flex min-w-0 max-w-full items-center gap-1 font-semibold">
 								<span class="min-w-0 truncate">{{ formatMessage(messages.worldColumn) }}</span>
-								<Tooltip
-									theme="dismissable-prompt"
-									class="inline-flex shrink-0"
-									:triggers="['hover', 'focus']"
-									:popper-triggers="['hover', 'focus']"
-									popper-class="v-popper--interactive"
-									placement="top"
-									:delay="{ show: 200, hide: 100 }"
-									no-auto-focus
-								>
+								<Tooltip theme="dismissable-prompt" class="inline-flex shrink-0" placement="top">
 									<button
 										type="button"
 										:aria-label="formatMessage(messages.instanceTooltipTitle)"
@@ -252,8 +234,9 @@
 
 <script setup lang="ts">
 import { IntercomBubbleIcon, UnknownIcon } from '@modrinth/assets'
-import { Tooltip } from 'floating-vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useSlots, watch } from 'vue'
+
+import { Tooltip } from '#ui/components/floating'
 
 import { useFormatDateTime, useRelativeTime } from '../../../composables'
 import { defineMessages, useVIntl } from '../../../composables/i18n'

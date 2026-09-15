@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO game_option_locale_origins\n\t\t(scope, option_id, source_instance_id, source_game_version, observation_json)\n\t\tSELECT ?, ?, ?, ?, ?\n\t\tWHERE ? <> '' OR EXISTS (SELECT 1 FROM synced_game_option_values WHERE option_id = ?)\n\t\tON CONFLICT(scope, option_id) DO UPDATE SET observation_json = excluded.observation_json\n\t\tWHERE game_option_locale_origins.observation_json IS NULL\n\t\tAND game_option_locale_origins.origin_json IS NULL\n\t\tAND game_option_locale_origins.backfilled = 0\n\t\tAND game_option_locale_origins.source_instance_id = excluded.source_instance_id\n\t\tAND game_option_locale_origins.source_game_version = excluded.source_game_version",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 7
+    },
+    "nullable": []
+  },
+  "hash": "d2c0630471ca3ecabcd9482cec25edb59da2487c0cc099bd965e16424f47d827"
+}

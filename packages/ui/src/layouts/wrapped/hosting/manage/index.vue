@@ -179,6 +179,7 @@
 								v-for="server in ownedFilteredData.filter((s) => s.is_medal)"
 								:key="`owned-medal-${server.server_id}`"
 								v-bind="server"
+								:on-download-world="getWorldDownload(server.server_id, serverFullList)"
 								@upgrade="openMedalUpgradeModal"
 							/>
 							<ServerListing
@@ -188,7 +189,7 @@
 								:cancellation-date="serverBillingMap.get(server.server_id)?.cancellationDate"
 								:is-provisioning="serverBillingMap.get(server.server_id)?.isProvisioning"
 								:on-resubscribe="serverBillingMap.get(server.server_id)?.onResubscribe"
-								:on-download-backup="serverBillingMap.get(server.server_id)?.onDownloadBackup"
+								:on-download-world="getWorldDownload(server.server_id, serverFullList)"
 							/>
 						</TransitionGroup>
 						<div v-else class="text-secondary">
@@ -238,16 +239,18 @@ import { HammerIcon, LoaderCircleIcon, PlusIcon, SearchIcon } from '@modrinth/as
 import {
 	CopyCode,
 	defineMessages,
+	hasAvailableWorldDownload,
 	injectAuth,
 	injectModrinthClient,
 	injectNotificationManager,
 	Input,
 	IntlFormatted,
+	isWithinServerResubscribeWindow,
 	ModrinthServersPurchaseModal,
 	ResubscribeModal,
 	ServerListEmpty,
 	ServersGuestPlanModal,
-	useServerBackupDownload,
+	useServerWorldDownload,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -561,14 +564,14 @@ function sortServers(array: Archon.Servers.v0.Server[]): Archon.Servers.v0.Serve
 	})
 }
 
-// files expire 30 days after cancellation
-function filesExpired(server: Archon.Servers.v0.Server): boolean {
-	if (server.status !== 'suspended' || server.suspension_reason !== 'cancelled') return false
+function shouldShowServer(server: Archon.Servers.v0.Server): boolean {
+	if (server.status !== 'suspended' || server.suspension_reason !== 'cancelled') return true
 	const cancellationDate = serverBillingMap.value.get(server.server_id)?.cancellationDate
-	if (!cancellationDate) return false
-	const cancellation = new Date(cancellationDate)
-	const thirtyDaysLater = new Date(cancellation.getTime() + 30 * 24 * 60 * 60 * 1000)
-	return new Date() > thirtyDaysLater
+	if (!cancellationDate || !serverFullList.value) return true
+	return (
+		isWithinServerResubscribeWindow(cancellationDate) ||
+		hasAvailableWorldDownload(server.server_id, serverFullList.value)
+	)
 }
 
 function isServerOwnedByCurrentUser(server: Archon.Servers.v0.Server): boolean {
@@ -586,11 +589,13 @@ function getServerOwner(server: Archon.Servers.v0.Server): ServerListingOwner | 
 }
 
 const ownedServerList = computed<ServerWithOwner[]>(() =>
-	serverList.value.filter((server) => !filesExpired(server) && isServerOwnedByCurrentUser(server)),
+	serverList.value.filter(
+		(server) => shouldShowServer(server) && isServerOwnedByCurrentUser(server),
+	),
 )
 const sharedServerList = computed<ServerWithOwner[]>(() =>
 	serverList.value
-		.filter((server) => !filesExpired(server) && !isServerOwnedByCurrentUser(server))
+		.filter((server) => shouldShowServer(server) && !isServerOwnedByCurrentUser(server))
 		.map((server) => ({
 			...server,
 			owner: getServerOwner(server),
@@ -636,7 +641,7 @@ watch(serverResponse, (response) => {
 
 const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
-const { getLatestBackupDownload } = useServerBackupDownload()
+const { getWorldDownload } = useServerWorldDownload()
 
 function handlePurchaseSuccess() {
 	startNewServerPolling(serverResponse.value?.servers ?? [])
@@ -776,7 +781,6 @@ type ServerBillingInfo = {
 	cancellationDate?: string | null
 	isProvisioning?: boolean
 	onResubscribe?: () => void
-	onDownloadBackup?: (() => void) | null
 }
 
 type ResubscribeRequest = {
@@ -928,12 +932,12 @@ const serverBillingMap = computed(() => {
 				(charge?.status === 'processing' || charge?.status === 'open'),
 		}
 
-		info.onDownloadBackup = getLatestBackupDownload(serverId, serverFullList.value)
-
 		if (charge?.status === 'cancelled') {
 			info.cancellationDate = charge.due
 
-			info.onResubscribe = () => openResubscribeModal(serverId, sub, charge)
+			if (isWithinServerResubscribeWindow(charge.due)) {
+				info.onResubscribe = () => openResubscribeModal(serverId, sub, charge)
+			}
 		}
 
 		map.set(serverId, info)

@@ -1,6 +1,13 @@
 {
 	"articles": [
 		{
+			"title": "Sync settings across instances",
+			"summary": "Keep game options, servers, resource packs, and more the same across your instances.",
+			"thumbnail": "https://modrinth.com/news/article/sync-settings/thumbnail.webp",
+			"date": "2026-09-07T19:00:00.000Z",
+			"link": "https://modrinth.com/news/article/sync-settings"
+		},
+		{
 			"title": "More ways to personalize your library",
 			"summary": "The new Play page, overhauled instance groups, custom icons, and a smoother onboarding experience.",
 			"thumbnail": "https://modrinth.com/news/article/app-personalization/thumbnail.webp",

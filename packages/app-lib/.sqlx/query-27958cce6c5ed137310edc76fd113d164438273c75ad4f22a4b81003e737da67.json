@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT option_id, enabled AS \"enabled!: bool\",\n\t\t\trevision AS \"revision!: i64\"\n\t\tFROM synced_game_option_preferences\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "option_id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "enabled!: bool",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "revision!: i64",
+        "ordinal": 2,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "27958cce6c5ed137310edc76fd113d164438273c75ad4f22a4b81003e737da67"
+}

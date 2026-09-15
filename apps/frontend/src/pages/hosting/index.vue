@@ -72,10 +72,10 @@
 			</div>
 
 			<div
-				class="absolute left-[55%] top-56 z-[5] hidden h-full max-h-[calc(100vh-10rem)] w-full rotate-1 xl:block"
+				class="top-70 absolute left-[55%] z-[5] hidden h-full max-h-[calc(100vh-25rem)] w-full xl:block"
 			>
 				<img
-					src="https://cdn.modrinth.com/servers/panel-right-dark.webp"
+					src="https://cdn-raw.modrinth.com/hosting-landing/hosting-panel.webp"
 					alt=""
 					aria-hidden="true"
 					class="pointer-events-none h-full w-auto select-none"
@@ -163,7 +163,7 @@
 				</div>
 				<div class="relative">
 					<img
-						src="https://cdn.modrinth.com/servers/installation-dark.webp"
+						src="https://cdn-raw.modrinth.com/hosting-landing/hosting-content.webp"
 						alt=""
 						class="hidden w-full rounded-2xl sm:block"
 					/>
@@ -323,17 +323,19 @@
 							border: 1px solid rgba(12, 107, 52, 0.55);
 							box-shadow: 0px 12px 38.1px rgba(27, 217, 106, 0.13);
 						"
-						class="relative flex flex-col gap-4 overflow-hidden rounded-2xl p-6 text-left sm:backdrop-blur-xl md:p-12"
+						class="relative flex flex-col gap-4 overflow-hidden rounded-2xl text-left sm:backdrop-blur-xl"
 					>
-						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.fileManager) }}</h2>
-						<h3 class="m-0 text-base font-normal">
-							{{ formatMessage(messages.fileManagerDescription) }}
-						</h3>
+						<div class="flex flex-col gap-4 p-6 pb-0 md:p-12 md:pb-0">
+							<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.fileManager) }}</h2>
+							<h3 class="m-0 text-base font-normal">
+								{{ formatMessage(messages.fileManagerDescription) }}
+							</h3>
+						</div>
 
 						<img
-							src="https://cdn.modrinth.com/servers/content-dark.webp"
+							src="https://cdn-raw.modrinth.com/hosting-landing/hosting-files.webp"
 							alt=""
-							class="absolute -bottom-12 -right-[15%] hidden max-w-2xl rounded-2xl bg-brand p-4 lg:block"
+							class="ml-6"
 						/>
 					</div>
 				</div>

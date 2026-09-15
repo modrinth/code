@@ -365,9 +365,29 @@ pub async fn save_edited_screenshot(
         crate::ErrorKind::InputError("Unknown screenshot".to_string())
     })?;
 
-    let source_dimensions =
-        png_dimensions(io::read(&source_screenshot.path).await?).await?;
-    let edited_dimensions = png_dimensions(png_bytes.clone()).await?;
+    let source_path = source_screenshot.path.clone();
+    let (source_dimensions, edited_dimensions, png_bytes) =
+        tokio::task::spawn_blocking(move || {
+            let source = std::fs::File::open(&source_path)
+                .map_err(|error| IOError::with_path(error, &source_path))?;
+            let source_dimensions = image::ImageReader::with_format(
+                std::io::BufReader::new(source),
+                image::ImageFormat::Png,
+            )
+            .into_dimensions()
+            .map_err(|error| {
+                crate::ErrorKind::InputError(format!(
+                    "Could not read screenshot dimensions: {error}"
+                ))
+            })?;
+            let edited_dimensions = validate_png_dimensions(&png_bytes)?;
+            Ok::<_, crate::Error>((
+                source_dimensions,
+                edited_dimensions,
+                png_bytes,
+            ))
+        })
+        .await??;
     if edited_dimensions.0 > source_dimensions.0
         || edited_dimensions.1 > source_dimensions.1
     {
@@ -557,27 +577,20 @@ async fn available_target_path(
     unreachable!()
 }
 
-async fn png_dimensions(bytes: Vec<u8>) -> crate::Result<(u32, u32)> {
-    tokio::task::spawn_blocking(move || {
-        image::ImageReader::with_format(
-            Cursor::new(bytes),
-            image::ImageFormat::Png,
-        )
-        .decode()
-        .map(|image| (image.width(), image.height()))
-        .map_err(|error| {
-            crate::ErrorKind::InputError(format!(
-                "Could not decode screenshot as PNG: {error}"
-            ))
-            .into()
-        })
-    })
-    .await
-    .map_err(|error| {
+fn validate_png_dimensions(bytes: &[u8]) -> crate::Result<(u32, u32)> {
+    let validate = || -> Result<_, png::DecodingError> {
+        let mut reader = png::Decoder::new(Cursor::new(bytes)).read_info()?;
+        let dimensions = (reader.info().width, reader.info().height);
+        while reader.next_row()?.is_some() {}
+        reader.finish()?;
+        Ok(dimensions)
+    };
+    validate().map_err(|error| {
         crate::ErrorKind::InputError(format!(
-            "Could not validate screenshot: {error}"
+            "Could not decode screenshot as PNG: {error}"
         ))
-    })?
+        .into()
+    })
 }
 
 fn ensure_unique_keys(keys: &[ScreenshotKey]) -> crate::Result<()> {

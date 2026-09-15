@@ -12,10 +12,9 @@ use crate::state::{
 };
 use crate::util::fetch::{
     DownloadMeta, DownloadReason, FetchProgressFn, fetch,
-    fetch_advanced_with_progress, sha1_file_async_with_progress,
+    sha1_file_async_with_progress,
 };
 use path_util::SafeRelativeUtf8UnixPathBuf;
-use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::future::Future;
@@ -143,6 +142,7 @@ impl Default for CreatePackInstance {
 #[derive(Clone)]
 pub enum CreatePackFile {
     Bytes(bytes::Bytes),
+    Downloaded(crate::util::fetch::DownloadedFile),
     // Local packs can be larger than available memory, so keep them file-backed.
     Path(PathBuf),
 }
@@ -423,17 +423,21 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
         .version_id(version_id.clone())
         .build();
     reporter.set_context(context).await?;
-    let file = fetch_advanced_with_progress(
-        Method::GET,
-        &url,
-        hash.map(|x| &**x),
-        None,
-        None,
+    let file = crate::util::fetch::fetch_content_file(
+        &state,
+        &[&url],
+        version
+            .files
+            .iter()
+            .find(|file| file.url == url)
+            .and_then(|file| file.hashes.get("sha512"))
+            .map(String::as_str),
+        version
+            .files
+            .iter()
+            .find(|file| file.url == url)
+            .map(|file| u64::from(file.size)),
         Some(&download_meta),
-        None,
-        None,
-        &state.fetch_semaphore,
-        &state.pool,
         progress,
     )
     .await?;
@@ -478,7 +482,7 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
     }
 
     Ok(CreatePack {
-        file: CreatePackFile::Bytes(file),
+        file: CreatePackFile::Downloaded(file),
         description: CreatePackDescription {
             icon,
             override_title: Some(title),
@@ -499,8 +503,15 @@ pub async fn generate_pack_from_file(
     let source_filename =
         path.file_name().map(|x| x.to_string_lossy().to_string());
 
+    let state = State::get().await?;
+    let stored_file = state.content_store.store_file(&path).await?;
     Ok(CreatePack {
-        file: CreatePackFile::Path(path),
+        file: CreatePackFile::Downloaded(
+            crate::util::fetch::DownloadedFile::from_stored_file(
+                stored_file,
+                true,
+            ),
+        ),
         description: CreatePackDescription {
             icon: None,
             override_title: None,

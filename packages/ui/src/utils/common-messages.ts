@@ -124,6 +124,10 @@ export const commonMessages = defineMessages({
 		id: 'button.download',
 		defaultMessage: 'Download',
 	},
+	downloadFilesButton: {
+		id: 'button.download-files',
+		defaultMessage: 'Download files',
+	},
 	downloadingButton: {
 		id: 'button.downloading',
 		defaultMessage: 'Downloading',
@@ -1239,10 +1243,6 @@ export const disclosureAiUsageMessages = defineMessages({
 	text: {
 		id: 'project.settings.disclosures.ai.types-text',
 		defaultMessage: 'Text',
-	},
-	functionality: {
-		id: 'project.settings.disclosures.ai.types-functionality',
-		defaultMessage: 'Functionality',
 	},
 })
 

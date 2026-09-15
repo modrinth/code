@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Button, IconButton } from '@modrinth/ui'
+import { Button, IconButton, Tooltip } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
 import type { Component } from 'vue'
 import { computed, inject, watchEffect } from 'vue'
@@ -31,7 +31,6 @@ import {
 } from '../resolve'
 import type { NodeState, Reactive } from '../state'
 import { resolve } from '../state'
-import ActionButton from './ActionButton.vue'
 
 const metaCtx = inject(CHECKLIST_META_KEY)
 
@@ -142,7 +141,6 @@ function componentProps(node: RenderableValueNode): Record<string, unknown> {
 		onImageUpload: props.onImageUpload,
 		toggleSetValue: (value) => toggleSetValue(node, value),
 		nodeFacts: { needsAttention: needsAttention(node), fixActionable: isFixActionable(node) },
-		tooltip: resolveTooltip(node),
 	}
 	const dropdownStyle = hasOptionsCap(node)
 		? {
@@ -182,13 +180,9 @@ function valueScope(node: HasValue & Identified): {
 	return { state, write: childWriter(props.state, props.write, node.id) }
 }
 
-const TOOLTIP_BASE = {
-	delay: { show: 500, hide: 0 },
-	triggers: ['hover', 'focus'],
-	placement: 'top',
-}
+type NodeTooltip = { text?: string; html?: string }
 
-function resolveTooltip(node: object): Record<string, unknown> | undefined {
+function resolveTooltip(node: object): NodeTooltip | undefined {
 	if (hasCap(node, '_tooltip')) {
 		const t = node._tooltip as
 			| Reactive<string>
@@ -196,12 +190,25 @@ function resolveTooltip(node: object): Record<string, unknown> | undefined {
 			| undefined
 		if (t !== undefined) {
 			const content = typeof t === 'function' ? t(wrappedState.value) : resolve(t)
-			if (content) return { ...TOOLTIP_BASE, content }
+			if (content) return { text: content }
 		}
 	}
 	const hasSegments = hasCap(node, '_segments')
 	const html = hasSegments ? metaCtx?.value.tooltipHtml.get(node) : undefined
-	return html ? { ...TOOLTIP_BASE, content: html, html: true } : undefined
+	return html ? { html } : undefined
+}
+
+function tooltipClass(): string {
+	return props.flex ? 'inline-flex max-w-full' : 'block w-full'
+}
+
+function tooltipText(node: object): string | undefined {
+	const tooltip = resolveTooltip(node)
+	return tooltip?.html ? undefined : tooltip?.text
+}
+
+function tooltipHtml(node: object): string | undefined {
+	return resolveTooltip(node)?.html
 }
 
 function clickButton(node: object): void {
@@ -222,13 +229,10 @@ function tweakEnabled(tweak: TweakDef, node: RenderableValueNode): boolean {
 	return result !== null && result !== undefined && result !== tweakCurrent(node)
 }
 
-function tweakTooltip(
-	tweak: TweakDef,
-	node: RenderableValueNode,
-): Record<string, unknown> | undefined {
+function tweakTooltip(tweak: TweakDef, node: RenderableValueNode): string | undefined {
 	if (!tweakEnabled(tweak, node)) return undefined
 	const content = tweakResult(tweak, node)
-	return content ? { ...TOOLTIP_BASE, content: String(content) } : undefined
+	return content != null ? String(content) : undefined
 }
 
 function tweakLabel(tweak: TweakDef, node: RenderableValueNode): string {
@@ -326,50 +330,64 @@ watchEffect(() => {
 					</template>
 
 					<template v-else-if="hasValueCap(item) && hasIdCap(item)">
-						<component
-							:is="resolveComponent(item as RenderableValueNode)"
-							v-if="resolveComponent(item as RenderableValueNode) === ActionButton"
-							v-bind="componentProps(item as RenderableValueNode)"
-							:[modelProp(item)]="
-								getEffectiveValue(item as RenderableValueNode, state[item.id], wrappedState)
-							"
-							@[updateEvent(item)]="(v: unknown) => updateValue(item as RenderableValueNode, v)"
-						/>
-						<component
-							:is="resolveComponent(item as RenderableValueNode)"
-							v-else
-							v-tooltip="resolveTooltip(item)"
-							v-bind="componentProps(item as RenderableValueNode)"
-							:[modelProp(item)]="
-								getEffectiveValue(item as RenderableValueNode, state[item.id], wrappedState)
-							"
-							@[updateEvent(item)]="(v: unknown) => updateValue(item as RenderableValueNode, v)"
-						/>
+						<Tooltip
+							:class="tooltipClass()"
+							placement="top"
+							:disabled="!resolveTooltip(item)"
+							:text="tooltipText(item)"
+						>
+							<component
+								:is="resolveComponent(item as RenderableValueNode)"
+								v-bind="componentProps(item as RenderableValueNode)"
+								:[modelProp(item)]="
+									getEffectiveValue(item as RenderableValueNode, state[item.id], wrappedState)
+								"
+								@[updateEvent(item)]="(v: unknown) => updateValue(item as RenderableValueNode, v)"
+							/>
+							<template v-if="tooltipHtml(item)" #popper>
+								<div class="tooltip-markdown font-normal text-primary" v-html="tooltipHtml(item)" />
+							</template>
+						</Tooltip>
 						<template
 							v-for="(tweak, tIdx) in (item as RenderableValueNode)._tweaks ?? []"
 							:key="`tweak-${tIdx}`"
 						>
-							<IconButton
-								v-tooltip="tweakTooltip(tweak, item as RenderableValueNode)"
-								:label="tweakLabel(tweak, item as RenderableValueNode)"
-								:disabled="!tweakEnabled(tweak, item as RenderableValueNode)"
-								@click="applyTweak(tweak, item as RenderableValueNode)"
+							<Tooltip
+								class="inline-flex"
+								placement="top"
+								:disabled="!tweakTooltip(tweak, item as RenderableValueNode)"
+								:text="tweakTooltip(tweak, item as RenderableValueNode)"
 							>
-								<component :is="tweak.icon" />
-							</IconButton>
+								<IconButton
+									:label="tweakLabel(tweak, item as RenderableValueNode)"
+									:disabled="!tweakEnabled(tweak, item as RenderableValueNode)"
+									@click="applyTweak(tweak, item as RenderableValueNode)"
+								>
+									<component :is="tweak.icon" />
+								</IconButton>
+							</Tooltip>
 						</template>
 					</template>
 
 					<template v-else-if="hasCap(item, '_onClick')">
-						<Button
-							v-tooltip="resolveTooltip(item)"
-							:disabled="!isEnabled(item as any)"
-							:aria-label="(item as any)._icon ? (item as any).label : undefined"
-							@click="clickButton(item)"
+						<Tooltip
+							:class="tooltipClass()"
+							placement="top"
+							:disabled="!resolveTooltip(item)"
+							:text="tooltipText(item)"
 						>
-							<component :is="(item as any)._icon" v-if="(item as any)._icon" />
-							<template v-else>{{ (item as any).label }}</template>
-						</Button>
+							<Button
+								:disabled="!isEnabled(item as any)"
+								:aria-label="(item as any)._icon ? (item as any).label : undefined"
+								@click="clickButton(item)"
+							>
+								<component :is="(item as any)._icon" v-if="(item as any)._icon" />
+								<template v-else>{{ (item as any).label }}</template>
+							</Button>
+							<template v-if="tooltipHtml(item)" #popper>
+								<div class="tooltip-markdown font-normal text-primary" v-html="tooltipHtml(item)" />
+							</template>
+						</Tooltip>
 					</template>
 				</div>
 			</template>
@@ -399,3 +417,8 @@ watchEffect(() => {
 		</template>
 	</div>
 </template>
+<style scoped>
+.tooltip-markdown > :first-child > :first-child {
+	padding-top: 0;
+}
+</style>

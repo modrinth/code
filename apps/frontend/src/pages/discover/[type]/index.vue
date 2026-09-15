@@ -16,7 +16,6 @@ import {
 	BrowseInstallHeader,
 	BrowsePageLayout,
 	BrowseSidebar,
-	commonMessages,
 	CreationFlowModal,
 	defineMessages,
 	formatProjectTypeSentence,
@@ -30,6 +29,7 @@ import {
 	useStickyObserver,
 	useVIntl,
 } from '@modrinth/ui'
+import { commonMessages } from '@modrinth/ui/src/utils/common-messages'
 import { cycleValue } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useTimeoutFn } from '@vueuse/core'
@@ -604,7 +604,7 @@ const { isStuck: isInstallHeaderStuck } = useStickyObserver(
 	<div
 		v-if="installContext"
 		ref="stickyInstallHeaderRef"
-		class="sticky top-0 z-20 -mx-6 border-0 border-solid border-divider bg-surface-1 px-6 pt-4"
+		class="sticky top-0 z-20 -mx-6 mb-2 border-0 border-solid border-divider bg-surface-1 px-6 pt-4"
 		:class="[isInstallHeaderStuck ? 'border-t' : '']"
 	>
 		<BrowseInstallHeader divider bottom-padding />
@@ -621,8 +621,11 @@ const { isStuck: isInstallHeaderStuck } = useStickyObserver(
 		"
 	>
 		<section
-			class="mt-6 flex min-w-0 flex-col gap-2 sm:mt-0"
-			:class="cosmetics.rightSearchLayout ? 'lg:order-1' : 'lg:order-2'"
+			class="flex min-w-0 flex-col gap-2"
+			:class="[
+				{ 'mt-6 sm:mt-0': !installContext },
+				cosmetics.rightSearchLayout ? 'lg:order-1' : 'lg:order-2',
+			]"
 		>
 			<BrowsePageLayout>
 				<template #display-mode-icon>

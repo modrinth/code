@@ -225,6 +225,7 @@ pub(super) async fn apply_shared_instance_update(
     let plan = SharedInstanceApplyPlan::build(&metadata, data, state).await?;
 
     if plan.configuration_changed {
+        crate::api::instance::prepare_instance_update(instance_id).await?;
         remove_existing_shared_instance_content(instance_id, state).await?;
         Box::pin(apply_shared_instance_content(
             job_id,
@@ -234,6 +235,23 @@ pub(super) async fn apply_shared_instance_update(
             data,
         ))
         .await?;
+        if data.modpack.is_none() {
+            if let Err(error) =
+                crate::api::instance::capture_game_options_pack_base(
+                    instance_id,
+                    None,
+                )
+                .await
+            {
+                tracing::warn!(
+                    "The shared instance was updated, but its local options.txt could not be restored after removing the previous pack: {error}"
+                );
+            }
+            crate::api::instance::reconcile_instance_after_pack_update(
+                instance_id,
+            )
+            .await?;
+        }
         return Ok(());
     }
 
@@ -579,6 +597,14 @@ pub(super) async fn apply_shared_instance_content(
     .await?;
 
     if let Some(modpack) = data.modpack.clone() {
+        crate::api::instance::edit(
+            instance_id,
+            crate::state::EditInstance {
+                link: Some(shared_instance_link(Some(&modpack))),
+                ..Default::default()
+            },
+        )
+        .await?;
         let location = shared_instance_pack_location(modpack);
         update_progress(
             job_id,
@@ -704,7 +730,6 @@ pub(super) async fn remove_existing_shared_instance_content(
     instance_id: &str,
     state: &State,
 ) -> crate::Result<()> {
-    let _content_lock = state.lock_instance_content(instance_id).await;
     let metadata = crate::state::instances::commands::get_instance_metadata(
         instance_id,
         &state.pool,
@@ -718,49 +743,23 @@ pub(super) async fn remove_existing_shared_instance_content(
         &state.pool,
     )
     .await?;
-    let files = content_rows::get_instance_files(instance_id, &state.pool)
-        .await?
+    let managed_ids = entries
         .into_iter()
-        .map(|file| (file.id.clone(), file))
-        .collect::<std::collections::HashMap<_, _>>();
-    let base = state
-        .directories
-        .instances_dir()
-        .join(&metadata.instance.path);
-
-    let mut removed_file_ids = HashSet::new();
-    for entry in entries {
-        if !entry.source_kind.is_shared_instance_managed() {
-            continue;
+        .filter(|entry| entry.source_kind.is_shared_instance_managed())
+        .filter_map(|entry| entry.file_id)
+        .collect::<HashSet<_>>();
+    for file in
+        content_rows::get_instance_files(instance_id, &state.pool).await?
+    {
+        if managed_ids.contains(&file.id) {
+            crate::state::instances::commands::remove_project(
+                instance_id,
+                &file.relative_path,
+                state,
+            )
+            .await?;
         }
-
-        let Some(file_id) = entry.file_id else {
-            continue;
-        };
-        if !removed_file_ids.insert(file_id.clone()) {
-            continue;
-        }
-
-        let Some(file) = files.get(&file_id) else {
-            continue;
-        };
-        crate::util::io::remove_file(base.join(&file.relative_path)).await?;
-        let mut tx = state.pool.begin().await?;
-        content_rows::remove_content_entries_for_file(
-            &metadata.applied_content_set.id,
-            &file.id,
-            &mut tx,
-        )
-        .await?;
-        content_rows::remove_instance_file_by_relative_path(
-            instance_id,
-            &file.relative_path,
-            &mut tx,
-        )
-        .await?;
-        tx.commit().await?;
     }
-
     Ok(())
 }
 

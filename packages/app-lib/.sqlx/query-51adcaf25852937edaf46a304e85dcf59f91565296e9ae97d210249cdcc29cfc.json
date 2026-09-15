@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT revision AS \"revision!: i64\",\n\t\t\tcatalog_revision AS \"catalog_revision!: i64\"\n\t\tFROM synced_game_option_state\n\t\tWHERE singleton = 1\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "revision!: i64",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "catalog_revision!: i64",
+        "ordinal": 1,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "51adcaf25852937edaf46a304e85dcf59f91565296e9ae97d210249cdcc29cfc"
+}

@@ -8,17 +8,20 @@
   "app.action-bar.downloads": {
     "message": "Downloads"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "Skjul aktive downloads"
+  },
   "app.action-bar.hide-more-running-instances": {
     "message": "Gem flere kørende instances"
   },
   "app.action-bar.install.copied-details": {
-    "message": "Kopiere"
+    "message": "Kopieret"
   },
   "app.action-bar.install.copy-details": {
     "message": "Kopier detaljer"
   },
   "app.action-bar.install.dismiss": {
-    "message": "Tilsidesæt"
+    "message": "Annuller"
   },
   "app.action-bar.install.open-instance": {
     "message": "Åben instance"
@@ -35,11 +38,14 @@
   "app.action-bar.install.summary.canceled": {
     "message": "Annulleret"
   },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Oprydning fuldførte ikke"
+  },
   "app.action-bar.install.summary.content-download-failed": {
-    "message": "Kunne ikke download filer"
+    "message": "Kunne ikke downloade filer"
   },
   "app.action-bar.install.summary.corrupt-download": {
-    "message": "Downloaded filer er korrupt"
+    "message": "Downloadet fil er korrupt"
   },
   "app.action-bar.install.summary.could-not-save-files": {
     "message": "Kunne ikke gemme filer"
@@ -51,16 +57,16 @@
     "message": "Instance kunne ikke blive fundet"
   },
   "app.action-bar.install.summary.invalid-file-path": {
-    "message": "Fil sti er ugyldig"
+    "message": "Filstien er ugyldig"
   },
   "app.action-bar.install.summary.invalid-modpack": {
     "message": "Modpack data ugyldig"
   },
   "app.action-bar.install.summary.invalid-modpack-files": {
-    "message": "Modpack har ugyldig metadata"
+    "message": "Modpack filer har ugyldig metadata"
   },
   "app.action-bar.install.summary.java-setup-failed": {
-    "message": "Java setup kunne ikke færdiggøres"
+    "message": "Java opsætning kunne ikke fuldføres"
   },
   "app.action-bar.install.summary.loader-setup-failed": {
     "message": "Loader setup fejlede"
@@ -69,13 +75,13 @@
     "message": "Kunne ikke opdatere lokal data"
   },
   "app.action-bar.install.summary.minecraft-setup-failed": {
-    "message": "Minecraft setup fejlede"
+    "message": "Opsætning af Minecraft fejlede"
   },
   "app.action-bar.install.summary.modrinth-unreachable": {
     "message": "Kunne ikke få forbindelse til Modrinth"
   },
   "app.action-bar.install.summary.no-write-permission": {
-    "message": "Ingen adgang til at skrive"
+    "message": "Ingen tilladelse til at skrive"
   },
   "app.action-bar.install.summary.pack-download-failed": {
     "message": "Kunne ikke download pack"
@@ -88,9 +94,6 @@
   },
   "app.action-bar.install.updating-shared-content": {
     "message": "Opdatere delt indhold"
-  },
-  "app.action-bar.installs": {
-    "message": "Installeringer"
   },
   "app.action-bar.make-primary-instance": {
     "message": "Gør til primære instance"
@@ -105,7 +108,10 @@
     "message": "Primære instance"
   },
   "app.action-bar.reload-to-update": {
-    "message": "Genindlæs for at opdater"
+    "message": "Genindlæs for at opdatere"
+  },
+  "app.action-bar.show-downloads": {
+    "message": "Vis aktive downloads"
   },
   "app.action-bar.show-more-running-instances": {
     "message": "Vis flere kørende instances"
@@ -126,10 +132,13 @@
     "message": "Vis logs"
   },
   "app.ads-consent.accept": {
-    "message": "Tillad alle"
+    "message": "Accepter alle"
   },
   "app.ads-consent.body": {
     "message": "Reklamer gør Modrinth muligt og finansiere skaber udbetalinger. Vores partnere må gemme og tilgå cookies i appen for at personliggøre reklamer og måle effektivitet."
+  },
+  "app.ads-consent.manage": {
+    "message": "Administrer præferencer"
   },
   "app.ads-consent.reject": {
     "message": "Afvis alle"
@@ -137,26 +146,50 @@
   "app.ads-consent.title": {
     "message": "Dit privatliv og hvordan reklamer hjælper Modrinth"
   },
+  "app.appearance-settings.compact-mode.description": {
+    "message": "Vis biblioteksinstanser i et kompakt række-layout."
+  },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "Kompakt tilstand"
+  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Hjem"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Bibliotek"
   },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Skjul dit brugernavn over spillerforhåndsvisning på Skin selector-siden."
+  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Gem nametag"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Minimér Modrinth App når Minecraft starter."
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimer app"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Vis hvor længe du har spillet hver instans."
+  },
   "app.appearance-settings.show-play-time.title": {
-    "message": "Vis tid spillet"
+    "message": "Vis spilletid"
+  },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Spring bekræftelser over for handlinger med lav risiko, såsom duplikerede installationer, normal sletning af indhold, masseopdateringer, frakobling, og reparationer. Advarsler om farlige handlinger vises altid."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Spring ikke nødvendige advarseler over"
   },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Skjul som standard højre sidepanel og tilføj en knap for at vise eller skjule det."
+  },
   "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Gem højre sidebar"
+    "message": "Skjul højre sidebar"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Vis en sikkerhedsadvarsel, før du installerer en Modrinth Pack (.mrpack), der ikke er hostet på Modrinth."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Advar mig før jeg installere en ukendt modpacks"
@@ -165,10 +198,25 @@
     "message": "Minecraft authentication servere kan måske være nede lige nu. Tjek din internet forbindelse og prøv igen senere."
   },
   "app.auth-servers.unreachable.header": {
-    "message": "Kan ikke nå autentificeringsservere"
+    "message": "Kan ikke nå godkendelsesserverne"
+  },
+  "app.behavior-settings.confirmations.title": {
+    "message": "Bekræftelser"
   },
   "app.behavior-settings.content.title": {
     "message": "Hjem og indhold"
+  },
+  "app.behavior-settings.startup-and-navigation.title": {
+    "message": "Opstart og navigation"
+  },
+  "app.behavior-settings.sync-across-devices.description": {
+    "message": "Brug disse adfærdsindstillinger overalt du er logget på. Slå dette fra for at holde separate indstillinger på denne enhed."
+  },
+  "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Log ind på en Modrinth-konto for at synkronisere indstillinger."
+  },
+  "app.behavior-settings.sync-across-devices.title": {
+    "message": "Synkroniser adfærd på tværs af enheder"
   },
   "app.browse.add-servers-to-instance": {
     "message": "Tilføjet server til instance"
@@ -180,7 +228,7 @@
     "message": "Tilføj til instance"
   },
   "app.browse.add-to-instance-name": {
-    "message": "Tilføjet til {instanceName}"
+    "message": "Tilføj til {instanceName}"
   },
   "app.browse.added": {
     "message": "Tilføjet"
@@ -203,14 +251,44 @@
   "app.browse.hide-installed-modpacks": {
     "message": "Skjul allerede installeret"
   },
+  "app.browse.project-actions.label": {
+    "message": "Projekthandlinger"
+  },
+  "app.browse.project-type.data-packs": {
+    "message": "Datapakker"
+  },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
+  },
+  "app.browse.project-type.mods": {
+    "message": "Mods"
+  },
+  "app.browse.project-type.resource-packs": {
+    "message": "Ressourcepakker"
+  },
+  "app.browse.project-type.servers": {
+    "message": "Servere"
+  },
+  "app.browse.project-type.shaders": {
+    "message": "Shaders"
+  },
+  "app.browse.server-instance-content-warning": {
+    "message": "Tilføjelse af indhold kan forhindre dig i at deltage i denne server. Ethvert indhold du tilføjer, vil blive fjernet når det administrerede serverindhold opdateres."
   },
   "app.browse.server.installing": {
     "message": "Installere"
   },
   "app.content-install.no-compatible-versions": {
     "message": "Ingen tilgængelige versioner passer til {compatibilityLabel}. Vælg en version for at installere. Afhængigheder bliver ikke installeret automatisk."
+  },
+  "app.content.desync-pack": {
+    "message": "Desync"
+  },
+  "app.content.sync-data-packs-disabled": {
+    "message": "Slå først synkronisering af datapakke til i app-indstillingerne."
+  },
+  "app.content.sync-pack": {
+    "message": "Synkronisér"
   },
   "app.export-modal.description-placeholder": {
     "message": "Indtast modpack beskrivelse..."
@@ -881,9 +959,6 @@
   "instance.settings.tabs.general.update-channel.beta": {
     "message": "Beta"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Startkommandoer giver avancerede brugere mulighed for at køre bestemte systemkommandoer før og efter spillet startes."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Post-exit"
   },
@@ -901,9 +976,6 @@
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Indtast pre-launch kommando..."
-  },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Spille lunch hooks"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Wrapper"
@@ -923,29 +995,11 @@
   "instance.settings.tabs.java.enter-java-arguments": {
     "message": "Indskriv Java argumenter..."
   },
-  "instance.settings.tabs.java.environment-variables": {
-    "message": "Omgivelses variabler"
-  },
   "instance.settings.tabs.java.hooks": {
     "message": "Hooks"
   },
-  "instance.settings.tabs.java.java-arguments": {
-    "message": "Java argumenter"
-  },
-  "instance.settings.tabs.java.java-installation": {
-    "message": "Java installation"
-  },
-  "instance.settings.tabs.java.java-memory": {
-    "message": "Allokeret hukommelse"
-  },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/vej/til/java"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Vindue"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Brugerdefineret vindue indstillinger"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Fuld skærm"

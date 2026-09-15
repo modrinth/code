@@ -19,12 +19,7 @@
 			v-if="hiddenCount > 0"
 			theme="dismissable-prompt"
 			class="inline-flex shrink-0 items-center"
-			:triggers="['hover', 'focus']"
-			:popper-triggers="['hover', 'focus']"
-			popper-class="v-popper--interactive audit-log-entity-list-popper"
 			placement="top"
-			:delay="{ show: 200, hide: 100 }"
-			no-auto-focus
 		>
 			<button
 				type="button"
@@ -34,7 +29,7 @@
 				{{ formatMessage(messages.hiddenCount, { count: hiddenCount }) }}
 			</button>
 			<template #popper>
-				<div class="relative max-w-[22rem]">
+				<div class="relative max-w-[22rem] -mr-4">
 					<Transition
 						enter-active-class="transition-all duration-200 ease-out"
 						enter-from-class="opacity-0 max-h-0"
@@ -83,8 +78,9 @@
 </template>
 
 <script setup lang="ts">
-import { Tooltip } from 'floating-vue'
 import { computed, ref } from 'vue'
+
+import { Tooltip } from '#ui/components/floating'
 
 import { defineMessages, useVIntl } from '../../../../composables/i18n'
 import { useScrollIndicator } from '../../../../composables/scroll-indicator'
@@ -137,11 +133,3 @@ const hiddenTooltip = computed(() => {
 	}).format(hiddenEntities.value.map((entity) => entity.label))
 })
 </script>
-
-<style lang="scss">
-.v-popper__popper.v-popper--theme-dismissable-prompt.audit-log-entity-list-popper {
-	.v-popper__inner {
-		padding-right: 0 !important;
-	}
-}
-</style>

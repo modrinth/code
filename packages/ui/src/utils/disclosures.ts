@@ -2,6 +2,7 @@ import type { Labrinth } from '@modrinth/api-client'
 
 export const PROJECT_DISCLOSURE_TYPES = [
 	'ai_content',
+	'ai_functionality',
 	'advertisements',
 	'epilepsy_triggers',
 	'system_interactions',
@@ -15,7 +16,6 @@ export const AI_USAGE_TYPES = [
 	'code',
 	'assets',
 	'text',
-	'functionality',
 ] as const satisfies readonly Labrinth.Projects.v3.AiUsage[]
 
 export const TELEMETRY_CONSENT_TYPES = [
@@ -39,6 +39,7 @@ export const DISCLOSURE_SUPPORTED_PROJECT_TYPES: Record<
 	readonly (typeof ALL_CONTENT_PROJECT_TYPES)[number][]
 > = {
 	ai_content: ALL_CONTENT_PROJECT_TYPES,
+	ai_functionality: ALL_CONTENT_PROJECT_TYPES,
 	advertisements: ALL_CONTENT_PROJECT_TYPES,
 	epilepsy_triggers: ALL_CONTENT_PROJECT_TYPES,
 	derivative_work: ALL_CONTENT_PROJECT_TYPES,

@@ -70,13 +70,7 @@
 								date: date.date ? formatDate(date.date) : '',
 							})
 						}}
-						<Tooltip
-							theme="dismissable-prompt"
-							class="inline-flex shrink-0"
-							:triggers="['hover', 'focus']"
-							no-auto-focus
-							:aria-id="`${baseId}-date-segment-tooltip-${i}`"
-						>
+						<Tooltip class="inline-flex shrink-0">
 							<nuxt-link
 								class="inline-flex items-center justify-center text-link"
 								to="/legal/cmp-info#pending"
@@ -84,10 +78,13 @@
 								<UnknownIcon class="inline-block size-4 align-middle md:size-5" />
 							</nuxt-link>
 							<template #popper>
-								<div class="w-[250px] font-semibold text-contrast">
-									{{ formatMessage(messages.estimatedTooltip1) }}
-									<br /><br />
-									{{ formatMessage(messages.estimatedTooltip2) }}
+								<div class="w-[250px]">
+									<p class="mb-2 mt-0">
+										{{ formatMessage(messages.estimatedTooltip1) }}
+									</p>
+									<p class="m-0">
+										{{ formatMessage(messages.estimatedTooltip2) }}
+									</p>
 								</div>
 							</template>
 						</Tooltip>
@@ -105,16 +102,10 @@
 							class="zone--striped-small zone--striped--gray my-auto block size-4 rounded-full bg-button-bg opacity-90 md:size-5"
 						></span>
 						{{ formatMessage(messages.processing) }}
-						<Tooltip
-							theme="dismissable-prompt"
-							class="inline-flex shrink-0"
-							:triggers="['hover', 'focus']"
-							no-auto-focus
-							:aria-id="`${baseId}-processing-tooltip`"
-						>
+						<Tooltip class="inline-flex shrink-0">
 							<InProgressIcon class="inline-block size-4 align-middle md:size-5" />
 							<template #popper>
-								<div class="w-[250px] font-semibold text-contrast">
+								<div class="w-[250px]">
 									{{ formatMessage(messages.processingTooltip) }}
 								</div>
 							</template>
@@ -275,13 +266,13 @@ import { ArrowUpRightIcon, InProgressIcon, UnknownIcon } from '@modrinth/assets'
 import {
 	defineMessages,
 	injectModrinthClient,
+	Tooltip,
 	useFormatDateTime,
 	useFormatMoney,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
-import { Tooltip } from 'floating-vue'
 
 import { useUserCountry } from '@/composables/country.ts'
 import CreatorWithdrawModal from '~/components/ui/dashboard/CreatorWithdrawModal.vue'
@@ -303,8 +294,6 @@ type RevenueBarSegment = {
 }
 
 const hoveredSeg = ref<string | null>(null)
-
-const baseId = useId()
 
 const withdrawModal = ref<InstanceType<typeof CreatorWithdrawModal>>()
 async function openWithdrawModal() {
@@ -673,16 +662,5 @@ $flash-colors: 'green', 'blue', 'purple', 'orange', 'red', 'gray';
 		padding: 2px;
 		pointer-events: none;
 	}
-}
-</style>
-
-<style>
-.v-popper--theme-dismissable-prompt .v-popper__inner {
-	border-color: transparent !important;
-}
-
-.v-popper--theme-dismissable-prompt .v-popper__arrow-outer,
-.v-popper--theme-dismissable-prompt .v-popper__arrow-inner {
-	border-color: transparent !important;
 }
 </style>

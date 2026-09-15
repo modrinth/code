@@ -734,6 +734,18 @@ export namespace Archon {
 		}
 
 		export namespace v1 {
+			export type WorldDownloadMethod =
+				| {
+						method_type: 'direct_node_download'
+				  }
+				| {
+						method_type: 'backup'
+						backup_id: string
+				  }
+				| {
+						method_type: 'unavailable'
+				  }
+
 			export type ServerFull = {
 				id: string
 				name: string
@@ -765,6 +777,7 @@ export namespace Archon {
 							region: string
 							region_should_be_user_displayed: boolean
 							hostname: string
+							url_host: string
 							is_decommissioned_node: boolean
 						}
 				  }
@@ -777,6 +790,7 @@ export namespace Archon {
 				name: string
 				created_at: string
 				is_active: boolean
+				download_method: WorldDownloadMethod
 				/**
 				 * @deprecated Prefer `client.archon.backups_queue_v1.list()` for queue-aware backup state.
 				 */

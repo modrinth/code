@@ -35,6 +35,12 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "통계 보기"
   },
+  "app.appearance-settings.native-decorations.description": {
+    "defaultMessage": "운영 체제의 제목 표시줄 및 창 제어 기능을 사용합니다. 앱 재시작이 필요합니다."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "defaultMessage": "시스템 창 프레임"
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "서버 설정 불러오기 실패"
   },
@@ -161,6 +167,9 @@
   "button.continue": {
     "defaultMessage": "계속"
   },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "클립보드에 복사되었습니다"
+  },
   "button.copy-filename": {
     "defaultMessage": "파일 이름 복사"
   },
@@ -187,6 +196,9 @@
   },
   "button.download": {
     "defaultMessage": "다운로드"
+  },
+  "button.download-files": {
+    "defaultMessage": "파일 다운로드"
   },
   "button.downloading": {
     "defaultMessage": "다운로드 중"
@@ -346,6 +358,15 @@
   },
   "collections.label.private": {
     "defaultMessage": "비공개"
+  },
+  "console.actions.collapse": {
+    "defaultMessage": "접기"
+  },
+  "console.actions.expand": {
+    "defaultMessage": "펼치기"
+  },
+  "console.actions.share": {
+    "defaultMessage": "공유"
   },
   "content-type.content.lowercase": {
     "defaultMessage": "콘텐츠"
@@ -575,6 +596,9 @@
   "content.managed-card.modpack-content": {
     "defaultMessage": "모드팩 콘텐츠"
   },
+  "content.managed-card.provided-by": {
+    "defaultMessage": "제공"
+  },
   "content.managed-card.server-suffix": {
     "defaultMessage": "서버"
   },
@@ -631,6 +655,9 @@
   },
   "content.metadata-filter.update.available": {
     "defaultMessage": "업데이트 가능"
+  },
+  "content.metadata-filter.warning.none": {
+    "defaultMessage": "경고 없음"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "경고"
@@ -793,6 +820,9 @@
   },
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "게임 버전 검색..."
+  },
+  "creation-flow.modal.custom-setup.icon.select": {
+    "defaultMessage": "업로드"
   },
   "creation-flow.modal.custom-setup.loader-version-type.latest": {
     "defaultMessage": "최신"
@@ -968,6 +998,15 @@
   "creation-flow.modal.modpack.search.placeholder": {
     "defaultMessage": "모드팩 검색"
   },
+  "creation-flow.modal.project.search.create-instance": {
+    "defaultMessage": "인스턴스 생성"
+  },
+  "creation-flow.modal.project.search.install-modpack": {
+    "defaultMessage": "모드팩 설치"
+  },
+  "creation-flow.modal.project.search.no-results": {
+    "defaultMessage": "검색 결과 없음"
+  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "로더와 게임 버전을 선택하여 처음부터 시작합니다."
   },
@@ -979,6 +1018,9 @@
   },
   "creation-flow.modal.setup-type.option.import-instance.title": {
     "defaultMessage": "인스턴스 가져오기"
+  },
+  "creation-flow.modal.setup-type.option.upload-modpack.title": {
+    "defaultMessage": "모드팩 업로드"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "모드나 플러그인이 없는 기본 Minecraft입니다."
@@ -1328,6 +1370,18 @@
   "files.create-modal.placeholder-file": {
     "defaultMessage": "예: config.yml"
   },
+  "files.create-zip-modal.create-button": {
+    "defaultMessage": "ZIP 생성"
+  },
+  "files.create-zip-modal.header": {
+    "defaultMessage": "ZIP 생성"
+  },
+  "files.create-zip-modal.name-label": {
+    "defaultMessage": "압축 파일 이름"
+  },
+  "files.create-zip-modal.required": {
+    "defaultMessage": "압축 파일 이름을 입력하세요."
+  },
   "files.delete-modal.deleting-name": {
     "defaultMessage": "\"{name}\" 삭제"
   },
@@ -1439,6 +1493,9 @@
   "files.layout.busy-warning": {
     "defaultMessage": "파일 작업이 진행 중인 동안 다른 파일 작업을 수행할 수 없습니다."
   },
+  "files.layout.create-zip": {
+    "defaultMessage": "ZIP 생성"
+  },
   "files.layout.dry-run-failed-text": {
     "defaultMessage": "실행 확인 중 오류 발생"
   },
@@ -1520,6 +1577,18 @@
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": ".zip URL에서 업로드"
   },
+  "files.operations.compressed": {
+    "defaultMessage": "{progress}% 압축됨"
+  },
+  "files.operations.compressing": {
+    "defaultMessage": "{source} 생성 중"
+  },
+  "files.operations.compressing-completed": {
+    "defaultMessage": "{source} 생성 완료"
+  },
+  "files.operations.compressing-failed": {
+    "defaultMessage": "{source} 생성 실패"
+  },
   "files.operations.current-file": {
     "defaultMessage": "현재 파일: {file}"
   },
@@ -1543,6 +1612,9 @@
   },
   "files.rename-modal.new-name-label": {
     "defaultMessage": "새 이름"
+  },
+  "files.row.create-zip": {
+    "defaultMessage": "ZIP 생성"
   },
   "files.row.item-count": {
     "defaultMessage": "항목 {count}개"
@@ -1672,6 +1744,30 @@
   },
   "files.zip-url-modal.zip-header": {
     "defaultMessage": "URL에서 .zip 파일 업로드"
+  },
+  "filter-bar.add": {
+    "defaultMessage": "추가"
+  },
+  "filter-bar.clear": {
+    "defaultMessage": "초기화"
+  },
+  "filter-bar.clear-named-filter": {
+    "defaultMessage": "{name} 필터 초기화"
+  },
+  "filter-bar.filtered-by": {
+    "defaultMessage": "필터 기준"
+  },
+  "filter-bar.no-options": {
+    "defaultMessage": "이용 가능한 설정이 없습니다."
+  },
+  "filter-bar.no-search-results": {
+    "defaultMessage": "설정을 찾을 수 없습니다."
+  },
+  "filter-bar.search-placeholder": {
+    "defaultMessage": "검색..."
+  },
+  "filter-bar.select-all": {
+    "defaultMessage": "전체 선택"
   },
   "form.label.address-line": {
     "defaultMessage": "주소"
@@ -1910,6 +2006,90 @@
   "icon-select.select": {
     "defaultMessage": "아이콘 선택"
   },
+  "image-viewer.close": {
+    "defaultMessage": "닫기"
+  },
+  "image-viewer.edit": {
+    "defaultMessage": "수정"
+  },
+  "image-viewer.editor.colour": {
+    "defaultMessage": "색상"
+  },
+  "image-viewer.editor.crop.dimensions": {
+    "defaultMessage": "{width} x {height} px"
+  },
+  "image-viewer.editor.eraser.area": {
+    "defaultMessage": "영역"
+  },
+  "image-viewer.editor.eraser.element": {
+    "defaultMessage": "요소"
+  },
+  "image-viewer.editor.eraser.mode": {
+    "defaultMessage": "지우개 모드"
+  },
+  "image-viewer.editor.image-editing-tools": {
+    "defaultMessage": "사진 편집 도구"
+  },
+  "image-viewer.editor.more-save-options": {
+    "defaultMessage": "추가 저장 설정"
+  },
+  "image-viewer.editor.overwrite": {
+    "defaultMessage": "덮어쓰기"
+  },
+  "image-viewer.editor.redo": {
+    "defaultMessage": "다시 실행"
+  },
+  "image-viewer.editor.save-as-new": {
+    "defaultMessage": "복사본 저장"
+  },
+  "image-viewer.editor.save-image": {
+    "defaultMessage": "이미지 저장"
+  },
+  "image-viewer.editor.size": {
+    "defaultMessage": "크기"
+  },
+  "image-viewer.editor.tool.arrow": {
+    "defaultMessage": "화살표"
+  },
+  "image-viewer.editor.tool.ellipse": {
+    "defaultMessage": "타원"
+  },
+  "image-viewer.editor.tool.eraser": {
+    "defaultMessage": "지우개"
+  },
+  "image-viewer.editor.tool.highlight": {
+    "defaultMessage": "강조"
+  },
+  "image-viewer.editor.tool.pen": {
+    "defaultMessage": "펜"
+  },
+  "image-viewer.editor.tool.rectangle": {
+    "defaultMessage": "직사각형"
+  },
+  "image-viewer.editor.tool.select": {
+    "defaultMessage": "선택"
+  },
+  "image-viewer.editor.tool.text": {
+    "defaultMessage": "텍스트"
+  },
+  "image-viewer.editor.undo": {
+    "defaultMessage": "실행 취소"
+  },
+  "image-viewer.editor.width": {
+    "defaultMessage": "너비"
+  },
+  "image-viewer.editor.zoom-in": {
+    "defaultMessage": "확대"
+  },
+  "image-viewer.editor.zoom-out": {
+    "defaultMessage": "축소"
+  },
+  "image-viewer.next": {
+    "defaultMessage": "다음 이미지"
+  },
+  "image-viewer.previous": {
+    "defaultMessage": "이전 이미지"
+  },
   "input.search-version.placeholder": {
     "defaultMessage": "버전 검색..."
   },
@@ -2102,6 +2282,9 @@
   "instances.content-install.header": {
     "defaultMessage": "프로젝트 설치"
   },
+  "instances.content-install.hide-unavailable": {
+    "defaultMessage": "이용 불가능한 항목 숨기기"
+  },
   "instances.content-install.incompatible-tooltip": {
     "defaultMessage": "이 인스턴스는 이 프로젝트에서 지원하는 로더나 게임 버전과 다른 것을 사용하고 있습니다."
   },
@@ -2132,8 +2315,20 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "인스턴스 검색"
   },
+  "instances.content-install.show-unavailable": {
+    "defaultMessage": "이용 불가능한 항목 표시"
+  },
+  "instances.managed-content-modal.disabled": {
+    "defaultMessage": "비활성화됨"
+  },
+  "instances.managed-content-modal.download-file": {
+    "defaultMessage": "파일 다운로드"
+  },
   "instances.managed-content-modal.empty-title": {
     "defaultMessage": "콘텐츠를 찾을 수 없습니다"
+  },
+  "instances.managed-content-modal.enabled": {
+    "defaultMessage": "활성화됨"
   },
   "instances.managed-content-modal.external-content": {
     "defaultMessage": "외부"
@@ -2141,11 +2336,17 @@
   "instances.managed-content-modal.external-content-description": {
     "defaultMessage": "이 파일은 Modrinth에 게시되지 않았습니다."
   },
+  "instances.managed-content-modal.header": {
+    "defaultMessage": "콘텐츠 관리"
+  },
   "instances.managed-content-modal.loading": {
     "defaultMessage": "콘텐츠 불러오는 중..."
   },
   "instances.managed-content-modal.open-in-slicer": {
     "defaultMessage": "Slicer에서 열기"
+  },
+  "instances.managed-content-modal.warnings": {
+    "defaultMessage": "경고"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "현재"
@@ -2296,6 +2497,9 @@
   },
   "label.error": {
     "defaultMessage": "오류"
+  },
+  "label.explanation": {
+    "defaultMessage": "설명"
   },
   "label.extract-failed": {
     "defaultMessage": "내보내기 실패"
@@ -2476,6 +2680,9 @@
   },
   "label.yes": {
     "defaultMessage": "예"
+  },
+  "layout.account-switcher.switching": {
+    "defaultMessage": "계정을 교체하는 중..."
   },
   "locale.cs-CZ": {
     "defaultMessage": "체코어"
@@ -2747,6 +2954,27 @@
   "notification.error.title": {
     "defaultMessage": "오류가 발생했습니다"
   },
+  "notifications.actor.unknown": {
+    "defaultMessage": "누군가"
+  },
+  "notifications.close": {
+    "defaultMessage": "닫기"
+  },
+  "notifications.dismiss": {
+    "defaultMessage": "알림 무시"
+  },
+  "notifications.instance-ready.launch-game": {
+    "defaultMessage": "게임 실행"
+  },
+  "notifications.instance-ready.open-instance": {
+    "defaultMessage": "인스턴스"
+  },
+  "notifications.invite.accept": {
+    "defaultMessage": "수락"
+  },
+  "notifications.invite.decline": {
+    "defaultMessage": "거절"
+  },
   "omorphia.component.badge.label.accepted": {
     "defaultMessage": "수락됨"
   },
@@ -2953,6 +3181,9 @@
   },
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural, one {프로젝트 #개} other {프로젝트 #개}}"
+  },
+  "profile.details.error.github-profile-title": {
+    "defaultMessage": "GitHub 프로필을 열 수 없습니다"
   },
   "profile.details.label.auth-providers": {
     "defaultMessage": "인증 제공자"
@@ -3272,6 +3503,9 @@
   "project.disclosure.advertising.title": {
     "defaultMessage": "광고 포함"
   },
+  "project.disclosure.ai-functionality.title": {
+    "defaultMessage": "생성형 AI 기능"
+  },
   "project.disclosure.ai-generated-content.title": {
     "defaultMessage": "AI 생성 {types} 포함"
   },
@@ -3284,9 +3518,6 @@
   "project.disclosure.ai-generated-content.use.content": {
     "defaultMessage": "콘텐츠"
   },
-  "project.disclosure.ai-generated-content.use.functionality": {
-    "defaultMessage": "기능"
-  },
   "project.disclosure.ai-generated-content.use.text": {
     "defaultMessage": "텍스트"
   },
@@ -3298,6 +3529,9 @@
   },
   "project.disclosure.paid-features.title": {
     "defaultMessage": "유료 기능 포함"
+  },
+  "project.disclosure.photosensitivity.title": {
+    "defaultMessage": "광과민성 경고"
   },
   "project.download-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {다운로드} other {다운로드}}"
@@ -3668,9 +3902,6 @@
   "project.settings.disclosures.ai.types-code": {
     "defaultMessage": "코드"
   },
-  "project.settings.disclosures.ai.types-functionality": {
-    "defaultMessage": "기능"
-  },
   "project.settings.disclosures.ai.types-text": {
     "defaultMessage": "텍스트"
   },
@@ -3884,8 +4115,17 @@
   "report.type.inappropriate": {
     "defaultMessage": "부적절함"
   },
+  "report.type.spam": {
+    "defaultMessage": "스팸"
+  },
   "s.bg": {
     "defaultMessage": "백그라운드 작업 실행 중"
+  },
+  "search.filter.dependency_type.optional": {
+    "defaultMessage": "선택사항"
+  },
+  "search.filter.dependency_type.required": {
+    "defaultMessage": "필수"
   },
   "search.filter.locked.default": {
     "defaultMessage": "필터 잠김"
@@ -3955,6 +4195,9 @@
   },
   "search.filter_type.game_version.all_versions": {
     "defaultMessage": "모든 버전 보이기"
+  },
+  "search.filter_type.included_content": {
+    "defaultMessage": "포함된 컨텐츠"
   },
   "search.filter_type.license": {
     "defaultMessage": "라이선스"
@@ -4787,6 +5030,9 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "서버가 이미 있으신가요?"
   },
+  "servers.list-empty.learn-more-link": {
+    "defaultMessage": "더 알아보기"
+  },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth 호스팅"
   },
@@ -4819,9 +5065,6 @@
   },
   "servers.listing.copy-id-label": {
     "defaultMessage": "신분증 복사"
-  },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "최신 백업 다운로드"
   },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "청구 관리"
@@ -5258,6 +5501,36 @@
   "settings.billing.title": {
     "defaultMessage": "결제 및 구독"
   },
+  "settings.display.project-list-layouts.mod": {
+    "defaultMessage": "모드 페이지"
+  },
+  "settings.display.project-list-layouts.mode.rows": {
+    "defaultMessage": "행"
+  },
+  "settings.display.project-list-layouts.modpack": {
+    "defaultMessage": "모드팩 페이지"
+  },
+  "settings.display.project-list-layouts.plugin": {
+    "defaultMessage": "플러그인 페이지"
+  },
+  "settings.display.project-list-layouts.resourcepack": {
+    "defaultMessage": "리소스팩 페이지"
+  },
+  "settings.display.project-list-layouts.server": {
+    "defaultMessage": "서버 페이지"
+  },
+  "settings.display.project-list-layouts.shader": {
+    "defaultMessage": "셰이더 페이지"
+  },
+  "settings.display.project-list-layouts.title": {
+    "defaultMessage": "프로젝트 목록 레이아웃"
+  },
+  "settings.display.project-list-layouts.user": {
+    "defaultMessage": "사용자 프로필 페이지"
+  },
+  "settings.display.sidebar.advanced-rendering.title": {
+    "defaultMessage": "고급 렌더링"
+  },
   "settings.display.theme.dark": {
     "defaultMessage": "어두운 테마"
   },
@@ -5441,6 +5714,9 @@
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "{username} 님의 아바타"
   },
+  "sharing.invite-players-modal.cancel": {
+    "defaultMessage": "취소"
+  },
   "sharing.invite-players-modal.custom-expiry": {
     "defaultMessage": "커스텀..."
   },
@@ -5476,6 +5752,9 @@
   },
   "sharing.invite-players-modal.friends-heading": {
     "defaultMessage": "당신의 친구 - {count}"
+  },
+  "sharing.invite-players-modal.heading": {
+    "defaultMessage": "플레이어 초대"
   },
   "sharing.invite-players-modal.invite": {
     "defaultMessage": "초대"
@@ -5521,6 +5800,21 @@
   },
   "sharing.invite-players-modal.update-invite-link-failed-title": {
     "defaultMessage": "초대 링크 업데이트 실패"
+  },
+  "sharing.invite-players-toast.accept": {
+    "defaultMessage": "수락"
+  },
+  "sharing.invite-players-toast.decline": {
+    "defaultMessage": "거절"
+  },
+  "sharing.invite-players-toast.server-suffix": {
+    "defaultMessage": "서버."
+  },
+  "skins.select": {
+    "defaultMessage": "스킨 선택"
+  },
+  "skins.select-named": {
+    "defaultMessage": "{name} 선택"
   },
   "tag.category.128x": {
     "defaultMessage": "128x"
@@ -6050,6 +6344,15 @@
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "페이지를 떠나겠습니까?"
   },
+  "ui.pagination.go-to-page": {
+    "defaultMessage": "페이지로 이동"
+  },
+  "ui.pagination.next-page": {
+    "defaultMessage": "다음 페이지"
+  },
+  "ui.pagination.previous-page": {
+    "defaultMessage": "이전 페이지"
+  },
   "ui.stacked-admonitions.alert-count": {
     "defaultMessage": "알림 {count}개"
   },
@@ -6191,9 +6494,6 @@
   "version.file-type.dev-jar": {
     "defaultMessage": "개발 jar"
   },
-  "version.file-type.javadoc-jar": {
-    "defaultMessage": "Javadoc jar"
-  },
   "version.file-type.optional-resource-pack": {
     "defaultMessage": "선택적 리소스 팩"
   },
@@ -6205,9 +6505,6 @@
   },
   "version.file-type.signature": {
     "defaultMessage": "시그니처 파일"
-  },
-  "version.file-type.sources-jar": {
-    "defaultMessage": "소스 jar"
   },
   "version.file-type.unknown": {
     "defaultMessage": "기타"

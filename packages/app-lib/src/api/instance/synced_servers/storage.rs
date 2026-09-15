@@ -7,7 +7,7 @@ use super::types::{
     ServerRecord, ServerSource,
 };
 use crate::{ErrorKind, State};
-use sqlx::{Sqlite, Transaction};
+use sqlx::{Executor, Sqlite, Transaction};
 use std::collections::HashSet;
 use std::path::PathBuf;
 
@@ -32,6 +32,12 @@ async fn canonical_initialized(state: &State) -> crate::Result<bool> {
 pub(super) async fn read_canonical(
     state: &State,
 ) -> crate::Result<Vec<CanonicalServer>> {
+    read_canonical_with(&state.pool).await
+}
+
+async fn read_canonical_with<'e>(
+    executor: impl Executor<'e, Database = Sqlite>,
+) -> crate::Result<Vec<CanonicalServer>> {
     let rows = sqlx::query!(
         "
 		SELECT id, nbt
@@ -39,7 +45,7 @@ pub(super) async fn read_canonical(
 		ORDER BY position
 		",
     )
-    .fetch_all(&state.pool)
+    .fetch_all(executor)
     .await?;
     rows.into_iter()
         .map(|row| {
@@ -49,6 +55,18 @@ pub(super) async fn read_canonical(
             })
         })
         .collect()
+}
+
+/// Reads canonical servers and instance overrides from the same committed revision.
+pub(super) async fn read_server_snapshot(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<(Vec<CanonicalServer>, Vec<LocalServer>)> {
+    let mut tx = state.pool.begin().await?;
+    let canonical = read_canonical_with(&mut *tx).await?;
+    let local = load_local_with(instance_id, &mut *tx).await?;
+    tx.commit().await?;
+    Ok((canonical, local))
 }
 
 pub(super) async fn commit_server_state(
@@ -179,6 +197,13 @@ pub(super) async fn load_local(
     instance_id: &str,
     state: &State,
 ) -> crate::Result<Vec<LocalServer>> {
+    load_local_with(instance_id, &state.pool).await
+}
+
+async fn load_local_with<'e>(
+    instance_id: &str,
+    executor: impl Executor<'e, Database = Sqlite>,
+) -> crate::Result<Vec<LocalServer>> {
     let rows = sqlx::query!(
         "
 		SELECT id, source, excluded_synced_server_id, nbt, position
@@ -188,7 +213,7 @@ pub(super) async fn load_local(
 		",
         instance_id,
     )
-    .fetch_all(&state.pool)
+    .fetch_all(executor)
     .await?;
     rows.into_iter()
         .map(|row| {

@@ -12,6 +12,7 @@ import {
 } from '@modrinth/ui'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
+import { useImageThumbnail } from '@/composables/use-image-thumbnail'
 import type { InstanceScreenshot } from '@/helpers/instance'
 
 const props = defineProps<{
@@ -33,6 +34,11 @@ const emit = defineEmits<{
 }>()
 
 const card = ref<HTMLElement>()
+const thumbnail = useImageThumbnail(
+	() => props.screenshot.path,
+	512,
+	() => props.screenshot.modified_at,
+)
 const image = ref<HTMLImageElement>()
 const imageReady = ref(false)
 const { formatMessage } = useVIntl()
@@ -79,7 +85,7 @@ function activate(event: MouseEvent | KeyboardEvent) {
 
 async function markImageLoaded() {
 	const loadedImage = image.value
-	const loadedUrl = props.screenshot.url
+	const loadedUrl = thumbnail.value
 	const generation = loadGeneration
 	if (!loadedImage) return
 
@@ -96,7 +102,7 @@ async function markImageLoaded() {
 	if (
 		generation !== loadGeneration ||
 		image.value !== loadedImage ||
-		props.screenshot.url !== loadedUrl
+		thumbnail.value !== loadedUrl
 	) {
 		return
 	}
@@ -145,20 +151,17 @@ onBeforeUnmount(() => {
 	})
 })
 
-watch(
-	() => props.screenshot.url,
-	(url, previousUrl) => {
-		loadGeneration += 1
-		loadStartedAt = performance.now()
-		imageReady.value = false
-		debugImage('source changed', {
-			id: props.screenshot.id,
-			fileName: props.screenshot.file_name,
-			previousUrl,
-			url,
-		})
-	},
-)
+watch(thumbnail, (url, previousUrl) => {
+	loadGeneration += 1
+	loadStartedAt = performance.now()
+	imageReady.value = false
+	debugImage('source changed', {
+		id: props.screenshot.id,
+		fileName: props.screenshot.file_name,
+		previousUrl,
+		url,
+	})
+})
 </script>
 
 <template>
@@ -211,7 +214,7 @@ watch(
 		</button>
 		<img
 			ref="image"
-			:src="screenshot.url"
+			:src="thumbnail"
 			:alt="screenshot.file_name"
 			loading="eager"
 			decoding="async"

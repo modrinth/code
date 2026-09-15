@@ -681,7 +681,6 @@ onUnmounted(() => {
 								<Combobox
 									v-model="currentFilterType"
 									class="!w-full"
-									dropdown-class="!z-[10000]"
 									:options="filterTypes"
 									:placeholder="formatMessage(commonMessages.filterByLabel)"
 									searchable
@@ -699,7 +698,6 @@ onUnmounted(() => {
 								<Combobox
 									v-model="currentProjectTypeFilter"
 									class="!w-full"
-									dropdown-class="!z-[10000]"
 									:options="projectTypeFilterTypes"
 									:placeholder="formatMessage(commonMessages.filterByLabel)"
 									searchable

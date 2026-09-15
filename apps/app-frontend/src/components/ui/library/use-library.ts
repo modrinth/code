@@ -13,8 +13,14 @@ import {
 	TrashIcon,
 	UploadIcon,
 } from '@modrinth/assets'
-import type { ButtonMenuLeafOption, ButtonMenuOption } from '@modrinth/ui'
-import { defineMessages, formatLoader, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import {
+	type ButtonMenuLeafOption,
+	type ButtonMenuOption,
+	defineMessages,
+	formatLoader,
+	injectNotificationManager,
+	useVIntl,
+} from '@modrinth/ui'
 import { open as openDialog } from '@tauri-apps/plugin-dialog'
 import { useEventListener, useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
@@ -47,6 +53,8 @@ import {
 	set_group_order as setInstanceGroupOrder,
 } from '@/helpers/instance-groups'
 import type { GameInstance, InstanceIconConfig } from '@/helpers/types'
+
+import { librarySearch } from './view-state'
 
 export const librarySortOptions = [
 	'Name',
@@ -181,7 +189,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const { handleError } = injectNotificationManager()
 	const { formatMessage } = useVIntl()
 
-	const search = ref('')
+	const search = librarySearch
 	const filters = useStorage<LibraryFilters>(
 		'Instances-grid-filters',
 		{
@@ -1265,7 +1273,8 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				? instanceGroupId
 				: null
 		const isFavorite = item.instance.group_ids.includes(FAVORITES_GROUP_ID)
-		const canAddContent = !item.instance.quarantined && !item.instance.link
+		const installing = item.instance.install_stage.includes('installing')
+		const canAddContent = !item.instance.quarantined && !item.instance.link && !installing
 
 		instanceOptions.value?.open(event, [
 			{
@@ -1281,6 +1290,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				label: formatMessage(instanceActionMessages.play),
 				icon: PlayIcon,
 				shown: !item.playing && !item.instance.quarantined,
+				disabled: installing,
 				tone: 'brand',
 				action: () => void item.play(null, 'InstanceGridContextMenu'),
 			},
@@ -1313,6 +1323,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				id: 'edit',
 				label: formatMessage(instanceActionMessages.viewInstance),
 				icon: EyeIcon,
+				disabled: installing,
 				action: () => void item.seeInstance(),
 			},
 			{

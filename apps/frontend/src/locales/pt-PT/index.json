@@ -581,23 +581,11 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Guarda o conteúdo de que mais gostas e recebe atualizações com apenas um clique."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Segue projetos"
-  },
-  "app-marketing.features.importing.description": {
-    "message": "Importa os teus perfis favoritos do launcher que utilizavas antes e começa a usar a Modrinth App em segundos!"
-  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
-  },
-  "app-marketing.features.importing.title": {
-    "message": "Importação de perfis"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Ações"
@@ -623,15 +611,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Versão"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Joga com os teus mods, quer tenhas ligação à internet ou não."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Modo offline"
-  },
-  "app-marketing.features.open-source.description": {
-    "message": "O launcher do Modrinth é totalmente código-aberto. Podes ver o código-fonte no nosso <github-link>GitHub</github-link>!"
-  },
   "app-marketing.features.open-source.title": {
     "message": "Código aberto"
   },
@@ -641,9 +620,6 @@
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
   },
-  "app-marketing.features.performance.description": {
-    "message": "A Modrinth App tem um desempenho melhor do que muitos dos principais gestores de mods, usando apenas 150 MB de RAM!"
-  },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
   },
@@ -652,15 +628,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"
@@ -791,9 +758,6 @@
   "auth.create-account.date-of-birth.required.title": {
     "message": "Data de nascimento requerida"
   },
-  "auth.create-account.date-of-birth.under13-helper": {
-    "message": "Não cumpres os requisitos de idade para criar uma conta no Modrinth."
-  },
   "auth.create-account.info-panel.source-code-link": {
     "message": "Código-fonte relevante"
   },
@@ -857,8 +821,8 @@
   "auth.sign-in.2fa.label": {
     "message": "Autenticação de dois fatores"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Inserir código..."
+  "auth.sign-in.choose-account": {
+    "message": "Escolha uma conta para usar no App Modrinth"
   },
   "auth.sign-in.continue-with-email": {
     "message": "Continuar com e-mail"
@@ -1997,9 +1961,6 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "Os servidores do Modrinth Hosting utilizam que tipo de CPUs?"
   },
-  "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Os servidores Modrinth Hosting estão equipados com CPUs AMD Ryzen 7900 e equivalentes ao 7950X3D com uma frequência de 5+ GHz, juntamente com memória DDR5."
-  },
   "hosting-marketing.faq.currency": {
     "message": "Em que moeda estão os preços?"
   },
@@ -2332,9 +2293,6 @@
   },
   "layout.action.new-project": {
     "message": "Novo projeto"
-  },
-  "layout.action.new-server-project": {
-    "message": "Novo servidor"
   },
   "layout.action.publish": {
     "message": "Publicar"
@@ -3671,14 +3629,8 @@
   "settings.account.two-factor.error.incorrect-code": {
     "message": "O código inserido está incorreto!"
   },
-  "settings.account.two-factor.field.code.description": {
-    "message": "Insere um código de dois fatores para continuar."
-  },
   "settings.account.two-factor.field.code.label": {
     "message": "Autenticação de dois fatores"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Inserir código..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "Autenticação de dois fatores mantém a tua conta segura ao requerer acesso a um segundo dispositivo para iniciar sessão."

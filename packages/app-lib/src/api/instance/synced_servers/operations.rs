@@ -3,6 +3,7 @@ use super::super::synced_options::{
     instance_dir, instance_is_running, instance_option_enabled,
     instance_option_supported, sha1_bytes, sha1_file, sync_files_are_protected,
 };
+use crate::api::worlds::time_world_load;
 use crate::state::{InstanceMetadata, SyncedOption};
 use crate::{ErrorKind, State};
 use quartz_nbt::NbtCompound;
@@ -20,13 +21,45 @@ use super::modpack::{
 use super::storage::{
     begin_server_checkpoint, canonical_exists, commit_server_state,
     generated_path, load_local, load_projection_entries, read_canonical,
-    server_revision, write_local,
+    read_server_snapshot, server_revision, write_local,
 };
 use super::types::{
     CanonicalServer, DesyncServerMode, LocalServer, ProjectionEntry,
     ProjectionOwner, ServerRecord, ServerSource, SyncedServer,
 };
 use std::collections::HashSet;
+
+fn normalized_server_address(data: &NbtCompound) -> (String, u16) {
+    let address = server_identity_address(data);
+    let (host, port) = crate::server_address::parse_server_address(&address)
+        .unwrap_or((&address, 25565));
+    (host.trim().to_string(), port)
+}
+
+async fn sync_candidates(
+    metadata: &InstanceMetadata,
+    state: &State,
+) -> crate::Result<Vec<NbtCompound>> {
+    let locals = load_local(&metadata.instance.id, state).await?;
+    let mut servers =
+        read_servers(&instance_dir(metadata, state).join(SERVERS_FILE)).await?;
+    for local in locals {
+        let local_address = normalized_server_address(&local.data);
+        let index = servers
+            .iter()
+            .position(|data| data == &local.data)
+            .or_else(|| {
+                servers.iter().position(|data| {
+                    !local_address.0.is_empty()
+                        && normalized_server_address(data) == local_address
+                })
+            });
+        if let Some(index) = index {
+            servers.remove(index);
+        }
+    }
+    Ok(servers)
+}
 
 pub(in crate::api::instance) async fn seed_servers(
     metadata: &InstanceMetadata,
@@ -42,7 +75,6 @@ pub(in crate::api::instance) async fn seed_servers(
             metadata.instance.id
         );
     }
-    let local_entries = load_local(&metadata.instance.id, state).await?;
     if is_modpack_link(&metadata.link)
         && !pack_state_exists(&metadata.instance.id, state).await?
     {
@@ -52,18 +84,7 @@ pub(in crate::api::instance) async fn seed_servers(
 		)
 		.into());
     }
-    let path = instance_dir(metadata, state).join(SERVERS_FILE);
-    let mut servers = read_servers(&path).await?;
-    for local in &local_entries {
-        let local_address = server_identity_address(&local.data);
-        if let Some(index) = servers.iter().position(|data| {
-            data == &local.data
-                || (!local_address.is_empty()
-                    && server_identity_address(data) == local_address)
-        }) {
-            servers.remove(index);
-        }
-    }
+    let servers = sync_candidates(metadata, state).await?;
     let canonical = servers
         .into_iter()
         .map(|data| CanonicalServer {
@@ -89,7 +110,6 @@ pub(in crate::api::instance) async fn merge_servers_from_instance(
             metadata.instance.id
         );
     }
-    let local_entries = load_local(&metadata.instance.id, state).await?;
     if is_modpack_link(&metadata.link)
         && !pack_state_exists(&metadata.instance.id, state).await?
     {
@@ -99,18 +119,7 @@ pub(in crate::api::instance) async fn merge_servers_from_instance(
         )
         .into());
     }
-    let path = instance_dir(metadata, state).join(SERVERS_FILE);
-    let mut candidates = read_servers(&path).await?;
-    for local in &local_entries {
-        let local_address = server_identity_address(&local.data);
-        if let Some(index) = candidates.iter().position(|data| {
-            data == &local.data
-                || (!local_address.is_empty()
-                    && server_identity_address(data) == local_address)
-        }) {
-            candidates.remove(index);
-        }
-    }
+    let candidates = sync_candidates(metadata, state).await?;
 
     let mut canonical = read_canonical(state).await?;
     for data in candidates {
@@ -148,9 +157,7 @@ pub(in crate::api::instance) async fn ensure_servers(
     }
     if !canonical_exists(state).await? {
         if !is_modpack_link(&metadata.link) {
-            let servers =
-                read_servers(&instance_dir(metadata, state).join(SERVERS_FILE))
-                    .await?;
+            let servers = sync_candidates(metadata, state).await?;
             let canonical = servers
                 .into_iter()
                 .map(|data| CanonicalServer {
@@ -172,48 +179,7 @@ pub(in crate::api::instance) async fn detach_servers(
 ) -> crate::Result<()> {
     let generated = generated_path(state, &metadata.instance.id);
     let local = instance_dir(metadata, state).join(SERVERS_FILE);
-    let Some(current_checkpoint) = checkpoint(
-        &metadata.instance.id,
-        SyncedOption::MultiplayerServers,
-        "default",
-        state,
-    )
-    .await?
-    else {
-        return detach_link(&generated, &local).await;
-    };
-    let linked_to_generated = tokio::fs::symlink_metadata(&local)
-        .await
-        .is_ok_and(|metadata| metadata.file_type().is_symlink())
-        && tokio::fs::read_link(&local)
-            .await
-            .is_ok_and(|target| target == generated);
-    let matches_checkpoint = local.exists()
-        && sha1_file(&local).await? == current_checkpoint.expected_sha1;
-    if current_checkpoint.status != CheckpointStatus::Ready
-        || (!linked_to_generated && !matches_checkpoint)
-    {
-        return detach_link(&generated, &local).await;
-    }
-
-    let current = read_servers(&local).await?;
-    let projections =
-        load_projection_entries(&metadata.instance.id, state).await?;
-    let projection_matches = match_projection_entries(&current, &projections);
-    let instance_servers = current
-        .into_iter()
-        .zip(projection_matches)
-        .filter_map(|(server, projection)| {
-            projection
-                .is_none_or(|projection| {
-                    projection.owner == ProjectionOwner::Instance
-                })
-                .then_some(server)
-        })
-        .collect::<Vec<_>>();
-
-    detach_link(&generated, &local).await?;
-    write_servers(&local, &instance_servers).await
+    detach_link(&generated, &local).await
 }
 
 pub(in crate::api::instance) async fn reconcile_servers(
@@ -424,12 +390,29 @@ fn match_projection_entries<'a>(
         .collect()
 }
 
+#[tracing::instrument(name = "server_records", skip_all, fields(instance_id = %metadata.instance.id))]
 pub(crate) async fn list_server_records(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<Vec<ServerRecord>> {
-    let _guard = state.lock_synced_options().await;
-    list_server_records_locked(metadata, state).await
+    if time_world_load(
+        "server_sync_participation",
+        participating(metadata, state),
+    )
+    .await?
+    {
+        let (canonical, locals) = time_world_load(
+            "server_records_snapshot",
+            read_server_snapshot(&metadata.instance.id, state),
+        )
+        .await?;
+        return Ok(merge_server_records(canonical, locals));
+    }
+    time_world_load(
+        "read_local_server_records",
+        list_local_server_records(metadata, state),
+    )
+    .await
 }
 
 async fn list_server_records_locked(
@@ -439,6 +422,13 @@ async fn list_server_records_locked(
     if participating(metadata, state).await? {
         return compose_records(metadata, state).await;
     }
+    list_local_server_records(metadata, state).await
+}
+
+async fn list_local_server_records(
+    metadata: &InstanceMetadata,
+    state: &State,
+) -> crate::Result<Vec<ServerRecord>> {
     Ok(
         read_servers(&instance_dir(metadata, state).join(SERVERS_FILE))
             .await?
@@ -450,6 +440,99 @@ async fn list_server_records_locked(
             })
             .collect(),
     )
+}
+
+/// Keeps an automatically added server local, even before server sync is enabled.
+pub(crate) async fn ensure_managed_server(
+    metadata: &InstanceMetadata,
+    data: NbtCompound,
+    state: &State,
+) -> crate::Result<()> {
+    let _guard = state.lock_synced_options().await;
+    let path = instance_dir(metadata, state).join(SERVERS_FILE);
+    let syncing = participating(metadata, state).await?;
+    let records = list_server_records_locked(metadata, state).await?;
+    let address = normalized_server_address(&data);
+    let name = server_identity_name(&data);
+    let existing_index = records
+        .iter()
+        .position(|record| {
+            normalized_server_address(&record.data) == address
+                && server_identity_name(&record.data) == name
+        })
+        .or_else(|| {
+            records.iter().position(|record| {
+                normalized_server_address(&record.data) == address
+            })
+        });
+    let existing = existing_index.map(|index| &records[index]);
+    let position = existing_index.unwrap_or_else(|| {
+        records
+            .iter()
+            .position(ServerRecord::hidden)
+            .unwrap_or(records.len())
+    });
+    let data = existing
+        .map(|record| {
+            let mut existing_data = record.data.clone();
+            if record.hidden() {
+                existing_data.insert(
+                    "name",
+                    data.get::<_, &str>("name").unwrap_or_default().to_string(),
+                );
+                existing_data.insert("hidden", 0_i8);
+            }
+            existing_data
+        })
+        .unwrap_or(data);
+    let excluded_synced_server_id = existing
+        .filter(|record| record.source == ServerSource::UserSynced)
+        .map(|record| record.id.clone());
+    let mut locals = load_local(&metadata.instance.id, state).await?;
+    if let Some(local) = locals
+        .iter_mut()
+        .find(|server| normalized_server_address(&server.data) == address)
+    {
+        let excluded_synced_server_id = excluded_synced_server_id
+            .or_else(|| local.excluded_synced_server_id.clone());
+        if existing.is_some_and(|record| record.data == data)
+            && local.data == data
+            && local.position == position as i64
+            && local.excluded_synced_server_id == excluded_synced_server_id
+            && (!syncing || path.exists())
+        {
+            return Ok(());
+        }
+        local.data = data.clone();
+        local.position = position as i64;
+        local.excluded_synced_server_id = excluded_synced_server_id;
+    } else {
+        locals.push(LocalServer {
+            id: Uuid::new_v4().to_string(),
+            source: ServerSource::LinkedServerProject,
+            excluded_synced_server_id,
+            data: data.clone(),
+            position: position as i64,
+        });
+    }
+    write_local(&metadata.instance.id, &locals, state).await?;
+    if syncing {
+        if effective(metadata, state).await? {
+            compose_instance(metadata, state).await?;
+        }
+    } else if existing.is_none_or(|record| record.data != data) {
+        let mut servers = records
+            .into_iter()
+            .map(|record| record.data)
+            .collect::<Vec<_>>();
+        if let Some(index) = existing_index {
+            servers[index] = data;
+        } else {
+            servers.insert(position, data);
+        }
+        write_servers(&path, &servers).await?;
+    }
+    Ok(())
 }
 
 pub(crate) async fn add_user_server(
@@ -785,6 +868,13 @@ async fn compose_records(
 ) -> crate::Result<Vec<ServerRecord>> {
     let canonical = read_canonical(state).await?;
     let locals = load_local(&metadata.instance.id, state).await?;
+    Ok(merge_server_records(canonical, locals))
+}
+
+fn merge_server_records(
+    canonical: Vec<CanonicalServer>,
+    locals: Vec<LocalServer>,
+) -> Vec<ServerRecord> {
     let exclusions = locals
         .iter()
         .filter_map(|server| server.excluded_synced_server_id.as_deref())
@@ -813,7 +903,7 @@ async fn compose_records(
             },
         );
     }
-    Ok(records)
+    records
 }
 
 async fn regenerate_servers(state: &State) -> crate::Result<()> {

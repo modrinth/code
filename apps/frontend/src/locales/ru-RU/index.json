@@ -165,7 +165,7 @@
     "message": "Показан топ‑{count} {itemType, select,\n  project {проектов}\n  country {стран}\n  monetization {типов монетизации}\n  downloadSource {источников скачивания}\n  downloadReason {причин скачивания}\n  member {участников}\n  projectVersion {версий проекта}\n  loader {загрузчиков}\n  gameVersion {версий игры}\n  other {элементов}\n} из таблицы"
   },
   "analytics.chart.tooltip.dependent-on-project": {
-    "message": "Зависит от {project}"
+    "message": "Зависит от {project}"
   },
   "analytics.chart.tooltip.dependent-project-version": {
     "message": "{dependentProject} зависит от {dependencyProject}, версия {version}"
@@ -575,14 +575,8 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Сохраняйте понравившийся контент и узнавайте об обновлениях в один клик."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Отслеживайте проекты"
-  },
   "app-marketing.features.importing.description": {
-    "message": "Перенесите любимые профили из старого лаунчера и начните пользоваться Modrinth App за считанные секунды!"
+    "message": "Перенесите все свои сборки из старого лаунчера и начните пользоваться Modrinth App за считанные секунды!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -591,7 +585,13 @@
     "message": "MultiMC"
   },
   "app-marketing.features.importing.title": {
-    "message": "Импорт профилей"
+    "message": "Импорт сборок"
+  },
+  "app-marketing.features.manage-skins.description": {
+    "message": "Меняйте свой скин прямо в Modrinth App."
+  },
+  "app-marketing.features.manage-skins.title": {
+    "message": "Управление скинами"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Действия"
@@ -617,12 +617,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Версия"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Играйте с модами даже без подключения к интернету."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Офлайн-режим"
-  },
   "app-marketing.features.open-source.description": {
     "message": "Modrinth App имеет полностью открытый исходный код, доступный на <github-link>GitHub</github-link>!"
   },
@@ -636,7 +630,7 @@
     "message": "% ЦП"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App работает лучше многих популярных лаунчеров, используя лишь 150 МБ ОЗУ!"
+    "message": "Modrinth App работает лучше многих популярных лаунчеров!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -646,15 +640,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ МБ"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ · ∞ МБ"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 МБ"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"
@@ -679,6 +664,12 @@
   },
   "app-marketing.features.play.title": {
     "message": "Играйте с любимыми модами"
+  },
+  "app-marketing.features.settings-sync.description": {
+    "message": "Применяйте настройки, наборы ресурсов и многое другое ко всем сборкам сразу."
+  },
+  "app-marketing.features.settings-sync.title": {
+    "message": "Синхронизация настроек"
   },
   "app-marketing.features.sharing.description": {
     "message": "Создавайте, делитесь и играйте в сборки, используя любые из тысяч модов и сборок, размещённых на Modrinth."
@@ -776,6 +767,9 @@
   "auth.create-account.date-of-birth.label": {
     "message": "Дата рождения"
   },
+  "auth.create-account.date-of-birth.not-meet-age-requirement": {
+    "message": "Вы не соответствуете возрастным ограничениям для создания аккаунта на Modrinth."
+  },
   "auth.create-account.date-of-birth.placeholder": {
     "message": "Введите дату рождения"
   },
@@ -786,7 +780,7 @@
     "message": "Необходима дата рождения"
   },
   "auth.create-account.date-of-birth.under13-helper": {
-    "message": "Вы не подходите по возрастным требованиям для создания аккаунта на Modrinth."
+    "message": "Вы не можете создать аккаунт на Modrinth, если вы младше 13 лет."
   },
   "auth.create-account.info-panel.source-code-link": {
     "message": "Исходный код"
@@ -810,7 +804,31 @@
     "message": "Имя пользователя"
   },
   "auth.create-account.username.placeholder": {
-    "message": "Введите никнейм"
+    "message": "Введите имя пользователя"
+  },
+  "auth.reauthenticate.2fa.description": {
+    "message": "Введите 6‑значный код из аутентификатора или используйте резервный код."
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "Подтверждение входа"
+  },
+  "auth.reauthenticate.continue-with-passkey": {
+    "message": "Использовать ключ доступа"
+  },
+  "auth.reauthenticate.last-signed-in-with": {
+    "message": "Способ последнего входа: {method, select, password {пароль} passkey {ключ доступа} github {GitHub} discord {Discord} google {Google} microsoft {Microsoft} gitlab {GitLab} steam {Steam} paypal {PayPal} other {{method}} }."
+  },
+  "auth.reauthenticate.page-title": {
+    "message": "Повторный вход"
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "Войти другим способом"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "Войти через {provider}"
+  },
+  "auth.reauthenticate.title": {
+    "message": "{name} нуждается в повторном входе."
   },
   "auth.reset-password.method-choice.action": {
     "message": "Отправить письмо"
@@ -851,8 +869,11 @@
   "auth.sign-in.2fa.label": {
     "message": "Подтверждение входа"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Введите код..."
+  "auth.sign-in.add-account": {
+    "message": "Добавить аккаунт"
+  },
+  "auth.sign-in.choose-account": {
+    "message": "Выбор аккаунта в Modrinth App"
   },
   "auth.sign-in.continue-with-email": {
     "message": "Войти по паролю"
@@ -868,6 +889,27 @@
   },
   "auth.sign-in.last-sign-in": {
     "message": "Последнее"
+  },
+  "auth.sign-in.launcher.callback.title": {
+    "message": "Обработка входа в Modrinth App"
+  },
+  "auth.sign-in.launcher.complete.description": {
+    "message": "Вы вернётесь в Modrinth App. Если ничего не произойдёт, нажмите кнопку ниже."
+  },
+  "auth.sign-in.launcher.complete.go-to-website": {
+    "message": "Перейти на Modrinth.com"
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "Открыть Modrinth App"
+  },
+  "auth.sign-in.launcher.complete.title": {
+    "message": "Вход выполнен"
+  },
+  "auth.sign-in.launcher.opening.description": {
+    "message": "Если приложение не откроется, нажмите на кнопку ниже."
+  },
+  "auth.sign-in.launcher.opening.title": {
+    "message": "Открытие Modrinth App..."
   },
   "auth.sign-in.no-account": {
     "message": "Нет аккаунта?"
@@ -901,6 +943,9 @@
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Создание аккаунта"
+  },
+  "auth.two-factor.incorrect-code": {
+    "message": "Неверный код. Повторите попытку или используйте резервный код."
   },
   "auth.verify-email.action.account-settings": {
     "message": "Настройки"
@@ -1018,6 +1063,9 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Одобрить с ответом"
+  },
+  "conversation-thread.action.close-report": {
+    "message": "Закрыть жалобу"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Закрыть с ответом"
@@ -1152,7 +1200,7 @@
     "message": "Загрузите основные и вспомогательные файлы"
   },
   "create-project-version.create-modal.stage.add-files.upload-secondary-prompt": {
-    "message": "Перетащите или выберите файлы"
+    "message": "Перетащите файлы или нажмите для обзора"
   },
   "create-project-version.create-modal.stage.details.details-tab": {
     "message": "Сведения"
@@ -1707,7 +1755,7 @@
     "message": "Нет близких по сумме номиналов"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-with-max": {
-    "message": "Рядом с вашим числом нет наименований. Самая высокая и доступная это {max}"
+    "message": "Нет близких к сумме номиналов. Доступный максимум — {max}."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Способ вывода"
@@ -1857,7 +1905,7 @@
     "message": "Указанные ниже ссылки будут перезаписаны во всех выбранных проектах. Пустые поля будут проигнорированы. Вы можете удалить ссылку из всех выбранных проектов с помощью значка корзины."
   },
   "dashboard.projects.links.discord-invite.description": {
-    "message": "Ссылка-приглашение на ваш Discord сервер."
+    "message": "Ссылка приглашение на ваш Discord сервер."
   },
   "dashboard.projects.links.discord-invite.label": {
     "message": "Discord"
@@ -2121,7 +2169,7 @@
     "message": "Сумма слишком мала"
   },
   "dashboard.withdraw.error.payout-method-disabled.text": {
-    "message": "Этот способ вывода отключён платёжным сервисом. Выберите другой вывода или свяжитесь с поддержкой."
+    "message": "Этот способ вывода отключён платёжным сервисом. Выберите другой способ вывода или свяжитесь с поддержкой."
   },
   "dashboard.withdraw.error.payout-method-disabled.title": {
     "message": "Способ вывода недоступен"
@@ -2182,6 +2230,12 @@
   },
   "error.generic.401.signed-in-as": {
     "message": "Текущий аккаунт:"
+  },
+  "error.generic.401.switch-account": {
+    "message": "Или смените аккаунт:"
+  },
+  "error.generic.401.switch-account-failed": {
+    "message": "Не удалось сменить аккаунт. Повторите попытку."
   },
   "error.generic.401.title": {
     "message": "У вас нет доступа к этой странице"
@@ -2295,7 +2349,7 @@
     "message": "Какие процессоры используются на серверах Modrinth Hosting?"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Серверы Modrinth Hosting оснащены процессорами уровня AMD Ryzen 7900 и 7950X3D с частотой более 5 ГГц и памятью DDR5."
+    "message": "Серверы Modrinth Hosting оснащены процессорами уровня AMD Ryzen 7950X или 9950X и памятью DDR5."
   },
   "hosting-marketing.faq.currency": {
     "message": "В какой валюте указаны цены?"
@@ -2655,7 +2709,7 @@
     "message": "Новый проект"
   },
   "layout.action.new-server-project": {
-    "message": "Новый сервер"
+    "message": "Новый серверный проект"
   },
   "layout.action.publish": {
     "message": "Опубликовать"
@@ -2668,6 +2722,9 @@
   },
   "layout.action.tech-review": {
     "message": "Техпроверка"
+  },
+  "layout.action.user-lookup": {
+    "message": "Поиск пользователя"
   },
   "layout.avatar.alt": {
     "message": "Ваш аватар"
@@ -2864,6 +2921,9 @@
   "layout.nav.active-reports": {
     "message": "Активные жалобы"
   },
+  "layout.nav.add-account": {
+    "message": "Добавить аккаунт"
+  },
   "layout.nav.discover": {
     "message": "Найти"
   },
@@ -2894,6 +2954,9 @@
   "layout.nav.projects": {
     "message": "Проекты"
   },
+  "layout.nav.remove-account": {
+    "message": "Удалить аккаунт"
+  },
   "layout.nav.revenue": {
     "message": "Доход"
   },
@@ -2902,6 +2965,12 @@
   },
   "layout.nav.search": {
     "message": "Поиск"
+  },
+  "layout.nav.switch-account": {
+    "message": "Сменить аккаунт"
+  },
+  "layout.nav.switch-account-failed": {
+    "message": "Не удалось сменить аккаунт. Повторите попытку."
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Перейти на Modrinth+"
@@ -2916,7 +2985,7 @@
     "message": "Автоматически устанавливайте все, во что они играют"
   },
   "modal.shared-instance.open-in-app.benefit.join": {
-    "message": "Играйте в тот же контент, что и ваши друзья"
+    "message": "Играйте в тот же, что и ваши друзья"
   },
   "modal.shared-instance.open-in-app.benefit.update": {
     "message": "Постоянно обновляйте общий контент по мере его изменения"
@@ -2941,6 +3010,9 @@
   },
   "moderation.moderate": {
     "message": "Модерировать"
+  },
+  "moderation.page.delphi-rules": {
+    "message": "Правила Delphi"
   },
   "moderation.page.external-projects": {
     "message": "Сторонние проекты"
@@ -3340,6 +3412,9 @@
   },
   "project-member-header.success-join": {
     "message": "Вы присоединились к команде проекта"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Проект отправлен на проверку!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Контрольный список для публикации"
@@ -3758,6 +3833,12 @@
   "project.notification.icon-updated.title": {
     "message": "Иконка обновлена"
   },
+  "project.notification.review-save-failed.description": {
+    "message": "Невозможно сохранить изменения, приводящие к ошибке проверки."
+  },
+  "project.notification.review-save-failed.title": {
+    "message": "Не удалось сохранить проект"
+  },
   "project.notification.updated.message": {
     "message": "Ваш проект обновлён."
   },
@@ -3795,10 +3876,10 @@
     "message": "Удаление проекта"
   },
   "project.settings.disclosures.advertising.description.1": {
-    "message": "Включите, если проект содержит рекламу, спонсорство или продвижение других работ."
+    "message": "Включите если проект содержит рекламу, спонсорство или продвижение других проектов."
   },
   "project.settings.disclosures.advertising.description.2": {
-    "message": "Если у продвижения нет прямой денежной ценности <emphasis>и</emphasis> оно представляет собой то, что обычный человек счёл бы <italic>уместным</italic> и <italic>ненавязчивым</italic> (например, ссылку на ваш профиль Modrinth в уголке страницы настроек вашего же мода), мы не будем считать это рекламой."
+    "message": "Это не относится к ненавязчивой рекламе соответствующего контента без прямой денежной ценности (например, ссылка на профиль Modrinth в вашем собственном меню конфигурации), и не относится к рекламе на странице проекта, такие как спонсируемые баннеры в описании."
   },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "Например: Adds the Modrinth SMP server to your server list automatically."
@@ -3806,20 +3887,32 @@
   "project.settings.disclosures.advertising.title": {
     "message": "Есть реклама"
   },
-  "project.settings.disclosures.ai.content-rules": {
-    "message": "Пожалуйста, ознакомьтесь с разделом 6 <rules>Правил контента Modrinth</rules> для получения дополнительной информации."
+  "project.settings.disclosures.ai-functionality.description": {
+    "message": "Необходимо включить, если проект имеет функциональность, которая генерирует что-либо во время работы используя ИИ, например как чат-бот или динамически генерирующееся текстуры."
+  },
+  "project.settings.disclosures.ai-functionality.note-placeholder": {
+    "message": "Например: The NPCs uses generative AI for dialogue options."
+  },
+  "project.settings.disclosures.ai-functionality.title": {
+    "message": "Есть функциональность на ИИ"
   },
   "project.settings.disclosures.ai.description": {
-    "message": "Вы должны включить это если в вашем проекте имеется малейшее содержание кода сгенерированного с помощью ИИ, ассетов созданных ИИ или в проекте хоть где-то используется искусственный интеллект. Или даже где-то в вашем описании, а также текстовом поле был использован генеративный искусственный интеллект."
+    "message": "Должен быть включен если этот проект содержит какие-либо ИИ текстуры или текст, а также если он содержит большое количество ИИ кода."
+  },
+  "project.settings.disclosures.ai.description.2": {
+    "message": "Важно быть честным, если использование ИИ сыграл важную роль в производстве или публикации этого проекта. Простой способ подумать об этом, если вы считаете ИИ соавтором проекта, вы должны раскрыть его здесь."
   },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "Например: The Chinese and Arabic translations are AI-generated."
   },
+  "project.settings.disclosures.ai.still-unsure": {
+    "message": "Всё ещё сомневаетесь? Ознакомьтесь с нашим руководством по <faq-link>раскрытию информации об использовании ИИ</faq-link> и разделом 6 <rules>Правил содержания Modrinth</rules> для получения дополнительной информации."
+  },
   "project.settings.disclosures.ai.title": {
-    "message": "Есть контент, созданный ИИ"
+    "message": "Есть ИИ‑контент"
   },
   "project.settings.disclosures.ai.types-description": {
-    "message": "Что было сгенерировано ИИ?"
+    "message": "Какие типы контента были созданы ИИ?"
   },
   "project.settings.disclosures.archived.banner-preview": {
     "message": "Предпросмотр баннера"
@@ -3857,11 +3950,20 @@
   "project.settings.disclosures.derivative.note-label": {
     "message": "Объясните, как ваш проект основан на оригинальной работе"
   },
+  "project.settings.disclosures.derivative.note-placeholder": {
+    "message": "Это форк который добавляет несколько новых биомов и переносит их новые версии Minecraft."
+  },
   "project.settings.disclosures.derivative.title": {
     "message": "Производная работа"
   },
   "project.settings.disclosures.description": {
     "message": "Необходимо указать всю применимую маркировку контента в соответствии с <rules>правилами контента Modrinth</rules>."
+  },
+  "project.settings.disclosures.description.2": {
+    "message": "Не знаете, как добавить информацию о содержании контента, созданого ИИ, в свой проект? Ознакомьтесь с нашим <faq-link>FAQ по раскрытию информации о контенте</faq-link>."
+  },
+  "project.settings.disclosures.info-tooltip": {
+    "message": "Нажмите, чтобы узнать больше о том, в каких случаях следует использовать это уведомление."
   },
   "project.settings.disclosures.last-updated": {
     "message": "Последнее изменение {date} от {user}"
@@ -3879,7 +3981,7 @@
     "message": "<contact-support-link>Свяжитесь с поддержкой</contact-support-link>, если эту маркировку нужно изменить или убрать."
   },
   "project.settings.disclosures.paid-features.description": {
-    "message": "Включите, если проект содержит контент, доступный только за реальные деньги."
+    "message": "Включите если проект содержит контент который доступен только за реальные деньги."
   },
   "project.settings.disclosures.paid-features.feature-placeholder": {
     "message": "Например: Cosmetics available as Patreon reward."
@@ -3957,7 +4059,7 @@
     "message": "Загрузите версии перед настройкой маркировки"
   },
   "project.settings.editing-project": {
-    "message": "Настройка проекта"
+    "message": "Редактирование проекта {projectType}"
   },
   "project.settings.general.name.description": {
     "message": "Не используйте лишние приписки, скобки и описания — введите только название проекта."
@@ -4003,6 +4105,12 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.links.donation.duplicate-type": {
+    "message": "Ссылка на {platform} повторяется."
+  },
+  "project.settings.links.donation.no-type": {
+    "message": "Выберите платформу для этой ссылки."
   },
   "project.settings.monetization.description": {
     "message": "Проекты на Modrinth автоматически зачисляются в <rewards-program-link>программу наград</rewards-program-link>. Если вы не хотите (или не можете по юридическим причинам) получать доход от этого проекта, вы можете отключить его здесь."
@@ -4151,9 +4259,6 @@
   "project.settings.server.srv-records-tooltip": {
     "message": "Адрес который вы сюда вводите,может иметь DNS записей SRV _minecraft._tcp.(ваш домен), которые указывают на ваш адрес и порт сервера Майнкрафта."
   },
-  "project.settings.tags.all-tags-selected-warning": {
-    "message": "Вы выбрали все {count} доступных тегов. Пожалуйста, выберите теги, которые применяются к вашему проекту."
-  },
   "project.settings.tags.categories-description": {
     "message": "Выберите все категории, которые отражают темы или функции вашего {type}"
   },
@@ -4195,6 +4300,9 @@
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Загрузите версии перед добавлением тегов"
+  },
+  "project.slug-suggestions.label": {
+    "message": "Предложения:"
   },
   "project.versions.copy-id-option": {
     "message": "Копировать ID"
@@ -4908,13 +5016,10 @@
     "message": "Введённый код неверный!"
   },
   "settings.account.two-factor.field.code.description": {
-    "message": "Введите код подтверждения из приложения."
+    "message": "Введите код из аутентификатора или используйте резервный код."
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Код подтверждения"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Введите код..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "Двухфакторная аутентификация защищает аккаунт, требуя доступ ко второму устройству при входе в систему."
@@ -5159,6 +5264,9 @@
   "settings.billing.plan.title": {
     "message": "{size} план"
   },
+  "settings.billing.price.includes-tax": {
+    "message": "Налог: {amount}"
+  },
   "settings.billing.price.per-interval": {
     "message": "{price} в {interval}"
   },
@@ -5377,6 +5485,21 @@
   },
   "ui.newsletter-button.tooltip": {
     "message": "Подписаться на рассылку от Modrinth"
+  },
+  "ui.two-factor-code.authentication-code": {
+    "message": "Шестизначный код из аутентификатора"
+  },
+  "ui.two-factor-code.backup-code": {
+    "message": "Резервный код"
+  },
+  "ui.two-factor-code.backup-code.placeholder": {
+    "message": "Введите резервный код"
+  },
+  "ui.two-factor-code.use-authentication-code": {
+    "message": "Использовать аутентификатор"
+  },
+  "ui.two-factor-code.use-backup-code": {
+    "message": "Использовать резервный код"
   },
   "version.all-versions": {
     "message": "Все версии"

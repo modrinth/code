@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, useId, watch } from 'vue'
+import type { Placement } from '@floating-ui/vue'
+import { computed, nextTick, ref, useId, useTemplateRef } from 'vue'
 
-import { useAnchoredTeleport } from '../../../utils/use-anchored-teleport'
+import FloatingMenu from '../../floating/FloatingMenu.vue'
 import Button from './Button.vue'
 import IconButton from './IconButton.vue'
 import type {
@@ -45,18 +46,34 @@ const emit = defineEmits<{
 	close: []
 }>()
 
+const menu = useTemplateRef<{ show: () => void; hide: () => void }>('menu')
 const triggerButton = ref<ButtonElementHandle | null>(null)
-const triggerElement = computed(() => triggerButton.value?.element ?? null)
 const panelElement = ref<HTMLElement | null>(null)
-const resolvedPlacement = computed(() => props.placement)
+const isOpen = ref(false)
 const panelId = `button-popout-${useId()}`
 const triggerComponent = computed(() => (props.iconOnly ? IconButton : Button))
+const menuPlacement = computed(() => props.placement.replace(/-center$/, '') as Placement)
 
-const { isOpen, panelStyle, open, close } = useAnchoredTeleport(
-	triggerElement,
-	panelElement,
-	resolvedPlacement,
-)
+function onOpen() {
+	isOpen.value = true
+	emit('open')
+	if (props.autoFocus) {
+		nextTick(focusPanel)
+	}
+}
+
+function onClose() {
+	isOpen.value = false
+	emit('close')
+}
+
+function onPanelKeydown(event: KeyboardEvent) {
+	if (event.key !== 'Escape') {
+		return
+	}
+	event.preventDefault()
+	nextTick(() => triggerButton.value?.element?.focus())
+}
 
 function focusPanel() {
 	const focusable = panelElement.value?.querySelector<HTMLElement>(
@@ -65,83 +82,52 @@ function focusPanel() {
 	;(focusable ?? panelElement.value)?.focus()
 }
 
-async function openMenu() {
-	if (props.disabled || isOpen.value) return
-	await open()
-	emit('open')
-	if (props.autoFocus) await nextTick(focusPanel)
-}
-
-function closeMenu(restoreFocus = true) {
-	if (!isOpen.value) return
-	close(restoreFocus)
-}
-
-async function toggleMenu() {
-	if (isOpen.value) closeMenu()
-	else await openMenu()
-}
-
-function handleTriggerKeydown(event: KeyboardEvent) {
-	if (event.key !== 'Escape' || !isOpen.value) return
-	event.preventDefault()
-	closeMenu()
-}
-
-function handlePanelKeydown(event: KeyboardEvent) {
-	if (event.key !== 'Escape') return
-	event.preventDefault()
-	closeMenu(true)
-}
-
-watch(isOpen, (openState, previousOpenState) => {
-	if (!openState && previousOpenState) emit('close')
+defineExpose({
+	open: () => menu.value?.show(),
+	close: () => menu.value?.hide(),
 })
-
-const isClient = ref(false)
-onMounted(() => {
-	isClient.value = true
-})
-
-defineExpose({ open: openMenu, close: closeMenu })
 </script>
 
 <template>
-	<component
-		:is="triggerComponent"
-		ref="triggerButton"
-		v-bind="$attrs"
-		v-tooltip="props.tooltip"
-		:label="props.iconOnly ? props.label : undefined"
-		:type="props.type"
-		:color="props.color"
-		:size="props.size"
-		:interaction="props.interaction"
-		:disabled="props.disabled"
-		:aria-expanded="isOpen"
-		:aria-controls="panelId"
-		:aria-haspopup="props.panelRole === 'dialog' ? 'dialog' : undefined"
-		@click="toggleMenu"
-		@keydown="handleTriggerKeydown"
+	<FloatingMenu
+		ref="menu"
+		bare
+		:class="$attrs.class"
+		:placement="menuPlacement"
+		:disabled="disabled"
+		panel-class="rounded-[14px] bg-surface-3 text-primary shadow-lg ring-1 ring-surface-5"
+		@open="onOpen"
+		@close="onClose"
 	>
-		<slot name="trigger" />
-	</component>
-
-	<Teleport v-if="isClient" to="body">
-		<Transition name="floating-expand">
+		<component
+			:is="triggerComponent"
+			ref="triggerButton"
+			v-bind="$attrs"
+			v-tooltip="props.tooltip"
+			:label="props.iconOnly ? props.label : undefined"
+			:type="props.type"
+			:color="props.color"
+			:size="props.size"
+			:interaction="props.interaction"
+			:disabled="props.disabled"
+			:aria-expanded="isOpen"
+			:aria-controls="panelId"
+			:aria-haspopup="props.panelRole === 'dialog' ? 'dialog' : undefined"
+		>
+			<slot name="trigger" />
+		</component>
+		<template #popper="{ hide }">
 			<div
-				v-if="isOpen"
 				:id="panelId"
 				ref="panelElement"
-				class="fixed isolate z-[9999] overflow-y-auto rounded-[14px] bg-surface-3 p-4 text-primary shadow-lg ring-1 ring-surface-5"
-				:style="panelStyle"
+				class="p-4"
 				:role="props.panelRole"
 				:aria-label="props.label"
 				tabindex="-1"
-				@keydown="handlePanelKeydown"
+				@keydown="onPanelKeydown"
 			>
-				<slot name="panel" :close="closeMenu" />
+				<slot name="panel" :close="hide" />
 			</div>
-		</Transition>
-	</Teleport>
+		</template>
+	</FloatingMenu>
 </template>

@@ -8,12 +8,18 @@ import {
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
-import { platform } from '@tauri-apps/plugin-os'
+import { useQueries, useQuery, useQueryClient } from '@tanstack/vue-query'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onUnmounted, ref, watch } from 'vue'
 
 import InstanceItem from '@/components/ui/world/InstanceItem.vue'
+import {
+	instanceProtocolQueryOptions,
+	recentWorldsKey,
+	recentWorldsQueryOptions,
+	serverStatusQueryOptions,
+} from '@/components/ui/world/queries'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
@@ -21,18 +27,15 @@ import { handleSevereError } from '@/composables/use-error.js'
 import { trackEvent } from '@/helpers/analytics'
 import { kill, run } from '@/helpers/instance'
 import { get_all } from '@/helpers/process'
+import { traceStartupStep } from '@/helpers/startup-debug'
 import { get_game_versions } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
 import {
-	get_instance_protocol_version,
-	get_recent_worlds,
 	getWorldIdentifier,
 	hasServerQuickPlaySupport,
 	hasWorldQuickPlaySupport,
 	type ProtocolVersion,
-	refreshServerData,
 	type ServerData,
-	type ServerWorld,
 	start_join_server,
 	start_join_singleplayer_world,
 	type WorldWithInstance,
@@ -51,16 +54,18 @@ const props = defineProps<{
 
 const appSettings = useAppSettings()
 
-const jumpBackInItems = ref<JumpBackInItem[]>([])
-const loading = ref(true)
-const serverData = ref<Record<string, ServerData>>({})
-const protocolVersions = ref<Record<string, ProtocolVersion | null>>({})
+const queryClient = useQueryClient()
 const locallyPlayedInstances = ref<Record<string, Dayjs>>({})
-const gameVersions = ref<GameVersion[]>(await get_game_versions().catch(() => []))
+const gameVersionsQuery = useQuery({
+	queryKey: ['tags', 'game-versions'],
+	queryFn: (): Promise<GameVersion[]> =>
+		traceStartupStep('Load jump-in game versions', () => get_game_versions()),
+	staleTime: Infinity,
+})
+const gameVersions = computed(() => gameVersionsQuery.data.value ?? [])
 
 const MAX_JUMP_BACK_IN = 5
 const MAX_NEW_INSTANCES = 3
-const MAX_LINUX_POPULATES = 3
 const ITEM_DRAG_DISTANCE = 92
 const STORAGE_KEY = 'modrinth-jump-back-in-count'
 
@@ -156,10 +161,6 @@ function endResize(event?: PointerEvent) {
 	}
 }
 
-// Track populate calls on Linux to prevent server ping spam
-const isLinux = platform() === 'linux'
-const linuxPopulateCount = ref(0)
-
 type BaseJumpBackInItem = {
 	sort_time: Dayjs
 	instance: GameInstance
@@ -179,92 +180,34 @@ type JumpBackInItem = InstanceJumpBackInItem | WorldJumpBackInItem
 
 const showWorlds = computed(() => appSettings.getFeatureFlag('worlds_in_home'))
 
-watch([() => props.recentInstances, () => showWorlds.value], async () => {
-	await populateJumpBackIn().catch(() => {
-		console.error('Failed to populate jump back in')
+const recentWorldsQuery = useQuery({
+	...recentWorldsQueryOptions(MAX_JUMP_BACK_IN),
+	enabled: showWorlds,
+})
+const loading = computed(() => showWorlds.value && recentWorldsQuery.isLoading.value)
+const worldItems = computed<WorldJumpBackInItem[]>(() => {
+	if (!showWorlds.value) return []
+	return (recentWorldsQuery.data.value ?? []).flatMap<WorldJumpBackInItem>((world) => {
+		const instance = props.recentInstances.find((instance) => instance.id === world.instance_id)
+		if (!instance || !world.last_played) return []
+		return [{ type: 'world', sort_time: dayjs(world.last_played), world, instance }]
 	})
 })
 
-await populateJumpBackIn()
-	.catch(() => {
-		console.error('Failed to populate jump back in')
-	})
-	.finally(() => {
-		loading.value = false
-	})
-
-async function populateJumpBackIn() {
-	// On Linux, limit automatic populates to prevent server ping spam
-	if (isLinux && linuxPopulateCount.value >= MAX_LINUX_POPULATES) return
-	if (isLinux) linuxPopulateCount.value++
-
-	console.info('Repopulating jump back in...')
-
-	const worldItems: WorldJumpBackInItem[] = []
-
-	if (showWorlds.value) {
-		const worlds = await get_recent_worlds(MAX_JUMP_BACK_IN, ['normal', 'favorite'])
-
-		worlds.forEach((world) => {
-			const instance = props.recentInstances.find((instance) => instance.id === world.instance_id)
-
-			if (!instance || !world.last_played) {
-				return
-			}
-
-			worldItems.push({
-				type: 'world',
-				sort_time: dayjs(world.last_played ?? 0),
-				world: world,
-				instance: instance,
-			})
-		})
-
-		const servers: {
-			instanceId: string
-			address: string
-		}[] = worldItems
-			.filter((item) => item.world.type === 'server' && item.instance)
-			.map((item) => ({
-				instanceId: item.instance.id,
-				address: (item.world as ServerWorld).address,
-			}))
-
-		// fetch protocol versions for all unique MC versions with server worlds
-		const uniqueServerInstances = new Set<string>(servers.map((x) => x.instanceId))
-		await Promise.all(
-			[...uniqueServerInstances].map((instanceId) =>
-				get_instance_protocol_version(instanceId)
-					.then((protoVer) => (protocolVersions.value[instanceId] = protoVer))
-					.catch(() => {
-						console.error(`Failed to get instance protocol for: ${instanceId} `)
-					}),
-			),
-		)
-
-		// initialize server data
-		servers.forEach(({ address }) => {
-			if (!serverData.value[address]) {
-				serverData.value[address] = {
-					refreshing: true,
-				}
-			}
-		})
-
-		servers.forEach(({ instanceId, address }) =>
-			refreshServerData(serverData.value[address], protocolVersions.value[instanceId], address),
-		)
-	}
-
+const jumpBackInItems = computed<JumpBackInItem[]>(() => {
+	const worlds = [...worldItems.value]
 	const instanceItems: InstanceJumpBackInItem[] = []
 	for (const instance of props.recentInstances) {
-		const worldItem = worldItems.find((item) => item.instance.id === instance.id)
-		const lastPlayed = instance.last_played
-			? dayjs(instance.last_played)
-			: locallyPlayedInstances.value[instance.id]
+		const worldItem = worlds.find((item) => item.instance.id === instance.id)
+		const recordedLastPlayed = instance.last_played ? dayjs(instance.last_played) : undefined
+		const localLastPlayed = locallyPlayedInstances.value[instance.id]
+		const lastPlayed =
+			localLastPlayed && (!recordedLastPlayed || localLastPlayed.isAfter(recordedLastPlayed))
+				? localLastPlayed
+				: recordedLastPlayed
 		const newlyAdded = !lastPlayed
 		if (worldItem && (!lastPlayed || !lastPlayed.isAfter(worldItem.sort_time))) continue
-		if (worldItem) worldItems.splice(worldItems.indexOf(worldItem), 1)
+		if (worldItem) worlds.splice(worlds.indexOf(worldItem), 1)
 
 		instanceItems.push({
 			type: 'instance',
@@ -274,10 +217,10 @@ async function populateJumpBackIn() {
 		})
 	}
 
-	const items: JumpBackInItem[] = [...worldItems, ...instanceItems]
+	const items: JumpBackInItem[] = [...worlds, ...instanceItems]
 	items.sort((a, b) => b.sort_time.diff(a.sort_time))
 	let newInstanceCount = 0
-	jumpBackInItems.value = items
+	return items
 		.filter((item) => {
 			if (item.type !== 'instance' || !item.newly_added) return true
 			if (newInstanceCount >= MAX_NEW_INSTANCES) return false
@@ -285,7 +228,7 @@ async function populateJumpBackIn() {
 			return true
 		})
 		.slice(0, MAX_JUMP_BACK_IN)
-}
+})
 
 function markInstancePlayed(item: InstanceJumpBackInItem) {
 	const lastPlayed = dayjs()
@@ -293,13 +236,99 @@ function markInstancePlayed(item: InstanceJumpBackInItem) {
 		...locallyPlayedInstances.value,
 		[item.instance.id]: lastPlayed,
 	}
-	item.sort_time = lastPlayed
-	item.newly_added = false
 }
 
-function refreshServer(address: string, instanceId: string) {
-	refreshServerData(serverData.value[address], protocolVersions.value[instanceId], address)
+const serverWorlds = computed(() =>
+	jumpBackInItems.value.flatMap((item) =>
+		item.type === 'world' && item.world.type === 'server'
+			? [{ instance: item.instance, address: item.world.address }]
+			: [],
+	),
+)
+const serverInstances = computed(() => [
+	...new Map(serverWorlds.value.map(({ instance }) => [instance.id, instance])).values(),
+])
+const protocolQueries = useQueries({
+	queries: computed(() =>
+		serverInstances.value.map((instance) => ({
+			...instanceProtocolQueryOptions(instance),
+			select: (protocol: ProtocolVersion | null) => ({ instanceId: instance.id, protocol }),
+		})),
+	),
+})
+const protocolVersions = computed(() => {
+	const versions: Record<string, ProtocolVersion | null | undefined> = {}
+	for (const query of protocolQueries.value) {
+		if (query.data) versions[query.data.instanceId] = query.data.protocol
+	}
+	return versions
+})
+const serversToPing = computed(() => {
+	const servers = new Map<string, { address: string; protocol: ProtocolVersion | null }>()
+	for (const { instance, address } of serverWorlds.value) {
+		const protocol = protocolVersions.value[instance.id]
+		const index = serverInstances.value.findIndex((server) => server.id === instance.id)
+		if (protocol === undefined && !protocolQueries.value[index]?.isError) continue
+		if (!servers.has(address)) servers.set(address, { address, protocol: protocol ?? null })
+	}
+	return [...servers.values()]
+})
+const serverQueries = useQueries({
+	queries: computed(() =>
+		serversToPing.value.map(({ address, protocol }) => ({
+			...serverStatusQueryOptions(address, protocol),
+			select: (data: ServerData) => ({ address, data }),
+		})),
+	),
+})
+const serverData = computed(() => {
+	const data: Record<string, ServerData> = {}
+	for (const query of serverQueries.value) {
+		if (query.data) {
+			data[query.data.address] = { ...query.data.data, refreshing: query.isFetching }
+		}
+	}
+	return data
+})
+
+function refreshServer(address: string) {
+	const server = serversToPing.value.find((server) => server.address === address)
+	if (!server) return
+	void queryClient.refetchQueries(
+		{ queryKey: serverStatusQueryOptions(address, server.protocol).queryKey, exact: true },
+		{ cancelRefetch: false },
+	)
 }
+
+let refreshTimer: ReturnType<typeof setTimeout> | undefined
+let refreshRequested = false
+let refreshingWorlds = false
+let disposed = false
+
+function scheduleWorldsRefresh() {
+	if (disposed || !showWorlds.value) return
+	refreshRequested = true
+	if (refreshTimer || refreshingWorlds) return
+	refreshTimer = setTimeout(() => {
+		refreshTimer = undefined
+		void refreshWorlds()
+	}, 250)
+}
+
+async function refreshWorlds() {
+	refreshRequested = false
+	refreshingWorlds = true
+	try {
+		await queryClient.invalidateQueries({ queryKey: recentWorldsKey }, { cancelRefetch: false })
+	} finally {
+		refreshingWorlds = false
+		if (refreshRequested) scheduleWorldsRefresh()
+	}
+}
+
+watch(recentWorldsQuery.error, (error) => {
+	if (error) handleError(error)
+})
 
 async function joinWorld(world: WorldWithInstance, instance?: GameInstance) {
 	if (instance?.quarantined) return
@@ -341,44 +370,40 @@ async function stopInstance(path: string) {
 const currentInstance = ref<string>()
 const currentWorld = ref<string>()
 
-useAppEvent('process', async () => {
-	await checkProcesses()
-})
-
-useAppEvent('instance', async () => {
-	await populateJumpBackIn().catch(() => {
-		console.error('Failed to populate jump back in')
-	})
-})
-
-const runningInstances = ref<string[]>([])
-
 type ProcessMetadata = {
 	uuid: string
 	instance_id: string
 	start_time: string
 }
 
-const checkProcesses = async () => {
-	const runningProcesses: ProcessMetadata[] = await get_all().catch(handleError)
-
-	const runningPaths = runningProcesses.map((x) => x.instance_id)
-
-	const stoppedInstances = runningInstances.value.filter((x) => !runningPaths.includes(x))
-	if (currentInstance.value && stoppedInstances.includes(currentInstance.value)) {
+const processesQuery = useQuery({
+	queryKey: ['processes', 'list'],
+	queryFn: (): Promise<ProcessMetadata[]> => get_all(),
+})
+const runningInstances = computed(() =>
+	(processesQuery.data.value ?? []).map((process) => process.instance_id),
+)
+watch(runningInstances, (running, previous) => {
+	if (
+		currentInstance.value &&
+		previous.includes(currentInstance.value) &&
+		!running.includes(currentInstance.value)
+	) {
 		currentInstance.value = undefined
 		currentWorld.value = undefined
 	}
-
-	runningInstances.value = runningPaths
-}
-
-onMounted(() => {
-	checkProcesses()
-	linuxPopulateCount.value = 0
+})
+useAppEvent('process', () => {
+	void queryClient.invalidateQueries({ queryKey: ['processes', 'list'] }, { cancelRefetch: false })
+	scheduleWorldsRefresh()
+})
+useAppEvent('instance', (event) => {
+	if (event.event !== 'screenshots_updated' && event.event !== 'synced') scheduleWorldsRefresh()
 })
 
 onUnmounted(() => {
+	disposed = true
+	clearTimeout(refreshTimer)
 	document.body.classList.remove('recent-worlds-resizing')
 	clearOverdragFlash()
 })
@@ -415,8 +440,8 @@ onUnmounted(() => {
 						"
 						:refreshing="
 							item.world.type === 'server'
-								? serverData[item.world.address].refreshing &&
-									!serverData[item.world.address].status
+								? (serverData[item.world.address]?.refreshing ?? true) &&
+									!serverData[item.world.address]?.status
 								: undefined
 						"
 						:supports-server-quick-play="
@@ -429,10 +454,12 @@ onUnmounted(() => {
 						"
 						:quarantined="item.instance.quarantined"
 						:server-status="
-							item.world.type === 'server' ? serverData[item.world.address].status : undefined
+							item.world.type === 'server' ? serverData[item.world.address]?.status : undefined
 						"
 						:rendered-motd="
-							item.world.type === 'server' ? serverData[item.world.address].renderedMotd : undefined
+							item.world.type === 'server'
+								? serverData[item.world.address]?.renderedMotd
+								: undefined
 						"
 						:current-protocol="protocolVersions[item.instance.id]"
 						:game-mode="
@@ -441,13 +468,8 @@ onUnmounted(() => {
 						:instance-id="item.instance.id"
 						:instance-name="item.instance.name"
 						:instance-icon="item.instance.icon_path"
-						@refresh="
-							() =>
-								item.world.type === 'server'
-									? refreshServer(item.world.address, item.instance.id)
-									: {}
-						"
-						@update="() => populateJumpBackIn()"
+						@refresh="() => (item.world.type === 'server' ? refreshServer(item.world.address) : {})"
+						@update="scheduleWorldsRefresh"
 						@play="
 							() => {
 								currentInstance = item.instance.id

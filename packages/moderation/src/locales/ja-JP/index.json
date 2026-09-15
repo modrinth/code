@@ -1,7 +1,4 @@
 {
-  "nags.add-description.description": {
-    "defaultMessage": "プロジェクトの目的と機能の明確な説明が必要です。"
-  },
   "nags.add-description.title": {
     "defaultMessage": "説明を追加する"
   },
@@ -23,14 +20,8 @@
   "nags.add-license-details.title": {
     "defaultMessage": "ライセンス詳細を追加"
   },
-  "nags.add-links-server.description": {
-    "defaultMessage": "Modrinth以外の関連リンク (ウェブサイト、ストア、Discord招待など) を追加してください。"
-  },
   "nags.add-links-server.title": {
     "defaultMessage": "外部リンクを追加する"
-  },
-  "nags.add-links.description": {
-    "defaultMessage": "ソースコードやバグの報告場所、Discordの招待などの外部リンクを追加してください。"
   },
   "nags.add-links.title": {
     "defaultMessage": "外部リンクを追加する"
@@ -41,14 +32,14 @@
   "nags.all-languages.title": {
     "defaultMessage": "正確な言語を選択してください"
   },
-  "nags.all-tags-selected.description": {
-    "defaultMessage": "利用できる{totalAvailableTags, plural, other {#個のタグ}}のすべてを選択しています。これでは、関連したプロジェクトをユーザーが見つけやすくするというタグ本来の目的を果たせなくなってしまいます。このプロジェクトに関連するタグのみを選択してください。"
-  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "適切なタグを選択する"
   },
-  "nags.check-disclosures.title": {
-    "defaultMessage": "コンテンツの開示を確認"
+  "nags.check-disclosures.description": {
+    "defaultMessage": "{type} に適用されるコンテンツの開示情報を入力して、ユーザーが重要な情報を認識していることを確認してください。"
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "説明を展開する"
   },
   "nags.edit-description.title": {
     "defaultMessage": "説明を編集する"
@@ -62,9 +53,6 @@
   "nags.edit-tags.title": {
     "defaultMessage": "タグを編集する"
   },
-  "nags.edit-title.title": {
-    "defaultMessage": "タイトルを編集する"
-  },
   "nags.feature-gallery-image.description": {
     "defaultMessage": "あなたのプロジェクトの第一印象はギャラリーに含まれる画像に大きく左右されます。"
   },
@@ -74,23 +62,11 @@
   "nags.gallery.title": {
     "defaultMessage": "ギャラリーのページを閲覧する"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "このライセンス{type}はソースコードの公開が必要です。ソースコードへのリンクを追加するか、バージョン毎にソースファイルを添付してください。もしくは他のライセンスへの変更を検討してください。"
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "ソースコードのリンクの追加"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "まったく同じ外部リンクが複数あります。各リンクは適切な形式で１つだけ入力してください。"
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "リンクの重複を整理"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "ライセンスのURLが無効です。"
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "ライセンスのURLは {domain} を指していますが、これはライセンス情報には適切ではありません。ライセンスのURLは、ソーシャルメディアやゲームプラットフォームなどではなく、直接ライセンスのファイルにリンクする必要があります。"
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "ライセンスのURLの形式が間違っています。ライセンスの本文にアクセスできる有効なURLを追加してください。"
@@ -116,9 +92,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "画像の代替テキストを追加"
   },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Discordの招待リンクは、他のリンクタイプには使用できません。Discordのリンクは、Discord招待リンク欄にのみ入力してください。"
-  },
   "nags.misused-discord-link.title": {
     "defaultMessage": "Discordの招待リンクを移動する"
   },
@@ -131,17 +104,8 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "フィードバックの確認"
   },
-  "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "{count, plural, other {#個の解像度タグ}} ({tags}) を選択しました。リソースパックは通常、主要な解像度と一致する1つの解像度タグのみを設定すべきです。"
-  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "正しい解像度を選択"
-  },
-  "nags.review-permissions.description": {
-    "defaultMessage": "Modpack に外部コンテンツを配布する許可を持っていることを証明する資料を必ず提供してください。"
-  },
-  "nags.review-permissions.title": {
-    "defaultMessage": "外部権限を確認する"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "サーバーがサポートするバージョンのModpackを選択するか、または独自のModpackをアップロードしてください。"
@@ -185,20 +149,14 @@
   "nags.settings.links.title": {
     "defaultMessage": "リンクの設定を表示"
   },
-  "nags.settings.permissions.title": {
-    "defaultMessage": "権限ダッシュボードを見る"
-  },
   "nags.settings.tags.title": {
     "defaultMessage": "タグの設定を表示"
   },
   "nags.settings.title": {
     "defaultMessage": "一般設定を表示"
   },
-  "nags.summary-special-formatting.description": {
-    "defaultMessage": "要約には、プレーンテキストのみが表示されるため、フォーマット、改行、特殊文字、またはリンクを含めないでください。"
-  },
-  "nags.summary-special-formatting.title": {
-    "defaultMessage": "要約を整理"
+  "nags.settings.versions.title": {
+    "defaultMessage": "バージョン設定を開く"
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "要約を展開"
@@ -209,14 +167,8 @@
   "nags.too-many-languages.title": {
     "defaultMessage": "適切な言語を選択する"
   },
-  "nags.too-many-tags-server.description": {
-    "defaultMessage": "{tagCount, plural, other {#個}}のタグを選択しました。サーバーが関連する検索結果に表示されるように、{maxTagCount}個以下に減らしてください。"
-  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "適切なタグを選択する"
-  },
-  "nags.too-many-tags.description": {
-    "defaultMessage": "{tagCount, plural, other {#個}}のタグを選択しました。関連する検索結果に表示されるように、{maxTagCount}個以下に減らすことを検討してください。"
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "正確なタグを選択"
@@ -239,13 +191,8 @@
   "nags.upload-version.title": {
     "defaultMessage": "バージョンをアップロード"
   },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "一部の外部リンクは、その種類のリンクに適さないドメインを使用している可能性があります。"
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "外部リンクの承認"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "リンク設定を表示"
   }
 }
+

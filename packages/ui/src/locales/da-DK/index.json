@@ -563,6 +563,9 @@
   "files.editor.find-previous-match": {
     "defaultMessage": "Tidligere match"
   },
+  "files.layout.unsaved-changes": {
+    "defaultMessage": "Du har ændringer, der ikke er gemt."
+  },
   "files.navbar.new-file": {
     "defaultMessage": "Ny fil"
   },
@@ -2212,5 +2215,12 @@
   },
   "tag.loader.vanilla": {
     "defaultMessage": "Vanilla Shader"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "Du har ændringer, der ikke er gemt."
+  },
+  "ui.confirm-leave-modal.header": {
+    "defaultMessage": "Du har ændringer, der ikke er gemt"
   }
 }
+

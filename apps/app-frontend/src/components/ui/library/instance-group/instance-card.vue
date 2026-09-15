@@ -123,6 +123,7 @@ const { isDragging } = useDraggable({
 const router = useRouter()
 
 const seeInstance = async () => {
+	if (installing.value) return
 	await router.push(`/instance/${encodeURIComponent(props.instance.id)}`)
 }
 
@@ -176,7 +177,7 @@ const checkProcess = async () => {
 
 const play = async (event: MouseEvent | null, context: string) => {
 	event?.stopPropagation()
-	if (props.instance.quarantined) return
+	if (props.instance.quarantined || installing.value || modLoading.value) return
 	loading.value = true
 	await run(props.instance.id)
 		.catch((err) => handleSevereError(err, { instanceId: props.instance.id }))
@@ -205,7 +206,7 @@ const stop = async (event: MouseEvent | null, context: string) => {
 
 const repair = async (event: MouseEvent) => {
 	event.stopPropagation()
-	if (props.instance.quarantined) return
+	if (props.instance.quarantined || installing.value || modLoading.value) return
 
 	if (
 		props.instance.install_stage !== 'pack_installed' &&
@@ -228,7 +229,7 @@ const openFolder = async () => {
 }
 
 const addContent = async () => {
-	if (props.instance.quarantined) return
+	if (props.instance.quarantined || installing.value || modLoading.value) return
 	await router.push({
 		path: `/browse/${props.instance.loader === 'vanilla' ? 'datapack' : 'mod'}`,
 		query: { i: props.instance.id },

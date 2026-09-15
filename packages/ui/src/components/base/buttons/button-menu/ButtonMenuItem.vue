@@ -172,7 +172,6 @@ function handleFocus(event: FocusEvent) {
 			ref="trailingElement"
 			v-tooltip="props.option.trailingAction.label"
 			type="button"
-			:aria-label="props.option.trailingAction.label"
 			:class="trailingActionClasses"
 			:style="trailingActionStyle"
 			tabindex="-1"

@@ -26,7 +26,7 @@ export default {
 		const context: I18nDebugContext = { enabled, keyReveal, registry, panelOpen }
 		app.provide(I18N_DEBUG_KEY, context)
 
-		initI18nDebugRuntime(context)
+		app.onUnmount(initI18nDebugRuntime(context))
 
 		watch(
 			() => appSettings.featureFlags.i18n_debug,

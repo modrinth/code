@@ -39,7 +39,7 @@
     "message": "依赖于"
   },
   "analytics.breakdown.dependent-project-download": {
-    "message": "依赖的项目"
+    "message": "依赖项目"
   },
   "analytics.breakdown.dependent-project-type": {
     "message": "依赖的项目类型"
@@ -468,7 +468,7 @@
     "message": "{count, plural, other {# 天}}"
   },
   "analytics.table.duration.hours": {
-    "message": "{count, plural, one {# 小时} other {# 小时}}"
+    "message": "{count, plural, other {# 小时}}"
   },
   "analytics.table.duration.minutes": {
     "message": "{count, plural, one {# 分钟} other {# 分钟}}"
@@ -581,12 +581,6 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "一键保存你喜爱的内容，并及时获取更新。"
-  },
-  "app-marketing.features.follow.title": {
-    "message": "关注项目"
-  },
   "app-marketing.features.importing.description": {
     "message": "轻松导入你在其他启动器上的所有配置，仅需数秒，即可快速上手 Modrinth App！"
   },
@@ -597,7 +591,13 @@
     "message": "MultiMC"
   },
   "app-marketing.features.importing.title": {
-    "message": "配置导入"
+    "message": "实例导入"
+  },
+  "app-marketing.features.manage-skins.description": {
+    "message": "从应用切换所有Minecraft皮肤。"
+  },
+  "app-marketing.features.manage-skins.title": {
+    "message": "皮肤选择器"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "操作"
@@ -623,14 +623,8 @@
   "app-marketing.features.mod-management.version": {
     "message": "版本"
   },
-  "app-marketing.features.offline.description": {
-    "message": "无论联网与否，皆可畅玩你的模组。"
-  },
-  "app-marketing.features.offline.title": {
-    "message": "离线模式"
-  },
   "app-marketing.features.open-source.description": {
-    "message": "Modrinth 的启动器是完全开源的。你可以在我们的 <github-link>GitHub</github-link> 上查看源代码！"
+    "message": "Modrinth App 完全开源。你可以在我们的 <github-link>GitHub</github-link> 上查看源代码！"
   },
   "app-marketing.features.open-source.title": {
     "message": "开源"
@@ -642,7 +636,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App 的性能优于许多主流模组管理器，内存占用仅为 150 MB！"
+    "message": "Modrinth App 的性能优于许多主流模组管理器！"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -652,15 +646,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"
@@ -685,6 +670,12 @@
   },
   "app-marketing.features.play.title": {
     "message": "畅玩心爱模组"
+  },
+  "app-marketing.features.settings-sync.description": {
+    "message": "在你所有的实例中使用相同的选项、资源包及更多。"
+  },
+  "app-marketing.features.settings-sync.title": {
+    "message": "同步你的设置"
   },
   "app-marketing.features.sharing.description": {
     "message": "基于 Modrinth 上的海量资源，你可以轻松制作、分享并畅玩你的整合包。"
@@ -782,6 +773,9 @@
   "auth.create-account.date-of-birth.label": {
     "message": "出生日期"
   },
+  "auth.create-account.date-of-birth.not-meet-age-requirement": {
+    "message": "您的年龄不满足 Modrinth 账户要求。"
+  },
   "auth.create-account.date-of-birth.placeholder": {
     "message": "请选择你的出生日期"
   },
@@ -792,7 +786,7 @@
     "message": "需提供出生日期"
   },
   "auth.create-account.date-of-birth.under13-helper": {
-    "message": "你还未满足在 Modrinth 上创建账号的年龄需求。"
+    "message": "您必须已满 13 岁，才能在 Modrinth 创建账户。"
   },
   "auth.create-account.info-panel.source-code-link": {
     "message": "相关源代码"
@@ -817,6 +811,30 @@
   },
   "auth.create-account.username.placeholder": {
     "message": "请输入用户名"
+  },
+  "auth.reauthenticate.2fa.description": {
+    "message": "请输入验证器应用生成的 6 位验证码，或使用backup code。"
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "双重身份验证"
+  },
+  "auth.reauthenticate.continue-with-passkey": {
+    "message": "使用通行密钥登录"
+  },
+  "auth.reauthenticate.last-signed-in-with": {
+    "message": "上次登录使用的是 {method, select, password {密码} passkey {通行密钥} github {GitHub} discord {Discord} google {Google} microsoft {Microsoft} gitlab {GitLab} steam {Steam} paypal {PayPal} other {{method}} }。"
+  },
+  "auth.reauthenticate.page-title": {
+    "message": "重新身份验证"
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "使用其他方式登录"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "使用 {provider} 登录"
+  },
+  "auth.reauthenticate.title": {
+    "message": "{name} 需要重新进行身份验证。"
   },
   "auth.reset-password.method-choice.action": {
     "message": "发送密码重置邮件"
@@ -857,8 +875,11 @@
   "auth.sign-in.2fa.label": {
     "message": "双因素验证"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "输入验证码……"
+  "auth.sign-in.add-account": {
+    "message": "添加账户"
+  },
+  "auth.sign-in.choose-account": {
+    "message": "选择要在 Modrinth App 中使用的账户"
   },
   "auth.sign-in.continue-with-email": {
     "message": "使用邮箱继续"
@@ -874,6 +895,27 @@
   },
   "auth.sign-in.last-sign-in": {
     "message": "最后一次登录"
+  },
+  "auth.sign-in.launcher.callback.title": {
+    "message": "Modrint应用登录返回"
+  },
+  "auth.sign-in.launcher.complete.description": {
+    "message": "将返回 Modrinth 应用。如果未自动跳转，请点击下方按钮。"
+  },
+  "auth.sign-in.launcher.complete.go-to-website": {
+    "message": "前往 Modrinth.com"
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "打开 Modrinth App"
+  },
+  "auth.sign-in.launcher.complete.title": {
+    "message": "已登录"
+  },
+  "auth.sign-in.launcher.opening.description": {
+    "message": "如果应用程序没有打开，请使用下面的按钮来完成登录。"
+  },
+  "auth.sign-in.launcher.opening.title": {
+    "message": "打开Modrinth App……"
   },
   "auth.sign-in.no-account": {
     "message": "没有账号？"
@@ -907,6 +949,9 @@
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "创建账号"
+  },
+  "auth.two-factor.incorrect-code": {
+    "message": "两步验证码不正确。请重试或使用备份代码。"
   },
   "auth.verify-email.action.account-settings": {
     "message": "账户设置"
@@ -1024,6 +1069,9 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "批准并回复"
+  },
+  "conversation-thread.action.close-report": {
+    "message": "关闭举报"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "关闭并回复"
@@ -2189,6 +2237,12 @@
   "error.generic.401.signed-in-as": {
     "message": "你目前登录的账号："
   },
+  "error.generic.401.switch-account": {
+    "message": "或切换到其他账户："
+  },
+  "error.generic.401.switch-account-failed": {
+    "message": "无法切换账户，请重试。"
+  },
   "error.generic.401.title": {
     "message": "你没有该页面的访问权限"
   },
@@ -2301,7 +2355,7 @@
     "message": "Modrinth Hosting 服务器是在哪种 CPU 上运行的？"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Modrinth Hosting 服务器由 AMD Ryzen 7900 和 7950X3D 等效 CPU 提供动力，主频为 5+ GHz，并配备 DDR5 内存。"
+    "message": "Modrinth Hosting 服务器搭载 AMD Ryzen 7950X 或 9950X（或同级别）的 CPU，并配备 DDR5 内存。"
   },
   "hosting-marketing.faq.currency": {
     "message": "价格以哪一种货币计算？"
@@ -2661,7 +2715,7 @@
     "message": "新建项目"
   },
   "layout.action.new-server-project": {
-    "message": "新建服务器"
+    "message": "新建服务器项目"
   },
   "layout.action.publish": {
     "message": "发布"
@@ -2674,6 +2728,9 @@
   },
   "layout.action.tech-review": {
     "message": "技术审查"
+  },
+  "layout.action.user-lookup": {
+    "message": "用户查找"
   },
   "layout.avatar.alt": {
     "message": "你的头像"
@@ -2870,6 +2927,9 @@
   "layout.nav.active-reports": {
     "message": "处理中的举报"
   },
+  "layout.nav.add-account": {
+    "message": "添加账户"
+  },
   "layout.nav.discover": {
     "message": "发现"
   },
@@ -2900,6 +2960,9 @@
   "layout.nav.projects": {
     "message": "项目"
   },
+  "layout.nav.remove-account": {
+    "message": "移除账户"
+  },
   "layout.nav.revenue": {
     "message": "收益"
   },
@@ -2908,6 +2971,12 @@
   },
   "layout.nav.search": {
     "message": "搜索"
+  },
+  "layout.nav.switch-account": {
+    "message": "切换账户"
+  },
+  "layout.nav.switch-account-failed": {
+    "message": "无法切换账户，请稍后重试。"
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "升级至 Modrinth+"
@@ -2947,6 +3016,9 @@
   },
   "moderation.moderate": {
     "message": "审核"
+  },
+  "moderation.page.delphi-rules": {
+    "message": "Delphi 规则"
   },
   "moderation.page.external-projects": {
     "message": "外部项目"
@@ -3349,6 +3421,9 @@
   },
   "project-member-header.success-join": {
     "message": "你加入了项目团队"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "您的项目已提交审核！"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "发布前检查单"
@@ -3767,6 +3842,12 @@
   "project.notification.icon-updated.title": {
     "message": "已更新项目图标"
   },
+  "project.notification.review-save-failed.description": {
+    "message": "您不能保存到验证失败的内容。"
+  },
+  "project.notification.review-save-failed.title": {
+    "message": "保存失败"
+  },
   "project.notification.updated.message": {
     "message": "你的项目已更新。"
   },
@@ -3804,7 +3885,10 @@
     "message": "删除项目"
   },
   "project.settings.disclosures.advertising.description.1": {
-    "message": "如果你的项目包含其他作品的广告、赞助或促销，您必须启用此功能。"
+    "message": "如果你的项目包含其他作品的广告、赞助或宣传，您必须启用此选项。"
+  },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "这并不关系到无直接货币价值的相关内容的非侵扰性推广(例如您自己的配置菜单中与Modrinth配置文件的链接)， 并且不适用于项目页面中的广告，例如描述中的赞助广告。"
   },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "例如：将 Modrinth SMP 服务器自动添加到你的服务器列表。"
@@ -3812,20 +3896,32 @@
   "project.settings.disclosures.advertising.title": {
     "message": "包含广告推广内容"
   },
-  "project.settings.disclosures.ai.content-rules": {
-    "message": "请参考第6节的 <rules>Modrinth Content Rules</rules> 获取更多信息。"
+  "project.settings.disclosures.ai-functionality.description": {
+    "message": "如果项目具有使用生成的AI的功能，如游戏中的聊天机器人或动态生成的纹理，则必须启用。"
+  },
+  "project.settings.disclosures.ai-functionality.note-placeholder": {
+    "message": "例如：NPC 使用 generative AI 进行对话选项。"
+  },
+  "project.settings.disclosures.ai-functionality.title": {
+    "message": "包含AI生成的功能"
   },
   "project.settings.disclosures.ai.description": {
-    "message": "如果此项目包含大量AI生成的代码，您必须启用此功能，任何资产基本上是AI生成的、该项目的功能依赖于使用AI或您的项目页面中的任何元素的部分为AI所生成的，请描述或发布依赖于生成的AI所生成的部分。"
+    "message": "如果此项目包含任何AI生成的资产或文本，或者包含大量的AI生成的代码，则必须启用此选项。"
+  },
+  "project.settings.disclosures.ai.description.2": {
+    "message": "如果AI在制作或出版这一内容方面发挥了重要作用，那么诚实至关重要。一个简单的判断方法是：如果你认为AI是该项目的共同作者，就应该在此予以披露。"
   },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "例如：中文和阿拉伯文的翻译是AI生成的。"
+  },
+  "project.settings.disclosures.ai.still-unsure": {
+    "message": "仍然不确定？ 欲了解更多信息，请参阅我们的 <faq-link>披露和使用</faq-link> 指南和 <rules>Modrinth的内容规则</rules> 第6条。"
   },
   "project.settings.disclosures.ai.title": {
     "message": "包含AI所生成的内容"
   },
   "project.settings.disclosures.ai.types-description": {
-    "message": "用了什么样的AI所生成的内容？"
+    "message": "通过 AI生成了哪些类型的内容？"
   },
   "project.settings.disclosures.archived.banner-preview": {
     "message": "提示横幅预览"
@@ -3863,11 +3959,20 @@
   "project.settings.disclosures.derivative.note-label": {
     "message": "解释你的项目是如何基于原项目进行的更改"
   },
+  "project.settings.disclosures.derivative.note-placeholder": {
+    "message": "这是一个叉，可以添加一些新的生物群落，并将其端口到更新的Minecraft版本。"
+  },
   "project.settings.disclosures.derivative.title": {
     "message": "包含衍生内容"
   },
   "project.settings.disclosures.description": {
     "message": "你必须按照 <rules>Modrinth的内容规则</rules> 向您的项目添加任何适用的内容披露。"
+  },
+  "project.settings.disclosures.description.2": {
+    "message": "不确定如何将内容披露应用于您的项目？查看我们的<faq-link>内容披露常见问题解答</faq-link>。"
+  },
+  "project.settings.disclosures.info-tooltip": {
+    "message": "点击了解更多关于何时使用此信息的信息。"
   },
   "project.settings.disclosures.last-updated": {
     "message": "最后由用户 {user} 在 {date} 更新"
@@ -3885,10 +3990,10 @@
     "message": "如果需要删除此披露，请 <contact-support-link>联系支持</contact-support-link>。"
   },
   "project.settings.disclosures.paid-features.description": {
-    "message": "如果你的项目包含可以通过真金白银获得的功能，你必须启用此功能。"
+    "message": "如果此项目包含可以通过用现实中的钱解锁的功能，则必须启用。"
   },
   "project.settings.disclosures.paid-features.feature-placeholder": {
-    "message": "例如：化妆品可用作Patreon奖励"
+    "message": "例如：提供外观饰品作为Patreon奖励"
   },
   "project.settings.disclosures.paid-features.features-description": {
     "message": "列出支付功能的类型"
@@ -3900,7 +4005,7 @@
     "message": "如果你的项目包含任何你认为可能对某些患有光敏性癫痫的人有危险的内容，请务必启用此功能。"
   },
   "project.settings.disclosures.photosensitivity.note-placeholder": {
-    "message": "例如，它添加了一个手势模式的手电筒。它可以在游戏中的辅助功能设置中禁用。"
+    "message": "例如：加入了有频闪模式的手电筒。可以在游戏中的辅助功能设置中禁用。"
   },
   "project.settings.disclosures.photosensitivity.title": {
     "message": "光敏性癫痫警告"
@@ -3936,7 +4041,7 @@
     "message": "描述外部系统的交互"
   },
   "project.settings.disclosures.system-interactions.note-placeholder": {
-    "message": "例如，它将一个文件添加到叫wake_up.txt的桌面"
+    "message": "例如：它会在桌面上添加名为wake_up.txt的文件"
   },
   "project.settings.disclosures.system-interactions.title": {
     "message": "与外部系统的交互"
@@ -4010,8 +4115,14 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.links.donation.duplicate-type": {
+    "message": "你已经有了一个{platform}链接了。"
+  },
+  "project.settings.links.donation.no-type": {
+    "message": "请为此捐赠链接选择一个平台。"
+  },
   "project.settings.monetization.description": {
-    "message": "Modrints上的项目自动注册于 <rewards-program-link>奖励方案</rewards-program-link>如果你不想(或由于法律原因不能)从这个项目赚取收入，你可以在这里关闭它。"
+    "message": "Modrinth上的项目会自动加入<rewards-program-link>激励计划</rewards-program-link>。如果你不想（或由于法律原因不能）从这个项目赚取收入，你可以在这里关闭它。"
   },
   "project.settings.monetization.disabled-description": {
     "message": "本项目不适用于变现。如果您认为此为错误，请<contact-support-link>联系支持团队</contact-support-link>。"
@@ -4176,16 +4287,16 @@
     "message": "选择你的{type}作用于哪类特性。"
   },
   "project.settings.tags.group-title.categories": {
-    "message": "{showType, select, yes {{types} 类别} other {类别}}"
+    "message": "{showType, select, yes {{types}类别} other {类别}}"
   },
   "project.settings.tags.group-title.features": {
-    "message": "{showType, select, yes {{types} 功能} other {功能}}"
+    "message": "{showType, select, yes {{types}功能特点} other {功能特点}}"
   },
   "project.settings.tags.group-title.performance-impact": {
-    "message": "{showType, select, yes {{types} 性能影响} other {性能影响}}"
+    "message": "{showType, select, yes {{types}性能要求} other {性能要求}}"
   },
   "project.settings.tags.group-title.resolutions": {
-    "message": "{showType, select, yes {{types} 功能} other {功能}}"
+    "message": "{showType, select, yes {{types}分辨率} other {分辨率}}"
   },
   "project.settings.tags.multiple-resolution-tags-warning": {
     "message": "你选择了 {count} 个分辨率标签（{tags}）。资源包通常应仅保留一个标签。"
@@ -4213,6 +4324,9 @@
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "添加标签前上传版本"
+  },
+  "project.slug-suggestions.label": {
+    "message": "建议："
   },
   "project.versions.copy-id-option": {
     "message": "复制 ID"
@@ -4926,13 +5040,10 @@
     "message": "输入的验证码不正确！"
   },
   "settings.account.two-factor.field.code.description": {
-    "message": "请输入双因素验证码以继续操作。"
+    "message": "从你的身份验证程序中输入代码，或使用你的备份代码。"
   },
   "settings.account.two-factor.field.code.label": {
     "message": "输入双因素验证码"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "输入验证码……"
   },
   "settings.account.two-factor.setup.intro": {
     "message": "双因素验证需要访问另一部设备才能登录，从而保护你的账户安全。"
@@ -5177,6 +5288,9 @@
   "settings.billing.plan.title": {
     "message": "{size}方案"
   },
+  "settings.billing.price.includes-tax": {
+    "message": "包含{amount}元税"
+  },
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
@@ -5401,6 +5515,21 @@
   },
   "ui.newsletter-button.tooltip": {
     "message": "订阅 Modrinth 新闻"
+  },
+  "ui.two-factor-code.authentication-code": {
+    "message": "六位身份验证码"
+  },
+  "ui.two-factor-code.backup-code": {
+    "message": "恢复码"
+  },
+  "ui.two-factor-code.backup-code.placeholder": {
+    "message": "输入恢复码"
+  },
+  "ui.two-factor-code.use-authentication-code": {
+    "message": "使用身份验证码"
+  },
+  "ui.two-factor-code.use-backup-code": {
+    "message": "使用恢复码"
   },
   "version.all-versions": {
     "message": "所有版本"

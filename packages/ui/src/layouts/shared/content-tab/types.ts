@@ -71,6 +71,8 @@ export interface ContentCardTableItem {
 	hasUpdate?: boolean
 	isClientOnly?: boolean
 	clientWarning?: ClientWarningType | null
+	synced?: boolean
+	syncUpdatePending?: boolean
 	hideDelete?: boolean
 	hideSwitchVersion?: boolean
 	overflowOptions?: ButtonMenuOption[]
@@ -92,6 +94,11 @@ export interface ContentItem extends Omit<
 	'id' | 'projectLink' | 'disabled' | 'overflowOptions'
 > {
 	id: string
+	synced_pack?: {
+		id: string
+		instance_ids: string[]
+		update_pending: boolean
+	} | null
 	file_name: string
 	file_path?: string
 	size?: number

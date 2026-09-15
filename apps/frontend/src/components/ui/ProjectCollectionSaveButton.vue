@@ -18,9 +18,12 @@
 			<Input
 				v-model="displayCollectionsSearch"
 				:placeholder="formatMessage(commonMessages.searchPlaceholder)"
-				wrapper-class="menu-search"
+				wrapper-class="w-full"
 			/>
-			<div v-if="filteredCollections.length > 0" class="collections-list text-primary">
+			<div
+				v-if="filteredCollections.length > 0"
+				class="mt-2 max-h-[40rem] overflow-y-auto rounded-xl border border-solid border-surface-4 bg-surface-2 p-2 text-primary"
+			>
 				<Checkbox
 					v-for="option in filteredCollections"
 					:key="option.id"
@@ -32,10 +35,10 @@
 				</Checkbox>
 			</div>
 
-			<div v-else class="menu-text">
-				<p class="popout-text">{{ noCollectionsLabel }}</p>
+			<div v-else class="mt-2 text-sm text-secondary">
+				<p>{{ noCollectionsLabel }}</p>
 			</div>
-			<Button class="mx-3 mb-3" @click="createCollection">
+			<Button class="mt-2 w-full" @click="createCollection">
 				<PlusIcon aria-hidden="true" />
 				{{ createNewCollectionLabel }}
 			</Button>
@@ -46,7 +49,6 @@
 		v-tooltip="formatMessage(commonMessages.saveButton)"
 		size="xl"
 		:to="signInRoute"
-		:aria-label="formatMessage(commonMessages.saveButton)"
 		class="!w-12 !rounded-full !px-0"
 	>
 		<BookmarkIcon aria-hidden="true" />
@@ -107,25 +109,5 @@ const filteredCollections = computed(() =>
 	&:hover {
 		filter: brightness(0.95);
 	}
-}
-
-.menu-text {
-	padding: 0 var(--gap-md);
-	font-size: var(--font-size-nm);
-	color: var(--color-secondary);
-}
-
-.menu-search {
-	margin: var(--gap-sm) var(--gap-md);
-	width: calc(100% - var(--gap-md) * 2);
-}
-
-.collections-list {
-	max-height: 40rem;
-	overflow-y: auto;
-	background-color: var(--color-bg);
-	border-radius: var(--radius-md);
-	margin: var(--gap-sm) var(--gap-md);
-	padding: var(--gap-sm);
 }
 </style>

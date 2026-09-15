@@ -161,6 +161,7 @@ export const configuredXss = new FilterXSS({
 					'workflow.serilum.com',
 					'modfolio.creeperkatze.dev',
 					'badges.crowdin.net',
+					'moddex.gg',
 				]
 
 				const allowedHostnameSuffixes = ['.github.io']

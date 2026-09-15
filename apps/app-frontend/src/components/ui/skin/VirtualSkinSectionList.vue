@@ -6,18 +6,17 @@ import {
 	commonMessages,
 	defineMessages,
 	IconButton,
-	SkinButton,
 	SkinLikeTextButton,
+	Tooltip,
 	useScrollViewport,
 	useVIntl,
 } from '@modrinth/ui'
 import { useElementSize, useWindowSize } from '@vueuse/core'
-import { Tooltip } from 'floating-vue'
 import { computed, nextTick, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 import Draggable from 'vuedraggable'
 
-import type { RenderResult } from '@/helpers/rendering/batch-skin-renderer.ts'
-import type { Skin } from '@/helpers/skins.ts'
+import BakedSkinButton from '@/components/ui/skin/BakedSkinButton.vue'
+import type { Cape, Skin } from '@/helpers/skins.ts'
 
 type SkinSectionKind = 'saved' | 'default'
 type SkinLikeTextButtonExpose = {
@@ -80,7 +79,7 @@ const messages = defineMessages({
 const props = defineProps<{
 	savedSkins: Skin[]
 	defaultSkinSections: DefaultSkinSection[]
-	getBakedSkinTextures: (skin: Skin) => RenderResult | undefined
+	capes: Cape[]
 	isSkinSelected: (skin: Skin) => boolean
 	isSkinActive: (skin: Skin) => boolean
 	isAddSkinButtonDragActive: boolean
@@ -389,12 +388,7 @@ defineExpose({ getAddSkinButtonElement })
 					<span class="min-w-0 text-xl font-semibold leading-7 text-primary">
 						{{ section.title }}
 					</span>
-					<Tooltip
-						v-if="section.infoTooltip"
-						theme="dismissable-prompt"
-						placement="top"
-						:triggers="['hover', 'focus']"
-					>
+					<Tooltip v-if="section.infoTooltip" theme="dismissable-prompt" placement="top">
 						<span
 							class="inline-flex size-6 shrink-0 items-center justify-center text-secondary transition-colors group-hover:text-primary"
 							@click.stop
@@ -454,9 +448,10 @@ defineExpose({ getAddSkinButtonElement })
 							:key="savedSkinKey(skin)"
 							class="relative aspect-[31/40] w-full min-w-0 box-border rounded-[20px]"
 						>
-							<SkinButton
+							<BakedSkinButton
 								class="h-full w-full min-w-0 box-border rounded-[20px]"
-								:forward-image-src="getBakedSkinTextures(skin)?.forwards"
+								:skin="skin"
+								:capes="capes"
 								:selected="isSkinSelected(skin)"
 								:active="isSkinActive(skin)"
 								:disabled="readOnly"
@@ -485,7 +480,7 @@ defineExpose({ getAddSkinButtonElement })
 										<TrashIcon />
 									</IconButton>
 								</template>
-							</SkinButton>
+							</BakedSkinButton>
 						</div>
 					</template>
 
@@ -495,9 +490,10 @@ defineExpose({ getAddSkinButtonElement })
 							:key="savedSkinKey(skin)"
 							class="relative aspect-[31/40] w-full min-w-0 box-border rounded-[20px]"
 						>
-							<SkinButton
+							<BakedSkinButton
 								class="h-full w-full min-w-0 box-border rounded-[20px]"
-								:forward-image-src="getBakedSkinTextures(skin)?.forwards"
+								:skin="skin"
+								:capes="capes"
 								:selected="isSkinSelected(skin)"
 								:active="isSkinActive(skin)"
 								:disabled="readOnly"
@@ -526,7 +522,7 @@ defineExpose({ getAddSkinButtonElement })
 										<TrashIcon />
 									</IconButton>
 								</template>
-							</SkinButton>
+							</BakedSkinButton>
 						</div>
 					</template>
 				</Draggable>
@@ -535,11 +531,12 @@ defineExpose({ getAddSkinButtonElement })
 					v-else
 					class="grid w-full grid-cols-3 gap-3 min-[1300px]:grid-cols-4 min-[1750px]:grid-cols-5 min-[2050px]:grid-cols-6"
 				>
-					<SkinButton
+					<BakedSkinButton
 						v-for="skin in section.skins"
 						:key="skinKey(skin, section.key)"
 						class="aspect-[31/40] w-full min-w-0 box-border rounded-[20px]"
-						:forward-image-src="getBakedSkinTextures(skin)?.forwards"
+						:skin="skin"
+						:capes="capes"
 						:selected="isSkinSelected(skin)"
 						:active="isSkinActive(skin)"
 						:tooltip="skin.name"
@@ -558,7 +555,7 @@ defineExpose({ getAddSkinButtonElement })
 								<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
 							</Button>
 						</template>
-					</SkinButton>
+					</BakedSkinButton>
 				</div>
 			</Accordion>
 		</div>

@@ -95,9 +95,6 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "Đang cập nhật nội dung được chia sẻ"
   },
-  "app.action-bar.installs": {
-    "message": "Cài đặt"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "Đặt làm bản instance chính"
   },
@@ -167,12 +164,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Ẩn thẻ tên"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Hiển thị các thế giới hoặc phiên chơi gần đây trong mục \"Jump in\" trên trang chủ."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Bước vào các thế giới hoặc các khu vực riêng biệt"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Thu nhỏ ứng dụng Modrinth khi Minecraft khởi động."
   },
@@ -211,6 +202,9 @@
   },
   "app.behavior-settings.confirmations.title": {
     "message": "Các xác nhận"
+  },
+  "app.behavior-settings.content.title": {
+    "message": "Nhà và nội dung"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Khởi động và điều hướng"
@@ -254,8 +248,29 @@
   "app.browse.hide-added-servers": {
     "message": "Ẩn máy chủ đã thêm vào"
   },
+  "app.browse.hide-installed-modpacks": {
+    "message": "Ẩn modpacks đã cài đặt"
+  },
+  "app.browse.project-actions.label": {
+    "message": "Hành động cho dự án"
+  },
+  "app.browse.project-type.data-packs": {
+    "message": "Các gói dữ liệu"
+  },
   "app.browse.project-type.modpacks": {
     "message": "Modpack"
+  },
+  "app.browse.project-type.mods": {
+    "message": "Mods"
+  },
+  "app.browse.project-type.resource-packs": {
+    "message": "Các gói tài nguyên"
+  },
+  "app.browse.project-type.servers": {
+    "message": "Máy chủ"
+  },
+  "app.browse.project-type.shaders": {
+    "message": "Shaders"
   },
   "app.browse.server-instance-content-warning": {
     "message": "Việc thêm nội dung có thể khiến bạn không thể tham gia máy chủ này. Mọi nội dung bạn thêm vào sẽ bị xóa khi nội dung do máy chủ quản lý được cập nhật."
@@ -266,11 +281,23 @@
   "app.content-install.no-compatible-versions": {
     "message": "Không có phiên bản nào phù hợp với {compatibilityLabel}. Nếu vẫn chọn một phiên bản để cài đặt, các gói phụ thuộc sẽ không được tải tự động."
   },
+  "app.content.desync-pack": {
+    "message": "Bỏ đồng bộ"
+  },
+  "app.content.sync-pack": {
+    "message": "Đồng bộ"
+  },
+  "app.error.state-init.open-backups-folder": {
+    "message": "Mở thư mục sao lưu"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Thêm miêu tả cho gói modpack..."
   },
   "app.export-modal.export-button": {
     "message": "Xuất"
+  },
+  "app.export-modal.export-complete": {
+    "message": "Hoàn thành xuất"
   },
   "app.export-modal.export-complete-description": {
     "message": "{name} đã được xuất thành công."
@@ -290,14 +317,35 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.features-settings.show-skin-selector.title": {
+    "message": "Hiển thị phần chọn skin ở thanh bên"
+  },
+  "app.features-settings.sidebar.title": {
+    "message": "Thanh bên"
+  },
   "app.home.jump-back-in.instance-locked": {
     "message": "Phiên bản này đã bị khóa"
+  },
+  "app.home.jump-back-in.instance-open": {
+    "message": "Phiên bản đã được mở"
+  },
+  "app.home.jump-back-in.more-options": {
+    "message": "Thêm lựa chọn"
   },
   "app.home.jump-back-in.never-played": {
     "message": "Chưa từng chơi"
   },
+  "app.home.jump-back-in.new-instance": {
+    "message": "Thêm phiên bản"
+  },
+  "app.home.jump-back-in.resize": {
+    "message": "Kéo để thay đổi kích thước"
+  },
   "app.home.jump-back-in.title": {
     "message": "Tham gia ngay"
+  },
+  "app.home.jump-back-in.view-instance": {
+    "message": "Xem phiên bản"
   },
   "app.hosting.update-required.description": {
     "message": "Bạn cần cập nhật để sử dụng Modrinth Hosting thông qua ứng dụng Modrinth"
@@ -307,24 +355,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "Yêu cầu cập nhật ứng dụng Modrinth"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "Không thể áp dụng các biểu tượng ngẫu nhiên cho các thực thể."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "Điểm mới trong bản cập nhật này"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "Tạo biểu tượng tùy chỉnh cho các instance của bạn ngay trong ứng dụng Modrinth. Hãy kết hợp các hình nền với những biểu tượng từ Minecraft và các bản mod phổ biến!"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "Trình chỉnh sửa biểu tượng tùy chỉnh"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "Tùy chỉnh các instance của bạn!"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "Trình chỉnh sửa biểu tượng mới"
   },
   "app.install.phase.downloading_content": {
     "message": "Đang tải nội dung"
@@ -359,6 +389,21 @@
   "app.install.phase.preparing_java.resolving": {
     "message": "Đang chuẩn bị Java {version}"
   },
+  "app.instance.action.edit": {
+    "message": "Chỉnh sửa"
+  },
+  "app.instance.action.open-folder": {
+    "message": "Mở thư mục"
+  },
+  "app.instance.action.play": {
+    "message": "Chơi"
+  },
+  "app.instance.action.stop": {
+    "message": "Dừng"
+  },
+  "app.instance.add-server.add": {
+    "message": "Thêm"
+  },
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Xem lại các thay đổi"
   },
@@ -385,6 +430,9 @@
   },
   "app.instance.confirm-delete.header": {
     "message": "Xoá hồ sơ"
+  },
+  "app.instance.content.managed-content.modpack-header": {
+    "message": "Nội dung modpack"
   },
   "app.instance.content.managed-content.shared-header": {
     "message": "Nội dung được chia sẻ"
@@ -455,6 +503,9 @@
   "app.instance.share.locked.linked-account-fallback": {
     "message": "tài khoản được liên kết"
   },
+  "app.instance.share.locked.switch-account-button": {
+    "message": "Đổi tài khoản"
+  },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Sai tài khoản"
   },
@@ -506,6 +557,18 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Tìm kiếm {count} world..."
   },
+  "app.java-detection.select": {
+    "message": "Chọn"
+  },
+  "app.library.filter.game-version": {
+    "message": "Phiên bản trò chơi"
+  },
+  "app.library.filter.instance-type.server": {
+    "message": "Máy chủ"
+  },
+  "app.library.instance.action.delete": {
+    "message": "Xoá"
+  },
   "app.modal.install-to-play.header": {
     "message": "Tải xuống để chơi"
   },
@@ -550,6 +613,39 @@
   },
   "app.project.versions.already-installed": {
     "message": "Đã có sẵn"
+  },
+  "app.settings.default-instance-options.fullscreen.title": {
+    "message": "Toàn màn hình"
+  },
+  "app.settings.default-instance-options.java-arguments.placeholder": {
+    "message": "Nhập đối số Java..."
+  },
+  "app.settings.default-instance-options.memory-allocation.title": {
+    "message": "Cấp phát bộ nhớ"
+  },
+  "app.settings.default-instance-options.post-exit-hook.description": {
+    "message": "Chạy sau khi trò chơi đóng lại."
+  },
+  "app.settings.default-instance-options.post-exit-hook.placeholder": {
+    "message": "Nhập lệnh sau khi thoát..."
+  },
+  "app.settings.default-instance-options.width.placeholder": {
+    "message": "Nhập chiều rộng..."
+  },
+  "app.settings.default-instance-options.width.title": {
+    "message": "Chiều rộng"
+  },
+  "app.settings.default-instance-options.window.title": {
+    "message": "Cửa sổ"
+  },
+  "app.settings.default-instance-options.wrapper-hook.description": {
+    "message": "Lệnh dùng để bọc tiến trình chạy Minecraft."
+  },
+  "app.settings.default-instance-options.wrapper-hook.placeholder": {
+    "message": "Nhập lệnh bọc..."
+  },
+  "app.settings.developer-mode-button.label": {
+    "message": "Bật tắt chế độ nhà phát triển"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Chế độ nhà phát triển đã được bật."
@@ -938,9 +1034,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Chọn kênh cập nhật"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Hooks cho phép người dùng nâng cao chạy câu lệnh hệ thống trước và sau khi chạy game."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Sau khi thoát"
   },
@@ -959,9 +1052,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Nhập câu lệnh trước khi chạy..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Hooks để chạy game"
-  },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Lệnh bao bọc (Wrapper)"
   },
@@ -977,47 +1067,17 @@
   "instance.settings.tabs.installation.loader-version": {
     "message": "Phiên bản {loader}"
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Tùy chọn biến môi trường"
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Tùy chỉnh tham số Java"
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Tùy chỉnh phiên bản cài đặt Java"
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Tùy chỉnh phân bổ bộ nhớ"
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Nhập biến môi trường..."
   },
   "instance.settings.tabs.java.enter-java-arguments": {
     "message": "Nhập tham số Java..."
   },
-  "instance.settings.tabs.java.environment-variables": {
-    "message": "Biến môi trường"
-  },
   "instance.settings.tabs.java.hooks": {
     "message": "Hooks"
   },
-  "instance.settings.tabs.java.java-arguments": {
-    "message": "Tham số Java"
-  },
-  "instance.settings.tabs.java.java-installation": {
-    "message": "Bản cài đặt Java"
-  },
-  "instance.settings.tabs.java.java-memory": {
-    "message": "Bộ nhớ phân bổ"
-  },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/đường_dẫn/tới/java"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Cửa sổ"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Thiết đặt cửa sổ tuỳ chỉnh"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Toàn màn hình"

@@ -76,7 +76,6 @@ export function toggle(id: string, label: string) {
 					icon: n._icon,
 					needsAttention: ctx.nodeFacts?.needsAttention ?? false,
 					fixActionable: ctx.nodeFacts?.fixActionable ?? false,
-					tooltip: ctx.tooltip,
 				}),
 			}),
 	)

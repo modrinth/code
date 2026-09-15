@@ -1,7 +1,4 @@
 {
-  "nags.add-description.description": {
-    "defaultMessage": "يجب تقديم وصف يوضح غرض المشروع ووظيفته بشكل واضح."
-  },
   "nags.add-description.title": {
     "defaultMessage": "أضف وصفًا"
   },
@@ -23,14 +20,8 @@
   "nags.add-license-details.title": {
     "defaultMessage": "أضف معلومات ترخيص"
   },
-  "nags.add-links-server.description": {
-    "defaultMessage": "أضف أي روابط ذات صلة خارج Modrinth، مثل موقع إلكتروني، متجر، أو دعوة Discord."
-  },
   "nags.add-links-server.title": {
     "defaultMessage": "إضافة روابط خارجية"
-  },
-  "nags.add-links.description": {
-    "defaultMessage": "أضف أي روابط ذات صلة تستهدف خارج Modrinth، مثل كود المصدر، أو متعقب المشكلات، أو دعوة Discord."
   },
   "nags.add-links.title": {
     "defaultMessage": "إضافة روابط خارجية"
@@ -41,20 +32,32 @@
   "nags.all-languages.title": {
     "defaultMessage": "اختر اللغات الدقيقة"
   },
-  "nags.all-tags-selected.description": {
-    "defaultMessage": "لقد قمت باختيار جميع {totalAvailableTags, plural, one {# وسم متاح} other {# وسوم متاحة}}. هذا يُفقد الأوسمة غايتها، حيث أن هدفها هو مساعدة المستخدمين في العثور على المشاريع ذات الصلة. يرجى اختيار الأوسمة ذات الصلة بمشروعك فقط."
-  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "اختر علامة دقيقة"
+  },
+  "nags.banned-link-usage.title": {
+    "defaultMessage": "إزالة الروابط المحظورة"
   },
   "nags.check-disclosures.description": {
     "defaultMessage": "تأكد من اطلاع المستخدمين على أي تفاصيل مهمة من خلال تعبئة إفصاحات المحتوى التي تنطبق على {type}."
   },
-  "nags.check-disclosures.title": {
-    "defaultMessage": "تحقق من إفصاحات المحتوى"
+  "nags.description-ends-with-header.description": {
+    "defaultMessage": "يجب ألا ينتهي وصف مشروعك برأسه لا يتبعه أي نص."
+  },
+  "nags.description-ends-with-header.title": {
+    "defaultMessage": "أزل إنهاء رأس"
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "قم بتوسيع الوصف"
+  },
+  "nags.disclosures-special-formatting.title": {
+    "defaultMessage": "إصلاح تنسيق الإفصاح"
   },
   "nags.edit-description.title": {
     "defaultMessage": "تعديل الوصف"
+  },
+  "nags.edit-gallery.title": {
+    "defaultMessage": "تحرير المعرض"
   },
   "nags.edit-license.title": {
     "defaultMessage": "تعديل الرخصة"
@@ -66,7 +69,7 @@
     "defaultMessage": "تعديل العلامات"
   },
   "nags.edit-title.title": {
-    "defaultMessage": "تعديل العنوان"
+    "defaultMessage": "تعديل الاسم"
   },
   "nags.feature-gallery-image.description": {
     "defaultMessage": "غالباً ما تكون صورة المَعرض الرئيسية هي الطريقة التي يترك بها مشروعك انطباعه الأول."
@@ -74,32 +77,38 @@
   "nags.feature-gallery-image.title": {
     "defaultMessage": "صورة عرض مميزة"
   },
+  "nags.gallery-text-non-standard.description": {
+    "defaultMessage": "لا يسمح باستخدام أحرف نصية غير قياسية، مثل \"النص الفارق\" أو \"زالغو\"، في عناوين أو أوصاف الصور في المعرض."
+  },
   "nags.gallery.title": {
     "defaultMessage": "زيارة مَعْرِض الصور"
-  },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "ستخدم {type} الخاص بك ترخيصاً يتطلب توفير الكود المصدري. يرجى تقديم رابط للكود المصدري أو ملف المصادر لكل إصدار إضافي، أو فكر في استخدام ترخيص مختلف."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "توفير كود مصدري"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "بعض روابطك الإضافية تبدو متطابقة. كل رابط يجب أن يكون فريدا بنوع رابط مناسب."
-  },
   "nags.identical-links.title": {
-    "defaultMessage": "تنظيف الروابط المتطابقة"
+    "defaultMessage": "أزل الروابط المتطابقة"
+  },
+  "nags.invalid-gallery-text.title": {
+    "defaultMessage": "تعديل نص معرض الصور"
   },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "رابط الرخصة غير صالح."
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "رابط حقوقك يعود إلى {domain} هو بطبعه غير لائق بمعلومات حقوق. روابط الحقوق يجب أن تربط إلى مَلف حقوقك. ليس منصات التواصل أو منصات الألعاب."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "رابط حقوقك يظهر على انه غير صحيح. يرجى توفير رابط حقوق صحيح."
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "اضف رابط حقوق صحيح"
+  },
+  "nags.invalid-project-description.title": {
+    "defaultMessage": "تعديل الوصف"
+  },
+  "nags.invalid-project-name.title": {
+    "defaultMessage": "تعديل اسم المشروع"
+  },
+  "nags.invalid-project-summary.title": {
+    "defaultMessage": "تعديل الملخص"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# header} other {# headers}} في وصفك {count, plural, one {طويل جدًا} other {طويلة جدًا}}.يجب أن تكون العناوين مختصرة وتعمل كعناوين للأقسام،وليست جملًا كاملة. "
@@ -134,17 +143,41 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "مراجعة التعليقات."
   },
-  "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "لقد اخترت {count, plural, one {وسم دقة واحد} two {وسمي دقة} few {# وسوم دقة} many {# وسم دقة} other {# وسم دقة}} ({tags}). يُفضّل أن يحتوي ريسورسباك عادةً على وسم دقة واحد فقط، بحيث يتوافق مع دقته الأساسية."
-  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "أختر قرار صحيح"
+  },
+  "nags.project-description-banned-link.description": {
+    "defaultMessage": "لا يسمح بوصلة ”{fullUrl}“ في أوصاف المشروع."
+  },
+  "nags.project-description-non-english.description": {
+    "defaultMessage": "يجب أن يكتب وصف مشروعك باللغة الإنجليزية أو يتضمن ترجمة باللغة الإنجليزية."
+  },
+  "nags.project-description-non-english.title": {
+    "defaultMessage": "ترجمة الوصف"
+  },
+  "nags.project-name-version.title": {
+    "defaultMessage": "تعديل اسم المشروع"
+  },
+  "nags.project-summary-content.title": {
+    "defaultMessage": "مراجعة الملخص"
+  },
+  "nags.project-summary-links.title": {
+    "defaultMessage": "أزل الروابط من الملخص"
+  },
+  "nags.project-summary-non-english.title": {
+    "defaultMessage": "ترجمة الملخص"
+  },
+  "nags.project-summary-non-standard-text.description": {
+    "defaultMessage": "لا يسمح باستخدام أحرف نصية غير قياسية، مثل \"النص الفارق\" أو \"زالغو\"، في الملخص."
+  },
+  "nags.project-summary-spam.title": {
+    "defaultMessage": "أزل التكرار من الملخص"
   },
   "nags.review-permissions.description": {
     "defaultMessage": "تأكد من تقديم ما يثبت حصولك على إذن لتوزيع أي محتوى خارجي ضمن المودباك الخاص بك."
   },
   "nags.review-permissions.title": {
-    "defaultMessage": "مراجعة الأُذون الخارجية"
+    "defaultMessage": "تحقق من إذن المحتوى"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "حدد إصدارات اللعبة التي يدعمها خادمك، واختر مودباك أو ارفع مودباكك الخاص."
@@ -158,6 +191,12 @@
   "nags.select-country.title": {
     "defaultMessage": "اختر منطقة"
   },
+  "nags.select-environment.description": {
+    "defaultMessage": "حدد البيئة التي يمكن أن يعمل فيها مشروعك."
+  },
+  "nags.select-environment.title": {
+    "defaultMessage": "اختر البيئة"
+  },
   "nags.select-language.description": {
     "defaultMessage": "اختر لغات المدعومة من خادمك."
   },
@@ -168,7 +207,7 @@
     "defaultMessage": "اختر الترخيص الذي يتم توزيع {type} الخاص بك بموجبه."
   },
   "nags.select-license.title": {
-    "defaultMessage": "اختر حقوقا"
+    "defaultMessage": "حدد ترخيص"
   },
   "nags.select-tags.description": {
     "defaultMessage": "اختر العلامات التي تنطبق على مشروعك لتساعد المستخدمين على إيجاده."
@@ -183,13 +222,13 @@
     "defaultMessage": "انتقل إلى إعدادات الإفصاحات"
   },
   "nags.settings.license.title": {
-    "defaultMessage": "زيارة إعدادات الحقوق"
+    "defaultMessage": "زيارة إعدادات الترخيص"
   },
   "nags.settings.links.title": {
     "defaultMessage": "زيارة إعدادات الروابط"
   },
   "nags.settings.permissions.title": {
-    "defaultMessage": "انتقل إلى لوحة التحكم بالأذونات"
+    "defaultMessage": "زيارة إعدادات الأذونات"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "زيارة إعدادات العلامة"
@@ -201,10 +240,10 @@
     "defaultMessage": "زيارة إعدادات الإصدارات"
   },
   "nags.summary-special-formatting.description": {
-    "defaultMessage": "لا يجب على الملخص الخاص بك أن يمتلك التنسيق، فواصل الأسطر، الأحرف الخاصة، أو الروابط، حيث أن الملخص سيعرض فقط النص العادي."
+    "defaultMessage": "يجب ألا يحتوي ملخصك على Markdown أو HTML، لان يمكن فقط عرض نص عادي."
   },
   "nags.summary-special-formatting.title": {
-    "defaultMessage": "نضف الملخص"
+    "defaultMessage": "أصلح تنسيق الملخص"
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "وسع الملخص"
@@ -215,14 +254,8 @@
   "nags.too-many-languages.title": {
     "defaultMessage": "اختر اللغات الدقيقة"
   },
-  "nags.too-many-tags-server.description": {
-    "defaultMessage": "لقد اخترت{tagCount, plural, one {# tag} other {# tags}}. \nفكر في تقليلها الى {maxTagCount} او اقل من اجل عرض خادمك في بحوثات متعلقة."
-  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "حدد علامات دقيقة"
-  },
-  "nags.too-many-tags.description": {
-    "defaultMessage": "لقد اخترت{tagCount, plural, one {# tag} other {# tags}}. \nفكر في تقليلها الى {maxTagCount} او اقل من اجل عرض مشروعك في بحوثات متعلقة."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "اختار علامات دقيقة"
@@ -237,21 +270,28 @@
     "defaultMessage": "يلزم وجود ثلاث صور معرض على الأقل لعرض محتوى المظلل (Shader) الخاص بك في مجموعة متنوعة من الحالات والظروف."
   },
   "nags.upload-gallery-image.title": {
-    "defaultMessage": "رفع صورة من المَعْرِض"
+    "defaultMessage": "رفع صورة من معرض الصور"
   },
   "nags.upload-version.description": {
     "defaultMessage": "إصدار واحد على الأقل لازم لتقديم المشروع للنشر."
   },
   "nags.upload-version.title": {
-    "defaultMessage": "رفع النسخة"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "بعض روابطك الإضافية يمكن أن تكون تستخدم مجالات غير لائقة لهذا النوع من الروابط"
+    "defaultMessage": "تحميل إصدار"
   },
   "nags.verify-external-links.title": {
-    "defaultMessage": "إثبات روابط خارجية"
+    "defaultMessage": "مراجعة الروابط الخارجية"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "زيارة إعدادات الروابط"
+  },
+  "project.text-validation.summary-matches-title": {
+    "defaultMessage": "يجب أن يوفر ملخص المشروع معلومات فريدة من نوعها وعدم تكرار اسم المشروع."
+  },
+  "project.text-validation.summary-too-short": {
+    "defaultMessage": "ملخصك قصير جدا. أضف جملة أو جملتين تصف مشروعك."
+  },
+  "project.text-validation.title-version-number": {
+    "defaultMessage": "يجب ألا تتضمن أسماء المشروع أرقام الإصدار."
   }
 }
+

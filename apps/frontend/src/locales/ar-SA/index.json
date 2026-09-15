@@ -581,23 +581,11 @@
   "app-marketing.download.windows": {
     "message": "ويندوز"
   },
-  "app-marketing.features.follow.description": {
-    "message": "احفظ المحتوى الذي تحبه واحصل على التحديثات بنقرة واحدة."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "تابع المشروعات"
-  },
-  "app-marketing.features.importing.description": {
-    "message": "استورد جميع ملفاتك الشخصية المفضلة من المشغل الذي كنت تستخدمه من قبل، وابدأ باستخدام Modrinth App في ثوانٍ!"
-  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
-  },
-  "app-marketing.features.importing.title": {
-    "message": "استيراد الملفات الشخصية"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "الإجراءات"
@@ -623,15 +611,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "الإصدار"
   },
-  "app-marketing.features.offline.description": {
-    "message": "العب موداتك سواء كنت متصلاً بالإنترنت أو غير متصل."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "الوضع غير المتصل"
-  },
-  "app-marketing.features.open-source.description": {
-    "message": "المشغل الخاص بـ مودرنث مفتوح المصدر بالكامل. يمكنك عرض الشيفرة المصدرية على <github-link>GitHub</github-link>!"
-  },
   "app-marketing.features.open-source.title": {
     "message": "مفتوح المصدر"
   },
@@ -641,9 +620,6 @@
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
   },
-  "app-marketing.features.performance.description": {
-    "message": "يعمل Modrinth App بكفاءة أفضل من العديد من مديري المودات الرائدين، باستخدام 150 ميغابايت فقط من الذاكرة العشوائية!"
-  },
   "app-marketing.features.performance.discord": {
     "message": "ديسكورد"
   },
@@ -652,15 +628,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "جوجل كروم"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ ميغابايت"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 ميغابايت"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "تطبيق مودرينث"
@@ -791,9 +758,6 @@
   "auth.create-account.date-of-birth.required.title": {
     "message": "تاريخ الميلاد مطلوب"
   },
-  "auth.create-account.date-of-birth.under13-helper": {
-    "message": "لا تستوفي متطلبات العمر لإنشاء حساب على Modrinth."
-  },
   "auth.create-account.info-panel.source-code-link": {
     "message": "شفرة المصدر ذات الصلة"
   },
@@ -856,9 +820,6 @@
   },
   "auth.sign-in.2fa.label": {
     "message": "المصادقة الثنائية"
-  },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "أدخل الرمز..."
   },
   "auth.sign-in.continue-with-email": {
     "message": "المتابعة باستخدام البريد الإلكتروني"
@@ -2297,9 +2258,6 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "ما نوع وحدات المعالجة المركزية التي تعمل بها خوادم Modrinth Hosting؟"
   },
-  "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "تعمل خوادم Modrinth Hosting بمعالجات مكافئة لمعالجات AMD Ryzen 7900 و7950X3D بتردد يتجاوز 5 جيجاهرتز، ومزوّدة بذاكرة DDR5."
-  },
   "hosting-marketing.faq.currency": {
     "message": "ما العملة التي تُعرض بها الأسعار؟"
   },
@@ -2656,9 +2614,6 @@
   },
   "layout.action.new-project": {
     "message": "مشروع جديد"
-  },
-  "layout.action.new-server-project": {
-    "message": "خادم جديد"
   },
   "layout.action.publish": {
     "message": "نشر"

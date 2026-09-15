@@ -66,7 +66,6 @@
 						target="_blank"
 						:href="`https://slicer.run/?url=${encodeURIComponent(createDownloadUrl(version))}`"
 						class="!w-9 !rounded-full !px-0 hover:!bg-button-bg"
-						aria-label="Open in Slicer"
 					>
 						<ExternalIcon aria-hidden="true" />
 					</ButtonLink>

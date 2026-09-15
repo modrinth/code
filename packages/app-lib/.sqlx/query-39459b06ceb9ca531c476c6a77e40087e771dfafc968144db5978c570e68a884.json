@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\t\t\tINSERT INTO synced_game_option_values\n\t\t\t\t\t(option_id, kind, raw_key, canonical_type,\n\t\t\t\t\t canonical_value_json, value_codec, seeded, revision, origin,\n\t\t\t\t\t source_game_version, source_instance_id, updated_at)\n\t\t\t\tVALUES (?, 'vanilla', NULL, ?, ?, 'catalog', 1, 1,\n\t\t\t\t\t'instance', ?, ?, ?)\n\t\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 6
+    },
+    "nullable": []
+  },
+  "hash": "39459b06ceb9ca531c476c6a77e40087e771dfafc968144db5978c570e68a884"
+}
