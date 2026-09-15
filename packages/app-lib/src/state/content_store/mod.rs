@@ -14,7 +14,9 @@ pub(crate) use adapters::sqlite::{
     file_storage, find_file, instance_storage, retained_owners,
     set_file_storage, set_setting, setting,
 };
-pub(crate) use commands::{PendingFileChange, migrate};
+pub(crate) use commands::{
+    PendingFileChange, migrate, migrate_instance_copies,
+};
 pub(crate) use domain::{
     content_file_path, file_path_on_disk, is_managed_content_path, normalize,
     object_relative_path, relative_link, validate_digest, validate_relative,

@@ -188,6 +188,14 @@ impl State {
         state
             .startup_complete
             .store(true, std::sync::atomic::Ordering::Release);
+		tokio::spawn(async move {
+			loop {
+				if let Err(error) = content_store::migrate_instance_copies(state).await {
+					tracing::warn!("Content copy migration deferred: {error}");
+				}
+				tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+			}
+		});
         tokio::spawn(async move {
             let mut interval =
                 tokio::time::interval(std::time::Duration::from_secs(600));
