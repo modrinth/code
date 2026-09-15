@@ -1,0 +1,169 @@
+@import "tailwindcss";
+
+/* ===== Design tokens ===== */
+@theme inline {
+  --color-background: #0a0a0a;
+  --color-foreground: #ffffff;
+
+  /* Minecraft/Owyx brand palette */
+  --color-mc-dark: #0a0a0a;
+  --color-mc-darker: #050505;
+  --color-mc-gold: #FFAA00;
+  --color-mc-yellow: #FFFF55;
+  --color-mc-gray: #2a2a2a;
+  --color-mc-light-gray: #404040;
+  --color-mc-lighter-gray: #555555;
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* ===== Scrollbar ===== */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-mc-gold) #1a1a1a;
+}
+*::-webkit-scrollbar { width: 8px; }
+*::-webkit-scrollbar-track { background: #1a1a1a; }
+*::-webkit-scrollbar-thumb { background: var(--color-mc-gold); border-radius: 4px; }
+
+/* ===== Body ===== */
+body {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  color: #ffffff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ===== Minecraft BG overlay ===== */
+.minecraft-bg {
+  background-image:
+    radial-gradient(circle at 25% 25%, #2a2a2a 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, #404040 0%, transparent 50%),
+    linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+}
+
+/* ===== Hero background skins ===== */
+.hero-with-skins {
+  position: relative;
+  background-image: linear-gradient(135deg, rgba(10,10,10,.8) 0%, rgba(26,26,26,.8) 100%);
+}
+.hero-with-skins::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/images/left-skin.png'), url('/images/right-skin.png');
+  background-position: left -500px center, right -700px center;
+  background-repeat: no-repeat;
+  background-size: auto 1400px, auto 1100px;
+  opacity: .3;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ===== Glass effect ===== */
+.glass-effect {
+  background: rgba(42, 42, 42, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 170, 0, 0.1);
+}
+
+/* ===== Text shadow ===== */
+.text-shadow {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* ===== Gold glow ===== */
+.gold-glow {
+  box-shadow: 0 0 20px rgba(255, 170, 0, 0.3);
+}
+
+/* ===== Minecraft button ===== */
+.btn-minecraft {
+  background: linear-gradient(45deg, #FFAA00, #FF6600);
+  border: 2px solid #FFAA00;
+  color: #1a1a1a;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+.btn-minecraft:hover {
+  background: linear-gradient(45deg, #FF6600, #FFAA00);
+  box-shadow: 0 0 25px rgba(255, 170, 0, 0.5);
+  transform: translateY(-2px);
+}
+
+/* ===== Nav hover ===== */
+.nav-item {
+  transition: color 0.3s ease;
+}
+.nav-item:hover {
+  color: #FFAA00 !important;
+}
+
+/* ===== Particles ===== */
+.particle {
+  position: absolute;
+  background: #FFAA00;
+  border-radius: 50%;
+  opacity: 0.7;
+  animation: particle-float 4s infinite linear;
+}
+@keyframes particle-float {
+  0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.7; }
+  90% { opacity: 0.7; }
+  100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+}
+
+/* ===== Float animation ===== */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* ===== Glow animation ===== */
+@keyframes glow {
+  0% { box-shadow: 0 0 5px #FFAA00; }
+  100% { box-shadow: 0 0 20px #FFAA00, 0 0 30px #FFAA00; }
+}
+.animate-glow {
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+/* ===== Dropdown ===== */
+@keyframes dropdown-show {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.dropdown-animate {
+  animation: dropdown-show 0.2s ease-out;
+}
+
+/* ===== Copy button ===== */
+.ip-copy-button {
+  position: relative;
+}
+.ip-copy-button:hover {
+  box-shadow: 0 0 15px rgba(255, 170, 0, 0.3);
+}
+.ip-copy-button:active {
+  transform: scale(0.98);
+}
+
+/* ===== Pixelated images ===== */
+.pixelated {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* ===== Pulse slow ===== */
+.animate-pulse-slow {
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Owyx - Fabric Exploration - Share</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#00e5ff",
+                        "on-secondary-container": "#c4abff",
+                        "on-surface": "#e4e1ea",
+                        "on-error-container": "#ffdad6",
+                        "text-primary": "#f3f4f6",
+                        "border": "#2a2b30",
+                        "on-tertiary-fixed": "#251a00",
+                        "on-surface-variant": "#bac9cc",
+                        "inverse-surface": "#e4e1ea",
+                        "on-secondary-fixed": "#23005c",
+                        "on-primary-fixed-variant": "#004f58",
+                        "surface-container-low": "#1b1b21",
+                        "outline-variant": "#3b494c",
+                        "on-background": "#e4e1ea",
+                        "tertiary-fixed-dim": "#f3bf26",
+                        "secondary-fixed": "#e9ddff",
+                        "surface-raised": "#14141c",
+                        "surface-variant": "#35343b",
+                        "inverse-on-surface": "#303037",
+                        "on-tertiary-fixed-variant": "#594400",
+                        "surface-tint": "#00daf3",
+                        "on-primary": "#00363d",
+                        "surface-bright": "#39383f",
+                        "tertiary-container": "#fec931",
+                        "on-tertiary": "#3e2e00",
+                        "primary": "#c3f5ff",
+                        "tertiary-fixed": "#ffdf96",
+                        "primary-fixed": "#9cf0ff",
+                        "inverse-primary": "#006875",
+                        "surface": "#131319",
+                        "secondary-container": "#571bc1",
+                        "outline": "#849396",
+                        "on-tertiary-container": "#6f5500",
+                        "on-primary-container": "#00626e",
+                        "error-container": "#93000a",
+                        "surface-container-lowest": "#0e0e14",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "tertiary": "#ffeac0",
+                        "surface-dim": "#131319",
+                        "on-error": "#690005",
+                        "on-secondary": "#3c0091",
+                        "on-primary-fixed": "#001f24",
+                        "primary-fixed-dim": "#00daf3",
+                        "secondary": "#d0bcff",
+                        "surface-container-highest": "#35343b",
+                        "text-muted": "#9aa0a8",
+                        "background": "#050508",
+                        "surface-container": "#1f1f25",
+                        "surface-container-high": "#2a2930",
+                        "error": "#ffb4ab",
+                        "brand-cyan": "#00e5ff",
+                        "brand-violet": "#8b5cf6",
+                        "brand-dark": "#041018"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "card": "14px",
+                        "button": "10px"
+                    },
+                    "spacing": {
+                        "gap-md": "12px",
+                        "gap-sm": "8px",
+                        "rail-width": "64px",
+                        "topbar-height": "48px",
+                        "gap-lg": "16px",
+                        "page-padding": "24px",
+                        "gap-xs": "4px",
+                        "gap-xl": "24px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["DM Sans", "sans-serif"],
+                        "body-sm": ["DM Sans", "sans-serif"],
+                        "body-md": ["DM Sans", "sans-serif"],
+                        "headline-md": ["DM Sans", "sans-serif"],
+                        "label-xs": ["DM Sans", "sans-serif"],
+                        "brand-nav": ["DM Sans", "sans-serif"],
+                        "title-sm": ["DM Sans", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["26px", { "lineHeight": "30px", "letterSpacing": "-0.03em", "fontWeight": "700" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "500" }],
+                        "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "500" }],
+                        "headline-md": ["20px", { "lineHeight": "24px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-xs": ["12px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+                        "brand-nav": ["15px", { "lineHeight": "15px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "title-sm": ["16px", { "lineHeight": "20px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'DM Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .icon-fill { font-variation-settings: 'FILL' 1; }
+        .bg-glow-violet {
+            background: radial-gradient(circle at center, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+        }
+        .o-logo-gradient {
+            background: linear-gradient(135deg, #8b5cf6, #00e5ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface h-screen w-screen overflow-hidden flex selection:bg-brand-cyan/20 selection:text-brand-cyan">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-full w-rail-width bg-background border-r border-border flex flex-col items-center py-lg gap-md z-50">
+<!-- Logo -->
+<div class="mb-4">
+<div class="w-10 h-10 rounded-full border-2 border-border flex items-center justify-center relative overflow-hidden group cursor-pointer">
+<div class="absolute inset-0 bg-glow-violet opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<span class="font-display-lg o-logo-gradient select-none">O</span>
+</div>
+</div>
+<!-- Main Nav -->
+<div class="flex flex-col gap-2 w-full px-2">
+<button class="w-12 h-12 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-colors group" title="Home">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">home</span>
+</button>
+<button class="w-12 h-12 rounded-full flex items-center justify-center bg-brand-violet/15 text-brand-cyan transition-colors relative" title="Library">
+<span class="material-symbols-outlined icon-fill">grid_view</span>
+<span class="absolute left-[-8px] top-1/2 -translate-y-1/2 w-1 h-6 bg-brand-cyan rounded-r-full"></span>
+</button>
+<button class="w-12 h-12 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-colors group" title="Private Servers">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">lan</span>
+</button>
+</div>
+<!-- Divider -->
+<div class="w-8 h-px bg-border my-2"></div>
+<!-- Recent Instances (Avatars) -->
+<div class="flex flex-col gap-2 w-full px-2 items-center">
+<button class="w-10 h-10 rounded-full border border-border overflow-hidden hover:border-brand-cyan transition-colors relative group" title="Vanilla Survival">
+<img class="w-full h-full object-cover" data-alt="A stylized, low-poly isometric grass block from a voxel game, bathed in warm sunset lighting, against a dark space background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBv8X2rvIRxeyxb8nPiWAcZrvoHog5p2UgpO2_A63zhuBRPof0l0wNGQjMu7IMdE4Yi08vX548x6EViUboQVGgrfdd7Xe4-sA4iJRpaHqXXxxmI3EF-khtQJ-8o2N7G3fzjIT25dTCh_1a9vNuixCOPVjcsg1CMDBWwUUej6y6ZzbqsqKYcfVCexLmfsZVuOUMXbLEHX1zDH2cJNTReMtmncYRLYQ7g_PShl0XeSZrhvnxcYcIjFrnI"/>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px] text-white">play_arrow</span>
+</div>
+</button>
+<button class="w-10 h-10 rounded-full border border-border overflow-hidden hover:border-brand-cyan transition-colors relative group" title="Create Modpack">
+<img class="w-full h-full object-cover" data-alt="A detailed rendering of a complex mechanical brass gear and steam pipe assembly on a dark slate background, high-contrast modern technical style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwx6-IQ80I4vQyITfgrRBeVBNGNEPu1v0VoW8I9u7-MkIJJY91avATqWdM783_SObQdumUumO0AsZU1D7c1Etms9wYBDXj4li9RnvvahC7FtV6G9SZQiOhxy-8leuScywVaQdlD9YLxUDoO0-zFcsXcnXfNB82hSgRqiov1wcuv_mtmqKubo0AFeeIoWDJimkPnLgK9fwGIYJ2wikcZ7JUGeEVvJtZQxoo4mNVeoURe8GM4538Mz_N"/>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px] text-white">play_arrow</span>
+</div>
+</button>
+</div>
+<!-- Add CTA -->
+<button class="w-10 h-10 rounded-full border border-dashed border-outline-variant text-on-surface-variant hover:text-brand-cyan hover:border-brand-cyan transition-colors flex items-center justify-center mt-2 group" title="Create Instance">
+<span class="material-symbols-outlined group-hover:rotate-90 transition-transform duration-300">add</span>
+</button>
+<!-- Spacer -->
+<div class="flex-grow"></div>
+<!-- Footer Nav -->
+<button class="w-12 h-12 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-colors group mb-4" title="Settings">
+<span class="material-symbols-outlined group-hover:rotate-45 transition-transform duration-500">settings</span>
+</button>
+</nav>
+<!-- Main Content Area -->
+<main class="ml-rail-width w-[calc(100%-64px)] h-full flex flex-col">
+<!-- TopNavBar -->
+<header class="h-topbar-height bg-background/80 backdrop-blur-md border-b border-border flex justify-between items-center px-page-padding w-full sticky top-0 z-40">
+<!-- Breadcrumbs / Title -->
+<div class="flex items-center gap-2 font-title-sm text-title-sm">
+<span class="font-brand-nav font-bold tracking-tighter text-white">owyx</span>
+<span class="text-on-surface-variant">/</span>
+<span class="text-on-surface-variant hover:text-on-surface cursor-pointer transition-colors">Library</span>
+<span class="text-on-surface-variant">/</span>
+<span class="text-brand-cyan font-bold">Fabric Exploration</span>
+</div>
+<!-- Status Pill -->
+<div class="flex items-center gap-2">
+<div class="bg-surface-raised border border-border rounded-full px-3 py-1 flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-brand-cyan shadow-[0_0_8px_#00e5ff]"></div>
+<span class="font-label-xs text-label-xs text-brand-cyan tracking-wider">READY</span>
+</div>
+</div>
+</header>
+<!-- Scrollable Stage -->
+<div class="flex-1 overflow-y-auto overflow-x-hidden p-page-padding relative">
+<!-- Hero Section -->
+<div class="bg-surface border border-border rounded-card p-6 mb-8 flex flex-col md:flex-row gap-6 items-start md:items-center relative overflow-hidden">
+<!-- Decorative background elements -->
+<div class="absolute right-0 top-0 w-64 h-64 bg-glow-violet opacity-20 pointer-events-none"></div>
+<!-- Icon -->
+<div class="w-24 h-24 rounded-2xl border border-border overflow-hidden shrink-0 shadow-lg relative bg-surface-raised flex items-center justify-center">
+<span class="material-symbols-outlined text-[48px] text-brand-violet opacity-50 absolute">extension</span>
+<img class="w-full h-full object-cover relative z-10 mix-blend-screen opacity-80" data-alt="A macro shot of glowing, interlaced cyan and violet fiber optic cables weaving together to form a highly detailed, futuristic fabric texture on a pitch black background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBl7lpwKYdOmXipgmpOiB7pDEK7N-vMAu8Xzkq6IfyX-uGjHKdefBYaSySPpWxmL5gzZa45RMj3SQPEz93GlztCqDkdA7aJwK_-uq7wJ5l1ONkoI0Ifuu21ydSe61ZNQiYBBzqvb3EFlq9YUuwFZ0sSbac98B67L1VS83nsZioVlmAz43WrBVx26DficSG3x6QrZ5kNlMkhAAJJOrvPUAjq68VcnH2lR4nx33jgoX9W4Hzzj_j4UkyY"/>
+</div>
+<!-- Meta -->
+<div class="flex-1 flex flex-col gap-1">
+<h1 class="font-display-lg text-display-lg text-white">Fabric Exploration</h1>
+<div class="flex flex-wrap items-center gap-3 font-body-sm text-body-sm text-on-surface-variant">
+<span class="flex items-center gap-1 bg-surface-raised border border-border px-2 py-0.5 rounded-md text-white">
+<span class="material-symbols-outlined text-[14px]">memory</span> Minecraft 1.21.1
+                        </span>
+<span class="flex items-center gap-1 bg-surface-raised border border-border px-2 py-0.5 rounded-md text-white">
+<span class="material-symbols-outlined text-[14px]">extension</span> Fabric 0.16.0
+                        </span>
+<span class="text-text-muted">•</span>
+<span>42 Mods installed</span>
+<span class="text-text-muted">•</span>
+<span>Played 2h ago</span>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-3 shrink-0">
+<button class="bg-brand-cyan text-brand-dark font-headline-md text-headline-md px-8 py-3 rounded-button hover:bg-brand-cyan/90 transition-colors shadow-[0_0_20px_rgba(0,229,255,0.2)] flex items-center gap-2">
+<span class="material-symbols-outlined icon-fill">play_arrow</span> Play
+                    </button>
+<button class="w-12 h-12 bg-surface-raised border border-border rounded-button flex items-center justify-center text-on-surface hover:border-brand-cyan hover:text-brand-cyan transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="w-12 h-12 bg-surface-raised border border-border rounded-button flex items-center justify-center text-on-surface hover:border-brand-cyan hover:text-brand-cyan transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Tab Navigation -->
+<div class="flex items-center gap-6 border-b border-border mb-8">
+<button class="pb-3 font-title-sm text-title-sm text-on-surface-variant hover:text-white transition-colors relative group">
+                    Content
+                    <span class="absolute bottom-0 left-0 w-full h-0.5 bg-brand-cyan scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+</button>
+<button class="pb-3 font-title-sm text-title-sm text-on-surface-variant hover:text-white transition-colors relative group">
+                    Files
+                    <span class="absolute bottom-0 left-0 w-full h-0.5 bg-brand-cyan scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+</button>
+<button class="pb-3 font-title-sm text-title-sm text-on-surface-variant hover:text-white transition-colors relative group">
+                    Worlds
+                    <span class="absolute bottom-0 left-0 w-full h-0.5 bg-brand-cyan scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+</button>
+<button class="pb-3 font-title-sm text-title-sm text-on-surface-variant hover:text-white transition-colors relative group">
+                    Logs
+                    <span class="absolute bottom-0 left-0 w-full h-0.5 bg-brand-cyan scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+</button>
+<button class="pb-3 font-title-sm text-title-sm text-brand-cyan relative">
+                    Share
+                    <span class="absolute bottom-0 left-0 w-full h-0.5 bg-brand-cyan"></span>
+</button>
+</div>
+<!-- Share Content Area -->
+<div class="max-w-3xl">
+<div class="bg-surface border border-border rounded-card p-8">
+<!-- Header -->
+<div class="mb-6 flex items-start gap-4">
+<div class="w-12 h-12 rounded-full bg-brand-violet/10 flex items-center justify-center border border-brand-violet/20 shrink-0">
+<span class="material-symbols-outlined text-brand-violet icon-fill text-[24px]">share</span>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md text-white mb-2">Share instance</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-xl">
+                                Export your instance as a portable file or create a shareable link for friends to download your exact mod configuration.
+                            </p>
+</div>
+</div>
+<!-- Action Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<!-- Export Card -->
+<button class="bg-surface-raised border border-border rounded-card p-6 flex flex-col items-start gap-4 text-left hover:border-brand-cyan/50 hover:bg-surface-variant/30 transition-all group">
+<div class="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center group-hover:border-brand-cyan group-hover:text-brand-cyan transition-colors">
+<span class="material-symbols-outlined">download</span>
+</div>
+<div>
+<h3 class="font-title-sm text-title-sm text-white mb-1 group-hover:text-brand-cyan transition-colors">Export Instance</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Package mods, configs, and worlds into a standard .mrpack file.</p>
+</div>
+</button>
+<!-- Share Link Card -->
+<button class="bg-surface-raised border border-border rounded-card p-6 flex flex-col items-start gap-4 text-left hover:border-brand-violet/50 hover:bg-surface-variant/30 transition-all group relative overflow-hidden" disabled="">
+<!-- Disabled Scrim -->
+<div class="absolute inset-0 bg-background/50 z-10 flex items-center justify-center backdrop-blur-[1px]">
+<span class="bg-surface border border-border font-label-xs text-label-xs text-on-surface-variant px-3 py-1 rounded-full uppercase tracking-wider">Coming Soon</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center text-text-muted">
+<span class="material-symbols-outlined">link</span>
+</div>
+<div class="opacity-50">
+<h3 class="font-title-sm text-title-sm text-white mb-1">Copy Share Link</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Generate a direct download link hosted on Owyx servers.</p>
+</div>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

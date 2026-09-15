@@ -1,0 +1,12 @@
+---
+description: Browser preview and UI screenshot testing for Owyx
+alwaysApply: true
+---
+
+# Owyx — browser and UI testing
+
+- When opening a web preview (`npm run dev`, Vite, docs, etc.), use **Cursor Browser / browser MCP** (`user-browsermcp`), not an external system browser.
+- For UI checks, the agent may take **screenshots via browser tools**, inspect the UI, and fix issues without waiting for the user — especially for layout, navigation, empty states, and create-instance flows that work in browser preview.
+- Native install/Play still needs `Owyx.exe` / `tauri dev`; browser preview is for shell UI only.
+- **Default verify = smoke/debug, not release.** Prefer `npm run check` + `npm run check:rust`, then `npm run build:smoke` (`target/debug/Owyx.exe` / optional `Launcher/Owyx.debug.exe`). Full `npm run build:release` only when shipping / hand-off — see `Launcher/BUILD.md`.
+- After a **release** ship build, place `Owyx.exe` at `Launcher/Owyx.exe` when the user asks for a runnable hand-off binary.

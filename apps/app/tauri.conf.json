@@ -55,14 +55,14 @@
 			}
 		]
 	},
-	"productName": "Modrinth App",
+	"productName": "Owyx",
 	"version": "../app-frontend/package.json",
-	"mainBinaryName": "Modrinth App",
-	"identifier": "ModrinthApp",
+	"mainBinaryName": "Owyx",
+	"identifier": "site.owyx.app",
 	"plugins": {
 		"deep-link": {
 			"desktop": {
-				"schemes": ["modrinth"]
+				"schemes": ["owyx"]
 			},
 			"mobile": []
 		}
@@ -77,7 +77,7 @@
 				"fullscreen": false,
 				"height": 800,
 				"resizable": true,
-				"title": "Modrinth App",
+				"title": "Owyx",
 				"label": "main",
 				"width": 1280,
 				"minHeight": 700,

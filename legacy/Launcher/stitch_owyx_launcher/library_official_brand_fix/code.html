@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Owyx - Library</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: DM Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-fixed-dim": "#00daf3",
+                      "text-muted": "#9aa0a8",
+                      "surface-raised": "#14141c",
+                      "on-primary": "#041018",
+                      "inverse-on-surface": "#303037",
+                      "tertiary": "#ffeac0",
+                      "on-error": "#690005",
+                      "secondary-fixed-dim": "#d0bcff",
+                      "error": "#ffb4ab",
+                      "inverse-surface": "#e4e1ea",
+                      "tertiary-fixed-dim": "#f3bf26",
+                      "surface-container-highest": "#35343b",
+                      "border": "#2a2b30",
+                      "secondary-container": "#571bc1",
+                      "outline-variant": "#3b494c",
+                      "on-secondary-fixed": "#23005c",
+                      "on-background": "#e4e1ea",
+                      "primary-container": "#00e5ff",
+                      "outline": "#849396",
+                      "text-primary": "#f3f4f6",
+                      "on-tertiary": "#3e2e00",
+                      "on-surface-variant": "#bac9cc",
+                      "error-container": "#93000a",
+                      "on-primary-fixed": "#001f24",
+                      "surface-container-high": "#2a2930",
+                      "background": "#050508",
+                      "surface-container-low": "#1b1b21",
+                      "on-secondary-fixed-variant": "#5516be",
+                      "surface-bright": "#39383f",
+                      "tertiary-fixed": "#ffdf96",
+                      "primary-fixed": "#9cf0ff",
+                      "surface-tint": "#00daf3",
+                      "surface-container-lowest": "#0e0e14",
+                      "primary": "#c3f5ff",
+                      "on-error-container": "#ffdad6",
+                      "secondary-fixed": "#e9ddff",
+                      "on-tertiary-fixed": "#251a00",
+                      "tertiary-container": "#fec931",
+                      "on-surface": "#e4e1ea",
+                      "on-tertiary-fixed-variant": "#594400",
+                      "on-tertiary-container": "#6f5500",
+                      "on-secondary-container": "#c4abff",
+                      "on-primary-container": "#00626e",
+                      "on-primary-fixed-variant": "#004f58",
+                      "surface-container": "#1f1f25",
+                      "on-secondary": "#3c0091",
+                      "surface": "#131319",
+                      "inverse-primary": "#006875",
+                      "surface-variant": "#35343b",
+                      "surface-dim": "#131319",
+                      "secondary": "#d0bcff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gap-sm": "8px",
+                      "topbar-height": "48px",
+                      "gap-md": "12px",
+                      "rail-width": "64px",
+                      "page-padding": "24px",
+                      "gap-xs": "4px",
+                      "gap-lg": "16px",
+                      "gap-xl": "24px"
+              },
+              "fontFamily": {
+                      "body-md": [
+                              "DM Sans"
+                      ],
+                      "label-xs": [
+                              "DM Sans"
+                      ],
+                      "body-sm": [
+                              "DM Sans"
+                      ],
+                      "brand-nav": [
+                              "DM Sans"
+                      ],
+                      "title-sm": [
+                              "DM Sans"
+                      ],
+                      "headline-md": [
+                              "DM Sans"
+                      ],
+                      "display-lg": [
+                              "DM Sans"
+                      ]
+              },
+              "fontSize": {
+                      "body-md": [
+                              "15px",
+                              {
+                                      "lineHeight": "22px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-xs": [
+                              "12px",
+                              {
+                                      "lineHeight": "14px",
+                                      "letterSpacing": "0.04em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-sm": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "brand-nav": [
+                              "15px",
+                              {
+                                      "lineHeight": "15px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "title-sm": [
+                              "16px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "24px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-lg": [
+                              "26px",
+                              {
+                                      "lineHeight": "30px",
+                                      "letterSpacing": "-0.03em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body {
+            background-color: #050508;
+            color: #e4e1ea;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Material Symbols Setup */
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Custom scrollbar for content area */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #2a2b30;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: #39383f;
+        }
+    </style>
+</head>
+<body class="flex h-screen w-screen bg-background text-on-background selection:bg-primary-container selection:text-on-primary">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 bottom-0 w-[64px] bg-surface dark:bg-surface border-r border-border flex flex-col items-center py-gap-lg gap-y-gap-md z-50">
+<!-- Logo -->
+<div class="mb-4 text-primary-container w-12 h-12 flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity">
+<svg fill="none" height="32" viewbox="0 0 32 32" width="32" xmlns="http://www.w3.org/2000/svg">
+<path d="M16 2L2 9.5V22.5L16 30L30 22.5V9.5L16 2Z" stroke="url(#paint0_linear)" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M16 8L8 12.5V20L16 24L24 20V12.5L16 8Z" stroke="#00e5ff" stroke-linejoin="round" stroke-width="1.5"></path>
+<defs>
+<lineargradient gradientunits="userSpaceOnUse" id="paint0_linear" x1="16" x2="16" y1="2" y2="30">
+<stop stop-color="#8b5cf6"></stop>
+<stop offset="1" stop-color="#00e5ff"></stop>
+</lineargradient>
+</defs>
+</svg>
+</div>
+<!-- Navigation Tabs -->
+<a class="text-text-muted w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-raised transition-all duration-200 active:scale-95 cursor-pointer" href="#" title="Home">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">home</span>
+</a>
+<a class="bg-secondary-container/20 text-primary-container rounded-full w-12 h-12 flex items-center justify-center hover:bg-surface-raised transition-all duration-200 active:scale-95 cursor-pointer" href="#" title="Library">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">library_books</span>
+</a>
+<a class="text-text-muted w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-raised transition-all duration-200 active:scale-95 cursor-pointer" href="#" title="Private Servers">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dns</span>
+</a>
+<!-- Divider -->
+<div class="w-8 h-[1px] bg-border my-2"></div>
+<!-- Recent Instances Avatars -->
+<div class="w-10 h-10 rounded-full overflow-hidden border border-border cursor-pointer hover:border-primary-container transition-colors" title="Vanilla 1.21.1">
+<img class="w-full h-full object-cover" data-alt="A macro shot of a single, vibrant green Minecraft grass block resting on a sleek, dark obsidian pedestal. The scene is illuminated by dramatic, high-contrast cyan lighting from above, casting sharp shadows in a deep space, low-light environment. The aesthetic is extremely polished, technical, and high-fidelity, typical of modern high-end gaming branding." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWvODkjjA-1oUfdNrA5TDe3GRktDlaNRMqddQZCHNy0b7obDyBYVhZJvblGXQc0pznMv1CE7ODrNwgFgBDdw2Vm0VBCmyOb_iO_Hk73xComnwkWDlUs7z1iqULT_ZiwF9RUP5na4bOO0qYxi4leNkxil91sm2nPgUlTkM_nZoxQ4zCEeOw81pr1Gq7VaoUwV7A7p22Ac_FjTNCG1Unj9rGEJGpgjWcazFGq93WCtfk03OMTDO7h6V200LvwLsGhCQKTlJqhMMugJ8"/>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-border cursor-pointer hover:border-primary-container transition-colors" title="Fabric SMP">
+<img class="w-full h-full object-cover" data-alt="A stylized, glowing diamond pickaxe floating against a pitch-black background. Subtle violet and cyan nebulous energy swirls around the tool. The lighting is cinematic and moody, highlighting the sharp edges of the pickaxe. The overall mood is mysterious and immersive, fitting for a premium, dark-mode gaming application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDy4G6DkLbeoliBvKTGndLvPRcqYqLo_N2FWJlIIHhYUD_QcVA4i3U-l0c-rpMQH2Ive6CNInTar4ek-z0qM15K8ykm-x9reKIquGYn-PVacwAHGrt27cA2rBqLM5Yrps34s6YsilH6MC5Zu2btyYgmlmqPL8OUaNyDKK-6JQev3PLxQxykJSzLWnzCe2JBAHf_cqcLiC8NR21KFRVJlMtr7VTvsl744fIDVxOQe0mczlEY1ugS1_8vVowx2ITcQ6ZRNThcvgS3xg"/>
+</div>
+<!-- CTA Action -->
+<button class="w-10 h-10 rounded-full border border-border bg-surface-raised text-text-muted flex items-center justify-center hover:bg-surface-bright hover:text-primary-container transition-all active:scale-95 mt-2" title="Create Instance">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+<!-- Spacer -->
+<div class="flex-grow"></div>
+<!-- Footer Utility -->
+<a class="text-text-muted w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-raised transition-all duration-200 active:scale-95 cursor-pointer" href="#" title="Settings">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+</a>
+</nav>
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 left-[64px] h-[48px] bg-background dark:bg-background border-b border-border flex items-center px-page-padding w-[calc(100%-64px)] z-40 flat no shadows">
+<div class="font-brand-nav text-brand-nav text-primary-container lowercase cursor-pointer hover:text-primary-fixed-dim transition-colors active:opacity-80">
+            owyx
+        </div>
+<div class="flex-grow"></div>
+<!-- Global Status / Utility -->
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 bg-surface-raised border border-border rounded-full px-3 py-1 text-label-xs font-label-xs text-text-muted">
+<div class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></div>
+                 Ready
+             </div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-[64px] mt-[48px] p-page-padding w-[calc(100%-64px)] h-[calc(100vh-48px)] overflow-y-auto custom-scrollbar flex flex-col gap-gap-xl">
+<!-- Header Section -->
+<div class="flex justify-between items-end">
+<div>
+<h1 class="font-display-lg text-display-lg text-text-primary mb-4">Library</h1>
+<!-- Pill Tabs -->
+<div class="flex gap-2">
+<button class="bg-secondary-container/20 text-primary-container border border-transparent px-4 py-1.5 rounded-full font-body-sm text-body-sm transition-colors cursor-pointer">
+                        All instances
+                    </button>
+<button class="bg-surface-raised text-text-muted border border-border px-4 py-1.5 rounded-full font-body-sm text-body-sm hover:bg-surface-bright transition-colors cursor-pointer">
+                        Favorites
+                    </button>
+<button class="bg-surface-raised text-text-muted border border-border px-4 py-1.5 rounded-full font-body-sm text-body-sm hover:bg-surface-bright transition-colors cursor-pointer">
+                        Vanilla
+                    </button>
+<button class="bg-surface-raised text-text-muted border border-border px-4 py-1.5 rounded-full font-body-sm text-body-sm hover:bg-surface-bright transition-colors cursor-pointer">
+                        Modded
+                    </button>
+</div>
+</div>
+<!-- Primary Action -->
+<button class="bg-primary-container text-on-primary font-title-sm text-title-sm px-5 py-2.5 rounded-lg flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,229,255,0.2)]">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                New instance
+            </button>
+</div>
+<!-- Instance List -->
+<div class="flex flex-col gap-3 mt-4">
+<!-- Instance Row 1 -->
+<div class="group bg-surface hover:bg-surface-raised border border-border rounded-[14px] p-4 flex items-center gap-4 transition-all duration-200 cursor-pointer">
+<!-- Icon -->
+<div class="w-14 h-14 rounded-lg overflow-hidden border border-border bg-background flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A highly detailed close-up of a Minecraft dirt block with vibrant green grass on top. The block is isolated against a deep, dark grey background. Striking cyan light washes over the left side of the block, while subtle violet ambient light fills the shadows on the right. The style is modern, cinematic, and tailored for a high-end dark mode gaming UI." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyTXMtAa1FWWCVqxlgPdVjXexzqXHqWvk1-2vhAnzfTFRVRFvROlw55qC0ojtSkhDhwLRx8DvbR9O3JWRnvGS2RT0unnDAuYDBVbEaGieej87bq9KwsI7LRzuUTtIE5pQg0nSKacr-sz_k4U39Y_C1NvUqPI_ktEUCi6rPRgTc-U7aJzy0i_-GfY0_6af_DJl4GyeeIt62uyGNClCTsXv6iHzTdu6z4b_z05f54-gFGnOFfFXMexizOk3yluBEMOgd70IZwBnHazg"/>
+</div>
+<!-- Info -->
+<div class="flex-grow flex flex-col justify-center">
+<h3 class="font-title-sm text-title-sm text-text-primary group-hover:text-primary-container transition-colors">Vanilla 1.21.1</h3>
+<div class="flex items-center gap-2 mt-1">
+<span class="bg-surface-bright text-text-muted px-2 py-0.5 rounded text-[11px] font-label-xs uppercase tracking-wider">Vanilla</span>
+<span class="font-body-sm text-body-sm text-text-muted">1.21.1</span>
+<span class="w-1 h-1 rounded-full bg-border"></span>
+<span class="font-body-sm text-body-sm text-text-muted">Played 2h ago</span>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-10 h-10 rounded-full text-text-muted hover:text-text-primary hover:bg-surface-bright flex items-center justify-center transition-colors" title="Instance Settings">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<button class="bg-primary-container text-on-primary font-title-sm text-title-sm px-6 py-2.5 rounded-lg flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-[0_0_10px_rgba(0,229,255,0.15)] ml-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+                    Play
+                </button>
+</div>
+<!-- Instance Row 2 -->
+<div class="group bg-surface hover:bg-surface-raised border border-border rounded-[14px] p-4 flex items-center gap-4 transition-all duration-200 cursor-pointer">
+<!-- Icon -->
+<div class="w-14 h-14 rounded-lg overflow-hidden border border-border bg-background flex-shrink-0 relative">
+<img class="w-full h-full object-cover" data-alt="An abstract, stylized representation of woven fabric or textile, rendered in deep purples and dark greys. Sharp, glowing cyan threads weave through the dark material, creating a high-contrast, technical pattern. The overall lighting is low-key, fitting perfectly into a sophisticated dark-mode interface. The image feels tactile yet digital." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHHAsV9B2REWo7ioWxRBDd5SeH6bs5n5AQvVxGl8nZXxvIvyXhqiUCVK3c4Yw0p6pcFoFVtKWz-vx4WW50LiUoMZbiPKrCfzZXPGE5BeeITQPn827-aqmUMpkoGFpdYjk76UW3TusBCeFND4KINQYWrMYG4tYy5OUuawa-cJvYKUZOVgLgBG2wulcfZqP9DdGIZbEIY2sYV69o-WdeuovVRBhPcqomO88ySSUskz_cMCY9PjJLrOPcBSc6fA5_nZVo8Wlg7Cgwqo8"/>
+</div>
+<!-- Info -->
+<div class="flex-grow flex flex-col justify-center">
+<h3 class="font-title-sm text-title-sm text-text-primary group-hover:text-primary-container transition-colors">Fabric SMP</h3>
+<div class="flex items-center gap-2 mt-1">
+<span class="bg-surface-bright text-text-muted px-2 py-0.5 rounded text-[11px] font-label-xs uppercase tracking-wider border border-[#e8ce9c]/20 text-[#e8ce9c]">Fabric</span>
+<span class="font-body-sm text-body-sm text-text-muted">1.20.4</span>
+<span class="w-1 h-1 rounded-full bg-border"></span>
+<span class="font-body-sm text-body-sm text-text-muted">45 Mods</span>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-10 h-10 rounded-full text-text-muted hover:text-text-primary hover:bg-surface-bright flex items-center justify-center transition-colors" title="Instance Settings">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<button class="bg-primary-container text-on-primary font-title-sm text-title-sm px-6 py-2.5 rounded-lg flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-[0_0_10px_rgba(0,229,255,0.15)] ml-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+                    Play
+                </button>
+</div>
+<!-- Instance Row 3 -->
+<div class="group bg-surface hover:bg-surface-raised border border-border rounded-[14px] p-4 flex items-center gap-4 transition-all duration-200 cursor-pointer">
+<!-- Icon -->
+<div class="w-14 h-14 rounded-lg overflow-hidden border border-border bg-background flex-shrink-0 relative">
+<img class="w-full h-full object-cover" data-alt="A dark, menacing metallic gear or cogwheel, partially submerged in shadow. The metal has a brushed, heavy texture. Intense, glowing red and cyan accents highlight the sharp teeth of the gear, suggesting extreme heat and power. The composition is central and iconic, designed to look dramatic within a dark, premium software environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYWsCjpJXHvAAhuZpsKqMGtrhO14nSDuassAvW5KTNGfzGwAeSUe4LIm-zlGFhGP4vviaWZcMW3iLx3b1P9yHCGV2Ap9Eaxu-CdrVUoGYsmQnXlqv21HNmKC5n9EpD-3qStDUXrFVL_1n5sk31v68JUw8ngqdNFeTuhH3tp0oyzqWJzwl11fzgS89MofosOxJLvl6vMyU-Oe8iHs0zQpNsBVfT7IJ_Wi52AUpSncYJqhMNdo_BvbpCR_-Oh3UawtiTc1W59mZS0h4"/>
+</div>
+<!-- Info -->
+<div class="flex-grow flex flex-col justify-center">
+<h3 class="font-title-sm text-title-sm text-text-primary group-hover:text-primary-container transition-colors">Modded Hardcore</h3>
+<div class="flex items-center gap-2 mt-1">
+<span class="bg-surface-bright text-text-muted px-2 py-0.5 rounded text-[11px] font-label-xs uppercase tracking-wider border border-[#dfa86a]/20 text-[#dfa86a]">Forge</span>
+<span class="font-body-sm text-body-sm text-text-muted">1.19.2</span>
+<span class="w-1 h-1 rounded-full bg-border"></span>
+<span class="font-body-sm text-body-sm text-text-muted">218 Mods</span>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-10 h-10 rounded-full text-text-muted hover:text-text-primary hover:bg-surface-bright flex items-center justify-center transition-colors" title="Instance Settings">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<button class="bg-primary-container text-on-primary font-title-sm text-title-sm px-6 py-2.5 rounded-lg flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-[0_0_10px_rgba(0,229,255,0.15)] ml-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+                    Play
+                </button>
+</div>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,56 @@
+---
+description: Public agent-tool-catalog pointer — always visible; fetch the live README only when choosing or adding agent tooling
+alwaysApply: true
+---
+
+# Agent tool catalog
+
+This rule is **always present** so every chat/message knows a useful public **agent-tool-catalog** exists and can be consulted when the task needs skills, MCP, UI tooling, or other agent tooling.
+
+**Presence ≠ fetch.** Seeing this rule does **not** mean you should hit the network. Do **not** `curl`/`gh` the catalog on every turn.
+
+## Fetch gate (mandatory)
+
+Fetch the live catalog README **only** when the task is about **choosing** or **adding** agent tooling (skills, MCP servers, UI tooling, or similar).
+
+Do **NOT** fetch on unrelated Launcher, Rust, Vite, site, or other product work — even though this rule is always in context.
+
+## Canon sources
+
+- Repository: https://github.com/ebluffy/agent-tool-catalog
+- Raw README (authoritative list): https://raw.githubusercontent.com/ebluffy/agent-tool-catalog/main/README.md
+
+## How to read the catalog
+
+When the fetch gate above applies:
+
+1. **Primary:** fetch the current README with `curl` against the raw URL above (e.g. `curl -fsSL https://raw.githubusercontent.com/ebluffy/agent-tool-catalog/main/README.md`).
+2. **Optional fallback:** `gh` (`gh api` / `gh repo view` against `ebluffy/agent-tool-catalog`) if curl is unavailable — note `gh` is often unauthenticated in cloud agents.
+3. Use that live content to pick tools. **Do not** keep a local memory dump or paste the full catalog into project files.
+4. **Do not** dump the whole catalog into chat answers — cite only the entries that apply to the task.
+5. This rule does **not** replace `AGENTS.md` or other project rules; it only points at the external catalog.
+
+## Fallback if fetch fails
+
+If the catalog cannot be fetched (network error, 404, empty response, auth failure, etc.):
+
+1. **Do not invent** catalog contents or tool lists.
+2. Tell the user the catalog fetch failed.
+3. Fall back to `AGENTS.md` and other project rules for guidance.
+
+## Adding entries (user request)
+
+When the user asks to add something in a form like «добавь в каталог: url — зачем» (or equivalent: URL + short reason), follow the live catalog’s **How to add an entry** section (and table layout) so this rule does not drift:
+
+1. Pick the right section in that repo’s `README.md` (UI / Process / …) — or create a new section if none fits.
+2. Insert **one markdown table row** of the form `| YYYY-MM-DD | <url> | <why> |` (do not append a free-form line outside the table).
+3. Update the `Last updated` date at the top of the README.
+4. Use a **PR-flow** in `ebluffy/agent-tool-catalog`: create a branch, commit there, open a pull request — **do not** commit and push straight to `main`.
+5. Do not open unrelated PRs in Owyx for catalog-only edits.
+
+## Never put in the catalog
+
+- Personal projects or private-only tooling
+- Local Windows paths such as `Z:\...`
+- Secrets, tokens, credentials, or env values
+- Private / non-shareable URLs

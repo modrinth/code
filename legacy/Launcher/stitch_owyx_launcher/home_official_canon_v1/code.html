@@ -1,0 +1,323 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Owyx - Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary": "#3e2e00",
+                      "on-primary-fixed-variant": "#004f58",
+                      "on-error-container": "#ffdad6",
+                      "surface-container-highest": "#35343b",
+                      "on-surface-variant": "#bac9cc",
+                      "border": "#2a2b30",
+                      "secondary-container": "#571bc1",
+                      "text-primary": "#f3f4f6",
+                      "surface-variant": "#35343b",
+                      "error": "#ffb4ab",
+                      "surface-bright": "#39383f",
+                      "surface-raised": "#14141c",
+                      "on-secondary-fixed-variant": "#5516be",
+                      "on-secondary": "#3c0091",
+                      "primary-container": "#00e5ff",
+                      "on-tertiary-fixed-variant": "#594400",
+                      "on-primary-fixed": "#001f24",
+                      "inverse-on-surface": "#303037",
+                      "tertiary-container": "#fec931",
+                      "surface-dim": "#131319",
+                      "secondary-fixed": "#e9ddff",
+                      "on-tertiary-fixed": "#251a00",
+                      "inverse-surface": "#e4e1ea",
+                      "surface-tint": "#00daf3",
+                      "secondary-fixed-dim": "#d0bcff",
+                      "tertiary-fixed-dim": "#f3bf26",
+                      "primary-fixed-dim": "#00daf3",
+                      "on-secondary-container": "#c4abff",
+                      "text-muted": "#9aa0a8",
+                      "on-tertiary-container": "#6f5500",
+                      "surface": "#131319",
+                      "primary-fixed": "#9cf0ff",
+                      "tertiary": "#ffeac0",
+                      "surface-container-lowest": "#0e0e14",
+                      "surface-container": "#1f1f25",
+                      "tertiary-fixed": "#ffdf96",
+                      "on-background": "#e4e1ea",
+                      "on-primary-container": "#00626e",
+                      "error-container": "#93000a",
+                      "on-primary": "#041018",
+                      "background": "#050508",
+                      "outline": "#849396",
+                      "on-error": "#690005",
+                      "inverse-primary": "#006875",
+                      "on-secondary-fixed": "#23005c",
+                      "surface-container-low": "#1b1b21",
+                      "secondary": "#d0bcff",
+                      "on-surface": "#e4e1ea",
+                      "primary": "#c3f5ff",
+                      "outline-variant": "#3b494c",
+                      "surface-container-high": "#2a2930"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "rail-width": "64px",
+                      "gap-sm": "8px",
+                      "gap-lg": "16px",
+                      "topbar-height": "48px",
+                      "page-padding": "24px",
+                      "gap-xs": "4px",
+                      "gap-xl": "24px",
+                      "gap-md": "12px"
+              },
+              "fontFamily": {
+                      "body-sm": [
+                              "DM Sans"
+                      ],
+                      "title-sm": [
+                              "DM Sans"
+                      ],
+                      "body-md": [
+                              "DM Sans"
+                      ],
+                      "label-xs": [
+                              "DM Sans"
+                      ],
+                      "brand-nav": [
+                              "DM Sans"
+                      ],
+                      "headline-md": [
+                              "DM Sans"
+                      ],
+                      "display-lg": [
+                              "DM Sans"
+                      ]
+              },
+              "fontSize": {
+                      "body-sm": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "title-sm": [
+                              "16px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "15px",
+                              {
+                                      "lineHeight": "22px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-xs": [
+                              "12px",
+                              {
+                                      "lineHeight": "14px",
+                                      "letterSpacing": "0.04em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "brand-nav": [
+                              "15px",
+                              {
+                                      "lineHeight": "15px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "24px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-lg": [
+                              "26px",
+                              {
+                                      "lineHeight": "30px",
+                                      "letterSpacing": "-0.03em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body {
+            background-color: #050508;
+            color: #f3f4f6;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        /* Custom Scrollbar for Content Area */
+        .content-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .content-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .content-scroll::-webkit-scrollbar-thumb {
+            background-color: #2a2b30;
+            border-radius: 4px;
+        }
+        
+        .glow-effect {
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.15);
+        }
+    </style>
+</head>
+<body class="flex h-screen w-screen overflow-hidden antialiased">
+<!-- SideNavBar (from JSON) -->
+<nav class="fixed left-0 top-0 h-full w-rail-width bg-surface-container-lowest border-r border-border flex flex-col items-center py-lg gap-md z-50">
+<!-- Brand Logo Area -->
+<div class="mb-gap-md w-full flex justify-center cursor-pointer group"><div class="mb-4 text-primary-container w-12 h-12 flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity"><svg fill="none" height="32" viewBox="0 0 32 32" width="32" xmlns="http://www.w3.org/2000/svg"><path d="M16 2L2 9.5V22.5L16 30L30 22.5V9.5L16 2Z" stroke="url(#paint0_linear)" stroke-linejoin="round" stroke-width="2"></path><path d="M16 8L8 12.5V20L16 24L24 20V12.5L16 8Z" stroke="#00e5ff" stroke-linejoin="round" stroke-width="1.5"></path><defs><linearGradient gradientUnits="userSpaceOnUse" id="paint0_linear" x1="16" x2="16" y1="2" y2="30"><stop stop-color="#8b5cf6"></stop><stop offset="1" stop-color="#00e5ff"></stop></linearGradient></defs></svg></div></div>
+<!-- Primary Navigation -->
+<div class="flex flex-col gap-gap-xs w-full px-2">
+<!-- Home (Active) -->
+<button class="w-12 h-12 rounded-full flex items-center justify-center relative group active:scale-95 transition-transform bg-[#8b5cf6]/20">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">home</span>
+</button>
+<!-- Library -->
+<button class="w-12 h-12 rounded-full flex items-center justify-center relative group hover:bg-surface-variant/50 transition-colors active:scale-95 transition-transform text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined">library_books</span></button>
+<!-- Private Servers -->
+<button class="w-12 h-12 rounded-full flex items-center justify-center relative group hover:bg-surface-variant/50 transition-colors active:scale-95 transition-transform text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined">dns</span></button>
+</div>
+<div class="w-8 h-px bg-border my-gap-xs"></div>
+<!-- Recent Instances (Avatars) -->
+<div class="flex flex-col gap-gap-sm w-full px-2 items-center">
+<div class="w-10 h-10 rounded-full bg-surface-raised border border-border flex items-center justify-center overflow-hidden hover:border-primary-container cursor-pointer transition-colors" title="Vanilla 1.21.1">
+<img alt="Vanilla" class="w-full h-full object-cover opacity-80 hover:opacity-100 transition-opacity" data-alt="A macro shot of a sleek, dark-themed isometric grass block icon. The lighting is moody and cinematic, highlighting sharp, high-contrast edges and subtle textures against a deep space black background. The color palette emphasizes sophisticated obsidian darks and vibrant, glowing emerald accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXg_bcvOexhRueDHIk8X_DPqL51Xohlfz0wP4dVTKEUSvpSzZ0qkwUGVNDMwCT0A_u370O1ziAlnjLIaOfxCCCo2wMfqolGKii61MSZnmAuNRE6__u4QS3kO-ZleTPmc9Ld1BgBAr6yYyGCh8UAKunFPPHOWojzZEZ6y3-iOVeJQHriQncgkkXjVKe1SCIMxFsZIq1wUVxm_xUjpeYplF3I34iV9XM48ay8ZSGx1I8DwjWSHw5Z4f5htIHERDE-wm0r-dIViSe590">
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-raised border border-border flex items-center justify-center overflow-hidden hover:border-primary-container cursor-pointer transition-colors" title="Fabric SMP">
+<img alt="Fabric" class="w-full h-full object-cover opacity-80 hover:opacity-100 transition-opacity" data-alt="A stylized, high-fidelity render of a futuristic cogwheel floating in a dark, minimalist digital environment. The scene features deep, rich blacks and grays, with bright, high-chroma cyan and violet rim lighting catching the metallic edges. The aesthetic is clean, technical, and modern." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQzhxavy1ies35uXdoDE9fPG5PW69qrwMC-n4dF6hlr1qT1-WEUDJqzsfW2OoHu6UcpEPlSc5w8KPVPrhulDqlDRQC66W-XQD29L0UyBtdO7wjRnBvsxKx0doCdvOUOZ0o3J9o108ZmH-VUl6NEnBtoNkrM_1MfjnkUXjJ1ForURW0GlAcJAAlQM7oX0HMKSH1u-52OSjhvub32hJiVKW0wQwoWPftXURd_9zkYxkh22w4M3k4OJKQokZ_wmYYM_LR3RXgjvShC7U">
+</div>
+</div>
+<!-- Create Button -->
+<div class="mt-gap-sm w-full px-2 flex justify-center">
+<button class="w-12 h-12 rounded-full bg-surface-raised border border-border flex items-center justify-center text-on-surface-variant hover:text-primary-container hover:border-primary-container transition-colors active:scale-95">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+<div class="flex-grow"></div>
+<!-- Footer Action -->
+<button class="w-12 h-12 rounded-full flex items-center justify-center relative group hover:bg-surface-variant/50 transition-colors active:scale-95 transition-transform text-on-surface-variant hover:text-on-surface mb-gap-sm">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</nav>
+<!-- TopNavBar (from JSON, modified based on prompt) -->
+<header class="fixed top-0 right-0 h-topbar-height left-rail-width bg-surface-dim border-b border-border flex justify-between items-center px-page-padding z-40">
+<div class="flex items-center gap-gap-sm">
+<div class="font-brand-nav text-brand-nav text-primary-container lowercase cursor-pointer hover:text-primary-fixed-dim transition-colors active:opacity-80">owyx</div>
+<span class="text-on-surface-variant">/</span>
+<span class="font-title-sm text-title-sm text-text-primary">Home</span>
+</div>
+<div class="flex items-center gap-gap-md">
+<div class="bg-surface-raised border border-border rounded-full px-3 py-1.5 flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-primary-container shadow-[0_0_8px_rgba(0,229,255,0.6)]"></div>
+<span class="font-label-xs text-label-xs text-text-muted">System Stable</span>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-rail-width mt-topbar-height w-[calc(100%-64px)] h-[calc(100vh-48px)] bg-background p-page-padding overflow-y-auto content-scroll flex gap-gap-xl">
+<!-- Left Column: Primary Content -->
+<div class="flex-1 flex flex-col gap-gap-xl max-w-4xl">
+<header>
+<h1 class="font-display-lg text-display-lg text-text-primary">Welcome back</h1>
+</header>
+<section class="flex flex-col gap-gap-md">
+<h2 class="font-title-sm text-title-sm text-text-primary border-b border-border pb-2">Jump back in</h2>
+<!-- Instance Row 1 -->
+<div class="bg-surface rounded-xl border border-border p-4 flex items-center justify-between hover:bg-surface-raised transition-colors group">
+<div class="flex items-center gap-4">
+<div class="w-16 h-16 rounded-lg bg-surface-raised border border-border overflow-hidden flex-shrink-0">
+<img alt="Vanilla" class="w-full h-full object-cover" data-alt="A macro shot of a sleek, dark-themed isometric grass block icon. The lighting is moody and cinematic, highlighting sharp, high-contrast edges and subtle textures against a deep space black background. The color palette emphasizes sophisticated obsidian darks and vibrant, glowing emerald accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZ2u-O28yX0GQyFWf_zJE_MufDlnSt6TdEyfHHB07cPNHloUvvOGh-K-rSJeLdP8teVNfeYtIQFciqZXJAGSwo-Na2oSOXrMoosAQF46ieZo9XL4vjEBWo-0edkuuJnazz62RvJOK_6BPGA5lmO24cWevn3oIeh8-leDQMN3T7jLnuZlYLVxZdgaHiKsMG0RmD8I_zTbiEpvL8DotsTXOBiSATUBjzXlw5Tjbbjeypdn3S7o0Ab_ZCFXf1jp7x1geAp-i8PtTCnbM">
+</div>
+<div class="flex flex-col">
+<span class="font-title-sm text-title-sm text-text-primary">Vanilla 1.21.1</span>
+<span class="font-body-sm text-body-sm text-text-muted">Played 2h ago • Survival</span>
+</div>
+</div>
+<button class="bg-primary-container text-on-primary font-title-sm text-title-sm px-6 py-2 rounded-lg hover:bg-[#c3f5ff] transition-colors active:scale-95 glow-effect">
+                        Play
+                    </button>
+</div>
+<!-- Instance Row 2 -->
+<div class="bg-surface rounded-xl border border-border p-4 flex items-center justify-between hover:bg-surface-raised transition-colors group">
+<div class="flex items-center gap-4">
+<div class="w-16 h-16 rounded-lg bg-surface-raised border border-border overflow-hidden flex-shrink-0">
+<img alt="Fabric" class="w-full h-full object-cover" data-alt="A stylized, high-fidelity render of a futuristic cogwheel floating in a dark, minimalist digital environment. The scene features deep, rich blacks and grays, with bright, high-chroma cyan and violet rim lighting catching the metallic edges. The aesthetic is clean, technical, and modern." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-IzzxXezxjyj1xjVVCLVnlee2CmVj_k0hcdHyNG7RK-hcvn5C0vMmwmaF4n5z9Rs-AZMOaDVLEcV_EQjFXJWt1JqDA19OJbTAiLemK5dEZturk18tphDq2Lw4xllIMxa-kaS9-ZNKZ7z0wG3ktxypu8hvj9tg46ZlXoLE7EuGb5bRZu0TrY-r4tWEdnvLNWy_Sca5UzP5dhtLtmYPGdiyH6x27imVgTD9dbbs5mefMxtwBcv8H-rADA0ZgS6SWcAdUyrTjFl9dbM">
+</div>
+<div class="flex flex-col">
+<span class="font-title-sm text-title-sm text-text-primary">Fabric SMP</span>
+<span class="font-body-sm text-body-sm text-text-muted">Played yesterday • Multiplayer</span>
+</div>
+</div>
+<button class="bg-primary-container text-on-primary font-title-sm text-title-sm px-6 py-2 rounded-lg hover:bg-[#c3f5ff] transition-colors active:scale-95 glow-effect">
+                        Play
+                    </button>
+</div>
+</section>
+</div>
+<!-- Right Column: Context/Utility (Fixed Width approx 300px) -->
+<aside class="w-[320px] flex-shrink-0 flex flex-col gap-gap-xl">
+<!-- Account Card -->
+<div class="bg-surface rounded-xl border border-border p-5 flex flex-col gap-4 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-[#8b5cf6] opacity-5 blur-[50px] rounded-full pointer-events-none"></div>
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-full bg-surface-raised border border-border flex items-center justify-center">
+<span class="material-symbols-outlined text-text-muted text-2xl">person</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-text-muted uppercase tracking-wider">Account</span>
+<span class="font-title-sm text-title-sm text-text-primary">Guest</span>
+</div>
+</div>
+<button class="w-full bg-surface-raised border border-border text-on-surface-variant font-body-sm text-body-sm py-2 rounded-lg flex items-center justify-center gap-2 opacity-50 cursor-not-allowed" disabled="">
+<span class="material-symbols-outlined text-[18px]">login</span>
+                    Sign in with Microsoft
+                </button>
+</div>
+<!-- Updates Card -->
+<div class="bg-surface rounded-xl border border-border p-5 flex flex-col gap-4">
+<h3 class="font-label-xs text-label-xs text-text-muted uppercase tracking-widest border-b border-border pb-2">Owyx Updates</h3>
+<div class="flex flex-col gap-3">
+<a class="group block" href="#">
+<span class="font-body-sm text-body-sm text-text-primary group-hover:text-primary-container transition-colors block leading-tight">Version 2.4.1 Released: Performance Improvements</span>
+<span class="font-label-xs text-label-xs text-text-muted mt-1 block">2 days ago</span>
+</a>
+<a class="group block" href="#">
+<span class="font-body-sm text-body-sm text-text-primary group-hover:text-primary-container transition-colors block leading-tight">New Modpack Installer Architecture</span>
+<span class="font-label-xs text-label-xs text-text-muted mt-1 block">1 week ago</span>
+</a>
+</div>
+</div>
+</aside>
+</main>
+
+
+</body></html>

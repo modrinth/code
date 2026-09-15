@@ -1,0 +1,40 @@
+# ==============================================
+# Frontend Docker Build Context — исключения
+# ==============================================
+
+# Git
+.git
+.gitignore
+
+# Node modules (будут установлены в контейнере)
+node_modules
+
+# Next.js build output (собирается внутри контейнера)
+.next
+
+# Конфиги IDE
+.vscode
+.idea
+*.swp
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment файлы (секреты не попадают в образ)
+.env
+.env.local
+.env.development
+.env.production
+
+# TypeScript build info
+*.tsbuildinfo
+
+# OS мусор
+.DS_Store
+Thumbs.db
+
+# README
+README.md
+AGENTS.md
+CLAUDE.md

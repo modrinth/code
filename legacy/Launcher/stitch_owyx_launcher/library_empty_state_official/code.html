@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Owyx - Library</title>
+<!-- Google Fonts: DM Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-surface": "#e4e1ea",
+                        "tertiary-fixed-dim": "#f3bf26",
+                        "on-secondary-fixed": "#23005c",
+                        "secondary": "#d0bcff",
+                        "on-surface-variant": "#bac9cc",
+                        "primary": "#c3f5ff",
+                        "surface-container-lowest": "#0e0e14",
+                        "surface-dim": "#131319",
+                        "on-secondary-container": "#c4abff",
+                        "text-primary": "#f3f4f6",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-container": "#fec931",
+                        "surface-container-highest": "#35343b",
+                        "tertiary-fixed": "#ffdf96",
+                        "surface-container-low": "#1b1b21",
+                        "surface-bright": "#39383f",
+                        "surface-tint": "#00daf3",
+                        "surface-raised": "#14141c",
+                        "on-primary-container": "#00626e",
+                        "inverse-primary": "#006875",
+                        "primary-container": "#00e5ff",
+                        "inverse-on-surface": "#303037",
+                        "on-background": "#e4e1ea",
+                        "on-error": "#690005",
+                        "on-tertiary-fixed": "#251a00",
+                        "error-container": "#93000a",
+                        "on-primary": "#00363d",
+                        "tertiary": "#ffeac0",
+                        "error": "#ffb4ab",
+                        "on-secondary": "#3c0091",
+                        "surface-container": "#1f1f25",
+                        "border": "#2a2b30",
+                        "primary-fixed-dim": "#00daf3",
+                        "on-primary-fixed-variant": "#004f58",
+                        "secondary-fixed": "#e9ddff",
+                        "surface-variant": "#35343b",
+                        "surface-container-high": "#2a2930",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "outline": "#849396",
+                        "on-primary-fixed": "#001f24",
+                        "outline-variant": "#3b494c",
+                        "on-tertiary-fixed-variant": "#594400",
+                        "surface": "#131319",
+                        "primary-fixed": "#9cf0ff",
+                        "text-muted": "#9aa0a8",
+                        "background": "#050508",
+                        "on-tertiary-container": "#6f5500",
+                        "on-tertiary": "#3e2e00",
+                        "inverse-surface": "#e4e1ea",
+                        "secondary-container": "#571bc1",
+                        "on-secondary-fixed-variant": "#5516be"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "gap-lg": "16px",
+                        "gap-xl": "24px",
+                        "gap-xs": "4px",
+                        "topbar-height": "48px",
+                        "rail-width": "64px",
+                        "gap-md": "12px",
+                        "page-padding": "24px",
+                        "gap-sm": "8px"
+                    },
+                    fontFamily: {
+                        "body-md": ["DM Sans"],
+                        "display-lg": ["DM Sans"],
+                        "brand-nav": ["DM Sans"],
+                        "body-sm": ["DM Sans"],
+                        "headline-md": ["DM Sans"],
+                        "label-xs": ["DM Sans"],
+                        "title-sm": ["DM Sans"]
+                    },
+                    fontSize: {
+                        "body-md": ["15px", { lineHeight: "22px", fontWeight: "500" }],
+                        "display-lg": ["26px", { lineHeight: "30px", letterSpacing: "-0.03em", fontWeight: "700" }],
+                        "brand-nav": ["15px", { lineHeight: "15px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "body-sm": ["13px", { lineHeight: "18px", fontWeight: "500" }],
+                        "headline-md": ["20px", { lineHeight: "24px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "label-xs": ["12px", { lineHeight: "14px", letterSpacing: "0.04em", fontWeight: "600" }],
+                        "title-sm": ["16px", { lineHeight: "20px", fontWeight: "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-text-primary font-body-md overflow-hidden select-none">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 bottom-0 w-[64px] bg-surface border-r border-border flex flex-col items-center py-gap-lg gap-y-gap-md z-50">
+<!-- Hexagonal O-logo with glow -->
+<div class="relative w-12 h-12 flex items-center justify-center mb-2 group cursor-pointer">
+<div class="absolute inset-0 bg-gradient-to-tr from-secondary-container to-primary-container opacity-40 blur-md rounded-full group-hover:opacity-70 transition-opacity duration-300"></div>
+<svg class="w-8 h-8 text-primary-container relative z-10" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24">
+<polygon points="12 2 22 7.5 22 16.5 12 22 2 16.5 2 7.5 12 2"></polygon>
+<circle cx="12" cy="12" r="4"></circle>
+</svg>
+</div>
+<!-- Navigation Tabs -->
+<!-- Home (Inactive) -->
+<div class="text-text-muted w-12 h-12 flex items-center justify-center hover:bg-surface-raised transition-all duration-200 rounded-full cursor-pointer group" title="Home">
+<span class="material-symbols-outlined text-[24px] group-hover:text-primary-fixed-dim transition-colors" data-icon="home">home</span>
+</div>
+<!-- Library (Active) -->
+<div class="bg-secondary-container/20 text-primary-container rounded-full w-12 h-12 flex items-center justify-center transition-all duration-200 cursor-default" title="Library">
+<span class="material-symbols-outlined text-[24px]" data-icon="library_books" style="font-variation-settings: 'FILL' 1;">library_books</span>
+</div>
+<!-- Private Servers (Inactive) -->
+<div class="text-text-muted w-12 h-12 flex items-center justify-center hover:bg-surface-raised transition-all duration-200 rounded-full cursor-pointer group" title="Private Servers">
+<span class="material-symbols-outlined text-[24px] group-hover:text-primary-fixed-dim transition-colors" data-icon="dns">dns</span>
+</div>
+<div class="w-8 h-px bg-border my-2"></div>
+<!-- Recent Instance Avatars (Placeholders) -->
+<div class="w-10 h-10 rounded-full bg-surface-raised border border-border flex items-center justify-center text-text-muted hover:border-outline transition-colors cursor-pointer" title="Recent Instance 1">
+<span class="font-label-xs text-label-xs">M</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-raised border border-border flex items-center justify-center text-text-muted hover:border-outline transition-colors cursor-pointer" title="Recent Instance 2">
+<span class="font-label-xs text-label-xs">V</span>
+</div>
+<!-- '+' Button -->
+<div class="text-text-muted w-12 h-12 flex items-center justify-center hover:bg-surface-raised transition-all duration-200 rounded-full cursor-pointer group mt-2" title="Create Instance">
+<span class="material-symbols-outlined text-[24px] group-hover:text-primary-container transition-colors" data-icon="add">add</span>
+</div>
+<!-- Spacer -->
+<div class="flex-grow"></div>
+<!-- Settings Footer -->
+<div class="text-text-muted w-12 h-12 flex items-center justify-center hover:bg-surface-raised transition-all duration-200 rounded-full cursor-pointer group" title="Settings">
+<span class="material-symbols-outlined text-[24px] group-hover:text-primary-fixed-dim transition-colors" data-icon="settings">settings</span>
+</div>
+</nav>
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 left-[64px] h-[48px] bg-background border-b border-border flex items-center justify-between px-page-padding z-40">
+<div class="font-brand-nav text-brand-nav text-primary-container lowercase">
+            owyx
+        </div>
+<div class="flex items-center gap-2 px-3 py-1 rounded-full bg-surface-raised border border-border shadow-sm">
+<div class="w-2 h-2 rounded-full bg-primary-container shadow-[0_0_8px_rgba(0,229,255,0.6)]"></div>
+<span class="font-label-xs text-label-xs text-on-surface-variant">System Stable</span>
+</div>
+</header>
+<!-- Main Content Area (Library Empty State) -->
+<main class="pl-[64px] pt-[48px] h-screen w-full flex items-center justify-center bg-background relative overflow-hidden">
+<!-- Subtle background texture/glow to avoid pure flatness -->
+<div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-surface-raised/20 via-background to-background pointer-events-none"></div>
+<!-- Empty State Container -->
+<div class="relative z-10 flex flex-col items-center text-center max-w-md px-6 py-8 bg-surface-container-lowest/50 backdrop-blur-sm border border-border/50 rounded-2xl">
+<!-- Icon Graphic -->
+<div class="w-24 h-24 mb-6 rounded-full bg-surface-raised border border-border flex items-center justify-center relative shadow-lg">
+<div class="absolute inset-0 rounded-full bg-primary-container/5 blur-xl"></div>
+<span class="material-symbols-outlined text-[48px] text-outline-variant" data-icon="inbox">inbox</span>
+</div>
+<!-- Typography -->
+<h2 class="font-headline-md text-headline-md text-text-primary mb-3 tracking-tight">
+                No instances found
+            </h2>
+<p class="font-body-md text-body-md text-text-muted mb-8 leading-relaxed">
+                You haven't created or imported any Minecraft instances yet.
+            </p>
+<!-- CTA Button -->
+<button class="group relative px-6 py-3 rounded-lg bg-primary-container text-on-primary-fixed font-title-sm text-title-sm flex items-center gap-2 hover:bg-primary-fixed transition-colors duration-200 active:scale-[0.98] shadow-[0_0_20px_rgba(0,229,255,0.15)] hover:shadow-[0_0_25px_rgba(0,229,255,0.25)]">
+<span class="material-symbols-outlined text-[20px] transition-transform group-hover:rotate-90 duration-300" data-icon="add">add</span>
+                New instance
+            </button>
+</div>
+</main>
+</body></html>

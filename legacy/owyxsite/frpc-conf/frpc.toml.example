@@ -1,0 +1,55 @@
+# ==============================================
+# FRP Client Configuration - OWYX (example)
+# ==============================================
+# Copy to frpc.toml and fill secrets locally:
+#   cp frpc.toml.example frpc.toml
+# frpc.toml is gitignored.
+
+serverAddr = "YOUR_FRP_SERVER_IP"
+serverPort = 7000
+
+[auth]
+token = "CHANGE_ME_FRP_TOKEN"
+
+[log]
+to = "/var/log/frpc.log"
+level = "info"
+maxDays = 7
+
+loginFailExit = false
+user = "owyx-client"
+
+[[proxies]]
+name = "owyx-web-http"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 80
+remotePort = 80
+
+[[proxies]]
+name = "owyx-web-https"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 443
+remotePort = 443
+
+[[proxies]]
+name = "owyx-nextjs"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 3000
+remotePort = 3000
+
+[[proxies]]
+name = "owyx-socketio"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 3001
+remotePort = 3001
+
+[[proxies]]
+name = "minecraft-tcp"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 25565
+remotePort = 25565

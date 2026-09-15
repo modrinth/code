@@ -1,0 +1,46 @@
+# ==============================================
+# Systemd Service для FRP Client
+# ==============================================
+# 
+# Установка:
+# sudo cp frpc.service /etc/systemd/system/
+# sudo systemctl daemon-reload
+# sudo systemctl enable frpc
+# sudo systemctl start frpc
+# sudo systemctl status frpc
+#
+# Управление:
+# sudo systemctl restart frpc  - перезапуск
+# sudo systemctl stop frpc     - остановка
+# sudo journalctl -u frpc -f   - логи в реальном времени
+
+[Unit]
+Description=FRP Client Service - OWYX
+Documentation=https://github.com/fatedier/frp
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Restart=always
+RestartSec=10
+# Используем TOML конфиг (новый формат)
+ExecStart=/usr/local/bin/frpc -c /etc/frp/frpc.toml
+ExecReload=/bin/kill -HUP $MAINPID
+LimitNOFILE=65536
+
+# Логи
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=frpc
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log/frp
+
+[Install]
+WantedBy=multi-user.target

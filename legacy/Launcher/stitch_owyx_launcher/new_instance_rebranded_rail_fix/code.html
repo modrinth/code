@@ -1,0 +1,408 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Owyx - New Instance</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#00daf3",
+                        "on-secondary": "#3c0091",
+                        "inverse-surface": "#e4e1ea",
+                        "inverse-primary": "#006875",
+                        "tertiary-fixed": "#ffdf96",
+                        "on-tertiary-container": "#6f5500",
+                        "secondary-container": "#571bc1",
+                        "on-error": "#690005",
+                        "surface": "#131319",
+                        "border": "#2a2b30",
+                        "tertiary-container": "#fec931",
+                        "on-surface": "#e4e1ea",
+                        "outline-variant": "#3b494c",
+                        "on-tertiary-fixed": "#251a00",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "background": "#050508",
+                        "surface-container-highest": "#35343b",
+                        "on-primary": "#00363d",
+                        "error": "#ffb4ab",
+                        "surface-variant": "#35343b",
+                        "on-secondary-fixed": "#23005c",
+                        "on-surface-variant": "#bac9cc",
+                        "inverse-on-surface": "#303037",
+                        "on-primary-container": "#00626e",
+                        "on-background": "#e4e1ea",
+                        "tertiary-fixed-dim": "#f3bf26",
+                        "on-tertiary": "#3e2e00",
+                        "primary": "#c3f5ff",
+                        "on-primary-fixed": "#001f24",
+                        "surface-container-lowest": "#0e0e14",
+                        "on-secondary-container": "#c4abff",
+                        "surface-dim": "#131319",
+                        "outline": "#849396",
+                        "surface-tint": "#00daf3",
+                        "on-error-container": "#ffdad6",
+                        "surface-container": "#1f1f25",
+                        "primary-fixed": "#9cf0ff",
+                        "error-container": "#93000a",
+                        "text-muted": "#9aa0a8",
+                        "surface-bright": "#39383f",
+                        "secondary-fixed": "#e9ddff",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "on-tertiary-fixed-variant": "#594400",
+                        "text-primary": "#f3f4f6",
+                        "surface-raised": "#14141c",
+                        "tertiary": "#ffeac0",
+                        "primary-container": "#00e5ff",
+                        "surface-container-low": "#1b1b21",
+                        "on-primary-fixed-variant": "#004f58",
+                        "secondary": "#d0bcff",
+                        "surface-container-high": "#2a2930",
+                        "brand-accent-violet": "#8b5cf6",
+                        "brand-accent-cyan": "#00e5ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "page-padding": "24px",
+                        "gap-lg": "16px",
+                        "gap-xl": "24px",
+                        "gap-xs": "4px",
+                        "topbar-height": "48px",
+                        "rail-width": "64px",
+                        "gap-sm": "8px",
+                        "gap-md": "12px"
+                    },
+                    "fontFamily": {
+                        "label-xs": ["DM Sans"],
+                        "title-sm": ["DM Sans"],
+                        "body-sm": ["DM Sans"],
+                        "headline-md": ["DM Sans"],
+                        "brand-nav": ["DM Sans"],
+                        "body-md": ["DM Sans"],
+                        "display-lg": ["DM Sans"]
+                    },
+                    "fontSize": {
+                        "label-xs": ["12px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+                        "title-sm": ["16px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "500" }],
+                        "headline-md": ["20px", { "lineHeight": "24px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "brand-nav": ["15px", { "lineHeight": "15px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "500" }],
+                        "display-lg": ["26px", { "lineHeight": "30px", "letterSpacing": "-0.03em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #050508;
+            color: #e4e1ea;
+            font-family: 'DM Sans', sans-serif;
+            overflow: hidden;
+        }
+        
+        .glow-ring {
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.5), inset 0 0 10px rgba(0, 229, 255, 0.5);
+            border: 2px solid transparent;
+            background-image: linear-gradient(#050508, #050508), linear-gradient(to right, #8b5cf6, #00e5ff);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+        }
+        
+        .modal-backdrop {
+            background-color: rgba(5, 5, 8, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #2a2b30;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #3b494c;
+        }
+
+        .bg-rail { background-color: #131319; }
+        
+        /* Select arrow styling */
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23bac9cc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+    </style>
+</head>
+<body class="flex h-screen w-full antialiased selection:bg-brand-accent-cyan selection:text-on-primary">
+<!-- Left Rail Navigation -->
+<nav class="fixed left-0 top-0 h-full w-rail-width bg-surface border-r border-border flex flex-col items-center py-lg gap-md z-10">
+<!-- Logo -->
+<div class="mb-4 text-primary-container w-12 h-12 flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity">
+<svg fill="none" height="32" viewBox="0 0 32 32" width="32" xmlns="http://www.w3.org/2000/svg">
+<path d="M16 2L2 9.5V22.5L16 30L30 22.5V9.5L16 2Z" stroke="url(#paint0_linear)" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M16 8L8 12.5V20L16 24L24 20V12.5L16 8Z" stroke="#00e5ff" stroke-linejoin="round" stroke-width="1.5"></path>
+<defs>
+<linearGradient gradientUnits="userSpaceOnUse" id="paint0_linear" x1="16" x2="16" y1="2" y2="30">
+<stop stop-color="#8b5cf6"></stop>
+<stop offset="1" stop-color="#00e5ff"></stop>
+</linearGradient>
+</defs>
+</svg>
+</div>
+<!-- Primary Navigation Tabs -->
+<div class="flex flex-col gap-2 w-full px-2"><a class="text-text-muted w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-raised transition-all duration-200 active:scale-95 cursor-pointer" href="#" title="Home">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">home</span>
+</a>
+<a class="bg-secondary-container/20 text-primary-container rounded-full w-12 h-12 flex items-center justify-center hover:bg-surface-raised transition-all duration-200 active:scale-95 cursor-pointer" href="#" title="Library">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">library_books</span>
+</a>
+<a class="text-text-muted w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-raised transition-all duration-200 active:scale-95 cursor-pointer" href="#" title="Private Servers">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dns</span>
+</a></div>
+<div class="w-8 h-px bg-border my-2"></div><div class="w-10 h-10 rounded-full overflow-hidden border border-border cursor-pointer hover:border-primary-container transition-colors" title="Vanilla 1.21.1">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWvODkjjA-1oUfdNrA5TDe3GRktDlaNRMqddQZCHNy0b7obDyBYVhZJvblGXQc0pznMv1CE7ODrNwgFgBDdw2Vm0VBCmyOb_iO_Hk73xComnwkWDlUs7z1iqULT_ZiwF9RUP5na4bOO0qYxi4leNkxil91sm2nPgUlTkM_nZoxQ4zCEeOw81pr1Gq7VaoUwV7A7p22Ac_FjTNCG1Unj9rGEJGpgjWcazFGq93WCtfk03OMTDO7h6V200LvwLsGhCQKTlJqhMMugJ8">
+</div>
+
+<!-- Recent Instances (Activity) -->
+<div class="flex flex-col gap-3 w-full px-2 items-center">
+<!-- Placeholder for an instance avatar -->
+<div class="w-10 h-10 rounded-full border border-border bg-surface-raised cursor-pointer overflow-hidden flex items-center justify-center group relative tooltip-trigger" title="My Survival World">
+<img class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" data-alt="A stylized minimalist Minecraft grass block icon, highly detailed with volumetric lighting, set against a dark grey technical background, glowing cyan edges, hyper-sharp rendering." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDA9edxZMoqIkhBtcHL6D7SB_hHktw2QsJCkA8huY0MQzrndgIt7xk7yNbUI1Qj-DQ-4li1ssTBfXEL5mEdKsSqwyCgteUZBh1_AEmYv5YYFwpczljhri4hmKh-PMOXWuBiy9QjhbfYTvecCxevMX0Gq2ijgu6XYumpRRciCFPSqkhonKueOWlnn1TbrGUMhFlJCTInbWdAx9WxldEz25Khn6iGxFEs95DYbH1DWn4iHNrBhiktGPT0_N2tIlAdE_EGzInnJiQg7y8">
+</div>
+<div class="w-10 h-10 rounded-full border border-border bg-surface-raised cursor-pointer overflow-hidden flex items-center justify-center group relative" title="FTB Modpack">
+<img class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" data-alt="A glowing magenta and deep purple stylized technical gear icon resembling a modded Minecraft element, dark background, sharp high-contrast cinematic lighting, 8k resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBX8JjNhRGllmXIqvKCDNFodY6byy1G6k9olfJEErxc-4UN6r9tOdcpgbT22r_63BvM7pi6VcvQPbWTffFzCCfQHBnrzWTSyPFNs-AlZ9chbnJemptRRc4c-6QXm0qayWyfElxDVxAg2bwtxGBPLDt8FuPZ2uy5gEBGLQJvwOsZ2KtnvMRhpTCivayy3-0-rK2cX-t1Y71CGHhesYRaJzO79Rjx7g3vMz2rlV-xMfULUyhhFluR73gRwPooj0fOSmPjzenzNgw9f8c">
+</div>
+</div><button class="w-10 h-10 rounded-full border border-border bg-surface-raised text-text-muted flex items-center justify-center hover:bg-surface-bright hover:text-primary-container transition-all active:scale-95 mt-2" title="Create Instance">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+<!-- Action: Create Instance -->
+
+<!-- Flexible Spacer -->
+<div class="flex-grow"></div>
+<!-- Footer Utility -->
+<div class="w-full px-2 pb-2">
+<a class="flex flex-col items-center justify-center w-12 h-12 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-colors cursor-pointer group" href="#" title="Settings">
+<span class="material-symbols-outlined text-xl transition-transform group-active:scale-95">settings</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 ml-rail-width flex flex-col relative h-full">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 right-0 h-topbar-height left-rail-width bg-surface-dim border-b border-border flex justify-between items-center px-page-padding w-[calc(100%-64px)] z-0">
+<!-- Brand -->
+<div class="flex items-center gap-4">
+<div class="font-brand-nav text-brand-nav text-primary-container lowercase cursor-pointer hover:text-primary-fixed-dim transition-colors active:opacity-80">owyx</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex items-center gap-6">
+<span class="font-title-sm text-brand-accent-cyan cursor-pointer transition-colors">My Instances</span>
+</div>
+<!-- Trailing Action / Status -->
+<div class="flex items-center"><div class="flex items-center gap-2 bg-surface-raised border border-border rounded-full px-3 py-1 text-label-xs font-label-xs text-text-muted">
+<div class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></div>
+                 Ready
+             </div></div>
+</header>
+<!-- Library Screen Background Content -->
+<div class="flex-1 mt-topbar-height p-page-padding overflow-y-auto custom-scrollbar">
+<!-- Header for Library -->
+<div class="flex justify-between items-end mb-8">
+<div>
+<h1 class="font-display-lg text-text-primary">Library</h1>
+<p class="font-body-md text-text-muted mt-1">Manage and launch your Minecraft instances.</p>
+</div>
+<div class="flex gap-3">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-lg">search</span>
+<input class="bg-surface-raised border border-border rounded-full pl-10 pr-4 py-2 font-body-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-accent-cyan focus:ring-1 focus:ring-brand-accent-cyan transition-all w-64" placeholder="Search instances..." type="text">
+</div>
+<button class="bg-surface-raised border border-border rounded-lg px-4 py-2 font-body-sm text-text-primary hover:bg-surface-variant/50 transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">filter_list</span> Filter
+                    </button>
+</div>
+</div>
+<!-- Grid of existing instances (background context) -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Instance Card 1 -->
+<div class="bg-surface rounded-[14px] border border-border overflow-hidden group hover:border-outline-variant transition-colors flex flex-col h-64">
+<div class="h-32 relative w-full border-b border-border">
+<img class="w-full h-full object-cover" data-alt="A wide cinematic landscape of a Minecraft survival world showing a beautiful sunset over a vast ocean, high quality render, raytraced lighting, deep blue and orange hues, dark ui context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgz4S6MPaqmmkDr7IiV6g_oIDA4EBOjeBBfs7-BNmuhngbDpS4WRtlHzP4wDfVyV75v8pBPpV1Ur5DAA8XwnUzyPbRTJnyAGPJJ_M2YhRtcOAsKkBzwdKRHJQJaqeuSzg8IZN2IldyUvJHm2GVkNsZ4UKFOTyFjzudZSiSiUp8c9eAflSRgrVu0rYMkMIKqMHs9xacaYchPTK6npHn8CFJ46DKK4h74Gamtpc9wFfqXT9oYlr81V4XC36-Aex8wiqnA_sXo1n6xvg">
+<div class="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-60"></div>
+<!-- Play overlay on hover -->
+<div class="absolute inset-0 bg-surface/40 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-12 h-12 bg-primary-container rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-[0_0_15px_rgba(0,229,255,0.3)]">
+<span class="material-symbols-outlined text-on-primary-fixed" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-text-primary truncate pr-2">My Survival World</h3>
+<span class="bg-surface-raised border border-border rounded text-[10px] px-1.5 py-0.5 font-label-xs text-text-muted uppercase tracking-wider">Vanilla</span>
+</div>
+<p class="font-body-sm text-text-muted mb-auto">1.20.4 • 48 hrs played</p>
+<div class="flex justify-between items-center mt-4">
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="font-label-xs text-[11px]">2 days ago</span>
+</div>
+<button class="text-on-surface-variant hover:text-text-primary transition-colors p-1 rounded hover:bg-surface-raised">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Instance Card 2 -->
+<div class="bg-surface rounded-[14px] border border-border overflow-hidden group hover:border-outline-variant transition-colors flex flex-col h-64">
+<div class="h-32 relative w-full border-b border-border">
+<img class="w-full h-full object-cover" data-alt="A dense intricate industrial machinery setup in modded Minecraft, glowing green and orange pipes in a dark stone room, high technical detail, cinematic lighting, shadow-heavy aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCud4dgyjLZemyM02ZOXM_Ew-1HMNtZPV46l23_BN5nmZcKn8xIrFPoatzijaJYoSeVtvvDdBcAFvv7qCOK45K7FdLxDUcotrm28ohlLjLl6jp4rezsKcZpHIpRyIR5y0unLc81LOZ497RGGJrBXE3I-CzkVycp5zxqyv-brC7kEyz0tYsh0yne1Gb6nB_XD_1TIGWF_5vlazUR05tqnsLxiIkQPDx5l_vjo7mhFSLOP2k7iAKMc5FnPen6JNP4HYBy8qaofhxQ9nQ">
+<div class="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-60"></div>
+<div class="absolute inset-0 bg-surface/40 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-12 h-12 bg-primary-container rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-[0_0_15px_rgba(0,229,255,0.3)]">
+<span class="material-symbols-outlined text-on-primary-fixed" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-text-primary truncate pr-2">FTB Modpack</h3>
+<span class="bg-surface-raised border border-border rounded text-[10px] px-1.5 py-0.5 font-label-xs text-brand-accent-violet uppercase tracking-wider border-brand-accent-violet/30 bg-brand-accent-violet/5">Forge</span>
+</div>
+<p class="font-body-sm text-text-muted mb-auto">1.19.2 • 234 Mods</p>
+<div class="flex justify-between items-center mt-4">
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="font-label-xs text-[11px]">Last week</span>
+</div>
+<button class="text-on-surface-variant hover:text-text-primary transition-colors p-1 rounded hover:bg-surface-raised">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Add New Instance Card Placeholder -->
+<div class="bg-surface-dim rounded-[14px] border border-dashed border-border flex flex-col items-center justify-center h-64 hover:border-brand-accent-cyan/50 hover:bg-surface transition-colors cursor-pointer group">
+<div class="w-12 h-12 rounded-full bg-surface-raised border border-border flex items-center justify-center mb-4 group-hover:bg-brand-accent-cyan/10 group-hover:text-brand-accent-cyan transition-colors">
+<span class="material-symbols-outlined text-2xl text-on-surface-variant group-hover:text-brand-accent-cyan">add</span>
+</div>
+<span class="font-headline-md text-text-primary">Create Instance</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Modal Overlay Backdrop -->
+<div class="fixed inset-0 modal-backdrop z-50 flex items-center justify-center">
+<!-- New Instance Modal -->
+<div class="bg-surface-container-lowest border border-border rounded-[14px] w-full max-w-[600px] shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+<!-- Modal Header -->
+<div class="flex justify-between items-center px-6 py-4 border-b border-border bg-surface">
+<h2 class="font-headline-md text-text-primary tracking-tight">New instance</h2>
+<button aria-label="Close" class="text-on-surface-variant hover:text-text-primary hover:bg-surface-raised p-1.5 rounded-full transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Modal Body -->
+<div class="p-6 flex flex-col gap-6">
+<!-- NAME Field -->
+<div class="flex flex-col gap-2">
+<label class="font-label-xs text-text-muted tracking-wider uppercase" for="instance-name">Name</label>
+<input class="w-full bg-surface-raised border border-border rounded-[10px] px-4 py-3 font-body-md text-text-primary placeholder:text-outline-variant focus:outline-none focus:border-brand-accent-cyan focus:ring-1 focus:ring-brand-accent-cyan transition-all" id="instance-name" placeholder="e.g. My Modpack" type="text">
+</div>
+<!-- PLATFORM Section -->
+<div class="flex flex-col gap-3">
+<label class="font-label-xs text-text-muted tracking-wider uppercase">Platform</label>
+<div class="flex flex-wrap gap-2">
+<!-- Inactive Pill -->
+<button class="px-4 py-2 rounded-full bg-surface-raised border border-border font-body-sm text-text-primary hover:bg-surface-variant transition-colors">
+                            Vanilla
+                        </button>
+<!-- Active Pill: Fabric -->
+<button class="px-4 py-2 rounded-full bg-brand-accent-violet/10 border border-brand-accent-cyan font-body-sm text-brand-accent-cyan shadow-[0_0_10px_rgba(0,229,255,0.15)] transition-colors">
+                            Fabric
+                        </button>
+<!-- Inactive Pills -->
+<button class="px-4 py-2 rounded-full bg-surface-raised border border-border font-body-sm text-text-primary hover:bg-surface-variant transition-colors">
+                            Quilt
+                        </button>
+<button class="px-4 py-2 rounded-full bg-surface-raised border border-border font-body-sm text-text-primary hover:bg-surface-variant transition-colors">
+                            Forge
+                        </button>
+<button class="px-4 py-2 rounded-full bg-surface-raised border border-border font-body-sm text-text-primary hover:bg-surface-variant transition-colors">
+                            NeoForge
+                        </button>
+</div>
+</div>
+<!-- GRID: Versions -->
+<div class="grid grid-cols-2 gap-4">
+<!-- Game Version Dropdown -->
+<div class="flex flex-col gap-2">
+<label class="font-label-xs text-text-muted tracking-wider uppercase" for="game-version">Game Version</label>
+<div class="relative">
+<select class="w-full bg-surface-raised border border-border rounded-[10px] pl-4 pr-10 py-3 font-body-md text-text-primary focus:outline-none focus:border-brand-accent-cyan focus:ring-1 focus:ring-brand-accent-cyan transition-all cursor-pointer" id="game-version">
+<option value="1.20.4">1.20.4</option>
+<option value="1.20.3">1.20.3</option>
+<option value="1.20.2">1.20.2</option>
+<option value="1.20.1">1.20.1</option>
+<option value="1.19.4">1.19.4</option>
+</select>
+</div>
+</div>
+<!-- Loader Version Dropdown -->
+<div class="flex flex-col gap-2">
+<label class="font-label-xs text-text-muted tracking-wider uppercase" for="loader-version">Loader Version</label>
+<div class="relative">
+<select class="w-full bg-surface-raised border border-border rounded-[10px] pl-4 pr-10 py-3 font-body-md text-text-primary focus:outline-none focus:border-brand-accent-cyan focus:ring-1 focus:ring-brand-accent-cyan transition-all cursor-pointer" id="loader-version">
+<option value="0.15.6">0.15.6</option>
+<option value="0.15.5">0.15.5</option>
+<option value="0.15.4">0.15.4</option>
+<option value="0.14.25">0.14.25</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Checkbox -->
+<div class="flex items-center gap-3 mt-2">
+<div class="relative flex items-center justify-center">
+<input class="peer appearance-none w-5 h-5 border border-border rounded bg-surface-raised checked:bg-brand-accent-cyan checked:border-brand-accent-cyan focus:outline-none focus:ring-2 focus:ring-brand-accent-cyan/30 transition-colors cursor-pointer" id="show-snapshots" type="checkbox">
+<span class="material-symbols-outlined absolute text-[16px] text-[#041018] opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<label class="font-body-sm text-on-surface-variant cursor-pointer select-none" for="show-snapshots">Show snapshots</label>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="px-6 py-4 border-t border-border bg-surface flex justify-end gap-3">
+<button class="px-6 py-2.5 rounded-[10px] bg-surface-raised border border-border font-body-md font-semibold text-text-primary hover:bg-surface-variant transition-colors">
+                    Cancel
+                </button>
+<button class="px-6 py-2.5 rounded-[10px] bg-primary-container font-headline-md text-on-primary-fixed text-[15px] hover:brightness-110 active:scale-[0.98] transition-all shadow-[0_0_15px_rgba(0,229,255,0.2)] hover:shadow-[0_0_20px_rgba(0,229,255,0.4)]">
+                    Create
+                </button>
+</div>
+</div>
+</div>
+
+
+</body></html>

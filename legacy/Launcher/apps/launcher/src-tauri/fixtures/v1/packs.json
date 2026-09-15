@@ -1,0 +1,13 @@
+{
+  "packs": [
+    {
+      "id": "demo-friends",
+      "name": "Friends Demo",
+      "minecraft": "1.20.1",
+      "loader": "fabric",
+      "loaderVersion": "0.15.0",
+      "summary": "Локальный mock для Sync MVP",
+      "manifestUrl": "/v1/packs/demo-friends/manifest"
+    }
+  ]
+}

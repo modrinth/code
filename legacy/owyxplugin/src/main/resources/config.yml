@@ -1,0 +1,129 @@
+# Конфигурация плагина ChiwawaPlugin
+# Версия: 1.0
+
+# Настройки API
+api:
+  base_url: "https://api.owyx.site/api"
+  timeout: 5000
+  admin_token: "CHANGE_ME_ADMIN_JWT_OR_API_TOKEN"
+  retry_attempts: 3
+
+# Настройки базы данных PostgreSQL
+database:
+  host: "127.0.0.1"
+  port: 5432
+  name: "owyx_db"
+  username: "owyx_user"
+  password: "CHANGE_ME_DB_PASSWORD"
+
+# Настройки сервера
+server:
+  ip: "play.owyx.site"
+  port: 25565
+  enable_whitelist: true       # Проверка доступа к серверу через API (заявки)
+  enable_authentication: true  # Система авторизации (login/register)
+  enable_time_limit: true      # Ограничение времени игры для trust level 0
+  enable_trust_system: true    # Trust level система
+  enable_reputation: true      # Система репутации
+  sync_interval: 300           # Секунд для синхронизации данных
+
+# Trust Level ограничения
+trust_levels:
+  0: # Проходимец
+    max_total_hours: 10 # ВСЕГО 10 часов, не дневной лимит!
+    description: "Новый игрок без подтвержденного email"
+  1: # Новичок
+    description: "Подтвержден email, полный доступ"
+  2: # Проверенный
+    description: "Опытный игрок с хорошей репутацией"
+  3: # Ветеран
+    description: "Проверенный временем игрок"
+
+# Сообщения
+messages:
+  # Кик сообщения (показываются при кике с сервера)
+  no_access_kick: |
+    &c&l┌─────────────────────────────┐
+    &c&l│    &f&lНЕТ ДОСТУПА К СЕРВЕРУ    &c&l│
+    &c&l├─────────────────────────────┤
+    &f&l│ &7У вас нет доступа к серверу  &f&l│
+    &f&l│ &7Подайте заявку на сайте:      &f&l│
+    &f&l│ &bhttps://chiwawa.site         &f&l│
+    &c&l└─────────────────────────────┘
+
+  time_limit_kick: |
+    &c&l┌─────────────────────────────┐
+    &c&l│    &f&lЛИМИТ ВРЕМЕНИ ИСЧЕРПАН   &c&l│
+    &c&l├─────────────────────────────┤
+    &f&l│ &7Вы достигли лимита в 10 часов &f&l│
+    &f&l│ &7Подтвердите email на сайте:   &f&l│
+    &f&l│ &bhttps://chiwawa.site         &f&l│
+    &c&l└─────────────────────────────┘
+
+  ban_kick: |
+    &4&l┌─────────────────────────────┐
+    &4&l│        &f&lВЫ ЗАБАНЕНЫ         &4&l│
+    &4&l├─────────────────────────────┤
+    &f&l│ &7Причина: &c%reason%          &f&l│
+    &f&l│ &7Обжалование на сайте:        &f&l│
+    &f&l│ &bhttps://chiwawa.site         &f&l│
+    &4&l└─────────────────────────────┘
+
+  # Чат сообщения (обычные сообщения в чат)
+  trust_level_up: "&a&l[★] &fВаш Trust Level повышен до &a&l%level% &7(%name%)&f!"
+  reputation_given: "&e&l[REP] &fВы дали &a+1 репутацию &fигроку &b%player%&f!"
+  reputation_received: "&e&l[REP] &fИгрок &b%player% &fдал вам &a+1 репутацию&f!"
+
+  # Системные сообщения
+  plugin_enabled: "&a&lChiwawaPlugin включен! Версия: %version%"
+  plugin_disabled: "&c&lChiwawaPlugin отключен!"
+  config_reloaded: "&aКонфигурация перезагружена!"
+  api_connection_failed: "&cОшибка подключения к API сайта!"
+  api_connection_restored: "&aСоединение с API восстановлено!"
+
+  # Сообщения команд
+  no_permission: "&cУ вас нет прав для выполнения этой команды!"
+  player_not_found: "&cИгрок не найден!"
+  player_not_online: "&cИгрок не в сети!"
+  invalid_arguments: "&cНеверные аргументы команды!"
+  command_success: "&aКоманда выполнена успешно!"
+  command_failed: "&cОшибка выполнения команды!"
+
+  # Профиль игрока
+  profile_header: "&e&l════════ ПРОФИЛЬ ИГРОКА ════════"
+  profile_nickname: "&7Никнейм: &f%nickname%"
+  profile_trust_level: "&7Trust Level: &a%level% &7(%description%)"
+  profile_reputation: "&7Репутация: &e%reputation%"
+  profile_playtime: "&7Время игры: &b%playtime%"
+  profile_email_status: "&7Email: %status%"
+  profile_registration: "&7Регистрация: &f%date%"
+  profile_footer: "&e&l═══════════════════════════════"
+
+  # Время игры
+  playtime_current: "&7Текущая сессия: &b%time%"
+  playtime_total: "&7Общее время: &b%time%"
+  playtime_remaining: "&7Осталось времени: &c%time%"
+  playtime_unlimited: "&aБез ограничений"
+
+  # Репутация
+  reputation_cooldown: "&cВы сможете дать репутацию через %time%"
+  reputation_self: "&cНельзя давать репутацию самому себе!"
+  reputation_insufficient_trust: "&cДля выдачи репутации нужен Trust Level 1 или выше!"
+
+  # Администрирование
+  user_banned: "&cИгрок %player% забанен. Причина: %reason%"
+  user_unbanned: "&aИгрок %player% разбанен"
+  trust_level_changed: "&aИзменен Trust Level игрока %player% на %level%"
+  sync_started: "&7Синхронизация данных игрока %player%..."
+  sync_completed: "&aСинхронизация завершена!"
+
+  # Статистика
+  stats_header: "&e&l════════ СТАТИСТИКА СЕРВЕРА ════════"
+  stats_online_players: "&7Игроков онлайн: &a%count%"
+  stats_cached_users: "&7Загружено пользователей: &a%count%"
+  stats_api_status: "&7Статус API: %status%"
+  stats_footer: "&e&l══════════════════════════════════"
+
+  stats_cached_users: "&7Загружено пользователей: &a%count%"
+  stats_api_status: "&7Статус API: %status%"
+  stats_footer: "&e&l══════════════════════════════════"

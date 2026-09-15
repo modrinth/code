@@ -1,0 +1,158 @@
+# ==============================================
+# FRP Client Configuration - OWYX (TOML Format)
+# ==============================================
+# Fast Reverse Proxy - проброс портов с VPS на локальную машину
+#
+# Установка на Linux:
+# 1. Скачать FRP: https://github.com/fatedier/frp/releases
+# 2. Распаковать: tar -xzf frp_*_linux_amd64.tar.gz
+# 3. Скопировать: sudo cp frpc /usr/local/bin/
+# 4. Создать конфиг: sudo mkdir -p /etc/frp
+# 5. Скопировать файл: sudo cp frpc.toml /etc/frp/
+# 6. Создать systemd сервис (см. frpc.service)
+# 7. Запуск: sudo systemctl start frpc
+# 8. Автозагрузка: sudo systemctl enable frpc
+
+# Основные настройки подключения
+serverAddr = "212.22.82.250"
+serverPort = 7000
+
+# Аутентификация
+[auth]
+token = "V6H4KcyRZ4V1pm0BDzexcppQB3DmXDLoFk4z9EML6Qt"
+
+# Логирование
+[log]
+to = "/var/log/frpc.log"
+level = "info"
+maxDays = 7
+
+# Heartbeat и reconnect
+loginFailExit = false
+user = "owyx-gmktec-m6"
+
+# ==============================================
+# OWYX WEB - HTTP/HTTPS
+# ==============================================
+
+# HTTP (порт 80)
+[[proxies]]
+name = "owyx-web-http"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 80
+remotePort = 80
+
+# HTTPS (порт 443)
+[[proxies]]
+name = "owyx-web-https"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 443
+remotePort = 443
+
+# ==============================================
+# OWYX SERVICES - Directus, Next.js, Socket.io
+# ==============================================
+
+# Directus API (порт 8055) - опционально, если нужен прямой доступ
+[[proxies]]
+name = "owyx-directus"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 8055
+remotePort = 8055
+
+# Next.js Frontend (порт 3000)
+[[proxies]]
+name = "owyx-nextjs"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 3000
+remotePort = 3000
+
+# Socket.io Real-time (порт 3001)
+[[proxies]]
+name = "owyx-socketio"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 3001
+remotePort = 3001
+
+# ==============================================
+# DATABASE - PostgreSQL
+# ==============================================
+
+[[proxies]]
+name = "postgresql"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 5432
+remotePort = 5432
+
+# pgAdmin Web Interface (порт 5050)
+[[proxies]]
+name = "pgadmin"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 5050
+remotePort = 5050
+
+# ==============================================
+# DISCORD BOT DASHBOARD
+# ==============================================
+
+[[proxies]]
+name = "discord-dashboard"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 6969
+remotePort = 6969
+
+# ==============================================
+# MINECRAFT SERVER
+# ==============================================
+
+# Minecraft TCP (основной протокол)
+[[proxies]]
+name = "minecraft-tcp"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 1488
+remotePort = 1488
+
+# Minecraft Voice TCP (порт 1489)
+[[proxies]]
+name = "minecraft-voice-tcp"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 1489
+remotePort = 1489
+
+# Minecraft Voice UDP (порт 1489)
+[[proxies]]
+name = "minecraft-voice-udp"
+type = "udp"
+localIP = "127.0.0.1"
+localPort = 1489
+remotePort = 1489
+
+# ==============================================
+# LEGACY (из старого проекта - можно удалить если не нужно)
+# ==============================================
+
+# MySQL (если используется)
+# [[proxies]]
+# name = "mysql"
+# type = "tcp"
+# localIP = "127.0.0.1"
+# localPort = 3306
+# remotePort = 3306
+
+# ChiwawaSite старый порт 5000 (если нужен)
+# [[proxies]]
+# name = "legacy-chiwawasite"
+# type = "tcp"
+# localIP = "127.0.0.1"
+# localPort = 5000
+# remotePort = 5000

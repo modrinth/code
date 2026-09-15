@@ -1,0 +1,358 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Owyx - Instance Detail</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#e4e1ea",
+                        "surface-bright": "#39383f",
+                        "error-container": "#93000a",
+                        "on-secondary": "#3c0091",
+                        "text-muted": "#9aa0a8",
+                        "surface-container": "#1f1f25",
+                        "tertiary-fixed-dim": "#f3bf26",
+                        "inverse-primary": "#006875",
+                        "outline-variant": "#3b494c",
+                        "on-surface-variant": "#bac9cc",
+                        "surface-dim": "#131319",
+                        "on-primary-container": "#00626e",
+                        "on-primary": "#00363d",
+                        "surface-container-low": "#1b1b21",
+                        "on-tertiary-container": "#6f5500",
+                        "on-tertiary": "#3e2e00",
+                        "on-primary-fixed-variant": "#004f58",
+                        "on-tertiary-fixed": "#251a00",
+                        "background": "#050508",
+                        "secondary": "#d0bcff",
+                        "on-secondary-container": "#c4abff",
+                        "on-error": "#690005",
+                        "tertiary-container": "#fec931",
+                        "surface": "#131319",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "inverse-on-surface": "#303037",
+                        "primary-fixed-dim": "#00daf3",
+                        "error": "#ffb4ab",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "border": "#2a2b30",
+                        "outline": "#849396",
+                        "on-tertiary-fixed-variant": "#594400",
+                        "on-primary-fixed": "#001f24",
+                        "surface-container-highest": "#35343b",
+                        "inverse-surface": "#e4e1ea",
+                        "surface-raised": "#14141c",
+                        "surface-variant": "#35343b",
+                        "secondary-fixed": "#e9ddff",
+                        "surface-container-high": "#2a2930",
+                        "secondary-container": "#571bc1",
+                        "primary": "#c3f5ff",
+                        "text-primary": "#f3f4f6",
+                        "tertiary-fixed": "#ffdf96",
+                        "surface-tint": "#00daf3",
+                        "surface-container-lowest": "#0e0e14",
+                        "on-secondary-fixed": "#23005c",
+                        "tertiary": "#ffeac0",
+                        "on-background": "#e4e1ea",
+                        "primary-fixed": "#9cf0ff",
+                        "primary-container": "#00e5ff",
+                        "on-error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gap-xs": "4px",
+                        "gap-md": "12px",
+                        "rail-width": "64px",
+                        "topbar-height": "48px",
+                        "gap-sm": "8px",
+                        "gap-xl": "24px",
+                        "gap-lg": "16px",
+                        "page-padding": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["DM Sans"],
+                        "brand-nav": ["DM Sans"],
+                        "label-xs": ["DM Sans"],
+                        "title-sm": ["DM Sans"],
+                        "body-sm": ["DM Sans"],
+                        "display-lg": ["DM Sans"],
+                        "body-md": ["DM Sans"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["20px", { "lineHeight": "24px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "brand-nav": ["15px", { "lineHeight": "15px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-xs": ["12px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+                        "title-sm": ["16px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "500" }],
+                        "display-lg": ["26px", { "lineHeight": "30px", "letterSpacing": "-0.03em", "fontWeight": "700" }],
+                        "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "500" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { background-color: #050508; color: #e4e1ea; font-family: 'DM Sans', sans-serif; }
+        .bg-surface-raised { background-color: #14141c; }
+        .bg-surface-panel { background-color: #0c0c12; }
+        .text-cyan { color: #00e5ff; }
+        .bg-cyan { background-color: #00e5ff; }
+        .text-dark { color: #041018; }
+        .bg-violet-wash { background-color: rgba(139, 92, 246, 0.15); }
+        .border-layout { border-color: #2a2b30; }
+        
+        /* Custom Checkbox Toggle */
+        .toggle-checkbox:checked { right: 0; border-color: #00e5ff; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #00e5ff; }
+        .toggle-checkbox:checked + .toggle-label:after { transform: translateX(100%); border-color: white; }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden antialiased">
+<!-- SideNavBar (from JSON) -->
+<nav class="bg-surface-dim dark:bg-surface-dim fixed left-0 top-0 bottom-0 w-rail-width border-r border-layout flat no shadows flex flex-col h-full items-center z-50"><!-- Logo -->
+<div class="mb-4 text-primary-container w-12 h-12 flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity">
+<svg fill="none" height="32" viewBox="0 0 32 32" width="32" xmlns="http://www.w3.org/2000/svg">
+<path d="M16 2L2 9.5V22.5L16 30L30 22.5V9.5L16 2Z" stroke="url(#paint0_linear)" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M16 8L8 12.5V20L16 24L24 20V12.5L16 8Z" stroke="#00e5ff" stroke-linejoin="round" stroke-width="1.5"></path>
+<defs>
+<linearGradient gradientUnits="userSpaceOnUse" id="paint0_linear" x1="16" x2="16" y1="2" y2="30">
+<stop stop-color="#8b5cf6"></stop>
+<stop offset="1" stop-color="#00e5ff"></stop>
+</linearGradient>
+</defs>
+</svg>
+</div>
+<!-- Navigation Tabs -->
+<a class="text-text-muted w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-raised transition-all duration-200 active:scale-95 cursor-pointer" href="#" title="Home">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">home</span>
+</a>
+<a class="bg-secondary-container/20 text-primary-container rounded-full w-12 h-12 flex items-center justify-center hover:bg-surface-raised transition-all duration-200 active:scale-95 cursor-pointer" href="#" title="Library">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">library_books</span>
+</a>
+<a class="text-text-muted w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-raised transition-all duration-200 active:scale-95 cursor-pointer" href="#" title="Private Servers">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dns</span>
+</a>
+<!-- Divider -->
+<div class="w-8 h-[1px] bg-border my-2"></div>
+<!-- Recent Instances Avatars -->
+<div class="w-10 h-10 rounded-full overflow-hidden border border-border cursor-pointer hover:border-primary-container transition-colors" title="Recent Instance 1">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCk4cfWI8HOc6Bm5O0EXr64L3jnBDUrozgJBRu43sfqQv0kEwsN5rzH4dj5DjbWaSqIJkJ3KDQxvy08zTKcbJjq_L6FZ3TpbbyXAawqRKUaZtl9HHBdKfSvQ7nDPrRLBWJnx7Pt7pDIPvUVMME_rLgO0a0Yw6THPr_6H-5LAz5n7o-tUXPeJDj888q00Ov-8JBbg7AcmIVly7vb9IhmL0W6XQ-wvEYIk45OGh8H0ZZlV2PqFB1IO3IgkraQwl6Hj-ICjG9d189rmPo">
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-border cursor-pointer hover:border-primary-container transition-colors" title="Recent Instance 2">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBM7ebgPwRberm0fYXerEw0y4hvccJKcvxcff3lN3C3Xk6HP_STdMSfBcdNFxzUfn27c1VO0Euv8V3pyeplxKDxOw8jwp1qZKuw6mJ4PFczJVtKeFjop7kdoK2jU8tbe68jPzUc8OkyA9eyt2Vr0joM73iHDpxAGe1pIAR55z4CHbDaJ2mJjGKT-M-9e-tOLj8a7bj91QlCi2JbvSuGtbf_C6v_hSl_tAnsm4p0-A5TQc1Q4dXE9VTgJkaevXrvuEUWCa3yMQ5NHNM">
+</div>
+<!-- CTA Action -->
+<button class="w-10 h-10 rounded-full border border-border bg-surface-raised text-text-muted flex items-center justify-center hover:bg-surface-bright hover:text-primary-container transition-all active:scale-95 mt-2" title="Create Instance">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+<!-- Spacer -->
+<div class="flex-grow"></div>
+<!-- Footer Utility -->
+<a class="text-text-muted w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-raised transition-all duration-200 active:scale-95 cursor-pointer" href="#" title="Settings">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+</a></nav>
+<!-- Main Workspace -->
+<div class="flex flex-col flex-grow ml-rail-width h-full bg-background relative">
+<!-- TopNavBar (from JSON) -->
+<header class="bg-background dark:bg-background text-primary-container dark:text-primary-container font-brand-nav text-brand-nav fixed top-0 right-0 left-rail-width h-topbar-height border-b border-layout flat no shadows flex justify-between items-center px-page-padding z-40"><div class="font-brand-nav text-brand-nav text-primary-container lowercase cursor-pointer hover:text-primary-fixed-dim transition-colors active:opacity-80">
+            owyx
+        </div>
+<div class="flex-grow"></div>
+<!-- Global Status / Utility -->
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 bg-surface-raised border border-border rounded-full px-3 py-1 text-label-xs font-label-xs text-text-muted">
+<div class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></div>
+                 Ready
+             </div>
+</div></header>
+<!-- Scrollable Content Area -->
+<main class="flex-grow overflow-y-auto mt-topbar-height p-page-padding">
+<div class="max-w-[1200px] mx-auto flex flex-col gap-gap-xl">
+<!-- Hero Section (Instance Details) -->
+<section class="bg-surface-panel border border-layout rounded-xl p-6 flex flex-col md:flex-row gap-6 items-start md:items-center relative overflow-hidden">
+<!-- Subtle background glow -->
+<div class="absolute -right-20 -top-20 w-64 h-64 bg-primary-container rounded-full blur-[100px] opacity-10 pointer-events-none"></div>
+<!-- Instance Icon -->
+<div class="w-24 h-24 rounded-xl overflow-hidden border border-layout flex-shrink-0 bg-surface-raised flex items-center justify-center shadow-lg">
+<img class="w-full h-full object-cover" data-alt="A detailed digital rendering of a sleek, abstract woven fabric pattern in deep blues and cyans, representing a modern software logo icon on a dark background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCa1VQlL5ttbM78Vfb91uEwWxf0kXXgoL23lYCRDlO2bqxVkpAxt9BUDu0EKiWbv-J5ySZZcO7waGeN4jQSVm3KESCoQCfdviknf1d_swR-gR3JVEipIMiQ3_avB8YizfRB4EXW2cgIQj8cy81uVevzJvoPbZO-JAlyw-BSVkyVYtKqtcC9VdrVErNPYqYtwprrLVES3mNAcIyVZeglhDTZj-BpVn5Te0K36uGOolBKR5wf8nhvVa4zCTbrVtN8H2J9DvXPA9oDLnI">
+</div>
+<!-- Instance Info -->
+<div class="flex-grow flex flex-col gap-1 z-10">
+<h1 class="font-display-lg text-display-lg text-on-surface m-0">Fabric Exploration</h1>
+<p class="font-body-md text-body-md text-text-muted m-0 flex items-center gap-2">
+<span class="">Minecraft 1.21.1</span>
+<span class="text-border">•</span>
+<span class="">Fabric 0.16.0</span>
+</p>
+</div>
+<!-- Action Buttons -->
+<div class="flex items-center gap-3 z-10 w-full md:w-auto">
+<button class="bg-cyan text-dark font-title-sm text-title-sm px-6 py-2.5 rounded-[10px] hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,229,255,0.2)] whitespace-nowrap flex items-center gap-2">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+                            Play
+                        </button>
+<button class="bg-surface-raised border border-layout text-on-surface w-10 h-10 rounded-[10px] flex items-center justify-center hover:bg-surface-variant transition-colors active:scale-95">
+<span class="material-symbols-outlined text-xl">settings</span>
+</button>
+<button class="bg-surface-raised border border-layout text-on-surface w-10 h-10 rounded-[10px] flex items-center justify-center hover:bg-surface-variant transition-colors active:scale-95">
+<span class="material-symbols-outlined text-xl">more_vert</span>
+</button>
+</div>
+</section>
+<!-- Main Content Area with Navigation -->
+<section class="flex flex-col gap-4">
+<!-- Tab Navigation -->
+<div class="flex items-center gap-2 border-b border-layout pb-4 overflow-x-auto hide-scrollbar">
+<button class="px-4 py-2 rounded-full bg-violet-wash text-cyan font-title-sm text-title-sm whitespace-nowrap border border-[rgba(139,92,246,0.3)]">Content</button>
+<button class="px-4 py-2 rounded-full bg-surface-raised text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors font-title-sm text-title-sm whitespace-nowrap border border-layout">Files</button>
+<button class="px-4 py-2 rounded-full bg-surface-raised text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors font-title-sm text-title-sm whitespace-nowrap border border-layout">Worlds</button>
+<button class="px-4 py-2 rounded-full bg-surface-raised text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors font-title-sm text-title-sm whitespace-nowrap border border-layout">Logs</button>
+<button class="px-4 py-2 rounded-full bg-surface-raised text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors font-title-sm text-title-sm whitespace-nowrap border border-layout">Share</button>
+</div>
+<!-- Toolbar -->
+<div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 py-2">
+<!-- Filters -->
+<div class="flex items-center gap-2 flex-wrap">
+<button class="px-3 py-1.5 rounded-full bg-surface-raised border border-primary-container/50 text-cyan font-label-xs text-label-xs transition-colors">All</button>
+<button class="px-3 py-1.5 rounded-full bg-surface-raised border border-layout text-on-surface-variant hover:border-outline transition-colors font-label-xs text-label-xs">Mods <span class="ml-1 text-text-muted bg-surface-dim px-1.5 rounded">4</span></button>
+<button class="px-3 py-1.5 rounded-full bg-surface-raised border border-layout text-on-surface-variant hover:border-outline transition-colors font-label-xs text-label-xs">Resource packs <span class="ml-1 text-text-muted bg-surface-dim px-1.5 rounded">0</span></button>
+</div>
+<!-- Search & Actions -->
+<div class="flex items-center gap-3 w-full lg:w-auto">
+<div class="relative flex-grow lg:w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-sm">search</span>
+<input class="w-full bg-surface-raised border border-layout rounded-[10px] py-1.5 pl-9 pr-3 text-body-sm font-body-sm text-on-surface placeholder:text-text-muted focus:outline-none focus:border-cyan focus:ring-1 focus:ring-cyan transition-all" placeholder="Search mods..." type="text">
+</div>
+<button class="bg-surface-raised border border-layout text-on-surface px-4 py-1.5 rounded-[10px] hover:bg-surface-variant transition-colors font-label-xs text-label-xs whitespace-nowrap flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">note_add</span> Add files
+                            </button>
+<button class="bg-surface-dim border border-layout text-text-muted px-4 py-1.5 rounded-[10px] cursor-not-allowed font-label-xs text-label-xs whitespace-nowrap opacity-50 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">travel_explore</span> Find projects
+                            </button>
+</div>
+</div>
+<!-- List Actions -->
+<div class="flex justify-between items-center px-2 pt-2">
+<div class="text-label-xs font-label-xs text-text-muted">4 items total</div>
+<div class="flex gap-4 text-label-xs font-label-xs text-cyan">
+<button class="hover:underline hover:text-primary-fixed-dim transition-colors">Enable all</button>
+<button class="hover:underline hover:text-primary-fixed-dim transition-colors">Disable all</button>
+</div>
+</div>
+<!-- Content Table (Data Grid Style) -->
+<div class="bg-surface-panel border border-layout rounded-xl overflow-hidden flex flex-col shadow-md mt-2">
+<!-- Header -->
+<div class="grid grid-cols-[minmax(200px,2fr)_1fr_100px] gap-4 px-6 py-3 border-b border-layout bg-surface-raised text-label-xs font-label-xs text-text-muted uppercase tracking-wider">
+<div class="">Project</div>
+<div class="">Version</div>
+<div class="text-right">Actions</div>
+</div>
+<!-- Rows -->
+<div class="flex flex-col">
+<!-- Row 1 -->
+<div class="grid grid-cols-[minmax(200px,2fr)_1fr_100px] gap-4 px-6 py-3 items-center border-b border-layout/50 hover:bg-surface-variant/30 transition-colors group">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-raised border border-layout overflow-hidden flex items-center justify-center p-1">
+<img class="w-full h-full object-contain" data-alt="A minimalist logo for a mod called Iris, featuring a stylized colorful aperture on a dark background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRVlAIQYbpon2eHjxfid1AJ-e96kGTXMTSe7x6dLnujQxUxhH-1eRo5DKxjHQbW-vsFpwYawg-F97nqJGkv5kclo6athZzNiMpKKZH4DYDwaSAZOS4C_oOrcUuNNfJRNk493nrYbmyJRT5T8dLeqcW1_15CL5zywX1LZuWurAXq_Eo-V5xIvHKVw_HuWIvDK6xLeSto-U_xFMJIuR9Z3SqndBUOJaAnIX0oVfLyjt6ZnH1DZ063gJQoHt3m51kIc8IzlUIWWh4a3c">
+</div>
+<span class="font-body-md text-body-md text-on-surface font-semibold group-hover:text-primary-container transition-colors cursor-pointer">Iris Shaders</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">
+<span class="bg-surface-raised border border-layout px-2 py-0.5 rounded text-xs">1.7.2+1.21.1</span>
+</div>
+<div class="flex items-center justify-end gap-3">
+<!-- Custom Toggle -->
+<div class="relative inline-block w-8 h-4 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-2 border-layout appearance-none cursor-pointer transition-transform duration-200 ease-in z-10" id="toggle1" name="toggle1" type="checkbox">
+<label class="toggle-label block overflow-hidden h-4 rounded-full bg-surface-raised border border-layout cursor-pointer transition-colors duration-200 ease-in" for="toggle1"></label>
+</div>
+<button class="text-text-muted hover:text-error transition-colors p-1 rounded hover:bg-surface-raised opacity-0 group-hover:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="grid grid-cols-[minmax(200px,2fr)_1fr_100px] gap-4 px-6 py-3 items-center border-b border-layout/50 hover:bg-surface-variant/30 transition-colors group">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-raised border border-layout overflow-hidden flex items-center justify-center p-1">
+<img class="w-full h-full object-contain" data-alt="A simple, abstract chemical icon representing Sodium, colored in cool blues and greys against a dark background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdSUYsX1A0pbpni-Cu0BXwqY-aPnjjNP2zkf8MKFUj1QOBK6IesnLGDvD5ZnYVuSsyVJqb0k2GziIOGnlyVV7y6P-cKUTKK0qHg61IyG-irhYUv0uapmUtGJkhZJYLtnTRjWjkKc9fhhlYcVwa3AdeiKjybzGojGM0K6cDn21Iq6QaCNeTtyjML8VeZvBJtx8d64fav8GoT7LRyxTR3Sk5qX2tWIPbxw92eGi-B51PIOrdLZCw0oErmsgreb8lggJAiCm2zGFl858">
+</div>
+<span class="font-body-md text-body-md text-on-surface font-semibold group-hover:text-primary-container transition-colors cursor-pointer">Sodium</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">
+<span class="bg-surface-raised border border-layout px-2 py-0.5 rounded text-xs">0.5.11+1.21.1</span>
+</div>
+<div class="flex items-center justify-end gap-3">
+<div class="relative inline-block w-8 h-4 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-2 border-layout appearance-none cursor-pointer transition-transform duration-200 ease-in z-10" id="toggle2" name="toggle2" type="checkbox">
+<label class="toggle-label block overflow-hidden h-4 rounded-full bg-surface-raised border border-layout cursor-pointer transition-colors duration-200 ease-in" for="toggle2"></label>
+</div>
+<button class="text-text-muted hover:text-error transition-colors p-1 rounded hover:bg-surface-raised opacity-0 group-hover:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="grid grid-cols-[minmax(200px,2fr)_1fr_100px] gap-4 px-6 py-3 items-center border-b border-layout/50 hover:bg-surface-variant/30 transition-colors group">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-raised border border-layout overflow-hidden flex items-center justify-center p-1">
+<img class="w-full h-full object-contain" data-alt="A minimalist icon of a battery or energy symbol representing Lithium, sleek and modern on a dark background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaMeEuKc4FQTtJs1Hm8J9qlZICx1lRO-WYoX61LXufKVl6AVamETQ6VjbFK4WGWQGAO6eF6zHtEgNGR0g0LwBPJkiMJLQ9u24GwmICH62LCEqOrICHNSLnt9G2ONBRrOdTthFr6g6eGHmTSg1v6MwRG75cblbLVofePvmgPp05kK1GchU3cpNPQ8Uvn0LSeQnky1bzOfHlBfMZ2sedpC7bxHrfRNs3mo415-BraDaj7QXXeFlW5CZeUTFPaKSw1Y6VSlr_GAimZm4">
+</div>
+<span class="font-body-md text-body-md text-on-surface font-semibold group-hover:text-primary-container transition-colors cursor-pointer">Lithium</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">
+<span class="bg-surface-raised border border-layout px-2 py-0.5 rounded text-xs">0.13.0+1.21.1</span>
+</div>
+<div class="flex items-center justify-end gap-3">
+<div class="relative inline-block w-8 h-4 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-2 border-layout appearance-none cursor-pointer transition-transform duration-200 ease-in z-10" id="toggle3" name="toggle3" type="checkbox">
+<label class="toggle-label block overflow-hidden h-4 rounded-full bg-surface-raised border border-layout cursor-pointer transition-colors duration-200 ease-in" for="toggle3"></label>
+</div>
+<button class="text-text-muted hover:text-error transition-colors p-1 rounded hover:bg-surface-raised opacity-0 group-hover:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Row 4 (Disabled state example) -->
+<div class="grid grid-cols-[minmax(200px,2fr)_1fr_100px] gap-4 px-6 py-3 items-center hover:bg-surface-variant/30 transition-colors group opacity-60">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-raised border border-layout overflow-hidden flex items-center justify-center p-1 grayscale">
+<img class="w-full h-full object-contain" data-alt="A simple stylized star icon representing Starlight, glowing faintly on a dark background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmj9lsZqqYeMg0e953ZUYWwHNFY7RItoYFNPc3W3GlvYBa4McoMFED7puTY9O3ntq9k5FMaWqMF1i6SDeLXFS-wJAaBxGpncP87Bhb9KYVpnOxGhSfSlI6X1Am1c0xhdQgsUrcCrjOIMtiJgU9ne6_xQnYm5BuXR5ycz-5y-4eCvB5414tb6YP4jGz8ggAjexavY-3gvCGsAbVDmoLst6273BUJiV97ejnp4oEZse8chMqw6EYjlwsytuDb_BCZ8sV-84oPZpIx4Y">
+</div>
+<span class="font-body-md text-body-md text-on-surface font-semibold group-hover:text-primary-container transition-colors cursor-pointer line-through decoration-text-muted">Starlight</span>
+</div>
+<div class="font-body-sm text-body-sm text-text-muted">
+<span class="bg-surface-raised border border-layout px-2 py-0.5 rounded text-xs">1.1.2+1.21.1</span>
+</div>
+<div class="flex items-center justify-end gap-3">
+<div class="relative inline-block w-8 h-4 align-middle select-none transition duration-200 ease-in">
+<input class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-text-muted border-2 border-layout appearance-none cursor-pointer transition-transform duration-200 ease-in z-10" id="toggle4" name="toggle4" type="checkbox">
+<label class="toggle-label block overflow-hidden h-4 rounded-full bg-surface-raised border border-layout cursor-pointer transition-colors duration-200 ease-in" for="toggle4"></label>
+</div>
+<button class="text-text-muted hover:text-error transition-colors p-1 rounded hover:bg-surface-raised opacity-0 group-hover:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom spacer for scrolling comfort -->
+<div class="h-8"></div>
+</div>
+</main>
+</div>
+
+
+</body></html>

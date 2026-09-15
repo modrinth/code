@@ -1,0 +1,206 @@
+name: ChiwawaPlugin
+version: 1.0.0
+description: Плагин интеграции с сайтом ChiwawaMine для системы whitelist, trust level и репутации
+author: eBluffy
+website: https://chiwawa.site
+main: org.ebluffy.chiwawa.ChiwawaPlugin
+api-version: '1.21'
+load: STARTUP
+prefix: Chiwawa
+
+# Команды плагина
+commands:
+  chiwawa:
+    description: Главная команда администрирования плагина
+    usage: /chiwawa <подкоманда>
+    permission: chiwawa.admin
+    aliases: [cw, chiw]
+
+  profile:
+    description: Показать профиль игрока
+    usage: /profile
+    permission: chiwawa.profile
+    aliases: [prof, me]
+
+  playtime:
+    description: Показать время игры
+    usage: /playtime
+    permission: chiwawa.playtime
+    aliases: [pt, time]
+
+  rep:
+    description: Дать репутацию игроку
+    usage: /rep <игрок>
+    permission: chiwawa.reputation
+    aliases: [reputation, +rep]
+
+  applications:
+    description: Статус заявки на сервер
+    usage: /applications
+    permission: chiwawa.applications
+    aliases: [apps, заявка]
+
+  discord:
+    description: Информация о Discord сервере
+    usage: /discord
+    permission: chiwawa.discord
+    aliases: [дискорд]
+
+  login:
+    description: Авторизация (пароль или токен)
+    usage: /login <пароль|токен>
+    aliases: [l, auth]
+
+  register:
+    description: Регистрация на сервере
+    usage: /register <пароль> <повтор_пароля>
+    aliases: [reg, регистрация]
+
+  changelogin:
+    description: Смена режима авторизации
+    usage: /changelogin [start|confirm <код>]
+    aliases: [changeauth, сменалогин]
+
+  changepass:
+    description: Смена пароля (простая авторизация)
+    usage: /changepass <старый> <новый> <повтор>
+    aliases: [changepassword, сменапароля]
+
+  unregister:
+    description: Удаление регистрации игрока (админ)
+    usage: /unregister <nickname>
+    permission: chiwawa.command.unregister
+    aliases: [unreg, delreg]
+
+# Права доступа
+permissions:
+  # Основные права
+  chiwawa.*:
+    description: Все права плагина
+    children:
+      chiwawa.admin: true
+      chiwawa.moderator: true
+      chiwawa.user: true
+    default: false
+
+  chiwawa.admin:
+    description: Административные права
+    children:
+      chiwawa.moderator: true
+      chiwawa.command.reload: true
+      chiwawa.command.sync: true
+      chiwawa.command.ban: true
+      chiwawa.command.unban: true
+      chiwawa.command.trust: true
+      chiwawa.command.rep.modify: true
+      chiwawa.command.stats: true
+      chiwawa.command.users: true
+      chiwawa.command.unregister: true
+    default: op
+
+  chiwawa.moderator:
+    description: Права модератора
+    children:
+      chiwawa.user: true
+      chiwawa.command.playtime.others: true
+      chiwawa.command.sync.self: true
+    default: false
+
+  chiwawa.user:
+    description: Базовые права игрока
+    children:
+      chiwawa.profile: true
+      chiwawa.playtime: true
+      chiwawa.reputation: true
+      chiwawa.applications: true
+      chiwawa.discord: true
+      chiwawa.login: true
+      chiwawa.register: true
+      chiwawa.changelogin: true
+      chiwawa.changepass: true
+    default: true
+
+  # Права на команды
+  chiwawa.profile:
+    description: Просмотр своего профиля
+    default: true
+
+  chiwawa.playtime:
+    description: Просмотр своего времени игры
+    default: true
+
+  chiwawa.reputation:
+    description: Выдача репутации другим игрокам
+    default: true
+
+  chiwawa.command.reload:
+    description: Перезагрузка конфигурации
+    default: op
+
+  chiwawa.command.sync:
+    description: Синхронизация данных игроков
+    default: op
+
+  chiwawa.command.ban:
+    description: Бан игроков через сайт
+    default: op
+
+  chiwawa.command.unban:
+    description: Разбан игроков
+    default: op
+
+  chiwawa.command.trust:
+    description: Изменение Trust Level
+    default: op
+
+  chiwawa.command.rep.modify:
+    description: Изменение репутации администратором
+    default: op
+
+  chiwawa.command.stats:
+    description: Просмотр статистики сервера
+    default: op
+
+  chiwawa.command.users:
+    description: Управление пользователями
+    default: op
+
+  chiwawa.command.playtime.others:
+    description: Просмотр времени игры других игроков
+    default: op
+
+  chiwawa.applications:
+    description: Просмотр статуса заявки
+    default: true
+
+  chiwawa.discord:
+    description: Информация о Discord сервере
+    default: true
+
+  chiwawa.login:
+    description: Авторизация (пароль или токен)
+    default: true
+
+  chiwawa.register:
+    description: Регистрация на сервере
+    default: true
+
+  chiwawa.changelogin:
+    description: Смена режима авторизации
+    default: true
+
+  chiwawa.changepass:
+    description: Смена пароля (простая авторизация)
+    default: true
+
+  chiwawa.command.unregister:
+    description: Удаление регистрации игрока
+    default: op
+
+# Зависимости
+depend: []
+softdepend: [Vault, PlaceholderAPI, LuckPerms]
+
+# Загрузка
+startup: POSTWORLD
+

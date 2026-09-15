@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Owyx - Fabric Exploration - Worlds</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-raised": "#14141c",
+                        "surface-bright": "#39383f",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "secondary": "#d0bcff",
+                        "surface-container-high": "#2a2930",
+                        "surface-container-lowest": "#0e0e14",
+                        "tertiary": "#ffeac0",
+                        "on-tertiary-fixed": "#251a00",
+                        "surface-tint": "#00daf3",
+                        "on-primary-fixed-variant": "#004f58",
+                        "on-secondary-container": "#c4abff",
+                        "surface": "#131319",
+                        "on-surface": "#e4e1ea",
+                        "error-container": "#93000a",
+                        "text-primary": "#f3f4f6",
+                        "surface-container-low": "#1b1b21",
+                        "background": "#050508",
+                        "secondary-fixed": "#e9ddff",
+                        "on-primary-fixed": "#001f24",
+                        "on-primary": "#00363d",
+                        "on-tertiary-fixed-variant": "#594400",
+                        "primary-fixed-dim": "#00daf3",
+                        "primary-fixed": "#9cf0ff",
+                        "on-tertiary": "#3e2e00",
+                        "tertiary-container": "#fec931",
+                        "on-secondary": "#3c0091",
+                        "inverse-surface": "#e4e1ea",
+                        "inverse-primary": "#006875",
+                        "primary-container": "#00e5ff",
+                        "surface-dim": "#131319",
+                        "on-tertiary-container": "#6f5500",
+                        "error": "#ffb4ab",
+                        "surface-container": "#1f1f25",
+                        "outline-variant": "#3b494c",
+                        "tertiary-fixed-dim": "#f3bf26",
+                        "on-background": "#e4e1ea",
+                        "tertiary-fixed": "#ffdf96",
+                        "border": "#2a2b30",
+                        "on-primary-container": "#00626e",
+                        "inverse-on-surface": "#303037",
+                        "text-muted": "#9aa0a8",
+                        "outline": "#849396",
+                        "surface-variant": "#35343b",
+                        "on-surface-variant": "#bac9cc",
+                        "on-secondary-fixed": "#23005c",
+                        "surface-container-highest": "#35343b",
+                        "secondary-container": "#571bc1",
+                        "primary": "#c3f5ff",
+                        "on-error": "#690005"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gap-xs": "4px",
+                        "gap-xl": "24px",
+                        "gap-lg": "16px",
+                        "topbar-height": "48px",
+                        "rail-width": "64px",
+                        "gap-sm": "8px",
+                        "gap-md": "12px",
+                        "page-padding": "24px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["DM Sans"],
+                        "title-sm": ["DM Sans"],
+                        "headline-md": ["DM Sans"],
+                        "body-sm": ["DM Sans"],
+                        "label-xs": ["DM Sans"],
+                        "display-lg": ["DM Sans"],
+                        "brand-nav": ["DM Sans"]
+                    },
+                    "fontSize": {
+                        "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "500" }],
+                        "title-sm": ["16px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "headline-md": ["20px", { "lineHeight": "24px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "500" }],
+                        "label-xs": ["12px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+                        "display-lg": ["26px", { "lineHeight": "30px", "letterSpacing": "-0.03em", "fontWeight": "700" }],
+                        "brand-nav": ["15px", { "lineHeight": "15px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'DM Sans', sans-serif; background-color: #050508; color: #e4e1ea; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+        
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #2a2b30; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #35343b; }
+    </style>
+</head>
+<body class="bg-background text-on-background h-screen w-screen overflow-hidden flex selection:bg-primary-container/30 selection:text-primary-container">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 bottom-0 w-[64px] bg-surface dark:bg-surface border-r border-border dark:border-border flex flex-col items-center py-4 gap-gap-lg h-full z-50">
+<!-- Brand Logo -->
+<div class="mb-4 group cursor-pointer relative flex items-center justify-center w-12 h-12">
+<svg class="w-8 h-8 text-primary-container drop-shadow-[0_0_8px_rgba(139,92,246,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,229,255,0.8)] transition-all duration-300" fill="none" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 2L20.6603 7V17L12 22L3.33975 17V7L12 2Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M12 6L17.1962 9V15L12 18L6.80385 15V9L12 6Z" stroke="#8b5cf6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<!-- Main Nav -->
+<div class="flex flex-col gap-2 w-full px-2">
+<!-- Home -->
+<button class="w-12 h-12 mx-auto flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-raised dark:hover:bg-surface-raised transition-colors scale-95 active:scale-90 relative group">
+<span class="material-symbols-outlined">home</span>
+<div class="absolute left-full ml-3 px-2 py-1 bg-surface-raised border border-border rounded text-label-xs font-label-xs whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">Home</div>
+</button>
+<!-- Library (Active) -->
+<button class="w-12 h-12 mx-auto flex items-center justify-center rounded-full bg-secondary-container/20 text-primary scale-95 active:scale-90 transition-transform relative group">
+<span class="material-symbols-outlined fill" style="color: #00e5ff;">library_books</span>
+<div class="absolute left-full ml-3 px-2 py-1 bg-surface-raised border border-border rounded text-label-xs font-label-xs whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">Library</div>
+</button>
+<!-- Private Servers -->
+<button class="w-12 h-12 mx-auto flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-raised dark:hover:bg-surface-raised transition-colors scale-95 active:scale-90 relative group">
+<span class="material-symbols-outlined">dns</span>
+<div class="absolute left-full ml-3 px-2 py-1 bg-surface-raised border border-border rounded text-label-xs font-label-xs whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">Private Servers</div>
+</button>
+</div>
+<div class="w-8 h-px bg-border my-2"></div>
+<!-- Recent Avatars -->
+<div class="flex flex-col gap-3 w-full px-2">
+<button class="w-10 h-10 mx-auto rounded-full bg-surface-raised border border-border overflow-hidden hover:border-outline-variant transition-colors group relative">
+<img class="w-full h-full object-cover" data-alt="A highly detailed icon of a lush, vibrant Minecraft-style grassy block with glowing cyan energy veins pulsing through the dirt. High contrast, modern gaming aesthetic, set against a dark studio background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEWLMiik9QcXeP8iN5pseOlrSxmEUkQINAKJtObqGLg9iBd45Oq3ymrURW_OiGBYd5JpG8zY2XF4PvcQ5Y8lFDJFdxAZBl4RxpMVoBrvHfZKVuHYzso9naooPt8ox3Dfo__1zCVmJHs_AbvKLPM3KIdYEe6fan_c92s5tMtaK7xSHc-uGvCdxYfrjrOzrnzMWf347jPpIlDdIm6L7eiQWqFEjNK-X_LfRhIvymsnxMNNzY0kdJypyH"/>
+<div class="absolute left-full ml-3 px-2 py-1 bg-surface-raised border border-border rounded text-label-xs font-label-xs whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">Fabric Exploration</div>
+</button>
+<button class="w-10 h-10 mx-auto rounded-full bg-surface-raised border border-border overflow-hidden hover:border-outline-variant transition-colors group relative">
+<img class="w-full h-full object-cover" data-alt="A sleek, metallic icon of a futuristic rocket engine with neon purple exhausts. Cyberpunk aesthetic, dark background, highly detailed rendering." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVDl64W-w-vVGGcAq8IPmqFsc24uR3AlqCSqSPwVsXV6onULV6d7vjM1qNyP8d8DUGA38xpGqaD78czwnOHei3eian-ff3yUFfELZyKDjD0541Wm4cSVgDn3_ToymIS04XJ7ep69uOXkAYsj70TPAP6YpzXdx7Op_gFKxG0P_O1FKB_HBuCpMOl7V9rfoQ52zNxS61y9B9qwTql7seqgyc9BrVoBbMPjctvw0Y6VNTGThtc2mTzDtw"/>
+<div class="absolute left-full ml-3 px-2 py-1 bg-surface-raised border border-border rounded text-label-xs font-label-xs whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">Space Modpack</div>
+</button>
+</div>
+<!-- Create Action -->
+<button class="w-10 h-10 mt-2 mx-auto flex items-center justify-center rounded-full border border-dashed border-outline-variant text-on-surface-variant hover:text-primary-container hover:border-primary-container hover:bg-primary-container/10 transition-all group relative">
+<span class="material-symbols-outlined">add</span>
+<div class="absolute left-full ml-3 px-2 py-1 bg-surface-raised border border-border rounded text-label-xs font-label-xs whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">Create Instance</div>
+</button>
+<div class="flex-1"></div>
+<!-- Settings -->
+<button class="w-12 h-12 mx-auto flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-raised dark:hover:bg-surface-raised transition-colors scale-95 active:scale-90 relative group">
+<span class="material-symbols-outlined">settings</span>
+<div class="absolute left-full ml-3 px-2 py-1 bg-surface-raised border border-border rounded text-label-xs font-label-xs whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">Settings</div>
+</button>
+</nav>
+<!-- Main Content Area Wrapper -->
+<div class="ml-[64px] flex-1 flex flex-col h-full overflow-hidden relative">
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 left-[64px] h-[48px] bg-background dark:bg-background border-b border-border dark:border-border flex justify-between items-center px-page-padding w-[calc(100%-64px)] z-40">
+<div class="flex items-center gap-4">
+<span class="font-brand-nav text-brand-nav lowercase text-on-surface dark:text-on-surface mr-2">owyx</span>
+<!-- Breadcrumbs -->
+<div class="flex items-center gap-2 text-label-xs font-label-xs text-on-surface-variant">
+<span class="cursor-pointer hover:text-primary transition-colors">Library</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-bold">Fabric Exploration</span>
+</div>
+</div>
+<div class="flex items-center">
+<!-- Status Pill -->
+<div class="flex items-center gap-2 px-3 py-1 bg-surface-raised border border-border rounded-full">
+<div class="w-2 h-2 rounded-full bg-primary-container shadow-[0_0_8px_rgba(0,229,255,0.6)]"></div>
+<span class="text-label-xs font-label-xs text-on-surface">Ready</span>
+</div>
+</div>
+</header>
+<!-- Scrollable Content Canvas -->
+<main class="flex-1 overflow-y-auto mt-[48px] px-page-padding py-8 relative">
+<div class="max-w-[1200px] mx-auto w-full flex flex-col gap-8">
+<!-- Hero Section -->
+<div class="flex flex-col md:flex-row items-start md:items-center gap-6 bg-surface p-6 rounded-xl border border-border relative overflow-hidden">
+<!-- Subtle background glow -->
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary-container/5 rounded-full blur-[80px] pointer-events-none"></div>
+<!-- Instance Icon -->
+<div class="w-24 h-24 rounded-[14px] overflow-hidden border border-border bg-surface-raised flex-shrink-0 relative">
+<img class="w-full h-full object-cover" data-alt="A highly detailed icon of a lush, vibrant Minecraft-style grassy block with glowing cyan energy veins pulsing through the dirt. High contrast, modern gaming aesthetic, set against a dark studio background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAG0DEDK6DyV6a2-WaxcrVPYC4wWh_RkKzpS2dsV1AUXGYm-PvrpkJXT5cCyGOakfMyOmoMsLWYhLSj3bpMqvYXX47_SQubyjq9ucm56AsXlh5nUdN6RpEKKzIm1akb9KpZ0sjTkSsMHs0nR0fTFUAa7KAgPtFDChJ1lYsoi4slN9QcOnWgQ8OOONlivvm49E9VFLOikzLTKM83bN6BFD7QWLE9od18dHGnR3RXCiwjX05hXu8lNnDW"/>
+</div>
+<!-- Metadata -->
+<div class="flex-1 flex flex-col gap-2">
+<h1 class="font-display-lg text-display-lg text-text-primary">Fabric Exploration</h1>
+<div class="flex items-center gap-3 text-body-sm font-body-sm text-on-surface-variant">
+<div class="flex items-center gap-1 bg-surface-raised px-2 py-1 rounded border border-border">
+<span class="material-symbols-outlined text-[16px]">videogame_asset</span>
+<span>Minecraft 1.21.1</span>
+</div>
+<div class="flex items-center gap-1 bg-surface-raised px-2 py-1 rounded border border-border">
+<span class="material-symbols-outlined text-[16px]">extension</span>
+<span>Fabric 0.16.0</span>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-3 mt-4 md:mt-0 z-10">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-raised border border-border text-on-surface-variant hover:bg-surface-bright hover:text-text-primary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-raised border border-border text-on-surface-variant hover:bg-surface-bright hover:text-text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+<button class="h-10 px-6 flex items-center gap-2 bg-primary-container text-[#041018] font-bold rounded-[10px] hover:bg-[#9cf0ff] hover:shadow-[0_0_15px_rgba(0,229,255,0.4)] transition-all">
+<span class="material-symbols-outlined fill">play_arrow</span>
+                            Play
+                        </button>
+</div>
+</div>
+<!-- Tabs -->
+<div class="flex items-center gap-2 border-b border-border pb-px">
+<button class="px-4 py-2 rounded-t-lg text-body-sm font-body-sm text-on-surface-variant hover:text-text-primary transition-colors bg-surface-raised/50 border border-transparent hover:border-border border-b-0">Content</button>
+<button class="px-4 py-2 rounded-t-lg text-body-sm font-body-sm text-on-surface-variant hover:text-text-primary transition-colors bg-surface-raised/50 border border-transparent hover:border-border border-b-0">Files</button>
+<!-- Active Tab -->
+<button class="px-4 py-2 rounded-t-lg text-primary-container font-body-sm font-bold bg-[#8b5cf6]/10 border border-border border-b-0 relative">
+                        Worlds
+                        <div class="absolute bottom-[-1px] left-0 right-0 h-[2px] bg-primary-container"></div>
+</button>
+<button class="px-4 py-2 rounded-t-lg text-body-sm font-body-sm text-on-surface-variant hover:text-text-primary transition-colors bg-surface-raised/50 border border-transparent hover:border-border border-b-0">Logs</button>
+<button class="px-4 py-2 rounded-t-lg text-body-sm font-body-sm text-on-surface-variant hover:text-text-primary transition-colors bg-surface-raised/50 border border-transparent hover:border-border border-b-0">Share</button>
+</div>
+<!-- Worlds Content Area -->
+<div class="flex flex-col gap-6">
+<!-- Toolbar -->
+<div class="flex items-center justify-between gap-4">
+<div class="relative flex-1 max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full h-10 pl-10 pr-4 bg-surface-raised border border-border rounded-[10px] text-body-sm font-body-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all" placeholder="Search worlds..." type="text"/>
+</div>
+<button class="h-10 px-4 flex items-center gap-2 bg-surface-raised border border-primary-container/50 text-primary-container font-body-sm rounded-[10px] hover:bg-primary-container/10 transition-colors">
+<span class="material-symbols-outlined">add</span>
+                            Demo world
+                        </button>
+</div>
+<!-- Worlds List -->
+<div class="flex flex-col gap-2">
+<!-- Header Row -->
+<div class="grid grid-cols-[1fr_200px_120px_100px] gap-4 px-4 py-2 text-label-xs font-label-xs text-text-muted border-b border-border uppercase tracking-wider">
+<div>Name</div>
+<div>Last Played</div>
+<div>Size</div>
+<div class="text-right">Actions</div>
+</div>
+<!-- Item 1 -->
+<div class="group grid grid-cols-[1fr_200px_120px_100px] items-center gap-4 px-4 py-3 bg-surface hover:bg-surface-raised border border-transparent hover:border-border rounded-lg transition-all cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-surface-raised border border-border flex items-center justify-center text-on-surface-variant group-hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined">public</span>
+</div>
+<span class="font-title-sm text-title-sm text-text-primary">Hardcore Season 1</span>
+</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant">2 hours ago</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant">156 MB</div>
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-8 h-8 flex items-center justify-center rounded bg-surface border border-border text-on-surface-variant hover:text-text-primary hover:border-outline-variant transition-colors" title="Backup">
+<span class="material-symbols-outlined text-[18px]">backup</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded bg-surface border border-border text-on-surface-variant hover:text-error hover:border-error/50 transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="group grid grid-cols-[1fr_200px_120px_100px] items-center gap-4 px-4 py-3 bg-surface hover:bg-surface-raised border border-transparent hover:border-border rounded-lg transition-all cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-surface-raised border border-border flex items-center justify-center text-on-surface-variant group-hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined">public</span>
+</div>
+<span class="font-title-sm text-title-sm text-text-primary">Redstone Testing</span>
+</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant">Yesterday</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant">42 MB</div>
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-8 h-8 flex items-center justify-center rounded bg-surface border border-border text-on-surface-variant hover:text-text-primary hover:border-outline-variant transition-colors" title="Backup">
+<span class="material-symbols-outlined text-[18px]">backup</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded bg-surface border border-border text-on-surface-variant hover:text-error hover:border-error/50 transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="group grid grid-cols-[1fr_200px_120px_100px] items-center gap-4 px-4 py-3 bg-surface hover:bg-surface-raised border border-transparent hover:border-border rounded-lg transition-all cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-surface-raised border border-border flex items-center justify-center text-on-surface-variant group-hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined">public</span>
+</div>
+<span class="font-title-sm text-title-sm text-text-primary">Creative Flat</span>
+</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant">Oct 20, 2023</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant">12 MB</div>
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-8 h-8 flex items-center justify-center rounded bg-surface border border-border text-on-surface-variant hover:text-text-primary hover:border-outline-variant transition-colors" title="Backup">
+<span class="material-symbols-outlined text-[18px]">backup</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded bg-surface border border-border text-on-surface-variant hover:text-error hover:border-error/50 transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

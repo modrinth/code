@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Owyx - Instance Logs</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-container": "#00626e",
+                      "surface-dim": "#131319",
+                      "inverse-surface": "#e4e1ea",
+                      "surface": "#131319",
+                      "surface-container-low": "#1b1b21",
+                      "surface-tint": "#00daf3",
+                      "surface-bright": "#39383f",
+                      "surface-raised": "#14141c",
+                      "secondary-fixed": "#e9ddff",
+                      "surface-variant": "#35343b",
+                      "surface-container-high": "#2a2930",
+                      "outline": "#849396",
+                      "on-secondary-fixed": "#23005c",
+                      "on-tertiary": "#3e2e00",
+                      "primary-fixed": "#9cf0ff",
+                      "surface-container-lowest": "#0e0e14",
+                      "text-primary": "#f3f4f6",
+                      "primary": "#c3f5ff",
+                      "surface-container": "#1f1f25",
+                      "on-background": "#e4e1ea",
+                      "secondary": "#d0bcff",
+                      "on-tertiary-container": "#6f5500",
+                      "on-secondary": "#3c0091",
+                      "primary-fixed-dim": "#00daf3",
+                      "on-primary-fixed": "#001f24",
+                      "on-error-container": "#ffdad6",
+                      "on-primary": "#00363d",
+                      "background": "#050508",
+                      "on-surface-variant": "#bac9cc",
+                      "tertiary-fixed": "#ffdf96",
+                      "outline-variant": "#3b494c",
+                      "on-surface": "#e4e1ea",
+                      "on-tertiary-fixed": "#251a00",
+                      "secondary-container": "#571bc1",
+                      "on-tertiary-fixed-variant": "#594400",
+                      "primary-container": "#00e5ff",
+                      "inverse-primary": "#006875",
+                      "tertiary": "#ffeac0",
+                      "on-secondary-container": "#c4abff",
+                      "tertiary-container": "#fec931",
+                      "secondary-fixed-dim": "#d0bcff",
+                      "inverse-on-surface": "#303037",
+                      "text-muted": "#9aa0a8",
+                      "error-container": "#93000a",
+                      "surface-container-highest": "#35343b",
+                      "error": "#ffb4ab",
+                      "on-primary-fixed-variant": "#004f58",
+                      "on-secondary-fixed-variant": "#5516be",
+                      "on-error": "#690005",
+                      "border": "#2a2b30",
+                      "tertiary-fixed-dim": "#f3bf26"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gap-xs": "4px",
+                      "gap-lg": "16px",
+                      "rail-width": "64px",
+                      "gap-sm": "8px",
+                      "topbar-height": "48px",
+                      "gap-xl": "24px",
+                      "gap-md": "12px",
+                      "page-padding": "24px"
+              },
+              "fontFamily": {
+                      "label-xs": [
+                              "DM Sans"
+                      ],
+                      "body-md": [
+                              "DM Sans"
+                      ],
+                      "brand-nav": [
+                              "DM Sans"
+                      ],
+                      "display-lg": [
+                              "DM Sans"
+                      ],
+                      "headline-md": [
+                              "DM Sans"
+                      ],
+                      "title-sm": [
+                              "DM Sans"
+                      ],
+                      "body-sm": [
+                              "DM Sans"
+                      ],
+                      "mono": [
+                              "ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace"
+                      ]
+              },
+              "fontSize": {
+                      "label-xs": [
+                              "12px",
+                              {
+                                      "lineHeight": "14px",
+                                      "letterSpacing": "0.04em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "15px",
+                              {
+                                      "lineHeight": "22px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "brand-nav": [
+                              "15px",
+                              {
+                                      "lineHeight": "15px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-lg": [
+                              "26px",
+                              {
+                                      "lineHeight": "30px",
+                                      "letterSpacing": "-0.03em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "24px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "title-sm": [
+                              "16px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-sm": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+            },
+          },
+        }
+      </script>
+<style>
+        body { background-color: theme('colors.background'); color: theme('colors.text-primary'); }
+        /* Custom scrollbar for log area */
+        .log-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+        .log-scroll::-webkit-scrollbar-track { background: transparent; }
+        .log-scroll::-webkit-scrollbar-thumb { background: theme('colors.surface-variant'); border-radius: 4px; }
+        .log-scroll::-webkit-scrollbar-thumb:hover { background: theme('colors.outline'); }
+        
+        .logo-gradient {
+            background: linear-gradient(135deg, theme('colors.secondary') 0%, theme('colors.primary-container') 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+      </style>
+</head>
+<body class="flex h-screen overflow-hidden antialiased font-body-md text-body-md bg-background">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-full w-rail-width bg-surface-dim dark:bg-surface-dim border-r border-border flex flex-col items-center py-lg gap-md z-50">
+<!-- Logo -->
+<div class="mb-4 h-12 w-12 flex items-center justify-center cursor-pointer">
+<span class="material-symbols-outlined font-brand-nav text-display-lg logo-gradient" style="font-variation-settings: 'FILL' 1;">hexagon</span>
+</div>
+<!-- Main Nav -->
+<div class="flex flex-col gap-4 w-full items-center">
+<button class="h-12 w-12 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-colors active:scale-95 transition-transform" title="Home">
+<span class="material-symbols-outlined">home</span>
+</button>
+<button class="h-12 w-12 rounded-full flex items-center justify-center bg-secondary-container/20 text-secondary hover:bg-secondary-container/40 transition-colors active:scale-95 transition-transform relative" title="Library">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+<span class="absolute right-0 top-0 w-3 h-3 bg-primary-container rounded-full border-2 border-surface-dim"></span>
+</button>
+<button class="h-12 w-12 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-colors active:scale-95 transition-transform" title="Private Servers">
+<span class="material-symbols-outlined">lan</span>
+</button>
+</div>
+<div class="w-8 h-px bg-border my-2"></div>
+<!-- Recent Instances -->
+<div class="flex flex-col gap-3 w-full items-center flex-1 overflow-y-auto hide-scrollbar">
+<div class="w-10 h-10 rounded-full bg-surface-raised border border-border flex items-center justify-center overflow-hidden cursor-pointer hover:border-primary-container/50 transition-colors" title="Fabric Exploration">
+<img class="w-full h-full object-cover" data-alt="A highly detailed, 50-100 word prompt describing a Minecraft grass block icon in a sleek, modern UI style. The block is rendered with sharp edges and a subtle neon cyan glow on the top rim, placed against a dark grey background. The lighting is dramatic, emphasizing the block's texture while maintaining a clean, technical aesthetic suitable for a high-end application interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYn1I-rq6Ns4yDUh3mnI5dpawiLsR2hkqr1Y4j7zRFTA0BvgZyRdetCCgyGNOkqyGyOxndNLdw1MSQRYaq31qJvK3n4-ztQTb_yenQ6P-5Gzz9XsPsykjCEt9xZDkTOdgd-EuET6iHSRsdCoMW3-Zb5vW0tSyMky5Va2vQitnDG1B-UvZHv2s0gu33y2cJGsGq9CV4L_cIOMahoMJKPlFJBTaJxa-jlofg7er0AcZpGCQPjlH7DoWI"/>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-raised border border-border flex items-center justify-center overflow-hidden cursor-pointer hover:border-primary-container/50 transition-colors opacity-60" title="Vanilla 1.20">
+<img class="w-full h-full object-cover" data-alt="A highly detailed, 50-100 word prompt describing a minimalist Minecraft dirt block icon. The block is stylized with a smooth, matte finish and subtle dark brown tones, set in a deep black environment. A soft white rim light hits the left edge, giving it a premium, polished look that fits a dark-mode desktop launcher UI." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB46NFMjcwoEsNrWd9zF9WauMpb6uvG-aB8wCFtMH2dMRuy86DdoRax97JRVP59gDrvN0BGL7Whmw6yCCUUKEk8hZ2MZqpWlJoWTQgZs__ERVpxAYqaPqrAxxCO97vtBlfEGBiN94NjkxUOVZi6gyqDeKOEyblahpEXX9gH04vt_UHf44vxbw6Af_Xo2Wi7r_FxNWqqU3fZyE-aiACP2XuGfJTrP-ymCFejY4PcIReE8dl0cuTm1F8I"/>
+</div>
+<button class="w-10 h-10 rounded-full border border-dashed border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-primary-container hover:border-primary-container hover:bg-primary-container/10 transition-all mt-2" title="Create Instance">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+<!-- Footer Nav -->
+<div class="mt-auto pt-4 flex flex-col gap-4 w-full items-center">
+<button class="h-12 w-12 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-colors active:scale-95 transition-transform" title="Settings">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 ml-rail-width flex flex-col h-full bg-background relative">
+<!-- TopNavBar -->
+<header class="h-topbar-height w-full bg-surface-dim border-b border-border flex justify-between items-center px-page-padding shrink-0 z-40">
+<div class="font-brand text-brand-nav text-on-surface uppercase tracking-tighter cursor-pointer logo-gradient">owyx</div>
+<div class="flex items-center gap-4">
+<div class="px-3 py-1 rounded-full bg-primary-container/10 border border-primary-container/20 text-primary-container font-label-xs flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></div>
+                    Ready
+                </div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="flex-1 overflow-y-auto px-page-padding py-page-padding flex flex-col gap-xl">
+<!-- Instance Header -->
+<section class="flex flex-col gap-lg">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-lg">
+<div class="w-24 h-24 rounded-xl bg-surface-raised border border-border shadow-lg flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A highly detailed, 50-100 word prompt describing a Minecraft grass block icon in a sleek, modern UI style. The block is rendered with sharp edges and a subtle neon cyan glow on the top rim, placed against a dark grey background. The lighting is dramatic, emphasizing the block's texture while maintaining a clean, technical aesthetic suitable for a high-end application interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6cQYVkOzulMFOjth8tn_51bRgNV0z8VTZQjAbZj7ZMWp3sitHv4jXxfcxuymSXAgZcXGXTJpVgw8mvNXNf8BrKfV4PHxl0G-2QrJrdw4EcZt7PUBuyPEJ9ruyTPD4CtCEO1_WTvwcTfdY_PveeW6uB6KB0FglQsCJBBiTbxrj2mnBtQwhIgQe_lqahLFe9pYvlLa7UWRlO3b7Fo5R6jC3F5ujf3pPasfh6u6_pKuZrdFNEzWnMMRE"/>
+</div>
+<div class="flex flex-col gap-2">
+<h1 class="font-display-lg text-display-lg text-text-primary">Fabric Exploration</h1>
+<div class="flex items-center gap-3 text-on-surface-variant font-body-sm text-body-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">sports_esports</span> Minecraft 1.21.1</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">extension</span> Fabric 0.16.0</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="h-10 w-10 rounded-lg bg-surface-raised border border-border flex items-center justify-center text-on-surface hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="h-10 w-10 rounded-lg bg-surface-raised border border-border flex items-center justify-center text-on-surface hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+<button class="h-10 px-6 rounded-lg bg-primary-container text-on-primary-fixed font-title-sm text-title-sm flex items-center gap-2 hover:bg-primary-fixed transition-colors active:scale-95 shadow-[0_0_15px_rgba(0,229,255,0.3)]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+                            Play
+                        </button>
+</div>
+</div>
+<!-- Navigation Tabs -->
+<div class="flex items-center gap-2 border-b border-border pb-1">
+<button class="px-4 py-2 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-raised transition-colors">Content</button>
+<button class="px-4 py-2 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-raised transition-colors">Files</button>
+<button class="px-4 py-2 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-raised transition-colors">Worlds</button>
+<button class="px-4 py-2 rounded-full font-title-sm text-title-sm bg-secondary-container/20 text-secondary border border-secondary/20 transition-colors shadow-[0_0_10px_rgba(139,92,246,0.1)]">Logs</button>
+<button class="px-4 py-2 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-raised transition-colors">Share</button>
+</div>
+</section>
+<!-- Logs Workspace -->
+<section class="flex flex-col gap-md flex-1 min-h-[400px]">
+<!-- Toolbar -->
+<div class="flex items-center justify-between bg-surface-raised p-2 rounded-lg border border-border">
+<div class="flex items-center gap-2 flex-1">
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="w-full h-9 bg-surface-dim border border-border rounded-md pl-9 pr-3 text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all placeholder:text-on-surface-variant" placeholder="Search logs..." type="text"/>
+</div>
+<div class="w-px h-6 bg-border mx-2"></div>
+<div class="flex items-center gap-2">
+<button class="px-3 py-1.5 rounded-md text-xs font-semibold bg-surface-variant text-on-surface border border-outline-variant">All</button>
+<button class="px-3 py-1.5 rounded-md text-xs font-semibold bg-transparent text-on-surface-variant hover:bg-surface-variant/50 border border-transparent">Info</button>
+<button class="px-3 py-1.5 rounded-md text-xs font-semibold bg-transparent text-tertiary hover:bg-tertiary/10 border border-transparent">Warn</button>
+<button class="px-3 py-1.5 rounded-md text-xs font-semibold bg-transparent text-error hover:bg-error/10 border border-transparent">Error</button>
+<button class="px-3 py-1.5 rounded-md text-xs font-semibold bg-transparent text-on-surface-variant hover:bg-surface-variant/50 border border-transparent">Debug</button>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="h-9 px-3 rounded-md bg-transparent border border-border flex items-center gap-2 text-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-colors">
+<span class="material-symbols-outlined text-[18px]">delete</span> Clear
+                        </button>
+<button class="h-9 px-3 rounded-md bg-surface-dim border border-border flex items-center gap-2 text-sm text-on-surface hover:border-primary-container/50 hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">content_copy</span> Copy
+                        </button>
+</div>
+</div>
+<!-- Console Output -->
+<div class="flex-1 bg-[#0a0a0f] border border-border rounded-lg overflow-hidden flex flex-col font-mono text-sm shadow-inner relative">
+<div class="absolute inset-0 pointer-events-none rounded-lg ring-1 ring-inset ring-white/5 z-10"></div>
+<div class="flex-1 overflow-y-auto log-scroll p-4">
+<div class="flex flex-col gap-1 w-full text-on-surface-variant whitespace-pre-wrap font-mono leading-relaxed">
+<div class="hover:bg-white/5 -mx-4 px-4 py-0.5"><span class="text-outline">14:20:05</span> <span class="text-text-muted">[main/INFO]:</span> Loading Minecraft 1.21.1 with Fabric Loader 0.16.0</div>
+<div class="hover:bg-white/5 -mx-4 px-4 py-0.5"><span class="text-outline">14:20:06</span> <span class="text-text-muted">[main/INFO]:</span> Loading 42 mods...</div>
+<div class="hover:bg-white/5 -mx-4 px-4 py-0.5"><span class="text-outline">14:20:06</span> <span class="text-text-muted">[main/INFO]:</span> Loading mod: fabric-api 0.100.4</div>
+<div class="hover:bg-white/5 -mx-4 px-4 py-0.5"><span class="text-outline">14:20:06</span> <span class="text-text-muted">[main/INFO]:</span> Loading mod: sodium 0.5.11</div>
+<div class="hover:bg-tertiary/10 text-tertiary -mx-4 px-4 py-0.5"><span class="text-outline">14:20:08</span> <span class="text-tertiary-fixed">[Render thread/WARN]:</span> Missing sound for event: minecraft:item.totem.use</div>
+<div class="hover:bg-white/5 -mx-4 px-4 py-0.5"><span class="text-outline">14:20:09</span> <span class="text-text-muted">[Render thread/INFO]:</span> OpenGL version 4.6.0 NVIDIA 536.23</div>
+<div class="hover:bg-error/10 text-error -mx-4 px-4 py-0.5 border-l-2 border-error"><span class="text-outline">14:20:10</span> <span class="text-error-container">[main/ERROR]:</span> Failed to load mod 'invalid-mod': dependency 'fabric-api' missing</div>
+<div class="hover:bg-error/5 text-error-container -mx-4 px-4 py-0.5 pl-8">net.fabricmc.loader.impl.FormattedException: Mod resolution encountered an incompatible mod set!</div>
+<div class="hover:bg-error/5 text-error-container -mx-4 px-4 py-0.5 pl-8">    at net.fabricmc.loader.impl.FabricLoaderImpl.load(FabricLoaderImpl.java:192)</div>
+<div class="hover:bg-error/5 text-error-container -mx-4 px-4 py-0.5 pl-8">    at net.fabricmc.loader.impl.launch.knot.Knot.init(Knot.java:148)</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</body></html>
