@@ -977,7 +977,7 @@ pub async fn delete_file(
         )
         .await
         .wrap_api_err(
-            "executing `tech_review_sync::sync_project_tech_review_state`",
+            "executing `tech_review_queue::remove_projects_without_details`",
         )?;
 
         transaction

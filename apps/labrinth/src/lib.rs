@@ -20,7 +20,7 @@ use crate::background_task::update_versions;
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::env::ENV;
 use crate::queue::billing::{index_billing, index_subscriptions};
-use crate::routes::internal::delphi::rescan::rescan_projects_in_queue;
+
 use crate::util::anrok;
 use crate::util::archon::ArchonClient;
 use crate::util::http::HttpClient;
@@ -111,17 +111,6 @@ pub fn app_setup(
         let incremental_search_queue = search_state.queue.clone();
         actix_rt::spawn(async move {
             incremental_search_queue.run().await;
-        });
-    }
-    {
-        let pool_ref = pool.clone();
-        let http_ref = http_client.clone();
-        actix_rt::spawn(async move {
-            if let Err(err) =
-                rescan_projects_in_queue(&pool_ref, &http_ref).await
-            {
-                warn!("Delphi rescan failed: {err:#}");
-            }
         });
     }
 

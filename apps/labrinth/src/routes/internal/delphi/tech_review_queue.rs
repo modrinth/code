@@ -142,6 +142,16 @@ pub async fn add_projects_with_review_details(
         r#"
         SELECT DISTINCT detail.project_id AS "project_id!: DBProjectId"
         FROM delphi_issue_details_with_statuses detail
+		INNER JOIN delphi_report_issues issue ON issue.id = detail.issue_id
+		INNER JOIN delphi_reports report
+			ON report.id = issue.report_id
+			AND NOT EXISTS (
+				SELECT 1
+				FROM delphi_reports newer_report
+				WHERE
+					newer_report.file_id = report.file_id
+					AND newer_report.delphi_version > report.delphi_version
+			)
         WHERE
             detail.project_id = ANY($1::bigint[])
             AND detail.status IN ('pending', 'unsafe')
@@ -180,6 +190,16 @@ pub async fn remove_projects_without_details(
         WHERE NOT EXISTS (
             SELECT 1
             FROM delphi_issue_details_with_statuses detail
+			INNER JOIN delphi_report_issues issue ON issue.id = detail.issue_id
+			INNER JOIN delphi_reports report
+				ON report.id = issue.report_id
+				AND NOT EXISTS (
+					SELECT 1
+					FROM delphi_reports newer_report
+					WHERE
+						newer_report.file_id = report.file_id
+						AND newer_report.delphi_version > report.delphi_version
+				)
             WHERE detail.project_id = requested.project_id
         )
         "#,

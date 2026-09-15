@@ -25,8 +25,8 @@ use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::search::SearchState;
 use crate::util::guards::admin_key_guard;
-use crate::util::http::HttpClient;
 use crate::util::img::upload_image_optimized;
+use crate::util::kafka::KafkaClientState;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
 use actix_multipart::{Field, Multipart};
@@ -277,7 +277,7 @@ pub async fn undo_uploads(
     Ok(())
 }
 
-/// Create a project.  
+/// Create a project.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects",
@@ -295,7 +295,7 @@ pub async fn project_create(
     redis: Data<RedisPool>,
     file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
-    http: Data<HttpClient>,
+    kafka_client: Data<KafkaClientState>,
     search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
     project_create_internal(
@@ -305,7 +305,7 @@ pub async fn project_create(
         redis,
         file_host,
         session_queue,
-        http,
+        kafka_client,
         search_state,
     )
     .await
@@ -318,7 +318,7 @@ pub async fn project_create_internal(
     redis: Data<RedisPool>,
     file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
-    http: Data<HttpClient>,
+    kafka_client: Data<KafkaClientState>,
     search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
@@ -336,7 +336,7 @@ pub async fn project_create_internal(
         &client,
         &redis,
         &session_queue,
-        &http,
+        &kafka_client,
         project_id,
     )
     .await;
@@ -364,7 +364,7 @@ pub async fn project_create_internal(
     result
 }
 
-/// Create a project with a specific ID.  
+/// Create a project with a specific ID.
 ///
 /// This is a testing endpoint only accessible behind an admin key.
 #[utoipa::path(
@@ -384,7 +384,7 @@ pub async fn project_create_with_id(
     redis: Data<RedisPool>,
     file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
-    http: Data<HttpClient>,
+    kafka_client: Data<KafkaClientState>,
     search_state: Data<SearchState>,
     path: web::Path<(ProjectId,)>,
 ) -> Result<HttpResponse, CreateError> {
@@ -402,7 +402,7 @@ pub async fn project_create_with_id(
         &client,
         &redis,
         &session_queue,
-        &http,
+        &kafka_client,
         project_id,
     )
     .await;
@@ -472,7 +472,7 @@ async fn project_create_inner(
     pool: &PgPool,
     redis: &RedisPool,
     session_queue: &AuthQueue,
-    http: &reqwest::Client,
+    kafka_client: &KafkaClientState,
     project_id: ProjectId,
 ) -> Result<HttpResponse, CreateError> {
     // The currently logged in user
@@ -940,7 +940,7 @@ async fn project_create_inner(
         let now = Utc::now();
 
         let id = project_builder_actual
-            .insert(&mut *transaction, redis, file_host, http)
+            .insert(&mut *transaction, redis, file_host, kafka_client)
             .await?;
         DBUser::clear_project_cache(&[current_user.id.into()], redis).await?;
 

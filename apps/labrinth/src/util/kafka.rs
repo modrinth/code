@@ -10,10 +10,12 @@ use serde::Serialize;
 use uuid::Uuid;
 
 pub const KAFKA_OPERATION_INTERVAL: Duration = Duration::from_secs(5);
+pub const DELPHI_FILE_SCAN_TASK: &str = "delphi-file-scan";
 pub const INCREMENTAL_INDEX_SEARCH_TASK: &str = "incremental-index-search";
 
 pub struct KafkaClientState {
     pub client: FutureProducer,
+    pub delphi_file_scan_consumer: StreamConsumer,
     pub incremental_index_search_consumer: StreamConsumer,
 }
 
@@ -22,9 +24,16 @@ impl KafkaClientState {
         let client = ClientConfig::new()
             .set("bootstrap.servers", ENV.KAFKA_BOOTSTRAP_SERVERS.0.join(","))
             .set("client.id", &ENV.KAFKA_CLIENT_ID)
+            .set("acks", "all")
+            .set(
+                "delivery.timeout.ms",
+                KAFKA_OPERATION_INTERVAL.as_millis().to_string(),
+            )
             .set("broker.address.family", "v4")
             .create()
             .wrap_err("failed to create Kafka producer")?;
+        let delphi_file_scan_consumer = create_consumer(DELPHI_FILE_SCAN_TASK)
+            .wrap_err("failed to create Delphi file scan Kafka consumer")?;
         let incremental_index_search_consumer = create_consumer(
             INCREMENTAL_INDEX_SEARCH_TASK,
         )
@@ -38,6 +47,7 @@ impl KafkaClientState {
 
         Ok(Self {
             client,
+            delphi_file_scan_consumer,
             incremental_index_search_consumer,
         })
     }
@@ -50,6 +60,7 @@ pub fn create_consumer(group_id: &str) -> eyre::Result<StreamConsumer> {
         .set("group.id", group_id)
         .set("enable.auto.commit", "false")
         .set("auto.offset.reset", "earliest")
+        .set("max.poll.interval.ms", "1800000")
         .set("broker.address.family", "v4")
         .create()
         .wrap_err("failed to create Kafka consumer")

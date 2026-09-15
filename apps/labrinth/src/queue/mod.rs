@@ -1,5 +1,6 @@
 pub mod analytics;
 pub mod billing;
+pub mod delphi_scan;
 pub mod email;
 pub mod file_scan;
 pub mod moderation;

@@ -17,6 +17,7 @@ use crate::{
     auth::check_is_moderator_from_headers,
     database::{
         DBProject,
+        advisory_lock::AdvisoryLock,
         models::{
             DBFileId, DBProjectId, DBThread, DBThreadId, DBUser, DBUserId,
             DBVersion, DBVersionId, DelphiReportId, DelphiReportIssueDetailsId,
@@ -221,7 +222,7 @@ pub struct GetIssue {
     pub include_hidden: bool,
 }
 
-/// Get a Delphi report issue.  
+/// Get a Delphi report issue.
 #[utoipa::path(
 	context_path = "/moderation/tech-review",
 	tag = "moderation",
@@ -523,14 +524,16 @@ async fn fetch_project_reports(
 
     let report_rows = sqlx::query!(
         r#"
-        SELECT
+        SELECT DISTINCT ON (file_id)
             id AS "report_id!: DelphiReportId",
             file_id AS "file_id!: DBFileId",
             created,
             severity AS "severity!: DelphiSeverity"
         FROM delphi_reports
-        WHERE file_id = ANY($1::bigint[])
-        ORDER BY file_id, created, id
+        WHERE
+            file_id IS NOT NULL
+            AND file_id = ANY($1::bigint[])
+        ORDER BY file_id, delphi_version DESC
         "#,
         &file_rows.iter().map(|f| f.file_id.0).collect::<Vec<_>>()
     )
@@ -792,7 +795,15 @@ pub async fn search_projects(
         INNER JOIN threads t ON t.mod_id = m.id
         LEFT JOIN versions v ON v.mod_id = m.id
         LEFT JOIN files f ON f.version_id = v.id
-        LEFT JOIN delphi_reports dr ON dr.file_id = f.id
+        LEFT JOIN delphi_reports dr
+            ON dr.file_id = f.id
+            AND NOT EXISTS (
+                SELECT 1
+                FROM delphi_reports newer_dr
+                WHERE
+                    newer_dr.file_id = dr.file_id
+                    AND newer_dr.delphi_version > dr.delphi_version
+            )
         LEFT JOIN delphi_report_issues dri ON dri.report_id = dr.id
         LEFT JOIN delphi_issue_details_with_statuses didws
             ON didws.issue_id = dri.id
@@ -849,6 +860,13 @@ pub async fn search_projects(
                         ON issue_file.version_id = issue_version.id
                     INNER JOIN delphi_reports issue_report
                         ON issue_report.file_id = issue_file.id
+                        AND NOT EXISTS (
+                            SELECT 1
+                            FROM delphi_reports newer_issue_report
+                            WHERE
+                                newer_issue_report.file_id = issue_report.file_id
+                                AND newer_issue_report.delphi_version > issue_report.delphi_version
+                        )
                     INNER JOIN delphi_report_issues issue
                         ON issue.report_id = issue_report.id
                     INNER JOIN delphi_issue_details_with_statuses detail
@@ -1114,7 +1132,15 @@ pub async fn submit_report(
         FROM mods m
         INNER JOIN versions v ON v.mod_id = m.id
         INNER JOIN files f ON f.version_id = v.id
-        INNER JOIN delphi_reports dr ON dr.file_id = f.id
+        INNER JOIN delphi_reports dr
+            ON dr.file_id = f.id
+            AND NOT EXISTS (
+                SELECT 1
+                FROM delphi_reports newer_dr
+                WHERE
+                    newer_dr.file_id = dr.file_id
+                    AND newer_dr.delphi_version > dr.delphi_version
+            )
         INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
         INNER JOIN delphi_issue_details_with_statuses didws ON didws.issue_id = dri.id
         WHERE
@@ -1422,7 +1448,7 @@ pub async fn update_issue_details(
     )
     .await
     .wrap_api_err(
-        "executing `tech_review_sync::sync_project_tech_review_state`",
+        "executing `tech_review_queue::add_projects_with_review_details`",
     )?;
 
     txn.commit()
@@ -1558,7 +1584,7 @@ pub async fn update_global_issue_details(
     )
     .await
     .wrap_api_err(
-        "executing `tech_review_sync::sync_detail_key_tech_review_state`",
+        "executing `tech_review_queue::add_projects_with_review_details`",
     )?;
 
     txn.commit()
@@ -1604,6 +1630,12 @@ pub async fn add_report(
         .begin()
         .await
         .wrap_internal_err("failed to begin transaction")?;
+    let db_file_id = DBFileId::from(file_id);
+
+    AdvisoryLock::DelphiFile(db_file_id)
+        .acquire(&mut txn)
+        .await
+        .wrap_internal_err("failed to lock file for Delphi report insertion")?;
 
     let record = sqlx::query!(
         r#"
@@ -1615,7 +1647,7 @@ pub async fn add_report(
         WHERE f.id = $1
         GROUP BY f.url
         "#,
-        DBFileId::from(file_id) as _,
+        db_file_id as _,
     )
     .fetch_one(&mut txn)
     .await
@@ -1627,7 +1659,7 @@ pub async fn add_report(
 
     let report_id = DBDelphiReport {
         id: DelphiReportId(0),
-        file_id: Some(file_id.into()),
+        file_id: Some(db_file_id),
         delphi_version: -1, // TODO
         artifact_url: record.url,
         created: Utc::now(),
