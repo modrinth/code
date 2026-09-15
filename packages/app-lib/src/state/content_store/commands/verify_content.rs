@@ -115,7 +115,16 @@ impl ContentStore {
         }
         if !restoration_pending {
             for path in quarantined {
-                filesystem::remove_unused_file(&path).await?;
+                let name = path
+                    .file_name()
+                    .ok_or_else(|| input("Invalid quarantined content path"))?;
+                let backup = self.root.join("recovered-content").join(name);
+                filesystem::move_instance_file(&path, &backup).await?;
+                tracing::warn!(
+                    sha512 = %stored_file.metadata.sha512,
+                    path = %backup.display(),
+                    "Preserved original content after repair; remove this recovery file manually when no longer needed",
+                );
             }
         }
         Ok(())
