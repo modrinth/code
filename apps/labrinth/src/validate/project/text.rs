@@ -1009,6 +1009,7 @@ pub(super) fn extract_description_blocks(markdown: &str) -> Vec<String> {
     let readable = description_language_input(markdown);
     let mut blocks = Vec::new();
     let mut paragraph = Vec::new();
+    let mut paragraph_word_count = 0;
     let mut previous_line_was_heading = false;
     let mut follows_blank_line = false;
 
@@ -1020,28 +1021,27 @@ pub(super) fn extract_description_blocks(markdown: &str) -> Vec<String> {
         }
 
         let is_heading = line.starts_with('#');
+        let line_word_count =
+            WORD.find_iter(line).take(MIN_PARAGRAPH_WORDS).count();
         let starts_new_paragraph = follows_blank_line
             && !previous_line_was_heading
-            && (has_minimum_word_count(
-                &paragraph.join(" "),
-                MIN_PARAGRAPH_WORDS,
-            ) || has_minimum_word_count(line, MIN_PARAGRAPH_WORDS));
+            && (paragraph_word_count >= MIN_PARAGRAPH_WORDS
+                || line_word_count >= MIN_PARAGRAPH_WORDS);
 
         if is_heading || starts_new_paragraph {
             push_description_block(&mut blocks, &mut paragraph);
+            paragraph_word_count = 0;
         }
 
         paragraph.push(line);
+        paragraph_word_count =
+            (paragraph_word_count + line_word_count).min(MIN_PARAGRAPH_WORDS);
         previous_line_was_heading = is_heading;
         follows_blank_line = false;
     }
 
     push_description_block(&mut blocks, &mut paragraph);
     blocks
-}
-
-fn has_minimum_word_count(text: &str, minimum: usize) -> bool {
-    WORD.find_iter(text).take(minimum).count() == minimum
 }
 
 fn push_description_block(blocks: &mut Vec<String>, paragraph: &mut Vec<&str>) {
