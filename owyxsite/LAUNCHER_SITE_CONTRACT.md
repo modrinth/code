@@ -59,9 +59,14 @@ The key is configured as `LAUNCHER_CLIENT_KEY` on the site and `OWYX_CLIENT_KEY`
 
 ## Auth flow (Owyx account in the launcher)
 
-1. `POST /api/auth/login` with `{ "email", "password" }`.
+1. `POST /api/auth/login` with `{ "email", "password", "remember": true }`.
+   - Browser (Host: `owyx.site`): may require Cloudflare Turnstile (`turnstileToken`).
+   - **Launcher** (Host: `api.owyx.site` **and** valid `X-Owyx-Client-Key`):
+     Turnstile is **skipped**. Browser Host (`owyx.site`) always requires captcha
+     even if the client key header is present.
    - `200` → `{ success: true, token, user }`. `token` is a JWT.
    - `401`/`403` → `{ error }` (wrong credentials / inactive). Show a human message.
+   - `401 unauthorized_client` → missing/invalid client key (configure in Owyx Servers settings).
 2. Store the JWT securely (OS app-data, never plaintext in the UI).
 3. `GET /api/launcher/me` with `Authorization: Bearer <token>` → profile + access.
    Session rows store a SHA-256 of the JWT (legacy base64 hashes are migrated on
@@ -331,3 +336,14 @@ migration `004_nickname_cooldown.sql`).
 - Stable surface under `/api/launcher/v1/*`. `GET /v1/status.version` is the
   contract version (`1.1.0`). Additive changes bump the minor; breaking changes
   add `/v2/`.
+
+## Launcher client (apps/app-frontend)
+
+- Catalog fetch: `GET /api/launcher/v1/servers` (primary), with legacy fallbacks
+  `/api/launcher/servers` and `/v1/launcher/catalog`.
+- Maps contract fields: `name`, `address` (+ `port`), `minecraft`, `loader`,
+  `iconUrl`, nested `pack.downloadUrl` → `packUrl`, `requiresAccount`.
+- Site account: `POST /api/auth/login` + `GET /api/launcher/me` (JWT in app storage).
+- Demo seed is **opt-in** (`owyx.demoServers`); default off.
+- Security gates: CSP `api.owyx.site`, https-only pack/icon (reject `//`),
+  http API base loopback-only, client key not sent to localhost fallback.

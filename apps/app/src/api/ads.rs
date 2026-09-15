@@ -34,7 +34,7 @@ const ADS_USER_AGENT: &str = concat!(
     "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36 ",
     "ModrinthApp/",
     env!("CARGO_PKG_VERSION"),
-    " (Modrinth App)",
+    " (Owyx)",
 );
 
 fn emit_ads_consent_required(required: bool) {
@@ -52,14 +52,14 @@ fn ads_user_agent_override_params() -> String {
             "brands": [
                 { "brand": "Chromium", "version": "128" },
                 { "brand": "Google Chrome", "version": "128" },
-                { "brand": "Modrinth App", "version": env!("CARGO_PKG_VERSION") },
+                { "brand": "Owyx", "version": env!("CARGO_PKG_VERSION") },
                 { "brand": "Not=A?Brand", "version": "99" },
             ],
             "fullVersion": "128.0.0.0",
             "fullVersionList": [
                 { "brand": "Chromium", "version": "128.0.0.0" },
                 { "brand": "Google Chrome", "version": "128.0.0.0" },
-                { "brand": "Modrinth App", "version": env!("CARGO_PKG_VERSION") },
+                { "brand": "Owyx", "version": env!("CARGO_PKG_VERSION") },
                 { "brand": "Not=A?Brand", "version": "99.0.0.0" },
             ],
             "platform": "Windows",

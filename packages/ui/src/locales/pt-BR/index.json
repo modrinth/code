@@ -3039,16 +3039,16 @@
     "defaultMessage": "Mantenha os arquivos atualizados quando o servidor mudar"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Baixe o Modrinth App"
+    "defaultMessage": "Baixe o Owyx"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "O Modrinth App vai abrir automaticamente..."
+    "defaultMessage": "O Owyx vai abrir automaticamente..."
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "Abrindo o Modrinth App"
+    "defaultMessage": "Abrindo o Owyx"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "Por que usar o Modrinth App"
+    "defaultMessage": "Por que usar o Owyx"
   },
   "notification.error.title": {
     "defaultMessage": "Ocorreu um erro"
@@ -5322,7 +5322,7 @@
     "defaultMessage": "Novo servidor"
   },
   "servers.list-empty.no-servers-description": {
-    "defaultMessage": "Instale mods, convide amigos e joguem juntos, tudo pelo Modrinth App."
+    "defaultMessage": "Instale mods, convide amigos e joguem juntos, tudo pelo Owyx."
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Escolha seus mods favoritos e nós cuidamos do resto."
@@ -5331,7 +5331,7 @@
     "defaultMessage": "Instalação de mods com um clique"
   },
   "servers.list-empty.play-with-friends-description": {
-    "defaultMessage": "Convide seus amigos para jogar no seu servidor com um clique pelo Modrinth App."
+    "defaultMessage": "Convide seus amigos para jogar no seu servidor com um clique pelo Owyx."
   },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Jogue com amigos"
@@ -5928,7 +5928,7 @@
     "defaultMessage": "Resultados da busca"
   },
   "settings.language.coverage.app-tooltip": {
-    "defaultMessage": "Cerca de {percentage}% do Modrinth App está disponível neste idioma."
+    "defaultMessage": "Cerca de {percentage}% do Owyx está disponível neste idioma."
   },
   "settings.language.coverage.label": {
     "defaultMessage": "{percentage}% suportado"

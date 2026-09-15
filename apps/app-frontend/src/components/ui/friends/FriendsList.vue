@@ -197,7 +197,7 @@ const messages = defineMessages({
 	signInToAddFriends: {
 		id: 'friends.sign-in-to-add-friends',
 		defaultMessage:
-			"<link>Sign in to a Modrinth account</link> to add friends and see what they're playing!",
+			"<link>Sign in to an Owyx account</link> to add friends and see what they're playing!",
 	},
 	addFriendsToShare: {
 		id: 'friends.add-friends-to-share',

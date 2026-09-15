@@ -11,41 +11,19 @@ export default new createRouter({
 			component: () => import('@/pages/Index.vue'),
 		},
 		{
+			path: '/owyx-servers',
+			name: 'OwyxServers',
+			component: () => import('@/pages/OwyxServers.vue'),
+		},
+		{
 			path: '/hosting/manage/',
 			name: 'Servers',
-			component: () => import('@/pages/Servers.vue'),
+			redirect: '/owyx-servers',
 		},
 		{
 			path: '/hosting/manage/:id',
 			name: 'ServerManage',
-			component: () => import('@/pages/hosting/manage/Index.vue'),
-			children: [
-				{
-					path: '',
-					name: 'ServerManageOverview',
-					component: () => import('@/pages/hosting/manage/Overview.vue'),
-				},
-				{
-					path: 'content',
-					name: 'ServerManageContent',
-					component: () => import('@/pages/hosting/manage/Content.vue'),
-				},
-				{
-					path: 'files',
-					name: 'ServerManageFiles',
-					component: () => import('@/pages/hosting/manage/Files.vue'),
-				},
-				{
-					path: 'backups',
-					name: 'ServerManageBackups',
-					component: () => import('@/pages/hosting/manage/Backups.vue'),
-				},
-				{
-					path: 'access',
-					name: 'ServerManageAccess',
-					component: () => import('@/pages/hosting/manage/Access.vue'),
-				},
-			],
+			redirect: '/owyx-servers',
 		},
 		{
 			path: '/browse/:projectType',

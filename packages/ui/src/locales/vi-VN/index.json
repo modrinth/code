@@ -2256,16 +2256,16 @@
     "defaultMessage": "Luôn cập nhật các file khi server thay đổi"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Tải Modrinth App"
+    "defaultMessage": "Tải Owyx"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "Modrinth App sẽ được tự động mở..."
+    "defaultMessage": "Owyx sẽ được tự động mở..."
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "Mở Modrinth App"
+    "defaultMessage": "Mở Owyx"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "Tại sao nên sử dụng Modrinth App"
+    "defaultMessage": "Tại sao nên sử dụng Owyx"
   },
   "notification.error.title": {
     "defaultMessage": "Đã xảy ra lỗi"

@@ -288,13 +288,13 @@
     "message": "Modrinth Pride"
   },
   "app.update-popup.body.download-complete": {
-    "message": "Tapos nang ma-download ang Modrinth App v{version}. Mag-reload upang ma-update ngayon, o awtomatiko sa pagsara ng Modrinth App."
+    "message": "Tapos nang ma-download ang Owyx v{version}. Mag-reload upang ma-update ngayon, o awtomatiko sa pagsara ng Owyx."
   },
   "app.update-popup.body.linux": {
-    "message": "Magagamit na ngayon ang Modrinth App v{version}. Gamitin ang iyong package manager upang i-update sa pinabagong tampok at pag-aayos!"
+    "message": "Magagamit na ngayon ang Owyx v{version}. Gamitin ang iyong package manager upang i-update sa pinabagong tampok at pag-aayos!"
   },
   "app.update-popup.body.metered": {
-    "message": "Magagamit na ngayon ang Modrinth App v{version}! Hindi namin dinanload kaagad dahil naka-metro ang inyong network."
+    "message": "Magagamit na ngayon ang Owyx v{version}! Hindi namin dinanload kaagad dahil naka-metro ang inyong network."
   },
   "app.update-popup.changelog": {
     "message": "Changelog"

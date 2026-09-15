@@ -7,11 +7,10 @@
 		<array>
 			<dict>
 				<key>CFBundleURLName</key>
-				<string>ModrinthApp</string>
+				<string>Owyx</string>
 				<key>CFBundleURLSchemes</key>
 				<array>
-					<string>modrinth</string>
-					<string>modrinthscheme</string>
+					<string>owyx</string>
 				</array>
 			</dict>
 		</array>

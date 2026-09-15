@@ -3030,16 +3030,16 @@
     "defaultMessage": "Houd de bestanden geupdate wanneer de server verandert"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Krijg de Modrinth App"
+    "defaultMessage": "Krijg de Owyx"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "De Modrinth App zal automatisch openen..."
+    "defaultMessage": "De Owyx zal automatisch openen..."
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "Bezig met de Modrinth App openen"
+    "defaultMessage": "Bezig met de Owyx openen"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "Waarom de Modrinth App gebruiken"
+    "defaultMessage": "Waarom de Owyx gebruiken"
   },
   "notification.error.title": {
     "defaultMessage": "Er is een fout opgetreden"
@@ -5865,7 +5865,7 @@
     "defaultMessage": "Donker"
   },
   "settings.display.theme.description": {
-    "defaultMessage": "Selecteer je voorkeur kleurenthema voor de Modrinth App."
+    "defaultMessage": "Selecteer je voorkeur kleurenthema voor de Owyx."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Licht"
@@ -5910,13 +5910,13 @@
     "defaultMessage": "Zoekresultaten"
   },
   "settings.language.coverage.app-tooltip": {
-    "defaultMessage": "Ongeveer {percentage}% van de Modrinth App is beschikbaar in deze taal."
+    "defaultMessage": "Ongeveer {percentage}% van de Owyx is beschikbaar in deze taal."
   },
   "settings.language.coverage.label": {
     "defaultMessage": "{percentage}% ondersteund"
   },
   "settings.language.coverage.website-tooltip": {
-    "defaultMessage": "Ongeveer {percentage}% van de Modrinth App is beschikbaar in deze taal."
+    "defaultMessage": "Ongeveer {percentage}% van de Owyx is beschikbaar in deze taal."
   },
   "settings.language.description": {
     "defaultMessage": "Kies de taal van je voorkeur voor het/de {platform}. De vertalingen worden aangeleverd door vrijwilligers <crowdin-link>op Crowdin</crowdin-link>."

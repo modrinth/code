@@ -3039,16 +3039,16 @@
     "defaultMessage": "Aktualisiere Dateien wenn der Server sich ändert"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Modrinth App herunterladen"
+    "defaultMessage": "Owyx herunterladen"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "Die Modrinth App wird sich automatisch öffnen..."
+    "defaultMessage": "Die Owyx wird sich automatisch öffnen..."
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "Öffne Modrinth App"
+    "defaultMessage": "Öffne Owyx"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "Warum die Modrinth App nutzen"
+    "defaultMessage": "Warum die Owyx nutzen"
   },
   "notification.error.title": {
     "defaultMessage": "Ein Fehler ist aufgetreten"
@@ -5322,7 +5322,7 @@
     "defaultMessage": "Neuer Server"
   },
   "servers.list-empty.no-servers-description": {
-    "defaultMessage": "Installiere Mods, lade Freunde ein und spiel gemeinsam, alles über die Modrinth App."
+    "defaultMessage": "Installiere Mods, lade Freunde ein und spiel gemeinsam, alles über die Owyx."
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Wähle deine Lieblingsmods aus, den Rest erledigen wir."
@@ -5331,7 +5331,7 @@
     "defaultMessage": "Installation von Mods mit nur einem Klick"
   },
   "servers.list-empty.play-with-friends-description": {
-    "defaultMessage": "Lade Freunde mit nur einem Klick über die Modrinth App zu deinem Server ein."
+    "defaultMessage": "Lade Freunde mit nur einem Klick über die Owyx zu deinem Server ein."
   },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Spiel mit Freunden"
@@ -5928,7 +5928,7 @@
     "defaultMessage": "Suchergebnisse"
   },
   "settings.language.coverage.app-tooltip": {
-    "defaultMessage": "Etwa {percentage}% der Modrinth App ist in dieser Sprache verfügbar."
+    "defaultMessage": "Etwa {percentage}% der Owyx ist in dieser Sprache verfügbar."
   },
   "settings.language.coverage.label": {
     "defaultMessage": "{percentage}% unterstützt"

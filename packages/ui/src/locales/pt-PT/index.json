@@ -1137,16 +1137,16 @@
     "defaultMessage": "Mantém ficheiros atualizados quando o servidor muda"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Obter a Modrinth App"
+    "defaultMessage": "Obter a Owyx"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "A Modrinth App vai abrir automaticamente..."
+    "defaultMessage": "A Owyx vai abrir automaticamente..."
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "A abrir a Modrinth App"
+    "defaultMessage": "A abrir a Owyx"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "Razões para usar a Modrinth App"
+    "defaultMessage": "Razões para usar a Owyx"
   },
   "notification.error.title": {
     "defaultMessage": "Ocorreu um erro"

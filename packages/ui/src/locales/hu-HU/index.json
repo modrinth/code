@@ -3018,16 +3018,16 @@
     "defaultMessage": "Tartsd naprakészen a fájlokat, amikor a szerver változik"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Szerezd meg a Modrinth Appot"
+    "defaultMessage": "Szerezd meg a Owyxot"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "A Modrinth App automatikusan megnyílik..."
+    "defaultMessage": "A Owyx automatikusan megnyílik..."
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "A Modrinth App megnyitása"
+    "defaultMessage": "A Owyx megnyitása"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "Miért használd a Modrinth Appot?"
+    "defaultMessage": "Miért használd a Owyxot?"
   },
   "notification.error.title": {
     "defaultMessage": "Hiba történt"
@@ -5301,7 +5301,7 @@
     "defaultMessage": "Új szerver"
   },
   "servers.list-empty.no-servers-description": {
-    "defaultMessage": "Telepíts modokat, hívd meg a barátaidat, és játsszatok együtt, mindezt a Modrinth Appban."
+    "defaultMessage": "Telepíts modokat, hívd meg a barátaidat, és játsszatok együtt, mindezt a Owyxban."
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Válaszd ki a kedvenc modjaidat, a többit bízd ránk!"
@@ -5310,7 +5310,7 @@
     "defaultMessage": "Modok telepítése egy kattintással"
   },
   "servers.list-empty.play-with-friends-description": {
-    "defaultMessage": "Hívd meg barátaidat játszani a szerveredre a Modrinth Appból, egyetlen kattintással."
+    "defaultMessage": "Hívd meg barátaidat játszani a szerveredre a Owyxból, egyetlen kattintással."
   },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Játssz a barátaiddal"
@@ -5907,7 +5907,7 @@
     "defaultMessage": "Keresési eredmények"
   },
   "settings.language.coverage.app-tooltip": {
-    "defaultMessage": "A Modrinth App körülbelül {percentage}%-a érhető el ezen a nyelven."
+    "defaultMessage": "A Owyx körülbelül {percentage}%-a érhető el ezen a nyelven."
   },
   "settings.language.coverage.label": {
     "defaultMessage": "{percentage}% támogatott"

@@ -50,7 +50,7 @@ const messages = defineMessages({
 	},
 	syncAcrossDevicesSignedOutTooltip: {
 		id: 'app.behavior-settings.sync-across-devices.signed-out-tooltip',
-		defaultMessage: 'Sign into a Modrinth account to sync settings.',
+		defaultMessage: 'Sign into an Owyx account to sync settings.',
 	},
 	startupAndNavigationTitle: {
 		id: 'app.behavior-settings.startup-and-navigation.title',
@@ -70,7 +70,7 @@ const messages = defineMessages({
 	},
 	minimizeLauncherDescription: {
 		id: 'app.appearance-settings.minimize-launcher.description',
-		defaultMessage: 'Minimize Modrinth App when Minecraft starts.',
+		defaultMessage: 'Minimize Owyx when Minecraft starts.',
 	},
 	defaultLandingPageHome: {
 		id: 'app.appearance-settings.default-landing-page.home',

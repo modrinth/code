@@ -165,7 +165,7 @@
     "message": "Namensschild ausblenden"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimiere die Modrinth App, wenn Minecraft startet."
+    "message": "Minimiere die Owyx, wenn Minecraft startet."
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "App minimieren"
@@ -405,7 +405,7 @@
     "message": "Instanz anzeigen"
   },
   "app.hosting.update-required.description": {
-    "message": "Du musst aktualisieren, um Modrinth Hosting durch die Modrinth App zu verwenden"
+    "message": "Du musst aktualisieren, um Modrinth Hosting durch die Owyx zu verwenden"
   },
   "app.hosting.update-required.download": {
     "message": "Zum Aktualisieren herunterladen"
@@ -414,7 +414,7 @@
     "message": "Begeisterter Modrinth-Bot"
   },
   "app.hosting.update-required.title": {
-    "message": "Update der Modrinth App erforderlich"
+    "message": "Update der Owyx erforderlich"
   },
   "app.install.phase.downloading_content": {
     "message": "Inhalte werden heruntergeladen"
@@ -1545,7 +1545,7 @@
     "message": "Älteste"
   },
   "app.settings.app-version": {
-    "message": "Modrinth App {version}"
+    "message": "Owyx {version}"
   },
   "app.settings.default-instance-options.environment-variables.description": {
     "message": "Umgebungsvariablen, die beim Starten einer Instanz gesetzt werden."
@@ -2658,7 +2658,7 @@
     "message": "Werbung ermöglicht Modrinth und finanziert die Auszahlungen an die Ersteller. Unsere Partner speichern möglicherweise Cookies in der App oder greifen auf diese zu, um Werbung zu personalisieren und die Leistung zu messen. Du kannst dies unten deaktivieren oder deine Einstellungen verwalten."
   },
   "app.settings.privacy.discord-rich-presence.description": {
-    "message": "Zeige Modrinth App als deine aktuelle Aktivität auf Discord. Dies betrifft nicht Rich Presence die von Mods zu Instanzen hinzugefügt wird. Benötigt einen Neustart der App."
+    "message": "Zeige Owyx als deine aktuelle Aktivität auf Discord. Dies betrifft nicht Rich Presence die von Mods zu Instanzen hinzugefügt wird. Benötigt einen Neustart der App."
   },
   "app.settings.privacy.discord-rich-presence.title": {
     "message": "Discord Rich Presence"
@@ -2703,7 +2703,7 @@
     "message": "Nach einem App-Verzeichnis suchen"
   },
   "app.settings.resource-management.app-directory.description": {
-    "message": "Wo Modrinth App Instanzen und andere Dateien speichert. Änderungen werden nach dem Neustarten der App angewendet."
+    "message": "Wo Owyx Instanzen und andere Dateien speichert. Änderungen werden nach dem Neustarten der App angewendet."
   },
   "app.settings.resource-management.app-directory.select": {
     "message": "Neues App-Verzeichnis auswählen"
@@ -3138,7 +3138,7 @@
     "message": "Aktivieren"
   },
   "app.survey.body": {
-    "message": "Könntest du ein paar Fragen über deine Erfahrung mit Modrinth App beantworten?"
+    "message": "Könntest du ein paar Fragen über deine Erfahrung mit Owyx beantworten?"
   },
   "app.survey.footer": {
     "message": "Das Feedback geht direkt an das Modrinth-Team und wird helfen, zukünftige Updates zu gestalten!"
@@ -3282,13 +3282,13 @@
     "message": "Synchronisierte Ressourcenpakete"
   },
   "app.update-popup.body.download-complete": {
-    "message": "Modrinth App v{version} wurde heruntergeladen. Jetzt neu laden, um sofort zu aktualisieren, oder beim Schließen der Modrinth-App automatisch aktualisieren."
+    "message": "Owyx v{version} wurde heruntergeladen. Jetzt neu laden, um sofort zu aktualisieren, oder beim Schließen der Modrinth-App automatisch aktualisieren."
   },
   "app.update-popup.body.linux": {
-    "message": "Modrinth App v{version} ist verfügbar. Verwende deinen Paketmanager, um die neuesten Funktionen und Fehlerbehebungen zu installieren!"
+    "message": "Owyx v{version} ist verfügbar. Verwende deinen Paketmanager, um die neuesten Funktionen und Fehlerbehebungen zu installieren!"
   },
   "app.update-popup.body.metered": {
-    "message": "Modrinth App v{version} ist jetzt verfügbar! Da du ein getaktetes Netzwerk nutzt, haben wir den Download nicht automatisch gestartet."
+    "message": "Owyx v{version} ist jetzt verfügbar! Da du ein getaktetes Netzwerk nutzt, haben wir den Download nicht automatisch gestartet."
   },
   "app.update-popup.changelog": {
     "message": "Änderungen"

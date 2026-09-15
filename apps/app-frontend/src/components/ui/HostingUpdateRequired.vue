@@ -15,11 +15,11 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	title: {
 		id: 'app.hosting.update-required.title',
-		defaultMessage: 'Modrinth App update required',
+		defaultMessage: 'Owyx update required',
 	},
 	description: {
 		id: 'app.hosting.update-required.description',
-		defaultMessage: 'You need to update to use Modrinth Hosting through the Modrinth App',
+		defaultMessage: 'You need to update Owyx to use this feature',
 	},
 	downloadToUpdate: {
 		id: 'app.hosting.update-required.download',
@@ -35,7 +35,7 @@ const messages = defineMessages({
 	},
 	excitedRinthbotAlt: {
 		id: 'app.hosting.update-required.rinthbot-alt',
-		defaultMessage: 'Excited Modrinth Bot',
+		defaultMessage: 'Owyx update',
 	},
 })
 
@@ -43,7 +43,7 @@ useRootBreadcrumb({
 	slot: 'root',
 	id: 'servers',
 	label: () => formatMessage(commonMessages.serversLabel),
-	to: '/hosting/manage/',
+	to: '/owyx-servers',
 	visual: { type: 'icon', component: ServerStackIcon },
 })
 

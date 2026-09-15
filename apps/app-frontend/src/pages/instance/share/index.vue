@@ -1,6 +1,6 @@
 <template>
 	<div v-if="!instance.quarantined" class="flex flex-col gap-4">
-		<ModrinthAccountRequiredModal ref="accountRequiredModal" :request-auth="requestAuth" />
+		<ModrinthAccountRequiredModal ref="accountRequiredModal" />
 		<InvitePlayersModal
 			ref="invitePlayersModal"
 			:header="formatMessage(messages.shareModalHeader, { name: instance.name })"
@@ -152,7 +152,6 @@ import {
 	isSharedInstanceUnavailableError,
 } from '@/helpers/install'
 import { edit } from '@/helpers/instance'
-import type { ModrinthAuthFlow } from '@/helpers/mr_auth.ts'
 import {
 	sharedInstanceErrorMessages,
 	useSharedInstanceErrors,
@@ -391,12 +390,6 @@ function removeMember(row: ShareRow) {
 }
 function userProfileLink(username: string) {
 	return !username || username.includes('@') ? undefined : `/user/${encodeURIComponent(username)}`
-}
-async function requestAuth(flow: ModrinthAuthFlow) {
-	await auth.requestSignIn(`/instance/${encodeURIComponent(instance.value.id)}/share`, flow, {
-		showModal: false,
-	})
-	return !!auth.session_token.value
 }
 function signInToShare(event?: MouseEvent) {
 	void accountRequiredModal.value?.show(event)

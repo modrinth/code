@@ -5,7 +5,6 @@ import {
 	LanguagesIcon,
 	LightBulbIcon,
 	MicrochipIcon,
-	ModrinthIcon,
 	PaintbrushIcon,
 	RefreshCwIcon,
 	Settings2Icon,
@@ -312,7 +311,7 @@ const messages = defineMessages({
 	},
 	appVersion: {
 		id: 'app.settings.app-version',
-		defaultMessage: 'Modrinth App {version}',
+		defaultMessage: 'Owyx {version}',
 	},
 	macos: {
 		id: 'app.settings.operating-system.macos',
@@ -373,7 +372,7 @@ const messages = defineMessages({
 						}"
 						@click="devModeCount"
 					>
-						<ModrinthIcon aria-hidden="true" class="w-6 h-6" />
+						<img src="/owyx-icon.svg" alt="" aria-hidden="true" class="w-6 h-6" />
 					</button>
 					<div v-if="appInfo" class="max-w-[200px]">
 						<p class="m-0">

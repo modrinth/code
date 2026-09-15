@@ -339,7 +339,7 @@
     "message": "신난 Modrinth Bot"
   },
   "app.hosting.update-required.title": {
-    "message": "Modrinth App 업데이트 필요"
+    "message": "Owyx 업데이트 필요"
   },
   "app.install.phase.downloading_content": {
     "message": "콘텐츠 다운로드 중"
@@ -1296,7 +1296,7 @@
     "message": "광고는 Modrinth가 운영될 수 있도록 하며, 크리에이터에게 지급되는 보상을 지원합니다. 우리의 파트너는 앱에서 광고를 개인 맞춤으로 제공하고 성과를 측정하기 위해 쿠키를 저장하거나 접근할 수 있습니다. 아래에서 거부하거나 환경 설정을 관리할 수 있습니다."
   },
   "app.settings.privacy.discord-rich-presence.description": {
-    "message": "Discord의 현재 활동 상태에 Modrinth App을 표시합니다. 모드가 인스턴스에 추가한 Rich Presence에는 영향을 미치지 않습니다. 앱 재시작이 필요합니다."
+    "message": "Discord의 현재 활동 상태에 Owyx을 표시합니다. 모드가 인스턴스에 추가한 Rich Presence에는 영향을 미치지 않습니다. 앱 재시작이 필요합니다."
   },
   "app.settings.privacy.discord-rich-presence.title": {
     "message": "Discord 활동 상태"
@@ -1341,7 +1341,7 @@
     "message": "앱 디렉터리 찾아보기"
   },
   "app.settings.resource-management.app-directory.description": {
-    "message": "Modrinth App이 인스턴스 및 기타 파일을 저장하는 위치입니다. 변경 사항은 앱을 재시작한 후 적용됩니다."
+    "message": "Owyx이 인스턴스 및 기타 파일을 저장하는 위치입니다. 변경 사항은 앱을 재시작한 후 적용됩니다."
   },
   "app.settings.resource-management.app-directory.select": {
     "message": "새 앱 디렉터리 선택"
@@ -1548,7 +1548,7 @@
     "message": "안녕하세요, Modrinth 사용자님!"
   },
   "app.update-popup.body.download-complete": {
-    "message": "Modrinth App v{version} 다운로드가 완료되었습니다. 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트됩니다."
+    "message": "Owyx v{version} 다운로드가 완료되었습니다. 새로고침하거나 Owyx을 종료하면 자동으로 업데이트됩니다."
   },
   "app.update-popup.body.linux": {
     "message": "Modrinth 앱 v{version}을 사용할 수 있습니다. 최신 기능과 오류 수정을 적용하려면 패키지 관리자를 통해 업데이트하세요!"

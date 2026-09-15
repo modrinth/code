@@ -55,7 +55,7 @@ const messages = defineMessages({
 	},
 	appCoverageTooltip: {
 		id: 'settings.language.coverage.app-tooltip',
-		defaultMessage: 'About {percentage}% of the Modrinth App is available in this language.',
+		defaultMessage: 'About {percentage}% of the Owyx is available in this language.',
 	},
 	websiteCoverageTooltip: {
 		id: 'settings.language.coverage.website-tooltip',

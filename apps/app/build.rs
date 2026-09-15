@@ -14,6 +14,7 @@ fn main() {
                     .commands(&[
                         "check_reachable",
                         "login",
+                        "login_offline",
                         "remove_user",
                         "get_default_user",
                         "set_default_user",
@@ -146,7 +147,10 @@ fn main() {
             .plugin(
                 "onboarding-checklist",
                 InlinedPlugin::new()
-                    .commands(&["get_onboarding_checklist"])
+                    .commands(&[
+                        "get_onboarding_checklist",
+                        "mark_logged_into_owyx_site",
+                    ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
                     ),

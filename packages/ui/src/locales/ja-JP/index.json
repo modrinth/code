@@ -2997,16 +2997,16 @@
     "defaultMessage": "サーバーが変更したときにファイルを更新し続ける"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Modrinth Appを入手する"
+    "defaultMessage": "Owyxを入手する"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "Modrinth Appが自動で開きます…"
+    "defaultMessage": "Owyxが自動で開きます…"
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "Modrinth Appを開く"
+    "defaultMessage": "Owyxを開く"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "なぜModrinth Appを使うのか"
+    "defaultMessage": "なぜOwyxを使うのか"
   },
   "notification.error.title": {
     "defaultMessage": "エラーが発生しました"
@@ -4917,7 +4917,7 @@
     "defaultMessage": "新しいサーバー"
   },
   "servers.list-empty.no-servers-description": {
-    "defaultMessage": "Modrinth Appを使えば、MODのインストール、友達の招待、そして一緒にプレイすることなど、すべてが可能です。"
+    "defaultMessage": "Owyxを使えば、MODのインストール、友達の招待、そして一緒にプレイすることなど、すべてが可能です。"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "お好みのModを選んだら、あとはすべて対応いたします。"
@@ -5328,7 +5328,7 @@
     "defaultMessage": "検索結果"
   },
   "settings.language.coverage.app-tooltip": {
-    "defaultMessage": "Modrinth Appの約{percentage}%がこの言語で利用可能です。"
+    "defaultMessage": "Owyxの約{percentage}%がこの言語で利用可能です。"
   },
   "settings.language.coverage.label": {
     "defaultMessage": "{percentage}%翻訳済み"

@@ -165,7 +165,7 @@
     "message": "Cacher le pseudo"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimiser Modrinth App quand Minecraft se lance."
+    "message": "Minimiser Owyx quand Minecraft se lance."
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimiser l'application"
@@ -405,7 +405,7 @@
     "message": "Voir l'instance"
   },
   "app.hosting.update-required.description": {
-    "message": "Vous avez besoin de mettre à jour pour utiliser Modrinth Hosting via Modrinth App"
+    "message": "Vous avez besoin de mettre à jour pour utiliser Modrinth Hosting via Owyx"
   },
   "app.hosting.update-required.download": {
     "message": "Télécharger pour mettre à jour"
@@ -414,7 +414,7 @@
     "message": "Modrinth Bot excité"
   },
   "app.hosting.update-required.title": {
-    "message": "Mise à jour de Modrinth App requise"
+    "message": "Mise à jour de Owyx requise"
   },
   "app.install.phase.downloading_content": {
     "message": "Téléchargement du contenu"
@@ -1539,7 +1539,7 @@
     "message": "Les plus anciens"
   },
   "app.settings.app-version": {
-    "message": "Modrinth App {version}"
+    "message": "Owyx {version}"
   },
   "app.settings.default-instance-options.environment-variables.description": {
     "message": "Variables d'environnement définies lors du lancement d'une instance."
@@ -2211,7 +2211,7 @@
     "message": "Les publicités rendent Modrinth possible et financent les rémunérations des créateurs. Nos partenaires peuvent stocker des cookies ou y accéder au sein de l'application afin de personnaliser les publicités et de mesurer les performances. Vous pouvez refuser ou gérer vos préférences ci-dessous."
   },
   "app.settings.privacy.discord-rich-presence.description": {
-    "message": "Affiche Modrinth App en tant que votre activité actuelle sur Discord. Cela n'affecte pas Rich Presence ajouté à l'instance par les mods. Nécessite un redémarrage de l'application."
+    "message": "Affiche Owyx en tant que votre activité actuelle sur Discord. Cela n'affecte pas Rich Presence ajouté à l'instance par les mods. Nécessite un redémarrage de l'application."
   },
   "app.settings.privacy.discord-rich-presence.title": {
     "message": "Discord Rich Presence"
@@ -2256,7 +2256,7 @@
     "message": "Parcourir pour le répertoire de l'application"
   },
   "app.settings.resource-management.app-directory.description": {
-    "message": "Où Modrinth App stocke les instances et les autres fichiers. Changer prend effet après avoir redémarré l'application."
+    "message": "Où Owyx stocke les instances et les autres fichiers. Changer prend effet après avoir redémarré l'application."
   },
   "app.settings.resource-management.app-directory.select": {
     "message": "Sélectionner un nouveau répertoire pour l'application"
@@ -2517,13 +2517,13 @@
     "message": "Salut, utilisateur de Modrinth !"
   },
   "app.update-popup.body.download-complete": {
-    "message": "Modrinth App v{version} a finie d'être téléchargée. Rechargez pour mettre à jour maintenant, ou automatiquement quand vous fermez Modrinth App."
+    "message": "Owyx v{version} a finie d'être téléchargée. Rechargez pour mettre à jour maintenant, ou automatiquement quand vous fermez Owyx."
   },
   "app.update-popup.body.linux": {
-    "message": "Modrinth App v{version} est disponible. Utilisez votre gestionnaire de paquets pour mettre à jour les dernières fonctionnalités et corrections de bogues !"
+    "message": "Owyx v{version} est disponible. Utilisez votre gestionnaire de paquets pour mettre à jour les dernières fonctionnalités et corrections de bogues !"
   },
   "app.update-popup.body.metered": {
-    "message": "Modrinth App v{version} est disponible maintenant ! Puisque vous êtes sur un réseau métré, nous ne l'avons pas téléchargé automatiquement."
+    "message": "Owyx v{version} est disponible maintenant ! Puisque vous êtes sur un réseau métré, nous ne l'avons pas téléchargé automatiquement."
   },
   "app.update-popup.changelog": {
     "message": "Journal des modifications"
@@ -2715,7 +2715,7 @@
     "message": "Dissocier l'instance partagée"
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
-    "message": "Cela supprime l'instance partagée des serveurs de Modrinth. Les personnes l'utilisant dans Modrinth App vont cesser de recevoir des mises à jour, mais votre instance locale et son contenu resteront sur cet appareil."
+    "message": "Cela supprime l'instance partagée des serveurs de Modrinth. Les personnes l'utilisant dans Owyx vont cesser de recevoir des mises à jour, mais votre instance locale et son contenu resteront sur cet appareil."
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-header": {
     "message": "Dépublication de l'instance partagée"

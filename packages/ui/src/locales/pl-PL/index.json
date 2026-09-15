@@ -3030,16 +3030,16 @@
     "defaultMessage": "Otrzymuj aktualizacje plików, gdy zmienione są na serwerze"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Pobierz Modrinth App"
+    "defaultMessage": "Pobierz Owyx"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "Modrinth App zostanie otwarte automatycznie..."
+    "defaultMessage": "Owyx zostanie otwarte automatycznie..."
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "Otwieranie Modrinth App"
+    "defaultMessage": "Otwieranie Owyx"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "Czemu warto używać Modrinth App"
+    "defaultMessage": "Czemu warto używać Owyx"
   },
   "notification.error.title": {
     "defaultMessage": "Wystąpił błąd"
@@ -5313,7 +5313,7 @@
     "defaultMessage": "Nowy serwer"
   },
   "servers.list-empty.no-servers-description": {
-    "defaultMessage": "Instaluj modyfikacje, zapraszaj znajomych i graj z nimi przy użyciu Modrinth App."
+    "defaultMessage": "Instaluj modyfikacje, zapraszaj znajomych i graj z nimi przy użyciu Owyx."
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Wybierz swoje ulubione mody, a my zajmiemy się resztą."
@@ -5874,7 +5874,7 @@
     "defaultMessage": "Ciemny"
   },
   "settings.display.theme.description": {
-    "defaultMessage": "Wybierz preferowany motyw kolorystyczny dla Modrinth App."
+    "defaultMessage": "Wybierz preferowany motyw kolorystyczny dla Owyx."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Jasny"
@@ -5919,7 +5919,7 @@
     "defaultMessage": "Wyniki wyszukiwania"
   },
   "settings.language.coverage.app-tooltip": {
-    "defaultMessage": "Około {percentage}% Modrinth App jest dostępne w tym języku."
+    "defaultMessage": "Około {percentage}% Owyx jest dostępne w tym języku."
   },
   "settings.language.coverage.label": {
     "defaultMessage": "{percentage}% wspierane"

@@ -24,7 +24,7 @@
   --color-foreground: #f3f4f6;
 
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-outfit), var(--font-dm-sans), ui-sans-serif, sans-serif;
+  --font-display: var(--font-sora), var(--font-outfit), var(--font-dm-sans), ui-sans-serif, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
 
   --radius-control: 10px;

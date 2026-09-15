@@ -2871,16 +2871,16 @@
     "defaultMessage": "Håll filer uppdaterade när servern ändras"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Skaffa Modrinth App"
+    "defaultMessage": "Skaffa Owyx"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "Modrinth App kommer att öppnas automatiskt..."
+    "defaultMessage": "Owyx kommer att öppnas automatiskt..."
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "Öppnar Modrinth App"
+    "defaultMessage": "Öppnar Owyx"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "Varför använda Modrinth App"
+    "defaultMessage": "Varför använda Owyx"
   },
   "notification.error.title": {
     "defaultMessage": "Ett fel inträffade"
@@ -5001,7 +5001,7 @@
     "defaultMessage": "Ny server"
   },
   "servers.list-empty.no-servers-description": {
-    "defaultMessage": "Installera moddar, bjud in vänner och spela tillsammans, allt från Modrinth App."
+    "defaultMessage": "Installera moddar, bjud in vänner och spela tillsammans, allt från Owyx."
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Välj dina favorit moddar så hanterar vi resten."
@@ -5499,7 +5499,7 @@
     "defaultMessage": "Sökresultat"
   },
   "settings.language.coverage.app-tooltip": {
-    "defaultMessage": "Runt {percentage} % av Modrinth App finns tillgängligt i det här språket."
+    "defaultMessage": "Runt {percentage} % av Owyx finns tillgängligt i det här språket."
   },
   "settings.language.coverage.label": {
     "defaultMessage": "{percentage} % stött"

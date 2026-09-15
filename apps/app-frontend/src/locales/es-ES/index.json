@@ -414,7 +414,7 @@
     "message": "Modrinth Bot emocionado"
   },
   "app.hosting.update-required.title": {
-    "message": "Se requiere actualizar Modrinth App"
+    "message": "Se requiere actualizar Owyx"
   },
   "app.install.phase.downloading_content": {
     "message": "Descargando contenido"
@@ -1542,7 +1542,7 @@
     "message": "Antiguo"
   },
   "app.settings.app-version": {
-    "message": "Modrinth App {version}"
+    "message": "Owyx {version}"
   },
   "app.settings.default-instance-options.environment-variables.description": {
     "message": "Variables de entorno definidas al ejecutar una instancia."
@@ -2586,7 +2586,7 @@
     "message": "Los anuncios hacen Modrinth posible y financian los pagos a los creadores. Nuestros socios pueden almacenar o acceder a cookies en la aplicación para personalizar los anuncios y medir el rendimiento. Puedes desactivar esta opción o modificar tus preferencias a continuación."
   },
   "app.settings.privacy.discord-rich-presence.description": {
-    "message": "Mostrar Modrinth App como tu actividad actual en Discord.\nEsto no afecta tu Presencia Enriquecida añadida a instancias por mods. Requiere reiniciar la aplicación."
+    "message": "Mostrar Owyx como tu actividad actual en Discord.\nEsto no afecta tu Presencia Enriquecida añadida a instancias por mods. Requiere reiniciar la aplicación."
   },
   "app.settings.privacy.discord-rich-presence.title": {
     "message": "Estado de la actividad en Discord"
@@ -2631,7 +2631,7 @@
     "message": "Buscar un directorio de aplicaciones"
   },
   "app.settings.resource-management.app-directory.description": {
-    "message": "Donde Modrinth App almacena instancias y otros archivos. Los cambios entran en vigor tras reiniciar la aplicación."
+    "message": "Donde Owyx almacena instancias y otros archivos. Los cambios entran en vigor tras reiniciar la aplicación."
   },
   "app.settings.resource-management.app-directory.select": {
     "message": "Seleccionar un nuevo directorio de aplicaciones"
@@ -3063,7 +3063,7 @@
     "message": "Activar"
   },
   "app.survey.body": {
-    "message": "¿Te importaría responder a algunas preguntas sobre tu experiencia con Modrinth App?"
+    "message": "¿Te importaría responder a algunas preguntas sobre tu experiencia con Owyx?"
   },
   "app.survey.footer": {
     "message": "¡Estos comentarios irán directamente al equipo de Modrinth y ayudarán a guiar futuras actualizaciones!"
@@ -3204,13 +3204,13 @@
     "message": "Paquetes de recursos sincronizados"
   },
   "app.update-popup.body.download-complete": {
-    "message": "Modrinth App v{version} se ha descargado. Actualiza la página ahora o espera a que se actualice automáticamente al cerrar Modrinth App."
+    "message": "Owyx v{version} se ha descargado. Actualiza la página ahora o espera a que se actualice automáticamente al cerrar Owyx."
   },
   "app.update-popup.body.linux": {
-    "message": "Ya está disponible Modrinth App v{version}. ¡Utiliza tu gestor de paquetes para actualizarla y disfrutar de las últimas funciones y correcciones!"
+    "message": "Ya está disponible Owyx v{version}. ¡Utiliza tu gestor de paquetes para actualizarla y disfrutar de las últimas funciones y correcciones!"
   },
   "app.update-popup.body.metered": {
-    "message": "¡Modrinth App v{version} ya está disponible! Como estás conectado a una red con tarifa por datos, no la hemos descargado automáticamente."
+    "message": "¡Owyx v{version} ya está disponible! Como estás conectado a una red con tarifa por datos, no la hemos descargado automáticamente."
   },
   "app.update-popup.changelog": {
     "message": "Registro de cambios"

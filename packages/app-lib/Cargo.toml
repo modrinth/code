@@ -125,6 +125,7 @@ ts-rs = { workspace = true, features = [
 url = { workspace = true, features = ["serde"] }
 urlencoding = { workspace = true }
 uuid = { workspace = true, features = ["serde", "v4"] }
+md5 = { workspace = true }
 whoami = { workspace = true }
 zbus = { workspace = true }
 zip = { workspace = true }

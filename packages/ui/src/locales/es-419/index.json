@@ -3039,16 +3039,16 @@
     "defaultMessage": "Mantiene los archivos actualizados cuando el servidor cambia"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Obtener la Modrinth App"
+    "defaultMessage": "Obtener la Owyx"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "La Modrinth App se abrirá automáticamente..."
+    "defaultMessage": "La Owyx se abrirá automáticamente..."
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "Abriendo la Modrinth App"
+    "defaultMessage": "Abriendo la Owyx"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "Por qué usar la Modrinth App"
+    "defaultMessage": "Por qué usar la Owyx"
   },
   "notification.error.title": {
     "defaultMessage": "Ha ocurrido un error"
@@ -5322,7 +5322,7 @@
     "defaultMessage": "Nuevo servidor"
   },
   "servers.list-empty.no-servers-description": {
-    "defaultMessage": "Instala mods, invita amigos, y jueguen juntos todo desde la Modrinth App."
+    "defaultMessage": "Instala mods, invita amigos, y jueguen juntos todo desde la Owyx."
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Escoge tus mods favoritos y nos encargaremos del resto."

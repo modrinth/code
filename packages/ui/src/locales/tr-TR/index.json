@@ -3039,13 +3039,13 @@
     "defaultMessage": "Modrinth Uygulaması Edin"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "Modrinth App otomatik olarak açılacak..."
+    "defaultMessage": "Owyx otomatik olarak açılacak..."
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "Modrinth App açılıyor"
+    "defaultMessage": "Owyx açılıyor"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "Neden Modrinth App kullanmalısın"
+    "defaultMessage": "Neden Owyx kullanmalısın"
   },
   "notification.error.title": {
     "defaultMessage": "Bir hata oluştu"
@@ -5310,7 +5310,7 @@
     "defaultMessage": "Yeni sunucu"
   },
   "servers.list-empty.no-servers-description": {
-    "defaultMessage": "Mod kur, arkadaş davet et, birlikte oyna ve hepsini Modrinth App'ten yap."
+    "defaultMessage": "Mod kur, arkadaş davet et, birlikte oyna ve hepsini Owyx'ten yap."
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Beğendiğiniz modları seçin ve biz geri kalan işi hallederiz."
@@ -5319,7 +5319,7 @@
     "defaultMessage": "Tek-tıklamada mod kurma"
   },
   "servers.list-empty.play-with-friends-description": {
-    "defaultMessage": "Arkadaşlarınızın sunucunuzda oynamak için tek tıkla Modrinth App'den davet edebilirsiniz."
+    "defaultMessage": "Arkadaşlarınızın sunucunuzda oynamak için tek tıkla Owyx'den davet edebilirsiniz."
   },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Arkadaşlarınızla oynayın"

@@ -165,7 +165,7 @@
     "message": "Ocultar nametag"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimiza o Modrinth App ao iniciar o Minecraft."
+    "message": "Minimiza o Owyx ao iniciar o Minecraft."
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimizar aplicativo"
@@ -405,7 +405,7 @@
     "message": "Ver instância"
   },
   "app.hosting.update-required.description": {
-    "message": "Você precisa atualizar para usar o Modrinth Hosting através do Modrinth App"
+    "message": "Você precisa atualizar para usar o Modrinth Hosting através do Owyx"
   },
   "app.hosting.update-required.download": {
     "message": "Baixar para atualizar"
@@ -414,7 +414,7 @@
     "message": "Modrinth Bot animado"
   },
   "app.hosting.update-required.title": {
-    "message": "Atualização do Modrinth App necessária"
+    "message": "Atualização do Owyx necessária"
   },
   "app.install.phase.downloading_content": {
     "message": "Instalando conteúdo"
@@ -1545,7 +1545,7 @@
     "message": "Mais antigo"
   },
   "app.settings.app-version": {
-    "message": "Modrinth App {version}"
+    "message": "Owyx {version}"
   },
   "app.settings.default-instance-options.environment-variables.description": {
     "message": "As variáveis do ambiente definidas ao iniciar uma instância."
@@ -2658,7 +2658,7 @@
     "message": "Anúncios tornam o Modrinth possível e financiam os pagamentos dos criadores. Nossos parceiros talvez armazenem ou acessem os cookies no aplicativo para personalizar anúncios e medir o desempenho. Você pode recusar ou gerenciar suas preferências abaixo."
   },
   "app.settings.privacy.discord-rich-presence.description": {
-    "message": "Exibe o Modrinth App como sua atividade atual no Discord. Isso não afeta a Presença Rica adicionada às instâncias por mods. Exige a reinicialização do aplicativo."
+    "message": "Exibe o Owyx como sua atividade atual no Discord. Isso não afeta a Presença Rica adicionada às instâncias por mods. Exige a reinicialização do aplicativo."
   },
   "app.settings.privacy.discord-rich-presence.title": {
     "message": "Presença Rica do Discord"
@@ -2703,7 +2703,7 @@
     "message": "Buscar por um diretório de aplicativo"
   },
   "app.settings.resource-management.app-directory.description": {
-    "message": "Onde o Modrinth App armazena as instâncias e outros arquivos. As mudanças serão aplicadas após reiniciar o aplicativo."
+    "message": "Onde o Owyx armazena as instâncias e outros arquivos. As mudanças serão aplicadas após reiniciar o aplicativo."
   },
   "app.settings.resource-management.app-directory.select": {
     "message": "Selecione um novo diretório de aplicativo"
@@ -3138,7 +3138,7 @@
     "message": "Ativar"
   },
   "app.survey.body": {
-    "message": "Você se importaria de responder algumas perguntas sobre sua experiência com o Modrinth App?"
+    "message": "Você se importaria de responder algumas perguntas sobre sua experiência com o Owyx?"
   },
   "app.survey.footer": {
     "message": "Este comentário vai diretamente para a equipe Modrinth e ajudará a guiar futuras atualizações!"
@@ -3282,13 +3282,13 @@
     "message": "Pacotes de recursos sincronizados"
   },
   "app.update-popup.body.download-complete": {
-    "message": "O Modrinth App v{version} já foi instalado. Recarregue para atualizar agora ou ela será feita automaticamente ao fechar o Modrinth App."
+    "message": "O Owyx v{version} já foi instalado. Recarregue para atualizar agora ou ela será feita automaticamente ao fechar o Owyx."
   },
   "app.update-popup.body.linux": {
-    "message": "O Modrinth App v{version} está disponível. Use o gerenciador de pacotes para atualizar para obter novos recursos e correções!"
+    "message": "O Owyx v{version} está disponível. Use o gerenciador de pacotes para atualizar para obter novos recursos e correções!"
   },
   "app.update-popup.body.metered": {
-    "message": "O Modrinth App v{version} já está disponível! Já que sua rede é limitada, não a instalamos automaticamente."
+    "message": "O Owyx v{version} já está disponível! Já que sua rede é limitada, não a instalamos automaticamente."
   },
   "app.update-popup.changelog": {
     "message": "Mudanças"
@@ -3486,7 +3486,7 @@
     "message": "Desvincular instância compartilhada"
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
-    "message": "Isso excluirá a instância compartilhada dos servidores do Modrinth. As pessoas usando-o no Modrinth App não receberá mais atualizações, mas sua instância local e seu conteúdo ainda permanecerá no dispositivo."
+    "message": "Isso excluirá a instância compartilhada dos servidores do Modrinth. As pessoas usando-o no Owyx não receberá mais atualizações, mas sua instância local e seu conteúdo ainda permanecerá no dispositivo."
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-header": {
     "message": "Removendo instância compartilhada"

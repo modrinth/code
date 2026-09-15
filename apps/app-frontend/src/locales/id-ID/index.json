@@ -366,13 +366,13 @@
     "message": "Pemilih rupa"
   },
   "app.update-popup.body.download-complete": {
-    "message": "Modrinth App v{version} telah selesai mengunduh. Muat ulang untuk memperbarui sekarang, atau secara otomatis saat Anda menutup Modrinth App."
+    "message": "Owyx v{version} telah selesai mengunduh. Muat ulang untuk memperbarui sekarang, atau secara otomatis saat Anda menutup Owyx."
   },
   "app.update-popup.body.linux": {
-    "message": "Modrinth App v{version} tersedia. Gunakan pengelola paket Anda untuk memperbarui dan mendapatkan fitur-fitur dan perbaikan terbaru!"
+    "message": "Owyx v{version} tersedia. Gunakan pengelola paket Anda untuk memperbarui dan mendapatkan fitur-fitur dan perbaikan terbaru!"
   },
   "app.update-popup.body.metered": {
-    "message": "Modrinth App v{version} sudah tersedia! Karena Anda saat ini sedang berada dalam jaringan terukur, kami tidak mengunduhnya secara otomatis."
+    "message": "Owyx v{version} sudah tersedia! Karena Anda saat ini sedang berada dalam jaringan terukur, kami tidak mengunduhnya secara otomatis."
   },
   "app.update-popup.changelog": {
     "message": "Catatan perubahan"

@@ -395,12 +395,23 @@ router.post('/login', [
         const ip = req.clientIp || req.ip || req.connection.remoteAddress;
         const userAgent = req.get('User-Agent') || '';
 
-        // Проверка Cloudflare Turnstile
-        const turnstileResult = await verifyTurnstile(turnstileToken, ip);
-        if (!turnstileResult.success) {
-            return res.status(400).json({
-                error: turnstileResult.message || 'Проверка капчи не пройдена'
-            });
+        // Launcher clients: Host api.* + valid X-Owyx-Client-Key → skip Turnstile.
+        // Browser Host (owyx.site) must still pass captcha even if someone replays the key.
+        const { requestHost, parseList } = require('../middleware/clientKey');
+        const expectedKey = (process.env.LAUNCHER_CLIENT_KEY || '').trim();
+        const gotKey = (req.get('x-owyx-client-key') || '').trim();
+        const apiHosts = parseList(process.env.API_HOSTS, 'api.owyx.site');
+        const onApiHost = apiHosts.includes(requestHost(req));
+        const launcherClient =
+            onApiHost && Boolean(expectedKey) && gotKey === expectedKey;
+
+        if (!launcherClient) {
+            const turnstileResult = await verifyTurnstile(turnstileToken, ip);
+            if (!turnstileResult.success) {
+                return res.status(400).json({
+                    error: turnstileResult.message || 'Проверка капчи не пройдена'
+                });
+            }
         }
 
         // Проверяем количество неудачных попыток

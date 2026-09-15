@@ -169,7 +169,7 @@ const messages = defineMessages({
 	unpublishModalBody: {
 		id: 'installation-settings.unpublish-shared-instance.modal.admonition-body',
 		defaultMessage:
-			"This deletes the shared instance from Modrinth's servers. People using it in the Modrinth App will stop receiving updates, but your local instance and its content will stay on this device.",
+			"This deletes the shared instance from Modrinth's servers. People using it in the Owyx will stop receiving updates, but your local instance and its content will stay on this device.",
 	},
 	unlinkModalHeader: {
 		id: 'installation-settings.unlink-shared-instance.modal.header',

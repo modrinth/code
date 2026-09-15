@@ -2940,16 +2940,16 @@
     "defaultMessage": "서버 변경 시 파일 자동 업데이트"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Modrinth App 받기"
+    "defaultMessage": "Owyx 받기"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "Modrinth App이 자동으로 열립니다..."
+    "defaultMessage": "Owyx이 자동으로 열립니다..."
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "Modrinth App 여는 중"
+    "defaultMessage": "Owyx 여는 중"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "Modrinth App을 사용하는 이유"
+    "defaultMessage": "Owyx을 사용하는 이유"
   },
   "notification.error.title": {
     "defaultMessage": "오류가 발생했습니다"

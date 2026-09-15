@@ -3039,16 +3039,16 @@
     "defaultMessage": "服务器更改时保持文件更新"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "获取 Modrinth App"
+    "defaultMessage": "获取 Owyx"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "Modrinth App 将自动打开……"
+    "defaultMessage": "Owyx 将自动打开……"
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "正在打开 Modrinth App"
+    "defaultMessage": "正在打开 Owyx"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "为何使用 Modrinth App"
+    "defaultMessage": "为何使用 Owyx"
   },
   "notification.error.title": {
     "defaultMessage": "发生错误"
@@ -5322,7 +5322,7 @@
     "defaultMessage": "添加服务器"
   },
   "servers.list-empty.no-servers-description": {
-    "defaultMessage": "安装模组、邀请好友并一起畅玩，这一切都能在 Modrinth App 中轻松完成。"
+    "defaultMessage": "安装模组、邀请好友并一起畅玩，这一切都能在 Owyx 中轻松完成。"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "选出你最喜欢的模组，其余的交给我们来处理。"
@@ -5331,7 +5331,7 @@
     "defaultMessage": "一键安装模组"
   },
   "servers.list-empty.play-with-friends-description": {
-    "defaultMessage": "邀请好友通过 Modrinth App 一键启动游玩您的服务器。"
+    "defaultMessage": "邀请好友通过 Owyx 一键启动游玩您的服务器。"
   },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "与好友同乐"
@@ -5928,7 +5928,7 @@
     "defaultMessage": "搜索结果"
   },
   "settings.language.coverage.app-tooltip": {
-    "defaultMessage": "该语言的 Modrinth App 翻译完成度约为 {percentage}%。"
+    "defaultMessage": "该语言的 Owyx 翻译完成度约为 {percentage}%。"
   },
   "settings.language.coverage.label": {
     "defaultMessage": "已翻译 {percentage}%"

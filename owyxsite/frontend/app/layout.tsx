@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
-import { DM_Sans, Geist_Mono, Outfit } from "next/font/google";
+import { DM_Sans, Geist_Mono, Outfit, Sora } from "next/font/google";
 import { AuthProvider } from "@/hooks/useAuth";
 import "./globals.css";
 
-/* Display = Outfit (geometric, not Inter). Body = DM Sans — matches launcher. */
+/* Display/brand = Sora (DESIGN.md). Body = DM Sans. Outfit kept as secondary. */
+const sora = Sora({
+  variable: "--font-sora",
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+});
+
 const outfit = Outfit({
   variable: "--font-outfit",
   subsets: ["latin", "latin-ext"],
@@ -28,6 +34,9 @@ export const metadata: Metadata = {
     "Owyx — экосистема приватного Minecraft: скачай лаунчер и играй, или войди аккаунтом Owyx для скина и плюшек. Без заявок.",
   keywords: ["owyx", "minecraft", "приватный сервер", "лаунчер", "своё сообщество"],
   authors: [{ name: "ebluffy" }],
+  icons: {
+    icon: "/favicon-owyx.svg",
+  },
   openGraph: {
     title: "Owyx — приватный Minecraft",
     description:
@@ -45,7 +54,7 @@ export default function RootLayout({
   return (
     <html
       lang="ru"
-      className={`${outfit.variable} ${dmSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${sora.variable} ${outfit.variable} ${dmSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-screen overflow-x-clip flex flex-col">
         <a href="#main-content" className="skip-link">

@@ -56,7 +56,7 @@ const messages = defineMessages({
 	},
 	syncAcrossDevicesSignedOutTooltip: {
 		id: 'app.features-settings.sync-across-devices.signed-out-tooltip',
-		defaultMessage: 'Sign into a Modrinth account to sync settings.',
+		defaultMessage: 'Sign into an Owyx account to sync settings.',
 	},
 	instancePagesTitle: {
 		id: 'app.features-settings.instance-pages.title',

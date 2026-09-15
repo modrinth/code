@@ -165,7 +165,7 @@
     "message": "隐藏名牌"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "当 Minecraft 进程启动时，将 Modrinth App 最小化。"
+    "message": "当 Minecraft 进程启动时，将 Owyx 最小化。"
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "最小化 App"
@@ -402,7 +402,7 @@
     "message": "兴奋的Modrinth Bot"
   },
   "app.hosting.update-required.title": {
-    "message": "需要更新 Modrinth App"
+    "message": "需要更新 Owyx"
   },
   "app.install.phase.downloading_content": {
     "message": "正在下载内容"
@@ -1530,7 +1530,7 @@
     "message": "从旧到新"
   },
   "app.settings.app-version": {
-    "message": "Modrinth App {version}"
+    "message": "Owyx {version}"
   },
   "app.settings.default-instance-options.environment-variables.description": {
     "message": "启动实例时设置的环境变量。"
@@ -2607,7 +2607,7 @@
     "message": "广告使 Modrinth 得以运营，并为创作者报酬提供资金支持。我们的合作伙伴可能会在应用中存储或访问 Cookie，以便实现广告个性化和效果衡量。您可以在下方选择退出或管理您的偏好设置。"
   },
   "app.settings.privacy.discord-rich-presence.description": {
-    "message": "在 Discord 上将 Modrinth App 显示为您当前的活动。这不会影响模组为游戏实例添加的 Rich Presence。需要重启应用生效。"
+    "message": "在 Discord 上将 Owyx 显示为您当前的活动。这不会影响模组为游戏实例添加的 Rich Presence。需要重启应用生效。"
   },
   "app.settings.privacy.discord-rich-presence.title": {
     "message": "Discord Rich Presence"
@@ -2652,7 +2652,7 @@
     "message": "浏览应用目录"
   },
   "app.settings.resource-management.app-directory.description": {
-    "message": "Modrinth App存储实例和其他文件的位置。更改会在重启程序后生效。"
+    "message": "Owyx存储实例和其他文件的位置。更改会在重启程序后生效。"
   },
   "app.settings.resource-management.app-directory.select": {
     "message": "选择新的应用目录"
@@ -3045,7 +3045,7 @@
     "message": "切换至开"
   },
   "app.survey.body": {
-    "message": "您是否介意回答一些关于使用 Modrinth App 的问题？"
+    "message": "您是否介意回答一些关于使用 Owyx 的问题？"
   },
   "app.survey.footer": {
     "message": "此反馈将直接发送给Modrinth团队，为今后的更新提供指导！"
@@ -3153,13 +3153,13 @@
     "message": "同步的资源包"
   },
   "app.update-popup.body.download-complete": {
-    "message": "Modrinth App v{version} 更新已下载完成！立即重启更新，或退出时自动安装。"
+    "message": "Owyx v{version} 更新已下载完成！立即重启更新，或退出时自动安装。"
   },
   "app.update-popup.body.linux": {
-    "message": "Modrinth App v{version} 现已发布。请使用你的软件包管理器进行更新，获取最新功能与修复！"
+    "message": "Owyx v{version} 现已发布。请使用你的软件包管理器进行更新，获取最新功能与修复！"
   },
   "app.update-popup.body.metered": {
-    "message": "Modrinth App v{version} 现已发布！由于你正在使用按流量计费的网络，该更新未自动下载。"
+    "message": "Owyx v{version} 现已发布！由于你正在使用按流量计费的网络，该更新未自动下载。"
   },
   "app.update-popup.changelog": {
     "message": "更新日志"
@@ -3357,7 +3357,7 @@
     "message": "解除共享实例关联"
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
-    "message": "这将从 Modrinth 服务器上删除该共享实例。在 Modrinth App 中使用它的用户将停止接收更新，但你的本地实例及其内容仍会保留在此设备上。"
+    "message": "这将从 Modrinth 服务器上删除该共享实例。在 Owyx 中使用它的用户将停止接收更新，但你的本地实例及其内容仍会保留在此设备上。"
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-header": {
     "message": "取消发布共享实例"

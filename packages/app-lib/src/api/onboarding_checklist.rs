@@ -19,7 +19,7 @@ pub(crate) async fn mark_logged_into_minecraft() -> crate::Result<()> {
     mark(OnboardingChecklistItem::LoggedIntoMinecraft).await
 }
 
-pub(crate) async fn mark_logged_into_modrinth() -> crate::Result<()> {
+pub async fn mark_logged_into_modrinth() -> crate::Result<()> {
     mark(OnboardingChecklistItem::LoggedIntoModrinth).await
 }
 

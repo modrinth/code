@@ -115,9 +115,11 @@ pub async fn parse_command(
 ) -> crate::Result<CommandPayload> {
     tracing::debug!("Parsing external command");
 
-    // modrinth://some-command
-    // This occurs when following a web redirect link
-    if let Some(sublink) = command_string.strip_prefix("modrinth://") {
+    // owyx:// or modrinth:// deep links (upstream-compatible)
+    if let Some(sublink) = command_string
+        .strip_prefix("owyx://")
+        .or_else(|| command_string.strip_prefix("modrinth://"))
+    {
         Ok(handle_url(sublink).await?)
     } else {
         // We assume anything else is a filepath to an .mrpack file

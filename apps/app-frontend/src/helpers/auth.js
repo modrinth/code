@@ -22,15 +22,19 @@ export async function check_reachable() {
 }
 
 /**
- * Authenticate a user with Hydra - part 1.
- * This begins the authentication flow quasi-synchronously.
- *
- * @returns {Promise<DeviceLoginSuccess>} A DeviceLoginSuccess object with two relevant fields:
- * @property {string} verification_uri - The URL to go to complete the flow.
- * @property {string} user_code - The code to enter on the verification_uri page.
+ * Authenticate with Microsoft (licensed Minecraft).
+ * Opens a WebView sign-in window.
  */
 export async function login() {
 	return await invoke('plugin:auth|login')
+}
+
+/**
+ * Create a local offline nickname account (offline-mode servers only).
+ * @param {string} username
+ */
+export async function login_offline(username) {
+	return await invoke('plugin:auth|login_offline', { username })
 }
 
 /**

@@ -339,7 +339,7 @@
     "message": "Zobrazit instanci"
   },
   "app.hosting.update-required.description": {
-    "message": "Musíte aktualizovat Modrinth Hosting přes Modrinth App"
+    "message": "Musíte aktualizovat Modrinth Hosting přes Owyx"
   },
   "app.hosting.update-required.download": {
     "message": "Stáhnout novou aktualizaci"
@@ -348,7 +348,7 @@
     "message": "Nadšený Modrinth Bot"
   },
   "app.hosting.update-required.title": {
-    "message": "Modrinth App potřebuje být aktualizovaná"
+    "message": "Owyx potřebuje být aktualizovaná"
   },
   "app.install.phase.downloading_content": {
     "message": "Stahování obsahu"
@@ -1407,7 +1407,7 @@
     "message": "Nejstarší"
   },
   "app.settings.app-version": {
-    "message": "Modrinth App {version}"
+    "message": "Owyx {version}"
   },
   "app.settings.default-instance-options.environment-variables.description": {
     "message": "Nastavení proměnného prostředí při spuštění instance."
@@ -1683,7 +1683,7 @@
     "message": "Výběr skinu"
   },
   "app.survey.body": {
-    "message": "Mohli byste prosím odpovědět na pár otázek ohledně vašich zkušeností s Modrinth App?"
+    "message": "Mohli byste prosím odpovědět na pár otázek ohledně vašich zkušeností s Owyx?"
   },
   "app.survey.footer": {
     "message": "Tato zpětná vazba půjde přímo k týmu Modrinthu a pomůže při budoucích aktualizacích!"
@@ -1698,13 +1698,13 @@
     "message": "Ahoj Modrinth uživateli!"
   },
   "app.update-popup.body.download-complete": {
-    "message": "Stahování Modrinth App v{version} bylo dokončeno. Aktualizujte ji znovunačtením nebo se automaticky aktualizuje po zavření."
+    "message": "Stahování Owyx v{version} bylo dokončeno. Aktualizujte ji znovunačtením nebo se automaticky aktualizuje po zavření."
   },
   "app.update-popup.body.linux": {
-    "message": "Modrinth App v{version} je k dispozici. Aktualizujte ji pomocí svého správce balíčků, abyste získali nejnovější funkce a opravy!"
+    "message": "Owyx v{version} je k dispozici. Aktualizujte ji pomocí svého správce balíčků, abyste získali nejnovější funkce a opravy!"
   },
   "app.update-popup.body.metered": {
-    "message": "Modrinth App v{version} je nyní k dispozici! Protože jste v měřené síti, nebyla stažena automaticky."
+    "message": "Owyx v{version} je nyní k dispozici! Protože jste v měřené síti, nebyla stažena automaticky."
   },
   "app.update-popup.changelog": {
     "message": "Seznam změn"

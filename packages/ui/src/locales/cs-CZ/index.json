@@ -2718,16 +2718,16 @@
     "defaultMessage": "Přidávání platební metody"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Získat Modrinth App"
+    "defaultMessage": "Získat Owyx"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "Modrinth App se otevře automaticky..."
+    "defaultMessage": "Owyx se otevře automaticky..."
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "Otevírání Modrinth App"
+    "defaultMessage": "Otevírání Owyx"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "Proč používat Modrinth App"
+    "defaultMessage": "Proč používat Owyx"
   },
   "notification.error.title": {
     "defaultMessage": "Došlo k chybě"
@@ -4374,7 +4374,7 @@
     "defaultMessage": "Nový server"
   },
   "servers.list-empty.no-servers-description": {
-    "defaultMessage": "Instalujte mody, zvěte přátele a hrajte společně, to vše z Modrinth App."
+    "defaultMessage": "Instalujte mody, zvěte přátele a hrajte společně, to vše z Owyx."
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Vyberte si své oblíbené mody a o zbytek se postaráme."

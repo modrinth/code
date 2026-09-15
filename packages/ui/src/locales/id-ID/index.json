@@ -1440,16 +1440,16 @@
     "defaultMessage": "Berkas-berkas selalu diperbarui ketika server berubah"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Dapatkan Modrinth App"
+    "defaultMessage": "Dapatkan Owyx"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "Modrinth App akan buka secara otomatis..."
+    "defaultMessage": "Owyx akan buka secara otomatis..."
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "Membuka Modrinth App"
+    "defaultMessage": "Membuka Owyx"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "Mengapa harus Modrinth App?"
+    "defaultMessage": "Mengapa harus Owyx?"
   },
   "notification.error.title": {
     "defaultMessage": "Terjadi kesalahan"

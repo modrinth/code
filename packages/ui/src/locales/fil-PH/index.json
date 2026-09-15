@@ -1035,16 +1035,16 @@
     "defaultMessage": "Panatilihing naisapanahon ang mga file kapag nagbago ang server"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Kunin ang Modrinth App"
+    "defaultMessage": "Kunin ang Owyx"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "Kusang bubukas ang Modrinth App..."
+    "defaultMessage": "Kusang bubukas ang Owyx..."
   },
   "modal.open-in-app.title": {
     "defaultMessage": "Binubukas ang Modrnth App"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "Bakit Modrinth App ang gamitin"
+    "defaultMessage": "Bakit Owyx ang gamitin"
   },
   "notification.error.title": {
     "defaultMessage": "Isang error na naganap"

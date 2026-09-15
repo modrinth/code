@@ -1539,7 +1539,7 @@
     "message": "Meno recenti"
   },
   "app.settings.app-version": {
-    "message": "Modrinth App {version}"
+    "message": "Owyx {version}"
   },
   "app.settings.default-instance-options.environment-variables.description": {
     "message": "Le variabili d'ambiente impostate all'avvio di un'istanza."
@@ -2652,7 +2652,7 @@
     "message": "Le pubblicità sostengono Modrinth e finanziano i creatori. I nostri partner potrebbero memorizzare o accedere ai cookie per personalizzare gli annunci e misurarne le prestazioni. Puoi negare il consenso o gestire le tue preferenze qui sotto."
   },
   "app.settings.privacy.discord-rich-presence.description": {
-    "message": "Mostra Modrinth App come attività su Discord. Questo non interferisce con le mod che interagiscono con Rich Presence. Richiede un riavvio dell'app."
+    "message": "Mostra Owyx come attività su Discord. Questo non interferisce con le mod che interagiscono con Rich Presence. Richiede un riavvio dell'app."
   },
   "app.settings.privacy.discord-rich-presence.title": {
     "message": "Rich Presence su Discord"
@@ -2697,7 +2697,7 @@
     "message": "Esplora una cartella per l'app"
   },
   "app.settings.resource-management.app-directory.description": {
-    "message": "Dove Modrinth App memorizza le istanze e altri file. Le modifiche avranno effetto dopo un riavvio."
+    "message": "Dove Owyx memorizza le istanze e altri file. Le modifiche avranno effetto dopo un riavvio."
   },
   "app.settings.resource-management.app-directory.select": {
     "message": "Seleziona la nuova cartella dell'app"
@@ -3132,7 +3132,7 @@
     "message": "Attiva"
   },
   "app.survey.body": {
-    "message": "Ti dispiacerebbe rispondere ad alcune domande sulla tua esperienza con Modrinth App?"
+    "message": "Ti dispiacerebbe rispondere ad alcune domande sulla tua esperienza con Owyx?"
   },
   "app.survey.footer": {
     "message": "Le tue risposte andranno direttamente al team di Modrinth e aiuteranno a guidare gli aggiornamenti futuri!"
@@ -3276,13 +3276,13 @@
     "message": "Pacchetti di risorse sincronizzati"
   },
   "app.update-popup.body.download-complete": {
-    "message": "Modrinth App v{version} è stata scaricata. Riavvia per aggiornare ora, o avverrà in automatico alla chiusura dell'app."
+    "message": "Owyx v{version} è stata scaricata. Riavvia per aggiornare ora, o avverrà in automatico alla chiusura dell'app."
   },
   "app.update-popup.body.linux": {
-    "message": "Modrinth App v{version} è disponibile. Usa il tuo gestore di pacchetti per aggiornare e ricevere le novità più recenti!"
+    "message": "Owyx v{version} è disponibile. Usa il tuo gestore di pacchetti per aggiornare e ricevere le novità più recenti!"
   },
   "app.update-popup.body.metered": {
-    "message": "Modrinth App v{version} è ora disponibile! Poiché sei su una rete a consumo, non l'abbiamo scaricata automaticamente."
+    "message": "Owyx v{version} è ora disponibile! Poiché sei su una rete a consumo, non l'abbiamo scaricata automaticamente."
   },
   "app.update-popup.changelog": {
     "message": "Novità"

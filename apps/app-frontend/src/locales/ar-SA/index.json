@@ -1923,7 +1923,7 @@
     "message": "انتهى تنزيل تطبيق Modrinth v{version}. أعد التحميل للتحديث الآن، أو تلقائيًا عند إغلاق تطبيق Modrinth."
   },
   "app.update-popup.body.linux": {
-    "message": "يتوفر الآن Modrinth App v{version}. استخدم مدير الحزم لتحديث التطبيق والحصول على أحدث الميزات والإصلاحات!"
+    "message": "يتوفر الآن Owyx v{version}. استخدم مدير الحزم لتحديث التطبيق والحصول على أحدث الميزات والإصلاحات!"
   },
   "app.update-popup.body.metered": {
     "message": "تطبيق Modrinth v{version} متاح الآن! وبما أنك متصل بشبكة مقيّدة، لم نقم بتنزيله تلقائيًا."
