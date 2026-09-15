@@ -1,3 +1,4 @@
+pub mod advisory_lock;
 pub mod models;
 mod postgres_database;
 pub mod redis;

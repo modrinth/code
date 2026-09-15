@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT pg_try_advisory_xact_lock(hashtextextended('discord_role_email_campaign', 0)) AS \"lock_acquired!\"",
+  "query": "SELECT pg_try_advisory_xact_lock(hashtextextended($1, 0)) AS \"lock_acquired!\"",
   "describe": {
     "columns": [
       {
@@ -10,11 +10,13 @@
       }
     ],
     "parameters": {
-      "Left": []
+      "Left": [
+        "Text"
+      ]
     },
     "nullable": [
       null
     ]
   },
-  "hash": "67d6f3431c2c78227c10c1ff2658e89ffec91b671e65915d7f6923dc2c95f82b"
+  "hash": "af3ab3a5cbe832973acbe05ac87d5dbbe03de9a010a1f08ea98dbebe813aa78b"
 }

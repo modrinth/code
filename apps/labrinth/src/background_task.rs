@@ -32,6 +32,7 @@ pub enum BackgroundTask {
     IndexBilling,
     IndexSubscriptions,
     IncrementalIndexSearch,
+    DelphiFileScan,
     Migrations,
     Mail,
     /// Queries server project analytics (e.g. number of verified plays in last
@@ -106,6 +107,9 @@ impl BackgroundTask {
                     kafka_client,
                 )
                 .await
+            }
+            DelphiFileScan => {
+                crate::queue::delphi_scan::run(pool, kafka_client).await
             }
             Mail => run_email(email_queue).await,
             CacheAnalytics => {
@@ -263,12 +267,11 @@ pub async fn discord_role_email_campaign(
         .await
         .wrap_err("failed to begin Discord role email campaign transaction")?;
 
-    let lock_acquired = sqlx::query_scalar!(
-        r#"SELECT pg_try_advisory_xact_lock(hashtextextended('discord_role_email_campaign', 0)) AS "lock_acquired!""#,
-    )
-    .fetch_one(&mut txn)
-    .await
-    .wrap_err("failed to acquire Discord role email campaign lock")?;
+    let lock_acquired =
+        crate::database::advisory_lock::AdvisoryLock::DiscordRoleEmailCampaign
+            .try_acquire(&mut txn)
+            .await
+            .wrap_err("failed to acquire Discord role email campaign lock")?;
 
     if !lock_acquired {
         info!("Discord role email campaign is already running");

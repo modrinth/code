@@ -304,9 +304,17 @@ pub async fn get_projects_internal(
                         OR NOT EXISTS (
                             SELECT 1
                             FROM delphi_issue_details_with_statuses didws
+                            INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
+                            INNER JOIN delphi_reports dr ON dr.id = dri.report_id
                             WHERE didws.project_id = m.id
                                 AND didws.status = 'pending'
                                 AND didws.severity != 'hidden'
+                                AND dr.file_id IS NOT NULL
+                                AND dr.delphi_version = (
+                                    SELECT MAX(latest_dr.delphi_version)
+                                    FROM delphi_reports latest_dr
+                                    WHERE latest_dr.file_id = dr.file_id
+                                )
                         )
                     )
             ),
@@ -554,9 +562,17 @@ pub async fn get_projects_internal(
                         OR NOT EXISTS (
                             SELECT 1
                             FROM delphi_issue_details_with_statuses didws
+                            INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
+                            INNER JOIN delphi_reports dr ON dr.id = dri.report_id
                             WHERE didws.project_id = m.id
                                 AND didws.status = 'pending'
                                 AND didws.severity != 'hidden'
+                                AND dr.file_id IS NOT NULL
+                                AND dr.delphi_version = (
+                                    SELECT MAX(latest_dr.delphi_version)
+                                    FROM delphi_reports latest_dr
+                                    WHERE latest_dr.file_id = dr.file_id
+                                )
                         )
                     )
             ),
@@ -786,9 +802,17 @@ pub async fn get_project_ids(
                         OR NOT EXISTS (
                             SELECT 1
                             FROM delphi_issue_details_with_statuses didws
+                            INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
+                            INNER JOIN delphi_reports dr ON dr.id = dri.report_id
                             WHERE didws.project_id = m.id
                                 AND didws.status = 'pending'
                                 AND didws.severity != 'hidden'
+                                AND dr.file_id IS NOT NULL
+                                AND dr.delphi_version = (
+                                    SELECT MAX(latest_dr.delphi_version)
+                                    FROM delphi_reports latest_dr
+                                    WHERE latest_dr.file_id = dr.file_id
+                                )
                         )
                     )
             ),
@@ -915,9 +939,17 @@ pub async fn get_project_ids(
                     OR NOT EXISTS (
                         SELECT 1
                         FROM delphi_issue_details_with_statuses didws
+                        INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
+                        INNER JOIN delphi_reports dr ON dr.id = dri.report_id
                         WHERE didws.project_id = mods.id
                             AND didws.status = 'pending'
                             AND didws.severity != 'hidden'
+                            AND dr.file_id IS NOT NULL
+                            AND dr.delphi_version = (
+                                SELECT MAX(latest_dr.delphi_version)
+                                FROM delphi_reports latest_dr
+                                WHERE latest_dr.file_id = dr.file_id
+                            )
                     )
                 )
             ORDER BY

@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT EXISTS(\n            SELECT 1\n            FROM delphi_file_scans\n            WHERE id = $1\n                AND outcome = 'succeeded'\n        ) AS \"succeeded!\"\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "succeeded!",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "e65feaa1c538db6b07699450ac700f9d92c6b495de241ee583500bbf26785dfa"
+}

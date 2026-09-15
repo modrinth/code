@@ -348,6 +348,7 @@ vars! {
     BREX_API_KEY: String = "none";
 
     DELPHI_URL: String = "";
+    DELPHI_SCAN_TIMEOUT: u64 = 60u64;
 
     SHARED_INSTANCES_URL: String = "";
     SHARED_INSTANCES_KEY: String = "";

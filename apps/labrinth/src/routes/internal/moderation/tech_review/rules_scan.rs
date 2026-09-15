@@ -675,6 +675,16 @@ async fn run_scan(
                     ) != 'hidden'
                 ) AS new_needs_review
             FROM delphi_issue_details_with_statuses detail
+            INNER JOIN delphi_report_issues issue ON issue.id = detail.issue_id
+            INNER JOIN delphi_reports report
+                ON report.id = issue.report_id
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM delphi_reports newer_report
+                    WHERE
+                        newer_report.file_id = report.file_id
+                        AND newer_report.delphi_version > report.delphi_version
+                )
             LEFT JOIN delphi_rule_effects new_effect
                 ON new_effect.revision = $1
                 AND new_effect.detail_id = detail.id

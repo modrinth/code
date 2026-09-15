@@ -3,7 +3,7 @@ use std::{collections::HashMap, fmt};
 use xredis::RedisPool;
 
 use crate::database::PgPool;
-use actix_web::{HttpRequest, get, patch, post, put, web};
+use actix_web::{HttpRequest, get, patch, post, web};
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -22,8 +22,7 @@ use crate::{
             DBVersion, DBVersionId, DelphiReportId, DelphiReportIssueDetailsId,
             DelphiReportIssueId,
             delphi_report_item::{
-                DBDelphiReport, DelphiSeverity, DelphiStatus, DelphiVerdict,
-                ReportIssueDetail,
+                DelphiSeverity, DelphiStatus, DelphiVerdict, ReportIssueDetail,
             },
             thread_item::ThreadMessageBuilder,
             version_item::VersionQueryResult,
@@ -62,7 +61,6 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(submit_report)
         .service(update_issue_details)
         .service(update_global_issue_details)
-        .service(add_report)
         .service(get_user_flagged_projects)
         .service(get_users_flagged_projects)
         .service(get_organization_flagged_projects)
@@ -221,7 +219,7 @@ pub struct GetIssue {
     pub include_hidden: bool,
 }
 
-/// Get a Delphi report issue.  
+/// Get a Delphi report issue.
 #[utoipa::path(
 	context_path = "/moderation/tech-review",
 	tag = "moderation",
@@ -523,14 +521,16 @@ async fn fetch_project_reports(
 
     let report_rows = sqlx::query!(
         r#"
-        SELECT
+        SELECT DISTINCT ON (file_id)
             id AS "report_id!: DelphiReportId",
             file_id AS "file_id!: DBFileId",
             created,
             severity AS "severity!: DelphiSeverity"
         FROM delphi_reports
-        WHERE file_id = ANY($1::bigint[])
-        ORDER BY file_id, created, id
+        WHERE
+            file_id IS NOT NULL
+            AND file_id = ANY($1::bigint[])
+        ORDER BY file_id, delphi_version DESC
         "#,
         &file_rows.iter().map(|f| f.file_id.0).collect::<Vec<_>>()
     )
@@ -792,7 +792,15 @@ pub async fn search_projects(
         INNER JOIN threads t ON t.mod_id = m.id
         LEFT JOIN versions v ON v.mod_id = m.id
         LEFT JOIN files f ON f.version_id = v.id
-        LEFT JOIN delphi_reports dr ON dr.file_id = f.id
+        LEFT JOIN delphi_reports dr
+            ON dr.file_id = f.id
+            AND NOT EXISTS (
+                SELECT 1
+                FROM delphi_reports newer_dr
+                WHERE
+                    newer_dr.file_id = dr.file_id
+                    AND newer_dr.delphi_version > dr.delphi_version
+            )
         LEFT JOIN delphi_report_issues dri ON dri.report_id = dr.id
         LEFT JOIN delphi_issue_details_with_statuses didws
             ON didws.issue_id = dri.id
@@ -849,6 +857,13 @@ pub async fn search_projects(
                         ON issue_file.version_id = issue_version.id
                     INNER JOIN delphi_reports issue_report
                         ON issue_report.file_id = issue_file.id
+                        AND NOT EXISTS (
+                            SELECT 1
+                            FROM delphi_reports newer_issue_report
+                            WHERE
+                                newer_issue_report.file_id = issue_report.file_id
+                                AND newer_issue_report.delphi_version > issue_report.delphi_version
+                        )
                     INNER JOIN delphi_report_issues issue
                         ON issue.report_id = issue_report.id
                     INNER JOIN delphi_issue_details_with_statuses detail
@@ -1114,7 +1129,15 @@ pub async fn submit_report(
         FROM mods m
         INNER JOIN versions v ON v.mod_id = m.id
         INNER JOIN files f ON f.version_id = v.id
-        INNER JOIN delphi_reports dr ON dr.file_id = f.id
+        INNER JOIN delphi_reports dr
+            ON dr.file_id = f.id
+            AND NOT EXISTS (
+                SELECT 1
+                FROM delphi_reports newer_dr
+                WHERE
+                    newer_dr.file_id = dr.file_id
+                    AND newer_dr.delphi_version > dr.delphi_version
+            )
         INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
         INNER JOIN delphi_issue_details_with_statuses didws ON didws.issue_id = dri.id
         WHERE
@@ -1416,14 +1439,13 @@ pub async fn update_issue_details(
         .map(|row| row.project_id)
         .collect::<Vec<_>>();
 
-    tech_review_queue::add_projects_with_review_details(
+    tech_review_queue::sync_projects(
         &affected_project_ids,
+        tech_review_queue::TechReviewRemovalReason::RulesChanged,
         &mut txn,
     )
     .await
-    .wrap_api_err(
-        "executing `tech_review_sync::sync_project_tech_review_state`",
-    )?;
+    .wrap_api_err("executing `tech_review_queue::sync_projects`")?;
 
     txn.commit()
         .await
@@ -1549,99 +1571,22 @@ pub async fn update_global_issue_details(
         "failed to fetch projects affected by global detail updates",
     )?;
 
-    tech_review_queue::add_projects_with_review_details(
+    tech_review_queue::sync_projects(
         &affected_projects
             .into_iter()
             .map(|row| row.project_id)
             .collect::<Vec<_>>(),
+        tech_review_queue::TechReviewRemovalReason::RulesChanged,
         &mut txn,
     )
     .await
-    .wrap_api_err(
-        "executing `tech_review_sync::sync_detail_key_tech_review_state`",
-    )?;
+    .wrap_api_err("executing `tech_review_queue::sync_projects`")?;
 
     txn.commit()
         .await
         .wrap_internal_err("failed to commit transaction")?;
 
     Ok(())
-}
-
-/// See [`add_report`].
-#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct AddReport {
-    pub file_id: FileId,
-}
-
-/// Add a technical review report.
-/// does not already exist for it.
-#[utoipa::path(
-	context_path = "/moderation/tech-review",
-	tag = "moderation",
-	responses((status = OK, body = DelphiReportId))
-)]
-#[put("/report")]
-pub async fn add_report(
-    req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    web::Json(add_report): web::Json<AddReport>,
-) -> Result<web::Json<DelphiReportId>, ApiError> {
-    check_is_moderator_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::PROJECT_WRITE,
-    )
-    .await
-    .wrap_auth_err("inserting database records for `add_report`")?;
-    let file_id = add_report.file_id;
-
-    let mut txn = pool
-        .begin()
-        .await
-        .wrap_internal_err("failed to begin transaction")?;
-
-    let record = sqlx::query!(
-        r#"
-        SELECT
-            f.url,
-            COUNT(dr.id) AS "report_count!"
-        FROM files f
-        LEFT JOIN delphi_reports dr ON dr.file_id = f.id
-        WHERE f.id = $1
-        GROUP BY f.url
-        "#,
-        DBFileId::from(file_id) as _,
-    )
-    .fetch_one(&mut txn)
-    .await
-    .wrap_internal_err("failed to fetch file")?;
-
-    if record.report_count > 0 {
-        return Err(ApiError::Request(eyre!("file already has reports")));
-    }
-
-    let report_id = DBDelphiReport {
-        id: DelphiReportId(0),
-        file_id: Some(file_id.into()),
-        delphi_version: -1, // TODO
-        artifact_url: record.url,
-        created: Utc::now(),
-        severity: DelphiSeverity::Low, // TODO
-    }
-    .upsert(&mut txn)
-    .await
-    .wrap_internal_err("failed to insert report")?;
-
-    txn.commit()
-        .await
-        .wrap_internal_err("failed to commit transaction")?;
-
-    Ok(web::Json(report_id))
 }
 
 /// A user's project that is stuck in `processing` or `rejected` because the

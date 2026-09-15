@@ -32,7 +32,8 @@ use crate::{
     routes::ApiError,
     search::SearchState,
     util::{
-        error::Context, http::HttpClient, validate::validation_errors_to_string,
+        error::Context, kafka::KafkaClientState,
+        validate::validation_errors_to_string,
     },
 };
 
@@ -110,7 +111,7 @@ pub struct ProjectCreate {
     pub components: exp::ProjectEdit,
 }
 
-/// Create a project from components.  
+/// Create a project from components.
 ///
 /// Components must include `base` ([`exp::base::Project`]), and at least one
 /// other component.
@@ -125,7 +126,7 @@ pub async fn create(
     redis: web::Data<RedisPool>,
     file_host: web::Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
-    http: web::Data<HttpClient>,
+    kafka_client: web::Data<KafkaClientState>,
     search_state: web::Data<SearchState>,
     web::Json(create): web::Json<ProjectCreate>,
 ) -> Result<web::Json<ProjectId>, CreateError> {
@@ -315,13 +316,13 @@ pub async fn create(
     };
 
     project_builder
-        .insert(&mut txn, &redis, &**file_host, &http)
+        .insert(&mut txn, &redis, &**file_host, &kafka_client)
         .await
         .wrap_internal_err("failed to insert project")?;
 
     if let Some(version_builder) = version_builder {
         version_builder
-            .insert(&mut txn, &redis, &**file_host, &http)
+            .insert(&mut txn, &redis, &**file_host, &kafka_client)
             .await
             .wrap_internal_err("failed to insert initial version")?;
     }

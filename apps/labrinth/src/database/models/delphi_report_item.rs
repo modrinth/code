@@ -42,7 +42,7 @@ impl DBDelphiReport {
             INSERT INTO delphi_reports (file_id, delphi_version, artifact_url, severity)
             VALUES ($1, $2, $3, $4)
             ON CONFLICT (file_id, delphi_version) DO UPDATE SET
-                delphi_version = $2, artifact_url = $3, created = CURRENT_TIMESTAMP, severity = $4
+                artifact_url = $3, created = CURRENT_TIMESTAMP, severity = $4
             RETURNING id
             ",
             self.file_id as Option<DBFileId>,
