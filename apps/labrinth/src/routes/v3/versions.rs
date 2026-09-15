@@ -1326,15 +1326,13 @@ pub async fn version_delete(
     .await
     .wrap_internal_err("deleting version from database")?;
 
-    delphi::tech_review_queue::remove_projects_without_details(
+    delphi::tech_review_queue::sync_projects(
         &[version.inner.project_id],
         delphi::tech_review_queue::TechReviewRemovalReason::FileDeleted,
         &mut transaction,
     )
     .await
-    .wrap_api_err(
-        "executing `tech_review_queue::remove_projects_without_details`",
-    )?;
+    .wrap_api_err("executing `tech_review_queue::sync_projects`")?;
 
     if validate_for_review {
         super::projects::validate::ensure_project_is_valid_for_review(

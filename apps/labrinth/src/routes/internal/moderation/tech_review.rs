@@ -1442,14 +1442,13 @@ pub async fn update_issue_details(
         .map(|row| row.project_id)
         .collect::<Vec<_>>();
 
-    tech_review_queue::add_projects_with_review_details(
+    tech_review_queue::sync_projects(
         &affected_project_ids,
+        tech_review_queue::TechReviewRemovalReason::RulesChanged,
         &mut txn,
     )
     .await
-    .wrap_api_err(
-        "executing `tech_review_queue::add_projects_with_review_details`",
-    )?;
+    .wrap_api_err("executing `tech_review_queue::sync_projects`")?;
 
     txn.commit()
         .await
@@ -1575,17 +1574,16 @@ pub async fn update_global_issue_details(
         "failed to fetch projects affected by global detail updates",
     )?;
 
-    tech_review_queue::add_projects_with_review_details(
+    tech_review_queue::sync_projects(
         &affected_projects
             .into_iter()
             .map(|row| row.project_id)
             .collect::<Vec<_>>(),
+        tech_review_queue::TechReviewRemovalReason::RulesChanged,
         &mut txn,
     )
     .await
-    .wrap_api_err(
-        "executing `tech_review_queue::add_projects_with_review_details`",
-    )?;
+    .wrap_api_err("executing `tech_review_queue::sync_projects`")?;
 
     txn.commit()
         .await

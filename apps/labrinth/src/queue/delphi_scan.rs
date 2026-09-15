@@ -40,6 +40,8 @@ const SCAN_POLL_INTERVAL: Duration = Duration::from_secs(1);
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct DelphiFileScanEvent {
     pub file_id: FileId,
+    #[serde(default)]
+    pub force: bool,
 }
 
 #[derive(Debug, Serialize)]
@@ -52,6 +54,8 @@ struct FailedDelphiFileScanEvent {
 struct DelphiFileScanMessage {
     event_metadata: DelphiFileScanEventMetadata,
     file_id: FileId,
+    #[serde(default)]
+    force: bool,
 }
 
 #[derive(Debug, Deserialize)]
@@ -68,6 +72,7 @@ pub(crate) enum DelphiFileScanOutcome {
 }
 
 enum ScanResult {
+    AlreadySucceeded,
     Succeeded,
     Failed {
         outcome: DelphiFileScanOutcome,
@@ -81,6 +86,23 @@ pub async fn enqueue_file(
     kafka_client: &KafkaClientState,
     file_id: DBFileId,
 ) -> Result<()> {
+    enqueue_file_inner(transaction, kafka_client, file_id, false).await
+}
+
+pub async fn force_enqueue_file(
+    transaction: &mut PgTransaction<'_>,
+    kafka_client: &KafkaClientState,
+    file_id: DBFileId,
+) -> Result<()> {
+    enqueue_file_inner(transaction, kafka_client, file_id, true).await
+}
+
+async fn enqueue_file_inner(
+    transaction: &mut PgTransaction<'_>,
+    kafka_client: &KafkaClientState,
+    file_id: DBFileId,
+    force: bool,
+) -> Result<()> {
     // Kafka can deliver the event before the transaction inserting the file
     // commits. The consumer takes the same lock before checking the file, so it
     // observes either the committed file or the completed rollback.
@@ -93,6 +115,7 @@ pub async fn enqueue_file(
         DELPHI_FILE_SCAN_TOPIC,
         DelphiFileScanEvent {
             file_id: file_id.into(),
+            force,
         },
     );
     let key = event.data.file_id.to_string();
@@ -240,7 +263,14 @@ async fn process_message(
         return commit_message(consumer, message);
     }
 
-    match scan_file(pool, event.file_id, scan_id).await? {
+    match scan_file(pool, event.file_id, scan_id, event.force).await? {
+        ScanResult::AlreadySucceeded => {
+            info!(
+                %event.file_id,
+                %scan_id,
+                "Skipping file already scanned by this Delphi version"
+            );
+        }
         ScanResult::Succeeded => {
             info!(%event.file_id, %scan_id, "Completed Delphi file scan");
         }
@@ -323,6 +353,7 @@ async fn scan_file(
     pool: &PgPool,
     file_id: FileId,
     scan_id: Uuid,
+    force: bool,
 ) -> Result<ScanResult> {
     let deadline = tokio::time::Instant::now()
         + Duration::from_secs(ENV.DELPHI_SCAN_TIMEOUT);
@@ -339,6 +370,13 @@ async fn scan_file(
         }
         Err(_) => return Ok(scan_timed_out(file_id, scan_id, None)),
     };
+
+    if !force
+        && let Some(delphi_version) = delphi_version
+        && successful_report_exists(pool, file_id, delphi_version).await?
+    {
+        return Ok(ScanResult::AlreadySucceeded);
+    }
 
     info!(%file_id, %scan_id, "Submitting file to Delphi");
     match tokio::time::timeout_at(
@@ -366,10 +404,32 @@ async fn scan_file(
         }
     }
 
-    match wait_for_succeeded_scan(pool, scan_id, deadline).await? {
-        true => Ok(ScanResult::Succeeded),
-        false => Ok(scan_timed_out(file_id, scan_id, delphi_version)),
+    if wait_for_succeeded_scan(pool, scan_id, deadline).await? {
+        Ok(ScanResult::Succeeded)
+    } else {
+        Ok(scan_timed_out(file_id, scan_id, delphi_version))
     }
+}
+
+async fn successful_report_exists(
+    pool: &PgPool,
+    file_id: FileId,
+    delphi_version: i32,
+) -> Result<bool> {
+    sqlx::query_scalar!(
+        r#"
+        SELECT EXISTS(
+            SELECT 1
+            FROM delphi_reports
+            WHERE file_id = $1 AND delphi_version = $2
+        ) AS "exists!"
+        "#,
+        file_id.0 as i64,
+        delphi_version,
+    )
+    .fetch_one(pool)
+    .await
+    .wrap_err("checking whether file was scanned by this Delphi version")
 }
 
 fn scan_timed_out(
@@ -387,7 +447,7 @@ fn scan_timed_out(
     }
 }
 
-async fn fetch_delphi_version() -> Result<i32> {
+pub(crate) async fn fetch_delphi_version() -> Result<i32> {
     let response = HTTP_CLIENT
         .get(format!("{}/version", ENV.DELPHI_URL))
         .send()

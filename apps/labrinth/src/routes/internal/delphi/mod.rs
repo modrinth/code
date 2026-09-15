@@ -34,6 +34,7 @@ use crate::{
     util::{error::Context, guards::admin_key_guard, kafka::KafkaClientState},
 };
 
+pub mod rescan;
 pub mod tech_review_queue;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
@@ -296,8 +297,9 @@ async fn ingest_report_deserialized(
     .await
     .wrap_internal_err("failed to apply delphi rules to new issue details")?;
 
-    tech_review_queue::add_projects_with_review_details(
+    tech_review_queue::sync_projects(
         &[DBProjectId::from(report.project_id)],
+        tech_review_queue::TechReviewRemovalReason::ScanCompleted,
         &mut transaction,
     )
     .await
@@ -388,7 +390,7 @@ pub async fn _run(
         .begin()
         .await
         .wrap_internal_err("beginning Delphi scan enqueue transaction")?;
-    crate::queue::delphi_scan::enqueue_file(
+    crate::queue::delphi_scan::force_enqueue_file(
         &mut transaction,
         &kafka_client,
         DBFileId(run_parameters.file_id.0 as i64),
