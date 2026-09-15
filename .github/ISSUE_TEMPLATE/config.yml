@@ -1,8 +1,8 @@
-blank_issues_enabled: false
+blank_issues_enabled: true
 contact_links:
-  - name: 🫶 Support portal
-    about: Get support using through our support website.
-    url: https://support.modrinth.com
-  - name: 💬 Chat on Discord
-    about: Join our Discord server to chat about Modrinth.
-    url: https://discord.modrinth.com
+  - name: Owyx website
+    about: Product site / account
+    url: https://owyx.site
+  - name: Upstream Modrinth (not this fork)
+    about: Issues about Modrinth itself belong on modrinth/code — this repo is an Owyx fork/rebrand.
+    url: https://github.com/modrinth/code

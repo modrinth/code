@@ -2,6 +2,8 @@
 
 Canonical product: **Owyx** = `apps/app` + `apps/app-frontend` + `packages/app-lib`, rebranded from the Modrinth App shell. Control-plane site: **`owyxsite/`**.
 
+This repo is a **fork of modrinth/code** — same package licenses (GPL-3 for the app); no Modrinth trademarks. See root `README.md`, `LICENSE`, `COPYING.md`.
+
 ## Do
 
 - Follow upstream `modrinth/code` for features/fixes; **keep the GitHub fork relationship**.

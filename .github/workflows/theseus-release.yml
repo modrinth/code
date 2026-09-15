@@ -1,7 +1,7 @@
-name: Modrinth App release
+name: Owyx App release
 on:
   workflow_run:
-    workflows: ['Modrinth App build']
+    workflows: ['Owyx App build']
     types: [completed]
 
 concurrency:
@@ -10,8 +10,11 @@ concurrency:
 
 jobs:
   release:
-    name: Release Modrinth App
+    name: Release Owyx App
+    # Never publish to Modrinth launcher-files CDN from this fork.
+    # Upstream workflow remains for modrinth/code only.
     if: >-
+      github.repository == 'modrinth/code' &&
       github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.event == 'push' &&
       startsWith(github.event.workflow_run.head_branch, 'v')

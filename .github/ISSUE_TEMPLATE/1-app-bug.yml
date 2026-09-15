@@ -1,60 +1,59 @@
-name: 🎮 Bug with Modrinth App
-description: For issues with Modrinth App.
+name: 🎮 Bug with Owyx launcher
+description: Bugs in the Owyx desktop launcher (this fork — not Modrinth App).
 labels: [app]
 type: 'bug'
 body:
+  - type: markdown
+    attributes:
+      value: |
+        This tracker is for **Owyx** ([ebluffy/Owyx](https://github.com/ebluffy/Owyx)), a rebranded fork of [modrinth/code](https://github.com/modrinth/code).
+        Upstream Modrinth App issues belong on the Modrinth repo.
   - type: checkboxes
     attributes:
       label: Please confirm the following.
       options:
-        - label: I checked the [existing issues](https://github.com/modrinth/code/issues?q=is%3Aissue) for duplicate problems
+        - label: I checked existing issues on this fork for duplicates
           required: true
-        - label: I have tried resolving the issue using the [support portal](https://support.modrinth.com)
+        - label: I am reporting an Owyx build (not the official Modrinth App)
           required: true
-        - label: I have ensured my Modrinth App installation is up to date
+        - label: My Owyx installation is up to date (or I note the commit/tag)
           required: true
   - type: input
     id: version
     attributes:
-      label: What version of the Modrinth App are you using?
-      description: Find this in ⚙️ Settings (bottom right) -> After Modrinth App (bottom left)
+      label: What version / commit of Owyx are you using?
+      description: Settings → about, or `git rev-parse --short HEAD` if building from source
     validations:
       required: true
   - type: dropdown
     id: oses
     attributes:
-      label: What operating systems are you seeing the problem on?
+      label: Operating system
       multiple: true
       options:
         - Windows
-        - MacOS
+        - macOS
         - Linux
-  - type: textarea
-    attributes:
-      label: Describe the bug
-      description: A clear and concise description of what the bug is. Include screenshots if applicable.
     validations:
       required: true
   - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: What happened? What did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
     attributes:
       label: Steps to reproduce
-      description: Steps to reproduce the behavior.
-      placeholder: |
-        1. Go to '...'
-        2. Click on '...'
-        3. Scroll down to '...'
-        4. See error
+      description: Minimal steps
     validations:
-      required: false
+      required: true
   - type: textarea
+    id: logs
     attributes:
-      label: Expected behavior
-      description: A clear and concise description of what you expected to happen.
-    validations:
-      required: false
-  - type: textarea
-    attributes:
-      label: Additional context
-      description: Add any other context about the problem here.
+      label: Logs / screenshots
+      description: Paste relevant logs if you have them
     validations:
       required: false

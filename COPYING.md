@@ -1,8 +1,8 @@
 # Copying Guidelines
 
-All packages in this repository are licensed under their respective licenses. For more information, refer to the LICENSE file in each package.
+This repository is a **fork of [modrinth/code](https://github.com/modrinth/code)** rebranded and extended as **Owyx**. Package source licenses are **unchanged** from upstream — see each package’s `LICENSE` / `LICENSE.txt` (the desktop app and related packages are **GNU GPL v3**). A copy of GPL-3 is also at the repository root [`LICENSE`](./LICENSE).
 
-For detailed information, consult each package's COPYING.md, LICENSE.txt, or LICENSE file, if available.
+For detailed information, consult each package's `COPYING.md`, `LICENSE.txt`, or `LICENSE` file, if available.
 
 ## Modrinth Branding
 
@@ -10,12 +10,12 @@ The use of Modrinth branding elements, including but not limited to the wrench-i
 
 > All rights reserved. © 2020-2025 Rinth, Inc.
 
-This includes, but may not be limited to, the following files:
+Upstream listed (among others) these trademark assets; **they are removed from this fork** and must not be restored:
 
-- .idea/icon.svg
-- .github/api_cover.png
-- .github/app_cover.png
-- .github/monorepo_cover.png
-- .github/web_cover.png
+- `.idea/icon.svg`
+- `.github/assets/api_cover.png`
+- `.github/assets/app_cover.png`
+- `.github/assets/monorepo_cover.png`
+- `.github/assets/web_cover.png`
 
-If you fork this repository, you must remove all Modrinth branding assets from your fork.
+If you fork this repository further, you must continue to omit Modrinth branding assets. Owyx product branding lives under [`brand/`](./brand/).
