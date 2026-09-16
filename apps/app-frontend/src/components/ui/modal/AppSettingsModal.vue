@@ -311,7 +311,7 @@ const messages = defineMessages({
 	},
 	appVersion: {
 		id: 'app.settings.app-version',
-		defaultMessage: 'Owyx {version}',
+		defaultMessage: 'Owyx™ {version}',
 	},
 	macos: {
 		id: 'app.settings.operating-system.macos',

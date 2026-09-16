@@ -24,11 +24,13 @@ Upstream listed (among others) these trademark assets; **they are removed from t
 
 If you fork this repository further, you must continue to omit Modrinth branding assets.
 
+See also [`TRADEMARK.md`](./TRADEMARK.md) for Owyx™ brand rules.
+
 ---
 
-## Owyx Branding
+## Owyx™ Branding
 
-**Owyx** product branding is **not** licensed under GPL-3 for reuse in forks, derivatives, or redistributed builds. Source code may be used under GPL-3; the Owyx name, marks, and assets may not.
+**Owyx™** product branding is **not** licensed under GPL-3 for reuse in forks, derivatives, or redistributed builds. Source code may be used under GPL-3; the Owyx™ name, marks, and assets may not.
 
 ### Where branding lives
 
@@ -38,14 +40,14 @@ If you fork this repository further, you must continue to omit Modrinth branding
 | [`apps/app/icons/`](./apps/app/icons/) | Launcher install icons (Windows/macOS/Linux) |
 | [`apps/app/dmg/`](./apps/app/dmg/) | macOS DMG artwork |
 | [`owyxsite/frontend/public/`](./owyxsite/frontend/public/) | Site favicons and public brand files |
-| Launcher / site strings & themes | Product name **Owyx**, cyan accent `#00e5ff`, dark cosmic palette, Sora wordmark usage |
+| Launcher / site strings & themes | Product name **Owyx™**, cyan accent `#00e5ff`, dark cosmic palette, Sora wordmark usage |
 
-### What you must not do without written permission from the Owyx maintainer
+### What you must not do without written permission from Owyx Team
 
-- Use the name **Owyx**, **Owyx Team**, **owyx.site**, **api.owyx.site**, or confusingly similar names as the product name of your fork, binary, installer, website, or Discord/community.
-- Ship or redistribute files from [`brand/`](./brand/) (or copies of those marks) in a product that is not an official Owyx build.
-- Use Owyx logos, crystal icons, wordmarks, Discord RPC art, installer icons, or site favicons as your own brand.
-- Imply affiliation with, endorsement by, or identity as the official Owyx project or Owyx Team.
+- Use the name **Owyx™**, **Owyx Team™**, **owyx.site**, **api.owyx.site**, or confusingly similar names as the product name of your fork, binary, installer, website, or Discord/community.
+- Ship or redistribute files from [`brand/`](./brand/) (or copies of those marks) in a product that is not an official Owyx™ build.
+- Use Owyx™ logos, crystal icons, wordmarks, Discord RPC art, installer icons, or site favicons as your own brand.
+- Imply affiliation with, endorsement by, or identity as the official Owyx™ project or Owyx Team™.
 
 ### What forks should do
 
@@ -55,6 +57,6 @@ If you fork this repository further, you must continue to omit Modrinth branding
 4. Keep omitting Modrinth branding as required above.
 5. Keep GPL-3 notices and upstream attribution for code you redistribute.
 
-> Owyx branding: all rights reserved. © Owyx Team. Code: see package licenses / root [`LICENSE`](./LICENSE).
+> Owyx™ branding: all rights reserved. © Owyx Team. Code: see package licenses / root [`LICENSE`](./LICENSE).
 
 Official design tokens and asset inventory: [`brand/DESIGN.md`](./brand/DESIGN.md), [`brand/README.md`](./brand/README.md).

@@ -2,12 +2,12 @@
 
 Canonical product: **Owyx** = `apps/app` + `apps/app-frontend` + `packages/app-lib`, rebranded from the Modrinth App shell. Control-plane site: **`owyxsite/`**.
 
-This repo is a **fork of modrinth/code** — same package licenses (GPL-3 for the app); no Modrinth trademarks. See root `README.md`, `LICENSE`, `COPYING.md`.
+This repo is a **fork of modrinth/code** — same package licenses (GPL-3 for the app); no Modrinth trademarks. See root `README.md`, `LICENSE`, `COPYING.md`, `TRADEMARK.md`.
 
 ## Do
 
 - Follow upstream `modrinth/code` for features/fixes; **keep the GitHub fork relationship**.
-- Brand from **`brand/`** — `brand/DESIGN.md`, prefer `brand/v2/` (Sora, cyan `#00e5ff`, bg `#050508`).
+- Brand from **`brand/`** — `brand/DESIGN.md`, prefer `brand/v2/` (Sora, cyan `#00e5ff`, bg `#050508`). Owyx™ marks: `TRADEMARK.md`.
 - Control-plane site: **`owyxsite/`** (Next frontend + Node API + deploy). Not Modrinth `apps/frontend` / `labrinth`.
 - API: `https://api.owyx.site` + header `X-Owyx-Client-Key` (placeholder / settings only — **never commit real keys**). Contract: `owyxsite/LAUNCHER_SITE_CONTRACT.md`.
 - Offline nickname + Microsoft login both live in `packages/app-lib` auth; see `docs/ms-oauth.md`.
@@ -21,6 +21,7 @@ This repo is a **fork of modrinth/code** — same package licenses (GPL-3 for th
 - Commit `.env`, real client keys, `*.exe`, `frpc.toml` secrets, or other secrets.
 - Unfork / delete the upstream remote / rewrite history to hide origin.
 - Touch `apps/frontend` / `apps/labrinth` for Owyx product work.
+- Reuse **Owyx™** branding in forks (see `TRADEMARK.md` / `COPYING.md`).
 
 ## Pointers
 
@@ -28,6 +29,7 @@ This repo is a **fork of modrinth/code** — same package licenses (GPL-3 for th
 |-------|--------|
 | Design tokens | `brand/DESIGN.md` |
 | Logos / icons | `brand/v2/` |
+| Brand / trademarks | `TRADEMARK.md`, `COPYING.md` |
 | MS OAuth | `docs/ms-oauth.md` |
 | Site ↔ launcher contract | `owyxsite/LAUNCHER_SITE_CONTRACT.md` |
 | Owyx Servers client | `apps/app-frontend/src/helpers/owyx-api.ts` |

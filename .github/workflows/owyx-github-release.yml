@@ -198,15 +198,16 @@ jobs:
         run: |
           set -euo pipefail
           NOTES=$(cat <<EOF
-          ## Owyx ${VERSION}
+          ## Owyx™ ${VERSION}
 
           ### Changes
-          - Release pipeline: idempotent version patch, Discord app ID, Tauri auto-update via GitHub \`latest.json\`
-          - Site: collapsible brand palette, password strength on register, Mailjet SMTP ready
-          - Launcher: Microsoft account preferred over offline nick; Owyx Servers / API settings admin-only; Discord RPC → Owyx app
-          - Data dir: \`%AppData%\\Roaming\\Owyx\` (Tauri identifier \`Owyx\`)
+          - Offline / Owyx nick accounts: restore compile fix; passive site→nick sync no longer steals active Microsoft; explicit nick login still activates
+          - Friends presence heartbeat (~90s TTL) + contract docs
+          - Branding: COPYING.md / TRADEMARK.md — forks may use GPL code but not Owyx™ marks
+          - Site: Terms / Privacy / EULA (EN+RU), language toggle, offer hidden
+          - Release CI: build app-frontend with root pnpm before Tauri (fixes Windows crash from nested packageManager)
 
-          Installers: Windows NSIS, Linux AppImage. GPL-3 fork of [modrinth/code](https://github.com/modrinth/code); not affiliated with Modrinth / Rinth, Inc.
+          Installers: Windows NSIS, Linux AppImage. GPL-3 fork of [modrinth/code](https://github.com/modrinth/code); not affiliated with Modrinth / Rinth, Inc. Owyx™ branding reserved — see TRADEMARK.md.
           EOF
           )
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then

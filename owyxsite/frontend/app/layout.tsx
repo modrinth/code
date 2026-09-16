@@ -30,18 +30,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Owyx — приватный Minecraft",
+  title: "Owyx™ — приватный Minecraft",
   description:
-    "Owyx — экосистема приватного Minecraft: скачай лаунчер и играй, или войди аккаунтом Owyx для скина и плюшек. Без заявок.",
+    "Owyx™ — экосистема приватного Minecraft: скачай лаунчер и играй, или войди аккаунтом Owyx™ для скина и плюшек. Без заявок.",
   keywords: ["owyx", "minecraft", "приватный сервер", "лаунчер", "своё сообщество"],
   authors: [{ name: "ebluffy" }],
   icons: {
     icon: "/favicon-owyx.svg",
   },
   openGraph: {
-    title: "Owyx — приватный Minecraft",
+    title: "Owyx™ — приватный Minecraft",
     description:
-      "Скачай лаунчер Owyx → играй по нику или войди аккаунтом сайта.",
+      "Скачай лаунчер Owyx™ → играй по нику или войди аккаунтом сайта.",
     type: "website",
     locale: "ru_RU",
   },

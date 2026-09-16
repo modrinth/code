@@ -1,42 +1,22 @@
+"use client";
+
 import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-
-export const metadata = {
-  title: "Скачать лаунчер — Owyx",
-  description: "Скачай лаунчер Owyx для Windows или Linux, войди тем же аккаунтом и играй.",
-};
+import { useLocale } from "@/hooks/useLocale";
 
 const REPO_URL = "https://github.com/ebluffy/Owyx";
 const RELEASES_URL = `${REPO_URL}/releases/latest`;
 
-/** Prefer env overrides; otherwise latest GitHub release asset names (SemVer in filename). */
+/** Prefer env overrides; otherwise point at latest GitHub release assets. */
 const WINDOWS_URL =
   process.env.NEXT_PUBLIC_LAUNCHER_DOWNLOAD_URL_WINDOWS ||
   process.env.NEXT_PUBLIC_LAUNCHER_DOWNLOAD_URL ||
-  `${REPO_URL}/releases/latest/download/Owyx_0.4.1_x64-setup.exe`;
+  `${REPO_URL}/releases/latest/download/Owyx_0.5.2_x64-setup.exe`;
 
 const LINUX_URL =
   process.env.NEXT_PUBLIC_LAUNCHER_DOWNLOAD_URL_LINUX ||
-  `${REPO_URL}/releases/latest/download/Owyx_0.4.1_amd64.AppImage`;
-
-const steps = [
-  {
-    n: "1",
-    title: "Скачай установщик",
-    text: "Windows: setup.exe. Linux: AppImage — сделай исполняемым и запусти.",
-  },
-  {
-    n: "2",
-    title: "Создай аккаунт и войди",
-    text: "Зарегистрируйся на owyx.site, затем войди тем же логином в лаунчере.",
-  },
-  {
-    n: "3",
-    title: "Создай сборку и играй",
-    text: "Создай instance или открой Owyx Servers → Play.",
-  },
-];
+  `${REPO_URL}/releases/latest/download/Owyx_0.5.2_amd64.AppImage`;
 
 function WindowsIcon({ className }: { className?: string }) {
   return (
@@ -55,23 +35,29 @@ function LinuxIcon({ className }: { className?: string }) {
 }
 
 export default function DownloadPage() {
+  const { dict, locale } = useLocale();
+  const d = dict.download;
+  const steps = [
+    { n: "1", title: d.step1Title, text: d.step1Text },
+    { n: "2", title: d.step2Title, text: d.step2Text },
+    { n: "3", title: d.step3Title, text: d.step3Text },
+  ];
+
   return (
     <>
       <Header />
       <main id="main-content" className="relative flex-1">
         <section className="max-w-3xl mx-auto px-4 sm:px-6 py-16">
           <div className="mb-10">
-            <p className="text-sm text-accent font-medium tracking-wide">Лаунчер Owyx</p>
+            <p className="text-sm text-accent font-medium tracking-wide">{d.eyebrow}</p>
             <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-[-0.04em] mt-2 mb-3">
-              Скачать
+              {d.title}
             </h1>
-            <p className="text-lg text-muted max-w-2xl">
-              Один аккаунт на сайте и в лаунчере. Выбери платформу:
-            </p>
+            <p className="text-lg text-muted max-w-2xl">{d.lead}</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 mb-4">
-            <span className="text-sm font-medium text-text mr-1">Скачать</span>
+            <span className="text-sm font-medium text-text mr-1">{d.downloadLabel}</span>
             <a
               href={WINDOWS_URL}
               className="btn btn-primary"
@@ -91,13 +77,13 @@ export default function DownloadPage() {
               Linux
             </a>
             <a href={RELEASES_URL} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">
-              Все релизы
+              {d.allReleases}
             </a>
           </div>
           <p className="text-muted text-sm mb-14 max-w-lg">
-            Актуальные файлы:{" "}
-            <code className="text-xs">Owyx_*_x64-setup.exe</code> и{" "}
-            <code className="text-xs">Owyx_*_amd64.AppImage</code> с{" "}
+            {locale === "en_US" ? "Current files:" : "Актуальные файлы:"}{" "}
+            <code className="text-xs">Owyx_*_x64-setup.exe</code> /{" "}
+            <code className="text-xs">Owyx_*_amd64.AppImage</code> —{" "}
             <a href={RELEASES_URL} target="_blank" rel="noopener noreferrer" className="link-accent">
               GitHub Releases
             </a>
@@ -117,11 +103,23 @@ export default function DownloadPage() {
           </ol>
 
           <div className="mt-10 text-muted text-sm">
-            Хочешь свой скин и плюшки?{" "}
-            <Link href="/register" className="link-accent">
-              Создай аккаунт Owyx
-            </Link>{" "}
-            и войди тем же аккаунтом в лаунчере.
+            {locale === "en_US" ? (
+              <>
+                Want a skin and extras?{" "}
+                <Link href="/register" className="link-accent">
+                  Create an Owyx™ account
+                </Link>{" "}
+                and sign in with the same account in the launcher.
+              </>
+            ) : (
+              <>
+                Хочешь свой скин и плюшки?{" "}
+                <Link href="/register" className="link-accent">
+                  Создай аккаунт Owyx™
+                </Link>{" "}
+                и войди тем же аккаунтом в лаунчере.
+              </>
+            )}
           </div>
         </section>
       </main>

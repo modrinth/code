@@ -15,7 +15,10 @@ export default function Footer() {
     <footer className="mt-auto border-t border-line/90">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-muted">
-          <span className="font-display font-semibold tracking-tight text-accent">owyx</span>
+          <span className="font-display font-semibold tracking-tight text-accent">
+            owyx
+            <sup className="ml-0.5 text-[0.55em] font-semibold text-accent/80">™</sup>
+          </span>
           {" "}© {new Date().getFullYear()} · {dict.footer.madeBy}
         </p>
         <nav className="flex flex-wrap gap-x-5 gap-y-2 text-xs">
