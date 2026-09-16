@@ -404,7 +404,6 @@ onMounted(() => {
 	void loadCatalog()
 })
 </script>
-</script>
 
 <template>
 	<div class="owyx-servers mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-6">
