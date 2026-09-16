@@ -8,9 +8,9 @@ Give each complex component its own folder:
 components/
 └── analytics-chart/
 	├── index.vue
-	├── analytics-chart-header.vue
-	├── analytics-chart-plot.vue
-	├── analytics-chart-data.ts
+	├── header.vue
+	├── plot.vue
+	├── data.ts
 	└── use-analytics-chart.ts
 ```
 
@@ -37,9 +37,9 @@ Keep files for only one component in that component's folder:
 ```
 analytics-chart/
 ├── index.vue
-├── analytics-chart-header.vue
-├── analytics-chart-plot.vue
-├── analytics-chart-tooltip.vue
+├── header.vue
+├── plot.vue
+├── tooltip.vue
 ├── chart-ranges.ts
 └── use-chart-hover-state.ts
 ```
@@ -60,8 +60,8 @@ Use clear names that show the relation between each subcomponent and its main co
 ```
 analytics-chart/
 ├── index.vue
-├── analytics-chart-header.vue
-└── analytics-chart-plot.vue
+├── header.vue
+└── plot.vue
 ```
 
 Do not use names that make a local component look like a public component:
@@ -73,7 +73,7 @@ analytics-chart/
 └── header.vue
 ```
 
-Add the `analytics-chart-` prefix to local filenames. This prefix shows the relation in search results, editor tabs, and imports.
+Add the `` prefix to local filenames. This prefix shows the relation in search results, editor tabs, and imports.
 
 ## Nesting
 
@@ -84,8 +84,8 @@ Use this structure:
 ```
 analytics-chart/
 ├── index.vue
-├── analytics-chart-header.vue
-├── analytics-chart-plot.vue
+├── header.vue
+├── plot.vue
 ├── use-chart-hover-state.ts
 └── use-chart-selection.ts
 ```
