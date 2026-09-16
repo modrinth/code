@@ -318,6 +318,7 @@ tauri-utils = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff69
 opt-level = 3
 
 [profile.test]
+inherits = "dev"
 debug = "line-tables-only"
 
 # Optimize for speed and reduce size on release builds
