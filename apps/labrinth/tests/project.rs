@@ -609,7 +609,7 @@ async fn test_edit_invalid_project_in_review_rolls_back() {
 }
 
 #[actix_rt::test]
-async fn test_leaving_review_allows_invalid_changed_fields() {
+async fn test_leaving_review_skips_validation() {
     with_test_environment(
         None,
         |test_env: TestEnvironment<ApiV3>| async move {

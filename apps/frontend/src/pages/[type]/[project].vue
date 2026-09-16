@@ -637,12 +637,12 @@ import ProjectCollectionSaveButton from '~/components/ui/ProjectCollectionSaveBu
 import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
+import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { useProjectLinkValidation } from '~/composables/link-network-validation'
 import {
 	canSubmitProjectForReview,
 	PROJECT_REVIEW_VALIDATION_ERROR,
 } from '~/composables/link-network-validation/submission'
-import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { notifyCopied } from '~/composables/moderation.ts'
 import { STALE_TIME, STALE_TIME_LONG, warmProjectCheckCaches } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
