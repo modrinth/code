@@ -3994,5 +3994,8 @@
   },
   "settings.sidebar.label.display": {
     "message": "Weergave"
+  },
+  "app.nav.admin-panel": {
+    "message": "Beheerderspaneel"
   }
 }

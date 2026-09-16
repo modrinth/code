@@ -121,6 +121,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_share_unlink,
             instance_share_unpublish,
             instance_export_mrpack,
+            instance_export_mrpack_bytes,
             instance_get_pack_export_candidates,
         ])
         .build()
@@ -1306,6 +1307,26 @@ pub async fn instance_export_mrpack(
     )
     .await?;
     Ok(())
+}
+
+#[tauri::command]
+pub async fn instance_export_mrpack_bytes(
+    instance_id: &str,
+    included_overrides: Vec<String>,
+    excluded_overrides: Vec<String>,
+    version_id: Option<String>,
+    description: Option<String>,
+    name: Option<String>,
+) -> Result<Vec<u8>> {
+    Ok(theseus::instance::export_mrpack_bytes(
+        instance_id,
+        included_overrides,
+        excluded_overrides,
+        version_id,
+        description,
+        name,
+    )
+    .await?)
 }
 
 #[tauri::command]

@@ -3451,5 +3451,8 @@
   },
   "settings.sidebar.label.display": {
     "message": "Visning"
+  },
+  "app.nav.admin-panel": {
+    "message": "Adminpanel"
   }
 }

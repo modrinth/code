@@ -2197,5 +2197,8 @@
   },
   "settings.sidebar.label.display": {
     "message": "디스플레이"
+  },
+  "app.nav.admin-panel": {
+    "message": "관리자 패널"
   }
 }

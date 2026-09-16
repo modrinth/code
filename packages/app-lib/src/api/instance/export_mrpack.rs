@@ -164,6 +164,36 @@ impl ExportSelectionNode {
     }
 }
 
+/// Export an instance to `.mrpack` bytes via a system temp file.
+/// Used by the launcher when the frontend cannot read `$TEMP` under Tauri FS scope.
+#[tracing::instrument(skip_all)]
+pub async fn export_mrpack_bytes(
+    instance_id: &str,
+    included_export_candidates: Vec<String>,
+    excluded_export_candidates: Vec<String>,
+    version_id: Option<String>,
+    description: Option<String>,
+    name: Option<String>,
+) -> crate::Result<Vec<u8>> {
+    let temporary = tempfile::NamedTempFile::new().map_err(|e| {
+        crate::ErrorKind::FSError(format!("creating temporary mrpack export: {e}"))
+    })?;
+    let path = temporary.path().to_path_buf();
+    export_mrpack(
+        instance_id,
+        path.clone(),
+        included_export_candidates,
+        excluded_export_candidates,
+        version_id,
+        description,
+        name,
+    )
+    .await?;
+    Ok(tokio::fs::read(&path)
+        .await
+        .map_err(|e| IOError::with_path(e, &path))?)
+}
+
 #[tracing::instrument(skip_all)]
 pub async fn export_mrpack(
     instance_id: &str,

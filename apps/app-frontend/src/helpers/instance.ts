@@ -577,6 +577,26 @@ export async function export_instance_mrpack(
 	})
 }
 
+/** Export `.mrpack` without writing through frontend FS scope (avoids Temp forbidden path). */
+export async function export_instance_mrpack_bytes(
+	instanceId: string,
+	includedOverrides: string[],
+	excludedOverrides: string[],
+	versionId?: string,
+	description?: string,
+	name?: string,
+): Promise<Uint8Array> {
+	const bytes = await invoke<number[]>('plugin:instance|instance_export_mrpack_bytes', {
+		instanceId,
+		includedOverrides,
+		excludedOverrides,
+		versionId,
+		description,
+		name,
+	})
+	return new Uint8Array(bytes)
+}
+
 export type PackExportCandidate = {
 	path: string
 	type: 'directory' | 'file'

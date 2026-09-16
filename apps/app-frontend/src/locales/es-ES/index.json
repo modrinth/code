@@ -4312,5 +4312,8 @@
   },
   "settings.sidebar.label.display": {
     "message": "Pantalla"
+  },
+  "app.nav.admin-panel": {
+    "message": "Panel de administración"
   }
 }

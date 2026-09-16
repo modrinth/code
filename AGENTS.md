@@ -33,5 +33,6 @@ This repo is a **fork of modrinth/code** — same package licenses (GPL-3 for th
 | Owyx Servers client | `apps/app-frontend/src/helpers/owyx-api.ts` |
 | Offline accounts | `Credentials::create_offline` in `packages/app-lib/src/state/minecraft_auth.rs` |
 | SemVer releases | `.cursor/rules/semver.mdc` — baseline `0.2.0`, bump MAJOR/MINOR/PATCH per https://semver.org/ |
+| External agent skills / MCP | [ebluffy/agent-tool-catalog](https://github.com/ebluffy/agent-tool-catalog) · skill `.agents/skills/agent-tool-catalog/` |
 
 Cloud task paste (local only): `promt.md` (gitignored).

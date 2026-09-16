@@ -4618,5 +4618,8 @@
 	},
 	"owyx.servers.demo-badge": {
 		"message": "demo"
-	}
+	},
+  "app.nav.admin-panel": {
+    "message": "Admin panel"
+  }
 }

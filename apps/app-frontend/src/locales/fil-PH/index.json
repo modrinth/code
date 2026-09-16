@@ -628,5 +628,8 @@
   },
   "search.filter.locked.server-environment.title": {
     "message": "Mga mod sa panig ng client lamang ang maidadaragdag sa instansiyang server"
+  },
+  "app.nav.admin-panel": {
+    "message": "Admin panel"
   }
 }

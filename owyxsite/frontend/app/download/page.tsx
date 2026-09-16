@@ -14,11 +14,11 @@ const RELEASES_URL = `${REPO_URL}/releases/latest`;
 const WINDOWS_URL =
   process.env.NEXT_PUBLIC_LAUNCHER_DOWNLOAD_URL_WINDOWS ||
   process.env.NEXT_PUBLIC_LAUNCHER_DOWNLOAD_URL ||
-  `${REPO_URL}/releases/latest/download/Owyx_0.4.0_x64-setup.exe`;
+  `${REPO_URL}/releases/latest/download/Owyx_0.4.1_x64-setup.exe`;
 
 const LINUX_URL =
   process.env.NEXT_PUBLIC_LAUNCHER_DOWNLOAD_URL_LINUX ||
-  `${REPO_URL}/releases/latest/download/Owyx_0.4.0_amd64.AppImage`;
+  `${REPO_URL}/releases/latest/download/Owyx_0.4.1_amd64.AppImage`;
 
 const steps = [
   {

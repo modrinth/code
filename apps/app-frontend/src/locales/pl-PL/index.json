@@ -4378,5 +4378,8 @@
   },
   "settings.sidebar.label.display": {
     "message": "Wyświetlanie"
+  },
+  "app.nav.admin-panel": {
+    "message": "Panel admina"
   }
 }

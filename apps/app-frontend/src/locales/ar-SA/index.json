@@ -2989,5 +2989,8 @@
   },
   "settings.sidebar.label.display": {
     "message": "المظهر"
+  },
+  "app.nav.admin-panel": {
+    "message": "لوحة الإدارة"
   }
 }

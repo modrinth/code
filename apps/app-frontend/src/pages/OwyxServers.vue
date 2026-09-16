@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { CogIcon, PlayIcon, ServerStackIcon } from '@modrinth/assets'
-import { Button, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
-import { basename, join, tempDir } from '@tauri-apps/api/path'
-import { readFile, remove } from '@tauri-apps/plugin-fs'
+import {
+	Button,
+	Combobox,
+	defineMessages,
+	injectNotificationManager,
+	useVIntl,
+	type ComboboxOption,
+} from '@modrinth/ui'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -24,10 +29,11 @@ import {
 import { createOwyxCatalogServer, publishLibraryPackToCatalog } from '@/helpers/owyx-friends'
 import { install_create_instance, installJobInstanceId } from '@/helpers/install'
 import {
-	export_instance_mrpack,
+	export_instance_mrpack_bytes,
 	get_pack_export_candidates,
 	list as listInstances,
 } from '@/helpers/instance'
+import { get_game_versions } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
 import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 import { injectOwyxSiteSession } from '@/providers/owyx-site-session'
@@ -38,6 +44,7 @@ const router = useRouter()
 const owyx = injectOwyxSiteSession()
 
 type AdminTab = 'catalog' | 'api'
+type GameVersionTag = { version: string; version_type: string }
 
 const messages = defineMessages({
 	title: { id: 'owyx.servers.title', defaultMessage: 'Owyx Servers' },
@@ -84,11 +91,35 @@ const messages = defineMessages({
 	serverAddress: { id: 'owyx.servers.server-address', defaultMessage: 'Address / IP' },
 	serverPort: { id: 'owyx.servers.server-port', defaultMessage: 'Port' },
 	serverMc: { id: 'owyx.servers.server-mc', defaultMessage: 'Minecraft version' },
+	serverMcSearch: {
+		id: 'owyx.servers.server-mc-search',
+		defaultMessage: 'Search game version…',
+	},
+	serverMcPlaceholder: {
+		id: 'owyx.servers.server-mc-placeholder',
+		defaultMessage: 'Select game version',
+	},
 	serverLoader: { id: 'owyx.servers.server-loader', defaultMessage: 'Loader' },
+	serverLoaderSearch: {
+		id: 'owyx.servers.server-loader-search',
+		defaultMessage: 'Search loader…',
+	},
+	serverLoaderPlaceholder: {
+		id: 'owyx.servers.server-loader-placeholder',
+		defaultMessage: 'Select loader',
+	},
 	serverDesc: { id: 'owyx.servers.server-desc', defaultMessage: 'Notes (local)' },
 	bindInstance: {
 		id: 'owyx.servers.bind-instance',
 		defaultMessage: 'Attach library instance (export → pack)',
+	},
+	bindInstanceSearch: {
+		id: 'owyx.servers.bind-instance-search',
+		defaultMessage: 'Search library instance…',
+	},
+	bindInstancePlaceholder: {
+		id: 'owyx.servers.bind-instance-placeholder',
+		defaultMessage: 'Select instance',
 	},
 	bindNone: { id: 'owyx.servers.bind-none', defaultMessage: '— no pack —' },
 	createServer: { id: 'owyx.servers.create-server', defaultMessage: 'Publish server' },
@@ -99,6 +130,14 @@ const messages = defineMessages({
 	},
 	playing: { id: 'owyx.servers.playing', defaultMessage: 'Preparing…' },
 	downloadPack: { id: 'owyx.servers.download-pack', defaultMessage: 'Pack' },
+	showSnapshots: {
+		id: 'owyx.servers.show-snapshots',
+		defaultMessage: 'Show all versions',
+	},
+	hideSnapshots: {
+		id: 'owyx.servers.hide-snapshots',
+		defaultMessage: 'Hide snapshots',
+	},
 })
 
 useRootBreadcrumb({
@@ -121,16 +160,41 @@ const copiedId = ref<string | null>(null)
 const adminOpen = ref(false)
 const adminTab = ref<AdminTab>('catalog')
 const instances = ref<GameInstance[]>([])
+const gameVersions = ref<GameVersionTag[]>([])
+const showSnapshots = ref(false)
 const busy = ref(false)
 const statusMsg = ref('')
 
 const formName = ref('')
 const formAddress = ref('')
 const formPort = ref('25565')
-const formMc = ref('1.21.1')
-const formLoader = ref('vanilla')
+const formMc = ref<string | null>('1.21.1')
+const formLoader = ref<string | null>('vanilla')
 const formNotes = ref('')
-const formInstanceId = ref('')
+const formInstanceId = ref<string | null>(null)
+
+const LOADER_OPTIONS: ComboboxOption<string>[] = [
+	{ value: 'vanilla', label: 'Vanilla' },
+	{ value: 'fabric', label: 'Fabric' },
+	{ value: 'forge', label: 'Forge' },
+	{ value: 'neoforge', label: 'NeoForge' },
+	{ value: 'quilt', label: 'Quilt' },
+]
+
+const gameVersionOptions = computed<ComboboxOption<string>[]>(() => {
+	const versions = showSnapshots.value
+		? gameVersions.value
+		: gameVersions.value.filter((v) => v.version_type === 'release')
+	return versions.map((v) => ({ value: v.version, label: v.version }))
+})
+
+const instanceOptions = computed<ComboboxOption<string | null>[]>(() => [
+	{ value: null, label: formatMessage(messages.bindNone) },
+	...instances.value.map((inst) => ({
+		value: inst.id,
+		label: `${inst.name} (${inst.game_version})`,
+	})),
+])
 
 const hasServers = computed(() => servers.value.length > 0)
 const isAdmin = computed(() => owyx.isAdmin.value)
@@ -160,11 +224,16 @@ async function loadCatalog() {
 async function loadInstances() {
 	try {
 		instances.value = await listInstances()
-		if (!formInstanceId.value && instances.value[0]) {
-			formInstanceId.value = instances.value[0].id
-		}
 	} catch {
 		instances.value = []
+	}
+}
+
+async function loadGameVersions() {
+	try {
+		gameVersions.value = (await get_game_versions()) as GameVersionTag[]
+	} catch {
+		gameVersions.value = []
 	}
 }
 
@@ -261,29 +330,23 @@ async function exportInstancePack(inst: GameInstance): Promise<{ blob: Blob; fil
 	const candidates = await get_pack_export_candidates(inst.id)
 	const included = candidates.filter((c) => c.defaultSelected).map((c) => c.path)
 	const excluded = candidates.filter((c) => !c.defaultSelected).map((c) => c.path)
-	const dir = await tempDir()
-	const exportPath = await join(dir, `owyx-publish-${Date.now()}.mrpack`)
-	try {
-		await export_instance_mrpack(
-			inst.id,
-			exportPath,
-			included,
-			excluded,
-			'1.0.0',
-			formNotes.value || 'Published from Owyx launcher',
-			inst.name,
-		)
-		const bytes = await readFile(exportPath)
-		const blob = new Blob([bytes], { type: 'application/zip' })
-		const fileName = (await basename(exportPath)) || 'pack.mrpack'
-		return { blob, fileName }
-	} finally {
-		await remove(exportPath).catch(() => undefined)
-	}
+	const bytes = await export_instance_mrpack_bytes(
+		inst.id,
+		included,
+		excluded,
+		'1.0.0',
+		formNotes.value || 'Published from Owyx launcher',
+		inst.name,
+	)
+	const blob = new Blob([bytes], { type: 'application/zip' })
+	const safeName = inst.name.replace(/[^\w.-]+/g, '_').slice(0, 48) || 'pack'
+	return { blob, fileName: `${safeName}.mrpack` }
 }
 
 async function publishServer() {
-	if (!formName.value.trim() || !formAddress.value.trim()) return
+	if (!formName.value.trim() || !formAddress.value.trim() || !formMc.value || !formLoader.value) {
+		return
+	}
 	busy.value = true
 	statusMsg.value = ''
 	try {
@@ -324,12 +387,23 @@ async function publishServer() {
 }
 
 watch(adminOpen, (open) => {
-	if (open && isAdmin.value) void loadInstances()
+	if (open && isAdmin.value) {
+		void loadInstances()
+		void loadGameVersions()
+	}
+})
+
+watch(formInstanceId, (id) => {
+	const inst = instances.value.find((i) => i.id === id)
+	if (!inst) return
+	if (inst.game_version) formMc.value = inst.game_version
+	if (inst.loader) formLoader.value = String(inst.loader).toLowerCase()
 })
 
 onMounted(() => {
 	void loadCatalog()
 })
+</script>
 </script>
 
 <template>
@@ -414,35 +488,50 @@ onMounted(() => {
 						</label>
 						<label class="flex flex-col gap-1 text-sm">
 							<span class="text-secondary">{{ formatMessage(messages.serverMc) }}</span>
-							<input
+							<Combobox
 								v-model="formMc"
-								class="rounded-lg border border-solid border-surface-5 bg-surface-2 px-3 py-2 text-primary"
-							/>
+								:options="gameVersionOptions"
+								searchable
+								sync-with-selection
+								:placeholder="formatMessage(messages.serverMcPlaceholder)"
+								:search-placeholder="formatMessage(messages.serverMcSearch)"
+							>
+								<template #dropdown-footer>
+									<button
+										class="flex w-full cursor-pointer items-center justify-center border-0 border-t border-solid border-surface-5 bg-transparent py-2 text-sm font-semibold text-secondary hover:text-contrast"
+										@mousedown.prevent
+										@click="showSnapshots = !showSnapshots"
+									>
+										{{
+											showSnapshots
+												? formatMessage(messages.hideSnapshots)
+												: formatMessage(messages.showSnapshots)
+										}}
+									</button>
+								</template>
+							</Combobox>
 						</label>
 						<label class="flex flex-col gap-1 text-sm">
 							<span class="text-secondary">{{ formatMessage(messages.serverLoader) }}</span>
-							<select
+							<Combobox
 								v-model="formLoader"
-								class="rounded-lg border border-solid border-surface-5 bg-surface-2 px-3 py-2 text-primary"
-							>
-								<option value="vanilla">vanilla</option>
-								<option value="fabric">fabric</option>
-								<option value="forge">forge</option>
-								<option value="neoforge">neoforge</option>
-								<option value="quilt">quilt</option>
-							</select>
+								:options="LOADER_OPTIONS"
+								searchable
+								sync-with-selection
+								:placeholder="formatMessage(messages.serverLoaderPlaceholder)"
+								:search-placeholder="formatMessage(messages.serverLoaderSearch)"
+							/>
 						</label>
 						<label class="flex flex-col gap-1 text-sm sm:col-span-2">
 							<span class="text-secondary">{{ formatMessage(messages.bindInstance) }}</span>
-							<select
+							<Combobox
 								v-model="formInstanceId"
-								class="rounded-lg border border-solid border-surface-5 bg-surface-2 px-3 py-2 text-primary"
-							>
-								<option value="">{{ formatMessage(messages.bindNone) }}</option>
-								<option v-for="inst in instances" :key="inst.id" :value="inst.id">
-									{{ inst.name }} ({{ inst.game_version }})
-								</option>
-							</select>
+								:options="instanceOptions"
+								searchable
+								sync-with-selection
+								:placeholder="formatMessage(messages.bindInstancePlaceholder)"
+								:search-placeholder="formatMessage(messages.bindInstanceSearch)"
+							/>
 						</label>
 						<label class="flex flex-col gap-1 text-sm sm:col-span-2">
 							<span class="text-secondary">{{ formatMessage(messages.serverDesc) }}</span>
@@ -456,7 +545,7 @@ onMounted(() => {
 						<Button
 							type="colored"
 							color="brand"
-							:disabled="busy || !formName || !formAddress"
+							:disabled="busy || !formName || !formAddress || !formMc || !formLoader"
 							@click="publishServer"
 						>
 							{{ busy ? formatMessage(messages.creating) : formatMessage(messages.createServer) }}

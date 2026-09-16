@@ -2464,5 +2464,8 @@
   },
   "settings.sidebar.label.display": {
     "message": "Zobrazení"
+  },
+  "app.nav.admin-panel": {
+    "message": "Admin panel"
   }
 }

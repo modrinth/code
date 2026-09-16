@@ -2965,5 +2965,8 @@
   },
   "settings.sidebar.label.display": {
     "message": "ディスプレイ"
+  },
+  "app.nav.admin-panel": {
+    "message": "管理パネル"
   }
 }

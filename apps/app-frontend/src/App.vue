@@ -706,6 +706,10 @@ const messages = defineMessages({
 		id: 'app.nav.sign-out-owyx',
 		defaultMessage: 'Sign out of Owyx',
 	},
+	adminPanel: {
+		id: 'app.nav.admin-panel',
+		defaultMessage: 'Admin panel',
+	},
 	restarting: {
 		id: 'app.restarting',
 		defaultMessage: 'Restarting...',
@@ -1493,6 +1497,17 @@ const owyxAccountMenuOptions = computed(() => [
 		href: OWYX_SITE_PROFILE_URL,
 		target: '_blank',
 	},
+	...(isOwyxSiteAdmin.value
+		? [
+				{
+					id: 'admin-panel',
+					label: formatMessage(messages.adminPanel),
+					icon: SettingsIcon,
+					type: 'link',
+					to: '/owyx-servers',
+				},
+			]
+		: []),
 	{
 		id: 'sign-out',
 		label: formatMessage(messages.signOutOwyx),

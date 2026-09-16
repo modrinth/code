@@ -4261,5 +4261,8 @@
   },
   "settings.sidebar.label.display": {
     "message": "显示"
+  },
+  "app.nav.admin-panel": {
+    "message": "管理面板"
   }
 }

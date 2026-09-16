@@ -1915,5 +1915,8 @@
   },
   "search.filter.locked.server-environment.title": {
     "message": "ניתן להוסיף רק מודים בצד הלקוח לשרת"
+  },
+  "app.nav.admin-panel": {
+    "message": "לוח ניהול"
   }
 }

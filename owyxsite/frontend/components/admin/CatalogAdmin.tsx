@@ -45,6 +45,92 @@ const SOURCE_TYPES: { id: SourceType; label: string }[] = [
 
 const LOADERS = ["vanilla", "fabric", "forge", "neoforge", "quilt"];
 
+
+const MC_VERSION_SUGGESTIONS = [
+  "1.21.8",
+  "1.21.7",
+  "1.21.6",
+  "1.21.5",
+  "1.21.4",
+  "1.21.3",
+  "1.21.1",
+  "1.21",
+  "1.20.6",
+  "1.20.4",
+  "1.20.1",
+  "1.19.4",
+  "1.19.2",
+  "1.18.2",
+  "1.16.5",
+  "1.12.2",
+  "1.8.9",
+  "1.7.10",
+];
+
+function SearchableSelect({
+  value,
+  onChange,
+  options,
+  placeholder,
+  listId,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+  placeholder?: string;
+  listId: string;
+}) {
+  const [query, setQuery] = useState(value);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    setQuery(value);
+  }, [value]);
+  const filtered = options.filter((o) => o.toLowerCase().includes(query.toLowerCase()));
+  return (
+    <div className="relative">
+      <input
+        className="input w-full"
+        value={query}
+        placeholder={placeholder}
+        autoComplete="off"
+        list={listId}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setTimeout(() => setOpen(false), 120)}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          onChange(e.target.value);
+          setOpen(true);
+        }}
+      />
+      <datalist id={listId}>
+        {options.map((o) => (
+          <option key={o} value={o} />
+        ))}
+      </datalist>
+      {open && filtered.length > 0 && (
+        <div className="absolute z-20 mt-1 max-h-48 w-full overflow-auto rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] shadow-lg">
+          {filtered.slice(0, 40).map((o) => (
+            <button
+              key={o}
+              type="button"
+              className="block w-full cursor-pointer border-0 bg-transparent px-3 py-1.5 text-left text-sm hover:bg-[var(--bg-hover)]"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                setQuery(o);
+                onChange(o);
+                setOpen(false);
+              }}
+            >
+              {o}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 const emptyPack = {
   name: "",
   minecraft: "1.21.1",
@@ -524,24 +610,22 @@ export default function CatalogAdmin({
             </Field>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Minecraft">
-                <input
-                  className="input"
+                <SearchableSelect
+                  listId="pack-mc-versions"
                   value={packForm.minecraft}
-                  onChange={(e) => setPackForm((f) => ({ ...f, minecraft: e.target.value }))}
+                  options={MC_VERSION_SUGGESTIONS}
+                  placeholder="Search version…"
+                  onChange={(minecraft) => setPackForm((f) => ({ ...f, minecraft }))}
                 />
               </Field>
               <Field label="Лоадер">
-                <select
-                  className="select"
+                <SearchableSelect
+                  listId="pack-loaders"
                   value={packForm.loader}
-                  onChange={(e) => setPackForm((f) => ({ ...f, loader: e.target.value }))}
-                >
-                  {LOADERS.map((l) => (
-                    <option key={l} value={l}>
-                      {l}
-                    </option>
-                  ))}
-                </select>
+                  options={LOADERS}
+                  placeholder="Search loader…"
+                  onChange={(loader) => setPackForm((f) => ({ ...f, loader }))}
+                />
               </Field>
             </div>
             <Field label="Иконка (URL)">
@@ -773,24 +857,22 @@ export default function CatalogAdmin({
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Minecraft">
-                <input
-                  className="input"
+                <SearchableSelect
+                  listId="server-mc-versions"
                   value={serverForm.minecraft}
-                  onChange={(e) => setServerForm((f) => ({ ...f, minecraft: e.target.value }))}
+                  options={MC_VERSION_SUGGESTIONS}
+                  placeholder="Search version…"
+                  onChange={(minecraft) => setServerForm((f) => ({ ...f, minecraft }))}
                 />
               </Field>
               <Field label="Лоадер">
-                <select
-                  className="select"
+                <SearchableSelect
+                  listId="server-loaders"
                   value={serverForm.loader}
-                  onChange={(e) => setServerForm((f) => ({ ...f, loader: e.target.value }))}
-                >
-                  {LOADERS.map((l) => (
-                    <option key={l} value={l}>
-                      {l}
-                    </option>
-                  ))}
-                </select>
+                  options={LOADERS}
+                  placeholder="Search loader…"
+                  onChange={(loader) => setServerForm((f) => ({ ...f, loader }))}
+                />
               </Field>
             </div>
             <label className="flex items-center gap-2 text-sm text-muted min-h-11">

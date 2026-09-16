@@ -1045,5 +1045,8 @@
   },
   "settings.sidebar.label.account": {
     "message": "Conta"
+  },
+  "app.nav.admin-panel": {
+    "message": "Painel de administração"
   }
 }

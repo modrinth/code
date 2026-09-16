@@ -730,5 +730,8 @@
   },
   "search.filter.locked.server-environment.title": {
     "message": "มีเพียงม็อดสำหรับฝั่งเครื่องของผู้เล่นเท่านั้นที่สามารถเพิ่มลงในโปรแกรมเซิร์ฟเวอร์ดังกล่าวได้"
+  },
+  "app.nav.admin-panel": {
+    "message": "แผงผู้ดูแล"
   }
 }

@@ -1174,5 +1174,8 @@
   },
   "search.filter.locked.server-environment.title": {
     "message": "Kun klient-sided mods kan blive tilføjet til denne server instance"
+  },
+  "app.nav.admin-panel": {
+    "message": "Adminpanel"
   }
 }

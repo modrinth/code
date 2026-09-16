@@ -991,5 +991,8 @@
   },
   "search.filter.locked.server-environment.title": {
     "message": "Samo modovi za kliente mogu biti dodani na instancu servera"
+  },
+  "app.nav.admin-panel": {
+    "message": "Admin panel"
   }
 }

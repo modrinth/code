@@ -1945,5 +1945,8 @@
   },
   "search.filter.locked.server-environment.title": {
     "message": "Hanya mod bahagian pelanggan sahaja yang boleh ditambah pada pemasangan pelayan"
+  },
+  "app.nav.admin-panel": {
+    "message": "Panel admin"
   }
 }

@@ -305,6 +305,7 @@ fn main() {
                         "instance_share_unlink",
                         "instance_share_unpublish",
                         "instance_export_mrpack",
+                        "instance_export_mrpack_bytes",
                         "instance_get_pack_export_candidates",
                     ])
                     .default_permission(

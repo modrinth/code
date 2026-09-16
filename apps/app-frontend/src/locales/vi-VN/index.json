@@ -1180,5 +1180,8 @@
   },
   "search.filter.locked.server-environment.title": {
     "message": "Chỉ các mod chạy phía client mới có thể thêm hồ sơ máy chủ"
+  },
+  "app.nav.admin-panel": {
+    "message": "Bảng quản trị"
   }
 }
