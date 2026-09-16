@@ -15,12 +15,13 @@ Tracked brief. Paste prompt: local gitignored `promt.md`.
 - Launcher **0.5.2** OBT; window title `Owyx™` in `apps/app/tauri.conf.json`.
 - Friends API + presence contract in `owyxsite/LAUNCHER_SITE_CONTRACT.md` (~1.2.0).
 - Skin upload API on site (cosmetics migration); launcher Social UI still largely placeholder.
+- Public GitHub fork + shipped OBT/Beta builds — product is already released as Beta, not a private invite app.
 
 ---
 
 ## Goal
 
-Reach a **playable-release bar** for friends: finish Social/Friends/Account/Share, wire skins into the world (TLSkin-class or thin custom mod), close i18n/UX debts, optional practical product ideas, then **UI/UX polish to shine**. Owner is out of product ideas — agent must invent a useful next backlog in the PR.
+Reach a **playable public Beta bar**: finish Social/Friends/Account/Share, wire skins into the world (TLSkin-class or thin custom mod), close i18n/UX debts, optional practical product ideas, then **UI/UX polish to shine**. Repo is **public** — anyone can download/use; do **not** market or copywrite as “owner’s friends only / private circle.” Friends = social feature, not exclusivity. Owner is out of product ideas — agent invents a useful next backlog in the PR.
 
 **Not in scope:** merge to main, GitHub Release, secrets, `apps/frontend`/`labrinth` product work, full MS OAuth, OwyxOld plugin, Modrinth marketplace redesign, **prod site deploy** (owner will ask a local agent later).
 
