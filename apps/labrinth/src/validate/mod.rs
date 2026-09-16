@@ -15,6 +15,7 @@ use crate::validate::plugin::*;
 use crate::validate::quilt::QuiltValidator;
 use crate::validate::resourcepack::{PackValidator, TexturePackValidator};
 use crate::validate::rift::RiftValidator;
+use crate::validate::risugami::RisugamiValidator;
 use crate::validate::shader::{
     CanvasShaderValidator, CoreShaderValidator, ShaderValidator,
 };
@@ -39,6 +40,7 @@ pub mod project;
 mod quilt;
 mod resourcepack;
 mod rift;
+mod risugami;
 mod shader;
 
 const HALPLIBE_PROJECT_ID: &str = "IIu8YulV";
@@ -157,6 +159,7 @@ static VALIDATORS: &[&dyn Validator] = &[
     &CoreShaderValidator,
     &DataPackValidator,
     &RiftValidator,
+    &RisugamiValidator,
     &NeoForgeValidator,
 ];
 
