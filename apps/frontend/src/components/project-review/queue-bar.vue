@@ -59,7 +59,7 @@ import { computed } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
-import { projectReviewMessages as messages } from '../messages'
+import { projectReviewMessages as messages } from './messages'
 
 const { queue, isLoading, navigation } = injectProjectReviewPageContext()
 const {
