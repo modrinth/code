@@ -1,5 +1,6 @@
 <template>
 	<SplitviewVue
+		class="project-review-columns"
 		:orientation="Orientation.HORIZONTAL"
 		:proportional-layout="false"
 		@ready="onColumnsReady"

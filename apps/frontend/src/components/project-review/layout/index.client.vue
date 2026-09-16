@@ -2,12 +2,13 @@
 	<section
 		class="project-review relative flex overflow-hidden bg-surface-2"
 		:aria-label="formatMessage(messages.title)"
+		@dblclick="onDividerDoubleClick"
 	>
 		<div class="min-h-0 min-w-0 flex-1 overflow-x-auto">
 			<ProjectReviewColumns
 				class="project-review-dock h-full"
 				:style="{
-					minWidth: `${320 + (leftVisible ? 180 : 0) + (rightVisible ? 200 : 0)}px`,
+					minWidth: `${workspacePanelSizes.center.minimum + (leftVisible ? workspacePanelSizes.left.minimum : 0) + (rightVisible ? workspacePanelSizes.right.minimum : 0)}px`,
 				}"
 			/>
 		</div>
@@ -22,13 +23,14 @@ import { useVIntl } from '@modrinth/ui'
 import { projectReviewMessages as messages } from '../messages'
 import ProjectReviewColumns from './columns.vue'
 import { provideProjectReviewContext } from './context'
+import { workspacePanelSizes } from './layout-storage'
 import type { ProjectReviewSlots } from './types'
 import { useProjectReviewLayout } from './use-layout'
 
 const slots = defineSlots<ProjectReviewSlots>()
 const { formatMessage } = useVIntl()
 const layout = useProjectReviewLayout((tab) => formatMessage(messages[tab]))
-const { leftVisible, rightVisible } = layout
+const { leftVisible, rightVisible, onDividerDoubleClick } = layout
 
 provideProjectReviewContext({ ...layout, slots })
 </script>
