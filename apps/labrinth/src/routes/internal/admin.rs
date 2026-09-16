@@ -1,3 +1,4 @@
+use crate::auth::AuthenticationError;
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::database::PgPool;
 use crate::models::analytics::{Download, DownloadReason};
@@ -161,7 +162,7 @@ pub async fn count_download(
         .find(|x| x.0.to_lowercase() == "authorization")
         .map(|x| &**x.1);
 
-    let user = get_user_record_from_bearer_token(
+    let user = match get_user_record_from_bearer_token(
         &req,
         token,
         &**pool,
@@ -170,8 +171,14 @@ pub async fn count_download(
         false,
     )
     .await
-    .ok()
-    .flatten();
+    {
+        Ok(user) => user,
+        Err(AuthenticationError::AccountLocked) => {
+            return Err(AuthenticationError::AccountLocked)
+                .wrap_auth_err("authenticating API request");
+        }
+        Err(_) => None,
+    };
 
     let project_id: crate::database::models::ids::DBProjectId =
         download_body.project_id.into();

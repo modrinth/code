@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            INSERT INTO oauth_access_tokens (\n                id, authorization_id, token_hash, scopes, last_used\n            )\n            VALUES (\n                $1, $2, $3, $4, $5\n            )\n            RETURNING created, expires\n            ",
+  "query": "\n            INSERT INTO oauth_access_tokens (\n                id, authorization_id, token_hash, scopes, last_used\n            )\n\t\t\tSELECT $1, $2, $3, $4, $5\n\t\t\tFROM oauth_client_authorizations auths\n\t\t\tJOIN users ON users.id = auths.user_id\n\t\t\tWHERE auths.id = $2 AND NOT users.account_locked\n            RETURNING created, expires\n            ",
   "describe": {
     "columns": [
       {
@@ -28,5 +28,5 @@
       false
     ]
   },
-  "hash": "6b881555e610ddc6796cdcbfd2de26e68b10522d0f1df3f006d58f6b72be9911"
+  "hash": "a120bab0d2d0f721bade7fdb7a4854aed5d31564ec8896635f81ded9b02153d7"
 }
