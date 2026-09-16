@@ -1,10 +1,15 @@
 <template>
-	<SplitviewVue
-		class="h-full"
-		:orientation="Orientation.VERTICAL"
-		:proportional-layout="false"
-		@ready="onRowsReady"
-	/>
+	<div class="flex h-full min-h-0 min-w-0 flex-col">
+		<div class="min-h-0 flex-1">
+			<SplitviewVue
+				class="h-full"
+				:orientation="Orientation.VERTICAL"
+				:proportional-layout="false"
+				@ready="onRowsReady"
+			/>
+		</div>
+		<component :is="slots.footer" v-if="slots.footer" />
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -19,5 +24,5 @@ defineOptions({
 	inheritAttrs: false,
 })
 
-const { onRowsReady } = injectProjectReviewContext()
+const { onRowsReady, slots } = injectProjectReviewContext()
 </script>

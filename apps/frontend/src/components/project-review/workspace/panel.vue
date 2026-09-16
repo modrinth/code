@@ -18,8 +18,8 @@ import { useVIntl } from '@modrinth/ui'
 import type { IDockviewPanelProps } from 'dockview-vue'
 import { computed } from 'vue'
 
-import { projectReviewMessages as messages } from '../messages'
 import { injectProjectReviewContext } from '../context'
+import { projectReviewMessages as messages } from '../messages'
 import type { ProjectReviewSlot } from '../types'
 
 defineOptions({ inheritAttrs: false })

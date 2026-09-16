@@ -1,8 +1,11 @@
 <template>
 	<ClientOnly>
 		<ProjectReviewWorkspace>
-			<template v-for="(_, name) in slots" #[name]>
-				<slot :name="name" />
+			<template #left><ProjectInfo /></template>
+			<template #footer><QueueBar /></template>
+			<template #description>
+				<div v-if="project" class="markdown-body" v-html="renderString(project.description)" />
+				<p v-else>{{ formatMessage(projectReviewMessages.empty) }}</p>
 			</template>
 		</ProjectReviewWorkspace>
 		<template #fallback>
@@ -15,11 +18,15 @@
 
 <script setup lang="ts">
 import { useVIntl } from '@modrinth/ui'
+import { renderString } from '@modrinth/utils'
+
+import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { projectReviewMessages } from './messages'
-import type { ProjectReviewSlots } from './types'
+import ProjectInfo from './project-info/index.vue'
+import QueueBar from './workspace/queue-bar.vue'
 import ProjectReviewWorkspace from './workspace/workspace.client.vue'
 
 const { formatMessage } = useVIntl()
-const slots = defineSlots<ProjectReviewSlots>()
+const { project } = injectProjectReviewPageContext()
 </script>
