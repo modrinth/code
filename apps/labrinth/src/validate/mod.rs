@@ -1,6 +1,8 @@
 use crate::database::PgTransaction;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
-use crate::database::models::loader_fields::VersionField;
+use crate::database::models::loader_fields::{
+    Loader as DBLoader, VersionField,
+};
 use crate::database::models::version_item::DependencyBuilder;
 use crate::models::ids::ProjectId;
 use crate::models::pack::PackFormat;
@@ -206,6 +208,10 @@ pub async fn validate_file(
         MinecraftGameVersion::list(None, None, &mut *transaction, redis)
             .await?;
 
+    let available_loaders = DBLoader::list(&mut *transaction, redis).await?;
+
+    validate_file_type_for_loaders(file_type, &loaders, &available_loaders)?;
+
     validate_dependencies(&loaders, dependencies)?;
 
     fabric::validate_game_versions(&loaders, &game_versions)?;
@@ -219,6 +225,33 @@ pub async fn validate_file(
         file_type,
     )
     .await
+}
+
+fn validate_file_type_for_loaders(
+    file_type: Option<FileType>,
+    loaders: &[Loader],
+    available_loaders: &[DBLoader],
+) -> Result<(), ValidationError> {
+    if matches!(
+        file_type,
+        Some(FileType::SourcesJar | FileType::DevJar | FileType::JavadocJar)
+    ) {
+        let supports_jar_files = available_loaders
+            .iter()
+            .filter(|loader| {
+                loaders.iter().any(|selected| selected.0 == loader.loader)
+            })
+            .flat_map(|loader| &loader.supported_project_types)
+            .any(|project_type| {
+                matches!(project_type.as_str(), "mod" | "plugin")
+            });
+        if !supports_jar_files {
+            return Err(ValidationError::InvalidInput(
+				"sources, dev, and javadoc jars are only supported for mods and plugins".into(),
+			));
+        }
+    }
+    Ok(())
 }
 
 fn validate_dependencies(
@@ -242,6 +275,34 @@ fn validate_dependencies(
 		));
     }
     Ok(())
+}
+
+fn validate_additional_jar(
+    file: &MaybeProtectedZipFile,
+    file_extension: &str,
+    file_type: FileType,
+) -> Result<ValidationResult, ValidationError> {
+    if file_extension != "jar" {
+        return Err(ValidationError::InvalidInput(
+            "sources, dev, and javadoc jars must use the `.jar` extension"
+                .into(),
+        ));
+    }
+
+    let MaybeProtectedZipFile::Unprotected(archive) = file else {
+        return Err(ValidationError::InvalidInput(
+            "additional jars must be readable jar archives".into(),
+        ));
+    };
+
+    if file_type == FileType::SourcesJar
+        && !archive.file_names().any(|name| name.ends_with(".java"))
+    {
+        return Err(ValidationError::InvalidInput(
+            "sources jars must contain at least one `.java` file".into(),
+        ));
+    }
+    Ok(ValidationResult::Pass)
 }
 
 async fn validate_minecraft_file(
@@ -283,7 +344,9 @@ async fn validate_minecraft_file(
                         ))
                     };
                 }
-                FileType::DevJar | FileType::SourcesJar | FileType::JavadocJar => {},
+                FileType::DevJar | FileType::SourcesJar | FileType::JavadocJar => {
+                  return validate_additional_jar(&zip, &file_extension, file_type);
+                },
                 FileType::Unknown => {}
             }
         }
