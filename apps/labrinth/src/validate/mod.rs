@@ -1,8 +1,10 @@
 use crate::database::PgTransaction;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::models::loader_fields::VersionField;
+use crate::database::models::version_item::DependencyBuilder;
+use crate::models::ids::ProjectId;
 use crate::models::pack::PackFormat;
-use crate::models::projects::{FileType, Loader};
+use crate::models::projects::{DependencyType, FileType, Loader};
 use crate::validate::datapack::DataPackValidator;
 use crate::validate::fabric::FabricValidator;
 use crate::validate::forge::{ForgeValidator, LegacyForgeValidator};
@@ -38,6 +40,8 @@ mod quilt;
 mod resourcepack;
 mod rift;
 mod shader;
+
+const HALPLIBE_PROJECT_ID: &str = "IIu8YulV";
 
 #[derive(Error, Debug)]
 pub enum ValidationError {
@@ -95,6 +99,14 @@ pub trait Validator: Sync {
     fn get_supported_loaders(&self) -> &[&str];
     fn get_supported_game_versions(&self) -> SupportedGameVersions;
 
+    fn ensure_required_loaders(
+        &self,
+        _archive: &mut ZipArchive<Cursor<Bytes>>,
+        _loaders: &[Loader],
+    ) -> Result<(), ValidationError> {
+        Ok(())
+    }
+
     fn validate(
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
@@ -139,6 +151,7 @@ static VALIDATORS: &[&dyn Validator] = &[
     &BungeeCordValidator,
     &VelocityValidator,
     &SpongeValidator,
+    &GeyserValidator,
     &CanvasShaderValidator,
     &ShaderValidator,
     &CoreShaderValidator,
@@ -178,6 +191,7 @@ pub async fn validate_file(
     loaders: Vec<Loader>,
     file_type: Option<FileType>,
     version_fields: Vec<VersionField>,
+    dependencies: &[DependencyBuilder],
     transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
 ) -> Result<ValidationResult, ValidationError> {
@@ -189,6 +203,10 @@ pub async fn validate_file(
         MinecraftGameVersion::list(None, None, &mut *transaction, redis)
             .await?;
 
+    validate_dependencies(&loaders, dependencies)?;
+
+    fabric::validate_game_versions(&loaders, &game_versions)?;
+
     validate_minecraft_file(
         data,
         file_extension,
@@ -198,6 +216,29 @@ pub async fn validate_file(
         file_type,
     )
     .await
+}
+
+fn validate_dependencies(
+    loaders: &[Loader],
+    dependencies: &[DependencyBuilder],
+) -> Result<(), ValidationError> {
+    if loaders
+        .iter()
+        .any(|loader| matches!(loader.0.as_str(), "bta-babric" | "mrpack"))
+    {
+        return Ok(());
+    }
+    if dependencies.iter().any(|dependency| {
+        dependency.dependency_type != DependencyType::Incompatible.as_str()
+            && dependency.project_id.is_some_and(|id| {
+                ProjectId::from(id).to_string() == HALPLIBE_PROJECT_ID
+            })
+    }) {
+        return Err(ValidationError::InvalidInput(
+			"versions that depend on `halplibe` must include the `bta-babric` loader".into(),
+		));
+    }
+    Ok(())
 }
 
 async fn validate_minecraft_file(
@@ -216,6 +257,12 @@ async fn validate_minecraft_file(
                 data,
             },
         };
+
+        if let MaybeProtectedZipFile::Unprotected(archive) = &mut zip {
+            for validator in VALIDATORS {
+                validator.ensure_required_loaders(archive, &loaders)?;
+            }
+        }
 
         if let Some(file_type) = file_type {
             match file_type {
