@@ -542,14 +542,14 @@ async fn project_create_inner(
             CreateError::InvalidInput(validation_errors_to_string(err, None))
         })?;
 
-		super::projects::validate::require_valid_project(
-			crate::validate::project::validate_link_input(
-				&create_data.link_urls,
-				&create_data.license_id,
-				create_data.license_url.as_deref(),
-				&create_data.description,
-			),
-		)?;
+        super::projects::validate::require_valid_project(
+            crate::validate::project::validate_link_input(
+                &create_data.link_urls,
+                &create_data.license_id,
+                create_data.license_url.as_deref(),
+                &create_data.description,
+            ),
+        )?;
 
         let slug_project_id_option: Option<ProjectId> = serde_json::from_str(
             &format!("\"{}\"", create_data.slug.to_lowercase()),
