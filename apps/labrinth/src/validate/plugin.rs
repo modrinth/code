@@ -1,8 +1,42 @@
+use crate::models::projects::Loader;
 use crate::validate::{
     SupportedGameVersions, ValidationError, ValidationResult,
 };
 use std::io::Cursor;
 use zip::ZipArchive;
+
+/// Checks loader metadata without imposing file-format requirements on Geyser uploads.
+pub struct GeyserValidator;
+
+impl super::Validator for GeyserValidator {
+    fn get_file_extensions(&self) -> &[&str] {
+        &[]
+    }
+
+    fn get_supported_loaders(&self) -> &[&str] {
+        &[]
+    }
+
+    fn get_supported_game_versions(&self) -> SupportedGameVersions {
+        SupportedGameVersions::All
+    }
+
+    fn ensure_required_loaders(
+        &self,
+        archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
+        loaders: &[Loader],
+    ) -> Result<(), ValidationError> {
+        if archive.file_names().any(|name| name == "extension.yml")
+            && !loaders.iter().any(|loader| loader.0 == "geyser")
+        {
+            return Err(ValidationError::InvalidInput(
+				"files containing `extension.yml` in the root directory must use the Geyser Extension loader".into(),
+			));
+        }
+
+        Ok(())
+    }
+}
 
 pub struct PluginYmlValidator;
 
