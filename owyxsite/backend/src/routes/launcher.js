@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../database/connection');
-const { authenticateToken } = require('./auth');
+const { authenticateToken, optionalAuthenticate } = require('./auth');
 const catalog = require('./catalog');
 
 // Owyx launcher API.
@@ -12,7 +12,7 @@ const catalog = require('./catalog');
 // Versioned surface lives under /api/launcher/v1/*. Catalogs (servers/packs)
 // are real rows from the site control-plane — not empty stubs.
 
-const LAUNCHER_API_VERSION = '1.1.0';
+const LAUNCHER_API_VERSION = '1.2.0';
 
 /** Absolute base URL the launcher can use to download static assets (skins).
  *  Built from the request the launcher made (its own API base), so it works in
@@ -105,9 +105,8 @@ router.get('/v1/status', (_req, res) => {
   });
 });
 
-// GET /api/launcher/v1/servers — published Owyx + community servers.
-// Bearer optional: requiresAccount is a Play gate in the launcher, not a list filter.
-router.get('/v1/servers', async (req, res) => {
+// GET /api/launcher/v1/servers — published Owyx + community servers (ACL-filtered).
+router.get('/v1/servers', optionalAuthenticate, async (req, res) => {
   try {
     const servers = await catalog.listPublishedServers(req);
     res.json({ servers });
@@ -118,7 +117,7 @@ router.get('/v1/servers', async (req, res) => {
 });
 
 // GET /api/launcher/v1/packs — published builds (safe player fields only).
-router.get('/v1/packs', async (req, res) => {
+router.get('/v1/packs', optionalAuthenticate, async (req, res) => {
   try {
     const packs = await catalog.listPublishedPacks(req);
     res.json({ packs });
@@ -129,10 +128,14 @@ router.get('/v1/packs', async (req, res) => {
 });
 
 // GET /api/launcher/v1/packs/:id — one published pack.
-router.get('/v1/packs/:id', async (req, res) => {
+router.get('/v1/packs/:id', optionalAuthenticate, async (req, res) => {
   try {
     const pack = await catalog.getPublishedPack(req, req.params.id);
     if (!pack) return res.status(404).json({ error: 'Пак не найден' });
+    const allowed = await catalog.listPublishedPacks(req);
+    if (!allowed.some((p) => p.id === pack.id)) {
+      return res.status(404).json({ error: 'Пак не найден' });
+    }
     res.json({ pack });
   } catch (error) {
     console.error('launcher/v1/packs/:id error:', error);
@@ -141,13 +144,17 @@ router.get('/v1/packs/:id', async (req, res) => {
 });
 
 // GET /api/launcher/v1/packs/:id/manifest — file list + sha (no SFTP secrets).
-router.get('/v1/packs/:id/manifest', async (req, res) => {
+router.get('/v1/packs/:id/manifest', optionalAuthenticate, async (req, res) => {
   try {
     const result = await db.query(
       `SELECT * FROM packs WHERE id = $1 AND published = true`,
       [req.params.id]
     );
     if (!result.rows[0]) return res.status(404).json({ error: 'Пак не найден' });
+    const allowed = await catalog.listPublishedPacks(req);
+    if (!allowed.some((p) => p.id === req.params.id)) {
+      return res.status(404).json({ error: 'Пак не найден' });
+    }
     res.json(catalog.packManifest(req, result.rows[0]));
   } catch (error) {
     console.error('launcher/v1/packs/:id/manifest error:', error);

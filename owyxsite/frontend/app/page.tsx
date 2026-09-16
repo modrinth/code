@@ -15,14 +15,14 @@ export default function HomePage() {
         <NewsSection />
 
         <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-20">
-          <div className="border-t border-line pt-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+          <div className="section-callout flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
             <div className="min-w-0">
               <h2 className="font-display text-xl font-bold tracking-tight">Готов играть?</h2>
-              <p className="mt-2 text-muted">
+              <p className="mt-2 text-sm text-muted leading-relaxed max-w-lg">
                 Скачай лаунчер и введи ник, или создай аккаунт Owyx — для скина и плюшек.
               </p>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 shrink-0">
               <Link href="/download" className="btn btn-primary">Скачать лаунчер</Link>
               <Link href="/register" className="btn btn-ghost">Создать аккаунт</Link>
             </div>

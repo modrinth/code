@@ -36,12 +36,11 @@ export default function CabinetShell({
 }) {
   return (
     <main id="main-content" className="relative min-h-[calc(100vh-64px)]">
-      <div className="owyx-space" aria-hidden />
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-        <header className="mb-8 flex flex-wrap items-end justify-between gap-4 fade-up">
+        <header className="mb-7 flex flex-wrap items-end justify-between gap-4 fade-up sm:mb-8">
           <div className="min-w-0">
-            <p className="text-xs uppercase tracking-[0.16em] text-muted">{eyebrow}</p>
-            <h1 className="font-display mt-1 text-3xl font-bold tracking-tight text-text sm:text-4xl overflow-wrap-anywhere min-w-0">
+            <p className="text-xs uppercase tracking-[0.16em] text-accent/80">{eyebrow}</p>
+            <h1 className="font-display mt-1.5 text-3xl font-bold tracking-tight text-text sm:text-4xl overflow-wrap-anywhere min-w-0">
               {title}
             </h1>
             {subtitle && <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">{subtitle}</p>}
@@ -49,10 +48,10 @@ export default function CabinetShell({
           {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
         </header>
 
-        <div className="grid gap-6 lg:grid-cols-[13.5rem_minmax(0,1fr)] fade-up-2">
+        <div className="grid gap-5 lg:grid-cols-[13.5rem_minmax(0,1fr)] lg:gap-6 fade-up-2">
           <nav
             aria-label="Разделы"
-            className="flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible lg:pb-0 lg:sticky lg:top-24 lg:self-start"
+            className="flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:gap-1.5 lg:overflow-visible lg:pb-0 lg:sticky lg:top-24 lg:self-start"
           >
             {nav.map((item) => {
               const active = item.id === activeId;
@@ -75,7 +74,7 @@ export default function CabinetShell({
             })}
           </nav>
 
-          <div className="min-w-0 rounded-2xl border border-line bg-panel/90 backdrop-blur-sm">
+          <div className="panel min-w-0 bg-panel/90 backdrop-blur-sm">
             <div className="p-5 sm:p-7">{children}</div>
           </div>
         </div>
@@ -96,12 +95,12 @@ export function SettingsSection({
   children: ReactNode;
 }) {
   return (
-    <section className="space-y-4">
-      <div>
-        <h2 className="font-display text-lg font-bold tracking-tight text-text">{title}</h2>
+    <section className="section-callout space-y-4">
+      <div className="border-b border-line pb-3">
+        <h2 className="font-display text-base font-bold tracking-tight text-text sm:text-lg">{title}</h2>
         {description && <p className="mt-1 text-sm text-muted leading-relaxed">{description}</p>}
       </div>
-      {children}
+      <div className="space-y-0">{children}</div>
     </section>
   );
 }

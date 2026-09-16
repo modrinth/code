@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Logo from "@/components/ui/Logo";
 import { useAuth } from "@/hooks/useAuth";
+import { resolveSiteAvatarUrl } from "@/lib/avatar";
 
 const NAV = [
   { href: "/", label: "Главная" },
@@ -38,13 +39,13 @@ export default function Header() {
   const isStaff = user?.role === "admin" || user?.role === "moderator";
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-bg/70 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-line/90 bg-bg/75 backdrop-blur-md">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-8 min-w-0">
+        <div className="flex items-center gap-7 min-w-0">
           <Link href="/" className="flex items-center shrink-0" aria-label="Owyx — на главную">
             <Logo size={26} wordClassName="text-xl" />
           </Link>
-          <nav className="hidden sm:flex items-center gap-6" aria-label="Основная">
+          <nav className="hidden sm:flex items-center gap-5" aria-label="Основная">
             {NAV.map((item) => (
               <Link
                 key={item.href}
@@ -59,56 +60,61 @@ export default function Header() {
 
         <div className="flex items-center gap-2 sm:gap-3">
           {user ? (
-            <div className="relative" ref={dropdownRef}>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOpen((v) => !v);
-                }}
-                aria-expanded={open}
-                aria-haspopup="menu"
-                className="flex items-center gap-2 rounded-[10px] border border-line bg-panel px-3 py-1.5 text-sm hover:border-accent transition-colors cursor-pointer min-h-11"
-              >
-                <span className="grid h-7 w-7 place-items-center overflow-hidden rounded-full bg-panel-2 text-accent">
-                  {user.avatar_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={user.avatar_url} alt="" className="h-full w-full object-cover" />
-                  ) : (
-                    (user.nickname || user.email || "?").slice(0, 1).toUpperCase()
-                  )}
-                </span>
-                <span className="max-w-[10rem] truncate hidden sm:inline">
-                  {user.nickname || user.email || "Игрок"}
-                </span>
-              </button>
-              {open && (
-                <div
-                  role="menu"
-                  className="absolute right-0 mt-2 w-52 overflow-hidden rounded-xl border border-line bg-panel shadow-2xl fade-up"
+            <>
+              <Link href="/download" className="hidden sm:inline-flex btn btn-ghost btn-sm">
+                Скачать
+              </Link>
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpen((v) => !v);
+                  }}
+                  aria-expanded={open}
+                  aria-haspopup="menu"
+                  className="flex items-center gap-2 rounded-[10px] border border-line bg-panel px-3 py-1.5 text-sm hover:border-accent transition-colors cursor-pointer min-h-11"
                 >
-                  <Link href="/profile" className="block px-4 py-3 text-sm hover:bg-panel-2 transition-colors" role="menuitem">
-                    Личный кабинет
-                  </Link>
-                  {isStaff && (
-                    <Link href="/admin" className="block px-4 py-3 text-sm hover:bg-panel-2 transition-colors border-t border-line" role="menuitem">
-                      Админ-панель
-                    </Link>
-                  )}
-                  <button
-                    type="button"
-                    role="menuitem"
-                    onClick={() => {
-                      setOpen(false);
-                      logout();
-                    }}
-                    className="w-full text-left px-4 py-3 text-sm text-danger hover:bg-panel-2 transition-colors border-t border-line cursor-pointer"
+                  <span className="grid h-7 w-7 place-items-center overflow-hidden rounded-full bg-panel-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={resolveSiteAvatarUrl(user.avatar_url)}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  </span>
+                  <span className="max-w-[10rem] truncate hidden sm:inline">
+                    {user.nickname || user.email || "Игрок"}
+                  </span>
+                </button>
+                {open && (
+                  <div
+                    role="menu"
+                    className="absolute right-0 mt-2 w-52 overflow-hidden rounded-[14px] border border-line bg-panel shadow-[0_16px_40px_-20px_rgba(0,0,0,0.75)] fade-up"
                   >
-                    Выйти
-                  </button>
-                </div>
-              )}
-            </div>
+                    <Link href="/profile" className="block px-4 py-3 text-sm hover:bg-panel-2 transition-colors" role="menuitem">
+                      Личный кабинет
+                    </Link>
+                    {isStaff && (
+                      <Link href="/admin" className="block px-4 py-3 text-sm hover:bg-panel-2 transition-colors border-t border-line" role="menuitem">
+                        Админ-панель
+                      </Link>
+                    )}
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        setOpen(false);
+                        logout();
+                      }}
+                      className="w-full text-left px-4 py-3 text-sm text-danger hover:bg-panel-2 transition-colors border-t border-line cursor-pointer"
+                    >
+                      Выйти
+                    </button>
+                  </div>
+                )}
+              </div>
+            </>
           ) : (
             <>
               <Link href="/login" className="hidden sm:inline text-sm text-muted hover:text-accent transition-colors">

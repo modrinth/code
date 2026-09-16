@@ -12,6 +12,7 @@ const { authenticateToken, requireRole } = require('./auth');
 const SOURCE_TYPES = ['http_zip', 'http_manifest', 'google_drive', 'mrpack', 'sftp', 'local_ingest'];
 const LOADERS = ['vanilla', 'fabric', 'forge', 'neoforge', 'quilt'];
 const KINDS = ['owyx', 'community'];
+const ACCESS_MODES = ['open', 'whitelist', 'blacklist'];
 const ID_RE = /^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$/;
 const ingestDir = path.join(__dirname, '../../uploads/packs');
 
@@ -104,6 +105,47 @@ function validateKind(kind) {
     throw err;
   }
   return v;
+}
+
+function validateAccessMode(mode) {
+  const v = String(mode || 'open').trim().toLowerCase();
+  if (!ACCESS_MODES.includes(v)) {
+    const err = new Error(`accessMode: ${ACCESS_MODES.join(', ')}`);
+    err.status = 400;
+    throw err;
+  }
+  return v;
+}
+
+/** Guest sees only open. Signed-in applies whitelist/blacklist via catalog_acl. */
+async function filterByAcl(req, rows, resourceType) {
+  if (!rows.length) return [];
+  const userId = req.user?.id != null ? Number(req.user.id) : null;
+  const ids = rows.map((r) => r.id);
+  const acl = await db.query(
+    `SELECT resource_id, user_id, effect
+     FROM catalog_acl
+     WHERE resource_type = $1 AND resource_id = ANY($2::text[])`,
+    [resourceType, ids]
+  );
+  const byResource = new Map();
+  for (const row of acl.rows) {
+    if (!byResource.has(row.resource_id)) byResource.set(row.resource_id, []);
+    byResource.get(row.resource_id).push(row);
+  }
+  return rows.filter((row) => {
+    const mode = row.access_mode || 'open';
+    if (mode === 'open') return true;
+    if (userId == null) return false;
+    const entries = byResource.get(row.id) || [];
+    if (mode === 'whitelist') {
+      return entries.some((e) => Number(e.user_id) === userId && e.effect === 'allow');
+    }
+    if (mode === 'blacklist') {
+      return !entries.some((e) => Number(e.user_id) === userId && e.effect === 'deny');
+    }
+    return true;
+  });
 }
 
 function validateHttpUrl(raw, field) {
@@ -239,6 +281,7 @@ function publicPack(req, row) {
     description: row.description || '',
     sourceType: type,
     manifestUrl: row.manifest_url ? absoluteAsset(req, row.manifest_url) : null,
+    accessMode: row.access_mode || 'open',
   };
   if (type === 'http_zip' || type === 'local_ingest') {
     out.downloadUrl = cfg.url ? absoluteAsset(req, cfg.url) : null;
@@ -273,6 +316,7 @@ function publicServer(req, row, packRow) {
     minecraft: row.minecraft || packRow?.minecraft || null,
     loader: row.loader || packRow?.loader || null,
     requiresAccount: Boolean(row.requires_account),
+    accessMode: row.access_mode || 'open',
     status: { online: null, players: null, max: null },
     pack: packRow ? publicPack(req, packRow) : null,
   };
@@ -291,6 +335,7 @@ function adminPack(row) {
     source: source,
     manifestUrl: row.manifest_url,
     published: Boolean(row.published),
+    accessMode: row.access_mode || 'open',
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     createdBy: row.created_by,
@@ -310,6 +355,7 @@ function adminServer(row) {
     loader: row.loader,
     requiresAccount: Boolean(row.requires_account),
     published: Boolean(row.published),
+    accessMode: row.access_mode || 'open',
     sortOrder: row.sort_order,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -340,6 +386,7 @@ function readPackBody(body) {
     source,
     manifestUrl: body.manifestUrl != null ? String(body.manifestUrl).trim() || null : null,
     published: asBool(body.published, true),
+    accessMode: validateAccessMode(body.accessMode),
   };
 }
 
@@ -373,6 +420,7 @@ function readServerBody(body) {
     loader: body.loader != null ? validateLoader(body.loader) : null,
     requiresAccount: asBool(body.requiresAccount, false),
     published: asBool(body.published, true),
+    accessMode: validateAccessMode(body.accessMode),
     sortOrder: Number.isFinite(parseInt(body.sortOrder, 10)) ? parseInt(body.sortOrder, 10) : 0,
   };
 }
@@ -387,7 +435,8 @@ async function listPublishedPacks(req) {
   const result = await db.query(
     `SELECT * FROM packs WHERE published = true ORDER BY name ASC`
   );
-  return result.rows.map((row) => publicPack(req, row));
+  const allowed = await filterByAcl(req, result.rows, 'pack');
+  return allowed.map((row) => publicPack(req, row));
 }
 
 async function listPublishedServers(req) {
@@ -396,13 +445,16 @@ async function listPublishedServers(req) {
             p.id AS p_id, p.name AS p_name, p.minecraft AS p_minecraft, p.loader AS p_loader,
             p.icon_url AS p_icon_url, p.description AS p_description,
             p.source_type AS p_source_type, p.source_config AS p_source_config,
-            p.manifest_url AS p_manifest_url, p.published AS p_published
+            p.manifest_url AS p_manifest_url, p.published AS p_published,
+            p.access_mode AS p_access_mode
      FROM servers s
      LEFT JOIN packs p ON p.id = s.pack_id
      WHERE s.published = true
      ORDER BY s.sort_order ASC, s.name ASC`
   );
-  return result.rows.map((row) => {
+  const allowed = await filterByAcl(req, result.rows, 'server');
+  const out = [];
+  for (const row of allowed) {
     const packRow = row.p_id
       ? {
           id: row.p_id,
@@ -415,10 +467,16 @@ async function listPublishedServers(req) {
           source_config: row.p_source_config,
           manifest_url: row.p_manifest_url,
           published: row.p_published,
+          access_mode: row.p_access_mode,
         }
       : null;
-    return publicServer(req, row, packRow);
-  });
+    if (packRow) {
+      const packOk = await filterByAcl(req, [packRow], 'pack');
+      if (!packOk.length) continue;
+    }
+    out.push(publicServer(req, row, packRow));
+  }
+  return out;
 }
 
 async function getPublishedPack(req, id) {
@@ -480,8 +538,8 @@ packsAdmin.post('/', async (req, res) => {
     const id = await uniqueId('packs', normalizeId(req.body.id, body.name, 'pack'));
     const manifestUrl = body.manifestUrl || `/api/launcher/v1/packs/${id}/manifest`;
     const result = await db.query(
-      `INSERT INTO packs (id, name, minecraft, loader, icon_url, description, source_type, source_config, manifest_url, published, created_by)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb,$9,$10,$11) RETURNING *`,
+      `INSERT INTO packs (id, name, minecraft, loader, icon_url, description, source_type, source_config, manifest_url, published, access_mode, created_by)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb,$9,$10,$11,$12) RETURNING *`,
       [
         id,
         body.name,
@@ -493,6 +551,7 @@ packsAdmin.post('/', async (req, res) => {
         JSON.stringify(body.source.config),
         manifestUrl,
         body.published,
+        body.accessMode,
         req.user.id,
       ]
     );
@@ -527,6 +586,7 @@ packsAdmin.put('/:id', async (req, res) => {
       sourceConfig: req.body.sourceConfig || req.body.source?.config || prev.source_config,
       manifestUrl: req.body.manifestUrl !== undefined ? req.body.manifestUrl : prev.manifest_url,
       published: req.body.published !== undefined ? req.body.published : prev.published,
+      accessMode: req.body.accessMode !== undefined ? req.body.accessMode : prev.access_mode || 'open',
     };
     if (prev.source_type === 'sftp' && merged.sourceType === 'sftp') {
       const nextCfg = parseConfig(merged.sourceConfig);
@@ -537,7 +597,7 @@ packsAdmin.put('/:id', async (req, res) => {
     const body = readPackBody(merged);
     const result = await db.query(
       `UPDATE packs SET name=$2, minecraft=$3, loader=$4, icon_url=$5, description=$6,
-        source_type=$7, source_config=$8::jsonb, manifest_url=$9, published=$10, updated_at=NOW()
+        source_type=$7, source_config=$8::jsonb, manifest_url=$9, published=$10, access_mode=$11, updated_at=NOW()
        WHERE id=$1 RETURNING *`,
       [
         req.params.id,
@@ -550,6 +610,7 @@ packsAdmin.put('/:id', async (req, res) => {
         JSON.stringify(body.source.config),
         body.manifestUrl,
         body.published,
+        body.accessMode,
       ]
     );
     res.json({ success: true, pack: adminPack(result.rows[0]) });
@@ -666,8 +727,8 @@ serversAdmin.post('/', async (req, res) => {
       if (!pack.rows[0]) return res.status(400).json({ error: 'Пак не найден' });
     }
     const result = await db.query(
-      `INSERT INTO servers (id, name, icon_url, address, port, kind, pack_id, minecraft, loader, requires_account, published, sort_order, created_by)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *`,
+      `INSERT INTO servers (id, name, icon_url, address, port, kind, pack_id, minecraft, loader, requires_account, published, access_mode, sort_order, created_by)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *`,
       [
         id,
         body.name,
@@ -680,6 +741,7 @@ serversAdmin.post('/', async (req, res) => {
         body.loader,
         body.requiresAccount,
         body.published,
+        body.accessMode,
         body.sortOrder,
         req.user.id,
       ]
@@ -716,6 +778,7 @@ serversAdmin.put('/:id', async (req, res) => {
       loader: req.body.loader !== undefined ? req.body.loader : prev.loader,
       requiresAccount: req.body.requiresAccount !== undefined ? req.body.requiresAccount : prev.requires_account,
       published: req.body.published !== undefined ? req.body.published : prev.published,
+      accessMode: req.body.accessMode !== undefined ? req.body.accessMode : prev.access_mode || 'open',
       sortOrder: req.body.sortOrder !== undefined ? req.body.sortOrder : prev.sort_order,
     });
     if (body.packId) {
@@ -724,7 +787,7 @@ serversAdmin.put('/:id', async (req, res) => {
     }
     const result = await db.query(
       `UPDATE servers SET name=$2, icon_url=$3, address=$4, port=$5, kind=$6, pack_id=$7,
-        minecraft=$8, loader=$9, requires_account=$10, published=$11, sort_order=$12, updated_at=NOW()
+        minecraft=$8, loader=$9, requires_account=$10, published=$11, access_mode=$12, sort_order=$13, updated_at=NOW()
        WHERE id=$1 RETURNING *`,
       [
         req.params.id,
@@ -738,6 +801,7 @@ serversAdmin.put('/:id', async (req, res) => {
         body.loader,
         body.requiresAccount,
         body.published,
+        body.accessMode,
         body.sortOrder,
       ]
     );
@@ -770,6 +834,7 @@ async function ensureCatalogSchema() {
       source_config JSONB NOT NULL DEFAULT '{}'::jsonb,
       manifest_url TEXT,
       published BOOLEAN NOT NULL DEFAULT true,
+      access_mode VARCHAR(16) NOT NULL DEFAULT 'open',
       created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
       created_by INTEGER
@@ -788,14 +853,29 @@ async function ensureCatalogSchema() {
       loader VARCHAR(32),
       requires_account BOOLEAN NOT NULL DEFAULT false,
       published BOOLEAN NOT NULL DEFAULT true,
+      access_mode VARCHAR(16) NOT NULL DEFAULT 'open',
       sort_order INTEGER NOT NULL DEFAULT 0,
       created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
       created_by INTEGER
     )
   `);
+  await db.query(`ALTER TABLE public.packs ADD COLUMN IF NOT EXISTS access_mode VARCHAR(16) NOT NULL DEFAULT 'open'`);
+  await db.query(`ALTER TABLE public.servers ADD COLUMN IF NOT EXISTS access_mode VARCHAR(16) NOT NULL DEFAULT 'open'`);
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS public.catalog_acl (
+      id BIGSERIAL PRIMARY KEY,
+      resource_type VARCHAR(16) NOT NULL CHECK (resource_type IN ('pack', 'server')),
+      resource_id TEXT NOT NULL,
+      user_id INTEGER NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+      effect VARCHAR(8) NOT NULL CHECK (effect IN ('allow', 'deny')),
+      created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT catalog_acl_unique UNIQUE (resource_type, resource_id, user_id, effect)
+    )
+  `);
   await db.query(`CREATE INDEX IF NOT EXISTS packs_published_idx ON public.packs (published)`);
   await db.query(`CREATE INDEX IF NOT EXISTS servers_published_sort_idx ON public.servers (published, sort_order, name)`);
+  await db.query(`CREATE INDEX IF NOT EXISTS catalog_acl_resource_idx ON public.catalog_acl (resource_type, resource_id)`);
   await db.query(
     `INSERT INTO public.packs (
         id, name, minecraft, loader, description, source_type, source_config, manifest_url, published
@@ -823,6 +903,86 @@ async function ensureCatalogSchema() {
      WHERE NOT EXISTS (SELECT 1 FROM public.servers WHERE id = seed.id)`
   );
 }
+
+async function loadAcl(resourceType, resourceId) {
+  const result = await db.query(
+    `SELECT a.id, a.user_id, a.effect, u.nickname
+     FROM catalog_acl a
+     JOIN users u ON u.id = a.user_id
+     WHERE a.resource_type = $1 AND a.resource_id = $2
+     ORDER BY u.nickname ASC`,
+    [resourceType, resourceId]
+  );
+  return result.rows.map((row) => ({
+    id: String(row.id),
+    userId: String(row.user_id),
+    nickname: row.nickname,
+    effect: row.effect,
+  }));
+}
+
+function aclRouter(resourceType, table) {
+  const r = express.Router({ mergeParams: true });
+  r.get('/:id/acl', async (req, res) => {
+    try {
+      const exists = await db.query(`SELECT id FROM ${table} WHERE id = $1`, [req.params.id]);
+      if (!exists.rows[0]) return res.status(404).json({ error: 'не найдено' });
+      res.json({ entries: await loadAcl(resourceType, req.params.id) });
+    } catch (error) {
+      sendError(res, error, 'не удалось загрузить ACL');
+    }
+  });
+  r.put('/:id/acl', async (req, res) => {
+    try {
+      const exists = await db.query(`SELECT id FROM ${table} WHERE id = $1`, [req.params.id]);
+      if (!exists.rows[0]) return res.status(404).json({ error: 'не найдено' });
+      const accessMode = validateAccessMode(req.body.accessMode);
+      await db.query(`UPDATE ${table} SET access_mode = $2, updated_at = NOW() WHERE id = $1`, [
+        req.params.id,
+        accessMode,
+      ]);
+      const nicknames = Array.isArray(req.body.nicknames)
+        ? req.body.nicknames.map((n) => String(n).trim()).filter(Boolean)
+        : [];
+      const effect = accessMode === 'blacklist' ? 'deny' : 'allow';
+      await db.query(`DELETE FROM catalog_acl WHERE resource_type = $1 AND resource_id = $2`, [
+        resourceType,
+        req.params.id,
+      ]);
+      for (const nick of nicknames) {
+        const user = await db.query(
+          `SELECT id FROM users WHERE LOWER(nickname) = LOWER($1)`,
+          [nick]
+        );
+        if (!user.rows[0]) {
+          const err = new Error(`пользователь не найден: ${nick}`);
+          err.status = 400;
+          throw err;
+        }
+        await db.query(
+          `INSERT INTO catalog_acl (resource_type, resource_id, user_id, effect)
+           VALUES ($1,$2,$3,$4)
+           ON CONFLICT (resource_type, resource_id, user_id, effect) DO NOTHING`,
+          [resourceType, req.params.id, user.rows[0].id, effect]
+        );
+      }
+      const row = await db.query(`SELECT * FROM ${table} WHERE id = $1`, [req.params.id]);
+      res.json({
+        success: true,
+        accessMode,
+        entries: await loadAcl(resourceType, req.params.id),
+        pack: table === 'packs' ? adminPack(row.rows[0]) : undefined,
+        server: table === 'servers' ? adminServer(row.rows[0]) : undefined,
+      });
+    } catch (error) {
+      sendError(res, error, 'не удалось сохранить ACL');
+    }
+  });
+  return r;
+}
+
+packsAdmin.use(aclRouter('pack', 'packs'));
+serversAdmin.use(aclRouter('server', 'servers'));
 
 module.exports = {
   packsAdmin,

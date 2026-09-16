@@ -3,12 +3,11 @@
 How the **Owyx launcher** talks to the **Owyx site** API. Source of truth for the
 launcher/site boundary. Keep in sync with `backend/src/routes/launcher.js`.
 
-**Versions:** launcher-facing **API surface `1.1.0`** (`GET /api/launcher/v1/status.version`),
-**site UI `0.1.0`** (`.siteVersion`). Additive catalog fill: live `servers` / `packs` /
-`news` (same `news` table as the site). Login + `/api/launcher/me` unchanged.
+**Versions:** launcher-facing **API surface `1.2.0`** (`GET /api/launcher/v1/status.version`),
+**site UI `0.1.0`** (`.siteVersion`). Additive: friends (`/api/friends`), catalog ACL
+(`access_mode` + `catalog_acl`), optional Bearer on catalog lists.
 
-**Updated:** 2026-08-24 — friends control-plane + quality pass: hashed sessions,
-plugin-only write tokens, `mrpack` is not a player download.
+**Updated:** 2026-09-16 — friends MVP, library→catalog publish (admin), whitelist/blacklist.
 
 ---
 
@@ -59,7 +58,8 @@ The key is configured as `LAUNCHER_CLIENT_KEY` on the site and `OWYX_CLIENT_KEY`
 
 ## Auth flow (Owyx account in the launcher)
 
-1. `POST /api/auth/login` with `{ "email", "password", "remember": true }`.
+1. `POST /api/auth/login` with `{ "login", "password", "remember": true }`
+   (`email` still accepted as an alias for `login`).
    - Browser (Host: `owyx.site`): may require Cloudflare Turnstile (`turnstileToken`).
    - **Launcher** (Host: `api.owyx.site` **and** valid `X-Owyx-Client-Key`):
      Turnstile is **skipped**. Browser Host (`owyx.site`) always requires captcha
@@ -81,12 +81,22 @@ launcher maps that to `no_session` and asks the user to sign in again.
 
 Offline profiles never call the API; a nick is enough to Play.
 
+**Account editing** (email, nick, password, Discord) is on the **website** ЛК
+(`/profile`), not yet mirrored as launcher settings APIs. Launcher signs in and
+reads `/me` + catalog.
+
+**Friends / Social** in the desktop UI still use the upstream Modrinth friends
+plugin (`plugin:friends`) and Labrinth identity — there is **no** Owyx-site friends
+API yet. Signing into an Owyx account does not currently enable friend lists or
+shared-instance invites until that control-plane exists. Catalog seed names like
+`owyx-friends` are unrelated demo servers.
+
 ---
 
 ## Endpoints
 
 ### `POST /api/auth/login`
-Request: `{ "email": string, "password": string }`
+Request: `{ "login": string, "password": string }` (`email` accepted as alias)
 Response `200`:
 ```json
 { "success": true, "token": "<jwt>", "user": { "id": 1, "nickname": "Steve", "role": "user", ... } }
@@ -125,13 +135,30 @@ Also available as `GET /api/launcher/v1/me`.
 ```json
 {
   "api": "owyx-launcher",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "siteVersion": "0.1.0",
   "serverAccessModel": "open",
   "auth": { "login": "/api/auth/login", "me": "/api/launcher/me" },
   "modules": ["servers", "packs", "news", "cosmetics", "adminCatalog"]
 }
 ```
+
+### Friends (`/api/friends`, auth: Bearer + client key on api host)
+
+- `GET /api/friends` → `{ friends: [{ id, userId, nickname, avatarUrl, status, incoming, ... }] }`
+- `GET /api/friends/search?q=` → `{ users: [...] }`
+- `POST /api/friends/request` `{ nickname }` → create pending (or auto-accept reciprocal)
+- `POST /api/friends/:id/accept` · `POST /api/friends/:id/decline` · `DELETE /api/friends/:id`
+- Presence / “what they’re playing” is **out of scope** for this release.
+
+### Catalog ACL
+
+- `packs.access_mode` / `servers.access_mode`: `open` | `whitelist` | `blacklist`
+- Junction `catalog_acl (resource_type, resource_id, user_id, effect)` with `allow`/`deny`
+- `GET /api/launcher/v1/servers` and `/packs` accept **optional** Bearer JWT:
+  - guest → only `open`
+  - signed-in → whitelist/blacklist applied
+- Admin: `GET|PUT /api/admin/packs|servers/:id/acl` with `{ accessMode, nicknames: string[] }`
 
 ### `GET /api/launcher/v1/cosmetics`  (auth)
 `{ "skinUrl", "skinModel", "capeUrl", "updatedAt" }`.

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Logo from "@/components/ui/Logo";
 
-/** Clean, card-less auth layout — same brand language as the launcher. */
+/** Clean auth layout — same brand language as the launcher (no heavy card chrome). */
 export default function AuthShell({
   title,
   subtitle,
@@ -15,13 +15,13 @@ export default function AuthShell({
 }) {
   return (
     <main id="main-content" className="min-h-screen flex flex-col">
-      <div className="px-4 sm:px-6 py-5">
+      <div className="px-4 sm:px-6 py-5 border-b border-line/60">
         <Link href="/" className="inline-flex items-center" aria-label="Owyx — на главную">
           <Logo size={26} wordClassName="text-xl" />
         </Link>
       </div>
-      <div className="flex-1 grid place-items-center px-4 pb-20">
-        <div className="w-full max-w-md min-w-0">
+      <div className="flex-1 grid place-items-center px-4 py-12 sm:pb-20">
+        <div className="w-full max-w-md min-w-0 fade-up">
           <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.04em]">{title}</h1>
           {subtitle && <p className="mt-2 text-muted leading-relaxed">{subtitle}</p>}
           <div className="mt-8">{children}</div>

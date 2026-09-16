@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 type SourceType = "http_zip" | "http_manifest" | "google_drive" | "mrpack" | "sftp" | "local_ingest";
 
@@ -14,6 +15,7 @@ type PackRow = {
   sourceType: SourceType;
   source?: { type: SourceType; config: Record<string, unknown> };
   published: boolean;
+  accessMode?: "open" | "whitelist" | "blacklist";
 };
 
 type ServerRow = {
@@ -28,6 +30,7 @@ type ServerRow = {
   loader?: string | null;
   requiresAccount: boolean;
   published: boolean;
+  accessMode?: "open" | "whitelist" | "blacklist";
   sortOrder: number;
 };
 
@@ -58,6 +61,8 @@ const emptyPack = {
   path: "",
   password: "",
   published: true,
+  accessMode: "open" as "open" | "whitelist" | "blacklist",
+  aclNicknames: "",
 };
 
 const emptyServer = {
@@ -71,6 +76,8 @@ const emptyServer = {
   loader: "vanilla",
   requiresAccount: false,
   published: true,
+  accessMode: "open" as "open" | "whitelist" | "blacklist",
+  aclNicknames: "",
   sortOrder: "0",
 };
 
@@ -167,8 +174,24 @@ export default function CatalogAdmin({
       path: String(cfg.path || ""),
       password: "",
       published: p.published,
+      accessMode: p.accessMode || "open",
+      aclNicknames: "",
     });
     setOpenPack(true);
+    void (async () => {
+      try {
+        const res = await fetch(`/api/admin/packs/${p.id}/acl`, { headers: authHeaders() });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && Array.isArray(data.entries)) {
+          setPackForm((f) => ({
+            ...f,
+            aclNicknames: data.entries.map((e: { nickname: string }) => e.nickname).join(", "),
+          }));
+        }
+      } catch {
+        /* ignore */
+      }
+    })();
   }
 
   function startCreateServer() {
@@ -195,9 +218,25 @@ export default function CatalogAdmin({
       loader: s.loader || "vanilla",
       requiresAccount: s.requiresAccount,
       published: s.published,
+      accessMode: s.accessMode || "open",
+      aclNicknames: "",
       sortOrder: String(s.sortOrder ?? 0),
     });
     setOpenServer(true);
+    void (async () => {
+      try {
+        const res = await fetch(`/api/admin/servers/${s.id}/acl`, { headers: authHeaders() });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && Array.isArray(data.entries)) {
+          setServerForm((f) => ({
+            ...f,
+            aclNicknames: data.entries.map((e: { nickname: string }) => e.nickname).join(", "),
+          }));
+        }
+      } catch {
+        /* ignore */
+      }
+    })();
   }
 
   async function savePack(e: React.FormEvent) {
@@ -213,6 +252,7 @@ export default function CatalogAdmin({
         sourceType: packForm.sourceType,
         source: sourcePayload(),
         published: packForm.published,
+        accessMode: packForm.accessMode,
       };
       const res = await fetch(editPackId ? `/api/admin/packs/${editPackId}` : "/api/admin/packs", {
         method: editPackId ? "PUT" : "POST",
@@ -224,7 +264,18 @@ export default function CatalogAdmin({
         showMessage(data.error || "Не удалось сохранить пак", "error");
         return;
       }
-      showMessage(editPackId ? "Пак обновлён" : "Пак создан", "success");
+      const packId = editPackId || data.pack?.id;
+      if (packId) {
+        const nicknames = packForm.aclNicknames
+          .split(/[,;\s]+/)
+          .map((n) => n.trim())
+          .filter(Boolean);
+        await fetch(`/api/admin/packs/${packId}/acl`, {
+          method: "PUT",
+          headers: authHeaders(),
+          body: JSON.stringify({ accessMode: packForm.accessMode, nicknames }),
+        });
+      }      showMessage(editPackId ? "Пак обновлён" : "Пак создан", "success");
       setOpenPack(false);
       await load();
     } catch {
@@ -249,6 +300,7 @@ export default function CatalogAdmin({
         loader: serverForm.loader || null,
         requiresAccount: serverForm.requiresAccount,
         published: serverForm.published,
+        accessMode: serverForm.accessMode,
         sortOrder: parseInt(serverForm.sortOrder, 10) || 0,
       };
       const res = await fetch(
@@ -264,7 +316,18 @@ export default function CatalogAdmin({
         showMessage(data.error || "Не удалось сохранить сервер", "error");
         return;
       }
-      showMessage(editServerId ? "Сервер обновлён" : "Сервер создан", "success");
+      const serverId = editServerId || data.server?.id;
+      if (serverId) {
+        const nicknames = serverForm.aclNicknames
+          .split(/[,;\s]+/)
+          .map((n) => n.trim())
+          .filter(Boolean);
+        await fetch(`/api/admin/servers/${serverId}/acl`, {
+          method: "PUT",
+          headers: authHeaders(),
+          body: JSON.stringify({ accessMode: serverForm.accessMode, nicknames }),
+        });
+      }      showMessage(editServerId ? "Сервер обновлён" : "Сервер создан", "success");
       setOpenServer(false);
       await load();
     } catch {
@@ -274,24 +337,28 @@ export default function CatalogAdmin({
     }
   }
 
-  async function togglePack(p: PackRow) {
-    const res = await fetch(`/api/admin/packs/${p.id}`, {
-      method: "PUT",
+  async function deleteServer(s: ServerRow) {
+    if (!window.confirm(`Удалить сервер «${s.name}»?`)) return;
+    const res = await fetch(`/api/admin/servers/${s.id}`, {
+      method: "DELETE",
       headers: authHeaders(),
-      body: JSON.stringify({ published: !p.published }),
     });
-    if (res.ok) await load();
-    else showMessage("Не удалось обновить пак", "error");
+    if (res.ok) {
+      showMessage("Сервер удалён", "success");
+      await load();
+    } else showMessage("Не удалось удалить сервер", "error");
   }
 
-  async function toggleServer(s: ServerRow) {
-    const res = await fetch(`/api/admin/servers/${s.id}`, {
-      method: "PUT",
+  async function deletePack(p: PackRow) {
+    if (!window.confirm(`Удалить пак «${p.name}»?`)) return;
+    const res = await fetch(`/api/admin/packs/${p.id}`, {
+      method: "DELETE",
       headers: authHeaders(),
-      body: JSON.stringify({ published: !s.published }),
     });
-    if (res.ok) await load();
-    else showMessage("Не удалось обновить сервер", "error");
+    if (res.ok) {
+      showMessage("Пак удалён", "success");
+      await load();
+    } else showMessage("Не удалось удалить пак", "error");
   }
 
   async function ingestPack(p: PackRow, file: File) {
@@ -356,7 +423,7 @@ export default function CatalogAdmin({
               {servers.map((s) => (
                 <li
                   key={s.id}
-                  className="flex flex-wrap items-center gap-3 rounded-xl border border-line px-3 py-3"
+                  className="list-row"
                 >
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-text truncate">{s.name}</p>
@@ -364,11 +431,9 @@ export default function CatalogAdmin({
                       {s.address}:{s.port}
                       <span className="text-muted"> · </span>
                       {s.minecraft || "—"} {s.loader || ""}
+                      {!s.published && <span className="text-muted"> · скрыт</span>}
                     </p>
                   </div>
-                  <span className={`badge ${s.published ? "badge-accent" : ""}`}>
-                    {s.published ? "опубл." : "скрыт"}
-                  </span>
                   <button
                     type="button"
                     className="btn btn-secondary btn-sm"
@@ -378,10 +443,10 @@ export default function CatalogAdmin({
                   </button>
                   <button
                     type="button"
-                    className="btn btn-ghost btn-sm"
-                    onClick={() => void toggleServer(s)}
+                    className="btn btn-danger btn-sm"
+                    onClick={() => void deleteServer(s)}
                   >
-                    {s.published ? "Скрыть" : "Показать"}
+                    Удалить
                   </button>
                 </li>
               ))}
@@ -403,17 +468,15 @@ export default function CatalogAdmin({
               {packs.map((p) => (
                 <li
                   key={p.id}
-                  className="flex flex-wrap items-center gap-3 rounded-xl border border-line px-3 py-3"
+                  className="list-row"
                 >
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-text truncate">{p.name}</p>
                     <p className="text-xs text-muted truncate">
                       {p.minecraft} {p.loader} · {p.sourceType}
+                      {!p.published && <span className="text-muted"> · скрыт</span>}
                     </p>
                   </div>
-                  <span className={`badge ${p.published ? "badge-accent" : ""}`}>
-                    {p.published ? "опубл." : "скрыт"}
-                  </span>
                   <label className="btn btn-secondary btn-sm cursor-pointer">
                     Залить zip
                     <input
@@ -436,10 +499,10 @@ export default function CatalogAdmin({
                   </button>
                   <button
                     type="button"
-                    className="btn btn-ghost btn-sm"
-                    onClick={() => void togglePack(p)}
+                    className="btn btn-danger btn-sm"
+                    onClick={() => void deletePack(p)}
                   >
-                    {p.published ? "Скрыть" : "Показать"}
+                    Удалить
                   </button>
                 </li>
               ))}
@@ -592,8 +655,34 @@ export default function CatalogAdmin({
                 checked={packForm.published}
                 onChange={(e) => setPackForm((f) => ({ ...f, published: e.target.checked }))}
               />
-              Опубликован
+              Показывать в лаунчере
             </label>
+            <Field label="Доступ (ACL)">
+              <select
+                className="select"
+                value={packForm.accessMode}
+                onChange={(e) =>
+                  setPackForm((f) => ({
+                    ...f,
+                    accessMode: e.target.value as "open" | "whitelist" | "blacklist",
+                  }))
+                }
+              >
+                <option value="open">open — всем</option>
+                <option value="whitelist">whitelist — только ники ниже</option>
+                <option value="blacklist">blacklist — все кроме ников ниже</option>
+              </select>
+            </Field>
+            {packForm.accessMode !== "open" && (
+              <Field label="Ники (через запятую)">
+                <input
+                  className="input"
+                  value={packForm.aclNicknames}
+                  onChange={(e) => setPackForm((f) => ({ ...f, aclNicknames: e.target.value }))}
+                  placeholder="Alice, Bob"
+                />
+              </Field>
+            )}
             <div className="flex justify-end gap-2 pt-2">
               <button type="button" className="btn btn-ghost" onClick={() => setOpenPack(false)}>
                 Отмена
@@ -722,8 +811,34 @@ export default function CatalogAdmin({
                 checked={serverForm.published}
                 onChange={(e) => setServerForm((f) => ({ ...f, published: e.target.checked }))}
               />
-              Опубликован
+              Показывать в лаунчере
             </label>
+            <Field label="Доступ (ACL)">
+              <select
+                className="select"
+                value={serverForm.accessMode}
+                onChange={(e) =>
+                  setServerForm((f) => ({
+                    ...f,
+                    accessMode: e.target.value as "open" | "whitelist" | "blacklist",
+                  }))
+                }
+              >
+                <option value="open">open — всем</option>
+                <option value="whitelist">whitelist — только ники ниже</option>
+                <option value="blacklist">blacklist — все кроме ников ниже</option>
+              </select>
+            </Field>
+            {serverForm.accessMode !== "open" && (
+              <Field label="Ники (через запятую)">
+                <input
+                  className="input"
+                  value={serverForm.aclNicknames}
+                  onChange={(e) => setServerForm((f) => ({ ...f, aclNicknames: e.target.value }))}
+                  placeholder="Alice, Bob"
+                />
+              </Field>
+            )}
             <div className="flex justify-end gap-2 pt-2">
               <button type="button" className="btn btn-ghost" onClick={() => setOpenServer(false)}>
                 Отмена
@@ -757,14 +872,26 @@ function ModalShell({
   onClose: () => void;
   children: ReactNode;
 }) {
-  return (
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
+  if (!mounted) return null;
+
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/65 py-10 px-4"
+      className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/65"
       onClick={onClose}
       role="presentation"
     >
       <div
-        className="w-full max-w-xl rounded-2xl border border-line bg-panel p-5 sm:p-6 shadow-xl"
+        className="w-full max-w-xl max-h-[min(90vh,44rem)] overflow-y-auto rounded-2xl border border-line bg-panel p-5 sm:p-6 shadow-xl"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -775,6 +902,7 @@ function ModalShell({
         </h3>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

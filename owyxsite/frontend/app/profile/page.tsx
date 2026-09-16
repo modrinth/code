@@ -9,7 +9,9 @@ import CabinetShell, {
   SettingsRow,
   Toast,
 } from "@/components/layout/CabinetShell";
+import AvatarCropModal from "@/components/profile/AvatarCropModal";
 import { useAuth } from "@/hooks/useAuth";
+import { resolveSiteAvatarUrl } from "@/lib/avatar";
 
 const authHeader = () => ({ Authorization: `Bearer ${localStorage.getItem("auth_token")}` });
 
@@ -25,7 +27,7 @@ function formatDate(dateStr?: string): string {
 function roleLabel(role?: string) {
   if (role === "admin") return { text: "Админ", cls: "badge-danger" };
   if (role === "moderator") return { text: "Модератор", cls: "badge-accent" };
-  if (role === "helper") return { text: "Хелпер", cls: "badge-violet" };
+  if (role === "helper") return { text: "Хелпер", cls: "badge-accent" };
   return { text: "Игрок", cls: "" };
 }
 
@@ -55,7 +57,7 @@ export default function ProfilePage() {
   }
 
   const role = roleLabel(user?.role);
-  const initial = (user?.nickname || user?.email || "?").slice(0, 1).toUpperCase();
+  const avatarSrc = resolveSiteAvatarUrl(user?.avatar_url);
 
   return (
     <>
@@ -82,7 +84,7 @@ export default function ProfilePage() {
         onNav={(id) => setTab(id as Tab)}
         footerNote="Скины на сайте скрыты — выбор скина будет в лаунчере."
       >
-        {tab === "overview" && <OverviewPane user={user} role={role} initial={initial} />}
+        {tab === "overview" && <OverviewPane user={user} role={role} avatarSrc={avatarSrc} />}
         {tab === "settings" && <SettingsPane user={user} />}
       </CabinetShell>
       <Footer />
@@ -93,11 +95,11 @@ export default function ProfilePage() {
 function OverviewPane({
   user,
   role,
-  initial,
+  avatarSrc,
 }: {
   user: ReturnType<typeof useAuth>["user"];
   role: { text: string; cls: string };
-  initial: string;
+  avatarSrc: string;
 }) {
   const now = useStableNow();
   if (!user) return null;
@@ -117,13 +119,9 @@ function OverviewPane({
   return (
     <div className="space-y-7">
       <div className="flex flex-wrap items-center gap-4">
-        <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl border border-line bg-panel-2 font-display text-2xl font-bold text-accent">
-          {user.avatar_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={user.avatar_url} alt="" className="h-full w-full rounded-2xl object-cover" />
-          ) : (
-            initial
-          )}
+        <div className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-2xl border border-line bg-panel-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={avatarSrc} alt="" className="h-full w-full object-cover" />
         </div>
         <div className="min-w-0">
           <p className="font-display text-xl font-bold tracking-tight truncate">{user.nickname}</p>
@@ -145,7 +143,7 @@ function OverviewPane({
         ))}
       </div>
 
-      <div className="rounded-xl border border-line bg-panel-2/50 px-4 py-4">
+      <div className="section-callout">
         <p className="text-sm font-medium text-text">Дальше</p>
         <p className="mt-1 text-sm text-muted leading-relaxed">
           Скачай лаунчер и войди тем же логином — сборки и Play подтянутся с сайта.
@@ -160,11 +158,115 @@ function OverviewPane({
 
 function SettingsPane({ user }: { user: ReturnType<typeof useAuth>["user"] }) {
   return (
-    <div className="space-y-10 max-w-2xl">
-      <EmailSection currentEmail={user?.email} />
-      <NicknameSection currentNick={user?.nickname} />
-      <ProfileSecuritySection user={user} />
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-6">
+      <div className="flex flex-col gap-5">
+        <AvatarSection currentUrl={user?.avatar_url} />
+        <ProfileInfoSection user={user} />
+      </div>
+      <div className="flex flex-col gap-5">
+        <EmailSection currentEmail={user?.email} />
+        <NicknameSection currentNick={user?.nickname} />
+      </div>
+      <div className="lg:col-span-2">
+        <PasswordSection />
+      </div>
     </div>
+  );
+}
+
+function AvatarSection({ currentUrl }: { currentUrl?: string | null }) {
+  const [preview, setPreview] = useState(resolveSiteAvatarUrl(currentUrl));
+  const [busy, setBusy] = useState(false);
+  const [toast, setToast] = useState<{ text: string; type: "success" | "error" } | null>(null);
+  const [cropFile, setCropFile] = useState<File | null>(null);
+
+  async function uploadWithCrop(file: File, cropData: import("@/components/profile/AvatarCropModal").AvatarCropData) {
+    setBusy(true);
+    setToast(null);
+    try {
+      const fd = new FormData();
+      fd.append("avatar", file);
+      fd.append("cropData", JSON.stringify(cropData));
+      const res = await fetch("/api/profile/avatar", {
+        method: "POST",
+        headers: authHeader(),
+        body: fd,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setPreview(resolveSiteAvatarUrl(data.avatar_url));
+        setToast({ text: "Аватар обновлён", type: "success" });
+      } else setToast({ text: data.error || "Не удалось загрузить", type: "error" });
+    } catch {
+      setToast({ text: "Не удалось связаться с сервером.", type: "error" });
+    } finally {
+      setBusy(false);
+      setCropFile(null);
+    }
+  }
+
+  async function removeAvatar() {
+    setBusy(true);
+    setToast(null);
+    try {
+      const res = await fetch("/api/profile/avatar", {
+        method: "DELETE",
+        headers: authHeader(),
+      });
+      if (res.ok) {
+        setPreview(resolveSiteAvatarUrl(null));
+        setToast({ text: "Аватар сброшен", type: "success" });
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setToast({ text: data.error || "Не удалось удалить", type: "error" });
+      }
+    } catch {
+      setToast({ text: "Не удалось связаться с сервером.", type: "error" });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <SettingsSection title="Аватар" description="Показывается на сайте и в лаунчере после следующего входа.">
+      <SettingsRow label="Фото" hint="PNG/JPEG/WebP, до ~2 МБ. Можно обрезать перед загрузкой.">
+        <div className="flex w-full flex-col gap-3 sm:items-end">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={preview}
+            alt=""
+            className="h-16 w-16 rounded-2xl border border-line object-cover bg-panel-2"
+          />
+          <div className="flex flex-wrap gap-2 justify-end">
+            <label className="btn btn-primary btn-sm cursor-pointer">
+              {busy ? "…" : "Загрузить"}
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                className="hidden"
+                disabled={busy}
+                onChange={(e) => {
+                  const f = e.target.files?.[0] ?? null;
+                  if (f) setCropFile(f);
+                  e.target.value = "";
+                }}
+              />
+            </label>
+            <button type="button" className="btn btn-ghost btn-sm" disabled={busy} onClick={() => void removeAvatar()}>
+              Сбросить
+            </button>
+          </div>
+        </div>
+      </SettingsRow>
+      {toast && <Toast text={toast.text} type={toast.type} />}
+      {cropFile && (
+        <AvatarCropModal
+          file={cropFile}
+          onCancel={() => setCropFile(null)}
+          onConfirm={(crop) => void uploadWithCrop(cropFile, crop)}
+        />
+      )}
+    </SettingsSection>
   );
 }
 
@@ -417,12 +519,10 @@ function NicknameSection({ currentNick }: { currentNick?: string }) {
   );
 }
 
-function ProfileSecuritySection({ user }: { user: ReturnType<typeof useAuth>["user"] }) {
+function ProfileInfoSection({ user }: { user: ReturnType<typeof useAuth>["user"] }) {
   const [form, setForm] = useState({
     first_name: user?.first_name || "",
     discord_username: user?.discord || "",
-    current_password: "",
-    new_password: "",
   });
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<{ text: string; type: "success" | "error" } | null>(null);
@@ -433,11 +533,10 @@ function ProfileSecuritySection({ user }: { user: ReturnType<typeof useAuth>["us
         const res = await fetch("/api/profile", { headers: authHeader() });
         if (res.ok) {
           const data = await res.json();
-          setForm((f) => ({
-            ...f,
+          setForm({
             first_name: data.first_name || "",
             discord_username: data.discord || "",
-          }));
+          });
         }
       } catch {
         /* ignore */
@@ -450,23 +549,17 @@ function ProfileSecuritySection({ user }: { user: ReturnType<typeof useAuth>["us
     setBusy(true);
     setToast(null);
     try {
-      const body: Record<string, unknown> = {
-        first_name: form.first_name,
-        discord_username: form.discord_username,
-      };
-      if (form.new_password) {
-        body.current_password = form.current_password;
-        body.new_password = form.new_password;
-      }
       const res = await fetch("/api/profile", {
         method: "PUT",
         headers: { ...authHeader(), "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+          first_name: form.first_name,
+          discord_username: form.discord_username,
+        }),
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        setToast({ text: data.message || "Сохранено", type: "success" });
-        setForm((f) => ({ ...f, current_password: "", new_password: "" }));
+        setToast({ text: data.message || "Профиль сохранён", type: "success" });
       } else setToast({ text: data.error || "Ошибка сохранения", type: "error" });
     } catch {
       setToast({ text: "Не удалось связаться с сервером.", type: "error" });
@@ -476,7 +569,7 @@ function ProfileSecuritySection({ user }: { user: ReturnType<typeof useAuth>["us
   }
 
   return (
-    <SettingsSection title="Профиль и безопасность" description="Имя, Discord и смена пароля.">
+    <SettingsSection title="Профиль" description="Имя и Discord — видно в ЛК; на геймплей не влияет.">
       <form onSubmit={save} className="space-y-1">
         <SettingsRow label="Имя">
           <input
@@ -495,7 +588,58 @@ function ProfileSecuritySection({ user }: { user: ReturnType<typeof useAuth>["us
             onChange={(e) => setForm((f) => ({ ...f, discord_username: e.target.value }))}
           />
         </SettingsRow>
-        <SettingsRow label="Текущий пароль" hint="Нужен только если меняете пароль.">
+        <div className="pt-4 flex justify-end">
+          <button type="submit" className="btn btn-primary btn-sm" disabled={busy}>
+            {busy ? "Сохранение…" : "Сохранить профиль"}
+          </button>
+        </div>
+      </form>
+      {toast && <Toast text={toast.text} type={toast.type} />}
+    </SettingsSection>
+  );
+}
+
+function PasswordSection() {
+  const [form, setForm] = useState({
+    current_password: "",
+    new_password: "",
+  });
+  const [busy, setBusy] = useState(false);
+  const [toast, setToast] = useState<{ text: string; type: "success" | "error" } | null>(null);
+
+  async function save(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form.new_password) {
+      setToast({ text: "Введите новый пароль", type: "error" });
+      return;
+    }
+    setBusy(true);
+    setToast(null);
+    try {
+      const res = await fetch("/api/profile", {
+        method: "PUT",
+        headers: { ...authHeader(), "Content-Type": "application/json" },
+        body: JSON.stringify({
+          current_password: form.current_password,
+          new_password: form.new_password,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setToast({ text: data.message || "Пароль обновлён", type: "success" });
+        setForm({ current_password: "", new_password: "" });
+      } else setToast({ text: data.error || "Ошибка смены пароля", type: "error" });
+    } catch {
+      setToast({ text: "Не удалось связаться с сервером.", type: "error" });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <SettingsSection title="Безопасность" description="Смена пароля для сайта и лаунчера.">
+      <form onSubmit={save} className="space-y-1">
+        <SettingsRow label="Текущий пароль">
           <input
             id="acc-cur-pass"
             type="password"
@@ -503,9 +647,10 @@ function ProfileSecuritySection({ user }: { user: ReturnType<typeof useAuth>["us
             autoComplete="current-password"
             value={form.current_password}
             onChange={(e) => setForm((f) => ({ ...f, current_password: e.target.value }))}
+            required
           />
         </SettingsRow>
-        <SettingsRow label="Новый пароль" hint="Оставьте пустым, если не меняете.">
+        <SettingsRow label="Новый пароль" hint="Минимум 8 символов.">
           <input
             id="acc-new-pass"
             type="password"
@@ -513,11 +658,13 @@ function ProfileSecuritySection({ user }: { user: ReturnType<typeof useAuth>["us
             autoComplete="new-password"
             value={form.new_password}
             onChange={(e) => setForm((f) => ({ ...f, new_password: e.target.value }))}
+            required
+            minLength={8}
           />
         </SettingsRow>
         <div className="pt-4 flex justify-end">
-          <button type="submit" className="btn btn-primary" disabled={busy}>
-            {busy ? "Сохранение…" : "Сохранить"}
+          <button type="submit" className="btn btn-primary btn-sm" disabled={busy}>
+            {busy ? "Сохранение…" : "Сменить пароль"}
           </button>
         </div>
       </form>

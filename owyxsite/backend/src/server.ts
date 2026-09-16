@@ -50,19 +50,32 @@ app.use(
   })
 );
 
-const corsOrigin = process.env.CORS_ORIGIN
-  ? process.env.CORS_ORIGIN.split(',').map((s) => s.trim())
-  : process.env.NODE_ENV === 'production'
-    ? [
-        process.env.FRONTEND_URL || 'https://owyx.site',
-        'https://www.owyx.site',
-      ]
-    : [
-        process.env.FRONTEND_URL || 'http://localhost:3000',
-        'http://127.0.0.1:3000',
-        'http://localhost:1420',
-        'http://127.0.0.1:1420',
-      ];
+/** Tauri 2 webview Origins — browser fetch to api.owyx.site needs these or login is "Failed to fetch". */
+const TAURI_CORS_ORIGINS = [
+  'https://tauri.localhost',
+  'http://tauri.localhost',
+  'tauri://localhost',
+  'http://localhost:1420',
+  'http://127.0.0.1:1420',
+];
+
+const envCors = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map((s) => s.trim()).filter(Boolean)
+  : [];
+
+const corsOrigin = [
+  ...new Set([
+    ...(envCors.length
+      ? envCors
+      : process.env.NODE_ENV === 'production'
+        ? [process.env.FRONTEND_URL || 'https://owyx.site', 'https://www.owyx.site']
+        : [
+            process.env.FRONTEND_URL || 'http://localhost:3000',
+            'http://127.0.0.1:3000',
+          ]),
+    ...TAURI_CORS_ORIGINS,
+  ]),
+];
 
 app.use(
   cors({
@@ -95,6 +108,7 @@ app.use(
 app.use('/api/auth', authRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/friends', require('./routes/friends'));
 app.use('/api/admin', adminRoutes);
 app.use('/api', settingsRoutes);
 app.use('/api/reputation', reputationRoutes);
@@ -249,6 +263,18 @@ httpServer.listen(PORT, async () => {
   console.log(`Health: http://127.0.0.1:${PORT}/health`);
   console.log(`Socket.io path: /socket.io`);
 
+  // Ensure upload dirs exist (volume may be empty). Permission fix is in entrypoint.
+  try {
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    const uploads = path.join(__dirname, '../uploads');
+    for (const sub of ['avatars', 'skins', 'packs']) {
+      await fs.mkdir(path.join(uploads, sub), { recursive: true });
+    }
+  } catch (e: any) {
+    console.warn('Upload dirs ensure skipped:', e?.message || e);
+  }
+
   const ok = await db.testConnection();
   if (ok) {
     await ensureChatSchema();
@@ -257,6 +283,15 @@ httpServer.listen(PORT, async () => {
       console.log('Catalog schema ready');
     } catch (error: any) {
       console.warn('Catalog schema ensure skipped:', error.message);
+    }
+    try {
+      const friendsRoutes = require('./routes/friends');
+      if (typeof friendsRoutes.ensureFriendsSchema === 'function') {
+        await friendsRoutes.ensureFriendsSchema();
+        console.log('Friends schema ready');
+      }
+    } catch (error: any) {
+      console.warn('Friends schema ensure skipped:', error.message);
     }
     try {
       await db.query('DELETE FROM user_sessions WHERE expires_at < NOW()');

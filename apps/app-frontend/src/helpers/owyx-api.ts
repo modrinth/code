@@ -4,6 +4,8 @@
  * Header: X-Owyx-Client-Key (placeholder only in git — never commit real secrets).
  */
 
+import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
+
 export const DEFAULT_OWYX_API_BASE = 'https://api.owyx.site'
 export const LOCAL_OWYX_API_FALLBACK = 'http://127.0.0.1:3001'
 
@@ -129,9 +131,15 @@ export function setOwyxLocalApiFallback(on: boolean) {
 	localStorage.setItem(STORAGE_LOCAL_FALLBACK, on ? '1' : '0')
 }
 
-function sanitizeMediaUrl(url: string | undefined): string | undefined {
+function sanitizeMediaUrl(url: string | undefined, apiBase?: string): string | undefined {
 	if (!url) return undefined
-	return isSafeExternalHttpsUrl(url) ? url.trim() : undefined
+	const trimmed = url.trim()
+	if (!isSafeExternalHttpsUrl(trimmed)) return undefined
+	if (trimmed.startsWith('/')) {
+		const base = sanitizeOwyxApiBase(apiBase || getStoredOwyxApiBase() || DEFAULT_OWYX_API_BASE)
+		return `${base.replace(/\/$/, '')}${trimmed}`
+	}
+	return trimmed
 }
 
 function formatAddress(raw: Record<string, unknown>): string {
@@ -162,7 +170,11 @@ function packDownloadUrl(raw: Record<string, unknown>): string | undefined {
 	return undefined
 }
 
-function normalizeEntry(raw: Record<string, unknown>, index: number): OwyxServerEntry | null {
+function normalizeEntry(
+	raw: Record<string, unknown>,
+	index: number,
+	apiBase?: string,
+): OwyxServerEntry | null {
 	const name = String(raw.name ?? raw.title ?? '').trim()
 	const address = formatAddress(raw)
 	if (!name || !address) return null
@@ -201,8 +213,8 @@ function normalizeEntry(raw: Record<string, unknown>, index: number): OwyxServer
 				? String(nested.loader)
 				: undefined,
 		address,
-		iconUrl: sanitizeMediaUrl(iconRaw),
-		packUrl: sanitizeMediaUrl(packRaw),
+		iconUrl: sanitizeMediaUrl(iconRaw, apiBase),
+		packUrl: sanitizeMediaUrl(packRaw, apiBase),
 		packId: raw.packId
 			? String(raw.packId)
 			: raw.pack_id
@@ -214,7 +226,7 @@ function normalizeEntry(raw: Record<string, unknown>, index: number): OwyxServer
 	}
 }
 
-function parseCatalog(data: unknown): OwyxServerEntry[] {
+function parseCatalog(data: unknown, apiBase?: string): OwyxServerEntry[] {
 	if (!data || typeof data !== 'object') return []
 	const root = data as Record<string, unknown>
 	const list = Array.isArray(root)
@@ -230,7 +242,7 @@ function parseCatalog(data: unknown): OwyxServerEntry[] {
 	const out: OwyxServerEntry[] = []
 	list.forEach((item, i) => {
 		if (item && typeof item === 'object') {
-			const entry = normalizeEntry(item as Record<string, unknown>, i)
+			const entry = normalizeEntry(item as Record<string, unknown>, i, apiBase)
 			if (entry) out.push(entry)
 		}
 	})
@@ -242,10 +254,10 @@ function parseCatalog(data: unknown): OwyxServerEntry[] {
 			const nested = Array.isArray(p.servers) ? p.servers : [p]
 			nested.forEach((item, j) => {
 				if (item && typeof item === 'object') {
-					const entry = normalizeEntry(item as Record<string, unknown>, i * 100 + j)
+					const entry = normalizeEntry(item as Record<string, unknown>, i * 100 + j, apiBase)
 					if (entry) {
 						if (!entry.packUrl && p.url) {
-							entry.packUrl = sanitizeMediaUrl(String(p.url))
+							entry.packUrl = sanitizeMediaUrl(String(p.url), apiBase)
 						}
 						out.push(entry)
 					}
@@ -260,6 +272,8 @@ function parseCatalog(data: unknown): OwyxServerEntry[] {
 export async function fetchOwyxCatalog(opts: {
 	baseUrl: string
 	clientKey?: string
+	/** Optional JWT so ACL whitelist/blacklist can apply. */
+	authToken?: string | null
 	demoFallback?: boolean
 	/** Explicit opt-in for http://127.0.0.1:3001 after primary base fails */
 	allowLocalFallback?: boolean
@@ -281,17 +295,29 @@ export async function fetchOwyxCatalog(opts: {
 		if (opts.clientKey && base === primary) {
 			headers['X-Owyx-Client-Key'] = opts.clientKey
 		}
+		if (opts.authToken) {
+			headers.Authorization = `Bearer ${opts.authToken}`
+		}
 
 		for (const path of paths) {
 			try {
-				const res = await fetch(`${base.replace(/\/$/, '')}${path}`, {
-					method: 'GET',
-					headers,
-					signal: AbortSignal.timeout(8000),
-				})
+				let res: Response
+				try {
+					res = await tauriFetch(`${base.replace(/\/$/, '')}${path}`, {
+						method: 'GET',
+						headers,
+						signal: AbortSignal.timeout(8000),
+					})
+				} catch {
+					res = await fetch(`${base.replace(/\/$/, '')}${path}`, {
+						method: 'GET',
+						headers,
+						signal: AbortSignal.timeout(8000),
+					})
+				}
 				if (!res.ok) continue
 				const data = await res.json()
-				const servers = parseCatalog(data)
+				const servers = parseCatalog(data, base)
 				if (servers.length > 0 || path === '/api/launcher/v1/servers') {
 					return { servers, fromFallback: false }
 				}

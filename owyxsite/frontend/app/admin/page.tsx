@@ -44,7 +44,6 @@ function AdminPageInner() {
   const [users, setUsers] = useState<AdminUser[] | null>(null);
   const [search, setSearch] = useState("");
   const [toast, setToast] = useState<{ text: string; type: "success" | "error" } | null>(null);
-  const [siteInfo, setSiteInfo] = useState<{ name?: string; ip?: string; online?: boolean } | null>(null);
   const [section, setSection] = useState<Section>("users");
 
   const isAdmin = user?.role === "admin";
@@ -77,23 +76,6 @@ function AdminPageInner() {
         }
       } catch {
         if (!cancelled) setUsers([]);
-      }
-    })();
-    (async () => {
-      try {
-        const res = await fetch("/api/settings/public");
-        if (res.ok) {
-          const d = await res.json();
-          if (!cancelled) {
-            setSiteInfo({
-              name: d.serverName ?? d.name,
-              ip: d.serverIp ?? d.ip,
-              online: d.online,
-            });
-          }
-        }
-      } catch {
-        /* ignore */
       }
     })();
     return () => {
@@ -177,10 +159,10 @@ function AdminPageInner() {
       <>
         <Header />
         <main id="main-content" className="relative min-h-[calc(100vh-64px)]">
-          <div className="owyx-space" aria-hidden />
           <div className="relative z-10 mx-auto max-w-md px-4 py-24 text-center">
-            <h1 className="font-display text-2xl font-bold tracking-tight">Доступ запрещён</h1>
-            <p className="mt-2 text-muted">Нужны права администратора.</p>
+            <p className="text-xs uppercase tracking-[0.16em] text-accent/80">Админ</p>
+            <h1 className="font-display mt-2 text-2xl font-bold tracking-tight">Доступ запрещён</h1>
+            <p className="mt-2 text-sm text-muted leading-relaxed">Нужны права администратора.</p>
             <button type="button" onClick={() => router.push("/profile")} className="btn btn-primary mt-6">
               В личный кабинет
             </button>
@@ -198,15 +180,6 @@ function AdminPageInner() {
         eyebrow="Control plane"
         title="Панель управления"
         subtitle="Аккаунты, каталог лаунчера и новости на главной."
-        actions={
-          <div className="flex flex-wrap items-center gap-2 text-sm">
-            <span className="badge">{siteInfo?.name ?? "Owyx"}</span>
-            <span className="badge font-mono text-xs">{siteInfo?.ip ?? "—"}</span>
-            <span className={`badge ${siteInfo?.online ? "badge-ok" : ""}`}>
-              {siteInfo?.online ? "онлайн" : "оффлайн"}
-            </span>
-          </div>
-        }
         nav={[
           { id: "users", label: "Аккаунты", hint: `${users?.length ?? "…"} чел.` },
           { id: "catalog", label: "Каталог", hint: "Серверы и паки" },
@@ -283,7 +256,7 @@ function UsersPane({
         />
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-line">
+      <div className="overflow-hidden rounded-[14px] border border-line">
         {dataLoading ? (
           <p className="py-12 text-center text-muted text-sm">Загрузка аккаунтов…</p>
         ) : filtered.length === 0 ? (
@@ -444,7 +417,7 @@ function NewsAdmin({
 
       <form
         onSubmit={create}
-        className="rounded-xl border border-line bg-panel-2/40 p-4 space-y-3"
+        className="section-callout space-y-3"
       >
         <div className="field">
           <label className="field-label" htmlFor="news-title">
@@ -500,7 +473,7 @@ function NewsAdmin({
           items.map((n) => (
             <div
               key={n.id}
-              className="flex flex-wrap items-center gap-3 rounded-xl border border-line px-3 py-3"
+              className="list-row"
             >
               <span className={`badge ${n.published ? "badge-accent" : ""}`}>{n.tag}</span>
               <div className="min-w-0 flex-1">

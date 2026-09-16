@@ -202,6 +202,8 @@ import { createServerInstall, provideServerInstall } from '@/providers/server-in
 import { setupProviders } from '@/providers/setup'
 import { setupAppEventsProvider } from '@/providers/setup/app-events'
 import { setupAuthProvider } from '@/providers/setup/auth'
+import { setupOwyxSiteSessionProvider } from '@/providers/owyx-site-session'
+import { resolveOwyxAvatarUrl } from '@/helpers/owyx-avatar'
 import { setupLoadingStateProvider } from '@/providers/setup/loading-state'
 import { setupAppUserPreferencesProvider } from '@/providers/setup/user-preferences.ts'
 import { appMessages } from '@/utils/app-messages'
@@ -422,7 +424,9 @@ const {
 		creationGeneratedIcon.value?.path === iconPath ? creationGeneratedIcon.value.config : null,
 )
 const { hasLoggedIntoMinecraft, hasLoggedIntoModrinth, showChecklist } = onboardingChecklist
-const showFriendsList = computed(() => !showChecklist.value || hasLoggedIntoModrinth.value)
+const showFriendsList = computed(
+	() => !showChecklist.value || hasLoggedIntoModrinth.value || !!owyxSiteSession.value?.token,
+)
 const isOwyxSiteAdmin = computed(() => {
 	const role = owyxSiteSession.value?.user?.role
 	return role === 'admin' || role === 'moderator'
@@ -1433,6 +1437,15 @@ async function signOutOwyxSiteAccount() {
 	owyxSiteSession.value = null
 }
 
+setupOwyxSiteSessionProvider(
+	owyxSiteSession,
+	refreshOwyxSiteSession,
+	async () => {
+		await requestSignIn()
+	},
+	signOutOwyxSiteAccount,
+)
+
 async function logOut() {
 	if (!credentials.value?.user) return
 	await completeAccountSwitch(() => logout())
@@ -2341,7 +2354,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				class="brightness-100 hover:!brightness-100 focus-visible:!brightness-100"
 			>
 				<Avatar
-					:src="owyxSiteSession?.user?.avatarUrl"
+					:src="resolveOwyxAvatarUrl(owyxSiteSession?.user?.avatarUrl)"
 					:alt="owyxSiteSession?.user?.nickname"
 					size="32px"
 					circle
@@ -2501,6 +2514,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 							<FriendsList
 								ref="friendsList"
 								:credentials="credentials"
+								:owyx-signed-in="!!owyxSiteSession?.token"
 								:sign-in="() => requestSignIn()"
 							/>
 						</suspense>

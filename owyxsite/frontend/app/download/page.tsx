@@ -4,20 +4,55 @@ import Footer from "@/components/layout/Footer";
 
 export const metadata = {
   title: "Скачать лаунчер — Owyx",
-  description: "Скачай лаунчер Owyx, введи ник и играй. Аккаунт нужен только для скина и плюшек.",
+  description: "Скачай лаунчер Owyx для Windows или Linux, войди тем же аккаунтом и играй.",
 };
 
 const REPO_URL = "https://github.com/ebluffy/Owyx";
-const RELEASES_URL = `${REPO_URL}/releases`;
-const DOWNLOAD_URL =
+const RELEASES_URL = `${REPO_URL}/releases/latest`;
+
+/** Prefer env overrides; otherwise latest GitHub release asset names (SemVer in filename). */
+const WINDOWS_URL =
+  process.env.NEXT_PUBLIC_LAUNCHER_DOWNLOAD_URL_WINDOWS ||
   process.env.NEXT_PUBLIC_LAUNCHER_DOWNLOAD_URL ||
-  `${REPO_URL}/releases/latest/download/Owyx_0.2.0_x64-setup.exe`;
+  `${REPO_URL}/releases/latest/download/Owyx_0.2.1_x64-setup.exe`;
+
+const LINUX_URL =
+  process.env.NEXT_PUBLIC_LAUNCHER_DOWNLOAD_URL_LINUX ||
+  `${REPO_URL}/releases/latest/download/Owyx_0.2.1_amd64.AppImage`;
 
 const steps = [
-  { n: "1", title: "Скачай установщик", text: "Файл Owyx_*_x64-setup.exe для Windows 10/11. Запусти и пройди мастер установки." },
-  { n: "2", title: "Создай аккаунт и войди", text: "Зарегистрируйся на owyx.site, затем войди тем же логином в лаунчере." },
-  { n: "3", title: "Создай сборку и играй", text: "Создай instance, нажми Play — лаунчер скачает Minecraft и запустит игру." },
+  {
+    n: "1",
+    title: "Скачай установщик",
+    text: "Windows: setup.exe. Linux: AppImage — сделай исполняемым и запусти.",
+  },
+  {
+    n: "2",
+    title: "Создай аккаунт и войди",
+    text: "Зарегистрируйся на owyx.site, затем войди тем же логином в лаунчере.",
+  },
+  {
+    n: "3",
+    title: "Создай сборку и играй",
+    text: "Создай instance или открой Owyx Servers → Play.",
+  },
 ];
+
+function WindowsIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M3 5.5 10.5 4.4v7.1H3V5.5Zm0 13 7.5 1.1v-7.2H3v6.1ZM11.5 4.25 21 3v8.5h-9.5V4.25ZM11.5 20.9 21 22v-9.6h-9.5v8.5Z" />
+    </svg>
+  );
+}
+
+function LinuxIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12.5 2.2c-.9 0-1.7.7-1.9 1.7-.1.4-.3.8-.6 1.1-.8.8-1.3 1.9-1.3 3.1v.4c-.9.5-1.5 1.5-1.5 2.6 0 .6.2 1.2.5 1.6-.5.7-.8 1.6-.8 2.5 0 1.4.7 2.7 1.8 3.5-.2.5-.3 1-.3 1.6 0 1.9 1.4 3.5 3.3 3.8.3.7 1 1.2 1.8 1.2.6 0 1.1-.2 1.5-.6.4.4.9.6 1.5.6.8 0 1.5-.5 1.8-1.2 1.9-.3 3.3-1.9 3.3-3.8 0-.6-.1-1.1-.3-1.6 1.1-.8 1.8-2.1 1.8-3.5 0-.9-.3-1.8-.8-2.5.3-.4.5-1 .5-1.6 0-1.1-.6-2.1-1.5-2.6v-.4c0-1.2-.5-2.3-1.3-3.1-.3-.3-.5-.7-.6-1.1-.2-1-1-1.7-1.9-1.7h-1Zm0 1.6h1c.3 0 .6.3.7.6.1.5.4 1 .8 1.4.5.5.8 1.2.8 1.9v1.1l.7.3c.5.2.8.7.8 1.3 0 .4-.2.8-.5 1l-.5.4.3.5c.3.4.4.9.4 1.4 0 1.1-.7 2.1-1.7 2.5l-.6.2.1.6c.1.4.1.7.1 1.1 0 1.2-.9 2.2-2.1 2.3h-.3l-.2.5c-.1.3-.4.5-.7.5s-.6-.2-.7-.5l-.2-.5h-.3c-1.2-.1-2.1-1.1-2.1-2.3 0-.4 0-.7.1-1.1l.1-.6-.6-.2c-1-.4-1.7-1.4-1.7-2.5 0-.5.1-1 .4-1.4l.3-.5-.5-.4c-.3-.2-.5-.6-.5-1 0-.6.3-1.1.8-1.3l.7-.3V8.8c0-.7.3-1.4.8-1.9.4-.4.7-.9.8-1.4.1-.3.4-.6.7-.6Z" />
+    </svg>
+  );
+}
 
 export default function DownloadPage() {
   return (
@@ -26,29 +61,47 @@ export default function DownloadPage() {
       <main id="main-content" className="relative flex-1">
         <section className="max-w-3xl mx-auto px-4 sm:px-6 py-16">
           <div className="mb-10">
-            <p className="text-sm text-accent font-medium tracking-wide">Windows 10 / 11</p>
+            <p className="text-sm text-accent font-medium tracking-wide">Лаунчер Owyx</p>
             <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-[-0.04em] mt-2 mb-3">
-              Скачать Owyx
+              Скачать
             </h1>
             <p className="text-lg text-muted max-w-2xl">
-              Десктоп-лаунчер Owyx (форк Modrinth App): установщик, аккаунт на сайте, Play в один клик.
+              Один аккаунт на сайте и в лаунчере. Выбери платформу:
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 mb-4">
-            <a href={DOWNLOAD_URL} className="btn btn-primary btn-lg" id="download-launcher" rel="noopener noreferrer">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
-              </svg>
-              Скачать для Windows
+            <span className="text-sm font-medium text-text mr-1">Скачать</span>
+            <a
+              href={WINDOWS_URL}
+              className="btn btn-primary"
+              id="download-launcher-windows"
+              rel="noopener noreferrer"
+            >
+              <WindowsIcon className="w-4 h-4" />
+              Windows
             </a>
-            <a href={REPO_URL} target="_blank" rel="noopener noreferrer" className="btn btn-ghost btn-lg" id="repo-link">
-              Репозиторий
+            <a
+              href={LINUX_URL}
+              className="btn btn-secondary"
+              id="download-launcher-linux"
+              rel="noopener noreferrer"
+            >
+              <LinuxIcon className="w-4 h-4" />
+              Linux
+            </a>
+            <a href={RELEASES_URL} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">
+              Все релизы
             </a>
           </div>
           <p className="text-muted text-sm mb-14 max-w-lg">
-            Если публичного релиза ещё нет, ссылка ведёт на{" "}
-            <a href={RELEASES_URL} target="_blank" rel="noopener noreferrer" className="link-accent">страницу релизов</a>.
+            Актуальные файлы:{" "}
+            <code className="text-xs">Owyx_*_x64-setup.exe</code> и{" "}
+            <code className="text-xs">Owyx_*_amd64.AppImage</code> с{" "}
+            <a href={RELEASES_URL} target="_blank" rel="noopener noreferrer" className="link-accent">
+              GitHub Releases
+            </a>
+            .
           </p>
 
           <ol className="space-y-0 border-t border-line">
@@ -65,7 +118,10 @@ export default function DownloadPage() {
 
           <div className="mt-10 text-muted text-sm">
             Хочешь свой скин и плюшки?{" "}
-            <Link href="/register" className="link-accent">Создай аккаунт Owyx</Link> и войди тем же аккаунтом в лаунчере.
+            <Link href="/register" className="link-accent">
+              Создай аккаунт Owyx
+            </Link>{" "}
+            и войди тем же аккаунтом в лаунчере.
           </div>
         </section>
       </main>

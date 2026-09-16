@@ -18,6 +18,51 @@ const {
 
 const router = express.Router();
 
+async function attachUserFromToken(req, token, { failOnMissingSession }) {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const hashes = sessionTokenHashes(token);
+
+    const sessionResult = await db.query(
+        `SELECT u.*, s.id AS session_id, s.token_hash AS session_token_hash
+         FROM user_sessions s
+         JOIN users u ON s.user_id = u.id
+         WHERE s.token_hash = ANY($1::text[])
+           AND s.user_id = $2
+           AND s.expires_at > NOW()
+           AND s.is_active = true`,
+        [hashes, decoded.userId]
+    );
+
+    if (sessionResult.rows.length === 0) {
+        if (failOnMissingSession) {
+            const err = new Error('Недействительная сессия');
+            err.status = 401;
+            throw err;
+        }
+        return false;
+    }
+
+    req.user = sessionResult.rows[0];
+    if (req.user.is_active === false || req.user.is_banned === true) {
+        await db.query(
+            'UPDATE user_sessions SET is_active = false WHERE id = $1',
+            [req.user.session_id]
+        ).catch(() => {});
+        const err = new Error(req.user.is_banned ? 'Аккаунт заблокирован' : 'Аккаунт неактивен');
+        err.status = 403;
+        throw err;
+    }
+    req.sessionTokenHash = hashes[0];
+    if (!req.user.role) {
+        req.user.role = 'user';
+    }
+    db.query(
+        'UPDATE user_sessions SET token_hash = $1, last_activity = NOW() WHERE id = $2',
+        [hashes[0], req.user.session_id]
+    ).catch(err => console.error('Error updating last_activity:', err));
+    return true;
+}
+
 // Middleware для проверки токена
 const authenticateToken = async (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -28,54 +73,31 @@ const authenticateToken = async (req, res, next) => {
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const hashes = sessionTokenHashes(token);
-
-        // Проверяем, что сессия активна
-        const sessionResult = await db.query(
-            `SELECT u.*, s.id AS session_id, s.token_hash AS session_token_hash
-             FROM user_sessions s
-             JOIN users u ON s.user_id = u.id
-             WHERE s.token_hash = ANY($1::text[])
-               AND s.user_id = $2
-               AND s.expires_at > NOW()
-               AND s.is_active = true`,
-            [hashes, decoded.userId]
-        );
-
-        if (sessionResult.rows.length === 0) {
-            return res.status(401).json({ error: 'Недействительная сессия' });
-        }
-
-        req.user = sessionResult.rows[0];
-        if (req.user.is_active === false || req.user.is_banned === true) {
-            await db.query(
-                'UPDATE user_sessions SET is_active = false WHERE id = $1',
-                [req.user.session_id]
-            ).catch(() => {});
-            return res.status(403).json({
-                error: req.user.is_banned ? 'Аккаунт заблокирован' : 'Аккаунт неактивен'
-            });
-        }
-        req.sessionTokenHash = hashes[0];
-        
-        // Роль уже есть в таблице users, больше не нужно запрашивать отдельно
-        if (!req.user.role) {
-            req.user.role = 'user'; // Значение по умолчанию
-        }
-        
-        // Обновляем время последней активности (не ждем завершения)
-        // Transparently migrate legacy reversible base64 rows to SHA-256.
-        db.query(
-            'UPDATE user_sessions SET token_hash = $1, last_activity = NOW() WHERE id = $2',
-            [hashes[0], req.user.session_id]
-        ).catch(err => console.error('Error updating last_activity:', err));
-        
+        await attachUserFromToken(req, token, { failOnMissingSession: true });
         next();
     } catch (error) {
         console.error('Ошибка проверки токена:', error);
-        return res.status(403).json({ error: 'Недействительный токен' });
+        const status = error.status || 403;
+        return res.status(status).json({ error: error.message || 'Недействительный токен' });
     }
+};
+
+/** Attach req.user when Bearer JWT is present; continue as guest otherwise. */
+const optionalAuthenticate = async (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (!token) {
+        return next();
+    }
+    try {
+        await attachUserFromToken(req, token, { failOnMissingSession: false });
+    } catch (error) {
+        if (error.status === 403) {
+            return res.status(403).json({ error: error.message });
+        }
+        // Ignore invalid tokens for public catalog — treat as guest.
+    }
+    next();
 };
 
 // Middleware для проверки API токена (для плагинов)
@@ -1460,6 +1482,7 @@ router.post('/terminate-game-sessions', authenticateToken, async (req, res) => {
 });
 
 router.authenticateToken = authenticateToken;
+router.optionalAuthenticate = optionalAuthenticate;
 router.authenticateApiToken = authenticateApiToken;
 router.authenticateLongTermApiToken = authenticateLongTermApiToken;
 router.authenticateLongTermApiTokenOnly = authenticateLongTermApiTokenOnly;

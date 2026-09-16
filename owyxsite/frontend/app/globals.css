@@ -69,16 +69,16 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Deep space backdrop: layered radial glows over the base bg. Not flat grey. */
+/* Deep space backdrop: cyan-first blackstack. Violet kept tiny (not SaaS purple). */
 .owyx-space {
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(980px 640px at 14% -12%, rgba(0, 229, 255, 0.12), transparent 58%),
-    radial-gradient(720px 480px at 92% 0%, rgba(139, 92, 246, 0.09), transparent 60%),
-    radial-gradient(1100px 700px at 50% 118%, rgba(0, 229, 255, 0.05), transparent 58%),
+    radial-gradient(980px 640px at 14% -12%, rgba(0, 229, 255, 0.13), transparent 58%),
+    radial-gradient(640px 420px at 94% 4%, rgba(0, 229, 255, 0.05), transparent 62%),
+    radial-gradient(1100px 700px at 50% 118%, rgba(0, 229, 255, 0.06), transparent 58%),
     var(--color-bg);
 }
 .owyx-space::before {
@@ -87,8 +87,8 @@ body {
   position: absolute;
   inset: -10% -5%;
   background:
-    radial-gradient(40% 28% at 22% 18%, rgba(0, 229, 255, 0.07), transparent 70%),
-    radial-gradient(32% 24% at 78% 32%, rgba(139, 92, 246, 0.05), transparent 72%);
+    radial-gradient(40% 28% at 22% 18%, rgba(0, 229, 255, 0.08), transparent 70%),
+    radial-gradient(28% 22% at 82% 28%, rgba(0, 229, 255, 0.04), transparent 72%);
   animation: owyx-mist 18s ease-in-out infinite alternate;
 }
 .owyx-space::after {
@@ -211,6 +211,15 @@ select:focus:not(:focus-visible) {
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
   min-height: 44px;
 }
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 2.5rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%239aa0a6' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+  background-size: 12px 8px;
+}
 .input::placeholder, .textarea::placeholder { color: #616772; }
 .input:focus, .textarea:focus, .select:focus {
   border-color: var(--color-accent);
@@ -226,6 +235,36 @@ select:focus:not(:focus-visible) {
 }
 .panel-2 { background: var(--color-panel-2); border: 1px solid var(--color-line); border-radius: 12px; }
 
+/* Shared callout / CTA strip (home, profile, admin forms) */
+.section-callout {
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-accent) 6%, transparent), transparent 42%),
+    color-mix(in srgb, var(--color-panel-2) 55%, transparent);
+  padding: 1.1rem 1.15rem;
+}
+@media (min-width: 640px) {
+  .section-callout { padding: 1.25rem 1.35rem; }
+}
+
+/* Dense list rows (admin catalog / news / users) */
+.list-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  background: color-mix(in srgb, var(--color-panel-2) 35%, transparent);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.list-row:hover {
+  background: color-mix(in srgb, var(--color-panel-2) 70%, transparent);
+  border-color: color-mix(in srgb, var(--color-line) 70%, var(--color-accent) 30%);
+}
+
 /* ===== Badges / pills ===== */
 .badge {
   display: inline-flex;
@@ -238,9 +277,11 @@ select:focus:not(:focus-visible) {
   border: 1px solid var(--color-line);
   color: var(--color-muted);
   background: var(--color-panel-2);
+  letter-spacing: 0.01em;
 }
 .badge-accent { color: var(--color-accent); border-color: color-mix(in srgb, var(--color-accent) 40%, transparent); background: rgba(0, 229, 255, 0.08); }
-.badge-violet { color: var(--color-accent-violet); border-color: color-mix(in srgb, var(--color-accent-violet) 40%, transparent); background: rgba(139, 92, 246, 0.10); }
+/* Kept for rare staff roles — prefer badge-accent in product UI */
+.badge-violet { color: var(--color-accent-violet); border-color: color-mix(in srgb, var(--color-accent-violet) 35%, transparent); background: rgba(139, 92, 246, 0.08); }
 .badge-ok { color: var(--color-ok); border-color: color-mix(in srgb, var(--color-ok) 40%, transparent); background: rgba(94, 234, 212, 0.08); }
 .badge-danger { color: var(--color-danger); border-color: color-mix(in srgb, var(--color-danger) 40%, transparent); background: rgba(255, 92, 108, 0.08); }
 
@@ -293,8 +334,16 @@ select:focus:not(:focus-visible) {
 
 /* ---- Compatibility primitives for profile/admin/news pages (additive) ---- */
 @layer components {
-  .btn-secondary { background: transparent; color: var(--color-text); border: 1px solid var(--color-line); }
-  .btn-secondary:hover:not(:disabled) { border-color: var(--color-accent); color: var(--color-accent); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--color-text);
+    border-color: var(--color-line);
+  }
+  .btn-secondary:hover:not(:disabled) {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    background: rgba(0, 229, 255, 0.04);
+  }
   .btn-lg { padding: 0.85rem 1.4rem; font-size: 1.05rem; min-height: 48px; }
   .btn-block { width: 100%; }
   .site-link { color: var(--color-accent); text-decoration: none; }
@@ -308,12 +357,12 @@ select:focus:not(:focus-visible) {
 /* Empty / parked surfaces */
 .empty-surface {
   text-align: center;
-  padding: 2.5rem 1.25rem;
-  border: 1px dashed color-mix(in srgb, var(--color-line) 85%, var(--color-accent) 15%);
+  padding: 2.25rem 1.25rem;
+  border: 1px dashed color-mix(in srgb, var(--color-line) 80%, var(--color-accent) 20%);
   border-radius: 14px;
   background:
-    radial-gradient(420px 160px at 50% 0%, color-mix(in srgb, var(--color-accent) 8%, transparent), transparent 70%),
-    var(--color-panel-2);
+    radial-gradient(420px 160px at 50% 0%, color-mix(in srgb, var(--color-accent) 9%, transparent), transparent 70%),
+    color-mix(in srgb, var(--color-panel-2) 85%, var(--color-bg));
 }
 .empty-surface h3 {
   font-family: var(--font-display);

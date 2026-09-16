@@ -8,155 +8,129 @@ import {
 	injectNotificationManager,
 	Input,
 	IntlFormatted,
-	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
-import FriendsSection from '@/components/ui/friends/FriendsSection.vue'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import { useAppSettings } from '@/composables/use-app-settings.ts'
-import { useFriends } from '@/composables/use-friends'
-import type { FriendWithUserData } from '@/helpers/friends.ts'
+import {
+	acceptOwyxFriend,
+	listOwyxFriends,
+	type OwyxFriend,
+	removeOwyxFriend,
+	requestOwyxFriend,
+} from '@/helpers/owyx-friends'
 import type { ModrinthCredentials } from '@/helpers/mr_auth'
-import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
+import { resolveOwyxAvatarUrl } from '@/helpers/owyx-avatar'
 
 const { formatMessage } = useVIntl()
-
 const { handleError } = injectNotificationManager()
-const formatRelativeTime = useRelativeTime()
-const appSettings = useAppSettings()
 
 const props = defineProps<{
+	/** Legacy Modrinth credentials — ignored; friends are Owyx-backed. */
 	credentials: ModrinthCredentials | null
+	owyxSignedIn?: boolean
 	signIn: () => void
 }>()
 
-type FriendsSectionCollapsedFlag =
-	| 'friends_active_collapsed'
-	| 'friends_online_collapsed'
-	| 'friends_offline_collapsed'
-	| 'friends_pending_collapsed'
-
-function isFriendsSectionCollapsed(flag: FriendsSectionCollapsedFlag) {
-	return appSettings.getFeatureFlag(flag)
-}
-
-function setFriendsSectionCollapsed(flag: FriendsSectionCollapsedFlag, collapsed: boolean) {
-	appSettings.featureFlags[flag] = collapsed
-	getSettings()
-		.then((settings) => {
-			settings.feature_flags[flag] = collapsed
-			return setSettings(settings)
-		})
-		.catch(handleError)
-}
-
-const userCredentials = computed(() => props.credentials)
-const {
-	friends: userFriends,
-	loading,
-	requestFriend,
-	acceptFriend,
-	removeFriend: removeFriendRecord,
-} = useFriends({
-	currentUserId: () => userCredentials.value?.user_id,
-	getCredentials: () => userCredentials.value,
-	onError: handleError,
-})
-
+const friends = ref<OwyxFriend[]>([])
+const loading = ref(false)
 const search = ref('')
-const friendInvitesModal = ref()
 const username = ref('')
-const addFriendModal = ref()
+const friendInvitesModal = ref<{ show: () => void; hide: () => void } | null>(null)
+const addFriendModal = ref<{ show: () => void; hide: () => void } | null>(null)
 
-const sortedFriends = computed<FriendWithUserData[]>(() =>
-	userFriends.value.slice().sort((a, b) => {
-		if (a.last_updated === null && b.last_updated === null) {
-			return 0 // Both are null, equal in sorting
-		}
-		if (a.last_updated === null) {
-			return 1 // `a` is null, move it after `b`
-		}
-		if (b.last_updated === null) {
-			return -1 // `b` is null, move it after `a`
-		}
-		// Both are non-null, sort by date
-		return b.last_updated.diff(a.last_updated)
-	}),
+async function refresh() {
+	if (!props.owyxSignedIn) {
+		friends.value = []
+		return
+	}
+	loading.value = true
+	try {
+		friends.value = await listOwyxFriends()
+	} catch (e) {
+		handleError(e)
+		friends.value = []
+	} finally {
+		loading.value = false
+	}
+}
+
+onMounted(() => {
+	void refresh()
+})
+watch(
+	() => props.owyxSignedIn,
+	() => {
+		void refresh()
+	},
 )
-const filteredFriends = computed<FriendWithUserData[]>(() =>
-	sortedFriends.value.filter((x) =>
-		x.username.trim().toLowerCase().includes(search.value.trim().toLowerCase()),
+
+const filtered = computed(() =>
+	friends.value.filter((f) =>
+		f.nickname.toLowerCase().includes(search.value.trim().toLowerCase()),
 	),
 )
-
-const activeFriends = computed<FriendWithUserData[]>(() =>
-	filteredFriends.value.filter((x) => !!x.status && x.online && x.accepted),
-)
-const onlineFriends = computed<FriendWithUserData[]>(() =>
-	filteredFriends.value.filter((x) => x.online && !x.status && x.accepted),
-)
-const offlineFriends = computed<FriendWithUserData[]>(() =>
-	filteredFriends.value.filter((x) => !x.online && x.accepted),
-)
-const pendingFriends = computed(() =>
-	filteredFriends.value
-		.filter((x) => !x.accepted && x.id !== userCredentials.value?.user_id)
-		.slice()
-		.sort((a, b) => b.created.diff(a.created)),
+const accepted = computed(() => filtered.value.filter((f) => f.status === 'accepted'))
+const pendingOutgoing = computed(() =>
+	filtered.value.filter((f) => f.status === 'pending' && !f.incoming),
 )
 const incomingRequests = computed(() =>
-	userFriends.value
-		.filter((x) => !x.accepted && x.id === userCredentials.value?.user_id)
-		.slice()
-		.sort((a, b) => b.created.diff(a.created)),
+	friends.value.filter((f) => f.status === 'pending' && f.incoming),
 )
-
-function addFriendFromModal() {
-	const target = username.value.trim()
-	if (!target) return
-
-	addFriendModal.value.hide()
-	requestFriend({ id: target, username: target })
-	username.value = ''
-}
 
 function showAddFriendModal() {
 	username.value = ''
 	addFriendModal.value?.show()
 }
 
-function addFriend(friend: FriendWithUserData) {
-	acceptFriend(friend)
+async function addFriendFromModal() {
+	const nick = username.value.trim()
+	if (!nick) return
+	addFriendModal.value?.hide()
+	try {
+		await requestOwyxFriend(nick)
+		username.value = ''
+		await refresh()
+	} catch (e) {
+		handleError(e)
+	}
 }
 
-function removeFriend(friend: FriendWithUserData) {
-	removeFriendRecord(friend)
+async function acceptIncoming(friend: OwyxFriend) {
+	try {
+		await acceptOwyxFriend(friend.id)
+		await refresh()
+	} catch (e) {
+		handleError(e)
+	}
+}
+
+async function removeFriend(friend: OwyxFriend) {
+	try {
+		await removeOwyxFriend(friend.id)
+		await refresh()
+	} catch (e) {
+		handleError(e)
+	}
 }
 
 defineExpose({ showAddFriendModal })
 
 const messages = defineMessages({
-	addFriend: {
-		id: 'friends.action.add-friend',
-		defaultMessage: 'Add a friend',
-	},
-	addingAFriend: {
-		id: 'friends.add-friend.title',
-		defaultMessage: 'Adding a friend',
-	},
+	addFriend: { id: 'friends.action.add-friend', defaultMessage: 'Add a friend' },
+	addingAFriend: { id: 'friends.add-friend.title', defaultMessage: 'Adding a friend' },
 	usernameTitle: {
 		id: 'friends.add-friend.username.title',
-		defaultMessage: "What's your friend's Modrinth username?",
+		defaultMessage: "What's your friend's Owyx nickname?",
 	},
 	usernameDescription: {
 		id: 'friends.add-friend.username.description',
-		defaultMessage: 'It may be different from their Minecraft username!',
+		defaultMessage: 'Use the nickname from their owyx.site account.',
 	},
 	usernamePlaceholder: {
 		id: 'friends.add-friend.username.placeholder',
-		defaultMessage: 'Enter Modrinth username...',
+		defaultMessage: 'Enter Owyx nickname...',
 	},
 	sendFriendRequest: {
 		id: 'friends.add-friend.submit',
@@ -170,25 +144,12 @@ const messages = defineMessages({
 		id: 'friends.search-friends-placeholder',
 		defaultMessage: 'Search friends...',
 	},
-	friends: {
-		id: 'friends.heading',
-		defaultMessage: 'Friends',
-	},
-	pending: {
-		id: 'friends.heading.pending',
-		defaultMessage: 'Pending',
-	},
-	active: {
-		id: 'friends.heading.active',
-		defaultMessage: 'Active',
-	},
-	online: {
-		id: 'friends.heading.online',
-		defaultMessage: 'Online',
-	},
-	offline: {
-		id: 'friends.heading.offline',
-		defaultMessage: 'Offline',
+	friends: { id: 'friends.heading', defaultMessage: 'Friends' },
+	pending: { id: 'friends.heading.pending', defaultMessage: 'Pending' },
+	offline: { id: 'friends.heading.offline', defaultMessage: 'Friends' },
+	presenceSoon: {
+		id: 'friends.presence-coming-soon',
+		defaultMessage: 'Live presence (“what they’re playing”) is coming soon.',
 	},
 	noFriendsMatch: {
 		id: 'friends.no-friends-match',
@@ -196,60 +157,47 @@ const messages = defineMessages({
 	},
 	signInToAddFriends: {
 		id: 'friends.sign-in-to-add-friends',
-		defaultMessage:
-			"<link>Sign in to an Owyx account</link> to add friends and see what they're playing!",
+		defaultMessage: '<link>Sign in to an Owyx account</link> to add friends.',
 	},
 	addFriendsToShare: {
 		id: 'friends.add-friends-to-share',
-		defaultMessage: "<link>Add friends</link> to see what they're playing!",
+		defaultMessage: '<link>Add friends</link> by Owyx nickname.',
 	},
 })
 </script>
 
 <template>
-	<ModalWrapper ref="friendInvitesModal" header="View friend requests">
-		<p v-if="incomingRequests.length === 0">You have no pending friend requests :C</p>
-		<div v-else class="flex flex-col gap-4 min-w-[40rem]">
-			<div v-for="friend in incomingRequests" :key="friend.username" class="flex gap-2">
-				<Avatar :src="friend.avatar" class="w-12 h-12 rounded-full" size="2.25rem" circle />
-				<div class="grid grid-cols-[1fr_auto] w-full gap-4">
-					<div>
-						<p class="m-0">
-							<template v-if="friend.id === userCredentials?.user_id">
-								<span class="text-contrast">{{ friend.username }}</span> sent you a friend request
-							</template>
-							<template v-else>
-								You sent <span class="font-bold">{{ friend.username }}</span> a friend request
-							</template>
-						</p>
-						<p class="m-0 text-sm text-secondary">
-							{{ formatRelativeTime(friend.created.toISOString()) }}
-						</p>
-					</div>
-					<div class="flex gap-2">
-						<template v-if="friend.id === userCredentials?.user_id">
-							<Button type="colored" color="brand" @click="addFriend(friend)">
-								<UserPlusIcon />
-								Accept
-							</Button>
-							<Button @click="removeFriend(friend)">
-								<XIcon />
-								Ignore
-							</Button>
-						</template>
-						<template v-else>
-							<Button @click="removeFriend(friend)">
-								<XIcon />
-								Cancel
-							</Button>
-						</template>
-					</div>
+	<ModalWrapper ref="friendInvitesModal" header="Friend requests">
+		<p v-if="incomingRequests.length === 0">No pending requests.</p>
+		<div v-else class="flex flex-col gap-4 min-w-[28rem]">
+			<div v-for="friend in incomingRequests" :key="friend.id" class="flex gap-2 items-center">
+				<Avatar
+					:src="resolveOwyxAvatarUrl(friend.avatarUrl)"
+					class="w-12 h-12 rounded-full"
+					size="2.25rem"
+					circle
+				/>
+				<div class="flex-1 min-w-0">
+					<p class="m-0">
+						<span class="text-contrast font-medium">{{ friend.nickname }}</span> sent a request
+					</p>
+				</div>
+				<div class="flex gap-2">
+					<Button type="colored" color="brand" @click="acceptIncoming(friend)">
+						<UserPlusIcon />
+						Accept
+					</Button>
+					<Button @click="removeFriend(friend)">
+						<XIcon />
+						Decline
+					</Button>
 				</div>
 			</div>
 		</div>
 	</ModalWrapper>
+
 	<ModalWrapper ref="addFriendModal" :header="formatMessage(messages.addingAFriend)">
-		<div class="min-w-[30rem]">
+		<div class="min-w-[28rem]">
 			<h2 class="m-0 text-base font-medium text-primary">
 				{{ formatMessage(messages.usernameTitle) }}
 			</h2>
@@ -277,13 +225,14 @@ const messages = defineMessages({
 			</div>
 		</div>
 	</ModalWrapper>
-	<div v-if="userCredentials && !loading" class="flex gap-1 items-center mb-3 -ml-1">
-		<template v-if="sortedFriends.length > 0">
+
+	<div v-if="owyxSignedIn && !loading" class="flex gap-1 items-center mb-3 -ml-1">
+		<template v-if="friends.length > 0">
 			<IconButton
 				v-tooltip="formatMessage(messages.addFriend)"
 				type="quiet"
 				:label="formatMessage(messages.addFriend)"
-				@click="addFriendModal.show"
+				@click="showAddFriendModal"
 			>
 				<UserPlusIcon />
 			</IconButton>
@@ -308,97 +257,76 @@ const messages = defineMessages({
 			type="quiet"
 			:label="formatMessage(messages.viewFriendRequests, { count: incomingRequests.length })"
 			class="relative"
-			@click="friendInvitesModal.show"
+			@click="friendInvitesModal?.show()"
 		>
-			<MailIcon />
 			<span
-				v-if="incomingRequests.length > 0"
-				aria-hidden="true"
-				class="absolute bg-brand text-brand-inverted text-[8px] top-0.5 px-1 right-0.5 min-w-3 h-3 rounded-full flex items-center justify-center font-bold"
+				class="absolute -top-0.5 -right-0.5 bg-brand text-inverted rounded-full size-4 text-[10px] flex items-center justify-center pointer-events-none"
 			>
 				{{ incomingRequests.length }}
 			</span>
+			<MailIcon />
 		</IconButton>
 	</div>
-	<div class="flex flex-col gap-3">
-		<h3 v-if="loading" class="text-base text-primary font-medium m-0">
-			{{ formatMessage(messages.friends) }}
-		</h3>
-		<template v-if="loading">
-			<div v-for="n in 5" :key="n" class="flex gap-2 items-center animate-pulse">
-				<div class="min-w-9 min-h-9 bg-button-bg rounded-full"></div>
-				<div class="flex flex-col w-full">
-					<div class="h-3 bg-button-bg rounded-full w-1/2 mb-1"></div>
-					<div class="h-2.5 bg-button-bg rounded-full w-3/4"></div>
-				</div>
-			</div>
-		</template>
-		<template v-else-if="sortedFriends.length === 0">
-			<div class="text-sm">
-				<div v-if="!userCredentials">
-					<IntlFormatted :message-id="messages.signInToAddFriends">
-						<template #link="{ children }">
-							<span class="font-semibold text-brand cursor-pointer" @click="signIn">
-								<component :is="() => children" />
-							</span>
-						</template>
-					</IntlFormatted>
-				</div>
-				<div v-else>
-					<IntlFormatted :message-id="messages.addFriendsToShare">
-						<template #link="{ children }">
-							<span class="font-semibold text-brand cursor-pointer" @click="addFriendModal.show">
-								<component :is="() => children" />
-							</span>
-						</template>
-					</IntlFormatted>
-				</div>
-			</div>
-		</template>
-		<template v-else>
-			<FriendsSection
-				v-if="activeFriends.length > 0"
-				:is-searching="!!search"
-				:open-by-default="!isFriendsSectionCollapsed('friends_active_collapsed')"
-				:friends="activeFriends"
-				:heading="formatMessage(messages.active)"
-				:remove-friend="removeFriend"
-				@on-open="setFriendsSectionCollapsed('friends_active_collapsed', false)"
-				@on-close="setFriendsSectionCollapsed('friends_active_collapsed', true)"
-			/>
-			<FriendsSection
-				v-if="onlineFriends.length > 0"
-				:is-searching="!!search"
-				:open-by-default="!isFriendsSectionCollapsed('friends_online_collapsed')"
-				:friends="onlineFriends"
-				:heading="formatMessage(messages.online)"
-				:remove-friend="removeFriend"
-				@on-open="setFriendsSectionCollapsed('friends_online_collapsed', false)"
-				@on-close="setFriendsSectionCollapsed('friends_online_collapsed', true)"
-			/>
-			<FriendsSection
-				v-if="offlineFriends.length > 0"
-				:is-searching="!!search"
-				:open-by-default="!isFriendsSectionCollapsed('friends_offline_collapsed')"
-				:friends="offlineFriends"
-				:heading="formatMessage(messages.offline)"
-				:remove-friend="removeFriend"
-				@on-open="setFriendsSectionCollapsed('friends_offline_collapsed', false)"
-				@on-close="setFriendsSectionCollapsed('friends_offline_collapsed', true)"
-			/>
-			<FriendsSection
-				v-if="pendingFriends.length > 0"
-				:is-searching="!!search"
-				:open-by-default="!isFriendsSectionCollapsed('friends_pending_collapsed')"
-				:friends="pendingFriends"
-				:heading="formatMessage(messages.pending)"
-				:remove-friend="removeFriend"
-				@on-open="setFriendsSectionCollapsed('friends_pending_collapsed', false)"
-				@on-close="setFriendsSectionCollapsed('friends_pending_collapsed', true)"
-			/>
-			<p v-if="filteredFriends.length === 0 && search" class="text-sm text-secondary my-1 mx-4">
+
+	<div v-if="owyxSignedIn && !loading" class="friends-list">
+		<p class="m-0 mb-3 text-xs text-secondary">{{ formatMessage(messages.presenceSoon) }}</p>
+		<template v-if="friends.length > 0">
+			<p v-if="filtered.length === 0" class="m-0 text-sm text-secondary">
 				{{ formatMessage(messages.noFriendsMatch, { query: search }) }}
 			</p>
+			<template v-else>
+				<div v-if="accepted.length > 0" class="mb-3">
+					<h4 class="m-0 mb-2 text-xs font-semibold uppercase tracking-wide text-secondary">
+						{{ formatMessage(messages.offline) }} ({{ accepted.length }})
+					</h4>
+					<div
+						v-for="friend in accepted"
+						:key="friend.id"
+						class="flex items-center gap-2 py-1.5"
+					>
+						<Avatar :src="resolveOwyxAvatarUrl(friend.avatarUrl)" size="1.75rem" circle />
+						<span class="flex-1 truncate text-sm text-primary">{{ friend.nickname }}</span>
+						<Button class="!px-2 !py-1" @click="removeFriend(friend)">
+							<XIcon class="h-3.5 w-3.5" />
+						</Button>
+					</div>
+				</div>
+				<div v-if="pendingOutgoing.length > 0">
+					<h4 class="m-0 mb-2 text-xs font-semibold uppercase tracking-wide text-secondary">
+						{{ formatMessage(messages.pending) }} ({{ pendingOutgoing.length }})
+					</h4>
+					<div
+						v-for="friend in pendingOutgoing"
+						:key="friend.id"
+						class="flex items-center gap-2 py-1.5"
+					>
+						<Avatar :src="resolveOwyxAvatarUrl(friend.avatarUrl)" size="1.75rem" circle />
+						<span class="flex-1 truncate text-sm text-secondary">{{ friend.nickname }}</span>
+						<Button class="!px-2 !py-1" @click="removeFriend(friend)">
+							<XIcon class="h-3.5 w-3.5" />
+						</Button>
+					</div>
+				</div>
+			</template>
 		</template>
+		<div v-else class="text-secondary text-sm">
+			<IntlFormatted :message-id="messages.addFriendsToShare">
+				<template #link="{ children }">
+					<button class="text-link cursor-pointer bg-transparent border-none p-0" @click="showAddFriendModal">
+						<component :is="() => children" />
+					</button>
+				</template>
+			</IntlFormatted>
+		</div>
+	</div>
+
+	<div v-else-if="!owyxSignedIn" class="text-secondary text-sm">
+		<IntlFormatted :message-id="messages.signInToAddFriends">
+			<template #link="{ children }">
+				<button class="text-link cursor-pointer bg-transparent border-none p-0" @click="signIn()">
+					<component :is="() => children" />
+				</button>
+			</template>
+		</IntlFormatted>
 	</div>
 </template>

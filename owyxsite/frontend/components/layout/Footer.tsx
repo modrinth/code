@@ -9,10 +9,11 @@ const LEGAL = [
 
 export default function Footer() {
   return (
-    <footer className="mt-auto border-t border-line">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <footer className="mt-auto border-t border-line/90">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-muted">
-          Owyx © {new Date().getFullYear()} · сделано <span className="text-accent">ebluffy</span>
+          <span className="font-display font-semibold tracking-tight text-accent">owyx</span>
+          {" "}© {new Date().getFullYear()} · сделано ebluffy
         </p>
         <nav className="flex flex-wrap gap-x-5 gap-y-2 text-xs">
           {LEGAL.map((l) => (
@@ -25,10 +26,10 @@ export default function Footer() {
           </a>
         </nav>
       </div>
-      <div className="border-t border-line">
-        <p className="max-w-6xl mx-auto px-4 sm:px-6 py-3 text-center text-[11px] text-muted">
+      <div className="border-t border-line/80">
+        <p className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 text-center text-[11px] leading-relaxed text-muted">
           Лаунчер использует код open-source клиента{" "}
-          <a href="https://github.com/modrinth/code" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Modrinth (Theseus)</a>
+          <a href="https://github.com/modrinth/code" target="_blank" rel="noopener noreferrer" className="link-accent">Modrinth (Theseus)</a>
           {" "}— форк под себя, не аффилирован с Modrinth.
         </p>
       </div>

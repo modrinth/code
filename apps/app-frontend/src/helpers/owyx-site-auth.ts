@@ -3,12 +3,23 @@
  * Contract: owyxsite/LAUNCHER_SITE_CONTRACT.md — POST /api/auth/login, GET /api/launcher/me
  */
 
+import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
+
 import {
 	DEFAULT_OWYX_API_BASE,
 	getOwyxClientKey,
 	getStoredOwyxApiBase,
 	sanitizeOwyxApiBase,
 } from '@/helpers/owyx-api'
+
+/** Prefer Tauri HTTP plugin (no CORS); fall back to browser fetch for vitest/SSR. */
+async function owyxFetch(input: string, init?: RequestInit): Promise<Response> {
+	try {
+		return await tauriFetch(input, init as Parameters<typeof tauriFetch>[1])
+	} catch {
+		return await fetch(input, init)
+	}
+}
 
 const STORAGE_TOKEN = 'owyx.siteToken'
 const STORAGE_USER = 'owyx.siteUser'
@@ -69,16 +80,21 @@ function persistSession(token: string, user: OwyxSiteUser) {
 }
 
 function mapUser(raw: Record<string, unknown>): OwyxSiteUser {
+	const avatarRaw = raw.avatarUrl
+		? String(raw.avatarUrl)
+		: raw.avatar_url
+			? String(raw.avatar_url)
+			: null
+	let avatarUrl: string | null = avatarRaw
+	if (avatarRaw?.startsWith('/')) {
+		avatarUrl = `https://owyx.site${avatarRaw}`
+	}
 	return {
 		id: (raw.id as number | string) ?? 0,
 		nickname: String(raw.nickname ?? raw.username ?? raw.email ?? 'Owyx'),
 		email: raw.email ? String(raw.email) : undefined,
 		role: raw.role ? String(raw.role) : undefined,
-		avatarUrl: raw.avatarUrl
-			? String(raw.avatarUrl)
-			: raw.avatar_url
-				? String(raw.avatar_url)
-				: null,
+		avatarUrl,
 	}
 }
 
@@ -90,7 +106,7 @@ export async function loginOwyxSite(login: string, password: string): Promise<Ow
 			'Launcher is missing X-Owyx-Client-Key. Reinstall from a current GitHub release or enable Developer mode to set the key.',
 		)
 	}
-	const res = await fetch(`${base.replace(/\/$/, '')}/api/auth/login`, {
+	const res = await owyxFetch(`${base.replace(/\/$/, '')}/api/auth/login`, {
 		method: 'POST',
 		headers: authHeaders(),
 		body: JSON.stringify({ login: login.trim(), password, remember: true }),
@@ -125,7 +141,7 @@ export async function fetchOwyxSiteMe(token?: string): Promise<OwyxSiteSession |
 
 	const base = apiBase()
 	try {
-		const res = await fetch(`${base.replace(/\/$/, '')}/api/launcher/me`, {
+		const res = await owyxFetch(`${base.replace(/\/$/, '')}/api/launcher/me`, {
 			method: 'GET',
 			headers: authHeaders(session.token),
 			signal: AbortSignal.timeout(10000),
@@ -153,7 +169,7 @@ export async function logoutOwyxSite() {
 	if (session?.token) {
 		try {
 			const base = apiBase()
-			await fetch(`${base.replace(/\/$/, '')}/api/auth/logout`, {
+			await owyxFetch(`${base.replace(/\/$/, '')}/api/auth/logout`, {
 				method: 'POST',
 				headers: authHeaders(session.token),
 				signal: AbortSignal.timeout(5000),
