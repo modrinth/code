@@ -3,6 +3,7 @@ import { computed, onMounted, watch } from 'vue'
 
 import { useModerationQueue } from '~/services/moderation/queue'
 
+import { useReviewContent } from './content'
 import { useReviewProject } from './project'
 import { useReviewQueue } from './queue'
 import type { ProjectReviewPageContext } from './types'
@@ -18,6 +19,7 @@ export function createProjectReviewPageContext() {
 		typeof route.query.project === 'string' ? route.query.project : '',
 	)
 	const data = useReviewProject(selection)
+	const content = useReviewContent(data.projectId)
 	const navigation = useReviewQueue(data.projectId, queue)
 
 	onMounted(async () => {
@@ -33,6 +35,11 @@ export function createProjectReviewPageContext() {
 
 	return {
 		...data,
+		...content,
+		tabCounts: computed(() => ({
+			...content.contentCounts.value,
+			gallery: data.project.value ? data.gallery.value.length : undefined,
+		})),
 		selection,
 		queue,
 		navigation,
