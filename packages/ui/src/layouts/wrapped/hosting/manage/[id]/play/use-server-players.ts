@@ -3,6 +3,7 @@ import { computed, type Ref } from 'vue'
 
 import type { InviteLinkSettings, InvitePlayersUser } from '#ui/components/sharing'
 import { injectAuth, injectModrinthClient } from '#ui/providers'
+import { sharedInstanceInvitesQueryOptions } from '#ui/layouts/shared/server-sharing'
 
 import type { ServerPlayerRow } from './types'
 
@@ -12,7 +13,6 @@ export function useServerPlayers(instanceId: Ref<string | null>, canManage: Ref<
 	const queryClient = useQueryClient()
 	const userId = computed(() => auth.user.value?.id)
 	const memberKey = (id: string) => ['shared-instances', id, 'players', userId.value] as const
-	const inviteKey = (id: string) => ['shared-instances', id, 'invites', userId.value] as const
 	const members = useQuery({
 		queryKey: computed(() => memberKey(instanceId.value ?? '')),
 		enabled: computed(() => !!instanceId.value && !!userId.value),
@@ -60,19 +60,45 @@ export function useServerPlayers(instanceId: Ref<string | null>, canManage: Ref<
 		}
 		return [...candidates.values()]
 	})
-	const links = useQuery({
-		queryKey: computed(() => inviteKey(instanceId.value ?? '')),
-		enabled: computed(() => !!instanceId.value && canManage.value),
-		queryFn: () => client.sharedinstances.invites_v1.list(instanceId.value!),
-	})
+	const links = useQuery(computed(() => ({
+		...sharedInstanceInvitesQueryOptions(client, instanceId.value ?? '', userId.value),
+		enabled: !!instanceId.value && !!userId.value && canManage.value,
+	})))
 	const link = computed(() => links.data.value?.find((link) => new Date(link.expiration).getTime() > Date.now() && link.uses < link.max_uses))
 
 	const membershipMutation = useMutation({
-		mutationFn: async ({ id, userId, remove }: { id: string; userId: string; remove: boolean }) => {
+		mutationFn: async ({ id, userId, remove }: { id: string; userId: string; remove: boolean; user?: InvitePlayersUser }) => {
 			if (!canManage.value) throw new Error('You do not have permission to manage players.')
 			if (remove) return client.sharedinstances.instances_v1.removeUsers(id, [userId])
 			const result = await client.sharedinstances.instances_v1.inviteUsers(id, [userId])
 			if (result.failed.includes(userId)) throw new Error('This player’s privacy settings do not allow this invitation.')
+		},
+		onMutate: async ({ id, userId, remove, user }) => {
+			const queryKey = memberKey(id)
+			await queryClient.cancelQueries({ queryKey, exact: true })
+			const previous = queryClient.getQueryData<{ rows: ServerPlayerRow[]; remaining: number }>(queryKey)
+			if (previous) {
+				const exists = previous.rows.some((row) => row.id === userId)
+				const addedRow: ServerPlayerRow = {
+					id: userId,
+					username: user?.username ?? userId,
+					avatarUrl: user?.avatarUrl ?? undefined,
+					joinedAt: null,
+					lastPlayedAt: null,
+					pending: true,
+					method: 'direct',
+				}
+				queryClient.setQueryData(queryKey, {
+					rows: remove
+						? previous.rows.filter((row) => row.id !== userId)
+						: exists ? previous.rows : [...previous.rows, addedRow],
+					remaining: Math.max(0, previous.remaining + (remove ? Number(exists) : -Number(!exists))),
+				})
+			}
+			return { queryKey, previous }
+		},
+		onError: (_error, _variables, context) => {
+			if (context?.previous) queryClient.setQueryData(context.queryKey, context.previous)
 		},
 		onSettled: (_data, _error, { id }) => queryClient.invalidateQueries({ queryKey: ['shared-instances', id, 'players'] }),
 	})
@@ -96,7 +122,7 @@ export function useServerPlayers(instanceId: Ref<string | null>, canManage: Ref<
 	})
 
 	async function ensureLink(id: string) {
-		const available = await queryClient.fetchQuery({ queryKey: inviteKey(id), queryFn: () => client.sharedinstances.invites_v1.list(id), staleTime: 0 })
+		const available = await queryClient.fetchQuery({ ...sharedInstanceInvitesQueryOptions(client, id, userId.value), staleTime: 0 })
 		if (available.some((link) => new Date(link.expiration).getTime() > Date.now() && link.uses < link.max_uses)) return
 		if (remaining.value <= 0) return
 		await linkMutation.mutateAsync({ id, settings: { maxUses: Math.min(10, remaining.value), expiresAt: new Date(Date.now() + 86400_000) } })

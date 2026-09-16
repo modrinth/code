@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { SpinnerIcon, UploadIcon } from '@modrinth/assets'
-import { useIsFetching, useIsMutating } from '@tanstack/vue-query'
-import { computed, reactive, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useIsFetching, useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { computed, reactive, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import { Button } from '#ui/components/base/buttons'
@@ -14,11 +14,15 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import type { FileOperation } from '#ui/layouts/shared/files-tab/types'
-import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
+import ContentDiffModal from '#ui/layouts/shared/installation-settings/components/ContentDiffModal.vue'
+import { resolveServerShareDiff } from '#ui/layouts/wrapped/hosting/manage/[id]/play/share-diff'
+import { injectAuth, injectModrinthClient, injectModrinthServerContext, injectNotificationManager } from '#ui/providers'
 
 import BackupAdmonition, { type BackupAdmonitionEntry } from './BackupAdmonition.vue'
 import FileOperationAdmonition from './FileOperationAdmonition.vue'
 import UploadAdmonition from './UploadAdmonition.vue'
+
+defineOptions({ inheritAttrs: false })
 
 const emit = defineEmits<{
 	'installation-retry': []
@@ -28,7 +32,9 @@ const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 const ctx = injectModrinthServerContext()
 const route = useRoute()
-const router = useRouter()
+const auth = injectAuth()
+const { handleError } = injectNotificationManager()
+const queryClient = useQueryClient()
 const { canSetup, canManageBackups, permissionDeniedMessage } = useServerPermissions()
 const needsShareUpdate = computed(() =>
 	ctx.serverFull.value?.worlds.find((world) => world.id === ctx.worldId.value)
@@ -38,12 +44,52 @@ const shareActions = useIsMutating({ mutationKey: ['servers', 'share-action', ct
 const sharePreviews = useIsFetching({ queryKey: ['servers', 'share-diff', ctx.serverId] })
 const sharePending = computed(() => shareActions.value > 0 || sharePreviews.value > 0)
 
-function reviewShareUpdate() {
-	void router.push({
-		path: `/hosting/manage/${encodeURIComponent(ctx.serverId)}/play`,
-		query: { ...route.query, reviewShare: 'true' },
-	})
+const diffModal = ref<InstanceType<typeof ContentDiffModal>>()
+const previewOpen = ref(false)
+const previewQuery = useQuery({
+	queryKey: computed(() => ['servers', 'share-diff', ctx.serverId, ctx.worldId.value, auth.user.value?.id]),
+	enabled: computed(() => previewOpen.value && !!ctx.worldId.value),
+	queryFn: async () => {
+		const diff = await client.archon.content_v1.getShareDiff(ctx.serverId, ctx.worldId.value!)
+		return { diff, items: resolveServerShareDiff(diff) }
+	},
+	retry: false,
+})
+const pushMutation = useMutation({
+	mutationKey: ['servers', 'share-action', ctx.serverId],
+	mutationFn: async (worldId: string) => {
+		await client.archon.content_v1.share(ctx.serverId, worldId)
+		await queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', ctx.serverId] })
+		await queryClient.invalidateQueries({ queryKey: ['servers', 'share-diff', ctx.serverId, worldId] })
+	},
+	onError: (error) => handleError(error),
+})
+
+async function reviewShareUpdate() {
+	if (!ctx.worldId.value || !canSetup.value || sharePending.value || ctx.busyReasons.value.length) return
+	const worldId = ctx.worldId.value
+	const userId = auth.user.value?.id
+	previewOpen.value = true
+	const result = await previewQuery.refetch()
+	if (!previewOpen.value || ctx.worldId.value !== worldId || auth.user.value?.id !== userId) return
+	if (result.error) {
+		previewOpen.value = false
+		handleError(result.error)
+	} else {
+		diffModal.value?.show()
+	}
 }
+
+function pushShareUpdate() {
+	if (!ctx.worldId.value || !canSetup.value || sharePending.value || ctx.busyReasons.value.length) return
+	previewOpen.value = false
+	pushMutation.mutate(ctx.worldId.value)
+}
+
+watch([ctx.worldId, () => auth.user.value?.id], () => {
+	previewOpen.value = false
+	diffModal.value?.hide()
+})
 
 const { activeOperations, backups, progressFor, invalidate } = useServerBackupsQueue(
 	computed(() => ctx.serverId),
@@ -51,6 +97,16 @@ const { activeOperations, backups, progressFor, invalidate } = useServerBackupsQ
 )
 
 const messages = defineMessages({
+	shareChanges: {
+		id: 'servers.play.share-changes',
+		defaultMessage: 'Share your changes',
+	},
+	shareChangesBody: {
+		id: 'servers.play.share-changes-body',
+		defaultMessage: 'These changes will be available to players when they update their instance.',
+	},
+	added: { id: 'servers.play.diff-added', defaultMessage: 'Added' },
+	removed: { id: 'servers.play.diff-removed', defaultMessage: 'Removed' },
 	unpublished: {
 		id: 'app.instance.admonitions.shared-instance.changes-header',
 		defaultMessage: "Your changes haven't been shared yet",
@@ -411,6 +467,7 @@ function onInstallationDismiss() {
 
 <template>
 	<StackedAdmonitions
+		v-bind="$attrs"
 		:items="stackItems"
 		:dismiss-all-enabled="hasBulkDismissableItems"
 		class="w-full"
@@ -484,4 +541,18 @@ function onInstallationDismiss() {
 			</Admonition>
 		</template>
 	</StackedAdmonitions>
+	<ContentDiffModal
+		ref="diffModal"
+		:header="formatMessage(messages.pushUpdate)"
+		:admonition-header="formatMessage(messages.shareChanges)"
+		:description="formatMessage(messages.shareChangesBody)"
+		:diffs="previewQuery.data.value?.items ?? []"
+		:confirm-label="formatMessage(messages.pushUpdate)"
+		:confirm-icon="UploadIcon"
+		:confirm-disabled="!canSetup || sharePending || ctx.busyReasons.value.length > 0 || previewQuery.isError.value || !previewQuery.data.value"
+		:added-label="formatMessage(messages.added)"
+		:removed-label="formatMessage(messages.removed)"
+		@confirm="pushShareUpdate"
+		@cancel="previewOpen = false"
+	/>
 </template>

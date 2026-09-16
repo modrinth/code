@@ -57,16 +57,19 @@
 
 		<SharedInstanceMembersTable v-else-if="showMembersTable" />
 
-		<SharedInstanceShareEmptyState
+		<Admonition
 			v-else-if="sharedInstanceUnavailable"
-			:heading="formatMessage(sharedInstanceErrorMessages.unavailableTitle)"
-			:description="
-				formatSharedInstanceUnavailable(
-					sharedInstanceUnavailableReason,
-					sharedInstanceUnavailableManager,
-				)
-			"
-		/>
+			type="warning"
+			:header="formatMessage(sharedInstanceUnavailableTitleMessage(sharedInstanceUnavailableReason))"
+		>
+			{{ formatSharedInstanceUnavailable(sharedInstanceUnavailableReason, sharedInstanceUnavailableManager) }}
+			<template #actions>
+				<Button :disabled="retryingAvailability" @click="retryAvailability">
+					<SpinnerIcon v-if="retryingAvailability" class="animate-spin" aria-hidden="true" />
+					{{ formatMessage(commonMessages.retryButton) }}
+				</Button>
+			</template>
+		</Admonition>
 
 		<SharedInstanceShareEmptyState
 			v-else-if="sharedInstanceActionsLocked"
@@ -131,8 +134,10 @@
 <script setup lang="ts">
 import { LogInIcon, SpinnerIcon, UserPlusIcon } from '@modrinth/assets'
 import {
+	Admonition,
 	Avatar,
 	Button,
+	commonMessages,
 	ConfirmUnlinkModal,
 	defineMessages,
 	injectAuth,
@@ -154,7 +159,7 @@ import {
 import { edit } from '@/helpers/instance'
 import type { ModrinthAuthFlow } from '@/helpers/mr_auth.ts'
 import {
-	sharedInstanceErrorMessages,
+	sharedInstanceUnavailableTitleMessage,
 	useSharedInstanceErrors,
 } from '@/helpers/shared-instance-errors'
 
@@ -185,6 +190,16 @@ const actionsLocked = sharedInstanceState.shareActionsLocked
 const sharedInstanceActionsLocked = actionsLocked
 const currentUserId = computed(() => auth.user.value?.id ?? null)
 const isSignedIn = computed(() => !!auth.session_token.value)
+const retryingAvailability = ref(false)
+async function retryAvailability() {
+	if (retryingAvailability.value) return
+	retryingAvailability.value = true
+	try {
+		await sharedInstanceState.refreshAvailability()
+	} finally {
+		retryingAvailability.value = false
+	}
+}
 const sharedInstancesApiUnavailable = ref(false)
 const accountRequiredModal = ref<InstanceType<typeof ModrinthAccountRequiredModal>>()
 const invitePlayersModal = ref<InstanceType<typeof InvitePlayersModal>>()

@@ -80,9 +80,8 @@
 						:disabled="disabled"
 						v-tooltip="row.pending ? 'Revoke invite' : 'More actions'"
 						type="quiet"
-						interaction="none"
 						:label="`${row.pending ? 'Revoke invite' : 'More actions'} for ${row.username}`"
-						class="!text-secondary"
+						class="!text-secondary hover:!filter-none focus-visible:!filter-none"
 						:class="row.pending ? 'hover:!text-red' : ''"
 						@click="row.pending ? emit('remove', row) : emit('open-actions', row)"
 					>

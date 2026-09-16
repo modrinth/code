@@ -11,13 +11,10 @@
 		/>
 		<section class="flex flex-col gap-3">
 			<h1 class="m-0 text-2xl font-semibold text-contrast">{{ formatMessage(messages.invitedPlayersTitle) }}</h1>
-			<div v-if="players.members.isLoading.value" class="flex justify-center p-8" role="status" :aria-label="formatMessage(messages.loading)">
-				<SpinnerIcon class="animate-spin" />
-			</div>
-			<Admonition v-else-if="players.members.isError.value" type="critical" :header="formatMessage(messages.playersError)">
+			<Admonition v-if="players.members.isError.value" type="critical" :header="formatMessage(messages.playersError)">
 				<Button @click="players.members.refetch()">{{ formatMessage(messages.retry) }}</Button>
 			</Admonition>
-			<ServerPlayersTable v-else :rows="players.rows.value" :can-manage="canSetup" :disabled="players.membershipMutation.isPending.value || actionsLocked" @remove="confirmRemove" @open-actions="confirmRemove" />
+			<ServerPlayersTable :rows="players.rows.value" :can-manage="canSetup" :disabled="players.membershipMutation.isPending.value || actionsLocked" @remove="confirmRemove" @open-actions="confirmRemove" />
 		</section>
 		<InvitePlayersModal
 			ref="invitePlayersModal"
@@ -62,15 +59,14 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import { SpinnerIcon, UploadIcon } from '@modrinth/assets'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage } from '@vueuse/core'
 import { computed, nextTick, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import { Button } from '#ui/components/base/buttons'
 import ConfirmModal from '#ui/components/modal/ConfirmModal.vue'
-import { type InviteLinkSettings, type InvitePlayersInvitePayload, InvitePlayersModal } from '#ui/components/sharing'
+import { type InviteLinkSettings, type InvitePlayersInvitePayload, InvitePlayersModal, type InvitePlayersUser } from '#ui/components/sharing'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import ContentDiffModal from '#ui/layouts/shared/installation-settings/components/ContentDiffModal.vue'
@@ -93,8 +89,6 @@ const { handleError } = injectNotificationManager()
 const client = injectModrinthClient()
 const auth = injectAuth()
 const queryClient = useQueryClient()
-const route = useRoute()
-const router = useRouter()
 const { serverId, worldId, server, serverFull, busyReasons } = injectModrinthServerContext()
 const { canSetup } = useServerPermissions()
 const world = computed(() => serverFull.value?.worlds.find((world) => world.id === worldId.value))
@@ -116,7 +110,7 @@ const previewQuery = useQuery({
 	enabled: computed(() => previewOpen.value && !!worldId.value && !!sharedInstanceId.value),
 	queryFn: async () => {
 		const diff = await client.archon.content_v1.getShareDiff(serverId, worldId.value!)
-		return { diff, items: await resolveServerShareDiff(client, diff) }
+		return { diff, items: resolveServerShareDiff(diff) }
 	},
 	retry: false,
 })
@@ -163,7 +157,8 @@ const actionMutation = useMutation({
 	onError: (error) => handleError(error),
 })
 const pendingAction = computed(() => actionMutation.isPending.value ? actionMutation.variables.value?.action : undefined)
-const actionsLocked = computed(() => actionMutation.isPending.value || previewQuery.isFetching.value || players.linkMutation.isPending.value || busyReasons.value.length > 0)
+const shareActions = useIsMutating({ mutationKey: ['servers', 'share-action', serverId] })
+const actionsLocked = computed(() => shareActions.value > 0 || previewQuery.isFetching.value || players.linkMutation.isPending.value || busyReasons.value.length > 0)
 function perform(action: Action, reviewed = false) {
 	if (!worldId.value || actionsLocked.value) return
 	if (action === 'play' && !reviewed && canSetup.value && needsUpdate.value && preferences.value.reviewChangesBeforePlaying) {
@@ -186,33 +181,12 @@ async function showPreview(playAfter = false) {
 		handleError(result.error)
 	} else diffModal.value?.show()
 }
-const openingRequestedPreview = ref(false)
-watch(
-	[() => route.query.reviewShare, canSetup, sharedInstanceId, actionsLocked],
-	async ([requested, allowed, instanceId, locked]) => {
-		if (requested !== 'true' || !allowed || !instanceId || locked || openingRequestedPreview.value) return
-		openingRequestedPreview.value = true
-		const requestedPath = route.path
-		try {
-			await nextTick()
-			await showPreview()
-		} finally {
-			if (route.path === requestedPath && route.query.reviewShare === 'true') {
-				const query = { ...route.query }
-				delete query.reviewShare
-				await router.replace({ path: route.path, query, hash: route.hash })
-			}
-			openingRequestedPreview.value = false
-		}
-	},
-	{ immediate: true, flush: 'post' },
-)
-function changeMember(userId: string, remove: boolean) {
+function changeMember(userId: string, remove: boolean, user?: InvitePlayersUser) {
 	if (!sharedInstanceId.value || players.membershipMutation.isPending.value || !canSetup.value) return
-	players.membershipMutation.mutate({ id: sharedInstanceId.value, userId, remove }, { onError: (error) => handleError(error) })
+	players.membershipMutation.mutate({ id: sharedInstanceId.value, userId, remove, user }, { onError: (error) => handleError(error) })
 }
 function invitePlayer(payload: InvitePlayersInvitePayload) {
-	changeMember(payload.user.id, false)
+	changeMember(payload.user.id, false, payload.user)
 }
 function confirmRemove(player: ServerPlayerRow) {
 	playerToRemove.value = player
@@ -225,7 +199,7 @@ async function updateInviteLink(settings: InviteLinkSettings) {
 	if (!sharedInstanceId.value || players.linkMutation.isPending.value) return
 	await players.linkMutation.mutateAsync({ id: sharedInstanceId.value, settings, replaceId: players.link.value?.id })
 }
-watch([worldId, () => auth.user.value?.id], () => {
+watch([worldId, sharedInstanceId, () => auth.user.value?.id], () => {
 	invitePlayersModal.value?.hide()
 	diffModal.value?.hide()
 	removeModal.value?.hide()
@@ -241,7 +215,6 @@ const messages = defineMessages({
 	inviteHeader: { id: 'servers.play.invite-header', defaultMessage: 'Invite players to {name}' },
 	refreshingPreview: { id: 'servers.play.refreshing-preview', defaultMessage: 'Refreshing changes…' },
 	previewError: { id: 'servers.play.preview-error', defaultMessage: 'Could not refresh the changes. Retry before publishing.' },
-	loading: { id: 'servers.play.loading', defaultMessage: 'Loading players' },
 	playersError: { id: 'servers.play.players-error', defaultMessage: 'Could not load invited players' },
 	retry: { id: 'servers.play.retry', defaultMessage: 'Retry' },
 	invitesUnavailable: { id: 'servers.play.invites-unavailable', defaultMessage: 'Invitations are unavailable while an action is in progress or the player limit has been reached.' },
