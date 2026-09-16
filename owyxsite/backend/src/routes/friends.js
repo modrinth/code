@@ -6,6 +6,8 @@ const router = express.Router();
 router.use(authenticateToken);
 
 const NICK_RE = /^[A-Za-z0-9_]{3,16}$/;
+/** Presence older than this is treated as offline. */
+const PRESENCE_TTL_MS = 90_000;
 
 async function ensureFriendsSchema() {
   await db.query(`
@@ -29,6 +31,30 @@ async function ensureFriendsSchema() {
     CREATE INDEX IF NOT EXISTS friendships_friend_status_idx
       ON public.friendships (friend_id, status)
   `);
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS public.user_presence (
+      user_id INTEGER PRIMARY KEY REFERENCES public.users(id) ON DELETE CASCADE,
+      status VARCHAR(16) NOT NULL DEFAULT 'offline'
+        CHECK (status IN ('offline', 'online', 'playing')),
+      instance_name TEXT,
+      updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+}
+
+function presenceFromRow(row) {
+  if (!row || !row.updated_at) {
+    return { status: 'offline', instanceName: null, updatedAt: null };
+  }
+  const age = Date.now() - new Date(row.updated_at).getTime();
+  if (Number.isNaN(age) || age > PRESENCE_TTL_MS) {
+    return { status: 'offline', instanceName: null, updatedAt: row.updated_at };
+  }
+  return {
+    status: row.status === 'playing' ? 'playing' : row.status === 'online' ? 'online' : 'offline',
+    instanceName: row.status === 'playing' ? row.instance_name || null : null,
+    updatedAt: row.updated_at,
+  };
 }
 
 function publicFriend(row, meId) {
@@ -38,6 +64,11 @@ function publicFriend(row, meId) {
   const otherAvatar =
     Number(row.user_id) === Number(meId) ? row.friend_avatar : row.user_avatar;
   const incoming = Number(row.friend_id) === Number(meId) && row.status === 'pending';
+  const presence = presenceFromRow({
+    status: row.presence_status,
+    instance_name: row.presence_instance,
+    updated_at: row.presence_updated_at,
+  });
   return {
     id: String(row.id),
     userId: String(otherId),
@@ -47,16 +78,26 @@ function publicFriend(row, meId) {
     incoming,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+    presence: presence.status,
+    instanceName: presence.instanceName,
+    presenceUpdatedAt: presence.updatedAt,
   };
 }
 
 const FRIEND_SELECT = `
   SELECT f.*,
          u.nickname AS user_nickname, u.avatar_url AS user_avatar,
-         fr.nickname AS friend_nickname, fr.avatar_url AS friend_avatar
+         fr.nickname AS friend_nickname, fr.avatar_url AS friend_avatar,
+         p.status AS presence_status,
+         p.instance_name AS presence_instance,
+         p.updated_at AS presence_updated_at
   FROM friendships f
   JOIN users u ON u.id = f.user_id
   JOIN users fr ON fr.id = f.friend_id
+  LEFT JOIN user_presence p ON p.user_id = CASE
+    WHEN f.user_id = $1 THEN f.friend_id
+    ELSE f.user_id
+  END
 `;
 
 // GET /api/friends — list mine (accepted + pending both ways)
@@ -69,10 +110,48 @@ router.get('/', async (req, res) => {
        ORDER BY f.updated_at DESC`,
       [me]
     );
-    res.json({ friends: result.rows.map((row) => publicFriend(row, me)) });
+    const friends = result.rows.map((row) => publicFriend(row, me));
+    res.json({
+      friends,
+      incomingCount: friends.filter((f) => f.incoming && f.status === 'pending').length,
+    });
   } catch (error) {
     console.error('friends list:', error);
     res.status(500).json({ error: 'не удалось загрузить друзей' });
+  }
+});
+
+// POST /api/friends/presence — heartbeat / playing status
+router.post('/presence', async (req, res) => {
+  try {
+    const raw = String(req.body.status || 'online').toLowerCase();
+    const status = ['offline', 'online', 'playing'].includes(raw) ? raw : 'online';
+    const instanceName =
+      status === 'playing'
+        ? String(req.body.instanceName || req.body.instance_name || '')
+            .trim()
+            .slice(0, 120) || null
+        : null;
+    await db.query(
+      `INSERT INTO user_presence (user_id, status, instance_name, updated_at)
+       VALUES ($1, $2, $3, NOW())
+       ON CONFLICT (user_id) DO UPDATE SET
+         status = EXCLUDED.status,
+         instance_name = EXCLUDED.instance_name,
+         updated_at = NOW()`,
+      [req.user.id, status, instanceName]
+    );
+    res.json({
+      success: true,
+      presence: {
+        status,
+        instanceName,
+        updatedAt: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    console.error('friends presence:', error);
+    res.status(500).json({ error: 'не удалось обновить статус' });
   }
 });
 
@@ -144,10 +223,13 @@ router.post('/request', async (req, res) => {
       if (Number(row.user_id) === Number(friendId) && Number(row.friend_id) === Number(req.user.id)) {
         const accepted = await db.query(
           `UPDATE friendships SET status = 'accepted', updated_at = NOW()
-           WHERE id = $1 RETURNING *`,
+           WHERE id = $1 RETURNING id`,
           [row.id]
         );
-        const full = await db.query(`${FRIEND_SELECT} WHERE f.id = $1`, [accepted.rows[0].id]);
+        const full = await db.query(`${FRIEND_SELECT} WHERE f.id = $2`, [
+          req.user.id,
+          accepted.rows[0].id,
+        ]);
         return res.json({ success: true, friend: publicFriend(full.rows[0], req.user.id) });
       }
       return res.status(409).json({ error: 'заявка уже отправлена' });
@@ -158,7 +240,10 @@ router.post('/request', async (req, res) => {
        VALUES ($1, $2, 'pending') RETURNING id`,
       [req.user.id, friendId]
     );
-    const full = await db.query(`${FRIEND_SELECT} WHERE f.id = $1`, [inserted.rows[0].id]);
+    const full = await db.query(`${FRIEND_SELECT} WHERE f.id = $2`, [
+      req.user.id,
+      inserted.rows[0].id,
+    ]);
     res.status(201).json({ success: true, friend: publicFriend(full.rows[0], req.user.id) });
   } catch (error) {
     console.error('friends request:', error);
@@ -178,7 +263,10 @@ router.post('/:id/accept', async (req, res) => {
     if (!result.rows[0]) {
       return res.status(404).json({ error: 'заявка не найдена' });
     }
-    const full = await db.query(`${FRIEND_SELECT} WHERE f.id = $1`, [result.rows[0].id]);
+    const full = await db.query(`${FRIEND_SELECT} WHERE f.id = $2`, [
+      req.user.id,
+      result.rows[0].id,
+    ]);
     res.json({ success: true, friend: publicFriend(full.rows[0], req.user.id) });
   } catch (error) {
     console.error('friends accept:', error);

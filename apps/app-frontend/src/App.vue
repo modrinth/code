@@ -204,6 +204,12 @@ import { setupAppEventsProvider } from '@/providers/setup/app-events'
 import { setupAuthProvider } from '@/providers/setup/auth'
 import { setupOwyxSiteSessionProvider } from '@/providers/owyx-site-session'
 import { resolveOwyxAvatarUrl } from '@/helpers/owyx-avatar'
+import {
+	setOwyxPresenceOnline,
+	setOwyxPresencePlaying,
+	startOwyxPresenceHeartbeat,
+	stopOwyxPresenceHeartbeat,
+} from '@/helpers/owyx-presence'
 import { setupLoadingStateProvider } from '@/providers/setup/loading-state'
 import { setupAppUserPreferencesProvider } from '@/providers/setup/user-preferences.ts'
 import { appMessages } from '@/utils/app-messages'
@@ -328,6 +334,28 @@ providePopupNotificationManager(popupNotificationManager)
 const { addPopupNotification } = popupNotificationManager
 let adsConsentPopupId = null
 useAppEvent('ads_consent_required', handleAdsConsentRequired, appEvents)
+
+useAppEvent(
+	'process',
+	async (event) => {
+		if (!owyxSiteSession.value?.token) return
+		const kind = typeof event.event === 'string' ? event.event : event.event?.tag
+		if (kind === 'launched') {
+			let name = 'Minecraft'
+			try {
+				const { get } = await import('@/helpers/instance')
+				const inst = event.instance_id ? await get(event.instance_id) : null
+				if (inst?.name) name = inst.name
+			} catch {
+				/* ignore */
+			}
+			setOwyxPresencePlaying(name)
+		} else if (kind === 'finished') {
+			setOwyxPresenceOnline()
+		}
+	},
+	appEvents,
+)
 
 const appVersion = getVersion()
 const tauriApiClient = new TauriModrinthClient({
@@ -1412,31 +1440,45 @@ async function refreshOwyxSiteSession() {
 	const cached = getStoredOwyxSiteSession()
 	if (!cached) {
 		owyxSiteSession.value = null
+		stopOwyxPresenceHeartbeat()
 		return
 	}
 	owyxSiteSession.value = cached
 	const fresh = await fetchOwyxSiteMe(cached.token)
 	owyxSiteSession.value = fresh
 	if (fresh?.token) {
+		startOwyxPresenceHeartbeat()
 		try {
 			const { markLoggedIntoOwyxSite } = await import('@/helpers/onboarding-checklist')
 			await markLoggedIntoOwyxSite()
 		} catch {
 			/* checklist mark is best-effort */
 		}
-		// Sync site login → offline MC nickname (MS account stays preferred if present)
+		// Sync site nickname → Owyx MC profile once (do not steal active Microsoft selection)
 		const nick = fresh.user?.nickname?.trim()
 		if (nick && nick.length <= 16) {
 			try {
-				await login_offline(nick)
+				const { users } = await import('@/helpers/auth')
+				const list = await users()
+				const hasOwyxNick = (Array.isArray(list) ? list : []).some(
+					(a) =>
+						a?.is_offline === true ||
+						a?.refresh_token === 'owyx-offline' ||
+						((a?.refresh_token ?? '') === '' &&
+							(a?.access_token === '' || a?.access_token === '0')),
+				)
+				if (!hasOwyxNick) {
+					await login_offline(nick)
+				}
 			} catch (e) {
-				console.warn('Could not sync Owyx nickname to offline profile', e)
+				console.warn('Could not sync Owyx nickname to play profile', e)
 			}
 		}
 	}
 }
 
 async function signOutOwyxSiteAccount() {
+	stopOwyxPresenceHeartbeat()
 	await logoutOwyxSite()
 	owyxSiteSession.value = null
 }

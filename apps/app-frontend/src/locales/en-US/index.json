@@ -2745,7 +2745,7 @@
 		"message": "Discord Rich Presence"
 	},
 	"app.settings.privacy.telemetry.description": {
-		"message": "Owyx collects anonymized analytics and usage data to improve our user experience and customize your experience. By disabling this option, you opt out and your data will no longer be collected."
+		"message": "Owyx collects anonymized analytics and usage data to improve the launcher and your experience. By disabling this option, you opt out and your data will no longer be collected."
 	},
 	"app.settings.privacy.telemetry.title": {
 		"message": "Telemetry"
@@ -3150,10 +3150,10 @@
 		"message": "Sign in to apply skins."
 	},
 	"app.skins.demo.description": {
-		"message": "Sign in to your Minecraft account to save and apply skins!"
+		"message": "Sign in with Microsoft to save and apply skins. Offline nicknames cannot change skins."
 	},
 	"app.skins.demo.title": {
-		"message": "Editing with a demo account"
+		"message": "Microsoft account required"
 	},
 	"app.skins.dropped-file-error.text": {
 		"message": "Failed to read the dropped file."
@@ -3552,10 +3552,10 @@
 		"message": "Adding a friend"
 	},
 	"friends.add-friend.username.description": {
-		"message": "It may be different from their Minecraft username!"
+		"message": "Search by nickname or type it exactly (3–16 characters)."
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "Enter Owyx username..."
+		"message": "Search Owyx nickname…"
 	},
 	"friends.add-friend.username.title": {
 		"message": "What's your friend's Owyx username?"
@@ -4551,28 +4551,28 @@
 		"message": "Add Microsoft account"
 	},
 	"minecraft-account.add-offline": {
-		"message": "Add offline nickname"
+		"message": "Add Owyx account"
 	},
 	"minecraft-account.microsoft": {
 		"message": "Microsoft"
 	},
 	"minecraft-account.offline": {
-		"message": "Offline (nickname)"
+		"message": "Owyx"
 	},
 	"minecraft-account.sign-in-microsoft": {
 		"message": "Sign in with Microsoft"
 	},
 	"minecraft-account.offline-nickname": {
-		"message": "Offline (nickname)"
+		"message": "Owyx nickname"
 	},
 	"minecraft-account.offline-warning": {
-		"message": "Only for offline-mode servers / friends. Does not work on Microsoft-authenticated public servers."
+		"message": "Uses your Owyx site nickname for offline-mode servers. Public Microsoft-authenticated servers still need a Microsoft account."
 	},
 	"minecraft-account.nickname-placeholder": {
 		"message": "Nickname"
 	},
 	"minecraft-account.play-offline": {
-		"message": "Save offline account"
+		"message": "Save Owyx account"
 	},
 	"app.nav.owyx-servers": {
 		"message": "Owyx Servers"
@@ -4621,5 +4621,62 @@
 	},
 	"app.nav.admin-panel": {
 		"message": "Admin panel"
+	},
+	"friends.status.online": {
+		"message": "Online"
+	},
+	"friends.status.playing": {
+		"message": "Playing {name}"
+	},
+	"friends.status.unknown-instance": {
+		"message": "Minecraft"
+	},
+	"friends.requests.header": {
+		"message": "Friend requests"
+	},
+	"friends.requests.empty": {
+		"message": "No pending requests."
+	},
+	"friends.requests.sent-a-request": {
+		"message": "sent a request"
+	},
+	"friends.requests.accept": {
+		"message": "Accept"
+	},
+	"friends.requests.decline": {
+		"message": "Decline"
+	},
+	"friends.search.already": {
+		"message": "Already friends"
+	},
+	"owyx.admin.title": {
+		"message": "Admin panel"
+	},
+	"owyx.admin.subtitle": {
+		"message": "Manage catalog, users, news, and publish packs from your library."
+	},
+	"owyx.admin.tab-publish": {
+		"message": "Publish"
+	},
+	"owyx.admin.tab-catalog": {
+		"message": "Catalog"
+	},
+	"owyx.admin.tab-users": {
+		"message": "Users"
+	},
+	"owyx.admin.tab-news": {
+		"message": "News"
+	},
+	"owyx.admin.tab-api": {
+		"message": "API"
+	},
+	"owyx.admin.tab-more": {
+		"message": "More"
+	},
+	"owyx.servers.open-admin-panel": {
+		"message": "Open Admin panel"
+	},
+	"owyx.servers.admin-tools-hint": {
+		"message": "Publish packs and API settings live in the Admin panel."
 	}
 }

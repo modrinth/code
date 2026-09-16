@@ -125,12 +125,28 @@ const filtered = computed(() =>
 	),
 )
 const accepted = computed(() => filtered.value.filter((f) => f.status === 'accepted'))
+const onlineFriends = computed(() =>
+	accepted.value.filter((f) => f.presence === 'online' || f.presence === 'playing'),
+)
+const offlineFriends = computed(() =>
+	accepted.value.filter((f) => f.presence !== 'online' && f.presence !== 'playing'),
+)
 const pendingOutgoing = computed(() =>
 	filtered.value.filter((f) => f.status === 'pending' && !f.incoming),
 )
 const incomingRequests = computed(() =>
 	friends.value.filter((f) => f.status === 'pending' && f.incoming),
 )
+
+function friendStatusLabel(friend: OwyxFriend) {
+	if (friend.presence === 'playing') {
+		return formatMessage(messages.playingStatus, {
+			name: friend.instanceName || formatMessage(messages.unknownInstance),
+		})
+	}
+	if (friend.presence === 'online') return formatMessage(messages.onlineStatus)
+	return formatMessage(messages.offlineStatus)
+}
 
 const friendNickSet = computed(() => new Set(friends.value.map((f) => f.nickname.toLowerCase())))
 
@@ -202,18 +218,27 @@ const messages = defineMessages({
 		defaultMessage: 'Search friends...',
 	},
 	friends: { id: 'friends.heading', defaultMessage: 'Friends' },
+	online: { id: 'friends.heading.online', defaultMessage: 'Online' },
 	pending: { id: 'friends.heading.pending', defaultMessage: 'Pending' },
 	sectionHeading: {
 		id: 'friends.section.heading',
 		defaultMessage: '{title} - {count}',
 	},
-	presenceSoon: {
-		id: 'friends.presence-coming-soon',
-		defaultMessage: 'Live presence (“what they’re playing”) is coming soon.',
-	},
 	offlineStatus: {
 		id: 'friends.status.offline',
 		defaultMessage: 'Offline',
+	},
+	onlineStatus: {
+		id: 'friends.status.online',
+		defaultMessage: 'Online',
+	},
+	playingStatus: {
+		id: 'friends.status.playing',
+		defaultMessage: 'Playing {name}',
+	},
+	unknownInstance: {
+		id: 'friends.status.unknown-instance',
+		defaultMessage: 'Minecraft',
 	},
 	alreadyFriends: {
 		id: 'friends.search.already',
@@ -400,7 +425,7 @@ const messages = defineMessages({
 			</p>
 			<template v-else>
 				<Accordion
-					v-if="accepted.length > 0"
+					v-if="onlineFriends.length > 0"
 					:open-by-default="true"
 					:force-open="isSearching"
 					:button-class="
@@ -414,8 +439,8 @@ const messages = defineMessages({
 						<h3 class="text-base text-primary font-medium m-0">
 							{{
 								formatMessage(messages.sectionHeading, {
-									title: formatMessage(messages.friends),
-									count: accepted.length,
+									title: formatMessage(messages.online),
+									count: onlineFriends.length,
 								})
 							}}
 						</h3>
@@ -423,7 +448,66 @@ const messages = defineMessages({
 					<template #default>
 						<div class="pt-3 flex flex-col gap-1">
 							<div
-								v-for="friend in accepted"
+								v-for="friend in onlineFriends"
+								:key="friend.id"
+								class="group grid items-center grid-cols-[1fr_auto] gap-2 hover:bg-button-bg transition-colors rounded-full mr-1 select-none"
+							>
+								<div class="grid min-w-0 grid-cols-[auto_1fr] items-center gap-2">
+									<Avatar :src="resolveOwyxAvatarUrl(friend.avatarUrl)" size="2rem" circle />
+									<div class="flex min-w-0 flex-col">
+										<span class="truncate text-sm text-contrast m-0">{{ friend.nickname }}</span>
+										<span class="m-0 text-xs text-secondary">{{ friendStatusLabel(friend) }}</span>
+									</div>
+								</div>
+								<TeleportOverflowMenu
+									type="quiet"
+									label="More options"
+									class="opacity-0 group-hover:opacity-100 transition-opacity"
+									:options="[
+										{
+											id: 'remove-friend',
+											label: formatMessage(messages.removeFriend),
+											action: () => removeFriend(friend),
+											tone: 'red',
+										},
+									]"
+								>
+									<MoreVerticalIcon />
+									<template #remove-friend>
+										<TrashIcon />
+										{{ formatMessage(messages.removeFriend) }}
+									</template>
+								</TeleportOverflowMenu>
+							</div>
+						</div>
+					</template>
+				</Accordion>
+
+				<Accordion
+					v-if="offlineFriends.length > 0"
+					:open-by-default="onlineFriends.length === 0"
+					:force-open="isSearching"
+					:button-class="
+						'flex w-full items-center bg-transparent border-0 p-0' +
+						(isSearching
+							? ''
+							: ' cursor-pointer hover:brightness-[--hover-brightness] active:scale-[0.98] transition-all')
+					"
+				>
+					<template #title>
+						<h3 class="text-base text-primary font-medium m-0">
+							{{
+								formatMessage(messages.sectionHeading, {
+									title: formatMessage(messages.friends),
+									count: offlineFriends.length,
+								})
+							}}
+						</h3>
+					</template>
+					<template #default>
+						<div class="pt-3 flex flex-col gap-1">
+							<div
+								v-for="friend in offlineFriends"
 								:key="friend.id"
 								class="group grid items-center grid-cols-[1fr_auto] gap-2 hover:bg-button-bg transition-colors rounded-full mr-1 select-none"
 							>
@@ -436,9 +520,7 @@ const messages = defineMessages({
 									/>
 									<div class="flex min-w-0 flex-col">
 										<span class="truncate text-sm text-primary m-0">{{ friend.nickname }}</span>
-										<span class="m-0 text-xs text-secondary">{{
-											formatMessage(messages.offlineStatus)
-										}}</span>
+										<span class="m-0 text-xs text-secondary">{{ friendStatusLabel(friend) }}</span>
 									</div>
 								</div>
 								<TeleportOverflowMenu
@@ -515,10 +597,8 @@ const messages = defineMessages({
 					</template>
 				</Accordion>
 			</template>
-			<p class="m-0 mt-2 text-xs text-secondary">{{ formatMessage(messages.presenceSoon) }}</p>
 		</template>
 		<div v-else class="text-secondary text-sm">
-			<p class="m-0 mb-2 text-xs">{{ formatMessage(messages.presenceSoon) }}</p>
 			<IntlFormatted :message-id="messages.addFriendsToShare">
 				<template #link="{ children }">
 					<button

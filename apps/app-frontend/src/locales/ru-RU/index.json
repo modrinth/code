@@ -144,7 +144,7 @@
 		"message": "Отклонить всё"
 	},
 	"app.ads-consent.title": {
-		"message": "Конфиденциальность и реклама на Owyx"
+		"message": "Конфиденциальность и реклама"
 	},
 	"app.appearance-settings.compact-mode.description": {
 		"message": "Отображать сборки в библиотеке компактным списком."
@@ -2640,7 +2640,7 @@
 		"message": "Discord Rich Presence"
 	},
 	"app.settings.privacy.telemetry.description": {
-		"message": "Owyx собирает анонимные данные об использовании для персонализации и улучшения сервиса. Отключите этот параметр, чтобы отказаться от сбора данных."
+		"message": "Owyx собирает анонимную аналитику, чтобы улучшать лаунчер. Отключите опцию, чтобы отказаться от сбора данных."
 	},
 	"app.settings.privacy.telemetry.title": {
 		"message": "Телеметрия"
@@ -2973,10 +2973,10 @@
 		"message": "Войдите, чтобы применять скины."
 	},
 	"app.skins.demo.description": {
-		"message": "Войдите в аккаунт Minecraft, чтобы сохранять и применять скины!"
+		"message": "Войдите через Microsoft, чтобы сохранять и применять скины. Ник Owyx скины менять не может."
 	},
 	"app.skins.demo.title": {
-		"message": "Редактирование с демо-аккаунта"
+		"message": "Нужен аккаунт Microsoft"
 	},
 	"app.skins.dropped-file-error.text": {
 		"message": "Не удалось прочитать перетащенный файл."
@@ -3363,7 +3363,7 @@
 		"message": "Это часть сборки"
 	},
 	"friends.action.add-friend": {
-		"message": "Добавить в друзья"
+		"message": "Добавить друга"
 	},
 	"friends.action.view-friend-requests": {
 		"message": "{count} {count, plural, one {запрос} few {запроса} other {запросов}} дружбы"
@@ -3375,28 +3375,28 @@
 		"message": "Добавление в друзья"
 	},
 	"friends.add-friend.username.description": {
-		"message": "Оно может быть не таким, как в Minecraft!"
+		"message": "Найдите по нику Owyx или введите его точно (3–16 символов)."
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "Введите имя с Owyx..."
+		"message": "Поиск ника Owyx…"
 	},
 	"friends.add-friend.username.title": {
-		"message": "Какое имя у друга на Owyx?"
+		"message": "Какой ник у друга на Owyx?"
 	},
 	"friends.add-friends-to-share": {
-		"message": "<link>Добавьте друзей</link> и следите за ними!"
+		"message": "<link>Добавьте друзей</link>, чтобы видеть, во что они играют!"
 	},
 	"friends.friend.actions.label": {
 		"message": "Действия с другом"
 	},
 	"friends.friend.cancel-request": {
-		"message": "Отменить запрос"
+		"message": "Отменить заявку"
 	},
 	"friends.friend.remove-friend": {
-		"message": "Удалить из друзей"
+		"message": "Удалить из друзей"
 	},
 	"friends.friend.request-sent": {
-		"message": "Отправлен запрос дружбы"
+		"message": "Заявка отправлена"
 	},
 	"friends.friend.view-profile": {
 		"message": "Посмотреть профиль"
@@ -3414,7 +3414,7 @@
 		"message": "В сети"
 	},
 	"friends.heading.pending": {
-		"message": "В ожидании"
+		"message": "Ожидание"
 	},
 	"friends.no-friends-match": {
 		"message": "Нет друзей по запросу «{query}»"
@@ -3426,7 +3426,7 @@
 		"message": "{title} — {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>Войдите в аккаунт Owyx</link>, чтобы добавлять друзей и следить за ними!"
+		"message": "<link>Войдите в аккаунт Owyx</link>, чтобы добавлять друзей."
 	},
 	"installation-settings.shared-instance.linked-title": {
 		"message": "Отвязка совместной сборки"
@@ -4368,28 +4368,28 @@
 		"message": "Добавить аккаунт Microsoft"
 	},
 	"minecraft-account.add-offline": {
-		"message": "Добавить офлайн-ник"
+		"message": "Добавить аккаунт Owyx"
 	},
 	"minecraft-account.microsoft": {
 		"message": "Microsoft"
 	},
 	"minecraft-account.offline": {
-		"message": "Офлайн (ник)"
+		"message": "Owyx"
 	},
 	"minecraft-account.sign-in-microsoft": {
 		"message": "Войти через Microsoft"
 	},
 	"minecraft-account.offline-nickname": {
-		"message": "Офлайн (ник)"
+		"message": "Ник Owyx"
 	},
 	"minecraft-account.offline-warning": {
-		"message": "Только для серверов в offline-mode / для друзей. Не работает на серверах с проверкой лицензии Microsoft."
+		"message": "Ник с owyx.site для серверов в offline-mode. На серверах с проверкой лицензии Microsoft нужен аккаунт Microsoft."
 	},
 	"minecraft-account.nickname-placeholder": {
 		"message": "Ник"
 	},
 	"minecraft-account.play-offline": {
-		"message": "Сохранить офлайн-аккаунт"
+		"message": "Сохранить аккаунт Owyx"
 	},
 	"app.nav.owyx-servers": {
 		"message": "Серверы Owyx"
@@ -4398,7 +4398,7 @@
 		"message": "Серверы Owyx"
 	},
 	"owyx.servers.subtitle": {
-		"message": "Кураторские приватные серверы с control-plane Owyx."
+		"message": "Кураторские приватные серверы с control plane Owyx."
 	},
 	"owyx.servers.empty": {
 		"message": "Сейчас нет доступных серверов. Проверьте настройки API или зайдите позже."
@@ -4438,5 +4438,122 @@
 	},
 	"app.nav.admin-panel": {
 		"message": "Админ-панель"
+	},
+	"friends.status.online": {
+		"message": "В сети"
+	},
+	"friends.status.offline": {
+		"message": "Не в сети"
+	},
+	"friends.status.playing": {
+		"message": "Играет в {name}"
+	},
+	"friends.status.unknown-instance": {
+		"message": "Minecraft"
+	},
+	"friends.requests.header": {
+		"message": "Заявки в друзья"
+	},
+	"friends.requests.empty": {
+		"message": "Нет входящих заявок."
+	},
+	"friends.requests.sent-a-request": {
+		"message": "отправил(а) заявку"
+	},
+	"friends.requests.accept": {
+		"message": "Принять"
+	},
+	"friends.requests.decline": {
+		"message": "Отклонить"
+	},
+	"friends.search.already": {
+		"message": "Уже в друзьях"
+	},
+	"owyx.admin.title": {
+		"message": "Админ-панель"
+	},
+	"owyx.admin.subtitle": {
+		"message": "Каталог, пользователи, новости и публикация паков из библиотеки."
+	},
+	"owyx.admin.tab-publish": {
+		"message": "Публикация"
+	},
+	"owyx.admin.tab-catalog": {
+		"message": "Каталог"
+	},
+	"owyx.admin.tab-users": {
+		"message": "Пользователи"
+	},
+	"owyx.admin.tab-news": {
+		"message": "Новости"
+	},
+	"owyx.admin.tab-api": {
+		"message": "API"
+	},
+	"owyx.admin.tab-more": {
+		"message": "Ещё"
+	},
+	"owyx.admin.open-site": {
+		"message": "Открыть админку сайта"
+	},
+	"owyx.admin.open-servers": {
+		"message": "Каталог серверов для игроков"
+	},
+	"owyx.admin.publish-export": {
+		"message": "Экспорт пака…"
+	},
+	"owyx.admin.publish-upload": {
+		"message": "Загрузка пака ({size} МБ)…"
+	},
+	"owyx.admin.publish-create": {
+		"message": "Создание сервера…"
+	},
+	"owyx.admin.servers": {
+		"message": "Серверы"
+	},
+	"owyx.admin.packs": {
+		"message": "Паки"
+	},
+	"owyx.admin.published": {
+		"message": "Опубликован"
+	},
+	"owyx.admin.draft": {
+		"message": "Черновик"
+	},
+	"owyx.admin.delete": {
+		"message": "Удалить"
+	},
+	"owyx.admin.search-users": {
+		"message": "Поиск ника или email…"
+	},
+	"owyx.admin.news-title": {
+		"message": "Заголовок"
+	},
+	"owyx.admin.news-summary": {
+		"message": "Кратко"
+	},
+	"owyx.admin.news-tag": {
+		"message": "Тег"
+	},
+	"owyx.admin.create-news": {
+		"message": "Создать новость"
+	},
+	"owyx.admin.create-pack-url": {
+		"message": "Добавить пак по URL"
+	},
+	"owyx.admin.pack-url": {
+		"message": "URL архива"
+	},
+	"owyx.admin.forbidden": {
+		"message": "Нужна роль admin."
+	},
+	"owyx.servers.open-admin-panel": {
+		"message": "Открыть админ-панель"
+	},
+	"owyx.servers.admin-tools": {
+		"message": "Админ-инструменты"
+	},
+	"owyx.servers.admin-tools-hint": {
+		"message": "Публикация паков и настройки API — в админ-панели."
 	}
 }

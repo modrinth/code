@@ -170,11 +170,14 @@ import {
 	users,
 } from '@/helpers/auth'
 import { getPlayerHeadUrl } from '@/helpers/rendering/player-head'
+import { resolveOwyxAvatarUrl } from '@/helpers/owyx-avatar'
 import type { Skin } from '@/helpers/skins'
 import { get_available_skins } from '@/helpers/skins'
+import { injectOwyxSiteSession } from '@/providers/owyx-site-session'
 
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
+const owyxSite = injectOwyxSiteSession()
 
 const emit = defineEmits<{
 	change: []
@@ -274,21 +277,14 @@ const selectedAccount = computed(() =>
 	accounts.value.find((account) => account.profile.id === defaultUser.value),
 )
 
-const avatarUrl = computed(() => {
-	if (equippedSkin.value?.texture_key) {
-		const cachedUrl = equippedHeadUrl.value
-		if (cachedUrl) {
-			return cachedUrl
-		}
-		return `https://mc-heads.net/avatar/${equippedSkin.value.texture_key}/128`
-	}
-	if (selectedAccount.value?.profile?.id) {
-		return `https://mc-heads.net/avatar/${selectedAccount.value.profile.id}/128`
-	}
-	return 'https://launcher-files.modrinth.com/assets/steve_head.png'
-})
-
 function getAccountAvatarUrl(account: MinecraftCredential) {
+	if (isOfflineAccount(account)) {
+		const site = owyxSite.session.value?.user
+		if (site?.nickname && site.nickname.toLowerCase() === account.profile.name.toLowerCase()) {
+			return resolveOwyxAvatarUrl(site.avatarUrl)
+		}
+		return resolveOwyxAvatarUrl(null)
+	}
 	if (
 		account.profile.id === selectedAccount.value?.profile?.id &&
 		equippedSkin.value?.texture_key
@@ -300,6 +296,23 @@ function getAccountAvatarUrl(account: MinecraftCredential) {
 	}
 	return `https://mc-heads.net/avatar/${account.profile.id}/128`
 }
+
+const avatarUrl = computed(() => {
+	if (selectedAccount.value && isOfflineAccount(selectedAccount.value)) {
+		return getAccountAvatarUrl(selectedAccount.value)
+	}
+	if (equippedSkin.value?.texture_key) {
+		const cachedUrl = equippedHeadUrl.value
+		if (cachedUrl) {
+			return cachedUrl
+		}
+		return `https://mc-heads.net/avatar/${equippedSkin.value.texture_key}/128`
+	}
+	if (selectedAccount.value?.profile?.id) {
+		return `https://mc-heads.net/avatar/${selectedAccount.value.profile.id}/128`
+	}
+	return resolveOwyxAvatarUrl(null)
+})
 
 async function setAccount(account: MinecraftCredential) {
 	defaultUser.value = account.profile.id
@@ -366,7 +379,7 @@ const messages = defineMessages({
 	},
 	addOffline: {
 		id: 'minecraft-account.add-offline',
-		defaultMessage: 'Add offline nickname',
+		defaultMessage: 'Add Owyx account',
 	},
 	removeAccount: {
 		id: 'minecraft-account.remove-account',
@@ -386,7 +399,7 @@ const messages = defineMessages({
 	},
 	offlineAccount: {
 		id: 'minecraft-account.offline',
-		defaultMessage: 'Offline (nickname)',
+		defaultMessage: 'Owyx',
 	},
 	signInMicrosoft: {
 		id: 'minecraft-account.sign-in-microsoft',
@@ -394,12 +407,12 @@ const messages = defineMessages({
 	},
 	offlineNickname: {
 		id: 'minecraft-account.offline-nickname',
-		defaultMessage: 'Offline (nickname)',
+		defaultMessage: 'Owyx nickname',
 	},
 	offlineWarning: {
 		id: 'minecraft-account.offline-warning',
 		defaultMessage:
-			'Only for offline-mode servers / friends. Does not work on Microsoft-authenticated public servers.',
+			'Uses your Owyx site nickname for offline-mode servers. Public Microsoft-authenticated servers still need a Microsoft account.',
 	},
 	nicknamePlaceholder: {
 		id: 'minecraft-account.nickname-placeholder',
@@ -407,7 +420,7 @@ const messages = defineMessages({
 	},
 	playOffline: {
 		id: 'minecraft-account.play-offline',
-		defaultMessage: 'Save offline account',
+		defaultMessage: 'Save Owyx account',
 	},
 	signInToMinecraft: {
 		id: 'minecraft-account.sign-in',

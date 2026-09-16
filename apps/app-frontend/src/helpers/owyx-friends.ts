@@ -12,6 +12,8 @@ import {
 } from '@/helpers/owyx-api'
 import { getStoredOwyxSiteSession } from '@/helpers/owyx-site-auth'
 
+export type OwyxFriendPresence = 'offline' | 'online' | 'playing'
+
 export type OwyxFriend = {
 	id: string
 	userId: string
@@ -21,6 +23,9 @@ export type OwyxFriend = {
 	incoming: boolean
 	createdAt?: string
 	updatedAt?: string
+	presence?: OwyxFriendPresence
+	instanceName?: string | null
+	presenceUpdatedAt?: string | null
 }
 
 async function owyxFetch(input: string, init?: RequestInit): Promise<Response> {
@@ -56,6 +61,25 @@ export async function listOwyxFriends(): Promise<OwyxFriend[]> {
 	const data = (await res.json().catch(() => ({}))) as { friends?: OwyxFriend[]; error?: string }
 	if (!res.ok) throw new Error(data.error || `Friends list failed (${res.status})`)
 	return Array.isArray(data.friends) ? data.friends : []
+}
+
+export async function postOwyxPresence(opts: {
+	status: OwyxFriendPresence
+	instanceName?: string | null
+}): Promise<void> {
+	const res = await owyxFetch(`${apiBase()}/api/friends/presence`, {
+		method: 'POST',
+		headers: authHeaders(),
+		body: JSON.stringify({
+			status: opts.status,
+			instanceName: opts.instanceName || null,
+		}),
+		signal: AbortSignal.timeout(8000),
+	})
+	if (!res.ok) {
+		const data = (await res.json().catch(() => ({}))) as { error?: string }
+		throw new Error(data.error || `Presence failed (${res.status})`)
+	}
 }
 
 export async function searchOwyxUsers(q: string): Promise<{ id: string; nickname: string; avatarUrl?: string | null }[]> {

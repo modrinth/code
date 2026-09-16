@@ -284,10 +284,10 @@ impl Credentials {
                 && (self.access_token.is_empty() || self.access_token == "0")
     }
 
-    /// Creates or replaces an offline nickname account.
+    /// Creates or replaces an Owyx nickname account (offline-mode Minecraft profile).
     ///
-    /// If a Microsoft (licensed) account already exists, that account stays the
-    /// active/default profile — offline nick is stored for offline-mode servers.
+    /// Used for Owyx.site nicknames on offline-mode servers. Selecting this account
+    /// does not remove a Microsoft account — both can coexist and the user picks one.
     pub async fn create_offline(
         username: &str,
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
@@ -310,12 +310,6 @@ impl Credentials {
             .into());
         }
 
-        let licensed_exists = Self::get_all(exec)
-            .await?
-            .iter()
-            .any(|entry| !entry.value().is_offline());
-
-        let id = offline_player_uuid(username);
         let credentials = Self {
             offline_profile: MinecraftProfile {
                 id,
@@ -325,8 +319,8 @@ impl Credentials {
             access_token: "0".to_string(),
             refresh_token: OFFLINE_REFRESH_TOKEN.to_string(),
             expires: Utc::now() + Duration::days(3650),
-            // Prefer Microsoft when both exist
-            active: !licensed_exists,
+            // Selecting / creating an Owyx nickname makes it the active play account.
+            active: true,
         };
         credentials.upsert(exec).await?;
         Ok(credentials)
@@ -586,31 +580,10 @@ impl Credentials {
         }
     }
 
-    /// Prefer a Microsoft (licensed) account over an offline nickname when both exist.
+    /// No-op kept for call-site compatibility; users choose Microsoft vs Owyx nick freely.
     async fn prefer_licensed_as_active(
-        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+        _exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
     ) -> crate::Result<()> {
-        let all = Self::get_all(exec).await?;
-        let Some(licensed) = all.iter().find(|entry| !entry.value().is_offline()) else {
-            return Ok(());
-        };
-        let active_is_offline = all
-            .iter()
-            .find(|entry| entry.value().active)
-            .map(|entry| entry.value().is_offline())
-            .unwrap_or(true);
-        if !active_is_offline {
-            return Ok(());
-        }
-
-        let prefer = Self {
-            offline_profile: licensed.value().offline_profile.clone(),
-            access_token: licensed.value().access_token.clone(),
-            refresh_token: licensed.value().refresh_token.clone(),
-            expires: licensed.value().expires,
-            active: true,
-        };
-        prefer.upsert(exec).await?;
         Ok(())
     }
 
@@ -619,9 +592,6 @@ impl Credentials {
     pub async fn get_active(
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
     ) -> crate::Result<Option<Self>> {
-        // Owyx: Microsoft login wins over offline / site nickname
-        let _ = Self::prefer_licensed_as_active(exec).await;
-
         let res = sqlx::query!(
             "
             SELECT
