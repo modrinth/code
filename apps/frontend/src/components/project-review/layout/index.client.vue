@@ -2,6 +2,7 @@
 	<section
 		class="project-review relative flex overflow-hidden bg-surface-2"
 		:aria-label="formatMessage(messages.title)"
+		@pointerdown.capture="onPointerDown"
 		@dblclick="onDividerDoubleClick"
 	>
 		<div class="min-h-0 min-w-0 flex-1 overflow-x-auto">
@@ -30,7 +31,13 @@ import { useProjectReviewLayout } from './use-layout'
 const slots = defineSlots<ProjectReviewSlots>()
 const { formatMessage } = useVIntl()
 const layout = useProjectReviewLayout((tab) => formatMessage(messages[tab]))
-const { leftVisible, rightVisible, onDividerDoubleClick } = layout
+const { leftVisible, rightVisible, onDividerDoubleClick, finishSidebarTransition } = layout
+
+function onPointerDown(event: PointerEvent) {
+	if (event.target instanceof Element && event.target.closest('.dv-sash')) {
+		finishSidebarTransition()
+	}
+}
 
 provideProjectReviewContext({ ...layout, slots })
 </script>
@@ -46,6 +53,20 @@ provideProjectReviewContext({ ...layout, slots })
 	--dv-separator-border: var(--surface-4);
 	--dv-sash-color: transparent;
 	--dv-active-sash-color: transparent;
+}
+
+.project-review :deep(.project-review-transition-column) {
+	left: 0 !important;
+	width: var(--review-column-width) !important;
+	transform: translateX(var(--review-column-left));
+	will-change: transform;
+	overflow: hidden;
+	z-index: 1;
+}
+
+.project-review :deep(.project-review-transition-column:nth-child(2)) {
+	z-index: 2;
+	background: var(--surface-2);
 }
 
 .project-review :deep(.dv-sash:not(.dv-disabled)::after) {

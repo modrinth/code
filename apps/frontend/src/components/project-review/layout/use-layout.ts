@@ -12,11 +12,13 @@ import { onBeforeUnmount, ref, watchEffect } from 'vue'
 
 import { readWorkspaceLayout, saveWorkspaceLayout, workspacePanelSizes } from './layout-storage'
 import { type ProjectReviewTab, projectReviewTabs } from './types'
+import { useSidebarTransition } from './use-sidebar-transition'
 
 export function useProjectReviewLayout(getTitle: (tab: ProjectReviewTab) => string) {
 	const savedLayout = readWorkspaceLayout()
 	const leftVisible = ref(savedLayout?.leftVisible ?? true)
 	const rightVisible = ref(savedLayout?.rightVisible ?? true)
+	const { centerElement, transitionSidebar, finishSidebarTransition } = useSidebarTransition()
 	let leftWidth = savedLayout?.leftWidth ?? workspacePanelSizes.left.default
 	let rightWidth = savedLayout?.rightWidth ?? workspacePanelSizes.right.default
 	let bottomHeight = savedLayout?.bottomHeight ?? workspacePanelSizes.bottom.default
@@ -167,13 +169,13 @@ export function useProjectReviewLayout(getTitle: (tab: ProjectReviewTab) => stri
 	function toggleSidebar(side: 'left' | 'right') {
 		const visible = side === 'left' ? leftVisible : rightVisible
 		const panel = columns?.getPanel(side)
-		if (!panel) return
+		if (!panel || !columns) return
 		if (visible.value) {
 			if (side === 'left') leftWidth = panel.api.width
 			else rightWidth = panel.api.width
 		}
 		visible.value = !visible.value
-		panel.api.setVisible(visible.value)
+		void transitionSidebar(columns, side, visible.value)
 		scheduleSave()
 	}
 
@@ -209,7 +211,10 @@ export function useProjectReviewLayout(getTitle: (tab: ProjectReviewTab) => stri
 			rows.getPanel('bottom')?.api.setSize({
 				size: Math.max(
 					workspacePanelSizes.bottom.minimum,
-					Math.min(workspacePanelSizes.bottom.default, rows.height - workspacePanelSizes.tabs.minimum),
+					Math.min(
+						workspacePanelSizes.bottom.default,
+						rows.height - workspacePanelSizes.tabs.minimum,
+					),
 				),
 			})
 		} else if (tabs && split.closest('.project-review-tabs')) {
@@ -254,6 +259,8 @@ export function useProjectReviewLayout(getTitle: (tab: ProjectReviewTab) => stri
 	})
 
 	return {
+		centerElement,
+		finishSidebarTransition,
 		leftVisible,
 		rightVisible,
 		topLeftGroupId,
