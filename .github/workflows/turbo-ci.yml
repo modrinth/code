@@ -62,7 +62,9 @@ jobs:
 
   build:
     name: Lint and Test
-    runs-on: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'namespace-profile-modrinth-turbo' || 'ubuntu-latest' }}
+    # Namespace runners exist only on modrinth/code. Same-repo PRs on forks set
+    # internal=true but have no Namespace capacity — use ubuntu-latest there.
+    runs-on: ${{ needs.skip-if-clean.outputs.internal == 'true' && github.repository == 'modrinth/code' && 'namespace-profile-modrinth-turbo' || 'ubuntu-latest' }}
     needs: [skip-if-clean]
     if: ${{ needs.skip-if-clean.outputs.skip != 'true' }}
 
@@ -98,7 +100,7 @@ jobs:
         run: corepack enable
 
       - name: Set up caches
-        if: needs.skip-if-clean.outputs.internal == 'true'
+        if: needs.skip-if-clean.outputs.internal == 'true' && github.repository == 'modrinth/code'
         uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
         with:
           cache: |
@@ -107,7 +109,7 @@ jobs:
             apt
 
       - name: Set up Turborepo caching
-        if: needs.skip-if-clean.outputs.internal == 'true'
+        if: needs.skip-if-clean.outputs.internal == 'true' && github.repository == 'modrinth/code'
         uses: namespace-actions/setup-turbocache@f96bd6befa13ae74b2858a5be49573640d4636f5 # v0.0.2
 
       - name: Install apt dependencies

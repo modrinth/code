@@ -4692,7 +4692,7 @@
 		"message": "In-world skins"
 	},
 	"owyx.settings.social.skins-body": {
-		"message": "Upload a skin on owyx.site. Install CustomSkinLoader in your instance (Owyx writes the config when you enable skins from instance options or on launch). Others with the same mod see your Owyx skin."
+		"message": "Upload a skin on owyx.site. Install CustomSkinLoader in your instance — Owyx writes config for https://owyx.site/api/csl/ on launch (and from instance options). Others with the same mod see your Owyx skin."
 	},
 	"owyx.settings.social.skins-mod-link": {
 		"message": "Open CustomSkinLoader on Modrinth"
@@ -4772,7 +4772,16 @@
 	"minecraft-account.owyx-session-badge": {
 		"message": "Owyx site session"
 	},
+	"minecraft-account.owyx-nick-too-long": {
+		"message": "Owyx nickname must be 3–16 letters, numbers, or underscores to sync with offline play and skins. Change it on owyx.site, then try again."
+	},
 	"friends.copy-server-address": {
 		"message": "Copy matching server address"
+	},
+	"friends.copied-instance-name": {
+		"message": "Instance name copied"
+	},
+	"friends.copied-server-address": {
+		"message": "Server address copied"
 	}
 }

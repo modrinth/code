@@ -390,6 +390,10 @@ async function signInOwyxSite() {
 		await owyxSite.signIn()
 		const nick = owyxSite.session.value?.user?.nickname
 		if (!nick) return
+		if (nick.length < 3 || nick.length > 16 || !/^[A-Za-z0-9_]+$/.test(nick)) {
+			handleError(new Error(formatMessage(messages.owyxNickTooLong)))
+			return
+		}
 		const makeActive = accounts.value.length === 0
 		const loggedIn = await login_offline_flow(nick, makeActive).catch(handleSevereError)
 		if (loggedIn && makeActive) {
@@ -440,6 +444,11 @@ const messages = defineMessages({
 	owyxSessionBadge: {
 		id: 'minecraft-account.owyx-session-badge',
 		defaultMessage: 'Owyx site session',
+	},
+	owyxNickTooLong: {
+		id: 'minecraft-account.owyx-nick-too-long',
+		defaultMessage:
+			'Owyx nickname must be 3–16 letters, numbers, or underscores to sync with offline play and skins. Change it on owyx.site, then try again.',
 	},
 	microsoftStubHint: {
 		id: 'minecraft-account.microsoft-stub-hint',

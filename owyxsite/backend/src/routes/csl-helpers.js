@@ -39,7 +39,10 @@ function absoluteWebsiteAsset(value) {
       const u = new URL(value);
       const host = u.hostname.toLowerCase();
       if (!allow.has(host)) return null;
-      if (!u.pathname.startsWith('/uploads/')) return null;
+      if (u.pathname.includes('..')) return null;
+      if (!u.pathname.startsWith('/uploads/skins/') && !u.pathname.startsWith('/uploads/capes/')) {
+        return null;
+      }
       // Prefer website origin for browser/CSL clients (no API client key).
       if (host === 'api.owyx.site' || host.startsWith('api.')) {
         return `${site}${u.pathname}${u.search}`;
@@ -51,7 +54,10 @@ function absoluteWebsiteAsset(value) {
   }
 
   const pathname = value.startsWith('/') ? value : `/${value}`;
-  if (!pathname.startsWith('/uploads/')) return null;
+  if (pathname.includes('..')) return null;
+  if (!pathname.startsWith('/uploads/skins/') && !pathname.startsWith('/uploads/capes/')) {
+    return null;
+  }
   return `${site}${pathname}`;
 }
 

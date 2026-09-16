@@ -48,7 +48,7 @@ import {
 import { injectOwyxSiteSession } from '@/providers/owyx-site-session'
 
 const { formatMessage } = useVIntl()
-const { handleError } = injectNotificationManager()
+const { handleError, addNotification } = injectNotificationManager()
 const owyx = injectOwyxSiteSession()
 
 const props = defineProps<{
@@ -268,6 +268,10 @@ async function copyPlayingInstance(friend: OwyxFriend) {
 	try {
 		await navigator.clipboard.writeText(name)
 		playOwyxUiSound('click')
+		addNotification({
+			type: 'success',
+			title: formatMessage(messages.copiedInstanceName),
+		})
 	} catch (e) {
 		handleError(e)
 	}
@@ -279,6 +283,10 @@ async function copyFriendServerAddress(friend: OwyxFriend) {
 	try {
 		await navigator.clipboard.writeText(server.address)
 		playOwyxUiSound('success')
+		addNotification({
+			type: 'success',
+			title: formatMessage(messages.copiedServerAddress),
+		})
 	} catch (e) {
 		handleError(e)
 	}
@@ -395,6 +403,14 @@ const messages = defineMessages({
 	copyServerAddress: {
 		id: 'friends.copy-server-address',
 		defaultMessage: 'Copy matching server address',
+	},
+	copiedInstanceName: {
+		id: 'friends.copied-instance-name',
+		defaultMessage: 'Instance name copied',
+	},
+	copiedServerAddress: {
+		id: 'friends.copied-server-address',
+		defaultMessage: 'Server address copied',
 	},
 })
 </script>

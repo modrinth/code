@@ -57,7 +57,7 @@ export default function RegisterPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    if (!/^[a-zA-Z0-9_]{3,32}$/.test(login)) {
+    if (!/^[a-zA-Z0-9_]{3,16}$/.test(login)) {
       setError(a.loginInvalid);
       return;
     }
@@ -140,7 +140,7 @@ export default function RegisterPage() {
             className="input"
             required
             minLength={3}
-            maxLength={32}
+            maxLength={16}
             autoComplete="username"
             placeholder="steve"
             value={login}

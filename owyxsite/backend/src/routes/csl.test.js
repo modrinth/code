@@ -46,6 +46,11 @@ describe('absoluteWebsiteAsset', () => {
 		assert.equal(absoluteWebsiteAsset('/evil/x.png'), null)
 	})
 
+	it('rejects relative path traversal and non-skin upload dirs', () => {
+		assert.equal(absoluteWebsiteAsset('/uploads/skins/../../evil.png'), null)
+		assert.equal(absoluteWebsiteAsset('/uploads/avatars/a.png'), null)
+	})
+
 	it('rejects third-party absolute URLs (open redirect)', () => {
 		assert.equal(absoluteWebsiteAsset('https://evil.example/x.png'), null)
 		assert.equal(absoluteWebsiteAsset('http://evil.example/uploads/skins/x.png'), null)

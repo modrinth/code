@@ -200,6 +200,10 @@ export async function patchOwyxSocialSettings(
 	if (!res.ok || !data.settings) {
 		throw new Error(friendlyFriendsError(data.error, res.status, 'Save settings failed'))
 	}
+	return {
+		allowFriendRequests: data.settings.allowFriendRequests !== false,
+	}
+}
 
 export async function publishLibraryPackToCatalog(opts: {
 	name: string
