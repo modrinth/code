@@ -13,7 +13,7 @@ import type { IDockviewPanelHeaderProps } from 'dockview-vue'
 import { ref, watchEffect } from 'vue'
 
 import { projectReviewMessages } from '../../messages'
-import type { ProjectReviewTab } from '../../types'
+import type { ProjectReviewTab } from '../types'
 
 const props = defineProps<{ params: IDockviewPanelHeaderProps<{ tab: ProjectReviewTab }> }>()
 const { formatMessage } = useVIntl()

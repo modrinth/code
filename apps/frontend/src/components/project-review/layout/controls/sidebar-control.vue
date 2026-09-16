@@ -19,8 +19,8 @@ import { IconButton, useVIntl } from '@modrinth/ui'
 import type { IDockviewHeaderActionsProps } from 'dockview-vue'
 import { computed } from 'vue'
 
-import { injectProjectReviewContext } from '../../context'
 import { projectReviewMessages as messages } from '../../messages'
+import { injectProjectReviewContext } from '../context'
 
 defineOptions({ inheritAttrs: false })
 const props = defineProps<{ side: 'left' | 'right'; params: IDockviewHeaderActionsProps }>()
