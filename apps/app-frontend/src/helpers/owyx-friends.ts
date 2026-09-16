@@ -103,7 +103,9 @@ export async function postOwyxPresence(opts: {
 	}
 }
 
-export async function searchOwyxUsers(q: string): Promise<{ id: string; nickname: string; avatarUrl?: string | null }[]> {
+export async function searchOwyxUsers(
+	q: string,
+): Promise<{ id: string; nickname: string; avatarUrl?: string | null }[]> {
 	const res = await owyxFetch(`${apiBase()}/api/friends/search?q=${encodeURIComponent(q)}`, {
 		method: 'GET',
 		headers: authHeaders(),
@@ -125,7 +127,8 @@ export async function requestOwyxFriend(nickname: string): Promise<OwyxFriend> {
 		signal: AbortSignal.timeout(12000),
 	})
 	const data = (await res.json().catch(() => ({}))) as { friend?: OwyxFriend; error?: string }
-	if (!res.ok || !data.friend) throw new Error(friendlyFriendsError(data.error, res.status, 'Request failed'))
+	if (!res.ok || !data.friend)
+		throw new Error(friendlyFriendsError(data.error, res.status, 'Request failed'))
 	return data.friend
 }
 
@@ -136,7 +139,8 @@ export async function acceptOwyxFriend(id: string): Promise<OwyxFriend> {
 		signal: AbortSignal.timeout(10000),
 	})
 	const data = (await res.json().catch(() => ({}))) as { friend?: OwyxFriend; error?: string }
-	if (!res.ok || !data.friend) throw new Error(friendlyFriendsError(data.error, res.status, 'Accept failed'))
+	if (!res.ok || !data.friend)
+		throw new Error(friendlyFriendsError(data.error, res.status, 'Accept failed'))
 	return data.friend
 }
 
@@ -252,12 +256,15 @@ export async function publishLibraryPackToCatalog(opts: {
 	if (key) ingestHeaders['X-Owyx-Client-Key'] = key
 	const token = getStoredOwyxSiteSession()?.token
 	if (token) ingestHeaders.Authorization = `Bearer ${token}`
-	const ingestRes = await owyxFetch(`${base}/api/admin/packs/${encodeURIComponent(packId)}/ingest`, {
-		method: 'POST',
-		headers: ingestHeaders,
-		body: fd,
-		signal: AbortSignal.timeout(Math.max(180000, Math.ceil(sizeMb) * 4000)),
-	})
+	const ingestRes = await owyxFetch(
+		`${base}/api/admin/packs/${encodeURIComponent(packId)}/ingest`,
+		{
+			method: 'POST',
+			headers: ingestHeaders,
+			body: fd,
+			signal: AbortSignal.timeout(Math.max(180000, Math.ceil(sizeMb) * 4000)),
+		},
+	)
 	if (!ingestRes.ok) {
 		const data = (await ingestRes.json().catch(() => ({}))) as { error?: string }
 		if (ingestRes.status === 413) {
@@ -269,12 +276,15 @@ export async function publishLibraryPackToCatalog(opts: {
 		throw new Error(data.error || `Ingest failed (${ingestRes.status})`)
 	}
 	if (opts.serverId) {
-		const bindRes = await owyxFetch(`${base}/api/admin/servers/${encodeURIComponent(opts.serverId)}`, {
-			method: 'PUT',
-			headers,
-			body: JSON.stringify({ packId }),
-			signal: AbortSignal.timeout(15000),
-		})
+		const bindRes = await owyxFetch(
+			`${base}/api/admin/servers/${encodeURIComponent(opts.serverId)}`,
+			{
+				method: 'PUT',
+				headers,
+				body: JSON.stringify({ packId }),
+				signal: AbortSignal.timeout(15000),
+			},
+		)
 		if (!bindRes.ok) {
 			const data = (await bindRes.json().catch(() => ({}))) as { error?: string }
 			throw new Error(data.error || `Bind server failed (${bindRes.status})`)

@@ -191,9 +191,7 @@ export async function adminCreatePack(body: {
 }
 
 export async function adminListUsers(search = ''): Promise<AdminUser[]> {
-	const q = search.trim()
-		? `?search=${encodeURIComponent(search.trim())}&limit=100`
-		: '?limit=100'
+	const q = search.trim() ? `?search=${encodeURIComponent(search.trim())}&limit=100` : '?limit=100'
 	const res = await owyxFetch(`${apiBase()}/api/admin/users${q}`, {
 		method: 'GET',
 		headers: owyxAdminAuthHeaders(),
@@ -218,15 +216,12 @@ export async function adminSetUserRole(id: number, role: string): Promise<void> 
 }
 
 export async function adminBanUser(id: number, ban: boolean): Promise<void> {
-	const res = await owyxFetch(
-		`${apiBase()}/api/admin/users/${id}/${ban ? 'ban' : 'unban'}`,
-		{
-			method: 'POST',
-			headers: owyxAdminAuthHeaders(),
-			body: ban ? JSON.stringify({ reason: 'Banned from launcher admin' }) : undefined,
-			signal: AbortSignal.timeout(15000),
-		},
-	)
+	const res = await owyxFetch(`${apiBase()}/api/admin/users/${id}/${ban ? 'ban' : 'unban'}`, {
+		method: 'POST',
+		headers: owyxAdminAuthHeaders(),
+		body: ban ? JSON.stringify({ reason: 'Banned from launcher admin' }) : undefined,
+		signal: AbortSignal.timeout(15000),
+	})
 	if (!res.ok) {
 		const data = await readJson(res)
 		throw new Error(data.error || `Ban update failed (${res.status})`)

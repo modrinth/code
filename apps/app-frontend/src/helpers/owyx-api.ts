@@ -143,10 +143,17 @@ function sanitizeMediaUrl(url: string | undefined, apiBase?: string): string | u
 }
 
 /** Resolve relative pack/media URLs to absolute https for window.open / downloads. */
-export function resolveOwyxPackUrl(url: string | null | undefined, apiBase?: string): string | null {
+export function resolveOwyxPackUrl(
+	url: string | null | undefined,
+	apiBase?: string,
+): string | null {
 	const resolved = sanitizeMediaUrl(url ?? undefined, apiBase)
 	if (!resolved) return null
-	if (resolved.startsWith('https://') || resolved.startsWith('http://127.0.0.1') || resolved.startsWith('http://localhost')) {
+	if (
+		resolved.startsWith('https://') ||
+		resolved.startsWith('http://127.0.0.1') ||
+		resolved.startsWith('http://localhost')
+	) {
 		return resolved
 	}
 	return null
@@ -163,7 +170,8 @@ function formatAddress(raw: Record<string, unknown>): string {
 }
 
 function packDownloadUrl(raw: Record<string, unknown>): string | undefined {
-	const nested = raw.pack && typeof raw.pack === 'object' ? (raw.pack as Record<string, unknown>) : null
+	const nested =
+		raw.pack && typeof raw.pack === 'object' ? (raw.pack as Record<string, unknown>) : null
 	const candidates = [
 		raw.packUrl,
 		raw.pack_url,
@@ -188,7 +196,8 @@ function normalizeEntry(
 	const name = String(raw.name ?? raw.title ?? '').trim()
 	const address = formatAddress(raw)
 	if (!name || !address) return null
-	const nested = raw.pack && typeof raw.pack === 'object' ? (raw.pack as Record<string, unknown>) : null
+	const nested =
+		raw.pack && typeof raw.pack === 'object' ? (raw.pack as Record<string, unknown>) : null
 	const packRaw = packDownloadUrl(raw)
 	const iconRaw = raw.iconUrl
 		? String(raw.iconUrl)
@@ -199,9 +208,7 @@ function normalizeEntry(
 				: nested?.iconUrl
 					? String(nested.iconUrl)
 					: undefined
-	const description = String(
-		raw.description ?? raw.desc ?? nested?.description ?? '',
-	)
+	const description = String(raw.description ?? raw.desc ?? nested?.description ?? '')
 	return {
 		id: String(raw.id ?? raw.slug ?? `server-${index}`),
 		name,
@@ -217,11 +224,7 @@ function normalizeEntry(
 						: nested?.minecraft
 							? String(nested.minecraft)
 							: undefined,
-		loader: raw.loader
-			? String(raw.loader)
-			: nested?.loader
-				? String(nested.loader)
-				: undefined,
+		loader: raw.loader ? String(raw.loader) : nested?.loader ? String(nested.loader) : undefined,
 		address,
 		iconUrl: sanitizeMediaUrl(iconRaw, apiBase),
 		packUrl: sanitizeMediaUrl(packRaw, apiBase),

@@ -32,21 +32,21 @@ import {
 	update_repair_modrinth,
 } from '@/helpers/instance'
 import { get_loader_versions } from '@/helpers/metadata'
-import { get_game_versions, get_loaders } from '@/helpers/tags'
-import { injectAppEvents } from '@/providers/app-events'
-import { provideInstanceBackup } from '@/providers/instance-backup'
-
-import type { Manifest } from '../../../../helpers/types'
-import { instanceKeys } from '../../query-options.ts'
-import { injectInstanceSettings } from './instance-settings-context.ts'
-import SharedInstanceInstallationSettingsControls from './shared-instance-installation-settings-controls.vue'
 import {
 	CUSTOM_SKIN_LOADER_MODRINTH,
 	mirrorLocalOwyxSkinToInstance,
 	writeOwyxCslConfigForInstance,
 } from '@/helpers/owyx-csl'
-import { injectOwyxSiteSession } from '@/providers/owyx-site-session'
 import { playOwyxUiSound } from '@/helpers/owyx-ui-sound'
+import { get_game_versions, get_loaders } from '@/helpers/tags'
+import { injectAppEvents } from '@/providers/app-events'
+import { provideInstanceBackup } from '@/providers/instance-backup'
+import { injectOwyxSiteSession } from '@/providers/owyx-site-session'
+
+import type { Manifest } from '../../../../helpers/types'
+import { instanceKeys } from '../../query-options.ts'
+import { injectInstanceSettings } from './instance-settings-context.ts'
+import SharedInstanceInstallationSettingsControls from './shared-instance-installation-settings-controls.vue'
 
 const { handleError } = injectNotificationManager()
 const appEvents = injectAppEvents()
@@ -530,7 +530,8 @@ const cslMessages = defineMessages({
 	},
 	skinsDone: {
 		id: 'owyx.instance.csl.done',
-		defaultMessage: 'Config written. Add CustomSkinLoader from Modrinth if it is not installed yet.',
+		defaultMessage:
+			'Config written. Add CustomSkinLoader from Modrinth if it is not installed yet.',
 	},
 	skinsMod: {
 		id: 'owyx.instance.csl.mod-link',
@@ -545,7 +546,9 @@ const cslMessages = defineMessages({
 			<div
 				class="mb-4 flex flex-col gap-2 rounded-xl border border-solid border-surface-5 bg-surface-2 p-3"
 			>
-				<p class="m-0 text-sm font-medium text-contrast">{{ formatMessage(cslMessages.skinsTitle) }}</p>
+				<p class="m-0 text-sm font-medium text-contrast">
+					{{ formatMessage(cslMessages.skinsTitle) }}
+				</p>
 				<p class="m-0 text-xs text-secondary leading-relaxed">
 					{{ formatMessage(cslMessages.skinsBody) }}
 				</p>
@@ -567,7 +570,9 @@ const cslMessages = defineMessages({
 						{{ formatMessage(cslMessages.skinsMod) }}
 					</a>
 				</div>
-				<p v-if="cslDone" class="m-0 text-xs text-secondary">{{ formatMessage(cslMessages.skinsDone) }}</p>
+				<p v-if="cslDone" class="m-0 text-xs text-secondary">
+					{{ formatMessage(cslMessages.skinsDone) }}
+				</p>
 			</div>
 			<SharedInstanceInstallationSettingsControls
 				:can-unlink="canUnlinkSharedInstance"

@@ -48,12 +48,7 @@
 					{{ errorMessage }}
 				</p>
 				<div class="grid grid-cols-1 gap-2 px-3 sm:grid-cols-2">
-					<Button
-						class="w-full"
-						native-type="button"
-						:disabled="submitting"
-						@click="openRegister"
-					>
+					<Button class="w-full" native-type="button" :disabled="submitting" @click="openRegister">
 						<UserPlusIcon aria-hidden="true" />
 						{{ formatMessage(messages.createAccountButton) }}
 					</Button>

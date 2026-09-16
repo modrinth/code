@@ -4,14 +4,11 @@
 		class="flex flex-col gap-3 bg-button-bg border border-solid border-surface-5 rounded-xl p-3 mt-2"
 	>
 		<span class="font-medium text-contrast">{{ formatMessage(messages.notSignedIn) }}</span>
-		<p class="m-0 text-xs text-secondary leading-relaxed">{{ formatMessage(messages.pathsHint) }}</p>
+		<p class="m-0 text-xs text-secondary leading-relaxed">
+			{{ formatMessage(messages.pathsHint) }}
+		</p>
 		<div class="flex flex-col gap-2">
-			<Button
-				type="colored"
-				color="brand"
-				:disabled="loginDisabled"
-				@click="signInOwyxSite()"
-			>
+			<Button type="colored" color="brand" :disabled="loginDisabled" @click="signInOwyxSite()">
 				{{ formatMessage(messages.signInOwyxSite) }}
 			</Button>
 			<Button
@@ -42,7 +39,12 @@
 				:placeholder="formatMessage(messages.nicknamePlaceholder)"
 				@keydown.enter="loginOffline()"
 			/>
-			<Button type="colored" color="brand" :disabled="loginDisabled || !offlineNickname.trim()" @click="loginOffline()">
+			<Button
+				type="colored"
+				color="brand"
+				:disabled="loginDisabled || !offlineNickname.trim()"
+				@click="loginOffline()"
+			>
 				{{ formatMessage(messages.playOffline) }}
 			</Button>
 		</div>
@@ -141,7 +143,9 @@
 					<PlusIcon />
 					{{ formatMessage(messages.addMicrosoft) }}
 				</Button>
-				<p class="m-0 px-1 text-[11px] text-secondary">{{ formatMessage(messages.microsoftStubHint) }}</p>
+				<p class="m-0 px-1 text-[11px] text-secondary">
+					{{ formatMessage(messages.microsoftStubHint) }}
+				</p>
 				<div v-if="showOfflineForm" class="flex flex-col gap-2 pb-1">
 					<p class="m-0 text-xs text-secondary">{{ formatMessage(messages.offlineWarning) }}</p>
 					<input
@@ -198,8 +202,8 @@ import {
 	set_default_user,
 	users,
 } from '@/helpers/auth'
-import { getPlayerHeadUrl } from '@/helpers/rendering/player-head'
 import { resolveOwyxAvatarUrl } from '@/helpers/owyx-avatar'
+import { getPlayerHeadUrl } from '@/helpers/rendering/player-head'
 import type { Skin } from '@/helpers/skins'
 import { get_available_skins } from '@/helpers/skins'
 import { injectOwyxSiteSession } from '@/providers/owyx-site-session'

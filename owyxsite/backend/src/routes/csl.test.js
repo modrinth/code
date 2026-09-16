@@ -51,6 +51,17 @@ describe('absoluteWebsiteAsset', () => {
 		assert.equal(absoluteWebsiteAsset('/uploads/avatars/a.png'), null)
 	})
 
+	it('rejects percent-encoded path traversal', () => {
+		assert.equal(
+			absoluteWebsiteAsset('/uploads/skins/%2e%2e/%2e%2e/etc/passwd'),
+			null,
+		)
+		assert.equal(
+			absoluteWebsiteAsset('/uploads/skins/%2E%2E/secret.png'),
+			null,
+		)
+	})
+
 	it('rejects third-party absolute URLs (open redirect)', () => {
 		assert.equal(absoluteWebsiteAsset('https://evil.example/x.png'), null)
 		assert.equal(absoluteWebsiteAsset('http://evil.example/uploads/skins/x.png'), null)
@@ -79,6 +90,7 @@ describe('resolveLocalUpload', () => {
 	it('rejects path traversal', () => {
 		assert.equal(resolveLocalUpload('/uploads/skins/../../etc/passwd'), null)
 		assert.equal(resolveLocalUpload('/uploads/skins/../secrets.png'), null)
+		assert.equal(resolveLocalUpload('/uploads/skins/%2e%2e/%2e%2e/etc/passwd'), null)
 	})
 
 	it('rejects non-skin upload dirs', () => {

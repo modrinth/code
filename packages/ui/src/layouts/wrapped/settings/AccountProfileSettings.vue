@@ -346,7 +346,8 @@ const messages = defineMessages({
 	},
 	signInRequiredDescription: {
 		id: 'settings.profile.sign-in-required.description',
-		defaultMessage: 'Sign in with your Owyx site account from the profile button in the launcher sidebar.',
+		defaultMessage:
+			'Sign in with your Owyx site account from the profile button in the launcher sidebar.',
 	},
 	saveError: {
 		id: 'settings.profile.save-error',

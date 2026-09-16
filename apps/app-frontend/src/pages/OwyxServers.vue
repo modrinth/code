@@ -4,6 +4,7 @@ import { Button, defineMessages, injectNotificationManager, useVIntl } from '@mo
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { install_create_instance, installJobInstanceId } from '@/helpers/install'
 import {
 	fetchOwyxCatalog,
 	getOwyxClientKey,
@@ -11,11 +12,10 @@ import {
 	getOwyxLocalApiFallback,
 	getStoredOwyxApiBase,
 	isSafeExternalHttpsUrl,
+	type OwyxServerEntry,
 	resolveOwyxPackUrl,
 	sanitizeOwyxApiBase,
-	type OwyxServerEntry,
 } from '@/helpers/owyx-api'
-import { install_create_instance, installJobInstanceId } from '@/helpers/install'
 import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 import { injectOwyxSiteSession } from '@/providers/owyx-site-session'
 
@@ -184,7 +184,9 @@ onMounted(() => {
 	<div class="owyx-servers mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-6">
 		<header class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
 			<div>
-				<h1 class="m-0 text-2xl font-semibold text-contrast">{{ formatMessage(messages.title) }}</h1>
+				<h1 class="m-0 text-2xl font-semibold text-contrast">
+					{{ formatMessage(messages.title) }}
+				</h1>
 				<p class="m-0 text-secondary">{{ formatMessage(messages.subtitle) }}</p>
 			</div>
 			<Button class="!bg-button-bg" :disabled="loading" @click="loadCatalog">
@@ -292,7 +294,11 @@ onMounted(() => {
 						@click="playServer(server)"
 					>
 						<PlayIcon class="h-4 w-4" />
-						{{ playingId === server.id ? formatMessage(messages.playing) : formatMessage(messages.play) }}
+						{{
+							playingId === server.id
+								? formatMessage(messages.playing)
+								: formatMessage(messages.play)
+						}}
 					</Button>
 				</div>
 			</li>

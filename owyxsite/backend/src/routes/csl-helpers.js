@@ -29,6 +29,28 @@ function allowedAssetHosts() {
  * Resolve a stored skin/cape path to a public absolute URL on an allowlisted host.
  * Rejects open redirects / third-party texture hosts.
  */
+function isAllowedUploadPath(pathname) {
+  return (
+    pathname.startsWith('/uploads/skins/') || pathname.startsWith('/uploads/capes/')
+  );
+}
+
+/** Decode + normalize a path; reject traversal / opaque junk. */
+function sanitizeUploadPathname(rawPath) {
+  if (!rawPath) return null;
+  let decoded = rawPath;
+  try {
+    // Decode once; reject nested encodings that still hide `..`.
+    decoded = decodeURIComponent(rawPath);
+  } catch {
+    return null;
+  }
+  if (decoded.includes('\0') || /%2e/i.test(decoded)) return null;
+  const normalized = path.posix.normalize(decoded.startsWith('/') ? decoded : `/${decoded}`);
+  if (normalized.includes('..') || !isAllowedUploadPath(normalized)) return null;
+  return normalized;
+}
+
 function absoluteWebsiteAsset(value) {
   if (!value) return null;
   const allow = allowedAssetHosts();
@@ -39,25 +61,20 @@ function absoluteWebsiteAsset(value) {
       const u = new URL(value);
       const host = u.hostname.toLowerCase();
       if (!allow.has(host)) return null;
-      if (u.pathname.includes('..')) return null;
-      if (!u.pathname.startsWith('/uploads/skins/') && !u.pathname.startsWith('/uploads/capes/')) {
-        return null;
-      }
+      const pathname = sanitizeUploadPathname(u.pathname);
+      if (!pathname) return null;
       // Prefer website origin for browser/CSL clients (no API client key).
       if (host === 'api.owyx.site' || host.startsWith('api.')) {
-        return `${site}${u.pathname}${u.search}`;
+        return `${site}${pathname}${u.search}`;
       }
-      return `${u.origin}${u.pathname}${u.search}`;
+      return `${u.origin}${pathname}${u.search}`;
     } catch {
       return null;
     }
   }
 
-  const pathname = value.startsWith('/') ? value : `/${value}`;
-  if (pathname.includes('..')) return null;
-  if (!pathname.startsWith('/uploads/skins/') && !pathname.startsWith('/uploads/capes/')) {
-    return null;
-  }
+  const pathname = sanitizeUploadPathname(value.startsWith('/') ? value : `/${value}`);
+  if (!pathname) return null;
   return `${site}${pathname}`;
 }
 
@@ -71,10 +88,10 @@ function uploadsRoot() {
 function resolveLocalUpload(skinUrl) {
   if (!skinUrl || !skinUrl.includes('/uploads/')) return null;
   try {
-    const pathname = /^https?:\/\//i.test(skinUrl) ? new URL(skinUrl).pathname : skinUrl;
+    const rawPath = /^https?:\/\//i.test(skinUrl) ? new URL(skinUrl).pathname : skinUrl;
+    const pathname = sanitizeUploadPathname(rawPath);
+    if (!pathname) return null;
     const rel = pathname.replace(/^\/+/, '');
-    if (!rel.startsWith('uploads/skins/') && !rel.startsWith('uploads/capes/')) return null;
-    if (rel.includes('..')) return null;
     const root = uploadsRoot();
     const full = path.resolve(path.join(__dirname, '../..', rel));
     if (full !== root && !full.startsWith(root + path.sep)) return null;

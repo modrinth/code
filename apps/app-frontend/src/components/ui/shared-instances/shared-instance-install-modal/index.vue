@@ -51,10 +51,7 @@
 						<li>
 							<IntlFormatted :message-id="messages.legalClaims">
 								<template #copyright-link="{ children }">
-									<AutoLink
-										class="text-link hover:underline"
-										to="https://owyx.site/legal/terms"
-									>
+									<AutoLink class="text-link hover:underline" to="https://owyx.site/legal/terms">
 										<component :is="() => children" />
 									</AutoLink>
 								</template>

@@ -4,10 +4,14 @@
  */
 
 import { homeDir, join } from '@tauri-apps/api/path'
-import { mkdir, writeFile, exists } from '@tauri-apps/plugin-fs'
+import { exists, mkdir, writeFile } from '@tauri-apps/plugin-fs'
 
 import { get_full_path } from '@/helpers/instance'
-import { DEFAULT_OWYX_API_BASE, getStoredOwyxApiBase, sanitizeOwyxApiBase } from '@/helpers/owyx-api'
+import {
+	DEFAULT_OWYX_API_BASE,
+	getStoredOwyxApiBase,
+	sanitizeOwyxApiBase,
+} from '@/helpers/owyx-api'
 
 export const CUSTOM_SKIN_LOADER_MODRINTH = 'https://modrinth.com/mod/customskinloader'
 export const CUSTOM_SKIN_LOADER_SOURCE = 'https://github.com/xfl03/MCCustomSkinLoader'

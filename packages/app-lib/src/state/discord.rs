@@ -75,11 +75,9 @@ impl DiscordGuard {
             return Ok(());
         }
 
-        let activity = Activity::new().state(msg).assets(
-            Assets::new()
-                .large_image("owyx")
-                .large_text("Owyx"),
-        );
+        let activity = Activity::new()
+            .state(msg)
+            .assets(Assets::new().large_image("owyx").large_text("Owyx"));
 
         // Attempt to set the activity
         // If the existing connection fails, attempt to reconnect and try again

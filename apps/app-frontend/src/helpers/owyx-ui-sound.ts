@@ -29,7 +29,9 @@ function audio(): AudioContext | null {
 	if (typeof window === 'undefined') return null
 	try {
 		if (!ctx) {
-			const AC = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
+			const AC =
+				window.AudioContext ||
+				(window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
 			if (!AC) return null
 			ctx = new AC()
 		}
@@ -44,7 +46,10 @@ export type OwyxUiSoundKind = 'click' | 'toggle' | 'success' | 'soft'
 /** Soft synthetic ticks — CC0 equivalent (generated, not sampled from elsewhere). */
 export function playOwyxUiSound(kind: OwyxUiSoundKind = 'click') {
 	if (!getOwyxUiSoundsEnabled()) return
-	if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+	if (
+		typeof window !== 'undefined' &&
+		window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+	) {
 		return
 	}
 	const ac = audio()
@@ -57,7 +62,10 @@ export function playOwyxUiSound(kind: OwyxUiSoundKind = 'click') {
 	osc.connect(gain)
 	gain.connect(ac.destination)
 
-	const profiles: Record<OwyxUiSoundKind, { f: number; d: number; g: number; type: OscillatorType }> = {
+	const profiles: Record<
+		OwyxUiSoundKind,
+		{ f: number; d: number; g: number; type: OscillatorType }
+	> = {
 		click: { f: 880, d: 0.04, g: 0.035, type: 'sine' },
 		toggle: { f: 660, d: 0.05, g: 0.03, type: 'triangle' },
 		success: { f: 988, d: 0.08, g: 0.04, type: 'sine' },

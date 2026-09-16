@@ -1725,7 +1725,7 @@ fn generate_oauth_challenge() -> String {
 
 #[cfg(test)]
 mod offline_account_tests {
-    use super::{offline_player_uuid, Credentials, OFFLINE_REFRESH_TOKEN};
+    use super::{Credentials, OFFLINE_REFRESH_TOKEN, offline_player_uuid};
     use chrono::{Duration, Utc};
     use sqlx::sqlite::SqlitePoolOptions;
     use uuid::Uuid;
@@ -1800,7 +1800,8 @@ mod offline_account_tests {
     #[tokio::test]
     async fn create_offline_does_not_steal_active_microsoft_when_passive() {
         let pool = memory_users_pool().await;
-        let ms_id = Uuid::parse_str("11111111-1111-1111-1111-111111111111").unwrap();
+        let ms_id =
+            Uuid::parse_str("11111111-1111-1111-1111-111111111111").unwrap();
         let ms_uuid = ms_id.as_hyphenated().to_string();
         let expires = (Utc::now() + Duration::days(1)).timestamp();
         sqlx::query(
@@ -1833,7 +1834,8 @@ mod offline_account_tests {
     #[tokio::test]
     async fn create_offline_make_active_switches_from_microsoft() {
         let pool = memory_users_pool().await;
-        let ms_id = Uuid::parse_str("22222222-2222-2222-2222-222222222222").unwrap();
+        let ms_id =
+            Uuid::parse_str("22222222-2222-2222-2222-222222222222").unwrap();
         let ms_uuid = ms_id.as_hyphenated().to_string();
         let expires = (Utc::now() + Duration::days(1)).timestamp();
         sqlx::query(

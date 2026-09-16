@@ -176,7 +176,9 @@ pub async fn export_mrpack_bytes(
     name: Option<String>,
 ) -> crate::Result<Vec<u8>> {
     let temporary = tempfile::NamedTempFile::new().map_err(|e| {
-        crate::ErrorKind::FSError(format!("creating temporary mrpack export: {e}"))
+        crate::ErrorKind::FSError(format!(
+            "creating temporary mrpack export: {e}"
+        ))
     })?;
     let path = temporary.path().to_path_buf();
     export_mrpack(

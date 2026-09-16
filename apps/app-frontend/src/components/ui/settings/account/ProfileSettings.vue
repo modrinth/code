@@ -17,7 +17,9 @@
 			<div class="min-w-0">
 				<p class="m-0 truncate text-lg font-semibold text-contrast">{{ nickname }}</p>
 				<p v-if="email" class="m-0 mt-0.5 truncate text-sm text-secondary">{{ email }}</p>
-				<p class="m-0 mt-1 text-xs text-secondary">{{ formatMessage(messages.roleHint, { role }) }}</p>
+				<p class="m-0 mt-1 text-xs text-secondary">
+					{{ formatMessage(messages.roleHint, { role }) }}
+				</p>
 			</div>
 		</section>
 
@@ -34,7 +36,9 @@
 				class="rounded-lg border border-solid border-surface-5 bg-surface-3 px-3 py-2 text-primary"
 				placeholder="username"
 			/>
-			<label class="text-sm text-secondary">{{ formatMessage(messages.currentPasswordLabel) }}</label>
+			<label class="text-sm text-secondary">{{
+				formatMessage(messages.currentPasswordLabel)
+			}}</label>
 			<input
 				v-model="currentPassword"
 				type="password"
@@ -83,9 +87,8 @@
 
 <script setup lang="ts">
 import { Button, defineMessages, useVIntl } from '@modrinth/ui'
-import { computed, ref, watch } from 'vue'
-
 import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
+import { computed, ref, watch } from 'vue'
 
 import {
 	DEFAULT_OWYX_API_BASE,
@@ -94,10 +97,7 @@ import {
 	sanitizeOwyxApiBase,
 } from '@/helpers/owyx-api'
 import { resolveOwyxAvatarUrl } from '@/helpers/owyx-avatar'
-import {
-	getStoredOwyxSiteSession,
-	OWYX_SITE_PROFILE_URL,
-} from '@/helpers/owyx-site-auth'
+import { getStoredOwyxSiteSession, OWYX_SITE_PROFILE_URL } from '@/helpers/owyx-site-auth'
 import { injectOwyxSiteSession } from '@/providers/owyx-site-session'
 
 const { formatMessage } = useVIntl()

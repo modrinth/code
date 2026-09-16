@@ -1,6 +1,5 @@
-import { type ComputedRef, computed, type Ref } from 'vue'
-
 import { createContext } from '@modrinth/ui'
+import { computed, type ComputedRef, type Ref } from 'vue'
 
 import type { OwyxSiteSession } from '@/helpers/owyx-site-auth'
 

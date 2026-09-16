@@ -3,14 +3,19 @@ import { NewspaperIcon, ServerStackIcon, UserIcon } from '@modrinth/assets'
 import {
 	Button,
 	Combobox,
+	type ComboboxOption,
 	defineMessages,
 	injectNotificationManager,
 	useVIntl,
-	type ComboboxOption,
 } from '@modrinth/ui'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
+import {
+	export_instance_mrpack_bytes,
+	get_pack_export_candidates,
+	list as listInstances,
+} from '@/helpers/instance'
 import {
 	adminBanUser,
 	adminCreateNews,
@@ -22,13 +27,13 @@ import {
 	adminListPacks,
 	adminListServers,
 	adminListUsers,
+	type AdminNews,
+	type AdminPack,
+	type AdminServer,
 	adminSetNewsPublished,
 	adminSetPackPublished,
 	adminSetServerPublished,
 	adminSetUserRole,
-	type AdminNews,
-	type AdminPack,
-	type AdminServer,
 	type AdminUser,
 } from '@/helpers/owyx-admin-api'
 import {
@@ -43,11 +48,6 @@ import {
 	setStoredOwyxApiBase,
 } from '@/helpers/owyx-api'
 import { createOwyxCatalogServer, publishLibraryPackToCatalog } from '@/helpers/owyx-friends'
-import {
-	export_instance_mrpack_bytes,
-	get_pack_export_candidates,
-	list as listInstances,
-} from '@/helpers/instance'
 import { get_game_versions } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
 import { useRootBreadcrumb } from '@/providers/breadcrumbs'
@@ -487,7 +487,9 @@ onMounted(() => {
 	<div class="owyx-admin mx-auto flex w-full max-w-5xl flex-col gap-5 px-4 py-6">
 		<header class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
 			<div>
-				<h1 class="m-0 text-2xl font-semibold text-contrast">{{ formatMessage(messages.title) }}</h1>
+				<h1 class="m-0 text-2xl font-semibold text-contrast">
+					{{ formatMessage(messages.title) }}
+				</h1>
 				<p class="m-0 text-secondary">{{ formatMessage(messages.subtitle) }}</p>
 			</div>
 			<div class="flex flex-wrap gap-2">
@@ -619,7 +621,11 @@ onMounted(() => {
 						:disabled="busy || !formName || !formAddress || !formMc || !formLoader"
 						@click="publishServer"
 					>
-						{{ busy ? statusMsg || formatMessage(messages.creating) : formatMessage(messages.createServer) }}
+						{{
+							busy
+								? statusMsg || formatMessage(messages.creating)
+								: formatMessage(messages.createServer)
+						}}
 					</Button>
 				</div>
 				<p v-if="statusMsg" class="m-0 text-sm text-secondary">{{ statusMsg }}</p>
@@ -644,7 +650,9 @@ onMounted(() => {
 					<button
 						type="button"
 						class="rounded-lg px-3 py-1.5 text-sm"
-						:class="catalogSub === 'packs' ? 'bg-brand/20 text-brand' : 'bg-surface-3 text-secondary'"
+						:class="
+							catalogSub === 'packs' ? 'bg-brand/20 text-brand' : 'bg-surface-3 text-secondary'
+						"
 						@click="catalogSub = 'packs'"
 					>
 						{{ formatMessage(messages.packs) }} ({{ packs.length }})
@@ -672,7 +680,9 @@ onMounted(() => {
 										.catch(handleError)
 								"
 							>
-								{{ s.published ? formatMessage(messages.published) : formatMessage(messages.draft) }}
+								{{
+									s.published ? formatMessage(messages.published) : formatMessage(messages.draft)
+								}}
 							</Button>
 							<Button
 								class="!bg-button-bg !text-red"
@@ -832,7 +842,9 @@ onMounted(() => {
 				v-else-if="adminTab === 'news'"
 				class="flex flex-col gap-3 rounded-xl border border-solid border-surface-5 bg-surface-2 p-4"
 			>
-				<div class="grid gap-2 rounded-lg border border-solid border-surface-5 bg-surface-3 p-3 sm:grid-cols-2">
+				<div
+					class="grid gap-2 rounded-lg border border-solid border-surface-5 bg-surface-3 p-3 sm:grid-cols-2"
+				>
 					<label class="flex flex-col gap-1 text-sm sm:col-span-2">
 						<span class="text-secondary">{{ formatMessage(messages.newsTitle) }}</span>
 						<input
@@ -879,11 +891,11 @@ onMounted(() => {
 						<div class="flex flex-wrap gap-2">
 							<Button
 								class="!bg-button-bg"
-								@click="
-									adminSetNewsPublished(n.id, !n.published).then(loadNews).catch(handleError)
-								"
+								@click="adminSetNewsPublished(n.id, !n.published).then(loadNews).catch(handleError)"
 							>
-								{{ n.published ? formatMessage(messages.published) : formatMessage(messages.draft) }}
+								{{
+									n.published ? formatMessage(messages.published) : formatMessage(messages.draft)
+								}}
 							</Button>
 							<Button
 								class="!bg-button-bg !text-red"

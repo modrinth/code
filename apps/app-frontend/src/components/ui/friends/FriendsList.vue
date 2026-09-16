@@ -24,6 +24,17 @@ import {
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import type { ModrinthCredentials } from '@/helpers/mr_auth'
+import {
+	fetchOwyxCatalog,
+	getOwyxClientKey,
+	getOwyxDemoFlag,
+	getOwyxLocalApiFallback,
+	getStoredOwyxApiBase,
+	type OwyxServerEntry,
+	sanitizeOwyxApiBase,
+} from '@/helpers/owyx-api'
+import { resolveOwyxAvatarUrl } from '@/helpers/owyx-avatar'
 import {
 	acceptOwyxFriend,
 	declineOwyxFriend,
@@ -33,18 +44,7 @@ import {
 	requestOwyxFriend,
 	searchOwyxUsers,
 } from '@/helpers/owyx-friends'
-import type { ModrinthCredentials } from '@/helpers/mr_auth'
-import { resolveOwyxAvatarUrl } from '@/helpers/owyx-avatar'
 import { playOwyxUiSound } from '@/helpers/owyx-ui-sound'
-import {
-	fetchOwyxCatalog,
-	getOwyxClientKey,
-	getOwyxDemoFlag,
-	getOwyxLocalApiFallback,
-	getStoredOwyxApiBase,
-	sanitizeOwyxApiBase,
-	type OwyxServerEntry,
-} from '@/helpers/owyx-api'
 import { injectOwyxSiteSession } from '@/providers/owyx-site-session'
 
 const { formatMessage } = useVIntl()
@@ -181,9 +181,7 @@ watch(username, (q) => {
 const isSearching = computed(() => search.value.trim().length > 0)
 
 const filtered = computed(() =>
-	friends.value.filter((f) =>
-		f.nickname.toLowerCase().includes(search.value.trim().toLowerCase()),
-	),
+	friends.value.filter((f) => f.nickname.toLowerCase().includes(search.value.trim().toLowerCase())),
 )
 const accepted = computed(() => filtered.value.filter((f) => f.status === 'accepted'))
 const onlineFriends = computed(() =>
@@ -393,7 +391,8 @@ const messages = defineMessages({
 	},
 	listError: {
 		id: 'friends.list-error',
-		defaultMessage: 'Could not reach Owyx friends API. Check your connection and client key, then retry.',
+		defaultMessage:
+			'Could not reach Owyx friends API. Check your connection and client key, then retry.',
 	},
 	retry: { id: 'friends.retry', defaultMessage: 'Retry' },
 	copyInstance: {
@@ -504,7 +503,11 @@ const messages = defineMessages({
 		{{ formatMessage(messages.offlineBanner) }}
 	</p>
 
-	<div v-if="owyxSignedIn && loading" class="friends-skeleton flex flex-col gap-2 mb-3" aria-busy="true">
+	<div
+		v-if="owyxSignedIn && loading"
+		class="friends-skeleton flex flex-col gap-2 mb-3"
+		aria-busy="true"
+	>
 		<p class="m-0 text-sm text-secondary">{{ formatMessage(messages.loading) }}</p>
 		<div class="h-8 rounded-full bg-button-bg animate-pulse" />
 		<div class="h-8 rounded-full bg-button-bg animate-pulse opacity-80" />
@@ -517,7 +520,9 @@ const messages = defineMessages({
 	>
 		<p class="m-0">{{ formatMessage(messages.listError) }}</p>
 		<p v-if="listError" class="m-0 text-xs opacity-80">{{ listError }}</p>
-		<Button size="sm" class="self-start" @click="refresh">{{ formatMessage(messages.retry) }}</Button>
+		<Button size="sm" class="self-start" @click="refresh">{{
+			formatMessage(messages.retry)
+		}}</Button>
 	</div>
 
 	<div v-if="owyxSignedIn && !loading" class="flex gap-1 items-center mb-3 -ml-1">
@@ -612,7 +617,9 @@ const messages = defineMessages({
 										<span
 											class="presence-dot"
 											:class="
-												friend.presence === 'playing' ? 'presence-dot--playing' : 'presence-dot--online'
+												friend.presence === 'playing'
+													? 'presence-dot--playing'
+													: 'presence-dot--online'
 											"
 											aria-hidden="true"
 										/>
@@ -654,7 +661,10 @@ const messages = defineMessages({
 									]"
 								>
 									<MoreVerticalIcon />
-									<template v-if="friend.presence === 'playing' && friend.instanceName" #copy-instance>
+									<template
+										v-if="friend.presence === 'playing' && friend.instanceName"
+										#copy-instance
+									>
 										{{ formatMessage(messages.copyInstance) }}
 									</template>
 									<template

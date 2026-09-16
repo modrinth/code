@@ -73,17 +73,14 @@
 import { Button, defineMessages, useVIntl } from '@modrinth/ui'
 import { onMounted, ref } from 'vue'
 
-import {
-	getOwyxSocialSettings,
-	patchOwyxSocialSettings,
-} from '@/helpers/owyx-friends'
 import { CUSTOM_SKIN_LOADER_MODRINTH } from '@/helpers/owyx-csl'
-import { injectOwyxSiteSession } from '@/providers/owyx-site-session'
+import { getOwyxSocialSettings, patchOwyxSocialSettings } from '@/helpers/owyx-friends'
 import {
 	getOwyxUiSoundsEnabled,
 	playOwyxUiSound,
 	setOwyxUiSoundsEnabled,
 } from '@/helpers/owyx-ui-sound'
+import { injectOwyxSiteSession } from '@/providers/owyx-site-session'
 
 const { formatMessage } = useVIntl()
 const owyx = injectOwyxSiteSession()
