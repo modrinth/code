@@ -1,6 +1,7 @@
 <template>
 	<section
-		class="h-full overflow-auto bg-surface-2 p-4"
+		class="h-full overflow-auto bg-surface-2 p-3"
+		:inert="sidebarHidden"
 		:aria-label="formatMessage(messages[slotName])"
 	>
 		<component :is="content" v-if="content" />
@@ -25,11 +26,18 @@ import type { ProjectReviewSlot } from './types'
 defineOptions({ inheritAttrs: false })
 type PanelParams = { slot: ProjectReviewSlot }
 
-const props = defineProps<{ params: PanelParams | IDockviewPanelProps<PanelParams> }>()
-const { slots } = injectProjectReviewContext()
+const props = defineProps<{
+	params: PanelParams | IDockviewPanelProps<PanelParams>
+}>()
+const { slots, leftVisible, rightVisible } = injectProjectReviewContext()
 const { formatMessage } = useVIntl()
 const slotName = computed(() =>
 	'slot' in props.params ? props.params.slot : props.params.params.slot,
 )
 const content = computed(() => slots[slotName.value])
+const sidebarHidden = computed(
+	() =>
+		(slotName.value === 'left' && !leftVisible.value) ||
+		(slotName.value === 'right' && !rightVisible.value),
+)
 </script>
