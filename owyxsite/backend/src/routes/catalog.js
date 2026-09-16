@@ -876,32 +876,7 @@ async function ensureCatalogSchema() {
   await db.query(`CREATE INDEX IF NOT EXISTS packs_published_idx ON public.packs (published)`);
   await db.query(`CREATE INDEX IF NOT EXISTS servers_published_sort_idx ON public.servers (published, sort_order, name)`);
   await db.query(`CREATE INDEX IF NOT EXISTS catalog_acl_resource_idx ON public.catalog_acl (resource_type, resource_id)`);
-  await db.query(
-    `INSERT INTO public.packs (
-        id, name, minecraft, loader, description, source_type, source_config, manifest_url, published
-     )
-     SELECT
-        'demo-vanilla',
-        'Owyx Demo Vanilla 1.21.1',
-        '1.21.1',
-        'vanilla',
-        'Крошечный тестовый оверлей для друзей. Лаунчер ставит ваниль, затем распаковывает этот zip в game/.',
-        'http_zip',
-        '{"url":"/fixtures/packs/demo-vanilla.zip","sha256":"b5b345b133be7e851e47ef6f0fd83c61be3abc56dfc8cacd0c6fc65790d2eadb"}'::jsonb,
-        '/api/launcher/v1/packs/demo-vanilla/manifest',
-        true
-     WHERE NOT EXISTS (SELECT 1 FROM public.packs WHERE id = 'demo-vanilla')`
-  );
-  await db.query(
-    `INSERT INTO public.servers (
-        id, name, address, port, kind, pack_id, minecraft, loader, requires_account, published, sort_order
-     )
-     SELECT * FROM (VALUES
-        ('owyx-demo', 'Owyx — демо', 'play.owyx.site', 25565, 'owyx', 'demo-vanilla', '1.21.1', 'vanilla', false, true, 0),
-        ('owyx-friends', 'Owyx — друзья', '127.0.0.1', 25565, 'community', 'demo-vanilla', '1.21.1', 'vanilla', false, true, 10)
-     ) AS seed(id, name, address, port, kind, pack_id, minecraft, loader, requires_account, published, sort_order)
-     WHERE NOT EXISTS (SELECT 1 FROM public.servers WHERE id = seed.id)`
-  );
+  // Demo seed removed for OBT — admins publish real packs/servers from the launcher or site.
 }
 
 async function loadAcl(resourceType, resourceId) {

@@ -405,7 +405,7 @@
     "message": "Переглянути примірник"
   },
   "app.hosting.update-required.description": {
-    "message": "Вам потрібно оновитися, щоб використовувати Modrinth Hosting через застосунок Modrinth"
+    "message": "Вам потрібно оновитися, щоб використовувати Owyx Servers через застосунок Modrinth"
   },
   "app.hosting.update-required.download": {
     "message": "Завантажити для оновлення"
@@ -1275,7 +1275,7 @@
     "message": "Обліковий запис Modrinth"
   },
   "app.nav.modrinth-hosting": {
-    "message": "Modrinth Hosting"
+    "message": "Owyx Servers"
   },
   "app.nav.remove-account": {
     "message": "Вилучити обліковий запис"

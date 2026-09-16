@@ -16,13 +16,14 @@ function parseList(raw, fallback) {
 }
 
 function requestHost(req) {
-  const xf = req.get('x-forwarded-host');
-  if (xf) {
-    return xf.split(',')[0].trim().toLowerCase().split(':')[0];
-  }
-  return String(req.hostname || req.get('host') || '')
+  // Never trust client-supplied X-Forwarded-Host — spoofing would skip the
+  // api.* client-key gate. Prefer Express hostname (respects trust proxy from
+  // the real Host / nginx-rewritten forward headers only).
+  const hostHeader = String(req.hostname || req.get('host') || '')
     .toLowerCase()
-    .split(':')[0];
+    .split(':')[0]
+    .trim();
+  return hostHeader;
 }
 
 function clientKeyGate(req, res, next) {

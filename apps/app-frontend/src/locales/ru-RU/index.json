@@ -405,7 +405,7 @@
 		"message": "Посмотреть сборку"
 	},
 	"app.hosting.update-required.description": {
-		"message": "Обновитесь, чтобы использовать Modrinth Hosting через Owyx"
+		"message": "Обновитесь, чтобы использовать Owyx Servers через Owyx"
 	},
 	"app.hosting.update-required.download": {
 		"message": "Скачать и обновить"
@@ -1263,7 +1263,7 @@
 		"message": "Аккаунт Modrinth"
 	},
 	"app.nav.modrinth-hosting": {
-		"message": "Modrinth Hosting"
+		"message": "Owyx Servers"
 	},
 	"app.nav.remove-account": {
 		"message": "Удалить аккаунт"

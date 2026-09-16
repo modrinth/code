@@ -9,7 +9,8 @@
     "copy-js": "mkdir -p dist/routes dist/utils dist/config dist/database dist/middleware && cp -r src/routes/* dist/routes/ && cp -r src/utils/* dist/utils/ && cp -r src/config/* dist/config/ && cp src/database/*.js dist/database/ 2>/dev/null || true && cp src/middleware/*.js dist/middleware/ 2>/dev/null || true",
     "start": "node dist/server.js",
     "start:dev": "tsx src/server.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --test src/**/*.test.js"
   },
   "engines": {
     "node": ">=20"

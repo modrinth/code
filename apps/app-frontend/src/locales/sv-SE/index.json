@@ -405,7 +405,7 @@
     "message": "Visa instans"
   },
   "app.hosting.update-required.description": {
-    "message": "Du behöver uppdatera för att använda Modrinth Hosting genom Owyx"
+    "message": "Du behöver uppdatera för att använda Owyx Servers genom Owyx"
   },
   "app.hosting.update-required.download": {
     "message": "Ladda ner för att uppdatera"
@@ -1278,7 +1278,7 @@
     "message": "Modrinth-konto"
   },
   "app.nav.modrinth-hosting": {
-    "message": "Modrinth Hosting"
+    "message": "Owyx Servers"
   },
   "app.nav.remove-account": {
     "message": "Ta bort konto"

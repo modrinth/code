@@ -24,6 +24,13 @@ function publicBase(req) {
   return `${req.protocol}://${req.get('host')}`;
 }
 
+/** Website origin for browser-loadable assets (avatars/skins) — no client key. */
+function websiteBase() {
+  const fromEnv = (process.env.SITE_PUBLIC_URL || process.env.PUBLIC_SITE_URL || '').trim();
+  if (fromEnv) return fromEnv.replace(/\/+$/, '');
+  return 'https://owyx.site';
+}
+
 /** Turn a stored `/uploads/...` path into an absolute URL for the launcher. */
 function absoluteAsset(req, value) {
   if (!value) return null;
@@ -31,11 +38,30 @@ function absoluteAsset(req, value) {
   return `${publicBase(req)}${value.startsWith('/') ? '' : '/'}${value}`;
 }
 
+/** Same as absoluteAsset but always on the public website host (img tags / no API key). */
+function absoluteWebsiteAsset(value) {
+  if (!value) return null;
+  if (/^https?:\/\//i.test(value)) {
+    // Rewrite api.* uploads to website so <img> works without X-Owyx-Client-Key.
+    try {
+      const u = new URL(value);
+      if (u.hostname === 'api.owyx.site' && u.pathname.startsWith('/uploads/')) {
+        return `${websiteBase()}${u.pathname}${u.search}`;
+      }
+    } catch {
+      /* keep */
+    }
+    return value;
+  }
+  return `${websiteBase()}${value.startsWith('/') ? '' : '/'}${value}`;
+}
+
 /** Build the launcher-facing view of a user row. */
 function buildMe(req, user) {
   const banned = Boolean(user.is_banned);
   const active = user.is_active !== false;
   const emailVerified = Boolean(user.is_email_verified);
+  const avatarUrl = absoluteWebsiteAsset(user.avatar_url);
 
   return {
     user: {
@@ -47,6 +73,8 @@ function buildMe(req, user) {
       banned,
       emailVerified,
       registeredAt: user.registered_at,
+      avatarUrl,
+      avatar_url: avatarUrl,
     },
     // Open access: any active, non-banned account may play. No application needed.
     serverAccess: active && !banned,
@@ -57,12 +85,14 @@ function buildMe(req, user) {
         ? 'inactive'
         : 'ok',
     cosmetics: {
-      skinUrl: absoluteAsset(req, user.skin_url),
+      avatarUrl,
+      skinUrl: absoluteWebsiteAsset(user.skin_url),
       skinModel: user.skin_model || 'classic',
-      capeUrl: absoluteAsset(req, user.cape_url),
+      capeUrl: absoluteWebsiteAsset(user.cape_url),
     },
-    // Convenience mirror of the skin for older launcher builds.
-    skinUrl: absoluteAsset(req, user.skin_url),
+    // Convenience mirrors for older launcher builds.
+    avatarUrl,
+    skinUrl: absoluteWebsiteAsset(user.skin_url),
     // DEPRECATED: applications ("заявки") are no longer part of the product.
     // Always null now; kept in the response shape for one transition release.
     application: null,

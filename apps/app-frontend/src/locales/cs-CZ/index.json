@@ -339,7 +339,7 @@
     "message": "Zobrazit instanci"
   },
   "app.hosting.update-required.description": {
-    "message": "Musíte aktualizovat Modrinth Hosting přes Owyx"
+    "message": "Musíte aktualizovat Owyx Servers přes Owyx"
   },
   "app.hosting.update-required.download": {
     "message": "Stáhnout novou aktualizaci"
@@ -1161,7 +1161,7 @@
     "message": "Modrinth účet"
   },
   "app.nav.modrinth-hosting": {
-    "message": "Modrinth Hosting"
+    "message": "Owyx Servers"
   },
   "app.nav.remove-account": {
     "message": "Odebrat účet"

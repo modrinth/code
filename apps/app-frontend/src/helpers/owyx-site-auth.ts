@@ -11,6 +11,7 @@ import {
 	getStoredOwyxApiBase,
 	sanitizeOwyxApiBase,
 } from '@/helpers/owyx-api'
+import { syncOwyxCosmeticsToDisk } from '@/helpers/owyx-cosmetics'
 
 /** Prefer Tauri HTTP plugin (no CORS); fall back to browser fetch for vitest/SSR. */
 async function owyxFetch(input: string, init?: RequestInit): Promise<Response> {
@@ -79,12 +80,16 @@ function persistSession(token: string, user: OwyxSiteUser) {
 	localStorage.setItem(STORAGE_USER, JSON.stringify(user))
 }
 
-function mapUser(raw: Record<string, unknown>): OwyxSiteUser {
+function mapUser(raw: Record<string, unknown>, cosmetics?: Record<string, unknown> | null): OwyxSiteUser {
 	const avatarRaw = raw.avatarUrl
 		? String(raw.avatarUrl)
 		: raw.avatar_url
 			? String(raw.avatar_url)
-			: null
+			: cosmetics?.avatarUrl
+				? String(cosmetics.avatarUrl)
+				: cosmetics?.avatar_url
+					? String(cosmetics.avatar_url)
+					: null
 	let avatarUrl: string | null = avatarRaw
 	if (avatarRaw?.startsWith('/')) {
 		avatarUrl = `https://owyx.site${avatarRaw}`
@@ -130,7 +135,9 @@ export async function loginOwyxSite(login: string, password: string): Promise<Ow
 	const user = mapUser(userRaw)
 	const token = String(data.token)
 	persistSession(token, user)
-	return { token, user }
+	// Refresh from /me so avatar/cosmetics are absolute and up to date.
+	const refreshed = await fetchOwyxSiteMe(token)
+	return refreshed ?? { token, user }
 }
 
 export async function fetchOwyxSiteMe(token?: string): Promise<OwyxSiteSession | null> {
@@ -156,8 +163,15 @@ export async function fetchOwyxSiteMe(token?: string): Promise<OwyxSiteSession |
 			string,
 			unknown
 		>
-		const user = mapUser(userRaw)
+		const cosmetics =
+			data.cosmetics && typeof data.cosmetics === 'object'
+				? (data.cosmetics as Record<string, unknown>)
+				: null
+		// Top-level avatarUrl mirror (older shape)
+		if (!userRaw.avatarUrl && data.avatarUrl) userRaw.avatarUrl = data.avatarUrl
+		const user = mapUser(userRaw, cosmetics)
 		persistSession(session.token, user)
+		void syncOwyxCosmeticsToDisk(user.nickname, cosmetics).catch(() => undefined)
 		return { token: session.token, user }
 	} catch {
 		return session

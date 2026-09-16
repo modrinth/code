@@ -141,28 +141,28 @@
 
 	--brand-gradient-bg: linear-gradient(
 		0deg,
-		rgba(68, 182, 138, 0.175) 0%,
-		rgba(58, 250, 112, 0.125) 100%
+		rgba(0, 229, 255, 0.14) 0%,
+		rgba(11, 122, 150, 0.08) 100%
 	);
 	--brand-gradient-strong-bg: linear-gradient(
 		270deg,
-		rgba(68, 182, 138, 0.175) 0%,
-		rgba(36, 225, 91, 0.12) 100%
+		rgba(0, 229, 255, 0.12) 0%,
+		rgba(11, 122, 150, 0.1) 100%
 	);
 	--brand-gradient-button: rgba(255, 255, 255, 0.5);
-	--brand-gradient-border: rgba(32, 64, 32, 0.15);
-	--brand-gradient-fade-out-color: linear-gradient(to bottom, rgba(213, 235, 224, 0), #d0ece0 70%);
+	--brand-gradient-border: rgba(0, 100, 120, 0.15);
+	--brand-gradient-fade-out-color: linear-gradient(to bottom, rgba(200, 245, 255, 0), #d6f4fb 70%);
 
 	--color-button-bg-selected: var(--color-brand);
 	--color-button-text-selected: var(--color-accent-contrast);
 
 	--color-gradient-button-bg: linear-gradient(180deg, #f8f9fa 0%, #dce0e6 100%);
 
-	--loading-bar-gradient: linear-gradient(to right, var(--color-brand) 0%, #00af5c 100%);
+	--loading-bar-gradient: linear-gradient(to right, var(--color-brand) 0%, #0b7a96 100%);
 
-	--splash-tint-top: rgba(185, 255, 207, 0.465);
-	--splash-tint-bottom: rgba(183, 226, 255, 0.563);
-	--splash-overlay: rgba(181, 255, 213, 0.315);
+	--splash-tint-top: rgba(0, 229, 255, 0.22);
+	--splash-tint-bottom: rgba(183, 226, 255, 0.4);
+	--splash-overlay: rgba(180, 240, 255, 0.28);
 	--splash-cube-opacity: 0.4;
 	--splash-cube-blend: multiply;
 

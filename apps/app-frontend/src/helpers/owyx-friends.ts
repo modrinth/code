@@ -172,3 +172,44 @@ export async function publishLibraryPackToCatalog(opts: {
 	}
 	return { packId }
 }
+
+export async function createOwyxCatalogServer(body: {
+	name: string
+	address: string
+	port?: number
+	minecraft?: string
+	loader?: string
+	kind?: string
+	packId?: string | null
+	description?: string
+	requiresAccount?: boolean
+	published?: boolean
+}): Promise<{ id: string }> {
+	const res = await owyxFetch(`${apiBase()}/api/admin/servers`, {
+		method: 'POST',
+		headers: authHeaders(),
+		body: JSON.stringify({
+			name: body.name,
+			address: body.address,
+			port: body.port ?? 25565,
+			minecraft: body.minecraft || '1.21.1',
+			loader: body.loader || 'vanilla',
+			kind: body.kind || 'owyx',
+			packId: body.packId || null,
+			requiresAccount: body.requiresAccount ?? false,
+			published: body.published ?? true,
+			accessMode: 'open',
+			sortOrder: 0,
+			iconUrl: null,
+		}),
+		signal: AbortSignal.timeout(20000),
+	})
+	const data = (await res.json().catch(() => ({}))) as {
+		server?: { id: string }
+		error?: string
+	}
+	if (!res.ok || !data.server?.id) {
+		throw new Error(data.error || `Create server failed (${res.status})`)
+	}
+	return { id: data.server.id }
+}

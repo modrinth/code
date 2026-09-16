@@ -19,7 +19,7 @@ pub struct AdsState {
     pub malicious_origins: HashSet<String>,
 }
 
-const AD_LINK: &str = "https://modrinth.com/wrapper/app-ads-cookie";
+const AD_LINK: &str = "https://owyx.site/";
 const APP_TITLE_BAR_HEIGHT: f32 = 48.0;
 #[cfg(any(windows, target_os = "macos"))]
 pub(super) const OCCLUDED_AREA_THRESHOLD: f64 = 0.5;

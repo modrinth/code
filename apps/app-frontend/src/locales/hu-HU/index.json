@@ -405,7 +405,7 @@
     "message": "Példány megtekintése"
   },
   "app.hosting.update-required.description": {
-    "message": "Frissítened kell, hogy használhasd a Modrinth Hostingot a Owyxon keresztül"
+    "message": "Frissítened kell, hogy használhasd a Owyx Serversot a Owyxon keresztül"
   },
   "app.hosting.update-required.download": {
     "message": "Letöltés a frissítéshez"
@@ -1284,7 +1284,7 @@
     "message": "Modrinth fiók"
   },
   "app.nav.modrinth-hosting": {
-    "message": "Modrinth Hosting"
+    "message": "Owyx Servers"
   },
   "app.nav.remove-account": {
     "message": "Fiók eltávolítása"

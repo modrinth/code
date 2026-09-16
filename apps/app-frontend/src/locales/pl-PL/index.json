@@ -405,7 +405,7 @@
     "message": "Pokaż instancję"
   },
   "app.hosting.update-required.description": {
-    "message": "Musisz pobrać aktualizacje, by móc korzystać z Modrinth Hosting poprzez Owyx"
+    "message": "Musisz pobrać aktualizacje, by móc korzystać z Owyx Servers poprzez Owyx"
   },
   "app.hosting.update-required.download": {
     "message": "Pobierz aktualizację"
@@ -1272,7 +1272,7 @@
     "message": "Konto Modrinth"
   },
   "app.nav.modrinth-hosting": {
-    "message": "Modrinth Hosting"
+    "message": "Owyx Servers"
   },
   "app.nav.remove-account": {
     "message": "Usuń konto"

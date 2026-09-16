@@ -15,8 +15,8 @@ function isUsableSecret(secret) {
 
 /**
  * Verify Cloudflare Turnstile token.
- * Set TURNSTILE_SECRET_KEY in env. When TURNSTILE_SKIP=true (local/dev), always pass.
- * Placeholder secrets (obt-pend…) are treated as "not configured" so register/login work.
+ * Production fail-close: missing/placeholder secret → reject (not skip).
+ * Skip only: NODE_ENV=test, or TURNSTILE_SKIP=true outside production.
  */
 async function verifyTurnstile(token, remoteip = null) {
   const production = process.env.NODE_ENV === 'production';
@@ -29,15 +29,17 @@ async function verifyTurnstile(token, remoteip = null) {
 
   const secret = process.env.TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET;
   if (!isUsableSecret(secret)) {
-    if (production && secret && !isUsableSecret(secret)) {
-      console.warn(
-        'TURNSTILE_SECRET_KEY looks like a placeholder — skipping captcha until real Cloudflare keys are set',
+    if (production) {
+      console.error(
+        'TURNSTILE_SECRET_KEY missing or placeholder in production — rejecting captcha (fail-close)',
       );
-    } else if (!secret && production) {
-      console.warn('TURNSTILE_SECRET_KEY not set — skipping Turnstile in production (set real keys to enable)');
-    } else if (!secret) {
-      console.warn('TURNSTILE_SECRET_KEY not set — skipping Turnstile verification in development');
+      return {
+        success: false,
+        message: 'проверка капчи недоступна на сервере',
+        code: 'turnstile_misconfigured',
+      };
     }
+    console.warn('TURNSTILE_SECRET_KEY not set — skipping Turnstile verification in development');
     return { success: true, skipped: true };
   }
 

@@ -351,7 +351,7 @@
     "message": "インスタンスを表示"
   },
   "app.hosting.update-required.description": {
-    "message": "Modrinth Hostingを利用するには、Owyxを更新してください"
+    "message": "Owyx Serversを利用するには、Owyxを更新してください"
   },
   "app.hosting.update-required.download": {
     "message": "ダウンロードして更新"
@@ -1218,7 +1218,7 @@
     "message": "Modrinthアカウント"
   },
   "app.nav.modrinth-hosting": {
-    "message": "Modrinth Hosting"
+    "message": "Owyx Servers"
   },
   "app.nav.remove-account": {
     "message": "アカウントを削除"

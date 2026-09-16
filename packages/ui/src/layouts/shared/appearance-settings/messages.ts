@@ -20,7 +20,7 @@ export const appearanceSettingsMessages = defineMessages({
 	},
 	syncAcrossDevicesSignedOutTooltip: {
 		id: 'settings.display.theme.sync-across-devices.sign-in-tooltip',
-		defaultMessage: 'Sign into Modrinth to sync theme',
+		defaultMessage: 'Sign into an Owyx account to sync theme',
 	},
 	projectListLayoutsTitle: {
 		id: 'settings.display.project-list-layouts.title',

@@ -142,6 +142,16 @@ function sanitizeMediaUrl(url: string | undefined, apiBase?: string): string | u
 	return trimmed
 }
 
+/** Resolve relative pack/media URLs to absolute https for window.open / downloads. */
+export function resolveOwyxPackUrl(url: string | null | undefined, apiBase?: string): string | null {
+	const resolved = sanitizeMediaUrl(url ?? undefined, apiBase)
+	if (!resolved) return null
+	if (resolved.startsWith('https://') || resolved.startsWith('http://127.0.0.1') || resolved.startsWith('http://localhost')) {
+		return resolved
+	}
+	return null
+}
+
 function formatAddress(raw: Record<string, unknown>): string {
 	const base = String(raw.address ?? raw.playAddress ?? raw.play_address ?? raw.host ?? '').trim()
 	if (!base) return ''
