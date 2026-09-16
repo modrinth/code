@@ -65,7 +65,7 @@ async function install() {
 			<div class="button-row">
 				<div class="markdown-body">
 					<p>
-						Installing <code>{{ version.id }}</code> from Modrinth
+						Installing <code>{{ version.id }}</code> from Owyx
 					</p>
 				</div>
 				<div class="button-group">

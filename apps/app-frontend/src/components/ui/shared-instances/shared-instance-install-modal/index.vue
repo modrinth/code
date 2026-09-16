@@ -584,7 +584,7 @@ const messages = defineMessages({
 	},
 	reviewedFiles: {
 		id: 'app.modal.install-to-play.reviewed-files',
-		defaultMessage: "Files that aren't published to Modrinth aren't reviewed.",
+		defaultMessage: "Files that aren't published to Owyx aren't reviewed.",
 	},
 	installAnyway: {
 		id: 'app.modal.install-to-play.install-anyway',

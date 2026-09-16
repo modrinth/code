@@ -86,12 +86,12 @@ const BADGES = [
 		icon: StaffBadge,
 		name: defineMessage({
 			id: 'user.profile.badge.staff.name',
-			defaultMessage: 'Modrinth Team',
+			defaultMessage: 'Owyx Team',
 		}),
 		about: [
 			defineMessage({
 				id: 'user.profile.badge.staff.about.1',
-				defaultMessage: `This user works for Modrinth.`,
+				defaultMessage: `This user works for Owyx.`,
 			}),
 		],
 		criteria: [
@@ -114,11 +114,11 @@ const BADGES = [
 		about: [
 			defineMessage({
 				id: 'user.profile.badge.moderator.about.1',
-				defaultMessage: `This user works for Modrinth as a Content Moderator.`,
+				defaultMessage: `This user works for Owyx as a Content Moderator.`,
 			}),
 			defineMessage({
 				id: 'user.profile.badge.moderator.about.2',
-				defaultMessage: `Content Moderators on Modrinth review projects, handle reports, and help keep Modrinth safe.`,
+				defaultMessage: `Content Moderators on Owyx review projects, handle reports, and help keep Owyx safe.`,
 			}),
 		],
 		criteria: [
@@ -137,7 +137,7 @@ const BADGES = [
 		about: [
 			defineMessage({
 				id: 'user.profile.badge.alpha.about.1',
-				defaultMessage: `This user has been around since Modrinth Alpha, which ended in November 2020.`,
+				defaultMessage: `This user has been around since Owyx Alpha, which ended in November 2020.`,
 			}),
 		],
 		criteria: [
@@ -160,7 +160,7 @@ const BADGES = [
 		about: [
 			defineMessage({
 				id: 'user.profile.badge.beta.about.1',
-				defaultMessage: `This user has been around since Modrinth Beta, which ended in February 2022.`,
+				defaultMessage: `This user has been around since Owyx Beta, which ended in February 2022.`,
 			}),
 		],
 		criteria: [
@@ -173,7 +173,7 @@ const BADGES = [
 			href: 'https://modrinth.com/news/article/modrinth-beta/',
 			message: defineMessage({
 				id: 'user.profile.badge.beta.link',
-				defaultMessage: `Click to read about the launch of Modrinth Beta.`,
+				defaultMessage: `Click to read about the launch of Owyx Beta.`,
 			}),
 		},
 	},
@@ -181,12 +181,12 @@ const BADGES = [
 		icon: PlusBadge,
 		name: defineMessage({
 			id: 'user.profile.badge.plus.name',
-			defaultMessage: 'Modrinth+ Member',
+			defaultMessage: 'Owyx+ Member',
 		}),
 		about: [
 			defineMessage({
 				id: 'user.profile.badge.plus.about.1',
-				defaultMessage: `This user is going the extra mile to support Modrinth and the creators on the platform.`,
+				defaultMessage: `This user is going the extra mile to support Owyx and the creators on the platform.`,
 			}),
 		],
 		criteria: [
@@ -215,7 +215,7 @@ const BADGES = [
 		about: [
 			defineMessage({
 				id: 'user.profile.badge.pride.about.1',
-				defaultMessage: `This user participated in at least one of Modrinth's Pride fundraisers for the LGBTQ+ community.`,
+				defaultMessage: `This user participated in at least one of Owyx's Pride fundraisers for the LGBTQ+ community.`,
 			}),
 		],
 		criteria: [
@@ -240,7 +240,7 @@ const BADGES = [
 		about: [
 			defineMessage({
 				id: 'user.profile.badge.early-modpack-adopter.about.1',
-				defaultMessage: `This user helped us test Modpack projects on Modrinth before we launched them in May 2022.`,
+				defaultMessage: `This user helped us test Modpack projects on Owyx before we launched them in May 2022.`,
 			}),
 		],
 		criteria: [
@@ -264,7 +264,7 @@ const BADGES = [
 		about: [
 			defineMessage({
 				id: 'user.profile.badge.early-resourcepack-adopter.about.1',
-				defaultMessage: `This user helped us test Resource Pack projects on Modrinth before we launched them in August 2022.`,
+				defaultMessage: `This user helped us test Resource Pack projects on Owyx before we launched them in August 2022.`,
 			}),
 		],
 		criteria: [
@@ -288,7 +288,7 @@ const BADGES = [
 		about: [
 			defineMessage({
 				id: 'user.profile.badge.early-plugin-adopter.about.1',
-				defaultMessage: `This user helped us test Plugin projects on Modrinth before we launched them in August 2022.`,
+				defaultMessage: `This user helped us test Plugin projects on Owyx before we launched them in August 2022.`,
 			}),
 		],
 		criteria: [
@@ -312,7 +312,7 @@ const BADGES = [
 		about: [
 			defineMessage({
 				id: 'user.profile.badge.early-datapack-adopter.about.1',
-				defaultMessage: `This user helped us test Data Pack projects on Modrinth before we launched them in January 2023.`,
+				defaultMessage: `This user helped us test Data Pack projects on Owyx before we launched them in January 2023.`,
 			}),
 		],
 		criteria: [
@@ -332,7 +332,7 @@ const BADGES = [
 		about: [
 			defineMessage({
 				id: 'user.profile.badge.early-shader-adopter.about.1',
-				defaultMessage: `This user helped us test Shader projects on Modrinth before we launched them in January 2023.`,
+				defaultMessage: `This user helped us test Shader projects on Owyx before we launched them in January 2023.`,
 			}),
 		],
 		criteria: [
@@ -352,7 +352,7 @@ const BADGES = [
 		about: [
 			defineMessage({
 				id: 'user.profile.badge.early-server-adopter.about.1',
-				defaultMessage: `This user helped us test Server projects on Modrinth before we launched them in March 2026.`,
+				defaultMessage: `This user helped us test Server projects on Owyx before we launched them in March 2026.`,
 			}),
 		],
 		criteria: [
@@ -367,12 +367,12 @@ const BADGES = [
 		icon: EarlyHostingBadge,
 		name: defineMessage({
 			id: 'user.profile.badge.hosting-alpha.name',
-			defaultMessage: 'Modrinth Hosting Alpha Tester',
+			defaultMessage: 'Owyx Hosting Alpha Tester',
 		}),
 		about: [
 			defineMessage({
 				id: 'user.profile.badge.hosting-alpha.about.1',
-				defaultMessage: `This user participated in a closed alpha test of Modrinth Hosting before we launched Modrinth Hosting Beta in November 2024.`,
+				defaultMessage: `This user participated in a closed alpha test of Owyx Hosting before we launched Owyx Hosting Beta in November 2024.`,
 			}),
 		],
 		criteria: [], // TODO: Add badge on backend for Hosting Alpha Tester

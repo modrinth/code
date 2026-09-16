@@ -76,16 +76,16 @@ const EARS_NOTICE_PLACEHOLDER = '__EARS_MOD_NAME__'
 const messages = defineMessages({
 	modrinthPrideSection: {
 		id: 'app.skins.section.modrinth-pride',
-		defaultMessage: 'Modrinth Pride',
+		defaultMessage: 'Owyx Pride',
 	},
 	modrinthPrideTooltip: {
 		id: 'app.skins.section.modrinth-pride.tooltip',
 		defaultMessage:
-			'You received these skins for donating to a Modrinth Pride fundraiser during Pride Month.',
+			'You received these skins for donating to an Owyx Pride fundraiser during Pride Month.',
 	},
 	modrinthSection: {
 		id: 'app.skins.section.modrinth',
-		defaultMessage: 'Modrinth',
+		defaultMessage: 'Owyx',
 	},
 	defaultSkinsSection: {
 		id: 'app.skins.section.default-skins',
@@ -190,17 +190,32 @@ const messages = defineMessages({
 	},
 	demoTitle: {
 		id: 'app.skins.demo.title',
-		defaultMessage: 'Editing with a demo account',
+		defaultMessage: 'Microsoft account required',
 	},
 	demoDescription: {
 		id: 'app.skins.demo.description',
-		defaultMessage: 'Sign in to your Minecraft account to save and apply skins!',
+		defaultMessage: 'Sign in with Microsoft to save and apply skins. Offline nicknames cannot change skins.',
 	},
 	signInButton: {
 		id: 'app.skins.sign-in.button',
 		defaultMessage: 'Sign in to Microsoft',
 	},
 })
+
+type MinecraftCredential = {
+	profile: { id: string; name: string }
+	is_offline?: boolean
+	refresh_token?: string
+	access_token?: string
+}
+
+function isOfflineAccount(account?: MinecraftCredential | null) {
+	if (!account) return false
+	if (account.is_offline === true || account.refresh_token === 'owyx-offline') return true
+	const refresh = account.refresh_token ?? ''
+	const access = account.access_token ?? ''
+	return refresh === '' && (access === '' || access === '0')
+}
 
 const editSkinModal = useTemplateRef('editSkinModal')
 const addSkinFileInput = useTemplateRef<HTMLInputElement>('addSkinFileInput')
@@ -218,8 +233,13 @@ const capes = ref<Cape[]>([])
 const offline = ref(!navigator.onLine)
 
 const accountsCard = inject('accountsCard') as Ref<typeof AccountsCard>
-const currentUser = ref(undefined)
+const currentUser = ref<MinecraftCredential | undefined>(undefined)
 const currentUserId = ref<string | undefined>(undefined)
+
+/** Skins API needs a licensed Microsoft account — offline nicknames count as demo. */
+const needsMicrosoftAccount = computed(
+	() => !currentUser.value || isOfflineAccount(currentUser.value),
+)
 
 const username = computed(() => currentUser.value?.profile?.name ?? undefined)
 const selectedSkin = ref<Skin | null>(null)
@@ -755,6 +775,7 @@ async function applySelectedSkin() {
 	const skinToApply = selectedSkin.value
 	if (
 		!currentUser.value ||
+		isOfflineAccount(currentUser.value) ||
 		!skinToApply ||
 		!hasPendingSkinChange.value ||
 		isApplyingSkin.value ||
@@ -803,7 +824,9 @@ async function loadCurrentUser() {
 		currentUserId.value = defaultId
 
 		const allAccounts = await users()
-		currentUser.value = allAccounts.find((acc) => acc.profile.id === defaultId)
+		currentUser.value = allAccounts.find(
+			(acc: MinecraftCredential) => acc.profile.id === defaultId,
+		) as MinecraftCredential | undefined
 	} catch (e) {
 		handleError(e as Error)
 		currentUser.value = undefined
@@ -1063,7 +1086,7 @@ await loadSkins()
 	<EditSkinModal
 		ref="editSkinModal"
 		:capes="capes"
-		:demo="!currentUser"
+		:demo="needsMicrosoftAccount"
 		@saved="onSkinSaved"
 		@deleted="() => loadSkins()"
 	/>
@@ -1082,7 +1105,7 @@ await loadSkins()
 		@proceed="deleteSkin"
 	/>
 
-	<div class="skin-layout box-border grow p-4" :class="{ 'pb-40': !currentUser }">
+	<div class="skin-layout box-border grow p-4" :class="{ 'pb-40': needsMicrosoftAccount }">
 		<div class="sticky top-6 self-start p-2 pt-0">
 			<h1 class="m-0 text-2xl font-bold flex items-center gap-2">
 				{{ formatMessage(appMessages.skinSelectorLabel) }}
@@ -1138,7 +1161,7 @@ await loadSkins()
 								</Button>
 								<Button
 									v-tooltip="
-										!currentUser
+										needsMicrosoftAccount
 											? formatMessage(messages.demoApplyTooltip)
 											: selectedSkinHasEarsFeatures
 												? formatMessage(messages.applyButton)
@@ -1148,7 +1171,7 @@ await loadSkins()
 									color="brand"
 									size="lg"
 									class="skin-preview-action-button"
-									:disabled="!currentUser || isApplyingSkin || isSkinManagementReadOnly"
+									:disabled="needsMicrosoftAccount || isApplyingSkin || isSkinManagementReadOnly"
 									:aria-label="formatMessage(messages.applyButton)"
 									@click="applySelectedSkin"
 								>
@@ -1261,7 +1284,7 @@ await loadSkins()
 		</div>
 	</div>
 
-	<div v-if="!currentUser" class="sticky w-full bottom-0 z-20 p-4 pt-0">
+	<div v-if="needsMicrosoftAccount" class="sticky w-full bottom-0 z-20 p-4 pt-0">
 		<div
 			class="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 rounded-[20px] border border-solid border-surface-5 bg-surface-3 p-4"
 		>

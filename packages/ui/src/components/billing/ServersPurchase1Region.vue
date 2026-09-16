@@ -172,7 +172,7 @@ const messages = defineMessages({
 	},
 	regionUnsupported: {
 		id: 'servers.region.region-unsupported',
-		defaultMessage: `Region not listed? <link>Let us know where you'd like to see Modrinth Hosting next!</link>`,
+		defaultMessage: `Region not listed? <link>Let us know where you'd like to see Owyx Hosting next!</link>`,
 	},
 	customPrompt: {
 		id: 'servers.region.custom.prompt',

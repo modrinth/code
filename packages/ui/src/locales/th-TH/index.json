@@ -1,648 +1,647 @@
 {
-  "action.no-permission": {
-    "defaultMessage": "คุณไม่มีสิทธิ์"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "เช่น YouTube"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "ใส่ชื่อผู้ใช้"
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "สร้างโดย {user}"
-  },
-  "badge.beta": {
-    "defaultMessage": "เบต้า"
-  },
-  "badge.new": {
-    "defaultMessage": "ใหม่"
-  },
-  "billing.resubscribe-modal.cancel": {
-    "defaultMessage": "ยกเลิก"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} กิกะไบต์ RAM"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} กิกะไบต์ พื้นที่จัดเก็บ"
-  },
-  "button.accept": {
-    "defaultMessage": "ยอมรับ"
-  },
-  "button.back": {
-    "defaultMessage": "กลับ"
-  },
-  "button.cancel": {
-    "defaultMessage": "ยกเลิก"
-  },
-  "button.clear": {
-    "defaultMessage": "ล้าง"
-  },
-  "button.close": {
-    "defaultMessage": "ปิด"
-  },
-  "button.continue": {
-    "defaultMessage": "ดำเนินการต่อ"
-  },
-  "button.copy-id": {
-    "defaultMessage": "คัดลอก ID"
-  },
-  "button.copy-permalink": {
-    "defaultMessage": "คัดลอกลิงก์ถาวร"
-  },
-  "button.create-a-project": {
-    "defaultMessage": "สร้างโปรเจกต์"
-  },
-  "button.disable": {
-    "defaultMessage": "ปิด"
-  },
-  "button.download": {
-    "defaultMessage": "ดาวน์โหลด"
-  },
-  "button.downloading": {
-    "defaultMessage": "กำลังดาวน์โหลด"
-  },
-  "button.edit": {
-    "defaultMessage": "แก้ไข"
-  },
-  "button.enable": {
-    "defaultMessage": "เปิด"
-  },
-  "button.follow": {
-    "defaultMessage": "ติดตาม"
-  },
-  "button.install": {
-    "defaultMessage": "ติดตั้ง"
-  },
-  "button.more-options": {
-    "defaultMessage": "ตัวเลือกเพิ่มเติม"
-  },
-  "button.next": {
-    "defaultMessage": "ถัดไป"
-  },
-  "button.open-folder": {
-    "defaultMessage": "เปิดโฟลเดอร์"
-  },
-  "button.play": {
-    "defaultMessage": "เล่น"
-  },
-  "button.refresh": {
-    "defaultMessage": "รีเฟรช"
-  },
-  "button.remove-image": {
-    "defaultMessage": "ลบรูป"
-  },
-  "button.report": {
-    "defaultMessage": "รายงาน"
-  },
-  "button.reset": {
-    "defaultMessage": "คืนค่า"
-  },
-  "button.save": {
-    "defaultMessage": "บันทึก"
-  },
-  "button.save-changes": {
-    "defaultMessage": "บันทึกการเปลี่ยนแปลง"
-  },
-  "button.saving": {
-    "defaultMessage": "บันทึก"
-  },
-  "button.sign-in": {
-    "defaultMessage": "เข้าสู่ระบบ"
-  },
-  "button.sign-out": {
-    "defaultMessage": "ออกจากระบบ"
-  },
-  "button.sign-up": {
-    "defaultMessage": "ลงทะเบียน"
-  },
-  "button.stop": {
-    "defaultMessage": "หยุด"
-  },
-  "button.unfollow": {
-    "defaultMessage": "เลิกติดตาม"
-  },
-  "button.upload-image": {
-    "defaultMessage": "อัพโหลดภาพ"
-  },
-  "changelog.justNow": {
-    "defaultMessage": "ตอนนี้"
-  },
-  "content.page-layout.update-all": {
-    "defaultMessage": "อัปเดตทั้งหมด"
-  },
-  "content.page-layout.upload-files": {
-    "defaultMessage": "อัปโหลดไฟล์"
-  },
-  "content.selection-bar.bulk.deleting": {
-    "defaultMessage": "กำลังลบ {progress}/{total}{contentType}..."
-  },
-  "content.selection-bar.bulk.deleting-waiting": {
-    "defaultMessage": "กำลังลบ {contentType}..."
-  },
-  "content.selection-bar.bulk.disabling": {
-    "defaultMessage": "กำลังปิดการใช้งาน {progress}/{total} {contentType}..."
-  },
-  "content.selection-bar.bulk.disabling-waiting": {
-    "defaultMessage": "กำลังปิดการใช้งาน {contentType}..."
-  },
-  "content.selection-bar.bulk.enabling": {
-    "defaultMessage": "กำลังเปิดการใช้งาน {progress}/{total} {contentType}..."
-  },
-  "content.selection-bar.bulk.enabling-waiting": {
-    "defaultMessage": "กำลังเปิดการใช้งาน {contentType}..."
-  },
-  "content.selection-bar.bulk.updating": {
-    "defaultMessage": "กำลังอัปเดต {progress}/{total} {contentType}..."
-  },
-  "content.selection-bar.bulk.updating-waiting": {
-    "defaultMessage": "กำลังอัปเดต {contentType}..."
-  },
-  "content.selection-bar.selected-count-simple": {
-    "defaultMessage": "{count, number} เลือกแล้ว"
-  },
-  "files.editor.failed-to-open-text": {
-    "defaultMessage": "ไม่สามารถโหลดไฟล์เนื้อหา"
-  },
-  "files.zip-url-modal.install-button": {
-    "defaultMessage": "ติดตั้ง"
-  },
-  "form.label.address-line-2": {
-    "defaultMessage": "ที่อยู่บรรทัดที่ 2 (ไม่จำเป็น)"
-  },
-  "form.label.amount": {
-    "defaultMessage": "จำนวน"
-  },
-  "form.label.bank-name": {
-    "defaultMessage": "ชื่อธนาคาร"
-  },
-  "form.label.business-name": {
-    "defaultMessage": "ชื่อบริษัท"
-  },
-  "form.label.city": {
-    "defaultMessage": "เมือง"
-  },
-  "form.label.country": {
-    "defaultMessage": "ประเทศ"
-  },
-  "form.label.date-of-birth": {
-    "defaultMessage": "วันเกิด"
-  },
-  "form.label.email": {
-    "defaultMessage": "อีเมล"
-  },
-  "form.label.first-name": {
-    "defaultMessage": "ชื่อจริง"
-  },
-  "form.label.last-name": {
-    "defaultMessage": "นามสกุล"
-  },
-  "form.label.postal-code": {
-    "defaultMessage": "รหัสไปรษณีย์"
-  },
-  "form.label.state-province": {
-    "defaultMessage": "รัฐ หรือ จังหวัด"
-  },
-  "form.placeholder.address": {
-    "defaultMessage": "กรอกที่อยู่"
-  },
-  "form.placeholder.amount": {
-    "defaultMessage": "กรอกจำนวน"
-  },
-  "form.placeholder.bank-name": {
-    "defaultMessage": "กรอกชื่อธนาคาร"
-  },
-  "form.placeholder.bank-name-dropdown": {
-    "defaultMessage": "เลือกธนาคาร"
-  },
-  "form.placeholder.business-name": {
-    "defaultMessage": "กรอกชื่อบริษัท"
-  },
-  "form.placeholder.city": {
-    "defaultMessage": "กรอกเมือง"
-  },
-  "form.placeholder.country": {
-    "defaultMessage": "เลือกประเทศ"
-  },
-  "form.placeholder.email": {
-    "defaultMessage": "กรอกอีเมล"
-  },
-  "form.placeholder.first-name": {
-    "defaultMessage": "กรอกชื่อจริง"
-  },
-  "form.placeholder.last-name": {
-    "defaultMessage": "กรอกนามสกุล"
-  },
-  "form.placeholder.postal-code": {
-    "defaultMessage": "กรอกรหัสไปรษณีย์"
-  },
-  "form.placeholder.state": {
-    "defaultMessage": "กรอกรัฐหรือจังหวัด"
-  },
-  "hosting.content.failed-to-bulk-delete": {
-    "defaultMessage": "ไม่สามารถลบเนื้อหาได้"
-  },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "ไม่สามารถปิดใช้งานเนื้อหาได้"
-  },
-  "icon-select.edit": {
-    "defaultMessage": "แก้ไขไอคอน"
-  },
-  "icon-select.remove": {
-    "defaultMessage": "ลบไอคอน"
-  },
-  "icon-select.replace": {
-    "defaultMessage": "เปลี่ยนไอคอน"
-  },
-  "icon-select.select": {
-    "defaultMessage": "เลือกรูปไอคอน"
-  },
-  "input.search.placeholder": {
-    "defaultMessage": "ค้นหา..."
-  },
-  "input.view.gallery": {
-    "defaultMessage": "มุมมองแกลเลอรี"
-  },
-  "input.view.grid": {
-    "defaultMessage": "มุมมองตาราง"
-  },
-  "input.view.list": {
-    "defaultMessage": "มุมมองแถว"
-  },
-  "instance.worlds.game_mode.adventure": {
-    "defaultMessage": "โหมดผจญภัย"
-  },
-  "instance.worlds.game_mode.creative": {
-    "defaultMessage": "โหมดสร้างสรรค์"
-  },
-  "instance.worlds.game_mode.spectator": {
-    "defaultMessage": "โหมดผู้ชม"
-  },
-  "instance.worlds.game_mode.survival": {
-    "defaultMessage": "โหมดเอาชีวิตรอด"
-  },
-  "instance.worlds.game_mode.unknown": {
-    "defaultMessage": "ไม่ทราบเกมโหมด"
-  },
-  "instances.content-install.game-version-placeholder": {
-    "defaultMessage": "เลือกเวอร์ชั่น"
-  },
-  "instances.content-install.header": {
-    "defaultMessage": "ติดตั้งโปรเจกต์"
-  },
-  "instances.content-install.install-button": {
-    "defaultMessage": "ติดตั้ง"
-  },
-  "instances.content-install.installed-badge": {
-    "defaultMessage": "ติดตั้งแล้ว"
-  },
-  "instances.content-install.instance-type": {
-    "defaultMessage": "ประเถทอินสแตนซ์"
-  },
-  "instances.content-install.name-label": {
-    "defaultMessage": "ชื่อ"
-  },
-  "instances.content-install.name-placeholder": {
-    "defaultMessage": "ใส่ชื่ออินสแตนซ์"
-  },
-  "instances.content-install.new-tab": {
-    "defaultMessage": "อินสแตนซ์อันใหม่"
-  },
-  "instances.content-install.search-placeholder": {
-    "defaultMessage": "ค้นหาอินสแตนซ์"
-  },
-  "label.available": {
-    "defaultMessage": "ว่างอยู่ {amount}"
-  },
-  "label.changes-saved": {
-    "defaultMessage": "บันทึกการเปลี่ยนแปลงแล้ว"
-  },
-  "label.collections": {
-    "defaultMessage": "คอลเลกชัน"
-  },
-  "label.content": {
-    "defaultMessage": "เนื้อหา"
-  },
-  "label.created-ago": {
-    "defaultMessage": "สร้างขึ้นเมื่อ {ago}"
-  },
-  "label.dashboard": {
-    "defaultMessage": "แดชบอร์ด"
-  },
-  "label.delete": {
-    "defaultMessage": "ลบ"
-  },
-  "label.description": {
-    "defaultMessage": "คำอธิบาย"
-  },
-  "label.error": {
-    "defaultMessage": "ข้อผิดพลาด"
-  },
-  "label.followed-projects": {
-    "defaultMessage": "โปรเจกต์ที่ติดตาม"
-  },
-  "label.loading": {
-    "defaultMessage": "กำลังโหลด..."
-  },
-  "label.moderation": {
-    "defaultMessage": "การกลั่นกรอง"
-  },
-  "label.notifications": {
-    "defaultMessage": "แจ้งเตือน"
-  },
-  "label.or": {
-    "defaultMessage": "หรือ"
-  },
-  "label.password": {
-    "defaultMessage": "รหัสผ่าน"
-  },
-  "label.public": {
-    "defaultMessage": "สาธารณะ"
-  },
-  "label.rejected": {
-    "defaultMessage": "ไม่อนุมัติ"
-  },
-  "label.saved": {
-    "defaultMessage": "บันทึกแล้ว"
-  },
-  "label.scopes": {
-    "defaultMessage": "ขอบเขต"
-  },
-  "label.server": {
-    "defaultMessage": "เซิร์ฟเวอร์"
-  },
-  "label.servers": {
-    "defaultMessage": "เซิร์ฟเวอร์"
-  },
-  "label.settings": {
-    "defaultMessage": "ตั้งค่า"
-  },
-  "label.singleplayer": {
-    "defaultMessage": "เล่นคนเดียว"
-  },
-  "label.title": {
-    "defaultMessage": "ชื่อ"
-  },
-  "label.unlisted": {
-    "defaultMessage": "ไม่เปิดเผย"
-  },
-  "label.visibility": {
-    "defaultMessage": "การเปิดเผย"
-  },
-  "modal.add-payment-method.action": {
-    "defaultMessage": "เพิ่มช่องทางการชำระเงิน"
-  },
-  "modal.add-payment-method.title": {
-    "defaultMessage": "กำลังเพิ่มช่องทางการชำระเงิน"
-  },
-  "notification.error.title": {
-    "defaultMessage": "เกิดข้อผิดพลาด"
-  },
-  "omorphia.component.badge.label.accepted": {
-    "defaultMessage": "ยอมรับแล้ว"
-  },
-  "omorphia.component.badge.label.approved": {
-    "defaultMessage": "อนุมัติแล้ว"
-  },
-  "omorphia.component.badge.label.archived": {
-    "defaultMessage": "จัดเก็บแล้ว"
-  },
-  "omorphia.component.badge.label.closed": {
-    "defaultMessage": "ถูกปิด"
-  },
-  "omorphia.component.badge.label.draft": {
-    "defaultMessage": "แบบร่าง"
-  },
-  "omorphia.component.badge.label.failed": {
-    "defaultMessage": "ไม่สำเร็จ"
-  },
-  "omorphia.component.badge.label.modrinth-team": {
-    "defaultMessage": "ทีม Modrinth"
-  },
-  "omorphia.component.badge.label.pending": {
-    "defaultMessage": "กําลังดำเนินการ"
-  },
-  "omorphia.component.badge.label.private": {
-    "defaultMessage": "ส่วนตัว"
-  },
-  "omorphia.component.badge.label.processed": {
-    "defaultMessage": "ประมวลผลแล้ว"
-  },
-  "omorphia.component.badge.label.rejected": {
-    "defaultMessage": "ถูกปฏิเสธ"
-  },
-  "omorphia.component.badge.label.returned": {
-    "defaultMessage": "ถูกตีกลับ"
-  },
-  "omorphia.component.badge.label.safe": {
-    "defaultMessage": "ผ่าน"
-  },
-  "omorphia.component.badge.label.under-review": {
-    "defaultMessage": "อยู่ภายใต้การพิจารณา"
-  },
-  "omorphia.component.badge.label.unlisted": {
-    "defaultMessage": "ไม่เผยแพร่"
-  },
-  "omorphia.component.badge.label.unsafe": {
-    "defaultMessage": "ไม่ผ่าน"
-  },
-  "omorphia.component.copy.action.copy": {
-    "defaultMessage": "คัดลอกโค้ดไปยังคลิปบอร์ด"
-  },
-  "omorphia.component.environment-indicator.label.client": {
-    "defaultMessage": "ไคลเอ็นต์"
-  },
-  "omorphia.component.environment-indicator.label.client-and-server": {
-    "defaultMessage": "ไคลเอ็นต์และเซิร์ฟเวอร์"
-  },
-  "omorphia.component.environment-indicator.label.client-or-server": {
-    "defaultMessage": "ไคลเอ็นต์และเซิร์ฟเวอร์"
-  },
-  "omorphia.component.environment-indicator.label.server": {
-    "defaultMessage": "เซิร์ฟเวอร์"
-  },
-  "omorphia.component.environment-indicator.label.unsupported": {
-    "defaultMessage": "ไม่รองรับ"
-  },
-  "payment-method.venmo": {
-    "defaultMessage": "Venmo"
-  },
-  "payment-method.virtual-visa": {
-    "defaultMessage": "Virtual Visa"
-  },
-  "payment-method.virtual-visa-plural": {
-    "defaultMessage": "Virtual Visas"
-  },
-  "project-type.all": {
-    "defaultMessage": "ทั้งหมด"
-  },
-  "project-type.mod.category": {
-    "defaultMessage": "ม็อด"
-  },
-  "project-type.modpack.category": {
-    "defaultMessage": "ม็อดแพ็ก"
-  },
-  "project-type.plugin.category": {
-    "defaultMessage": "ปลั๊กอิน"
-  },
-  "project-type.resourcepack.category": {
-    "defaultMessage": "รีซอร์ซแพ็ก"
-  },
-  "project-type.server.category": {
-    "defaultMessage": "เซิร์ฟเวอร์"
-  },
-  "project-type.shader.category": {
-    "defaultMessage": "แสงเงา"
-  },
-  "project.about.compatibility.game.minecraftJava": {
-    "defaultMessage": "Minecraft: Java Edition"
-  },
-  "project.about.compatibility.platforms": {
-    "defaultMessage": "แพลตฟอร์ม"
-  },
-  "project.about.creators.title": {
-    "defaultMessage": "ผู้สร้าง"
-  },
-  "project.about.details.created": {
-    "defaultMessage": "สร้างขึ้นเมื่อ {date}"
-  },
-  "project.about.details.licensed": {
-    "defaultMessage": "ไลเซนส์ {license}"
-  },
-  "project.about.details.published": {
-    "defaultMessage": "เผยแพร่เมื่อ {date}"
-  },
-  "project.about.details.updated": {
-    "defaultMessage": "อัพเดทเมื่อ {date}"
-  },
-  "project.about.links.discord": {
-    "defaultMessage": "เข้าร่วม Discord server"
-  },
-  "project.about.links.donate.bmac": {
-    "defaultMessage": "Buy Me a Coffee"
-  },
-  "project.about.links.donate.generic": {
-    "defaultMessage": "สนับสนุน"
-  },
-  "project.about.links.donate.github": {
-    "defaultMessage": "สปอนเซอร์บน GitHub"
-  },
-  "project.about.links.donate.kofi": {
-    "defaultMessage": "สนับสนุนบน Ko-fi"
-  },
-  "project.about.links.donate.patreon": {
-    "defaultMessage": "สนับสนุนบน Patreon"
-  },
-  "project.about.links.donate.paypal": {
-    "defaultMessage": "สนับสนุนบน PayPal"
-  },
-  "project.about.links.issues": {
-    "defaultMessage": "รายงานปัญหา"
-  },
-  "project.about.links.title": {
-    "defaultMessage": "ลิงก์"
-  },
-  "project.server.status.offline": {
-    "defaultMessage": "ออฟไลน์"
-  },
-  "project.server.status.offline.tooltip": {
-    "defaultMessage": "เซิร์ฟเวอร์ออฟไลน์อยู่"
-  },
-  "project.server.status.online": {
-    "defaultMessage": "ออนไลน์"
-  },
-  "project.settings.description.title": {
-    "defaultMessage": "คำอธิบาย"
-  },
-  "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
-    "defaultMessage": "ไม่จำเป็นบนทั้งคู่แต่ทำงานได้ดีที่สุดเพื่อติดตั้งบนทั้งคู่"
-  },
-  "project.settings.environment.client_and_server.optional_client.title": {
-    "defaultMessage": "ไม่จำเป็นสำหรับไคลเอนต์"
-  },
-  "project.settings.environment.client_and_server.optional_server.title": {
-    "defaultMessage": "ไม่จำเป็นบนเซิร์ฟเวอร์"
-  },
-  "project.settings.environment.client_and_server.required_both.title": {
-    "defaultMessage": "จำเป็นบนทั้งคู่"
-  },
-  "project.settings.environment.client_and_server.title": {
-    "defaultMessage": "ไคลเอ็นต์และเซิร์ฟเวอร์"
-  },
-  "project.settings.environment.client_only.title": {
-    "defaultMessage": "ฝั่งไคลเอนต์เท่านั้น"
-  },
-  "project.versions.channel.alpha.symbol": {
-    "defaultMessage": "A"
-  },
-  "project.versions.channel.beta.symbol": {
-    "defaultMessage": "B"
-  },
-  "project.versions.channel.release.symbol": {
-    "defaultMessage": "R"
-  },
-  "project.visibility.draft": {
-    "defaultMessage": "แบบร่าง"
-  },
-  "project.visibility.private": {
-    "defaultMessage": "ส่วนตัว"
-  },
-  "project.visibility.public": {
-    "defaultMessage": "สาธารณะ"
-  },
-  "project.visibility.rejected": {
-    "defaultMessage": "ไม่อนุมัติ"
-  },
-  "project.visibility.under-review": {
-    "defaultMessage": "อยู่ภายใต้การพิจารณา"
-  },
-  "project.visibility.unknown": {
-    "defaultMessage": "ไม่ทราบ"
-  },
-  "project.visibility.unlisted": {
-    "defaultMessage": "ไม่เปิดเผย"
-  },
-  "search.filter_type.environment.server": {
-    "defaultMessage": "เซิร์ฟเวอร์"
-  },
-  "search.filter_type.game_version.all_versions": {
-    "defaultMessage": "ดูทุกเวอร์ชั่น"
-  },
-  "search.filter_type.server_content_type": {
-    "defaultMessage": "ประเภท"
-  },
-  "servers.listing.server-icon-alt": {
-    "defaultMessage": "เซิร์ฟเวอร์ไอคอน"
-  },
-  "servers.medal-listing.server-icon-alt": {
-    "defaultMessage": "เซิร์ฟเวอร์ไอคอน"
-  },
-  "servers.region.prompt": {
-    "defaultMessage": "คุณอยากตั้งเซิร์ฟเวอร์ไว้ที่ไหน"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "ยุโรปตะวันตก"
-  },
-  "settings.account.title": {
-    "defaultMessage": "บัญชีและความปลอดภัย"
-  },
-  "settings.authorized-apps.title": {
-    "defaultMessage": "แอพที่ได้รับอนุญาต"
-  },
-  "settings.display.theme.dark": {
-    "defaultMessage": "มืด"
-  },
-  "settings.display.theme.light": {
-    "defaultMessage": "สว่าง"
-  },
-  "settings.display.theme.oled": {
-    "defaultMessage": "OLED"
-  },
-  "settings.display.theme.title": {
-    "defaultMessage": "ธีมสี"
-  },
-  "settings.language.title": {
-    "defaultMessage": "ภาษา"
-  }
+	"action.no-permission": {
+		"defaultMessage": "คุณไม่มีสิทธิ์"
+	},
+	"affiliate.create.title.placeholder": {
+		"defaultMessage": "เช่น YouTube"
+	},
+	"affiliate.create.user.placeholder": {
+		"defaultMessage": "ใส่ชื่อผู้ใช้"
+	},
+	"affiliate.createdBy": {
+		"defaultMessage": "สร้างโดย {user}"
+	},
+	"badge.beta": {
+		"defaultMessage": "เบต้า"
+	},
+	"badge.new": {
+		"defaultMessage": "ใหม่"
+	},
+	"billing.resubscribe-modal.cancel": {
+		"defaultMessage": "ยกเลิก"
+	},
+	"billing.resubscribe-modal.ram": {
+		"defaultMessage": "{ramGb} กิกะไบต์ RAM"
+	},
+	"billing.resubscribe-modal.storage": {
+		"defaultMessage": "{storageGb} กิกะไบต์ พื้นที่จัดเก็บ"
+	},
+	"button.accept": {
+		"defaultMessage": "ยอมรับ"
+	},
+	"button.back": {
+		"defaultMessage": "กลับ"
+	},
+	"button.cancel": {
+		"defaultMessage": "ยกเลิก"
+	},
+	"button.clear": {
+		"defaultMessage": "ล้าง"
+	},
+	"button.close": {
+		"defaultMessage": "ปิด"
+	},
+	"button.continue": {
+		"defaultMessage": "ดำเนินการต่อ"
+	},
+	"button.copy-id": {
+		"defaultMessage": "คัดลอก ID"
+	},
+	"button.copy-permalink": {
+		"defaultMessage": "คัดลอกลิงก์ถาวร"
+	},
+	"button.create-a-project": {
+		"defaultMessage": "สร้างโปรเจกต์"
+	},
+	"button.disable": {
+		"defaultMessage": "ปิด"
+	},
+	"button.download": {
+		"defaultMessage": "ดาวน์โหลด"
+	},
+	"button.downloading": {
+		"defaultMessage": "กำลังดาวน์โหลด"
+	},
+	"button.edit": {
+		"defaultMessage": "แก้ไข"
+	},
+	"button.enable": {
+		"defaultMessage": "เปิด"
+	},
+	"button.follow": {
+		"defaultMessage": "ติดตาม"
+	},
+	"button.install": {
+		"defaultMessage": "ติดตั้ง"
+	},
+	"button.more-options": {
+		"defaultMessage": "ตัวเลือกเพิ่มเติม"
+	},
+	"button.next": {
+		"defaultMessage": "ถัดไป"
+	},
+	"button.open-folder": {
+		"defaultMessage": "เปิดโฟลเดอร์"
+	},
+	"button.play": {
+		"defaultMessage": "เล่น"
+	},
+	"button.refresh": {
+		"defaultMessage": "รีเฟรช"
+	},
+	"button.remove-image": {
+		"defaultMessage": "ลบรูป"
+	},
+	"button.report": {
+		"defaultMessage": "รายงาน"
+	},
+	"button.reset": {
+		"defaultMessage": "คืนค่า"
+	},
+	"button.save": {
+		"defaultMessage": "บันทึก"
+	},
+	"button.save-changes": {
+		"defaultMessage": "บันทึกการเปลี่ยนแปลง"
+	},
+	"button.saving": {
+		"defaultMessage": "บันทึก"
+	},
+	"button.sign-in": {
+		"defaultMessage": "เข้าสู่ระบบ"
+	},
+	"button.sign-out": {
+		"defaultMessage": "ออกจากระบบ"
+	},
+	"button.sign-up": {
+		"defaultMessage": "ลงทะเบียน"
+	},
+	"button.stop": {
+		"defaultMessage": "หยุด"
+	},
+	"button.unfollow": {
+		"defaultMessage": "เลิกติดตาม"
+	},
+	"button.upload-image": {
+		"defaultMessage": "อัพโหลดภาพ"
+	},
+	"changelog.justNow": {
+		"defaultMessage": "ตอนนี้"
+	},
+	"content.page-layout.update-all": {
+		"defaultMessage": "อัปเดตทั้งหมด"
+	},
+	"content.page-layout.upload-files": {
+		"defaultMessage": "อัปโหลดไฟล์"
+	},
+	"content.selection-bar.bulk.deleting": {
+		"defaultMessage": "กำลังลบ {progress}/{total}{contentType}..."
+	},
+	"content.selection-bar.bulk.deleting-waiting": {
+		"defaultMessage": "กำลังลบ {contentType}..."
+	},
+	"content.selection-bar.bulk.disabling": {
+		"defaultMessage": "กำลังปิดการใช้งาน {progress}/{total} {contentType}..."
+	},
+	"content.selection-bar.bulk.disabling-waiting": {
+		"defaultMessage": "กำลังปิดการใช้งาน {contentType}..."
+	},
+	"content.selection-bar.bulk.enabling": {
+		"defaultMessage": "กำลังเปิดการใช้งาน {progress}/{total} {contentType}..."
+	},
+	"content.selection-bar.bulk.enabling-waiting": {
+		"defaultMessage": "กำลังเปิดการใช้งาน {contentType}..."
+	},
+	"content.selection-bar.bulk.updating": {
+		"defaultMessage": "กำลังอัปเดต {progress}/{total} {contentType}..."
+	},
+	"content.selection-bar.bulk.updating-waiting": {
+		"defaultMessage": "กำลังอัปเดต {contentType}..."
+	},
+	"content.selection-bar.selected-count-simple": {
+		"defaultMessage": "{count, number} เลือกแล้ว"
+	},
+	"files.editor.failed-to-open-text": {
+		"defaultMessage": "ไม่สามารถโหลดไฟล์เนื้อหา"
+	},
+	"files.zip-url-modal.install-button": {
+		"defaultMessage": "ติดตั้ง"
+	},
+	"form.label.address-line-2": {
+		"defaultMessage": "ที่อยู่บรรทัดที่ 2 (ไม่จำเป็น)"
+	},
+	"form.label.amount": {
+		"defaultMessage": "จำนวน"
+	},
+	"form.label.bank-name": {
+		"defaultMessage": "ชื่อธนาคาร"
+	},
+	"form.label.business-name": {
+		"defaultMessage": "ชื่อบริษัท"
+	},
+	"form.label.city": {
+		"defaultMessage": "เมือง"
+	},
+	"form.label.country": {
+		"defaultMessage": "ประเทศ"
+	},
+	"form.label.date-of-birth": {
+		"defaultMessage": "วันเกิด"
+	},
+	"form.label.email": {
+		"defaultMessage": "อีเมล"
+	},
+	"form.label.first-name": {
+		"defaultMessage": "ชื่อจริง"
+	},
+	"form.label.last-name": {
+		"defaultMessage": "นามสกุล"
+	},
+	"form.label.postal-code": {
+		"defaultMessage": "รหัสไปรษณีย์"
+	},
+	"form.label.state-province": {
+		"defaultMessage": "รัฐ หรือ จังหวัด"
+	},
+	"form.placeholder.address": {
+		"defaultMessage": "กรอกที่อยู่"
+	},
+	"form.placeholder.amount": {
+		"defaultMessage": "กรอกจำนวน"
+	},
+	"form.placeholder.bank-name": {
+		"defaultMessage": "กรอกชื่อธนาคาร"
+	},
+	"form.placeholder.bank-name-dropdown": {
+		"defaultMessage": "เลือกธนาคาร"
+	},
+	"form.placeholder.business-name": {
+		"defaultMessage": "กรอกชื่อบริษัท"
+	},
+	"form.placeholder.city": {
+		"defaultMessage": "กรอกเมือง"
+	},
+	"form.placeholder.country": {
+		"defaultMessage": "เลือกประเทศ"
+	},
+	"form.placeholder.email": {
+		"defaultMessage": "กรอกอีเมล"
+	},
+	"form.placeholder.first-name": {
+		"defaultMessage": "กรอกชื่อจริง"
+	},
+	"form.placeholder.last-name": {
+		"defaultMessage": "กรอกนามสกุล"
+	},
+	"form.placeholder.postal-code": {
+		"defaultMessage": "กรอกรหัสไปรษณีย์"
+	},
+	"form.placeholder.state": {
+		"defaultMessage": "กรอกรัฐหรือจังหวัด"
+	},
+	"hosting.content.failed-to-bulk-delete": {
+		"defaultMessage": "ไม่สามารถลบเนื้อหาได้"
+	},
+	"hosting.content.failed-to-bulk-disable": {
+		"defaultMessage": "ไม่สามารถปิดใช้งานเนื้อหาได้"
+	},
+	"icon-select.edit": {
+		"defaultMessage": "แก้ไขไอคอน"
+	},
+	"icon-select.remove": {
+		"defaultMessage": "ลบไอคอน"
+	},
+	"icon-select.replace": {
+		"defaultMessage": "เปลี่ยนไอคอน"
+	},
+	"icon-select.select": {
+		"defaultMessage": "เลือกรูปไอคอน"
+	},
+	"input.search.placeholder": {
+		"defaultMessage": "ค้นหา..."
+	},
+	"input.view.gallery": {
+		"defaultMessage": "มุมมองแกลเลอรี"
+	},
+	"input.view.grid": {
+		"defaultMessage": "มุมมองตาราง"
+	},
+	"input.view.list": {
+		"defaultMessage": "มุมมองแถว"
+	},
+	"instance.worlds.game_mode.adventure": {
+		"defaultMessage": "โหมดผจญภัย"
+	},
+	"instance.worlds.game_mode.creative": {
+		"defaultMessage": "โหมดสร้างสรรค์"
+	},
+	"instance.worlds.game_mode.spectator": {
+		"defaultMessage": "โหมดผู้ชม"
+	},
+	"instance.worlds.game_mode.survival": {
+		"defaultMessage": "โหมดเอาชีวิตรอด"
+	},
+	"instance.worlds.game_mode.unknown": {
+		"defaultMessage": "ไม่ทราบเกมโหมด"
+	},
+	"instances.content-install.game-version-placeholder": {
+		"defaultMessage": "เลือกเวอร์ชั่น"
+	},
+	"instances.content-install.header": {
+		"defaultMessage": "ติดตั้งโปรเจกต์"
+	},
+	"instances.content-install.install-button": {
+		"defaultMessage": "ติดตั้ง"
+	},
+	"instances.content-install.installed-badge": {
+		"defaultMessage": "ติดตั้งแล้ว"
+	},
+	"instances.content-install.instance-type": {
+		"defaultMessage": "ประเถทอินสแตนซ์"
+	},
+	"instances.content-install.name-label": {
+		"defaultMessage": "ชื่อ"
+	},
+	"instances.content-install.name-placeholder": {
+		"defaultMessage": "ใส่ชื่ออินสแตนซ์"
+	},
+	"instances.content-install.new-tab": {
+		"defaultMessage": "อินสแตนซ์อันใหม่"
+	},
+	"instances.content-install.search-placeholder": {
+		"defaultMessage": "ค้นหาอินสแตนซ์"
+	},
+	"label.available": {
+		"defaultMessage": "ว่างอยู่ {amount}"
+	},
+	"label.changes-saved": {
+		"defaultMessage": "บันทึกการเปลี่ยนแปลงแล้ว"
+	},
+	"label.collections": {
+		"defaultMessage": "คอลเลกชัน"
+	},
+	"label.content": {
+		"defaultMessage": "เนื้อหา"
+	},
+	"label.created-ago": {
+		"defaultMessage": "สร้างขึ้นเมื่อ {ago}"
+	},
+	"label.dashboard": {
+		"defaultMessage": "แดชบอร์ด"
+	},
+	"label.delete": {
+		"defaultMessage": "ลบ"
+	},
+	"label.description": {
+		"defaultMessage": "คำอธิบาย"
+	},
+	"label.error": {
+		"defaultMessage": "ข้อผิดพลาด"
+	},
+	"label.followed-projects": {
+		"defaultMessage": "โปรเจกต์ที่ติดตาม"
+	},
+	"label.loading": {
+		"defaultMessage": "กำลังโหลด..."
+	},
+	"label.moderation": {
+		"defaultMessage": "การกลั่นกรอง"
+	},
+	"label.notifications": {
+		"defaultMessage": "แจ้งเตือน"
+	},
+	"label.or": {
+		"defaultMessage": "หรือ"
+	},
+	"label.password": {
+		"defaultMessage": "รหัสผ่าน"
+	},
+	"label.public": {
+		"defaultMessage": "สาธารณะ"
+	},
+	"label.rejected": {
+		"defaultMessage": "ไม่อนุมัติ"
+	},
+	"label.saved": {
+		"defaultMessage": "บันทึกแล้ว"
+	},
+	"label.scopes": {
+		"defaultMessage": "ขอบเขต"
+	},
+	"label.server": {
+		"defaultMessage": "เซิร์ฟเวอร์"
+	},
+	"label.servers": {
+		"defaultMessage": "เซิร์ฟเวอร์"
+	},
+	"label.settings": {
+		"defaultMessage": "ตั้งค่า"
+	},
+	"label.singleplayer": {
+		"defaultMessage": "เล่นคนเดียว"
+	},
+	"label.title": {
+		"defaultMessage": "ชื่อ"
+	},
+	"label.unlisted": {
+		"defaultMessage": "ไม่เปิดเผย"
+	},
+	"label.visibility": {
+		"defaultMessage": "การเปิดเผย"
+	},
+	"modal.add-payment-method.action": {
+		"defaultMessage": "เพิ่มช่องทางการชำระเงิน"
+	},
+	"modal.add-payment-method.title": {
+		"defaultMessage": "กำลังเพิ่มช่องทางการชำระเงิน"
+	},
+	"notification.error.title": {
+		"defaultMessage": "เกิดข้อผิดพลาด"
+	},
+	"omorphia.component.badge.label.accepted": {
+		"defaultMessage": "ยอมรับแล้ว"
+	},
+	"omorphia.component.badge.label.approved": {
+		"defaultMessage": "อนุมัติแล้ว"
+	},
+	"omorphia.component.badge.label.archived": {
+		"defaultMessage": "จัดเก็บแล้ว"
+	},
+	"omorphia.component.badge.label.closed": {
+		"defaultMessage": "ถูกปิด"
+	},
+	"omorphia.component.badge.label.draft": {
+		"defaultMessage": "แบบร่าง"
+	},
+	"omorphia.component.badge.label.failed": {
+		"defaultMessage": "ไม่สำเร็จ"
+	},
+	"omorphia.component.badge.label.modrinth-team": {
+		"defaultMessage": "ทีม Owyx"
+	},
+	"omorphia.component.badge.label.pending": {
+		"defaultMessage": "กําลังดำเนินการ"
+	},
+	"omorphia.component.badge.label.private": {
+		"defaultMessage": "ส่วนตัว"
+	},
+	"omorphia.component.badge.label.processed": {
+		"defaultMessage": "ประมวลผลแล้ว"
+	},
+	"omorphia.component.badge.label.rejected": {
+		"defaultMessage": "ถูกปฏิเสธ"
+	},
+	"omorphia.component.badge.label.returned": {
+		"defaultMessage": "ถูกตีกลับ"
+	},
+	"omorphia.component.badge.label.safe": {
+		"defaultMessage": "ผ่าน"
+	},
+	"omorphia.component.badge.label.under-review": {
+		"defaultMessage": "อยู่ภายใต้การพิจารณา"
+	},
+	"omorphia.component.badge.label.unlisted": {
+		"defaultMessage": "ไม่เผยแพร่"
+	},
+	"omorphia.component.badge.label.unsafe": {
+		"defaultMessage": "ไม่ผ่าน"
+	},
+	"omorphia.component.copy.action.copy": {
+		"defaultMessage": "คัดลอกโค้ดไปยังคลิปบอร์ด"
+	},
+	"omorphia.component.environment-indicator.label.client": {
+		"defaultMessage": "ไคลเอ็นต์"
+	},
+	"omorphia.component.environment-indicator.label.client-and-server": {
+		"defaultMessage": "ไคลเอ็นต์และเซิร์ฟเวอร์"
+	},
+	"omorphia.component.environment-indicator.label.client-or-server": {
+		"defaultMessage": "ไคลเอ็นต์และเซิร์ฟเวอร์"
+	},
+	"omorphia.component.environment-indicator.label.server": {
+		"defaultMessage": "เซิร์ฟเวอร์"
+	},
+	"omorphia.component.environment-indicator.label.unsupported": {
+		"defaultMessage": "ไม่รองรับ"
+	},
+	"payment-method.venmo": {
+		"defaultMessage": "Venmo"
+	},
+	"payment-method.virtual-visa": {
+		"defaultMessage": "Virtual Visa"
+	},
+	"payment-method.virtual-visa-plural": {
+		"defaultMessage": "Virtual Visas"
+	},
+	"project-type.all": {
+		"defaultMessage": "ทั้งหมด"
+	},
+	"project-type.mod.category": {
+		"defaultMessage": "ม็อด"
+	},
+	"project-type.modpack.category": {
+		"defaultMessage": "ม็อดแพ็ก"
+	},
+	"project-type.plugin.category": {
+		"defaultMessage": "ปลั๊กอิน"
+	},
+	"project-type.resourcepack.category": {
+		"defaultMessage": "รีซอร์ซแพ็ก"
+	},
+	"project-type.server.category": {
+		"defaultMessage": "เซิร์ฟเวอร์"
+	},
+	"project-type.shader.category": {
+		"defaultMessage": "แสงเงา"
+	},
+	"project.about.compatibility.game.minecraftJava": {
+		"defaultMessage": "Minecraft: Java Edition"
+	},
+	"project.about.compatibility.platforms": {
+		"defaultMessage": "แพลตฟอร์ม"
+	},
+	"project.about.creators.title": {
+		"defaultMessage": "ผู้สร้าง"
+	},
+	"project.about.details.created": {
+		"defaultMessage": "สร้างขึ้นเมื่อ {date}"
+	},
+	"project.about.details.licensed": {
+		"defaultMessage": "ไลเซนส์ {license}"
+	},
+	"project.about.details.published": {
+		"defaultMessage": "เผยแพร่เมื่อ {date}"
+	},
+	"project.about.details.updated": {
+		"defaultMessage": "อัพเดทเมื่อ {date}"
+	},
+	"project.about.links.discord": {
+		"defaultMessage": "เข้าร่วม Discord server"
+	},
+	"project.about.links.donate.bmac": {
+		"defaultMessage": "Buy Me a Coffee"
+	},
+	"project.about.links.donate.generic": {
+		"defaultMessage": "สนับสนุน"
+	},
+	"project.about.links.donate.github": {
+		"defaultMessage": "สปอนเซอร์บน GitHub"
+	},
+	"project.about.links.donate.kofi": {
+		"defaultMessage": "สนับสนุนบน Ko-fi"
+	},
+	"project.about.links.donate.patreon": {
+		"defaultMessage": "สนับสนุนบน Patreon"
+	},
+	"project.about.links.donate.paypal": {
+		"defaultMessage": "สนับสนุนบน PayPal"
+	},
+	"project.about.links.issues": {
+		"defaultMessage": "รายงานปัญหา"
+	},
+	"project.about.links.title": {
+		"defaultMessage": "ลิงก์"
+	},
+	"project.server.status.offline": {
+		"defaultMessage": "ออฟไลน์"
+	},
+	"project.server.status.offline.tooltip": {
+		"defaultMessage": "เซิร์ฟเวอร์ออฟไลน์อยู่"
+	},
+	"project.server.status.online": {
+		"defaultMessage": "ออนไลน์"
+	},
+	"project.settings.description.title": {
+		"defaultMessage": "คำอธิบาย"
+	},
+	"project.settings.environment.client_and_server.optional_both_prefers_both.title": {
+		"defaultMessage": "ไม่จำเป็นบนทั้งคู่แต่ทำงานได้ดีที่สุดเพื่อติดตั้งบนทั้งคู่"
+	},
+	"project.settings.environment.client_and_server.optional_client.title": {
+		"defaultMessage": "ไม่จำเป็นสำหรับไคลเอนต์"
+	},
+	"project.settings.environment.client_and_server.optional_server.title": {
+		"defaultMessage": "ไม่จำเป็นบนเซิร์ฟเวอร์"
+	},
+	"project.settings.environment.client_and_server.required_both.title": {
+		"defaultMessage": "จำเป็นบนทั้งคู่"
+	},
+	"project.settings.environment.client_and_server.title": {
+		"defaultMessage": "ไคลเอ็นต์และเซิร์ฟเวอร์"
+	},
+	"project.settings.environment.client_only.title": {
+		"defaultMessage": "ฝั่งไคลเอนต์เท่านั้น"
+	},
+	"project.versions.channel.alpha.symbol": {
+		"defaultMessage": "A"
+	},
+	"project.versions.channel.beta.symbol": {
+		"defaultMessage": "B"
+	},
+	"project.versions.channel.release.symbol": {
+		"defaultMessage": "R"
+	},
+	"project.visibility.draft": {
+		"defaultMessage": "แบบร่าง"
+	},
+	"project.visibility.private": {
+		"defaultMessage": "ส่วนตัว"
+	},
+	"project.visibility.public": {
+		"defaultMessage": "สาธารณะ"
+	},
+	"project.visibility.rejected": {
+		"defaultMessage": "ไม่อนุมัติ"
+	},
+	"project.visibility.under-review": {
+		"defaultMessage": "อยู่ภายใต้การพิจารณา"
+	},
+	"project.visibility.unknown": {
+		"defaultMessage": "ไม่ทราบ"
+	},
+	"project.visibility.unlisted": {
+		"defaultMessage": "ไม่เปิดเผย"
+	},
+	"search.filter_type.environment.server": {
+		"defaultMessage": "เซิร์ฟเวอร์"
+	},
+	"search.filter_type.game_version.all_versions": {
+		"defaultMessage": "ดูทุกเวอร์ชั่น"
+	},
+	"search.filter_type.server_content_type": {
+		"defaultMessage": "ประเภท"
+	},
+	"servers.listing.server-icon-alt": {
+		"defaultMessage": "เซิร์ฟเวอร์ไอคอน"
+	},
+	"servers.medal-listing.server-icon-alt": {
+		"defaultMessage": "เซิร์ฟเวอร์ไอคอน"
+	},
+	"servers.region.prompt": {
+		"defaultMessage": "คุณอยากตั้งเซิร์ฟเวอร์ไว้ที่ไหน"
+	},
+	"servers.region.western-europe": {
+		"defaultMessage": "ยุโรปตะวันตก"
+	},
+	"settings.account.title": {
+		"defaultMessage": "บัญชีและความปลอดภัย"
+	},
+	"settings.authorized-apps.title": {
+		"defaultMessage": "แอพที่ได้รับอนุญาต"
+	},
+	"settings.display.theme.dark": {
+		"defaultMessage": "มืด"
+	},
+	"settings.display.theme.light": {
+		"defaultMessage": "สว่าง"
+	},
+	"settings.display.theme.oled": {
+		"defaultMessage": "OLED"
+	},
+	"settings.display.theme.title": {
+		"defaultMessage": "ธีมสี"
+	},
+	"settings.language.title": {
+		"defaultMessage": "ภาษา"
+	}
 }
-

@@ -331,7 +331,7 @@ useAppEvent('ads_consent_required', handleAdsConsentRequired, appEvents)
 
 const appVersion = getVersion()
 const tauriApiClient = new TauriModrinthClient({
-	userAgent: async () => `modrinth/theseus/${await appVersion} (support@modrinth.com)`,
+	userAgent: async () => `owyx/theseus/${await appVersion} (support@owyx.site)`,
 	labrinthBaseUrl: config.labrinthBaseUrl,
 	archonBaseUrl: config.archonBaseUrl,
 	sharedInstancesBaseUrl: config.sharedInstancesBaseUrl,
@@ -635,12 +635,12 @@ const messages = defineMessages({
 	},
 	adsConsentTitle: {
 		id: 'app.ads-consent.title',
-		defaultMessage: 'Your privacy and how ads support Modrinth',
+		defaultMessage: 'Your privacy and ads',
 	},
 	adsConsentBody: {
 		id: 'app.ads-consent.body',
 		defaultMessage:
-			'Ads make Modrinth possible and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance.',
+			'Ads were part of upstream Modrinth; Owyx does not rely on them. Partners may store or access cookies to personalize ads and measure performance.',
 	},
 	adsConsentManage: {
 		id: 'app.ads-consent.manage',
@@ -1504,7 +1504,7 @@ const owyxAccountMenuOptions = computed(() => [
 					label: formatMessage(messages.adminPanel),
 					icon: SettingsIcon,
 					type: 'link',
-					to: '/owyx-servers',
+					to: '/owyx-admin',
 				},
 			]
 		: []),

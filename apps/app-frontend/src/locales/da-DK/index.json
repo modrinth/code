@@ -1,1181 +1,1181 @@
 {
-  "app.action-bar.downloading-java": {
-    "message": "Downloader Java {version}"
-  },
-  "app.action-bar.downloading-update": {
-    "message": "Downloader opdatering"
-  },
-  "app.action-bar.downloads": {
-    "message": "Downloads"
-  },
-  "app.action-bar.hide-downloads": {
-    "message": "Skjul aktive downloads"
-  },
-  "app.action-bar.hide-more-running-instances": {
-    "message": "Gem flere kørende instances"
-  },
-  "app.action-bar.install.copied-details": {
-    "message": "Kopieret"
-  },
-  "app.action-bar.install.copy-details": {
-    "message": "Kopier detaljer"
-  },
-  "app.action-bar.install.dismiss": {
-    "message": "Annuller"
-  },
-  "app.action-bar.install.open-instance": {
-    "message": "Åben instance"
-  },
-  "app.action-bar.install.retry": {
-    "message": "Prøv igen"
-  },
-  "app.action-bar.install.summary.app-closing": {
-    "message": "Annulleret på grund af appen blev lukket"
-  },
-  "app.action-bar.install.summary.bad-modpack-file": {
-    "message": "Kunne ikke indlæse modpack"
-  },
-  "app.action-bar.install.summary.canceled": {
-    "message": "Annulleret"
-  },
-  "app.action-bar.install.summary.cleanup-incomplete": {
-    "message": "Oprydning fuldførte ikke"
-  },
-  "app.action-bar.install.summary.content-download-failed": {
-    "message": "Kunne ikke downloade filer"
-  },
-  "app.action-bar.install.summary.corrupt-download": {
-    "message": "Downloadet fil er korrupt"
-  },
-  "app.action-bar.install.summary.could-not-save-files": {
-    "message": "Kunne ikke gemme filer"
-  },
-  "app.action-bar.install.summary.download-failed": {
-    "message": "Download kunne ikke blive fuldført"
-  },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "Instance kunne ikke blive fundet"
-  },
-  "app.action-bar.install.summary.invalid-file-path": {
-    "message": "Filstien er ugyldig"
-  },
-  "app.action-bar.install.summary.invalid-modpack": {
-    "message": "Modpack data ugyldig"
-  },
-  "app.action-bar.install.summary.invalid-modpack-files": {
-    "message": "Modpack filer har ugyldig metadata"
-  },
-  "app.action-bar.install.summary.java-setup-failed": {
-    "message": "Java opsætning kunne ikke fuldføres"
-  },
-  "app.action-bar.install.summary.loader-setup-failed": {
-    "message": "Loader setup fejlede"
-  },
-  "app.action-bar.install.summary.local-data-error": {
-    "message": "Kunne ikke opdatere lokal data"
-  },
-  "app.action-bar.install.summary.minecraft-setup-failed": {
-    "message": "Opsætning af Minecraft fejlede"
-  },
-  "app.action-bar.install.summary.modrinth-unreachable": {
-    "message": "Kunne ikke få forbindelse til Modrinth"
-  },
-  "app.action-bar.install.summary.no-write-permission": {
-    "message": "Ingen tilladelse til at skrive"
-  },
-  "app.action-bar.install.summary.pack-download-failed": {
-    "message": "Kunne ikke download pack"
-  },
-  "app.action-bar.install.summary.unexpected-error": {
-    "message": "Noget gik galt"
-  },
-  "app.action-bar.install.unknown-instance": {
-    "message": "Ukendt instance"
-  },
-  "app.action-bar.install.updating-shared-content": {
-    "message": "Opdatere delt indhold"
-  },
-  "app.action-bar.make-primary-instance": {
-    "message": "Gør til primære instance"
-  },
-  "app.action-bar.no-instances-running": {
-    "message": "Ingen instances kørende"
-  },
-  "app.action-bar.offline": {
-    "message": "Offline"
-  },
-  "app.action-bar.primary-instance": {
-    "message": "Primære instance"
-  },
-  "app.action-bar.reload-to-update": {
-    "message": "Genindlæs for at opdatere"
-  },
-  "app.action-bar.show-downloads": {
-    "message": "Vis aktive downloads"
-  },
-  "app.action-bar.show-more-running-instances": {
-    "message": "Vis flere kørende instances"
-  },
-  "app.action-bar.stop-instance": {
-    "message": "Stop instance"
-  },
-  "app.action-bar.update": {
-    "message": "Opdater"
-  },
-  "app.action-bar.view-active-downloads": {
-    "message": "Vis aktive downloads"
-  },
-  "app.action-bar.view-instance": {
-    "message": "Vis instance"
-  },
-  "app.action-bar.view-logs": {
-    "message": "Vis logs"
-  },
-  "app.ads-consent.accept": {
-    "message": "Accepter alle"
-  },
-  "app.ads-consent.body": {
-    "message": "Reklamer gør Modrinth muligt og finansiere skaber udbetalinger. Vores partnere må gemme og tilgå cookies i appen for at personliggøre reklamer og måle effektivitet."
-  },
-  "app.ads-consent.manage": {
-    "message": "Administrer præferencer"
-  },
-  "app.ads-consent.reject": {
-    "message": "Afvis alle"
-  },
-  "app.ads-consent.title": {
-    "message": "Dit privatliv og hvordan reklamer hjælper Modrinth"
-  },
-  "app.appearance-settings.compact-mode.description": {
-    "message": "Vis biblioteksinstanser i et kompakt række-layout."
-  },
-  "app.appearance-settings.compact-mode.title": {
-    "message": "Kompakt tilstand"
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Hjem"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Bibliotek"
-  },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Skjul dit brugernavn over spillerforhåndsvisning på Skin selector-siden."
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "Gem nametag"
-  },
-  "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimér Owyx når Minecraft starter."
-  },
-  "app.appearance-settings.minimize-launcher.title": {
-    "message": "Minimer app"
-  },
-  "app.appearance-settings.show-play-time.description": {
-    "message": "Vis hvor længe du har spillet hver instans."
-  },
-  "app.appearance-settings.show-play-time.title": {
-    "message": "Vis spilletid"
-  },
-  "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Spring bekræftelser over for handlinger med lav risiko, såsom duplikerede installationer, normal sletning af indhold, masseopdateringer, frakobling, og reparationer. Advarsler om farlige handlinger vises altid."
-  },
-  "app.appearance-settings.skip-non-essential-warnings.title": {
-    "message": "Spring ikke nødvendige advarseler over"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Skjul som standard højre sidepanel og tilføj en knap for at vise eller skjule det."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Skjul højre sidebar"
-  },
-  "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Vis en sikkerhedsadvarsel, før du installerer en Modrinth Pack (.mrpack), der ikke er hostet på Modrinth."
-  },
-  "app.appearance-settings.unknown-pack-warning.title": {
-    "message": "Advar mig før jeg installere en ukendt modpacks"
-  },
-  "app.auth-servers.unreachable.body": {
-    "message": "Minecraft authentication servere kan måske være nede lige nu. Tjek din internet forbindelse og prøv igen senere."
-  },
-  "app.auth-servers.unreachable.header": {
-    "message": "Kan ikke nå godkendelsesserverne"
-  },
-  "app.behavior-settings.confirmations.title": {
-    "message": "Bekræftelser"
-  },
-  "app.behavior-settings.content.title": {
-    "message": "Hjem og indhold"
-  },
-  "app.behavior-settings.startup-and-navigation.title": {
-    "message": "Opstart og navigation"
-  },
-  "app.behavior-settings.sync-across-devices.description": {
-    "message": "Brug disse adfærdsindstillinger overalt du er logget på. Slå dette fra for at holde separate indstillinger på denne enhed."
-  },
-  "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
-    "message": "Log ind på en Modrinth-konto for at synkronisere indstillinger."
-  },
-  "app.behavior-settings.sync-across-devices.title": {
-    "message": "Synkroniser adfærd på tværs af enheder"
-  },
-  "app.browse.add-servers-to-instance": {
-    "message": "Tilføjet server til instance"
-  },
-  "app.browse.add-to-an-instance": {
-    "message": "Tilføj til en instance"
-  },
-  "app.browse.add-to-instance": {
-    "message": "Tilføj til instance"
-  },
-  "app.browse.add-to-instance-name": {
-    "message": "Tilføj til {instanceName}"
-  },
-  "app.browse.added": {
-    "message": "Tilføjet"
-  },
-  "app.browse.already-added": {
-    "message": "Allerede tilføjet"
-  },
-  "app.browse.back-to-instance": {
-    "message": "Tilbage til instance"
-  },
-  "app.browse.discover-project-type": {
-    "message": "Udforsk {projectType}"
-  },
-  "app.browse.discover-servers": {
-    "message": "Opdag servere"
-  },
-  "app.browse.hide-added-servers": {
-    "message": "Gem servere som allerede er tilføjet"
-  },
-  "app.browse.hide-installed-modpacks": {
-    "message": "Skjul allerede installeret"
-  },
-  "app.browse.project-actions.label": {
-    "message": "Projekthandlinger"
-  },
-  "app.browse.project-type.data-packs": {
-    "message": "Datapakker"
-  },
-  "app.browse.project-type.modpacks": {
-    "message": "Modpacks"
-  },
-  "app.browse.project-type.mods": {
-    "message": "Mods"
-  },
-  "app.browse.project-type.resource-packs": {
-    "message": "Ressourcepakker"
-  },
-  "app.browse.project-type.servers": {
-    "message": "Servere"
-  },
-  "app.browse.project-type.shaders": {
-    "message": "Shaders"
-  },
-  "app.browse.server-instance-content-warning": {
-    "message": "Tilføjelse af indhold kan forhindre dig i at deltage i denne server. Ethvert indhold du tilføjer, vil blive fjernet når det administrerede serverindhold opdateres."
-  },
-  "app.browse.server.installing": {
-    "message": "Installere"
-  },
-  "app.content-install.no-compatible-versions": {
-    "message": "Ingen tilgængelige versioner passer til {compatibilityLabel}. Vælg en version for at installere. Afhængigheder bliver ikke installeret automatisk."
-  },
-  "app.content.desync-pack": {
-    "message": "Desync"
-  },
-  "app.content.sync-data-packs-disabled": {
-    "message": "Slå først synkronisering af datapakke til i app-indstillingerne."
-  },
-  "app.content.sync-pack": {
-    "message": "Synkronisér"
-  },
-  "app.export-modal.description-placeholder": {
-    "message": "Indtast modpack beskrivelse..."
-  },
-  "app.export-modal.export-button": {
-    "message": "Eksporter"
-  },
-  "app.export-modal.header": {
-    "message": "Eksporter modpack"
-  },
-  "app.export-modal.modpack-name-label": {
-    "message": "Modpack navn"
-  },
-  "app.export-modal.modpack-name-placeholder": {
-    "message": "Modpack navn"
-  },
-  "app.export-modal.version-number-label": {
-    "message": "Versionsnummer"
-  },
-  "app.export-modal.version-number-placeholder": {
-    "message": "1.0.0"
-  },
-  "app.install.phase.downloading_content": {
-    "message": "Downloader indhold"
-  },
-  "app.install.phase.downloading_minecraft": {
-    "message": "Downloader Minecraft"
-  },
-  "app.install.phase.finalizing": {
-    "message": "Færdiggører"
-  },
-  "app.install.phase.preparing_instance": {
-    "message": "I kø til at intallere"
-  },
-  "app.install.phase.preparing_java": {
-    "message": "Forbereder Java"
-  },
-  "app.install.phase.preparing_java.downloading": {
-    "message": "Downloader Java {version}"
-  },
-  "app.install.phase.preparing_java.extracting": {
-    "message": "Udpakker Java {version}"
-  },
-  "app.install.phase.preparing_java.fetching-metadata": {
-    "message": "Henter Java {version}"
-  },
-  "app.install.phase.preparing_java.resolving": {
-    "message": "Forbereder Java {version}"
-  },
-  "app.install.phase.preparing_java.validating": {
-    "message": "Validerer Java {version}"
-  },
-  "app.instance.admonitions.shared-instance.added-label": {
-    "message": "Tilføjet"
-  },
-  "app.instance.admonitions.shared-instance.publish-button": {
-    "message": "Skub opdatering"
-  },
-  "app.instance.admonitions.shared-instance.publishing-button": {
-    "message": "Skubber..."
-  },
-  "app.instance.admonitions.shared-instance.removed-label": {
-    "message": "Fjernet"
-  },
-  "app.instance.admonitions.shared-instance.review-admonition-header": {
-    "message": "Skub opdatering"
-  },
-  "app.instance.admonitions.shared-instance.review-header": {
-    "message": "Gennemså ændringer"
-  },
-  "app.instance.admonitions.shared-instance.reviewing-button": {
-    "message": "Gennemgår..."
-  },
-  "app.instance.confirm-delete.admonition-body": {
-    "message": "Al' data for din instance vil blive permanent slettet, dette inkludere dine verdener, konfigurationer, og alt installeret indhold."
-  },
-  "app.instance.confirm-delete.admonition-header": {
-    "message": "Denne handling kan ikke fortrydes"
-  },
-  "app.instance.confirm-delete.delete-button": {
-    "message": "Slet instance"
-  },
-  "app.instance.confirm-delete.header": {
-    "message": "Slet instance"
-  },
-  "app.instance.modpack-already-installed.body": {
-    "message": "Denne modpack er allerede installeret i <bold>{instanceName}</bold> instancen. Er du sikker på du vil duplikere den?"
-  },
-  "app.instance.modpack-already-installed.create": {
-    "message": "Opret"
-  },
-  "app.instance.modpack-already-installed.header": {
-    "message": "Modpack allerede installeret"
-  },
-  "app.instance.modpack-already-installed.instance": {
-    "message": "Instance"
-  },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "Downloader {current, number}/{total, number} projekter..."
-  },
-  "app.instance.mods.content-type-project": {
-    "message": "projekt"
-  },
-  "app.instance.mods.locked-content": {
-    "message": "Indhold i låste instances kan ikke blive ændret."
-  },
-  "app.instance.mods.project-was-added": {
-    "message": "\"{name}\" blev tilføjet"
-  },
-  "app.instance.mods.projects-were-added": {
-    "message": "{count} projekter blev tilføjet"
-  },
-  "app.instance.mods.share-text": {
-    "message": "Tjek ud disse projekter jeg bruger i min modpack!"
-  },
-  "app.instance.mods.share-title": {
-    "message": "Deler modpack indhold"
-  },
-  "app.instance.mods.successfully-uploaded": {
-    "message": "Uploadet"
-  },
-  "app.instance.share.empty.description": {
-    "message": "Du kan ændre denne instance med dine venner!"
-  },
-  "app.instance.share.empty.heading": {
-    "message": "Ingen venner inviteret"
-  },
-  "app.instance.share.empty.invite-friends-button": {
-    "message": "Inviter venner"
-  },
-  "app.instance.share.invite-modal.heading": {
-    "message": "Del {name}"
-  },
-  "app.instance.share.locked.empty-description-suffix": {
-    "message": "for at tilgå denne side."
-  },
-  "app.instance.share.locked.signed-out-heading": {
-    "message": "Ikke logget ind"
-  },
-  "app.instance.share.locked.switch-account-button": {
-    "message": "Skift konto"
-  },
-  "app.instance.share.locked.wrong-account-heading": {
-    "message": "Forkert konto"
-  },
-  "app.instance.share.remove-user-modal.effects-label": {
-    "message": "Hvad vil der ske?"
-  },
-  "app.instance.share.remove-user-modal.header": {
-    "message": "Fjern adgang"
-  },
-  "app.instance.share.remove-user-modal.remove-button": {
-    "message": "Fjern adgang"
-  },
-  "app.instance.share.remove-user-modal.user-avatar-alt": {
-    "message": "{username}'s avatar"
-  },
-  "app.instance.share.sign-in.button": {
-    "message": "Log ind"
-  },
-  "app.instance.shared-instance-already-installed.install-anyway": {
-    "message": "Installer alligevel"
-  },
-  "app.instance.shared-instance-already-installed.instance": {
-    "message": "Instans"
-  },
-  "app.instance.shared-instance-wrong-account.sign-in-as-label": {
-    "message": "Log ind som"
-  },
-  "app.instance.worlds.add-server": {
-    "message": "Tilføj server"
-  },
-  "app.instance.worlds.browse-servers": {
-    "message": "Søg servere"
-  },
-  "app.instance.worlds.delete-world-modal.delete-button": {
-    "message": "Slet verden"
-  },
-  "app.instance.worlds.delete-world-modal.title": {
-    "message": "Slet verden"
-  },
-  "app.instance.worlds.delete-world-modal.warning-header": {
-    "message": "Sletter {name}"
-  },
-  "app.instance.worlds.filter-modded": {
-    "message": "Moddet"
-  },
-  "app.instance.worlds.filter-offline": {
-    "message": "Offline"
-  },
-  "app.instance.worlds.filter-online": {
-    "message": "Online"
-  },
-  "app.instance.worlds.filter-vanilla": {
-    "message": "Vanilla"
-  },
-  "app.instance.worlds.no-worlds-description": {
-    "message": "Tilføj en server, eller søg efter en for at komme i gang"
-  },
-  "app.instance.worlds.no-worlds-heading": {
-    "message": "Ingen servere eller verdener tilføjet"
-  },
-  "app.instance.worlds.remove-server-modal.remove-button": {
-    "message": "Fjern server"
-  },
-  "app.instance.worlds.remove-server-modal.title": {
-    "message": "Fjern server"
-  },
-  "app.instance.worlds.remove-server-modal.warning-header": {
-    "message": "Fjerner {name}"
-  },
-  "app.instance.worlds.search-worlds-placeholder": {
-    "message": "Søg {count} verdener..."
-  },
-  "app.modal.install-to-play.additional-context": {
-    "message": "Yderligere kontekst"
-  },
-  "app.modal.install-to-play.delete-instance": {
-    "message": "Slet instans"
-  },
-  "app.modal.install-to-play.header": {
-    "message": "Installer for at spille"
-  },
-  "app.modal.install-to-play.install-anyway": {
-    "message": "Installer alligevel"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Installer"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, one {# mod} other {# mods}}"
-  },
-  "app.modal.install-to-play.report-image-too-large": {
-    "message": "Filen overskrider 1MiB størrelse begrænsning"
-  },
-  "app.modal.install-to-play.shared-instance": {
-    "message": "Delt instance"
-  },
-  "app.modal.install-to-play.view-contents": {
-    "message": "Vis indhold"
-  },
-  "app.modal.update-to-play.header": {
-    "message": "Opdater for at spille"
-  },
-  "app.modal.update-to-play.shared-instance-added-label": {
-    "message": "Tilføjede"
-  },
-  "app.modal.update-to-play.shared-instance-removed-label": {
-    "message": "Fjernede"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Opdatering krævet"
-  },
-  "app.project.install-button.already-installed": {
-    "message": "Dette projekt er allerede installeret"
-  },
-  "app.project.install-button.switch-version": {
-    "message": "Skift version"
-  },
-  "app.project.install-context.back-to-browse": {
-    "message": "Tilbage til udforsk"
-  },
-  "app.project.version.all-versions": {
-    "message": "Alle versioner"
-  },
-  "app.project.version.download-in-browser": {
-    "message": "Download i browser"
-  },
-  "app.project.version.installing": {
-    "message": "Installere"
-  },
-  "app.project.versions.already-installed": {
-    "message": "Allerede installeret"
-  },
-  "app.settings.developer-mode-enabled": {
-    "message": "Udvikler-tilstand aktiveret."
-  },
-  "app.settings.downloading": {
-    "message": "Downloader v{version}"
-  },
-  "app.settings.tabs.appearance": {
-    "message": "Udseende"
-  },
-  "app.settings.tabs.java-installations": {
-    "message": "Javainstallationer"
-  },
-  "app.settings.tabs.language": {
-    "message": "Sprog"
-  },
-  "app.settings.tabs.privacy": {
-    "message": "Privatliv"
-  },
-  "app.settings.tabs.resource-management": {
-    "message": "Ressourcestyring"
-  },
-  "app.skins.add-button": {
-    "message": "Tilføj skin"
-  },
-  "app.skins.add-button.drag-and-drop": {
-    "message": "Træk og slip"
-  },
-  "app.skins.apply-button": {
-    "message": "Brug"
-  },
-  "app.skins.delete-button": {
-    "message": "Slet skin"
-  },
-  "app.skins.delete-modal.description": {
-    "message": "Dette vil permanent slette det valgte skin. Dette vil ikke kunne blive fortydes."
-  },
-  "app.skins.delete-modal.title": {
-    "message": "Er du sikker på, at du vil slette dette skin?"
-  },
-  "app.skins.dropped-file-error.text": {
-    "message": "Fejl ved læsning af den afleverede fil."
-  },
-  "app.skins.dropped-file-error.title": {
-    "message": "Fejl under behandling af fil"
-  },
-  "app.skins.edit-button": {
-    "message": "Rediger skin"
-  },
-  "app.skins.modal.add-skin-button": {
-    "message": "Tilføj skin"
-  },
-  "app.skins.modal.add-title": {
-    "message": "Tilføjer et skin"
-  },
-  "app.skins.modal.arm-style-section": {
-    "message": "Arm stil"
-  },
-  "app.skins.modal.arm-style-slim": {
-    "message": "Slank"
-  },
-  "app.skins.modal.arm-style-wide": {
-    "message": "Bred"
-  },
-  "app.skins.modal.cape-fallback-name": {
-    "message": "Kappe"
-  },
-  "app.skins.modal.cape-section": {
-    "message": "Kappe"
-  },
-  "app.skins.modal.edit-title": {
-    "message": "Rediger skin"
-  },
-  "app.skins.modal.make-edit-first-tooltip": {
-    "message": "Rediger skinnet først!"
-  },
-  "app.skins.modal.no-cape-tooltip": {
-    "message": "Ingen kappe"
-  },
-  "app.skins.modal.none-cape-option": {
-    "message": "Ingen"
-  },
-  "app.skins.modal.save-skin-button": {
-    "message": "Gem skin"
-  },
-  "app.skins.modal.saving-tooltip": {
-    "message": "Gemmer..."
-  },
-  "app.skins.modal.upload-skin-first-tooltip": {
-    "message": "Upload et skin først!"
-  },
-  "app.skins.preview.edit-button": {
-    "message": "Rediger skin"
-  },
-  "app.skins.previewing-badge": {
-    "message": "Forhåndsvisning"
-  },
-  "app.skins.rate-limit.text": {
-    "message": "Du skifter dit skin for ofte. Mojang's servere har midlertidigt blokeret fremtidige anmodninger. Vent venligst et øjeblik for du prøver igen."
-  },
-  "app.skins.rate-limit.title": {
-    "message": "Ro på!"
-  },
-  "app.skins.section.builders-and-biomes": {
-    "message": "Builders & Biomes"
-  },
-  "app.skins.section.chaos-cubed": {
-    "message": "Chaos Cubed"
-  },
-  "app.skins.section.chase-the-skies": {
-    "message": "Chase the Skies"
-  },
-  "app.skins.section.default-skins": {
-    "message": "Standard skins"
-  },
-  "app.skins.section.minecon-earth-2017": {
-    "message": "MINECON Earth 2017"
-  },
-  "app.skins.section.modrinth": {
-    "message": "Modrinth"
-  },
-  "app.skins.section.modrinth-pride": {
-    "message": "Modrinth Pride"
-  },
-  "app.skins.section.modrinth-pride.tooltip": {
-    "message": "Du modtog disse skins for at donere til en Modrinth Pride indsamling imens der er Pride Month."
-  },
-  "app.skins.section.mounts-of-mayhem": {
-    "message": "Mounts of Mayhem"
-  },
-  "app.skins.section.saved-skins": {
-    "message": "Gemte skins"
-  },
-  "app.skins.section.striding-hero": {
-    "message": "Striding Hero"
-  },
-  "app.skins.section.the-copper-age": {
-    "message": "The Copper Age"
-  },
-  "app.skins.section.the-garden-awakens": {
-    "message": "The Garden Awakens"
-  },
-  "app.skins.section.tiny-takeover": {
-    "message": "Tiny Takeover"
-  },
-  "app.skins.title": {
-    "message": "Skin vælger"
-  },
-  "app.skins.toggle-ears-features-off": {
-    "message": "Slå fra"
-  },
-  "app.skins.toggle-ears-features-on": {
-    "message": "Slå til"
-  },
-  "app.update-popup.body.download-complete": {
-    "message": "Owyx v{version} er færdig med at download. Genindlæs for at opdatere nu, eller automatisk når du lukker Owyx."
-  },
-  "app.update-popup.body.linux": {
-    "message": "Owyx v{version} er nu tilgængelig. Brug din pakke-manager til at opdatere for de nyeste features og fejlrettelser!"
-  },
-  "app.update-popup.body.metered": {
-    "message": "Owyx v{version} er nu tilgængelig! Siden du er på et begrænset netværk, vi downloadede den ikke automatisk."
-  },
-  "app.update-popup.changelog": {
-    "message": "Ændringslog"
-  },
-  "app.update-popup.download": {
-    "message": "Download ({size})"
-  },
-  "app.update-popup.download-complete": {
-    "message": "Download færdiggjort"
-  },
-  "app.update-popup.reload": {
-    "message": "Genindlæs for at opdater"
-  },
-  "app.update-popup.title": {
-    "message": "Opdatering tilgængelig"
-  },
-  "app.update.complete-toast.text": {
-    "message": "Klik her for at vise ændringslog."
-  },
-  "app.update.complete-toast.title": {
-    "message": "Version {version} var installeret med succes!"
-  },
-  "app.world.server-modal.placeholder-address": {
-    "message": "eksemple.modrinth.gg"
-  },
-  "app.world.server-modal.select-an-option": {
-    "message": "Vælg en mulighed"
-  },
-  "app.world.world-item.incompatible-version": {
-    "message": "Ikke kompatibel version {version}"
-  },
-  "app.world.world-item.not-played-yet": {
-    "message": "Ikke spillet endnu"
-  },
-  "app.world.world-item.offline": {
-    "message": "Offline"
-  },
-  "content.shared-instance.delete-button": {
-    "message": "Slet alligevel"
-  },
-  "friends.action.add-friend": {
-    "message": "Tilføj en ven"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "{count} venne{count, plural, one {anmodning} other {anmodninger}}"
-  },
-  "friends.add-friend.submit": {
-    "message": "Send en venneanmodning"
-  },
-  "friends.add-friend.title": {
-    "message": "Tilføjer en ven"
-  },
-  "friends.add-friend.username.description": {
-    "message": "Det er muligvis anderledes end deres Minecraft brugernavn!"
-  },
-  "friends.add-friend.username.placeholder": {
-    "message": "Indskriv Modrinth brugernavn..."
-  },
-  "friends.add-friend.username.title": {
-    "message": "Hvad er din vens Modrinth brugernavn?"
-  },
-  "friends.add-friends-to-share": {
-    "message": "<link>Tilføj venner</link> for at se hvad de spiller!"
-  },
-  "friends.friend.cancel-request": {
-    "message": "Annuller anmodning"
-  },
-  "friends.friend.remove-friend": {
-    "message": "Fjern ven"
-  },
-  "friends.friend.request-sent": {
-    "message": "Venneanmodning sendt"
-  },
-  "friends.friend.view-profile": {
-    "message": "Vis profil"
-  },
-  "friends.heading": {
-    "message": "Venner"
-  },
-  "friends.heading.active": {
-    "message": "Aktiv"
-  },
-  "friends.heading.offline": {
-    "message": "Offline"
-  },
-  "friends.heading.online": {
-    "message": "Online"
-  },
-  "friends.heading.pending": {
-    "message": "Afventer"
-  },
-  "friends.no-friends-match": {
-    "message": "Ingen venner som matcher \"{query}\""
-  },
-  "friends.search-friends-placeholder": {
-    "message": "Søg venner..."
-  },
-  "friends.section.heading": {
-    "message": "{title} - {count}"
-  },
-  "friends.sign-in-to-add-friends": {
-    "message": "<link>Log ind på en Modrinth konto</link> for at tilføje venner og se hvad de spiller!"
-  },
-  "instance.action.create-shortcut": {
-    "message": "Opret genvej"
-  },
-  "instance.action.export-modpack": {
-    "message": "Eksporter modpack"
-  },
-  "instance.action.more-actions": {
-    "message": "Flere handlinger"
-  },
-  "instance.action.open-folder": {
-    "message": "Åbn mappe"
-  },
-  "instance.action.settings": {
-    "message": "Instans indstillinger"
-  },
-  "instance.action.starting": {
-    "message": "Starter..."
-  },
-  "instance.action.stopping": {
-    "message": "Stopper..."
-  },
-  "instance.add-server.add-and-play": {
-    "message": "Tilføj og spil"
-  },
-  "instance.add-server.add-server": {
-    "message": "Tilføj server"
-  },
-  "instance.add-server.resource-pack.disabled": {
-    "message": "Deaktiveret"
-  },
-  "instance.add-server.resource-pack.enabled": {
-    "message": "Aktiveret"
-  },
-  "instance.add-server.resource-pack.prompt": {
-    "message": "Spørg"
-  },
-  "instance.add-server.title": {
-    "message": "Tilføj en server"
-  },
-  "instance.edit-server.title": {
-    "message": "Rediger server"
-  },
-  "instance.edit-world.hide-from-home": {
-    "message": "Skjul fra forside"
-  },
-  "instance.edit-world.name": {
-    "message": "Navn"
-  },
-  "instance.edit-world.placeholder-name": {
-    "message": "Minecraft verden"
-  },
-  "instance.edit-world.reset-icon": {
-    "message": "Nulstil ikon"
-  },
-  "instance.edit-world.title": {
-    "message": "Rediger verden"
-  },
-  "instance.files.adding-files": {
-    "message": "Tilføjer filer ({completed}/{total})"
-  },
-  "instance.files.save-as": {
-    "message": "Gem som..."
-  },
-  "instance.locked.delete-button": {
-    "message": "Slet instans"
-  },
-  "instance.locked.play-tooltip": {
-    "message": "Denne instans er blevet låst"
-  },
-  "instance.playtime.never-played": {
-    "message": "Aldrig spillet"
-  },
-  "instance.server-modal.address": {
-    "message": "Adresse"
-  },
-  "instance.server-modal.name": {
-    "message": "Navn"
-  },
-  "instance.server-modal.placeholder-name": {
-    "message": "Minecraft server"
-  },
-  "instance.server-modal.resource-pack": {
-    "message": "Ressourcepakke"
-  },
-  "instance.settings.tabs.general": {
-    "message": "Generelt"
-  },
-  "instance.settings.tabs.general.delete": {
-    "message": "Slet instans"
-  },
-  "instance.settings.tabs.general.delete.button": {
-    "message": "Slet instans"
-  },
-  "instance.settings.tabs.general.delete.description": {
-    "message": "Permanent slet en instans fra din enhed, inkluderer dine verdener, konfigurationer, og alt installeret indhold. Vær forsigtig, for så snart du sletter en instans der er ingen at gendanne det."
-  },
-  "instance.settings.tabs.general.deleting.button": {
-    "message": "Sletter..."
-  },
-  "instance.settings.tabs.general.duplicate-button": {
-    "message": "Kopiér"
-  },
-  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
-    "message": "Kan ikke kopiere under installation."
-  },
-  "instance.settings.tabs.general.duplicate-instance": {
-    "message": "Kopiér instans"
-  },
-  "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "Opret en kopi af denne instans, inkluderer verdener, konfigurationer, mods, osv."
-  },
-  "instance.settings.tabs.general.edit-icon": {
-    "message": "Rediger ikon"
-  },
-  "instance.settings.tabs.general.edit-icon.remove": {
-    "message": "Fjern ikon"
-  },
-  "instance.settings.tabs.general.edit-icon.replace": {
-    "message": "Udskift ikon"
-  },
-  "instance.settings.tabs.general.edit-icon.select": {
-    "message": "Vælg ikon"
-  },
-  "instance.settings.tabs.general.name": {
-    "message": "Navn"
-  },
-  "instance.settings.tabs.general.update-channel.alpha": {
-    "message": "Alpha"
-  },
-  "instance.settings.tabs.general.update-channel.beta": {
-    "message": "Beta"
-  },
-  "instance.settings.tabs.hooks.post-exit": {
-    "message": "Post-exit"
-  },
-  "instance.settings.tabs.hooks.post-exit.description": {
-    "message": "Kørte efter spillet lukkes."
-  },
-  "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "Indtast post-exit kommando..."
-  },
-  "instance.settings.tabs.hooks.pre-launch": {
-    "message": "Pre-launch"
-  },
-  "instance.settings.tabs.hooks.pre-launch.description": {
-    "message": "Kørt før en instance bliver kørt."
-  },
-  "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "Indtast pre-launch kommando..."
-  },
-  "instance.settings.tabs.hooks.wrapper": {
-    "message": "Wrapper"
-  },
-  "instance.settings.tabs.hooks.wrapper.description": {
-    "message": "Wrapper kommando for at køre Minecraft."
-  },
-  "instance.settings.tabs.hooks.wrapper.enter": {
-    "message": "Indtast wrapper kommando..."
-  },
-  "instance.settings.tabs.installation": {
-    "message": "Installation"
-  },
-  "instance.settings.tabs.installation.loader-version": {
-    "message": "{loader} version"
-  },
-  "instance.settings.tabs.java.enter-java-arguments": {
-    "message": "Indskriv Java argumenter..."
-  },
-  "instance.settings.tabs.java.hooks": {
-    "message": "Hooks"
-  },
-  "instance.settings.tabs.java.java-path-placeholder": {
-    "message": "/vej/til/java"
-  },
-  "instance.settings.tabs.window.fullscreen": {
-    "message": "Fuld skærm"
-  },
-  "instance.settings.tabs.window.fullscreen.description": {
-    "message": "Gør så spillet starter i fuld skærm når du køre spillet (Med brug af options.txt)."
-  },
-  "instance.settings.tabs.window.height": {
-    "message": "Højde"
-  },
-  "instance.settings.tabs.window.height.description": {
-    "message": "Højden af spillevinduet når kørt."
-  },
-  "instance.settings.tabs.window.height.enter": {
-    "message": "Indtast højde..."
-  },
-  "instance.settings.tabs.window.width": {
-    "message": "Bredde"
-  },
-  "instance.settings.tabs.window.width.description": {
-    "message": "Bredden på spille vinduet når kørt."
-  },
-  "instance.settings.tabs.window.width.enter": {
-    "message": "Indtast bredde..."
-  },
-  "instance.shared-instance.error.title": {
-    "message": "Noget gik galt"
-  },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Tilføjede"
-  },
-  "instance.shared-instance.publish-review.admonition-header": {
-    "message": "Skub opdatering til spillere"
-  },
-  "instance.shared-instance.publish-review.config-title-v2": {
-    "message": "Vælg konfigurations filer"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Gennemså ændringer"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Skub opdatering"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Fjernede"
-  },
-  "instance.shared-instance.unavailable.locked-title": {
-    "message": "Instans låst"
-  },
-  "instance.shared-instance.unavailable.title": {
-    "message": "Delt instans er ikke længere tilgængelig"
-  },
-  "instance.worlds.a_minecraft_server": {
-    "message": "En Minecraft server"
-  },
-  "instance.worlds.cant_connect": {
-    "message": "Kan ikke forbinde til serveren"
-  },
-  "instance.worlds.copy_address": {
-    "message": "Kopier adresse"
-  },
-  "instance.worlds.create_shortcut": {
-    "message": "Opret genvej"
-  },
-  "instance.worlds.dont_show_on_home": {
-    "message": "Vis ikke på forsiden"
-  },
-  "instance.worlds.game_already_open": {
-    "message": "Instance allerede åben"
-  },
-  "instance.worlds.hardcore": {
-    "message": "Hardcore mode"
-  },
-  "instance.worlds.incompatible_server": {
-    "message": "Serveren er uforenelig"
-  },
-  "instance.worlds.linked_server": {
-    "message": "Styret af server projektet"
-  },
-  "instance.worlds.no_contact": {
-    "message": "Serveren kunne ikke blive kontaktet"
-  },
-  "instance.worlds.no_server_quick_play": {
-    "message": "Du kan kun hoppe lige ind i servere på Minecraft Alpha 1.0.5+"
-  },
-  "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Du kan kun hoppe lige ind i singleplayer verdener på Minecraft 1.20+"
-  },
-  "instance.worlds.play_instance": {
-    "message": "Spil instance"
-  },
-  "instance.worlds.view_instance": {
-    "message": "Se instance"
-  },
-  "instance.worlds.world_in_use": {
-    "message": "Verden er i brug"
-  },
-  "minecraft-account.add-account": {
-    "message": "Tilføj konto"
-  },
-  "minecraft-account.label": {
-    "message": "Minecraft konto"
-  },
-  "minecraft-account.not-signed-in": {
-    "message": "Ikke logged ind"
-  },
-  "minecraft-account.remove-account": {
-    "message": "Fjern konto"
-  },
-  "minecraft-account.select-account": {
-    "message": "Vælg konto"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Log ind på Minecraft"
-  },
-  "minecraft-required.description-header": {
-    "message": "Log ind med en Microsoft konto"
-  },
-  "minecraft-required.dont-have-account": {
-    "message": "Har du ikke en konto?"
-  },
-  "minecraft-required.get-minecraft": {
-    "message": "Få Minecraft"
-  },
-  "minecraft-required.get-support": {
-    "message": "Få hjælp"
-  },
-  "minecraft-required.header": {
-    "message": "Minecraft påkrævet"
-  },
-  "minecraft-required.sign-in": {
-    "message": "Log ind på Microsoft"
-  },
-  "modal.modrinth-account-required.continue-in-browser-heading": {
-    "message": "Fortsæt i din browser"
-  },
-  "modal.modrinth-account-required.create-account-button": {
-    "message": "Opret en konto"
-  },
-  "modal.modrinth-account-required.header": {
-    "message": "Konto påkrævet"
-  },
-  "modal.modrinth-account-required.open-browser-again-button": {
-    "message": "Åbn browser igen"
-  },
-  "modal.modrinth-account-required.sign-in-button": {
-    "message": "Log ind på Modrinth"
-  },
-  "modal.modrinth-account-required.sign-in-heading": {
-    "message": "Log ind med en Modrinth konto"
-  },
-  "modal.modrinth-account-required.signing-in-header": {
-    "message": "Logger ind"
-  },
-  "modal.modrinth-account-required.support-prompt": {
-    "message": "Har du problemer med at logge ind? <support>Få hjælp</support>"
-  },
-  "modal.modrinth-account-required.waiting-for-browser": {
-    "message": "Venter på browser bekræftigelse..."
-  },
-  "search.filter.locked.instance": {
-    "message": "Givet af instanceen"
-  },
-  "search.filter.locked.instance-game-version.title": {
-    "message": "Spille version er givet af instanceen"
-  },
-  "search.filter.locked.instance-loader.title": {
-    "message": "Loader er givet af instanceen"
-  },
-  "search.filter.locked.instance.sync": {
-    "message": "Synkroniser med instance"
-  },
-  "search.filter.locked.server-environment.title": {
-    "message": "Kun klient-sided mods kan blive tilføjet til denne server instance"
-  },
-  "app.nav.admin-panel": {
-    "message": "Adminpanel"
-  }
+	"app.action-bar.downloading-java": {
+		"message": "Downloader Java {version}"
+	},
+	"app.action-bar.downloading-update": {
+		"message": "Downloader opdatering"
+	},
+	"app.action-bar.downloads": {
+		"message": "Downloads"
+	},
+	"app.action-bar.hide-downloads": {
+		"message": "Skjul aktive downloads"
+	},
+	"app.action-bar.hide-more-running-instances": {
+		"message": "Gem flere kørende instances"
+	},
+	"app.action-bar.install.copied-details": {
+		"message": "Kopieret"
+	},
+	"app.action-bar.install.copy-details": {
+		"message": "Kopier detaljer"
+	},
+	"app.action-bar.install.dismiss": {
+		"message": "Annuller"
+	},
+	"app.action-bar.install.open-instance": {
+		"message": "Åben instance"
+	},
+	"app.action-bar.install.retry": {
+		"message": "Prøv igen"
+	},
+	"app.action-bar.install.summary.app-closing": {
+		"message": "Annulleret på grund af appen blev lukket"
+	},
+	"app.action-bar.install.summary.bad-modpack-file": {
+		"message": "Kunne ikke indlæse modpack"
+	},
+	"app.action-bar.install.summary.canceled": {
+		"message": "Annulleret"
+	},
+	"app.action-bar.install.summary.cleanup-incomplete": {
+		"message": "Oprydning fuldførte ikke"
+	},
+	"app.action-bar.install.summary.content-download-failed": {
+		"message": "Kunne ikke downloade filer"
+	},
+	"app.action-bar.install.summary.corrupt-download": {
+		"message": "Downloadet fil er korrupt"
+	},
+	"app.action-bar.install.summary.could-not-save-files": {
+		"message": "Kunne ikke gemme filer"
+	},
+	"app.action-bar.install.summary.download-failed": {
+		"message": "Download kunne ikke blive fuldført"
+	},
+	"app.action-bar.install.summary.instance-not-found": {
+		"message": "Instance kunne ikke blive fundet"
+	},
+	"app.action-bar.install.summary.invalid-file-path": {
+		"message": "Filstien er ugyldig"
+	},
+	"app.action-bar.install.summary.invalid-modpack": {
+		"message": "Modpack data ugyldig"
+	},
+	"app.action-bar.install.summary.invalid-modpack-files": {
+		"message": "Modpack filer har ugyldig metadata"
+	},
+	"app.action-bar.install.summary.java-setup-failed": {
+		"message": "Java opsætning kunne ikke fuldføres"
+	},
+	"app.action-bar.install.summary.loader-setup-failed": {
+		"message": "Loader setup fejlede"
+	},
+	"app.action-bar.install.summary.local-data-error": {
+		"message": "Kunne ikke opdatere lokal data"
+	},
+	"app.action-bar.install.summary.minecraft-setup-failed": {
+		"message": "Opsætning af Minecraft fejlede"
+	},
+	"app.action-bar.install.summary.modrinth-unreachable": {
+		"message": "Kunne ikke få forbindelse til Owyx"
+	},
+	"app.action-bar.install.summary.no-write-permission": {
+		"message": "Ingen tilladelse til at skrive"
+	},
+	"app.action-bar.install.summary.pack-download-failed": {
+		"message": "Kunne ikke download pack"
+	},
+	"app.action-bar.install.summary.unexpected-error": {
+		"message": "Noget gik galt"
+	},
+	"app.action-bar.install.unknown-instance": {
+		"message": "Ukendt instance"
+	},
+	"app.action-bar.install.updating-shared-content": {
+		"message": "Opdatere delt indhold"
+	},
+	"app.action-bar.make-primary-instance": {
+		"message": "Gør til primære instance"
+	},
+	"app.action-bar.no-instances-running": {
+		"message": "Ingen instances kørende"
+	},
+	"app.action-bar.offline": {
+		"message": "Offline"
+	},
+	"app.action-bar.primary-instance": {
+		"message": "Primære instance"
+	},
+	"app.action-bar.reload-to-update": {
+		"message": "Genindlæs for at opdatere"
+	},
+	"app.action-bar.show-downloads": {
+		"message": "Vis aktive downloads"
+	},
+	"app.action-bar.show-more-running-instances": {
+		"message": "Vis flere kørende instances"
+	},
+	"app.action-bar.stop-instance": {
+		"message": "Stop instance"
+	},
+	"app.action-bar.update": {
+		"message": "Opdater"
+	},
+	"app.action-bar.view-active-downloads": {
+		"message": "Vis aktive downloads"
+	},
+	"app.action-bar.view-instance": {
+		"message": "Vis instance"
+	},
+	"app.action-bar.view-logs": {
+		"message": "Vis logs"
+	},
+	"app.ads-consent.accept": {
+		"message": "Accepter alle"
+	},
+	"app.ads-consent.body": {
+		"message": "Reklamer gør Owyx muligt og finansiere skaber udbetalinger. Vores partnere må gemme og tilgå cookies i appen for at personliggøre reklamer og måle effektivitet."
+	},
+	"app.ads-consent.manage": {
+		"message": "Administrer præferencer"
+	},
+	"app.ads-consent.reject": {
+		"message": "Afvis alle"
+	},
+	"app.ads-consent.title": {
+		"message": "Dit privatliv og hvordan reklamer hjælper Owyx"
+	},
+	"app.appearance-settings.compact-mode.description": {
+		"message": "Vis biblioteksinstanser i et kompakt række-layout."
+	},
+	"app.appearance-settings.compact-mode.title": {
+		"message": "Kompakt tilstand"
+	},
+	"app.appearance-settings.default-landing-page.home": {
+		"message": "Hjem"
+	},
+	"app.appearance-settings.default-landing-page.library": {
+		"message": "Bibliotek"
+	},
+	"app.appearance-settings.hide-nametag.description": {
+		"message": "Skjul dit brugernavn over spillerforhåndsvisning på Skin selector-siden."
+	},
+	"app.appearance-settings.hide-nametag.title": {
+		"message": "Gem nametag"
+	},
+	"app.appearance-settings.minimize-launcher.description": {
+		"message": "Minimér Owyx når Minecraft starter."
+	},
+	"app.appearance-settings.minimize-launcher.title": {
+		"message": "Minimer app"
+	},
+	"app.appearance-settings.show-play-time.description": {
+		"message": "Vis hvor længe du har spillet hver instans."
+	},
+	"app.appearance-settings.show-play-time.title": {
+		"message": "Vis spilletid"
+	},
+	"app.appearance-settings.skip-non-essential-warnings.description": {
+		"message": "Spring bekræftelser over for handlinger med lav risiko, såsom duplikerede installationer, normal sletning af indhold, masseopdateringer, frakobling, og reparationer. Advarsler om farlige handlinger vises altid."
+	},
+	"app.appearance-settings.skip-non-essential-warnings.title": {
+		"message": "Spring ikke nødvendige advarseler over"
+	},
+	"app.appearance-settings.toggle-sidebar.description": {
+		"message": "Skjul som standard højre sidepanel og tilføj en knap for at vise eller skjule det."
+	},
+	"app.appearance-settings.toggle-sidebar.title": {
+		"message": "Skjul højre sidebar"
+	},
+	"app.appearance-settings.unknown-pack-warning.description": {
+		"message": "Vis en sikkerhedsadvarsel, før du installerer en Owyx Pack (.mrpack), der ikke er hostet på Owyx."
+	},
+	"app.appearance-settings.unknown-pack-warning.title": {
+		"message": "Advar mig før jeg installere en ukendt modpacks"
+	},
+	"app.auth-servers.unreachable.body": {
+		"message": "Minecraft authentication servere kan måske være nede lige nu. Tjek din internet forbindelse og prøv igen senere."
+	},
+	"app.auth-servers.unreachable.header": {
+		"message": "Kan ikke nå godkendelsesserverne"
+	},
+	"app.behavior-settings.confirmations.title": {
+		"message": "Bekræftelser"
+	},
+	"app.behavior-settings.content.title": {
+		"message": "Hjem og indhold"
+	},
+	"app.behavior-settings.startup-and-navigation.title": {
+		"message": "Opstart og navigation"
+	},
+	"app.behavior-settings.sync-across-devices.description": {
+		"message": "Brug disse adfærdsindstillinger overalt du er logget på. Slå dette fra for at holde separate indstillinger på denne enhed."
+	},
+	"app.behavior-settings.sync-across-devices.signed-out-tooltip": {
+		"message": "Log ind på en Owyx-konto for at synkronisere indstillinger."
+	},
+	"app.behavior-settings.sync-across-devices.title": {
+		"message": "Synkroniser adfærd på tværs af enheder"
+	},
+	"app.browse.add-servers-to-instance": {
+		"message": "Tilføjet server til instance"
+	},
+	"app.browse.add-to-an-instance": {
+		"message": "Tilføj til en instance"
+	},
+	"app.browse.add-to-instance": {
+		"message": "Tilføj til instance"
+	},
+	"app.browse.add-to-instance-name": {
+		"message": "Tilføj til {instanceName}"
+	},
+	"app.browse.added": {
+		"message": "Tilføjet"
+	},
+	"app.browse.already-added": {
+		"message": "Allerede tilføjet"
+	},
+	"app.browse.back-to-instance": {
+		"message": "Tilbage til instance"
+	},
+	"app.browse.discover-project-type": {
+		"message": "Udforsk {projectType}"
+	},
+	"app.browse.discover-servers": {
+		"message": "Opdag servere"
+	},
+	"app.browse.hide-added-servers": {
+		"message": "Gem servere som allerede er tilføjet"
+	},
+	"app.browse.hide-installed-modpacks": {
+		"message": "Skjul allerede installeret"
+	},
+	"app.browse.project-actions.label": {
+		"message": "Projekthandlinger"
+	},
+	"app.browse.project-type.data-packs": {
+		"message": "Datapakker"
+	},
+	"app.browse.project-type.modpacks": {
+		"message": "Modpacks"
+	},
+	"app.browse.project-type.mods": {
+		"message": "Mods"
+	},
+	"app.browse.project-type.resource-packs": {
+		"message": "Ressourcepakker"
+	},
+	"app.browse.project-type.servers": {
+		"message": "Servere"
+	},
+	"app.browse.project-type.shaders": {
+		"message": "Shaders"
+	},
+	"app.browse.server-instance-content-warning": {
+		"message": "Tilføjelse af indhold kan forhindre dig i at deltage i denne server. Ethvert indhold du tilføjer, vil blive fjernet når det administrerede serverindhold opdateres."
+	},
+	"app.browse.server.installing": {
+		"message": "Installere"
+	},
+	"app.content-install.no-compatible-versions": {
+		"message": "Ingen tilgængelige versioner passer til {compatibilityLabel}. Vælg en version for at installere. Afhængigheder bliver ikke installeret automatisk."
+	},
+	"app.content.desync-pack": {
+		"message": "Desync"
+	},
+	"app.content.sync-data-packs-disabled": {
+		"message": "Slå først synkronisering af datapakke til i app-indstillingerne."
+	},
+	"app.content.sync-pack": {
+		"message": "Synkronisér"
+	},
+	"app.export-modal.description-placeholder": {
+		"message": "Indtast modpack beskrivelse..."
+	},
+	"app.export-modal.export-button": {
+		"message": "Eksporter"
+	},
+	"app.export-modal.header": {
+		"message": "Eksporter modpack"
+	},
+	"app.export-modal.modpack-name-label": {
+		"message": "Modpack navn"
+	},
+	"app.export-modal.modpack-name-placeholder": {
+		"message": "Modpack navn"
+	},
+	"app.export-modal.version-number-label": {
+		"message": "Versionsnummer"
+	},
+	"app.export-modal.version-number-placeholder": {
+		"message": "1.0.0"
+	},
+	"app.install.phase.downloading_content": {
+		"message": "Downloader indhold"
+	},
+	"app.install.phase.downloading_minecraft": {
+		"message": "Downloader Minecraft"
+	},
+	"app.install.phase.finalizing": {
+		"message": "Færdiggører"
+	},
+	"app.install.phase.preparing_instance": {
+		"message": "I kø til at intallere"
+	},
+	"app.install.phase.preparing_java": {
+		"message": "Forbereder Java"
+	},
+	"app.install.phase.preparing_java.downloading": {
+		"message": "Downloader Java {version}"
+	},
+	"app.install.phase.preparing_java.extracting": {
+		"message": "Udpakker Java {version}"
+	},
+	"app.install.phase.preparing_java.fetching-metadata": {
+		"message": "Henter Java {version}"
+	},
+	"app.install.phase.preparing_java.resolving": {
+		"message": "Forbereder Java {version}"
+	},
+	"app.install.phase.preparing_java.validating": {
+		"message": "Validerer Java {version}"
+	},
+	"app.instance.admonitions.shared-instance.added-label": {
+		"message": "Tilføjet"
+	},
+	"app.instance.admonitions.shared-instance.publish-button": {
+		"message": "Skub opdatering"
+	},
+	"app.instance.admonitions.shared-instance.publishing-button": {
+		"message": "Skubber..."
+	},
+	"app.instance.admonitions.shared-instance.removed-label": {
+		"message": "Fjernet"
+	},
+	"app.instance.admonitions.shared-instance.review-admonition-header": {
+		"message": "Skub opdatering"
+	},
+	"app.instance.admonitions.shared-instance.review-header": {
+		"message": "Gennemså ændringer"
+	},
+	"app.instance.admonitions.shared-instance.reviewing-button": {
+		"message": "Gennemgår..."
+	},
+	"app.instance.confirm-delete.admonition-body": {
+		"message": "Al' data for din instance vil blive permanent slettet, dette inkludere dine verdener, konfigurationer, og alt installeret indhold."
+	},
+	"app.instance.confirm-delete.admonition-header": {
+		"message": "Denne handling kan ikke fortrydes"
+	},
+	"app.instance.confirm-delete.delete-button": {
+		"message": "Slet instance"
+	},
+	"app.instance.confirm-delete.header": {
+		"message": "Slet instance"
+	},
+	"app.instance.modpack-already-installed.body": {
+		"message": "Denne modpack er allerede installeret i <bold>{instanceName}</bold> instancen. Er du sikker på du vil duplikere den?"
+	},
+	"app.instance.modpack-already-installed.create": {
+		"message": "Opret"
+	},
+	"app.instance.modpack-already-installed.header": {
+		"message": "Modpack allerede installeret"
+	},
+	"app.instance.modpack-already-installed.instance": {
+		"message": "Instance"
+	},
+	"app.instance.mods.bulk-update.downloading-projects": {
+		"message": "Downloader {current, number}/{total, number} projekter..."
+	},
+	"app.instance.mods.content-type-project": {
+		"message": "projekt"
+	},
+	"app.instance.mods.locked-content": {
+		"message": "Indhold i låste instances kan ikke blive ændret."
+	},
+	"app.instance.mods.project-was-added": {
+		"message": "\"{name}\" blev tilføjet"
+	},
+	"app.instance.mods.projects-were-added": {
+		"message": "{count} projekter blev tilføjet"
+	},
+	"app.instance.mods.share-text": {
+		"message": "Tjek ud disse projekter jeg bruger i min modpack!"
+	},
+	"app.instance.mods.share-title": {
+		"message": "Deler modpack indhold"
+	},
+	"app.instance.mods.successfully-uploaded": {
+		"message": "Uploadet"
+	},
+	"app.instance.share.empty.description": {
+		"message": "Du kan ændre denne instance med dine venner!"
+	},
+	"app.instance.share.empty.heading": {
+		"message": "Ingen venner inviteret"
+	},
+	"app.instance.share.empty.invite-friends-button": {
+		"message": "Inviter venner"
+	},
+	"app.instance.share.invite-modal.heading": {
+		"message": "Del {name}"
+	},
+	"app.instance.share.locked.empty-description-suffix": {
+		"message": "for at tilgå denne side."
+	},
+	"app.instance.share.locked.signed-out-heading": {
+		"message": "Ikke logget ind"
+	},
+	"app.instance.share.locked.switch-account-button": {
+		"message": "Skift konto"
+	},
+	"app.instance.share.locked.wrong-account-heading": {
+		"message": "Forkert konto"
+	},
+	"app.instance.share.remove-user-modal.effects-label": {
+		"message": "Hvad vil der ske?"
+	},
+	"app.instance.share.remove-user-modal.header": {
+		"message": "Fjern adgang"
+	},
+	"app.instance.share.remove-user-modal.remove-button": {
+		"message": "Fjern adgang"
+	},
+	"app.instance.share.remove-user-modal.user-avatar-alt": {
+		"message": "{username}'s avatar"
+	},
+	"app.instance.share.sign-in.button": {
+		"message": "Log ind"
+	},
+	"app.instance.shared-instance-already-installed.install-anyway": {
+		"message": "Installer alligevel"
+	},
+	"app.instance.shared-instance-already-installed.instance": {
+		"message": "Instans"
+	},
+	"app.instance.shared-instance-wrong-account.sign-in-as-label": {
+		"message": "Log ind som"
+	},
+	"app.instance.worlds.add-server": {
+		"message": "Tilføj server"
+	},
+	"app.instance.worlds.browse-servers": {
+		"message": "Søg servere"
+	},
+	"app.instance.worlds.delete-world-modal.delete-button": {
+		"message": "Slet verden"
+	},
+	"app.instance.worlds.delete-world-modal.title": {
+		"message": "Slet verden"
+	},
+	"app.instance.worlds.delete-world-modal.warning-header": {
+		"message": "Sletter {name}"
+	},
+	"app.instance.worlds.filter-modded": {
+		"message": "Moddet"
+	},
+	"app.instance.worlds.filter-offline": {
+		"message": "Offline"
+	},
+	"app.instance.worlds.filter-online": {
+		"message": "Online"
+	},
+	"app.instance.worlds.filter-vanilla": {
+		"message": "Vanilla"
+	},
+	"app.instance.worlds.no-worlds-description": {
+		"message": "Tilføj en server, eller søg efter en for at komme i gang"
+	},
+	"app.instance.worlds.no-worlds-heading": {
+		"message": "Ingen servere eller verdener tilføjet"
+	},
+	"app.instance.worlds.remove-server-modal.remove-button": {
+		"message": "Fjern server"
+	},
+	"app.instance.worlds.remove-server-modal.title": {
+		"message": "Fjern server"
+	},
+	"app.instance.worlds.remove-server-modal.warning-header": {
+		"message": "Fjerner {name}"
+	},
+	"app.instance.worlds.search-worlds-placeholder": {
+		"message": "Søg {count} verdener..."
+	},
+	"app.modal.install-to-play.additional-context": {
+		"message": "Yderligere kontekst"
+	},
+	"app.modal.install-to-play.delete-instance": {
+		"message": "Slet instans"
+	},
+	"app.modal.install-to-play.header": {
+		"message": "Installer for at spille"
+	},
+	"app.modal.install-to-play.install-anyway": {
+		"message": "Installer alligevel"
+	},
+	"app.modal.install-to-play.install-button": {
+		"message": "Installer"
+	},
+	"app.modal.install-to-play.mod-count": {
+		"message": "{count, plural, one {# mod} other {# mods}}"
+	},
+	"app.modal.install-to-play.report-image-too-large": {
+		"message": "Filen overskrider 1MiB størrelse begrænsning"
+	},
+	"app.modal.install-to-play.shared-instance": {
+		"message": "Delt instance"
+	},
+	"app.modal.install-to-play.view-contents": {
+		"message": "Vis indhold"
+	},
+	"app.modal.update-to-play.header": {
+		"message": "Opdater for at spille"
+	},
+	"app.modal.update-to-play.shared-instance-added-label": {
+		"message": "Tilføjede"
+	},
+	"app.modal.update-to-play.shared-instance-removed-label": {
+		"message": "Fjernede"
+	},
+	"app.modal.update-to-play.update-required": {
+		"message": "Opdatering krævet"
+	},
+	"app.project.install-button.already-installed": {
+		"message": "Dette projekt er allerede installeret"
+	},
+	"app.project.install-button.switch-version": {
+		"message": "Skift version"
+	},
+	"app.project.install-context.back-to-browse": {
+		"message": "Tilbage til udforsk"
+	},
+	"app.project.version.all-versions": {
+		"message": "Alle versioner"
+	},
+	"app.project.version.download-in-browser": {
+		"message": "Download i browser"
+	},
+	"app.project.version.installing": {
+		"message": "Installere"
+	},
+	"app.project.versions.already-installed": {
+		"message": "Allerede installeret"
+	},
+	"app.settings.developer-mode-enabled": {
+		"message": "Udvikler-tilstand aktiveret."
+	},
+	"app.settings.downloading": {
+		"message": "Downloader v{version}"
+	},
+	"app.settings.tabs.appearance": {
+		"message": "Udseende"
+	},
+	"app.settings.tabs.java-installations": {
+		"message": "Javainstallationer"
+	},
+	"app.settings.tabs.language": {
+		"message": "Sprog"
+	},
+	"app.settings.tabs.privacy": {
+		"message": "Privatliv"
+	},
+	"app.settings.tabs.resource-management": {
+		"message": "Ressourcestyring"
+	},
+	"app.skins.add-button": {
+		"message": "Tilføj skin"
+	},
+	"app.skins.add-button.drag-and-drop": {
+		"message": "Træk og slip"
+	},
+	"app.skins.apply-button": {
+		"message": "Brug"
+	},
+	"app.skins.delete-button": {
+		"message": "Slet skin"
+	},
+	"app.skins.delete-modal.description": {
+		"message": "Dette vil permanent slette det valgte skin. Dette vil ikke kunne blive fortydes."
+	},
+	"app.skins.delete-modal.title": {
+		"message": "Er du sikker på, at du vil slette dette skin?"
+	},
+	"app.skins.dropped-file-error.text": {
+		"message": "Fejl ved læsning af den afleverede fil."
+	},
+	"app.skins.dropped-file-error.title": {
+		"message": "Fejl under behandling af fil"
+	},
+	"app.skins.edit-button": {
+		"message": "Rediger skin"
+	},
+	"app.skins.modal.add-skin-button": {
+		"message": "Tilføj skin"
+	},
+	"app.skins.modal.add-title": {
+		"message": "Tilføjer et skin"
+	},
+	"app.skins.modal.arm-style-section": {
+		"message": "Arm stil"
+	},
+	"app.skins.modal.arm-style-slim": {
+		"message": "Slank"
+	},
+	"app.skins.modal.arm-style-wide": {
+		"message": "Bred"
+	},
+	"app.skins.modal.cape-fallback-name": {
+		"message": "Kappe"
+	},
+	"app.skins.modal.cape-section": {
+		"message": "Kappe"
+	},
+	"app.skins.modal.edit-title": {
+		"message": "Rediger skin"
+	},
+	"app.skins.modal.make-edit-first-tooltip": {
+		"message": "Rediger skinnet først!"
+	},
+	"app.skins.modal.no-cape-tooltip": {
+		"message": "Ingen kappe"
+	},
+	"app.skins.modal.none-cape-option": {
+		"message": "Ingen"
+	},
+	"app.skins.modal.save-skin-button": {
+		"message": "Gem skin"
+	},
+	"app.skins.modal.saving-tooltip": {
+		"message": "Gemmer..."
+	},
+	"app.skins.modal.upload-skin-first-tooltip": {
+		"message": "Upload et skin først!"
+	},
+	"app.skins.preview.edit-button": {
+		"message": "Rediger skin"
+	},
+	"app.skins.previewing-badge": {
+		"message": "Forhåndsvisning"
+	},
+	"app.skins.rate-limit.text": {
+		"message": "Du skifter dit skin for ofte. Mojang's servere har midlertidigt blokeret fremtidige anmodninger. Vent venligst et øjeblik for du prøver igen."
+	},
+	"app.skins.rate-limit.title": {
+		"message": "Ro på!"
+	},
+	"app.skins.section.builders-and-biomes": {
+		"message": "Builders & Biomes"
+	},
+	"app.skins.section.chaos-cubed": {
+		"message": "Chaos Cubed"
+	},
+	"app.skins.section.chase-the-skies": {
+		"message": "Chase the Skies"
+	},
+	"app.skins.section.default-skins": {
+		"message": "Standard skins"
+	},
+	"app.skins.section.minecon-earth-2017": {
+		"message": "MINECON Earth 2017"
+	},
+	"app.skins.section.modrinth": {
+		"message": "Owyx"
+	},
+	"app.skins.section.modrinth-pride": {
+		"message": "Owyx Pride"
+	},
+	"app.skins.section.modrinth-pride.tooltip": {
+		"message": "Du modtog disse skins for at donere til en Owyx Pride indsamling imens der er Pride Month."
+	},
+	"app.skins.section.mounts-of-mayhem": {
+		"message": "Mounts of Mayhem"
+	},
+	"app.skins.section.saved-skins": {
+		"message": "Gemte skins"
+	},
+	"app.skins.section.striding-hero": {
+		"message": "Striding Hero"
+	},
+	"app.skins.section.the-copper-age": {
+		"message": "The Copper Age"
+	},
+	"app.skins.section.the-garden-awakens": {
+		"message": "The Garden Awakens"
+	},
+	"app.skins.section.tiny-takeover": {
+		"message": "Tiny Takeover"
+	},
+	"app.skins.title": {
+		"message": "Skin vælger"
+	},
+	"app.skins.toggle-ears-features-off": {
+		"message": "Slå fra"
+	},
+	"app.skins.toggle-ears-features-on": {
+		"message": "Slå til"
+	},
+	"app.update-popup.body.download-complete": {
+		"message": "Owyx v{version} er færdig med at download. Genindlæs for at opdatere nu, eller automatisk når du lukker Owyx."
+	},
+	"app.update-popup.body.linux": {
+		"message": "Owyx v{version} er nu tilgængelig. Brug din pakke-manager til at opdatere for de nyeste features og fejlrettelser!"
+	},
+	"app.update-popup.body.metered": {
+		"message": "Owyx v{version} er nu tilgængelig! Siden du er på et begrænset netværk, vi downloadede den ikke automatisk."
+	},
+	"app.update-popup.changelog": {
+		"message": "Ændringslog"
+	},
+	"app.update-popup.download": {
+		"message": "Download ({size})"
+	},
+	"app.update-popup.download-complete": {
+		"message": "Download færdiggjort"
+	},
+	"app.update-popup.reload": {
+		"message": "Genindlæs for at opdater"
+	},
+	"app.update-popup.title": {
+		"message": "Opdatering tilgængelig"
+	},
+	"app.update.complete-toast.text": {
+		"message": "Klik her for at vise ændringslog."
+	},
+	"app.update.complete-toast.title": {
+		"message": "Version {version} var installeret med succes!"
+	},
+	"app.world.server-modal.placeholder-address": {
+		"message": "eksemple.modrinth.gg"
+	},
+	"app.world.server-modal.select-an-option": {
+		"message": "Vælg en mulighed"
+	},
+	"app.world.world-item.incompatible-version": {
+		"message": "Ikke kompatibel version {version}"
+	},
+	"app.world.world-item.not-played-yet": {
+		"message": "Ikke spillet endnu"
+	},
+	"app.world.world-item.offline": {
+		"message": "Offline"
+	},
+	"content.shared-instance.delete-button": {
+		"message": "Slet alligevel"
+	},
+	"friends.action.add-friend": {
+		"message": "Tilføj en ven"
+	},
+	"friends.action.view-friend-requests": {
+		"message": "{count} venne{count, plural, one {anmodning} other {anmodninger}}"
+	},
+	"friends.add-friend.submit": {
+		"message": "Send en venneanmodning"
+	},
+	"friends.add-friend.title": {
+		"message": "Tilføjer en ven"
+	},
+	"friends.add-friend.username.description": {
+		"message": "Det er muligvis anderledes end deres Minecraft brugernavn!"
+	},
+	"friends.add-friend.username.placeholder": {
+		"message": "Indskriv Owyx brugernavn..."
+	},
+	"friends.add-friend.username.title": {
+		"message": "Hvad er din vens Owyx brugernavn?"
+	},
+	"friends.add-friends-to-share": {
+		"message": "<link>Tilføj venner</link> for at se hvad de spiller!"
+	},
+	"friends.friend.cancel-request": {
+		"message": "Annuller anmodning"
+	},
+	"friends.friend.remove-friend": {
+		"message": "Fjern ven"
+	},
+	"friends.friend.request-sent": {
+		"message": "Venneanmodning sendt"
+	},
+	"friends.friend.view-profile": {
+		"message": "Vis profil"
+	},
+	"friends.heading": {
+		"message": "Venner"
+	},
+	"friends.heading.active": {
+		"message": "Aktiv"
+	},
+	"friends.heading.offline": {
+		"message": "Offline"
+	},
+	"friends.heading.online": {
+		"message": "Online"
+	},
+	"friends.heading.pending": {
+		"message": "Afventer"
+	},
+	"friends.no-friends-match": {
+		"message": "Ingen venner som matcher \"{query}\""
+	},
+	"friends.search-friends-placeholder": {
+		"message": "Søg venner..."
+	},
+	"friends.section.heading": {
+		"message": "{title} - {count}"
+	},
+	"friends.sign-in-to-add-friends": {
+		"message": "<link>Log ind på en Owyx konto</link> for at tilføje venner og se hvad de spiller!"
+	},
+	"instance.action.create-shortcut": {
+		"message": "Opret genvej"
+	},
+	"instance.action.export-modpack": {
+		"message": "Eksporter modpack"
+	},
+	"instance.action.more-actions": {
+		"message": "Flere handlinger"
+	},
+	"instance.action.open-folder": {
+		"message": "Åbn mappe"
+	},
+	"instance.action.settings": {
+		"message": "Instans indstillinger"
+	},
+	"instance.action.starting": {
+		"message": "Starter..."
+	},
+	"instance.action.stopping": {
+		"message": "Stopper..."
+	},
+	"instance.add-server.add-and-play": {
+		"message": "Tilføj og spil"
+	},
+	"instance.add-server.add-server": {
+		"message": "Tilføj server"
+	},
+	"instance.add-server.resource-pack.disabled": {
+		"message": "Deaktiveret"
+	},
+	"instance.add-server.resource-pack.enabled": {
+		"message": "Aktiveret"
+	},
+	"instance.add-server.resource-pack.prompt": {
+		"message": "Spørg"
+	},
+	"instance.add-server.title": {
+		"message": "Tilføj en server"
+	},
+	"instance.edit-server.title": {
+		"message": "Rediger server"
+	},
+	"instance.edit-world.hide-from-home": {
+		"message": "Skjul fra forside"
+	},
+	"instance.edit-world.name": {
+		"message": "Navn"
+	},
+	"instance.edit-world.placeholder-name": {
+		"message": "Minecraft verden"
+	},
+	"instance.edit-world.reset-icon": {
+		"message": "Nulstil ikon"
+	},
+	"instance.edit-world.title": {
+		"message": "Rediger verden"
+	},
+	"instance.files.adding-files": {
+		"message": "Tilføjer filer ({completed}/{total})"
+	},
+	"instance.files.save-as": {
+		"message": "Gem som..."
+	},
+	"instance.locked.delete-button": {
+		"message": "Slet instans"
+	},
+	"instance.locked.play-tooltip": {
+		"message": "Denne instans er blevet låst"
+	},
+	"instance.playtime.never-played": {
+		"message": "Aldrig spillet"
+	},
+	"instance.server-modal.address": {
+		"message": "Adresse"
+	},
+	"instance.server-modal.name": {
+		"message": "Navn"
+	},
+	"instance.server-modal.placeholder-name": {
+		"message": "Minecraft server"
+	},
+	"instance.server-modal.resource-pack": {
+		"message": "Ressourcepakke"
+	},
+	"instance.settings.tabs.general": {
+		"message": "Generelt"
+	},
+	"instance.settings.tabs.general.delete": {
+		"message": "Slet instans"
+	},
+	"instance.settings.tabs.general.delete.button": {
+		"message": "Slet instans"
+	},
+	"instance.settings.tabs.general.delete.description": {
+		"message": "Permanent slet en instans fra din enhed, inkluderer dine verdener, konfigurationer, og alt installeret indhold. Vær forsigtig, for så snart du sletter en instans der er ingen at gendanne det."
+	},
+	"instance.settings.tabs.general.deleting.button": {
+		"message": "Sletter..."
+	},
+	"instance.settings.tabs.general.duplicate-button": {
+		"message": "Kopiér"
+	},
+	"instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+		"message": "Kan ikke kopiere under installation."
+	},
+	"instance.settings.tabs.general.duplicate-instance": {
+		"message": "Kopiér instans"
+	},
+	"instance.settings.tabs.general.duplicate-instance.description": {
+		"message": "Opret en kopi af denne instans, inkluderer verdener, konfigurationer, mods, osv."
+	},
+	"instance.settings.tabs.general.edit-icon": {
+		"message": "Rediger ikon"
+	},
+	"instance.settings.tabs.general.edit-icon.remove": {
+		"message": "Fjern ikon"
+	},
+	"instance.settings.tabs.general.edit-icon.replace": {
+		"message": "Udskift ikon"
+	},
+	"instance.settings.tabs.general.edit-icon.select": {
+		"message": "Vælg ikon"
+	},
+	"instance.settings.tabs.general.name": {
+		"message": "Navn"
+	},
+	"instance.settings.tabs.general.update-channel.alpha": {
+		"message": "Alpha"
+	},
+	"instance.settings.tabs.general.update-channel.beta": {
+		"message": "Beta"
+	},
+	"instance.settings.tabs.hooks.post-exit": {
+		"message": "Post-exit"
+	},
+	"instance.settings.tabs.hooks.post-exit.description": {
+		"message": "Kørte efter spillet lukkes."
+	},
+	"instance.settings.tabs.hooks.post-exit.enter": {
+		"message": "Indtast post-exit kommando..."
+	},
+	"instance.settings.tabs.hooks.pre-launch": {
+		"message": "Pre-launch"
+	},
+	"instance.settings.tabs.hooks.pre-launch.description": {
+		"message": "Kørt før en instance bliver kørt."
+	},
+	"instance.settings.tabs.hooks.pre-launch.enter": {
+		"message": "Indtast pre-launch kommando..."
+	},
+	"instance.settings.tabs.hooks.wrapper": {
+		"message": "Wrapper"
+	},
+	"instance.settings.tabs.hooks.wrapper.description": {
+		"message": "Wrapper kommando for at køre Minecraft."
+	},
+	"instance.settings.tabs.hooks.wrapper.enter": {
+		"message": "Indtast wrapper kommando..."
+	},
+	"instance.settings.tabs.installation": {
+		"message": "Installation"
+	},
+	"instance.settings.tabs.installation.loader-version": {
+		"message": "{loader} version"
+	},
+	"instance.settings.tabs.java.enter-java-arguments": {
+		"message": "Indskriv Java argumenter..."
+	},
+	"instance.settings.tabs.java.hooks": {
+		"message": "Hooks"
+	},
+	"instance.settings.tabs.java.java-path-placeholder": {
+		"message": "/vej/til/java"
+	},
+	"instance.settings.tabs.window.fullscreen": {
+		"message": "Fuld skærm"
+	},
+	"instance.settings.tabs.window.fullscreen.description": {
+		"message": "Gør så spillet starter i fuld skærm når du køre spillet (Med brug af options.txt)."
+	},
+	"instance.settings.tabs.window.height": {
+		"message": "Højde"
+	},
+	"instance.settings.tabs.window.height.description": {
+		"message": "Højden af spillevinduet når kørt."
+	},
+	"instance.settings.tabs.window.height.enter": {
+		"message": "Indtast højde..."
+	},
+	"instance.settings.tabs.window.width": {
+		"message": "Bredde"
+	},
+	"instance.settings.tabs.window.width.description": {
+		"message": "Bredden på spille vinduet når kørt."
+	},
+	"instance.settings.tabs.window.width.enter": {
+		"message": "Indtast bredde..."
+	},
+	"instance.shared-instance.error.title": {
+		"message": "Noget gik galt"
+	},
+	"instance.shared-instance.publish-review.added-label": {
+		"message": "Tilføjede"
+	},
+	"instance.shared-instance.publish-review.admonition-header": {
+		"message": "Skub opdatering til spillere"
+	},
+	"instance.shared-instance.publish-review.config-title-v2": {
+		"message": "Vælg konfigurations filer"
+	},
+	"instance.shared-instance.publish-review.header": {
+		"message": "Gennemså ændringer"
+	},
+	"instance.shared-instance.publish-review.publish-button": {
+		"message": "Skub opdatering"
+	},
+	"instance.shared-instance.publish-review.removed-label": {
+		"message": "Fjernede"
+	},
+	"instance.shared-instance.unavailable.locked-title": {
+		"message": "Instans låst"
+	},
+	"instance.shared-instance.unavailable.title": {
+		"message": "Delt instans er ikke længere tilgængelig"
+	},
+	"instance.worlds.a_minecraft_server": {
+		"message": "En Minecraft server"
+	},
+	"instance.worlds.cant_connect": {
+		"message": "Kan ikke forbinde til serveren"
+	},
+	"instance.worlds.copy_address": {
+		"message": "Kopier adresse"
+	},
+	"instance.worlds.create_shortcut": {
+		"message": "Opret genvej"
+	},
+	"instance.worlds.dont_show_on_home": {
+		"message": "Vis ikke på forsiden"
+	},
+	"instance.worlds.game_already_open": {
+		"message": "Instance allerede åben"
+	},
+	"instance.worlds.hardcore": {
+		"message": "Hardcore mode"
+	},
+	"instance.worlds.incompatible_server": {
+		"message": "Serveren er uforenelig"
+	},
+	"instance.worlds.linked_server": {
+		"message": "Styret af server projektet"
+	},
+	"instance.worlds.no_contact": {
+		"message": "Serveren kunne ikke blive kontaktet"
+	},
+	"instance.worlds.no_server_quick_play": {
+		"message": "Du kan kun hoppe lige ind i servere på Minecraft Alpha 1.0.5+"
+	},
+	"instance.worlds.no_singleplayer_quick_play": {
+		"message": "Du kan kun hoppe lige ind i singleplayer verdener på Minecraft 1.20+"
+	},
+	"instance.worlds.play_instance": {
+		"message": "Spil instance"
+	},
+	"instance.worlds.view_instance": {
+		"message": "Se instance"
+	},
+	"instance.worlds.world_in_use": {
+		"message": "Verden er i brug"
+	},
+	"minecraft-account.add-account": {
+		"message": "Tilføj konto"
+	},
+	"minecraft-account.label": {
+		"message": "Minecraft konto"
+	},
+	"minecraft-account.not-signed-in": {
+		"message": "Ikke logged ind"
+	},
+	"minecraft-account.remove-account": {
+		"message": "Fjern konto"
+	},
+	"minecraft-account.select-account": {
+		"message": "Vælg konto"
+	},
+	"minecraft-account.sign-in": {
+		"message": "Log ind på Minecraft"
+	},
+	"minecraft-required.description-header": {
+		"message": "Log ind med en Microsoft konto"
+	},
+	"minecraft-required.dont-have-account": {
+		"message": "Har du ikke en konto?"
+	},
+	"minecraft-required.get-minecraft": {
+		"message": "Få Minecraft"
+	},
+	"minecraft-required.get-support": {
+		"message": "Få hjælp"
+	},
+	"minecraft-required.header": {
+		"message": "Minecraft påkrævet"
+	},
+	"minecraft-required.sign-in": {
+		"message": "Log ind på Microsoft"
+	},
+	"modal.modrinth-account-required.continue-in-browser-heading": {
+		"message": "Fortsæt i din browser"
+	},
+	"modal.modrinth-account-required.create-account-button": {
+		"message": "Opret en konto"
+	},
+	"modal.modrinth-account-required.header": {
+		"message": "Konto påkrævet"
+	},
+	"modal.modrinth-account-required.open-browser-again-button": {
+		"message": "Åbn browser igen"
+	},
+	"modal.modrinth-account-required.sign-in-button": {
+		"message": "Log ind på Owyx"
+	},
+	"modal.modrinth-account-required.sign-in-heading": {
+		"message": "Log ind med en Owyx konto"
+	},
+	"modal.modrinth-account-required.signing-in-header": {
+		"message": "Logger ind"
+	},
+	"modal.modrinth-account-required.support-prompt": {
+		"message": "Har du problemer med at logge ind? <support>Få hjælp</support>"
+	},
+	"modal.modrinth-account-required.waiting-for-browser": {
+		"message": "Venter på browser bekræftigelse..."
+	},
+	"search.filter.locked.instance": {
+		"message": "Givet af instanceen"
+	},
+	"search.filter.locked.instance-game-version.title": {
+		"message": "Spille version er givet af instanceen"
+	},
+	"search.filter.locked.instance-loader.title": {
+		"message": "Loader er givet af instanceen"
+	},
+	"search.filter.locked.instance.sync": {
+		"message": "Synkroniser med instance"
+	},
+	"search.filter.locked.server-environment.title": {
+		"message": "Kun klient-sided mods kan blive tilføjet til denne server instance"
+	},
+	"app.nav.admin-panel": {
+		"message": "Adminpanel"
+	}
 }

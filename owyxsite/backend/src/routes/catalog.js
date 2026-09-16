@@ -654,7 +654,7 @@ const ingestUpload = multer({
       cb(null, `${safe}-${Date.now()}.zip`);
     },
   }),
-  limits: { fileSize: 50 * 1024 * 1024 },
+  limits: { fileSize: 2 * 1024 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     const name = String(file.originalname || '').toLowerCase();
     if (!name.endsWith('.zip') && !name.endsWith('.mrpack')) {
@@ -673,12 +673,22 @@ packsAdmin.post(
     }
     next();
   },
-  ingestUpload.single('archive'),
+  (req, res, next) => {
+    ingestUpload.single('archive')(req, res, (err) => {
+      if (!err) return next();
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(413).json({
+          error: 'archive too large (max 2 GB)',
+        });
+      }
+      return res.status(400).json({ error: err.message || 'upload failed' });
+    });
+  },
   async (req, res) => {
   try {
     const existing = await db.query(`SELECT * FROM packs WHERE id = $1`, [req.params.id]);
     if (!existing.rows[0]) return res.status(404).json({ error: 'Пак не найден' });
-    if (!req.file) return res.status(400).json({ error: 'Приложите zip (поле archive), до 50 МБ' });
+    if (!req.file) return res.status(400).json({ error: 'Приложите zip (поле archive), до 2 ГБ' });
     const bytes = await fs.promises.readFile(req.file.path);
     const sha256 = crypto.createHash('sha256').update(bytes).digest('hex');
     const isMrpack = String(req.file.originalname || '').toLowerCase().endsWith('.mrpack');
@@ -701,7 +711,7 @@ packsAdmin.post(
       pack: adminPack(result.rows[0]),
       downloadUrl: url,
       sha256,
-      note: 'Файл на этом сайте. Для 2 ГБ склада задайте http_zip URL мини-ПК вручную.',
+      note: 'Файл на этом сайте. Для очень больших складов задайте http_zip URL мини-ПК вручную.',
     });
   } catch (error) {
     if (req.file?.path) fs.promises.unlink(req.file.path).catch(() => {});

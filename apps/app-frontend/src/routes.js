@@ -16,6 +16,11 @@ export default new createRouter({
 			component: () => import('@/pages/OwyxServers.vue'),
 		},
 		{
+			path: '/owyx-admin',
+			name: 'OwyxAdmin',
+			component: () => import('@/pages/OwyxAdmin.vue'),
+		},
+		{
 			path: '/hosting/manage/',
 			name: 'Servers',
 			redirect: '/owyx-servers',

@@ -1,1187 +1,1187 @@
 {
-  "app.action-bar.downloading-java": {
-    "message": "Đang tải xuống Java {version}"
-  },
-  "app.action-bar.downloading-update": {
-    "message": "Đang tải xuống bản cập nhật"
-  },
-  "app.action-bar.downloads": {
-    "message": "Tải xuống"
-  },
-  "app.action-bar.hide-downloads": {
-    "message": "Ẩn các lượt tải xuống đang hoạt động"
-  },
-  "app.action-bar.hide-more-running-instances": {
-    "message": "Đóng các phiên bản đang chạy"
-  },
-  "app.action-bar.install.copied-details": {
-    "message": "Đã sao chép"
-  },
-  "app.action-bar.install.copy-details": {
-    "message": "Sao chép chi tiết"
-  },
-  "app.action-bar.install.dismiss": {
-    "message": "Bỏ qua"
-  },
-  "app.action-bar.install.open-instance": {
-    "message": "Xem phiên bản"
-  },
-  "app.action-bar.install.retry": {
-    "message": "Thử lại"
-  },
-  "app.action-bar.install.summary.app-closing": {
-    "message": "Đã hủy do đóng ứng dụng"
-  },
-  "app.action-bar.install.summary.bad-modpack-file": {
-    "message": "Không đọc được modpack"
-  },
-  "app.action-bar.install.summary.canceled": {
-    "message": "Đã hủy"
-  },
-  "app.action-bar.install.summary.cleanup-incomplete": {
-    "message": "Dọn dẹp không hoàn thện"
-  },
-  "app.action-bar.install.summary.content-download-failed": {
-    "message": "Không tải được tệp"
-  },
-  "app.action-bar.install.summary.corrupt-download": {
-    "message": "Tệp được tải bị hỏng"
-  },
-  "app.action-bar.install.summary.could-not-save-files": {
-    "message": "Không lưu được tệp"
-  },
-  "app.action-bar.install.summary.download-failed": {
-    "message": "Không hoàn tất tải xuống"
-  },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "Không tìm thấy phiên bản"
-  },
-  "app.action-bar.install.summary.invalid-file-path": {
-    "message": "Đường dẫn tệp tin không hợp lệ"
-  },
-  "app.action-bar.install.summary.invalid-modpack": {
-    "message": "Dữ liệu modpack không hợp lệ"
-  },
-  "app.action-bar.install.summary.invalid-modpack-files": {
-    "message": "Tệp modpack có metadata không hợp lệ"
-  },
-  "app.action-bar.install.summary.java-setup-failed": {
-    "message": "Quá trình cài đặt Java không thể hoàn thành"
-  },
-  "app.action-bar.install.summary.loader-setup-failed": {
-    "message": "Cài đặt Loader thất bại"
-  },
-  "app.action-bar.install.summary.local-data-error": {
-    "message": "Không thể cập nhật dữ liệu cục bộ"
-  },
-  "app.action-bar.install.summary.minecraft-setup-failed": {
-    "message": "Cài đặt Minecraft thất bại"
-  },
-  "app.action-bar.install.summary.modrinth-unreachable": {
-    "message": "Không thể kết nối được với Modrinth"
-  },
-  "app.action-bar.install.summary.no-write-permission": {
-    "message": "Không có quyền để viết"
-  },
-  "app.action-bar.install.summary.pack-download-failed": {
-    "message": "Không thể tải xuống gói"
-  },
-  "app.action-bar.install.summary.unexpected-error": {
-    "message": "Đã xảy ra lỗi"
-  },
-  "app.action-bar.install.unknown-instance": {
-    "message": "Instance không rõ"
-  },
-  "app.action-bar.install.updating-shared-content": {
-    "message": "Đang cập nhật nội dung được chia sẻ"
-  },
-  "app.action-bar.make-primary-instance": {
-    "message": "Đặt làm bản instance chính"
-  },
-  "app.action-bar.no-instances-running": {
-    "message": "Không có phiên bản nào đang chạy"
-  },
-  "app.action-bar.offline": {
-    "message": "Ngoại tuyến"
-  },
-  "app.action-bar.primary-instance": {
-    "message": "Bản instance chính"
-  },
-  "app.action-bar.reload-to-update": {
-    "message": "Tải lại để cập nhật"
-  },
-  "app.action-bar.show-downloads": {
-    "message": "Hiển thị các lượt tải xuống đang hoạt động"
-  },
-  "app.action-bar.show-more-running-instances": {
-    "message": "Hiện thêm các phiên bản đang chạy"
-  },
-  "app.action-bar.stop-instance": {
-    "message": "Dừng instance"
-  },
-  "app.action-bar.update": {
-    "message": "Cập nhật"
-  },
-  "app.action-bar.view-active-downloads": {
-    "message": "Xem các lượt tải xuống"
-  },
-  "app.action-bar.view-instance": {
-    "message": "Xem phiên bản"
-  },
-  "app.action-bar.view-logs": {
-    "message": "Xem logs"
-  },
-  "app.ads-consent.accept": {
-    "message": "Chấp nhận tất cả"
-  },
-  "app.ads-consent.body": {
-    "message": "Quảng cáo giúp Modrinth hoạt động và tài trợ cho việc thanh toán cho người sáng tạo nội dung. Các đối tác của chúng tôi có thể lưu trữ hoặc truy cập cookie trong ứng dụng để cá nhân hóa quảng cáo và đo lường hiệu suất."
-  },
-  "app.ads-consent.manage": {
-    "message": "Quản lý tùy chọn"
-  },
-  "app.ads-consent.reject": {
-    "message": "Từ chối tất cả"
-  },
-  "app.ads-consent.title": {
-    "message": "Quyền riêng tư của bạn và cách quảng cáo hỗ trợ Modrinth"
-  },
-  "app.appearance-settings.compact-mode.description": {
-    "message": "Hiển thị thư viện phiên bản theo bố cục hàng nhỏ gọn."
-  },
-  "app.appearance-settings.compact-mode.title": {
-    "message": "Chế độ nhỏ gọn"
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Trang chủ"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Thư viện"
-  },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Ẩn tên người dùng của bạn phía trên phần xem trước nhân vật tại trang chọn giao diện skin."
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "Ẩn thẻ tên"
-  },
-  "app.appearance-settings.minimize-launcher.description": {
-    "message": "Thu nhỏ ứng dụng Modrinth khi Minecraft khởi động."
-  },
-  "app.appearance-settings.minimize-launcher.title": {
-    "message": "Thu nhỏ ứng dụng"
-  },
-  "app.appearance-settings.show-play-time.description": {
-    "message": "Hiển thị thời gian bạn đã chơi mỗi phiên."
-  },
-  "app.appearance-settings.show-play-time.title": {
-    "message": "Hiện thời gian chơi"
-  },
-  "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Bỏ qua bước xác nhận đối với các thao tác ít rủi ro như cài đặt lại, xóa nội dung thông thường, cập nhật hàng loạt, hủy liên kết và sửa chữa. Các cảnh báo cho những thao tác nguy hiểm sẽ luôn được hiển thị."
-  },
-  "app.appearance-settings.skip-non-essential-warnings.title": {
-    "message": "Bỏ qua các cảnh báo không quan trọng"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Ẩn thanh bên phải theo mặc định và thêm nút để hiển thị hoặc ẩn nó."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Ẩn thanh bên"
-  },
-  "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Hiển thị cảnh báo an toàn trước khi cài đặt một gói Modrinth (.mrpack) không được lưu trữ trên Modrinth."
-  },
-  "app.appearance-settings.unknown-pack-warning.title": {
-    "message": "Cảnh báo tôi trước khi cài đặt các modpacks không rõ nguồn gốc"
-  },
-  "app.auth-servers.unreachable.body": {
-    "message": "Máy chủ xác thực của Minecraft có thể đang bị sập. Hãy kiểm tra kết nối Internet của bạn và thử lại sau."
-  },
-  "app.auth-servers.unreachable.header": {
-    "message": "Không thể kết nối đến máy chủ xác thực"
-  },
-  "app.behavior-settings.confirmations.title": {
-    "message": "Các xác nhận"
-  },
-  "app.behavior-settings.content.title": {
-    "message": "Nhà và nội dung"
-  },
-  "app.behavior-settings.startup-and-navigation.title": {
-    "message": "Khởi động và điều hướng"
-  },
-  "app.behavior-settings.sync-across-devices.description": {
-    "message": "Sử dụng các cài đặt hành vi này ở mọi nơi bạn đăng nhập. Hãy tắt tùy chọn này nếu muốn duy trì các cài đặt riêng cho thiết bị này."
-  },
-  "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
-    "message": "Đăng nhập vào tài khoản Modrinth để đồng bộ hóa cài đặt."
-  },
-  "app.behavior-settings.sync-across-devices.title": {
-    "message": "Đồng bộ hóa hành vi trên các thiết bị"
-  },
-  "app.browse.add-servers-to-instance": {
-    "message": "Thêm máy chủ vào phiên bản"
-  },
-  "app.browse.add-to-an-instance": {
-    "message": "Thêm vào phiên bản"
-  },
-  "app.browse.add-to-instance": {
-    "message": "Thêm vào hồ sơ"
-  },
-  "app.browse.add-to-instance-name": {
-    "message": "Thêm vào {instanceName}"
-  },
-  "app.browse.added": {
-    "message": "Đã thêm"
-  },
-  "app.browse.already-added": {
-    "message": "Đã được thêm"
-  },
-  "app.browse.back-to-instance": {
-    "message": "Quay lại phiên bản"
-  },
-  "app.browse.discover-project-type": {
-    "message": "Khám phá {projectType}"
-  },
-  "app.browse.discover-servers": {
-    "message": "Khám phá máy chủ"
-  },
-  "app.browse.hide-added-servers": {
-    "message": "Ẩn máy chủ đã thêm vào"
-  },
-  "app.browse.hide-installed-modpacks": {
-    "message": "Ẩn modpacks đã cài đặt"
-  },
-  "app.browse.project-actions.label": {
-    "message": "Hành động cho dự án"
-  },
-  "app.browse.project-type.data-packs": {
-    "message": "Các gói dữ liệu"
-  },
-  "app.browse.project-type.modpacks": {
-    "message": "Modpack"
-  },
-  "app.browse.project-type.mods": {
-    "message": "Mods"
-  },
-  "app.browse.project-type.resource-packs": {
-    "message": "Các gói tài nguyên"
-  },
-  "app.browse.project-type.servers": {
-    "message": "Máy chủ"
-  },
-  "app.browse.project-type.shaders": {
-    "message": "Shaders"
-  },
-  "app.browse.server-instance-content-warning": {
-    "message": "Việc thêm nội dung có thể khiến bạn không thể tham gia máy chủ này. Mọi nội dung bạn thêm vào sẽ bị xóa khi nội dung do máy chủ quản lý được cập nhật."
-  },
-  "app.browse.server.installing": {
-    "message": "Đang cài đặt"
-  },
-  "app.content-install.no-compatible-versions": {
-    "message": "Không có phiên bản nào phù hợp với {compatibilityLabel}. Nếu vẫn chọn một phiên bản để cài đặt, các gói phụ thuộc sẽ không được tải tự động."
-  },
-  "app.content.desync-pack": {
-    "message": "Bỏ đồng bộ"
-  },
-  "app.content.sync-pack": {
-    "message": "Đồng bộ"
-  },
-  "app.error.state-init.open-backups-folder": {
-    "message": "Mở thư mục sao lưu"
-  },
-  "app.export-modal.description-placeholder": {
-    "message": "Thêm miêu tả cho gói modpack..."
-  },
-  "app.export-modal.export-button": {
-    "message": "Xuất"
-  },
-  "app.export-modal.export-complete": {
-    "message": "Hoàn thành xuất"
-  },
-  "app.export-modal.export-complete-description": {
-    "message": "{name} đã được xuất thành công."
-  },
-  "app.export-modal.header": {
-    "message": "Xuất modpack"
-  },
-  "app.export-modal.modpack-name-label": {
-    "message": "Tên modpack"
-  },
-  "app.export-modal.modpack-name-placeholder": {
-    "message": "Tên modpack"
-  },
-  "app.export-modal.version-number-label": {
-    "message": "Phiên bản"
-  },
-  "app.export-modal.version-number-placeholder": {
-    "message": "1.0.0"
-  },
-  "app.features-settings.show-skin-selector.title": {
-    "message": "Hiển thị phần chọn skin ở thanh bên"
-  },
-  "app.features-settings.sidebar.title": {
-    "message": "Thanh bên"
-  },
-  "app.home.jump-back-in.instance-locked": {
-    "message": "Phiên bản này đã bị khóa"
-  },
-  "app.home.jump-back-in.instance-open": {
-    "message": "Phiên bản đã được mở"
-  },
-  "app.home.jump-back-in.more-options": {
-    "message": "Thêm lựa chọn"
-  },
-  "app.home.jump-back-in.never-played": {
-    "message": "Chưa từng chơi"
-  },
-  "app.home.jump-back-in.new-instance": {
-    "message": "Thêm phiên bản"
-  },
-  "app.home.jump-back-in.resize": {
-    "message": "Kéo để thay đổi kích thước"
-  },
-  "app.home.jump-back-in.title": {
-    "message": "Tham gia ngay"
-  },
-  "app.home.jump-back-in.view-instance": {
-    "message": "Xem phiên bản"
-  },
-  "app.hosting.update-required.description": {
-    "message": "Bạn cần cập nhật để sử dụng Owyx Servers thông qua ứng dụng Modrinth"
-  },
-  "app.hosting.update-required.download": {
-    "message": "Tải xuống để cập nhật"
-  },
-  "app.hosting.update-required.title": {
-    "message": "Yêu cầu cập nhật ứng dụng Modrinth"
-  },
-  "app.install.phase.downloading_content": {
-    "message": "Đang tải nội dung"
-  },
-  "app.install.phase.downloading_minecraft": {
-    "message": "Đang tải Minecraft"
-  },
-  "app.install.phase.downloading_pack_file": {
-    "message": "Đang tải tệp gói"
-  },
-  "app.install.phase.extracting_overrides": {
-    "message": "Trích xuất ghi đè"
-  },
-  "app.install.phase.finalizing": {
-    "message": "Hoàn tất"
-  },
-  "app.install.phase.preparing_instance": {
-    "message": "Đã thêm vào hàng chờ tải"
-  },
-  "app.install.phase.preparing_java": {
-    "message": "Đang chuẩn bị Java"
-  },
-  "app.install.phase.preparing_java.downloading": {
-    "message": "Đang tải Java {version}"
-  },
-  "app.install.phase.preparing_java.extracting": {
-    "message": "Trích xuất Java {version}"
-  },
-  "app.install.phase.preparing_java.fetching-metadata": {
-    "message": "Đang tìm Java {version}"
-  },
-  "app.install.phase.preparing_java.resolving": {
-    "message": "Đang chuẩn bị Java {version}"
-  },
-  "app.instance.action.edit": {
-    "message": "Chỉnh sửa"
-  },
-  "app.instance.action.open-folder": {
-    "message": "Mở thư mục"
-  },
-  "app.instance.action.play": {
-    "message": "Chơi"
-  },
-  "app.instance.action.stop": {
-    "message": "Dừng"
-  },
-  "app.instance.add-server.add": {
-    "message": "Thêm"
-  },
-  "app.instance.admonitions.shared-instance.review-header": {
-    "message": "Xem lại các thay đổi"
-  },
-  "app.instance.admonitions.shared-instance.reviewing-button": {
-    "message": "Đang xem xét..."
-  },
-  "app.instance.card.loading": {
-    "message": "Đang tải phiên bản..."
-  },
-  "app.instance.confirm-delete.admonition-body": {
-    "message": "Tất cả dữ liệu trong gói hồ sơ này sẽ bị xoá, bao gồm thế giới của bạn, cấu hình, và tất cả nội dung đã được tải xuống."
-  },
-  "app.instance.confirm-delete.admonition-header": {
-    "message": "Hành động này sẽ không thể huỷ bỏ"
-  },
-  "app.instance.confirm-delete.bulk-admonition-body": {
-    "message": "Tất cả dữ liệu của {count} phiên bản này sẽ bị xóa vĩnh viễn, bao gồm thế giới, cấu hình và toàn bộ nội dung đã cài đặt."
-  },
-  "app.instance.confirm-delete.bulk-delete-button": {
-    "message": "Xóa {count} mục"
-  },
-  "app.instance.confirm-delete.delete-button": {
-    "message": "Xoá hồ sơ"
-  },
-  "app.instance.confirm-delete.header": {
-    "message": "Xoá hồ sơ"
-  },
-  "app.instance.content.managed-content.modpack-header": {
-    "message": "Nội dung modpack"
-  },
-  "app.instance.content.managed-content.shared-header": {
-    "message": "Nội dung được chia sẻ"
-  },
-  "app.instance.modpack-already-installed.body": {
-    "message": "Gói modpack này đã được cài đặt trong hồ sơ <bold>{instanceName}</bold> rồi. Bạn có chắc chắn muốn sao chép nó không?"
-  },
-  "app.instance.modpack-already-installed.create": {
-    "message": "Khởi tạo"
-  },
-  "app.instance.modpack-already-installed.header": {
-    "message": "Modpack đã được cài đặt"
-  },
-  "app.instance.modpack-already-installed.instance": {
-    "message": "Hồ sơ"
-  },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "Đang tải xuống {current, number}/{total, number} dự án..."
-  },
-  "app.instance.mods.bulk-update.finishing": {
-    "message": "Đang hoàn tất cập nhật..."
-  },
-  "app.instance.mods.bulk-update.resolving-versions": {
-    "message": "Đang xác định các phiên bản..."
-  },
-  "app.instance.mods.content-type-project": {
-    "message": "Dự án"
-  },
-  "app.instance.mods.freeze-content": {
-    "message": "Phiên bản cố định"
-  },
-  "app.instance.mods.locked-content": {
-    "message": "Không thể thay đổi nội dung trong các instance bị khóa."
-  },
-  "app.instance.mods.project-was-added": {
-    "message": "\"{name}\" đã được thêm"
-  },
-  "app.instance.mods.projects-were-added": {
-    "message": "{count} dự án đã được thêm"
-  },
-  "app.instance.mods.share-text": {
-    "message": "Kiểm tra dự án tôi đang sử dụng trong modpack của mình!"
-  },
-  "app.instance.mods.share-title": {
-    "message": "Chia sẻ hồ sơ modpack"
-  },
-  "app.instance.mods.successfully-uploaded": {
-    "message": "Tải lên thành công"
-  },
-  "app.instance.mods.unfreeze-content": {
-    "message": "Hủy đóng băng phiên bản"
-  },
-  "app.instance.share.empty.description": {
-    "message": "Bạn có thể chia sẻ phiên bản này với bạn bè của mình!"
-  },
-  "app.instance.share.empty.heading": {
-    "message": "Không có bạn để mời"
-  },
-  "app.instance.share.invite-modal.user-limit-reached": {
-    "message": "Phiên bản này đã đạt đến giới hạn {limit} người dùng."
-  },
-  "app.instance.share.locked.empty-description-prefix": {
-    "message": "Bạn cần đăng nhập với tư cách là"
-  },
-  "app.instance.share.locked.empty-description-suffix": {
-    "message": "để truy cập trang này."
-  },
-  "app.instance.share.locked.linked-account-fallback": {
-    "message": "tài khoản được liên kết"
-  },
-  "app.instance.share.locked.switch-account-button": {
-    "message": "Đổi tài khoản"
-  },
-  "app.instance.share.locked.wrong-account-heading": {
-    "message": "Sai tài khoản"
-  },
-  "app.instance.share.members.empty": {
-    "message": "Chưa có người dùng nào tham gia"
-  },
-  "app.instance.worlds.add-server": {
-    "message": "Thêm máy chủ"
-  },
-  "app.instance.worlds.browse-servers": {
-    "message": "Tìm kiếm máy chủ"
-  },
-  "app.instance.worlds.delete-world-modal.delete-button": {
-    "message": "Xóa thế giới"
-  },
-  "app.instance.worlds.delete-world-modal.title": {
-    "message": "Xóa thế giới"
-  },
-  "app.instance.worlds.delete-world-modal.warning-header": {
-    "message": "Đang xóa {name}"
-  },
-  "app.instance.worlds.filter-modded": {
-    "message": "Modded"
-  },
-  "app.instance.worlds.filter-offline": {
-    "message": "Ngoại tuyến"
-  },
-  "app.instance.worlds.filter-online": {
-    "message": "Trực tuyến"
-  },
-  "app.instance.worlds.filter-vanilla": {
-    "message": "Vanilla"
-  },
-  "app.instance.worlds.no-worlds-description": {
-    "message": "Thêm một máy chủ hoặc tìm kiếm để bắt đầu"
-  },
-  "app.instance.worlds.no-worlds-heading": {
-    "message": "Không có máy chủ hay thế giới nào đã được thêm"
-  },
-  "app.instance.worlds.remove-server-modal.remove-button": {
-    "message": "Bỏ khỏi danh sách"
-  },
-  "app.instance.worlds.remove-server-modal.title": {
-    "message": "Xóa máy chủ"
-  },
-  "app.instance.worlds.remove-server-modal.warning-header": {
-    "message": "{name} sẽ bị xóa"
-  },
-  "app.instance.worlds.search-worlds-placeholder": {
-    "message": "Tìm kiếm {count} world..."
-  },
-  "app.java-detection.select": {
-    "message": "Chọn"
-  },
-  "app.library.filter.game-version": {
-    "message": "Phiên bản trò chơi"
-  },
-  "app.library.filter.instance-type.server": {
-    "message": "Máy chủ"
-  },
-  "app.library.instance.action.delete": {
-    "message": "Xoá"
-  },
-  "app.modal.install-to-play.header": {
-    "message": "Tải xuống để chơi"
-  },
-  "app.modal.install-to-play.install-anyway": {
-    "message": "Tải tiếp"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Tải xuống"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, other {# mod}}"
-  },
-  "app.modal.install-to-play.shared-instance": {
-    "message": "Chia sẻ hồ sơ"
-  },
-  "app.modal.install-to-play.view-contents": {
-    "message": "Xem nội dung"
-  },
-  "app.modal.update-to-play.header": {
-    "message": "Cập nhật và bắt đầu chơi"
-  },
-  "app.modal.update-to-play.removed": {
-    "message": "Đã bỏ"
-  },
-  "app.project.install-button.already-installed": {
-    "message": "Dự án này đã được cài đặt"
-  },
-  "app.project.install-button.switch-version": {
-    "message": "Đổi phiên bản"
-  },
-  "app.project.install-context.back-to-browse": {
-    "message": "Quay lại trang Khám Phá"
-  },
-  "app.project.version.all-versions": {
-    "message": "Tất cả phiên bản"
-  },
-  "app.project.version.download-in-browser": {
-    "message": "Tải trong trình duyệt"
-  },
-  "app.project.version.installing": {
-    "message": "Đang tải"
-  },
-  "app.project.versions.already-installed": {
-    "message": "Đã có sẵn"
-  },
-  "app.settings.default-instance-options.fullscreen.title": {
-    "message": "Toàn màn hình"
-  },
-  "app.settings.default-instance-options.java-arguments.placeholder": {
-    "message": "Nhập đối số Java..."
-  },
-  "app.settings.default-instance-options.memory-allocation.title": {
-    "message": "Cấp phát bộ nhớ"
-  },
-  "app.settings.default-instance-options.post-exit-hook.description": {
-    "message": "Chạy sau khi trò chơi đóng lại."
-  },
-  "app.settings.default-instance-options.post-exit-hook.placeholder": {
-    "message": "Nhập lệnh sau khi thoát..."
-  },
-  "app.settings.default-instance-options.width.placeholder": {
-    "message": "Nhập chiều rộng..."
-  },
-  "app.settings.default-instance-options.width.title": {
-    "message": "Chiều rộng"
-  },
-  "app.settings.default-instance-options.window.title": {
-    "message": "Cửa sổ"
-  },
-  "app.settings.default-instance-options.wrapper-hook.description": {
-    "message": "Lệnh dùng để bọc tiến trình chạy Minecraft."
-  },
-  "app.settings.default-instance-options.wrapper-hook.placeholder": {
-    "message": "Nhập lệnh bọc..."
-  },
-  "app.settings.developer-mode-button.label": {
-    "message": "Bật tắt chế độ nhà phát triển"
-  },
-  "app.settings.developer-mode-enabled": {
-    "message": "Chế độ nhà phát triển đã được bật."
-  },
-  "app.settings.downloading": {
-    "message": "Đang tải về v{version}"
-  },
-  "app.settings.tabs.appearance": {
-    "message": "Giao diện"
-  },
-  "app.settings.tabs.java-installations": {
-    "message": "Các bản cài Java"
-  },
-  "app.settings.tabs.language": {
-    "message": "Ngôn ngữ"
-  },
-  "app.settings.tabs.privacy": {
-    "message": "Quyền riêng tư"
-  },
-  "app.settings.tabs.resource-management": {
-    "message": "Quản lý tài nguyên"
-  },
-  "app.skins.add-button": {
-    "message": "Skin tự tạo"
-  },
-  "app.skins.add-button.drag-and-drop": {
-    "message": "Kéo và thả"
-  },
-  "app.skins.apply-button": {
-    "message": "Áp dụng"
-  },
-  "app.skins.delete-button": {
-    "message": "Xóa skin"
-  },
-  "app.skins.delete-modal.description": {
-    "message": "Hành động này sẽ xóa skin trên vĩnh viễn. Hành động này không thể khôi phục lại."
-  },
-  "app.skins.delete-modal.title": {
-    "message": "Bạn hoàn toàn muốn xóa skin này chứ?"
-  },
-  "app.skins.dropped-file-error.text": {
-    "message": "Không đọc được file thả."
-  },
-  "app.skins.dropped-file-error.title": {
-    "message": "Có lỗi khi đọc file"
-  },
-  "app.skins.edit-button": {
-    "message": "Sửa skin"
-  },
-  "app.skins.modal.add-skin-button": {
-    "message": "Tạo skin"
-  },
-  "app.skins.modal.add-title": {
-    "message": "Tạo skin"
-  },
-  "app.skins.modal.arm-style-section": {
-    "message": "Độ rộng cánh tay"
-  },
-  "app.skins.modal.arm-style-slim": {
-    "message": "Gầy"
-  },
-  "app.skins.modal.arm-style-wide": {
-    "message": "Béo"
-  },
-  "app.skins.modal.cape-fallback-name": {
-    "message": "Cape"
-  },
-  "app.skins.modal.cape-section": {
-    "message": "Cape"
-  },
-  "app.skins.modal.edit-title": {
-    "message": "Sửa skin"
-  },
-  "app.skins.modal.make-edit-first-tooltip": {
-    "message": "Sửa skin trước đã!"
-  },
-  "app.skins.modal.no-cape-tooltip": {
-    "message": "Không cape"
-  },
-  "app.skins.modal.none-cape-option": {
-    "message": "Không"
-  },
-  "app.skins.modal.replace-texture-button": {
-    "message": "Đổi skin"
-  },
-  "app.skins.modal.save-skin-button": {
-    "message": "Lưu skin"
-  },
-  "app.skins.modal.saving-tooltip": {
-    "message": "Đang lưu..."
-  },
-  "app.skins.modal.texture-section": {
-    "message": "Skin"
-  },
-  "app.skins.modal.upload-skin-first-tooltip": {
-    "message": "Nhập skin vào trước đã!"
-  },
-  "app.skins.preview.edit-button": {
-    "message": "Sửa skin"
-  },
-  "app.skins.previewing-badge": {
-    "message": "Xem trước"
-  },
-  "app.skins.rate-limit.text": {
-    "message": "Bạn đang chỉnh skin quá thường xuyên. Mãy chủ của Mojang đã tạm thời chặn lại các yêu cầu hiện thời. Đợi một lúc trước khi thử lại lần nữa."
-  },
-  "app.skins.rate-limit.title": {
-    "message": "Bình tĩnh lại!"
-  },
-  "app.skins.reorder-error.text": {
-    "message": "Không thể lưu thứ tự skin của bạn."
-  },
-  "app.skins.reorder-error.title": {
-    "message": "Sắp xếp lại skin thất bại"
-  },
-  "app.skins.section.builders-and-biomes": {
-    "message": "Builders & Biomes"
-  },
-  "app.skins.section.chaos-cubed": {
-    "message": "Chaos Cubed"
-  },
-  "app.skins.section.chase-the-skies": {
-    "message": "Chase the Skies"
-  },
-  "app.skins.section.default-skins": {
-    "message": "Skin mặc định"
-  },
-  "app.skins.section.minecon-earth-2017": {
-    "message": "MINECON Earth 2017"
-  },
-  "app.skins.section.modrinth": {
-    "message": "Modrinth"
-  },
-  "app.skins.section.modrinth-pride": {
-    "message": "Modrinth Pride"
-  },
-  "app.skins.section.modrinth-pride.tooltip": {
-    "message": "Bạn đã được tặng những skin này sau khi quyên góp cho Modrinth trong tháng tự hào LGBT thế giới."
-  },
-  "app.skins.section.mounts-of-mayhem": {
-    "message": "Mounts of Mayhem"
-  },
-  "app.skins.section.saved-skins": {
-    "message": "Skin đã lưu"
-  },
-  "app.skins.section.striding-hero": {
-    "message": "Striding Hero"
-  },
-  "app.skins.section.the-copper-age": {
-    "message": "The Copper Age"
-  },
-  "app.skins.section.the-garden-awakens": {
-    "message": "The Garden Awakens"
-  },
-  "app.skins.section.tiny-takeover": {
-    "message": "Tiny Takeover"
-  },
-  "app.skins.title": {
-    "message": "Đổi skin"
-  },
-  "app.update-popup.body.download-complete": {
-    "message": "Phiên bản v{version} của Modrinth đã sẵn sàng để có thể cài đặt. Khởi động lại ứng dụng để cập nhật ngay bây giờ, hoặc tự động cập nhật sau khi bạn tắt Modrinth."
-  },
-  "app.update-popup.body.linux": {
-    "message": "Phiên bản v{version} của Modrinth hiện đang khả dụng. Hãy sử dụng trình quản lý gói của bạn để cập nhật các tính năng và bản vá lỗi mới nhất!"
-  },
-  "app.update-popup.body.metered": {
-    "message": "Phiên bản v{version} của Modrinth hiện đang khả dụng ngay bây giờ! Vì bạn đang sử dụng mạng có tính phí theo dung lượng nên chúng tôi không tự động tải xuống."
-  },
-  "app.update-popup.changelog": {
-    "message": "Nhật ký thay đổi"
-  },
-  "app.update-popup.download": {
-    "message": "Tải xuống ({size})"
-  },
-  "app.update-popup.download-complete": {
-    "message": "Cài đặt thành công"
-  },
-  "app.update-popup.reload": {
-    "message": "Tải lại để cập nhật"
-  },
-  "app.update-popup.title": {
-    "message": "Cập nhật mới hiện đang khả dụng"
-  },
-  "app.update.complete-toast.text": {
-    "message": "Nhấn vào đây để xem nhật kí thay đổi."
-  },
-  "app.update.complete-toast.title": {
-    "message": "Phiên bản {version} đã được cài đặt thành công!"
-  },
-  "app.world.server-modal.placeholder-address": {
-    "message": "example.modrinth.gg"
-  },
-  "app.world.server-modal.select-an-option": {
-    "message": "Chọn một tuỳ chọn"
-  },
-  "app.world.world-item.incompatible-version": {
-    "message": "Không phù hợp với phiên bản {version}"
-  },
-  "app.world.world-item.not-played-yet": {
-    "message": "Chưa từng được chơi"
-  },
-  "app.world.world-item.offline": {
-    "message": "Ngoại tuyến"
-  },
-  "friends.action.add-friend": {
-    "message": "Thêm một người bạn"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "{count} {count, plural, other {yêu cầu kết bạn}}"
-  },
-  "friends.add-friend.submit": {
-    "message": "Gửi yêu cầu kết bạn"
-  },
-  "friends.add-friend.title": {
-    "message": "Thêm một người bạn"
-  },
-  "friends.add-friend.username.description": {
-    "message": "Nó có thể khác với tên người dùng Minecraft của họ!"
-  },
-  "friends.add-friend.username.placeholder": {
-    "message": "Nhập tên người dùng Modrinth..."
-  },
-  "friends.add-friend.username.title": {
-    "message": "Tên người dùng Modrinth của bạn của bạn là gì?"
-  },
-  "friends.add-friends-to-share": {
-    "message": "Hãy <link>thêm bạn bè</link> để biết họ đang chơi gì!"
-  },
-  "friends.friend.cancel-request": {
-    "message": "Huỷ yêu cầu"
-  },
-  "friends.friend.remove-friend": {
-    "message": "Xoá bạn bè"
-  },
-  "friends.friend.request-sent": {
-    "message": "Đã gửi yêu cầu kết bạn"
-  },
-  "friends.friend.view-profile": {
-    "message": "Xem thông tin"
-  },
-  "friends.heading": {
-    "message": "Bạn bè"
-  },
-  "friends.heading.active": {
-    "message": "Đang hoạt động"
-  },
-  "friends.heading.offline": {
-    "message": "Ngoại tuyến"
-  },
-  "friends.heading.online": {
-    "message": "Trực tuyến"
-  },
-  "friends.heading.pending": {
-    "message": "Đang chờ"
-  },
-  "friends.no-friends-match": {
-    "message": "Không có người bạn nào phù hợp với ''{query}''"
-  },
-  "friends.search-friends-placeholder": {
-    "message": "Tìm kiếm bạn bè..."
-  },
-  "friends.section.heading": {
-    "message": "{title} - {count}"
-  },
-  "friends.sign-in-to-add-friends": {
-    "message": "<link>Đăng nhập bằng tài khoản Modrinth</link> để kết bạn và xem họ đang chơi gì!"
-  },
-  "instance.add-server.add-and-play": {
-    "message": "Thêm và chơi"
-  },
-  "instance.add-server.add-server": {
-    "message": "Thêm máy chủ"
-  },
-  "instance.add-server.resource-pack.disabled": {
-    "message": "Tắt"
-  },
-  "instance.add-server.resource-pack.enabled": {
-    "message": "Bật"
-  },
-  "instance.add-server.resource-pack.prompt": {
-    "message": "Nhắc nhở"
-  },
-  "instance.add-server.title": {
-    "message": "Thêm máy chủ"
-  },
-  "instance.edit-server.title": {
-    "message": "Sửa máy chủ"
-  },
-  "instance.edit-world.hide-from-home": {
-    "message": "Ẩn khỏi trang chủ"
-  },
-  "instance.edit-world.name": {
-    "message": "Tên"
-  },
-  "instance.edit-world.placeholder-name": {
-    "message": "Thế giới Minecraft"
-  },
-  "instance.edit-world.reset-icon": {
-    "message": "Đặt lại biểu tượng"
-  },
-  "instance.edit-world.title": {
-    "message": "Chỉnh sửa thế giới"
-  },
-  "instance.files.adding-files": {
-    "message": "Đang thêm dữ liệu ({completed}/{total})"
-  },
-  "instance.files.save-as": {
-    "message": "Lưu như..."
-  },
-  "instance.server-modal.address": {
-    "message": "Địa chỉ"
-  },
-  "instance.server-modal.name": {
-    "message": "Tên"
-  },
-  "instance.server-modal.placeholder-name": {
-    "message": "Máy chủ Minecraft"
-  },
-  "instance.server-modal.resource-pack": {
-    "message": "Gói tài nguyên"
-  },
-  "instance.settings.tabs.general": {
-    "message": "Tổng quát"
-  },
-  "instance.settings.tabs.general.delete": {
-    "message": "Xoá hồ sơ"
-  },
-  "instance.settings.tabs.general.delete.button": {
-    "message": "Xoá hồ sơ"
-  },
-  "instance.settings.tabs.general.delete.description": {
-    "message": "Xoá vĩnh viễn sẽ xoá toàn bộ thế giới, cài đặt, và các nội dung được cài đặt khỏi thiết bị của bạn. Hãy cân nhắc và chắc chắn vì bạn không thể khôi phục các tệp dữ liệt sau khi xoá."
-  },
-  "instance.settings.tabs.general.deleting.button": {
-    "message": "Đang xoá..."
-  },
-  "instance.settings.tabs.general.duplicate-button": {
-    "message": "Nhân bản"
-  },
-  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
-    "message": "Không thể nhân bản trong khi đang cài đặt."
-  },
-  "instance.settings.tabs.general.duplicate-instance": {
-    "message": "Nhân bản hồ sơ"
-  },
-  "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "Tạo ra một bản sao của hồ sơ này, bao gồm các thế giới, cấu hình, mod, v.v."
-  },
-  "instance.settings.tabs.general.edit-icon": {
-    "message": "Sửa biểu tượng"
-  },
-  "instance.settings.tabs.general.edit-icon.remove": {
-    "message": "Loại bỏ biểu tượng"
-  },
-  "instance.settings.tabs.general.edit-icon.replace": {
-    "message": "Thay thế biểu tượng"
-  },
-  "instance.settings.tabs.general.edit-icon.select": {
-    "message": "Chọn biểu tượng"
-  },
-  "instance.settings.tabs.general.name": {
-    "message": "Tên"
-  },
-  "instance.settings.tabs.general.update-channel": {
-    "message": "Kênh cập nhật"
-  },
-  "instance.settings.tabs.general.update-channel.alpha": {
-    "message": "Sơ khai"
-  },
-  "instance.settings.tabs.general.update-channel.alpha.description": {
-    "message": "Các phiên bản chính thức, thử nghiệm và sơ khai sẽ hiển thị trong danh sách cập nhật có sẵn."
-  },
-  "instance.settings.tabs.general.update-channel.beta": {
-    "message": "Thử nghiệm"
-  },
-  "instance.settings.tabs.general.update-channel.beta.description": {
-    "message": "Các phiên bản chính thức và thử nghiệm sẽ hiển thị trong danh sách cập nhật có sẵn."
-  },
-  "instance.settings.tabs.general.update-channel.release": {
-    "message": "Chính thức"
-  },
-  "instance.settings.tabs.general.update-channel.release.description": {
-    "message": "Chỉ phiên bản chính thức sẽ hiển thị trong danh sách cập nhật có sẵn."
-  },
-  "instance.settings.tabs.general.update-channel.select": {
-    "message": "Chọn kênh cập nhật"
-  },
-  "instance.settings.tabs.hooks.post-exit": {
-    "message": "Sau khi thoát"
-  },
-  "instance.settings.tabs.hooks.post-exit.description": {
-    "message": "Chạy sau khi trò chơi đóng lại."
-  },
-  "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "Nhập lệnh sau khi thoát..."
-  },
-  "instance.settings.tabs.hooks.pre-launch": {
-    "message": "Trước khi chạy"
-  },
-  "instance.settings.tabs.hooks.pre-launch.description": {
-    "message": "Chạy trước khi hiện thể được khởi chạy."
-  },
-  "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "Nhập câu lệnh trước khi chạy..."
-  },
-  "instance.settings.tabs.hooks.wrapper": {
-    "message": "Lệnh bao bọc (Wrapper)"
-  },
-  "instance.settings.tabs.hooks.wrapper.description": {
-    "message": "Lệnh bao bọc (Wrapper) để khởi chạy Minecraft."
-  },
-  "instance.settings.tabs.hooks.wrapper.enter": {
-    "message": "Nhập lệnh bao bọc..."
-  },
-  "instance.settings.tabs.installation": {
-    "message": "Cài đặt"
-  },
-  "instance.settings.tabs.installation.loader-version": {
-    "message": "Phiên bản {loader}"
-  },
-  "instance.settings.tabs.java.enter-environment-variables": {
-    "message": "Nhập biến môi trường..."
-  },
-  "instance.settings.tabs.java.enter-java-arguments": {
-    "message": "Nhập tham số Java..."
-  },
-  "instance.settings.tabs.java.hooks": {
-    "message": "Hooks"
-  },
-  "instance.settings.tabs.java.java-path-placeholder": {
-    "message": "/đường_dẫn/tới/java"
-  },
-  "instance.settings.tabs.window.fullscreen": {
-    "message": "Toàn màn hình"
-  },
-  "instance.settings.tabs.window.fullscreen.description": {
-    "message": "Làm cho trò chơi bắt đầu ở dạng toàn màn hình khi khởi chạy (sử dụng options.txt)."
-  },
-  "instance.settings.tabs.window.height": {
-    "message": "Chiều cao"
-  },
-  "instance.settings.tabs.window.height.description": {
-    "message": "Chiều cao cửa sổ trò chơi khi khởi chạy."
-  },
-  "instance.settings.tabs.window.height.enter": {
-    "message": "Nhập chiều cao..."
-  },
-  "instance.settings.tabs.window.width": {
-    "message": "Chiều rộng"
-  },
-  "instance.settings.tabs.window.width.description": {
-    "message": "Chiều dài cửa sổ trò chơi khi khởi chạy."
-  },
-  "instance.settings.tabs.window.width.enter": {
-    "message": "Nhập chiều dài..."
-  },
-  "instance.worlds.a_minecraft_server": {
-    "message": "Một máy chủ Minecraft"
-  },
-  "instance.worlds.cant_connect": {
-    "message": "Không thể kết nối đến máy chủ"
-  },
-  "instance.worlds.copy_address": {
-    "message": "Sao chép địa chỉ"
-  },
-  "instance.worlds.create_shortcut": {
-    "message": "Tạo lối tắt"
-  },
-  "instance.worlds.dont_show_on_home": {
-    "message": "Không hiện ở Trang chủ"
-  },
-  "instance.worlds.game_already_open": {
-    "message": "Bản này đã mở sẵn"
-  },
-  "instance.worlds.hardcore": {
-    "message": "Chế độ siêu khó"
-  },
-  "instance.worlds.incompatible_server": {
-    "message": "Máy chủ không tương thích"
-  },
-  "instance.worlds.linked_server": {
-    "message": "Quản lý dự án máy chủ"
-  },
-  "instance.worlds.no_contact": {
-    "message": "Không thể liên lạc với máy chủ"
-  },
-  "instance.worlds.no_server_quick_play": {
-    "message": "Bạn chỉ có thể nhảy thẳng vào servers trên phiên bản Minecraft Alpha 1.0.5+"
-  },
-  "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Bạn chỉ có thể nhảy thẳng vào thế giới người chơi đơn trên phiên bản Minecraft 1.20+"
-  },
-  "instance.worlds.play_instance": {
-    "message": "Chơi phiên bản này"
-  },
-  "instance.worlds.view_instance": {
-    "message": "Xem phiên bản"
-  },
-  "instance.worlds.world_in_use": {
-    "message": "Thế giới đang mở"
-  },
-  "minecraft-account.add-account": {
-    "message": "Thêm tài khoản"
-  },
-  "minecraft-account.label": {
-    "message": "Tài khoản Minecraft"
-  },
-  "minecraft-account.not-signed-in": {
-    "message": "Chưa đăng nhập"
-  },
-  "minecraft-account.remove-account": {
-    "message": "Xoá tài khoản"
-  },
-  "minecraft-account.select-account": {
-    "message": "Chọn tài khoản"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Đăng nhập vào Minecraft"
-  },
-  "search.filter.locked.instance": {
-    "message": "Được cung cấp bởi phiên bản"
-  },
-  "search.filter.locked.instance-game-version.title": {
-    "message": "Phiên bản trò chơi được cung cấp bởi hồ sơ này"
-  },
-  "search.filter.locked.instance-loader.title": {
-    "message": "Loader được cung cấp bởi hồ sơ"
-  },
-  "search.filter.locked.instance.sync": {
-    "message": "Đồng bộ với phiên bản"
-  },
-  "search.filter.locked.server-environment.title": {
-    "message": "Chỉ các mod chạy phía client mới có thể thêm hồ sơ máy chủ"
-  },
-  "app.nav.admin-panel": {
-    "message": "Bảng quản trị"
-  }
+	"app.action-bar.downloading-java": {
+		"message": "Đang tải xuống Java {version}"
+	},
+	"app.action-bar.downloading-update": {
+		"message": "Đang tải xuống bản cập nhật"
+	},
+	"app.action-bar.downloads": {
+		"message": "Tải xuống"
+	},
+	"app.action-bar.hide-downloads": {
+		"message": "Ẩn các lượt tải xuống đang hoạt động"
+	},
+	"app.action-bar.hide-more-running-instances": {
+		"message": "Đóng các phiên bản đang chạy"
+	},
+	"app.action-bar.install.copied-details": {
+		"message": "Đã sao chép"
+	},
+	"app.action-bar.install.copy-details": {
+		"message": "Sao chép chi tiết"
+	},
+	"app.action-bar.install.dismiss": {
+		"message": "Bỏ qua"
+	},
+	"app.action-bar.install.open-instance": {
+		"message": "Xem phiên bản"
+	},
+	"app.action-bar.install.retry": {
+		"message": "Thử lại"
+	},
+	"app.action-bar.install.summary.app-closing": {
+		"message": "Đã hủy do đóng ứng dụng"
+	},
+	"app.action-bar.install.summary.bad-modpack-file": {
+		"message": "Không đọc được modpack"
+	},
+	"app.action-bar.install.summary.canceled": {
+		"message": "Đã hủy"
+	},
+	"app.action-bar.install.summary.cleanup-incomplete": {
+		"message": "Dọn dẹp không hoàn thện"
+	},
+	"app.action-bar.install.summary.content-download-failed": {
+		"message": "Không tải được tệp"
+	},
+	"app.action-bar.install.summary.corrupt-download": {
+		"message": "Tệp được tải bị hỏng"
+	},
+	"app.action-bar.install.summary.could-not-save-files": {
+		"message": "Không lưu được tệp"
+	},
+	"app.action-bar.install.summary.download-failed": {
+		"message": "Không hoàn tất tải xuống"
+	},
+	"app.action-bar.install.summary.instance-not-found": {
+		"message": "Không tìm thấy phiên bản"
+	},
+	"app.action-bar.install.summary.invalid-file-path": {
+		"message": "Đường dẫn tệp tin không hợp lệ"
+	},
+	"app.action-bar.install.summary.invalid-modpack": {
+		"message": "Dữ liệu modpack không hợp lệ"
+	},
+	"app.action-bar.install.summary.invalid-modpack-files": {
+		"message": "Tệp modpack có metadata không hợp lệ"
+	},
+	"app.action-bar.install.summary.java-setup-failed": {
+		"message": "Quá trình cài đặt Java không thể hoàn thành"
+	},
+	"app.action-bar.install.summary.loader-setup-failed": {
+		"message": "Cài đặt Loader thất bại"
+	},
+	"app.action-bar.install.summary.local-data-error": {
+		"message": "Không thể cập nhật dữ liệu cục bộ"
+	},
+	"app.action-bar.install.summary.minecraft-setup-failed": {
+		"message": "Cài đặt Minecraft thất bại"
+	},
+	"app.action-bar.install.summary.modrinth-unreachable": {
+		"message": "Không thể kết nối được với Owyx"
+	},
+	"app.action-bar.install.summary.no-write-permission": {
+		"message": "Không có quyền để viết"
+	},
+	"app.action-bar.install.summary.pack-download-failed": {
+		"message": "Không thể tải xuống gói"
+	},
+	"app.action-bar.install.summary.unexpected-error": {
+		"message": "Đã xảy ra lỗi"
+	},
+	"app.action-bar.install.unknown-instance": {
+		"message": "Instance không rõ"
+	},
+	"app.action-bar.install.updating-shared-content": {
+		"message": "Đang cập nhật nội dung được chia sẻ"
+	},
+	"app.action-bar.make-primary-instance": {
+		"message": "Đặt làm bản instance chính"
+	},
+	"app.action-bar.no-instances-running": {
+		"message": "Không có phiên bản nào đang chạy"
+	},
+	"app.action-bar.offline": {
+		"message": "Ngoại tuyến"
+	},
+	"app.action-bar.primary-instance": {
+		"message": "Bản instance chính"
+	},
+	"app.action-bar.reload-to-update": {
+		"message": "Tải lại để cập nhật"
+	},
+	"app.action-bar.show-downloads": {
+		"message": "Hiển thị các lượt tải xuống đang hoạt động"
+	},
+	"app.action-bar.show-more-running-instances": {
+		"message": "Hiện thêm các phiên bản đang chạy"
+	},
+	"app.action-bar.stop-instance": {
+		"message": "Dừng instance"
+	},
+	"app.action-bar.update": {
+		"message": "Cập nhật"
+	},
+	"app.action-bar.view-active-downloads": {
+		"message": "Xem các lượt tải xuống"
+	},
+	"app.action-bar.view-instance": {
+		"message": "Xem phiên bản"
+	},
+	"app.action-bar.view-logs": {
+		"message": "Xem logs"
+	},
+	"app.ads-consent.accept": {
+		"message": "Chấp nhận tất cả"
+	},
+	"app.ads-consent.body": {
+		"message": "Quảng cáo giúp Owyx hoạt động và tài trợ cho việc thanh toán cho người sáng tạo nội dung. Các đối tác của chúng tôi có thể lưu trữ hoặc truy cập cookie trong ứng dụng để cá nhân hóa quảng cáo và đo lường hiệu suất."
+	},
+	"app.ads-consent.manage": {
+		"message": "Quản lý tùy chọn"
+	},
+	"app.ads-consent.reject": {
+		"message": "Từ chối tất cả"
+	},
+	"app.ads-consent.title": {
+		"message": "Quyền riêng tư của bạn và cách quảng cáo hỗ trợ Owyx"
+	},
+	"app.appearance-settings.compact-mode.description": {
+		"message": "Hiển thị thư viện phiên bản theo bố cục hàng nhỏ gọn."
+	},
+	"app.appearance-settings.compact-mode.title": {
+		"message": "Chế độ nhỏ gọn"
+	},
+	"app.appearance-settings.default-landing-page.home": {
+		"message": "Trang chủ"
+	},
+	"app.appearance-settings.default-landing-page.library": {
+		"message": "Thư viện"
+	},
+	"app.appearance-settings.hide-nametag.description": {
+		"message": "Ẩn tên người dùng của bạn phía trên phần xem trước nhân vật tại trang chọn giao diện skin."
+	},
+	"app.appearance-settings.hide-nametag.title": {
+		"message": "Ẩn thẻ tên"
+	},
+	"app.appearance-settings.minimize-launcher.description": {
+		"message": "Thu nhỏ ứng dụng Owyx khi Minecraft khởi động."
+	},
+	"app.appearance-settings.minimize-launcher.title": {
+		"message": "Thu nhỏ ứng dụng"
+	},
+	"app.appearance-settings.show-play-time.description": {
+		"message": "Hiển thị thời gian bạn đã chơi mỗi phiên."
+	},
+	"app.appearance-settings.show-play-time.title": {
+		"message": "Hiện thời gian chơi"
+	},
+	"app.appearance-settings.skip-non-essential-warnings.description": {
+		"message": "Bỏ qua bước xác nhận đối với các thao tác ít rủi ro như cài đặt lại, xóa nội dung thông thường, cập nhật hàng loạt, hủy liên kết và sửa chữa. Các cảnh báo cho những thao tác nguy hiểm sẽ luôn được hiển thị."
+	},
+	"app.appearance-settings.skip-non-essential-warnings.title": {
+		"message": "Bỏ qua các cảnh báo không quan trọng"
+	},
+	"app.appearance-settings.toggle-sidebar.description": {
+		"message": "Ẩn thanh bên phải theo mặc định và thêm nút để hiển thị hoặc ẩn nó."
+	},
+	"app.appearance-settings.toggle-sidebar.title": {
+		"message": "Ẩn thanh bên"
+	},
+	"app.appearance-settings.unknown-pack-warning.description": {
+		"message": "Hiển thị cảnh báo an toàn trước khi cài đặt một gói Owyx (.mrpack) không được lưu trữ trên Owyx."
+	},
+	"app.appearance-settings.unknown-pack-warning.title": {
+		"message": "Cảnh báo tôi trước khi cài đặt các modpacks không rõ nguồn gốc"
+	},
+	"app.auth-servers.unreachable.body": {
+		"message": "Máy chủ xác thực của Minecraft có thể đang bị sập. Hãy kiểm tra kết nối Internet của bạn và thử lại sau."
+	},
+	"app.auth-servers.unreachable.header": {
+		"message": "Không thể kết nối đến máy chủ xác thực"
+	},
+	"app.behavior-settings.confirmations.title": {
+		"message": "Các xác nhận"
+	},
+	"app.behavior-settings.content.title": {
+		"message": "Nhà và nội dung"
+	},
+	"app.behavior-settings.startup-and-navigation.title": {
+		"message": "Khởi động và điều hướng"
+	},
+	"app.behavior-settings.sync-across-devices.description": {
+		"message": "Sử dụng các cài đặt hành vi này ở mọi nơi bạn đăng nhập. Hãy tắt tùy chọn này nếu muốn duy trì các cài đặt riêng cho thiết bị này."
+	},
+	"app.behavior-settings.sync-across-devices.signed-out-tooltip": {
+		"message": "Đăng nhập vào tài khoản Owyx để đồng bộ hóa cài đặt."
+	},
+	"app.behavior-settings.sync-across-devices.title": {
+		"message": "Đồng bộ hóa hành vi trên các thiết bị"
+	},
+	"app.browse.add-servers-to-instance": {
+		"message": "Thêm máy chủ vào phiên bản"
+	},
+	"app.browse.add-to-an-instance": {
+		"message": "Thêm vào phiên bản"
+	},
+	"app.browse.add-to-instance": {
+		"message": "Thêm vào hồ sơ"
+	},
+	"app.browse.add-to-instance-name": {
+		"message": "Thêm vào {instanceName}"
+	},
+	"app.browse.added": {
+		"message": "Đã thêm"
+	},
+	"app.browse.already-added": {
+		"message": "Đã được thêm"
+	},
+	"app.browse.back-to-instance": {
+		"message": "Quay lại phiên bản"
+	},
+	"app.browse.discover-project-type": {
+		"message": "Khám phá {projectType}"
+	},
+	"app.browse.discover-servers": {
+		"message": "Khám phá máy chủ"
+	},
+	"app.browse.hide-added-servers": {
+		"message": "Ẩn máy chủ đã thêm vào"
+	},
+	"app.browse.hide-installed-modpacks": {
+		"message": "Ẩn modpacks đã cài đặt"
+	},
+	"app.browse.project-actions.label": {
+		"message": "Hành động cho dự án"
+	},
+	"app.browse.project-type.data-packs": {
+		"message": "Các gói dữ liệu"
+	},
+	"app.browse.project-type.modpacks": {
+		"message": "Modpack"
+	},
+	"app.browse.project-type.mods": {
+		"message": "Mods"
+	},
+	"app.browse.project-type.resource-packs": {
+		"message": "Các gói tài nguyên"
+	},
+	"app.browse.project-type.servers": {
+		"message": "Máy chủ"
+	},
+	"app.browse.project-type.shaders": {
+		"message": "Shaders"
+	},
+	"app.browse.server-instance-content-warning": {
+		"message": "Việc thêm nội dung có thể khiến bạn không thể tham gia máy chủ này. Mọi nội dung bạn thêm vào sẽ bị xóa khi nội dung do máy chủ quản lý được cập nhật."
+	},
+	"app.browse.server.installing": {
+		"message": "Đang cài đặt"
+	},
+	"app.content-install.no-compatible-versions": {
+		"message": "Không có phiên bản nào phù hợp với {compatibilityLabel}. Nếu vẫn chọn một phiên bản để cài đặt, các gói phụ thuộc sẽ không được tải tự động."
+	},
+	"app.content.desync-pack": {
+		"message": "Bỏ đồng bộ"
+	},
+	"app.content.sync-pack": {
+		"message": "Đồng bộ"
+	},
+	"app.error.state-init.open-backups-folder": {
+		"message": "Mở thư mục sao lưu"
+	},
+	"app.export-modal.description-placeholder": {
+		"message": "Thêm miêu tả cho gói modpack..."
+	},
+	"app.export-modal.export-button": {
+		"message": "Xuất"
+	},
+	"app.export-modal.export-complete": {
+		"message": "Hoàn thành xuất"
+	},
+	"app.export-modal.export-complete-description": {
+		"message": "{name} đã được xuất thành công."
+	},
+	"app.export-modal.header": {
+		"message": "Xuất modpack"
+	},
+	"app.export-modal.modpack-name-label": {
+		"message": "Tên modpack"
+	},
+	"app.export-modal.modpack-name-placeholder": {
+		"message": "Tên modpack"
+	},
+	"app.export-modal.version-number-label": {
+		"message": "Phiên bản"
+	},
+	"app.export-modal.version-number-placeholder": {
+		"message": "1.0.0"
+	},
+	"app.features-settings.show-skin-selector.title": {
+		"message": "Hiển thị phần chọn skin ở thanh bên"
+	},
+	"app.features-settings.sidebar.title": {
+		"message": "Thanh bên"
+	},
+	"app.home.jump-back-in.instance-locked": {
+		"message": "Phiên bản này đã bị khóa"
+	},
+	"app.home.jump-back-in.instance-open": {
+		"message": "Phiên bản đã được mở"
+	},
+	"app.home.jump-back-in.more-options": {
+		"message": "Thêm lựa chọn"
+	},
+	"app.home.jump-back-in.never-played": {
+		"message": "Chưa từng chơi"
+	},
+	"app.home.jump-back-in.new-instance": {
+		"message": "Thêm phiên bản"
+	},
+	"app.home.jump-back-in.resize": {
+		"message": "Kéo để thay đổi kích thước"
+	},
+	"app.home.jump-back-in.title": {
+		"message": "Tham gia ngay"
+	},
+	"app.home.jump-back-in.view-instance": {
+		"message": "Xem phiên bản"
+	},
+	"app.hosting.update-required.description": {
+		"message": "Bạn cần cập nhật để sử dụng Owyx Servers thông qua ứng dụng Owyx"
+	},
+	"app.hosting.update-required.download": {
+		"message": "Tải xuống để cập nhật"
+	},
+	"app.hosting.update-required.title": {
+		"message": "Yêu cầu cập nhật ứng dụng Owyx"
+	},
+	"app.install.phase.downloading_content": {
+		"message": "Đang tải nội dung"
+	},
+	"app.install.phase.downloading_minecraft": {
+		"message": "Đang tải Minecraft"
+	},
+	"app.install.phase.downloading_pack_file": {
+		"message": "Đang tải tệp gói"
+	},
+	"app.install.phase.extracting_overrides": {
+		"message": "Trích xuất ghi đè"
+	},
+	"app.install.phase.finalizing": {
+		"message": "Hoàn tất"
+	},
+	"app.install.phase.preparing_instance": {
+		"message": "Đã thêm vào hàng chờ tải"
+	},
+	"app.install.phase.preparing_java": {
+		"message": "Đang chuẩn bị Java"
+	},
+	"app.install.phase.preparing_java.downloading": {
+		"message": "Đang tải Java {version}"
+	},
+	"app.install.phase.preparing_java.extracting": {
+		"message": "Trích xuất Java {version}"
+	},
+	"app.install.phase.preparing_java.fetching-metadata": {
+		"message": "Đang tìm Java {version}"
+	},
+	"app.install.phase.preparing_java.resolving": {
+		"message": "Đang chuẩn bị Java {version}"
+	},
+	"app.instance.action.edit": {
+		"message": "Chỉnh sửa"
+	},
+	"app.instance.action.open-folder": {
+		"message": "Mở thư mục"
+	},
+	"app.instance.action.play": {
+		"message": "Chơi"
+	},
+	"app.instance.action.stop": {
+		"message": "Dừng"
+	},
+	"app.instance.add-server.add": {
+		"message": "Thêm"
+	},
+	"app.instance.admonitions.shared-instance.review-header": {
+		"message": "Xem lại các thay đổi"
+	},
+	"app.instance.admonitions.shared-instance.reviewing-button": {
+		"message": "Đang xem xét..."
+	},
+	"app.instance.card.loading": {
+		"message": "Đang tải phiên bản..."
+	},
+	"app.instance.confirm-delete.admonition-body": {
+		"message": "Tất cả dữ liệu trong gói hồ sơ này sẽ bị xoá, bao gồm thế giới của bạn, cấu hình, và tất cả nội dung đã được tải xuống."
+	},
+	"app.instance.confirm-delete.admonition-header": {
+		"message": "Hành động này sẽ không thể huỷ bỏ"
+	},
+	"app.instance.confirm-delete.bulk-admonition-body": {
+		"message": "Tất cả dữ liệu của {count} phiên bản này sẽ bị xóa vĩnh viễn, bao gồm thế giới, cấu hình và toàn bộ nội dung đã cài đặt."
+	},
+	"app.instance.confirm-delete.bulk-delete-button": {
+		"message": "Xóa {count} mục"
+	},
+	"app.instance.confirm-delete.delete-button": {
+		"message": "Xoá hồ sơ"
+	},
+	"app.instance.confirm-delete.header": {
+		"message": "Xoá hồ sơ"
+	},
+	"app.instance.content.managed-content.modpack-header": {
+		"message": "Nội dung modpack"
+	},
+	"app.instance.content.managed-content.shared-header": {
+		"message": "Nội dung được chia sẻ"
+	},
+	"app.instance.modpack-already-installed.body": {
+		"message": "Gói modpack này đã được cài đặt trong hồ sơ <bold>{instanceName}</bold> rồi. Bạn có chắc chắn muốn sao chép nó không?"
+	},
+	"app.instance.modpack-already-installed.create": {
+		"message": "Khởi tạo"
+	},
+	"app.instance.modpack-already-installed.header": {
+		"message": "Modpack đã được cài đặt"
+	},
+	"app.instance.modpack-already-installed.instance": {
+		"message": "Hồ sơ"
+	},
+	"app.instance.mods.bulk-update.downloading-projects": {
+		"message": "Đang tải xuống {current, number}/{total, number} dự án..."
+	},
+	"app.instance.mods.bulk-update.finishing": {
+		"message": "Đang hoàn tất cập nhật..."
+	},
+	"app.instance.mods.bulk-update.resolving-versions": {
+		"message": "Đang xác định các phiên bản..."
+	},
+	"app.instance.mods.content-type-project": {
+		"message": "Dự án"
+	},
+	"app.instance.mods.freeze-content": {
+		"message": "Phiên bản cố định"
+	},
+	"app.instance.mods.locked-content": {
+		"message": "Không thể thay đổi nội dung trong các instance bị khóa."
+	},
+	"app.instance.mods.project-was-added": {
+		"message": "\"{name}\" đã được thêm"
+	},
+	"app.instance.mods.projects-were-added": {
+		"message": "{count} dự án đã được thêm"
+	},
+	"app.instance.mods.share-text": {
+		"message": "Kiểm tra dự án tôi đang sử dụng trong modpack của mình!"
+	},
+	"app.instance.mods.share-title": {
+		"message": "Chia sẻ hồ sơ modpack"
+	},
+	"app.instance.mods.successfully-uploaded": {
+		"message": "Tải lên thành công"
+	},
+	"app.instance.mods.unfreeze-content": {
+		"message": "Hủy đóng băng phiên bản"
+	},
+	"app.instance.share.empty.description": {
+		"message": "Bạn có thể chia sẻ phiên bản này với bạn bè của mình!"
+	},
+	"app.instance.share.empty.heading": {
+		"message": "Không có bạn để mời"
+	},
+	"app.instance.share.invite-modal.user-limit-reached": {
+		"message": "Phiên bản này đã đạt đến giới hạn {limit} người dùng."
+	},
+	"app.instance.share.locked.empty-description-prefix": {
+		"message": "Bạn cần đăng nhập với tư cách là"
+	},
+	"app.instance.share.locked.empty-description-suffix": {
+		"message": "để truy cập trang này."
+	},
+	"app.instance.share.locked.linked-account-fallback": {
+		"message": "tài khoản được liên kết"
+	},
+	"app.instance.share.locked.switch-account-button": {
+		"message": "Đổi tài khoản"
+	},
+	"app.instance.share.locked.wrong-account-heading": {
+		"message": "Sai tài khoản"
+	},
+	"app.instance.share.members.empty": {
+		"message": "Chưa có người dùng nào tham gia"
+	},
+	"app.instance.worlds.add-server": {
+		"message": "Thêm máy chủ"
+	},
+	"app.instance.worlds.browse-servers": {
+		"message": "Tìm kiếm máy chủ"
+	},
+	"app.instance.worlds.delete-world-modal.delete-button": {
+		"message": "Xóa thế giới"
+	},
+	"app.instance.worlds.delete-world-modal.title": {
+		"message": "Xóa thế giới"
+	},
+	"app.instance.worlds.delete-world-modal.warning-header": {
+		"message": "Đang xóa {name}"
+	},
+	"app.instance.worlds.filter-modded": {
+		"message": "Modded"
+	},
+	"app.instance.worlds.filter-offline": {
+		"message": "Ngoại tuyến"
+	},
+	"app.instance.worlds.filter-online": {
+		"message": "Trực tuyến"
+	},
+	"app.instance.worlds.filter-vanilla": {
+		"message": "Vanilla"
+	},
+	"app.instance.worlds.no-worlds-description": {
+		"message": "Thêm một máy chủ hoặc tìm kiếm để bắt đầu"
+	},
+	"app.instance.worlds.no-worlds-heading": {
+		"message": "Không có máy chủ hay thế giới nào đã được thêm"
+	},
+	"app.instance.worlds.remove-server-modal.remove-button": {
+		"message": "Bỏ khỏi danh sách"
+	},
+	"app.instance.worlds.remove-server-modal.title": {
+		"message": "Xóa máy chủ"
+	},
+	"app.instance.worlds.remove-server-modal.warning-header": {
+		"message": "{name} sẽ bị xóa"
+	},
+	"app.instance.worlds.search-worlds-placeholder": {
+		"message": "Tìm kiếm {count} world..."
+	},
+	"app.java-detection.select": {
+		"message": "Chọn"
+	},
+	"app.library.filter.game-version": {
+		"message": "Phiên bản trò chơi"
+	},
+	"app.library.filter.instance-type.server": {
+		"message": "Máy chủ"
+	},
+	"app.library.instance.action.delete": {
+		"message": "Xoá"
+	},
+	"app.modal.install-to-play.header": {
+		"message": "Tải xuống để chơi"
+	},
+	"app.modal.install-to-play.install-anyway": {
+		"message": "Tải tiếp"
+	},
+	"app.modal.install-to-play.install-button": {
+		"message": "Tải xuống"
+	},
+	"app.modal.install-to-play.mod-count": {
+		"message": "{count, plural, other {# mod}}"
+	},
+	"app.modal.install-to-play.shared-instance": {
+		"message": "Chia sẻ hồ sơ"
+	},
+	"app.modal.install-to-play.view-contents": {
+		"message": "Xem nội dung"
+	},
+	"app.modal.update-to-play.header": {
+		"message": "Cập nhật và bắt đầu chơi"
+	},
+	"app.modal.update-to-play.removed": {
+		"message": "Đã bỏ"
+	},
+	"app.project.install-button.already-installed": {
+		"message": "Dự án này đã được cài đặt"
+	},
+	"app.project.install-button.switch-version": {
+		"message": "Đổi phiên bản"
+	},
+	"app.project.install-context.back-to-browse": {
+		"message": "Quay lại trang Khám Phá"
+	},
+	"app.project.version.all-versions": {
+		"message": "Tất cả phiên bản"
+	},
+	"app.project.version.download-in-browser": {
+		"message": "Tải trong trình duyệt"
+	},
+	"app.project.version.installing": {
+		"message": "Đang tải"
+	},
+	"app.project.versions.already-installed": {
+		"message": "Đã có sẵn"
+	},
+	"app.settings.default-instance-options.fullscreen.title": {
+		"message": "Toàn màn hình"
+	},
+	"app.settings.default-instance-options.java-arguments.placeholder": {
+		"message": "Nhập đối số Java..."
+	},
+	"app.settings.default-instance-options.memory-allocation.title": {
+		"message": "Cấp phát bộ nhớ"
+	},
+	"app.settings.default-instance-options.post-exit-hook.description": {
+		"message": "Chạy sau khi trò chơi đóng lại."
+	},
+	"app.settings.default-instance-options.post-exit-hook.placeholder": {
+		"message": "Nhập lệnh sau khi thoát..."
+	},
+	"app.settings.default-instance-options.width.placeholder": {
+		"message": "Nhập chiều rộng..."
+	},
+	"app.settings.default-instance-options.width.title": {
+		"message": "Chiều rộng"
+	},
+	"app.settings.default-instance-options.window.title": {
+		"message": "Cửa sổ"
+	},
+	"app.settings.default-instance-options.wrapper-hook.description": {
+		"message": "Lệnh dùng để bọc tiến trình chạy Minecraft."
+	},
+	"app.settings.default-instance-options.wrapper-hook.placeholder": {
+		"message": "Nhập lệnh bọc..."
+	},
+	"app.settings.developer-mode-button.label": {
+		"message": "Bật tắt chế độ nhà phát triển"
+	},
+	"app.settings.developer-mode-enabled": {
+		"message": "Chế độ nhà phát triển đã được bật."
+	},
+	"app.settings.downloading": {
+		"message": "Đang tải về v{version}"
+	},
+	"app.settings.tabs.appearance": {
+		"message": "Giao diện"
+	},
+	"app.settings.tabs.java-installations": {
+		"message": "Các bản cài Java"
+	},
+	"app.settings.tabs.language": {
+		"message": "Ngôn ngữ"
+	},
+	"app.settings.tabs.privacy": {
+		"message": "Quyền riêng tư"
+	},
+	"app.settings.tabs.resource-management": {
+		"message": "Quản lý tài nguyên"
+	},
+	"app.skins.add-button": {
+		"message": "Skin tự tạo"
+	},
+	"app.skins.add-button.drag-and-drop": {
+		"message": "Kéo và thả"
+	},
+	"app.skins.apply-button": {
+		"message": "Áp dụng"
+	},
+	"app.skins.delete-button": {
+		"message": "Xóa skin"
+	},
+	"app.skins.delete-modal.description": {
+		"message": "Hành động này sẽ xóa skin trên vĩnh viễn. Hành động này không thể khôi phục lại."
+	},
+	"app.skins.delete-modal.title": {
+		"message": "Bạn hoàn toàn muốn xóa skin này chứ?"
+	},
+	"app.skins.dropped-file-error.text": {
+		"message": "Không đọc được file thả."
+	},
+	"app.skins.dropped-file-error.title": {
+		"message": "Có lỗi khi đọc file"
+	},
+	"app.skins.edit-button": {
+		"message": "Sửa skin"
+	},
+	"app.skins.modal.add-skin-button": {
+		"message": "Tạo skin"
+	},
+	"app.skins.modal.add-title": {
+		"message": "Tạo skin"
+	},
+	"app.skins.modal.arm-style-section": {
+		"message": "Độ rộng cánh tay"
+	},
+	"app.skins.modal.arm-style-slim": {
+		"message": "Gầy"
+	},
+	"app.skins.modal.arm-style-wide": {
+		"message": "Béo"
+	},
+	"app.skins.modal.cape-fallback-name": {
+		"message": "Cape"
+	},
+	"app.skins.modal.cape-section": {
+		"message": "Cape"
+	},
+	"app.skins.modal.edit-title": {
+		"message": "Sửa skin"
+	},
+	"app.skins.modal.make-edit-first-tooltip": {
+		"message": "Sửa skin trước đã!"
+	},
+	"app.skins.modal.no-cape-tooltip": {
+		"message": "Không cape"
+	},
+	"app.skins.modal.none-cape-option": {
+		"message": "Không"
+	},
+	"app.skins.modal.replace-texture-button": {
+		"message": "Đổi skin"
+	},
+	"app.skins.modal.save-skin-button": {
+		"message": "Lưu skin"
+	},
+	"app.skins.modal.saving-tooltip": {
+		"message": "Đang lưu..."
+	},
+	"app.skins.modal.texture-section": {
+		"message": "Skin"
+	},
+	"app.skins.modal.upload-skin-first-tooltip": {
+		"message": "Nhập skin vào trước đã!"
+	},
+	"app.skins.preview.edit-button": {
+		"message": "Sửa skin"
+	},
+	"app.skins.previewing-badge": {
+		"message": "Xem trước"
+	},
+	"app.skins.rate-limit.text": {
+		"message": "Bạn đang chỉnh skin quá thường xuyên. Mãy chủ của Mojang đã tạm thời chặn lại các yêu cầu hiện thời. Đợi một lúc trước khi thử lại lần nữa."
+	},
+	"app.skins.rate-limit.title": {
+		"message": "Bình tĩnh lại!"
+	},
+	"app.skins.reorder-error.text": {
+		"message": "Không thể lưu thứ tự skin của bạn."
+	},
+	"app.skins.reorder-error.title": {
+		"message": "Sắp xếp lại skin thất bại"
+	},
+	"app.skins.section.builders-and-biomes": {
+		"message": "Builders & Biomes"
+	},
+	"app.skins.section.chaos-cubed": {
+		"message": "Chaos Cubed"
+	},
+	"app.skins.section.chase-the-skies": {
+		"message": "Chase the Skies"
+	},
+	"app.skins.section.default-skins": {
+		"message": "Skin mặc định"
+	},
+	"app.skins.section.minecon-earth-2017": {
+		"message": "MINECON Earth 2017"
+	},
+	"app.skins.section.modrinth": {
+		"message": "Owyx"
+	},
+	"app.skins.section.modrinth-pride": {
+		"message": "Owyx Pride"
+	},
+	"app.skins.section.modrinth-pride.tooltip": {
+		"message": "Bạn đã được tặng những skin này sau khi quyên góp cho Owyx trong tháng tự hào LGBT thế giới."
+	},
+	"app.skins.section.mounts-of-mayhem": {
+		"message": "Mounts of Mayhem"
+	},
+	"app.skins.section.saved-skins": {
+		"message": "Skin đã lưu"
+	},
+	"app.skins.section.striding-hero": {
+		"message": "Striding Hero"
+	},
+	"app.skins.section.the-copper-age": {
+		"message": "The Copper Age"
+	},
+	"app.skins.section.the-garden-awakens": {
+		"message": "The Garden Awakens"
+	},
+	"app.skins.section.tiny-takeover": {
+		"message": "Tiny Takeover"
+	},
+	"app.skins.title": {
+		"message": "Đổi skin"
+	},
+	"app.update-popup.body.download-complete": {
+		"message": "Phiên bản v{version} của Owyx đã sẵn sàng để có thể cài đặt. Khởi động lại ứng dụng để cập nhật ngay bây giờ, hoặc tự động cập nhật sau khi bạn tắt Owyx."
+	},
+	"app.update-popup.body.linux": {
+		"message": "Phiên bản v{version} của Owyx hiện đang khả dụng. Hãy sử dụng trình quản lý gói của bạn để cập nhật các tính năng và bản vá lỗi mới nhất!"
+	},
+	"app.update-popup.body.metered": {
+		"message": "Phiên bản v{version} của Owyx hiện đang khả dụng ngay bây giờ! Vì bạn đang sử dụng mạng có tính phí theo dung lượng nên chúng tôi không tự động tải xuống."
+	},
+	"app.update-popup.changelog": {
+		"message": "Nhật ký thay đổi"
+	},
+	"app.update-popup.download": {
+		"message": "Tải xuống ({size})"
+	},
+	"app.update-popup.download-complete": {
+		"message": "Cài đặt thành công"
+	},
+	"app.update-popup.reload": {
+		"message": "Tải lại để cập nhật"
+	},
+	"app.update-popup.title": {
+		"message": "Cập nhật mới hiện đang khả dụng"
+	},
+	"app.update.complete-toast.text": {
+		"message": "Nhấn vào đây để xem nhật kí thay đổi."
+	},
+	"app.update.complete-toast.title": {
+		"message": "Phiên bản {version} đã được cài đặt thành công!"
+	},
+	"app.world.server-modal.placeholder-address": {
+		"message": "play.example.com"
+	},
+	"app.world.server-modal.select-an-option": {
+		"message": "Chọn một tuỳ chọn"
+	},
+	"app.world.world-item.incompatible-version": {
+		"message": "Không phù hợp với phiên bản {version}"
+	},
+	"app.world.world-item.not-played-yet": {
+		"message": "Chưa từng được chơi"
+	},
+	"app.world.world-item.offline": {
+		"message": "Ngoại tuyến"
+	},
+	"friends.action.add-friend": {
+		"message": "Thêm một người bạn"
+	},
+	"friends.action.view-friend-requests": {
+		"message": "{count} {count, plural, other {yêu cầu kết bạn}}"
+	},
+	"friends.add-friend.submit": {
+		"message": "Gửi yêu cầu kết bạn"
+	},
+	"friends.add-friend.title": {
+		"message": "Thêm một người bạn"
+	},
+	"friends.add-friend.username.description": {
+		"message": "Nó có thể khác với tên người dùng Minecraft của họ!"
+	},
+	"friends.add-friend.username.placeholder": {
+		"message": "Nhập tên người dùng Owyx..."
+	},
+	"friends.add-friend.username.title": {
+		"message": "Tên người dùng Owyx của bạn của bạn là gì?"
+	},
+	"friends.add-friends-to-share": {
+		"message": "Hãy <link>thêm bạn bè</link> để biết họ đang chơi gì!"
+	},
+	"friends.friend.cancel-request": {
+		"message": "Huỷ yêu cầu"
+	},
+	"friends.friend.remove-friend": {
+		"message": "Xoá bạn bè"
+	},
+	"friends.friend.request-sent": {
+		"message": "Đã gửi yêu cầu kết bạn"
+	},
+	"friends.friend.view-profile": {
+		"message": "Xem thông tin"
+	},
+	"friends.heading": {
+		"message": "Bạn bè"
+	},
+	"friends.heading.active": {
+		"message": "Đang hoạt động"
+	},
+	"friends.heading.offline": {
+		"message": "Ngoại tuyến"
+	},
+	"friends.heading.online": {
+		"message": "Trực tuyến"
+	},
+	"friends.heading.pending": {
+		"message": "Đang chờ"
+	},
+	"friends.no-friends-match": {
+		"message": "Không có người bạn nào phù hợp với ''{query}''"
+	},
+	"friends.search-friends-placeholder": {
+		"message": "Tìm kiếm bạn bè..."
+	},
+	"friends.section.heading": {
+		"message": "{title} - {count}"
+	},
+	"friends.sign-in-to-add-friends": {
+		"message": "<link>Đăng nhập bằng tài khoản Owyx</link> để kết bạn và xem họ đang chơi gì!"
+	},
+	"instance.add-server.add-and-play": {
+		"message": "Thêm và chơi"
+	},
+	"instance.add-server.add-server": {
+		"message": "Thêm máy chủ"
+	},
+	"instance.add-server.resource-pack.disabled": {
+		"message": "Tắt"
+	},
+	"instance.add-server.resource-pack.enabled": {
+		"message": "Bật"
+	},
+	"instance.add-server.resource-pack.prompt": {
+		"message": "Nhắc nhở"
+	},
+	"instance.add-server.title": {
+		"message": "Thêm máy chủ"
+	},
+	"instance.edit-server.title": {
+		"message": "Sửa máy chủ"
+	},
+	"instance.edit-world.hide-from-home": {
+		"message": "Ẩn khỏi trang chủ"
+	},
+	"instance.edit-world.name": {
+		"message": "Tên"
+	},
+	"instance.edit-world.placeholder-name": {
+		"message": "Thế giới Minecraft"
+	},
+	"instance.edit-world.reset-icon": {
+		"message": "Đặt lại biểu tượng"
+	},
+	"instance.edit-world.title": {
+		"message": "Chỉnh sửa thế giới"
+	},
+	"instance.files.adding-files": {
+		"message": "Đang thêm dữ liệu ({completed}/{total})"
+	},
+	"instance.files.save-as": {
+		"message": "Lưu như..."
+	},
+	"instance.server-modal.address": {
+		"message": "Địa chỉ"
+	},
+	"instance.server-modal.name": {
+		"message": "Tên"
+	},
+	"instance.server-modal.placeholder-name": {
+		"message": "Máy chủ Minecraft"
+	},
+	"instance.server-modal.resource-pack": {
+		"message": "Gói tài nguyên"
+	},
+	"instance.settings.tabs.general": {
+		"message": "Tổng quát"
+	},
+	"instance.settings.tabs.general.delete": {
+		"message": "Xoá hồ sơ"
+	},
+	"instance.settings.tabs.general.delete.button": {
+		"message": "Xoá hồ sơ"
+	},
+	"instance.settings.tabs.general.delete.description": {
+		"message": "Xoá vĩnh viễn sẽ xoá toàn bộ thế giới, cài đặt, và các nội dung được cài đặt khỏi thiết bị của bạn. Hãy cân nhắc và chắc chắn vì bạn không thể khôi phục các tệp dữ liệt sau khi xoá."
+	},
+	"instance.settings.tabs.general.deleting.button": {
+		"message": "Đang xoá..."
+	},
+	"instance.settings.tabs.general.duplicate-button": {
+		"message": "Nhân bản"
+	},
+	"instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+		"message": "Không thể nhân bản trong khi đang cài đặt."
+	},
+	"instance.settings.tabs.general.duplicate-instance": {
+		"message": "Nhân bản hồ sơ"
+	},
+	"instance.settings.tabs.general.duplicate-instance.description": {
+		"message": "Tạo ra một bản sao của hồ sơ này, bao gồm các thế giới, cấu hình, mod, v.v."
+	},
+	"instance.settings.tabs.general.edit-icon": {
+		"message": "Sửa biểu tượng"
+	},
+	"instance.settings.tabs.general.edit-icon.remove": {
+		"message": "Loại bỏ biểu tượng"
+	},
+	"instance.settings.tabs.general.edit-icon.replace": {
+		"message": "Thay thế biểu tượng"
+	},
+	"instance.settings.tabs.general.edit-icon.select": {
+		"message": "Chọn biểu tượng"
+	},
+	"instance.settings.tabs.general.name": {
+		"message": "Tên"
+	},
+	"instance.settings.tabs.general.update-channel": {
+		"message": "Kênh cập nhật"
+	},
+	"instance.settings.tabs.general.update-channel.alpha": {
+		"message": "Sơ khai"
+	},
+	"instance.settings.tabs.general.update-channel.alpha.description": {
+		"message": "Các phiên bản chính thức, thử nghiệm và sơ khai sẽ hiển thị trong danh sách cập nhật có sẵn."
+	},
+	"instance.settings.tabs.general.update-channel.beta": {
+		"message": "Thử nghiệm"
+	},
+	"instance.settings.tabs.general.update-channel.beta.description": {
+		"message": "Các phiên bản chính thức và thử nghiệm sẽ hiển thị trong danh sách cập nhật có sẵn."
+	},
+	"instance.settings.tabs.general.update-channel.release": {
+		"message": "Chính thức"
+	},
+	"instance.settings.tabs.general.update-channel.release.description": {
+		"message": "Chỉ phiên bản chính thức sẽ hiển thị trong danh sách cập nhật có sẵn."
+	},
+	"instance.settings.tabs.general.update-channel.select": {
+		"message": "Chọn kênh cập nhật"
+	},
+	"instance.settings.tabs.hooks.post-exit": {
+		"message": "Sau khi thoát"
+	},
+	"instance.settings.tabs.hooks.post-exit.description": {
+		"message": "Chạy sau khi trò chơi đóng lại."
+	},
+	"instance.settings.tabs.hooks.post-exit.enter": {
+		"message": "Nhập lệnh sau khi thoát..."
+	},
+	"instance.settings.tabs.hooks.pre-launch": {
+		"message": "Trước khi chạy"
+	},
+	"instance.settings.tabs.hooks.pre-launch.description": {
+		"message": "Chạy trước khi hiện thể được khởi chạy."
+	},
+	"instance.settings.tabs.hooks.pre-launch.enter": {
+		"message": "Nhập câu lệnh trước khi chạy..."
+	},
+	"instance.settings.tabs.hooks.wrapper": {
+		"message": "Lệnh bao bọc (Wrapper)"
+	},
+	"instance.settings.tabs.hooks.wrapper.description": {
+		"message": "Lệnh bao bọc (Wrapper) để khởi chạy Minecraft."
+	},
+	"instance.settings.tabs.hooks.wrapper.enter": {
+		"message": "Nhập lệnh bao bọc..."
+	},
+	"instance.settings.tabs.installation": {
+		"message": "Cài đặt"
+	},
+	"instance.settings.tabs.installation.loader-version": {
+		"message": "Phiên bản {loader}"
+	},
+	"instance.settings.tabs.java.enter-environment-variables": {
+		"message": "Nhập biến môi trường..."
+	},
+	"instance.settings.tabs.java.enter-java-arguments": {
+		"message": "Nhập tham số Java..."
+	},
+	"instance.settings.tabs.java.hooks": {
+		"message": "Hooks"
+	},
+	"instance.settings.tabs.java.java-path-placeholder": {
+		"message": "/đường_dẫn/tới/java"
+	},
+	"instance.settings.tabs.window.fullscreen": {
+		"message": "Toàn màn hình"
+	},
+	"instance.settings.tabs.window.fullscreen.description": {
+		"message": "Làm cho trò chơi bắt đầu ở dạng toàn màn hình khi khởi chạy (sử dụng options.txt)."
+	},
+	"instance.settings.tabs.window.height": {
+		"message": "Chiều cao"
+	},
+	"instance.settings.tabs.window.height.description": {
+		"message": "Chiều cao cửa sổ trò chơi khi khởi chạy."
+	},
+	"instance.settings.tabs.window.height.enter": {
+		"message": "Nhập chiều cao..."
+	},
+	"instance.settings.tabs.window.width": {
+		"message": "Chiều rộng"
+	},
+	"instance.settings.tabs.window.width.description": {
+		"message": "Chiều dài cửa sổ trò chơi khi khởi chạy."
+	},
+	"instance.settings.tabs.window.width.enter": {
+		"message": "Nhập chiều dài..."
+	},
+	"instance.worlds.a_minecraft_server": {
+		"message": "Một máy chủ Minecraft"
+	},
+	"instance.worlds.cant_connect": {
+		"message": "Không thể kết nối đến máy chủ"
+	},
+	"instance.worlds.copy_address": {
+		"message": "Sao chép địa chỉ"
+	},
+	"instance.worlds.create_shortcut": {
+		"message": "Tạo lối tắt"
+	},
+	"instance.worlds.dont_show_on_home": {
+		"message": "Không hiện ở Trang chủ"
+	},
+	"instance.worlds.game_already_open": {
+		"message": "Bản này đã mở sẵn"
+	},
+	"instance.worlds.hardcore": {
+		"message": "Chế độ siêu khó"
+	},
+	"instance.worlds.incompatible_server": {
+		"message": "Máy chủ không tương thích"
+	},
+	"instance.worlds.linked_server": {
+		"message": "Quản lý dự án máy chủ"
+	},
+	"instance.worlds.no_contact": {
+		"message": "Không thể liên lạc với máy chủ"
+	},
+	"instance.worlds.no_server_quick_play": {
+		"message": "Bạn chỉ có thể nhảy thẳng vào servers trên phiên bản Minecraft Alpha 1.0.5+"
+	},
+	"instance.worlds.no_singleplayer_quick_play": {
+		"message": "Bạn chỉ có thể nhảy thẳng vào thế giới người chơi đơn trên phiên bản Minecraft 1.20+"
+	},
+	"instance.worlds.play_instance": {
+		"message": "Chơi phiên bản này"
+	},
+	"instance.worlds.view_instance": {
+		"message": "Xem phiên bản"
+	},
+	"instance.worlds.world_in_use": {
+		"message": "Thế giới đang mở"
+	},
+	"minecraft-account.add-account": {
+		"message": "Thêm tài khoản"
+	},
+	"minecraft-account.label": {
+		"message": "Tài khoản Minecraft"
+	},
+	"minecraft-account.not-signed-in": {
+		"message": "Chưa đăng nhập"
+	},
+	"minecraft-account.remove-account": {
+		"message": "Xoá tài khoản"
+	},
+	"minecraft-account.select-account": {
+		"message": "Chọn tài khoản"
+	},
+	"minecraft-account.sign-in": {
+		"message": "Đăng nhập vào Minecraft"
+	},
+	"search.filter.locked.instance": {
+		"message": "Được cung cấp bởi phiên bản"
+	},
+	"search.filter.locked.instance-game-version.title": {
+		"message": "Phiên bản trò chơi được cung cấp bởi hồ sơ này"
+	},
+	"search.filter.locked.instance-loader.title": {
+		"message": "Loader được cung cấp bởi hồ sơ"
+	},
+	"search.filter.locked.instance.sync": {
+		"message": "Đồng bộ với phiên bản"
+	},
+	"search.filter.locked.server-environment.title": {
+		"message": "Chỉ các mod chạy phía client mới có thể thêm hồ sơ máy chủ"
+	},
+	"app.nav.admin-panel": {
+		"message": "Bảng quản trị"
+	}
 }

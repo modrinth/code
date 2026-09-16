@@ -1,743 +1,743 @@
 {
-  "app.action-bar.downloading-java": {
-    "message": "Mengunduh Java {version}"
-  },
-  "app.action-bar.downloading-update": {
-    "message": "Mengunduh pembaruan"
-  },
-  "app.action-bar.downloads": {
-    "message": "Unduhan"
-  },
-  "app.action-bar.hide-more-running-instances": {
-    "message": "Sembunyikan lebih banyak instans yang sedang berjalan"
-  },
-  "app.action-bar.make-primary-instance": {
-    "message": "Jadikan sebagai instans utama"
-  },
-  "app.action-bar.no-instances-running": {
-    "message": "Tidak ada instans yang sedang berjalan"
-  },
-  "app.action-bar.offline": {
-    "message": "Luring"
-  },
-  "app.action-bar.primary-instance": {
-    "message": "Instans utama"
-  },
-  "app.action-bar.reload-to-update": {
-    "message": "Muat ulang untuk memperbarui"
-  },
-  "app.action-bar.show-more-running-instances": {
-    "message": "Tampilkan lebih banyak instans yang sedang berjalan"
-  },
-  "app.action-bar.stop-instance": {
-    "message": "Hentikan instans"
-  },
-  "app.action-bar.update": {
-    "message": "Perbarui"
-  },
-  "app.action-bar.view-active-downloads": {
-    "message": "Lihat pengunduhan berlangsung"
-  },
-  "app.action-bar.view-instance": {
-    "message": "Lihat instans"
-  },
-  "app.action-bar.view-logs": {
-    "message": "Lihat catatan"
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Beranda"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Pustaka"
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "Sembunyikan label nama"
-  },
-  "app.appearance-settings.show-play-time.title": {
-    "message": "Tampilkan waktu bermain"
-  },
-  "app.appearance-settings.unknown-pack-warning.title": {
-    "message": "Peringatkan saya sebelum memasang paket mod tidak dikenal"
-  },
-  "app.auth-servers.unreachable.body": {
-    "message": "Server autentikasi Minecraft mungkin sedang tidak tersedia saat ini. Periksa koneksi internet Anda dan coba lagi nanti."
-  },
-  "app.auth-servers.unreachable.header": {
-    "message": "Tidak dapat terhubung ke server autentikasi"
-  },
-  "app.browse.add-servers-to-instance": {
-    "message": "Menambah server ke instans"
-  },
-  "app.browse.add-to-an-instance": {
-    "message": "Tambah ke instans"
-  },
-  "app.browse.add-to-instance": {
-    "message": "Tambah ke instans"
-  },
-  "app.browse.add-to-instance-name": {
-    "message": "Tambah ke {instanceName}"
-  },
-  "app.browse.added": {
-    "message": "Ditambahkan"
-  },
-  "app.browse.already-added": {
-    "message": "Telah ditambahkan"
-  },
-  "app.browse.back-to-instance": {
-    "message": "Kembali ke instans"
-  },
-  "app.browse.discover-servers": {
-    "message": "Temukan server"
-  },
-  "app.browse.project-type.modpacks": {
-    "message": "Paket Mod"
-  },
-  "app.browse.server.installing": {
-    "message": "Memasang"
-  },
-  "app.content-install.no-compatible-versions": {
-    "message": "Tidak ada versi tersedia yang cocok untuk {compatibilityLabel}. Anda tetap dapat memilih versi yang akan dipasang. Dependensi tidak akan dipasang secara otomatis."
-  },
-  "app.export-modal.description-placeholder": {
-    "message": "Masukkan deskripsi paket mod..."
-  },
-  "app.export-modal.export-button": {
-    "message": "Ekspor"
-  },
-  "app.export-modal.header": {
-    "message": "Ekspor paket mod"
-  },
-  "app.export-modal.modpack-name-placeholder": {
-    "message": "Nama paket mod"
-  },
-  "app.export-modal.version-number-label": {
-    "message": "Nomor versi"
-  },
-  "app.export-modal.version-number-placeholder": {
-    "message": "1.0.0"
-  },
-  "app.instance.confirm-delete.admonition-body": {
-    "message": "Semua data dari instans Anda akan dihapus secara permanen, termasuk dunia, konfigurasi, dan konten terpasang Anda."
-  },
-  "app.instance.confirm-delete.admonition-header": {
-    "message": "Tindakan ini tidak dapat dibatalkan"
-  },
-  "app.instance.confirm-delete.delete-button": {
-    "message": "Hapus instans"
-  },
-  "app.instance.confirm-delete.header": {
-    "message": "Hapus instans"
-  },
-  "app.instance.modpack-already-installed.body": {
-    "message": "Paket mod ini telah terpasang di instans <bold>{instanceName}</bold>. Apakah Anda yakin ingin menggandakannya?"
-  },
-  "app.instance.modpack-already-installed.create": {
-    "message": "Buat"
-  },
-  "app.instance.modpack-already-installed.header": {
-    "message": "Paket mod telah terpasang"
-  },
-  "app.instance.modpack-already-installed.instance": {
-    "message": "Instans"
-  },
-  "app.instance.mods.content-type-project": {
-    "message": "proyek"
-  },
-  "app.instance.mods.project-was-added": {
-    "message": "\"{name}\" telah ditambahkan"
-  },
-  "app.instance.mods.projects-were-added": {
-    "message": "{count} proyek telah ditambahkan"
-  },
-  "app.instance.mods.share-text": {
-    "message": "Lihat proyek-proyek yang saya pakai di paket mod saya!"
-  },
-  "app.instance.mods.share-title": {
-    "message": "Membagi konten paket mod"
-  },
-  "app.instance.mods.successfully-uploaded": {
-    "message": "Berhasil diunggah"
-  },
-  "app.instance.worlds.add-server": {
-    "message": "Tambah server"
-  },
-  "app.instance.worlds.browse-servers": {
-    "message": "Telusuri server"
-  },
-  "app.instance.worlds.filter-modded": {
-    "message": "Dimodifikasi"
-  },
-  "app.instance.worlds.filter-offline": {
-    "message": "Luring"
-  },
-  "app.instance.worlds.filter-online": {
-    "message": "Daring"
-  },
-  "app.instance.worlds.filter-vanilla": {
-    "message": "Vanila"
-  },
-  "app.instance.worlds.no-worlds-description": {
-    "message": "Tambah server atau telusuri untuk memulai"
-  },
-  "app.instance.worlds.no-worlds-heading": {
-    "message": "Tidak ada server atau dunia yang ditambahkan"
-  },
-  "app.instance.worlds.search-worlds-placeholder": {
-    "message": "Cari {count} dunia..."
-  },
-  "app.modal.install-to-play.header": {
-    "message": "Pasang untuk memainkan"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Pasang"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, other {# mod}}"
-  },
-  "app.modal.install-to-play.shared-instance": {
-    "message": "Instans terbagi"
-  },
-  "app.modal.install-to-play.view-contents": {
-    "message": "Lihat konten"
-  },
-  "app.modal.update-to-play.header": {
-    "message": "Perbarui untuk memainkan"
-  },
-  "app.project.install-button.already-installed": {
-    "message": "Proyek ini sudah terpasang"
-  },
-  "app.project.install-context.back-to-browse": {
-    "message": "Kembali ke halaman pencarian"
-  },
-  "app.settings.developer-mode-enabled": {
-    "message": "Mode pengembang dihidupkan."
-  },
-  "app.settings.downloading": {
-    "message": "Mengunduh v{version}"
-  },
-  "app.settings.tabs.appearance": {
-    "message": "Tampilan"
-  },
-  "app.settings.tabs.java-installations": {
-    "message": "Pemasangan Java"
-  },
-  "app.settings.tabs.language": {
-    "message": "Bahasa"
-  },
-  "app.settings.tabs.privacy": {
-    "message": "Privasi"
-  },
-  "app.settings.tabs.resource-management": {
-    "message": "Manajemen sumber"
-  },
-  "app.skins.add-button": {
-    "message": "Tambah rupa"
-  },
-  "app.skins.add-button.drag-and-drop": {
-    "message": "Seret dan lepas"
-  },
-  "app.skins.apply-button": {
-    "message": "Terapkan"
-  },
-  "app.skins.delete-button": {
-    "message": "Hapus rupa"
-  },
-  "app.skins.delete-modal.description": {
-    "message": "Ini akan menghapus rupa terpilih secara permanen. Tindakan ini tidak dapat dibatalkan."
-  },
-  "app.skins.delete-modal.title": {
-    "message": "Apakah Anda yakin ingin menghapus rupa ini?"
-  },
-  "app.skins.dropped-file-error.text": {
-    "message": "Gagal membaca berkas yang diletakkan."
-  },
-  "app.skins.dropped-file-error.title": {
-    "message": "Kesalahan dalam memroses berkas"
-  },
-  "app.skins.edit-button": {
-    "message": "Sunting rupa"
-  },
-  "app.skins.modal.add-skin-button": {
-    "message": "Tambah rupa"
-  },
-  "app.skins.modal.add-title": {
-    "message": "Menambah rupa"
-  },
-  "app.skins.modal.arm-style-section": {
-    "message": "Gaya lengan"
-  },
-  "app.skins.modal.arm-style-slim": {
-    "message": "Ramping"
-  },
-  "app.skins.modal.arm-style-wide": {
-    "message": "Lebar"
-  },
-  "app.skins.modal.cape-fallback-name": {
-    "message": "Jubah"
-  },
-  "app.skins.modal.cape-section": {
-    "message": "Jubah"
-  },
-  "app.skins.modal.edit-title": {
-    "message": "Menyunting rupa"
-  },
-  "app.skins.modal.make-edit-first-tooltip": {
-    "message": "Sunting rupa terlebih dahulu!"
-  },
-  "app.skins.modal.no-cape-tooltip": {
-    "message": "Tanpa jubah"
-  },
-  "app.skins.modal.none-cape-option": {
-    "message": "Tidak ada"
-  },
-  "app.skins.modal.replace-texture-button": {
-    "message": "Ganti tekstur"
-  },
-  "app.skins.modal.save-skin-button": {
-    "message": "Simpan rupa"
-  },
-  "app.skins.modal.saving-tooltip": {
-    "message": "Menyimpan..."
-  },
-  "app.skins.modal.texture-section": {
-    "message": "Tekstur"
-  },
-  "app.skins.modal.upload-skin-first-tooltip": {
-    "message": "Unggah rupa terlebih dahulu!"
-  },
-  "app.skins.preview.edit-button": {
-    "message": "Sunting rupa"
-  },
-  "app.skins.previewing-badge": {
-    "message": "Mempratinjau"
-  },
-  "app.skins.rate-limit.text": {
-    "message": "Anda terlalu sering mengganti rupa Anda. Server Mojang telah memblokir permintaan lebih lanjut untuk sementara. Mohon tunggu sebentar sebelum mencoba lagi."
-  },
-  "app.skins.rate-limit.title": {
-    "message": "Pelan-pelan!"
-  },
-  "app.skins.reorder-error.text": {
-    "message": "Urutan rupa Anda tidak dapat disimpan."
-  },
-  "app.skins.reorder-error.title": {
-    "message": "Gagal mengurut ulang rupa"
-  },
-  "app.skins.section.builders-and-biomes": {
-    "message": "Builders & Biomes"
-  },
-  "app.skins.section.chase-the-skies": {
-    "message": "Chase the Skies"
-  },
-  "app.skins.section.default-skins": {
-    "message": "Rupa bawaan"
-  },
-  "app.skins.section.minecon-earth-2017": {
-    "message": "MINECON Earth 2017"
-  },
-  "app.skins.section.modrinth": {
-    "message": "Modrinth"
-  },
-  "app.skins.section.modrinth-pride": {
-    "message": "Modrinth Pride"
-  },
-  "app.skins.section.modrinth-pride.tooltip": {
-    "message": "Anda mendapat rupa ini karena telah berdonasi ke penggalangan dana Modrinth Pride saat Pride Month."
-  },
-  "app.skins.section.mounts-of-mayhem": {
-    "message": "Mounts of Mayhem"
-  },
-  "app.skins.section.saved-skins": {
-    "message": "Rupa tersimpan"
-  },
-  "app.skins.section.striding-hero": {
-    "message": "Striding Hero"
-  },
-  "app.skins.section.the-copper-age": {
-    "message": "The Copper Age"
-  },
-  "app.skins.section.the-garden-awakens": {
-    "message": "The Garden Awakens"
-  },
-  "app.skins.section.tiny-takeover": {
-    "message": "Tiny Takeover"
-  },
-  "app.skins.title": {
-    "message": "Pemilih rupa"
-  },
-  "app.update-popup.body.download-complete": {
-    "message": "Owyx v{version} telah selesai mengunduh. Muat ulang untuk memperbarui sekarang, atau secara otomatis saat Anda menutup Owyx."
-  },
-  "app.update-popup.body.linux": {
-    "message": "Owyx v{version} tersedia. Gunakan pengelola paket Anda untuk memperbarui dan mendapatkan fitur-fitur dan perbaikan terbaru!"
-  },
-  "app.update-popup.body.metered": {
-    "message": "Owyx v{version} sudah tersedia! Karena Anda saat ini sedang berada dalam jaringan terukur, kami tidak mengunduhnya secara otomatis."
-  },
-  "app.update-popup.changelog": {
-    "message": "Catatan perubahan"
-  },
-  "app.update-popup.download": {
-    "message": "Unduh ({size})"
-  },
-  "app.update-popup.download-complete": {
-    "message": "Selesai mengunduh"
-  },
-  "app.update-popup.reload": {
-    "message": "Muat ulang untuk memperbarui"
-  },
-  "app.update-popup.title": {
-    "message": "Pembaruan tersedia"
-  },
-  "app.update.complete-toast.text": {
-    "message": "Klik di sini untuk melihat catatan perubahan."
-  },
-  "app.update.complete-toast.title": {
-    "message": "Versi {version} berhasil dipasang!"
-  },
-  "app.world.server-modal.placeholder-address": {
-    "message": "example.modrinth.gg"
-  },
-  "app.world.server-modal.select-an-option": {
-    "message": "Pilih opsi"
-  },
-  "app.world.world-item.incompatible-version": {
-    "message": "Versi {version} tidak cocok"
-  },
-  "app.world.world-item.not-played-yet": {
-    "message": "Belum pernah dimainkan"
-  },
-  "app.world.world-item.offline": {
-    "message": "Luring"
-  },
-  "friends.action.add-friend": {
-    "message": "Tambah teman"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "{count} {count, plural, other {permintaan}} teman"
-  },
-  "friends.add-friend.submit": {
-    "message": "Kirim permintaan teman"
-  },
-  "friends.add-friend.title": {
-    "message": "Menambah teman"
-  },
-  "friends.add-friend.username.description": {
-    "message": "Ia mungkin memiliki nama yang berbeda dari nama pengguna Minecraft!"
-  },
-  "friends.add-friend.username.placeholder": {
-    "message": "Masukkan nama pengguna Modrinth..."
-  },
-  "friends.add-friend.username.title": {
-    "message": "Apa nama pengguna Modrinth teman Anda?"
-  },
-  "friends.add-friends-to-share": {
-    "message": "<link>Tambah teman</link> untuk melihat apa yang mereka mainkan!"
-  },
-  "friends.friend.cancel-request": {
-    "message": "Batalkan permintaan"
-  },
-  "friends.friend.remove-friend": {
-    "message": "Hapus teman"
-  },
-  "friends.friend.request-sent": {
-    "message": "Permintaan teman dikirim"
-  },
-  "friends.friend.view-profile": {
-    "message": "Lihat profil"
-  },
-  "friends.heading": {
-    "message": "Teman"
-  },
-  "friends.heading.active": {
-    "message": "Aktif"
-  },
-  "friends.heading.offline": {
-    "message": "Luring"
-  },
-  "friends.heading.online": {
-    "message": "Daring"
-  },
-  "friends.heading.pending": {
-    "message": "Menunggu"
-  },
-  "friends.no-friends-match": {
-    "message": "Tidak ada teman dengan nama \"{query}\""
-  },
-  "friends.search-friends-placeholder": {
-    "message": "Cari teman..."
-  },
-  "friends.section.heading": {
-    "message": "{title} - {count}"
-  },
-  "friends.sign-in-to-add-friends": {
-    "message": "<link>Masuk ke akun Modrinth</link> untuk menambah teman dan melihat apa yang mereka mainkan!"
-  },
-  "instance.add-server.add-and-play": {
-    "message": "Tambah dan mainkan"
-  },
-  "instance.add-server.add-server": {
-    "message": "Tambah server"
-  },
-  "instance.add-server.resource-pack.disabled": {
-    "message": "Dimatikan"
-  },
-  "instance.add-server.resource-pack.enabled": {
-    "message": "Dihidupkan"
-  },
-  "instance.add-server.resource-pack.prompt": {
-    "message": "Konfirmasi"
-  },
-  "instance.add-server.title": {
-    "message": "Tambah server"
-  },
-  "instance.edit-server.title": {
-    "message": "Sunting server"
-  },
-  "instance.edit-world.hide-from-home": {
-    "message": "Sembunyikan dari Beranda"
-  },
-  "instance.edit-world.name": {
-    "message": "Nama"
-  },
-  "instance.edit-world.placeholder-name": {
-    "message": "Dunia Minecraft"
-  },
-  "instance.edit-world.reset-icon": {
-    "message": "Atur ulang ikon"
-  },
-  "instance.edit-world.title": {
-    "message": "Sunting dunia"
-  },
-  "instance.files.adding-files": {
-    "message": "Menambahkan berkas ({completed}/{total})"
-  },
-  "instance.files.save-as": {
-    "message": "Simpan sebagai..."
-  },
-  "instance.server-modal.address": {
-    "message": "Alamat"
-  },
-  "instance.server-modal.name": {
-    "message": "Nama"
-  },
-  "instance.server-modal.placeholder-name": {
-    "message": "Server Minecraft"
-  },
-  "instance.server-modal.resource-pack": {
-    "message": "Paket sumber"
-  },
-  "instance.settings.tabs.general": {
-    "message": "Umum"
-  },
-  "instance.settings.tabs.general.delete": {
-    "message": "Hapus instans"
-  },
-  "instance.settings.tabs.general.delete.button": {
-    "message": "Hapus instans"
-  },
-  "instance.settings.tabs.general.delete.description": {
-    "message": "Menghapus instans secara permanen dari perangkat Anda, termasuk dunia, konfigurasi, dan konten terpasang Anda. Berhati-hatilah, karena Anda tidak dapat memulihkan instans yang telah dihapus."
-  },
-  "instance.settings.tabs.general.deleting.button": {
-    "message": "Menghapus..."
-  },
-  "instance.settings.tabs.general.duplicate-button": {
-    "message": "Gandakan"
-  },
-  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
-    "message": "Tidak dapat menggandakan saat memasang."
-  },
-  "instance.settings.tabs.general.duplicate-instance": {
-    "message": "Gandakan instans"
-  },
-  "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "Membuat salinan dari instans ini, termasuk dunia, konfigurasi, mod, dsb."
-  },
-  "instance.settings.tabs.general.edit-icon": {
-    "message": "Sunting ikon"
-  },
-  "instance.settings.tabs.general.edit-icon.remove": {
-    "message": "Hapus ikon"
-  },
-  "instance.settings.tabs.general.edit-icon.replace": {
-    "message": "Ganti ikon"
-  },
-  "instance.settings.tabs.general.edit-icon.select": {
-    "message": "Pilih ikon"
-  },
-  "instance.settings.tabs.general.name": {
-    "message": "Nama"
-  },
-  "instance.settings.tabs.general.update-channel": {
-    "message": "Perbarui kanal"
-  },
-  "instance.settings.tabs.general.update-channel.alpha": {
-    "message": "Alpha"
-  },
-  "instance.settings.tabs.general.update-channel.alpha.description": {
-    "message": "Versi rilisan, beta, dan alpha akan ditampilkan sebagai pembaruan yang tersedia."
-  },
-  "instance.settings.tabs.general.update-channel.beta": {
-    "message": "Beta"
-  },
-  "instance.settings.tabs.general.update-channel.beta.description": {
-    "message": "Versi beta dan alpha akan ditampilkan sebagai pembaruan yang tersedia."
-  },
-  "instance.settings.tabs.general.update-channel.release": {
-    "message": "Rilisan"
-  },
-  "instance.settings.tabs.general.update-channel.release.description": {
-    "message": "Hanya versi rilisan yang akan ditampilkan sebagai pembaruan yang tersedia."
-  },
-  "instance.settings.tabs.general.update-channel.select": {
-    "message": "Pilih kanal pembaruan"
-  },
-  "instance.settings.tabs.hooks.post-exit": {
-    "message": "Pascakeluar"
-  },
-  "instance.settings.tabs.hooks.post-exit.description": {
-    "message": "Berjalan setelah permainan tertutup."
-  },
-  "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "Masukkan perintah pascakeluar..."
-  },
-  "instance.settings.tabs.hooks.pre-launch": {
-    "message": "Praluncur"
-  },
-  "instance.settings.tabs.hooks.pre-launch.description": {
-    "message": "Berjalan sebelum instans diluncurkan."
-  },
-  "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "Masukkan perintah praluncur..."
-  },
-  "instance.settings.tabs.hooks.wrapper": {
-    "message": "Pembungkus"
-  },
-  "instance.settings.tabs.hooks.wrapper.description": {
-    "message": "Perintah pembungkus untuk meluncurkan Minecraft."
-  },
-  "instance.settings.tabs.hooks.wrapper.enter": {
-    "message": "Masukkan perintah pembungkus..."
-  },
-  "instance.settings.tabs.installation": {
-    "message": "Pemasangan"
-  },
-  "instance.settings.tabs.installation.loader-version": {
-    "message": "Versi {loader}"
-  },
-  "instance.settings.tabs.java.enter-environment-variables": {
-    "message": "Masukkan variabel lingkungan..."
-  },
-  "instance.settings.tabs.java.enter-java-arguments": {
-    "message": "Masukkan argumen Java..."
-  },
-  "instance.settings.tabs.java.hooks": {
-    "message": "Kait"
-  },
-  "instance.settings.tabs.java.java-path-placeholder": {
-    "message": "/jalur/ke/java"
-  },
-  "instance.settings.tabs.window.fullscreen": {
-    "message": "Layar penuh"
-  },
-  "instance.settings.tabs.window.fullscreen.description": {
-    "message": "Permainan berada dalam layar penuh ketika diluncurkan (menggunakan options.txt)."
-  },
-  "instance.settings.tabs.window.height": {
-    "message": "Tinggi"
-  },
-  "instance.settings.tabs.window.height.description": {
-    "message": "Tinggi jendela permainan ketika diluncurkan."
-  },
-  "instance.settings.tabs.window.height.enter": {
-    "message": "Masukkan tinggi..."
-  },
-  "instance.settings.tabs.window.width": {
-    "message": "Lebar"
-  },
-  "instance.settings.tabs.window.width.description": {
-    "message": "Lebar jendela permainan ketika diluncurkan."
-  },
-  "instance.settings.tabs.window.width.enter": {
-    "message": "Masukkan lebar..."
-  },
-  "instance.worlds.a_minecraft_server": {
-    "message": "Server Minecraft"
-  },
-  "instance.worlds.cant_connect": {
-    "message": "Tidak dapat menghubungkan ke server"
-  },
-  "instance.worlds.copy_address": {
-    "message": "Salin alamat"
-  },
-  "instance.worlds.dont_show_on_home": {
-    "message": "Jangan tampilkan di Beranda"
-  },
-  "instance.worlds.game_already_open": {
-    "message": "Instans telah dibuka"
-  },
-  "instance.worlds.hardcore": {
-    "message": "Mode Menantang"
-  },
-  "instance.worlds.incompatible_server": {
-    "message": "Server tidak cocok"
-  },
-  "instance.worlds.linked_server": {
-    "message": "Dikelola oleh proyek server"
-  },
-  "instance.worlds.no_contact": {
-    "message": "Server tidak dapat dihubungi"
-  },
-  "instance.worlds.no_server_quick_play": {
-    "message": "Anda hanya dapat memasuki server secara langsung pada Minecraft versi Alpha 1.0.5 ke atas"
-  },
-  "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Anda hanya dapat memasuki dunia bermain sendiri secara langsung pada Minecraft versi Alpha 1.20 ke atas"
-  },
-  "instance.worlds.play_instance": {
-    "message": "Mainkan instans"
-  },
-  "instance.worlds.view_instance": {
-    "message": "Lihat instans"
-  },
-  "instance.worlds.world_in_use": {
-    "message": "Dunia sedang dimainkan"
-  },
-  "minecraft-account.add-account": {
-    "message": "Tambah akun"
-  },
-  "minecraft-account.label": {
-    "message": "Akun Minecraft"
-  },
-  "minecraft-account.not-signed-in": {
-    "message": "Tidak masuk"
-  },
-  "minecraft-account.remove-account": {
-    "message": "Hapus akun"
-  },
-  "minecraft-account.select-account": {
-    "message": "Pilih akun"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Masuk ke Minecraft"
-  },
-  "search.filter.locked.instance": {
-    "message": "Disediakan oleh instans"
-  },
-  "search.filter.locked.instance-game-version.title": {
-    "message": "Versi permainan disediakan oleh instans"
-  },
-  "search.filter.locked.instance-loader.title": {
-    "message": "Pemuat disediakan oleh instans"
-  },
-  "search.filter.locked.instance.sync": {
-    "message": "Sinkronkan dengan instans"
-  },
-  "search.filter.locked.server-environment.title": {
-    "message": "Anda hanya dapat menambahkan mod sisi klien pada instans server"
-  },
-  "app.nav.admin-panel": {
-    "message": "Panel admin"
-  }
+	"app.action-bar.downloading-java": {
+		"message": "Mengunduh Java {version}"
+	},
+	"app.action-bar.downloading-update": {
+		"message": "Mengunduh pembaruan"
+	},
+	"app.action-bar.downloads": {
+		"message": "Unduhan"
+	},
+	"app.action-bar.hide-more-running-instances": {
+		"message": "Sembunyikan lebih banyak instans yang sedang berjalan"
+	},
+	"app.action-bar.make-primary-instance": {
+		"message": "Jadikan sebagai instans utama"
+	},
+	"app.action-bar.no-instances-running": {
+		"message": "Tidak ada instans yang sedang berjalan"
+	},
+	"app.action-bar.offline": {
+		"message": "Luring"
+	},
+	"app.action-bar.primary-instance": {
+		"message": "Instans utama"
+	},
+	"app.action-bar.reload-to-update": {
+		"message": "Muat ulang untuk memperbarui"
+	},
+	"app.action-bar.show-more-running-instances": {
+		"message": "Tampilkan lebih banyak instans yang sedang berjalan"
+	},
+	"app.action-bar.stop-instance": {
+		"message": "Hentikan instans"
+	},
+	"app.action-bar.update": {
+		"message": "Perbarui"
+	},
+	"app.action-bar.view-active-downloads": {
+		"message": "Lihat pengunduhan berlangsung"
+	},
+	"app.action-bar.view-instance": {
+		"message": "Lihat instans"
+	},
+	"app.action-bar.view-logs": {
+		"message": "Lihat catatan"
+	},
+	"app.appearance-settings.default-landing-page.home": {
+		"message": "Beranda"
+	},
+	"app.appearance-settings.default-landing-page.library": {
+		"message": "Pustaka"
+	},
+	"app.appearance-settings.hide-nametag.title": {
+		"message": "Sembunyikan label nama"
+	},
+	"app.appearance-settings.show-play-time.title": {
+		"message": "Tampilkan waktu bermain"
+	},
+	"app.appearance-settings.unknown-pack-warning.title": {
+		"message": "Peringatkan saya sebelum memasang paket mod tidak dikenal"
+	},
+	"app.auth-servers.unreachable.body": {
+		"message": "Server autentikasi Minecraft mungkin sedang tidak tersedia saat ini. Periksa koneksi internet Anda dan coba lagi nanti."
+	},
+	"app.auth-servers.unreachable.header": {
+		"message": "Tidak dapat terhubung ke server autentikasi"
+	},
+	"app.browse.add-servers-to-instance": {
+		"message": "Menambah server ke instans"
+	},
+	"app.browse.add-to-an-instance": {
+		"message": "Tambah ke instans"
+	},
+	"app.browse.add-to-instance": {
+		"message": "Tambah ke instans"
+	},
+	"app.browse.add-to-instance-name": {
+		"message": "Tambah ke {instanceName}"
+	},
+	"app.browse.added": {
+		"message": "Ditambahkan"
+	},
+	"app.browse.already-added": {
+		"message": "Telah ditambahkan"
+	},
+	"app.browse.back-to-instance": {
+		"message": "Kembali ke instans"
+	},
+	"app.browse.discover-servers": {
+		"message": "Temukan server"
+	},
+	"app.browse.project-type.modpacks": {
+		"message": "Paket Mod"
+	},
+	"app.browse.server.installing": {
+		"message": "Memasang"
+	},
+	"app.content-install.no-compatible-versions": {
+		"message": "Tidak ada versi tersedia yang cocok untuk {compatibilityLabel}. Anda tetap dapat memilih versi yang akan dipasang. Dependensi tidak akan dipasang secara otomatis."
+	},
+	"app.export-modal.description-placeholder": {
+		"message": "Masukkan deskripsi paket mod..."
+	},
+	"app.export-modal.export-button": {
+		"message": "Ekspor"
+	},
+	"app.export-modal.header": {
+		"message": "Ekspor paket mod"
+	},
+	"app.export-modal.modpack-name-placeholder": {
+		"message": "Nama paket mod"
+	},
+	"app.export-modal.version-number-label": {
+		"message": "Nomor versi"
+	},
+	"app.export-modal.version-number-placeholder": {
+		"message": "1.0.0"
+	},
+	"app.instance.confirm-delete.admonition-body": {
+		"message": "Semua data dari instans Anda akan dihapus secara permanen, termasuk dunia, konfigurasi, dan konten terpasang Anda."
+	},
+	"app.instance.confirm-delete.admonition-header": {
+		"message": "Tindakan ini tidak dapat dibatalkan"
+	},
+	"app.instance.confirm-delete.delete-button": {
+		"message": "Hapus instans"
+	},
+	"app.instance.confirm-delete.header": {
+		"message": "Hapus instans"
+	},
+	"app.instance.modpack-already-installed.body": {
+		"message": "Paket mod ini telah terpasang di instans <bold>{instanceName}</bold>. Apakah Anda yakin ingin menggandakannya?"
+	},
+	"app.instance.modpack-already-installed.create": {
+		"message": "Buat"
+	},
+	"app.instance.modpack-already-installed.header": {
+		"message": "Paket mod telah terpasang"
+	},
+	"app.instance.modpack-already-installed.instance": {
+		"message": "Instans"
+	},
+	"app.instance.mods.content-type-project": {
+		"message": "proyek"
+	},
+	"app.instance.mods.project-was-added": {
+		"message": "\"{name}\" telah ditambahkan"
+	},
+	"app.instance.mods.projects-were-added": {
+		"message": "{count} proyek telah ditambahkan"
+	},
+	"app.instance.mods.share-text": {
+		"message": "Lihat proyek-proyek yang saya pakai di paket mod saya!"
+	},
+	"app.instance.mods.share-title": {
+		"message": "Membagi konten paket mod"
+	},
+	"app.instance.mods.successfully-uploaded": {
+		"message": "Berhasil diunggah"
+	},
+	"app.instance.worlds.add-server": {
+		"message": "Tambah server"
+	},
+	"app.instance.worlds.browse-servers": {
+		"message": "Telusuri server"
+	},
+	"app.instance.worlds.filter-modded": {
+		"message": "Dimodifikasi"
+	},
+	"app.instance.worlds.filter-offline": {
+		"message": "Luring"
+	},
+	"app.instance.worlds.filter-online": {
+		"message": "Daring"
+	},
+	"app.instance.worlds.filter-vanilla": {
+		"message": "Vanila"
+	},
+	"app.instance.worlds.no-worlds-description": {
+		"message": "Tambah server atau telusuri untuk memulai"
+	},
+	"app.instance.worlds.no-worlds-heading": {
+		"message": "Tidak ada server atau dunia yang ditambahkan"
+	},
+	"app.instance.worlds.search-worlds-placeholder": {
+		"message": "Cari {count} dunia..."
+	},
+	"app.modal.install-to-play.header": {
+		"message": "Pasang untuk memainkan"
+	},
+	"app.modal.install-to-play.install-button": {
+		"message": "Pasang"
+	},
+	"app.modal.install-to-play.mod-count": {
+		"message": "{count, plural, other {# mod}}"
+	},
+	"app.modal.install-to-play.shared-instance": {
+		"message": "Instans terbagi"
+	},
+	"app.modal.install-to-play.view-contents": {
+		"message": "Lihat konten"
+	},
+	"app.modal.update-to-play.header": {
+		"message": "Perbarui untuk memainkan"
+	},
+	"app.project.install-button.already-installed": {
+		"message": "Proyek ini sudah terpasang"
+	},
+	"app.project.install-context.back-to-browse": {
+		"message": "Kembali ke halaman pencarian"
+	},
+	"app.settings.developer-mode-enabled": {
+		"message": "Mode pengembang dihidupkan."
+	},
+	"app.settings.downloading": {
+		"message": "Mengunduh v{version}"
+	},
+	"app.settings.tabs.appearance": {
+		"message": "Tampilan"
+	},
+	"app.settings.tabs.java-installations": {
+		"message": "Pemasangan Java"
+	},
+	"app.settings.tabs.language": {
+		"message": "Bahasa"
+	},
+	"app.settings.tabs.privacy": {
+		"message": "Privasi"
+	},
+	"app.settings.tabs.resource-management": {
+		"message": "Manajemen sumber"
+	},
+	"app.skins.add-button": {
+		"message": "Tambah rupa"
+	},
+	"app.skins.add-button.drag-and-drop": {
+		"message": "Seret dan lepas"
+	},
+	"app.skins.apply-button": {
+		"message": "Terapkan"
+	},
+	"app.skins.delete-button": {
+		"message": "Hapus rupa"
+	},
+	"app.skins.delete-modal.description": {
+		"message": "Ini akan menghapus rupa terpilih secara permanen. Tindakan ini tidak dapat dibatalkan."
+	},
+	"app.skins.delete-modal.title": {
+		"message": "Apakah Anda yakin ingin menghapus rupa ini?"
+	},
+	"app.skins.dropped-file-error.text": {
+		"message": "Gagal membaca berkas yang diletakkan."
+	},
+	"app.skins.dropped-file-error.title": {
+		"message": "Kesalahan dalam memroses berkas"
+	},
+	"app.skins.edit-button": {
+		"message": "Sunting rupa"
+	},
+	"app.skins.modal.add-skin-button": {
+		"message": "Tambah rupa"
+	},
+	"app.skins.modal.add-title": {
+		"message": "Menambah rupa"
+	},
+	"app.skins.modal.arm-style-section": {
+		"message": "Gaya lengan"
+	},
+	"app.skins.modal.arm-style-slim": {
+		"message": "Ramping"
+	},
+	"app.skins.modal.arm-style-wide": {
+		"message": "Lebar"
+	},
+	"app.skins.modal.cape-fallback-name": {
+		"message": "Jubah"
+	},
+	"app.skins.modal.cape-section": {
+		"message": "Jubah"
+	},
+	"app.skins.modal.edit-title": {
+		"message": "Menyunting rupa"
+	},
+	"app.skins.modal.make-edit-first-tooltip": {
+		"message": "Sunting rupa terlebih dahulu!"
+	},
+	"app.skins.modal.no-cape-tooltip": {
+		"message": "Tanpa jubah"
+	},
+	"app.skins.modal.none-cape-option": {
+		"message": "Tidak ada"
+	},
+	"app.skins.modal.replace-texture-button": {
+		"message": "Ganti tekstur"
+	},
+	"app.skins.modal.save-skin-button": {
+		"message": "Simpan rupa"
+	},
+	"app.skins.modal.saving-tooltip": {
+		"message": "Menyimpan..."
+	},
+	"app.skins.modal.texture-section": {
+		"message": "Tekstur"
+	},
+	"app.skins.modal.upload-skin-first-tooltip": {
+		"message": "Unggah rupa terlebih dahulu!"
+	},
+	"app.skins.preview.edit-button": {
+		"message": "Sunting rupa"
+	},
+	"app.skins.previewing-badge": {
+		"message": "Mempratinjau"
+	},
+	"app.skins.rate-limit.text": {
+		"message": "Anda terlalu sering mengganti rupa Anda. Server Mojang telah memblokir permintaan lebih lanjut untuk sementara. Mohon tunggu sebentar sebelum mencoba lagi."
+	},
+	"app.skins.rate-limit.title": {
+		"message": "Pelan-pelan!"
+	},
+	"app.skins.reorder-error.text": {
+		"message": "Urutan rupa Anda tidak dapat disimpan."
+	},
+	"app.skins.reorder-error.title": {
+		"message": "Gagal mengurut ulang rupa"
+	},
+	"app.skins.section.builders-and-biomes": {
+		"message": "Builders & Biomes"
+	},
+	"app.skins.section.chase-the-skies": {
+		"message": "Chase the Skies"
+	},
+	"app.skins.section.default-skins": {
+		"message": "Rupa bawaan"
+	},
+	"app.skins.section.minecon-earth-2017": {
+		"message": "MINECON Earth 2017"
+	},
+	"app.skins.section.modrinth": {
+		"message": "Owyx"
+	},
+	"app.skins.section.modrinth-pride": {
+		"message": "Owyx Pride"
+	},
+	"app.skins.section.modrinth-pride.tooltip": {
+		"message": "Anda mendapat rupa ini karena telah berdonasi ke penggalangan dana Owyx Pride saat Pride Month."
+	},
+	"app.skins.section.mounts-of-mayhem": {
+		"message": "Mounts of Mayhem"
+	},
+	"app.skins.section.saved-skins": {
+		"message": "Rupa tersimpan"
+	},
+	"app.skins.section.striding-hero": {
+		"message": "Striding Hero"
+	},
+	"app.skins.section.the-copper-age": {
+		"message": "The Copper Age"
+	},
+	"app.skins.section.the-garden-awakens": {
+		"message": "The Garden Awakens"
+	},
+	"app.skins.section.tiny-takeover": {
+		"message": "Tiny Takeover"
+	},
+	"app.skins.title": {
+		"message": "Pemilih rupa"
+	},
+	"app.update-popup.body.download-complete": {
+		"message": "Owyx v{version} telah selesai mengunduh. Muat ulang untuk memperbarui sekarang, atau secara otomatis saat Anda menutup Owyx."
+	},
+	"app.update-popup.body.linux": {
+		"message": "Owyx v{version} tersedia. Gunakan pengelola paket Anda untuk memperbarui dan mendapatkan fitur-fitur dan perbaikan terbaru!"
+	},
+	"app.update-popup.body.metered": {
+		"message": "Owyx v{version} sudah tersedia! Karena Anda saat ini sedang berada dalam jaringan terukur, kami tidak mengunduhnya secara otomatis."
+	},
+	"app.update-popup.changelog": {
+		"message": "Catatan perubahan"
+	},
+	"app.update-popup.download": {
+		"message": "Unduh ({size})"
+	},
+	"app.update-popup.download-complete": {
+		"message": "Selesai mengunduh"
+	},
+	"app.update-popup.reload": {
+		"message": "Muat ulang untuk memperbarui"
+	},
+	"app.update-popup.title": {
+		"message": "Pembaruan tersedia"
+	},
+	"app.update.complete-toast.text": {
+		"message": "Klik di sini untuk melihat catatan perubahan."
+	},
+	"app.update.complete-toast.title": {
+		"message": "Versi {version} berhasil dipasang!"
+	},
+	"app.world.server-modal.placeholder-address": {
+		"message": "play.example.com"
+	},
+	"app.world.server-modal.select-an-option": {
+		"message": "Pilih opsi"
+	},
+	"app.world.world-item.incompatible-version": {
+		"message": "Versi {version} tidak cocok"
+	},
+	"app.world.world-item.not-played-yet": {
+		"message": "Belum pernah dimainkan"
+	},
+	"app.world.world-item.offline": {
+		"message": "Luring"
+	},
+	"friends.action.add-friend": {
+		"message": "Tambah teman"
+	},
+	"friends.action.view-friend-requests": {
+		"message": "{count} {count, plural, other {permintaan}} teman"
+	},
+	"friends.add-friend.submit": {
+		"message": "Kirim permintaan teman"
+	},
+	"friends.add-friend.title": {
+		"message": "Menambah teman"
+	},
+	"friends.add-friend.username.description": {
+		"message": "Ia mungkin memiliki nama yang berbeda dari nama pengguna Minecraft!"
+	},
+	"friends.add-friend.username.placeholder": {
+		"message": "Masukkan nama pengguna Owyx..."
+	},
+	"friends.add-friend.username.title": {
+		"message": "Apa nama pengguna Owyx teman Anda?"
+	},
+	"friends.add-friends-to-share": {
+		"message": "<link>Tambah teman</link> untuk melihat apa yang mereka mainkan!"
+	},
+	"friends.friend.cancel-request": {
+		"message": "Batalkan permintaan"
+	},
+	"friends.friend.remove-friend": {
+		"message": "Hapus teman"
+	},
+	"friends.friend.request-sent": {
+		"message": "Permintaan teman dikirim"
+	},
+	"friends.friend.view-profile": {
+		"message": "Lihat profil"
+	},
+	"friends.heading": {
+		"message": "Teman"
+	},
+	"friends.heading.active": {
+		"message": "Aktif"
+	},
+	"friends.heading.offline": {
+		"message": "Luring"
+	},
+	"friends.heading.online": {
+		"message": "Daring"
+	},
+	"friends.heading.pending": {
+		"message": "Menunggu"
+	},
+	"friends.no-friends-match": {
+		"message": "Tidak ada teman dengan nama \"{query}\""
+	},
+	"friends.search-friends-placeholder": {
+		"message": "Cari teman..."
+	},
+	"friends.section.heading": {
+		"message": "{title} - {count}"
+	},
+	"friends.sign-in-to-add-friends": {
+		"message": "<link>Masuk ke akun Owyx</link> untuk menambah teman dan melihat apa yang mereka mainkan!"
+	},
+	"instance.add-server.add-and-play": {
+		"message": "Tambah dan mainkan"
+	},
+	"instance.add-server.add-server": {
+		"message": "Tambah server"
+	},
+	"instance.add-server.resource-pack.disabled": {
+		"message": "Dimatikan"
+	},
+	"instance.add-server.resource-pack.enabled": {
+		"message": "Dihidupkan"
+	},
+	"instance.add-server.resource-pack.prompt": {
+		"message": "Konfirmasi"
+	},
+	"instance.add-server.title": {
+		"message": "Tambah server"
+	},
+	"instance.edit-server.title": {
+		"message": "Sunting server"
+	},
+	"instance.edit-world.hide-from-home": {
+		"message": "Sembunyikan dari Beranda"
+	},
+	"instance.edit-world.name": {
+		"message": "Nama"
+	},
+	"instance.edit-world.placeholder-name": {
+		"message": "Dunia Minecraft"
+	},
+	"instance.edit-world.reset-icon": {
+		"message": "Atur ulang ikon"
+	},
+	"instance.edit-world.title": {
+		"message": "Sunting dunia"
+	},
+	"instance.files.adding-files": {
+		"message": "Menambahkan berkas ({completed}/{total})"
+	},
+	"instance.files.save-as": {
+		"message": "Simpan sebagai..."
+	},
+	"instance.server-modal.address": {
+		"message": "Alamat"
+	},
+	"instance.server-modal.name": {
+		"message": "Nama"
+	},
+	"instance.server-modal.placeholder-name": {
+		"message": "Server Minecraft"
+	},
+	"instance.server-modal.resource-pack": {
+		"message": "Paket sumber"
+	},
+	"instance.settings.tabs.general": {
+		"message": "Umum"
+	},
+	"instance.settings.tabs.general.delete": {
+		"message": "Hapus instans"
+	},
+	"instance.settings.tabs.general.delete.button": {
+		"message": "Hapus instans"
+	},
+	"instance.settings.tabs.general.delete.description": {
+		"message": "Menghapus instans secara permanen dari perangkat Anda, termasuk dunia, konfigurasi, dan konten terpasang Anda. Berhati-hatilah, karena Anda tidak dapat memulihkan instans yang telah dihapus."
+	},
+	"instance.settings.tabs.general.deleting.button": {
+		"message": "Menghapus..."
+	},
+	"instance.settings.tabs.general.duplicate-button": {
+		"message": "Gandakan"
+	},
+	"instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+		"message": "Tidak dapat menggandakan saat memasang."
+	},
+	"instance.settings.tabs.general.duplicate-instance": {
+		"message": "Gandakan instans"
+	},
+	"instance.settings.tabs.general.duplicate-instance.description": {
+		"message": "Membuat salinan dari instans ini, termasuk dunia, konfigurasi, mod, dsb."
+	},
+	"instance.settings.tabs.general.edit-icon": {
+		"message": "Sunting ikon"
+	},
+	"instance.settings.tabs.general.edit-icon.remove": {
+		"message": "Hapus ikon"
+	},
+	"instance.settings.tabs.general.edit-icon.replace": {
+		"message": "Ganti ikon"
+	},
+	"instance.settings.tabs.general.edit-icon.select": {
+		"message": "Pilih ikon"
+	},
+	"instance.settings.tabs.general.name": {
+		"message": "Nama"
+	},
+	"instance.settings.tabs.general.update-channel": {
+		"message": "Perbarui kanal"
+	},
+	"instance.settings.tabs.general.update-channel.alpha": {
+		"message": "Alpha"
+	},
+	"instance.settings.tabs.general.update-channel.alpha.description": {
+		"message": "Versi rilisan, beta, dan alpha akan ditampilkan sebagai pembaruan yang tersedia."
+	},
+	"instance.settings.tabs.general.update-channel.beta": {
+		"message": "Beta"
+	},
+	"instance.settings.tabs.general.update-channel.beta.description": {
+		"message": "Versi beta dan alpha akan ditampilkan sebagai pembaruan yang tersedia."
+	},
+	"instance.settings.tabs.general.update-channel.release": {
+		"message": "Rilisan"
+	},
+	"instance.settings.tabs.general.update-channel.release.description": {
+		"message": "Hanya versi rilisan yang akan ditampilkan sebagai pembaruan yang tersedia."
+	},
+	"instance.settings.tabs.general.update-channel.select": {
+		"message": "Pilih kanal pembaruan"
+	},
+	"instance.settings.tabs.hooks.post-exit": {
+		"message": "Pascakeluar"
+	},
+	"instance.settings.tabs.hooks.post-exit.description": {
+		"message": "Berjalan setelah permainan tertutup."
+	},
+	"instance.settings.tabs.hooks.post-exit.enter": {
+		"message": "Masukkan perintah pascakeluar..."
+	},
+	"instance.settings.tabs.hooks.pre-launch": {
+		"message": "Praluncur"
+	},
+	"instance.settings.tabs.hooks.pre-launch.description": {
+		"message": "Berjalan sebelum instans diluncurkan."
+	},
+	"instance.settings.tabs.hooks.pre-launch.enter": {
+		"message": "Masukkan perintah praluncur..."
+	},
+	"instance.settings.tabs.hooks.wrapper": {
+		"message": "Pembungkus"
+	},
+	"instance.settings.tabs.hooks.wrapper.description": {
+		"message": "Perintah pembungkus untuk meluncurkan Minecraft."
+	},
+	"instance.settings.tabs.hooks.wrapper.enter": {
+		"message": "Masukkan perintah pembungkus..."
+	},
+	"instance.settings.tabs.installation": {
+		"message": "Pemasangan"
+	},
+	"instance.settings.tabs.installation.loader-version": {
+		"message": "Versi {loader}"
+	},
+	"instance.settings.tabs.java.enter-environment-variables": {
+		"message": "Masukkan variabel lingkungan..."
+	},
+	"instance.settings.tabs.java.enter-java-arguments": {
+		"message": "Masukkan argumen Java..."
+	},
+	"instance.settings.tabs.java.hooks": {
+		"message": "Kait"
+	},
+	"instance.settings.tabs.java.java-path-placeholder": {
+		"message": "/jalur/ke/java"
+	},
+	"instance.settings.tabs.window.fullscreen": {
+		"message": "Layar penuh"
+	},
+	"instance.settings.tabs.window.fullscreen.description": {
+		"message": "Permainan berada dalam layar penuh ketika diluncurkan (menggunakan options.txt)."
+	},
+	"instance.settings.tabs.window.height": {
+		"message": "Tinggi"
+	},
+	"instance.settings.tabs.window.height.description": {
+		"message": "Tinggi jendela permainan ketika diluncurkan."
+	},
+	"instance.settings.tabs.window.height.enter": {
+		"message": "Masukkan tinggi..."
+	},
+	"instance.settings.tabs.window.width": {
+		"message": "Lebar"
+	},
+	"instance.settings.tabs.window.width.description": {
+		"message": "Lebar jendela permainan ketika diluncurkan."
+	},
+	"instance.settings.tabs.window.width.enter": {
+		"message": "Masukkan lebar..."
+	},
+	"instance.worlds.a_minecraft_server": {
+		"message": "Server Minecraft"
+	},
+	"instance.worlds.cant_connect": {
+		"message": "Tidak dapat menghubungkan ke server"
+	},
+	"instance.worlds.copy_address": {
+		"message": "Salin alamat"
+	},
+	"instance.worlds.dont_show_on_home": {
+		"message": "Jangan tampilkan di Beranda"
+	},
+	"instance.worlds.game_already_open": {
+		"message": "Instans telah dibuka"
+	},
+	"instance.worlds.hardcore": {
+		"message": "Mode Menantang"
+	},
+	"instance.worlds.incompatible_server": {
+		"message": "Server tidak cocok"
+	},
+	"instance.worlds.linked_server": {
+		"message": "Dikelola oleh proyek server"
+	},
+	"instance.worlds.no_contact": {
+		"message": "Server tidak dapat dihubungi"
+	},
+	"instance.worlds.no_server_quick_play": {
+		"message": "Anda hanya dapat memasuki server secara langsung pada Minecraft versi Alpha 1.0.5 ke atas"
+	},
+	"instance.worlds.no_singleplayer_quick_play": {
+		"message": "Anda hanya dapat memasuki dunia bermain sendiri secara langsung pada Minecraft versi Alpha 1.20 ke atas"
+	},
+	"instance.worlds.play_instance": {
+		"message": "Mainkan instans"
+	},
+	"instance.worlds.view_instance": {
+		"message": "Lihat instans"
+	},
+	"instance.worlds.world_in_use": {
+		"message": "Dunia sedang dimainkan"
+	},
+	"minecraft-account.add-account": {
+		"message": "Tambah akun"
+	},
+	"minecraft-account.label": {
+		"message": "Akun Minecraft"
+	},
+	"minecraft-account.not-signed-in": {
+		"message": "Tidak masuk"
+	},
+	"minecraft-account.remove-account": {
+		"message": "Hapus akun"
+	},
+	"minecraft-account.select-account": {
+		"message": "Pilih akun"
+	},
+	"minecraft-account.sign-in": {
+		"message": "Masuk ke Minecraft"
+	},
+	"search.filter.locked.instance": {
+		"message": "Disediakan oleh instans"
+	},
+	"search.filter.locked.instance-game-version.title": {
+		"message": "Versi permainan disediakan oleh instans"
+	},
+	"search.filter.locked.instance-loader.title": {
+		"message": "Pemuat disediakan oleh instans"
+	},
+	"search.filter.locked.instance.sync": {
+		"message": "Sinkronkan dengan instans"
+	},
+	"search.filter.locked.server-environment.title": {
+		"message": "Anda hanya dapat menambahkan mod sisi klien pada instans server"
+	},
+	"app.nav.admin-panel": {
+		"message": "Panel admin"
+	}
 }

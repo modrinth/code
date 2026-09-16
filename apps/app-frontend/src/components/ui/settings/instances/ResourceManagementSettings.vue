@@ -64,7 +64,7 @@ const messages = defineMessages({
 	appCacheDescription: {
 		id: 'app.settings.resource-management.app-cache.description',
 		defaultMessage:
-			'Clear cached data and download it again from Modrinth. The app may load more slowly until the cache is rebuilt.',
+			'Clear cached data and download it again from Owyx. The app may load more slowly until the cache is rebuilt.',
 	},
 	maximumConcurrentDownloadsTitle: {
 		id: 'app.settings.resource-management.maximum-concurrent-downloads.title',

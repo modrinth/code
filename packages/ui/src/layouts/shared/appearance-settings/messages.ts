@@ -7,7 +7,7 @@ export const appearanceSettingsMessages = defineMessages({
 	},
 	colorThemeDescription: {
 		id: 'settings.display.theme.description',
-		defaultMessage: 'Select your preferred color theme across Modrinth.',
+		defaultMessage: 'Select your preferred color theme across Owyx.',
 	},
 	syncAcrossDevicesTitle: {
 		id: 'settings.display.theme.sync-across-devices',

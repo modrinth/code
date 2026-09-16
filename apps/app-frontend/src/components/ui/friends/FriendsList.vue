@@ -1,6 +1,16 @@
 <script setup lang="ts">
-import { MailIcon, SearchIcon, SendIcon, UserIcon, UserPlusIcon, XIcon } from '@modrinth/assets'
 import {
+	MailIcon,
+	MoreVerticalIcon,
+	SearchIcon,
+	SendIcon,
+	TrashIcon,
+	UserIcon,
+	UserPlusIcon,
+	XIcon,
+} from '@modrinth/assets'
+import {
+	Accordion,
 	Avatar,
 	Button,
 	defineMessages,
@@ -8,9 +18,10 @@ import {
 	injectNotificationManager,
 	Input,
 	IntlFormatted,
+	TeleportOverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import {
@@ -19,6 +30,7 @@ import {
 	type OwyxFriend,
 	removeOwyxFriend,
 	requestOwyxFriend,
+	searchOwyxUsers,
 } from '@/helpers/owyx-friends'
 import type { ModrinthCredentials } from '@/helpers/mr_auth'
 import { resolveOwyxAvatarUrl } from '@/helpers/owyx-avatar'
@@ -27,7 +39,6 @@ const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
 
 const props = defineProps<{
-	/** Legacy Modrinth credentials — ignored; friends are Owyx-backed. */
 	credentials: ModrinthCredentials | null
 	owyxSignedIn?: boolean
 	signIn: () => void
@@ -37,8 +48,13 @@ const friends = ref<OwyxFriend[]>([])
 const loading = ref(false)
 const search = ref('')
 const username = ref('')
+const searchHits = ref<{ id: string; nickname: string; avatarUrl?: string | null }[]>([])
+const searchBusy = ref(false)
 const friendInvitesModal = ref<{ show: () => void; hide: () => void } | null>(null)
 const addFriendModal = ref<{ show: () => void; hide: () => void } | null>(null)
+
+let pollTimer: ReturnType<typeof setInterval> | null = null
+let searchDebounce: ReturnType<typeof setTimeout> | null = null
 
 async function refresh() {
 	if (!props.owyxSignedIn) {
@@ -56,8 +72,24 @@ async function refresh() {
 	}
 }
 
+async function quietRefresh() {
+	if (!props.owyxSignedIn) return
+	try {
+		friends.value = await listOwyxFriends()
+	} catch {
+		/* keep previous list */
+	}
+}
+
 onMounted(() => {
 	void refresh()
+	pollTimer = setInterval(() => {
+		void quietRefresh()
+	}, 45_000)
+})
+onUnmounted(() => {
+	if (pollTimer) clearInterval(pollTimer)
+	if (searchDebounce) clearTimeout(searchDebounce)
 })
 watch(
 	() => props.owyxSignedIn,
@@ -65,6 +97,27 @@ watch(
 		void refresh()
 	},
 )
+
+watch(username, (q) => {
+	if (searchDebounce) clearTimeout(searchDebounce)
+	const trimmed = q.trim()
+	if (trimmed.length < 2) {
+		searchHits.value = []
+		return
+	}
+	searchDebounce = setTimeout(async () => {
+		searchBusy.value = true
+		try {
+			searchHits.value = await searchOwyxUsers(trimmed)
+		} catch {
+			searchHits.value = []
+		} finally {
+			searchBusy.value = false
+		}
+	}, 280)
+})
+
+const isSearching = computed(() => search.value.trim().length > 0)
 
 const filtered = computed(() =>
 	friends.value.filter((f) =>
@@ -79,18 +132,22 @@ const incomingRequests = computed(() =>
 	friends.value.filter((f) => f.status === 'pending' && f.incoming),
 )
 
+const friendNickSet = computed(() => new Set(friends.value.map((f) => f.nickname.toLowerCase())))
+
 function showAddFriendModal() {
 	username.value = ''
+	searchHits.value = []
 	addFriendModal.value?.show()
 }
 
-async function addFriendFromModal() {
-	const nick = username.value.trim()
+async function addFriendFromModal(nickOverride?: string) {
+	const nick = (nickOverride ?? username.value).trim()
 	if (!nick) return
 	addFriendModal.value?.hide()
 	try {
 		await requestOwyxFriend(nick)
 		username.value = ''
+		searchHits.value = []
 		await refresh()
 	} catch (e) {
 		handleError(e)
@@ -126,11 +183,11 @@ const messages = defineMessages({
 	},
 	usernameDescription: {
 		id: 'friends.add-friend.username.description',
-		defaultMessage: 'Use the nickname from their owyx.site account.',
+		defaultMessage: 'Search by nickname or type it exactly (3–16 characters).',
 	},
 	usernamePlaceholder: {
 		id: 'friends.add-friend.username.placeholder',
-		defaultMessage: 'Enter Owyx nickname...',
+		defaultMessage: 'Search Owyx nickname…',
 	},
 	sendFriendRequest: {
 		id: 'friends.add-friend.submit',
@@ -146,10 +203,33 @@ const messages = defineMessages({
 	},
 	friends: { id: 'friends.heading', defaultMessage: 'Friends' },
 	pending: { id: 'friends.heading.pending', defaultMessage: 'Pending' },
-	offline: { id: 'friends.heading.offline', defaultMessage: 'Friends' },
+	sectionHeading: {
+		id: 'friends.section.heading',
+		defaultMessage: '{title} - {count}',
+	},
 	presenceSoon: {
 		id: 'friends.presence-coming-soon',
 		defaultMessage: 'Live presence (“what they’re playing”) is coming soon.',
+	},
+	offlineStatus: {
+		id: 'friends.status.offline',
+		defaultMessage: 'Offline',
+	},
+	alreadyFriends: {
+		id: 'friends.search.already',
+		defaultMessage: 'Already friends',
+	},
+	friendRequestSent: {
+		id: 'friends.friend.request-sent',
+		defaultMessage: 'Friend request sent',
+	},
+	removeFriend: {
+		id: 'friends.friend.remove-friend',
+		defaultMessage: 'Remove friend',
+	},
+	cancelRequest: {
+		id: 'friends.friend.cancel-request',
+		defaultMessage: 'Cancel request',
 	},
 	noFriendsMatch: {
 		id: 'friends.no-friends-match',
@@ -161,14 +241,28 @@ const messages = defineMessages({
 	},
 	addFriendsToShare: {
 		id: 'friends.add-friends-to-share',
-		defaultMessage: '<link>Add friends</link> by Owyx nickname.',
+		defaultMessage: '<link>Add friends</link> to see what they’re playing!',
 	},
+	friendRequestsHeader: {
+		id: 'friends.requests.header',
+		defaultMessage: 'Friend requests',
+	},
+	noPendingRequests: {
+		id: 'friends.requests.empty',
+		defaultMessage: 'No pending requests.',
+	},
+	sentARequest: {
+		id: 'friends.requests.sent-a-request',
+		defaultMessage: 'sent a request',
+	},
+	accept: { id: 'friends.requests.accept', defaultMessage: 'Accept' },
+	decline: { id: 'friends.requests.decline', defaultMessage: 'Decline' },
 })
 </script>
 
 <template>
-	<ModalWrapper ref="friendInvitesModal" header="Friend requests">
-		<p v-if="incomingRequests.length === 0">No pending requests.</p>
+	<ModalWrapper ref="friendInvitesModal" :header="formatMessage(messages.friendRequestsHeader)">
+		<p v-if="incomingRequests.length === 0">{{ formatMessage(messages.noPendingRequests) }}</p>
 		<div v-else class="flex flex-col gap-4 min-w-[28rem]">
 			<div v-for="friend in incomingRequests" :key="friend.id" class="flex gap-2 items-center">
 				<Avatar
@@ -179,17 +273,18 @@ const messages = defineMessages({
 				/>
 				<div class="flex-1 min-w-0">
 					<p class="m-0">
-						<span class="text-contrast font-medium">{{ friend.nickname }}</span> sent a request
+						<span class="text-contrast font-medium">{{ friend.nickname }}</span>
+						{{ ' ' }}{{ formatMessage(messages.sentARequest) }}
 					</p>
 				</div>
 				<div class="flex gap-2">
 					<Button type="colored" color="brand" @click="acceptIncoming(friend)">
 						<UserPlusIcon />
-						Accept
+						{{ formatMessage(messages.accept) }}
 					</Button>
 					<Button @click="removeFriend(friend)">
 						<XIcon />
-						Decline
+						{{ formatMessage(messages.decline) }}
 					</Button>
 				</div>
 			</div>
@@ -211,17 +306,37 @@ const messages = defineMessages({
 					type="text"
 					:placeholder="formatMessage(messages.usernamePlaceholder)"
 					wrapper-class="flex-1"
-					@keyup.enter="addFriendFromModal"
+					@keyup.enter="addFriendFromModal()"
 				/>
 				<Button
 					type="colored"
 					color="brand"
-					:disabled="username.length === 0"
-					@click="addFriendFromModal"
+					:disabled="username.trim().length < 3"
+					@click="addFriendFromModal()"
 				>
 					<SendIcon />
 					{{ formatMessage(messages.sendFriendRequest) }}
 				</Button>
+			</div>
+			<div v-if="searchHits.length > 0 || searchBusy" class="mt-3 flex flex-col gap-1">
+				<p v-if="searchBusy" class="m-0 text-xs text-secondary">…</p>
+				<button
+					v-for="hit in searchHits"
+					:key="hit.id"
+					type="button"
+					class="flex w-full cursor-pointer items-center gap-2 rounded-lg border-0 bg-transparent px-2 py-1.5 text-left hover:bg-button-bg"
+					:disabled="friendNickSet.has(hit.nickname.toLowerCase())"
+					@click="addFriendFromModal(hit.nickname)"
+				>
+					<Avatar :src="resolveOwyxAvatarUrl(hit.avatarUrl)" size="1.75rem" circle />
+					<span class="flex-1 truncate text-sm text-contrast">{{ hit.nickname }}</span>
+					<span
+						v-if="friendNickSet.has(hit.nickname.toLowerCase())"
+						class="text-xs text-secondary"
+						>{{ formatMessage(messages.alreadyFriends) }}</span
+					>
+					<UserPlusIcon v-else class="h-4 w-4 text-brand" />
+				</button>
 			</div>
 		</div>
 	</ModalWrapper>
@@ -252,7 +367,7 @@ const messages = defineMessages({
 			{{ formatMessage(messages.friends) }}
 		</h3>
 		<IconButton
-			v-if="incomingRequests.length > 0"
+			v-if="incomingRequests.length > 0 || friends.length > 0"
 			v-tooltip="formatMessage(messages.viewFriendRequests, { count: incomingRequests.length })"
 			type="quiet"
 			:label="formatMessage(messages.viewFriendRequests, { count: incomingRequests.length })"
@@ -260,59 +375,156 @@ const messages = defineMessages({
 			@click="friendInvitesModal?.show()"
 		>
 			<span
+				v-if="incomingRequests.length > 0"
 				class="absolute -top-0.5 -right-0.5 bg-brand text-inverted rounded-full size-4 text-[10px] flex items-center justify-center pointer-events-none"
 			>
 				{{ incomingRequests.length }}
 			</span>
 			<MailIcon />
 		</IconButton>
+		<IconButton
+			v-if="friends.length === 0"
+			v-tooltip="formatMessage(messages.addFriend)"
+			type="quiet"
+			:label="formatMessage(messages.addFriend)"
+			@click="showAddFriendModal"
+		>
+			<UserPlusIcon />
+		</IconButton>
 	</div>
 
-	<div v-if="owyxSignedIn && !loading" class="friends-list">
-		<p class="m-0 mb-3 text-xs text-secondary">{{ formatMessage(messages.presenceSoon) }}</p>
+	<div v-if="owyxSignedIn && !loading" class="friends-list flex flex-col gap-2">
 		<template v-if="friends.length > 0">
 			<p v-if="filtered.length === 0" class="m-0 text-sm text-secondary">
 				{{ formatMessage(messages.noFriendsMatch, { query: search }) }}
 			</p>
 			<template v-else>
-				<div v-if="accepted.length > 0" class="mb-3">
-					<h4 class="m-0 mb-2 text-xs font-semibold uppercase tracking-wide text-secondary">
-						{{ formatMessage(messages.offline) }} ({{ accepted.length }})
-					</h4>
-					<div
-						v-for="friend in accepted"
-						:key="friend.id"
-						class="flex items-center gap-2 py-1.5"
-					>
-						<Avatar :src="resolveOwyxAvatarUrl(friend.avatarUrl)" size="1.75rem" circle />
-						<span class="flex-1 truncate text-sm text-primary">{{ friend.nickname }}</span>
-						<Button class="!px-2 !py-1" @click="removeFriend(friend)">
-							<XIcon class="h-3.5 w-3.5" />
-						</Button>
-					</div>
-				</div>
-				<div v-if="pendingOutgoing.length > 0">
-					<h4 class="m-0 mb-2 text-xs font-semibold uppercase tracking-wide text-secondary">
-						{{ formatMessage(messages.pending) }} ({{ pendingOutgoing.length }})
-					</h4>
-					<div
-						v-for="friend in pendingOutgoing"
-						:key="friend.id"
-						class="flex items-center gap-2 py-1.5"
-					>
-						<Avatar :src="resolveOwyxAvatarUrl(friend.avatarUrl)" size="1.75rem" circle />
-						<span class="flex-1 truncate text-sm text-secondary">{{ friend.nickname }}</span>
-						<Button class="!px-2 !py-1" @click="removeFriend(friend)">
-							<XIcon class="h-3.5 w-3.5" />
-						</Button>
-					</div>
-				</div>
+				<Accordion
+					v-if="accepted.length > 0"
+					:open-by-default="true"
+					:force-open="isSearching"
+					:button-class="
+						'flex w-full items-center bg-transparent border-0 p-0' +
+						(isSearching
+							? ''
+							: ' cursor-pointer hover:brightness-[--hover-brightness] active:scale-[0.98] transition-all')
+					"
+				>
+					<template #title>
+						<h3 class="text-base text-primary font-medium m-0">
+							{{
+								formatMessage(messages.sectionHeading, {
+									title: formatMessage(messages.friends),
+									count: accepted.length,
+								})
+							}}
+						</h3>
+					</template>
+					<template #default>
+						<div class="pt-3 flex flex-col gap-1">
+							<div
+								v-for="friend in accepted"
+								:key="friend.id"
+								class="group grid items-center grid-cols-[1fr_auto] gap-2 hover:bg-button-bg transition-colors rounded-full mr-1 select-none"
+							>
+								<div class="grid min-w-0 grid-cols-[auto_1fr] items-center gap-2">
+									<Avatar
+										:src="resolveOwyxAvatarUrl(friend.avatarUrl)"
+										size="2rem"
+										circle
+										class="grayscale opacity-80"
+									/>
+									<div class="flex min-w-0 flex-col">
+										<span class="truncate text-sm text-primary m-0">{{ friend.nickname }}</span>
+										<span class="m-0 text-xs text-secondary">{{
+											formatMessage(messages.offlineStatus)
+										}}</span>
+									</div>
+								</div>
+								<TeleportOverflowMenu
+									type="quiet"
+									label="More options"
+									class="opacity-0 group-hover:opacity-100 transition-opacity"
+									:options="[
+										{
+											id: 'remove-friend',
+											label: formatMessage(messages.removeFriend),
+											action: () => removeFriend(friend),
+											tone: 'red',
+										},
+									]"
+								>
+									<MoreVerticalIcon />
+									<template #remove-friend>
+										<TrashIcon />
+										{{ formatMessage(messages.removeFriend) }}
+									</template>
+								</TeleportOverflowMenu>
+							</div>
+						</div>
+					</template>
+				</Accordion>
+
+				<Accordion
+					v-if="pendingOutgoing.length > 0"
+					:open-by-default="true"
+					:force-open="isSearching"
+					:button-class="
+						'flex w-full items-center bg-transparent border-0 p-0' +
+						(isSearching
+							? ''
+							: ' cursor-pointer hover:brightness-[--hover-brightness] active:scale-[0.98] transition-all')
+					"
+				>
+					<template #title>
+						<h3 class="text-base text-primary font-medium m-0">
+							{{
+								formatMessage(messages.sectionHeading, {
+									title: formatMessage(messages.pending),
+									count: pendingOutgoing.length,
+								})
+							}}
+						</h3>
+					</template>
+					<template #default>
+						<div class="pt-3 flex flex-col gap-1">
+							<div
+								v-for="friend in pendingOutgoing"
+								:key="friend.id"
+								class="group grid items-center grid-cols-[1fr_auto] gap-2 hover:bg-button-bg transition-colors rounded-full mr-1 select-none"
+							>
+								<div class="grid min-w-0 grid-cols-[auto_1fr] items-center gap-2">
+									<Avatar :src="resolveOwyxAvatarUrl(friend.avatarUrl)" size="2rem" circle />
+									<div class="flex min-w-0 flex-col">
+										<span class="truncate text-sm text-contrast m-0">{{ friend.nickname }}</span>
+										<span class="m-0 text-xs text-secondary">{{
+											formatMessage(messages.friendRequestSent)
+										}}</span>
+									</div>
+								</div>
+								<IconButton
+									v-tooltip="formatMessage(messages.cancelRequest)"
+									type="quiet"
+									:label="formatMessage(messages.cancelRequest)"
+									@click="removeFriend(friend)"
+								>
+									<XIcon />
+								</IconButton>
+							</div>
+						</div>
+					</template>
+				</Accordion>
 			</template>
+			<p class="m-0 mt-2 text-xs text-secondary">{{ formatMessage(messages.presenceSoon) }}</p>
 		</template>
 		<div v-else class="text-secondary text-sm">
+			<p class="m-0 mb-2 text-xs">{{ formatMessage(messages.presenceSoon) }}</p>
 			<IntlFormatted :message-id="messages.addFriendsToShare">
 				<template #link="{ children }">
-					<button class="text-link cursor-pointer bg-transparent border-none p-0" @click="showAddFriendModal">
+					<button
+						class="text-link cursor-pointer bg-transparent border-none p-0"
+						@click="showAddFriendModal"
+					>
 						<component :is="() => children" />
 					</button>
 				</template>

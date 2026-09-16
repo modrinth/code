@@ -164,7 +164,7 @@ const messages = defineMessages({
 	},
 	reviewedFiles: {
 		id: 'unknown-file-warning-modal.reviewed-files',
-		defaultMessage: "Files that aren't published to Modrinth aren't reviewed.",
+		defaultMessage: "Files that aren't published to Owyx aren't reviewed.",
 	},
 	unrecognizedFiles: {
 		id: 'unknown-file-warning-modal.unrecognized-files',

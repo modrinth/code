@@ -148,7 +148,7 @@ const messages = defineMessages({
 	},
 	officialAccount: {
 		id: 'profile.official-account',
-		defaultMessage: 'Official Modrinth account',
+		defaultMessage: 'Official Owyx account',
 	},
 	profileJoinedLabel: {
 		id: 'profile.label.joined',

@@ -234,7 +234,7 @@ export const commonMessages = defineMessages({
 	},
 	openInModrinthButton: {
 		id: 'button.open-in-modrinth',
-		defaultMessage: 'Open in Modrinth',
+		defaultMessage: 'Open in browser',
 	},
 	orLabel: {
 		id: 'label.or',

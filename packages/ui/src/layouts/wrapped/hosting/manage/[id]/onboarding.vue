@@ -103,7 +103,7 @@ const { canSetup, permissionDeniedMessage } = useServerPermissions()
 const messages = defineMessages({
 	welcomeTitle: {
 		id: 'servers.setup.onboarding.welcome.title',
-		defaultMessage: 'Welcome to Modrinth Hosting',
+		defaultMessage: 'Welcome to Owyx Hosting',
 	},
 	welcomeDescription: {
 		id: 'servers.setup.onboarding.welcome.description',

@@ -305,10 +305,10 @@ const messages = defineMessages({
 	errorDetails: { id: 'servers.manage.error.details', defaultMessage: 'Error details:' },
 	contactSupportButton: {
 		id: 'servers.manage.contact-support-button',
-		defaultMessage: 'Contact Modrinth Support',
+		defaultMessage: 'Contact Owyx Support',
 	},
 	reloadButton: { id: 'servers.manage.reload-button', defaultMessage: 'Reload' },
-	serversTitle: { id: 'servers.manage.servers-title', defaultMessage: 'Modrinth Hosting' },
+	serversTitle: { id: 'servers.manage.servers-title', defaultMessage: 'Owyx Hosting' },
 	searchPlaceholder: {
 		id: 'servers.manage.search-placeholder',
 		defaultMessage: 'Search {count} {count, plural, one {server} other {servers}}...',
@@ -375,7 +375,7 @@ const messages = defineMessages({
 	},
 	resubscribeErrorText: {
 		id: 'servers.manage.resubscribe-error.text',
-		defaultMessage: 'An error occurred while resubscribing to your Modrinth server.',
+		defaultMessage: 'An error occurred while resubscribing to your Owyx server.',
 	},
 })
 

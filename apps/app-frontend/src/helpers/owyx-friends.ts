@@ -141,6 +141,12 @@ export async function publishLibraryPackToCatalog(opts: {
 		throw new Error(createData.error || `Create pack failed (${createRes.status})`)
 	}
 	const packId = createData.pack.id
+	const sizeMb = opts.file.size / (1024 * 1024)
+	if (sizeMb > 2048) {
+		throw new Error(
+			`pack is ${sizeMb.toFixed(0)} MB — max upload is 2 GB. Host a larger archive via HTTP URL instead.`,
+		)
+	}
 	const fd = new FormData()
 	fd.append('archive', opts.file, opts.fileName)
 	const ingestHeaders: Record<string, string> = { Accept: 'application/json' }
@@ -152,10 +158,16 @@ export async function publishLibraryPackToCatalog(opts: {
 		method: 'POST',
 		headers: ingestHeaders,
 		body: fd,
-		signal: AbortSignal.timeout(120000),
+		signal: AbortSignal.timeout(Math.max(180000, Math.ceil(sizeMb) * 4000)),
 	})
 	if (!ingestRes.ok) {
 		const data = (await ingestRes.json().catch(() => ({}))) as { error?: string }
+		if (ingestRes.status === 413) {
+			throw new Error(
+				data.error ||
+					`ingest failed (413): archive too large for the API (max 2 GB, yours ~${sizeMb.toFixed(0)} MB)`,
+			)
+		}
 		throw new Error(data.error || `Ingest failed (${ingestRes.status})`)
 	}
 	if (opts.serverId) {

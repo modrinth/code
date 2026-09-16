@@ -420,7 +420,7 @@ const messages = defineMessages({
 	},
 	reviewedFiles: {
 		id: 'content.diff-modal.reviewed-files',
-		defaultMessage: "Files that aren't published to Modrinth aren't reviewed.",
+		defaultMessage: "Files that aren't published to Owyx aren't reviewed.",
 	},
 	installAnyway: {
 		id: 'content.diff-modal.install-anyway',

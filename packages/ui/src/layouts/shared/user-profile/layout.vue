@@ -546,7 +546,7 @@ const messages = defineMessages({
 	},
 	githubPopupBlockedMessage: {
 		id: 'profile.details.error.github-popup-blocked',
-		defaultMessage: 'Allow pop-ups for Modrinth, then try again.',
+		defaultMessage: 'Allow pop-ups for Owyx, then try again.',
 	},
 	paymentMethodsLabel: {
 		id: 'profile.details.label.payment-methods',
@@ -562,11 +562,11 @@ const messages = defineMessages({
 	},
 	bioFallbackUser: {
 		id: 'profile.bio.fallback.user',
-		defaultMessage: 'A Modrinth user.',
+		defaultMessage: 'A Owyx user.',
 	},
 	bioFallbackCreator: {
 		id: 'profile.bio.fallback.creator',
-		defaultMessage: 'A Modrinth creator.',
+		defaultMessage: 'A Owyx creator.',
 	},
 	collectionLabel: {
 		id: 'profile.label.collection',

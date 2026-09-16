@@ -78,7 +78,7 @@
 		"message": "Minecraft setup failed"
 	},
 	"app.action-bar.install.summary.modrinth-unreachable": {
-		"message": "Couldn't reach Modrinth"
+		"message": "Couldn't reach Owyx"
 	},
 	"app.action-bar.install.summary.no-write-permission": {
 		"message": "No permission to write"
@@ -135,7 +135,7 @@
 		"message": "Accept all"
 	},
 	"app.ads-consent.body": {
-		"message": "Ads were part of upstream Modrinth; Owyx does not rely on them and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance."
+		"message": "Ads were part of upstream Owyx; Owyx does not rely on them and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance."
 	},
 	"app.ads-consent.manage": {
 		"message": "Manage preferences"
@@ -189,7 +189,7 @@
 		"message": "Hide right sidebar"
 	},
 	"app.appearance-settings.unknown-pack-warning.description": {
-		"message": "Show a safety warning before installing a Modrinth Pack (.mrpack) that isn't hosted on Modrinth."
+		"message": "Show a safety warning before installing a Owyx Pack (.mrpack) that isn't hosted on Owyx."
 	},
 	"app.appearance-settings.unknown-pack-warning.title": {
 		"message": "Warn me before installing unknown modpacks"
@@ -1263,10 +1263,10 @@
 		"message": "Install"
 	},
 	"app.modal.install-to-play.invite-warning": {
-		"message": "This invite was created by another Modrinth user, not Modrinth. Only accept invites from people you trust."
+		"message": "This invite was created by another Owyx user, not Owyx. Only accept invites from people you trust."
 	},
 	"app.modal.install-to-play.invite-warning-with-creator": {
-		"message": "This invite was created by <creator>{username}</creator>, not Modrinth. Only accept invites from people you trust."
+		"message": "This invite was created by <creator>{username}</creator>, not Owyx. Only accept invites from people you trust."
 	},
 	"app.modal.install-to-play.managed-content.modpack-header": {
 		"message": "Modpack content"
@@ -1299,7 +1299,7 @@
 		"message": "For support requests, contact our <support-link>support team</support-link>. For bug reports, open a <github-link>GitHub issue</github-link>."
 	},
 	"app.modal.install-to-play.reviewed-files": {
-		"message": "Files that aren't published to Modrinth aren't reviewed."
+		"message": "Files that aren't published to Owyx aren't reviewed."
 	},
 	"app.modal.install-to-play.shared-instance": {
 		"message": "Shared instance"
@@ -1308,10 +1308,10 @@
 		"message": "Shared instance content"
 	},
 	"app.modal.install-to-play.shared-instance-unknown-files-description": {
-		"message": "This shared instance contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust."
+		"message": "This shared instance contains files that aren’t published on Owyx. We strongly recommend only installing files from sources you trust."
 	},
 	"app.modal.install-to-play.unknown-files-description": {
-		"message": "This server modpack contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust."
+		"message": "This server modpack contains files that aren’t published on Owyx. We strongly recommend only installing files from sources you trust."
 	},
 	"app.modal.install-to-play.unknown-files-warning": {
 		"message": "Unknown files warning"
@@ -1332,7 +1332,7 @@
 		"message": "Removed"
 	},
 	"app.modal.update-to-play.server-modpack-unknown-files-description": {
-		"message": "This server modpack update contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust."
+		"message": "This server modpack update contains files that aren’t published on Owyx. We strongly recommend only installing files from sources you trust."
 	},
 	"app.modal.update-to-play.shared-instance-added-label": {
 		"message": "Added"
@@ -1341,7 +1341,7 @@
 		"message": "Removed"
 	},
 	"app.modal.update-to-play.shared-instance-unknown-files-description": {
-		"message": "This shared instance update contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust."
+		"message": "This shared instance update contains files that aren’t published on Owyx. We strongly recommend only installing files from sources you trust."
 	},
 	"app.modal.update-to-play.update-required": {
 		"message": "Update required"
@@ -1596,7 +1596,7 @@
 		"message": "Export ZIP"
 	},
 	"app.screenshots.selection.global-export-filename": {
-		"message": "Modrinth screenshots.zip"
+		"message": "Owyx screenshots.zip"
 	},
 	"app.screenshots.selection.instance-export-filename": {
 		"message": "{instance} screenshots.zip"
@@ -2736,7 +2736,7 @@
 		"message": "macOS"
 	},
 	"app.settings.privacy.ads-consent.intro": {
-		"message": "Ads were part of upstream Modrinth; Owyx does not rely on them and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance. You can opt out or manage your preferences below."
+		"message": "Ads were part of upstream Owyx; Owyx does not rely on them and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance. You can opt out or manage your preferences below."
 	},
 	"app.settings.privacy.discord-rich-presence.description": {
 		"message": "Show Owyx as your current activity on Discord. This does not affect Rich Presence added to instances by mods. Requires an app restart."
@@ -2745,7 +2745,7 @@
 		"message": "Discord Rich Presence"
 	},
 	"app.settings.privacy.telemetry.description": {
-		"message": "Modrinth collects anonymized analytics and usage data to improve our user experience and customize your experience. By disabling this option, you opt out and your data will no longer be collected."
+		"message": "Owyx collects anonymized analytics and usage data to improve our user experience and customize your experience. By disabling this option, you opt out and your data will no longer be collected."
 	},
 	"app.settings.privacy.telemetry.title": {
 		"message": "Telemetry"
@@ -3255,10 +3255,10 @@
 		"message": "Owyx"
 	},
 	"app.skins.section.modrinth-pride": {
-		"message": "Modrinth Pride"
+		"message": "Owyx Pride"
 	},
 	"app.skins.section.modrinth-pride.tooltip": {
-		"message": "You received these skins for donating to a Modrinth Pride fundraiser during Pride Month."
+		"message": "You received these skins for donating to a Owyx Pride fundraiser during Pride Month."
 	},
 	"app.skins.section.mounts-of-mayhem": {
 		"message": "Mounts of Mayhem"
@@ -3489,7 +3489,7 @@
 		"message": "Welcome to Owyx"
 	},
 	"app.world.server-modal.placeholder-address": {
-		"message": "example.modrinth.gg"
+		"message": "play.example.com"
 	},
 	"app.world.server-modal.select-an-option": {
 		"message": "Select an option"
@@ -3624,7 +3624,7 @@
 		"message": "Unpublish shared instance"
 	},
 	"installation-settings.shared-instance.unpublish-description": {
-		"message": "Remove this shared instance from Modrinth and stop sending updates to anyone using it. Your local instance will not be affected."
+		"message": "Remove this shared instance from Owyx and stop sending updates to anyone using it. Your local instance will not be affected."
 	},
 	"installation-settings.shared-instance.unpublishing-button": {
 		"message": "Unpublishing..."
@@ -3639,7 +3639,7 @@
 		"message": "Unlink shared instance"
 	},
 	"installation-settings.unpublish-shared-instance.modal.admonition-body": {
-		"message": "This deletes the shared instance from Modrinth's servers. People using it in the Owyx will stop receiving updates, but your local instance and its content will stay on this device."
+		"message": "This deletes the shared instance from Owyx's servers. People using it in the Owyx will stop receiving updates, but your local instance and its content will stay on this device."
 	},
 	"installation-settings.unpublish-shared-instance.modal.admonition-header": {
 		"message": "Unpublishing shared instance"
@@ -4619,7 +4619,7 @@
 	"owyx.servers.demo-badge": {
 		"message": "demo"
 	},
-  "app.nav.admin-panel": {
-    "message": "Admin panel"
-  }
+	"app.nav.admin-panel": {
+		"message": "Admin panel"
+	}
 }

@@ -451,7 +451,7 @@ const messages = defineMessages({
 	},
 	friendRequestsDescription: {
 		id: 'settings.social.friend-requests.description',
-		defaultMessage: 'Control who can send you friend requests on Modrinth.',
+		defaultMessage: 'Control who can send you friend requests on Owyx.',
 	},
 	sharedInstanceInvitesTitle: {
 		id: 'settings.social.shared-instance-invites.title',
@@ -467,7 +467,7 @@ const messages = defineMessages({
 	},
 	hostingAccessDescription: {
 		id: 'settings.social.hosting-access.description',
-		defaultMessage: 'Control who can invite you to manage a Modrinth Hosting server.',
+		defaultMessage: 'Control who can invite you to manage a Owyx Hosting server.',
 	},
 	everyone: {
 		id: 'settings.social.interaction-source.everyone',
@@ -503,7 +503,7 @@ const messages = defineMessages({
 	},
 	blockedUsersDescription: {
 		id: 'settings.social.blocked-users.description',
-		defaultMessage: 'These are the users you have blocked on Modrinth. They cannot:',
+		defaultMessage: 'These are the users you have blocked on Owyx. They cannot:',
 	},
 	friendRequestsRestriction: {
 		id: 'settings.social.blocked-users.restriction.friend-requests',
@@ -515,7 +515,7 @@ const messages = defineMessages({
 	},
 	hostingRestriction: {
 		id: 'settings.social.blocked-users.restriction.hosting',
-		defaultMessage: 'Invite you to manage a Modrinth Hosting server.',
+		defaultMessage: 'Invite you to manage a Owyx Hosting server.',
 	},
 	userColumn: {
 		id: 'settings.social.blocked-users.column.user',
