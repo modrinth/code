@@ -41,21 +41,18 @@
 					<DownloadIcon v-else aria-hidden="true" />
 					{{ formatMessage(messages.downloadModpackButton) }}
 				</Button>
-				<div
-					class="flex h-10 min-w-0 items-center justify-between gap-3 rounded-xl bg-surface-2 px-4 sm:w-[313px]"
+				<Button
+					v-tooltip="formatMessage(copied ? messages.copiedAddress : messages.copyAddress)"
+					native-type="button"
+					size="lg"
+					class="w-full !justify-between text-left sm:w-[313px]"
+					:aria-label="formatMessage(copied ? messages.copiedAddress : messages.copyAddress)"
+					@click="copyAddress"
 				>
-					<span class="min-w-0 truncate font-semibold text-primary">{{ address }}</span>
-					<button
-						v-tooltip="formatMessage(copied ? messages.copiedAddress : messages.copyAddress)"
-						type="button"
-						class="flex shrink-0 cursor-pointer items-center border-0 bg-transparent p-0 text-primary"
-						:aria-label="formatMessage(copied ? messages.copiedAddress : messages.copyAddress)"
-						@click="copyAddress"
-					>
-						<CheckIcon v-if="copied" class="size-5 text-brand" aria-hidden="true" />
-						<CopyIcon v-else class="size-5" aria-hidden="true" />
-					</button>
-				</div>
+					<span class="min-w-0 truncate text-base font-semibold text-primary">{{ address }}</span>
+					<CheckIcon v-if="copied" class="size-5 shrink-0 text-brand" aria-hidden="true" />
+					<ClipboardCopyIcon v-else class="size-5 shrink-0 text-secondary" aria-hidden="true" />
+				</Button>
 			</div>
 		</div>
 	</section>
@@ -64,7 +61,7 @@
 <script setup lang="ts">
 import {
 	CheckIcon,
-	CopyIcon,
+	ClipboardCopyIcon,
 	DownloadIcon,
 	PlayIcon,
 	SpinnerIcon,

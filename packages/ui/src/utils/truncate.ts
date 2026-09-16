@@ -24,7 +24,9 @@ export function truncatedTooltip(
 	if (!el) return undefined
 	if (!tooltipText) return undefined
 
-	return el.scrollWidth > el.clientWidth || el.scrollHeight > el.clientHeight
-		? tooltipText
-		: undefined
+	if (el.scrollWidth > el.clientWidth) return tooltipText
+
+	// Single-line labels can overflow vertically because of font metrics without being truncated.
+	const wraps = getComputedStyle(el).whiteSpace !== 'nowrap'
+	return wraps && el.scrollHeight > el.clientHeight ? tooltipText : undefined
 }
