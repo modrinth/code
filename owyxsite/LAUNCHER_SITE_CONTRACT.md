@@ -85,11 +85,14 @@ Offline profiles never call the API; a nick is enough to Play.
 (`/profile`), not yet mirrored as launcher settings APIs. Launcher signs in and
 reads `/me` + catalog.
 
-**Friends / Social** in the desktop UI still use the upstream Modrinth friends
-plugin (`plugin:friends`) and Labrinth identity — there is **no** Owyx-site friends
-API yet. Signing into an Owyx account does not currently enable friend lists or
-shared-instance invites until that control-plane exists. Catalog seed names like
-`owyx-friends` are unrelated demo servers.
+**Friends / Social** in the desktop UI use the **Owyx control-plane** friends API
+(`GET/POST /api/friends…` on `api.owyx.site`), not the upstream Modrinth
+`plugin:friends` / Labrinth identity. The launcher helpers are
+`apps/app-frontend/src/helpers/owyx-friends.ts` and `owyx-presence.ts`; the
+sidebar UI is `FriendsList.vue`. Auth is Bearer JWT (site session) plus
+`X-Owyx-Client-Key` on the API host. Presence heartbeats (`POST /api/friends/presence`)
+use a server-side TTL of about **90 seconds** — after that the friend shows offline.
+Catalog seed names like `owyx-friends` are unrelated demo servers.
 
 ---
 
@@ -145,11 +148,11 @@ Also available as `GET /api/launcher/v1/me`.
 
 ### Friends (`/api/friends`, auth: Bearer + client key on api host)
 
-- `GET /api/friends` → `{ friends: [{ id, userId, nickname, avatarUrl, status, incoming, ... }] }`
+- `GET /api/friends` → `{ friends: [{ id, userId, nickname, avatarUrl, status, incoming, presence, instanceName, presenceUpdatedAt, ... }], incomingCount }`
 - `GET /api/friends/search?q=` → `{ users: [...] }`
 - `POST /api/friends/request` `{ nickname }` → create pending (or auto-accept reciprocal)
 - `POST /api/friends/:id/accept` · `POST /api/friends/:id/decline` · `DELETE /api/friends/:id`
-- Presence / “what they’re playing” is **out of scope** for this release.
+- `POST /api/friends/presence` `{ status: "online"|"playing"|"offline", instanceName? }` — launcher heartbeat; presence rows older than ~90s are treated as offline.
 
 ### Catalog ACL
 

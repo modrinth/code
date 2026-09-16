@@ -65,10 +65,19 @@ jobs:
         shell: bash
         run: cp packages/app-lib/.env.prod packages/app-lib/.env
 
+      - name: Build app frontend (release)
+        shell: bash
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+          VITE_OWYX_CLIENT_KEY: ${{ secrets.OWYX_CLIENT_KEY }}
+          VITE_OWYX_API_BASE_URL: https://api.owyx.site
+        run: pnpm turbo run build --filter=@modrinth/app-frontend
+
       - name: Build NSIS installer + updater
         shell: bash
         working-directory: apps/app
         env:
+          NODE_OPTIONS: --max-old-space-size=8192
           VITE_OWYX_CLIENT_KEY: ${{ secrets.OWYX_CLIENT_KEY }}
           VITE_OWYX_API_BASE_URL: https://api.owyx.site
           OWYX_DISCORD_APP_ID: ${{ secrets.OWYX_DISCORD_APP_ID }}
@@ -130,9 +139,17 @@ jobs:
       - name: Prepare app-lib compile-time env (prod API hosts)
         run: cp packages/app-lib/.env.prod packages/app-lib/.env
 
+      - name: Build app frontend (release)
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+          VITE_OWYX_CLIENT_KEY: ${{ secrets.OWYX_CLIENT_KEY }}
+          VITE_OWYX_API_BASE_URL: https://api.owyx.site
+        run: pnpm turbo run build --filter=@modrinth/app-frontend
+
       - name: Build AppImage + updater
         working-directory: apps/app
         env:
+          NODE_OPTIONS: --max-old-space-size=8192
           VITE_OWYX_CLIENT_KEY: ${{ secrets.OWYX_CLIENT_KEY }}
           VITE_OWYX_API_BASE_URL: https://api.owyx.site
           OWYX_DISCORD_APP_ID: ${{ secrets.OWYX_DISCORD_APP_ID }}

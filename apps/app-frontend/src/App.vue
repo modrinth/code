@@ -1468,7 +1468,8 @@ async function refreshOwyxSiteSession() {
 							(a?.access_token === '' || a?.access_token === '0')),
 				)
 				if (!hasOwyxNick) {
-					await login_offline(nick)
+					// Passive sync: create nick profile without stealing active Microsoft selection
+					await login_offline(nick, false)
 				}
 			} catch (e) {
 				console.warn('Could not sync Owyx nickname to play profile', e)

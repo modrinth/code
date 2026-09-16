@@ -4,7 +4,8 @@
 		"createUpdaterArtifacts": true
 	},
 	"build": {
-		"features": ["updater"]
+		"features": ["updater"],
+		"beforeBuildCommand": ""
 	},
 	"app": {
 		"security": {

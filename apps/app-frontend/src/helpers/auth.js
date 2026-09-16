@@ -32,9 +32,13 @@ export async function login() {
 /**
  * Create a local offline nickname account (offline-mode servers only).
  * @param {string} username
+ * @param {boolean} [makeActive=true] When false, do not steal an existing active Microsoft account.
  */
-export async function login_offline(username) {
-	return await invoke('plugin:auth|login_offline', { username })
+export async function login_offline(username, makeActive = true) {
+	return await invoke('plugin:auth|login_offline', {
+		username,
+		makeActive,
+	})
 }
 
 /**

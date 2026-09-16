@@ -87,9 +87,19 @@ pub async fn login<R: Runtime>(
 }
 
 /// Create a local offline nickname account (for offline-mode servers).
+///
+/// When `make_active` is omitted or true, the nick becomes the active play account.
+/// Pass `false` for background site→nick sync so an existing Microsoft account stays active.
 #[tauri::command]
-pub async fn login_offline(username: String) -> Result<Credentials> {
-    Ok(minecraft_auth::login_offline(&username).await?)
+pub async fn login_offline(
+    username: String,
+    make_active: Option<bool>,
+) -> Result<Credentials> {
+    Ok(minecraft_auth::login_offline(
+        &username,
+        make_active.unwrap_or(true),
+    )
+    .await?)
 }
 
 #[tauri::command]

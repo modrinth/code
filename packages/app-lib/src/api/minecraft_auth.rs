@@ -48,9 +48,17 @@ pub async fn finish_login(
 }
 
 #[tracing::instrument]
-pub async fn login_offline(username: &str) -> crate::Result<Credentials> {
+pub async fn login_offline(
+    username: &str,
+    make_active: bool,
+) -> crate::Result<Credentials> {
     let state = State::get().await?;
-    crate::state::Credentials::create_offline(username, &state.pool).await
+    crate::state::Credentials::create_offline(
+        username,
+        &state.pool,
+        make_active,
+    )
+    .await
 }
 
 #[tracing::instrument]

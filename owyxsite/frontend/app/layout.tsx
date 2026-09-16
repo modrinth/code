@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans, Geist_Mono, Outfit, Sora } from "next/font/google";
 import { AuthProvider } from "@/hooks/useAuth";
+import { LocaleProvider } from "@/hooks/useLocale";
 import "./globals.css";
 
 /* Display/brand = Sora (DESIGN.md). Body = DM Sans. Outfit kept as secondary. */
@@ -61,7 +62,9 @@ export default function RootLayout({
           К содержимому
         </a>
         <div className="owyx-space" aria-hidden="true" />
-        <AuthProvider>{children}</AuthProvider>
+        <LocaleProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

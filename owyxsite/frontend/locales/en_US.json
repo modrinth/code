@@ -1,0 +1,394 @@
+{
+  "meta": {
+    "locale": "en_US",
+    "languageName": "English"
+  },
+  "header": {
+    "home": "Home",
+    "download": "Download",
+    "login": "Sign in",
+    "register": "Register",
+    "cabinet": "Account",
+    "admin": "Admin",
+    "logout": "Sign out",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "languageAria": "Switch language",
+    "languageTitle": "Language (EN / RU)",
+    "logoHome": "Owyx — home"
+  },
+  "footer": {
+    "madeBy": "made by ebluffy",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "eula": "EULA",
+    "discord": "Discord",
+    "attribution": "The launcher uses open-source code from the Modrinth (Theseus) client — a fork under our own brand, not affiliated with Modrinth."
+  },
+  "legal": {
+    "breadcrumbHome": "Home",
+    "breadcrumbDocs": "Legal",
+    "draftBadge": "",
+    "notLegalAdvice": "This page is provided for transparency and is not legal advice.",
+    "terms": {
+      "title": "Terms of Use",
+      "lastModified": "September 16, 2026",
+      "intro": "These Terms of Use are entered into by and between You and Owyx Team (\"Owyx\", \"we\", \"us\", or \"our\"). Owyx Team is an independent individual maintainer / project team (not a registered company unless later stated on this site). These Terms, together with our Privacy Policy and Launcher EULA (collectively, the \"Agreements\"), govern your access to and use of owyx.site, www.owyx.site, api.owyx.site, related subdomains, and the Owyx desktop launcher and related client software (collectively, the \"Service\"), whether as a guest or a registered user.",
+      "sections": [
+        {
+          "id": "acceptance",
+          "title": "Acceptance of the Terms of Use",
+          "paragraphs": [
+            "Please read these Terms carefully before you start to use the Service. By accessing or using the Service, creating an account, downloading the launcher, or otherwise interacting with Owyx domains or clients, you accept and agree to be bound by these Terms and the Privacy Policy and Launcher EULA. If you do not want to agree, you must not access or use the Service.",
+            "The Service is offered and available to users who are 13 years of age or older. By using the Service, you represent that you meet this requirement and have legal capacity to form a binding agreement. If you do not meet these requirements, you must not use the Service.",
+            "If you use the Service on behalf of an organization, you represent that you have authority to bind that organization to these Terms."
+          ]
+        },
+        {
+          "id": "parties",
+          "title": "Parties and nature of Owyx Team",
+          "paragraphs": [
+            "The contracting party providing access to the Service is Owyx Team (the sole maintainer / operator of the Owyx project as presented on owyx.site). References to \"Company\" in similar industry terms of use should be read as Owyx Team for this Service.",
+            "Owyx Team is not affiliated with, endorsed by, or sponsored by Mojang Studios, Microsoft Corporation, Rinth, Inc., or Modrinth. Minecraft® is a trademark of Mojang Synergies AB / Microsoft.",
+            "We may provide contact channels (for example Discord or an email address published on the site). We do not publish personal passport, tax, or bank requisites on these pages."
+          ]
+        },
+        {
+          "id": "changes",
+          "title": "Changes to the Terms of Use",
+          "paragraphs": [
+            "We may revise and update these Terms from time to time in our sole discretion. Changes are effective when posted on this page and apply to all subsequent access and use of the Service.",
+            "Your continued use of the Service after revised Terms are posted means you accept the changes. You are expected to check this page periodically."
+          ]
+        },
+        {
+          "id": "service",
+          "title": "About the Service",
+          "paragraphs": [
+            "The Service includes: (a) the website and account system on Owyx domains; (b) APIs on api.owyx.site; (c) the Owyx launcher and related desktop client features; (d) optional cosmetics, friends, catalog, news, and community features we enable from time to time.",
+            "Depending on configuration, you may be able to play using an Owyx site nickname (offline-mode style profile) and/or a Microsoft-linked Minecraft account. Availability of features may change without notice.",
+            "Owyx does not sell you a license to Minecraft itself. Any play that requires a valid Minecraft / Microsoft license remains your responsibility under Mojang/Microsoft terms. Offline-mode or nickname play does not replace, waive, or grant rights under the Minecraft EULA or Microsoft services agreements.",
+            "We reserve the right to withdraw, restrict, or amend any part of the Service without notice. We are not liable if the Service is unavailable for any period."
+          ]
+        },
+        {
+          "id": "accounts",
+          "title": "Accessing the Service and account security",
+          "paragraphs": [
+            "You are responsible for arranging your own access to the Service and for ensuring that anyone who accesses the Service through your connection complies with these Terms.",
+            "Registration information you provide must be correct, current, and complete. Account information is governed by our Privacy Policy.",
+            "You must treat email, password, session tokens, and API client keys as confidential. Your account is personal to you. You must not share credentials. You agree to notify us promptly of any unauthorized access.",
+            "We may disable any username, nickname, password, or account at any time, for any or no reason, including suspected Terms violations, abuse, fraud, or legal risk.",
+            "You are responsible for all activity under your account, including actions by anyone you allow to use it."
+          ]
+        },
+        {
+          "id": "minecraft",
+          "title": "Minecraft, third-party rights, and compliance",
+          "paragraphs": [
+            "Minecraft game files, assets, trademarks, and online services are owned by Mojang/Microsoft. Owyx is a third-party launcher / community ecosystem and is not an official Minecraft product.",
+            "You agree to comply with applicable Mojang/Microsoft terms (including the Minecraft EULA and related policies) whenever they apply to your use of Minecraft. Nothing in these Terms authorizes infringement, piracy, circumvention of technical protection measures where prohibited, or unauthorized redistribution of Minecraft.",
+            "Servers, packs, mods, resource packs, and other third-party content you obtain through or outside Owyx remain subject to their own licenses. You are solely responsible for verifying that you have rights to use such content.",
+            "Owyx may integrate Microsoft OAuth / Minecraft authentication flows for licensed accounts. Those flows are subject to Microsoft terms. Owyx is not responsible for Microsoft outages, account bans, or authentication changes."
+          ]
+        },
+        {
+          "id": "launcher",
+          "title": "Launcher software and open source",
+          "paragraphs": [
+            "The Owyx launcher is based on open-source software derived from the Modrinth App / Theseus lineage and is generally distributed under GNU GPL v3 (see the public repository LICENSE and COPYING.md). GPL covers source code rights — not the Owyx brand.",
+            "You may use the launcher subject to GPL-3 (for GPL-covered components) and this Launcher EULA / Terms for Service access. Forks must not use Owyx branding (see COPYING.md and brand/).",
+            "Auto-update, Discord presence, cosmetics sync, friends, and catalog features may phone home to Owyx APIs. By using those features you consent to the related network calls described in the Privacy Policy."
+          ]
+        },
+        {
+          "id": "api",
+          "title": "API usage",
+          "paragraphs": [
+            "We may provide HTTP APIs (including api.owyx.site). We grant a limited, non-exclusive, non-sublicensable, revocable license to use the API for personal or project use that complies with these Terms and applicable law.",
+            "You must not abuse rate limits, scrape aggressively, attempt unauthorized access, share secret client keys publicly, or use the API to harm the Service or other users.",
+            "We may revoke API access at any time. You indemnify Owyx Team against claims arising from your API use."
+          ]
+        },
+        {
+          "id": "ugc",
+          "title": "User content and contributions",
+          "paragraphs": [
+            "You may upload or submit nicknames, avatars, skins, messages, catalog-related materials, or other content (\"User Content\"). You retain ownership of your User Content, but grant Owyx Team a worldwide, non-exclusive, royalty-free license to host, display, transmit, and process it as needed to operate the Service.",
+            "You represent that you have all rights needed to submit User Content and that it does not infringe others’ rights or violate law.",
+            "We may remove or refuse User Content at our discretion. We do not pre-screen all content and are not responsible for User Content."
+          ]
+        },
+        {
+          "id": "conduct",
+          "title": "Prohibited uses",
+          "paragraphs": [
+            "You may use the Service only for lawful purposes. You agree not to:",
+            "(a) violate any applicable law or regulation; (b) exploit or harm minors; (c) transmit malware, spam, or unauthorized advertising; (d) impersonate others or Owyx Team; (e) harass, threaten, or doxx users; (f) attempt unauthorized access to systems, accounts, or data; (g) interfere with Service integrity, including DDoS, scraping that degrades service, or reverse engineering where prohibited; (h) bypass bans, rate limits, or access controls; (i) use the Service to distribute illegal content; (j) misrepresent Owyx as an official Mojang/Microsoft/Modrinth product; (k) use Owyx trademarks in a misleading way."
+          ]
+        },
+        {
+          "id": "ip",
+          "title": "Intellectual property and trademarks",
+          "paragraphs": [
+            "Except for User Content and third-party open-source components under their licenses, the Service’s branding, design, text, and proprietary materials are owned by Owyx Team or licensors and protected by intellectual property laws.",
+            "The name Owyx, Owyx Team, related logos, crystal marks, and design system assets under brand/ are trademarks / trade dress of Owyx Team. You must not use them without prior written permission.",
+            "No rights are transferred to you except the limited license to use the Service as expressly permitted."
+          ]
+        },
+        {
+          "id": "disclaimer",
+          "title": "Disclaimer of warranties",
+          "paragraphs": [
+            "THE SERVICE IS PROVIDED ON AN \"AS IS\" AND \"AS AVAILABLE\" BASIS WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS, IMPLIED, OR STATUTORY, INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.",
+            "We do not warrant that the Service will be uninterrupted, secure, error-free, or free of harmful components, or that defects will be corrected.",
+            "You use Minecraft, mods, packs, and third-party servers at your own risk."
+          ]
+        },
+        {
+          "id": "liability",
+          "title": "Limitation of liability",
+          "paragraphs": [
+            "TO THE FULLEST EXTENT PERMITTED BY LAW, OWYX TEAM AND ITS CONTRIBUTORS SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS, DATA, GOODWILL, OR BUSINESS OPPORTUNITY, ARISING FROM YOUR USE OF THE SERVICE.",
+            "OUR TOTAL LIABILITY FOR ANY CLAIM RELATING TO THE SERVICE SHALL NOT EXCEED THE GREATER OF (A) THE AMOUNTS YOU PAID TO OWYX TEAM FOR THE SERVICE IN THE 12 MONTHS BEFORE THE CLAIM (IF ANY) OR (B) EUR 50 (OR LOCAL CURRENCY EQUIVALENT).",
+            "Some jurisdictions do not allow certain limitations; in those cases our liability is limited to the maximum extent permitted."
+          ]
+        },
+        {
+          "id": "indemnity",
+          "title": "Indemnification",
+          "paragraphs": [
+            "You agree to defend, indemnify, and hold harmless Owyx Team and contributors from any claims, damages, losses, and expenses (including reasonable legal fees) arising out of your use of the Service, your User Content, your violation of these Terms, or your violation of any third-party rights or law (including Mojang/Microsoft terms)."
+          ]
+        },
+        {
+          "id": "termination",
+          "title": "Termination",
+          "paragraphs": [
+            "You may stop using the Service at any time. We may suspend or terminate access immediately, without notice, for any reason including Terms violations.",
+            "Upon termination, your right to use the Service ceases. Provisions that by nature should survive (including IP, disclaimers, liability limits, indemnity) will survive."
+          ]
+        },
+        {
+          "id": "law",
+          "title": "Governing law and disputes",
+          "paragraphs": [
+            "These Terms are governed by the laws applicable at the place of the Owyx Team maintainer’s habitual residence, without regard to conflict-of-law rules, unless mandatory consumer law of your country provides otherwise.",
+            "You agree to first contact us and attempt informal resolution. Where permitted, disputes shall be resolved in the courts competent for the maintainer’s habitual residence, subject to mandatory consumer venue rights.",
+            "If any provision is held unenforceable, the remaining provisions remain in effect."
+          ]
+        },
+        {
+          "id": "entire",
+          "title": "Entire agreement",
+          "paragraphs": [
+            "These Terms, the Privacy Policy, and the Launcher EULA constitute the entire agreement between you and Owyx Team regarding the Service and supersede prior understandings on the same subject.",
+            "Our failure to enforce a provision is not a waiver. You may not assign these Terms without our consent; we may assign them in connection with a project transfer."
+          ]
+        },
+        {
+          "id": "contact",
+          "title": "Contact",
+          "paragraphs": [
+            "Questions about these Terms may be sent through the contact channels published on owyx.site (for example Discord community links). We do not list personal legal requisites on this page."
+          ]
+        }
+      ]
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "lastModified": "September 16, 2026",
+      "intro": "This Privacy Policy explains how Owyx Team (\"Owyx\", \"we\", \"us\") collects, uses, stores, and shares information when you use owyx.site, api.owyx.site, and the Owyx launcher (the \"Service\"). Owyx Team is an independent project maintainer / team. This policy is designed to be transparent; it is not legal advice.",
+      "sections": [
+        {
+          "id": "scope",
+          "title": "Scope",
+          "paragraphs": [
+            "This policy applies to information we collect on the website, via email or other messages you send us, through the desktop launcher, and through APIs that support the Service.",
+            "It does not apply to third-party sites, Minecraft servers, Discord, Microsoft, Mojang, Modrinth, payment processors, or other services you use outside Owyx — those have their own policies."
+          ]
+        },
+        {
+          "id": "foreword",
+          "title": "Legal foreword",
+          "paragraphs": [
+            "This document is intended to support transparency expectations under frameworks such as the EU GDPR and similar privacy laws, to the extent they apply. Because Owyx Team may be a small / solo operator, some corporate formalities may not apply in the same way as for large companies; we still aim to respect your rights."
+          ]
+        },
+        {
+          "id": "controller",
+          "title": "Data controller",
+          "paragraphs": [
+            "The data controller for personal data processed through the Service is Owyx Team as operator of owyx.site / api.owyx.site. Contact channels are published on the site. We do not publish home address or national ID requisites here."
+          ]
+        },
+        {
+          "id": "collect",
+          "title": "Information we collect",
+          "paragraphs": [
+            "Account data: email address, password hash (not plaintext password), nickname, role/trust flags, optional Discord link, avatar/skin uploads, email verification status, registration timestamps.",
+            "Session data: authentication tokens / session hashes, device or client metadata reasonably needed for security, IP addresses in logs, approximate timestamps of access.",
+            "Launcher / API usage: requests to catalog, cosmetics, friends, presence heartbeats (online/playing status and optional instance name), admin actions if you are staff.",
+            "Technical logs: server logs, error reports, rate-limit and abuse-prevention signals, CDN/WAF metadata if used.",
+            "Communications: messages you send to support channels.",
+            "We do not intentionally collect special-category data. Please do not submit sensitive personal data in nicknames or skins."
+          ]
+        },
+        {
+          "id": "use",
+          "title": "How we use information",
+          "paragraphs": [
+            "To create and secure accounts; authenticate launcher and site sessions; provide cosmetics, friends, catalog, and related features; prevent fraud and abuse; debug and improve the Service; communicate about security or account issues; comply with law.",
+            "We do not sell your personal data. We do not use your data for third-party advertising networks as a core business model."
+          ]
+        },
+        {
+          "id": "legal_bases",
+          "title": "Legal bases (where GDPR-like rules apply)",
+          "paragraphs": [
+            "Contract / steps prior to contract: providing the account and launcher features you request.",
+            "Legitimate interests: securing the Service, preventing abuse, understanding aggregate reliability.",
+            "Consent: where we ask for it (for example optional marketing, if ever enabled).",
+            "Legal obligation: when we must retain or disclose data to comply with law."
+          ]
+        },
+        {
+          "id": "sharing",
+          "title": "Sharing and processors",
+          "paragraphs": [
+            "We may use infrastructure providers (hosting, database, object storage, email delivery, CDN/WAF, captcha, Discord for community). They process data on our instructions or as independent controllers for their own services.",
+            "Microsoft / Mojang receive data only when you choose Microsoft login for Minecraft — according to their terms.",
+            "We may disclose information if required by law, to protect rights and safety, or in connection with a good-faith transfer of the project."
+          ]
+        },
+        {
+          "id": "retention",
+          "title": "Retention",
+          "paragraphs": [
+            "Account data is kept while your account remains open and for a reasonable period afterward for security, backups, and legal claims.",
+            "Logs are retained for a limited operational period unless needed longer for investigations.",
+            "You may request deletion subject to legal exceptions (see Rights)."
+          ]
+        },
+        {
+          "id": "security",
+          "title": "Security",
+          "paragraphs": [
+            "We use reasonable technical and organizational measures (hashed passwords, HTTPS, session controls, access-limited admin tools). No method of transmission or storage is 100% secure."
+          ]
+        },
+        {
+          "id": "transfers",
+          "title": "International transfers",
+          "paragraphs": [
+            "Servers and processors may be located in different countries. Where required, we rely on appropriate safeguards or your necessity for the Service."
+          ]
+        },
+        {
+          "id": "cookies",
+          "title": "Cookies and local storage",
+          "paragraphs": [
+            "We use cookies / local storage for login sessions, language preference, and similar functional needs. You can clear site data in your browser; some features may stop working."
+          ]
+        },
+        {
+          "id": "children",
+          "title": "Children",
+          "paragraphs": [
+            "The Service is not directed to children under 13. We do not knowingly collect personal data from children under 13. If you believe we have, contact us and we will delete it promptly."
+          ]
+        },
+        {
+          "id": "rights",
+          "title": "Your rights",
+          "paragraphs": [
+            "Depending on your jurisdiction, you may have rights to access, rectify, erase, restrict, port, or object to certain processing, and to withdraw consent.",
+            "To exercise rights, contact us via published channels and verify your identity. We will respond within a reasonable period (typically within 30 days where required).",
+            "You may lodge a complaint with a supervisory authority if applicable."
+          ]
+        },
+        {
+          "id": "changes_p",
+          "title": "Changes",
+          "paragraphs": [
+            "We may update this Privacy Policy by posting a new version on this page and updating the \"Last modified\" date. Continued use after changes means you acknowledge the updated policy."
+          ]
+        },
+        {
+          "id": "contact_p",
+          "title": "Contact",
+          "paragraphs": [
+            "Privacy questions: use the contact channels on owyx.site. We do not list personal postal requisites on this page."
+          ]
+        }
+      ]
+    },
+    "eula": {
+      "title": "Launcher End-User License Agreement (EULA)",
+      "lastModified": "September 16, 2026",
+      "intro": "This Launcher EULA is an agreement between you and Owyx Team regarding the Owyx desktop launcher and related client components (the \"Software\"). It supplements the Terms of Use and Privacy Policy. If there is a conflict about Software licensing, GPL-3 terms for GPL-covered code control for source distribution rights; this EULA governs branded Service access and acceptable use.",
+      "sections": [
+        {
+          "id": "license_grant",
+          "title": "License grant",
+          "paragraphs": [
+            "Subject to these terms, Owyx Team grants you a personal, non-exclusive, non-transferable, revocable license to install and use the Software to access the Service and play Minecraft in configurations the Software supports.",
+            "Open-source components are also licensed under their stated licenses (including GNU GPL v3 for applicable launcher packages). You may exercise GPL rights for those components as provided by GPL-3."
+          ]
+        },
+        {
+          "id": "brand",
+          "title": "Brand and trademark restrictions",
+          "paragraphs": [
+            "This license does not grant rights to the Owyx name, logos, icons, or design system. Forks and redistributed builds must not use Owyx branding. See repository COPYING.md and the brand/ directory inventory."
+          ]
+        },
+        {
+          "id": "restrictions",
+          "title": "Restrictions",
+          "paragraphs": [
+            "Except as allowed by GPL-3 for GPL-covered code or applicable law, you must not: misrepresent the Software as an official Mojang/Microsoft client; use the Software to violate Minecraft/Microsoft terms; bypass Owyx access controls; introduce malware; or remove attribution / copyright notices where required."
+          ]
+        },
+        {
+          "id": "updates",
+          "title": "Updates and network calls",
+          "paragraphs": [
+            "The Software may automatically check for updates, authenticate sessions, sync cosmetics, send friends presence, and fetch catalog/news from Owyx servers. You can limit some features by not signing in or by network configuration, but core update checks may still occur in release builds."
+          ]
+        },
+        {
+          "id": "no_game_license",
+          "title": "No Minecraft license",
+          "paragraphs": [
+            "The Software does not include Minecraft game ownership. Obtaining and using Minecraft remains subject to Mojang/Microsoft terms. Nickname / offline-mode profiles are a technical feature of certain server configurations and do not equal a purchased Minecraft license."
+          ]
+        },
+        {
+          "id": "warranty_eula",
+          "title": "Disclaimer and liability",
+          "paragraphs": [
+            "THE SOFTWARE IS PROVIDED \"AS IS\" WITHOUT WARRANTY. LIABILITY LIMITATIONS IN THE TERMS OF USE APPLY TO THE SOFTWARE."
+          ]
+        },
+        {
+          "id": "termination_eula",
+          "title": "Termination",
+          "paragraphs": [
+            "This EULA terminates if you breach it or if we discontinue the Software. GPL rights to corresponding source (where applicable) survive according to GPL-3."
+          ]
+        },
+        {
+          "id": "contact_eula",
+          "title": "Contact",
+          "paragraphs": [
+            "Questions: contact channels published on owyx.site."
+          ]
+        }
+      ]
+    }
+  },
+  "common": {
+    "skipToContent": "Skip to content"
+  }
+}

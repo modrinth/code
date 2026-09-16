@@ -288,9 +288,15 @@ impl Credentials {
     ///
     /// Used for Owyx.site nicknames on offline-mode servers. Selecting this account
     /// does not remove a Microsoft account — both can coexist and the user picks one.
+    ///
+    /// When `make_active` is `true` (explicit UI login), the nick becomes the active
+    /// play account. When `false` (background site→nick sync), an existing active
+    /// Microsoft (or other) account is left alone; the nick is only activated if no
+    /// account is currently active.
     pub async fn create_offline(
         username: &str,
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+        make_active: bool,
     ) -> crate::Result<Self> {
         let username = username.trim();
         if username.is_empty() || username.len() > 16 {
@@ -310,6 +316,12 @@ impl Credentials {
             .into());
         }
 
+        let active = if make_active {
+            true
+        } else {
+            Self::get_active(exec).await?.is_none()
+        };
+
         let id = offline_player_uuid(username);
         let credentials = Self {
             offline_profile: MinecraftProfile {
@@ -320,8 +332,7 @@ impl Credentials {
             access_token: "0".to_string(),
             refresh_token: OFFLINE_REFRESH_TOKEN.to_string(),
             expires: Utc::now() + Duration::days(3650),
-            // Selecting / creating an Owyx nickname makes it the active play account.
-            active: true,
+            active,
         };
         credentials.upsert(exec).await?;
         Ok(credentials)
@@ -579,13 +590,6 @@ impl Credentials {
         } else {
             Ok(None)
         }
-    }
-
-    /// No-op kept for call-site compatibility; users choose Microsoft vs Owyx nick freely.
-    async fn prefer_licensed_as_active(
-        _exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
-    ) -> crate::Result<()> {
-        Ok(())
     }
 
     /// Fetches the currently selected credentials from the database, attempting
@@ -1721,7 +1725,9 @@ fn generate_oauth_challenge() -> String {
 
 #[cfg(test)]
 mod offline_account_tests {
-    use super::{offline_player_uuid, OFFLINE_REFRESH_TOKEN};
+    use super::{offline_player_uuid, Credentials, OFFLINE_REFRESH_TOKEN};
+    use chrono::{Duration, Utc};
+    use sqlx::sqlite::SqlitePoolOptions;
     use uuid::Uuid;
 
     #[test]
@@ -1741,5 +1747,118 @@ mod offline_account_tests {
     #[test]
     fn offline_marker_constant() {
         assert_eq!(OFFLINE_REFRESH_TOKEN, "owyx-offline");
+    }
+
+    #[test]
+    fn is_offline_detects_marker_token() {
+        let creds = Credentials {
+            offline_profile: Default::default(),
+            access_token: "0".to_string(),
+            refresh_token: OFFLINE_REFRESH_TOKEN.to_string(),
+            expires: Utc::now() + Duration::days(1),
+            active: false,
+        };
+        assert!(creds.is_offline());
+    }
+
+    async fn memory_users_pool() -> sqlx::SqlitePool {
+        let pool = SqlitePoolOptions::new()
+            .max_connections(1)
+            .connect("sqlite::memory:")
+            .await
+            .expect("sqlite memory");
+        sqlx::query(
+            r#"
+            CREATE TABLE minecraft_users (
+                uuid TEXT NOT NULL PRIMARY KEY,
+                active INTEGER NOT NULL DEFAULT 0,
+                username TEXT NOT NULL,
+                access_token TEXT NOT NULL,
+                refresh_token TEXT NOT NULL,
+                expires INTEGER NOT NULL
+            )
+            "#,
+        )
+        .execute(&pool)
+        .await
+        .expect("create minecraft_users");
+        pool
+    }
+
+    #[tokio::test]
+    async fn create_offline_sets_uuid_and_marker() {
+        let pool = memory_users_pool().await;
+        let creds = Credentials::create_offline("Steve", &pool, true)
+            .await
+            .expect("create_offline");
+        assert_eq!(creds.offline_profile.id, offline_player_uuid("Steve"));
+        assert_eq!(creds.refresh_token, OFFLINE_REFRESH_TOKEN);
+        assert!(creds.is_offline());
+        assert!(creds.active);
+    }
+
+    #[tokio::test]
+    async fn create_offline_does_not_steal_active_microsoft_when_passive() {
+        let pool = memory_users_pool().await;
+        let ms_id = Uuid::parse_str("11111111-1111-1111-1111-111111111111").unwrap();
+        let ms_uuid = ms_id.as_hyphenated().to_string();
+        let expires = (Utc::now() + Duration::days(1)).timestamp();
+        sqlx::query(
+            r#"
+            INSERT INTO minecraft_users
+                (uuid, active, username, access_token, refresh_token, expires)
+            VALUES (?, 1, 'LicensedPlayer', 'ms-access', 'ms-refresh', ?)
+            "#,
+        )
+        .bind(&ms_uuid)
+        .bind(expires)
+        .execute(&pool)
+        .await
+        .expect("insert ms");
+
+        let nick = Credentials::create_offline("Steve", &pool, false)
+            .await
+            .expect("create_offline passive");
+        assert!(!nick.active);
+        assert!(nick.is_offline());
+
+        let active = Credentials::get_active(&pool)
+            .await
+            .expect("get_active")
+            .expect("some active");
+        assert_eq!(active.offline_profile.id, ms_id);
+        assert!(!active.is_offline());
+    }
+
+    #[tokio::test]
+    async fn create_offline_make_active_switches_from_microsoft() {
+        let pool = memory_users_pool().await;
+        let ms_id = Uuid::parse_str("22222222-2222-2222-2222-222222222222").unwrap();
+        let ms_uuid = ms_id.as_hyphenated().to_string();
+        let expires = (Utc::now() + Duration::days(1)).timestamp();
+        sqlx::query(
+            r#"
+            INSERT INTO minecraft_users
+                (uuid, active, username, access_token, refresh_token, expires)
+            VALUES (?, 1, 'LicensedPlayer', 'ms-access', 'ms-refresh', ?)
+            "#,
+        )
+        .bind(&ms_uuid)
+        .bind(expires)
+        .execute(&pool)
+        .await
+        .expect("insert ms");
+
+        let nick = Credentials::create_offline("Alex", &pool, true)
+            .await
+            .expect("create_offline active");
+        assert!(nick.active);
+
+        let active = Credentials::get_active(&pool)
+            .await
+            .expect("get_active")
+            .expect("some active");
+        assert_eq!(active.offline_profile.id, offline_player_uuid("Alex"));
+        assert!(active.is_offline());
     }
 }

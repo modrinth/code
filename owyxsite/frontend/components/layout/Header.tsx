@@ -3,19 +3,22 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Logo from "@/components/ui/Logo";
+import LanguageToggle from "@/components/layout/LanguageToggle";
 import { useAuth } from "@/hooks/useAuth";
+import { useLocale } from "@/hooks/useLocale";
 import { resolveSiteAvatarUrl } from "@/lib/avatar";
-
-const NAV = [
-  { href: "/", label: "Главная" },
-  { href: "/download", label: "Скачать" },
-];
 
 export default function Header() {
   const { user, logout } = useAuth();
+  const { dict } = useLocale();
   const [open, setOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const NAV = [
+    { href: "/", label: dict.header.home },
+    { href: "/download", label: dict.header.download },
+  ];
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -42,10 +45,10 @@ export default function Header() {
     <header className="sticky top-0 z-50 border-b border-line/90 bg-bg/75 backdrop-blur-md">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
         <div className="flex items-center gap-7 min-w-0">
-          <Link href="/" className="flex items-center shrink-0" aria-label="Owyx — на главную">
+          <Link href="/" className="flex items-center shrink-0" aria-label={dict.header.logoHome}>
             <Logo size={26} wordClassName="text-xl" />
           </Link>
-          <nav className="hidden sm:flex items-center gap-5" aria-label="Основная">
+          <nav className="hidden sm:flex items-center gap-5" aria-label="Main">
             {NAV.map((item) => (
               <Link
                 key={item.href}
@@ -62,7 +65,7 @@ export default function Header() {
           {user ? (
             <>
               <Link href="/download" className="hidden sm:inline-flex btn btn-ghost btn-sm">
-                Скачать
+                {dict.header.download}
               </Link>
               <div className="relative" ref={dropdownRef}>
                 <button
@@ -84,7 +87,7 @@ export default function Header() {
                     />
                   </span>
                   <span className="max-w-[10rem] truncate hidden sm:inline">
-                    {user.nickname || user.email || "Игрок"}
+                    {user.nickname || user.email || "Player"}
                   </span>
                 </button>
                 {open && (
@@ -93,11 +96,11 @@ export default function Header() {
                     className="absolute right-0 mt-2 w-52 overflow-hidden rounded-[14px] border border-line bg-panel shadow-[0_16px_40px_-20px_rgba(0,0,0,0.75)] fade-up"
                   >
                     <Link href="/profile" className="block px-4 py-3 text-sm hover:bg-panel-2 transition-colors" role="menuitem">
-                      Личный кабинет
+                      {dict.header.cabinet}
                     </Link>
                     {isStaff && (
                       <Link href="/admin" className="block px-4 py-3 text-sm hover:bg-panel-2 transition-colors border-t border-line" role="menuitem">
-                        Админ-панель
+                        {dict.header.admin}
                       </Link>
                     )}
                     <button
@@ -109,7 +112,7 @@ export default function Header() {
                       }}
                       className="w-full text-left px-4 py-3 text-sm text-danger hover:bg-panel-2 transition-colors border-t border-line cursor-pointer"
                     >
-                      Выйти
+                      {dict.header.logout}
                     </button>
                   </div>
                 )}
@@ -118,21 +121,23 @@ export default function Header() {
           ) : (
             <>
               <Link href="/login" className="hidden sm:inline text-sm text-muted hover:text-accent transition-colors">
-                Войти
+                {dict.header.login}
               </Link>
               <Link href="/register" className="hidden sm:inline text-sm text-muted hover:text-accent transition-colors">
-                Регистрация
+                {dict.header.register}
               </Link>
               <Link href="/download" className="btn btn-primary btn-sm">
-                Скачать
+                {dict.header.download}
               </Link>
             </>
           )}
 
+          <LanguageToggle />
+
           <button
             type="button"
             className="sm:hidden inline-flex items-center justify-center rounded-[10px] border border-line bg-panel h-11 w-11 text-text hover:border-accent transition-colors cursor-pointer"
-            aria-label={mobileOpen ? "Закрыть меню" : "Открыть меню"}
+            aria-label={mobileOpen ? dict.header.closeMenu : dict.header.openMenu}
             aria-expanded={mobileOpen}
             aria-controls="mobile-nav"
             onClick={() => setMobileOpen((v) => !v)}
@@ -152,7 +157,7 @@ export default function Header() {
         <nav
           id="mobile-nav"
           className="sm:hidden border-t border-line bg-bg/95 backdrop-blur-md px-4 py-3 flex flex-col gap-1 fade-up"
-          aria-label="Мобильная"
+          aria-label="Mobile"
         >
           {NAV.map((item) => (
             <Link
@@ -171,14 +176,14 @@ export default function Header() {
                 onClick={() => setMobileOpen(false)}
                 className="rounded-[10px] px-3 py-3 text-sm text-muted hover:text-accent hover:bg-panel-2 transition-colors"
               >
-                Войти
+                {dict.header.login}
               </Link>
               <Link
                 href="/register"
                 onClick={() => setMobileOpen(false)}
                 className="rounded-[10px] px-3 py-3 text-sm text-muted hover:text-accent hover:bg-panel-2 transition-colors"
               >
-                Регистрация
+                {dict.header.register}
               </Link>
             </>
           )}
