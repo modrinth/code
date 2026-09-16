@@ -332,7 +332,12 @@ async fn version_create_inner(
                 }
 
                 let daily_version_limits =
-                    UserLimits::get_for_versions_per_day(&user, pool).await?;
+                    UserLimits::get_for_versions_per_day(
+                        &user,
+                        Utc::now(),
+                        pool,
+                    )
+                    .await?;
                 if daily_version_limits.current >= daily_version_limits.max {
                     return Err(CreateError::DailyVersionLimitReached);
                 }

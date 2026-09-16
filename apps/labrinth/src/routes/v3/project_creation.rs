@@ -559,9 +559,12 @@ async fn project_create_inner(
                 return Err(CreateError::ProjectVersionLimitReached);
             }
 
-            let daily_version_limits =
-                UserLimits::get_for_versions_per_day(&current_user, pool)
-                    .await?;
+            let daily_version_limits = UserLimits::get_for_versions_per_day(
+                &current_user,
+                Utc::now(),
+                pool,
+            )
+            .await?;
             if daily_version_limits
                 .current
                 .saturating_add(versions_to_create)

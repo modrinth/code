@@ -1,4 +1,5 @@
 use crate::database::PgPool;
+use chrono::{DateTime, TimeDelta, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -121,17 +122,25 @@ impl UserLimits {
 
     pub async fn get_for_versions_per_day(
         user: &User,
+        now: DateTime<Utc>,
         pool: &PgPool,
     ) -> Result<Self, sqlx::Error> {
         let user_id = DBUserId::from(user.id);
         let db_limits = DBUserLimits::get(user_id, pool).await?;
+        let day_start = now
+            .date_naive()
+            .and_hms_opt(0, 0, 0)
+            .expect("midnight is always a valid time")
+            .and_utc();
+        let day_end = day_start + TimeDelta::days(1);
         let current = sqlx::query_scalar!(
             "SELECT COUNT(*) FROM versions
             WHERE author_id = $1
-                AND date_published >= (
-                    (NOW() AT TIME ZONE 'UTC')::date AT TIME ZONE 'UTC'
-                )",
+                AND date_published >= $2
+                AND date_published < $3",
             user_id as DBUserId,
+            day_start,
+            day_end,
         )
         .fetch_one(pool)
         .await?
