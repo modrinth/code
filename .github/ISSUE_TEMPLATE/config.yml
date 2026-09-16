@@ -1,7 +1,7 @@
 blank_issues_enabled: true
 contact_links:
   - name: Owyx website
-    about: Product site / account
+    about: Product site / account (owyx.site)
     url: https://owyx.site
   - name: Upstream Modrinth (not this fork)
     about: Issues about Modrinth itself belong on modrinth/code — this repo is an Owyx fork/rebrand.

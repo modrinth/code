@@ -1,0 +1,44 @@
+name: 🌐 Bug with owyx.site
+description: Bugs on the Owyx website / account / API (control plane).
+labels: [bug]
+type: 'bug'
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For **owyx.site** / **api.owyx.site** (account, profile, admin, friends API, catalog).
+        Launcher bugs → use **Bug with Owyx launcher**. Upstream Modrinth → [modrinth/code](https://github.com/modrinth/code).
+  - type: checkboxes
+    attributes:
+      label: Please confirm the following.
+      options:
+        - label: I checked existing issues for duplicates
+          required: true
+        - label: This is about Owyx site/API, not Modrinth.com / Hosting
+          required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Website UI
+        - Auth / account
+        - API (api.owyx.site)
+        - Admin
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Steps to reproduce, expected vs actual, screenshots if useful
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Page / endpoint URL
+      placeholder: https://owyx.site/...
+    validations:
+      required: false
