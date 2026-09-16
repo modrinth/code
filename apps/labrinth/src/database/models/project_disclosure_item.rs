@@ -2,10 +2,11 @@ use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
 
 use chrono::{DateTime, Utc};
+use eyre::{Result, WrapErr};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    database::models::{DBProjectId, DBUserId, DatabaseError},
+    database::models::{DBProjectId, DBUserId},
     models::v3::disclosures::{
         DisclosureLockStatus, ProjectDisclosure, ProjectDisclosureType,
     },
@@ -26,13 +27,11 @@ impl DBProjectDisclosure {
     pub async fn upsert(
         &self,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<(), DatabaseError> {
-        let (disclosure_type, metadata) =
-            self.disclosure.to_parts().map_err(|e| {
-                DatabaseError::Internal(eyre::Report::new(e).wrap_err(
-                    "failed to serialize project disclosure metadata",
-                ))
-            })?;
+    ) -> Result<()> {
+        let (disclosure_type, metadata) = self
+            .disclosure
+            .to_parts()
+            .wrap_err("serializing project disclosure metadata")?;
 
         sqlx::query!(
             r#"
@@ -54,7 +53,8 @@ impl DBProjectDisclosure {
             <&'static str>::from(self.lock_status),
         )
         .execute(exec)
-        .await?;
+        .await
+        .wrap_err("upserting project disclosure")?;
 
         Ok(())
     }
@@ -63,7 +63,7 @@ impl DBProjectDisclosure {
         project_id: DBProjectId,
         include_deleted: bool,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<DBProjectDisclosure>, DatabaseError> {
+    ) -> Result<Vec<DBProjectDisclosure>> {
         let rows = sqlx::query!(
             r#"
 			SELECT project_id, type AS "disclosure_type!", metadata, updated_at, updated_by, set_by_moderator, deleted_at, lock_status
@@ -75,21 +75,18 @@ impl DBProjectDisclosure {
             include_deleted,
         )
         .fetch_all(exec)
-        .await?;
+        .await
+        .wrap_err("fetching project disclosures")?;
 
         rows.into_iter()
             .map(|row| {
-                Ok(DBProjectDisclosure {
+                eyre::Ok(DBProjectDisclosure {
                     project_id: DBProjectId(row.project_id),
                     disclosure: ProjectDisclosure::from_parts(
                         &row.disclosure_type,
                         row.metadata,
                     )
-                    .map_err(|e| {
-                        DatabaseError::Internal(eyre::Report::new(e).wrap_err(
-                            "failed to deserialize project disclosure metadata",
-                        ))
-                    })?,
+                    .wrap_err("deserializing project disclosure metadata")?,
                     updated_at: row.updated_at,
                     updated_by: DBUserId(row.updated_by),
                     set_by_moderator: row.set_by_moderator,
@@ -97,11 +94,7 @@ impl DBProjectDisclosure {
                     lock_status: DisclosureLockStatus::from_str(
                         &row.lock_status,
                     )
-                    .map_err(|e| {
-                        DatabaseError::Internal(eyre::Report::new(e).wrap_err(
-                            "failed to parse project disclosure lock status",
-                        ))
-                    })?,
+                    .wrap_err("parsing project disclosure lock status")?,
                 })
             })
             .collect()
@@ -112,7 +105,7 @@ impl DBProjectDisclosure {
         disclosure_type: ProjectDisclosureType,
         project_ids: &[DBProjectId],
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<HashSet<DBProjectId>, DatabaseError> {
+    ) -> Result<HashSet<DBProjectId>> {
         let ids = project_ids.iter().map(|id| id.0).collect::<Vec<_>>();
         let rows = sqlx::query_scalar!(
             r#"
@@ -124,7 +117,8 @@ impl DBProjectDisclosure {
             &ids,
         )
         .fetch_all(exec)
-        .await?;
+        .await
+        .wrap_err("fetching projects with disclosure type")?;
 
         Ok(rows.into_iter().map(DBProjectId).collect())
     }
@@ -133,7 +127,7 @@ impl DBProjectDisclosure {
         project_id: DBProjectId,
         types: &[String],
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<HashMap<String, DisclosureLockStatus>, DatabaseError> {
+    ) -> Result<HashMap<String, DisclosureLockStatus>> {
         let rows = sqlx::query!(
             r#"
 			SELECT type AS "disclosure_type!", lock_status
@@ -144,20 +138,16 @@ impl DBProjectDisclosure {
             types,
         )
         .fetch_all(exec)
-        .await?;
+        .await
+        .wrap_err("fetching project disclosure lock statuses")?;
 
         rows.into_iter()
             .map(|row| {
-                let lock_status = DisclosureLockStatus::from_str(
-                    &row.lock_status,
-                )
-                .map_err(|e| {
-                    DatabaseError::Internal(eyre::Report::new(e).wrap_err(
-                        "failed to parse project disclosure lock status",
-                    ))
-                })?;
+                let lock_status =
+                    DisclosureLockStatus::from_str(&row.lock_status)
+                        .wrap_err("parsing project disclosure lock status")?;
 
-                Ok((row.disclosure_type, lock_status))
+                eyre::Ok((row.disclosure_type, lock_status))
             })
             .collect()
     }
@@ -168,7 +158,7 @@ impl DBProjectDisclosure {
         updated_by: DBUserId,
         set_by_moderator: bool,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<bool, DatabaseError> {
+    ) -> Result<bool> {
         let result = sqlx::query!(
             r#"
 			UPDATE project_disclosures
@@ -181,7 +171,8 @@ impl DBProjectDisclosure {
             set_by_moderator,
         )
         .execute(exec)
-        .await?;
+        .await
+        .wrap_err("removing project disclosure")?;
 
         Ok(result.rows_affected() > 0)
     }

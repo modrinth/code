@@ -1,9 +1,10 @@
 use chrono::{DateTime, Utc};
+use eyre::{Result, WrapErr};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sha2::Digest;
 
-use super::{DBOAuthClientId, DBOAuthRedirectUriId, DBUserId, DatabaseError};
+use super::{DBOAuthClientId, DBOAuthRedirectUriId, DBUserId};
 use crate::{database::PgTransaction, models::pats::Scopes};
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
@@ -81,14 +82,18 @@ impl DBOAuthClient {
     pub async fn get(
         id: DBOAuthClientId,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Option<DBOAuthClient>, DatabaseError> {
-        Ok(Self::get_many(&[id], exec).await?.into_iter().next())
+    ) -> Result<Option<DBOAuthClient>> {
+        Ok(Self::get_many(&[id], exec)
+            .await
+            .wrap_err("fetching oauth client")?
+            .into_iter()
+            .next())
     }
 
     pub async fn get_many(
         ids: &[DBOAuthClientId],
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<DBOAuthClient>, DatabaseError> {
+    ) -> Result<Vec<DBOAuthClient>> {
         let ids = ids.iter().map(|id| id.0).collect_vec();
         let ids_ref: &[i64] = &ids;
         let results = select_clients_with_predicate!(
@@ -96,7 +101,8 @@ impl DBOAuthClient {
             ids_ref
         )
         .fetch_all(exec)
-        .await?;
+        .await
+        .wrap_err("fetching oauth clients")?;
 
         Ok(results.into_iter().map(|r| r.into()).collect_vec())
     }
@@ -104,14 +110,15 @@ impl DBOAuthClient {
     pub async fn get_all_user_clients(
         user_id: DBUserId,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<DBOAuthClient>, DatabaseError> {
+    ) -> Result<Vec<DBOAuthClient>> {
         let user_id_param = user_id.0;
         let clients = select_clients_with_predicate!(
             "WHERE created_by = $1",
             user_id_param
         )
         .fetch_all(exec)
-        .await?;
+        .await
+        .wrap_err("fetching oauth clients for user")?;
 
         Ok(clients.into_iter().map(|r| r.into()).collect())
     }
@@ -119,7 +126,7 @@ impl DBOAuthClient {
     pub async fn remove(
         id: DBOAuthClientId,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<()> {
         // Cascades to oauth_client_redirect_uris, oauth_client_authorizations
         sqlx::query!(
             "
@@ -129,7 +136,8 @@ impl DBOAuthClient {
             id.0
         )
         .execute(exec)
-        .await?;
+        .await
+        .wrap_err("removing oauth client")?;
 
         Ok(())
     }
@@ -137,7 +145,7 @@ impl DBOAuthClient {
     pub async fn insert(
         &self,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<()> {
         sqlx::query!(
             "
             INSERT INTO oauth_clients (
@@ -156,10 +164,12 @@ impl DBOAuthClient {
             self.created_by.0
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("inserting oauth client")?;
 
         Self::insert_redirect_uris(&self.redirect_uris, &mut *transaction)
-            .await?;
+            .await
+            .wrap_err("inserting oauth client redirect uris")?;
 
         Ok(())
     }
@@ -167,7 +177,7 @@ impl DBOAuthClient {
     pub async fn update_editable_fields(
         &self,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<()> {
         sqlx::query!(
             "
             UPDATE oauth_clients
@@ -183,7 +193,8 @@ impl DBOAuthClient {
             self.id.0,
         )
         .execute(exec)
-        .await?;
+        .await
+        .wrap_err("updating oauth client")?;
 
         Ok(())
     }
@@ -191,7 +202,7 @@ impl DBOAuthClient {
     pub async fn remove_redirect_uris(
         ids: impl IntoIterator<Item = DBOAuthRedirectUriId>,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<()> {
         let ids = ids.into_iter().map(|id| id.0).collect_vec();
         sqlx::query!(
             "
@@ -202,7 +213,8 @@ impl DBOAuthClient {
             &ids[..]
         )
         .execute(exec)
-        .await?;
+        .await
+        .wrap_err("removing oauth client redirect uris")?;
 
         Ok(())
     }
@@ -210,7 +222,7 @@ impl DBOAuthClient {
     pub async fn insert_redirect_uris(
         uris: &[DBOAuthRedirectUri],
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<()> {
         let (ids, client_ids, uris): (Vec<_>, Vec<_>, Vec<_>) = uris
             .iter()
             .map(|r| (r.id.0, r.client_id.0, r.uri.clone()))
@@ -225,7 +237,8 @@ impl DBOAuthClient {
             &uris[..],
         )
         .execute(exec)
-        .await?;
+        .await
+        .wrap_err("inserting oauth client redirect uris")?;
 
         Ok(())
     }

@@ -535,7 +535,7 @@ pub async fn thread_send_message_internal(
             let project =
                 database::models::DBProject::get_id(project_id, pool, redis)
                     .await
-                    .wrap_api_err("fetching thread project")?;
+                    .wrap_internal_err("fetching thread project")?;
 
             if let Some(project) = project
                 && project.inner.status != ProjectStatus::Processing

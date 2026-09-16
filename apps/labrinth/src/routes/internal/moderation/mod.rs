@@ -1136,7 +1136,7 @@ pub async fn get_project_meta(
     let project =
         database::models::DBProject::get(&project_id, &**pool, &redis)
             .await
-            .wrap_api_err("fetching project from database")?;
+            .wrap_internal_err("fetching project from database")?;
 
     if let Some(project) = project {
         let rows = sqlx::query!(
@@ -1405,7 +1405,7 @@ pub async fn acquire_lock(
     let project =
         database::models::DBProject::get(&project_id_str, &**pool, &redis)
             .await
-            .wrap_api_err("fetching project from database")?
+            .wrap_internal_err("fetching project from database")?
             .wrap_not_found_err("resource not found")?;
 
     let db_project_id = project.inner.id;
@@ -1469,7 +1469,7 @@ pub async fn override_lock(
     let project =
         database::models::DBProject::get(&project_id_str, &**pool, &redis)
             .await
-            .wrap_api_err("fetching project from database")?
+            .wrap_internal_err("fetching project from database")?
             .wrap_not_found_err("resource not found")?;
 
     let db_project_id = project.inner.id;
@@ -1520,7 +1520,7 @@ pub async fn get_lock_status(
     let project =
         database::models::DBProject::get(&project_id_str, &**pool, &redis)
             .await
-            .wrap_api_err("fetching project from database")?
+            .wrap_internal_err("fetching project from database")?
             .wrap_not_found_err("resource not found")?;
 
     let db_project_id = project.inner.id;
@@ -1587,7 +1587,7 @@ pub async fn release_lock(
     let project =
         database::models::DBProject::get(&project_id_str, &**pool, &redis)
             .await
-            .wrap_api_err("fetching project from database")?
+            .wrap_internal_err("fetching project from database")?
             .wrap_not_found_err("resource not found")?;
 
     let db_project_id = project.inner.id;
@@ -1663,7 +1663,7 @@ pub async fn release_lock_beacon(
     let project =
         database::models::DBProject::get(&project_id_str, &**pool, &redis)
             .await
-            .wrap_api_err("fetching project from database")?
+            .wrap_internal_err("fetching project from database")?
             .wrap_not_found_err("resource not found")?;
 
     let db_project_id = project.inner.id;
