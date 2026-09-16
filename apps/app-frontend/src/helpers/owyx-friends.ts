@@ -136,7 +136,7 @@ export async function acceptOwyxFriend(id: string): Promise<OwyxFriend> {
 		signal: AbortSignal.timeout(10000),
 	})
 	const data = (await res.json().catch(() => ({}))) as { friend?: OwyxFriend; error?: string }
-	if (!res.ok || !data.friend) throw new Error(data.error || `Accept failed (${res.status})`)
+	if (!res.ok || !data.friend) throw new Error(friendlyFriendsError(data.error, res.status, 'Accept failed'))
 	return data.friend
 }
 
@@ -148,7 +148,7 @@ export async function declineOwyxFriend(id: string): Promise<void> {
 	})
 	if (!res.ok) {
 		const data = (await res.json().catch(() => ({}))) as { error?: string }
-		throw new Error(data.error || `Decline failed (${res.status})`)
+		throw new Error(friendlyFriendsError(data.error, res.status, 'Decline failed'))
 	}
 }
 
@@ -160,7 +160,7 @@ export async function removeOwyxFriend(id: string): Promise<void> {
 	})
 	if (!res.ok) {
 		const data = (await res.json().catch(() => ({}))) as { error?: string }
-		throw new Error(data.error || `Remove failed (${res.status})`)
+		throw new Error(friendlyFriendsError(data.error, res.status, 'Remove failed'))
 	}
 }
 
@@ -178,7 +178,7 @@ export async function getOwyxSocialSettings(): Promise<OwyxSocialSettings> {
 		settings?: OwyxSocialSettings
 		error?: string
 	}
-	if (!res.ok) throw new Error(data.error || `Settings failed (${res.status})`)
+	if (!res.ok) throw new Error(friendlyFriendsError(data.error, res.status, 'Settings failed'))
 	return {
 		allowFriendRequests: data.settings?.allowFriendRequests !== false,
 	}
@@ -197,11 +197,9 @@ export async function patchOwyxSocialSettings(
 		settings?: OwyxSocialSettings
 		error?: string
 	}
-	if (!res.ok || !data.settings) throw new Error(data.error || `Save settings failed (${res.status})`)
-	return {
-		allowFriendRequests: data.settings.allowFriendRequests !== false,
+	if (!res.ok || !data.settings) {
+		throw new Error(friendlyFriendsError(data.error, res.status, 'Save settings failed'))
 	}
-}
 
 export async function publishLibraryPackToCatalog(opts: {
 	name: string

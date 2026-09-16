@@ -68,6 +68,12 @@
 						selectedAccount ? selectedAccount.profile.name : formatMessage(messages.selectAccount)
 					}}</span>
 					<span class="text-secondary text-xs">{{ accountTypeLabel(selectedAccount) }}</span>
+					<span
+						v-if="owyxSite.isSignedIn.value"
+						class="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-brand"
+					>
+						{{ formatMessage(messages.owyxSessionBadge) }}
+					</span>
 				</div>
 			</div>
 		</template>
@@ -430,6 +436,10 @@ const messages = defineMessages({
 	signInOwyxSite: {
 		id: 'minecraft-account.sign-in-owyx-site',
 		defaultMessage: 'Sign in with Owyx account',
+	},
+	owyxSessionBadge: {
+		id: 'minecraft-account.owyx-session-badge',
+		defaultMessage: 'Owyx site session',
 	},
 	microsoftStubHint: {
 		id: 'minecraft-account.microsoft-stub-hint',

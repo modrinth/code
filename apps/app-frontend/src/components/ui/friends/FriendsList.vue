@@ -36,9 +36,20 @@ import {
 import type { ModrinthCredentials } from '@/helpers/mr_auth'
 import { resolveOwyxAvatarUrl } from '@/helpers/owyx-avatar'
 import { playOwyxUiSound } from '@/helpers/owyx-ui-sound'
+import {
+	fetchOwyxCatalog,
+	getOwyxClientKey,
+	getOwyxDemoFlag,
+	getOwyxLocalApiFallback,
+	getStoredOwyxApiBase,
+	sanitizeOwyxApiBase,
+	type OwyxServerEntry,
+} from '@/helpers/owyx-api'
+import { injectOwyxSiteSession } from '@/providers/owyx-site-session'
 
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
+const owyx = injectOwyxSiteSession()
 
 const props = defineProps<{
 	credentials: ModrinthCredentials | null
@@ -47,6 +58,7 @@ const props = defineProps<{
 }>()
 
 const friends = ref<OwyxFriend[]>([])
+const catalogServers = ref<OwyxServerEntry[]>([])
 const loading = ref(false)
 const listError = ref('')
 const offline = ref(typeof navigator !== 'undefined' ? !navigator.onLine : false)
@@ -97,10 +109,39 @@ async function quietRefresh() {
 	}
 }
 
+async function loadCatalogQuiet() {
+	try {
+		const result = await fetchOwyxCatalog({
+			baseUrl: sanitizeOwyxApiBase(getStoredOwyxApiBase()),
+			clientKey: getOwyxClientKey(),
+			authToken: owyx.session.value?.token,
+			demoFallback: getOwyxDemoFlag(),
+			allowLocalFallback: getOwyxLocalApiFallback(),
+		})
+		catalogServers.value = result.servers
+	} catch {
+		/* optional */
+	}
+}
+
+function matchCatalogServer(friend: OwyxFriend): OwyxServerEntry | null {
+	const name = friend.instanceName?.trim().toLowerCase()
+	if (!name) return null
+	return (
+		catalogServers.value.find(
+			(s) =>
+				s.name.toLowerCase() === name ||
+				s.address.toLowerCase() === name ||
+				s.id.toLowerCase() === name,
+		) || null
+	)
+}
+
 onMounted(() => {
 	window.addEventListener('offline', onOffline)
 	window.addEventListener('online', onOnline)
 	void refresh()
+	void loadCatalogQuiet()
 	pollTimer = setInterval(() => {
 		void quietRefresh()
 	}, 45_000)
@@ -232,6 +273,17 @@ async function copyPlayingInstance(friend: OwyxFriend) {
 	}
 }
 
+async function copyFriendServerAddress(friend: OwyxFriend) {
+	const server = matchCatalogServer(friend)
+	if (!server?.address) return
+	try {
+		await navigator.clipboard.writeText(server.address)
+		playOwyxUiSound('success')
+	} catch (e) {
+		handleError(e)
+	}
+}
+
 defineExpose({ showAddFriendModal })
 
 const messages = defineMessages({
@@ -339,6 +391,10 @@ const messages = defineMessages({
 	copyInstance: {
 		id: 'friends.copy-instance',
 		defaultMessage: 'Copy what they’re playing',
+	},
+	copyServerAddress: {
+		id: 'friends.copy-server-address',
+		defaultMessage: 'Copy matching server address',
 	},
 })
 </script>
@@ -564,6 +620,15 @@ const messages = defineMessages({
 													},
 												]
 											: []),
+										...(friend.presence === 'playing' && matchCatalogServer(friend)
+											? [
+													{
+														id: 'copy-server-address',
+														label: formatMessage(messages.copyServerAddress),
+														action: () => copyFriendServerAddress(friend),
+													},
+												]
+											: []),
 										{
 											id: 'remove-friend',
 											label: formatMessage(messages.removeFriend),
@@ -575,6 +640,12 @@ const messages = defineMessages({
 									<MoreVerticalIcon />
 									<template v-if="friend.presence === 'playing' && friend.instanceName" #copy-instance>
 										{{ formatMessage(messages.copyInstance) }}
+									</template>
+									<template
+										v-if="friend.presence === 'playing' && matchCatalogServer(friend)"
+										#copy-server-address
+									>
+										{{ formatMessage(messages.copyServerAddress) }}
 									</template>
 									<template #remove-friend>
 										<TrashIcon />

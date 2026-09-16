@@ -4663,5 +4663,11 @@
 	},
 	"owyx.admin.open-site-home": {
 		"message": "Открыть owyx.site"
+	},
+	"minecraft-account.owyx-session-badge": {
+		"message": "Сессия сайта Owyx"
+	},
+	"friends.copy-server-address": {
+		"message": "Скопировать адрес сервера"
 	}
 }

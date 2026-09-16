@@ -4768,5 +4768,11 @@
 	},
 	"owyx.admin.open-site-home": {
 		"message": "Open owyx.site"
+	},
+	"minecraft-account.owyx-session-badge": {
+		"message": "Owyx site session"
+	},
+	"friends.copy-server-address": {
+		"message": "Copy matching server address"
 	}
 }
