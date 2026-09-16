@@ -310,6 +310,7 @@ impl Credentials {
             .into());
         }
 
+        let id = offline_player_uuid(username);
         let credentials = Self {
             offline_profile: MinecraftProfile {
                 id,
