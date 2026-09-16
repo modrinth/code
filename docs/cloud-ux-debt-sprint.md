@@ -1,92 +1,89 @@
-# Cloud sprint brief — close UX / practice debts (site + launcher)
+# Cloud sprint brief — playable-release polish (site + launcher)
 
 **Repo:** https://github.com/ebluffy/Owyx  
 **Updated:** 2026-09-17  
 **Audience:** Cursor Cloud Agent (branch + PR only; do not merge `main`)
 
-This is the **tracked** brief. Paste task lives locally in gitignored `promt.md`.
+Tracked brief. Paste prompt: local gitignored `promt.md`.
 
 ---
 
-## Already shipped on `main` (do not redo)
+## Already on `main` (do not redo from scratch)
 
-- Owyx™ branding, `COPYING.md` / `TRADEMARK.md`, no “private Minecraft” in site tab title (`Owyx™` only).
-- Site public EN/RU: home, download shell, auth pages, profile, servers marketing, coming-soon, legal docs, header/footer locale toggle.
-- Launcher OBT line through **0.5.2** (offline active policy, etc.). Window title in source is already `Owyx™` (`apps/app/tauri.conf.json`).
-- Friends / catalog control-plane + `owyxsite/LAUNCHER_SITE_CONTRACT.md` (API ~1.2.0).
-
----
-
-## Goal of this sprint
-
-Close **usage + practice debts** so EN/RU and everyday flows feel finished for friends — not new product pillars (no plugin rewrite, no Microsoft OAuth completion, no Modrinth marketplace redesign).
-
-**Definition of Done**
-
-1. Public site: switching **EN** leaves **no** user-visible Russian outside intentional locale strings (admin may stay RU-primary if timeboxed; prefer EN/RU parity if feasible).
-2. Launcher: account chooser (offline / Owyx / MS stub) and Servers tab empty/error states are clear in **en-US + ru-RU**; support links do not dump users onto Modrinth support by default.
-3. No secrets committed; no touch of `apps/frontend` / `apps/labrinth` for product work.
-4. Branch pushed + `gh pr create` (or `PR_BODY.md` fallback). Brief section **“Agent result”** updated at end of PR.
+- Owyx™ branding, `COPYING.md` / `TRADEMARK.md`, site tab title **Owyx™** only.
+- Site public EN/RU shell (home/auth/profile/servers/legal/header locale).
+- Launcher **0.5.2** OBT; window title `Owyx™` in `apps/app/tauri.conf.json`.
+- Friends API + presence contract in `owyxsite/LAUNCHER_SITE_CONTRACT.md` (~1.2.0).
+- Skin upload API on site (cosmetics migration); launcher Social UI still largely placeholder.
 
 ---
 
-## Priority backlog (do in order)
+## Goal
 
-### P0 — Site i18n holes
+Reach a **playable-release bar** for friends: finish Social/Friends/Account/Share, wire skins into the world (TLSkin-class or thin custom mod), close i18n/UX debts, optional practical product ideas, then **UI/UX polish to shine**. Owner is out of product ideas — agent must invent a useful next backlog in the PR.
 
-| Item | Where | Notes |
-|------|--------|--------|
-| Hardcoded RU on download page | `owyxsite/frontend/app/download/page.tsx` | Skin/account CTA still RU when EN |
-| News cards locale gaps | `components/sections/NewsSection.tsx` | Badge class keys / RU fallbacks |
-| Admin panel RU-only | `app/admin/page.tsx`, `components/admin/CatalogAdmin.tsx` | Wire through `locales/*` like profile; staff UI OK if bilingual |
-| LegalDoc / meta polish | `components/legal/LegalDoc.tsx`, `app/legal/[slug]/page.tsx` | Prefer locale keys over ternary; titles `… — Owyx™` |
-| Grep pass | `owyxsite/frontend` | Cyrillic outside `locales/ru_RU.json` and admin if deferred |
+**Not in scope:** merge to main, GitHub Release, secrets, `apps/frontend`/`labrinth` product work, full MS OAuth, OwyxOld plugin, Modrinth marketplace redesign, **prod site deploy** (owner will ask a local agent later).
 
-### P1 — Launcher everyday UX
+---
 
-| Item | Where | Notes |
-|------|--------|--------|
-| Error / Minecraft-required support URLs | `ErrorModal.vue`, `MinecraftRequiredModal.vue` | Prefer owyx.site / Discord / honest “no Modrinth support”; keep package names `@modrinth/*` |
-| Welcome + account paths | `WelcomeScreen.vue`, auth UI | Three paths obvious: offline nick, Owyx site account, MS (stub honesty) |
-| Servers empty / unreachable | Owyx Servers pages + `owyx.*` locale keys | en-US + ru-RU messages; no dead “Modrinth Hosting” chrome |
-| Settings copy | Privacy / about strings | No “we are Modrinth”; upstream attribution OK in legal tone |
+## Definition of Done
 
-### P2 — Practice / hygiene (small, high value)
+1. Settings → Social is not a wall of “coming soon”; friends + presence usable with site API.
+2. Account paths clear (offline / Owyx / MS stub); Share invites don’t dead-end.
+3. Skin visibility path for Owyx players documented + MVP (reuse TLSkin-compatible open mod **or** thin custom mod + launcher install).
+4. Public site EN has no stray RU; launcher support links don’t default to Modrinth support.
+5. Final UI/UX polish pass (motion, optional open-licensed UI sounds with mute, modern brand-faithful look).
+6. PR includes agent-written **Ideas / next** backlog; Agent result section filled below.
+7. No deploy attempts; PR notes owner deploys after merge.
 
-- Confirm `SkipLink` + focus order on auth/profile; form labels/`aria-*` on login/register.
-- Site: `days with us` / date formatting consistent with locale (profile already uses `formatDate`).
-- Launcher: do **not** cut a GitHub Release unless a real fix warrants PATCH; SemVer via `.cursor/rules/semver.mdc`.
-- After site UI changes: note owner must `ssh owyxsite` → `/opt/owyx` pull + `owyxsite/deploy/vps-up.sh` (cloud agent usually cannot deploy prod).
+---
 
-### Out of scope
+## Priority backlog
 
-- Rebranding `@modrinth/*` package names.
-- Full Microsoft OAuth.
-- Plugin / old `OwyxOld` stack.
-- Redesigning Modrinth content discovery / ads systems.
-- Force-push, secrets, merging own PR to `main`.
+### A — Finish Social / Friends / Account / Share
+
+| Area | Reality today | Target |
+|------|---------------|--------|
+| Friends panel | API helpers exist | Add/accept/decline/remove + empty/error states en+ru |
+| Presence | Heartbeat in contract (~90s) | Show online/playing/offline in UI |
+| Social settings | Placeholders in Settings → Social | Real toggles where API allows; else honest disabled + reason |
+| Account | Three auth paths | Grandma-clear copy; no Modrinth support URLs |
+| Share | Shared instance invites | Accept/decline/install playable |
+
+### B — In-game skins (TLauncher-like)
+
+- Prefer **open TLSkinCapes-compatible** (or similar) mod if license OK; wire skin URL from Owyx profile/API.
+- Or thin **custom mod scaffold** + auto-install into instances from launcher.
+- Document license, MC/loader versions, install path in PR.
+- Do not ship proprietary TLauncher or misuse trademarks.
+
+### C — Site / launcher practice debts
+
+- Hardcoded RU: `download/page.tsx`, `NewsSection.tsx`, admin if timeboxed.
+- Launcher: `ErrorModal` / `MinecraftRequiredModal` support URLs; Servers empty states; de-Modrinth user copy.
+
+### D — Invent practical product (optional 1–3)
+
+Only if useful to **admin** (catalog, ACL, publish, diagnostics) or **all players**. Small MVPs only; list each in PR.
+
+### E — UI/UX polish pass (last)
+
+- Modernize within `brand/DESIGN.md`.
+- Light animations + `prefers-reduced-motion`.
+- Optional UI SFX from **open** sources; cite license/URL; settings mute.
+- Empty states, loading, focus, density — site + launcher.
+
+### F — PR Ideas section (required)
+
+Agent fills: can add / need polish / launcher still needs / site still needs / risks.
 
 ---
 
 ## Sources of truth
 
-1. Root `AGENTS.md`, `brand/DESIGN.md`, `TRADEMARK.md`, `COPYING.md`
-2. `owyxsite/LAUNCHER_SITE_CONTRACT.md`, `owyxsite/frontend/AGENTS.md`
-3. `packages/ui/AGENTS.md` only if touching shared UI (prefer not)
-4. External tooling catalog: `.agents/skills/agent-tool-catalog/` → https://github.com/ebluffy/agent-tool-catalog
+`AGENTS.md`, `brand/DESIGN.md`, `TRADEMARK.md`, `COPYING.md`, `owyxsite/LAUNCHER_SITE_CONTRACT.md`, `.agents/skills/agent-tool-catalog/`, repo `i18n-pass`.
 
-### Suggested external skills (SkillsMP / catalog — read, don’t vendor wholesale)
-
-| Need | Skill |
-|------|--------|
-| Site a11y | [frontend-a11y](https://skillsmp.com/creators/affaan-m/ecc/skills-frontend-a11y) / [accessibility](https://skillsmp.com/creators/affaan-m/ecc/skills-accessibility) |
-| Next/React patterns | [frontend-patterns](https://skillsmp.com/creators/affaan-m/ecc/agents-skills-frontend-patterns), [react-performance](https://skillsmp.com/creators/affaan-m/ecc/skills-react-performance) |
-| Vue launcher UI | [vue-patterns](https://skillsmp.com/creators/affaan-m/ecc/skills-vue-patterns); repo skill `.agents/skills/i18n-pass/` for Vue string migration |
-| Tauri specifics | [tauri-v2](https://skillsmp.com/skills/midudev-autoskills-packages-autoskills-skills-registry-tauri-v2-skill-md) |
-| Process | [writing-plans](https://skillsmp.com/skills/obra-superpowers-skills-writing-plans-skill-md), [requesting-code-review](https://skillsmp.com/skills/obra-superpowers-skills-requesting-code-review-skill-md) |
-| UI anti-slop | hallmark + ui-ux-pro-max from agent-tool-catalog — still obey `brand/DESIGN.md` |
-
-Repo skills win over generic SkillsMP when they conflict.
+SkillsMP picks: frontend-a11y, frontend-patterns, vue-patterns, tauri-v2, writing-plans, requesting-code-review; UI via catalog hallmark / ui-ux-pro-max after brand tokens.
 
 ---
 
@@ -94,6 +91,8 @@ Repo skills win over generic SkillsMP when they conflict.
 
 - Branch:
 - PR URL:
-- Done:
+- Done (A–E):
+- Skin approach:
 - Deferred:
-- Risks / owner follow-up (deploy, release):
+- Ideas summary:
+- Owner follow-up: **deploy site after merge** (local agent); optional launcher release bump suggestion:
