@@ -245,6 +245,9 @@
   "nags.project-description-content.title": {
     "defaultMessage": "Review the description"
   },
+  "nags.project-description-content.title": {
+    "defaultMessage": "Review the description"
+  },
   "nags.project-description-non-english.description": {
     "defaultMessage": "Your project's description must be written in English or include an English translation."
   },

@@ -17,8 +17,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::Context as _;
 use crate::validate::project::{
-    ProjectNag, ProjectNagSeverity,
-    validate_with_context as validate_project,
+    ProjectNag, ProjectNagSeverity, validate_with_context as validate_project,
 };
 
 #[derive(Debug, thiserror::Error)]
@@ -111,17 +110,17 @@ pub(crate) async fn ensure_project_is_valid_for_review(
     .collect::<Vec<_>>();
     let project = Project::from(reloaded_project.clone());
 
-	let nags = web::block(move || {
-		validate_project(
-			&project,
-			&versions,
-			&available_categories,
-			&disclosures,
-		)
-	})
-	.await
-	.wrap_internal_err("validating project for review")?;
-	require_valid_project(nags)?;
+    let nags = web::block(move || {
+        validate_project(
+            &project,
+            &versions,
+            &available_categories,
+            &disclosures,
+        )
+    })
+    .await
+    .wrap_internal_err("validating project for review")?;
+    require_valid_project(nags)?;
 
     Ok(reloaded_project)
 }

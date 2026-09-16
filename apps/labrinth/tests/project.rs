@@ -651,7 +651,7 @@ async fn test_leaving_review_allows_invalid_changed_fields() {
                     .get_project_deserialized(project_slug, USER_USER_PAT)
                     .await;
                 assert_eq!(project.status, expected_status);
-                assert_eq!(project.description, "");
+                assert!(project.description.is_empty());
             }
         },
     )
@@ -689,6 +689,7 @@ async fn test_description_similarity_to_summary() {
 					)
 					.await;
 				assert_status!(&response, StatusCode::NO_CONTENT);
+
 				let request = test::TestRequest::get()
 					.uri(&format!("/v3/project/{project_slug}/validate"))
 					.append_pat(USER_USER_PAT)
