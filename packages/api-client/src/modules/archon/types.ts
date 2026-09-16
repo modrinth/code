@@ -307,6 +307,12 @@ export namespace Archon {
 				local_updated_at: string
 				has_changes: boolean
 				diffs: SharedContentDiffEntry[]
+				projects: Record<string, { name: string; icon_url: string | null }>
+				versions: Record<string, {
+					project_id: string
+					name: string
+					version_number: string | null
+				}>
 			}
 
 			export type AddonKind = 'mod' | 'plugin' | 'datapack' | 'shader' | 'resourcepack'
@@ -1185,6 +1191,12 @@ export namespace Archon {
 				needs_update: boolean
 			}
 
+			export type WorldSharedInstanceDeleteEvent = {
+				type: 'world.shared_instance.delete'
+				world_id: string
+				shared_instance_id: string
+			}
+
 			export type SyncEvent =
 				| ProtocolResetEvent
 				| ProtocolInvalidEvent
@@ -1205,6 +1217,7 @@ export namespace Archon {
 				| WorldContentBaseUpdateEvent
 				| WorldContentUpdateEvent
 				| WorldSharedInstanceUpdateEvent
+				| WorldSharedInstanceDeleteEvent
 		}
 	}
 

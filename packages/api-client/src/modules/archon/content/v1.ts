@@ -18,6 +18,15 @@ export class ArchonContentV1Module extends AbstractModule {
 		})
 	}
 
+	public async unshare(serverId: string, worldId: string): Promise<void> {
+		return this.client.request(`/servers/${encodeURIComponent(serverId)}/worlds/${encodeURIComponent(worldId)}/content/share`, {
+			api: 'archon',
+			version: 1,
+			method: 'DELETE',
+			retry: false,
+		})
+	}
+
 	/** GET /v1/:server_id/worlds/:world_id/addons */
 	public async getAddons(
 		serverId: string,
