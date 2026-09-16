@@ -17,7 +17,7 @@
 <script setup lang="ts">
 import { type DockviewTheme, DockviewVue } from 'dockview-vue'
 
-import { injectProjectReviewContext } from '../../context'
+import { injectProjectReviewContext } from '../context'
 import ProjectReviewLeftControl from '../controls/left-control.vue'
 import ProjectReviewRightControl from '../controls/right-control.vue'
 import ProjectReviewPanel from '../panel.vue'
