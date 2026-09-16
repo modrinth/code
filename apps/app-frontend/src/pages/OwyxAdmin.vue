@@ -115,6 +115,7 @@ const messages = defineMessages({
 	createServer: { id: 'owyx.servers.create-server', defaultMessage: 'Publish server' },
 	creating: { id: 'owyx.servers.creating', defaultMessage: 'Publishing…' },
 	openSiteAdmin: { id: 'owyx.admin.open-site', defaultMessage: 'Open full site admin' },
+	openSiteHome: { id: 'owyx.admin.open-site-home', defaultMessage: 'Open owyx.site' },
 	openServersCatalog: {
 		id: 'owyx.admin.open-servers',
 		defaultMessage: 'Player servers catalog',
@@ -463,8 +464,8 @@ function openSiteAdmin() {
 	window.open('https://owyx.site/admin', '_blank', 'noopener,noreferrer')
 }
 
-function openSiteCatalog() {
-	window.open('https://owyx.site/admin', '_blank', 'noopener,noreferrer')
+function openSiteHome() {
+	window.open('https://owyx.site', '_blank', 'noopener,noreferrer')
 }
 
 function copyClientKeyHint() {
@@ -933,8 +934,8 @@ onMounted(() => {
 					<Button class="!bg-button-bg" :disabled="apiHealthBusy" @click="checkApiHealth">
 						{{ formatMessage(messages.apiHealth) }}
 					</Button>
-					<Button class="!bg-button-bg" @click="openSiteCatalog">
-						{{ formatMessage(messages.openSiteAdmin) }}
+					<Button class="!bg-button-bg" @click="openSiteHome">
+						{{ formatMessage(messages.openSiteHome) }}
 					</Button>
 					<Button class="!bg-button-bg" @click="copyClientKeyHint">
 						{{ formatMessage(messages.copyKeyHeader) }}

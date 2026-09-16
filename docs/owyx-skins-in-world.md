@@ -27,6 +27,8 @@ No `X-Owyx-Client-Key` required when called from the website host; `/api/csl/*` 
 
 Prefer configuring CSL with **`https://owyx.site/api/csl/`** so Minecraft clients never need the launcher client key.
 
+Public CSL only serves / redirects textures whose stored `skin_url` / `cape_url` is a relative `/uploads/…` path or an absolute URL on an allowlisted host (`owyx.site`, `api.owyx.site`, plus `SITE_PUBLIC_URL` / `API_PUBLIC_URL` hosts). Third-party URLs return **404** (no open redirect).
+
 ## Launcher wiring
 
 1. On Owyx site login, cosmetics are synced to `~/owyx/skins/{nickname}.png` (`owyx-cosmetics.ts`).

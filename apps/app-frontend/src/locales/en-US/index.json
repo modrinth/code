@@ -4737,7 +4737,7 @@
 		"message": "Sign in with Owyx account"
 	},
 	"minecraft-account.microsoft-stub-hint": {
-		"message": "Microsoft sign-in is for a licensed Minecraft profile. Full OAuth polish is still in progress — use Owyx or offline nick to play on offline-mode servers."
+		"message": "Microsoft is for a licensed Minecraft profile. Signing into Owyx does not replace an active Microsoft account. Use “Play with offline nickname” if you want the offline profile selected."
 	},
 	"app.welcome-screen.account-paths": {
 		"message": "New here? Use the account card on the left: Owyx site login, offline nickname, or Microsoft."
@@ -4755,7 +4755,7 @@
 		"message": "Owyx in-world skins"
 	},
 	"owyx.instance.csl.body": {
-		"message": "Writes CustomSkinLoader config pointing at Owyx skin URLs. Install the CustomSkinLoader mod in this instance (Fabric/Forge/NeoForge)."
+		"message": "Writes CustomSkinLoader config pointing at https://owyx.site/api/csl/ (public, no client key). Localhost API builds use your configured API base instead. Install the CustomSkinLoader mod in this instance (Fabric/Forge/NeoForge)."
 	},
 	"owyx.instance.csl.enable": {
 		"message": "Write Owyx skin config"
@@ -4765,5 +4765,8 @@
 	},
 	"owyx.instance.csl.mod-link": {
 		"message": "Open CustomSkinLoader"
+	},
+	"owyx.admin.open-site-home": {
+		"message": "Open owyx.site"
 	}
 }

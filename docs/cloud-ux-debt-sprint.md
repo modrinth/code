@@ -21,7 +21,7 @@ Tracked brief. Paste prompt: local gitignored `promt.md`.
 
 ## Goal
 
-Reach a **playable public Beta bar**: finish Social/Friends/Account/Share, wire skins into the world (TLSkin-class or thin custom mod), close i18n/UX debts, optional practical product ideas, then **UI/UX polish to shine**. Repo is **public** — anyone can download/use; do **not** market or copywrite as “owner’s friends only / private circle.” Friends = social feature, not exclusivity. Owner is out of product ideas — agent invents a useful next backlog in the PR.
+Reach a **playable public Beta bar**: finish Social/Friends/Account/Share, wire skins into the world (TLSkin-class or thin custom mod), close i18n/UX debts, optional practical product ideas, then **UI/UX polish to shine**. Repo is **public** — anyone can download/use; do **not** market or write copy as “owner’s friends only / private circle.” Friends = social feature, not exclusivity. Owner is out of product ideas — agent invents a useful next backlog in the PR.
 
 **Not in scope:** merge to main, GitHub Release, secrets, `apps/frontend`/`labrinth` product work, full MS OAuth, OwyxOld plugin, Modrinth marketplace redesign, **prod site deploy** (owner will ask a local agent later).
 

@@ -9,38 +9,15 @@
  */
 
 const express = require('express');
-const path = require('path');
-const fs = require('fs');
 const db = require('../database/connection');
+const {
+  absoluteWebsiteAsset,
+  resolveLocalUpload,
+  allowedAssetHosts,
+} = require('./csl-helpers');
 
 const router = express.Router();
 const NICK_RE = /^[A-Za-z0-9_]{3,16}$/;
-
-function websiteBase() {
-  const fromEnv = (process.env.SITE_PUBLIC_URL || process.env.PUBLIC_SITE_URL || '').trim();
-  if (fromEnv) return fromEnv.replace(/\/+$/, '');
-  return 'https://owyx.site';
-}
-
-function absoluteWebsiteAsset(value) {
-  if (!value) return null;
-  if (/^https?:\/\//i.test(value)) {
-    try {
-      const u = new URL(value);
-      if (u.hostname === 'api.owyx.site' && u.pathname.startsWith('/uploads/')) {
-        return `${websiteBase()}${u.pathname}${u.search}`;
-      }
-    } catch {
-      /* keep */
-    }
-    return value;
-  }
-  return `${websiteBase()}${value.startsWith('/') ? '' : '/'}${value}`;
-}
-
-function uploadsRoot() {
-  return path.join(__dirname, '../../uploads');
-}
 
 async function findUserByNick(nickname) {
   const result = await db.query(
@@ -51,21 +28,6 @@ async function findUserByNick(nickname) {
     [nickname]
   );
   return result.rows[0] || null;
-}
-
-function resolveLocalUpload(skinUrl) {
-  if (!skinUrl || !skinUrl.includes('/uploads/')) return null;
-  try {
-    const pathname = /^https?:\/\//i.test(skinUrl) ? new URL(skinUrl).pathname : skinUrl;
-    const rel = pathname.replace(/^\/+/, '');
-    if (!rel.startsWith('uploads/skins/')) return null;
-    const full = path.join(__dirname, '../..', rel);
-    if (!full.startsWith(uploadsRoot())) return null;
-    if (!fs.existsSync(full)) return null;
-    return full;
-  } catch {
-    return null;
-  }
 }
 
 // GET /api/csl/skins/:nickname.png — Legacy skin texture
@@ -109,6 +71,9 @@ router.get('/:nickname.json', async (req, res) => {
       return res.status(404).json({ error: 'profile not found' });
     }
     const skinAbs = absoluteWebsiteAsset(user.skin_url);
+    if (!skinAbs) {
+      return res.status(404).json({ error: 'profile not found' });
+    }
     const capeAbs = absoluteWebsiteAsset(user.cape_url);
     const model = user.skin_model === 'slim' ? 'slim' : 'default';
     const skins = {};
@@ -128,3 +93,6 @@ router.get('/:nickname.json', async (req, res) => {
 });
 
 module.exports = router;
+module.exports.absoluteWebsiteAsset = absoluteWebsiteAsset;
+module.exports.resolveLocalUpload = resolveLocalUpload;
+module.exports.allowedAssetHosts = allowedAssetHosts;

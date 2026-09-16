@@ -360,22 +360,43 @@ async function loginOffline() {
 	const name = offlineNickname.value.trim()
 	if (!name) return
 	loginDisabled.value = true
-	const loggedIn = await login_offline_flow(name).catch(handleSevereError)
-	if (loggedIn) {
-		await setAccount(loggedIn)
-		offlineNickname.value = ''
-		showOfflineForm.value = false
+	try {
+		const loggedIn = await login_offline_flow(name, true).catch(handleSevereError)
+		if (loggedIn) {
+			await setAccount(loggedIn)
+			offlineNickname.value = ''
+			showOfflineForm.value = false
+		}
+		trackEvent('AccountLogInOffline')
+	} finally {
+		loginDisabled.value = false
 	}
-	trackEvent('AccountLogInOffline')
-	loginDisabled.value = false
 }
 
+/**
+ * Sign in to Owyx site session (friends/skins). Sync nickname onto disk without
+ * stealing an existing active Microsoft account when other profiles already exist.
+ */
 async function signInOwyxSite() {
-	await owyxSite.signIn()
-	const nick = owyxSite.session.value?.user?.nickname
-	if (nick) {
-		offlineNickname.value = nick
-		await loginOffline()
+	if (loginDisabled.value) return
+	loginDisabled.value = true
+	try {
+		await owyxSite.signIn()
+		const nick = owyxSite.session.value?.user?.nickname
+		if (!nick) return
+		const makeActive = accounts.value.length === 0
+		const loggedIn = await login_offline_flow(nick, makeActive).catch(handleSevereError)
+		if (loggedIn && makeActive) {
+			await setAccount(loggedIn)
+		} else {
+			await refreshValues()
+			emit('change')
+		}
+		trackEvent('AccountLogInOwyxSite')
+	} catch (e) {
+		handleError(e)
+	} finally {
+		loginDisabled.value = false
 	}
 }
 
@@ -413,7 +434,7 @@ const messages = defineMessages({
 	microsoftStubHint: {
 		id: 'minecraft-account.microsoft-stub-hint',
 		defaultMessage:
-			'Microsoft sign-in is for a licensed Minecraft profile. Full OAuth polish is still in progress — use Owyx or offline nick to play on offline-mode servers.',
+			'Microsoft is for a licensed Minecraft profile. Signing into Owyx does not replace an active Microsoft account. Use “Play with offline nickname” if you want the offline profile selected.',
 	},
 	addAccount: {
 		id: 'minecraft-account.add-account',

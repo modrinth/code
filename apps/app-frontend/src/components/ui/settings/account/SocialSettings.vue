@@ -180,7 +180,7 @@ const messages = defineMessages({
 	skinsBody: {
 		id: 'owyx.settings.social.skins-body',
 		defaultMessage:
-			'Upload a skin on owyx.site. Install CustomSkinLoader in your instance (Owyx writes the config when you enable skins from instance options or Admin). Others with the same mod see your Owyx skin.',
+			'Upload a skin on owyx.site. Install CustomSkinLoader in your instance — Owyx writes config for https://owyx.site/api/csl/ on launch (and from instance options). Others with the same mod see your Owyx skin.',
 	},
 	skinsModLink: {
 		id: 'owyx.settings.social.skins-mod-link',

@@ -52,6 +52,7 @@ image = { workspace = true, features = ["gif", "jpeg", "png", "webp"] }
 indicatif = { workspace = true, optional = true }
 itertools = { workspace = true }
 json5 = { workspace = true }
+md5 = { workspace = true }
 modrinth-content-management = { workspace = true }
 notify = { workspace = true }
 notify-debouncer-mini = { workspace = true }
@@ -125,7 +126,6 @@ ts-rs = { workspace = true, features = [
 url = { workspace = true, features = ["serde"] }
 urlencoding = { workspace = true }
 uuid = { workspace = true, features = ["serde", "v4"] }
-md5 = { workspace = true }
 whoami = { workspace = true }
 zbus = { workspace = true }
 zip = { workspace = true }

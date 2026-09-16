@@ -522,7 +522,7 @@ const cslMessages = defineMessages({
 	skinsBody: {
 		id: 'owyx.instance.csl.body',
 		defaultMessage:
-			'Writes CustomSkinLoader config pointing at api.owyx.site / owyx.site skin URLs. Install the CustomSkinLoader mod in this instance (Fabric/Forge/NeoForge).',
+			'Writes CustomSkinLoader config pointing at https://owyx.site/api/csl/ (public, no client key). Localhost API builds use your configured API base instead. Install the CustomSkinLoader mod in this instance (Fabric/Forge/NeoForge).',
 	},
 	skinsEnable: {
 		id: 'owyx.instance.csl.enable',

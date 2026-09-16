@@ -52,6 +52,27 @@ function authHeaders(): Record<string, string> {
 	return headers
 }
 
+/** Map common API errors to short English (Vue i18n layers can translate later). */
+function friendlyFriendsError(raw: string | undefined, status: number, fallback: string): string {
+	const msg = (raw || '').toLowerCase()
+	if (status === 401 || msg.includes('unauthorized') || msg.includes('no_session')) {
+		return 'Sign in to your Owyx account again, then retry.'
+	}
+	if (status === 403 && msg.includes('not accepting')) {
+		return 'This player is not accepting friend requests.'
+	}
+	if (status === 404 && msg.includes('not found')) {
+		return 'User not found. Check the nickname and try again.'
+	}
+	if (status === 409 && msg.includes('already')) {
+		return 'You are already friends or a request is pending.'
+	}
+	if (!getOwyxClientKey()) {
+		return 'Missing client key. Set X-Owyx-Client-Key in Admin → API.'
+	}
+	return raw || `${fallback} (${status})`
+}
+
 export async function listOwyxFriends(): Promise<OwyxFriend[]> {
 	const res = await owyxFetch(`${apiBase()}/api/friends`, {
 		method: 'GET',
@@ -59,7 +80,7 @@ export async function listOwyxFriends(): Promise<OwyxFriend[]> {
 		signal: AbortSignal.timeout(12000),
 	})
 	const data = (await res.json().catch(() => ({}))) as { friends?: OwyxFriend[]; error?: string }
-	if (!res.ok) throw new Error(data.error || `Friends list failed (${res.status})`)
+	if (!res.ok) throw new Error(friendlyFriendsError(data.error, res.status, 'Friends list failed'))
 	return Array.isArray(data.friends) ? data.friends : []
 }
 
@@ -92,7 +113,7 @@ export async function searchOwyxUsers(q: string): Promise<{ id: string; nickname
 		users?: { id: string; nickname: string; avatarUrl?: string | null }[]
 		error?: string
 	}
-	if (!res.ok) throw new Error(data.error || `Search failed (${res.status})`)
+	if (!res.ok) throw new Error(friendlyFriendsError(data.error, res.status, 'Search failed'))
 	return Array.isArray(data.users) ? data.users : []
 }
 
@@ -104,7 +125,7 @@ export async function requestOwyxFriend(nickname: string): Promise<OwyxFriend> {
 		signal: AbortSignal.timeout(12000),
 	})
 	const data = (await res.json().catch(() => ({}))) as { friend?: OwyxFriend; error?: string }
-	if (!res.ok || !data.friend) throw new Error(data.error || `Request failed (${res.status})`)
+	if (!res.ok || !data.friend) throw new Error(friendlyFriendsError(data.error, res.status, 'Request failed'))
 	return data.friend
 }
 

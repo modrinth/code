@@ -4632,7 +4632,7 @@
 		"message": "Войти аккаунтом Owyx"
 	},
 	"minecraft-account.microsoft-stub-hint": {
-		"message": "Вход Microsoft — для лицензионного профиля. Полный OAuth ещё дорабатывается — для offline-mode серверов используйте Owyx или офлайн-ник."
+		"message": "Microsoft — для лицензионного профиля. Вход в Owyx не сменяет активный Microsoft. Выберите «Играть с офлайн-ником», если нужен офлайн-профиль."
 	},
 	"app.welcome-screen.account-paths": {
 		"message": "Новичок? Карточка аккаунта слева: вход Owyx, офлайн-ник или Microsoft."
@@ -4650,7 +4650,7 @@
 		"message": "Скины Owyx в мире"
 	},
 	"owyx.instance.csl.body": {
-		"message": "Пишет конфиг CustomSkinLoader на URL скинов Owyx. Установите мод CustomSkinLoader в этот инстанс (Fabric/Forge/NeoForge)."
+		"message": "Пишет конфиг CustomSkinLoader на https://owyx.site/api/csl/ (публично, без client key). Для localhost используется ваш API base. Установите мод CustomSkinLoader в этот инстанс (Fabric/Forge/NeoForge)."
 	},
 	"owyx.instance.csl.enable": {
 		"message": "Записать конфиг скинов Owyx"
@@ -4660,5 +4660,8 @@
 	},
 	"owyx.instance.csl.mod-link": {
 		"message": "Открыть CustomSkinLoader"
+	},
+	"owyx.admin.open-site-home": {
+		"message": "Открыть owyx.site"
 	}
 }
