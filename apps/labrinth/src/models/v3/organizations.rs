@@ -19,6 +19,8 @@ pub struct Organization {
 
     /// The icon url of the organization
     pub icon_url: Option<String>,
+    /// The raw icon url of the organization
+    pub raw_icon_url: Option<String>,
     /// The color of the organization (picked from the icon)
     pub color: Option<u32>,
 
@@ -41,6 +43,7 @@ impl Organization {
             description: data.description,
             members: team_members,
             icon_url: data.icon_url,
+            raw_icon_url: data.raw_icon_url,
             color: data.color,
             moderation_notes: None,
         }
