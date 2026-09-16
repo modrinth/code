@@ -17,9 +17,52 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::Context as _;
 use crate::validate::project::{
-    ProjectNag, has_required_nags_with_context,
-    validate_with_context as validate_project,
+    ProjectNag, ProjectNagSeverity, validate_with_context as validate_project,
 };
+
+#[derive(Debug, thiserror::Error)]
+#[error("resolve required project validation messages before saving")]
+pub(crate) struct ProjectValidationError(pub Vec<ProjectNag>);
+
+pub(crate) fn require_valid_project(
+    nags: Vec<ProjectNag>,
+) -> Result<(), ApiError> {
+    if nags
+        .iter()
+        .any(|nag| nag.severity == ProjectNagSeverity::Required)
+    {
+        return Err(ApiError::Request(eyre!(ProjectValidationError(nags))));
+    }
+    Ok(())
+}
+
+pub(crate) fn apply_link_changes(
+    project: &mut Project,
+    links: &std::collections::HashMap<String, Option<String>>,
+) {
+    for (field, url) in links {
+        if let Some(url) = url {
+            project.link_urls.insert(
+                field.clone(),
+                crate::models::projects::Link {
+                    platform: field.clone(),
+                    url: url.clone(),
+                    donation: !matches!(
+                        field.as_str(),
+                        "source"
+                            | "issues"
+                            | "wiki"
+                            | "discord"
+                            | "site"
+                            | "store"
+                    ),
+                },
+            );
+        } else {
+            project.link_urls.remove(field);
+        }
+    }
+}
 
 #[derive(Serialize, utoipa::ToSchema)]
 pub struct ProjectValidationResponse {
@@ -67,8 +110,8 @@ pub(crate) async fn ensure_project_is_valid_for_review(
     .collect::<Vec<_>>();
     let project = Project::from(reloaded_project.clone());
 
-    let has_required_nags = web::block(move || {
-        has_required_nags_with_context(
+    let nags = web::block(move || {
+        validate_project(
             &project,
             &versions,
             &available_categories,
@@ -77,11 +120,7 @@ pub(crate) async fn ensure_project_is_valid_for_review(
     })
     .await
     .wrap_internal_err("validating project for review")?;
-    if has_required_nags {
-        return Err(ApiError::Request(eyre!(
-            "project must have no required validation nags before or while under review"
-        )));
-    }
+    require_valid_project(nags)?;
 
     Ok(reloaded_project)
 }
