@@ -3035,20 +3035,68 @@
   "moderation.page.technicalReview": {
     "message": "Tech review"
   },
+  "moderation.project-review.approvedCount": {
+    "message": "{count} approved"
+  },
+  "moderation.project-review.archivedCount": {
+    "message": "{count} archived"
+  },
+  "moderation.project-review.back": {
+    "message": "Back"
+  },
   "moderation.project-review.bottom": {
     "message": "Review summary"
+  },
+  "moderation.project-review.compatibility": {
+    "message": "Compatibility"
+  },
+  "moderation.project-review.complete": {
+    "message": "Complete"
+  },
+  "moderation.project-review.created": {
+    "message": "Created"
+  },
+  "moderation.project-review.customLicense": {
+    "message": "Custom"
+  },
+  "moderation.project-review.customSlug": {
+    "message": "Differs from the project name"
   },
   "moderation.project-review.description": {
     "message": "Description"
   },
+  "moderation.project-review.details": {
+    "message": "Details"
+  },
   "moderation.project-review.disclosures": {
     "message": "Disclosures"
+  },
+  "moderation.project-review.discord": {
+    "message": "Discord invite"
+  },
+  "moderation.project-review.downloads": {
+    "message": "Downloads"
+  },
+  "moderation.project-review.draftCount": {
+    "message": "{count} draft"
   },
   "moderation.project-review.empty": {
     "message": "No project selected."
   },
+  "moderation.project-review.environments": {
+    "message": "Environments"
+  },
+  "moderation.project-review.exit": {
+    "message": "Exit"
+  },
+  "moderation.project-review.finish": {
+    "message": "Finish"
+  },
   "moderation.project-review.gallery": {
     "message": "Gallery"
+  },
+  "moderation.project-review.gameVersions": {
+    "message": "Game versions"
   },
   "moderation.project-review.hideLeft": {
     "message": "Hide project details"
@@ -3059,14 +3107,71 @@
   "moderation.project-review.history": {
     "message": "History"
   },
+  "moderation.project-review.issues": {
+    "message": "Issue tracker"
+  },
   "moderation.project-review.left": {
     "message": "Project details"
+  },
+  "moderation.project-review.license": {
+    "message": "License"
+  },
+  "moderation.project-review.links": {
+    "message": "Project links"
+  },
+  "moderation.project-review.loadError": {
+    "message": "Could not load project data."
   },
   "moderation.project-review.loading": {
     "message": "Loading review workspace…"
   },
+  "moderation.project-review.matchesName": {
+    "message": "Matches the project name"
+  },
+  "moderation.project-review.members": {
+    "message": "Members"
+  },
+  "moderation.project-review.next": {
+    "message": "Next"
+  },
+  "moderation.project-review.owner": {
+    "message": "Owner"
+  },
+  "moderation.project-review.platforms": {
+    "message": "Platforms"
+  },
+  "moderation.project-review.privateCount": {
+    "message": "{count} private"
+  },
+  "moderation.project-review.processingCount": {
+    "message": "{count} under review"
+  },
+  "moderation.project-review.projectType": {
+    "message": "Project type"
+  },
+  "moderation.project-review.queueError": {
+    "message": "Could not change projects. Please try again."
+  },
+  "moderation.project-review.queueNavigation": {
+    "message": "Review queue navigation"
+  },
+  "moderation.project-review.rejectedCount": {
+    "message": "{count} rejected"
+  },
+  "moderation.project-review.requesting": {
+    "message": "Requesting"
+  },
+  "moderation.project-review.reset": {
+    "message": "Reset"
+  },
+  "moderation.project-review.retry": {
+    "message": "Retry"
+  },
   "moderation.project-review.right": {
     "message": "Review issues"
+  },
+  "moderation.project-review.scheduledCount": {
+    "message": "{count} scheduled"
   },
   "moderation.project-review.showLeft": {
     "message": "Show project details"
@@ -3074,14 +3179,50 @@
   "moderation.project-review.showRight": {
     "message": "Show review issues"
   },
+  "moderation.project-review.skip": {
+    "message": "Skip"
+  },
+  "moderation.project-review.source": {
+    "message": "Source code"
+  },
+  "moderation.project-review.submissions": {
+    "message": "{count, plural, one {# submission} other {# submissions}}"
+  },
+  "moderation.project-review.submitted": {
+    "message": "Submitted"
+  },
+  "moderation.project-review.tags": {
+    "message": "Categories"
+  },
   "moderation.project-review.tech-review": {
     "message": "Tech Review"
   },
   "moderation.project-review.title": {
     "message": "Project review"
   },
+  "moderation.project-review.total": {
+    "message": "Total"
+  },
+  "moderation.project-review.unavailable": {
+    "message": "Unavailable"
+  },
+  "moderation.project-review.unknownCount": {
+    "message": "{count} unknown"
+  },
+  "moderation.project-review.unlistedCount": {
+    "message": "{count} unlisted"
+  },
+  "moderation.project-review.updated": {
+    "message": "Updated"
+  },
   "moderation.project-review.versions": {
     "message": "Versions"
+  },
+  "moderation.project-review.wiki": {
+    "message": "Wiki"
+  },
+  "moderation.project-review.withheldCount": {
+    "message": "{count} withheld"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} per batch"

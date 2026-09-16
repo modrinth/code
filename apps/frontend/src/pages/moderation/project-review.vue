@@ -7,8 +7,13 @@ import { useVIntl } from '@modrinth/ui'
 
 import ProjectReview from '~/components/project-review/index.vue'
 import { projectReviewMessages } from '~/components/project-review/messages'
+import {
+	createProjectReviewPageContext,
+	provideProjectReviewPageContext,
+} from '~/providers/project-review'
 
 const { formatMessage } = useVIntl()
+provideProjectReviewPageContext(createProjectReviewPageContext())
 
 definePageMeta({
 	layout: 'empty',

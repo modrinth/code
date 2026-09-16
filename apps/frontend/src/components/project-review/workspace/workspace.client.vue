@@ -19,11 +19,11 @@ import 'dockview-vue/dist/styles/dockview.css'
 
 import { useVIntl } from '@modrinth/ui'
 
-import { projectReviewMessages as messages } from '../messages'
-import ProjectReviewColumns from './columns.vue'
 import { provideProjectReviewContext } from '../context'
+import { projectReviewMessages as messages } from '../messages'
 import type { ProjectReviewSlots } from '../types'
 import { useProjectReviewLayout } from '../use-layout'
+import ProjectReviewColumns from './columns.vue'
 
 const slots = defineSlots<ProjectReviewSlots>()
 const { formatMessage } = useVIntl()
