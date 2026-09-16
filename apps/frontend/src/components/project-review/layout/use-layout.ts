@@ -7,19 +7,19 @@ import type {
 	SplitviewApi,
 	SplitviewReadyEvent,
 } from 'dockview-vue'
-import { LayoutPriority } from 'dockview-vue'
+import { getGridLocation, LayoutPriority } from 'dockview-vue'
 import { onBeforeUnmount, ref, watchEffect } from 'vue'
 
-import { readWorkspaceLayout, saveWorkspaceLayout } from './layout-storage'
+import { readWorkspaceLayout, saveWorkspaceLayout, workspacePanelSizes } from './layout-storage'
 import { type ProjectReviewTab, projectReviewTabs } from './types'
 
 export function useProjectReviewLayout(getTitle: (tab: ProjectReviewTab) => string) {
 	const savedLayout = readWorkspaceLayout()
 	const leftVisible = ref(savedLayout?.leftVisible ?? true)
 	const rightVisible = ref(savedLayout?.rightVisible ?? true)
-	let leftWidth = savedLayout?.leftWidth ?? 260
-	let rightWidth = savedLayout?.rightWidth ?? 300
-	let bottomHeight = savedLayout?.bottomHeight ?? 180
+	let leftWidth = savedLayout?.leftWidth ?? workspacePanelSizes.left.default
+	let rightWidth = savedLayout?.rightWidth ?? workspacePanelSizes.right.default
+	let bottomHeight = savedLayout?.bottomHeight ?? workspacePanelSizes.bottom.default
 	const topLeftGroupId = ref<string>()
 	const topRightGroupId = ref<string>()
 	let columns: SplitviewApi | undefined
@@ -59,20 +59,20 @@ export function useProjectReviewLayout(getTitle: (tab: ProjectReviewTab) => stri
 			id: 'left',
 			component: 'ProjectReviewPanel',
 			params: { slot: 'left' },
-			minimumSize: 180,
+			minimumSize: workspacePanelSizes.left.minimum,
 			size: leftWidth,
 		})
 		api.addPanel({
 			id: 'center',
 			component: 'ProjectReviewCenter',
-			minimumSize: 320,
+			minimumSize: workspacePanelSizes.center.minimum,
 			priority: LayoutPriority.High,
 		})
 		api.addPanel({
 			id: 'right',
 			component: 'ProjectReviewPanel',
 			params: { slot: 'right' },
-			minimumSize: 200,
+			minimumSize: workspacePanelSizes.right.minimum,
 			size: rightWidth,
 		})
 		api.getPanel('left')?.api.setSize({ size: leftWidth })
@@ -87,14 +87,14 @@ export function useProjectReviewLayout(getTitle: (tab: ProjectReviewTab) => stri
 		api.addPanel({
 			id: 'tabs',
 			component: 'ProjectReviewTabs',
-			minimumSize: 180,
+			minimumSize: workspacePanelSizes.tabs.minimum,
 			priority: LayoutPriority.High,
 		})
 		api.addPanel({
 			id: 'bottom',
 			component: 'ProjectReviewPanel',
 			params: { slot: 'bottom' },
-			minimumSize: 100,
+			minimumSize: workspacePanelSizes.bottom.minimum,
 			size: bottomHeight,
 		})
 		subscriptions.push(api.onDidLayoutChange(scheduleSave))
@@ -177,6 +177,67 @@ export function useProjectReviewLayout(getTitle: (tab: ProjectReviewTab) => stri
 		scheduleSave()
 	}
 
+	function onDividerDoubleClick(event: MouseEvent) {
+		if (!(event.target instanceof HTMLElement)) return
+		const sash = event.target.closest('.dv-sash:not(.dv-disabled)')
+		const container = sash?.parentElement
+		const split = container?.parentElement
+		if (!sash || !container || !split) return
+		const index = Array.from(container.children).indexOf(sash)
+		const columnSplit = split
+			.closest('.project-review-columns')
+			?.querySelector('.dv-split-view-container')
+		const rowSplit = split
+			.closest('.project-review-rows')
+			?.querySelector('.dv-split-view-container')
+		if (split === columnSplit && columns) {
+			const side = index === 0 ? 'left' : 'right'
+			const panel = columns.getPanel(side)
+			if (!panel?.api.isVisible) return
+			const otherSide = columns.getPanel(side === 'left' ? 'right' : 'left')
+			const otherWidth = otherSide?.api.isVisible ? otherSide.api.width : 0
+			panel.api.setSize({
+				size: Math.max(
+					workspacePanelSizes[side].minimum,
+					Math.min(
+						workspacePanelSizes[side].default,
+						columns.width - otherWidth - workspacePanelSizes.center.minimum,
+					),
+				),
+			})
+		} else if (split === rowSplit && rows) {
+			rows.getPanel('bottom')?.api.setSize({
+				size: Math.max(
+					workspacePanelSizes.bottom.minimum,
+					Math.min(workspacePanelSizes.bottom.default, rows.height - workspacePanelSizes.tabs.minimum),
+				),
+			})
+		} else if (tabs && split.closest('.project-review-tabs')) {
+			const branch = split.parentElement
+			if (!branch?.classList.contains('dv-branch-node')) return
+			const layout = tabs.toJSON()
+			let node = layout.grid.root
+			for (const childIndex of getGridLocation(branch)) {
+				if (!Array.isArray(node.data) || !node.data[childIndex]) return
+				node = node.data[childIndex]
+			}
+			if (!Array.isArray(node.data)) return
+			const before = node.data[index]
+			const after = node.data[index + 1]
+			if (!before?.size || !after?.size) return
+			const total = before.size + after.size
+			before.size = Math.round(total / 2)
+			after.size = total - before.size
+			tabs.fromJSON(layout, { reuseExistingPanels: true })
+			updateCornerGroups()
+		} else {
+			return
+		}
+		event.preventDefault()
+		event.stopPropagation()
+		scheduleSave()
+	}
+
 	watchEffect(() => {
 		for (const tab of projectReviewTabs) {
 			const title = getTitle(tab)
@@ -200,6 +261,7 @@ export function useProjectReviewLayout(getTitle: (tab: ProjectReviewTab) => stri
 		onColumnsReady,
 		onRowsReady,
 		onTabsReady,
+		onDividerDoubleClick,
 		toggleSidebar,
 	}
 }
