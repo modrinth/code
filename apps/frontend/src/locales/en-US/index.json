@@ -3038,20 +3038,38 @@
   "moderation.project-review.approvedCount": {
     "message": "{count} approved"
   },
+  "moderation.project-review.archived": {
+    "message": "Archived"
+  },
   "moderation.project-review.archivedCount": {
     "message": "{count} archived"
+  },
+  "moderation.project-review.author": {
+    "message": "Author"
   },
   "moderation.project-review.back": {
     "message": "Back"
   },
+  "moderation.project-review.backToFiles": {
+    "message": "Back to files"
+  },
   "moderation.project-review.bottom": {
-    "message": "Review summary"
+    "message": "Tools"
+  },
+  "moderation.project-review.changelog": {
+    "message": "Changelog"
+  },
+  "moderation.project-review.collapseAll": {
+    "message": "Collapse all"
   },
   "moderation.project-review.compatibility": {
     "message": "Compatibility"
   },
   "moderation.project-review.complete": {
     "message": "Complete"
+  },
+  "moderation.project-review.completedFiles": {
+    "message": "Reviewed files ({count})"
   },
   "moderation.project-review.created": {
     "message": "Created"
@@ -3061,6 +3079,9 @@
   },
   "moderation.project-review.customSlug": {
     "message": "Differs from the project name"
+  },
+  "moderation.project-review.dependencies": {
+    "message": "Dependencies"
   },
   "moderation.project-review.description": {
     "message": "Description"
@@ -3074,20 +3095,56 @@
   "moderation.project-review.discord": {
     "message": "Discord invite"
   },
+  "moderation.project-review.download": {
+    "message": "Download"
+  },
   "moderation.project-review.downloads": {
     "message": "Downloads"
+  },
+  "moderation.project-review.draft": {
+    "message": "Draft"
   },
   "moderation.project-review.draftCount": {
     "message": "{count} draft"
   },
+  "moderation.project-review.embedded": {
+    "message": "Embedded"
+  },
   "moderation.project-review.empty": {
     "message": "No project selected."
+  },
+  "moderation.project-review.emptyChangelog": {
+    "message": "No changelog was provided."
+  },
+  "moderation.project-review.emptyDependencies": {
+    "message": "No dependencies."
+  },
+  "moderation.project-review.emptyDescription": {
+    "message": "No description has been provided."
+  },
+  "moderation.project-review.emptyGallery": {
+    "message": "This project has no gallery images."
+  },
+  "moderation.project-review.emptyVersions": {
+    "message": "This project has no versions."
   },
   "moderation.project-review.environments": {
     "message": "Environments"
   },
   "moderation.project-review.exit": {
     "message": "Exit"
+  },
+  "moderation.project-review.expandAll": {
+    "message": "Expand all"
+  },
+  "moderation.project-review.featured": {
+    "message": "Featured"
+  },
+  "moderation.project-review.fileCount": {
+    "message": "{count, plural, one {# file} other {# files}}"
+  },
+  "moderation.project-review.files": {
+    "message": "Files"
   },
   "moderation.project-review.finish": {
     "message": "Finish"
@@ -3098,6 +3155,9 @@
   "moderation.project-review.gameVersions": {
     "message": "Game versions"
   },
+  "moderation.project-review.hashes": {
+    "message": "Hashes"
+  },
   "moderation.project-review.hideLeft": {
     "message": "Hide project details"
   },
@@ -3106,6 +3166,12 @@
   },
   "moderation.project-review.history": {
     "message": "History"
+  },
+  "moderation.project-review.imageNumber": {
+    "message": "Image {number}"
+  },
+  "moderation.project-review.incompatible": {
+    "message": "Incompatible"
   },
   "moderation.project-review.issues": {
     "message": "Issue tracker"
@@ -3118,6 +3184,9 @@
   },
   "moderation.project-review.links": {
     "message": "Project links"
+  },
+  "moderation.project-review.listed": {
+    "message": "Listed"
   },
   "moderation.project-review.loadError": {
     "message": "Could not load project data."
@@ -3134,11 +3203,32 @@
   "moderation.project-review.next": {
     "message": "Next"
   },
+  "moderation.project-review.noFlagsFiles": {
+    "message": "Files without flags ({count})"
+  },
+  "moderation.project-review.noPendingFiles": {
+    "message": "No files with unresolved flags."
+  },
+  "moderation.project-review.noReports": {
+    "message": "No technical-review reports are available for this project."
+  },
+  "moderation.project-review.openImage": {
+    "message": "Open image {number}"
+  },
+  "moderation.project-review.optional": {
+    "message": "Optional"
+  },
   "moderation.project-review.owner": {
     "message": "Owner"
   },
+  "moderation.project-review.pendingFiles": {
+    "message": "Pending files ({count})"
+  },
   "moderation.project-review.platforms": {
     "message": "Platforms"
+  },
+  "moderation.project-review.primary": {
+    "message": "Primary file"
   },
   "moderation.project-review.privateCount": {
     "message": "{count} private"
@@ -3148,6 +3238,9 @@
   },
   "moderation.project-review.projectType": {
     "message": "Project type"
+  },
+  "moderation.project-review.published": {
+    "message": "Published"
   },
   "moderation.project-review.queueError": {
     "message": "Could not change projects. Please try again."
@@ -3161,14 +3254,26 @@
   "moderation.project-review.requesting": {
     "message": "Requesting"
   },
+  "moderation.project-review.required": {
+    "message": "Required"
+  },
   "moderation.project-review.reset": {
     "message": "Reset"
+  },
+  "moderation.project-review.resolvePermissions": {
+    "message": "Review redistribution permissions"
   },
   "moderation.project-review.retry": {
     "message": "Retry"
   },
+  "moderation.project-review.reviewProgress": {
+    "message": "Reviewed flags indicate progress, not a safe verdict. Files without flags have no flag verdict."
+  },
   "moderation.project-review.right": {
     "message": "Review issues"
+  },
+  "moderation.project-review.scheduled": {
+    "message": "Scheduled"
   },
   "moderation.project-review.scheduledCount": {
     "message": "{count} scheduled"
@@ -3184,6 +3289,9 @@
   },
   "moderation.project-review.source": {
     "message": "Source code"
+  },
+  "moderation.project-review.sourceError": {
+    "message": "Could not load source code. Try opening the flag again."
   },
   "moderation.project-review.submissions": {
     "message": "{count, plural, one {# submission} other {# submissions}}"
@@ -3206,8 +3314,14 @@
   "moderation.project-review.unavailable": {
     "message": "Unavailable"
   },
+  "moderation.project-review.unknown": {
+    "message": "Unknown"
+  },
   "moderation.project-review.unknownCount": {
     "message": "{count} unknown"
+  },
+  "moderation.project-review.unlisted": {
+    "message": "Unlisted"
   },
   "moderation.project-review.unlistedCount": {
     "message": "{count} unlisted"
@@ -3215,14 +3329,50 @@
   "moderation.project-review.updated": {
     "message": "Updated"
   },
+  "moderation.project-review.uploaded": {
+    "message": "Uploaded {date}"
+  },
+  "moderation.project-review.versionId": {
+    "message": "Version ID"
+  },
   "moderation.project-review.versions": {
     "message": "Versions"
+  },
+  "moderation.project-review.viewVersion": {
+    "message": "View version"
   },
   "moderation.project-review.wiki": {
     "message": "Wiki"
   },
+  "moderation.project-review.withheld": {
+    "message": "Withheld"
+  },
   "moderation.project-review.withheldCount": {
     "message": "{count} withheld"
+  },
+  "moderation.tech-review.file.download": {
+    "message": "Download"
+  },
+  "moderation.tech-review.file.download-file": {
+    "message": "Download {filename} ({size})"
+  },
+  "moderation.tech-review.file.flags": {
+    "message": "Flags"
+  },
+  "moderation.tech-review.file.manual": {
+    "message": "Manual review"
+  },
+  "moderation.tech-review.file.no-flags": {
+    "message": "No flags"
+  },
+  "moderation.tech-review.file.open-slicer": {
+    "message": "Open in Slicer"
+  },
+  "moderation.tech-review.file.slicer": {
+    "message": "Slicer"
+  },
+  "moderation.tech-review.file.view-version": {
+    "message": "View version"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} per batch"

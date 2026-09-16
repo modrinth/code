@@ -93,6 +93,9 @@ export function useReviewProject(selection: Ref<string>) {
 
 	return {
 		projectId,
+		gallery: computed(() =>
+			(projectQuery.data.value?.gallery ?? []).toSorted((a, b) => a.ordering - b.ordering),
+		),
 		project: projectQuery.data,
 		projectV2: legacyQuery.data,
 		members,
