@@ -1,10 +1,9 @@
-import ComingSoon from "@/components/layout/ComingSoon";
+"use client";
 
-export default function ForumCategoryPage() {
-  return (
-    <ComingSoon
-      title="Форум"
-      description="Разделы форума появятся в следующей фазе."
-    />
-  );
+import ComingSoon from "@/components/layout/ComingSoon";
+import { useLocale } from "@/hooks/useLocale";
+
+export default function ForumSlugPage() {
+  const { dict } = useLocale();
+  return <ComingSoon title={dict.comingSoon.forumTitle} description={dict.comingSoon.forumDesc} />;
 }

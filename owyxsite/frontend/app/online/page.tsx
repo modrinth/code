@@ -1,12 +1,9 @@
-import ComingSoon from "@/components/layout/ComingSoon";
+"use client";
 
-export const metadata = { title: "Онлайн — Owyx" };
+import ComingSoon from "@/components/layout/ComingSoon";
+import { useLocale } from "@/hooks/useLocale";
 
 export default function OnlinePage() {
-  return (
-    <ComingSoon
-      title="Кто онлайн"
-      description="Список игроков онлайн вернётся в новом дизайне. Статус сервера — на главной и в разделе «Серверы»."
-    />
-  );
+  const { dict } = useLocale();
+  return <ComingSoon title={dict.comingSoon.onlineTitle} description={dict.comingSoon.onlineDesc} />;
 }

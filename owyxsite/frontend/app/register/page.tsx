@@ -5,6 +5,7 @@ import Link from "next/link";
 import AuthShell from "@/components/layout/AuthShell";
 import Turnstile from "@/components/ui/Turnstile";
 import { useAuth } from "@/hooks/useAuth";
+import { useLocale } from "@/hooks/useLocale";
 
 const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
 
@@ -27,11 +28,17 @@ function passwordScore(pw: string): 0 | 1 | 2 | 3 | 4 {
   return 4;
 }
 
-const STRENGTH_LABEL = ["", "Слабый", "Средний", "Хороший", "Надёжный"] as const;
 const STRENGTH_COLOR = ["", "bg-danger", "bg-orange-400", "bg-accent", "bg-ok"] as const;
 
 export default function RegisterPage() {
+  const { dict } = useLocale();
+  const a = dict.auth;
   useAuth({ redirectIfAuth: true });
+
+  const strengthLabels = useMemo(
+    () => ["", a.strengthWeak, a.strengthFair, a.strengthGood, a.strengthStrong] as const,
+    [a.strengthWeak, a.strengthFair, a.strengthGood, a.strengthStrong]
+  );
 
   const [login, setLogin] = useState("");
   const [email, setEmail] = useState("");
@@ -51,19 +58,19 @@ export default function RegisterPage() {
     e.preventDefault();
     setError("");
     if (!/^[a-zA-Z0-9_]{3,32}$/.test(login)) {
-      setError("Логин: 3–32 символа, только буквы, цифры и _.");
+      setError(a.loginInvalid);
       return;
     }
     if (!strongEnough) {
-      setError("Пароль: минимум 8 символов, 1 заглавная буква, 1 цифра и 1 спецсимвол.");
+      setError(a.passwordWeak);
       return;
     }
     if (password !== confirm) {
-      setError("Пароли не совпадают.");
+      setError(a.passwordsMismatch);
       return;
     }
     if (SITE_KEY && !turnstileToken) {
-      setError("Пройдите проверку, что вы не робот.");
+      setError(a.captchaRequired);
       return;
     }
     setLoading(true);
@@ -82,10 +89,10 @@ export default function RegisterPage() {
       if (res.ok) {
         setDone(true);
       } else {
-        setError(result.error || result.details?.[0]?.msg || "Не удалось зарегистрироваться.");
+        setError(result.error || result.details?.[0]?.msg || a.registerFailed);
       }
     } catch {
-      setError("Ошибка сети. Попробуйте позже.");
+      setError(dict.common.networkError);
     } finally {
       setLoading(false);
     }
@@ -94,26 +101,40 @@ export default function RegisterPage() {
   if (done) {
     return (
       <AuthShell
-        title="Почти готово"
-        subtitle="Аккаунт создан. Проверьте email — мы отправили ссылку для подтверждения."
-        footer={<>Готово? <Link href="/login" className="link-accent">Войти</Link></>}
+        title={a.almostReady}
+        subtitle={a.almostReadyBody}
+        footer={
+          <>
+            {a.readyQuestion}{" "}
+            <Link href="/login" className="link-accent">
+              {a.submitLogin}
+            </Link>
+          </>
+        }
       >
-        <div className="panel p-5 text-sm text-muted">
-          Подтвердите email, затем скачайте лаунчер и войдите тем же аккаунтом.
-        </div>
+        <div className="panel p-5 text-sm text-muted">{a.almostReadyPanel}</div>
       </AuthShell>
     );
   }
 
   return (
     <AuthShell
-      title="Создать аккаунт"
-      subtitle="Один аккаунт Owyx: сайт, доступ к серверам и лаунчер."
-      footer={<>Уже есть аккаунт? <Link href="/login" className="link-accent">Войти</Link></>}
+      title={a.registerTitle}
+      subtitle={a.registerSubtitle}
+      footer={
+        <>
+          {a.haveAccount}{" "}
+          <Link href="/login" className="link-accent">
+            {a.submitLogin}
+          </Link>
+        </>
+      }
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="field-label" htmlFor="login">Логин</label>
+          <label className="field-label" htmlFor="login">
+            {a.username}
+          </label>
           <input
             id="login"
             className="input"
@@ -125,10 +146,12 @@ export default function RegisterPage() {
             value={login}
             onChange={(e) => setLogin(e.target.value)}
           />
-          <p className="field-hint mt-1.5">Этот же логин будет в лаунчере и в игре (если не входишь через Microsoft).</p>
+          <p className="field-hint mt-1.5">{a.usernameHint}</p>
         </div>
         <div>
-          <label className="field-label" htmlFor="email">Email</label>
+          <label className="field-label" htmlFor="email">
+            {a.email}
+          </label>
           <input
             id="email"
             type="email"
@@ -141,7 +164,9 @@ export default function RegisterPage() {
           />
         </div>
         <div>
-          <label className="field-label" htmlFor="password">Пароль</label>
+          <label className="field-label" htmlFor="password">
+            {a.password}
+          </label>
           <input
             id="password"
             type="password"
@@ -149,7 +174,7 @@ export default function RegisterPage() {
             required
             minLength={8}
             className="input"
-            placeholder="Минимум 8 символов"
+            placeholder={a.passwordPlaceholder}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             aria-describedby="password-hints"
@@ -167,26 +192,22 @@ export default function RegisterPage() {
                     />
                   ))}
                 </div>
-                <span className="font-mono text-[11px] text-muted shrink-0">
-                  {STRENGTH_LABEL[score]}
-                </span>
+                <span className="font-mono text-[11px] text-muted shrink-0">{strengthLabels[score]}</span>
               </div>
               <ul className="text-xs text-muted space-y-1 m-0 pl-4 list-disc">
-                <li className={checks.length ? "text-ok" : undefined}>не меньше 8 символов</li>
-                <li className={checks.upper ? "text-ok" : undefined}>минимум 1 заглавная буква</li>
-                <li className={checks.digit ? "text-ok" : undefined}>минимум 1 цифра</li>
-                <li className={checks.special ? "text-ok" : undefined}>минимум 1 спецсимвол (!@#$…)</li>
+                <li className={checks.length ? "text-ok" : undefined}>{a.passwordRuleLen}</li>
+                <li className={checks.upper ? "text-ok" : undefined}>{a.passwordRuleUpper}</li>
+                <li className={checks.digit ? "text-ok" : undefined}>{a.passwordRuleDigit}</li>
+                <li className={checks.special ? "text-ok" : undefined}>{a.passwordRuleSpecial}</li>
               </ul>
             </div>
           )}
-          {!password && (
-            <p className="field-hint mt-1.5">
-              Нужны: заглавная буква, цифра и спецсимвол (например Owyx!2026).
-            </p>
-          )}
+          {!password && <p className="field-hint mt-1.5">{a.passwordHint}</p>}
         </div>
         <div>
-          <label className="field-label" htmlFor="confirm">Повторите пароль</label>
+          <label className="field-label" htmlFor="confirm">
+            {a.confirmPassword}
+          </label>
           <input
             id="confirm"
             type="password"
@@ -204,7 +225,7 @@ export default function RegisterPage() {
         {error && <p className="text-sm text-danger">{error}</p>}
 
         <button type="submit" className="btn btn-primary w-full" disabled={loading || !strongEnough}>
-          {loading ? "Создаём…" : "Создать аккаунт"}
+          {loading ? a.submittingRegister : a.submitRegister}
         </button>
       </form>
     </AuthShell>

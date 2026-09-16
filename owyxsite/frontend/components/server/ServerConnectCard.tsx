@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import ServerStatus from "@/components/server/ServerStatus";
 import CopyIPButton from "@/components/server/CopyIPButton";
+import { useLocale } from "@/hooks/useLocale";
 
 const FALLBACK_IP = "play.owyx.site";
 const FALLBACK_NAME = "Owyx Survival";
 
 export default function ServerConnectCard() {
+  const { dict } = useLocale();
   const [name, setName] = useState(FALLBACK_NAME);
   const [ip, setIp] = useState(FALLBACK_IP);
 
@@ -40,7 +42,7 @@ export default function ServerConnectCard() {
   return (
     <div className="mt-10 panel p-6 sm:p-8 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <div className="text-sm text-muted">Основной сервер</div>
+        <div className="text-sm text-muted">{dict.servers.mainServer}</div>
         <div className="mt-1 font-display text-2xl font-semibold tracking-tight">{name}</div>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <ServerStatus />
@@ -49,10 +51,10 @@ export default function ServerConnectCard() {
       </div>
       <div className="flex flex-wrap gap-3">
         <Link href="/download" className="btn btn-primary">
-          Скачать лаунчер
+          {dict.home.downloadLauncher}
         </Link>
         <Link href="/profile" className="btn btn-ghost">
-          Кабинет
+          {dict.header.cabinet}
         </Link>
       </div>
     </div>

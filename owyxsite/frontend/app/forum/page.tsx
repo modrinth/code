@@ -1,12 +1,9 @@
-import ComingSoon from "@/components/layout/ComingSoon";
+"use client";
 
-export const metadata = { title: "Форум — Owyx" };
+import ComingSoon from "@/components/layout/ComingSoon";
+import { useLocale } from "@/hooks/useLocale";
 
 export default function ForumPage() {
-  return (
-    <ComingSoon
-      title="Форум"
-      description="Обсуждения, гайды и анонсы сообщества Owyx появятся здесь в следующей фазе."
-    />
-  );
+  const { dict } = useLocale();
+  return <ComingSoon title={dict.comingSoon.forumTitle} description={dict.comingSoon.forumDesc} />;
 }

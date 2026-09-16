@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import Logo from "@/components/ui/Logo";
+import { useLocale } from "@/hooks/useLocale";
 
 /** Clean auth layout — same brand language as the launcher (no heavy card chrome). */
 export default function AuthShell({
@@ -13,10 +16,12 @@ export default function AuthShell({
   children: React.ReactNode;
   footer?: React.ReactNode;
 }) {
+  const { dict } = useLocale();
+
   return (
     <main id="main-content" className="min-h-screen flex flex-col">
       <div className="px-4 sm:px-6 py-5 border-b border-line/60">
-        <Link href="/" className="inline-flex items-center" aria-label="Owyx — на главную">
+        <Link href="/" className="inline-flex items-center" aria-label={dict.auth.logoHome}>
           <Logo size={26} wordClassName="text-xl" />
         </Link>
       </div>

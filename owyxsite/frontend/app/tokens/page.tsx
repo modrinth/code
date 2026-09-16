@@ -1,12 +1,9 @@
-import ComingSoon from "@/components/layout/ComingSoon";
+"use client";
 
-export const metadata = { title: "Токены — Owyx" };
+import ComingSoon from "@/components/layout/ComingSoon";
+import { useLocale } from "@/hooks/useLocale";
 
 export default function TokensPage() {
-  return (
-    <ComingSoon
-      title="Токены"
-      description="Внутренняя экономика Owyx в разработке."
-    />
-  );
+  const { dict } = useLocale();
+  return <ComingSoon title={dict.comingSoon.tokensTitle} description={dict.comingSoon.tokensDesc} />;
 }

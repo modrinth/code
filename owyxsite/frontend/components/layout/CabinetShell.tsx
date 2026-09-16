@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useLocale } from "@/hooks/useLocale";
 
 export type CabinetNavItem = {
   id: string;
@@ -8,11 +9,6 @@ export type CabinetNavItem = {
   hint?: string;
 };
 
-/**
- * Shared cabinet chrome for /profile and /admin.
- * Launcher-parity: left rail + one content pane (DESIGN.md §4–5).
- * Hallmark: locked tokens, no invented metrics, mobile rail → chips.
- */
 export default function CabinetShell({
   eyebrow,
   title,
@@ -34,6 +30,8 @@ export default function CabinetShell({
   children: ReactNode;
   footerNote?: ReactNode;
 }) {
+  const { dict } = useLocale();
+
   return (
     <main id="main-content" className="relative min-h-[calc(100vh-64px)]">
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
@@ -50,7 +48,7 @@ export default function CabinetShell({
 
         <div className="grid gap-5 lg:grid-cols-[13.5rem_minmax(0,1fr)] lg:gap-6 fade-up-2">
           <nav
-            aria-label="Разделы"
+            aria-label={dict.profile.sectionsAria}
             className="flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:gap-1.5 lg:overflow-visible lg:pb-0 lg:sticky lg:top-24 lg:self-start"
           >
             {nav.map((item) => {

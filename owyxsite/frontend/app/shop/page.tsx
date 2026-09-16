@@ -1,12 +1,9 @@
-import ComingSoon from "@/components/layout/ComingSoon";
+"use client";
 
-export const metadata = { title: "Магазин — Owyx" };
+import ComingSoon from "@/components/layout/ComingSoon";
+import { useLocale } from "@/hooks/useLocale";
 
 export default function ShopPage() {
-  return (
-    <ComingSoon
-      title="Магазин"
-      description="Донат и привилегии появятся позже. Оплата пока не подключена."
-    />
-  );
+  const { dict } = useLocale();
+  return <ComingSoon title={dict.comingSoon.shopTitle} description={dict.comingSoon.shopDesc} />;
 }

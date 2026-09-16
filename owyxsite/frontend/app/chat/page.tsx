@@ -1,12 +1,9 @@
-import ComingSoon from "@/components/layout/ComingSoon";
+"use client";
 
-export const metadata = { title: "Чат — Owyx" };
+import ComingSoon from "@/components/layout/ComingSoon";
+import { useLocale } from "@/hooks/useLocale";
 
 export default function ChatPage() {
-  return (
-    <ComingSoon
-      title="Чат"
-      description="Живой чат сообщества Owyx вернётся в новом дизайне позже."
-    />
-  );
+  const { dict } = useLocale();
+  return <ComingSoon title={dict.comingSoon.chatTitle} description={dict.comingSoon.chatDesc} />;
 }

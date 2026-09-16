@@ -3,8 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import AuthShell from "@/components/layout/AuthShell";
+import { useLocale } from "@/hooks/useLocale";
 
 export default function ForgotPasswordPage() {
+  const { dict } = useLocale();
+  const a = dict.auth;
+
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
@@ -24,10 +28,10 @@ export default function ForgotPasswordPage() {
         setSent(true);
       } else {
         const data = await res.json().catch(() => ({}));
-        setError(data.error || "Не удалось отправить письмо.");
+        setError(data.error || a.forgotFailed);
       }
     } catch {
-      setError("Ошибка сети. Попробуйте позже.");
+      setError(dict.common.networkError);
     } finally {
       setLoading(false);
     }
@@ -35,19 +39,22 @@ export default function ForgotPasswordPage() {
 
   return (
     <AuthShell
-      title="Восстановление пароля"
-      subtitle="Укажите email — пришлём ссылку для сброса пароля."
-      footer={<><Link href="/login" className="link-accent">← Вернуться ко входу</Link></>}
+      title={a.forgotTitle}
+      subtitle={a.forgotSubtitle}
+      footer={
+        <Link href="/login" className="link-accent">
+          {a.backToLogin}
+        </Link>
+      }
     >
       {sent ? (
-        <div className="panel p-5 text-sm text-muted">
-          Если такой email есть в системе, мы отправили на него ссылку для сброса пароля.
-          Проверьте почту (и папку «Спам»).
-        </div>
+        <div className="panel p-5 text-sm text-muted">{a.forgotSent}</div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="field-label" htmlFor="email">Email</label>
+            <label className="field-label" htmlFor="email">
+              {a.email}
+            </label>
             <input
               id="email"
               type="email"
@@ -61,7 +68,7 @@ export default function ForgotPasswordPage() {
           </div>
           {error && <p className="text-sm text-danger">{error}</p>}
           <button type="submit" className="btn btn-primary w-full" disabled={loading}>
-            {loading ? "Отправляем…" : "Отправить ссылку"}
+            {loading ? a.forgotSending : a.forgotSubmit}
           </button>
         </form>
       )}

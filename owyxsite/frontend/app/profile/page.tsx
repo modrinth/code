@@ -11,24 +11,30 @@ import CabinetShell, {
 } from "@/components/layout/CabinetShell";
 import AvatarCropModal from "@/components/profile/AvatarCropModal";
 import { useAuth } from "@/hooks/useAuth";
+import { useLocale } from "@/hooks/useLocale";
+import type { Locale } from "@/lib/i18n";
 import { resolveSiteAvatarUrl } from "@/lib/avatar";
 
 const authHeader = () => ({ Authorization: `Bearer ${localStorage.getItem("auth_token")}` });
 
-function formatDate(dateStr?: string): string {
-  if (!dateStr) return "—";
-  return new Date(dateStr).toLocaleDateString("ru-RU", {
+function dateLocale(locale: Locale): string {
+  return locale === "en_US" ? "en-US" : "ru-RU";
+}
+
+function formatDate(dateStr: string | undefined, locale: Locale, dash: string): string {
+  if (!dateStr) return dash;
+  return new Date(dateStr).toLocaleDateString(dateLocale(locale), {
     day: "2-digit",
     month: "long",
     year: "numeric",
   });
 }
 
-function roleLabel(role?: string) {
-  if (role === "admin") return { text: "Админ", cls: "badge-danger" };
-  if (role === "moderator") return { text: "Модератор", cls: "badge-accent" };
-  if (role === "helper") return { text: "Хелпер", cls: "badge-accent" };
-  return { text: "Игрок", cls: "" };
+function roleLabel(role: string | undefined, p: ReturnType<typeof useLocale>["dict"]["profile"]) {
+  if (role === "admin") return { text: p.roleAdmin, cls: "badge-danger" };
+  if (role === "moderator") return { text: p.roleModerator, cls: "badge-accent" };
+  if (role === "helper") return { text: p.roleHelper, cls: "badge-accent" };
+  return { text: p.rolePlayer, cls: "" };
 }
 
 type Tab = "overview" | "settings";
@@ -45,46 +51,50 @@ function useStableNow(intervalMs = 60_000) {
 }
 
 export default function ProfilePage() {
+  const { dict, locale } = useLocale();
+  const p = dict.profile;
   const { user, loading, logout } = useAuth({ requireAuth: true });
   const [tab, setTab] = useState<Tab>("overview");
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted">Загрузка…</p>
+        <p className="text-muted">{dict.common.loading}</p>
       </div>
     );
   }
 
-  const role = roleLabel(user?.role);
+  const role = roleLabel(user?.role, p);
   const avatarSrc = resolveSiteAvatarUrl(user?.avatar_url);
 
   return (
     <>
       <Header />
       <CabinetShell
-        eyebrow="Аккаунт Owyx"
-        title={user?.nickname || "Игрок"}
-        subtitle="Тот же логин — на сайте и в лаунчере."
+        eyebrow={p.eyebrow}
+        title={user?.nickname || p.playerFallback}
+        subtitle={p.subtitle}
         actions={
           <>
             <Link href="/download" className="btn btn-primary">
-              Скачать лаунчер
+              {p.downloadLauncher}
             </Link>
             <button type="button" onClick={logout} className="btn btn-ghost" id="profile-logout-btn">
-              Выйти
+              {p.logout}
             </button>
           </>
         }
         nav={[
-          { id: "overview", label: "Обзор", hint: "Кто вы в Owyx" },
-          { id: "settings", label: "Настройки", hint: "Почта, ник, пароль" },
+          { id: "overview", label: p.navOverview, hint: p.navOverviewHint },
+          { id: "settings", label: p.navSettings, hint: p.navSettingsHint },
         ]}
         activeId={tab}
         onNav={(id) => setTab(id as Tab)}
-        footerNote="Скины на сайте скрыты — выбор скина будет в лаунчере."
+        footerNote={p.footerNote}
       >
-        {tab === "overview" && <OverviewPane user={user} role={role} avatarSrc={avatarSrc} />}
+        {tab === "overview" && (
+          <OverviewPane user={user} role={role} avatarSrc={avatarSrc} locale={locale} />
+        )}
         {tab === "settings" && <SettingsPane user={user} />}
       </CabinetShell>
       <Footer />
@@ -96,11 +106,16 @@ function OverviewPane({
   user,
   role,
   avatarSrc,
+  locale,
 }: {
   user: ReturnType<typeof useAuth>["user"];
   role: { text: string; cls: string };
   avatarSrc: string;
+  locale: Locale;
 }) {
+  const { dict } = useLocale();
+  const p = dict.profile;
+  const c = dict.common;
   const now = useStableNow();
   if (!user) return null;
   const daysWithUs = user.created_at
@@ -108,12 +123,12 @@ function OverviewPane({
     : 0;
 
   const rows = [
-    { label: "Логин", value: user.nickname || "—" },
-    { label: "Имя", value: user.first_name || "—" },
-    { label: "Email", value: user.email || "—" },
-    { label: "Discord", value: user.discord || "—" },
-    { label: "Регистрация", value: formatDate(user.created_at) },
-    { label: "Дней с нами", value: String(daysWithUs) },
+    { label: p.labelLogin, value: user.nickname || c.dash },
+    { label: p.labelName, value: user.first_name || c.dash },
+    { label: p.labelEmail, value: user.email || c.dash },
+    { label: p.labelDiscord, value: user.discord || c.dash },
+    { label: p.labelRegistered, value: formatDate(user.created_at, locale, c.dash) },
+    { label: p.labelDays, value: String(daysWithUs) },
   ];
 
   return (
@@ -128,7 +143,7 @@ function OverviewPane({
           <div className="mt-2 flex flex-wrap gap-2">
             <span className={`badge ${role.cls}`}>{role.text}</span>
             <span className={`badge ${user.status === "banned" ? "badge-danger" : "badge-ok"}`}>
-              {user.status === "banned" ? "Заблокирован" : "Активен"}
+              {user.status === "banned" ? p.statusBanned : p.statusActive}
             </span>
           </div>
         </div>
@@ -144,12 +159,10 @@ function OverviewPane({
       </div>
 
       <div className="section-callout">
-        <p className="text-sm font-medium text-text">Дальше</p>
-        <p className="mt-1 text-sm text-muted leading-relaxed">
-          Скачай лаунчер и войди тем же логином — сборки и Play подтянутся с сайта.
-        </p>
+        <p className="text-sm font-medium text-text">{p.nextTitle}</p>
+        <p className="mt-1 text-sm text-muted leading-relaxed">{p.nextBody}</p>
         <Link href="/download" className="btn btn-primary mt-4">
-          Перейти к загрузке
+          {p.goDownload}
         </Link>
       </div>
     </div>
@@ -175,6 +188,10 @@ function SettingsPane({ user }: { user: ReturnType<typeof useAuth>["user"] }) {
 }
 
 function AvatarSection({ currentUrl }: { currentUrl?: string | null }) {
+  const { dict } = useLocale();
+  const p = dict.profile;
+  const c = dict.common;
+
   const [preview, setPreview] = useState(resolveSiteAvatarUrl(currentUrl));
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<{ text: string; type: "success" | "error" } | null>(null);
@@ -195,10 +212,10 @@ function AvatarSection({ currentUrl }: { currentUrl?: string | null }) {
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
         setPreview(resolveSiteAvatarUrl(data.avatar_url));
-        setToast({ text: "Аватар обновлён", type: "success" });
-      } else setToast({ text: data.error || "Не удалось загрузить", type: "error" });
+        setToast({ text: p.avatarUpdated, type: "success" });
+      } else setToast({ text: data.error || p.uploadFailed, type: "error" });
     } catch {
-      setToast({ text: "Не удалось связаться с сервером.", type: "error" });
+      setToast({ text: c.serverError, type: "error" });
     } finally {
       setBusy(false);
       setCropFile(null);
@@ -215,21 +232,21 @@ function AvatarSection({ currentUrl }: { currentUrl?: string | null }) {
       });
       if (res.ok) {
         setPreview(resolveSiteAvatarUrl(null));
-        setToast({ text: "Аватар сброшен", type: "success" });
+        setToast({ text: p.avatarCleared, type: "success" });
       } else {
         const data = await res.json().catch(() => ({}));
-        setToast({ text: data.error || "Не удалось удалить", type: "error" });
+        setToast({ text: data.error || p.deleteFailed, type: "error" });
       }
     } catch {
-      setToast({ text: "Не удалось связаться с сервером.", type: "error" });
+      setToast({ text: c.serverError, type: "error" });
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <SettingsSection title="Аватар" description="Показывается на сайте и в лаунчере после следующего входа.">
-      <SettingsRow label="Фото" hint="PNG/JPEG/WebP, до ~2 МБ. Можно обрезать перед загрузкой.">
+    <SettingsSection title={p.avatarTitle} description={p.avatarDesc}>
+      <SettingsRow label={p.avatarPhoto} hint={p.avatarHint}>
         <div className="flex w-full flex-col gap-3 sm:items-end">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -239,7 +256,7 @@ function AvatarSection({ currentUrl }: { currentUrl?: string | null }) {
           />
           <div className="flex flex-wrap gap-2 justify-end">
             <label className="btn btn-primary btn-sm cursor-pointer">
-              {busy ? "…" : "Загрузить"}
+              {busy ? c.saving : p.upload}
               <input
                 type="file"
                 accept="image/png,image/jpeg,image/webp,image/gif"
@@ -253,7 +270,7 @@ function AvatarSection({ currentUrl }: { currentUrl?: string | null }) {
               />
             </label>
             <button type="button" className="btn btn-ghost btn-sm" disabled={busy} onClick={() => void removeAvatar()}>
-              Сбросить
+              {p.reset}
             </button>
           </div>
         </div>
@@ -271,17 +288,21 @@ function AvatarSection({ currentUrl }: { currentUrl?: string | null }) {
 }
 
 function EmailSection({ currentEmail }: { currentEmail?: string }) {
+  const { dict } = useLocale();
+  const p = dict.profile;
+  const c = dict.common;
+
   const [overrideEmail, setOverrideEmail] = useState<string | null>(null);
   const email = overrideEmail ?? currentEmail ?? "";
   const [open, setOpen] = useState(false);
 
   return (
-    <SettingsSection title="Почта" description="Вход и восстановление доступа.">
-      <SettingsRow label="Текущий адрес" hint="На него приходят подтверждения и сброс пароля.">
+    <SettingsSection title={p.emailTitle} description={p.emailDesc}>
+      <SettingsRow label={p.emailCurrent} hint={p.emailHint}>
         <div className="flex w-full flex-col gap-2 sm:items-end">
-          <span className="text-sm font-medium text-text break-all text-right">{email || "—"}</span>
+          <span className="text-sm font-medium text-text break-all text-right">{email || c.dash}</span>
           <button type="button" className="btn btn-secondary btn-sm self-end" onClick={() => setOpen(true)}>
-            Сменить почту
+            {p.changeEmail}
           </button>
         </div>
       </SettingsRow>
@@ -305,6 +326,10 @@ function EmailChangeModal({
   onClose: () => void;
   onDone: (email: string) => void;
 }) {
+  const { dict } = useLocale();
+  const p = dict.profile;
+  const c = dict.common;
+
   const [step, setStep] = useState<"email" | "code">("email");
   const [newEmail, setNewEmail] = useState("");
   const [code, setCode] = useState("");
@@ -326,12 +351,12 @@ function EmailChangeModal({
         setStep("code");
         const shown =
           process.env.NODE_ENV === "development" && data.devCode
-            ? `Код (dev): ${data.devCode}`
-            : "Код отправлен на новую почту.";
+            ? `Dev: ${data.devCode}`
+            : p.codeSent;
         setMsg({ text: shown, type: "success" });
-      } else setMsg({ text: data.error || "Не удалось отправить код", type: "error" });
+      } else setMsg({ text: data.error || p.codeSendFailed, type: "error" });
     } catch {
-      setMsg({ text: "Не удалось связаться с сервером.", type: "error" });
+      setMsg({ text: c.serverError, type: "error" });
     } finally {
       setBusy(false);
     }
@@ -349,9 +374,9 @@ function EmailChangeModal({
       });
       const data = await res.json();
       if (res.ok) onDone(data.email || newEmail);
-      else setMsg({ text: data.error || "Неверный код", type: "error" });
+      else setMsg({ text: data.error || p.badCode, type: "error" });
     } catch {
-      setMsg({ text: "Не удалось связаться с сервером.", type: "error" });
+      setMsg({ text: c.serverError, type: "error" });
     } finally {
       setBusy(false);
     }
@@ -371,12 +396,10 @@ function EmailChangeModal({
         aria-labelledby="email-change-title"
       >
         <h3 id="email-change-title" className="font-display text-lg font-bold tracking-tight">
-          Смена почты
+          {p.emailChangeTitle}
         </h3>
         <p className="mt-1 text-sm text-muted">
-          {step === "email"
-            ? "Введите новый адрес — придёт код подтверждения."
-            : `Код отправлен на ${newEmail}.`}
+          {step === "email" ? p.emailChangeStep1 : p.emailChangeStep2.replace("{email}", newEmail)}
         </p>
         {msg && (
           <div className={`form-msg mt-4 ${msg.type === "success" ? "form-msg-ok" : "form-msg-err"}`}>
@@ -387,7 +410,7 @@ function EmailChangeModal({
           <form onSubmit={requestCode} className="mt-5 space-y-4">
             <div className="field">
               <label className="field-label" htmlFor="new-email">
-                Новая почта
+                {p.emailNew}
               </label>
               <input
                 id="new-email"
@@ -402,10 +425,10 @@ function EmailChangeModal({
             </div>
             <div className="flex flex-wrap gap-2">
               <button type="submit" disabled={busy} className="btn btn-primary">
-                {busy ? "Отправка…" : "Отправить код"}
+                {busy ? p.sending : p.sendCode}
               </button>
               <button type="button" onClick={onClose} className="btn btn-ghost">
-                Отмена
+                {c.cancel}
               </button>
             </div>
           </form>
@@ -413,7 +436,7 @@ function EmailChangeModal({
           <form onSubmit={confirmCode} className="mt-5 space-y-4">
             <div className="field">
               <label className="field-label" htmlFor="email-code">
-                Код из письма
+                {p.codeFromMail}
               </label>
               <input
                 id="email-code"
@@ -429,10 +452,10 @@ function EmailChangeModal({
             </div>
             <div className="flex flex-wrap gap-2">
               <button type="submit" disabled={busy} className="btn btn-primary">
-                {busy ? "Проверка…" : "Подтвердить"}
+                {busy ? c.checking : c.confirm}
               </button>
               <button type="button" onClick={() => setStep("email")} className="btn btn-ghost">
-                Назад
+                {c.back}
               </button>
             </div>
           </form>
@@ -443,6 +466,10 @@ function EmailChangeModal({
 }
 
 function NicknameSection({ currentNick }: { currentNick?: string }) {
+  const { dict } = useLocale();
+  const p = dict.profile;
+  const c = dict.common;
+
   const [nick, setNick] = useState(currentNick || "");
   const [changedAt, setChangedAt] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -480,22 +507,24 @@ function NicknameSection({ currentNick }: { currentNick?: string }) {
       });
       const data = await res.json();
       if (res.ok) {
-        setToast({ text: "Ник обновлён. Следующая смена — через 30 дней.", type: "success" });
+        setToast({ text: p.nickUpdated, type: "success" });
         setChangedAt(data.nickname_changed_at ?? new Date().toISOString());
-      } else setToast({ text: data.error || "Не удалось изменить ник", type: "error" });
+      } else setToast({ text: data.error || p.nickFailed, type: "error" });
     } catch {
-      setToast({ text: "Не удалось связаться с сервером.", type: "error" });
+      setToast({ text: c.serverError, type: "error" });
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <SettingsSection title="Никнейм" description="Менять можно не чаще одного раза в 30 дней.">
+    <SettingsSection title={p.nickTitle} description={p.nickDesc}>
       <form onSubmit={save} className="space-y-1">
         <SettingsRow
-          label="Ник"
-          hint={onCooldown ? `Следующая смена через ${daysLeft} дн.` : "Отображается на сайте и в лаунчере."}
+          label={p.nickLabel}
+          hint={
+            onCooldown ? p.nickCooldown.replace("{days}", String(daysLeft)) : p.nickHint
+          }
         >
           <div className="flex w-full flex-col gap-2 sm:items-end">
             <input
@@ -509,7 +538,7 @@ function NicknameSection({ currentNick }: { currentNick?: string }) {
               autoComplete="username"
             />
             <button type="submit" className="btn btn-primary btn-sm self-end" disabled={busy || onCooldown}>
-              {busy ? "Сохранение…" : "Сменить ник"}
+              {busy ? c.saving : p.changeNick}
             </button>
           </div>
         </SettingsRow>
@@ -520,6 +549,10 @@ function NicknameSection({ currentNick }: { currentNick?: string }) {
 }
 
 function ProfileInfoSection({ user }: { user: ReturnType<typeof useAuth>["user"] }) {
+  const { dict } = useLocale();
+  const p = dict.profile;
+  const c = dict.common;
+
   const [form, setForm] = useState({
     first_name: user?.first_name || "",
     discord_username: user?.discord || "",
@@ -559,19 +592,19 @@ function ProfileInfoSection({ user }: { user: ReturnType<typeof useAuth>["user"]
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        setToast({ text: data.message || "Профиль сохранён", type: "success" });
-      } else setToast({ text: data.error || "Ошибка сохранения", type: "error" });
+        setToast({ text: data.message || p.profileSaved, type: "success" });
+      } else setToast({ text: data.error || p.profileSaveFailed, type: "error" });
     } catch {
-      setToast({ text: "Не удалось связаться с сервером.", type: "error" });
+      setToast({ text: c.serverError, type: "error" });
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <SettingsSection title="Профиль" description="Имя и Discord — видно в ЛК; на геймплей не влияет.">
+    <SettingsSection title={p.infoTitle} description={p.infoDesc}>
       <form onSubmit={save} className="space-y-1">
-        <SettingsRow label="Имя">
+        <SettingsRow label={p.labelName}>
           <input
             id="acc-name"
             className="input sm:max-w-xs"
@@ -580,7 +613,7 @@ function ProfileInfoSection({ user }: { user: ReturnType<typeof useAuth>["user"]
             autoComplete="given-name"
           />
         </SettingsRow>
-        <SettingsRow label="Discord" hint="Ник в Discord, без #тега.">
+        <SettingsRow label={p.labelDiscord} hint={p.discordHint}>
           <input
             id="acc-discord"
             className="input sm:max-w-xs"
@@ -590,7 +623,7 @@ function ProfileInfoSection({ user }: { user: ReturnType<typeof useAuth>["user"]
         </SettingsRow>
         <div className="pt-4 flex justify-end">
           <button type="submit" className="btn btn-primary btn-sm" disabled={busy}>
-            {busy ? "Сохранение…" : "Сохранить профиль"}
+            {busy ? c.saving : p.saveProfile}
           </button>
         </div>
       </form>
@@ -600,6 +633,10 @@ function ProfileInfoSection({ user }: { user: ReturnType<typeof useAuth>["user"]
 }
 
 function PasswordSection() {
+  const { dict } = useLocale();
+  const p = dict.profile;
+  const c = dict.common;
+
   const [form, setForm] = useState({
     current_password: "",
     new_password: "",
@@ -610,7 +647,7 @@ function PasswordSection() {
   async function save(e: React.FormEvent) {
     e.preventDefault();
     if (!form.new_password) {
-      setToast({ text: "Введите новый пароль", type: "error" });
+      setToast({ text: p.enterNewPassword, type: "error" });
       return;
     }
     setBusy(true);
@@ -626,20 +663,20 @@ function PasswordSection() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        setToast({ text: data.message || "Пароль обновлён", type: "success" });
+        setToast({ text: data.message || p.passwordUpdated, type: "success" });
         setForm({ current_password: "", new_password: "" });
-      } else setToast({ text: data.error || "Ошибка смены пароля", type: "error" });
+      } else setToast({ text: data.error || p.passwordFailed, type: "error" });
     } catch {
-      setToast({ text: "Не удалось связаться с сервером.", type: "error" });
+      setToast({ text: c.serverError, type: "error" });
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <SettingsSection title="Безопасность" description="Смена пароля для сайта и лаунчера.">
+    <SettingsSection title={p.securityTitle} description={p.securityDesc}>
       <form onSubmit={save} className="space-y-1">
-        <SettingsRow label="Текущий пароль">
+        <SettingsRow label={p.currentPassword}>
           <input
             id="acc-cur-pass"
             type="password"
@@ -650,7 +687,7 @@ function PasswordSection() {
             required
           />
         </SettingsRow>
-        <SettingsRow label="Новый пароль" hint="Минимум 8 символов.">
+        <SettingsRow label={p.newPassword} hint={p.newPasswordHint}>
           <input
             id="acc-new-pass"
             type="password"
@@ -664,7 +701,7 @@ function PasswordSection() {
         </SettingsRow>
         <div className="pt-4 flex justify-end">
           <button type="submit" className="btn btn-primary btn-sm" disabled={busy}>
-            {busy ? "Сохранение…" : "Сменить пароль"}
+            {busy ? c.saving : p.changePassword}
           </button>
         </div>
       </form>

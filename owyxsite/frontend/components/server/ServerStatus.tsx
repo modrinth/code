@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLocale } from "@/hooks/useLocale";
 
 interface ServerStatusData {
   online: boolean;
@@ -8,6 +9,10 @@ interface ServerStatusData {
 }
 
 export default function ServerStatus() {
+  const { dict } = useLocale();
+  const s = dict.servers;
+  const c = dict.common;
+
   const [status, setStatus] = useState<ServerStatusData>({
     online: false,
     players: { online: 0, max: 0 },
@@ -64,14 +69,17 @@ export default function ServerStatus() {
           aria-hidden="true"
         />
         <span className={online ? "text-ok" : "text-danger"}>
-          {!loaded ? "Проверка…" : online ? "Онлайн" : "Оффлайн"}
+          {!loaded ? c.checking : online ? s.statusOnline : s.statusOffline}
         </span>
       </span>
       {online && status.players.max > 0 && (
         <>
           <span className="text-line">·</span>
           <span className="text-muted">
-            игроков <span className="font-mono text-text">{status.players.online}/{status.players.max}</span>
+            {s.playersLabel}{" "}
+            <span className="font-mono text-text">
+              {status.players.online}/{status.players.max}
+            </span>
           </span>
         </>
       )}
