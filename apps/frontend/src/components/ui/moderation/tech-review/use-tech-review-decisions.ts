@@ -183,7 +183,13 @@ export function useTechReviewDecisions(reports: MaybeRefOrGetter<FlattenedFileRe
 		await client.labrinth.tech_review_internal.updateGlobalIssueDetails(data)
 	}
 
+	function resetDecisions() {
+		detailDecisions.clear()
+		detailDecisionScopes.clear()
+	}
+
 	return {
+		resetDecisions,
 		updatingDetails,
 		updatingGlobalDetailKeys,
 		getDetailDecision,

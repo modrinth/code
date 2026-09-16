@@ -1,6 +1,6 @@
 <template>
 	<section
-		class="h-full overflow-auto bg-surface-2 p-3"
+		class="h-full overflow-auto p-3"
 		:inert="sidebarHidden"
 		:aria-label="formatMessage(messages[slotName])"
 	>

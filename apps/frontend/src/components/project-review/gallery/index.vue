@@ -1,0 +1,93 @@
+<template>
+	<div>
+		<p v-if="!selection" class="text-secondary">
+			{{ formatMessage(messages.empty) }}
+		</p>
+		<p v-else-if="isLoading" role="status">
+			{{ formatMessage(messages.loading) }}
+		</p>
+		<div v-else-if="error" role="alert">
+			<p>{{ formatMessage(messages.loadError) }}</p>
+			<Button @click="refresh">{{ formatMessage(messages.retry) }}</Button>
+		</div>
+		<p v-else-if="!gallery.length" class="text-secondary">
+			{{ formatMessage(messages.emptyGallery) }}
+		</p>
+		<div v-else class="gallery-grid">
+			<article
+				v-for="(item, index) in gallery"
+				:key="item.url"
+				class="flex min-w-0 flex-col overflow-hidden rounded-xl border border-solid border-surface-4 bg-surface-3"
+			>
+				<button
+					type="button"
+					class="cursor-zoom-in border-0 bg-surface-1 p-0"
+					:aria-label="formatMessage(messages.openImage, { number: index + 1 })"
+					@click="viewer?.show(index)"
+				>
+					<img
+						:src="item.raw_url || item.url"
+						:alt="item.title || formatMessage(messages.imageNumber, { number: index + 1 })"
+						class="aspect-video w-full object-contain"
+						loading="lazy"
+					/>
+				</button>
+				<div class="flex flex-1 flex-col gap-2 p-3">
+					<div class="flex flex-wrap justify-between gap-2 text-sm text-secondary">
+						<span>{{ formatMessage(messages.imageNumber, { number: index + 1 }) }}</span>
+						<span v-if="item.featured" class="text-brand">{{
+							formatMessage(messages.featured)
+						}}</span>
+					</div>
+					<h3 v-if="item.title" class="m-0 break-words text-lg font-semibold text-contrast">
+						{{ item.title }}
+					</h3>
+					<p v-if="item.description" class="m-0 whitespace-pre-wrap break-words">
+						{{ item.description }}
+					</p>
+					<time :datetime="item.created" class="mt-auto pt-2 text-sm text-secondary">{{
+						formatMessage(messages.uploaded, {
+							date: formatDateTime(item.created),
+						})
+					}}</time>
+				</div>
+			</article>
+		</div>
+		<ImageViewerEditor :key="projectId" ref="viewer" :items="viewerItems" editor="disabled" />
+	</div>
+</template>
+
+<script setup lang="ts">
+import { Button, ImageViewerEditor, useFormatDateTime, useVIntl } from '@modrinth/ui'
+import { computed, ref } from 'vue'
+
+import { injectProjectReviewPageContext } from '~/providers/project-review'
+
+import { projectReviewMessages as messages } from '../messages'
+
+const { formatMessage } = useVIntl()
+const formatDateTime = useFormatDateTime({
+	dateStyle: 'long',
+	timeStyle: 'short',
+})
+const { selection, projectId, gallery, isLoading, error, refresh } =
+	injectProjectReviewPageContext()
+const viewer = ref<InstanceType<typeof ImageViewerEditor>>()
+const viewerItems = computed(() =>
+	gallery.value.map((item, index) => ({
+		id: item.url,
+		src: item.raw_url || item.url,
+		alt: item.title || formatMessage(messages.imageNumber, { number: index + 1 }),
+		title: item.title,
+		description: item.description,
+	})),
+)
+</script>
+
+<style scoped>
+.gallery-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+	gap: 1rem;
+}
+</style>

@@ -1,6 +1,14 @@
 import { defineMessages } from '@modrinth/ui'
 
 export const projectReviewMessages = defineMessages({
+	withheld: {
+		id: 'moderation.project-review.withheld',
+		defaultMessage: 'Withheld',
+	},
+	resolvePermissions: {
+		id: 'moderation.project-review.resolvePermissions',
+		defaultMessage: 'Review redistribution permissions',
+	},
 	title: {
 		id: 'moderation.project-review.title',
 		defaultMessage: 'Project review',
@@ -15,7 +23,7 @@ export const projectReviewMessages = defineMessages({
 	},
 	bottom: {
 		id: 'moderation.project-review.bottom',
-		defaultMessage: 'Review summary',
+		defaultMessage: 'Tools',
 	},
 	description: {
 		id: 'moderation.project-review.description',
@@ -252,5 +260,166 @@ export const projectReviewMessages = defineMessages({
 	unknownCount: {
 		id: 'moderation.project-review.unknownCount',
 		defaultMessage: '{count} unknown',
+	},
+	emptyDescription: {
+		id: 'moderation.project-review.emptyDescription',
+		defaultMessage: 'No description has been provided.',
+	},
+	emptyGallery: {
+		id: 'moderation.project-review.emptyGallery',
+		defaultMessage: 'This project has no gallery images.',
+	},
+	imageNumber: {
+		id: 'moderation.project-review.imageNumber',
+		defaultMessage: 'Image {number}',
+	},
+	openImage: {
+		id: 'moderation.project-review.openImage',
+		defaultMessage: 'Open image {number}',
+	},
+	featured: {
+		id: 'moderation.project-review.featured',
+		defaultMessage: 'Featured',
+	},
+	uploaded: {
+		id: 'moderation.project-review.uploaded',
+		defaultMessage: 'Uploaded {date}',
+	},
+	emptyVersions: {
+		id: 'moderation.project-review.emptyVersions',
+		defaultMessage: 'This project has no versions.',
+	},
+	expandAll: {
+		id: 'moderation.project-review.expandAll',
+		defaultMessage: 'Expand all',
+	},
+	collapseAll: {
+		id: 'moderation.project-review.collapseAll',
+		defaultMessage: 'Collapse all',
+	},
+	fileCount: {
+		id: 'moderation.project-review.fileCount',
+		defaultMessage: '{count, plural, one {# file} other {# files}}',
+	},
+	files: {
+		id: 'moderation.project-review.files',
+		defaultMessage: 'Files',
+	},
+	primary: {
+		id: 'moderation.project-review.primary',
+		defaultMessage: 'Primary file',
+	},
+	hashes: {
+		id: 'moderation.project-review.hashes',
+		defaultMessage: 'Hashes',
+	},
+	changelog: {
+		id: 'moderation.project-review.changelog',
+		defaultMessage: 'Changelog',
+	},
+	emptyChangelog: {
+		id: 'moderation.project-review.emptyChangelog',
+		defaultMessage: 'No changelog was provided.',
+	},
+	versionId: {
+		id: 'moderation.project-review.versionId',
+		defaultMessage: 'Version ID',
+	},
+	published: {
+		id: 'moderation.project-review.published',
+		defaultMessage: 'Published',
+	},
+	author: {
+		id: 'moderation.project-review.author',
+		defaultMessage: 'Author',
+	},
+	viewVersion: {
+		id: 'moderation.project-review.viewVersion',
+		defaultMessage: 'View version',
+	},
+	download: {
+		id: 'moderation.project-review.download',
+		defaultMessage: 'Download',
+	},
+	dependencies: {
+		id: 'moderation.project-review.dependencies',
+		defaultMessage: 'Dependencies',
+	},
+	emptyDependencies: {
+		id: 'moderation.project-review.emptyDependencies',
+		defaultMessage: 'No dependencies.',
+	},
+	listed: {
+		id: 'moderation.project-review.listed',
+		defaultMessage: 'Listed',
+	},
+	archived: {
+		id: 'moderation.project-review.archived',
+		defaultMessage: 'Archived',
+	},
+	draft: {
+		id: 'moderation.project-review.draft',
+		defaultMessage: 'Draft',
+	},
+	unlisted: {
+		id: 'moderation.project-review.unlisted',
+		defaultMessage: 'Unlisted',
+	},
+	scheduled: {
+		id: 'moderation.project-review.scheduled',
+		defaultMessage: 'Scheduled',
+	},
+	unknown: {
+		id: 'moderation.project-review.unknown',
+		defaultMessage: 'Unknown',
+	},
+	required: {
+		id: 'moderation.project-review.required',
+		defaultMessage: 'Required',
+	},
+	optional: {
+		id: 'moderation.project-review.optional',
+		defaultMessage: 'Optional',
+	},
+	incompatible: {
+		id: 'moderation.project-review.incompatible',
+		defaultMessage: 'Incompatible',
+	},
+	embedded: {
+		id: 'moderation.project-review.embedded',
+		defaultMessage: 'Embedded',
+	},
+	pendingFiles: {
+		id: 'moderation.project-review.pendingFiles',
+		defaultMessage: 'Pending files ({count})',
+	},
+	completedFiles: {
+		id: 'moderation.project-review.completedFiles',
+		defaultMessage: 'Reviewed files ({count})',
+	},
+	noReports: {
+		id: 'moderation.project-review.noReports',
+		defaultMessage: 'No technical-review reports are available for this project.',
+	},
+	noPendingFiles: {
+		id: 'moderation.project-review.noPendingFiles',
+		defaultMessage: 'No files with unresolved flags.',
+	},
+	reviewProgress: {
+		id: 'moderation.project-review.reviewProgress',
+		defaultMessage:
+			'Reviewed flags indicate progress, not a safe verdict. Files without flags have no flag verdict.',
+	},
+	backToFiles: {
+		id: 'moderation.project-review.backToFiles',
+		defaultMessage: 'Back to files',
+	},
+	noFlagsFiles: {
+		id: 'moderation.project-review.noFlagsFiles',
+		defaultMessage: 'Files without flags ({count})',
+	},
+	sourceError: {
+		id: 'moderation.project-review.sourceError',
+		defaultMessage: 'Could not load source code. Try opening the flag again.',
 	},
 })

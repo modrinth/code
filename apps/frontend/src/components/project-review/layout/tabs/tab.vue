@@ -4,19 +4,33 @@
 		:class="isActive ? 'project-review-tab-active text-contrast' : 'text-secondary'"
 	>
 		{{ formatMessage(projectReviewMessages[params.params.tab]) }}
+		<span
+			v-if="count !== undefined"
+			class="ml-1.5 rounded bg-surface-3 px-1 text-xs tabular-nums"
+			>{{ count }}</span
+		>
 	</span>
 </template>
 
 <script setup lang="ts">
 import { useVIntl } from '@modrinth/ui'
 import type { IDockviewPanelHeaderProps } from 'dockview-vue'
-import { ref, watchEffect } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
+
+import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { projectReviewMessages } from '../../messages'
 import type { ProjectReviewTab } from '../types'
 
-const props = defineProps<{ params: IDockviewPanelHeaderProps<{ tab: ProjectReviewTab }> }>()
+const props = defineProps<{
+	params: IDockviewPanelHeaderProps<{ tab: ProjectReviewTab }>
+}>()
 const { formatMessage } = useVIntl()
+const { tabCounts } = injectProjectReviewPageContext()
+const count = computed(() => {
+	const tab = props.params.params.tab
+	return tab in tabCounts.value ? tabCounts.value[tab as keyof typeof tabCounts.value] : undefined
+})
 const isActive = ref(props.params.api.isVisible)
 
 watchEffect((onCleanup) => {

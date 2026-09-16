@@ -6,8 +6,8 @@
 			:circular="false"
 			:label="formatMessage(label)"
 			:aria-expanded="visible"
-			@click="toggleSidebar(side)"
 			class="opacity-70 hover:opacity-100"
+			@click="toggleSidebar(side)"
 		>
 			<PanelLeftOpenIcon v-if="side === 'left'" aria-hidden="true" />
 			<PanelRightOpenIcon v-else aria-hidden="true" />
