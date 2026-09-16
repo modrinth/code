@@ -2,7 +2,7 @@ use crate::database::PgPool;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    database::models::{DBUserId, user_limits::DBUserLimits},
+    database::models::{DBProjectId, DBUserId, user_limits::DBUserLimits},
     models::users::User,
 };
 
@@ -93,6 +93,53 @@ impl UserLimits {
         Ok(Self {
             current,
             max: db_limits.collections,
+        }
+        .adjust_for_user(user))
+    }
+
+    pub async fn get_for_versions_per_project(
+        user: &User,
+        project_id: DBProjectId,
+        pool: &PgPool,
+    ) -> Result<Self, sqlx::Error> {
+        let db_limits =
+            DBUserLimits::get(DBUserId::from(user.id), pool).await?;
+        let current = sqlx::query_scalar!(
+            "SELECT COUNT(*) FROM versions WHERE mod_id = $1",
+            project_id as DBProjectId,
+        )
+        .fetch_one(pool)
+        .await?
+        .map_or(0, |x| x as u64);
+
+        Ok(Self {
+            current,
+            max: db_limits.versions_per_project,
+        }
+        .adjust_for_user(user))
+    }
+
+    pub async fn get_for_versions_per_day(
+        user: &User,
+        pool: &PgPool,
+    ) -> Result<Self, sqlx::Error> {
+        let user_id = DBUserId::from(user.id);
+        let db_limits = DBUserLimits::get(user_id, pool).await?;
+        let current = sqlx::query_scalar!(
+            "SELECT COUNT(*) FROM versions
+            WHERE author_id = $1
+                AND date_published >= (
+                    (NOW() AT TIME ZONE 'UTC')::date AT TIME ZONE 'UTC'
+                )",
+            user_id as DBUserId,
+        )
+        .fetch_one(pool)
+        .await?
+        .map_or(0, |x| x as u64);
+
+        Ok(Self {
+            current,
+            max: db_limits.versions_per_day,
         }
         .adjust_for_user(user))
     }
