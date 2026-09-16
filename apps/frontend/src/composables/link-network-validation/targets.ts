@@ -15,7 +15,9 @@ export function projectLinkTargets(
 	patch: Labrinth.Projects.v3.EditProjectRequest = {},
 ): LinkTarget[] {
 	const links = {
-		...Object.fromEntries(Object.entries(project.link_urls).map(([field, link]) => [field, link.url])),
+		...Object.fromEntries(
+			Object.entries(project.link_urls).map(([field, link]) => [field, link.url]),
+		),
 		...patch.link_urls,
 	}
 	const targets: LinkTarget[] = Object.entries(links).flatMap(([field, url]) =>

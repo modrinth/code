@@ -203,7 +203,11 @@
 									<ScaleIcon aria-hidden="true" />
 									{{ formatMessage(messages.actionResubmitForReviewWithReply) }}
 								</Button>
-								<Button v-else :disabled="isLoading || reviewSubmissionDisabled" @click="openResubmitModal(false)">
+								<Button
+									v-else
+									:disabled="isLoading || reviewSubmissionDisabled"
+									@click="openResubmitModal(false)"
+								>
 									<ScaleIcon aria-hidden="true" />
 									{{ formatMessage(messages.actionResubmitForReview) }}
 								</Button>
@@ -309,7 +313,10 @@
 															runBlockingAction('send-to-review-reply', () =>
 																sendReply('processing', true),
 															),
-														disabled: project.status === 'processing' || isLoading || reviewSubmissionDisabled,
+														disabled:
+															project.status === 'processing' ||
+															isLoading ||
+															reviewSubmissionDisabled,
 													},
 												]
 											: [
@@ -338,7 +345,10 @@
 														hoverFilled: true,
 														action: () =>
 															runBlockingAction('send-to-review', () => setStatus('processing')),
-														disabled: project.status === 'processing' || isLoading || reviewSubmissionDisabled,
+														disabled:
+															project.status === 'processing' ||
+															isLoading ||
+															reviewSubmissionDisabled,
 													},
 												]
 									"

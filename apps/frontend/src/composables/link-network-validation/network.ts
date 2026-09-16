@@ -65,12 +65,7 @@ export async function validateLinkNetwork(
 				}
 				const githubRepository = !target.image && githubRepositoryPath(target.url, true)
 				if (!githubRepository) return []
-				const observed = await probeGithubRepository(
-					client,
-					target.url,
-					githubRepository,
-					deadline,
-				)
+				const observed = await probeGithubRepository(client, target.url, githubRepository, deadline)
 				return observed.accessible === false ? [linkNag(target, 'unverifiable')] : []
 			} catch {
 				signal.throwIfAborted()
