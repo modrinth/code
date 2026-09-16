@@ -11,4 +11,6 @@ export const projectReviewTabs = [
 
 export type ProjectReviewTab = (typeof projectReviewTabs)[number]
 export type ProjectReviewSlot = ProjectReviewTab | 'left' | 'right' | 'bottom'
-export type ProjectReviewSlots = { [Key in ProjectReviewSlot]?: () => VNode[] }
+export type ProjectReviewSlots = {
+	[Key in ProjectReviewSlot | 'footer']?: () => VNode[]
+}
