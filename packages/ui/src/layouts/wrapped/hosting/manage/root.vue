@@ -292,6 +292,7 @@
 	<Suspense>
 		<ServerSettingsModal
 			ref="serverSettingsModal"
+			:site-url="siteUrl"
 			:resolve-viewer="resolveViewer"
 			:browse-modpacks="handleBrowseModpacks"
 		/>

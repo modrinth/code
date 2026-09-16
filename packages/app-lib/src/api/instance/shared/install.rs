@@ -439,6 +439,12 @@ pub(super) async fn handle_unavailable_shared_instance_if_current_user(
     reason: SharedInstanceUnavailableReason,
     state: &State,
 ) -> crate::Result<()> {
+	// A missing ID can belong to another API environment. Keep the attachment
+	// so opening a production instance in a staging build cannot unlink it.
+	if reason == SharedInstanceUnavailableReason::Deleted {
+		return Ok(());
+	}
+
     if reason != SharedInstanceUnavailableReason::Quarantined
         && !shared_attachment_matches_current_user(attachment, state).await?
     {

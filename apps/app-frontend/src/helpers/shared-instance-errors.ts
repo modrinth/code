@@ -11,6 +11,10 @@ export const sharedInstanceErrorMessages = defineMessages({
 		id: 'instance.shared-instance.unavailable.title',
 		defaultMessage: 'Shared instance no longer available',
 	},
+	notFoundTitle: {
+		id: 'instance.shared-instance.unavailable.not-found-title',
+		defaultMessage: 'Shared instance unavailable',
+	},
 	lockedTitle: {
 		id: 'instance.shared-instance.unavailable.locked-title',
 		defaultMessage: 'Instance locked',
@@ -21,9 +25,9 @@ export const sharedInstanceErrorMessages = defineMessages({
 			"Your local instance is still available, but it is no longer linked and won't receive updates.",
 	},
 	deletedText: {
-		id: 'instance.shared-instance.unavailable.deleted-text',
+		id: 'instance.shared-instance.unavailable.not-found-text',
 		defaultMessage:
-			'The primary instance was deleted. This instance is still available, but it is no longer linked and will no longer receive updates.',
+			'We couldn’t find this shared instance. Your installed content is still on this device.',
 	},
 	accessRevokedText: {
 		id: 'instance.shared-instance.unavailable.access-revoked-text',
@@ -65,6 +69,7 @@ export function sharedInstanceUnavailableTextMessage(
 export function sharedInstanceUnavailableTitleMessage(
 	reason: SharedInstanceUnavailableReason | null,
 ) {
+	if (reason === 'deleted') return sharedInstanceErrorMessages.notFoundTitle
 	return reason === 'quarantined'
 		? sharedInstanceErrorMessages.lockedTitle
 		: sharedInstanceErrorMessages.unavailableTitle

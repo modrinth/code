@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/vue-query'
 import type { ComputedRef, Ref } from 'vue'
 import { onMounted, onUnmounted, watch } from 'vue'
 
+import { clearServerSharedInstance } from '#ui/layouts/shared/server-sharing'
 import { injectModrinthClient } from '#ui/providers'
 
 import {
@@ -128,6 +129,9 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 					},
 				} : world)
 				void queryClient.invalidateQueries({ queryKey: ['servers', 'share-diff', serverId, event.world_id] })
+				break
+			case 'world.shared_instance.delete':
+				void clearServerSharedInstance(queryClient, serverId, event.world_id, event.shared_instance_id)
 				break
 			case 'world.content.update':
 				handleWorldContentUpdate(serverId, event)
