@@ -212,7 +212,7 @@ jobs:
             [[ -f "$art" ]] || continue
             b=$(basename "$art")
             case "$b" in
-              *.nsis.zip)
+              *.nsis.zip|*-setup.exe)
                 WIN_URL="https://github.com/ebluffy/Owyx/releases/download/${TAG}/${b}"
                 WIN_SIG=$(cat "$sigf")
                 ;;
