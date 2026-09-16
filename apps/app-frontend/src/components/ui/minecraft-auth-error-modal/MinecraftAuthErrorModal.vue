@@ -130,7 +130,7 @@ async function copyToClipboard(text: string) {
 
 			<!-- Action buttons -->
 			<div class="flex items-center gap-1">
-				<ButtonLink href="https://support.modrinth.com" class="flex-1" @click="modal?.hide()">
+				<ButtonLink href="https://owyx.site" class="flex-1" @click="modal?.hide()">
 					<MessagesSquareIcon /> Contact support
 				</ButtonLink>
 				<Button

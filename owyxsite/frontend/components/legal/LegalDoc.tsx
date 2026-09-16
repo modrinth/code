@@ -7,7 +7,7 @@ import { useLocale } from "@/hooks/useLocale";
 import type { LegalSlug } from "@/lib/legal";
 
 export default function LegalDoc({ slug }: { slug: LegalSlug }) {
-  const { dict, locale } = useLocale();
+  const { dict } = useLocale();
   const doc = dict.legal[slug];
 
   return (
@@ -23,7 +23,7 @@ export default function LegalDoc({ slug }: { slug: LegalSlug }) {
           </p>
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-2">{doc.title}</h1>
           <p className="text-xs text-muted mb-6">
-            {locale === "en_US" ? "Last modified" : "Обновлено"}: {doc.lastModified}
+            {dict.legal.lastModifiedLabel}: {doc.lastModified}
           </p>
           <div className="panel p-4 mb-8 text-sm text-muted space-y-2">
             <p>{doc.intro}</p>

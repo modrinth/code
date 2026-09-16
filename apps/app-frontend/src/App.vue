@@ -350,6 +350,18 @@ useAppEvent(
 				/* ignore */
 			}
 			setOwyxPresencePlaying(name)
+			if (event.instance_id) {
+				try {
+					const { writeOwyxCslConfigForInstance, mirrorLocalOwyxSkinToInstance } = await import(
+						'@/helpers/owyx-csl'
+					)
+					await writeOwyxCslConfigForInstance(event.instance_id)
+					const nick = owyxSiteSession.value?.user?.nickname
+					if (nick) await mirrorLocalOwyxSkinToInstance(event.instance_id, nick)
+				} catch {
+					/* best-effort skin wiring */
+				}
+			}
 		} else if (kind === 'finished') {
 			setOwyxPresenceOnline()
 		}

@@ -144,6 +144,14 @@ const messages = defineMessages({
 		defaultMessage: 'Also try http://127.0.0.1:3001 (dev only)',
 	},
 	saveSettings: { id: 'owyx.servers.save-settings', defaultMessage: 'Save API settings' },
+	apiHealth: {
+		id: 'owyx.admin.api-health',
+		defaultMessage: 'Check API status',
+	},
+	copyKeyHeader: {
+		id: 'owyx.admin.copy-key-header',
+		defaultMessage: 'Copy header name',
+	},
 	servers: { id: 'owyx.admin.servers', defaultMessage: 'Servers' },
 	packs: { id: 'owyx.admin.packs', defaultMessage: 'Packs' },
 	published: { id: 'owyx.admin.published', defaultMessage: 'Published' },
@@ -419,8 +427,48 @@ function saveSettings() {
 	statusMsg.value = 'Saved'
 }
 
+const apiHealth = ref('')
+const apiHealthBusy = ref(false)
+
+async function checkApiHealth() {
+	apiHealthBusy.value = true
+	apiHealth.value = ''
+	try {
+		const base = sanitizeOwyxApiBase(apiBase.value)
+		const headers: Record<string, string> = { Accept: 'application/json' }
+		const key = clientKey.value.trim() || getOwyxClientKey()
+		if (key) headers['X-Owyx-Client-Key'] = key
+		const res = await fetch(`${base}/api/launcher/v1/status`, {
+			headers,
+			signal: AbortSignal.timeout(8000),
+		})
+		const data = (await res.json().catch(() => ({}))) as {
+			version?: string
+			api?: string
+			error?: string
+		}
+		if (!res.ok) {
+			apiHealth.value = data.error || `HTTP ${res.status}`
+		} else {
+			apiHealth.value = `OK · ${data.api || 'owyx-launcher'} · API ${data.version || '?'}`
+		}
+	} catch (e) {
+		apiHealth.value = e instanceof Error ? e.message : String(e)
+	} finally {
+		apiHealthBusy.value = false
+	}
+}
+
 function openSiteAdmin() {
 	window.open('https://owyx.site/admin', '_blank', 'noopener,noreferrer')
+}
+
+function openSiteCatalog() {
+	window.open('https://owyx.site/admin', '_blank', 'noopener,noreferrer')
+}
+
+function copyClientKeyHint() {
+	void navigator.clipboard.writeText('X-Owyx-Client-Key').catch(() => undefined)
 }
 
 onMounted(() => {
@@ -878,9 +926,21 @@ onMounted(() => {
 					<input v-model="localFallback" type="checkbox" />
 					{{ formatMessage(messages.localFallbackToggle) }}
 				</label>
-				<Button type="colored" color="brand" @click="saveSettings">
-					{{ formatMessage(messages.saveSettings) }}
-				</Button>
+				<div class="flex flex-wrap gap-2">
+					<Button type="colored" color="brand" @click="saveSettings">
+						{{ formatMessage(messages.saveSettings) }}
+					</Button>
+					<Button class="!bg-button-bg" :disabled="apiHealthBusy" @click="checkApiHealth">
+						{{ formatMessage(messages.apiHealth) }}
+					</Button>
+					<Button class="!bg-button-bg" @click="openSiteCatalog">
+						{{ formatMessage(messages.openSiteAdmin) }}
+					</Button>
+					<Button class="!bg-button-bg" @click="copyClientKeyHint">
+						{{ formatMessage(messages.copyKeyHeader) }}
+					</Button>
+				</div>
+				<p v-if="apiHealth" class="m-0 text-sm text-secondary">{{ apiHealth }}</p>
 				<p v-if="statusMsg" class="m-0 text-sm text-secondary">{{ statusMsg }}</p>
 			</section>
 		</template>

@@ -12,7 +12,7 @@ const catalog = require('./catalog');
 // Versioned surface lives under /api/launcher/v1/*. Catalogs (servers/packs)
 // are real rows from the site control-plane — not empty stubs.
 
-const LAUNCHER_API_VERSION = '1.2.0';
+const LAUNCHER_API_VERSION = '1.3.0';
 
 /** Absolute base URL the launcher can use to download static assets (skins).
  *  Built from the request the launcher made (its own API base), so it works in
@@ -131,7 +131,17 @@ router.get('/v1/status', (_req, res) => {
       login: '/api/auth/login',
       me: '/api/launcher/me',
     },
-    modules: ['servers', 'packs', 'news', 'cosmetics', 'adminCatalog'],
+    modules: ['servers', 'packs', 'news', 'cosmetics', 'adminCatalog', 'friends', 'csl'],
+    skins: {
+      customSkinLoader: {
+        mod: 'https://modrinth.com/mod/customskinloader',
+        source: 'https://github.com/xfl03/MCCustomSkinLoader',
+        license: 'GPL-3.0',
+        apiRoot: '/api/csl/',
+        legacySkin: '/api/csl/skins/{USERNAME}.png',
+        profileJson: '/api/csl/{USERNAME}.json',
+      },
+    },
   });
 });
 

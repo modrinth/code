@@ -3297,7 +3297,7 @@
 		"message": "Создать сборку"
 	},
 	"app.welcome-screen.description": {
-		"message": "Готовы к началу?"
+		"message": "Выберите путь аккаунта (сайт Owyx, офлайн-ник или Microsoft), создайте инстанс и играйте."
 	},
 	"app.welcome-screen.import-from-launcher": {
 		"message": "Импортировать из лаунчера"
@@ -4266,7 +4266,7 @@
 		"message": "Аккаунт Minecraft"
 	},
 	"minecraft-account.not-signed-in": {
-		"message": "Вход не выполнен"
+		"message": "Как будете играть"
 	},
 	"minecraft-account.remove-account": {
 		"message": "Удалить аккаунт"
@@ -4368,19 +4368,19 @@
 		"message": "Добавить аккаунт Microsoft"
 	},
 	"minecraft-account.add-offline": {
-		"message": "Добавить аккаунт Owyx"
+		"message": "Добавить офлайн-ник"
 	},
 	"minecraft-account.microsoft": {
 		"message": "Microsoft"
 	},
 	"minecraft-account.offline": {
-		"message": "Owyx"
+		"message": "Owyx / офлайн"
 	},
 	"minecraft-account.sign-in-microsoft": {
 		"message": "Войти через Microsoft"
 	},
 	"minecraft-account.offline-nickname": {
-		"message": "Ник Owyx"
+		"message": "Играть с офлайн-ником"
 	},
 	"minecraft-account.offline-warning": {
 		"message": "Ник с owyx.site для серверов в offline-mode. На серверах с проверкой лицензии Microsoft нужен аккаунт Microsoft."
@@ -4389,7 +4389,7 @@
 		"message": "Ник"
 	},
 	"minecraft-account.play-offline": {
-		"message": "Сохранить аккаунт Owyx"
+		"message": "Сохранить ник"
 	},
 	"app.nav.owyx-servers": {
 		"message": "Серверы Owyx"
@@ -4398,7 +4398,7 @@
 		"message": "Серверы Owyx"
 	},
 	"owyx.servers.subtitle": {
-		"message": "Кураторские приватные серверы с control plane Owyx."
+		"message": "Сообщество и кураторские серверы с control plane Owyx."
 	},
 	"owyx.servers.empty": {
 		"message": "Сейчас нет доступных серверов. Проверьте настройки API или зайдите позже."
@@ -4555,5 +4555,110 @@
 	},
 	"owyx.servers.admin-tools-hint": {
 		"message": "Публикация паков и настройки API — в админ-панели."
+	},
+	"owyx.settings.social.allow-requests-hint": {
+		"message": "Если выключено, другие игроки не смогут отправлять вам новые заявки. Текущие друзья остаются."
+	},
+	"owyx.settings.social.presence-title": {
+		"message": "Присутствие"
+	},
+	"owyx.settings.social.presence-body": {
+		"message": "Пока вы вошли в аккаунт, лаунчер шлёт короткий heartbeat (~30 с). Друзья видят вас онлайн или в игре. Без heartbeat около 90 с вы офлайн."
+	},
+	"owyx.settings.social.skins-title": {
+		"message": "Скины в мире"
+	},
+	"owyx.settings.social.skins-body": {
+		"message": "Загрузите скин на owyx.site. Установите CustomSkinLoader в инстанс (Owyx пишет конфиг при включении скинов или при запуске). Другие с тем же модом увидят ваш скин Owyx."
+	},
+	"owyx.settings.social.skins-mod-link": {
+		"message": "Открыть CustomSkinLoader на Modrinth"
+	},
+	"owyx.settings.social.friends-hint": {
+		"message": "Подсказка: панель Друзья в сайдбаре — для заявок и статуса."
+	},
+	"owyx.settings.social.saved": {
+		"message": "Сохранено"
+	},
+	"owyx.settings.social.ui-sounds": {
+		"message": "Тихие звуки интерфейса"
+	},
+	"owyx.settings.social.ui-sounds-hint": {
+		"message": "Синтетические клики в приложении (без сэмплов). Отключаются при prefers-reduced-motion."
+	},
+	"owyx.settings.social.privacy": {
+		"message": "Приватность заявок в друзья — переключателем ниже."
+	},
+	"owyx.settings.social.coming-soon": {
+		"message": "доступно"
+	},
+	"owyx.settings.social.title": {
+		"message": "Друзья и соцсеть"
+	},
+	"owyx.settings.social.body": {
+		"message": "Заявки в друзья идут по никам Owyx. Панель Друзья в сайдбаре — добавить, принять или удалить."
+	},
+	"owyx.settings.social.allow-requests": {
+		"message": "Разрешить заявки в друзья от всех"
+	},
+	"owyx.settings.social.sign-in-title": {
+		"message": "Нужен аккаунт Owyx"
+	},
+	"owyx.settings.social.sign-in-body": {
+		"message": "Войдите, чтобы управлять друзьями и приватностью."
+	},
+	"owyx.settings.social.sign-in": {
+		"message": "Войти"
+	},
+	"friends.loading": {
+		"message": "Загрузка друзей…"
+	},
+	"friends.offline-banner": {
+		"message": "Вы офлайн. Список друзей может быть устаревшим."
+	},
+	"friends.list-error": {
+		"message": "Не удалось связаться с API друзей Owyx. Проверьте сеть и клиентский ключ, затем повторите."
+	},
+	"friends.retry": {
+		"message": "Повторить"
+	},
+	"friends.copy-instance": {
+		"message": "Скопировать, во что играют"
+	},
+	"minecraft-account.paths-hint": {
+		"message": "1) Войти аккаунтом сайта Owyx · 2) Офлайн-ник · 3) Microsoft (лицензия Minecraft)."
+	},
+	"minecraft-account.sign-in-owyx-site": {
+		"message": "Войти аккаунтом Owyx"
+	},
+	"minecraft-account.microsoft-stub-hint": {
+		"message": "Вход Microsoft — для лицензионного профиля. Полный OAuth ещё дорабатывается — для offline-mode серверов используйте Owyx или офлайн-ник."
+	},
+	"app.welcome-screen.account-paths": {
+		"message": "Новичок? Карточка аккаунта слева: вход Owyx, офлайн-ник или Microsoft."
+	},
+	"owyx.servers.loading": {
+		"message": "Загрузка серверов…"
+	},
+	"owyx.admin.api-health": {
+		"message": "Проверить статус API"
+	},
+	"owyx.admin.copy-key-header": {
+		"message": "Скопировать имя заголовка"
+	},
+	"owyx.instance.csl.title": {
+		"message": "Скины Owyx в мире"
+	},
+	"owyx.instance.csl.body": {
+		"message": "Пишет конфиг CustomSkinLoader на URL скинов Owyx. Установите мод CustomSkinLoader в этот инстанс (Fabric/Forge/NeoForge)."
+	},
+	"owyx.instance.csl.enable": {
+		"message": "Записать конфиг скинов Owyx"
+	},
+	"owyx.instance.csl.done": {
+		"message": "Конфиг записан. Добавьте CustomSkinLoader с Modrinth, если мода ещё нет."
+	},
+	"owyx.instance.csl.mod-link": {
+		"message": "Открыть CustomSkinLoader"
 	}
 }

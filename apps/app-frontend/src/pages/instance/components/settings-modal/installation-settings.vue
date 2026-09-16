@@ -40,6 +40,13 @@ import type { Manifest } from '../../../../helpers/types'
 import { instanceKeys } from '../../query-options.ts'
 import { injectInstanceSettings } from './instance-settings-context.ts'
 import SharedInstanceInstallationSettingsControls from './shared-instance-installation-settings-controls.vue'
+import {
+	CUSTOM_SKIN_LOADER_MODRINTH,
+	mirrorLocalOwyxSkinToInstance,
+	writeOwyxCslConfigForInstance,
+} from '@/helpers/owyx-csl'
+import { injectOwyxSiteSession } from '@/providers/owyx-site-session'
+import { playOwyxUiSound } from '@/helpers/owyx-ui-sound'
 
 const { handleError } = injectNotificationManager()
 const appEvents = injectAppEvents()
@@ -486,11 +493,82 @@ provideInstallationSettings({
 	repairing,
 	reinstalling,
 })
+
+const owyx = injectOwyxSiteSession()
+const cslBusy = ref(false)
+const cslDone = ref(false)
+
+async function enableOwyxSkins() {
+	cslBusy.value = true
+	cslDone.value = false
+	try {
+		await writeOwyxCslConfigForInstance(instance.value.id)
+		const nick = owyx.session.value?.user?.nickname
+		if (nick) await mirrorLocalOwyxSkinToInstance(instance.value.id, nick)
+		cslDone.value = true
+		playOwyxUiSound('success')
+	} catch (e) {
+		handleError(e)
+	} finally {
+		cslBusy.value = false
+	}
+}
+
+const cslMessages = defineMessages({
+	skinsTitle: {
+		id: 'owyx.instance.csl.title',
+		defaultMessage: 'Owyx in-world skins',
+	},
+	skinsBody: {
+		id: 'owyx.instance.csl.body',
+		defaultMessage:
+			'Writes CustomSkinLoader config pointing at api.owyx.site / owyx.site skin URLs. Install the CustomSkinLoader mod in this instance (Fabric/Forge/NeoForge).',
+	},
+	skinsEnable: {
+		id: 'owyx.instance.csl.enable',
+		defaultMessage: 'Write Owyx skin config',
+	},
+	skinsDone: {
+		id: 'owyx.instance.csl.done',
+		defaultMessage: 'Config written. Add CustomSkinLoader from Modrinth if it is not installed yet.',
+	},
+	skinsMod: {
+		id: 'owyx.instance.csl.mod-link',
+		defaultMessage: 'Open CustomSkinLoader',
+	},
+})
 </script>
 
 <template>
 	<InstallationSettingsLayout>
 		<template #extra>
+			<div
+				class="mb-4 flex flex-col gap-2 rounded-xl border border-solid border-surface-5 bg-surface-2 p-3"
+			>
+				<p class="m-0 text-sm font-medium text-contrast">{{ formatMessage(cslMessages.skinsTitle) }}</p>
+				<p class="m-0 text-xs text-secondary leading-relaxed">
+					{{ formatMessage(cslMessages.skinsBody) }}
+				</p>
+				<div class="flex flex-wrap gap-2">
+					<button
+						type="button"
+						class="btn btn-primary cursor-pointer rounded-lg border-0 bg-brand px-3 py-1.5 text-sm text-inverted disabled:opacity-60"
+						:disabled="cslBusy"
+						@click="enableOwyxSkins"
+					>
+						{{ formatMessage(cslMessages.skinsEnable) }}
+					</button>
+					<a
+						class="text-sm text-link self-center"
+						:href="CUSTOM_SKIN_LOADER_MODRINTH"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						{{ formatMessage(cslMessages.skinsMod) }}
+					</a>
+				</div>
+				<p v-if="cslDone" class="m-0 text-xs text-secondary">{{ formatMessage(cslMessages.skinsDone) }}</p>
+			</div>
 			<SharedInstanceInstallationSettingsControls
 				:can-unlink="canUnlinkSharedInstance"
 				:busy="installationSettingsBusy"

@@ -119,6 +119,18 @@ export async function acceptOwyxFriend(id: string): Promise<OwyxFriend> {
 	return data.friend
 }
 
+export async function declineOwyxFriend(id: string): Promise<void> {
+	const res = await owyxFetch(`${apiBase()}/api/friends/${encodeURIComponent(id)}/decline`, {
+		method: 'POST',
+		headers: authHeaders(),
+		signal: AbortSignal.timeout(10000),
+	})
+	if (!res.ok) {
+		const data = (await res.json().catch(() => ({}))) as { error?: string }
+		throw new Error(data.error || `Decline failed (${res.status})`)
+	}
+}
+
 export async function removeOwyxFriend(id: string): Promise<void> {
 	const res = await owyxFetch(`${apiBase()}/api/friends/${encodeURIComponent(id)}`, {
 		method: 'DELETE',
@@ -128,6 +140,45 @@ export async function removeOwyxFriend(id: string): Promise<void> {
 	if (!res.ok) {
 		const data = (await res.json().catch(() => ({}))) as { error?: string }
 		throw new Error(data.error || `Remove failed (${res.status})`)
+	}
+}
+
+export type OwyxSocialSettings = {
+	allowFriendRequests: boolean
+}
+
+export async function getOwyxSocialSettings(): Promise<OwyxSocialSettings> {
+	const res = await owyxFetch(`${apiBase()}/api/friends/settings`, {
+		method: 'GET',
+		headers: authHeaders(),
+		signal: AbortSignal.timeout(10000),
+	})
+	const data = (await res.json().catch(() => ({}))) as {
+		settings?: OwyxSocialSettings
+		error?: string
+	}
+	if (!res.ok) throw new Error(data.error || `Settings failed (${res.status})`)
+	return {
+		allowFriendRequests: data.settings?.allowFriendRequests !== false,
+	}
+}
+
+export async function patchOwyxSocialSettings(
+	settings: Partial<OwyxSocialSettings>,
+): Promise<OwyxSocialSettings> {
+	const res = await owyxFetch(`${apiBase()}/api/friends/settings`, {
+		method: 'PATCH',
+		headers: authHeaders(),
+		body: JSON.stringify(settings),
+		signal: AbortSignal.timeout(10000),
+	})
+	const data = (await res.json().catch(() => ({}))) as {
+		settings?: OwyxSocialSettings
+		error?: string
+	}
+	if (!res.ok || !data.settings) throw new Error(data.error || `Save settings failed (${res.status})`)
+	return {
+		allowFriendRequests: data.settings.allowFriendRequests !== false,
 	}
 }
 

@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { useLocale } from "@/hooks/useLocale";
 
 type SourceType = "http_zip" | "http_manifest" | "google_drive" | "mrpack" | "sftp" | "local_ingest";
 
@@ -34,17 +35,7 @@ type ServerRow = {
   sortOrder: number;
 };
 
-const SOURCE_TYPES: { id: SourceType; label: string }[] = [
-  { id: "http_zip", label: "HTTP zip" },
-  { id: "http_manifest", label: "HTTP манифест" },
-  { id: "google_drive", label: "Google Drive" },
-  { id: "mrpack", label: "mrpack" },
-  { id: "sftp", label: "SFTP (только админ)" },
-  { id: "local_ingest", label: "Локальная заливка" },
-];
-
 const LOADERS = ["vanilla", "fabric", "forge", "neoforge", "quilt"];
-
 
 const MC_VERSION_SUGGESTIONS = [
   "1.21.8",
@@ -174,6 +165,22 @@ export default function CatalogAdmin({
   authHeaders: () => Record<string, string>;
   showMessage: (t: string, k: "success" | "error") => void;
 }) {
+  const { locale } = useLocale();
+  const en = locale === "en_US";
+  const t = (enText: string, ruText: string) => (en ? enText : ruText);
+  const SOURCE_TYPES: { id: SourceType; label: string }[] = useMemo(
+    () => [
+      { id: "http_zip", label: "HTTP zip" },
+      { id: "http_manifest", label: t("HTTP manifest", "HTTP манифест") },
+      { id: "google_drive", label: "Google Drive" },
+      { id: "mrpack", label: "mrpack" },
+      { id: "sftp", label: t("SFTP (admin only)", "SFTP (только админ)") },
+      { id: "local_ingest", label: t("Local upload", "Локальная заливка") },
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- locale drives labels
+    [locale],
+  );
+
   const [tab, setTab] = useState<"servers" | "packs">("servers");
   const [servers, setServers] = useState<ServerRow[]>([]);
   const [packs, setPacks] = useState<PackRow[]>([]);
@@ -469,9 +476,14 @@ export default function CatalogAdmin({
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="font-display text-lg font-bold tracking-tight">Каталог лаунчера</h2>
+          <h2 className="font-display text-lg font-bold tracking-tight">
+            {t("Launcher catalog", "Каталог лаунчера")}
+          </h2>
           <p className="mt-1 text-sm text-muted">
-            Серверы и сборки, которые видит лаунчер. SFTP — только для админа.
+            {t(
+              "Servers and packs the launcher can see. SFTP is admin-only.",
+              "Серверы и сборки, которые видит лаунчер. SFTP — только для админа.",
+            )}
           </p>
         </div>
         <div className="flex gap-2">
@@ -480,14 +492,14 @@ export default function CatalogAdmin({
             className={`cabinet-rail-item ${tab === "servers" ? "is-active" : ""}`}
             onClick={() => setTab("servers")}
           >
-            Серверы
+            {t("Servers", "Серверы")}
           </button>
           <button
             type="button"
             className={`cabinet-rail-item ${tab === "packs" ? "is-active" : ""}`}
             onClick={() => setTab("packs")}
           >
-            Сборки
+            {t("Packs", "Сборки")}
           </button>
         </div>
       </div>

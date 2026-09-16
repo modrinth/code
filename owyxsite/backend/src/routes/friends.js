@@ -40,6 +40,24 @@ async function ensureFriendsSchema() {
       updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
     )
   `);
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS public.user_social_settings (
+      user_id INTEGER PRIMARY KEY REFERENCES public.users(id) ON DELETE CASCADE,
+      allow_friend_requests BOOLEAN NOT NULL DEFAULT true,
+      updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+}
+
+async function getSocialSettings(userId) {
+  const result = await db.query(
+    `SELECT allow_friend_requests FROM user_social_settings WHERE user_id = $1`,
+    [userId]
+  );
+  if (!result.rows[0]) {
+    return { allowFriendRequests: true };
+  }
+  return { allowFriendRequests: result.rows[0].allow_friend_requests !== false };
 }
 
 function presenceFromRow(row) {
@@ -100,6 +118,44 @@ const FRIEND_SELECT = `
   END
 `;
 
+// GET /api/friends/settings
+router.get('/settings', async (req, res) => {
+  try {
+    const settings = await getSocialSettings(req.user.id);
+    res.json({ settings });
+  } catch (error) {
+    console.error('friends settings get:', error);
+    res.status(500).json({ error: 'could not load social settings' });
+  }
+});
+
+// PATCH /api/friends/settings  { allowFriendRequests?: boolean }
+router.patch('/settings', async (req, res) => {
+  try {
+    const allow =
+      typeof req.body.allowFriendRequests === 'boolean'
+        ? req.body.allowFriendRequests
+        : typeof req.body.allow_friend_requests === 'boolean'
+          ? req.body.allow_friend_requests
+          : null;
+    if (allow === null) {
+      return res.status(400).json({ error: 'allowFriendRequests boolean required' });
+    }
+    await db.query(
+      `INSERT INTO user_social_settings (user_id, allow_friend_requests, updated_at)
+       VALUES ($1, $2, NOW())
+       ON CONFLICT (user_id) DO UPDATE SET
+         allow_friend_requests = EXCLUDED.allow_friend_requests,
+         updated_at = NOW()`,
+      [req.user.id, allow]
+    );
+    res.json({ settings: { allowFriendRequests: allow } });
+  } catch (error) {
+    console.error('friends settings patch:', error);
+    res.status(500).json({ error: 'could not save social settings' });
+  }
+});
+
 // GET /api/friends — list mine (accepted + pending both ways)
 router.get('/', async (req, res) => {
   try {
@@ -117,7 +173,7 @@ router.get('/', async (req, res) => {
     });
   } catch (error) {
     console.error('friends list:', error);
-    res.status(500).json({ error: 'не удалось загрузить друзей' });
+    res.status(500).json({ error: 'could not load friends' });
   }
 });
 
@@ -151,7 +207,7 @@ router.post('/presence', async (req, res) => {
     });
   } catch (error) {
     console.error('friends presence:', error);
-    res.status(500).json({ error: 'не удалось обновить статус' });
+    res.status(500).json({ error: 'could not update presence' });
   }
 });
 
@@ -160,7 +216,7 @@ router.get('/search', async (req, res) => {
   try {
     const q = String(req.query.q || '').trim();
     if (q.length < 2) {
-      return res.status(400).json({ error: 'минимум 2 символа' });
+      return res.status(400).json({ error: 'at least 2 characters' });
     }
     const result = await db.query(
       `SELECT id, nickname, avatar_url
@@ -182,7 +238,7 @@ router.get('/search', async (req, res) => {
     });
   } catch (error) {
     console.error('friends search:', error);
-    res.status(500).json({ error: 'не удалось найти пользователей' });
+    res.status(500).json({ error: 'could not search users' });
   }
 });
 
@@ -191,7 +247,7 @@ router.post('/request', async (req, res) => {
   try {
     const nickname = String(req.body.nickname || '').trim();
     if (!NICK_RE.test(nickname)) {
-      return res.status(400).json({ error: 'ник: 3–16 латиница/цифры/_' });
+      return res.status(400).json({ error: 'nickname: 3–16 letters, digits, or _' });
     }
     const target = await db.query(
       `SELECT id, nickname, avatar_url FROM users
@@ -201,11 +257,16 @@ router.post('/request', async (req, res) => {
       [nickname]
     );
     if (!target.rows[0]) {
-      return res.status(404).json({ error: 'пользователь не найден' });
+      return res.status(404).json({ error: 'user not found' });
     }
     const friendId = target.rows[0].id;
     if (Number(friendId) === Number(req.user.id)) {
-      return res.status(400).json({ error: 'нельзя добавить себя' });
+      return res.status(400).json({ error: 'cannot add yourself' });
+    }
+
+    const targetSettings = await getSocialSettings(friendId);
+    if (!targetSettings.allowFriendRequests) {
+      return res.status(403).json({ error: 'this player is not accepting friend requests' });
     }
 
     const existing = await db.query(
@@ -217,7 +278,7 @@ router.post('/request', async (req, res) => {
     if (existing.rows[0]) {
       const row = existing.rows[0];
       if (row.status === 'accepted') {
-        return res.status(409).json({ error: 'уже друзья' });
+        return res.status(409).json({ error: 'already friends' });
       }
       // If they already sent us a request, auto-accept.
       if (Number(row.user_id) === Number(friendId) && Number(row.friend_id) === Number(req.user.id)) {
@@ -232,7 +293,7 @@ router.post('/request', async (req, res) => {
         ]);
         return res.json({ success: true, friend: publicFriend(full.rows[0], req.user.id) });
       }
-      return res.status(409).json({ error: 'заявка уже отправлена' });
+      return res.status(409).json({ error: 'request already sent' });
     }
 
     const inserted = await db.query(
@@ -247,7 +308,7 @@ router.post('/request', async (req, res) => {
     res.status(201).json({ success: true, friend: publicFriend(full.rows[0], req.user.id) });
   } catch (error) {
     console.error('friends request:', error);
-    res.status(500).json({ error: 'не удалось отправить заявку' });
+    res.status(500).json({ error: 'could not send friend request' });
   }
 });
 
@@ -261,7 +322,7 @@ router.post('/:id/accept', async (req, res) => {
       [req.params.id, req.user.id]
     );
     if (!result.rows[0]) {
-      return res.status(404).json({ error: 'заявка не найдена' });
+      return res.status(404).json({ error: 'request not found' });
     }
     const full = await db.query(`${FRIEND_SELECT} WHERE f.id = $2`, [
       req.user.id,
@@ -270,7 +331,7 @@ router.post('/:id/accept', async (req, res) => {
     res.json({ success: true, friend: publicFriend(full.rows[0], req.user.id) });
   } catch (error) {
     console.error('friends accept:', error);
-    res.status(500).json({ error: 'не удалось принять заявку' });
+    res.status(500).json({ error: 'could not accept request' });
   }
 });
 
@@ -284,12 +345,12 @@ async function removeFriendship(req, res) {
       [req.params.id, req.user.id]
     );
     if (!result.rows[0]) {
-      return res.status(404).json({ error: 'запись не найдена' });
+      return res.status(404).json({ error: 'friendship not found' });
     }
     res.json({ success: true });
   } catch (error) {
     console.error('friends remove:', error);
-    res.status(500).json({ error: 'не удалось удалить' });
+    res.status(500).json({ error: 'could not remove friendship' });
   }
 }
 

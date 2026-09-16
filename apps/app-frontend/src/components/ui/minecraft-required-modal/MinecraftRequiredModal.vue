@@ -21,7 +21,7 @@
 
 		<div class="flex flex-col gap-6 px-6 pb-6">
 			<div class="grid grid-cols-2 gap-2">
-				<ButtonLink href="https://support.modrinth.com" @click="modal?.hide()">
+				<ButtonLink href="https://owyx.site" @click="modal?.hide()">
 					<MessagesSquareIcon />
 					{{ formatMessage(messages.getSupport) }}
 				</ButtonLink>
@@ -79,14 +79,14 @@ const messages = defineMessages({
 		id: 'minecraft-required.description-header',
 		defaultMessage: 'Sign in to a Microsoft account',
 	},
+	getSupport: {
+		id: 'minecraft-required.get-support',
+		defaultMessage: 'Visit owyx.site',
+	},
 	description: {
 		id: 'minecraft-required.description',
 		defaultMessage:
-			'You need a Microsoft account that owns Minecraft before you can launch and play.',
-	},
-	getSupport: {
-		id: 'minecraft-required.get-support',
-		defaultMessage: 'Get support',
+			'A Microsoft account that owns Minecraft is required for this action. For offline-mode play you can use an Owyx nickname instead. Owyx does not offer Modrinth support.',
 	},
 	signIn: {
 		id: 'minecraft-required.sign-in',

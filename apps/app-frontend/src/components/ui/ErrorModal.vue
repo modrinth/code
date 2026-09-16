@@ -47,7 +47,7 @@ const errorCollapsed = ref(false)
 
 const title = ref('An error occurred')
 const errorType = ref('unknown')
-const supportLink = ref('https://support.modrinth.com')
+const supportLink = ref('https://owyx.site')
 const metadata = ref({})
 
 defineExpose({
@@ -59,7 +59,7 @@ defineExpose({
 			title.value = 'Unable to sign in to Minecraft'
 			errorType.value = 'minecraft_auth'
 			supportLink.value =
-				'https://support.modrinth.com/en/articles/9038231-minecraft-sign-in-issues'
+				'https://owyx.site'
 
 			if (
 				errorVal.message.includes('existing connection was forcibly closed') ||
@@ -73,7 +73,7 @@ defineExpose({
 		} else if (errorVal.message && errorVal.message.includes('Move directory error:')) {
 			title.value = 'Could not change app directory'
 			errorType.value = 'directory_move'
-			supportLink.value = 'https://support.modrinth.com'
+			supportLink.value = 'https://owyx.site'
 
 			if (errorVal.message.includes('directory is not writable')) {
 				metadata.value.readOnly = true
@@ -85,16 +85,16 @@ defineExpose({
 		} else if (errorVal.message && errorVal.message.includes('No loader version selected for')) {
 			title.value = 'No loader selected'
 			errorType.value = 'no_loader_version'
-			supportLink.value = 'https://support.modrinth.com'
+			supportLink.value = 'https://owyx.site'
 			metadata.value.instanceId = context.instanceId
 		} else if (source === 'state_init') {
 			title.value = 'Error initializing Owyx'
 			errorType.value = 'state_init'
-			supportLink.value = 'https://support.modrinth.com'
+			supportLink.value = 'https://owyx.site'
 		} else {
 			title.value = 'An error occurred'
 			errorType.value = 'unknown'
-			supportLink.value = 'https://support.modrinth.com'
+			supportLink.value = 'https://owyx.site'
 			metadata.value = {}
 		}
 
@@ -180,29 +180,21 @@ async function copyToClipboard(text) {
 					<template v-if="metadata.network">
 						<h3>Network issues</h3>
 						<p>
-							It looks like there were issues with the Owyx connecting to Microsoft's
+							It looks like there were issues with Owyx connecting to Microsoft's
 							servers. This is often the result of a poor connection, so we recommend trying again
-							to see if it works. If issues continue to persist, follow the steps in
-							<a
-								href="https://support.modrinth.com/en/articles/9038231-minecraft-sign-in-issues#h_e71a5f805f"
-							>
-								our support article
-							</a>
-							to troubleshoot.
+							to see if it works. Owyx does not provide Modrinth support — for help visit
+							<a href="https://owyx.site">owyx.site</a>
+							or our Discord. You can also play with an Owyx / offline nickname on offline-mode servers.
 						</p>
 					</template>
 					<template v-else-if="metadata.hostsFile">
 						<h3>Network issues</h3>
 						<p>
-							The Owyx tried to connect to Microsoft / Xbox / Minecraft services, but the
+							The Owyx launcher tried to connect to Microsoft / Xbox / Minecraft services, but the
 							remote server rejected the connection. This may indicate that these services are
-							blocked by the hosts file. Please visit
-							<a
-								href="https://support.modrinth.com/en/articles/9038231-minecraft-sign-in-issues#h_d694a29256"
-							>
-								our support article
-							</a>
-							for steps on how to fix the issue.
+							blocked by the hosts file. Visit
+							<a href="https://owyx.site">owyx.site</a>
+							or Discord for community tips — Owyx is not Modrinth support.
 						</p>
 					</template>
 					<template v-else>

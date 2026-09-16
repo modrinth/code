@@ -18,30 +18,24 @@ export default function NewsSection() {
 
   const FALLBACK: NewsItem[] = [
     {
-      title: locale === "en_US" ? "Sign in with your Owyx™ account" : "Вход по аккаунту Owyx™",
+      title: dict.home.newsFallbackTitleLauncher,
       tag: dict.home.newsFallbackTagLauncher,
-      summary:
-        locale === "en_US"
-          ? "You can sign into the launcher with your site account — nickname, role, and skin sync automatically."
-          : "В лаунчере можно войти аккаунтом сайта — ник, роль и скин подтягиваются автоматически.",
+      summary: dict.home.newsFallbackBodyLauncher,
     },
     {
-      title: locale === "en_US" ? "Skins and capes" : "Скины и плащи",
+      title: dict.home.newsFallbackTitleCosmetics,
       tag: dict.home.newsFallbackTagCosmetics,
-      summary:
-        locale === "en_US"
-          ? "Upload your skin in the profile — the launcher picks it up when you sign in. Capes are on the way."
-          : "Загружай свой скин в профиле — лаунчер подхватит его при входе. Плащи на подходе.",
+      summary: dict.home.newsFallbackBodyCosmetics,
     },
   ];
 
   const tagClass: Record<string, string> = {
     [dict.home.newsFallbackTagLauncher]: "badge-accent",
     [dict.home.newsFallbackTagCosmetics]: "badge-ok",
-    Лаунчер: "badge-accent",
-    Косметика: "badge-ok",
     Launcher: "badge-accent",
     Cosmetics: "badge-ok",
+    Лаунчер: "badge-accent",
+    Косметика: "badge-ok",
   };
 
   function fmtDate(iso?: string) {

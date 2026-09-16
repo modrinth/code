@@ -34,14 +34,14 @@
 						<li>
 							<IntlFormatted :message-id="messages.supportAndBugReports">
 								<template #support-link="{ children }">
-									<AutoLink class="text-link hover:underline" to="https://support.modrinth.com">
+									<AutoLink class="text-link hover:underline" to="https://owyx.site">
 										<component :is="() => children" />
 									</AutoLink>
 								</template>
 								<template #github-link="{ children }">
 									<AutoLink
 										class="text-link hover:underline"
-										to="https://github.com/modrinth/code/issues"
+										to="https://github.com/ebluffy/Owyx/issues"
 									>
 										<component :is="() => children" />
 									</AutoLink>
@@ -53,7 +53,7 @@
 								<template #copyright-link="{ children }">
 									<AutoLink
 										class="text-link hover:underline"
-										to="https://modrinth.com/legal/copyright"
+										to="https://owyx.site/legal/terms"
 									>
 										<component :is="() => children" />
 									</AutoLink>
@@ -511,12 +511,12 @@ const messages = defineMessages({
 	inviteWarning: {
 		id: 'app.modal.install-to-play.invite-warning',
 		defaultMessage:
-			'This invite was created by another Modrinth user, not Modrinth. Only accept invites from people you trust.',
+			'This invite was created by another player, not the Owyx team. Only accept invites from people you trust. You can accept, decline, or install from the prompt — there is no dead end.',
 	},
 	inviteWarningWithCreator: {
 		id: 'app.modal.install-to-play.invite-warning-with-creator',
 		defaultMessage:
-			'This invite was created by <creator>{username}</creator>, not Modrinth. Only accept invites from people you trust.',
+			'This invite was created by <creator>{username}</creator>, not the Owyx team. Only accept invites from people you trust.',
 	},
 	reportDescription: {
 		id: 'app.modal.install-to-play.report-description',
@@ -526,12 +526,12 @@ const messages = defineMessages({
 	supportAndBugReports: {
 		id: 'app.modal.install-to-play.report-support-and-bugs',
 		defaultMessage:
-			'For support requests, contact our <support-link>support team</support-link>. For bug reports, open a <github-link>GitHub issue</github-link>.',
+			'For help, visit <support-link>owyx.site</support-link> (Owyx does not offer Modrinth support). For bugs, open a <github-link>GitHub issue</github-link>.',
 	},
 	legalClaims: {
 		id: 'app.modal.install-to-play.report-legal-claims',
 		defaultMessage:
-			'For DMCA notices or other legal claims, see our <copyright-link>Copyright Policy</copyright-link>.',
+			'For DMCA notices or other legal claims, see our <copyright-link>legal pages on owyx.site</copyright-link>.',
 	},
 	contentYouAreReporting: {
 		id: 'app.modal.install-to-play.content-you-are-reporting',

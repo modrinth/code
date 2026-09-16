@@ -28,11 +28,20 @@ const messages = defineMessages({
 	title: { id: 'owyx.servers.title', defaultMessage: 'Owyx Servers' },
 	subtitle: {
 		id: 'owyx.servers.subtitle',
-		defaultMessage: 'Curated private servers from the Owyx control plane.',
+		defaultMessage: 'Community and curated servers from the Owyx control plane.',
 	},
 	empty: {
 		id: 'owyx.servers.empty',
-		defaultMessage: 'No servers published yet. Check back later or ask an admin.',
+		defaultMessage: 'No servers published yet. Check back later, or ask an admin to publish one.',
+	},
+	unreachable: {
+		id: 'owyx.servers.unreachable',
+		defaultMessage:
+			'Could not reach the Owyx API. Check your connection, API base URL, and client key in Admin → API.',
+	},
+	loading: {
+		id: 'owyx.servers.loading',
+		defaultMessage: 'Loading servers…',
 	},
 	play: { id: 'owyx.servers.play', defaultMessage: 'Play' },
 	settings: { id: 'owyx.servers.settings', defaultMessage: 'Settings' },
@@ -60,6 +69,7 @@ useRootBreadcrumb({
 
 const servers = ref<OwyxServerEntry[]>([])
 const loading = ref(false)
+const loadError = ref('')
 const playingId = ref<string | null>(null)
 const apiBase = ref(getStoredOwyxApiBase())
 const copiedId = ref<string | null>(null)
@@ -69,6 +79,7 @@ const isAdmin = computed(() => owyx.isAdmin.value)
 
 async function loadCatalog() {
 	loading.value = true
+	loadError.value = ''
 	try {
 		const result = await fetchOwyxCatalog({
 			baseUrl: sanitizeOwyxApiBase(apiBase.value),
@@ -81,6 +92,7 @@ async function loadCatalog() {
 		apiBase.value = getStoredOwyxApiBase()
 	} catch (e) {
 		servers.value = []
+		loadError.value = e instanceof Error ? e.message : String(e)
 		handleError(e)
 	} finally {
 		loading.value = false
@@ -192,7 +204,18 @@ onMounted(() => {
 			</Button>
 		</section>
 
-		<section v-if="loading" class="text-secondary">…</section>
+		<section v-if="loading" class="text-secondary animate-pulse">
+			{{ formatMessage(messages.loading) }}
+		</section>
+
+		<section
+			v-else-if="loadError && !hasServers"
+			class="rounded-xl border border-dashed border-surface-5 bg-surface-2 p-8 text-center text-secondary"
+		>
+			<p class="m-0">{{ formatMessage(messages.unreachable) }}</p>
+			<p class="m-0 mt-2 text-xs opacity-80">{{ loadError }}</p>
+			<Button class="mt-4" @click="loadCatalog">{{ formatMessage(messages.refresh) }}</Button>
+		</section>
 
 		<section
 			v-else-if="!hasServers"

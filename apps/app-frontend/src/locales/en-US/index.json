@@ -4449,7 +4449,7 @@
 		"message": "Minecraft account"
 	},
 	"minecraft-account.not-signed-in": {
-		"message": "Not signed in"
+		"message": "Choose how to play"
 	},
 	"minecraft-account.remove-account": {
 		"message": "Remove account"
@@ -4678,5 +4678,92 @@
 	},
 	"owyx.servers.admin-tools-hint": {
 		"message": "Publish packs and API settings live in the Admin panel."
+	},
+	"owyx.settings.social.allow-requests-hint": {
+		"message": "When off, other players cannot send you new requests. Existing friends stay connected."
+	},
+	"owyx.settings.social.presence-title": {
+		"message": "Presence"
+	},
+	"owyx.settings.social.presence-body": {
+		"message": "While signed in, the launcher sends a short heartbeat (~30s). Friends see you as online or playing. After about 90 seconds without a heartbeat you appear offline."
+	},
+	"owyx.settings.social.skins-title": {
+		"message": "In-world skins"
+	},
+	"owyx.settings.social.skins-body": {
+		"message": "Upload a skin on owyx.site. Install CustomSkinLoader in your instance (Owyx writes the config when you enable skins from instance options or on launch). Others with the same mod see your Owyx skin."
+	},
+	"owyx.settings.social.skins-mod-link": {
+		"message": "Open CustomSkinLoader on Modrinth"
+	},
+	"owyx.settings.social.friends-hint": {
+		"message": "Tip: open the Friends panel from the home sidebar to manage requests."
+	},
+	"owyx.settings.social.saved": {
+		"message": "Saved"
+	},
+	"owyx.settings.social.ui-sounds": {
+		"message": "Soft UI sounds"
+	},
+	"owyx.settings.social.ui-sounds-hint": {
+		"message": "Synthetic clicks generated in the app (no sample packs). Muted automatically when prefers-reduced-motion is on."
+	},
+	"owyx.settings.social.privacy": {
+		"message": "Friend-request privacy is controlled by the toggle below."
+	},
+	"owyx.settings.social.coming-soon": {
+		"message": "available"
+	},
+	"friends.loading": {
+		"message": "Loading friends…"
+	},
+	"friends.offline-banner": {
+		"message": "You are offline. Friend list may be out of date."
+	},
+	"friends.list-error": {
+		"message": "Could not reach Owyx friends API. Check your connection and client key, then retry."
+	},
+	"friends.retry": {
+		"message": "Retry"
+	},
+	"friends.copy-instance": {
+		"message": "Copy what they’re playing"
+	},
+	"minecraft-account.paths-hint": {
+		"message": "1) Sign in with your Owyx site account · 2) Use an offline nickname · 3) Microsoft (licensed Minecraft)."
+	},
+	"minecraft-account.sign-in-owyx-site": {
+		"message": "Sign in with Owyx account"
+	},
+	"minecraft-account.microsoft-stub-hint": {
+		"message": "Microsoft sign-in is for a licensed Minecraft profile. Full OAuth polish is still in progress — use Owyx or offline nick to play on offline-mode servers."
+	},
+	"app.welcome-screen.account-paths": {
+		"message": "New here? Use the account card on the left: Owyx site login, offline nickname, or Microsoft."
+	},
+	"owyx.servers.loading": {
+		"message": "Loading servers…"
+	},
+	"owyx.admin.api-health": {
+		"message": "Check API status"
+	},
+	"owyx.admin.copy-key-header": {
+		"message": "Copy header name"
+	},
+	"owyx.instance.csl.title": {
+		"message": "Owyx in-world skins"
+	},
+	"owyx.instance.csl.body": {
+		"message": "Writes CustomSkinLoader config pointing at Owyx skin URLs. Install the CustomSkinLoader mod in this instance (Fabric/Forge/NeoForge)."
+	},
+	"owyx.instance.csl.enable": {
+		"message": "Write Owyx skin config"
+	},
+	"owyx.instance.csl.done": {
+		"message": "Config written. Add CustomSkinLoader from Modrinth if it is not installed yet."
+	},
+	"owyx.instance.csl.mod-link": {
+		"message": "Open CustomSkinLoader"
 	}
 }

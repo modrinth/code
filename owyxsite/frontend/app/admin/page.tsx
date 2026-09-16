@@ -6,6 +6,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import CabinetShell, { Toast } from "@/components/layout/CabinetShell";
 import { useAuth } from "@/hooks/useAuth";
+import { useLocale } from "@/hooks/useLocale";
 import CatalogAdmin from "@/components/admin/CatalogAdmin";
 
 interface AdminUser {
@@ -23,20 +24,26 @@ type Section = "users" | "catalog" | "news";
 
 export default function AdminPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center">
-          <p className="text-muted">Загрузка…</p>
-        </div>
-      }
-    >
+    <Suspense fallback={<AdminLoadingFallback />}>
       <AdminPageInner />
     </Suspense>
   );
 }
 
+function AdminLoadingFallback() {
+  const { locale } = useLocale();
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <p className="text-muted">{locale === "en_US" ? "Loading…" : "Загрузка…"}</p>
+    </div>
+  );
+}
+
 function AdminPageInner() {
   const { user, loading: authLoading } = useAuth({ requireAuth: true });
+  const { locale } = useLocale();
+  const en = locale === "en_US";
+  const t = (a: string, b: string) => (en ? a : b);
   const router = useRouter();
   const searchParams = useSearchParams();
   const advanced = searchParams.get("advanced") === "1";
@@ -149,7 +156,7 @@ function AdminPageInner() {
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted">Загрузка…</p>
+        <p className="text-muted">{t("Loading…", "Загрузка…")}</p>
       </div>
     );
   }
@@ -160,11 +167,15 @@ function AdminPageInner() {
         <Header />
         <main id="main-content" className="relative min-h-[calc(100vh-64px)]">
           <div className="relative z-10 mx-auto max-w-md px-4 py-24 text-center">
-            <p className="text-xs uppercase tracking-[0.16em] text-accent/80">Админ</p>
-            <h1 className="font-display mt-2 text-2xl font-bold tracking-tight">Доступ запрещён</h1>
-            <p className="mt-2 text-sm text-muted leading-relaxed">Нужны права администратора.</p>
+            <p className="text-xs uppercase tracking-[0.16em] text-accent/80">{t("Admin", "Админ")}</p>
+            <h1 className="font-display mt-2 text-2xl font-bold tracking-tight">
+              {t("Access denied", "Доступ запрещён")}
+            </h1>
+            <p className="mt-2 text-sm text-muted leading-relaxed">
+              {t("Administrator role required.", "Нужны права администратора.")}
+            </p>
             <button type="button" onClick={() => router.push("/profile")} className="btn btn-primary mt-6">
-              В личный кабинет
+              {t("Back to account", "В личный кабинет")}
             </button>
           </div>
         </main>
@@ -178,12 +189,19 @@ function AdminPageInner() {
       <Header />
       <CabinetShell
         eyebrow="Control plane"
-        title="Панель управления"
-        subtitle="Аккаунты, каталог лаунчера и новости на главной."
+        title={t("Control panel", "Панель управления")}
+        subtitle={t(
+          "Accounts, launcher catalog, and home news.",
+          "Аккаунты, каталог лаунчера и новости на главной.",
+        )}
         nav={[
-          { id: "users", label: "Аккаунты", hint: `${users?.length ?? "…"} чел.` },
-          { id: "catalog", label: "Каталог", hint: "Серверы и паки" },
-          { id: "news", label: "Новости", hint: "Главная сайта" },
+          {
+            id: "users",
+            label: t("Accounts", "Аккаунты"),
+            hint: `${users?.length ?? "…"} ${t("users", "чел.")}`,
+          },
+          { id: "catalog", label: t("Catalog", "Каталог"), hint: t("Servers & packs", "Серверы и паки") },
+          { id: "news", label: t("News", "Новости"), hint: t("Site home", "Главная сайта") },
         ]}
         activeId={section}
         onNav={(id) => setSection(id as Section)}
