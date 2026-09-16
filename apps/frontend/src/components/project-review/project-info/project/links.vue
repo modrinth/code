@@ -1,7 +1,7 @@
 <template>
 	<section
 		v-if="links.length"
-		class="flex flex-col gap-4 rounded-xl border border-solid border-orange p-2.5"
+		class="flex flex-col gap-4 rounded-xl p-2.5"
 		:aria-label="formatMessage(messages.links)"
 	>
 		<div v-for="link in links" :key="link.key" class="min-w-0">

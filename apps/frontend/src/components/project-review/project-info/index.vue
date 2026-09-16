@@ -8,6 +8,7 @@
 		<p v-else-if="!project">{{ formatMessage(messages.empty) }}</p>
 		<template v-else>
 			<div class="flex flex-col gap-6 px-2 pb-6">
+				<h1 class="m-0 text-lg">{{ project.name }}</h1>
 				<Slug />
 				<Icon />
 				<Summary />

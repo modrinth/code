@@ -8,7 +8,7 @@
 			>
 			<span
 				v-if="project.license.id.startsWith('LicenseRef-')"
-				class="review-badge font-bold uppercase tracking-wider"
+				class="review-badge font-bold tracking-wider"
 				>{{ formatMessage(messages.customLicense) }}</span
 			>
 		</div>
