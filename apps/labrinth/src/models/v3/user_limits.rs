@@ -1,8 +1,9 @@
 use crate::database::PgPool;
+use chrono::{DateTime, TimeDelta, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    database::models::{DBUserId, user_limits::DBUserLimits},
+    database::models::{DBProjectId, DBUserId, user_limits::DBUserLimits},
     models::users::User,
 };
 
@@ -93,6 +94,61 @@ impl UserLimits {
         Ok(Self {
             current,
             max: db_limits.collections,
+        }
+        .adjust_for_user(user))
+    }
+
+    pub async fn get_for_versions_per_project(
+        user: &User,
+        project_id: DBProjectId,
+        pool: &PgPool,
+    ) -> Result<Self, sqlx::Error> {
+        let db_limits =
+            DBUserLimits::get(DBUserId::from(user.id), pool).await?;
+        let current = sqlx::query_scalar!(
+            "SELECT COUNT(*) FROM versions WHERE mod_id = $1",
+            project_id as DBProjectId,
+        )
+        .fetch_one(pool)
+        .await?
+        .map_or(0, |x| x as u64);
+
+        Ok(Self {
+            current,
+            max: db_limits.versions_per_project,
+        }
+        .adjust_for_user(user))
+    }
+
+    pub async fn get_for_versions_per_day(
+        user: &User,
+        now: DateTime<Utc>,
+        pool: &PgPool,
+    ) -> Result<Self, sqlx::Error> {
+        let user_id = DBUserId::from(user.id);
+        let db_limits = DBUserLimits::get(user_id, pool).await?;
+        let day_start = now
+            .date_naive()
+            .and_hms_opt(0, 0, 0)
+            .expect("midnight is always a valid time")
+            .and_utc();
+        let day_end = day_start + TimeDelta::days(1);
+        let current = sqlx::query_scalar!(
+            "SELECT COUNT(*) FROM versions
+            WHERE author_id = $1
+                AND date_published >= $2
+                AND date_published < $3",
+            user_id as DBUserId,
+            day_start,
+            day_end,
+        )
+        .fetch_one(pool)
+        .await?
+        .map_or(0, |x| x as u64);
+
+        Ok(Self {
+            current,
+            max: db_limits.versions_per_day,
         }
         .adjust_for_user(user))
     }

@@ -45,6 +45,8 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 pub enum CreateError {
     #[error("project limit reached")]
     LimitReached,
+    #[error("project version limit reached")]
+    ProjectVersionLimitReached,
     #[error("invalid component kinds")]
     ComponentKinds(ComponentRelationError<ProjectComponentKind>),
     #[error("failed to validate request: {0}")]
@@ -58,11 +60,13 @@ pub enum CreateError {
 impl CreateError {
     pub fn as_api_error(&self) -> crate::models::error::ApiError<'_> {
         match self {
-            Self::LimitReached => crate::models::error::ApiError {
-                error: "limit_reached",
-                description: self.to_string(),
-                details: None,
-            },
+            Self::LimitReached | Self::ProjectVersionLimitReached => {
+                crate::models::error::ApiError {
+                    error: "limit_reached",
+                    description: self.to_string(),
+                    details: None,
+                }
+            }
             Self::ComponentKinds(err) => crate::models::error::ApiError {
                 error: "component_kinds",
                 description: format!("{self}: {err}"),
@@ -90,6 +94,7 @@ impl ResponseError for CreateError {
     fn status_code(&self) -> actix_http::StatusCode {
         match self {
             Self::LimitReached
+            | Self::ProjectVersionLimitReached
             | Self::ComponentKinds(_)
             | Self::Validation(_)
             | Self::SlugCollision => StatusCode::BAD_REQUEST,
@@ -258,6 +263,17 @@ pub async fn create(
     let mut version_builder = None::<VersionBuilder>;
 
     if components.minecraft_server.is_some() {
+        let version_limits = UserLimits::get_for_versions_per_project(
+            &user,
+            project_id.into(),
+            &db,
+        )
+        .await
+        .wrap_internal_err("fetching project version limits")?;
+        if version_limits.current >= version_limits.max {
+            return Err(CreateError::ProjectVersionLimitReached);
+        }
+
         // servers are not part of the monetization pool;
         // they generate no payouts for their owners
         monetization_status = MonetizationStatus::ForceDemonetized;
