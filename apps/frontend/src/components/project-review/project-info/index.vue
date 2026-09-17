@@ -1,11 +1,11 @@
 <template>
 	<div class="review-details min-w-0 pb-10 text-sm text-secondary">
-		<p v-if="isLoading" role="status">{{ formatMessage(messages.loading) }}</p>
+		<p v-if="isLoading" role="status" class="m-0">{{ formatMessage(messages.loading) }}</p>
 		<div v-else-if="error" role="alert">
-			<p>{{ formatMessage(messages.loadError) }}</p>
+			<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
 			<Button @click="refresh">{{ formatMessage(messages.retry) }}</Button>
 		</div>
-		<p v-else-if="!project">{{ formatMessage(messages.empty) }}</p>
+		<p v-else-if="!project" class="m-0">{{ formatMessage(messages.empty) }}</p>
 		<template v-else>
 			<section class="review-section">
 				<h3 class="review-section-label">

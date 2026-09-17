@@ -21,7 +21,7 @@
 					:aria-label="formatMessage(messages.owner)"
 				/>
 			</div>
-			<p class="mb-1 mt-0.5 text-xs">{{ member.role }}</p>
+			<p class="m-0 text-xs">{{ member.role }}</p>
 			<div class="flex flex-wrap gap-x-2 gap-y-1 text-xs">
 				<span
 					v-for="stat in visibleStats"

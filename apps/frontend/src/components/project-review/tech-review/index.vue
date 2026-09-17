@@ -1,16 +1,16 @@
 <template>
 	<div class="flex min-w-0 flex-col gap-3">
-		<p v-if="!selection" class="text-secondary">
+		<p v-if="!selection" class="m-0 text-secondary">
 			{{ formatMessage(messages.empty) }}
 		</p>
 		<div v-else-if="error || reportsQuery.isError.value" role="alert">
-			<p>{{ formatMessage(messages.loadError) }}</p>
+			<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
 			<Button @click="retry">{{ formatMessage(messages.retry) }}</Button>
 		</div>
-		<p v-else-if="isLoading || reportsQuery.isPending.value" role="status">
+		<p v-else-if="isLoading || reportsQuery.isPending.value" role="status" class="m-0">
 			{{ formatMessage(messages.loading) }}
 		</p>
-		<p v-else-if="!reports.length" class="text-secondary">
+		<p v-else-if="!reports.length" class="m-0 text-secondary">
 			{{ formatMessage(messages.noReports) }}
 		</p>
 		<template v-else-if="project">
@@ -28,7 +28,7 @@
 					{{ selectedFile.file_name }}
 				</h3>
 				<div v-if="sourceQueries.some((query) => query.isError)" role="alert">
-					<p>{{ formatMessage(messages.sourceError) }}</p>
+					<p class="m-0">{{ formatMessage(messages.sourceError) }}</p>
 					<Button @click="retrySources">{{ formatMessage(messages.retry) }}</Button>
 				</div>
 				<TechRevFileDetailTab
@@ -54,7 +54,7 @@
 					:project="project"
 					@view-flags="selectFile"
 				/>
-				<p v-else class="text-secondary">
+				<p v-else class="m-0 text-secondary">
 					{{ formatMessage(messages.noPendingFiles) }}
 				</p>
 				<details v-if="completedReports.length">

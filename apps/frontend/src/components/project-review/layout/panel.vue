@@ -9,7 +9,7 @@
 			<h2 class="m-0 text-lg font-semibold text-contrast">
 				{{ formatMessage(messages[slotName]) }}
 			</h2>
-			<p class="text-secondary">{{ formatMessage(messages.empty) }}</p>
+			<p class="m-0 text-secondary">{{ formatMessage(messages.empty) }}</p>
 		</template>
 	</section>
 </template>

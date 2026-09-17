@@ -150,14 +150,14 @@
 				<h3 class="mb-2 mt-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.dependencies) }}
 				</h3>
-				<p v-if="!version.dependencies.length" class="text-secondary">
+				<p v-if="!version.dependencies.length" class="m-0 text-secondary">
 					{{ formatMessage(messages.emptyDependencies) }}
 				</p>
-				<p v-else-if="dependenciesQuery.isPending.value" role="status">
+				<p v-else-if="dependenciesQuery.isPending.value" role="status" class="m-0">
 					{{ formatMessage(messages.loading) }}
 				</p>
 				<div v-else-if="dependenciesQuery.isError.value" role="alert">
-					<p>{{ formatMessage(messages.loadError) }}</p>
+					<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
 					<Button @click="dependenciesQuery.refetch()">{{ formatMessage(messages.retry) }}</Button>
 				</div>
 				<div v-else class="flex flex-col gap-1.5">
@@ -192,18 +192,18 @@
 					{{ formatMessage(messages.changelog) }}
 				</summary>
 				<div v-if="changelogOpen" class="mt-3 rounded-lg p-3">
-					<p v-if="detailQuery.isPending.value" role="status">
+					<p v-if="detailQuery.isPending.value" role="status" class="m-0">
 						{{ formatMessage(messages.loading) }}
 					</p>
 					<div v-else-if="detailQuery.isError.value" role="alert">
-						<p>{{ formatMessage(messages.loadError) }}</p>
+						<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
 						<Button @click="detailQuery.refetch()">{{ formatMessage(messages.retry) }}</Button>
 					</div>
 					<ProjectPageDescription
 						v-else-if="detailQuery.data.value?.changelog"
 						:description="detailQuery.data.value.changelog"
 					/>
-					<p v-else class="text-secondary">
+					<p v-else class="m-0 text-secondary">
 						{{ formatMessage(messages.emptyChangelog) }}
 					</p>
 				</div>
