@@ -117,6 +117,13 @@ pub enum CreateAccountError {
     DuplicateEmail,
     #[error("Username is already taken on Modrinth.")]
     UsernameTaken,
+    #[error("{}", match .0 {
+        Some(feedback) => format!("Password too weak: {feedback}"),
+        None => "Specified password is too weak! Please improve its strength.".to_string(),
+    })]
+    WeakPassword(Option<String>),
+    #[error("{0}")]
+    InvalidInput(String),
     #[error(transparent)]
     Api(#[from] ApiError),
 }
@@ -134,6 +141,16 @@ impl CreateAccountError {
                 description: self.to_string(),
                 details: None,
             },
+            Self::WeakPassword(_) => ApiErrorResponse {
+                error: "weak_password",
+                description: self.to_string(),
+                details: None,
+            },
+            Self::InvalidInput(_) => ApiErrorResponse {
+                error: "invalid_input",
+                description: self.to_string(),
+                details: None,
+            },
             Self::Api(error) => error.as_api_error(),
         }
     }
@@ -142,9 +159,10 @@ impl CreateAccountError {
 impl actix_web::ResponseError for CreateAccountError {
     fn status_code(&self) -> StatusCode {
         match self {
-            Self::UsernameTaken | Self::DuplicateEmail => {
-                StatusCode::BAD_REQUEST
-            }
+            Self::UsernameTaken
+            | Self::DuplicateEmail
+            | Self::WeakPassword(_)
+            | Self::InvalidInput(_) => StatusCode::BAD_REQUEST,
             Self::Api(error) => actix_web::ResponseError::status_code(error),
         }
     }
@@ -1889,60 +1907,6 @@ struct ReadyAccountRegisterFlow {
     inner: AccountRegisterFlow,
 }
 
-#[derive(Debug, Error)]
-enum AccountRegisterValidateError {
-    #[error("Username is already taken on Modrinth.")]
-    UsernameTaken,
-    #[error(
-        "Email is already registered on Modrinth. Try 'Forgot password' to access your account."
-    )]
-    DuplicateEmail,
-    #[error("{}", match .0 {
-        Some(feedback) => format!("Password too weak: {feedback}"),
-        None => "Specified password is too weak! Please improve its strength.".to_string(),
-    })]
-    WeakPassword(Option<String>),
-    #[error("{0}")]
-    InvalidInput(String),
-}
-
-impl AccountRegisterValidateError {
-    fn error_code(&self) -> &'static str {
-        match self {
-            AccountRegisterValidateError::UsernameTaken => "username_taken",
-            AccountRegisterValidateError::DuplicateEmail => "duplicate_email",
-            AccountRegisterValidateError::WeakPassword(_) => "weak_password",
-            AccountRegisterValidateError::InvalidInput(_) => "invalid_input",
-        }
-    }
-
-    fn into_api_error(self) -> ApiError {
-        match &self {
-            Self::UsernameTaken => {
-                ApiError::Auth(eyre::eyre!(AuthenticationError::UsernameTaken))
-            }
-            Self::DuplicateEmail => {
-                ApiError::Auth(eyre::eyre!(AuthenticationError::DuplicateEmail))
-            }
-            _ => ApiError::Request(eyre::eyre!("{self}")),
-        }
-    }
-}
-
-impl actix_web::ResponseError for AccountRegisterValidateError {
-    fn status_code(&self) -> StatusCode {
-        StatusCode::BAD_REQUEST
-    }
-
-    fn error_response(&self) -> HttpResponse {
-        HttpResponse::build(self.status_code()).json(ApiErrorResponse {
-            error: self.error_code(),
-            description: self.to_string(),
-            details: None,
-        })
-    }
-}
-
 impl From<NewAccount> for AccountRegisterFlow {
     fn from(account: NewAccount) -> Self {
         Self {
@@ -2056,14 +2020,11 @@ impl AccountRegisterFlow {
         self,
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
-    ) -> Result<
-        Result<ReadyAccountRegisterFlow, AccountRegisterValidateError>,
-        ApiError,
-    > {
+    ) -> Result<ReadyAccountRegisterFlow, CreateAccountError> {
         if let Err(err) = validator::Validate::validate(&self) {
-            return Ok(Err(AccountRegisterValidateError::InvalidInput(
+            return Err(CreateAccountError::InvalidInput(
                 validation_errors_to_string(err, None),
-            )));
+            ));
         }
 
         if crate::database::models::DBUser::get(
@@ -2075,7 +2036,7 @@ impl AccountRegisterFlow {
         .wrap_internal_err("fetching existing user with username")?
         .is_some()
         {
-            return Ok(Err(AccountRegisterValidateError::UsernameTaken));
+            return Err(CreateAccountError::UsernameTaken);
         }
 
         let score =
@@ -2086,9 +2047,7 @@ impl AccountRegisterFlow {
                 .feedback()
                 .and_then(|x| x.warning())
                 .map(|w| w.to_string());
-            return Ok(Err(AccountRegisterValidateError::WeakPassword(
-                feedback,
-            )));
+            return Err(CreateAccountError::WeakPassword(feedback));
         }
 
         if !crate::database::models::DBUser::get_by_case_insensitive_email(
@@ -2099,10 +2058,10 @@ impl AccountRegisterFlow {
         .wrap_internal_err("fetching existing user with email")?
         .is_empty()
         {
-            return Ok(Err(AccountRegisterValidateError::DuplicateEmail));
+            return Err(CreateAccountError::DuplicateEmail);
         }
 
-        Ok(Ok(ReadyAccountRegisterFlow { inner: self }))
+        Ok(ReadyAccountRegisterFlow { inner: self })
     }
 }
 
@@ -2113,7 +2072,7 @@ impl ReadyAccountRegisterFlow {
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
         email_queue: &EmailQueue,
-    ) -> Result<crate::models::sessions::Session, ApiError> {
+    ) -> Result<crate::models::sessions::Session, CreateAccountError> {
         let register_flow = self.inner;
 
         let user_id = crate::database::models::generate_user_id(transaction)
@@ -2164,16 +2123,10 @@ impl ReadyAccountRegisterFlow {
                 if let sqlx::Error::Database(database_error) = &err {
                     match database_error.constraint() {
                         Some("username_unique" | "users_username_key") => {
-                            return Err(
-                                AccountRegisterValidateError::UsernameTaken
-                                    .into_api_error(),
-                            );
+                            return Err(CreateAccountError::UsernameTaken);
                         }
                         Some("email_unique" | "users_email_key") => {
-                            return Err(
-                                AccountRegisterValidateError::DuplicateEmail
-                                    .into_api_error(),
-                            );
+                            return Err(CreateAccountError::DuplicateEmail);
                         }
                         _ => {}
                     }
@@ -2181,7 +2134,8 @@ impl ReadyAccountRegisterFlow {
 
                 return Err(ApiError::Internal(eyre::eyre!(
                     "inserting registered user: {err}"
-                )));
+                ))
+                .into());
             }
         }
 
@@ -2219,7 +2173,7 @@ pub async fn validate_create_account_with_password(
     pool: Data<PgPool>,
     redis: Data<RedisPool>,
     new_account: web::Json<NewAccount>,
-) -> Result<Result<(), AccountRegisterValidateError>, ApiError> {
+) -> Result<(), CreateAccountError> {
     let mut transaction = pool
         .begin()
         .await
@@ -2228,7 +2182,7 @@ pub async fn validate_create_account_with_password(
     AccountRegisterFlow::from(new_account.into_inner())
         .validate(&mut transaction, &redis)
         .await
-        .map(|r| r.map(drop))
+        .map(drop)
 }
 
 /// Create account with a password.
@@ -2249,7 +2203,7 @@ pub async fn create_account_with_password(
     redis: Data<RedisPool>,
     new_account: web::Json<NewAccount>,
     email: web::Data<EmailQueue>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<HttpResponse, CreateAccountError> {
     let new_account = new_account.into_inner();
 
     validate_account_consent(new_account.account_consent)
@@ -2261,7 +2215,8 @@ pub async fn create_account_with_password(
     {
         return Err(ApiError::Request(eyre::eyre!(
             "captcha validation failed"
-        )));
+        ))
+        .into());
     }
 
     ensure_email_is_usable(&redis, &new_account.email)
@@ -2275,13 +2230,11 @@ pub async fn create_account_with_password(
 
     let ready_flow = AccountRegisterFlow::from(new_account)
         .validate(&mut transaction, &redis)
-        .await?
-        .wrap_request_err("invalid account details")?;
+        .await?;
 
     let res = ready_flow
         .execute(req, &mut transaction, &redis, &email)
-        .await
-        .wrap_api_err("executing `execute`")?;
+        .await?;
     transaction
         .commit()
         .await

@@ -41,6 +41,12 @@ interface ApiErrorShape {
 	data?: {
 		description?: string
 	}
+	v1Error?: {
+		description?: string
+	}
+	responseData?: {
+		description?: string
+	}
 }
 
 const getQueryString = (
@@ -52,8 +58,12 @@ const getQueryString = (
 
 const getErrorMessage = (error: unknown): string => {
 	const apiError = error as ApiErrorShape
-	if (typeof apiError?.data?.description === 'string') {
-		return apiError.data.description
+	const description =
+		apiError?.v1Error?.description ??
+		apiError?.responseData?.description ??
+		apiError?.data?.description
+	if (typeof description === 'string') {
+		return description
 	}
 	if (error instanceof Error) {
 		return error.message
