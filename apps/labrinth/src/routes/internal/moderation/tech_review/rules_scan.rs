@@ -1,14 +1,16 @@
-use std::collections::{BTreeMap, HashMap};
+use std::{
+    collections::{BTreeMap, HashMap},
+    time::Duration,
+};
 
 use actix_web::{HttpRequest, HttpResponse, get, post, web};
 use ariadne::ids::base62_impl::to_base62;
 use bytes::Bytes;
 use eyre::{Result, eyre};
-use futures_util::{StreamExt, TryStreamExt};
+use futures_util::TryStreamExt;
 use serde::{Deserialize, Serialize};
 use sqlx::types::Json;
 use tokio::sync::mpsc;
-use tokio_stream::wrappers::UnboundedReceiverStream;
 use utoipa::{PartialSchema, ToSchema};
 use xredis::RedisPool;
 
@@ -33,6 +35,7 @@ use crate::{
 
 const RULE_SCAN_LOCK_ID: i64 = 0x6465_6c70_6869_7275;
 const PROGRESS_INTERVAL: usize = 50;
+const SSE_HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(get_rule_schema)
         .service(get_detail_rule_input)
@@ -393,6 +396,8 @@ pub async fn scan_rules(
     }
 
     let (sender, receiver) = mpsc::unbounded_channel();
+    let _ = sender.send(Bytes::from_static(b": connected\n\n"));
+
     actix_web::rt::spawn(async move {
         match run_scan(transaction, &sender).await {
             Ok(summary) => {
@@ -422,12 +427,30 @@ pub async fn scan_rules(
         }
     });
 
-    let stream =
-        UnboundedReceiverStream::new(receiver).map(Ok::<_, std::io::Error>);
+    let mut heartbeat = tokio::time::interval_at(
+        tokio::time::Instant::now() + SSE_HEARTBEAT_INTERVAL,
+        SSE_HEARTBEAT_INTERVAL,
+    );
+    heartbeat.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Delay);
+    let stream = futures_util::stream::unfold(
+        (receiver, heartbeat),
+        |(mut receiver, mut heartbeat)| async move {
+            tokio::select! {
+                event = receiver.recv() => event.map(|event| (
+                    Ok::<_, std::io::Error>(event),
+                    (receiver, heartbeat),
+                )),
+                _ = heartbeat.tick() => Some((
+                    Ok(Bytes::from_static(b": keepalive\n\n")),
+                    (receiver, heartbeat),
+                )),
+            }
+        },
+    );
 
     Ok(HttpResponse::Ok()
         .insert_header(("Content-Type", "text/event-stream"))
-        .insert_header(("Cache-Control", "no-cache"))
+        .insert_header(("Cache-Control", "no-cache, no-transform"))
         .insert_header(("X-Accel-Buffering", "no"))
         .streaming(stream))
 }
