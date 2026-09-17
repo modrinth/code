@@ -404,18 +404,6 @@
   "app.home.jump-back-in.view-instance": {
     "message": "Переглянути примірник"
   },
-  "app.hosting.update-required.description": {
-    "message": "Вам потрібно оновитися, щоб використовувати Owyx Servers через застосунок Owyx"
-  },
-  "app.hosting.update-required.download": {
-    "message": "Завантажити для оновлення"
-  },
-  "app.hosting.update-required.rinthbot-alt": {
-    "message": "Схвильований бот Owyx"
-  },
-  "app.hosting.update-required.title": {
-    "message": "Потрібне оновлення Owyx"
-  },
   "app.install.phase.downloading_content": {
     "message": "Завантаження вмісту"
   },
@@ -4253,9 +4241,6 @@
   "instance.worlds.world_in_use": {
     "message": "Світ наразі використовується"
   },
-  "minecraft-account.add-account": {
-    "message": "Додати обліковий запис"
-  },
   "minecraft-account.label": {
     "message": "Обліковий запис Minecraft"
   },
@@ -4267,9 +4252,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Вибрати обліковий запис"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Увійти в Minecraft"
   },
   "minecraft-required.description": {
     "message": "Ви повинні мати обліковий запис Microsoft із придбаним Minecraft, перш ніж запускати ігри."

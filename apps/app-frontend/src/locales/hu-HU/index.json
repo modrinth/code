@@ -404,18 +404,6 @@
   "app.home.jump-back-in.view-instance": {
     "message": "Példány megtekintése"
   },
-  "app.hosting.update-required.description": {
-    "message": "Frissítened kell, hogy használhasd a Owyx Serversot a Owyxon keresztül"
-  },
-  "app.hosting.update-required.download": {
-    "message": "Letöltés a frissítéshez"
-  },
-  "app.hosting.update-required.rinthbot-alt": {
-    "message": "Izgatott Owyx bot"
-  },
-  "app.hosting.update-required.title": {
-    "message": "Frissítés szükséges a Owyxhoz"
-  },
   "app.install.phase.downloading_content": {
     "message": "A tartalom letöltése..."
   },
@@ -4262,9 +4250,6 @@
   "instance.worlds.world_in_use": {
     "message": "A világ használatban van"
   },
-  "minecraft-account.add-account": {
-    "message": "Fiók hozzáadása"
-  },
   "minecraft-account.label": {
     "message": "Minecraft-fiók"
   },
@@ -4276,9 +4261,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Fiók kiválasztása"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Bejelentkezés a Minecraftba"
   },
   "minecraft-required.description": {
     "message": "A játék indítása és használata előtt rendelkezned kell egy Microsoft-fiókkal, amelyhez Minecraft tartozik."

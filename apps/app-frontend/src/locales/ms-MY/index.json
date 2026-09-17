@@ -1907,9 +1907,6 @@
   "instance.worlds.world_in_use": {
     "message": "Dunia sedang digunakan"
   },
-  "minecraft-account.add-account": {
-    "message": "Tambah akaun"
-  },
   "minecraft-account.label": {
     "message": "Akaun Minecraft"
   },
@@ -1921,9 +1918,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Pilih akaun"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Daftar masuk ke dalam Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Disediakan oleh pemasangan ini"

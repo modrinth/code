@@ -392,18 +392,6 @@
   "app.home.jump-back-in.view-instance": {
     "message": "查看实例"
   },
-  "app.hosting.update-required.description": {
-    "message": "你需要更新你的Modrint App才能使用Modrinth在线服务"
-  },
-  "app.hosting.update-required.download": {
-    "message": "更新升级"
-  },
-  "app.hosting.update-required.rinthbot-alt": {
-    "message": "兴奋的Modrinth Bot"
-  },
-  "app.hosting.update-required.title": {
-    "message": "需要更新 Owyx"
-  },
   "app.install.phase.downloading_content": {
     "message": "正在下载内容"
   },
@@ -4136,9 +4124,6 @@
   "instance.worlds.world_in_use": {
     "message": "世界正在使用中"
   },
-  "minecraft-account.add-account": {
-    "message": "添加账户"
-  },
   "minecraft-account.label": {
     "message": "Minecraft 账户"
   },
@@ -4150,9 +4135,6 @@
   },
   "minecraft-account.select-account": {
     "message": "选择账户"
-  },
-  "minecraft-account.sign-in": {
-    "message": "登录 Minecraft"
   },
   "minecraft-required.description": {
     "message": "你需要先登录拥有 Minecraft 的 Microsoft 账户，然后才能启动游戏。"

@@ -338,18 +338,6 @@
   "app.home.jump-back-in.view-instance": {
     "message": "Zobrazit instanci"
   },
-  "app.hosting.update-required.description": {
-    "message": "Musíte aktualizovat Owyx Servers přes Owyx"
-  },
-  "app.hosting.update-required.download": {
-    "message": "Stáhnout novou aktualizaci"
-  },
-  "app.hosting.update-required.rinthbot-alt": {
-    "message": "Nadšený Owyx Bot"
-  },
-  "app.hosting.update-required.title": {
-    "message": "Owyx potřebuje být aktualizovaná"
-  },
   "app.install.phase.downloading_content": {
     "message": "Stahování obsahu"
   },
@@ -2372,9 +2360,6 @@
   "instance.worlds.world_in_use": {
     "message": "Svět je používán"
   },
-  "minecraft-account.add-account": {
-    "message": "Přidat účet"
-  },
   "minecraft-account.label": {
     "message": "Minecraft účet"
   },
@@ -2386,9 +2371,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Zvolte účet"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Přihlásit se do Minecraftu"
   },
   "minecraft-required.description-header": {
     "message": "Přihlaste se k účtu Microsoft"

@@ -344,18 +344,6 @@
   "app.home.jump-back-in.view-instance": {
     "message": "عرض النسخة"
   },
-  "app.hosting.update-required.description": {
-    "message": "يجب عليك التحديث لاستخدام Owyx Servers بواسطة تطبيق Owyx"
-  },
-  "app.hosting.update-required.download": {
-    "message": "نزّل للتحديث"
-  },
-  "app.hosting.update-required.rinthbot-alt": {
-    "message": "بوت Owyx المتحمّس"
-  },
-  "app.hosting.update-required.title": {
-    "message": "يلزم تحديث تطبيق Owyx"
-  },
   "app.install.phase.downloading_content": {
     "message": "جارٍ تنزيل المحتوى"
   },
@@ -2864,9 +2852,6 @@
   "instance.worlds.world_in_use": {
     "message": "العالم قيد الاستخدام"
   },
-  "minecraft-account.add-account": {
-    "message": "إضافة حساب"
-  },
   "minecraft-account.label": {
     "message": "حساب ماينكرافت"
   },
@@ -2878,9 +2863,6 @@
   },
   "minecraft-account.select-account": {
     "message": "اختيار الحساب"
-  },
-  "minecraft-account.sign-in": {
-    "message": "سجل دخولك لـ ماينكرافت"
   },
   "minecraft-required.description": {
     "message": "تحتاج إلى حساب مايكروسوفت يمتلك ماين كرافت قبل أن تتمكن من التشغيل واللعب."

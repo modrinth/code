@@ -458,6 +458,12 @@
   "app.features-settings.sync-across-devices.title": {
     "message": "Sync features across devices"
   },
+  "app.features-settings.ui-sounds.description": {
+    "message": "Synthetic clicks in the app. Muted when prefers-reduced-motion is on."
+  },
+  "app.features-settings.ui-sounds.title": {
+    "message": "Soft UI sounds"
+  },
   "app.home.jump-back-in.actions.label": {
     "message": "Instance actions"
   },
@@ -484,18 +490,6 @@
   },
   "app.home.jump-back-in.view-instance": {
     "message": "View instance"
-  },
-  "app.hosting.update-required.description": {
-    "message": "You need to update Owyx to use this feature"
-  },
-  "app.hosting.update-required.download": {
-    "message": "Download to update"
-  },
-  "app.hosting.update-required.rinthbot-alt": {
-    "message": "Owyx update"
-  },
-  "app.hosting.update-required.title": {
-    "message": "Owyx update required"
   },
   "app.install.phase.downloading_content": {
     "message": "Downloading content"
@@ -3153,7 +3147,7 @@
     "message": "Sign in to apply skins."
   },
   "app.skins.demo.description": {
-    "message": "Skin management needs a Microsoft account that owns Minecraft. An Owyx account alone cannot change Mojang skins."
+    "message": "Sign in with Microsoft to save and apply skins. Offline nicknames cannot change skins."
   },
   "app.skins.demo.title": {
     "message": "Microsoft account required"
@@ -4493,26 +4487,38 @@
   "instance.worlds.world_in_use": {
     "message": "World is in use"
   },
-  "minecraft-account.add-account": {
-    "message": "Add account"
+  "minecraft-account.account-hint": {
+    "message": "Owyx is for friends, skins, and your display nickname in game. Microsoft is for a licensed Minecraft profile and online-mode servers."
   },
   "minecraft-account.add-microsoft": {
     "message": "Add Microsoft account"
   },
+  "minecraft-account.cancel": {
+    "message": "Cancel"
+  },
+  "minecraft-account.edit-display-nick": {
+    "message": "Change display nickname"
+  },
+  "minecraft-account.edit-display-nick-hint": {
+    "message": "Shown to friends and used in-game. Your login stays the same. 3–16 letters, numbers, or _."
+  },
+  "minecraft-account.edit-display-nick-title": {
+    "message": "Display nickname"
+  },
   "minecraft-account.label": {
     "message": "Minecraft account"
+  },
+  "minecraft-account.login-as": {
+    "message": "Login: {login}"
   },
   "minecraft-account.microsoft": {
     "message": "Microsoft"
   },
-  "minecraft-account.microsoft-stub-hint": {
-    "message": "Owyx is for friends, skins, and your site nickname in game. Microsoft is for a licensed Minecraft profile and online-mode servers."
-  },
-  "minecraft-account.nickname-placeholder": {
-    "message": "Nickname"
-  },
   "minecraft-account.not-signed-in": {
     "message": "Choose how to play"
+  },
+  "minecraft-account.owyx": {
+    "message": "Owyx"
   },
   "minecraft-account.owyx-nick-too-long": {
     "message": "Display nickname must be 3–16 letters, numbers, or underscores. Change it and try again."
@@ -4520,38 +4526,20 @@
   "minecraft-account.owyx-session-badge": {
     "message": "Owyx site session"
   },
-  "minecraft-account.playing-as": {
-    "message": "Playing as"
-  },
-  "minecraft-account.login-as": {
-    "message": "Login: {login}"
-  },
-  "minecraft-account.edit-display-nick": {
-    "message": "Change display nickname"
-  },
-  "minecraft-account.edit-display-nick-title": {
-    "message": "Display nickname"
-  },
-  "minecraft-account.edit-display-nick-hint": {
-    "message": "Shown to friends and used in-game. Your login stays the same. 3–16 letters, numbers, or _."
-  },
-  "minecraft-account.cancel": {
-    "message": "Cancel"
-  },
-  "minecraft-account.save": {
-    "message": "Save"
-  },
   "minecraft-account.paths-hint": {
     "message": "Owyx account (friends & skins) or Microsoft (licensed Minecraft)."
+  },
+  "minecraft-account.playing-as": {
+    "message": "Playing as"
   },
   "minecraft-account.remove-account": {
     "message": "Remove account"
   },
+  "minecraft-account.save": {
+    "message": "Save"
+  },
   "minecraft-account.select-account": {
     "message": "Select account"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Sign in to Minecraft"
   },
   "minecraft-account.sign-in-microsoft": {
     "message": "Sign in with Microsoft"
@@ -4560,7 +4548,7 @@
     "message": "Sign in with Owyx account"
   },
   "minecraft-required.description": {
-    "message": "A Microsoft account that owns Minecraft is required for this action. For Owyx servers, sign in with your Owyx account instead."
+    "message": "A Microsoft account that owns Minecraft is required for this action. For offline-mode Owyx servers, sign in with your Owyx account instead."
   },
   "minecraft-required.description-header": {
     "message": "Sign in to a Microsoft account"
@@ -4896,16 +4884,25 @@
     "message": "Allow friend requests from anyone"
   },
   "owyx.settings.social.allow-requests-hint": {
-    "message": "When off, other players cannot send you new requests. Existing friends stay connected."
+    "message": "When off, others cannot send new requests. Existing friends stay connected."
   },
-  "owyx.settings.social.body": {
-    "message": "Friend requests use Owyx nicknames. Use the Friends panel in the sidebar to add, accept, or remove friends."
+  "owyx.settings.social.install-csl": {
+    "message": "Install CustomSkinLoader to instance"
   },
-  "owyx.settings.social.friends-hint": {
-    "message": "Tip: open the Friends panel from the home sidebar to manage requests."
+  "owyx.settings.social.open-friends": {
+    "message": "Open Friends"
+  },
+  "owyx.settings.social.open-profile": {
+    "message": "Open profile on site"
   },
   "owyx.settings.social.presence-body": {
-    "message": "While signed in, the launcher sends a short heartbeat (~30s). Friends see you as online or playing. After about 90 seconds without a heartbeat you appear offline."
+    "message": "Heartbeat ~30s while signed in. Idle ~90s → appear offline to friends."
+  },
+  "owyx.settings.social.presence-off": {
+    "message": "Off"
+  },
+  "owyx.settings.social.presence-on": {
+    "message": "Active"
   },
   "owyx.settings.social.presence-title": {
     "message": "Presence"
@@ -4917,28 +4914,34 @@
     "message": "Sign in"
   },
   "owyx.settings.social.sign-in-body": {
-    "message": "Sign in to manage friends and social privacy."
+    "message": "Sign in to manage friends, presence, and social privacy."
   },
   "owyx.settings.social.sign-in-title": {
     "message": "Owyx account required"
   },
+  "owyx.settings.social.signed-in-as": {
+    "message": "Signed in as {nick}"
+  },
   "owyx.settings.social.skins-body": {
-    "message": "Upload a skin on owyx.site. Install CustomSkinLoader in your instance — Owyx writes config for https://owyx.site/api/csl/ on launch (and from instance options). Others with the same mod see your Owyx skin."
+    "message": "Upload on owyx.site. CustomSkinLoader in your instance reads https://owyx.site/api/csl/ (Owyx writes config on launch)."
   },
   "owyx.settings.social.skins-mod-link": {
-    "message": "Open CustomSkinLoader on Modrinth"
+    "message": "CustomSkinLoader on Modrinth"
   },
   "owyx.settings.social.skins-title": {
     "message": "In-world skins"
   },
+  "owyx.settings.social.stat-friends": {
+    "message": "Friends"
+  },
+  "owyx.settings.social.stat-online": {
+    "message": "Online"
+  },
+  "owyx.settings.social.stat-pending": {
+    "message": "Incoming"
+  },
   "owyx.settings.social.title": {
     "message": "Friends & social"
-  },
-  "owyx.settings.social.ui-sounds": {
-    "message": "Soft UI sounds"
-  },
-  "owyx.settings.social.ui-sounds-hint": {
-    "message": "Synthetic clicks generated in the app (no sample packs). Muted automatically when prefers-reduced-motion is on."
   },
   "search.filter.locked.instance": {
     "message": "Provided by the instance"
@@ -4960,44 +4963,5 @@
   },
   "settings.sidebar.label.display": {
     "message": "Display"
-  },
-  "minecraft-account.account-hint": {
-    "message": "Owyx is for friends, skins, and your display nickname in game. Microsoft is for a licensed Minecraft profile and online-mode servers."
-  },
-  "minecraft-account.owyx": {
-    "message": "Owyx"
-  },
-  "owyx.settings.social.open-friends": {
-    "message": "Open Friends"
-  },
-  "owyx.settings.social.stat-friends": {
-    "message": "Friends"
-  },
-  "owyx.settings.social.stat-online": {
-    "message": "Online"
-  },
-  "owyx.settings.social.stat-pending": {
-    "message": "Incoming"
-  },
-  "owyx.settings.social.presence-on": {
-    "message": "Active"
-  },
-  "owyx.settings.social.presence-off": {
-    "message": "Off"
-  },
-  "owyx.settings.social.open-profile": {
-    "message": "Open profile on site"
-  },
-  "owyx.settings.social.install-csl": {
-    "message": "Install CustomSkinLoader to instance"
-  },
-  "owyx.settings.social.signed-in-as": {
-    "message": "Signed in as {nick}"
-  },
-  "app.features-settings.ui-sounds.title": {
-    "message": "Soft UI sounds"
-  },
-  "app.features-settings.ui-sounds.description": {
-    "message": "Synthetic clicks in the app. Muted when prefers-reduced-motion is on."
   }
 }

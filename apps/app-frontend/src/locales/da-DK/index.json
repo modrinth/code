@@ -1091,9 +1091,6 @@
   "instance.worlds.world_in_use": {
     "message": "Verden er i brug"
   },
-  "minecraft-account.add-account": {
-    "message": "Tilføj konto"
-  },
   "minecraft-account.label": {
     "message": "Minecraft konto"
   },
@@ -1105,9 +1102,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Vælg konto"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Log ind på Minecraft"
   },
   "minecraft-required.description-header": {
     "message": "Log ind med en Microsoft konto"

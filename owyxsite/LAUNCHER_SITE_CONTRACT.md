@@ -86,8 +86,6 @@ launcher can stay signed in together. The server keeps up to ~10 active sessions
 per user (oldest dropped). A `401`/`403` from `/me` means the JWT is gone —
 launcher maps that to `no_session` and asks the user to sign in again.
 
-Offline profiles never call the API; a nick is enough to Play.
-
 **Account editing** (email, nick, password, Discord) is on the **website** ЛК
 (`/profile`), not yet mirrored as launcher settings APIs. Launcher signs in and
 reads `/me` + catalog.

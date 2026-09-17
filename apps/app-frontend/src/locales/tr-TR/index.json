@@ -404,18 +404,6 @@
   "app.home.jump-back-in.view-instance": {
     "message": "Kurulumu göster"
   },
-  "app.hosting.update-required.description": {
-    "message": "Owyx Servers'i Owyx'ten kullanmak için güncellemeniz gerekiyor"
-  },
-  "app.hosting.update-required.download": {
-    "message": "Güncellemeyi indir"
-  },
-  "app.hosting.update-required.rinthbot-alt": {
-    "message": "Heyecanlı Owyx Botu"
-  },
-  "app.hosting.update-required.title": {
-    "message": "Owyx güncellemesi gerekli"
-  },
   "app.install.phase.downloading_content": {
     "message": "İçerik indiriliyor"
   },
@@ -3245,9 +3233,6 @@
   "instance.worlds.world_in_use": {
     "message": "Dünya şu anda kullanımda"
   },
-  "minecraft-account.add-account": {
-    "message": "Hesap ekle"
-  },
   "minecraft-account.label": {
     "message": "Minecraft hesabı"
   },
@@ -3259,9 +3244,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Hesap seçin"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Minecraft'a giriş yapın"
   },
   "minecraft-required.description": {
     "message": "Oyunu başlatmak ve oynamak için Minecraft'a sahip olan bir Microsoft hesabına ihtiyaç vardır."

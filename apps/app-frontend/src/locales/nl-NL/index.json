@@ -404,18 +404,6 @@
   "app.home.jump-back-in.view-instance": {
     "message": "Bekijk instantie"
   },
-  "app.hosting.update-required.description": {
-    "message": "Je moet bijwerken om Owyx Servers te gebruiken via de Owyx"
-  },
-  "app.hosting.update-required.download": {
-    "message": "Update aan het downloaden"
-  },
-  "app.hosting.update-required.rinthbot-alt": {
-    "message": "Opgewonden Owyx-bot"
-  },
-  "app.hosting.update-required.title": {
-    "message": "Update van Owyx-app vereist"
-  },
   "app.install.phase.downloading_content": {
     "message": "Inhoud aan het downloaden"
   },
@@ -3869,9 +3857,6 @@
   "instance.worlds.world_in_use": {
     "message": "Wereld wordt gebruikt"
   },
-  "minecraft-account.add-account": {
-    "message": "Voeg account toe"
-  },
   "minecraft-account.label": {
     "message": "Minecraft account"
   },
@@ -3883,9 +3868,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Selecteer account"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Meld je aan bij Minecraft"
   },
   "minecraft-required.description": {
     "message": "Je hebt een Microsoft-account nodig waarop Minecraft is geregistreerd voordat je het spel kunt starten en spelen."
