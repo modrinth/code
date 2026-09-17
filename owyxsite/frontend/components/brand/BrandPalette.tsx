@@ -41,7 +41,7 @@ export default function BrandPalette() {
     <div className="fixed bottom-4 right-4 z-40 hidden lg:flex flex-col items-end gap-2">
       {open && (
         <aside
-          className="max-w-[min(22rem,42vw)] flex flex-col gap-2 rounded-xl border border-line/80 bg-panel/90 backdrop-blur-sm p-3 shadow-[0_12px_40px_-20px_rgba(0,229,255,0.35)]"
+          className="max-w-[min(22rem,42vw)] flex flex-col gap-2 rounded-xl border border-line/80 bg-panel/90 backdrop-blur-sm p-3 shadow-[0_12px_40px_-20px_color-mix(in_srgb,var(--accent)_35%,transparent)]"
           aria-label="Токены бренда v2"
         >
           <div className="flex items-center justify-between gap-3">

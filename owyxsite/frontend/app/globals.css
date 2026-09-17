@@ -48,6 +48,7 @@ html[data-accent="cyan"] {
   --accent-hi: #67f0ff;
   --accent-lo: #007a8a;
   --accent-mid: #00d2ec;
+  --accent-rgb: 0, 229, 255;
   --space-deep: #040406;
   --space-top: #07070c;
   --glass-shine: rgba(255, 255, 255, 0.1);
@@ -81,6 +82,7 @@ html[data-accent="synthwave"] {
   --accent-hi: #f9a8d4;
   --accent-lo: #831843;
   --accent-mid: #db2777;
+  --accent-rgb: 236, 72, 153;
   --space-deep: #050208;
   --space-top: #120814;
   --glass-shine: rgba(249, 168, 212, 0.12);
@@ -114,6 +116,7 @@ html[data-accent="onyx"] {
   --accent-hi: #ffffff;
   --accent-lo: #737373;
   --accent-mid: #d4d4d4;
+  --accent-rgb: 245, 245, 245;
   --space-deep: #000000;
   --space-top: #0a0a0a;
   --glass-shine: rgba(255, 255, 255, 0.14);
@@ -147,6 +150,7 @@ html[data-accent="magma"] {
   --accent-hi: #fecaca;
   --accent-lo: #7f1d1d;
   --accent-mid: #ef4444;
+  --accent-rgb: 248, 113, 113;
   --space-deep: #050202;
   --space-top: #120808;
   --glass-shine: rgba(254, 202, 202, 0.1);
@@ -518,7 +522,7 @@ select:focus:not(:focus-visible) {
   background: var(--color-panel-2);
   letter-spacing: 0.01em;
 }
-.badge-accent { color: var(--color-accent); border-color: color-mix(in srgb, var(--color-accent) 40%, transparent); background: rgba(0, 229, 255, 0.08); }
+.badge-accent { color: var(--color-accent); border-color: color-mix(in srgb, var(--color-accent) 40%, transparent); background: color-mix(in srgb, var(--color-accent) 10%, transparent); }
 /* Kept for rare staff roles — prefer badge-accent in product UI */
 .badge-violet { color: var(--color-accent-violet); border-color: color-mix(in srgb, var(--color-accent-violet) 35%, transparent); background: rgba(139, 92, 246, 0.08); }
 .badge-ok { color: var(--color-ok); border-color: color-mix(in srgb, var(--color-ok) 40%, transparent); background: rgba(94, 234, 212, 0.08); }
@@ -565,8 +569,8 @@ select:focus:not(:focus-visible) {
   height: 70%;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 70% 55% at 72% 38%, rgba(0, 229, 255, 0.12), transparent 70%),
-    radial-gradient(ellipse 45% 40% at 18% 62%, rgba(0, 229, 255, 0.05), transparent 70%);
+    radial-gradient(ellipse 70% 55% at 72% 38%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%),
+    radial-gradient(ellipse 45% 40% at 18% 62%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 70%);
   filter: blur(2px);
 }
 .hero-grid {
@@ -575,13 +579,13 @@ select:focus:not(:focus-visible) {
   pointer-events: none;
   opacity: 0.18;
   background-image:
-    linear-gradient(rgba(0, 229, 255, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 229, 255, 0.07) 1px, transparent 1px);
+    linear-gradient(color-mix(in srgb, var(--accent) 9%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 9%, transparent) 1px, transparent 1px);
   background-size: 56px 56px;
   mask-image: radial-gradient(ellipse 70% 60% at 60% 40%, #000 10%, transparent 75%);
 }
 .hero-title-glow {
-  text-shadow: 0 0 48px rgba(0, 229, 255, 0.28);
+  text-shadow: 0 0 48px color-mix(in srgb, var(--accent) 32%, transparent);
   font-variation-settings: "wght" 800;
 }
 
@@ -600,8 +604,8 @@ select:focus:not(:focus-visible) {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 85% 70% at 50% 35%, transparent 35%, rgba(5, 5, 8, 0.55) 100%),
-    linear-gradient(180deg, transparent 60%, rgba(5, 5, 8, 0.65) 100%);
+    radial-gradient(ellipse 85% 70% at 50% 35%, transparent 35%, color-mix(in srgb, var(--color-bg) 55%, transparent) 100%),
+    linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--color-bg) 65%, transparent) 100%);
 }
 
 .skeleton-line {
@@ -651,7 +655,7 @@ select:focus:not(:focus-visible) {
   .btn-secondary:hover:not(:disabled) {
     border-color: var(--color-accent);
     color: var(--color-accent);
-    background: rgba(0, 229, 255, 0.04);
+    background: color-mix(in srgb, var(--color-accent) 6%, transparent);
   }
   .btn-lg { padding: 0.85rem 1.4rem; font-size: 1.05rem; min-height: 48px; }
   .btn-block { width: 100%; }
@@ -714,7 +718,7 @@ select:focus:not(:focus-visible) {
 }
 .cabinet-rail-item.is-active {
   color: var(--color-accent);
-  background: rgba(0, 229, 255, 0.08);
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
   border-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
 }
 .overflow-wrap-anywhere {

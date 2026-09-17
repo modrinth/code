@@ -197,15 +197,21 @@ jobs:
           VERSION: ${{ steps.ver.outputs.version }}
         run: |
           set -euo pipefail
+          # Prefer real commit subjects since previous tag (not a stale hardcoded blurb).
+          PREV="$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || true)"
+          if [ -n "${PREV}" ]; then
+            CHANGELOG="$(git log "${PREV}..${TAG}" --pretty=format:'- %s' --no-merges | head -n 40)"
+          else
+            CHANGELOG="$(git log -n 20 --pretty=format:'- %s' --no-merges)"
+          fi
+          if [ -z "${CHANGELOG}" ]; then
+            CHANGELOG="- Build ${VERSION}"
+          fi
           NOTES=$(cat <<EOF
           ## Owyx™ ${VERSION}
 
           ### Changes
-          - Accounts: user-facing play paths are **Owyx site** + **Microsoft** only (no offline-nick UI); site session badge when signed in
-          - Social: Friends stats, presence chip from real heartbeat, Open Friends closes settings modal; incoming pending only
-          - Site: launcher-first DESIGN (no one-server / plugin pitch); hero API/DB status; download from GitHub Releases; RU/EN form placeholders
-          - Cleanup: Hosting pages removed (catch-all → Owyx Servers); plugin/game-token/applications APIs return **410**; no game IP in public settings
-          - Brand: Onest + Unbounded, cyan accent; dead Pride banner / Medal hosting prefetch gone
+          ${CHANGELOG}
 
           Installers: Windows NSIS, Linux AppImage. GPL-3 fork of [modrinth/code](https://github.com/modrinth/code); not affiliated with Modrinth / Rinth, Inc. Owyx™ branding reserved — see TRADEMARK.md.
           EOF
