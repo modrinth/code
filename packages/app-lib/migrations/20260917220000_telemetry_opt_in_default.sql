@@ -1,7 +1,10 @@
--- Owyx: launcher telemetry is opt-in (default off for fresh installs).
--- init.sql now uses DEFAULT FALSE for settings.telemetry.
--- Do NOT mass-update existing rows — users who already have telemetry=1 stay opted in.
--- SQLite cannot ALTER COLUMN DEFAULT in-place; this migration documents the policy
--- for databases created before the init.sql change.
+-- Owyx: launcher telemetry is opt-in for fresh installs.
+-- Do NOT edit 20240711194701_init.sql (sqlx checksums break upgrades).
+-- Fresh app.db: settings row exists, no instances yet → default telemetry off.
+-- Existing users (any instance history) keep their current telemetry value.
 
-UPDATE settings SET id = id WHERE 0;
+UPDATE settings
+SET telemetry = 0
+WHERE id = 0
+  AND telemetry = 1
+  AND NOT EXISTS (SELECT 1 FROM instances);

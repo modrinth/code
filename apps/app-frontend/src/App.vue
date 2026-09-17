@@ -1400,8 +1400,8 @@ async function refreshOwyxSiteSession() {
 			const social = await getOwyxSocialSettings()
 			setOwyxSharePresenceEnabled(social.sharePresence)
 		} catch {
-			// Do not fail-open to online if settings cannot be loaded.
-			stopOwyxPresenceHeartbeat()
+			// Fail closed: unknown privacy → offline, no heartbeat resume.
+			setOwyxSharePresenceEnabled(false)
 		}
 		try {
 			const { markLoggedIntoOwyxSite } = await import('@/helpers/onboarding-checklist')

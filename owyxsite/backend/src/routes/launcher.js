@@ -223,10 +223,22 @@ const TELEMETRY_MAX_PER_INSTALL = 60;
 const telemetryIpBuckets = new Map();
 /** @type {Map<string, { windowStart: number, count: number }>} */
 const telemetryInstallBuckets = new Map();
+let lastTelemetryBucketSweep = Date.now();
+
+function pruneTelemetryBuckets(map, now) {
+  for (const [key, bucket] of map) {
+    if (now - bucket.windowStart >= TELEMETRY_WINDOW_MS) map.delete(key);
+  }
+}
 
 function takeTelemetryToken(map, key, max) {
   if (!key) return true;
   const now = Date.now();
+  if (now - lastTelemetryBucketSweep > TELEMETRY_WINDOW_MS) {
+    pruneTelemetryBuckets(telemetryIpBuckets, now);
+    pruneTelemetryBuckets(telemetryInstallBuckets, now);
+    lastTelemetryBucketSweep = now;
+  }
   let bucket = map.get(key);
   if (!bucket || now - bucket.windowStart >= TELEMETRY_WINDOW_MS) {
     bucket = { windowStart: now, count: 0 };

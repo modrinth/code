@@ -107,7 +107,7 @@ Hosting/Medal/Modrinth+; MC plugin; mass `@modrinth/*` rename; secrets/`.env`/bi
 - [x] Presence engine does not wipe `playing` when Social loads / session refreshes while sharing
 - [x] Skins / CSL install still works
 - [x] Admin Logs: account + moderation + launcher tabs polished (human labels)
-- [x] Telemetry: opt-in only (fresh default off; existing TRUE kept); rate-limited ingest; no PII; contract + `012`/`013` VPS notes
+- [x] Telemetry: opt-in UX + rate-limited ingest; fresh installs off via additive migration (no sqlx checksum rewrite); existing TRUE with instances kept; no PII; contract + `012`/`013` VPS notes
 - [x] `logUserActivity` uses trusted `req.clientIp`; skin_delete logged
 - [x] Site glass/layout/support verified (SupportContact → GitHub issue; profile full-width + liquid glass on main/#35)
 - [ ] CI green on `ebluffy/Owyx`

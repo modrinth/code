@@ -216,7 +216,7 @@ Anonymous launcher stats / errors. Opt-in on the client (`settings.telemetry`).
 - `kind`: `session_start` | `heartbeat` | `error` | `crash` | `perf` | `feature`
 - Max 20 events per request. Server sanitizes emails / Bearer tokens / home paths.
 - Rate limit: ~30 req/min per IP and ~60 req/min per installId (HTTP 429 when exceeded).
-- Opt-in on the launcher (`settings.telemetry`, default **off** for fresh installs). Existing opted-in users are not mass-flipped.
+- Opt-in on the launcher (`settings.telemetry`). Fresh installs get telemetry off via additive migration `20260917220000_telemetry_opt_in_default.sql` (does not rewrite sqlx checksums on `init.sql`; existing users with instances keep their value).
 - Optional Bearer links `user_id` only — never store nick/email in the event body.
 - Admin reads: `GET /api/admin/activity`, `GET /api/admin/logs`, `GET /api/admin/telemetry`.
 - Schema: `postgres/migrations/012_logs_telemetry.sql` (`launcher_telemetry`).
