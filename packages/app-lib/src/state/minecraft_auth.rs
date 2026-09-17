@@ -1725,7 +1725,10 @@ fn generate_oauth_challenge() -> String {
 
 #[cfg(test)]
 mod offline_account_tests {
-    use super::{Credentials, OFFLINE_REFRESH_TOKEN, offline_player_uuid};
+    use super::{
+        Credentials, MinecraftProfile, OFFLINE_REFRESH_TOKEN,
+        offline_player_uuid,
+    };
     use chrono::{Duration, Utc};
     use sqlx::sqlite::SqlitePoolOptions;
     use uuid::Uuid;
@@ -1752,7 +1755,7 @@ mod offline_account_tests {
     #[test]
     fn is_offline_detects_marker_token() {
         let creds = Credentials {
-            offline_profile: Default::default(),
+            offline_profile: MinecraftProfile::default(),
             access_token: "0".to_string(),
             refresh_token: OFFLINE_REFRESH_TOKEN.to_string(),
             expires: Utc::now() + Duration::days(1),
