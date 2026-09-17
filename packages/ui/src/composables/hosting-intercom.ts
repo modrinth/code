@@ -45,6 +45,9 @@ const LAUNCHER_SELECTOR =
 const RIGHT_VAR = '--modrinth-hosting-intercom-right'
 const BOTTOM_VAR = '--modrinth-hosting-intercom-bottom'
 const POINTER_EVENTS_VAR = '--modrinth-hosting-intercom-pointer-events'
+const LAUNCHER_OPACITY_VAR = '--modrinth-hosting-intercom-launcher-opacity'
+const LAUNCHER_VISIBILITY_VAR = '--modrinth-hosting-intercom-launcher-visibility'
+const LAUNCHER_POINTER_EVENTS_VAR = '--modrinth-hosting-intercom-launcher-pointer-events'
 
 function sanitizePixels(value: number | undefined, fallback = DEFAULT_PADDING) {
 	if (typeof value !== 'number' || !Number.isFinite(value)) return fallback
@@ -75,7 +78,12 @@ iframe[name='intercom-messenger-frame'] {
 iframe[name='intercom-launcher-frame'] {
 	right: var(${RIGHT_VAR}, ${DEFAULT_PADDING}px) !important;
 	bottom: var(${BOTTOM_VAR}, ${DEFAULT_PADDING}px) !important;
+	opacity: var(${LAUNCHER_OPACITY_VAR}, 1) !important;
+	visibility: var(${LAUNCHER_VISIBILITY_VAR}, visible) !important;
+	pointer-events: var(${LAUNCHER_POINTER_EVENTS_VAR}, auto) !important;
 	transition:
+		opacity 0.15s ease-out,
+		visibility 0.15s,
 		right 0.12s ease-out,
 		bottom 0.12s ease-out !important;
 }
@@ -95,6 +103,8 @@ export function useHostingIntercom(options: UseHostingIntercomOptions) {
 	const { stackCount } = useModalStack()
 	const horizontalPaddingRequests = new Map<symbol, number>()
 	const verticalClearanceRequests = new Map<symbol, number>()
+	const hiddenRequests = new Set<symbol>()
+	const launcherHidden = ref(false)
 	const requestedHorizontalPadding = ref<number | null>(null)
 	const requestedVerticalClearance = ref<number | null>(null)
 	const launcherWidth = ref(DEFAULT_LAUNCHER_WIDTH)
@@ -105,7 +115,7 @@ export function useHostingIntercom(options: UseHostingIntercomOptions) {
 	let syncAfterBoot = false
 	let stopSync: (() => void) | null = null
 	let stopPositionSync: (() => void) | null = null
-	let stopModalSync: (() => void) | null = null
+	let stopVisibilitySync: (() => void) | null = null
 	let launcherObserver: ResizeObserver | null = null
 	let documentObserver: MutationObserver | null = null
 	let observedLauncher: Element | null = null
@@ -145,6 +155,15 @@ export function useHostingIntercom(options: UseHostingIntercomOptions) {
 			POINTER_EVENTS_VAR,
 			stackCount.value > 0 ? 'none' : 'auto',
 		)
+		document.documentElement.style.setProperty(LAUNCHER_OPACITY_VAR, launcherHidden.value ? '0' : '1')
+		document.documentElement.style.setProperty(
+			LAUNCHER_VISIBILITY_VAR,
+			launcherHidden.value ? 'hidden' : 'visible',
+		)
+		document.documentElement.style.setProperty(
+			LAUNCHER_POINTER_EVENTS_VAR,
+			launcherHidden.value || stackCount.value > 0 ? 'none' : 'auto',
+		)
 
 		if (updateSdk && booted) {
 			updateIntercom({
@@ -180,6 +199,9 @@ export function useHostingIntercom(options: UseHostingIntercomOptions) {
 		document.documentElement.style.removeProperty(RIGHT_VAR)
 		document.documentElement.style.removeProperty(BOTTOM_VAR)
 		document.documentElement.style.removeProperty(POINTER_EVENTS_VAR)
+		document.documentElement.style.removeProperty(LAUNCHER_OPACITY_VAR)
+		document.documentElement.style.removeProperty(LAUNCHER_VISIBILITY_VAR)
+		document.documentElement.style.removeProperty(LAUNCHER_POINTER_EVENTS_VAR)
 	}
 
 	function stop() {
@@ -262,13 +284,13 @@ export function useHostingIntercom(options: UseHostingIntercomOptions) {
 			immediate: true,
 		})
 		stopPositionSync = watch([horizontalPadding, verticalPadding], () => applyPosition(true))
-		stopModalSync = watch(stackCount, () => applyPosition())
+		stopVisibilitySync = watch([stackCount, launcherHidden], () => applyPosition())
 	})
 
 	onBeforeUnmount(() => {
 		stopSync?.()
 		stopPositionSync?.()
-		stopModalSync?.()
+		stopVisibilitySync?.()
 		launcherObserver?.disconnect()
 		documentObserver?.disconnect()
 		stop()
@@ -279,6 +301,11 @@ export function useHostingIntercom(options: UseHostingIntercomOptions) {
 		intercomBubble: {
 			width: launcherWidth,
 			horizontalPadding,
+			requestHidden: (id: symbol, hidden: boolean) => {
+				if (hidden) hiddenRequests.add(id)
+				else hiddenRequests.delete(id)
+				launcherHidden.value = hiddenRequests.size > 0
+			},
 			requestHorizontalPadding: (id: symbol, value: number | null) =>
 				requestFromMap(horizontalPaddingRequests, requestedHorizontalPadding, id, value),
 			requestVerticalClearance: (id: symbol, value: number | null) =>
