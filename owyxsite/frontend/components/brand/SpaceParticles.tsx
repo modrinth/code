@@ -12,9 +12,17 @@ type Particle = {
   layer: 1 | 2 | 3;
 };
 
+function readAccentRgb(): string {
+  const raw = getComputedStyle(document.documentElement)
+    .getPropertyValue("--accent-rgb")
+    .trim();
+  return raw || "0, 229, 255";
+}
+
 /**
  * Deep-space particle field (no spiderweb links — anti AI-slop).
- * Three depth layers, O(N). Respects prefers-reduced-motion + Page Visibility.
+ * Three depth layers, O(N). Color follows active site theme accent.
+ * Respects prefers-reduced-motion + Page Visibility.
  */
 export default function SpaceParticles() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -38,6 +46,7 @@ export default function SpaceParticles() {
     let h = 0;
     let dpr = 1;
     let particles: Particle[] = [];
+    let accentRgb = readAccentRgb();
 
     function countForViewport() {
       const area = w * h;
@@ -88,8 +97,8 @@ export default function SpaceParticles() {
 
         if (p.layer === 3) {
           const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
-          g.addColorStop(0, `rgba(0, 229, 255, ${p.a * 0.35})`);
-          g.addColorStop(1, "rgba(0, 229, 255, 0)");
+          g.addColorStop(0, `rgba(${accentRgb}, ${p.a * 0.35})`);
+          g.addColorStop(1, `rgba(${accentRgb}, 0)`);
           ctx.fillStyle = g;
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
@@ -100,7 +109,7 @@ export default function SpaceParticles() {
         ctx.fillStyle =
           p.layer === 1
             ? `rgba(220, 230, 240, ${p.a})`
-            : `rgba(0, 229, 255, ${p.a})`;
+            : `rgba(${accentRgb}, ${p.a})`;
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fill();
       }
@@ -114,6 +123,14 @@ export default function SpaceParticles() {
       else window.cancelAnimationFrame(raf);
     }
 
+    const themeObserver = new MutationObserver(() => {
+      accentRgb = readAccentRgb();
+    });
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-accent", "style", "class"],
+    });
+
     resize();
     raf = window.requestAnimationFrame(tick);
     window.addEventListener("resize", resize);
@@ -124,6 +141,7 @@ export default function SpaceParticles() {
       window.cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
       document.removeEventListener("visibilitychange", onVisibility);
+      themeObserver.disconnect();
     };
   }, []);
 
