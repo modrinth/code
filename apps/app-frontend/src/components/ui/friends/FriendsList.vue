@@ -204,8 +204,7 @@ const filtered = computed(() =>
 		const q = search.value.trim().toLowerCase()
 		if (!q) return true
 		return (
-			f.nickname.toLowerCase().includes(q) ||
-			(f.displayNickname || '').toLowerCase().includes(q)
+			f.nickname.toLowerCase().includes(q) || (f.displayNickname || '').toLowerCase().includes(q)
 		)
 	}),
 )
@@ -233,9 +232,7 @@ function friendStatusLabel(friend: OwyxFriend) {
 	return formatMessage(messages.offlineStatus)
 }
 
-const friendNickSet = computed(
-	() => new Set(friends.value.map((f) => f.nickname.toLowerCase())),
-)
+const friendNickSet = computed(() => new Set(friends.value.map((f) => f.nickname.toLowerCase())))
 
 function friendDisplay(friend: OwyxFriend | { nickname: string; displayNickname?: string }) {
 	return owyxFriendLabel(friend)
@@ -520,9 +517,7 @@ const messages = defineMessages({
 					@click="addFriendFromModal(hit.nickname)"
 				>
 					<Avatar :src="resolveOwyxAvatarUrl(hit.avatarUrl)" size="1.75rem" circle />
-					<span class="flex-1 truncate text-sm text-contrast">{{
-						friendDisplay(hit)
-					}}</span>
+					<span class="flex-1 truncate text-sm text-contrast">{{ friendDisplay(hit) }}</span>
 					<span
 						v-if="friendNickSet.has(hit.nickname.toLowerCase())"
 						class="text-xs text-secondary"

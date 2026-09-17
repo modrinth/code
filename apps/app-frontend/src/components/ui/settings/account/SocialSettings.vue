@@ -72,9 +72,7 @@
 				:class="presenceLive ? 'bg-green/20 text-green' : 'bg-button-bg text-secondary'"
 			>
 				{{
-					presenceLive
-						? formatMessage(messages.presenceOn)
-						: formatMessage(messages.presenceOff)
+					presenceLive ? formatMessage(messages.presenceOn) : formatMessage(messages.presenceOff)
 				}}
 			</span>
 		</div>
@@ -101,7 +99,13 @@
 			<p class="m-0 font-medium text-contrast">{{ formatMessage(messages.skinsTitle) }}</p>
 			<p class="m-0 mt-1 leading-relaxed">{{ formatMessage(messages.skinsBody) }}</p>
 			<div class="mt-3 flex flex-wrap gap-2">
-				<Button size="sm" type="colored" color="brand" :disabled="installingCsl" @click="installCsl">
+				<Button
+					size="sm"
+					type="colored"
+					color="brand"
+					:disabled="installingCsl"
+					@click="installCsl"
+				>
 					{{ formatMessage(messages.installCsl) }}
 				</Button>
 				<a
@@ -134,10 +138,7 @@ import { Button, defineMessages, injectNotificationManager, useVIntl } from '@mo
 import { computed, inject, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-import {
-	CUSTOM_SKIN_LOADER_MODRINTH,
-	CUSTOM_SKIN_LOADER_PROJECT_ID,
-} from '@/helpers/owyx-csl'
+import { CUSTOM_SKIN_LOADER_MODRINTH, CUSTOM_SKIN_LOADER_PROJECT_ID } from '@/helpers/owyx-csl'
 import {
 	getOwyxSocialSettings,
 	listOwyxFriends,
@@ -171,9 +172,7 @@ const presenceLive = computed(() => {
 function openFriends(focus?: 'incoming') {
 	settingsModal?.close()
 	void router.push('/')
-	window.dispatchEvent(
-		new CustomEvent('owyx:open-friends', { detail: { focus: focus || 'list' } }),
-	)
+	window.dispatchEvent(new CustomEvent('owyx:open-friends', { detail: { focus: focus || 'list' } }))
 }
 
 async function installCsl() {

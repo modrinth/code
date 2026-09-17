@@ -284,7 +284,9 @@ export async function updateOwyxDisplayNickname(displayNickname: string): Promis
 	})
 	const data = (await res.json().catch(() => ({}))) as Record<string, unknown>
 	if (!res.ok) {
-		throw new Error(String(data.error ?? data.message ?? `Could not change nickname (${res.status})`))
+		throw new Error(
+			String(data.error ?? data.message ?? `Could not change nickname (${res.status})`),
+		)
 	}
 	const fresh = await fetchOwyxSiteMe(session.token)
 	if (!fresh) throw new Error('Could not refresh Owyx session')

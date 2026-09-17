@@ -14,14 +14,15 @@ launcher/site boundary. Keep in sync with `backend/src/routes/launcher.js`.
 
 ## Product model (important)
 
-Playing is **open**:
+Playing is **open** (no application / whitelist gate):
 
-- **Guest / offline** — pick a nick in the launcher and Play. No account.
 - **Owyx account** — register on the site, sign in inside the launcher with the
-  same account, play. Later: skin, cape, profile perks.
+  same account. The launcher syncs an offline-mode play profile to your
+  **display nickname** (in-game name). Friends, skins/CSL, and presence use this
+  account.
 - **Microsoft** — licensed Minecraft via Theseus SISU / Microsoft OAuth in
-  `packages/app-lib` (optional; see `docs/ms-oauth.md`). Never breaks offline or
-  Owyx nick play.
+  `packages/app-lib` (optional; see `docs/ms-oauth.md`). Use for online-mode
+  servers and licensed skins. Does not replace the Owyx site account.
 
 **Applications («заявки») are no longer a whitelist gate.** A registered account
 that is **active and not banned** may play. A **ban** blocks everything.

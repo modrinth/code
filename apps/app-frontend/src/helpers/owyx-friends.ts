@@ -110,7 +110,9 @@ export async function postOwyxPresence(opts: {
 
 export async function searchOwyxUsers(
 	q: string,
-): Promise<{ id: string; nickname: string; displayNickname?: string; avatarUrl?: string | null }[]> {
+): Promise<
+	{ id: string; nickname: string; displayNickname?: string; avatarUrl?: string | null }[]
+> {
 	const res = await owyxFetch(`${apiBase()}/api/friends/search?q=${encodeURIComponent(q)}`, {
 		method: 'GET',
 		headers: authHeaders(),

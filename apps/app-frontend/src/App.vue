@@ -1398,8 +1398,7 @@ async function refreshOwyxSiteSession() {
 				const isOwyxOffline = (a) =>
 					a?.is_offline === true ||
 					a?.refresh_token === 'owyx-offline' ||
-					((a?.refresh_token ?? '') === '' &&
-						(a?.access_token === '' || a?.access_token === '0'))
+					((a?.refresh_token ?? '') === '' && (a?.access_token === '' || a?.access_token === '0'))
 				const offlineAccounts = accounts.filter(isOwyxOffline)
 				const match = offlineAccounts.find((a) => a?.profile?.name === nick)
 				if (!match) {
