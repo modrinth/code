@@ -145,7 +145,7 @@ const emptyPack = {
 const emptyServer = {
   name: "",
   iconUrl: "",
-  address: "play.owyx.site",
+  address: "",
   port: "25565",
   kind: "owyx" as "owyx" | "community",
   packId: "",

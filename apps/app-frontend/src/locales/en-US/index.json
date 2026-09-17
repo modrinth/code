@@ -4499,9 +4499,6 @@
   "minecraft-account.add-microsoft": {
     "message": "Add Microsoft account"
   },
-  "minecraft-account.add-offline": {
-    "message": "Add offline nickname"
-  },
   "minecraft-account.label": {
     "message": "Minecraft account"
   },
@@ -4517,26 +4514,14 @@
   "minecraft-account.not-signed-in": {
     "message": "Choose how to play"
   },
-  "minecraft-account.offline": {
-    "message": "Owyx / offline"
-  },
-  "minecraft-account.offline-nickname": {
-    "message": "Play with offline nickname"
-  },
-  "minecraft-account.offline-warning": {
-    "message": "Uses a nickname for offline-mode servers. Prefer the same nick as on owyx.site so skins and friends match. Public Microsoft-authenticated servers still need a Microsoft account."
-  },
   "minecraft-account.owyx-nick-too-long": {
-    "message": "Owyx nickname must be 3–16 letters, numbers, or underscores to sync with offline play and skins. Change it on owyx.site, then try again."
+    "message": "Owyx nickname must be 3–16 letters, numbers, or underscores to sync with play and skins. Change it on owyx.site, then try again."
   },
   "minecraft-account.owyx-session-badge": {
     "message": "Owyx site session"
   },
   "minecraft-account.paths-hint": {
     "message": "Owyx account (friends & skins) or Microsoft (licensed Minecraft)."
-  },
-  "minecraft-account.play-offline": {
-    "message": "Save nickname"
   },
   "minecraft-account.remove-account": {
     "message": "Remove account"

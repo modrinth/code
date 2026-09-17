@@ -8,21 +8,20 @@ type HealthPayload = {
   services?: {
     database?: string;
     server?: string;
-    socketio?: string;
   };
 };
 
 type Row = { id: string; label: string; ok: boolean | null };
 
 /**
- * Compact control-plane status (API / DB / realtime) — launcher-first, not a game-server IP.
+ * Compact control-plane status (API / DB) — launcher-first, not a game-server IP.
+ * Realtime omitted: backend reports socketio as a static "enabled" flag, not live health.
  */
 export default function ApiServicesStatus() {
   const { locale } = useLocale();
   const [rows, setRows] = useState<Row[]>([
     { id: "api", label: "API", ok: null },
     { id: "db", label: locale === "ru" ? "База" : "Database", ok: null },
-    { id: "rt", label: "Realtime", ok: null },
   ]);
 
   useEffect(() => {
@@ -39,8 +38,6 @@ export default function ApiServicesStatus() {
 
         const dbOk = data.services?.database === "connected";
         const apiOk = data.status === "healthy" || data.services?.server === "running";
-        const rtOk =
-          data.services?.socketio === "enabled" || data.services?.socketio === "connected";
 
         setRows([
           { id: "api", label: "API", ok: Boolean(apiOk) },
@@ -49,7 +46,6 @@ export default function ApiServicesStatus() {
             label: locale === "ru" ? "База" : "Database",
             ok: Boolean(dbOk),
           },
-          { id: "rt", label: "Realtime", ok: Boolean(rtOk) },
         ]);
       } catch {
         if (cancelled) return;

@@ -162,16 +162,16 @@
 
 ## 7. Чеклист приёмки
 
-- [ ] Primary accent = `#00e5ff` (не gold).
-- [ ] Фон `#050508` / панели `#131319`.
-- [ ] Первый viewport: brand + 1 мысль + 1 CTA (+ опц. статус сервисов); **без** IP/«основной сервер».
-- [ ] Нет плагина в копирайте текущей поверхности.
-- [ ] Download ведёт на актуальные артефакты GitHub Releases (не протухший semver в URL).
-- [ ] Auth/profile: RU/EN без английских плейсхолдеров на RU.
-- [ ] Coming Soon → download launcher, не `/servers`.
-- [ ] Лаунчер: только Owyx + Microsoft в UI аккаунтов; без Hosting leftovers.
-- [ ] Нет Inter-as-display / фиолетового SaaS / золотого btn-minecraft.
-- [ ] Mobile: hero читаем, CTA не обрезан.
+- [x] Primary accent = `#00e5ff` (не gold).
+- [x] Фон `#050508` / панели `#131319`.
+- [x] Первый viewport: brand + 1 мысль + 1 CTA (+ опц. статус сервисов); **без** IP/«основной сервер».
+- [x] Нет плагина в копирайте текущей поверхности.
+- [x] Download ведёт на актуальные артефакты GitHub Releases (не протухший semver в URL).
+- [x] Auth/profile: RU/EN без английских плейсхолдеров на RU.
+- [x] Coming Soon → download launcher, не `/servers`.
+- [x] Лаунчер: только Owyx + Microsoft в UI аккаунтов; без Hosting leftovers.
+- [x] Нет Inter-as-display / фиолетового SaaS / золотого btn-minecraft.
+- [x] Mobile: hero читаем, CTA не обрезан.
 
 ---
 

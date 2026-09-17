@@ -4349,29 +4349,14 @@
   "minecraft-account.add-microsoft": {
     "message": "Добавить аккаунт Microsoft"
   },
-  "minecraft-account.add-offline": {
-    "message": "Добавить офлайн-ник"
-  },
   "minecraft-account.microsoft": {
     "message": "Microsoft"
-  },
-  "minecraft-account.offline": {
-    "message": "Owyx / офлайн"
   },
   "minecraft-account.sign-in-microsoft": {
     "message": "Войти через Microsoft"
   },
-  "minecraft-account.offline-nickname": {
-    "message": "Играть с офлайн-ником"
-  },
-  "minecraft-account.offline-warning": {
-    "message": "Ник с owyx.site для серверов в offline-mode. На серверах с проверкой лицензии Microsoft нужен аккаунт Microsoft."
-  },
   "minecraft-account.nickname-placeholder": {
     "message": "Ник"
-  },
-  "minecraft-account.play-offline": {
-    "message": "Сохранить ник"
   },
   "app.nav.owyx-servers": {
     "message": "Серверы Owyx"
