@@ -11,7 +11,7 @@ use common::api_common::{ApiProject, ApiVersion};
 use common::database::{ENEMY_USER_PAT, USER_USER_PAT};
 use common::environment::{TestEnvironment, with_test_environment};
 use dashmap::DashMap;
-use labrinth::database::models::DatabaseError;
+use eyre::Result;
 use labrinth::database::models::project_item::{
     PROJECTS_NAMESPACE, PROJECTS_SLUGS_NAMESPACE,
 };
@@ -259,7 +259,7 @@ async fn cache_lock_coalesces_concurrent_misses_for_one_key() {
                     for key in keys {
                         values.insert(key.clone(), format!("value-{key}"));
                     }
-                    Ok::<_, DatabaseError>(values)
+                    eyre::Ok(values)
                 },
             )
             .await
@@ -304,7 +304,7 @@ async fn cache_lock_coalesces_only_overlapping_keys() {
                             .or_insert(1);
                         values.insert(key.clone(), format!("value-{key}"));
                     }
-                    Ok::<_, DatabaseError>(values)
+                    eyre::Ok(values)
                 },
             )
             .await
@@ -340,7 +340,7 @@ async fn cache_lock_does_not_block_independent_keys() {
                     slow_release.notified().await;
                     let values = DashMap::new();
                     values.insert(keys[0].clone(), "slow-value".to_string());
-                    Ok::<_, DatabaseError>(values)
+                    eyre::Ok(values)
                 },
             )
             .await
@@ -355,7 +355,7 @@ async fn cache_lock_does_not_block_independent_keys() {
             |keys| async move {
                 let values = DashMap::new();
                 values.insert(keys[0].clone(), "fast-value".to_string());
-                Ok::<_, DatabaseError>(values)
+                eyre::Ok(values)
             },
         ),
     )
@@ -382,8 +382,8 @@ async fn cache_lock_is_released_after_error_and_cancellation() {
             "error_recovery:v4",
             &["key".to_string()],
             |_| async {
-                Err::<DashMap<String, String>, _>(DatabaseError::Internal(
-                    eyre::eyre!("intentional cache fill failure"),
+                Err::<DashMap<String, String>, _>(eyre::eyre!(
+                    "intentional cache fill failure"
                 ))
             },
         )
@@ -398,7 +398,7 @@ async fn cache_lock_is_released_after_error_and_cancellation() {
             |keys| async move {
                 let values = DashMap::new();
                 values.insert(keys[0].clone(), "recovered".to_string());
-                Ok::<_, DatabaseError>(values)
+                eyre::Ok(values)
             },
         ),
     )
@@ -417,10 +417,8 @@ async fn cache_lock_is_released_after_error_and_cancellation() {
                 &["key".to_string()],
                 move |_| async move {
                     cancelled_started.notify_one();
-                    std::future::pending::<
-                        Result<DashMap<String, String>, DatabaseError>,
-                    >()
-                    .await
+                    std::future::pending::<Result<DashMap<String, String>>>()
+                        .await
                 },
             )
             .await
@@ -437,7 +435,7 @@ async fn cache_lock_is_released_after_error_and_cancellation() {
             |keys| async move {
                 let values = DashMap::new();
                 values.insert(keys[0].clone(), "recovered".to_string());
-                Ok::<_, DatabaseError>(values)
+                eyre::Ok(values)
             },
         ),
     )
@@ -485,7 +483,7 @@ async fn expired_cache_value_serves_waiter_while_writer_refreshes() {
                     writer_release.notified().await;
                     let values = DashMap::new();
                     values.insert(keys[0].clone(), "fresh".to_string());
-                    Ok::<_, DatabaseError>(values)
+                    eyre::Ok(values)
                 },
             )
             .await
@@ -495,8 +493,8 @@ async fn expired_cache_value_serves_waiter_while_writer_refreshes() {
     let stale = timeout(
         Duration::from_secs(1),
         pool.get_cached_keys_raw(namespace, &["key".to_string()], |_| async {
-            Err::<DashMap<String, String>, _>(DatabaseError::Internal(
-                eyre::eyre!("stale waiter unexpectedly became writer"),
+            Err::<DashMap<String, String>, _>(eyre::eyre!(
+                "stale waiter unexpectedly became writer"
             ))
         }),
     )
@@ -512,8 +510,8 @@ async fn expired_cache_value_serves_waiter_while_writer_refreshes() {
     );
     let fresh = pool
         .get_cached_keys_raw(namespace, &["key".to_string()], |_| async {
-            Err::<DashMap<String, String>, _>(DatabaseError::Internal(
-                eyre::eyre!("fresh value unexpectedly missed cache"),
+            Err::<DashMap<String, String>, _>(eyre::eyre!(
+                "fresh value unexpectedly missed cache"
             ))
         })
         .await
@@ -551,7 +549,7 @@ async fn case_insensitive_slug_requests_share_one_cache_lock() {
                         canonical_id.to_string(),
                         (Some("MiXeD-Slug".to_string()), "value".to_string()),
                     );
-                    Ok::<_, DatabaseError>(values)
+                    eyre::Ok(values)
                 },
             )
             .await

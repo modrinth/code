@@ -374,7 +374,7 @@ pub async fn collection_edit(
                     project_id, &**pool, &redis,
                 )
                 .await
-                .wrap_api_err("fetching project from database")?
+                .wrap_internal_err("fetching project from database")?
                 .wrap_request_err_with(|| {
                     eyre!("the specified project `{project_id}` does not exist")
                 })?;

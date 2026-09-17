@@ -1,10 +1,11 @@
 use chrono::{DateTime, Utc};
+use eyre::{Result, WrapErr};
 use futures::{StreamExt, TryStreamExt};
 use sqlx::types::Json;
 use xredis::RedisPool;
 
 use crate::{
-    database::models::{DBAnalyticsEventId, DatabaseError},
+    database::models::DBAnalyticsEventId,
     models::v3::analytics_event::AnalyticsEventMeta,
 };
 use serde::{Deserialize, Serialize};
@@ -24,7 +25,7 @@ impl DBAnalyticsEvent {
     pub async fn insert(
         &self,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<()> {
         sqlx::query!(
             "
 			INSERT INTO analytics_events (id, meta, starts, ends)
@@ -36,7 +37,8 @@ impl DBAnalyticsEvent {
             self.ends,
         )
         .execute(exec)
-        .await?;
+        .await
+        .wrap_err("inserting analytics event")?;
 
         Ok(())
     }
@@ -44,7 +46,7 @@ impl DBAnalyticsEvent {
     pub async fn update(
         &self,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<bool, DatabaseError> {
+    ) -> Result<bool> {
         let result = sqlx::query!(
             "
 			UPDATE analytics_events
@@ -57,7 +59,8 @@ impl DBAnalyticsEvent {
             self.ends,
         )
         .execute(exec)
-        .await?;
+        .await
+        .wrap_err("updating analytics event")?;
 
         Ok(result.rows_affected() > 0)
     }
@@ -65,7 +68,7 @@ impl DBAnalyticsEvent {
     pub async fn remove(
         id: DBAnalyticsEventId,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<bool, DatabaseError> {
+    ) -> Result<bool> {
         let result = sqlx::query!(
             "
 			DELETE FROM analytics_events
@@ -74,7 +77,8 @@ impl DBAnalyticsEvent {
             id as DBAnalyticsEventId,
         )
         .execute(exec)
-        .await?;
+        .await
+        .wrap_err("removing analytics event")?;
 
         Ok(result.rows_affected() > 0)
     }
@@ -82,13 +86,20 @@ impl DBAnalyticsEvent {
     pub async fn get_all(
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
         redis: &RedisPool,
-    ) -> Result<Vec<DBAnalyticsEvent>, DatabaseError> {
-        let mut redis = redis.connect().await?;
+    ) -> Result<Vec<DBAnalyticsEvent>> {
+        let mut redis = redis
+            .connect()
+            .await
+            .wrap_err("connecting to redis for analytics events")?;
         let key = redis
             .key()
             .metadata(ANALYTICS_EVENTS_NAMESPACE, ANALYTICS_EVENTS_ALL_KEY);
 
-        if let Some(events) = redis.get_deserialized(&key).await? {
+        if let Some(events) = redis
+            .get_deserialized(&key)
+            .await
+            .wrap_err("getting cached analytics events")?
+        {
             return Ok(events);
         }
 
@@ -101,9 +112,9 @@ impl DBAnalyticsEvent {
         )
         .fetch(exec)
         .map(|record| {
-            let record = record?;
+            let record = record.wrap_err("reading analytics event record")?;
 
-            Ok::<_, DatabaseError>(DBAnalyticsEvent {
+            eyre::Ok(DBAnalyticsEvent {
                 id: DBAnalyticsEventId(record.id),
                 meta: record.meta.0,
                 starts: record.starts,
@@ -111,19 +122,29 @@ impl DBAnalyticsEvent {
             })
         })
         .try_collect::<Vec<_>>()
-        .await?;
+        .await
+        .wrap_err("fetching analytics events from database")?;
 
-        redis.set_serialized(&key, &events, None).await?;
+        redis
+            .set_serialized(&key, &events, None)
+            .await
+            .wrap_err("caching analytics events")?;
 
         Ok(events)
     }
 
-    pub async fn clear_cache(redis: &RedisPool) -> Result<(), DatabaseError> {
-        let mut redis = redis.connect().await?;
+    pub async fn clear_cache(redis: &RedisPool) -> Result<()> {
+        let mut redis = redis
+            .connect()
+            .await
+            .wrap_err("connecting to redis to clear analytics event cache")?;
         let key = redis
             .key()
             .metadata(ANALYTICS_EVENTS_NAMESPACE, ANALYTICS_EVENTS_ALL_KEY);
-        redis.delete(&key).await?;
+        redis
+            .delete(&key)
+            .await
+            .wrap_err("clearing analytics event cache")?;
         Ok(())
     }
 }

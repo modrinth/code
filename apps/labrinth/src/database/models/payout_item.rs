@@ -3,10 +3,11 @@ use crate::{
     models::payouts::{PayoutMethodType, PayoutStatus},
 };
 use chrono::{DateTime, Utc};
+use eyre::{Result, WrapErr};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
-use super::{DBPayoutId, DBUserId, DatabaseError};
+use super::{DBPayoutId, DBUserId};
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct DBPayout {
@@ -30,7 +31,7 @@ impl DBPayout {
     pub async fn insert(
         &self,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<()> {
         sqlx::query!(
             "
             INSERT INTO payouts (
@@ -51,7 +52,8 @@ impl DBPayout {
             self.platform_id,
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("inserting payout")?;
 
         Ok(())
     }
@@ -59,19 +61,20 @@ impl DBPayout {
     pub async fn get<'a, 'b, E>(
         id: DBPayoutId,
         executor: E,
-    ) -> Result<Option<DBPayout>, DatabaseError>
+    ) -> Result<Option<DBPayout>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         DBPayout::get_many(&[id], executor)
             .await
+            .wrap_err("fetching payout")
             .map(|x| x.into_iter().next())
     }
 
     pub async fn get_many<'a, E>(
         payout_ids: &[DBPayoutId],
         exec: E,
-    ) -> Result<Vec<DBPayout>, DatabaseError>
+    ) -> Result<Vec<DBPayout>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -99,7 +102,8 @@ impl DBPayout {
             fee: r.fee,
         })
         .try_collect::<Vec<DBPayout>>()
-        .await?;
+        .await
+        .wrap_err("fetching payouts")?;
 
         Ok(results)
     }
@@ -107,7 +111,7 @@ impl DBPayout {
     pub async fn get_all_for_user(
         user_id: DBUserId,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<DBPayoutId>, DatabaseError> {
+    ) -> Result<Vec<DBPayoutId>> {
         let results = sqlx::query!(
             "
             SELECT id
@@ -117,7 +121,8 @@ impl DBPayout {
             user_id.0
         )
         .fetch_all(exec)
-        .await?;
+        .await
+        .wrap_err("fetching payouts for user")?;
 
         Ok(results
             .into_iter()

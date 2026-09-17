@@ -82,7 +82,7 @@ pub async fn version_project_get_helper(
 ) -> Result<HttpResponse, ApiError> {
     let result = database::models::DBProject::get(&id.0, &***ro_pool, &redis)
         .await
-        .wrap_api_err("fetching project from database")?;
+        .wrap_internal_err("fetching project from database")?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -1072,7 +1072,7 @@ pub async fn version_list_internal(
 
     let result = database::models::DBProject::get(&string, &***ro_pool, &redis)
         .await
-        .wrap_api_err("fetching project from database")?;
+        .wrap_internal_err("fetching project from database")?;
 
     let user_option = get_user_from_headers(
         &req,

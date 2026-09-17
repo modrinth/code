@@ -234,7 +234,7 @@ pub async fn get_update_from_hash(
             &redis,
         )
         .await
-        .wrap_api_err("fetching project for version file")?
+        .wrap_internal_err("fetching project for version file")?
     {
         let mut versions = database::models::DBVersion::get_many(
             &project.versions,
@@ -445,7 +445,7 @@ pub async fn get_projects_from_hashes(
             &redis,
         )
         .await
-        .wrap_api_err("fetching projects for visibility filtering")?,
+        .wrap_internal_err("fetching projects for visibility filtering")?,
         &user_option,
         &pool,
         false,
@@ -773,7 +773,7 @@ pub async fn update_individual_files(
         &redis,
     )
     .await
-    .wrap_api_err("fetching projects for version files")?;
+    .wrap_internal_err("fetching projects for version files")?;
     let all_versions = database::models::DBVersion::get_many(
         &projects
             .iter()

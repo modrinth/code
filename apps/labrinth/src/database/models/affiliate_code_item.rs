@@ -1,7 +1,8 @@
 use chrono::{DateTime, Utc};
+use eyre::{Result, WrapErr};
 use futures::{StreamExt, TryStreamExt};
 
-use crate::database::models::{DBAffiliateCodeId, DBUserId, DatabaseError};
+use crate::database::models::{DBAffiliateCodeId, DBUserId};
 
 #[derive(Debug)]
 pub struct DBAffiliateCode {
@@ -16,14 +17,15 @@ impl DBAffiliateCode {
     pub async fn get_by_id(
         id: DBAffiliateCodeId,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Option<DBAffiliateCode>, DatabaseError> {
+    ) -> Result<Option<DBAffiliateCode>> {
         let record = sqlx::query!(
             "SELECT id, created_at, created_by, affiliate, source_name
             FROM affiliate_codes WHERE id = $1",
             id as DBAffiliateCodeId
         )
         .fetch_optional(exec)
-        .await?;
+        .await
+        .wrap_err("fetching affiliate code by id")?;
 
         Ok(record.map(|record| DBAffiliateCode {
             id: DBAffiliateCodeId(record.id),
@@ -37,7 +39,7 @@ impl DBAffiliateCode {
     pub async fn get_by_affiliate(
         affiliate: DBUserId,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<DBAffiliateCode>, DatabaseError> {
+    ) -> Result<Vec<DBAffiliateCode>> {
         let records = sqlx::query!(
             "SELECT id, created_at, created_by, affiliate, source_name
             FROM affiliate_codes WHERE affiliate = $1",
@@ -45,8 +47,8 @@ impl DBAffiliateCode {
         )
         .fetch(exec)
         .map(|record| {
-            let record = record?;
-            Ok::<_, DatabaseError>(DBAffiliateCode {
+            let record = record.wrap_err("reading affiliate code record")?;
+            eyre::Ok(DBAffiliateCode {
                 id: DBAffiliateCodeId(record.id),
                 created_at: record.created_at,
                 created_by: DBUserId(record.created_by),
@@ -55,7 +57,8 @@ impl DBAffiliateCode {
             })
         })
         .try_collect::<Vec<_>>()
-        .await?;
+        .await
+        .wrap_err("fetching affiliate codes by affiliate")?;
 
         Ok(records)
     }
@@ -63,7 +66,7 @@ impl DBAffiliateCode {
     pub async fn insert(
         &self,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<()> {
         sqlx::query!(
             "INSERT INTO affiliate_codes (id, created_at, created_by, affiliate, source_name)
             VALUES ($1, $2, $3, $4, $5)",
@@ -74,20 +77,22 @@ impl DBAffiliateCode {
             self.source_name
         )
         .execute(exec)
-        .await?;
+        .await
+        .wrap_err("inserting affiliate code")?;
         Ok(())
     }
 
     pub async fn remove(
         id: DBAffiliateCodeId,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Option<()>, DatabaseError> {
+    ) -> Result<Option<()>> {
         let result = sqlx::query!(
             "DELETE FROM affiliate_codes WHERE id = $1",
             id as DBAffiliateCodeId
         )
         .execute(exec)
-        .await?;
+        .await
+        .wrap_err("removing affiliate code")?;
 
         if result.rows_affected() > 0 {
             Ok(Some(()))
@@ -100,29 +105,30 @@ impl DBAffiliateCode {
         id: DBAffiliateCodeId,
         source_name: &str,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<bool, DatabaseError> {
+    ) -> Result<bool> {
         let result = sqlx::query!(
             "UPDATE affiliate_codes SET source_name = $1 WHERE id = $2",
             source_name,
             id as DBAffiliateCodeId
         )
         .execute(exec)
-        .await?;
+        .await
+        .wrap_err("updating affiliate code source name")?;
 
         Ok(result.rows_affected() > 0)
     }
 
     pub async fn get_all(
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<DBAffiliateCode>, DatabaseError> {
+    ) -> Result<Vec<DBAffiliateCode>> {
         let records = sqlx::query!(
             "SELECT id, created_at, created_by, affiliate, source_name
             FROM affiliate_codes ORDER BY created_at DESC"
         )
         .fetch(exec)
         .map(|record| {
-            let record = record?;
-            Ok::<_, DatabaseError>(DBAffiliateCode {
+            let record = record.wrap_err("reading affiliate code record")?;
+            eyre::Ok(DBAffiliateCode {
                 id: DBAffiliateCodeId(record.id),
                 created_at: record.created_at,
                 created_by: DBUserId(record.created_by),
@@ -131,7 +137,8 @@ impl DBAffiliateCode {
             })
         })
         .try_collect::<Vec<_>>()
-        .await?;
+        .await
+        .wrap_err("fetching all affiliate codes")?;
 
         Ok(records)
     }

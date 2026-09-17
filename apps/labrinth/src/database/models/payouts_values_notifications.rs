@@ -1,5 +1,6 @@
-use crate::database::models::{DBUserId, DatabaseError};
+use crate::database::models::DBUserId;
 use chrono::{DateTime, Utc};
+use eyre::{Result, WrapErr};
 
 pub struct PayoutsValuesNotification {
     pub id: i32,
@@ -11,7 +12,7 @@ impl PayoutsValuesNotification {
     pub async fn unnotified_users_with_available_payouts_with_limit(
         exec: impl sqlx::PgExecutor<'_>,
         limit: i64,
-    ) -> Result<Vec<PayoutsValuesNotification>, DatabaseError> {
+    ) -> Result<Vec<PayoutsValuesNotification>> {
         Ok(sqlx::query_as!(
             QueryResult,
             "
@@ -29,7 +30,8 @@ impl PayoutsValuesNotification {
             limit,
         )
         .fetch_all(exec)
-        .await?
+        .await
+        .wrap_err("fetching users with unnotified available payouts")?
         .into_iter()
         .map(Into::into)
         .collect())
@@ -38,7 +40,7 @@ impl PayoutsValuesNotification {
     pub async fn set_notified_many(
         ids: &[i32],
         exec: impl sqlx::PgExecutor<'_>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<()> {
         sqlx::query!(
             "
 			UPDATE payouts_values_notifications
@@ -48,7 +50,8 @@ impl PayoutsValuesNotification {
             &ids[..],
         )
         .execute(exec)
-        .await?;
+        .await
+        .wrap_err("marking payout value notifications as notified")?;
 
         Ok(())
     }
@@ -57,7 +60,7 @@ impl PayoutsValuesNotification {
 pub async fn synchronize_future_payout_values(
     exec: impl sqlx::PgExecutor<'_>,
     limit: i64,
-) -> Result<(), DatabaseError> {
+) -> Result<()> {
     sqlx::query!(
         "
 		INSERT INTO payouts_values_notifications (date_available, user_id, notified)
@@ -70,7 +73,8 @@ pub async fn synchronize_future_payout_values(
         limit,
     )
     .execute(exec)
-    .await?;
+    .await
+    .wrap_err("synchronizing future payout value notifications")?;
 
     Ok(())
 }
