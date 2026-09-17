@@ -1,6 +1,6 @@
 <template>
 	<section
-		class="project-review relative flex overflow-hidden bg-surface-2"
+		class="project-review relative flex overflow-hidden bg-surface-1"
 		:aria-label="formatMessage(messages.title)"
 		@pointerdown.capture="onPointerDown"
 		@dblclick="onDividerDoubleClick"
@@ -49,7 +49,7 @@ provideProjectReviewContext({ ...layout, slots })
 }
 
 .project-review :deep(.project-review-dock) {
-	--dv-background-color: var(--surface-2);
+	--dv-background-color: var(--color-bg);
 	--dv-separator-border: var(--surface-4);
 	--dv-sash-color: transparent;
 	--dv-active-sash-color: transparent;
@@ -66,7 +66,7 @@ provideProjectReviewContext({ ...layout, slots })
 
 .project-review :deep(.project-review-transition-column:nth-child(2)) {
 	z-index: 2;
-	background: var(--surface-2);
+	background: var(--color-bg);
 }
 
 .project-review :deep(.dv-sash:not(.dv-disabled)::after) {

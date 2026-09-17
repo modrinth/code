@@ -44,12 +44,6 @@ const theme: DockviewTheme = {
 
 <style scoped>
 .project-review-tabs :deep(.project-review-dock) {
-	--dv-group-view-background-color: var(--surface-2);
-	--dv-tabs-and-actions-container-background-color: var(--surface-2);
-	--dv-activegroup-visiblepanel-tab-background-color: var(--surface-2);
-	--dv-activegroup-hiddenpanel-tab-background-color: var(--surface-2);
-	--dv-inactivegroup-visiblepanel-tab-background-color: var(--surface-2);
-	--dv-inactivegroup-hiddenpanel-tab-background-color: var(--surface-2);
 	--dv-activegroup-visiblepanel-tab-color: var(--color-contrast);
 	--dv-inactivegroup-visiblepanel-tab-color: var(--color-contrast);
 	--dv-activegroup-hiddenpanel-tab-color: var(--color-secondary);

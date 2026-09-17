@@ -19,7 +19,7 @@ export const projectReviewMessages = defineMessages({
 	},
 	right: {
 		id: 'moderation.project-review.right',
-		defaultMessage: 'Review issues',
+		defaultMessage: 'Right panel',
 	},
 	bottom: {
 		id: 'moderation.project-review.bottom',
@@ -59,11 +59,11 @@ export const projectReviewMessages = defineMessages({
 	},
 	showRight: {
 		id: 'moderation.project-review.showRight',
-		defaultMessage: 'Show review issues',
+		defaultMessage: 'Show panel',
 	},
 	hideRight: {
 		id: 'moderation.project-review.hideRight',
-		defaultMessage: 'Hide review issues',
+		defaultMessage: 'Hide panel',
 	},
 	empty: {
 		id: 'moderation.project-review.empty',
