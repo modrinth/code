@@ -277,7 +277,7 @@ pub async fn undo_uploads(
     Ok(())
 }
 
-/// Create a project.  
+/// Create a project.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects",
@@ -364,7 +364,7 @@ pub async fn project_create_internal(
     result
 }
 
-/// Create a project with a specific ID.  
+/// Create a project with a specific ID.
 ///
 /// This is a testing endpoint only accessible behind an admin key.
 #[utoipa::path(
@@ -989,7 +989,8 @@ async fn project_create_inner(
             report_id: None,
         }
         .insert(&mut *transaction)
-        .await?;
+        .await
+        .map_err(models::DatabaseError::Internal)?;
 
         let loaders = project_builder
             .initial_versions

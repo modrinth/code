@@ -59,7 +59,7 @@ pub use project_disclosure_item::DBProjectDisclosure;
 pub use project_item::DBProject;
 pub use team_item::DBTeam;
 pub use team_item::DBTeamMember;
-pub use thread_item::{DBThread, DBThreadMessage};
+pub use thread_item::{DBThread, DBThreadIssue, DBThreadMessage};
 pub use user_item::DBUser;
 pub use version_item::DBVersion;
 

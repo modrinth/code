@@ -20,5 +20,6 @@ pub use v3::projects;
 pub use v3::reports;
 pub use v3::sessions;
 pub use v3::teams;
+pub use v3::thread_issues;
 pub use v3::threads;
 pub use v3::users;

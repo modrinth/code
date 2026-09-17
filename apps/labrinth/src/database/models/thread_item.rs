@@ -1,8 +1,9 @@
 use super::ids::*;
 use crate::database::PgTransaction;
-use crate::database::models::DatabaseError;
+use crate::models::thread_issues::{ThreadIssueTarget, ThreadIssueVerdict};
 use crate::models::threads::{MessageBody, ThreadType};
 use chrono::{DateTime, Utc};
+use eyre::{Result, WrapErr};
 use serde::{Deserialize, Serialize};
 
 pub struct ThreadBuilder {
@@ -41,12 +42,28 @@ pub struct DBThreadMessage {
     pub hide_identity: bool,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct DBThreadIssue {
+    pub id: DBThreadIssueId,
+    pub thread_id: DBThreadId,
+    pub what: ThreadIssueTarget,
+    pub why: serde_json::Value,
+    pub user_addressed: bool,
+    pub moderator_verified: bool,
+    pub verdict: ThreadIssueVerdict,
+    pub created_at: DateTime<Utc>,
+}
+
 impl ThreadMessageBuilder {
     pub async fn insert(
         &self,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<DBThreadMessageId, DatabaseError> {
-        let thread_message_id = generate_thread_message_id(transaction).await?;
+    ) -> Result<DBThreadMessageId> {
+        let thread_message_id = generate_thread_message_id(transaction)
+            .await
+            .wrap_err("generating thread message ID")?;
+        let body = serde_json::value::to_value(self.body.clone())
+            .wrap_err("serializing thread message body")?;
 
         sqlx::query!(
             "
@@ -59,12 +76,13 @@ impl ThreadMessageBuilder {
             ",
             thread_message_id as DBThreadMessageId,
             self.author_id.map(|x| x.0),
-            serde_json::value::to_value(self.body.clone())?,
+            body,
             self.thread_id as DBThreadId,
             self.hide_identity
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("inserting thread message")?;
 
         Ok(thread_message_id)
     }
@@ -74,8 +92,10 @@ impl ThreadBuilder {
     pub async fn insert(
         &self,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<DBThreadId, DatabaseError> {
-        let thread_id = generate_thread_id(&mut *transaction).await?;
+    ) -> Result<DBThreadId> {
+        let thread_id = generate_thread_id(&mut *transaction)
+            .await
+            .wrap_err("generating thread ID")?;
         sqlx::query!(
             "
             INSERT INTO threads (
@@ -91,7 +111,8 @@ impl ThreadBuilder {
             self.report_id.map(|x| x.0),
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("inserting thread")?;
 
         let (thread_ids, members): (Vec<_>, Vec<_>) =
             self.members.iter().map(|m| (thread_id.0, m.0)).unzip();
@@ -106,29 +127,29 @@ impl ThreadBuilder {
             &members[..],
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("inserting thread members")?;
 
         Ok(thread_id)
     }
 }
 
 impl DBThread {
-    pub async fn get<'a, E>(
-        id: DBThreadId,
-        exec: E,
-    ) -> Result<Option<DBThread>, sqlx::Error>
+    pub async fn get<'a, E>(id: DBThreadId, exec: E) -> Result<Option<DBThread>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        Self::get_many(&[id], exec)
+        Ok(Self::get_many(&[id], exec)
             .await
-            .map(|x| x.into_iter().next())
+            .wrap_err("fetching thread")?
+            .into_iter()
+            .next())
     }
 
     pub async fn get_many<'a, E>(
         thread_ids: &[DBThreadId],
         exec: E,
-    ) -> Result<Vec<DBThread>, sqlx::Error>
+    ) -> Result<Vec<DBThread>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -167,7 +188,8 @@ impl DBThread {
                 members: x.members.unwrap_or_default().into_iter().map(DBUserId).collect(),
             })
         .try_collect::<Vec<DBThread>>()
-        .await?;
+        .await
+        .wrap_err("fetching threads")?;
 
         Ok(threads)
     }
@@ -175,7 +197,7 @@ impl DBThread {
     pub async fn remove_full(
         id: DBThreadId,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<Option<()>, sqlx::error::Error> {
+    ) -> Result<Option<()>> {
         sqlx::query!(
             "
             DELETE FROM threads_messages
@@ -184,7 +206,8 @@ impl DBThread {
             id as DBThreadId,
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("removing thread messages")?;
         sqlx::query!(
             "
             DELETE FROM threads_members
@@ -193,7 +216,8 @@ impl DBThread {
             id as DBThreadId
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("removing thread members")?;
         sqlx::query!(
             "
             DELETE FROM threads
@@ -202,7 +226,8 @@ impl DBThread {
             id as DBThreadId,
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("removing thread")?;
 
         Ok(Some(()))
     }
@@ -212,19 +237,21 @@ impl DBThreadMessage {
     pub async fn get<'a, E>(
         id: DBThreadMessageId,
         exec: E,
-    ) -> Result<Option<DBThreadMessage>, sqlx::Error>
+    ) -> Result<Option<DBThreadMessage>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
-        Self::get_many(&[id], exec)
+        Ok(Self::get_many(&[id], exec)
             .await
-            .map(|x| x.into_iter().next())
+            .wrap_err("fetching thread message")?
+            .into_iter()
+            .next())
     }
 
     pub async fn get_many<'a, E>(
         message_ids: &[DBThreadMessageId],
         exec: E,
-    ) -> Result<Vec<DBThreadMessage>, sqlx::Error>
+    ) -> Result<Vec<DBThreadMessage>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -250,7 +277,8 @@ impl DBThreadMessage {
             hide_identity: x.hide_identity,
         })
         .try_collect::<Vec<DBThreadMessage>>()
-        .await?;
+        .await
+        .wrap_err("fetching thread messages")?;
 
         Ok(messages)
     }
@@ -259,7 +287,10 @@ impl DBThreadMessage {
         id: DBThreadMessageId,
         private: bool,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<Option<()>, sqlx::error::Error> {
+    ) -> Result<Option<()>> {
+        let body = serde_json::to_value(MessageBody::Deleted { private })
+            .wrap_err("serializing deleted thread message body")?;
+
         sqlx::query!(
             "
             UPDATE threads_messages
@@ -267,11 +298,11 @@ impl DBThreadMessage {
             WHERE id = $1
             ",
             id as DBThreadMessageId,
-            serde_json::to_value(MessageBody::Deleted { private })
-                .unwrap_or(serde_json::json!({}))
+            body,
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("removing thread message")?;
 
         Ok(Some(()))
     }
