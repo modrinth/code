@@ -21,7 +21,7 @@ export default function ApiServicesStatus() {
   const { locale } = useLocale();
   const [rows, setRows] = useState<Row[]>([
     { id: "api", label: "API", ok: null },
-    { id: "db", label: locale === "ru" ? "База" : "Database", ok: null },
+    { id: "db", label: locale === "ru_RU" ? "База" : "Database", ok: null },
   ]);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export default function ApiServicesStatus() {
           { id: "api", label: "API", ok: Boolean(apiOk) },
           {
             id: "db",
-            label: locale === "ru" ? "База" : "Database",
+            label: locale === "ru_RU" ? "База" : "Database",
             ok: Boolean(dbOk),
           },
         ]);
