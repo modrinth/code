@@ -86,7 +86,9 @@ async function deviceSnapshot(appVersion: string) {
 
 	const nav = typeof navigator !== 'undefined' ? navigator : null
 	const ramGb =
-		nav && 'deviceMemory' in nav && typeof (nav as Navigator & { deviceMemory?: number }).deviceMemory === 'number'
+		nav &&
+		'deviceMemory' in nav &&
+		typeof (nav as Navigator & { deviceMemory?: number }).deviceMemory === 'number'
 			? (nav as Navigator & { deviceMemory?: number }).deviceMemory
 			: undefined
 

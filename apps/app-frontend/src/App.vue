@@ -864,10 +864,7 @@ async function setupApp() {
 		initAnalytics()
 		if (dev) debugAnalytics()
 		trackEvent('Launched', { version, dev })
-		void Promise.all([
-			import('@/helpers/owyx-telemetry'),
-			import('@/helpers/owyx-site-auth'),
-		])
+		void Promise.all([import('@/helpers/owyx-telemetry'), import('@/helpers/owyx-site-auth')])
 			.then(([{ reportOwyxLauncherSession }, { getStoredOwyxSiteSession }]) =>
 				reportOwyxLauncherSession({
 					dev,

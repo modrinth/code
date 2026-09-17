@@ -115,7 +115,9 @@
 		</section>
 
 		<section class="border-0 border-t border-solid border-surface-4 pt-6">
-			<h2 class="m-0 text-lg font-semibold text-contrast">{{ formatMessage(messages.skinsTitle) }}</h2>
+			<h2 class="m-0 text-lg font-semibold text-contrast">
+				{{ formatMessage(messages.skinsTitle) }}
+			</h2>
 			<p class="m-0 mt-1 text-sm leading-relaxed text-secondary">
 				{{ formatMessage(messages.skinsBody) }}
 			</p>
