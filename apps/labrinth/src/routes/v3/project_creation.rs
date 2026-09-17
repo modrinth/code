@@ -94,6 +94,12 @@ pub enum CreateError {
     ImageError(#[from] ImageError),
     #[error("Project limit reached")]
     LimitReached,
+    #[error("daily project creation limit reached")]
+    DailyProjectLimitReached,
+    #[error("project version limit reached")]
+    ProjectVersionLimitReached,
+    #[error("daily version upload limit reached")]
+    DailyVersionLimitReached,
 }
 
 impl From<crate::routes::ApiError> for CreateError {
@@ -137,7 +143,10 @@ impl actix_web::ResponseError for CreateError {
             CreateError::ValidationError(..) => StatusCode::BAD_REQUEST,
             CreateError::FileValidationError(..) => StatusCode::BAD_REQUEST,
             CreateError::ImageError(..) => StatusCode::BAD_REQUEST,
-            CreateError::LimitReached => StatusCode::BAD_REQUEST,
+            CreateError::LimitReached
+            | CreateError::DailyProjectLimitReached
+            | CreateError::ProjectVersionLimitReached
+            | CreateError::DailyVersionLimitReached => StatusCode::BAD_REQUEST,
         }
     }
 
@@ -162,7 +171,10 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::ValidationError(..) => "invalid_input",
                 CreateError::FileValidationError(..) => "invalid_input",
                 CreateError::ImageError(..) => "invalid_image",
-                CreateError::LimitReached => "limit_reached",
+                CreateError::LimitReached
+                | CreateError::DailyProjectLimitReached
+                | CreateError::ProjectVersionLimitReached
+                | CreateError::DailyVersionLimitReached => "limit_reached",
             },
             description: self.to_string(),
             details: None,
@@ -490,6 +502,13 @@ async fn project_create_inner(
         return Err(CreateError::LimitReached);
     }
 
+    let daily_limits =
+        UserLimits::get_for_projects_per_day(&current_user, Utc::now(), pool)
+            .await?;
+    if daily_limits.current >= daily_limits.max {
+        return Err(CreateError::DailyProjectLimitReached);
+    }
+
     let all_loaders =
         models::loader_fields::Loader::list(&mut *transaction, redis).await?;
 
@@ -531,6 +550,38 @@ async fn project_create_inner(
         create_data.validate().map_err(|err| {
             CreateError::InvalidInput(validation_errors_to_string(err, None))
         })?;
+
+        let versions_to_create = create_data.initial_versions.len() as u64;
+        if versions_to_create > 0 {
+            let project_version_limits =
+                UserLimits::get_for_versions_per_project(
+                    &current_user,
+                    project_id.into(),
+                    pool,
+                )
+                .await?;
+            if project_version_limits
+                .current
+                .saturating_add(versions_to_create)
+                > project_version_limits.max
+            {
+                return Err(CreateError::ProjectVersionLimitReached);
+            }
+
+            let daily_version_limits = UserLimits::get_for_versions_per_day(
+                &current_user,
+                Utc::now(),
+                pool,
+            )
+            .await?;
+            if daily_version_limits
+                .current
+                .saturating_add(versions_to_create)
+                > daily_version_limits.max
+            {
+                return Err(CreateError::DailyVersionLimitReached);
+            }
+        }
 
         let slug_project_id_option: Option<ProjectId> = serde_json::from_str(
             &format!("\"{}\"", create_data.slug.to_lowercase()),
