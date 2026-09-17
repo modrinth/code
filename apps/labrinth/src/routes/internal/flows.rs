@@ -109,6 +109,51 @@ pub struct TempUser {
     pub country: Option<String>,
 }
 
+#[derive(Debug, Error)]
+pub enum CreateAccountError {
+    #[error(
+        "User email is already registered on Modrinth. Try 'Forgot password' to access your account."
+    )]
+    DuplicateEmail,
+    #[error("Username is already taken on Modrinth.")]
+    UsernameTaken,
+    #[error(transparent)]
+    Api(#[from] ApiError),
+}
+
+impl CreateAccountError {
+    fn as_api_error(&self) -> ApiErrorResponse<'_> {
+        match self {
+            Self::UsernameTaken => ApiErrorResponse {
+                error: "username_taken",
+                description: self.to_string(),
+                details: None,
+            },
+            Self::DuplicateEmail => ApiErrorResponse {
+                error: "duplicate_email",
+                description: self.to_string(),
+                details: None,
+            },
+            Self::Api(error) => error.as_api_error(),
+        }
+    }
+}
+
+impl actix_web::ResponseError for CreateAccountError {
+    fn status_code(&self) -> StatusCode {
+        match self {
+            Self::UsernameTaken | Self::DuplicateEmail => {
+                StatusCode::BAD_REQUEST
+            }
+            Self::Api(error) => actix_web::ResponseError::status_code(error),
+        }
+    }
+
+    fn error_response(&self) -> HttpResponse {
+        HttpResponse::build(self.status_code()).json(self.as_api_error())
+    }
+}
+
 impl TempUser {
     async fn create_account(
         self,
@@ -119,30 +164,34 @@ impl TempUser {
         redis: &RedisPool,
         username: String,
         sign_up_newsletter: bool,
-    ) -> Result<DBUserId, AuthenticationError> {
+    ) -> Result<DBUserId, CreateAccountError> {
         if let Some(email) = &self.email
             && crate::database::models::DBUser::get_by_email(email, client)
-                .await?
+                .await
+                .wrap_internal_err("fetching existing user by email")?
                 .is_some()
         {
-            return Err(AuthenticationError::DuplicateEmail);
+            return Err(CreateAccountError::DuplicateEmail);
         }
 
-        let user_id =
-            crate::database::models::generate_user_id(transaction).await?;
+        let user_id = crate::database::models::generate_user_id(transaction)
+            .await
+            .wrap_internal_err("generating user ID")?;
 
         let existing_id = DBUser::get(&username, client, redis)
             .await
-            .wrap_err("failed to fetch existing user by id")?;
+            .wrap_internal_err("fetching existing user by ID")?;
 
         if existing_id.is_some() {
-            return Err(AuthenticationError::UsernameTaken);
+            return Err(CreateAccountError::UsernameTaken);
         }
 
         let (avatar_url, raw_avatar_url) = if let Some(avatar_url) =
             self.avatar_url
         {
-            let res = reqwest::get(&avatar_url).await?;
+            let res = reqwest::get(&avatar_url)
+                .await
+                .wrap_internal_err("fetching OAuth user avatar")?;
             let headers = res.headers().clone();
 
             let img_data = if let Some(content_type) = headers
@@ -155,7 +204,10 @@ impl TempUser {
             };
 
             if let Some(ext) = img_data {
-                let bytes = res.bytes().await?;
+                let bytes = res
+                    .bytes()
+                    .await
+                    .wrap_internal_err("reading OAuth user avatar")?;
 
                 let upload_result = upload_image_optimized(
                     &format!("user/{}", ariadne::ids::UserId::from(user_id)),
@@ -187,7 +239,7 @@ impl TempUser {
                     self.id
                         .clone()
                         .parse()
-                        .map_err(|_| AuthenticationError::InvalidCredentials)?,
+                        .wrap_internal_err("parsing GitHub user ID")?,
                 )
             } else {
                 None
@@ -196,7 +248,7 @@ impl TempUser {
                 Some(
                     self.id
                         .parse()
-                        .map_err(|_| AuthenticationError::InvalidCredentials)?,
+                        .wrap_internal_err("parsing Discord user ID")?,
                 )
             } else {
                 None
@@ -205,7 +257,7 @@ impl TempUser {
                 Some(
                     self.id
                         .parse()
-                        .map_err(|_| AuthenticationError::InvalidCredentials)?,
+                        .wrap_internal_err("parsing GitLab user ID")?,
                 )
             } else {
                 None
@@ -219,7 +271,7 @@ impl TempUser {
                 Some(
                     self.id
                         .parse()
-                        .map_err(|_| AuthenticationError::InvalidCredentials)?,
+                        .wrap_internal_err("parsing Steam user ID")?,
                 )
             } else {
                 None
@@ -259,7 +311,8 @@ impl TempUser {
             eligibility_verified_at: Some(Utc::now()),
         }
         .insert(transaction)
-        .await?;
+        .await
+        .wrap_internal_err("inserting user into database")?;
 
         Ok(user_id)
     }
@@ -1511,7 +1564,7 @@ pub async fn create_oauth_account(
     redis: Data<RedisPool>,
     email_queue: Data<EmailQueue>,
     web::Json(new_account): web::Json<NewOAuthAccount>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<HttpResponse, CreateAccountError> {
     new_account
         .validate()
         .map_err(|err| eyre::eyre!(err))
@@ -1526,7 +1579,8 @@ pub async fn create_oauth_account(
     {
         return Err(ApiError::Request(eyre::eyre!(
             "captcha validation failed"
-        )));
+        ))
+        .into());
     }
 
     let flow = DBFlow::get(&new_account.state, &redis)
@@ -1540,7 +1594,7 @@ pub async fn create_oauth_account(
         user,
     } = flow
     else {
-        return Err(ApiError::Internal(eyre!("invalid flow kind")));
+        return Err(ApiError::Internal(eyre!("invalid flow kind")).into());
     };
 
     if let Some(email) = &user.email {
@@ -1566,8 +1620,7 @@ pub async fn create_oauth_account(
             new_account.username,
             new_account.sign_up_newsletter,
         )
-        .await
-        .wrap_auth_err("inserting user ID into database")?;
+        .await?;
 
     if let Some(email_address) = account_email {
         // The address comes from the OAuth provider, so the user cannot correct
