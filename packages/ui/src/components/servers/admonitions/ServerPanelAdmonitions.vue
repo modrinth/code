@@ -1,21 +1,29 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { SpinnerIcon, UploadIcon } from '@modrinth/assets'
+import { useIsFetching, useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { computed, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
+import { Button } from '#ui/components/base/buttons'
 import StackedAdmonitions, {
 	type StackedAdmonitionItem,
 } from '#ui/components/base/StackedAdmonitions.vue'
 import InstallingBanner from '#ui/components/servers/InstallingBanner.vue'
+import ServerConfigFilePicker from '#ui/components/servers/ServerConfigFilePicker.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import type { FileOperation } from '#ui/layouts/shared/files-tab/types'
-import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
+import ContentDiffModal from '#ui/layouts/shared/installation-settings/components/ContentDiffModal.vue'
+import { resolveServerShareDiff } from '#ui/layouts/wrapped/hosting/manage/[id]/play/share-diff'
+import { injectAuth, injectModrinthClient, injectModrinthServerContext, injectNotificationManager } from '#ui/providers'
 
 import BackupAdmonition, { type BackupAdmonitionEntry } from './BackupAdmonition.vue'
 import FileOperationAdmonition from './FileOperationAdmonition.vue'
 import UploadAdmonition from './UploadAdmonition.vue'
+
+defineOptions({ inheritAttrs: false })
 
 const emit = defineEmits<{
 	'installation-retry': []
@@ -25,7 +33,77 @@ const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 const ctx = injectModrinthServerContext()
 const route = useRoute()
+const auth = injectAuth()
+const { handleError } = injectNotificationManager()
+const queryClient = useQueryClient()
 const { canSetup, canManageBackups, permissionDeniedMessage } = useServerPermissions()
+const needsShareUpdate = computed(() =>
+	ctx.serverFull.value?.worlds.find((world) => world.id === ctx.worldId.value)
+		?.content?.shared_instance_needs_update ?? false,
+)
+const shareActions = useIsMutating({ mutationKey: ['servers', 'share-action', ctx.serverId] })
+const sharePreviews = useIsFetching({ queryKey: ['servers', 'share-diff', ctx.serverId] })
+const resolvingConfigs = ref(false)
+const sharePending = computed(() => resolvingConfigs.value || shareActions.value > 0 || sharePreviews.value > 0)
+const configPicker = ref<InstanceType<typeof ServerConfigFilePicker>>()
+
+const diffModal = ref<InstanceType<typeof ContentDiffModal>>()
+const previewOpen = ref(false)
+const previewQuery = useQuery({
+	queryKey: computed(() => ['servers', 'share-diff', ctx.serverId, ctx.worldId.value, auth.user.value?.id]),
+	enabled: computed(() => previewOpen.value && !!ctx.worldId.value),
+	queryFn: async () => {
+		const diff = await client.archon.content_v1.getShareDiff(ctx.serverId, ctx.worldId.value!)
+		return { diff, items: resolveServerShareDiff(diff) }
+	},
+	retry: false,
+})
+const pushMutation = useMutation({
+	mutationKey: ['servers', 'share-action', ctx.serverId],
+	mutationFn: async ({ worldId, configPaths }: { worldId: string; configPaths: string[] }) => {
+		await client.archon.content_v1.share(ctx.serverId, worldId, configPaths)
+		await queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', ctx.serverId] })
+		await queryClient.invalidateQueries({ queryKey: ['servers', 'share-diff', ctx.serverId, worldId] })
+	},
+})
+
+async function reviewShareUpdate() {
+	if (!ctx.worldId.value || !canSetup.value || sharePending.value || ctx.busyReasons.value.length) return
+	const worldId = ctx.worldId.value
+	const userId = auth.user.value?.id
+	previewOpen.value = true
+	const result = await previewQuery.refetch()
+	if (!previewOpen.value || ctx.worldId.value !== worldId || auth.user.value?.id !== userId) return
+	if (result.error) {
+		previewOpen.value = false
+		handleError(result.error)
+	} else {
+		diffModal.value?.show()
+	}
+}
+
+async function pushShareUpdate() {
+	if (!ctx.worldId.value || !canSetup.value || sharePending.value || ctx.busyReasons.value.length) return
+	const worldId = ctx.worldId.value
+	const userId = auth.user.value?.id
+	resolvingConfigs.value = true
+	try {
+		const configPaths = await configPicker.value?.resolvePaths() ?? []
+		if (!previewOpen.value || ctx.worldId.value !== worldId || auth.user.value?.id !== userId || !canSetup.value || ctx.busyReasons.value.length) return
+		await pushMutation.mutateAsync({ worldId, configPaths })
+		previewOpen.value = false
+	} catch (error) {
+		handleError(error)
+		if (previewOpen.value && ctx.worldId.value === worldId && auth.user.value?.id === userId) diffModal.value?.show()
+	} finally {
+		resolvingConfigs.value = false
+	}
+}
+
+watch([ctx.worldId, () => auth.user.value?.id], () => {
+	previewOpen.value = false
+	diffModal.value?.hide()
+})
 
 const { activeOperations, backups, progressFor, invalidate } = useServerBackupsQueue(
 	computed(() => ctx.serverId),
@@ -33,6 +111,36 @@ const { activeOperations, backups, progressFor, invalidate } = useServerBackupsQ
 )
 
 const messages = defineMessages({
+	shareChanges: {
+		id: 'servers.play.share-changes',
+		defaultMessage: 'Share your changes',
+	},
+	shareChangesBody: {
+		id: 'servers.play.share-changes-body',
+		defaultMessage: 'These changes will be available to players when they update their instance.',
+	},
+	added: { id: 'servers.play.diff-added', defaultMessage: 'Added' },
+	removed: { id: 'servers.play.diff-removed', defaultMessage: 'Removed' },
+	unpublished: {
+		id: 'app.instance.admonitions.shared-instance.changes-header',
+		defaultMessage: "Your changes haven't been shared yet",
+	},
+	unpublishedBody: {
+		id: 'servers.play.unpublished-body',
+		defaultMessage: 'Push an update to share your server’s content changes with players.',
+	},
+	pushUpdate: {
+		id: 'app.instance.admonitions.shared-instance.publish-button',
+		defaultMessage: 'Push update',
+	},
+	publishing: {
+		id: 'app.instance.admonitions.shared-instance.publishing-button',
+		defaultMessage: 'Pushing...',
+	},
+	reviewing: {
+		id: 'app.instance.admonitions.shared-instance.reviewing-button',
+		defaultMessage: 'Reviewing...',
+	},
 	backgroundTaskRunning: {
 		id: 'servers.admonitions.background-task-running',
 		defaultMessage: 'Background task running',
@@ -139,6 +247,7 @@ type ServerAdmonitionItem = StackedAdmonitionItem & {
 		| { kind: 'backup'; entry: BackupAdmonitionEntry }
 		| { kind: 'busy-content' }
 		| { kind: 'busy-files' }
+		| { kind: 'share-update' }
 	)
 
 const showInstallingBanner = computed(() => {
@@ -242,6 +351,17 @@ const stackItems = computed<ServerAdmonitionItem[]>(() => {
 			dismissible: false,
 			kind: 'busy-files',
 			priority: p,
+			sortIndex: sortIndex++,
+		})
+	}
+
+	if (needsShareUpdate.value && canSetup.value) {
+		out.push({
+			id: 'share-update',
+			type: 'info',
+			dismissible: false,
+			kind: 'share-update',
+			priority: 3,
 			sortIndex: sortIndex++,
 		})
 	}
@@ -361,14 +481,36 @@ function onInstallationDismiss() {
 
 <template>
 	<StackedAdmonitions
+		v-bind="$attrs"
 		:items="stackItems"
 		:dismiss-all-enabled="hasBulkDismissableItems"
 		class="w-full"
 		@dismiss-all="onDismissAll"
 	>
 		<template #item="{ item, dismissible }">
+			<Admonition
+				v-if="item.kind === 'share-update'"
+				type="info"
+				:header="formatMessage(messages.unpublished)"
+				inline-actions
+			>
+				{{ formatMessage(messages.unpublishedBody) }}
+				<template #actions>
+					<Button
+						type="colored"
+						color="blue"
+						size="lg"
+						:disabled="sharePending || ctx.busyReasons.value.length > 0"
+						@click="reviewShareUpdate"
+					>
+						<SpinnerIcon v-if="sharePending" class="animate-spin" aria-hidden="true" />
+						<UploadIcon v-else aria-hidden="true" />
+						{{ formatMessage(shareActions > 0 ? messages.publishing : sharePreviews > 0 ? messages.reviewing : messages.pushUpdate) }}
+					</Button>
+				</template>
+			</Admonition>
 			<InstallingBanner
-				v-if="item.kind === 'installing'"
+				v-else-if="item.kind === 'installing'"
 				:retry-disabled="!canSetup"
 				:retry-disabled-tooltip="permissionDeniedMessage"
 				@dismiss="onInstallationDismiss"
@@ -413,4 +555,22 @@ function onInstallationDismiss() {
 			</Admonition>
 		</template>
 	</StackedAdmonitions>
+	<ContentDiffModal
+		ref="diffModal"
+		:header="formatMessage(messages.pushUpdate)"
+		:admonition-header="formatMessage(messages.shareChanges)"
+		:description="formatMessage(messages.shareChangesBody)"
+		:diffs="previewQuery.data.value?.items ?? []"
+		:confirm-label="formatMessage(messages.pushUpdate)"
+		:confirm-icon="UploadIcon"
+		:confirm-disabled="!canSetup || sharePending || ctx.busyReasons.value.length > 0 || previewQuery.isError.value || !previewQuery.data.value"
+		:added-label="formatMessage(messages.added)"
+		:removed-label="formatMessage(messages.removed)"
+		@confirm="pushShareUpdate"
+		@cancel="previewOpen = false"
+	>
+		<template #additional-content>
+			<ServerConfigFilePicker v-if="previewOpen && ctx.worldId.value" :key="ctx.worldId.value" ref="configPicker" :server-id="ctx.serverId" :world-id="ctx.worldId.value" :disabled="sharePending" />
+		</template>
+	</ContentDiffModal>
 </template>

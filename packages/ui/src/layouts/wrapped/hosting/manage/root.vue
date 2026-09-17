@@ -107,8 +107,8 @@
 		}"
 		:class="[
 			'server-panel-' + revealState,
-			containedLayout
-				? 'h-full min-h-0 overflow-hidden pb-6'
+			fillLayout
+				? 'flex-1 pb-6'
 				: constrainWidth
 					? 'min-h-[100svh] max-w-[1280px] pb-16'
 					: 'min-h-[calc(100svh-100px)] pb-6',
@@ -118,7 +118,7 @@
 			<div
 				v-if="!isOnboarding"
 				class="w-full flex flex-col gap-4"
-				:class="['server-stagger-item', containedLayout ? 'shrink-0' : '', { 'mt-4': isNuxt }]"
+				:class="['server-stagger-item', fillLayout ? 'shrink-0' : '', { 'mt-4': isNuxt }]"
 				:style="{ '--si': 0 }"
 			>
 				<PageHeader :title="serverData?.name || 'Server'">
@@ -227,13 +227,12 @@
 			<ServerOnboardingPanelPage v-if="isOnboarding" :browse-modpacks="handleBrowseModpacks" />
 
 			<template v-else>
-				<div class="server-stagger-item -mb-3">
+				<div class="server-stagger-item -mb-3" :class="fillLayout ? 'shrink-0' : ''">
 					<NavTabs
 						:links="navLinks"
 						replace
 						page-nav
 						data-pyro-navigation
-						:class="containedLayout ? 'shrink-0' : ''"
 						:style="{ '--si': 1 }"
 					/>
 				</div>
@@ -241,7 +240,7 @@
 				<div
 					data-pyro-mount
 					class="server-stagger-item w-full flex-1"
-					:class="containedLayout ? 'flex min-h-0 flex-col overflow-hidden' : 'h-full'"
+					:class="fillLayout ? 'flex flex-col' : 'h-full'"
 					:style="{ '--si': 2 }"
 				>
 					<div v-if="serverData.is_medal" class="mb-4">
@@ -292,6 +291,7 @@
 	<Suspense>
 		<ServerSettingsModal
 			ref="serverSettingsModal"
+			:site-url="siteUrl"
 			:resolve-viewer="resolveViewer"
 			:browse-modpacks="handleBrowseModpacks"
 		/>
@@ -317,6 +317,7 @@ import {
 	LinkIcon,
 	LoaderCircleIcon,
 	LockIcon,
+	PlayIcon,
 	MoreVerticalIcon,
 	ServerIcon as ServerAssetIcon,
 	SettingsIcon,
@@ -412,7 +413,7 @@ const props = withDefaults(
 			type: 'mod' | 'plugin' | 'datapack'
 		}) => void | Promise<void>
 		constrainWidth?: boolean
-		layoutMode?: 'page' | 'contained'
+		layoutMode?: 'page' | 'fill'
 	}>(),
 	{
 		showCopyIdAction: false,
@@ -466,7 +467,7 @@ const DISABLE_LOADING_ANIM = true
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const constrainWidth = computed(() => props.constrainWidth)
-const containedLayout = computed(() => props.layoutMode === 'contained')
+const fillLayout = computed(() => props.layoutMode === 'fill')
 const isNuxt = computed(() => client instanceof NuxtModrinthClient)
 const queryClient = useQueryClient()
 const route = useRoute()
@@ -775,6 +776,12 @@ watch(serverData, (data) => {
 })
 
 const navLinks = computed<Tab[]>(() => [
+	{
+		label: 'Play',
+		href: `/hosting/manage/${props.serverId}/play`,
+		icon: PlayIcon,
+		subpages: [],
+	},
 	{
 		label: 'Overview',
 		href: `/hosting/manage/${props.serverId}`,

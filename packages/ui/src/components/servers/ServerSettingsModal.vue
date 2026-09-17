@@ -2,7 +2,7 @@
 import type { Archon } from '@modrinth/api-client'
 import { ChevronRightIcon } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
 import type { TabbedModalTab } from '#ui/components'
 import { TabbedModal } from '#ui/components'
@@ -13,6 +13,7 @@ import {
 	ServerSettingsInstallationPage,
 	ServerSettingsNetworkPage,
 	ServerSettingsPropertiesPage,
+	ServerSettingsSharingPage,
 	serverSettingsTabDefinitions,
 	type ServerSettingsTabId,
 } from '#ui/layouts/shared/server-settings'
@@ -31,6 +32,7 @@ type ShowOptions = {
 }
 
 const props = defineProps<{
+	siteUrl?: string
 	resolveViewer: () => Promise<{ userId: string | null; userRole: string | null }>
 	browseModpacks?: (args: {
 		serverId: string
@@ -53,7 +55,7 @@ const messages = defineMessages({
 
 const modal = ref<InstanceType<typeof TabbedModal> | null>(null)
 
-const { serverId: currentServerId, worldId, server } = injectModrinthServerContext()
+const { serverId: currentServerId, worldId, server, serverFull } = injectModrinthServerContext()
 
 const currentUserId = ref<string | null>(null)
 const currentUserRole = ref<string | null>(null)
@@ -74,6 +76,7 @@ useQuery({
 const serverSettingsTabComponentMap = {
 	general: ServerSettingsGeneralPage,
 	installation: ServerSettingsInstallationPage,
+	sharing: ServerSettingsSharingPage,
 	network: ServerSettingsNetworkPage,
 	properties: ServerSettingsPropertiesPage,
 	advanced: ServerSettingsAdvancedPage,
@@ -83,6 +86,7 @@ const saveBannerTarget = ref<HTMLElement | null>(null)
 const saveBannerShown = ref(false)
 
 provideServerSettings({
+	siteUrl: computed(() => (props.siteUrl ?? 'https://modrinth.com').replace(/\/$/, '')),
 	isApp,
 	currentUserId,
 	currentUserRole,
@@ -103,6 +107,8 @@ const tabs = computed<TabbedModalTab[]>(() =>
 			serverStatus: server.value?.status,
 			isOwner: isOwner.value,
 			isAdmin: isAdmin.value,
+			isShared: !!serverFull.value?.worlds.find((world) => world.id === worldId.value)?.content
+				?.shared_instance_id,
 		}
 		const name = defineMessage({
 			id: `server.settings.tabs.${tab.id}`,
@@ -127,6 +133,15 @@ const tabs = computed<TabbedModalTab[]>(() =>
 		}
 	}),
 )
+
+watch(tabs, (currentTabs, previousTabs) => {
+	if (!modal.value) return
+	const selectedTab = previousTabs.filter((tab) => tab.shown !== false)[modal.value.selectedTab]
+	const selectedIndex = currentTabs
+		.filter((tab) => tab.shown !== false)
+		.findIndex((tab) => tab.content === selectedTab?.content)
+	modal.value.setTab(Math.max(selectedIndex, 0))
+})
 
 async function fetchViewer() {
 	currentUserId.value = null

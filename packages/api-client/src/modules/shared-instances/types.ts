@@ -23,6 +23,13 @@ export namespace SharedInstances {
 				joined_at: string | null
 			}
 
+			export type InviteLink = {
+				id: string
+				expiration: string
+				max_uses: number
+				uses: number
+			}
+
 			export type Invite = {
 				instance_id: string
 				instance_name: string
@@ -41,6 +48,7 @@ export namespace SharedInstances {
 				name: string
 				icon: string | null
 				quarantine: boolean
+				linked_server: { domain: string; region: string } | null
 			}
 
 			export type JoinType = 'owner' | 'invite' | 'link'

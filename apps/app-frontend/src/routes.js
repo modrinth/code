@@ -21,6 +21,11 @@ export default new createRouter({
 			component: () => import('@/pages/hosting/manage/Index.vue'),
 			children: [
 				{
+					path: 'play',
+					name: 'ServerManagePlay',
+					component: () => import('@/pages/hosting/manage/Play.vue'),
+				},
+				{
 					path: '',
 					name: 'ServerManageOverview',
 					component: () => import('@/pages/hosting/manage/Overview.vue'),

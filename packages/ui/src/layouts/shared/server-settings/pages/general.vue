@@ -30,35 +30,19 @@
 						<div class="flex flex-col gap-2.5">
 							<label for="server-subdomain" class="flex flex-col gap-2.5">
 								<span class="text-lg font-semibold text-contrast">Hostname</span>
-								<div
-									class="flex w-full overflow-hidden rounded-xl bg-button-bg px-3 [box-shadow:var(--shadow-inset-sm)] transition-[box-shadow] duration-100 ease-in-out focus-within:[box-shadow:0_0_0_0.25rem_var(--color-brand-shadow)]"
+								<Input
+									id="server-subdomain"
+									v-model="serverSubdomain"
+									v-tooltip="advancedActionTooltip"
+									placeholder="Enter subdomain..."
+									:maxlength="32"
+									:disabled="!canUseAdvancedSettings"
+									wrapper-class="w-full"
+									autocomplete="off"
+									@keyup.enter="saveGeneral"
 								>
-									<div class="relative inline-flex min-h-9 items-center">
-										<span
-											class="pointer-events-none invisible whitespace-pre px-px text-base font-medium"
-											aria-hidden="true"
-											>{{ serverSubdomain || 'Enter subdomain...' }}</span
-										>
-										<input
-											id="server-subdomain"
-											v-tooltip="advancedActionTooltip"
-											:value="serverSubdomain"
-											placeholder="Enter subdomain..."
-											:maxlength="32"
-											:disabled="!canUseAdvancedSettings"
-											class="absolute left-px inset-0 bg-transparent !p-0 text-base font-medium text-primary !shadow-none transition-colors placeholder:text-secondary focus:text-contrast"
-											autocomplete="off"
-											@input="serverSubdomain = ($event.target as HTMLInputElement).value"
-											@keyup.enter="saveGeneral"
-										/>
-									</div>
-									<div
-										class="flex min-h-9 shrink-0 select-none items-center py-2 pr-4 font-medium opacity-50 [filter:grayscale(50%)]"
-										:class="!serverSubdomain ? '!ml-auto' : ''"
-									>
-										.modrinth.gg
-									</div>
-								</div>
+									<template #suffix>.modrinth.gg</template>
+								</Input>
 							</label>
 							<span>Your friends can connect to your server using this address.</span>
 							<div v-if="!isValidSubdomain" class="text-red font-medium">
@@ -223,6 +207,8 @@ const defaultPreferences: UserPreferences = {
 const userPreferences = useStorage<UserPreferences>(
 	`pyro-server-${serverId}-preferences`,
 	defaultPreferences,
+	undefined,
+	{ mergeDefaults: true },
 )
 
 const newUserPreferences = ref<UserPreferences>(JSON.parse(JSON.stringify(userPreferences.value)))

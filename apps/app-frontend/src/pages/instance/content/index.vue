@@ -288,11 +288,13 @@ watch(projects, (newProjects) => {
 })
 
 const mergedProjects = computed<ContentItem[]>(() => {
+	const managedFiles = new Set(managedContentItems.value.map((item) => item.file_name))
+	const additionalProjects = projects.value.filter((item) => !managedFiles.has(item.file_name))
 	const active = installingItems.value.get(instance.value.id)
-	const pending = active ?? installingBuffer.value
-	if (pending.length === 0) return projects.value
+	const pending = (active ?? installingBuffer.value).filter((item) => !managedFiles.has(item.file_name))
+	if (pending.length === 0) return additionalProjects
 	const pendingProjectIds = new Set(pending.map((p) => p.project?.id).filter(Boolean))
-	const displayProjects = projects.value.map((project) =>
+	const displayProjects = additionalProjects.map((project) =>
 		project.project?.id && pendingProjectIds.has(project.project.id)
 			? { ...project, installing: true }
 			: project,

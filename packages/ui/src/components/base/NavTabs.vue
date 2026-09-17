@@ -182,6 +182,8 @@ function computeActiveIndex(): { index: number; isSubpage: boolean } {
 		}
 	}
 
+	let subpageIndex = -1
+
 	for (let i = filteredLinks.value.length - 1; i >= 0; i--) {
 		const link = filteredLinks.value[i]
 		const decodedPath = decodeURIComponent(route.path)
@@ -204,12 +206,12 @@ function computeActiveIndex(): { index: number; isSubpage: boolean } {
 				(decodedPath.length === decodedHref.length || decodedPath[decodedHref.length] === '/')) ||
 			link.subpages?.some((subpage) => decodedPath.includes(subpage))
 
-		if (isSubpageMatch) {
-			return { index: i, isSubpage: true }
+		if (isSubpageMatch && subpageIndex === -1) {
+			subpageIndex = i
 		}
 	}
 
-	return { index: -1, isSubpage: false }
+	return { index: subpageIndex, isSubpage: subpageIndex !== -1 }
 }
 
 function getTabElement(index: number): HTMLElement | null {
