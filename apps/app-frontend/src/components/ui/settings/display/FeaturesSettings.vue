@@ -23,6 +23,11 @@ import {
 } from '@/composables/use-quick-instance-limit.ts'
 import { type GlobalSyncedOptions, set_global_synced_option } from '@/helpers/instance.ts'
 import {
+	getOwyxUiSoundsEnabled,
+	playOwyxUiSound,
+	setOwyxUiSoundsEnabled,
+} from '@/helpers/owyx-ui-sound'
+import {
 	type AppSettings,
 	appSettingsKeys,
 	appSettingsQueryOptions,
@@ -30,11 +35,6 @@ import {
 	set,
 } from '@/helpers/settings.ts'
 import { globalSyncedOptionsQueryOptions, syncedOptionsKeys } from '@/helpers/synced-options'
-import {
-	getOwyxUiSoundsEnabled,
-	playOwyxUiSound,
-	setOwyxUiSoundsEnabled,
-} from '@/helpers/owyx-ui-sound'
 import { screenshotKeys } from '@/pages/instance/query-options.ts'
 import { appSettingsModalContextKey } from '@/providers/app-settings-modal'
 

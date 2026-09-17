@@ -241,17 +241,18 @@ function friendDisplay(friend: OwyxFriend | { nickname: string; displayNickname?
 	return owyxFriendLabel(friend)
 }
 
-defineExpose({
-	refresh,
-	quietRefresh,
-	showIncoming: () => friendInvitesModal.value?.show(),
-})
-
 function showAddFriendModal() {
 	username.value = ''
 	searchHits.value = []
 	addFriendModal.value?.show()
 }
+
+defineExpose({
+	refresh,
+	quietRefresh,
+	showIncoming: () => friendInvitesModal.value?.show(),
+	showAddFriendModal,
+})
 
 async function addFriendFromModal(nickOverride?: string) {
 	const nick = (nickOverride ?? username.value).trim()
@@ -327,8 +328,6 @@ async function copyFriendServerAddress(friend: OwyxFriend) {
 		handleError(e)
 	}
 }
-
-defineExpose({ showAddFriendModal })
 
 const messages = defineMessages({
 	addFriend: { id: 'friends.action.add-friend', defaultMessage: 'Add a friend' },

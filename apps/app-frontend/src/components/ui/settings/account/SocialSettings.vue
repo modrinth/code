@@ -145,8 +145,8 @@ import {
 } from '@/helpers/owyx-friends'
 import { owyxPresenceStatus } from '@/helpers/owyx-presence'
 import { playOwyxUiSound } from '@/helpers/owyx-ui-sound'
-import { injectContentInstall } from '@/providers/content-install'
 import { appSettingsModalContextKey } from '@/providers/app-settings-modal'
+import { injectContentInstall } from '@/providers/content-install'
 import { injectOwyxSiteSession } from '@/providers/owyx-site-session'
 
 const { formatMessage } = useVIntl()

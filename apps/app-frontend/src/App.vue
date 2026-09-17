@@ -1543,7 +1543,7 @@ async function respondToServerInvite(notification, action) {
 
 async function acceptServerInviteNotification(notification) {
 	try {
-		const serverId = await respondToServerInvite(notification, 'accept')
+		await respondToServerInvite(notification, 'accept')
 		await router.push('/owyx-servers')
 		queryClient.invalidateQueries({ queryKey: ['servers'] })
 	} catch (error) {
