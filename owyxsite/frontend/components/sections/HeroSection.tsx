@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocale } from "@/hooks/useLocale";
+import ApiServicesStatus from "@/components/brand/ApiServicesStatus";
 
 /**
  * Brand-first first viewport (DESIGN.md §5):
- * Owyx™ wordmark · one value line · primary CTA + secondary auth.
- * Atmosphere lives in global space + particles — no hero icon watermark.
+ * Owyx™ · lead · CTA · optional API/services status (launcher-first — not a game-server IP).
  */
 export default function HeroSection() {
   const { user, loading } = useAuth();
@@ -36,6 +36,10 @@ export default function HeroSection() {
           <p className="fade-up-2 mt-6 text-base sm:text-lg text-muted max-w-xl leading-relaxed">
             {dict.home.heroLead}
           </p>
+
+          <div className="fade-up-3 mt-5">
+            <ApiServicesStatus />
+          </div>
 
           <div className="fade-up-3 mt-7 flex flex-wrap items-center gap-3">
             <Link href="/download" className="btn btn-primary btn-lg">

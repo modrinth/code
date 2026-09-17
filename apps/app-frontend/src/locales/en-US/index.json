@@ -3153,7 +3153,7 @@
     "message": "Sign in to apply skins."
   },
   "app.skins.demo.description": {
-    "message": "Sign in with Microsoft to save and apply skins. Offline nicknames cannot change skins."
+    "message": "Skin management needs a Microsoft account that owns Minecraft. An Owyx account alone cannot change Mojang skins."
   },
   "app.skins.demo.title": {
     "message": "Microsoft account required"
@@ -3474,13 +3474,13 @@
     "message": "Install to instance"
   },
   "app.welcome-screen.account-paths": {
-    "message": "New here? Use the account card on the left: Owyx site login, offline nickname, or Microsoft."
+    "message": "New here? Use the account card on the left: Owyx account or Microsoft."
   },
   "app.welcome-screen.create-instance": {
     "message": "Create an instance"
   },
   "app.welcome-screen.description": {
-    "message": "Pick an account path (Owyx site, offline nick, or Microsoft), create an instance, and play."
+    "message": "Sign in with Owyx or Microsoft, create an instance, and play."
   },
   "app.welcome-screen.import-from-launcher": {
     "message": "Import from launcher"
@@ -4499,9 +4499,6 @@
   "minecraft-account.add-microsoft": {
     "message": "Add Microsoft account"
   },
-  "minecraft-account.add-offline": {
-    "message": "Add offline nickname"
-  },
   "minecraft-account.label": {
     "message": "Minecraft account"
   },
@@ -4509,7 +4506,7 @@
     "message": "Microsoft"
   },
   "minecraft-account.microsoft-stub-hint": {
-    "message": "Microsoft is for a licensed Minecraft profile. Signing into Owyx does not replace an active Microsoft account. Use “Play with offline nickname” if you want the offline profile selected."
+    "message": "Owyx is for friends, skins, and your site nickname in game. Microsoft is for a licensed Minecraft profile and online-mode servers."
   },
   "minecraft-account.nickname-placeholder": {
     "message": "Nickname"
@@ -4517,26 +4514,14 @@
   "minecraft-account.not-signed-in": {
     "message": "Choose how to play"
   },
-  "minecraft-account.offline": {
-    "message": "Owyx / offline"
-  },
-  "minecraft-account.offline-nickname": {
-    "message": "Play with offline nickname"
-  },
-  "minecraft-account.offline-warning": {
-    "message": "Uses a nickname for offline-mode servers. Prefer the same nick as on owyx.site so skins and friends match. Public Microsoft-authenticated servers still need a Microsoft account."
-  },
   "minecraft-account.owyx-nick-too-long": {
-    "message": "Owyx nickname must be 3–16 letters, numbers, or underscores to sync with offline play and skins. Change it on owyx.site, then try again."
+    "message": "Owyx nickname must be 3–16 letters, numbers, or underscores to sync with play and skins. Change it on owyx.site, then try again."
   },
   "minecraft-account.owyx-session-badge": {
     "message": "Owyx site session"
   },
   "minecraft-account.paths-hint": {
-    "message": "1) Sign in with your Owyx site account · 2) Use an offline nickname · 3) Microsoft (licensed Minecraft)."
-  },
-  "minecraft-account.play-offline": {
-    "message": "Save nickname"
+    "message": "Owyx account (friends & skins) or Microsoft (licensed Minecraft)."
   },
   "minecraft-account.remove-account": {
     "message": "Remove account"
@@ -4554,7 +4539,7 @@
     "message": "Sign in with Owyx account"
   },
   "minecraft-required.description": {
-    "message": "A Microsoft account that owns Minecraft is required for this action. For offline-mode play you can use an Owyx nickname instead. Owyx does not offer Modrinth support."
+    "message": "A Microsoft account that owns Minecraft is required for this action. For Owyx servers, sign in with your Owyx account instead."
   },
   "minecraft-required.description-header": {
     "message": "Sign in to a Microsoft account"
@@ -4954,5 +4939,11 @@
   },
   "settings.sidebar.label.display": {
     "message": "Display"
+  },
+  "minecraft-account.account-hint": {
+    "message": "Owyx is for friends, skins, and your site nickname in game. Microsoft is for a licensed Minecraft profile and online-mode servers."
+  },
+  "minecraft-account.owyx": {
+    "message": "Owyx"
   }
 }

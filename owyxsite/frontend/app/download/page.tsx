@@ -1,22 +1,26 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useLocale } from "@/hooks/useLocale";
 
-const REPO_URL = "https://github.com/ebluffy/Owyx";
+const REPO = "ebluffy/Owyx";
+const REPO_URL = `https://github.com/${REPO}`;
 const RELEASES_URL = `${REPO_URL}/releases/latest`;
+const RELEASES_API = `https://api.github.com/repos/${REPO}/releases/latest`;
 
-/** Prefer env overrides; otherwise point at latest GitHub release assets. */
-const WINDOWS_URL =
-  process.env.NEXT_PUBLIC_LAUNCHER_DOWNLOAD_URL_WINDOWS ||
-  process.env.NEXT_PUBLIC_LAUNCHER_DOWNLOAD_URL ||
-  `${REPO_URL}/releases/latest/download/Owyx_0.5.2_x64-setup.exe`;
+type PlatformLinks = {
+  windows: string;
+  linux: string;
+  tag?: string;
+};
 
-const LINUX_URL =
-  process.env.NEXT_PUBLIC_LAUNCHER_DOWNLOAD_URL_LINUX ||
-  `${REPO_URL}/releases/latest/download/Owyx_0.5.2_amd64.AppImage`;
+function pickAssetUrl(assets: { name: string; browser_download_url: string }[], re: RegExp) {
+  const hit = assets.find((a) => re.test(a.name));
+  return hit?.browser_download_url ?? null;
+}
 
 function WindowsIcon({ className }: { className?: string }) {
   return (
@@ -35,13 +39,68 @@ function LinuxIcon({ className }: { className?: string }) {
 }
 
 export default function DownloadPage() {
-  const { dict } = useLocale();
+  const { dict, locale } = useLocale();
   const d = dict.download;
+  const [links, setLinks] = useState<PlatformLinks>({
+    windows:
+      process.env.NEXT_PUBLIC_LAUNCHER_DOWNLOAD_URL_WINDOWS ||
+      process.env.NEXT_PUBLIC_LAUNCHER_DOWNLOAD_URL ||
+      RELEASES_URL,
+    linux: process.env.NEXT_PUBLIC_LAUNCHER_DOWNLOAD_URL_LINUX || RELEASES_URL,
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+    const ctrl = new AbortController();
+    (async () => {
+      try {
+        const res = await fetch(RELEASES_API, {
+          signal: ctrl.signal,
+          headers: { Accept: "application/vnd.github+json" },
+        });
+        if (!res.ok) return;
+        const data = (await res.json()) as {
+          tag_name?: string;
+          assets?: { name: string; browser_download_url: string }[];
+        };
+        const assets = data.assets ?? [];
+        const windows =
+          pickAssetUrl(assets, /x64-setup\.exe$/i) ||
+          pickAssetUrl(assets, /\.exe$/i) ||
+          RELEASES_URL;
+        const linux =
+          pickAssetUrl(assets, /\.AppImage$/i) ||
+          pickAssetUrl(assets, /amd64.*\.(deb|rpm)$/i) ||
+          RELEASES_URL;
+        if (!cancelled) {
+          setLinks({
+            windows:
+              process.env.NEXT_PUBLIC_LAUNCHER_DOWNLOAD_URL_WINDOWS ||
+              process.env.NEXT_PUBLIC_LAUNCHER_DOWNLOAD_URL ||
+              windows,
+            linux: process.env.NEXT_PUBLIC_LAUNCHER_DOWNLOAD_URL_LINUX || linux,
+            tag: data.tag_name,
+          });
+        }
+      } catch {
+        /* keep fallbacks → releases page */
+      }
+    })();
+    return () => {
+      cancelled = true;
+      ctrl.abort();
+    };
+  }, []);
+
   const steps = [
     { n: "1", title: d.step1Title, text: d.step1Text },
     { n: "2", title: d.step2Title, text: d.step2Text },
     { n: "3", title: d.step3Title, text: d.step3Text },
   ];
+
+  const windowsLabel = locale === "ru" ? "Windows" : "Windows";
+  const linuxLabel = "Linux";
+  const releasesLabel = locale === "ru" ? "Все релизы на GitHub" : "All releases on GitHub";
 
   return (
     <>
@@ -59,33 +118,37 @@ export default function DownloadPage() {
           <div className="flex flex-wrap items-center gap-3 mb-4">
             <span className="text-sm font-medium text-text mr-1">{d.downloadLabel}</span>
             <a
-              href={WINDOWS_URL}
+              href={links.windows}
               className="btn btn-primary"
               id="download-launcher-windows"
               rel="noopener noreferrer"
             >
               <WindowsIcon className="w-4 h-4" />
-              Windows
+              {windowsLabel}
             </a>
             <a
-              href={LINUX_URL}
+              href={links.linux}
               className="btn btn-secondary"
               id="download-launcher-linux"
               rel="noopener noreferrer"
             >
               <LinuxIcon className="w-4 h-4" />
-              Linux
+              {linuxLabel}
             </a>
             <a href={RELEASES_URL} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">
-              {d.allReleases}
+              {d.allReleases || releasesLabel}
             </a>
           </div>
           <p className="text-muted text-sm mb-14 max-w-lg">
             {d.currentFiles}{" "}
-            <code className="text-xs">Owyx_*_x64-setup.exe</code> /{" "}
-            <code className="text-xs">Owyx_*_amd64.AppImage</code> —{" "}
+            {links.tag ? (
+              <code className="text-xs">{links.tag}</code>
+            ) : (
+              <code className="text-xs">latest</code>
+            )}{" "}
+            —{" "}
             <a href={RELEASES_URL} target="_blank" rel="noopener noreferrer" className="link-accent">
-              GitHub Releases
+              {releasesLabel}
             </a>
             .
           </p>

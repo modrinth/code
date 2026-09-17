@@ -9,11 +9,12 @@ type Particle = {
   vy: number;
   r: number;
   a: number;
+  layer: 1 | 2 | 3;
 };
 
 /**
- * Soft cyan particle field for Owyx space backdrop.
- * SSR-safe (canvas only after mount). Respects prefers-reduced-motion + Page Visibility.
+ * Deep-space particle field (no spiderweb links — anti AI-slop).
+ * Three depth layers, O(N). Respects prefers-reduced-motion + Page Visibility.
  */
 export default function SpaceParticles() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -40,20 +41,25 @@ export default function SpaceParticles() {
 
     function countForViewport() {
       const area = w * h;
-      if (area < 500_000) return 28;
-      if (area < 1_200_000) return 42;
-      return 58;
+      if (area < 500_000) return 48;
+      if (area < 1_200_000) return 72;
+      return 96;
     }
 
     function spawn(n: number) {
-      particles = Array.from({ length: n }, () => ({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 0.22,
-        vy: (Math.random() - 0.5) * 0.18 - 0.05,
-        r: Math.random() * 1.6 + 0.5,
-        a: Math.random() * 0.45 + 0.2,
-      }));
+      particles = Array.from({ length: n }, (_, i) => {
+        const layer = (i % 3 === 0 ? 3 : i % 3 === 1 ? 2 : 1) as 1 | 2 | 3;
+        const speed = layer === 1 ? 0.08 : layer === 2 ? 0.14 : 0.2;
+        return {
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: (Math.random() - 0.5) * speed,
+          vy: (Math.random() - 0.5) * speed * 0.85 - 0.03,
+          r: layer === 1 ? Math.random() * 0.7 + 0.25 : layer === 2 ? Math.random() * 1.1 + 0.4 : Math.random() * 1.8 + 0.7,
+          a: layer === 1 ? Math.random() * 0.25 + 0.12 : layer === 2 ? Math.random() * 0.35 + 0.18 : Math.random() * 0.5 + 0.25,
+          layer,
+        };
+      });
     }
 
     function resize() {
@@ -72,11 +78,7 @@ export default function SpaceParticles() {
       if (!running || !ctx) return;
       ctx.clearRect(0, 0, w, h);
 
-      const linkDist = Math.min(140, w * 0.12);
-      const linkDist2 = linkDist * linkDist;
-
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
+      for (const p of particles) {
         p.x += p.vx;
         p.y += p.vy;
         if (p.x < -20) p.x = w + 20;
@@ -84,33 +86,23 @@ export default function SpaceParticles() {
         if (p.y < -20) p.y = h + 20;
         if (p.y > h + 20) p.y = -20;
 
-        for (let j = i + 1; j < particles.length; j++) {
-          const q = particles[j];
-          const dx = p.x - q.x;
-          const dy = p.y - q.y;
-          const d2 = dx * dx + dy * dy;
-          if (d2 < linkDist2) {
-            const t = 1 - Math.sqrt(d2) / linkDist;
-            ctx.strokeStyle = `rgba(0, 229, 255, ${0.08 * t})`;
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(q.x, q.y);
-            ctx.stroke();
-          }
+        if (p.layer === 3) {
+          const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
+          g.addColorStop(0, `rgba(0, 229, 255, ${p.a * 0.35})`);
+          g.addColorStop(1, "rgba(0, 229, 255, 0)");
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
+          ctx.fill();
         }
 
         ctx.beginPath();
-        ctx.fillStyle = `rgba(0, 229, 255, ${p.a})`;
+        ctx.fillStyle =
+          p.layer === 1
+            ? `rgba(220, 230, 240, ${p.a})`
+            : `rgba(0, 229, 255, ${p.a})`;
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fill();
-
-        if (p.r > 1.4) {
-          ctx.beginPath();
-          ctx.fillStyle = `rgba(191, 248, 255, ${p.a * 0.35})`;
-          ctx.arc(p.x, p.y, p.r * 0.35, 0, Math.PI * 2);
-          ctx.fill();
-        }
       }
 
       raf = window.requestAnimationFrame(tick);

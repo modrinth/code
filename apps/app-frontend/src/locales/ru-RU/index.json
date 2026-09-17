@@ -2961,7 +2961,7 @@
     "message": "Войдите, чтобы применять скины."
   },
   "app.skins.demo.description": {
-    "message": "Войдите через Microsoft, чтобы сохранять и применять скины. Ник Owyx скины менять не может."
+    "message": "Управление скинами Mojang требует Microsoft-аккаунт с Minecraft. Одного аккаунта Owyx недостаточно."
   },
   "app.skins.demo.title": {
     "message": "Нужен аккаунт Microsoft"
@@ -3285,7 +3285,7 @@
     "message": "Создать сборку"
   },
   "app.welcome-screen.description": {
-    "message": "Выберите путь аккаунта (сайт Owyx, офлайн-ник или Microsoft), создайте инстанс и играйте."
+    "message": "Войди через Owyx или Microsoft, создай инстанс и играй."
   },
   "app.welcome-screen.import-from-launcher": {
     "message": "Импортировать из лаунчера"
@@ -4257,7 +4257,7 @@
     "message": "Войти в Minecraft"
   },
   "minecraft-required.description": {
-    "message": "Для запуска и игры требуется аккаунт Microsoft с приобретённым Minecraft."
+    "message": "Для этого действия нужен Microsoft-аккаунт с Minecraft. Для серверов Owyx войди через аккаунт Owyx."
   },
   "minecraft-required.description-header": {
     "message": "Войдите в аккаунт Microsoft"
@@ -4349,29 +4349,14 @@
   "minecraft-account.add-microsoft": {
     "message": "Добавить аккаунт Microsoft"
   },
-  "minecraft-account.add-offline": {
-    "message": "Добавить офлайн-ник"
-  },
   "minecraft-account.microsoft": {
     "message": "Microsoft"
-  },
-  "minecraft-account.offline": {
-    "message": "Owyx / офлайн"
   },
   "minecraft-account.sign-in-microsoft": {
     "message": "Войти через Microsoft"
   },
-  "minecraft-account.offline-nickname": {
-    "message": "Играть с офлайн-ником"
-  },
-  "minecraft-account.offline-warning": {
-    "message": "Ник с owyx.site для серверов в offline-mode. На серверах с проверкой лицензии Microsoft нужен аккаунт Microsoft."
-  },
   "minecraft-account.nickname-placeholder": {
     "message": "Ник"
-  },
-  "minecraft-account.play-offline": {
-    "message": "Сохранить ник"
   },
   "app.nav.owyx-servers": {
     "message": "Серверы Owyx"
@@ -4599,16 +4584,16 @@
     "message": "Скопировать, во что играют"
   },
   "minecraft-account.paths-hint": {
-    "message": "1) Войти аккаунтом сайта Owyx · 2) Офлайн-ник · 3) Microsoft (лицензия Minecraft)."
+    "message": "Аккаунт Owyx (друзья и скины) или Microsoft (лицензия Minecraft)."
   },
   "minecraft-account.sign-in-owyx-site": {
     "message": "Войти аккаунтом Owyx"
   },
   "minecraft-account.microsoft-stub-hint": {
-    "message": "Microsoft — для лицензионного профиля. Вход в Owyx не сменяет активный Microsoft. Выберите «Играть с офлайн-ником», если нужен офлайн-профиль."
+    "message": "Owyx — друзья, скины и ник с сайта. Microsoft — лицензионный профиль и online-mode серверы."
   },
   "app.welcome-screen.account-paths": {
-    "message": "Новичок? Карточка аккаунта слева: вход Owyx, офлайн-ник или Microsoft."
+    "message": "Новичок? Карточка аккаунта слева: аккаунт Owyx или Microsoft."
   },
   "owyx.servers.loading": {
     "message": "Загрузка серверов…"
@@ -4651,5 +4636,11 @@
   },
   "friends.copied-server-address": {
     "message": "Адрес сервера скопирован"
+  },
+  "minecraft-account.account-hint": {
+    "message": "Owyx — друзья, скины и ник с сайта. Microsoft — лицензионный профиль и online-mode серверы."
+  },
+  "minecraft-account.owyx": {
+    "message": "Owyx"
   }
 }

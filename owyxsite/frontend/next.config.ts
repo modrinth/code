@@ -29,6 +29,11 @@ const nextConfig: NextConfig = {
 
   async redirects() {
     return [
+      {
+        source: "/servers",
+        destination: "/download",
+        permanent: false,
+      },
       // Resend-verification used to email /verify-email; the real page is /verify.
       { source: "/verify-email", destination: "/verify", permanent: false },
     ];

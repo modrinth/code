@@ -107,7 +107,7 @@ export default function LoginPage() {
             autoComplete="current-password"
             required
             className="input"
-            placeholder="••••••••"
+            placeholder={dict.auth.passwordDots}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />

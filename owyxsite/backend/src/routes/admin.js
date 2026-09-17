@@ -4,7 +4,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const db = require('../database/connection');
-const { authenticateToken, authenticateApiToken, authenticateLongTermApiToken, requireRole } = require('./auth');
+const { authenticateToken, authenticateLongTermApiToken, requireRole } = require('./auth');
 const bcrypt = require('bcryptjs');
 
 const router = express.Router();
@@ -2039,13 +2039,11 @@ router.post('/test-email-with-template', [
 
         // Переменные для замены в шаблоне (используем реальные данные)
         const templateVars = {
-            serverName: getSetting('server-name', 'ChiwawaMine'),
-            serverDescription: getSetting('server-description', 'Лучший Minecraft сервер'),
-            serverIp: getSetting('server-ip', 'play.chiwawa.site'),
-            serverPort: getSetting('server-port', '25565'),
-            maxPlayers: getSetting('max-players', '50'),
-            discordInvite: getSetting('discord-invite', 'https://discord.gg/chiwawa'),
-            telegramInvite: getSetting('telegram-invite', 'https://t.me/chiwawa'),
+            serverName: getSetting('server-name', 'Owyx'),
+            serverDescription: getSetting('server-description', 'Owyx launcher and site'),
+            siteUrl: getSetting('site-url', 'https://owyx.site'),
+            discordInvite: getSetting('discord-invite', 'https://discord.gg/owyx'),
+            telegramInvite: getSetting('telegram-invite', 'https://t.me/owyx'),
 
             // Данные пользователя (реальные или тестовые)
             nickname: targetUser ? targetUser.nickname : 'Тестовый игрок',
@@ -2090,7 +2088,7 @@ router.post('/test-email-with-template', [
         });
 
         console.log(`📧 Тестовое письмо с шаблоном:\nКому: ${finalEmail} (${targetUser ? `${targetUser.nickname}, роль: ${targetUser.role}` : 'ручной ввод'})\nШаблон: ${template.template_name}\nТема: ${processedSubject}\nHTML длина: ${processedHtml.length} символов`);
-        console.log(`🔧 Используемые настройки сервера:\n- Имя: ${templateVars.serverName}\n- IP: ${templateVars.serverIp}\n- Discord: ${templateVars.discordInvite}\n- Telegram: ${templateVars.telegramInvite}`);
+        console.log(`🔧 Используемые настройки сайта:\n- Имя: ${templateVars.serverName}\n- Site: ${templateVars.siteUrl}\n- Discord: ${templateVars.discordInvite}\n- Telegram: ${templateVars.telegramInvite}`);
 
         // Получаем SMTP настройки (поддерживаем разные форматы ключей)
         const smtpResult = await db.query(`
@@ -2696,16 +2694,15 @@ router.post('/test-email', authenticateToken, requireRole(['admin']), async (req
                     
                     // Используем реальные данные пользователя и сервера
                     const templateData = {
-                        serverName: serverSettings.serverName || 'ChiwawaMine',
+                        serverName: serverSettings['server-name'] || 'Owyx',
                         nickname: req.user?.nickname || 'Администратор',
-                        serverIp: serverSettings.serverIp || 'chiwawasite.com',
-                        serverPort: serverSettings.serverPort || '25565',
-                        discordInvite: serverSettings.discordInvite || 'https://discord.gg/chiwawa',
-                        telegramInvite: serverSettings.telegramInvite || 'https://t.me/chiwawa',
+                        siteUrl: 'https://owyx.site',
+                        discordInvite: serverSettings['discord-invite'] || 'https://discord.gg/owyx',
+                        telegramInvite: serverSettings['telegram-invite'] || 'https://t.me/owyx',
                         verificationLink: `${req.protocol}://${req.get('host')}/verify/test-token`,
                         resetLink: `${req.protocol}://${req.get('host')}/reset-password/test-token`,
                         currentDate: new Date().toLocaleDateString('ru-RU'),
-                        userEmail: req.user?.email || 'admin@chiwawasite.com'
+                        userEmail: req.user?.email || 'admin@owyx.site'
                     };
                     
                     Object.keys(templateData).forEach(key => {
@@ -2977,72 +2974,12 @@ router.delete('/api-tokens/:id', authenticateToken, requireRole(['admin']), asyn
     }
 });
 
-// POST /api/admin/api-tokens/plugin - Создать специальный токен для плагина (бессрочный)
-router.post('/api-tokens/plugin', authenticateToken, requireRole(['admin']), async (req, res) => {
-    try {
-        const { name = 'Minecraft Plugin Token' } = req.body;
-
-        // Генерируем специальный токен для плагина
-        const crypto = require('crypto');
-        const rawToken = crypto.randomBytes(64).toString('hex');
-        const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
-        const tokenPrefix = rawToken.substring(0, 8);
-
-        // Права для плагина
-        const pluginPermissions = [
-            'server:status',
-            'players:read',
-            'players:update',
-            'sessions:manage',
-            'stats:update'
-        ];
-
-        // Создаем бессрочный токен
-        const result = await db.query(`
-            INSERT INTO api_tokens (
-                token_name, token_hash, token_prefix, user_id, 
-                permissions, expires_at, created_by, description
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-            RETURNING id, token_name, token_prefix, created_at
-        `, [
-            name,
-            tokenHash,
-            tokenPrefix,
-            req.user.id,
-            JSON.stringify(pluginPermissions),
-            null, // Никогда не истекает
-            req.user.id,
-            'Бессрочный токен для Minecraft плагина'
-        ]);
-
-        // Логируем создание
-        await db.query(
-            'INSERT INTO admin_logs (admin_id, action, details) VALUES ($1, $2, $3)',
-            [req.user.id, 'plugin_token_created', `Создан токен для плагина: ${name}`]
-        );
-
-        res.json({
-            success: true,
-            message: 'Токен для плагина создан успешно',
-            token: {
-                id: result.rows[0].id,
-                name: result.rows[0].token_name,
-                prefix: result.rows[0].token_prefix,
-                created_at: result.rows[0].created_at,
-                full_token: rawToken,
-                permissions: pluginPermissions
-            },
-            instructions: {
-                config_field: 'admin_token',
-                expires: 'never',
-                usage: 'Скопируйте этот токен в config.yml плагина'
-            }
-        });
-
-    } catch (error) {
-        console.error('Ошибка создания токена для плагина:', error);
-        res.status(500).json({ error: 'Ошибка сервера' });
-    }
+// POST /api/admin/api-tokens/plugin — retired with the Minecraft plugin.
+router.post('/api-tokens/plugin', authenticateToken, requireRole(['admin']), (_req, res) => {
+    res.status(410).json({
+        error: 'gone',
+        message: 'Plugin API tokens are retired. Product scope is site + launcher only.'
+    });
 });
 
 module.exports = router;

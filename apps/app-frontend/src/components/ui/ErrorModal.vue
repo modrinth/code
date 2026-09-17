@@ -183,8 +183,7 @@ async function copyToClipboard(text) {
 							often the result of a poor connection, so we recommend trying again to see if it
 							works. Owyx does not provide Modrinth support — for help visit
 							<a href="https://owyx.site">owyx.site</a>
-							or our Discord. You can also play with an Owyx / offline nickname on offline-mode
-							servers.
+							or our Discord. You can also sign in with an Owyx account.
 						</p>
 					</template>
 					<template v-else-if="metadata.hostsFile">

@@ -86,7 +86,7 @@ const messages = defineMessages({
 	description: {
 		id: 'minecraft-required.description',
 		defaultMessage:
-			'A Microsoft account that owns Minecraft is required for this action. For offline-mode play you can use an Owyx nickname instead. Owyx does not offer Modrinth support.',
+			'A Microsoft account that owns Minecraft is required for this action. For offline-mode Owyx servers, sign in with your Owyx account instead.',
 	},
 	signIn: {
 		id: 'minecraft-required.sign-in',

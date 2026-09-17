@@ -17,13 +17,12 @@ const messages = defineMessages({
 	},
 	welcomeDescription: {
 		id: 'app.welcome-screen.description',
-		defaultMessage:
-			'Pick an account path (Owyx site, offline nick, or Microsoft), create an instance, and play.',
+		defaultMessage: 'Sign in with Owyx or Microsoft, create an instance, and play.',
 	},
 	accountPaths: {
 		id: 'app.welcome-screen.account-paths',
 		defaultMessage:
-			'New here? Use the account card on the left: Owyx site login, offline nickname, or Microsoft.',
+			'New here? Use the account card on the left: Owyx account or Microsoft.',
 	},
 	createInstance: {
 		id: 'app.welcome-screen.create-instance',

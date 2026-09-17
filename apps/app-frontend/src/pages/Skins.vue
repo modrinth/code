@@ -237,7 +237,7 @@ const accountsCard = inject('accountsCard') as Ref<typeof AccountsCard>
 const currentUser = ref<MinecraftCredential | undefined>(undefined)
 const currentUserId = ref<string | undefined>(undefined)
 
-/** Skins API needs a licensed Microsoft account — offline nicknames count as demo. */
+/** Skins API needs a licensed Microsoft account — Owyx play profiles use site nick sync instead. */
 const needsMicrosoftAccount = computed(
 	() => !currentUser.value || isOfflineAccount(currentUser.value),
 )

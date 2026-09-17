@@ -201,11 +201,11 @@ jobs:
           ## Owyx™ ${VERSION}
 
           ### Changes
-          - Offline / Owyx nick accounts: restore compile fix; passive site→nick sync no longer steals active Microsoft; explicit nick login still activates
-          - Friends presence heartbeat (~90s TTL) + contract docs
-          - Branding: COPYING.md / TRADEMARK.md — forks may use GPL code but not Owyx™ marks
-          - Site: Terms / Privacy / EULA (EN+RU), language toggle, offer hidden
-          - Release CI: build app-frontend with root pnpm before Tauri (fixes Windows crash from nested packageManager)
+          - Accounts: user-facing play paths are **Owyx site** + **Microsoft** only (no offline-nick UI); site session badge when signed in
+          - Social: Friends stats, presence chip from real heartbeat, Open Friends closes settings modal; incoming pending only
+          - Site: launcher-first DESIGN (no one-server / plugin pitch); hero API/DB status; download from GitHub Releases; RU/EN form placeholders
+          - Cleanup: Hosting pages removed (catch-all → Owyx Servers); plugin/game-token/applications APIs return **410**; no game IP in public settings
+          - Brand: Onest + Unbounded, cyan accent; dead Pride banner / Medal hosting prefetch gone
 
           Installers: Windows NSIS, Linux AppImage. GPL-3 fork of [modrinth/code](https://github.com/modrinth/code); not affiliated with Modrinth / Rinth, Inc. Owyx™ branding reserved — see TRADEMARK.md.
           EOF

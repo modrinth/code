@@ -31,6 +31,10 @@ export default new createRouter({
 			redirect: '/owyx-servers',
 		},
 		{
+			path: '/hosting/:pathMatch(.*)*',
+			redirect: '/owyx-servers',
+		},
+		{
 			path: '/browse/:projectType',
 			name: 'Discover content',
 			component: () => import('@/pages/Browse.vue'),

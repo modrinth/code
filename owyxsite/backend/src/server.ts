@@ -149,10 +149,9 @@ app.get('/api', (_req, res) => {
   res.json({
     name: 'Owyx API',
     version: '1.0.0',
-    description: 'API for Owyx Minecraft site (migrated from chiwawasite)',
+    description: 'API for Owyx site + launcher control plane',
     endpoints: {
       auth: '/api/auth',
-      applications: '/api/applications',
       profile: '/api/profile',
       admin: '/api/admin',
       forum: '/api/forum',
