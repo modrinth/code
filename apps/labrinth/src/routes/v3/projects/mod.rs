@@ -2344,8 +2344,7 @@ pub async fn project_icon_edit_internal(
         262144,
         "Icons must be smaller than 256KiB",
     )
-    .await
-    .wrap_api_err("executing `read_limited_from_payload`")?;
+    .await?;
 
     let project_id: ProjectId = project_item.inner.id.into();
     let upload_result = upload_image_optimized(
@@ -2657,8 +2656,7 @@ pub async fn add_gallery_item_internal(
         5 * (1 << 20),
         "Gallery image exceeds the maximum of 5MiB.",
     )
-    .await
-    .wrap_api_err("executing `read_limited_from_payload`")?;
+    .await?;
 
     let id: ProjectId = project_item.inner.id.into();
     let upload_result = upload_image_optimized(

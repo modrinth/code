@@ -485,8 +485,7 @@ pub async fn collection_icon_edit(
         262144,
         "Icons must be smaller than 256KiB",
     )
-    .await
-    .wrap_api_err("executing `read_limited_from_payload`")?;
+    .await?;
 
     let collection_id: CollectionId = collection_item.id.into();
     let upload_result = crate::util::img::upload_image_optimized(

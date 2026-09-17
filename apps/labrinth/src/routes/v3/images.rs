@@ -204,8 +204,7 @@ pub async fn images_add(
         1_048_576,
         "Icons must be smaller than 1MiB",
     )
-    .await
-    .wrap_api_err("executing `read_limited_from_payload`")?;
+    .await?;
 
     let content_length = bytes.len();
     let upload_result = upload_image_optimized(

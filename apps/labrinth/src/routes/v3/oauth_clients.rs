@@ -473,8 +473,7 @@ pub async fn oauth_client_icon_edit(
         262144,
         "Icons must be smaller than 256KiB",
     )
-    .await
-    .wrap_api_err("executing `read_limited_from_payload`")?;
+    .await?;
     let upload_result = upload_image_optimized(
         &format!("data/{client_id}"),
         FileHostPublicity::Public,
