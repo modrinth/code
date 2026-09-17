@@ -1,5 +1,5 @@
 <template>
-	<li class="flex min-w-0 items-start gap-1.5">
+	<li class="flex min-w-0 items-start gap-2">
 		<Avatar
 			:src="member.user.avatar_url"
 			:alt="member.user.username"
