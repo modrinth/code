@@ -269,13 +269,8 @@ const forceSidebar = computed(
 		route.path.startsWith('/user'),
 )
 const sidebarVisible = computed(() => sidebarToggled.value || forceSidebar.value)
-const hostingRouteActive = computed(() => route.path.startsWith('/hosting'))
-const hostingUpdateRequired = computed(
-	() =>
-		hostingRouteActive.value &&
-		!!appUpdateState.availableUpdate.value &&
-		appUpdateState.updatesEnabled.value,
-)
+const hostingRouteActive = computed(() => false)
+const hostingUpdateRequired = computed(() => false)
 const prideFundraiserEnabled = computed(
 	() => appSettings.getFeatureFlag('pride_fundraiser') && Date.now() < PRIDE_FUNDRAISER_END_DATE,
 )
@@ -1628,7 +1623,7 @@ async function respondToServerInvite(notification, action) {
 async function acceptServerInviteNotification(notification) {
 	try {
 		const serverId = await respondToServerInvite(notification, 'accept')
-		await router.push(`/hosting/manage/${encodeURIComponent(serverId)}`)
+		await router.push('/owyx-servers')
 		queryClient.invalidateQueries({ queryKey: ['servers'] })
 	} catch (error) {
 		handleError(error)

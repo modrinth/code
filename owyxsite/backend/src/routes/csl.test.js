@@ -46,9 +46,15 @@ describe('absoluteWebsiteAsset', () => {
 		assert.equal(absoluteWebsiteAsset('/evil/x.png'), null)
 	})
 
-	it('rejects relative path traversal and non-skin upload dirs', () => {
+	it('rejects relative path traversal', () => {
 		assert.equal(absoluteWebsiteAsset('/uploads/skins/../../evil.png'), null)
-		assert.equal(absoluteWebsiteAsset('/uploads/avatars/a.png'), null)
+	})
+
+	it('allows avatars under /uploads/avatars/', () => {
+		assert.equal(
+			absoluteWebsiteAsset('/uploads/avatars/a.png'),
+			'https://owyx.site/uploads/avatars/a.png',
+		)
 	})
 
 	it('rejects percent-encoded path traversal', () => {
@@ -93,8 +99,9 @@ describe('resolveLocalUpload', () => {
 		assert.equal(resolveLocalUpload('/uploads/skins/%2e%2e/%2e%2e/etc/passwd'), null)
 	})
 
-	it('rejects non-skin upload dirs', () => {
-		assert.equal(resolveLocalUpload('/uploads/avatars/a.png'), null)
+	it('rejects non-upload dirs', () => {
+		assert.equal(resolveLocalUpload('/uploads/other/a.png'), null)
+		assert.equal(resolveLocalUpload('/uploads/secrets.png'), null)
 	})
 
 	it('returns null when file missing', () => {

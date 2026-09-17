@@ -1,7 +1,7 @@
--- Enforce Minecraft nick length (3–16) for any historical rows that slipped past
--- older 3–32 app validation, then shrink the column to varchar(16).
+-- Idempotent: shrink users.nickname to varchar(16) on DBs that already ran
+-- an earlier 008 (truncate-only) without ALTER COLUMN.
+-- Safe to re-run when the column is already varchar(16).
 
--- Truncate overlong nicknames (collision-safe: append _<id> when needed).
 DO $$
 DECLARE
   r RECORD;

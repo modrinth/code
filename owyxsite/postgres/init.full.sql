@@ -1694,7 +1694,7 @@ COMMENT ON COLUMN public.user_sessions.last_activity IS 'Время послед
 
 CREATE TABLE public.users (
     id integer NOT NULL,
-    nickname character varying(50) NOT NULL,
+    nickname character varying(16) NOT NULL,
     email character varying(255) NOT NULL,
     password_hash character varying(255) NOT NULL,
     first_name character varying(100),

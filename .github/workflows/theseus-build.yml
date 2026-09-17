@@ -42,6 +42,8 @@ concurrency:
 jobs:
   build:
     name: Build
+    # Upstream Namespace runners only — Owyx releases use owyx-github-release.yml.
+    if: github.repository == 'modrinth/code'
     env:
       VITE_STRIPE_PUBLISHABLE_KEY: pk_live_51JbFxJJygY5LJFfKLVVldb10HlLt24p421OWRsTOWc5sXYFOnFUXWieSc6HD3PHo25ktx8db1WcHr36XGFvZFVUz00V9ixrCs5
       RUSTC_WRAPPER: 'sccache'

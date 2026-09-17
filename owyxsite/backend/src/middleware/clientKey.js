@@ -4,7 +4,8 @@
  * - Browser traffic hits https://owyx.site/api (Host: owyx.site) — no client key.
  * - Launcher hits https://api.owyx.site (Host: api.owyx.site) — requires
  *   header X-Owyx-Client-Key matching LAUNCHER_CLIENT_KEY.
- * - /health stays open for uptime checks.
+ * - Unknown / spoofed Host → fail-closed (require client key).
+ * - /health stays open for uptime checks; /api/csl is public for Minecraft.
  */
 
 function parseList(raw, fallback) {
@@ -26,6 +27,16 @@ function requestHost(req) {
   return hostHeader;
 }
 
+/** Hosts that may call the API without X-Owyx-Client-Key (browser / site proxy). */
+function siteHosts() {
+  // `backend` = Docker Compose service name used by Next rewrites / SSR.
+  const fallback =
+    process.env.NODE_ENV === 'production'
+      ? 'owyx.site,www.owyx.site,backend'
+      : 'owyx.site,www.owyx.site,localhost,127.0.0.1,backend';
+  return parseList(process.env.SITE_HOSTS, fallback);
+}
+
 function clientKeyGate(req, res, next) {
   const path = req.path || '';
   if (path === '/health' || path.startsWith('/health/')) {
@@ -36,14 +47,13 @@ function clientKeyGate(req, res, next) {
     return next();
   }
 
-  const apiHosts = parseList(process.env.API_HOSTS, 'api.owyx.site');
   const host = requestHost(req);
-  const onApiHost = apiHosts.some((h) => host === h);
-
-  if (!onApiHost) {
+  const onSiteHost = siteHosts().some((h) => host === h);
+  if (onSiteHost) {
     return next();
   }
 
+  // Fail-closed: api.* and any other/spoofed Host require the launcher key.
   const expected = (process.env.LAUNCHER_CLIENT_KEY || '').trim();
   if (!expected) {
     if (process.env.NODE_ENV === 'production') {
@@ -65,4 +75,4 @@ function clientKeyGate(req, res, next) {
   return next();
 }
 
-module.exports = { clientKeyGate, requestHost, parseList };
+module.exports = { clientKeyGate, requestHost, parseList, siteHosts };

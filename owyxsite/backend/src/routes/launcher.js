@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../database/connection');
 const { authenticateToken, optionalAuthenticate } = require('./auth');
 const catalog = require('./catalog');
+const { absoluteWebsiteAsset } = require('./csl-helpers');
 
 // Owyx launcher API.
 //
@@ -13,48 +14,6 @@ const catalog = require('./catalog');
 // are real rows from the site control-plane — not empty stubs.
 
 const LAUNCHER_API_VERSION = '1.3.0';
-
-/** Absolute base URL the launcher can use to download static assets (skins).
- *  Built from the request the launcher made (its own API base), so it works in
- *  dev (direct :3001) and behind a reverse proxy in prod (Host = public domain).
- *  Set API_PUBLIC_URL only to force a specific base. */
-function publicBase(req) {
-  const fromEnv = (process.env.API_PUBLIC_URL || '').trim();
-  if (fromEnv) return fromEnv.replace(/\/+$/, '');
-  return `${req.protocol}://${req.get('host')}`;
-}
-
-/** Website origin for browser-loadable assets (avatars/skins) — no client key. */
-function websiteBase() {
-  const fromEnv = (process.env.SITE_PUBLIC_URL || process.env.PUBLIC_SITE_URL || '').trim();
-  if (fromEnv) return fromEnv.replace(/\/+$/, '');
-  return 'https://owyx.site';
-}
-
-/** Turn a stored `/uploads/...` path into an absolute URL for the launcher. */
-function absoluteAsset(req, value) {
-  if (!value) return null;
-  if (/^https?:\/\//i.test(value)) return value;
-  return `${publicBase(req)}${value.startsWith('/') ? '' : '/'}${value}`;
-}
-
-/** Same as absoluteAsset but always on the public website host (img tags / no API key). */
-function absoluteWebsiteAsset(value) {
-  if (!value) return null;
-  if (/^https?:\/\//i.test(value)) {
-    // Rewrite api.* uploads to website so <img> works without X-Owyx-Client-Key.
-    try {
-      const u = new URL(value);
-      if (u.hostname === 'api.owyx.site' && u.pathname.startsWith('/uploads/')) {
-        return `${websiteBase()}${u.pathname}${u.search}`;
-      }
-    } catch {
-      /* keep */
-    }
-    return value;
-  }
-  return `${websiteBase()}${value.startsWith('/') ? '' : '/'}${value}`;
-}
 
 /** Build the launcher-facing view of a user row. */
 function buildMe(req, user) {
@@ -233,9 +192,9 @@ router.get('/v1/cosmetics', authenticateToken, async (req, res) => {
   try {
     const u = req.user;
     res.json({
-      skinUrl: absoluteAsset(req, u.skin_url),
+      skinUrl: absoluteWebsiteAsset(u.skin_url),
       skinModel: u.skin_model || 'classic',
-      capeUrl: absoluteAsset(req, u.cape_url),
+      capeUrl: absoluteWebsiteAsset(u.cape_url),
       updatedAt: u.cosmetics_updated_at || null,
     });
   } catch (error) {

@@ -31,7 +31,9 @@ function allowedAssetHosts() {
  */
 function isAllowedUploadPath(pathname) {
   return (
-    pathname.startsWith('/uploads/skins/') || pathname.startsWith('/uploads/capes/')
+    pathname.startsWith('/uploads/skins/') ||
+    pathname.startsWith('/uploads/capes/') ||
+    pathname.startsWith('/uploads/avatars/')
   );
 }
 

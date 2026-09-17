@@ -40,6 +40,7 @@ concurrency:
 
 jobs:
   deploy:
+    if: github.repository_owner == 'modrinth'
     runs-on: namespace-profile-modrinth-frontend
     permissions:
       contents: read

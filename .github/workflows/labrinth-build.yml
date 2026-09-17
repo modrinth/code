@@ -49,7 +49,10 @@ jobs:
           HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
           REPO: ${{ github.repository }}
         run: |
-          if [ "$EVENT_NAME" != "pull_request" ] || [ "$HEAD_REPO" = "$REPO" ]; then
+          # Namespace runners exist only on modrinth/code — forks always use ubuntu-latest.
+          if [ "${{ github.repository }}" != "modrinth/code" ]; then
+            echo "internal=false" >> $GITHUB_OUTPUT
+          elif [ "$EVENT_NAME" != "pull_request" ] || [ "$HEAD_REPO" = "$REPO" ]; then
             echo "internal=true" >> $GITHUB_OUTPUT
           else
             echo "internal=false" >> $GITHUB_OUTPUT

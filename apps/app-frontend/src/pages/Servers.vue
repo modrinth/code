@@ -16,8 +16,8 @@ const client = injectModrinthClient()
 useRootBreadcrumb({
 	slot: 'root',
 	id: 'servers',
-	label: 'Hosting',
-	to: '/hosting/manage/',
+	label: 'Owyx Servers',
+	to: '/owyx-servers',
 	visual: { type: 'icon', component: ServerStackIcon },
 })
 

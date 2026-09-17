@@ -79,6 +79,51 @@ export function isSafeExternalHttpsUrl(url: string | null | undefined): boolean 
 	}
 }
 
+const DEFAULT_OWYX_ASSET_HOSTS = new Set(['owyx.site', 'www.owyx.site', 'api.owyx.site'])
+
+/** Cosmetics / skin download hosts — Owyx uploads only (no arbitrary https). */
+export function isAllowedOwyxAssetUrl(url: string | null | undefined): boolean {
+	if (!url) return false
+	const trimmed = url.trim()
+	if (trimmed.startsWith('//')) return false
+	if (
+		trimmed.startsWith('/uploads/skins/') ||
+		trimmed.startsWith('/uploads/capes/') ||
+		trimmed.startsWith('/uploads/avatars/')
+	) {
+		return true
+	}
+	try {
+		const parsed = new URL(trimmed)
+		if (parsed.protocol !== 'https:') return false
+		const host = parsed.hostname.toLowerCase()
+		const allowed = new Set(DEFAULT_OWYX_ASSET_HOSTS)
+		try {
+			allowed.add(new URL(sanitizeOwyxApiBase(getStoredApiBase())).hostname.toLowerCase())
+		} catch {
+			/* ignore */
+		}
+		if (!allowed.has(host)) return false
+		const path = parsed.pathname
+		return (
+			path.startsWith('/uploads/skins/') ||
+			path.startsWith('/uploads/capes/') ||
+			path.startsWith('/uploads/avatars/')
+		)
+	} catch {
+		return false
+	}
+}
+
+function getStoredApiBase(): string {
+	try {
+		if (typeof localStorage === 'undefined') return DEFAULT_OWYX_API_BASE
+		return localStorage.getItem(STORAGE_API) || DEFAULT_OWYX_API_BASE
+	} catch {
+		return DEFAULT_OWYX_API_BASE
+	}
+}
+
 export function getStoredOwyxApiBase(): string {
 	try {
 		return sanitizeOwyxApiBase(localStorage.getItem(STORAGE_API))

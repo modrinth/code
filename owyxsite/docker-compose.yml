@@ -27,8 +27,9 @@ services:
       - ./postgres/migrations/006_news.sql:/docker-entrypoint-initdb.d/07_news.sql:ro
       - ./postgres/migrations/007_servers_packs.sql:/docker-entrypoint-initdb.d/08_servers_packs.sql:ro
       - ./postgres/migrations/008_nickname_max_16.sql:/docker-entrypoint-initdb.d/09_nickname_max_16.sql:ro
+      - ./postgres/migrations/009_nickname_varchar_16.sql:/docker-entrypoint-initdb.d/10_nickname_varchar_16.sql:ro
     ports:
-      - "${POSTGRES_BIND:-0.0.0.0}:${POSTGRES_PORT:-5432}:5432"
+      - "${POSTGRES_BIND:-127.0.0.1}:${POSTGRES_PORT:-5432}:5432"
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-owyx_user} -d ${DB_NAME:-owyx_db}"]
@@ -44,7 +45,7 @@ services:
       - ADMINER_DEFAULT_SERVER=postgres
       - ADMINER_DESIGN=dracula
     ports:
-      - "${ADMINER_BIND:-0.0.0.0}:${ADMINER_PORT:-8080}:8080"
+      - "${ADMINER_BIND:-127.0.0.1}:${ADMINER_PORT:-8080}:8080"
     depends_on:
       postgres:
         condition: service_healthy
@@ -138,7 +139,7 @@ services:
       - ./backend/uploads:/app/uploads
       - ./backend/fixtures:/app/fixtures:ro
     ports:
-      - "${API_BIND:-0.0.0.0}:${API_PORT:-3001}:3001"
+      - "${API_BIND:-127.0.0.1}:${API_PORT:-3001}:3001"
     depends_on:
       postgres:
         condition: service_healthy

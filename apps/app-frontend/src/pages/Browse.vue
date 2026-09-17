@@ -198,7 +198,7 @@ const serversBreadcrumbDefinition = {
 	slot: 'root',
 	id: 'servers',
 	label: () => formatMessage(commonMessages.serversLabel),
-	to: '/hosting/manage/',
+	to: '/owyx-servers',
 	visual: { type: 'icon', component: ServerStackIcon },
 } satisfies BreadcrumbDefinition
 const serverBreadcrumbTo = ref(serverBackUrl.value)

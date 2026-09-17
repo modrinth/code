@@ -7,7 +7,7 @@ import { homeDir, join } from '@tauri-apps/api/path'
 import { mkdir, writeFile } from '@tauri-apps/plugin-fs'
 import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 
-import { isSafeExternalHttpsUrl } from '@/helpers/owyx-api'
+import { isAllowedOwyxAssetUrl } from '@/helpers/owyx-api'
 
 function sanitizeNick(nick: string): string {
 	return nick.replace(/[^A-Za-z0-9_\-.]/g, '_').slice(0, 32) || 'player'
@@ -24,7 +24,7 @@ export async function syncOwyxCosmeticsToDisk(
 			? String(cosmetics.skin_url)
 			: null
 	if (!skinUrl) return
-	if (!isSafeExternalHttpsUrl(skinUrl) && !skinUrl.startsWith('https://')) return
+	if (!isAllowedOwyxAssetUrl(skinUrl)) return
 
 	let res: Response
 	try {

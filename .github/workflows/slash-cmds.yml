@@ -8,7 +8,7 @@ permissions: {}
 
 jobs:
   dispatch-command:
-    if: ${{ github.event.sender.type == 'User' && contains(fromJSON('["OWNER", "MEMBER"]'), github.event.comment.author_association) }}
+    if: ${{ github.repository_owner == 'modrinth' && github.event.sender.type == 'User' && contains(fromJSON('["OWNER", "MEMBER"]'), github.event.comment.author_association) }}
     runs-on: namespace-profile-tiny-arm64
     steps:
       - name: Slash Command Dispatch
