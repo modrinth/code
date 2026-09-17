@@ -130,7 +130,7 @@
 
 <script setup lang="ts">
 import { Button, defineMessages, useVIntl } from '@modrinth/ui'
-import { computed, onMounted, ref } from 'vue'
+import { computed, inject, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { CUSTOM_SKIN_LOADER_MODRINTH } from '@/helpers/owyx-csl'
@@ -139,16 +139,19 @@ import {
 	listOwyxFriends,
 	patchOwyxSocialSettings,
 } from '@/helpers/owyx-friends'
+import { owyxPresenceStatus } from '@/helpers/owyx-presence'
 import {
 	getOwyxUiSoundsEnabled,
 	playOwyxUiSound,
 	setOwyxUiSoundsEnabled,
 } from '@/helpers/owyx-ui-sound'
+import { appSettingsModalContextKey } from '@/providers/app-settings-modal'
 import { injectOwyxSiteSession } from '@/providers/owyx-site-session'
 
 const { formatMessage } = useVIntl()
 const router = useRouter()
 const owyx = injectOwyxSiteSession()
+const settingsModal = inject(appSettingsModalContextKey, null)
 const allowRequests = ref(true)
 const saving = ref(false)
 const saveError = ref('')
@@ -157,7 +160,10 @@ const savedFlash = ref(false)
 const uiSounds = ref(getOwyxUiSoundsEnabled())
 const stats = ref({ friends: 0, online: 0, pending: 0 })
 
-const presenceLive = computed(() => owyx.isSignedIn.value)
+const presenceLive = computed(() => {
+	const status = owyxPresenceStatus.value
+	return status === 'online' || status === 'playing'
+})
 
 function onUiSoundsChange() {
 	setOwyxUiSoundsEnabled(uiSounds.value)
@@ -165,8 +171,8 @@ function onUiSoundsChange() {
 }
 
 function openFriends() {
+	settingsModal?.close()
 	void router.push('/')
-	// Friends rail is on home; emit is not available — navigate home is enough.
 }
 
 async function loadSettings() {
@@ -179,7 +185,7 @@ async function loadSettings() {
 		stats.value = {
 			friends: accepted.length,
 			online: accepted.filter((f) => f.presence === 'online' || f.presence === 'playing').length,
-			pending: friends.filter((f) => f.status === 'pending').length,
+			pending: friends.filter((f) => f.status === 'pending' && f.incoming).length,
 		}
 	} catch (e) {
 		loadError.value = e instanceof Error ? e.message : String(e)
@@ -245,7 +251,7 @@ const messages = defineMessages({
 	},
 	statPending: {
 		id: 'owyx.settings.social.stat-pending',
-		defaultMessage: 'Pending',
+		defaultMessage: 'Incoming',
 	},
 	allowRequests: {
 		id: 'owyx.settings.social.allow-requests',

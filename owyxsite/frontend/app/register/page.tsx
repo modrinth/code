@@ -216,7 +216,6 @@ export default function RegisterPage() {
             className="input"
             placeholder={a.passwordDots}
             value={confirm}
-            value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
           />
         </div>

@@ -2,11 +2,27 @@
  * Owyx friends presence heartbeat for the launcher sidebar.
  */
 
+import { readonly, shallowRef } from 'vue'
+
 import { type OwyxFriendPresence, postOwyxPresence } from '@/helpers/owyx-friends'
 
 let heartbeatTimer: ReturnType<typeof setInterval> | null = null
 let current: { status: OwyxFriendPresence; instanceName?: string | null } = {
 	status: 'offline',
+}
+
+/** Live presence for UI (signed-in ≠ heartbeat running). */
+const presenceStatus = shallowRef<OwyxFriendPresence>('offline')
+
+export const owyxPresenceStatus = readonly(presenceStatus)
+
+export function getOwyxPresenceStatus(): OwyxFriendPresence {
+	return presenceStatus.value
+}
+
+function setCurrent(next: { status: OwyxFriendPresence; instanceName?: string | null }) {
+	current = next
+	presenceStatus.value = next.status
 }
 
 async function push() {
@@ -19,7 +35,7 @@ async function push() {
 
 export function startOwyxPresenceHeartbeat() {
 	stopOwyxPresenceHeartbeat()
-	current = { status: 'online', instanceName: null }
+	setCurrent({ status: 'online', instanceName: null })
 	void push()
 	heartbeatTimer = setInterval(() => {
 		void push()
@@ -32,17 +48,17 @@ export function stopOwyxPresenceHeartbeat() {
 		heartbeatTimer = null
 	}
 	if (current.status !== 'offline') {
-		current = { status: 'offline', instanceName: null }
+		setCurrent({ status: 'offline', instanceName: null })
 		void push()
 	}
 }
 
 export function setOwyxPresencePlaying(instanceName: string) {
-	current = { status: 'playing', instanceName: instanceName.slice(0, 120) }
+	setCurrent({ status: 'playing', instanceName: instanceName.slice(0, 120) })
 	void push()
 }
 
 export function setOwyxPresenceOnline() {
-	current = { status: 'online', instanceName: null }
+	setCurrent({ status: 'online', instanceName: null })
 	void push()
 }
