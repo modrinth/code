@@ -6,6 +6,7 @@ use unicode_normalization::UnicodeNormalization;
 use unicode_segmentation::UnicodeSegmentation;
 
 const MIN_ENGLISH_TO_BEST_RATIO: f64 = 0.5;
+const MIN_SUMMARY_TRANSLATION_ENGLISH_TO_BEST_RATIO: f64 = 0.1;
 const MIN_DESCRIPTION_CONFIDENCE: f64 = 0.35;
 const MIN_DESCRIPTION_MARGIN: f64 = 0.15;
 const MIN_NON_ENGLISH_CONFIDENCE: f64 = 0.8;
@@ -18,6 +19,8 @@ const MIN_SHORT_TEXT_MARGIN: f64 = 0.5;
 const MIN_DESCRIPTION_ENGLISH_PROPORTION: f64 = 0.2;
 const MIN_PASSAGE_WORDS: usize = 4;
 const MIN_PASSAGE_CHARS: usize = 25;
+const MIN_SUMMARY_TRANSLATION_WORDS: usize = 4;
+const MIN_SUMMARY_TRANSLATION_CHARS: usize = 18;
 
 static DETECTOR: LazyLock<LanguageDetector> =
     LazyLock::new(|| LanguageDetectorBuilder::from_all_languages().build());
@@ -195,13 +198,15 @@ fn has_lowercase_prose(text: &str) -> bool {
 }
 
 fn summary_translation_passage(text: &str) -> Passage {
-    let mut passage = description_passage(text);
-    if passage.qualifies_as_english
-        && passage.english_grammatical_words < MIN_ENGLISH_GRAMMATICAL_WORDS
-    {
-        passage.qualifies_as_english = false;
-    }
-    passage
+	let eligible = alphabetic_word_count(text) >= MIN_SUMMARY_TRANSLATION_WORDS
+		&& text.trim().graphemes(true).count() >= MIN_SUMMARY_TRANSLATION_CHARS;
+	classify_passage(
+		text.to_owned(),
+		eligible,
+		MIN_SUMMARY_TRANSLATION_ENGLISH_TO_BEST_RATIO,
+		&DETECTOR,
+		eligible,
+	)
 }
 
 /// Bound detector input without overlapping or splitting words.
@@ -341,11 +346,7 @@ fn summary_rescue_passages(text: &str) -> Vec<Passage> {
             let normalized =
                 text.split_whitespace().collect::<Vec<_>>().join(" ");
             let whole = summary_translation_passage(&normalized);
-            if whole.qualifies_as_english
-                || !whole.eligible
-                || whole.english_grammatical_words
-                    < MIN_ENGLISH_GRAMMATICAL_WORDS
-            {
+			if whole.qualifies_as_english || !whole.eligible {
                 return vec![whole];
             }
             let spans = mixed_language_passages(&normalized, &DETECTOR);
