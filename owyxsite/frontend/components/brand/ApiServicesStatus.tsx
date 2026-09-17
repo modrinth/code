@@ -21,7 +21,7 @@ export default function ApiServicesStatus() {
   const { locale } = useLocale();
   const [rows, setRows] = useState<Row[]>([
     { id: "api", label: "API", ok: null },
-    { id: "db", label: locale === "ru" ? "База" : "Database", ok: null },
+    { id: "db", label: locale === "ru_RU" ? "База" : "Database", ok: null },
   ]);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export default function ApiServicesStatus() {
           { id: "api", label: "API", ok: Boolean(apiOk) },
           {
             id: "db",
-            label: locale === "ru" ? "База" : "Database",
+            label: locale === "ru_RU" ? "База" : "Database",
             ok: Boolean(dbOk),
           },
         ]);
@@ -61,7 +61,7 @@ export default function ApiServicesStatus() {
     };
   }, [locale]);
 
-  const title = locale === "ru" ? "Сервисы Owyx" : "Owyx services";
+  const title = locale === "ru_RU" ? "Сервисы Owyx" : "Owyx services";
 
   return (
     <div
@@ -89,10 +89,10 @@ export default function ApiServicesStatus() {
             {row.ok === null
               ? "…"
               : row.ok
-                ? locale === "ru"
+                ? locale === "ru_RU"
                   ? "ок"
                   : "ok"
-                : locale === "ru"
+                : locale === "ru_RU"
                   ? "нет"
                   : "down"}
           </span>

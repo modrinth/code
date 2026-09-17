@@ -98,9 +98,9 @@ export default function DownloadPage() {
     { n: "3", title: d.step3Title, text: d.step3Text },
   ];
 
-  const windowsLabel = locale === "ru" ? "Windows" : "Windows";
+  const windowsLabel = "Windows";
   const linuxLabel = "Linux";
-  const releasesLabel = locale === "ru" ? "Все релизы на GitHub" : "All releases on GitHub";
+  const releasesLabel = locale === "ru_RU" ? "Все релизы на GitHub" : "All releases on GitHub";
 
   return (
     <>
