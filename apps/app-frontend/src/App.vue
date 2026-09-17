@@ -3,10 +3,10 @@ import {
 	AuthFeature,
 	ModrinthApiError,
 	NodeAuthFeature,
+	nodeAuthState,
 	PanelVersionFeature,
 	TauriModrinthClient,
 	VerboseLoggingFeature,
-	nodeAuthState,
 } from '@modrinth/api-client'
 import {
 	ChevronLeftIcon,
