@@ -1,11 +1,11 @@
 <template>
 	<div
-		class="h-full w-full pt-6"
-		:class="isContainedServerRoute ? 'box-border min-h-0 overflow-hidden' : ''"
+		class="w-full pt-6"
+		:class="isOverviewRoute ? 'flex min-h-full flex-col' : 'h-full'"
 	>
 		<ServersManageRootLayout
 			:server-id="serverId"
-			:layout-mode="isContainedServerRoute ? 'contained' : 'page'"
+			:layout-mode="isOverviewRoute ? 'fill' : 'page'"
 			:reload-page="() => router.go(0)"
 			:resolve-viewer="resolveViewer"
 			:show-copy-id-action="appSettings.devMode"
@@ -74,7 +74,7 @@ const queryClient = useQueryClient()
 const appSettings = useAppSettings()
 const { formatMessage } = useVIntl()
 
-const isContainedServerRoute = computed(() => route.name === 'ServerManageOverview')
+const isOverviewRoute = computed(() => route.name === 'ServerManageOverview')
 
 const serverId = computed(() => {
 	const rawId = route.params.id

@@ -15,6 +15,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Archon } from '@modrinth/api-client'
 import { DownloadIcon } from '@modrinth/assets'
 import { ContentDiffModal, type ContentDiffItem, getHostingServerAddress, defineMessages, injectAuth, injectModrinthClient, injectNotificationManager, type ServerPlayTarget, useVIntl } from '@modrinth/ui'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
@@ -24,20 +25,24 @@ import { useRouter } from 'vue-router'
 import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
 import SharedInstanceInstallModal from '@/components/ui/shared-instances/shared-instance-install-modal/index.vue'
 import { hostingInstanceMetadata, useHostingInstanceCache } from '@/composables/instances/use-hosting-instance'
+import { useInstanceLaunchState } from '@/composables/instances/use-instance-launch-state'
 import { toError } from '@/helpers/errors'
 import { install_job_list, install_get_shared_instance_preview, install_get_shared_instance_update_preview, install_shared_instance, install_update_shared_instance, installJobInstanceId, wait_for_install_job } from '@/helpers/install'
 import { get, list } from '@/helpers/instance'
 import { get as getCredentials, type ModrinthAuthFlow } from '@/helpers/mr_auth'
+import { get_by_instance_id } from '@/helpers/process'
 import { ensureManagedServerWorldExists, start_join_server } from '@/helpers/worlds'
+import { instanceKeys } from '@/pages/instance/query-options'
 import { injectAppEvents } from '@/providers/app-events'
 
-type LaunchTarget = ServerPlayTarget & { sharedInstanceId: string; name: string; address: string; userId: string; icon: string | null }
+type LaunchTarget = ServerPlayTarget & { sharedInstanceId: string; name: string; userId: string; icon: string | null }
 const auth = injectAuth()
 const client = injectModrinthClient()
 const appEvents = injectAppEvents()
 const queryClient = useQueryClient()
 const router = useRouter()
 const hostingInstances = useHostingInstanceCache()
+const instanceLaunch = useInstanceLaunchState()
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const accountModal = ref<InstanceType<typeof ModrinthAccountRequiredModal>>()
@@ -61,23 +66,35 @@ async function findInstance(target: LaunchTarget) {
 	}
 	return instance
 }
+async function openAndLaunch(instanceId: string, launch: () => Promise<void>) {
+	await instanceLaunch.run(instanceId, async () => {
+		await router.push(`/instance/${encodeURIComponent(instanceId)}`)
+		const processes = await get_by_instance_id(instanceId)
+		queryClient.setQueryData(instanceKeys.processes(instanceId), Array.isArray(processes) ? processes : [])
+		if (Array.isArray(processes) && processes.length) return
+		await launch()
+	})
+}
 async function join(target: LaunchTarget, instanceId: string) {
 	await assertAccount(target)
-	const server = await client.archon.servers_v1.get(target.serverId)
+	const [server, legacy] = await Promise.all([
+		client.archon.servers_v1.get(target.serverId),
+		client.archon.servers_v0.get(target.serverId),
+	])
 	if (!server.worlds.some((world) => world.id === target.worldId && world.is_active && world.content?.shared_instance_id === target.sharedInstanceId)) {
 		throw new Error(formatMessage(messages.worldChanged))
 	}
 	await assertAccount(target)
 	const instance = await get(instanceId)
 	if (!instance || instance.quarantined || instance.install_stage !== 'installed') throw new Error(formatMessage(messages.notReady))
-	const legacy = await client.archon.servers_v0.get(target.serverId)
 	const address = getHostingServerAddress(legacy.net, server.subdomain)
 	if (!address) throw new Error(formatMessage(messages.noAddress))
 	await assertAccount(target)
 	await ensureManagedServerWorldExists(instanceId, target.name, address)
 	hostingInstances.value[instanceId] = hostingInstanceMetadata(server, target.worldId, target.sharedInstanceId, address)
-	await router.push(`/instance/${encodeURIComponent(instanceId)}`)
+	await assertAccount(target)
 	await start_join_server(instanceId, address)
+	queryClient.setQueryData(instanceKeys.processes(instanceId), [true])
 }
 const launchMutation = useMutation({
 	mutationFn: async ({ target, instanceId }: { target: LaunchTarget; instanceId?: string }) => {
@@ -86,17 +103,19 @@ const launchMutation = useMutation({
 		if (instanceId && existing?.id !== instanceId) throw new Error(formatMessage(messages.notReady))
 		if (existing) {
 			if (existing.quarantined || existing.install_stage !== 'installed') throw new Error(formatMessage(messages.notReady))
-			const update = await install_get_shared_instance_update_preview(existing.id)
-			await assertAccount(target)
-			if (update?.updateAvailable) {
-				if (!instanceId) {
-					showUpdate(target, existing.id, update)
-					return
+			await openAndLaunch(existing.id, async () => {
+				const update = await install_get_shared_instance_update_preview(existing.id)
+				await assertAccount(target)
+				if (update?.updateAvailable) {
+					if (!instanceId) {
+						showUpdate(target, existing.id, update)
+						return
+					}
+					const job = await install_update_shared_instance(existing.id)
+					await wait_for_install_job(appEvents, job.job_id)
 				}
-				const job = await install_update_shared_instance(existing.id)
-				await wait_for_install_job(appEvents, job.job_id)
-			}
-			await join(target, existing.id)
+				await join(target, existing.id)
+			})
 		} else {
 			await assertAccount(target)
 			const job = await install_shared_instance(target.sharedInstanceId, target.name, null, target.name, target.icon, target.icon)
@@ -104,7 +123,7 @@ const launchMutation = useMutation({
 			if (!installedId) throw new Error(formatMessage(messages.notReady))
 			await queryClient.invalidateQueries({ queryKey: ['instances'] })
 			await wait_for_install_job(appEvents, job.job_id)
-			await join(target, installedId)
+			await openAndLaunch(installedId, () => join(target, installedId))
 		}
 	},
 	onError: (error) => handleError(toError(error)),
@@ -135,23 +154,26 @@ const prepareMutation = useMutation({
 		if (!auth.session_token.value && !(await accountModal.value?.show())) return
 		const credentials = await getCredentials()
 		if (!credentials) return
-		const [server, legacy] = await Promise.all([client.archon.servers_v1.get(serverId), client.archon.servers_v0.get(serverId)])
+		const server = queryClient.getQueryData<Archon.Servers.v1.ServerFull>(['servers', 'v1', 'detail', serverId])
+			?? await client.archon.servers_v1.get(serverId)
 		const world = server.worlds.find((world) => world.id === worldId && world.is_active)
 		const sharedInstanceId = world?.content?.shared_instance_id
 		if (!sharedInstanceId) throw new Error(formatMessage(messages.worldChanged))
-		const remote = await client.sharedinstances.instances_v1.get(sharedInstanceId)
-		const address = getHostingServerAddress(legacy.net, server.subdomain)
-		if (!address) throw new Error(formatMessage(messages.noAddress))
-		const target: LaunchTarget = { serverId, worldId, sharedInstanceId, name: remote.name, address, userId: credentials.user_id, icon: remote.icon }
+		const target: LaunchTarget = { serverId, worldId, sharedInstanceId, name: server.name, userId: credentials.user_id, icon: null }
 		await assertAccount(target)
 		const existing = await findInstance(target)
 		if (existing) {
 			if (existing.quarantined || existing.install_stage !== 'installed') throw new Error(formatMessage(messages.notReady))
-			const preview = await install_get_shared_instance_update_preview(existing.id)
-			await assertAccount(target)
-			if (preview?.updateAvailable) showUpdate(target, existing.id, preview)
-			else await join(target, existing.id)
+			await openAndLaunch(existing.id, async () => {
+				const preview = await install_get_shared_instance_update_preview(existing.id)
+				await assertAccount(target)
+				if (preview?.updateAvailable) showUpdate(target, existing.id, preview)
+				else await join(target, existing.id)
+			})
 		} else {
+			const remote = await client.sharedinstances.instances_v1.get(sharedInstanceId)
+			target.name = remote.name
+			target.icon = remote.icon
 			const preview = await install_get_shared_instance_preview(sharedInstanceId, target.name)
 			await assertAccount(target)
 			if (remote.icon) preview.iconUrl = remote.icon

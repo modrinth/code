@@ -9,6 +9,7 @@ use super::runner::{
 };
 use crate::api::instance::{
     CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS,
+	CONFIG_FILE_TYPE, MAX_CONFIG_BUNDLE_FILE_SIZE,
     CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES,
     read_bounded_config_bundle_entry,
 };
@@ -56,6 +57,15 @@ pub(super) async fn finalize_shared_instance_attachment(
     data: &SharedInstanceInstallData,
     state: &State,
 ) -> crate::Result<()> {
+	if let Some(server) = &data.linked_server {
+		crate::api::worlds::ensure_managed_server_in_instance(
+			instance_id,
+			data.server_manager_name.clone()
+				.unwrap_or_else(|| data.name.clone()),
+			server.domain.clone(),
+		)
+		.await?;
+	}
     crate::state::attach_shared_instance(
         instance_id,
         SharedInstanceAttachmentInput {
@@ -117,6 +127,7 @@ struct DesiredSharedInstanceContent {
         DesiredSharedInstanceExternalFile,
     >,
     config_bundle: Option<SharedInstanceExternalFileData>,
+	config_files: Vec<SharedInstanceExternalFileData>,
 }
 
 struct SharedInstanceProjectUpdate {
@@ -134,6 +145,7 @@ struct SharedInstanceApplyPlan {
     external_updates: Vec<DesiredSharedInstanceExternalFile>,
     external_additions: Vec<DesiredSharedInstanceExternalFile>,
     config_bundle: Option<SharedInstanceExternalFileData>,
+	config_files: Vec<SharedInstanceExternalFileData>,
 }
 
 impl SharedInstanceApplyPlan {
@@ -169,6 +181,7 @@ impl SharedInstanceApplyPlan {
             project_removals,
             external_removals,
             config_bundle: desired.config_bundle,
+			config_files: desired.config_files,
             ..Default::default()
         };
 
@@ -203,7 +216,8 @@ impl SharedInstanceApplyPlan {
             + self.project_additions.len()
             + self.external_updates.len()
             + self.external_additions.len()
-            + usize::from(self.config_bundle.is_some())) as u64
+            + usize::from(self.config_bundle.is_some())
+			+ self.config_files.len()) as u64
     }
 }
 
@@ -367,10 +381,10 @@ pub(super) async fn apply_shared_instance_update(
         .await?;
     }
 
-    if let Some(config_bundle) = plan.config_bundle {
+    for config_file in plan.config_bundle.into_iter().chain(plan.config_files) {
         install_shared_instance_external_file(
             instance_id,
-            &config_bundle,
+            &config_file,
             state,
         )
         .await?;
@@ -518,6 +532,12 @@ async fn desired_shared_instance_content(
     }
 
     for file in &data.external_files {
+		if file.file_type == CONFIG_FILE_TYPE {
+			if CONFIG_SYNC_ENABLED {
+				content.config_files.push(file.clone());
+			}
+			continue;
+		}
         if file.file_type == CONFIG_BUNDLE_FILE_TYPE {
             if CONFIG_SYNC_ENABLED {
                 content.config_bundle = Some(file.clone());
@@ -788,11 +808,27 @@ async fn install_shared_instance_external_file(
     file: &SharedInstanceExternalFileData,
     state: &State,
 ) -> crate::Result<()> {
-    if file.file_type == CONFIG_BUNDLE_FILE_TYPE && !CONFIG_SYNC_ENABLED {
+	if matches!(
+		file.file_type.as_str(),
+		CONFIG_BUNDLE_FILE_TYPE | CONFIG_FILE_TYPE
+	) && !CONFIG_SYNC_ENABLED {
         return Ok(());
     }
 
-    validate_shared_instance_external_file_name(&file.file_name)?;
+	if file.file_type == CONFIG_FILE_TYPE {
+		crate::state::content_store::validate_relative(&file.file_name)?;
+		if file.file_name.split('/').any(|part| part.starts_with('.'))
+			|| !is_supported_config_file(std::path::Path::new(&file.file_name))
+			|| file.file_size > MAX_CONFIG_BUNDLE_FILE_SIZE
+		{
+			return Err(crate::ErrorKind::InputError(format!(
+				"Shared instance config file {} is unsupported or too large",
+				file.file_name
+			)).into());
+		}
+	} else {
+		validate_shared_instance_external_file_name(&file.file_name)?;
+	}
 
     if file.file_size > MAX_SHARED_INSTANCE_EXTERNAL_FILE_SIZE {
         return Err(crate::ErrorKind::InputError(format!(
@@ -862,6 +898,18 @@ async fn install_shared_instance_external_file(
         .into());
     }
     let bytes = bytes::Bytes::from(bytes);
+
+	if file.file_type == CONFIG_FILE_TYPE {
+		let path = crate::api::instance::validate_instance_file_write(
+			instance_id,
+			&file.file_name,
+		).await?;
+		if let Some(parent) = path.parent() {
+			crate::util::io::create_dir_all(parent).await?;
+		}
+		crate::util::io::write(path, bytes).await?;
+		return Ok(());
+	}
 
     if file.file_type == CONFIG_BUNDLE_FILE_TYPE {
         return install_shared_instance_config_bundle(

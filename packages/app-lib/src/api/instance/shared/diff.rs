@@ -32,7 +32,7 @@ pub(super) async fn shared_instance_update_diffs(
         configuration: after_configuration,
     };
 
-    shared_content_diffs(
+    let mut diffs = shared_content_diffs(
         &before,
         &after,
         &HashSet::new(),
@@ -40,7 +40,24 @@ pub(super) async fn shared_instance_update_diffs(
         CommonExternalFilePolicy::AssumeUpdated,
         state,
     )
-    .await
+    .await?;
+	let config_file_count = version.external_files
+		.iter()
+		.filter(|file| file.file_type == CONFIG_FILE_TYPE)
+		.count();
+	if config_file_count > 0 {
+		diffs.push(SharedInstanceUpdateDiff {
+			type_: SharedInstanceUpdateDiffType::ConfigFilesUpdated,
+			project_id: None,
+			project_name: None,
+			file_name: None,
+			current_version_name: None,
+			new_version_name: None,
+			config_file_count: Some(config_file_count),
+			disabled: false,
+		});
+	}
+	Ok(diffs)
 }
 
 pub(super) async fn shared_instance_publish_diffs(
@@ -456,7 +473,7 @@ fn remote_shared_content(
     let external_files = version
         .external_files
         .iter()
-        .filter(|file| file.file_type != CONFIG_BUNDLE_FILE_TYPE)
+        .filter(|file| !matches!(file.file_type.as_str(), CONFIG_BUNDLE_FILE_TYPE | CONFIG_FILE_TYPE))
         .map(|file| shared_external_file_key(&file.file_type, &file.file_name))
         .collect::<crate::Result<_>>()?;
     Ok((version_ids, external_files))

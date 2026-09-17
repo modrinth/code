@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-6">
+	<div class="relative flex flex-col gap-6">
 		<ServerPlayCard
 			:address="serverAddress"
 			:disabled="actionsLocked || !worldId || (!canSetup && !sharedInstanceId)"
@@ -14,8 +14,24 @@
 			<Admonition v-if="players.members.isError.value" type="critical" :header="formatMessage(messages.playersError)">
 				<Button @click="players.members.refetch()">{{ formatMessage(messages.retry) }}</Button>
 			</Admonition>
-			<ServerPlayersTable :rows="players.rows.value" :can-manage="canSetup" :disabled="players.membershipMutation.isPending.value || actionsLocked" @remove="confirmRemove" @open-actions="confirmRemove" />
+			<InvitedPlayersTableLayout :rows="players.rows.value" :can-manage="canSetup" :disabled="players.membershipMutation.isPending.value || actionsLocked" @remove="confirmRemove">
+				<template #toolbar-actions>
+					<Button
+						v-if="canSetup && sharedInstanceId"
+						type="outlined"
+						size="lg"
+						class="shrink-0 !border"
+						:disabled="actionsLocked || !worldId"
+						@click="showPreview()"
+					>
+						<SpinnerIcon v-if="previewQuery.isFetching.value || pendingAction === 'push'" class="animate-spin" aria-hidden="true" />
+						<UploadIcon v-else aria-hidden="true" />
+						{{ formatMessage(messages.pushUpdate) }}
+					</Button>
+				</template>
+			</InvitedPlayersTableLayout>
 		</section>
+		<span ref="pageBottom" class="pointer-events-none absolute bottom-0 h-px w-px" aria-hidden="true" />
 		<InvitePlayersModal
 			ref="invitePlayersModal"
 			:header="formatMessage(messages.inviteHeader, { name: server.name })"
@@ -46,6 +62,7 @@
 			@cancel="previewOpen = false"
 		>
 			<template #additional-content>
+				<ServerConfigFilePicker v-if="previewOpen && worldId" :key="worldId" ref="configPicker" :server-id="serverId" :world-id="worldId" :disabled="actionsLocked" />
 				<p v-if="previewQuery.isFetching.value" class="m-0 flex items-center gap-2"><SpinnerIcon class="animate-spin" />{{ formatMessage(messages.refreshingPreview) }}</p>
 				<Admonition v-else-if="previewQuery.isError.value" type="critical" :header="formatMessage(messages.previewError)">
 					<Button @click="previewQuery.refetch()">{{ formatMessage(messages.retry) }}</Button>
@@ -60,20 +77,22 @@
 import type { Archon } from '@modrinth/api-client'
 import { SpinnerIcon, UploadIcon } from '@modrinth/assets'
 import { useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { useStorage } from '@vueuse/core'
-import { computed, nextTick, ref, watch } from 'vue'
+import { useIntersectionObserver, useStorage } from '@vueuse/core'
+import { computed, nextTick, onScopeDispose, ref, watch } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import { Button } from '#ui/components/base/buttons'
 import ConfirmModal from '#ui/components/modal/ConfirmModal.vue'
+import ServerConfigFilePicker from '#ui/components/servers/ServerConfigFilePicker.vue'
 import { type InviteLinkSettings, type InvitePlayersInvitePayload, InvitePlayersModal, type InvitePlayersUser } from '#ui/components/sharing'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import ContentDiffModal from '#ui/layouts/shared/installation-settings/components/ContentDiffModal.vue'
+import InvitedPlayersTableLayout from '#ui/layouts/shared/invited-players/layout.vue'
 import { getHostingServerAddress, injectAuth, injectModrinthClient, injectModrinthServerContext, injectNotificationManager, type ServerPlayTarget } from '#ui/providers'
+import { injectPageContext } from '#ui/providers/page-context'
 
 import ServerPlayCard from './ServerPlayCard.vue'
-import ServerPlayersTable from './ServerPlayersTable.vue'
 import { resolveServerShareDiff } from './share-diff'
 import type { ServerPlayerRow } from './types'
 import { useServerPlayers } from './use-server-players'
@@ -85,6 +104,15 @@ const props = defineProps<{
 	siteUrl: string
 }>()
 const { formatMessage } = useVIntl()
+const pageContext = injectPageContext(null)
+const pageBottom = ref<HTMLElement | null>(null)
+const intercomHiddenRequestId = Symbol('server-play-bottom')
+useIntersectionObserver(pageBottom, ([entry]) => {
+	pageContext?.intercomBubble?.requestHidden?.(intercomHiddenRequestId, entry?.isIntersecting ?? false)
+})
+onScopeDispose(() => {
+	pageContext?.intercomBubble?.requestHidden?.(intercomHiddenRequestId, false)
+})
 const { handleError } = injectNotificationManager()
 const client = injectModrinthClient()
 const auth = injectAuth()
@@ -97,6 +125,8 @@ const needsUpdate = computed(() => world.value?.content?.shared_instance_needs_u
 const players = useServerPlayers(sharedInstanceId, canSetup)
 const invitePlayersModal = ref<InstanceType<typeof InvitePlayersModal>>()
 const diffModal = ref<InstanceType<typeof ContentDiffModal>>()
+const configPicker = ref<InstanceType<typeof ServerConfigFilePicker>>()
+const resolvingConfigs = ref(false)
 const removeModal = ref<InstanceType<typeof ConfirmModal>>()
 const playerToRemove = ref<ServerPlayerRow>()
 const previewOpen = ref(false)
@@ -116,13 +146,13 @@ const previewQuery = useQuery({
 })
 const actionMutation = useMutation({
 	mutationKey: ['servers', 'share-action', serverId],
-	mutationFn: async ({ action, targetWorldId, userId }: { action: Action; targetWorldId: string; userId: string | undefined }) => {
+	mutationFn: async ({ action, targetWorldId, userId, configPaths }: { action: Action; targetWorldId: string; userId: string | undefined; configPaths: string[] }) => {
 		if (busyReasons.value.length) throw new Error(formatMessage(messages.busy))
 		if (auth.user.value?.id !== userId) return
 		const sameContext = () => worldId.value === targetWorldId && auth.user.value?.id === userId
 		let id = serverFull.value?.worlds.find((world) => world.id === targetWorldId)?.content?.shared_instance_id
-		if (canSetup.value) {
-			const shared = await client.archon.content_v1.share(serverId, targetWorldId)
+		if (canSetup.value && (action !== 'play' || !id || needsUpdate.value || configPaths.length > 0)) {
+			const shared = await client.archon.content_v1.share(serverId, targetWorldId, configPaths)
 			id = shared.shared_instance_id
 			queryClient.setQueryData<Archon.Servers.v1.ServerFull>(['servers', 'v1', 'detail', serverId], (current) => current ? {
 				...current,
@@ -130,7 +160,9 @@ const actionMutation = useMutation({
 					...world, content: { ...world.content, shared_instance_id: shared.shared_instance_id },
 				} : world),
 			} : current)
-			await queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] })
+			const refresh = queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] })
+			if (action === 'play') void refresh
+			else await refresh
 		} else if (action === 'invite' || action === 'push') {
 			throw new Error(formatMessage(messages.permission))
 		}
@@ -158,15 +190,27 @@ const actionMutation = useMutation({
 })
 const pendingAction = computed(() => actionMutation.isPending.value ? actionMutation.variables.value?.action : undefined)
 const shareActions = useIsMutating({ mutationKey: ['servers', 'share-action', serverId] })
-const actionsLocked = computed(() => shareActions.value > 0 || previewQuery.isFetching.value || players.linkMutation.isPending.value || busyReasons.value.length > 0)
-function perform(action: Action, reviewed = false) {
+const actionsLocked = computed(() => resolvingConfigs.value || shareActions.value > 0 || previewQuery.isFetching.value || players.linkMutation.isPending.value || busyReasons.value.length > 0)
+async function perform(action: Action, reviewed = false) {
 	if (!worldId.value || actionsLocked.value) return
 	if (action === 'play' && !reviewed && canSetup.value && needsUpdate.value && preferences.value.reviewChangesBeforePlaying) {
 		void showPreview(true)
 		return
 	}
-	previewOpen.value = false
-	actionMutation.mutate({ action, targetWorldId: worldId.value, userId: auth.user.value?.id })
+	const targetWorldId = worldId.value
+	const userId = auth.user.value?.id
+	resolvingConfigs.value = true
+	try {
+		const configPaths = reviewed ? await configPicker.value?.resolvePaths() ?? [] : []
+		if (worldId.value !== targetWorldId || auth.user.value?.id !== userId || (reviewed && !previewOpen.value)) return
+		previewOpen.value = false
+		actionMutation.mutate({ action, targetWorldId, userId, configPaths })
+	} catch (error) {
+		handleError(error)
+		if (previewOpen.value && worldId.value === targetWorldId && auth.user.value?.id === userId) diffModal.value?.show()
+	} finally {
+		resolvingConfigs.value = false
+	}
 }
 async function showPreview(playAfter = false) {
 	if (actionsLocked.value) return
