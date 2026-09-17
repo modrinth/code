@@ -82,7 +82,18 @@ export default function NewsSection() {
       </div>
 
       {news === null ? (
-        <p className="text-muted text-sm py-8">{dict.home.loading}</p>
+        <div className="divide-y divide-line border-y border-line" aria-busy="true" aria-label={dict.home.loading}>
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="py-5 flex flex-col gap-3 sm:flex-row sm:gap-6">
+              <span className="skeleton-line w-20 h-5 sm:w-28" />
+              <div className="flex-1 space-y-2.5 min-w-0">
+                <span className="skeleton-line w-3/5 max-w-xs h-4" />
+                <span className="skeleton-line w-full max-w-xl h-3.5" />
+                <span className="skeleton-line w-4/5 max-w-md h-3.5" />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : news.length === 0 ? (
         <div className="empty-surface">
           <h3>{dict.home.newsEmptyTitle}</h3>

@@ -76,10 +76,11 @@ body {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(980px 640px at 14% -12%, rgba(0, 229, 255, 0.13), transparent 58%),
-    radial-gradient(640px 420px at 94% 4%, rgba(0, 229, 255, 0.05), transparent 62%),
-    radial-gradient(1100px 700px at 50% 118%, rgba(0, 229, 255, 0.06), transparent 58%),
-    var(--color-bg);
+    radial-gradient(1100px 720px at 12% -18%, rgba(0, 229, 255, 0.16), transparent 55%),
+    radial-gradient(720px 480px at 92% 8%, rgba(0, 229, 255, 0.07), transparent 60%),
+    radial-gradient(900px 560px at 70% 40%, rgba(0, 229, 255, 0.04), transparent 65%),
+    radial-gradient(1200px 800px at 50% 120%, rgba(0, 229, 255, 0.07), transparent 55%),
+    linear-gradient(180deg, #07070c 0%, var(--color-bg) 42%, #040406 100%);
 }
 .owyx-space::before {
   /* soft cyan mist drift */
@@ -87,26 +88,33 @@ body {
   position: absolute;
   inset: -10% -5%;
   background:
-    radial-gradient(40% 28% at 22% 18%, rgba(0, 229, 255, 0.08), transparent 70%),
-    radial-gradient(28% 22% at 82% 28%, rgba(0, 229, 255, 0.04), transparent 72%);
+    radial-gradient(42% 30% at 18% 14%, rgba(0, 229, 255, 0.11), transparent 70%),
+    radial-gradient(30% 24% at 88% 22%, rgba(0, 229, 255, 0.06), transparent 72%),
+    radial-gradient(50% 40% at 60% 80%, rgba(0, 229, 255, 0.04), transparent 75%);
   animation: owyx-mist 18s ease-in-out infinite alternate;
 }
 .owyx-space::after {
-  /* faint starfield */
+  /* denser starfield */
   content: "";
   position: absolute;
   inset: 0;
   background-image:
-    radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.35), transparent),
-    radial-gradient(1px 1px at 70% 20%, rgba(255, 255, 255, 0.25), transparent),
-    radial-gradient(1px 1px at 40% 70%, rgba(255, 255, 255, 0.20), transparent),
-    radial-gradient(1px 1px at 85% 60%, rgba(255, 255, 255, 0.28), transparent),
-    radial-gradient(1px 1px at 55% 45%, rgba(255, 255, 255, 0.18), transparent),
-    radial-gradient(1px 1px at 10% 80%, rgba(255, 255, 255, 0.22), transparent),
-    radial-gradient(1.5px 1.5px at 62% 12%, rgba(0, 229, 255, 0.35), transparent),
-    radial-gradient(1px 1px at 33% 48%, rgba(255, 255, 255, 0.16), transparent);
-  background-repeat: repeat;
-  opacity: 0.55;
+    radial-gradient(1px 1px at 12% 18%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 28% 42%, rgba(255, 255, 255, 0.22), transparent),
+    radial-gradient(1px 1px at 48% 12%, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 62% 55%, rgba(255, 255, 255, 0.18), transparent),
+    radial-gradient(1px 1px at 78% 28%, rgba(255, 255, 255, 0.32), transparent),
+    radial-gradient(1px 1px at 88% 70%, rgba(255, 255, 255, 0.2), transparent),
+    radial-gradient(1px 1px at 8% 78%, rgba(255, 255, 255, 0.25), transparent),
+    radial-gradient(1px 1px at 38% 88%, rgba(255, 255, 255, 0.16), transparent),
+    radial-gradient(1.5px 1.5px at 55% 22%, rgba(0, 229, 255, 0.45), transparent),
+    radial-gradient(1.5px 1.5px at 72% 48%, rgba(0, 229, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 20% 60%, rgba(255, 255, 255, 0.2), transparent),
+    radial-gradient(1px 1px at 95% 40%, rgba(255, 255, 255, 0.28), transparent);
+  background-size: 100% 100%, 100% 100%, 180% 180%, 140% 140%, 100% 100%, 160% 160%,
+    100% 100%, 120% 120%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+  opacity: 0.65;
+  animation: owyx-stars 40s linear infinite;
 }
 
 /* ===== Brand wordmark ===== */
@@ -237,12 +245,24 @@ select:focus:not(:focus-visible) {
 
 /* Shared callout / CTA strip (home, profile, admin forms) */
 .section-callout {
-  border: 1px solid var(--color-line);
-  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--color-line) 75%, var(--color-accent) 25%);
+  border-radius: 16px;
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--color-accent) 6%, transparent), transparent 42%),
-    color-mix(in srgb, var(--color-panel-2) 55%, transparent);
-  padding: 1.1rem 1.15rem;
+    linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 10%, transparent), transparent 42%),
+    linear-gradient(180deg, color-mix(in srgb, var(--color-accent) 5%, transparent), transparent 50%),
+    color-mix(in srgb, var(--color-panel-2) 70%, transparent);
+  padding: 1.25rem 1.2rem;
+  box-shadow: 0 18px 50px -36px rgba(0, 229, 255, 0.45);
+}
+.section-callout::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--color-accent), transparent);
+  opacity: 0.85;
 }
 @media (min-width: 640px) {
   .section-callout { padding: 1.25rem 1.35rem; }
@@ -309,6 +329,71 @@ select:focus:not(:focus-visible) {
   to { transform: translate3d(2%, 1.5%, 0) scale(1.04); opacity: 1; }
 }
 
+@keyframes owyx-stars {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(0, -1.5%, 0); }
+}
+
+@keyframes owyx-crystal-float {
+  from { transform: translate3d(0, 0, 0) rotate(-6deg); }
+  to { transform: translate3d(-1.5%, 2%, 0) rotate(-4deg); }
+}
+
+@keyframes owyx-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Hero atmosphere */
+.hero-aurora {
+  position: absolute;
+  inset: -20% -10% auto;
+  height: 70%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 55% at 70% 40%, rgba(0, 229, 255, 0.14), transparent 70%),
+    radial-gradient(ellipse 45% 40% at 20% 60%, rgba(0, 229, 255, 0.06), transparent 70%);
+  filter: blur(2px);
+}
+.hero-crystal {
+  position: absolute;
+  right: -6%;
+  top: 50%;
+  translate: 0 -48%;
+  width: min(48vw, 28rem);
+  height: min(48vw, 28rem);
+  pointer-events: none;
+  opacity: 0.22;
+  mask-image: radial-gradient(circle at 45% 45%, #000 35%, transparent 72%);
+  animation: owyx-crystal-float 14s ease-in-out infinite alternate;
+}
+.hero-crystal-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 40px rgba(0, 229, 255, 0.35));
+}
+.hero-title-glow {
+  text-shadow: 0 0 48px rgba(0, 229, 255, 0.28);
+}
+@media (max-width: 767px) {
+  .hero-crystal { opacity: 0.12; right: -18%; width: 70vw; height: 70vw; }
+}
+
+.skeleton-line {
+  display: block;
+  height: 0.85rem;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-panel-2) 80%, transparent) 25%,
+    color-mix(in srgb, var(--color-accent) 12%, var(--color-panel)) 50%,
+    color-mix(in srgb, var(--color-panel-2) 80%, transparent) 75%
+  );
+  background-size: 200% 100%;
+  animation: owyx-shimmer 1.4s ease-in-out infinite;
+}
+
 /* Hero brand underline sweep */
 @keyframes owyx-underline {
   from { transform: scaleX(0); }
@@ -327,7 +412,7 @@ select:focus:not(:focus-visible) {
 
 @media (prefers-reduced-motion: reduce) {
   .pulse-dot, .fade-up, .fade-up-2, .fade-up-3, .hero-brand-underline { animation: none; }
-  .owyx-space::before { animation: none; }
+  .owyx-space::before, .owyx-space::after, .hero-crystal, .skeleton-line { animation: none; }
   .btn-primary:hover:not(:disabled) { transform: none; }
   .hero-brand-underline { transform: none; opacity: 1; }
 }

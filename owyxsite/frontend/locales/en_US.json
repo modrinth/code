@@ -406,6 +406,7 @@
   "home": {
     "heroTitle": "owyx",
     "heroLead": "Your own Minecraft launcher: register on the site, sign in inside the launcher — play under your nickname. A Microsoft account is optional for a licensed Mojang skin.",
+    "betaEyebrow": "Public Beta",
     "downloadLauncher": "Download launcher",
     "toCabinet": "Account",
     "signInCreate": "Sign in / Create account",
