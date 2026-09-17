@@ -5,7 +5,10 @@ use actix_web::test;
 use common::api_v3::ApiV3;
 use common::environment::{TestEnvironment, with_test_environment};
 use itertools::Itertools;
-use labrinth::database::models::legacy_loader_fields::MinecraftGameVersion;
+use labrinth::database::models::{
+    DBUserId, legacy_loader_fields::MinecraftGameVersion,
+    user_limits::DBUserLimits,
+};
 use labrinth::models::v3;
 use serde_json::json;
 
@@ -464,6 +467,16 @@ async fn test_multi_get_redis_cache() {
         None,
         |test_env: TestEnvironment<ApiV3>| async move {
             let api = &test_env.api;
+            let defaults =
+                DBUserLimits::get_defaults(&test_env.db.pool).await.unwrap();
+            DBUserLimits {
+                user_id: Some(DBUserId(USER_USER_ID_PARSED)),
+                projects_per_day: 32,
+                ..defaults
+            }
+            .upsert(&test_env.db.pool)
+            .await
+            .unwrap();
 
             // Create 5 modpacks
             let mut modpacks = Vec::new();
