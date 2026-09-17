@@ -4277,6 +4277,42 @@
   "minecraft-required.sign-in": {
     "message": "Войти в Microsoft"
   },
+  "modal.owyx-account-required.client-key-hint": {
+    "message": ""
+  },
+  "modal.owyx-account-required.create-account-button": {
+    "message": "Создать аккаунт"
+  },
+  "modal.owyx-account-required.description": {
+    "message": "Используй тот же логин (или email) и пароль, что на owyx.site. Вход через Microsoft необязателен — для лицензионных скинов."
+  },
+  "modal.owyx-account-required.email": {
+    "message": "Логин или email"
+  },
+  "modal.owyx-account-required.header": {
+    "message": "Нужен аккаунт"
+  },
+  "modal.owyx-account-required.password": {
+    "message": "Пароль"
+  },
+  "modal.owyx-account-required.sign-in-button": {
+    "message": "Войти в Owyx"
+  },
+  "modal.owyx-account-required.sign-in-heading": {
+    "message": "Вход в аккаунт Owyx"
+  },
+  "modal.owyx-account-required.signing-in-button": {
+    "message": "Входим…"
+  },
+  "modal.owyx-account-required.signing-in-header": {
+    "message": "Вход"
+  },
+  "modal.owyx-account-required.support-prompt": {
+    "message": "Нужна помощь? Зайди на <support>owyx.site</support>."
+  },
+  "modal.owyx-account-required.waiting": {
+    "message": "Входим в Owyx…"
+  },
   "onboarding-checklist.create-instance": {
     "message": "Создайте сборку"
   },
