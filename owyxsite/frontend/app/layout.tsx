@@ -3,6 +3,7 @@ import { DM_Sans, Geist_Mono, Outfit, Sora } from "next/font/google";
 import { AuthProvider } from "@/hooks/useAuth";
 import { LocaleProvider } from "@/hooks/useLocale";
 import SkipLink from "@/components/layout/SkipLink";
+import SpaceParticles from "@/components/brand/SpaceParticles";
 import "./globals.css";
 
 /* Display/brand = Sora (DESIGN.md). Body = DM Sans. Outfit kept as secondary. */
@@ -58,6 +59,8 @@ export default function RootLayout({
     >
       <body className="min-h-screen overflow-x-clip flex flex-col">
         <div className="owyx-space" aria-hidden="true" />
+        <div className="owyx-vignette" aria-hidden="true" />
+        <SpaceParticles />
         <LocaleProvider>
           <SkipLink />
           <AuthProvider>{children}</AuthProvider>

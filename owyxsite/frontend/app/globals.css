@@ -73,7 +73,7 @@ body {
 .owyx-space {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: -2;
   pointer-events: none;
   background:
     radial-gradient(1100px 720px at 12% -18%, rgba(0, 229, 255, 0.16), transparent 55%),
@@ -334,50 +334,54 @@ select:focus:not(:focus-visible) {
   to { transform: translate3d(0, -1.5%, 0); }
 }
 
-@keyframes owyx-crystal-float {
-  from { transform: translate3d(0, 0, 0) rotate(-6deg); }
-  to { transform: translate3d(-1.5%, 2%, 0) rotate(-4deg); }
-}
-
 @keyframes owyx-shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
 
-/* Hero atmosphere */
+/* Hero atmosphere (no icon watermark) */
 .hero-aurora {
   position: absolute;
   inset: -20% -10% auto;
   height: 70%;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 70% 55% at 70% 40%, rgba(0, 229, 255, 0.14), transparent 70%),
-    radial-gradient(ellipse 45% 40% at 20% 60%, rgba(0, 229, 255, 0.06), transparent 70%);
+    radial-gradient(ellipse 70% 55% at 72% 38%, rgba(0, 229, 255, 0.12), transparent 70%),
+    radial-gradient(ellipse 45% 40% at 18% 62%, rgba(0, 229, 255, 0.05), transparent 70%);
   filter: blur(2px);
 }
-.hero-crystal {
+.hero-grid {
   position: absolute;
-  right: -6%;
-  top: 50%;
-  translate: 0 -48%;
-  width: min(48vw, 28rem);
-  height: min(48vw, 28rem);
+  inset: 0;
   pointer-events: none;
-  opacity: 0.22;
-  mask-image: radial-gradient(circle at 45% 45%, #000 35%, transparent 72%);
-  animation: owyx-crystal-float 14s ease-in-out infinite alternate;
-}
-.hero-crystal-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  filter: drop-shadow(0 0 40px rgba(0, 229, 255, 0.35));
+  opacity: 0.18;
+  background-image:
+    linear-gradient(rgba(0, 229, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 229, 255, 0.07) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 70% 60% at 60% 40%, #000 10%, transparent 75%);
 }
 .hero-title-glow {
   text-shadow: 0 0 48px rgba(0, 229, 255, 0.28);
 }
-@media (max-width: 767px) {
-  .hero-crystal { opacity: 0.12; right: -18%; width: 70vw; height: 70vw; }
+
+.owyx-particles {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+}
+
+.owyx-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 85% 70% at 50% 35%, transparent 35%, rgba(5, 5, 8, 0.55) 100%),
+    linear-gradient(180deg, transparent 60%, rgba(5, 5, 8, 0.65) 100%);
 }
 
 .skeleton-line {
@@ -412,7 +416,7 @@ select:focus:not(:focus-visible) {
 
 @media (prefers-reduced-motion: reduce) {
   .pulse-dot, .fade-up, .fade-up-2, .fade-up-3, .hero-brand-underline { animation: none; }
-  .owyx-space::before, .owyx-space::after, .hero-crystal, .skeleton-line { animation: none; }
+  .owyx-space::before, .owyx-space::after, .skeleton-line { animation: none; }
   .btn-primary:hover:not(:disabled) { transform: none; }
   .hero-brand-underline { transform: none; opacity: 1; }
 }

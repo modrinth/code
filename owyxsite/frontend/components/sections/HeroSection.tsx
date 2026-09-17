@@ -1,13 +1,13 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocale } from "@/hooks/useLocale";
 
 /**
  * Brand-first first viewport (DESIGN.md §5):
- * Owyx™ wordmark · one value line · primary CTA + secondary auth · crystal atmosphere.
+ * Owyx™ wordmark · one value line · primary CTA + secondary auth.
+ * Atmosphere lives in global space + particles — no hero icon watermark.
  */
 export default function HeroSection() {
   const { user, loading } = useAuth();
@@ -16,17 +16,7 @@ export default function HeroSection() {
   return (
     <section className="relative overflow-hidden min-h-[min(78vh,40rem)] flex items-center">
       <div className="hero-aurora" aria-hidden="true" />
-      <div className="hero-crystal" aria-hidden="true">
-        <Image
-          src="/owyx-icon.svg"
-          alt=""
-          width={520}
-          height={520}
-          className="hero-crystal-img"
-          unoptimized
-          priority
-        />
-      </div>
+      <div className="hero-grid" aria-hidden="true" />
 
       <div className="relative z-[1] w-full max-w-6xl mx-auto px-4 sm:px-6 pt-14 pb-16 sm:pt-20 sm:pb-24">
         <div className="max-w-2xl min-w-0">
