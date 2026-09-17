@@ -68,6 +68,7 @@ impl ContentStore {
         self.check_instance_path(&path, &binding.blob_sha512).await
     }
 
+    #[expect(dead_code)]
     pub(crate) async fn validate_instance(
         &self,
         instance: &Instance,
