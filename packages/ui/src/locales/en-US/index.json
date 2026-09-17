@@ -5894,17 +5894,14 @@
   "settings.display.theme.light": {
     "defaultMessage": "Light"
   },
-  "settings.display.theme.oled": {
-    "defaultMessage": "OLED"
-  },
   "settings.display.theme.magma": {
     "defaultMessage": "Magma"
   },
+  "settings.display.theme.oled": {
+    "defaultMessage": "OLED"
+  },
   "settings.display.theme.onyx": {
     "defaultMessage": "Onyx"
-  },
-  "settings.display.theme.synthwave": {
-    "defaultMessage": "Synthwave"
   },
   "settings.display.theme.preferred-dark-theme": {
     "defaultMessage": "Preferred dark theme"
@@ -5923,6 +5920,9 @@
   },
   "settings.display.theme.sync-across-devices.sign-in-tooltip": {
     "defaultMessage": "Sign into an Owyx account to sync theme"
+  },
+  "settings.display.theme.synthwave": {
+    "defaultMessage": "Synthwave"
   },
   "settings.display.theme.system": {
     "defaultMessage": "Sync with system"
