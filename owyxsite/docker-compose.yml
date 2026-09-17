@@ -26,6 +26,7 @@ services:
       - ./postgres/migrations/005_email_change.sql:/docker-entrypoint-initdb.d/06_email_change.sql:ro
       - ./postgres/migrations/006_news.sql:/docker-entrypoint-initdb.d/07_news.sql:ro
       - ./postgres/migrations/007_servers_packs.sql:/docker-entrypoint-initdb.d/08_servers_packs.sql:ro
+      - ./postgres/migrations/008_nickname_max_16.sql:/docker-entrypoint-initdb.d/09_nickname_max_16.sql:ro
     ports:
       - "${POSTGRES_BIND:-0.0.0.0}:${POSTGRES_PORT:-5432}:5432"
     restart: always
