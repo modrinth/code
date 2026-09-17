@@ -29,6 +29,7 @@ services:
       - ./postgres/migrations/008_nickname_max_16.sql:/docker-entrypoint-initdb.d/09_nickname_max_16.sql:ro
       - ./postgres/migrations/009_nickname_varchar_16.sql:/docker-entrypoint-initdb.d/10_nickname_varchar_16.sql:ro
       - ./postgres/migrations/010_display_nickname.sql:/docker-entrypoint-initdb.d/11_display_nickname.sql:ro
+      - ./postgres/migrations/011_display_nickname_nonunique.sql:/docker-entrypoint-initdb.d/12_display_nickname_nonunique.sql:ro
     ports:
       - "${POSTGRES_BIND:-127.0.0.1}:${POSTGRES_PORT:-5432}:5432"
     restart: always

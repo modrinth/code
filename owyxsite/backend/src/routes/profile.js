@@ -679,11 +679,7 @@ router.put('/nickname', authenticateToken, async (req, res) => {
         }
 
         const taken = await db.query(
-            `SELECT id FROM users
-             WHERE id <> $2 AND (
-               LOWER(nickname) = LOWER($1)
-               OR LOWER(COALESCE(display_nickname, nickname)) = LOWER($1)
-             )`,
+            `SELECT id FROM users WHERE id <> $2 AND LOWER(nickname) = LOWER($1)`,
             [raw, req.user.id]
         );
         if (taken.rows.length > 0) {
@@ -725,7 +721,8 @@ router.put('/nickname', authenticateToken, async (req, res) => {
     }
 });
 
-// PUT /api/profile/display-nickname — visible / in-game nick (unique, MC format, 5/min).
+// PUT /api/profile/display-nickname — visible / in-game nick (MC format, 5/min).
+// Duplicates across accounts are allowed; only login + email stay unique.
 router.put('/display-nickname', authenticateToken, async (req, res) => {
     try {
         if (!checkDisplayNickRate(req.user.id)) {
@@ -753,18 +750,6 @@ router.put('/display-nickname', authenticateToken, async (req, res) => {
             return res.status(400).json({ error: 'Это уже ваш текущий ник' });
         }
 
-        const taken = await db.query(
-            `SELECT id FROM users
-             WHERE id <> $2 AND (
-               LOWER(COALESCE(display_nickname, nickname)) = LOWER($1)
-               OR LOWER(nickname) = LOWER($1)
-             )`,
-            [raw, req.user.id]
-        );
-        if (taken.rows.length > 0) {
-            return res.status(409).json({ error: 'Этот ник уже занят' });
-        }
-
         try {
             await db.query(
                 'UPDATE users SET display_nickname = $1, display_nickname_changed_at = NOW() WHERE id = $2',
@@ -772,7 +757,7 @@ router.put('/display-nickname', authenticateToken, async (req, res) => {
             );
         } catch (updateErr) {
             if (isPgUniqueViolation(updateErr)) {
-                return res.status(409).json({ error: 'Этот ник уже занят' });
+                return res.status(409).json({ error: 'Не удалось сохранить ник' });
             }
             throw updateErr;
         }

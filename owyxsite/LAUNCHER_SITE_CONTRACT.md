@@ -141,9 +141,9 @@ Also available as `GET /api/launcher/v1/me`.
 - `user.nickname` is the **login** (site/launcher auth). Change via
   `PUT /api/profile/nickname` ≤ 1 / 30 days.
 - `user.displayNickname` is the **visible / in-game** name. Change via
-  `PUT /api/profile/display-nickname` (MC format `3–16` `[A-Za-z0-9_]`, unique
-  case-insensitive, rate limit 5/min). Launcher syncs offline play profile to
-  this value.
+  `PUT /api/profile/display-nickname` (MC format `3–16` `[A-Za-z0-9_]`;
+  duplicates allowed across accounts; login + email stay unique; rate limit
+  5/min). Launcher syncs offline play profile to this value.
 - `serverAccess` = account is active **and** not banned.
 - `skinUrl` is absolute, built from the request host, so it is downloadable by
   whatever base the launcher used.
@@ -375,8 +375,8 @@ migration `004_nickname_cooldown.sql`). Does **not** overwrite
 `display_nickname`.
 
 Display nickname: `PUT /api/profile/display-nickname`
-`{ displayNickname }` (or `display_nickname`) — unique, MC format, 5/min
-(migration `010_display_nickname.sql`).
+`{ displayNickname }` (or `display_nickname`) — MC format, 5/min; **not** globally
+unique (migration `011_display_nickname_nonunique.sql` after `010`).
 
 ---
 

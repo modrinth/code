@@ -567,6 +567,24 @@ impl Credentials {
                         return Ok(Some(creds));
                     }
 
+                    // Mojang rate-limits /launcher/login aggressively; keep the
+                    // cached Microsoft session so startup does not hard-fail.
+                    if let ErrorKind::MinecraftAuthenticationError(
+                        MinecraftAuthenticationError::DeserializeResponse {
+                            status_code,
+                            ..
+                        },
+                    ) = *err.raw
+                        && (status_code.as_u16() == 429
+                            || status_code.is_server_error())
+                    {
+                        tracing::warn!(
+                            %status_code,
+                            "Minecraft credential refresh soft-failed; using cached tokens"
+                        );
+                        return Ok(Some(creds));
+                    }
+
                     if matches!(
                         &*err.raw,
                         ErrorKind::MinecraftAuthenticationError(source)
@@ -1260,6 +1278,18 @@ async fn minecraft_token(
             step: MinecraftAuthStep::MinecraftToken,
         }
     })?;
+
+    if !status.is_success() {
+        // Preserve status (e.g. 429) so callers can soft-fail instead of
+        // treating Mojang's rate-limit JSON as a missing access_token.
+        return Err(MinecraftAuthenticationError::DeserializeResponse {
+            source: serde_json::from_str::<MinecraftToken>("{}")
+                .expect_err("MinecraftToken requires access_token"),
+            raw: text,
+            step: MinecraftAuthStep::MinecraftToken,
+            status_code: status,
+        });
+    }
 
     serde_json::from_str(&text).map_err(|source| {
         MinecraftAuthenticationError::DeserializeResponse {
