@@ -40,7 +40,7 @@ const messages = defineMessages({
 	telemetryDescription: {
 		id: 'app.settings.privacy.telemetry.description',
 		defaultMessage:
-			'Owyx collects anonymized analytics and usage data to improve the launcher and your experience. By disabling this option, you opt out and your data will no longer be collected.',
+			'Help improve Owyx by sharing anonymous usage stats and sanitized errors (OS, version, crashes). Off by default — turn this on only if you consent. No emails, usernames, or home paths are sent.',
 	},
 	discordRichPresenceTitle: {
 		id: 'app.settings.privacy.discord-rich-presence.title',
@@ -97,7 +97,7 @@ watch(
 				{{ formatMessage(messages.telemetryDescription) }}
 			</p>
 		</div>
-		<Toggle id="opt-out-analytics" v-model="settings.telemetry" />
+		<Toggle id="opt-in-analytics" v-model="settings.telemetry" />
 	</div>
 
 	<div class="mt-4 flex items-center justify-between gap-4">

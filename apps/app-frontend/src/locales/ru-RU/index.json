@@ -2622,7 +2622,7 @@
     "message": "Discord Rich Presence"
   },
   "app.settings.privacy.telemetry.description": {
-    "message": "Owyx собирает анонимную аналитику, чтобы улучшать лаунчер. Отключите опцию, чтобы отказаться от сбора данных."
+    "message": "Помогите улучшать Owyx: анонимная статистика и обезличенные ошибки (ОС, версия, краши). По умолчанию выкл. — включайте только если согласны. Без email, ников и домашних путей."
   },
   "app.settings.privacy.telemetry.title": {
     "message": "Телеметрия"
@@ -4521,7 +4521,7 @@
     "message": "Загрузите скин на owyx.site. Установите CustomSkinLoader в инстанс — Owyx пишет конфиг для https://owyx.site/api/csl/ при запуске (и из настроек инстанса). Другие с тем же модом увидят ваш скин Owyx."
   },
   "owyx.settings.social.skins-mod-link": {
-    "message": "Открыть CustomSkinLoader на Modrinth"
+    "message": "Страница CustomSkinLoader"
   },
   "owyx.settings.social.saved": {
     "message": "Сохранено"

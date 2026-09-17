@@ -216,6 +216,27 @@ router.get('/v1/cosmetics', authenticateToken, async (req, res) => {
  * Body: { installId: uuid, events: [...] }  (max 20 events)
  * No passwords, emails, paths with usernames — sanitized server-side.
  */
+const TELEMETRY_WINDOW_MS = 60_000;
+const TELEMETRY_MAX_PER_IP = 30;
+const TELEMETRY_MAX_PER_INSTALL = 60;
+/** @type {Map<string, { windowStart: number, count: number }>} */
+const telemetryIpBuckets = new Map();
+/** @type {Map<string, { windowStart: number, count: number }>} */
+const telemetryInstallBuckets = new Map();
+
+function takeTelemetryToken(map, key, max) {
+  if (!key) return true;
+  const now = Date.now();
+  let bucket = map.get(key);
+  if (!bucket || now - bucket.windowStart >= TELEMETRY_WINDOW_MS) {
+    bucket = { windowStart: now, count: 0 };
+    map.set(key, bucket);
+  }
+  if (bucket.count >= max) return false;
+  bucket.count += 1;
+  return true;
+}
+
 router.post('/v1/telemetry', optionalAuthenticate, async (req, res) => {
   try {
     const installId = String(req.body?.installId || req.body?.install_id || '').trim();
@@ -223,6 +244,14 @@ router.post('/v1/telemetry', optionalAuthenticate, async (req, res) => {
       /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     if (!uuidRe.test(installId)) {
       return res.status(400).json({ error: 'installId must be a UUID' });
+    }
+
+    const ip = clientIp(req) || 'unknown';
+    if (
+      !takeTelemetryToken(telemetryIpBuckets, ip, TELEMETRY_MAX_PER_IP) ||
+      !takeTelemetryToken(telemetryInstallBuckets, installId.toLowerCase(), TELEMETRY_MAX_PER_INSTALL)
+    ) {
+      return res.status(429).json({ error: 'Too many telemetry requests; try again later' });
     }
 
     const rawEvents = Array.isArray(req.body?.events)
@@ -243,7 +272,6 @@ router.post('/v1/telemetry', optionalAuthenticate, async (req, res) => {
     }
 
     const userId = req.user?.id || null;
-    const ip = clientIp(req);
     let inserted = 0;
 
     for (const ev of normalized) {
@@ -265,7 +293,7 @@ router.post('/v1/telemetry', optionalAuthenticate, async (req, res) => {
           ev.ramMb,
           ev.locale,
           JSON.stringify(ev.metadata || {}),
-          ip,
+          ip === 'unknown' ? null : ip,
         ]
       );
       inserted += 1;

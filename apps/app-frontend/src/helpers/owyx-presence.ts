@@ -9,7 +9,8 @@ import { readonly, shallowRef } from 'vue'
 import { type OwyxFriendPresence, postOwyxPresence } from '@/helpers/owyx-friends'
 
 let heartbeatTimer: ReturnType<typeof setInterval> | null = null
-let sharePresenceEnabled = true
+/** Fail closed until /api/friends/settings says otherwise. */
+let sharePresenceEnabled = false
 let current: { status: OwyxFriendPresence; instanceName?: string | null } = {
 	status: 'offline',
 }
@@ -27,9 +28,9 @@ export function isOwyxSharePresenceEnabled(): boolean {
 	return sharePresenceEnabled
 }
 
-/** Reset local preference after sign-out (next login reloads from API). */
+/** Reset local preference after sign-out (stay offline until API reloads). */
 export function resetOwyxSharePresencePreference() {
-	sharePresenceEnabled = true
+	sharePresenceEnabled = false
 	clearHeartbeatTimer()
 	setCurrent({ status: 'offline', instanceName: null })
 }

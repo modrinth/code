@@ -25,101 +25,66 @@ Stop only when the PR is merge-ready: green CI, AR clean (or only intentional de
 
 1. Read `.agents/skills/agent-tool-catalog/SKILL.md` and the live catalog README.
 2. Prefer catalog UI defaults: **hallmark** + **ui-ux-pro-max** — still **Owyx tokens first** (`brand/DESIGN.md`, cyan `#00e5ff`, bg `#050508`, Sora/Onest/Unbounded). No Modrinth green-as-primary, no Hosting upsell chrome.
-3. SkillsMP: admin/dashboard/list inspiration only (e.g. FlowAI activity-log patterns) — implement in **existing** Vue/Next components, do not paste HTML dashboard templates.
+3. SkillsMP: admin/dashboard/list inspiration only — implement in **existing** Vue/Next components, do not paste HTML dashboard templates.
 4. Launcher UI: reuse `@modrinth/ui` **`Toggle` / `ToggleCard`** (and settings layout patterns used by Appearance/Privacy), not bare checkboxes that disappear on dark themes.
 5. i18n: `defineMessages` + FormatJS for launcher; site locales `en_US` / `ru_RU` (+ `merge-site-i18n.mjs` if needed).
 
 ---
 
-## Priority A — Launcher Social settings (broken / ugly today)
+## Priority A — Launcher Social settings
 
-**File:** `apps/app-frontend/src/components/ui/settings/account/SocialSettings.vue`  
-**Screenshot context (v0.8.0):** Settings → Social looks unfinished: stats row OK-ish; Presence is a read-only badge with **no way to disable**; “Allow friend requests” has **no visible switch** (native checkbox is effectively invisible); skins section works.
+**File:** `apps/app-frontend/src/components/ui/settings/account/SocialSettings.vue`
 
-### Must fix
+### Canonical field name
 
-1. **Allow friend requests**
-   - Replace native `<input type="checkbox">` with design-system **`Toggle`** (or `ToggleCard`) so the control is obvious on dark themes.
-   - Keep wire to `getOwyxSocialSettings` / `patchOwyxSocialSettings` (`allowFriendRequests`).
-   - Saving must remain optimistic + revert on error; play toggle sound if that pattern exists.
+Use **`sharePresence` only** (not `presenceEnabled`) everywhere: SQL `share_presence`, PATCH/GET JSON, TS helpers, UI, contract.
 
-2. **Presence — user must be able to turn it OFF**
-   - Today presence is display-only (`owyxPresenceStatus` → Active/Off badge). That is not enough.
-   - Add a real setting, e.g. `sharePresence` / `presenceEnabled` (name consistently across API + client):
-     - **ON:** current heartbeat behavior (~30s while signed in; idle ~90s → offline to friends).
-     - **OFF:** stop heartbeats; force offline to friends; clear/stop presence updates; badge reflects Off.
-   - Backend: extend `user_social_settings` (migration if needed) + `GET|PATCH /api/friends/settings` in `owyxsite/backend/src/routes/friends.js`. When disabled, `POST /api/friends/presence` should no-op or set offline; friends list must not show the user as online.
-   - Client: `owyx-presence` helper + Social toggle must stay in sync.
+### Must fix / keep
+
+1. **Allow friend requests** — `@modrinth/ui` `Toggle`; wire `getOwyxSocialSettings` / `patchOwyxSocialSettings` (`allowFriendRequests`); optimistic + revert on error; toggle sound.
+2. **Presence OFF (`sharePresence`)**
+   - **ON:** heartbeat ~30s; idle ~90s → offline to friends.
+   - **OFF:** stop heartbeats; force offline to friends; badge Off.
+   - Backend: `user_social_settings.share_presence` (migration `013_share_presence.sql` + `ensureFriendsSchema`); `GET|PATCH /api/friends/settings`.
+   - When disabled: `POST /api/friends/presence` **forces offline** (never leave stale online); friends list masks via `share_presence`.
+   - Turning OFF in PATCH immediately writes offline presence.
+   - Client: `owyx-presence` + Social toggle stay in sync; **do not wipe `playing` → `online`** when re-entering Social or refreshing session while already sharing.
    - Update `LAUNCHER_SITE_CONTRACT.md`.
-
-3. **Visual polish (Social tab)**
-   - Remove “max-w-lg left-stuck empty space” feel; use the same settings density as Appearance/Privacy.
-   - One clear hierarchy: header → stats → toggles (Presence, Allow requests) → skins.
-   - No cluttered card soup; use ToggleCard / settings rows consistently.
-   - Stats chips: keep useful, but refine spacing/typography to match brand.
-   - Skins block: keep “Install CustomSkinLoader” + “Open profile on site” working; tighten copy/layout only.
-   - RU/EN strings complete; no leftover Modrinth wording.
-
-4. **Regression**
-   - Friends panel open-from-settings still works.
+3. **Visual polish** — density like Appearance/Privacy; hierarchy header → stats → toggles → skins; RU/EN; no Modrinth product wording beyond CSL Modrinth project link.
+4. **Anti-regress locks (#29) — non-negotiable**
+   - `openFriends` **must** call `settingsModal?.close()` via `inject(appSettingsModalContextKey)` before `router.push('/')` and `owyx:open-friends`.
+   - Presence badge / `presenceLive` = `owyxPresenceStatus` ∈ `{online, playing}` — **not** `isSignedIn`.
+   - Pending chip = only `status === 'pending' && incoming` (label Incoming).
    - Signed-out empty state still prompts Owyx sign-in.
    - Do not break CSL install flow.
 
 ---
 
-## Priority B — Logs & telemetry (finish beyond foundation)
+## Priority B — Logs & telemetry
 
-Already on `main` from #35:
-
-- Migration `owyxsite/postgres/migrations/012_logs_telemetry.sql`
-- `POST /api/launcher/v1/telemetry`, admin `GET /api/admin/activity|logs|telemetry`
-- Admin UI `AdminLogs.tsx`, launcher `owyx-telemetry.ts`, support CTA, glass/layout fixes
+Already on `main` from #35: migration `012_logs_telemetry.sql`, telemetry ingest, AdminLogs, `owyx-telemetry.ts`, support CTA.
 
 ### Finish / harden
 
-1. **Site account activity completeness**
-   - Ensure every important account mutation is logged in `user_activity` (login/logout, register, login change, email change, password change, display nick, avatar, profile fields, ban-related if applicable). Use `owyxsite/backend/src/utils/activityLog.js`; never log passwords/tokens/raw emails in metadata (redact).
-   - Admin Account tab: searchable, filterable, readable labels (humanize types if needed).
-
-2. **Launcher telemetry usefulness**
-   - Keep opt-in via `settings.telemetry`.
-   - Events: session_start, heartbeat, error/crash, optional perf/feature — expand only if useful.
-   - PC stats: OS, version, arch, cpu cores, RAM estimate — **no** usernames, emails, absolute home paths, tokens.
-   - Wire more high-signal error paths if missing (startup failures, auth soft-fails summary without secrets).
-   - Admin Launcher tab: KPI row + filters solid; empty states clear.
-
-3. **Ops**
-   - Document VPS apply step for `012_logs_telemetry.sql` in site README / contract if not already obvious.
-   - Fail soft if table missing (503 with clear message is OK).
-
-4. **Privacy**
-   - Double-check sanitizers client + server.
-   - No PII in admin telemetry table by design.
+1. Log important account mutations via `activityLog.js` (`logUserActivity`); never passwords/tokens/raw emails. Prefer `req.clientIp` (trust-proxy path) — do not spoof via raw `X-Forwarded-For`.
+2. Admin Account tab: searchable/filterable/human labels.
+3. Launcher telemetry opt-in `settings.telemetry`; no PII; Admin Launcher KPI + filters + empty states.
+4. Document VPS apply for `012` (+ `013`); fail soft if table missing.
+5. Cover skin delete and other account mutations still missing.
 
 ---
 
-## Priority C — Site UI polish (carry-over)
+## Priority C — Site UI
 
-- Profile Security/Profile cards: full-width layout already started — verify no left-stuck empty gutters; inputs use full content column.
-- Liquid glass: visible but not gaudy; respect `prefers-reduced-transparency`.
-- Support button: modal copy + GitHub issue link (`components/support/SupportContact.tsx`) — keep working; optionally add to admin/cabinet if it fits without clutter.
-
----
+Profile Security/Profile full-width; liquid glass + `prefers-reduced-transparency`; `SupportContact.tsx` → GitHub new issue.
 
 ## Priority D — Release / CI hygiene
 
-- Do not regress `packages/app-lib/src/state/minecraft_auth.rs` soft-fail path (use `unwrap_err`, not `expect_err` on non-Debug types).
-- Fix any intl/key-order / theme enum issues AR or CI report.
-- If cutting a launcher release after merge: SemVer patch/feature per `.cursor/rules/semver.mdc`; sync versions via `scripts/set-app-version.js`; prefer **0.8.2** (or next appropriate) after green — only if asked or clearly needed to validate.
-
----
+Do not regress `minecraft_auth.rs` soft-fail (`unwrap_err`, not `expect_err`). Fix intl/theme AR/CI issues.
 
 ## Out of scope
 
-- Modrinth Hosting / Medal / Modrinth+ upsell.
-- Minecraft plugin / game-token revival.
-- Mass-renaming `@modrinth/*` packages.
-- Committing secrets, `.env`, real client keys, binaries.
+Hosting/Medal/Modrinth+; MC plugin; mass `@modrinth/*` rename; secrets/`.env`/binaries.
 
 ---
 
@@ -128,20 +93,23 @@ Already on `main` from #35:
 1. Implement Priority A first (Social), then B, then C/D.
 2. Push to **this PR branch** only (`cloud/polish-logs-social-ideal` → `ebluffy/Owyx`).
 3. After each meaningful push: wait for CI + Autoreview; fix everything actionable.
-4. Grok babysitter will nag on this PR using **this document** as the source of truth — address every open item until closed.
-5. Re-read this brief before declaring done; update the PR checklist below.
+4. Grok babysitter nags using **this document** as SSoT — address every open item until closed.
+5. Re-read this brief before declaring done; update the checklist below.
 
 ---
 
 ## Acceptance checklist
 
 - [x] Social: visible Toggle for allow friend requests; persists correctly
-- [x] Social: presence can be disabled; friends see offline; heartbeat stops
+- [x] Social: `sharePresence` GET/PATCH; OFF stops heartbeat; force-offline ingest; friends see offline; badge Off
 - [x] Social: layout matches settings design system; no invisible controls; RU/EN OK
+- [x] Anti-regress #29: modal `close()`, presence ≠ `isSignedIn`, pending = incoming only
+- [x] Presence engine does not wipe `playing` when Social loads / session refreshes while sharing
 - [x] Skins / CSL install still works
-- [x] Admin Logs: account + moderation + launcher tabs polished and useful
-- [x] Telemetry: opt-in only; no PII; contract updated
-- [x] Site glass/layout/support verified
+- [x] Admin Logs: account + moderation + launcher tabs polished (human labels)
+- [x] Telemetry: opt-in only (fresh default off; existing TRUE kept); rate-limited ingest; no PII; contract + `012`/`013` VPS notes
+- [x] `logUserActivity` uses trusted `req.clientIp`; skin_delete logged
+- [x] Site glass/layout/support verified (SupportContact → GitHub issue; profile full-width + liquid glass on main/#35)
 - [ ] CI green on `ebluffy/Owyx`
 - [ ] AR clean (or only approved deferrals documented in PR)
 - [ ] Grok babysitter satisfied / no open blockers
@@ -160,6 +128,6 @@ Already on `main` from #35:
 | Telemetry ingest | `owyxsite/backend/src/routes/launcher.js` |
 | Admin logs UI | `owyxsite/frontend/components/admin/AdminLogs.tsx` |
 | Activity helper | `owyxsite/backend/src/utils/activityLog.js` |
-| Migration | `owyxsite/postgres/migrations/012_logs_telemetry.sql` |
+| Migrations | `012_logs_telemetry.sql`, `013_share_presence.sql` |
 | Contract | `owyxsite/LAUNCHER_SITE_CONTRACT.md` |
 | Brand | `brand/DESIGN.md`, `AGENTS.md` |

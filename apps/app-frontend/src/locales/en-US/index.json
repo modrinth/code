@@ -2742,7 +2742,7 @@
     "message": "Discord Rich Presence"
   },
   "app.settings.privacy.telemetry.description": {
-    "message": "Owyx collects anonymized analytics and usage data to improve the launcher and your experience. By disabling this option, you opt out and your data will no longer be collected."
+    "message": "Help improve Owyx by sharing anonymous usage stats and sanitized errors (OS, version, crashes). Off by default — turn this on only if you consent. No emails, usernames, or home paths are sent."
   },
   "app.settings.privacy.telemetry.title": {
     "message": "Telemetry"
@@ -4926,7 +4926,7 @@
     "message": "Upload on owyx.site. CustomSkinLoader in your instance reads https://owyx.site/api/csl/ (Owyx writes config on launch)."
   },
   "owyx.settings.social.skins-mod-link": {
-    "message": "CustomSkinLoader on Modrinth"
+    "message": "CustomSkinLoader project page"
   },
   "owyx.settings.social.skins-title": {
     "message": "In-world skins"

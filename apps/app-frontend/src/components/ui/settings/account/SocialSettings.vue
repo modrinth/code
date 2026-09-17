@@ -234,18 +234,9 @@ async function loadSettings() {
 	try {
 		const [s, friends] = await Promise.all([getOwyxSocialSettings(), listOwyxFriends()])
 		allowRequests.value = s.allowFriendRequests
-		const prevShare = sharePresence.value
 		sharePresence.value = s.sharePresence
-		// Only sync the presence engine when the preference changed — avoid
-		// restarting heartbeat (which would wipe playing → online).
-		if (prevShare !== s.sharePresence) {
-			setOwyxSharePresenceEnabled(s.sharePresence)
-		} else if (s.sharePresence) {
-			// Ensure flag matches server without restarting an active timer.
-			setOwyxSharePresenceEnabled(true)
-		} else {
-			setOwyxSharePresenceEnabled(false)
-		}
+		// Idempotent: does not wipe playing → online when already sharing + timer live.
+		setOwyxSharePresenceEnabled(s.sharePresence)
 		const accepted = friends.filter((f) => f.status === 'accepted')
 		stats.value = {
 			friends: accepted.length,
@@ -395,7 +386,7 @@ const messages = defineMessages({
 	},
 	skinsModLink: {
 		id: 'owyx.settings.social.skins-mod-link',
-		defaultMessage: 'CustomSkinLoader on Modrinth',
+		defaultMessage: 'CustomSkinLoader project page',
 	},
 	saved: {
 		id: 'owyx.settings.social.saved',
