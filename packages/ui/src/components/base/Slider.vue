@@ -2,7 +2,8 @@
 	<div class="flex w-full items-center gap-4">
 		<span
 			v-if="currentValue !== null"
-			class="min-w-10 shrink-0 whitespace-nowrap py-2 text-right text-sm leading-5 text-secondary"
+			class="shrink-0 whitespace-nowrap py-2 leading-5 text-secondary"
+			:class="labelSizeClass"
 		>
 			{{ minLabel ?? min }}
 		</span>
@@ -13,7 +14,6 @@
 			:class="[heightClass, disabled ? 'opacity-50' : '']"
 		>
 			<input
-				ref="input"
 				:value="currentValue"
 				type="range"
 				:min="min"
@@ -34,6 +34,29 @@
 				@input="onInputWithSnap(($event.target as HTMLInputElement).value)"
 			/>
 			<div
+				v-if="visibleSnapPoints.length"
+				class="snap-points pointer-events-none absolute inset-x-0 top-1/2 h-[18px] -translate-y-1/2"
+			>
+				<span
+					v-for="snapPoint in visibleSnapPoints"
+					:key="snapPoint"
+					class="absolute top-0 h-[18px] w-1.5 -translate-x-1/2 rounded-full bg-surface-5"
+					:style="{ left: `${getPercentage(snapPoint)}%` }"
+				/>
+				<div
+					class="snap-points-filled absolute inset-0"
+					:style="{ clipPath: `inset(0 ${100 - currentPercentage}% 0 0)` }"
+				>
+					<span
+						v-for="snapPoint in visibleSnapPoints"
+						:key="`filled-${snapPoint}`"
+						class="absolute top-0 h-[18px] w-1.5 -translate-x-1/2 rounded-full bg-brand"
+						:style="{ left: `${getPercentage(snapPoint)}%` }"
+					/>
+				</div>
+			</div>
+
+			<div
 				class="slider-track pointer-events-none absolute inset-x-0 top-1/2 h-[6px] -translate-y-1/2 rounded-full bg-surface-5"
 			>
 				<div
@@ -45,24 +68,12 @@
 					></div>
 				</div>
 			</div>
-
-			<div
-				v-if="visibleSnapPoints.length"
-				class="snap-points pointer-events-none absolute inset-x-0 top-1/2 h-[18px] -translate-y-1/2"
-			>
-				<span
-					v-for="snapPoint in visibleSnapPoints"
-					:key="snapPoint"
-					class="absolute top-0 h-[18px] w-1.5 -translate-x-1/2 rounded-full"
-					:class="snapPoint <= currentValue ? 'bg-brand brightness-on-hover' : 'bg-surface-5'"
-					:style="{ left: `${getPercentage(snapPoint)}%` }"
-				/>
-			</div>
 		</div>
 
 		<span
 			v-if="currentValue !== null"
-			class="min-w-10 shrink-0 whitespace-nowrap py-2 text-left text-sm leading-5 text-secondary"
+			class="shrink-0 whitespace-nowrap py-2 leading-5 text-secondary"
+			:class="labelSizeClass"
 		>
 			{{ maxLabel ?? formatValue(max) }}
 		</span>
@@ -72,7 +83,8 @@
 			type="number"
 			:size="size"
 			wrapper-class="slider-value shrink-0"
-			:style="{ width: currentValue === null ? '100%' : inputWidth }"
+			:class="currentValue === null ? 'w-full' : undefined"
+			:style="currentValue === null ? undefined : { '--value-chars': valueFieldChars }"
 			:input-class="currentValue === null ? undefined : 'text-center'"
 			:disabled="disabled"
 			:placeholder="placeholder"
@@ -132,15 +144,17 @@ const heightClass = computed(
 			large: 'h-12',
 		})[props.size],
 )
-const currentValue = ref(props.modelValue === null ? null : normalizeValue(props.modelValue))
-const inputWidth = computed(() => {
-	const digits = Math.max(String(props.min).length, String(props.max).length)
-	const padding = props.size === 'small' || props.size === 'standard' ? 1.5 : 2
-	return `max(65px, calc(${digits}ch + ${padding}rem + 2px))`
+const labelSizeClass = computed(() => (props.size === 'small' ? 'text-sm' : 'text-base'))
+const valueFieldChars = computed(() => {
+	const decimals = (String(props.step).split('.')[1] ?? '').length
+
+	return Math.max(props.min.toFixed(decimals).length, props.max.toFixed(decimals).length, 2)
 })
+const currentValue = ref(props.modelValue === null ? null : normalizeValue(props.modelValue))
+const previousRawValue = ref<number | null>(null)
 const currentPercentage = computed(() => getPercentage(currentValue.value ?? props.min))
 const visibleSnapPoints = computed(() =>
-	props.snapPoints.filter((snapPoint) => snapPoint >= props.min && snapPoint <= props.max),
+	props.snapPoints.filter((snapPoint) => snapPoint > props.min && snapPoint < props.max),
 )
 
 watch(
@@ -180,14 +194,25 @@ function inputValueValid(inputValue: number) {
 }
 
 function onInputWithSnap(value: string) {
-	let parsedValue = Number.parseFloat(value)
+	const parsedValue = Number.parseFloat(value)
+	const previousValue = previousRawValue.value ?? currentValue.value ?? props.min
+
+	let snappedValue = parsedValue
+	let closestDistance = props.snapRange
 
 	for (const snapPoint of props.snapPoints) {
 		const distance = Math.abs(snapPoint - parsedValue)
-		if (distance < props.snapRange) parsedValue = snapPoint
+		const previousDistance = Math.abs(snapPoint - previousValue)
+
+		// Only pull toward a snap point while approaching it, not while moving away
+		if (distance < closestDistance && distance < previousDistance) {
+			closestDistance = distance
+			snappedValue = snapPoint
+		}
 	}
 
-	inputValueValid(parsedValue)
+	previousRawValue.value = parsedValue
+	inputValueValid(snappedValue)
 }
 
 function onInput(event: Event) {
@@ -246,15 +271,15 @@ function onInput(event: Event) {
 		opacity: 1;
 	}
 
-	&:focus-visible + .slider-track .slider-thumb {
+	&:focus-visible ~ .slider-track .slider-thumb {
 		outline: 3px solid var(--color-focus-ring);
 		outline-offset: 3px;
 	}
 
 	&:hover,
 	&:focus-visible {
-		& + .slider-track .filled-slider-track,
-		& ~ .snap-points .brightness-on-hover {
+		& ~ .slider-track .filled-slider-track,
+		& ~ .snap-points .bg-brand {
 			filter: brightness(var(--hover-brightness));
 		}
 	}
@@ -262,6 +287,8 @@ function onInput(event: Event) {
 
 .slider-value :deep(input[type='number']) {
 	-moz-appearance: textfield;
+	flex: none;
+	width: calc(var(--value-chars) * 1ch);
 
 	&::-webkit-inner-spin-button,
 	&::-webkit-outer-spin-button {
@@ -272,6 +299,13 @@ function onInput(event: Event) {
 
 .filled-slider-track {
 	transition: width 0.25s var(--ease-out-expo);
+	@media (prefers-reduced-motion) {
+		transition: none;
+	}
+}
+
+.snap-points-filled {
+	transition: clip-path 0.25s var(--ease-out-expo);
 	@media (prefers-reduced-motion) {
 		transition: none;
 	}

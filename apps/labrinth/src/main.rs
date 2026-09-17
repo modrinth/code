@@ -80,7 +80,16 @@ fn main() -> std::io::Result<()> {
         }
     }
 
-    actix_rt::System::new().block_on(app())?;
+    let system = actix_rt::System::new();
+    let app_result = system.block_on(app());
+
+    // actix-rt drops its LocalSet before the Tokio runtime, outside any runtime
+    // context. Tasks still holding a sqlx PoolConnection then panic on drop,
+    // since returning the connection needs to spawn onto a runtime.
+    let tokio_handle = system.runtime().tokio_runtime().handle().clone();
+    let _tokio_context = tokio_handle.enter();
+    drop(system);
+    app_result?;
 
     // Sentry guard must live until the end of the app
     drop(sentry);
