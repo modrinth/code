@@ -3,14 +3,19 @@ import { NewspaperIcon, ServerStackIcon, UserIcon } from '@modrinth/assets'
 import {
 	Button,
 	Combobox,
+	type ComboboxOption,
 	defineMessages,
 	injectNotificationManager,
 	useVIntl,
-	type ComboboxOption,
 } from '@modrinth/ui'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
+import {
+	export_instance_mrpack_bytes,
+	get_pack_export_candidates,
+	list as listInstances,
+} from '@/helpers/instance'
 import {
 	adminBanUser,
 	adminCreateNews,
@@ -22,13 +27,13 @@ import {
 	adminListPacks,
 	adminListServers,
 	adminListUsers,
+	type AdminNews,
+	type AdminPack,
+	type AdminServer,
 	adminSetNewsPublished,
 	adminSetPackPublished,
 	adminSetServerPublished,
 	adminSetUserRole,
-	type AdminNews,
-	type AdminPack,
-	type AdminServer,
 	type AdminUser,
 } from '@/helpers/owyx-admin-api'
 import {
@@ -43,11 +48,6 @@ import {
 	setStoredOwyxApiBase,
 } from '@/helpers/owyx-api'
 import { createOwyxCatalogServer, publishLibraryPackToCatalog } from '@/helpers/owyx-friends'
-import {
-	export_instance_mrpack_bytes,
-	get_pack_export_candidates,
-	list as listInstances,
-} from '@/helpers/instance'
 import { get_game_versions } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
 import { useRootBreadcrumb } from '@/providers/breadcrumbs'
@@ -115,6 +115,7 @@ const messages = defineMessages({
 	createServer: { id: 'owyx.servers.create-server', defaultMessage: 'Publish server' },
 	creating: { id: 'owyx.servers.creating', defaultMessage: 'Publishing…' },
 	openSiteAdmin: { id: 'owyx.admin.open-site', defaultMessage: 'Open full site admin' },
+	openSiteHome: { id: 'owyx.admin.open-site-home', defaultMessage: 'Open owyx.site' },
 	openServersCatalog: {
 		id: 'owyx.admin.open-servers',
 		defaultMessage: 'Player servers catalog',
@@ -144,6 +145,14 @@ const messages = defineMessages({
 		defaultMessage: 'Also try http://127.0.0.1:3001 (dev only)',
 	},
 	saveSettings: { id: 'owyx.servers.save-settings', defaultMessage: 'Save API settings' },
+	apiHealth: {
+		id: 'owyx.admin.api-health',
+		defaultMessage: 'Check API status',
+	},
+	copyKeyHeader: {
+		id: 'owyx.admin.copy-key-header',
+		defaultMessage: 'Copy header name',
+	},
 	servers: { id: 'owyx.admin.servers', defaultMessage: 'Servers' },
 	packs: { id: 'owyx.admin.packs', defaultMessage: 'Packs' },
 	published: { id: 'owyx.admin.published', defaultMessage: 'Published' },
@@ -419,8 +428,48 @@ function saveSettings() {
 	statusMsg.value = 'Saved'
 }
 
+const apiHealth = ref('')
+const apiHealthBusy = ref(false)
+
+async function checkApiHealth() {
+	apiHealthBusy.value = true
+	apiHealth.value = ''
+	try {
+		const base = sanitizeOwyxApiBase(apiBase.value)
+		const headers: Record<string, string> = { Accept: 'application/json' }
+		const key = clientKey.value.trim() || getOwyxClientKey()
+		if (key) headers['X-Owyx-Client-Key'] = key
+		const res = await fetch(`${base}/api/launcher/v1/status`, {
+			headers,
+			signal: AbortSignal.timeout(8000),
+		})
+		const data = (await res.json().catch(() => ({}))) as {
+			version?: string
+			api?: string
+			error?: string
+		}
+		if (!res.ok) {
+			apiHealth.value = data.error || `HTTP ${res.status}`
+		} else {
+			apiHealth.value = `OK · ${data.api || 'owyx-launcher'} · API ${data.version || '?'}`
+		}
+	} catch (e) {
+		apiHealth.value = e instanceof Error ? e.message : String(e)
+	} finally {
+		apiHealthBusy.value = false
+	}
+}
+
 function openSiteAdmin() {
 	window.open('https://owyx.site/admin', '_blank', 'noopener,noreferrer')
+}
+
+function openSiteHome() {
+	window.open('https://owyx.site', '_blank', 'noopener,noreferrer')
+}
+
+function copyClientKeyHint() {
+	void navigator.clipboard.writeText('X-Owyx-Client-Key').catch(() => undefined)
 }
 
 onMounted(() => {
@@ -438,7 +487,9 @@ onMounted(() => {
 	<div class="owyx-admin mx-auto flex w-full max-w-5xl flex-col gap-5 px-4 py-6">
 		<header class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
 			<div>
-				<h1 class="m-0 text-2xl font-semibold text-contrast">{{ formatMessage(messages.title) }}</h1>
+				<h1 class="m-0 text-2xl font-semibold text-contrast">
+					{{ formatMessage(messages.title) }}
+				</h1>
 				<p class="m-0 text-secondary">{{ formatMessage(messages.subtitle) }}</p>
 			</div>
 			<div class="flex flex-wrap gap-2">
@@ -570,7 +621,11 @@ onMounted(() => {
 						:disabled="busy || !formName || !formAddress || !formMc || !formLoader"
 						@click="publishServer"
 					>
-						{{ busy ? statusMsg || formatMessage(messages.creating) : formatMessage(messages.createServer) }}
+						{{
+							busy
+								? statusMsg || formatMessage(messages.creating)
+								: formatMessage(messages.createServer)
+						}}
 					</Button>
 				</div>
 				<p v-if="statusMsg" class="m-0 text-sm text-secondary">{{ statusMsg }}</p>
@@ -595,7 +650,9 @@ onMounted(() => {
 					<button
 						type="button"
 						class="rounded-lg px-3 py-1.5 text-sm"
-						:class="catalogSub === 'packs' ? 'bg-brand/20 text-brand' : 'bg-surface-3 text-secondary'"
+						:class="
+							catalogSub === 'packs' ? 'bg-brand/20 text-brand' : 'bg-surface-3 text-secondary'
+						"
 						@click="catalogSub = 'packs'"
 					>
 						{{ formatMessage(messages.packs) }} ({{ packs.length }})
@@ -623,7 +680,9 @@ onMounted(() => {
 										.catch(handleError)
 								"
 							>
-								{{ s.published ? formatMessage(messages.published) : formatMessage(messages.draft) }}
+								{{
+									s.published ? formatMessage(messages.published) : formatMessage(messages.draft)
+								}}
 							</Button>
 							<Button
 								class="!bg-button-bg !text-red"
@@ -783,7 +842,9 @@ onMounted(() => {
 				v-else-if="adminTab === 'news'"
 				class="flex flex-col gap-3 rounded-xl border border-solid border-surface-5 bg-surface-2 p-4"
 			>
-				<div class="grid gap-2 rounded-lg border border-solid border-surface-5 bg-surface-3 p-3 sm:grid-cols-2">
+				<div
+					class="grid gap-2 rounded-lg border border-solid border-surface-5 bg-surface-3 p-3 sm:grid-cols-2"
+				>
 					<label class="flex flex-col gap-1 text-sm sm:col-span-2">
 						<span class="text-secondary">{{ formatMessage(messages.newsTitle) }}</span>
 						<input
@@ -830,11 +891,11 @@ onMounted(() => {
 						<div class="flex flex-wrap gap-2">
 							<Button
 								class="!bg-button-bg"
-								@click="
-									adminSetNewsPublished(n.id, !n.published).then(loadNews).catch(handleError)
-								"
+								@click="adminSetNewsPublished(n.id, !n.published).then(loadNews).catch(handleError)"
 							>
-								{{ n.published ? formatMessage(messages.published) : formatMessage(messages.draft) }}
+								{{
+									n.published ? formatMessage(messages.published) : formatMessage(messages.draft)
+								}}
 							</Button>
 							<Button
 								class="!bg-button-bg !text-red"
@@ -878,9 +939,21 @@ onMounted(() => {
 					<input v-model="localFallback" type="checkbox" />
 					{{ formatMessage(messages.localFallbackToggle) }}
 				</label>
-				<Button type="colored" color="brand" @click="saveSettings">
-					{{ formatMessage(messages.saveSettings) }}
-				</Button>
+				<div class="flex flex-wrap gap-2">
+					<Button type="colored" color="brand" @click="saveSettings">
+						{{ formatMessage(messages.saveSettings) }}
+					</Button>
+					<Button class="!bg-button-bg" :disabled="apiHealthBusy" @click="checkApiHealth">
+						{{ formatMessage(messages.apiHealth) }}
+					</Button>
+					<Button class="!bg-button-bg" @click="openSiteHome">
+						{{ formatMessage(messages.openSiteHome) }}
+					</Button>
+					<Button class="!bg-button-bg" @click="copyClientKeyHint">
+						{{ formatMessage(messages.copyKeyHeader) }}
+					</Button>
+				</div>
+				<p v-if="apiHealth" class="m-0 text-sm text-secondary">{{ apiHealth }}</p>
 				<p v-if="statusMsg" class="m-0 text-sm text-secondary">{{ statusMsg }}</p>
 			</section>
 		</template>

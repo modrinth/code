@@ -227,7 +227,8 @@ fn read_meta_from_profile_json(folder: &Path) -> Option<DetectedMeta> {
 }
 
 fn read_meta_from_minecraftinstance(folder: &Path) -> Option<DetectedMeta> {
-    let raw = std::fs::read_to_string(folder.join("minecraftinstance.json")).ok()?;
+    let raw =
+        std::fs::read_to_string(folder.join("minecraftinstance.json")).ok()?;
     let meta: MinecraftInstanceFile = serde_json::from_str(&raw).ok()?;
     let (loader, loader_version) = meta
         .base_mod_loader
@@ -273,7 +274,9 @@ fn read_meta_from_manifest(folder: &Path) -> Option<DetectedMeta> {
     })
 }
 
-fn detect_loader_heuristic(folder: &Path) -> (ModLoader, Option<String>, Option<String>) {
+fn detect_loader_heuristic(
+    folder: &Path,
+) -> (ModLoader, Option<String>, Option<String>) {
     let mods = folder.join("mods");
     if mods.is_dir()
         && let Ok(rd) = std::fs::read_dir(&mods)
@@ -316,11 +319,16 @@ fn merge_meta(into: &mut DetectedMeta, from: DetectedMeta) {
     }
 }
 
-async fn resolve_meta(folder: &Path, folder_name: &str, search_root: &Path) -> DetectedMeta {
+async fn resolve_meta(
+    folder: &Path,
+    folder_name: &str,
+    search_root: &Path,
+) -> DetectedMeta {
     let mut meta = DetectedMeta::default();
 
     // 1) Modrinth App SQLite — authoritative for Theseus installs.
-    if let Some(db) = find_modrinth_app_db(search_root).or_else(|| find_modrinth_app_db(folder))
+    if let Some(db) = find_modrinth_app_db(search_root)
+        .or_else(|| find_modrinth_app_db(folder))
         && let Some(from_db) = read_meta_from_app_db(&db, folder_name).await
     {
         merge_meta(&mut meta, from_db);
@@ -464,14 +472,8 @@ async fn import_modrinth_folder(
     .await?;
 
     let state = State::get().await?;
-    finish_import(
-        instance_id,
-        folder,
-        &state.io_semaphore,
-        reporter,
-        details,
-    )
-    .await?;
+    finish_import(instance_id, folder, &state.io_semaphore, reporter, details)
+        .await?;
 
     Ok(())
 }

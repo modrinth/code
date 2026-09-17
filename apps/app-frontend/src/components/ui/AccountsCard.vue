@@ -3,12 +3,13 @@
 		v-if="accounts.length === 0"
 		class="flex flex-col gap-3 bg-button-bg border border-solid border-surface-5 rounded-xl p-3 mt-2"
 	>
-		<span>{{ formatMessage(messages.notSignedIn) }}</span>
+		<span class="font-medium text-contrast">{{ formatMessage(messages.notSignedIn) }}</span>
+		<p class="m-0 text-xs text-secondary leading-relaxed">
+			{{ formatMessage(messages.pathsHint) }}
+		</p>
 		<div class="flex flex-col gap-2">
-			<Button type="colored" color="brand" :disabled="loginDisabled" @click="loginMicrosoft()">
-				<LogInIcon v-if="!loginDisabled" />
-				<SpinnerIcon v-else class="animate-spin" />
-				{{ formatMessage(messages.signInMicrosoft) }}
+			<Button type="colored" color="brand" :disabled="loginDisabled" @click="signInOwyxSite()">
+				{{ formatMessage(messages.signInOwyxSite) }}
 			</Button>
 			<Button
 				class="!bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
@@ -17,7 +18,17 @@
 			>
 				{{ formatMessage(messages.offlineNickname) }}
 			</Button>
+			<Button
+				class="!bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
+				:disabled="loginDisabled"
+				@click="loginMicrosoft()"
+			>
+				<LogInIcon v-if="!loginDisabled" />
+				<SpinnerIcon v-else class="animate-spin" />
+				{{ formatMessage(messages.signInMicrosoft) }}
+			</Button>
 		</div>
+		<p class="m-0 text-[11px] text-secondary">{{ formatMessage(messages.microsoftStubHint) }}</p>
 		<div v-if="showOfflineForm" class="flex flex-col gap-2 pt-1">
 			<p class="m-0 text-xs text-secondary">{{ formatMessage(messages.offlineWarning) }}</p>
 			<input
@@ -28,7 +39,12 @@
 				:placeholder="formatMessage(messages.nicknamePlaceholder)"
 				@keydown.enter="loginOffline()"
 			/>
-			<Button type="colored" color="brand" :disabled="loginDisabled || !offlineNickname.trim()" @click="loginOffline()">
+			<Button
+				type="colored"
+				color="brand"
+				:disabled="loginDisabled || !offlineNickname.trim()"
+				@click="loginOffline()"
+			>
 				{{ formatMessage(messages.playOffline) }}
 			</Button>
 		</div>
@@ -54,6 +70,12 @@
 						selectedAccount ? selectedAccount.profile.name : formatMessage(messages.selectAccount)
 					}}</span>
 					<span class="text-secondary text-xs">{{ accountTypeLabel(selectedAccount) }}</span>
+					<span
+						v-if="owyxSite.isSignedIn.value"
+						class="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-brand"
+					>
+						{{ formatMessage(messages.owyxSessionBadge) }}
+					</span>
 				</div>
 			</div>
 		</template>
@@ -100,10 +122,10 @@
 				<Button
 					class="w-full !bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
 					:disabled="loginDisabled"
-					@click="loginMicrosoft()"
+					@click="signInOwyxSite()"
 				>
 					<PlusIcon />
-					{{ formatMessage(messages.addMicrosoft) }}
+					{{ formatMessage(messages.signInOwyxSite) }}
 				</Button>
 				<Button
 					class="w-full !bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
@@ -113,6 +135,17 @@
 					<PlusIcon />
 					{{ formatMessage(messages.addOffline) }}
 				</Button>
+				<Button
+					class="w-full !bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
+					:disabled="loginDisabled"
+					@click="loginMicrosoft()"
+				>
+					<PlusIcon />
+					{{ formatMessage(messages.addMicrosoft) }}
+				</Button>
+				<p class="m-0 px-1 text-[11px] text-secondary">
+					{{ formatMessage(messages.microsoftStubHint) }}
+				</p>
 				<div v-if="showOfflineForm" class="flex flex-col gap-2 pb-1">
 					<p class="m-0 text-xs text-secondary">{{ formatMessage(messages.offlineWarning) }}</p>
 					<input
@@ -169,8 +202,8 @@ import {
 	set_default_user,
 	users,
 } from '@/helpers/auth'
-import { getPlayerHeadUrl } from '@/helpers/rendering/player-head'
 import { resolveOwyxAvatarUrl } from '@/helpers/owyx-avatar'
+import { getPlayerHeadUrl } from '@/helpers/rendering/player-head'
 import type { Skin } from '@/helpers/skins'
 import { get_available_skins } from '@/helpers/skins'
 import { injectOwyxSiteSession } from '@/providers/owyx-site-session'
@@ -337,14 +370,48 @@ async function loginOffline() {
 	const name = offlineNickname.value.trim()
 	if (!name) return
 	loginDisabled.value = true
-	const loggedIn = await login_offline_flow(name).catch(handleSevereError)
-	if (loggedIn) {
-		await setAccount(loggedIn)
-		offlineNickname.value = ''
-		showOfflineForm.value = false
+	try {
+		const loggedIn = await login_offline_flow(name, true).catch(handleSevereError)
+		if (loggedIn) {
+			await setAccount(loggedIn)
+			offlineNickname.value = ''
+			showOfflineForm.value = false
+		}
+		trackEvent('AccountLogInOffline')
+	} finally {
+		loginDisabled.value = false
 	}
-	trackEvent('AccountLogInOffline')
-	loginDisabled.value = false
+}
+
+/**
+ * Sign in to Owyx site session (friends/skins). Sync nickname onto disk without
+ * stealing an existing active Microsoft account when other profiles already exist.
+ */
+async function signInOwyxSite() {
+	if (loginDisabled.value) return
+	loginDisabled.value = true
+	try {
+		await owyxSite.signIn()
+		const nick = owyxSite.session.value?.user?.nickname
+		if (!nick) return
+		if (nick.length < 3 || nick.length > 16 || !/^[A-Za-z0-9_]+$/.test(nick)) {
+			handleError(new Error(formatMessage(messages.owyxNickTooLong)))
+			return
+		}
+		const makeActive = accounts.value.length === 0
+		const loggedIn = await login_offline_flow(nick, makeActive).catch(handleSevereError)
+		if (loggedIn && makeActive) {
+			await setAccount(loggedIn)
+		} else {
+			await refreshValues()
+			emit('change')
+		}
+		trackEvent('AccountLogInOwyxSite')
+	} catch (e) {
+		handleError(e)
+	} finally {
+		loginDisabled.value = false
+	}
 }
 
 async function logout(id: string) {
@@ -367,7 +434,30 @@ useAppEvent('process', async (e) => {
 const messages = defineMessages({
 	notSignedIn: {
 		id: 'minecraft-account.not-signed-in',
-		defaultMessage: 'Not signed in',
+		defaultMessage: 'Choose how to play',
+	},
+	pathsHint: {
+		id: 'minecraft-account.paths-hint',
+		defaultMessage:
+			'1) Sign in with your Owyx site account · 2) Use an offline nickname · 3) Microsoft (licensed Minecraft).',
+	},
+	signInOwyxSite: {
+		id: 'minecraft-account.sign-in-owyx-site',
+		defaultMessage: 'Sign in with Owyx account',
+	},
+	owyxSessionBadge: {
+		id: 'minecraft-account.owyx-session-badge',
+		defaultMessage: 'Owyx site session',
+	},
+	owyxNickTooLong: {
+		id: 'minecraft-account.owyx-nick-too-long',
+		defaultMessage:
+			'Owyx nickname must be 3–16 letters, numbers, or underscores to sync with offline play and skins. Change it on owyx.site, then try again.',
+	},
+	microsoftStubHint: {
+		id: 'minecraft-account.microsoft-stub-hint',
+		defaultMessage:
+			'Microsoft is for a licensed Minecraft profile. Signing into Owyx does not replace an active Microsoft account. Use “Play with offline nickname” if you want the offline profile selected.',
 	},
 	addAccount: {
 		id: 'minecraft-account.add-account',
@@ -379,7 +469,7 @@ const messages = defineMessages({
 	},
 	addOffline: {
 		id: 'minecraft-account.add-offline',
-		defaultMessage: 'Add Owyx account',
+		defaultMessage: 'Add offline nickname',
 	},
 	removeAccount: {
 		id: 'minecraft-account.remove-account',
@@ -399,7 +489,7 @@ const messages = defineMessages({
 	},
 	offlineAccount: {
 		id: 'minecraft-account.offline',
-		defaultMessage: 'Owyx',
+		defaultMessage: 'Owyx / offline',
 	},
 	signInMicrosoft: {
 		id: 'minecraft-account.sign-in-microsoft',
@@ -407,12 +497,12 @@ const messages = defineMessages({
 	},
 	offlineNickname: {
 		id: 'minecraft-account.offline-nickname',
-		defaultMessage: 'Owyx nickname',
+		defaultMessage: 'Play with offline nickname',
 	},
 	offlineWarning: {
 		id: 'minecraft-account.offline-warning',
 		defaultMessage:
-			'Uses your Owyx site nickname for offline-mode servers. Public Microsoft-authenticated servers still need a Microsoft account.',
+			'Uses a nickname for offline-mode servers. Prefer the same nick as on owyx.site so skins and friends match. Public Microsoft-authenticated servers still need a Microsoft account.',
 	},
 	nicknamePlaceholder: {
 		id: 'minecraft-account.nickname-placeholder',
@@ -420,7 +510,7 @@ const messages = defineMessages({
 	},
 	playOffline: {
 		id: 'minecraft-account.play-offline',
-		defaultMessage: 'Save Owyx account',
+		defaultMessage: 'Save nickname',
 	},
 	signInToMinecraft: {
 		id: 'minecraft-account.sign-in',

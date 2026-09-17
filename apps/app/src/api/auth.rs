@@ -95,11 +95,10 @@ pub async fn login_offline(
     username: String,
     make_active: Option<bool>,
 ) -> Result<Credentials> {
-    Ok(minecraft_auth::login_offline(
-        &username,
-        make_active.unwrap_or(true),
+    Ok(
+        minecraft_auth::login_offline(&username, make_active.unwrap_or(true))
+            .await?,
     )
-    .await?)
 }
 
 #[tauri::command]

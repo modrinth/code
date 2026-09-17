@@ -30,6 +30,8 @@ gam = "gam"
 consts = "consts"
 # short for "Copy"
 Cpy = "Cpy"
+# Intentional local filename for cloud task paste (gitignored); not "prompt.md"
+promt = "promt"
 
 [default.extend-identifiers]
 # Constant from the `zip` crate

@@ -65,4 +65,35 @@ describe('clientKeyGate', () => {
 		assert.equal(status, 401)
 		assert.equal(body.error, 'unauthorized_client')
 	})
+
+	it('allows public CSL paths on api host without key', async () => {
+		process.env.API_HOSTS = 'api.owyx.site'
+		process.env.LAUNCHER_CLIENT_KEY = 'test-key-value'
+		process.env.NODE_ENV = 'production'
+		const req = mockReq({
+			host: 'api.owyx.site',
+			hostname: 'api.owyx.site',
+			path: '/api/csl/skins/Steve.png',
+		})
+		let nextCalled = false
+		await new Promise((resolve) => {
+			clientKeyGate(
+				req,
+				{
+					status() {
+						return this
+					},
+					json() {
+						return this
+					},
+				},
+				() => {
+					nextCalled = true
+					resolve()
+				},
+			)
+			setTimeout(resolve, 20)
+		})
+		assert.equal(nextCalled, true)
+	})
 })

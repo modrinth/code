@@ -2,7 +2,7 @@
  * Owyx friends presence heartbeat for the launcher sidebar.
  */
 
-import { postOwyxPresence, type OwyxFriendPresence } from '@/helpers/owyx-friends'
+import { type OwyxFriendPresence, postOwyxPresence } from '@/helpers/owyx-friends'
 
 let heartbeatTimer: ReturnType<typeof setInterval> | null = null
 let current: { status: OwyxFriendPresence; instanceName?: string | null } = {

@@ -38,13 +38,11 @@ const messages = defineMessages({
 	},
 	surveyBody: {
 		id: 'app.survey.body',
-		defaultMessage:
-			'Would you mind answering a few questions about your experience with Owyx?',
+		defaultMessage: 'Would you mind answering a few questions about your experience with Owyx?',
 	},
 	surveyFooter: {
 		id: 'app.survey.footer',
-		defaultMessage:
-			'This feedback helps guide future Owyx updates.',
+		defaultMessage: 'This feedback helps guide future Owyx updates.',
 	},
 	takeSurvey: {
 		id: 'app.survey.take-survey',

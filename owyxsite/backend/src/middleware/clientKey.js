@@ -31,6 +31,10 @@ function clientKeyGate(req, res, next) {
   if (path === '/health' || path.startsWith('/health/')) {
     return next();
   }
+  // Public CustomSkinLoader endpoints — Minecraft clients have no launcher key.
+  if (path === '/api/csl' || path.startsWith('/api/csl/')) {
+    return next();
+  }
 
   const apiHosts = parseList(process.env.API_HOSTS, 'api.owyx.site');
   const host = requestHost(req);

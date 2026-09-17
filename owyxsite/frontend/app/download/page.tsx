@@ -35,7 +35,7 @@ function LinuxIcon({ className }: { className?: string }) {
 }
 
 export default function DownloadPage() {
-  const { dict, locale } = useLocale();
+  const { dict } = useLocale();
   const d = dict.download;
   const steps = [
     { n: "1", title: d.step1Title, text: d.step1Text },
@@ -81,7 +81,7 @@ export default function DownloadPage() {
             </a>
           </div>
           <p className="text-muted text-sm mb-14 max-w-lg">
-            {locale === "en_US" ? "Current files:" : "Актуальные файлы:"}{" "}
+            {d.currentFiles}{" "}
             <code className="text-xs">Owyx_*_x64-setup.exe</code> /{" "}
             <code className="text-xs">Owyx_*_amd64.AppImage</code> —{" "}
             <a href={RELEASES_URL} target="_blank" rel="noopener noreferrer" className="link-accent">
@@ -103,23 +103,11 @@ export default function DownloadPage() {
           </ol>
 
           <div className="mt-10 text-muted text-sm">
-            {locale === "en_US" ? (
-              <>
-                Want a skin and extras?{" "}
-                <Link href="/register" className="link-accent">
-                  Create an Owyx™ account
-                </Link>{" "}
-                and sign in with the same account in the launcher.
-              </>
-            ) : (
-              <>
-                Хочешь свой скин и плюшки?{" "}
-                <Link href="/register" className="link-accent">
-                  Создай аккаунт Owyx™
-                </Link>{" "}
-                и войди тем же аккаунтом в лаунчере.
-              </>
-            )}
+            {d.skinCtaBefore}{" "}
+            <Link href="/register" className="link-accent">
+              {d.skinCtaLink}
+            </Link>{" "}
+            {d.skinCtaAfter}
           </div>
         </section>
       </main>

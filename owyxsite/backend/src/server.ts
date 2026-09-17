@@ -109,6 +109,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/friends', require('./routes/friends'));
+app.use('/api/csl', require('./routes/csl'));
 app.use('/api/admin', adminRoutes);
 app.use('/api', settingsRoutes);
 app.use('/api/reputation', reputationRoutes);

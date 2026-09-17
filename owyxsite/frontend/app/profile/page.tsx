@@ -532,7 +532,7 @@ function NicknameSection({ currentNick }: { currentNick?: string }) {
               className="input sm:max-w-xs"
               value={nick}
               onChange={(e) => setNick(e.target.value)}
-              maxLength={32}
+              maxLength={16}
               placeholder="YourNickname"
               disabled={onCooldown}
               autoComplete="username"

@@ -57,9 +57,7 @@ const instancesQuery = useQuery(instanceListQueryOptions())
 const instances = computed(() => instancesQuery.data.value ?? [])
 const showWelcome = computed(() => isReady.value && instances.value.length === 0)
 
-await traceStartupStep('Load library instances', () => instancesQuery.suspense()).catch(
-	handleError,
-)
+await traceStartupStep('Load library instances', () => instancesQuery.suspense()).catch(handleError)
 
 const recentInstances = computed(() =>
 	instances.value

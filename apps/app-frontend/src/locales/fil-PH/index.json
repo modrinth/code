@@ -1,635 +1,629 @@
 {
-	"app.action-bar.downloading-java": {
-		"message": "Dina-download ang Java {version}"
-	},
-	"app.action-bar.downloading-update": {
-		"message": "Dina-download ang update"
-	},
-	"app.action-bar.downloads": {
-		"message": "Mga downloads"
-	},
-	"app.action-bar.hide-more-running-instances": {
-		"message": "Itago ang mas marami pang tumatakbong instansiya"
-	},
-	"app.action-bar.install.copied-details": {
-		"message": "Kinopya"
-	},
-	"app.action-bar.install.copy-details": {
-		"message": "Kopyahin ang detalye"
-	},
-	"app.action-bar.install.retry": {
-		"message": "Subukan muli"
-	},
-	"app.action-bar.install.summary.app-closing": {
-		"message": "Kinansela dahil sa pagsara ng aplikasyon"
-	},
-	"app.action-bar.install.summary.bad-modpack-file": {
-		"message": "Hindi mabasa ang modpack"
-	},
-	"app.action-bar.install.summary.canceled": {
-		"message": "Kinansela"
-	},
-	"app.action-bar.install.summary.cleanup-incomplete": {
-		"message": "Hindi matapos ang paglinis"
-	},
-	"app.action-bar.install.summary.content-download-failed": {
-		"message": "Hindi ma-download ang mga talaksan"
-	},
-	"app.action-bar.install.summary.could-not-save-files": {
-		"message": "Hindi ma-save ang mga talaksan"
-	},
-	"app.action-bar.install.summary.download-failed": {
-		"message": "Hindi matapos ang pagdownload"
-	},
-	"app.action-bar.install.summary.instance-not-found": {
-		"message": "Hindi mahanap ang instansiya"
-	},
-	"app.action-bar.make-primary-instance": {
-		"message": "Gumawa ng pangunahing instansiya"
-	},
-	"app.action-bar.no-instances-running": {
-		"message": "Walang instansiya ang tumatakbo"
-	},
-	"app.action-bar.offline": {
-		"message": "Offline"
-	},
-	"app.action-bar.primary-instance": {
-		"message": "Pangunahing instansiya"
-	},
-	"app.action-bar.reload-to-update": {
-		"message": "Mag-reload upang ma-update"
-	},
-	"app.action-bar.show-more-running-instances": {
-		"message": "Ipakita ang mas marami pang tumatakbong instansiya"
-	},
-	"app.action-bar.stop-instance": {
-		"message": "Itigil ang instansiya"
-	},
-	"app.action-bar.update": {
-		"message": "Mag-update"
-	},
-	"app.action-bar.view-active-downloads": {
-		"message": "Tignan ang mga active downloads"
-	},
-	"app.action-bar.view-instance": {
-		"message": "Tignan ang instansiya"
-	},
-	"app.action-bar.view-logs": {
-		"message": "Tignan ang logs"
-	},
-	"app.appearance-settings.default-landing-page.home": {
-		"message": "Tahanan"
-	},
-	"app.appearance-settings.default-landing-page.library": {
-		"message": "Librarya"
-	},
-	"app.appearance-settings.hide-nametag.title": {
-		"message": "Itago ang nametag"
-	},
-	"app.appearance-settings.unknown-pack-warning.title": {
-		"message": "Pakipaalala bago ko ma-install ang mga di-kilalang modpack"
-	},
-	"app.auth-servers.unreachable.body": {
-		"message": "Maaaring hindi maaabot ang mga authentication server ng Minecraft sa ngayon. Tingnan mo ang iyong internet connection at muling subukan mamaya."
-	},
-	"app.auth-servers.unreachable.header": {
-		"message": "Hindi maabot ang mga authentication server"
-	},
-	"app.browse.add-servers-to-instance": {
-		"message": "Idinaragdag ang server sa instansiya"
-	},
-	"app.browse.add-to-an-instance": {
-		"message": "Idagdag sa instansiya"
-	},
-	"app.browse.add-to-instance": {
-		"message": "Idagdag sa instansiya"
-	},
-	"app.browse.add-to-instance-name": {
-		"message": "Idagdag sa {instanceName}"
-	},
-	"app.browse.added": {
-		"message": "Dinagdag"
-	},
-	"app.browse.already-added": {
-		"message": "Nadagdag na"
-	},
-	"app.browse.back-to-instance": {
-		"message": "Bumalik sa instansiya"
-	},
-	"app.browse.discover-servers": {
-		"message": "Tumuklas ng mga server"
-	},
-	"app.browse.project-type.modpacks": {
-		"message": "Modpacks"
-	},
-	"app.browse.server.installing": {
-		"message": "Ini-install"
-	},
-	"app.export-modal.description-placeholder": {
-		"message": "Ilagay ang paglalarawan ng modpack..."
-	},
-	"app.export-modal.export-button": {
-		"message": "Iluwas"
-	},
-	"app.export-modal.header": {
-		"message": "Iluwas ang modpack"
-	},
-	"app.export-modal.modpack-name-placeholder": {
-		"message": "Pangalan ng modpack"
-	},
-	"app.export-modal.version-number-label": {
-		"message": "Numero ng bersiyon"
-	},
-	"app.export-modal.version-number-placeholder": {
-		"message": "1.0.0"
-	},
-	"app.instance.confirm-delete.admonition-body": {
-		"message": "Ang lahat ng data ng iyong instansiya ay tuluyang mawawala, kabilang na ang iyong mga mundo, kumpigurasyon, at lahat ng na-install na kontento."
-	},
-	"app.instance.confirm-delete.admonition-header": {
-		"message": "Hindi mababawi ang aksiyong ito"
-	},
-	"app.instance.confirm-delete.delete-button": {
-		"message": "Tanggalin ang instansiya"
-	},
-	"app.instance.confirm-delete.header": {
-		"message": "Tanggalin ang instansiya"
-	},
-	"app.instance.modpack-already-installed.body": {
-		"message": "Naka-install na ang modpack sa instansiyang <bold>{instanceName}</bold>. Sigurado ka ba sa pag-ulit nito?"
-	},
-	"app.instance.modpack-already-installed.create": {
-		"message": "Ilikha"
-	},
-	"app.instance.modpack-already-installed.header": {
-		"message": "Naka-install na ang modpack"
-	},
-	"app.instance.modpack-already-installed.instance": {
-		"message": "Instansiya"
-	},
-	"app.instance.mods.content-type-project": {
-		"message": "proyekto"
-	},
-	"app.instance.mods.project-was-added": {
-		"message": "Ang \"{name}\" ay nadagdag"
-	},
-	"app.instance.mods.projects-were-added": {
-		"message": "{count} proyekto ang nadagdag"
-	},
-	"app.instance.mods.share-text": {
-		"message": "Tingnan ang mga proyektong ginagamit ko sa aking modpack!"
-	},
-	"app.instance.mods.share-title": {
-		"message": "Binabahagi ang kontento ng modpack"
-	},
-	"app.instance.mods.successfully-uploaded": {
-		"message": "Matagumpay na na-upload"
-	},
-	"app.instance.worlds.add-server": {
-		"message": "Magdagdag ng server"
-	},
-	"app.instance.worlds.browse-servers": {
-		"message": "Mag-browse ng servers"
-	},
-	"app.instance.worlds.filter-modded": {
-		"message": "Modded"
-	},
-	"app.instance.worlds.filter-offline": {
-		"message": "Offline"
-	},
-	"app.instance.worlds.filter-online": {
-		"message": "Online"
-	},
-	"app.instance.worlds.filter-vanilla": {
-		"message": "Vanilla"
-	},
-	"app.instance.worlds.no-worlds-description": {
-		"message": "Maglagay ng server o mag-browse upang mag-simula"
-	},
-	"app.instance.worlds.no-worlds-heading": {
-		"message": "Walang servers o worlds ang nalalagay"
-	},
-	"app.instance.worlds.search-worlds-placeholder": {
-		"message": "Hanapin sa {count} mundo..."
-	},
-	"app.modal.install-to-play.header": {
-		"message": "Mag-install upang malaro"
-	},
-	"app.modal.install-to-play.install-button": {
-		"message": "I-install"
-	},
-	"app.modal.install-to-play.mod-count": {
-		"message": "{count, plural, one {# mod} other {# na mod}}"
-	},
-	"app.modal.install-to-play.shared-instance": {
-		"message": "Binahaging instansiya"
-	},
-	"app.modal.install-to-play.view-contents": {
-		"message": "Tingnan ang mga kontento"
-	},
-	"app.modal.update-to-play.header": {
-		"message": "Mag-update upang malaro"
-	},
-	"app.project.install-button.already-installed": {
-		"message": "Naka-install na ang proyektong ito"
-	},
-	"app.project.install-context.back-to-browse": {
-		"message": "Bumalik sa pagtutuklas"
-	},
-	"app.settings.developer-mode-enabled": {
-		"message": "Binuksan ang moda ng nagdi-develop."
-	},
-	"app.settings.downloading": {
-		"message": "Dina-download ang v{version}"
-	},
-	"app.settings.tabs.appearance": {
-		"message": "Itsura"
-	},
-	"app.settings.tabs.java-installations": {
-		"message": "Mga instalasyon ng Java"
-	},
-	"app.settings.tabs.language": {
-		"message": "Wika"
-	},
-	"app.settings.tabs.privacy": {
-		"message": "Pribasiya"
-	},
-	"app.settings.tabs.resource-management": {
-		"message": "Pamamahala ng paglalaan"
-	},
-	"app.skins.apply-button": {
-		"message": "Ilapat"
-	},
-	"app.skins.modal.arm-style-slim": {
-		"message": "Payat"
-	},
-	"app.skins.modal.arm-style-wide": {
-		"message": "Malapad"
-	},
-	"app.skins.modal.cape-fallback-name": {
-		"message": "Kapa"
-	},
-	"app.skins.modal.cape-section": {
-		"message": "Kapa"
-	},
-	"app.skins.modal.no-cape-tooltip": {
-		"message": "Walang kapa"
-	},
-	"app.skins.modal.none-cape-option": {
-		"message": "Wala"
-	},
-	"app.skins.modal.texture-section": {
-		"message": "Texture"
-	},
-	"app.skins.section.modrinth": {
-		"message": "Owyx"
-	},
-	"app.skins.section.modrinth-pride": {
-		"message": "Owyx Pride"
-	},
-	"app.update-popup.body.download-complete": {
-		"message": "Tapos nang ma-download ang Owyx v{version}. Mag-reload upang ma-update ngayon, o awtomatiko sa pagsara ng Owyx."
-	},
-	"app.update-popup.body.linux": {
-		"message": "Magagamit na ngayon ang Owyx v{version}. Gamitin ang iyong package manager upang i-update sa pinabagong tampok at pag-aayos!"
-	},
-	"app.update-popup.body.metered": {
-		"message": "Magagamit na ngayon ang Owyx v{version}! Hindi namin dinanload kaagad dahil naka-metro ang inyong network."
-	},
-	"app.update-popup.changelog": {
-		"message": "Changelog"
-	},
-	"app.update-popup.download": {
-		"message": "I-download ({size})"
-	},
-	"app.update-popup.download-complete": {
-		"message": "Nakumpleto ang pagdownload"
-	},
-	"app.update-popup.title": {
-		"message": "May bagong update"
-	},
-	"app.update.complete-toast.text": {
-		"message": "Dito pumindot upang matingnan ang changelog."
-	},
-	"app.update.complete-toast.title": {
-		"message": "Tagumpay na na-install ang bersiyong {version}!"
-	},
-	"app.world.server-modal.placeholder-address": {
-		"message": "play.example.com"
-	},
-	"app.world.server-modal.select-an-option": {
-		"message": "Pumili ng opsiyon"
-	},
-	"app.world.world-item.incompatible-version": {
-		"message": "Di-magkatugmang bersiyong {version}"
-	},
-	"app.world.world-item.not-played-yet": {
-		"message": "Hindi pa nalalaro"
-	},
-	"app.world.world-item.offline": {
-		"message": "Offline"
-	},
-	"friends.action.add-friend": {
-		"message": "Magdagdag ng kaibigan"
-	},
-	"friends.action.view-friend-requests": {
-		"message": "{count, plural, one {{count}} other {{count} na}} hiling na makipagkaibigan"
-	},
-	"friends.add-friend.submit": {
-		"message": "Magpadala ng hiling na makipagkaibigan"
-	},
-	"friends.add-friend.title": {
-		"message": "Pagdaragdag ng kaibigan"
-	},
-	"friends.add-friend.username.description": {
-		"message": "Maaaraing hindi pareho sa kanilang pangalan sa Minecraft!"
-	},
-	"friends.add-friend.username.placeholder": {
-		"message": "Ilagay ang username sa Owyx..."
-	},
-	"friends.add-friend.username.title": {
-		"message": "Ano ang pangalan ng iyong kaibigan sa Owyx?"
-	},
-	"friends.add-friends-to-share": {
-		"message": "<link>Magdagdag ng mga kaibigan</link> upang makita ang kanilang nilalaro!"
-	},
-	"friends.friend.cancel-request": {
-		"message": "Kanselahin ang hiling"
-	},
-	"friends.friend.remove-friend": {
-		"message": "Tanggalin ang kaibing"
-	},
-	"friends.friend.request-sent": {
-		"message": "Ipinadala na ang hiling na makipagkaibigan"
-	},
-	"friends.friend.view-profile": {
-		"message": "Tingnan ang profile"
-	},
-	"friends.heading": {
-		"message": "Mga kaibigan"
-	},
-	"friends.heading.active": {
-		"message": "Aktibo"
-	},
-	"friends.heading.offline": {
-		"message": "Offline"
-	},
-	"friends.heading.online": {
-		"message": "Online"
-	},
-	"friends.heading.pending": {
-		"message": "Nakabinbin"
-	},
-	"friends.no-friends-match": {
-		"message": "Walang kaibigang tumugma sa \"{query}\""
-	},
-	"friends.search-friends-placeholder": {
-		"message": "Hanapin ang mga kaibigan..."
-	},
-	"friends.section.heading": {
-		"message": "{title} - {count}"
-	},
-	"friends.sign-in-to-add-friends": {
-		"message": "<link>Mag-sign in sa Owyx account</link> upang maidagdag ang mga kaibigan at malaman ang kanilang nilalaro!"
-	},
-	"instance.add-server.add-and-play": {
-		"message": "Idagdag at laruin"
-	},
-	"instance.add-server.add-server": {
-		"message": "Idagdag ang server"
-	},
-	"instance.add-server.resource-pack.disabled": {
-		"message": "Tanggihan"
-	},
-	"instance.add-server.resource-pack.enabled": {
-		"message": "Payagan"
-	},
-	"instance.add-server.resource-pack.prompt": {
-		"message": "Magpahintulot"
-	},
-	"instance.add-server.title": {
-		"message": "Magdagdag ng server"
-	},
-	"instance.edit-server.title": {
-		"message": "Baguhin ang server"
-	},
-	"instance.edit-world.hide-from-home": {
-		"message": "Itago sa pahina ng Tahanan"
-	},
-	"instance.edit-world.name": {
-		"message": "Pangalan"
-	},
-	"instance.edit-world.placeholder-name": {
-		"message": "Minecraft na Mundo"
-	},
-	"instance.edit-world.reset-icon": {
-		"message": "I-reset ang ikono"
-	},
-	"instance.edit-world.title": {
-		"message": "Baguhin ang mundo"
-	},
-	"instance.files.adding-files": {
-		"message": "Idinadagdag ang mga file ({completed}/{total})"
-	},
-	"instance.files.save-as": {
-		"message": "I-save bilang..."
-	},
-	"instance.server-modal.address": {
-		"message": "Adres"
-	},
-	"instance.server-modal.name": {
-		"message": "Pangalan"
-	},
-	"instance.server-modal.placeholder-name": {
-		"message": "Minecraft Server"
-	},
-	"instance.server-modal.resource-pack": {
-		"message": "Resource pack"
-	},
-	"instance.settings.tabs.general": {
-		"message": "General"
-	},
-	"instance.settings.tabs.general.delete": {
-		"message": "Tanggalin ang instansiya"
-	},
-	"instance.settings.tabs.general.delete.button": {
-		"message": "Tanggalin ang instansiya"
-	},
-	"instance.settings.tabs.general.delete.description": {
-		"message": "Habambuhay na matatanggal ang instansiya sa iyong device, kasama ang iyong mga mundo, kompigurasyon, at lahat ng naka-install na kontento. Mag-ingat, kapag nagtanggal ka ng instansiya ay hindi na ito mababawi."
-	},
-	"instance.settings.tabs.general.deleting.button": {
-		"message": "Nagde-delete..."
-	},
-	"instance.settings.tabs.general.duplicate-button": {
-		"message": "I-duplicate"
-	},
-	"instance.settings.tabs.general.duplicate-button.tooltip.installing": {
-		"message": "Hindi makaka-duplicate habang nag-i-install."
-	},
-	"instance.settings.tabs.general.duplicate-instance": {
-		"message": "I-duplicate ang instansiya"
-	},
-	"instance.settings.tabs.general.duplicate-instance.description": {
-		"message": "Lilikhaan ng kopya ang instansiyang ito, kasama ang mga mundo, kumpigurasyon, mod, at iba pa."
-	},
-	"instance.settings.tabs.general.edit-icon": {
-		"message": "Baguhin ang ikono"
-	},
-	"instance.settings.tabs.general.edit-icon.remove": {
-		"message": "Tanggalin ang ikono"
-	},
-	"instance.settings.tabs.general.edit-icon.replace": {
-		"message": "Palitan ang ikono"
-	},
-	"instance.settings.tabs.general.edit-icon.select": {
-		"message": "Pumili ng ikono"
-	},
-	"instance.settings.tabs.general.name": {
-		"message": "Pangalan"
-	},
-	"instance.settings.tabs.general.update-channel.alpha": {
-		"message": "Alpha"
-	},
-	"instance.settings.tabs.general.update-channel.beta": {
-		"message": "Beta"
-	},
-	"instance.settings.tabs.hooks.post-exit": {
-		"message": "Post-exist"
-	},
-	"instance.settings.tabs.hooks.post-exit.description": {
-		"message": "Ipapatakbo pagkatapos magsara ang laro."
-	},
-	"instance.settings.tabs.hooks.post-exit.enter": {
-		"message": "Ilagay ang post-exit command..."
-	},
-	"instance.settings.tabs.hooks.pre-launch": {
-		"message": "Pre-launch"
-	},
-	"instance.settings.tabs.hooks.pre-launch.description": {
-		"message": "Ipapatakbo bago mai-launch ang instansiya."
-	},
-	"instance.settings.tabs.hooks.pre-launch.enter": {
-		"message": "Ilagay ang pre-launch command..."
-	},
-	"instance.settings.tabs.hooks.wrapper": {
-		"message": "Wrapper"
-	},
-	"instance.settings.tabs.hooks.wrapper.description": {
-		"message": "Wrapper command sa pag-launch ng Minecraft."
-	},
-	"instance.settings.tabs.hooks.wrapper.enter": {
-		"message": "Ilagay ang wrapper command..."
-	},
-	"instance.settings.tabs.installation": {
-		"message": "Instalasyon"
-	},
-	"instance.settings.tabs.installation.loader-version": {
-		"message": "Bersiyon ng {loader}"
-	},
-	"instance.settings.tabs.java.hooks": {
-		"message": "Mga hook"
-	},
-	"instance.settings.tabs.window.fullscreen": {
-		"message": "Fullscreen"
-	},
-	"instance.settings.tabs.window.fullscreen.description": {
-		"message": "Gagawing magsisimulang naka-fullscreen ang laro pag-launch (gamit ang options.txt)."
-	},
-	"instance.settings.tabs.window.height": {
-		"message": "Taas"
-	},
-	"instance.settings.tabs.window.height.description": {
-		"message": "Ang taas ng game window kung na-launch."
-	},
-	"instance.settings.tabs.window.height.enter": {
-		"message": "Ilagay ang taas..."
-	},
-	"instance.settings.tabs.window.width": {
-		"message": "Lapad"
-	},
-	"instance.settings.tabs.window.width.description": {
-		"message": "Ang lapad ng game window kung na-launch."
-	},
-	"instance.settings.tabs.window.width.enter": {
-		"message": "Ilagay ang lapad..."
-	},
-	"instance.worlds.a_minecraft_server": {
-		"message": "Isang Minecraft Server"
-	},
-	"instance.worlds.cant_connect": {
-		"message": "Hndi makakonekta sa server"
-	},
-	"instance.worlds.copy_address": {
-		"message": "Kopyahin ang adres"
-	},
-	"instance.worlds.dont_show_on_home": {
-		"message": "Huwag ipakita sa Tahanan"
-	},
-	"instance.worlds.game_already_open": {
-		"message": "Bukas naman ang instansiya"
-	},
-	"instance.worlds.hardcore": {
-		"message": "Modong eksperto"
-	},
-	"instance.worlds.incompatible_server": {
-		"message": "Hindi magkatugma sa server"
-	},
-	"instance.worlds.linked_server": {
-		"message": "Pinamamahala ng proyektong server"
-	},
-	"instance.worlds.no_contact": {
-		"message": "Hindi makontak ang server"
-	},
-	"instance.worlds.no_server_quick_play": {
-		"message": "Deretso kang makakalukso lamang sa mga server na nasa Minecraft Alpha 1.0.5+"
-	},
-	"instance.worlds.no_singleplayer_quick_play": {
-		"message": "Deretso kang makakalukso lamang sa mga pang-isahang larong mundo na nasa Minecraft 1.20+"
-	},
-	"instance.worlds.play_instance": {
-		"message": "Laruin ang instansiya"
-	},
-	"instance.worlds.view_instance": {
-		"message": "Tingnan ang instansiya"
-	},
-	"instance.worlds.world_in_use": {
-		"message": "Ginagamit ang mundo"
-	},
-	"minecraft-account.add-account": {
-		"message": "Maglagay ng account"
-	},
-	"minecraft-account.label": {
-		"message": "Minecraft account"
-	},
-	"minecraft-account.not-signed-in": {
-		"message": "Hindi pa naka sign in"
-	},
-	"minecraft-account.remove-account": {
-		"message": "Itanggal ang account"
-	},
-	"minecraft-account.select-account": {
-		"message": "Pumili ng account"
-	},
-	"minecraft-account.sign-in": {
-		"message": "Mag sign in kay Minecraft"
-	},
-	"search.filter.locked.instance": {
-		"message": "Sagot na ng instansiya"
-	},
-	"search.filter.locked.instance-game-version.title": {
-		"message": "Sagot na ng instansiya ang bersiyon ng laro"
-	},
-	"search.filter.locked.instance-loader.title": {
-		"message": "Sagot na ng instansiya ang loader ng laro"
-	},
-	"search.filter.locked.instance.sync": {
-		"message": "Maki-sync sa instansiya"
-	},
-	"search.filter.locked.server-environment.title": {
-		"message": "Mga mod sa panig ng client lamang ang maidadaragdag sa instansiyang server"
-	},
-	"app.nav.admin-panel": {
-		"message": "Admin panel"
-	}
+  "app.action-bar.downloading-java": {
+    "message": "Dina-download ang Java {version}"
+  },
+  "app.action-bar.downloading-update": {
+    "message": "Dina-download ang update"
+  },
+  "app.action-bar.downloads": {
+    "message": "Mga downloads"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Itago ang mas marami pang tumatakbong instansiya"
+  },
+  "app.action-bar.install.copied-details": {
+    "message": "Kinopya"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Kopyahin ang detalye"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Subukan muli"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Kinansela dahil sa pagsara ng aplikasyon"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Hindi mabasa ang modpack"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Kinansela"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Hindi matapos ang paglinis"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Hindi ma-download ang mga talaksan"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Hindi ma-save ang mga talaksan"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Hindi matapos ang pagdownload"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Hindi mahanap ang instansiya"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Gumawa ng pangunahing instansiya"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "Walang instansiya ang tumatakbo"
+  },
+  "app.action-bar.offline": {
+    "message": "Offline"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "Pangunahing instansiya"
+  },
+  "app.action-bar.reload-to-update": {
+    "message": "Mag-reload upang ma-update"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Ipakita ang mas marami pang tumatakbong instansiya"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Itigil ang instansiya"
+  },
+  "app.action-bar.update": {
+    "message": "Mag-update"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "Tignan ang mga active downloads"
+  },
+  "app.action-bar.view-instance": {
+    "message": "Tignan ang instansiya"
+  },
+  "app.action-bar.view-logs": {
+    "message": "Tignan ang logs"
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Tahanan"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Librarya"
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "Itago ang nametag"
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "Pakipaalala bago ko ma-install ang mga di-kilalang modpack"
+  },
+  "app.auth-servers.unreachable.body": {
+    "message": "Maaaring hindi maaabot ang mga authentication server ng Minecraft sa ngayon. Tingnan mo ang iyong internet connection at muling subukan mamaya."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Hindi maabot ang mga authentication server"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Idinaragdag ang server sa instansiya"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Idagdag sa instansiya"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Idagdag sa instansiya"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Idagdag sa {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "Dinagdag"
+  },
+  "app.browse.already-added": {
+    "message": "Nadagdag na"
+  },
+  "app.browse.back-to-instance": {
+    "message": "Bumalik sa instansiya"
+  },
+  "app.browse.discover-servers": {
+    "message": "Tumuklas ng mga server"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "Modpacks"
+  },
+  "app.browse.server.installing": {
+    "message": "Ini-install"
+  },
+  "app.export-modal.description-placeholder": {
+    "message": "Ilagay ang paglalarawan ng modpack..."
+  },
+  "app.export-modal.export-button": {
+    "message": "Iluwas"
+  },
+  "app.export-modal.header": {
+    "message": "Iluwas ang modpack"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Pangalan ng modpack"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "Numero ng bersiyon"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "Ang lahat ng data ng iyong instansiya ay tuluyang mawawala, kabilang na ang iyong mga mundo, kumpigurasyon, at lahat ng na-install na kontento."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "Hindi mababawi ang aksiyong ito"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Tanggalin ang instansiya"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Tanggalin ang instansiya"
+  },
+  "app.instance.modpack-already-installed.body": {
+    "message": "Naka-install na ang modpack sa instansiyang <bold>{instanceName}</bold>. Sigurado ka ba sa pag-ulit nito?"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Ilikha"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Naka-install na ang modpack"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Instansiya"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "proyekto"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "Ang \"{name}\" ay nadagdag"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "{count} proyekto ang nadagdag"
+  },
+  "app.instance.mods.share-text": {
+    "message": "Tingnan ang mga proyektong ginagamit ko sa aking modpack!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "Binabahagi ang kontento ng modpack"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "Matagumpay na na-upload"
+  },
+  "app.instance.worlds.add-server": {
+    "message": "Magdagdag ng server"
+  },
+  "app.instance.worlds.browse-servers": {
+    "message": "Mag-browse ng servers"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Modded"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Offline"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "Online"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Vanilla"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "Maglagay ng server o mag-browse upang mag-simula"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "Walang servers o worlds ang nalalagay"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Hanapin sa {count} mundo..."
+  },
+  "app.modal.install-to-play.header": {
+    "message": "Mag-install upang malaro"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "I-install"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {# mod} other {# na mod}}"
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Binahaging instansiya"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "Tingnan ang mga kontento"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Mag-update upang malaro"
+  },
+  "app.project.install-button.already-installed": {
+    "message": "Naka-install na ang proyektong ito"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Bumalik sa pagtutuklas"
+  },
+  "app.settings.developer-mode-enabled": {
+    "message": "Binuksan ang moda ng nagdi-develop."
+  },
+  "app.settings.downloading": {
+    "message": "Dina-download ang v{version}"
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Itsura"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Mga instalasyon ng Java"
+  },
+  "app.settings.tabs.language": {
+    "message": "Wika"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Pribasiya"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Pamamahala ng paglalaan"
+  },
+  "app.skins.apply-button": {
+    "message": "Ilapat"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Payat"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Malapad"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Kapa"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Kapa"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Walang kapa"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Wala"
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Texture"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Owyx"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Owyx Pride"
+  },
+  "app.update-popup.body.download-complete": {
+    "message": "Tapos nang ma-download ang Owyx v{version}. Mag-reload upang ma-update ngayon, o awtomatiko sa pagsara ng Owyx."
+  },
+  "app.update-popup.body.linux": {
+    "message": "Magagamit na ngayon ang Owyx v{version}. Gamitin ang iyong package manager upang i-update sa pinabagong tampok at pag-aayos!"
+  },
+  "app.update-popup.body.metered": {
+    "message": "Magagamit na ngayon ang Owyx v{version}! Hindi namin dinanload kaagad dahil naka-metro ang inyong network."
+  },
+  "app.update-popup.changelog": {
+    "message": "Changelog"
+  },
+  "app.update-popup.download": {
+    "message": "I-download ({size})"
+  },
+  "app.update-popup.download-complete": {
+    "message": "Nakumpleto ang pagdownload"
+  },
+  "app.update-popup.title": {
+    "message": "May bagong update"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Dito pumindot upang matingnan ang changelog."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Tagumpay na na-install ang bersiyong {version}!"
+  },
+  "app.world.server-modal.placeholder-address": {
+    "message": "play.example.com"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "Pumili ng opsiyon"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "Di-magkatugmang bersiyong {version}"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "Hindi pa nalalaro"
+  },
+  "app.world.world-item.offline": {
+    "message": "Offline"
+  },
+  "friends.action.add-friend": {
+    "message": "Magdagdag ng kaibigan"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count, plural, one {{count}} other {{count} na}} hiling na makipagkaibigan"
+  },
+  "friends.add-friend.submit": {
+    "message": "Magpadala ng hiling na makipagkaibigan"
+  },
+  "friends.add-friend.title": {
+    "message": "Pagdaragdag ng kaibigan"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Maaaraing hindi pareho sa kanilang pangalan sa Minecraft!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Ilagay ang username sa Owyx..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Ano ang pangalan ng iyong kaibigan sa Owyx?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Magdagdag ng mga kaibigan</link> upang makita ang kanilang nilalaro!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Kanselahin ang hiling"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Tanggalin ang kaibing"
+  },
+  "friends.friend.request-sent": {
+    "message": "Ipinadala na ang hiling na makipagkaibigan"
+  },
+  "friends.friend.view-profile": {
+    "message": "Tingnan ang profile"
+  },
+  "friends.heading": {
+    "message": "Mga kaibigan"
+  },
+  "friends.heading.online": {
+    "message": "Online"
+  },
+  "friends.heading.pending": {
+    "message": "Nakabinbin"
+  },
+  "friends.no-friends-match": {
+    "message": "Walang kaibigang tumugma sa \"{query}\""
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Hanapin ang mga kaibigan..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Mag-sign in sa Owyx account</link> upang maidagdag ang mga kaibigan at malaman ang kanilang nilalaro!"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Idagdag at laruin"
+  },
+  "instance.add-server.add-server": {
+    "message": "Idagdag ang server"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Tanggihan"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Payagan"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Magpahintulot"
+  },
+  "instance.add-server.title": {
+    "message": "Magdagdag ng server"
+  },
+  "instance.edit-server.title": {
+    "message": "Baguhin ang server"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Itago sa pahina ng Tahanan"
+  },
+  "instance.edit-world.name": {
+    "message": "Pangalan"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft na Mundo"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "I-reset ang ikono"
+  },
+  "instance.edit-world.title": {
+    "message": "Baguhin ang mundo"
+  },
+  "instance.files.adding-files": {
+    "message": "Idinadagdag ang mga file ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "I-save bilang..."
+  },
+  "instance.server-modal.address": {
+    "message": "Adres"
+  },
+  "instance.server-modal.name": {
+    "message": "Pangalan"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft Server"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Resource pack"
+  },
+  "instance.settings.tabs.general": {
+    "message": "General"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "Tanggalin ang instansiya"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Tanggalin ang instansiya"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Habambuhay na matatanggal ang instansiya sa iyong device, kasama ang iyong mga mundo, kompigurasyon, at lahat ng naka-install na kontento. Mag-ingat, kapag nagtanggal ka ng instansiya ay hindi na ito mababawi."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Nagde-delete..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "I-duplicate"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "Hindi makaka-duplicate habang nag-i-install."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "I-duplicate ang instansiya"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Lilikhaan ng kopya ang instansiyang ito, kasama ang mga mundo, kumpigurasyon, mod, at iba pa."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Baguhin ang ikono"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Tanggalin ang ikono"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "Palitan ang ikono"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Pumili ng ikono"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Pangalan"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alpha"
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "Post-exist"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "Ipapatakbo pagkatapos magsara ang laro."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "Ilagay ang post-exit command..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "Pre-launch"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "Ipapatakbo bago mai-launch ang instansiya."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "Ilagay ang pre-launch command..."
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "Wrapper"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "Wrapper command sa pag-launch ng Minecraft."
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "Ilagay ang wrapper command..."
+  },
+  "instance.settings.tabs.installation": {
+    "message": "Instalasyon"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "Bersiyon ng {loader}"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "Mga hook"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "Fullscreen"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "Gagawing magsisimulang naka-fullscreen ang laro pag-launch (gamit ang options.txt)."
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "Taas"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "Ang taas ng game window kung na-launch."
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "Ilagay ang taas..."
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "Lapad"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "Ang lapad ng game window kung na-launch."
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "Ilagay ang lapad..."
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "Isang Minecraft Server"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "Hndi makakonekta sa server"
+  },
+  "instance.worlds.copy_address": {
+    "message": "Kopyahin ang adres"
+  },
+  "instance.worlds.dont_show_on_home": {
+    "message": "Huwag ipakita sa Tahanan"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "Bukas naman ang instansiya"
+  },
+  "instance.worlds.hardcore": {
+    "message": "Modong eksperto"
+  },
+  "instance.worlds.incompatible_server": {
+    "message": "Hindi magkatugma sa server"
+  },
+  "instance.worlds.linked_server": {
+    "message": "Pinamamahala ng proyektong server"
+  },
+  "instance.worlds.no_contact": {
+    "message": "Hindi makontak ang server"
+  },
+  "instance.worlds.no_server_quick_play": {
+    "message": "Deretso kang makakalukso lamang sa mga server na nasa Minecraft Alpha 1.0.5+"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "Deretso kang makakalukso lamang sa mga pang-isahang larong mundo na nasa Minecraft 1.20+"
+  },
+  "instance.worlds.play_instance": {
+    "message": "Laruin ang instansiya"
+  },
+  "instance.worlds.view_instance": {
+    "message": "Tingnan ang instansiya"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "Ginagamit ang mundo"
+  },
+  "minecraft-account.add-account": {
+    "message": "Maglagay ng account"
+  },
+  "minecraft-account.label": {
+    "message": "Minecraft account"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "Hindi pa naka sign in"
+  },
+  "minecraft-account.remove-account": {
+    "message": "Itanggal ang account"
+  },
+  "minecraft-account.select-account": {
+    "message": "Pumili ng account"
+  },
+  "minecraft-account.sign-in": {
+    "message": "Mag sign in kay Minecraft"
+  },
+  "search.filter.locked.instance": {
+    "message": "Sagot na ng instansiya"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "Sagot na ng instansiya ang bersiyon ng laro"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "Sagot na ng instansiya ang loader ng laro"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "Maki-sync sa instansiya"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "Mga mod sa panig ng client lamang ang maidadaragdag sa instansiyang server"
+  },
+  "app.nav.admin-panel": {
+    "message": "Admin panel"
+  }
 }

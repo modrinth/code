@@ -3,11 +3,12 @@
 How the **Owyx launcher** talks to the **Owyx site** API. Source of truth for the
 launcher/site boundary. Keep in sync with `backend/src/routes/launcher.js`.
 
-**Versions:** launcher-facing **API surface `1.2.0`** (`GET /api/launcher/v1/status.version`),
+**Versions:** launcher-facing **API surface `1.3.0`** (`GET /api/launcher/v1/status.version`),
 **site UI `0.1.0`** (`.siteVersion`). Additive: friends (`/api/friends`), catalog ACL
-(`access_mode` + `catalog_acl`), optional Bearer on catalog lists.
+(`access_mode` + `catalog_acl`), optional Bearer on catalog lists, social settings
+(`GET|PATCH /api/friends/settings`), CustomSkinLoader public API (`/api/csl`).
 
-**Updated:** 2026-09-16 — friends MVP, library→catalog publish (admin), whitelist/blacklist.
+**Updated:** 2026-09-17 — friends privacy settings, CSL skin API, presence contract unchanged (~90s).
 
 ---
 
@@ -150,9 +151,17 @@ Also available as `GET /api/launcher/v1/me`.
 
 - `GET /api/friends` → `{ friends: [{ id, userId, nickname, avatarUrl, status, incoming, presence, instanceName, presenceUpdatedAt, ... }], incomingCount }`
 - `GET /api/friends/search?q=` → `{ users: [...] }`
-- `POST /api/friends/request` `{ nickname }` → create pending (or auto-accept reciprocal)
+- `POST /api/friends/request` `{ nickname }` → create pending (or auto-accept reciprocal); respects target `allowFriendRequests`
 - `POST /api/friends/:id/accept` · `POST /api/friends/:id/decline` · `DELETE /api/friends/:id`
 - `POST /api/friends/presence` `{ status: "online"|"playing"|"offline", instanceName? }` — launcher heartbeat; presence rows older than ~90s are treated as offline.
+- `GET /api/friends/settings` → `{ settings: { allowFriendRequests: boolean } }`
+- `PATCH /api/friends/settings` `{ allowFriendRequests: boolean }` → upsert privacy
+
+### CustomSkinLoader / public skins (`/api/csl`, no client key)
+
+- `GET /api/csl/skins/{nickname}.png` — Legacy skin PNG (or redirect to uploaded asset)
+- `GET /api/csl/{nickname}.json` — CustomSkinAPI profile for CSL
+- Prefer `https://owyx.site/api/csl/` from in-game clients. See `docs/owyx-skins-in-world.md`.
 
 ### Catalog ACL
 

@@ -24,19 +24,32 @@ import {
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import type { ModrinthCredentials } from '@/helpers/mr_auth'
+import {
+	fetchOwyxCatalog,
+	getOwyxClientKey,
+	getOwyxDemoFlag,
+	getOwyxLocalApiFallback,
+	getStoredOwyxApiBase,
+	type OwyxServerEntry,
+	sanitizeOwyxApiBase,
+} from '@/helpers/owyx-api'
+import { resolveOwyxAvatarUrl } from '@/helpers/owyx-avatar'
 import {
 	acceptOwyxFriend,
+	declineOwyxFriend,
 	listOwyxFriends,
 	type OwyxFriend,
 	removeOwyxFriend,
 	requestOwyxFriend,
 	searchOwyxUsers,
 } from '@/helpers/owyx-friends'
-import type { ModrinthCredentials } from '@/helpers/mr_auth'
-import { resolveOwyxAvatarUrl } from '@/helpers/owyx-avatar'
+import { playOwyxUiSound } from '@/helpers/owyx-ui-sound'
+import { injectOwyxSiteSession } from '@/providers/owyx-site-session'
 
 const { formatMessage } = useVIntl()
-const { handleError } = injectNotificationManager()
+const { handleError, addNotification } = injectNotificationManager()
+const owyx = injectOwyxSiteSession()
 
 const props = defineProps<{
 	credentials: ModrinthCredentials | null
@@ -45,7 +58,10 @@ const props = defineProps<{
 }>()
 
 const friends = ref<OwyxFriend[]>([])
+const catalogServers = ref<OwyxServerEntry[]>([])
 const loading = ref(false)
+const listError = ref('')
+const offline = ref(typeof navigator !== 'undefined' ? !navigator.onLine : false)
 const search = ref('')
 const username = ref('')
 const searchHits = ref<{ id: string; nickname: string; avatarUrl?: string | null }[]>([])
@@ -56,15 +72,26 @@ const addFriendModal = ref<{ show: () => void; hide: () => void } | null>(null)
 let pollTimer: ReturnType<typeof setInterval> | null = null
 let searchDebounce: ReturnType<typeof setTimeout> | null = null
 
+function onOffline() {
+	offline.value = true
+}
+function onOnline() {
+	offline.value = false
+	void quietRefresh()
+}
+
 async function refresh() {
 	if (!props.owyxSignedIn) {
 		friends.value = []
+		listError.value = ''
 		return
 	}
 	loading.value = true
+	listError.value = ''
 	try {
 		friends.value = await listOwyxFriends()
 	} catch (e) {
+		listError.value = e instanceof Error ? e.message : String(e)
 		handleError(e)
 		friends.value = []
 	} finally {
@@ -76,18 +103,52 @@ async function quietRefresh() {
 	if (!props.owyxSignedIn) return
 	try {
 		friends.value = await listOwyxFriends()
+		listError.value = ''
 	} catch {
 		/* keep previous list */
 	}
 }
 
+async function loadCatalogQuiet() {
+	try {
+		const result = await fetchOwyxCatalog({
+			baseUrl: sanitizeOwyxApiBase(getStoredOwyxApiBase()),
+			clientKey: getOwyxClientKey(),
+			authToken: owyx.session.value?.token,
+			demoFallback: getOwyxDemoFlag(),
+			allowLocalFallback: getOwyxLocalApiFallback(),
+		})
+		catalogServers.value = result.servers
+	} catch {
+		/* optional */
+	}
+}
+
+function matchCatalogServer(friend: OwyxFriend): OwyxServerEntry | null {
+	const name = friend.instanceName?.trim().toLowerCase()
+	if (!name) return null
+	return (
+		catalogServers.value.find(
+			(s) =>
+				s.name.toLowerCase() === name ||
+				s.address.toLowerCase() === name ||
+				s.id.toLowerCase() === name,
+		) || null
+	)
+}
+
 onMounted(() => {
+	window.addEventListener('offline', onOffline)
+	window.addEventListener('online', onOnline)
 	void refresh()
+	void loadCatalogQuiet()
 	pollTimer = setInterval(() => {
 		void quietRefresh()
 	}, 45_000)
 })
 onUnmounted(() => {
+	window.removeEventListener('offline', onOffline)
+	window.removeEventListener('online', onOnline)
 	if (pollTimer) clearInterval(pollTimer)
 	if (searchDebounce) clearTimeout(searchDebounce)
 })
@@ -120,9 +181,7 @@ watch(username, (q) => {
 const isSearching = computed(() => search.value.trim().length > 0)
 
 const filtered = computed(() =>
-	friends.value.filter((f) =>
-		f.nickname.toLowerCase().includes(search.value.trim().toLowerCase()),
-	),
+	friends.value.filter((f) => f.nickname.toLowerCase().includes(search.value.trim().toLowerCase())),
 )
 const accepted = computed(() => filtered.value.filter((f) => f.status === 'accepted'))
 const onlineFriends = computed(() =>
@@ -164,6 +223,7 @@ async function addFriendFromModal(nickOverride?: string) {
 		await requestOwyxFriend(nick)
 		username.value = ''
 		searchHits.value = []
+		playOwyxUiSound('success')
 		await refresh()
 	} catch (e) {
 		handleError(e)
@@ -173,6 +233,17 @@ async function addFriendFromModal(nickOverride?: string) {
 async function acceptIncoming(friend: OwyxFriend) {
 	try {
 		await acceptOwyxFriend(friend.id)
+		playOwyxUiSound('success')
+		await refresh()
+	} catch (e) {
+		handleError(e)
+	}
+}
+
+async function declineIncoming(friend: OwyxFriend) {
+	try {
+		await declineOwyxFriend(friend.id)
+		playOwyxUiSound('soft')
 		await refresh()
 	} catch (e) {
 		handleError(e)
@@ -182,7 +253,38 @@ async function acceptIncoming(friend: OwyxFriend) {
 async function removeFriend(friend: OwyxFriend) {
 	try {
 		await removeOwyxFriend(friend.id)
+		playOwyxUiSound('soft')
 		await refresh()
+	} catch (e) {
+		handleError(e)
+	}
+}
+
+async function copyPlayingInstance(friend: OwyxFriend) {
+	const name = friend.instanceName?.trim()
+	if (!name) return
+	try {
+		await navigator.clipboard.writeText(name)
+		playOwyxUiSound('click')
+		addNotification({
+			type: 'success',
+			title: formatMessage(messages.copiedInstanceName),
+		})
+	} catch (e) {
+		handleError(e)
+	}
+}
+
+async function copyFriendServerAddress(friend: OwyxFriend) {
+	const server = matchCatalogServer(friend)
+	if (!server?.address) return
+	try {
+		await navigator.clipboard.writeText(server.address)
+		playOwyxUiSound('success')
+		addNotification({
+			type: 'success',
+			title: formatMessage(messages.copiedServerAddress),
+		})
 	} catch (e) {
 		handleError(e)
 	}
@@ -282,6 +384,33 @@ const messages = defineMessages({
 	},
 	accept: { id: 'friends.requests.accept', defaultMessage: 'Accept' },
 	decline: { id: 'friends.requests.decline', defaultMessage: 'Decline' },
+	loading: { id: 'friends.loading', defaultMessage: 'Loading friends…' },
+	offlineBanner: {
+		id: 'friends.offline-banner',
+		defaultMessage: 'You are offline. Friend list may be out of date.',
+	},
+	listError: {
+		id: 'friends.list-error',
+		defaultMessage:
+			'Could not reach Owyx friends API. Check your connection and client key, then retry.',
+	},
+	retry: { id: 'friends.retry', defaultMessage: 'Retry' },
+	copyInstance: {
+		id: 'friends.copy-instance',
+		defaultMessage: 'Copy what they’re playing',
+	},
+	copyServerAddress: {
+		id: 'friends.copy-server-address',
+		defaultMessage: 'Copy matching server address',
+	},
+	copiedInstanceName: {
+		id: 'friends.copied-instance-name',
+		defaultMessage: 'Instance name copied',
+	},
+	copiedServerAddress: {
+		id: 'friends.copied-server-address',
+		defaultMessage: 'Server address copied',
+	},
 })
 </script>
 
@@ -307,7 +436,7 @@ const messages = defineMessages({
 						<UserPlusIcon />
 						{{ formatMessage(messages.accept) }}
 					</Button>
-					<Button @click="removeFriend(friend)">
+					<Button @click="declineIncoming(friend)">
 						<XIcon />
 						{{ formatMessage(messages.decline) }}
 					</Button>
@@ -365,6 +494,36 @@ const messages = defineMessages({
 			</div>
 		</div>
 	</ModalWrapper>
+
+	<p
+		v-if="owyxSignedIn && offline"
+		class="m-0 mb-2 rounded-lg bg-button-bg px-2 py-1.5 text-xs text-secondary"
+		role="status"
+	>
+		{{ formatMessage(messages.offlineBanner) }}
+	</p>
+
+	<div
+		v-if="owyxSignedIn && loading"
+		class="friends-skeleton flex flex-col gap-2 mb-3"
+		aria-busy="true"
+	>
+		<p class="m-0 text-sm text-secondary">{{ formatMessage(messages.loading) }}</p>
+		<div class="h-8 rounded-full bg-button-bg animate-pulse" />
+		<div class="h-8 rounded-full bg-button-bg animate-pulse opacity-80" />
+		<div class="h-8 rounded-full bg-button-bg animate-pulse opacity-60" />
+	</div>
+
+	<div
+		v-else-if="owyxSignedIn && listError && friends.length === 0"
+		class="mb-3 flex flex-col gap-2 text-sm text-secondary"
+	>
+		<p class="m-0">{{ formatMessage(messages.listError) }}</p>
+		<p v-if="listError" class="m-0 text-xs opacity-80">{{ listError }}</p>
+		<Button size="sm" class="self-start" @click="refresh">{{
+			formatMessage(messages.retry)
+		}}</Button>
+	</div>
 
 	<div v-if="owyxSignedIn && !loading" class="flex gap-1 items-center mb-3 -ml-1">
 		<template v-if="friends.length > 0">
@@ -453,7 +612,18 @@ const messages = defineMessages({
 								class="group grid items-center grid-cols-[1fr_auto] gap-2 hover:bg-button-bg transition-colors rounded-full mr-1 select-none"
 							>
 								<div class="grid min-w-0 grid-cols-[auto_1fr] items-center gap-2">
-									<Avatar :src="resolveOwyxAvatarUrl(friend.avatarUrl)" size="2rem" circle />
+									<div class="relative shrink-0">
+										<Avatar :src="resolveOwyxAvatarUrl(friend.avatarUrl)" size="2rem" circle />
+										<span
+											class="presence-dot"
+											:class="
+												friend.presence === 'playing'
+													? 'presence-dot--playing'
+													: 'presence-dot--online'
+											"
+											aria-hidden="true"
+										/>
+									</div>
 									<div class="flex min-w-0 flex-col">
 										<span class="truncate text-sm text-contrast m-0">{{ friend.nickname }}</span>
 										<span class="m-0 text-xs text-secondary">{{ friendStatusLabel(friend) }}</span>
@@ -464,6 +634,24 @@ const messages = defineMessages({
 									label="More options"
 									class="opacity-0 group-hover:opacity-100 transition-opacity"
 									:options="[
+										...(friend.presence === 'playing' && friend.instanceName
+											? [
+													{
+														id: 'copy-instance',
+														label: formatMessage(messages.copyInstance),
+														action: () => copyPlayingInstance(friend),
+													},
+												]
+											: []),
+										...(friend.presence === 'playing' && matchCatalogServer(friend)
+											? [
+													{
+														id: 'copy-server-address',
+														label: formatMessage(messages.copyServerAddress),
+														action: () => copyFriendServerAddress(friend),
+													},
+												]
+											: []),
 										{
 											id: 'remove-friend',
 											label: formatMessage(messages.removeFriend),
@@ -473,6 +661,18 @@ const messages = defineMessages({
 									]"
 								>
 									<MoreVerticalIcon />
+									<template
+										v-if="friend.presence === 'playing' && friend.instanceName"
+										#copy-instance
+									>
+										{{ formatMessage(messages.copyInstance) }}
+									</template>
+									<template
+										v-if="friend.presence === 'playing' && matchCatalogServer(friend)"
+										#copy-server-address
+									>
+										{{ formatMessage(messages.copyServerAddress) }}
+									</template>
 									<template #remove-friend>
 										<TrashIcon />
 										{{ formatMessage(messages.removeFriend) }}
@@ -622,3 +822,40 @@ const messages = defineMessages({
 		</IntlFormatted>
 	</div>
 </template>
+
+<style scoped>
+.presence-dot {
+	position: absolute;
+	right: -1px;
+	bottom: -1px;
+	width: 0.55rem;
+	height: 0.55rem;
+	border-radius: 9999px;
+	border: 2px solid var(--color-bg, #050508);
+	background: #22c55e;
+}
+.presence-dot--playing {
+	background: #00e5ff;
+	animation: presence-pulse 1.6s ease-in-out infinite;
+}
+.presence-dot--online {
+	background: #22c55e;
+}
+@keyframes presence-pulse {
+	0%,
+	100% {
+		box-shadow: 0 0 0 0 color-mix(in srgb, #00e5ff 55%, transparent);
+	}
+	50% {
+		box-shadow: 0 0 0 4px color-mix(in srgb, #00e5ff 0%, transparent);
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.presence-dot--playing {
+		animation: none;
+	}
+	.friends-skeleton .animate-pulse {
+		animation: none;
+	}
+}
+</style>

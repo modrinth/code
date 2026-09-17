@@ -286,15 +286,15 @@ const checkLoginAttempts = async (ip, identifier) => {
 // POST /api/auth/register - Регистрация нового пользователя
 const loginFieldValidator = body('login')
     .optional()
-    .isLength({ min: 3, max: 32 })
-    .withMessage('Логин должен быть от 3 до 32 символов')
+    .isLength({ min: 3, max: 16 })
+    .withMessage('Логин должен быть от 3 до 16 символов')
     .matches(/^[a-zA-Z0-9_]+$/)
     .withMessage('Логин может содержать только буквы, цифры и подчеркивания');
 
 const legacyNickValidator = body('minecraft_nick')
     .optional()
-    .isLength({ min: 3, max: 32 })
-    .withMessage('Логин должен быть от 3 до 32 символов')
+    .isLength({ min: 3, max: 16 })
+    .withMessage('Логин должен быть от 3 до 16 символов')
     .matches(/^[a-zA-Z0-9_]+$/)
     .withMessage('Логин может содержать только буквы, цифры и подчеркивания');
 
@@ -326,10 +326,10 @@ router.post('/register', [
         const { email, password, first_name, turnstileToken } = req.body;
         const clientIp = req.clientIp || req.ip || req.connection.remoteAddress;
 
-        if (!loginName || !/^[a-zA-Z0-9_]{3,32}$/.test(loginName)) {
+        if (!loginName || !/^[a-zA-Z0-9_]{3,16}$/.test(loginName)) {
             return res.status(400).json({
                 error: 'Ошибка валидации',
-                details: [{ msg: 'Укажите логин 3–32 символа (буквы, цифры, _)' }]
+                details: [{ msg: 'Укажите логин 3–16 символов (буквы, цифры, _)' }]
             });
         }
 

@@ -52,6 +52,27 @@ function authHeaders(): Record<string, string> {
 	return headers
 }
 
+/** Map common API errors to short English (Vue i18n layers can translate later). */
+function friendlyFriendsError(raw: string | undefined, status: number, fallback: string): string {
+	const msg = (raw || '').toLowerCase()
+	if (status === 401 || msg.includes('unauthorized') || msg.includes('no_session')) {
+		return 'Sign in to your Owyx account again, then retry.'
+	}
+	if (status === 403 && msg.includes('not accepting')) {
+		return 'This player is not accepting friend requests.'
+	}
+	if (status === 404 && msg.includes('not found')) {
+		return 'User not found. Check the nickname and try again.'
+	}
+	if (status === 409 && msg.includes('already')) {
+		return 'You are already friends or a request is pending.'
+	}
+	if (!getOwyxClientKey()) {
+		return 'Missing client key. Set X-Owyx-Client-Key in Admin → API.'
+	}
+	return raw || `${fallback} (${status})`
+}
+
 export async function listOwyxFriends(): Promise<OwyxFriend[]> {
 	const res = await owyxFetch(`${apiBase()}/api/friends`, {
 		method: 'GET',
@@ -59,7 +80,7 @@ export async function listOwyxFriends(): Promise<OwyxFriend[]> {
 		signal: AbortSignal.timeout(12000),
 	})
 	const data = (await res.json().catch(() => ({}))) as { friends?: OwyxFriend[]; error?: string }
-	if (!res.ok) throw new Error(data.error || `Friends list failed (${res.status})`)
+	if (!res.ok) throw new Error(friendlyFriendsError(data.error, res.status, 'Friends list failed'))
 	return Array.isArray(data.friends) ? data.friends : []
 }
 
@@ -82,7 +103,9 @@ export async function postOwyxPresence(opts: {
 	}
 }
 
-export async function searchOwyxUsers(q: string): Promise<{ id: string; nickname: string; avatarUrl?: string | null }[]> {
+export async function searchOwyxUsers(
+	q: string,
+): Promise<{ id: string; nickname: string; avatarUrl?: string | null }[]> {
 	const res = await owyxFetch(`${apiBase()}/api/friends/search?q=${encodeURIComponent(q)}`, {
 		method: 'GET',
 		headers: authHeaders(),
@@ -92,7 +115,7 @@ export async function searchOwyxUsers(q: string): Promise<{ id: string; nickname
 		users?: { id: string; nickname: string; avatarUrl?: string | null }[]
 		error?: string
 	}
-	if (!res.ok) throw new Error(data.error || `Search failed (${res.status})`)
+	if (!res.ok) throw new Error(friendlyFriendsError(data.error, res.status, 'Search failed'))
 	return Array.isArray(data.users) ? data.users : []
 }
 
@@ -104,7 +127,8 @@ export async function requestOwyxFriend(nickname: string): Promise<OwyxFriend> {
 		signal: AbortSignal.timeout(12000),
 	})
 	const data = (await res.json().catch(() => ({}))) as { friend?: OwyxFriend; error?: string }
-	if (!res.ok || !data.friend) throw new Error(data.error || `Request failed (${res.status})`)
+	if (!res.ok || !data.friend)
+		throw new Error(friendlyFriendsError(data.error, res.status, 'Request failed'))
 	return data.friend
 }
 
@@ -115,8 +139,21 @@ export async function acceptOwyxFriend(id: string): Promise<OwyxFriend> {
 		signal: AbortSignal.timeout(10000),
 	})
 	const data = (await res.json().catch(() => ({}))) as { friend?: OwyxFriend; error?: string }
-	if (!res.ok || !data.friend) throw new Error(data.error || `Accept failed (${res.status})`)
+	if (!res.ok || !data.friend)
+		throw new Error(friendlyFriendsError(data.error, res.status, 'Accept failed'))
 	return data.friend
+}
+
+export async function declineOwyxFriend(id: string): Promise<void> {
+	const res = await owyxFetch(`${apiBase()}/api/friends/${encodeURIComponent(id)}/decline`, {
+		method: 'POST',
+		headers: authHeaders(),
+		signal: AbortSignal.timeout(10000),
+	})
+	if (!res.ok) {
+		const data = (await res.json().catch(() => ({}))) as { error?: string }
+		throw new Error(friendlyFriendsError(data.error, res.status, 'Decline failed'))
+	}
 }
 
 export async function removeOwyxFriend(id: string): Promise<void> {
@@ -127,7 +164,48 @@ export async function removeOwyxFriend(id: string): Promise<void> {
 	})
 	if (!res.ok) {
 		const data = (await res.json().catch(() => ({}))) as { error?: string }
-		throw new Error(data.error || `Remove failed (${res.status})`)
+		throw new Error(friendlyFriendsError(data.error, res.status, 'Remove failed'))
+	}
+}
+
+export type OwyxSocialSettings = {
+	allowFriendRequests: boolean
+}
+
+export async function getOwyxSocialSettings(): Promise<OwyxSocialSettings> {
+	const res = await owyxFetch(`${apiBase()}/api/friends/settings`, {
+		method: 'GET',
+		headers: authHeaders(),
+		signal: AbortSignal.timeout(10000),
+	})
+	const data = (await res.json().catch(() => ({}))) as {
+		settings?: OwyxSocialSettings
+		error?: string
+	}
+	if (!res.ok) throw new Error(friendlyFriendsError(data.error, res.status, 'Settings failed'))
+	return {
+		allowFriendRequests: data.settings?.allowFriendRequests !== false,
+	}
+}
+
+export async function patchOwyxSocialSettings(
+	settings: Partial<OwyxSocialSettings>,
+): Promise<OwyxSocialSettings> {
+	const res = await owyxFetch(`${apiBase()}/api/friends/settings`, {
+		method: 'PATCH',
+		headers: authHeaders(),
+		body: JSON.stringify(settings),
+		signal: AbortSignal.timeout(10000),
+	})
+	const data = (await res.json().catch(() => ({}))) as {
+		settings?: OwyxSocialSettings
+		error?: string
+	}
+	if (!res.ok || !data.settings) {
+		throw new Error(friendlyFriendsError(data.error, res.status, 'Save settings failed'))
+	}
+	return {
+		allowFriendRequests: data.settings.allowFriendRequests !== false,
 	}
 }
 
@@ -178,12 +256,15 @@ export async function publishLibraryPackToCatalog(opts: {
 	if (key) ingestHeaders['X-Owyx-Client-Key'] = key
 	const token = getStoredOwyxSiteSession()?.token
 	if (token) ingestHeaders.Authorization = `Bearer ${token}`
-	const ingestRes = await owyxFetch(`${base}/api/admin/packs/${encodeURIComponent(packId)}/ingest`, {
-		method: 'POST',
-		headers: ingestHeaders,
-		body: fd,
-		signal: AbortSignal.timeout(Math.max(180000, Math.ceil(sizeMb) * 4000)),
-	})
+	const ingestRes = await owyxFetch(
+		`${base}/api/admin/packs/${encodeURIComponent(packId)}/ingest`,
+		{
+			method: 'POST',
+			headers: ingestHeaders,
+			body: fd,
+			signal: AbortSignal.timeout(Math.max(180000, Math.ceil(sizeMb) * 4000)),
+		},
+	)
 	if (!ingestRes.ok) {
 		const data = (await ingestRes.json().catch(() => ({}))) as { error?: string }
 		if (ingestRes.status === 413) {
@@ -195,12 +276,15 @@ export async function publishLibraryPackToCatalog(opts: {
 		throw new Error(data.error || `Ingest failed (${ingestRes.status})`)
 	}
 	if (opts.serverId) {
-		const bindRes = await owyxFetch(`${base}/api/admin/servers/${encodeURIComponent(opts.serverId)}`, {
-			method: 'PUT',
-			headers,
-			body: JSON.stringify({ packId }),
-			signal: AbortSignal.timeout(15000),
-		})
+		const bindRes = await owyxFetch(
+			`${base}/api/admin/servers/${encodeURIComponent(opts.serverId)}`,
+			{
+				method: 'PUT',
+				headers,
+				body: JSON.stringify({ packId }),
+				signal: AbortSignal.timeout(15000),
+			},
+		)
 		if (!bindRes.ok) {
 			const data = (await bindRes.json().catch(() => ({}))) as { error?: string }
 			throw new Error(data.error || `Bind server failed (${bindRes.status})`)

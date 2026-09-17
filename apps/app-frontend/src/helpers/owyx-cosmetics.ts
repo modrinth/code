@@ -3,9 +3,9 @@
  * Path: %USERPROFILE%/owyx/skins/{nickname}.png (Windows) / ~/owyx/skins/…
  */
 
-import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 import { homeDir, join } from '@tauri-apps/api/path'
 import { mkdir, writeFile } from '@tauri-apps/plugin-fs'
+import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 
 import { isSafeExternalHttpsUrl } from '@/helpers/owyx-api'
 

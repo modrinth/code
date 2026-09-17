@@ -194,7 +194,8 @@ const messages = defineMessages({
 	},
 	demoDescription: {
 		id: 'app.skins.demo.description',
-		defaultMessage: 'Sign in with Microsoft to save and apply skins. Offline nicknames cannot change skins.',
+		defaultMessage:
+			'Sign in with Microsoft to save and apply skins. Offline nicknames cannot change skins.',
 	},
 	signInButton: {
 		id: 'app.skins.sign-in.button',

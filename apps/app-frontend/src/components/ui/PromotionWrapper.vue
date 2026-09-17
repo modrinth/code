@@ -6,5 +6,5 @@
 </script>
 
 <template>
-	<!-- no Hosting ads in Owyx -->
+	<span class="contents" aria-hidden="true" />
 </template>

@@ -17,7 +17,13 @@ const messages = defineMessages({
 	},
 	welcomeDescription: {
 		id: 'app.welcome-screen.description',
-		defaultMessage: 'Ready to start playing?',
+		defaultMessage:
+			'Pick an account path (Owyx site, offline nick, or Microsoft), create an instance, and play.',
+	},
+	accountPaths: {
+		id: 'app.welcome-screen.account-paths',
+		defaultMessage:
+			'New here? Use the account card on the left: Owyx site login, offline nickname, or Microsoft.',
 	},
 	createInstance: {
 		id: 'app.welcome-screen.create-instance',
@@ -97,6 +103,9 @@ onUnmounted(() => {
 					</h1>
 					<p class="m-0 text-center text-base leading-6 text-primary">
 						{{ formatMessage(messages.welcomeDescription) }}
+					</p>
+					<p class="m-0 max-w-md text-center text-sm leading-5 text-secondary">
+						{{ formatMessage(messages.accountPaths) }}
 					</p>
 				</div>
 				<div class="flex w-72 flex-col items-center gap-4">

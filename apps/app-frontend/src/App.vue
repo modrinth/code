@@ -9,14 +9,12 @@ import {
 	VerboseLoggingFeature,
 } from '@modrinth/api-client'
 import {
-	ArrowLeftRightIcon,
 	ChevronLeftIcon,
 	ChevronRightIcon,
 	CompassIcon,
 	ImageIcon,
 	LogInIcon,
 	LogOutIcon,
-	NewspaperIcon,
 	PlayIcon,
 	PlusIcon,
 	RefreshCwIcon,
@@ -25,18 +23,12 @@ import {
 	SettingsIcon,
 	ShirtIcon,
 	SpinnerIcon,
-	ToggleRightIcon,
 	UserIcon,
-	UserPlusIcon,
-	XIcon,
 } from '@modrinth/assets'
 import {
-	AccountSwitchOverlay,
 	Admonition,
 	Avatar,
-	ButtonLink,
 	commonMessages,
-	commonSettingsMessages,
 	ContentInstallModal,
 	ContentUpdaterModal,
 	CreationFlowModal,
@@ -44,7 +36,6 @@ import {
 	I18nDebugPanel,
 	IconButton,
 	LoadingBar,
-	NewsArticleCard,
 	NotificationPanel,
 	PopupNotificationPanel,
 	provideModalBehavior,
@@ -58,7 +49,6 @@ import {
 	useDebugLogger,
 	useFormatBytes,
 	useHostingIntercom,
-	UserRoleIcon,
 	useVIntl,
 } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils/parse'
@@ -111,7 +101,7 @@ import { useInstanceMetadataRefresh } from '@/composables/use-instance-metadata-
 import { useQuickInstanceLimit } from '@/composables/use-quick-instance-limit.ts'
 import { isDarkTheme, useTheme } from '@/composables/use-theme.ts'
 import { config } from '@/config'
-import { getAccountAppearance, rememberAccountAppearance } from '@/helpers/account-appearance.ts'
+import { rememberAccountAppearance } from '@/helpers/account-appearance.ts'
 import {
 	hide_ads_window,
 	init_ads_window,
@@ -122,7 +112,7 @@ import {
 } from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable, login_offline } from '@/helpers/auth.js'
-import { get_user, get_user_many, get_version } from '@/helpers/cache.js'
+import { get_user, get_version } from '@/helpers/cache.js'
 import { gameSettingsQueryOptions } from '@/helpers/game-options'
 import { install_create_modpack_instance, install_get_modpack_preview } from '@/helpers/install'
 import {
@@ -132,14 +122,14 @@ import {
 	set_global_synced_option,
 } from '@/helpers/instance'
 import { maxMemoryQueryOptions } from '@/helpers/jre.js'
+import { get as getCreds, login, removeUser } from '@/helpers/mr_auth.ts'
+import { resolveOwyxAvatarUrl } from '@/helpers/owyx-avatar'
 import {
-	get as getCreds,
-	getAll as getAllCreds,
-	login,
-	logout,
-	removeUser,
-	setActive,
-} from '@/helpers/mr_auth.ts'
+	setOwyxPresenceOnline,
+	setOwyxPresencePlaying,
+	startOwyxPresenceHeartbeat,
+	stopOwyxPresenceHeartbeat,
+} from '@/helpers/owyx-presence'
 import {
 	fetchOwyxSiteMe,
 	getStoredOwyxSiteSession,
@@ -164,7 +154,6 @@ import {
 } from '@/helpers/synced-options'
 import { syncedPackQueryOptions } from '@/helpers/synced-packs'
 import { hasActivePride26Midas, hasMidasBadge } from '@/helpers/user-campaigns.ts'
-import { get_user_preferences } from '@/helpers/user-preferences.ts'
 import { parse_modrinth_user_link } from '@/helpers/users'
 import {
 	areUpdatesEnabled,
@@ -198,18 +187,11 @@ import {
 	provideAppUpdateDownloadProgress,
 	subscribeToDownloadProgress,
 } from '@/providers/download-progress.ts'
+import { setupOwyxSiteSessionProvider } from '@/providers/owyx-site-session'
 import { createServerInstall, provideServerInstall } from '@/providers/server-install'
 import { setupProviders } from '@/providers/setup'
 import { setupAppEventsProvider } from '@/providers/setup/app-events'
 import { setupAuthProvider } from '@/providers/setup/auth'
-import { setupOwyxSiteSessionProvider } from '@/providers/owyx-site-session'
-import { resolveOwyxAvatarUrl } from '@/helpers/owyx-avatar'
-import {
-	setOwyxPresenceOnline,
-	setOwyxPresencePlaying,
-	startOwyxPresenceHeartbeat,
-	stopOwyxPresenceHeartbeat,
-} from '@/helpers/owyx-presence'
 import { setupLoadingStateProvider } from '@/providers/setup/loading-state'
 import { setupAppUserPreferencesProvider } from '@/providers/setup/user-preferences.ts'
 import { appMessages } from '@/utils/app-messages'
@@ -266,9 +248,10 @@ const APP_SIDEBAR_WIDTH = 300
 const INTERCOM_BUBBLE_DEFAULT_PADDING = 20
 const PRIDE_FUNDRAISER_END_DATE = new Date('2026-07-01T00:00:00Z').getTime()
 const credentials = ref()
-const storedModrinthAccounts = ref([])
 /** Bottom-left = Owyx site account (email), not Modrinth. */
-const owyxSiteSession = ref(/** @type {import('@/helpers/owyx-site-auth').OwyxSiteSession | null | undefined} */ (undefined))
+const owyxSiteSession = ref(
+	/** @type {import('@/helpers/owyx-site-auth').OwyxSiteSession | null | undefined} */ (undefined),
+)
 let credentialsRefreshId = 0
 const sidebarToggled = ref(true)
 watch(
@@ -350,6 +333,17 @@ useAppEvent(
 				/* ignore */
 			}
 			setOwyxPresencePlaying(name)
+			if (event.instance_id) {
+				try {
+					const { writeOwyxCslConfigForInstance, mirrorLocalOwyxSkinToInstance } =
+						await import('@/helpers/owyx-csl')
+					await writeOwyxCslConfigForInstance(event.instance_id)
+					const nick = owyxSiteSession.value?.user?.nickname
+					if (nick) await mirrorLocalOwyxSkinToInstance(event.instance_id, nick)
+				} catch {
+					/* best-effort skin wiring */
+				}
+			}
 		} else if (kind === 'finished') {
 			setOwyxPresenceOnline()
 		}
@@ -496,7 +490,6 @@ function onCreationIconSaved(iconPath, config) {
 	context.instanceIconPath.value = iconPath
 }
 
-const news = ref([])
 const displayedServerInviteNotifications = new Set()
 const serverInvitePopupNotificationIds = new Set()
 let liveNotificationGeneration = 0
@@ -1395,7 +1388,6 @@ async function fetchCredentials() {
 
 			credentials.value = null
 			liveNotificationsEnabled = false
-			await fetchStoredModrinthAccounts()
 			return
 		}
 		creds.user = await traceStartupStep('Fetch signed-in user', () =>
@@ -1405,7 +1397,6 @@ async function fetchCredentials() {
 	}
 	credentials.value = creds ?? null
 	liveNotificationsEnabled = !!creds?.session
-	await traceStartupStep('Load stored account profiles', fetchStoredModrinthAccounts)
 }
 
 async function signIn(flow = 'sign-in', addAccount = false) {
@@ -1428,12 +1419,6 @@ async function signIn(flow = 'sign-in', addAccount = false) {
 async function requestSignIn(flow = 'sign-in', addAccount = false) {
 	const signedIn = await modrinthLoginModal.value?.showSigningIn(flow, addAccount)
 	if (signedIn) await refreshOwyxSiteSession()
-}
-
-async function requestModrinthAuth(flow = 'sign-in', addAccount = false) {
-	const signedIn = await modrinthLoginModal.value?.showSigningIn(flow, addAccount)
-	if (signedIn) await refreshOwyxSiteSession()
-	return !!owyxSiteSession.value?.token
 }
 
 async function refreshOwyxSiteSession() {
@@ -1493,38 +1478,6 @@ setupOwyxSiteSessionProvider(
 	signOutOwyxSiteAccount,
 )
 
-async function logOut() {
-	if (!credentials.value?.user) return
-	await completeAccountSwitch(() => logout())
-}
-
-async function fetchStoredModrinthAccounts() {
-	const all = (await getAllCreds().catch(handleError)) ?? []
-	const ids = all.map((account) => account.user_id)
-	const users = ids.length ? ((await get_user_many(ids).catch(handleError)) ?? []) : []
-	const usersById = new Map(users.map((user) => [user.id, user]))
-
-	storedModrinthAccounts.value = all.map((account) => ({
-		...account,
-		user: usersById.get(account.user_id) ?? {
-			id: account.user_id,
-			username: account.user_id,
-			avatar_url: null,
-			role: 'developer',
-		},
-	}))
-}
-
-const accountSwitcherAccounts = computed(() => {
-	const currentId = credentials.value?.session ? credentials.value.user_id : null
-
-	return storedModrinthAccounts.value.map((account) => ({
-		...account,
-		optionId: `account-${account.user_id}`,
-		current: account.user_id === currentId,
-	}))
-})
-
 const profileButtonTooltip = computed(() => {
 	if (owyxSiteSession.value === undefined) return formatMessage(messages.loadingProfile)
 	if (owyxSiteSession.value?.user) return formatMessage(messages.modrinthAccount)
@@ -1557,126 +1510,6 @@ const owyxAccountMenuOptions = computed(() => [
 		icon: LogOutIcon,
 		color: 'red',
 		action: () => signOutOwyxSiteAccount(),
-	},
-])
-
-const accountSwitcherOptions = computed(() => [
-	...accountSwitcherAccounts.value.map((account) => ({
-		id: account.optionId,
-		label: account.user.username,
-		selected: account.current,
-		action: () => switchModrinthAccount(account),
-		trailingAction: {
-			label: formatMessage(messages.removeAccount),
-			icon: XIcon,
-			color: 'red',
-			action: () => forgetModrinthAccount(account.user_id),
-		},
-	})),
-	{
-		type: 'divider',
-	},
-	{
-		id: 'add-account',
-		label: formatMessage(messages.addAccount),
-		icon: PlusIcon,
-		action: () => requestSignIn('sign-in', true),
-	},
-])
-
-const isSwitchingAccount = ref(false)
-
-async function persistAppearanceTheme(appearance) {
-	const selectedTheme = appearance.auto ? 'system' : appearance.theme
-	appTheme.applyAccountAppearance(appearance)
-	const settings = await getSettings()
-	if (settings.theme !== selectedTheme) {
-		settings.theme = selectedTheme
-		await setSettings(settings)
-	}
-}
-
-async function completeAccountSwitch(task) {
-	isSwitchingAccount.value = true
-	await nextTick()
-	try {
-		await task()
-		window.location.reload()
-	} catch (error) {
-		isSwitchingAccount.value = false
-		handleError(error)
-	}
-}
-
-async function switchModrinthAccount(account) {
-	if (account.current) return
-
-	const cached = getAccountAppearance(account.user_id)
-	if (cached) await persistAppearanceTheme(cached)
-	await nextTick()
-
-	await completeAccountSwitch(async () => {
-		await setActive(account.user_id)
-		if (cached) return
-
-		try {
-			const preferences = await get_user_preferences(account.user_id)
-			rememberAccountAppearance(account.user_id, preferences.appearance)
-			await persistAppearanceTheme(preferences.appearance)
-			await nextTick()
-		} catch {
-			// no saved appearance for this account
-		}
-	})
-}
-
-async function forgetModrinthAccount(userId) {
-	const isCurrent = credentials.value?.user_id === userId && !!credentials.value?.session
-	if (isCurrent) {
-		await completeAccountSwitch(() => removeUser(userId))
-		return
-	}
-
-	await removeUser(userId).catch(handleError)
-	await fetchStoredModrinthAccounts()
-}
-
-const modrinthAccountMenuOptions = computed(() => [
-	{
-		id: 'view-profile',
-		label: formatMessage(messages.viewProfile),
-		icon: UserIcon,
-		action: () => router.push(`/user/${encodeURIComponent(credentials.value.user.username)}`),
-	},
-	{
-		id: 'add-friend',
-		label: formatMessage(messages.addFriend),
-		icon: UserPlusIcon,
-		action: () => friendsList.value?.showAddFriendModal(),
-	},
-	{
-		id: 'flags',
-		label: formatMessage(commonSettingsMessages.featureFlags),
-		icon: ToggleRightIcon,
-		shown: appSettings.devMode,
-		action: () => appSettingsModal.value?.showFeatureFlags(),
-	},
-	{
-		type: 'divider',
-	},
-	{
-		id: 'switch-account',
-		label: formatMessage(messages.switchAccount),
-		icon: ArrowLeftRightIcon,
-		type: 'submenu',
-		options: accountSwitcherOptions.value,
-	},
-	{
-		id: 'sign-out',
-		label: formatMessage(commonMessages.signOutButton),
-		icon: LogOutIcon,
-		tone: 'red',
-		action: () => logOut(),
 	},
 ])
 
@@ -2278,7 +2111,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	<TooltipDirective />
 	<SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
 	<div id="teleports"></div>
-	<AccountSwitchOverlay :show="isSwitchingAccount" />
 	<div
 		v-if="stateInitialized"
 		class="app-grid-layout relative"

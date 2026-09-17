@@ -47,7 +47,7 @@ const errorCollapsed = ref(false)
 
 const title = ref('An error occurred')
 const errorType = ref('unknown')
-const supportLink = ref('https://support.modrinth.com')
+const supportLink = ref('https://owyx.site')
 const metadata = ref({})
 
 defineExpose({
@@ -58,8 +58,7 @@ defineExpose({
 		if (errorVal.message && errorVal.message.includes('Minecraft authentication error:')) {
 			title.value = 'Unable to sign in to Minecraft'
 			errorType.value = 'minecraft_auth'
-			supportLink.value =
-				'https://support.modrinth.com/en/articles/9038231-minecraft-sign-in-issues'
+			supportLink.value = 'https://owyx.site'
 
 			if (
 				errorVal.message.includes('existing connection was forcibly closed') ||
@@ -73,7 +72,7 @@ defineExpose({
 		} else if (errorVal.message && errorVal.message.includes('Move directory error:')) {
 			title.value = 'Could not change app directory'
 			errorType.value = 'directory_move'
-			supportLink.value = 'https://support.modrinth.com'
+			supportLink.value = 'https://owyx.site'
 
 			if (errorVal.message.includes('directory is not writable')) {
 				metadata.value.readOnly = true
@@ -85,16 +84,16 @@ defineExpose({
 		} else if (errorVal.message && errorVal.message.includes('No loader version selected for')) {
 			title.value = 'No loader selected'
 			errorType.value = 'no_loader_version'
-			supportLink.value = 'https://support.modrinth.com'
+			supportLink.value = 'https://owyx.site'
 			metadata.value.instanceId = context.instanceId
 		} else if (source === 'state_init') {
 			title.value = 'Error initializing Owyx'
 			errorType.value = 'state_init'
-			supportLink.value = 'https://support.modrinth.com'
+			supportLink.value = 'https://owyx.site'
 		} else {
 			title.value = 'An error occurred'
 			errorType.value = 'unknown'
-			supportLink.value = 'https://support.modrinth.com'
+			supportLink.value = 'https://owyx.site'
 			metadata.value = {}
 		}
 
@@ -180,29 +179,22 @@ async function copyToClipboard(text) {
 					<template v-if="metadata.network">
 						<h3>Network issues</h3>
 						<p>
-							It looks like there were issues with the Owyx connecting to Microsoft's
-							servers. This is often the result of a poor connection, so we recommend trying again
-							to see if it works. If issues continue to persist, follow the steps in
-							<a
-								href="https://support.modrinth.com/en/articles/9038231-minecraft-sign-in-issues#h_e71a5f805f"
-							>
-								our support article
-							</a>
-							to troubleshoot.
+							It looks like there were issues with Owyx connecting to Microsoft's servers. This is
+							often the result of a poor connection, so we recommend trying again to see if it
+							works. Owyx does not provide Modrinth support — for help visit
+							<a href="https://owyx.site">owyx.site</a>
+							or our Discord. You can also play with an Owyx / offline nickname on offline-mode
+							servers.
 						</p>
 					</template>
 					<template v-else-if="metadata.hostsFile">
 						<h3>Network issues</h3>
 						<p>
-							The Owyx tried to connect to Microsoft / Xbox / Minecraft services, but the
+							The Owyx launcher tried to connect to Microsoft / Xbox / Minecraft services, but the
 							remote server rejected the connection. This may indicate that these services are
-							blocked by the hosts file. Please visit
-							<a
-								href="https://support.modrinth.com/en/articles/9038231-minecraft-sign-in-issues#h_d694a29256"
-							>
-								our support article
-							</a>
-							for steps on how to fix the issue.
+							blocked by the hosts file. Visit
+							<a href="https://owyx.site">owyx.site</a>
+							or Discord for community tips — Owyx is not Modrinth support.
 						</p>
 					</template>
 					<template v-else>
@@ -233,9 +225,8 @@ async function copyToClipboard(text) {
 					<template v-if="metadata.readOnly">
 						<h3>Change directory permissions</h3>
 						<p>
-							It looks like the Owyx is unable to write to the directory you selected.
-							Please adjust the permissions of the directory and try again or cancel the directory
-							change.
+							It looks like the Owyx is unable to write to the directory you selected. Please adjust
+							the permissions of the directory and try again or cancel the directory change.
 						</p>
 					</template>
 					<template v-else-if="metadata.notEnoughSpace">
@@ -247,8 +238,8 @@ async function copyToClipboard(text) {
 					</template>
 					<template v-else>
 						<p>
-							The Owyx is unable to migrate to the new directory you selected. Please
-							contact support for help or cancel the directory change.
+							The Owyx is unable to migrate to the new directory you selected. Please contact
+							support for help or cancel the directory change.
 						</p>
 					</template>
 
@@ -263,8 +254,8 @@ async function copyToClipboard(text) {
 				</template>
 				<template v-else-if="errorType === 'state_init'">
 					<p>
-						Owyx failed to load correctly. This may be because of a corrupted file, or
-						because the app is missing crucial files.
+						Owyx failed to load correctly. This may be because of a corrupted file, or because the
+						app is missing crucial files.
 					</p>
 					<p>You may be able to fix it through one of the following ways:</p>
 					<ul>

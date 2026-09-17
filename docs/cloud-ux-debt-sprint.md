@@ -21,7 +21,7 @@ Tracked brief. Paste prompt: local gitignored `promt.md`.
 
 ## Goal
 
-Reach a **playable public Beta bar**: finish Social/Friends/Account/Share, wire skins into the world (TLSkin-class or thin custom mod), close i18n/UX debts, optional practical product ideas, then **UI/UX polish to shine**. Repo is **public** — anyone can download/use; do **not** market or copywrite as “owner’s friends only / private circle.” Friends = social feature, not exclusivity. Owner is out of product ideas — agent invents a useful next backlog in the PR.
+Reach a **playable public Beta bar**: finish Social/Friends/Account/Share, wire skins into the world (TLSkin-class or thin custom mod), close i18n/UX debts, optional practical product ideas, then **UI/UX polish to shine**. Repo is **public** — anyone can download/use; do **not** market or write copy as “owner’s friends only / private circle.” Friends = social feature, not exclusivity. Owner is out of product ideas — agent invents a useful next backlog in the PR.
 
 **Not in scope:** merge to main, GitHub Release, secrets, `apps/frontend`/`labrinth` product work, full MS OAuth, OwyxOld plugin, Modrinth marketplace redesign, **prod site deploy** (owner will ask a local agent later).
 
@@ -90,10 +90,11 @@ SkillsMP picks: frontend-a11y, frontend-patterns, vue-patterns, tauri-v2, writin
 
 ## Agent result (fill at end of PR)
 
-- Branch:
-- PR URL:
-- Done (A–E):
-- Skin approach:
-- Deferred:
-- Ideas summary:
-- Owner follow-up: **deploy site after merge** (local agent); optional launcher release bump suggestion:
+- Branch: `cursor/playable-release-polish-e12e`
+- PR URL: https://github.com/ebluffy/Owyx/pull/14
+- Done (A–E): A Social/Friends/Account/Share playable; B CSL skin path + docs; C public EN scrub + launcher support links; D copy-playing / API health / UI sounds; E presence pulse, skeletons, reduced-motion
+- Skin approach: CustomSkinLoader (GPL-3.0) + public `/api/csl` + launcher config writer — see `docs/owyx-skins-in-world.md`
+- Deferred: auto-install CSL jar; full admin i18n; MS OAuth; SkinRestorer server plugin
+- Ideas summary: in PR body “Ideas / next (agent)”; also `docs/playable-release-polish-plan.md`
+- Owner follow-up: **deploy site after merge** (local agent); optional launcher release bump suggestion: **0.5.3 PATCH** or **0.6.0 MINOR** (owner chooses; cloud did not cut a GitHub Release)
+

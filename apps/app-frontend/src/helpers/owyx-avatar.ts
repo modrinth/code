@@ -4,8 +4,11 @@
  */
 
 import owyxAvatarFallback from '@/assets/owyx-avatar-fallback.svg?url'
-
-import { DEFAULT_OWYX_API_BASE, getStoredOwyxApiBase, sanitizeOwyxApiBase } from '@/helpers/owyx-api'
+import {
+	DEFAULT_OWYX_API_BASE,
+	getStoredOwyxApiBase,
+	sanitizeOwyxApiBase,
+} from '@/helpers/owyx-api'
 
 const SITE_ORIGIN = 'https://owyx.site'
 

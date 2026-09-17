@@ -80,7 +80,10 @@ function persistSession(token: string, user: OwyxSiteUser) {
 	localStorage.setItem(STORAGE_USER, JSON.stringify(user))
 }
 
-function mapUser(raw: Record<string, unknown>, cosmetics?: Record<string, unknown> | null): OwyxSiteUser {
+function mapUser(
+	raw: Record<string, unknown>,
+	cosmetics?: Record<string, unknown> | null,
+): OwyxSiteUser {
 	const avatarRaw = raw.avatarUrl
 		? String(raw.avatarUrl)
 		: raw.avatar_url
@@ -120,7 +123,7 @@ export async function loginOwyxSite(login: string, password: string): Promise<Ow
 	const data = (await res.json().catch(() => ({}))) as Record<string, unknown>
 	if (!res.ok || !data.token) {
 		const code = String(data.error ?? '')
-		if (code === 'unauthorized_client' || res.status === 401 && code.includes('unauthorized')) {
+		if (code === 'unauthorized_client' || (res.status === 401 && code.includes('unauthorized'))) {
 			throw new Error(
 				'Invalid or missing client key (unauthorized_client). Set X-Owyx-Client-Key under Owyx Servers.',
 			)

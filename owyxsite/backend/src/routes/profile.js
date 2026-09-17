@@ -979,8 +979,8 @@ const NICK_COOLDOWN_DAYS = 30;
 router.put('/nickname', authenticateToken, async (req, res) => {
     try {
         const raw = (req.body && req.body.nickname != null) ? String(req.body.nickname).trim() : '';
-        if (raw.length < 3 || raw.length > 32) {
-            return res.status(400).json({ error: 'Ник должен быть от 3 до 32 символов' });
+        if (raw.length < 3 || raw.length > 16) {
+            return res.status(400).json({ error: 'Ник должен быть от 3 до 16 символов' });
         }
         if (!/^[a-zA-Z0-9_]+$/.test(raw)) {
             return res.status(400).json({ error: 'Ник может содержать только буквы, цифры и _' });
