@@ -30,7 +30,7 @@
   --radius-control: 10px;
 }
 
-/* Launcher-parity token aliases (DESIGN.md names) */
+/* Full theme skins (not accent-only). data-accent drives the whole page. */
 :root,
 html[data-accent="cyan"] {
   --bg: #050508;
@@ -47,35 +47,121 @@ html[data-accent="cyan"] {
   --danger: #ff5c6c;
   --accent-hi: #67f0ff;
   --accent-lo: #007a8a;
+  --accent-mid: #00d2ec;
+  --space-deep: #040406;
+  --space-top: #07070c;
+  --glass-shine: rgba(255, 255, 255, 0.1);
+  --glass-edge: color-mix(in srgb, var(--accent) 22%, #2a2b30);
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-panel-2: var(--panel-2);
+  --color-rail: var(--rail);
+  --color-line: var(--line);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
 }
 
+/* Synthwave — pink cyber / outrun atmosphere */
 html[data-accent="synthwave"] {
+  --bg: #09050c;
+  --panel: #1a0f1c;
+  --panel-2: #140b16;
+  --rail: #100810;
+  --line: #3d2438;
+  --text: #fdf2f8;
+  --muted: #c4a0b8;
   --accent: #ec4899;
   --accent-ink: #1a0610;
+  --accent-violet: #a855f7;
+  --ok: #f9a8d4;
   --accent-hi: #f9a8d4;
   --accent-lo: #831843;
+  --accent-mid: #db2777;
+  --space-deep: #050208;
+  --space-top: #120814;
+  --glass-shine: rgba(249, 168, 212, 0.12);
+  --glass-edge: color-mix(in srgb, var(--accent) 28%, #3d2438);
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-panel-2: var(--panel-2);
+  --color-rail: var(--rail);
+  --color-line: var(--line);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
 }
 
+/* Onyx — cool monochrome / premium white-on-black */
 html[data-accent="onyx"] {
+  --bg: #030303;
+  --panel: #121212;
+  --panel-2: #0c0c0c;
+  --rail: #0a0a0a;
+  --line: #2e2e2e;
+  --text: #fafafa;
+  --muted: #a3a3a3;
   --accent: #f5f5f5;
   --accent-ink: #0a0a0a;
+  --accent-violet: #d4d4d4;
+  --ok: #e5e5e5;
   --accent-hi: #ffffff;
-  --accent-lo: #a3a3a3;
+  --accent-lo: #737373;
+  --accent-mid: #d4d4d4;
+  --space-deep: #000000;
+  --space-top: #0a0a0a;
+  --glass-shine: rgba(255, 255, 255, 0.14);
+  --glass-edge: color-mix(in srgb, #fff 18%, #2e2e2e);
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-panel-2: var(--panel-2);
+  --color-rail: var(--rail);
+  --color-line: var(--line);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
 }
 
+/* Magma — warm nether / aggressive red */
 html[data-accent="magma"] {
+  --bg: #0a0505;
+  --panel: #1a0c0c;
+  --panel-2: #140808;
+  --rail: #100606;
+  --line: #3a1c1c;
+  --text: #fef2f2;
+  --muted: #c4a0a0;
   --accent: #f87171;
   --accent-ink: #1a0505;
+  --accent-violet: #fb923c;
+  --ok: #fecaca;
   --accent-hi: #fecaca;
   --accent-lo: #7f1d1d;
+  --accent-mid: #ef4444;
+  --space-deep: #050202;
+  --space-top: #120808;
+  --glass-shine: rgba(254, 202, 202, 0.1);
+  --glass-edge: color-mix(in srgb, var(--accent) 26%, #3a1c1c);
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-panel-2: var(--panel-2);
+  --color-rail: var(--rail);
+  --color-line: var(--line);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
 }
 
 /* ===== Base ===== */
@@ -99,34 +185,33 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  transition: background-color 0.25s ease, color 0.2s ease;
 }
 
-/* Deep space backdrop: accent-tinted blackstack (not SaaS purple). */
+/* Deep space backdrop — tinted by active theme accent. */
 .owyx-space {
   position: fixed;
   inset: 0;
   z-index: -2;
   pointer-events: none;
   background:
-    radial-gradient(1100px 720px at 12% -18%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 55%),
-    radial-gradient(720px 480px at 92% 8%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 60%),
-    radial-gradient(900px 560px at 70% 40%, color-mix(in srgb, var(--accent) 4%, transparent), transparent 65%),
-    radial-gradient(1200px 800px at 50% 120%, color-mix(in srgb, var(--accent-lo) 10%, transparent), transparent 55%),
-    linear-gradient(180deg, #07070c 0%, var(--color-bg) 42%, #040406 100%);
+    radial-gradient(1100px 720px at 12% -18%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 55%),
+    radial-gradient(720px 480px at 92% 8%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%),
+    radial-gradient(900px 560px at 70% 40%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 65%),
+    radial-gradient(1200px 800px at 50% 120%, color-mix(in srgb, var(--accent-lo) 14%, transparent), transparent 55%),
+    linear-gradient(180deg, var(--space-top) 0%, var(--color-bg) 42%, var(--space-deep) 100%);
 }
 .owyx-space::before {
-  /* soft cyan mist drift */
   content: "";
   position: absolute;
   inset: -10% -5%;
   background:
-    radial-gradient(42% 30% at 18% 14%, rgba(0, 229, 255, 0.11), transparent 70%),
-    radial-gradient(30% 24% at 88% 22%, rgba(0, 229, 255, 0.06), transparent 72%),
-    radial-gradient(50% 40% at 60% 80%, rgba(0, 229, 255, 0.04), transparent 75%);
+    radial-gradient(42% 30% at 18% 14%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 70%),
+    radial-gradient(30% 24% at 88% 22%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 72%),
+    radial-gradient(50% 40% at 60% 80%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 75%);
   animation: owyx-mist 18s ease-in-out infinite alternate;
 }
 .owyx-space::after {
-  /* denser starfield */
   content: "";
   position: absolute;
   inset: 0;
@@ -139,8 +224,8 @@ body {
     radial-gradient(1px 1px at 88% 70%, rgba(255, 255, 255, 0.2), transparent),
     radial-gradient(1px 1px at 8% 78%, rgba(255, 255, 255, 0.25), transparent),
     radial-gradient(1px 1px at 38% 88%, rgba(255, 255, 255, 0.16), transparent),
-    radial-gradient(1.5px 1.5px at 55% 22%, rgba(0, 229, 255, 0.45), transparent),
-    radial-gradient(1.5px 1.5px at 72% 48%, rgba(0, 229, 255, 0.3), transparent),
+    radial-gradient(1.5px 1.5px at 55% 22%, color-mix(in srgb, var(--accent) 55%, transparent), transparent),
+    radial-gradient(1.5px 1.5px at 72% 48%, color-mix(in srgb, var(--accent) 40%, transparent), transparent),
     radial-gradient(1px 1px at 20% 60%, rgba(255, 255, 255, 0.2), transparent),
     radial-gradient(1px 1px at 95% 40%, rgba(255, 255, 255, 0.28), transparent);
   background-size: 100% 100%, 100% 100%, 180% 180%, 140% 140%, 100% 100%, 160% 160%,
@@ -229,54 +314,55 @@ select:focus:not(:focus-visible) {
   pointer-events: none;
 }
 .btn-primary {
-  background: linear-gradient(180deg, #1ce8ff 0%, #00d2ec 100%);
-  color: #021720;
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: linear-gradient(180deg, var(--accent-hi) 0%, var(--accent-mid) 55%, var(--accent) 100%);
+  color: var(--accent-ink);
+  border: 1px solid color-mix(in srgb, #fff 35%, var(--accent));
   box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.65),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.55),
     inset 0 -1px 0 0 rgba(0, 0, 0, 0.15),
     0 1px 3px 0 rgba(0, 0, 0, 0.4),
-    0 0 20px -4px rgba(0, 229, 255, 0.45);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
+    0 0 22px -4px color-mix(in srgb, var(--accent) 55%, transparent);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-1.5px);
-  background: linear-gradient(180deg, #3eedff 0%, #0cdbf5 100%);
-  border-color: rgba(255, 255, 255, 0.6);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent-hi) 85%, #fff) 0%, var(--accent-hi) 45%, var(--accent-mid) 100%);
+  border-color: rgba(255, 255, 255, 0.55);
   box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.85),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.75),
     inset 0 -1px 0 0 rgba(0, 0, 0, 0.2),
     0 4px 14px 0 rgba(0, 0, 0, 0.35),
-    0 0 28px -2px rgba(0, 229, 255, 0.7);
+    0 0 28px -2px color-mix(in srgb, var(--accent) 70%, transparent);
 }
 .btn-primary:active:not(:disabled) {
   transform: translateY(1px) scale(0.985);
-  background: linear-gradient(180deg, #00c9e0 0%, #00b6cc 100%);
+  background: linear-gradient(180deg, var(--accent) 0%, var(--accent-lo) 100%);
   box-shadow:
     inset 0 2px 4px 0 rgba(0, 0, 0, 0.25),
     0 1px 2px 0 rgba(0, 0, 0, 0.2),
-    0 0 12px -2px rgba(0, 229, 255, 0.35);
+    0 0 12px -2px color-mix(in srgb, var(--accent) 40%, transparent);
 }
 .btn-ghost,
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.035);
-  backdrop-filter: blur(8px);
+  background: color-mix(in srgb, var(--color-panel) 55%, transparent);
+  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
   color: var(--color-text);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid color-mix(in srgb, #fff 10%, var(--color-line));
   box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.07),
+    inset 0 1px 0 0 var(--glass-shine),
     0 1px 3px 0 rgba(0, 0, 0, 0.3);
 }
 .btn-ghost:hover:not(:disabled),
 .btn-secondary:hover:not(:disabled) {
   transform: translateY(-1.5px);
-  background: rgba(255, 255, 255, 0.065);
-  border-color: rgba(0, 229, 255, 0.4);
-  color: #ffffff;
+  background: color-mix(in srgb, var(--color-panel) 75%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--color-line));
+  color: var(--color-text);
   box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.12),
+    inset 0 1px 0 0 var(--glass-shine),
     0 4px 14px 0 rgba(0, 0, 0, 0.35),
-    0 0 18px -6px rgba(0, 229, 255, 0.35);
+    0 0 18px -6px color-mix(in srgb, var(--accent) 40%, transparent);
 }
 .btn-ghost:active:not(:disabled),
 .btn-secondary:active:not(:disabled) {
@@ -317,39 +403,53 @@ select:focus:not(:focus-visible) {
 .input::placeholder, .textarea::placeholder { color: #616772; }
 .input:focus, .textarea:focus, .select:focus {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.18);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
 }
 .textarea { resize: vertical; min-height: 96px; }
 
-/* ===== Surfaces ===== */
+/* ===== Surfaces / liquid glass ===== */
 .panel {
-  background: color-mix(in srgb, var(--color-panel) 82%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-line) 70%, var(--color-accent) 12%);
-  border-radius: 14px;
-  backdrop-filter: blur(14px) saturate(1.15);
-  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  background:
+    linear-gradient(
+      155deg,
+      color-mix(in srgb, var(--accent) 8%, transparent) 0%,
+      transparent 42%
+    ),
+    color-mix(in srgb, var(--color-panel) 58%, transparent);
+  border: 1px solid var(--glass-edge);
+  border-radius: 16px;
+  backdrop-filter: blur(22px) saturate(1.45);
+  -webkit-backdrop-filter: blur(22px) saturate(1.45);
   box-shadow:
-    inset 0 1px 0 color-mix(in srgb, #fff 6%, transparent),
-    0 12px 40px -28px rgba(0, 0, 0, 0.65);
+    inset 0 1px 0 var(--glass-shine),
+    inset 0 -1px 0 color-mix(in srgb, #000 18%, transparent),
+    0 18px 48px -28px rgba(0, 0, 0, 0.72),
+    0 0 0 1px color-mix(in srgb, var(--accent) 6%, transparent);
 }
 .panel-2 {
-  background: color-mix(in srgb, var(--color-panel-2) 85%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-line) 75%, transparent);
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--color-panel-2) 62%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-line) 70%, var(--accent) 12%);
+  border-radius: 14px;
+  backdrop-filter: blur(16px) saturate(1.3);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  box-shadow: inset 0 1px 0 var(--glass-shine);
 }
 
 .liquid-glass-header {
+  background: color-mix(in srgb, var(--color-bg) 42%, transparent) !important;
+  border-bottom-color: var(--glass-edge) !important;
+  backdrop-filter: blur(22px) saturate(1.5) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.5) !important;
   box-shadow:
-    inset 0 -1px 0 color-mix(in srgb, var(--color-accent) 10%, transparent),
-    0 8px 28px -20px rgba(0, 0, 0, 0.55);
+    inset 0 -1px 0 color-mix(in srgb, var(--accent) 18%, transparent),
+    0 10px 32px -22px rgba(0, 0, 0, 0.65);
 }
 
 @media (prefers-reduced-transparency: reduce) {
   .panel,
   .panel-2,
-  .liquid-glass-header {
+  .liquid-glass-header,
+  .empty-surface {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     background: var(--color-panel);
@@ -358,7 +458,7 @@ select:focus:not(:focus-visible) {
     background: var(--color-panel-2);
   }
   .liquid-glass-header {
-    background: color-mix(in srgb, var(--color-bg) 92%, transparent);
+    background: color-mix(in srgb, var(--color-bg) 94%, transparent) !important;
   }
 }
 
@@ -373,7 +473,7 @@ select:focus:not(:focus-visible) {
     linear-gradient(180deg, color-mix(in srgb, var(--color-accent) 5%, transparent), transparent 50%),
     color-mix(in srgb, var(--color-panel-2) 70%, transparent);
   padding: 1.25rem 1.2rem;
-  box-shadow: 0 18px 50px -36px rgba(0, 229, 255, 0.45);
+  box-shadow: 0 18px 50px -36px color-mix(in srgb, var(--accent) 50%, transparent);
 }
 .section-callout::before {
   content: "";
@@ -567,11 +667,16 @@ select:focus:not(:focus-visible) {
 .empty-surface {
   text-align: center;
   padding: 2.25rem 1.25rem;
-  border: 1px dashed color-mix(in srgb, var(--color-line) 80%, var(--color-accent) 20%);
-  border-radius: 14px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 16px;
   background:
-    radial-gradient(420px 160px at 50% 0%, color-mix(in srgb, var(--color-accent) 9%, transparent), transparent 70%),
-    color-mix(in srgb, var(--color-panel-2) 85%, var(--color-bg));
+    radial-gradient(420px 160px at 50% 0%, color-mix(in srgb, var(--color-accent) 14%, transparent), transparent 70%),
+    color-mix(in srgb, var(--color-panel) 55%, transparent);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  box-shadow:
+    inset 0 1px 0 var(--glass-shine),
+    0 16px 40px -28px rgba(0, 0, 0, 0.6);
 }
 .empty-surface h3 {
   font-family: var(--font-display);
