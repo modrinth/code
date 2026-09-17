@@ -11597,6 +11597,7 @@ dependencies = [
  "core-graphics 0.24.0",
  "daedalus",
  "dashmap",
+ "dirs",
  "either",
  "enumset",
  "hyper 1.7.0",

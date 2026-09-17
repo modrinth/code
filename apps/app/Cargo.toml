@@ -12,6 +12,7 @@ async_zip = { workspace = true, features = ["deflate", "tokio-fs"] }
 chrono = { workspace = true }
 daedalus = { workspace = true }
 dashmap = { workspace = true }
+dirs = { workspace = true }
 either = { workspace = true }
 enumset = { workspace = true, features = ["serde"] }
 hyper = { workspace = true, features = ["server"] }

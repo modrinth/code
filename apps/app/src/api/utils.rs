@@ -25,8 +25,51 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
             progress_bars_list,
             get_opening_command,
             super::thumbnails::get_image_thumbnail,
+            owyx_site_session_get,
+            owyx_site_session_set,
+            owyx_site_session_clear,
         ])
         .build()
+}
+
+/// `%USERPROFILE%/owyx/site_session.json` (or `~/owyx/…`) — JWT outside webview localStorage.
+fn owyx_site_session_path() -> Result<PathBuf> {
+    let home = dirs::home_dir().ok_or_else(|| {
+        theseus::Error::from(theseus::ErrorKind::OtherError(
+            "Could not resolve home directory for Owyx site session".to_string(),
+        ))
+    })?;
+    Ok(home.join("owyx").join("site_session.json"))
+}
+
+#[tauri::command]
+pub async fn owyx_site_session_get() -> Result<Option<String>> {
+    let path = owyx_site_session_path()?;
+    match tokio::fs::read_to_string(&path).await {
+        Ok(raw) => Ok(Some(raw)),
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(err) => Err(err.into()),
+    }
+}
+
+#[tauri::command]
+pub async fn owyx_site_session_set(payload: String) -> Result<()> {
+    let path = owyx_site_session_path()?;
+    if let Some(parent) = path.parent() {
+        tokio::fs::create_dir_all(parent).await?;
+    }
+    tokio::fs::write(&path, payload).await?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn owyx_site_session_clear() -> Result<()> {
+    let path = owyx_site_session_path()?;
+    match tokio::fs::remove_file(&path).await {
+        Ok(()) => Ok(()),
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(err) => Err(err.into()),
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

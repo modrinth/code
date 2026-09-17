@@ -386,6 +386,9 @@ fn main() {
                         "progress_bars_list",
                         "get_opening_command",
                         "get_image_thumbnail",
+                        "owyx_site_session_get",
+                        "owyx_site_session_set",
+                        "owyx_site_session_clear",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

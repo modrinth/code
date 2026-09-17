@@ -19,8 +19,9 @@ Playing is **open**:
 - **Guest / offline** — pick a nick in the launcher and Play. No account.
 - **Owyx account** — register on the site, sign in inside the launcher with the
   same account, play. Later: skin, cape, profile perks.
-- **Microsoft** — separate licensed profile (real OAuth is future work; honest
-  stub for now). Never breaks offline or Owyx.
+- **Microsoft** — licensed Minecraft via Theseus SISU / Microsoft OAuth in
+  `packages/app-lib` (optional; see `docs/ms-oauth.md`). Never breaks offline or
+  Owyx nick play.
 
 **Applications («заявки») are no longer a whitelist gate.** A registered account
 that is **active and not banned** may play. A **ban** blocks everything.
@@ -36,8 +37,10 @@ The launcher targets one API base:
 | dev | `http://127.0.0.1:3001` |
 | prod | `https://api.owyx.site` |
 
-Configured in the launcher via `OWYX_API_BASE_URL` (see `Launcher/.env.example`)
-or the launcher config. All paths below are relative to the base.
+Configured in the launcher via `OWYX_API_BASE_URL` / `VITE_OWYX_API_BASE_URL`,
+site `owyxsite/.env.example` (`LAUNCHER_CLIENT_KEY`), and in-app Owyx Servers
+settings (`getStoredOwyxApiBase` / `getOwyxClientKey`). All paths below are
+relative to the API base.
 
 **Website** is `https://owyx.site` (browser uses same-origin `/api` via nginx → backend).
 Do not point the launcher at `owyx.site` for catalog downloads in prod — use `api.owyx.site`.
@@ -68,7 +71,9 @@ The key is configured as `LAUNCHER_CLIENT_KEY` on the site and `OWYX_CLIENT_KEY`
    - `200` → `{ success: true, token, user }`. `token` is a JWT.
    - `401`/`403` → `{ error }` (wrong credentials / inactive). Show a human message.
    - `401 unauthorized_client` → missing/invalid client key (configure in Owyx Servers settings).
-2. Store the JWT securely (OS app-data, never plaintext in the UI).
+2. Store the JWT securely in OS app-data (`~/owyx/site_session.json` via Tauri
+   `plugin:utils|owyx_site_session_*`). Never plaintext in webview `localStorage`.
+   Legacy `localStorage` keys are migrated once then cleared.
 3. `GET /api/launcher/me` with `Authorization: Bearer <token>` → profile + access.
    Session rows store a SHA-256 of the JWT (legacy base64 hashes are migrated on
    use). Logout deletes the matching session hash.
@@ -139,7 +144,7 @@ Also available as `GET /api/launcher/v1/me`.
 ```json
 {
   "api": "owyx-launcher",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "siteVersion": "0.1.0",
   "serverAccessModel": "open",
   "auth": { "login": "/api/auth/login", "me": "/api/launcher/me" },
@@ -373,7 +378,7 @@ migration `004_nickname_cooldown.sql`).
 ## Versioning
 
 - Stable surface under `/api/launcher/v1/*`. `GET /v1/status.version` is the
-  contract version (`1.1.0`). Additive changes bump the minor; breaking changes
+  contract version (`1.3.0`). Additive changes bump the minor; breaking changes
   add `/v2/`.
 
 ## Launcher client (apps/app-frontend)

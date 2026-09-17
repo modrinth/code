@@ -111,7 +111,7 @@ import {
 	take_ads_window_hold,
 } from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
-import { check_reachable, login_offline } from '@/helpers/auth.js'
+import { check_reachable, login_offline, remove_user } from '@/helpers/auth.js'
 import { get_user, get_version } from '@/helpers/cache.js'
 import { gameSettingsQueryOptions } from '@/helpers/game-options'
 import { install_create_modpack_instance, install_get_modpack_preview } from '@/helpers/install'
@@ -133,7 +133,9 @@ import {
 import {
 	fetchOwyxSiteMe,
 	getStoredOwyxSiteSession,
+	hydrateOwyxSiteSession,
 	logoutOwyxSite,
+	OWYX_SITE_CHANGELOG_URL,
 	OWYX_SITE_PROFILE_URL,
 } from '@/helpers/owyx-site-auth'
 import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
@@ -914,7 +916,10 @@ async function setupApp() {
 
 	traceStartupStep('Read opening command', get_opening_command).then(handleCommand)
 	traceStartupStep('Refresh startup credentials', fetchCredentials)
-	traceStartupStep('Refresh Owyx site session', refreshOwyxSiteSession)
+	traceStartupStep('Hydrate Owyx site session', async () => {
+		await hydrateOwyxSiteSession()
+		await refreshOwyxSiteSession()
+	})
 
 	if (pending_update_toast_for_version !== null) {
 		const settings = await traceStartupStep(
@@ -1422,6 +1427,7 @@ async function requestSignIn(flow = 'sign-in', addAccount = false) {
 }
 
 async function refreshOwyxSiteSession() {
+	await hydrateOwyxSiteSession()
 	const cached = getStoredOwyxSiteSession()
 	if (!cached) {
 		owyxSiteSession.value = null
@@ -1439,21 +1445,32 @@ async function refreshOwyxSiteSession() {
 		} catch {
 			/* checklist mark is best-effort */
 		}
-		// Sync site nickname → Owyx MC profile once (do not steal active Microsoft selection)
-		const nick = fresh.user?.nickname?.trim()
-		if (nick && nick.length <= 16) {
+		// Sync site nickname → offline play profile (rename replaces stale offline UUID)
+		const nick = fresh.user?.nickname?.trim() ?? ''
+		const nickOk = /^[A-Za-z0-9_]{3,16}$/.test(nick)
+		if (nickOk) {
 			try {
 				const { users } = await import('@/helpers/auth')
 				const list = await users()
-				const hasOwyxNick = (Array.isArray(list) ? list : []).some(
-					(a) =>
-						a?.is_offline === true ||
-						a?.refresh_token === 'owyx-offline' ||
-						((a?.refresh_token ?? '') === '' &&
-							(a?.access_token === '' || a?.access_token === '0')),
-				)
-				if (!hasOwyxNick) {
-					// Passive sync: create nick profile without stealing active Microsoft selection
+				const accounts = Array.isArray(list) ? list : []
+				const isOwyxOffline = (a) =>
+					a?.is_offline === true ||
+					a?.refresh_token === 'owyx-offline' ||
+					((a?.refresh_token ?? '') === '' &&
+						(a?.access_token === '' || a?.access_token === '0'))
+				const offlineAccounts = accounts.filter(isOwyxOffline)
+				const match = offlineAccounts.find((a) => a?.profile?.name === nick)
+				if (!match) {
+					for (const stale of offlineAccounts) {
+						const id = stale?.profile?.id
+						if (id) {
+							try {
+								await remove_user(id)
+							} catch (e) {
+								console.warn('Could not remove stale offline nick', e)
+							}
+						}
+					}
 					await login_offline(nick, false)
 				}
 			} catch (e) {
@@ -2010,7 +2027,7 @@ async function installUpdate() {
 setAppUpdateActions({
 	download: downloadAvailableUpdate,
 	install: installUpdate,
-	changelog: () => openUrl('https://modrinth.com/news/changelog?filter=app'),
+	changelog: () => openUrl(OWYX_SITE_CHANGELOG_URL),
 })
 
 async function openModrinthProjectLinkInApp(parsed) {

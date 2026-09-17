@@ -1,8 +1,11 @@
 /**
  * Owyx site account (control-plane email login).
  * Contract: owyxsite/LAUNCHER_SITE_CONTRACT.md — POST /api/auth/login, GET /api/launcher/me
+ *
+ * JWT lives in OS app-data (`~/owyx/site_session.json` via Tauri), not webview localStorage.
  */
 
+import { invoke } from '@tauri-apps/api/core'
 import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 
 import {
@@ -22,8 +25,9 @@ async function owyxFetch(input: string, init?: RequestInit): Promise<Response> {
 	}
 }
 
-const STORAGE_TOKEN = 'owyx.siteToken'
-const STORAGE_USER = 'owyx.siteUser'
+/** Legacy keys — migrated once into OS storage then cleared. */
+const LEGACY_STORAGE_TOKEN = 'owyx.siteToken'
+const LEGACY_STORAGE_USER = 'owyx.siteUser'
 
 export type OwyxSiteUser = {
 	id: number | string
@@ -37,6 +41,10 @@ export type OwyxSiteSession = {
 	token: string
 	user: OwyxSiteUser
 }
+
+/** In-memory cache; never write JWT to localStorage. */
+let memorySession: OwyxSiteSession | null = null
+let hydratePromise: Promise<OwyxSiteSession | null> | null = null
 
 function authHeaders(token?: string): Record<string, string> {
 	const headers: Record<string, string> = {
@@ -53,10 +61,20 @@ function apiBase(): string {
 	return sanitizeOwyxApiBase(getStoredOwyxApiBase() || DEFAULT_OWYX_API_BASE)
 }
 
-export function getStoredOwyxSiteSession(): OwyxSiteSession | null {
+function parseSessionPayload(raw: string): OwyxSiteSession | null {
 	try {
-		const token = localStorage.getItem(STORAGE_TOKEN)
-		const raw = localStorage.getItem(STORAGE_USER)
+		const data = JSON.parse(raw) as { token?: string; user?: OwyxSiteUser }
+		if (!data?.token || !data?.user?.nickname) return null
+		return { token: String(data.token), user: data.user }
+	} catch {
+		return null
+	}
+}
+
+function readLegacyLocalStorage(): OwyxSiteSession | null {
+	try {
+		const token = localStorage.getItem(LEGACY_STORAGE_TOKEN)
+		const raw = localStorage.getItem(LEGACY_STORAGE_USER)
 		if (!token || !raw) return null
 		const user = JSON.parse(raw) as OwyxSiteUser
 		if (!user?.nickname) return null
@@ -66,18 +84,82 @@ export function getStoredOwyxSiteSession(): OwyxSiteSession | null {
 	}
 }
 
-export function clearOwyxSiteSession() {
+function clearLegacyLocalStorage() {
 	try {
-		localStorage.removeItem(STORAGE_TOKEN)
-		localStorage.removeItem(STORAGE_USER)
+		localStorage.removeItem(LEGACY_STORAGE_TOKEN)
+		localStorage.removeItem(LEGACY_STORAGE_USER)
 	} catch {
 		/* ignore */
 	}
 }
 
+async function writeOsSession(session: OwyxSiteSession): Promise<void> {
+	try {
+		await invoke('plugin:utils|owyx_site_session_set', {
+			payload: JSON.stringify({ token: session.token, user: session.user }),
+		})
+	} catch (err) {
+		console.warn('Failed to persist Owyx site session to OS storage', err)
+	}
+}
+
+async function clearOsSession(): Promise<void> {
+	try {
+		await invoke('plugin:utils|owyx_site_session_clear')
+	} catch {
+		/* ignore */
+	}
+}
+
+/** Sync peek of in-memory session (call {@link hydrateOwyxSiteSession} at startup). */
+export function getStoredOwyxSiteSession(): OwyxSiteSession | null {
+	return memorySession
+}
+
+/** Load JWT from OS app-data; migrate legacy localStorage once. */
+export async function hydrateOwyxSiteSession(): Promise<OwyxSiteSession | null> {
+	if (!hydratePromise) {
+		hydratePromise = (async () => {
+			try {
+				const raw = await invoke<string | null>('plugin:utils|owyx_site_session_get')
+				if (raw) {
+					const parsed = parseSessionPayload(raw)
+					if (parsed) {
+						memorySession = parsed
+						clearLegacyLocalStorage()
+						return memorySession
+					}
+				}
+			} catch {
+				/* Tauri unavailable (tests) — fall through */
+			}
+
+			const legacy = readLegacyLocalStorage()
+			if (legacy) {
+				memorySession = legacy
+				clearLegacyLocalStorage()
+				await writeOsSession(legacy)
+				return memorySession
+			}
+
+			memorySession = null
+			return null
+		})()
+	}
+	return hydratePromise
+}
+
+export function clearOwyxSiteSession() {
+	memorySession = null
+	hydratePromise = Promise.resolve(null)
+	clearLegacyLocalStorage()
+	void clearOsSession()
+}
+
 function persistSession(token: string, user: OwyxSiteUser) {
-	localStorage.setItem(STORAGE_TOKEN, token)
-	localStorage.setItem(STORAGE_USER, JSON.stringify(user))
+	memorySession = { token, user }
+	hydratePromise = Promise.resolve(memorySession)
+	void writeOsSession(memorySession)
 }
 
 function mapUser(
@@ -138,7 +220,6 @@ export async function loginOwyxSite(login: string, password: string): Promise<Ow
 	const user = mapUser(userRaw)
 	const token = String(data.token)
 	persistSession(token, user)
-	// Refresh from /me so avatar/cosmetics are absolute and up to date.
 	const refreshed = await fetchOwyxSiteMe(token)
 	return refreshed ?? { token, user }
 }
@@ -170,7 +251,6 @@ export async function fetchOwyxSiteMe(token?: string): Promise<OwyxSiteSession |
 			data.cosmetics && typeof data.cosmetics === 'object'
 				? (data.cosmetics as Record<string, unknown>)
 				: null
-		// Top-level avatarUrl mirror (older shape)
 		if (!userRaw.avatarUrl && data.avatarUrl) userRaw.avatarUrl = data.avatarUrl
 		const user = mapUser(userRaw, cosmetics)
 		persistSession(session.token, user)
@@ -202,3 +282,4 @@ export const OWYX_SITE_REGISTER_URL = 'https://owyx.site/register'
 export const OWYX_SITE_LOGIN_URL = 'https://owyx.site/login'
 export const OWYX_SITE_PROFILE_URL = 'https://owyx.site/profile'
 export const OWYX_SITE_SUPPORT_URL = 'https://owyx.site'
+export const OWYX_SITE_CHANGELOG_URL = 'https://github.com/ebluffy/Owyx/releases'

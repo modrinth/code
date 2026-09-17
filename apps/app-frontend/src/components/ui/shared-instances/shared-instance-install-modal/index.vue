@@ -19,12 +19,12 @@
 					<p class="m-0">
 						<IntlFormatted :message-id="messages.reportDescription">
 							<template #rules-link="{ children }">
-								<AutoLink class="text-link hover:underline" to="https://modrinth.com/legal/rules">
+								<AutoLink class="text-link hover:underline" to="https://owyx.site/legal/terms">
 									<component :is="() => children" />
 								</AutoLink>
 							</template>
 							<template #terms-link="{ children }">
-								<AutoLink class="text-link hover:underline" to="https://modrinth.com/legal/terms">
+								<AutoLink class="text-link hover:underline" to="https://owyx.site/legal/privacy">
 									<component :is="() => children" />
 								</AutoLink>
 							</template>
