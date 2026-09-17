@@ -3,7 +3,9 @@ use std::{
     time::Duration,
 };
 
-use actix_web::{HttpRequest, HttpResponse, get, post, web};
+use actix_web::{
+    HttpRequest, HttpResponse, get, http::header::ContentEncoding, post, web,
+};
 use ariadne::ids::base62_impl::to_base62;
 use bytes::Bytes;
 use eyre::{Result, eyre};
@@ -450,6 +452,7 @@ pub async fn scan_rules(
 
     Ok(HttpResponse::Ok()
         .insert_header(("Content-Type", "text/event-stream"))
+        .insert_header(ContentEncoding::Identity)
         .insert_header(("Cache-Control", "no-cache, no-transform"))
         .insert_header(("X-Accel-Buffering", "no"))
         .streaming(stream))
