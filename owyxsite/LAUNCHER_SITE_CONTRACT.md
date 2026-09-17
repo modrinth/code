@@ -165,7 +165,7 @@ Also available as `GET /api/launcher/v1/me`.
 
 - `GET /api/friends` → `{ friends: [{ id, userId, nickname, displayNickname, avatarUrl, status, incoming, presence, instanceName, presenceUpdatedAt, ... }], incomingCount }`
 - `GET /api/friends/search?q=` → `{ users: [{ id, nickname, displayNickname, avatarUrl }] }` (match login or display)
-- `POST /api/friends/request` `{ nickname }` → create pending by **login** nickname (or auto-accept reciprocal); respects target `allowFriendRequests`
+- `POST /api/friends/request` `{ nickname }` → create pending by **login or display** nickname (exact match, prefers login on ties; or auto-accept reciprocal); respects target `allowFriendRequests`
 - `POST /api/friends/:id/accept` · `POST /api/friends/:id/decline` · `DELETE /api/friends/:id`
 - `POST /api/friends/presence` `{ status: "online"|"playing"|"offline", instanceName? }` — launcher heartbeat; presence rows older than ~90s are treated as offline.
 - `GET /api/friends/settings` → `{ settings: { allowFriendRequests: boolean } }`

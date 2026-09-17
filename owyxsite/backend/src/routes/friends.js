@@ -253,7 +253,7 @@ router.get('/search', async (req, res) => {
   }
 });
 
-// POST /api/friends/request { nickname }
+// POST /api/friends/request { nickname } — resolve by login OR display nickname
 router.post('/request', async (req, res) => {
   try {
     const nickname = String(req.body.nickname || '').trim();
@@ -261,10 +261,16 @@ router.post('/request', async (req, res) => {
       return res.status(400).json({ error: 'nickname: 3–16 letters, digits, or _' });
     }
     const target = await db.query(
-      `SELECT id, nickname, avatar_url FROM users
-       WHERE LOWER(nickname) = LOWER($1)
+      `SELECT id, nickname, COALESCE(display_nickname, nickname) AS display_nickname, avatar_url
+       FROM users
+       WHERE (
+         LOWER(nickname) = LOWER($1)
+         OR LOWER(COALESCE(display_nickname, nickname)) = LOWER($1)
+       )
          AND is_active IS DISTINCT FROM false
-         AND is_banned IS DISTINCT FROM true`,
+         AND is_banned IS DISTINCT FROM true
+       ORDER BY CASE WHEN LOWER(nickname) = LOWER($1) THEN 0 ELSE 1 END, id ASC
+       LIMIT 1`,
       [nickname]
     );
     if (!target.rows[0]) {

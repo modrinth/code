@@ -642,6 +642,10 @@ function isValidMcNick(raw) {
     return typeof raw === 'string' && raw.length >= 3 && raw.length <= 16 && /^[A-Za-z0-9_]+$/.test(raw);
 }
 
+function isPgUniqueViolation(error) {
+    return error && (error.code === '23505' || error.code === 'unique_violation');
+}
+
 router.put('/nickname', authenticateToken, async (req, res) => {
     try {
         const raw = (req.body && req.body.nickname != null) ? String(req.body.nickname).trim() : '';
@@ -686,10 +690,17 @@ router.put('/nickname', authenticateToken, async (req, res) => {
             return res.status(409).json({ error: 'Этот логин уже занят' });
         }
 
-        await db.query(
-            'UPDATE users SET nickname = $1, nickname_changed_at = NOW() WHERE id = $2',
-            [raw, req.user.id]
-        );
+        try {
+            await db.query(
+                'UPDATE users SET nickname = $1, nickname_changed_at = NOW() WHERE id = $2',
+                [raw, req.user.id]
+            );
+        } catch (updateErr) {
+            if (isPgUniqueViolation(updateErr)) {
+                return res.status(409).json({ error: 'Этот логин уже занят' });
+            }
+            throw updateErr;
+        }
 
         await db.query(`
             INSERT INTO user_activity (user_id, activity_type, description)
@@ -754,10 +765,17 @@ router.put('/display-nickname', authenticateToken, async (req, res) => {
             return res.status(409).json({ error: 'Этот ник уже занят' });
         }
 
-        await db.query(
-            'UPDATE users SET display_nickname = $1, display_nickname_changed_at = NOW() WHERE id = $2',
-            [raw, req.user.id]
-        );
+        try {
+            await db.query(
+                'UPDATE users SET display_nickname = $1, display_nickname_changed_at = NOW() WHERE id = $2',
+                [raw, req.user.id]
+            );
+        } catch (updateErr) {
+            if (isPgUniqueViolation(updateErr)) {
+                return res.status(409).json({ error: 'Этот ник уже занят' });
+            }
+            throw updateErr;
+        }
 
         await db.query(`
             INSERT INTO user_activity (user_id, activity_type, description)

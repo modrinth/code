@@ -17,6 +17,10 @@
     "languageTitle": "Язык (RU / EN)",
     "themeAria": "Сменить акцентный цвет",
     "themeTitle": "Акцент: Cyan / Synthwave / Onyx / Magma",
+    "themeCyan": "Cyan",
+    "themeSynthwave": "Wave",
+    "themeOnyx": "Onyx",
+    "themeMagma": "Magma",
     "logoHome": "Owyx™ — на главную"
   },
   "footer": {
@@ -550,6 +554,7 @@
     "emailDesc": "Вход и восстановление доступа. Менять можно не чаще одного раза в 30 дней.",
     "emailCurrent": "Текущий адрес",
     "emailHint": "На него приходят подтверждения и сброс пароля.",
+    "emailCooldown": "Следующая смена почты через {days} дн.",
     "changeEmail": "Сменить почту",
     "emailChangeTitle": "Смена почты",
     "emailChangeStep1": "Введите новый адрес — придёт код подтверждения.",

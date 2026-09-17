@@ -17,6 +17,10 @@
     "languageTitle": "Language (EN / RU)",
     "themeAria": "Cycle accent theme",
     "themeTitle": "Accent: Cyan / Synthwave / Onyx / Magma",
+    "themeCyan": "Cyan",
+    "themeSynthwave": "Wave",
+    "themeOnyx": "Onyx",
+    "themeMagma": "Magma",
     "logoHome": "Owyx™ — home"
   },
   "footer": {
@@ -551,6 +555,7 @@
     "emailDesc": "Sign-in and account recovery. You can change it at most once every 30 days.",
     "emailCurrent": "Current address",
     "emailHint": "Confirmations and password resets go here.",
+    "emailCooldown": "Next email change in {days} d.",
     "changeEmail": "Change email",
     "emailChangeTitle": "Change email",
     "emailChangeStep1": "Enter the new address — a confirmation code will be sent.",

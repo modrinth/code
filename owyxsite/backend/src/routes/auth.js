@@ -285,24 +285,25 @@ router.post('/register', [
             });
         }
 
-        // Проверяем, не существует ли уже пользователь с таким email или ником
+        // Case-insensitive: login and display nicknames must be unique across accounts.
         const existingUser = await db.query(
-            'SELECT id, email, nickname FROM users WHERE email = $1 OR nickname = $2',
+            `SELECT id, email, nickname, display_nickname FROM users
+             WHERE LOWER(email) = LOWER($1)
+                OR LOWER(nickname) = LOWER($2)
+                OR LOWER(COALESCE(display_nickname, nickname)) = LOWER($2)`,
             [email, loginName]
         );
 
         if (existingUser.rows.length > 0) {
             const existing = existingUser.rows[0];
-            if (existing.email === email) {
+            if ((existing.email || '').toLowerCase() === String(email).toLowerCase()) {
                 return res.status(400).json({
                     error: 'Пользователь с таким email уже существует'
                 });
             }
-            if (existing.nickname === loginName) {
-                return res.status(400).json({
-                    error: 'Пользователь с таким логином уже существует'
-                });
-            }
+            return res.status(400).json({
+                error: 'Пользователь с таким логином уже существует'
+            });
         }
 
         // Хешируем пароль
@@ -310,12 +311,20 @@ router.post('/register', [
         const passwordHash = await bcrypt.hash(password, saltRounds);
 
         // Создаем пользователя
-        const result = await db.query(
-            `INSERT INTO users (nickname, display_nickname, email, password_hash, first_name, registered_at) 
-             VALUES ($1, $1, $2, $3, $4, NOW()) 
-             RETURNING id, nickname, display_nickname, email, first_name, registered_at`,
-            [loginName, email, passwordHash, first_name || null]
-        );
+        let result;
+        try {
+            result = await db.query(
+                `INSERT INTO users (nickname, display_nickname, email, password_hash, first_name, registered_at) 
+                 VALUES ($1, $1, $2, $3, $4, NOW()) 
+                 RETURNING id, nickname, display_nickname, email, first_name, registered_at`,
+                [loginName, email, passwordHash, first_name || null]
+            );
+        } catch (insertErr) {
+            if (insertErr && insertErr.code === '23505') {
+                return res.status(409).json({ error: 'Пользователь с таким логином или email уже существует' });
+            }
+            throw insertErr;
+        }
 
         const newUser = result.rows[0];
 

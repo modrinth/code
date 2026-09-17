@@ -3,16 +3,16 @@
 import { useLocale } from "@/hooks/useLocale";
 import { useSiteAccent, type SiteAccent } from "@/lib/siteTheme";
 
-const LABELS: Record<SiteAccent, string> = {
-  cyan: "Cyan",
-  synthwave: "Wave",
-  onyx: "Onyx",
-  magma: "Magma",
-};
-
 export default function ThemeToggle() {
   const { dict } = useLocale();
   const { accent, cycle } = useSiteAccent();
+
+  const labels: Record<SiteAccent, string> = {
+    cyan: dict.header.themeCyan,
+    synthwave: dict.header.themeSynthwave,
+    onyx: dict.header.themeOnyx,
+    magma: dict.header.themeMagma,
+  };
 
   return (
     <button
@@ -27,7 +27,7 @@ export default function ThemeToggle() {
         style={{ background: "var(--accent)" }}
         aria-hidden="true"
       />
-      <span className="text-[10px] font-bold tracking-wide">{LABELS[accent]}</span>
+      <span className="text-[10px] font-bold tracking-wide">{labels[accent]}</span>
     </button>
   );
 }

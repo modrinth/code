@@ -198,7 +198,7 @@ function SettingsPane({ user }: { user: ReturnType<typeof useAuth>["user"] }) {
           {p.groupSecurity}
         </h2>
         <NicknameSection currentNick={user?.nickname} />
-        <EmailSection currentEmail={user?.email} />
+        <EmailSection currentEmail={user?.email} emailChangedAt={user?.email_changed_at} />
         <PasswordSection />
       </div>
     </div>
@@ -305,21 +305,40 @@ function AvatarSection({ currentUrl }: { currentUrl?: string | null }) {
   );
 }
 
-function EmailSection({ currentEmail }: { currentEmail?: string }) {
+function EmailSection({
+  currentEmail,
+  emailChangedAt,
+}: {
+  currentEmail?: string;
+  emailChangedAt?: string | null;
+}) {
   const { dict } = useLocale();
   const p = dict.profile;
   const c = dict.common;
+  const { refreshAuth } = useAuth();
 
   const [overrideEmail, setOverrideEmail] = useState<string | null>(null);
   const email = overrideEmail ?? currentEmail ?? "";
   const [open, setOpen] = useState(false);
+  const now = useStableNow();
+  const nextAllowed = emailChangedAt ? new Date(emailChangedAt).getTime() + 30 * 86400000 : 0;
+  const onCooldown = nextAllowed > now;
+  const daysLeft = onCooldown ? Math.ceil((nextAllowed - now) / 86400000) : 0;
 
   return (
     <SettingsSection title={p.emailTitle} description={p.emailDesc}>
-      <SettingsRow label={p.emailCurrent} hint={p.emailHint}>
+      <SettingsRow
+        label={p.emailCurrent}
+        hint={onCooldown ? p.emailCooldown.replace("{days}", String(daysLeft)) : p.emailHint}
+      >
         <div className="flex w-full flex-col gap-2 sm:items-end">
           <span className="text-sm font-medium text-text break-all text-right">{email || c.dash}</span>
-          <button type="button" className="btn btn-secondary btn-sm self-end" onClick={() => setOpen(true)}>
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm self-end"
+            disabled={onCooldown}
+            onClick={() => setOpen(true)}
+          >
             {p.changeEmail}
           </button>
         </div>
@@ -330,6 +349,7 @@ function EmailSection({ currentEmail }: { currentEmail?: string }) {
           onDone={(newEmail) => {
             setOverrideEmail(newEmail);
             setOpen(false);
+            void refreshAuth();
           }}
         />
       )}
@@ -487,6 +507,7 @@ function DisplayNicknameSection({ currentNick }: { currentNick?: string }) {
   const { dict } = useLocale();
   const p = dict.profile;
   const c = dict.common;
+  const { refreshAuth } = useAuth();
 
   const [nick, setNick] = useState(currentNick || "");
   const [busy, setBusy] = useState(false);
@@ -510,6 +531,7 @@ function DisplayNicknameSection({ currentNick }: { currentNick?: string }) {
       if (res.ok) {
         setNick(data.display_nickname || nick);
         setToast({ text: p.displayNickUpdated, type: "success" });
+        await refreshAuth();
       } else setToast({ text: data.error || p.displayNickFailed, type: "error" });
     } catch {
       setToast({ text: c.serverError, type: "error" });
