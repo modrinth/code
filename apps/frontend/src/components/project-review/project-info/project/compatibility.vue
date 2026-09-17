@@ -3,9 +3,9 @@
 		<dt class="text-sm text-secondary">{{ formatMessage(messages.gameVersions) }}</dt>
 		<dd class="m-0 flex flex-wrap items-start gap-1">
 			<TagItem
-				class="!border-surface-4 !bg-surface-3 !text-secondary"
 				v-for="version in projectV2?.game_versions"
 				:key="version"
+				class="!border-surface-4 !bg-surface-3 !text-secondary"
 				>{{ version }}</TagItem
 			>
 			<span v-if="compatibilityError">{{ formatMessage(messages.unavailable) }}</span>
@@ -13,18 +13,18 @@
 		<dt class="text-sm text-secondary">{{ formatMessage(messages.platforms) }}</dt>
 		<dd class="m-0 flex flex-wrap items-start gap-1">
 			<TagItem
-				class="!border-surface-4 !bg-surface-3 !text-secondary"
 				v-for="loader in project?.loaders"
 				:key="loader"
+				class="!border-surface-4 !bg-surface-3 !text-secondary"
 				>{{ formatLoader(formatMessage, loader) }}</TagItem
 			>
 		</dd>
 		<dt class="text-sm text-secondary">{{ formatMessage(messages.environments) }}</dt>
 		<dd class="m-0 flex flex-wrap items-start gap-1">
 			<TagItem
-				class="!border-surface-4 !bg-surface-3 !text-secondary"
 				v-for="environment in project?.environment"
 				:key="environment"
+				class="!border-surface-4 !bg-surface-3 !text-secondary"
 				>{{ formatMessage(ENVIRONMENTS_COPY[environment].title) }}</TagItem
 			>
 		</dd>

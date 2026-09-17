@@ -11,8 +11,8 @@
 			<Button @click="refresh">{{ formatMessage(messages.retry) }}</Button>
 		</div>
 		<ProjectPageDescription
-			class="text-sm"
 			v-else-if="project?.description?.trim()"
+			class="text-sm"
 			:description="project.description"
 		/>
 		<p v-else class="text-secondary">

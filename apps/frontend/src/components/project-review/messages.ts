@@ -287,11 +287,11 @@ export const projectReviewMessages = defineMessages({
 	},
 	emptyDescription: {
 		id: 'moderation.project-review.emptyDescription',
-		defaultMessage: 'No description has been provided.',
+		defaultMessage: 'No description.',
 	},
 	emptyGallery: {
 		id: 'moderation.project-review.emptyGallery',
-		defaultMessage: 'This project has no gallery images.',
+		defaultMessage: 'No gallery images.',
 	},
 	imageNumber: {
 		id: 'moderation.project-review.imageNumber',
@@ -311,7 +311,7 @@ export const projectReviewMessages = defineMessages({
 	},
 	emptyVersions: {
 		id: 'moderation.project-review.emptyVersions',
-		defaultMessage: 'This project has no versions.',
+		defaultMessage: 'No versions.',
 	},
 	expandAll: {
 		id: 'moderation.project-review.expandAll',
@@ -343,7 +343,7 @@ export const projectReviewMessages = defineMessages({
 	},
 	emptyChangelog: {
 		id: 'moderation.project-review.emptyChangelog',
-		defaultMessage: 'No changelog was provided.',
+		defaultMessage: 'No changelog.',
 	},
 	versionId: {
 		id: 'moderation.project-review.versionId',

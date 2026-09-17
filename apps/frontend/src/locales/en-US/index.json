@@ -3114,19 +3114,25 @@
     "message": "No project selected."
   },
   "moderation.project-review.emptyChangelog": {
-    "message": "No changelog was provided."
+    "message": "No changelog."
   },
   "moderation.project-review.emptyDependencies": {
     "message": "No dependencies."
   },
   "moderation.project-review.emptyDescription": {
-    "message": "No description has been provided."
+    "message": "No description."
   },
   "moderation.project-review.emptyGallery": {
-    "message": "This project has no gallery images."
+    "message": "No gallery images."
+  },
+  "moderation.project-review.emptyLinks": {
+    "message": "No links."
+  },
+  "moderation.project-review.emptyTags": {
+    "message": "No tags."
   },
   "moderation.project-review.emptyVersions": {
-    "message": "This project has no versions."
+    "message": "No versions."
   },
   "moderation.project-review.environments": {
     "message": "Environments"
@@ -3162,10 +3168,13 @@
     "message": "Hide project details"
   },
   "moderation.project-review.hideRight": {
-    "message": "Hide review issues"
+    "message": "Hide panel"
   },
   "moderation.project-review.history": {
     "message": "History"
+  },
+  "moderation.project-review.icon": {
+    "message": "Icon"
   },
   "moderation.project-review.imageNumber": {
     "message": "Image {number}"
@@ -3183,7 +3192,7 @@
     "message": "License"
   },
   "moderation.project-review.links": {
-    "message": "Project links"
+    "message": "Links"
   },
   "moderation.project-review.listed": {
     "message": "Listed"
@@ -3236,6 +3245,9 @@
   "moderation.project-review.processingCount": {
     "message": "{count} under review"
   },
+  "moderation.project-review.projectTitle": {
+    "message": "Title"
+  },
   "moderation.project-review.projectType": {
     "message": "Project type"
   },
@@ -3270,7 +3282,7 @@
     "message": "Reviewed flags indicate progress, not a safe verdict. Files without flags have no flag verdict."
   },
   "moderation.project-review.right": {
-    "message": "Review issues"
+    "message": "Right panel"
   },
   "moderation.project-review.scheduled": {
     "message": "Scheduled"
@@ -3282,10 +3294,13 @@
     "message": "Show project details"
   },
   "moderation.project-review.showRight": {
-    "message": "Show review issues"
+    "message": "Show panel"
   },
   "moderation.project-review.skip": {
     "message": "Skip"
+  },
+  "moderation.project-review.slug": {
+    "message": "Slug"
   },
   "moderation.project-review.source": {
     "message": "Source code"
@@ -3299,8 +3314,11 @@
   "moderation.project-review.submitted": {
     "message": "Submitted"
   },
+  "moderation.project-review.summary": {
+    "message": "Summary"
+  },
   "moderation.project-review.tags": {
-    "message": "Categories"
+    "message": "Tags"
   },
   "moderation.project-review.tech-review": {
     "message": "Tech Review"
