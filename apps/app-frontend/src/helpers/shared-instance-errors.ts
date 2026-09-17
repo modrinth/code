@@ -1,9 +1,9 @@
+import { ModrinthApiError } from '@modrinth/api-client'
 import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 
 import {
 	getErrorMessage,
 	isSharedInstanceFileNotAllowedError,
-	isSharedInstancesApiError,
 	type SharedInstanceUnavailableReason,
 } from '@/helpers/install'
 
@@ -113,10 +113,8 @@ export function useSharedInstanceErrors() {
 	}
 
 	function notifySharedInstanceError(error: unknown) {
-		if (isSharedInstancesApiError(error)) {
-			notifySharedInstanceConnectionError()
-			return
-		}
+		const message = getErrorMessage(error)
+		const status = error instanceof ModrinthApiError ? error.statusCode : undefined
 
 		addNotification({
 			type: 'error',
@@ -125,7 +123,7 @@ export function useSharedInstanceErrors() {
 					? sharedInstanceErrorMessages.fileNotAllowedTitle
 					: sharedInstanceErrorMessages.errorTitle,
 			),
-			text: getErrorMessage(error),
+			text: status && !message.includes(`HTTP ${status}`) ? `HTTP ${status}: ${message}` : message,
 		})
 	}
 

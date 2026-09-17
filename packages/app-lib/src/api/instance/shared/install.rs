@@ -544,6 +544,22 @@ pub(super) async fn shared_instance_install_data(
     )
     .await?;
 
+	let remote = match get_remote_instance_access(shared_instance_id, state)
+		.await?
+	{
+		SharedInstanceRemoteResponse::Available(remote) => remote,
+		SharedInstanceRemoteResponse::Unavailable(reason) => {
+			return Err(shared_instance_unavailable_error(reason));
+		}
+	};
+	let (manager_id, server_manager_name, server_manager_icon_url) =
+		if remote.linked_server.is_some() {
+			(None, Some(remote.name), remote.icon.clone())
+		} else {
+			(manager_id, server_manager_name, server_manager_icon_url)
+		};
+	let instance_icon_url = remote.icon.or(instance_icon_url);
+
     let name = shared_instance_name(name);
     let linked_user_id = linked_modrinth_user_id(state).await?;
     let modpack = shared_instance_install_modpack(&version, state).await?;
@@ -556,6 +572,7 @@ pub(super) async fn shared_instance_install_data(
         .collect();
 
     Ok(SharedInstanceInstallData {
+		linked_server: remote.linked_server,
         shared_instance_id: shared_instance_id.to_string(),
         manager_id,
         server_manager_name,
