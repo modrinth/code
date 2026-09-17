@@ -1,8 +1,8 @@
 <template>
-	<p v-if="membersLoading" role="status">
+	<p v-if="membersLoading" role="status" class="m-0">
 		{{ formatMessage(messages.loading) }}
 	</p>
-	<p v-else-if="membersError" role="alert">
+	<p v-else-if="membersError" role="alert" class="m-0">
 		{{ formatMessage(messages.loadError) }}
 	</p>
 	<ul v-else class="m-0 flex list-none flex-col gap-4 p-0">

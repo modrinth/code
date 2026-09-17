@@ -1,16 +1,16 @@
 <template>
 	<div class="flex flex-col gap-1.5">
-		<p v-if="!selection" class="text-secondary">
+		<p v-if="!selection" class="m-0 text-secondary">
 			{{ formatMessage(messages.empty) }}
 		</p>
 		<div v-else-if="error || versionsQuery.isError.value" role="alert">
-			<p>{{ formatMessage(messages.loadError) }}</p>
+			<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
 			<Button @click="retry">{{ formatMessage(messages.retry) }}</Button>
 		</div>
-		<p v-else-if="isLoading || versionsQuery.isPending.value" role="status">
+		<p v-else-if="isLoading || versionsQuery.isPending.value" role="status" class="m-0">
 			{{ formatMessage(messages.loading) }}
 		</p>
-		<p v-else-if="!versions.length" class="text-secondary">
+		<p v-else-if="!versions.length" class="m-0 text-secondary">
 			{{ formatMessage(messages.emptyVersions) }}
 		</p>
 		<template v-else>

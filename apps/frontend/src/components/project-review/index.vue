@@ -11,7 +11,7 @@
 			<template #tech-review><TechReview :key="projectId" /></template>
 		</ProjectReviewLayout>
 		<template #fallback>
-			<p class="p-4 text-secondary" role="status">
+			<p class="m-0 p-4 text-secondary" role="status">
 				{{ formatMessage(projectReviewMessages.loading) }}
 			</p>
 		</template>

@@ -1,16 +1,16 @@
 <template>
 	<div>
-		<p v-if="!selection" class="text-secondary">
+		<p v-if="!selection" class="m-0 text-secondary">
 			{{ formatMessage(messages.empty) }}
 		</p>
-		<p v-else-if="isLoading" role="status">
+		<p v-else-if="isLoading" role="status" class="m-0">
 			{{ formatMessage(messages.loading) }}
 		</p>
 		<div v-else-if="error" role="alert">
-			<p>{{ formatMessage(messages.loadError) }}</p>
+			<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
 			<Button @click="refresh">{{ formatMessage(messages.retry) }}</Button>
 		</div>
-		<p v-else-if="!gallery.length" class="text-secondary">
+		<p v-else-if="!gallery.length" class="m-0 text-secondary">
 			{{ formatMessage(messages.emptyGallery) }}
 		</p>
 		<div v-else class="gallery-grid">

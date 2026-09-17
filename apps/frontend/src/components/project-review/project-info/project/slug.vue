@@ -4,7 +4,7 @@
 			<span>/{{ projectV2?.project_type ?? project.project_types[0] }}/ </span>
 			<span class="text-contrast">{{ project.slug ?? project.id }}</span>
 		</div>
-		<p class="mb-0 mt-2 flex items-center gap-1.5 text-xs">
+		<p class="m-0 flex items-center gap-1.5 text-xs">
 			<CheckIcon v-if="matchesName" class="size-3 shrink-0" />
 			{{ formatMessage(matchesName ? messages.matchesName : messages.customSlug) }}
 		</p>
