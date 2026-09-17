@@ -37,7 +37,7 @@ function roleLabel(role: string | undefined, p: ReturnType<typeof useLocale>["di
   return { text: p.rolePlayer, cls: "" };
 }
 
-type Tab = "overview" | "settings";
+type Tab = "overview" | "profile" | "security";
 
 function useStableNow(intervalMs = 60_000) {
   return useSyncExternalStore(
@@ -86,7 +86,8 @@ export default function ProfilePage() {
         }
         nav={[
           { id: "overview", label: p.navOverview, hint: p.navOverviewHint },
-          { id: "settings", label: p.navSettings, hint: p.navSettingsHint },
+          { id: "profile", label: p.navProfile, hint: p.navProfileHint },
+          { id: "security", label: p.navSecurity, hint: p.navSecurityHint },
         ]}
         activeId={tab}
         onNav={(id) => setTab(id as Tab)}
@@ -95,7 +96,8 @@ export default function ProfilePage() {
         {tab === "overview" && (
           <OverviewPane user={user} role={role} avatarSrc={avatarSrc} locale={locale} />
         )}
-        {tab === "settings" && <SettingsPane user={user} />}
+        {tab === "profile" && <ProfileSettingsPane user={user} />}
+        {tab === "security" && <SecuritySettingsPane user={user} />}
       </CabinetShell>
       <Footer />
     </>
@@ -179,28 +181,25 @@ function OverviewPane({
   );
 }
 
-function SettingsPane({ user }: { user: ReturnType<typeof useAuth>["user"] }) {
-  const { dict } = useLocale();
-  const p = dict.profile;
-
+function ProfileSettingsPane({ user }: { user: ReturnType<typeof useAuth>["user"] }) {
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start lg:gap-8">
-      <div className="flex flex-col gap-5 min-w-0">
-        <h2 className="font-display text-base font-bold tracking-tight text-text m-0">
-          {p.groupProfile}
-        </h2>
-        <AvatarSection currentUrl={user?.avatar_url} />
-        <DisplayNicknameSection currentNick={user?.display_nickname || user?.nickname} />
-        <ProfileInfoSection user={user} />
-      </div>
-      <div className="flex flex-col gap-5 min-w-0">
-        <h2 className="font-display text-base font-bold tracking-tight text-text m-0">
-          {p.groupSecurity}
-        </h2>
-        <NicknameSection currentNick={user?.nickname} />
-        <EmailSection currentEmail={user?.email} emailChangedAt={user?.email_changed_at} />
-        <PasswordSection />
-      </div>
+    <div className="flex flex-col gap-5 max-w-2xl">
+      <AvatarSection currentUrl={user?.avatar_url} />
+      <DisplayNicknameSection currentNick={user?.display_nickname || user?.nickname} />
+      <ProfileInfoSection user={user} />
+    </div>
+  );
+}
+
+function SecuritySettingsPane({ user }: { user: ReturnType<typeof useAuth>["user"] }) {
+  return (
+    <div className="flex flex-col gap-5 max-w-2xl">
+      <NicknameSection
+        currentNick={user?.nickname}
+        nicknameChangedAt={user?.nickname_changed_at}
+      />
+      <EmailSection currentEmail={user?.email} emailChangedAt={user?.email_changed_at} />
+      <PasswordSection />
     </div>
   );
 }
@@ -566,30 +565,30 @@ function DisplayNicknameSection({ currentNick }: { currentNick?: string }) {
   );
 }
 
-function NicknameSection({ currentNick }: { currentNick?: string }) {
+function NicknameSection({
+  currentNick,
+  nicknameChangedAt,
+}: {
+  currentNick?: string;
+  nicknameChangedAt?: string | null;
+}) {
   const { dict } = useLocale();
   const p = dict.profile;
   const c = dict.common;
+  const { refreshAuth } = useAuth();
 
   const [nick, setNick] = useState(currentNick || "");
-  const [changedAt, setChangedAt] = useState<string | null>(null);
+  const [changedAt, setChangedAt] = useState<string | null>(nicknameChangedAt ?? null);
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch("/api/profile", { headers: authHeader() });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.minecraft_nick) setNick(data.minecraft_nick);
-          setChangedAt(data.nickname_changed_at ?? null);
-        }
-      } catch {
-        /* ignore */
-      }
-    })();
-  }, []);
+    setNick(currentNick || "");
+  }, [currentNick]);
+
+  useEffect(() => {
+    setChangedAt(nicknameChangedAt ?? null);
+  }, [nicknameChangedAt]);
 
   const now = useStableNow();
   const nextAllowed = changedAt ? new Date(changedAt).getTime() + 30 * 86400000 : 0;
@@ -606,11 +605,15 @@ function NicknameSection({ currentNick }: { currentNick?: string }) {
         headers: { ...authHeader(), "Content-Type": "application/json" },
         body: JSON.stringify({ nickname: nick }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
         setToast({ text: p.nickUpdated, type: "success" });
         setChangedAt(data.nickname_changed_at ?? new Date().toISOString());
-      } else setToast({ text: data.error || p.nickFailed, type: "error" });
+        void refreshAuth();
+      } else {
+        setToast({ text: data.error || p.nickFailed, type: "error" });
+        if (res.status === 429) void refreshAuth();
+      }
     } catch {
       setToast({ text: c.serverError, type: "error" });
     } finally {
@@ -620,12 +623,16 @@ function NicknameSection({ currentNick }: { currentNick?: string }) {
 
   return (
     <SettingsSection title={p.nickTitle} description={p.nickDesc}>
+      {toast && <Toast text={toast.text} type={toast.type} />}
+      {onCooldown && (
+        <p className="mb-3 rounded-lg border border-accent/25 bg-accent/10 px-3 py-2 text-sm text-accent">
+          {p.nickCooldown.replace("{days}", String(daysLeft))}
+        </p>
+      )}
       <form onSubmit={save} className="space-y-1">
         <SettingsRow
           label={p.nickLabel}
-          hint={
-            onCooldown ? p.nickCooldown.replace("{days}", String(daysLeft)) : p.nickHint
-          }
+          hint={onCooldown ? p.nickCooldown.replace("{days}", String(daysLeft)) : p.nickHint}
         >
           <div className="flex w-full flex-col gap-2 sm:items-end">
             <input
@@ -644,7 +651,6 @@ function NicknameSection({ currentNick }: { currentNick?: string }) {
           </div>
         </SettingsRow>
       </form>
-      {toast && <Toast text={toast.text} type={toast.type} />}
     </SettingsSection>
   );
 }
