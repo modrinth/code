@@ -404,18 +404,6 @@
   "app.home.jump-back-in.view-instance": {
     "message": "Pokaż instancję"
   },
-  "app.hosting.update-required.description": {
-    "message": "Musisz pobrać aktualizacje, by móc korzystać z Owyx Servers poprzez Owyx"
-  },
-  "app.hosting.update-required.download": {
-    "message": "Pobierz aktualizację"
-  },
-  "app.hosting.update-required.rinthbot-alt": {
-    "message": "Podekscytowany Owyx Bot"
-  },
-  "app.hosting.update-required.title": {
-    "message": "Wymagana aktualizacja Owyx"
-  },
   "app.install.phase.downloading_content": {
     "message": "Pobieranie zawartości"
   },
@@ -4253,9 +4241,6 @@
   "instance.worlds.world_in_use": {
     "message": "Świat jest w użytku"
   },
-  "minecraft-account.add-account": {
-    "message": "Dodaj konto"
-  },
   "minecraft-account.label": {
     "message": "Konto Minecraft"
   },
@@ -4267,9 +4252,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Wybierz konto"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Zaloguj się do Minecraft"
   },
   "minecraft-required.description": {
     "message": "Potrzebujesz konto Microsoft, które posiada Minecraft, zanim będziesz mógł włączyć i zacząć grać."

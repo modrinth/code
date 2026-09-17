@@ -72,7 +72,7 @@ export default function ProfilePage() {
       <Header />
       <CabinetShell
         eyebrow={p.eyebrow}
-        title={user?.nickname || p.playerFallback}
+        title={user?.display_nickname || user?.nickname || p.playerFallback}
         subtitle={p.subtitle}
         actions={
           <>
@@ -123,6 +123,7 @@ function OverviewPane({
     : 0;
 
   const rows = [
+    { label: p.labelDisplayNick, value: user.display_nickname || user.nickname || c.dash },
     { label: p.labelLogin, value: user.nickname || c.dash },
     { label: p.labelName, value: user.first_name || c.dash },
     { label: p.labelEmail, value: user.email || c.dash },
@@ -139,7 +140,16 @@ function OverviewPane({
           <img src={avatarSrc} alt="" className="h-full w-full object-cover" />
         </div>
         <div className="min-w-0">
-          <p className="font-display text-xl font-bold tracking-tight truncate">{user.nickname}</p>
+          <p className="font-display text-xl font-bold tracking-tight truncate">
+            {user.display_nickname || user.nickname}
+          </p>
+          {user.nickname &&
+            user.display_nickname &&
+            user.nickname !== user.display_nickname && (
+              <p className="mt-1 text-xs text-muted truncate">
+                {p.labelLogin}: {user.nickname}
+              </p>
+            )}
           <div className="mt-2 flex flex-wrap gap-2">
             <span className={`badge ${role.cls}`}>{role.text}</span>
             <span className={`badge ${user.status === "banned" ? "badge-danger" : "badge-ok"}`}>
@@ -170,17 +180,25 @@ function OverviewPane({
 }
 
 function SettingsPane({ user }: { user: ReturnType<typeof useAuth>["user"] }) {
+  const { dict } = useLocale();
+  const p = dict.profile;
+
   return (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-6">
-      <div className="flex flex-col gap-5">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start lg:gap-8">
+      <div className="flex flex-col gap-5 min-w-0">
+        <h2 className="font-display text-base font-bold tracking-tight text-text m-0">
+          {p.groupProfile}
+        </h2>
         <AvatarSection currentUrl={user?.avatar_url} />
+        <DisplayNicknameSection currentNick={user?.display_nickname || user?.nickname} />
         <ProfileInfoSection user={user} />
       </div>
-      <div className="flex flex-col gap-5">
-        <EmailSection currentEmail={user?.email} />
+      <div className="flex flex-col gap-5 min-w-0">
+        <h2 className="font-display text-base font-bold tracking-tight text-text m-0">
+          {p.groupSecurity}
+        </h2>
         <NicknameSection currentNick={user?.nickname} />
-      </div>
-      <div className="lg:col-span-2">
+        <EmailSection currentEmail={user?.email} emailChangedAt={user?.email_changed_at} />
         <PasswordSection />
       </div>
     </div>
@@ -287,21 +305,40 @@ function AvatarSection({ currentUrl }: { currentUrl?: string | null }) {
   );
 }
 
-function EmailSection({ currentEmail }: { currentEmail?: string }) {
+function EmailSection({
+  currentEmail,
+  emailChangedAt,
+}: {
+  currentEmail?: string;
+  emailChangedAt?: string | null;
+}) {
   const { dict } = useLocale();
   const p = dict.profile;
   const c = dict.common;
+  const { refreshAuth } = useAuth();
 
   const [overrideEmail, setOverrideEmail] = useState<string | null>(null);
   const email = overrideEmail ?? currentEmail ?? "";
   const [open, setOpen] = useState(false);
+  const now = useStableNow();
+  const nextAllowed = emailChangedAt ? new Date(emailChangedAt).getTime() + 30 * 86400000 : 0;
+  const onCooldown = nextAllowed > now;
+  const daysLeft = onCooldown ? Math.ceil((nextAllowed - now) / 86400000) : 0;
 
   return (
     <SettingsSection title={p.emailTitle} description={p.emailDesc}>
-      <SettingsRow label={p.emailCurrent} hint={p.emailHint}>
+      <SettingsRow
+        label={p.emailCurrent}
+        hint={onCooldown ? p.emailCooldown.replace("{days}", String(daysLeft)) : p.emailHint}
+      >
         <div className="flex w-full flex-col gap-2 sm:items-end">
           <span className="text-sm font-medium text-text break-all text-right">{email || c.dash}</span>
-          <button type="button" className="btn btn-secondary btn-sm self-end" onClick={() => setOpen(true)}>
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm self-end"
+            disabled={onCooldown}
+            onClick={() => setOpen(true)}
+          >
             {p.changeEmail}
           </button>
         </div>
@@ -312,6 +349,7 @@ function EmailSection({ currentEmail }: { currentEmail?: string }) {
           onDone={(newEmail) => {
             setOverrideEmail(newEmail);
             setOpen(false);
+            void refreshAuth();
           }}
         />
       )}
@@ -462,6 +500,69 @@ function EmailChangeModal({
         )}
       </div>
     </div>
+  );
+}
+
+function DisplayNicknameSection({ currentNick }: { currentNick?: string }) {
+  const { dict } = useLocale();
+  const p = dict.profile;
+  const c = dict.common;
+  const { refreshAuth } = useAuth();
+
+  const [nick, setNick] = useState(currentNick || "");
+  const [busy, setBusy] = useState(false);
+  const [toast, setToast] = useState<{ text: string; type: "success" | "error" } | null>(null);
+
+  useEffect(() => {
+    setNick(currentNick || "");
+  }, [currentNick]);
+
+  async function save(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setToast(null);
+    try {
+      const res = await fetch("/api/profile/display-nickname", {
+        method: "PUT",
+        headers: { ...authHeader(), "Content-Type": "application/json" },
+        body: JSON.stringify({ displayNickname: nick }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setNick(data.display_nickname || nick);
+        setToast({ text: p.displayNickUpdated, type: "success" });
+        await refreshAuth();
+      } else setToast({ text: data.error || p.displayNickFailed, type: "error" });
+    } catch {
+      setToast({ text: c.serverError, type: "error" });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <SettingsSection title={p.displayNickTitle} description={p.displayNickDesc}>
+      <form onSubmit={save} className="space-y-1">
+        <SettingsRow label={p.displayNickLabel} hint={p.displayNickHint}>
+          <div className="flex w-full flex-col gap-2 sm:items-end">
+            <input
+              id="acc-display-nick"
+              className="input sm:max-w-xs"
+              value={nick}
+              onChange={(e) => setNick(e.target.value)}
+              maxLength={16}
+              placeholder={p.displayNickPlaceholder}
+              autoComplete="off"
+              spellCheck={false}
+            />
+            <button type="submit" className="btn btn-primary btn-sm self-end" disabled={busy}>
+              {busy ? c.saving : p.changeDisplayNick}
+            </button>
+          </div>
+        </SettingsRow>
+      </form>
+      {toast && <Toast text={toast.text} type={toast.type} />}
+    </SettingsSection>
   );
 }
 

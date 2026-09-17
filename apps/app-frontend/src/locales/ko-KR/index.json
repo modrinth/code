@@ -332,15 +332,6 @@
   "app.home.jump-back-in.view-instance": {
     "message": "인스턴스 보기"
   },
-  "app.hosting.update-required.download": {
-    "message": "다운로드하여 업데이트"
-  },
-  "app.hosting.update-required.rinthbot-alt": {
-    "message": "신난 Owyx Bot"
-  },
-  "app.hosting.update-required.title": {
-    "message": "Owyx 업데이트 필요"
-  },
   "app.install.phase.downloading_content": {
     "message": "콘텐츠 다운로드 중"
   },
@@ -2090,9 +2081,6 @@
   "instance.worlds.world_in_use": {
     "message": "사용 중인 세계"
   },
-  "minecraft-account.add-account": {
-    "message": "계정 추가"
-  },
   "minecraft-account.label": {
     "message": "마인크래프트 계정"
   },
@@ -2104,9 +2092,6 @@
   },
   "minecraft-account.select-account": {
     "message": "계정 선택"
-  },
-  "minecraft-account.sign-in": {
-    "message": "마인크래프트 계정으로 로그인"
   },
   "minecraft-required.description": {
     "message": "게임을 실행하고 플레이하려면 마인크래프트를 보유한 Microsoft 계정이 필요합니다."

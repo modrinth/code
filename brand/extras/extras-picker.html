@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Owyx Extras · Synthwave · Onyx · Magma</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #050508;
+      --panel: #131319;
+      --panel-2: #14141c;
+      --line: #2a2b30;
+      --text: #f3f4f6;
+      --muted: #9aa0a8;
+      --accent: #00e5ff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+      padding: 32px 24px 80px;
+      line-height: 1.5;
+    }
+    .container { max-width: 1480px; margin: 0 auto; }
+
+    header { border-bottom: 1px solid var(--line); padding-bottom: 20px; margin-bottom: 32px; }
+    h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; }
+    h1 .accent { color: var(--accent); }
+    .lead { font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--muted); margin-top: 8px; max-width: 800px; line-height: 1.7; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
+
+    .swatch {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: var(--panel);
+    }
+    .swatch-header {
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      border-bottom: 1px solid var(--line);
+    }
+    .swatch-name {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-variation-settings: "opsz" 24, "wght" 700;
+      font-size: 18px;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .swatch-name img { width: 32px; height: 32px; }
+    .swatch-mood {
+      font-family: 'Geist Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.05);
+      color: var(--muted);
+    }
+
+    .hero-mock {
+      position: relative;
+      min-height: 260px;
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.7;
+    }
+    .mock-eyebrow {
+      font-family: 'Geist Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      position: relative;
+    }
+    .mock-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-variation-settings: "opsz" 96, "wght" 800;
+      font-size: clamp(40px, 6vw, 64px);
+      letter-spacing: -0.05em;
+      line-height: 0.92;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .mock-underline {
+      display: block;
+      width: 120px;
+      height: 2px;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .mock-body {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-variation-settings: "opsz" 18, "wght" 400;
+      font-size: 14px;
+      max-width: 380px;
+      line-height: 1.55;
+      margin-bottom: 18px;
+      position: relative;
+    }
+    .mock-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 20px;
+      border-radius: 9px;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-variation-settings: "opsz" 14, "wght" 600;
+      font-size: 13px;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      text-decoration: none;
+    }
+    .mock-files {
+      padding: 12px 24px;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      background: rgba(0, 0, 0, 0.4);
+      border-top: 1px solid var(--line);
+    }
+    .file-chip {
+      font-family: 'Geist Mono', monospace;
+      font-size: 10px;
+      padding: 3px 7px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+
+    /* Synthwave */
+    .p-synthwave .hero-mock { background: linear-gradient(135deg, #0a0512, #120520); }
+    .p-synthwave .hero-bg {
+      background:
+        radial-gradient(ellipse 400px 200px at 70% 30%, rgba(236, 72, 153, 0.22), transparent 70%),
+        radial-gradient(ellipse 300px 200px at 20% 70%, rgba(34, 211, 238, 0.18), transparent 70%);
+    }
+    .p-synthwave .mock-eyebrow { color: rgba(236, 72, 153, 0.75); }
+    .p-synthwave .mock-title {
+      background: linear-gradient(90deg, #ec4899 0%, #a78bfa 50%, #22d3ee 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .p-synthwave .mock-underline { background: linear-gradient(90deg, #ec4899, #22d3ee); }
+    .p-synthwave .mock-body { color: #b8a3c2; }
+    .p-synthwave .mock-btn { background: #ec4899; color: #1a0a14; }
+
+    /* Onyx */
+    .p-onyx .hero-mock { background: linear-gradient(135deg, #050505, #0a0a0a); }
+    .p-onyx .hero-bg { background: radial-gradient(ellipse 400px 200px at 80% 30%, rgba(245, 245, 245, 0.06), transparent 70%); }
+    .p-onyx .mock-eyebrow { color: rgba(245, 245, 245, 0.6); }
+    .p-onyx .mock-title { color: #f5f5f5; text-shadow: 0 0 30px rgba(255, 255, 255, 0.1); }
+    .p-onyx .mock-underline { background: linear-gradient(90deg, #f5f5f5, transparent); }
+    .p-onyx .mock-body { color: #8a8a8a; }
+    .p-onyx .mock-btn { background: #f5f5f5; color: #0a0a0a; }
+
+    /* Magma */
+    .p-magma .hero-mock { background: linear-gradient(135deg, #140505, #1f0a08); }
+    .p-magma .hero-bg { background: radial-gradient(ellipse 400px 200px at 80% 30%, rgba(248, 113, 113, 0.20), transparent 70%); }
+    .p-magma .mock-eyebrow { color: rgba(248, 113, 113, 0.75); }
+    .p-magma .mock-title { color: #f87171; text-shadow: 0 0 40px rgba(248, 113, 113, 0.3); }
+    .p-magma .mock-underline { background: linear-gradient(90deg, #f87171, transparent); }
+    .p-magma .mock-body { color: #c2a3a3; }
+    .p-magma .mock-btn { background: #f87171; color: #2a0a0a; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="eyebrow" style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);">owyx · extras</div>
+      <h1>Дополнительные <span class="accent">палитры</span></h1>
+      <div class="lead">3 add-on color schemes для основного cyan-бренда. Те же геометрия иконки, тот же wordmark, просто разные цвета. Drop-in для дизайнов.</div>
+    </header>
+
+    <div class="grid">
+      <div class="swatch p-synthwave">
+        <div class="swatch-header">
+          <div class="swatch-name">
+            <img src="synthwave/icon-synthwave-gradient.svg" alt="">
+            Synthwave
+          </div>
+          <span class="swatch-mood">cyberpunk · 80s · duo</span>
+        </div>
+        <div class="hero-mock">
+          <div class="hero-bg"></div>
+          <div class="mock-eyebrow">публичная beta</div>
+          <h2 class="mock-title">owyx<sup style="font-size:0.35em;vertical-align:super">™</sup></h2>
+          <span class="mock-underline"></span>
+          <p class="mock-body">Свой лаунчер Minecraft — зарегистрируйся, войди, играй.</p>
+          <a class="mock-btn" href="#">Скачать лаунчер</a>
+        </div>
+        <div class="mock-files">
+          <span class="file-chip">icon-gradient</span>
+          <span class="file-chip">icon-solid</span>
+          <span class="file-chip">icon-outline</span>
+          <span class="file-chip">favicon</span>
+          <span class="file-chip">wordmark</span>
+          <span class="file-chip">logo-md</span>
+        </div>
+      </div>
+
+      <div class="swatch p-onyx">
+        <div class="swatch-header">
+          <div class="swatch-name">
+            <img src="onyx/icon-onyx-gradient.svg" alt="">
+            Onyx
+          </div>
+          <span class="swatch-mood">luxury · minimal · white</span>
+        </div>
+        <div class="hero-mock">
+          <div class="hero-bg"></div>
+          <div class="mock-eyebrow">публичная beta</div>
+          <h2 class="mock-title">owyx<sup style="font-size:0.35em;vertical-align:super">™</sup></h2>
+          <span class="mock-underline"></span>
+          <p class="mock-body">Свой лаунчер Minecraft — зарегистрируйся, войди, играй.</p>
+          <a class="mock-btn" href="#">Скачать лаунчер</a>
+        </div>
+        <div class="mock-files">
+          <span class="file-chip">icon-gradient</span>
+          <span class="file-chip">icon-solid</span>
+          <span class="file-chip">icon-outline</span>
+          <span class="file-chip">favicon</span>
+          <span class="file-chip">wordmark</span>
+          <span class="file-chip">logo-md</span>
+        </div>
+      </div>
+
+      <div class="swatch p-magma">
+        <div class="swatch-header">
+          <div class="swatch-name">
+            <img src="magma/icon-magma-gradient.svg" alt="">
+            Magma
+          </div>
+          <span class="swatch-mood">aggressive · red · nether</span>
+        </div>
+        <div class="hero-mock">
+          <div class="hero-bg"></div>
+          <div class="mock-eyebrow">публичная beta</div>
+          <h2 class="mock-title">owyx<sup style="font-size:0.35em;vertical-align:super">™</sup></h2>
+          <span class="mock-underline"></span>
+          <p class="mock-body">Свой лаунчер Minecraft — зарегистрируйся, войди, играй.</p>
+          <a class="mock-btn" href="#">Скачать лаунчер</a>
+        </div>
+        <div class="mock-files">
+          <span class="file-chip">icon-gradient</span>
+          <span class="file-chip">icon-solid</span>
+          <span class="file-chip">icon-outline</span>
+          <span class="file-chip">favicon</span>
+          <span class="file-chip">wordmark</span>
+          <span class="file-chip">logo-md</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

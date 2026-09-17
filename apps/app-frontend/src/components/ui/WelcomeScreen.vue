@@ -21,8 +21,7 @@ const messages = defineMessages({
 	},
 	accountPaths: {
 		id: 'app.welcome-screen.account-paths',
-		defaultMessage:
-			'New here? Use the account card on the left: Owyx account or Microsoft.',
+		defaultMessage: 'New here? Use the account card on the left: Owyx account or Microsoft.',
 	},
 	createInstance: {
 		id: 'app.welcome-screen.create-instance',

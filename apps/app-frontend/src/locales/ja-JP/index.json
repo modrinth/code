@@ -350,18 +350,6 @@
   "app.home.jump-back-in.view-instance": {
     "message": "インスタンスを表示"
   },
-  "app.hosting.update-required.description": {
-    "message": "Owyx Serversを利用するには、Owyxを更新してください"
-  },
-  "app.hosting.update-required.download": {
-    "message": "ダウンロードして更新"
-  },
-  "app.hosting.update-required.rinthbot-alt": {
-    "message": "ワクワクしているModrinth Bot"
-  },
-  "app.hosting.update-required.title": {
-    "message": "Owyxの更新が必要です"
-  },
   "app.install.phase.downloading_content": {
     "message": "コンテンツをダウンロード中"
   },
@@ -2840,9 +2828,6 @@
   "instance.worlds.world_in_use": {
     "message": "ワールドは使用中"
   },
-  "minecraft-account.add-account": {
-    "message": "アカウントを追加"
-  },
   "minecraft-account.label": {
     "message": "Minecraftアカウント"
   },
@@ -2854,9 +2839,6 @@
   },
   "minecraft-account.select-account": {
     "message": "アカウントを選択"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Minecraftにサインイン"
   },
   "minecraft-required.description": {
     "message": "Minecraftを起動してプレイするには、Minecraftを所有しているMicrosoftアカウントが必要です。"

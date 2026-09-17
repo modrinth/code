@@ -31,7 +31,8 @@
 }
 
 /* Launcher-parity token aliases (DESIGN.md names) */
-:root {
+:root,
+html[data-accent="cyan"] {
   --bg: #050508;
   --panel: #131319;
   --panel-2: #14141c;
@@ -44,6 +45,37 @@
   --accent-violet: #8b5cf6;
   --ok: #5eead4;
   --danger: #ff5c6c;
+  --accent-hi: #67f0ff;
+  --accent-lo: #007a8a;
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+}
+
+html[data-accent="synthwave"] {
+  --accent: #ec4899;
+  --accent-ink: #1a0610;
+  --accent-hi: #f9a8d4;
+  --accent-lo: #831843;
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+}
+
+html[data-accent="onyx"] {
+  --accent: #f5f5f5;
+  --accent-ink: #0a0a0a;
+  --accent-hi: #ffffff;
+  --accent-lo: #a3a3a3;
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+}
+
+html[data-accent="magma"] {
+  --accent: #f87171;
+  --accent-ink: #1a0505;
+  --accent-hi: #fecaca;
+  --accent-lo: #7f1d1d;
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
 }
 
 /* ===== Base ===== */
@@ -69,17 +101,17 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Deep space backdrop: cyan-first blackstack. Violet kept tiny (not SaaS purple). */
+/* Deep space backdrop: accent-tinted blackstack (not SaaS purple). */
 .owyx-space {
   position: fixed;
   inset: 0;
   z-index: -2;
   pointer-events: none;
   background:
-    radial-gradient(1100px 720px at 12% -18%, rgba(0, 229, 255, 0.16), transparent 55%),
-    radial-gradient(720px 480px at 92% 8%, rgba(0, 229, 255, 0.07), transparent 60%),
-    radial-gradient(900px 560px at 70% 40%, rgba(0, 229, 255, 0.04), transparent 65%),
-    radial-gradient(1200px 800px at 50% 120%, rgba(0, 229, 255, 0.07), transparent 55%),
+    radial-gradient(1100px 720px at 12% -18%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 55%),
+    radial-gradient(720px 480px at 92% 8%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 60%),
+    radial-gradient(900px 560px at 70% 40%, color-mix(in srgb, var(--accent) 4%, transparent), transparent 65%),
+    radial-gradient(1200px 800px at 50% 120%, color-mix(in srgb, var(--accent-lo) 10%, transparent), transparent 55%),
     linear-gradient(180deg, #07070c 0%, var(--color-bg) 42%, #040406 100%);
 }
 .owyx-space::before {
@@ -291,11 +323,44 @@ select:focus:not(:focus-visible) {
 
 /* ===== Surfaces ===== */
 .panel {
-  background: var(--color-panel);
-  border: 1px solid var(--color-line);
+  background: color-mix(in srgb, var(--color-panel) 82%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-line) 70%, var(--color-accent) 12%);
   border-radius: 14px;
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 6%, transparent),
+    0 12px 40px -28px rgba(0, 0, 0, 0.65);
 }
-.panel-2 { background: var(--color-panel-2); border: 1px solid var(--color-line); border-radius: 12px; }
+.panel-2 {
+  background: color-mix(in srgb, var(--color-panel-2) 85%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-line) 75%, transparent);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.liquid-glass-header {
+  box-shadow:
+    inset 0 -1px 0 color-mix(in srgb, var(--color-accent) 10%, transparent),
+    0 8px 28px -20px rgba(0, 0, 0, 0.55);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .panel,
+  .panel-2,
+  .liquid-glass-header {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--color-panel);
+  }
+  .panel-2 {
+    background: var(--color-panel-2);
+  }
+  .liquid-glass-header {
+    background: color-mix(in srgb, var(--color-bg) 92%, transparent);
+  }
+}
 
 /* Shared callout / CTA strip (home, profile, admin forms) */
 .section-callout {

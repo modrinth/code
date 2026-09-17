@@ -1387,8 +1387,8 @@ async function refreshOwyxSiteSession() {
 		} catch {
 			/* checklist mark is best-effort */
 		}
-		// Sync site nickname → offline play profile (rename replaces stale offline UUID)
-		const nick = fresh.user?.nickname?.trim() ?? ''
+		// Sync site display nickname → offline play profile (rename replaces stale offline UUID)
+		const nick = (fresh.user?.displayNickname || fresh.user?.nickname)?.trim() ?? ''
 		const nickOk = /^[A-Za-z0-9_]{3,16}$/.test(nick)
 		if (nickOk) {
 			try {
@@ -1398,8 +1398,7 @@ async function refreshOwyxSiteSession() {
 				const isOwyxOffline = (a) =>
 					a?.is_offline === true ||
 					a?.refresh_token === 'owyx-offline' ||
-					((a?.refresh_token ?? '') === '' &&
-						(a?.access_token === '' || a?.access_token === '0'))
+					((a?.refresh_token ?? '') === '' && (a?.access_token === '' || a?.access_token === '0'))
 				const offlineAccounts = accounts.filter(isOwyxOffline)
 				const match = offlineAccounts.find((a) => a?.profile?.name === nick)
 				if (!match) {
@@ -1416,7 +1415,7 @@ async function refreshOwyxSiteSession() {
 					await login_offline(nick, false)
 				}
 			} catch (e) {
-				console.warn('Could not sync Owyx nickname to play profile', e)
+				console.warn('Could not sync Owyx display nickname to play profile', e)
 			}
 		}
 	}
@@ -1543,7 +1542,7 @@ async function respondToServerInvite(notification, action) {
 
 async function acceptServerInviteNotification(notification) {
 	try {
-		const serverId = await respondToServerInvite(notification, 'accept')
+		await respondToServerInvite(notification, 'accept')
 		await router.push('/owyx-servers')
 		queryClient.invalidateQueries({ queryKey: ['servers'] })
 	} catch (error) {

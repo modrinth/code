@@ -404,18 +404,6 @@
   "app.home.jump-back-in.view-instance": {
     "message": "הצג התקנה"
   },
-  "app.hosting.update-required.description": {
-    "message": "עליך לעדכן בכדי להשתמש ב- Owyx Servers דרך אפליקציית ה Owyx"
-  },
-  "app.hosting.update-required.download": {
-    "message": "הורד על מנת לעדכן"
-  },
-  "app.hosting.update-required.rinthbot-alt": {
-    "message": "רובוט Owyx מתרגש"
-  },
-  "app.hosting.update-required.title": {
-    "message": "אפליקציית ה- Owyx דורשת עדכון"
-  },
   "app.install.phase.downloading_content": {
     "message": "מוריד תוכן"
   },

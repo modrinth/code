@@ -32,6 +32,8 @@ const LEGACY_STORAGE_USER = 'owyx.siteUser'
 export type OwyxSiteUser = {
 	id: number | string
 	nickname: string
+	/** Visible / in-game name. Falls back to login nickname. */
+	displayNickname: string
 	email?: string
 	role?: string
 	avatarUrl?: string | null
@@ -182,6 +184,9 @@ function mapUser(
 	return {
 		id: (raw.id as number | string) ?? 0,
 		nickname: String(raw.nickname ?? raw.username ?? raw.email ?? 'Owyx'),
+		displayNickname: String(
+			raw.displayNickname ?? raw.display_nickname ?? raw.nickname ?? raw.username ?? 'Owyx',
+		),
 		email: raw.email ? String(raw.email) : undefined,
 		role: raw.role ? String(raw.role) : undefined,
 		avatarUrl,
@@ -254,11 +259,38 @@ export async function fetchOwyxSiteMe(token?: string): Promise<OwyxSiteSession |
 		if (!userRaw.avatarUrl && data.avatarUrl) userRaw.avatarUrl = data.avatarUrl
 		const user = mapUser(userRaw, cosmetics)
 		persistSession(session.token, user)
-		void syncOwyxCosmeticsToDisk(user.nickname, cosmetics).catch(() => undefined)
+		const playNick = user.displayNickname || user.nickname
+		void syncOwyxCosmeticsToDisk(playNick, cosmetics).catch(() => undefined)
 		return { token: session.token, user }
 	} catch {
 		return session
 	}
+}
+
+/** Change visible / in-game nickname on the site API, then refresh session. */
+export async function updateOwyxDisplayNickname(displayNickname: string): Promise<OwyxSiteSession> {
+	const session = getStoredOwyxSiteSession()
+	if (!session?.token) throw new Error('Not signed in to Owyx')
+	const nick = displayNickname.trim()
+	if (!/^[A-Za-z0-9_]{3,16}$/.test(nick)) {
+		throw new Error('Display nickname must be 3–16 letters, numbers, or underscores')
+	}
+	const base = apiBase()
+	const res = await owyxFetch(`${base.replace(/\/$/, '')}/api/profile/display-nickname`, {
+		method: 'PUT',
+		headers: authHeaders(session.token),
+		body: JSON.stringify({ displayNickname: nick }),
+		signal: AbortSignal.timeout(10000),
+	})
+	const data = (await res.json().catch(() => ({}))) as Record<string, unknown>
+	if (!res.ok) {
+		throw new Error(
+			String(data.error ?? data.message ?? `Could not change nickname (${res.status})`),
+		)
+	}
+	const fresh = await fetchOwyxSiteMe(session.token)
+	if (!fresh) throw new Error('Could not refresh Owyx session')
+	return fresh
 }
 
 export async function logoutOwyxSite() {

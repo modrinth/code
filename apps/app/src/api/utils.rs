@@ -36,7 +36,8 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
 fn owyx_site_session_path() -> Result<PathBuf> {
     let home = dirs::home_dir().ok_or_else(|| {
         theseus::Error::from(theseus::ErrorKind::OtherError(
-            "Could not resolve home directory for Owyx site session".to_string(),
+            "Could not resolve home directory for Owyx site session"
+                .to_string(),
         ))
     })?;
     Ok(home.join("owyx").join("site_session.json"))

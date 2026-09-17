@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" fill="none" role="img" aria-label="Owyx — magma">
+  <title>Owyx — Magma lockup</title>
+  <defs><linearGradient id="owyx-magma-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fecaca"/><stop offset="55%" stop-color="#f87171"/><stop offset="100%" stop-color="#7f1d1d"/></linearGradient><linearGradient id="owyx-magma-edge" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fee2e2"/><stop offset="100%" stop-color="#b91c1c"/></linearGradient><radialGradient id="owyx-magma-core" cx="50%" cy="32%" r="38%"><stop offset="0%" stop-color="#ffffff" stop-opacity="0.85"/><stop offset="60%" stop-color="#fca5a5" stop-opacity="0.3"/><stop offset="100%" stop-color="#dc2626" stop-opacity="0"/></radialGradient><linearGradient id="owyx-magma-text" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fecaca"/><stop offset="55%" stop-color="#f87171"/><stop offset="100%" stop-color="#7f1d1d"/></linearGradient></defs>
+<g transform="translate(8,8)">
+<g stroke="url(#owyx-magma-edge)" stroke-width="0.75" stroke-linejoin="round"><path d="M32 4 L56 18 L32 32 Z" fill="url(#owyx-magma-fill)" fill-opacity="0.95"/><path d="M8 18 L32 4 L32 32 Z" fill="url(#owyx-magma-fill)" fill-opacity="0.75"/><path d="M56 18 L56 46 L32 32 Z" fill="url(#owyx-magma-fill)" fill-opacity="0.55"/><path d="M8 46 L8 18 L32 32 Z" fill="url(#owyx-magma-fill)" fill-opacity="0.42"/><path d="M56 46 L32 60 L32 32 Z" fill="url(#owyx-magma-fill)" fill-opacity="0.3"/><path d="M32 60 L8 46 L32 32 Z" fill="url(#owyx-magma-fill)" fill-opacity="0.18"/></g>
+<polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="none" stroke="#f87171" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="32" cy="26" r="9" fill="url(#owyx-magma-core)"/>
+<circle cx="32" cy="32" r="1.4" fill="#fee2e2"/>
+</g>
+<text x="89" y="56" fill="url(#owyx-magma-text)"
+      font-family="'Sora','Space Grotesk','Outfit','Geist',system-ui,-apple-system,Segoe UI,Roboto,sans-serif"
+      font-weight="600" font-size="56" letter-spacing="-3"
+      style="font-feature-settings: 'ss01' on;">owyx</text>
+</svg>

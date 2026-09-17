@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Logo from "@/components/ui/Logo";
 import LanguageToggle from "@/components/layout/LanguageToggle";
+import ThemeToggle from "@/components/layout/ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocale } from "@/hooks/useLocale";
 import { resolveSiteAvatarUrl } from "@/lib/avatar";
@@ -42,7 +43,7 @@ export default function Header() {
   const isStaff = user?.role === "admin" || user?.role === "moderator";
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line/90 bg-bg/75 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-line/60 bg-bg/55 backdrop-blur-xl liquid-glass-header">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
         <div className="flex items-center gap-7 min-w-0">
           <Link href="/" className="flex items-center shrink-0" aria-label={dict.header.logoHome}>
@@ -87,7 +88,7 @@ export default function Header() {
                     />
                   </span>
                   <span className="max-w-[10rem] truncate hidden sm:inline">
-                    {user.nickname || user.email || "Player"}
+                    {user.display_nickname || user.nickname || user.email || "Player"}
                   </span>
                 </button>
                 {open && (
@@ -133,6 +134,7 @@ export default function Header() {
           )}
 
           <LanguageToggle />
+          <ThemeToggle />
 
           <button
             type="button"

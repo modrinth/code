@@ -347,15 +347,6 @@
   "app.home.jump-back-in.view-instance": {
     "message": "Xem phiên bản"
   },
-  "app.hosting.update-required.description": {
-    "message": "Bạn cần cập nhật để sử dụng Owyx Servers thông qua ứng dụng Owyx"
-  },
-  "app.hosting.update-required.download": {
-    "message": "Tải xuống để cập nhật"
-  },
-  "app.hosting.update-required.title": {
-    "message": "Yêu cầu cập nhật ứng dụng Owyx"
-  },
   "app.install.phase.downloading_content": {
     "message": "Đang tải nội dung"
   },
@@ -1142,9 +1133,6 @@
   "instance.worlds.world_in_use": {
     "message": "Thế giới đang mở"
   },
-  "minecraft-account.add-account": {
-    "message": "Thêm tài khoản"
-  },
   "minecraft-account.label": {
     "message": "Tài khoản Minecraft"
   },
@@ -1156,9 +1144,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Chọn tài khoản"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Đăng nhập vào Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Được cung cấp bởi phiên bản"

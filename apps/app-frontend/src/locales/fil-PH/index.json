@@ -590,9 +590,6 @@
   "instance.worlds.world_in_use": {
     "message": "Ginagamit ang mundo"
   },
-  "minecraft-account.add-account": {
-    "message": "Maglagay ng account"
-  },
   "minecraft-account.label": {
     "message": "Minecraft account"
   },
@@ -604,9 +601,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Pumili ng account"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Mag sign in kay Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Sagot na ng instansiya"

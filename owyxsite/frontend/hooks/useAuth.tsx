@@ -16,6 +16,7 @@ export interface AuthUser {
   id?: number;
   email?: string;
   nickname?: string;
+  display_nickname?: string;
   first_name?: string;
   role?: string;
   avatar_url?: string;
@@ -28,6 +29,8 @@ export interface AuthUser {
   skin_url?: string | null;
   skin_model?: string;
   is_email_verified?: boolean;
+  nickname_changed_at?: string | null;
+  email_changed_at?: string | null;
 }
 
 interface UseAuthOptions {

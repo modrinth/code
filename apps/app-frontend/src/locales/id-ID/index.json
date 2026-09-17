@@ -698,9 +698,6 @@
   "instance.worlds.world_in_use": {
     "message": "Dunia sedang dimainkan"
   },
-  "minecraft-account.add-account": {
-    "message": "Tambah akun"
-  },
   "minecraft-account.label": {
     "message": "Akun Minecraft"
   },
@@ -712,9 +709,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Pilih akun"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Masuk ke Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Disediakan oleh instans"

@@ -404,18 +404,6 @@
   "app.home.jump-back-in.view-instance": {
     "message": "Visa instans"
   },
-  "app.hosting.update-required.description": {
-    "message": "Du behöver uppdatera för att använda Owyx Servers genom Owyx"
-  },
-  "app.hosting.update-required.download": {
-    "message": "Ladda ner för att uppdatera"
-  },
-  "app.hosting.update-required.rinthbot-alt": {
-    "message": "Exalterad Owyx-bot"
-  },
-  "app.hosting.update-required.title": {
-    "message": "Owyx-uppdatering krävs"
-  },
   "app.install.phase.downloading_content": {
     "message": "Laddar ner innehåll"
   },
@@ -3326,9 +3314,6 @@
   "instance.worlds.world_in_use": {
     "message": "Värld används"
   },
-  "minecraft-account.add-account": {
-    "message": "Lägg till konto"
-  },
   "minecraft-account.label": {
     "message": "Minecraft konto"
   },
@@ -3340,9 +3325,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Välj konto"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Logga in till Minecraft"
   },
   "minecraft-required.description": {
     "message": "Du behöver ett Microsoft-konto som äger Minecraft innan du kan köra och spela."

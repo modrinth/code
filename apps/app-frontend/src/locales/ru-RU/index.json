@@ -353,6 +353,12 @@
   "app.features-settings.show-jump-in.title": {
     "message": "Показывать недавние сборки и миры"
   },
+  "app.features-settings.ui-sounds.title": {
+    "message": "Мягкие звуки интерфейса"
+  },
+  "app.features-settings.ui-sounds.description": {
+    "message": "Синтетические клики в приложении. Отключаются при prefers-reduced-motion."
+  },
   "app.features-settings.show-screenshots-tab.title": {
     "message": "Показывать вкладку Скриншоты в сборках"
   },
@@ -403,18 +409,6 @@
   },
   "app.home.jump-back-in.view-instance": {
     "message": "Посмотреть сборку"
-  },
-  "app.hosting.update-required.description": {
-    "message": "Обновитесь, чтобы использовать Owyx Servers через Owyx"
-  },
-  "app.hosting.update-required.download": {
-    "message": "Скачать и обновить"
-  },
-  "app.hosting.update-required.rinthbot-alt": {
-    "message": "Восторженный Owyx Bot"
-  },
-  "app.hosting.update-required.title": {
-    "message": "Обновите Owyx"
   },
   "app.install.phase.downloading_content": {
     "message": "Скачивание контента"
@@ -4238,9 +4232,6 @@
   "instance.worlds.world_in_use": {
     "message": "Мир используется"
   },
-  "minecraft-account.add-account": {
-    "message": "Добавить аккаунт"
-  },
   "minecraft-account.label": {
     "message": "Аккаунт Minecraft"
   },
@@ -4252,9 +4243,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Выберите аккаунт"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Войти в Minecraft"
   },
   "minecraft-required.description": {
     "message": "Для этого действия нужен Microsoft-аккаунт с Minecraft. Для серверов Owyx войди через аккаунт Owyx."
@@ -4354,9 +4342,6 @@
   },
   "minecraft-account.sign-in-microsoft": {
     "message": "Войти через Microsoft"
-  },
-  "minecraft-account.nickname-placeholder": {
-    "message": "Ник"
   },
   "app.nav.owyx-servers": {
     "message": "Серверы Owyx"
@@ -4538,23 +4523,11 @@
   "owyx.settings.social.skins-mod-link": {
     "message": "Открыть CustomSkinLoader на Modrinth"
   },
-  "owyx.settings.social.friends-hint": {
-    "message": "Подсказка: панель Друзья в сайдбаре — для заявок и статуса."
-  },
   "owyx.settings.social.saved": {
     "message": "Сохранено"
   },
-  "owyx.settings.social.ui-sounds": {
-    "message": "Тихие звуки интерфейса"
-  },
-  "owyx.settings.social.ui-sounds-hint": {
-    "message": "Синтетические клики в приложении (без сэмплов). Отключаются при prefers-reduced-motion."
-  },
   "owyx.settings.social.title": {
     "message": "Друзья и соцсеть"
-  },
-  "owyx.settings.social.body": {
-    "message": "Заявки в друзья идут по никам Owyx. Панель Друзья в сайдбаре — добавить, принять или удалить."
   },
   "owyx.settings.social.allow-requests": {
     "message": "Разрешить заявки в друзья от всех"
@@ -4588,9 +4561,6 @@
   },
   "minecraft-account.sign-in-owyx-site": {
     "message": "Войти аккаунтом Owyx"
-  },
-  "minecraft-account.microsoft-stub-hint": {
-    "message": "Owyx — друзья, скины и ник с сайта. Microsoft — лицензионный профиль и online-mode серверы."
   },
   "app.welcome-screen.account-paths": {
     "message": "Новичок? Карточка аккаунта слева: аккаунт Owyx или Microsoft."
@@ -4626,7 +4596,28 @@
     "message": "Сессия сайта Owyx"
   },
   "minecraft-account.owyx-nick-too-long": {
-    "message": "Ник Owyx должен быть 3–16 символов (буквы, цифры, _). Смените его на owyx.site и попробуйте снова."
+    "message": "Отображаемый ник: 3–16 букв, цифр или _. Измените и попробуйте снова."
+  },
+  "minecraft-account.playing-as": {
+    "message": "Играете как"
+  },
+  "minecraft-account.login-as": {
+    "message": "Логин: {login}"
+  },
+  "minecraft-account.edit-display-nick": {
+    "message": "Сменить отображаемый ник"
+  },
+  "minecraft-account.edit-display-nick-title": {
+    "message": "Отображаемый ник"
+  },
+  "minecraft-account.edit-display-nick-hint": {
+    "message": "Виден друзьям и в игре. Логин не меняется. 3–16 букв, цифр или _."
+  },
+  "minecraft-account.cancel": {
+    "message": "Отмена"
+  },
+  "minecraft-account.save": {
+    "message": "Сохранить"
   },
   "friends.copy-server-address": {
     "message": "Скопировать адрес сервера"
@@ -4638,9 +4629,36 @@
     "message": "Адрес сервера скопирован"
   },
   "minecraft-account.account-hint": {
-    "message": "Owyx — друзья, скины и ник с сайта. Microsoft — лицензионный профиль и online-mode серверы."
+    "message": "Owyx — друзья, скины и отображаемый ник в игре. Microsoft — лицензионный профиль и online-mode серверы."
   },
   "minecraft-account.owyx": {
     "message": "Owyx"
+  },
+  "owyx.settings.social.open-friends": {
+    "message": "Открыть друзей"
+  },
+  "owyx.settings.social.stat-friends": {
+    "message": "Друзья"
+  },
+  "owyx.settings.social.stat-online": {
+    "message": "Онлайн"
+  },
+  "owyx.settings.social.stat-pending": {
+    "message": "Входящие"
+  },
+  "owyx.settings.social.presence-on": {
+    "message": "Активно"
+  },
+  "owyx.settings.social.presence-off": {
+    "message": "Выкл"
+  },
+  "owyx.settings.social.open-profile": {
+    "message": "Профиль на сайте"
+  },
+  "owyx.settings.social.install-csl": {
+    "message": "Установить CustomSkinLoader в сборку"
+  },
+  "owyx.settings.social.signed-in-as": {
+    "message": "Вы вошли как {nick}"
   }
 }

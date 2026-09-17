@@ -12,39 +12,52 @@
 			<div>
 				<p class="m-0 text-lg font-semibold text-contrast">{{ formatMessage(messages.title) }}</p>
 				<p class="m-0 mt-1 text-sm text-secondary">
-					{{ formatMessage(messages.signedInAs, { nick: owyx.session.value?.user?.nickname || '—' }) }}
+					{{
+						formatMessage(messages.signedInAs, {
+							nick:
+								owyx.session.value?.user?.displayNickname ||
+								owyx.session.value?.user?.nickname ||
+								'—',
+						})
+					}}
 				</p>
 			</div>
-			<Button size="sm" @click="openFriends">
+			<Button size="sm" @click="openFriends()">
 				{{ formatMessage(messages.openFriends) }}
 			</Button>
 		</div>
 
 		<div class="grid grid-cols-3 gap-2">
-			<div
-				class="rounded-xl border border-solid border-surface-5 bg-surface-2 px-3 py-3 text-center"
+			<button
+				type="button"
+				class="rounded-xl border border-solid border-surface-5 bg-surface-2 px-3 py-3 text-center cursor-pointer button-base hover:border-[var(--color-brand)]"
+				@click="openFriends()"
 			>
 				<p class="m-0 text-2xl font-semibold text-contrast tabular-nums">{{ stats.friends }}</p>
 				<p class="m-0 mt-1 text-[11px] uppercase tracking-wide text-secondary">
 					{{ formatMessage(messages.statFriends) }}
 				</p>
-			</div>
-			<div
-				class="rounded-xl border border-solid border-surface-5 bg-surface-2 px-3 py-3 text-center"
+			</button>
+			<button
+				type="button"
+				class="rounded-xl border border-solid border-surface-5 bg-surface-2 px-3 py-3 text-center cursor-pointer button-base hover:border-[var(--color-brand)]"
+				@click="openFriends()"
 			>
 				<p class="m-0 text-2xl font-semibold text-contrast tabular-nums">{{ stats.online }}</p>
 				<p class="m-0 mt-1 text-[11px] uppercase tracking-wide text-secondary">
 					{{ formatMessage(messages.statOnline) }}
 				</p>
-			</div>
-			<div
-				class="rounded-xl border border-solid border-surface-5 bg-surface-2 px-3 py-3 text-center"
+			</button>
+			<button
+				type="button"
+				class="rounded-xl border border-solid border-surface-5 bg-surface-2 px-3 py-3 text-center cursor-pointer button-base hover:border-[var(--color-brand)]"
+				@click="openFriends('incoming')"
 			>
 				<p class="m-0 text-2xl font-semibold text-contrast tabular-nums">{{ stats.pending }}</p>
 				<p class="m-0 mt-1 text-[11px] uppercase tracking-wide text-secondary">
 					{{ formatMessage(messages.statPending) }}
 				</p>
-			</div>
+			</button>
 		</div>
 
 		<div
@@ -59,9 +72,7 @@
 				:class="presenceLive ? 'bg-green/20 text-green' : 'bg-button-bg text-secondary'"
 			>
 				{{
-					presenceLive
-						? formatMessage(messages.presenceOn)
-						: formatMessage(messages.presenceOff)
+					presenceLive ? formatMessage(messages.presenceOn) : formatMessage(messages.presenceOff)
 				}}
 			</span>
 		</div>
@@ -88,6 +99,15 @@
 			<p class="m-0 font-medium text-contrast">{{ formatMessage(messages.skinsTitle) }}</p>
 			<p class="m-0 mt-1 leading-relaxed">{{ formatMessage(messages.skinsBody) }}</p>
 			<div class="mt-3 flex flex-wrap gap-2">
+				<Button
+					size="sm"
+					type="colored"
+					color="brand"
+					:disabled="installingCsl"
+					@click="installCsl"
+				>
+					{{ formatMessage(messages.installCsl) }}
+				</Button>
 				<a
 					class="btn-like inline-flex items-center rounded-lg border border-solid border-surface-5 bg-button-bg px-3 py-1.5 text-xs font-medium text-primary no-underline hover:border-[var(--color-brand)]"
 					href="https://owyx.site/profile"
@@ -107,21 +127,6 @@
 			</div>
 		</div>
 
-		<label
-			class="flex items-start justify-between gap-3 rounded-xl border border-solid border-surface-5 bg-surface-2 px-3 py-3 text-sm text-primary cursor-pointer"
-		>
-			<span class="flex flex-col gap-1 min-w-0">
-				<span class="font-medium text-contrast">{{ formatMessage(messages.uiSounds) }}</span>
-				<span class="text-xs text-secondary">{{ formatMessage(messages.uiSoundsHint) }}</span>
-			</span>
-			<input
-				v-model="uiSounds"
-				type="checkbox"
-				class="mt-1 accent-[var(--color-brand)] shrink-0"
-				@change="onUiSoundsChange"
-			/>
-		</label>
-
 		<p v-if="saveError" class="m-0 text-sm text-red">{{ saveError }}</p>
 		<p v-else-if="savedFlash" class="m-0 text-sm text-green">{{ formatMessage(messages.saved) }}</p>
 		<p v-else-if="loadError" class="m-0 text-sm text-secondary">{{ loadError }}</p>
@@ -129,35 +134,34 @@
 </template>
 
 <script setup lang="ts">
-import { Button, defineMessages, useVIntl } from '@modrinth/ui'
-import { computed, inject, onMounted, ref } from 'vue'
+import { Button, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import { computed, inject, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { CUSTOM_SKIN_LOADER_MODRINTH } from '@/helpers/owyx-csl'
+import { CUSTOM_SKIN_LOADER_MODRINTH, CUSTOM_SKIN_LOADER_PROJECT_ID } from '@/helpers/owyx-csl'
 import {
 	getOwyxSocialSettings,
 	listOwyxFriends,
 	patchOwyxSocialSettings,
 } from '@/helpers/owyx-friends'
 import { owyxPresenceStatus } from '@/helpers/owyx-presence'
-import {
-	getOwyxUiSoundsEnabled,
-	playOwyxUiSound,
-	setOwyxUiSoundsEnabled,
-} from '@/helpers/owyx-ui-sound'
+import { playOwyxUiSound } from '@/helpers/owyx-ui-sound'
 import { appSettingsModalContextKey } from '@/providers/app-settings-modal'
+import { injectContentInstall } from '@/providers/content-install'
 import { injectOwyxSiteSession } from '@/providers/owyx-site-session'
 
 const { formatMessage } = useVIntl()
+const { handleError } = injectNotificationManager()
 const router = useRouter()
 const owyx = injectOwyxSiteSession()
+const { install: installVersion } = injectContentInstall()
 const settingsModal = inject(appSettingsModalContextKey, null)
 const allowRequests = ref(true)
 const saving = ref(false)
 const saveError = ref('')
 const loadError = ref('')
 const savedFlash = ref(false)
-const uiSounds = ref(getOwyxUiSoundsEnabled())
+const installingCsl = ref(false)
 const stats = ref({ friends: 0, online: 0, pending: 0 })
 
 const presenceLive = computed(() => {
@@ -165,14 +169,33 @@ const presenceLive = computed(() => {
 	return status === 'online' || status === 'playing'
 })
 
-function onUiSoundsChange() {
-	setOwyxUiSoundsEnabled(uiSounds.value)
-	if (uiSounds.value) playOwyxUiSound('toggle')
-}
-
-function openFriends() {
+function openFriends(focus?: 'incoming') {
 	settingsModal?.close()
 	void router.push('/')
+	window.dispatchEvent(new CustomEvent('owyx:open-friends', { detail: { focus: focus || 'list' } }))
+}
+
+async function installCsl() {
+	if (installingCsl.value) return
+	installingCsl.value = true
+	try {
+		settingsModal?.close()
+		await installVersion(
+			CUSTOM_SKIN_LOADER_PROJECT_ID,
+			null,
+			null,
+			'SocialSettings',
+			() => {
+				installingCsl.value = false
+			},
+			(instanceId) => {
+				void router.push(`/instance/${encodeURIComponent(instanceId)}`)
+			},
+		)
+	} catch (e) {
+		installingCsl.value = false
+		handleError(e)
+	}
 }
 
 async function loadSettings() {
@@ -212,9 +235,23 @@ async function saveAllowRequests() {
 	}
 }
 
+function onVisibility() {
+	if (document.visibilityState === 'visible') void loadSettings()
+}
+
 onMounted(() => {
 	void loadSettings()
+	document.addEventListener('visibilitychange', onVisibility)
 })
+onUnmounted(() => {
+	document.removeEventListener('visibilitychange', onVisibility)
+})
+watch(
+	() => owyx.isSignedIn.value,
+	() => {
+		void loadSettings()
+	},
+)
 
 const messages = defineMessages({
 	signInTitle: {
@@ -286,6 +323,10 @@ const messages = defineMessages({
 		defaultMessage:
 			'Upload on owyx.site. CustomSkinLoader in your instance reads https://owyx.site/api/csl/ (Owyx writes config on launch).',
 	},
+	installCsl: {
+		id: 'owyx.settings.social.install-csl',
+		defaultMessage: 'Install CustomSkinLoader to instance',
+	},
 	openProfile: {
 		id: 'owyx.settings.social.open-profile',
 		defaultMessage: 'Open profile on site',
@@ -297,14 +338,6 @@ const messages = defineMessages({
 	saved: {
 		id: 'owyx.settings.social.saved',
 		defaultMessage: 'Saved',
-	},
-	uiSounds: {
-		id: 'owyx.settings.social.ui-sounds',
-		defaultMessage: 'Soft UI sounds',
-	},
-	uiSoundsHint: {
-		id: 'owyx.settings.social.ui-sounds-hint',
-		defaultMessage: 'Synthetic clicks in the app. Muted when prefers-reduced-motion is on.',
 	},
 })
 </script>

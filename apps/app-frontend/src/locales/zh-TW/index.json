@@ -404,18 +404,6 @@
   "app.home.jump-back-in.view-instance": {
     "message": "查看實例"
   },
-  "app.hosting.update-required.description": {
-    "message": "你需要更新才能透過 Owyx 使用 Owyx Servers"
-  },
-  "app.hosting.update-required.download": {
-    "message": "下載即可更新"
-  },
-  "app.hosting.update-required.rinthbot-alt": {
-    "message": "興奮的 Owyx Bot"
-  },
-  "app.hosting.update-required.title": {
-    "message": "需要更新 Owyx"
-  },
   "app.install.phase.downloading_content": {
     "message": "正在下載內容"
   },
@@ -4265,9 +4253,6 @@
   "instance.worlds.world_in_use": {
     "message": "世界正在使用中"
   },
-  "minecraft-account.add-account": {
-    "message": "新增帳號"
-  },
   "minecraft-account.label": {
     "message": "Minecraft 帳號"
   },
@@ -4279,9 +4264,6 @@
   },
   "minecraft-account.select-account": {
     "message": "選擇帳號"
-  },
-  "minecraft-account.sign-in": {
-    "message": "登入 Minecraft"
   },
   "minecraft-required.description": {
     "message": "你需要登入擁有 Minecraft 的 Microsoft 帳號才能啟動遊戲。"

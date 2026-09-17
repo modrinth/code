@@ -26,6 +26,7 @@ function buildMe(req, user) {
     user: {
       id: user.id,
       nickname: user.nickname,
+      displayNickname: user.display_nickname || user.nickname,
       email: user.email,
       role: user.role || 'user',
       trustLevel: user.trust_level ?? 0,
@@ -34,6 +35,8 @@ function buildMe(req, user) {
       registeredAt: user.registered_at,
       avatarUrl,
       avatar_url: avatarUrl,
+      nicknameChangedAt: user.nickname_changed_at || null,
+      emailChangedAt: user.email_changed_at || null,
     },
     // Open access: any active, non-banned account may play. No application needed.
     serverAccess: active && !banned,

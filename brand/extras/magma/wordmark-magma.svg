@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" fill="none" role="img" aria-label="owyx wordmark — magma">
+  <title>owyx — Magma</title>
+  <defs><linearGradient id="owyx-magma-text" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fecaca"/><stop offset="55%" stop-color="#f87171"/><stop offset="100%" stop-color="#7f1d1d"/></linearGradient></defs>
+<text x="120" y="58" text-anchor="middle" fill="url(#owyx-magma-text)"
+      font-family="'Sora','Space Grotesk','Outfit','Geist',system-ui,-apple-system,Segoe UI,Roboto,sans-serif"
+      font-weight="600" font-size="58" letter-spacing="-3"
+      style="font-feature-settings: 'ss01' on;">owyx</text>
+</svg>

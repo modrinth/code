@@ -72,7 +72,7 @@ export default function CabinetShell({
             })}
           </nav>
 
-          <div className="panel min-w-0 bg-panel/90 backdrop-blur-sm">
+          <div className="panel min-w-0">
             <div className="p-5 sm:p-7">{children}</div>
           </div>
         </div>

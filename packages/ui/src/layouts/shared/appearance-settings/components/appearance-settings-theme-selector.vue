@@ -38,6 +38,18 @@ const themeLabels = defineMessages({
 		id: 'settings.display.theme.retro',
 		defaultMessage: 'Retro',
 	},
+	magma: {
+		id: 'settings.display.theme.magma',
+		defaultMessage: 'Magma',
+	},
+	onyx: {
+		id: 'settings.display.theme.onyx',
+		defaultMessage: 'Onyx',
+	},
+	synthwave: {
+		id: 'settings.display.theme.synthwave',
+		defaultMessage: 'Synthwave',
+	},
 })
 
 const themeTooltips = defineMessages({
@@ -126,6 +138,18 @@ function getPreviewClass(option: T): string {
 
 		&.retro-mode {
 			@extend .retro-mode;
+		}
+
+		&.magma-mode {
+			@extend .magma-mode;
+		}
+
+		&.onyx-mode {
+			@extend .onyx-mode;
+		}
+
+		&.synthwave-mode {
+			@extend .synthwave-mode;
 		}
 	}
 
