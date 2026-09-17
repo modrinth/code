@@ -1,23 +1,22 @@
 <template>
-	<section
-		v-if="links.length"
-		class="flex flex-col gap-4 rounded-xl p-2.5"
-		:aria-label="formatMessage(messages.links)"
-	>
+	<div v-if="links.length" class="flex flex-col gap-3.5">
 		<div v-for="link in links" :key="link.key" class="min-w-0">
-			<h2 class="!mb-1">{{ link.label }}</h2>
+			<h4 class="m-0 mb-1 text-sm font-normal text-secondary">{{ link.label }}</h4>
 			<a
 				:href="link.url"
 				target="_blank"
 				rel="noopener noreferrer"
-				class="break-all font-mono text-xs text-secondary hover:text-contrast"
-				>{{ link.url.replace(/^https?:\/\//, '') }}</a
+				class="inline-flex max-w-full items-center gap-1 break-all font-mono text-xs !transition-colors hover:text-contrast"
 			>
+				<span class="min-w-0">{{ link.url.replace(/^https?:\/\//, '') }}</span>
+				<ExternalIcon class="mb-0.5 size-3.5 shrink-0" aria-hidden="true" />
+			</a>
 		</div>
-	</section>
+	</div>
 </template>
 
 <script setup lang="ts">
+import { ExternalIcon } from '@modrinth/assets'
 import { useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 

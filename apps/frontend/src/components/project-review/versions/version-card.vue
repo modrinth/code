@@ -1,5 +1,7 @@
 <template>
-	<article class="min-w-0 overflow-hidden rounded-xl border border-solid border-surface-4">
+	<article
+		class="min-w-0 overflow-hidden rounded-lg border border-solid border-surface-4 bg-surface-2"
+	>
 		<div class="flex flex-wrap items-center gap-3 p-3">
 			<button
 				type="button"
@@ -113,7 +115,7 @@
 				<h3 class="mb-2 mt-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.files) }}
 				</h3>
-				<div class="flex flex-col gap-2">
+				<div class="flex flex-col gap-1.5">
 					<div v-for="file in version.files" :key="file.url" class="min-w-0 rounded-lg p-3">
 						<div class="flex flex-wrap items-center justify-between gap-2">
 							<div class="flex min-w-0 flex-col gap-1">
@@ -158,7 +160,7 @@
 					<p>{{ formatMessage(messages.loadError) }}</p>
 					<Button @click="dependenciesQuery.refetch()">{{ formatMessage(messages.retry) }}</Button>
 				</div>
-				<div v-else class="flex flex-col gap-2">
+				<div v-else class="flex flex-col gap-1.5">
 					<div v-for="(context, index) in dependencies" :key="index" class="min-w-0 rounded-lg p-3">
 						<span class="text-sm font-semibold text-secondary">{{
 							formatMessage(messages[context.dependency.dependency_type])

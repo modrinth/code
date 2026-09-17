@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-3">
+	<div class="flex flex-col gap-1.5">
 		<p v-if="!selection" class="text-secondary">
 			{{ formatMessage(messages.empty) }}
 		</p>

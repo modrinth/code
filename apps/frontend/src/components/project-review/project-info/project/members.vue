@@ -1,21 +1,18 @@
 <template>
-	<section>
-		<h2>{{ formatMessage(messages.members) }}</h2>
-		<p v-if="membersLoading" role="status">
-			{{ formatMessage(messages.loading) }}
-		</p>
-		<p v-else-if="membersError" role="alert">
-			{{ formatMessage(messages.loadError) }}
-		</p>
-		<ul v-else class="m-0 flex list-none flex-col gap-4 p-0">
-			<MemberItem
-				v-for="member in members"
-				:key="member.user.id"
-				:member="member"
-				:stats="memberStats[member.user.id] ?? []"
-			/>
-		</ul>
-	</section>
+	<p v-if="membersLoading" role="status">
+		{{ formatMessage(messages.loading) }}
+	</p>
+	<p v-else-if="membersError" role="alert">
+		{{ formatMessage(messages.loadError) }}
+	</p>
+	<ul v-else class="m-0 flex list-none flex-col gap-4 p-0">
+		<MemberItem
+			v-for="member in members"
+			:key="member.user.id"
+			:member="member"
+			:stats="memberStats[member.user.id] ?? []"
+		/>
+	</ul>
 </template>
 
 <script setup lang="ts">
