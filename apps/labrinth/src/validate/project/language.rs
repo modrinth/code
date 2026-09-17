@@ -198,15 +198,15 @@ fn has_lowercase_prose(text: &str) -> bool {
 }
 
 fn summary_translation_passage(text: &str) -> Passage {
-	let eligible = alphabetic_word_count(text) >= MIN_SUMMARY_TRANSLATION_WORDS
-		&& text.trim().graphemes(true).count() >= MIN_SUMMARY_TRANSLATION_CHARS;
-	classify_passage(
-		text.to_owned(),
-		eligible,
-		MIN_SUMMARY_TRANSLATION_ENGLISH_TO_BEST_RATIO,
-		&DETECTOR,
-		eligible,
-	)
+    let eligible = alphabetic_word_count(text) >= MIN_SUMMARY_TRANSLATION_WORDS
+        && text.trim().graphemes(true).count() >= MIN_SUMMARY_TRANSLATION_CHARS;
+    classify_passage(
+        text.to_owned(),
+        eligible,
+        MIN_SUMMARY_TRANSLATION_ENGLISH_TO_BEST_RATIO,
+        &DETECTOR,
+        eligible,
+    )
 }
 
 /// Bound detector input without overlapping or splitting words.
@@ -346,7 +346,7 @@ fn summary_rescue_passages(text: &str) -> Vec<Passage> {
             let normalized =
                 text.split_whitespace().collect::<Vec<_>>().join(" ");
             let whole = summary_translation_passage(&normalized);
-			if whole.qualifies_as_english || !whole.eligible {
+            if whole.qualifies_as_english || !whole.eligible {
                 return vec![whole];
             }
             let spans = mixed_language_passages(&normalized, &DETECTOR);
