@@ -66,6 +66,8 @@ impl LinkUrl {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DBGalleryItem {
+    #[serde(default)]
+    pub id: Option<i32>,
     pub image_url: String,
     pub raw_image_url: String,
     pub featured: bool,
@@ -718,7 +720,7 @@ impl DBProject {
 
                 let mods_gallery: DashMap<DBProjectId, Vec<DBGalleryItem>> = sqlx::query!(
                     "
-                    SELECT DISTINCT mod_id, mg.image_url, mg.raw_image_url, mg.featured, mg.name, mg.description, mg.created, mg.ordering
+                    SELECT DISTINCT mod_id, mg.id gallery_id, mg.image_url, mg.raw_image_url, mg.featured, mg.name, mg.description, mg.created, mg.ordering
                     FROM mods_gallery mg
                     INNER JOIN mods m ON mg.mod_id = m.id
                     WHERE m.id = ANY($1) OR m.slug = ANY($2)
@@ -730,6 +732,7 @@ impl DBProject {
                         acc.entry(DBProjectId(m.mod_id))
                             .or_default()
                             .push(DBGalleryItem {
+                                id: Some(m.gallery_id),
                                 image_url: m.image_url,
                                 raw_image_url: m.raw_image_url,
                                 featured: m.featured.unwrap_or(false),

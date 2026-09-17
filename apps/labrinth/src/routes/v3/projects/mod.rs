@@ -2705,6 +2705,7 @@ pub async fn add_gallery_item_internal(
     }
 
     let gallery_item = vec![db_models::project_item::DBGalleryItem {
+        id: None,
         image_url: upload_result.url.clone(),
         raw_image_url: upload_result.raw_url.clone(),
         featured: item.featured,

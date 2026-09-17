@@ -1,6 +1,5 @@
 use super::ids::*;
 use crate::database::PgTransaction;
-use crate::models::thread_issues::{ThreadIssueTarget, ThreadIssueVerdict};
 use crate::models::threads::{MessageBody, ThreadType};
 use chrono::{DateTime, Utc};
 use eyre::{Result, WrapErr};
@@ -40,18 +39,6 @@ pub struct DBThreadMessage {
     pub body: MessageBody,
     pub created: DateTime<Utc>,
     pub hide_identity: bool,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct DBThreadIssue {
-    pub id: DBThreadIssueId,
-    pub thread_id: DBThreadId,
-    pub what: ThreadIssueTarget,
-    pub why: serde_json::Value,
-    pub user_addressed: bool,
-    pub moderator_verified: bool,
-    pub verdict: ThreadIssueVerdict,
-    pub created_at: DateTime<Utc>,
 }
 
 impl ThreadMessageBuilder {

@@ -680,6 +680,7 @@ async fn project_create_inner(
                         publicity: FileHostPublicity::Public,
                     });
                     gallery_urls.push(crate::models::projects::GalleryItem {
+                        id: None,
                         url: upload_result.url,
                         raw_url: upload_result.raw_url,
                         featured: item.featured,
@@ -922,6 +923,7 @@ async fn project_create_inner(
             gallery_items: gallery_urls
                 .iter()
                 .map(|x| models::project_item::DBGalleryItem {
+                    id: None,
                     image_url: x.url.clone(),
                     raw_image_url: x.raw_url.clone(),
                     featured: x.featured,

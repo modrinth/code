@@ -35,6 +35,7 @@ pub mod project_item;
 pub mod report_item;
 pub mod session_item;
 pub mod team_item;
+pub mod thread_issue_item;
 pub mod thread_item;
 pub mod user_item;
 pub mod user_limits;
@@ -59,7 +60,8 @@ pub use project_disclosure_item::DBProjectDisclosure;
 pub use project_item::DBProject;
 pub use team_item::DBTeam;
 pub use team_item::DBTeamMember;
-pub use thread_item::{DBThread, DBThreadIssue, DBThreadMessage};
+pub use thread_issue_item::DBThreadIssue;
+pub use thread_item::{DBThread, DBThreadMessage};
 pub use user_item::DBUser;
 pub use version_item::DBVersion;
 
