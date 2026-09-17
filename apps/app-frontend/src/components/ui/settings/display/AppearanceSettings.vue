@@ -2,6 +2,7 @@
 import {
 	AppearanceSettingsLayout,
 	injectAuth,
+	injectNotificationManager,
 	injectUserPreferences,
 	provideAppearanceSettings,
 	useSavable,
@@ -17,6 +18,7 @@ import { appSettingsModalContextKey } from '@/providers/app-settings-modal'
 const theme = useTheme()
 const appSettings = useAppSettings()
 const auth = injectAuth()
+const { handleError } = injectNotificationManager()
 const { updatePreferences } = injectUserPreferences()
 const settingsModal = inject(appSettingsModalContextKey, null)
 const os = platform()
@@ -107,8 +109,8 @@ watch(
 async function saveAppearanceSettings(): Promise<void> {
 	try {
 		await save()
-	} catch {
-		return
+	} catch (error) {
+		handleError(error)
 	}
 }
 

@@ -106,24 +106,13 @@
 				v-if="owyxSite.isSignedIn.value"
 				class="mx-2 mt-1 mb-1 rounded-lg border border-solid border-surface-5 bg-surface-2 px-2.5 py-2 text-[11px] text-secondary"
 			>
-				<div class="flex items-center justify-between gap-2">
-					<div class="min-w-0">
-						<span class="font-medium text-brand">{{ formatMessage(messages.playingAs) }}</span>
-						<span class="mx-1">·</span>
-						<span class="text-contrast">{{ displayNickLabel }}</span>
-						<span v-if="loginNickLabel" class="block mt-0.5 text-[10px] text-secondary truncate">
-							{{ formatMessage(messages.loginAs, { login: loginNickLabel }) }}
-						</span>
-					</div>
-					<IconButton
-						v-tooltip="formatMessage(messages.editDisplayNick)"
-						type="quiet"
-						:label="formatMessage(messages.editDisplayNick)"
-						class="shrink-0 !bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
-						@click="openDisplayNickModal()"
-					>
-						<EditIcon />
-					</IconButton>
+				<div class="min-w-0">
+					<span class="font-medium text-brand">{{ formatMessage(messages.playingAs) }}</span>
+					<span class="mx-1">·</span>
+					<span class="text-contrast">{{ displayNickLabel }}</span>
+					<span v-if="loginNickLabel" class="block mt-0.5 text-[10px] text-secondary truncate">
+						{{ formatMessage(messages.loginAs, { login: loginNickLabel }) }}
+					</span>
 				</div>
 			</div>
 			<div class="flex flex-col gap-2 px-2 pt-2">
@@ -526,7 +515,7 @@ const messages = defineMessages({
 	editDisplayNickHint: {
 		id: 'minecraft-account.edit-display-nick-hint',
 		defaultMessage:
-			'Shown to friends and used in-game. Your login stays the same. 3–16 letters, numbers, or _.',
+			'Shown to friends and used in-game. Your login stays the same. 3–16 letters, numbers, or _. May match other players.',
 	},
 	cancel: {
 		id: 'minecraft-account.cancel',

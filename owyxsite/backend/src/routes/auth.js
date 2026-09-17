@@ -285,12 +285,11 @@ router.post('/register', [
             });
         }
 
-        // Case-insensitive: login and display nicknames must be unique across accounts.
+        // Case-insensitive: login + email must be unique. Display nick may duplicate.
         const existingUser = await db.query(
-            `SELECT id, email, nickname, display_nickname FROM users
+            `SELECT id, email, nickname FROM users
              WHERE LOWER(email) = LOWER($1)
-                OR LOWER(nickname) = LOWER($2)
-                OR LOWER(COALESCE(display_nickname, nickname)) = LOWER($2)`,
+                OR LOWER(nickname) = LOWER($2)`,
             [email, loginName]
         );
 

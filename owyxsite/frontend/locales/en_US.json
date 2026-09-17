@@ -574,7 +574,7 @@
     "displayNickTitle": "Display nickname",
     "displayNickDesc": "Shown to friends and used in-game. Change freely (rate-limited).",
     "displayNickLabel": "Display nickname",
-    "displayNickHint": "3–16 letters, numbers, or _. Unique across accounts.",
+    "displayNickHint": "3–16 letters, numbers, or _. May match other players.",
     "displayNickPlaceholder": "Steve",
     "changeDisplayNick": "Save display nickname",
     "displayNickUpdated": "Display nickname updated",

@@ -573,7 +573,7 @@
     "displayNickTitle": "Отображаемый ник",
     "displayNickDesc": "Виден друзьям и используется в игре. Можно менять чаще (есть лимит).",
     "displayNickLabel": "Отображаемый ник",
-    "displayNickHint": "3–16 букв, цифр или _. Уникальный среди аккаунтов.",
+    "displayNickHint": "3–16 букв, цифр или _. Может совпадать у разных игроков.",
     "displayNickPlaceholder": "Steve",
     "changeDisplayNick": "Сохранить ник",
     "displayNickUpdated": "Отображаемый ник обновлён",
