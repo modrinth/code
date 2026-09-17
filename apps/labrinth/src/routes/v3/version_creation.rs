@@ -1003,6 +1003,7 @@ pub async fn upload_file(
         loaders.clone(),
         file_type,
         version_fields.to_vec(),
+        dependencies,
         &mut *transaction,
         redis,
     )
