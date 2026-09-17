@@ -3,10 +3,10 @@ import {
 	AuthFeature,
 	ModrinthApiError,
 	NodeAuthFeature,
-	nodeAuthState,
 	PanelVersionFeature,
 	TauriModrinthClient,
 	VerboseLoggingFeature,
+	nodeAuthState,
 } from '@modrinth/api-client'
 import {
 	ChevronLeftIcon,
@@ -122,10 +122,10 @@ import { maxMemoryQueryOptions } from '@/helpers/jre.js'
 import { get as getCreds, login, removeUser } from '@/helpers/mr_auth.ts'
 import { resolveOwyxAvatarUrl } from '@/helpers/owyx-avatar'
 import {
+	resetOwyxSharePresencePreference,
 	setOwyxPresenceOnline,
 	setOwyxPresencePlaying,
 	setOwyxSharePresenceEnabled,
-	resetOwyxSharePresencePreference,
 	stopOwyxPresenceHeartbeat,
 } from '@/helpers/owyx-presence'
 import {

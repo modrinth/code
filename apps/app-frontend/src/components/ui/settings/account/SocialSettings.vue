@@ -155,7 +155,7 @@
 </template>
 
 <script setup lang="ts">
-import { Button, Toggle, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import { Button, defineMessages, injectNotificationManager, Toggle, useVIntl } from '@modrinth/ui'
 import { computed, inject, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 

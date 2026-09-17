@@ -3,8 +3,8 @@
  * Sends anonymous PC stats + sanitized errors. No emails / nicks / paths with usernames.
  */
 
-import { arch, platform, version as osVersion } from '@tauri-apps/plugin-os'
 import { getVersion } from '@tauri-apps/api/app'
+import { arch, platform, version as osVersion } from '@tauri-apps/plugin-os'
 
 import {
 	DEFAULT_OWYX_API_BASE,
