@@ -7,6 +7,7 @@ use crate::database::models::DBUserId;
 pub struct DBUserLimits {
     pub user_id: Option<DBUserId>,
     pub projects: u64,
+    pub projects_per_day: u64,
     pub organizations: u64,
     pub collections: u64,
     pub versions_per_project: u64,
@@ -17,18 +18,20 @@ impl DBUserLimits {
     pub async fn upsert(&self, pool: &PgPool) -> Result<(), sqlx::Error> {
         sqlx::query!(
             "INSERT INTO user_limits (
-                user_id, projects, organizations, collections,
+                user_id, projects, projects_per_day, organizations, collections,
                 versions_per_project, versions_per_day
             )
-            VALUES ($1, $2, $3, $4, $5, $6)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
             ON CONFLICT (user_id) DO UPDATE
             SET projects = EXCLUDED.projects,
+                projects_per_day = EXCLUDED.projects_per_day,
                 organizations = EXCLUDED.organizations,
                 collections = EXCLUDED.collections,
                 versions_per_project = EXCLUDED.versions_per_project,
                 versions_per_day = EXCLUDED.versions_per_day",
             self.user_id.map(|id| id.0),
             self.projects as i64,
+            self.projects_per_day as i64,
             self.organizations as i64,
             self.collections as i64,
             self.versions_per_project as i64,
@@ -42,7 +45,7 @@ impl DBUserLimits {
 
     pub async fn get_defaults(pool: &PgPool) -> Result<Self, sqlx::Error> {
         let row = sqlx::query!(
-            "SELECT projects, organizations, collections,
+            "SELECT projects, projects_per_day, organizations, collections,
                 versions_per_project, versions_per_day
             FROM user_limits
             WHERE user_id IS NULL"
@@ -53,6 +56,7 @@ impl DBUserLimits {
         Ok(Self {
             user_id: None,
             projects: row.projects as u64,
+            projects_per_day: row.projects_per_day as u64,
             organizations: row.organizations as u64,
             collections: row.collections as u64,
             versions_per_project: row.versions_per_project as u64,
@@ -65,7 +69,7 @@ impl DBUserLimits {
         pool: &PgPool,
     ) -> Result<Self, sqlx::Error> {
         let row = sqlx::query!(
-            "SELECT projects, organizations, collections,
+            "SELECT projects, projects_per_day, organizations, collections,
                 versions_per_project, versions_per_day
             FROM user_limits
             WHERE user_id = $1",
@@ -78,6 +82,7 @@ impl DBUserLimits {
             Ok(Self {
                 user_id: Some(user_id),
                 projects: row.projects as u64,
+                projects_per_day: row.projects_per_day as u64,
                 organizations: row.organizations as u64,
                 collections: row.collections as u64,
                 versions_per_project: row.versions_per_project as u64,

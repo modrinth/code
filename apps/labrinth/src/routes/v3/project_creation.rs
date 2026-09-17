@@ -94,6 +94,8 @@ pub enum CreateError {
     ImageError(#[from] ImageError),
     #[error("Project limit reached")]
     LimitReached,
+    #[error("daily project creation limit reached")]
+    DailyProjectLimitReached,
     #[error("project version limit reached")]
     ProjectVersionLimitReached,
     #[error("daily version upload limit reached")]
@@ -144,6 +146,7 @@ impl actix_web::ResponseError for CreateError {
             CreateError::FileValidationError(..) => StatusCode::BAD_REQUEST,
             CreateError::ImageError(..) => StatusCode::BAD_REQUEST,
             CreateError::LimitReached
+            | CreateError::DailyProjectLimitReached
             | CreateError::ProjectVersionLimitReached
             | CreateError::DailyVersionLimitReached => StatusCode::BAD_REQUEST,
         }
@@ -171,6 +174,7 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::FileValidationError(..) => "invalid_input",
                 CreateError::ImageError(..) => "invalid_image",
                 CreateError::LimitReached
+                | CreateError::DailyProjectLimitReached
                 | CreateError::ProjectVersionLimitReached
                 | CreateError::DailyVersionLimitReached => "limit_reached",
             },
@@ -498,6 +502,13 @@ async fn project_create_inner(
     let limits = UserLimits::get_for_projects(&current_user, pool).await?;
     if limits.current >= limits.max {
         return Err(CreateError::LimitReached);
+    }
+
+    let daily_limits =
+        UserLimits::get_for_projects_per_day(&current_user, Utc::now(), pool)
+            .await?;
+    if daily_limits.current >= daily_limits.max {
+        return Err(CreateError::DailyProjectLimitReached);
     }
 
     let all_loaders =

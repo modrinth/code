@@ -13,8 +13,21 @@ use labrinth::models::{users::User, v3::user_limits::UserLimits};
 use serde_json::Value;
 
 use crate::common::api_common::{ApiProject, ApiUser, ApiVersion};
+use crate::common::api_v3::request_data::get_public_project_creation_data;
 
 pub mod common;
+
+async fn set_project_daily_limit(pool: &PgPool, projects_per_day: u64) {
+    let defaults = DBUserLimits::get_defaults(pool).await.unwrap();
+    DBUserLimits {
+        user_id: Some(DBUserId(USER_USER_ID_PARSED)),
+        projects_per_day,
+        ..defaults
+    }
+    .upsert(pool)
+    .await
+    .unwrap();
+}
 
 async fn set_version_limits(
     pool: &PgPool,
@@ -53,6 +66,127 @@ pub async fn limits() {
             .await;
             let project_limits = api.get_project_limits(USER_USER_PAT).await;
             assert_eq!(project_limits.current, 3);
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
+pub async fn max_projects_created_per_day() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let user_response = api.get_current_user(USER_USER_PAT).await;
+            assert_status!(&user_response, StatusCode::OK);
+            let user: User = test::read_body_json(user_response).await;
+            let now = Utc::now();
+            let current_daily_projects = UserLimits::get_for_projects_per_day(
+                &user,
+                now,
+                &test_env.db.pool,
+            )
+            .await
+            .unwrap()
+            .current;
+
+            set_project_daily_limit(
+                &test_env.db.pool,
+                current_daily_projects + 1,
+            )
+            .await;
+
+            let allowed = api
+                .create_project(
+                    get_public_project_creation_data(
+                        "daily-project-limit-allowed",
+                        None,
+                        None,
+                    ),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&allowed, StatusCode::OK);
+
+            let blocked = api
+                .create_project(
+                    get_public_project_creation_data(
+                        "daily-project-limit-blocked",
+                        None,
+                        None,
+                    ),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&blocked, StatusCode::BAD_REQUEST);
+            let error: Value = test::read_body_json(blocked).await;
+            assert_eq!(error["error"], "limit_reached");
+            assert_eq!(
+                error["description"],
+                "daily project creation limit reached"
+            );
+
+            let removed = api
+                .remove_project("daily-project-limit-allowed", USER_USER_PAT)
+                .await;
+            assert_status!(&removed, StatusCode::NO_CONTENT);
+
+            let replacement = api
+                .create_project(
+                    get_public_project_creation_data(
+                        "daily-project-limit-replacement",
+                        None,
+                        None,
+                    ),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&replacement, StatusCode::OK);
+
+            let next_day_limits = UserLimits::get_for_projects_per_day(
+                &user,
+                now + TimeDelta::days(1),
+                &test_env.db.pool,
+            )
+            .await
+            .unwrap();
+            assert_eq!(next_day_limits.current, 0);
+            assert_eq!(next_day_limits.max, current_daily_projects + 1);
+
+            let day_start = now
+                .date_naive()
+                .and_hms_opt(0, 0, 0)
+                .expect("midnight is always a valid time")
+                .and_utc();
+            let day_end = day_start + TimeDelta::days(1);
+            sqlx::query!(
+                "UPDATE mods m
+                SET published = m.published - INTERVAL '1 day'
+                FROM teams t, team_members tm
+                WHERE m.team_id = t.id
+                    AND t.id = tm.team_id
+                    AND tm.user_id = $1
+                    AND m.published >= $2
+                    AND m.published < $3",
+                DBUserId(USER_USER_ID_PARSED) as DBUserId,
+                day_start,
+                day_end,
+            )
+            .execute(&test_env.db.pool)
+            .await
+            .unwrap();
+
+            let next_day_creation = api
+                .create_project(
+                    get_public_project_creation_data(
+                        "daily-project-limit-next-day",
+                        None,
+                        None,
+                    ),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&next_day_creation, StatusCode::OK);
         },
     )
     .await;

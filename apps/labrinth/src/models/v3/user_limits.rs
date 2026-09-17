@@ -7,6 +7,15 @@ use crate::{
     models::users::User,
 };
 
+fn utc_day_bounds(now: DateTime<Utc>) -> (DateTime<Utc>, DateTime<Utc>) {
+    let day_start = now
+        .date_naive()
+        .and_hms_opt(0, 0, 0)
+        .expect("midnight is always a valid time")
+        .and_utc();
+    (day_start, day_start + TimeDelta::days(1))
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserLimits {
     pub current: u64,
@@ -46,6 +55,36 @@ impl UserLimits {
         Ok(Self {
             current,
             max: db_limits.projects,
+        }
+        .adjust_for_user(user))
+    }
+
+    pub async fn get_for_projects_per_day(
+        user: &User,
+        now: DateTime<Utc>,
+        pool: &PgPool,
+    ) -> Result<Self, sqlx::Error> {
+        let user_id = DBUserId::from(user.id);
+        let db_limits = DBUserLimits::get(user_id, pool).await?;
+        let (day_start, day_end) = utc_day_bounds(now);
+        let current = sqlx::query_scalar!(
+            "SELECT COUNT(*) FROM mods m
+            JOIN teams t ON m.team_id = t.id
+            JOIN team_members tm ON t.id = tm.team_id
+            WHERE tm.user_id = $1
+                AND m.published >= $2
+                AND m.published < $3",
+            user_id as DBUserId,
+            day_start,
+            day_end,
+        )
+        .fetch_one(pool)
+        .await?
+        .map_or(0, |x| x as u64);
+
+        Ok(Self {
+            current,
+            max: db_limits.projects_per_day,
         }
         .adjust_for_user(user))
     }
@@ -127,12 +166,7 @@ impl UserLimits {
     ) -> Result<Self, sqlx::Error> {
         let user_id = DBUserId::from(user.id);
         let db_limits = DBUserLimits::get(user_id, pool).await?;
-        let day_start = now
-            .date_naive()
-            .and_hms_opt(0, 0, 0)
-            .expect("midnight is always a valid time")
-            .and_utc();
-        let day_end = day_start + TimeDelta::days(1);
+        let (day_start, day_end) = utc_day_bounds(now);
         let current = sqlx::query_scalar!(
             "SELECT COUNT(*) FROM versions
             WHERE author_id = $1

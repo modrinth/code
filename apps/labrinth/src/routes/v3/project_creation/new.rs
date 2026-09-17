@@ -1,5 +1,6 @@
 use actix_http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, ResponseError, put, web};
+use chrono::Utc;
 use eyre::eyre;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -45,6 +46,8 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 pub enum CreateError {
     #[error("project limit reached")]
     LimitReached,
+    #[error("daily project creation limit reached")]
+    DailyProjectLimitReached,
     #[error("project version limit reached")]
     ProjectVersionLimitReached,
     #[error("invalid component kinds")]
@@ -60,7 +63,9 @@ pub enum CreateError {
 impl CreateError {
     pub fn as_api_error(&self) -> crate::models::error::ApiError<'_> {
         match self {
-            Self::LimitReached | Self::ProjectVersionLimitReached => {
+            Self::LimitReached
+            | Self::DailyProjectLimitReached
+            | Self::ProjectVersionLimitReached => {
                 crate::models::error::ApiError {
                     error: "limit_reached",
                     description: self.to_string(),
@@ -94,6 +99,7 @@ impl ResponseError for CreateError {
     fn status_code(&self) -> actix_http::StatusCode {
         match self {
             Self::LimitReached
+            | Self::DailyProjectLimitReached
             | Self::ProjectVersionLimitReached
             | Self::ComponentKinds(_)
             | Self::Validation(_)
@@ -153,6 +159,14 @@ pub async fn create(
         .wrap_internal_err("fetching project limits")?;
     if limits.current >= limits.max {
         return Err(CreateError::LimitReached);
+    }
+
+    let daily_limits =
+        UserLimits::get_for_projects_per_day(&user, Utc::now(), &db)
+            .await
+            .wrap_internal_err("fetching daily project limits")?;
+    if daily_limits.current >= daily_limits.max {
+        return Err(CreateError::DailyProjectLimitReached);
     }
 
     // check if the given details are valid
