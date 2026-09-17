@@ -5801,17 +5801,14 @@
 	"settings.display.theme.light": {
 		"defaultMessage": "Светлая"
 	},
-	"settings.display.theme.oled": {
-		"defaultMessage": "OLED"
-	},
 	"settings.display.theme.magma": {
 		"defaultMessage": "Magma"
 	},
+	"settings.display.theme.oled": {
+		"defaultMessage": "OLED"
+	},
 	"settings.display.theme.onyx": {
 		"defaultMessage": "Onyx"
-	},
-	"settings.display.theme.synthwave": {
-		"defaultMessage": "Synthwave"
 	},
 	"settings.display.theme.preferred-dark-theme": {
 		"defaultMessage": "Основная тёмная тема"
@@ -5830,6 +5827,9 @@
 	},
 	"settings.display.theme.sync-across-devices.sign-in-tooltip": {
 		"defaultMessage": "Войдите в Owyx для синхронизации темы"
+	},
+	"settings.display.theme.synthwave": {
+		"defaultMessage": "Synthwave"
 	},
 	"settings.display.theme.system": {
 		"defaultMessage": "Системная"
