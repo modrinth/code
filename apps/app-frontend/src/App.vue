@@ -126,7 +126,6 @@ import {
 	setOwyxPresencePlaying,
 	setOwyxSharePresenceEnabled,
 	resetOwyxSharePresencePreference,
-	startOwyxPresenceHeartbeat,
 	stopOwyxPresenceHeartbeat,
 } from '@/helpers/owyx-presence'
 import {
