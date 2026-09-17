@@ -3,12 +3,13 @@
 How the **Owyx launcher** talks to the **Owyx site** API. Source of truth for the
 launcher/site boundary. Keep in sync with `backend/src/routes/launcher.js`.
 
-**Versions:** launcher-facing **API surface `1.3.0`** (`GET /api/launcher/v1/status.version`),
+**Versions:** launcher-facing **API surface `1.4.0`** (`GET /api/launcher/v1/status.version`),
 **site UI `0.1.0`** (`.siteVersion`). Additive: friends (`/api/friends`), catalog ACL
 (`access_mode` + `catalog_acl`), optional Bearer on catalog lists, social settings
-(`GET|PATCH /api/friends/settings`), CustomSkinLoader public API (`/api/csl`).
+(`GET|PATCH /api/friends/settings`), CustomSkinLoader public API (`/api/csl`),
+anonymous launcher telemetry (`POST /api/launcher/v1/telemetry`).
 
-**Updated:** 2026-09-17 — friends privacy settings, CSL skin API, presence contract unchanged (~90s).
+**Updated:** 2026-09-18 — launcher telemetry ingest + admin Logs (account / moderation / launcher).
 
 ---
 
@@ -187,6 +188,36 @@ Also available as `GET /api/launcher/v1/me`.
 
 ### `GET /api/launcher/v1/cosmetics`  (auth)
 `{ "skinUrl", "skinModel", "capeUrl", "updatedAt" }`.
+
+### `POST /api/launcher/v1/telemetry`  (optional auth)
+
+Anonymous launcher stats / errors. Opt-in on the client (`settings.telemetry`).
+
+```json
+{
+  "installId": "uuid-v4",
+  "events": [
+    {
+      "kind": "session_start",
+      "message": "launcher session",
+      "appVersion": "0.8.2",
+      "os": "windows",
+      "osVersion": "10.0.26200",
+      "arch": "x86_64",
+      "cpuCores": 16,
+      "ramMb": 32768,
+      "locale": "ru-RU",
+      "metadata": { "dev": false }
+    }
+  ]
+}
+```
+
+- `kind`: `session_start` | `heartbeat` | `error` | `crash` | `perf` | `feature`
+- Max 20 events per request. Server sanitizes emails / Bearer tokens / home paths.
+- Optional Bearer links `user_id` only — never store nick/email in the event body.
+- Admin reads: `GET /api/admin/activity`, `GET /api/admin/logs`, `GET /api/admin/telemetry`.
+- Schema: `postgres/migrations/012_logs_telemetry.sql` (`launcher_telemetry`).
 
 ### Catalog (site owns it; launcher is the client)
 

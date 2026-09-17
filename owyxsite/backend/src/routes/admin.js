@@ -1275,6 +1275,158 @@ router.get('/logs', authenticateToken, requireRole(['admin', 'moderator']), asyn
     }
 });
 
+// GET /api/admin/activity — site account activity (login, nick, email, password, …)
+router.get('/activity', authenticateToken, requireRole(['admin', 'moderator']), async (req, res) => {
+    try {
+        const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+        const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 50, 1), 200);
+        const offset = (page - 1) * limit;
+        const type = (req.query.type || 'all').toString();
+        const q = (req.query.q || '').toString().trim().slice(0, 80);
+        const userId = req.query.user_id ? parseInt(req.query.user_id, 10) : null;
+
+        const where = [];
+        const params = [];
+        let i = 1;
+
+        if (type !== 'all') {
+            where.push(`ua.activity_type = $${i++}`);
+            params.push(type);
+        }
+        if (userId && Number.isFinite(userId)) {
+            where.push(`ua.user_id = $${i++}`);
+            params.push(userId);
+        }
+        if (q) {
+            where.push(
+                `(ua.description ILIKE $${i} OR u.nickname ILIKE $${i} OR u.email ILIKE $${i} OR CAST(ua.user_id AS TEXT) = $${i + 1})`
+            );
+            params.push(`%${q}%`);
+            params.push(q);
+            i += 2;
+        }
+
+        const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
+        const countRes = await db.query(
+            `SELECT COUNT(*)::int AS total
+             FROM user_activity ua
+             LEFT JOIN users u ON u.id = ua.user_id
+             ${whereSql}`,
+            params
+        );
+        const total = countRes.rows[0]?.total || 0;
+
+        const listParams = [...params, limit, offset];
+        const listRes = await db.query(
+            `SELECT ua.id, ua.user_id, ua.activity_type, ua.description, ua.metadata,
+                    ua.ip_address, ua.created_at,
+                    u.nickname, u.display_nickname, u.email
+             FROM user_activity ua
+             LEFT JOIN users u ON u.id = ua.user_id
+             ${whereSql}
+             ORDER BY ua.created_at DESC
+             LIMIT $${i++} OFFSET $${i++}`,
+            listParams
+        );
+
+        const typesRes = await db.query(
+            `SELECT activity_type AS type, COUNT(*)::int AS count
+             FROM user_activity
+             GROUP BY activity_type
+             ORDER BY count DESC
+             LIMIT 40`
+        );
+
+        res.json({
+            activity: listRes.rows,
+            types: typesRes.rows,
+            pagination: { page, limit, total, totalPages: Math.ceil(total / limit) || 1 },
+        });
+    } catch (error) {
+        console.error('admin/activity error:', error);
+        res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    }
+});
+
+// GET /api/admin/telemetry — launcher anonymous stats / errors
+router.get('/telemetry', authenticateToken, requireRole(['admin', 'moderator']), async (req, res) => {
+    try {
+        const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+        const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 50, 1), 200);
+        const offset = (page - 1) * limit;
+        const kind = (req.query.kind || 'all').toString();
+        const q = (req.query.q || '').toString().trim().slice(0, 80);
+
+        const where = [];
+        const params = [];
+        let i = 1;
+
+        if (kind !== 'all') {
+            where.push(`lt.event_kind = $${i++}`);
+            params.push(kind);
+        }
+        if (q) {
+            where.push(
+                `(lt.message ILIKE $${i} OR lt.app_version ILIKE $${i} OR lt.os_name ILIKE $${i} OR CAST(lt.install_id AS TEXT) ILIKE $${i})`
+            );
+            params.push(`%${q}%`);
+            i += 1;
+        }
+
+        const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
+        const countRes = await db.query(
+            `SELECT COUNT(*)::int AS total FROM launcher_telemetry lt ${whereSql}`,
+            params
+        );
+        const total = countRes.rows[0]?.total || 0;
+
+        const listParams = [...params, limit, offset];
+        const listRes = await db.query(
+            `SELECT lt.id, lt.install_id, lt.user_id, lt.event_kind, lt.message,
+                    lt.app_version, lt.os_name, lt.os_version, lt.arch,
+                    lt.cpu_cores, lt.ram_mb, lt.locale, lt.metadata, lt.created_at,
+                    u.nickname AS linked_nickname
+             FROM launcher_telemetry lt
+             LEFT JOIN users u ON u.id = lt.user_id
+             ${whereSql}
+             ORDER BY lt.created_at DESC
+             LIMIT $${i++} OFFSET $${i++}`,
+            listParams
+        );
+
+        const statsRes = await db.query(
+            `SELECT
+               COUNT(*)::int AS total_events,
+               COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '24 hours')::int AS last_24h,
+               COUNT(*) FILTER (WHERE event_kind IN ('error','crash'))::int AS errors,
+               COUNT(DISTINCT install_id)::int AS installs
+             FROM launcher_telemetry`
+        );
+
+        const kindsRes = await db.query(
+            `SELECT event_kind AS kind, COUNT(*)::int AS count
+             FROM launcher_telemetry
+             GROUP BY event_kind
+             ORDER BY count DESC`
+        );
+
+        res.json({
+            events: listRes.rows,
+            kinds: kindsRes.rows,
+            stats: statsRes.rows[0] || { total_events: 0, last_24h: 0, errors: 0, installs: 0 },
+            pagination: { page, limit, total, totalPages: Math.ceil(total / limit) || 1 },
+        });
+    } catch (error) {
+        console.error('admin/telemetry error:', error);
+        if (error.code === '42P01') {
+            return res.status(503).json({
+                error: 'Таблица telemetry ещё не создана. Примените migrations/012_logs_telemetry.sql',
+            });
+        }
+        res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    }
+});
+
 // POST /api/admin/announcement - Создание объявления
 router.post('/announcement', [
     authenticateToken,

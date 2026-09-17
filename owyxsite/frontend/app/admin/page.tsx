@@ -8,6 +8,7 @@ import CabinetShell, { Toast } from "@/components/layout/CabinetShell";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocale } from "@/hooks/useLocale";
 import CatalogAdmin from "@/components/admin/CatalogAdmin";
+import AdminLogs from "@/components/admin/AdminLogs";
 
 interface AdminUser {
   id: number;
@@ -20,7 +21,7 @@ interface AdminUser {
 
 const ROLES = ["user", "helper", "moderator", "admin"] as const;
 
-type Section = "users" | "catalog" | "news";
+type Section = "users" | "catalog" | "news" | "logs";
 
 export default function AdminPage() {
   return (
@@ -191,8 +192,8 @@ function AdminPageInner() {
         eyebrow="Control plane"
         title={t("Control panel", "Панель управления")}
         subtitle={t(
-          "Accounts, launcher catalog, and home news.",
-          "Аккаунты, каталог лаунчера и новости на главной.",
+          "Accounts, launcher catalog, home news, and logs.",
+          "Аккаунты, каталог лаунчера, новости и логи.",
         )}
         nav={[
           {
@@ -202,6 +203,11 @@ function AdminPageInner() {
           },
           { id: "catalog", label: t("Catalog", "Каталог"), hint: t("Servers & packs", "Серверы и паки") },
           { id: "news", label: t("News", "Новости"), hint: t("Site home", "Главная сайта") },
+          {
+            id: "logs",
+            label: t("Logs", "Логи"),
+            hint: t("Account · moderation · launcher", "Аккаунт · модерация · лаунчер"),
+          },
         ]}
         activeId={section}
         onNav={(id) => setSection(id as Section)}
@@ -224,6 +230,9 @@ function AdminPageInner() {
         )}
         {section === "news" && (
           <NewsAdmin authHeaders={authHeaders} showMessage={showMessage} />
+        )}
+        {section === "logs" && (
+          <AdminLogs authHeaders={authHeaders} showMessage={showMessage} />
         )}
       </CabinetShell>
       {toast && <Toast text={toast.text} type={toast.type} />}

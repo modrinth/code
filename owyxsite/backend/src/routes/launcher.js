@@ -4,6 +4,10 @@ const db = require('../database/connection');
 const { authenticateToken, optionalAuthenticate } = require('./auth');
 const catalog = require('./catalog');
 const { absoluteWebsiteAsset } = require('./csl-helpers');
+const {
+  clientIp,
+  normalizeTelemetryEvent,
+} = require('../utils/activityLog');
 
 // Owyx launcher API.
 //
@@ -13,7 +17,7 @@ const { absoluteWebsiteAsset } = require('./csl-helpers');
 // Versioned surface lives under /api/launcher/v1/*. Catalogs (servers/packs)
 // are real rows from the site control-plane — not empty stubs.
 
-const LAUNCHER_API_VERSION = '1.3.0';
+const LAUNCHER_API_VERSION = '1.4.0';
 
 /** Build the launcher-facing view of a user row. */
 function buildMe(req, user) {
@@ -93,7 +97,7 @@ router.get('/v1/status', (_req, res) => {
       login: '/api/auth/login',
       me: '/api/launcher/me',
     },
-    modules: ['servers', 'packs', 'news', 'cosmetics', 'adminCatalog', 'friends', 'csl'],
+    modules: ['servers', 'packs', 'news', 'cosmetics', 'adminCatalog', 'friends', 'csl', 'telemetry'],
     skins: {
       customSkinLoader: {
         mod: 'https://modrinth.com/mod/customskinloader',
@@ -203,6 +207,79 @@ router.get('/v1/cosmetics', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('launcher/v1/cosmetics error:', error);
     res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+  }
+});
+
+/**
+ * POST /api/launcher/v1/telemetry
+ * Anonymous launcher stats / errors. Optional JWT links user_id only.
+ * Body: { installId: uuid, events: [...] }  (max 20 events)
+ * No passwords, emails, paths with usernames — sanitized server-side.
+ */
+router.post('/v1/telemetry', optionalAuthenticate, async (req, res) => {
+  try {
+    const installId = String(req.body?.installId || req.body?.install_id || '').trim();
+    const uuidRe =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRe.test(installId)) {
+      return res.status(400).json({ error: 'installId must be a UUID' });
+    }
+
+    const rawEvents = Array.isArray(req.body?.events)
+      ? req.body.events
+      : req.body?.event
+        ? [req.body.event]
+        : [];
+    if (!rawEvents.length) {
+      return res.status(400).json({ error: 'events required' });
+    }
+    if (rawEvents.length > 20) {
+      return res.status(400).json({ error: 'max 20 events per request' });
+    }
+
+    const normalized = rawEvents.map(normalizeTelemetryEvent).filter(Boolean);
+    if (!normalized.length) {
+      return res.status(400).json({ error: 'no valid events' });
+    }
+
+    const userId = req.user?.id || null;
+    const ip = clientIp(req);
+    let inserted = 0;
+
+    for (const ev of normalized) {
+      await db.query(
+        `INSERT INTO launcher_telemetry
+           (install_id, user_id, event_kind, message, app_version,
+            os_name, os_version, arch, cpu_cores, ram_mb, locale, metadata, ip_address)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12::jsonb,$13)`,
+        [
+          installId,
+          userId,
+          ev.kind,
+          ev.message,
+          ev.appVersion,
+          ev.osName,
+          ev.osVersion,
+          ev.arch,
+          ev.cpuCores,
+          ev.ramMb,
+          ev.locale,
+          JSON.stringify(ev.metadata || {}),
+          ip,
+        ]
+      );
+      inserted += 1;
+    }
+
+    res.status(202).json({ ok: true, accepted: inserted });
+  } catch (error) {
+    console.error('launcher/v1/telemetry error:', error);
+    if (error.code === '42P01') {
+      return res.status(503).json({
+        error: 'Telemetry table missing. Apply migrations/012_logs_telemetry.sql',
+      });
+    }
+    res.status(500).json({ error: 'Не удалось принять телеметрию' });
   }
 });
 
