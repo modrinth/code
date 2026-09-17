@@ -61,7 +61,7 @@ export default function ApiServicesStatus() {
     };
   }, [locale]);
 
-  const title = locale === "ru" ? "Сервисы Owyx" : "Owyx services";
+  const title = locale === "ru_RU" ? "Сервисы Owyx" : "Owyx services";
 
   return (
     <div
@@ -89,10 +89,10 @@ export default function ApiServicesStatus() {
             {row.ok === null
               ? "…"
               : row.ok
-                ? locale === "ru"
+                ? locale === "ru_RU"
                   ? "ок"
                   : "ok"
-                : locale === "ru"
+                : locale === "ru_RU"
                   ? "нет"
                   : "down"}
           </span>
