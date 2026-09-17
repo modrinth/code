@@ -135,13 +135,13 @@ Already on `main` from #35:
 
 ## Acceptance checklist
 
-- [ ] Social: visible Toggle for allow friend requests; persists correctly
-- [ ] Social: presence can be disabled; friends see offline; heartbeat stops
-- [ ] Social: layout matches settings design system; no invisible controls; RU/EN OK
-- [ ] Skins / CSL install still works
-- [ ] Admin Logs: account + moderation + launcher tabs polished and useful
-- [ ] Telemetry: opt-in only; no PII; contract updated
-- [ ] Site glass/layout/support verified
+- [x] Social: visible Toggle for allow friend requests; persists correctly
+- [x] Social: presence can be disabled; friends see offline; heartbeat stops
+- [x] Social: layout matches settings design system; no invisible controls; RU/EN OK
+- [x] Skins / CSL install still works
+- [x] Admin Logs: account + moderation + launcher tabs polished and useful
+- [x] Telemetry: opt-in only; no PII; contract updated
+- [x] Site glass/layout/support verified
 - [ ] CI green on `ebluffy/Owyx`
 - [ ] AR clean (or only approved deferrals documented in PR)
 - [ ] Grok babysitter satisfied / no open blockers

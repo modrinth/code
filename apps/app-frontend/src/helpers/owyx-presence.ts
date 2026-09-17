@@ -27,6 +27,13 @@ export function isOwyxSharePresenceEnabled(): boolean {
 	return sharePresenceEnabled
 }
 
+/** Reset local preference after sign-out (next login reloads from API). */
+export function resetOwyxSharePresencePreference() {
+	sharePresenceEnabled = true
+	clearHeartbeatTimer()
+	setCurrent({ status: 'offline', instanceName: null })
+}
+
 function setCurrent(next: { status: OwyxFriendPresence; instanceName?: string | null }) {
 	current = next
 	presenceStatus.value = next.status
@@ -47,31 +54,47 @@ function clearHeartbeatTimer() {
 	}
 }
 
-/**
- * Apply sharePresence from social settings.
- * OFF → stop heartbeats and force offline to friends.
- * ON → start heartbeat if not already running.
- */
-export function setOwyxSharePresenceEnabled(enabled: boolean) {
-	sharePresenceEnabled = enabled
-	if (enabled) {
-		startOwyxPresenceHeartbeat()
-	} else {
-		stopOwyxPresenceHeartbeat({ forceOfflinePush: true })
-	}
-}
-
-export function startOwyxPresenceHeartbeat() {
-	clearHeartbeatTimer()
-	if (!sharePresenceEnabled) {
-		setCurrent({ status: 'offline', instanceName: null })
-		return
-	}
-	setCurrent({ status: 'online', instanceName: null })
-	void push()
+function ensureHeartbeatTimer() {
+	if (heartbeatTimer) return
 	heartbeatTimer = setInterval(() => {
 		void push()
 	}, 30_000)
+}
+
+/**
+ * Apply sharePresence from social settings.
+ * OFF → stop heartbeats and force offline to friends.
+ * ON → start/resume heartbeat without wiping an in-game `playing` status.
+ */
+export function setOwyxSharePresenceEnabled(enabled: boolean) {
+	if (enabled) {
+		if (sharePresenceEnabled && heartbeatTimer) {
+			sharePresenceEnabled = true
+			return
+		}
+		sharePresenceEnabled = true
+		startOwyxPresenceHeartbeat()
+		return
+	}
+	sharePresenceEnabled = false
+	stopOwyxPresenceHeartbeat({ forceOfflinePush: true })
+}
+
+export function startOwyxPresenceHeartbeat() {
+	if (!sharePresenceEnabled) {
+		clearHeartbeatTimer()
+		setCurrent({ status: 'offline', instanceName: null })
+		return
+	}
+	// Already live (online/playing): only ensure the timer; do not wipe playing → online.
+	if (current.status === 'online' || current.status === 'playing') {
+		ensureHeartbeatTimer()
+		return
+	}
+	clearHeartbeatTimer()
+	setCurrent({ status: 'online', instanceName: null })
+	void push()
+	ensureHeartbeatTimer()
 }
 
 export function stopOwyxPresenceHeartbeat(opts?: { forceOfflinePush?: boolean }) {
@@ -87,10 +110,12 @@ export function setOwyxPresencePlaying(instanceName: string) {
 	if (!sharePresenceEnabled) return
 	setCurrent({ status: 'playing', instanceName: instanceName.slice(0, 120) })
 	void push()
+	ensureHeartbeatTimer()
 }
 
 export function setOwyxPresenceOnline() {
 	if (!sharePresenceEnabled) return
 	setCurrent({ status: 'online', instanceName: null })
 	void push()
+	ensureHeartbeatTimer()
 }

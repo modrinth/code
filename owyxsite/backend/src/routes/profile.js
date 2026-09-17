@@ -611,6 +611,7 @@ router.delete('/skin', authenticateToken, async (req, res) => {
         const oldPath = path.join(__dirname, '../../', oldSkinUrl.replace(/^\//, ''));
         await fs.unlink(oldPath).catch(() => {});
     }
+    await logUserActivity(req.user.id, 'skin_delete', 'Profile skin removed', { req });
     res.json({ success: true, message: 'Скин удалён' });
 });
 

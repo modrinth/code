@@ -234,8 +234,18 @@ async function loadSettings() {
 	try {
 		const [s, friends] = await Promise.all([getOwyxSocialSettings(), listOwyxFriends()])
 		allowRequests.value = s.allowFriendRequests
+		const prevShare = sharePresence.value
 		sharePresence.value = s.sharePresence
-		setOwyxSharePresenceEnabled(s.sharePresence)
+		// Only sync the presence engine when the preference changed — avoid
+		// restarting heartbeat (which would wipe playing → online).
+		if (prevShare !== s.sharePresence) {
+			setOwyxSharePresenceEnabled(s.sharePresence)
+		} else if (s.sharePresence) {
+			// Ensure flag matches server without restarting an active timer.
+			setOwyxSharePresenceEnabled(true)
+		} else {
+			setOwyxSharePresenceEnabled(false)
+		}
 		const accepted = friends.filter((f) => f.status === 'accepted')
 		stats.value = {
 			friends: accepted.length,
@@ -268,11 +278,11 @@ async function onAllowRequests(next: boolean) {
 async function onSharePresence(next: boolean) {
 	const prev = sharePresence.value
 	sharePresence.value = next
-	setOwyxSharePresenceEnabled(next)
 	saving.value = true
 	saveError.value = ''
 	savedFlash.value = false
 	try {
+		// Persist first so POST /presence force-offline races cannot revive Active.
 		const s = await patchOwyxSocialSettings({ sharePresence: next })
 		sharePresence.value = s.sharePresence
 		setOwyxSharePresenceEnabled(s.sharePresence)

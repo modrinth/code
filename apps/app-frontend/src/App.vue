@@ -125,6 +125,7 @@ import {
 	setOwyxPresenceOnline,
 	setOwyxPresencePlaying,
 	setOwyxSharePresenceEnabled,
+	resetOwyxSharePresencePreference,
 	startOwyxPresenceHeartbeat,
 	stopOwyxPresenceHeartbeat,
 } from '@/helpers/owyx-presence'
@@ -1388,6 +1389,7 @@ async function refreshOwyxSiteSession() {
 	if (!cached) {
 		owyxSiteSession.value = null
 		stopOwyxPresenceHeartbeat()
+		resetOwyxSharePresencePreference()
 		return
 	}
 	owyxSiteSession.value = cached
@@ -1443,6 +1445,7 @@ async function refreshOwyxSiteSession() {
 
 async function signOutOwyxSiteAccount() {
 	stopOwyxPresenceHeartbeat()
+	resetOwyxSharePresencePreference()
 	await logoutOwyxSite()
 	owyxSiteSession.value = null
 }
