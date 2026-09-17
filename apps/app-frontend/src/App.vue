@@ -654,7 +654,7 @@ const messages = defineMessages({
 		id: 'app.nav.home',
 		defaultMessage: 'Home',
 	},
-	modrinthHosting: {
+	owyxServers: {
 		id: 'app.nav.owyx-servers',
 		defaultMessage: 'Owyx Servers',
 	},
@@ -1012,38 +1012,7 @@ watch(stateInitialized, (ready) => {
 			routerToken = null
 		}
 
-		queryClient.prefetchQuery({
-			queryKey: ['servers'],
-			queryFn: async () => {
-				const response = await tauriApiClient.archon.servers_v0.list({ limit: 100 })
-				const hasMedalServers = response.servers.some((s) => s.is_medal)
-				if (hasMedalServers) {
-					const subscriptions = await tauriApiClient.labrinth.billing_internal.getSubscriptions()
-					for (const server of response.servers) {
-						if (server.is_medal) {
-							const sub = subscriptions.find((s) => s.metadata?.id === server.server_id)
-							if (sub) {
-								server.medal_expires = new Date(
-									new Date(sub.created).getTime() + 5 * 86400000,
-								).toISOString()
-							}
-						}
-					}
-				}
-				return response
-			},
-			staleTime: 30_000,
-		})
-		queryClient.prefetchQuery({
-			queryKey: ['billing', 'subscriptions'],
-			queryFn: () => tauriApiClient.labrinth.billing_internal.getSubscriptions(),
-			staleTime: 30_000,
-		})
-		queryClient.prefetchQuery({
-			queryKey: ['billing', 'payments'],
-			queryFn: () => tauriApiClient.labrinth.billing_internal.getPayments(),
-			staleTime: 30_000,
-		})
+		// Hosting/Medal/billing prefetch removed — Owyx does not use Modrinth Hosting.
 	}
 })
 
@@ -2161,7 +2130,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<!-- Owyx Servers: admin-only catalog / API tools -->
 			<NavButton
 				v-if="isOwyxSiteAdmin"
-				v-tooltip.right="formatMessage(messages.modrinthHosting)"
+				v-tooltip.right="formatMessage(messages.owyxServers)"
 				to="/owyx-servers"
 				:is-primary="(r) => r.path === '/owyx-servers'"
 				:is-subpage="(r) => r.path.startsWith('/owyx-servers/')"

@@ -22,6 +22,13 @@ This repo is a **fork of modrinth/code** — same package licenses (GPL-3 for th
 - Unfork / delete the upstream remote / rewrite history to hide origin.
 - Touch `apps/frontend` / `apps/labrinth` for Owyx product work.
 - Reuse **Owyx™** branding in forks (see `TRADEMARK.md` / `COPYING.md`).
+- Revive Minecraft **plugin** / game-token / Hosting panel as product surface (410 / redirects only).
+
+## Hosting / upstream UI note
+
+`packages/ui` still contains Modrinth Hosting layouts for **upstream merge hygiene**.
+The Owyx launcher does **not** mount them: `/hosting/manage*` redirects to
+`/owyx-servers`, and dead hosting pages under `apps/app-frontend` are removed.
 
 ## Pointers
 

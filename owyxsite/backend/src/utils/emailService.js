@@ -92,7 +92,7 @@ const getServerSettings = async () => {
 
     return {
       serverName: settings['server-name'] || 'Owyx',
-      serverIp: settings['server-ip'] || '45.131.186.146:1488',
+      siteUrl: settings['site-url'] || 'https://owyx.site',
       discordInvite: settings['discord-invite'] || 'https://discord.gg/owyx',
       telegramInvite: settings['telegram-invite'] || 'https://t.me/owyx',
       currentDate: new Date().toLocaleDateString('ru-RU', {
@@ -105,7 +105,7 @@ const getServerSettings = async () => {
     console.error('Error loading server settings for email:', error.message);
     return {
       serverName: 'Owyx',
-      serverIp: '45.131.186.146:1488',
+      siteUrl: 'https://owyx.site',
       discordInvite: 'https://discord.gg/owyx',
       telegramInvite: 'https://t.me/owyx',
       currentDate: new Date().toLocaleDateString('ru-RU'),

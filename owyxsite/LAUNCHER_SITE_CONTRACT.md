@@ -308,35 +308,25 @@ the password. Applications/whitelist stay gone. Ban still blocks `/me`.
 
 ---
 
-## Community server auth (target flow)
+## Community server auth
 
-The direction is **launcher-driven session**, not a copy-pasted token:
+**Out of current product scope.** Owyx is site + launcher. A community-server
+plugin and chat `/login <token>` flow are **retired** (history in OwyxOld).
 
-1. Player signs into the launcher with their **Owyx account** (`/api/auth/login`).
-2. The launcher holds a session (JWT) and can prove identity to a server.
-3. A **community server plugin** (the server owner's) validates that proof with
-   the site — fast login / access without the player typing anything in chat.
-4. Owner servers and "community" servers (owners who connected their server)
-   appear in `/api/launcher/v1/servers`; `requiresAccount` decides offline-vs-Owyx.
-
-The exact server↔site validation endpoint (e.g. a signed session-check for the
-plugin) is **future work**; this section fixes the intent so the plugin and
-launcher can be built against a stable idea.
-
-### Legacy: game token (`/auth <token>` in chat) — **deprecated**
+Retired endpoints return **HTTP 410**:
 
 - `POST /api/auth/generate-game-token`, `verify-game-token`, `create-game-session`,
-  `check-game-session` still exist for the **transitional** plugin and are not
-  removed, but are **not promoted** in the site UI (the profile "game token" tab
-  was removed). New servers should use the launcher-session flow above.
-- `GET /api/plugin/server-access?nickname=...` and other
-  `/plugin/*` **write/session** routes accept a **long-term API token only**
-  (`authenticateLongTermApiTokenOnly`). A website session JWT is not enough,
-  even for an admin. `hasAccess: true` for an **active, non-banned** account.
-  Banned → `false`. The Express mount is `/api` + `/plugin/...` (not
-  `/api/settings/plugin/...`).
-- Whitelisting, if a server wants it, lives in the **plugin config**, never via
-  site applications (applications are gone).
+  `check-game-session`, `GET /api/auth/game-tokens`, `game-sessions`,
+  `POST /api/auth/terminate-game-sessions`
+- `GET /api/settings/server-info`, `GET /api/plugin/server-info`,
+  `GET /api/plugin/server-access`, `POST /api/settings/server-data`
+- `POST /api/admin/api-tokens/plugin`
+- `/api/applications/*` (whitelist applications)
+
+Public `GET /api/settings/public` returns site metadata only (no game IP).
+
+Launcher catalog ACL (`packs`/`servers` access_mode) remains for optional
+community entries in the launcher — that is catalog control-plane, not a plugin.
 
 ---
 
