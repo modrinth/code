@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require('../database/connection');
 const { authenticateToken } = require('./auth');
+const { logUserActivity } = require('../utils/activityLog');
 
 const router = express.Router();
 router.use(authenticateToken);
@@ -44,23 +45,34 @@ async function ensureFriendsSchema() {
     CREATE TABLE IF NOT EXISTS public.user_social_settings (
       user_id INTEGER PRIMARY KEY REFERENCES public.users(id) ON DELETE CASCADE,
       allow_friend_requests BOOLEAN NOT NULL DEFAULT true,
+      share_presence BOOLEAN NOT NULL DEFAULT true,
       updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
     )
+  `);
+  await db.query(`
+    ALTER TABLE public.user_social_settings
+      ADD COLUMN IF NOT EXISTS share_presence BOOLEAN NOT NULL DEFAULT true
   `);
 }
 
 async function getSocialSettings(userId) {
   const result = await db.query(
-    `SELECT allow_friend_requests FROM user_social_settings WHERE user_id = $1`,
+    `SELECT allow_friend_requests, share_presence FROM user_social_settings WHERE user_id = $1`,
     [userId]
   );
   if (!result.rows[0]) {
-    return { allowFriendRequests: true };
+    return { allowFriendRequests: true, sharePresence: true };
   }
-  return { allowFriendRequests: result.rows[0].allow_friend_requests !== false };
+  return {
+    allowFriendRequests: result.rows[0].allow_friend_requests !== false,
+    sharePresence: result.rows[0].share_presence !== false,
+  };
 }
 
-function presenceFromRow(row) {
+function presenceFromRow(row, sharePresence = true) {
+  if (sharePresence === false) {
+    return { status: 'offline', instanceName: null, updatedAt: row?.updated_at || null };
+  }
   if (!row || !row.updated_at) {
     return { status: 'offline', instanceName: null, updatedAt: null };
   }
@@ -86,11 +98,14 @@ function publicFriend(row, meId) {
   const otherAvatar =
     Number(row.user_id) === Number(meId) ? row.friend_avatar : row.user_avatar;
   const incoming = Number(row.friend_id) === Number(meId) && row.status === 'pending';
-  const presence = presenceFromRow({
-    status: row.presence_status,
-    instance_name: row.presence_instance,
-    updated_at: row.presence_updated_at,
-  });
+  const presence = presenceFromRow(
+    {
+      status: row.presence_status,
+      instance_name: row.presence_instance,
+      updated_at: row.presence_updated_at,
+    },
+    row.share_presence !== false,
+  );
   return {
     id: String(row.id),
     userId: String(otherId),
@@ -117,7 +132,8 @@ const FRIEND_SELECT = `
          fr.avatar_url AS friend_avatar,
          p.status AS presence_status,
          p.instance_name AS presence_instance,
-         p.updated_at AS presence_updated_at
+         p.updated_at AS presence_updated_at,
+         COALESCE(uss.share_presence, true) AS share_presence
   FROM friendships f
   JOIN users u ON u.id = f.user_id
   JOIN users fr ON fr.id = f.friend_id
@@ -125,7 +141,17 @@ const FRIEND_SELECT = `
     WHEN f.user_id = $1 THEN f.friend_id
     ELSE f.user_id
   END
+  LEFT JOIN user_social_settings uss ON uss.user_id = CASE
+    WHEN f.user_id = $1 THEN f.friend_id
+    ELSE f.user_id
+  END
 `;
+
+function parseOptionalBool(body, camel, snake) {
+  if (typeof body[camel] === 'boolean') return body[camel];
+  if (typeof body[snake] === 'boolean') return body[snake];
+  return null;
+}
 
 // GET /api/friends/settings
 router.get('/settings', async (req, res) => {
@@ -138,27 +164,51 @@ router.get('/settings', async (req, res) => {
   }
 });
 
-// PATCH /api/friends/settings  { allowFriendRequests?: boolean }
+// PATCH /api/friends/settings  { allowFriendRequests?: boolean, sharePresence?: boolean }
 router.patch('/settings', async (req, res) => {
   try {
-    const allow =
-      typeof req.body.allowFriendRequests === 'boolean'
-        ? req.body.allowFriendRequests
-        : typeof req.body.allow_friend_requests === 'boolean'
-          ? req.body.allow_friend_requests
-          : null;
-    if (allow === null) {
-      return res.status(400).json({ error: 'allowFriendRequests boolean required' });
+    const allow = parseOptionalBool(req.body, 'allowFriendRequests', 'allow_friend_requests');
+    const share = parseOptionalBool(req.body, 'sharePresence', 'share_presence');
+    if (allow === null && share === null) {
+      return res.status(400).json({
+        error: 'allowFriendRequests and/or sharePresence boolean required',
+      });
     }
-    await db.query(
-      `INSERT INTO user_social_settings (user_id, allow_friend_requests, updated_at)
-       VALUES ($1, $2, NOW())
+    const result = await db.query(
+      `INSERT INTO user_social_settings (user_id, allow_friend_requests, share_presence, updated_at)
+       VALUES ($1, COALESCE($2, true), COALESCE($3, true), NOW())
        ON CONFLICT (user_id) DO UPDATE SET
-         allow_friend_requests = EXCLUDED.allow_friend_requests,
-         updated_at = NOW()`,
-      [req.user.id, allow]
+         allow_friend_requests = COALESCE($2, user_social_settings.allow_friend_requests),
+         share_presence = COALESCE($3, user_social_settings.share_presence),
+         updated_at = NOW()
+       RETURNING allow_friend_requests, share_presence`,
+      [req.user.id, allow, share]
     );
-    res.json({ settings: { allowFriendRequests: allow } });
+    const row = result.rows[0];
+    const settings = {
+      allowFriendRequests: row.allow_friend_requests !== false,
+      sharePresence: row.share_presence !== false,
+    };
+    // Turning presence off: force offline so friends stop seeing Active immediately.
+    if (share === false) {
+      await db.query(
+        `INSERT INTO user_presence (user_id, status, instance_name, updated_at)
+         VALUES ($1, 'offline', NULL, NOW())
+         ON CONFLICT (user_id) DO UPDATE SET
+           status = 'offline',
+           instance_name = NULL,
+           updated_at = NOW()`,
+        [req.user.id]
+      );
+    }
+    await logUserActivity(req.user.id, 'social_settings', 'Social privacy updated', {
+      req,
+      metadata: {
+        allowFriendRequests: settings.allowFriendRequests,
+        sharePresence: settings.sharePresence,
+      },
+    });
+    res.json({ settings });
   } catch (error) {
     console.error('friends settings patch:', error);
     res.status(500).json({ error: 'could not save social settings' });
@@ -189,6 +239,28 @@ router.get('/', async (req, res) => {
 // POST /api/friends/presence — heartbeat / playing status
 router.post('/presence', async (req, res) => {
   try {
+    const settings = await getSocialSettings(req.user.id);
+    if (!settings.sharePresence) {
+      await db.query(
+        `INSERT INTO user_presence (user_id, status, instance_name, updated_at)
+         VALUES ($1, 'offline', NULL, NOW())
+         ON CONFLICT (user_id) DO UPDATE SET
+           status = 'offline',
+           instance_name = NULL,
+           updated_at = NOW()`,
+        [req.user.id]
+      );
+      return res.json({
+        success: true,
+        sharing: false,
+        presence: {
+          status: 'offline',
+          instanceName: null,
+          updatedAt: new Date().toISOString(),
+        },
+      });
+    }
+
     const raw = String(req.body.status || 'online').toLowerCase();
     const status = ['offline', 'online', 'playing'].includes(raw) ? raw : 'online';
     const instanceName =
@@ -208,6 +280,7 @@ router.post('/presence', async (req, res) => {
     );
     res.json({
       success: true,
+      sharing: true,
       presence: {
         status,
         instanceName,

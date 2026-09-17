@@ -182,6 +182,7 @@ export async function removeOwyxFriend(id: string): Promise<void> {
 
 export type OwyxSocialSettings = {
 	allowFriendRequests: boolean
+	sharePresence: boolean
 }
 
 export async function getOwyxSocialSettings(): Promise<OwyxSocialSettings> {
@@ -191,12 +192,13 @@ export async function getOwyxSocialSettings(): Promise<OwyxSocialSettings> {
 		signal: AbortSignal.timeout(10000),
 	})
 	const data = (await res.json().catch(() => ({}))) as {
-		settings?: OwyxSocialSettings
+		settings?: Partial<OwyxSocialSettings>
 		error?: string
 	}
 	if (!res.ok) throw new Error(friendlyFriendsError(data.error, res.status, 'Settings failed'))
 	return {
 		allowFriendRequests: data.settings?.allowFriendRequests !== false,
+		sharePresence: data.settings?.sharePresence !== false,
 	}
 }
 
@@ -210,7 +212,7 @@ export async function patchOwyxSocialSettings(
 		signal: AbortSignal.timeout(10000),
 	})
 	const data = (await res.json().catch(() => ({}))) as {
-		settings?: OwyxSocialSettings
+		settings?: Partial<OwyxSocialSettings>
 		error?: string
 	}
 	if (!res.ok || !data.settings) {
@@ -218,6 +220,7 @@ export async function patchOwyxSocialSettings(
 	}
 	return {
 		allowFriendRequests: data.settings.allowFriendRequests !== false,
+		sharePresence: data.settings.sharePresence !== false,
 	}
 }
 

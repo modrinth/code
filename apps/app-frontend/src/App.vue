@@ -124,6 +124,7 @@ import { resolveOwyxAvatarUrl } from '@/helpers/owyx-avatar'
 import {
 	setOwyxPresenceOnline,
 	setOwyxPresencePlaying,
+	setOwyxSharePresenceEnabled,
 	startOwyxPresenceHeartbeat,
 	stopOwyxPresenceHeartbeat,
 } from '@/helpers/owyx-presence'
@@ -1393,7 +1394,13 @@ async function refreshOwyxSiteSession() {
 	const fresh = await fetchOwyxSiteMe(cached.token)
 	owyxSiteSession.value = fresh
 	if (fresh?.token) {
-		startOwyxPresenceHeartbeat()
+		try {
+			const { getOwyxSocialSettings } = await import('@/helpers/owyx-friends')
+			const social = await getOwyxSocialSettings()
+			setOwyxSharePresenceEnabled(social.sharePresence)
+		} catch {
+			startOwyxPresenceHeartbeat()
+		}
 		try {
 			const { markLoggedIntoOwyxSite } = await import('@/helpers/onboarding-checklist')
 			await markLoggedIntoOwyxSite()

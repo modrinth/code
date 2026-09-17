@@ -7,9 +7,9 @@
 		</Button>
 	</div>
 
-	<div v-else class="flex flex-col gap-5 max-w-lg">
+	<div v-else class="flex w-full flex-col gap-6">
 		<div class="flex flex-wrap items-start justify-between gap-3">
-			<div>
+			<div class="min-w-0">
 				<p class="m-0 text-lg font-semibold text-contrast">{{ formatMessage(messages.title) }}</p>
 				<p class="m-0 mt-1 text-sm text-secondary">
 					{{
@@ -27,7 +27,7 @@
 			</Button>
 		</div>
 
-		<div class="grid grid-cols-3 gap-2">
+		<div class="grid grid-cols-3 gap-2 sm:gap-3">
 			<button
 				type="button"
 				class="rounded-xl border border-solid border-surface-5 bg-surface-2 px-3 py-3 text-center cursor-pointer button-base hover:border-[var(--color-brand)]"
@@ -60,44 +60,65 @@
 			</button>
 		</div>
 
-		<div
-			class="flex items-center justify-between gap-3 rounded-xl border border-solid border-surface-5 bg-surface-2 px-3 py-3"
-		>
-			<div class="min-w-0">
-				<p class="m-0 font-medium text-contrast">{{ formatMessage(messages.presenceTitle) }}</p>
-				<p class="m-0 mt-0.5 text-xs text-secondary">{{ formatMessage(messages.presenceBody) }}</p>
+		<section class="flex flex-col gap-4 border-0 border-t border-solid border-surface-4 pt-6">
+			<div class="flex items-center justify-between gap-4">
+				<div class="min-w-0">
+					<div class="flex flex-wrap items-center gap-2">
+						<h2 class="m-0 text-lg font-semibold text-contrast">
+							{{ formatMessage(messages.presenceTitle) }}
+						</h2>
+						<span
+							class="shrink-0 rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide"
+							:class="
+								sharePresence && presenceLive
+									? 'bg-green/20 text-green'
+									: 'bg-button-bg text-secondary'
+							"
+						>
+							{{
+								sharePresence && presenceLive
+									? formatMessage(messages.presenceOn)
+									: formatMessage(messages.presenceOff)
+							}}
+						</span>
+					</div>
+					<p class="m-0 mt-1 text-sm text-secondary">
+						{{ formatMessage(messages.presenceBody) }}
+					</p>
+				</div>
+				<Toggle
+					id="owyx-share-presence"
+					:model-value="sharePresence"
+					:disabled="saving"
+					:aria-label="formatMessage(messages.presenceTitle)"
+					@update:model-value="onSharePresence"
+				/>
 			</div>
-			<span
-				class="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide"
-				:class="presenceLive ? 'bg-green/20 text-green' : 'bg-button-bg text-secondary'"
-			>
-				{{
-					presenceLive ? formatMessage(messages.presenceOn) : formatMessage(messages.presenceOff)
-				}}
-			</span>
-		</div>
 
-		<label
-			class="flex items-start justify-between gap-3 rounded-xl border border-solid border-surface-5 bg-surface-2 px-3 py-3 text-sm text-primary cursor-pointer"
-		>
-			<span class="flex flex-col gap-1 min-w-0">
-				<span class="font-medium text-contrast">{{ formatMessage(messages.allowRequests) }}</span>
-				<span class="text-xs text-secondary">{{ formatMessage(messages.allowRequestsHint) }}</span>
-			</span>
-			<input
-				v-model="allowRequests"
-				type="checkbox"
-				class="mt-1 accent-[var(--color-brand)] shrink-0"
-				:disabled="saving"
-				@change="saveAllowRequests"
-			/>
-		</label>
+			<div class="flex items-center justify-between gap-4">
+				<div class="min-w-0">
+					<h2 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.allowRequests) }}
+					</h2>
+					<p class="m-0 mt-1 text-sm text-secondary">
+						{{ formatMessage(messages.allowRequestsHint) }}
+					</p>
+				</div>
+				<Toggle
+					id="owyx-allow-friend-requests"
+					:model-value="allowRequests"
+					:disabled="saving"
+					:aria-label="formatMessage(messages.allowRequests)"
+					@update:model-value="onAllowRequests"
+				/>
+			</div>
+		</section>
 
-		<div
-			class="rounded-xl border border-solid border-surface-5 bg-surface-2 px-3 py-3 text-sm text-secondary"
-		>
-			<p class="m-0 font-medium text-contrast">{{ formatMessage(messages.skinsTitle) }}</p>
-			<p class="m-0 mt-1 leading-relaxed">{{ formatMessage(messages.skinsBody) }}</p>
+		<section class="border-0 border-t border-solid border-surface-4 pt-6">
+			<h2 class="m-0 text-lg font-semibold text-contrast">{{ formatMessage(messages.skinsTitle) }}</h2>
+			<p class="m-0 mt-1 text-sm leading-relaxed text-secondary">
+				{{ formatMessage(messages.skinsBody) }}
+			</p>
 			<div class="mt-3 flex flex-wrap gap-2">
 				<Button
 					size="sm"
@@ -125,7 +146,7 @@
 					{{ formatMessage(messages.skinsModLink) }}
 				</a>
 			</div>
-		</div>
+		</section>
 
 		<p v-if="saveError" class="m-0 text-sm text-red">{{ saveError }}</p>
 		<p v-else-if="savedFlash" class="m-0 text-sm text-green">{{ formatMessage(messages.saved) }}</p>
@@ -134,7 +155,7 @@
 </template>
 
 <script setup lang="ts">
-import { Button, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import { Button, Toggle, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { computed, inject, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -144,7 +165,7 @@ import {
 	listOwyxFriends,
 	patchOwyxSocialSettings,
 } from '@/helpers/owyx-friends'
-import { owyxPresenceStatus } from '@/helpers/owyx-presence'
+import { owyxPresenceStatus, setOwyxSharePresenceEnabled } from '@/helpers/owyx-presence'
 import { playOwyxUiSound } from '@/helpers/owyx-ui-sound'
 import { appSettingsModalContextKey } from '@/providers/app-settings-modal'
 import { injectContentInstall } from '@/providers/content-install'
@@ -157,6 +178,7 @@ const owyx = injectOwyxSiteSession()
 const { install: installVersion } = injectContentInstall()
 const settingsModal = inject(appSettingsModalContextKey, null)
 const allowRequests = ref(true)
+const sharePresence = ref(true)
 const saving = ref(false)
 const saveError = ref('')
 const loadError = ref('')
@@ -198,12 +220,22 @@ async function installCsl() {
 	}
 }
 
+function flashSaved() {
+	savedFlash.value = true
+	playOwyxUiSound('toggle')
+	setTimeout(() => {
+		savedFlash.value = false
+	}, 2000)
+}
+
 async function loadSettings() {
 	if (!owyx.isSignedIn.value) return
 	loadError.value = ''
 	try {
 		const [s, friends] = await Promise.all([getOwyxSocialSettings(), listOwyxFriends()])
 		allowRequests.value = s.allowFriendRequests
+		sharePresence.value = s.sharePresence
+		setOwyxSharePresenceEnabled(s.sharePresence)
 		const accepted = friends.filter((f) => f.status === 'accepted')
 		stats.value = {
 			friends: accepted.length,
@@ -215,21 +247,40 @@ async function loadSettings() {
 	}
 }
 
-async function saveAllowRequests() {
+async function onAllowRequests(next: boolean) {
+	const prev = allowRequests.value
+	allowRequests.value = next
 	saving.value = true
 	saveError.value = ''
 	savedFlash.value = false
 	try {
-		const s = await patchOwyxSocialSettings({ allowFriendRequests: allowRequests.value })
+		const s = await patchOwyxSocialSettings({ allowFriendRequests: next })
 		allowRequests.value = s.allowFriendRequests
-		savedFlash.value = true
-		playOwyxUiSound('toggle')
-		setTimeout(() => {
-			savedFlash.value = false
-		}, 2000)
+		flashSaved()
 	} catch (e) {
+		allowRequests.value = prev
 		saveError.value = e instanceof Error ? e.message : String(e)
-		await loadSettings()
+	} finally {
+		saving.value = false
+	}
+}
+
+async function onSharePresence(next: boolean) {
+	const prev = sharePresence.value
+	sharePresence.value = next
+	setOwyxSharePresenceEnabled(next)
+	saving.value = true
+	saveError.value = ''
+	savedFlash.value = false
+	try {
+		const s = await patchOwyxSocialSettings({ sharePresence: next })
+		sharePresence.value = s.sharePresence
+		setOwyxSharePresenceEnabled(s.sharePresence)
+		flashSaved()
+	} catch (e) {
+		sharePresence.value = prev
+		setOwyxSharePresenceEnabled(prev)
+		saveError.value = e instanceof Error ? e.message : String(e)
 	} finally {
 		saving.value = false
 	}
@@ -300,11 +351,12 @@ const messages = defineMessages({
 	},
 	presenceTitle: {
 		id: 'owyx.settings.social.presence-title',
-		defaultMessage: 'Presence',
+		defaultMessage: 'Share presence with friends',
 	},
 	presenceBody: {
 		id: 'owyx.settings.social.presence-body',
-		defaultMessage: 'Heartbeat ~30s while signed in. Idle ~90s → appear offline to friends.',
+		defaultMessage:
+			'When on, heartbeat ~30s while signed in. Idle ~90s → offline. When off, friends always see you offline.',
 	},
 	presenceOn: {
 		id: 'owyx.settings.social.presence-on',

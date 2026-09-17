@@ -4896,7 +4896,7 @@
     "message": "Open profile on site"
   },
   "owyx.settings.social.presence-body": {
-    "message": "Heartbeat ~30s while signed in. Idle ~90s → appear offline to friends."
+    "message": "When on, heartbeat ~30s while signed in. Idle ~90s → offline. When off, friends always see you offline."
   },
   "owyx.settings.social.presence-off": {
     "message": "Off"
@@ -4905,7 +4905,7 @@
     "message": "Active"
   },
   "owyx.settings.social.presence-title": {
-    "message": "Presence"
+    "message": "Share presence with friends"
   },
   "owyx.settings.social.saved": {
     "message": "Saved"

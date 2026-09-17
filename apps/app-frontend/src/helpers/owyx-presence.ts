@@ -1,5 +1,7 @@
 /**
  * Owyx friends presence heartbeat for the launcher sidebar.
+ * Respects sharePresence from /api/friends/settings — when off, no heartbeats
+ * and friends see offline.
  */
 
 import { readonly, shallowRef } from 'vue'
@@ -7,6 +9,7 @@ import { readonly, shallowRef } from 'vue'
 import { type OwyxFriendPresence, postOwyxPresence } from '@/helpers/owyx-friends'
 
 let heartbeatTimer: ReturnType<typeof setInterval> | null = null
+let sharePresenceEnabled = true
 let current: { status: OwyxFriendPresence; instanceName?: string | null } = {
 	status: 'offline',
 }
@@ -18,6 +21,10 @@ export const owyxPresenceStatus = readonly(presenceStatus)
 
 export function getOwyxPresenceStatus(): OwyxFriendPresence {
 	return presenceStatus.value
+}
+
+export function isOwyxSharePresenceEnabled(): boolean {
+	return sharePresenceEnabled
 }
 
 function setCurrent(next: { status: OwyxFriendPresence; instanceName?: string | null }) {
@@ -33,8 +40,33 @@ async function push() {
 	}
 }
 
+function clearHeartbeatTimer() {
+	if (heartbeatTimer) {
+		clearInterval(heartbeatTimer)
+		heartbeatTimer = null
+	}
+}
+
+/**
+ * Apply sharePresence from social settings.
+ * OFF → stop heartbeats and force offline to friends.
+ * ON → start heartbeat if not already running.
+ */
+export function setOwyxSharePresenceEnabled(enabled: boolean) {
+	sharePresenceEnabled = enabled
+	if (enabled) {
+		startOwyxPresenceHeartbeat()
+	} else {
+		stopOwyxPresenceHeartbeat({ forceOfflinePush: true })
+	}
+}
+
 export function startOwyxPresenceHeartbeat() {
-	stopOwyxPresenceHeartbeat()
+	clearHeartbeatTimer()
+	if (!sharePresenceEnabled) {
+		setCurrent({ status: 'offline', instanceName: null })
+		return
+	}
 	setCurrent({ status: 'online', instanceName: null })
 	void push()
 	heartbeatTimer = setInterval(() => {
@@ -42,23 +74,23 @@ export function startOwyxPresenceHeartbeat() {
 	}, 30_000)
 }
 
-export function stopOwyxPresenceHeartbeat() {
-	if (heartbeatTimer) {
-		clearInterval(heartbeatTimer)
-		heartbeatTimer = null
-	}
-	if (current.status !== 'offline') {
-		setCurrent({ status: 'offline', instanceName: null })
+export function stopOwyxPresenceHeartbeat(opts?: { forceOfflinePush?: boolean }) {
+	clearHeartbeatTimer()
+	const wasLive = current.status !== 'offline'
+	setCurrent({ status: 'offline', instanceName: null })
+	if (wasLive || opts?.forceOfflinePush) {
 		void push()
 	}
 }
 
 export function setOwyxPresencePlaying(instanceName: string) {
+	if (!sharePresenceEnabled) return
 	setCurrent({ status: 'playing', instanceName: instanceName.slice(0, 120) })
 	void push()
 }
 
 export function setOwyxPresenceOnline() {
+	if (!sharePresenceEnabled) return
 	setCurrent({ status: 'online', instanceName: null })
 	void push()
 }
