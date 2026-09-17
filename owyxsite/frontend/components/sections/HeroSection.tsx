@@ -1,44 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocale } from "@/hooks/useLocale";
-import ServerStatus from "@/components/server/ServerStatus";
-import CopyIPButton from "@/components/server/CopyIPButton";
-
-const FALLBACK_IP = "play.owyx.site";
+import ApiServicesStatus from "@/components/brand/ApiServicesStatus";
 
 /**
  * Brand-first first viewport (DESIGN.md §5):
- * Owyx™ · lead · CTA · server status/IP pill (no card clutter / no offline widget).
+ * Owyx™ · lead · CTA · optional API/services status (launcher-first — not a game-server IP).
  */
 export default function HeroSection() {
   const { user, loading } = useAuth();
   const { dict } = useLocale();
-  const [ip, setIp] = useState(FALLBACK_IP);
-
-  useEffect(() => {
-    let cancelled = false;
-    const ctrl = new AbortController();
-    const timer = window.setTimeout(() => ctrl.abort(), 2500);
-    (async () => {
-      try {
-        const res = await fetch("/api/settings/public", { signal: ctrl.signal });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (!cancelled && data.serverIp) setIp(data.serverIp);
-      } catch {
-        /* keep fallback */
-      } finally {
-        window.clearTimeout(timer);
-      }
-    })();
-    return () => {
-      cancelled = true;
-      ctrl.abort();
-    };
-  }, []);
 
   return (
     <section className="relative overflow-hidden min-h-[min(78vh,40rem)] flex items-center">
@@ -64,9 +37,8 @@ export default function HeroSection() {
             {dict.home.heroLead}
           </p>
 
-          <div className="fade-up-3 mt-5 flex flex-wrap items-center gap-2.5">
-            <ServerStatus />
-            <CopyIPButton ip={ip} />
+          <div className="fade-up-3 mt-5">
+            <ApiServicesStatus />
           </div>
 
           <div className="fade-up-3 mt-7 flex flex-wrap items-center gap-3">

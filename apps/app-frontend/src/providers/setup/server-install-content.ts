@@ -168,14 +168,14 @@ export function createServerInstallContent(opts: {
 	})
 	const serverBackUrl = computed(() => {
 		const sid = serverIdQuery.value
-		if (!sid) return '/hosting/manage'
+		if (!sid) return '/owyx-servers'
 		if (serverFlowFrom.value === 'onboarding') {
-			return `/hosting/manage/${sid}?resumeModal=setup-type`
+			return `/owyx-servers`
 		}
 		if (serverFlowFrom.value === 'reset-server') {
-			return `/hosting/manage/${sid}?openSettings=installation`
+			return `/owyx-servers`
 		}
-		return `/hosting/manage/${sid}/content`
+		return `/owyx-servers`
 	})
 	const serverBackLabel = computed(() => {
 		if (serverFlowFrom.value === 'onboarding') return 'Back to setup'
@@ -536,11 +536,11 @@ export function createServerInstallContent(opts: {
 
 			if (serverFlowFrom.value === 'onboarding') {
 				await client.archon.servers_v1.endIntro(sid)
-				await router.push(`/hosting/manage/${sid}/content`)
+				await router.push('/owyx-servers')
 				return
 			}
 
-			await router.push(`/hosting/manage/${sid}?openSettings=installation`)
+			await router.push('/owyx-servers')
 		} catch (err) {
 			handleError(err as Error)
 			config.loading.value = false

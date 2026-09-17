@@ -27,8 +27,8 @@ export default function ComingSoon({
             <Link href="/" className="btn btn-ghost">
               {dict.comingSoon.toHome}
             </Link>
-            <Link href="/servers" className="btn btn-primary">
-              {dict.comingSoon.toServers}
+            <Link href="/download" className="btn btn-primary">
+              {dict.comingSoon.toDownload}
             </Link>
           </div>
         </div>

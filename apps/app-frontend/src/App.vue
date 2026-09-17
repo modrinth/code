@@ -271,9 +271,7 @@ const forceSidebar = computed(
 const sidebarVisible = computed(() => sidebarToggled.value || forceSidebar.value)
 const hostingRouteActive = computed(() => false)
 const hostingUpdateRequired = computed(() => false)
-const prideFundraiserEnabled = computed(
-	() => appSettings.getFeatureFlag('pride_fundraiser') && Date.now() < PRIDE_FUNDRAISER_END_DATE,
-)
+const prideFundraiserEnabled = computed(() => false)
 const hostingIntercomIdentityKey = computed(() => {
 	const rawServerId = route.params.id
 	const serverId = Array.isArray(rawServerId) ? rawServerId[0] : rawServerId
@@ -442,9 +440,9 @@ const {
 	(iconPath) =>
 		creationGeneratedIcon.value?.path === iconPath ? creationGeneratedIcon.value.config : null,
 )
-const { hasLoggedIntoMinecraft, hasLoggedIntoModrinth, showChecklist } = onboardingChecklist
+const { hasLoggedIntoMinecraft, showChecklist } = onboardingChecklist
 const showFriendsList = computed(
-	() => !showChecklist.value || hasLoggedIntoModrinth.value || !!owyxSiteSession.value?.token,
+	() => !showChecklist.value || !!owyxSiteSession.value?.token || hasLoggedIntoMinecraft.value,
 )
 const isOwyxSiteAdmin = computed(() => {
 	const role = owyxSiteSession.value?.user?.role

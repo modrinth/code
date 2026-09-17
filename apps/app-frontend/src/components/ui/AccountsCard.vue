@@ -375,7 +375,7 @@ const messages = defineMessages({
 	},
 	pathsHint: {
 		id: 'minecraft-account.paths-hint',
-		defaultMessage: 'Owyx account (site nick + friends) or Microsoft (licensed Minecraft).',
+		defaultMessage: 'Owyx account (friends & skins) or Microsoft (licensed Minecraft).',
 	},
 	signInOwyxSite: {
 		id: 'minecraft-account.sign-in-owyx-site',
@@ -393,7 +393,7 @@ const messages = defineMessages({
 	accountHint: {
 		id: 'minecraft-account.account-hint',
 		defaultMessage:
-			'Owyx is for friends, skins, and offline-mode servers. Microsoft is for a licensed Minecraft profile and online-mode servers.',
+			'Owyx is for friends, skins, and your site nickname in game. Microsoft is for a licensed Minecraft profile and online-mode servers.',
 	},
 	addMicrosoft: {
 		id: 'minecraft-account.add-microsoft',
