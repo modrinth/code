@@ -17,17 +17,17 @@
 			<article
 				v-for="(item, index) in gallery"
 				:key="item.url"
-				class="flex min-w-0 flex-col overflow-hidden rounded-xl border border-solid border-surface-4 bg-surface-3"
+				class="flex min-w-0 flex-col overflow-hidden rounded-xl border border-solid border-surface-4"
 			>
 				<button
 					type="button"
-					class="cursor-zoom-in border-0 bg-surface-1 p-0"
+					class="cursor-zoom-in border-0 p-0"
 					:aria-label="formatMessage(messages.openImage, { number: index + 1 })"
 					@click="viewer?.show(index)"
 				>
 					<img
 						:src="item.raw_url || item.url"
-						:alt="item.title || formatMessage(messages.imageNumber, { number: index + 1 })"
+						:alt="item.name || formatMessage(messages.imageNumber, { number: index + 1 })"
 						class="aspect-video w-full object-contain"
 						loading="lazy"
 					/>
@@ -39,8 +39,8 @@
 							formatMessage(messages.featured)
 						}}</span>
 					</div>
-					<h3 v-if="item.title" class="m-0 break-words text-lg font-semibold text-contrast">
-						{{ item.title }}
+					<h3 v-if="item.name" class="m-0 break-words text-lg font-semibold text-contrast">
+						{{ item.name }}
 					</h3>
 					<p v-if="item.description" class="m-0 whitespace-pre-wrap break-words">
 						{{ item.description }}
@@ -77,8 +77,8 @@ const viewerItems = computed(() =>
 	gallery.value.map((item, index) => ({
 		id: item.url,
 		src: item.raw_url || item.url,
-		alt: item.title || formatMessage(messages.imageNumber, { number: index + 1 }),
-		title: item.title,
+		alt: item.name || formatMessage(messages.imageNumber, { number: index + 1 }),
+		title: item.name,
 		description: item.description,
 	})),
 )
