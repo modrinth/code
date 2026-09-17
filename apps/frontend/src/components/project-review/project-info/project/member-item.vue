@@ -1,9 +1,9 @@
 <template>
-	<li class="flex min-w-0 items-start gap-2.5">
+	<li class="flex min-w-0 items-start gap-1.5">
 		<Avatar
 			:src="member.user.avatar_url"
 			:alt="member.user.username"
-			size="1.75rem"
+			size="2rem"
 			circle
 			no-shadow
 		/>
@@ -12,7 +12,7 @@
 				<NuxtLink
 					:to="`/user/${member.user.username}`"
 					target="_blank"
-					class="truncate font-semibold text-contrast"
+					class="truncate font-semibold text-primary"
 					>{{ member.user.username }}</NuxtLink
 				>
 				<CrownIcon
