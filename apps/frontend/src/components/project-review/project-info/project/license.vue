@@ -1,15 +1,10 @@
 <template>
-	<section v-if="project" :aria-label="formatMessage(messages.license)">
+	<div v-if="project" class="flex flex-col gap-1">
 		<div class="flex items-center gap-3">
 			<span
 				class="min-w-0 flex-1 truncate"
 				:title="project.license.name || projectV2?.license.name || project.license.id"
 				>{{ project.license.name || projectV2?.license.name || project.license.id }}</span
-			>
-			<span
-				v-if="project.license.id.startsWith('LicenseRef-')"
-				class="review-badge font-bold tracking-wider"
-				>{{ formatMessage(messages.customLicense) }}</span
 			>
 		</div>
 		<a
@@ -17,12 +12,12 @@
 			:href="url"
 			target="_blank"
 			rel="noopener noreferrer"
-			class="mt-1 flex min-w-0 items-center gap-1 text-xs text-secondary hover:text-contrast"
+			class="mt-1 flex min-w-0 items-center gap-1 font-mono text-xs !transition-colors hover:text-contrast"
 		>
-			<ExternalIcon class="size-3 shrink-0" />
 			<span class="truncate" :title="url">{{ url.replace(/^https?:\/\//, '') }}</span>
+			<ExternalIcon class="size-3 shrink-0" />
 		</a>
-	</section>
+	</div>
 </template>
 
 <script setup lang="ts">

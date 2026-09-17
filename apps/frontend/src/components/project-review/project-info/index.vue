@@ -1,5 +1,5 @@
 <template>
-	<div class="review-details min-w-0 text-sm text-secondary">
+	<div class="review-details min-w-0 pb-10 text-sm text-secondary">
 		<p v-if="isLoading" role="status">{{ formatMessage(messages.loading) }}</p>
 		<div v-else-if="error" role="alert">
 			<p>{{ formatMessage(messages.loadError) }}</p>
@@ -7,26 +7,78 @@
 		</div>
 		<p v-else-if="!project">{{ formatMessage(messages.empty) }}</p>
 		<template v-else>
-			<div class="flex flex-col gap-6 px-2 pb-6">
-				<h1 class="m-0 text-lg">{{ project.name }}</h1>
+			<section class="review-section">
+				<h3 class="review-section-label">
+					{{ formatMessage(messages.projectTitle) }}
+				</h3>
+				<h1 class="m-0 text-xl">{{ project.name }}</h1>
+			</section>
+			<section class="review-section">
+				<h3 class="review-section-label">
+					{{ formatMessage(messages.slug) }}
+				</h3>
 				<Slug />
+			</section>
+			<section class="review-section review-section-icon">
+				<h3 class="review-section-label">
+					{{ formatMessage(messages.icon) }}
+				</h3>
 				<Icon />
+			</section>
+			<section class="review-section">
+				<h3 class="review-section-label">
+					{{ formatMessage(messages.summary) }}
+				</h3>
 				<Summary />
-			</div>
-			<License class="review-section" />
-			<Tags class="review-section" />
-			<div class="review-section !px-0"><Links /></div>
-			<Compatibility class="review-section" />
-			<Members class="review-section" />
-			<Details class="review-section" />
+			</section>
+			<section class="review-section" :aria-label="formatMessage(messages.license)">
+				<h3 class="review-section-label">
+					{{ formatMessage(messages.license) }}
+				</h3>
+				<License />
+			</section>
+			<section class="review-section" :aria-label="formatMessage(messages.tags)">
+				<h3 class="review-section-label">
+					{{ formatMessage(messages.tags) }}
+				</h3>
+				<Tags v-if="hasTags" />
+				<span v-else>{{ formatMessage(messages.emptyTags) }}</span>
+			</section>
+			<section class="review-section" :aria-label="formatMessage(messages.links)">
+				<h3 class="review-section-label">
+					{{ formatMessage(messages.links) }}
+				</h3>
+				<Links v-if="hasLinks" />
+				<span v-else>{{ formatMessage(messages.emptyLinks) }}</span>
+			</section>
+			<section class="review-section">
+				<h3 class="review-section-label">
+					{{ formatMessage(messages.compatibility) }}
+				</h3>
+				<Compatibility />
+			</section>
+			<section class="review-section">
+				<h3 class="review-section-label">
+					{{ formatMessage(messages.members) }}
+				</h3>
+				<Members />
+			</section>
+			<section class="review-section">
+				<h3 class="review-section-label">
+					{{ formatMessage(messages.details) }}
+				</h3>
+				<Details />
+			</section>
 		</template>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { Button, useVIntl } from '@modrinth/ui'
+import { computed } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
+import { reviewExternalUrl } from '~/providers/project-review/project-links'
 
 import { projectReviewMessages as messages } from '../messages'
 import Compatibility from './project/compatibility.vue'
@@ -41,19 +93,26 @@ import Tags from './project/tags.vue'
 
 const { project, isLoading, error, refresh } = injectProjectReviewPageContext()
 const { formatMessage } = useVIntl()
+const hasTags = computed(
+	() => !!(project.value?.categories.length || project.value?.additional_categories.length),
+)
+const hasLinks = computed(() =>
+	Object.values(project.value?.link_urls ?? {}).some((link) => reviewExternalUrl(link.url)),
+)
 </script>
 
 <style scoped>
 .review-section {
-	border-top: 1px solid var(--color-divider);
-	padding: 1rem 0.5rem;
+	@apply flex flex-col gap-3 border-0 border-t border-solid border-divider px-0.5 pb-4 pt-3;
 }
-.review-details :deep(h2) {
-	margin: 0 0 0.75rem;
-	font-size: 0.6875rem;
-	font-weight: 700;
-	letter-spacing: 0.1em;
-	text-transform: uppercase;
+.review-section:first-child {
+	@apply border-t-0;
+}
+.review-section-icon {
+	@apply items-start gap-3;
+}
+.review-section-label {
+	@apply m-0 text-sm font-normal text-secondary;
 }
 .review-details :deep(.review-badge) {
 	border-radius: 0.25rem;

@@ -1,6 +1,6 @@
 <template>
 	<section
-		class="project-review relative flex overflow-hidden bg-surface-1"
+		class="project-review relative flex overflow-hidden bg-bg"
 		:aria-label="formatMessage(messages.title)"
 		@pointerdown.capture="onPointerDown"
 		@dblclick="onDividerDoubleClick"

@@ -73,6 +73,22 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.loading',
 		defaultMessage: 'Loading review workspace…',
 	},
+	projectTitle: {
+		id: 'moderation.project-review.projectTitle',
+		defaultMessage: 'Title',
+	},
+	slug: {
+		id: 'moderation.project-review.slug',
+		defaultMessage: 'Slug',
+	},
+	icon: {
+		id: 'moderation.project-review.icon',
+		defaultMessage: 'Icon',
+	},
+	summary: {
+		id: 'moderation.project-review.summary',
+		defaultMessage: 'Summary',
+	},
 	matchesName: {
 		id: 'moderation.project-review.matchesName',
 		defaultMessage: 'Matches the project name',
@@ -91,11 +107,19 @@ export const projectReviewMessages = defineMessages({
 	},
 	tags: {
 		id: 'moderation.project-review.tags',
-		defaultMessage: 'Categories',
+		defaultMessage: 'Tags',
 	},
 	links: {
 		id: 'moderation.project-review.links',
-		defaultMessage: 'Project links',
+		defaultMessage: 'Links',
+	},
+	emptyTags: {
+		id: 'moderation.project-review.emptyTags',
+		defaultMessage: 'No tags.',
+	},
+	emptyLinks: {
+		id: 'moderation.project-review.emptyLinks',
+		defaultMessage: 'No links.',
 	},
 	source: {
 		id: 'moderation.project-review.source',

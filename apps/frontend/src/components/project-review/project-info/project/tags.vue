@@ -1,26 +1,21 @@
 <template>
-	<section v-if="project" class="flex flex-wrap gap-1" :aria-label="formatMessage(messages.tags)">
-		<span
+	<div v-if="project" class="flex flex-wrap gap-1">
+		<TagItem
 			v-for="category in project.categories"
 			:key="category"
-			class="rounded-full border border-solid border-brand px-2 py-0.5 text-xs text-brand"
-			>{{ formatCategory(formatMessage, category) }}</span
+			class="!border-brand !bg-transparent !text-brand opacity-70"
+			>{{ formatCategory(formatMessage, category) }}</TagItem
 		>
-		<span
-			v-for="category in project.additional_categories"
-			:key="category"
-			class="rounded-full bg-button-bg px-2 py-0.5 text-xs"
-			>{{ formatCategory(formatMessage, category) }}</span
-		>
-	</section>
+		<TagItem v-for="category in project.additional_categories" :key="category">
+			{{ formatCategory(formatMessage, category) }}
+		</TagItem>
+	</div>
 </template>
 
 <script setup lang="ts">
-import { formatCategory, useVIntl } from '@modrinth/ui'
+import { formatCategory, TagItem, useVIntl } from '@modrinth/ui'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
-
-import { projectReviewMessages as messages } from '../../messages'
 
 const { project } = injectProjectReviewPageContext()
 const { formatMessage } = useVIntl()
