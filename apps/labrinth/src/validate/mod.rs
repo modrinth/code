@@ -1,5 +1,4 @@
 use crate::database::PgTransaction;
-use crate::database::models::DatabaseError;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::models::loader_fields::VersionField;
 use crate::models::pack::PackFormat;
@@ -52,8 +51,8 @@ pub enum ValidationError {
     InvalidInput(std::borrow::Cow<'static, str>),
     #[error("Error while managing threads")]
     Blocking(#[from] actix_web::error::BlockingError),
-    #[error("Error while querying database")]
-    Database(#[from] DatabaseError),
+    #[error("internal error while validating uploaded file")]
+    Internal(#[from] eyre::Report),
 }
 
 #[derive(Eq, PartialEq, Debug)]

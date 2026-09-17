@@ -2,15 +2,20 @@ use std::collections::HashSet;
 
 use actix_http::StatusCode;
 use actix_web::test;
+use ariadne::ids::base62_impl::parse_base62;
+use chrono::Utc;
 use common::api_v3::ApiV3;
 use common::environment::{TestEnvironment, with_test_environment};
 use itertools::Itertools;
 use labrinth::database::models::{
-    DBUserId, legacy_loader_fields::MinecraftGameVersion,
+    DBUserId, DBVersionId,
+    legacy_loader_fields::MinecraftGameVersion,
     user_limits::DBUserLimits,
+    version_item::{VERSIONS_NAMESPACE, VersionQueryResult},
 };
 use labrinth::models::v3;
 use serde_json::json;
+use xredis::RedisValue;
 
 use crate::common::api_common::{ApiProject, ApiVersion};
 use crate::common::api_v3::request_data::get_public_project_creation_data;
@@ -366,6 +371,147 @@ async fn creating_loader_fields() {
         );
     })
     .await
+}
+
+#[actix_rt::test]
+async fn version_edit_uses_submitted_loaders_for_field_validation() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let version_id = &test_env.dummy.project_alpha.version_id;
+
+            let response = api
+                .edit_version(
+                    version_id,
+                    json!({
+                        "loaders": ["bukkit"]
+                    }),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+
+            let response = api
+                .edit_version(
+                    version_id,
+                    json!({
+                        "loaders": ["fabric"],
+                        "game_versions": ["1.20.1"],
+                        "environment": "client_only",
+                        "test_fabric_optional": 42
+                    }),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+
+            let version = api
+                .get_version_deserialized(version_id, USER_USER_PAT)
+                .await;
+            assert_eq!(version.loaders.len(), 1);
+            assert_eq!(version.loaders[0].0, "fabric");
+            assert_eq!(version.fields["game_versions"], json!(["1.20.1"]));
+            assert_eq!(version.fields["environment"], json!("client_only"));
+            assert_eq!(version.fields["test_fabric_optional"], json!(42));
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
+async fn version_edit_uses_authoritative_loaders_for_field_validation() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let version_id = &test_env.dummy.project_alpha.version_id;
+            api.get_version_deserialized(version_id, USER_USER_PAT)
+                .await;
+
+            let parsed_version_id = parse_base62(version_id).unwrap();
+            let mut redis = test_env.db.redis_pool.connect().await.unwrap();
+            let version_key =
+                redis.key().entity(VERSIONS_NAMESPACE, parsed_version_id);
+            let cached_version: RedisValue<
+                VersionQueryResult,
+                DBVersionId,
+                String,
+            > = redis.get_deserialized(&version_key).await.unwrap().unwrap();
+            let mut stale_version = cached_version.value().clone();
+            stale_version.loaders = vec!["bukkit".to_string()];
+            redis
+                .set_serialized(
+                    &version_key,
+                    &RedisValue::new(
+                        DBVersionId(parsed_version_id as i64),
+                        None::<String>,
+                        Utc::now().timestamp(),
+                        stale_version,
+                    ),
+                    None,
+                )
+                .await
+                .unwrap();
+            drop(redis);
+
+            let response = api
+                .edit_version(
+                    version_id,
+                    json!({
+                        "test_fabric_optional": 73
+                    }),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+
+            let version = api
+                .get_version_deserialized(version_id, USER_USER_PAT)
+                .await;
+            assert_eq!(version.fields["test_fabric_optional"], json!(73));
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
+async fn version_edit_lists_all_incompatible_loader_fields() {
+    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
+        let api = &test_env.api;
+        let version_id = &test_env.dummy.project_alpha.version_id;
+
+        let response = api
+            .edit_version(
+                version_id,
+                json!({
+                    "loaders": ["bukkit"]
+                }),
+                USER_USER_PAT,
+            )
+            .await;
+        assert_status!(&response, StatusCode::NO_CONTENT);
+
+        let response = api
+            .edit_version(
+                version_id,
+                json!({
+                    "test_fabric_optional": 42,
+                    "mrpack_loaders": ["fabric"],
+                    "environment": "client_only"
+                }),
+                USER_USER_PAT,
+            )
+            .await;
+        assert_status!(&response, StatusCode::BAD_REQUEST);
+        let body: serde_json::Value = test::read_body_json(response).await;
+        assert_eq!(body["error"], "request_error");
+        assert_eq!(
+            body["description"],
+            "loader fields `mrpack_loaders`, `test_fabric_optional` do not exist for any loaders supplied"
+        );
+    })
+    .await;
 }
 
 #[actix_rt::test]

@@ -1,8 +1,8 @@
 use super::ids::*;
 use crate::database::PgTransaction;
-use crate::database::models::DatabaseError;
 use crate::models::threads::{MessageBody, ThreadType};
 use chrono::{DateTime, Utc};
+use eyre::{Result, WrapErr};
 use serde::{Deserialize, Serialize};
 
 pub struct ThreadBuilder {
@@ -45,8 +45,10 @@ impl ThreadMessageBuilder {
     pub async fn insert(
         &self,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<DBThreadMessageId, DatabaseError> {
-        let thread_message_id = generate_thread_message_id(transaction).await?;
+    ) -> Result<DBThreadMessageId> {
+        let thread_message_id = generate_thread_message_id(transaction)
+            .await
+            .wrap_err("generating thread message id")?;
 
         sqlx::query!(
             "
@@ -59,12 +61,14 @@ impl ThreadMessageBuilder {
             ",
             thread_message_id as DBThreadMessageId,
             self.author_id.map(|x| x.0),
-            serde_json::value::to_value(self.body.clone())?,
+            serde_json::value::to_value(self.body.clone())
+                .wrap_err("serializing thread message body")?,
             self.thread_id as DBThreadId,
             self.hide_identity
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("inserting thread message")?;
 
         Ok(thread_message_id)
     }
@@ -74,8 +78,10 @@ impl ThreadBuilder {
     pub async fn insert(
         &self,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<DBThreadId, DatabaseError> {
-        let thread_id = generate_thread_id(&mut *transaction).await?;
+    ) -> Result<DBThreadId> {
+        let thread_id = generate_thread_id(&mut *transaction)
+            .await
+            .wrap_err("generating thread id")?;
         sqlx::query!(
             "
             INSERT INTO threads (
@@ -91,7 +97,8 @@ impl ThreadBuilder {
             self.report_id.map(|x| x.0),
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("inserting thread")?;
 
         let (thread_ids, members): (Vec<_>, Vec<_>) =
             self.members.iter().map(|m| (thread_id.0, m.0)).unzip();
@@ -106,7 +113,8 @@ impl ThreadBuilder {
             &members[..],
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("inserting thread members")?;
 
         Ok(thread_id)
     }

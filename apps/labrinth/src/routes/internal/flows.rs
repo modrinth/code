@@ -2003,12 +2003,15 @@ impl AccountRegisterFlow {
         self,
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
-    ) -> Result<ReadyAccountRegisterFlow, AccountRegisterValidateError> {
-        validator::Validate::validate(&self).map_err(|err| {
-            AccountRegisterValidateError::InvalidInput(
+    ) -> Result<
+        Result<ReadyAccountRegisterFlow, AccountRegisterValidateError>,
+        ApiError,
+    > {
+        if let Err(err) = validator::Validate::validate(&self) {
+            return Ok(Err(AccountRegisterValidateError::InvalidInput(
                 validation_errors_to_string(err, None),
-            )
-        })?;
+            )));
+        }
 
         if crate::database::models::DBUser::get(
             &self.username,
@@ -2016,12 +2019,10 @@ impl AccountRegisterFlow {
             redis,
         )
         .await
-        .map_err(|err| {
-            AccountRegisterValidateError::InvalidInput(err.to_string())
-        })?
+        .wrap_internal_err("fetching existing user with username")?
         .is_some()
         {
-            return Err(AccountRegisterValidateError::UsernameTaken);
+            return Ok(Err(AccountRegisterValidateError::UsernameTaken));
         }
 
         let score =
@@ -2032,7 +2033,9 @@ impl AccountRegisterFlow {
                 .feedback()
                 .and_then(|x| x.warning())
                 .map(|w| w.to_string());
-            return Err(AccountRegisterValidateError::WeakPassword(feedback));
+            return Ok(Err(AccountRegisterValidateError::WeakPassword(
+                feedback,
+            )));
         }
 
         if !crate::database::models::DBUser::get_by_case_insensitive_email(
@@ -2040,15 +2043,13 @@ impl AccountRegisterFlow {
             &mut *transaction,
         )
         .await
-        .map_err(|err| {
-            AccountRegisterValidateError::InvalidInput(err.to_string())
-        })?
+        .wrap_internal_err("fetching existing user with email")?
         .is_empty()
         {
-            return Err(AccountRegisterValidateError::DuplicateEmail);
+            return Ok(Err(AccountRegisterValidateError::DuplicateEmail));
         }
 
-        Ok(ReadyAccountRegisterFlow { inner: self })
+        Ok(Ok(ReadyAccountRegisterFlow { inner: self }))
     }
 }
 
@@ -2165,16 +2166,16 @@ pub async fn validate_create_account_with_password(
     pool: Data<PgPool>,
     redis: Data<RedisPool>,
     new_account: web::Json<NewAccount>,
-) -> Result<(), AccountRegisterValidateError> {
-    let mut transaction = pool.begin().await.map_err(|err| {
-        AccountRegisterValidateError::InvalidInput(err.to_string())
-    })?;
+) -> Result<Result<(), AccountRegisterValidateError>, ApiError> {
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("beginning transaction")?;
 
     AccountRegisterFlow::from(new_account.into_inner())
         .validate(&mut transaction, &redis)
-        .await?;
-
-    Ok(())
+        .await
+        .map(|r| r.map(drop))
 }
 
 /// Create account with a password.
@@ -2221,8 +2222,8 @@ pub async fn create_account_with_password(
 
     let ready_flow = AccountRegisterFlow::from(new_account)
         .validate(&mut transaction, &redis)
-        .await
-        .wrap_internal_err("validating ready flow")?;
+        .await?
+        .wrap_request_err("invalid account details")?;
 
     let res = ready_flow
         .execute(req, &mut transaction, &redis, &email)

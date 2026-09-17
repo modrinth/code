@@ -56,10 +56,10 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 
 #[derive(Error, Debug)]
 pub enum CreateError {
+    #[error(transparent)]
+    InternalError(#[from] eyre::Report),
     #[error("An unknown database error occurred")]
     SqlxDatabaseError(#[from] sqlx::Error),
-    #[error("Database Error: {0}")]
-    DatabaseError(#[from] models::DatabaseError),
     #[error("Error while parsing multipart payload: {0}")]
     MultipartError(#[from] actix_multipart::MultipartError),
     #[error("Error while parsing JSON: {0}")]
@@ -111,9 +111,7 @@ impl From<crate::routes::ApiError> for CreateError {
             crate::routes::ApiError::Request(err) => {
                 Self::InvalidInput(format!("{err:#}"))
             }
-            err => Self::DatabaseError(models::DatabaseError::SchemaError(
-                format!("{err:#}"),
-            )),
+            err => Self::InternalError(eyre::eyre!("{err:#}")),
         }
     }
 }
@@ -121,10 +119,10 @@ impl From<crate::routes::ApiError> for CreateError {
 impl actix_web::ResponseError for CreateError {
     fn status_code(&self) -> StatusCode {
         match self {
+            CreateError::InternalError(..) => StatusCode::INTERNAL_SERVER_ERROR,
             CreateError::SqlxDatabaseError(..) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
-            CreateError::DatabaseError(..) => StatusCode::INTERNAL_SERVER_ERROR,
             CreateError::FileHostingError(..) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
@@ -155,8 +153,8 @@ impl actix_web::ResponseError for CreateError {
     fn error_response(&self) -> HttpResponse {
         HttpResponse::build(self.status_code()).json(ApiError {
             error: match self {
+                CreateError::InternalError(..) => "database_error",
                 CreateError::SqlxDatabaseError(..) => "database_error",
-                CreateError::DatabaseError(..) => "database_error",
                 CreateError::FileHostingError(..) => "file_hosting_error",
                 CreateError::SerDeError(..) => "invalid_input",
                 CreateError::MultipartError(..) => "invalid_input",
@@ -601,7 +599,7 @@ async fn project_create_inner(
             )
             .fetch_one(&mut *transaction)
             .await
-            .map_err(|e| CreateError::DatabaseError(e.into()))?;
+            .map_err(CreateError::SqlxDatabaseError)?;
 
             if results.exists.unwrap_or(false) {
                 return Err(CreateError::SlugCollision);
@@ -622,7 +620,7 @@ async fn project_create_inner(
             )
             .fetch_one(&mut *transaction)
             .await
-            .map_err(|e| CreateError::DatabaseError(e.into()))?;
+            .map_err(CreateError::SqlxDatabaseError)?;
 
             if results.exists.unwrap_or(false) {
                 return Err(CreateError::SlugCollision);

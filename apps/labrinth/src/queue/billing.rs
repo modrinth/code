@@ -1,4 +1,5 @@
 use crate::database::models::charge_item::DBCharge;
+use crate::database::models::ids::*;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::product_item::DBProduct;
 use crate::database::models::products_tax_identifier_item::DBProductsTaxIdentifier;
@@ -6,7 +7,6 @@ use crate::database::models::user_item::DBUser;
 use crate::database::models::user_subscription_item::DBUserSubscription;
 use crate::database::models::users_redeemals::UserRedeemal;
 use crate::database::models::users_subscriptions_affiliations::DBUsersSubscriptionsAffiliations;
-use crate::database::models::{DatabaseError, ids::*};
 use crate::database::models::{
     product_item, user_subscription_item, users_redeemals,
 };
@@ -90,19 +90,15 @@ async fn update_tax_amounts(
                     )
                     .await
                     .wrap_api_err("fetching price")?
-                    .ok_or_else(|| {
-                        DatabaseError::Database(sqlx::Error::RowNotFound)
-                    })
-                    .wrap_internal_err("querying database for `update_tax_amounts`")?;
+                    .wrap_internal_err(
+                        "finding product tax identifier for price",
+                    )?;
 
                     let product = DBProduct::get_price(charge.price_id, &pg)
                         .await
                         .wrap_internal_err(
                             "fetching product price from database",
                         )?
-                        .ok_or_else(|| {
-                            DatabaseError::Database(sqlx::Error::RowNotFound)
-                        })
                         .wrap_internal_err(
                             "finding product price in database",
                         )?;
@@ -402,10 +398,7 @@ async fn update_anrok_transactions(
         let tax_id = DBProductsTaxIdentifier::get_price(c.price_id, &mut *txn)
             .await
             .wrap_api_err("fetching price")?
-            .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))
-            .wrap_internal_err(
-                "fetching products tax identifier from database",
-            )?;
+            .wrap_internal_err("finding product tax identifier for price")?;
 
         // Note: if the tax amount that was charged to the customer is *different* than
         // what it *should* be NOW, we will take on a loss here.

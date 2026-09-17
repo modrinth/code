@@ -8,7 +8,7 @@ use crate::auth::checks::{
 use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::database::models::loader_fields::{
-    self, LoaderField, LoaderFieldEnumValue, VersionField,
+    LoaderField, LoaderFieldEnumValue, VersionField,
 };
 use crate::database::models::version_item::{
     DBLoaderVersion, DependencyBuilder,
@@ -82,7 +82,7 @@ pub async fn version_project_get_helper(
 ) -> Result<HttpResponse, ApiError> {
     let result = database::models::DBProject::get(&id.0, &***ro_pool, &redis)
         .await
-        .wrap_api_err("fetching project from database")?;
+        .wrap_internal_err("fetching project from database")?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -536,6 +536,31 @@ pub async fn version_edit_helper(
                 .await
                 .wrap_internal_err("starting database transaction")?;
 
+            let new_loader_ids =
+                if let Some(loaders) = &new_version.loaders {
+                    let mut loader_ids = Vec::with_capacity(loaders.len());
+                    for loader in loaders {
+                        let loader_id =
+                            database::models::loader_fields::Loader::get_id(
+                                &loader.0,
+                                &mut transaction,
+                                &redis,
+                            )
+                            .await
+                            .wrap_internal_err("fetching loader from Redis")?
+                            .wrap_request_err_with(|| {
+                                format!(
+                                    "no database entry for loader `{}`",
+                                    loader.0
+                                )
+                            })?;
+                        loader_ids.push(loader_id);
+                    }
+                    Some(loader_ids)
+                } else {
+                    None
+                };
+
             if let Some(name) = &new_version.name {
                 sqlx::query!(
                     "
@@ -624,31 +649,67 @@ pub async fn version_edit_helper(
                     .map(|x| x.to_string())
                     .collect::<Vec<String>>();
 
-                let all_loaders =
-                    loader_fields::Loader::list(&mut transaction, &redis)
-                        .await
-                        .wrap_internal_err("fetching loader from Redis")?;
-                let loader_ids = version_item
-                    .loaders
-                    .iter()
-                    .filter_map(|x| {
-                        all_loaders
-                            .iter()
-                            .find(|y| &y.loader == x)
-                            .map(|y| y.id)
-                    })
-                    .collect_vec();
+                let loader_ids = if let Some(loader_ids) = &new_loader_ids {
+                    loader_ids.clone()
+                } else {
+                    sqlx::query!(
+                        "
+                        SELECT loader_id
+                        FROM loaders_versions
+                        WHERE version_id = $1
+                        ",
+                        version_id as database::models::ids::DBVersionId,
+                    )
+                    .fetch_all(&mut transaction)
+                    .await
+                    .wrap_internal_err(
+                        "fetching version loaders from database",
+                    )?
+                    .into_iter()
+                    .map(|row| database::models::ids::LoaderId(row.loader_id))
+                    .collect_vec()
+                };
 
-                let loader_fields = LoaderField::get_fields(
+                let available_loader_fields = LoaderField::get_fields(
                     &loader_ids,
                     &mut transaction,
                     &redis,
                 )
                 .await
-                .wrap_internal_err("fetching loader field from Redis")?
-                .into_iter()
-                .filter(|lf| version_fields_names.contains(&lf.field))
-                .collect::<Vec<LoaderField>>();
+                .wrap_internal_err("fetching loader field from Redis")?;
+
+                let mut incompatible_loader_fields = version_fields_names
+                    .iter()
+                    .filter(|field| {
+                        !available_loader_fields
+                            .iter()
+                            .any(|loader_field| &loader_field.field == *field)
+                    })
+                    .cloned()
+                    .collect_vec();
+                incompatible_loader_fields.sort_unstable();
+
+                if !incompatible_loader_fields.is_empty() {
+                    let fields = incompatible_loader_fields
+                        .iter()
+                        .map(|field| format!("`{field}`"))
+                        .join(", ");
+                    let message = if incompatible_loader_fields.len() == 1 {
+                        format!(
+                            "loader field {fields} does not exist for any loaders supplied"
+                        )
+                    } else {
+                        format!(
+                            "loader fields {fields} do not exist for any loaders supplied"
+                        )
+                    };
+                    return Err(ApiError::Request(eyre::eyre!(message)));
+                }
+
+                let loader_fields = available_loader_fields
+                    .into_iter()
+                    .filter(|lf| version_fields_names.contains(&lf.field))
+                    .collect::<Vec<LoaderField>>();
 
                 let loader_field_ids = loader_fields
                     .iter()
@@ -708,7 +769,7 @@ pub async fn version_edit_helper(
                     )?;
             }
 
-            if let Some(loaders) = &new_version.loaders {
+            if let Some(loader_ids) = new_loader_ids {
                 sqlx::query!(
                     "
                     DELETE FROM loaders_versions WHERE version_id = $1
@@ -719,27 +780,13 @@ pub async fn version_edit_helper(
                 .await
                 .wrap_internal_err("fetching loaders from database")?;
 
-                let mut loader_versions = Vec::new();
-                for loader in loaders {
-                    let loader_id =
-                        database::models::loader_fields::Loader::get_id(
-                            &loader.0,
-                            &mut transaction,
-                            &redis,
-                        )
-                        .await
-                        .wrap_internal_err("fetching loader from Redis")?
-                        .wrap_request_err_with(
-                            || {
-                                "no database entry for loader provided."
-                                    .to_string()
-                            },
-                        )?;
-                    loader_versions.push(DBLoaderVersion {
+                let loader_versions = loader_ids
+                    .into_iter()
+                    .map(|loader_id| DBLoaderVersion {
                         loader_id,
                         version_id,
-                    });
-                }
+                    })
+                    .collect();
                 DBLoaderVersion::insert_many(loader_versions, &mut transaction)
                     .await
                     .wrap_internal_err(
@@ -1025,7 +1072,7 @@ pub async fn version_list_internal(
 
     let result = database::models::DBProject::get(&string, &***ro_pool, &redis)
         .await
-        .wrap_api_err("fetching project from database")?;
+        .wrap_internal_err("fetching project from database")?;
 
     let user_option = get_user_from_headers(
         &req,
