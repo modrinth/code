@@ -100,42 +100,6 @@ const optionalAuthenticate = async (req, res, next) => {
     next();
 };
 
-// Middleware для проверки API токена (для плагинов)
-const authenticateApiToken = async (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token) {
-        return res.status(401).json({ error: 'Токен доступа отсутствует' });
-    }
-
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
-        // Для API токенов просто проверяем пользователя в базе
-        const userResult = await db.query(
-            'SELECT * FROM users WHERE id = $1',
-            [decoded.userId]
-        );
-
-        if (userResult.rows.length === 0) {
-            return res.status(401).json({ error: 'Пользователь не найден' });
-        }
-
-        req.user = userResult.rows[0];
-        
-        // Роль уже есть в таблице users
-        if (!req.user.role) {
-            req.user.role = 'user'; // Значение по умолчанию
-        }
-        
-        next();
-    } catch (error) {
-        console.error('Ошибка проверки API токена:', error);
-        return res.status(403).json({ error: 'Недействительный токен' });
-    }
-};
-
 function emailVerificationUrl(token) {
     const base = (process.env.FRONTEND_URL || 'http://localhost:3000').replace(/\/+$/, '');
     return `${base}/verify?token=${token}`;
@@ -187,26 +151,6 @@ function bearerOrApiKey(req) {
     }
     return typeof token === 'string' ? token : null;
 }
-
-// Strict middleware for plugin/server write endpoints. A normal website JWT is
-// never accepted here, even if it belongs to an administrator.
-const authenticateLongTermApiTokenOnly = async (req, res, next) => {
-    const token = bearerOrApiKey(req);
-
-    if (!token) {
-        return res.status(401).json({ error: 'API токен отсутствует' });
-    }
-
-    try {
-        const tokenData = await findLongTermApiToken(token);
-        if (!tokenData) return res.status(403).json({ error: 'Недействительный API токен' });
-        attachLongTermApiToken(req, tokenData);
-        return next();
-    } catch (error) {
-        console.error('Ошибка проверки API токена:', error);
-        return res.status(403).json({ error: 'Недействительный токен' });
-    }
-};
 
 // Hybrid middleware retained for admin routes that support either a signed-in
 // website session or a long-term admin API key.
@@ -1170,9 +1114,7 @@ router.post('/terminate-game-sessions', pluginGone);
 
 router.authenticateToken = authenticateToken;
 router.optionalAuthenticate = optionalAuthenticate;
-router.authenticateApiToken = authenticateApiToken;
 router.authenticateLongTermApiToken = authenticateLongTermApiToken;
-router.authenticateLongTermApiTokenOnly = authenticateLongTermApiTokenOnly;
 router.requireRole = requireRole;
 
 module.exports = router;

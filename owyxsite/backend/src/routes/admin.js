@@ -4,7 +4,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const db = require('../database/connection');
-const { authenticateToken, authenticateApiToken, authenticateLongTermApiToken, requireRole } = require('./auth');
+const { authenticateToken, authenticateLongTermApiToken, requireRole } = require('./auth');
 const bcrypt = require('bcryptjs');
 
 const router = express.Router();
