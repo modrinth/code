@@ -472,3 +472,42 @@ html {
 
 	--brand-gradient-strong-bg: #3a3b38;
 }
+
+.magma-mode {
+	@extend .dark-mode;
+	--color-brand: #f87171;
+	--color-brand-highlight: rgba(248, 113, 113, 0.25);
+	--color-brand-shadow: rgba(248, 113, 113, 0.55);
+	--brand-gradient-bg: linear-gradient(0deg, rgba(248, 113, 113, 0.14) 0%, rgba(5, 5, 8, 0.2) 100%);
+	--brand-gradient-strong-bg: linear-gradient(270deg, #050508 10%, #1a0a0a 100%);
+	--brand-gradient-border: rgba(248, 113, 113, 0.2);
+	--loading-bar-gradient: linear-gradient(to right, #f87171 0%, #7f1d1d 100%);
+	--splash-tint-top: rgba(248, 113, 113, 0.2);
+	--color-button-text-selected: var(--color-brand);
+}
+
+.onyx-mode {
+	@extend .dark-mode;
+	--color-brand: #f5f5f5;
+	--color-brand-highlight: rgba(245, 245, 245, 0.18);
+	--color-brand-shadow: rgba(255, 255, 255, 0.35);
+	--brand-gradient-bg: linear-gradient(0deg, rgba(255, 255, 255, 0.1) 0%, rgba(5, 5, 8, 0.25) 100%);
+	--brand-gradient-strong-bg: linear-gradient(270deg, #050508 10%, #141414 100%);
+	--brand-gradient-border: rgba(245, 245, 245, 0.18);
+	--loading-bar-gradient: linear-gradient(to right, #ffffff 0%, #a3a3a3 100%);
+	--splash-tint-top: rgba(255, 255, 255, 0.14);
+	--color-button-text-selected: var(--color-brand);
+}
+
+.synthwave-mode {
+	@extend .dark-mode;
+	--color-brand: #ec4899;
+	--color-brand-highlight: rgba(236, 72, 153, 0.25);
+	--color-brand-shadow: rgba(236, 72, 153, 0.55);
+	--brand-gradient-bg: linear-gradient(0deg, rgba(236, 72, 153, 0.14) 0%, rgba(5, 5, 8, 0.2) 100%);
+	--brand-gradient-strong-bg: linear-gradient(270deg, #050508 10%, #1a0a14 100%);
+	--brand-gradient-border: rgba(236, 72, 153, 0.22);
+	--loading-bar-gradient: linear-gradient(to right, #f9a8d4 0%, #ec4899 50%, #831843 100%);
+	--splash-tint-top: rgba(236, 72, 153, 0.2);
+	--color-button-text-selected: var(--color-brand);
+}

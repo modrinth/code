@@ -18,6 +18,7 @@ export type OwyxFriend = {
 	id: string
 	userId: string
 	nickname: string
+	displayNickname?: string
 	avatarUrl?: string | null
 	status: 'pending' | 'accepted'
 	incoming: boolean
@@ -26,6 +27,10 @@ export type OwyxFriend = {
 	presence?: OwyxFriendPresence
 	instanceName?: string | null
 	presenceUpdatedAt?: string | null
+}
+
+export function owyxFriendLabel(friend: Pick<OwyxFriend, 'nickname' | 'displayNickname'>): string {
+	return (friend.displayNickname || friend.nickname || '').trim() || friend.nickname
 }
 
 async function owyxFetch(input: string, init?: RequestInit): Promise<Response> {
@@ -105,14 +110,19 @@ export async function postOwyxPresence(opts: {
 
 export async function searchOwyxUsers(
 	q: string,
-): Promise<{ id: string; nickname: string; avatarUrl?: string | null }[]> {
+): Promise<{ id: string; nickname: string; displayNickname?: string; avatarUrl?: string | null }[]> {
 	const res = await owyxFetch(`${apiBase()}/api/friends/search?q=${encodeURIComponent(q)}`, {
 		method: 'GET',
 		headers: authHeaders(),
 		signal: AbortSignal.timeout(10000),
 	})
 	const data = (await res.json().catch(() => ({}))) as {
-		users?: { id: string; nickname: string; avatarUrl?: string | null }[]
+		users?: {
+			id: string
+			nickname: string
+			displayNickname?: string
+			avatarUrl?: string | null
+		}[]
 		error?: string
 	}
 	if (!res.ok) throw new Error(friendlyFriendsError(data.error, res.status, 'Search failed'))

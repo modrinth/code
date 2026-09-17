@@ -311,9 +311,9 @@ router.post('/register', [
 
         // Создаем пользователя
         const result = await db.query(
-            `INSERT INTO users (nickname, email, password_hash, first_name, registered_at) 
-             VALUES ($1, $2, $3, $4, NOW()) 
-             RETURNING id, nickname, email, first_name, registered_at`,
+            `INSERT INTO users (nickname, display_nickname, email, password_hash, first_name, registered_at) 
+             VALUES ($1, $1, $2, $3, $4, NOW()) 
+             RETURNING id, nickname, display_nickname, email, first_name, registered_at`,
             [loginName, email, passwordHash, first_name || null]
         );
 

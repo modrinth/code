@@ -50,8 +50,17 @@ export default function RootLayout({
   return (
     <html
       lang="ru"
+      data-accent="cyan"
       className={`${onest.variable} ${unbounded.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('owyx.siteTheme');if(t==='cyan'||t==='synthwave'||t==='onyx'||t==='magma'){document.documentElement.setAttribute('data-accent',t);}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className="min-h-screen overflow-x-clip flex flex-col">
         <div className="owyx-space" aria-hidden="true" />
         <div className="owyx-vignette" aria-hidden="true" />

@@ -353,6 +353,12 @@
   "app.features-settings.show-jump-in.title": {
     "message": "Показывать недавние сборки и миры"
   },
+  "app.features-settings.ui-sounds.title": {
+    "message": "Мягкие звуки интерфейса"
+  },
+  "app.features-settings.ui-sounds.description": {
+    "message": "Синтетические клики в приложении. Отключаются при prefers-reduced-motion."
+  },
   "app.features-settings.show-screenshots-tab.title": {
     "message": "Показывать вкладку Скриншоты в сборках"
   },
@@ -4626,7 +4632,28 @@
     "message": "Сессия сайта Owyx"
   },
   "minecraft-account.owyx-nick-too-long": {
-    "message": "Ник Owyx должен быть 3–16 символов (буквы, цифры, _). Смените его на owyx.site и попробуйте снова."
+    "message": "Отображаемый ник: 3–16 букв, цифр или _. Измените и попробуйте снова."
+  },
+  "minecraft-account.playing-as": {
+    "message": "Играете как"
+  },
+  "minecraft-account.login-as": {
+    "message": "Логин: {login}"
+  },
+  "minecraft-account.edit-display-nick": {
+    "message": "Сменить отображаемый ник"
+  },
+  "minecraft-account.edit-display-nick-title": {
+    "message": "Отображаемый ник"
+  },
+  "minecraft-account.edit-display-nick-hint": {
+    "message": "Виден друзьям и в игре. Логин не меняется. 3–16 букв, цифр или _."
+  },
+  "minecraft-account.cancel": {
+    "message": "Отмена"
+  },
+  "minecraft-account.save": {
+    "message": "Сохранить"
   },
   "friends.copy-server-address": {
     "message": "Скопировать адрес сервера"
@@ -4638,9 +4665,36 @@
     "message": "Адрес сервера скопирован"
   },
   "minecraft-account.account-hint": {
-    "message": "Owyx — друзья, скины и ник с сайта. Microsoft — лицензионный профиль и online-mode серверы."
+    "message": "Owyx — друзья, скины и отображаемый ник в игре. Microsoft — лицензионный профиль и online-mode серверы."
   },
   "minecraft-account.owyx": {
     "message": "Owyx"
+  },
+  "owyx.settings.social.open-friends": {
+    "message": "Открыть друзей"
+  },
+  "owyx.settings.social.stat-friends": {
+    "message": "Друзья"
+  },
+  "owyx.settings.social.stat-online": {
+    "message": "Онлайн"
+  },
+  "owyx.settings.social.stat-pending": {
+    "message": "Входящие"
+  },
+  "owyx.settings.social.presence-on": {
+    "message": "Активно"
+  },
+  "owyx.settings.social.presence-off": {
+    "message": "Выкл"
+  },
+  "owyx.settings.social.open-profile": {
+    "message": "Профиль на сайте"
+  },
+  "owyx.settings.social.install-csl": {
+    "message": "Установить CustomSkinLoader в сборку"
+  },
+  "owyx.settings.social.signed-in-as": {
+    "message": "Вы вошли как {nick}"
   }
 }

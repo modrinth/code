@@ -118,12 +118,15 @@ Also available as `GET /api/launcher/v1/me`.
   "user": {
     "id": 1,
     "nickname": "Steve",
+    "displayNickname": "Steve",
     "email": "steve@owyx.local",
     "role": "user",
     "trustLevel": 0,
     "banned": false,
     "emailVerified": false,
-    "registeredAt": "2026-08-06T01:13:43.477Z"
+    "registeredAt": "2026-08-06T01:13:43.477Z",
+    "nicknameChangedAt": null,
+    "emailChangedAt": null
   },
   "serverAccess": true,
   "accessReason": "ok",          // "ok" | "banned" | "inactive"
@@ -136,6 +139,12 @@ Also available as `GET /api/launcher/v1/me`.
   "application": null            // DEPRECATED: always null, removed next release
 }
 ```
+- `user.nickname` is the **login** (site/launcher auth). Change via
+  `PUT /api/profile/nickname` ≤ 1 / 30 days.
+- `user.displayNickname` is the **visible / in-game** name. Change via
+  `PUT /api/profile/display-nickname` (MC format `3–16` `[A-Za-z0-9_]`, unique
+  case-insensitive, rate limit 5/min). Launcher syncs offline play profile to
+  this value.
 - `serverAccess` = account is active **and** not banned.
 - `skinUrl` is absolute, built from the request host, so it is downloadable by
   whatever base the launcher used.
@@ -154,9 +163,9 @@ Also available as `GET /api/launcher/v1/me`.
 
 ### Friends (`/api/friends`, auth: Bearer + client key on api host)
 
-- `GET /api/friends` → `{ friends: [{ id, userId, nickname, avatarUrl, status, incoming, presence, instanceName, presenceUpdatedAt, ... }], incomingCount }`
-- `GET /api/friends/search?q=` → `{ users: [...] }`
-- `POST /api/friends/request` `{ nickname }` → create pending (or auto-accept reciprocal); respects target `allowFriendRequests`
+- `GET /api/friends` → `{ friends: [{ id, userId, nickname, displayNickname, avatarUrl, status, incoming, presence, instanceName, presenceUpdatedAt, ... }], incomingCount }`
+- `GET /api/friends/search?q=` → `{ users: [{ id, nickname, displayNickname, avatarUrl }] }` (match login or display)
+- `POST /api/friends/request` `{ nickname }` → create pending by **login** nickname (or auto-accept reciprocal); respects target `allowFriendRequests`
 - `POST /api/friends/:id/accept` · `POST /api/friends/:id/decline` · `DELETE /api/friends/:id`
 - `POST /api/friends/presence` `{ status: "online"|"playing"|"offline", instanceName? }` — launcher heartbeat; presence rows older than ~90s are treated as offline.
 - `GET /api/friends/settings` → `{ settings: { allowFriendRequests: boolean } }`
@@ -357,11 +366,18 @@ Confirm a NEW address with a 6-digit code sent to that new address (`Bearer` JWT
   response includes `devCode` for local testing. Production never echoes the
   code. Errors: `400` bad/existing email, `409` taken, `429` too soon.
 - `POST /api/profile/email/confirm` `{ code }` → applies the change, sets
-  `is_email_verified = true`. Errors: `400` no request / expired / wrong code.
+  `is_email_verified = true`, stamps `email_changed_at`. Errors: `400` no
+  request / expired / wrong code. Email change cooldown: **≤ 1 / 30 days**
+  (same as login).
 - Code lives 15 minutes (columns on `users`, migration `005_email_change.sql`).
 
-Nickname change stays at **≤ 1 / 30 days** (`PUT /api/profile/nickname`,
-migration `004_nickname_cooldown.sql`).
+Login nickname change stays at **≤ 1 / 30 days** (`PUT /api/profile/nickname`,
+migration `004_nickname_cooldown.sql`). Does **not** overwrite
+`display_nickname`.
+
+Display nickname: `PUT /api/profile/display-nickname`
+`{ displayNickname }` (or `display_nickname`) — unique, MC format, 5/min
+(migration `010_display_nickname.sql`).
 
 ---
 

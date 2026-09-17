@@ -5804,6 +5804,15 @@
 	"settings.display.theme.oled": {
 		"defaultMessage": "OLED"
 	},
+	"settings.display.theme.magma": {
+		"defaultMessage": "Magma"
+	},
+	"settings.display.theme.onyx": {
+		"defaultMessage": "Onyx"
+	},
+	"settings.display.theme.synthwave": {
+		"defaultMessage": "Synthwave"
+	},
 	"settings.display.theme.preferred-dark-theme": {
 		"defaultMessage": "Основная тёмная тема"
 	},

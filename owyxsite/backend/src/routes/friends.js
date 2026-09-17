@@ -77,8 +77,12 @@ function presenceFromRow(row) {
 
 function publicFriend(row, meId) {
   const otherId = Number(row.user_id) === Number(meId) ? row.friend_id : row.user_id;
-  const otherNick =
+  const otherLogin =
     Number(row.user_id) === Number(meId) ? row.friend_nickname : row.user_nickname;
+  const otherDisplay =
+    Number(row.user_id) === Number(meId)
+      ? row.friend_display_nickname || row.friend_nickname
+      : row.user_display_nickname || row.user_nickname;
   const otherAvatar =
     Number(row.user_id) === Number(meId) ? row.friend_avatar : row.user_avatar;
   const incoming = Number(row.friend_id) === Number(meId) && row.status === 'pending';
@@ -90,7 +94,8 @@ function publicFriend(row, meId) {
   return {
     id: String(row.id),
     userId: String(otherId),
-    nickname: otherNick,
+    nickname: otherLogin,
+    displayNickname: otherDisplay,
     avatarUrl: otherAvatar || null,
     status: row.status,
     incoming,
@@ -104,8 +109,12 @@ function publicFriend(row, meId) {
 
 const FRIEND_SELECT = `
   SELECT f.*,
-         u.nickname AS user_nickname, u.avatar_url AS user_avatar,
-         fr.nickname AS friend_nickname, fr.avatar_url AS friend_avatar,
+         u.nickname AS user_nickname,
+         COALESCE(u.display_nickname, u.nickname) AS user_display_nickname,
+         u.avatar_url AS user_avatar,
+         fr.nickname AS friend_nickname,
+         COALESCE(fr.display_nickname, fr.nickname) AS friend_display_nickname,
+         fr.avatar_url AS friend_avatar,
          p.status AS presence_status,
          p.instance_name AS presence_instance,
          p.updated_at AS presence_updated_at
@@ -211,28 +220,30 @@ router.post('/presence', async (req, res) => {
   }
 });
 
-// GET /api/friends/search?q=nick — find users by nickname
+// GET /api/friends/search?q=nick — find users by login or display nickname
 router.get('/search', async (req, res) => {
   try {
     const q = String(req.query.q || '').trim();
     if (q.length < 2) {
       return res.status(400).json({ error: 'at least 2 characters' });
     }
+    const like = `${q.replace(/[%_]/g, '')}%`;
     const result = await db.query(
-      `SELECT id, nickname, avatar_url
+      `SELECT id, nickname, COALESCE(display_nickname, nickname) AS display_nickname, avatar_url
        FROM users
        WHERE is_active IS DISTINCT FROM false
          AND is_banned IS DISTINCT FROM true
          AND id <> $1
-         AND nickname ILIKE $2
+         AND (nickname ILIKE $2 OR COALESCE(display_nickname, nickname) ILIKE $2)
        ORDER BY nickname ASC
        LIMIT 20`,
-      [req.user.id, `${q.replace(/[%_]/g, '')}%`]
+      [req.user.id, like]
     );
     res.json({
       users: result.rows.map((u) => ({
         id: String(u.id),
         nickname: u.nickname,
+        displayNickname: u.display_nickname || u.nickname,
         avatarUrl: u.avatar_url || null,
       })),
     });

@@ -81,6 +81,16 @@
 						</div>
 					</button>
 					<IconButton
+						v-if="owyxSite.isSignedIn.value && isOwyxPlayAccount(account)"
+						v-tooltip="formatMessage(messages.editDisplayNick)"
+						type="quiet"
+						:label="formatMessage(messages.editDisplayNick)"
+						class="!bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
+						@click="openDisplayNickModal()"
+					>
+						<EditIcon />
+					</IconButton>
+					<IconButton
 						v-tooltip="formatMessage(messages.removeAccount)"
 						type="quiet"
 						color="red"
@@ -96,9 +106,25 @@
 				v-if="owyxSite.isSignedIn.value"
 				class="mx-2 mt-1 mb-1 rounded-lg border border-solid border-surface-5 bg-surface-2 px-2.5 py-2 text-[11px] text-secondary"
 			>
-				<span class="font-medium text-brand">{{ formatMessage(messages.owyxSessionBadge) }}</span>
-				<span class="mx-1">·</span>
-				<span>{{ owyxSite.session.value?.user?.nickname }}</span>
+				<div class="flex items-center justify-between gap-2">
+					<div class="min-w-0">
+						<span class="font-medium text-brand">{{ formatMessage(messages.playingAs) }}</span>
+						<span class="mx-1">·</span>
+						<span class="text-contrast">{{ displayNickLabel }}</span>
+						<span v-if="loginNickLabel" class="block mt-0.5 text-[10px] text-secondary truncate">
+							{{ formatMessage(messages.loginAs, { login: loginNickLabel }) }}
+						</span>
+					</div>
+					<IconButton
+						v-tooltip="formatMessage(messages.editDisplayNick)"
+						type="quiet"
+						:label="formatMessage(messages.editDisplayNick)"
+						class="shrink-0 !bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
+						@click="openDisplayNickModal()"
+					>
+						<EditIcon />
+					</IconButton>
+				</div>
 			</div>
 			<div class="flex flex-col gap-2 px-2 pt-2">
 				<Button
@@ -124,10 +150,43 @@
 			</div>
 		</div>
 	</Accordion>
+
+	<ModalWrapper ref="displayNickModal" :header="formatMessage(messages.editDisplayNickTitle)">
+		<div class="flex flex-col gap-3 p-1">
+			<p class="m-0 text-sm text-secondary">
+				{{ formatMessage(messages.editDisplayNickHint) }}
+			</p>
+			<input
+				v-model="displayNickDraft"
+				class="w-full rounded-lg border border-solid border-surface-5 bg-surface-3 px-3 py-2 text-primary"
+				maxlength="16"
+				autocomplete="off"
+				spellcheck="false"
+				:disabled="displayNickSaving"
+				@keydown.enter.prevent="saveDisplayNick()"
+			/>
+			<p v-if="displayNickError" class="m-0 text-xs text-red">{{ displayNickError }}</p>
+			<div class="flex justify-end gap-2">
+				<Button :disabled="displayNickSaving" @click="closeDisplayNickModal()">
+					{{ formatMessage(messages.cancel) }}
+				</Button>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="displayNickSaving || !displayNickDraft.trim()"
+					@click="saveDisplayNick()"
+				>
+					<SpinnerIcon v-if="displayNickSaving" class="animate-spin" />
+					{{ formatMessage(messages.save) }}
+				</Button>
+			</div>
+		</div>
+	</ModalWrapper>
 </template>
 
 <script setup lang="ts">
 import {
+	EditIcon,
 	LogInIcon,
 	PlusIcon,
 	RadioButtonCheckedIcon,
@@ -147,6 +206,7 @@ import {
 import type { Ref } from 'vue'
 import { computed, onUnmounted, ref } from 'vue'
 
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { useAppEvent } from '@/composables/use-app-event'
 import { handleSevereError } from '@/composables/use-error.js'
 import { trackEvent } from '@/helpers/analytics'
@@ -159,6 +219,7 @@ import {
 	users,
 } from '@/helpers/auth'
 import { resolveOwyxAvatarUrl } from '@/helpers/owyx-avatar'
+import { updateOwyxDisplayNickname } from '@/helpers/owyx-site-auth'
 import { getPlayerHeadUrl } from '@/helpers/rendering/player-head'
 import type { Skin } from '@/helpers/skins'
 import { get_available_skins } from '@/helpers/skins'
@@ -188,7 +249,24 @@ const equippedSkin = ref<Skin | null>(null)
 const equippedHeadUrl = ref<string>()
 let headRequest = 0
 
-/** Owyx play profile (site nick → local credentials). Not shown as “offline”. */
+const displayNickModal = ref<InstanceType<typeof ModalWrapper> | null>(null)
+const displayNickDraft = ref('')
+const displayNickSaving = ref(false)
+const displayNickError = ref('')
+
+const displayNickLabel = computed(() => {
+	const u = owyxSite.session.value?.user
+	return (u?.displayNickname || u?.nickname || '').trim()
+})
+
+const loginNickLabel = computed(() => {
+	const u = owyxSite.session.value?.user
+	const login = (u?.nickname || '').trim()
+	const display = (u?.displayNickname || login).trim()
+	return login && login !== display ? login : ''
+})
+
+/** Owyx play profile (site display nick → local credentials). Not shown as “offline”. */
 function isOwyxPlayAccount(account?: MinecraftCredential | null) {
 	if (!account) return false
 	if (account.is_offline === true || account.refresh_token === 'owyx-offline') return true
@@ -264,11 +342,17 @@ const selectedAccount = computed(() =>
 	accounts.value.find((account) => account.profile.id === defaultUser.value),
 )
 
+function siteDisplayNick(): string {
+	const u = owyxSite.session.value?.user
+	return (u?.displayNickname || u?.nickname || '').trim()
+}
+
 function getAccountAvatarUrl(account: MinecraftCredential) {
 	if (isOwyxPlayAccount(account)) {
 		const site = owyxSite.session.value?.user
-		if (site?.nickname && site.nickname.toLowerCase() === account.profile.name.toLowerCase()) {
-			return resolveOwyxAvatarUrl(site.avatarUrl)
+		const playNick = siteDisplayNick()
+		if (playNick && playNick.toLowerCase() === account.profile.name.toLowerCase()) {
+			return resolveOwyxAvatarUrl(site?.avatarUrl)
 		}
 		return resolveOwyxAvatarUrl(null)
 	}
@@ -321,7 +405,7 @@ async function loginMicrosoft() {
 }
 
 /**
- * Sign in to Owyx site (friends/skins) and ensure a play profile for the site nickname.
+ * Sign in to Owyx site (friends/skins) and ensure a play profile for the display nickname.
  * Does not steal an active Microsoft account when other profiles already exist.
  */
 async function signInOwyxSite() {
@@ -329,7 +413,7 @@ async function signInOwyxSite() {
 	loginDisabled.value = true
 	try {
 		await owyxSite.signIn()
-		const nick = owyxSite.session.value?.user?.nickname
+		const nick = siteDisplayNick()
 		if (!nick) return
 		if (nick.length < 3 || nick.length > 16 || !/^[A-Za-z0-9_]+$/.test(nick)) {
 			handleError(new Error(formatMessage(messages.owyxNickTooLong)))
@@ -348,6 +432,39 @@ async function signInOwyxSite() {
 		handleError(e)
 	} finally {
 		loginDisabled.value = false
+	}
+}
+
+function openDisplayNickModal() {
+	displayNickError.value = ''
+	displayNickDraft.value = siteDisplayNick()
+	displayNickModal.value?.show()
+}
+
+function closeDisplayNickModal() {
+	displayNickModal.value?.hide()
+}
+
+async function saveDisplayNick() {
+	if (displayNickSaving.value) return
+	const next = displayNickDraft.value.trim()
+	if (!/^[A-Za-z0-9_]{3,16}$/.test(next)) {
+		displayNickError.value = formatMessage(messages.owyxNickTooLong)
+		return
+	}
+	displayNickSaving.value = true
+	displayNickError.value = ''
+	try {
+		await updateOwyxDisplayNickname(next)
+		await owyxSite.refresh()
+		await refreshValues()
+		emit('change')
+		closeDisplayNickModal()
+		trackEvent('OwyxDisplayNickChanged')
+	} catch (e) {
+		displayNickError.value = e instanceof Error ? e.message : String(e)
+	} finally {
+		displayNickSaving.value = false
 	}
 }
 
@@ -388,12 +505,41 @@ const messages = defineMessages({
 	owyxNickTooLong: {
 		id: 'minecraft-account.owyx-nick-too-long',
 		defaultMessage:
-			'Owyx nickname must be 3–16 letters, numbers, or underscores. Change it on owyx.site, then try again.',
+			'Display nickname must be 3–16 letters, numbers, or underscores. Change it and try again.',
+	},
+	playingAs: {
+		id: 'minecraft-account.playing-as',
+		defaultMessage: 'Playing as',
+	},
+	loginAs: {
+		id: 'minecraft-account.login-as',
+		defaultMessage: 'Login: {login}',
+	},
+	editDisplayNick: {
+		id: 'minecraft-account.edit-display-nick',
+		defaultMessage: 'Change display nickname',
+	},
+	editDisplayNickTitle: {
+		id: 'minecraft-account.edit-display-nick-title',
+		defaultMessage: 'Display nickname',
+	},
+	editDisplayNickHint: {
+		id: 'minecraft-account.edit-display-nick-hint',
+		defaultMessage:
+			'Shown to friends and used in-game. Your login stays the same. 3–16 letters, numbers, or _.',
+	},
+	cancel: {
+		id: 'minecraft-account.cancel',
+		defaultMessage: 'Cancel',
+	},
+	save: {
+		id: 'minecraft-account.save',
+		defaultMessage: 'Save',
 	},
 	accountHint: {
 		id: 'minecraft-account.account-hint',
 		defaultMessage:
-			'Owyx is for friends, skins, and your site nickname in game. Microsoft is for a licensed Minecraft profile and online-mode servers.',
+			'Owyx is for friends, skins, and your display nickname in game. Microsoft is for a licensed Minecraft profile and online-mode servers.',
 	},
 	addMicrosoft: {
 		id: 'minecraft-account.add-microsoft',

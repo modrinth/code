@@ -619,20 +619,38 @@ router.delete('/skin', authenticateToken, async (req, res) => {
     res.json({ success: true, message: 'Скин удалён' });
 });
 
-// PUT /api/profile/nickname - change nickname, at most once per 30 days.
+// PUT /api/profile/nickname - change login nickname, at most once per 30 days.
+// Does not overwrite display_nickname (even if it still matched the old login).
 const NICK_COOLDOWN_DAYS = 30;
+const EMAIL_COOLDOWN_DAYS = 30;
+const DISPLAY_NICK_RATE_WINDOW_MS = 60 * 1000;
+const DISPLAY_NICK_RATE_MAX = 5;
+const displayNickRateBuckets = new Map();
+
+function checkDisplayNickRate(userId) {
+    const now = Date.now();
+    let bucket = displayNickRateBuckets.get(userId);
+    if (!bucket || now - bucket.windowStart >= DISPLAY_NICK_RATE_WINDOW_MS) {
+        bucket = { windowStart: now, count: 0 };
+        displayNickRateBuckets.set(userId, bucket);
+    }
+    bucket.count += 1;
+    return bucket.count <= DISPLAY_NICK_RATE_MAX;
+}
+
+function isValidMcNick(raw) {
+    return typeof raw === 'string' && raw.length >= 3 && raw.length <= 16 && /^[A-Za-z0-9_]+$/.test(raw);
+}
+
 router.put('/nickname', authenticateToken, async (req, res) => {
     try {
         const raw = (req.body && req.body.nickname != null) ? String(req.body.nickname).trim() : '';
-        if (raw.length < 3 || raw.length > 16) {
-            return res.status(400).json({ error: 'Ник должен быть от 3 до 16 символов' });
-        }
-        if (!/^[a-zA-Z0-9_]+$/.test(raw)) {
-            return res.status(400).json({ error: 'Ник может содержать только буквы, цифры и _' });
+        if (!isValidMcNick(raw)) {
+            return res.status(400).json({ error: 'Логин должен быть от 3 до 16 символов (буквы, цифры, _)' });
         }
 
         const current = await db.query(
-            'SELECT nickname, nickname_changed_at FROM users WHERE id = $1',
+            'SELECT nickname, nickname_changed_at, display_nickname FROM users WHERE id = $1',
             [req.user.id]
         );
         if (current.rows.length === 0) {
@@ -641,29 +659,31 @@ router.put('/nickname', authenticateToken, async (req, res) => {
         const row = current.rows[0];
 
         if (row.nickname === raw) {
-            return res.status(400).json({ error: 'Это уже ваш текущий ник' });
+            return res.status(400).json({ error: 'Это уже ваш текущий логин' });
         }
 
-        // 30-day cooldown.
         if (row.nickname_changed_at) {
             const changedAt = new Date(row.nickname_changed_at).getTime();
             const nextAllowed = changedAt + NICK_COOLDOWN_DAYS * 24 * 60 * 60 * 1000;
             if (Date.now() < nextAllowed) {
                 const daysLeft = Math.ceil((nextAllowed - Date.now()) / (24 * 60 * 60 * 1000));
                 return res.status(429).json({
-                    error: `Ник можно менять раз в ${NICK_COOLDOWN_DAYS} дней. Попробуйте через ${daysLeft} дн.`,
+                    error: `Логин можно менять раз в ${NICK_COOLDOWN_DAYS} дней. Попробуйте через ${daysLeft} дн.`,
                     next_allowed_at: new Date(nextAllowed).toISOString()
                 });
             }
         }
 
-        // Uniqueness (case-insensitive).
         const taken = await db.query(
-            'SELECT id FROM users WHERE LOWER(nickname) = LOWER($1) AND id <> $2',
+            `SELECT id FROM users
+             WHERE id <> $2 AND (
+               LOWER(nickname) = LOWER($1)
+               OR LOWER(COALESCE(display_nickname, nickname)) = LOWER($1)
+             )`,
             [raw, req.user.id]
         );
         if (taken.rows.length > 0) {
-            return res.status(409).json({ error: 'Этот ник уже занят' });
+            return res.status(409).json({ error: 'Этот логин уже занят' });
         }
 
         await db.query(
@@ -674,9 +694,8 @@ router.put('/nickname', authenticateToken, async (req, res) => {
         await db.query(`
             INSERT INTO user_activity (user_id, activity_type, description)
             VALUES ($1, 'nickname_change', $2)
-        `, [req.user.id, `Ник изменён на ${raw}`]).catch(() => {});
+        `, [req.user.id, `Логин изменён на ${raw}`]).catch(() => {});
 
-        // Notify by email (best-effort; simulated in logs when SMTP is off).
         try {
             const { sendNicknameChangedEmail } = require('../utils/emailService');
             if (req.user.email) sendNicknameChangedEmail(req.user.email, row.nickname, raw).catch(() => {});
@@ -684,12 +703,75 @@ router.put('/nickname', authenticateToken, async (req, res) => {
 
         res.json({
             success: true,
-            message: 'Ник изменён',
+            message: 'Логин изменён',
             nickname: raw,
+            display_nickname: row.display_nickname || row.nickname,
             nickname_changed_at: new Date().toISOString()
         });
     } catch (error) {
-        console.error('Ошибка смены ника:', error);
+        console.error('Ошибка смены логина:', error);
+        res.status(500).json({ error: 'Не удалось изменить логин' });
+    }
+});
+
+// PUT /api/profile/display-nickname — visible / in-game nick (unique, MC format, 5/min).
+router.put('/display-nickname', authenticateToken, async (req, res) => {
+    try {
+        if (!checkDisplayNickRate(req.user.id)) {
+            return res.status(429).json({ error: 'Слишком много попыток. Подождите минуту.' });
+        }
+
+        const raw = (req.body && (req.body.displayNickname ?? req.body.display_nickname) != null)
+            ? String(req.body.displayNickname ?? req.body.display_nickname).trim()
+            : '';
+        if (!isValidMcNick(raw)) {
+            return res.status(400).json({ error: 'Ник должен быть от 3 до 16 символов (буквы, цифры, _)' });
+        }
+
+        const current = await db.query(
+            'SELECT nickname, display_nickname FROM users WHERE id = $1',
+            [req.user.id]
+        );
+        if (current.rows.length === 0) {
+            return res.status(404).json({ error: 'Пользователь не найден' });
+        }
+        const row = current.rows[0];
+        const currentDisplay = row.display_nickname || row.nickname;
+
+        if (currentDisplay === raw) {
+            return res.status(400).json({ error: 'Это уже ваш текущий ник' });
+        }
+
+        const taken = await db.query(
+            `SELECT id FROM users
+             WHERE id <> $2 AND (
+               LOWER(COALESCE(display_nickname, nickname)) = LOWER($1)
+               OR LOWER(nickname) = LOWER($1)
+             )`,
+            [raw, req.user.id]
+        );
+        if (taken.rows.length > 0) {
+            return res.status(409).json({ error: 'Этот ник уже занят' });
+        }
+
+        await db.query(
+            'UPDATE users SET display_nickname = $1, display_nickname_changed_at = NOW() WHERE id = $2',
+            [raw, req.user.id]
+        );
+
+        await db.query(`
+            INSERT INTO user_activity (user_id, activity_type, description)
+            VALUES ($1, 'display_nickname_change', $2)
+        `, [req.user.id, `Отображаемый ник изменён на ${raw}`]).catch(() => {});
+
+        res.json({
+            success: true,
+            message: 'Ник изменён',
+            display_nickname: raw,
+            display_nickname_changed_at: new Date().toISOString()
+        });
+    } catch (error) {
+        console.error('Ошибка смены отображаемого ника:', error);
         res.status(500).json({ error: 'Не удалось изменить ник' });
     }
 });
@@ -709,12 +791,23 @@ router.post('/email/request', authenticateToken, async (req, res) => {
         }
 
         const current = await db.query(
-            'SELECT email, email_change_expires FROM users WHERE id = $1',
+            'SELECT email, email_change_expires, email_changed_at FROM users WHERE id = $1',
             [req.user.id]
         );
         if (current.rows.length === 0) return res.status(404).json({ error: 'Пользователь не найден' });
         if ((current.rows[0].email || '').toLowerCase() === email) {
             return res.status(400).json({ error: 'Это уже ваша текущая почта' });
+        }
+        if (current.rows[0].email_changed_at) {
+            const changedAt = new Date(current.rows[0].email_changed_at).getTime();
+            const nextAllowed = changedAt + EMAIL_COOLDOWN_DAYS * 24 * 60 * 60 * 1000;
+            if (Date.now() < nextAllowed) {
+                const daysLeft = Math.ceil((nextAllowed - Date.now()) / (24 * 60 * 60 * 1000));
+                return res.status(429).json({
+                    error: `Почту можно менять раз в ${EMAIL_COOLDOWN_DAYS} дней. Попробуйте через ${daysLeft} дн.`,
+                    next_allowed_at: new Date(nextAllowed).toISOString()
+                });
+            }
         }
         if (current.rows[0].email_change_expires) {
             const requestedAt =
@@ -807,12 +900,17 @@ router.post('/email/confirm', authenticateToken, async (req, res) => {
         await db.query(
             `UPDATE users SET email = $1, is_email_verified = true,
              pending_email = NULL, email_change_code = NULL, email_change_expires = NULL,
-             email_change_attempts = 0
+             email_change_attempts = 0, email_changed_at = NOW()
              WHERE id = $2`,
             [row.pending_email, req.user.id]
         );
 
-        res.json({ success: true, message: 'Почта изменена', email: row.pending_email });
+        res.json({
+            success: true,
+            message: 'Почта изменена',
+            email: row.pending_email,
+            email_changed_at: new Date().toISOString()
+        });
     } catch (error) {
         console.error('Ошибка подтверждения смены почты:', error);
         res.status(500).json({ error: 'Не удалось подтвердить смену почты' });

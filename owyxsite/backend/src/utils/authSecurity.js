@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const PUBLIC_USER_FIELDS = [
   'id',
   'nickname',
+  'display_nickname',
   'email',
   'first_name',
   'role',
@@ -24,6 +25,8 @@ const PUBLIC_USER_FIELDS = [
   'skin_model',
   'cape_url',
   'nickname_changed_at',
+  'display_nickname_changed_at',
+  'email_changed_at',
 ];
 
 function hashSessionToken(token) {
@@ -46,6 +49,7 @@ function publicUser(user) {
   // Preserve the names consumed by the current Next frontend.
   safe.created_at = user.created_at ?? user.registered_at;
   safe.discord = user.discord ?? user.discord_username;
+  safe.display_nickname = user.display_nickname ?? user.nickname;
   return safe;
 }
 

@@ -1387,8 +1387,8 @@ async function refreshOwyxSiteSession() {
 		} catch {
 			/* checklist mark is best-effort */
 		}
-		// Sync site nickname → offline play profile (rename replaces stale offline UUID)
-		const nick = fresh.user?.nickname?.trim() ?? ''
+		// Sync site display nickname → offline play profile (rename replaces stale offline UUID)
+		const nick = (fresh.user?.displayNickname || fresh.user?.nickname)?.trim() ?? ''
 		const nickOk = /^[A-Za-z0-9_]{3,16}$/.test(nick)
 		if (nickOk) {
 			try {
@@ -1416,7 +1416,7 @@ async function refreshOwyxSiteSession() {
 					await login_offline(nick, false)
 				}
 			} catch (e) {
-				console.warn('Could not sync Owyx nickname to play profile', e)
+				console.warn('Could not sync Owyx display nickname to play profile', e)
 			}
 		}
 	}

@@ -4515,10 +4515,31 @@
     "message": "Choose how to play"
   },
   "minecraft-account.owyx-nick-too-long": {
-    "message": "Owyx nickname must be 3–16 letters, numbers, or underscores to sync with play and skins. Change it on owyx.site, then try again."
+    "message": "Display nickname must be 3–16 letters, numbers, or underscores. Change it and try again."
   },
   "minecraft-account.owyx-session-badge": {
     "message": "Owyx site session"
+  },
+  "minecraft-account.playing-as": {
+    "message": "Playing as"
+  },
+  "minecraft-account.login-as": {
+    "message": "Login: {login}"
+  },
+  "minecraft-account.edit-display-nick": {
+    "message": "Change display nickname"
+  },
+  "minecraft-account.edit-display-nick-title": {
+    "message": "Display nickname"
+  },
+  "minecraft-account.edit-display-nick-hint": {
+    "message": "Shown to friends and used in-game. Your login stays the same. 3–16 letters, numbers, or _."
+  },
+  "minecraft-account.cancel": {
+    "message": "Cancel"
+  },
+  "minecraft-account.save": {
+    "message": "Save"
   },
   "minecraft-account.paths-hint": {
     "message": "Owyx account (friends & skins) or Microsoft (licensed Minecraft)."
@@ -4941,9 +4962,42 @@
     "message": "Display"
   },
   "minecraft-account.account-hint": {
-    "message": "Owyx is for friends, skins, and your site nickname in game. Microsoft is for a licensed Minecraft profile and online-mode servers."
+    "message": "Owyx is for friends, skins, and your display nickname in game. Microsoft is for a licensed Minecraft profile and online-mode servers."
   },
   "minecraft-account.owyx": {
     "message": "Owyx"
+  },
+  "owyx.settings.social.open-friends": {
+    "message": "Open Friends"
+  },
+  "owyx.settings.social.stat-friends": {
+    "message": "Friends"
+  },
+  "owyx.settings.social.stat-online": {
+    "message": "Online"
+  },
+  "owyx.settings.social.stat-pending": {
+    "message": "Incoming"
+  },
+  "owyx.settings.social.presence-on": {
+    "message": "Active"
+  },
+  "owyx.settings.social.presence-off": {
+    "message": "Off"
+  },
+  "owyx.settings.social.open-profile": {
+    "message": "Open profile on site"
+  },
+  "owyx.settings.social.install-csl": {
+    "message": "Install CustomSkinLoader to instance"
+  },
+  "owyx.settings.social.signed-in-as": {
+    "message": "Signed in as {nick}"
+  },
+  "app.features-settings.ui-sounds.title": {
+    "message": "Soft UI sounds"
+  },
+  "app.features-settings.ui-sounds.description": {
+    "message": "Synthetic clicks in the app. Muted when prefers-reduced-motion is on."
   }
 }

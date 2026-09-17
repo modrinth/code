@@ -14,6 +14,8 @@ import {
 } from '@/helpers/owyx-api'
 
 export const CUSTOM_SKIN_LOADER_MODRINTH = 'https://modrinth.com/mod/customskinloader'
+/** Modrinth project id/slug for ContentInstallModal. */
+export const CUSTOM_SKIN_LOADER_PROJECT_ID = 'customskinloader'
 export const CUSTOM_SKIN_LOADER_SOURCE = 'https://github.com/xfl03/MCCustomSkinLoader'
 export const CUSTOM_SKIN_LOADER_LICENSE = 'GPL-3.0'
 

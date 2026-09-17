@@ -40,6 +40,7 @@ import {
 	declineOwyxFriend,
 	listOwyxFriends,
 	type OwyxFriend,
+	owyxFriendLabel,
 	removeOwyxFriend,
 	requestOwyxFriend,
 	searchOwyxUsers,
@@ -64,7 +65,9 @@ const listError = ref('')
 const offline = ref(typeof navigator !== 'undefined' ? !navigator.onLine : false)
 const search = ref('')
 const username = ref('')
-const searchHits = ref<{ id: string; nickname: string; avatarUrl?: string | null }[]>([])
+const searchHits = ref<
+	{ id: string; nickname: string; displayNickname?: string; avatarUrl?: string | null }[]
+>([])
 const searchBusy = ref(false)
 const friendInvitesModal = ref<{ show: () => void; hide: () => void } | null>(null)
 const addFriendModal = ref<{ show: () => void; hide: () => void } | null>(null)
@@ -78,6 +81,18 @@ function onOffline() {
 function onOnline() {
 	offline.value = false
 	void quietRefresh()
+}
+
+function onVisibility() {
+	if (document.visibilityState === 'visible') void quietRefresh()
+}
+
+function onOpenFriendsEvent(ev: Event) {
+	const detail = (ev as CustomEvent<{ focus?: string }>).detail
+	void quietRefresh()
+	if (detail?.focus === 'incoming') {
+		friendInvitesModal.value?.show()
+	}
 }
 
 async function refresh() {
@@ -140,15 +155,19 @@ function matchCatalogServer(friend: OwyxFriend): OwyxServerEntry | null {
 onMounted(() => {
 	window.addEventListener('offline', onOffline)
 	window.addEventListener('online', onOnline)
+	document.addEventListener('visibilitychange', onVisibility)
+	window.addEventListener('owyx:open-friends', onOpenFriendsEvent as EventListener)
 	void refresh()
 	void loadCatalogQuiet()
 	pollTimer = setInterval(() => {
 		void quietRefresh()
-	}, 45_000)
+	}, 20_000)
 })
 onUnmounted(() => {
 	window.removeEventListener('offline', onOffline)
 	window.removeEventListener('online', onOnline)
+	document.removeEventListener('visibilitychange', onVisibility)
+	window.removeEventListener('owyx:open-friends', onOpenFriendsEvent as EventListener)
 	if (pollTimer) clearInterval(pollTimer)
 	if (searchDebounce) clearTimeout(searchDebounce)
 })
@@ -181,7 +200,14 @@ watch(username, (q) => {
 const isSearching = computed(() => search.value.trim().length > 0)
 
 const filtered = computed(() =>
-	friends.value.filter((f) => f.nickname.toLowerCase().includes(search.value.trim().toLowerCase())),
+	friends.value.filter((f) => {
+		const q = search.value.trim().toLowerCase()
+		if (!q) return true
+		return (
+			f.nickname.toLowerCase().includes(q) ||
+			(f.displayNickname || '').toLowerCase().includes(q)
+		)
+	}),
 )
 const accepted = computed(() => filtered.value.filter((f) => f.status === 'accepted'))
 const onlineFriends = computed(() =>
@@ -207,7 +233,19 @@ function friendStatusLabel(friend: OwyxFriend) {
 	return formatMessage(messages.offlineStatus)
 }
 
-const friendNickSet = computed(() => new Set(friends.value.map((f) => f.nickname.toLowerCase())))
+const friendNickSet = computed(
+	() => new Set(friends.value.map((f) => f.nickname.toLowerCase())),
+)
+
+function friendDisplay(friend: OwyxFriend | { nickname: string; displayNickname?: string }) {
+	return owyxFriendLabel(friend)
+}
+
+defineExpose({
+	refresh,
+	quietRefresh,
+	showIncoming: () => friendInvitesModal.value?.show(),
+})
 
 function showAddFriendModal() {
 	username.value = ''
@@ -427,7 +465,7 @@ const messages = defineMessages({
 				/>
 				<div class="flex-1 min-w-0">
 					<p class="m-0">
-						<span class="text-contrast font-medium">{{ friend.nickname }}</span>
+						<span class="text-contrast font-medium">{{ friendDisplay(friend) }}</span>
 						{{ ' ' }}{{ formatMessage(messages.sentARequest) }}
 					</p>
 				</div>
@@ -483,7 +521,9 @@ const messages = defineMessages({
 					@click="addFriendFromModal(hit.nickname)"
 				>
 					<Avatar :src="resolveOwyxAvatarUrl(hit.avatarUrl)" size="1.75rem" circle />
-					<span class="flex-1 truncate text-sm text-contrast">{{ hit.nickname }}</span>
+					<span class="flex-1 truncate text-sm text-contrast">{{
+						friendDisplay(hit)
+					}}</span>
 					<span
 						v-if="friendNickSet.has(hit.nickname.toLowerCase())"
 						class="text-xs text-secondary"
@@ -625,7 +665,9 @@ const messages = defineMessages({
 										/>
 									</div>
 									<div class="flex min-w-0 flex-col">
-										<span class="truncate text-sm text-contrast m-0">{{ friend.nickname }}</span>
+										<span class="truncate text-sm text-contrast m-0">{{
+											friendDisplay(friend)
+										}}</span>
 										<span class="m-0 text-xs text-secondary">{{ friendStatusLabel(friend) }}</span>
 									</div>
 								</div>
@@ -719,7 +761,9 @@ const messages = defineMessages({
 										class="grayscale opacity-80"
 									/>
 									<div class="flex min-w-0 flex-col">
-										<span class="truncate text-sm text-primary m-0">{{ friend.nickname }}</span>
+										<span class="truncate text-sm text-primary m-0">{{
+											friendDisplay(friend)
+										}}</span>
 										<span class="m-0 text-xs text-secondary">{{ friendStatusLabel(friend) }}</span>
 									</div>
 								</div>
@@ -778,7 +822,9 @@ const messages = defineMessages({
 								<div class="grid min-w-0 grid-cols-[auto_1fr] items-center gap-2">
 									<Avatar :src="resolveOwyxAvatarUrl(friend.avatarUrl)" size="2rem" circle />
 									<div class="flex min-w-0 flex-col">
-										<span class="truncate text-sm text-contrast m-0">{{ friend.nickname }}</span>
+										<span class="truncate text-sm text-contrast m-0">{{
+											friendDisplay(friend)
+										}}</span>
 										<span class="m-0 text-xs text-secondary">{{
 											formatMessage(messages.friendRequestSent)
 										}}</span>

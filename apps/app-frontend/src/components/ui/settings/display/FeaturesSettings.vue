@@ -10,7 +10,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { inject, onBeforeUnmount, onMounted } from 'vue'
+import { inject, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import {
 	DEFAULT_FEATURE_FLAGS,
@@ -30,6 +30,11 @@ import {
 	set,
 } from '@/helpers/settings.ts'
 import { globalSyncedOptionsQueryOptions, syncedOptionsKeys } from '@/helpers/synced-options'
+import {
+	getOwyxUiSoundsEnabled,
+	playOwyxUiSound,
+	setOwyxUiSoundsEnabled,
+} from '@/helpers/owyx-ui-sound'
 import { screenshotKeys } from '@/pages/instance/query-options.ts'
 import { appSettingsModalContextKey } from '@/providers/app-settings-modal'
 
@@ -41,6 +46,13 @@ const { updatePreferences } = injectUserPreferences()
 const settingsModal = inject(appSettingsModalContextKey, null)
 const quickInstances = useQuickInstanceLimit()
 const queryClient = useQueryClient()
+const uiSoundsEnabled = ref(getOwyxUiSoundsEnabled())
+
+function onUiSoundsToggle(value: boolean) {
+	uiSoundsEnabled.value = value
+	setOwyxUiSoundsEnabled(value)
+	if (value) playOwyxUiSound('toggle')
+}
 
 const showJumpInFlag: FeatureFlag = 'worlds_in_home'
 
@@ -115,6 +127,14 @@ const messages = defineMessages({
 	showJumpInDescription: {
 		id: 'app.features-settings.show-jump-in.description',
 		defaultMessage: 'Show recently played worlds and instances at the top of the Play page.',
+	},
+	uiSoundsTitle: {
+		id: 'app.features-settings.ui-sounds.title',
+		defaultMessage: 'Soft UI sounds',
+	},
+	uiSoundsDescription: {
+		id: 'app.features-settings.ui-sounds.description',
+		defaultMessage: 'Synthetic clicks in the app. Muted when prefers-reduced-motion is on.',
 	},
 })
 
@@ -400,6 +420,25 @@ onBeforeUnmount(() => {
 				id="show-jump-in-section"
 				v-model="current.showJumpIn"
 				:aria-label="formatMessage(messages.showJumpInTitle)"
+			/>
+		</div>
+	</section>
+
+	<section class="mt-8 border-0 border-t border-solid border-surface-4 pt-6">
+		<div class="flex items-center justify-between gap-4">
+			<div>
+				<h2 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.uiSoundsTitle) }}
+				</h2>
+				<p class="m-0 mt-1 text-secondary">
+					{{ formatMessage(messages.uiSoundsDescription) }}
+				</p>
+			</div>
+			<Toggle
+				id="owyx-ui-sounds"
+				:model-value="uiSoundsEnabled"
+				:aria-label="formatMessage(messages.uiSoundsTitle)"
+				@update:model-value="onUiSoundsToggle"
 			/>
 		</div>
 	</section>
