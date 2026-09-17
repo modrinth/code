@@ -95,7 +95,7 @@ pub async fn organization_projects_get(
             &redis,
         )
         .await
-        .wrap_api_err("fetching organization projects")?;
+        .wrap_internal_err("fetching organization projects")?;
 
         let projects =
             filter_visible_projects(projects_data, &current_user, &pool, true)
@@ -950,7 +950,7 @@ pub async fn organization_projects_add(
         &redis,
     )
     .await
-    .wrap_api_err("fetching project from database")?
+    .wrap_internal_err("fetching project from database")?
     .wrap_request_err_with(|| {
         "the specified project does not exist!".to_string()
     })?;
@@ -1132,7 +1132,7 @@ pub async fn organization_projects_remove(
     let project_item =
         database::models::DBProject::get(&project_id, &**pool, &redis)
             .await
-            .wrap_api_err("fetching project from database")?
+            .wrap_internal_err("fetching project from database")?
             .wrap_request_err_with(|| {
                 "the specified project does not exist!".to_string()
             })?;

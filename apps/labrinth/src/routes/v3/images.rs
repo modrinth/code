@@ -82,7 +82,7 @@ pub async fn images_add(
                 let project =
                     project_item::DBProject::get(&id, &**pool, &redis)
                         .await
-                        .wrap_api_err("fetching project from database")?;
+                        .wrap_internal_err("fetching project from database")?;
                 if let Some(project) = project {
                     if is_team_member_project(
                         &project.inner,

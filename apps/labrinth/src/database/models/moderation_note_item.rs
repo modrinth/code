@@ -1,11 +1,12 @@
 use std::collections::HashMap;
 
 use chrono::{DateTime, Utc};
+use eyre::{Result, WrapErr};
 use serde::{Deserialize, Serialize};
 
 use xredis::RedisPool;
 
-use super::{DBOrganizationId, DBUserId, DatabaseError};
+use super::{DBOrganizationId, DBUserId};
 
 const MODERATION_NOTES_USERS_NAMESPACE: &str = "moderation_notes_users:v4";
 const MODERATION_NOTES_ORGANIZATIONS_NAMESPACE: &str =
@@ -28,19 +29,24 @@ impl DBModerationNote {
         user_ids: &[DBUserId],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<HashMap<DBUserId, Self>, DatabaseError>
+    ) -> Result<HashMap<DBUserId, Self>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let cached = {
-            let mut redis = redis.connect().await?;
+            let mut redis = redis.connect().await.wrap_err(
+                "connecting to redis to fetch user moderation notes",
+            )?;
             let keys = user_ids
                 .iter()
                 .map(|id| {
                     redis.key().entity(MODERATION_NOTES_USERS_NAMESPACE, id.0)
                 })
                 .collect::<Vec<_>>();
-            redis.get_many_deserialized::<Self>(&keys).await?
+            redis
+                .get_many_deserialized::<Self>(&keys)
+                .await
+                .wrap_err("fetching cached user moderation notes")?
         };
 
         let mut notes = HashMap::new();
@@ -66,9 +72,13 @@ impl DBModerationNote {
             &missing_ids,
         )
         .fetch_all(exec)
-        .await?;
+        .await
+        .wrap_err("fetching user moderation notes")?;
 
-        let mut redis = redis.connect().await?;
+        let mut redis = redis
+            .connect()
+            .await
+            .wrap_err("connecting to redis to cache user moderation notes")?;
         for row in rows {
             let note = Self {
                 user_id: row.user_id.map(DBUserId),
@@ -85,7 +95,10 @@ impl DBModerationNote {
                 let key = redis
                     .key()
                     .entity(MODERATION_NOTES_USERS_NAMESPACE, user_id.0);
-                redis.set_serialized(&key, &note, None).await?;
+                redis
+                    .set_serialized(&key, &note, None)
+                    .await
+                    .wrap_err("caching user moderation note")?;
                 notes.insert(user_id, note);
             }
         }
@@ -97,12 +110,13 @@ impl DBModerationNote {
         user_id: DBUserId,
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Option<Self>, DatabaseError>
+    ) -> Result<Option<Self>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Ok(Self::get_many_users(&[user_id], exec, redis)
-            .await?
+            .await
+            .wrap_err("fetching user moderation note")?
             .remove(&user_id))
     }
 
@@ -110,12 +124,14 @@ impl DBModerationNote {
         organization_ids: &[DBOrganizationId],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<HashMap<DBOrganizationId, Self>, DatabaseError>
+    ) -> Result<HashMap<DBOrganizationId, Self>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let cached = {
-            let mut redis = redis.connect().await?;
+            let mut redis = redis.connect().await.wrap_err(
+                "connecting to redis to fetch organization moderation notes",
+            )?;
             let keys = organization_ids
                 .iter()
                 .map(|id| {
@@ -124,7 +140,10 @@ impl DBModerationNote {
                         .entity(MODERATION_NOTES_ORGANIZATIONS_NAMESPACE, id.0)
                 })
                 .collect::<Vec<_>>();
-            redis.get_many_deserialized::<Self>(&keys).await?
+            redis
+                .get_many_deserialized::<Self>(&keys)
+                .await
+                .wrap_err("fetching cached organization moderation notes")?
         };
 
         let mut notes = HashMap::new();
@@ -150,9 +169,12 @@ impl DBModerationNote {
             &missing_ids,
         )
         .fetch_all(exec)
-        .await?;
+        .await
+        .wrap_err("fetching organization moderation notes")?;
 
-        let mut redis = redis.connect().await?;
+        let mut redis = redis.connect().await.wrap_err(
+            "connecting to redis to cache organization moderation notes",
+        )?;
         for row in rows {
             let note = Self {
                 user_id: row.user_id.map(DBUserId),
@@ -170,7 +192,10 @@ impl DBModerationNote {
                     MODERATION_NOTES_ORGANIZATIONS_NAMESPACE,
                     organization_id.0,
                 );
-                redis.set_serialized(&key, &note, None).await?;
+                redis
+                    .set_serialized(&key, &note, None)
+                    .await
+                    .wrap_err("caching organization moderation note")?;
                 notes.insert(organization_id, note);
             }
         }
@@ -182,13 +207,14 @@ impl DBModerationNote {
         organization_id: DBOrganizationId,
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Option<Self>, DatabaseError>
+    ) -> Result<Option<Self>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Ok(
             Self::get_many_organizations(&[organization_id], exec, redis)
-                .await?
+                .await
+                .wrap_err("fetching organization moderation note")?
                 .remove(&organization_id),
         )
     }
@@ -200,7 +226,7 @@ impl DBModerationNote {
         notes: Option<&str>,
         user_rating: Option<i32>,
         exec: E,
-    ) -> Result<Option<i32>, DatabaseError>
+    ) -> Result<Option<i32>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -225,7 +251,8 @@ impl DBModerationNote {
             user_rating,
         )
         .fetch_optional(exec)
-        .await?;
+        .await
+        .wrap_err("inserting moderation note")?;
 
         Ok(result)
     }
@@ -238,7 +265,7 @@ impl DBModerationNote {
         notes: Option<&str>,
         user_rating: Option<i32>,
         exec: E,
-    ) -> Result<Option<i32>, DatabaseError>
+    ) -> Result<Option<i32>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -266,7 +293,8 @@ impl DBModerationNote {
             expected_current_version
         )
         .fetch_optional(exec)
-        .await?;
+        .await
+        .wrap_err("updating moderation note")?;
 
         Ok(result)
     }
@@ -274,23 +302,33 @@ impl DBModerationNote {
     pub async fn clear_user_cache(
         user_id: DBUserId,
         redis: &RedisPool,
-    ) -> Result<(), DatabaseError> {
-        let mut redis = redis.connect().await?;
+    ) -> Result<()> {
+        let mut redis = redis.connect().await.wrap_err(
+            "connecting to redis to clear user moderation note cache",
+        )?;
         let key = redis
             .key()
             .entity(MODERATION_NOTES_USERS_NAMESPACE, user_id.0);
-        redis.delete(&key).await.map_err(Into::into)
+        redis
+            .delete(&key)
+            .await
+            .wrap_err("clearing user moderation note cache")
     }
 
     pub async fn clear_organization_cache(
         organization_id: DBOrganizationId,
         redis: &RedisPool,
-    ) -> Result<(), DatabaseError> {
-        let mut redis = redis.connect().await?;
+    ) -> Result<()> {
+        let mut redis = redis.connect().await.wrap_err(
+            "connecting to redis to clear organization moderation note cache",
+        )?;
         let key = redis.key().entity(
             MODERATION_NOTES_ORGANIZATIONS_NAMESPACE,
             organization_id.0,
         );
-        redis.delete(&key).await.map_err(Into::into)
+        redis
+            .delete(&key)
+            .await
+            .wrap_err("clearing organization moderation note cache")
     }
 }

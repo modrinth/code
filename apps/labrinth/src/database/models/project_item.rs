@@ -3,7 +3,7 @@ use super::loader_fields::{
     VersionField,
 };
 use super::{DBUser, ids::*};
-use crate::database::models::DatabaseError;
+
 use crate::database::{PgTransaction, models};
 use crate::file_hosting::FileHost;
 use crate::models::exp;
@@ -11,11 +11,11 @@ use crate::models::ids::ProjectId;
 use crate::models::projects::{
     MonetizationStatus, ProjectStatus, SideTypesMigrationReviewStatus,
 };
-use crate::routes::ApiError;
-use crate::util::{error::Context, kafka::KafkaClientState};
+use crate::util::kafka::KafkaClientState;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
+use eyre::{Result, WrapErr};
 use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -41,7 +41,7 @@ impl LinkUrl {
         links: Vec<Self>,
         project_id: DBProjectId,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<(), sqlx::error::Error> {
+    ) -> Result<()> {
         let (project_ids, platform_ids, urls): (Vec<_>, Vec<_>, Vec<_>) = links
             .into_iter()
             .map(|url| (project_id.0, url.platform_id.0, url.url))
@@ -58,7 +58,8 @@ impl LinkUrl {
             &urls[..],
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("inserting project links into database")?;
 
         Ok(())
     }
@@ -80,7 +81,7 @@ impl DBGalleryItem {
         items: Vec<Self>,
         project_id: DBProjectId,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<(), sqlx::error::Error> {
+    ) -> Result<()> {
         let (
             project_ids,
             image_urls,
@@ -119,7 +120,8 @@ impl DBGalleryItem {
             &orderings[..]
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("inserting project gallery items into database")?;
 
         Ok(())
     }
@@ -135,7 +137,7 @@ impl DBModCategory {
     pub async fn insert_many(
         items: Vec<Self>,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<()> {
         let (project_ids, category_ids, is_additionals): (
             Vec<_>,
             Vec<_>,
@@ -154,7 +156,8 @@ impl DBModCategory {
             &is_additionals[..]
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("inserting project categories")?;
 
         Ok(())
     }
@@ -192,7 +195,7 @@ impl ProjectBuilder {
         redis: &RedisPool,
         file_host: &dyn FileHost,
         kafka_client: &KafkaClientState,
-    ) -> Result<DBProjectId, DatabaseError> {
+    ) -> Result<DBProjectId> {
         let project_struct = DBProject {
             id: self.project_id,
             team_id: self.team_id,
@@ -227,7 +230,10 @@ impl ProjectBuilder {
             loaders: vec![],
             components: self.components,
         };
-        project_struct.insert(&mut *transaction).await?;
+        project_struct
+            .insert(&mut *transaction)
+            .await
+            .wrap_err("inserting project")?;
 
         let ProjectBuilder {
             link_urls,
@@ -241,7 +247,8 @@ impl ProjectBuilder {
             version.project_id = self.project_id;
             version
                 .insert(transaction, redis, file_host, kafka_client)
-                .await?;
+                .await
+                .wrap_err("inserting initial project version")?;
         }
 
         LinkUrl::insert_many_projects(
@@ -249,14 +256,16 @@ impl ProjectBuilder {
             self.project_id,
             &mut *transaction,
         )
-        .await?;
+        .await
+        .wrap_err("inserting project links")?;
 
         DBGalleryItem::insert_many(
             gallery_items,
             self.project_id,
             &mut *transaction,
         )
-        .await?;
+        .await
+        .wrap_err("inserting project gallery items")?;
 
         let project_id = self.project_id;
         let mod_categories = categories
@@ -274,7 +283,9 @@ impl ProjectBuilder {
                 }
             }))
             .collect_vec();
-        DBModCategory::insert_many(mod_categories, &mut *transaction).await?;
+        DBModCategory::insert_many(mod_categories, &mut *transaction)
+            .await
+            .wrap_err("inserting project categories")?;
 
         Ok(self.project_id)
     }
@@ -314,7 +325,7 @@ impl DBProject {
     pub async fn insert(
         &self,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<()> {
         sqlx::query!(
             "
             INSERT INTO mods (
@@ -355,7 +366,8 @@ impl DBProject {
             serde_json::to_value(&self.components).expect("serialization shouldn't fail"),
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("inserting project")?;
 
         Ok(())
     }
@@ -364,15 +376,15 @@ impl DBProject {
         id: DBProjectId,
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
-    ) -> Result<Option<()>, ApiError> {
+    ) -> Result<Option<()>> {
         let project = Self::get_id(id, &mut *transaction, redis)
             .await
-            .wrap_internal_err("failed to fetch project by ID")?;
+            .wrap_err("fetching project by id")?;
 
         if let Some(project) = project {
             DBProject::clear_cache(id, project.inner.slug, Some(true), redis)
                 .await
-                .wrap_internal_err("failed to clear project cache")?;
+                .wrap_err("clearing project cache")?;
 
             sqlx::query!(
                 "
@@ -383,7 +395,7 @@ impl DBProject {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_internal_err("failed to delete project followers")?;
+            .wrap_err("deleting project followers")?;
 
             sqlx::query!(
                 "
@@ -394,7 +406,7 @@ impl DBProject {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_internal_err("failed to delete project gallery items")?;
+            .wrap_err("deleting project gallery items")?;
 
             sqlx::query!(
                 "
@@ -405,9 +417,7 @@ impl DBProject {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_internal_err(
-                "failed to delete duplicate project followers",
-            )?;
+            .wrap_err("deleting duplicate project followers")?;
 
             sqlx::query!(
                 "
@@ -419,7 +429,7 @@ impl DBProject {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_internal_err("failed to clear report project references")?;
+            .wrap_err("clearing report project references")?;
 
             sqlx::query!(
                 "
@@ -430,7 +440,7 @@ impl DBProject {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_internal_err("failed to delete project categories")?;
+            .wrap_err("deleting project categories")?;
 
             sqlx::query!(
                 "
@@ -441,12 +451,12 @@ impl DBProject {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_internal_err("failed to delete project links")?;
+            .wrap_err("deleting project links")?;
 
             for version in project.versions {
                 super::DBVersion::remove_full(version, redis, transaction)
                     .await
-                    .wrap_internal_err("failed to remove project version")?;
+                    .wrap_err("removing project version")?;
             }
 
             sqlx::query!(
@@ -457,7 +467,7 @@ impl DBProject {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_internal_err("failed to delete dependency references")?;
+            .wrap_err("deleting dependency references")?;
 
             sqlx::query!(
                 "
@@ -469,7 +479,7 @@ impl DBProject {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_internal_err("failed to clear payout project references")?;
+            .wrap_err("clearing payout project references")?;
 
             sqlx::query!(
                 "
@@ -480,11 +490,11 @@ impl DBProject {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_internal_err("failed to delete project row")?;
+            .wrap_err("deleting project row")?;
 
             models::DBTeamMember::clear_cache(project.inner.team_id, redis)
                 .await
-                .wrap_internal_err("failed to clear team member cache")?;
+                .wrap_err("clearing team member cache")?;
 
             let affected_user_ids = sqlx::query!(
                 "
@@ -498,11 +508,11 @@ impl DBProject {
             .map_ok(|x| DBUserId(x.user_id))
             .try_collect::<Vec<_>>()
             .await
-            .wrap_internal_err("failed to delete team members")?;
+            .wrap_err("deleting team members")?;
 
             DBUser::clear_project_cache(&affected_user_ids, redis)
                 .await
-                .wrap_internal_err("failed to clear user project cache")?;
+                .wrap_err("clearing user project cache")?;
 
             sqlx::query!(
                 "
@@ -513,7 +523,7 @@ impl DBProject {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_internal_err("failed to delete team")?;
+            .wrap_err("deleting team")?;
 
             Ok(Some(()))
         } else {
@@ -525,12 +535,13 @@ impl DBProject {
         string: &str,
         executor: E,
         redis: &RedisPool,
-    ) -> Result<Option<ProjectQueryResult>, ApiError>
+    ) -> Result<Option<ProjectQueryResult>>
     where
         E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
         DBProject::get_many(&[string], executor, redis)
             .await
+            .wrap_err("fetching project")
             .map(|x| x.into_iter().next())
     }
 
@@ -538,7 +549,7 @@ impl DBProject {
         id: DBProjectId,
         executor: E,
         redis: &RedisPool,
-    ) -> Result<Option<ProjectQueryResult>, ApiError>
+    ) -> Result<Option<ProjectQueryResult>>
     where
         E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
@@ -548,6 +559,7 @@ impl DBProject {
             redis,
         )
         .await
+        .wrap_err("fetching project by id")
         .map(|x| x.into_iter().next())
     }
 
@@ -555,7 +567,7 @@ impl DBProject {
         project_ids: &[DBProjectId],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<ProjectQueryResult>, ApiError>
+    ) -> Result<Vec<ProjectQueryResult>>
     where
         E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
@@ -563,7 +575,9 @@ impl DBProject {
             .iter()
             .map(|x| crate::models::ids::ProjectId::from(*x))
             .collect::<Vec<_>>();
-        DBProject::get_many(&ids, exec, redis).await
+        DBProject::get_many(&ids, exec, redis)
+            .await
+            .wrap_err("fetching projects by id")
     }
 
     pub async fn get_many<
@@ -574,11 +588,13 @@ impl DBProject {
         project_strings: &[T],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<ProjectQueryResult>, ApiError>
+    ) -> Result<Vec<ProjectQueryResult>>
     where
         E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
-        Self::get_many_inner(project_strings, exec, redis, true).await
+        Self::get_many_inner(project_strings, exec, redis, true)
+            .await
+            .wrap_err("fetching projects")
     }
 
     pub async fn get_many_uncached<
@@ -589,11 +605,13 @@ impl DBProject {
         project_strings: &[T],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<ProjectQueryResult>, ApiError>
+    ) -> Result<Vec<ProjectQueryResult>>
     where
         E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
-        Self::get_many_inner(project_strings, exec, redis, false).await
+        Self::get_many_inner(project_strings, exec, redis, false)
+            .await
+            .wrap_err("fetching uncached projects")
     }
 
     async fn get_many_inner<
@@ -605,7 +623,7 @@ impl DBProject {
         exec: E,
         redis: &RedisPool,
         use_cache: bool,
-    ) -> Result<Vec<ProjectQueryResult>, ApiError>
+    ) -> Result<Vec<ProjectQueryResult>>
     where
         E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
@@ -618,7 +636,8 @@ impl DBProject {
             |ids| async move {
                 let mut exec = exec
                     .acquire()
-                    .await?;
+                    .await
+                    .wrap_err("acquiring database connection for project query")?;
                 let project_ids_parsed: Vec<i64> = ids
                     .iter()
                     .filter_map(|x| parse_base62(&x.to_string()).ok())
@@ -657,7 +676,8 @@ impl DBProject {
                             async move { Ok(acc) }
                         },
                     )
-                    .await?;
+                    .await
+                    .wrap_err("fetching project versions")?;
 
                 let loader_field_enum_value_ids = DashSet::new();
                 let version_fields: DashMap<DBProjectId, Vec<QueryVersionField>> = sqlx::query!(
@@ -689,7 +709,8 @@ impl DBProject {
                             async move { Ok(acc) }
                         },
                     )
-                    .await?;
+                    .await
+                    .wrap_err("fetching project version fields")?;
 
                 let loader_field_enum_values: Vec<QueryLoaderFieldEnumValue> = sqlx::query!(
                     r#"
@@ -716,7 +737,8 @@ impl DBProject {
                         major: m.major,
                     })
                     .try_collect()
-                    .await?;
+                    .await
+                    .wrap_err("fetching project loader field enum values")?;
 
                 let mods_gallery: DashMap<DBProjectId, Vec<DBGalleryItem>> = sqlx::query!(
                     "
@@ -743,7 +765,8 @@ impl DBProject {
                         async move { Ok(acc) }
                     }
                     )
-                    .await?;
+                    .await
+                    .wrap_err("fetching project gallery items")?;
 
                 let links: DashMap<DBProjectId, Vec<LinkUrl>> = sqlx::query!(
                     "
@@ -768,7 +791,8 @@ impl DBProject {
                         async move { Ok(acc) }
                     }
                     )
-                    .await?;
+                    .await
+                    .wrap_err("fetching project links")?;
 
                 #[derive(Default)]
                 struct VersionLoaderData {
@@ -821,7 +845,8 @@ impl DBProject {
                     }
                     )
                     .try_collect()
-                    .await?;
+                    .await
+                    .wrap_err("fetching project loader metadata")?;
 
                 let loader_fields: Vec<QueryLoaderField> = sqlx::query!(
                     "
@@ -842,7 +867,8 @@ impl DBProject {
                         optional: m.optional,
                     })
                     .try_collect()
-                    .await?;
+                    .await
+                    .wrap_err("fetching project loader fields")?;
 
                 let project_rows = sqlx::query!(
                     r#"
@@ -870,7 +896,8 @@ impl DBProject {
                     &slugs,
                 )
                 .fetch_all(&mut exec)
-                .await?;
+                .await
+                .wrap_err("fetching project rows")?;
 
                 let project_components = project_rows
                     .iter()
@@ -891,7 +918,7 @@ impl DBProject {
 
                 let projects = project_rows
                     .into_iter()
-                    .try_fold(DashMap::new(), |acc, m| -> Result<_, DatabaseError> {
+                    .try_fold(DashMap::new(), |acc, m| {
                         let id = m.id;
                         let project_id = DBProjectId(id);
                         let VersionLoaderData {
@@ -938,9 +965,10 @@ impl DBProject {
                                 status: ProjectStatus::from_string(
                                     &m.status,
                                 ),
-                                requested_status: m.requested_status.map(|x| ProjectStatus::from_string(
-                                    &x,
-                                )),
+                                requested_status: m
+                                    .requested_status
+                                    .as_deref()
+                                    .map(ProjectStatus::from_string),
                                 license: m.license.clone(),
                                 slug: m.slug.clone(),
                                 description: m.description.clone(),
@@ -976,15 +1004,15 @@ impl DBProject {
                         };
 
                         acc.insert(m.id, (m.slug, project));
-                        Ok(acc)
+                        eyre::Ok(acc)
                     })
-                    ?;
+                    .wrap_err("building project query results")?;
 
-                Ok::<_, DatabaseError>(projects)
+                eyre::Ok(projects)
             },
         )
         .await
-        .wrap_internal_err("fetching cached projects")?;
+        .wrap_err("fetching cached projects")?;
 
         Ok(val)
     }
@@ -999,7 +1027,6 @@ impl DBProject {
             Option<DBProjectId>,
             Option<DBProjectId>,
         )>,
-        DatabaseError,
     >
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
@@ -1011,11 +1038,15 @@ impl DBProject {
         )>;
 
         {
-            let mut redis = redis.connect().await?;
+            let mut redis = redis.connect().await.wrap_err(
+                "connecting to redis to fetch project dependencies",
+            )?;
             let key = redis.key().entity(PROJECTS_DEPENDENCIES_NAMESPACE, id.0);
 
-            let dependencies =
-                redis.get_deserialized::<Dependencies>(&key).await?;
+            let dependencies = redis
+                .get_deserialized::<Dependencies>(&key)
+                .await
+                .wrap_err("fetching cached project dependencies")?;
             if let Some(dependencies) = dependencies {
                 return Ok(dependencies);
             }
@@ -1044,12 +1075,19 @@ impl DBProject {
             )
         })
         .try_collect::<Dependencies>()
-        .await?;
+        .await
+        .wrap_err("fetching project dependencies")?;
 
-        let mut redis = redis.connect().await?;
+        let mut redis = redis
+            .connect()
+            .await
+            .wrap_err("connecting to redis to cache project dependencies")?;
         let key = redis.key().entity(PROJECTS_DEPENDENCIES_NAMESPACE, id.0);
 
-        redis.set_serialized(&key, &dependencies, None).await?;
+        redis
+            .set_serialized(&key, &dependencies, None)
+            .await
+            .wrap_err("caching project dependencies")?;
         Ok(dependencies)
     }
 
@@ -1058,8 +1096,11 @@ impl DBProject {
         slug: Option<String>,
         clear_dependencies: Option<bool>,
         redis: &RedisPool,
-    ) -> Result<(), DatabaseError> {
-        let mut redis = redis.connect().await?;
+    ) -> Result<()> {
+        let mut redis = redis
+            .connect()
+            .await
+            .wrap_err("connecting to redis to clear project cache")?;
         let mut keys = vec![redis.key().entity(PROJECTS_NAMESPACE, id.0)];
         if let Some(slug) = slug {
             keys.push(
@@ -1074,7 +1115,10 @@ impl DBProject {
             );
         }
 
-        redis.delete_many(&keys).await?;
+        redis
+            .delete_many(&keys)
+            .await
+            .wrap_err("clearing project cache")?;
         Ok(())
     }
 }

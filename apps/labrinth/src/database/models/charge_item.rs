@@ -1,11 +1,12 @@
 use crate::database::PgTransaction;
 use crate::database::models::{
-    DBChargeId, DBProductPriceId, DBUserId, DBUserSubscriptionId, DatabaseError,
+    DBChargeId, DBProductPriceId, DBUserId, DBUserSubscriptionId,
 };
 use crate::models::billing::{
     ChargeStatus, ChargeType, PaymentPlatform, PriceDuration,
 };
 use chrono::{DateTime, Utc};
+use eyre::{Result, WrapErr};
 use std::convert::{TryFrom, TryInto};
 
 #[derive(Clone)]
@@ -125,7 +126,7 @@ impl DBCharge {
     pub async fn upsert(
         &self,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<DBChargeId, DatabaseError> {
+    ) -> Result<DBChargeId> {
         sqlx::query!(
             r#"
             INSERT INTO charges (id, user_id, price_id, amount, currency_code, charge_type, status, due, last_attempt, subscription_id, subscription_interval, payment_platform, payment_platform_id, parent_charge_id, net, tax_amount, tax_platform_id, tax_last_updated, tax_drift_loss, tax_transaction_version, tax_platform_accounting_time)
@@ -175,7 +176,8 @@ impl DBCharge {
             self.tax_platform_accounting_time,
         )
             .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("upserting charge")?;
 
         Ok(self.id)
     }
@@ -183,11 +185,12 @@ impl DBCharge {
     pub async fn get(
         id: DBChargeId,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Option<DBCharge>, DatabaseError> {
+    ) -> Result<Option<DBCharge>> {
         let id = id.0;
         let res = select_charges_with_predicate!("WHERE id = $1", id)
             .fetch_optional(exec)
-            .await?;
+            .await
+            .wrap_err("fetching charge")?;
 
         Ok(res.and_then(|r| r.try_into().ok()))
     }
@@ -195,43 +198,45 @@ impl DBCharge {
     pub async fn get_from_user(
         user_id: DBUserId,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<DBCharge>, DatabaseError> {
+    ) -> Result<Vec<DBCharge>> {
         let user_id = user_id.0;
         let res = select_charges_with_predicate!(
             "WHERE user_id = $1 ORDER BY due DESC",
             user_id
         )
         .fetch_all(exec)
-        .await?;
+        .await
+        .wrap_err("fetching charges for user")?;
 
-        Ok(res
-            .into_iter()
+        res.into_iter()
             .map(|r| r.try_into())
-            .collect::<Result<Vec<_>, serde_json::Error>>()?)
+            .collect::<Result<Vec<_>, serde_json::Error>>()
+            .wrap_err("parsing charges for user")
     }
 
     pub async fn get_children(
         charge_id: DBChargeId,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<DBCharge>, DatabaseError> {
+    ) -> Result<Vec<DBCharge>> {
         let charge_id = charge_id.0;
         let res = select_charges_with_predicate!(
             "WHERE parent_charge_id = $1",
             charge_id
         )
         .fetch_all(exec)
-        .await?;
+        .await
+        .wrap_err("fetching child charges")?;
 
-        Ok(res
-            .into_iter()
+        res.into_iter()
             .map(|r| r.try_into())
-            .collect::<Result<Vec<_>, serde_json::Error>>()?)
+            .collect::<Result<Vec<_>, serde_json::Error>>()
+            .wrap_err("parsing child charges")
     }
 
     pub async fn get_open_subscription(
         user_subscription_id: DBUserSubscriptionId,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Option<DBCharge>, DatabaseError> {
+    ) -> Result<Option<DBCharge>> {
         let user_subscription_id = user_subscription_id.0;
         let res = select_charges_with_predicate!(
             "WHERE
@@ -241,14 +246,15 @@ impl DBCharge {
             user_subscription_id
         )
         .fetch_optional(exec)
-        .await?;
+        .await
+        .wrap_err("fetching open subscription charge")?;
 
         Ok(res.and_then(|r| r.try_into().ok()))
     }
 
     pub async fn get_chargeable(
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<DBCharge>, DatabaseError> {
+    ) -> Result<Vec<DBCharge>> {
         let charge_type = ChargeType::Subscription.as_str();
         let res = select_charges_with_predicate!(
             r#"
@@ -262,17 +268,18 @@ impl DBCharge {
             charge_type
         )
             .fetch_all(exec)
-            .await?;
+            .await
+            .wrap_err("fetching chargeable charges")?;
 
-        Ok(res
-            .into_iter()
+        res.into_iter()
             .map(|r| r.try_into())
-            .collect::<Result<Vec<_>, serde_json::Error>>()?)
+            .collect::<Result<Vec<_>, serde_json::Error>>()
+            .wrap_err("parsing chargeable charges")
     }
 
     pub async fn get_unprovision(
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<DBCharge>, DatabaseError> {
+    ) -> Result<Vec<DBCharge>> {
         let charge_type = ChargeType::Subscription.as_str();
         let res = select_charges_with_predicate!(
             r#"
@@ -289,17 +296,18 @@ impl DBCharge {
             charge_type
         )
             .fetch_all(exec)
-            .await?;
+            .await
+            .wrap_err("fetching charges to unprovision")?;
 
-        Ok(res
-            .into_iter()
+        res.into_iter()
             .map(|r| r.try_into())
-            .collect::<Result<Vec<_>, serde_json::Error>>()?)
+            .collect::<Result<Vec<_>, serde_json::Error>>()
+            .wrap_err("parsing charges to unprovision")
     }
 
     pub async fn get_cancellable(
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<DBCharge>, DatabaseError> {
+    ) -> Result<Vec<DBCharge>> {
         let charge_type = ChargeType::Subscription.as_str();
         let res = select_charges_with_predicate!(
             r#"
@@ -310,12 +318,13 @@ impl DBCharge {
             charge_type
         )
         .fetch_all(exec)
-        .await?;
+        .await
+        .wrap_err("fetching cancellable charges")?;
 
-        Ok(res
-            .into_iter()
+        res.into_iter()
             .map(|r| r.try_into())
-            .collect::<Result<Vec<_>, serde_json::Error>>()?)
+            .collect::<Result<Vec<_>, serde_json::Error>>()
+            .wrap_err("parsing cancellable charges")
     }
 
     /// Returns all charges that need to have their tax amount updated.
@@ -330,7 +339,7 @@ impl DBCharge {
     pub async fn get_updateable_lock(
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
         limit: i64,
-    ) -> Result<Vec<DBCharge>, DatabaseError> {
+    ) -> Result<Vec<DBCharge>> {
         let res = select_charges_with_predicate!(
 			"
 			INNER JOIN users u ON u.id = charges.user_id
@@ -347,12 +356,13 @@ impl DBCharge {
 			limit
 		)
 		.fetch_all(exec)
-		.await?;
+		.await
+		.wrap_err("fetching charges requiring tax updates")?;
 
-        Ok(res
-            .into_iter()
+        res.into_iter()
             .map(|r| r.try_into())
-            .collect::<Result<Vec<_>, serde_json::Error>>()?)
+            .collect::<Result<Vec<_>, serde_json::Error>>()
+            .wrap_err("parsing charges requiring tax updates")
     }
 
     /// Returns all charges which are missing a tax identifier, that is, are succeeded and haven't been assigned a tax identifier yet.
@@ -362,7 +372,7 @@ impl DBCharge {
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
         offset: i64,
         limit: i64,
-    ) -> Result<Vec<DBCharge>, DatabaseError> {
+    ) -> Result<Vec<DBCharge>> {
         let res = select_charges_with_predicate!(
             "
 			WHERE
@@ -378,18 +388,19 @@ impl DBCharge {
             limit
         )
         .fetch_all(exec)
-        .await?;
+        .await
+        .wrap_err("fetching charges missing tax identifiers")?;
 
-        Ok(res
-            .into_iter()
+        res.into_iter()
             .map(|r| r.try_into())
-            .collect::<Result<Vec<_>, serde_json::Error>>()?)
+            .collect::<Result<Vec<_>, serde_json::Error>>()
+            .wrap_err("parsing charges missing tax identifiers")
     }
 
     pub async fn remove(
         id: DBChargeId,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<()> {
         sqlx::query!(
             "
             DELETE FROM charges
@@ -398,7 +409,8 @@ impl DBCharge {
             id.0 as i64
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("removing charge")?;
 
         Ok(())
     }

@@ -1,4 +1,5 @@
 - Use `ApiError` as the error type for API routes
+- Always use `cargo clippy` instead of `cargo check`
 - The return type of an HTTP route should not be `HttpResponse` if possible; always prefer more specific types
   - Use `web::Json<T>` for JSON-encoded response
   - Use `()` for no content

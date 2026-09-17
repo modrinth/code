@@ -1,9 +1,9 @@
 use super::ids::*;
-use crate::database::models::DatabaseError;
 use crate::database::{PgTransaction, models};
 use crate::models::collections::CollectionStatus;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
+use eyre::{Result, WrapErr};
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
@@ -24,7 +24,7 @@ impl CollectionBuilder {
     pub async fn insert(
         self,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<DBCollectionId, DatabaseError> {
+    ) -> Result<DBCollectionId> {
         let collection_struct = DBCollection {
             id: self.collection_id,
             name: self.name,
@@ -38,7 +38,10 @@ impl CollectionBuilder {
             status: self.status,
             projects: self.projects,
         };
-        collection_struct.insert(transaction).await?;
+        collection_struct
+            .insert(transaction)
+            .await
+            .wrap_err("inserting built collection")?;
 
         Ok(self.collection_id)
     }
@@ -62,7 +65,7 @@ impl DBCollection {
     pub async fn insert(
         &self,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<()> {
         sqlx::query!(
             "
             INSERT INTO collections (
@@ -84,7 +87,8 @@ impl DBCollection {
             self.status.to_string(),
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("inserting collection")?;
 
         let (collection_ids, project_ids): (Vec<_>, Vec<_>) =
             self.projects.iter().map(|p| (self.id.0, p.0)).unzip();
@@ -98,7 +102,8 @@ impl DBCollection {
             &project_ids[..],
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("inserting collection projects")?;
 
         Ok(())
     }
@@ -107,8 +112,10 @@ impl DBCollection {
         id: DBCollectionId,
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
-    ) -> Result<Option<()>, DatabaseError> {
-        let collection = Self::get(id, &mut *transaction, redis).await?;
+    ) -> Result<Option<()>> {
+        let collection = Self::get(id, &mut *transaction, redis)
+            .await
+            .wrap_err("fetching collection to remove")?;
 
         if let Some(collection) = collection {
             sqlx::query!(
@@ -119,7 +126,8 @@ impl DBCollection {
                 id as DBCollectionId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("deleting collection projects")?;
 
             sqlx::query!(
                 "
@@ -129,9 +137,12 @@ impl DBCollection {
                 id as DBCollectionId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("deleting collection")?;
 
-            models::DBCollection::clear_cache(collection.id, redis).await?;
+            models::DBCollection::clear_cache(collection.id, redis)
+                .await
+                .wrap_err("clearing removed collection cache")?;
 
             Ok(Some(()))
         } else {
@@ -143,12 +154,13 @@ impl DBCollection {
         id: DBCollectionId,
         executor: E,
         redis: &RedisPool,
-    ) -> Result<Option<DBCollection>, DatabaseError>
+    ) -> Result<Option<DBCollection>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         DBCollection::get_many(&[id], executor, redis)
             .await
+            .wrap_err("fetching collection")
             .map(|x| x.into_iter().next())
     }
 
@@ -156,7 +168,7 @@ impl DBCollection {
         collection_ids: &[DBCollectionId],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<DBCollection>, DatabaseError>
+    ) -> Result<Vec<DBCollection>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -165,7 +177,7 @@ impl DBCollection {
                 COLLECTIONS_NAMESPACE,
                 &collection_ids.iter().map(|x| x.0).collect::<Vec<_>>(),
                 |collection_ids| async move {
-                    let collections = sqlx::query!(
+                    sqlx::query!(
                         "
                     SELECT c.id id, c.name name, c.description description,
                     c.icon_url icon_url, c.raw_icon_url raw_icon_url, c.color color, c.created created, c.user_id user_id,
@@ -200,14 +212,13 @@ impl DBCollection {
                         };
 
                         acc.insert(m.id, collection);
-                        async move { Ok(acc) }
+                        async move { Ok::<_, sqlx::Error>(acc) }
                     })
-                    .await?;
-
-                    Ok::<_, DatabaseError>(collections)
+                    .await
                 },
             )
-            .await?;
+            .await
+            .wrap_err("fetching cached collections")?;
 
         Ok(val)
     }
@@ -215,11 +226,17 @@ impl DBCollection {
     pub async fn clear_cache(
         id: DBCollectionId,
         redis: &RedisPool,
-    ) -> Result<(), DatabaseError> {
-        let mut redis = redis.connect().await?;
+    ) -> Result<()> {
+        let mut redis = redis
+            .connect()
+            .await
+            .wrap_err("connecting to redis to clear collection cache")?;
         let key = redis.key().entity(COLLECTIONS_NAMESPACE, id.0);
 
-        redis.delete(&key).await?;
+        redis
+            .delete(&key)
+            .await
+            .wrap_err("clearing collection cache")?;
         Ok(())
     }
 }

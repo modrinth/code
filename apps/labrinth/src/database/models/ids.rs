@@ -1,4 +1,3 @@
-use super::DatabaseError;
 use crate::database::PgTransaction;
 use crate::models::ids::{
     AffiliateCodeId, AnalyticsEventId, AttributionGroupId, CampaignDonationId,
@@ -11,6 +10,7 @@ use crate::models::ids::{
 use ariadne::ids::base62_impl::to_base62;
 use ariadne::ids::{UserId, random_base62_rng, random_base62_rng_range};
 use censor::Censor;
+use eyre::{Result, WrapErr};
 use paste::paste;
 use rand::SeedableRng;
 use rand_chacha::ChaCha20Rng;
@@ -23,7 +23,7 @@ macro_rules! generate_ids {
     ($function_name:ident, $return_type:ident, $select_stmnt:expr) => {
         pub async fn $function_name(
             con: &mut PgTransaction<'_>,
-        ) -> Result<$return_type, DatabaseError> {
+        ) -> Result<$return_type> {
             let mut rng = ChaCha20Rng::from_entropy();
             let length = 8;
             let mut id = random_base62_rng(&mut rng, length);
@@ -34,7 +34,8 @@ macro_rules! generate_ids {
             loop {
                 let results = sqlx::query!($select_stmnt, id as i64)
                     .fetch_one(&mut *con)
-                    .await?;
+                    .await
+                    .wrap_err("checking generated ID uniqueness")?;
 
                 if results.exists.unwrap_or(true)
                     || censor.check(&*to_base62(id))
@@ -46,7 +47,9 @@ macro_rules! generate_ids {
 
                 retry_count += 1;
                 if retry_count > ID_RETRY_COUNT {
-                    return Err(DatabaseError::RandomId);
+                    return Err(eyre::eyre!(
+                        "failed to generate a unique random ID"
+                    ));
                 }
             }
 
@@ -60,7 +63,7 @@ macro_rules! generate_bulk_ids {
         pub async fn $function_name(
             count: usize,
             con: &mut PgTransaction<'_>,
-        ) -> Result<Vec<$return_type>, DatabaseError> {
+        ) -> Result<Vec<$return_type>> {
             let mut retry_count = 0;
 
             // Check if ID is unique
@@ -75,7 +78,8 @@ macro_rules! generate_bulk_ids {
 
                 let results = sqlx::query!($select_stmnt, &ids)
                     .fetch_one(&mut *con)
-                    .await?;
+                    .await
+                    .wrap_err("checking generated ID uniqueness")?;
 
                 if !results.exists.unwrap_or(true) {
                     return Ok(ids
@@ -86,7 +90,9 @@ macro_rules! generate_bulk_ids {
 
                 retry_count += 1;
                 if retry_count > ID_RETRY_COUNT {
-                    return Err(DatabaseError::RandomId);
+                    return Err(eyre::eyre!(
+                        "failed to generate unique random IDs"
+                    ));
                 }
             }
         }
