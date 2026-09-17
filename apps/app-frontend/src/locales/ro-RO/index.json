@@ -1,755 +1,749 @@
 {
-	"app.action-bar.downloading-java": {
-		"message": "Se descarcă Java {version}"
-	},
-	"app.action-bar.downloading-update": {
-		"message": "Se descarcă actualizarea"
-	},
-	"app.action-bar.downloads": {
-		"message": "Descărcări"
-	},
-	"app.action-bar.hide-downloads": {
-		"message": "Ascunde descărcările active"
-	},
-	"app.action-bar.hide-more-running-instances": {
-		"message": "Ascunde mai mult instanțe pornite"
-	},
-	"app.action-bar.install.copied-details": {
-		"message": "Copiat"
-	},
-	"app.action-bar.install.copy-details": {
-		"message": "Copiază detaliile"
-	},
-	"app.action-bar.install.dismiss": {
-		"message": "Ignoră"
-	},
-	"app.action-bar.install.open-instance": {
-		"message": "Instanța nouă"
-	},
-	"app.action-bar.install.retry": {
-		"message": "Reîncearcă"
-	},
-	"app.action-bar.install.summary.app-closing": {
-		"message": "Anulat din cauza închiderii aplicației"
-	},
-	"app.action-bar.install.summary.bad-modpack-file": {
-		"message": "Nu s-a putut citi modpack-ul"
-	},
-	"app.action-bar.install.summary.canceled": {
-		"message": "Anulat"
-	},
-	"app.action-bar.install.summary.cleanup-incomplete": {
-		"message": "Curățarea nu s-a terminat"
-	},
-	"app.action-bar.install.summary.content-download-failed": {
-		"message": "Nu s-au putut descărca fișierele"
-	},
-	"app.action-bar.install.summary.corrupt-download": {
-		"message": "Fișierul descărcat este corupt"
-	},
-	"app.action-bar.install.summary.could-not-save-files": {
-		"message": "Nu s-au putut salva fișierele"
-	},
-	"app.action-bar.install.summary.download-failed": {
-		"message": "Descărcarea nu s-a putut finaliza"
-	},
-	"app.action-bar.install.summary.instance-not-found": {
-		"message": "Instanța nu a fost găsită"
-	},
-	"app.action-bar.install.summary.invalid-file-path": {
-		"message": "Calea fișierului este invalidă"
-	},
-	"app.action-bar.install.summary.invalid-modpack": {
-		"message": "Datele modpack-ului nu sunt valide"
-	},
-	"app.action-bar.install.summary.invalid-modpack-files": {
-		"message": "Fișierele modpack-ului au metadate invalide"
-	},
-	"app.action-bar.install.summary.java-setup-failed": {
-		"message": "Configurarea Java nu s-a putut finaliza"
-	},
-	"app.action-bar.install.summary.loader-setup-failed": {
-		"message": "Configurarea loader-ului a eșuat"
-	},
-	"app.action-bar.install.summary.local-data-error": {
-		"message": "Datele locale nu au putut fi actualizate"
-	},
-	"app.action-bar.install.summary.minecraft-setup-failed": {
-		"message": "Configurarea Minecraft a eșuat"
-	},
-	"app.action-bar.install.summary.modrinth-unreachable": {
-		"message": "Owyx nu a putut fi accesat"
-	},
-	"app.action-bar.install.summary.no-write-permission": {
-		"message": "Nu există permisiunea de scriere"
-	},
-	"app.action-bar.install.summary.pack-download-failed": {
-		"message": "Pachetul nu a putut fi descărcat"
-	},
-	"app.action-bar.install.summary.unexpected-error": {
-		"message": "Ceva nu a funcționat corect"
-	},
-	"app.action-bar.install.unknown-instance": {
-		"message": "Instanță necunoscută"
-	},
-	"app.action-bar.install.updating-shared-content": {
-		"message": "Actualizând conținutul partajat"
-	},
-	"app.action-bar.make-primary-instance": {
-		"message": "Setează ca instanță principală"
-	},
-	"app.action-bar.no-instances-running": {
-		"message": "Nu rulează nicio instanță"
-	},
-	"app.action-bar.offline": {
-		"message": "Offline"
-	},
-	"app.action-bar.primary-instance": {
-		"message": "Instanță principală"
-	},
-	"app.action-bar.reload-to-update": {
-		"message": "Reîncarcă pentru a actualiza"
-	},
-	"app.action-bar.show-downloads": {
-		"message": "Vezi descărcările active"
-	},
-	"app.action-bar.show-more-running-instances": {
-		"message": "Arată mai multe instanţe care rulează"
-	},
-	"app.action-bar.stop-instance": {
-		"message": "Oprește instanța"
-	},
-	"app.action-bar.update": {
-		"message": "Actualizează"
-	},
-	"app.action-bar.view-active-downloads": {
-		"message": "Vezi descărcările active"
-	},
-	"app.action-bar.view-instance": {
-		"message": "Vezi instanțele"
-	},
-	"app.action-bar.view-logs": {
-		"message": "Vezi jurnalele"
-	},
-	"app.ads-consent.accept": {
-		"message": "Acceptă tot"
-	},
-	"app.ads-consent.body": {
-		"message": "Anunțurile fac posibil Owyx și finanțează plățile creatorilor. Partenerii noștri pot stoca sau accesa cookie-uri în aplicație pentru a personaliza reclamele și a măsura performanța."
-	},
-	"app.ads-consent.manage": {
-		"message": "Gestionează preferințele"
-	},
-	"app.ads-consent.reject": {
-		"message": "Refuză tot"
-	},
-	"app.ads-consent.title": {
-		"message": "Confidențialitatea ta și modul în care anunțurile susțin Owyx"
-	},
-	"app.appearance-settings.compact-mode.description": {
-		"message": "Afișează instanțele bibliotecii într-un layout compact."
-	},
-	"app.appearance-settings.compact-mode.title": {
-		"message": "Mod compact"
-	},
-	"app.appearance-settings.default-landing-page.home": {
-		"message": "Acasă"
-	},
-	"app.appearance-settings.default-landing-page.library": {
-		"message": "Librărie"
-	},
-	"app.appearance-settings.hide-nametag.description": {
-		"message": "Ascunde numele tău de utilizator deasupra previzualizării jucătorului de pe pagina selectare Skin."
-	},
-	"app.appearance-settings.hide-nametag.title": {
-		"message": "Ascunde nametag-ul"
-	},
-	"app.appearance-settings.minimize-launcher.description": {
-		"message": "Minimizează aplicația Owyx atunci când Minecraft pornește."
-	},
-	"app.appearance-settings.minimize-launcher.title": {
-		"message": "Minimizează aplicația"
-	},
-	"app.appearance-settings.show-play-time.description": {
-		"message": "Arată cât timp te-ai pe jucat fiecare instanță."
-	},
-	"app.appearance-settings.show-play-time.title": {
-		"message": "Arată timpul jucat"
-	},
-	"app.appearance-settings.skip-non-essential-warnings.description": {
-		"message": "Sari peste confirmările pentru acțiuni cu risc scăzut, precum instalări duplicate, ștergere normala a conținutului, actualizări in masa, deconectare si reparații. Avertismente pentru acțiunile periculoase sunt mereu afișate."
-	},
-	"app.appearance-settings.skip-non-essential-warnings.title": {
-		"message": "Sari peste avertismentele neesențiale"
-	},
-	"app.appearance-settings.toggle-sidebar.description": {
-		"message": "Ascundeți implicit bara laterală dreapta si adaugați un buton pentru a o afișa sau a o ascunde."
-	},
-	"app.appearance-settings.toggle-sidebar.title": {
-		"message": "Ascundeți bara laterală dreapta"
-	},
-	"app.appearance-settings.unknown-pack-warning.description": {
-		"message": "Afișați un avertisment de siguranța înainte de a instala un Owyx Pack (.mrpack) care nu este găzduit de Owyx."
-	},
-	"app.appearance-settings.unknown-pack-warning.title": {
-		"message": "Avertizează-ma înainte de a instala modpackuri necunoscute"
-	},
-	"app.auth-servers.unreachable.body": {
-		"message": "Serverele de autentificare Minecraft pot fi indisponibile în acest moment. Verificați conexiunea la internet și încercați din nou mai târziu."
-	},
-	"app.auth-servers.unreachable.header": {
-		"message": "Nu se pot accesa serverele de autentificare"
-	},
-	"app.behavior-settings.confirmations.title": {
-		"message": "Confirmări"
-	},
-	"app.behavior-settings.content.title": {
-		"message": "Acasă și conținut"
-	},
-	"app.behavior-settings.startup-and-navigation.title": {
-		"message": "Pornire și navigare"
-	},
-	"app.behavior-settings.sync-across-devices.description": {
-		"message": "Utilizați aceste setări de comportament pretutindeni unde sunteți conectat. Dezactivați această opțiune pentru a păstra setări separate pe acest dispozitiv."
-	},
-	"app.behavior-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "Conectează-te la un cont Owyx pentru a sincroniza setările."
-	},
-	"app.behavior-settings.sync-across-devices.title": {
-		"message": "Sincronizați comportamentul între dispozitive"
-	},
-	"app.browse.add-servers-to-instance": {
-		"message": "Adaugă server la instanță"
-	},
-	"app.browse.add-to-an-instance": {
-		"message": "Adaugă la o instanță"
-	},
-	"app.browse.add-to-instance": {
-		"message": "Adăugați la instanță"
-	},
-	"app.browse.add-to-instance-name": {
-		"message": "Adaugă la {instanceName}"
-	},
-	"app.browse.added": {
-		"message": "Adăugat"
-	},
-	"app.browse.already-added": {
-		"message": "Deja adăugat"
-	},
-	"app.browse.back-to-instance": {
-		"message": "Înapoi la instanță"
-	},
-	"app.browse.discover-project-type": {
-		"message": "Descoperă {projectType}"
-	},
-	"app.browse.discover-servers": {
-		"message": "Descoperă servere"
-	},
-	"app.browse.hide-added-servers": {
-		"message": "Ascunde serverele deja adăugate"
-	},
-	"app.browse.hide-installed-modpacks": {
-		"message": "Ascunde conținutul deja instalat"
-	},
-	"app.browse.project-actions.label": {
-		"message": "Acțiuni de proiect"
-	},
-	"app.browse.project-type.data-packs": {
-		"message": "Data Pack-uri"
-	},
-	"app.browse.project-type.modpacks": {
-		"message": "Modpack-uri"
-	},
-	"app.browse.project-type.mods": {
-		"message": "Moduri"
-	},
-	"app.browse.project-type.resource-packs": {
-		"message": "Resource Pack-uri"
-	},
-	"app.browse.project-type.servers": {
-		"message": "Servere"
-	},
-	"app.browse.project-type.shaders": {
-		"message": "Shadere"
-	},
-	"app.browse.server-instance-content-warning": {
-		"message": "Adăugarea de conținut poate împiedica conectarea la acest server. Orice conținut adăugat va fi eliminat atunci când conținutul serverului gestionat este actualizat."
-	},
-	"app.browse.server.installing": {
-		"message": "Se instalează"
-	},
-	"app.content-install.no-compatible-versions": {
-		"message": "Nicio versiune disponibilă nu corespunde cu {compatibilityLabel}. Selectați o versiune pentru a o instala oricum. Dependențele nu vor fi instalate automat."
-	},
-	"app.content.desync-pack": {
-		"message": "Desincronizare"
-	},
-	"app.content.sync-pack": {
-		"message": "Sincronizeaza"
-	},
-	"app.error.state-init.open-backups-folder": {
-		"message": "Deschideți folderul de copii de rezervă"
-	},
-	"app.export-modal.description-placeholder": {
-		"message": "Introduceți descrierea modpack-ului..."
-	},
-	"app.export-modal.export-button": {
-		"message": "Exportă"
-	},
-	"app.export-modal.export-complete": {
-		"message": "Exportare completă"
-	},
-	"app.export-modal.export-complete-description": {
-		"message": "{name} a fost exportat cu succes."
-	},
-	"app.export-modal.header": {
-		"message": "Exportă modpack"
-	},
-	"app.export-modal.modpack-name-label": {
-		"message": "Numele modpack-ului"
-	},
-	"app.export-modal.modpack-name-placeholder": {
-		"message": "Numele modpack-ului"
-	},
-	"app.export-modal.version-number-placeholder": {
-		"message": "1.0.0"
-	},
-	"app.features-settings.instance-pages.title": {
-		"message": "Instanțe"
-	},
-	"app.features-settings.play-page.title": {
-		"message": "Joacă pagină"
-	},
-	"app.features-settings.quick-instances.description": {
-		"message": "Alegeți numărul maxim de instanțe recente afișate în bara laterală din stânga. Puteți ajusta acest lucru și trăgând de separator."
-	},
-	"app.features-settings.quick-instances.title": {
-		"message": "Instanțe rapide în bara laterală"
-	},
-	"app.features-settings.show-all-screenshots.description": {
-		"message": "Afișați un buton în bara laterală din stânga pentru a vizualiza capturile de ecran din toate instanțele dvs."
-	},
-	"app.features-settings.show-all-screenshots.title": {
-		"message": "Afișați toate capturile de ecran în bara laterală"
-	},
-	"app.features-settings.show-jump-in.description": {
-		"message": "Afișați lumile și instanțele jucate recent în partea de sus a paginii Joacă."
-	},
-	"app.features-settings.show-jump-in.title": {
-		"message": "Afișează salt in secțiune"
-	},
-	"app.features-settings.show-screenshots-tab.title": {
-		"message": "Afișează fila Capturi de ecran în instanțe"
-	},
-	"app.features-settings.sidebar.title": {
-		"message": "Bară laterală"
-	},
-	"app.features-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "Conectează-te la un cont Owyx pentru a sincroniza setările."
-	},
-	"app.home.jump-back-in.more-options": {
-		"message": "Mai multe opțiuni"
-	},
-	"app.home.jump-back-in.never-played": {
-		"message": "Niciodată jucat"
-	},
-	"app.home.jump-back-in.new-instance": {
-		"message": "Instanță nouă"
-	},
-	"app.install.phase.finalizing": {
-		"message": "Se finalizează"
-	},
-	"app.instance.action.play": {
-		"message": "Joacă"
-	},
-	"app.instance.action.stop": {
-		"message": "Oprește"
-	},
-	"app.instance.add-server.add": {
-		"message": "Adaugă"
-	},
-	"app.instance.add-server.added": {
-		"message": "Adăugat"
-	},
-	"app.instance.admonitions.shared-instance.added-label": {
-		"message": "Adăugat"
-	},
-	"app.instance.modpack-already-installed.create": {
-		"message": "Creează"
-	},
-	"app.instance.share.sign-in.button": {
-		"message": "Conectează-te"
-	},
-	"app.instance.shared-instance-already-installed.instance": {
-		"message": "Instanță"
-	},
-	"app.instance.worlds.delete-world-modal.delete-button": {
-		"message": "Șterge lumea"
-	},
-	"app.instance.worlds.delete-world-modal.title": {
-		"message": "Șterge lumea"
-	},
-	"app.instance.worlds.delete-world-modal.warning-header": {
-		"message": "Se șterge {name}"
-	},
-	"app.instance.worlds.filter-offline": {
-		"message": "Offline"
-	},
-	"app.instance.worlds.filter-online": {
-		"message": "Online"
-	},
-	"app.instance.worlds.filter-vanilla": {
-		"message": "Vanilla"
-	},
-	"app.instance.worlds.refreshing": {
-		"message": "Se reîmprospătează..."
-	},
-	"app.java-detection.cancel": {
-		"message": "Anulează"
-	},
-	"app.java-detection.columns.actions": {
-		"message": "Acțiuni"
-	},
-	"app.modal.install-to-play.header": {
-		"message": "Instalați pentru a juca"
-	},
-	"app.modal.install-to-play.install-button": {
-		"message": "Instalează"
-	},
-	"app.modal.install-to-play.mod-count": {
-		"message": "{count, plural,one {#mod} other {# moduri}}"
-	},
-	"app.modal.install-to-play.shared-instance": {
-		"message": "Instanță comună"
-	},
-	"app.modal.install-to-play.view-contents": {
-		"message": "Vizualizați conținutul"
-	},
-	"app.modal.update-to-play.header": {
-		"message": "Actualizați pentru a juca"
-	},
-	"app.settings.developer-mode-enabled": {
-		"message": "Modul dezvoltator activat."
-	},
-	"app.settings.downloading": {
-		"message": "Se descarcă v{version}"
-	},
-	"app.settings.tabs.appearance": {
-		"message": "Aspect"
-	},
-	"app.settings.tabs.java-installations": {
-		"message": "Instalări Java"
-	},
-	"app.settings.tabs.language": {
-		"message": "Limbă"
-	},
-	"app.settings.tabs.privacy": {
-		"message": "Confidențialitate"
-	},
-	"app.settings.tabs.resource-management": {
-		"message": "Administrare resurse"
-	},
-	"app.update-popup.body.download-complete": {
-		"message": "Aplicația Owyx v{version} a terminat descărcarea. Reîncărcați pentru a actualiza acum sau automat când închideți aplicația Owyx."
-	},
-	"app.update-popup.body.linux": {
-		"message": "Aplicația Owyx v{version} este disponibil. Utilizați managerul de pachete pentru a actualiza pentru cele mai recente funcții și remedieri!"
-	},
-	"app.update-popup.body.metered": {
-		"message": "Aplicația Owyx v{version} este disponibil acum! Deoarece sunteți într-o rețea cu contorizare, nu am descărcat-o automat."
-	},
-	"app.update-popup.changelog": {
-		"message": "Jurnalul modificărilor"
-	},
-	"app.update-popup.download": {
-		"message": "Descărcați ({size})"
-	},
-	"app.update-popup.download-complete": {
-		"message": "Descărcare finalizată"
-	},
-	"app.update-popup.title": {
-		"message": "Actualizare disponibilă"
-	},
-	"app.update.complete-toast.text": {
-		"message": "Apasă aici pentru a vedea istoricul de modificări."
-	},
-	"app.update.complete-toast.title": {
-		"message": "Versiunea {version} a fost instalată cu succes!"
-	},
-	"app.world.server-modal.select-an-option": {
-		"message": "Selectează o opțiune"
-	},
-	"friends.action.add-friend": {
-		"message": "Adaugă un prieten"
-	},
-	"friends.action.view-friend-requests": {
-		"message": "{count} prieten {count, plural,one {cerere} other {cerere}}"
-	},
-	"friends.add-friend.submit": {
-		"message": "Trimite cerere de prietenie"
-	},
-	"friends.add-friend.title": {
-		"message": "Adăugarea unui prieten"
-	},
-	"friends.add-friend.username.description": {
-		"message": "Poate fi diferit de numele lor de utilizator Minecraft!"
-	},
-	"friends.add-friend.username.placeholder": {
-		"message": "Introduceți numele de utilizator Owyx..."
-	},
-	"friends.add-friend.username.title": {
-		"message": "Care este numele de utilizator Owyx al prietenului tău?"
-	},
-	"friends.add-friends-to-share": {
-		"message": "<link>Adaugă prieteni</link> pentru a vedea ce joacă!"
-	},
-	"friends.friend.cancel-request": {
-		"message": "Anulează cererea"
-	},
-	"friends.friend.remove-friend": {
-		"message": "Eliminare prieten"
-	},
-	"friends.friend.request-sent": {
-		"message": "Cerere de prietenie trimisă"
-	},
-	"friends.friend.view-profile": {
-		"message": "Vizualizați profilul"
-	},
-	"friends.heading": {
-		"message": "Prieteni"
-	},
-	"friends.heading.active": {
-		"message": "Activ"
-	},
-	"friends.heading.offline": {
-		"message": "Inactiv"
-	},
-	"friends.heading.online": {
-		"message": "Online"
-	},
-	"friends.heading.pending": {
-		"message": "În așteptare"
-	},
-	"friends.no-friends-match": {
-		"message": "Nu există prieteni care să corespundă cu \"{query}”"
-	},
-	"friends.search-friends-placeholder": {
-		"message": "Caută prieteni..."
-	},
-	"friends.section.heading": {
-		"message": "{title} - {count}"
-	},
-	"friends.sign-in-to-add-friends": {
-		"message": "<link>Conectează-te la un cont Owyx</link> pentru a adăuga prieteni și a vedea ce joacă!"
-	},
-	"instance.add-server.add-and-play": {
-		"message": "Adaugă și joacă"
-	},
-	"instance.add-server.add-server": {
-		"message": "Adaugă server"
-	},
-	"instance.add-server.resource-pack.disabled": {
-		"message": "Dezactivat"
-	},
-	"instance.add-server.resource-pack.enabled": {
-		"message": "Activat"
-	},
-	"instance.add-server.resource-pack.prompt": {
-		"message": "Întreabă"
-	},
-	"instance.add-server.title": {
-		"message": "Adaugă un server"
-	},
-	"instance.edit-server.title": {
-		"message": "Editează server"
-	},
-	"instance.edit-world.hide-from-home": {
-		"message": "Ascunde din pagina principală"
-	},
-	"instance.edit-world.name": {
-		"message": "Nume"
-	},
-	"instance.edit-world.placeholder-name": {
-		"message": "Lume Minecraft"
-	},
-	"instance.edit-world.reset-icon": {
-		"message": "Resetează pictograma"
-	},
-	"instance.edit-world.title": {
-		"message": "Editează lumea"
-	},
-	"instance.server-modal.address": {
-		"message": "Adresă"
-	},
-	"instance.server-modal.name": {
-		"message": "Nume"
-	},
-	"instance.server-modal.placeholder-name": {
-		"message": "Server Minecraft"
-	},
-	"instance.server-modal.resource-pack": {
-		"message": "Pachet de resurse"
-	},
-	"instance.settings.tabs.general": {
-		"message": "General"
-	},
-	"instance.settings.tabs.general.delete": {
-		"message": "Șterge instanța"
-	},
-	"instance.settings.tabs.general.delete.button": {
-		"message": "Șterge instanța"
-	},
-	"instance.settings.tabs.general.delete.description": {
-		"message": "Șterge definitiv o instanță de pe dispozitivul tău, inclusiv lumile, configurațiile și tot conținutul instalat. Fii atent, deoarece odată ce ștergi o instanță, nu există nicio modalitate de a o recupera."
-	},
-	"instance.settings.tabs.general.deleting.button": {
-		"message": "Se șterge..."
-	},
-	"instance.settings.tabs.general.duplicate-button": {
-		"message": "Duplică"
-	},
-	"instance.settings.tabs.general.duplicate-button.tooltip.installing": {
-		"message": "Nu se poate duplica în timp ce se instalează."
-	},
-	"instance.settings.tabs.general.duplicate-instance": {
-		"message": "Duplică instanța"
-	},
-	"instance.settings.tabs.general.duplicate-instance.description": {
-		"message": "Creează o copie a acestei instanțe, incluzând lumi, configurații, moduri, etc."
-	},
-	"instance.settings.tabs.general.edit-icon": {
-		"message": "Editează pictograma"
-	},
-	"instance.settings.tabs.general.edit-icon.remove": {
-		"message": "Șterge pictograma"
-	},
-	"instance.settings.tabs.general.edit-icon.replace": {
-		"message": "Înlocuiește pictograma"
-	},
-	"instance.settings.tabs.general.edit-icon.select": {
-		"message": "Selectează pictograma"
-	},
-	"instance.settings.tabs.general.name": {
-		"message": "Nume"
-	},
-	"instance.settings.tabs.hooks.post-exit": {
-		"message": "După ieșire"
-	},
-	"instance.settings.tabs.hooks.post-exit.description": {
-		"message": "Rulează după ce jocul se închide."
-	},
-	"instance.settings.tabs.hooks.post-exit.enter": {
-		"message": "Introdu comanda după ieșire..."
-	},
-	"instance.settings.tabs.hooks.pre-launch": {
-		"message": "Înainte de lansare"
-	},
-	"instance.settings.tabs.hooks.pre-launch.description": {
-		"message": "Rulează înainte ca instanța să fie lansată."
-	},
-	"instance.settings.tabs.hooks.pre-launch.enter": {
-		"message": "Introdu comanda înainte de lansare..."
-	},
-	"instance.settings.tabs.hooks.wrapper": {
-		"message": "Wrapper"
-	},
-	"instance.settings.tabs.hooks.wrapper.description": {
-		"message": "Comandă de tip wrapper pentru lansarea Minecraft."
-	},
-	"instance.settings.tabs.hooks.wrapper.enter": {
-		"message": "Introdu comanda de tip wrapper..."
-	},
-	"instance.settings.tabs.installation": {
-		"message": "Instalare"
-	},
-	"instance.settings.tabs.installation.loader-version": {
-		"message": "Versiune {loader}"
-	},
-	"instance.settings.tabs.java.hooks": {
-		"message": "Legături"
-	},
-	"instance.settings.tabs.window.fullscreen": {
-		"message": "Ecran complet"
-	},
-	"instance.settings.tabs.window.fullscreen.description": {
-		"message": "Face ca jocul să pornească pe ecran complet când este lansat (folosind options.txt)."
-	},
-	"instance.settings.tabs.window.height": {
-		"message": "Înălțime"
-	},
-	"instance.settings.tabs.window.height.description": {
-		"message": "Înălțimea ferestrei de joc la pornire."
-	},
-	"instance.settings.tabs.window.height.enter": {
-		"message": "Introdu înălțimea..."
-	},
-	"instance.settings.tabs.window.width": {
-		"message": "Lățime"
-	},
-	"instance.settings.tabs.window.width.description": {
-		"message": "Lățimea ferestrei jocului la pornire."
-	},
-	"instance.settings.tabs.window.width.enter": {
-		"message": "Introdu lățimea..."
-	},
-	"instance.worlds.a_minecraft_server": {
-		"message": "Un server de Minecraft"
-	},
-	"instance.worlds.cant_connect": {
-		"message": "Nu m-am putut conecta la server"
-	},
-	"instance.worlds.copy_address": {
-		"message": "Copiază adresa"
-	},
-	"instance.worlds.dont_show_on_home": {
-		"message": "Nu afișa în pagina principală"
-	},
-	"instance.worlds.game_already_open": {
-		"message": "Instanța este deja deschisă"
-	},
-	"instance.worlds.hardcore": {
-		"message": "Modul extrem"
-	},
-	"instance.worlds.incompatible_server": {
-		"message": "Serverul este incompatibil"
-	},
-	"instance.worlds.linked_server": {
-		"message": "Gestionat de proiect server"
-	},
-	"instance.worlds.no_contact": {
-		"message": "Serverul nu a putut fi contactat"
-	},
-	"instance.worlds.no_server_quick_play": {
-		"message": "Poți să intri direct pe servere doar pe Minecraft Alpha 1.0.5+"
-	},
-	"instance.worlds.no_singleplayer_quick_play": {
-		"message": "Poți să intri direct în lumile de jucător simplu numai pe Minecraft 1.20+"
-	},
-	"instance.worlds.play_instance": {
-		"message": "Joacă pe instanța"
-	},
-	"instance.worlds.view_instance": {
-		"message": "Afișează instanța"
-	},
-	"instance.worlds.world_in_use": {
-		"message": "Lumea este în folosință"
-	},
-	"search.filter.locked.instance": {
-		"message": "Oferit de instanță"
-	},
-	"search.filter.locked.instance-game-version.title": {
-		"message": "Versiunea jocului este oferit de instanță"
-	},
-	"search.filter.locked.instance-loader.title": {
-		"message": "Loader-ul este oferit de instanță"
-	},
-	"search.filter.locked.instance.sync": {
-		"message": "Sincronizează cu instanța"
-	},
-	"search.filter.locked.server-environment.title": {
-		"message": "Numai modurile de pe partea clientului pot fi adăugate la instanța serverului"
-	},
-	"app.nav.admin-panel": {
-		"message": "Panou admin"
-	}
+  "app.action-bar.downloading-java": {
+    "message": "Se descarcă Java {version}"
+  },
+  "app.action-bar.downloading-update": {
+    "message": "Se descarcă actualizarea"
+  },
+  "app.action-bar.downloads": {
+    "message": "Descărcări"
+  },
+  "app.action-bar.hide-downloads": {
+    "message": "Ascunde descărcările active"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Ascunde mai mult instanțe pornite"
+  },
+  "app.action-bar.install.copied-details": {
+    "message": "Copiat"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Copiază detaliile"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "Ignoră"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Instanța nouă"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Reîncearcă"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Anulat din cauza închiderii aplicației"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Nu s-a putut citi modpack-ul"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Anulat"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Curățarea nu s-a terminat"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Nu s-au putut descărca fișierele"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Fișierul descărcat este corupt"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Nu s-au putut salva fișierele"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Descărcarea nu s-a putut finaliza"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Instanța nu a fost găsită"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "Calea fișierului este invalidă"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Datele modpack-ului nu sunt valide"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "Fișierele modpack-ului au metadate invalide"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Configurarea Java nu s-a putut finaliza"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "Configurarea loader-ului a eșuat"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Datele locale nu au putut fi actualizate"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Configurarea Minecraft a eșuat"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Owyx nu a putut fi accesat"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Nu există permisiunea de scriere"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Pachetul nu a putut fi descărcat"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Ceva nu a funcționat corect"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Instanță necunoscută"
+  },
+  "app.action-bar.install.updating-shared-content": {
+    "message": "Actualizând conținutul partajat"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Setează ca instanță principală"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "Nu rulează nicio instanță"
+  },
+  "app.action-bar.offline": {
+    "message": "Offline"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "Instanță principală"
+  },
+  "app.action-bar.reload-to-update": {
+    "message": "Reîncarcă pentru a actualiza"
+  },
+  "app.action-bar.show-downloads": {
+    "message": "Vezi descărcările active"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Arată mai multe instanţe care rulează"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Oprește instanța"
+  },
+  "app.action-bar.update": {
+    "message": "Actualizează"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "Vezi descărcările active"
+  },
+  "app.action-bar.view-instance": {
+    "message": "Vezi instanțele"
+  },
+  "app.action-bar.view-logs": {
+    "message": "Vezi jurnalele"
+  },
+  "app.ads-consent.accept": {
+    "message": "Acceptă tot"
+  },
+  "app.ads-consent.body": {
+    "message": "Anunțurile fac posibil Owyx și finanțează plățile creatorilor. Partenerii noștri pot stoca sau accesa cookie-uri în aplicație pentru a personaliza reclamele și a măsura performanța."
+  },
+  "app.ads-consent.manage": {
+    "message": "Gestionează preferințele"
+  },
+  "app.ads-consent.reject": {
+    "message": "Refuză tot"
+  },
+  "app.ads-consent.title": {
+    "message": "Confidențialitatea ta și modul în care anunțurile susțin Owyx"
+  },
+  "app.appearance-settings.compact-mode.description": {
+    "message": "Afișează instanțele bibliotecii într-un layout compact."
+  },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "Mod compact"
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Acasă"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Librărie"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Ascunde numele tău de utilizator deasupra previzualizării jucătorului de pe pagina selectare Skin."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "Ascunde nametag-ul"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Minimizează aplicația Owyx atunci când Minecraft pornește."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Minimizează aplicația"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Arată cât timp te-ai pe jucat fiecare instanță."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Arată timpul jucat"
+  },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Sari peste confirmările pentru acțiuni cu risc scăzut, precum instalări duplicate, ștergere normala a conținutului, actualizări in masa, deconectare si reparații. Avertismente pentru acțiunile periculoase sunt mereu afișate."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Sari peste avertismentele neesențiale"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Ascundeți implicit bara laterală dreapta si adaugați un buton pentru a o afișa sau a o ascunde."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Ascundeți bara laterală dreapta"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Afișați un avertisment de siguranța înainte de a instala un Owyx Pack (.mrpack) care nu este găzduit de Owyx."
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "Avertizează-ma înainte de a instala modpackuri necunoscute"
+  },
+  "app.auth-servers.unreachable.body": {
+    "message": "Serverele de autentificare Minecraft pot fi indisponibile în acest moment. Verificați conexiunea la internet și încercați din nou mai târziu."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Nu se pot accesa serverele de autentificare"
+  },
+  "app.behavior-settings.confirmations.title": {
+    "message": "Confirmări"
+  },
+  "app.behavior-settings.content.title": {
+    "message": "Acasă și conținut"
+  },
+  "app.behavior-settings.startup-and-navigation.title": {
+    "message": "Pornire și navigare"
+  },
+  "app.behavior-settings.sync-across-devices.description": {
+    "message": "Utilizați aceste setări de comportament pretutindeni unde sunteți conectat. Dezactivați această opțiune pentru a păstra setări separate pe acest dispozitiv."
+  },
+  "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Conectează-te la un cont Owyx pentru a sincroniza setările."
+  },
+  "app.behavior-settings.sync-across-devices.title": {
+    "message": "Sincronizați comportamentul între dispozitive"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Adaugă server la instanță"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Adaugă la o instanță"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Adăugați la instanță"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Adaugă la {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "Adăugat"
+  },
+  "app.browse.already-added": {
+    "message": "Deja adăugat"
+  },
+  "app.browse.back-to-instance": {
+    "message": "Înapoi la instanță"
+  },
+  "app.browse.discover-project-type": {
+    "message": "Descoperă {projectType}"
+  },
+  "app.browse.discover-servers": {
+    "message": "Descoperă servere"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Ascunde serverele deja adăugate"
+  },
+  "app.browse.hide-installed-modpacks": {
+    "message": "Ascunde conținutul deja instalat"
+  },
+  "app.browse.project-actions.label": {
+    "message": "Acțiuni de proiect"
+  },
+  "app.browse.project-type.data-packs": {
+    "message": "Data Pack-uri"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "Modpack-uri"
+  },
+  "app.browse.project-type.mods": {
+    "message": "Moduri"
+  },
+  "app.browse.project-type.resource-packs": {
+    "message": "Resource Pack-uri"
+  },
+  "app.browse.project-type.servers": {
+    "message": "Servere"
+  },
+  "app.browse.project-type.shaders": {
+    "message": "Shadere"
+  },
+  "app.browse.server-instance-content-warning": {
+    "message": "Adăugarea de conținut poate împiedica conectarea la acest server. Orice conținut adăugat va fi eliminat atunci când conținutul serverului gestionat este actualizat."
+  },
+  "app.browse.server.installing": {
+    "message": "Se instalează"
+  },
+  "app.content-install.no-compatible-versions": {
+    "message": "Nicio versiune disponibilă nu corespunde cu {compatibilityLabel}. Selectați o versiune pentru a o instala oricum. Dependențele nu vor fi instalate automat."
+  },
+  "app.content.desync-pack": {
+    "message": "Desincronizare"
+  },
+  "app.content.sync-pack": {
+    "message": "Sincronizeaza"
+  },
+  "app.error.state-init.open-backups-folder": {
+    "message": "Deschideți folderul de copii de rezervă"
+  },
+  "app.export-modal.description-placeholder": {
+    "message": "Introduceți descrierea modpack-ului..."
+  },
+  "app.export-modal.export-button": {
+    "message": "Exportă"
+  },
+  "app.export-modal.export-complete": {
+    "message": "Exportare completă"
+  },
+  "app.export-modal.export-complete-description": {
+    "message": "{name} a fost exportat cu succes."
+  },
+  "app.export-modal.header": {
+    "message": "Exportă modpack"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Numele modpack-ului"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Numele modpack-ului"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.features-settings.instance-pages.title": {
+    "message": "Instanțe"
+  },
+  "app.features-settings.play-page.title": {
+    "message": "Joacă pagină"
+  },
+  "app.features-settings.quick-instances.description": {
+    "message": "Alegeți numărul maxim de instanțe recente afișate în bara laterală din stânga. Puteți ajusta acest lucru și trăgând de separator."
+  },
+  "app.features-settings.quick-instances.title": {
+    "message": "Instanțe rapide în bara laterală"
+  },
+  "app.features-settings.show-all-screenshots.description": {
+    "message": "Afișați un buton în bara laterală din stânga pentru a vizualiza capturile de ecran din toate instanțele dvs."
+  },
+  "app.features-settings.show-all-screenshots.title": {
+    "message": "Afișați toate capturile de ecran în bara laterală"
+  },
+  "app.features-settings.show-jump-in.description": {
+    "message": "Afișați lumile și instanțele jucate recent în partea de sus a paginii Joacă."
+  },
+  "app.features-settings.show-jump-in.title": {
+    "message": "Afișează salt in secțiune"
+  },
+  "app.features-settings.show-screenshots-tab.title": {
+    "message": "Afișează fila Capturi de ecran în instanțe"
+  },
+  "app.features-settings.sidebar.title": {
+    "message": "Bară laterală"
+  },
+  "app.features-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Conectează-te la un cont Owyx pentru a sincroniza setările."
+  },
+  "app.home.jump-back-in.more-options": {
+    "message": "Mai multe opțiuni"
+  },
+  "app.home.jump-back-in.never-played": {
+    "message": "Niciodată jucat"
+  },
+  "app.home.jump-back-in.new-instance": {
+    "message": "Instanță nouă"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Se finalizează"
+  },
+  "app.instance.action.play": {
+    "message": "Joacă"
+  },
+  "app.instance.action.stop": {
+    "message": "Oprește"
+  },
+  "app.instance.add-server.add": {
+    "message": "Adaugă"
+  },
+  "app.instance.add-server.added": {
+    "message": "Adăugat"
+  },
+  "app.instance.admonitions.shared-instance.added-label": {
+    "message": "Adăugat"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Creează"
+  },
+  "app.instance.share.sign-in.button": {
+    "message": "Conectează-te"
+  },
+  "app.instance.shared-instance-already-installed.instance": {
+    "message": "Instanță"
+  },
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Șterge lumea"
+  },
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Șterge lumea"
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "Se șterge {name}"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Offline"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "Online"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Vanilla"
+  },
+  "app.instance.worlds.refreshing": {
+    "message": "Se reîmprospătează..."
+  },
+  "app.java-detection.cancel": {
+    "message": "Anulează"
+  },
+  "app.java-detection.columns.actions": {
+    "message": "Acțiuni"
+  },
+  "app.modal.install-to-play.header": {
+    "message": "Instalați pentru a juca"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Instalează"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural,one {#mod} other {# moduri}}"
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Instanță comună"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "Vizualizați conținutul"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Actualizați pentru a juca"
+  },
+  "app.settings.developer-mode-enabled": {
+    "message": "Modul dezvoltator activat."
+  },
+  "app.settings.downloading": {
+    "message": "Se descarcă v{version}"
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Aspect"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Instalări Java"
+  },
+  "app.settings.tabs.language": {
+    "message": "Limbă"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Confidențialitate"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Administrare resurse"
+  },
+  "app.update-popup.body.download-complete": {
+    "message": "Aplicația Owyx v{version} a terminat descărcarea. Reîncărcați pentru a actualiza acum sau automat când închideți aplicația Owyx."
+  },
+  "app.update-popup.body.linux": {
+    "message": "Aplicația Owyx v{version} este disponibil. Utilizați managerul de pachete pentru a actualiza pentru cele mai recente funcții și remedieri!"
+  },
+  "app.update-popup.body.metered": {
+    "message": "Aplicația Owyx v{version} este disponibil acum! Deoarece sunteți într-o rețea cu contorizare, nu am descărcat-o automat."
+  },
+  "app.update-popup.changelog": {
+    "message": "Jurnalul modificărilor"
+  },
+  "app.update-popup.download": {
+    "message": "Descărcați ({size})"
+  },
+  "app.update-popup.download-complete": {
+    "message": "Descărcare finalizată"
+  },
+  "app.update-popup.title": {
+    "message": "Actualizare disponibilă"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Apasă aici pentru a vedea istoricul de modificări."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Versiunea {version} a fost instalată cu succes!"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "Selectează o opțiune"
+  },
+  "friends.action.add-friend": {
+    "message": "Adaugă un prieten"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} prieten {count, plural,one {cerere} other {cerere}}"
+  },
+  "friends.add-friend.submit": {
+    "message": "Trimite cerere de prietenie"
+  },
+  "friends.add-friend.title": {
+    "message": "Adăugarea unui prieten"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Poate fi diferit de numele lor de utilizator Minecraft!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Introduceți numele de utilizator Owyx..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Care este numele de utilizator Owyx al prietenului tău?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Adaugă prieteni</link> pentru a vedea ce joacă!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Anulează cererea"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Eliminare prieten"
+  },
+  "friends.friend.request-sent": {
+    "message": "Cerere de prietenie trimisă"
+  },
+  "friends.friend.view-profile": {
+    "message": "Vizualizați profilul"
+  },
+  "friends.heading": {
+    "message": "Prieteni"
+  },
+  "friends.heading.online": {
+    "message": "Online"
+  },
+  "friends.heading.pending": {
+    "message": "În așteptare"
+  },
+  "friends.no-friends-match": {
+    "message": "Nu există prieteni care să corespundă cu \"{query}”"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Caută prieteni..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Conectează-te la un cont Owyx</link> pentru a adăuga prieteni și a vedea ce joacă!"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Adaugă și joacă"
+  },
+  "instance.add-server.add-server": {
+    "message": "Adaugă server"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Dezactivat"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Activat"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Întreabă"
+  },
+  "instance.add-server.title": {
+    "message": "Adaugă un server"
+  },
+  "instance.edit-server.title": {
+    "message": "Editează server"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Ascunde din pagina principală"
+  },
+  "instance.edit-world.name": {
+    "message": "Nume"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Lume Minecraft"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Resetează pictograma"
+  },
+  "instance.edit-world.title": {
+    "message": "Editează lumea"
+  },
+  "instance.server-modal.address": {
+    "message": "Adresă"
+  },
+  "instance.server-modal.name": {
+    "message": "Nume"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Server Minecraft"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Pachet de resurse"
+  },
+  "instance.settings.tabs.general": {
+    "message": "General"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "Șterge instanța"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Șterge instanța"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Șterge definitiv o instanță de pe dispozitivul tău, inclusiv lumile, configurațiile și tot conținutul instalat. Fii atent, deoarece odată ce ștergi o instanță, nu există nicio modalitate de a o recupera."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Se șterge..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Duplică"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "Nu se poate duplica în timp ce se instalează."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "Duplică instanța"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Creează o copie a acestei instanțe, incluzând lumi, configurații, moduri, etc."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Editează pictograma"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Șterge pictograma"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "Înlocuiește pictograma"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Selectează pictograma"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Nume"
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "După ieșire"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "Rulează după ce jocul se închide."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "Introdu comanda după ieșire..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "Înainte de lansare"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "Rulează înainte ca instanța să fie lansată."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "Introdu comanda înainte de lansare..."
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "Wrapper"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "Comandă de tip wrapper pentru lansarea Minecraft."
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "Introdu comanda de tip wrapper..."
+  },
+  "instance.settings.tabs.installation": {
+    "message": "Instalare"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "Versiune {loader}"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "Legături"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "Ecran complet"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "Face ca jocul să pornească pe ecran complet când este lansat (folosind options.txt)."
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "Înălțime"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "Înălțimea ferestrei de joc la pornire."
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "Introdu înălțimea..."
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "Lățime"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "Lățimea ferestrei jocului la pornire."
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "Introdu lățimea..."
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "Un server de Minecraft"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "Nu m-am putut conecta la server"
+  },
+  "instance.worlds.copy_address": {
+    "message": "Copiază adresa"
+  },
+  "instance.worlds.dont_show_on_home": {
+    "message": "Nu afișa în pagina principală"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "Instanța este deja deschisă"
+  },
+  "instance.worlds.hardcore": {
+    "message": "Modul extrem"
+  },
+  "instance.worlds.incompatible_server": {
+    "message": "Serverul este incompatibil"
+  },
+  "instance.worlds.linked_server": {
+    "message": "Gestionat de proiect server"
+  },
+  "instance.worlds.no_contact": {
+    "message": "Serverul nu a putut fi contactat"
+  },
+  "instance.worlds.no_server_quick_play": {
+    "message": "Poți să intri direct pe servere doar pe Minecraft Alpha 1.0.5+"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "Poți să intri direct în lumile de jucător simplu numai pe Minecraft 1.20+"
+  },
+  "instance.worlds.play_instance": {
+    "message": "Joacă pe instanța"
+  },
+  "instance.worlds.view_instance": {
+    "message": "Afișează instanța"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "Lumea este în folosință"
+  },
+  "search.filter.locked.instance": {
+    "message": "Oferit de instanță"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "Versiunea jocului este oferit de instanță"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "Loader-ul este oferit de instanță"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "Sincronizează cu instanța"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "Numai modurile de pe partea clientului pot fi adăugate la instanța serverului"
+  },
+  "app.nav.admin-panel": {
+    "message": "Panou admin"
+  }
 }
