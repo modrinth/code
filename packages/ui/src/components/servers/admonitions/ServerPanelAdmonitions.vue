@@ -10,6 +10,7 @@ import StackedAdmonitions, {
 	type StackedAdmonitionItem,
 } from '#ui/components/base/StackedAdmonitions.vue'
 import InstallingBanner from '#ui/components/servers/InstallingBanner.vue'
+import ServerConfigFilePicker from '#ui/components/servers/ServerConfigFilePicker.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import { useServerPermissions } from '#ui/composables/server-permissions'
@@ -42,7 +43,9 @@ const needsShareUpdate = computed(() =>
 )
 const shareActions = useIsMutating({ mutationKey: ['servers', 'share-action', ctx.serverId] })
 const sharePreviews = useIsFetching({ queryKey: ['servers', 'share-diff', ctx.serverId] })
-const sharePending = computed(() => shareActions.value > 0 || sharePreviews.value > 0)
+const resolvingConfigs = ref(false)
+const sharePending = computed(() => resolvingConfigs.value || shareActions.value > 0 || sharePreviews.value > 0)
+const configPicker = ref<InstanceType<typeof ServerConfigFilePicker>>()
 
 const diffModal = ref<InstanceType<typeof ContentDiffModal>>()
 const previewOpen = ref(false)
@@ -57,12 +60,11 @@ const previewQuery = useQuery({
 })
 const pushMutation = useMutation({
 	mutationKey: ['servers', 'share-action', ctx.serverId],
-	mutationFn: async (worldId: string) => {
-		await client.archon.content_v1.share(ctx.serverId, worldId)
+	mutationFn: async ({ worldId, configPaths }: { worldId: string; configPaths: string[] }) => {
+		await client.archon.content_v1.share(ctx.serverId, worldId, configPaths)
 		await queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', ctx.serverId] })
 		await queryClient.invalidateQueries({ queryKey: ['servers', 'share-diff', ctx.serverId, worldId] })
 	},
-	onError: (error) => handleError(error),
 })
 
 async function reviewShareUpdate() {
@@ -80,10 +82,22 @@ async function reviewShareUpdate() {
 	}
 }
 
-function pushShareUpdate() {
+async function pushShareUpdate() {
 	if (!ctx.worldId.value || !canSetup.value || sharePending.value || ctx.busyReasons.value.length) return
-	previewOpen.value = false
-	pushMutation.mutate(ctx.worldId.value)
+	const worldId = ctx.worldId.value
+	const userId = auth.user.value?.id
+	resolvingConfigs.value = true
+	try {
+		const configPaths = await configPicker.value?.resolvePaths() ?? []
+		if (!previewOpen.value || ctx.worldId.value !== worldId || auth.user.value?.id !== userId || !canSetup.value || ctx.busyReasons.value.length) return
+		await pushMutation.mutateAsync({ worldId, configPaths })
+		previewOpen.value = false
+	} catch (error) {
+		handleError(error)
+		if (previewOpen.value && ctx.worldId.value === worldId && auth.user.value?.id === userId) diffModal.value?.show()
+	} finally {
+		resolvingConfigs.value = false
+	}
 }
 
 watch([ctx.worldId, () => auth.user.value?.id], () => {
@@ -554,5 +568,9 @@ function onInstallationDismiss() {
 		:removed-label="formatMessage(messages.removed)"
 		@confirm="pushShareUpdate"
 		@cancel="previewOpen = false"
-	/>
+	>
+		<template #additional-content>
+			<ServerConfigFilePicker v-if="previewOpen && ctx.worldId.value" :key="ctx.worldId.value" ref="configPicker" :server-id="ctx.serverId" :world-id="ctx.worldId.value" :disabled="sharePending" />
+		</template>
+	</ContentDiffModal>
 </template>

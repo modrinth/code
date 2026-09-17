@@ -48,6 +48,7 @@ export namespace SharedInstances {
 				name: string
 				icon: string | null
 				quarantine: boolean
+				linked_server: { domain: string; region: string } | null
 			}
 
 			export type JoinType = 'owner' | 'invite' | 'link'

@@ -36,7 +36,7 @@
 				:show-instance-play-time="showInstancePlayTime"
 				:time-played="timePlayed"
 				:playing="playing"
-				:loading="loading"
+				:loading="loading || checkingSharedInstanceLaunch || instanceLaunch.isStarting(instance.id)"
 				:stopping="stopping"
 				:loading-server-ping="loadingServerPing"
 				:players-online="playersOnline"
@@ -125,6 +125,7 @@ import {
 	getServerStatusQueryKey,
 } from '@/composables/instances/use-server-status-query'
 import { useAppEvent } from '@/composables/use-app-event'
+import { useInstanceLaunchState } from '@/composables/instances/use-instance-launch-state'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { handleSevereError } from '@/composables/use-error.js'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
@@ -359,6 +360,7 @@ useRootBreadcrumb({
 })
 
 const loading = ref(false)
+const instanceLaunch = useInstanceLaunchState()
 const checkingSharedInstanceLaunch = ref(false)
 const subpagePending = ref(false)
 const stopping = ref(false)
@@ -545,9 +547,11 @@ const launchInstance = async (context: string, address?: string) => {
 	const currentInstance = instance.value
 	loading.value = true
 	try {
-		if (address) await start_join_server(currentInstance.id, address)
-		else await run(currentInstance.id)
-		queryClient.setQueryData(instanceKeys.processes(currentInstance.id), [true])
+		await instanceLaunch.run(currentInstance.id, async () => {
+			if (address) await start_join_server(currentInstance.id, address)
+			else await run(currentInstance.id)
+			queryClient.setQueryData(instanceKeys.processes(currentInstance.id), [true])
+		})
 	} catch (err) {
 		handleSevereError(err, { instanceId: currentInstance.id })
 	}
@@ -602,7 +606,7 @@ function handleSharedInstanceUpdateComplete(successful: boolean) {
 
 const startInstance = async (context: string, address?: string) => {
 	if (!instance.value || instance.value.quarantined) return
-	if (checkingSharedInstanceLaunch.value || loading.value || playing.value) return
+	if (checkingSharedInstanceLaunch.value || loading.value || playing.value || instanceLaunch.isStarting(instance.value.id)) return
 
 	const instanceId = instance.value.id
 	const isSharedInstanceMember = instance.value.shared_instance?.role === 'member'
