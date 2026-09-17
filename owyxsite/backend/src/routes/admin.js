@@ -2039,13 +2039,11 @@ router.post('/test-email-with-template', [
 
         // Переменные для замены в шаблоне (используем реальные данные)
         const templateVars = {
-            serverName: getSetting('server-name', 'ChiwawaMine'),
-            serverDescription: getSetting('server-description', 'Лучший Minecraft сервер'),
-            serverIp: getSetting('server-ip', 'play.chiwawa.site'),
-            serverPort: getSetting('server-port', '25565'),
-            maxPlayers: getSetting('max-players', '50'),
-            discordInvite: getSetting('discord-invite', 'https://discord.gg/chiwawa'),
-            telegramInvite: getSetting('telegram-invite', 'https://t.me/chiwawa'),
+            serverName: getSetting('server-name', 'Owyx'),
+            serverDescription: getSetting('server-description', 'Owyx launcher and site'),
+            siteUrl: getSetting('site-url', 'https://owyx.site'),
+            discordInvite: getSetting('discord-invite', 'https://discord.gg/owyx'),
+            telegramInvite: getSetting('telegram-invite', 'https://t.me/owyx'),
 
             // Данные пользователя (реальные или тестовые)
             nickname: targetUser ? targetUser.nickname : 'Тестовый игрок',
@@ -2090,7 +2088,7 @@ router.post('/test-email-with-template', [
         });
 
         console.log(`📧 Тестовое письмо с шаблоном:\nКому: ${finalEmail} (${targetUser ? `${targetUser.nickname}, роль: ${targetUser.role}` : 'ручной ввод'})\nШаблон: ${template.template_name}\nТема: ${processedSubject}\nHTML длина: ${processedHtml.length} символов`);
-        console.log(`🔧 Используемые настройки сервера:\n- Имя: ${templateVars.serverName}\n- IP: ${templateVars.serverIp}\n- Discord: ${templateVars.discordInvite}\n- Telegram: ${templateVars.telegramInvite}`);
+        console.log(`🔧 Используемые настройки сайта:\n- Имя: ${templateVars.serverName}\n- Site: ${templateVars.siteUrl}\n- Discord: ${templateVars.discordInvite}\n- Telegram: ${templateVars.telegramInvite}`);
 
         // Получаем SMTP настройки (поддерживаем разные форматы ключей)
         const smtpResult = await db.query(`
@@ -2696,16 +2694,15 @@ router.post('/test-email', authenticateToken, requireRole(['admin']), async (req
                     
                     // Используем реальные данные пользователя и сервера
                     const templateData = {
-                        serverName: serverSettings.serverName || 'ChiwawaMine',
+                        serverName: serverSettings['server-name'] || 'Owyx',
                         nickname: req.user?.nickname || 'Администратор',
-                        serverIp: serverSettings.serverIp || 'chiwawasite.com',
-                        serverPort: serverSettings.serverPort || '25565',
-                        discordInvite: serverSettings.discordInvite || 'https://discord.gg/chiwawa',
-                        telegramInvite: serverSettings.telegramInvite || 'https://t.me/chiwawa',
+                        siteUrl: 'https://owyx.site',
+                        discordInvite: serverSettings['discord-invite'] || 'https://discord.gg/owyx',
+                        telegramInvite: serverSettings['telegram-invite'] || 'https://t.me/owyx',
                         verificationLink: `${req.protocol}://${req.get('host')}/verify/test-token`,
                         resetLink: `${req.protocol}://${req.get('host')}/reset-password/test-token`,
                         currentDate: new Date().toLocaleDateString('ru-RU'),
-                        userEmail: req.user?.email || 'admin@chiwawasite.com'
+                        userEmail: req.user?.email || 'admin@owyx.site'
                     };
                     
                     Object.keys(templateData).forEach(key => {

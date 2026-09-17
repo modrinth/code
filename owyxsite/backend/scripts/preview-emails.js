@@ -18,7 +18,7 @@ const sample = {
   oldNick: "OldNick",
   newNick: "Steve",
   serverName: "Owyx",
-  serverIp: "play.owyx.site",
+  siteUrl: "https://owyx.site",
 };
 
 const index = [];
