@@ -53,8 +53,7 @@ export function useSharedInstanceInviteHandler(
 	const auth = injectAuth()
 	const client = injectModrinthClient()
 	const { handleError } = injectNotificationManager()
-	const { notifySharedInstanceConnectionError, notifySharedInstanceError } =
-		useSharedInstanceErrors()
+	const { notifySharedInstanceError } = useSharedInstanceErrors()
 	const popupNotificationManager = injectPopupNotificationManager()
 	const queryClient = useQueryClient()
 	const router = useRouter()
@@ -83,21 +82,15 @@ export function useSharedInstanceInviteHandler(
 	}
 
 	async function resolveInvite(invite: SharedInstanceInvite) {
-		const [invitedBy, sharedInstance] = await Promise.all([
+		const invitedBy =
 			(!invite.invitedByUsername || !invite.invitedByAvatarUrl) && invite.invitedById
-				? get_user(invite.invitedById, 'bypass').catch(() => null)
-				: null,
-			client.sharedinstances.instances_v1.get(invite.sharedInstanceId).catch(() => {
-				notifySharedInstanceConnectionError()
-				return null
-			}),
-		])
+				? await get_user(invite.invitedById, 'bypass').catch(() => null)
+				: null
 
 		return {
 			...invite,
 			invitedByUsername: invite.invitedByUsername ?? invitedBy?.username ?? null,
 			invitedByAvatarUrl: invite.invitedByAvatarUrl ?? invitedBy?.avatar_url ?? null,
-			instanceIconUrl: sharedInstance ? sharedInstance.icon : invite.instanceIconUrl,
 		}
 	}
 
