@@ -1,12 +1,16 @@
 <template>
-	<div v-if="project" class="flex flex-wrap gap-1">
+	<div v-if="project" class="flex flex-wrap gap-1.5">
 		<TagItem
 			v-for="category in project.categories"
 			:key="category"
 			class="!border-brand !bg-transparent !text-brand opacity-70"
 			>{{ formatCategory(formatMessage, category) }}</TagItem
 		>
-		<TagItem v-for="category in project.additional_categories" :key="category">
+		<TagItem
+			class="!border-surface-4 !bg-surface-3 !text-secondary"
+			v-for="category in project.additional_categories"
+			:key="category"
+		>
 			{{ formatCategory(formatMessage, category) }}
 		</TagItem>
 	</div>
