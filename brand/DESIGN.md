@@ -63,9 +63,9 @@
 
 ### Типографика
 
-- **Display / brand:** выразительный геометрический или techno-гротеск (не Inter). Лаунчер: текущий UI-font стек; сайт — выбрать 1 display + 1 body, зафиксировать в CSS variables.
-- **Body:** читаемый sans, ~15–16px, line-height ~1.5.
-- **Mono:** логи, IP, версии — `ui-monospace` / Geist Mono / аналог.
+- **Display / brand:** `Unbounded` (заголовки) + **Onest** (UI/body) с кириллицей. Не Sora/Outfit/DM Sans fallback-каша; не Bricolage (нет Cyrillic на Google Fonts).
+- **Body:** Onest ~15–16px, line-height ~1.5.
+- **Mono:** Geist Mono / JetBrains-compatible — логи, IP, версии.
 
 ### Иконки и лого
 
