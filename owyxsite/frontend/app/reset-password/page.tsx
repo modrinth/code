@@ -124,7 +124,7 @@ function ResetPasswordInner() {
           autoComplete="new-password"
           required
           className="input"
-          placeholder="••••••••"
+          placeholder={a.passwordDots}
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
         />

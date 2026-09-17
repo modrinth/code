@@ -419,7 +419,7 @@ function EmailChangeModal({
                 className="input"
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
-                placeholder="you@example.com"
+                placeholder={p.emailPlaceholder}
                 autoComplete="email"
               />
             </div>
@@ -446,7 +446,7 @@ function EmailChangeModal({
                 className="input tracking-[0.35em]"
                 value={code}
                 onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-                placeholder="123456"
+                placeholder={p.codePlaceholder}
                 autoComplete="one-time-code"
               />
             </div>
@@ -533,7 +533,7 @@ function NicknameSection({ currentNick }: { currentNick?: string }) {
               value={nick}
               onChange={(e) => setNick(e.target.value)}
               maxLength={16}
-              placeholder="YourNickname"
+              placeholder={p.nickPlaceholder}
               disabled={onCooldown}
               autoComplete="username"
             />

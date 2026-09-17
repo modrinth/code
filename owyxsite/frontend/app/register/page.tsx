@@ -142,7 +142,7 @@ export default function RegisterPage() {
             minLength={3}
             maxLength={16}
             autoComplete="username"
-            placeholder="steve"
+            placeholder={a.usernamePlaceholder}
             value={login}
             onChange={(e) => setLogin(e.target.value)}
           />
@@ -158,7 +158,7 @@ export default function RegisterPage() {
             autoComplete="email"
             required
             className="input"
-            placeholder="you@example.com"
+            placeholder={a.emailPlaceholder}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -214,7 +214,8 @@ export default function RegisterPage() {
             autoComplete="new-password"
             required
             className="input"
-            placeholder="••••••••"
+            placeholder={a.passwordDots}
+            value={confirm}
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
           />

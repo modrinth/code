@@ -126,7 +126,7 @@ function AdminPageInner() {
 
   async function deleteUser(u: AdminUser) {
     const reason = window.prompt(
-      `Удалить ${u.nickname || u.email}? Причина (мин. 5 символов). Может сломать связку с плагином.`
+      `Удалить ${u.nickname || u.email}? Причина (мин. 5 символов).`
     );
     if (!reason || reason.trim().length < 5) {
       if (reason !== null) showMessage("Нужна причина (мин. 5 символов)", "error");

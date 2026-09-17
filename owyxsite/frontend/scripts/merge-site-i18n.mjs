@@ -180,8 +180,10 @@ const en = {
   },
   comingSoon: {
     badge: "Soon",
+    title: "Section in progress",
+    description: "Focus is on the site and launcher right now. This section will land later.",
     toHome: "Home",
-    toServers: "Servers",
+    toDownload: "Download launcher",
     shopTitle: "Shop",
     shopDesc: "Donations and ranks will appear later. Payments are not connected yet.",
     tokensTitle: "Tokens",
@@ -367,8 +369,10 @@ const ru = {
   },
   comingSoon: {
     badge: "Скоро",
+    title: "Раздел в работе",
+    description: "Сейчас в фокусе сайт и лаунчер. Этот раздел появится позже.",
     toHome: "На главную",
-    toServers: "Свои сервера",
+    toDownload: "Скачать лаунчер",
     shopTitle: "Магазин",
     shopDesc: "Донат и привилегии появятся позже. Оплата пока не подключена.",
     tokensTitle: "Токены",

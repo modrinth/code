@@ -412,7 +412,7 @@
     "loading": "Загрузка…",
     "newsTitle": "Новости и обновления",
     "newsEmptyTitle": "Пока тихо",
-    "newsEmptyBody": "Новости появятся здесь. А пока — скачай лаунчер и зайди на сервер.",
+    "newsEmptyBody": "Новости появятся здесь. А пока — скачай лаунчер и зайди в игру.",
     "newsFallbackTagLauncher": "Лаунчер",
     "newsFallbackTagCosmetics": "Косметика",
     "newsFallbackTitleLauncher": "Вход по аккаунту Owyx™",
@@ -444,7 +444,7 @@
     "loginTitle": "Вход",
     "loginSubtitle": "Войдите в аккаунт Owyx™ — тот же логин потом в лаунчере.",
     "loginLabel": "Логин или email",
-    "loginPlaceholder": "steve или you@example.com",
+    "loginPlaceholder": "ник или email",
     "password": "Пароль",
     "rememberMe": "Запомнить меня",
     "submitLogin": "Войти",
@@ -455,9 +455,9 @@
     "captchaRequired": "Пройдите проверку, что вы не робот.",
     "loginFailed": "Не удалось войти. Проверьте данные.",
     "registerTitle": "Создать аккаунт",
-    "registerSubtitle": "Один аккаунт Owyx™: сайт, доступ к серверам и лаунчер.",
+    "registerSubtitle": "Один аккаунт Owyx™: сайт и лаунчер.",
     "username": "Логин",
-    "usernameHint": "Этот же логин будет в лаунчере и в игре (если не входишь через Microsoft).",
+    "usernameHint": "Тот же логин — в лаунчере и в игре (если не Microsoft).",
     "email": "Email",
     "confirmPassword": "Повторите пароль",
     "passwordPlaceholder": "Минимум 8 символов",
@@ -499,7 +499,11 @@
     "verifyOk": "Email подтверждён.",
     "verifyMissing": "Токен подтверждения не указан.",
     "verifyBad": "Ссылка недействительна или истекла.",
-    "logoHome": "Owyx™ — на главную"
+    "logoHome": "Owyx™ — на главную",
+    "usernamePlaceholder": "ник",
+    "emailPlaceholder": "you@mail.ru",
+    "passwordDots": "••••••••",
+    "codePlaceholder": "123456"
   },
   "profile": {
     "eyebrow": "Аккаунт Owyx™",
@@ -575,7 +579,10 @@
     "enterNewPassword": "Введите новый пароль",
     "passwordUpdated": "Пароль обновлён",
     "passwordFailed": "Ошибка смены пароля",
-    "sectionsAria": "Разделы"
+    "sectionsAria": "Разделы",
+    "emailPlaceholder": "you@mail.ru",
+    "nickPlaceholder": "Ник",
+    "codePlaceholder": "123456"
   },
   "servers": {
     "badge": "Сервера сообщества",
@@ -599,8 +606,9 @@
   },
   "comingSoon": {
     "badge": "Скоро",
+    "title": "Раздел в работе",
+    "description": "Сейчас в фокусе сайт и лаунчер. Этот раздел появится позже.",
     "toHome": "На главную",
-    "toServers": "Свои сервера",
     "toDownload": "Скачать лаунчер",
     "shopTitle": "Магазин",
     "shopDesc": "Донат и привилегии появятся позже. Оплата пока не подключена.",

@@ -413,7 +413,7 @@
     "loading": "Loading…",
     "newsTitle": "News and updates",
     "newsEmptyTitle": "Quiet for now",
-    "newsEmptyBody": "News will show up here. Meanwhile — download the launcher and join a server.",
+    "newsEmptyBody": "News will show up here. Meanwhile — download the launcher and jump in.",
     "newsFallbackTagLauncher": "Launcher",
     "newsFallbackTagCosmetics": "Cosmetics",
     "newsFallbackTitleLauncher": "Sign in with your Owyx™ account",
@@ -445,7 +445,7 @@
     "loginTitle": "Sign in",
     "loginSubtitle": "Sign into your Owyx™ account — the same login later in the launcher.",
     "loginLabel": "Username or email",
-    "loginPlaceholder": "steve or you@example.com",
+    "loginPlaceholder": "username or email",
     "password": "Password",
     "rememberMe": "Remember me",
     "submitLogin": "Sign in",
@@ -456,9 +456,9 @@
     "captchaRequired": "Please complete the captcha.",
     "loginFailed": "Could not sign in. Check your details.",
     "registerTitle": "Create account",
-    "registerSubtitle": "One Owyx™ account: site, servers, and launcher.",
+    "registerSubtitle": "One Owyx™ account: site and launcher.",
     "username": "Username",
-    "usernameHint": "The same username is used in the launcher and in-game (unless you use Microsoft).",
+    "usernameHint": "Same username in the launcher and in-game (unless you use Microsoft).",
     "email": "Email",
     "confirmPassword": "Confirm password",
     "passwordPlaceholder": "At least 8 characters",
@@ -500,7 +500,11 @@
     "verifyOk": "Email confirmed.",
     "verifyMissing": "Confirmation token is missing.",
     "verifyBad": "Link is invalid or expired.",
-    "logoHome": "Owyx™ — home"
+    "logoHome": "Owyx™ — home",
+    "usernamePlaceholder": "username",
+    "emailPlaceholder": "you@example.com",
+    "passwordDots": "••••••••",
+    "codePlaceholder": "123456"
   },
   "profile": {
     "eyebrow": "Owyx™ account",
@@ -576,7 +580,10 @@
     "enterNewPassword": "Enter a new password",
     "passwordUpdated": "Password updated",
     "passwordFailed": "Password change failed",
-    "sectionsAria": "Sections"
+    "sectionsAria": "Sections",
+    "emailPlaceholder": "you@example.com",
+    "nickPlaceholder": "Nickname",
+    "codePlaceholder": "123456"
   },
   "servers": {
     "badge": "Community servers",
@@ -600,8 +607,9 @@
   },
   "comingSoon": {
     "badge": "Soon",
+    "title": "Section in progress",
+    "description": "Focus is on the site and launcher right now. This section will land later.",
     "toHome": "Home",
-    "toServers": "Servers",
     "toDownload": "Download launcher",
     "shopTitle": "Shop",
     "shopDesc": "Donations and ranks will appear later. Payments are not connected yet.",
