@@ -113,12 +113,12 @@ export function SettingsRow({
   children: ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-3 border-b border-line py-4 last:border-0 sm:flex-row sm:items-center sm:justify-between">
-      <div className="min-w-0 sm:max-w-[42%]">
+    <div className="flex flex-col gap-3 border-b border-line py-4 last:border-0 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
+      <div className="min-w-0 sm:w-[34%] sm:shrink-0 sm:max-w-xs">
         <p className="text-sm font-medium text-text">{label}</p>
         {hint && <p className="mt-0.5 text-xs text-muted leading-relaxed">{hint}</p>}
       </div>
-      <div className="min-w-0 w-full sm:max-w-sm sm:flex-1 sm:flex sm:justify-end">{children}</div>
+      <div className="min-w-0 w-full sm:flex-1">{children}</div>
     </div>
   );
 }

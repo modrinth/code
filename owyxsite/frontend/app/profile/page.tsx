@@ -10,6 +10,7 @@ import CabinetShell, {
   Toast,
 } from "@/components/layout/CabinetShell";
 import AvatarCropModal from "@/components/profile/AvatarCropModal";
+import { SupportContactButton } from "@/components/support/SupportContact";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocale } from "@/hooks/useLocale";
 import type { Locale } from "@/lib/i18n";
@@ -76,6 +77,9 @@ export default function ProfilePage() {
         subtitle={p.subtitle}
         actions={
           <>
+            <SupportContactButton className="btn btn-ghost">
+              {p.contactSupport}
+            </SupportContactButton>
             <Link href="/download" className="btn btn-primary">
               {p.downloadLauncher}
             </Link>
@@ -183,7 +187,7 @@ function OverviewPane({
 
 function ProfileSettingsPane({ user }: { user: ReturnType<typeof useAuth>["user"] }) {
   return (
-    <div className="flex flex-col gap-5 max-w-2xl">
+    <div className="flex w-full flex-col gap-5">
       <AvatarSection currentUrl={user?.avatar_url} />
       <DisplayNicknameSection currentNick={user?.display_nickname || user?.nickname} />
       <ProfileInfoSection user={user} />
@@ -193,7 +197,7 @@ function ProfileSettingsPane({ user }: { user: ReturnType<typeof useAuth>["user"
 
 function SecuritySettingsPane({ user }: { user: ReturnType<typeof useAuth>["user"] }) {
   return (
-    <div className="flex flex-col gap-5 max-w-2xl">
+    <div className="flex w-full flex-col gap-5">
       <NicknameSection
         currentNick={user?.nickname}
         nicknameChangedAt={user?.nickname_changed_at}
@@ -546,7 +550,7 @@ function DisplayNicknameSection({ currentNick }: { currentNick?: string }) {
           <div className="flex w-full flex-col gap-2 sm:items-end">
             <input
               id="acc-display-nick"
-              className="input sm:max-w-xs"
+              className="input w-full"
               value={nick}
               onChange={(e) => setNick(e.target.value)}
               maxLength={16}
@@ -637,7 +641,7 @@ function NicknameSection({
           <div className="flex w-full flex-col gap-2 sm:items-end">
             <input
               id="acc-nick"
-              className="input sm:max-w-xs"
+              className="input w-full"
               value={nick}
               onChange={(e) => setNick(e.target.value)}
               maxLength={16}
@@ -714,7 +718,7 @@ function ProfileInfoSection({ user }: { user: ReturnType<typeof useAuth>["user"]
         <SettingsRow label={p.labelName}>
           <input
             id="acc-name"
-            className="input sm:max-w-xs"
+            className="input w-full"
             value={form.first_name}
             onChange={(e) => setForm((f) => ({ ...f, first_name: e.target.value }))}
             autoComplete="given-name"
@@ -723,7 +727,7 @@ function ProfileInfoSection({ user }: { user: ReturnType<typeof useAuth>["user"]
         <SettingsRow label={p.labelDiscord} hint={p.discordHint}>
           <input
             id="acc-discord"
-            className="input sm:max-w-xs"
+            className="input w-full"
             value={form.discord_username}
             onChange={(e) => setForm((f) => ({ ...f, discord_username: e.target.value }))}
           />
@@ -787,7 +791,7 @@ function PasswordSection() {
           <input
             id="acc-cur-pass"
             type="password"
-            className="input sm:max-w-xs"
+            className="input w-full"
             autoComplete="current-password"
             value={form.current_password}
             onChange={(e) => setForm((f) => ({ ...f, current_password: e.target.value }))}
@@ -798,7 +802,7 @@ function PasswordSection() {
           <input
             id="acc-new-pass"
             type="password"
-            className="input sm:max-w-xs"
+            className="input w-full"
             autoComplete="new-password"
             value={form.new_password}
             onChange={(e) => setForm((f) => ({ ...f, new_password: e.target.value }))}

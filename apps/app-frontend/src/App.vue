@@ -863,6 +863,19 @@ async function setupApp() {
 		initAnalytics()
 		if (dev) debugAnalytics()
 		trackEvent('Launched', { version, dev })
+		void Promise.all([
+			import('@/helpers/owyx-telemetry'),
+			import('@/helpers/owyx-site-auth'),
+		])
+			.then(([{ reportOwyxLauncherSession }, { getStoredOwyxSiteSession }]) =>
+				reportOwyxLauncherSession({
+					dev,
+					authToken: getStoredOwyxSiteSession()?.token ?? null,
+				}),
+			)
+			.catch(() => {
+				/* telemetry must never block startup */
+			})
 	}
 
 	const osType = await traceStartupStep('Read operating system type', async () => type())

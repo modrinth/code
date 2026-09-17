@@ -99,6 +99,20 @@ defineExpose({
 
 		error.value = errorVal
 		errorModal.value.show()
+
+		const msg = errorVal?.message || String(errorVal || '')
+		if (msg) {
+			void import('@/helpers/owyx-telemetry')
+				.then(({ reportOwyxLauncherError }) =>
+					reportOwyxLauncherError(msg, {
+						metadata: {
+							errorType: errorType.value,
+							source: source || null,
+						},
+					}),
+				)
+				.catch(() => {})
+		}
 	},
 })
 
