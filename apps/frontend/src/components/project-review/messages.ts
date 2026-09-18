@@ -1,6 +1,26 @@
 import { defineMessages } from '@modrinth/ui'
 
 export const projectReviewMessages = defineMessages({
+	reviewSection: {
+		id: 'moderation.project-review.reviewSection',
+		defaultMessage: 'Review {section}',
+	},
+	closeReview: {
+		id: 'moderation.project-review.closeReview',
+		defaultMessage: 'Close review controls',
+	},
+	noReviewActions: {
+		id: 'moderation.project-review.noReviewActions',
+		defaultMessage: 'No review actions available for this section.',
+	},
+	reviewScope: {
+		id: 'moderation.project-review.reviewScope',
+		defaultMessage: 'These selections apply to the {stage} review for the whole project.',
+	},
+	licenseUrl: {
+		id: 'moderation.project-review.licenseUrl',
+		defaultMessage: 'License URL',
+	},
 	withheld: {
 		id: 'moderation.project-review.withheld',
 		defaultMessage: 'Withheld',

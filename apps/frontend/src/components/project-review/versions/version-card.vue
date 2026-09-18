@@ -1,8 +1,13 @@
 <template>
-	<article
+	<ReviewPanel
+		mode="anchored"
+		as="article"
+		trigger-placement="header"
+		:target="{ kind: 'version', key: version.id }"
+		:label="version.version_number"
 		class="min-w-0 overflow-hidden rounded-lg border border-solid border-surface-4 bg-surface-2"
 	>
-		<div class="flex flex-wrap items-center gap-3 p-3">
+		<div data-review-header class="flex flex-wrap items-center gap-3 p-3">
 			<button
 				type="button"
 				class="flex min-w-0 flex-1 cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-left text-primary"
@@ -209,7 +214,7 @@
 				</div>
 			</details>
 		</div>
-	</article>
+	</ReviewPanel>
 </template>
 
 <script setup lang="ts">
@@ -243,6 +248,7 @@ import { versionQueryOptions } from '~/composables/queries/version'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { projectReviewMessages as messages } from '../messages'
+import ReviewPanel from '../review-panel/index.vue'
 
 const props = defineProps<{
 	version: Labrinth.Versions.v3.Version

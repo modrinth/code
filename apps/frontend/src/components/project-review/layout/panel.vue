@@ -1,6 +1,6 @@
 <template>
 	<section
-		class="review-panel h-full overflow-auto p-3"
+		class="layout-panel h-full overflow-auto p-3"
 		:inert="sidebarHidden"
 		:aria-label="formatMessage(messages[slotName])"
 	>
@@ -43,40 +43,40 @@ const sidebarHidden = computed(
 </script>
 
 <style scoped>
-@property --review-panel-scrollbar-color {
+@property --layout-panel-scrollbar-color {
 	syntax: '<color>';
 	inherits: true;
 	initial-value: transparent;
 }
 
-.review-panel {
-	--review-panel-scrollbar-color: transparent;
-	transition: --review-panel-scrollbar-color 1750ms ease;
+.layout-panel {
+	--layout-panel-scrollbar-color: transparent;
+	transition: --layout-panel-scrollbar-color 1750ms ease;
 }
 
-.review-panel:hover {
-	--review-panel-scrollbar-color: var(--color-scrollbar);
+.layout-panel:hover {
+	--layout-panel-scrollbar-color: var(--color-scrollbar);
 	transition-duration: 200ms;
 }
 
-.review-panel,
-.review-panel :deep(*) {
-	scrollbar-color: var(--review-panel-scrollbar-color) transparent;
+.layout-panel,
+.layout-panel :deep(*) {
+	scrollbar-color: var(--layout-panel-scrollbar-color) transparent;
 }
 
-.review-panel::-webkit-scrollbar-thumb,
-.review-panel :deep(*::-webkit-scrollbar-thumb) {
-	background: var(--review-panel-scrollbar-color);
+.layout-panel::-webkit-scrollbar-thumb,
+.layout-panel :deep(*::-webkit-scrollbar-thumb) {
+	background: var(--layout-panel-scrollbar-color);
 }
 
 @media (hover: none) {
-	.review-panel {
-		--review-panel-scrollbar-color: var(--color-scrollbar);
+	.layout-panel {
+		--layout-panel-scrollbar-color: var(--color-scrollbar);
 	}
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.review-panel {
+	.layout-panel {
 		transition: none;
 	}
 }

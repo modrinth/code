@@ -1,7 +1,16 @@
 <template>
 	<div v-if="links.length" class="flex flex-col gap-3.5">
-		<div v-for="link in links" :key="link.key" class="min-w-0">
-			<h4 class="m-0 mb-1 text-sm font-normal text-secondary">{{ link.label }}</h4>
+		<ReviewPanel
+			mode="anchored"
+			v-for="link in links"
+			:key="link.key"
+			:target="{ kind: 'link', key: link.key }"
+			:label="link.label"
+			class="min-w-0"
+		>
+			<h4 class="m-0 mb-1 text-sm font-normal text-secondary">
+				{{ link.label }}
+			</h4>
 			<a
 				:href="link.url"
 				target="_blank"
@@ -11,7 +20,7 @@
 				<span class="min-w-0">{{ link.url.replace(/^https?:\/\//, '') }}</span>
 				<ExternalIcon class="mb-0.5 size-3.5 shrink-0" aria-hidden="true" />
 			</a>
-		</div>
+		</ReviewPanel>
 	</div>
 </template>
 
@@ -24,6 +33,7 @@ import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { reviewExternalUrl } from '~/providers/project-review/project-links'
 
 import { projectReviewMessages as messages } from '../../messages'
+import ReviewPanel from '../../review-panel/index.vue'
 
 const { project } = injectProjectReviewPageContext()
 const { formatMessage } = useVIntl()
