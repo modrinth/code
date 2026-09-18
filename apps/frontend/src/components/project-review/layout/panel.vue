@@ -1,6 +1,7 @@
 <template>
 	<section
-		class="layout-panel h-full overflow-auto p-3"
+		class="layout-panel h-full p-3"
+		:class="slotName === 'right' ? 'overflow-hidden' : 'overflow-auto'"
 		:inert="sidebarHidden"
 		:aria-label="formatMessage(messages[slotName])"
 	>

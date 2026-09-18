@@ -4,6 +4,7 @@
 			:key="`${binding.projectId}:${binding.scope}`"
 			:nodes="nodes"
 			:state="state"
+			:global-state="globalState"
 			:write="write"
 			:title-depth="1"
 		/>
@@ -34,6 +35,9 @@ const { formatMessage } = useVIntl()
 const session = injectReviewSession()
 const { resolve } = injectReviewStages()
 const binding = computed(() => resolve(props.target))
+const globalState = computed(() =>
+	binding.value ? session.readProject(binding.value.projectId) : {},
+)
 const state = computed(() =>
 	binding.value ? session.read(binding.value.projectId, binding.value.scope) : {},
 )

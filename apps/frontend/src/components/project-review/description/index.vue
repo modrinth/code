@@ -3,7 +3,6 @@
 		<ReviewPanel
 			mode="inline"
 			:target="{ kind: 'description' }"
-			:label="formatMessage(messages.description)"
 			:disabled="isLoading || !!error"
 			class="mb-2"
 		/>

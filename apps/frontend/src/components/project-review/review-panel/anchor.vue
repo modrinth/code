@@ -20,7 +20,7 @@
 			type="button"
 			class="review-trigger absolute right-0.5 top-0.5 flex cursor-pointer items-center gap-1 rounded-md border border-solid border-surface-5 bg-surface-3 px-2 py-1 text-xs text-secondary hover:text-contrast focus-visible:opacity-100"
 			:class="{ 'review-trigger-active': active?.id === id }"
-			:aria-label="formatMessage(messages.reviewSection, { section: label })"
+			:aria-label="triggerLabel"
 			:aria-expanded="active?.id === id"
 			:aria-controls="active?.id === id ? panelId : undefined"
 			aria-haspopup="dialog"
@@ -33,26 +33,23 @@
 
 <script setup lang="ts">
 import { ListBulletedIcon } from '@modrinth/assets'
-import { useVIntl } from '@modrinth/ui'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 
 import type { ReviewTarget } from '~/providers/project-review/review'
 
-import { projectReviewMessages as messages } from '../messages'
 import { injectReviewContext } from './context'
 
 const props = withDefaults(
 	defineProps<{
 		anchorId: string
 		target: ReviewTarget
-		label: string
+		triggerLabel: string
 		as?: 'section' | 'div' | 'article'
 		disabled?: boolean
 		triggerPlacement?: 'inset' | 'header' | 'overlay'
 	}>(),
 	{ as: 'div', triggerPlacement: 'inset' },
 )
-const { formatMessage } = useVIntl()
 const { active, panelId, isAvailable, open, release, leave, cancelClose } = injectReviewContext()
 const id = props.anchorId
 const element = ref<HTMLElement>()
@@ -65,7 +62,6 @@ function show(explicit = false) {
 		{
 			id,
 			target: props.target,
-			label: props.label,
 			element: element.value,
 			trigger: trigger.value ?? null,
 			available: () => available.value,
@@ -90,7 +86,6 @@ watch(
 	[
 		() => props.target.kind,
 		() => ('key' in props.target ? props.target.key : undefined),
-		() => props.label,
 	],
 	() => release(id),
 )

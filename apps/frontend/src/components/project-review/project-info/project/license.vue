@@ -3,7 +3,6 @@
 		<ReviewPanel
 			mode="anchored"
 			:target="{ kind: 'license' }"
-			:label="formatMessage(messages.license)"
 			class="flex items-center gap-3"
 		>
 			<span
@@ -15,7 +14,6 @@
 		<ReviewPanel
 			mode="anchored"
 			:target="{ kind: 'license-url' }"
-			:label="formatMessage(messages.licenseUrl)"
 		>
 			<a
 				v-if="url"

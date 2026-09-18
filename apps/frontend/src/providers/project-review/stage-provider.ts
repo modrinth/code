@@ -2,6 +2,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import { type ProjectPageContext, provideProjectPageContext } from '@modrinth/ui'
 import { computed, defineComponent, h, onScopeDispose, type PropType } from 'vue'
 
+import { injectProjectReviewPageContext } from './index'
 import { injectReviewStages, useReviewStageDefinitions } from './review-stages'
 
 export default defineComponent({
@@ -14,9 +15,11 @@ export default defineComponent({
 		},
 	},
 	setup(props, { slots }) {
-		/** Temporary compatibility boundary: these stages only read projectV3. */
-		const stageProject: Pick<ProjectPageContext, 'projectV3'> = {
+		const { projectV2, threadQuery } = injectProjectReviewPageContext()
+		const stageProject = {
 			projectV3: computed(() => props.project),
+			projectV2,
+			thread: threadQuery.data,
 		}
 		provideProjectPageContext(stageProject as ProjectPageContext)
 

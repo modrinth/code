@@ -5,6 +5,7 @@ export const projectReviewTabs = [
 	'gallery',
 	'disclosures',
 	'versions',
+	'permissions',
 	'history',
 	'tech-review',
 ] as const
