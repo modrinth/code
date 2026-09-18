@@ -55,7 +55,7 @@
 					<Avatar :src="displayedAvatarUrl" size="md" circle :alt="auth.user.value.username" />
 					<div class="flex flex-col gap-2">
 						<FileButton
-							:max-size="262144"
+							:max-size="524288"
 							:prompt="formatMessage(commonMessages.uploadImageButton)"
 							accept="image/png,image/jpeg,image/gif,image/webp"
 							size="md"
