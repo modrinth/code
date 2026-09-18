@@ -14,6 +14,10 @@ use tokio::sync::Semaphore;
 
 #[tracing::instrument(skip(semaphore))]
 pub async fn fetch(semaphore: Arc<Semaphore>) -> Result<FetchResult, Error> {
+	let library_patches_sha1 = sha1_async(bytes::Bytes::from_static(
+		include_bytes!("../library-patches.json"),
+	))
+	.await?;
     let upload_files = DashMap::new();
     let modrinth_manifest = fetch_json::<VersionManifest>(
         &format_url(&format!(
@@ -34,6 +38,8 @@ pub async fn fetch(semaphore: Arc<Semaphore>) -> Result<FetchResult, Error> {
     // If they are not, we will fetch them
     let (fetch_versions, existing_versions) =
         if let Some(mut modrinth_manifest) = modrinth_manifest {
+			let patches_changed = modrinth_manifest.library_patches_sha1.as_ref()
+				!= Some(&library_patches_sha1);
             let (mut fetch_versions, mut existing_versions) =
                 (Vec::new(), Vec::new());
 
@@ -50,6 +56,7 @@ pub async fn fetch(semaphore: Arc<Semaphore>) -> Result<FetchResult, Error> {
                         .original_sha1
                         .as_ref()
                         .is_some_and(|x| x == &version.sha1)
+						&& !patches_changed
                     {
                         existing_versions.push(modrinth_version);
                     } else {
@@ -153,6 +160,7 @@ pub async fn fetch(semaphore: Arc<Semaphore>) -> Result<FetchResult, Error> {
         );
 
         let new_manifest = VersionManifest {
+			library_patches_sha1: Some(library_patches_sha1),
             latest: mojang_manifest.latest,
             versions: new_versions,
         };

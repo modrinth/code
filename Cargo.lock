@@ -12390,6 +12390,7 @@ dependencies = [
  "shlex 1.3.0",
  "sqlx",
  "sysinfo",
+ "tar",
  "tauri",
  "tempfile",
  "thiserror 2.0.17",
