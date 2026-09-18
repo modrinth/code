@@ -1,5 +1,16 @@
 <template>
 	<div>
+		<ReviewPanel
+			mode="inline"
+			:target="{ kind: 'gallery' }"
+			:label="formatMessage(messages.gallery)"
+			:disabled="isLoading || !!error"
+			class="mb-2"
+		>
+		</ReviewPanel>
+		<h2 class="m-0 text-lg font-semibold text-contrast">
+			{{ formatMessage(messages.gallery) }}
+		</h2>
 		<p v-if="!selection" class="m-0 text-secondary">
 			{{ formatMessage(messages.empty) }}
 		</p>
@@ -14,9 +25,14 @@
 			{{ formatMessage(messages.emptyGallery) }}
 		</p>
 		<div v-else class="gallery-grid">
-			<article
+			<ReviewPanel
+				mode="anchored"
 				v-for="(item, index) in gallery"
 				:key="item.url"
+				as="article"
+				trigger-placement="overlay"
+				:target="{ kind: 'gallery-image', key: item.url }"
+				:label="item.name || formatMessage(messages.imageNumber, { number: index + 1 })"
 				class="flex min-w-0 flex-col overflow-hidden rounded-xl border border-solid border-surface-4"
 			>
 				<button
@@ -51,7 +67,7 @@
 						})
 					}}</time>
 				</div>
-			</article>
+			</ReviewPanel>
 		</div>
 		<ImageViewerEditor :key="projectId" ref="viewer" :items="viewerItems" editor="disabled" />
 	</div>
@@ -64,6 +80,7 @@ import { computed, ref } from 'vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { projectReviewMessages as messages } from '../messages'
+import ReviewPanel from '../review-panel/index.vue'
 
 const { formatMessage } = useVIntl()
 const formatDateTime = useFormatDateTime({

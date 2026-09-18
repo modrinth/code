@@ -1,5 +1,18 @@
 <template>
 	<div class="flex flex-col gap-1.5">
+		<ReviewPanel
+			mode="anchored"
+			:target="{ kind: 'versions' }"
+			:label="formatMessage(messages.versions)"
+			:disabled="
+				isLoading || !!error || versionsQuery.isPending.value || versionsQuery.isError.value
+			"
+			class="mb-3"
+		>
+			<h2 class="m-0 text-lg font-semibold text-contrast">
+				{{ formatMessage(messages.versions) }}
+			</h2>
+		</ReviewPanel>
 		<p v-if="!selection" class="m-0 text-secondary">
 			{{ formatMessage(messages.empty) }}
 		</p>
@@ -38,6 +51,7 @@ import { computed, ref } from 'vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { projectReviewMessages as messages } from '../messages'
+import ReviewPanel from '../review-panel/index.vue'
 import VersionCard from './version-card.vue'
 
 const { formatMessage } = useVIntl()

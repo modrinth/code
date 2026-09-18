@@ -1,36 +1,62 @@
 <template>
 	<div class="review-details min-w-0 pb-10 text-sm text-secondary">
-		<p v-if="isLoading" role="status" class="m-0">{{ formatMessage(messages.loading) }}</p>
+		<p v-if="isLoading" role="status" class="m-0">
+			{{ formatMessage(messages.loading) }}
+		</p>
 		<div v-else-if="error" role="alert">
 			<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
 			<Button @click="refresh">{{ formatMessage(messages.retry) }}</Button>
 		</div>
 		<p v-else-if="!project" class="m-0">{{ formatMessage(messages.empty) }}</p>
 		<template v-else>
-			<section class="review-section">
+			<ReviewPanel
+				mode="anchored"
+				as="section"
+				:target="{ kind: 'title' }"
+				:label="formatMessage(messages.projectTitle)"
+				class="review-section"
+			>
 				<h3 class="review-section-label">
 					{{ formatMessage(messages.projectTitle) }}
 				</h3>
 				<h1 class="m-0 text-xl">{{ project.name }}</h1>
-			</section>
-			<section class="review-section">
+			</ReviewPanel>
+			<ReviewPanel
+				mode="anchored"
+				as="section"
+				:target="{ kind: 'slug' }"
+				:label="formatMessage(messages.slug)"
+				class="review-section"
+			>
 				<h3 class="review-section-label">
 					{{ formatMessage(messages.slug) }}
 				</h3>
 				<Slug />
-			</section>
-			<section class="review-section review-section-icon">
+			</ReviewPanel>
+			<ReviewPanel
+				mode="anchored"
+				as="section"
+				:target="{ kind: 'icon' }"
+				:label="formatMessage(messages.icon)"
+				class="review-section review-section-icon"
+			>
 				<h3 class="review-section-label">
 					{{ formatMessage(messages.icon) }}
 				</h3>
 				<Icon />
-			</section>
-			<section class="review-section">
+			</ReviewPanel>
+			<ReviewPanel
+				mode="anchored"
+				as="section"
+				:target="{ kind: 'summary' }"
+				:label="formatMessage(messages.summary)"
+				class="review-section"
+			>
 				<h3 class="review-section-label">
 					{{ formatMessage(messages.summary) }}
 				</h3>
 				<Summary />
-			</section>
+			</ReviewPanel>
 			<section class="review-section" :aria-label="formatMessage(messages.license)">
 				<h3 class="review-section-label">
 					{{ formatMessage(messages.license) }}
@@ -44,7 +70,7 @@
 				<Tags v-if="hasTags" />
 				<span v-else>{{ formatMessage(messages.emptyTags) }}</span>
 			</section>
-			<section class="review-section" :aria-label="formatMessage(messages.links)">
+			<section :aria-label="formatMessage(messages.links)" class="review-section">
 				<h3 class="review-section-label">
 					{{ formatMessage(messages.links) }}
 				</h3>
@@ -81,6 +107,7 @@ import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { reviewExternalUrl } from '~/providers/project-review/project-links'
 
 import { projectReviewMessages as messages } from '../messages'
+import ReviewPanel from '../review-panel/index.vue'
 import Compatibility from './project/compatibility.vue'
 import Details from './project/details.vue'
 import Icon from './project/icon.vue'

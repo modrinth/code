@@ -98,6 +98,7 @@ export function useReviewProject(selection: Ref<string>) {
 		),
 		project: projectQuery.data,
 		projectV2: legacyQuery.data,
+		threadQuery,
 		members,
 		memberStats,
 		membersLoading: memberQuery.isPending,
