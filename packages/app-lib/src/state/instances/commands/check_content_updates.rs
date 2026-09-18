@@ -3,7 +3,8 @@ use crate::state::instances::{
     adapters::sqlite::{content_rows, instance_rows},
 };
 use crate::state::{
-    CacheBehaviour, CachedEntry, ProjectType, ReleaseChannel, State,
+    CacheBehaviour, CachedEntry, CachedFileUpdate, ProjectType, ReleaseChannel,
+    State,
 };
 use std::collections::HashMap;
 
@@ -13,6 +14,7 @@ use super::sync_content_files::{
 
 #[derive(Clone, Debug)]
 pub(crate) struct ContentUpdate {
+    pub project_id: String,
     pub relative_path: String,
     pub current_version_id: String,
     pub update_version_id: String,
@@ -148,13 +150,8 @@ async fn check_content_updates_with_cache_behaviours(
         &state.api_semaphore,
     )
     .await?;
-    let mut updates_by_hash: HashMap<String, Vec<String>> = HashMap::new();
-    for update in updates {
-        updates_by_hash
-            .entry(update.hash)
-            .or_default()
-            .push(update.update_version_id);
-    }
+    let mut updates_by_hash =
+        resolve_update_versions(updates, update_cache_behaviour, state).await?;
 
     let mut output = Vec::new();
     for candidate in candidates {
@@ -162,9 +159,18 @@ async fn check_content_updates_with_cache_behaviours(
             .remove(&candidate.file.sha1)
             .unwrap_or_default()
             .into_iter()
-            .find(|update_version_id| {
-                update_version_id != &candidate.current_version_id
-            });
+            .find(|version| {
+                let metadata = &file_info_by_hash[&candidate.file.sha1];
+                let project_id = candidate
+                    .entry
+                    .as_ref()
+                    .and_then(|entry| entry.project_id.as_deref())
+                    .unwrap_or(&metadata.project_id);
+                version.id != candidate.current_version_id
+                    && metadata.project_id == project_id
+                    && version.project_id == project_id
+            })
+            .map(|version| version.id);
 
         if let Some(entry) = &candidate.entry {
             content_rows::upsert_content_update_check(
@@ -178,6 +184,9 @@ async fn check_content_updates_with_cache_behaviours(
 
         if let Some(update_version_id) = update_version_id {
             output.push(ContentUpdate {
+                project_id: file_info_by_hash[&candidate.file.sha1]
+                    .project_id
+                    .clone(),
                 relative_path: candidate.file.relative_path,
                 current_version_id: candidate.current_version_id,
                 update_version_id,
@@ -250,4 +259,37 @@ fn update_cache_key(
         channel.key(),
         game_version
     )
+}
+
+pub(super) async fn resolve_update_versions(
+    updates: Vec<CachedFileUpdate>,
+    cache_behaviour: Option<CacheBehaviour>,
+    state: &State,
+) -> crate::Result<HashMap<String, Vec<crate::state::Version>>> {
+    if updates.is_empty() {
+        return Ok(HashMap::new());
+    }
+    let version_ids = updates
+        .iter()
+        .map(|update| update.update_version_id.as_str())
+        .collect::<Vec<_>>();
+    let versions = CachedEntry::get_version_many(
+        &version_ids,
+        cache_behaviour,
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?;
+    let versions_by_id = versions
+        .into_iter()
+        .map(|version| (version.id.clone(), version))
+        .collect::<HashMap<_, _>>();
+    let mut output: HashMap<String, Vec<crate::state::Version>> =
+        HashMap::new();
+    for update in updates {
+        if let Some(version) = versions_by_id.get(&update.update_version_id) {
+            output.entry(update.hash).or_default().push(version.clone());
+        }
+    }
+    Ok(output)
 }
