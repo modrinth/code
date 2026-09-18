@@ -51,9 +51,7 @@ const appSettings = useAppSettings()
 
 const { instance, offline, isMinecraftServer, onUnlinked, closeModal } = injectInstanceSettings()
 const managedContentPolicy = useManagedContentPolicy(instance)
-const skipNonEssentialWarnings = computed(() =>
-	appSettings.getFeatureFlag('skip_non_essential_warnings'),
-)
+const skipNonEssentialWarnings = computed(() => appSettings.skipNonEssentialWarnings)
 
 debug('metadata load: start', {
 	instanceId: instance.value.id,
