@@ -23,7 +23,7 @@ export function createReviewSession() {
 		projects.set(projectId, { ...project, [scope]: state })
 	}
 
-	function readProject(projectId: string): ProjectReviewState[string] {
+	function readProject(projectId: string): ProjectReviewState {
 		return projects.get(projectId) ?? {}
 	}
 

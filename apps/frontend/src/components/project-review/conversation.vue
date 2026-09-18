@@ -5,6 +5,10 @@
 			<ConversationThread
 				v-if="thread"
 				:thread="thread"
+				v-model:reply-body="draft"
+				:generating-message="generating"
+				resizable-editor
+				initial-preview
 				:project="project"
 				:auth="auth"
 				:set-status="setStatus"
@@ -13,7 +17,9 @@
 				@update-thread="updateThread"
 			/>
 			<div v-else-if="isError" class="flex flex-col gap-3 p-4">
-				<p class="m-0 text-red" role="alert">{{ formatMessage(messages.loadError) }}</p>
+				<p class="m-0 text-red" role="alert">
+					{{ formatMessage(messages.loadError) }}
+				</p>
 				<Button class="w-fit" @click="() => refetch()">
 					{{ formatMessage(messages.retry) }}
 				</Button>
@@ -38,6 +44,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query'
 
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
+import { injectReviewStages } from '~/providers/project-review/review-stages'
 
 import { projectReviewMessages as messages } from './messages'
 import ProjectActions from './project-actions.vue'
@@ -47,6 +54,7 @@ const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const auth = useAuthState()
+const { draft, generating } = injectReviewStages()
 const { project, threadQuery } = injectProjectReviewPageContext()
 const { data: thread, isError, refetch } = threadQuery
 
