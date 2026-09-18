@@ -20,7 +20,9 @@
 						<strong :title="version.name" class="break-all text-contrast">{{
 							version.version_number
 						}}</strong>
-						<TagItem>{{ formatMessage(messages[version.status] ?? messages.unknown) }}</TagItem>
+						<TagItem v-if="version.status !== 'listed'">{{
+							formatMessage(messages[version.status] ?? messages.unknown)
+						}}</TagItem>
 						<TagItem v-if="version.files_missing_attribution?.length" class="text-orange">{{
 							formatMessage(messages.withheld)
 						}}</TagItem>
