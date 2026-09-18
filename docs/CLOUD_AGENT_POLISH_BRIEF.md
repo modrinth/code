@@ -110,9 +110,9 @@ Hosting/Medal/Modrinth+; MC plugin; mass `@modrinth/*` rename; secrets/`.env`/bi
 - [x] Telemetry: opt-in UX + rate-limited ingest; fresh installs off via additive migration (no sqlx checksum rewrite); existing TRUE with instances kept; no PII; contract + `012`/`013` VPS notes
 - [x] `logUserActivity` uses trusted `req.clientIp`; skin_delete logged
 - [x] Site glass/layout/support verified (SupportContact → GitHub issue; profile full-width + liquid glass on main/#35)
-- [ ] CI green on `ebluffy/Owyx`
-- [ ] AR clean (or only approved deferrals documented in PR)
-- [ ] Grok babysitter satisfied / no open blockers
+- [x] CI green on `ebluffy/Owyx`
+- [x] AR clean (or only approved deferrals documented in PR)
+- [x] Grok babysitter satisfied / no open blockers
 
 ---
 
