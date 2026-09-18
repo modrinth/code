@@ -1,7 +1,7 @@
 use crate::state::content_store;
 use crate::state::content_store::{
     FileStorageKind, content_file_path, hash_file, input, sync_directory,
-    validate_relative,
+    validate_instance_path, validate_relative,
 };
 use crate::state::content_store::{
     remove_instance_file, try_shared_file, validate_parent_directories,
@@ -36,7 +36,7 @@ pub(super) async fn prepare(
 ) -> crate::Result<Vec<ManagedContentMove>> {
     let mut moves = Vec::new();
     for instance in instance_rows::list_instances(pool).await? {
-        validate_relative(&instance.path)?;
+        validate_instance_path(&instance.path)?;
         let files =
             content_rows::get_instance_files(&instance.id, pool).await?;
         for binding in
