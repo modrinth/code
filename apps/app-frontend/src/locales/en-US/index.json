@@ -4500,7 +4500,7 @@
     "message": "Change display nickname"
   },
   "minecraft-account.edit-display-nick-hint": {
-    "message": "Shown to friends and used in-game. Your login stays the same. 3–16 letters, numbers, or _."
+    "message": "Shown to friends and used in-game. Your login stays the same. 3–16 letters, numbers, or _. May match other players."
   },
   "minecraft-account.edit-display-nick-title": {
     "message": "Display nickname"
