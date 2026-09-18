@@ -121,7 +121,7 @@ export function useSharedInstanceInviteHandler(
 			(instance) => instance.shared_instance?.id === sharedInstanceId,
 		)
 
-		if (!existingInstance || appSettings.getFeatureFlag('skip_non_essential_warnings')) {
+		if (!existingInstance || appSettings.skipNonEssentialWarnings) {
 			showInstall(preview, install, creator)
 			return
 		}

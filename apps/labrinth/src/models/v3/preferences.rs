@@ -39,6 +39,7 @@ pub struct AppearancePreferences {
 #[derive(Debug, Serialize, Deserialize, ToSchema, PartialEq, Component)]
 pub struct BehaviorPreferences {
     pub minimize_app: bool,
+    pub refocus_on_game_close: bool,
     pub hide_right_sidebar: bool,
     pub show_jump_in: bool,
     pub compact_instance_cards: bool,
@@ -58,6 +59,7 @@ impl Default for BehaviorPreferences {
     fn default() -> Self {
         Self {
             minimize_app: false,
+            refocus_on_game_close: false,
             hide_right_sidebar: false,
             show_jump_in: true,
             compact_instance_cards: false,
