@@ -108,7 +108,9 @@
 				v-if="scrollMessages || sortedMessages.length > 0"
 				ref="messageList"
 				class="flex flex-col pt-2"
-				:class="{ 'min-h-0 flex-1 overflow-y-auto overscroll-contain': scrollMessages }"
+				:class="{
+					'min-h-0 flex-1 overflow-y-auto overscroll-contain': scrollMessages,
+				}"
 			>
 				<ThreadMessage
 					v-for="message in sortedMessages"
@@ -137,18 +139,44 @@
 				</Button>
 			</div>
 			<template v-else-if="!report || !report.closed">
-				<div class="mx-2 mb-2 mt-2.5 shrink-0 border-0 border-t border-solid border-divider pt-2.5">
-					<MarkdownEditor
-						v-model="replyBody"
-						:placeholder="
-							formatMessage(
-								sortedMessages.length > 0
-									? messages.replyEditorPlaceholderReply
-									: messages.replyEditorPlaceholderSend,
-							)
-						"
-						:on-image-upload="onUploadImage"
-					/>
+				<div
+					class="relative mx-2 mb-2 mt-2.5 shrink-0 border-0 border-t border-solid border-divider pt-2.5"
+					:style="resizableEditor ? { height: `${editorHeight}px` } : undefined"
+				>
+					<div
+						v-if="resizableEditor"
+						role="separator"
+						tabindex="0"
+						aria-orientation="horizontal"
+						:aria-label="formatMessage(messages.resizeEditor)"
+						:aria-valuenow="editorHeight"
+						:aria-valuemin="120"
+						:aria-valuemax="maxEditorHeight"
+						class="absolute -top-2 left-0 flex h-4 w-full cursor-row-resize touch-none items-center justify-center"
+						@pointerdown="startEditorResize"
+						@pointermove="resizeEditor"
+						@pointerup="stopEditorResize"
+						@pointercancel="stopEditorResize"
+						@keydown.up.prevent="setEditorHeight(editorHeight + 20)"
+						@keydown.down.prevent="setEditorHeight(editorHeight - 20)"
+					>
+						<span class="h-1 w-10 rounded-full bg-surface-5" />
+					</div>
+					<div :class="resizableEditor ? 'h-full overflow-y-auto' : undefined">
+						<MarkdownEditor
+							v-model="replyBody"
+							:initial-preview="initialPreview"
+							:disabled="generatingMessage"
+							:placeholder="
+								formatMessage(
+									sortedMessages.length > 0
+										? messages.replyEditorPlaceholderReply
+										: messages.replyEditorPlaceholderSend,
+								)
+							"
+							:on-image-upload="onUploadImage"
+						/>
+					</div>
 				</div>
 				<div class="mx-2 mt-3 flex shrink-0 flex-col gap-4">
 					<div class="flex flex-wrap items-center justify-end gap-2">
@@ -501,6 +529,10 @@ const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	resizeEditor: {
+		id: 'conversation-thread.resize-editor',
+		defaultMessage: 'Resize message editor',
+	},
 	resubmitModalHeaderResubmitting: {
 		id: 'conversation-thread.resubmit-modal.header.resubmitting',
 		defaultMessage: 'Resubmitting for review',
@@ -656,6 +688,9 @@ const messages = defineMessages({
 })
 
 const props = defineProps({
+	resizableEditor: Boolean,
+	initialPreview: Boolean,
+	generatingMessage: Boolean,
 	reviewSubmissionDisabled: {
 		type: Boolean,
 		default: false,
@@ -716,7 +751,33 @@ const members = computed(() => {
 	return members
 })
 
-const replyBody = ref('')
+const replyBody = defineModel('replyBody', { type: String, default: '' })
+const editorHeight = ref(240)
+const maxEditorHeight = ref(600)
+let editorDrag = null
+
+function setEditorHeight(height) {
+	maxEditorHeight.value = Math.max(120, Math.floor(window.innerHeight * 0.6))
+	editorHeight.value = Math.min(maxEditorHeight.value, Math.max(120, height))
+}
+
+function startEditorResize(event) {
+	if (event.button !== 0) return
+	event.preventDefault()
+	event.currentTarget.setPointerCapture(event.pointerId)
+	editorDrag = { y: event.clientY, height: editorHeight.value }
+}
+
+function resizeEditor(event) {
+	if (editorDrag) setEditorHeight(editorDrag.height + editorDrag.y - event.clientY)
+}
+
+function stopEditorResize(event) {
+	editorDrag = null
+	if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+		event.currentTarget.releasePointerCapture(event.pointerId)
+	}
+}
 
 const sortedMessages = computed(() => {
 	if (props.thread !== null) {
@@ -731,10 +792,10 @@ const modalSubmit = ref(null)
 const modalReply = ref(null)
 
 const loadingAction = ref(null)
-const isLoading = computed(() => loadingAction.value !== null)
+const isLoading = computed(() => loadingAction.value !== null || props.generatingMessage)
 
 async function runBlockingAction(actionId, action) {
-	if (loadingAction.value !== null) {
+	if (isLoading.value) {
 		return
 	}
 	loadingAction.value = actionId

@@ -16,7 +16,7 @@ import useUndefinedProjectStage from '@modrinth/moderation/src/data/stages/undef
 import useVersionsStage from '@modrinth/moderation/src/data/stages/versions'
 import { isShown, type StageNode } from '@modrinth/moderation/src/types/node'
 import { createContext } from '@modrinth/ui'
-import { computed, type Ref, shallowRef } from 'vue'
+import { computed, type Ref, ref, shallowRef } from 'vue'
 
 import { injectProjectReviewPageContext } from './index'
 import type { ReviewTarget } from './review'
@@ -52,6 +52,8 @@ export const [injectReviewStages, provideReviewStages] =
 	createContext<ReturnType<typeof createReviewStages>>('ProjectReviewStages')
 
 export function createReviewStages(projectId: Ref<string | undefined>) {
+	const draft = ref('')
+	const generating = ref(false)
 	const registered = shallowRef<{ projectId: string; stages: ReviewStages }>()
 
 	function register(id: string, stages: ReviewStages) {
@@ -71,7 +73,7 @@ export function createReviewStages(projectId: Ref<string | undefined>) {
 		return { projectId: entry.projectId, stage, scope }
 	}
 
-	return { register, resolve }
+	return { register, resolve, draft, generating }
 }
 
 export function useReviewStageDefinitions(): ReviewStages {
