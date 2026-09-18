@@ -11,11 +11,11 @@ export const projectReviewMessages = defineMessages({
 	},
 	noReviewActions: {
 		id: 'moderation.project-review.noReviewActions',
-		defaultMessage: 'No review actions available for this section.',
+		defaultMessage: 'No review actions available for this section',
 	},
 	reviewScope: {
 		id: 'moderation.project-review.reviewScope',
-		defaultMessage: 'These selections apply to the {stage} review for the whole project.',
+		defaultMessage: 'These selections apply to the {stage} review for the whole project',
 	},
 	licenseUrl: {
 		id: 'moderation.project-review.licenseUrl',
@@ -87,11 +87,11 @@ export const projectReviewMessages = defineMessages({
 	},
 	empty: {
 		id: 'moderation.project-review.empty',
-		defaultMessage: 'No project selected.',
+		defaultMessage: 'No project selected',
 	},
 	loading: {
 		id: 'moderation.project-review.loading',
-		defaultMessage: 'Loading review workspace…',
+		defaultMessage: 'Loading...',
 	},
 	projectTitle: {
 		id: 'moderation.project-review.projectTitle',
@@ -135,11 +135,11 @@ export const projectReviewMessages = defineMessages({
 	},
 	emptyTags: {
 		id: 'moderation.project-review.emptyTags',
-		defaultMessage: 'No tags.',
+		defaultMessage: 'No tags',
 	},
 	emptyLinks: {
 		id: 'moderation.project-review.emptyLinks',
-		defaultMessage: 'No links.',
+		defaultMessage: 'No links',
 	},
 	source: {
 		id: 'moderation.project-review.source',
@@ -251,15 +251,19 @@ export const projectReviewMessages = defineMessages({
 	},
 	loadError: {
 		id: 'moderation.project-review.loadError',
-		defaultMessage: 'Could not load project data.',
+		defaultMessage: 'Could not load project data',
 	},
 	queueError: {
 		id: 'moderation.project-review.queueError',
-		defaultMessage: 'Could not change projects. Please try again.',
+		defaultMessage: 'Could not change projects. Please try again',
 	},
 	unavailable: {
 		id: 'moderation.project-review.unavailable',
 		defaultMessage: 'Unavailable',
+	},
+	noLicenseUrl: {
+		id: 'moderation.project-review.noLicense',
+		defaultMessage: 'No license URL',
 	},
 	queueNavigation: {
 		id: 'moderation.project-review.queueNavigation',
@@ -307,11 +311,11 @@ export const projectReviewMessages = defineMessages({
 	},
 	emptyDescription: {
 		id: 'moderation.project-review.emptyDescription',
-		defaultMessage: 'No description.',
+		defaultMessage: 'No description',
 	},
 	emptyGallery: {
 		id: 'moderation.project-review.emptyGallery',
-		defaultMessage: 'No gallery images.',
+		defaultMessage: 'No gallery images',
 	},
 	imageNumber: {
 		id: 'moderation.project-review.imageNumber',
@@ -331,7 +335,7 @@ export const projectReviewMessages = defineMessages({
 	},
 	emptyVersions: {
 		id: 'moderation.project-review.emptyVersions',
-		defaultMessage: 'No versions.',
+		defaultMessage: 'No versions',
 	},
 	expandAll: {
 		id: 'moderation.project-review.expandAll',
@@ -363,7 +367,7 @@ export const projectReviewMessages = defineMessages({
 	},
 	emptyChangelog: {
 		id: 'moderation.project-review.emptyChangelog',
-		defaultMessage: 'No changelog.',
+		defaultMessage: 'No changelog',
 	},
 	versionId: {
 		id: 'moderation.project-review.versionId',
@@ -391,7 +395,7 @@ export const projectReviewMessages = defineMessages({
 	},
 	emptyDependencies: {
 		id: 'moderation.project-review.emptyDependencies',
-		defaultMessage: 'No dependencies.',
+		defaultMessage: 'No dependencies',
 	},
 	listed: {
 		id: 'moderation.project-review.listed',
@@ -443,16 +447,16 @@ export const projectReviewMessages = defineMessages({
 	},
 	noReports: {
 		id: 'moderation.project-review.noReports',
-		defaultMessage: 'No technical-review reports are available for this project.',
+		defaultMessage: 'No technical-review reports are available for this project',
 	},
 	noPendingFiles: {
 		id: 'moderation.project-review.noPendingFiles',
-		defaultMessage: 'No files with unresolved flags.',
+		defaultMessage: 'No files with unresolved flags',
 	},
 	reviewProgress: {
 		id: 'moderation.project-review.reviewProgress',
 		defaultMessage:
-			'Reviewed flags indicate progress, not a safe verdict. Files without flags have no flag verdict.',
+			'Reviewed flags indicate progress, not a safe verdict. Files without flags have no flag verdict',
 	},
 	backToFiles: {
 		id: 'moderation.project-review.backToFiles',
@@ -464,6 +468,6 @@ export const projectReviewMessages = defineMessages({
 	},
 	sourceError: {
 		id: 'moderation.project-review.sourceError',
-		defaultMessage: 'Could not load source code. Try opening the flag again.',
+		defaultMessage: 'Could not load source code. Try opening the flag again',
 	},
 })
