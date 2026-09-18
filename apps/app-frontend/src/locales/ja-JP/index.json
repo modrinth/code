@@ -53,9 +53,6 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "ダウンロードを完了することができませんでした"
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "インスタンスが見つかりませんでした"
-  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "ファイルパスが無効です"
   },
