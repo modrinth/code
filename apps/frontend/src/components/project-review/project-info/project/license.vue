@@ -27,7 +27,7 @@
 				<span class="truncate" :title="url">{{ url.replace(/^https?:\/\//, '') }}</span>
 				<ExternalIcon class="size-3 shrink-0" />
 			</a>
-			<span v-else class="text-secondary">{{ formatMessage(messages.unavailable) }}</span>
+			<span v-else class="text-secondary">{{ formatMessage(messages.noLicenseUrl) }}</span>
 		</ReviewPanel>
 	</div>
 </template>

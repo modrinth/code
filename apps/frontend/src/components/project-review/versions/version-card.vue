@@ -1,16 +1,11 @@
 <template>
-	<ReviewPanel
-		mode="anchored"
-		as="article"
-		trigger-placement="header"
-		:target="{ kind: 'version', key: version.id }"
-		:label="version.version_number"
-		class="min-w-0 overflow-hidden rounded-lg border border-solid border-surface-4 bg-surface-2"
+	<article
+		class="min-w-0 overflow-hidden rounded-xl border border-solid border-surface-4 bg-surface-2"
 	>
-		<div data-review-header class="flex flex-wrap items-center gap-3 p-3">
+		<div class="flex flex-wrap items-center gap-3">
 			<button
 				type="button"
-				class="flex min-w-0 flex-1 cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-left text-primary"
+				class="flex min-w-0 flex-1 cursor-pointer items-center gap-3 border-0 bg-transparent p-3 text-left text-primary"
 				:aria-expanded="expanded"
 				:aria-controls="`review-version-${version.id}`"
 				@click="emit('toggle')"
@@ -19,10 +14,12 @@
 					class="shrink-0 transition-transform"
 					:class="{ '-rotate-90': !expanded }"
 				/>
-				<div class="flex min-w-0 flex-col gap-2">
+				<div class="flex items-center gap-2">
 					<div class="flex flex-wrap items-center gap-2">
 						<VersionChannelTag :channel="version.version_type" />
-						<strong class="break-all text-contrast">{{ version.version_number }}</strong>
+						<strong :title="version.name" class="break-all text-contrast">{{
+							version.version_number
+						}}</strong>
 						<TagItem>{{ formatMessage(messages[version.status] ?? messages.unknown) }}</TagItem>
 						<TagItem v-if="version.files_missing_attribution?.length" class="text-orange">{{
 							formatMessage(messages.withheld)
@@ -34,7 +31,7 @@
 					>
 				</div>
 			</button>
-			<div class="flex flex-wrap gap-2">
+			<div class="flex flex-wrap gap-2 pr-3">
 				<ButtonLink :to="versionHref" target="_blank">{{
 					formatMessage(messages.viewVersion)
 				}}</ButtonLink>
@@ -48,147 +45,181 @@
 			:id="`review-version-${version.id}`"
 			class="flex min-w-0 flex-col gap-4 border-0 border-t border-solid border-surface-4 p-3"
 		>
-			<h3 class="m-0 break-words text-lg font-semibold text-contrast">
-				{{ version.name }}
-			</h3>
-			<dl class="metadata-grid m-0">
-				<div>
-					<dt class="text-sm text-secondary">
-						{{ formatMessage(messages.gameVersions) }}
-					</dt>
-					<dd class="m-0 flex flex-wrap gap-1">
-						<TagItem v-for="game in version.game_versions" :key="game">{{ game }}</TagItem>
-					</dd>
-				</div>
-				<div>
-					<dt class="text-sm text-secondary">
-						{{ formatMessage(messages.platforms) }}
-					</dt>
-					<dd class="m-0 flex flex-wrap gap-1">
-						<TagTagItem v-for="loader in platforms" :key="loader" :tag="loader" />
-					</dd>
-				</div>
-				<div v-if="version.environment">
-					<dt class="text-sm text-secondary">
-						{{ formatMessage(messages.environments) }}
-					</dt>
-					<dd class="m-0">
-						<EnvironmentTags :environment="version.environment" />
-					</dd>
-				</div>
-				<div>
-					<dt class="text-sm text-secondary">
-						{{ formatMessage(messages.published) }}
-					</dt>
-					<dd class="m-0">
-						<time :datetime="version.date_published">{{
-							formatDateTime(version.date_published)
-						}}</time>
-					</dd>
-				</div>
-				<div>
-					<dt class="text-sm text-secondary">
-						{{ formatMessage(messages.author) }}
-					</dt>
-					<dd class="m-0">
-						<NuxtLink :to="`/user/${version.author_id}`" target="_blank" class="hover:underline">{{
-							author?.username ?? version.author_id
-						}}</NuxtLink>
-					</dd>
-				</div>
-				<div>
-					<dt class="text-sm text-secondary">
-						{{ formatMessage(messages.downloads) }}
-					</dt>
-					<dd class="m-0">{{ formatNumber(version.downloads) }}</dd>
-				</div>
-				<div>
-					<dt class="text-sm text-secondary">
-						{{ formatMessage(messages.versionId) }}
-					</dt>
-					<dd class="m-0"><CopyCode :text="version.id" /></dd>
-				</div>
-			</dl>
-			<ButtonLink
-				v-if="version.files_missing_attribution?.length"
-				:to="permissionsHref"
-				target="_blank"
-				class="w-fit"
-				>{{ formatMessage(messages.resolvePermissions) }}</ButtonLink
-			>
-			<section>
-				<h3 class="mb-2 mt-0 text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.files) }}
-				</h3>
-				<div class="flex flex-col gap-1.5">
-					<div v-for="file in version.files" :key="file.url" class="min-w-0 rounded-lg p-3">
-						<div class="flex flex-wrap items-center justify-between gap-2">
-							<div class="flex min-w-0 flex-col gap-1">
-								<strong class="break-all text-contrast">{{ file.filename }}</strong>
-								<div class="flex flex-wrap items-center gap-2 text-sm text-secondary">
-									<TagItem v-if="file.primary">{{ formatMessage(messages.primary) }}</TagItem
-									><span>{{ formatMessage(fileTypeMessages[file.file_type ?? 'unknown']) }}</span
-									><span>{{ formatBytes(file.size) }}</span>
-								</div>
-							</div>
-							<ButtonLink :href="file.url" :download="file.filename"
-								><DownloadIcon />{{ formatMessage(messages.download) }}</ButtonLink
-							>
-						</div>
-						<details class="mt-2">
-							<summary class="cursor-pointer text-sm text-secondary">
-								{{ formatMessage(messages.hashes) }}
-							</summary>
+			<div class="flex min-w-0 flex-wrap items-start gap-6">
+				<section class="min-w-0 flex-[1_1_16rem]">
+					<h3 class="mb-2 mt-0 text-sm font-semibold text-secondary">
+						{{ formatMessage(messages.details) }}
+					</h3>
+					<table class="version-metadata w-full text-left">
+						<tbody>
+							<tr>
+								<th scope="row" class="text-sm font-normal text-secondary">
+									{{ formatMessage(messages.gameVersions) }}
+								</th>
+								<td>
+									<div class="flex flex-wrap gap-1">
+										<TagItem v-for="game in version.game_versions" :key="game">{{ game }}</TagItem>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row" class="text-sm font-normal text-secondary">
+									{{ formatMessage(messages.platforms) }}
+								</th>
+								<td>
+									<div class="flex flex-wrap gap-1">
+										<TagTagItem v-for="loader in platforms" :key="loader" :tag="loader" />
+									</div>
+								</td>
+							</tr>
+							<tr v-if="version.environment">
+								<th scope="row" class="text-sm font-normal text-secondary">
+									{{ formatMessage(messages.environments) }}
+								</th>
+								<td class="space-y-1.5">
+									<EnvironmentTags :environment="version.environment" />
+								</td>
+							</tr>
+							<tr>
+								<th scope="row" class="text-sm font-normal text-secondary">
+									{{ formatMessage(messages.published) }}
+								</th>
+								<td>
+									<time :datetime="version.date_published">{{
+										formatDateTime(version.date_published)
+									}}</time>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row" class="text-sm font-normal text-secondary">
+									{{ formatMessage(messages.author) }}
+								</th>
+								<td>
+									<NuxtLink
+										:to="`/user/${version.author_id}`"
+										target="_blank"
+										class="hover:underline"
+										>{{ author?.username ?? version.author_id }}</NuxtLink
+									>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row" class="text-sm font-normal text-secondary">
+									{{ formatMessage(messages.downloads) }}
+								</th>
+								<td>{{ formatNumber(version.downloads) }}</td>
+							</tr>
+							<tr>
+								<th scope="row" class="text-sm font-normal text-secondary">
+									{{ formatMessage(messages.versionId) }}
+								</th>
+								<td><CopyCode :text="version.id" /></td>
+							</tr>
+						</tbody>
+					</table>
+					<ButtonLink
+						v-if="version.files_missing_attribution?.length"
+						:to="permissionsHref"
+						target="_blank"
+						class="mt-3 w-fit"
+						>{{ formatMessage(messages.resolvePermissions) }}</ButtonLink
+					>
+				</section>
+				<div class="flex min-w-0 flex-[3_1_24rem] flex-col gap-4">
+					<section>
+						<h3 class="mb-2 mt-0 text-sm font-semibold text-secondary">
+							{{ formatMessage(messages.files) }}
+						</h3>
+						<div class="flex flex-col gap-1.5">
 							<div
-								v-for="(hash, algorithm) in file.hashes"
-								:key="algorithm"
-								class="mt-2 flex min-w-0 flex-wrap items-center gap-2 text-xs"
+								v-for="file in version.files"
+								:key="file.url"
+								class="min-w-0 rounded-lg bg-surface-1 px-3 py-2"
 							>
-								<span class="uppercase">{{ algorithm }}</span
-								><CopyCode :text="hash" class="min-w-0 max-w-full break-all [&_svg]:shrink-0" />
+								<div class="flex flex-wrap items-center justify-between gap-2">
+									<div class="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
+										<strong class="min-w-0 flex-1 break-all text-contrast">{{
+											file.filename
+										}}</strong>
+										<div class="flex flex-wrap items-center gap-2 text-sm text-secondary">
+											<TagItem v-if="file.primary">{{ formatMessage(messages.primary) }}</TagItem
+											><span>{{
+												formatMessage(fileTypeMessages[file.file_type ?? 'unknown'])
+											}}</span
+											><span>{{ formatBytes(file.size) }}</span>
+										</div>
+									</div>
+									<ButtonLink
+										:href="file.url"
+										:download="file.filename"
+										:aria-label="formatMessage(messages.download)"
+										icon-only
+										><DownloadIcon
+									/></ButtonLink>
+								</div>
+								<details class="mt-2">
+									<summary class="cursor-pointer text-sm text-secondary">
+										{{ formatMessage(messages.hashes) }}
+									</summary>
+									<div
+										v-for="(hash, algorithm) in file.hashes"
+										:key="algorithm"
+										class="mt-2 flex min-w-0 flex-wrap items-center gap-2 text-xs"
+									>
+										<span class="uppercase">{{ algorithm }}</span
+										><CopyCode :text="hash" class="min-w-0 max-w-full break-all [&_svg]:shrink-0" />
+									</div>
+								</details>
 							</div>
-						</details>
-					</div>
+						</div>
+					</section>
+					<section>
+						<h3 class="mb-2 mt-0 text-sm font-semibold text-secondary">
+							{{ formatMessage(messages.dependencies) }}
+						</h3>
+						<p v-if="!version.dependencies.length" class="m-0 text-secondary">
+							{{ formatMessage(messages.emptyDependencies) }}
+						</p>
+						<p v-else-if="dependenciesQuery.isPending.value" role="status" class="m-0">
+							{{ formatMessage(messages.loading) }}
+						</p>
+						<div v-else-if="dependenciesQuery.isError.value" role="alert">
+							<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
+							<Button @click="dependenciesQuery.refetch()">{{
+								formatMessage(messages.retry)
+							}}</Button>
+						</div>
+						<div v-else class="flex flex-col gap-1.5">
+							<div
+								v-for="(context, index) in dependencies"
+								:key="index"
+								class="min-w-0 rounded-lg bg-surface-1 px-3 py-2"
+							>
+								<VersionDependencyItem
+									:context="context"
+									:dependency-link="dependencyHref(context)"
+									link-tabbable
+									class="min-w-0 break-words"
+								>
+									<TagItem>{{
+										formatMessage(messages[context.dependency.dependency_type])
+									}}</TagItem>
+								</VersionDependencyItem>
+								<CopyCode
+									v-if="!context.project"
+									:text="
+										context.dependency.project_id ??
+										context.dependency.version_id ??
+										context.dependency.file_name ??
+										''
+									"
+									class="mt-2"
+								/>
+							</div>
+						</div>
+					</section>
 				</div>
-			</section>
-			<section>
-				<h3 class="mb-2 mt-0 text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.dependencies) }}
-				</h3>
-				<p v-if="!version.dependencies.length" class="m-0 text-secondary">
-					{{ formatMessage(messages.emptyDependencies) }}
-				</p>
-				<p v-else-if="dependenciesQuery.isPending.value" role="status" class="m-0">
-					{{ formatMessage(messages.loading) }}
-				</p>
-				<div v-else-if="dependenciesQuery.isError.value" role="alert">
-					<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
-					<Button @click="dependenciesQuery.refetch()">{{ formatMessage(messages.retry) }}</Button>
-				</div>
-				<div v-else class="flex flex-col gap-1.5">
-					<div v-for="(context, index) in dependencies" :key="index" class="min-w-0 rounded-lg p-3">
-						<span class="text-sm font-semibold text-secondary">{{
-							formatMessage(messages[context.dependency.dependency_type])
-						}}</span>
-						<VersionDependencyItem
-							:context="context"
-							:dependency-link="dependencyHref(context)"
-							link-tabbable
-							class="mt-2 break-words"
-						/>
-						<CopyCode
-							v-if="!context.project"
-							:text="
-								context.dependency.project_id ??
-								context.dependency.version_id ??
-								context.dependency.file_name ??
-								''
-							"
-							class="mt-2"
-						/>
-					</div>
-				</div>
-			</section>
+			</div>
 			<details
 				:open="changelogOpen"
 				@toggle="changelogOpen = ($event.target as HTMLDetailsElement).open"
@@ -213,8 +244,13 @@
 					</p>
 				</div>
 			</details>
+			<ReviewPanel
+				mode="inline"
+				:target="{ kind: 'version', key: version.id }"
+				:label="version.version_number"
+			/>
 		</div>
-	</ReviewPanel>
+	</article>
 </template>
 
 <script setup lang="ts">
@@ -332,9 +368,20 @@ function dependencyHref(context: DependencyContext) {
 </script>
 
 <style scoped>
-.metadata-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
-	gap: 1rem;
+.version-metadata {
+	border-collapse: collapse;
+}
+
+.version-metadata th {
+	width: 7rem;
+	padding-right: 0.75rem;
+}
+
+.version-metadata th,
+.version-metadata td {
+	padding-top: 0.25rem;
+	padding-bottom: 0.25rem;
+	vertical-align: top;
+	overflow-wrap: anywhere;
 }
 </style>
