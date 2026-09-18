@@ -34,7 +34,6 @@ function formatDate(dateStr: string | undefined, locale: Locale, dash: string): 
 function roleLabel(role: string | undefined, p: ReturnType<typeof useLocale>["dict"]["profile"]) {
   if (role === "admin") return { text: p.roleAdmin, cls: "badge-danger" };
   if (role === "moderator") return { text: p.roleModerator, cls: "badge-accent" };
-  if (role === "helper") return { text: p.roleHelper, cls: "badge-accent" };
   return { text: p.rolePlayer, cls: "" };
 }
 

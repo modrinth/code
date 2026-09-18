@@ -38,7 +38,11 @@ router.get('/', async (req, res) => {
 });
 
 // --- Admin CRUD (/api/admin/news) ---
-adminRouter.use(authenticateToken, requireRole(['admin']));
+adminRouter.use(authenticateToken, requireRole(['admin', 'moderator']));
+adminRouter.use((req, res, next) => {
+  if (req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS') return next();
+  return requireRole(['admin'])(req, res, next);
+});
 
 // GET /api/admin/news — all items incl. unpublished.
 adminRouter.get('/', async (_req, res) => {

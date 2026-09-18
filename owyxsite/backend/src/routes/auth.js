@@ -363,7 +363,7 @@ router.post('/register', [
 
         console.log(`✅ Новая регистрация: ${loginName} (${email})`);
 
-        await logUserActivity(newUser.id, 'register', 'Account registered', {
+        await logUserActivity(newUser.id, 'register', 'Аккаунт зарегистрирован', {
             req,
             metadata: { hasEmail: true },
         });
@@ -529,7 +529,7 @@ router.post('/login', [
         await logLoginAttempt(user.email || loginKey, ip, userAgent, true);
 
         // Записываем активность
-        await logUserActivity(user.id, 'login', 'Signed in', {
+        await logUserActivity(user.id, 'login', 'Вход в систему', {
             req,
             ip,
             userAgent,
@@ -562,7 +562,7 @@ router.post('/logout', authenticateToken, async (req, res) => {
             );
 
             // Записываем активность
-            await logUserActivity(req.user.id, 'logout', 'Signed out', {
+            await logUserActivity(req.user.id, 'logout', 'Выход из системы', {
                 req,
                 ip: req.clientIp || req.ip,
             });
@@ -847,7 +847,7 @@ router.post('/link-discord', authenticateToken, async (req, res) => {
         ]);
 
         // Логируем активность
-        await logUserActivity(req.user.id, 'discord_linked', 'Discord account linked', {
+        await logUserActivity(req.user.id, 'discord_linked', 'Discord привязан', {
             req,
             metadata: { discordUsername: String(discordData.username || '').slice(0, 64) },
         });
@@ -884,7 +884,7 @@ router.post('/unlink-discord', authenticateToken, async (req, res) => {
         `, [req.user.id]);
 
         // Логируем активность
-        await logUserActivity(req.user.id, 'discord_unlinked', 'Discord account unlinked', { req });
+        await logUserActivity(req.user.id, 'discord_unlinked', 'Discord отвязан', { req });
 
         res.json({
             success: true,
@@ -1012,7 +1012,7 @@ router.post('/reset-password', [
             [userId]
         );
 
-        await logUserActivity(userId, 'password_reset', 'Password reset via email link', {
+        await logUserActivity(userId, 'password_reset', 'Пароль сброшен по ссылке из письма', {
             req,
         });
 

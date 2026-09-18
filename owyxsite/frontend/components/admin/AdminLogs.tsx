@@ -84,28 +84,14 @@ function kindBadge(kind: string) {
   return "badge badge-accent";
 }
 
-const ACTIVITY_LABELS_EN: Record<string, string> = {
-  login: "Sign in",
-  logout: "Sign out",
-  register: "Register",
-  password_reset: "Password reset",
-  email_change: "Email change",
-  nickname_change: "Login change",
-  display_nickname_change: "Display nick",
-  avatar_update: "Avatar upload",
-  avatar_delete: "Avatar remove",
-  skin_update: "Skin update",
-  skin_delete: "Skin remove",
-  discord_linked: "Discord linked",
-  discord_unlinked: "Discord unlinked",
-  social_settings: "Social privacy",
-};
-
+/** Logs are Russian-only (ops language) — no locale switch for stored/type labels. */
 const ACTIVITY_LABELS_RU: Record<string, string> = {
   login: "Вход",
   logout: "Выход",
   register: "Регистрация",
   password_reset: "Сброс пароля",
+  password_change: "Смена пароля",
+  profile_update: "Профиль",
   email_change: "Смена почты",
   nickname_change: "Смена логина",
   display_nickname_change: "Отображаемый ник",
@@ -118,15 +104,6 @@ const ACTIVITY_LABELS_RU: Record<string, string> = {
   social_settings: "Соц. приватность",
 };
 
-const TELEMETRY_LABELS_EN: Record<string, string> = {
-  session_start: "Session start",
-  heartbeat: "Heartbeat",
-  error: "Error",
-  crash: "Crash",
-  perf: "Performance",
-  feature: "Feature",
-};
-
 const TELEMETRY_LABELS_RU: Record<string, string> = {
   session_start: "Старт сессии",
   heartbeat: "Heartbeat",
@@ -136,8 +113,25 @@ const TELEMETRY_LABELS_RU: Record<string, string> = {
   feature: "Фича",
 };
 
-function humanLabel(raw: string, en: boolean, mapEn: Record<string, string>, mapRu: Record<string, string>) {
-  return (en ? mapEn : mapRu)[raw] || raw.replace(/_/g, " ");
+const ADMIN_ACTION_LABELS_RU: Record<string, string> = {
+  role_changed: "Смена роли",
+  profile_update: "Правка профиля",
+  user_banned: "Бан",
+  user_unbanned: "Разбан",
+  user_deleted: "Удаление",
+  user_moderation: "Модерация",
+  application_reviewed: "Заявка",
+  settings_updated: "Настройки",
+  email_sent: "Письмо",
+  email_test: "Тест почты",
+  cache_cleared: "Сброс кэша",
+  api_token_created: "API-токен создан",
+  api_token_updated: "API-токен обновлён",
+  api_token_deleted: "API-токен удалён",
+};
+
+function humanLabel(raw: string, map: Record<string, string>) {
+  return map[raw] || raw.replace(/_/g, " ");
 }
 
 export default function AdminLogs({
@@ -241,7 +235,15 @@ export default function AdminLogs({
       ? activityTypes.map((x) => x.type)
       : tab === "launcher"
         ? telemetryKinds.map((x) => x.kind)
-        : ["user_banned", "user_unbanned", "user_deleted", "user_moderation"];
+        : [
+            "role_changed",
+            "profile_update",
+            "user_banned",
+            "user_unbanned",
+            "user_deleted",
+            "user_moderation",
+            "application_reviewed",
+          ];
 
   return (
     <div className="space-y-5">
@@ -320,10 +322,10 @@ export default function AdminLogs({
           {filterOptions.map((opt) => (
             <option key={opt} value={opt}>
               {tab === "account"
-                ? humanLabel(opt, en, ACTIVITY_LABELS_EN, ACTIVITY_LABELS_RU)
+                ? humanLabel(opt, ACTIVITY_LABELS_RU)
                 : tab === "launcher"
-                  ? humanLabel(opt, en, TELEMETRY_LABELS_EN, TELEMETRY_LABELS_RU)
-                  : opt.replace(/_/g, " ")}
+                  ? humanLabel(opt, TELEMETRY_LABELS_RU)
+                  : humanLabel(opt, ADMIN_ACTION_LABELS_RU)}
             </option>
           ))}
         </select>
@@ -343,16 +345,16 @@ export default function AdminLogs({
       </div>
 
       <div className="panel overflow-hidden">
-        <div className="overflow-x-auto max-h-[min(32rem,70vh)]">
+        <div className="overflow-x-auto overflow-y-auto max-h-[min(32rem,70vh)]">
           {loading ? (
             <p className="p-6 text-sm text-muted">{t("Loading…", "Загрузка…")}</p>
           ) : tab === "account" ? (
-            <table className="w-full text-sm">
+            <table className="w-full text-sm table-fixed">
               <thead className="sticky top-0 bg-panel-2/95 backdrop-blur text-left text-xs uppercase tracking-wider text-muted">
                 <tr>
-                  <th className="px-4 py-3 font-medium">{t("When", "Когда")}</th>
-                  <th className="px-4 py-3 font-medium">{t("User", "Игрок")}</th>
-                  <th className="px-4 py-3 font-medium">{t("Type", "Тип")}</th>
+                  <th className="w-28 px-4 py-3 font-medium">{t("When", "Когда")}</th>
+                  <th className="w-36 px-4 py-3 font-medium">{t("User", "Игрок")}</th>
+                  <th className="w-40 px-4 py-3 font-medium">{t("Type", "Тип")}</th>
                   <th className="px-4 py-3 font-medium">{t("Details", "Детали")}</th>
                 </tr>
               </thead>
@@ -365,7 +367,7 @@ export default function AdminLogs({
                   </tr>
                 ) : (
                   activity.map((row) => (
-                    <tr key={row.id} className="border-t border-line/60 hover:bg-panel-2/40">
+                    <tr key={row.id} className="border-t border-line/60 hover:bg-panel-2/40 align-top">
                       <td className="px-4 py-2.5 whitespace-nowrap text-muted">
                         {fmtWhen(row.created_at, en)}
                       </td>
@@ -379,10 +381,10 @@ export default function AdminLogs({
                       </td>
                       <td className="px-4 py-2.5">
                         <span className={kindBadge(row.activity_type)} title={row.activity_type}>
-                          {humanLabel(row.activity_type, en, ACTIVITY_LABELS_EN, ACTIVITY_LABELS_RU)}
+                          {humanLabel(row.activity_type, ACTIVITY_LABELS_RU)}
                         </span>
                       </td>
-                      <td className="px-4 py-2.5 text-muted max-w-md truncate" title={row.description}>
+                      <td className="px-4 py-2.5 text-muted whitespace-normal break-words">
                         {row.description}
                       </td>
                     </tr>
@@ -391,13 +393,13 @@ export default function AdminLogs({
               </tbody>
             </table>
           ) : tab === "admin" ? (
-            <table className="w-full text-sm">
+            <table className="w-full text-sm table-fixed">
               <thead className="sticky top-0 bg-panel-2/95 backdrop-blur text-left text-xs uppercase tracking-wider text-muted">
                 <tr>
-                  <th className="px-4 py-3 font-medium">{t("When", "Когда")}</th>
-                  <th className="px-4 py-3 font-medium">{t("Admin", "Админ")}</th>
-                  <th className="px-4 py-3 font-medium">{t("Action", "Действие")}</th>
-                  <th className="px-4 py-3 font-medium">{t("Target", "Цель")}</th>
+                  <th className="w-28 px-4 py-3 font-medium">{t("When", "Когда")}</th>
+                  <th className="w-28 px-4 py-3 font-medium">{t("Admin", "Админ")}</th>
+                  <th className="w-36 px-4 py-3 font-medium">{t("Action", "Действие")}</th>
+                  <th className="w-28 px-4 py-3 font-medium">{t("Target", "Цель")}</th>
                   <th className="px-4 py-3 font-medium">{t("Details", "Детали")}</th>
                 </tr>
               </thead>
@@ -410,16 +412,18 @@ export default function AdminLogs({
                   </tr>
                 ) : (
                   adminLogs.map((row) => (
-                    <tr key={row.id} className="border-t border-line/60 hover:bg-panel-2/40">
+                    <tr key={row.id} className="border-t border-line/60 hover:bg-panel-2/40 align-top">
                       <td className="px-4 py-2.5 whitespace-nowrap text-muted">
                         {fmtWhen(row.created_at, en)}
                       </td>
                       <td className="px-4 py-2.5 font-medium">{row.admin_nickname || "—"}</td>
                       <td className="px-4 py-2.5">
-                        <span className={kindBadge(row.action)}>{row.action}</span>
+                        <span className={kindBadge(row.action)} title={row.action}>
+                          {humanLabel(row.action, ADMIN_ACTION_LABELS_RU)}
+                        </span>
                       </td>
                       <td className="px-4 py-2.5">{row.target_user_nickname || "—"}</td>
-                      <td className="px-4 py-2.5 text-muted max-w-sm truncate" title={row.details || ""}>
+                      <td className="px-4 py-2.5 text-muted whitespace-normal break-words">
                         {row.details || "—"}
                       </td>
                     </tr>
@@ -428,13 +432,13 @@ export default function AdminLogs({
               </tbody>
             </table>
           ) : (
-            <table className="w-full text-sm">
+            <table className="w-full text-sm table-fixed">
               <thead className="sticky top-0 bg-panel-2/95 backdrop-blur text-left text-xs uppercase tracking-wider text-muted">
                 <tr>
-                  <th className="px-4 py-3 font-medium">{t("When", "Когда")}</th>
-                  <th className="px-4 py-3 font-medium">{t("Kind", "Тип")}</th>
-                  <th className="px-4 py-3 font-medium">{t("Device", "Устройство")}</th>
-                  <th className="px-4 py-3 font-medium">{t("App", "Приложение")}</th>
+                  <th className="w-28 px-4 py-3 font-medium">{t("When", "Когда")}</th>
+                  <th className="w-36 px-4 py-3 font-medium">{t("Kind", "Тип")}</th>
+                  <th className="w-36 px-4 py-3 font-medium">{t("Device", "Устройство")}</th>
+                  <th className="w-28 px-4 py-3 font-medium">{t("App", "Приложение")}</th>
                   <th className="px-4 py-3 font-medium">{t("Message", "Сообщение")}</th>
                 </tr>
               </thead>
@@ -450,13 +454,13 @@ export default function AdminLogs({
                   </tr>
                 ) : (
                   telemetry.map((row) => (
-                    <tr key={row.id} className="border-t border-line/60 hover:bg-panel-2/40">
+                    <tr key={row.id} className="border-t border-line/60 hover:bg-panel-2/40 align-top">
                       <td className="px-4 py-2.5 whitespace-nowrap text-muted">
                         {fmtWhen(row.created_at, en)}
                       </td>
                       <td className="px-4 py-2.5">
                         <span className={kindBadge(row.event_kind)} title={row.event_kind}>
-                          {humanLabel(row.event_kind, en, TELEMETRY_LABELS_EN, TELEMETRY_LABELS_RU)}
+                          {humanLabel(row.event_kind, TELEMETRY_LABELS_RU)}
                         </span>
                       </td>
                       <td className="px-4 py-2.5 text-muted">
@@ -478,7 +482,7 @@ export default function AdminLogs({
                           <span className="block text-xs text-accent">{row.linked_nickname}</span>
                         )}
                       </td>
-                      <td className="px-4 py-2.5 text-muted max-w-md truncate" title={row.message || ""}>
+                      <td className="px-4 py-2.5 text-muted whitespace-normal break-words">
                         {row.message || "—"}
                       </td>
                     </tr>

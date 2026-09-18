@@ -18,8 +18,16 @@ const ingestDir = path.join(__dirname, '../../uploads/packs');
 
 const packsAdmin = express.Router();
 const serversAdmin = express.Router();
-packsAdmin.use(authenticateToken, requireRole(['admin']));
-serversAdmin.use(authenticateToken, requireRole(['admin']));
+packsAdmin.use(authenticateToken, requireRole(['admin', 'moderator']));
+packsAdmin.use((req, res, next) => {
+  if (req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS') return next();
+  return requireRole(['admin'])(req, res, next);
+});
+serversAdmin.use(authenticateToken, requireRole(['admin', 'moderator']));
+serversAdmin.use((req, res, next) => {
+  if (req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS') return next();
+  return requireRole(['admin'])(req, res, next);
+});
 
 function publicBase(req) {
   const fromEnv = (process.env.API_PUBLIC_URL || '').trim();

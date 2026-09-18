@@ -3,6 +3,7 @@
 
 const express = require('express');
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 const { body, validationResult } = require('express-validator');
 const db = require('../database/connection');
 const { authenticateToken } = require('./auth');
@@ -80,6 +81,132 @@ const skinUpload = multer({
         const isPng = /\.png$/i.test(file.originalname) && /png/i.test(file.mimetype);
         if (isPng) return cb(null, true);
         cb(new Error('Скин должен быть файлом PNG'));
+    }
+});
+
+/** Map DB user row → public profile JSON for the site cabinet. */
+function mapProfileUser(row) {
+    return {
+        id: row.id,
+        nickname: row.nickname,
+        display_nickname: row.display_nickname || row.nickname,
+        email: row.email,
+        first_name: row.first_name || null,
+        discord: row.discord_username || null,
+        avatar_url: row.avatar_url || null,
+        role: row.role || 'user',
+        status: row.is_banned ? 'banned' : 'active',
+        created_at: row.registered_at || row.created_at || null,
+        nickname_changed_at: row.nickname_changed_at || null,
+        email_changed_at: row.email_changed_at || null,
+        is_email_verified: Boolean(row.is_email_verified),
+    };
+}
+
+// GET /api/profile — current signed-in user (cabinet).
+router.get('/', authenticateToken, async (req, res) => {
+    try {
+        const result = await db.query(
+            `SELECT id, nickname, display_nickname, email, first_name, discord_username,
+                    avatar_url, role, is_banned, is_email_verified,
+                    registered_at, nickname_changed_at, email_changed_at
+             FROM users WHERE id = $1`,
+            [req.user.id]
+        );
+        if (!result.rows[0]) {
+            return res.status(404).json({ error: 'Пользователь не найден' });
+        }
+        res.json(mapProfileUser(result.rows[0]));
+    } catch (error) {
+        console.error('GET /api/profile error:', error);
+        res.status(500).json({ error: 'Не удалось загрузить профиль' });
+    }
+});
+
+// PUT /api/profile — update name / discord, and/or change password.
+router.put('/', authenticateToken, async (req, res) => {
+    try {
+        const body = req.body || {};
+        const updates = [];
+        const params = [];
+        let i = 1;
+        const changed = [];
+
+        if (Object.prototype.hasOwnProperty.call(body, 'first_name')) {
+            const name = String(body.first_name || '').trim().slice(0, 50);
+            updates.push(`first_name = $${i++}`);
+            params.push(name || null);
+            changed.push('имя');
+        }
+        if (
+            Object.prototype.hasOwnProperty.call(body, 'discord_username') ||
+            Object.prototype.hasOwnProperty.call(body, 'discord')
+        ) {
+            const discord = String(body.discord_username ?? body.discord ?? '')
+                .trim()
+                .slice(0, 64);
+            updates.push(`discord_username = $${i++}`);
+            params.push(discord || null);
+            changed.push('Discord');
+        }
+
+        const currentPassword = body.current_password ? String(body.current_password) : '';
+        const newPassword = body.new_password ? String(body.new_password) : '';
+        if (newPassword) {
+            if (newPassword.length < 8) {
+                return res.status(400).json({ error: 'Новый пароль — минимум 8 символов' });
+            }
+            if (!currentPassword) {
+                return res.status(400).json({ error: 'Укажите текущий пароль' });
+            }
+            const pwRow = await db.query('SELECT password_hash FROM users WHERE id = $1', [
+                req.user.id,
+            ]);
+            const hash = pwRow.rows[0]?.password_hash;
+            if (!hash || !(await bcrypt.compare(currentPassword, hash))) {
+                return res.status(400).json({ error: 'Неверный текущий пароль' });
+            }
+            const newHash = await bcrypt.hash(newPassword, 12);
+            updates.push(`password_hash = $${i++}`);
+            params.push(newHash);
+            changed.push('пароль');
+        }
+
+        if (!updates.length) {
+            return res.status(400).json({ error: 'Нет полей для обновления' });
+        }
+
+        params.push(req.user.id);
+        await db.query(
+            `UPDATE users SET ${updates.join(', ')} WHERE id = $${i}`,
+            params
+        );
+
+        await logUserActivity(
+            req.user.id,
+            newPassword && changed.length === 1 ? 'password_change' : 'profile_update',
+            newPassword && changed.length === 1
+                ? 'Пароль изменён'
+                : `Обновлён профиль: ${changed.join(', ')}`,
+            { req }
+        );
+
+        const fresh = await db.query(
+            `SELECT id, nickname, display_nickname, email, first_name, discord_username,
+                    avatar_url, role, is_banned, is_email_verified,
+                    registered_at, nickname_changed_at, email_changed_at
+             FROM users WHERE id = $1`,
+            [req.user.id]
+        );
+
+        res.json({
+            success: true,
+            message: newPassword && changed.length === 1 ? 'Пароль обновлён' : 'Профиль сохранён',
+            user: mapProfileUser(fresh.rows[0]),
+        });
+    } catch (error) {
+        console.error('PUT /api/profile error:', error);
+        res.status(500).json({ error: 'Не удалось сохранить профиль' });
     }
 });
 
@@ -347,7 +474,7 @@ router.post('/avatar', authenticateToken, avatarUpload.single('avatar'), async (
         }
 
         // Логируем активность
-        await logUserActivity(req.user.id, 'avatar_update', 'Profile avatar updated', { req });
+        await logUserActivity(req.user.id, 'avatar_update', 'Обновлён аватар профиля', { req });
 
         res.json({
             success: true,
@@ -402,7 +529,7 @@ router.delete('/avatar', authenticateToken, async (req, res) => {
         }
 
         // Логируем активность
-        await logUserActivity(req.user.id, 'avatar_delete', 'Profile avatar removed', { req });
+        await logUserActivity(req.user.id, 'avatar_delete', 'Аватар профиля удалён', { req });
 
         res.json({
             success: true,
@@ -568,7 +695,7 @@ router.put('/skin', authenticateToken, skinUpload.single('skin'), async (req, re
             await fs.unlink(oldPath).catch(() => {});
         }
 
-        await logUserActivity(req.user.id, 'skin_update', 'Profile skin updated', {
+        await logUserActivity(req.user.id, 'skin_update', 'Скин профиля обновлён', {
             req,
             metadata: { model: String(model || '').slice(0, 16) || null },
         });
@@ -611,7 +738,7 @@ router.delete('/skin', authenticateToken, async (req, res) => {
         const oldPath = path.join(__dirname, '../../', oldSkinUrl.replace(/^\//, ''));
         await fs.unlink(oldPath).catch(() => {});
     }
-    await logUserActivity(req.user.id, 'skin_delete', 'Profile skin removed', { req });
+    await logUserActivity(req.user.id, 'skin_delete', 'Скин профиля удалён', { req });
     res.json({ success: true, message: 'Скин удалён' });
 });
 
@@ -694,7 +821,7 @@ router.put('/nickname', authenticateToken, async (req, res) => {
             throw updateErr;
         }
 
-        await logUserActivity(req.user.id, 'nickname_change', 'Login nickname changed', {
+        await logUserActivity(req.user.id, 'nickname_change', `Логин изменён на ${raw}`, {
             req,
             metadata: { nickname: raw },
         });
@@ -758,7 +885,7 @@ router.put('/display-nickname', authenticateToken, async (req, res) => {
             throw updateErr;
         }
 
-        await logUserActivity(req.user.id, 'display_nickname_change', 'Display nickname changed', {
+        await logUserActivity(req.user.id, 'display_nickname_change', `Отображаемый ник изменён на ${raw}`, {
             req,
             metadata: { displayNickname: raw },
         });
@@ -904,7 +1031,7 @@ router.post('/email/confirm', authenticateToken, async (req, res) => {
             [row.pending_email, req.user.id]
         );
 
-        await logUserActivity(req.user.id, 'email_change', 'Email address changed', {
+        await logUserActivity(req.user.id, 'email_change', 'Адрес почты изменён', {
             req,
             metadata: { verified: true },
         });

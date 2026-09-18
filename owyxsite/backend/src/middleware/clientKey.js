@@ -46,6 +46,10 @@ function clientKeyGate(req, res, next) {
   if (path === '/api/csl' || path.startsWith('/api/csl/')) {
     return next();
   }
+  // Public uploads (avatars/skins/capes) — browsers may load via api.* or site.
+  if (path === '/uploads' || path.startsWith('/uploads/')) {
+    return next();
+  }
 
   const host = requestHost(req);
   const onSiteHost = siteHosts().some((h) => host === h);

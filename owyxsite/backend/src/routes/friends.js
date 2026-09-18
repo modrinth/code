@@ -201,7 +201,7 @@ router.patch('/settings', async (req, res) => {
         [req.user.id]
       );
     }
-    await logUserActivity(req.user.id, 'social_settings', 'Social privacy updated', {
+    await logUserActivity(req.user.id, 'social_settings', 'Настройки приватности обновлены', {
       req,
       metadata: {
         allowFriendRequests: settings.allowFriendRequests,

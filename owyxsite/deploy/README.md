@@ -45,4 +45,17 @@ Launcher prod: `https://api.owyx.site` + header `X-Owyx-Client-Key`.
 
 ## Fresh vs old Postgres volume
 
-`initdb.d` runs only on empty volumes. Apply `007_servers_packs.sql` on old DBs; owner `owyx_user`.
+`initdb.d` runs only on empty volumes. Apply numbered migrations under `postgres/migrations/` on old DBs (e.g. `014_drop_helper_role.sql`); owner `owyx_user`.
+
+## Email deliverability (Mailjet + Cloudflare DNS)
+
+Records alone are not enough if policies are soft:
+
+1. **SPF** on `owyx.site`: prefer `v=spf1 include:spf.mailjet.com -all` (hard fail). Soft `~all` still lets spam filters distrust mail.
+2. **DKIM**: keep `mailjet._domainkey` TXT from Mailjet (already set).
+3. **DMARC** on `_dmarc.owyx.site`: move from `p=none` to at least `p=quarantine` once Mailjet reports look clean, e.g.  
+   `v=DMARC1; p=quarantine; rua=mailto:…` (keep your rua).
+4. Send only via Mailjet SMTP; From domain must match SPF/DKIM (e.g. `@owyx.site`).
+5. Backend already sends multipart text + HTML and `List-Unsubscribe` headers.
+
+After tightening DNS, wait 24–48h and re-test with Mail-Tester / Gmail.

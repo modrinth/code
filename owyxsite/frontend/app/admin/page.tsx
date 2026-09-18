@@ -19,7 +19,7 @@ interface AdminUser {
   created_at?: string;
 }
 
-const ROLES = ["user", "helper", "moderator", "admin"] as const;
+const ROLES = ["user", "moderator", "admin"] as const;
 
 type Section = "users" | "catalog" | "news" | "logs";
 
@@ -55,6 +55,9 @@ function AdminPageInner() {
   const [section, setSection] = useState<Section>("users");
 
   const isAdmin = user?.role === "admin";
+  const isModerator = user?.role === "moderator";
+  const canAccess = isAdmin || isModerator;
+  const readOnly = isModerator && !isAdmin;
   const dataLoading = users === null;
 
   const authHeaders = useCallback(
@@ -71,7 +74,7 @@ function AdminPageInner() {
   }, []);
 
   useEffect(() => {
-    if (!isAdmin || authLoading) return;
+    if (!canAccess || authLoading) return;
     let cancelled = false;
     (async () => {
       try {
@@ -89,7 +92,7 @@ function AdminPageInner() {
     return () => {
       cancelled = true;
     };
-  }, [isAdmin, authLoading, authHeaders]);
+  }, [canAccess, authLoading, authHeaders]);
 
   async function changeRole(id: number, role: string) {
     try {
@@ -162,7 +165,7 @@ function AdminPageInner() {
     );
   }
 
-  if (!isAdmin) {
+  if (!canAccess) {
     return (
       <>
         <Header />
@@ -173,7 +176,10 @@ function AdminPageInner() {
               {t("Access denied", "Доступ запрещён")}
             </h1>
             <p className="mt-2 text-sm text-muted leading-relaxed">
-              {t("Administrator role required.", "Нужны права администратора.")}
+              {t(
+                "Administrator or moderator role required.",
+                "Нужны права администратора или модератора.",
+              )}
             </p>
             <button type="button" onClick={() => router.push("/profile")} className="btn btn-primary mt-6">
               {t("Back to account", "В личный кабинет")}
@@ -191,10 +197,17 @@ function AdminPageInner() {
       <CabinetShell
         eyebrow="Control plane"
         title={t("Control panel", "Панель управления")}
-        subtitle={t(
-          "Accounts, launcher catalog, home news, and logs.",
-          "Аккаунты, каталог лаунчера, новости и логи.",
-        )}
+        subtitle={
+          readOnly
+            ? t(
+                "Read-only: accounts, catalog, news. Full access to logs.",
+                "Только просмотр: аккаунты, каталог, новости. Полный доступ к логам.",
+              )
+            : t(
+                "Accounts, launcher catalog, home news, and logs.",
+                "Аккаунты, каталог лаунчера, новости и логи.",
+              )
+        }
         nav={[
           {
             id: "users",
@@ -218,7 +231,8 @@ function AdminPageInner() {
             search={search}
             setSearch={setSearch}
             dataLoading={dataLoading}
-            advanced={advanced}
+            advanced={advanced && !readOnly}
+            readOnly={readOnly}
             selfId={user?.id}
             changeRole={changeRole}
             toggleBan={toggleBan}
@@ -226,10 +240,10 @@ function AdminPageInner() {
           />
         )}
         {section === "catalog" && (
-          <CatalogAdmin authHeaders={authHeaders} showMessage={showMessage} />
+          <CatalogAdmin authHeaders={authHeaders} showMessage={showMessage} readOnly={readOnly} />
         )}
         {section === "news" && (
-          <NewsAdmin authHeaders={authHeaders} showMessage={showMessage} />
+          <NewsAdmin authHeaders={authHeaders} showMessage={showMessage} readOnly={readOnly} />
         )}
         {section === "logs" && (
           <AdminLogs authHeaders={authHeaders} showMessage={showMessage} />
@@ -247,6 +261,7 @@ function UsersPane({
   setSearch,
   dataLoading,
   advanced,
+  readOnly,
   selfId,
   changeRole,
   toggleBan,
@@ -257,6 +272,7 @@ function UsersPane({
   setSearch: (v: string) => void;
   dataLoading: boolean;
   advanced: boolean;
+  readOnly: boolean;
   selfId?: number;
   changeRole: (id: number, role: string) => void;
   toggleBan: (u: AdminUser) => void;
@@ -266,7 +282,11 @@ function UsersPane({
     <div className="space-y-5">
       <div>
         <h2 className="font-display text-lg font-bold tracking-tight">Аккаунты</h2>
-        <p className="mt-1 text-sm text-muted">Роли для сайта и лаунчера. Бан/удаление — только advanced.</p>
+        <p className="mt-1 text-sm text-muted">
+          {readOnly
+            ? "Режим просмотра: роли и баны недоступны."
+            : "Роли для сайта и лаунчера. Бан/удаление — только advanced."}
+        </p>
       </div>
 
       <div className="field max-w-md">
@@ -306,21 +326,25 @@ function UsersPane({
                 </div>
                 <p className="text-sm text-muted truncate">{u.email}</p>
                 <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-                  <select
-                    className="select !py-2 !min-h-10 max-w-[9.5rem]"
-                    value={ROLES.includes(u.role as (typeof ROLES)[number]) ? u.role : "user"}
-                    onChange={(e) => changeRole(u.id, e.target.value)}
-                    disabled={u.id === selfId}
-                    title={u.id === selfId ? "Нельзя изменить свою роль" : "Сменить роль"}
-                    aria-label={`Роль ${u.nickname || u.email}`}
-                  >
-                    {ROLES.map((r) => (
-                      <option key={r} value={r}>
-                        {r}
-                      </option>
-                    ))}
-                  </select>
-                  {advanced && u.id !== selfId && (
+                  {readOnly ? (
+                    <span className="badge badge-accent">{u.role || "user"}</span>
+                  ) : (
+                    <select
+                      className="select !py-2 !min-h-10 max-w-[9.5rem]"
+                      value={ROLES.includes(u.role as (typeof ROLES)[number]) ? u.role : "user"}
+                      onChange={(e) => changeRole(u.id, e.target.value)}
+                      disabled={u.id === selfId}
+                      title={u.id === selfId ? "Нельзя изменить свою роль" : "Сменить роль"}
+                      aria-label={`Роль ${u.nickname || u.email}`}
+                    >
+                      {ROLES.map((r) => (
+                        <option key={r} value={r}>
+                          {r}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  {!readOnly && advanced && u.id !== selfId && (
                     <>
                       <button
                         type="button"
@@ -341,7 +365,7 @@ function UsersPane({
         )}
       </div>
 
-      {!advanced && (
+      {!readOnly && !advanced && (
         <p className="text-xs text-muted">
           Опасные действия:{" "}
           <a className="link-accent" href="/admin?advanced=1">
@@ -365,9 +389,11 @@ interface NewsRow {
 function NewsAdmin({
   authHeaders,
   showMessage,
+  readOnly = false,
 }: {
   authHeaders: () => Record<string, string>;
   showMessage: (t: string, k: "success" | "error") => void;
+  readOnly?: boolean;
 }) {
   const [items, setItems] = useState<NewsRow[]>([]);
   const [form, setForm] = useState({ title: "", tag: "Новость", summary: "" });
@@ -439,9 +465,14 @@ function NewsAdmin({
     <div className="space-y-6">
       <div>
         <h2 className="font-display text-lg font-bold tracking-tight">Новости</h2>
-        <p className="mt-1 text-sm text-muted">Блок на главной. Сними публикацию, чтобы скрыть.</p>
+        <p className="mt-1 text-sm text-muted">
+          {readOnly
+            ? "Режим просмотра: правки недоступны."
+            : "Блок на главной. Сними публикацию, чтобы скрыть."}
+        </p>
       </div>
 
+      {!readOnly && (
       <form
         onSubmit={create}
         className="section-callout space-y-3"
@@ -489,6 +520,7 @@ function NewsAdmin({
           </button>
         </div>
       </form>
+      )}
 
       <div className="space-y-2">
         {items.length === 0 ? (
@@ -507,12 +539,21 @@ function NewsAdmin({
                 <p className="text-sm font-medium text-text truncate">{n.title}</p>
                 <p className="text-xs text-muted truncate">{n.summary}</p>
               </div>
-              <button type="button" onClick={() => togglePublish(n)} className="btn btn-secondary btn-sm">
-                {n.published ? "Скрыть" : "Опубликовать"}
-              </button>
-              <button type="button" onClick={() => remove(n.id)} className="btn btn-danger btn-sm">
-                Удалить
-              </button>
+              {!readOnly && (
+                <>
+                  <button type="button" onClick={() => togglePublish(n)} className="btn btn-secondary btn-sm">
+                    {n.published ? "Скрыть" : "Опубликовать"}
+                  </button>
+                  <button type="button" onClick={() => remove(n.id)} className="btn btn-danger btn-sm">
+                    Удалить
+                  </button>
+                </>
+              )}
+              {readOnly && (
+                <span className={`badge ${n.published ? "badge-ok" : ""}`}>
+                  {n.published ? "опубликовано" : "черновик"}
+                </span>
+              )}
             </div>
           ))
         )}

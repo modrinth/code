@@ -102,15 +102,15 @@ async function reviewApplication(req, res, status) {
     }
 }
 
-router.post('/applications/:id/approve', authenticateToken, requireRole(['admin', 'moderator']), (req, res) =>
+router.post('/applications/:id/approve', authenticateToken, requireRole(['admin']), (req, res) =>
     reviewApplication(req, res, 'approved')
 );
-router.post('/applications/:id/reject', authenticateToken, requireRole(['admin', 'moderator']), (req, res) =>
+router.post('/applications/:id/reject', authenticateToken, requireRole(['admin']), (req, res) =>
     reviewApplication(req, res, 'rejected')
 );
 
 // POST aliases for ban/unban (UI uses POST; plugin uses PUT)
-router.post('/users/:id/ban', authenticateToken, requireRole(['admin', 'moderator']), async (req, res) => {
+router.post('/users/:id/ban', authenticateToken, requireRole(['admin']), async (req, res) => {
     try {
         const { id } = req.params;
         const reason = req.body?.reason || 'Заблокирован администратором';
@@ -130,7 +130,7 @@ router.post('/users/:id/ban', authenticateToken, requireRole(['admin', 'moderato
     }
 });
 
-router.post('/users/:id/unban', authenticateToken, requireRole(['admin', 'moderator']), async (req, res) => {
+router.post('/users/:id/unban', authenticateToken, requireRole(['admin']), async (req, res) => {
     try {
         const { id } = req.params;
         await db.query(`
@@ -365,7 +365,7 @@ router.get('/users', authenticateLongTermApiToken, requireRole(['admin', 'modera
 // PUT /api/admin/users/:id/ban - Блокировка пользователя
 router.put('/users/:id/ban', [
     authenticateLongTermApiToken,
-    requireRole(['admin', 'moderator']),
+    requireRole(['admin']),
     body('reason').isLength({ min: 1, max: 500 }).withMessage('Причина должна содержать от 1 до 500 символов'),
     body('type').optional().isIn(['temporary', 'permanent']).withMessage('Тип должен быть temporary или permanent'),
     body('duration').optional().isInt({ min: 1 }).withMessage('Длительность должна быть положительным числом'),
@@ -482,7 +482,7 @@ router.put('/users/:id/ban', [
 // PUT /api/admin/users/:id/unban - Разблокировка пользователя
 router.put('/users/:id/unban', [
     authenticateLongTermApiToken, 
-    requireRole(['admin', 'moderator']),
+    requireRole(['admin']),
     body('minecraft_nick').optional().isLength({ min: 1, max: 50 }).withMessage('Minecraft ник должен содержать от 1 до 50 символов')
 ], async (req, res) => {
     try {
@@ -1659,7 +1659,7 @@ router.get('/users/:id/activity', authenticateToken, requireRole(['admin', 'mode
 router.put('/users/:id/role', [
     authenticateToken,
     requireRole(['admin']),
-    body('role').isIn(['user', 'moderator', 'admin', 'helper'])
+    body('role').isIn(['user', 'moderator', 'admin'])
 ], async (req, res) => {
     try {
         const errors = validationResult(req);

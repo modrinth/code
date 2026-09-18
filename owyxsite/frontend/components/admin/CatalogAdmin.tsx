@@ -161,9 +161,11 @@ const emptyServer = {
 export default function CatalogAdmin({
   authHeaders,
   showMessage,
+  readOnly = false,
 }: {
   authHeaders: () => Record<string, string>;
   showMessage: (t: string, k: "success" | "error") => void;
+  readOnly?: boolean;
 }) {
   const { locale } = useLocale();
   const en = locale === "en_US";
@@ -508,9 +510,11 @@ export default function CatalogAdmin({
         <p className="text-sm text-muted py-8 text-center">Загрузка каталога…</p>
       ) : tab === "servers" ? (
         <div className="space-y-4">
-          <button type="button" className="btn btn-primary" onClick={startCreateServer}>
-            Добавить сервер
-          </button>
+          {!readOnly && (
+            <button type="button" className="btn btn-primary" onClick={startCreateServer}>
+              Добавить сервер
+            </button>
+          )}
           {servers.length === 0 ? (
             <div className="empty-surface">
               <h3>Серверов пока нет</h3>
@@ -532,20 +536,24 @@ export default function CatalogAdmin({
                       {!s.published && <span className="text-muted"> · скрыт</span>}
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    className="btn btn-secondary btn-sm"
-                    onClick={() => startEditServer(s)}
-                  >
-                    Изменить
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-danger btn-sm"
-                    onClick={() => void deleteServer(s)}
-                  >
-                    Удалить
-                  </button>
+                  {!readOnly && (
+                    <>
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => startEditServer(s)}
+                      >
+                        Изменить
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-danger btn-sm"
+                        onClick={() => void deleteServer(s)}
+                      >
+                        Удалить
+                      </button>
+                    </>
+                  )}
                 </li>
               ))}
             </ul>
@@ -553,9 +561,11 @@ export default function CatalogAdmin({
         </div>
       ) : (
         <div className="space-y-4">
-          <button type="button" className="btn btn-primary" onClick={startCreatePack}>
-            Добавить пак
-          </button>
+          {!readOnly && (
+            <button type="button" className="btn btn-primary" onClick={startCreatePack}>
+              Добавить пак
+            </button>
+          )}
           {packs.length === 0 ? (
             <div className="empty-surface">
               <h3>Сборок пока нет</h3>
@@ -575,33 +585,37 @@ export default function CatalogAdmin({
                       {!p.published && <span className="text-muted"> · скрыт</span>}
                     </p>
                   </div>
-                  <label className="btn btn-secondary btn-sm cursor-pointer">
-                    Залить zip
-                    <input
-                      type="file"
-                      accept=".zip,.mrpack"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) void ingestPack(p, file);
-                        e.target.value = "";
-                      }}
-                    />
-                  </label>
-                  <button
-                    type="button"
-                    className="btn btn-secondary btn-sm"
-                    onClick={() => startEditPack(p)}
-                  >
-                    Изменить
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-danger btn-sm"
-                    onClick={() => void deletePack(p)}
-                  >
-                    Удалить
-                  </button>
+                  {!readOnly && (
+                    <>
+                      <label className="btn btn-secondary btn-sm cursor-pointer">
+                        Залить zip
+                        <input
+                          type="file"
+                          accept=".zip,.mrpack"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) void ingestPack(p, file);
+                            e.target.value = "";
+                          }}
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => startEditPack(p)}
+                      >
+                        Изменить
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-danger btn-sm"
+                        onClick={() => void deletePack(p)}
+                      >
+                        Удалить
+                      </button>
+                    </>
+                  )}
                 </li>
               ))}
             </ul>
@@ -609,7 +623,7 @@ export default function CatalogAdmin({
         </div>
       )}
 
-      {openPack && (
+      {!readOnly && openPack && (
         <ModalShell title={editPackId ? "Изменить пак" : "Добавить пак"} onClose={() => setOpenPack(false)}>
           <form onSubmit={savePack} className="space-y-3">
             <Field label="Название">
@@ -791,7 +805,7 @@ export default function CatalogAdmin({
         </ModalShell>
       )}
 
-      {openServer && (
+      {!readOnly && openServer && (
         <ModalShell
           title={editServerId ? "Изменить сервер" : "Добавить сервер"}
           onClose={() => setOpenServer(false)}
