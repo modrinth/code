@@ -53,9 +53,6 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "O download não foi concluído"
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "A instância não foi encontrada"
-  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "O caminho do arquivo é inválido"
   },
