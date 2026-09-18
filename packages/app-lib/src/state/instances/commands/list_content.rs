@@ -734,13 +734,13 @@ async fn content_projects_for_scope_inner(
         &state.api_semaphore,
     )
     .await?;
-    let mut updates_by_hash: HashMap<String, Vec<String>> = HashMap::new();
-    for update in file_updates {
-        updates_by_hash
-            .entry(update.hash)
-            .or_default()
-            .push(update.update_version_id);
-    }
+    let mut updates_by_hash =
+        super::check_content_updates::resolve_update_versions(
+            file_updates,
+            cache_behaviour,
+            state,
+        )
+        .await?;
     let output = DashMap::new();
 
     for file in files {
@@ -798,13 +798,24 @@ async fn content_projects_for_scope_inner(
         }
 
         let update_version_id = metadata.as_ref().and_then(|metadata| {
-            let update_ids =
-                updates_by_hash.remove(&file.sha1).unwrap_or_default();
-            if !update_ids.contains(&metadata.version_id) {
-                update_ids.into_iter().next()
-            } else {
-                None
+            let project_id = entry
+                .and_then(|entry| entry.project_id.as_deref())
+                .unwrap_or(&metadata.project_id);
+            if metadata.project_id != project_id {
+                return None;
             }
+            let versions =
+                updates_by_hash.remove(&file.sha1).unwrap_or_default();
+            if versions
+                .iter()
+                .any(|version| version.id == metadata.version_id)
+            {
+                return None;
+            }
+            versions
+                .into_iter()
+                .find(|version| version.project_id == project_id)
+                .map(|version| version.id)
         });
 
         output.insert(
