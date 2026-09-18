@@ -485,7 +485,11 @@ html {
 	--color-brand: #f87171;
 	--color-brand-highlight: rgba(248, 113, 113, 0.25);
 	--color-brand-shadow: rgba(248, 113, 113, 0.55);
-	--brand-gradient-bg: linear-gradient(0deg, rgba(248, 113, 113, 0.18) 0%, rgba(10, 5, 5, 0.35) 100%);
+	--brand-gradient-bg: linear-gradient(
+		0deg,
+		rgba(248, 113, 113, 0.18) 0%,
+		rgba(10, 5, 5, 0.35) 100%
+	);
 	--brand-gradient-strong-bg: linear-gradient(270deg, #0a0505 8%, #2a0c0c 100%);
 	--brand-gradient-border: rgba(248, 113, 113, 0.28);
 	--loading-bar-gradient: linear-gradient(to right, #fecaca 0%, #f87171 45%, #7f1d1d 100%);
@@ -531,7 +535,11 @@ html {
 	--color-brand: #ec4899;
 	--color-brand-highlight: rgba(236, 72, 153, 0.25);
 	--color-brand-shadow: rgba(236, 72, 153, 0.55);
-	--brand-gradient-bg: linear-gradient(0deg, rgba(236, 72, 153, 0.18) 0%, rgba(9, 5, 12, 0.35) 100%);
+	--brand-gradient-bg: linear-gradient(
+		0deg,
+		rgba(236, 72, 153, 0.18) 0%,
+		rgba(9, 5, 12, 0.35) 100%
+	);
 	--brand-gradient-strong-bg: linear-gradient(270deg, #09050c 8%, #2a1030 100%);
 	--brand-gradient-border: rgba(236, 72, 153, 0.3);
 	--loading-bar-gradient: linear-gradient(to right, #f9a8d4 0%, #ec4899 50%, #831843 100%);

@@ -122,9 +122,10 @@ import { maxMemoryQueryOptions } from '@/helpers/jre.js'
 import { get as getCreds, login, removeUser } from '@/helpers/mr_auth.ts'
 import { resolveOwyxAvatarUrl } from '@/helpers/owyx-avatar'
 import {
+	resetOwyxSharePresencePreference,
 	setOwyxPresenceOnline,
 	setOwyxPresencePlaying,
-	startOwyxPresenceHeartbeat,
+	setOwyxSharePresenceEnabled,
 	stopOwyxPresenceHeartbeat,
 } from '@/helpers/owyx-presence'
 import {
@@ -863,10 +864,7 @@ async function setupApp() {
 		initAnalytics()
 		if (dev) debugAnalytics()
 		trackEvent('Launched', { version, dev })
-		void Promise.all([
-			import('@/helpers/owyx-telemetry'),
-			import('@/helpers/owyx-site-auth'),
-		])
+		void Promise.all([import('@/helpers/owyx-telemetry'), import('@/helpers/owyx-site-auth')])
 			.then(([{ reportOwyxLauncherSession }, { getStoredOwyxSiteSession }]) =>
 				reportOwyxLauncherSession({
 					dev,
@@ -1387,13 +1385,21 @@ async function refreshOwyxSiteSession() {
 	if (!cached) {
 		owyxSiteSession.value = null
 		stopOwyxPresenceHeartbeat()
+		resetOwyxSharePresencePreference()
 		return
 	}
 	owyxSiteSession.value = cached
 	const fresh = await fetchOwyxSiteMe(cached.token)
 	owyxSiteSession.value = fresh
 	if (fresh?.token) {
-		startOwyxPresenceHeartbeat()
+		try {
+			const { getOwyxSocialSettings } = await import('@/helpers/owyx-friends')
+			const social = await getOwyxSocialSettings()
+			setOwyxSharePresenceEnabled(social.sharePresence)
+		} catch {
+			// Fail closed: unknown privacy → offline, no heartbeat resume.
+			setOwyxSharePresenceEnabled(false)
+		}
 		try {
 			const { markLoggedIntoOwyxSite } = await import('@/helpers/onboarding-checklist')
 			await markLoggedIntoOwyxSite()
@@ -1436,6 +1442,7 @@ async function refreshOwyxSiteSession() {
 
 async function signOutOwyxSiteAccount() {
 	stopOwyxPresenceHeartbeat()
+	resetOwyxSharePresencePreference()
 	await logoutOwyxSite()
 	owyxSiteSession.value = null
 }

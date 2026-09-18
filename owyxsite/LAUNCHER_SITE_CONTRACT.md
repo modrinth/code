@@ -167,9 +167,9 @@ Also available as `GET /api/launcher/v1/me`.
 - `GET /api/friends/search?q=` → `{ users: [{ id, nickname, displayNickname, avatarUrl }] }` (match login or display)
 - `POST /api/friends/request` `{ nickname }` → create pending by **login or display** nickname (exact match, prefers login on ties; or auto-accept reciprocal); respects target `allowFriendRequests`
 - `POST /api/friends/:id/accept` · `POST /api/friends/:id/decline` · `DELETE /api/friends/:id`
-- `POST /api/friends/presence` `{ status: "online"|"playing"|"offline", instanceName? }` — launcher heartbeat; presence rows older than ~90s are treated as offline.
-- `GET /api/friends/settings` → `{ settings: { allowFriendRequests: boolean } }`
-- `PATCH /api/friends/settings` `{ allowFriendRequests: boolean }` → upsert privacy
+- `POST /api/friends/presence` `{ status: "online"|"playing"|"offline", instanceName? }` — launcher heartbeat; presence rows older than ~90s are treated as offline. If the user has `sharePresence: false`, the server forces offline (no-op for online/playing).
+- `GET /api/friends/settings` → `{ settings: { allowFriendRequests: boolean, sharePresence: boolean } }`
+- `PATCH /api/friends/settings` `{ allowFriendRequests?: boolean, sharePresence?: boolean }` → upsert privacy. Turning `sharePresence` off immediately marks the user offline for friends.
 
 ### CustomSkinLoader / public skins (`/api/csl`, no client key)
 
@@ -215,9 +215,13 @@ Anonymous launcher stats / errors. Opt-in on the client (`settings.telemetry`).
 
 - `kind`: `session_start` | `heartbeat` | `error` | `crash` | `perf` | `feature`
 - Max 20 events per request. Server sanitizes emails / Bearer tokens / home paths.
+- Rate limit: ~30 req/min per IP and ~60 req/min per installId (HTTP 429 when exceeded).
+- Opt-in on the launcher (`settings.telemetry`). Fresh installs get telemetry off via additive migration `20260917220000_telemetry_opt_in_default.sql` (does not rewrite sqlx checksums on `init.sql`; existing users with instances keep their value).
 - Optional Bearer links `user_id` only — never store nick/email in the event body.
 - Admin reads: `GET /api/admin/activity`, `GET /api/admin/logs`, `GET /api/admin/telemetry`.
 - Schema: `postgres/migrations/012_logs_telemetry.sql` (`launcher_telemetry`).
+- VPS: apply on existing volumes (`docker compose exec -T postgres psql -U owyx_user -d owyx_db < postgres/migrations/012_logs_telemetry.sql`). Ingest returns 503 with a clear message if the table is missing.
+- Social presence column: `postgres/migrations/013_share_presence.sql` (also ensured at runtime by `ensureFriendsSchema()`).
 
 ### Catalog (site owns it; launcher is the client)
 

@@ -1282,9 +1282,11 @@ async fn minecraft_token(
     if !status.is_success() {
         // Preserve status (e.g. 429) so callers can soft-fail instead of
         // treating Mojang's rate-limit JSON as a missing access_token.
-        // Use unwrap_err (not expect_err) — MinecraftToken has no Debug impl.
+        // Avoid unwrap_err/expect_err — MinecraftToken has no Debug impl.
         return Err(MinecraftAuthenticationError::DeserializeResponse {
-            source: serde_json::from_str::<MinecraftToken>("{}").unwrap_err(),
+            source: serde_json::from_str::<MinecraftToken>("{}")
+                .err()
+                .expect("empty object must fail MinecraftToken deserialize"),
             raw: text,
             step: MinecraftAuthStep::MinecraftToken,
             status_code: status,

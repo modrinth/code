@@ -15,6 +15,7 @@ const {
     sessionTokenHashes,
     publicUser
 } = require('../utils/authSecurity');
+const { logUserActivity } = require('../utils/activityLog');
 
 const router = express.Router();
 
@@ -362,6 +363,11 @@ router.post('/register', [
 
         console.log(`✅ Новая регистрация: ${loginName} (${email})`);
 
+        await logUserActivity(newUser.id, 'register', 'Account registered', {
+            req,
+            metadata: { hasEmail: true },
+        });
+
         res.status(201).json({
             message: 'Регистрация прошла успешно! Проверьте email для подтверждения адреса.',
             user: {
@@ -523,10 +529,11 @@ router.post('/login', [
         await logLoginAttempt(user.email || loginKey, ip, userAgent, true);
 
         // Записываем активность
-        await db.query(
-            'INSERT INTO user_activity (user_id, activity_type, description, ip_address) VALUES ($1, $2, $3, $4)',
-            [user.id, 'login', 'Вход в систему', ip]
-        );
+        await logUserActivity(user.id, 'login', 'Signed in', {
+            req,
+            ip,
+            userAgent,
+        });
 
         res.json({
             success: true,
@@ -555,10 +562,10 @@ router.post('/logout', authenticateToken, async (req, res) => {
             );
 
             // Записываем активность
-            await db.query(
-                'INSERT INTO user_activity (user_id, activity_type, description, ip_address) VALUES ($1, $2, $3, $4)',
-                [req.user.id, 'logout', 'Выход из системы', req.clientIp || req.ip]
-            );
+            await logUserActivity(req.user.id, 'logout', 'Signed out', {
+                req,
+                ip: req.clientIp || req.ip,
+            });
         }
 
         res.json({ success: true, message: 'Успешный выход из системы' });
@@ -840,10 +847,10 @@ router.post('/link-discord', authenticateToken, async (req, res) => {
         ]);
 
         // Логируем активность
-        await db.query(`
-            INSERT INTO user_activity (user_id, activity_type, description)
-            VALUES ($1, 'discord_linked', $2)
-        `, [req.user.id, `Привязан Discord аккаунт: ${discordData.username}`]);
+        await logUserActivity(req.user.id, 'discord_linked', 'Discord account linked', {
+            req,
+            metadata: { discordUsername: String(discordData.username || '').slice(0, 64) },
+        });
 
         // Очищаем временные данные
         delete req.session.pendingDiscordLink;
@@ -877,10 +884,7 @@ router.post('/unlink-discord', authenticateToken, async (req, res) => {
         `, [req.user.id]);
 
         // Логируем активность
-        await db.query(`
-            INSERT INTO user_activity (user_id, activity_type, description)
-            VALUES ($1, 'discord_unlinked', 'Отвязан Discord аккаунт')
-        `, [req.user.id]);
+        await logUserActivity(req.user.id, 'discord_unlinked', 'Discord account unlinked', { req });
 
         res.json({
             success: true,
@@ -1007,6 +1011,10 @@ router.post('/reset-password', [
             'UPDATE user_sessions SET is_active = false WHERE user_id = $1',
             [userId]
         );
+
+        await logUserActivity(userId, 'password_reset', 'Password reset via email link', {
+            req,
+        });
 
         res.json({
             message: 'Пароль успешно изменен'

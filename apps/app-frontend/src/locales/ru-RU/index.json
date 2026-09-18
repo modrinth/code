@@ -2622,7 +2622,7 @@
     "message": "Discord Rich Presence"
   },
   "app.settings.privacy.telemetry.description": {
-    "message": "Owyx собирает анонимную аналитику, чтобы улучшать лаунчер. Отключите опцию, чтобы отказаться от сбора данных."
+    "message": "Помогите улучшать Owyx: анонимная статистика и обезличенные ошибки (ОС, версия, краши). По умолчанию выкл. — включайте только если согласны. Без email, ников и домашних путей."
   },
   "app.settings.privacy.telemetry.title": {
     "message": "Телеметрия"
@@ -4509,10 +4509,10 @@
     "message": "Если выключено, другие игроки не смогут отправлять вам новые заявки. Текущие друзья остаются."
   },
   "owyx.settings.social.presence-title": {
-    "message": "Присутствие"
+    "message": "Показывать присутствие друзьям"
   },
   "owyx.settings.social.presence-body": {
-    "message": "Пока вы вошли в аккаунт, лаунчер шлёт короткий heartbeat (~30 с). Друзья видят вас онлайн или в игре. Без heartbeat около 90 с вы офлайн."
+    "message": "Если включено, heartbeat ~30 с пока вы в аккаунте. Без heartbeat ~90 с — офлайн. Если выключено, друзья всегда видят вас офлайн."
   },
   "owyx.settings.social.skins-title": {
     "message": "Скины в мире"
@@ -4521,7 +4521,7 @@
     "message": "Загрузите скин на owyx.site. Установите CustomSkinLoader в инстанс — Owyx пишет конфиг для https://owyx.site/api/csl/ при запуске (и из настроек инстанса). Другие с тем же модом увидят ваш скин Owyx."
   },
   "owyx.settings.social.skins-mod-link": {
-    "message": "Открыть CustomSkinLoader на Modrinth"
+    "message": "Страница CustomSkinLoader"
   },
   "owyx.settings.social.saved": {
     "message": "Сохранено"

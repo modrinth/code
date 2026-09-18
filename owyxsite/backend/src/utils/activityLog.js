@@ -6,9 +6,15 @@
 const db = require('../database/connection');
 
 function clientIp(req) {
-  const xf = req.headers['x-forwarded-for'];
-  if (typeof xf === 'string' && xf.length) return xf.split(',')[0].trim().slice(0, 45);
-  return (req.ip || req.socket?.remoteAddress || '').toString().slice(0, 45) || null;
+  // Prefer Express trust-proxy IP set by middleware (req.clientIp / req.ip).
+  // Do not trust raw X-Forwarded-For over that path.
+  const trusted =
+    (typeof req.clientIp === 'string' && req.clientIp) ||
+    (typeof req.ip === 'string' && req.ip) ||
+    (req.socket?.remoteAddress ? String(req.socket.remoteAddress) : '');
+  let ip = trusted.toString().slice(0, 45);
+  if (ip.startsWith('::ffff:')) ip = ip.substring(7);
+  return ip || null;
 }
 
 function clientUa(req) {

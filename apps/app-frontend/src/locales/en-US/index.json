@@ -2742,7 +2742,7 @@
     "message": "Discord Rich Presence"
   },
   "app.settings.privacy.telemetry.description": {
-    "message": "Owyx collects anonymized analytics and usage data to improve the launcher and your experience. By disabling this option, you opt out and your data will no longer be collected."
+    "message": "Help improve Owyx by sharing anonymous usage stats and sanitized errors (OS, version, crashes). Off by default — turn this on only if you consent. No emails, usernames, or home paths are sent."
   },
   "app.settings.privacy.telemetry.title": {
     "message": "Telemetry"
@@ -4500,7 +4500,7 @@
     "message": "Change display nickname"
   },
   "minecraft-account.edit-display-nick-hint": {
-    "message": "Shown to friends and used in-game. Your login stays the same. 3–16 letters, numbers, or _."
+    "message": "Shown to friends and used in-game. Your login stays the same. 3–16 letters, numbers, or _. May match other players."
   },
   "minecraft-account.edit-display-nick-title": {
     "message": "Display nickname"
@@ -4896,7 +4896,7 @@
     "message": "Open profile on site"
   },
   "owyx.settings.social.presence-body": {
-    "message": "Heartbeat ~30s while signed in. Idle ~90s → appear offline to friends."
+    "message": "When on, heartbeat ~30s while signed in. Idle ~90s → offline. When off, friends always see you offline."
   },
   "owyx.settings.social.presence-off": {
     "message": "Off"
@@ -4905,7 +4905,7 @@
     "message": "Active"
   },
   "owyx.settings.social.presence-title": {
-    "message": "Presence"
+    "message": "Share presence with friends"
   },
   "owyx.settings.social.saved": {
     "message": "Saved"
@@ -4926,7 +4926,7 @@
     "message": "Upload on owyx.site. CustomSkinLoader in your instance reads https://owyx.site/api/csl/ (Owyx writes config on launch)."
   },
   "owyx.settings.social.skins-mod-link": {
-    "message": "CustomSkinLoader on Modrinth"
+    "message": "CustomSkinLoader project page"
   },
   "owyx.settings.social.skins-title": {
     "message": "In-world skins"

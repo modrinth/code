@@ -10,6 +10,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
 const sharp = require('sharp');
+const { logUserActivity } = require('../utils/activityLog');
 
 const router = express.Router();
 
@@ -346,10 +347,7 @@ router.post('/avatar', authenticateToken, avatarUpload.single('avatar'), async (
         }
 
         // Логируем активность
-        await db.query(`
-            INSERT INTO user_activity (user_id, activity_type, description)
-            VALUES ($1, 'avatar_update', 'Обновлен аватар профиля')
-        `, [req.user.id]);
+        await logUserActivity(req.user.id, 'avatar_update', 'Profile avatar updated', { req });
 
         res.json({
             success: true,
@@ -404,10 +402,7 @@ router.delete('/avatar', authenticateToken, async (req, res) => {
         }
 
         // Логируем активность
-        await db.query(`
-            INSERT INTO user_activity (user_id, activity_type, description)
-            VALUES ($1, 'avatar_delete', 'Удален аватар профиля')
-        `, [req.user.id]);
+        await logUserActivity(req.user.id, 'avatar_delete', 'Profile avatar removed', { req });
 
         res.json({
             success: true,
@@ -573,10 +568,10 @@ router.put('/skin', authenticateToken, skinUpload.single('skin'), async (req, re
             await fs.unlink(oldPath).catch(() => {});
         }
 
-        await db.query(`
-            INSERT INTO user_activity (user_id, activity_type, description)
-            VALUES ($1, 'skin_update', 'Обновлён скин профиля')
-        `, [req.user.id]).catch(() => {});
+        await logUserActivity(req.user.id, 'skin_update', 'Profile skin updated', {
+            req,
+            metadata: { model: String(model || '').slice(0, 16) || null },
+        });
 
         res.json({
             success: true,
@@ -616,6 +611,7 @@ router.delete('/skin', authenticateToken, async (req, res) => {
         const oldPath = path.join(__dirname, '../../', oldSkinUrl.replace(/^\//, ''));
         await fs.unlink(oldPath).catch(() => {});
     }
+    await logUserActivity(req.user.id, 'skin_delete', 'Profile skin removed', { req });
     res.json({ success: true, message: 'Скин удалён' });
 });
 
@@ -698,10 +694,10 @@ router.put('/nickname', authenticateToken, async (req, res) => {
             throw updateErr;
         }
 
-        await db.query(`
-            INSERT INTO user_activity (user_id, activity_type, description)
-            VALUES ($1, 'nickname_change', $2)
-        `, [req.user.id, `Логин изменён на ${raw}`]).catch(() => {});
+        await logUserActivity(req.user.id, 'nickname_change', 'Login nickname changed', {
+            req,
+            metadata: { nickname: raw },
+        });
 
         try {
             const { sendNicknameChangedEmail } = require('../utils/emailService');
@@ -762,10 +758,10 @@ router.put('/display-nickname', authenticateToken, async (req, res) => {
             throw updateErr;
         }
 
-        await db.query(`
-            INSERT INTO user_activity (user_id, activity_type, description)
-            VALUES ($1, 'display_nickname_change', $2)
-        `, [req.user.id, `Отображаемый ник изменён на ${raw}`]).catch(() => {});
+        await logUserActivity(req.user.id, 'display_nickname_change', 'Display nickname changed', {
+            req,
+            metadata: { displayNickname: raw },
+        });
 
         res.json({
             success: true,
@@ -907,6 +903,11 @@ router.post('/email/confirm', authenticateToken, async (req, res) => {
              WHERE id = $2`,
             [row.pending_email, req.user.id]
         );
+
+        await logUserActivity(req.user.id, 'email_change', 'Email address changed', {
+            req,
+            metadata: { verified: true },
+        });
 
         res.json({
             success: true,

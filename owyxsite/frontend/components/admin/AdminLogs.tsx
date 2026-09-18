@@ -84,6 +84,62 @@ function kindBadge(kind: string) {
   return "badge badge-accent";
 }
 
+const ACTIVITY_LABELS_EN: Record<string, string> = {
+  login: "Sign in",
+  logout: "Sign out",
+  register: "Register",
+  password_reset: "Password reset",
+  email_change: "Email change",
+  nickname_change: "Login change",
+  display_nickname_change: "Display nick",
+  avatar_update: "Avatar upload",
+  avatar_delete: "Avatar remove",
+  skin_update: "Skin update",
+  skin_delete: "Skin remove",
+  discord_linked: "Discord linked",
+  discord_unlinked: "Discord unlinked",
+  social_settings: "Social privacy",
+};
+
+const ACTIVITY_LABELS_RU: Record<string, string> = {
+  login: "Вход",
+  logout: "Выход",
+  register: "Регистрация",
+  password_reset: "Сброс пароля",
+  email_change: "Смена почты",
+  nickname_change: "Смена логина",
+  display_nickname_change: "Отображаемый ник",
+  avatar_update: "Аватар",
+  avatar_delete: "Удаление аватара",
+  skin_update: "Скин",
+  skin_delete: "Удаление скина",
+  discord_linked: "Discord привязан",
+  discord_unlinked: "Discord отвязан",
+  social_settings: "Соц. приватность",
+};
+
+const TELEMETRY_LABELS_EN: Record<string, string> = {
+  session_start: "Session start",
+  heartbeat: "Heartbeat",
+  error: "Error",
+  crash: "Crash",
+  perf: "Performance",
+  feature: "Feature",
+};
+
+const TELEMETRY_LABELS_RU: Record<string, string> = {
+  session_start: "Старт сессии",
+  heartbeat: "Heartbeat",
+  error: "Ошибка",
+  crash: "Крах",
+  perf: "Производительность",
+  feature: "Фича",
+};
+
+function humanLabel(raw: string, en: boolean, mapEn: Record<string, string>, mapRu: Record<string, string>) {
+  return (en ? mapEn : mapRu)[raw] || raw.replace(/_/g, " ");
+}
+
 export default function AdminLogs({
   authHeaders,
   showMessage,
@@ -263,7 +319,11 @@ export default function AdminLogs({
           <option value="all">{t("All types", "Все типы")}</option>
           {filterOptions.map((opt) => (
             <option key={opt} value={opt}>
-              {opt}
+              {tab === "account"
+                ? humanLabel(opt, en, ACTIVITY_LABELS_EN, ACTIVITY_LABELS_RU)
+                : tab === "launcher"
+                  ? humanLabel(opt, en, TELEMETRY_LABELS_EN, TELEMETRY_LABELS_RU)
+                  : opt.replace(/_/g, " ")}
             </option>
           ))}
         </select>
@@ -318,7 +378,9 @@ export default function AdminLogs({
                         )}
                       </td>
                       <td className="px-4 py-2.5">
-                        <span className={kindBadge(row.activity_type)}>{row.activity_type}</span>
+                        <span className={kindBadge(row.activity_type)} title={row.activity_type}>
+                          {humanLabel(row.activity_type, en, ACTIVITY_LABELS_EN, ACTIVITY_LABELS_RU)}
+                        </span>
                       </td>
                       <td className="px-4 py-2.5 text-muted max-w-md truncate" title={row.description}>
                         {row.description}
@@ -393,7 +455,9 @@ export default function AdminLogs({
                         {fmtWhen(row.created_at, en)}
                       </td>
                       <td className="px-4 py-2.5">
-                        <span className={kindBadge(row.event_kind)}>{row.event_kind}</span>
+                        <span className={kindBadge(row.event_kind)} title={row.event_kind}>
+                          {humanLabel(row.event_kind, en, TELEMETRY_LABELS_EN, TELEMETRY_LABELS_RU)}
+                        </span>
                       </td>
                       <td className="px-4 py-2.5 text-muted">
                         <span className="text-text">

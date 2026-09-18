@@ -81,7 +81,13 @@ Apply any older migration to a running DB the same way:
 
 ```bash
 docker compose exec -T postgres psql -U owyx_user -d owyx_db < postgres/migrations/006_news.sql
+# logs / telemetry (admin Logs + launcher ingest):
+docker compose exec -T postgres psql -U owyx_user -d owyx_db < postgres/migrations/012_logs_telemetry.sql
+# share presence privacy (friends offline when disabled):
+docker compose exec -T postgres psql -U owyx_user -d owyx_db < postgres/migrations/013_share_presence.sql
 ```
+
+If `012_logs_telemetry.sql` is not applied, `POST /api/launcher/v1/telemetry` and admin telemetry fail soft with a clear 503.
 
 Production: loopback binds + host nginx. See [`deploy/README.md`](./deploy/README.md)
 (`bash deploy/vps-up.sh`; set `TURNSTILE_SECRET_KEY` first). `panel.owyx.site` stays with C³ CELERITY — do not
