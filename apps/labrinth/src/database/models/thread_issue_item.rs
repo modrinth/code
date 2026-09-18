@@ -1,7 +1,8 @@
 use super::ids::{DBThreadId, DBThreadIssueId};
 use crate::database::PgTransaction;
-use crate::models::projects::Project;
-use crate::models::thread_issues::{ThreadIssueTarget, ThreadIssueVerdict};
+use crate::models::thread_issues::{
+    ThreadIssueContext, ThreadIssueTarget, ThreadIssueVerdict,
+};
 use chrono::{DateTime, Utc};
 use eyre::{Result, WrapErr, eyre};
 use serde::{Deserialize, Serialize};
@@ -21,7 +22,7 @@ pub struct DBThreadIssue {
 
 impl DBThreadIssue {
     pub async fn sync_project_verdicts(
-        project: &Project,
+        context: &ThreadIssueContext<'_>,
         transaction: &mut PgTransaction<'_>,
     ) -> Result<Vec<Self>> {
         let rows = sqlx::query!(
@@ -40,7 +41,7 @@ impl DBThreadIssue {
 			ORDER BY id
 			FOR UPDATE
 			"#,
-            DBThreadId::from(project.thread_id) as DBThreadId,
+            DBThreadId::from(context.project.thread_id) as DBThreadId,
         )
         .fetch_all(&mut *transaction)
         .await
@@ -63,7 +64,7 @@ impl DBThreadIssue {
             };
             let what = row.what.0;
             let verdict = what.verdict(
-                project,
+                context,
                 row.user_addressed,
                 row.moderator_verified,
             );

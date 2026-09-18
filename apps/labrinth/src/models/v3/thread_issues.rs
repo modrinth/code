@@ -1,8 +1,15 @@
 use crate::models::ids::{GalleryImageId, ThreadIssueId};
-use crate::models::projects::Project;
+use crate::models::projects::{Project, Version};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+
+/// Current project state used to evaluate moderation issues.
+#[derive(Debug, Clone, Copy)]
+pub struct ThreadIssueContext<'a> {
+    pub project: &'a Project,
+    pub versions: &'a [Version],
+}
 
 /// Issue that a moderator has flagged on a project in its moderation thread.
 ///
@@ -131,7 +138,7 @@ impl ThreadIssueVerdict {
 impl ThreadIssueTarget {
     pub fn verdict(
         &self,
-        project: &Project,
+        context: &ThreadIssueContext<'_>,
         user_addressed: bool,
         moderator_verified: bool,
     ) -> ThreadIssueVerdict {
@@ -139,7 +146,7 @@ impl ThreadIssueTarget {
             return ThreadIssueVerdict::Resolved;
         }
 
-        match (self.value_state(project, user_addressed), user_addressed) {
+        match (self.value_state(context, user_addressed), user_addressed) {
             (ThreadIssueValueState::SameAsSuggested, _) => {
                 ThreadIssueVerdict::Resolved
             }
@@ -152,10 +159,11 @@ impl ThreadIssueTarget {
 
     pub fn value_state(
         &self,
-        project: &Project,
+        context: &ThreadIssueContext<'_>,
         user_addressed: bool,
     ) -> ThreadIssueValueState {
-        let state = match self {
+        let project = context.project;
+        match self {
             Self::Title(target) => value_state(target, &project.name),
             Self::Slug(target) => {
                 value_state(target, project.slug.as_deref().unwrap_or_default())
@@ -253,9 +261,7 @@ impl ThreadIssueTarget {
                     ThreadIssueValueState::DifferentToOriginal
                 }
             },
-        };
-
-        state
+        }
     }
 }
 
@@ -379,6 +385,13 @@ mod tests {
         }
     }
 
+    fn context(project: &Project) -> ThreadIssueContext<'_> {
+        ThreadIssueContext {
+            project,
+            versions: &[],
+        }
+    }
+
     fn text_target(original: &str, suggestion: Option<&str>) -> TextTarget {
         TextTarget {
             original: original.to_string(),
@@ -395,19 +408,19 @@ mod tests {
         ));
 
         assert_eq!(
-            target.value_state(&project, false),
+            target.value_state(&context(&project), false),
             ThreadIssueValueState::SameAsOriginal
         );
 
         project.name = "Another Project".to_string();
         assert_eq!(
-            target.value_state(&project, false),
+            target.value_state(&context(&project), false),
             ThreadIssueValueState::DifferentToOriginal
         );
 
         project.name = "Suggested Project".to_string();
         assert_eq!(
-            target.value_state(&project, false),
+            target.value_state(&context(&project), false),
             ThreadIssueValueState::SameAsSuggested
         );
     }
@@ -419,7 +432,7 @@ mod tests {
         let target = ThreadIssueTarget::Slug(text_target("", None));
 
         assert_eq!(
-            target.value_state(&project, false),
+            target.value_state(&context(&project), false),
             ThreadIssueValueState::SameAsOriginal
         );
     }
@@ -433,20 +446,20 @@ mod tests {
         };
 
         assert_eq!(
-            target.value_state(&project, false),
+            target.value_state(&context(&project), false),
             ThreadIssueValueState::SameAsOriginal
         );
 
         project.license.id = "Apache-2.0".to_string();
         assert_eq!(
-            target.value_state(&project, false),
+            target.value_state(&context(&project), false),
             ThreadIssueValueState::SameAsSuggested
         );
 
         project.license.url =
             Some("https://example.com/other-license".to_string());
         assert_eq!(
-            target.value_state(&project, false),
+            target.value_state(&context(&project), false),
             ThreadIssueValueState::DifferentToOriginal
         );
     }
@@ -471,21 +484,21 @@ mod tests {
         };
 
         assert_eq!(
-            target.value_state(&project, false),
+            target.value_state(&context(&project), false),
             ThreadIssueValueState::SameAsOriginal
         );
 
         project.link_urls.get_mut("source").unwrap().url =
             "https://example.com/new-source".to_string();
         assert_eq!(
-            target.value_state(&project, false),
+            target.value_state(&context(&project), false),
             ThreadIssueValueState::SameAsSuggested
         );
 
         project.link_urls.get_mut("issues").unwrap().url =
             "https://example.com/other-issues".to_string();
         assert_eq!(
-            target.value_state(&project, false),
+            target.value_state(&context(&project), false),
             ThreadIssueValueState::DifferentToOriginal
         );
     }
@@ -501,22 +514,22 @@ mod tests {
         };
 
         assert_eq!(
-            icon.value_state(&project, false),
+            icon.value_state(&context(&project), false),
             ThreadIssueValueState::SameAsOriginal
         );
         assert_eq!(
-            tags.value_state(&project, false),
+            tags.value_state(&context(&project), false),
             ThreadIssueValueState::SameAsOriginal
         );
 
         project.icon_url = None;
         project.additional_categories.clear();
         assert_eq!(
-            icon.value_state(&project, false),
+            icon.value_state(&context(&project), false),
             ThreadIssueValueState::DifferentToOriginal
         );
         assert_eq!(
-            tags.value_state(&project, false),
+            tags.value_state(&context(&project), false),
             ThreadIssueValueState::DifferentToOriginal
         );
     }
@@ -538,19 +551,19 @@ mod tests {
         };
 
         assert_eq!(
-            target.value_state(&project, false),
+            target.value_state(&context(&project), false),
             ThreadIssueValueState::SameAsOriginal
         );
 
         project.gallery.remove(0);
         assert_eq!(
-            target.value_state(&project, false),
+            target.value_state(&context(&project), false),
             ThreadIssueValueState::DifferentToOriginal
         );
 
         project.gallery.clear();
         assert_eq!(
-            target.value_state(&project, false),
+            target.value_state(&context(&project), false),
             ThreadIssueValueState::SameAsSuggested
         );
     }
@@ -565,15 +578,15 @@ mod tests {
         };
 
         assert_eq!(
-            checkbox.value_state(&project(), false),
+            checkbox.value_state(&context(&project()), false),
             ThreadIssueValueState::SameAsOriginal
         );
         assert_eq!(
-            checkbox.value_state(&project(), true),
+            checkbox.value_state(&context(&project()), true),
             ThreadIssueValueState::SameAsSuggested
         );
         assert_eq!(
-            reply.value_state(&project(), true),
+            reply.value_state(&context(&project()), true),
             ThreadIssueValueState::DifferentToOriginal
         );
     }
@@ -587,29 +600,29 @@ mod tests {
         ));
 
         assert_eq!(
-            target.verdict(&project, true, false),
+            target.verdict(&context(&project), true, false),
             ThreadIssueVerdict::Open
         );
 
         project.name = "Another Project".to_string();
         assert_eq!(
-            target.verdict(&project, false, false),
+            target.verdict(&context(&project), false, false),
             ThreadIssueVerdict::Open
         );
         assert_eq!(
-            target.verdict(&project, true, false),
+            target.verdict(&context(&project), true, false),
             ThreadIssueVerdict::Addressed
         );
 
         project.name = "Suggested Project".to_string();
         assert_eq!(
-            target.verdict(&project, false, false),
+            target.verdict(&context(&project), false, false),
             ThreadIssueVerdict::Resolved
         );
 
         project.name = "Example Project".to_string();
         assert_eq!(
-            target.verdict(&project, false, true),
+            target.verdict(&context(&project), false, true),
             ThreadIssueVerdict::Resolved
         );
     }
@@ -631,20 +644,20 @@ mod tests {
         };
 
         assert_eq!(
-            gallery.verdict(&project, true, false),
+            gallery.verdict(&context(&project), true, false),
             ThreadIssueVerdict::Addressed
         );
         project.gallery.remove(0);
         assert_eq!(
-            gallery.verdict(&project, false, false),
+            gallery.verdict(&context(&project), false, false),
             ThreadIssueVerdict::Resolved
         );
         assert_eq!(
-            checkbox.verdict(&project, true, false),
+            checkbox.verdict(&context(&project), true, false),
             ThreadIssueVerdict::Resolved
         );
         assert_eq!(
-            reply.verdict(&project, true, false),
+            reply.verdict(&context(&project), true, false),
             ThreadIssueVerdict::Addressed
         );
     }
