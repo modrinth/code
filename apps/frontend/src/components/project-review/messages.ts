@@ -57,6 +57,34 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.disclosures',
 		defaultMessage: 'Disclosures',
 	},
+	permissions: {
+		id: 'moderation.project-review.permissions',
+		defaultMessage: 'Permissions',
+	},
+	permissionsPlaceholder: {
+		id: 'moderation.project-review.permissionsPlaceholder',
+		defaultMessage: 'Permissions review is coming soon',
+	},
+	reupload: {
+		id: 'moderation.project-review.reupload',
+		defaultMessage: 'Reupload',
+	},
+	're-review': {
+		id: 'moderation.project-review.re-review',
+		defaultMessage: 'Re-review',
+	},
+	'post-approval': {
+		id: 'moderation.project-review.post-approval',
+		defaultMessage: 'Post-approval',
+	},
+	'status-alerts': {
+		id: 'moderation.project-review.status-alerts',
+		defaultMessage: 'Status alerts',
+	},
+	undefinedProject: {
+		id: 'moderation.project-review.undefinedProject',
+		defaultMessage: 'Undefined project',
+	},
 	versions: {
 		id: 'moderation.project-review.versions',
 		defaultMessage: 'Versions',

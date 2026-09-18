@@ -3,7 +3,6 @@
 		<ReviewPanel
 			mode="inline"
 			:target="{ kind: 'gallery' }"
-			:label="formatMessage(messages.gallery)"
 			:disabled="isLoading || !!error"
 			class="mb-2"
 		>
@@ -32,7 +31,6 @@
 				as="article"
 				trigger-placement="overlay"
 				:target="{ kind: 'gallery-image', key: item.url }"
-				:label="item.name || formatMessage(messages.imageNumber, { number: index + 1 })"
 				class="flex min-w-0 flex-col overflow-hidden rounded-xl border border-solid border-surface-4"
 			>
 				<button

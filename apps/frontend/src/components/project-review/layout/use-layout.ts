@@ -14,7 +14,10 @@ import { readWorkspaceLayout, saveWorkspaceLayout, workspacePanelSizes } from '.
 import { type ProjectReviewTab, projectReviewTabs } from './types'
 import { useSidebarTransition } from './use-sidebar-transition'
 
-export function useProjectReviewLayout(getTitle: (tab: ProjectReviewTab) => string) {
+export function useProjectReviewLayout(
+	getTitle: (tab: ProjectReviewTab) => string,
+	getTabs: () => readonly ProjectReviewTab[],
+) {
 	const savedLayout = readWorkspaceLayout()
 	const leftVisible = ref(savedLayout?.leftVisible ?? true)
 	const rightVisible = ref(savedLayout?.rightVisible ?? true)
@@ -134,35 +137,14 @@ export function useProjectReviewLayout(getTitle: (tab: ProjectReviewTab) => stri
 		if (savedLayout) {
 			try {
 				api.fromJSON(savedLayout.tabs)
-				if (
-					api.panels.length !== projectReviewTabs.length ||
-					projectReviewTabs.some((tab) => !api.getPanel(tab))
-				) {
-					throw new Error('Incomplete saved review layout')
-				}
 				restored = true
 			} catch {
 				api.clear()
 			}
 		}
-		if (!restored) {
-			for (const tab of projectReviewTabs) {
-				api.addPanel({
-					id: tab,
-					component: 'ProjectReviewPanel',
-					title: getTitle(tab),
-					params: { tab, slot: tab },
-					renderer: 'always',
-					minimumHeight: 120,
-					position: tab === 'description' ? undefined : { referencePanel: 'description' },
-				})
-			}
-			api.getPanel('description')?.api.setActive()
-		}
-		for (const tab of projectReviewTabs) {
-			api.getPanel(tab)?.api.setTitle(getTitle(tab))
-		}
 		tabsReady = true
+		syncTabs()
+		if (!restored) api.getPanel('description')?.api.setActive()
 		updateCornerGroups()
 	}
 
@@ -243,12 +225,34 @@ export function useProjectReviewLayout(getTitle: (tab: ProjectReviewTab) => stri
 		scheduleSave()
 	}
 
-	watchEffect(() => {
+	function syncTabs() {
+		const visibleTabs = getTabs()
+		const titles = new Map(visibleTabs.map((tab) => [tab, getTitle(tab)]))
+		if (!tabs || !tabsReady) return
 		for (const tab of projectReviewTabs) {
-			const title = getTitle(tab)
-			tabs?.getPanel(tab)?.api.setTitle(title)
+			const panel = tabs.getPanel(tab)
+			if (!visibleTabs.includes(tab)) {
+				if (panel) tabs.removePanel(panel)
+				continue
+			}
+			if (!panel) {
+				tabs.addPanel({
+					id: tab,
+					component: 'ProjectReviewPanel',
+					title: titles.get(tab),
+					params: { tab, slot: tab },
+					renderer: 'always',
+					minimumHeight: 120,
+					inactive: true,
+					position: tab === 'description' ? undefined : { referencePanel: 'description' },
+				})
+			} else {
+				panel.api.setTitle(titles.get(tab) ?? tab)
+			}
 		}
-	})
+	}
+
+	watchEffect(syncTabs)
 
 	window.addEventListener('pagehide', saveLayout)
 	onBeforeUnmount(() => {

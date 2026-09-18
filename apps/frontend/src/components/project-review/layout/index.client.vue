@@ -25,12 +25,16 @@ import { projectReviewMessages as messages } from '../messages'
 import ProjectReviewColumns from './columns.vue'
 import { provideProjectReviewContext } from './context'
 import { workspacePanelSizes } from './layout-storage'
-import type { ProjectReviewSlots } from './types'
+import type { ProjectReviewSlots, ProjectReviewTab } from './types'
 import { useProjectReviewLayout } from './use-layout'
 
+const props = defineProps<{ tabs: readonly ProjectReviewTab[] }>()
 const slots = defineSlots<ProjectReviewSlots>()
 const { formatMessage } = useVIntl()
-const layout = useProjectReviewLayout((tab) => formatMessage(messages[tab]))
+const layout = useProjectReviewLayout(
+	(tab) => formatMessage(messages[tab]),
+	() => props.tabs,
+)
 const { leftVisible, rightVisible, onDividerDoubleClick, finishSidebarTransition } = layout
 
 function onPointerDown(event: PointerEvent) {

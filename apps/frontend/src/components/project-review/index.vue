@@ -1,12 +1,13 @@
 <template>
 	<ClientOnly>
-		<ProjectReviewLayout>
+		<ProjectReviewLayout :tabs="visibleTabs">
 			<template #left><ProjectInfo /></template>
 			<template #right><Conversation :key="projectId" /></template>
 			<template #footer><QueueBar /></template>
 			<template #description><Description :key="projectId" /></template>
 			<template #gallery><Gallery :key="projectId" /></template>
 			<template #disclosures><Disclosures :key="projectId" /></template>
+			<template #permissions><Permissions :key="projectId" /></template>
 			<template #versions><Versions :key="projectId" /></template>
 			<template #history><History :key="projectId" /></template>
 			<template #tech-review><TechReview :key="projectId" /></template>
@@ -38,7 +39,9 @@ import Disclosures from './disclosures/index.vue'
 import Gallery from './gallery/index.vue'
 import History from './history/index.vue'
 import ProjectReviewLayout from './layout/index.client.vue'
+import { projectReviewTabs } from './layout/types'
 import { projectReviewMessages } from './messages'
+import Permissions from './permissions/index.vue'
 import ProjectInfo from './project-info/index.vue'
 import QueueBar from './queue-bar.vue'
 import { createReviewContext, provideReviewContext } from './review-panel/context'
@@ -47,6 +50,11 @@ import Versions from './versions/index.vue'
 
 const { formatMessage } = useVIntl()
 const { projectId, project } = injectProjectReviewPageContext()
+const visibleTabs = computed(() =>
+	projectReviewTabs.filter(
+		(tab) => tab !== 'permissions' || project.value?.project_types.includes('modpack'),
+	),
+)
 const reviewProjectId = computed(() => project.value?.id)
 const stages = provideReviewStages(createReviewStages(reviewProjectId))
 provideReviewSession(createReviewSession())

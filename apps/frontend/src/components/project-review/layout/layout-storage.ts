@@ -35,7 +35,9 @@ export function readWorkspaceLayout(): SavedWorkspaceLayout | undefined {
 			typeof saved.rightVisible !== 'boolean' ||
 			!saved.tabs?.grid ||
 			!saved.tabs.panels ||
-			Object.keys(saved.tabs.panels).length !== projectReviewTabs.length ||
+			Object.keys(saved.tabs.panels).some(
+				(tab) => !projectReviewTabs.includes(tab as (typeof projectReviewTabs)[number]),
+			) ||
 			saved.tabs.floatingGroups?.length ||
 			saved.tabs.popoutGroups?.length ||
 			saved.tabs.edgeGroups
@@ -45,6 +47,7 @@ export function readWorkspaceLayout(): SavedWorkspaceLayout | undefined {
 
 		for (const tab of projectReviewTabs) {
 			const panel = saved.tabs.panels[tab]
+			if (tab === 'permissions' && !panel) continue
 			if (
 				panel?.id !== tab ||
 				panel.contentComponent !== 'ProjectReviewPanel' ||

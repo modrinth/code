@@ -6,7 +6,6 @@ import type { ReviewTarget } from '~/providers/project-review/review'
 export interface ReviewAnchor {
 	id: string
 	target: ReviewTarget
-	label: string
 	element: HTMLElement
 	trigger: HTMLElement | null
 	available: () => boolean

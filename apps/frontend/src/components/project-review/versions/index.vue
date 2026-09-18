@@ -1,13 +1,16 @@
 <template>
 	<div class="flex h-full min-h-0 flex-col gap-3 overflow-hidden">
 		<ReviewPanel
+			v-if="resolve({ kind: 'undefined-project' })"
+			mode="inline"
+			:target="{ kind: 'undefined-project' }"
+		/>
+		<ReviewPanel
 			mode="inline"
 			:target="{ kind: 'versions' }"
-			:label="formatMessage(messages.versions)"
 			:disabled="
 				isLoading || !!error || versionsQuery.isPending.value || versionsQuery.isError.value
 			"
-			class="flex shrink-0 flex-wrap items-center justify-between gap-3"
 		>
 		</ReviewPanel>
 		<div class="min-h-0 flex-1 overflow-auto">
@@ -74,12 +77,14 @@ import { Button, useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
+import { injectReviewStages } from '~/providers/project-review/review-stages'
 
 import { projectReviewMessages as messages } from '../messages'
 import ReviewPanel from '../review-panel/index.vue'
 import VersionCard from './version-card.vue'
 
 const { formatMessage } = useVIntl()
+const { resolve } = injectReviewStages()
 const { selection, versions, versionsQuery, isLoading, error, refresh } =
 	injectProjectReviewPageContext()
 const expanded = ref<Set<string> | null>(null)

@@ -1,6 +1,11 @@
-<template><slot id="main" /></template>
+<template>
+	<TooltipDirective />
+	<slot id="main" />
+</template>
 
 <script setup lang="ts">
+import { TooltipDirective } from '@modrinth/ui'
+
 useFavicon()
 </script>
 

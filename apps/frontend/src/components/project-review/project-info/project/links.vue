@@ -5,7 +5,6 @@
 			v-for="link in links"
 			:key="link.key"
 			:target="{ kind: 'link', key: link.key }"
-			:label="link.label"
 			class="min-w-0"
 		>
 			<h4 class="m-0 mb-1 text-sm font-normal text-secondary">

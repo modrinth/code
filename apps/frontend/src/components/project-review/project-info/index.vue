@@ -13,7 +13,6 @@
 				mode="anchored"
 				as="section"
 				:target="{ kind: 'title' }"
-				:label="formatMessage(messages.projectTitle)"
 				class="review-section"
 			>
 				<h3 class="review-section-label">
@@ -25,7 +24,6 @@
 				mode="anchored"
 				as="section"
 				:target="{ kind: 'slug' }"
-				:label="formatMessage(messages.slug)"
 				class="review-section"
 			>
 				<h3 class="review-section-label">
@@ -37,7 +35,6 @@
 				mode="anchored"
 				as="section"
 				:target="{ kind: 'icon' }"
-				:label="formatMessage(messages.icon)"
 				class="review-section review-section-icon"
 			>
 				<h3 class="review-section-label">
@@ -49,7 +46,6 @@
 				mode="anchored"
 				as="section"
 				:target="{ kind: 'summary' }"
-				:label="formatMessage(messages.summary)"
 				class="review-section"
 			>
 				<h3 class="review-section-label">
@@ -63,13 +59,18 @@
 				</h3>
 				<License />
 			</section>
-			<section class="review-section" :aria-label="formatMessage(messages.tags)">
+			<ReviewPanel
+				mode="anchored"
+				as="section"
+				:target="{ kind: 'tags' }"
+				class="review-section"
+			>
 				<h3 class="review-section-label">
 					{{ formatMessage(messages.tags) }}
 				</h3>
 				<Tags v-if="hasTags" />
 				<span v-else>{{ formatMessage(messages.emptyTags) }}</span>
-			</section>
+			</ReviewPanel>
 			<section :aria-label="formatMessage(messages.links)" class="review-section">
 				<h3 class="review-section-label">
 					{{ formatMessage(messages.links) }}
@@ -77,12 +78,17 @@
 				<Links v-if="hasLinks" />
 				<span v-else>{{ formatMessage(messages.emptyLinks) }}</span>
 			</section>
-			<section class="review-section">
+			<ReviewPanel
+				mode="anchored"
+				as="section"
+				:target="{ kind: 'compatibility' }"
+				class="review-section"
+			>
 				<h3 class="review-section-label">
 					{{ formatMessage(messages.compatibility) }}
 				</h3>
 				<Compatibility />
-			</section>
+			</ReviewPanel>
 			<section class="review-section">
 				<h3 class="review-section-label">
 					{{ formatMessage(messages.members) }}

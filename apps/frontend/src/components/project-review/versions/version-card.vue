@@ -138,26 +138,22 @@
 								:key="file.url"
 								class="min-w-0 rounded-lg bg-surface-1 px-3 py-2"
 							>
-								<div class="flex flex-wrap items-center justify-between gap-2">
-									<div class="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
-										<strong class="min-w-0 flex-1 break-all text-contrast">{{
-											file.filename
-										}}</strong>
-										<div class="flex flex-wrap items-center gap-2 text-sm text-secondary">
-											<TagItem v-if="file.primary">{{ formatMessage(messages.primary) }}</TagItem
-											><span>{{
-												formatMessage(fileTypeMessages[file.file_type ?? 'unknown'])
-											}}</span
-											><span>{{ formatBytes(file.size) }}</span>
-										</div>
+								<div class="flex w-full min-w-0 flex-wrap items-center justify-between gap-2.5">
+									<div class="min-w-0 font-medium">{{ file.filename }}</div>
+									<div class="flex items-center gap-2 text-sm text-secondary">
+										<TagItem v-if="file.primary">{{ formatMessage(messages.primary) }}</TagItem
+										><span>{{ formatMessage(fileTypeMessages[file.file_type ?? 'unknown']) }}</span
+										><span>{{ formatBytes(file.size) }}</span>
+										<ButtonLink
+											size="sm"
+											:href="file.url"
+											:download="file.filename"
+											:aria-label="formatMessage(messages.download)"
+											icon-only
+										>
+											<DownloadIcon />
+										</ButtonLink>
 									</div>
-									<ButtonLink
-										:href="file.url"
-										:download="file.filename"
-										:aria-label="formatMessage(messages.download)"
-										icon-only
-										><DownloadIcon
-									/></ButtonLink>
 								</div>
 								<details class="mt-2">
 									<summary class="cursor-pointer text-sm text-secondary">
@@ -246,11 +242,7 @@
 					</p>
 				</div>
 			</details>
-			<ReviewPanel
-				mode="inline"
-				:target="{ kind: 'version', key: version.id }"
-				:label="version.version_number"
-			/>
+			<ReviewPanel mode="inline" :target="{ kind: 'version', key: version.id }" />
 		</div>
 	</article>
 </template>

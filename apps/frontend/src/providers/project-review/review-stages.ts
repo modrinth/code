@@ -1,23 +1,39 @@
+import useCategoriesStage from '@modrinth/moderation/src/data/stages/categories'
 import useDescriptionStage from '@modrinth/moderation/src/data/stages/description'
 import useDisclosuresStage from '@modrinth/moderation/src/data/stages/disclosures'
 import useGalleryStage from '@modrinth/moderation/src/data/stages/gallery'
 import useLicenseStage from '@modrinth/moderation/src/data/stages/license'
 import useLinksStage from '@modrinth/moderation/src/data/stages/links'
+import useMetadataStage from '@modrinth/moderation/src/data/stages/metadata'
+import usePostApprovalStage from '@modrinth/moderation/src/data/stages/post-approval'
+import useReReviewStage from '@modrinth/moderation/src/data/stages/re-review'
+import useReuploadStage from '@modrinth/moderation/src/data/stages/reupload'
 import useRulesStage from '@modrinth/moderation/src/data/stages/rules'
+import useStatusAlertsStage from '@modrinth/moderation/src/data/stages/status-alerts'
 import useSummaryStage from '@modrinth/moderation/src/data/stages/summary'
 import useTitleSlugStage from '@modrinth/moderation/src/data/stages/title-slug'
+import useUndefinedProjectStage from '@modrinth/moderation/src/data/stages/undefined-project'
 import useVersionsStage from '@modrinth/moderation/src/data/stages/versions'
 import { isShown, type StageNode } from '@modrinth/moderation/src/types/node'
 import { createContext } from '@modrinth/ui'
-import { type Ref, shallowRef } from 'vue'
+import { computed, type Ref, shallowRef } from 'vue'
 
+import { injectProjectReviewPageContext } from './index'
 import type { ReviewTarget } from './review'
+import { injectReviewSession } from './review-session'
 
 const targetStages = {
 	title: 'title-slug',
 	slug: 'title-slug',
 	icon: 'rules',
 	summary: 'summary',
+	tags: 'tags',
+	compatibility: 'metadata',
+	reupload: 'reupload',
+	're-review': 're-review',
+	'post-approval': 'post-approval',
+	'status-alerts': 'status-alerts',
+	'undefined-project': 'undefined-project',
 	link: 'links',
 	license: 'license',
 	'license-url': 'license',
@@ -59,15 +75,37 @@ export function createReviewStages(projectId: Ref<string | undefined>) {
 }
 
 export function useReviewStageDefinitions(): ReviewStages {
-	return {
+	const { project, projectV2 } = injectProjectReviewPageContext()
+	const session = injectReviewSession()
+	const mainStages = {
+		metadata: useMetadataStage(),
+		reupload: useReuploadStage(),
+		're-review': useReReviewStage(),
+		'post-approval': usePostApprovalStage(),
+		'undefined-project': useUndefinedProjectStage().shown(
+			computed(
+				() =>
+					!!projectV2.value &&
+					projectV2.value.versions.length === 0 &&
+					!project.value?.minecraft_server,
+			),
+		),
 		'title-slug': useTitleSlugStage(),
 		rules: useRulesStage(),
 		summary: useSummaryStage(),
+		tags: useCategoriesStage(),
 		links: useLinksStage(),
 		license: useLicenseStage(),
 		description: useDescriptionStage(),
 		gallery: useGalleryStage(),
 		disclosures: useDisclosuresStage(),
 		versions: useVersionsStage(),
+	}
+	return {
+		...mainStages,
+		'status-alerts': useStatusAlertsStage(
+			Object.values(mainStages),
+			computed(() => session.readProject(project.value?.id ?? '')),
+		),
 	}
 }

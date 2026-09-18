@@ -24,7 +24,7 @@
 			<TagItem
 				v-for="environment in project?.environment"
 				:key="environment"
-				class="!border-surface-4 !bg-surface-3 !text-secondary"
+				class="max-w-full !text-wrap !border-surface-4 !bg-surface-3 !text-secondary"
 				>{{ formatMessage(ENVIRONMENTS_COPY[environment].title) }}</TagItem
 			>
 		</dd>

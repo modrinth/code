@@ -4,7 +4,7 @@
 			:id="panelId"
 			ref="element"
 			role="dialog"
-			:aria-label="formatMessage(messages.reviewSection, { section: anchor.label })"
+			:aria-labelledby="titleId"
 			:data-review-panel="anchor.id"
 			tabindex="-1"
 			class="z-[99990] box-border w-[28rem] max-w-[calc(100vw-1rem)] overflow-y-auto rounded-xl border border-solid border-surface-5 bg-surface-3 p-4 text-sm text-primary"
@@ -13,7 +13,7 @@
 			@pointerleave="leave(anchor.id)"
 		>
 			<div class="flex items-center justify-between gap-3">
-				<div class="text-lg font-semibold text-contrast">{{ anchor.label }}</div>
+				<slot name="title" />
 				<IconButton
 					:label="formatMessage(messages.closeReview)"
 					@click="dismiss(true)"
@@ -40,7 +40,7 @@ import { projectReviewMessages as messages } from '../messages'
 import { injectReviewContext, type ReviewAnchor } from './context'
 
 const { formatMessage } = useVIntl()
-const props = defineProps<{ anchor: ReviewAnchor }>()
+const props = defineProps<{ anchor: ReviewAnchor; titleId: string }>()
 const { active, panel, panelId, pinned, close, leave, cancelClose } = injectReviewContext()
 const element = shallowRef<HTMLElement | null>(null)
 const reference = computed(() => props.anchor.trigger ?? props.anchor.element)

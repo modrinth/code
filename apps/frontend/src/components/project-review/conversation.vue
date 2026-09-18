@@ -1,13 +1,14 @@
 <template>
-	<div class="flex min-h-full min-w-0 flex-col">
-		<div class="grow" />
-		<div v-if="project" class="min-w-0 shrink-0">
+	<div class="flex h-full min-h-0 min-w-0 flex-col gap-2.5 overflow-hidden">
+		<ProjectActions class="border-0 border-b border-solid border-divider" />
+		<div v-if="project" class="min-h-0 min-w-0 flex-1">
 			<ConversationThread
 				v-if="thread"
 				:thread="thread"
 				:project="project"
 				:auth="auth"
 				:set-status="setStatus"
+				scroll-messages
 				class="rounded-none border-none bg-transparent p-0"
 				@update-thread="updateThread"
 			/>
@@ -39,6 +40,7 @@ import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { projectReviewMessages as messages } from './messages'
+import ProjectActions from './project-actions.vue'
 
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
