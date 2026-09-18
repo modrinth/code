@@ -377,26 +377,22 @@ IS_MATCH ? "low" : null</code></pre>
 			</div>
 		</div>
 
-		<section v-if="isScanning && scanProgress" class="universal-card flex flex-col gap-3">
+		<section v-if="isScanning" class="universal-card flex flex-col gap-3 tabular-nums">
 			<div class="flex flex-wrap items-center justify-between gap-2">
-				<div>
-					<h2 class="m-0 text-base font-bold text-contrast">Scanning Delphi rule effects</h2>
-					<p class="m-0 text-sm text-secondary">
-						{{ scanProgress.scanned.toLocaleString() }} of
-						{{ scanProgress.total.toLocaleString() }} details scanned ·
-						{{ scanProgress.effects.toLocaleString() }} effects
-					</p>
-				</div>
-				<span class="text-sm font-semibold capitalize text-secondary">
+				<h2 class="m-0 text-base font-bold text-contrast">Scanning Delphi rule effects</h2>
+				<span v-if="scanProgress" class="text-sm font-semibold capitalize text-secondary">
 					{{ scanProgress.phase }} revision {{ scanProgress.revision }}
 				</span>
 			</div>
 			<ProgressBar
-				:progress="scanProgress.scanned"
-				:max="Math.max(scanProgress.total, 1)"
-				:waiting="scanProgress.total === 0 && scanProgress.phase !== 'complete'"
+				:progress="scanProgress?.scanned ?? 0"
+				:max="Math.max(scanProgress?.total ?? 0, 1)"
+				:waiting="!scanProgress || (scanProgress.total === 0 && scanProgress.phase !== 'complete')"
+				:label="scanProgressLabel"
+				:show-progress="scanProgress !== null"
+				:animated="false"
+				label-class="min-w-0 text-sm text-secondary"
 				full-width
-				show-progress
 			/>
 		</section>
 
@@ -467,9 +463,20 @@ IS_MATCH ? "low" : null</code></pre>
 				><code>{{ rule.rule }}</code></pre>
 
 				<section class="flex flex-col gap-2">
-					<h3 class="m-0 text-sm font-semibold text-contrast">
-						Affected details ({{ getAffectedDetailsTotal(rule).toLocaleString() }})
-					</h3>
+					<div class="flex flex-wrap items-center justify-between gap-2">
+						<h3 class="m-0 text-sm font-semibold text-contrast">
+							Affected details ({{ getAffectedDetailsTotal(rule).toLocaleString() }})
+						</h3>
+						<label class="flex cursor-pointer items-center gap-2 text-sm text-secondary">
+							Processing projects only
+							<Toggle
+								:model-value="isShowingProcessingAffectedDetailsOnly(rule)"
+								:disabled="loadingAffectedRuleIds.has(rule.id)"
+								small
+								@update:model-value="setProcessingAffectedDetailsOnly(rule, $event ?? false)"
+							/>
+						</label>
+					</div>
 					<p v-if="getAffectedDetailsTotal(rule) === 0" class="m-0 text-sm text-secondary">
 						No details are affected in the current revision.
 					</p>
@@ -597,6 +604,7 @@ import {
 	type TabsTab,
 	TagItem,
 	Textarea,
+	Toggle,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { useDebounceFn } from '@vueuse/core'
@@ -792,6 +800,8 @@ const traceDataError = ref<string | null>(null)
 const testTraceMode = ref<TestTraceMode>('fields')
 const rawTestTraceInput = ref('')
 const scanProgress = ref<Labrinth.TechReview.Internal.DelphiRuleScanEvent | null>(null)
+const scanEstimatedSecondsRemaining = ref<number | null>(null)
+const scanProgressSamples: Array<{ scanned: number; recordedAt: number }> = []
 const affectedDetailsPages = reactive(
 	new Map<
 		number,
@@ -803,7 +813,9 @@ const affectedDetailsPages = reactive(
 	>(),
 )
 const loadingAffectedRuleIds = reactive(new Set<number>())
+const processingOnlyAffectedRuleIds = reactive(new Set<number>())
 const AFFECTED_DETAILS_PAGE_SIZE = 3
+const SCAN_RATE_SAMPLE_COUNT = 8
 const form = reactive({
 	name: '',
 	priority: 0 as number | undefined,
@@ -824,6 +836,31 @@ onMounted(async () => {
 })
 
 const modalTitle = computed(() => (editingRuleId.value === null ? 'Create rule' : 'Edit rule'))
+const scanEstimatedTimeRemaining = computed(() => {
+	const seconds = scanEstimatedSecondsRemaining.value
+	if (seconds === null) return null
+
+	if (seconds < 60) {
+		const roundedSeconds = Math.max(1, Math.ceil(seconds))
+		return `${roundedSeconds} second${roundedSeconds === 1 ? '' : 's'}`
+	}
+
+	const minutes = Math.ceil(seconds / 60)
+	if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'}`
+
+	const hours = Math.floor(minutes / 60)
+	const remainingMinutes = minutes % 60
+	return remainingMinutes === 0 ? `${hours}h` : `${hours}h ${remainingMinutes}m`
+})
+const scanProgressLabel = computed(() => {
+	const progress = scanProgress.value
+	if (!progress) return 'Preparing scan...'
+
+	const label = `${progress.scanned.toLocaleString()} of ${progress.total.toLocaleString()} details scanned · ${progress.effects.toLocaleString()} effects`
+	return scanEstimatedTimeRemaining.value
+		? `${label} · About ${scanEstimatedTimeRemaining.value} remaining`
+		: label
+})
 const {
 	data: issueTypeSchema,
 	isPending: isLoadingIssueTypes,
@@ -1245,6 +1282,7 @@ async function loadRules() {
 	try {
 		rules.value = await client.labrinth.tech_review_internal.getRules()
 		affectedDetailsPages.clear()
+		processingOnlyAffectedRuleIds.clear()
 	} catch (error) {
 		console.error('Failed to load Delphi rules', error)
 		loadFailed.value = true
@@ -1313,27 +1351,58 @@ function getVersionLink(detail: Labrinth.TechReview.Internal.DelphiRuleAffectedD
 	return `/project/${detail.project_id}/version/${detail.version_id}`
 }
 
+function isShowingProcessingAffectedDetailsOnly(
+	rule: Labrinth.TechReview.Internal.DelphiRule,
+): boolean {
+	return processingOnlyAffectedRuleIds.has(rule.id)
+}
+
+async function setProcessingAffectedDetailsOnly(
+	rule: Labrinth.TechReview.Internal.DelphiRule,
+	processingOnly: boolean,
+) {
+	if (loadingAffectedRuleIds.has(rule.id)) return
+
+	if (processingOnly) {
+		processingOnlyAffectedRuleIds.add(rule.id)
+		const loaded = await loadAffectedDetailsPage(rule, 1)
+		if (!loaded) processingOnlyAffectedRuleIds.delete(rule.id)
+	} else {
+		processingOnlyAffectedRuleIds.delete(rule.id)
+		affectedDetailsPages.delete(rule.id)
+	}
+}
+
 async function switchAffectedDetailsPage(
 	rule: Labrinth.TechReview.Internal.DelphiRule,
 	page: number,
 ) {
 	if (loadingAffectedRuleIds.has(rule.id)) return
-	if (page === 1) {
+	if (page === 1 && !isShowingProcessingAffectedDetailsOnly(rule)) {
 		affectedDetailsPages.delete(rule.id)
 		return
 	}
 
+	await loadAffectedDetailsPage(rule, page)
+}
+
+async function loadAffectedDetailsPage(
+	rule: Labrinth.TechReview.Internal.DelphiRule,
+	page: number,
+): Promise<boolean> {
 	loadingAffectedRuleIds.add(rule.id)
 	try {
 		const response = await client.labrinth.tech_review_internal.getRuleAffectedDetails(rule.id, {
 			limit: AFFECTED_DETAILS_PAGE_SIZE,
 			page: page - 1,
+			processing_only: isShowingProcessingAffectedDetailsOnly(rule),
 		})
 		affectedDetailsPages.set(rule.id, {
 			page,
 			total: response.total,
 			details: response.details,
 		})
+		return true
 	} catch (error) {
 		console.error('Failed to load details affected by Delphi rule', error)
 		addNotification({
@@ -1341,6 +1410,7 @@ async function switchAffectedDetailsPage(
 			title: 'Failed to load affected details',
 			text: 'The requested page of affected details could not be loaded.',
 		})
+		return false
 	} finally {
 		loadingAffectedRuleIds.delete(rule.id)
 	}
@@ -1475,11 +1545,45 @@ async function deleteRule() {
 	}
 }
 
+function updateScanProgress(progress: Labrinth.TechReview.Internal.DelphiRuleScanEvent) {
+	scanProgress.value = progress
+
+	if (progress.phase !== 'scanning' || progress.total === 0 || progress.scanned >= progress.total) {
+		scanEstimatedSecondsRemaining.value = null
+		return
+	}
+
+	const previousSample = scanProgressSamples.at(-1)
+	if (!previousSample || progress.scanned > previousSample.scanned) {
+		scanProgressSamples.push({ scanned: progress.scanned, recordedAt: Date.now() })
+		if (scanProgressSamples.length > SCAN_RATE_SAMPLE_COUNT) scanProgressSamples.shift()
+	}
+
+	const firstSample = scanProgressSamples[0]
+	const latestSample = scanProgressSamples.at(-1)
+	if (!firstSample || !latestSample || firstSample === latestSample) {
+		scanEstimatedSecondsRemaining.value = null
+		return
+	}
+
+	const elapsedSeconds = (latestSample.recordedAt - firstSample.recordedAt) / 1000
+	const scannedDetails = latestSample.scanned - firstSample.scanned
+	if (elapsedSeconds <= 0 || scannedDetails <= 0) {
+		scanEstimatedSecondsRemaining.value = null
+		return
+	}
+
+	const detailsPerSecond = scannedDetails / elapsedSeconds
+	scanEstimatedSecondsRemaining.value = (progress.total - progress.scanned) / detailsPerSecond
+}
+
 async function runFullScan() {
 	if (isScanning.value) return
 
 	isScanning.value = true
 	scanProgress.value = null
+	scanEstimatedSecondsRemaining.value = null
+	scanProgressSamples.length = 0
 	scanAbortController = new AbortController()
 	let completed = false
 
@@ -1490,6 +1594,7 @@ async function runFullScan() {
 		const parser = new SseParser()
 
 		const processItems = (items: ReturnType<SseParser['feed']>) => {
+			let latestProgress: Labrinth.TechReview.Internal.DelphiRuleScanEvent | null = null
 			for (const item of items) {
 				if (item.kind !== 'event') continue
 
@@ -1501,32 +1606,44 @@ async function runFullScan() {
 				}
 
 				if (item.event === 'progress' || item.event === 'complete') {
-					scanProgress.value = JSON.parse(
+					latestProgress = JSON.parse(
 						item.data,
 					) as Labrinth.TechReview.Internal.DelphiRuleScanEvent
 					completed ||= item.event === 'complete'
 				}
 			}
+
+			if (!latestProgress) return false
+			updateScanProgress(latestProgress)
+			return true
 		}
 
 		while (true) {
 			const { done, value } = await reader.read()
 			if (done) break
-			processItems(parser.feed(decoder.decode(value, { stream: true })))
+			const progressUpdated = processItems(
+				parser.feed(decoder.decode(value, { stream: true })),
+			)
+			if (progressUpdated) {
+				await new Promise<void>((resolve) => setTimeout(resolve, 0))
+			}
 		}
 
 		const finalChunk = decoder.decode()
 		if (finalChunk) processItems(parser.feed(finalChunk))
 		processItems(parser.end())
 
-		if (!completed || !scanProgress.value) {
+		const completedProgress = scanProgress.value as
+			| Labrinth.TechReview.Internal.DelphiRuleScanEvent
+			| null
+		if (!completed || !completedProgress) {
 			throw new Error('The scan stream ended before the new revision was published.')
 		}
 
 		addNotification({
 			type: 'success',
 			title: 'Rule scan complete',
-			text: `${scanProgress.value.scanned.toLocaleString()} details were scanned for revision ${scanProgress.value.revision}.`,
+			text: `${completedProgress.scanned.toLocaleString()} details were scanned for revision ${completedProgress.revision}.`,
 		})
 		await loadRules()
 	} catch (error) {
