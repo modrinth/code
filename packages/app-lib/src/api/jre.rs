@@ -152,8 +152,13 @@ async fn auto_install_java_inner(
         Some(java_step_progress(1)),
     )
     .await?;
+	let archive_type = if cfg!(all(target_os = "linux", target_arch = "aarch64")) {
+		"tar.gz"
+	} else {
+		"zip"
+	};
     let metadata_url = format!(
-        "https://api.azul.com/metadata/v1/zulu/packages?arch={}&java_version={}&os={}&archive_type=zip&javafx_bundled=false&java_package_type=jre&page_size=1",
+		"https://api.azul.com/metadata/v1/zulu/packages?arch={}&java_version={}&os={}&archive_type={archive_type}&javafx_bundled=false&java_package_type=jre&crac_supported=false&release_status=ga&availability_types=CA&page_size=1",
         std::env::consts::ARCH,
         java_version,
         std::env::consts::OS
@@ -284,35 +289,25 @@ async fn auto_install_java_inner(
                 )
                 .await?;
         }
-        let mut archive = zip::ZipArchive::new(std::io::Cursor::new(file))
+        let directory_name = download
+            .name
+            .file_name()
+            .and_then(|name| name.to_str())
+            .and_then(|name| name.strip_suffix(&format!(".{archive_type}")))
+            .filter(|dir| {
+                !dir.contains(['\\', ':'])
+                    && matches!(
+                        std::path::Path::new(dir).components().next(),
+                        Some(std::path::Component::Normal(_))
+                    )
+            })
             .context(ErrorKind::InputError(
-                "failed to read java zip".to_string(),
+                "invalid Java archive directory".to_string(),
             ))?;
-
-        let names = archive.file_names().collect::<Result<Vec<_>, _>>()?;
-        // removes the old installation of java
-        if let Some(file) = names.first()
-            && let Some(dir) = file.split('/').next()
-        {
-            if dir.is_empty()
-                || dir == "."
-                || dir == ".."
-                || dir.contains(['\\', ':'])
-                || !matches!(
-                    std::path::Path::new(dir).components().next(),
-                    Some(std::path::Component::Normal(_))
-                )
-            {
-                bail!(ErrorKind::InputError(
-                    "invalid Java archive directory".to_string()
-                ));
-            }
-            let path = path.join(dir);
-
-            if path.exists() {
-                io::remove_dir_all(path).await?;
-            }
-        }
+        let mut base_path = path.join(directory_name);
+        io::create_dir_all(&path).await?;
+        let staging = tempfile::tempdir_in(&path)
+            .map_err(|err| io::IOError::with_path(err, &path))?;
 
         if let Some(loading_bar) = &loading_bar {
             emit_loading(loading_bar, 0.0, Some("Extracting java"))?;
@@ -338,20 +333,50 @@ async fn auto_install_java_inner(
                 )
                 .await?;
         }
-        archive.extract(&path).context(ErrorKind::InputError(
-            "failed to extract java zip".to_string(),
-        ))?;
+        let staging = tokio::task::spawn_blocking(move || {
+            if archive_type == "tar.gz" {
+                let decoder = flate2::read::GzDecoder::new(file.as_ref());
+                tar::Archive::new(decoder).unpack(staging.path()).context(
+                    ErrorKind::InputError(
+                        "failed to extract java tar.gz".to_string(),
+                    ),
+                )?;
+            } else {
+                let mut archive =
+                    zip::ZipArchive::new(std::io::Cursor::new(file)).context(
+                        ErrorKind::InputError(
+                            "failed to read java zip".to_string(),
+                        ),
+                    )?;
+                archive.extract(staging.path()).context(
+                    ErrorKind::InputError(
+                        "failed to extract java zip".to_string(),
+                    ),
+                )?;
+            }
+            crate::Result::Ok(staging)
+        })
+        .await??;
+        let extracted_path = staging.path().join(directory_name);
+        #[cfg(target_os = "macos")]
+        let java_path = extracted_path.join("Contents/Home/bin/java");
+        #[cfg(not(target_os = "macos"))]
+        let java_path = extracted_path.join("bin").join(jre::JAVA_BIN);
+        if !java_path.is_file() {
+            bail!(ErrorKind::InputError(
+                "Java archive does not contain the expected executable"
+                    .to_string()
+            ));
+        }
+        if base_path.exists() {
+            io::remove_dir_all(&base_path).await?;
+        }
+        tokio::fs::rename(&extracted_path, &base_path)
+            .await
+            .map_err(|err| io::IOError::with_path(err, &base_path))?;
         if let Some(loading_bar) = &loading_bar {
             emit_loading(loading_bar, 10.0, Some("Done extracting java"))?;
         }
-        let mut base_path = path.join(
-            download
-                .name
-                .file_stem()
-                .unwrap_or_default()
-                .to_string_lossy()
-                .to_string(),
-        );
 
         #[cfg(target_os = "macos")]
         {
