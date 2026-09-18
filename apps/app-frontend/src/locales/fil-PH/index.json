@@ -41,9 +41,6 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Hindi matapos ang pagdownload"
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "Hindi mahanap ang instansiya"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "Gumawa ng pangunahing instansiya"
   },

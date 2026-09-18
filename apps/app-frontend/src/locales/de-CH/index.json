@@ -53,9 +53,6 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Download konnte nicht abgeschlossen werden"
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "Die Instanz konnte nicht gefunden werden"
-  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Dateipfad ist ungültig"
   },

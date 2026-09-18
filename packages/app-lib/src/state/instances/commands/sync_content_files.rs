@@ -125,6 +125,10 @@ pub(crate) async fn sync_instance_content_files(
         )
         .await;
     }
+    let running =
+        crate::state::instance_has_running_process(&instance.id, state).await?;
+    let renamed =
+        !running && reconcile_instance_renames(instance, state).await?;
     let mut existing =
         sqlite::content_rows::get_instance_files(&instance.id, &state.pool)
             .await?;
@@ -166,8 +170,6 @@ pub(crate) async fn sync_instance_content_files(
             duplicate_paths.insert(canonical);
         }
     }
-    let running =
-        crate::state::instance_has_running_process(&instance.id, state).await?;
     let mut files = Vec::new();
     let mut saved_files = HashSet::new();
     for previous in &existing {
@@ -280,7 +282,8 @@ pub(crate) async fn sync_instance_content_files(
         .iter()
         .filter(|file| !present_ids.contains(file.id.as_str()) && !file.missing)
         .collect::<Vec<_>>();
-    let changed = normalized
+    let changed = renamed
+        || normalized
         || !missing.is_empty()
         || files.iter().any(|file| {
             existing
@@ -317,6 +320,141 @@ pub(crate) async fn sync_instance_content_files(
         crate::api::instance::queue_game_locale_index();
     }
     Ok(stored)
+}
+
+/// Call only while holding both the instance content lock and the content store lock.
+/// Minecraft must not be running for this instance.
+pub(crate) async fn reconcile_instance_renames(
+    instance: &Instance,
+    state: &State,
+) -> crate::Result<bool> {
+    let files =
+        sqlite::content_rows::get_instance_files(&instance.id, &state.pool)
+            .await?;
+    let bindings = crate::state::content_store::instance_storage(
+        &state.pool,
+        &instance.id,
+    )
+    .await?
+    .into_iter()
+    .map(|binding| (binding.file_id.clone(), binding))
+    .collect::<HashMap<_, _>>();
+    let mut missing = Vec::new();
+    for file in &files {
+        if let Some(binding) = bindings.get(&file.id) {
+            let path = state
+                .content_store
+                .instance_path(&instance.path, &content_file_path(file))
+                .await?;
+            match tokio::fs::symlink_metadata(path).await {
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                    missing.push((file, binding));
+                }
+                Err(error) => return Err(error.into()),
+                Ok(_) => {}
+            }
+        }
+    }
+    if missing.is_empty() {
+        return Ok(false);
+    }
+    let scanned = filesystem::scan_content_files(
+        &state.directories.instances_dir(),
+        &instance.path,
+    )?;
+    let mut renames = Vec::new();
+    for candidate in &scanned {
+        if candidate.is_symlink
+            || candidate.has_linked_parent
+            || !crate::state::content_store::is_managed_content_path(
+                &candidate.relative_path,
+            )
+        {
+            continue;
+        }
+        let canonical = candidate.relative_path.trim_end_matches(".disabled");
+        let target = files.iter().find(|file| {
+            file.relative_path == canonical
+                || file.relative_path == candidate.relative_path
+        });
+        if target.is_some_and(|file| file.relative_path != canonical) {
+            continue;
+        }
+        let possible = missing
+            .iter()
+            .filter(|(file, _)| {
+                file.size == candidate.size
+                    && file.enabled == candidate.enabled
+                    && project_type_for_file(file)
+                        == filesystem::project_type_from_relative_path(
+                            &candidate.relative_path,
+                        )
+            })
+            .collect::<Vec<_>>();
+        if possible.is_empty() {
+            continue;
+        }
+        let path = state
+            .content_store
+            .instance_path(&instance.path, &candidate.relative_path)
+            .await?;
+        let hash = crate::state::content_store::hash_file(&path).await?.sha512;
+        let matches = possible
+            .into_iter()
+            .filter(|(_, binding)| binding.blob_sha512 == hash)
+            .collect::<Vec<_>>();
+        if matches.len() != 1 {
+            continue;
+        }
+        let (source, binding) = *matches[0];
+        if target.is_some_and(|target| bindings.contains_key(&target.id)) {
+            continue;
+        }
+        renames.push((source, binding, candidate));
+    }
+    let mut changed = false;
+    for (source, binding, candidate) in &renames {
+        if renames
+            .iter()
+            .filter(|(file, _, _)| file.id == source.id)
+            .count()
+            != 1
+        {
+            continue;
+        }
+        let canonical = candidate.relative_path.trim_end_matches(".disabled");
+        let mut renamed = (*source).clone();
+        renamed.relative_path = canonical.to_string();
+        if state
+            .content_store
+            .check_instance_file(instance, source, binding)
+            .await?
+            != InstanceFileStatus::Missing
+            || state
+                .content_store
+                .check_instance_file(instance, &renamed, binding)
+                .await?
+                != InstanceFileStatus::Healthy
+        {
+            continue;
+        }
+        let mut tx = state.pool.begin().await?;
+        sqlite::content_rows::rename_instance_file(
+            &instance.id,
+            &source.relative_path,
+            canonical,
+            candidate.file_name.trim_end_matches(".disabled"),
+            source.enabled,
+            &mut tx,
+        )
+        .await?;
+        tx.commit().await?;
+        changed = true;
+    }
+    if changed {
+        super::mark_shared_instance_stale(&instance.id, &state.pool).await?;
+    }
+    Ok(changed)
 }
 
 pub(super) async fn normalize_legacy_content_files(

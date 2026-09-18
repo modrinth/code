@@ -53,9 +53,6 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "لم يكتمل التنزيل"
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "تعذّر العثور على النسخة"
-  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "مسار الملف غير صالح"
   },
