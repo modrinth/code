@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div :class="{ 'flex h-full min-h-0 flex-col overflow-hidden': scrollMessages }">
 		<NewModal
 			ref="modalSubmit"
 			:header="
@@ -95,12 +95,23 @@
 				</div>
 			</div>
 		</NewModal>
-		<div v-if="flags.showThreadIds" class="mx-4 mb-3 font-semibold">
+		<div v-if="flags.showThreadIds" class="mx-4 mb-3 shrink-0 font-semibold">
 			Thread ID:
 			<CopyCode :text="thread.id" />
 		</div>
-		<div v-bind="$attrs" class="flex flex-col">
-			<div v-if="sortedMessages.length > 0" class="flex flex-col pt-2">
+		<div
+			v-bind="$attrs"
+			class="flex flex-col"
+			:class="{ 'min-h-0 flex-1 overflow-hidden': scrollMessages }"
+		>
+			<div
+				v-if="scrollMessages || sortedMessages.length > 0"
+				ref="messageList"
+				class="flex flex-col pt-2"
+				:class="{
+					'min-h-0 flex-1 overflow-y-auto overscroll-contain': scrollMessages,
+				}"
+			>
 				<ThreadMessage
 					v-for="message in sortedMessages"
 					:key="'message-' + message.id"
@@ -109,11 +120,12 @@
 					:members="members"
 					:report="report"
 					:auth="auth"
+					class="shrink-0"
 					raised
 					@update-thread="() => updateThreadLocal()"
 				/>
 			</div>
-			<div v-if="report && report.closed" class="m-4 mt-2 flex flex-col gap-4">
+			<div v-if="report && report.closed" class="m-4 mt-2 flex shrink-0 flex-col gap-4">
 				<p class="m-0">{{ formatMessage(messages.closedThreadDescription) }}</p>
 				<Button
 					v-if="isStaff(auth.user)"
@@ -127,21 +139,78 @@
 				</Button>
 			</div>
 			<template v-else-if="!report || !report.closed">
-				<div class="mx-4 mb-2 mt-2">
-					<MarkdownEditor
-						v-model="replyBody"
-						:placeholder="
-							formatMessage(
-								sortedMessages.length > 0
-									? messages.replyEditorPlaceholderReply
-									: messages.replyEditorPlaceholderSend,
-							)
-						"
-						:on-image-upload="onUploadImage"
-					/>
+				<div
+					class="relative mx-2 mb-2 mt-2.5 shrink-0 border-0 border-t border-solid border-divider pt-2.5"
+					:style="resizableEditor ? { height: `${editorHeight}px` } : undefined"
+				>
+					<div
+						v-if="resizableEditor"
+						role="separator"
+						tabindex="0"
+						aria-orientation="horizontal"
+						:aria-label="formatMessage(messages.resizeEditor)"
+						:aria-valuenow="editorHeight"
+						:aria-valuemin="120"
+						:aria-valuemax="maxEditorHeight"
+						class="absolute -top-2 left-0 flex h-4 w-full cursor-row-resize touch-none items-center justify-center"
+						@pointerdown="startEditorResize"
+						@pointermove="resizeEditor"
+						@pointerup="stopEditorResize"
+						@pointercancel="stopEditorResize"
+						@keydown.up.prevent="setEditorHeight(editorHeight + 20)"
+						@keydown.down.prevent="setEditorHeight(editorHeight - 20)"
+					>
+						<span class="h-1 w-10 rounded-full bg-surface-5" />
+					</div>
+					<div :class="resizableEditor ? 'h-full overflow-y-auto' : undefined">
+						<MarkdownEditor
+							v-model="replyBody"
+							:initial-preview="initialPreview"
+							:disabled="generatingMessage"
+							:placeholder="
+								formatMessage(
+									sortedMessages.length > 0
+										? messages.replyEditorPlaceholderReply
+										: messages.replyEditorPlaceholderSend,
+								)
+							"
+							:on-image-upload="onUploadImage"
+						/>
+					</div>
 				</div>
-				<div class="m-4 mt-3 flex flex-wrap items-center justify-between gap-4">
-					<div class="flex flex-wrap items-center gap-2">
+				<div class="mx-2 mt-3 flex shrink-0 flex-col gap-4">
+					<div class="flex flex-wrap items-center justify-end gap-2">
+						<template v-if="currentMember && !currentMember.staffOnly">
+							<template v-if="isRejected(project)">
+								<Button
+									v-if="replyBody"
+									type="colored"
+									color="orange"
+									:disabled="isLoading"
+									@click="openResubmitModal(true)"
+								>
+									<ScaleIcon aria-hidden="true" />
+									{{ formatMessage(messages.actionResubmitForReviewWithReply) }}
+								</Button>
+								<Button v-else :disabled="isLoading" @click="openResubmitModal(false)">
+									<ScaleIcon aria-hidden="true" />
+									{{ formatMessage(messages.actionResubmitForReview) }}
+								</Button>
+							</template>
+						</template>
+						<Button
+							v-if="isStaff(auth.user)"
+							:disabled="!replyBody || isLoading"
+							@click="runBlockingAction('private-note', () => sendReply(null, true))"
+						>
+							<SpinnerIcon
+								v-if="loadingAction === 'private-note'"
+								class="animate-spin"
+								aria-hidden="true"
+							/>
+							<StickyNotePlusIcon v-else aria-hidden="true" />
+							{{ formatMessage(messages.actionAddPrivateNote) }}
+						</Button>
 						<Button
 							v-if="sortedMessages.length > 0"
 							type="colored"
@@ -178,39 +247,11 @@
 							<SendIcon v-else aria-hidden="true" />
 							{{ formatMessage(messages.actionSend) }}
 						</Button>
-						<Button
-							v-if="isStaff(auth.user)"
-							:disabled="!replyBody || isLoading"
-							@click="runBlockingAction('private-note', () => sendReply(null, true))"
-						>
-							<SpinnerIcon
-								v-if="loadingAction === 'private-note'"
-								class="animate-spin"
-								aria-hidden="true"
-							/>
-							<StickyNotePlusIcon v-else aria-hidden="true" />
-							{{ formatMessage(messages.actionAddPrivateNote) }}
-						</Button>
-						<template v-if="currentMember && !currentMember.staffOnly">
-							<template v-if="isRejected(project)">
-								<Button
-									v-if="replyBody"
-									type="colored"
-									color="orange"
-									:disabled="isLoading"
-									@click="openResubmitModal(true)"
-								>
-									<ScaleIcon aria-hidden="true" />
-									{{ formatMessage(messages.actionResubmitForReviewWithReply) }}
-								</Button>
-								<Button v-else :disabled="isLoading" @click="openResubmitModal(false)">
-									<ScaleIcon aria-hidden="true" />
-									{{ formatMessage(messages.actionResubmitForReview) }}
-								</Button>
-							</template>
-						</template>
 					</div>
-					<div class="flex flex-wrap items-center gap-2">
+					<div
+						v-if="report || (project && isStaff(auth.user))"
+						class="flex flex-wrap items-center gap-2"
+					>
 						<template v-if="report">
 							<Button
 								v-if="isStaff(auth.user) && replyBody"
@@ -244,53 +285,80 @@
 						<template v-if="project">
 							<template v-if="isStaff(auth.user)">
 								<Button
-									v-if="replyBody"
 									type="colored"
 									color="green"
+									class="moderation-action flex-1"
 									:disabled="isApproved(project) || isLoading"
-									@click="runBlockingAction('approve-with-reply', () => sendReply(requestedStatus))"
+									@click="
+										replyBody
+											? runBlockingAction('approve-with-reply', () => sendReply(requestedStatus))
+											: runBlockingAction('approve', () => setStatus(requestedStatus))
+									"
 								>
 									<SpinnerIcon
-										v-if="loadingAction === 'approve-with-reply'"
+										v-if="loadingAction === 'approve-with-reply' || loadingAction === 'approve'"
 										class="animate-spin"
 										aria-hidden="true"
 									/>
-									<CheckIcon v-else aria-hidden="true" />
-									{{ formatMessage(messages.actionApproveWithReply) }}
+									{{
+										formatMessage(
+											replyBody ? messages.actionApproveWithReply : messages.actionApprove,
+										)
+									}}
 								</Button>
 								<Button
-									v-else
-									type="colored"
-									color="green"
-									:disabled="isApproved(project) || isLoading"
-									@click="runBlockingAction('approve', () => setStatus(requestedStatus))"
+									type="outlined"
+									color="orange"
+									class="moderation-action flex-1"
+									:disabled="project.status === 'withheld' || isLoading"
+									@click="
+										replyBody
+											? runBlockingAction('withhold-with-reply', () => sendReply('withheld'))
+											: runBlockingAction('withhold', () => setStatus('withheld'))
+									"
 								>
 									<SpinnerIcon
-										v-if="loadingAction === 'approve'"
+										v-if="loadingAction === 'withhold-with-reply' || loadingAction === 'withhold'"
 										class="animate-spin"
 										aria-hidden="true"
 									/>
-									<CheckIcon v-else aria-hidden="true" />
-									{{ formatMessage(messages.actionApprove) }}
+									{{
+										formatMessage(
+											replyBody ? messages.actionWithholdWithReply : messages.actionWithhold,
+										)
+									}}
 								</Button>
-								<SplitButton
-									type="colored"
+								<Button
+									type="outlined"
 									color="red"
-									:menu-label="formatMessage(commonMessages.moreOptionsButton)"
+									class="moderation-action flex-1"
+									:disabled="project.status === 'rejected' || isLoading"
+									@click="
+										replyBody
+											? runBlockingAction('reject-with-reply', () => sendReply('rejected'))
+											: runBlockingAction('reject', () => setStatus('rejected'))
+									"
+								>
+									<SpinnerIcon
+										v-if="loadingAction === 'reject-with-reply' || loadingAction === 'reject'"
+										class="animate-spin"
+										aria-hidden="true"
+									/>
+									{{
+										formatMessage(
+											replyBody ? messages.actionRejectWithReply : messages.actionReject,
+										)
+									}}
+								</Button>
+								<!-- TODO: TBD whether we still need these actions -->
+								<!-- <TeleportOverflowMenu
+									type="quiet"
+									:circular="false"
+									:label="formatMessage(commonMessages.moreOptionsButton)"
 									:disabled="isLoading"
-									:primary-disabled="project.status === 'rejected'"
 									:options="
 										replyBody
 											? [
-													{
-														id: 'withhold-reply',
-														label: formatMessage(messages.actionWithholdWithReply),
-														tone: 'orange',
-														hoverFilled: true,
-														action: () =>
-															runBlockingAction('withhold-reply', () => sendReply('withheld')),
-														disabled: project.status === 'withheld' || isLoading,
-													},
 													{
 														id: 'set-to-draft-reply',
 														label: formatMessage(messages.actionSetToDraftWithReply),
@@ -314,15 +382,6 @@
 												]
 											: [
 													{
-														id: 'withhold',
-														label: formatMessage(messages.actionWithhold),
-														tone: 'orange',
-														hoverFilled: true,
-														action: () =>
-															runBlockingAction('withhold', () => setStatus('withheld')),
-														disabled: project.status === 'withheld' || isLoading,
-													},
-													{
 														id: 'set-to-draft',
 														label: formatMessage(messages.actionSetToDraft),
 														tone: 'orange',
@@ -342,31 +401,8 @@
 													},
 												]
 									"
-									@click="
-										replyBody
-											? runBlockingAction('reject-with-reply', () => sendReply('rejected'))
-											: runBlockingAction('reject', () => setStatus('rejected'))
-									"
 								>
-									<SpinnerIcon
-										v-if="loadingAction === 'reject-with-reply' || loadingAction === 'reject'"
-										class="animate-spin"
-										aria-hidden="true"
-									/>
-									<XIcon v-else aria-hidden="true" />
-									{{
-										formatMessage(
-											replyBody ? messages.actionRejectWithReply : messages.actionReject,
-										)
-									}}
-									<template #withhold-reply>
-										<EyeOffIcon aria-hidden="true" />
-										{{ formatMessage(messages.actionWithholdWithReply) }}
-									</template>
-									<template #withhold>
-										<EyeOffIcon aria-hidden="true" />
-										{{ formatMessage(messages.actionWithhold) }}
-									</template>
+									<MoreHorizontalIcon aria-hidden="true" />
 									<template #set-to-draft-reply>
 										<FileTextIcon aria-hidden="true" />
 										{{ formatMessage(messages.actionSetToDraftWithReply) }}
@@ -383,7 +419,7 @@
 										<ScaleIcon aria-hidden="true" />
 										{{ formatMessage(messages.actionSendToReview) }}
 									</template>
-								</SplitButton>
+								</TeleportOverflowMenu> -->
 							</template>
 						</template>
 					</div>
@@ -396,9 +432,8 @@
 <script setup>
 import {
 	CheckCircleIcon,
-	CheckIcon,
-	EyeOffIcon,
 	FileTextIcon,
+	MoreHorizontalIcon,
 	ReplyIcon,
 	ScaleIcon,
 	SendIcon,
@@ -416,9 +451,10 @@ import {
 	IntlFormatted,
 	MarkdownEditor,
 	NewModal,
-	SplitButton,
+	TeleportOverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
+import { nextTick, onMounted, ref, watch } from 'vue'
 
 import ThreadMessage from '~/components/ui/thread/ThreadMessage.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
@@ -429,6 +465,10 @@ const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	resizeEditor: {
+		id: 'conversation-thread.resize-editor',
+		defaultMessage: 'Resize message editor',
+	},
 	resubmitModalHeaderResubmitting: {
 		id: 'conversation-thread.resubmit-modal.header.resubmitting',
 		defaultMessage: 'Resubmitting for review',
@@ -584,6 +624,13 @@ const messages = defineMessages({
 })
 
 const props = defineProps({
+	resizableEditor: Boolean,
+	initialPreview: Boolean,
+	generatingMessage: Boolean,
+	scrollMessages: {
+		type: Boolean,
+		default: false,
+	},
 	thread: {
 		type: Object,
 		required: true,
@@ -617,6 +664,18 @@ const props = defineProps({
 
 const emit = defineEmits(['update-thread'])
 
+const messageList = ref(null)
+
+async function scrollMessagesToBottom() {
+	if (!props.scrollMessages) return
+	await nextTick()
+	const element = messageList.value
+	if (element) element.scrollTop = element.scrollHeight
+}
+
+onMounted(scrollMessagesToBottom)
+watch(() => props.thread.id, scrollMessagesToBottom, { flush: 'post' })
+
 const app = useNuxtApp()
 const flags = useFeatureFlags()
 
@@ -628,7 +687,33 @@ const members = computed(() => {
 	return members
 })
 
-const replyBody = ref('')
+const replyBody = defineModel('replyBody', { type: String, default: '' })
+const editorHeight = ref(240)
+const maxEditorHeight = ref(600)
+let editorDrag = null
+
+function setEditorHeight(height) {
+	maxEditorHeight.value = Math.max(120, Math.floor(window.innerHeight * 0.6))
+	editorHeight.value = Math.min(maxEditorHeight.value, Math.max(120, height))
+}
+
+function startEditorResize(event) {
+	if (event.button !== 0) return
+	event.preventDefault()
+	event.currentTarget.setPointerCapture(event.pointerId)
+	editorDrag = { y: event.clientY, height: editorHeight.value }
+}
+
+function resizeEditor(event) {
+	if (editorDrag) setEditorHeight(editorDrag.height + editorDrag.y - event.clientY)
+}
+
+function stopEditorResize(event) {
+	editorDrag = null
+	if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+		event.currentTarget.releasePointerCapture(event.pointerId)
+	}
+}
 
 const sortedMessages = computed(() => {
 	if (props.thread !== null) {
@@ -643,10 +728,10 @@ const modalSubmit = ref(null)
 const modalReply = ref(null)
 
 const loadingAction = ref(null)
-const isLoading = computed(() => loadingAction.value !== null)
+const isLoading = computed(() => loadingAction.value !== null || props.generatingMessage)
 
 async function runBlockingAction(actionId, action) {
-	if (loadingAction.value !== null) {
+	if (isLoading.value) {
 		return
 	}
 	loadingAction.value = actionId
@@ -795,3 +880,18 @@ defineOptions({
 	inheritAttrs: false,
 })
 </script>
+
+<style scoped>
+.moderation-action {
+	height: 2.625rem;
+	min-width: 8.125rem;
+	gap: 0.5rem;
+	padding-inline: 1rem;
+	border-radius: 0.625rem;
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--button-color) 40%, transparent);
+}
+
+.moderation-action::before {
+	display: none;
+}
+</style>

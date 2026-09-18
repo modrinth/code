@@ -544,6 +544,7 @@ const props = withDefaults(
 		modelValue: string
 		disabled?: boolean
 		headingButtons?: boolean
+		initialPreview?: boolean
 		/**
 		 * @param file The file to upload
 		 * @throws If the file is invalid or the upload fails
@@ -558,6 +559,7 @@ const props = withDefaults(
 		modelValue: '',
 		disabled: false,
 		headingButtons: true,
+		initialPreview: false,
 		onImageUpload: undefined,
 		placeholder: undefined,
 		maxLength: undefined,
@@ -870,7 +872,7 @@ const updateCurrentValue = (newValue: string) => {
 	emit('update:modelValue', newValue)
 }
 
-const previewMode = ref(false)
+const previewMode = ref(props.initialPreview)
 
 const linkText = ref('')
 const linkUrl = ref('')

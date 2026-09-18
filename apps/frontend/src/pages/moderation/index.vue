@@ -171,7 +171,6 @@ import ModerationQueueSkeleton from '~/components/ui/moderation/ModerationQueueS
 import ModerationQueueToolbar from '~/components/ui/moderation/ModerationQueueToolbar.vue'
 import QueueSummaryModal from '~/components/ui/moderation/QueueSummaryModal.vue'
 import { type ModerationProject, toModerationProjects } from '~/helpers/moderation.ts'
-import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
 import { useModerationQueue } from '~/services/moderation/queue.ts'
 import { findNextEligibleQueueProject } from '~/services/moderation/queue-eligibility.ts'
 
@@ -478,14 +477,6 @@ const pageEnd = computed(() =>
 		totalProjects.value,
 	),
 )
-const projectsById = computed(() => {
-	const projects = new Map<string, ModerationProject>()
-	for (const project of filteredProjects.value) {
-		projects.set(project.project.id, project)
-	}
-
-	return projects
-})
 
 watch(totalPages, (pages) => {
 	if (pages === 0 && currentPage.value !== 1) {
@@ -545,26 +536,10 @@ async function findFirstEligibleProject(): Promise<string | null> {
 	return next.project
 }
 
-function getProjectRouteParam(projectId: string): string {
-	return projectsById.value.get(projectId)?.project.slug || projectId
-}
-
-function getProjectRouteType(projectId: string): string {
-	const projectType = projectsById.value.get(projectId)?.project.project_types[0]
-	if (!projectType) return 'project'
-	return getProjectTypeForUrlShorthand(projectType, [])
-}
-
 async function navigateToModerationProject(projectId: string) {
 	await navigateTo({
-		name: 'type-project',
-		params: {
-			type: getProjectRouteType(projectId),
-			project: getProjectRouteParam(projectId),
-		},
-		state: {
-			showChecklist: true,
-		},
+		path: '/moderation/project-review',
+		query: { project: projectId },
 	})
 }
 
