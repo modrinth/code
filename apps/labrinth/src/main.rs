@@ -233,6 +233,11 @@ async fn app() -> std::io::Result<()> {
         !args.no_background_tasks,
     );
 
+    labrinth_config
+        .active_sockets
+        .register_and_set_metrics(&prometheus.registry)
+        .expect("Failed to register socket metrics");
+
     info!("Starting Actix HTTP server!");
 
     HttpServer::new(move || {
