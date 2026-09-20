@@ -761,39 +761,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Sai tài khoản"
   },
-  "app.instance.share.members.empty": {
-    "message": "Chưa có người dùng nào tham gia"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Không có người dùng nào khớp với bộ lọc."
-  },
-  "app.instance.share.remove-user-modal.effect-access": {
-    "message": "Họ sẽ không còn nhận được cập nhật cho bản cài đặt được chia sẻ này"
-  },
-  "app.instance.share.remove-user-modal.effect-installed-copy": {
-    "message": "Các bản sao họ đã cài vẫn sẽ ở trên thiết bị của họ"
-  },
-  "app.instance.share.remove-user-modal.effect-invite-again": {
-    "message": "Bạn có thể mời lại họ sau"
-  },
-  "app.instance.share.remove-user-modal.effect-last-user": {
-    "message": "Đây là người dùng cuối cùng; tính năng chia sẻ sẽ bị tắt cho bản cài đặt này"
-  },
-  "app.instance.share.remove-user-modal.effects-label": {
-    "message": "Điều gì sẽ xảy ra?"
-  },
-  "app.instance.share.remove-user-modal.header": {
-    "message": "Thu hồi quyền truy cập"
-  },
-  "app.instance.share.remove-user-modal.remove-button": {
-    "message": "Thu hồi quyền truy cập"
-  },
-  "app.instance.share.remove-user-modal.user-avatar-alt": {
-    "message": "Ảnh đại diện của {username}"
-  },
-  "app.instance.share.remove-user-modal.warning-body": {
-    "message": "Nếu bạn thu hồi quyền truy cập của {username} vào bản cài đặt được chia sẻ này, bạn sẽ phải mời lại họ trước khi họ có thể nhận cập nhật."
-  },
   "app.instance.share.sign-in.button": {
     "message": "Đăng nhập"
   },
@@ -3964,45 +3931,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Gói tài nguyên"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Thao tác"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Liên kết mời"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Bất kỳ ai có một trong các liên kết mời này đều có thể tham gia khi liên kết còn hiệu lực."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "Không có lời mời nào đang hoạt động."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Hết hạn"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Thu hồi lời mời"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "Thu hồi lời mời {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Lời mời đang hoạt động"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Lượt dùng"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "Liên kết mời <monospace>{code}</monospace> sẽ ngừng hoạt động ngay lập tức. Những người đã tham gia vẫn giữ quyền truy cập."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Không thể hoàn tác thao tác này"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Thu hồi lời mời"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Thu hồi lời mời"
   },
   "instance.settings.synced-options.data-override": {
     "message": "Tắt ghi đè này để chỉnh sửa dữ liệu đã đồng bộ."

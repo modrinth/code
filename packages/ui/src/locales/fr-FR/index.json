@@ -5489,15 +5489,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Ils peuvent maintenant être trouvés ici !"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Ne plus afficher"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Les paramètres de votre serveur se sont déplacés"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Serveurs partagés"
   },

@@ -60,9 +60,16 @@
 		<Admonition
 			v-else-if="sharedInstanceUnavailable"
 			type="warning"
-			:header="formatMessage(sharedInstanceUnavailableTitleMessage(sharedInstanceUnavailableReason))"
+			:header="
+				formatMessage(sharedInstanceUnavailableTitleMessage(sharedInstanceUnavailableReason))
+			"
 		>
-			{{ formatSharedInstanceUnavailable(sharedInstanceUnavailableReason, sharedInstanceUnavailableManager) }}
+			{{
+				formatSharedInstanceUnavailable(
+					sharedInstanceUnavailableReason,
+					sharedInstanceUnavailableManager,
+				)
+			}}
 			<template #actions>
 				<Button :disabled="retryingAvailability" @click="retryAvailability">
 					<SpinnerIcon v-if="retryingAvailability" class="animate-spin" aria-hidden="true" />

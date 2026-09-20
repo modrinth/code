@@ -622,7 +622,7 @@ function getLoaderVersionsForGameVersion(
 watch(
 	() => selectedLoader.value,
 	async (loader) => {
-		if (ctx.projectInstall.value) return
+		if (ctx.projectInstall.value && ctx.flowType === 'instance') return
 		await fetchLoaderMetadata(loader)
 	},
 	{ immediate: true },
@@ -638,7 +638,7 @@ watch(
 		loaderVersionsData.value = []
 		selectedLoaderVersion.value = null
 
-		if (ctx.projectInstall.value) return
+		if (ctx.projectInstall.value && ctx.flowType === 'instance') return
 		if (!loader || !gameVersion || loader === 'vanilla') return
 
 		loaderVersionsLoading.value = true
@@ -683,6 +683,7 @@ watch(
 		// Auto-select based on loaderVersionType
 		autoSelectLoaderVersion()
 	},
+	{ immediate: true },
 )
 
 watch(

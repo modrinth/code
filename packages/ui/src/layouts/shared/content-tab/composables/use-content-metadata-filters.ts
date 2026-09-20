@@ -13,7 +13,7 @@ import {
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 import type { ContentItem } from '../types'
-import { getClientWarningType } from './content-filtering'
+import { getContentWarningType } from './content-filtering'
 
 export type ContentMetadataFilterValue = Record<string, string[]>
 
@@ -127,6 +127,10 @@ const messages = defineMessages({
 		id: 'content.metadata-filter.warning.none',
 		defaultMessage: 'No warnings',
 	},
+	unknownEnvironment: {
+		id: 'content.metadata-filter.warning.unknown-environment',
+		defaultMessage: 'Unknown environment',
+	},
 	external: {
 		id: 'content.metadata-filter.source.external',
 		defaultMessage: 'External',
@@ -213,7 +217,7 @@ export function useContentMetadataFilters(
 			key: 'warnings',
 			label: formatMessage(messages.warnings),
 			values: (item) => {
-				const warning = getClientWarningType(item, config?.showEnvironmentWarnings)
+				const warning = getContentWarningType(item, config?.showEnvironmentWarnings)
 				switch (warning) {
 					case 'retained':
 						return [option(warning, formatMessage(messages.clientRetained))]
@@ -221,6 +225,8 @@ export function useContentMetadataFilters(
 						return [option(warning, formatMessage(messages.clientDepends))]
 					case 'environment':
 						return [option(warning, formatMessage(messages.clientOnly))]
+					case 'unknown-environment':
+						return [option(warning, formatMessage(messages.unknownEnvironment))]
 					default:
 						return [option('none', formatMessage(messages.noWarnings))]
 				}

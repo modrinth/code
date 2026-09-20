@@ -116,16 +116,14 @@ import { computed, type ComputedRef, onUnmounted, ref, shallowRef, watch } from 
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 
 import ExportModal from '@/components/ui/ExportModal.vue'
-import { useHostingInstance } from '@/composables/instances/use-hosting-instance'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import SharedInstanceInstallModal from '@/components/ui/shared-instances/shared-instance-install-modal/index.vue'
 import SharedInstanceUpdateModal from '@/components/ui/shared-instances/SharedInstanceUpdateModal.vue'
-import {
-	getServerStatusQueryKey,
-} from '@/composables/instances/use-server-status-query'
-import { useAppEvent } from '@/composables/use-app-event'
+import { useHostingInstance } from '@/composables/instances/use-hosting-instance'
 import { useInstanceLaunchState } from '@/composables/instances/use-instance-launch-state'
+import { getServerStatusQueryKey } from '@/composables/instances/use-server-status-query'
+import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { handleSevereError } from '@/composables/use-error.js'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
@@ -298,7 +296,9 @@ const linkedProjectQuery = useQuery(
 )
 const linkedProjectV3 = computed(() => linkedProjectQuery.data.value ?? undefined)
 const hosting = useHostingInstance(instance, offline)
-const isServerInstance = computed(() => hosting.isHostingInstance.value || linkedProjectV3.value?.minecraft_server != null)
+const isServerInstance = computed(
+	() => hosting.isHostingInstance.value || linkedProjectV3.value?.minecraft_server != null,
+)
 const processesQuery = useQuery(
 	computed(() => ({
 		...instanceProcessesQueryOptions(instanceId.value),
@@ -378,9 +378,10 @@ const { notifySharedInstanceError, notifySharedInstanceUnavailable } = useShared
 useLoadingBarToken(subpagePending)
 useLoadingBarToken(computed(() => instanceQuery.isPending.value && !instance.value))
 
-const minecraftServer = computed(() => hosting.isHostingInstance.value
-	? { region: hosting.region.value }
-	: linkedProjectV3.value?.minecraft_server,
+const minecraftServer = computed(() =>
+	hosting.isHostingInstance.value
+		? { region: hosting.region.value }
+		: linkedProjectV3.value?.minecraft_server,
 )
 const javaServerPingData = computed(() => linkedProjectV3.value?.minecraft_java_server?.ping?.data)
 const sharedInstanceState = createSharedInstanceContext(
@@ -411,7 +412,11 @@ const sharedInstanceUpdateAvailable = computed(
 		sharedInstanceUpdateKey.value !== hiddenSharedInstanceUpdateKey.value,
 )
 
-const serverAddress = computed(() => hosting.isHostingInstance.value ? hosting.address.value : linkedProjectV3.value?.minecraft_java_server?.address)
+const serverAddress = computed(() =>
+	hosting.isHostingInstance.value
+		? hosting.address.value
+		: linkedProjectV3.value?.minecraft_java_server?.address,
+)
 const serverStatusQuery = useQuery({
 	queryKey: computed(() => getServerStatusQueryKey(serverAddress.value ?? '')),
 	queryFn: () => get_server_status(serverAddress.value!),
@@ -420,9 +425,17 @@ const serverStatusQuery = useQuery({
 	refetchInterval: 30_000,
 	retry: false,
 })
-const statusOnline = computed(() => !serverStatusQuery.isError.value && (!!serverStatusQuery.data.value || !!javaServerPingData.value))
-const playersOnline = computed(() => serverStatusQuery.isError.value ? undefined : serverStatusQuery.data.value?.players?.online)
-const ping = computed(() => serverStatusQuery.isError.value ? undefined : serverStatusQuery.data.value?.ping)
+const statusOnline = computed(
+	() =>
+		!serverStatusQuery.isError.value &&
+		(!!serverStatusQuery.data.value || !!javaServerPingData.value),
+)
+const playersOnline = computed(() =>
+	serverStatusQuery.isError.value ? undefined : serverStatusQuery.data.value?.players?.online,
+)
+const ping = computed(() =>
+	serverStatusQuery.isError.value ? undefined : serverStatusQuery.data.value?.ping,
+)
 const loadingServerPing = computed(() => serverStatusQuery.isFetched.value || offline.value)
 
 async function refreshInstance() {
@@ -606,7 +619,13 @@ function handleSharedInstanceUpdateComplete(successful: boolean) {
 
 const startInstance = async (context: string, address?: string) => {
 	if (!instance.value || instance.value.quarantined) return
-	if (checkingSharedInstanceLaunch.value || loading.value || playing.value || instanceLaunch.isStarting(instance.value.id)) return
+	if (
+		checkingSharedInstanceLaunch.value ||
+		loading.value ||
+		playing.value ||
+		instanceLaunch.isStarting(instance.value.id)
+	)
+		return
 
 	const instanceId = instance.value.id
 	const isSharedInstanceMember = instance.value.shared_instance?.role === 'member'

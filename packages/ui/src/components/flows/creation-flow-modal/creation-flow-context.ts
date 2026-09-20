@@ -16,6 +16,7 @@ import { createContext, injectModrinthClient, injectNotificationManager } from '
 import type { ImportableLauncher } from '../../../providers/instance-import'
 import type { MultiStageModal, StageConfigInput } from '../../base'
 import type { ComboboxOption } from '../../base/Combobox.vue'
+import { installServerContent, prepareServerContent, searchServerContent } from './server-content'
 import { stageConfigs } from './stages'
 
 export type FlowType = 'world' | 'server-onboarding' | 'reset-server' | 'instance'
@@ -118,6 +119,8 @@ export interface ProjectSearchResult {
 }
 
 export interface ProjectInstallSelection {
+	versionId?: string
+	contentType?: 'mod' | 'plugin' | 'datapack'
 	projectId: string
 	title: string
 	iconUrl?: string | null
@@ -234,7 +237,8 @@ export interface CreationFlowContextValue {
 	setSetupType: (type: SetupType) => void
 	setImportMode: () => void
 	browseModpacks: () => void
-	selectProject: (projectId: string, projectType: string) => Promise<void>
+	selectProject: (projectId: string, projectType: string, versionId?: string) => Promise<void>
+	installServerContent: (serverId: string, worldId: string) => Promise<void>
 	finish: () => void
 	buildProperties: () => Archon.Content.v1.PropertiesFields
 	fetchLoaderMetadata: (loader?: string | null) => Promise<void>
@@ -298,10 +302,14 @@ export function createCreationFlowContext(
 	const onBack = options.onBack ?? null
 	const randomizeInstanceIcon = options.randomizeInstanceIcon ?? null
 	const customizeInstanceIcon = options.customizeInstanceIcon ?? null
-	const searchProjects = options.searchProjects!
+	const searchProjects =
+		options.searchProjects ??
+		((query: string, limit?: number) => searchServerContent(client, query, limit))
 	const prepareProjectInstall = options.prepareProjectInstall
 	const createProjectInstall = options.createProjectInstall
-	const getProjectVersions = options.getProjectVersions!
+	const getProjectVersions =
+		options.getProjectVersions ??
+		((projectId: string) => client.labrinth.versions_v3.getProjectVersions(projectId))
 	const getLoaderManifest = options.getLoaderManifest ?? null
 	const finishDisabled = options.finishDisabled ?? computed(() => false)
 	const finishDisabledTooltip = options.finishDisabledTooltip ?? computed(() => undefined)
@@ -387,7 +395,7 @@ export function createCreationFlowContext(
 		() =>
 			setupType.value === 'vanilla' ||
 			selectedLoader.value === 'vanilla' ||
-			projectInstall.value !== null,
+			(flowType === 'instance' && projectInstall.value !== null),
 	)
 
 	function toApiLoaderName(loader: string): string {
@@ -548,11 +556,13 @@ export function createCreationFlowContext(
 		emit.browseModpacks()
 	}
 
-	async function selectProject(projectId: string, projectType: string) {
-		if (!prepareProjectInstall) return
+	async function selectProject(projectId: string, projectType: string, versionId?: string) {
+		if (!prepareProjectInstall && flowType === 'instance') return
 
 		try {
-			const selection = await prepareProjectInstall(projectId, projectType)
+			const selection = prepareProjectInstall
+				? await prepareProjectInstall(projectId, projectType)
+				: await prepareServerContent(client, projectId, projectType, availableLoaders, versionId)
 			if (selection) {
 				setProjectInstall(selection)
 			} else {
@@ -694,6 +704,8 @@ export function createCreationFlowContext(
 		setImportMode,
 		browseModpacks,
 		selectProject,
+		installServerContent: (serverId, worldId) =>
+			installServerContent(client, contextValue, serverId, worldId),
 		finish,
 		buildProperties,
 		fetchLoaderMetadata,

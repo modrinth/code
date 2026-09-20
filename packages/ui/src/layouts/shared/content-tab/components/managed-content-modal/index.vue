@@ -30,7 +30,7 @@ import {
 	normalizeProjectType,
 } from '#ui/utils/common-messages'
 
-import { getClientWarningType } from '../../composables/content-filtering'
+import { getClientWarningType, getContentWarningType } from '../../composables/content-filtering'
 import type {
 	ContentCardProject,
 	ContentCardTableItem,
@@ -144,7 +144,7 @@ const messages = defineMessages({
 	},
 	enabledForDescription: {
 		id: 'content.enabled-for.description',
-		defaultMessage: 'Choose where this content is enabled. Turn both off to disable it.',
+		defaultMessage: 'Choose where this content is enabled.',
 	},
 	pleaseWait: {
 		id: 'content.enabled-for.please-wait',
@@ -206,6 +206,12 @@ const fuse = new Fuse<ContentItem>([], {
 
 watchSyncEffect(() => fuse.setCollection(items.value))
 
+function getItemWarningType(item: ContentItem) {
+	return props.enableEnabledFor
+		? getContentWarningType(item, props.showEnvironmentWarnings)
+		: getClientWarningType(item, props.showEnvironmentWarnings)
+}
+
 const filterOptions = computed(() => {
 	if (props.filterMode === 'status') {
 		return [
@@ -234,9 +240,7 @@ const filterOptions = computed(() => {
 			}
 		})
 
-	if (
-		items.value.some((item) => getClientWarningType(item, props.showEnvironmentWarnings) !== null)
-	) {
+	if (items.value.some((item) => getItemWarningType(item) !== null)) {
 		options.push({ id: 'warnings', label: formatMessage(messages.warnings) })
 	}
 
@@ -245,6 +249,13 @@ const filterOptions = computed(() => {
 	}
 
 	return options
+})
+
+watchSyncEffect(() => {
+	if (items.value.length === 0) return
+	const availableFilters = new Set(filterOptions.value.map((option) => option.id))
+	const validFilters = selectedFilters.value.filter((filter) => availableFilters.has(filter))
+	if (validFilters.length !== selectedFilters.value.length) selectedFilters.value = validFilters
 })
 
 const stats = computed(() => {
@@ -267,8 +278,7 @@ function matchesSelectedFilters(item: ContentItem) {
 		return false
 	if (hasEnabledFilter !== hasDisabledFilter && Boolean(item.enabled) !== hasEnabledFilter)
 		return false
-	if (hasWarningsFilter && getClientWarningType(item, props.showEnvironmentWarnings) === null)
-		return false
+	if (hasWarningsFilter && getItemWarningType(item) === null) return false
 	return true
 }
 

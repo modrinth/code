@@ -1,5 +1,5 @@
 <template>
-	<div class="mx-auto flex w-fit flex-col items-start gap-4 mt-16 max-w-[500px]">
+	<div class="mx-auto flex w-fit max-w-[500px] shrink-0 flex-col items-start gap-4">
 		<div class="flex flex-col gap-2 w-full">
 			<h2 class="m-0 text-2xl font-semibold text-contrast">
 				{{ formatMessage(messages.welcomeTitle) }}
@@ -65,7 +65,6 @@
 			type="server-onboarding"
 			:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"
 			:show-snapshot-toggle="true"
-			:search-projects="searchModpacks"
 			:get-project-versions="getProjectVersions"
 			:finish-disabled="!canSetup"
 			:finish-disabled-tooltip="!canSetup ? permissionDeniedMessage : undefined"
@@ -83,6 +82,7 @@ import {
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
+	useDismissServerIntro,
 	useServerPermissions,
 	useVIntl,
 } from '@modrinth/ui'
@@ -166,22 +166,15 @@ const messages = defineMessages({
 	},
 })
 
-async function searchModpacks(query: string, limit: number = 10) {
-	return client.labrinth.projects_v2.search({
-		query: query || undefined,
-		facets: [['project_type:modpack'], ['client_side:required'], ['server_side:required']],
-		limit,
-	})
-}
-
 async function getProjectVersions(projectId: string) {
 	const versions = await client.labrinth.versions_v3.getProjectVersions(projectId)
 	return versions.map((v) => ({ id: v.id }))
 }
-const { serverId, worldId, server } = injectModrinthServerContext()
+const { serverId, worldId } = injectModrinthServerContext()
 const route = useRoute()
 const router = useRouter()
 const queryClient = useQueryClient()
+const dismissServerIntro = useDismissServerIntro()
 
 const props = withDefaults(
 	defineProps<{
@@ -268,11 +261,14 @@ onMounted(async () => {
 
 async function finalizeSetup() {
 	modalRef.value?.hide()
-	server.value.flows = { intro: false }
-	client.archon.servers_v1.endIntro(serverId).then(() => {
-		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
-	})
+	await dismissServerIntro.mutateAsync(serverId)
 	await router.push(`/hosting/manage/${serverId}/`)
+}
+
+function markInstalling() {
+	queryClient.setQueryData<Archon.Servers.v0.Server>(['servers', 'detail', serverId], (server) =>
+		server ? { ...server, status: 'installing' } : server,
+	)
 }
 
 /** Map UI loader names to API Modloader values */
@@ -284,6 +280,22 @@ function toApiLoader(loader: string): Archon.Content.v1.Modloader {
 const onCreate = async (config: CreationFlowContextValue) => {
 	if (!canSetup.value) {
 		config.loading.value = false
+		return
+	}
+
+	if (config.projectInstall.value) {
+		try {
+			await config.installServerContent(serverId, worldId.value!)
+			await finalizeSetup()
+		} catch (error) {
+			addNotification({
+				title: formatMessage(messages.installationFailedTitle),
+				text:
+					error instanceof Error ? error.message : formatMessage(messages.installationFailedText),
+				type: 'error',
+			})
+			config.loading.value = false
+		}
 		return
 	}
 
@@ -308,7 +320,7 @@ const onCreate = async (config: CreationFlowContextValue) => {
 				},
 			)
 			await handle.promise
-			server.value.status = 'installing'
+			markInstalling()
 			await finalizeSetup()
 		} catch {
 			addNotification({
@@ -351,7 +363,7 @@ const onCreate = async (config: CreationFlowContextValue) => {
 
 	try {
 		await client.archon.content_v1.installContent(serverId, worldId.value!, request)
-		server.value.status = 'installing'
+		markInstalling()
 		await finalizeSetup()
 	} catch {
 		addNotification({

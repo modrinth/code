@@ -5,8 +5,8 @@ import {
 	ModrinthIcon,
 	SettingsIcon,
 	ShieldIcon,
-	UsersIcon,
 	TextQuoteIcon,
+	UsersIcon,
 	VersionIcon,
 	WrenchIcon,
 } from '@modrinth/assets'

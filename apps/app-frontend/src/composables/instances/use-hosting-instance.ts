@@ -27,9 +27,10 @@ export function hostingInstanceMetadata(
 		serverId: server.id,
 		worldId,
 		address,
-		region: location.status === 'assigned' && location.location_metadata.region_should_be_user_displayed
-			? location.location_metadata.region
-			: undefined,
+		region:
+			location.status === 'assigned' && location.location_metadata.region_should_be_user_displayed
+				? location.location_metadata.region
+				: undefined,
 	}
 }
 
@@ -48,7 +49,13 @@ export function useHostingInstance(instance: Ref<GameInstance | undefined>, offl
 	})
 	const serverQuery = useQuery({
 		queryKey: computed(() => ['instances', instance.value?.id, 'hosting', auth.user.value?.id]),
-		enabled: computed(() => !!instance.value?.shared_instance && !offline.value && !!auth.user.value?.id && auth.user.value.id === instance.value.shared_instance.linked_user_id),
+		enabled: computed(
+			() =>
+				!!instance.value?.shared_instance &&
+				!offline.value &&
+				!!auth.user.value?.id &&
+				auth.user.value.id === instance.value.shared_instance.linked_user_id,
+		),
 		queryFn: async () => {
 			const current = instance.value!
 			const sharedId = current.shared_instance!.id
@@ -71,16 +78,23 @@ export function useHostingInstance(instance: Ref<GameInstance | undefined>, offl
 	watch(serverQuery.data, (result) => {
 		if (result) cache.value[result.instanceId] = result.metadata
 	})
-	const isHostingInstance = computed(() => !!saved.value || !!instance.value?.shared_instance?.server_manager_name)
+	const isHostingInstance = computed(
+		() => !!saved.value || !!instance.value?.shared_instance?.server_manager_name,
+	)
 	const worldsQuery = useQuery({
 		queryKey: computed(() => ['instances', instance.value?.id, 'hosting-worlds']),
-		enabled: computed(() => isHostingInstance.value && !saved.value && instance.value?.install_stage === 'installed'),
+		enabled: computed(
+			() =>
+				isHostingInstance.value && !saved.value && instance.value?.install_stage === 'installed',
+		),
 		queryFn: () => get_instance_worlds(instance.value!.id),
 	})
 	const address = computed(() => {
 		if (saved.value?.address) return saved.value.address
-		const world = worldsQuery.data.value?.find((world) =>
-			world.type === 'server' && world.name === instance.value?.shared_instance?.server_manager_name,
+		const world = worldsQuery.data.value?.find(
+			(world) =>
+				world.type === 'server' &&
+				world.name === instance.value?.shared_instance?.server_manager_name,
 		)
 		return world?.type === 'server' ? world.address : undefined
 	})

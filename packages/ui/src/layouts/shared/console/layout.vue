@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="flex flex-1 flex-col gap-4"
+		class="flex flex-1 flex-col gap-2"
 		:class="[
 			minLogHeight && !isFullscreen ? 'min-h-min' : 'min-h-0',
 			isFullscreen ? `fixed inset-0 z-[15] bg-surface-1 p-6 py-8 ${isApp ? 'pt-12' : ''}` : '',
@@ -8,7 +8,7 @@
 	>
 		<CollapsibleAdmonition
 			v-if="ctx.crashAnalysis?.value && !isFullscreen"
-			class="shrink-0"
+			class="mb-2 shrink-0"
 			type="critical"
 			:header="crashHeader"
 			:items="crashItems"

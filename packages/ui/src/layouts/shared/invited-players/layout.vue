@@ -10,7 +10,32 @@
 					size="medium"
 					clearable
 				/>
-				<slot name="toolbar-actions" />
+				<template v-if="canManage">
+					<Button
+						v-if="showPushUpdate"
+						type="outlined"
+						size="lg"
+						class="shrink-0 !border"
+						:disabled="pushUpdateDisabled || pushUpdatePending"
+						@click="emit('push-update', $event)"
+					>
+						<SpinnerIcon v-if="pushUpdatePending" class="animate-spin" aria-hidden="true" />
+						<UploadIcon v-else aria-hidden="true" />
+						{{ formatMessage(messages.pushUpdate) }}
+					</Button>
+					<Button
+						type="colored"
+						color="brand"
+						size="lg"
+						class="shrink-0"
+						:disabled="inviteDisabled || invitePending"
+						@click="emit('invite', $event)"
+					>
+						<SpinnerIcon v-if="invitePending" class="animate-spin" aria-hidden="true" />
+						<UserPlusIcon v-else aria-hidden="true" />
+						{{ inviteLabel ?? formatMessage(messages.invitePlayers) }}
+					</Button>
+				</template>
 			</div>
 			<div v-if="hasMultipleMethods" class="flex flex-wrap items-center gap-1.5">
 				<FilterIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
@@ -97,8 +122,8 @@
 			<template #cell-actions="{ row }">
 				<div v-if="canManage" class="flex items-center justify-end">
 					<IconButton
-						:disabled="disabled"
 						v-tooltip="'Revoke access'"
+						:disabled="disabled"
 						type="quiet"
 						:label="`Revoke access for ${row.username}`"
 						class="text-secondary hover:!filter-none hover:text-red focus-visible:!filter-none"
@@ -113,12 +138,20 @@
 </template>
 
 <script setup lang="ts">
-import { FilterIcon, LinkIcon, SearchIcon, UserPlusIcon, XIcon } from '@modrinth/assets'
+import {
+	FilterIcon,
+	LinkIcon,
+	SearchIcon,
+	SpinnerIcon,
+	UploadIcon,
+	UserPlusIcon,
+	XIcon,
+} from '@modrinth/assets'
 import { computed, ref, toRef } from 'vue'
 
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
-import { IconButton } from '#ui/components/base/buttons'
+import { Button, IconButton } from '#ui/components/base/buttons'
 import Input from '#ui/components/base/inputs/Input.vue'
 import Table, { type TableColumn } from '#ui/components/base/Table.vue'
 import { useFormatDateTime, useRelativeTime } from '#ui/composables'
@@ -130,13 +163,26 @@ import { invitedPlayerMethodLabels as methodLabels, type InvitedPlayerRow } from
 
 type InvitedPlayerColumn = 'username' | 'lastPlayed' | 'joined' | 'method' | 'actions'
 
-const props = defineProps<{
-	rows: InvitedPlayerRow[]
-	canManage?: boolean
-	disabled?: boolean
-}>()
+const props = withDefaults(
+	defineProps<{
+		rows: InvitedPlayerRow[]
+		canManage?: boolean
+		disabled?: boolean
+		showPushUpdate?: boolean
+		pushUpdateDisabled?: boolean
+		pushUpdatePending?: boolean
+		inviteLabel?: string
+		inviteDisabled?: boolean
+		invitePending?: boolean
+	}>(),
+	{
+		showPushUpdate: true,
+	},
+)
 const emit = defineEmits<{
 	remove: [row: InvitedPlayerRow]
+	'push-update': [event: MouseEvent]
+	invite: [event: MouseEvent]
 }>()
 const usernameRefs = ref<Record<string, HTMLElement | null>>({})
 const { formatMessage } = useVIntl()
@@ -210,6 +256,14 @@ function filterClass(active: boolean) {
 }
 
 const messages = defineMessages({
+	pushUpdate: {
+		id: 'app.instance.admonitions.shared-instance.publish-button',
+		defaultMessage: 'Push update',
+	},
+	invitePlayers: {
+		id: 'servers.play.card.app.invite-button',
+		defaultMessage: 'Invite players',
+	},
 	noUsersJoined: {
 		id: 'app.instance.share.members.empty',
 		defaultMessage: 'No users have joined yet',
