@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 
 use futures::{Stream, StreamExt, stream};
+use sqlx::Connection;
 use uuid::{Uuid, fmt::Hyphenated};
 
 use super::MinecraftSkinVariant;
@@ -55,7 +56,8 @@ impl CustomMinecraftSkin {
         let minecraft_user_id = minecraft_user_id.as_hyphenated();
         let cape_id = cape_id.map(|id| id.hyphenated());
 
-        let mut transaction = db.begin().await?;
+        let mut connection = db.acquire().await?;
+        let mut transaction = connection.begin_with("BEGIN IMMEDIATE").await?;
 
         let existing_order = sqlx::query_scalar!(
             "SELECT display_order FROM custom_minecraft_skins WHERE minecraft_user_uuid = ? AND texture_key = ?",
@@ -228,7 +230,8 @@ impl CustomMinecraftSkin {
         db: impl sqlx::Acquire<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<()> {
         let minecraft_user_id = minecraft_user_id.as_hyphenated();
-        let mut transaction = db.begin().await?;
+        let mut connection = db.acquire().await?;
+        let mut transaction = connection.begin_with("BEGIN IMMEDIATE").await?;
 
         let existing_rows = sqlx::query!(
             "SELECT texture_key FROM custom_minecraft_skins \

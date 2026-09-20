@@ -111,7 +111,7 @@ async fn record_current_app_version(pool: &Pool<Sqlite>) -> crate::Result<()> {
 /// kept around for a little while to allow users to recover from accidental
 /// deletions.
 async fn stale_data_cleanup(pool: &Pool<Sqlite>) -> crate::Result<()> {
-    let mut tx = pool.begin().await?;
+    let mut tx = pool.begin_with("BEGIN IMMEDIATE").await?;
 
     let has_skin_tables = sqlx::query!(
 		"SELECT COUNT(*) AS \"count!: i64\" FROM sqlite_master WHERE type = 'table' AND name IN ('custom_minecraft_skins', 'minecraft_users')",

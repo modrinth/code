@@ -368,7 +368,7 @@ pub(super) async fn normalize_legacy_content_files(
     if renames.is_empty() {
         return Ok(false);
     }
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
     for (source, canonical, file_name, enabled) in renames {
         if let Some(file) = sqlite::content_rows::rename_instance_file(
             &instance.id,

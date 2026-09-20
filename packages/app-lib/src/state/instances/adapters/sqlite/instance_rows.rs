@@ -1117,7 +1117,7 @@ pub(crate) async fn set_instance_group_order(
     group_ids: &[String],
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-    let mut tx = pool.begin().await?;
+    let mut tx = pool.begin_with("BEGIN IMMEDIATE").await?;
     let existing_group_ids = sqlx::query_scalar::<_, String>(
         "
 		SELECT id
