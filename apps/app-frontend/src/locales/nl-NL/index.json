@@ -761,12 +761,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Verkeerd account"
   },
-  "app.instance.share.members.empty": {
-    "message": "Nog geen gebruikers zijn lid geworden"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Geen gebruikers voldoen aan je filters."
-  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Ze zullen geen updates meer ontvangen voor deze gedeelde instantie"
   },
@@ -3197,9 +3191,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Gekoppelde gedeelde instantie"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "Instantie terugtrekken"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Gedeelde instantie ontkoppelen"
   },
@@ -3209,14 +3200,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Ontkoppelen..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Gedeelde instantie terugtrekken"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Verwijder deze gedeelde instantie uit Modrinth en stuur geen updates meer naar gebruikers ervan. Je lokale instantie merkt hier geen gevolgen van."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Terugtrekken..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Dit heeft alleen gevolgen voor je lokale instantie. Je geïnstalleerde inhoud blijft op dit apparaat staan, en de gedeelde instantie en andere gebruikers ervan ondervinden hier geen hinder van."
@@ -3229,12 +3214,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Hiermee wordt de gedeelde instantie van de servers van Modrinth verwijderd. Gebruikers die deze instantie in de Modrinth-app gebruiken, ontvangen geen updates meer, maar je lokale instantie en de inhoud daarvan blijven op dit apparaat staan."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Gedeelde instantie terugtrekken"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Gedeelde instantie terugtrekken"
   },
   "instance.action.create-shortcut": {
     "message": "Snelkoppeling maken"
@@ -3541,45 +3520,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Bronpakket"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Acties"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Uitnodigingslink"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Iedereen die zo'n uitnodigingslink heeft, kan meedoen zolang deze actief is."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "Er zijn geen actieve uitnodigingen."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Vervalt"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Uitnodiging intrekken"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "Uitnodiging {code} intrekken"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Actieve uitnodigingen"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Keren gebruikt"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "De uitnodigingslink <monospace>{code}</monospace> zal gelijk niet meer werken. Mensen die zich al hebben aangemeld, behouden hun toegang."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Deze actie kan niet ongedaan worden gemaakt"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Uitnodiging intrekken"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Uitnodiging intrekken"
   },
   "instance.settings.tabs.behavior.description": {
     "message": "Kies welke tabbladen worden weergegeven op deze instantie."
@@ -3892,9 +3832,6 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Je toegang tot de gedeelde instantie is ingetrokken. Deze instantie is nog steeds beschikbaar, maar is niet langer gekoppeld en ontvangt geen updates meer."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "De hoofdinstantie is verwijderd. Deze instantie is nog steeds beschikbaar, maar is niet meer gekoppeld en ontvangt geen updates meer."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Deze gedeelde instantie is vergrendeld door het inhoudsmoderatieteam. De instantie ontvangt geen updates meer van de hoofdinstantie en je kunt er niet meer in spelen."

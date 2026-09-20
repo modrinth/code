@@ -1,14 +1,26 @@
 <template>
-	<Accordion overflow-visible button-class="w-full bg-transparent m-0 p-0 border-none" @on-open="forceCheck">
+	<Accordion
+		overflow-visible
+		button-class="w-full bg-transparent m-0 p-0 border-none"
+		@on-open="forceCheck"
+	>
 		<template #title>
 			<FileCogIcon class="size-4 shrink-0" />
 			<span class="text-lg font-semibold text-contrast">{{ formatMessage(messages.title) }}</span>
 		</template>
 		<div class="flex min-w-0 flex-col gap-3 pt-4">
-			<Admonition v-if="directory.isError.value" type="critical" :header="formatMessage(messages.error)">
+			<Admonition
+				v-if="directory.isError.value"
+				type="critical"
+				:header="formatMessage(messages.error)"
+			>
 				<Button @click="directory.refetch()">{{ formatMessage(messages.retry) }}</Button>
 			</Admonition>
-			<div v-show="directory.data.value" class="relative overflow-hidden rounded-[20px]" :inert="disabled">
+			<div
+				v-show="directory.data.value"
+				class="relative overflow-hidden rounded-[20px]"
+				:inert="disabled"
+			>
 				<div ref="container" class="max-h-[292px] overflow-y-auto">
 					<FileTreeSelect
 						v-model="includedPaths"
@@ -58,13 +70,35 @@ const includedPaths = ref<string[]>([])
 const excludedPaths = ref<string[]>([])
 const container = ref<HTMLElement | null>(null)
 const { showTopFade, showBottomFade, forceCheck } = useScrollIndicator(container)
-const extensions = new Set(['json', 'json5', 'jsonc', 'yml', 'yaml', 'css', 'toml', 'txt', 'ini', 'cfg', 'conf', 'properties', 'xml', 'nbt'])
+const extensions = new Set([
+	'json',
+	'json5',
+	'jsonc',
+	'yml',
+	'yaml',
+	'css',
+	'toml',
+	'txt',
+	'ini',
+	'cfg',
+	'conf',
+	'properties',
+	'xml',
+	'nbt',
+])
 
 function directoryOptions(path: string) {
 	const worldId = props.worldId
 	const directoryPath = path ? `/config/${path}` : '/config'
 	return {
-		queryKey: ['servers', 'share-config-files', props.serverId, worldId, auth.user.value?.id, directoryPath],
+		queryKey: [
+			'servers',
+			'share-config-files',
+			props.serverId,
+			worldId,
+			auth.user.value?.id,
+			directoryPath,
+		],
 		queryFn: async () => {
 			const items: FileTreeSelectItem[] = []
 			let pages = 1
@@ -72,9 +106,14 @@ function directoryOptions(path: string) {
 				const result = await client.kyros.files_v0.listDirectory(directoryPath, page, 2000)
 				pages = result.total
 				for (const item of result.items) {
-					if (item.name.startsWith('.') || /[/\\:]/.test(item.name) || /[. ]$/.test(item.name)) continue
+					if (item.name.startsWith('.') || /[/\\:]/.test(item.name) || /[. ]$/.test(item.name))
+						continue
 					if (item.type !== 'directory' && item.type !== 'file') continue
-					if (item.type === 'file' && !extensions.has(item.name.split('.').pop()?.toLowerCase() ?? '')) continue
+					if (
+						item.type === 'file' &&
+						!extensions.has(item.name.split('.').pop()?.toLowerCase() ?? '')
+					)
+						continue
 					items.push({
 						path: path ? `${path}/${item.name}` : item.name,
 						type: item.type,
@@ -115,11 +154,16 @@ async function resolvePaths() {
 		return selected
 	}
 	async function visit(path: string) {
-		if (props.worldId !== worldId || auth.user.value?.id !== userId) throw new Error(formatMessage(messages.contextChanged))
+		if (props.worldId !== worldId || auth.user.value?.id !== userId)
+			throw new Error(formatMessage(messages.contextChanged))
 		const items = await queryClient.fetchQuery(directoryOptions(path))
 		for (const item of items) {
 			if (item.type === 'directory') {
-				if (isSelected(item.path) || [...included].some((included) => included.startsWith(`${item.path}/`))) await visit(item.path)
+				if (
+					isSelected(item.path) ||
+					[...included].some((included) => included.startsWith(`${item.path}/`))
+				)
+					await visit(item.path)
 			} else if (isSelected(item.path)) {
 				const size = item.size ?? 0
 				totalSize += size
@@ -135,11 +179,21 @@ async function resolvePaths() {
 }
 
 const messages = defineMessages({
-	title: { id: 'instance.shared-instance.publish-review.config-title-v2', defaultMessage: 'Select config files' },
+	title: {
+		id: 'instance.shared-instance.publish-review.config-title-v2',
+		defaultMessage: 'Select config files',
+	},
 	error: { id: 'servers.play.config-files.error', defaultMessage: 'Could not load config files' },
 	retry: { id: 'servers.play.retry', defaultMessage: 'Retry' },
-	selectionTooLarge: { id: 'servers.play.config-files.selection-too-large', defaultMessage: 'Select up to 4,096 config files, with a maximum of 16 MiB per file and 128 MiB in total.' },
-	contextChanged: { id: 'servers.play.config-files.context-changed', defaultMessage: 'The world or account changed. Open Push update again.' },
+	selectionTooLarge: {
+		id: 'servers.play.config-files.selection-too-large',
+		defaultMessage:
+			'Select up to 4,096 config files, with a maximum of 16 MiB per file and 128 MiB in total.',
+	},
+	contextChanged: {
+		id: 'servers.play.config-files.context-changed',
+		defaultMessage: 'The world or account changed. Open Push update again.',
+	},
 })
 
 defineExpose({ resolvePaths })

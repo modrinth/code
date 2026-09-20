@@ -17,6 +17,7 @@ export * from './popup-notifications'
 export * from './project-page'
 export * from './project-page-new'
 export * from './server-context'
+export * from './server-play'
 export * from './server-settings-modal'
 export * from './tags'
 export {
@@ -28,4 +29,3 @@ export {
 export * from './user-country'
 export * from './user-preferences'
 export * from './web-notifications'
-export * from './server-play'

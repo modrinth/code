@@ -45,7 +45,10 @@ const messages = defineMessages({
 		id: 'instance.settings.sharing.active-invites.description',
 		defaultMessage: 'Anyone with one of these invite links can join while it remains active.',
 	},
-	inviteLink: { id: 'instance.settings.sharing.active-invites.code', defaultMessage: 'Invite link' },
+	inviteLink: {
+		id: 'instance.settings.sharing.active-invites.code',
+		defaultMessage: 'Invite link',
+	},
 	uses: { id: 'instance.settings.sharing.active-invites.uses', defaultMessage: 'Uses' },
 	expires: { id: 'instance.settings.sharing.active-invites.expires', defaultMessage: 'Expires' },
 	actions: { id: 'instance.settings.sharing.active-invites.actions', defaultMessage: 'Actions' },
@@ -58,7 +61,10 @@ const messages = defineMessages({
 		defaultMessage: 'Failed to load active invites',
 	},
 	retry: { id: 'server.settings.sharing.retry', defaultMessage: 'Retry' },
-	revoke: { id: 'instance.settings.sharing.active-invites.revoke', defaultMessage: 'Revoke invite' },
+	revoke: {
+		id: 'instance.settings.sharing.active-invites.revoke',
+		defaultMessage: 'Revoke invite',
+	},
 	revokeWithCode: {
 		id: 'instance.settings.sharing.active-invites.revoke-with-code',
 		defaultMessage: 'Revoke invite {code}',
@@ -80,7 +86,11 @@ const columns = computed<TableColumn<'id' | 'uses' | 'expiration' | 'actions'>[]
 			</h3>
 			<p class="m-0 text-secondary">{{ formatMessage(messages.activeInvitesDescription) }}</p>
 		</div>
-		<Admonition v-if="ctx.error.value" type="critical" :header="formatMessage(messages.invitesError)">
+		<Admonition
+			v-if="ctx.error.value"
+			type="critical"
+			:header="formatMessage(messages.invitesError)"
+		>
 			<Button @click="refresh">{{ formatMessage(messages.retry) }}</Button>
 		</Admonition>
 		<Table v-else :columns="columns" :data="ctx.invites.value" row-key="id" table-min-width="36rem">

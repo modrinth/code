@@ -5495,15 +5495,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "他们现在可以在这里找到！"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "不再显示"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "你的服务器设置已移动"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "共享服务器"
   },
@@ -6981,4 +6972,3 @@
     "defaultMessage": "类型"
   }
 }
-

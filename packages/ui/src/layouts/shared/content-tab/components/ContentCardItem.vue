@@ -152,6 +152,7 @@ const hasSwitchVersionListener = computed(
 )
 
 const versionNumberRef = ref<HTMLElement | null>(null)
+const compactVersionNumberRef = ref<HTMLElement | null>(null)
 const fileNameRef = ref<HTMLElement | null>(null)
 
 const isDisabled = computed(() => props.disabled || props.installing)
@@ -191,7 +192,8 @@ const installTooltip = computed(() => {
 		class="flex items-center"
 		:class="{
 			'h-[74px] gap-4 px-3': !inline && !enabledFor,
-			'h-[72px] gap-2 px-3': !inline && enabledFor,
+			'h-[152px] flex-wrap gap-x-2 gap-y-0 px-3 py-3 @[450px]:h-[112px] @[600px]:h-[72px] @[600px]:grid @[600px]:grid-cols-[var(--content-columns)] @[600px]:py-0 @[900px]:grid-cols-[var(--content-columns-wide)]':
+				!inline && enabledFor,
 			'gap-3': inline,
 			'justify-between': !enabledFor,
 			'opacity-50 grayscale': disabled && !installing,
@@ -202,10 +204,10 @@ const installTooltip = computed(() => {
 		<div
 			class="flex min-w-0 items-center gap-4"
 			:class="
-				hideActions || !showVersion
-					? 'flex-1'
-					: enabledFor
-						? 'flex-1 @[800px]:w-[340px] @[800px]:shrink-0 @[800px]:flex-none'
+				enabledFor
+					? 'w-full flex-none @[600px]:w-auto @[600px]:flex-[1.2]'
+					: hideActions || !showVersion
+						? 'flex-1'
 						: 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none'
 			"
 		>
@@ -327,7 +329,10 @@ const installTooltip = computed(() => {
 							<span class="text-sm leading-5">{{ formatMessage(messages.uploaded) }}</span>
 						</span>
 						<template v-if="showVersion && version && !external">
-							<BulletDivider class="shrink-0 @[800px]:hidden" />
+							<BulletDivider
+								class="shrink-0"
+								:class="enabledFor ? '@[900px]:hidden' : '@[800px]:hidden'"
+							/>
 							<AutoLink
 								:target="
 									typeof versionLink === 'string' && versionLink.startsWith('http')
@@ -335,10 +340,19 @@ const installTooltip = computed(() => {
 										: undefined
 								"
 								:to="versionLink"
-								class="truncate text-sm leading-5 text-secondary !decoration-secondary @[800px]:hidden"
-								:class="{ 'hover:underline': versionLink }"
+								class="min-w-0 text-sm leading-5 text-secondary !decoration-secondary"
+								:class="[
+									enabledFor ? '@[900px]:hidden' : '@[800px]:hidden',
+									{ 'hover:underline': versionLink },
+								]"
 							>
-								{{ version.version_number }}
+								<span
+									ref="compactVersionNumberRef"
+									v-tooltip="truncatedTooltip(compactVersionNumberRef, version.version_number)"
+									class="block truncate"
+								>
+									{{ version.version_number }}
+								</span>
 							</AutoLink>
 						</template>
 					</div>
@@ -346,7 +360,10 @@ const installTooltip = computed(() => {
 			</div>
 		</div>
 
-		<div v-if="enabledFor" class="hidden w-[200px] shrink-0 @[800px]:block">
+		<div
+			v-if="enabledFor"
+			class="w-full shrink-0 @[450px]:w-[var(--enabled-for-column-width,max-content)]"
+		>
 			<ContentEnabledFor
 				:model-value="enabledFor"
 				:disabled="isDisabled"
@@ -357,9 +374,9 @@ const installTooltip = computed(() => {
 
 		<div
 			v-if="showVersion"
-			class="hidden flex-col gap-0.5 transition-[filter,opacity] duration-200 @[800px]:flex"
+			class="hidden min-w-0 flex-1 flex-col gap-0.5 transition-[filter,opacity] duration-200"
 			:class="[
-				hideActions ? 'flex-1' : enabledFor ? 'min-w-0 flex-1' : 'flex-1 min-w-0',
+				enabledFor ? '@[900px]:flex' : '@[800px]:flex',
 				!enabledFor && enabled === false && !disabled ? 'grayscale opacity-50' : '',
 			]"
 		>
@@ -376,7 +393,7 @@ const installTooltip = computed(() => {
 					<span ref="versionNumberRef" class="truncate">{{
 						version.version_number.slice(0, Math.ceil(version.version_number.length / 2))
 					}}</span
-					><span class="shrink-0">{{
+					><span class="min-w-0 max-w-[50%] truncate">{{
 						version.version_number.slice(Math.ceil(version.version_number.length / 2))
 					}}</span>
 				</AutoLink>
@@ -387,7 +404,7 @@ const installTooltip = computed(() => {
 					<span ref="fileNameRef" class="truncate">{{
 						version.file_name.slice(0, Math.ceil(version.file_name.length / 2))
 					}}</span
-					><span class="shrink-0">{{
+					><span class="min-w-0 max-w-[50%] truncate">{{
 						version.file_name.slice(Math.ceil(version.file_name.length / 2))
 					}}</span>
 				</span>
@@ -397,7 +414,7 @@ const installTooltip = computed(() => {
 		<div
 			v-if="!hideActions"
 			class="flex shrink-0 items-center justify-end gap-2 transition-colors duration-200"
-			:class="enabledFor ? 'w-[168px]' : 'min-w-[160px]'"
+			:class="enabledFor ? 'ml-auto w-[168px]' : 'min-w-[160px]'"
 		>
 			<slot name="additionalButtonsLeft" />
 			<span

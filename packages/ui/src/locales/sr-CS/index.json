@@ -5252,15 +5252,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth hostiranje"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Sada se mogu naći ovde!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Ne prikazuj ponovo"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Podešavanja tvojeg servera su pomerena"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Podeleni serveri"
   },

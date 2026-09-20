@@ -34,7 +34,7 @@
 						aria-hidden="true"
 						class="pointer-events-none invisible col-start-1 row-start-1 whitespace-pre font-medium"
 						:class="[size === 'small' ? 'text-sm' : 'text-base', inputClass, controlClass]"
-					>{{ hasValue ? model : placeholder || ' ' }}</span
+						>{{ hasValue ? model : placeholder || ' ' }}</span
 					>
 					<input
 						v-bind="mergeProps(controlAttrs(), inputAttrs ?? {})"

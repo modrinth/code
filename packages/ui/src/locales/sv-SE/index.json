@@ -5156,15 +5156,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "De kan nu hittas här!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Visa inte igen"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Dina server-inställningar har flyttats"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Delade servrar"
   },

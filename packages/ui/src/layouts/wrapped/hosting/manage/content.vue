@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { type Archon, type Labrinth, ModrinthApiError } from '@modrinth/api-client'
-import { ClipboardCopyIcon, LockIcon, LockOpenIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -12,6 +12,7 @@ import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-up
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { waitForServerContextRuntimeReady } from '#ui/composables/server-context-runtime'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { useServerPreferences } from '#ui/composables/server-preferences'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -29,6 +30,7 @@ import {
 	resolveServerAddonInstallPlans,
 } from '../../../shared/browse-tab/composables/install-logic'
 import ManagedContentModal from '../../../shared/content-tab/components/managed-content-modal/index.vue'
+import ConfirmEnvironmentModal from '../../../shared/content-tab/components/modals/ConfirmEnvironmentModal.vue'
 import ConfirmModpackUpdateModal from '../../../shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmUnlinkModal from '../../../shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
 import ContentUpdaterModal from '../../../shared/content-tab/components/modals/content-updater-modal/index.vue'
@@ -56,6 +58,14 @@ const props = withDefaults(
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	resourcePackLock: {
+		id: 'hosting.content.enabled-for.resource-pack-lock',
+		defaultMessage: 'Resource packs can only be enabled for players.',
+	},
+	shaderLock: {
+		id: 'hosting.content.enabled-for.shader-lock',
+		defaultMessage: 'Shaders can only be enabled for players.',
+	},
 	modpackContent: {
 		id: 'hosting.content.managed-content.modpack-header',
 		defaultMessage: 'Modpack content',
@@ -71,10 +81,6 @@ const messages = defineMessages({
 	failedToSetEnabledFor: {
 		id: 'hosting.content.failed-to-set-enabled-for',
 		defaultMessage: 'Failed to change where {name} is enabled',
-	},
-	failedToSetSideLock: {
-		id: 'hosting.content.failed-to-set-side-lock',
-		defaultMessage: 'Failed to change the environment lock for {name}',
 	},
 	failedToUpload: {
 		id: 'hosting.content.failed-to-upload',
@@ -110,16 +116,7 @@ const messages = defineMessages({
 	},
 	unknownEnvironment: {
 		id: 'hosting.content.enabled-for.unknown-environment',
-		defaultMessage:
-			"We couldn't tell where this content should be enabled. Review the Server and Player choices.",
-	},
-	lockEnvironment: {
-		id: 'hosting.content.enabled-for.lock-environment',
-		defaultMessage: 'Lock',
-	},
-	unlockEnvironment: {
-		id: 'hosting.content.enabled-for.unlock-environment',
-		defaultMessage: 'Unlock',
+		defaultMessage: "We couldn't tell where this content should be enabled.",
 	},
 })
 
@@ -144,6 +141,8 @@ const route = useRoute()
 const router = useRouter()
 const queryClient = useQueryClient()
 const serverId = route.params.id as string
+const userPreferences = useServerPreferences(serverId)
+const environmentWarningModal = ref<InstanceType<typeof ConfirmEnvironmentModal>>()
 
 const type = computed(() => {
 	const loader = server.value?.loader?.toLowerCase()
@@ -331,34 +330,23 @@ function hasDetectedEnvironment(addon: Archon.Content.v1.Addon) {
 	return environment !== undefined && environment !== 'unknown'
 }
 
-function getEnvironmentLockedSides(addon: Archon.Content.v1.Addon): ContentSide[] {
-	switch (getAddonEnvironment(addon)) {
-		case 'client_and_server':
-		case 'client_only':
-		case 'singleplayer_only':
-		case 'server_only':
-		case 'dedicated_server_only':
-			return ['server', 'player']
-		case 'client_only_server_optional':
-			return ['player']
-		case 'server_only_client_optional':
-			return ['server']
-		default:
-			return []
-	}
+function isPlayerOnlyContent(addon: Archon.Content.v1.Addon) {
+	return addon.kind === 'resourcepack' || addon.kind === 'shader'
 }
 
-function getLockedSides(addon: Archon.Content.v1.Addon): ContentSide[] {
-	return addon.side_toggle_unlocked ? [] : getEnvironmentLockedSides(addon)
-}
-
-function hasEnvironmentLock(addon: Archon.Content.v1.Addon) {
-	return getEnvironmentLockedSides(addon).length > 0
+function isIncompatibleEnvironment(addon: Archon.Content.v1.Addon, side: ContentSide) {
+	const environment = getAddonEnvironment(addon)
+	return side === 'server'
+		? environment === 'client_only' || environment === 'singleplayer_only'
+		: environment === 'server_only' || environment === 'dedicated_server_only'
 }
 
 function getEnabledForWarning(addon: Archon.Content.v1.Addon) {
-	if (addon.pack_client_retained) return formatMessage(commonMessages.clientRetainedWarning)
-	if (addon.pack_client_depends) return formatMessage(commonMessages.clientDependsWarning)
+	if (isPlayerOnlyContent(addon)) return null
+	if (!addon.disabled_server) {
+		if (addon.pack_client_retained) return formatMessage(commonMessages.clientRetainedWarning)
+		if (addon.pack_client_depends) return formatMessage(commonMessages.clientDependsWarning)
+	}
 	if (!hasDetectedEnvironment(addon)) return formatMessage(messages.unknownEnvironment)
 	return null
 }
@@ -681,6 +669,15 @@ type SetEnabledForVariables = {
 
 const setEnabledForMutation = useMutation({
 	mutationFn: async ({ addon, sides, enabled }: SetEnabledForVariables) => {
+		const targetWorldId = worldId.value!
+		if (isPlayerOnlyContent(addon) && sides.includes('server')) return
+		if (!isPlayerOnlyContent(addon) && !addon.side_toggle_unlocked) {
+			await client.archon.content_v1.setAddonSideToggleLocked(serverId, targetWorldId, {
+				filename: addon.filename,
+				kind: addon.kind,
+				locked: false,
+			})
+		}
 		const request: Archon.Content.v1.SetAddonEnabledRequest = {
 			filename: addon.filename,
 			kind: addon.kind,
@@ -689,8 +686,8 @@ const setEnabledForMutation = useMutation({
 		await Promise.all(
 			sides.map((side) =>
 				side === 'server'
-					? client.archon.content_v1.setAddonEnabledServer(serverId, worldId.value!, request)
-					: client.archon.content_v1.setAddonEnabledPlayer(serverId, worldId.value!, request),
+					? client.archon.content_v1.setAddonEnabledServer(serverId, targetWorldId, request)
+					: client.archon.content_v1.setAddonEnabledPlayer(serverId, targetWorldId, request),
 			),
 		)
 	},
@@ -733,53 +730,23 @@ const setEnabledForMutation = useMutation({
 	},
 })
 
-const setSideLockMutation = useMutation({
-	mutationFn: async ({ addon, locked }: { addon: Archon.Content.v1.Addon; locked: boolean }) => {
-		await client.archon.content_v1.setAddonSideToggleLocked(serverId, worldId.value!, {
-			filename: addon.filename,
-			kind: addon.kind,
-			locked,
-		})
-	},
-	onMutate: async ({ addon, locked }) => {
-		const targetQueryKey = getAddonQueryKey(addon)
-		await queryClient.cancelQueries({ queryKey: targetQueryKey })
-		const previousData = queryClient.getQueryData<Archon.Content.v1.Addons>(targetQueryKey)
-		queryClient.setQueryData(targetQueryKey, (oldData: Archon.Content.v1.Addons | undefined) => {
-			if (!oldData) return oldData
-			return {
-				...oldData,
-				addons: (oldData.addons ?? []).map((candidate) =>
-					candidate.filename === addon.filename && candidate.kind === addon.kind
-						? { ...candidate, side_toggle_unlocked: !locked }
-						: candidate,
-				),
-			}
-		})
-		return { previousData, targetQueryKey }
-	},
-	onError: (error, { addon }, context) => {
-		if (context?.previousData) {
-			queryClient.setQueryData(context.targetQueryKey, context.previousData)
-		}
-		addNotification({
-			type: 'error',
-			title: formatMessage(messages.failedToSetSideLock, {
-				name: friendlyAddonName(addon),
-			}),
-			text: error instanceof Error ? error.message : undefined,
-		})
-	},
-	onSettled: () => {
-		void queryClient.invalidateQueries({ queryKey: queryKey.value })
-		void queryClient.invalidateQueries({ queryKey: modpackContentQueryKey.value })
-	},
-})
-
 async function handleSetEnabledFor(item: ContentItem, side: ContentSide, enabled: boolean) {
 	if (contentActionDisabled.value) return
 	const addon = getAddonForItem(item)
-	if (!addon) return
+	if (!addon || (side === 'server' && isPlayerOnlyContent(addon))) return
+	const targetWorldId = worldId.value
+	if (
+		enabled &&
+		userPreferences.value.warnOnIncompatibleContent &&
+		isIncompatibleEnvironment(addon, side)
+	) {
+		const confirmed = await environmentWarningModal.value?.show(
+			item.project.title,
+			side,
+			getAddonEnvironment(addon) === 'singleplayer_only',
+		)
+		if (!confirmed || contentActionDisabled.value || worldId.value !== targetWorldId) return
+	}
 	await setEnabledForMutation.mutateAsync({ addon, sides: [side], enabled })
 }
 
@@ -1014,9 +981,9 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 					fallbackUrl: projectMetadata?.icon_url,
 				}
 			: undefined
-	const serverEnabled = !addon.disabled_server
+	const serverEnabled = !isPlayerOnlyContent(addon) && !addon.disabled_server
 	const playerEnabled = !addon.disabled_player
-	const lockedSides = getLockedSides(addon)
+	const lockedSides: ContentSide[] = isPlayerOnlyContent(addon) ? ['server'] : []
 	return {
 		project: {
 			...(projectMetadata ?? {}),
@@ -1051,6 +1018,11 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 			server: serverEnabled,
 			player: playerEnabled,
 			locked: lockedSides.length > 0,
+			lockedTooltip: isPlayerOnlyContent(addon)
+				? formatMessage(
+						addon.kind === 'resourcepack' ? messages.resourcePackLock : messages.shaderLock,
+					)
+				: undefined,
 			disabledSides: lockedSides,
 			warningTooltip: getEnabledForWarning(addon),
 		},
@@ -1313,14 +1285,6 @@ function handleModpackUpdateCancel() {
 	pendingModpackUpdateVersion.value = null
 }
 
-async function handleToggleSideLock(addon: Archon.Content.v1.Addon) {
-	if (contentActionDisabled.value) return
-	await setSideLockMutation.mutateAsync({
-		addon,
-		locked: addon.side_toggle_unlocked,
-	})
-}
-
 function getOverflowOptions(item: ContentItem): OverflowMenuOption[] {
 	const options: OverflowMenuOption[] = []
 	const addon = getAddonForItem(item)
@@ -1335,18 +1299,6 @@ function getOverflowOptions(item: ContentItem): OverflowMenuOption[] {
 					`https://modrinth.com/${item.project_type}/${item.project?.slug}`,
 				)
 			},
-		})
-	}
-
-	if (addon && hasEnvironmentLock(addon)) {
-		if (options.length > 0) options.push({ type: 'divider' })
-		options.push({
-			id: 'toggle-side-lock',
-			label: formatMessage(
-				addon.side_toggle_unlocked ? messages.lockEnvironment : messages.unlockEnvironment,
-			),
-			icon: addon.side_toggle_unlocked ? LockIcon : LockOpenIcon,
-			action: () => handleToggleSideLock(addon),
 		})
 	}
 
@@ -1483,6 +1435,7 @@ provideContentManager({
 			</template>
 		</ContentPageLayout>
 	</ReadyTransition>
+	<ConfirmEnvironmentModal ref="environmentWarningModal" :action-disabled="contentActionDisabled" />
 	<ConfirmModpackUpdateModal
 		ref="modpackUpdateModal"
 		:downgrade="isModpackUpdateDowngrade"

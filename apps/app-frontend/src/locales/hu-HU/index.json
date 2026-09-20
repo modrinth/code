@@ -716,12 +716,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Helytelen fiók"
   },
-  "app.instance.share.members.empty": {
-    "message": "Még senki sem csatlakozott"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Nem található a keresésnek megfelelő felhasználó"
-  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Többé nem fog frissítéseket kapni ehhez a megosztott példányhoz"
   },
@@ -3503,9 +3497,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Összekapcsolt megosztott példány"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "Példány megosztásának visszavonása"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Megosztott példány leválasztása"
   },
@@ -3515,14 +3506,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Leválasztás..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Pédány megosztásának visszavonása"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Eltávolítja ezt a megosztott példányt a Modrinthból, és nem küld többé frissítéseket azoknak, akik használják. A helyi példányodat ez nem érinti."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Közzététel visszavonása..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Ez kizárólag a helyi példányodra vonatkozik. A telepített tartalmaid ezen az eszközön maradnak, és ez nem érinti a megosztott példányt, illetve az azt használó többi felhasználót."
@@ -3535,12 +3520,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Ezzel a megosztott példány törlődik a Modrinth szervereiről. A Modrinth Appban az ezt használók többé nem kapnak frissítéseket, de a helyipéldány és annak tartalma továbbra is ezen az eszközön marad."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Visszavonod a megosztott példány megosztását"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Megosztott példány megosztásának visszavonása"
   },
   "instance.action.create-shortcut": {
     "message": "Parancsikon létrehozása"
@@ -3847,45 +3826,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Forráscsomag"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Műveletek"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Meghívó link"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Bárki, akinek van ilyen meghívó linkje, csatlakozhat, amíg az aktív marad."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "Nincsenek aktív meghívások."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Lejár"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Meghívó törlése"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "A(z) {code} meghívó törlése"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Aktív meghívások"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Használatok"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "A(z) <monospace>{code}</monospace> meghívó link azonnal érvényét veszti. Azok, akik már csatlakoztak, továbbra is hozzáférhetnek."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Ezt a műveletet nem lehet visszavonni"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Meghívó törlése"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Meghívó törlése"
   },
   "instance.settings.synced-options.data-override": {
     "message": "Kapcsold ki ezt a felülírást hogy szerkeszthető legyen a szinkronizált adat."
@@ -4234,9 +4174,6 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "A megosztott példányhoz való hozzáférésedet megvonták. Ez a példány továbbra is elérhető, de már nincs összekapcsolva, és többé nem kap frissítéseket."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "Az elsődleges példányt törölték. Ez a példány továbbra is elérhető, de már nincs összekapcsolva, és többé nem kap frissítéseket."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Ezt a megosztott példányt a Tartalommoderációs csapat zárolta. Többé nem kap frissítéseket az elsődleges példánytól, és nem lehet játszani vele."

@@ -296,7 +296,12 @@ export namespace Archon {
 
 			export type SharedContentDiffEntry =
 				| { type: 'project'; project_id: string; change: SharedContentChange<string> }
-				| { type: 'external_file'; file_type: string; file_name: string; kind: 'added' | 'removed' | 'updated' }
+				| {
+						type: 'external_file'
+						file_type: string
+						file_name: string
+						kind: 'added' | 'removed' | 'updated'
+				  }
 				| { type: 'modpack' | 'game_version'; change: SharedContentChange<string> }
 				| { type: 'loader'; change: SharedContentChange<{ name: string; version: string | null }> }
 
@@ -307,11 +312,14 @@ export namespace Archon {
 				has_changes: boolean
 				diffs: SharedContentDiffEntry[]
 				projects: Record<string, { name: string; icon_url: string | null }>
-				versions: Record<string, {
-					project_id: string
-					name: string
-					version_number: string | null
-				}>
+				versions: Record<
+					string,
+					{
+						project_id: string
+						name: string
+						version_number: string | null
+					}
+				>
 			}
 
 			export type AddonKind = 'mod' | 'plugin' | 'datapack' | 'shader' | 'resourcepack'

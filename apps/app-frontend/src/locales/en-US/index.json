@@ -269,6 +269,9 @@
   "app.browse.project-type.mods": {
     "message": "Mods"
   },
+  "app.browse.project-type.plugins": {
+    "message": "Plugins"
+  },
   "app.browse.project-type.resource-packs": {
     "message": "Resource Packs"
   },
@@ -766,12 +769,6 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Wrong account"
-  },
-  "app.instance.share.members.empty": {
-    "message": "No users have joined yet"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "No users match your filters."
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "They will no longer receive updates for this shared instance"
@@ -3611,11 +3608,26 @@
   "friends.sign-in-to-add-friends": {
     "message": "<link>Sign in to a Modrinth account</link> to add friends and see what they're playing!"
   },
+  "hosting.play.account-changed": {
+    "message": "Your Modrinth account changed. Press Play server again to continue."
+  },
+  "hosting.play.no-address": {
+    "message": "This server does not have a connection address yet."
+  },
+  "hosting.play.not-ready": {
+    "message": "This instance is not available to launch. Check its installation status in your library."
+  },
+  "hosting.play.update-description": {
+    "message": "Update this instance to the server’s latest shared content before joining."
+  },
+  "hosting.play.update-to-play": {
+    "message": "Update to play"
+  },
+  "hosting.play.world-changed": {
+    "message": "This world is no longer active or has not been shared. Open the server panel and press Play server again."
+  },
   "installation-settings.shared-instance.linked-title": {
     "message": "Linked shared instance"
-  },
-  "installation-settings.shared-instance.title": {
-    "message": "Unpublish instance"
   },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Unlink shared instance"
@@ -3626,14 +3638,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Unlinking..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Unpublish shared instance"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Remove this shared instance from Modrinth and stop sending updates to anyone using it. Your local instance will not be affected."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Unpublishing..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "This only affects your local instance. Your installed content will stay on this device, and the shared instance and other people using it will not be affected."
@@ -3646,12 +3652,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "This deletes the shared instance from Modrinth's servers. People using it in the Modrinth App will stop receiving updates, but your local instance and its content will stay on this device."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Unpublishing shared instance"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Unpublish shared instance"
   },
   "instance.action.create-shortcut": {
     "message": "Create shortcut"
@@ -3961,45 +3961,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Resource pack"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Actions"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Invite link"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Anyone with one of these invite links can join while it remains active."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "There are no active invites."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Expires"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Revoke invite"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "Revoke invite {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Active invites"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Uses"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "The invite link <monospace>{code}</monospace> will stop working immediately. People who already joined will keep access."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "This action cannot be undone"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Revoke invite"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Revoke invite"
   },
   "instance.settings.synced-options.data-override": {
     "message": "Turn off this override to edit synced data."
@@ -4349,9 +4310,6 @@
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Your access to the shared instance was revoked. This instance is still available, but it is no longer linked and will no longer receive updates."
   },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "The primary instance was deleted. This instance is still available, but it is no longer linked and will no longer receive updates."
-  },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "This shared instance was locked by the Content Moderation team. It will no longer receive updates from the primary instance and cannot be played."
   },
@@ -4360,6 +4318,12 @@
   },
   "instance.shared-instance.unavailable.manager-fallback": {
     "message": "the instance manager"
+  },
+  "instance.shared-instance.unavailable.not-found-text": {
+    "message": "We couldn’t find this shared instance. Your installed content is still on this device."
+  },
+  "instance.shared-instance.unavailable.not-found-title": {
+    "message": "Shared instance unavailable"
   },
   "instance.shared-instance.unavailable.text": {
     "message": "Your local instance is still available, but it is no longer linked and won't receive updates."
@@ -4544,8 +4508,20 @@
   "search.filter.locked.instance.sync": {
     "message": "Sync with instance"
   },
+  "search.filter.locked.server": {
+    "message": "Provided by the server"
+  },
   "search.filter.locked.server-environment.title": {
     "message": "Only client-side mods can be added to the server instance"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Game version is provided by the server"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Loader is provided by the server"
+  },
+  "search.filter.locked.server.sync": {
+    "message": "Sync with server"
   },
   "settings.sidebar.label.account": {
     "message": "Account"

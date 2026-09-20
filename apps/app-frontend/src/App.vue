@@ -53,6 +53,7 @@ import {
 	provideNotificationManager,
 	providePageContext,
 	providePopupNotificationManager,
+	provideServerPlay,
 	TeleportOverflowMenu,
 	TextLogo,
 	TooltipDirective,
@@ -80,6 +81,7 @@ import AppActionBar from '@/components/ui/AppActionBar.vue'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
+import HostingPlayHandler from '@/components/ui/hosting/HostingPlayHandler.vue'
 import HostingUpdateRequired from '@/components/ui/HostingUpdateRequired.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
@@ -96,9 +98,6 @@ import OnboardingChecklist from '@/components/ui/onboarding-checklist/index.vue'
 import PrideFundraiserBanner from '@/components/ui/PrideFundraiserBanner.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
-import HostingPlayHandler from '@/components/ui/hosting/HostingPlayHandler.vue'
-import { provideServerPlay } from '@modrinth/ui'
-
 import SharedInstanceInviteHandler from '@/components/ui/shared-instances/shared-instance-invite-handler/index.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import SurveyPopup from '@/components/ui/SurveyPopup.vue'

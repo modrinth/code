@@ -2,7 +2,18 @@
 	<div class="contents">
 		<div class="flex flex-row items-center gap-2 rounded-lg">
 			<Button
-				v-if="isInstalling"
+				v-if="isStartingRequest"
+				type="colored"
+				color="brand"
+				size="xl"
+				disabled
+				class="flex-shrink-0"
+			>
+				<LoaderCircleIcon class="size-5 animate-spin" /> Starting server...
+			</Button>
+
+			<Button
+				v-else-if="isInstalling"
 				type="colored"
 				color="brand"
 				size="xl"
@@ -100,6 +111,7 @@ const props = withDefaults(
 )
 
 const {
+	isStartingRequest,
 	isInstalling,
 	isStopping,
 	showRestartButton,

@@ -755,12 +755,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Hatalı hesap"
   },
-  "app.instance.share.members.empty": {
-    "message": "Henüz katılan kullanıcı yok"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Filtrelerinizle eşleşen kullanıcı yok."
-  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Artık bu paylaşılan kurulum için güncelleme almayacaklar"
   },
@@ -2690,9 +2684,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Bağlantılı paylaşımlı örnek"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "Örneği yayından kaldır"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Paylaşımlı örneğin bağlantısını kaldır"
   },
@@ -2702,14 +2693,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Bağlantı kesiliyor..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Paylaşımlı örneği yayından kaldır"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Bu paylaşımlı örneği Modrinth'ten kaldırın ve onu kullanan kişilere güncelleme göndermeyi durdurun. Yerel örneğiniz bundan etkilenmeyecektir."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Yayından kaldırılıyor..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Bu yalnızca yerel örneğinizi etkiler. Yüklediğiniz içerik bu cihazda kalacak, paylaşımlı örnek ve kullanan diğer kişiler etkilenmeyecek."
@@ -2722,12 +2707,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Bu paylaşımlı örneği Modrinth'in sunucularından kaldırır. Modrinth App'i kullanan kişiler güncelleme almayı bırakır fakat yerel örneğiniz ve içeriği bu cihazda kalacak."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Paylaşımlı örnek yayından kaldırılıyor"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Paylaşımlı örneği yayından kaldır"
   },
   "instance.action.create-shortcut": {
     "message": "Kısayol oluştur"
@@ -3034,45 +3013,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Kaynak paketi"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Eylemler"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Davet bağlantısı"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Bu davet bağlantısına sahip olan herhangi birisi aktif olduğu sürece katılabilecektir."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "Aktif davet bulunmuyor."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Süresi doluyor"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Daveti geri çek"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "{code} davetini geri çek"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Aktif davetler"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Kullanımlar"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "Davet linki <monospace>{code}</monospace>, hemen çalışmayı durduracaktır. Zaten katılmış kişiler erişimi sürdürecektir."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Bu eylem geri alınamaz"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Daveti geri çek"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Daveti geri çek"
   },
   "instance.settings.tabs.behavior.description": {
     "message": "Bu örnekte hangi sekmelerin görüneceğini seçin."
@@ -3385,9 +3325,6 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Bu paylaşımlı örneğe olan erişiminiz geri çekildi. Örnek hala erişilebilir fakat artık bağlantılı değil ve güncelleme almayacak."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "Ana örnek silindi. Bu örnek hala erişilebilir fakat artık bağlantılı değil ve güncelleme almayacak."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Bu paylaşımlı örnek İçerik Moderasyonu ekibi tarafından kilitlendi. Artık ana örnekten güncelleme almayacak ve oynanılamaz."

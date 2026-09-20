@@ -5477,15 +5477,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Artık burada bulunabilirler!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Bir daha gösterme"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Sunucu ayarlarınız taşındı"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Paylaşımlı sunucular"
   },

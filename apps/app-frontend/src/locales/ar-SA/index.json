@@ -665,12 +665,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "حساب خاطئ"
   },
-  "app.instance.share.members.empty": {
-    "message": "لم ينضم أي مستخدمين حتى الآن"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "لا يوجد مستخدمون يطابقون الفلاتر الخاصة بك."
-  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "لن يتلقوا أي تحديثات لهذه النسخة المشتركة بعد الآن."
   },
@@ -2201,9 +2195,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "النسخة المشتركة المرتبطة"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "إلغاء نشر النسخة"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "إلغاء ربط النسخة المشتركة"
   },
@@ -2213,14 +2204,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "جاري إلغاء الربط..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "إلغاء نشر النسخة المُشاركة"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "إزالة هذه النسخة المُشاركة من Modrinth والتوقف عن إرسال التحديثات لأي شخص يستخدمها. لن تتأثر نسختك المحلية."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "جاري إلغاء النشر..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "هذا يؤثر فقط على نسختك المحلية. سيبقى المحتوى المثبت على هذا الجهاز، ولن تتأثر النسخة المُشاركة أو الأشخاص الآخرون الذين يستخدمونها."
@@ -2233,12 +2218,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "سيؤدي هذا إلى حذف النسخة المُشاركة من خوادم Modrinth. سيتوقف الأشخاص الذين يستخدمونها على تطبيق Modrinth عن تلقي التحديثات، ولكن ستظل نسختك المحلية ومحتواها على هذا الجهاز."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "جاري إلغاء نشر النسخة المُشاركة"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "إلغاء نشر النسخة المُشاركة"
   },
   "instance.action.create-shortcut": {
     "message": "إنشاء اختصار"
@@ -2545,45 +2524,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "حزمة الموارد"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "الإجراءات"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "رابط الدعوة"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "يمكن لأي شخص لديه أحد روابط الدعوة هذه الانضمام طالما ظلت نشطة."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "لا توجد أي دعوات نشطة."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "تنتهي الصلاحية في"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "إلغاء الدعوة"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "إلغاء الدعوة {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "الدعوات النشطة"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "الاستخدامات"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "سيتوقف رابط الدعوة <monospace>{code}</monospace> عن العمل فورًا. وسيظل الأشخاص الذين انضموا فعلًا قادرين على الوصول."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "لا يمكن التراجع عن هذا الإجراء"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "إلغاء الدعوة"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "إلغاء الدعوة"
   },
   "instance.settings.tabs.behavior.description": {
     "message": "اختر علامات التبويب الذي يظهر في هذه النسخة."
@@ -2896,9 +2836,6 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "تم إلغاء وصولك إلى النسخة المشتركة. هذه النسخة لا تزال متاحة، ولكنها لم تعد مرتبطة ولن تتلقى التحديثات بعد الآن."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "تم حذف النسخة الرئيسية. هذه النسخة لا تزال متاحة، ولكنها لم تعد مرتبطة ولن تتلقى التحديثات بعد الآن."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "تم قفل هذه النسخة المُشارَكة بواسطة فريق الإشراف على المحتوى. لن تتلقى هذه النسخة أي تحديثات أخرى من النسخة الرئيسية ولا يمكن لعبها."

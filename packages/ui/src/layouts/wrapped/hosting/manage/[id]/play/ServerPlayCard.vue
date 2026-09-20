@@ -12,15 +12,17 @@
 				</p>
 			</div>
 			<div class="flex shrink-0 flex-col gap-2 md:w-[164px]">
-				<Button type="colored" color="brand" size="lg" class="w-full" :disabled="disabled" @click="emit('play')">
+				<Button
+					type="colored"
+					color="brand"
+					size="lg"
+					class="w-full"
+					:disabled="disabled"
+					@click="emit('play')"
+				>
 					<SpinnerIcon v-if="pendingAction === 'play'" class="animate-spin" aria-hidden="true" />
 					<PlayIcon v-else aria-hidden="true" />
 					{{ formatMessage(messages.playServerButton) }}
-				</Button>
-				<Button size="lg" class="w-full" :disabled="disabled || !canInvite" @click="emit('invite')">
-					<SpinnerIcon v-if="pendingAction === 'invite'" class="animate-spin" aria-hidden="true" />
-					<UserPlusIcon v-else aria-hidden="true" />
-					{{ formatMessage(messages.invitePlayersButton) }}
 				</Button>
 			</div>
 		</div>
@@ -37,7 +39,11 @@
 			</div>
 			<div class="flex flex-col gap-2 sm:flex-row sm:items-center">
 				<Button size="lg" :disabled="disabled" @click="emit('download')">
-					<SpinnerIcon v-if="pendingAction === 'download'" class="animate-spin" aria-hidden="true" />
+					<SpinnerIcon
+						v-if="pendingAction === 'download'"
+						class="animate-spin"
+						aria-hidden="true"
+					/>
 					<DownloadIcon v-else aria-hidden="true" />
 					{{ formatMessage(messages.downloadModpackButton) }}
 				</Button>
@@ -59,14 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-	CheckIcon,
-	ClipboardCopyIcon,
-	DownloadIcon,
-	PlayIcon,
-	SpinnerIcon,
-	UserPlusIcon,
-} from '@modrinth/assets'
+import { CheckIcon, ClipboardCopyIcon, DownloadIcon, PlayIcon, SpinnerIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
@@ -75,13 +74,11 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 const props = defineProps<{
 	address: string
 	disabled?: boolean
-	canInvite?: boolean
 	pendingAction?: string
 }>()
 
 const emit = defineEmits<{
 	play: []
-	invite: []
 	download: []
 }>()
 
@@ -101,10 +98,6 @@ const messages = defineMessages({
 	playServerButton: {
 		id: 'servers.play.card.app.play-button',
 		defaultMessage: 'Play server',
-	},
-	invitePlayersButton: {
-		id: 'servers.play.card.app.invite-button',
-		defaultMessage: 'Invite players',
 	},
 	differentLauncherTitle: {
 		id: 'servers.play.card.launcher.title',

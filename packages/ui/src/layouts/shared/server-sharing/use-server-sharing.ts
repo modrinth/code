@@ -29,8 +29,10 @@ export function useServerSharingSettings() {
 		{ mergeDefaults: true },
 	)
 	const userId = computed(() => auth.user.value?.id)
-	const sharedInstanceId = computed(() =>
-		serverFull.value?.worlds.find((world) => world.id === worldId.value)?.content?.shared_instance_id,
+	const sharedInstanceId = computed(
+		() =>
+			serverFull.value?.worlds.find((world) => world.id === worldId.value)?.content
+				?.shared_instance_id,
 	)
 	const targetKey = computed(() =>
 		canSetup.value && worldId.value && sharedInstanceId.value && userId.value
@@ -58,14 +60,17 @@ export function useServerSharingSettings() {
 			)
 		},
 		onSettled: (_data, _error, target) =>
-			queryClient.invalidateQueries({ queryKey: ['shared-instances', target.instanceId, 'invites'] }),
+			queryClient.invalidateQueries({
+				queryKey: ['shared-instances', target.instanceId, 'invites'],
+			}),
 	})
 	const unpublishMutation = useMutation({
 		mutationKey: ['servers', 'share-action', serverId],
 		mutationFn: (target: ShareTarget) => client.archon.content_v1.unshare(serverId, target.worldId),
 		onSuccess: (_data, target) =>
 			clearServerSharedInstance(queryClient, serverId, target.worldId, target.instanceId),
-		onSettled: () => queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),
+		onSettled: () =>
+			queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),
 	})
 	const busy = computed(
 		() =>
@@ -77,7 +82,12 @@ export function useServerSharingSettings() {
 	)
 
 	function currentTarget(expectedKey: string): ShareTarget | undefined {
-		if (busy.value || expectedKey !== targetKey.value || !worldId.value || !sharedInstanceId.value) {
+		if (
+			busy.value ||
+			expectedKey !== targetKey.value ||
+			!worldId.value ||
+			!sharedInstanceId.value
+		) {
 			return
 		}
 		return { worldId: worldId.value, instanceId: sharedInstanceId.value }

@@ -5477,15 +5477,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Mostantól itt található!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Ne mutasd újra"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "A szerver beállításait áthelyeztük"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Megosztott szerverek"
   },

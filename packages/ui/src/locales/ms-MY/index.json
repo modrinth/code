@@ -4025,15 +4025,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Mereka kini boleh ditemui di sini!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Jangan tunjukkan lagi"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Tetapan pelayan anda telah dipindahkan"
-  },
   "servers.manage.your-servers-title": {
     "defaultMessage": "Pelayan anda"
   },

@@ -31,7 +31,9 @@ const messages = defineMessages({
 
 <template>
 	<p v-if="!canSetup" class="m-0 text-secondary">{{ permissionDeniedMessage }}</p>
-	<p v-else-if="!sharedInstanceId" class="m-0 text-secondary">{{ formatMessage(messages.notShared) }}</p>
+	<p v-else-if="!sharedInstanceId" class="m-0 text-secondary">
+		{{ formatMessage(messages.notShared) }}
+	</p>
 	<SharingSettingsLayout
 		v-else
 		:site-url="siteUrl"

@@ -5093,15 +5093,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth ホスティング"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "こちらに移動しました！"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "次回から表示しない"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "サーバー設定の場所が移動しました"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "共有サーバー"
   },

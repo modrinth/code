@@ -97,21 +97,19 @@
 					<div class="text-lg m-0 font-semibold text-contrast">Info</div>
 					<div class="flex flex-col gap-2.5 rounded-xl bg-surface-2 p-4">
 						<div
-							v-for="property in infoProperties"
+							v-for="property in visibleInfoProperties"
 							:key="property.name"
 							class="flex items-start justify-between gap-4"
 						>
-							<template v-if="property.value !== 'Unknown'">
-								<span class="mt-1">{{ property.name }}</span>
-								<CopyCode v-if="property.type === 'copy'" :text="property.value" />
-								<div
-									v-else-if="property.type === 'specs'"
-									class="flex flex-col items-end text-right text-sm leading-5 break-words"
-								>
-									<span v-for="line in property.lines" :key="line">{{ line }}</span>
-								</div>
-								<span v-else class="text-right text-sm break-words">{{ property.value }}</span>
-							</template>
+							<span class="mt-1">{{ property.name }}</span>
+							<CopyCode v-if="property.type === 'copy'" :text="property.value" />
+							<div
+								v-else-if="property.type === 'specs'"
+								class="flex flex-col items-end text-right text-sm leading-5 break-words"
+							>
+								<span v-for="line in property.lines" :key="line">{{ line }}</span>
+							</div>
+							<span v-else class="text-right text-sm break-words">{{ property.value }}</span>
 						</div>
 					</div>
 				</div>
@@ -131,13 +129,14 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { useStorage } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
 import { CopyCode, Input, Toggle } from '#ui/components'
 import EditServerIcon from '#ui/components/servers/edit-server-icon/EditServerIcon.vue'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { useServerPreferences } from '#ui/composables/server-preferences'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -174,42 +173,43 @@ const isUpdating = ref(false)
 const isValidServerName = computed(() => (serverName.value?.length ?? 0) > 0)
 
 // Preferences
-const preferences = {
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	incompatibleContentTitle: {
+		id: 'hosting.settings.warn-incompatible-content.title',
+		defaultMessage: 'Warn before enabling incompatible content',
+	},
+	incompatibleContentDescription: {
+		id: 'hosting.settings.warn-incompatible-content.description',
+		defaultMessage:
+			'Ask for confirmation when enabling content for an environment it may not support.',
+	},
+})
+const preferences = computed(() => ({
+	warnOnIncompatibleContent: {
+		displayName: formatMessage(messages.incompatibleContentTitle),
+		description: formatMessage(messages.incompatibleContentDescription),
+		implemented: true,
+	},
 	hideSubdomainLabel: {
 		displayName: 'Hide subdomain label',
 		description: 'When enabled, the subdomain label will be hidden from the server header.',
 		implemented: true,
 	},
-	// autoRestart: {
-	// 	displayName: 'Auto restarts',
-	// 	description: 'Automatically restart the server if it crashes.',
-	// 	implemented: false,
-	// },
 	ramAsNumber: {
 		displayName: 'RAM as bytes',
 		description: 'Show RAM usage in bytes instead of a percentage.',
 		implemented: true,
 	},
-} as const
+}))
 
-type PreferenceKeys = keyof typeof preferences
+type PreferenceKeys = keyof typeof preferences.value
 
 type UserPreferences = {
 	[K in PreferenceKeys]: boolean
 }
 
-const defaultPreferences: UserPreferences = {
-	hideSubdomainLabel: false,
-	// autoRestart: false,
-	ramAsNumber: false,
-}
-
-const userPreferences = useStorage<UserPreferences>(
-	`pyro-server-${serverId}-preferences`,
-	defaultPreferences,
-	undefined,
-	{ mergeDefaults: true },
-)
+const userPreferences = useServerPreferences(serverId)
 
 const newUserPreferences = ref<UserPreferences>(JSON.parse(JSON.stringify(userPreferences.value)))
 
@@ -325,6 +325,10 @@ const infoProperties = computed<InfoProperty[]>(() => [
 			: [],
 	},
 ])
+
+const visibleInfoProperties = computed(() =>
+	infoProperties.value.filter((property) => property.value !== 'Unknown'),
+)
 
 // Unsaved changes tracking (API fields + preferences)
 const hasServerSettingsChanges = computed(

@@ -761,12 +761,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "账号错误"
   },
-  "app.instance.share.members.empty": {
-    "message": "暂无用户加入"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "没有符合您筛选条件的用户。"
-  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "对方将不再收到该共享实例的后续更新"
   },
@@ -3608,9 +3602,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "已关联的共享实例"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "取消发布实例"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "解除共享实例关联"
   },
@@ -3620,14 +3611,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "正在解除关联……"
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "取消发布共享实例"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "从Modrinth移除这个分享实例，同时停止发送新的更新到正在使用它的人，你的本地实例不会被影响。"
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "取消发布中……"
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "这只会影响到你的本地实例，你安装过的内容依然会在你的设备上保留，被其他人使用的分享实例也不会被影响。"
@@ -3640,12 +3625,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "这将从 Modrinth 服务器上删除该共享实例。在 Modrinth App 中使用它的用户将停止接收更新，但你的本地实例及其内容仍会保留在此设备上。"
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "取消发布共享实例"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "取消发布共享实例"
   },
   "instance.action.create-shortcut": {
     "message": "创建快捷方式"
@@ -3955,45 +3934,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "资源包"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "操作"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "邀请链接"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "只要邀请链接有效，任何拥有该链接的人均可加入。"
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "暂无有效邀请。"
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "有效期"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "撤销邀请码"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "撤销邀请码 {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "有效邀请"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "使用次数"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "邀请链接 <monospace>{code}</monospace> 将立即失效。已加入的成员将保留访问权限。"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "这一操作无法撤销"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "撤销邀请"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "撤销邀请"
   },
   "instance.settings.synced-options.data-override": {
     "message": "关闭此覆盖以编辑同步数据。"
@@ -4342,9 +4282,6 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "你对此共享实例的访问权限已被撤销。该实例仍可正常使用，但已解除关联且不再接收后续更新。"
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "源实例已被删除。该实例仍可正常使用，但已解除关联且不再接收后续更新。"
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "此共享实例已被内容审核团队锁定。它将不再接收主实例的更新，且无法继续游玩。"

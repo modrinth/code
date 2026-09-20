@@ -761,12 +761,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "帳號錯誤"
   },
-  "app.instance.share.members.empty": {
-    "message": "還沒有使用者加入"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "沒有找到使用者。"
-  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "他不會再收到這個共用實例的更新"
   },
@@ -3608,9 +3602,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "已連結的共用實例"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "取消發布實例"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "取消連結共用實例"
   },
@@ -3620,14 +3611,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "正在取消連結..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "取消發布共用實例"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "在 Modrinth 上移除這個共用實例，並停止向任何使用者推送更新。你的本機實例不會受到影響。"
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "正在取消發布..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "這只會影響你的本機實例。你已安裝的內容仍會保留在此裝置上，共用實例及其他使用者都不會受到影響。"
@@ -3640,12 +3625,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "這會從 Modrinth 的伺服器刪除共用實例。在 Modrinth App 使用該實例的使用者將不再收到更新，但本機實例及其內容仍會保留在此裝置上。"
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "即將取消發布共用實例"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "取消發布共用實例"
   },
   "instance.action.create-shortcut": {
     "message": "建立捷徑"
@@ -3955,45 +3934,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "資源包"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "動作"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "邀請連結"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "任何使用者都可透過下列任何一個有效邀請連結加入。"
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "目前沒有有效的邀請。"
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "有效期限"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "撤銷邀請"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "撤銷邀請 {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "有效邀請"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "使用次數"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "邀請連結 <monospace>{code}</monospace> 將立即失效。已加入的使用者不受影響。"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "這項動作無法復原"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "撤銷邀請"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "撤銷邀請"
   },
   "instance.settings.synced-options.data-override": {
     "message": "關閉這項覆寫設定即可編輯已同步資料。"
@@ -4342,9 +4282,6 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "你對共用實例的存取權已被撤銷。這個實例仍可正常使用，但已不再與共用實例連結，且不再接收更新。"
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "主要實例已被刪除。這個實例仍可正常使用，但已不再與共用實例連結，且不再接收更新。"
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "這個共用實例已被內容管理團隊鎖定，不會再接收來自主要實例的更新，且無法遊玩。"

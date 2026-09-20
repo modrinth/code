@@ -6,26 +6,48 @@ export class ArchonContentV1Module extends AbstractModule {
 		return 'archon_content_v1'
 	}
 
-	public async share(serverId: string, worldId: string, configPaths: string[] = []): Promise<Archon.Content.v1.ShareWorldContentResponse> {
-		return this.client.request(`/servers/${encodeURIComponent(serverId)}/worlds/${encodeURIComponent(worldId)}/content/share`, {
-			api: 'archon', version: 1, method: 'POST', timeout: 600_000, retry: false,
-			body: { config_paths: configPaths },
-		})
+	public async share(
+		serverId: string,
+		worldId: string,
+		configPaths: string[] = [],
+	): Promise<Archon.Content.v1.ShareWorldContentResponse> {
+		return this.client.request(
+			`/servers/${encodeURIComponent(serverId)}/worlds/${encodeURIComponent(worldId)}/content/share`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'POST',
+				timeout: 600_000,
+				retry: false,
+				body: { config_paths: configPaths },
+			},
+		)
 	}
 
-	public async getShareDiff(serverId: string, worldId: string): Promise<Archon.Content.v1.SharedInstancePublishDiff> {
-		return this.client.request(`/servers/${encodeURIComponent(serverId)}/worlds/${encodeURIComponent(worldId)}/content/share/diff`, {
-			api: 'archon', version: 1, method: 'GET',
-		})
+	public async getShareDiff(
+		serverId: string,
+		worldId: string,
+	): Promise<Archon.Content.v1.SharedInstancePublishDiff> {
+		return this.client.request(
+			`/servers/${encodeURIComponent(serverId)}/worlds/${encodeURIComponent(worldId)}/content/share/diff`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'GET',
+			},
+		)
 	}
 
 	public async unshare(serverId: string, worldId: string): Promise<void> {
-		return this.client.request(`/servers/${encodeURIComponent(serverId)}/worlds/${encodeURIComponent(worldId)}/content/share`, {
-			api: 'archon',
-			version: 1,
-			method: 'DELETE',
-			retry: false,
-		})
+		return this.client.request(
+			`/servers/${encodeURIComponent(serverId)}/worlds/${encodeURIComponent(worldId)}/content/share`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'DELETE',
+				retry: false,
+			},
+		)
 	}
 
 	/** GET /v1/:server_id/worlds/:world_id/addons */

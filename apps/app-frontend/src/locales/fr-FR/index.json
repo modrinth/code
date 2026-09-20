@@ -755,12 +755,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Mauvais compte"
   },
-  "app.instance.share.members.empty": {
-    "message": "Aucun utilisateur n'a encore rejoint"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Aucun utilisateur ne correspond à vos filtres."
-  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Ils vont désormais cesser de recevoir des mises à jour pour cette instance partagée"
   },
@@ -2969,9 +2963,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Instance partagée liée"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "Dépublier l'instance"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Dissocier l'instance partagée"
   },
@@ -2981,14 +2972,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Dissociation..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Dépublier l'instance partagée"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Supprime cette instance partagée de Modrinth et arrête d'envoyer des mises à jour à toute personne l'utilisant. Votre copie locale ne sera pas affectée."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Dépublication..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Cela affecte seulement votre instance locale. Votre contenu installé restera sur cet appareil, et l'instance partagée et les autres personnes l'utilisant ne seront pas affectés."
@@ -3001,12 +2986,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Cela supprime l'instance partagée des serveurs de Modrinth. Les personnes l'utilisant dans Modrinth App vont cesser de recevoir des mises à jour, mais votre instance locale et son contenu resteront sur cet appareil."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Dépublication de l'instance partagée"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Dépublier l'instance partagée"
   },
   "instance.action.create-shortcut": {
     "message": "Créer un raccourci"
@@ -3311,45 +3290,6 @@
   "instance.server-modal.resource-pack": {
     "message": "Pack de ressources"
   },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Actions"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Lien d'invitation"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "N'importe qui avec l'un de ces liens d'invitation peut rejoindre pendant qu'il reste actif."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "Il n'y a aucune invitation active."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Expire"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Révoquer l'invitation"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "Révoquer l'invitation {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Invitations actives"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Utilisations"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "Le lien d'invitation <monospace>{code}</monospace> cessera de fonctionner immédiatement. Les personnes qui ont déjà rejoint conserveront leur accès."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Cette action ne peut pas être annulée"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Révoquer l'invitation"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Révoquer l'invitation"
-  },
   "instance.settings.synced-options.data-packs": {
     "message": "Désynchroniser les packs de données"
   },
@@ -3628,9 +3568,6 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Votre accès à l'instance partagée a été révoqué. Cette instance reste disponible, mais n'est plus liée et ne recevra plus de mises à jour."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "L'instance principale a été supprimée. Cette instance est encore disponible, mais n'est plus liée et va cesser de recevoir des mises à jour."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Cette instance partagée a été verrouillée par la Team de Modération de Contenu. Elle ne recevra plus de mises à jour de l'instance primaire et ne peut plus être jouée."

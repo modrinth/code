@@ -10,9 +10,9 @@ import {
 	getTargetInstallPreferences,
 	injectModrinthClient,
 	injectNotificationManager,
-	type ProjectSearchResult,
 	readStoredServerInstallQueue,
 	resolveServerAddonInstallPlans,
+	useDismissServerIntro,
 	useServerContextRuntime,
 	useServerPanelSync,
 	waitForServerContextRuntimeReady,
@@ -30,6 +30,7 @@ type InstallableSearchResult = Labrinth.Search.v3.ResultSearchProject & {
 }
 
 export interface ServerModpackSelectionRequest {
+	contentType?: string
 	projectId: string
 	versionId: string
 	name: string
@@ -69,9 +70,8 @@ export interface ServerInstallContentContext {
 	installQueuedServerInstallsAndBack: () => Promise<boolean>
 	initServerContext: () => Promise<void>
 	watchServerContextChanges: () => void
-	searchServerModpacks: (query: string, limit?: number) => Promise<ProjectSearchResult>
 	getServerProjectVersions: (projectId: string) => Promise<{ id: string }[]>
-	enforceSetupModpackRoute: (currentProjectType: string | undefined) => void
+	enforceServerSetupRoute: (currentProjectType: string | undefined) => void
 	getQueuedServerInstallPlans: () => Map<string, BrowseInstallPlan<InstallableSearchResult>>
 	setQueuedServerInstallPlans: (
 		plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>,
@@ -102,6 +102,7 @@ export function createServerInstallContent(opts: {
 	const client = injectModrinthClient()
 	const { handleError } = injectNotificationManager()
 	const queryClient = useQueryClient()
+	const dismissServerIntro = useDismissServerIntro()
 
 	const serverIdQuery = computed(() => readQueryString(route.query.sid))
 	const worldIdQuery = computed(() => readQueryString(route.query.wid))
@@ -184,7 +185,7 @@ export function createServerInstallContent(opts: {
 	})
 	const serverBrowseHeading = computed(() => {
 		if (serverFlowFrom.value === 'reset-server') {
-			return 'Selecting modpack to install after reset'
+			return 'Selecting content to install after reset'
 		}
 		return 'Installing content'
 	})
@@ -281,33 +282,16 @@ export function createServerInstallContent(opts: {
 		})
 	}
 
-	function enforceSetupModpackRoute(currentProjectType: string | undefined) {
-		if (!isSetupServerContext.value || currentProjectType === 'modpack') return
+	function enforceServerSetupRoute(currentProjectType: string | undefined) {
+		if (
+			!isSetupServerContext.value ||
+			['modpack', 'mod', 'plugin', 'datapack'].includes(currentProjectType ?? '')
+		)
+			return
 		router.replace({
 			path: '/browse/modpack',
 			query: route.query,
 		})
-	}
-
-	async function searchServerModpacks(query: string, limit: number = 10) {
-		const results = await client.labrinth.projects_v3.search({
-			query: query || undefined,
-			new_filters:
-				'project_types = "modpack" AND environment IN ["client_and_server", "server_only_client_optional"]',
-			limit,
-		})
-
-		return {
-			hits: results.hits.map((hit) => ({
-				project_id: hit.project_id,
-				title: hit.name,
-				icon_url: hit.icon_url ?? '',
-				latest_version: hit.version_id,
-			})),
-			total_hits: results.total_hits,
-			offset: (results.page - 1) * results.hits_per_page,
-			limit: results.hits_per_page,
-		}
 	}
 
 	async function getServerProjectVersions(projectId: string) {
@@ -323,11 +307,16 @@ export function createServerInstallContent(opts: {
 		const modalInstance = serverSetupModalRef.value
 		if (!modalInstance) return
 
-		modalInstance.show()
+		await modalInstance.show()
 		await nextTick()
 
 		const ctx = modalInstance.ctx
 		if (!ctx) return
+
+		if (request.contentType && request.contentType !== 'modpack') {
+			await ctx.selectProject(request.projectId, request.contentType, request.versionId)
+			return
+		}
 
 		ctx.setupType.value = 'modpack'
 		ctx.modpackSelection.value = {
@@ -516,26 +505,30 @@ export function createServerInstallContent(opts: {
 	async function handleServerModpackFlowCreate(config: CreationFlowContextValue) {
 		const sid = serverIdQuery.value
 		const wid = effectiveServerWorldId.value
-		if (!sid || !wid || !config.modpackSelection.value) {
+		if (!sid || !wid || (!config.modpackSelection.value && !config.projectInstall.value)) {
 			config.loading.value = false
 			return
 		}
 
 		try {
-			await client.archon.content_v1.installContent(sid, wid, {
-				content_variant: 'modpack',
-				spec: {
-					platform: 'modrinth',
-					project_id: config.modpackSelection.value.projectId,
-					version_id: config.modpackSelection.value.versionId,
-				},
-				soft_override: false,
-				properties: config.buildProperties(),
-			} satisfies Archon.Content.v1.InstallWorldContent)
+			if (config.projectInstall.value) {
+				await config.installServerContent(sid, wid)
+			} else {
+				await client.archon.content_v1.installContent(sid, wid, {
+					content_variant: 'modpack',
+					spec: {
+						platform: 'modrinth',
+						project_id: config.modpackSelection.value!.projectId,
+						version_id: config.modpackSelection.value!.versionId,
+					},
+					soft_override: false,
+					properties: config.buildProperties(),
+				} satisfies Archon.Content.v1.InstallWorldContent)
+			}
 			serverSetupModalRef.value?.hide()
 
 			if (serverFlowFrom.value === 'onboarding') {
-				await client.archon.servers_v1.endIntro(sid)
+				await dismissServerIntro.mutateAsync(sid)
 				await router.push(`/hosting/manage/${sid}/content`)
 				return
 			}
@@ -578,9 +571,8 @@ export function createServerInstallContent(opts: {
 		installQueuedServerInstallsAndBack,
 		initServerContext,
 		watchServerContextChanges,
-		searchServerModpacks,
 		getServerProjectVersions,
-		enforceSetupModpackRoute,
+		enforceServerSetupRoute,
 		getQueuedServerInstallPlans,
 		setQueuedServerInstallPlans,
 		resolveQueuedServerInstallPlan,

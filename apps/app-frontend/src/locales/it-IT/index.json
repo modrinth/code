@@ -761,12 +761,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Account errato"
   },
-  "app.instance.share.members.empty": {
-    "message": "Ancora nessun partecipante"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Nessun utente trovato."
-  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Non riceveranno più aggiornamenti"
   },
@@ -3602,9 +3596,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Istanza condivisa collegata"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "Rimuovi l'istanza dai server"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Scollega l'istanza condivisa"
   },
@@ -3614,14 +3605,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Scollegamento..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Rimuovi l'istanza condivisa dai server"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Rimuovi l'istanza condivisa da Modrinth e non inviare più aggiornamenti a chi la usa. L'istanza locale non sarà toccata."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Rimozione..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Ciò influirà solo sull'istanza locale. I contenuti installati rimarranno sul dispositivo e l'istanza condivisa e gli utenti che la usano non verranno toccati."
@@ -3634,12 +3619,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Ciò eliminerà l'istanza condivisa dai server di Modrinth. Gli utenti che la usavano non riceveranno più aggiornamenti, ma l'istanza locale e i contenuti rimarranno su questo dispositivo."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Rimuovere l'istanza condivisa dai server"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Rimuovi l'istanza condivisa dai server"
   },
   "instance.action.create-shortcut": {
     "message": "Crea collegamento"
@@ -3949,45 +3928,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Pacchetto di risorse"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Azioni"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Link d'invito"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Chiunque abbia uno di questi inviti potrà entrare finché siano attivi."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "Non ci sono inviti attivi."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Scadenza"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Revoca invito"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "Revoca invito {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Inviti attivi"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Usi"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "L'invito <monospace>{code}</monospace> smetterà di funzionare immediatamente. Le persone già entrate manterranno l'accesso."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Questa azione è irreversibile"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Revoca invito"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Revoca invito"
   },
   "instance.settings.synced-options.data-override": {
     "message": "Disattiva la sovrascrittura per modificare i dati sincronizzati."
@@ -4336,9 +4276,6 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "L'accesso all'istanza condivisa è stato revocato. È ancora disponibile localmente, ma non è più collegata e non riceverà aggiornamenti."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "L'istanza principale è stata eliminata. È ancora disponibile localmente, ma non è più collegata e non riceverà aggiornamenti."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "L'istanza condivisa è stata bloccata dal team di moderazione dei contenuti. Non riceverà più aggiornamenti dall'istanza principale e non potrà essere avviata."

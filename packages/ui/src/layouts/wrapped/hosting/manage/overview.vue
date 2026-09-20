@@ -11,10 +11,7 @@
 				:loading="isWsAuthIncorrect"
 			/>
 
-			<div
-				class="flex flex-col gap-2"
-				:class="fillConsole ? 'flex-1' : 'min-h-[700px]'"
-			>
+			<div class="flex flex-col gap-2" :class="fillConsole ? 'flex-1' : 'min-h-[700px]'">
 				<span class="shrink-0 text-2xl font-semibold text-contrast">Console</span>
 
 				<ConsolePageLayout :min-log-height="fillConsole ? '28rem' : undefined" />

@@ -761,12 +761,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Cuenta equivocada"
   },
-  "app.instance.share.members.empty": {
-    "message": "Nadie se ha unido todavía"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Ningún usuario coincide con tus filtros."
-  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Ya no recibirán actualizaciones para esta instancia"
   },
@@ -3608,9 +3602,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Vincular instancia compartida"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "Despublicar instancia"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Desvincular instancia compartida"
   },
@@ -3620,14 +3611,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Desvinculando..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Despublicar instancia compartida"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Borra esta instancia compartida de Modrinth y deja de enviar actualizaciones a cualquiera que la tenga. Tu instancia local no se verá afectada."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Despublicando..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Esto solo afecta a tu instancia local. Tu contenido instalado se quedará en este dispositivo, y la instancia compartida, junto a todos los que la estén usando, no se verán afectados."
@@ -3640,12 +3625,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Esto borrará la instancia compartida de los servidores de Modrinth. La gente que esté usando esta instancia dejará de recibir actualizaciones, pero tu instancia local y sus contenidos se quedarán en este dispositivo."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Despublicando instancia compartida"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Despublicar instancia compartida"
   },
   "instance.action.create-shortcut": {
     "message": "Crear acceso directo"
@@ -3955,45 +3934,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Paquete de recursos"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Acciones"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Link de invitación"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Cualquiera con alguno de estos links se puede unir mientras el link esté activo."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "No hay invitaciones activas."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Expira"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Revocar invitación"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "Revocar invitación {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Invitaciones activas"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Usos"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "El link de invitación <monospace>{code}</monospace> dejará de funcionar inmediatamente. Cualquiera que ya se haya unido mantendrá su acceso."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Esta acción no se puede deshacer"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Revocar invitación"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Revocar invitación"
   },
   "instance.settings.synced-options.data-override": {
     "message": "Desactivar este sobreescrito para editar los datos sincronizados."
@@ -4342,9 +4282,6 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Tu acceso a la instancia compartida fue revocado. Esta instancia seguirá disponible, pero ya no está vinculada, y no recibirás más actualizaciones."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "La instancia principal fue borrada. Esta instancia seguirá disponible, pero ya no está vinculada, y no recibirás más actualizaciones."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Esta instancia compartida fue bloqueada por el equipo de Moderación de Contenido. Ya no recibirá más actualizaciones de la instancia principal y tampoco se puede jugar."

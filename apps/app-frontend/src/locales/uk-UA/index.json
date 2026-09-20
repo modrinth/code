@@ -752,12 +752,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Неправильний обліковий запис"
   },
-  "app.instance.share.members.empty": {
-    "message": "Жоден користувач ще не приєднався"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Жоден користувач не відповідає вашим фільтрам."
-  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Він більше не зможе отримувати оновлення для цього спільного примірника"
   },
@@ -3599,9 +3593,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Пов'язаний спільний примірник"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "Скасувати публікацію примірника"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Відв'язати спільний примірник"
   },
@@ -3611,14 +3602,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Відв'язування..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Скасувати публікацію спільного примірника"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Видалити цей спільний примірник із Modrinth і припинити надсилати оновлення всім, хто ним користується. Це не вплине на ваш локальний примірник."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Скасування публікації..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Це вплине лише на ваш локальний примірник. Установлений уміст залишиться на цьому пристрої, а спільний примірник й інші користувачі не зазнають змін."
@@ -3631,12 +3616,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Це видалить спільний примірник із серверів Modrinth. Користувачі Modrinth App припинять отримувати оновлення, але ваш локальний примірник і його вміст залишаться на цьому пристрої."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Скасування публікації спільного примірника"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Скасувати публікацію спільного примірника"
   },
   "instance.action.create-shortcut": {
     "message": "Створити ярлик"
@@ -3946,45 +3925,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Пакет ресурсів"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Дії"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Посилання"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Будь-хто з цим посиланням-запрошенням може приєднатися, поки воно залишається активним."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "Немає активних запрошень."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Чинний до"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Відкликати запрошення"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "Відкликати запрошення {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Активні запрошення"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Використання"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "Посилання для запрошення <monospace>{code}</monospace> негайно припинить діяти. Люди, які вже приєдналися, збережуть доступ."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Цю дію неможливо скасувати"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Відкликати запрошення"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Відкликати запрошення"
   },
   "instance.settings.synced-options.data-override": {
     "message": "Вимкніть це перевизначення для зміни синхронізованих даних."
@@ -4333,9 +4273,6 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Ваш доступ до цього спільного примірника відкликано. Примірник досі доступний, але вже не прив'язаний та не отримуватиме оновлення."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "Основний примірник видалено. Цей примірник досі доступний, але вже не прив'язаний та не отримуватиме оновлення."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Цей спільний примірник заблокували модератори вмісту. Він більше не отримуватиме оновлень від основного примірника і не може бути запущений."

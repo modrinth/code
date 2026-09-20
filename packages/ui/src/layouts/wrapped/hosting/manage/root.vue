@@ -174,43 +174,15 @@
 					<template #actions>
 						<PageHeaderActions>
 							<PanelServerActionButton />
-							<Tooltip
-								theme="dismissable-prompt"
-								:open="showSettingsHint"
-								:disabled="!showSettingsHint"
-								placement="bottom-end"
+							<IconButton
+								v-tooltip="'Server settings'"
+								size="xl"
+								label="Server settings"
+								native-type="button"
+								@click="openServerSettingsModal()"
 							>
-								<IconButton
-									v-tooltip="showSettingsHint ? undefined : 'Server settings'"
-									size="xl"
-									label="Server settings"
-									native-type="button"
-									@click="handleOpenServerSettings"
-								>
-									<SettingsIcon />
-								</IconButton>
-								<template #popper>
-									<div class="grid grid-cols-[min-content] gap-1">
-										<div class="flex min-w-48 items-center justify-between gap-8">
-											<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
-												{{ formatMessage(settingsHintMessages.title) }}
-											</h3>
-											<IconButton
-												class="!size-6"
-												size="xs"
-												:label="formatMessage(settingsHintMessages.dismiss)"
-												native-type="button"
-												@click="dismissSettingsHint"
-											>
-												<XIcon aria-hidden="true" />
-											</IconButton>
-										</div>
-										<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
-											{{ formatMessage(settingsHintMessages.description) }}
-										</p>
-									</div>
-								</template>
-							</Tooltip>
+								<SettingsIcon />
+							</IconButton>
 							<TeleportOverflowMenu
 								type="quiet"
 								size="xl"
@@ -224,17 +196,15 @@
 				</PageHeader>
 			</div>
 
-			<ServerOnboardingPanelPage v-if="isOnboarding" :browse-modpacks="handleBrowseModpacks" />
+			<ServerOnboardingPanelPage
+				v-if="isOnboarding"
+				:class="fillLayout ? 'my-auto' : 'mt-16'"
+				:browse-modpacks="handleBrowseModpacks"
+			/>
 
 			<template v-else>
 				<div class="server-stagger-item -mb-3" :class="fillLayout ? 'shrink-0' : ''">
-					<NavTabs
-						:links="navLinks"
-						replace
-						page-nav
-						data-pyro-navigation
-						:style="{ '--si': 1 }"
-					/>
+					<NavTabs :links="navLinks" replace page-nav data-pyro-navigation :style="{ '--si': 1 }" />
 				</div>
 
 				<div
@@ -317,15 +287,14 @@ import {
 	LinkIcon,
 	LoaderCircleIcon,
 	LockIcon,
-	PlayIcon,
 	MoreVerticalIcon,
+	PlayIcon,
 	ServerIcon as ServerAssetIcon,
 	SettingsIcon,
 	TimerIcon,
 	TransferIcon,
 	TriangleAlertIcon,
 	UsersIcon,
-	XIcon,
 } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage } from '@vueuse/core'
@@ -343,7 +312,6 @@ import PageHeaderMetadataItem from '#ui/components/base/page-header/metadata/pag
 import PageHeaderActions from '#ui/components/base/page-header/page-header-actions.vue'
 import ServerNotice from '#ui/components/base/ServerNotice.vue'
 import TagIcon from '#ui/components/base/TagIcon.vue'
-import { Tooltip } from '#ui/components/floating'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPanelAdmonitions.vue'
 import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
@@ -446,21 +414,6 @@ const leaveMessages = defineMessages({
 	},
 })
 
-const settingsHintMessages = defineMessages({
-	title: {
-		id: 'servers.manage.settings-hint.title',
-		defaultMessage: 'Your server settings have moved',
-	},
-	description: {
-		id: 'servers.manage.settings-hint.description',
-		defaultMessage: 'They can now be found here!',
-	},
-	dismiss: {
-		id: 'servers.manage.settings-hint.dismiss',
-		defaultMessage: "Don't show again",
-	},
-})
-
 // disabled, keeping the animation logic cos it's really nice and we might want to re-enable in future
 const DISABLE_LOADING_ANIM = true
 
@@ -477,19 +430,10 @@ const debug = useDebugLogger('ServerManage')
 const isReconnecting = ref(false)
 const isLoading = ref(true)
 const isMounted = ref(true)
-const isOnboarding = computed(() => serverData.value?.flows?.intro)
 
-const SETTINGS_HINT_KEY = 'server-panel-settings-hint-dismissed'
-const settingsHintDismissed = useStorage(SETTINGS_HINT_KEY, false)
-const showSettingsHint = ref(!settingsHintDismissed.value)
 const serverPreferences = useStorage(`pyro-server-${props.serverId}-preferences`, {
 	hideSubdomainLabel: false,
 })
-
-function dismissSettingsHint() {
-	showSettingsHint.value = false
-	settingsHintDismissed.value = true
-}
 
 const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>(null)
 const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
@@ -592,6 +536,8 @@ const {
 	onStateEvent,
 })
 
+const isOnboarding = computed(() => serverData.value?.flows?.intro && !installation.value)
+
 const serverHeaderImage = computed(() =>
 	serverData.value?.is_medal ? 'https://cdn.modrinth.com/medal_icon.webp' : serverImage.value,
 )
@@ -648,11 +594,6 @@ function copyServerAddress() {
 
 function copyServerId() {
 	void navigator.clipboard.writeText(props.serverId)
-}
-
-function handleOpenServerSettings() {
-	openServerSettingsModal()
-	dismissSettingsHint()
 }
 
 const isUploading = computed(() => uploadState.value.isUploading)
@@ -777,15 +718,15 @@ watch(serverData, (data) => {
 
 const navLinks = computed<Tab[]>(() => [
 	{
-		label: 'Play',
-		href: `/hosting/manage/${props.serverId}/play`,
-		icon: PlayIcon,
-		subpages: [],
-	},
-	{
 		label: 'Overview',
 		href: `/hosting/manage/${props.serverId}`,
 		icon: LayoutTemplateIcon,
+		subpages: [],
+	},
+	{
+		label: 'Play',
+		href: `/hosting/manage/${props.serverId}/play`,
+		icon: PlayIcon,
 		subpages: [],
 	},
 	{

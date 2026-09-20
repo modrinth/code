@@ -761,12 +761,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Conta errada"
   },
-  "app.instance.share.members.empty": {
-    "message": "Nenhum usuário entrou ainda"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Nenhum usuário corresponde seus filtros."
-  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Eles não receberão mais atualizações para esta instância compartilhada"
   },
@@ -3608,9 +3602,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Instância compartilhada vinculada"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "Remover instância"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Desvincular instância compartilhada"
   },
@@ -3620,14 +3611,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Desvinculando..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Remover instância compartilhada"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Remova esta instância compartilhada do Modrinth e pare de enviar atualizações para todos que a utilizam. Sua instância local não será afetada."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Removendo..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Isso afeta apenas a sua instância local. O conteúdo instalado permanecerá neste dispositivo, e a instância compartilhada e outras pessoas que a utilizam não serão afetadas."
@@ -3640,12 +3625,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Isso excluirá a instância compartilhada dos servidores do Modrinth. As pessoas usando-o no Modrinth App não receberá mais atualizações, mas sua instância local e seu conteúdo ainda permanecerá no dispositivo."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Removendo instância compartilhada"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Remover instância compartilhada"
   },
   "instance.action.create-shortcut": {
     "message": "Criar atalho"
@@ -3955,45 +3934,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Pacote de recursos"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Ações"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Link de convite"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Qualquer um com algum desses links de convite pode entrar enquanto permanecem ativos."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "Não há nenhum convite ativo."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Expira"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Revogar convite"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "Revogar convite {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Convites ativos"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Usos"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "Este link de convite <monospace>{code}</monospace> deixará de funcionar imediatamente. As pessoas que já entraram ainda permanecerão com acesso."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Esta ação não pode ser desfeita"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Revogar convite"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Revogar convite"
   },
   "instance.settings.synced-options.data-override": {
     "message": "Desligar sobreposição para editar dados sincronizados"
@@ -4342,9 +4282,6 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Seu acesso a esta instância compartilhada foi revogado. Ela ainda está disponível, mas não está mais vinculada e não receberá mais atualizações."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "A instância principal foi excluída. Esta instância ainda está disponível, mas não está mais vinculada e não receberá mais atualizações."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Esta instância compartilhada foi bloqueada pela equipe de Moderação de Conteúdo. Ela não receberá mais atualizações da instância principal e não poderá ser jogada."

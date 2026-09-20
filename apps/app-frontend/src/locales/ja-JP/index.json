@@ -758,12 +758,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "アカウントが違います"
   },
-  "app.instance.share.members.empty": {
-    "message": "まだ誰も参加していません"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "フィルターに一致するユーザーが見つかりません。"
-  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "このインスタンスのアップデートは受信できなくなります"
   },
@@ -2282,9 +2276,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "リンク済の共有インスタンス"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "インスタンスを非公開化"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "インスタンスの共有を解除"
   },
@@ -2294,14 +2285,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "共有を解除中…"
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "共有インスタンスを非公開にする"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "この共有インスタンスをModrinthから削除し、使用者へのアップデート送信を停止します。ローカルのインスタンスには影響しません。"
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "非公開に設定中…"
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "これはローカルインスタンスにのみ影響します。インストール済みのコンテンツはこのデバイスに残り、共有インスタンスやそれを使用している他のユーザーには影響しません。"
@@ -2314,12 +2299,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Modrinthのサーバーからこの共有インスタンスを削除します。Modrinthアプリでこれを使用しているユーザーへのアップデート配信は停止しますが、ローカルのインスタンスとそのコンテンツはこのデバイスに残ります。"
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "共有インスタンスの非公開化"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "共有インスタンスを非公開にする"
   },
   "instance.action.create-shortcut": {
     "message": "ショートカットを作成"
@@ -2626,45 +2605,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "リソースパック"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "アクション"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "招待リンク"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "アクティブな招待リンクをお持ちの方なら誰でも参加できます。"
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "有効な招待はありません。"
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "有効期限"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "招待を取り消す"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "招待コード {code} を取り消す"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "有効な招待"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "ユーザー"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "招待リンク <monospace>{code}</monospace> は即座に無効化されます。すでに参加しているユーザーのアクセス権はそのまま保持されます。"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "この操作は取り消せません"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "招待を取り消す"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "招待を取り消す"
   },
   "instance.settings.tabs.behavior.description": {
     "message": "このインスタンスに表示するタブを選択してください。"
@@ -2977,9 +2917,6 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "共有インスタンスへのアクセス権が取り消されました。このインスタンスは引き続き利用可能ですが、リンクは解除され、今後のアップデートは受信されなくなります。"
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "プライマリインスタンスが削除されました。このインスタンスは引き続き利用可能ですが、リンクは解除され、今後のアップデートは受信されなくなります。"
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "この共有インスタンスはコンテンツモデレーションチームによってロックされました。プライマリインスタンスからのアップデートの受信は停止し、プレイすることもできません。"

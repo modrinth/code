@@ -4028,15 +4028,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Nó hiện đang ở đây!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Đừng hiển thị lại"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Cài đặt máy chủ của bạn đã được di chuyển"
-  },
   "servers.medal-listing.countdown.remaining": {
     "defaultMessage": "còn <days-count>{days}</days-count> {days, plural, other {ngày}} <hours-count>{hours}</hours-count> {hours, plural,  other {giờ}} <minutes-count>{minutes}</minutes-count> {minutes, plural,  other {phút}} <seconds-count>{seconds}</seconds-count> {seconds, plural, other {giây}}..."
   },

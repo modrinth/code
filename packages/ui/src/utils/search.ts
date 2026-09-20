@@ -167,6 +167,24 @@ export type EnvironmentSearchOverride =
 	| { mode: 'include'; values: string[] }
 	| { mode: 'exclude'; values: string[] }
 
+export function getHostingModEnvironmentOverride(serverOnly: boolean): EnvironmentSearchOverride {
+	return serverOnly
+		? {
+				mode: 'include',
+				values: [
+					'server_only',
+					'dedicated_server_only',
+					'server_only_client_optional',
+					'client_or_server_prefers_both',
+					'client_or_server',
+				],
+			}
+		: {
+				mode: 'exclude',
+				values: ['client_only', 'singleplayer_only'],
+			}
+}
+
 export const LOADER_FILTER_TYPES = [
 	'mod_loader',
 	'plugin_loader',
