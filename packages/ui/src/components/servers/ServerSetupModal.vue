@@ -9,7 +9,6 @@
 		:initial-loader="initialLoader"
 		:initial-game-version="initialGameVersion"
 		:fade="props.initialSetup ? undefined : 'danger'"
-		:search-projects="searchModpacks"
 		:get-project-versions="getProjectVersions"
 		:finish-disabled="!canCompleteSetup"
 		:finish-disabled-tooltip="!canCompleteSetup ? permissionDeniedMessage : undefined"
@@ -65,15 +64,6 @@ const { addNotification } = injectNotificationManager()
 const serverLoaders = ['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']
 const { canSetup, canResetServer, permissionDeniedMessage } = useServerPermissions()
 
-async function searchModpacks(query: string, limit: number = 10) {
-	return client.labrinth.projects_v2.search({
-		query: query || undefined,
-		new_filters:
-			'project_types = "modpack" AND (client_side = "optional" OR client_side = "required") AND server_side = "required"',
-		limit,
-	})
-}
-
 async function getProjectVersions(projectId: string) {
 	const versions = await client.labrinth.versions_v3.getProjectVersions(projectId)
 	return versions.map((v) => ({ id: v.id }))
@@ -126,7 +116,10 @@ async function onFlowComplete(ctx: CreationFlowContextValue) {
 	})
 
 	try {
-		if (ctx.setupType.value === 'modpack' && ctx.modpackFile.value) {
+		if (ctx.projectInstall.value) {
+			await ctx.installServerContent(serverContext.serverId, serverContext.worldId.value!)
+			emitReinstall()
+		} else if (ctx.setupType.value === 'modpack' && ctx.modpackFile.value) {
 			debug('onFlowComplete: mrpack upload path')
 			await handleMrpackUpload(ctx.modpackFile.value, ctx.buildProperties())
 		} else if (ctx.setupType.value === 'modpack' && ctx.modpackSelection.value) {

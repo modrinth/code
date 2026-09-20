@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { SpinnerIcon, UploadIcon } from '@modrinth/assets'
-import { useIsFetching, useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import {
+	useIsFetching,
+	useIsMutating,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from '@tanstack/vue-query'
 import { computed, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -17,7 +23,12 @@ import { useServerPermissions } from '#ui/composables/server-permissions'
 import type { FileOperation } from '#ui/layouts/shared/files-tab/types'
 import ContentDiffModal from '#ui/layouts/shared/installation-settings/components/ContentDiffModal.vue'
 import { resolveServerShareDiff } from '#ui/layouts/wrapped/hosting/manage/[id]/play/share-diff'
-import { injectAuth, injectModrinthClient, injectModrinthServerContext, injectNotificationManager } from '#ui/providers'
+import {
+	injectAuth,
+	injectModrinthClient,
+	injectModrinthServerContext,
+	injectNotificationManager,
+} from '#ui/providers'
 
 import BackupAdmonition, { type BackupAdmonitionEntry } from './BackupAdmonition.vue'
 import FileOperationAdmonition from './FileOperationAdmonition.vue'
@@ -37,20 +48,29 @@ const auth = injectAuth()
 const { handleError } = injectNotificationManager()
 const queryClient = useQueryClient()
 const { canSetup, canManageBackups, permissionDeniedMessage } = useServerPermissions()
-const needsShareUpdate = computed(() =>
-	ctx.serverFull.value?.worlds.find((world) => world.id === ctx.worldId.value)
-		?.content?.shared_instance_needs_update ?? false,
+const needsShareUpdate = computed(
+	() =>
+		ctx.serverFull.value?.worlds.find((world) => world.id === ctx.worldId.value)?.content
+			?.shared_instance_needs_update ?? false,
 )
 const shareActions = useIsMutating({ mutationKey: ['servers', 'share-action', ctx.serverId] })
 const sharePreviews = useIsFetching({ queryKey: ['servers', 'share-diff', ctx.serverId] })
 const resolvingConfigs = ref(false)
-const sharePending = computed(() => resolvingConfigs.value || shareActions.value > 0 || sharePreviews.value > 0)
+const sharePending = computed(
+	() => resolvingConfigs.value || shareActions.value > 0 || sharePreviews.value > 0,
+)
 const configPicker = ref<InstanceType<typeof ServerConfigFilePicker>>()
 
 const diffModal = ref<InstanceType<typeof ContentDiffModal>>()
 const previewOpen = ref(false)
 const previewQuery = useQuery({
-	queryKey: computed(() => ['servers', 'share-diff', ctx.serverId, ctx.worldId.value, auth.user.value?.id]),
+	queryKey: computed(() => [
+		'servers',
+		'share-diff',
+		ctx.serverId,
+		ctx.worldId.value,
+		auth.user.value?.id,
+	]),
 	enabled: computed(() => previewOpen.value && !!ctx.worldId.value),
 	queryFn: async () => {
 		const diff = await client.archon.content_v1.getShareDiff(ctx.serverId, ctx.worldId.value!)
@@ -63,12 +83,15 @@ const pushMutation = useMutation({
 	mutationFn: async ({ worldId, configPaths }: { worldId: string; configPaths: string[] }) => {
 		await client.archon.content_v1.share(ctx.serverId, worldId, configPaths)
 		await queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', ctx.serverId] })
-		await queryClient.invalidateQueries({ queryKey: ['servers', 'share-diff', ctx.serverId, worldId] })
+		await queryClient.invalidateQueries({
+			queryKey: ['servers', 'share-diff', ctx.serverId, worldId],
+		})
 	},
 })
 
 async function reviewShareUpdate() {
-	if (!ctx.worldId.value || !canSetup.value || sharePending.value || ctx.busyReasons.value.length) return
+	if (!ctx.worldId.value || !canSetup.value || sharePending.value || ctx.busyReasons.value.length)
+		return
 	const worldId = ctx.worldId.value
 	const userId = auth.user.value?.id
 	previewOpen.value = true
@@ -83,18 +106,27 @@ async function reviewShareUpdate() {
 }
 
 async function pushShareUpdate() {
-	if (!ctx.worldId.value || !canSetup.value || sharePending.value || ctx.busyReasons.value.length) return
+	if (!ctx.worldId.value || !canSetup.value || sharePending.value || ctx.busyReasons.value.length)
+		return
 	const worldId = ctx.worldId.value
 	const userId = auth.user.value?.id
 	resolvingConfigs.value = true
 	try {
-		const configPaths = await configPicker.value?.resolvePaths() ?? []
-		if (!previewOpen.value || ctx.worldId.value !== worldId || auth.user.value?.id !== userId || !canSetup.value || ctx.busyReasons.value.length) return
+		const configPaths = (await configPicker.value?.resolvePaths()) ?? []
+		if (
+			!previewOpen.value ||
+			ctx.worldId.value !== worldId ||
+			auth.user.value?.id !== userId ||
+			!canSetup.value ||
+			ctx.busyReasons.value.length
+		)
+			return
 		await pushMutation.mutateAsync({ worldId, configPaths })
 		previewOpen.value = false
 	} catch (error) {
 		handleError(error)
-		if (previewOpen.value && ctx.worldId.value === worldId && auth.user.value?.id === userId) diffModal.value?.show()
+		if (previewOpen.value && ctx.worldId.value === worldId && auth.user.value?.id === userId)
+			diffModal.value?.show()
 	} finally {
 		resolvingConfigs.value = false
 	}
@@ -505,7 +537,15 @@ function onInstallationDismiss() {
 					>
 						<SpinnerIcon v-if="sharePending" class="animate-spin" aria-hidden="true" />
 						<UploadIcon v-else aria-hidden="true" />
-						{{ formatMessage(shareActions > 0 ? messages.publishing : sharePreviews > 0 ? messages.reviewing : messages.pushUpdate) }}
+						{{
+							formatMessage(
+								shareActions > 0
+									? messages.publishing
+									: sharePreviews > 0
+										? messages.reviewing
+										: messages.pushUpdate,
+							)
+						}}
 					</Button>
 				</template>
 			</Admonition>
@@ -563,14 +603,27 @@ function onInstallationDismiss() {
 		:diffs="previewQuery.data.value?.items ?? []"
 		:confirm-label="formatMessage(messages.pushUpdate)"
 		:confirm-icon="UploadIcon"
-		:confirm-disabled="!canSetup || sharePending || ctx.busyReasons.value.length > 0 || previewQuery.isError.value || !previewQuery.data.value"
+		:confirm-disabled="
+			!canSetup ||
+			sharePending ||
+			ctx.busyReasons.value.length > 0 ||
+			previewQuery.isError.value ||
+			!previewQuery.data.value
+		"
 		:added-label="formatMessage(messages.added)"
 		:removed-label="formatMessage(messages.removed)"
 		@confirm="pushShareUpdate"
 		@cancel="previewOpen = false"
 	>
 		<template #additional-content>
-			<ServerConfigFilePicker v-if="previewOpen && ctx.worldId.value" :key="ctx.worldId.value" ref="configPicker" :server-id="ctx.serverId" :world-id="ctx.worldId.value" :disabled="sharePending" />
+			<ServerConfigFilePicker
+				v-if="previewOpen && ctx.worldId.value"
+				:key="ctx.worldId.value"
+				ref="configPicker"
+				:server-id="ctx.serverId"
+				:world-id="ctx.worldId.value"
+				:disabled="sharePending"
+			/>
 		</template>
 	</ContentDiffModal>
 </template>

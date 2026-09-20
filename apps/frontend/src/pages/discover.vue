@@ -6,7 +6,10 @@ const { formatMessage } = useVIntl()
 const flags = useFeatureFlags()
 const route = useRoute()
 
-const allowTabChanging = computed(() => !route.query.sid)
+const isServerSetup = computed(
+	() => !!route.query.sid && ['onboarding', 'reset-server'].includes(String(route.query.from)),
+)
+const allowTabChanging = computed(() => !route.query.sid || isServerSetup.value)
 
 const selectableProjectTypes = [
 	{
@@ -45,14 +48,30 @@ const selectableProjectTypes = [
 		type: 'servers',
 	},
 ]
+const projectTypeLinks = computed(() => {
+	const query = new URLSearchParams()
+	for (const key of ['sid', 'wid', 'from']) {
+		const value = route.query[key]
+		if (typeof value === 'string') query.set(key, value)
+	}
+	return selectableProjectTypes
+		.filter(
+			(type) =>
+				!isServerSetup.value || ['mods', 'plugins', 'modpacks', 'datapacks'].includes(type.type),
+		)
+		.map((type) => ({
+			...type,
+			href: isServerSetup.value ? `${type.href}?${query.toString()}` : type.href,
+		}))
+})
 </script>
 <template>
 	<div class="mx-auto box-border flex w-full max-w-[1280px] flex-col gap-4 px-6 pb-6">
 		<NavTabs
-			v-if="!flags.projectTypesPrimaryNav && allowTabChanging"
-			:links="selectableProjectTypes"
+			v-if="(!flags.projectTypesPrimaryNav || isServerSetup) && allowTabChanging"
+			:links="projectTypeLinks"
 			replace
-			class="hidden md:flex"
+			:class="isServerSetup ? 'flex' : 'hidden md:flex'"
 		/>
 		<NuxtPage />
 	</div>

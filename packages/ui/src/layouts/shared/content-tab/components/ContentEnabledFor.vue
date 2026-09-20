@@ -15,9 +15,17 @@ const messages = defineMessages({
 		id: 'content.enabled-for.player',
 		defaultMessage: 'Player',
 	},
+	serverTooltip: {
+		id: 'content.enabled-for.server-tooltip',
+		defaultMessage: 'Install this content on your server.',
+	},
+	playerTooltip: {
+		id: 'content.enabled-for.player-tooltip',
+		defaultMessage: 'Include this content in the shared instance or .mrpack that players download.',
+	},
 	locked: {
 		id: 'content.enabled-for.locked',
-		defaultMessage: 'These choices are locked. Select Unlock from the row menu to change them.',
+		defaultMessage: 'This content can only be enabled for players.',
 	},
 	requiredHere: {
 		id: 'content.enabled-for.required-here',
@@ -61,7 +69,10 @@ function isDisabled(side: ContentSide) {
 function getDisabledTooltip(side: ContentSide) {
 	if (props.disabled) return props.disabledTooltip
 	if (!disabledSides.value.has(side)) return undefined
-	return formatMessage(isSelected(side) ? messages.requiredHere : messages.notSupportedHere)
+	return (
+		props.modelValue.lockedTooltip ??
+		formatMessage(isSelected(side) ? messages.requiredHere : messages.notSupportedHere)
+	)
 }
 
 function toggle(side: ContentSide) {
@@ -71,11 +82,14 @@ function toggle(side: ContentSide) {
 </script>
 
 <template>
-	<div class="flex w-[200px] shrink-0 items-center gap-1.5">
+	<div class="flex w-max shrink-0 items-center gap-1.5">
 		<button
 			v-for="side in sides"
 			:key="side"
-			v-tooltip="getDisabledTooltip(side)"
+			v-tooltip="
+				getDisabledTooltip(side) ??
+				formatMessage(side === 'server' ? messages.serverTooltip : messages.playerTooltip)
+			"
 			type="button"
 			class="flex h-8 items-center rounded-xl border border-solid px-3 text-sm font-medium transition-[background-color,border-color,color,opacity,transform] duration-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow"
 			:class="[
@@ -93,7 +107,7 @@ function toggle(side: ContentSide) {
 
 		<span
 			v-if="modelValue.locked && disabledSides.size > 0"
-			v-tooltip="formatMessage(messages.locked)"
+			v-tooltip="modelValue.lockedTooltip ?? formatMessage(messages.locked)"
 			class="inline-flex size-5 shrink-0 cursor-help items-center justify-center text-secondary"
 			tabindex="0"
 		>

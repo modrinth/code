@@ -1,10 +1,10 @@
-import { computed, ref, type Ref, watch } from 'vue'
+import { computed, type Ref, ref, watch } from 'vue'
 
 import type { SortDirection } from '#ui/components/base/Table.vue'
 
 import {
-	invitedPlayerMethodLabels as methodLabels,
 	type InvitedPlayerMethod,
+	invitedPlayerMethodLabels as methodLabels,
 	type InvitedPlayerRow,
 } from '../types'
 
@@ -49,7 +49,9 @@ export function useInvitedPlayersTable(
 			compared = methodLabels[a.method].localeCompare(methodLabels[b.method])
 		else
 			compared =
-				(a.pending ? Number.MAX_SAFE_INTEGER : (a.joinedAt?.getTime() ?? Number.NEGATIVE_INFINITY)) -
+				(a.pending
+					? Number.MAX_SAFE_INTEGER
+					: (a.joinedAt?.getTime() ?? Number.NEGATIVE_INFINITY)) -
 					(b.pending
 						? Number.MAX_SAFE_INTEGER
 						: (b.joinedAt?.getTime() ?? Number.NEGATIVE_INFINITY)) ||

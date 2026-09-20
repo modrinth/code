@@ -28,7 +28,11 @@
 					<span>
 						{{
 							formatMessage(
-								isModpackOption(item.value) ? messages.installModpack : messages.createInstance,
+								isModpackOption(item.value)
+									? messages.installModpack
+									: ctx.flowType === 'instance'
+										? messages.createInstance
+										: commonMessages.continueButton,
 							)
 						}}
 					</span>
@@ -328,7 +332,7 @@ watch(
 		if (!projectId) return
 		const hit = ctx.projectSearchHits.value[projectId]
 
-		if (ctx.flowType === 'instance') {
+		if (ctx.flowType === 'instance' || hit?.projectType !== 'modpack') {
 			void ctx.selectProject(projectId, hit?.projectType ?? 'mod')
 			return
 		}

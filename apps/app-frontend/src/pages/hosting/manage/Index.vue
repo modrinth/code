@@ -1,8 +1,5 @@
 <template>
-	<div
-		class="w-full pt-6"
-		:class="isOverviewRoute ? 'flex min-h-full flex-col' : 'h-full'"
-	>
+	<div class="w-full pt-6" :class="isOverviewRoute ? 'flex min-h-full flex-col' : 'h-full'">
 		<ServersManageRootLayout
 			:server-id="serverId"
 			:layout-mode="isOverviewRoute ? 'fill' : 'page'"
@@ -58,7 +55,7 @@ import {
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useAppSettings } from '@/composables/use-app-settings.ts'
@@ -74,10 +71,21 @@ const queryClient = useQueryClient()
 const appSettings = useAppSettings()
 const { formatMessage } = useVIntl()
 
-const isOverviewRoute = computed(() => route.name === 'ServerManageOverview')
+const serverRoute = shallowRef(router.currentRoute.value)
+watch(
+	router.currentRoute,
+	(nextRoute) => {
+		if (nextRoute.matched.some((record) => record.name === 'ServerManage')) {
+			serverRoute.value = nextRoute
+		}
+	},
+	{ flush: 'sync' },
+)
+
+const isOverviewRoute = computed(() => serverRoute.value.name === 'ServerManageOverview')
 
 const serverId = computed(() => {
-	const rawId = route.params.id
+	const rawId = serverRoute.value.params.id
 	return Array.isArray(rawId) ? (rawId[0] ?? '') : (rawId ?? '')
 })
 

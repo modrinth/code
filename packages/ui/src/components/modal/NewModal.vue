@@ -101,7 +101,8 @@
 							data-modal-content
 							:class="[
 								'flex-1 min-h-0 overflow-y-auto',
-								props.noPadding ? '' : 'p-6 !pb-1 sm:pb-6',
+								props.noPadding ? '' : 'p-6',
+								{ '!pb-0': $slots.actions && !actionsDivider && !props.noPadding },
 								{ 'pt-12': props.mergeHeader && closable && !props.noPadding },
 							]"
 							:style="{ maxHeight: maxContentHeight }"
@@ -134,6 +135,7 @@
 						:class="[
 							'min-h-0',
 							props.noPadding ? '' : 'overflow-y-auto p-6',
+							{ '!pb-0': $slots.actions && !actionsDivider && !props.noPadding },
 							{ 'pt-12': props.mergeHeader && closable && !props.noPadding },
 						]"
 					>

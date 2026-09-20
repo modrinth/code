@@ -2,8 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, type Ref } from 'vue'
 
 import type { InviteLinkSettings, InvitePlayersUser } from '#ui/components/sharing'
-import { injectAuth, injectModrinthClient } from '#ui/providers'
 import { sharedInstanceInvitesQueryOptions } from '#ui/layouts/shared/server-sharing'
+import { injectAuth, injectModrinthClient } from '#ui/providers'
 
 import type { ServerPlayerRow } from './types'
 
@@ -21,18 +21,20 @@ export function useServerPlayers(instanceId: Ref<string | null>, canManage: Ref<
 			const users = response.users.length
 				? await client.labrinth.users_v2.getMultiple(response.users.map((user) => user.id))
 				: []
-			const rows: ServerPlayerRow[] = response.users.filter((user) => user.join_type !== 'owner').map((member) => {
-				const user = users.find((user) => user.id === member.id)
-				return {
-					id: member.id,
-					username: user?.username ?? member.id,
-					avatarUrl: user?.avatar_url ?? undefined,
-					joinedAt: member.joined_at ? new Date(member.joined_at) : null,
-					lastPlayedAt: member.last_played ? new Date(member.last_played) : null,
-					pending: !member.joined_at,
-					method: member.join_type === 'link' ? 'link' : 'direct',
-				}
-			})
+			const rows: ServerPlayerRow[] = response.users
+				.filter((user) => user.join_type !== 'owner')
+				.map((member) => {
+					const user = users.find((user) => user.id === member.id)
+					return {
+						id: member.id,
+						username: user?.username ?? member.id,
+						avatarUrl: user?.avatar_url ?? undefined,
+						joinedAt: member.joined_at ? new Date(member.joined_at) : null,
+						lastPlayedAt: member.last_played ? new Date(member.last_played) : null,
+						pending: !member.joined_at,
+						method: member.join_type === 'link' ? 'link' : 'direct',
+					}
+				})
 			return { rows, remaining: Math.max(0, 50 - response.users.length - response.tokens) }
 		},
 		refetchInterval: 30_000,
@@ -45,38 +47,62 @@ export function useServerPlayers(instanceId: Ref<string | null>, canManage: Ref<
 		queryFn: async () => {
 			const currentUserId = userId.value
 			const relationships = await client.labrinth.friends_v3.list()
-			const ids = relationships.filter((friend) => friend.accepted)
-				.map((friend) => friend.id === currentUserId ? friend.friend_id : friend.id)
+			const ids = relationships
+				.filter((friend) => friend.accepted)
+				.map((friend) => (friend.id === currentUserId ? friend.friend_id : friend.id))
 			return ids.length ? client.labrinth.users_v2.getMultiple(ids) : []
 		},
 	})
 	const candidates = computed<InvitePlayersUser[]>(() => {
 		const candidates = new Map<string, InvitePlayersUser>()
 		for (const friend of friends.data.value ?? []) {
-			candidates.set(friend.id, { id: friend.id, username: friend.username, avatarUrl: friend.avatar_url, status: 'available' })
+			candidates.set(friend.id, {
+				id: friend.id,
+				username: friend.username,
+				avatarUrl: friend.avatar_url,
+				status: 'available',
+			})
 		}
 		for (const row of rows.value) {
 			candidates.set(row.id, { ...row, status: row.pending ? 'pending' : 'added' })
 		}
 		return [...candidates.values()]
 	})
-	const links = useQuery(computed(() => ({
-		...sharedInstanceInvitesQueryOptions(client, instanceId.value ?? '', userId.value),
-		enabled: !!instanceId.value && !!userId.value && canManage.value,
-	})))
-	const link = computed(() => links.data.value?.find((link) => new Date(link.expiration).getTime() > Date.now() && link.uses < link.max_uses))
+	const links = useQuery(
+		computed(() => ({
+			...sharedInstanceInvitesQueryOptions(client, instanceId.value ?? '', userId.value),
+			enabled: !!instanceId.value && !!userId.value && canManage.value,
+		})),
+	)
+	const link = computed(() =>
+		links.data.value?.find(
+			(link) => new Date(link.expiration).getTime() > Date.now() && link.uses < link.max_uses,
+		),
+	)
 
 	const membershipMutation = useMutation({
-		mutationFn: async ({ id, userId, remove }: { id: string; userId: string; remove: boolean; user?: InvitePlayersUser }) => {
+		mutationFn: async ({
+			id,
+			userId,
+			remove,
+		}: {
+			id: string
+			userId: string
+			remove: boolean
+			user?: InvitePlayersUser
+		}) => {
 			if (!canManage.value) throw new Error('You do not have permission to manage players.')
 			if (remove) return client.sharedinstances.instances_v1.removeUsers(id, [userId])
 			const result = await client.sharedinstances.instances_v1.inviteUsers(id, [userId])
-			if (result.failed.includes(userId)) throw new Error('This player’s privacy settings do not allow this invitation.')
+			if (result.failed.includes(userId))
+				throw new Error('This player’s privacy settings do not allow this invitation.')
 		},
 		onMutate: async ({ id, userId, remove, user }) => {
 			const queryKey = memberKey(id)
 			await queryClient.cancelQueries({ queryKey, exact: true })
-			const previous = queryClient.getQueryData<{ rows: ServerPlayerRow[]; remaining: number }>(queryKey)
+			const previous = queryClient.getQueryData<{ rows: ServerPlayerRow[]; remaining: number }>(
+				queryKey,
+			)
 			if (previous) {
 				const exists = previous.rows.some((row) => row.id === userId)
 				const addedRow: ServerPlayerRow = {
@@ -91,7 +117,9 @@ export function useServerPlayers(instanceId: Ref<string | null>, canManage: Ref<
 				queryClient.setQueryData(queryKey, {
 					rows: remove
 						? previous.rows.filter((row) => row.id !== userId)
-						: exists ? previous.rows : [...previous.rows, addedRow],
+						: exists
+							? previous.rows
+							: [...previous.rows, addedRow],
 					remaining: Math.max(0, previous.remaining + (remove ? Number(exists) : -Number(!exists))),
 				})
 			}
@@ -100,13 +128,25 @@ export function useServerPlayers(instanceId: Ref<string | null>, canManage: Ref<
 		onError: (_error, _variables, context) => {
 			if (context?.previous) queryClient.setQueryData(context.queryKey, context.previous)
 		},
-		onSettled: (_data, _error, { id }) => queryClient.invalidateQueries({ queryKey: ['shared-instances', id, 'players'] }),
+		onSettled: (_data, _error, { id }) =>
+			queryClient.invalidateQueries({ queryKey: ['shared-instances', id, 'players'] }),
 	})
 	const linkMutation = useMutation({
-		mutationFn: async ({ id, settings, replaceId }: { id: string; settings: InviteLinkSettings; replaceId?: string }) => {
+		mutationFn: async ({
+			id,
+			settings,
+			replaceId,
+		}: {
+			id: string
+			settings: InviteLinkSettings
+			replaceId?: string
+		}) => {
 			if (!canManage.value) throw new Error('You do not have permission to manage invite links.')
 			const created = await client.sharedinstances.invites_v1.create(id, {
-				max_age: Math.max(1, Math.min(604800, Math.floor((settings.expiresAt.getTime() - Date.now()) / 1000))),
+				max_age: Math.max(
+					1,
+					Math.min(604800, Math.floor((settings.expiresAt.getTime() - Date.now()) / 1000)),
+				),
 				max_uses: Math.max(1, Math.min(settings.maxUses, remaining.value)),
 			})
 			if (replaceId) {
@@ -118,14 +158,29 @@ export function useServerPlayers(instanceId: Ref<string | null>, canManage: Ref<
 				}
 			}
 		},
-		onSettled: (_data, _error, { id }) => queryClient.invalidateQueries({ queryKey: ['shared-instances', id, 'invites'] }),
+		onSettled: (_data, _error, { id }) =>
+			queryClient.invalidateQueries({ queryKey: ['shared-instances', id, 'invites'] }),
 	})
 
 	async function ensureLink(id: string) {
-		const available = await queryClient.fetchQuery({ ...sharedInstanceInvitesQueryOptions(client, id, userId.value), staleTime: 0 })
-		if (available.some((link) => new Date(link.expiration).getTime() > Date.now() && link.uses < link.max_uses)) return
+		const available = await queryClient.fetchQuery({
+			...sharedInstanceInvitesQueryOptions(client, id, userId.value),
+			staleTime: 0,
+		})
+		if (
+			available.some(
+				(link) => new Date(link.expiration).getTime() > Date.now() && link.uses < link.max_uses,
+			)
+		)
+			return
 		if (remaining.value <= 0) return
-		await linkMutation.mutateAsync({ id, settings: { maxUses: Math.min(10, remaining.value), expiresAt: new Date(Date.now() + 86400_000) } })
+		await linkMutation.mutateAsync({
+			id,
+			settings: {
+				maxUses: Math.min(10, remaining.value),
+				expiresAt: new Date(Date.now() + 86400_000),
+			},
+		})
 	}
 
 	async function search(query: string) {
@@ -134,9 +189,26 @@ export function useServerPlayers(instanceId: Ref<string | null>, canManage: Ref<
 			queryFn: () => client.labrinth.users_v3.search(query),
 			staleTime: 30_000,
 		})
-		return users.filter((user) => user.id !== userId.value && !candidates.value.some((candidate) => candidate.id === user.id))
+		return users
+			.filter(
+				(user) =>
+					user.id !== userId.value &&
+					!candidates.value.some((candidate) => candidate.id === user.id),
+			)
 			.map((user) => ({ id: user.id, username: user.username, avatarUrl: user.avatar_url }))
 	}
 
-	return { members, rows, remaining, candidates, link, links, friends, membershipMutation, linkMutation, ensureLink, search }
+	return {
+		members,
+		rows,
+		remaining,
+		candidates,
+		link,
+		links,
+		friends,
+		membershipMutation,
+		linkMutation,
+		ensureLink,
+		search,
+	}
 }

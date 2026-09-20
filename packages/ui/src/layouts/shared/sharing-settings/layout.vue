@@ -87,7 +87,8 @@ const messages = defineMessages({
 	},
 	reviewChangesBeforePlayingDescription: {
 		id: 'server.settings.sharing.review-changes-before-playing-description',
-		defaultMessage: 'Review content updates before sharing them with players. Saved on this device.',
+		defaultMessage:
+			'Review content updates before sharing them with players. Saved on this device.',
 	},
 	unpublishTitle: {
 		id: 'installation-settings.shared-instance.title',
@@ -122,7 +123,12 @@ const messages = defineMessages({
 				class="flex-none"
 			/>
 		</div>
-		<ActiveInvites :site-url="siteUrl" :busy="busy" :revoking-id="revokingId" @revoke="showRevoke" />
+		<ActiveInvites
+			:site-url="siteUrl"
+			:busy="busy"
+			:revoking-id="revokingId"
+			@revoke="showRevoke"
+		/>
 		<section class="flex flex-col gap-2.5">
 			<h3 class="m-0 text-lg font-semibold text-contrast">
 				{{ formatMessage(messages.unpublishTitle) }}
