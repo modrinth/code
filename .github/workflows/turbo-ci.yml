@@ -85,7 +85,14 @@ jobs:
 
     steps:
       - name: Check out code
+        if: needs.skip-if-clean.outputs.internal != 'true'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+
+      - name: Check out code (Namespace)
+        if: needs.skip-if-clean.outputs.internal == 'true'
+        uses: namespacelabs/nscloud-checkout-action@66f2dc6f6c42a8ac6c4e53473c4840006822831e # v9.0.1
         with:
           fetch-depth: 2
 
