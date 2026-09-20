@@ -23,6 +23,19 @@ export function getClientWarningType(
 	return null
 }
 
+export function getContentWarningType(
+	item: ContentItem,
+	showEnvironmentWarnings = false,
+): ClientWarningType | 'unknown-environment' | null {
+	if (!item.enabledFor) return getClientWarningType(item, showEnvironmentWarnings)
+	if (!item.enabledFor.warningTooltip) return null
+	if (item.enabledFor.server) {
+		if (item.pack_client_retained) return 'retained'
+		if (item.pack_client_depends) return 'depends'
+	}
+	return 'unknown-environment'
+}
+
 export interface ContentFilterOption {
 	id: string
 	label: string
@@ -96,7 +109,7 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 		if (
 			config?.showWarningsFilter &&
 			items.value.some(
-				(item) => getClientWarningType(item, config.showEnvironmentWarnings) !== null,
+				(item) => getContentWarningType(item, config.showEnvironmentWarnings) !== null,
 			)
 		) {
 			options.push({ id: 'warnings', label: formatMessage(messages.warnings) })
@@ -168,7 +181,7 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 				if (filter === 'disabled' && item.enabled) return false
 				if (
 					filter === 'warnings' &&
-					getClientWarningType(item, config?.showEnvironmentWarnings) === null
+					getContentWarningType(item, config?.showEnvironmentWarnings) === null
 				)
 					return false
 			}

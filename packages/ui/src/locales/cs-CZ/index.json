@@ -4433,9 +4433,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Znovu nezobrazovat"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Sdílené servery"
   },

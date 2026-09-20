@@ -1,4 +1,4 @@
-import { computed, type Ref } from 'vue'
+import { computed, type Ref, ref } from 'vue'
 
 import { useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
@@ -16,6 +16,8 @@ export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 	const { serverId, powerState, busyReasons } = injectModrinthServerContext()
 	const { addNotification } = injectNotificationManager()
 	const { canUsePowerActions, permissionDeniedMessage } = useServerPermissions()
+	const pendingAction = ref<PowerAction | null>(null)
+	const isStartingRequest = computed(() => pendingAction.value === 'Start')
 
 	const isInstalling = computed(() =>
 		busyReasons.value.some((reason) => reason.reason.id === 'servers.busy.installing'),
@@ -31,6 +33,7 @@ export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 	const isBlockedByPropsBusyOrPermission = computed(
 		() =>
 			!canUsePowerActions.value ||
+			pendingAction.value !== null ||
 			Boolean(options?.disabled?.value) ||
 			busyReasons.value.length > 0,
 	)
@@ -64,6 +67,8 @@ export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 	})
 
 	async function sendPowerAction(action: PowerAction) {
+		if (pendingAction.value) return
+		pendingAction.value = action
 		try {
 			await client.archon.servers_v0.power(serverId, action)
 		} catch (error) {
@@ -73,6 +78,8 @@ export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 				title: `Failed to ${action.toLowerCase()} server`,
 				text: 'An error occurred while performing this action.',
 			})
+		} finally {
+			pendingAction.value = null
 		}
 	}
 
@@ -90,6 +97,7 @@ export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 	}
 
 	return {
+		isStartingRequest,
 		isInstalling,
 		isRunning,
 		isStopping,

@@ -155,7 +155,10 @@ export function useHostingIntercom(options: UseHostingIntercomOptions) {
 			POINTER_EVENTS_VAR,
 			stackCount.value > 0 ? 'none' : 'auto',
 		)
-		document.documentElement.style.setProperty(LAUNCHER_OPACITY_VAR, launcherHidden.value ? '0' : '1')
+		document.documentElement.style.setProperty(
+			LAUNCHER_OPACITY_VAR,
+			launcherHidden.value ? '0' : '1',
+		)
 		document.documentElement.style.setProperty(
 			LAUNCHER_VISIBILITY_VAR,
 			launcherHidden.value ? 'hidden' : 'visible',

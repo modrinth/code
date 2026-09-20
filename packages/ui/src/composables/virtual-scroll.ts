@@ -195,7 +195,8 @@ export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptio
 		if (index < 0 || index >= items.value.length) return
 		syncScrollState()
 		if (!listContainer.value || !scrollContainer.value) return
-		const top = containerOffset.value + index * itemHeight - (viewportHeight.value - itemHeight) / 2
+		const height = resolvedItemHeight.value
+		const top = containerOffset.value + index * height - (viewportHeight.value - height) / 2
 		scrollContainer.value.scrollTo({ top: Math.max(0, top), behavior: 'instant' })
 		syncScrollState()
 	}
