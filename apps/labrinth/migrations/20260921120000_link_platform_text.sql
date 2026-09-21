@@ -1,7 +1,6 @@
 ALTER TABLE mods_links
 	ADD COLUMN platform TEXT;
 
-/*
 DO $$
 BEGIN
 	IF EXISTS (
@@ -44,4 +43,9 @@ BEGIN
 	WHERE lp.id = ml.joining_platform_id;
 END
 $$;
-*/
+
+ALTER TABLE mods_links
+	ALTER COLUMN platform SET NOT NULL,
+	DROP COLUMN joining_platform_id;
+
+DROP TABLE link_platforms;
