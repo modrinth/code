@@ -254,7 +254,7 @@ pub(super) fn validate_targets_static(
             nags.push(nag);
         }
     }
-	nags.sort_by_key(|nag| nag.details.to_string());
+    nags.sort_by_key(|nag| nag.details.to_string());
     nags.dedup();
     nags
 }
