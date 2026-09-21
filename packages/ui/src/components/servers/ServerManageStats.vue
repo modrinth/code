@@ -28,6 +28,18 @@
 					/>
 				</div>
 			</template>
+			<template v-if="'compactValue' in metric" #value>
+				<span class="flex flex-wrap items-baseline gap-x-1">
+					<span class="whitespace-nowrap @[220px]:hidden">{{ metric.compactValue }}</span>
+					<span class="hidden whitespace-nowrap @[220px]:inline">{{ metric.value }}</span>
+					<span
+						v-if="metric.secondary"
+						class="whitespace-nowrap text-sm font-normal text-secondary"
+					>
+						{{ metric.secondary }}
+					</span>
+				</span>
+			</template>
 		</ServerStatCard>
 	</div>
 </template>
@@ -160,6 +172,7 @@ const metrics = computed(() => {
 	const storageMetric = {
 		title: 'Storage',
 		value: formatBytes(props.loading ? 0 : (stats.value.storage_usage_bytes ?? 0), 1),
+		compactValue: formatBytes(props.loading ? 0 : (stats.value.storage_usage_bytes ?? 0), 0),
 		secondary: null as string | null,
 		icon: FolderOpenIcon,
 		showGraph: false,

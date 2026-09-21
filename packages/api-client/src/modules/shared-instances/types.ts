@@ -44,11 +44,13 @@ export namespace SharedInstances {
 
 	export namespace Instances {
 		export namespace v1 {
+			export type OnlineStatus = 'unknown' | 'running' | 'stopped' | null
+
 			export type Instance = {
 				name: string
 				icon: string | null
 				quarantine: boolean
-				linked_server: { domain: string; region: string } | null
+				linked_server: { domain: string; region: string; online_status: OnlineStatus } | null
 			}
 
 			export type JoinType = 'owner' | 'invite' | 'link'
