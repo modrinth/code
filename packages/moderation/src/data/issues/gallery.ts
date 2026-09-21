@@ -4,6 +4,7 @@ import insufficientMessage from '../messages/checklist/messages/gallery/insuffic
 import notRelevantMessage from '../messages/checklist/messages/gallery/not-relevant.md'
 import showcaseClarityMessage from '../messages/checklist/messages/gallery/showcase-clarity.md'
 import { issue, panel, toggle } from './component-builders/builders'
+import { rulesAiImagesIssue } from './rules'
 
 export const galleryInsufficientIssue = issue({
 	id: 'gallery-insufficient',
@@ -41,5 +42,9 @@ export const galleryReviewPanel = panel({
 	toggle({
 		issue: galleryShowcaseClarityIssue,
 		label: 'Showcase Clarity',
+	}),
+	toggle({
+		issue: rulesAiImagesIssue,
+		label: 'AI Images',
 	}),
 )

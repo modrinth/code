@@ -15,6 +15,7 @@ import nonEnglish from '../messages/checklist/messages/description/non-english.m
 import nonEnglishServer from '../messages/checklist/messages/description/non-english-server.md'
 import nonStandardText from '../messages/checklist/messages/description/non-standard-text.md'
 import { issue, markdown, panel, section, toggle } from './component-builders/builders'
+import { rulesAiImagesIssue } from './rules'
 
 export const insufficientDescriptionIssue = issue({
 	id: 'description-insufficient',
@@ -108,6 +109,10 @@ export const descriptionReviewPanel = panel({
 	toggle({
 		label: 'Unclear / Misleading',
 		issue: unclearDescriptionIssue,
+	}),
+	toggle({
+		label: 'AI Images',
+		issue: rulesAiImagesIssue,
 	}),
 	section({
 		label: 'Why is this Description Insufficient?',
