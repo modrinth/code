@@ -53,9 +53,6 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Stahování se nepodařilo dokončit"
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "Instance nebyla nalezena"
-  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Cesta k souboru je neplatná"
   },

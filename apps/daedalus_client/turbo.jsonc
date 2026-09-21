@@ -1,0 +1,48 @@
+{
+	"$schema": "../../node_modules/turbo/schema.json",
+	"extends": ["//"],
+	"tasks": {
+		// Turborepo only knows the pnpm dependency graph, so the Cargo workspace
+		// files and sibling crates this crate compiles against are hashed explicitly
+		"build": {
+			"inputs": [
+				"$TURBO_DEFAULT$",
+				".env*",
+				"$TURBO_ROOT$/Cargo.toml",
+				"$TURBO_ROOT$/Cargo.lock",
+				"$TURBO_ROOT$/rust-toolchain.toml",
+				"$TURBO_ROOT$/clippy.toml",
+				"$TURBO_ROOT$/rustfmt.toml",
+				"$TURBO_ROOT$/.cargo/config.toml",
+				"$TURBO_ROOT$/packages/*/Cargo.toml",
+				"$TURBO_ROOT$/packages/*/src/**/*.rs"
+			]
+		},
+		"lint": {
+			"inputs": [
+				"$TURBO_DEFAULT$",
+				"$TURBO_ROOT$/Cargo.toml",
+				"$TURBO_ROOT$/Cargo.lock",
+				"$TURBO_ROOT$/rust-toolchain.toml",
+				"$TURBO_ROOT$/clippy.toml",
+				"$TURBO_ROOT$/rustfmt.toml",
+				"$TURBO_ROOT$/.cargo/config.toml",
+				"$TURBO_ROOT$/packages/*/Cargo.toml",
+				"$TURBO_ROOT$/packages/*/src/**/*.rs"
+			]
+		},
+		"test": {
+			"inputs": [
+				"$TURBO_DEFAULT$",
+				"$TURBO_ROOT$/Cargo.toml",
+				"$TURBO_ROOT$/Cargo.lock",
+				"$TURBO_ROOT$/rust-toolchain.toml",
+				"$TURBO_ROOT$/clippy.toml",
+				"$TURBO_ROOT$/rustfmt.toml",
+				"$TURBO_ROOT$/.cargo/config.toml",
+				"$TURBO_ROOT$/packages/*/Cargo.toml",
+				"$TURBO_ROOT$/packages/*/src/**/*.rs"
+			]
+		}
+	}
+}

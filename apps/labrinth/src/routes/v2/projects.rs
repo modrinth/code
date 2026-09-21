@@ -631,7 +631,7 @@ pub async fn project_edit(
         let fetched_example_project =
             project_item::DBProject::get(&info.0, &**pool, &redis)
                 .await
-                .wrap_api_err("fetching project from database")?;
+                .wrap_internal_err("fetching project from database")?;
         let donation_links = fetched_example_project
             .map(|x| {
                 x.urls
@@ -707,7 +707,7 @@ pub async fn project_edit(
             &redis,
         )
         .await
-        .wrap_api_err("fetching project from database")?;
+        .wrap_internal_err("fetching project from database")?;
         let version_ids = project_item.map(|x| x.versions).unwrap_or_default();
         let versions =
             version_item::DBVersion::get_many(&version_ids, &**pool, &redis)

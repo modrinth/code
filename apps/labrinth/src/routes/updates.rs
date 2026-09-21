@@ -58,7 +58,7 @@ pub async fn forge_updates(
 
     let project = database::models::DBProject::get(&id, &**pool, &redis)
         .await
-        .wrap_api_err("fetching project from database")?
+        .wrap_internal_err("fetching project from database")?
         .wrap_request_err_with(|| ERROR.to_string())?;
 
     let user_option = get_user_from_headers(

@@ -89,7 +89,7 @@ pub async fn maven_metadata(
     let Some(project) =
         database::models::DBProject::get(&project_id, &**pool, &redis)
             .await
-            .wrap_api_err("fetching Maven project")?
+            .wrap_internal_err("fetching Maven project")?
     else {
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };
@@ -327,7 +327,7 @@ pub async fn version_file(
     let Some(project) =
         database::models::DBProject::get(&project_id, &**pool, &redis)
             .await
-            .wrap_api_err("fetching Maven project")?
+            .wrap_internal_err("fetching Maven project")?
     else {
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };
@@ -414,7 +414,7 @@ pub async fn version_file_sha1(
     let Some(project) =
         database::models::DBProject::get(&project_id, &**pool, &redis)
             .await
-            .wrap_api_err("fetching Maven project")?
+            .wrap_internal_err("fetching Maven project")?
     else {
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };
@@ -480,7 +480,7 @@ pub async fn version_file_sha512(
     let Some(project) =
         database::models::DBProject::get(&project_id, &**pool, &redis)
             .await
-            .wrap_api_err("fetching Maven project")?
+            .wrap_internal_err("fetching Maven project")?
     else {
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };

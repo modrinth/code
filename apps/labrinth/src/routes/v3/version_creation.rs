@@ -24,6 +24,7 @@ use crate::models::projects::{
 };
 use crate::models::projects::{DependencyType, skip_nulls};
 use crate::models::teams::ProjectPermissions;
+use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::search::SearchState;
 use crate::util::kafka::KafkaClientState;
@@ -317,6 +318,28 @@ async fn version_create_inner(
                     return Err(CreateError::CustomAuthenticationError(
                         "You don't have permission to upload this version!".to_string(),
                     ));
+                }
+
+                let project_version_limits =
+                    UserLimits::get_for_versions_per_project(
+                        &user,
+                        project_id,
+                        pool,
+                    )
+                    .await?;
+                if project_version_limits.current >= project_version_limits.max {
+                    return Err(CreateError::ProjectVersionLimitReached);
+                }
+
+                let daily_version_limits =
+                    UserLimits::get_for_versions_per_day(
+                        &user,
+                        Utc::now(),
+                        pool,
+                    )
+                    .await?;
+                if daily_version_limits.current >= daily_version_limits.max {
+                    return Err(CreateError::DailyVersionLimitReached);
                 }
 
                 let version_id: VersionId = models::generate_version_id(transaction).await?.into();

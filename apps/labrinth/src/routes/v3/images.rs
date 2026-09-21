@@ -82,7 +82,7 @@ pub async fn images_add(
                 let project =
                     project_item::DBProject::get(&id, &**pool, &redis)
                         .await
-                        .wrap_api_err("fetching project from database")?;
+                        .wrap_internal_err("fetching project from database")?;
                 if let Some(project) = project {
                     if is_team_member_project(
                         &project.inner,
@@ -204,8 +204,7 @@ pub async fn images_add(
         1_048_576,
         "Icons must be smaller than 1MiB",
     )
-    .await
-    .wrap_api_err("executing `read_limited_from_payload`")?;
+    .await?;
 
     let content_length = bytes.len();
     let upload_result = upload_image_optimized(

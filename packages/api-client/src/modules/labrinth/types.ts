@@ -2535,6 +2535,7 @@ export namespace Labrinth {
 			export type GetRuleAffectedDetailsRequest = {
 				limit?: number
 				page?: number
+				processing_only?: boolean
 			}
 
 			export type GetRuleAffectedDetailsResponse = {

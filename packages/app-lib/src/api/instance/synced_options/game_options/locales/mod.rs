@@ -80,10 +80,6 @@ struct Candidate {
 
 pub(crate) fn queue_game_locale_index() {
     if let Some(state) = State::get_if_initialized() {
-        tracing::info!(
-            started = state.game_locale_indexer.started.load(Ordering::Acquire),
-            "Game setting locales: indexing queued"
-        );
         state.game_locale_indexer.notify.notify_one();
     } else {
         tracing::warn!(
@@ -100,33 +96,22 @@ pub(crate) fn start_game_locale_indexer(state: Arc<State>) {
     {
         return;
     }
-    tracing::info!("Game setting locales: indexer started");
     state.game_locale_indexer.notify.notify_one();
     tokio::spawn(async move {
         loop {
             state.game_locale_indexer.notify.notified().await;
             tokio::time::sleep(std::time::Duration::from_millis(300)).await;
-            let started = std::time::Instant::now();
             if let Err(error) = index_installed_sources(&state).await {
                 tracing::warn!(%error, "Game setting locales: indexing failed");
             }
-            tracing::info!(
-                elapsed_ms = started.elapsed().as_millis(),
-                "Game setting locales: indexing pass finished"
-            );
             #[cfg(feature = "tauri")]
             {
                 use tauri::Emitter;
-                match crate::EventState::get()
+                if let Err(error) = crate::EventState::get()
                     .app
                     .emit("game-option-locales-updated", ())
                 {
-                    Ok(()) => tracing::info!(
-                        "Game setting locales: emitted game-option-locales-updated"
-                    ),
-                    Err(error) => {
-                        tracing::warn!(%error, "Game setting locales: update event failed")
-                    }
+                    tracing::warn!(%error, "Game setting locales: update event failed");
                 }
             }
         }
@@ -221,19 +206,11 @@ async fn cached_archive(
 #[tracing::instrument(skip_all, err)]
 async fn index_installed_sources(state: &State) -> crate::Result<()> {
     let mut instances = crate::state::list_instances(&state.pool).await?;
-    tracing::info!(
-        instances = instances.len(),
-        "Game setting locales: indexing installed instances"
-    );
     instances.sort_by(|a, b| a.instance.id.cmp(&b.instance.id));
     let mut candidates = Vec::new();
     let mut resolver = origins::OriginResolver::default();
     for metadata in instances {
         if super::super::sync_files_are_protected(&metadata) {
-            tracing::info!(
-                instance_id = metadata.instance.id,
-                "Game setting locales: skipping protected instance"
-            );
             continue;
         }
         let document = match read_document(&options_path(&metadata, state))
@@ -261,9 +238,6 @@ async fn index_installed_sources(state: &State) -> crate::Result<()> {
                 continue;
             }
         };
-        tracing::info!(instance_id = metadata.instance.id, %snapshot_id, game_version = snapshot.game_version,
-			mods = snapshot.mods.len(),
-			"Game setting locales: snapshot loaded");
         resolver
             .index_snapshot(state, &snapshot_id, snapshot.clone())
             .await?;
@@ -284,11 +258,6 @@ async fn index_installed_sources(state: &State) -> crate::Result<()> {
             .await?;
         }
         tx.commit().await?;
-        tracing::info!(
-            instance_id = metadata.instance.id,
-            options = keys.len(),
-            "Game setting locales: observations recorded"
-        );
         candidates.push(Candidate {
             snapshot_id,
             snapshot,
@@ -296,14 +265,6 @@ async fn index_installed_sources(state: &State) -> crate::Result<()> {
         });
     }
     let rows = storage::load(&state.pool, None).await?;
-    tracing::info!(
-        candidates = candidates.len(),
-        rows = rows.len(),
-        resolved = rows.iter().filter(|row| row.origin.is_some()).count(),
-        "Game setting locales: resolving translation origins"
-    );
-    let mut pinned = 0;
-    let mut unresolved = 0;
     for row in rows {
         if row.origin.is_some() {
             continue;
@@ -342,14 +303,10 @@ async fn index_installed_sources(state: &State) -> crate::Result<()> {
                 raw_key: c.keys[&row.option_id].clone(),
             }));
         }
-        let mut resolved = false;
-        let observation_count = observations.len();
         for observation in observations {
             match resolver.resolve(state, &observation).await {
                 Ok(Some(origin)) => {
                     storage::pin(&state.pool, &row, &origin).await?;
-                    resolved = true;
-                    pinned += 1;
                     break;
                 }
                 Ok(None) => {}
@@ -359,22 +316,7 @@ async fn index_installed_sources(state: &State) -> crate::Result<()> {
                 }
             }
         }
-        if !resolved {
-            tracing::debug!(
-                scope = row.scope,
-                option_id = row.option_id,
-                observation_count,
-                backfilled = row.backfilled,
-                "Game setting locales: no matching translation origin"
-            );
-            unresolved += 1;
-        }
     }
-    tracing::info!(
-        pinned,
-        unresolved,
-        "Game setting locales: origin resolution finished"
-    );
     Ok(())
 }
 
@@ -405,7 +347,6 @@ pub async fn get_game_setting_locale_labels(
     option_ids: Vec<String>,
     refresh_sources: bool,
 ) -> crate::Result<GameSettingLocaleLabels> {
-    tracing::info!("Game setting locales: label request received");
     if option_ids.len() > 16_384 {
         return Err(input_error("Too many requested game-setting labels"));
     }
@@ -430,12 +371,6 @@ pub async fn get_game_setting_locale_labels(
     }
     let scope = instance_id.unwrap_or("");
     let mut rows = storage::load(&state.pool, Some(scope)).await?;
-    tracing::info!(
-        scope,
-        rows = rows.len(),
-        resolved = rows.iter().filter(|row| row.origin.is_some()).count(),
-        "Game setting locales: scoped origins loaded"
-    );
     if scope.is_empty() {
         let mut sourced: std::collections::HashSet<_> =
             rows.iter().map(|row| row.option_id.clone()).collect();
@@ -450,11 +385,6 @@ pub async fn get_game_setting_locale_labels(
             }
         }
     }
-    tracing::info!(
-        rows = rows.len(),
-        resolved = rows.iter().filter(|row| row.origin.is_some()).count(),
-        "Game setting locales: origins selected including fallbacks"
-    );
     let hashes: std::collections::HashSet<_> = rows
         .iter()
         .filter(|row| requested.contains(&row.option_id))
@@ -473,13 +403,11 @@ pub async fn get_game_setting_locale_labels(
     let mut result = GameSettingLocaleLabels::default();
     let mut archives = HashMap::new();
     let mut dictionaries: HashMap<String, Translations> = HashMap::new();
-    let mut missing_origins = Vec::new();
     for row in rows {
         if !requested.contains(&row.option_id) {
             continue;
         }
         let Some(origin) = row.origin else {
-            missing_origins.push(row.option_id);
             continue;
         };
         if origin.legacy_game_jar_hash.as_deref()
@@ -522,8 +450,6 @@ pub async fn get_game_setting_locale_labels(
                 translations.extend(selected.clone());
             }
             bundle.deprecated.apply(&mut translations);
-            tracing::info!(%dictionary_id, %locale, translations = translations.len(),
-				"Game setting locales: dictionary loaded");
             dictionaries.insert(dictionary_id.clone(), translations);
         }
         let translations = &dictionaries[&dictionary_id];
@@ -576,16 +502,5 @@ pub async fn get_game_setting_locale_labels(
             );
         }
     }
-    let mut missing: Vec<_> = requested
-        .iter()
-        .filter(|id| !result.settings.contains_key(*id))
-        .collect();
-    missing.sort();
-    tracing::info!(
-        returned = result.settings.len(),
-        ?missing,
-        ?missing_origins,
-        "Game setting locales: label request completed"
-    );
     Ok(result)
 }

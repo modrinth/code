@@ -25,6 +25,7 @@ struct BulkUpdatePlan {
 
 #[derive(Clone, Debug)]
 struct PlannedProjectUpdate {
+    project_id: String,
     relative_path: String,
     current_version_id: String,
     update_version_id: String,
@@ -107,6 +108,8 @@ async fn apply_content_update(
         state,
     )
     .await?;
+
+    validate_update_project(&downloaded, &update.project_id)?;
 
     let new_path = add_downloaded_project_version_with_enabled(
         instance_id,
@@ -240,6 +243,8 @@ async fn download_planned_projects(
                         state,
                     )
                     .await?;
+
+                    validate_update_project(&downloaded, &update.project_id)?;
 
                     Ok::<_, crate::Error>(DownloadedBulkProject::ProjectUpdate(
                         update, downloaded,
@@ -439,6 +444,7 @@ async fn plan_bulk_update(
     let project_updates = updates
         .into_iter()
         .map(|update| PlannedProjectUpdate {
+            project_id: update.project_id,
             relative_path: update.relative_path,
             current_version_id: update.current_version_id,
             update_version_id: update.update_version_id,
@@ -695,4 +701,17 @@ fn is_dependency_version_compatible(
             .iter()
             .any(|loader| loader == content_set.loader.as_str())
             || version.loaders.iter().any(|loader| loader == "datapack"))
+}
+
+fn validate_update_project(
+    downloaded: &DownloadedProjectVersion,
+    project_id: &str,
+) -> crate::Result<()> {
+    if downloaded.project_id != project_id {
+        return Err(crate::ErrorKind::InputError(
+            "Cannot update content to a different Modrinth project".to_string(),
+        )
+        .into());
+    }
+    Ok(())
 }

@@ -230,10 +230,10 @@
 		<div class="items">
 			<div v-for="(item, index) in filteredGallery" :key="index" class="card gallery-item">
 				<a class="gallery-thumbnail" @click="expandImage(item, index)">
-					<img
+					<FullImage
 						:src="item.url ? item.url : 'https://cdn.modrinth.com/placeholder-banner.svg'"
+						:raw-src="item.raw_url"
 						:alt="item.title ? item.title : 'gallery-image'"
-						@contextmenu="onFullImageContextMenu($event, item.raw_url)"
 					/>
 				</a>
 				<div class="gallery-body">
@@ -312,13 +312,13 @@ import {
 	ConfirmModal,
 	DropArea,
 	FileButton,
+	FullImage,
 	IconButton,
 	injectProjectPageContext,
 	Input,
 	NewModal as Modal,
 	Textarea,
 	useFormatDateTime,
-	useFullImageContextMenu,
 } from '@modrinth/ui'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
@@ -333,8 +333,6 @@ const formatDate = useFormatDateTime({
 	month: 'long',
 	day: 'numeric',
 })
-const onFullImageContextMenu = useFullImageContextMenu()
-
 const {
 	projectV2: project,
 	currentMember,

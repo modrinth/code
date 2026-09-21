@@ -212,7 +212,7 @@ pub async fn random_projects_get(
     let projects_data =
         db_models::DBProject::get_many_ids(&project_ids, &**pool, &redis)
             .await
-            .wrap_api_err("fetching projects by ID")?
+            .wrap_internal_err("fetching projects by ID")?
             .into_iter()
             .map(Project::from)
             .collect::<Vec<_>>();
@@ -257,7 +257,7 @@ pub async fn projects_get(
         .wrap_request_err("deserializing JSON data")?;
     let projects_data = db_models::DBProject::get_many(&ids, &**pool, &redis)
         .await
-        .wrap_api_err("fetching requested projects")?;
+        .wrap_internal_err("fetching requested projects")?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -472,7 +472,7 @@ pub async fn project_edit_internal(
     let Some(mut project_item) =
         db_models::DBProject::get(&info.into_inner().0, &**pool, &redis)
             .await
-            .wrap_api_err("fetching project")?
+            .wrap_internal_err("fetching project")?
     else {
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };
@@ -505,9 +505,10 @@ pub async fn project_edit_internal(
         new_project.status,
         Some(ProjectStatus::Draft | ProjectStatus::Rejected)
     );
-    let validate_for_review = submit_for_review
-        || (project_item.inner.status == ProjectStatus::Processing
-            && !leave_review);
+    let validate_for_review = !user.role.is_mod()
+        && (submit_for_review
+            || (project_item.inner.status == ProjectStatus::Processing
+                && !leave_review));
     if submit_for_review {
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
             return Err(ApiError::Auth(eyre!(
@@ -944,7 +945,7 @@ pub async fn project_edit_internal(
             &redis,
         )
         .await
-        .wrap_api_err("checking project slug availability")?;
+        .wrap_internal_err("checking project slug availability")?;
         if existing.is_some() {
             return Err(ApiError::Request(eyre::eyre!(
                 "Slug collides with other project's id!",
@@ -1697,7 +1698,7 @@ pub async fn project_get_check_internal(
 
     let project_data = db_models::DBProject::get(&slug, &**pool, &redis)
         .await
-        .wrap_api_err("fetching project from database")?;
+        .wrap_internal_err("fetching project from database")?;
 
     if let Some(project) = project_data {
         Ok(HttpResponse::Ok().json(ProjectCheckResponse {
@@ -1744,7 +1745,7 @@ pub async fn dependency_list_internal(
 
     let result = db_models::DBProject::get(&string, &***ro_pool, &redis)
         .await
-        .wrap_api_err("fetching project from database")?;
+        .wrap_internal_err("fetching project from database")?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -1806,11 +1807,11 @@ pub async fn dependency_list_internal(
                     &redis,
                 )
                 .await
-                .wrap_internal_err("failed to fetch dependency versions")
+                .wrap_err("fetching dependency versions")
             },
         )
         .await
-        .wrap_api_err("fetching project dependencies")?;
+        .wrap_internal_err("fetching project dependencies")?;
 
         let mut projects = filter_visible_projects(
             projects_result,
@@ -1930,7 +1931,7 @@ pub async fn projects_edit(
     let projects_data =
         db_models::DBProject::get_many_ids(&project_ids, &**pool, &redis)
             .await
-            .wrap_api_err("fetching projects to edit")?;
+            .wrap_internal_err("fetching projects to edit")?;
 
     if let Some(id) = project_ids
         .iter()
@@ -2317,7 +2318,7 @@ pub async fn project_icon_edit_internal(
 
     let project_item = db_models::DBProject::get(&string, &**pool, &redis)
         .await
-        .wrap_api_err("fetching project from database")?
+        .wrap_internal_err("fetching project from database")?
         .wrap_request_err_with(|| {
             "the specified project does not exist!".to_string()
         })?;
@@ -2364,11 +2365,10 @@ pub async fn project_icon_edit_internal(
 
     let bytes = read_limited_from_payload(
         &mut payload,
-        262144,
-        "Icons must be smaller than 256KiB",
+        524288,
+        "Icons must be smaller than 512KiB",
     )
-    .await
-    .wrap_api_err("executing `read_limited_from_payload`")?;
+    .await?;
 
     let project_id: ProjectId = project_item.inner.id.into();
     let upload_result = upload_image_optimized(
@@ -2470,7 +2470,7 @@ pub async fn delete_project_icon_internal(
 
     let project_item = db_models::DBProject::get(&string, &**pool, &redis)
         .await
-        .wrap_api_err("fetching project from database")?
+        .wrap_internal_err("fetching project from database")?
         .wrap_request_err_with(|| {
             "the specified project does not exist!".to_string()
         })?;
@@ -2633,7 +2633,7 @@ pub async fn add_gallery_item_internal(
 
     let project_item = db_models::DBProject::get(&string, &**pool, &redis)
         .await
-        .wrap_api_err("fetching project from database")?
+        .wrap_internal_err("fetching project from database")?
         .wrap_request_err_with(|| {
             "the specified project does not exist!".to_string()
         })?;
@@ -2680,8 +2680,7 @@ pub async fn add_gallery_item_internal(
         5 * (1 << 20),
         "Gallery image exceeds the maximum of 5MiB.",
     )
-    .await
-    .wrap_api_err("executing `read_limited_from_payload`")?;
+    .await?;
 
     let id: ProjectId = project_item.inner.id.into();
     let upload_result = upload_image_optimized(
@@ -2888,7 +2887,7 @@ pub async fn edit_gallery_item_internal(
         &redis,
     )
     .await
-    .wrap_api_err("fetching project from database")?
+    .wrap_internal_err("fetching project from database")?
     .wrap_request_err_with(|| {
         "the specified project does not exist!".to_string()
     })?;
@@ -3115,7 +3114,7 @@ pub async fn delete_gallery_item_internal(
         &redis,
     )
     .await
-    .wrap_api_err("fetching project from database")?
+    .wrap_internal_err("fetching project from database")?
     .wrap_request_err_with(|| {
         "the specified project does not exist!".to_string()
     })?;
@@ -3556,7 +3555,7 @@ pub async fn project_follow_internal(
 
     let project = db_models::DBProject::get(&string, &**pool, &redis)
         .await
-        .wrap_api_err("fetching project from database")?
+        .wrap_internal_err("fetching project from database")?
         .wrap_request_err_with(|| {
             "the specified project does not exist!".to_string()
         })?;
@@ -3661,7 +3660,7 @@ pub async fn project_unfollow_internal(
 
     let project = db_models::DBProject::get(&string, &**pool, &redis)
         .await
-        .wrap_api_err("fetching project from database")?
+        .wrap_internal_err("fetching project from database")?
         .wrap_request_err_with(|| {
             "the specified project does not exist!".to_string()
         })?;
@@ -3749,7 +3748,7 @@ pub async fn project_get_organization(
     let string = info.into_inner().0;
     let result = db_models::DBProject::get(&string, &**pool, &redis)
         .await
-        .wrap_api_err("fetching project from database")?
+        .wrap_internal_err("fetching project from database")?
         .wrap_request_err_with(|| {
             "the specified project does not exist!".to_string()
         })?;

@@ -1,8 +1,9 @@
 use super::ids::*;
 use crate::database::PgTransaction;
-use crate::{database::models::DatabaseError, models::images::ImageContext};
+use crate::models::images::ImageContext;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
+use eyre::{Result, WrapErr};
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
@@ -30,7 +31,7 @@ impl DBImage {
     pub async fn insert(
         &self,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<()> {
         sqlx::query!(
             "
             INSERT INTO uploaded_images (
@@ -53,7 +54,8 @@ impl DBImage {
             self.report_id.map(|x| x.0),
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("inserting uploaded image")?;
 
         Ok(())
     }
@@ -62,8 +64,10 @@ impl DBImage {
         id: DBImageId,
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
-    ) -> Result<Option<()>, DatabaseError> {
-        let image = Self::get(id, &mut *transaction, redis).await?;
+    ) -> Result<Option<()>> {
+        let image = Self::get(id, &mut *transaction, redis)
+            .await
+            .wrap_err("fetching uploaded image to remove")?;
 
         if let Some(image) = image {
             sqlx::query!(
@@ -74,9 +78,12 @@ impl DBImage {
                 id as DBImageId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("deleting uploaded image")?;
 
-            DBImage::clear_cache(image.id, redis).await?;
+            DBImage::clear_cache(image.id, redis)
+                .await
+                .wrap_err("clearing removed uploaded image cache")?;
 
             Ok(Some(()))
         } else {
@@ -87,7 +94,7 @@ impl DBImage {
     pub async fn get_many_contexted(
         context: ImageContext,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<Vec<DBImage>, sqlx::Error> {
+    ) -> std::result::Result<Vec<DBImage>, sqlx::Error> {
         // Set all of project_id, version_id, thread_message_id, report_id to None
         // Then set the one that is relevant to Some
 
@@ -164,12 +171,13 @@ impl DBImage {
         id: DBImageId,
         executor: E,
         redis: &RedisPool,
-    ) -> Result<Option<DBImage>, DatabaseError>
+    ) -> Result<Option<DBImage>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         DBImage::get_many(&[id], executor, redis)
             .await
+            .wrap_err("fetching uploaded image")
             .map(|x| x.into_iter().next())
     }
 
@@ -177,7 +185,7 @@ impl DBImage {
         image_ids: &[DBImageId],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<DBImage>, DatabaseError>
+    ) -> Result<Vec<DBImage>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -187,7 +195,7 @@ impl DBImage {
             IMAGES_NAMESPACE,
             &image_ids.iter().map(|x| x.0).collect::<Vec<_>>(),
             |image_ids| async move {
-                let images = sqlx::query!(
+                sqlx::query!(
                     "
                     SELECT id, url, raw_url, size, created, owner_id, context, mod_id, version_id, thread_message_id, report_id
                     FROM uploaded_images
@@ -213,25 +221,28 @@ impl DBImage {
                         };
 
                         acc.insert(i.id, img);
-                        async move { Ok(acc) }
+                        async move { Ok::<_, sqlx::Error>(acc) }
                     })
-                    .await?;
-
-                Ok::<_, DatabaseError>(images)
+                    .await
             },
-        ).await?;
+        )
+        .await
+        .wrap_err("fetching cached uploaded images")?;
 
         Ok(val)
     }
 
-    pub async fn clear_cache(
-        id: DBImageId,
-        redis: &RedisPool,
-    ) -> Result<(), DatabaseError> {
-        let mut redis = redis.connect().await?;
+    pub async fn clear_cache(id: DBImageId, redis: &RedisPool) -> Result<()> {
+        let mut redis = redis
+            .connect()
+            .await
+            .wrap_err("connecting to redis to clear uploaded image cache")?;
         let key = redis.key().entity(IMAGES_NAMESPACE, id.0);
 
-        redis.delete(&key).await?;
+        redis
+            .delete(&key)
+            .await
+            .wrap_err("clearing uploaded image cache")?;
         Ok(())
     }
 }
