@@ -92,6 +92,10 @@ export async function refresh_content_updates(instanceId: string): Promise<void>
 	return await invoke('plugin:instance|instance_refresh_content_updates', { instanceId })
 }
 
+export async function sync_content_files(instanceId: string): Promise<void> {
+	return await invoke('plugin:instance|instance_sync_content_files', { instanceId })
+}
+
 // Linked modpack info returned from backend
 export interface LinkedModpackInfo {
 	project: Labrinth.Projects.v2.Project
