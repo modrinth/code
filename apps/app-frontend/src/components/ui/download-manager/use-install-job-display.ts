@@ -176,9 +176,9 @@ const failureSummaryMessages = defineMessages({
 		id: 'app.action-bar.install.summary.invalid-file-path',
 		defaultMessage: 'File path is invalid',
 	},
-	instanceNotFound: {
-		id: 'app.action-bar.install.summary.instance-not-found',
-		defaultMessage: "Instance couldn't be found",
+	instanceError: {
+		id: 'app.action-bar.install.summary.instance-error',
+		defaultMessage: "Couldn't prepare instance",
 	},
 	cleanupIncomplete: {
 		id: 'app.action-bar.install.summary.cleanup-incomplete',
@@ -214,7 +214,7 @@ const failureMessagesByCode = new Map([
 	['hash_error', failureSummaryMessages.corruptDownload],
 	['filesystem_error', failureSummaryMessages.couldNotSaveFiles],
 	['path_error', failureSummaryMessages.invalidFilePath],
-	['instance_error', failureSummaryMessages.instanceNotFound],
+	['instance_error', failureSummaryMessages.instanceError],
 	['java_error', failureSummaryMessages.javaSetupFailed],
 	['loader_error', failureSummaryMessages.loaderSetupFailed],
 	['processor_error', failureSummaryMessages.loaderSetupFailed],
@@ -232,7 +232,7 @@ const failureMessagesByPhase = new Map([
 	['resolving_loader', failureSummaryMessages.loaderSetupFailed],
 	['running_loader_processors', failureSummaryMessages.loaderSetupFailed],
 	['preparing_java', failureSummaryMessages.javaSetupFailed],
-	['preparing_instance', failureSummaryMessages.instanceNotFound],
+	['preparing_instance', failureSummaryMessages.instanceError],
 	['rolling_back', failureSummaryMessages.cleanupIncomplete],
 ])
 
