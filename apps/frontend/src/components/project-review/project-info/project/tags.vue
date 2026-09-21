@@ -7,9 +7,9 @@
 			>{{ formatCategory(formatMessage, category) }}</TagItem
 		>
 		<TagItem
-			class="!border-surface-4 !bg-surface-3 !text-secondary"
 			v-for="category in project.additional_categories"
 			:key="category"
+			class="!border-surface-4 !bg-surface-3 !text-secondary"
 		>
 			{{ formatCategory(formatMessage, category) }}
 		</TagItem>

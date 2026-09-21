@@ -18,5 +18,7 @@ export type ReviewTarget =
 				| 'gallery'
 				| 'disclosures'
 				| 'versions'
+				| 'permissions'
+				| 'rules'
 	  }
 	| { kind: 'link' | 'gallery-image' | 'version'; key: string }

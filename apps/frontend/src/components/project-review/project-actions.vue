@@ -19,19 +19,19 @@
 import { Tabs } from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 
-import { injectReviewStages } from '~/providers/project-review/review-stages'
+import { injectReviewPanels } from '~/providers/project-review/review-panels'
 
 import ReviewPanel from './review-panel/index.vue'
 
-const { resolve } = injectReviewStages()
-const targets = ['re-review', 'reupload', 'post-approval', 'status-alerts'] as const
+const { resolve } = injectReviewPanels()
+const targets = ['re-review', 'reupload', 'rules', 'post-approval', 'status-alerts'] as const
 type ActionTarget = (typeof targets)[number]
 const selectedTarget = ref<ActionTarget>('re-review')
 const visibleTargets = computed(() => targets.filter((kind) => resolve({ kind })))
 const tabs = computed(() =>
 	visibleTargets.value.map((kind) => ({
 		value: kind,
-		label: resolve({ kind })!.stage.label,
+		label: resolve({ kind })!.panel.title,
 	})),
 )
 

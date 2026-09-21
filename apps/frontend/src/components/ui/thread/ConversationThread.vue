@@ -688,6 +688,7 @@ const messages = defineMessages({
 })
 
 const props = defineProps({
+	beforeSendReply: { type: Function, default: null },
 	resizableEditor: Boolean,
 	initialPreview: Boolean,
 	generatingMessage: Boolean,
@@ -855,6 +856,8 @@ async function sendReply(status = null, privateMessage = false) {
 			}
 		}
 
+		await props.beforeSendReply?.({ status, privateMessage })
+
 		await useBaseFetch(`thread/${props.thread.id}`, {
 			method: 'POST',
 			body,
@@ -869,7 +872,7 @@ async function sendReply(status = null, privateMessage = false) {
 	} catch (err) {
 		addNotification({
 			title: formatMessage(messages.errorSendingMessage),
-			text: err.data ? err.data.description : err,
+			text: err.data ? err.data.description : err instanceof Error ? err.message : err,
 			type: 'error',
 		})
 	}

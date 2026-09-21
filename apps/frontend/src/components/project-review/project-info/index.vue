@@ -9,23 +9,13 @@
 		</div>
 		<p v-else-if="!project" class="m-0">{{ formatMessage(messages.empty) }}</p>
 		<template v-else>
-			<ReviewPanel
-				mode="anchored"
-				as="section"
-				:target="{ kind: 'title' }"
-				class="review-section"
-			>
+			<ReviewPanel mode="anchored" as="section" :target="{ kind: 'title' }" class="review-section">
 				<h3 class="review-section-label">
 					{{ formatMessage(messages.projectTitle) }}
 				</h3>
 				<h1 class="m-0 text-xl">{{ project.name }}</h1>
 			</ReviewPanel>
-			<ReviewPanel
-				mode="anchored"
-				as="section"
-				:target="{ kind: 'slug' }"
-				class="review-section"
-			>
+			<ReviewPanel mode="anchored" as="section" :target="{ kind: 'slug' }" class="review-section">
 				<h3 class="review-section-label">
 					{{ formatMessage(messages.slug) }}
 				</h3>
@@ -59,12 +49,7 @@
 				</h3>
 				<License />
 			</section>
-			<ReviewPanel
-				mode="anchored"
-				as="section"
-				:target="{ kind: 'tags' }"
-				class="review-section"
-			>
+			<ReviewPanel mode="anchored" as="section" :target="{ kind: 'tags' }" class="review-section">
 				<h3 class="review-section-label">
 					{{ formatMessage(messages.tags) }}
 				</h3>

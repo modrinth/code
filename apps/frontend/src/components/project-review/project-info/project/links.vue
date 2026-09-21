@@ -1,9 +1,9 @@
 <template>
 	<div v-if="links.length" class="flex flex-col gap-3.5">
 		<ReviewPanel
-			mode="anchored"
 			v-for="link in links"
 			:key="link.key"
+			mode="anchored"
 			:target="{ kind: 'link', key: link.key }"
 			class="min-w-0"
 		>
