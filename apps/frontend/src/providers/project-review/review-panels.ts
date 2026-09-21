@@ -11,6 +11,7 @@ import type {
 import { descriptionReviewPanel } from '@modrinth/moderation/src/data/issues/description'
 import { disclosuresReviewPanel } from '@modrinth/moderation/src/data/issues/disclosures'
 import { galleryReviewPanel } from '@modrinth/moderation/src/data/issues/gallery'
+import { iconReviewPanel } from '@modrinth/moderation/src/data/issues/icon'
 import { licenseReviewPanel } from '@modrinth/moderation/src/data/issues/license'
 import {
 	bmacReviewPanel,
@@ -64,6 +65,7 @@ const reviewPanels = {
 	categories: categoriesReviewPanel,
 	disclosures: disclosuresReviewPanel,
 	gallery: galleryReviewPanel,
+	icon: iconReviewPanel,
 	license: licenseReviewPanel,
 	metadata: metadataReviewPanel,
 	permissions: permissionsReviewPanel,
@@ -301,7 +303,6 @@ export function createReviewPanels(
 
 	function resolve(target: ReviewTarget) {
 		const aliases: Partial<Record<ReviewTarget['kind'], string>> = {
-			icon: 'rules',
 			tags: 'categories',
 			compatibility: 'metadata',
 			'license-url': 'license',
