@@ -8,6 +8,7 @@ use crate::database::{PgTransaction, models};
 use crate::file_hosting::FileHost;
 use crate::models::exp;
 use crate::models::ids::ProjectId;
+use crate::models::link_platform::LinkPlatform;
 use crate::models::projects::{
     MonetizationStatus, ProjectStatus, SideTypesMigrationReviewStatus,
 };
@@ -24,16 +25,14 @@ use std::fmt::{Debug, Display};
 use std::hash::Hash;
 use xredis::RedisPool;
 
-pub const PROJECTS_NAMESPACE: &str = "projects:v4";
+pub const PROJECTS_NAMESPACE: &str = "projects:v5";
 pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs:v4";
 const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies:v4";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct LinkUrl {
-    pub platform_id: LinkPlatformId,
-    pub platform_name: String,
+    pub platform: LinkPlatform,
     pub url: String,
-    pub donation: bool, // Is this a donation link
 }
 
 impl LinkUrl {
@@ -42,19 +41,19 @@ impl LinkUrl {
         project_id: DBProjectId,
         transaction: &mut PgTransaction<'_>,
     ) -> Result<()> {
-        let (project_ids, platform_ids, urls): (Vec<_>, Vec<_>, Vec<_>) = links
+        let (project_ids, platforms, urls): (Vec<_>, Vec<_>, Vec<_>) = links
             .into_iter()
-            .map(|url| (project_id.0, url.platform_id.0, url.url))
+            .map(|url| (project_id.0, url.platform.to_string(), url.url))
             .multiunzip();
         sqlx::query!(
             "
             INSERT INTO mods_links (
-                joining_mod_id, joining_platform_id, url
+                joining_mod_id, platform, url
             )
-            SELECT * FROM UNNEST($1::bigint[], $2::int[], $3::varchar[])
+            SELECT * FROM UNNEST($1::bigint[], $2::text[], $3::varchar[])
             ",
             &project_ids[..],
-            &platform_ids[..],
+            &platforms[..],
             &urls[..],
         )
         .execute(&mut *transaction)
@@ -770,10 +769,9 @@ impl DBProject {
 
                 let links: DashMap<DBProjectId, Vec<LinkUrl>> = sqlx::query!(
                     "
-                    SELECT DISTINCT joining_mod_id as mod_id, joining_platform_id as platform_id, lp.name as platform_name, url, lp.donation as donation
+                    SELECT DISTINCT joining_mod_id as mod_id, platform, url
                     FROM mods_links ml
                     INNER JOIN mods m ON ml.joining_mod_id = m.id
-                    INNER JOIN link_platforms lp ON ml.joining_platform_id = lp.id
                     WHERE m.id = ANY($1) OR m.slug = ANY($2)
                     ",
                     &project_ids_parsed,
@@ -783,10 +781,8 @@ impl DBProject {
                         acc.entry(DBProjectId(m.mod_id))
                             .or_default()
                             .push(LinkUrl {
-                                platform_id: LinkPlatformId(m.platform_id),
-                                platform_name: m.platform_name,
+                                platform: m.platform.parse().wrap_err("parsing link platform")?,
                                 url: m.url,
-                                donation: m.donation,
                             });
                         async move { Ok(acc) }
                     }

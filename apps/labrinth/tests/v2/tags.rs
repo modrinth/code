@@ -85,7 +85,7 @@ async fn get_donation_platforms() {
                     name: "Patreon".to_string(),
                 },
                 DonationPlatformQueryData {
-                    short: "ko-fi".to_string(),
+                    short: "kofi".to_string(),
                     name: "Ko-fi".to_string(),
                 },
                 DonationPlatformQueryData {

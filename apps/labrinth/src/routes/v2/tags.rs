@@ -36,7 +36,7 @@ pub struct CategoryData {
     pub header: String,
 }
 
-/// List project categories.  
+/// List project categories.
 #[utoipa::path(
 	context_path = "/tag",
 	tag = "tags",
@@ -86,7 +86,7 @@ pub struct LoaderData {
     pub supported_project_types: Vec<String>,
 }
 
-/// List loaders.  
+/// List loaders.
 #[utoipa::path(
 	context_path = "/tag",
 	tag = "tags",
@@ -164,7 +164,7 @@ pub struct GameVersionQuery {
     major: Option<bool>,
 }
 
-/// List game versions.  
+/// List game versions.
 #[utoipa::path(
 	context_path = "/tag",
 	tag = "tags",
@@ -234,7 +234,7 @@ pub struct License {
     pub name: String,
 }
 
-/// List SPDX license identifiers and names.  
+/// List SPDX license identifiers and names.
 #[utoipa::path(
 	context_path = "/tag",
 	tag = "tags",
@@ -275,7 +275,7 @@ pub struct LicenseText {
     pub body: String,
 }
 
-/// Get full license text by SPDX ID.  
+/// Get full license text by SPDX ID.
 #[utoipa::path(
 	context_path = "/tag",
 	tag = "tags",
@@ -327,7 +327,7 @@ pub struct DonationPlatformQueryData {
     pub name: String,
 }
 
-/// List donation platforms.  
+/// List donation platforms.
 #[utoipa::path(
 	context_path = "/tag",
 	tag = "tags",
@@ -369,7 +369,7 @@ pub async fn donation_platform_list(
                                 name: match p.name.as_str() {
                                     "bmac" => "Buy Me A Coffee".to_string(),
                                     "github" => "GitHub Sponsors".to_string(),
-                                    "ko-fi" => "Ko-fi".to_string(),
+                                    "kofi" => "Ko-fi".to_string(),
                                     "paypal" => "PayPal".to_string(),
                                     // Otherwise, capitalize it
                                     _ => capitalize_first(&p.name),
@@ -389,7 +389,7 @@ pub async fn donation_platform_list(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-/// List valid report types.  
+/// List valid report types.
 #[utoipa::path(
 	context_path = "/tag",
 	tag = "tags",
@@ -414,7 +414,7 @@ pub async fn report_type_list(
         .or_else(v2_reroute::flatten_404_error)
 }
 
-/// List valid project types.  
+/// List valid project types.
 #[utoipa::path(
 	context_path = "/tag",
 	tag = "tags",
@@ -439,7 +439,7 @@ pub async fn project_type_list(
         .or_else(v2_reroute::flatten_404_error)
 }
 
-/// List valid side-type values.  
+/// List valid side-type values.
 #[utoipa::path(
 	context_path = "/tag",
 	tag = "tags",
