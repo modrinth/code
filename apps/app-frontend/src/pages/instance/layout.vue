@@ -145,6 +145,7 @@ import {
 	refresh_content_updates,
 	remove,
 	run,
+	sync_content_files,
 } from '@/helpers/instance'
 import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
@@ -232,18 +233,54 @@ useQuery(
 	})),
 )
 const instance = computed(() => instanceQuery.data.value)
+async function invalidateContent(targetInstanceId: string) {
+	await Promise.all([
+		queryClient.invalidateQueries({ queryKey: instanceKeys.content(targetInstanceId) }),
+		queryClient.invalidateQueries({ queryKey: instanceKeys.linkedContent(targetInstanceId) }),
+	])
+}
+
+const contentSyncQuery = useQuery(
+	computed(() => {
+		const targetInstanceId = instanceId.value
+		return {
+			queryKey: instanceKeys.contentSync(targetInstanceId),
+			queryFn: async () => {
+				try {
+					await sync_content_files(targetInstanceId)
+					await invalidateContent(targetInstanceId)
+					return targetInstanceId
+				} catch (error) {
+					handleError(toError(error))
+					throw error
+				}
+			},
+			enabled: !!targetInstanceId && instance.value?.install_stage === 'installed',
+			networkMode: 'always' as const,
+			staleTime: 0,
+			gcTime: 0,
+			refetchOnWindowFocus: false,
+			refetchOnReconnect: false,
+			retry: false,
+		}
+	}),
+)
 useQuery(
 	computed(() => ({
 		queryKey: instanceKeys.contentUpdateCheck(instanceId.value),
 		queryFn: async () => {
 			const targetInstanceId = instanceId.value
 			await refresh_content_updates(targetInstanceId)
-			await queryClient.invalidateQueries({
-				queryKey: instanceKeys.content(targetInstanceId),
-			})
+			await invalidateContent(targetInstanceId)
 			return targetInstanceId
 		},
-		enabled: !!instanceId.value && !offline.value && instance.value?.install_stage === 'installed',
+		enabled:
+			!!instanceId.value &&
+			!offline.value &&
+			instance.value?.install_stage === 'installed' &&
+			contentSyncQuery.isSuccess.value &&
+			!contentSyncQuery.isFetching.value &&
+			contentSyncQuery.data.value === instanceId.value,
 		staleTime: 10 * 60_000,
 		gcTime: 30 * 60_000,
 		retry: false,
