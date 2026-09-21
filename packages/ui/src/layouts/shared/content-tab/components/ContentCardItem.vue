@@ -164,7 +164,11 @@ const toggleTooltip = computed(() => {
 	if (!isToggleDisabled.value) return undefined
 	return props.toggleDisabledTooltip ?? props.disabledTooltip ?? undefined
 })
-const isEnabledForDisabled = computed(() => !props.enabledFor?.server && !props.enabledFor?.player)
+const isContentDisabled = computed(
+	() =>
+		props.enabled === false ||
+		(props.enabledFor && !props.enabledFor.server && !props.enabledFor.player),
+)
 
 const clientWarningMessage = computed(() => {
 	switch (props.clientWarning) {
@@ -197,8 +201,7 @@ const installTooltip = computed(() => {
 			'gap-3': inline,
 			'justify-between': !enabledFor,
 			'opacity-50 grayscale': disabled && !installing,
-			'opacity-50':
-				installing || (enabledFor && (isEnabledForDisabled || enabled === false) && !disabled),
+			'opacity-50': installing,
 		}"
 	>
 		<div
@@ -222,7 +225,7 @@ const installTooltip = computed(() => {
 
 			<div
 				class="flex min-w-0 items-center gap-3 transition-[filter,opacity] duration-200"
-				:class="!enabledFor && enabled === false && !disabled ? 'grayscale opacity-50' : ''"
+				:class="isContentDisabled && !disabled && !installing ? 'grayscale opacity-50' : ''"
 			>
 				<div v-tooltip="installTooltip" class="relative flex shrink-0 items-center">
 					<ContentCardItemIcon
@@ -377,7 +380,7 @@ const installTooltip = computed(() => {
 			class="hidden min-w-0 flex-1 flex-col gap-0.5 transition-[filter,opacity] duration-200"
 			:class="[
 				enabledFor ? '@[900px]:flex' : '@[800px]:flex',
-				!enabledFor && enabled === false && !disabled ? 'grayscale opacity-50' : '',
+				isContentDisabled && !disabled && !installing ? 'grayscale opacity-50' : '',
 			]"
 		>
 			<template v-if="version">

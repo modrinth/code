@@ -169,13 +169,14 @@ const selectedItems = computed(() =>
 )
 const toggleableSelectedItems = computed(() => selectedItems.value)
 
-const fuse = new Fuse<ContentItem>([], {
-	keys: ['project.title', 'owner.name', 'file_name'],
-	threshold: 0.4,
-	distance: 100,
-})
-
-watchSyncEffect(() => fuse.setCollection(items.value))
+const fuse = computed(
+	() =>
+		new Fuse<ContentItem>(items.value, {
+			keys: ['project.title', 'owner.name', 'file_name'],
+			threshold: 0.4,
+			distance: 100,
+		}),
+)
 
 function getItemWarningType(item: ContentItem) {
 	return props.enableEnabledFor
@@ -260,7 +261,7 @@ const filteredItems = computed(() => {
 
 	let result: ContentItem[]
 	if (query) {
-		result = fuse.search(query).map(({ item }) => item)
+		result = fuse.value.search(query).map(({ item }) => item)
 	} else {
 		result = sortContentItems(items.value)
 	}

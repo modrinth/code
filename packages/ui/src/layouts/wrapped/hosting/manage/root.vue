@@ -972,15 +972,6 @@ const handleFilesystemOps = (data: Archon.Websocket.v0.WSFilesystemOpsEvent) => 
 	)
 }
 
-let newModInvalidateTimer: ReturnType<typeof setTimeout> | null = null
-const handleNewMod = () => {
-	if (newModInvalidateTimer) clearTimeout(newModInvalidateTimer)
-	newModInvalidateTimer = setTimeout(() => {
-		newModInvalidateTimer = null
-		void queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
-	}, 500)
-}
-
 type InstallationServerSnapshot = Pick<
 	Archon.Servers.v0.Server,
 	'loader' | 'loader_version' | 'mc_version'
@@ -1108,7 +1099,6 @@ async function invalidateAfterInstall() {
 				queryClient.invalidateQueries({
 					queryKey: ['servers', 'startup', 'v1', props.serverId],
 				}),
-				queryClient.invalidateQueries({ queryKey: ['content', 'list'] }),
 			])
 		} catch (err: unknown) {
 			console.error('Error refreshing data after installation:', err)
@@ -1310,7 +1300,6 @@ function initializeServer() {
 			extraSubscriptions: (targetServerId) => [
 				client.archon.sockets.on(targetServerId, 'backup-progress', handleBackupProgress),
 				client.archon.sockets.on(targetServerId, 'filesystem-ops', handleFilesystemOps),
-				client.archon.sockets.on(targetServerId, 'new-mod', handleNewMod),
 			],
 		})
 			.then((connected) => {
@@ -1334,10 +1323,6 @@ function initializeServer() {
 
 const cleanup = () => {
 	isMounted.value = false
-	if (newModInvalidateTimer) {
-		clearTimeout(newModInvalidateTimer)
-		newModInvalidateTimer = null
-	}
 
 	saveWsStateToCache()
 
