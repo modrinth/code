@@ -197,6 +197,9 @@
   "nags.project-description-banned-link.description": {
     "defaultMessage": "Опис проєкту не може містити посилання «{fullUrl}»."
   },
+  "nags.project-description-content.title": {
+    "defaultMessage": "Перевірте опис"
+  },
   "nags.project-description-non-english.description": {
     "defaultMessage": "Опис проєкту повинний бути англійською або містити переклад англійською."
   },
@@ -379,6 +382,9 @@
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Відвідайте налаштування посилань"
+  },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "Опис проєкту повинний надавати унікальну інформацію, а не повторювати короткий зміст."
   },
   "project.text-validation.summary-matches-title": {
     "defaultMessage": "Короткий зміст проєкту повинний надавати унікальну інформацію, а не повторювати назву проєкту."

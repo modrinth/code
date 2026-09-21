@@ -1,4 +1,7 @@
 {
+  "nags.add-description.description": {
+    "defaultMessage": "Projenizin içeriğini, amacını, neden kabul edilmesini açıklayan bir açıklama gereklidir."
+  },
   "nags.add-description.title": {
     "defaultMessage": "Açıklama ekle"
   },

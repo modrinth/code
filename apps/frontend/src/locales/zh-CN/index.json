@@ -2604,10 +2604,10 @@
     "message": "关注你喜欢的项目"
   },
   "landing.feature.launcher.description": {
-    "message": "Modrinth 的开源 API 可供启动器添加与 Modrinth 的深度集成。通过<link>我们的应用程序</link>，以及 ATLauncher、MultiMC、Prism Launcher 等高人气启动器，都可使用 Modrinth。"
+    "message": "Modrinth 的开源 API 允许启动器深度集成于Modrinth 。通过<link>我们的应用程序</link>，以及 ATLauncher、MultiMC、Prism Launcher 等高人气启动器，均可直接访问 Modrinth。"
   },
   "landing.feature.launcher.heading": {
-    "message": "与你喜欢的启动器协同并行"
+    "message": "与你心仪的启动器协同并行"
   },
   "landing.feature.search.description": {
     "message": "Modrinth 的搜索快如闪电，配合强大的筛选功能，心仪内容就在弹指一挥间。"
@@ -2664,7 +2664,7 @@
     "message": "新版本 {version} 已发布，适用于 {gameVersion}"
   },
   "landing.section.for-creators.description": {
-    "message": "给你的作品在网上安家，并触达广大的忠实玩家群体。"
+    "message": "为你的创作安一个家，连接全球千万忠实玩家。"
   },
   "landing.section.for-creators.label": {
     "message": "面向创作者"

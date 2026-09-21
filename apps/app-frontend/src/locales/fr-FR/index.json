@@ -293,6 +293,84 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Activez d'abord la synchronisation des packs de ressource dans les paramètres de l'application."
   },
+  "app.download-manager.active": {
+    "message": "Actif"
+  },
+  "app.download-manager.attention": {
+    "message": "Nécessite votre attention"
+  },
+  "app.download-manager.cancel": {
+    "message": "Annuler l'installation"
+  },
+  "app.download-manager.canceling": {
+    "message": "Annulation de l'installation"
+  },
+  "app.download-manager.clear-all": {
+    "message": "Tout effacer"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Effacer toutes les tâches terminées"
+  },
+  "app.download-manager.complete": {
+    "message": "Terminé"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Instance dupliquée"
+  },
+  "app.download-manager.empty": {
+    "message": "Aucune tâche d'installation"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Vitesse de téléchargement estimée"
+  },
+  "app.download-manager.eta": {
+    "message": "Temps restant estimé pour ce téléchargement"
+  },
+  "app.download-manager.hide": {
+    "message": "Masquer les tâches d'installation"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Instance importée"
+  },
+  "app.download-manager.modpack": {
+    "message": "Modpack"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Installation du Modpack"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Nouvelle instance"
+  },
+  "app.download-manager.pause": {
+    "message": "Mettre en pause l'installation"
+  },
+  "app.download-manager.paused": {
+    "message": "En pause"
+  },
+  "app.download-manager.remove": {
+    "message": "Supprimer de l'historique"
+  },
+  "app.download-manager.resume": {
+    "message": "Reprendre l'installation"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Instance partagée"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "Mise à jour de l'instance partagée"
+  },
+  "app.download-manager.show": {
+    "message": "Afficher les tâches d'installation"
+  },
+  "app.download-manager.tasks": {
+    "message": "Tâches"
+  },
+  "app.download-manager.title": {
+    "message": "Gestionnaire de téléchargement"
+  },
+  "app.download-manager.verifying": {
+    "message": "Vérification en cours"
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "Ouvrir le dossier de sauvegardes"
   },
@@ -1376,6 +1454,9 @@
   "app.quick-instance-switcher.instance-locked": {
     "message": "Cette instance a été verrouillée"
   },
+  "app.quick-instance-switcher.title": {
+    "message": "Instances récentes"
+  },
   "app.quick-instance-switcher.view-instance": {
     "message": "Voir l'instance"
   },
@@ -1573,9 +1654,6 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Arguments Java"
-  },
-  "app.settings.default-instance-options.launch-hooks.title": {
-    "message": "Lancer le crochet"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "Mémoire maximale disponible pour chaque instance."
@@ -2085,7 +2163,7 @@
     "message": "Largeur du chat"
   },
   "app.settings.game-options.setting.chunk-fade-time.label": {
-    "message": "Temps de disparition de tronçons"
+    "message": "Temps de fondu du chunk"
   },
   "app.settings.game-options.setting.cloud-range.label": {
     "message": "Distance des nuages"
@@ -2183,6 +2261,18 @@
   "app.settings.game-options.setting.hide-lightning-flashes.label": {
     "message": "Masquer les éclairs"
   },
+  "app.settings.game-options.setting.hide-matched-names.label": {
+    "message": "Masquer les noms correspondants"
+  },
+  "app.settings.game-options.setting.hide-server-address.label": {
+    "message": "Cacher l'adresse du serveur"
+  },
+  "app.settings.game-options.setting.high-contrast-outline.label": {
+    "message": "Contraste élevé du contour du bloc"
+  },
+  "app.settings.game-options.setting.high-contrast.description": {
+    "message": "Améliore le contraste des éléments de l'interface."
+  },
   "app.settings.game-options.setting.high-contrast.label": {
     "message": "Contraste élevé"
   },
@@ -2192,11 +2282,122 @@
   "app.settings.game-options.setting.improved-transparency.label": {
     "message": "Transparence améliorée"
   },
+  "app.settings.game-options.setting.in-game-notifications.label": {
+    "message": "Notifications en jeu"
+  },
+  "app.settings.game-options.setting.inactivity-framerate-limit.label": {
+    "message": "Réduire les FPS"
+  },
+  "app.settings.game-options.setting.invert-horizontal-mouse.label": {
+    "message": "Inverser la souris horizontale"
+  },
+  "app.settings.game-options.setting.invert-mouse.description": {
+    "message": "Inverser le mouvement vertical de la souris."
+  },
+  "app.settings.game-options.setting.invert-mouse.label": {
+    "message": "Inverser la souris"
+  },
+  "app.settings.game-options.setting.key-back.label": {
+    "message": "Reculer"
+  },
+  "app.settings.game-options.setting.key-command.label": {
+    "message": "Commande"
+  },
+  "app.settings.game-options.setting.key-debug-chunk-borders.label": {
+    "message": "Afficher les bordures des chunks"
+  },
+  "app.settings.game-options.setting.key-debug-clear-chat.label": {
+    "message": "Effacer l'historique du chat"
+  },
+  "app.settings.game-options.setting.key-debug-copy-location.label": {
+    "message": "Copier l'emplacement"
+  },
   "app.settings.game-options.setting.key-debug-hitboxes.label": {
     "message": "Afficher les hitboxes"
   },
   "app.settings.game-options.setting.key-debug-lightmap-texture.label": {
     "message": "Texture de la carte lumineuse"
+  },
+  "app.settings.game-options.setting.key-debug-reload-chunks.label": {
+    "message": "Recharger les chunks"
+  },
+  "app.settings.game-options.setting.key-debug-reload-resource-packs.label": {
+    "message": "Recharger les packs de ressource"
+  },
+  "app.settings.game-options.setting.key-debug-switch-game-mode.label": {
+    "message": "Changer de mode de jeu"
+  },
+  "app.settings.game-options.setting.key-drop.label": {
+    "message": "Jeter un objet"
+  },
+  "app.settings.game-options.setting.key-friends.label": {
+    "message": "Amis"
+  },
+  "app.settings.game-options.setting.key-perspective.label": {
+    "message": "Changer la perspective"
+  },
+  "app.settings.game-options.setting.key-pick-item.label": {
+    "message": "Choisir un bloc"
+  },
+  "app.settings.game-options.setting.key-player-list.label": {
+    "message": "Liste des joueurs"
+  },
+  "app.settings.game-options.setting.key-screenshot.label": {
+    "message": "Capture d'écran"
+  },
+  "app.settings.game-options.setting.key-sneak.label": {
+    "message": "S'accroupir"
+  },
+  "app.settings.game-options.setting.key-social-interactions.label": {
+    "message": "Interactions socials"
+  },
+  "app.settings.game-options.setting.key-sprint.label": {
+    "message": "Courir"
+  },
+  "app.settings.game-options.setting.key-use.label": {
+    "message": "Utiliser l'objet"
+  },
+  "app.settings.game-options.setting.language.label": {
+    "message": "Langue"
+  },
+  "app.settings.game-options.setting.legacy-framerate-limit.label": {
+    "message": "Limite des FPS"
+  },
+  "app.settings.game-options.setting.legacy-view-distance.label": {
+    "message": "Distance d'affichage"
+  },
+  "app.settings.game-options.setting.main-hand.label": {
+    "message": "Main principale"
+  },
+  "app.settings.game-options.setting.master-volume.label": {
+    "message": "Volume principal"
+  },
+  "app.settings.game-options.setting.max-framerate.label": {
+    "message": "FPS maximum"
+  },
+  "app.settings.game-options.setting.music-frequency.label": {
+    "message": "Fréquence de la musique"
+  },
+  "app.settings.game-options.setting.music-volume.label": {
+    "message": "Musique"
+  },
+  "app.settings.game-options.setting.players-volume.label": {
+    "message": "Joueurs"
+  },
+  "app.settings.game-options.setting.sensitivity.label": {
+    "message": "Sensitivité de la souris"
+  },
+  "app.settings.game-options.setting.simulation-distance.label": {
+    "message": "Distance de simulation"
+  },
+  "app.settings.game-options.setting.subtitles.label": {
+    "message": "Sous-titres"
+  },
+  "app.settings.game-options.setting.vignette.label": {
+    "message": "Vignette"
+  },
+  "app.settings.game-options.setting.vsync.label": {
+    "message": "Synchronisation Verticale"
   },
   "app.settings.java-installations.location.title": {
     "message": "Emplacement de Java {version, number}"
@@ -2513,6 +2714,51 @@
   "app.survey.title": {
     "message": "Salut, utilisateur de Modrinth !"
   },
+  "app.synced-content.change.enable-everywhere": {
+    "message": "Activer partout"
+  },
+  "app.synced-content.change.enable-everywhere-description": {
+    "message": "Activer ce contenu entre toutes les instances synchronisées."
+  },
+  "app.synced-content.change.enable-here": {
+    "message": "Activer ici"
+  },
+  "app.synced-content.change.enable-title": {
+    "message": "Activer le contenu ?"
+  },
+  "app.synced-content.delete.delete-everywhere": {
+    "message": "Supprimer partout"
+  },
+  "app.synced-content.delete.delete-here": {
+    "message": "Supprimer ici"
+  },
+  "app.synced-content.delete.description": {
+    "message": "Supprimer ce contenu va le supprimer de toutes vos instances"
+  },
+  "app.synced-content.delete.mixed": {
+    "message": "Le contenu sélectionné qui n'est pas synchronisé va seulement être supprimé de cette instance."
+  },
+  "app.synced-content.desync.keep": {
+    "message": "Garder"
+  },
+  "app.synced-content.desync.remove": {
+    "message": "Retirer"
+  },
+  "app.synced-content.desync.title": {
+    "message": "Désynchroniser le contenu"
+  },
+  "app.synced-content.warning.title": {
+    "message": "Ce contenu est synchronisé"
+  },
+  "app.synced-packs.data-packs.title": {
+    "message": "Packs de donnés synchronisés"
+  },
+  "app.synced-packs.load-failed": {
+    "message": "Les packs n'ont pas pu être chargés. Essayez de rafraîchir."
+  },
+  "app.synced-packs.resource-packs.title": {
+    "message": "Packs de ressources synchronisés"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} a finie d'être téléchargée. Rechargez pour mettre à jour maintenant, ou automatiquement quand vous fermez Modrinth App."
   },
@@ -2542,6 +2788,9 @@
   },
   "app.update.complete-toast.title": {
     "message": "La version {version} a été téléchargée avec succès !"
+  },
+  "app.update.download-error.missing-version": {
+    "message": "Impossible de télécharger la mise à jour : aucune version disponible"
   },
   "app.user.project.install-to-instance": {
     "message": "Installer dans l'instance"
@@ -2888,6 +3137,9 @@
   "instance.icon-editor.symbol.couch": {
     "message": "Canapé"
   },
+  "instance.icon-editor.symbol.crafting-table": {
+    "message": "Établi"
+  },
   "instance.icon-editor.symbol.create-wrench": {
     "message": "Clé à Molette"
   },
@@ -3059,8 +3311,32 @@
   "instance.settings.sharing.revoke-invite.header": {
     "message": "Révoquer l'invitation"
   },
+  "instance.settings.synced-options.data-packs": {
+    "message": "Désynchroniser les packs de données"
+  },
+  "instance.settings.synced-options.data-packs.description": {
+    "message": "Garder les packs de données de cette instance séparés des packs synchronisés."
+  },
+  "instance.settings.synced-options.data-packs.disabled": {
+    "message": "La synchronisation des packs de données est désactivée dans les paramètres de l'application."
+  },
+  "instance.settings.synced-options.edit-packs": {
+    "message": "Modifier les packs synchronisés"
+  },
+  "instance.settings.synced-options.resource-packs": {
+    "message": "Désynchroniser les packs de ressources"
+  },
+  "instance.settings.tabs.behavior.files": {
+    "message": "Montrer l'onglet des Fichiers"
+  },
+  "instance.settings.tabs.behavior.screenshots": {
+    "message": "Montrer l'onglet des Captures d'écran"
+  },
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "L'onglet Captures d'écran ne peut pas être masqué lorsque la page globale des captures d'écran est désactivée."
+  },
+  "instance.settings.tabs.behavior.worlds": {
+    "message": "Montrer l'onglet des Mondes"
   },
   "instance.settings.tabs.general": {
     "message": "Général"
@@ -3194,14 +3470,35 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Les paramètres d'installation ne sont pas disponible pendant que cette instance est verrouillée."
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Paramétrer les variables d'environnement séparément pour cette instance."
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Paramétrer les arguments Java séparément pour cette instance."
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Sélectionner une installation Java différente pour cette instance."
+  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Entrer une variable d'environnement..."
   },
   "instance.settings.tabs.java.enter-java-arguments": {
     "message": "Entrer un argument Java..."
   },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "Variables d'environnement personnalisées"
+  },
   "instance.settings.tabs.java.hooks": {
     "message": "Hooks"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Paramètres Java personnalisés"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Installation Java personnalisée"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "Allocation de mémoire personnalisée"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/chemin/vers/java"
@@ -3214,6 +3511,21 @@
   },
   "instance.settings.tabs.synced-options.command-history.disabled-in-app": {
     "message": "La synchronisation de l'historique des commandes est désactivée dans les paramètres de l'application."
+  },
+  "instance.settings.tabs.synced-options.command-history.override-description": {
+    "message": "Garder l'historique de commandes de cette instance séparé de l'historique de commandes synchronisé."
+  },
+  "instance.settings.tabs.synced-options.game-settings": {
+    "message": "Désynchroniser les paramètres de jeu"
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers": {
+    "message": "Désynchroniser les serveurs multijoueurs"
+  },
+  "instance.settings.tabs.synced-options.open-app-settings": {
+    "message": "Gérer les paramètres synchronisés"
+  },
+  "instance.settings.tabs.window": {
+    "message": "Paramètres de fenêtre personnalisée"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Plein écran"
@@ -3361,6 +3673,9 @@
   },
   "instance.worlds.shortcut-creation-failed": {
     "message": "Échec de la création du raccourci"
+  },
+  "instance.worlds.synced_server": {
+    "message": "Synchronisé entre les instances"
   },
   "instance.worlds.view_instance": {
     "message": "Voir l'instance"

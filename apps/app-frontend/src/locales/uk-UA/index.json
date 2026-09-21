@@ -293,6 +293,87 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Спочатку ввімкніть синхронізацію пакетів ресурсів у налаштуваннях застосунку."
   },
+  "app.download-manager.active": {
+    "message": "Активно"
+  },
+  "app.download-manager.attention": {
+    "message": "Потребує уваги"
+  },
+  "app.download-manager.cancel": {
+    "message": "Скасувати встановлення"
+  },
+  "app.download-manager.canceling": {
+    "message": "Скасування встановлення…"
+  },
+  "app.download-manager.clear-all": {
+    "message": "Очистити все"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Очистити всі завершені завдання"
+  },
+  "app.download-manager.complete": {
+    "message": "Завершено"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Дубльований примірник"
+  },
+  "app.download-manager.empty": {
+    "message": "Немає завдань установлення"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Приблизна швидкість завантаження"
+  },
+  "app.download-manager.eta": {
+    "message": "Приблизний час, що залишився для цього завантаження"
+  },
+  "app.download-manager.hide": {
+    "message": "Приховати завдання встановлення"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Імпортований примірник"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "Установлення примірника"
+  },
+  "app.download-manager.modpack": {
+    "message": "Збірка"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Установлення збірки"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Новий примірник"
+  },
+  "app.download-manager.pause": {
+    "message": "Призупинити встановлення"
+  },
+  "app.download-manager.paused": {
+    "message": "Призупинено"
+  },
+  "app.download-manager.remove": {
+    "message": "Вилучити з історії"
+  },
+  "app.download-manager.resume": {
+    "message": "Відновити встановлення"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Спільний примірник"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "Оновлення спільного примірника"
+  },
+  "app.download-manager.show": {
+    "message": "Показати завдання встановлення"
+  },
+  "app.download-manager.tasks": {
+    "message": "Завдання"
+  },
+  "app.download-manager.title": {
+    "message": "Менеджер завантажень"
+  },
+  "app.download-manager.verifying": {
+    "message": "Перевірка"
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "Відкрити теку резервних копій"
   },
@@ -1369,6 +1450,9 @@
   },
   "app.quick-instance-switcher.instance-locked": {
     "message": "Цей примірник заблоковано"
+  },
+  "app.quick-instance-switcher.title": {
+    "message": "Останні примірники"
   },
   "app.quick-instance-switcher.view-instance": {
     "message": "Переглянути примірник"
@@ -2708,6 +2792,45 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Максимум одночасних записів"
   },
+  "app.settings.resource-management.store.attention": {
+    "message": "Деякі файли потребують уваги"
+  },
+  "app.settings.resource-management.store.cache-limit.label": {
+    "message": "Зберігати невикористовувані завантаження"
+  },
+  "app.settings.resource-management.store.cache-limit.unit": {
+    "message": "Гіб"
+  },
+  "app.settings.resource-management.store.calculating": {
+    "message": "Обчислення"
+  },
+  "app.settings.resource-management.store.clear": {
+    "message": "Очистити невикористане"
+  },
+  "app.settings.resource-management.store.clear.description": {
+    "message": "Видалити невикористаний завантажений уміст"
+  },
+  "app.settings.resource-management.store.cleared": {
+    "message": "Звільнено {size} дискового простору."
+  },
+  "app.settings.resource-management.store.clearing": {
+    "message": "Очищення…"
+  },
+  "app.settings.resource-management.store.description": {
+    "message": "Заощаджуйте місце, повторно використовуючи наявні інсталяції ігор, модів та пакетів між вашими примірниками."
+  },
+  "app.settings.resource-management.store.nothing-to-clear": {
+    "message": "Немає невикористаного вмісту для очищення."
+  },
+  "app.settings.resource-management.store.repair": {
+    "message": "Перевірити й виправити"
+  },
+  "app.settings.resource-management.store.repair.running-description": {
+    "message": "Це закриє всі запущені примірники."
+  },
+  "app.settings.resource-management.store.verification-result": {
+    "message": "Перевірено {checked, plural, one {# файл} few {# файли} many {# файлів} other {# файлу}} та виконано {repaired, plural, one {# виправлення} few {# виправленя} many {# виправлень} other {# виправлення}}."
+  },
   "app.settings.sidebar.label.instances": {
     "message": "Примірники"
   },
@@ -3315,7 +3438,7 @@
     "message": "Змінили запускач?"
   },
   "app.welcome-screen.quick-create-hint": {
-    "message": "Натисніть <shortcut>N</shortcut> для швидкого створення примірника"
+    "message": "Натисніть <shortcut>N</shortcut> для створення примірника"
   },
   "app.welcome-screen.title": {
     "message": "Вітаємо в Modrinth"

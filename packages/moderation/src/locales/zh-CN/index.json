@@ -60,7 +60,7 @@
     "defaultMessage": "移除违规链接"
   },
   "nags.check-disclosures.description": {
-    "defaultMessage": "请通过填写适用于你 {type} 的内容披露信息，确保用户充分了解所有重要信息"
+    "defaultMessage": "请填写适用于你的{type}的内容披露信息，确保用户充分了解所有重要信息。"
   },
   "nags.check-disclosures.title": {
     "defaultMessage": "审查披露"
@@ -196,6 +196,9 @@
   },
   "nags.project-description-banned-link.description": {
     "defaultMessage": "描述中不允许存在 “{fullUrl}”。"
+  },
+  "nags.project-description-content.title": {
+    "defaultMessage": "查看描述"
   },
   "nags.project-description-non-english.description": {
     "defaultMessage": "您的项目描述必须以英语编写或者包含英语翻译。"
@@ -379,6 +382,9 @@
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "访问链接设置"
+  },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "您的项目描述应该提供独特的信息，且不要重复项目的摘要。"
   },
   "project.text-validation.summary-matches-title": {
     "defaultMessage": "您的项目简介应该提供独特的信息，不要重复项目的名称。"

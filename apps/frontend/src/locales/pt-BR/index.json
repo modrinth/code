@@ -3969,10 +3969,10 @@
     "message": "Você deve adicionar todos os avisos de conteúdo aplicáveis ​​ao seu projeto em conformidade com as <rules>Regras de Conteúdo do Modrinth</rules>."
   },
   "project.settings.disclosures.description.2": {
-    "message": "Não tem certeza de como aplicar a divulgação do seu projeto? Confira nosso <faq-link>FAQ sobre Divulgação de Conteúdo</faq-link>"
+    "message": "Não tem certeza de como aplicar os avisos de conteúdo no seu projeto? Confira nosso <faq-link>FAQ sobre Avisos de Conteúdo</faq-link>."
   },
   "project.settings.disclosures.info-tooltip": {
-    "message": "Clique para aprender mais sobre quando usar essa divulgação."
+    "message": "Clique para aprender mais sobre quando usar esse aviso de conteúdo."
   },
   "project.settings.disclosures.last-updated": {
     "message": "Última atualização em {date} por {user}"

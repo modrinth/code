@@ -1400,6 +1400,12 @@
   "external-project-license-status.yes": {
     "defaultMessage": "是"
   },
+  "file-button.file-too-large.description": {
+    "defaultMessage": "文件 {filename} 过大。最大文件大小为 {maxSize}。"
+  },
+  "file-button.file-too-large.title": {
+    "defaultMessage": "文件过大"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "解压概览"
   },
@@ -3744,7 +3750,7 @@
     "defaultMessage": "许可证"
   },
   "project.online-player-count": {
-    "defaultMessage": "{count, number} 在线"
+    "defaultMessage": "{count, number}人在线"
   },
   "project.online-player-count.tooltip": {
     "defaultMessage": "{count} {countPlural, plural, other {个玩家}} 在线"

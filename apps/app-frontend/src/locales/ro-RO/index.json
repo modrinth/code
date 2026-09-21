@@ -284,6 +284,45 @@
   "app.content.sync-pack": {
     "message": "Sincronizeaza"
   },
+  "app.download-manager.active": {
+    "message": "Activ"
+  },
+  "app.download-manager.attention": {
+    "message": "Necesită atenție"
+  },
+  "app.download-manager.cancel": {
+    "message": "Anulează instalarea"
+  },
+  "app.download-manager.canceling": {
+    "message": "Se anulează instalarea..."
+  },
+  "app.download-manager.complete": {
+    "message": "Complet"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Instanță duplicată"
+  },
+  "app.download-manager.pause": {
+    "message": "Întrerupe instalarea"
+  },
+  "app.download-manager.paused": {
+    "message": "Întrerupt"
+  },
+  "app.download-manager.remove": {
+    "message": "Șterge din istoric"
+  },
+  "app.download-manager.resume": {
+    "message": "Reia instalarea"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Instanță comuna"
+  },
+  "app.download-manager.tasks": {
+    "message": "Sarcini"
+  },
+  "app.download-manager.verifying": {
+    "message": "Se verifică"
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "Deschideți folderul de copii de rezervă"
   },

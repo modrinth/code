@@ -197,6 +197,9 @@
   "nags.project-description-banned-link.description": {
     "defaultMessage": "Ссылка «{fullUrl}» запрещена в описаниях."
   },
+  "nags.project-description-content.title": {
+    "defaultMessage": "Проверьте описание"
+  },
   "nags.project-description-non-english.description": {
     "defaultMessage": "Описание проекта должно быть написано или переведено на английский."
   },
@@ -379,6 +382,9 @@
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Настроить ссылки"
+  },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "Описание должно иметь уникальную информацию и не повторять сводку проекта."
   },
   "project.text-validation.summary-matches-title": {
     "defaultMessage": "Сводка должна иметь уникальную информацию и не повторять название проекта."

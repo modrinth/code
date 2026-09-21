@@ -1340,6 +1340,12 @@
   "external-project-license-status.yes": {
     "defaultMessage": "Ja"
   },
+  "file-button.file-too-large.description": {
+    "defaultMessage": "Filen {filename} är för stor. Den maximala filstorleken är {maxSize}."
+  },
+  "file-button.file-too-large.title": {
+    "defaultMessage": "Fil för stor"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "Extraherings-lista"
   },
@@ -2002,6 +2008,9 @@
   },
   "image-viewer.editor.tool.crop": {
     "defaultMessage": "Beskär"
+  },
+  "image-viewer.editor.tool.ellipse": {
+    "defaultMessage": "Ellips"
   },
   "image-viewer.editor.tool.pen": {
     "defaultMessage": "Penna"
@@ -3209,6 +3218,9 @@
   "project-card.environment.client-or-server": {
     "defaultMessage": "Klient eller server"
   },
+  "project-card.environment.dedicated-server": {
+    "defaultMessage": "Dedikerad server"
+  },
   "project-card.environment.server": {
     "defaultMessage": "Server"
   },
@@ -3421,6 +3433,9 @@
   },
   "project.disclosure.advertising.title": {
     "defaultMessage": "Innehåller marknadsföring"
+  },
+  "project.disclosure.ai-functionality.title": {
+    "defaultMessage": "Generativ AI-funktionalitet"
   },
   "project.disclosure.ai-generated-content.title": {
     "defaultMessage": "Innehåller AI-genererat {types}"
@@ -4070,6 +4085,9 @@
   "search.filter.dependency_type.required_or_optional": {
     "defaultMessage": "Obligatorisk eller frivillig"
   },
+  "search.filter.dependent_project.search_placeholder": {
+    "defaultMessage": "Sök efter ett projekt..."
+  },
   "search.filter.excluded_projects": {
     "defaultMessage": "Exkluderar: {projects}"
   },
@@ -4138,6 +4156,9 @@
   },
   "search.filter_type.advanced.disclosure.ai_content.usage": {
     "defaultMessage": "AI-{usage}"
+  },
+  "search.filter_type.advanced.disclosure.ai_functionality": {
+    "defaultMessage": "Generativ AI-funktionalitet"
   },
   "search.filter_type.advanced.disclosure.archived": {
     "defaultMessage": "Arkiverad"
@@ -4874,6 +4895,9 @@
   "servers.busy.installing": {
     "defaultMessage": "Servern installeras"
   },
+  "servers.download.failed.description": {
+    "defaultMessage": "Ett fel inträffade vid nedladdning av världfilerna."
+  },
   "servers.download.failed.title": {
     "defaultMessage": "Nedladdning misslyckades"
   },
@@ -5005,6 +5029,9 @@
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Välj dina favorit moddar så hanterar vi resten."
+  },
+  "servers.list-empty.one-click-mod-installs-title": {
+    "defaultMessage": "Installera moddar i ett klick"
   },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Spela med vänner"
@@ -5225,6 +5252,9 @@
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Kom igång"
   },
+  "servers.purchase.step.plan.hardware-subtitle": {
+    "defaultMessage": "Använder AMD Ryzen 7950X, 9950X eller motsvarande, med DDR5-minne."
+  },
   "servers.purchase.step.plan.large": {
     "defaultMessage": "Stor"
   },
@@ -5344,6 +5374,9 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-error-text": {
     "defaultMessage": "Vänligen försök igen senare."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-description": {
+    "defaultMessage": "Det tidigare användarnamnet och lösenordet kommer att sluta fungera."
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Ett oväntat fel inträffade under installeringen. Vänligen försök igen senare."

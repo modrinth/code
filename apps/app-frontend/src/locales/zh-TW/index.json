@@ -293,6 +293,87 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "請先在應用程式設定中啟用資源包同步。"
   },
+  "app.download-manager.active": {
+    "message": "執行中"
+  },
+  "app.download-manager.attention": {
+    "message": "需要注意"
+  },
+  "app.download-manager.cancel": {
+    "message": "取消安裝"
+  },
+  "app.download-manager.canceling": {
+    "message": "正在取消安裝..."
+  },
+  "app.download-manager.clear-all": {
+    "message": "全部清除"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "清除所有已完成的工作"
+  },
+  "app.download-manager.complete": {
+    "message": "已完成"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "複製實例"
+  },
+  "app.download-manager.empty": {
+    "message": "沒有安裝工作"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "預估下載速度"
+  },
+  "app.download-manager.eta": {
+    "message": "這項下載的預估剩餘時間"
+  },
+  "app.download-manager.hide": {
+    "message": "隱藏安裝工作"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "匯入實例"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "實例安裝"
+  },
+  "app.download-manager.modpack": {
+    "message": "模組包"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "模組包安裝"
+  },
+  "app.download-manager.new-instance": {
+    "message": "新增實例"
+  },
+  "app.download-manager.pause": {
+    "message": "暫停安裝"
+  },
+  "app.download-manager.paused": {
+    "message": "已暫停"
+  },
+  "app.download-manager.remove": {
+    "message": "從紀錄中移除"
+  },
+  "app.download-manager.resume": {
+    "message": "繼續安裝"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "共用實例"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "共用實例更新"
+  },
+  "app.download-manager.show": {
+    "message": "顯示安裝工作"
+  },
+  "app.download-manager.tasks": {
+    "message": "工作"
+  },
+  "app.download-manager.title": {
+    "message": "下載管理器"
+  },
+  "app.download-manager.verifying": {
+    "message": "驗證中"
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "開啟備份資料夾"
   },
@@ -2139,7 +2220,7 @@
     "message": "獨占全螢幕"
   },
   "app.settings.game-options.setting.extra-telemetry.label": {
-    "message": "資料收集"
+    "message": "選用遙測資料"
   },
   "app.settings.game-options.setting.focused-chat-height.label": {
     "message": "聊天欄聚焦高度"
@@ -2720,17 +2801,89 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "並行寫入上限"
   },
+  "app.settings.resource-management.store.attention": {
+    "message": "仍有部分檔案需要注意"
+  },
+  "app.settings.resource-management.store.cache-limit.description": {
+    "message": "設定將來安裝時要保留多少未使用內容。保留愈多愈能節省下載時間。"
+  },
+  "app.settings.resource-management.store.cache-limit.label": {
+    "message": "保留未使用的下載內容"
+  },
+  "app.settings.resource-management.store.cache-limit.unit": {
+    "message": "GiB"
+  },
+  "app.settings.resource-management.store.calculating": {
+    "message": "計算中"
+  },
+  "app.settings.resource-management.store.clear": {
+    "message": "清除未使用內容"
+  },
+  "app.settings.resource-management.store.clear.description": {
+    "message": "刪除未使用的下載內容"
+  },
+  "app.settings.resource-management.store.cleared": {
+    "message": "已釋放 {size} 的儲存空間。"
+  },
+  "app.settings.resource-management.store.clearing": {
+    "message": "正在清除..."
+  },
+  "app.settings.resource-management.store.description": {
+    "message": "跨實例重複使用遊戲安裝檔、模組和其他內容，即可節省空間。"
+  },
+  "app.settings.resource-management.store.empty": {
+    "message": "安裝模組或其他內容即可在這裡查看儲存空間使用狀況。"
+  },
+  "app.settings.resource-management.store.issues": {
+    "message": "查看 {count, plural, other {# 個問題}}"
+  },
+  "app.settings.resource-management.store.nothing-to-clear": {
+    "message": "沒有可清除的未使用內容。"
+  },
+  "app.settings.resource-management.store.repair": {
+    "message": "驗證並修復"
+  },
+  "app.settings.resource-management.store.repair.running-description": {
+    "message": "這將關閉所有執行中的實例。"
+  },
+  "app.settings.resource-management.store.repair.verify-description": {
+    "message": "檢查是否有遺失或損毀的檔案，並進行修復。"
+  },
+  "app.settings.resource-management.store.repairing": {
+    "message": "正在驗證與修復..."
+  },
+  "app.settings.resource-management.store.shared.label": {
+    "message": "共用"
+  },
+  "app.settings.resource-management.store.title": {
+    "message": "內容儲存空間"
+  },
+  "app.settings.resource-management.store.total": {
+    "message": "已使用 {size}"
+  },
+  "app.settings.resource-management.store.unique.label": {
+    "message": "獨特"
+  },
+  "app.settings.resource-management.store.unused.label": {
+    "message": "孤立"
+  },
+  "app.settings.resource-management.store.verification-result": {
+    "message": "已檢查 {checked, plural, other {# 個檔案}}，並執行 {repaired, plural, other {# 次修復}}。"
+  },
+  "app.settings.resource-management.store.verified": {
+    "message": "驗證完成"
+  },
   "app.settings.sidebar.label.instances": {
     "message": "實例"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
-    "message": "選擇要從哪個實例複製指令紀錄。這個紀錄僅用於初始同步，你之後可以從任何實例中編輯它。"
+    "message": "選擇要從哪個實例複製指令紀錄。這個紀錄僅用於初始同步，你之後可以從任何實例中進行編輯。"
   },
   "app.settings.synced-options.choose-sync-source.command-history-title": {
     "message": "選擇指令紀錄來源"
   },
   "app.settings.synced-options.choose-sync-source.creative-hotbars-description": {
-    "message": "選擇要從哪個實例複製已儲存的創造模式快捷欄。這些快捷欄僅用於初始同步，你之後可以從任何實例中編輯它們。"
+    "message": "選擇要從哪個實例複製已儲存的創造模式快捷欄。這些快捷欄僅用於初始同步，你之後可以從任何實例中進行編輯。"
   },
   "app.settings.synced-options.choose-sync-source.creative-hotbars-title": {
     "message": "選擇創造模式快捷欄來源"
@@ -2739,19 +2892,19 @@
     "message": "選擇資料包來源"
   },
   "app.settings.synced-options.choose-sync-source.game-settings-description": {
-    "message": "選擇要從哪個實例複製遊戲設定。這些設定僅用於初始同步，你之後可以從任何實例中編輯它們。"
+    "message": "選擇要從哪個實例複製遊戲設定。這些設定僅用於初始同步，你之後可以從任何實例中進行編輯。"
   },
   "app.settings.synced-options.choose-sync-source.game-settings-title": {
     "message": "選擇遊戲設定來源"
   },
   "app.settings.synced-options.choose-sync-source.ineligible": {
-    "message": "你不能選擇這個實例為同步來源"
+    "message": "你無法選擇這個實例作為同步來源"
   },
   "app.settings.synced-options.choose-sync-source.load-error": {
     "message": "無法載入同步來源，請再試一次。"
   },
   "app.settings.synced-options.choose-sync-source.multiplayer-servers-description": {
-    "message": "選擇要從哪個實例複製多人遊戲伺服器。這些伺服器僅用於初始同步，你之後可以從任何實例中編輯它們。"
+    "message": "選擇要從哪個實例複製多人遊戲伺服器。這些伺服器僅用於初始同步，你之後可以從任何實例中進行編輯。"
   },
   "app.settings.synced-options.choose-sync-source.multiplayer-servers-title": {
     "message": "選擇多人遊戲伺服器來源"
@@ -3153,16 +3306,16 @@
     "message": "更新內容"
   },
   "app.sync-instances-update.choose-source.all": {
-    "message": "選擇要從哪個實例複製遊戲設定、資源包、指令紀錄、創造模式快捷欄、多人遊戲伺服器。這些設定僅用於初始同步，你之後可以從任何實例中編輯它們。"
+    "message": "選擇要從哪個實例複製遊戲設定、資源包、指令紀錄、創造模式快捷欄、多人遊戲伺服器。這些設定僅用於初始同步，你之後可以從任何實例中進行編輯。"
   },
   "app.sync-instances-update.choose-source.all-title": {
     "message": "選擇同步來源"
   },
   "app.sync-instances-update.choose-source.data-packs": {
-    "message": "選擇要從哪個實例複製資料包。這些資料包僅用於初始同步，你之後可以從任何實例中編輯它們。"
+    "message": "選擇要從哪個實例複製資料包。這些資料包僅用於初始同步，你之後可以從任何實例中進行編輯。"
   },
   "app.sync-instances-update.choose-source.resource-packs": {
-    "message": "選擇要從哪個實例複製資源包。這些資源包僅用於初始同步，你之後可以從任何實例中編輯它們。"
+    "message": "選擇要從哪個實例複製資源包。這些資源包僅用於初始同步，你之後可以從任何實例中進行編輯。"
   },
   "app.sync-instances-update.creative-hotbars": {
     "message": "同步創造模式快捷欄"
@@ -3556,6 +3709,9 @@
   },
   "instance.files.adding-files": {
     "message": "正在新增檔案 ({completed}/{total})"
+  },
+  "instance.files.managed-content-read-only": {
+    "message": "透過「內容」頁籤管理已安裝的內容"
   },
   "instance.files.save-as": {
     "message": "另存新檔..."

@@ -369,7 +369,7 @@
     "defaultMessage": "Összecsukás"
   },
   "console.actions.expand": {
-    "defaultMessage": "Kibontás"
+    "defaultMessage": "Teljes képernyő"
   },
   "console.actions.share": {
     "defaultMessage": "Megosztás"
@@ -498,7 +498,7 @@
     "defaultMessage": "Hozzáadva: (függőség)"
   },
   "content.diff-modal.diff-type.removed": {
-    "defaultMessage": "Letiltva"
+    "defaultMessage": "Letiltva:"
   },
   "content.diff-modal.diff-type.removed-disabled": {
     "defaultMessage": "Eltávolítva (kikapcsolva)"
@@ -513,7 +513,7 @@
     "defaultMessage": "Hozzáadva"
   },
   "content.diff-modal.external-diff-type.removed": {
-    "defaultMessage": "Eltávolítva"
+    "defaultMessage": "Eltávolítva:"
   },
   "content.diff-modal.external-diff-type.updated": {
     "defaultMessage": "Frissítve"
@@ -1378,6 +1378,12 @@
   },
   "external-project-license-status.yes": {
     "defaultMessage": "Igen"
+  },
+  "file-button.file-too-large.description": {
+    "defaultMessage": "A(z) {filename} túl nagy. A fájl maximum mérete csak {maxSize} lehet."
+  },
+  "file-button.file-too-large.title": {
+    "defaultMessage": "A fájl túl nagy"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Kicsomagolás összegzése"

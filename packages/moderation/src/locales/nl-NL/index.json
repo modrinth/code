@@ -197,6 +197,9 @@
   "nags.project-description-banned-link.description": {
     "defaultMessage": "De link \"{fullUrl}\" is niet toegestaan in projectbeschrijvingen."
   },
+  "nags.project-description-content.title": {
+    "defaultMessage": "Check uw beschrijving"
+  },
   "nags.project-description-non-english.description": {
     "defaultMessage": "Uw projectbeschrijvingen moeten in het Engels geschreven worden, of een Engelse vertaling hebben."
   },
@@ -379,6 +382,9 @@
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Bezoek linkjes instellingen"
+  },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "De beschrijving van uw project hoort unieke informatie te geven, en hoort niet simpelweg de samenvatting herhalen."
   },
   "project.text-validation.summary-matches-title": {
     "defaultMessage": "De samenvatting van uw project hoort unieke informatie te bevatten, en niet alleen de naam van uw project."

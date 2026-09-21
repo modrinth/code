@@ -293,6 +293,54 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Schakel eerst resource pakket syncen aan in de appinstellingen."
   },
+  "app.download-manager.active": {
+    "message": "Actief"
+  },
+  "app.download-manager.attention": {
+    "message": "Heeft aandacht nodig"
+  },
+  "app.download-manager.cancel": {
+    "message": "Installatie annuleren"
+  },
+  "app.download-manager.canceling": {
+    "message": "Installatie annuleren..."
+  },
+  "app.download-manager.complete": {
+    "message": "Klaar"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Gedupliceerde instantie"
+  },
+  "app.download-manager.empty": {
+    "message": "Geen installatietaken"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Verwachte downloadsnelheid"
+  },
+  "app.download-manager.modpack": {
+    "message": "Modpack"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Nieuwe instantie"
+  },
+  "app.download-manager.pause": {
+    "message": "Pauzeer installatie"
+  },
+  "app.download-manager.paused": {
+    "message": "Gepauzeerd"
+  },
+  "app.download-manager.remove": {
+    "message": "Verwijder uit geschiedenis"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Gedeelde instantie"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "Update gedeelde instantie"
+  },
+  "app.download-manager.tasks": {
+    "message": "Taken"
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "Open back-up-map"
   },
@@ -1379,6 +1427,9 @@
   "app.quick-instance-switcher.instance-locked": {
     "message": "Deze instantie is vergrendeld"
   },
+  "app.quick-instance-switcher.title": {
+    "message": "Recente instanties"
+  },
   "app.quick-instance-switcher.view-instance": {
     "message": "Bekijk instantie"
   },
@@ -2464,6 +2515,9 @@
   },
   "app.settings.game-options.setting.music-volume.label": {
     "message": "Muziek"
+  },
+  "app.settings.game-options.setting.narrator-hotkey.label": {
+    "message": "Verteller hotkey"
   },
   "app.settings.game-options.setting.narrator.description": {
     "message": "Kies wat de Verteller voorleest."

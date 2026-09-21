@@ -197,6 +197,9 @@
   "nags.project-description-banned-link.description": {
     "defaultMessage": "El enlace “{fullUrl}” no está permitido en las descripciones del proyecto."
   },
+  "nags.project-description-content.title": {
+    "defaultMessage": "Revisar la descripción"
+  },
   "nags.project-description-non-english.description": {
     "defaultMessage": "La descripción de tu proyecto debe estar escrita en inglés o incluir una traducción al inglés."
   },
@@ -379,6 +382,9 @@
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Ver configuración de enlaces"
+  },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "El resumen de tu proyecto debe proporcionar información única y no repetir el nombre del proyecto."
   },
   "project.text-validation.summary-matches-title": {
     "defaultMessage": "El resumen de tu proyecto debe proporcionar información única y no repetir el nombre del proyecto."

@@ -1340,6 +1340,12 @@
   "external-project-license-status.yes": {
     "defaultMessage": "Да"
   },
+  "file-button.file-too-large.description": {
+    "defaultMessage": "Файл {filename} слишком большой. Лимит — {maxSize}."
+  },
+  "file-button.file-too-large.title": {
+    "defaultMessage": "Файл слишком большой"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "Итоги распаковки"
   },
