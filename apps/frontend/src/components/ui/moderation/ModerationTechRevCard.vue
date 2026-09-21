@@ -52,7 +52,7 @@ const emit = defineEmits<{
 	showMaliciousSummary: [unsafeFiles: UnsafeFile[]]
 }>()
 
-const showHiddenTraces = ref(false)
+const showHiddenTraces = ref(props.allowShowingHiddenTraces ?? false)
 const hiddenTraceCount = computed(() =>
 	props.item.reports.reduce(
 		(reportCount, report) =>

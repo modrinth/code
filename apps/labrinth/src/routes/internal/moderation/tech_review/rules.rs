@@ -82,6 +82,8 @@ pub struct GetRuleAffectedDetailsRequest {
     #[serde(default)]
     #[schema(default = 0)]
     pub page: u64,
+    #[serde(default)]
+    pub processing_only: bool,
 }
 
 #[derive(Debug, Serialize, utoipa::ToSchema)]
@@ -269,7 +271,7 @@ pub async fn get_rules(
 			delphi_rule.updated_at,
 			delphi_rule.created_by,
 			delphi_rule.updated_by,
-			COALESCE(preview.affected_details_count, 0)
+			COALESCE(affected.affected_details_count, 0)
 				AS "affected_details_count!",
 			preview.detail_id AS "detail_id?: DelphiReportIssueDetailsId",
 			preview.issue_id AS "issue_id?: DelphiReportIssueId",
@@ -286,6 +288,15 @@ pub async fn get_rules(
 			preview.original_severity AS "original_severity?: DelphiSeverity",
 			preview.severity AS "effect_severity?: DelphiSeverity"
 		FROM delphi_rules delphi_rule
+		LEFT JOIN (
+			SELECT
+				effect.rule_id,
+				COUNT(*) AS affected_details_count
+			FROM delphi_rule_effects effect
+			INNER JOIN delphi_rule_revisions published
+				ON published.revision = effect.revision
+			GROUP BY effect.rule_id
+		) affected ON affected.rule_id = delphi_rule.id
 		LEFT JOIN LATERAL (
 			SELECT
 				effect.detail_id,
@@ -301,11 +312,16 @@ pub async fn get_rules(
 				detail.jar,
 				detail.file_path,
 				detail.severity AS original_severity,
-				effect.severity,
-				COUNT(*) OVER () AS affected_details_count
-			FROM delphi_rule_effects effect
-			INNER JOIN delphi_rule_revisions published
-				ON published.revision = effect.revision
+				effect.severity
+			FROM (
+				SELECT effect.detail_id, effect.severity
+				FROM delphi_rule_effects effect
+				INNER JOIN delphi_rule_revisions published
+					ON published.revision = effect.revision
+				WHERE effect.rule_id = delphi_rule.id
+				ORDER BY effect.detail_id DESC
+				LIMIT 3
+			) effect
 			INNER JOIN delphi_report_issue_details detail
 				ON detail.id = effect.detail_id
 			INNER JOIN delphi_report_issues issue
@@ -315,9 +331,7 @@ pub async fn get_rules(
 			LEFT JOIN files file ON file.id = report.file_id
 			LEFT JOIN versions version ON version.id = file.version_id
 			LEFT JOIN mods project ON project.id = version.mod_id
-			WHERE effect.rule_id = delphi_rule.id
 			ORDER BY effect.detail_id DESC
-			LIMIT 3
 		) preview ON TRUE
 		WHERE NOT delphi_rule.delete_on_next_revision
 		ORDER BY
@@ -406,7 +420,8 @@ pub async fn get_rules(
     params(
         ("id" = DelphiRuleId, Path),
         ("limit" = Option<u64>, Query),
-        ("page" = Option<u64>, Query)
+        ("page" = Option<u64>, Query),
+        ("processing_only" = Option<bool>, Query)
     ),
     responses((status = OK, body = GetRuleAffectedDetailsResponse))
 )]
@@ -443,9 +458,28 @@ pub async fn get_rule_affected_details(
 		FROM delphi_rule_effects effect
 		INNER JOIN delphi_rule_revisions published
 			ON published.revision = effect.revision
-		WHERE effect.rule_id = $1
+		WHERE
+			effect.rule_id = $1
+			AND (
+				NOT $2
+				OR EXISTS (
+					SELECT 1
+					FROM delphi_report_issue_details detail
+					INNER JOIN delphi_report_issues issue
+						ON issue.id = detail.issue_id
+					INNER JOIN delphi_reports report
+						ON report.id = issue.report_id
+					INNER JOIN files file ON file.id = report.file_id
+					INNER JOIN versions version ON version.id = file.version_id
+					INNER JOIN mods project ON project.id = version.mod_id
+					WHERE
+						detail.id = effect.detail_id
+						AND project.status = 'processing'
+				)
+			)
 		"#,
         rule_id as DelphiRuleId,
+        query.processing_only,
     )
     .fetch_one(&***ro_pool)
     .await
@@ -478,11 +512,14 @@ pub async fn get_rule_affected_details(
 		LEFT JOIN files file ON file.id = report.file_id
 		LEFT JOIN versions version ON version.id = file.version_id
 		LEFT JOIN mods project ON project.id = version.mod_id
-		WHERE effect.rule_id = $1
+		WHERE
+			effect.rule_id = $1
+			AND (NOT $2 OR project.status = 'processing')
 		ORDER BY effect.detail_id DESC
-		LIMIT $2 OFFSET $3
+		LIMIT $3 OFFSET $4
 		"#,
         rule_id as DelphiRuleId,
+        query.processing_only,
         limit,
         offset,
     )
