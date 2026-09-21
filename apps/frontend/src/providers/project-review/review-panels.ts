@@ -9,7 +9,18 @@ import type {
 	WithContext,
 } from '@modrinth/moderation/src/data/issues/component-builders/types'
 import { descriptionReviewPanel } from '@modrinth/moderation/src/data/issues/description'
-import { disclosuresReviewPanel } from '@modrinth/moderation/src/data/issues/disclosures'
+import {
+	adsDisclosureReviewPanel,
+	aiDisclosureReviewPanel,
+	aiFunctionalityDisclosureReviewPanel,
+	archiveDisclosureReviewPanel,
+	derivativeContentDisclosureReviewPanel,
+	disclosuresReviewPanel,
+	paidFeaturesDisclosureReviewPanel,
+	photosensitivityDisclosureReviewPanel,
+	systemInteractionsDisclosureReviewPanel,
+	telemetryDisclosureReviewPanel,
+} from '@modrinth/moderation/src/data/issues/disclosures'
 import { galleryReviewPanel } from '@modrinth/moderation/src/data/issues/gallery'
 import { iconReviewPanel } from '@modrinth/moderation/src/data/issues/icon'
 import { licenseReviewPanel } from '@modrinth/moderation/src/data/issues/license'
@@ -64,6 +75,15 @@ const reviewPanels = {
 	'other-link': otherReviewPanel,
 	categories: categoriesReviewPanel,
 	disclosures: disclosuresReviewPanel,
+	'ai-disclosure': aiDisclosureReviewPanel,
+	'ai-functionality-disclosure': aiFunctionalityDisclosureReviewPanel,
+	'ads-disclosure': adsDisclosureReviewPanel,
+	'paid-features-disclosure': paidFeaturesDisclosureReviewPanel,
+	'telemetry-disclosure': telemetryDisclosureReviewPanel,
+	'derivative-content-disclosure': derivativeContentDisclosureReviewPanel,
+	'photosensitivity-disclosure': photosensitivityDisclosureReviewPanel,
+	'system-interactions-disclosure': systemInteractionsDisclosureReviewPanel,
+	'archive-disclosure': archiveDisclosureReviewPanel,
 	gallery: galleryReviewPanel,
 	icon: iconReviewPanel,
 	license: licenseReviewPanel,
@@ -309,6 +329,7 @@ export function createReviewPanels(
 			'gallery-image': 'gallery',
 			version: 'versions',
 		}
+		if (target.kind === 'disclosure') return panels.value.get(`${target.key}-disclosure`)
 		return panels.value.get(
 			target.kind === 'link' ? `${target.key}-link` : (aliases[target.kind] ?? target.kind),
 		)

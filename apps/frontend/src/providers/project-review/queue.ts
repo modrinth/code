@@ -6,7 +6,11 @@ import { projectQueryOptions } from '~/composables/queries/project'
 import type { ModerationQueueService } from '~/services/moderation/queue'
 import { findNextEligibleQueueProject } from '~/services/moderation/queue-eligibility'
 
-export function useReviewQueue(projectId: Ref<string>, queue: ModerationQueueService) {
+export function useReviewQueue(
+	projectId: Ref<string>,
+	queue: ModerationQueueService,
+	beforeNavigate: () => Promise<boolean>,
+) {
 	const router = useRouter()
 	const route = useRoute()
 	const client = injectModrinthClient()
@@ -33,6 +37,7 @@ export function useReviewQueue(projectId: Ref<string>, queue: ModerationQueueSer
 		busy.value = true
 		error.value = null
 		try {
+			if (!(await beforeNavigate())) return
 			await action()
 		} catch (cause) {
 			error.value = cause

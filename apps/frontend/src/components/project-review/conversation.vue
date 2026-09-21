@@ -66,7 +66,7 @@ const queryClient = useQueryClient()
 const auth = useAuthState()
 const { draft, generating } = injectReviewMessages()
 const panels = injectReviewPanels()
-const { project, threadQuery } = injectProjectReviewPageContext()
+const { project, threadQuery, disclosures } = injectProjectReviewPageContext()
 const { data: thread, isError, refetch } = threadQuery
 
 const scrollContainer = ref<HTMLElement>()
@@ -103,6 +103,11 @@ function updateThread(updatedThread: Labrinth.Threads.v3.Thread | null | undefin
 }
 
 const correctionMessages = defineMessages({
+	unsavedDisclosures: {
+		id: 'project-review.disclosures.unsaved',
+		defaultMessage:
+			'Save or reset your disclosure changes before sending a reply or changing the project status.',
+	},
 	missing: {
 		id: 'project-review.corrections.missing-fields',
 		defaultMessage: 'Complete the required review fields before sending your reply.',
@@ -139,6 +144,8 @@ const correctionMutation = useMutation({
 
 async function beforeSendReply({ privateMessage }: { privateMessage: boolean }) {
 	if (privateMessage) return
+	if (disclosures.hasChanges.value || disclosures.saving.value)
+		throw new Error(formatMessage(correctionMessages.unsavedDisclosures))
 	if (panels.validationErrors.value.length)
 		throw new Error(formatMessage(correctionMessages.missing))
 	if (!panels.correctionsRequested.value) return
@@ -181,6 +188,8 @@ const statusMutation = useMutation({
 async function setStatus(status: Labrinth.Projects.v2.ProjectStatus) {
 	if (!project.value) return
 	try {
+		if (disclosures.hasChanges.value || disclosures.saving.value)
+			throw new Error(formatMessage(correctionMessages.unsavedDisclosures))
 		await statusMutation.mutateAsync({
 			id: project.value.id,
 			threadId: project.value.thread_id,

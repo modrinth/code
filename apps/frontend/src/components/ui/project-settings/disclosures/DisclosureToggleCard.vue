@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { CircleSlashIcon, LockIcon, LockOpenIcon, UnknownIcon } from '@modrinth/assets'
+import { UnknownIcon } from '@modrinth/assets'
 import {
-	Button,
-	ButtonGroup,
 	defineMessages,
 	IntlFormatted,
 	normalizeChildren,
@@ -13,7 +11,9 @@ import {
 import type { Component } from 'vue'
 import { computed } from 'vue'
 
+import DisclosureLockControls from './DisclosureLockControls.vue'
 import DisclosureUpdatedBy from './DisclosureUpdatedBy.vue'
+import ProjectReviewDisclosureCard from './ProjectReviewDisclosureCard.vue'
 import type { DisclosureCardMetaProps, DisclosureLockStatus } from './types'
 
 defineOptions({ inheritAttrs: false })
@@ -36,12 +36,6 @@ const emit = defineEmits<{
 const enabled = defineModel<boolean>({ required: true })
 
 const resolvedLockStatus = computed(() => props.lockStatus ?? 'unlocked')
-
-const LOCK_STATUSES = [
-	{ status: 'unlocked', label: 'Unlocked' },
-	{ status: 'cannot_disable', label: 'Cannot disable' },
-	{ status: 'fully_locked', label: 'Fully locked' },
-] as const
 
 const messages = defineMessages({
 	cannotDisableWarning: {
@@ -90,15 +84,18 @@ function setLockStatus(status: DisclosureLockStatus) {
 </script>
 
 <template>
-	<SettingsToggleCard
+	<component
+		:is="variant === 'review' ? ProjectReviewDisclosureCard : SettingsToggleCard"
 		v-model="enabled"
 		:disabled="disabled"
 		:toggle-disabled="toggleDisabled"
 		:icon="icon"
 		:title="title"
-		:description="description"
+		:description="hideDescription ? undefined : description"
 	>
-		<slot />
+		<template v-if="!hideDescription && $slots.default" #default>
+			<slot />
+		</template>
 		<template #title-suffix>
 			<a
 				v-if="infoLink"
@@ -114,7 +111,21 @@ function setLockStatus(status: DisclosureLockStatus) {
 		<template v-if="$slots.expanded" #expanded>
 			<slot name="expanded" />
 		</template>
-		<template v-if="showFooter" #footer>
+		<template v-if="variant === 'review' && updatedAt" #updated-by>
+			<DisclosureUpdatedBy
+				:updated-at="updatedAt"
+				:updated-by="updatedBy"
+				:set-by-moderator="setByModerator"
+			/>
+		</template>
+		<template v-if="variant === 'review' && showModeratorLockControls" #lock-controls>
+			<DisclosureLockControls
+				:lock-status="resolvedLockStatus"
+				:disabled="disabled"
+				@set-lock-status="setLockStatus"
+			/>
+		</template>
+		<template v-if="variant !== 'review' && showFooter" #footer>
 			<div class="flex flex-col gap-3">
 				<SettingsInlineWarning v-if="showLockWarning && lockWarningMessage">
 					<IntlFormatted :message-id="lockWarningMessage">
@@ -138,29 +149,15 @@ function setLockStatus(status: DisclosureLockStatus) {
 						:set-by-moderator="setByModerator"
 					/>
 					<span v-else />
-					<ButtonGroup v-if="showModeratorLockControls" class="ml-auto" label="Lock status">
-						<Button
-							v-for="{ status, label } in LOCK_STATUSES"
-							:key="status"
-							:color="
-								status === 'cannot_disable'
-									? 'orange'
-									: status === 'fully_locked'
-										? 'red'
-										: undefined
-							"
-							:type="status !== 'unlocked' ? 'colored-text' : undefined"
-							:disabled="disabled || resolvedLockStatus === status"
-							@click="setLockStatus(status)"
-						>
-							<LockOpenIcon v-if="status === 'unlocked'" />
-							<CircleSlashIcon v-else-if="status === 'cannot_disable'" />
-							<LockIcon v-else />
-							{{ label }}
-						</Button>
-					</ButtonGroup>
+					<DisclosureLockControls
+						v-if="showModeratorLockControls"
+						class="ml-auto"
+						:lock-status="resolvedLockStatus"
+						:disabled="disabled"
+						@set-lock-status="setLockStatus"
+					/>
 				</div>
 			</div>
 		</template>
-	</SettingsToggleCard>
+	</component>
 </template>

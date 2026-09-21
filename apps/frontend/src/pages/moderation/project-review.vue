@@ -1,9 +1,10 @@
 <template>
 	<ProjectReview />
+	<ConfirmLeaveModal ref="confirmLeaveModal" />
 </template>
 
 <script setup lang="ts">
-import { useVIntl } from '@modrinth/ui'
+import { ConfirmLeaveModal, useVIntl } from '@modrinth/ui'
 
 import ProjectReview from '~/components/project-review/index.vue'
 import { projectReviewMessages } from '~/components/project-review/messages'
@@ -13,7 +14,7 @@ import {
 } from '~/providers/project-review'
 
 const { formatMessage } = useVIntl()
-provideProjectReviewPageContext(createProjectReviewPageContext())
+const { confirmLeaveModal } = provideProjectReviewPageContext(createProjectReviewPageContext())
 
 definePageMeta({
 	layout: 'empty',
