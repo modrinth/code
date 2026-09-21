@@ -213,6 +213,7 @@ fn main() {
                         "instance_get_install_candidates",
                         "instance_content",
                         "instance_get_content_items",
+                        "instance_sync_content_files",
                         "instance_refresh_content_updates",
                         "instance_get_dependencies_as_content_items",
                         "instance_get_linked_modpack_info",
