@@ -208,7 +208,7 @@ pub async fn all_projects(
     let projects_data =
         crate::database::DBProject::get_many_ids(&project_ids, &**pool, &redis)
             .await
-            .wrap_api_err("fetching user and organization projects")?;
+            .wrap_internal_err("fetching user and organization projects")?;
     let projects = filter_visible_projects(projects_data, &user, &pool, true)
         .await
         .wrap_api_err("filtering visible projects")?;
@@ -369,7 +369,7 @@ pub async fn projects_list(
             &redis,
         )
         .await
-        .wrap_api_err("fetching organization projects")?;
+        .wrap_internal_err("fetching organization projects")?;
         let projects = filter_visible_projects(projects, &user, &pool, true)
             .await
             .wrap_api_err("filtering visible projects")?;
@@ -1223,8 +1223,7 @@ pub async fn user_icon_edit(
             262144,
             "Icons must be smaller than 256KiB",
         )
-        .await
-        .wrap_api_err("executing `read_limited_from_payload`")?;
+        .await?;
 
         let user_id: UserId = actual_user.id.into();
         let upload_result = crate::util::img::upload_image_optimized(
@@ -1447,7 +1446,7 @@ pub async fn user_follows(
             &redis,
         )
         .await
-        .wrap_api_err("fetching followed projects")?
+        .wrap_internal_err("fetching followed projects")?
         .into_iter()
         .map(Project::from)
         .collect();

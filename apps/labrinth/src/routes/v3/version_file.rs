@@ -1,5 +1,7 @@
 use super::ApiError;
-use crate::auth::checks::{filter_visible_versions, is_visible_version};
+use crate::auth::checks::{
+    filter_visible_version_ids, filter_visible_versions, is_visible_version,
+};
 use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::PgPool;
 use crate::database::ReadOnlyPgPool;
@@ -232,7 +234,7 @@ pub async fn get_update_from_hash(
             &redis,
         )
         .await
-        .wrap_api_err("fetching project for version file")?
+        .wrap_internal_err("fetching project for version file")?
     {
         let mut versions = database::models::DBVersion::get_many(
             &project.versions,
@@ -443,7 +445,7 @@ pub async fn get_projects_from_hashes(
             &redis,
         )
         .await
-        .wrap_api_err("fetching projects for visibility filtering")?,
+        .wrap_internal_err("fetching projects for visibility filtering")?,
         &user_option,
         &pool,
         false,
@@ -485,21 +487,25 @@ pub struct ManyUpdateData {
 )]
 #[post("/version_files/update_many")]
 pub async fn update_files_many_route(
+    req: HttpRequest,
     pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     update_data: web::Json<ManyUpdateData>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<HashMap<String, Vec<models::projects::Version>>>, ApiError>
 {
-    update_files_many(pool, redis, update_data).await
+    update_files_many(req, pool, redis, update_data, session_queue).await
 }
 
 pub async fn update_files_many(
+    req: HttpRequest,
     pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     update_data: web::Json<ManyUpdateData>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<HashMap<String, Vec<models::projects::Version>>>, ApiError>
 {
-    update_files_internal(pool, redis, update_data)
+    update_files_internal(req, pool, redis, update_data, session_queue)
         .await
         .map(web::Json)
 }
@@ -537,20 +543,24 @@ pub async fn update_files_many(
 )]
 #[post("/version_files/update")]
 pub async fn update_files_route(
+    req: HttpRequest,
     pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     update_data: web::Json<ManyUpdateData>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<HashMap<String, models::projects::Version>>, ApiError> {
-    update_files(pool, redis, update_data).await
+    update_files(req, pool, redis, update_data, session_queue).await
 }
 
 pub async fn update_files(
+    req: HttpRequest,
     pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     update_data: web::Json<ManyUpdateData>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<HashMap<String, models::projects::Version>>, ApiError> {
     let file_hashes_to_versions =
-        update_files_internal(pool, redis, update_data)
+        update_files_internal(req, pool, redis, update_data, session_queue)
             .await
             .wrap_api_err("updating files internal")?;
     let resp = file_hashes_to_versions
@@ -564,10 +574,23 @@ pub async fn update_files(
 }
 
 async fn update_files_internal(
+    req: HttpRequest,
     pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     update_data: web::Json<ManyUpdateData>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HashMap<String, Vec<models::projects::Version>>, ApiError> {
+    let user_option = get_user_from_headers(
+        &req,
+        &***pool,
+        &redis,
+        &session_queue,
+        Scopes::VERSION_READ,
+    )
+    .await
+    .map(|x| x.1)
+    .ok();
+
     let algorithm = update_data
         .algorithm
         .clone()
@@ -598,14 +621,12 @@ async fn update_files_internal(
         &update_data.game_versions.clone().unwrap_or_default(),
         &update_data.loaders.clone().unwrap_or_default(),
         &update_data.version_types.clone().unwrap_or_default().iter().map(|x| x.to_string()).collect::<Vec<_>>(),
-        &*VersionStatus::iterator()
-            .filter(|x| !x.is_hidden())
-            .map(|x| x.to_string())
-            .collect::<Vec<String>>(),
-        &*ProjectStatus::iterator()
-            .filter(|x| !x.is_hidden())
-            .map(|x| x.to_string())
-            .collect::<Vec<String>>(),
+		&*VersionStatus::iterator()
+			.map(|x| x.to_string())
+			.collect::<Vec<String>>(),
+		&*ProjectStatus::iterator()
+			.map(|x| x.to_string())
+			.collect::<Vec<String>>(),
     )
         .fetch(&***pool)
         .try_fold(DashMap::new(), |acc : DashMap<_,Vec<database::models::ids::DBVersionId>>, m| {
@@ -617,16 +638,38 @@ async fn update_files_internal(
         .await
         .wrap_internal_err("fetching project version IDs from database")?;
 
-    let versions = database::models::DBVersion::get_many(
+    let candidate_versions = database::models::DBVersion::get_many(
         &update_version_ids
-            .into_iter()
-            .filter_map(|x| x.1.last().copied())
+            .iter()
+            .flat_map(|x| x.value().clone())
             .collect::<Vec<_>>(),
         &***pool,
         &redis,
     )
     .await
     .wrap_internal_err("updating versions in database")?;
+    let visible_version_ids = filter_visible_version_ids(
+        candidate_versions.iter().map(|x| &x.inner).collect(),
+        &user_option,
+        &pool,
+        &redis,
+    )
+    .await
+    .wrap_api_err("filtering visible update versions")?;
+    let versions = database::models::DBVersion::get_many(
+        &update_version_ids
+            .into_iter()
+            .filter_map(|x| {
+                x.1.into_iter()
+                    .rev()
+                    .find(|id| visible_version_ids.contains(id))
+            })
+            .collect::<Vec<_>>(),
+        &***pool,
+        &redis,
+    )
+    .await
+    .wrap_internal_err("fetching latest visible update versions")?;
 
     let mut response = HashMap::<String, Vec<models::projects::Version>>::new();
     for file in files {
@@ -730,7 +773,7 @@ pub async fn update_individual_files(
         &redis,
     )
     .await
-    .wrap_api_err("fetching projects for version files")?;
+    .wrap_internal_err("fetching projects for version files")?;
     let all_versions = database::models::DBVersion::get_many(
         &projects
             .iter()

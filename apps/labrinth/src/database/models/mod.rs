@@ -1,5 +1,3 @@
-use thiserror::Error;
-
 pub mod affiliate_code_item;
 pub mod analytics_event_item;
 pub mod blocked_user_item;
@@ -65,21 +63,3 @@ pub use version_item::DBVersion;
 
 pub use moderation_lock_item::{DBModerationLock, ModerationLockWithUser};
 pub use moderation_note_item::DBModerationNote;
-
-#[derive(Error, Debug)]
-pub enum DatabaseError {
-    #[error(transparent)]
-    Internal(#[from] eyre::Report),
-    #[error("Error while interacting with the database: {0}")]
-    Database(#[from] sqlx::Error),
-    #[error("Error while trying to generate random ID")]
-    RandomId,
-    #[error("Error while interacting with the cache: {0}")]
-    CacheError(#[from] redis::RedisError),
-    #[error("Error while serializing with the cache: {0}")]
-    SerdeCacheError(#[from] serde_json::Error),
-    #[error("error while encoding or decoding the cache: {0}")]
-    PostcardCacheError(#[from] postcard::Error),
-    #[error("Schema error: {0}")]
-    SchemaError(String),
-}

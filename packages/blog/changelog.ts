@@ -11,6 +11,14 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-09-16T16:37:03+00:00`,
+		product: 'app',
+		version: '0.21.4',
+		body: `## Fixed
+- Fixes issue for some users not being able to launch the game
+- Fixed some styling and snapping issues with slider inputs.`,
+	},
+	{
 		date: `2026-09-15T17:44:10+00:00`,
 		product: 'app',
 		version: '0.21.3',

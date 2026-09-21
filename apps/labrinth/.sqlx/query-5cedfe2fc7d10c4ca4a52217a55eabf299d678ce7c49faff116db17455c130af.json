@@ -1,0 +1,52 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT projects, projects_per_day, organizations, collections,\n                versions_per_project, versions_per_day\n            FROM user_limits\n            WHERE user_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "projects",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "projects_per_day",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "organizations",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "collections",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "versions_per_project",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "versions_per_day",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "5cedfe2fc7d10c4ca4a52217a55eabf299d678ce7c49faff116db17455c130af"
+}

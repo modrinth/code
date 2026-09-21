@@ -56,10 +56,10 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 
 #[derive(Error, Debug)]
 pub enum CreateError {
+    #[error(transparent)]
+    InternalError(#[from] eyre::Report),
     #[error("An unknown database error occurred")]
     SqlxDatabaseError(#[from] sqlx::Error),
-    #[error("Database Error: {0}")]
-    DatabaseError(#[from] models::DatabaseError),
     #[error("Error while parsing multipart payload: {0}")]
     MultipartError(#[from] actix_multipart::MultipartError),
     #[error("Error while parsing JSON: {0}")]
@@ -94,6 +94,12 @@ pub enum CreateError {
     ImageError(#[from] ImageError),
     #[error("Project limit reached")]
     LimitReached,
+    #[error("daily project creation limit reached")]
+    DailyProjectLimitReached,
+    #[error("project version limit reached")]
+    ProjectVersionLimitReached,
+    #[error("daily version upload limit reached")]
+    DailyVersionLimitReached,
 }
 
 impl From<crate::routes::ApiError> for CreateError {
@@ -105,9 +111,7 @@ impl From<crate::routes::ApiError> for CreateError {
             crate::routes::ApiError::Request(err) => {
                 Self::InvalidInput(format!("{err:#}"))
             }
-            err => Self::DatabaseError(models::DatabaseError::SchemaError(
-                format!("{err:#}"),
-            )),
+            err => Self::InternalError(eyre::eyre!("{err:#}")),
         }
     }
 }
@@ -115,10 +119,10 @@ impl From<crate::routes::ApiError> for CreateError {
 impl actix_web::ResponseError for CreateError {
     fn status_code(&self) -> StatusCode {
         match self {
+            CreateError::InternalError(..) => StatusCode::INTERNAL_SERVER_ERROR,
             CreateError::SqlxDatabaseError(..) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
-            CreateError::DatabaseError(..) => StatusCode::INTERNAL_SERVER_ERROR,
             CreateError::FileHostingError(..) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
@@ -139,15 +143,18 @@ impl actix_web::ResponseError for CreateError {
             CreateError::ValidationError(..) => StatusCode::BAD_REQUEST,
             CreateError::FileValidationError(..) => StatusCode::BAD_REQUEST,
             CreateError::ImageError(..) => StatusCode::BAD_REQUEST,
-            CreateError::LimitReached => StatusCode::BAD_REQUEST,
+            CreateError::LimitReached
+            | CreateError::DailyProjectLimitReached
+            | CreateError::ProjectVersionLimitReached
+            | CreateError::DailyVersionLimitReached => StatusCode::BAD_REQUEST,
         }
     }
 
     fn error_response(&self) -> HttpResponse {
         HttpResponse::build(self.status_code()).json(ApiError {
             error: match self {
+                CreateError::InternalError(..) => "database_error",
                 CreateError::SqlxDatabaseError(..) => "database_error",
-                CreateError::DatabaseError(..) => "database_error",
                 CreateError::FileHostingError(..) => "file_hosting_error",
                 CreateError::SerDeError(..) => "invalid_input",
                 CreateError::MultipartError(..) => "invalid_input",
@@ -164,7 +171,10 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::ValidationError(..) => "invalid_input",
                 CreateError::FileValidationError(..) => "invalid_input",
                 CreateError::ImageError(..) => "invalid_image",
-                CreateError::LimitReached => "limit_reached",
+                CreateError::LimitReached
+                | CreateError::DailyProjectLimitReached
+                | CreateError::ProjectVersionLimitReached
+                | CreateError::DailyVersionLimitReached => "limit_reached",
             },
             description: self.to_string(),
             details: None,
@@ -492,6 +502,13 @@ async fn project_create_inner(
         return Err(CreateError::LimitReached);
     }
 
+    let daily_limits =
+        UserLimits::get_for_projects_per_day(&current_user, Utc::now(), pool)
+            .await?;
+    if daily_limits.current >= daily_limits.max {
+        return Err(CreateError::DailyProjectLimitReached);
+    }
+
     let all_loaders =
         models::loader_fields::Loader::list(&mut *transaction, redis).await?;
 
@@ -534,6 +551,38 @@ async fn project_create_inner(
             CreateError::InvalidInput(validation_errors_to_string(err, None))
         })?;
 
+        let versions_to_create = create_data.initial_versions.len() as u64;
+        if versions_to_create > 0 {
+            let project_version_limits =
+                UserLimits::get_for_versions_per_project(
+                    &current_user,
+                    project_id.into(),
+                    pool,
+                )
+                .await?;
+            if project_version_limits
+                .current
+                .saturating_add(versions_to_create)
+                > project_version_limits.max
+            {
+                return Err(CreateError::ProjectVersionLimitReached);
+            }
+
+            let daily_version_limits = UserLimits::get_for_versions_per_day(
+                &current_user,
+                Utc::now(),
+                pool,
+            )
+            .await?;
+            if daily_version_limits
+                .current
+                .saturating_add(versions_to_create)
+                > daily_version_limits.max
+            {
+                return Err(CreateError::DailyVersionLimitReached);
+            }
+        }
+
         let slug_project_id_option: Option<ProjectId> = serde_json::from_str(
             &format!("\"{}\"", create_data.slug.to_lowercase()),
         )
@@ -550,7 +599,7 @@ async fn project_create_inner(
             )
             .fetch_one(&mut *transaction)
             .await
-            .map_err(|e| CreateError::DatabaseError(e.into()))?;
+            .map_err(CreateError::SqlxDatabaseError)?;
 
             if results.exists.unwrap_or(false) {
                 return Err(CreateError::SlugCollision);
@@ -571,7 +620,7 @@ async fn project_create_inner(
             )
             .fetch_one(&mut *transaction)
             .await
-            .map_err(|e| CreateError::DatabaseError(e.into()))?;
+            .map_err(CreateError::SqlxDatabaseError)?;
 
             if results.exists.unwrap_or(false) {
                 return Err(CreateError::SlugCollision);
