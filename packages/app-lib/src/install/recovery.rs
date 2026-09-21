@@ -55,6 +55,11 @@ pub(super) async fn prepare_instance_update_backup(
     crate::util::io::create_dir_all(&staging_dir).await?;
 
     let result = async {
+		crate::state::instances::commands::reconcile_instance_renames(
+			&metadata.instance,
+			state,
+		)
+		.await?;
         let files = content_rows::get_instance_files(
             &metadata.instance.id,
             &state.pool,

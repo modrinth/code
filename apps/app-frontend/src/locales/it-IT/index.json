@@ -53,9 +53,6 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Download interrotto"
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "Istanza non trovata"
-  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Percorso del file non valido"
   },

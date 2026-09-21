@@ -53,9 +53,6 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Descărcarea nu s-a putut finaliza"
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "Instanța nu a fost găsită"
-  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Calea fișierului este invalidă"
   },
