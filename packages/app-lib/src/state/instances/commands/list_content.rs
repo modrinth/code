@@ -27,6 +27,12 @@ struct ResolvedContentScope {
     content_set: ContentSet,
 }
 
+#[derive(Clone, Copy)]
+enum ContentReadMode {
+    Indexed,
+    Reconcile,
+}
+
 #[derive(Clone, Copy, Debug)]
 enum ContentFilter<'a> {
     All,
@@ -199,6 +205,23 @@ pub(crate) async fn list_content(
         content_set_id,
         cache_behaviour,
         false,
+        ContentReadMode::Reconcile,
+        state,
+    )
+    .await
+}
+
+pub(crate) async fn list_indexed_content(
+    instance_id: &str,
+    cache_behaviour: Option<CacheBehaviour>,
+    state: &State,
+) -> crate::Result<Vec<ContentItem>> {
+    list_content_inner(
+        instance_id,
+        None,
+        cache_behaviour,
+        false,
+        ContentReadMode::Indexed,
         state,
     )
     .await
@@ -208,7 +231,15 @@ pub(crate) async fn list_pack_content(
     instance_id: &str,
     state: &State,
 ) -> crate::Result<Vec<ContentItem>> {
-    list_content_inner(instance_id, None, None, true, state).await
+    list_content_inner(
+        instance_id,
+        None,
+        None,
+        true,
+        ContentReadMode::Reconcile,
+        state,
+    )
+    .await
 }
 
 async fn list_content_inner(
@@ -216,6 +247,7 @@ async fn list_content_inner(
     content_set_id: Option<&str>,
     cache_behaviour: Option<CacheBehaviour>,
     packs_only: bool,
+    read_mode: ContentReadMode,
     state: &State,
 ) -> crate::Result<Vec<ContentItem>> {
     let resolved = resolve_content_scope_with_instance(
@@ -268,6 +300,7 @@ async fn list_content_inner(
         state,
         filter,
         packs_only,
+        read_mode,
     )
     .await?;
     let files = files.into_iter().collect::<Vec<_>>();
@@ -300,7 +333,7 @@ pub(crate) async fn list_linked_modpack_content(
     )
     .await?;
     if is_imported_modpack_scope(&link) {
-        let files = content_projects_for_scope(
+        let files = content_projects_for_scope_inner(
             &resolved,
             cache_behaviour,
             state,
@@ -309,6 +342,8 @@ pub(crate) async fn list_linked_modpack_content(
                 include_untracked: resolved.instance.install_stage
                     != crate::state::InstanceInstallStage::Installed,
             },
+            false,
+            ContentReadMode::Indexed,
         )
         .await?;
         let files = files.into_iter().collect::<Vec<_>>();
@@ -351,9 +386,15 @@ pub(crate) async fn list_linked_modpack_content(
     } else {
         return Ok(Vec::new());
     };
-    let files =
-        content_projects_for_scope(&resolved, cache_behaviour, state, filter)
-            .await?;
+    let files = content_projects_for_scope_inner(
+        &resolved,
+        cache_behaviour,
+        state,
+        filter,
+        false,
+        ContentReadMode::Indexed,
+    )
+    .await?;
     let files = files.into_iter().collect::<Vec<_>>();
 
     content_files_to_content_items(
@@ -642,6 +683,7 @@ async fn content_projects_for_scope(
         state,
         filter,
         false,
+        ContentReadMode::Reconcile,
     )
     .await
 }
@@ -652,9 +694,20 @@ async fn content_projects_for_scope_inner(
     state: &State,
     filter: ContentFilter<'_>,
     packs_only: bool,
+    read_mode: ContentReadMode,
 ) -> crate::Result<DashMap<String, ContentFile>> {
-    let mut files =
-        sync_instance_content_files(&resolved.instance, state).await?;
+    let mut files = match read_mode {
+        ContentReadMode::Indexed => {
+            sqlite::content_rows::get_instance_files(
+                &resolved.instance.id,
+                &state.pool,
+            )
+            .await?
+        }
+        ContentReadMode::Reconcile => {
+            sync_instance_content_files(&resolved.instance, state).await?
+        }
+    };
     if packs_only {
         files.retain(|file| {
             matches!(
