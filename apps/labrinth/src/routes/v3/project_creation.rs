@@ -1079,7 +1079,7 @@ async fn project_create_inner(
                 .link_urls
                 .clone()
                 .into_iter()
-                .map(|x| (x.platform_name.clone(), Link::from(x)))
+                .map(|x| (x.platform.to_string(), Link::from(x)))
                 .collect(),
             gallery: gallery_urls,
             color: project_builder.color,

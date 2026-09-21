@@ -305,7 +305,7 @@ impl Project {
     //     let link_urls = m
     //         .links
     //         .into_iter()
-    //         .map(|d| (d.platform_name.clone(), Link::from(d)))
+    //         .map(|d| (d.platform.to_string(), Link::from(d)))
     //         .collect();
     //
     //     let gallery = m

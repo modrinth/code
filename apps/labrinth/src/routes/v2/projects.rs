@@ -635,7 +635,7 @@ pub async fn project_edit(
                 x.urls
                     .into_iter()
                     .filter_map(|l| {
-                        if l.donation {
+                        if l.platform.is_donation() {
                             Some(Link::from(l)) // TODO: tests
                         } else {
                             None

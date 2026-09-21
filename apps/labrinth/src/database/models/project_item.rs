@@ -777,14 +777,17 @@ impl DBProject {
                     &project_ids_parsed,
                     &slugs
                 ).fetch(&mut exec)
-                    .try_fold(DashMap::new(), |acc : DashMap<DBProjectId, Vec<LinkUrl>>, m| {
+                    .try_fold(DashMap::new(), |acc : DashMap<DBProjectId, Vec<LinkUrl>>, m| async move {
+                        let platform = m.platform.parse().map_err(|error| {
+                            sqlx::Error::Decode(Box::new(error))
+                        })?;
                         acc.entry(DBProjectId(m.mod_id))
                             .or_default()
                             .push(LinkUrl {
-                                platform: m.platform.parse().wrap_err("parsing link platform")?,
+                                platform,
                                 url: m.url,
                             });
-                        async move { Ok(acc) }
+                        Ok(acc)
                     }
                     )
                     .await
