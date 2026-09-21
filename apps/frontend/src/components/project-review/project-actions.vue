@@ -138,7 +138,7 @@ watch(
 
 .actions-resize:hover::after {
 	opacity: 1;
-	transition: opacity 0s 1s;
+	transition: opacity 0s 0.5s;
 }
 
 .actions-resize:focus-visible::after,

@@ -96,6 +96,10 @@ export function createReviewContext(
 				)
 			)
 				return
+			if (pendingAnchor && pendingAnchor.id !== id) {
+				leave(id)
+				return
+			}
 			close()
 		}, CLOSE_DELAY)
 	}
