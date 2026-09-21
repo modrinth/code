@@ -400,7 +400,7 @@ const hasSharedManagedContent = computed(() => {
 })
 
 const managedContentItems = computed(() => {
-	const linkedContent = modpackContentQuery.data.value ?? []
+	const linkedContent = instance.value.link ? (modpackContentQuery.data.value ?? []) : []
 	const sourcedContent = hasSharedManagedContent.value
 		? projects.value.filter((item) =>
 				['server_project', 'shared_instance'].includes(item.source_kind ?? ''),

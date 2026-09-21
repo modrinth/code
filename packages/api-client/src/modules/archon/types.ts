@@ -1149,6 +1149,9 @@ export namespace Archon {
 				has_update: string | null
 			}
 			export type WorldContentItem = {
+				disabled_server?: boolean
+				disabled_player?: boolean
+				side_toggle_unlocked?: boolean
 				parent_directory: string
 				file_sha1: string | null
 				filename: string

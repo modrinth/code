@@ -449,6 +449,8 @@ const tableItems = computed<ContentCardTableItem[]>(() => {
 	const items = filteredItems.value.map((item) => {
 		const base = ctx.mapToTableItem(item)
 		const id = getItemId(item)
+		const mutationPending =
+			ctx.disableWhileMutating !== false && (isChanging(id) || isBulkOperating.value)
 		const locked = base.locked ?? item.locked ?? false
 		const clientWarning = base.enabledFor
 			? null
@@ -457,11 +459,10 @@ const tableItems = computed<ContentCardTableItem[]>(() => {
 			...base,
 			id,
 			locked,
-			disabled:
-				isChanging(id) || ctx.isBusy.value || isBulkOperating.value || item.installing === true,
+			disabled: mutationPending || ctx.isBusy.value || item.installing === true,
 			disabledTooltip: ctx.isBusy.value
 				? (ctx.busyMessage?.value ?? null)
-				: isChanging(id)
+				: mutationPending
 					? formatMessage(messages.pleaseWait)
 					: item.installing
 						? formatMessage(commonMessages.installingLabel)
@@ -1056,7 +1057,10 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 						</div>
 
 						<div class="@container flex items-start gap-2">
-							<div ref="filterControlsRef" class="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+							<div
+								ref="filterControlsRef"
+								class="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-2"
+							>
 								<div ref="projectTypeFiltersRef" class="flex items-center gap-2">
 									<TeleportOverflowMenu
 										class="!h-[34px] !text-sm !font-medium"
@@ -1085,10 +1089,10 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 								<div
 									v-if="metadataFilterCategories.length > 0"
 									ref="metadataFiltersRef"
-									class="flex flex-wrap items-center gap-1.5 [&>div:last-of-type]:!h-[34px] [&>div:last-of-type]:!gap-1.5 [&_[data-button]]:!h-[34px]"
+									class="relative flex flex-wrap items-center gap-1.5 [&>div:last-of-type]:!h-[34px] [&>div:last-of-type]:!gap-1.5 [&_[data-button]]:!h-[34px]"
 								>
 									<div
-										class="mr-0.5 h-6 w-px shrink-0 bg-surface-5"
+										class="absolute -left-2 top-[5px] h-6 w-px bg-surface-5"
 										:class="{ invisible: metadataFiltersWrapped }"
 									/>
 									<DropdownFilterBar

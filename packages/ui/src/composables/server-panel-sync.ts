@@ -274,65 +274,68 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 		serverId: string,
 		event: Archon.Sync.v1.WorldContentUpdateEvent,
 	) {
-		if (event.world_id !== options.worldId.value) {
-			void invalidateContentAndServerDetails(serverId)
-			return
-		}
-
-		const content = worldContentUpdateToAddons(event)
-		queryClient.setQueryData<Archon.Content.v1.Addons>(contentListKey(serverId), (current) => ({
-			...content,
-			addons: mergeWorldContentSideState(
-				current?.addons ?? [],
-				content.addons?.filter((addon) => !addon.from_modpack) ?? [],
-			),
-		}))
-		queryClient.setQueryData<Archon.Content.v1.Addons>(
-			modpackContentListKey(serverId),
-			(current) => ({
-				...content,
-				addons: mergeWorldContentSideState(
-					current?.addons ?? [],
-					content.addons?.filter((addon) => addon.from_modpack) ?? [],
-				),
-			}),
-		)
-		void queryClient.invalidateQueries({ queryKey: contentListKey(serverId) })
-		void queryClient.invalidateQueries({ queryKey: modpackContentListKey(serverId) })
-		void queryClient.invalidateQueries({ queryKey: serverV1DetailKey(serverId) })
-	}
-
-	function mergeWorldContentSideState(
-		currentAddons: Archon.Content.v1.Addon[],
-		incomingAddons: Archon.Content.v1.Addon[],
-	) {
-		const currentByFilename = new Map(
-			currentAddons.map((addon) => [normalizeAddonFilename(addon.filename), addon] as const),
-		)
-		return incomingAddons.map((incoming) => {
-			const current = currentByFilename.get(normalizeAddonFilename(incoming.filename))
-			return current
+		patchServerFullWorld(serverId, event.world_id, (world) =>
+			world.content && event.platform_data
 				? {
-						...incoming,
-						disabled_server: current.disabled_server,
-						disabled_player: current.disabled_player,
-						side_toggle_unlocked: current.side_toggle_unlocked,
+						...world,
+						content: {
+							...world.content,
+							modloader:
+								event.platform_data.platform === 'neoforge' ? 'neo_forge' : event.platform_data.platform,
+							modloader_version: event.platform_data.platform_version ?? '',
+							game_version: event.platform_data.game_version,
+						},
 					}
-				: incoming
+				: world,
+		)
+		if (event.world_id !== options.worldId.value) return
+
+		void queryClient.cancelQueries({ queryKey: contentListKey(serverId) })
+		const currentAddons = [contentListKey(serverId), modpackContentListKey(serverId)].flatMap(
+			(key) => queryClient.getQueryData<Archon.Content.v1.Addons>(key)?.addons ?? [],
+		)
+		const content = worldContentUpdateToAddons(event, currentAddons)
+		queryClient.setQueryData<Archon.Content.v1.Addons>(contentListKey(serverId), {
+			...content,
+			addons: content.addons?.filter((addon) => !addon.from_modpack) ?? [],
+		})
+		queryClient.setQueryData<Archon.Content.v1.Addons>(modpackContentListKey(serverId), {
+			...content,
+			addons: content.addons?.filter((addon) => addon.from_modpack) ?? [],
 		})
 	}
 
 	function worldContentUpdateToAddons(
 		event: Archon.Sync.v1.WorldContentUpdateEvent,
+		currentAddons: Archon.Content.v1.Addon[],
 	): Archon.Content.v1.Addons {
+		const currentByFilename = new Map(
+			currentAddons.map((addon) => [
+				`${addon.kind}:${normalizeAddonFilename(addon.filename)}`,
+				addon,
+			]),
+		)
+		const addons = event.content
+			.filter((item) => ['mods', 'plugins', 'datapacks'].includes(item.parent_directory))
+			.map((item) =>
+				worldContentItemToAddon(
+					item,
+					currentByFilename.get(
+						`${parentDirectoryToAddonKind(item.parent_directory)}:${normalizeAddonFilename(item.filename)}`,
+					),
+				),
+			)
 		return {
-			modloader: event.platform_data?.platform ?? null,
+			modloader:
+				event.platform_data?.platform === 'neoforge'
+					? 'neo_forge'
+					: (event.platform_data?.platform ?? null),
 			modloader_version: event.platform_data?.platform_version ?? null,
 			game_version: event.platform_data?.game_version ?? null,
 			modpack: worldContentModpackToModpackFields(event.linked_modpack),
 			installing: event.installing,
 			error: event.error,
-			addons: event.content.map(worldContentItemToAddon),
+			addons,
 		}
 	}
 
@@ -369,16 +372,19 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 		}
 	}
 
-	function worldContentItemToAddon(item: Archon.Sync.v1.WorldContentItem): Archon.Content.v1.Addon {
+	function worldContentItemToAddon(
+		item: Archon.Sync.v1.WorldContentItem,
+		current?: Archon.Content.v1.Addon,
+	): Archon.Content.v1.Addon {
 		return {
 			id: item.version?.id ?? item.version_id ?? item.file_sha1 ?? item.filename,
 			filename: item.filename,
 			filesize: item.filesize ?? 0,
 			btime: item.btime,
-			disabled: false,
-			disabled_server: false,
-			disabled_player: false,
-			side_toggle_unlocked: false,
+			disabled: item.filename.endsWith('.disabled'),
+			disabled_server: item.disabled_server ?? current?.disabled_server ?? false,
+			disabled_player: item.disabled_player ?? current?.disabled_player ?? false,
+			side_toggle_unlocked: item.side_toggle_unlocked ?? current?.side_toggle_unlocked ?? false,
 			manifest: item.manifest ?? null,
 			kind: parentDirectoryToAddonKind(item.parent_directory),
 			from_modpack: item.from_modpack,
@@ -400,6 +406,10 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 				return 'plugin'
 			case 'datapacks':
 				return 'datapack'
+			case 'shaderpacks':
+				return 'shader'
+			case 'resourcepacks':
+				return 'resourcepack'
 			default:
 				return 'mod'
 		}

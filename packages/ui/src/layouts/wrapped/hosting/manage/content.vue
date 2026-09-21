@@ -2,7 +2,7 @@
 import { type Archon, type Labrinth, ModrinthApiError } from '@modrinth/api-client'
 import { ClipboardCopyIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import type { OverflowMenuOption } from '#ui/components/base/buttons'
@@ -542,10 +542,6 @@ async function flushStoredServerInstalls() {
 			})
 			return
 		}
-
-		if (result.flushedPlans.length > 0) {
-			await queryClient.invalidateQueries({ queryKey: queryKey.value })
-		}
 	} finally {
 		isFlushingStoredServerInstalls.value = false
 	}
@@ -588,6 +584,7 @@ const deleteMutation = useMutation({
 			kind: addon.kind,
 		}),
 	onMutate: async ({ addon }) => {
+		cancelQueuedAddonToggle(addon)
 		await queryClient.cancelQueries({ queryKey: queryKey.value })
 		const previousData = queryClient.getQueryData<Archon.Content.v1.Addons>(queryKey.value)
 		queryClient.setQueryData(queryKey.value, (oldData: Archon.Content.v1.Addons | undefined) => {
@@ -597,13 +594,16 @@ const deleteMutation = useMutation({
 				addons: (oldData.addons ?? []).filter((a) => a.filename !== addon.filename),
 			}
 		})
-		return { previousData }
-	},
-	onSuccess: () => {
-		queryClient.invalidateQueries({ queryKey: queryKey.value })
+		return {
+			previousData,
+			dataUpdateCount: queryClient.getQueryState(queryKey.value)?.dataUpdateCount,
+		}
 	},
 	onError: (err, _vars, context) => {
-		if (context?.previousData) {
+		if (
+			context?.previousData &&
+			queryClient.getQueryState(queryKey.value)?.dataUpdateCount === context.dataUpdateCount
+		) {
 			queryClient.setQueryData(queryKey.value, context.previousData)
 		}
 		addNotification({
@@ -614,120 +614,167 @@ const deleteMutation = useMutation({
 	},
 })
 
-const toggleEnabledMutation = useMutation({
-	mutationFn: async ({ addon, enabled }: { addon: Archon.Content.v1.Addon; enabled: boolean }) => {
-		const request: Archon.Content.v1.RemoveAddonRequest = {
-			filename: addon.filename,
-			kind: addon.kind,
-		}
-		if (enabled) {
-			await client.archon.content_v1.enableAddon(serverId, worldId.value!, request)
-		} else {
-			await client.archon.content_v1.disableAddon(serverId, worldId.value!, request)
-		}
-	},
-	onMutate: async ({ addon, enabled }) => {
-		const targetQueryKey = getAddonQueryKey(addon)
-		await queryClient.cancelQueries({ queryKey: targetQueryKey })
-		const previousData = queryClient.getQueryData<Archon.Content.v1.Addons>(targetQueryKey)
-		queryClient.setQueryData(targetQueryKey, (oldData: Archon.Content.v1.Addons | undefined) => {
-			if (!oldData) return oldData
-			return {
-				...oldData,
-				addons: (oldData.addons ?? []).map((candidate) =>
-					candidate.filename === addon.filename && candidate.kind === addon.kind
-						? { ...candidate, disabled: !enabled }
-						: candidate,
-				),
-			}
-		})
-		return { previousData, targetQueryKey }
-	},
-	onError: (error, { addon }, context) => {
-		if (context?.previousData) {
-			queryClient.setQueryData(context.targetQueryKey, context.previousData)
-		}
-		addNotification({
-			type: 'error',
-			title: formatMessage(messages.failedToToggle, {
-				name: friendlyAddonName(addon),
-			}),
-			text: error instanceof Error ? error.message : undefined,
-		})
-	},
-	onSettled: () => {
-		void queryClient.invalidateQueries({ queryKey: queryKey.value })
-		void queryClient.invalidateQueries({ queryKey: modpackContentQueryKey.value })
-	},
-})
-
-type SetEnabledForVariables = {
-	addon: Archon.Content.v1.Addon
-	sides: ContentSide[]
-	enabled: boolean
+type AddonToggleChanges = {
+	enabled?: boolean
+	server?: boolean
+	player?: boolean
 }
 
-const setEnabledForMutation = useMutation({
-	mutationFn: async ({ addon, sides, enabled }: SetEnabledForVariables) => {
-		const targetWorldId = worldId.value!
-		if (isPlayerOnlyContent(addon) && sides.includes('server')) return
+type AddonToggleBatch = {
+	addon: Archon.Content.v1.Addon
+	worldId: string
+	queryKey: string[]
+	changes: AddonToggleChanges
+	dataUpdateCount: number | undefined
+}
+
+type AddonToggleQueue = {
+	pending?: AddonToggleBatch
+	timer?: ReturnType<typeof setTimeout>
+	running: boolean
+}
+
+const addonToggleQueues = new Map<string, AddonToggleQueue>()
+
+function addonToggleKey(addon: Archon.Content.v1.Addon) {
+	return `${addon.kind}:${addon.filename.replace(/\.disabled$/, '')}`
+}
+
+function cancelQueuedAddonToggle(addon: Archon.Content.v1.Addon) {
+	const key = `${worldId.value}:${addonToggleKey(addon)}`
+	const queue = addonToggleQueues.get(key)
+	if (!queue) return
+	if (queue.timer) clearTimeout(queue.timer)
+	queue.timer = undefined
+	queue.pending = undefined
+	if (!queue.running) addonToggleQueues.delete(key)
+}
+
+function applyAddonToggleChanges(addon: Archon.Content.v1.Addon, changes: AddonToggleChanges) {
+	return {
+		...addon,
+		...(changes.enabled !== undefined ? { disabled: !changes.enabled } : {}),
+		...(changes.server !== undefined ? { disabled_server: !changes.server } : {}),
+		...(changes.player !== undefined ? { disabled_player: !changes.player } : {}),
+		...((changes.server !== undefined || changes.player !== undefined) && !isPlayerOnlyContent(addon)
+			? { side_toggle_unlocked: true }
+			: {}),
+	}
+}
+
+const toggleAddonMutation = useMutation({
+	mutationFn: async ({ addon, worldId: targetWorldId, changes }: AddonToggleBatch) => {
+		const request = { filename: addon.filename, kind: addon.kind }
+		if (changes.enabled !== undefined) {
+			if (changes.enabled) {
+				await client.archon.content_v1.enableAddon(serverId, targetWorldId, request)
+			} else {
+				await client.archon.content_v1.disableAddon(serverId, targetWorldId, request)
+			}
+		}
+		const sides = (['server', 'player'] as const).filter((side) => changes[side] !== undefined)
+		if (sides.length === 0) return
 		if (!isPlayerOnlyContent(addon) && !addon.side_toggle_unlocked) {
 			await client.archon.content_v1.setAddonSideToggleLocked(serverId, targetWorldId, {
-				filename: addon.filename,
-				kind: addon.kind,
+				...request,
 				locked: false,
 			})
 		}
-		const request: Archon.Content.v1.SetAddonEnabledRequest = {
-			filename: addon.filename,
-			kind: addon.kind,
-			enabled,
-		}
-		await Promise.all(
-			sides.map((side) =>
-				side === 'server'
-					? client.archon.content_v1.setAddonEnabledServer(serverId, targetWorldId, request)
-					: client.archon.content_v1.setAddonEnabledPlayer(serverId, targetWorldId, request),
-			),
-		)
-	},
-	onMutate: async ({ addon, sides, enabled }) => {
-		const targetQueryKey = getAddonQueryKey(addon)
-		await queryClient.cancelQueries({ queryKey: targetQueryKey })
-		const previousData = queryClient.getQueryData<Archon.Content.v1.Addons>(targetQueryKey)
-		queryClient.setQueryData(targetQueryKey, (oldData: Archon.Content.v1.Addons | undefined) => {
-			if (!oldData) return oldData
-			return {
-				...oldData,
-				addons: (oldData.addons ?? []).map((candidate) => {
-					if (candidate.filename !== addon.filename || candidate.kind !== addon.kind)
-						return candidate
-					return {
-						...candidate,
-						...(sides.includes('server') ? { disabled_server: !enabled } : {}),
-						...(sides.includes('player') ? { disabled_player: !enabled } : {}),
-					}
-				}),
+		for (const side of sides) {
+			const sideRequest = { ...request, enabled: changes[side]! }
+			if (side === 'server') {
+				await client.archon.content_v1.setAddonEnabledServer(serverId, targetWorldId, sideRequest)
+			} else {
+				await client.archon.content_v1.setAddonEnabledPlayer(serverId, targetWorldId, sideRequest)
 			}
-		})
-		return { previousData, targetQueryKey }
+		}
 	},
-	onError: (error, { addon }, context) => {
-		if (context?.previousData) {
-			queryClient.setQueryData(context.targetQueryKey, context.previousData)
+	onError: (error, batch) => {
+		if (queryClient.getQueryState(batch.queryKey)?.dataUpdateCount === batch.dataUpdateCount) {
+			queryClient.setQueryData<Archon.Content.v1.Addons>(batch.queryKey, (current) =>
+				current
+					? {
+							...current,
+							addons: (current.addons ?? []).map((addon) =>
+								addonToggleKey(addon) === addonToggleKey(batch.addon) ? batch.addon : addon,
+							),
+						}
+					: current,
+			)
 		}
 		addNotification({
 			type: 'error',
-			title: formatMessage(messages.failedToSetEnabledFor, {
-				name: friendlyAddonName(addon),
-			}),
+			title: formatMessage(
+				batch.changes.enabled !== undefined ? messages.failedToToggle : messages.failedToSetEnabledFor,
+				{ name: friendlyAddonName(batch.addon) },
+			),
 			text: error instanceof Error ? error.message : undefined,
 		})
 	},
-	onSettled: () => {
-		void queryClient.invalidateQueries({ queryKey: queryKey.value })
-		void queryClient.invalidateQueries({ queryKey: modpackContentQueryKey.value })
-	},
+})
+
+async function flushAddonToggle(key: string, queue: AddonToggleQueue) {
+	if (queue.running || !queue.pending) return
+	const batch = queue.pending
+	queue.pending = undefined
+	queue.running = true
+	try {
+		await toggleAddonMutation.mutateAsync(batch)
+	} catch {
+		// The mutation reports the error and rolls back if no newer state has arrived.
+	} finally {
+		queue.running = false
+		if (!queue.pending) {
+			addonToggleQueues.delete(key)
+		} else if (!queue.timer) {
+			void flushAddonToggle(key, queue)
+		}
+	}
+}
+
+function queueAddonToggle(addon: Archon.Content.v1.Addon, changes: AddonToggleChanges) {
+	const targetWorldId = worldId.value
+	if (!targetWorldId) return
+	const key = `${targetWorldId}:${addonToggleKey(addon)}`
+	const queue: AddonToggleQueue = addonToggleQueues.get(key) ?? { running: false }
+	addonToggleQueues.set(key, queue)
+	const targetQueryKey = getAddonQueryKey(addon)
+	void queryClient.cancelQueries({ queryKey: targetQueryKey, exact: true })
+	const batch: AddonToggleBatch = queue.pending ?? {
+		addon,
+		worldId: targetWorldId,
+		queryKey: targetQueryKey,
+		changes: {},
+		dataUpdateCount: undefined,
+	}
+	batch.changes = { ...batch.changes, ...changes }
+	queue.pending = batch
+	queryClient.setQueryData<Archon.Content.v1.Addons>(targetQueryKey, (current) =>
+		current
+			? {
+					...current,
+					addons: (current.addons ?? []).map((candidate) =>
+						addonToggleKey(candidate) === addonToggleKey(addon)
+							? applyAddonToggleChanges(candidate, batch.changes)
+							: candidate,
+					),
+				}
+			: current,
+	)
+	batch.dataUpdateCount = queryClient.getQueryState(targetQueryKey)?.dataUpdateCount
+	if (queue.timer) clearTimeout(queue.timer)
+	queue.timer = setTimeout(() => {
+		queue.timer = undefined
+		void flushAddonToggle(key, queue)
+	}, 250)
+}
+
+onUnmounted(() => {
+	for (const [key, queue] of addonToggleQueues) {
+		if (queue.timer) clearTimeout(queue.timer)
+		queue.timer = undefined
+		void flushAddonToggle(key, queue)
+	}
 })
 
 async function handleSetEnabledFor(item: ContentItem, side: ContentSide, enabled: boolean) {
@@ -738,6 +785,7 @@ async function handleSetEnabledFor(item: ContentItem, side: ContentSide, enabled
 	if (
 		enabled &&
 		userPreferences.value.warnOnIncompatibleContent &&
+		!(side === 'server' && addon.pack_client_depends) &&
 		isIncompatibleEnvironment(addon, side)
 	) {
 		const confirmed = await environmentWarningModal.value?.show(
@@ -747,14 +795,14 @@ async function handleSetEnabledFor(item: ContentItem, side: ContentSide, enabled
 		)
 		if (!confirmed || contentActionDisabled.value || worldId.value !== targetWorldId) return
 	}
-	await setEnabledForMutation.mutateAsync({ addon, sides: [side], enabled })
+	queueAddonToggle(addon, { [side]: enabled })
 }
 
 async function handleToggleEnabled(item: ContentItem) {
 	if (contentActionDisabled.value) return
 	const addon = getAddonForItem(item)
 	if (!addon) return
-	await toggleEnabledMutation.mutateAsync({ addon, enabled: addon.disabled })
+	queueAddonToggle(addon, { enabled: addon.disabled })
 }
 
 async function handleModpackSetEnabledFor(item: ContentItem, side: ContentSide, enabled: boolean) {
@@ -789,14 +837,44 @@ function itemsToAddonRequests(items: ContentItem[]): Archon.Content.v1.RemoveAdd
 	})
 }
 
+async function optimisticallyUpdateAddons(
+	update: (addons: Archon.Content.v1.Addon[]) => Archon.Content.v1.Addon[],
+) {
+	const targetQueryKey = queryKey.value
+	await queryClient.cancelQueries({ queryKey: targetQueryKey, exact: true })
+	const previousData = queryClient.getQueryData<Archon.Content.v1.Addons>(targetQueryKey)
+	queryClient.setQueryData<Archon.Content.v1.Addons>(targetQueryKey, (current) =>
+		current ? { ...current, addons: update(current.addons ?? []) } : current,
+	)
+	const dataUpdateCount = queryClient.getQueryState(targetQueryKey)?.dataUpdateCount
+	return () => {
+		if (
+			previousData &&
+			queryClient.getQueryState(targetQueryKey)?.dataUpdateCount === dataUpdateCount
+		) {
+			queryClient.setQueryData(targetQueryKey, previousData)
+		}
+	}
+}
+
 async function handleBulkDelete(items: ContentItem[]) {
 	if (contentActionDisabled.value) return
 	const requests = itemsToAddonRequests(items)
 	if (requests.length === 0) return
+	for (const item of items) {
+		const addon = getAddonForItem(item)
+		if (addon) cancelQueuedAddonToggle(addon)
+	}
+	const rollback = await optimisticallyUpdateAddons((addons) =>
+		addons.filter(
+			(addon) =>
+				!requests.some((request) => request.filename === addon.filename && request.kind === addon.kind),
+		),
+	)
 	try {
 		await client.archon.content_v1.deleteAddons(serverId, worldId.value!, requests)
-		await queryClient.invalidateQueries({ queryKey: queryKey.value })
 	} catch (err) {
+		rollback()
 		addNotification({
 			type: 'error',
 			title: formatMessage(messages.failedToBulkDelete),
@@ -899,10 +977,9 @@ function handleUploadFiles() {
 			}
 			if (confirmedFiles.length === 0) return
 
-			const result = await contentUploadSession.uploadFiles(
+			await contentUploadSession.uploadFiles(
 				confirmedFiles.map((file) => ({ file, filename: file.name })),
 			)
-			if (result === 'completed') await contentQuery.refetch()
 		} catch (err) {
 			addNotification({
 				type: 'error',
@@ -1045,7 +1122,6 @@ async function handleViewModpackContent() {
 	if (modpackContentQuery.data.value) {
 		modpackAddons.value = modpackContentQuery.data.value.addons ?? []
 		modpackContentModal.value?.show(modpackAddons.value.map(addonToContentItem))
-		void modpackContentQuery.refetch()
 		return
 	}
 
@@ -1075,7 +1151,6 @@ async function handleModpackUnlinkConfirm() {
 	if (setupActionDisabled.value) return
 	try {
 		await client.archon.content_v1.unlinkModpack(serverId, worldId.value!)
-		await contentQuery.refetch()
 	} catch (err) {
 		addNotification({
 			type: 'error',
@@ -1094,10 +1169,16 @@ async function handleBulkUpdate(items: ContentItem[]) {
 			version_id: item.update_version_id ?? undefined,
 		}))
 	if (addons.length === 0) return
+	const filenames = new Set(addons.map((addon) => addon.filename))
+	const rollback = await optimisticallyUpdateAddons((current) =>
+		current.map((addon) =>
+			filenames.has(addon.filename) ? { ...addon, installing: true } : addon,
+		),
+	)
 	try {
 		await client.archon.content_v1.updateAddons(serverId, worldId.value!, addons)
-		await queryClient.invalidateQueries({ queryKey: queryKey.value })
 	} catch (err) {
+		rollback()
 		addNotification({
 			type: 'error',
 			title: formatMessage(messages.failedToBulkUpdate),
@@ -1213,18 +1294,6 @@ function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version, event?
 	performUpdate(selectedVersion)
 }
 
-function setAddonInstalling(filename: string, installing: boolean) {
-	queryClient.setQueryData(queryKey.value, (oldData: Archon.Content.v1.Addons | undefined) => {
-		if (!oldData) return oldData
-		return {
-			...oldData,
-			addons: (oldData.addons ?? []).map((a) =>
-				a.filename === filename ? { ...a, installing } : a,
-			),
-		}
-	})
-}
-
 async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 	if (
 		(updatingModpack.value && setupActionDisabled.value) ||
@@ -1232,9 +1301,13 @@ async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 	)
 		return
 	const item = updatingProject.value
-	if (item) {
-		setAddonInstalling(item.file_name, true)
-	}
+	const rollback = item
+		? await optimisticallyUpdateAddons((addons) =>
+				addons.map((addon) =>
+					addon.filename === item.file_name ? { ...addon, installing: true } : addon,
+				),
+			)
+		: undefined
 	try {
 		if (updatingModpack.value) {
 			const mp = contentQuery.data.value?.modpack
@@ -1257,11 +1330,8 @@ async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 				})
 			}
 		}
-		await contentQuery.refetch()
 	} catch (err) {
-		if (item) {
-			setAddonInstalling(item.file_name, false)
-		}
+		rollback?.()
 		addNotification({
 			type: 'error',
 			title: formatMessage(messages.failedToUpdate),
@@ -1312,6 +1382,7 @@ provideContentManager({
 	managedContent,
 	isPackLocked: ref(false),
 	isBusy: contentActionDisabled,
+	disableWhileMutating: false,
 	busyMessage: contentActionBusyMessage,
 	disableAddContent: computed(() => !canSetup.value),
 	disableAddContentTooltip: permissionDeniedMessage.value,
@@ -1389,7 +1460,6 @@ provideContentManager({
 					:header="formatMessage(messages.modpackContent)"
 					enable-enabled-for
 					show-environment-warnings
-					:get-overflow-options="getOverflowOptions"
 					:action-disabled="contentActionDisabled"
 					:action-disabled-tooltip="contentActionBusyMessage ?? undefined"
 					@update:enabled="handleModpackToggleEnabled"
