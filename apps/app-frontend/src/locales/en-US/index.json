@@ -53,8 +53,8 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Download couldn't finish"
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "Instance couldn't be found"
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Couldn't prepare instance"
   },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "File path is invalid"
