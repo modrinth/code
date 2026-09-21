@@ -1400,6 +1400,12 @@
   "external-project-license-status.yes": {
     "defaultMessage": "Sí"
   },
+  "file-button.file-too-large.description": {
+    "defaultMessage": "El archivo {filename} es demasiado grande. El tamaño máximo del archivo es {maxSize}."
+  },
+  "file-button.file-too-large.title": {
+    "defaultMessage": "Archivo demasiado grande"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "Resumen de la extracción"
   },
@@ -2142,7 +2148,7 @@
     "defaultMessage": "Borrador"
   },
   "image-viewer.editor.tool.highlight": {
-    "defaultMessage": "Resaltar"
+    "defaultMessage": "Marcador"
   },
   "image-viewer.editor.tool.pen": {
     "defaultMessage": "Bolígrafo"

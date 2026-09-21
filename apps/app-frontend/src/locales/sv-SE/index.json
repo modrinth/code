@@ -296,6 +296,63 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Aktivera synkronisering av resurs­paket i appens inställningar först."
   },
+  "app.download-manager.active": {
+    "message": "Aktiv"
+  },
+  "app.download-manager.attention": {
+    "message": "Behöver uppmärksamhet"
+  },
+  "app.download-manager.cancel": {
+    "message": "Avbryt installation"
+  },
+  "app.download-manager.canceling": {
+    "message": "Avbryter installation…"
+  },
+  "app.download-manager.clear-all": {
+    "message": "Rensa alla"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Rensa alla slutförda uppgifter"
+  },
+  "app.download-manager.complete": {
+    "message": "Slutförd"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Uppskattad nedladdningshastighet"
+  },
+  "app.download-manager.eta": {
+    "message": "Uppskattad tid kvar för den här nedladdningen"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Importerad instans"
+  },
+  "app.download-manager.modpack": {
+    "message": "Modpaket"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Ny instans"
+  },
+  "app.download-manager.pause": {
+    "message": "Pausa installation"
+  },
+  "app.download-manager.paused": {
+    "message": "Pausad"
+  },
+  "app.download-manager.remove": {
+    "message": "Ta bort från historik"
+  },
+  "app.download-manager.resume": {
+    "message": "Fortsätt installation"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Delad instans"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "Delad instansuppdatering"
+  },
+  "app.download-manager.verifying": {
+    "message": "Verifierar"
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "Öppna mappen för säkerhetskopior"
   },
@@ -1373,6 +1430,9 @@
   "app.quick-instance-switcher.instance-locked": {
     "message": "Den här instansen har låsts"
   },
+  "app.quick-instance-switcher.title": {
+    "message": "Senaste instanser"
+  },
   "app.quick-instance-switcher.view-instance": {
     "message": "Visa instans"
   },
@@ -1696,6 +1756,9 @@
   },
   "app.settings.game-options.choice.left": {
     "message": "Vänster"
+  },
+  "app.settings.game-options.choice.limited": {
+    "message": "Begränsad"
   },
   "app.settings.game-options.choice.minimal": {
     "message": "Minimalt"

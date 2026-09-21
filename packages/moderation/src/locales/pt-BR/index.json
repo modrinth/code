@@ -1,6 +1,6 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "É necessária uma descrição que descreva claramente o conteúdo, o propósito e o apelo do seu projeto."
+    "defaultMessage": "É necessária uma descrição que descreva com clareza o propósito e função do projeto."
   },
   "nags.add-description.title": {
     "defaultMessage": "Adicione uma descrição"
@@ -60,7 +60,7 @@
     "defaultMessage": "Remover links proibidos"
   },
   "nags.check-disclosures.description": {
-    "defaultMessage": "Certifique-se de que os usuários estejam cientes de qualquer detalhe importante ao preencher a divulgação de conteúdo que se apliquem ao seu {type}."
+    "defaultMessage": "Certifique-se de que os usuários estejam cientes de qualquer detalhe importante ao preencher os avisos de conteúdo que se apliquem ao seu {type}."
   },
   "nags.check-disclosures.title": {
     "defaultMessage": "Revisar avisos de conteúdo"
@@ -197,6 +197,9 @@
   "nags.project-description-banned-link.description": {
     "defaultMessage": "O link “{fullUrl}” não é permitido nas descrições do projeto."
   },
+  "nags.project-description-content.title": {
+    "defaultMessage": "Revise a descrição"
+  },
   "nags.project-description-non-english.description": {
     "defaultMessage": "A descrição do seu projeto deve ser escrito em inglês ou incluir uma tradução em inglês."
   },
@@ -306,7 +309,7 @@
     "defaultMessage": "Visitar configurações do servidor"
   },
   "nags.settings.disclosures.title": {
-    "defaultMessage": "Visitar configurações de divulgação"
+    "defaultMessage": "Visitar configurações de aviso de conteúdo"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Visitar configurações de licença"
@@ -379,6 +382,9 @@
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Visitar página de links"
+  },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "A descrição do seu projeto deve fornecer informações únicas e não repetir o resumo do projeto."
   },
   "project.text-validation.summary-matches-title": {
     "defaultMessage": "O resumo do seu projeto deve fornecer informações únicas e não repetir o nome do projeto."

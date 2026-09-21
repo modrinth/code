@@ -957,7 +957,7 @@
     "message": "Ajustes de cuenta"
   },
   "auth.verify-email.action.discover-mods": {
-    "message": "Descubre modificaciones"
+    "message": "Descubre mods"
   },
   "auth.verify-email.already-verified.description": {
     "message": "¡Tu correo electrónico ya está verificado!"
@@ -999,7 +999,7 @@
     "message": "Subir Icono"
   },
   "collection.button.discover-mods": {
-    "message": "Descubrir modificaciones"
+    "message": "Descubrir mods"
   },
   "collection.button.edit-icon": {
     "message": "Editar icono"
@@ -2631,7 +2631,7 @@
     "message": "servidores"
   },
   "landing.heading.the-place-for-minecraft.shaders": {
-    "message": "sombreadores"
+    "message": "shaders"
   },
   "landing.launcher.atlauncher-label": {
     "message": "ATLauncher"
@@ -2907,7 +2907,7 @@
     "message": "Desplegar menú"
   },
   "layout.meta.description": {
-    "message": "Descarga mods, plugins, paquetes de datos, sombreadores, paquetes de recursos y paquetes de mods de Minecraft en Modrinth. Descubre y publica proyectos en Modrinth con una interfaz moderna y fácil de usar y una API."
+    "message": "Descarga mods, plugins, datapacks, shaders, paquetes de recursos y modpacks de Minecraft en Modrinth. Descubre y publica proyectos en Modrinth con una interfaz moderna y fácil de usar y una API."
   },
   "layout.meta.og-description": {
     "message": "¡Descubre y publica contenido de Minecraft!"
@@ -3507,7 +3507,7 @@
     "message": "Servidor"
   },
   "project-type.shader.plural": {
-    "message": "Sombreadores"
+    "message": "Shaders"
   },
   "project-type.shader.singular": {
     "message": "Sombreador"
@@ -4794,7 +4794,7 @@
     "message": "Ideal para 6–15 jugadores y múltiples mods."
   },
   "servers.plan.small.description": {
-    "message": "Perfecto para 1–5 amigos con algunas modificaciones ligeras."
+    "message": "Perfecto para 1–5 amigos con algunos mods ligeros."
   },
   "servers.purchase.step.plan.most-popular": {
     "message": "Más popular"

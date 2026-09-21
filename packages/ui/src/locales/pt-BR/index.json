@@ -1400,6 +1400,12 @@
   "external-project-license-status.yes": {
     "defaultMessage": "Sim"
   },
+  "file-button.file-too-large.description": {
+    "defaultMessage": "O arquivo {filename} é muito grande. O tamanho máximo para arquivos é {maxSize}."
+  },
+  "file-button.file-too-large.title": {
+    "defaultMessage": "Arquivo muito grande"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "Resumo da extração"
   },
@@ -4044,7 +4050,7 @@
     "defaultMessage": "Desativar"
   },
   "project.settings.disclosures.title": {
-    "defaultMessage": "Divulgações"
+    "defaultMessage": "Avisos de conteúdo"
   },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Tem alguma funcionalidade tanto no cliente quanto no servidor, mesmo que apenas de forma parcial."
@@ -4269,7 +4275,7 @@
     "defaultMessage": "Malicioso"
   },
   "report.type.missing-disclosure": {
-    "defaultMessage": "Divulgação incorreta ou em falta"
+    "defaultMessage": "Aviso de conteúdo incorreto ou em falta"
   },
   "report.type.name-squatting": {
     "defaultMessage": "Imitação"

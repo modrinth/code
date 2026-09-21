@@ -293,6 +293,90 @@
   "app.content.sync-packs-override": {
     "message": "このインスタンスの設定でパックの同期を無効にしてください。"
   },
+  "app.content.sync-resource-packs-disabled": {
+    "message": "アプリの設定で最初にリソースパックの同期をオンにしてください。"
+  },
+  "app.download-manager.active": {
+    "message": "有効"
+  },
+  "app.download-manager.attention": {
+    "message": "注意が必要"
+  },
+  "app.download-manager.cancel": {
+    "message": "インストールをキャンセル"
+  },
+  "app.download-manager.canceling": {
+    "message": "インストールをキャンセル中…"
+  },
+  "app.download-manager.clear-all": {
+    "message": "全て消去"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "完了したすべてのタスクを消去"
+  },
+  "app.download-manager.complete": {
+    "message": "完了"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "インスタンスを複製"
+  },
+  "app.download-manager.empty": {
+    "message": "インストールタスクがありません"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "推定ダウンロード速度"
+  },
+  "app.download-manager.eta": {
+    "message": "このダウンロードの推定残り時間"
+  },
+  "app.download-manager.hide": {
+    "message": "インストールタスクを非表示"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "インポートされたインスタンス"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "インスタンスのインストール"
+  },
+  "app.download-manager.modpack": {
+    "message": "Modパック"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Modパックのインストール"
+  },
+  "app.download-manager.new-instance": {
+    "message": "インスタンスを作成"
+  },
+  "app.download-manager.pause": {
+    "message": "インストールを一時停止"
+  },
+  "app.download-manager.paused": {
+    "message": "一時停止中"
+  },
+  "app.download-manager.remove": {
+    "message": "履歴から削除する"
+  },
+  "app.download-manager.resume": {
+    "message": "インストールを再開"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "シェアされたインスタンス"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "シェアされたインスタンスにアップデート"
+  },
+  "app.download-manager.show": {
+    "message": "インストールされているタスクを表示"
+  },
+  "app.download-manager.tasks": {
+    "message": "タスク"
+  },
+  "app.download-manager.title": {
+    "message": "ダウンロードマネージャー"
+  },
+  "app.download-manager.verifying": {
+    "message": "認証中"
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "バックアップフォルダーを開く"
   },
@@ -322,6 +406,57 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.features-settings.instance-pages.title": {
+    "message": "インスタンス"
+  },
+  "app.features-settings.play-page.title": {
+    "message": "最近遊んだページ"
+  },
+  "app.features-settings.quick-instances.description": {
+    "message": "左サイドバーに表示される最近のインスタンスの最大数を選択します。スライダーをドラッグすることで、調整することもできます。"
+  },
+  "app.features-settings.quick-instances.title": {
+    "message": "サイドバーのクイックインスタンス"
+  },
+  "app.features-settings.show-all-screenshots.description": {
+    "message": "すべてのインスタンスからスクリーンショットを表示するボタンを、左サイドバーに表示します。"
+  },
+  "app.features-settings.show-all-screenshots.title": {
+    "message": "すべてのスクリーンショットをサイドバーに表示"
+  },
+  "app.features-settings.show-files-tab.title": {
+    "message": "インスタンスにファイルタブを表示する"
+  },
+  "app.features-settings.show-jump-in.description": {
+    "message": "ホーム画面の上部に最近プレイしたワールドとインスタンスを表示します。"
+  },
+  "app.features-settings.show-jump-in.title": {
+    "message": "ジャンプをセクションで表示"
+  },
+  "app.features-settings.show-screenshots-tab.title": {
+    "message": "インスタンスにスクリーンショットタブを表示する"
+  },
+  "app.features-settings.show-skin-selector.description": {
+    "message": "左サイドバーにスキンセレクターを開くボタンを表示する。"
+  },
+  "app.features-settings.show-skin-selector.title": {
+    "message": "サイドバーにスキンセレクターを表示する"
+  },
+  "app.features-settings.show-worlds-tab.title": {
+    "message": "インスタンスにワールドタブを表示する"
+  },
+  "app.features-settings.sidebar.title": {
+    "message": "サイドバー"
+  },
+  "app.features-settings.sync-across-devices.description": {
+    "message": "サインインされているすべてのデバイスでこれらの機能はすべて共有されます。デバイスごとに設定した場合はこの機能をオフにしてください。"
+  },
+  "app.features-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "設定を同期するには、Modrinthアカウントにログインしてください。"
+  },
+  "app.features-settings.sync-across-devices.title": {
+    "message": "デバイス間での同期機能を同期する"
   },
   "app.home.jump-back-in.actions.label": {
     "message": "インスタンスの操作"
@@ -769,6 +904,18 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "サーバーの削除"
+  },
+  "app.instance.worlds.remove-server-modal.remove-everywhere": {
+    "message": "すべての場所から削除"
+  },
+  "app.instance.worlds.remove-server-modal.remove-here": {
+    "message": "ここで削除"
+  },
+  "app.instance.worlds.remove-server-modal.synced-description": {
+    "message": "このセッションから削除、または同期されているすべてのデバイスから削除することができます。このセッションだけ削除したら、オーバーライドが有効になり、このインスタンスは同期されたサーバーの変更を受け取れません。"
+  },
+  "app.instance.worlds.remove-server-modal.synced-header": {
+    "message": "このサーバーは同期されています"
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "サーバーの削除"
@@ -1316,6 +1463,9 @@
   "app.quick-instance-switcher.instance-locked": {
     "message": "このインスタンスはロックされています"
   },
+  "app.quick-instance-switcher.title": {
+    "message": "最近のインスタンス"
+  },
   "app.quick-instance-switcher.view-instance": {
     "message": "インスタンスを表示"
   },
@@ -1571,8 +1721,74 @@
   "app.settings.downloading": {
     "message": "v{version}をダウンロード中"
   },
+  "app.settings.game-options.category.accessibility.description": {
+    "message": "アクセシビリティの設定"
+  },
+  "app.settings.game-options.category.accessibility.label": {
+    "message": "アクセシビリティ"
+  },
+  "app.settings.game-options.category.chat.label": {
+    "message": "チャット"
+  },
+  "app.settings.game-options.category.custom.description": {
+    "message": "Mod によって追加された設定"
+  },
+  "app.settings.game-options.category.custom.label": {
+    "message": "カスタム設定"
+  },
+  "app.settings.game-options.category.language.description": {
+    "message": "ゲームの言語"
+  },
+  "app.settings.game-options.category.language.label": {
+    "message": "言語"
+  },
+  "app.settings.game-options.category.music-and-sound.description": {
+    "message": "オーディオ設定"
+  },
+  "app.settings.game-options.category.music-and-sound.label": {
+    "message": "音楽とサウンド"
+  },
+  "app.settings.game-options.category.online.description": {
+    "message": "オンラインとRealms の設定"
+  },
   "app.settings.game-options.category.online.label": {
     "message": "オンライン"
+  },
+  "app.settings.game-options.category.video.label": {
+    "message": "動画"
+  },
+  "app.settings.game-options.choice.all": {
+    "message": "すべて"
+  },
+  "app.settings.game-options.choice.chat": {
+    "message": "チャット"
+  },
+  "app.settings.game-options.choice.crosshair": {
+    "message": "クロスヘア"
+  },
+  "app.settings.game-options.choice.custom": {
+    "message": "カスタム"
+  },
+  "app.settings.game-options.choice.hotbar": {
+    "message": "ホットバー"
+  },
+  "app.settings.game-options.choice.max-fps": {
+    "message": "最大フレームレート"
+  },
+  "app.settings.game-options.choice.off": {
+    "message": "オフ"
+  },
+  "app.settings.game-options.choice.on": {
+    "message": "オン"
+  },
+  "app.settings.game-options.choice.opengl": {
+    "message": "OpenGL"
+  },
+  "app.settings.game-options.choice.pause": {
+    "message": "ポーズメニュー"
+  },
+  "app.settings.game-options.choice.system": {
+    "message": "システム"
   },
   "app.settings.java-installations.location.title": {
     "message": "Java {version, number} の場所"

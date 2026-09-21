@@ -2763,7 +2763,7 @@
     "message": "這是 Modrinth 網站的預覽部署版本。"
   },
   "layout.banner.staging.description": {
-    "message": "預備環境與 Modrinth 的正式資料庫完全獨立。\n它被用於測試與除錯，因此你執行的 Modrinth 後端或前端，可能是比正式實例還要新的開發中版本。"
+    "message": "預備環境與 Modrinth 的正式資料庫完全獨立。它被用於測試與除錯，因此你執行的 Modrinth 後端或前端，可能是比正式實例還要新的開發中版本。"
   },
   "layout.banner.staging.title": {
     "message": "你正在查看 Modrinth 的預備環境"
@@ -3843,7 +3843,7 @@
     "message": "專案圖示已更新"
   },
   "project.notification.review-save-failed.description": {
-    "message": "你不能儲存未通過驗證的專案變更。"
+    "message": "你無法儲存未通過驗證的專案變更。"
   },
   "project.notification.review-save-failed.title": {
     "message": "無法儲存審查中的專案"

@@ -713,6 +713,9 @@
   "app-marketing.hero.download-modrinth-app": {
     "message": "A Modrinth App letöltése"
   },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "A Modrinth App letöltése {os} rendszerre"
+  },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "A Cobblemon modcsomag főmenüjének képernyőképe."
   },

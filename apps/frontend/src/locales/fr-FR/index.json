@@ -581,11 +581,20 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
+  "app-marketing.features.importing.description": {
+    "message": "Importez toutes vos instances depuis l’ancien launcher et commencez avec Modrinth App en quelques secondes !"
+  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "Importez une instance"
+  },
+  "app-marketing.features.manage-skins.description": {
+    "message": "Changez entre tous vos skins Minecraft dans l'app."
   },
   "app-marketing.features.manage-skins.title": {
     "message": "Sélecteur de skin"
@@ -614,6 +623,9 @@
   "app-marketing.features.mod-management.version": {
     "message": "Versions"
   },
+  "app-marketing.features.open-source.description": {
+    "message": "Modrinth App est Open Source. Vous pouvez voir le code source sur <github-link>GitHub</github-link>!"
+  },
   "app-marketing.features.open-source.title": {
     "message": "Open source"
   },
@@ -622,6 +634,9 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% Processeur"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "Modrinth App est plus performante que la plupart des autres gestionnaires de mods !"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -655,6 +670,9 @@
   },
   "app-marketing.features.play.title": {
     "message": "Jouez avec vos mods préférés"
+  },
+  "app-marketing.features.settings-sync.description": {
+    "message": "Utilise les mêmes options, packs de ressource, et plus avec toutes vos instances."
   },
   "app-marketing.features.settings-sync.title": {
     "message": "Synchronisez vos paramètres"

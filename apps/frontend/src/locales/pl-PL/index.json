@@ -578,11 +578,23 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
+  "app-marketing.features.importing.description": {
+    "message": "Zaimportuj wszystkie swoje instalacje gry ze starego lanchera, skorzystaj z naszego Modrinth App w kilka sekund!"
+  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "Importowanie instancji"
+  },
+  "app-marketing.features.manage-skins.description": {
+    "message": "Przełączaj się między wszystkimi swoimi skórkami Minecraft bezpośrednio w aplikacji."
+  },
+  "app-marketing.features.manage-skins.title": {
+    "message": "Wybór skórki"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Akcje"
@@ -608,6 +620,9 @@
   "app-marketing.features.mod-management.version": {
     "message": "Wersja"
   },
+  "app-marketing.features.open-source.description": {
+    "message": "Modrinth App jest w pełni otwarto-źródłowy. Kod źródłowy możesz zobaczyć na naszym <github-link>GitHubie</github-link>!"
+  },
   "app-marketing.features.open-source.title": {
     "message": "Otwarte oprogramowanie"
   },
@@ -616,6 +631,9 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "Modrinth App działa wydajniej niż wiele popularnych menedżerów modów!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -649,6 +667,12 @@
   },
   "app-marketing.features.play.title": {
     "message": "Graj ze swoimi ulubionymi modami"
+  },
+  "app-marketing.features.settings-sync.description": {
+    "message": "Używaj tych samych opcji, paczek zasobów i więcej we wszystkich swoich instancjach."
+  },
+  "app-marketing.features.settings-sync.title": {
+    "message": "Synchronizuj ustawienia"
   },
   "app-marketing.features.sharing.description": {
     "message": "Twórz, udostępniaj i graj w paczki modów, korzystając z tysięcy modów i paczek dostępnych na Modrinth."
@@ -3866,8 +3890,23 @@
   "project.settings.disclosures.ai-functionality.description": {
     "message": "Musi być włączone, jeśli projekt posiada funkcjonalność używającą generatywnego AI, takiej jak chatbot w grze lub dynamicznie generowane tekstury."
   },
+  "project.settings.disclosures.ai-functionality.note-placeholder": {
+    "message": "n.p. NPC-ety używają generatywne AI w opcjach dialogowych."
+  },
+  "project.settings.disclosures.ai-functionality.title": {
+    "message": "Zawiera funkcjonalność wykorzystującą generatywne AI"
+  },
+  "project.settings.disclosures.ai.description": {
+    "message": "Musi być włączone, jeśli ten projekt zawiera jakiekolwiek zasoby, tekst lub większą część kodu wygenerowane przez AI."
+  },
+  "project.settings.disclosures.ai.description.2": {
+    "message": "Najważniejsze jest to, żeby być szczerym, czy AI odegrało znaczącą rolę w produkcji lub publikacji tego zasobu. Żeby łatwiej było można to sobie zobrazować, odpowiedz sobie na pytanie: czy uważasz, że AI jest współtwórcą tego projektu? Jeżeli tak, to powinieneś te informacje tu ujawnić."
+  },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "np. chińskie i arabskie tłumaczenia zostały wygenerowane przez sztuczną inteligencję."
+  },
+  "project.settings.disclosures.ai.still-unsure": {
+    "message": "Czy nadal nie jesteś pewny? Aby uzyskać więcej informacji, zapoznaj się z naszym przewodnikiem <faq-link>Klauzula i użytek AI </faq-link> oraz sekcją 6 regulaminu platformy <rules>Modrinth</rules>."
   },
   "project.settings.disclosures.ai.title": {
     "message": "Zawiera treści wygenerowane przez sztuczną inteligencję"
@@ -3920,6 +3959,12 @@
   "project.settings.disclosures.description": {
     "message": "Musisz dodać wszelkie stosowne informacje o treści do swojego projektu zgodnie z <rules>Regułami Treści Modrinth</rules>."
   },
+  "project.settings.disclosures.description.2": {
+    "message": "Nie jesteś pewien, jak zastosować ujawnienia w Twoim projekcie? Sprawdź nasze <faq-link>FAQ ujawnień</faq-link>."
+  },
+  "project.settings.disclosures.info-tooltip": {
+    "message": "Kliknij, aby dowiedzieć się, kiedy używać tego ujawnienia."
+  },
   "project.settings.disclosures.last-updated": {
     "message": "Ostatnio zaktualizowano dnia {date} przez {user}"
   },
@@ -3934,6 +3979,9 @@
   },
   "project.settings.disclosures.lock-status.fully-locked.warning": {
     "message": "Proszę <contact-support-link>skontaktować się ze wsparciem technicznym</contact-support-link>, jeśli ujawnienie to wymaga usunięcia."
+  },
+  "project.settings.disclosures.paid-features.description": {
+    "message": "Musi być włączone, jeśli ten projekt zawiera części, które mogą zostać odblokowane poprzez wydanie pieniędzy w świecie rzeczywistym."
   },
   "project.settings.disclosures.paid-features.feature-placeholder": {
     "message": "np. Kosmetyki dostępne jako nagroda Patreona"

@@ -33,7 +33,7 @@
     "message": "Cancelado devido ao aplicativo ter fechado"
   },
   "app.action-bar.install.summary.bad-modpack-file": {
-    "message": "Não foi possível ler o pacote de mods"
+    "message": "Falha ao ler modpack"
   },
   "app.action-bar.install.summary.canceled": {
     "message": "Cancelado"
@@ -60,10 +60,10 @@
     "message": "O caminho do arquivo é inválido"
   },
   "app.action-bar.install.summary.invalid-modpack": {
-    "message": "Os dados do pacote de mods é inválido"
+    "message": "Os dados do pacote de mods são inválidos"
   },
   "app.action-bar.install.summary.invalid-modpack-files": {
-    "message": "Os arquivos do pacote de mods possui metadados inválidos"
+    "message": "Os arquivos do pacote de mods possuem metadados inválidos"
   },
   "app.action-bar.install.summary.java-setup-failed": {
     "message": "Configuração Java não foi finalizada"
@@ -192,7 +192,7 @@
     "message": "Exibe um aviso de segurança ao instalar um Pacote Modrinth (.mrpack) que não seja hospedado no Modrinth."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
-    "message": "Alertar-me antes de instalar pacotes de mods desconhecidos"
+    "message": "Alertar-me antes de instalar modpacks desconhecidos"
   },
   "app.auth-servers.unreachable.body": {
     "message": "Os servidores de autenticação do Minecraft talvez estejam indisponíveis no momento. Verifique sua conexão com a internet e tente novamente mais tarde."
@@ -295,6 +295,87 @@
   },
   "app.content.sync-resource-packs-disabled": {
     "message": "Ative a sincronização de pacote de recursos nas configurações do aplicativo primeiro."
+  },
+  "app.download-manager.active": {
+    "message": "Ativo"
+  },
+  "app.download-manager.attention": {
+    "message": "Requer atenção"
+  },
+  "app.download-manager.cancel": {
+    "message": "Cancelar instalação"
+  },
+  "app.download-manager.canceling": {
+    "message": "Cancelando instalação…"
+  },
+  "app.download-manager.clear-all": {
+    "message": "Limpar tudo"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Limpar todas as tarefas concluídas"
+  },
+  "app.download-manager.complete": {
+    "message": "Concluído"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Instância duplicada"
+  },
+  "app.download-manager.empty": {
+    "message": "Não há tarefas de instalação"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Velocidade estimada de download"
+  },
+  "app.download-manager.eta": {
+    "message": "Tempo restante estimado para este download"
+  },
+  "app.download-manager.hide": {
+    "message": "Ocultar tarefas de instalação"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Instância importada"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "Instalação da instância"
+  },
+  "app.download-manager.modpack": {
+    "message": "Pacote de mods"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Instalação do pacote de mods"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Nova instância"
+  },
+  "app.download-manager.pause": {
+    "message": "Pausar instalação"
+  },
+  "app.download-manager.paused": {
+    "message": "Pausado"
+  },
+  "app.download-manager.remove": {
+    "message": "Remover do histórico"
+  },
+  "app.download-manager.resume": {
+    "message": "Resumir Instalação"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Instância compartilhada"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "Atualização de instância compartilhada"
+  },
+  "app.download-manager.show": {
+    "message": "Mostrar tarefas de Instalação"
+  },
+  "app.download-manager.tasks": {
+    "message": "Tarefas"
+  },
+  "app.download-manager.title": {
+    "message": "Gerenciador de Downloads"
+  },
+  "app.download-manager.verifying": {
+    "message": "Verificando"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Abrir pasta das cópias de segurança"
@@ -1662,7 +1743,7 @@
     "message": "Configurações adicionadas por mods"
   },
   "app.settings.game-options.category.custom.label": {
-    "message": "Customizar configurações"
+    "message": "Configurações personalizadas"
   },
   "app.settings.game-options.category.language.description": {
     "message": "Idioma do jogo"
@@ -2723,6 +2804,78 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Máximo de escritas simultâneas"
   },
+  "app.settings.resource-management.store.attention": {
+    "message": "Alguns arquivos ainda precisam de atenção"
+  },
+  "app.settings.resource-management.store.cache-limit.description": {
+    "message": "Mantenha esta quantidade de conteúdo não utilizado para instalações futuras. Manter mais pode poupar tempo de download."
+  },
+  "app.settings.resource-management.store.cache-limit.label": {
+    "message": "Manter downloads não usados"
+  },
+  "app.settings.resource-management.store.cache-limit.unit": {
+    "message": "GiB"
+  },
+  "app.settings.resource-management.store.calculating": {
+    "message": "Calculando"
+  },
+  "app.settings.resource-management.store.clear": {
+    "message": "Limpar não utilizados"
+  },
+  "app.settings.resource-management.store.clear.description": {
+    "message": "Excluir conteúdo baixado não utilizado"
+  },
+  "app.settings.resource-management.store.cleared": {
+    "message": "{size} Foram liberados do armazenamento."
+  },
+  "app.settings.resource-management.store.clearing": {
+    "message": "Limpando..."
+  },
+  "app.settings.resource-management.store.description": {
+    "message": "Salve espaço reutilizando instalações, mods e pacotes das suas instâncias."
+  },
+  "app.settings.resource-management.store.empty": {
+    "message": "Instale mods ou pacotes para ver seu uso do armazenamento aqui."
+  },
+  "app.settings.resource-management.store.issues": {
+    "message": "Ver {count, plural, one {# problema} other {# problemas}}"
+  },
+  "app.settings.resource-management.store.nothing-to-clear": {
+    "message": "Nenhum conteúdo não utilizado para limpar."
+  },
+  "app.settings.resource-management.store.repair": {
+    "message": "Verificar e reparar"
+  },
+  "app.settings.resource-management.store.repair.running-description": {
+    "message": "Isso fechará todas as instâncias em execução."
+  },
+  "app.settings.resource-management.store.repair.verify-description": {
+    "message": "Checar por arquivos ausentes ou danificados e repare-os."
+  },
+  "app.settings.resource-management.store.repairing": {
+    "message": "Verificando e reparando..."
+  },
+  "app.settings.resource-management.store.shared.label": {
+    "message": "Compartilhado"
+  },
+  "app.settings.resource-management.store.title": {
+    "message": "Armazenamento de conteúdo"
+  },
+  "app.settings.resource-management.store.total": {
+    "message": "{size} armazenado"
+  },
+  "app.settings.resource-management.store.unique.label": {
+    "message": "Único"
+  },
+  "app.settings.resource-management.store.unused.label": {
+    "message": "Órfão"
+  },
+  "app.settings.resource-management.store.verification-result": {
+    "message": "Checado {checked, plural, one {# arquivo} other {# arquivos}} e fez {repaired, plural, one {# reparo} other {# reparos}}."
+  },
+  "app.settings.resource-management.store.verified": {
+    "message": "Verificação concluída"
+  },
   "app.settings.sidebar.label.instances": {
     "message": "Instâncias"
   },
@@ -3559,6 +3712,9 @@
   },
   "instance.files.adding-files": {
     "message": "Adicionando arquivos ({completed}/{total})"
+  },
+  "instance.files.managed-content-read-only": {
+    "message": "Gerencie o conteúdo instalado através da aba Conteúdo"
   },
   "instance.files.save-as": {
     "message": "Salvar como..."

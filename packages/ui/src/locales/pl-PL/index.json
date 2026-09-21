@@ -1400,6 +1400,12 @@
   "external-project-license-status.yes": {
     "defaultMessage": "Tak"
   },
+  "file-button.file-too-large.description": {
+    "defaultMessage": "Plik {filename} jest zbyt duży. Maksymalny rozmiar pliku to {maxSize}."
+  },
+  "file-button.file-too-large.title": {
+    "defaultMessage": "Zbyt duży plik"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "Podsumowanie rozpakowywania"
   },
@@ -4359,7 +4365,7 @@
     "defaultMessage": "Pokaż więcej opcji"
   },
   "search.filter_type.advanced": {
-    "defaultMessage": "Wyłączenia zaawansowane"
+    "defaultMessage": "Zaawansowane wykluczenia"
   },
   "search.filter_type.advanced.disclosure.advertisements": {
     "defaultMessage": "Reklamy"

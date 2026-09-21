@@ -168,7 +168,7 @@
     "defaultMessage": "避免品牌侵權"
   },
   "nags.missing-alt-text.description": {
-    "defaultMessage": "您的部分圖片缺少替代文字，這對於無障礙存取至關重要，特別是對視障用戶而言。"
+    "defaultMessage": "你的部分圖片缺少替代文字，替代文字對於無障礙體驗至關重要，是協助視障使用者的重要工具。"
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "新增圖片替代文字"
@@ -196,6 +196,9 @@
   },
   "nags.project-description-banned-link.description": {
     "defaultMessage": "專案描述中不允許使用連結「{fullUrl}」。"
+  },
+  "nags.project-description-content.title": {
+    "defaultMessage": "檢查描述"
   },
   "nags.project-description-non-english.description": {
     "defaultMessage": "專案描述必須以英文撰寫或附上英文翻譯。"
@@ -379,6 +382,9 @@
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "前往連結設定"
+  },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "專案描述應提供獨特資訊，避免重複摘要內容。"
   },
   "project.text-validation.summary-matches-title": {
     "defaultMessage": "專案摘要應提供獨特資訊，避免重複專案名稱。"

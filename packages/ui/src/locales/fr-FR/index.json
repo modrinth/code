@@ -1400,6 +1400,12 @@
   "external-project-license-status.yes": {
     "defaultMessage": "Oui"
   },
+  "file-button.file-too-large.description": {
+    "defaultMessage": "Le fichier {filename} est trop volumineux. La taille maximale est de {maxSize}."
+  },
+  "file-button.file-too-large.title": {
+    "defaultMessage": "Fichier trop volumineux"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "Extraire le sommaire"
   },

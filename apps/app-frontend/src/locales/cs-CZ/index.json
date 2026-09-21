@@ -1460,6 +1460,39 @@
   "app.settings.downloading": {
     "message": "Stahování v{version}"
   },
+  "app.settings.game-options.category.chat.description": {
+    "message": "Viditelnost a vzhled chatu"
+  },
+  "app.settings.game-options.category.chat.label": {
+    "message": "Chat"
+  },
+  "app.settings.game-options.category.custom.label": {
+    "message": "Vlastní nastavení"
+  },
+  "app.settings.game-options.category.language.label": {
+    "message": "Jazyk"
+  },
+  "app.settings.game-options.category.music-and-sound.description": {
+    "message": "Nastavení hlasitosti a zvuku"
+  },
+  "app.settings.game-options.category.music-and-sound.label": {
+    "message": "Hudba a zvuk"
+  },
+  "app.settings.game-options.category.online.label": {
+    "message": "Online"
+  },
+  "app.settings.game-options.category.video.description": {
+    "message": "Nastavení kamery a zobrazení"
+  },
+  "app.settings.game-options.choice.all": {
+    "message": "Vše"
+  },
+  "app.settings.game-options.choice.chat": {
+    "message": "Chat"
+  },
+  "app.settings.game-options.choice.commands-only": {
+    "message": "Pouze příkazy"
+  },
   "app.settings.java-installations.location.title": {
     "message": "Umístění Javy {version, number}"
   },
