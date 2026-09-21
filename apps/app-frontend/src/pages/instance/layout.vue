@@ -17,6 +17,16 @@
 				:offline="offline"
 				@unlinked="refreshInstance"
 			/>
+			<ConfirmModal
+				ref="serverOfflineModal"
+				:title="formatMessage(messages.serverOfflineTitle)"
+				:description="formatMessage(messages.serverOfflineDescription)"
+				:proceed-label="formatMessage(messages.launchAnyway)"
+				:proceed-icon="PlayIcon"
+				:danger="false"
+				:markdown="false"
+				@proceed="launchDespiteOfflineServer"
+			/>
 			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance" />
 			<SharedInstanceUpdateModal
 				ref="sharedInstanceUpdateModal"
@@ -41,6 +51,7 @@
 				:loading-server-ping="loadingServerPing"
 				:players-online="playersOnline"
 				:status-online="statusOnline"
+				:hosting-status="hosting.isHostingInstance.value ? hosting.onlineStatus.value : undefined"
 				:ping="ping"
 				:minecraft-server="minecraftServer"
 				@repair="() => repairInstance()"
@@ -101,6 +112,7 @@ import {
 } from '@modrinth/assets'
 import {
 	commonMessages,
+	ConfirmModal,
 	ContextMenu,
 	defineMessages,
 	injectNotificationManager,
@@ -176,6 +188,19 @@ const route = useRoute()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	serverOfflineTitle: {
+		id: 'app.instance.server.offline.title',
+		defaultMessage: 'Server is offline',
+	},
+	serverOfflineDescription: {
+		id: 'app.instance.server.offline.description',
+		defaultMessage:
+			'This server is currently offline. You can still launch Minecraft, but you may not be able to connect.',
+	},
+	launchAnyway: {
+		id: 'app.instance.server.offline.launch-anyway',
+		defaultMessage: 'Launch anyway',
+	},
 	play: { id: 'app.instance.action.play', defaultMessage: 'Play' },
 	stop: { id: 'app.instance.action.stop', defaultMessage: 'Stop' },
 	addContent: { id: 'app.instance.action.add-content', defaultMessage: 'Add content' },
@@ -364,6 +389,8 @@ const instanceLaunch = useInstanceLaunchState()
 const checkingSharedInstanceLaunch = ref(false)
 const subpagePending = ref(false)
 const stopping = ref(false)
+const serverOfflineModal = ref<InstanceType<typeof ConfirmModal>>()
+const pendingOfflineLaunch = ref<{ instanceId: string; context: string; address?: string } | null>(null)
 const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
 const sharedInstanceUpdateModal = ref<InstanceType<typeof SharedInstanceUpdateModal>>()
@@ -427,8 +454,10 @@ const serverStatusQuery = useQuery({
 })
 const statusOnline = computed(
 	() =>
-		!serverStatusQuery.isError.value &&
-		(!!serverStatusQuery.data.value || !!javaServerPingData.value),
+		hosting.isHostingInstance.value
+			? hosting.onlineStatus.value === 'running'
+			: !serverStatusQuery.isError.value &&
+				(!!serverStatusQuery.data.value || !!javaServerPingData.value),
 )
 const playersOnline = computed(() =>
 	serverStatusQuery.isError.value ? undefined : serverStatusQuery.data.value?.players?.online,
@@ -617,7 +646,14 @@ function handleSharedInstanceUpdateComplete(successful: boolean) {
 	}
 }
 
-const startInstance = async (context: string, address?: string) => {
+async function launchDespiteOfflineServer() {
+	const pending = pendingOfflineLaunch.value
+	pendingOfflineLaunch.value = null
+	if (!pending || instance.value?.id !== pending.instanceId) return
+	await startInstance(pending.context, pending.address, true)
+}
+
+const startInstance = async (context: string, address?: string, skipOfflineWarning = false) => {
 	if (!instance.value || instance.value.quarantined) return
 	if (
 		checkingSharedInstanceLaunch.value ||
@@ -628,6 +664,21 @@ const startInstance = async (context: string, address?: string) => {
 		return
 
 	const instanceId = instance.value.id
+	if (hosting.isHostingInstance.value && !skipOfflineWarning) {
+		checkingSharedInstanceLaunch.value = true
+		let status: Awaited<ReturnType<typeof hosting.refreshOnlineStatus>> = null
+		try {
+			status = await hosting.refreshOnlineStatus()
+		} finally {
+			checkingSharedInstanceLaunch.value = false
+		}
+		if (instance.value?.id !== instanceId) return
+		if (status === 'stopped') {
+			pendingOfflineLaunch.value = { instanceId, context, address }
+			serverOfflineModal.value?.show()
+			return
+		}
+	}
 	const isSharedInstanceMember = instance.value.shared_instance?.role === 'member'
 	const canCheckSharedInstanceUpdate =
 		!!instance.value.shared_instance && !sharedInstanceActionsLocked.value && !offline.value

@@ -11,7 +11,7 @@
 			v-for="(metric, index) in metrics"
 			:key="index"
 			:to="metric.link && !loading ? metric.link : undefined"
-			class="relative isolate min-h-[145px] w-full overflow-hidden rounded-[20px] bg-surface-3 p-5"
+			class="@container relative isolate min-h-[145px] w-full overflow-hidden rounded-[20px] bg-surface-3 p-5"
 			:class="
 				metric.link && !loading
 					? 'cursor-pointer transition-transform duration-100 hover:brightness-125 active:scale-95'
@@ -31,8 +31,12 @@
 					</span>
 				</div>
 				<span class="stat-drop-shadow text-4xl font-bold text-contrast">
-					{{ metric.value
-					}}<span
+					<template v-if="'compactValue' in metric">
+						<span class="whitespace-nowrap @[220px]:hidden">{{ metric.compactValue }}</span>
+						<span class="hidden whitespace-nowrap @[220px]:inline">{{ metric.value }}</span>
+					</template>
+					<template v-else>{{ metric.value }}</template>
+					<span
 						v-if="metric.secondary"
 						class="ml-1 text-sm font-normal stat-drop-shadow text-secondary"
 						>{{ metric.secondary }}</span
@@ -185,6 +189,7 @@ const metrics = computed(() => {
 	const storageMetric = {
 		title: 'Storage',
 		value: formatBytes(props.loading ? 0 : (stats.value.storage_usage_bytes ?? 0), 1),
+		compactValue: formatBytes(props.loading ? 0 : (stats.value.storage_usage_bytes ?? 0), 0),
 		secondary: null as string | null,
 		icon: FolderOpenIcon,
 		showGraph: false,
