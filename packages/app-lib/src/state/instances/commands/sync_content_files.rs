@@ -157,6 +157,10 @@ pub(crate) async fn sync_instance_content_files(
         .iter()
         .map(|file| (file.relative_path.as_str(), file))
         .collect::<HashMap<_, _>>();
+    let existing_by_id = existing
+        .iter()
+        .map(|file| (file.id.as_str(), file))
+        .collect::<HashMap<_, _>>();
     let managed_by_path = existing
         .iter()
         .filter(|file| bindings.contains_key(&file.id))
@@ -267,6 +271,9 @@ pub(crate) async fn sync_instance_content_files(
         if let Some(previous) = previous {
             file.relative_path.clone_from(&previous.relative_path);
             file.file_name.clone_from(&previous.file_name);
+            if is_content_unchanged(&file, previous) {
+                file.modified_at = previous.modified_at;
+            }
         } else if !duplicate_paths.contains(canonical_path) {
             file.relative_path = canonical_path.to_string();
             file.file_name =
@@ -305,7 +312,15 @@ pub(crate) async fn sync_instance_content_files(
     }
     let mut stored = Vec::new();
     for file in files {
-        if saved_files.contains(&file.id) {
+        if saved_files.contains(&file.id)
+            || existing_by_id
+                .get(file.id.as_str())
+                .is_some_and(|previous| {
+                    is_content_unchanged(&file, previous)
+                        && file.modified_at.timestamp()
+                            == previous.modified_at.timestamp()
+                })
+        {
             stored.push(file);
         } else {
             stored.push(
@@ -455,6 +470,21 @@ pub(crate) async fn reconcile_instance_renames(
         super::mark_shared_instance_stale(&instance.id, &state.pool).await?;
     }
     Ok(changed)
+}
+
+/// Whether a rescanned file matches what is already stored, ignoring
+/// `modified_at` — which records when the file last actually changed, not when
+/// it was last looked at.
+fn is_content_unchanged(
+    candidate: &InstanceFile,
+    previous: &InstanceFile,
+) -> bool {
+    candidate.relative_path == previous.relative_path
+        && candidate.file_name == previous.file_name
+        && candidate.enabled == previous.enabled
+        && candidate.sha1 == previous.sha1
+        && candidate.size == previous.size
+        && candidate.missing == previous.missing
 }
 
 pub(super) async fn normalize_legacy_content_files(

@@ -1220,8 +1220,8 @@ pub async fn user_icon_edit(
 
         let bytes = read_limited_from_payload(
             &mut payload,
-            262144,
-            "Icons must be smaller than 256KiB",
+            524288,
+            "Icons must be smaller than 512KiB",
         )
         .await?;
 
