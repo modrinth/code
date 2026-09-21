@@ -1606,9 +1606,7 @@ async function runFullScan() {
 				}
 
 				if (item.event === 'progress' || item.event === 'complete') {
-					latestProgress = JSON.parse(
-						item.data,
-					) as Labrinth.TechReview.Internal.DelphiRuleScanEvent
+					latestProgress = JSON.parse(item.data) as Labrinth.TechReview.Internal.DelphiRuleScanEvent
 					completed ||= item.event === 'complete'
 				}
 			}
@@ -1621,9 +1619,7 @@ async function runFullScan() {
 		while (true) {
 			const { done, value } = await reader.read()
 			if (done) break
-			const progressUpdated = processItems(
-				parser.feed(decoder.decode(value, { stream: true })),
-			)
+			const progressUpdated = processItems(parser.feed(decoder.decode(value, { stream: true })))
 			if (progressUpdated) {
 				await new Promise<void>((resolve) => setTimeout(resolve, 0))
 			}
@@ -1633,9 +1629,8 @@ async function runFullScan() {
 		if (finalChunk) processItems(parser.feed(finalChunk))
 		processItems(parser.end())
 
-		const completedProgress = scanProgress.value as
-			| Labrinth.TechReview.Internal.DelphiRuleScanEvent
-			| null
+		const completedProgress =
+			scanProgress.value as Labrinth.TechReview.Internal.DelphiRuleScanEvent | null
 		if (!completed || !completedProgress) {
 			throw new Error('The scan stream ended before the new revision was published.')
 		}
