@@ -12,7 +12,6 @@ import { onBeforeUnmount, ref, watchEffect } from 'vue'
 
 import { readWorkspaceLayout, saveWorkspaceLayout, workspacePanelSizes } from './layout-storage'
 import { type ProjectReviewTab, projectReviewTabs } from './types'
-import { useSidebarTransition } from './use-sidebar-transition'
 
 export function useProjectReviewLayout(
 	getTitle: (tab: ProjectReviewTab) => string,
@@ -21,7 +20,6 @@ export function useProjectReviewLayout(
 	const savedLayout = readWorkspaceLayout()
 	const leftVisible = ref(savedLayout?.leftVisible ?? true)
 	const rightVisible = ref(savedLayout?.rightVisible ?? true)
-	const { centerElement, transitionSidebar, finishSidebarTransition } = useSidebarTransition()
 	let leftWidth = savedLayout?.leftWidth ?? workspacePanelSizes.left.default
 	let rightWidth = savedLayout?.rightWidth ?? workspacePanelSizes.right.default
 	let bottomHeight = savedLayout?.bottomHeight ?? workspacePanelSizes.bottom.default
@@ -157,7 +155,7 @@ export function useProjectReviewLayout(
 			else rightWidth = panel.api.width
 		}
 		visible.value = !visible.value
-		void transitionSidebar(columns, side, visible.value)
+		panel.api.setVisible(visible.value)
 		scheduleSave()
 	}
 
@@ -263,8 +261,6 @@ export function useProjectReviewLayout(
 	})
 
 	return {
-		centerElement,
-		finishSidebarTransition,
 		leftVisible,
 		rightVisible,
 		topLeftGroupId,

@@ -73,7 +73,7 @@ export function createReviewContext(
 		if (explicit) show()
 		else {
 			pendingAnchor = anchor
-			openTimer = setTimeout(show, 180)
+			openTimer = setTimeout(show, 100)
 		}
 	}
 
