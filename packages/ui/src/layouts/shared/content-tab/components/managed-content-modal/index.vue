@@ -8,7 +8,6 @@ import {
 	PaintbrushIcon,
 	SearchIcon,
 	SpinnerIcon,
-	UnknownIcon,
 } from '@modrinth/assets'
 import Fuse from 'fuse.js'
 import { computed, nextTick, ref, watchSyncEffect } from 'vue'
@@ -17,7 +16,6 @@ import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
 import type { ButtonMenuOption } from '#ui/components/base/buttons'
 import { ButtonLink } from '#ui/components/base/buttons'
-import Checkbox from '#ui/components/base/Checkbox.vue'
 import FilterPills from '#ui/components/base/FilterPills.vue'
 import Input from '#ui/components/base/inputs/Input.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
@@ -138,14 +136,6 @@ const messages = defineMessages({
 		id: 'instances.managed-content-modal.disabled',
 		defaultMessage: 'Disabled',
 	},
-	enabledFor: {
-		id: 'content.enabled-for.label',
-		defaultMessage: 'Enabled for',
-	},
-	enabledForDescription: {
-		id: 'content.enabled-for.description',
-		defaultMessage: 'Choose where this content is enabled.',
-	},
 	pleaseWait: {
 		id: 'content.enabled-for.please-wait',
 		defaultMessage: 'Please wait',
@@ -178,25 +168,6 @@ const selectedItems = computed(() =>
 	items.value.filter((item) => selectedIds.value.includes(item.id)),
 )
 const toggleableSelectedItems = computed(() => selectedItems.value)
-
-const allSelected = computed(() => {
-	if (filteredItems.value.length === 0) return false
-	return filteredItems.value.every((item) => selectedIds.value.includes(item.id))
-})
-
-const someSelected = computed(() => {
-	return (
-		filteredItems.value.some((item) => selectedIds.value.includes(item.id)) && !allSelected.value
-	)
-})
-
-function toggleSelectAll() {
-	if (allSelected.value || someSelected.value) {
-		selectedIds.value = []
-	} else {
-		selectedIds.value = filteredItems.value.map((item) => item.id)
-	}
-}
 
 const fuse = new Fuse<ContentItem>([], {
 	keys: ['project.title', 'owner.name', 'file_name'],
@@ -631,70 +602,6 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 				</div>
 
 				<div v-else class="@container flex min-h-0 flex-col">
-					<div
-						class="flex h-12 shrink-0 items-center border-0 border-b border-solid border-surface-4 bg-surface-3 px-3"
-						:class="props.enableEnabledFor ? 'gap-2' : 'justify-between gap-4'"
-					>
-						<div
-							class="flex min-w-0 items-center gap-4"
-							:class="
-								showTableActions && showVersion
-									? props.enableEnabledFor
-										? 'flex-1 @[800px]:w-[340px] @[800px]:shrink-0 @[800px]:flex-none'
-										: 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none'
-									: 'flex-1'
-							"
-						>
-							<Checkbox
-								v-if="props.enableToggle"
-								:model-value="allSelected"
-								:indeterminate="someSelected"
-								:aria-label="formatMessage(commonMessages.selectAllLabel)"
-								class="shrink-0"
-								@update:model-value="toggleSelectAll"
-							/>
-							<span class="font-semibold text-secondary">{{
-								formatMessage(commonMessages.projectLabel)
-							}}</span>
-						</div>
-						<div
-							v-if="props.enableEnabledFor"
-							class="hidden w-[200px] shrink-0 items-center gap-1.5 @[800px]:flex"
-						>
-							<span class="font-semibold text-secondary">{{
-								formatMessage(messages.enabledFor)
-							}}</span>
-							<UnknownIcon
-								v-tooltip="formatMessage(messages.enabledForDescription)"
-								class="size-4 cursor-help text-secondary"
-								tabindex="0"
-							/>
-						</div>
-						<div
-							v-if="showVersion"
-							class="hidden @[800px]:flex"
-							:class="
-								showTableActions
-									? props.enableEnabledFor
-										? 'min-w-0 flex-1'
-										: 'flex-1 min-w-0'
-									: 'flex-1'
-							"
-						>
-							<span class="font-semibold text-secondary">{{
-								formatMessage(commonMessages.versionLabel)
-							}}</span>
-						</div>
-						<div
-							v-if="showTableActions"
-							class="shrink-0 text-right"
-							:class="props.enableEnabledFor ? 'w-[168px]' : 'min-w-[160px]'"
-						>
-							<span class="font-semibold text-secondary">{{
-								formatMessage(commonMessages.actionsLabel)
-							}}</span>
-						</div>
-					</div>
 					<div ref="scrollContainer" class="min-h-0 overflow-y-auto">
 						<ContentCardTable
 							v-model:selected-ids="selectedIds"
@@ -705,7 +612,6 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 							:show-version="showVersion"
 							:show-enabled-for-column="props.enableEnabledFor"
 							hide-delete
-							hide-header
 							flat
 							v-on="
 								props.enableToggle || props.enableEnabledFor

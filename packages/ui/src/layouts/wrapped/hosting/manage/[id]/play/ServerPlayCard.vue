@@ -101,7 +101,7 @@ const messages = defineMessages({
 	},
 	differentLauncherTitle: {
 		id: 'servers.play.card.launcher.title',
-		defaultMessage: 'Using a Different Launcher?',
+		defaultMessage: 'Using a different launcher?',
 	},
 	differentLauncherDescription: {
 		id: 'servers.play.card.launcher.description',
