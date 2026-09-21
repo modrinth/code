@@ -18,8 +18,12 @@
 			v-if="available"
 			ref="trigger"
 			type="button"
-			class="review-trigger absolute right-0.5 top-0.5 flex cursor-pointer items-center gap-1 rounded-md border border-solid border-surface-5 bg-surface-3 px-2 py-1 text-xs text-secondary hover:text-contrast focus-visible:opacity-100"
-			:class="{ 'review-trigger-active': active?.id === id }"
+			class="review-trigger absolute flex cursor-pointer items-center gap-1 rounded-md border border-solid border-surface-5 bg-surface-3 px-2 py-1 text-xs text-secondary hover:text-contrast focus-visible:opacity-100"
+			:class="{
+				'review-trigger-active': active?.id === id,
+				'right-4 top-0 z-10 -translate-y-1/2': triggerPlacement === 'above',
+				'right-0.5 top-0.5': triggerPlacement !== 'above',
+			}"
 			:aria-label="triggerLabel"
 			:aria-expanded="active?.id === id"
 			:aria-controls="active?.id === id ? panelId : undefined"
@@ -46,7 +50,7 @@ const props = withDefaults(
 		triggerLabel: string
 		as?: 'section' | 'div' | 'article'
 		disabled?: boolean
-		triggerPlacement?: 'inset' | 'header' | 'overlay'
+		triggerPlacement?: 'inset' | 'header' | 'overlay' | 'above'
 	}>(),
 	{ as: 'div', triggerPlacement: 'inset' },
 )

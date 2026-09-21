@@ -62,7 +62,7 @@ const props = defineProps<{
 	target: ReviewTarget
 	as?: 'section' | 'div' | 'article'
 	disabled?: boolean
-	triggerPlacement?: 'inset' | 'header' | 'overlay'
+	triggerPlacement?: 'inset' | 'header' | 'overlay' | 'above'
 }>()
 
 const id = useId()

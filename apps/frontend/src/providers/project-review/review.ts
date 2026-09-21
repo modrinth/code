@@ -21,4 +21,4 @@ export type ReviewTarget =
 				| 'permissions'
 				| 'rules'
 	  }
-	| { kind: 'link' | 'gallery-image' | 'version'; key: string }
+	| { kind: 'link' | 'gallery-image' | 'version' | 'disclosure'; key: string }

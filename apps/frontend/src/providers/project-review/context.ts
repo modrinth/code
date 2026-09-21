@@ -1,6 +1,11 @@
+import type { ConfirmLeaveModal } from '@modrinth/ui'
 import { createContext } from '@modrinth/ui'
-import { computed, onMounted, watch } from 'vue'
+import { isAdmin, isStaff } from '@modrinth/utils'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 
+import { useDisclosureEditor } from '~/components/ui/project-settings/disclosures/use-disclosure-editor'
+import { useAuthState } from '~/composables/auth'
 import { useModerationQueue } from '~/services/moderation/queue'
 
 import { useReviewContent } from './content'
@@ -20,7 +25,37 @@ export function createProjectReviewPageContext() {
 	)
 	const data = useReviewProject(selection)
 	const content = useReviewContent(data.projectId)
-	const navigation = useReviewQueue(data.projectId, queue)
+	const auth = useAuthState()
+	const disclosures = useDisclosureEditor({
+		projectId: data.projectId,
+		projectTypes: computed(() => data.project.value?.project_types ?? []),
+		canEditDisclosures: computed(
+			() =>
+				!!data.project.value &&
+				(data.project.value.versions.length > 0 || data.project.value.minecraft_server != null),
+		),
+		hasPermission: computed(() => isStaff(auth.value.user)),
+		isActingAsModerator: computed(() => isStaff(auth.value.user)),
+		isAdminUser: computed(() => isAdmin(auth.value.user)),
+	})
+	const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
+	async function confirmDiscardDisclosures() {
+		if (disclosures.saving.value) return false
+		if (!disclosures.hasChanges.value) return true
+		if (!(await confirmLeaveModal.value?.prompt())) return false
+		disclosures.reset()
+		return true
+	}
+	const navigation = useReviewQueue(data.projectId, queue, confirmDiscardDisclosures)
+	onBeforeRouteLeave(confirmDiscardDisclosures)
+	onBeforeRouteUpdate((to, from) => {
+		if (to.query.project !== from.query.project) return confirmDiscardDisclosures()
+	})
+	function beforeUnload(event: BeforeUnloadEvent) {
+		if (disclosures.hasChanges.value || disclosures.saving.value) event.preventDefault()
+	}
+	onMounted(() => window.addEventListener('beforeunload', beforeUnload))
+	onBeforeUnmount(() => window.removeEventListener('beforeunload', beforeUnload))
 
 	onMounted(async () => {
 		await queue.ready
@@ -34,6 +69,8 @@ export function createProjectReviewPageContext() {
 	})
 
 	return {
+		disclosures,
+		confirmLeaveModal,
 		...data,
 		...content,
 		tabCounts: computed(() => ({
