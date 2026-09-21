@@ -685,7 +685,7 @@ pub async fn test_bulk_edit_links() {
                                 "url": "https://www.patreon.com/my_user"
                             },
                             {
-                                "id": "kofi",
+                                "id": "ko-fi",
                                 "platform": "Ko-fi",
                                 "url": "https://www.ko-fi.com/my_user"
                             }
@@ -699,7 +699,7 @@ pub async fn test_bulk_edit_links() {
                         ],
                         "remove_donation_urls": [
                             {
-                                "id": "kofi",
+                                "id": "ko-fi",
                                 "platform": "Ko-fi",
                                 "url": "https://www.ko-fi.com/my_user"
                             }

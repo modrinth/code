@@ -16,14 +16,17 @@ use strum::{EnumIter, EnumString};
     EnumString,
     utoipa::ToSchema,
 )]
-#[display(rename_all = "snake_case")]
-#[serde(rename_all = "snake_case")]
-#[strum(serialize_all = "snake_case")]
+#[display(rename_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
+#[strum(serialize_all = "kebab-case")]
 pub enum LinkPlatform {
     Patreon,
     Bmac,
     Paypal,
     Github,
+    #[display("ko-fi")]
+    #[serde(rename = "ko-fi")]
+    #[strum(serialize = "ko-fi")]
     Kofi,
     Other,
     Issues,

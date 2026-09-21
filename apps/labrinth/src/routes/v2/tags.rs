@@ -369,7 +369,7 @@ pub async fn donation_platform_list(
                                 name: match p.name.as_str() {
                                     "bmac" => "Buy Me A Coffee".to_string(),
                                     "github" => "GitHub Sponsors".to_string(),
-                                    "kofi" => "Ko-fi".to_string(),
+                                    "ko-fi" => "Ko-fi".to_string(),
                                     "paypal" => "PayPal".to_string(),
                                     // Otherwise, capitalize it
                                     _ => capitalize_first(&p.name),

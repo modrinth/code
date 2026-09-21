@@ -30,7 +30,7 @@ BEGIN
 		WHEN 'bmac' THEN 'bmac'
 		WHEN 'paypal' THEN 'paypal'
 		WHEN 'github' THEN 'github'
-		WHEN 'ko-fi' THEN 'kofi'
+		WHEN 'ko-fi' THEN 'ko-fi'
 		WHEN 'other' THEN 'other'
 		WHEN 'issues' THEN 'issues'
 		WHEN 'wiki' THEN 'wiki'
