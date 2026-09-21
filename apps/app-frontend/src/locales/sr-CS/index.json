@@ -50,9 +50,6 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Preuzimanje nije završeno"
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "Instanca nije pronađena"
-  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Put do datoteke nije ispravan"
   },

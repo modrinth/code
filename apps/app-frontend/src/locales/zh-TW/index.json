@@ -53,9 +53,6 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "無法完成下載"
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "找不到實例"
-  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "檔案路徑無效"
   },

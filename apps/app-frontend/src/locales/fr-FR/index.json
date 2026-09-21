@@ -53,9 +53,6 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Le téléchargement n'a pas pu terminer"
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "L'instance est introuvable"
-  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Le chemin d'accès au fichier est invalide"
   },

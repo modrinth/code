@@ -132,6 +132,7 @@ pub async fn collection_create(
         created: now,
         updated: now,
         icon_url: None,
+        raw_icon_url: None,
         color: None,
         status: collection_builder.status,
         projects: initial_project_ids,
