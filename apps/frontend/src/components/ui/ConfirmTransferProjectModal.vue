@@ -88,7 +88,7 @@ import { Admonition, Avatar, Button, Input, NewModal } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 const props = defineProps<{
-	project: { name: string; icon_url: string | null }
+	project: { name: string; icon_url: string | null; raw_icon_url?: string | null }
 	currentOwner: { avatar_url: string | null; username: string; role: string }
 	transferTo: {
 		avatar_url?: string | null
