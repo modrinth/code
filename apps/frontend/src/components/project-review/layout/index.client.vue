@@ -76,7 +76,7 @@ provideProjectReviewContext({ ...layout, slots })
 
 .project-review :deep(.dv-sash:not(.dv-disabled):hover::after) {
 	opacity: 1;
-	transition: opacity 0s 1s;
+	transition: opacity 0s 0.5s;
 }
 
 .project-review :deep(.dv-sash:not(.dv-disabled):active::after) {
