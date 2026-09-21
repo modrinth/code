@@ -77,14 +77,14 @@ import { Button, useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
-import { injectReviewStages } from '~/providers/project-review/review-stages'
+import { injectReviewPanels } from '~/providers/project-review/review-panels'
 
 import { projectReviewMessages as messages } from '../messages'
 import ReviewPanel from '../review-panel/index.vue'
 import VersionCard from './version-card.vue'
 
 const { formatMessage } = useVIntl()
-const { resolve } = injectReviewStages()
+const { resolve } = injectReviewPanels()
 const { selection, versions, versionsQuery, isLoading, error, refresh } =
 	injectProjectReviewPageContext()
 const expanded = ref<Set<string> | null>(null)

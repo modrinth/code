@@ -16,8 +16,8 @@
 				<slot name="title" />
 				<IconButton
 					:label="formatMessage(messages.closeReview)"
-					@click="dismiss(true)"
 					type="quiet"
+					@click="dismiss(true)"
 				>
 					<XIcon />
 				</IconButton>
@@ -41,7 +41,8 @@ import { injectReviewContext, type ReviewAnchor } from './context'
 
 const { formatMessage } = useVIntl()
 const props = defineProps<{ anchor: ReviewAnchor; titleId: string }>()
-const { active, panel, panelId, pinned, close, leave, cancelClose } = injectReviewContext()
+const { active, panel, panelId, pinned, close, leave, cancelClose, contains } =
+	injectReviewContext()
 const element = shallowRef<HTMLElement | null>(null)
 const reference = computed(() => props.anchor.trigger ?? props.anchor.element)
 const { floatingStyles, isPositioned } = useFloating(reference, element, {
@@ -81,11 +82,11 @@ watch([isPositioned, pinned], () => {
 })
 useEventListener('pointerdown', (event) => {
 	if (active.value?.id !== props.anchor.id || !(event.target instanceof Node)) return
-	if (props.anchor.element.contains(event.target) || element.value?.contains(event.target)) return
+	if (props.anchor.element.contains(event.target) || contains(event.target)) return
 	const focused = document.activeElement
 	if (
 		focused instanceof HTMLElement &&
-		(props.anchor.element.contains(focused) || element.value?.contains(focused))
+		(props.anchor.element.contains(focused) || contains(focused))
 	) {
 		focused.blur()
 	}

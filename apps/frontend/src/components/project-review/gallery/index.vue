@@ -25,9 +25,9 @@
 		</p>
 		<div v-else class="gallery-grid">
 			<ReviewPanel
-				mode="anchored"
 				v-for="(item, index) in gallery"
 				:key="item.url"
+				mode="anchored"
 				as="article"
 				trigger-placement="overlay"
 				:target="{ kind: 'gallery-image', key: item.url }"

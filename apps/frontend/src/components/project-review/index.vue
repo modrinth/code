@@ -12,7 +12,6 @@
 			<template #history><History :key="projectId" /></template>
 			<template #tech-review><TechReview :key="projectId" /></template>
 		</ProjectReviewLayout>
-		<StageProvider v-if="project" :key="project.id" :project="project" />
 		<template #fallback>
 			<p class="m-0 p-4 text-secondary" role="status">
 				{{ formatMessage(projectReviewMessages.loading) }}
@@ -27,11 +26,14 @@ import { computed } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import {
+	createReviewMessages,
+	provideReviewMessages,
+} from '~/providers/project-review/review-messages'
+import { createReviewPanels, provideReviewPanels } from '~/providers/project-review/review-panels'
+import {
 	createReviewSession,
 	provideReviewSession,
 } from '~/providers/project-review/review-session'
-import { createReviewStages, provideReviewStages } from '~/providers/project-review/review-stages'
-import StageProvider from '~/providers/project-review/stage-provider'
 
 import Conversation from './conversation.vue'
 import Description from './description/index.vue'
@@ -49,14 +51,24 @@ import TechReview from './tech-review/index.vue'
 import Versions from './versions/index.vue'
 
 const { formatMessage } = useVIntl()
-const { projectId, project } = injectProjectReviewPageContext()
+const { projectId, project, projectV2, wasReviewed, permissions } = injectProjectReviewPageContext()
 const visibleTabs = computed(() =>
 	projectReviewTabs.filter(
 		(tab) => tab !== 'permissions' || project.value?.project_types.includes('modpack'),
 	),
 )
 const reviewProjectId = computed(() => project.value?.id)
-const stages = provideReviewStages(createReviewStages(reviewProjectId))
-provideReviewSession(createReviewSession())
-provideReviewContext(createReviewContext(reviewProjectId, (target) => !!stages.resolve(target)))
+const session = provideReviewSession(createReviewSession())
+const panels = provideReviewPanels(
+	createReviewPanels(
+		project,
+		session,
+		computed(() => ({
+			wasReviewed: wasReviewed.value,
+			permissions: permissions.value,
+		})),
+	),
+)
+provideReviewMessages(createReviewMessages(project, projectV2, panels))
+provideReviewContext(createReviewContext(reviewProjectId, (target) => !!panels.resolve(target)))
 </script>

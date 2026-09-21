@@ -48,7 +48,7 @@ import { Tooltip, useVIntl } from '@modrinth/ui'
 import { computed, useId } from 'vue'
 
 import type { ReviewTarget } from '~/providers/project-review/review'
-import { injectReviewStages } from '~/providers/project-review/review-stages'
+import { injectReviewPanels } from '~/providers/project-review/review-panels'
 
 import { projectReviewMessages as messages } from '../messages'
 import Anchor from './anchor.vue'
@@ -68,12 +68,12 @@ const props = defineProps<{
 const id = useId()
 const { formatMessage } = useVIntl()
 const { active } = injectReviewContext()
-const { resolve } = injectReviewStages()
+const panels = injectReviewPanels()
 const titleId = `${id}-title`
-const stage = computed(() => resolve(props.target)?.stage)
-const title = computed(() => stage.value?.label)
+const panel = computed(() => panels.resolve(props.target)?.panel)
+const title = computed(() => panel.value?.title)
 const accessibleTitle = computed(() =>
 	formatMessage(messages.reviewSection, { section: title.value ?? '' }),
 )
-const hint = computed(() => stage.value?._hint)
+const hint = computed(() => panel.value?.hint)
 </script>

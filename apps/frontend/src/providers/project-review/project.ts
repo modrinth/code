@@ -70,6 +70,45 @@ export function useReviewProject(selection: Ref<string>) {
 		queryFn: () => client.labrinth.threads_v3.getThread(threadId.value),
 		enabled: computed(() => !!threadId.value),
 	})
+	const wasReviewed = computed(() => {
+		if (projectQuery.data.value?.status !== 'processing') return false
+		const messages = threadQuery.data.value?.messages ?? []
+		const approved = ['approved', 'archived', 'unlisted', 'private']
+		const rejected = ['rejected', 'withheld']
+		const lastApproval = messages.findLastIndex(
+			(message) =>
+				message.body.type === 'status_change' && approved.includes(message.body.new_status),
+		)
+		return messages
+			.slice(lastApproval + 1)
+			.some(
+				(message) =>
+					message.body.type === 'status_change' && rejected.includes(message.body.new_status),
+			)
+	})
+	const attributionQuery = useQuery({
+		queryKey: computed(() => ['project', projectId.value, 'attribution']),
+		queryFn: () => client.labrinth.attribution_internal.listProjectAttribution(projectId.value),
+		enabled: computed(
+			() =>
+				!!projectId.value &&
+				!!projectQuery.data.value?.project_types.includes('modpack') &&
+				!projectQuery.data.value.minecraft_server,
+		),
+	})
+	const permissions = computed(() => ({
+		groups: attributionQuery.data.value ?? [],
+		unresolvedCount: (attributionQuery.data.value ?? []).filter(
+			({ attribution }) =>
+				!attribution ||
+				(attribution.kind !== 'globally_allowed' &&
+					attribution.moderation_status?.kind !== 'approved'),
+		).length,
+		loaded: attributionQuery.isSuccess.value,
+		loading: attributionQuery.isFetching.value,
+		error: attributionQuery.error.value,
+	}))
+
 	const submissionCount = computed(
 		() =>
 			threadQuery.data.value?.messages.filter(
@@ -99,6 +138,8 @@ export function useReviewProject(selection: Ref<string>) {
 		project: projectQuery.data,
 		projectV2: legacyQuery.data,
 		threadQuery,
+		wasReviewed,
+		permissions,
 		members,
 		memberStats,
 		membersLoading: memberQuery.isPending,

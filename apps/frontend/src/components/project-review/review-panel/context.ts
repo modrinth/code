@@ -23,6 +23,7 @@ export function createReviewContext(
 	const panelId = useId()
 	const active = shallowRef<ReviewAnchor>()
 	const panel = shallowRef<HTMLElement | null>(null)
+	const childPanels = new Set<HTMLElement>()
 	const pinned = ref(false)
 	let openTimer: ReturnType<typeof setTimeout> | undefined
 	let closeTimer: ReturnType<typeof setTimeout> | undefined
@@ -30,6 +31,19 @@ export function createReviewContext(
 
 	function cancelClose() {
 		clearTimeout(closeTimer)
+	}
+
+	function contains(target: Node) {
+		return panel.value?.contains(target) || [...childPanels].some((child) => child.contains(target))
+	}
+
+	function registerChildPanel(element: HTMLElement) {
+		childPanels.add(element)
+		cancelClose()
+		return () => {
+			childPanels.delete(element)
+			if (active.value) leave(active.value.id)
+		}
 	}
 
 	function close(restoreFocus = false) {
@@ -72,7 +86,14 @@ export function createReviewContext(
 		cancelClose()
 		closeTimer = setTimeout(() => {
 			if (active.value?.id !== id) return
-			if (active.value.element.matches(':hover') || panel.value?.matches(':hover')) return
+			if (
+				active.value.element.matches(':hover') ||
+				panel.value?.matches(':hover') ||
+				[...childPanels].some(
+					(child) => child.matches(':hover') || child.contains(document.activeElement),
+				)
+			)
+				return
 			close()
 		}, CLOSE_DELAY)
 	}
@@ -105,5 +126,7 @@ export function createReviewContext(
 		release,
 		leave,
 		cancelClose,
+		contains,
+		registerChildPanel,
 	}
 }
