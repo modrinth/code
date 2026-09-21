@@ -3,7 +3,6 @@ use super::super::synced_options::{
     instance_dir, instance_is_running, instance_option_enabled,
     instance_option_supported, sha1_bytes, sha1_file, sync_files_are_protected,
 };
-use crate::api::worlds::time_world_load;
 use crate::state::{InstanceMetadata, SyncedOption};
 use crate::{ErrorKind, State};
 use quartz_nbt::NbtCompound;
@@ -395,24 +394,12 @@ pub(crate) async fn list_server_records(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<Vec<ServerRecord>> {
-    if time_world_load(
-        "server_sync_participation",
-        participating(metadata, state),
-    )
-    .await?
-    {
-        let (canonical, locals) = time_world_load(
-            "server_records_snapshot",
-            read_server_snapshot(&metadata.instance.id, state),
-        )
-        .await?;
+    if participating(metadata, state).await? {
+        let (canonical, locals) =
+            read_server_snapshot(&metadata.instance.id, state).await?;
         return Ok(merge_server_records(canonical, locals));
     }
-    time_world_load(
-        "read_local_server_records",
-        list_local_server_records(metadata, state),
-    )
-    .await
+    list_local_server_records(metadata, state).await
 }
 
 async fn list_server_records_locked(

@@ -30,70 +30,26 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod' }}
 
+env:
+  INTERNAL: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+
 jobs:
-  skip-if-clean:
-    name: Skip if merge_queue produces no diff
-    runs-on: ubuntu-latest
-    outputs:
-      skip: ${{ steps.check.outputs.skip }}
-      internal: ${{ steps.check-internal.outputs.internal }}
-    if: ${{ always() }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Check if workflow runs on an internal branch
-        id: check-internal
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
-          REPO: ${{ github.repository }}
-        run: |
-          if [ "$EVENT_NAME" != "pull_request" ] || [ "$HEAD_REPO" = "$REPO" ]; then
-            echo "internal=true" >> $GITHUB_OUTPUT
-          else
-            echo "internal=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Merge Queue CI Check Skipper
-        id: merge-queue-ci-skipper
-        uses: ./.github/merge-queue-ci-skipper
-        with:
-          secret: ${{ secrets.GH_ACCESS_TOKEN }}
-
-      - name: Check merge_group synthetic commit
-        id: check
-        run: |
-          # PR mode: never skip
-          if [ "${{ github.event_name }}" != "merge_group" ]; then
-            echo "skip=false" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-
-          if [ "${{ steps.merge-queue-ci-skipper.outputs.skip-check }}" = "true" ]; then
-            echo "skip=true" >> $GITHUB_OUTPUT
-          else
-            echo "skip=false" >> $GITHUB_OUTPUT
-          fi
-
   build:
     name: Build Labrinth
-    runs-on: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'namespace-profile-modrinth-labrinth' || 'ubuntu-latest' }}
-    needs: [skip-if-clean]
-    if: ${{ needs.skip-if-clean.outputs.skip != 'true' }}
+    runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && 'namespace-profile-modrinth-labrinth' || 'ubuntu-latest' }}
     env:
       SQLX_OFFLINE: 'true'
       GIT_HASH: ${{ github.sha }}
-      SCCACHE_CACHE_SIZE: ${{ needs.skip-if-clean.outputs.internal == 'true' && '20G' || '' }}
-      RUSTC_WRAPPER: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'sccache' || '' }}
+      SCCACHE_CACHE_SIZE: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && '20G' || '' }}
+      RUSTC_WRAPPER: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && 'sccache' || '' }}
       RUST_MIN_STACK: '268435456'
     steps:
       - name: Check out code
-        if: needs.skip-if-clean.outputs.internal != 'true'
+        if: env.INTERNAL != 'true'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Check out code (Namespace)
-        if: needs.skip-if-clean.outputs.internal == 'true'
+        if: env.INTERNAL == 'true'
         uses: namespacelabs/nscloud-checkout-action@66f2dc6f6c42a8ac6c4e53473c4840006822831e # v9.0.1
 
       - name: Setup Rust toolchain
@@ -109,7 +65,7 @@ jobs:
         uses: mozilla-actions/sccache-action@9e7fa8a12102821edf02ca5dbea1acd0f89a2696 # v0.0.10
 
       - name: Set up caches
-        if: needs.skip-if-clean.outputs.internal == 'true'
+        if: env.INTERNAL == 'true'
         uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
         with:
           cache: |
@@ -117,7 +73,7 @@ jobs:
             apt
 
       - name: Configure sccache
-        if: needs.skip-if-clean.outputs.internal == 'true'
+        if: env.INTERNAL == 'true'
         run: nsc cache sccache setup --cache_name default >> "$GITHUB_ENV"
 
       - name: Install build dependencies
@@ -134,7 +90,7 @@ jobs:
           cp -r apps/labrinth/assets apps/labrinth/docker-stage/assets
 
       - name: Upload Docker context
-        if: needs.skip-if-clean.outputs.internal == 'true'
+        if: env.INTERNAL == 'true'
         uses: namespace-actions/upload-artifact@f6ccaacc655aec41b93af180d1d7eef21af862d2 # v1.0.3
         with:
           name: labrinth-docker-context
@@ -142,8 +98,8 @@ jobs:
           path: apps/labrinth/docker-stage
 
   docker-build:
-    needs: [skip-if-clean, build]
-    if: ${{ needs.skip-if-clean.outputs.internal == 'true' }}
+    needs: [build]
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
     uses: SparkUniverse/workflows/.github/workflows/docker-build.yaml@main
     with:
       image-name: labrinth
@@ -151,8 +107,8 @@ jobs:
       artifacts-name: labrinth-docker-context
 
   deploy:
-    needs: [skip-if-clean, docker-build]
-    if: ${{ needs.skip-if-clean.outputs.internal == 'true' && github.ref == 'refs/heads/prod' }}
+    needs: [docker-build]
+    if: ${{ github.ref == 'refs/heads/prod' }}
     uses: SparkUniverse/workflows/.github/workflows/argo-update.yaml@main
     secrets:
       ARGOCD_DEPLOY_KEY: ${{ secrets.ARGOCD_DEPLOY_KEY }}

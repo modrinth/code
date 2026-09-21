@@ -377,6 +377,7 @@ let resolveUnknownFileConfirmation: ((confirmed: boolean) => void) | null = null
 const modpackContentQueryKey = computed(() => instanceKeys.linkedContent(instance.value.id))
 const modpackContentQuery = useQuery({
 	queryKey: modpackContentQueryKey,
+	networkMode: 'always',
 	queryFn: () => get_linked_modpack_content(instance.value.id),
 	enabled: computed(
 		() =>
