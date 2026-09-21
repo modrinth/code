@@ -956,7 +956,7 @@ router.afterEach((to, from, failure) => {
 	trackEvent('PageView', {
 		path: to.path,
 		fromPath: from.path,
-		failed: failure,
+		failed: !!failure,
 	})
 	setTimeout(() => {
 		debugStartup('Route loading release check', {

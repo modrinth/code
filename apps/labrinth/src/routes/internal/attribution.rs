@@ -331,7 +331,7 @@ pub async fn list(
 
     let project = DBProject::get_id(project_id, pool.as_ref(), redis.as_ref())
         .await
-        .wrap_api_err("fetching attribution project")?
+        .wrap_internal_err("fetching attribution project")?
         .wrap_not_found_err("resource not found")?;
     let (team_member, organization_team_member) =
         DBTeamMember::get_for_project_permissions(

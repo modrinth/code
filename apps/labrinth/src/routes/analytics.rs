@@ -9,7 +9,7 @@ use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::date::get_current_tenths_of_ms;
-use crate::util::error::ApiContext as _;
+
 use crate::util::error::Context;
 use crate::util::http::HttpClient;
 use actix_web::{HttpRequest, HttpResponse};
@@ -160,7 +160,7 @@ pub async fn page_view_ingest(
                     &redis,
                 )
                 .await
-                .wrap_api_err("fetching project from database")?;
+                .wrap_internal_err("fetching project from database")?;
 
                 if let Some(project) = project {
                     view.project_id = project.inner.id.0 as u64;
@@ -305,7 +305,7 @@ pub async fn minecraft_server_play_ingest(
 
     let project = DBProject::get(&project_id.to_string(), &**pool, &redis)
         .await
-        .wrap_api_err("fetching project from database")?
+        .wrap_internal_err("fetching project from database")?
         .wrap_not_found_err("resource not found")?;
 
     if project.components.minecraft_server.is_none() {

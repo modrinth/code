@@ -520,6 +520,16 @@ pub(super) async fn source_screenshots_dir(
             .await
             .map_err(|error| IOError::with_path(error, &instance_dir))?;
     let screenshots_dir = canonical_instance_dir.join(SCREENSHOTS_DIRECTORY);
+    let screenshots_dir = match tokio::fs::canonicalize(&screenshots_dir).await
+    {
+        Ok(path) => path,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+            screenshots_dir
+        }
+        Err(error) => {
+            return Err(IOError::with_path(error, &screenshots_dir).into());
+        }
+    };
 
     ensure_directory_is_not_symlink(&screenshots_dir).await?;
     Ok(screenshots_dir)

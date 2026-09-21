@@ -1,6 +1,6 @@
 use super::ids::*;
-use crate::database::models::DatabaseError;
 use crate::models::v3::notifications::{NotificationChannel, NotificationType};
+use eyre::{Result, WrapErr};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -40,14 +40,16 @@ impl UserNotificationPreference {
     pub async fn get_user_or_default(
         user_id: DBUserId,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<UserNotificationPreference>, DatabaseError> {
-        Self::get_many_users_or_default(&[user_id], exec).await
+    ) -> Result<Vec<UserNotificationPreference>> {
+        Self::get_many_users_or_default(&[user_id], exec)
+            .await
+            .wrap_err("fetching user notification preferences")
     }
 
     pub async fn get_many_users_or_default(
         user_ids: &[DBUserId],
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<UserNotificationPreference>, DatabaseError> {
+    ) -> Result<Vec<UserNotificationPreference>> {
         let results = sqlx::query!(
             r#"
             SELECT
@@ -65,7 +67,8 @@ impl UserNotificationPreference {
             &user_ids.iter().map(|x| x.0).collect::<Vec<_>>(),
         )
         .fetch_all(exec)
-        .await?;
+        .await
+        .wrap_err("fetching user notification preferences")?;
 
         let preferences = results
             .into_iter()
@@ -87,7 +90,7 @@ impl UserNotificationPreference {
     pub async fn insert(
         &mut self,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<()> {
         let id = sqlx::query_scalar!(
             "
             INSERT INTO users_notifications_preferences (
@@ -102,7 +105,8 @@ impl UserNotificationPreference {
             self.enabled,
         )
         .fetch_one(exec)
-        .await?;
+        .await
+        .wrap_err("inserting user notification preference")?;
 
         self.id = id;
 

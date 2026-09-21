@@ -1,9 +1,10 @@
 use super::{
     DBOAuthAccessTokenId, DBOAuthClientAuthorizationId, DBOAuthClientId,
-    DBUserId, DatabaseError,
+    DBUserId,
 };
 use crate::models::pats::Scopes;
 use chrono::{DateTime, Utc};
+use eyre::{Result, WrapErr};
 use serde::{Deserialize, Serialize};
 use sha2::Digest;
 
@@ -26,7 +27,7 @@ impl DBOAuthAccessToken {
     pub async fn get(
         token_hash: String,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Option<DBOAuthAccessToken>, DatabaseError> {
+    ) -> Result<Option<DBOAuthAccessToken>> {
         let value = sqlx::query!(
             "
             SELECT
@@ -47,7 +48,8 @@ impl DBOAuthAccessToken {
             token_hash
         )
         .fetch_optional(exec)
-        .await?;
+        .await
+        .wrap_err("fetching oauth access token")?;
 
         Ok(value.map(|r| DBOAuthAccessToken {
             id: DBOAuthAccessTokenId(r.id),
@@ -66,7 +68,7 @@ impl DBOAuthAccessToken {
     pub async fn insert(
         &self,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<chrono::Duration, DatabaseError> {
+    ) -> Result<chrono::Duration> {
         let r = sqlx::query!(
             "
             INSERT INTO oauth_access_tokens (
@@ -84,7 +86,8 @@ impl DBOAuthAccessToken {
             Option::<DateTime<Utc>>::None
         )
         .fetch_one(exec)
-        .await?;
+        .await
+        .wrap_err("inserting oauth access token")?;
 
         let (created, expires) = (r.created, r.expires);
         let time_until_expiration = expires - created;
