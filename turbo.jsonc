@@ -18,7 +18,7 @@
 		"build": {
 			"dependsOn": ["//#i18n:coverage", "^build"],
 			"inputs": ["$TURBO_DEFAULT$", ".env*"],
-			"outputs": [".nuxt/**", "dist/**", ".output/**", "$TURBO_ROOT$/target/**"],
+			"outputs": [".nuxt/**", "dist/**", ".output/**"],
 			"env": [
 				"NODE_ENV",
 				"SITE_URL",
