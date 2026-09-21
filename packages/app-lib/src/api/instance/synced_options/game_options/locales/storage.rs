@@ -85,7 +85,7 @@ pub(super) async fn pin(
     origin: &Origin,
 ) -> crate::Result<()> {
     let json = serde_json::to_string(origin)?;
-	sqlx::query!(
+    sqlx::query!(
         "UPDATE game_option_locale_origins SET origin_json = ?
 		WHERE scope = ? AND option_id = ? AND origin_json IS NULL",
         json,

@@ -195,10 +195,10 @@ pub async fn get_recent_worlds(
     limit: usize,
     display_statuses: EnumSet<DisplayStatus>,
 ) -> Result<Vec<WorldWithInstance>> {
-	let state = State::get().await?;
+    let state = State::get().await?;
     let instances_dir = state.directories.instances_dir();
 
-	let mut instances = crate::state::list_instances(&state.pool).await?;
+    let mut instances = crate::state::list_instances(&state.pool).await?;
     instances.sort_by_key(|x| Reverse(x.instance.last_played));
 
     let mut result = Vec::with_capacity(limit);
@@ -297,15 +297,15 @@ async fn get_all_worlds_in_instance(
     instance_dir: &Path,
 ) -> Result<Vec<World>> {
     let mut worlds = vec![];
-	get_singleplayer_worlds_in_instance(instance_dir, &mut worlds).await?;
-	let state = State::get().await?;
+    get_singleplayer_worlds_in_instance(instance_dir, &mut worlds).await?;
+    let state = State::get().await?;
 
-	get_server_worlds_in_instance(instance_id, instance_dir, &mut worlds)
-		.await?;
+    get_server_worlds_in_instance(instance_id, instance_dir, &mut worlds)
+        .await?;
 
-	let attached_data =
-		AttachedWorldData::get_all_for_instance(instance_id, &state.pool)
-			.await?;
+    let attached_data =
+        AttachedWorldData::get_all_for_instance(instance_id, &state.pool)
+            .await?;
     if !attached_data.is_empty() {
         for world in &mut worlds {
             if let Some(data) = attached_data
@@ -392,7 +392,7 @@ async fn read_singleplayer_world_maybe_locked(
     world_path: PathBuf,
     locked: bool,
 ) -> Result<World> {
-	let raw = io::read(world_path.join("level.dat")).await?;
+    let raw = io::read(world_path.join("level.dat")).await?;
     let (root, _) = quartz_nbt::io::read_nbt(
         &mut Cursor::new(raw),
         quartz_nbt::io::Flavor::GzCompressed,
@@ -412,9 +412,9 @@ async fn read_singleplayer_world_maybe_locked(
     let game_type = data.get::<_, i32>("GameType").unwrap_or(0);
     let hardcore = read_hardcore(data);
 
-	let icon = if tokio::fs::try_exists(world_path.join("icon.png"))
-		.await
-		.unwrap_or(false)
+    let icon = if tokio::fs::try_exists(world_path.join("icon.png"))
+        .await
+        .unwrap_or(false)
     {
         Some(Either::Left(world_path.join("icon.png")))
     } else {
@@ -460,10 +460,10 @@ async fn get_server_worlds_in_instance(
     _instance_dir: &Path,
     worlds: &mut Vec<World>,
 ) -> Result<()> {
-	let state = State::get().await?;
-	let metadata = crate::state::get_instance(instance_id, &state.pool)
-		.await?
-		.ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
+    let state = State::get().await?;
+    let metadata = crate::state::get_instance(instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
     let servers = crate::api::instance::synced_servers::list_server_records(
         &metadata, &state,
     )
@@ -472,9 +472,9 @@ async fn get_server_worlds_in_instance(
         return Ok(());
     }
 
-	let join_log = server_join_log::get_joins(instance_id, &state.pool)
-		.await
-		.ok();
+    let join_log = server_join_log::get_joins(instance_id, &state.pool)
+        .await
+        .ok();
 
     for (index, server) in servers.into_iter().enumerate() {
         if server.hidden() {
@@ -748,7 +748,7 @@ async fn get_world_session_lock(world: &Path) -> Result<tokio::fs::File> {
         .open(&lock_path)
         .await?;
     file.write_all("☃".as_bytes()).await?;
-	file.sync_all().await?;
+    file.sync_all().await?;
     let locked = file.try_lock_exclusive()?;
     locked.then_some(file).ok_or_else(|| {
         io::IOError::IOPathError {

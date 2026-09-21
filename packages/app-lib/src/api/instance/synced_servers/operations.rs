@@ -394,12 +394,12 @@ pub(crate) async fn list_server_records(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<Vec<ServerRecord>> {
-	if participating(metadata, state).await? {
-		let (canonical, locals) =
-			read_server_snapshot(&metadata.instance.id, state).await?;
+    if participating(metadata, state).await? {
+        let (canonical, locals) =
+            read_server_snapshot(&metadata.instance.id, state).await?;
         return Ok(merge_server_records(canonical, locals));
     }
-	list_local_server_records(metadata, state).await
+    list_local_server_records(metadata, state).await
 }
 
 async fn list_server_records_locked(
