@@ -29,6 +29,7 @@ interface MetadataFilterDefinition {
 interface ContentMetadataFilterConfig {
 	showSharedContent?: Ref<boolean> | Readonly<Ref<boolean>>
 	showEnvironmentWarnings?: boolean
+	showEnabledFor?: boolean
 }
 
 const openSourceLicenseIds = new Set([
@@ -74,6 +75,18 @@ const messages = defineMessages({
 	environment: {
 		id: 'content.metadata-filter.environment',
 		defaultMessage: 'Environment',
+	},
+	enabledFor: {
+		id: 'content.enabled-for.label',
+		defaultMessage: 'Enabled for',
+	},
+	server: {
+		id: 'content.enabled-for.server',
+		defaultMessage: 'Server',
+	},
+	player: {
+		id: 'content.enabled-for.player',
+		defaultMessage: 'Player',
 	},
 	clientSideOnly: {
 		id: 'project.settings.environment.client_only.title',
@@ -187,20 +200,33 @@ export function useContentMetadataFilters(
 					? [option(`${item.owner.type}:${item.owner.id}`, item.owner.name, [item.owner.id])]
 					: [],
 		},
-		{
-			key: 'environment',
-			label: formatMessage(messages.environment),
-			options: [
-				option('client', getEnvironmentFilterLabel('client')),
-				option('server', getEnvironmentFilterLabel('server')),
-				option('client_and_server', getEnvironmentFilterLabel('client_and_server')),
-				option('singleplayer', getEnvironmentFilterLabel('singleplayer')),
-			],
-			values: (item) => {
-				const value = getEnvironmentFilterValue(item.environment)
-				return value ? [option(value, getEnvironmentFilterLabel(value))] : []
-			},
-		},
+		config?.showEnabledFor
+			? {
+					key: 'enabled_for',
+					label: formatMessage(messages.enabledFor),
+					options: [
+						option('server', formatMessage(messages.server)),
+						option('player', formatMessage(messages.player)),
+					],
+					values: (item) => [
+						...(item.enabledFor?.server ? [option('server', formatMessage(messages.server))] : []),
+						...(item.enabledFor?.player ? [option('player', formatMessage(messages.player))] : []),
+					],
+				}
+			: {
+					key: 'environment',
+					label: formatMessage(messages.environment),
+					options: [
+						option('client', getEnvironmentFilterLabel('client')),
+						option('server', getEnvironmentFilterLabel('server')),
+						option('client_and_server', getEnvironmentFilterLabel('client_and_server')),
+						option('singleplayer', getEnvironmentFilterLabel('singleplayer')),
+					],
+					values: (item) => {
+						const value = getEnvironmentFilterValue(item.environment)
+						return value ? [option(value, getEnvironmentFilterLabel(value))] : []
+					},
+				},
 		{
 			key: 'state',
 			label: formatMessage(messages.state),

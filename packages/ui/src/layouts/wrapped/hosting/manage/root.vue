@@ -184,6 +184,7 @@
 								<SettingsIcon />
 							</IconButton>
 							<TeleportOverflowMenu
+								v-if="isNuxt"
 								type="quiet"
 								size="xl"
 								label="More server options"

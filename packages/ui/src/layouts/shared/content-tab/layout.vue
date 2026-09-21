@@ -290,6 +290,7 @@ const { selectedFilters, filterOptions, toggleFilter, applyFilters } = useConten
 const { selectedMetadataFilters, metadataFilterCategories, applyMetadataFilters } =
 	useContentMetadataFilters(ctx.items, ctx.filterPersistKey, {
 		showSharedContent: ctx.showSharedContentFilter,
+		showEnabledFor: !!ctx.setEnabledFor,
 		showEnvironmentWarnings: ctx.showEnvironmentWarnings,
 	})
 

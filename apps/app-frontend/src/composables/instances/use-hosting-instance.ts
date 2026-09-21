@@ -47,20 +47,23 @@ export function useHostingInstance(instance: Ref<GameInstance | undefined>, offl
 		const metadata = current && cache.value[current.id]
 		return metadata?.sharedInstanceId === current?.shared_instance?.id ? metadata : undefined
 	})
+	const canQuery = computed(
+		() =>
+			!!instance.value?.shared_instance &&
+			!offline.value &&
+			!!auth.user.value?.id &&
+			auth.user.value.id === instance.value.shared_instance.linked_user_id,
+	)
 	const serverQuery = useQuery({
 		queryKey: computed(() => ['instances', instance.value?.id, 'hosting', auth.user.value?.id]),
-		enabled: computed(
-			() =>
-				!!instance.value?.shared_instance &&
-				!offline.value &&
-				!!auth.user.value?.id &&
-				auth.user.value.id === instance.value.shared_instance.linked_user_id,
-		),
+		enabled: canQuery,
 		queryFn: async () => {
 			const current = instance.value!
 			const sharedId = current.shared_instance!.id
 			const known = saved.value
-			const shared = await client.sharedinstances.instances_v1.get(sharedId)
+			const shared = await client.sharedinstances.instances_v1.get(sharedId, {
+				query_linked_server: false,
+			})
 			if (!shared.linked_server) return null
 			return {
 				instanceId: current.id,
@@ -81,6 +84,28 @@ export function useHostingInstance(instance: Ref<GameInstance | undefined>, offl
 	const isHostingInstance = computed(
 		() => !!saved.value || !!instance.value?.shared_instance?.server_manager_name,
 	)
+	const statusQuery = useQuery({
+		queryKey: computed(() => [
+			'instances',
+			instance.value?.id,
+			'hosting-status',
+			instance.value?.shared_instance?.id,
+			auth.user.value?.id,
+		]),
+		enabled: computed(() => canQuery.value && isHostingInstance.value),
+		queryFn: () =>
+			client.sharedinstances.instances_v1.get(instance.value!.shared_instance!.id, {
+				query_linked_server: true,
+			}),
+		staleTime: 30_000,
+		refetchInterval: 30_000,
+		retry: false,
+	})
+	async function refreshOnlineStatus() {
+		if (!canQuery.value || !isHostingInstance.value) return null
+		const result = await statusQuery.refetch({ throwOnError: false })
+		return result.isError ? null : (result.data?.linked_server?.online_status ?? null)
+	}
 	const worldsQuery = useQuery({
 		queryKey: computed(() => ['instances', instance.value?.id, 'hosting-worlds']),
 		enabled: computed(
@@ -100,6 +125,12 @@ export function useHostingInstance(instance: Ref<GameInstance | undefined>, offl
 	})
 	return {
 		isHostingInstance,
+		onlineStatus: computed(() =>
+			!canQuery.value || statusQuery.isError.value
+				? null
+				: (statusQuery.data.value?.linked_server?.online_status ?? null),
+		),
+		refreshOnlineStatus,
 		region: computed(() => saved.value?.region),
 		address,
 	}
