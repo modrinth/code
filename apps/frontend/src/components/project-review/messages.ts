@@ -1,6 +1,19 @@
 import { defineMessages } from '@modrinth/ui'
 
 export const projectReviewMessages = defineMessages({
+	reviewIssues: {
+		id: 'moderation.project-review.reviewIssues',
+		defaultMessage: 'Issues',
+	},
+	conversationThread: {
+		id: 'moderation.project-review.conversationThread',
+		defaultMessage: 'Conversation thread',
+	},
+	noSelectedIssues: {
+		id: 'moderation.project-review.noSelectedIssues',
+		defaultMessage:
+			'No issues added. Select issues while reviewing the project to see the message here.',
+	},
 	reviewSection: {
 		id: 'moderation.project-review.reviewSection',
 		defaultMessage: 'Review {section}',
@@ -8,6 +21,14 @@ export const projectReviewMessages = defineMessages({
 	closeReview: {
 		id: 'moderation.project-review.closeReview',
 		defaultMessage: 'Close review controls',
+	},
+	pinReview: {
+		id: 'moderation.project-review.pinReview',
+		defaultMessage: 'Pin review controls',
+	},
+	unpinReview: {
+		id: 'moderation.project-review.unpinReview',
+		defaultMessage: 'Unpin review controls',
 	},
 	noReviewActions: {
 		id: 'moderation.project-review.noReviewActions',

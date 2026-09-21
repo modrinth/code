@@ -65,6 +65,7 @@ export function createReviewContext(
 		pendingAnchor = undefined
 		const show = () => {
 			pendingAnchor = undefined
+			if (pinned.value && !explicit) return
 			if (!anchor.element.isConnected || !anchor.available() || !isAvailable(anchor.target)) return
 			cancelClose()
 			active.value = anchor
@@ -86,6 +87,7 @@ export function createReviewContext(
 		cancelClose()
 		closeTimer = setTimeout(() => {
 			if (active.value?.id !== id) return
+			if (pinned.value) return
 			if (
 				active.value.element.matches(':hover') ||
 				panel.value?.matches(':hover') ||

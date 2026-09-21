@@ -27,7 +27,7 @@
 		v-else
 		v-bind="$attrs"
 		:aria-labelledby="title ? titleId : undefined"
-		class="flex w-full flex-col gap-2.5 overflow-y-auto text-sm text-primary"
+		class="box-border flex w-full flex-col gap-2.5 overflow-y-auto p-1 text-sm text-primary"
 	>
 		<div v-if="title" class="flex items-center gap-2">
 			<h2 :id="titleId" class="m-0 text-sm font-semibold text-contrast">{{ title }}</h2>
