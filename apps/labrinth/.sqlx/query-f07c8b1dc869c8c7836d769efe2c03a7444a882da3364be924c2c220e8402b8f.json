@@ -1,0 +1,46 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            files.url,\n            files.filename,\n            files.size,\n            files.version_id AS \"version_id: DBVersionId\",\n            versions.mod_id AS \"project_id: DBProjectId\"\n        FROM files INNER JOIN versions ON files.version_id = versions.id\n        WHERE files.id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "filename",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "size",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "version_id: DBVersionId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "project_id: DBProjectId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "f07c8b1dc869c8c7836d769efe2c03a7444a882da3364be924c2c220e8402b8f"
+}
