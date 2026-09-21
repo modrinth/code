@@ -1,5 +1,5 @@
 <template>
-	<div :class="{ 'flex h-full min-h-0 flex-col overflow-hidden': scrollMessages }">
+	<div>
 		<NewModal
 			ref="modalSubmit"
 			:header="
@@ -95,74 +95,48 @@
 				</div>
 			</div>
 		</NewModal>
-		<div v-if="flags.showThreadIds" class="mx-4 mb-3 shrink-0 font-semibold">
-			Thread ID:
-			<CopyCode :text="thread.id" />
-		</div>
-		<div
-			v-bind="$attrs"
-			class="flex flex-col"
-			:class="{ 'min-h-0 flex-1 overflow-hidden': scrollMessages }"
-		>
-			<div
-				v-if="scrollMessages || sortedMessages.length > 0"
-				ref="messageList"
-				class="flex flex-col pt-2"
-				:class="{
-					'min-h-0 flex-1 overflow-y-auto overscroll-contain': scrollMessages,
-				}"
+		<div v-bind="$attrs" class="flex flex-col">
+			<slot
+				:is-loading="isLoading"
+				:loading-action="loadingAction"
+				:run-blocking-action="runBlockingAction"
+				:send-reply="sendReply"
 			>
-				<ThreadMessage
-					v-for="message in sortedMessages"
-					:key="'message-' + message.id"
-					:thread="thread"
-					:message="message"
-					:members="members"
-					:report="report"
-					:auth="auth"
-					class="shrink-0"
-					raised
-					@update-thread="() => updateThreadLocal()"
-				/>
-			</div>
-			<div v-if="report && report.closed" class="m-4 mt-2 flex shrink-0 flex-col gap-4">
-				<p class="m-0">{{ formatMessage(messages.closedThreadDescription) }}</p>
-				<Button
-					v-if="isStaff(auth.user)"
-					:disabled="isLoading"
-					class="w-fit"
-					@click="runBlockingAction('reopen', () => reopenReport())"
-				>
-					<SpinnerIcon v-if="loadingAction === 'reopen'" class="animate-spin" aria-hidden="true" />
-					<CheckCircleIcon v-else aria-hidden="true" />
-					{{ formatMessage(messages.actionReopenThread) }}
-				</Button>
-			</div>
-			<template v-else-if="!report || !report.closed">
-				<div
-					class="relative mx-2 mb-2 mt-2.5 shrink-0 border-0 border-t border-solid border-divider pt-2.5"
-					:style="resizableEditor ? { height: `${editorHeight}px` } : undefined"
-				>
-					<div
-						v-if="resizableEditor"
-						role="separator"
-						tabindex="0"
-						aria-orientation="horizontal"
-						:aria-label="formatMessage(messages.resizeEditor)"
-						:aria-valuenow="editorHeight"
-						:aria-valuemin="120"
-						:aria-valuemax="maxEditorHeight"
-						class="absolute -top-2 left-0 flex h-4 w-full cursor-row-resize touch-none items-center justify-center"
-						@pointerdown="startEditorResize"
-						@pointermove="resizeEditor"
-						@pointerup="stopEditorResize"
-						@pointercancel="stopEditorResize"
-						@keydown.up.prevent="setEditorHeight(editorHeight + 20)"
-						@keydown.down.prevent="setEditorHeight(editorHeight - 20)"
+				<div v-if="flags.showThreadIds" class="mx-4 mb-3 shrink-0 font-semibold">
+					Thread ID:
+					<CopyCode :text="thread.id" />
+				</div>
+				<div v-if="sortedMessages.length > 0" class="flex flex-col">
+					<ThreadMessage
+						v-for="message in sortedMessages"
+						:key="'message-' + message.id"
+						:thread="thread"
+						:message="message"
+						:members="members"
+						:report="report"
+						:auth="auth"
+						class="shrink-0"
+						raised
+						@update-thread="() => updateThreadLocal()"
+					/>
+				</div>
+				<div v-if="report && report.closed" class="m-4 mt-2 flex shrink-0 flex-col gap-4">
+					<p class="m-0">{{ formatMessage(messages.closedThreadDescription) }}</p>
+					<Button
+						v-if="isStaff(auth.user)"
+						:disabled="isLoading"
+						class="w-fit"
+						@click="runBlockingAction('reopen', () => reopenReport())"
 					>
-						<span class="h-1 w-10 rounded-full bg-surface-5" />
-					</div>
-					<div :class="resizableEditor ? 'h-full overflow-y-auto' : undefined">
+						<SpinnerIcon v-if="loadingAction === 'reopen'" class="animate-spin" aria-hidden="true" />
+						<CheckCircleIcon v-else aria-hidden="true" />
+						{{ formatMessage(messages.actionReopenThread) }}
+					</Button>
+				</div>
+				<template v-else-if="!report || !report.closed">
+					<div
+						class="relative mb-2 mt-2.5 shrink-0 border-0 border-t border-solid border-divider pt-2.5"
+					>
 						<MarkdownEditor
 							v-model="replyBody"
 							:initial-preview="initialPreview"
@@ -518,7 +492,7 @@ import {
 	TeleportOverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
-import { nextTick, onMounted, ref, watch } from 'vue'
+import { ref } from 'vue'
 
 import ThreadMessage from '~/components/ui/thread/ThreadMessage.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
@@ -529,10 +503,6 @@ const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
-	resizeEditor: {
-		id: 'conversation-thread.resize-editor',
-		defaultMessage: 'Resize message editor',
-	},
 	resubmitModalHeaderResubmitting: {
 		id: 'conversation-thread.resubmit-modal.header.resubmitting',
 		defaultMessage: 'Resubmitting for review',
@@ -633,25 +603,13 @@ const messages = defineMessages({
 		id: 'conversation-thread.action.close-report',
 		defaultMessage: 'Close report',
 	},
-	actionApproveWithReply: {
-		id: 'conversation-thread.action.approve-with-reply',
-		defaultMessage: 'Approve with reply',
-	},
 	actionApprove: {
 		id: 'conversation-thread.action.approve',
 		defaultMessage: 'Approve',
 	},
-	actionRejectWithReply: {
-		id: 'conversation-thread.action.reject-with-reply',
-		defaultMessage: 'Reject with reply',
-	},
 	actionReject: {
 		id: 'conversation-thread.action.reject',
 		defaultMessage: 'Reject',
-	},
-	actionWithholdWithReply: {
-		id: 'conversation-thread.action.withhold-with-reply',
-		defaultMessage: 'Withhold with reply',
 	},
 	actionWithhold: {
 		id: 'conversation-thread.action.withhold',
@@ -689,7 +647,6 @@ const messages = defineMessages({
 
 const props = defineProps({
 	beforeSendReply: { type: Function, default: null },
-	resizableEditor: Boolean,
 	initialPreview: Boolean,
 	generatingMessage: Boolean,
 	reviewSubmissionDisabled: {
@@ -729,18 +686,6 @@ const props = defineProps({
 
 const emit = defineEmits(['update-thread'])
 
-const messageList = ref(null)
-
-async function scrollMessagesToBottom() {
-	if (!props.scrollMessages) return
-	await nextTick()
-	const element = messageList.value
-	if (element) element.scrollTop = element.scrollHeight
-}
-
-onMounted(scrollMessagesToBottom)
-watch(() => props.thread.id, scrollMessagesToBottom, { flush: 'post' })
-
 const app = useNuxtApp()
 const flags = useFeatureFlags()
 
@@ -753,33 +698,6 @@ const members = computed(() => {
 })
 
 const replyBody = defineModel('replyBody', { type: String, default: '' })
-const editorHeight = ref(240)
-const maxEditorHeight = ref(600)
-let editorDrag = null
-
-function setEditorHeight(height) {
-	maxEditorHeight.value = Math.max(120, Math.floor(window.innerHeight * 0.6))
-	editorHeight.value = Math.min(maxEditorHeight.value, Math.max(120, height))
-}
-
-function startEditorResize(event) {
-	if (event.button !== 0) return
-	event.preventDefault()
-	event.currentTarget.setPointerCapture(event.pointerId)
-	editorDrag = { y: event.clientY, height: editorHeight.value }
-}
-
-function resizeEditor(event) {
-	if (editorDrag) setEditorHeight(editorDrag.height + editorDrag.y - event.clientY)
-}
-
-function stopEditorResize(event) {
-	editorDrag = null
-	if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-		event.currentTarget.releasePointerCapture(event.pointerId)
-	}
-}
-
 const sortedMessages = computed(() => {
 	if (props.thread !== null) {
 		return props.thread.messages

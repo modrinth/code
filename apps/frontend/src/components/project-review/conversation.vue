@@ -1,33 +1,38 @@
 <template>
 	<div class="flex h-full min-h-0 min-w-0 flex-col gap-2.5 overflow-hidden">
-		<ProjectActions class="border-0 border-b border-solid border-divider" />
-		<div v-if="project" class="min-h-0 min-w-0 flex-1">
-			<ConversationThread
-				v-if="thread"
-				v-model:reply-body="draft"
-				:thread="thread"
-				:generating-message="generating"
-				resizable-editor
-				initial-preview
-				:project="project"
-				:auth="auth"
-				:set-status="setStatus"
-				:before-send-reply="beforeSendReply"
-				scroll-messages
-				class="rounded-none border-none bg-transparent p-0"
-				@update-thread="updateThread"
-			/>
-			<div v-else-if="isError" class="flex flex-col gap-3 p-4">
-				<p class="m-0 text-red" role="alert">
-					{{ formatMessage(messages.loadError) }}
+		<ProjectActions />
+		<div
+			v-if="project"
+			ref="scrollContainer"
+			class="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain"
+			@scroll="updateScrollPosition"
+		>
+			<div ref="conversationContent">
+				<ConversationThread
+					v-if="thread"
+					v-model:reply-body="draft"
+					:thread="thread"
+					:generating-message="generating"
+					:project="project"
+					:auth="auth"
+					:set-status="setStatus"
+					:before-send-reply="beforeSendReply"
+					initial-preview
+					class="rounded-none border-none bg-transparent p-0 text-xs"
+					@update-thread="updateThread"
+				/>
+				<div v-else-if="isError" class="flex flex-col gap-3 p-4">
+					<p class="m-0 text-red" role="alert">
+						{{ formatMessage(messages.loadError) }}
+					</p>
+					<Button class="w-fit" @click="() => refetch()">
+						{{ formatMessage(messages.retry) }}
+					</Button>
+				</div>
+				<p v-else class="m-0 p-4 text-secondary" role="status">
+					{{ formatMessage(messages.loading) }}
 				</p>
-				<Button class="w-fit" @click="() => refetch()">
-					{{ formatMessage(messages.retry) }}
-				</Button>
 			</div>
-			<p v-else class="m-0 p-4 text-secondary" role="status">
-				{{ formatMessage(messages.loading) }}
-			</p>
 		</div>
 	</div>
 </template>
@@ -43,6 +48,8 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { useResizeObserver } from '@vueuse/core'
+import { ref, watch } from 'vue'
 
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
@@ -61,6 +68,34 @@ const { draft, generating } = injectReviewMessages()
 const panels = injectReviewPanels()
 const { project, threadQuery } = injectProjectReviewPageContext()
 const { data: thread, isError, refetch } = threadQuery
+
+const scrollContainer = ref<HTMLElement>()
+const conversationContent = ref<HTMLElement>()
+const isAtBottom = ref(true)
+
+function updateScrollPosition() {
+	const container = scrollContainer.value
+	if (!container) return
+	isAtBottom.value = container.scrollHeight - container.scrollTop - container.clientHeight <= 1
+}
+
+function scrollToBottom() {
+	const container = scrollContainer.value
+	if (container) container.scrollTop = container.scrollHeight
+}
+
+useResizeObserver([scrollContainer, conversationContent], () => {
+	if (isAtBottom.value) scrollToBottom()
+})
+
+watch(
+	[scrollContainer, () => thread.value?.id],
+	() => {
+		isAtBottom.value = true
+		scrollToBottom()
+	},
+	{ flush: 'post' },
+)
 
 function updateThread(updatedThread: Labrinth.Threads.v3.Thread | null | undefined) {
 	if (!updatedThread) return

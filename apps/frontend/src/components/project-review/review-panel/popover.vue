@@ -14,13 +14,27 @@
 		>
 			<div class="flex items-center justify-between gap-3">
 				<slot name="title" />
-				<IconButton
-					:label="formatMessage(messages.closeReview)"
-					type="quiet"
-					@click="dismiss(true)"
-				>
-					<XIcon />
-				</IconButton>
+				<div class="flex shrink-0 items-center gap-1">
+					<IconButton
+						size="sm"
+						v-tooltip="formatMessage(pinned ? messages.unpinReview : messages.pinReview)"
+						:label="formatMessage(pinned ? messages.unpinReview : messages.pinReview)"
+						:aria-pressed="pinned"
+						:type="pinned ? 'colored-text' : 'quiet'"
+						:color="pinned ? 'green' : undefined"
+						@click="pinned = !pinned"
+					>
+						<PinIcon />
+					</IconButton>
+					<IconButton
+						size="sm"
+						:label="formatMessage(messages.closeReview)"
+						type="quiet"
+						@click="dismiss(true)"
+					>
+						<XIcon />
+					</IconButton>
+				</div>
 			</div>
 			<div class="space-y-4 break-words [&_a]:break-all">
 				<slot />
@@ -31,7 +45,7 @@
 
 <script setup lang="ts">
 import { autoUpdate, flip, offset, shift, size, useFloating } from '@floating-ui/vue'
-import { XIcon } from '@modrinth/assets'
+import { PinIcon, XIcon } from '@modrinth/assets'
 import { IconButton, useVIntl } from '@modrinth/ui'
 import { useEventListener } from '@vueuse/core'
 import { computed, nextTick, onBeforeUnmount, shallowRef, watch } from 'vue'
@@ -81,6 +95,7 @@ watch([isPositioned, pinned], () => {
 	})
 })
 useEventListener('pointerdown', (event) => {
+	if (pinned.value) return
 	if (active.value?.id !== props.anchor.id || !(event.target instanceof Node)) return
 	if (props.anchor.element.contains(event.target) || contains(event.target)) return
 	const focused = document.activeElement
