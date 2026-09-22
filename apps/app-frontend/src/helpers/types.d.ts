@@ -1,4 +1,7 @@
+import type { IconConfig } from '@modrinth/ui'
 import type { ModrinthId } from '@modrinth/utils'
+
+export type { IconBackground } from '@modrinth/ui'
 
 export type GameInstance = {
 	id: string
@@ -53,21 +56,7 @@ export type GameInstance = {
 	}
 }
 
-export type IconBackground =
-	| {
-			type: 'color'
-			value: string
-	  }
-	| {
-			type: 'linear-top-down-gradient'
-			top_color: string
-			bottom_color: string
-	  }
-
-export type InstanceIconConfig = {
-	background: IconBackground
-	symbol: string
-}
+export type InstanceIconConfig = IconConfig
 
 type InstallStage =
 	| 'installed'
