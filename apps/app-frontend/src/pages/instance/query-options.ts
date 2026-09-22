@@ -18,6 +18,7 @@ export const instanceKeys = {
 	detail: (instanceId: string) => [...instanceKeys.all, 'summary', instanceId] as const,
 	processes: (instanceId: string) => [...instanceKeys.all, 'processes', instanceId] as const,
 	content: (instanceId: string) => [...instanceKeys.all, 'content', instanceId] as const,
+	contentSync: (instanceId: string) => [...instanceKeys.all, 'content-sync', instanceId] as const,
 	contentUpdateCheck: (instanceId: string) =>
 		[...instanceKeys.all, 'content-update-check', instanceId] as const,
 	rootPath: (instanceId: string) => [...instanceKeys.detail(instanceId), 'root-path'] as const,
@@ -79,6 +80,7 @@ export function screenshotGroupsQueryOptions() {
 export function instanceDetailQueryOptions(instanceId: string) {
 	return queryOptions({
 		queryKey: instanceKeys.detail(instanceId),
+		networkMode: 'always',
 		queryFn: async () => {
 			const instance = await getInstance(instanceId)
 			if (!instance) throw new Error(`Instance ${instanceId} is not managed`)
@@ -113,6 +115,7 @@ export function instanceContentQueryOptions(
 ) {
 	return queryOptions({
 		queryKey: instanceKeys.content(instanceId),
+		networkMode: 'always',
 		queryFn: () => loadInstanceContentData(instanceId, undefined, onError),
 		staleTime: 30_000,
 	})

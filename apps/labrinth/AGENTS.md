@@ -26,7 +26,6 @@
   - `Authorization: Bearer mra_admin` for default admin user
   - `Authorization: Bearer mra_user` for a regular user
   - `Modrinth-Admin: feedbeef` as admin key
-- If some steps require you to create a project/mod or version for testing, ask the user to go into the web frontend and manually create a project/version
 - When using `sqlx::query` etc. always use the macro form like `sqlx::query!` or `sqlx::query_scalar!` - never the plain function form. Avoid using `query_as!`.
 - Do not use `()` as an error type for operations, unless you have a very good reason. Either make a new error type, or use `eyre::Report`.
 - Do not run `cargo test`, even for a single specific test, unless explicitly prompted to by the user, since it takes a long time to run.

@@ -22,7 +22,7 @@ pub(crate) use self::list_content::{
     dependencies_to_content_items, get_content_projects,
     get_installed_project_ids_for_instance, get_instance_install_candidates,
     get_linked_modpack_info, list_content, list_content_sets,
-    list_linked_modpack_content, list_pack_content,
+    list_indexed_content, list_linked_modpack_content, list_pack_content,
 };
 
 mod embedded_content_metadata;
@@ -36,7 +36,9 @@ pub(crate) use self::refresh_instances::*;
 mod migrate_legacy_content;
 mod sync_content_files;
 pub(crate) use self::migrate_legacy_content::migrate_legacy_content;
-pub(crate) use self::sync_content_files::sync_content_files;
+pub(crate) use self::sync_content_files::{
+    reconcile_instance_renames, sync_content_files,
+};
 
 mod launch_context;
 pub(crate) use self::launch_context::*;

@@ -817,6 +817,7 @@ impl Elasticsearch {
         json!({
             "dis_max": {
                 "queries": [
+                    Self::exact_title_tier(query, 5),
                     Self::prefix_tier(query, &["name"], 4),
                     Self::prefix_tier(
                         query,
@@ -830,6 +831,22 @@ impl Elasticsearch {
                     ),
                     Self::prefix_tier(query, &["summary"], 1),
                 ]
+            }
+        })
+    }
+
+    fn exact_title_tier(query: &str, boost: u8) -> Value {
+        json!({
+            "constant_score": {
+                "filter": {
+                    "term": {
+                        "name.keyword": {
+                            "value": query.trim(),
+                            "case_insensitive": true
+                        }
+                    }
+                },
+                "boost": boost
             }
         })
     }
@@ -1228,4 +1245,36 @@ fn push_json_line<T: Serialize>(output: &mut String, value: &T) -> Result<()> {
     output.push_str(&serde_json::to_string(value)?);
     output.push('\n');
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn exact_title_tier_preserves_special_characters() {
+        let query = Elasticsearch::text_query("end+");
+        let exact_title = &query["dis_max"]["queries"][0]["constant_score"];
+
+        assert_eq!(exact_title["boost"], 5);
+        assert_eq!(
+            exact_title["filter"]["term"]["name.keyword"]["value"],
+            "end+"
+        );
+        assert_eq!(
+            exact_title["filter"]["term"]["name.keyword"]["case_insensitive"],
+            true
+        );
+    }
+
+    #[test]
+    fn exact_title_tier_trims_query_whitespace() {
+        let query = Elasticsearch::text_query("  End+  ");
+
+        assert_eq!(
+            query["dis_max"]["queries"][0]["constant_score"]["filter"]["term"]
+                ["name.keyword"]["value"],
+            "End+"
+        );
+    }
 }

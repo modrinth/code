@@ -132,6 +132,7 @@ pub async fn collection_create(
         created: now,
         updated: now,
         icon_url: None,
+        raw_icon_url: None,
         color: None,
         status: collection_builder.status,
         projects: initial_project_ids,
@@ -482,8 +483,8 @@ pub async fn collection_icon_edit(
 
     let bytes = read_limited_from_payload(
         &mut payload,
-        262144,
-        "Icons must be smaller than 256KiB",
+        524288,
+        "Icons must be smaller than 512KiB",
     )
     .await?;
 

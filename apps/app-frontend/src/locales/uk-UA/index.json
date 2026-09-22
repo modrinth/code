@@ -53,9 +53,6 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Не вдалося завантажити"
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "Примірника не знайдено"
-  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Недійсний шлях до файлу"
   },
