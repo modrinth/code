@@ -48,8 +48,12 @@ const messages = defineMessages({
 		defaultMessage: 'Select {project}',
 	},
 	uploaded: {
-		id: 'content.card.uploaded',
-		defaultMessage: 'Uploaded',
+		id: 'content.card.uploaded-file',
+		defaultMessage: 'Uploaded file',
+	},
+	externalFile: {
+		id: 'content.card.external-file',
+		defaultMessage: 'External file',
 	},
 	frozen: {
 		id: 'content.card.frozen',
@@ -75,6 +79,7 @@ interface Props {
 	owner?: ContentOwner
 	source?: ContentSource
 	external?: boolean
+	externalFile?: boolean
 	enabled?: boolean
 	locked?: boolean
 	installing?: boolean
@@ -109,6 +114,7 @@ const props = withDefaults(defineProps<Props>(), {
 	owner: undefined,
 	source: undefined,
 	external: false,
+	externalFile: false,
 	enabled: undefined,
 	locked: false,
 	installing: false,
@@ -330,7 +336,9 @@ const installTooltip = computed(() => {
 						</AutoLink>
 						<span v-else-if="external" class="flex items-center gap-1 text-secondary">
 							<UploadIcon class="size-4 shrink-0" />
-							<span class="text-sm leading-5">{{ formatMessage(messages.uploaded) }}</span>
+							<span class="text-sm leading-5">{{
+								formatMessage(externalFile ? messages.externalFile : messages.uploaded)
+							}}</span>
 						</span>
 						<template v-if="showVersion && version && !external">
 							<BulletDivider
