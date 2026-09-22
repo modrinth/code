@@ -1,0 +1,32 @@
+[package]
+name = "modrinth-sandbox"
+version = "0.1.0"
+edition.workspace = true
+readme = "README.md"
+
+[dependencies]
+tracing = { workspace = true }
+tokio = { workspace = true, features = ["process"] }
+eyre = { workspace = true }
+async-trait = { workspace = true }
+derive_more = { workspace = true, features = ["debug"] }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["full"] }
+tracing-subscriber = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
+
+# [target.'cfg(unix)'.dependencies]
+# libc =  { workspace = true }
+
+# [target.'cfg(target_os = "linux")'.dependencies]
+# libseccomp =  { workspace = true }
+
+# [target.'cfg(target_os = "macos")'.dependencies]
+# security-framework =  { workspace = true }
+# security-framework-sys =  { workspace = true }
+
+# [target.'cfg(target_os = "windows")'.dependencies]
+# windows =  { workspace = true }
+# junction =  { workspace = true }
+# scopeguard =  { workspace = true }

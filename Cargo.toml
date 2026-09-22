@@ -12,6 +12,7 @@ members = [
   "packages/modrinth-content-management",
   "packages/modrinth-log",
   "packages/modrinth-maxmind",
+  "packages/modrinth-sandbox",
   "packages/modrinth-util",
   "packages/neverbounce",
   "packages/path-util",
@@ -34,6 +35,7 @@ actix-web = "4.11.0"
 actix-web-prom = "0.10.0"
 actix-ws = "0.3.0"
 arc-swap = "1.7.1"
+modrinth-sandbox = { path = "packages/modrinth-sandbox" }
 argon2 = { version = "0.5.3", features = ["std"] }
 ariadne = { path = "packages/ariadne" }
 async-minecraft-ping = { path = "packages/async-minecraft-ping" }

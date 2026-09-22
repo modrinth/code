@@ -23,6 +23,7 @@ async_zip = { workspace = true, features = [
   "tokio-fs",
   "zstd",
 ] }
+modrinth-sandbox = { workspace = true }
 base64 = { workspace = true }
 bon = { workspace = true }
 bytemuck = { workspace = true, features = ["extern_crate_alloc"] }

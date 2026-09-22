@@ -7191,6 +7191,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "modrinth-sandbox"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "clap 4.5.48",
+ "derive_more 2.1.1",
+ "eyre",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "modrinth-util"
 version = "0.0.0"
 dependencies = [
@@ -12362,6 +12375,7 @@ dependencies = [
  "itertools 0.14.0",
  "json5",
  "modrinth-content-management",
+ "modrinth-sandbox",
  "notify",
  "notify-debouncer-mini",
  "p256",

@@ -1,6 +1,8 @@
 //! Theseus state management system
 use crate::util::fetch::{FetchSemaphore, IoSemaphore};
 use dashmap::DashMap;
+use eyre::Context;
+use modrinth_sandbox::SandboxEnv;
 use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
 use tokio::sync::{Mutex, MutexGuard, OnceCell, OwnedMutexGuard, Semaphore};
@@ -118,6 +120,7 @@ pub struct State {
     pub(crate) pool: SqlitePool,
 
     pub(crate) file_watcher: FileWatcher,
+    pub sandbox_env: SandboxEnv,
 }
 
 impl State {
@@ -374,6 +377,10 @@ impl State {
 
         let friends_socket = FriendsSocket::new();
 
+        let sandbox_env = modrinth_sandbox::create_env()
+            .await
+            .wrap_err("failed to setup sandboxing")?;
+
         Ok(Arc::new(Self {
             startup_complete: AtomicBool::new(false),
             directories,
@@ -396,7 +403,7 @@ impl State {
             restart_after_pending_update: AtomicBool::new(false),
             pool,
             file_watcher,
-            // app_identifier,
+            sandbox_env,
         }))
     }
 }
