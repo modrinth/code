@@ -59,7 +59,7 @@ export const CreateWorld: Story = {
 // ============================================
 
 export const ServerOnboarding: Story = {
-	name: 'Server Setup (Legacy) (Hosting)',
+	name: 'Server onboarding (Hosting)',
 	render: () => ({
 		components: { CreationFlowModal, Button },
 		setup() {
@@ -69,6 +69,10 @@ export const ServerOnboarding: Story = {
 
 			const onCreate = (config: CreationFlowContextValue) => {
 				lastEvent.value = `create emitted — loader: ${config.selectedLoader.value}, version: ${config.selectedGameVersion.value}`
+				config.loading.value = false
+				config.inviteLink.value = 'https://modrinth.com/share/example-invite'
+				config.inviteSubmitted.value = true
+				config.modal.value?.setStage('invite-friends')
 			}
 			return { modalRef, openModal, lastEvent, onCreate }
 		},

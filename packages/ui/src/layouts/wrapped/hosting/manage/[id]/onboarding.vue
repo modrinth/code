@@ -16,7 +16,11 @@
 
 			<div class="rounded-[20px] border border-solid border-surface-5 bg-surface-3 p-5">
 				<div class="flex flex-col">
-					<div v-for="(step, i) in steps" :key="i" class="flex gap-3">
+					<div
+						v-for="(step, i) in steps"
+						:key="i"
+						class="flex gap-3"
+					>
 						<div class="flex w-10 shrink-0 flex-col items-center">
 							<div
 								class="flex size-10 items-center justify-center rounded-full border border-solid border-surface-5 bg-surface-4"
@@ -28,7 +32,7 @@
 								class="my-2 flex-1 w-0.5 rounded-full bg-surface-5"
 							/>
 						</div>
-						<div :class="['flex flex-col gap-1 pt-2', i < steps.length - 1 ? 'pb-[44px]' : '']">
+						<div class="flex flex-col gap-1 pt-2" :class="i < steps.length - 1 ? 'pb-4' : ''">
 							<span class="text-base font-semibold text-contrast">
 								{{ i + 1 }}. {{ step.title }}
 							</span>
@@ -68,7 +72,7 @@
 			:get-project-versions="getProjectVersions"
 			:finish-disabled="!canSetup"
 			:finish-disabled-tooltip="!canSetup ? permissionDeniedMessage : undefined"
-			@hide="() => {}"
+			@after-hide="onModalAfterHide"
 			@browse-modpacks="onBrowseModpacks"
 			@create="onCreate"
 		/>
@@ -87,7 +91,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import type { CreationFlowContextValue } from '#ui/components'
@@ -162,7 +166,7 @@ const messages = defineMessages({
 	inviteFriendsDescription: {
 		id: 'servers.setup.onboarding.step.invite-friends.description',
 		defaultMessage:
-			"Share your server with friends by copying the address and letting them know which mods they'll need to join.",
+			'Invite friends to your server with a link and let them join in one click from the Modrinth App.',
 	},
 })
 
@@ -178,6 +182,7 @@ const dismissServerIntro = useDismissServerIntro()
 
 const props = withDefaults(
 	defineProps<{
+		siteUrl: string
 		browseModpacks?: (args: {
 			serverId: string
 			worldId: string | null
@@ -189,7 +194,11 @@ const props = withDefaults(
 	},
 )
 
+const emit = defineEmits<{ 'setup-started': []; 'invite-started': []; 'setup-finished': [] }>()
+
 const modalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
+let inviteModalHidden = false
+let introFinished = false
 
 const uploading = ref(false)
 const uploadedBytes = ref(0)
@@ -202,8 +211,6 @@ const openModal = () => {
 	if (!canSetup.value) return
 	modalRef.value?.show()
 }
-
-onBeforeUnmount(() => modalRef.value?.hide())
 
 function onBrowseModpacks() {
 	if (!canSetup.value) return
@@ -260,9 +267,32 @@ onMounted(async () => {
 })
 
 async function finalizeSetup() {
-	modalRef.value?.hide()
-	await dismissServerIntro.mutateAsync(serverId)
-	await router.push(`/hosting/manage/${serverId}/`)
+	try {
+		await dismissServerIntro.mutateAsync(serverId)
+	} finally {
+		introFinished = true
+		finishInviteIfReady()
+	}
+}
+
+function onModalAfterHide() {
+	if (!modalRef.value?.ctx?.inviteSubmitted.value) {
+		emit('setup-finished')
+		return
+	}
+	inviteModalHidden = true
+	finishInviteIfReady()
+}
+
+function finishInviteIfReady() {
+	if (inviteModalHidden && introFinished) emit('setup-finished')
+}
+
+function showInvite(config: CreationFlowContextValue) {
+	inviteModalHidden = false
+	introFinished = false
+	emit('invite-started')
+	config.showInvite(serverId, worldId.value!, props.siteUrl, finalizeSetup)
 }
 
 function markInstalling() {
@@ -282,11 +312,12 @@ const onCreate = async (config: CreationFlowContextValue) => {
 		config.loading.value = false
 		return
 	}
+	emit('setup-started')
 
 	if (config.projectInstall.value) {
 		try {
 			await config.installServerContent(serverId, worldId.value!)
-			await finalizeSetup()
+			showInvite(config)
 		} catch (error) {
 			addNotification({
 				title: formatMessage(messages.installationFailedTitle),
@@ -301,7 +332,6 @@ const onCreate = async (config: CreationFlowContextValue) => {
 
 	// Handle mrpack file upload
 	if (config.setupType.value === 'modpack' && config.modpackFile.value) {
-		modalRef.value?.hide()
 		uploading.value = true
 		uploadedBytes.value = 0
 		totalBytes.value = config.modpackFile.value.size
@@ -321,7 +351,7 @@ const onCreate = async (config: CreationFlowContextValue) => {
 			)
 			await handle.promise
 			markInstalling()
-			await finalizeSetup()
+			showInvite(config)
 		} catch {
 			addNotification({
 				title: formatMessage(messages.modpackUploadFailedTitle),
@@ -364,7 +394,7 @@ const onCreate = async (config: CreationFlowContextValue) => {
 	try {
 		await client.archon.content_v1.installContent(serverId, worldId.value!, request)
 		markInstalling()
-		await finalizeSetup()
+		showInvite(config)
 	} catch {
 		addNotification({
 			title: formatMessage(messages.installationFailedTitle),
