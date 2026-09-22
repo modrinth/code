@@ -41,16 +41,11 @@ export const modpackTitleSimilaritiesIssue = issue({
 
 export const titleReviewPanel = panel({
 	field: 'title',
-	title: 'Title and slug',
+	title: 'Title',
 	hint: "Are the project's name and URL accurate and appropriate?",
 	icon: BookOpenIcon,
 }).content(
 	section().content(
-		toggle({
-			label: 'Misused slug',
-			issue: misusedSlugIssue,
-			shown: ({ ProjectV3 }) => generateUrlSlug(ProjectV3.name) !== ProjectV3.slug,
-		}),
 		toggle({
 			label: 'Contains Useless Info',
 			issue: titleUselessInfoIssue,
@@ -78,6 +73,16 @@ export const titleReviewPanel = panel({
 			label: 'Forked Project',
 			id: 'title-similarities-fork',
 			issue: titleSimilaritiesIssue,
+		}),
+	),
+	section({
+		label: 'Slug',
+		shown: ({ ProjectV3 }) => generateUrlSlug(ProjectV3.name) !== ProjectV3.slug,
+	}).content(
+		toggle({
+			label: 'Misused slug',
+			issue: misusedSlugIssue,
+			shown: ({ ProjectV3 }) => generateUrlSlug(ProjectV3.name) !== ProjectV3.slug,
 		}),
 	),
 )

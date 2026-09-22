@@ -166,6 +166,10 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.icon',
 		defaultMessage: 'Icon',
 	},
+	openIcon: {
+		id: 'moderation.project-review.openIcon',
+		defaultMessage: 'View enlarged project icon',
+	},
 	summary: {
 		id: 'moderation.project-review.summary',
 		defaultMessage: 'Summary',

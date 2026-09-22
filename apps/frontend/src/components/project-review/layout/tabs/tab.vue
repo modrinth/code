@@ -1,6 +1,6 @@
 <template>
 	<span
-		class="project-review-tab box-border flex h-full w-full items-center whitespace-nowrap rounded-lg border border-solid border-transparent px-2.5 text-[13px] font-semibold leading-none transition-colors duration-150 hover:text-contrast motion-reduce:transition-none"
+		class="project-review-tab box-border flex h-full w-full items-center whitespace-nowrap rounded-lg border border-solid border-transparent px-2 text-[13px] font-semibold leading-none transition-colors duration-150 hover:text-contrast motion-reduce:transition-none"
 		:class="isActive ? 'project-review-tab-active text-contrast' : 'text-secondary'"
 	>
 		{{ formatMessage(projectReviewMessages[params.params.tab]) }}

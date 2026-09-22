@@ -4,6 +4,7 @@
 		:color="color === 'standard' ? undefined : color"
 		:disabled="disabled"
 		:aria-label="icon ? label : undefined"
+		size="sm"
 		@click="emit('update:modelValue', !modelValue)"
 	>
 		<component :is="icon" v-if="icon" />
