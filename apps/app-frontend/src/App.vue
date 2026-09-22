@@ -28,6 +28,7 @@ import {
 	ContentInstallModal,
 	ContentUpdaterModal,
 	CreationFlowModal,
+	createServerOnboardingInviteFlow,
 	defineMessages,
 	I18nDebugPanel,
 	IconButton,
@@ -41,6 +42,8 @@ import {
 	providePageContext,
 	providePopupNotificationManager,
 	provideServerPlay,
+	provideServerOnboardingInviteFlow,
+	ServerOnboardingInviteModal,
 	TeleportOverflowMenu,
 	TooltipDirective,
 	useDebugLogger,
@@ -285,6 +288,7 @@ useAppEvent('ads_consent_required', handleAdsConsentRequired, appEvents)
 
 const tauriApiClient = createAppClient()
 provideModrinthClient(tauriApiClient)
+provideServerOnboardingInviteFlow(createServerOnboardingInviteFlow())
 const { data: authenticatedModrinthUser } = useQuery({
 	queryKey: computed(() => ['authenticated-user', 'campaigns', credentials.value?.user?.id]),
 	queryFn: () => tauriApiClient.labrinth.users_v3.getAuthenticated(),
@@ -2016,6 +2020,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			@create="handleCreate"
 			@browse-modpacks="handleBrowseModpacks"
 		/>
+		<ServerOnboardingInviteModal />
 		<IconEditorModal
 			ref="creationIconEditorModal"
 			:config="creationGeneratedIcon?.config"

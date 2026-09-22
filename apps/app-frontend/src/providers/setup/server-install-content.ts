@@ -10,9 +10,9 @@ import {
 	getTargetInstallPreferences,
 	injectModrinthClient,
 	injectNotificationManager,
+	injectServerOnboardingInviteFlow,
 	readStoredServerInstallQueue,
 	resolveServerAddonInstallPlans,
-	useDismissServerIntro,
 	useServerContextRuntime,
 	useServerPanelSync,
 	waitForServerContextRuntimeReady,
@@ -21,6 +21,9 @@ import {
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, type ComputedRef, nextTick, type Ref, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+import { config as appConfig } from '@/config'
+
 
 type ServerFlowFrom = 'onboarding' | 'reset-server'
 
@@ -100,9 +103,9 @@ export function createServerInstallContent(opts: {
 	const route = useRoute()
 	const router = useRouter()
 	const client = injectModrinthClient()
+	const inviteFlow = injectServerOnboardingInviteFlow()
 	const { handleError } = injectNotificationManager()
 	const queryClient = useQueryClient()
-	const dismissServerIntro = useDismissServerIntro()
 
 	const serverIdQuery = computed(() => readQueryString(route.query.sid))
 	const worldIdQuery = computed(() => readQueryString(route.query.wid))
@@ -525,14 +528,13 @@ export function createServerInstallContent(opts: {
 					properties: config.buildProperties(),
 				} satisfies Archon.Content.v1.InstallWorldContent)
 			}
-			serverSetupModalRef.value?.hide()
-
 			if (serverFlowFrom.value === 'onboarding') {
-				await dismissServerIntro.mutateAsync(sid)
-				await router.push(`/hosting/manage/${sid}/content`)
+				await inviteFlow.open({ serverId: sid, worldId: wid, siteUrl: appConfig.siteUrl })
+				await router.push(`/hosting/manage/${sid}`)
 				return
 			}
 
+			serverSetupModalRef.value?.hide()
 			await router.push(`/hosting/manage/${sid}?openSettings=installation`)
 		} catch (err) {
 			handleError(err as Error)

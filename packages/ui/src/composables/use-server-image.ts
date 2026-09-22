@@ -67,17 +67,17 @@ export function useServerImage(
 				const fsAuth = await client.archon.servers_v0.getFilesystemAuth(serverId)
 
 				try {
-					const blob = await client.kyros.files_v0.downloadFileWithAuth(fsAuth, '/server-icon.png')
+					const blob = await client.kyros.files_v0.downloadFileWithAuth(
+						fsAuth,
+						'/server-icon-original.png',
+					)
 					return await processImageBlob(blob, iconSize)
 				} catch (error) {
 					if (!isNotFound(error)) throw error
 				}
 
 				try {
-					const blob = await client.kyros.files_v0.downloadFileWithAuth(
-						fsAuth,
-						'/server-icon-original.png',
-					)
+					const blob = await client.kyros.files_v0.downloadFileWithAuth(fsAuth, '/server-icon.png')
 					return await processImageBlob(blob, iconSize)
 				} catch (error) {
 					if (!isNotFound(error)) throw error
