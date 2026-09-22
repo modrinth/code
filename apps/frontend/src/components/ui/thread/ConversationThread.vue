@@ -128,239 +128,233 @@
 						class="w-fit"
 						@click="runBlockingAction('reopen', () => reopenReport())"
 					>
-						<SpinnerIcon v-if="loadingAction === 'reopen'" class="animate-spin" aria-hidden="true" />
+						<SpinnerIcon
+							v-if="loadingAction === 'reopen'"
+							class="animate-spin"
+							aria-hidden="true"
+						/>
 						<CheckCircleIcon v-else aria-hidden="true" />
 						{{ formatMessage(messages.actionReopenThread) }}
 					</Button>
 				</div>
 				<template v-else-if="!report || !report.closed">
 					<div
-						class="relative mb-2 mt-2.5 shrink-0 border-0 border-t border-solid border-divider pt-2.5"
+						class="relative mb-2 mt-2.5 shrink-0 border-0 border-t border-solid border-divider px-1 pt-2.5"
 					>
-						<MarkdownEditor
-							v-model="replyBody"
-							:initial-preview="initialPreview"
-							:disabled="generatingMessage"
-							:placeholder="
-								formatMessage(
-									sortedMessages.length > 0
-										? messages.replyEditorPlaceholderReply
-										: messages.replyEditorPlaceholderSend,
-								)
-							"
-							:on-image-upload="onUploadImage"
-						/>
-					</div>
-				</div>
-				<div class="mx-2 mt-3 flex shrink-0 flex-col gap-4">
-					<div class="flex flex-wrap items-center justify-end gap-2">
-						<template v-if="currentMember && !currentMember.staffOnly">
-							<template v-if="isRejected(project)">
-								<Button
-									v-if="replyBody"
-									type="colored"
-									color="orange"
-									:disabled="isLoading"
-									@click="openResubmitModal(true)"
-								>
-									<ScaleIcon aria-hidden="true" />
-									{{ formatMessage(messages.actionResubmitForReviewWithReply) }}
-								</Button>
-								<Button v-else :disabled="isLoading" @click="openResubmitModal(false)">
-									<ScaleIcon aria-hidden="true" />
-									{{ formatMessage(messages.actionResubmitForReview) }}
-								</Button>
-							</template>
-						</template>
-						<Button
-							v-if="isStaff(auth.user)"
-							:disabled="!replyBody || isLoading"
-							@click="runBlockingAction('private-note', () => sendReply(null, true))"
+						<div
+							v-for="mode in isStaff(auth.user) ? ['reply', 'note'] : ['reply']"
+							v-show="editorMode === mode"
+							:key="`${thread.id}-${mode}`"
 						>
-							<SpinnerIcon
-								v-if="loadingAction === 'private-note'"
-								class="animate-spin"
-								aria-hidden="true"
-							/>
-							<StickyNotePlusIcon v-else aria-hidden="true" />
-							{{ formatMessage(messages.actionAddPrivateNote) }}
-						</Button>
-						<Button
-							v-if="sortedMessages.length > 0"
-							type="colored"
-							color="brand"
-							:disabled="!replyBody || isLoading"
-							@click="
-								isApproved(project) && !isStaff(auth.user)
-									? openReplyModal()
-									: runBlockingAction('reply', () => sendReply())
-							"
-						>
-							<SpinnerIcon
-								v-if="loadingAction === 'reply'"
-								class="animate-spin"
-								aria-hidden="true"
-							/>
-							<ReplyIcon v-else aria-hidden="true" />
-							{{ formatMessage(messages.actionReply) }}
-						</Button>
-						<Button
-							v-else
-							:disabled="!replyBody || isLoading"
-							@click="
-								isApproved(project) && !isStaff(auth.user)
-									? openReplyModal()
-									: runBlockingAction('send', () => sendReply())
-							"
-						>
-							<SpinnerIcon
-								v-if="loadingAction === 'send'"
-								class="animate-spin"
-								aria-hidden="true"
-							/>
-							<SendIcon v-else aria-hidden="true" />
-							{{ formatMessage(messages.actionSend) }}
-						</Button>
-						<Button
-							v-if="isStaff(auth.user)"
-							:disabled="!replyBody || isLoading"
-							@click="runBlockingAction('private-note', () => sendReply(null, true))"
-						>
-							<SpinnerIcon
-								v-if="loadingAction === 'private-note'"
-								class="animate-spin"
-								aria-hidden="true"
-							/>
-							<StickyNotePlusIcon v-else aria-hidden="true" />
-							{{ formatMessage(messages.actionAddPrivateNote) }}
-						</Button>
-						<template v-if="currentMember && !currentMember.staffOnly">
-							<template v-if="isRejected(project)">
-								<Button
-									v-if="replyBody"
-									type="colored"
-									color="orange"
-									:disabled="isLoading || reviewSubmissionDisabled"
-									@click="openResubmitModal(true)"
-								>
-									<ScaleIcon aria-hidden="true" />
-									{{ formatMessage(messages.actionResubmitForReviewWithReply) }}
-								</Button>
-								<Button
-									v-else
-									:disabled="isLoading || reviewSubmissionDisabled"
-									@click="openResubmitModal(false)"
-								>
-									<ScaleIcon aria-hidden="true" />
-									{{ formatMessage(messages.actionResubmitForReview) }}
-								</Button>
-							</template>
-						</template>
-					</div>
-					<div
-						v-if="report || (project && isStaff(auth.user))"
-						class="flex flex-wrap items-center gap-2"
-					>
-						<template v-if="report">
-							<Button
-								v-if="isStaff(auth.user) && replyBody"
-								type="colored"
-								color="red"
+							<MarkdownEditor
+								:model-value="mode === 'note' ? privateNoteBody : replyBody"
+								:initial-preview="mode === 'reply' && initialPreview"
 								:disabled="isLoading"
-								@click="runBlockingAction('close-with-reply', () => closeReport(true))"
+								:placeholder="
+									formatMessage(
+										mode === 'note'
+											? messages.privateNotePlaceholder
+											: sortedMessages.length > 0
+												? messages.replyEditorPlaceholderReply
+												: messages.replyEditorPlaceholderSend,
+									)
+								"
+								:on-image-upload="(file) => onUploadImage(file, mode)"
+								@update:model-value="
+									mode === 'note' ? (privateNoteBody = $event) : (replyBody = $event)
+								"
+							>
+								<template v-if="isStaff(auth.user)" #after-preview>
+									<Tabs
+										v-model:value="editorMode"
+										class="!ml-auto !h-7 shrink-0 !gap-0.5 overflow-hidden !rounded-lg [&>button]:!rounded-md [&>button]:!px-2 [&>button]:!text-xs"
+										:tabs="[
+											{ value: 'reply', label: formatMessage(messages.actionReply) },
+											{ value: 'note', label: formatMessage(messages.privateNoteTab) },
+										]"
+									/>
+								</template>
+							</MarkdownEditor>
+						</div>
+					</div>
+					<div class="mx-2 mt-3 flex shrink-0 flex-col gap-4">
+						<div class="flex flex-wrap items-center justify-end gap-2">
+							<template v-if="editorMode === 'reply' && currentMember && !currentMember.staffOnly">
+								<template v-if="isRejected(project)">
+									<Button
+										v-if="replyBody"
+										type="colored"
+										color="orange"
+										:disabled="isLoading || reviewSubmissionDisabled"
+										@click="openResubmitModal(true)"
+									>
+										<ScaleIcon aria-hidden="true" />
+										{{ formatMessage(messages.actionResubmitForReviewWithReply) }}
+									</Button>
+									<Button
+										v-else
+										:disabled="isLoading || reviewSubmissionDisabled"
+										@click="openResubmitModal(false)"
+									>
+										<ScaleIcon aria-hidden="true" />
+										{{ formatMessage(messages.actionResubmitForReview) }}
+									</Button>
+								</template>
+							</template>
+							<Button
+								v-if="isStaff(auth.user) && editorMode === 'note'"
+								:disabled="!privateNoteBody || isLoading"
+								@click="runBlockingAction('private-note', () => sendReply(null, true))"
 							>
 								<SpinnerIcon
-									v-if="loadingAction === 'close-with-reply'"
+									v-if="loadingAction === 'private-note'"
 									class="animate-spin"
 									aria-hidden="true"
 								/>
-								<CheckCircleIcon v-else aria-hidden="true" />
-								{{ formatMessage(messages.actionCloseWithReply) }}
+								<StickyNotePlusIcon v-else aria-hidden="true" />
+								{{ formatMessage(messages.actionAddPrivateNote) }}
+							</Button>
+							<Button
+								v-else-if="sortedMessages.length > 0"
+								type="colored"
+								color="brand"
+								:disabled="!replyBody || isLoading"
+								@click="
+									isApproved(project) && !isStaff(auth.user)
+										? openReplyModal()
+										: runBlockingAction('reply', () => sendReply())
+								"
+							>
+								<SpinnerIcon
+									v-if="loadingAction === 'reply'"
+									class="animate-spin"
+									aria-hidden="true"
+								/>
+								<ReplyIcon v-else aria-hidden="true" />
+								{{ formatMessage(messages.actionReply) }}
 							</Button>
 							<Button
 								v-else
-								:disabled="isLoading"
-								@click="runBlockingAction('close', () => closeReport())"
+								:disabled="!replyBody || isLoading"
+								@click="
+									isApproved(project) && !isStaff(auth.user)
+										? openReplyModal()
+										: runBlockingAction('send', () => sendReply())
+								"
 							>
 								<SpinnerIcon
-									v-if="loadingAction === 'close'"
+									v-if="loadingAction === 'send'"
 									class="animate-spin"
 									aria-hidden="true"
 								/>
-								<CheckCircleIcon v-else aria-hidden="true" />
-								{{ formatMessage(messages.actionCloseThread) }}
+								<SendIcon v-else aria-hidden="true" />
+								{{ formatMessage(messages.actionSend) }}
 							</Button>
-						</template>
-						<template v-if="project">
-							<template v-if="isStaff(auth.user)">
+						</div>
+						<div
+							v-if="editorMode === 'reply' && (report || (project && isStaff(auth.user)))"
+							class="flex flex-wrap items-center gap-2"
+						>
+							<template v-if="report">
 								<Button
+									v-if="isStaff(auth.user) && replyBody"
 									type="colored"
-									color="green"
-									class="moderation-action flex-1"
-									:disabled="isApproved(project) || isLoading"
-									@click="
-										replyBody
-											? runBlockingAction('approve-with-reply', () => sendReply(requestedStatus))
-											: runBlockingAction('approve', () => setStatus(requestedStatus))
-									"
-								>
-									<SpinnerIcon
-										v-if="loadingAction === 'approve-with-reply' || loadingAction === 'approve'"
-										class="animate-spin"
-										aria-hidden="true"
-									/>
-									{{
-										formatMessage(
-											replyBody ? messages.actionApproveWithReply : messages.actionApprove,
-										)
-									}}
-								</Button>
-								<Button
-									type="outlined"
-									color="orange"
-									class="moderation-action flex-1"
-									:disabled="project.status === 'withheld' || isLoading"
-									@click="
-										replyBody
-											? runBlockingAction('withhold-with-reply', () => sendReply('withheld'))
-											: runBlockingAction('withhold', () => setStatus('withheld'))
-									"
-								>
-									<SpinnerIcon
-										v-if="loadingAction === 'withhold-with-reply' || loadingAction === 'withhold'"
-										class="animate-spin"
-										aria-hidden="true"
-									/>
-									{{
-										formatMessage(
-											replyBody ? messages.actionWithholdWithReply : messages.actionWithhold,
-										)
-									}}
-								</Button>
-								<Button
-									type="outlined"
 									color="red"
-									class="moderation-action flex-1"
-									:disabled="project.status === 'rejected' || isLoading"
-									@click="
-										replyBody
-											? runBlockingAction('reject-with-reply', () => sendReply('rejected'))
-											: runBlockingAction('reject', () => setStatus('rejected'))
-									"
+									:disabled="isLoading"
+									@click="runBlockingAction('close-with-reply', () => closeReport(true))"
 								>
 									<SpinnerIcon
-										v-if="loadingAction === 'reject-with-reply' || loadingAction === 'reject'"
+										v-if="loadingAction === 'close-with-reply'"
 										class="animate-spin"
 										aria-hidden="true"
 									/>
-									{{
-										formatMessage(
-											replyBody ? messages.actionRejectWithReply : messages.actionReject,
-										)
-									}}
+									<CheckCircleIcon v-else aria-hidden="true" />
+									{{ formatMessage(messages.actionCloseWithReply) }}
 								</Button>
-								<!-- TODO: TBD whether we still need these actions -->
-								<!-- <TeleportOverflowMenu
+								<Button
+									v-else
+									:disabled="isLoading"
+									@click="runBlockingAction('close', () => closeReport())"
+								>
+									<SpinnerIcon
+										v-if="loadingAction === 'close'"
+										class="animate-spin"
+										aria-hidden="true"
+									/>
+									<CheckCircleIcon v-else aria-hidden="true" />
+									{{ formatMessage(messages.actionCloseThread) }}
+								</Button>
+							</template>
+							<template v-if="project">
+								<template v-if="isStaff(auth.user)">
+									<Button
+										type="colored"
+										color="green"
+										class="moderation-action flex-1"
+										:disabled="isApproved(project) || isLoading"
+										@click="
+											replyBody
+												? runBlockingAction('approve-with-reply', () => sendReply(requestedStatus))
+												: runBlockingAction('approve', () => setStatus(requestedStatus))
+										"
+									>
+										<SpinnerIcon
+											v-if="loadingAction === 'approve-with-reply' || loadingAction === 'approve'"
+											class="animate-spin"
+											aria-hidden="true"
+										/>
+										{{
+											formatMessage(
+												replyBody ? messages.actionApproveWithReply : messages.actionApprove,
+											)
+										}}
+									</Button>
+									<Button
+										type="outlined"
+										color="orange"
+										class="moderation-action flex-1"
+										:disabled="project.status === 'withheld' || isLoading"
+										@click="
+											replyBody
+												? runBlockingAction('withhold-with-reply', () => sendReply('withheld'))
+												: runBlockingAction('withhold', () => setStatus('withheld'))
+										"
+									>
+										<SpinnerIcon
+											v-if="loadingAction === 'withhold-with-reply' || loadingAction === 'withhold'"
+											class="animate-spin"
+											aria-hidden="true"
+										/>
+										{{
+											formatMessage(
+												replyBody ? messages.actionWithholdWithReply : messages.actionWithhold,
+											)
+										}}
+									</Button>
+									<Button
+										type="outlined"
+										color="red"
+										class="moderation-action flex-1"
+										:disabled="project.status === 'rejected' || isLoading"
+										@click="
+											replyBody
+												? runBlockingAction('reject-with-reply', () => sendReply('rejected'))
+												: runBlockingAction('reject', () => setStatus('rejected'))
+										"
+									>
+										<SpinnerIcon
+											v-if="loadingAction === 'reject-with-reply' || loadingAction === 'reject'"
+											class="animate-spin"
+											aria-hidden="true"
+										/>
+										{{
+											formatMessage(
+												replyBody ? messages.actionRejectWithReply : messages.actionReject,
+											)
+										}}
+									</Button>
+									<!-- TODO: TBD whether we still need these actions -->
+									<!-- <TeleportOverflowMenu
 									type="quiet"
 									:circular="false"
 									:label="formatMessage(commonMessages.moreOptionsButton)"
@@ -458,11 +452,12 @@
 										{{ formatMessage(messages.actionSendToReview) }}
 									</template>
 								</TeleportOverflowMenu> -->
+								</template>
 							</template>
-						</template>
+						</div>
 					</div>
-				</div>
-			</template>
+				</template>
+			</slot>
 		</div>
 	</div>
 </template>
@@ -489,10 +484,11 @@ import {
 	IntlFormatted,
 	MarkdownEditor,
 	NewModal,
+	Tabs,
 	TeleportOverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
-import { ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import ThreadMessage from '~/components/ui/thread/ThreadMessage.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
@@ -503,6 +499,14 @@ const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	privateNoteTab: {
+		id: 'conversation-thread.private-note.tab',
+		defaultMessage: 'Private note',
+	},
+	privateNotePlaceholder: {
+		id: 'conversation-thread.private-note.placeholder',
+		defaultMessage: 'Leave a private note for staff...',
+	},
 	resubmitModalHeaderResubmitting: {
 		id: 'conversation-thread.resubmit-modal.header.resubmitting',
 		defaultMessage: 'Resubmitting for review',
@@ -698,6 +702,9 @@ const members = computed(() => {
 })
 
 const replyBody = defineModel('replyBody', { type: String, default: '' })
+const privateNoteBody = ref('')
+const editorMode = ref('reply')
+
 const sortedMessages = computed(() => {
 	if (props.thread !== null) {
 		return props.thread.messages
@@ -740,13 +747,23 @@ async function updateThreadLocal() {
 }
 
 const imageIDs = ref([])
+const privateNoteImageIDs = ref([])
 
-async function onUploadImage(file) {
+watch(
+	() => props.thread.id,
+	() => {
+		privateNoteBody.value = ''
+		editorMode.value = 'reply'
+		imageIDs.value = []
+		privateNoteImageIDs.value = []
+	},
+)
+
+async function onUploadImage(file, mode) {
+	const draftImages = mode === 'note' ? privateNoteImageIDs : imageIDs
 	const response = await useImageUpload(file, { context: 'thread_message' })
 
-	imageIDs.value.push(response.id)
-	// Keep the last 10 entries of image IDs
-	imageIDs.value = imageIDs.value.slice(-10)
+	draftImages.value = [...draftImages.value, response.id].slice(-10)
 
 	return response.url
 }
@@ -758,19 +775,21 @@ async function sendReplyFromModal(status = null, privateMessage = false) {
 
 async function sendReply(status = null, privateMessage = false) {
 	if (status === 'processing' && props.reviewSubmissionDisabled) return
+	const draftBody = privateMessage ? privateNoteBody : replyBody
+	const draftImages = privateMessage ? privateNoteImageIDs : imageIDs
 	try {
 		const body = {
 			body: {
 				type: 'text',
-				body: replyBody.value,
+				body: draftBody.value,
 				private: privateMessage,
 			},
 		}
 
-		if (imageIDs.value.length > 0) {
+		if (draftImages.value.length > 0) {
 			body.body = {
 				...body.body,
-				uploaded_images: imageIDs.value,
+				uploaded_images: draftImages.value,
 			}
 		}
 
@@ -781,7 +800,8 @@ async function sendReply(status = null, privateMessage = false) {
 			body,
 		})
 
-		replyBody.value = ''
+		draftBody.value = ''
+		draftImages.value = []
 
 		await updateThreadLocal()
 		if (status !== null) {

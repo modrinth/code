@@ -242,11 +242,12 @@
 						</template>
 					</template>
 				</div>
-				<div class="flex items-center gap-2">
+				<div class="flex items-center gap-2 w-full">
 					<Toggle :id="previewId" v-model="previewMode" small />
 					<label class="label" :for="previewId">
 						{{ formatMessage(messages.editorPreviewToggleLabel) }}
 					</label>
+					<slot name="after-preview" />
 				</div>
 			</div>
 		</div>
