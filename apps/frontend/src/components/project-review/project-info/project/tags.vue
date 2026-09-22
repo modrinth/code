@@ -3,7 +3,7 @@
 		<TagItem
 			v-for="category in project.categories"
 			:key="category"
-			class="!border-brand !bg-transparent !text-brand opacity-70"
+			class="!border-brand !bg-transparent !text-brand opacity-90"
 			>{{ formatCategory(formatMessage, category) }}</TagItem
 		>
 		<TagItem
