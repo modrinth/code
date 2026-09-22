@@ -48,9 +48,9 @@ pub(crate) fn apply_link_changes(
                 crate::models::projects::Link {
                     platform: field.clone(),
                     url: url.clone(),
-					donation: field
-						.parse::<LinkPlatform>()
-						.map_or(true, LinkPlatform::is_donation),
+                    donation: field
+                        .parse::<LinkPlatform>()
+                        .map_or(true, LinkPlatform::is_donation),
                 },
             );
         } else {

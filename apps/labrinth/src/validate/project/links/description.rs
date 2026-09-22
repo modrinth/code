@@ -102,7 +102,7 @@ fn push(targets: &mut Vec<LinkTarget>, url: &str, image: bool) {
         && matches!(parsed.scheme(), "http" | "https" | "file")
     {
         targets.push(LinkTarget {
-			field: LinkField::Description,
+            field: LinkField::Description,
             url: parsed.to_string(),
             image,
         });

@@ -340,6 +340,30 @@ pub(super) fn validate_target(target: &LinkTarget) -> Option<ProjectNag> {
     None
 }
 
+pub(super) fn validate_input(
+    links: &HashMap<String, String>,
+    license_url: Option<&str>,
+    description: &str,
+) -> Vec<ProjectNag> {
+    let mut targets = links
+        .iter()
+        .map(|(field, url)| LinkTarget {
+            field: field.as_str().into(),
+            url: url.clone(),
+            image: false,
+        })
+        .collect::<Vec<_>>();
+    if let Some(url) = license_url {
+        targets.push(LinkTarget {
+            field: LinkField::License,
+            url: url.into(),
+            image: false,
+        });
+    }
+    targets.extend(self::description::extract(description));
+    validate_targets_static(&targets)
+}
+
 pub(super) fn globally_blocked(url: &Url) -> bool {
     from_domains(url, GLOBAL_BLOCKS) || url.host_str().is_some_and(is_nsfw_host)
 }
