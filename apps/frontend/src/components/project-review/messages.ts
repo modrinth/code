@@ -390,6 +390,10 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.openImage',
 		defaultMessage: 'Open image {number}',
 	},
+	openImageInNewTab: {
+		id: 'moderation.project-review.openImageInNewTab',
+		defaultMessage: 'Open image in new tab',
+	},
 	featured: {
 		id: 'moderation.project-review.featured',
 		defaultMessage: 'Featured',

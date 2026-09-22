@@ -242,7 +242,7 @@
 						</template>
 					</template>
 				</div>
-				<div class="flex items-center gap-2 w-full">
+				<div class="flex items-center gap-2 flex-1">
 					<Toggle :id="previewId" v-model="previewMode" small />
 					<label class="label" :for="previewId">
 						{{ formatMessage(messages.editorPreviewToggleLabel) }}
