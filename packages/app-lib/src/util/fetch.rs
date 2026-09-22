@@ -24,7 +24,7 @@ use std::sync::{Arc, LazyLock};
 use std::time::{Duration, Instant, SystemTime};
 use tokio::sync::Semaphore;
 use tokio::{fs::File, io::AsyncReadExt, io::AsyncWriteExt};
-use tracing::{debug, info};
+use tracing::{debug, info, warn};
 
 pub const DOWNLOAD_META_HEADER: &str = "modrinth-download-meta";
 
@@ -942,7 +942,16 @@ async fn fetch_advanced_with_target(
 
     for attempt in 1..=(FETCH_ATTEMPTS + 1) {
         if is_api_url {
-            GLOBAL_API_RATE_LIMIT.check()?;
+            if let Err(error) = GLOBAL_API_RATE_LIMIT.check() {
+                warn!(
+                    request_path = %url.split('?').next().unwrap_or(url),
+                    ?uri_path,
+                    attempt,
+                    error = %error,
+                    "Modrinth API request blocked by local rate limiter"
+                );
+                return Err(error);
+            }
         }
 
         if let Some(fence_key) = fence_key
@@ -981,6 +990,14 @@ async fn fetch_advanced_with_target(
                     && let Some(error) =
                         GLOBAL_API_RATE_LIMIT.handle_response(&resp)
                 {
+                    warn!(
+                        request_path = %url.split('?').next().unwrap_or(url),
+                        ?uri_path,
+                        attempt,
+                        retry_after = ?resp.headers().get(reqwest::header::RETRY_AFTER),
+                        error = %error,
+                        "Modrinth API returned HTTP 429"
+                    );
                     return Err(error.into());
                 }
 
