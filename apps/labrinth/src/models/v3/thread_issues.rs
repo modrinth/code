@@ -1,5 +1,10 @@
-use crate::models::ids::{GalleryImageId, ThreadIssueId};
-use crate::models::projects::{Project, Version};
+use crate::models::disclosures::ProjectDisclosure;
+use crate::models::exp::minecraft::Language;
+use crate::models::ids::{
+    FileId, GalleryImageId, TeamId, ThreadIssueId, VersionId,
+};
+use crate::models::projects::{Dependency, FileType, Project, Version};
+use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -9,6 +14,15 @@ use std::collections::HashMap;
 pub struct ThreadIssueContext<'a> {
     pub project: &'a Project,
     pub versions: &'a [Version],
+    pub disclosures: &'a [ProjectDisclosure],
+    pub team_members: &'a [ThreadIssueTeamMember],
+}
+
+#[derive(Debug, Clone)]
+pub struct ThreadIssueTeamMember {
+    pub team_id: TeamId,
+    pub user_id: UserId,
+    pub role: String,
 }
 
 /// Issue that a moderator has flagged on a project in its moderation thread.
@@ -68,8 +82,46 @@ pub enum ThreadIssueTarget {
     Links {
         links: HashMap<String, TextTarget>,
     },
+    AddGalleryImages {
+        original_count: u32,
+    },
+    ModifyGalleryImage {
+        image_id: GalleryImageId,
+        original_url: String,
+        name: Option<OptionalTextTarget>,
+        description: Option<OptionalTextTarget>,
+    },
     RemoveGalleryImages {
         originals: Vec<(GalleryImageId, String)>,
+    },
+    RemoveProjectDisclosures {
+        originals: Vec<(String, serde_json::Value)>,
+    },
+    ModifyProjectDisclosure {
+        disclosure_type: String,
+        metadata: JsonTarget,
+    },
+    ProjectDisclosureNote {
+        disclosure_type: String,
+        note: OptionalTextTarget,
+    },
+    Version {
+        version_id: VersionId,
+        version_number: String,
+        target: VersionIssueTarget,
+    },
+    TeamMemberRole {
+        team_id: TeamId,
+        user_id: UserId,
+        role: TextTarget,
+    },
+    ServerLanguages {
+        original: Vec<Language>,
+        suggestion: Option<Vec<Language>>,
+    },
+    ServerAddress {
+        platform: ServerAddressPlatform,
+        address: TextTarget,
     },
     Acknowledge {
         mode: ThreadIssueAcknowledgement,
@@ -84,6 +136,68 @@ pub struct TextTarget {
     pub original: String,
     /// Moderator-proposed value for this field.
     pub suggestion: Option<String>,
+}
+
+#[derive(
+    Debug, Clone, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
+)]
+pub struct OptionalTextTarget {
+    pub original: Option<String>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    pub suggestion: Option<Option<String>>,
+}
+
+#[derive(
+    Debug, Clone, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
+)]
+pub struct JsonTarget {
+    pub original: serde_json::Value,
+    pub suggestion: Option<serde_json::Value>,
+}
+
+#[derive(
+    Debug, Clone, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
+)]
+#[serde(tag = "type", content = "value", rename_all = "snake_case")]
+pub enum VersionIssueTarget {
+    Remove,
+    Environment(TextTarget),
+    GameVersions {
+        original: Vec<String>,
+        suggestion: Option<Vec<String>>,
+    },
+    Dependencies {
+        original: Vec<Dependency>,
+        suggestion: Option<Vec<Dependency>>,
+    },
+    Changelog(TextTarget),
+    RemoveAdditionalFiles {
+        originals: Vec<(FileId, String)>,
+    },
+    AdditionalFileType {
+        file_id: FileId,
+        filename: String,
+        original: Option<FileType>,
+        #[serde(
+            default,
+            skip_serializing_if = "Option::is_none",
+            with = "::serde_with::rust::double_option"
+        )]
+        suggestion: Option<Option<FileType>>,
+    },
+}
+
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum ServerAddressPlatform {
+    MinecraftJava,
+    MinecraftBedrock,
 }
 
 /// How should a user communicate that they've resolved a [`ThreadIssue`]?
@@ -233,6 +347,48 @@ impl ThreadIssueTarget {
                 }
                 state
             }
+            Self::AddGalleryImages { original_count } => {
+                if project.gallery.len() > *original_count as usize {
+                    ThreadIssueValueState::DifferentToOriginal
+                } else {
+                    ThreadIssueValueState::SameAsOriginal
+                }
+            }
+            Self::ModifyGalleryImage {
+                image_id,
+                name,
+                description,
+                ..
+            } => {
+                let Some(image) = project
+                    .gallery
+                    .iter()
+                    .find(|image| image.id.as_ref() == Some(image_id))
+                else {
+                    return ThreadIssueValueState::DifferentToOriginal;
+                };
+
+                let name_state = name.as_ref().map(|target| {
+                    optional_text_value_state(target, &image.name)
+                });
+                let description_state = description.as_ref().map(|target| {
+                    optional_text_value_state(target, &image.description)
+                });
+
+                if name_state
+                    .into_iter()
+                    .chain(description_state)
+                    .all(|state| state == ThreadIssueValueState::SameAsOriginal)
+                {
+                    ThreadIssueValueState::SameAsOriginal
+                } else if name_state.into_iter().chain(description_state).all(
+                    |state| state == ThreadIssueValueState::SameAsSuggested,
+                ) {
+                    ThreadIssueValueState::SameAsSuggested
+                } else {
+                    ThreadIssueValueState::DifferentToOriginal
+                }
+            }
             Self::RemoveGalleryImages { originals } => {
                 let remaining = originals
                     .iter()
@@ -252,6 +408,273 @@ impl ThreadIssueTarget {
                     ThreadIssueValueState::DifferentToOriginal
                 }
             }
+            Self::RemoveProjectDisclosures { originals } => {
+                let remaining = originals
+                    .iter()
+                    .filter(|(original_type, _)| {
+                        context.disclosures.iter().any(|disclosure| {
+                            disclosure.to_parts().is_ok_and(
+                                |(current_type, _)| {
+                                    current_type == original_type
+                                },
+                            )
+                        })
+                    })
+                    .count();
+
+                if remaining == 0 {
+                    ThreadIssueValueState::SameAsSuggested
+                } else if remaining == originals.len() {
+                    ThreadIssueValueState::SameAsOriginal
+                } else {
+                    ThreadIssueValueState::DifferentToOriginal
+                }
+            }
+            Self::ModifyProjectDisclosure {
+                disclosure_type,
+                metadata,
+            } => {
+                let current =
+                    context.disclosures.iter().find_map(|disclosure| {
+                        let (current_type, mut current) =
+                            disclosure.to_parts().ok()?;
+                        if current_type != disclosure_type {
+                            return None;
+                        }
+                        if let Some(current) = current.as_object_mut() {
+                            current.remove("note");
+                        }
+                        Some(current)
+                    });
+
+                let mut original = metadata.original.clone();
+                if let Some(original) = original.as_object_mut() {
+                    original.remove("note");
+                }
+                let suggestion =
+                    metadata.suggestion.as_ref().map(|suggestion| {
+                        let mut suggestion = suggestion.clone();
+                        if let Some(suggestion) = suggestion.as_object_mut() {
+                            suggestion.remove("note");
+                        }
+                        suggestion
+                    });
+
+                match current {
+                    Some(current) if suggestion.as_ref() == Some(&current) => {
+                        ThreadIssueValueState::SameAsSuggested
+                    }
+                    Some(current) if current == original => {
+                        ThreadIssueValueState::SameAsOriginal
+                    }
+                    _ => ThreadIssueValueState::DifferentToOriginal,
+                }
+            }
+            Self::ProjectDisclosureNote {
+                disclosure_type,
+                note,
+            } => {
+                let current =
+                    context.disclosures.iter().find_map(|disclosure| {
+                        let (current_type, metadata) =
+                            disclosure.to_parts().ok()?;
+                        if current_type != disclosure_type {
+                            return None;
+                        }
+                        Some(
+                            metadata
+                                .get("note")
+                                .and_then(serde_json::Value::as_str)
+                                .map(String::from),
+                        )
+                    });
+
+                current.map_or(
+                    ThreadIssueValueState::DifferentToOriginal,
+                    |current| optional_text_value_state(note, &current),
+                )
+            }
+            Self::Version {
+                version_id, target, ..
+            } => {
+                let version = context
+                    .versions
+                    .iter()
+                    .find(|version| version.id == *version_id);
+
+                if matches!(target, VersionIssueTarget::Remove) {
+                    if version.is_none() {
+                        ThreadIssueValueState::SameAsSuggested
+                    } else {
+                        ThreadIssueValueState::SameAsOriginal
+                    }
+                } else {
+                    let Some(version) = version else {
+                        return ThreadIssueValueState::DifferentToOriginal;
+                    };
+
+                    match target {
+                        VersionIssueTarget::Remove => unreachable!(),
+                        VersionIssueTarget::Environment(target) => value_state(
+                            target,
+                            version
+                                .fields
+                                .get("environment")
+                                .and_then(serde_json::Value::as_str)
+                                .unwrap_or_default(),
+                        ),
+                        VersionIssueTarget::GameVersions {
+                            original,
+                            suggestion,
+                        } => {
+                            let current = version
+                                .fields
+                                .get("game_versions")
+                                .and_then(serde_json::Value::as_array)
+                                .map(|versions| {
+                                    versions
+                                        .iter()
+                                        .filter_map(|version| {
+                                            version.as_str().map(String::from)
+                                        })
+                                        .collect::<Vec<_>>()
+                                })
+                                .unwrap_or_default();
+                            if suggestion.as_ref().is_some_and(|suggestion| {
+                                suggestion.len() == current.len()
+                                    && suggestion.iter().all(|version| {
+                                        current.contains(version)
+                                    })
+                            }) {
+                                ThreadIssueValueState::SameAsSuggested
+                            } else if original.len() == current.len()
+                                && original
+                                    .iter()
+                                    .all(|version| current.contains(version))
+                            {
+                                ThreadIssueValueState::SameAsOriginal
+                            } else {
+                                ThreadIssueValueState::DifferentToOriginal
+                            }
+                        }
+                        VersionIssueTarget::Dependencies {
+                            original,
+                            suggestion,
+                        } => {
+                            if suggestion.as_ref().is_some_and(|suggestion| {
+                                suggestion.len() == version.dependencies.len()
+                                    && suggestion.iter().all(|dependency| {
+                                        version
+                                            .dependencies
+                                            .contains(dependency)
+                                    })
+                            }) {
+                                ThreadIssueValueState::SameAsSuggested
+                            } else if original.len()
+                                == version.dependencies.len()
+                                && original.iter().all(|dependency| {
+                                    version.dependencies.contains(dependency)
+                                })
+                            {
+                                ThreadIssueValueState::SameAsOriginal
+                            } else {
+                                ThreadIssueValueState::DifferentToOriginal
+                            }
+                        }
+                        VersionIssueTarget::Changelog(target) => value_state(
+                            target,
+                            version.changelog.as_deref().unwrap_or_default(),
+                        ),
+                        VersionIssueTarget::RemoveAdditionalFiles {
+                            originals,
+                        } => {
+                            let remaining = originals
+                                .iter()
+                                .filter(|(id, _)| {
+                                    version.files.iter().any(|file| {
+                                        file.id.as_ref() == Some(id)
+                                    })
+                                })
+                                .count();
+                            if remaining == 0 {
+                                ThreadIssueValueState::SameAsSuggested
+                            } else if remaining == originals.len() {
+                                ThreadIssueValueState::SameAsOriginal
+                            } else {
+                                ThreadIssueValueState::DifferentToOriginal
+                            }
+                        }
+                        VersionIssueTarget::AdditionalFileType {
+                            file_id,
+                            original,
+                            suggestion,
+                            ..
+                        } => {
+                            let Some(file) = version
+                                .files
+                                .iter()
+                                .find(|file| file.id.as_ref() == Some(file_id))
+                            else {
+                                return ThreadIssueValueState::DifferentToOriginal;
+                            };
+                            if suggestion.as_ref() == Some(&file.file_type) {
+                                ThreadIssueValueState::SameAsSuggested
+                            } else if file.file_type == *original {
+                                ThreadIssueValueState::SameAsOriginal
+                            } else {
+                                ThreadIssueValueState::DifferentToOriginal
+                            }
+                        }
+                    }
+                }
+            }
+            Self::TeamMemberRole {
+                team_id,
+                user_id,
+                role,
+            } => context
+                .team_members
+                .iter()
+                .find(|member| {
+                    member.team_id == *team_id && member.user_id == *user_id
+                })
+                .map_or(ThreadIssueValueState::DifferentToOriginal, |member| {
+                    value_state(role, &member.role)
+                }),
+            Self::ServerLanguages {
+                original,
+                suggestion,
+            } => {
+                let Some(server) = project.components.minecraft_server.as_ref()
+                else {
+                    return ThreadIssueValueState::DifferentToOriginal;
+                };
+                if suggestion.as_ref() == Some(&server.languages) {
+                    ThreadIssueValueState::SameAsSuggested
+                } else if server.languages == *original {
+                    ThreadIssueValueState::SameAsOriginal
+                } else {
+                    ThreadIssueValueState::DifferentToOriginal
+                }
+            }
+            Self::ServerAddress { platform, address } => {
+                let current = match platform {
+                    ServerAddressPlatform::MinecraftJava => project
+                        .components
+                        .minecraft_java_server
+                        .as_ref()
+                        .map(|server| server.address.as_str()),
+                    ServerAddressPlatform::MinecraftBedrock => project
+                        .components
+                        .minecraft_bedrock_server
+                        .as_ref()
+                        .map(|server| server.address.as_str()),
+                };
+                current.map_or(
+                    ThreadIssueValueState::DifferentToOriginal,
+                    |current| value_state(address, current),
+                )
+            }
             Self::Acknowledge { mode } => match (mode, user_addressed) {
                 (_, false) => ThreadIssueValueState::SameAsOriginal,
                 (ThreadIssueAcknowledgement::Checkbox, true) => {
@@ -262,6 +685,19 @@ impl ThreadIssueTarget {
                 }
             },
         }
+    }
+}
+
+fn optional_text_value_state(
+    target: &OptionalTextTarget,
+    current: &Option<String>,
+) -> ThreadIssueValueState {
+    if target.suggestion.as_ref() == Some(current) {
+        ThreadIssueValueState::SameAsSuggested
+    } else if *current == target.original {
+        ThreadIssueValueState::SameAsOriginal
+    } else {
+        ThreadIssueValueState::DifferentToOriginal
     }
 }
 
@@ -389,6 +825,8 @@ mod tests {
         ThreadIssueContext {
             project,
             versions: &[],
+            disclosures: &[],
+            team_members: &[],
         }
     }
 
@@ -397,6 +835,35 @@ mod tests {
             original: original.to_string(),
             suggestion: suggestion.map(str::to_string),
         }
+    }
+
+    fn optional_text_target(
+        original: Option<&str>,
+        suggestion: Option<Option<&str>>,
+    ) -> OptionalTextTarget {
+        OptionalTextTarget {
+            original: original.map(str::to_string),
+            suggestion: suggestion
+                .map(|suggestion| suggestion.map(str::to_string)),
+        }
+    }
+
+    #[test]
+    fn nullable_suggestions_round_trip() {
+        let target = OptionalTextTarget {
+            original: Some("Original".to_string()),
+            suggestion: Some(None),
+        };
+        let serialized = serde_json::to_value(&target).unwrap();
+
+        assert_eq!(
+            serialized.get("suggestion"),
+            Some(&serde_json::Value::Null)
+        );
+        assert_eq!(
+            serde_json::from_value::<OptionalTextTarget>(serialized).unwrap(),
+            target
+        );
     }
 
     #[test]
@@ -535,6 +1002,53 @@ mod tests {
     }
 
     #[test]
+    fn gallery_addition_and_metadata_value_states() {
+        let mut project = project();
+        let add = ThreadIssueTarget::AddGalleryImages {
+            original_count: project.gallery.len() as u32,
+        };
+        let metadata = ThreadIssueTarget::ModifyGalleryImage {
+            image_id: GalleryImageId(1),
+            original_url: "https://example.com/gallery/1".to_string(),
+            name: Some(optional_text_target(None, Some(Some("Screenshot")))),
+            description: Some(optional_text_target(
+                None,
+                Some(Some("Description")),
+            )),
+        };
+
+        assert_eq!(
+            add.value_state(&context(&project), false),
+            ThreadIssueValueState::SameAsOriginal
+        );
+        assert_eq!(
+            metadata.value_state(&context(&project), false),
+            ThreadIssueValueState::SameAsOriginal
+        );
+
+        let mut added = project.gallery[0].clone();
+        added.id = Some(GalleryImageId(3));
+        project.gallery.push(added);
+        project.gallery[0].name = Some("Screenshot".to_string());
+        project.gallery[0].description = Some("Description".to_string());
+
+        assert_eq!(
+            add.value_state(&context(&project), false),
+            ThreadIssueValueState::DifferentToOriginal
+        );
+        assert_eq!(
+            metadata.value_state(&context(&project), false),
+            ThreadIssueValueState::SameAsSuggested
+        );
+
+        project.gallery[0].description = Some("Unrelated text".to_string());
+        assert_eq!(
+            metadata.value_state(&context(&project), false),
+            ThreadIssueValueState::DifferentToOriginal
+        );
+    }
+
+    #[test]
     fn all_gallery_targets_must_be_removed() {
         let mut project = project();
         let target = ThreadIssueTarget::RemoveGalleryImages {
@@ -565,6 +1079,102 @@ mod tests {
         assert_eq!(
             target.value_state(&context(&project), false),
             ThreadIssueValueState::SameAsSuggested
+        );
+    }
+
+    #[test]
+    fn disclosure_value_states() {
+        let project = project();
+        let mut disclosures = vec![ProjectDisclosure::Advertisements {
+            note: Some("Original note".to_string()),
+        }];
+        let remove = ThreadIssueTarget::RemoveProjectDisclosures {
+            originals: vec![(
+                "advertisements".to_string(),
+                serde_json::json!({ "note": "Original note" }),
+            )],
+        };
+        let note = ThreadIssueTarget::ProjectDisclosureNote {
+            disclosure_type: "advertisements".to_string(),
+            note: optional_text_target(
+                Some("Original note"),
+                Some(Some("Suggested note")),
+            ),
+        };
+        let value_state = |target: &ThreadIssueTarget, disclosures| {
+            target.value_state(
+                &ThreadIssueContext {
+                    project: &project,
+                    versions: &[],
+                    disclosures,
+                    team_members: &[],
+                },
+                false,
+            )
+        };
+
+        assert_eq!(
+            value_state(&remove, &disclosures),
+            ThreadIssueValueState::SameAsOriginal
+        );
+        assert_eq!(
+            value_state(&note, &disclosures),
+            ThreadIssueValueState::SameAsOriginal
+        );
+
+        disclosures[0] = ProjectDisclosure::Advertisements {
+            note: Some("Suggested note".to_string()),
+        };
+        assert_eq!(
+            value_state(&note, &disclosures),
+            ThreadIssueValueState::SameAsSuggested
+        );
+
+        disclosures.clear();
+        assert_eq!(
+            value_state(&remove, &disclosures),
+            ThreadIssueValueState::SameAsSuggested
+        );
+    }
+
+    #[test]
+    fn team_member_role_value_states() {
+        let project = project();
+        let mut members = vec![ThreadIssueTeamMember {
+            team_id: TeamId(2),
+            user_id: UserId(4),
+            role: "Developer".to_string(),
+        }];
+        let target = ThreadIssueTarget::TeamMemberRole {
+            team_id: TeamId(2),
+            user_id: UserId(4),
+            role: text_target("Developer", Some("Artist")),
+        };
+        let value_state = |members: &[ThreadIssueTeamMember]| {
+            target.value_state(
+                &ThreadIssueContext {
+                    project: &project,
+                    versions: &[],
+                    disclosures: &[],
+                    team_members: members,
+                },
+                false,
+            )
+        };
+
+        assert_eq!(
+            value_state(&members),
+            ThreadIssueValueState::SameAsOriginal
+        );
+        members[0].role = "Artist".to_string();
+        assert_eq!(
+            value_state(&members),
+            ThreadIssueValueState::SameAsSuggested
+        );
+        members.clear();
+        assert_eq!(
+            value_state(&members),
+            ThreadIssueValueState::DifferentToOriginal
         );
     }
 

@@ -2,11 +2,13 @@ use eyre::eyre;
 use xredis::RedisPool;
 
 use crate::database::models::project_item::ProjectQueryResult;
-use crate::database::models::{DBProjectId, DBThreadIssue};
+use crate::database::models::{DBProjectId, DBTeamId, DBThreadIssue, DBUserId};
 use crate::database::{PgTransaction, models as db_models};
 use crate::models::ids::ProjectId;
 use crate::models::projects::{Project, ProjectStatus, Version};
-use crate::models::thread_issues::{ThreadIssueContext, ThreadIssueVerdict};
+use crate::models::thread_issues::{
+    ThreadIssueContext, ThreadIssueTeamMember, ThreadIssueVerdict,
+};
 use crate::routes::ApiError;
 use crate::routes::internal::delphi;
 use crate::util::error::{ApiContext as _, Context as _};
@@ -72,6 +74,31 @@ async fn sync_project_state(
     .into_iter()
     .map(|disclosure| disclosure.disclosure)
     .collect::<Vec<_>>();
+    let team_members = sqlx::query!(
+        r#"
+        SELECT team_id, user_id, role
+        FROM team_members
+        WHERE
+            team_id = $1
+            OR team_id = (
+                SELECT team_id
+                FROM organizations
+                WHERE id = $2
+            )
+        "#,
+        data.inner.team_id as DBTeamId,
+        data.inner.organization_id.map(|id| id.0),
+    )
+    .fetch_all(&mut *transaction)
+    .await
+    .wrap_internal_err("fetching project team members")?
+    .into_iter()
+    .map(|member| ThreadIssueTeamMember {
+        team_id: DBTeamId(member.team_id).into(),
+        user_id: DBUserId(member.user_id).into(),
+        role: member.role,
+    })
+    .collect::<Vec<_>>();
     let has_required_nags = has_required_nags_with_context(
         &project,
         &versions,
@@ -82,6 +109,8 @@ async fn sync_project_state(
     let context = ThreadIssueContext {
         project: &project,
         versions: &versions,
+        disclosures: &disclosures,
+        team_members: &team_members,
     };
     let thread_issues =
         db_models::DBThreadIssue::sync_project_verdicts(&context, transaction)
