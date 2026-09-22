@@ -11,18 +11,15 @@ import {
 	FileIcon,
 	FolderOpenIcon,
 	LinkIcon,
-	OrganizationIcon,
 	RefreshCwIcon,
 	SearchIcon,
 	ShareIcon,
 	TextCursorInputIcon,
 	TrashIcon,
-	UserIcon,
 } from '@modrinth/assets'
 import { useSessionStorage } from '@vueuse/core'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
-import Avatar from '#ui/components/base/Avatar.vue'
 import { Button, type ButtonMenuOption, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import DropdownFilterBar from '#ui/components/base/DropdownFilterBar.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
@@ -114,10 +111,6 @@ const messages = defineMessages({
 	filter: {
 		id: 'content.page-layout.filter.add',
 		defaultMessage: 'Filter',
-	},
-	authorCount: {
-		id: 'content.page-layout.filter.author-count',
-		defaultMessage: '{count, plural, one {# author} other {# authors}}',
 	},
 	updateAll: {
 		id: 'content.page-layout.update-all',
@@ -304,54 +297,6 @@ watch(
 	},
 	{ immediate: true },
 )
-
-const metadataFilterAuthors = computed(() => {
-	const authors = new Map<string, NonNullable<ContentItem['owner']>>()
-	for (const item of ctx.items.value) {
-		if (!item.owner) continue
-		authors.set(`${item.owner.type}:${item.owner.id}`, item.owner)
-	}
-	return authors
-})
-
-function getMetadataFilterAuthor(value: string) {
-	return metadataFilterAuthors.value.get(value)
-}
-
-function getMetadataFilterPreviewAuthor(selectedValues: string[]) {
-	const [selectedValue] = selectedValues
-	return selectedValues.length === 1 && selectedValue
-		? getMetadataFilterAuthor(selectedValue)
-		: undefined
-}
-
-const metadataFilterPreviewAuthorLimit = 3
-const metadataFilterPreviewAuthorSize = 20
-const metadataFilterPreviewAuthorOffset = 14
-
-function getMetadataFilterPreviewAuthorValues(selectedValues: string[]) {
-	return selectedValues.slice(0, metadataFilterPreviewAuthorLimit)
-}
-
-function getMetadataFilterPreviewAuthorOverflow(selectedValues: string[]) {
-	return Math.max(0, selectedValues.length - metadataFilterPreviewAuthorLimit)
-}
-
-function getMetadataFilterPreviewAuthorStackWidth(selectedValues: string[]) {
-	const visibleCount = Math.min(selectedValues.length, metadataFilterPreviewAuthorLimit)
-	if (visibleCount === 0) return 0
-	return (
-		metadataFilterPreviewAuthorSize +
-		(visibleCount - 1 + (selectedValues.length > metadataFilterPreviewAuthorLimit ? 1 : 0)) *
-			metadataFilterPreviewAuthorOffset
-	)
-}
-
-function isMetadataFilterOrganization(value: string) {
-	return (
-		getMetadataFilterAuthor(value)?.type === 'organization' || value.startsWith('organization:')
-	)
-}
 
 const metadataFilterTriggerClass =
 	'!h-[34px] !rounded-xl !border !border-solid !border-surface-5 !bg-transparent !px-3 !text-sm !font-medium !text-primary !shadow-[0_1px_1.5px_rgba(0,0,0,0.15)] transition-all duration-100 active:scale-[0.97] hover:!bg-surface-3 focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5'
@@ -1106,144 +1051,14 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 										checkbox-position="right"
 										apply-immediately
 									>
-										<template #preview-content="{ category, selectedValues, label, summary }">
-											<div
-												v-if="category.key === 'author'"
-												class="flex min-w-0 flex-1 items-center gap-2"
-											>
-												<template v-if="selectedValues.length === 1">
-													<span
-														class="flex size-5 shrink-0 items-center justify-center overflow-hidden bg-surface-2 text-brand"
-														:class="
-															getMetadataFilterPreviewAuthor(selectedValues)?.type ===
-															'organization'
-																? 'rounded'
-																: 'rounded-full'
-														"
-													>
-														<Avatar
-															v-if="getMetadataFilterPreviewAuthor(selectedValues)?.avatar_url"
-															:src="getMetadataFilterPreviewAuthor(selectedValues)?.avatar_url"
-															size="100%"
-															:circle="
-																getMetadataFilterPreviewAuthor(selectedValues)?.type !==
-																'organization'
-															"
-															no-shadow
-															class="!border-0"
-														/>
-														<OrganizationIcon
-															v-else-if="
-																getMetadataFilterPreviewAuthor(selectedValues)?.type ===
-																'organization'
-															"
-															class="size-4"
-														/>
-														<UserIcon v-else class="size-4" />
-													</span>
-													<span class="min-w-0 truncate font-semibold text-contrast">
-														{{ getMetadataFilterPreviewAuthor(selectedValues)?.name ?? summary }}
-													</span>
-												</template>
-												<template v-else>
-													<span class="font-medium">{{ label }}:</span>
-													<div
-														class="relative h-5 shrink-0"
-														:style="{
-															width: `${getMetadataFilterPreviewAuthorStackWidth(selectedValues)}px`,
-														}"
-														aria-hidden="true"
-													>
-														<div
-															v-for="(value, index) in getMetadataFilterPreviewAuthorValues(
-																selectedValues,
-															)"
-															:key="value"
-															class="absolute top-0 flex size-5 items-center justify-center overflow-hidden border border-solid border-surface-3 bg-surface-4 text-brand"
-															:class="
-																isMetadataFilterOrganization(value) ? 'rounded' : 'rounded-full'
-															"
-															:style="{
-																left: `${index * metadataFilterPreviewAuthorOffset}px`,
-																zIndex:
-																	getMetadataFilterPreviewAuthorValues(selectedValues).length -
-																	index,
-															}"
-														>
-															<Avatar
-																v-if="getMetadataFilterAuthor(value)?.avatar_url"
-																:src="getMetadataFilterAuthor(value)?.avatar_url"
-																size="100%"
-																:circle="!isMetadataFilterOrganization(value)"
-																no-shadow
-																class="!border-0"
-															/>
-															<OrganizationIcon
-																v-else-if="isMetadataFilterOrganization(value)"
-																class="size-3.5"
-															/>
-															<UserIcon v-else class="size-3.5" />
-														</div>
-														<div
-															v-if="getMetadataFilterPreviewAuthorOverflow(selectedValues) > 0"
-															class="absolute top-0 flex size-5 items-center justify-center rounded-full border border-solid border-surface-3 bg-surface-4 text-[10px] font-bold text-contrast"
-															:style="{
-																left: `${getMetadataFilterPreviewAuthorValues(selectedValues).length * metadataFilterPreviewAuthorOffset}px`,
-															}"
-														>
-															+{{ getMetadataFilterPreviewAuthorOverflow(selectedValues) }}
-														</div>
-													</div>
-													<span class="min-w-0 truncate font-semibold text-contrast">
-														{{
-															formatMessage(messages.authorCount, { count: selectedValues.length })
-														}}
-													</span>
-												</template>
-											</div>
-											<span v-else class="min-w-0 flex-1 truncate">
+										<template #preview-content="{ label, summary }">
+											<span class="min-w-0 flex-1 truncate">
 												<span class="font-medium">{{ label }}:</span>
 												<span class="ml-1 font-semibold text-contrast">{{ summary }}</span>
 											</span>
 										</template>
-										<template #option="{ category, option, selected }">
-											<div
-												v-if="category.key === 'author'"
-												class="flex min-w-0 flex-1 items-center gap-2"
-											>
-												<span
-													v-tooltip="option.label"
-													class="flex size-6 shrink-0 items-center justify-center overflow-hidden bg-surface-2 text-secondary"
-													:class="
-														getMetadataFilterAuthor(option.value)?.type === 'organization'
-															? 'rounded'
-															: 'rounded-full'
-													"
-												>
-													<img
-														v-if="getMetadataFilterAuthor(option.value)?.avatar_url"
-														:src="getMetadataFilterAuthor(option.value)?.avatar_url"
-														:alt="option.label"
-														class="size-full object-cover"
-													/>
-													<OrganizationIcon
-														v-else-if="
-															getMetadataFilterAuthor(option.value)?.type === 'organization'
-														"
-														class="size-5"
-													/>
-													<UserIcon v-else class="size-5" />
-												</span>
-												<span
-													v-tooltip="option.label"
-													class="min-w-0 truncate font-semibold leading-tight"
-													:class="selected ? 'text-contrast' : 'text-primary'"
-												>
-													{{ option.label }}
-												</span>
-											</div>
+										<template #option="{ option, selected }">
 											<span
-												v-else
 												class="min-w-0 truncate font-semibold leading-tight"
 												:class="selected ? 'text-contrast' : 'text-primary'"
 											>

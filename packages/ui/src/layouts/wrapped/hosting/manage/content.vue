@@ -118,6 +118,18 @@ const messages = defineMessages({
 		id: 'hosting.content.enabled-for.unknown-environment',
 		defaultMessage: "We couldn't tell where this content should be enabled.",
 	},
+	clientOnlyEnabledForServer: {
+		id: 'hosting.content.enabled-for.client-only-enabled-for-server',
+		defaultMessage: 'Enabled for the server, but this content is client-only.',
+	},
+	singleplayerOnlyEnabledForServer: {
+		id: 'hosting.content.enabled-for.singleplayer-only-enabled-for-server',
+		defaultMessage: 'Enabled for the server, but this content is singleplayer-only.',
+	},
+	serverOnlyEnabledForPlayers: {
+		id: 'hosting.content.enabled-for.server-only-enabled-for-players',
+		defaultMessage: 'Enabled for players, but this content is server-only.',
+	},
 })
 
 const client = injectModrinthClient()
@@ -346,6 +358,16 @@ function getEnabledForWarning(addon: Archon.Content.v1.Addon) {
 	if (!addon.disabled_server) {
 		if (addon.pack_client_retained) return formatMessage(commonMessages.clientRetainedWarning)
 		if (addon.pack_client_depends) return formatMessage(commonMessages.clientDependsWarning)
+		if (isIncompatibleEnvironment(addon, 'server')) {
+			return formatMessage(
+				getAddonEnvironment(addon) === 'singleplayer_only'
+					? messages.singleplayerOnlyEnabledForServer
+					: messages.clientOnlyEnabledForServer,
+			)
+		}
+	}
+	if (!addon.disabled_player && isIncompatibleEnvironment(addon, 'player')) {
+		return formatMessage(messages.serverOnlyEnabledForPlayers)
 	}
 	if (!hasDetectedEnvironment(addon)) return formatMessage(messages.unknownEnvironment)
 	return null
