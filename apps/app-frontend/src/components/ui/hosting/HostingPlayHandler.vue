@@ -137,12 +137,7 @@ async function join(target: LaunchTarget, instanceId: string) {
 	if (!address) throw new Error(formatMessage(messages.noAddress))
 	await assertAccount(target)
 	await ensureManagedServerWorldExists(instanceId, target.name, address)
-	hostingInstances.value[instanceId] = hostingInstanceMetadata(
-		server,
-		target.worldId,
-		target.sharedInstanceId,
-		address,
-	)
+	hostingInstances.value[instanceId] = hostingInstanceMetadata(server, target.sharedInstanceId, address)
 	await assertAccount(target)
 	try {
 		await start_join_server(instanceId, address)
@@ -152,27 +147,41 @@ async function join(target: LaunchTarget, instanceId: string) {
 	}
 	queryClient.setQueryData(instanceKeys.processes(instanceId), [true])
 }
+async function playExisting(
+	target: LaunchTarget,
+	existing: NonNullable<Awaited<ReturnType<typeof findInstance>>>,
+	approveUpdate: boolean,
+) {
+	if (existing.quarantined || existing.install_stage !== 'installed')
+		throw new Error(formatMessage(messages.notReady))
+	await openAndLaunch(existing.id, async () => {
+		await assertAccount(target)
+		if (approveUpdate) {
+			const job = await install_update_shared_instance(existing.id)
+			await wait_for_install_job(appEvents, job.job_id)
+		} else {
+			const preview = await install_get_shared_instance_update_preview(existing.id)
+			await assertAccount(target)
+			if (preview?.updateAvailable) {
+				showUpdate(target, existing.id, preview)
+				return
+			}
+		}
+		await join(target, existing.id)
+	})
+}
 const launchMutation = useMutation({
 	mutationFn: async ({ target, instanceId }: { target: LaunchTarget; instanceId?: string }) => {
 		await assertAccount(target)
-		const existing = await findInstance(target)
-		if (instanceId && existing?.id !== instanceId) throw new Error(formatMessage(messages.notReady))
+		const existing = instanceId ? await get(instanceId) : await findInstance(target)
+		if (
+			instanceId &&
+			(existing?.shared_instance?.id !== target.sharedInstanceId ||
+				existing?.shared_instance?.linked_user_id !== target.userId)
+		)
+			throw new Error(formatMessage(messages.notReady))
 		if (existing) {
-			if (existing.quarantined || existing.install_stage !== 'installed')
-				throw new Error(formatMessage(messages.notReady))
-			await openAndLaunch(existing.id, async () => {
-				const update = await install_get_shared_instance_update_preview(existing.id)
-				await assertAccount(target)
-				if (update?.updateAvailable) {
-					if (!instanceId) {
-						showUpdate(target, existing.id, update)
-						return
-					}
-					const job = await install_update_shared_instance(existing.id)
-					await wait_for_install_job(appEvents, job.job_id)
-				}
-				await join(target, existing.id)
-			})
+			await playExisting(target, existing, !!instanceId)
 		} else {
 			await assertAccount(target)
 			const job = await install_shared_instance(
@@ -258,14 +267,7 @@ const prepareMutation = useMutation({
 		await assertAccount(target)
 		const existing = await findInstance(target)
 		if (existing) {
-			if (existing.quarantined || existing.install_stage !== 'installed')
-				throw new Error(formatMessage(messages.notReady))
-			await openAndLaunch(existing.id, async () => {
-				const preview = await install_get_shared_instance_update_preview(existing.id)
-				await assertAccount(target)
-				if (preview?.updateAvailable) showUpdate(target, existing.id, preview)
-				else await join(target, existing.id)
-			})
+			await playExisting(target, existing, false)
 		} else {
 			const remote = await client.sharedinstances.instances_v1.get(sharedInstanceId)
 			target.name = remote.name

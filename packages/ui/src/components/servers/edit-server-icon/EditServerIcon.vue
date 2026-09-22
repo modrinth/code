@@ -245,15 +245,20 @@ async function uploadIcon(file: File, config: IconConfig | null) {
 		} catch (error) {
 			console.debug('Server icon original upload failed:', error)
 		}
-		await deleteFile(fsAuth, configPath)
-		if (config) {
-			const configFile = new File([JSON.stringify(config)], 'server-icon-config.json', {
-				type: 'application/json',
-			})
-			await client.kyros.files_v0.uploadFileWithAuth(fsAuth, configPath, configFile).promise
+		let configFailed = false
+		try {
+			await deleteFile(fsAuth, configPath)
+			if (config) {
+				const configFile = new File([JSON.stringify(config)], 'server-icon-config.json', {
+					type: 'application/json',
+				})
+				await client.kyros.files_v0.uploadFileWithAuth(fsAuth, configPath, configFile).promise
+			}
+			generatedConfig.value = config
+			if (config) await saveRecentConfig(config)
+		} catch {
+			configFailed = true
 		}
-		generatedConfig.value = config
-		if (config) await saveRecentConfig(config)
 
 		const dataURL = await processImageBlob(file, 512)
 		setImage(dataURL)
@@ -261,11 +266,14 @@ async function uploadIcon(file: File, config: IconConfig | null) {
 		const remoteIcon = await refetchRemoteIcon()
 		if (remoteIcon.data) resetLocalOverride()
 		await queryClient.invalidateQueries({ queryKey: ['server-icon', serverId] })
+		if (configFailed) await loadGeneratedConfig()
 
 		addNotification({
-			type: 'success',
-			title: 'Server icon updated',
-			text: 'Your server icon was successfully changed.',
+			type: configFailed ? 'error' : 'success',
+			title: configFailed ? 'Icon editor settings not saved' : 'Server icon updated',
+			text: configFailed
+				? 'The server icon was updated, but its editor settings could not be saved.'
+				: 'Your server icon was successfully changed.',
 		})
 	} finally {
 		isUploadingIcon.value = false

@@ -19,7 +19,7 @@
 				<div class="flex min-w-0 flex-1 flex-col gap-0.5">
 					<span class="min-w-0 truncate font-medium text-contrast">{{ username }}</span>
 					<span class="truncate text-sm text-secondary">{{
-						row ? methodLabels[row.method] : ''
+						row ? formatMessage(methodMessages[row.method]) : ''
 					}}</span>
 				</div>
 			</div>
@@ -56,7 +56,7 @@ import {
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
-import { methodLabels, type ShareRow } from './shared-instance-share-types'
+import { methodMessages, type ShareRow } from './shared-instance-share-types'
 
 const props = defineProps<{ row: ShareRow | null; memberCount: number }>()
 const emit = defineEmits<{ confirm: [row: ShareRow]; clear: [] }>()

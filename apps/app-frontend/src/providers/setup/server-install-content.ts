@@ -528,6 +528,7 @@ export function createServerInstallContent(opts: {
 				} satisfies Archon.Content.v1.InstallWorldContent)
 			}
 			if (serverFlowFrom.value === 'onboarding') {
+				serverSetupModalRef.value?.hide()
 				await inviteFlow.open({ serverId: sid, worldId: wid, siteUrl: appConfig.siteUrl })
 				await router.push(`/hosting/manage/${sid}`)
 				return
