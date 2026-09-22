@@ -2,6 +2,7 @@
 	<h2 class="m-0 text-lg font-semibold text-contrast">
 		{{ formatMessage(messages.history) }}
 	</h2>
+	<p class="text-secondary">{{ formatMessage(messages.historyStub) }}</p>
 </template>
 
 <script setup lang="ts">

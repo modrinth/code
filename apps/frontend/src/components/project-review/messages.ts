@@ -118,6 +118,10 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.history',
 		defaultMessage: 'History',
 	},
+	historyStub: {
+		id: 'moderation.project-review.historyStub',
+		defaultMessage: 'Stub for history tab',
+	},
 	'tech-review': {
 		id: 'moderation.project-review.tech-review',
 		defaultMessage: 'Tech Review',

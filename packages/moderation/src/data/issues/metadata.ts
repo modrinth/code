@@ -64,6 +64,18 @@ export const metadataReviewPanel = panel({
 	icon: DatabaseIcon,
 	shown: ({ ProjectV3 }) => !ProjectV3.minecraft_server,
 }).content(
+	toggle({
+		issue: metadataDependenciesIssue,
+		label: 'Dependencies',
+	}),
+	toggle({
+		issue: metadataGameVersionsIssue,
+		label: 'Game Versions',
+	}),
+	toggle({
+		issue: metadataLoadersIssue,
+		label: 'Loaders',
+	}),
 	section({
 		shown: ({ ProjectV3 }) => requiresEnvironmentInfo(ProjectV3.project_types),
 	}).content(
@@ -89,16 +101,4 @@ export const metadataReviewPanel = panel({
 			}),
 		),
 	),
-	toggle({
-		issue: metadataDependenciesIssue,
-		label: 'Dependencies',
-	}),
-	toggle({
-		issue: metadataGameVersionsIssue,
-		label: 'Game Versions',
-	}),
-	toggle({
-		issue: metadataLoadersIssue,
-		label: 'Loaders',
-	}),
 )

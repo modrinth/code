@@ -14,9 +14,9 @@
 		>
 		</ReviewPanel>
 		<div class="min-h-0 flex-1 overflow-auto">
-			<div class="mr-0.5 mt-0.5 flex flex-col gap-3">
+			<div class="mr-0.5 mt-0.5 flex flex-col gap-1">
 				<div class="flex justify-between">
-					<div class="flex flex-wrap items-center gap-x-6 gap-y-2">
+					<div class="flex flex-wrap items-center gap-x-6 gap-y-2 pl-2.5">
 						<h2 class="m-0 flex items-center gap-2 text-sm font-semibold text-secondary">
 							{{ formatMessage(messages.versions) }}
 							<span class="text-contrast">{{ versions.length }}</span>
@@ -34,7 +34,7 @@
 					</div>
 					<Button
 						v-if="versions.length && !isLoading && !error && !versionsQuery.isError.value"
-						type="outlined"
+						type="quiet"
 						@click="
 							expanded = allExpanded ? new Set() : new Set(versions.map((version) => version.id))
 						"
