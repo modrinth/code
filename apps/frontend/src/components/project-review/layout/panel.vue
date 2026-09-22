@@ -2,7 +2,10 @@
 	<section
 		class="layout-panel h-full p-3"
 		:class="
-			slotName === 'right' || slotName === 'disclosures' || slotName === 'permissions'
+			slotName === 'right' ||
+			slotName === 'disclosures' ||
+			slotName === 'permissions' ||
+			slotName === 'gallery'
 				? 'overflow-hidden'
 				: 'overflow-auto'
 		"

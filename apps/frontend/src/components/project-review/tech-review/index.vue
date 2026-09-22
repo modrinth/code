@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="flex min-w-0 flex-col gap-3 rounded-lg border border-solid border-surface-4 bg-surface-2 p-3"
+		class="flex min-w-0 flex-col gap-1 rounded-lg border border-solid border-surface-4 bg-surface-2 p-3"
 	>
 		<p v-if="!selection" class="m-0 text-secondary">
 			{{ formatMessage(messages.empty) }}
