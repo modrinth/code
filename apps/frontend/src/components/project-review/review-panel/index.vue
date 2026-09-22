@@ -19,7 +19,11 @@
 					</Tooltip>
 				</div>
 			</template>
-			<Controls :target="target" />
+			<Controls
+				:target="target"
+				@dropdown-open="setDropdownOpen(id, true)"
+				@dropdown-close="setDropdownOpen(id, false)"
+			/>
 		</Popover>
 	</Anchor>
 	<component
@@ -67,7 +71,7 @@ const props = defineProps<{
 
 const id = useId()
 const { formatMessage } = useVIntl()
-const { active } = injectReviewContext()
+const { active, setDropdownOpen } = injectReviewContext()
 const panels = injectReviewPanels()
 const titleId = `${id}-title`
 const panel = computed(() => panels.resolve(props.target)?.panel)
