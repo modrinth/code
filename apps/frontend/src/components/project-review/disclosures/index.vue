@@ -1,9 +1,9 @@
 <template>
-	<div v-if="project" class="flex h-full min-h-0 flex-col gap-4 overflow-hidden">
+	<div v-if="project" class="flex h-full min-h-0 flex-col overflow-hidden">
 		<ReviewPanel
 			mode="inline"
 			:target="{ kind: 'disclosures' }"
-			class="shrink-0 !overflow-visible"
+			class="mb-1 shrink-0 !overflow-visible"
 		/>
 		<p v-if="isPending" role="status">{{ formatMessage(statusMessages.loading) }}</p>
 		<div v-else-if="isError" role="alert">

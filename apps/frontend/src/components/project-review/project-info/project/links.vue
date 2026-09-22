@@ -1,5 +1,5 @@
 <template>
-	<div v-if="links.length" class="flex flex-col gap-3.5">
+	<div v-if="links.length" class="flex flex-col">
 		<ReviewPanel
 			v-for="link in links"
 			:key="link.key"
@@ -7,18 +7,20 @@
 			:target="{ kind: 'link', key: link.key }"
 			class="min-w-0"
 		>
-			<h4 class="m-0 mb-1 text-sm font-normal text-secondary">
-				{{ link.label }}
-			</h4>
-			<a
-				:href="link.url"
-				target="_blank"
-				rel="noopener noreferrer"
-				class="inline-flex max-w-full items-center gap-1 break-all font-mono text-xs !transition-colors hover:text-contrast"
-			>
-				<span class="min-w-0">{{ link.url.replace(/^https?:\/\//, '') }}</span>
-				<ExternalIcon class="mb-0.5 size-3.5 shrink-0" aria-hidden="true" />
-			</a>
+			<div class="flex flex-col gap-1 py-1.5">
+				<h4 class="m-0 text-sm font-normal text-secondary">
+					{{ link.label }}
+				</h4>
+				<a
+					:href="link.url"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="inline-flex max-w-full items-center gap-1 break-all font-mono text-xs !transition-colors hover:text-contrast"
+				>
+					<span class="min-w-0">{{ link.url.replace(/^https?:\/\//, '') }}</span>
+					<ExternalIcon class="mb-0.5 size-3.5 shrink-0" aria-hidden="true" />
+				</a>
+			</div>
 		</ReviewPanel>
 	</div>
 </template>

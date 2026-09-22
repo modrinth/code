@@ -1,5 +1,5 @@
 <template>
-	<div v-if="panelBinding" class="flex flex-col gap-3">
+	<div v-if="panelBinding && hasToggles" class="flex flex-col gap-3">
 		<div
 			v-for="(section, index) in panelBinding.panel.sections"
 			:key="`${panelBinding.projectId}:${panelBinding.key}:${index}`"
@@ -56,30 +56,19 @@
 							:aria-required="control.required"
 							@update:model-value="panelBinding && panels.write(panelBinding, control, $event)"
 						/>
-						<select
+						<Combobox
 							v-else-if="control.type === 'select'"
-							:value="panels.selectValues(panelBinding, control)[0] ?? ''"
+							:model-value="panels.selectValues(panelBinding, control)[0] ?? ''"
+							:options="[
+								{ value: '', label: control.placeholder ?? formatMessage(controlMessages.select) },
+								...control.options,
+							]"
+							:placeholder="control.placeholder ?? formatMessage(controlMessages.select)"
 							:disabled="control.disabled"
-							:required="control.required"
 							:aria-label="control.label"
-							class="w-full rounded-lg border-0 bg-surface-4 px-3 py-2 text-primary"
-							@change="
-								panelBinding &&
-								panels.write(panelBinding, control, ($event.target as HTMLSelectElement).value)
-							"
-						>
-							<option value="">
-								{{ control.placeholder ?? formatMessage(controlMessages.select) }}
-							</option>
-							<option
-								v-for="option in control.options"
-								:key="option.value"
-								:value="option.value"
-								:disabled="option.disabled"
-							>
-								{{ option.label }}
-							</option>
-						</select>
+							:aria-required="control.required"
+							@update:model-value="panelBinding && panels.write(panelBinding, control, $event)"
+						/>
 					</div>
 					<Tooltip v-else :disabled="!control.tooltip" :text="control.tooltip">
 						<ActionButton
@@ -94,8 +83,8 @@
 			</div>
 		</div>
 	</div>
-	<p v-else class="m-0 text-secondary">
-		{{ formatMessage(messages.noReviewActions) }}
+	<p v-else class="m-0 text-base text-secondary">
+		{{ formatMessage(panelBinding ? messages.noIssues : messages.noReviewActions) }}
 	</p>
 	<div
 		v-if="!binding && target.kind === 'status-alerts' && panels.correctionsRequested.value"
@@ -121,7 +110,15 @@
 
 <script setup lang="ts">
 import ActionButton from '@modrinth/moderation/src/types/node/components/ActionButton.vue'
-import { defineMessages, Input, MarkdownEditor, MultiSelect, Tooltip, useVIntl } from '@modrinth/ui'
+import {
+	Combobox,
+	defineMessages,
+	Input,
+	MarkdownEditor,
+	MultiSelect,
+	Tooltip,
+	useVIntl,
+} from '@modrinth/ui'
 import { computed, useId } from 'vue'
 
 import type { ReviewTarget } from '~/providers/project-review/review'
@@ -159,4 +156,9 @@ const controlMessages = defineMessages({
 const { formatMessage } = useVIntl()
 const panels = injectReviewPanels()
 const panelBinding = computed(() => props.binding ?? panels.resolve(props.target))
+const hasToggles = computed(() =>
+	panelBinding.value?.panel.sections.some((section) =>
+		section.controls.some((control) => control.type === 'toggle'),
+	),
+)
 </script>

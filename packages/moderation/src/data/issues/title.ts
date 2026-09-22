@@ -1,11 +1,13 @@
 import { BookOpenIcon } from '@modrinth/assets'
 
+import { generateUrlSlug } from '../../utils'
 import minecraftBranding from '../messages/checklist/messages/title-slug/title/minecraft-branding.md'
 import similarities from '../messages/checklist/messages/title-slug/title/similarities.md'
 import forkSimilarities from '../messages/checklist/messages/title-slug/title/similarities/fork.md'
 import modpackSimilarities from '../messages/checklist/messages/title-slug/title/similarities/modpack.md'
 import uselessInfo from '../messages/checklist/messages/title-slug/title/useless-info.md'
 import { issue, panel, section, toggle } from './component-builders/builders'
+import { misusedSlugIssue } from './slug'
 
 export const titleUselessInfoIssue = issue({
 	id: 'title-useless-info',
@@ -39,11 +41,16 @@ export const modpackTitleSimilaritiesIssue = issue({
 
 export const titleReviewPanel = panel({
 	field: 'title',
-	title: 'Title',
-	hint: "Is the project's name accurate and appropriate?",
+	title: 'Title and slug',
+	hint: "Are the project's name and URL accurate and appropriate?",
 	icon: BookOpenIcon,
 }).content(
 	section().content(
+		toggle({
+			label: 'Misused slug',
+			issue: misusedSlugIssue,
+			shown: ({ ProjectV3 }) => generateUrlSlug(ProjectV3.name) !== ProjectV3.slug,
+		}),
 		toggle({
 			label: 'Contains Useless Info',
 			issue: titleUselessInfoIssue,

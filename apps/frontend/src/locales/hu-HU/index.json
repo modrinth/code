@@ -1064,9 +1064,6 @@
   "conversation-thread.action.approve": {
     "message": "Jóváhagyás"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Jóváhagyás és válasz"
-  },
   "conversation-thread.action.close-report": {
     "message": "Jelentés lezárása"
   },
@@ -1075,9 +1072,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Elutasítás"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Elutasítás és válasz"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Beszélgetés megnyitása újra"
@@ -1111,9 +1105,6 @@
   },
   "conversation-thread.action.withhold": {
     "message": "Visszatartás"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Visszatartás és válasz"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Ez a beszélgetés le van zárva, és nem lehet új üzeneteket küldeni benne."

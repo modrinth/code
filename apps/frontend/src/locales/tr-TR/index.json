@@ -1043,9 +1043,6 @@
   "conversation-thread.action.approve": {
     "message": "Onaylandı"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Onaylandı, işlem tamamlandı"
-  },
   "conversation-thread.action.close-report": {
     "message": "Raporu kapat"
   },
@@ -1054,9 +1051,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Reddet"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Cevap vererek reddet"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Konuyu yeniden aç"
@@ -1090,9 +1084,6 @@
   },
   "conversation-thread.action.withhold": {
     "message": "Yanıtla birlikte taslağa çevir"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Yanıtla birlikte beklet"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Bu konu kapatılmıştır ve yeni mesaj gönderilemez."

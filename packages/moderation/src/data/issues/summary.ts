@@ -47,10 +47,12 @@ export const summaryReviewPanel = panel({
 		toggle({
 			label: 'Insufficient',
 			issue: insufficientSummaryIssue,
+			disabled: ({ selected }) => selected.issueIds.includes(summaryRepeatsTitleIssue.id),
 		}),
 		toggle({
 			label: 'Repeat of Title',
 			issue: summaryRepeatsTitleIssue,
+			disabled: ({ selected }) => selected.issueIds.includes(insufficientSummaryIssue.id),
 		}),
 		toggle({
 			label: 'Formatting',

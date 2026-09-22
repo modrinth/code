@@ -4,10 +4,10 @@
 		<div
 			v-if="project"
 			ref="scrollContainer"
-			class="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain"
+			class="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overscroll-contain"
 			@scroll="updateScrollPosition"
 		>
-			<div ref="conversationContent">
+			<div ref="conversationContent" class="mt-auto shrink-0">
 				<ConversationThread
 					v-if="thread"
 					v-model:reply-body="draft"

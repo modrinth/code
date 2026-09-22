@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Toggle } from '@modrinth/ui'
-import { computed, useId, type Component } from 'vue'
+import { type Component,computed, useId } from 'vue'
 
 const props = defineProps<{
 	title: string

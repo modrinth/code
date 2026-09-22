@@ -1007,9 +1007,6 @@
   "conversation-thread.action.approve": {
     "message": "Godkänn"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Godkänn med svar"
-  },
   "conversation-thread.action.close-report": {
     "message": "Stäng rapport"
   },
@@ -1018,9 +1015,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Avslå"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Avslå med svar"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Återuppta tråd"
@@ -1054,9 +1048,6 @@
   },
   "conversation-thread.action.withhold": {
     "message": "Tillhandahåll"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Tillbakahåll med svar"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Den här tråden är stängd och nya meddelanden kan inte skickas."

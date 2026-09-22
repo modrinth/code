@@ -44,6 +44,6 @@ import { projectReviewMessages as messages } from '../../messages'
 
 const { project, submissionCount } = injectProjectReviewPageContext()
 const { formatMessage } = useVIntl()
-const relativeTime = useRelativeTime()
+const relativeTime = useRelativeTime({ style: 'narrow' })
 const formatNumber = useFormatNumber()
 </script>

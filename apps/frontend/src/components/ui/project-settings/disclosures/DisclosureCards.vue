@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import ReviewPanel from '~/components/project-review/review-panel/index.vue'
 
+import AdvertisingDisclosureCard from './AdvertisingDisclosureCard.vue'
 import AiDisclosureCard from './AiDisclosureCard.vue'
 import AiFunctionalityDisclosureCard from './AiFunctionalityDisclosureCard.vue'
-import AdvertisingDisclosureCard from './AdvertisingDisclosureCard.vue'
-import PaidFeaturesDisclosureCard from './PaidFeaturesDisclosureCard.vue'
-import TelemetryDisclosureCard from './TelemetryDisclosureCard.vue'
+import ArchivedDisclosureCard from './ArchivedDisclosureCard.vue'
 import DerivativeDisclosureCard from './DerivativeDisclosureCard.vue'
+import PaidFeaturesDisclosureCard from './PaidFeaturesDisclosureCard.vue'
 import PhotosensitivityDisclosureCard from './PhotosensitivityDisclosureCard.vue'
 import SystemInteractionsDisclosureCard from './SystemInteractionsDisclosureCard.vue'
-import ArchivedDisclosureCard from './ArchivedDisclosureCard.vue'
+import TelemetryDisclosureCard from './TelemetryDisclosureCard.vue'
 import type { DisclosureLockStatus } from './types'
 import type { useDisclosureEditor } from './use-disclosure-editor'
 
