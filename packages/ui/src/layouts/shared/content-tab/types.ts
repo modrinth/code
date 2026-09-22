@@ -76,6 +76,7 @@ export interface ContentCardTableItem {
 	owner?: ContentOwner
 	source?: ContentSource
 	external?: boolean
+	externalFile?: boolean
 	enabled?: boolean
 	locked?: boolean
 	disabled?: boolean
