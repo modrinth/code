@@ -28,13 +28,6 @@ pub struct ReportType {
     pub report_type: String,
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct LinkPlatform {
-    pub id: LinkPlatformId,
-    pub name: String,
-    pub donation: bool,
-}
-
 impl Category {
     // Gets hashmap of category ids matching a name
     // Multiple categories can have the same name, but different project types, so we need to return a hashmap
@@ -142,82 +135,6 @@ impl Category {
             .set_serialized(&key, &result, None)
             .await
             .wrap_err("caching categories")?;
-
-        Ok(result)
-    }
-}
-
-impl LinkPlatform {
-    pub async fn get_id<'a, E>(
-        id: &str,
-        exec: E,
-    ) -> Result<Option<LinkPlatformId>>
-    where
-        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
-    {
-        let result = sqlx::query!(
-            "
-            SELECT id FROM link_platforms
-            WHERE name = $1
-            ",
-            id
-        )
-        .fetch_optional(exec)
-        .await
-        .wrap_err("fetching link platform id")?;
-
-        Ok(result.map(|r| LinkPlatformId(r.id)))
-    }
-
-    pub async fn list<'a, E>(
-        exec: E,
-        redis: &RedisPool,
-    ) -> Result<Vec<LinkPlatform>>
-    where
-        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
-    {
-        {
-            let mut redis = redis
-                .connect()
-                .await
-                .wrap_err("connecting to redis for cached link platforms")?;
-            let key = redis.key().metadata(TAGS_NAMESPACE, "link_platform");
-
-            let res: Option<Vec<LinkPlatform>> = redis
-                .get_deserialized(&key)
-                .await
-                .wrap_err("fetching cached link platforms")?;
-
-            if let Some(res) = res {
-                return Ok(res);
-            }
-        }
-
-        let result = sqlx::query!(
-            "
-            SELECT id, name, donation FROM link_platforms
-            "
-        )
-        .fetch(exec)
-        .map_ok(|c| LinkPlatform {
-            id: LinkPlatformId(c.id),
-            name: c.name,
-            donation: c.donation,
-        })
-        .try_collect::<Vec<LinkPlatform>>()
-        .await
-        .wrap_err("fetching link platforms")?;
-
-        let mut redis = redis
-            .connect()
-            .await
-            .wrap_err("connecting to redis to cache link platforms")?;
-        let key = redis.key().metadata(TAGS_NAMESPACE, "link_platform");
-
-        redis
-            .set_serialized(&key, &result, None)
-            .await
-            .wrap_err("caching link platforms")?;
 
         Ok(result)
     }
