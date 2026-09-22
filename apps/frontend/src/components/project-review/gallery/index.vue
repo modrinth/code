@@ -1,5 +1,5 @@
 <template>
-	<div class="flex h-full min-h-0 flex-col gap-1 overflow-hidden">
+	<div class="flex h-full min-h-0 flex-col gap-2.5 overflow-hidden">
 		<ReviewPanel mode="inline" :target="{ kind: 'gallery' }" :disabled="isLoading || !!error">
 		</ReviewPanel>
 		<div class="min-h-0 flex-1 overflow-y-auto overscroll-contain">

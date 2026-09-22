@@ -1,5 +1,5 @@
 <template>
-	<div class="flex h-full min-h-0 flex-col gap-1 overflow-hidden">
+	<div class="flex h-full min-h-0 flex-col gap-2.5 overflow-hidden">
 		<ReviewPanel mode="inline" :target="{ kind: 'description' }" :disabled="isLoading || !!error" />
 		<div class="min-h-0 flex-1 overflow-auto">
 			<p v-if="!selection" class="m-0 text-secondary">
