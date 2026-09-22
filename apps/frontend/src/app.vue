@@ -16,13 +16,13 @@
 <script setup lang="ts">
 import {
 	AccountSwitchOverlay,
+	createServerOnboardingInviteFlow,
 	I18nDebugPanel,
 	injectI18n,
 	LoadingBar,
 	NotificationPanel,
-	ServerOnboardingInviteModal,
-	createServerOnboardingInviteFlow,
 	provideServerOnboardingInviteFlow,
+	ServerOnboardingInviteModal,
 } from '@modrinth/ui'
 
 import AdsConsentNotification from '~/components/ui/AdsConsentNotification.vue'

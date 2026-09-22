@@ -140,7 +140,9 @@ const actionsWidth = computed(() =>
 
 function getItemListeners(id: string) {
 	return {
-		...(hasDeleteListener.value ? { delete: (event: MouseEvent) => emit('delete', id, event) } : {}),
+		...(hasDeleteListener.value
+			? { delete: (event: MouseEvent) => emit('delete', id, event) }
+			: {}),
 		...(hasUpdateListener.value ? { update: () => emit('update', id) } : {}),
 		...(hasSwitchVersionListener.value ? { switchVersion: () => emit('switchVersion', id) } : {}),
 	}
@@ -188,7 +190,10 @@ const contentColumnStyles = computed(() => {
 })
 const itemHeight = computed(() => {
 	if (!stacked.value) return 74
-	const controlRows = layout.value === 'narrow' ? controlColumns.value.length : Math.min(1, controlColumns.value.length)
+	const controlRows =
+		layout.value === 'narrow'
+			? controlColumns.value.length
+			: Math.min(1, controlColumns.value.length)
 	return 25 + 48 + controlRows * 44
 })
 const { listContainer, totalHeight, visibleRange, visibleTop, visibleItems, scrollToIndex } =
@@ -321,11 +326,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 					: '',
 			]"
 		>
-			<div
-				role="row"
-				class="flex min-w-0 items-center gap-4"
-				:class="{ 'col-span-full': stacked }"
-			>
+			<div role="row" class="flex min-w-0 items-center gap-4" :class="{ 'col-span-full': stacked }">
 				<Checkbox
 					v-if="showSelection"
 					:model-value="allSelected"
@@ -423,8 +424,8 @@ function handleSort(column: ContentCardTableSortColumn) {
 					:project-link="item.projectLink"
 					:version="item.version"
 					:show-version="showVersion"
-				:table-layout="layout"
-				:enabled-for-column="hasEnabledForColumn"
+					:table-layout="layout"
+					:enabled-for-column="hasEnabledForColumn"
 					:version-link="item.versionLink"
 					:owner="item.owner"
 					:source="item.source"

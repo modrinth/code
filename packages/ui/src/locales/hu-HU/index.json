@@ -395,9 +395,6 @@
   "content.card.synced": {
     "defaultMessage": "Példányok között szinkronizálva"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Feltöltve"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Biztosan frissíteni szeretnél {count} projektet a legújabb kompatibilis verziójára? Javasoljuk, hogy a tartalmakat egyenként frissítsd."
   },
@@ -653,9 +650,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Tartalom megtekintése"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Készítő"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Környezet"
   },
@@ -688,9 +682,6 @@
   },
   "content.metadata-filter.warning.client-retained": {
     "defaultMessage": "Kliensfájl megtartva"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Nincsenek figyelmeztetések"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Figyelmeztetések"
@@ -727,9 +718,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Szűrő"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count} készítő"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Tartalom betöltése..."
@@ -2411,12 +2399,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Engedélyezve"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Külső"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Ez a fájl nincs közzétéve a Modrinthon."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Kezelt tartalom"
   },
@@ -2431,9 +2413,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Keresés {count, number} projekt között..."
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Figyelmeztetések"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Jelenlegi"

@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { CheckIcon, InfoIcon, RefreshCwIcon, SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+
 import Avatar from '#ui/components/base/Avatar.vue'
 import Button from '#ui/components/base/buttons/Button.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectNotificationManager } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
-
-import type { IconBackground, IconConfig } from './types'
 
 import {
 	type BackgroundId,
@@ -20,6 +19,7 @@ import {
 	type SymbolOption,
 	symbolOptions,
 } from './editor-catalog'
+import type { IconBackground, IconConfig } from './types'
 
 const props = defineProps<{
 	config?: IconConfig | null
@@ -211,7 +211,7 @@ function surpriseMe() {
 	selectedSymbol.value = configuration.symbol
 }
 
-async function loadRecents() {
+async function refreshRecentConfigs() {
 	try {
 		recentConfigs.value = props.loadRecents ? await props.loadRecents() : []
 	} catch (error) {
@@ -223,7 +223,7 @@ function show() {
 	selectedBackground.value = backgroundOption(props.config?.background)?.id ?? DEFAULT_BACKGROUND_ID
 	selectedSymbol.value = symbolOption(props.config?.symbol ?? '')?.id ?? DEFAULT_SYMBOL_ID
 	modal.value?.show()
-	void loadRecents()
+	void refreshRecentConfigs()
 	nextTick(updateBackgroundScrollShadows)
 }
 

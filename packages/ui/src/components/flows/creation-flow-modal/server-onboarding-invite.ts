@@ -11,7 +11,8 @@ export async function createServerOnboardingInvite(
 ): Promise<string | null> {
 	const details = await client.archon.servers_v1.get(serverId)
 	if (!isCurrent()) return null
-	const existingId = details.worlds.find((world) => world.id === worldId)?.content?.shared_instance_id
+	const existingId = details.worlds.find((world) => world.id === worldId)?.content
+		?.shared_instance_id
 	const instanceId =
 		existingId ??
 		(await client.archon.content_v1.share(serverId, worldId, [], { timeout: 20_000 }))
