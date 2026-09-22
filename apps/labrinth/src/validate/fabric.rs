@@ -1,10 +1,10 @@
-use crate::database::models::DatabaseError;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::models::projects::Loader;
 use crate::validate::{
     SupportedGameVersions, ValidationError, ValidationResult,
     validate_pack_formats,
 };
+use eyre::eyre;
 use std::io::Cursor;
 use zip::ZipArchive;
 
@@ -87,9 +87,9 @@ pub(super) fn validate_game_versions(
         .find(|version| version.version == name)
         .map(|version| version.created)
         .ok_or_else(|| {
-          DatabaseError::SchemaError(format!(
-            "missing minecraft game version `{name}` required for loader validation"
-          ))
+            eyre!(
+              "missing minecraft game version `{name}` required for loader validation"
+            )
         })
     };
 
