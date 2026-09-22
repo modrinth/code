@@ -23,12 +23,17 @@
 			</div>
 			<p class="m-0 text-xs">{{ member.role }}</p>
 			<div class="flex flex-wrap gap-x-2 gap-y-1 text-xs">
-				<span
-					v-for="stat in visibleStats"
+				<Tooltip
+					v-for="stat in statusStats"
 					:key="stat.status"
-					:class="{ 'text-red': stat.status === 'rejected' }"
-					>{{ formatMessage(stat.message, { count: stat.count }) }}</span
+					:text="formatMessage(stat.message, { count: stat.count })"
+					:aria-label="formatMessage(stat.message, { count: stat.count })"
+					class="flex items-center gap-1 font-semibold tabular-nums"
+					:class="stat.color"
 				>
+					<component :is="stat.icon" class="size-4 shrink-0" aria-hidden="true" />
+					<span aria-hidden="true">{{ stat.count }}</span>
+				</Tooltip>
 			</div>
 		</div>
 	</li>
@@ -36,8 +41,8 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { CrownIcon } from '@modrinth/assets'
-import { Avatar, useVIntl } from '@modrinth/ui'
+import { CheckIcon, CrownIcon } from '@modrinth/assets'
+import { Avatar, PROJECT_STATUS_ICONS, Tooltip, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
 import { projectReviewMessages as messages } from '../../messages'
@@ -59,10 +64,30 @@ const statusMessages = {
 	scheduled: messages.scheduledCount,
 	unknown: messages.unknownCount,
 }
-const visibleStats = computed(() =>
-	props.stats.flatMap((stat) => {
-		const message = statusMessages[stat.status as keyof typeof statusMessages]
-		return message && stat.count ? [{ ...stat, message }] : []
-	}),
+const statusColors = {
+	approved: 'text-green',
+	archived: 'text-purple',
+	unlisted: 'text-purple',
+	withheld: 'text-red',
+	processing: 'text-orange',
+	draft: 'text-blue',
+	rejected: 'text-red',
+	private: 'text-purple',
+	scheduled: 'text-orange',
+	unknown: 'text-orange',
+}
+const statusStats = computed(() =>
+	Object.entries(statusMessages)
+		.map(([key, message]) => {
+			const status = key as keyof typeof statusMessages
+			return {
+				status,
+				message,
+				count: props.stats.find((stat) => stat.status === status)?.count ?? 0,
+				icon: status === 'approved' ? CheckIcon : PROJECT_STATUS_ICONS[status],
+				color: statusColors[status],
+			}
+		})
+		.filter((stat) => stat.count > 0),
 )
 </script>

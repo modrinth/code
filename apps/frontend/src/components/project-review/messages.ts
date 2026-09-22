@@ -394,6 +394,30 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.collapseAll',
 		defaultMessage: 'Collapse all',
 	},
+	expandVersion: {
+		id: 'moderation.project-review.expandVersion',
+		defaultMessage: 'Show details',
+	},
+	collapseVersion: {
+		id: 'moderation.project-review.collapseVersion',
+		defaultMessage: 'Hide details',
+	},
+	dependencyCount: {
+		id: 'moderation.project-review.dependencyCount',
+		defaultMessage: '{count, plural, one {# dep} other {# deps}}',
+	},
+	versionNumber: {
+		id: 'moderation.project-review.versionNumber',
+		defaultMessage: 'Version Number',
+	},
+	versionSubtitle: {
+		id: 'moderation.project-review.versionSubtitle',
+		defaultMessage: 'Version Subtitle',
+	},
+	publishedBy: {
+		id: 'moderation.project-review.publishedBy',
+		defaultMessage: 'Published by',
+	},
 	fileCount: {
 		id: 'moderation.project-review.fileCount',
 		defaultMessage: '{count, plural, one {# file} other {# files}}',
@@ -409,6 +433,10 @@ export const projectReviewMessages = defineMessages({
 	hashes: {
 		id: 'moderation.project-review.hashes',
 		defaultMessage: 'Hashes',
+	},
+	copyHash: {
+		id: 'moderation.project-review.copyHash',
+		defaultMessage: 'Copy {algorithm}',
 	},
 	changelog: {
 		id: 'moderation.project-review.changelog',
