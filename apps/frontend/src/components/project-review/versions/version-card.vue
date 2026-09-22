@@ -1,178 +1,121 @@
 <template>
 	<article
-		class="min-w-0 overflow-hidden rounded-xl border border-solid border-surface-4 bg-surface-2"
+		class="version-card flex min-w-0 flex-col gap-3 overflow-hidden rounded-2xl border border-solid bg-surface-2 p-2.5 pb-0.5"
+		:class="withheld ? 'border-orange' : 'border-transparent'"
 	>
-		<div class="flex flex-wrap items-center gap-3">
-			<button
-				type="button"
-				class="flex min-w-0 flex-1 cursor-pointer items-center gap-3 border-0 bg-transparent p-3 text-left text-primary"
-				:aria-expanded="expanded"
-				:aria-controls="`review-version-${version.id}`"
-				@click="emit('toggle')"
-			>
-				<ChevronDownIcon
-					class="shrink-0 transition-transform"
-					:class="{ '-rotate-90': !expanded }"
+		<div class="flex min-w-0 flex-1 flex-wrap items-start gap-2 gap-x-4">
+			<div class="mt-0.5 flex min-w-0 flex-1 flex-wrap items-center gap-2">
+				<VersionChannelIndicator
+					:channel="version.version_type"
+					:title="formatMessage(commonMessages[version.version_type])"
+					size="sm"
 				/>
-				<div class="flex items-center gap-2">
-					<div class="flex flex-wrap items-center gap-2">
-						<VersionChannelTag :channel="version.version_type" />
-						<strong :title="version.name" class="break-all text-contrast">{{
-							version.version_number
-						}}</strong>
-						<TagItem v-if="version.status !== 'listed'">{{
-							formatMessage(messages[version.status] ?? messages.unknown)
-						}}</TagItem>
-						<TagItem v-if="version.files_missing_attribution?.length" class="text-orange">{{
-							formatMessage(messages.withheld)
-						}}</TagItem>
-					</div>
-					<span class="break-words text-sm text-secondary"
-						>{{ compatibility }} ·
-						{{ formatMessage(messages.fileCount, { count: version.files.length }) }}</span
-					>
-				</div>
-			</button>
-			<div class="flex flex-wrap gap-2 pr-3">
-				<ButtonLink :to="versionHref" target="_blank">{{
-					formatMessage(messages.viewVersion)
-				}}</ButtonLink>
-				<ButtonLink v-if="primaryFile" :href="primaryFile.url" :download="primaryFile.filename"
-					><DownloadIcon />{{ formatMessage(messages.download) }}</ButtonLink
+				<TagTagItem v-for="loader in platforms" :key="loader" :tag="loader" />
+				<TagItem v-for="game in gameVersions" :key="game">{{ game }}</TagItem>
+				<EnvironmentTags v-if="version.environment" :environment="version.environment" />
+				<TagItem
+					v-if="withheld"
+					class="!border-orange-highlight !bg-orange-highlight font-semibold capitalize !text-orange"
+					>{{ formatMessage(messages.withheld) }}</TagItem
 				>
+				<TagItem v-if="version.status !== 'listed'">{{
+					formatMessage(messages[version.status] ?? messages.unknown)
+				}}</TagItem>
+			</div>
+			<div class="ml-auto flex flex-wrap items-center justify-end gap-2 text-sm text-secondary">
+				<span>{{
+					formatMessage(messages.dependencyCount, { count: version.dependencies.length })
+				}}</span>
+				<BulletDivider aria-hidden="true" />
+				<span
+					class="inline-flex items-center gap-1"
+					:title="`${formatMessage(messages.downloads)}: ${formatNumber(version.downloads)}`"
+				>
+					<DownloadIcon class="size-4" aria-hidden="true" />{{
+						formatCompactNumber(version.downloads)
+					}}
+				</span>
+				<BulletDivider aria-hidden="true" />
+				<time :datetime="version.date_published" :title="formatDateTime(version.date_published)">{{
+					relativeTime(version.date_published)
+				}}</time>
+				<ButtonLink
+					v-tooltip="formatMessage(messages.viewVersion)"
+					:to="versionHref"
+					:aria-label="formatMessage(messages.viewVersion)"
+					target="_blank"
+					type="quiet"
+					circular
+					size="sm"
+					icon-only
+				>
+					<ExternalIcon />
+				</ButtonLink>
 			</div>
 		</div>
-		<div
-			v-if="expanded"
-			:id="`review-version-${version.id}`"
-			class="flex min-w-0 flex-col gap-4 border-0 border-t border-solid border-surface-4 p-3"
-		>
-			<div class="flex min-w-0 flex-wrap items-start gap-6">
-				<section class="min-w-0 flex-[1_1_16rem]">
-					<h3 class="mb-2 mt-0 text-sm font-semibold text-secondary">
+		<div class="flex flex-col gap-1.5">
+			<div
+				v-for="file in version.files"
+				:key="file.url"
+				class="min-w-0 rounded-lg bg-surface-1 px-3 py-2"
+			>
+				<div class="flex w-full min-w-0 flex-wrap items-center justify-between gap-2.5">
+					<div class="min-w-0 break-all font-medium">
+						{{ file.filename }}
+						<span class="ml-1 text-sm font-normal text-secondary">
+							({{ formatBytes(file.size) }})
+						</span>
+					</div>
+					<div class="flex flex-wrap items-center gap-2 text-sm text-secondary">
+						<span v-if="file.file_type && file.file_type !== 'unknown'">{{
+							formatMessage(fileTypeMessages[file.file_type])
+						}}</span>
+						<TeleportOverflowMenu
+							type="quiet"
+							size="sm"
+							:label="formatMessage(commonMessages.moreOptionsButton)"
+							:options="fileActions(file)"
+						>
+							<MoreVerticalIcon />
+						</TeleportOverflowMenu>
+					</div>
+				</div>
+			</div>
+			<Accordion
+				button-class="w-full cursor-pointer border-0 bg-transparent py-2 text-left text-sm font-medium hover:brightness-125 [&>div>svg]:ml-0 [&>div>svg]:size-4"
+				:open-by-default="expanded"
+				@on-open="!expanded && emit('toggle')"
+				@on-close="expanded && emit('toggle')"
+			>
+				<template #title>
+					<span class="text-primary">
 						{{ formatMessage(messages.details) }}
-					</h3>
-					<table class="version-metadata w-full text-left">
-						<tbody>
-							<tr>
-								<th scope="row" class="text-sm font-normal text-secondary">
-									{{ formatMessage(messages.gameVersions) }}
-								</th>
-								<td>
-									<div class="flex flex-wrap gap-1">
-										<TagItem v-for="game in version.game_versions" :key="game">{{ game }}</TagItem>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<th scope="row" class="text-sm font-normal text-secondary">
-									{{ formatMessage(messages.platforms) }}
-								</th>
-								<td>
-									<div class="flex flex-wrap gap-1">
-										<TagTagItem v-for="loader in platforms" :key="loader" :tag="loader" />
-									</div>
-								</td>
-							</tr>
-							<tr v-if="version.environment">
-								<th scope="row" class="text-sm font-normal text-secondary">
-									{{ formatMessage(messages.environments) }}
-								</th>
-								<td class="space-y-1.5">
-									<EnvironmentTags :environment="version.environment" />
-								</td>
-							</tr>
-							<tr>
-								<th scope="row" class="text-sm font-normal text-secondary">
-									{{ formatMessage(messages.published) }}
-								</th>
-								<td>
-									<time :datetime="version.date_published">{{
-										formatDateTime(version.date_published)
-									}}</time>
-								</td>
-							</tr>
-							<tr>
-								<th scope="row" class="text-sm font-normal text-secondary">
-									{{ formatMessage(messages.author) }}
-								</th>
-								<td>
-									<NuxtLink
-										:to="`/user/${version.author_id}`"
-										target="_blank"
-										class="hover:underline"
-										>{{ author?.username ?? version.author_id }}</NuxtLink
-									>
-								</td>
-							</tr>
-							<tr>
-								<th scope="row" class="text-sm font-normal text-secondary">
-									{{ formatMessage(messages.downloads) }}
-								</th>
-								<td>{{ formatNumber(version.downloads) }}</td>
-							</tr>
-							<tr>
-								<th scope="row" class="text-sm font-normal text-secondary">
-									{{ formatMessage(messages.versionId) }}
-								</th>
-								<td><CopyCode :text="version.id" /></td>
-							</tr>
-						</tbody>
-					</table>
-					<ButtonLink
-						v-if="version.files_missing_attribution?.length"
-						:to="permissionsHref"
-						target="_blank"
-						class="mt-3 w-fit"
-						>{{ formatMessage(messages.resolvePermissions) }}</ButtonLink
-					>
-				</section>
-				<div class="flex min-w-0 flex-[3_1_24rem] flex-col gap-4">
+					</span>
+				</template>
+				<div :id="`review-version-${version.id}`" class="mt-1 flex min-w-0 flex-col gap-5">
 					<section>
-						<h3 class="mb-2 mt-0 text-sm font-semibold text-secondary">
-							{{ formatMessage(messages.files) }}
-						</h3>
-						<div class="flex flex-col gap-1.5">
-							<div
-								v-for="file in version.files"
-								:key="file.url"
-								class="min-w-0 rounded-lg bg-surface-1 px-3 py-2"
-							>
-								<div class="flex w-full min-w-0 flex-wrap items-center justify-between gap-2.5">
-									<div class="min-w-0 font-medium">{{ file.filename }}</div>
-									<div class="flex items-center gap-2 text-sm text-secondary">
-										<TagItem v-if="file.primary">{{ formatMessage(messages.primary) }}</TagItem
-										><span>{{ formatMessage(fileTypeMessages[file.file_type ?? 'unknown']) }}</span
-										><span>{{ formatBytes(file.size) }}</span>
-										<ButtonLink
-											size="sm"
-											:href="file.url"
-											:download="file.filename"
-											:aria-label="formatMessage(messages.download)"
-											icon-only
-										>
-											<DownloadIcon />
-										</ButtonLink>
-									</div>
-								</div>
-								<details class="mt-2">
-									<summary class="cursor-pointer text-sm text-secondary">
-										{{ formatMessage(messages.hashes) }}
-									</summary>
-									<div
-										v-for="(hash, algorithm) in file.hashes"
-										:key="algorithm"
-										class="mt-2 flex min-w-0 flex-wrap items-center gap-2 text-xs"
-									>
-										<span class="uppercase">{{ algorithm }}</span
-										><CopyCode :text="hash" class="min-w-0 max-w-full break-all [&_svg]:shrink-0" />
-									</div>
-								</details>
-							</div>
-						</div>
+						<dl
+							class="m-0 grid min-w-0 grid-cols-[minmax(0,max-content)_minmax(0,1fr)] items-baseline gap-x-6 gap-y-3"
+						>
+							<dt class="text-secondary">{{ formatMessage(messages.versionNumber) }}</dt>
+							<dd class="m-0 min-w-0 break-all">{{ version.version_number }}</dd>
+							<dt class="text-secondary">{{ formatMessage(messages.versionSubtitle) }}</dt>
+							<dd class="m-0 min-w-0 break-words">{{ version.name }}</dd>
+							<dt class="text-secondary">{{ formatMessage(messages.publishedBy) }}</dt>
+							<dd class="m-0 min-w-0 break-words">
+								<NuxtLink
+									:to="`/user/${version.author_id}`"
+									target="_blank"
+									class="hover:underline"
+									>{{ author?.username ?? version.author_id }}</NuxtLink
+								>
+							</dd>
+							<dt class="text-secondary">{{ formatMessage(messages.versionId) }}</dt>
+							<dd class="m-0 min-w-0"><CopyCode :text="version.id" /></dd>
+						</dl>
 					</section>
 					<section>
-						<h3 class="mb-2 mt-0 text-sm font-semibold text-secondary">
+						<h3 class="mb-3 mt-0 text-sm font-semibold text-secondary">
 							{{ formatMessage(messages.dependencies) }}
 						</h3>
 						<p v-if="!version.dependencies.length" class="m-0 text-secondary">
@@ -193,66 +136,85 @@
 								:key="index"
 								class="min-w-0 rounded-lg bg-surface-1 px-3 py-2"
 							>
-								<VersionDependencyItem
-									:context="context"
-									:dependency-link="dependencyHref(context)"
-									link-tabbable
-									class="min-w-0 break-words"
-								>
-									<TagItem>{{
+								<div class="flex min-w-0 flex-wrap items-center gap-3">
+									<AutoLink
+										:to="dependencyHref(context)"
+										class="flex min-w-0 flex-1 items-center gap-3 text-contrast hover:underline"
+									>
+										<Avatar
+											:src="
+												context.project?.icon_url ??
+												context.dependency.attribution?.flame_project?.icon_url
+											"
+											alt=""
+											size="1.5rem"
+											no-shadow
+										/>
+										<span class="break-words">{{
+											context.project?.title ??
+											context.dependency.file_name ??
+											context.dependency.project_id ??
+											context.dependency.version_id
+										}}</span>
+									</AutoLink>
+									<span v-if="context.version" class="break-all font-mono text-sm text-secondary">{{
+										context.version.version_number
+									}}</span>
+									<TagItem class="text-xs">{{
 										formatMessage(messages[context.dependency.dependency_type])
 									}}</TagItem>
-								</VersionDependencyItem>
-								<CopyCode
-									v-if="!context.project"
-									:text="
-										context.dependency.project_id ??
-										context.dependency.version_id ??
-										context.dependency.file_name ??
-										''
-									"
-									class="mt-2"
-								/>
+								</div>
 							</div>
 						</div>
+						<Accordion
+							:open-by-default="changelogOpen"
+							button-class="w-full cursor-pointer border-0 bg-transparent mt-2 py-2 text-left text-sm font-medium hover:brightness-125 [&>div>svg]:ml-0 [&>div>svg]:size-4"
+							@on-open="changelogOpen = true"
+							@on-close="changelogOpen = false"
+						>
+							<template #title>
+								<span class="text-primary">
+									{{ formatMessage(messages.changelog) }}
+								</span>
+							</template>
+							<div class="mb-2.5">
+								<p v-if="detailQuery.isPending.value" role="status" class="m-0">
+									{{ formatMessage(messages.loading) }}
+								</p>
+								<div v-else-if="detailQuery.isError.value" role="alert">
+									<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
+									<Button @click="detailQuery.refetch()">{{
+										formatMessage(messages.retry)
+									}}</Button>
+								</div>
+								<ProjectPageDescription
+									v-else-if="detailQuery.data.value?.changelog"
+									:description="detailQuery.data.value.changelog"
+								/>
+								<p v-else class="m-0 text-secondary">
+									{{ formatMessage(messages.emptyChangelog) }}
+								</p>
+							</div>
+						</Accordion>
 					</section>
 				</div>
-			</div>
-			<details
-				:open="changelogOpen"
-				@toggle="changelogOpen = ($event.target as HTMLDetailsElement).open"
-			>
-				<summary class="cursor-pointer font-semibold text-contrast">
-					{{ formatMessage(messages.changelog) }}
-				</summary>
-				<div v-if="changelogOpen" class="mt-3 rounded-lg p-3">
-					<p v-if="detailQuery.isPending.value" role="status" class="m-0">
-						{{ formatMessage(messages.loading) }}
-					</p>
-					<div v-else-if="detailQuery.isError.value" role="alert">
-						<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
-						<Button @click="detailQuery.refetch()">{{ formatMessage(messages.retry) }}</Button>
-					</div>
-					<ProjectPageDescription
-						v-else-if="detailQuery.data.value?.changelog"
-						:description="detailQuery.data.value.changelog"
-					/>
-					<p v-else class="m-0 text-secondary">
-						{{ formatMessage(messages.emptyChangelog) }}
-					</p>
-				</div>
-			</details>
-			<ReviewPanel mode="inline" :target="{ kind: 'version', key: version.id }" />
+			</Accordion>
 		</div>
 	</article>
 </template>
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ChevronDownIcon, DownloadIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, DownloadIcon, ExternalIcon, MoreVerticalIcon } from '@modrinth/assets'
 import {
+	Accordion,
+	AutoLink,
+	Avatar,
+	BulletDivider,
 	Button,
 	ButtonLink,
+	type ButtonMenuOption,
+	commonMessages,
 	CopyCode,
 	type DependencyContext,
 	fileTypeMessages,
@@ -261,14 +223,16 @@ import {
 	ProjectPageDescription,
 	TagItem,
 	TagTagItem,
+	TeleportOverflowMenu,
+	useCompactNumber,
 	useFormatBytes,
 	useFormatDateTime,
 	useFormatNumber,
+	useRelativeTime,
 	useVIntl,
-	VersionDependencyItem,
+	VersionChannelIndicator,
 } from '@modrinth/ui'
 import EnvironmentTags from '@modrinth/ui/src/components/project/EnvironmentTags.vue'
-import VersionChannelTag from '@modrinth/ui/src/components/version/VersionChannelTag.vue'
 import { formatVersionsForDisplay } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
@@ -278,7 +242,6 @@ import { versionQueryOptions } from '~/composables/queries/version'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { projectReviewMessages as messages } from '../messages'
-import ReviewPanel from '../review-panel/index.vue'
 
 const props = defineProps<{
 	version: Labrinth.Versions.v3.Version
@@ -291,31 +254,29 @@ const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
 })
 const formatNumber = useFormatNumber()
+const { formatCompactNumber } = useCompactNumber()
+const relativeTime = useRelativeTime({ style: 'narrow' })
 const formatBytes = useFormatBytes()
 const client = injectModrinthClient()
 const tags = injectTags(null)
 const { project, members } = injectProjectReviewPageContext()
 const changelogOpen = ref(false)
+const withheld = computed(() => !!props.version.files_missing_attribution?.length)
 const platforms = computed(() =>
 	props.version.loaders.includes('mrpack')
 		? (props.version.mrpack_loaders ?? [])
 		: props.version.loaders,
 )
-const compatibility = computed(() => {
-	const games = tags?.gameVersions.value?.length
+const gameVersions = computed(() =>
+	tags?.gameVersions.value?.length
 		? formatVersionsForDisplay(props.version.game_versions, tags.gameVersions.value)
-		: props.version.game_versions
-	return [...games, ...platforms.value].join(', ')
-})
-const primaryFile = computed(
-	() => props.version.files.find((file) => file.primary) ?? props.version.files[0],
+		: props.version.game_versions,
 )
 const projectHref = computed(
 	() =>
 		`/${project.value?.project_types[0] ?? 'project'}/${project.value?.slug ?? props.version.project_id}`,
 )
 const versionHref = computed(() => `${projectHref.value}/version/${props.version.id}`)
-const permissionsHref = computed(() => `${projectHref.value}/settings/permissions`)
 const detailQuery = useQuery(
 	computed(() => ({
 		...versionQueryOptions.v3(props.version.id, client),
@@ -351,6 +312,31 @@ const dependencies = computed<DependencyContext[]>(() =>
 		}
 	}),
 )
+function fileActions(file: Labrinth.Versions.v3.Version['files'][number]): ButtonMenuOption[] {
+	const options: ButtonMenuOption[] = []
+	for (const algorithm of ['sha1', 'sha512'] as const) {
+		const hash = file.hashes[algorithm]
+		if (!hash) continue
+		options.push({
+			id: `copy-${algorithm}`,
+			label: formatMessage(messages.copyHash, {
+				algorithm: algorithm === 'sha1' ? 'SHA-1' : 'SHA-512',
+			}),
+			icon: ClipboardCopyIcon,
+			action: () => navigator.clipboard.writeText(hash),
+		})
+	}
+	options.push({
+		id: 'download',
+		type: 'link',
+		label: formatMessage(messages.download),
+		icon: DownloadIcon,
+		href: file.url,
+		download: file.filename,
+	})
+	return options
+}
+
 function dependencyHref(context: DependencyContext) {
 	if (context.project) {
 		const path = `/${context.project.project_type}/${context.project.slug ?? context.project.id}`
@@ -360,22 +346,3 @@ function dependencyHref(context: DependencyContext) {
 	return resolution && 'link_to_work' in resolution ? resolution.link_to_work : undefined
 }
 </script>
-
-<style scoped>
-.version-metadata {
-	border-collapse: collapse;
-}
-
-.version-metadata th {
-	width: 7rem;
-	padding-right: 0.75rem;
-}
-
-.version-metadata th,
-.version-metadata td {
-	padding-top: 0.25rem;
-	padding-bottom: 0.25rem;
-	vertical-align: top;
-	overflow-wrap: anywhere;
-}
-</style>
