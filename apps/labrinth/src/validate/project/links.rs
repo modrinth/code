@@ -2,11 +2,13 @@ mod description;
 
 use std::collections::HashMap;
 
+use derive_more::Display;
 use serde_json::json;
 use url::Url;
 
 use super::{ProjectNag, ProjectNagKind, ProjectNagSeverity};
 use crate::models::{
+    link_platform::LinkPlatform,
     projects::{Project, Version},
     v2::projects::LegacyProject,
 };
@@ -90,17 +92,17 @@ const LICENSE_DOMAINS: &[&str] = &[
     "apache.org",
     "creativecommons.org",
 ];
-const DONATION_DOMAINS: &[(&str, &[&str])] = &[
-    ("patreon", &["patreon.com"]),
+const DONATION_DOMAINS: &[(LinkPlatform, &[&str])] = &[
+    (LinkPlatform::Patreon, &["patreon.com"]),
     (
-        "bmac",
+        LinkPlatform::Bmac,
         &["buymeacoffee.com", "buymeacoff.ee", "coff.ee", "bmc.link"],
     ),
     (
-        "paypal",
+        LinkPlatform::Paypal,
         &["paypal.me", "paypal.com", "py.pl", "paypal.biz"],
     ),
-    ("ko-fi", &["ko-fi.com"]),
+    (LinkPlatform::KoFi, &["ko-fi.com"]),
 ];
 const SOURCE_REQUIRING_LICENSES: &[&str] = &[
     "GPL-2.0",
@@ -126,9 +128,34 @@ const SOURCE_REQUIRING_LICENSES: &[&str] = &[
     "MPL-2.0",
 ];
 
+#[derive(Clone, Debug, Display, PartialEq, Eq)]
+pub(super) enum LinkField {
+    #[display("{_0}")]
+    Platform(LinkPlatform),
+    #[display("license")]
+    License,
+    #[display("description")]
+    Description,
+    #[display("{_0}")]
+    Unknown(String),
+}
+
+impl From<&str> for LinkField {
+    fn from(field: &str) -> Self {
+        match field {
+            "license" => Self::License,
+            "description" => Self::Description,
+            _ => field
+                .parse()
+                .map(Self::Platform)
+                .unwrap_or_else(|_| Self::Unknown(field.to_owned())),
+        }
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(super) struct LinkTarget {
-    pub field: String,
+    pub field: LinkField,
     pub url: String,
     pub image: bool,
 }
@@ -137,7 +164,7 @@ impl LinkTarget {
     fn nag(&self, reason: &str, severity: ProjectNagSeverity) -> ProjectNag {
         ProjectNag::new(ProjectNagKind::LinkValidation, severity).with_details(
             json!({
-                "field": self.field,
+                "field": self.field.to_string(),
                 "url": self.url,
                 "reason": reason,
             }),
@@ -158,19 +185,19 @@ pub(super) fn targets(project: &Project) -> Vec<LinkTarget> {
         .link_urls
         .iter()
         .map(|(field, link)| LinkTarget {
-            field: field.clone(),
+            field: field.as_str().into(),
             url: link.url.clone(),
             image: false,
         })
         .collect::<Vec<_>>();
     if let Some(url) = &project.license.url {
         targets.push(LinkTarget {
-            field: "license".into(),
+            field: LinkField::License,
             url: url.clone(),
             image: false,
         });
     }
-    targets.sort_by(|a, b| a.field.cmp(&b.field));
+    targets.sort_by_cached_key(|target| target.field.to_string());
     targets.extend(description::extract(&project.description));
     targets
 }
@@ -198,7 +225,7 @@ pub(super) fn validate(
         project.project_types.iter().any(|kind| kind == "datapack");
     let has_source = project
         .link_urls
-        .get("source")
+        .get(&LinkPlatform::Source.to_string())
         .is_some_and(|link| !link.url.is_empty());
     if !is_datapack
         && is_source_project
@@ -214,7 +241,7 @@ pub(super) fn validate(
                 ProjectNagSeverity::Required,
             )
             .with_details(
-                json!({ "project_type": project_type, "field": "source" }),
+				json!({ "project_type": project_type, "field": LinkPlatform::Source }),
             ),
         );
     }
@@ -238,7 +265,7 @@ pub(super) fn validate_targets_static(
     let mut seen: HashMap<&str, Vec<&LinkTarget>> = HashMap::new();
     for target in targets
         .iter()
-        .filter(|target| target.field != "description")
+        .filter(|target| target.field != LinkField::Description)
     {
         seen.entry(&target.url).or_default().push(target);
     }
@@ -250,7 +277,7 @@ pub(super) fn validate_targets_static(
                 continue;
             };
             let mut nag = target.required("duplicate");
-            nag.details["other_field"] = json!(other.field);
+            nag.details["other_field"] = json!(other.field.to_string());
             nags.push(nag);
         }
     }
@@ -266,11 +293,11 @@ pub(super) fn validate_target(target: &LinkTarget) -> Option<ProjectNag> {
     let Ok(url) = Url::parse(&target.url) else {
         return Some(target.required("malformed"));
     };
-    if target.field == "description" && url.scheme() == "file" {
+    if target.field == LinkField::Description && url.scheme() == "file" {
         return Some(target.required("download"));
     }
     if !matches!(url.scheme(), "https" | "http")
-        || (target.field != "description" && url.scheme() != "https")
+        || (target.field != LinkField::Description && url.scheme() != "https")
         || url.host_str().is_none()
         || !url.username().is_empty()
         || url.password().is_some()
@@ -280,7 +307,7 @@ pub(super) fn validate_target(target: &LinkTarget) -> Option<ProjectNag> {
     if globally_blocked(&url) {
         return Some(target.required("global_blocklist_match"));
     }
-    if target.field == "description" {
+    if target.field == LinkField::Description {
         return description::known_download(&url, target.image)
             .then(|| target.required("download"));
     }
@@ -290,44 +317,27 @@ pub(super) fn validate_target(target: &LinkTarget) -> Option<ProjectNag> {
     if let Some(reason) = field_block(&target.field, &url) {
         return Some(target.required(reason));
     }
-    if target.field == "source"
+    if target.field == LinkField::Platform(LinkPlatform::Source)
         && from_domains(&url, SOURCE_DOMAINS)
         && !repository_path(&url)
     {
         return Some(target.required("source_repository"));
     }
     if !matches!(
-        target.field.as_str(),
-        "site" | "store" | "other" | "source" | "discord" | "wiki"
+        target.field,
+        LinkField::Platform(
+            LinkPlatform::Site
+                | LinkPlatform::Store
+                | LinkPlatform::Other
+                | LinkPlatform::Source
+                | LinkPlatform::Discord
+                | LinkPlatform::Wiki
+        )
     ) && !allowed(&target.field, &url)
     {
         return Some(target.warning("not_in_allowlist"));
     }
     None
-}
-
-pub(super) fn validate_input(
-    links: &HashMap<String, String>,
-    license_url: Option<&str>,
-    description: &str,
-) -> Vec<ProjectNag> {
-    let mut targets = links
-        .iter()
-        .map(|(field, url)| LinkTarget {
-            field: field.clone(),
-            url: url.clone(),
-            image: false,
-        })
-        .collect::<Vec<_>>();
-    if let Some(url) = license_url {
-        targets.push(LinkTarget {
-            field: "license".into(),
-            url: url.into(),
-            image: false,
-        });
-    }
-    targets.extend(self::description::extract(description));
-    validate_targets_static(&targets)
 }
 
 pub(super) fn globally_blocked(url: &Url) -> bool {
@@ -412,16 +422,16 @@ pub(super) fn discord_code(url: &Url) -> Option<&str> {
     .then_some(code)
 }
 
-fn allowed(field: &str, url: &Url) -> bool {
+fn allowed(field: &LinkField, url: &Url) -> bool {
     let parts = path(url);
     match field {
-        "source" => {
+        LinkField::Platform(LinkPlatform::Source) => {
             from_domains(url, SOURCE_DOMAINS)
                 && repository_path(url)
                 && !repo_section(url, "issues")
                 && !repo_section(url, "wiki")
         }
-        "issues" => {
+        LinkField::Platform(LinkPlatform::Issues) => {
             (from_domains(url, SOURCE_DOMAINS) && repo_section(url, "issues"))
                 || (from_domains(url, CURSEFORGE_DOMAINS)
                     && parts.len() == 4
@@ -437,53 +447,79 @@ fn allowed(field: &str, url: &Url) -> bool {
                     && parts.first() == Some(&"to")
                     && parts.len() >= 2)
         }
-        "wiki" => {
+        LinkField::Platform(LinkPlatform::Wiki) => {
             from_domains(url, SOURCE_DOMAINS) && repo_section(url, "wiki")
         }
-        "discord" => discord_code(url).is_some(),
-        "github" => {
+        LinkField::Platform(LinkPlatform::Discord) => {
+            discord_code(url).is_some()
+        }
+        LinkField::Platform(LinkPlatform::Github) => {
             from_domains(url, GITHUB_DOMAINS)
                 && parts.first() == Some(&"sponsors")
                 && (parts.len() == 2
                     || (parts.len() == 3 && parts[2] == "sponsorships"))
         }
-        "license" => {
+        LinkField::License => {
             from_domains(url, LICENSE_DOMAINS)
-                || (from_domains(url, GITHUB_DOMAINS) && allowed("source", url))
+                || (from_domains(url, GITHUB_DOMAINS)
+                    && allowed(&LinkField::Platform(LinkPlatform::Source), url))
         }
-        _ => DONATION_DOMAINS.iter().any(|(platform, domains)| {
-            *platform == field && from_domains(url, domains)
-        }),
+        LinkField::Platform(platform) => {
+            DONATION_DOMAINS.iter().any(|(donation_platform, domains)| {
+                donation_platform == platform && from_domains(url, domains)
+            })
+        }
+        LinkField::Description | LinkField::Unknown(_) => false,
     }
 }
 
-fn field_block(field: &str, url: &Url) -> Option<&'static str> {
-    if field == "wiki" && from_domains(url, SOURCE_DOMAINS) {
+fn field_block(field: &LinkField, url: &Url) -> Option<&'static str> {
+    if *field == LinkField::Platform(LinkPlatform::Wiki)
+        && from_domains(url, SOURCE_DOMAINS)
+    {
         return None;
     }
     let own_pattern = allowed(field, url);
     for other in [
-        "issues", "wiki", "discord", "github", "patreon", "bmac", "paypal",
-        "ko-fi", "license",
+        LinkField::Platform(LinkPlatform::Issues),
+        LinkField::Platform(LinkPlatform::Wiki),
+        LinkField::Platform(LinkPlatform::Discord),
+        LinkField::Platform(LinkPlatform::Github),
+        LinkField::Platform(LinkPlatform::Patreon),
+        LinkField::Platform(LinkPlatform::Bmac),
+        LinkField::Platform(LinkPlatform::Paypal),
+        LinkField::Platform(LinkPlatform::KoFi),
+        LinkField::License,
     ] {
-        let matches_other = if other == "license" {
+        let matches_other = if other == LinkField::License {
             from_domains(url, LICENSE_DOMAINS)
         } else {
-            allowed(other, url)
+            allowed(&other, url)
         };
-        if other != field && matches_other {
+        if &other != field && matches_other {
             return Some("wrong_field");
         }
     }
-    if field != "source" && from_domains(url, SOURCE_DOMAINS) && !own_pattern {
+    if *field != LinkField::Platform(LinkPlatform::Source)
+        && from_domains(url, SOURCE_DOMAINS)
+        && !own_pattern
+    {
         return Some("wrong_field");
     }
-    if field != "discord" && from_domains(url, DISCORD_REDIRECT_DOMAINS) {
+    if *field != LinkField::Platform(LinkPlatform::Discord)
+        && from_domains(url, DISCORD_REDIRECT_DOMAINS)
+    {
         return Some("wrong_field");
     }
     let explicit_exception = matches!(
         field,
-        "source" | "issues" | "wiki" | "github" | "discord" | "license"
+        LinkField::Platform(
+            LinkPlatform::Source
+                | LinkPlatform::Issues
+                | LinkPlatform::Wiki
+                | LinkPlatform::Github
+                | LinkPlatform::Discord
+        ) | LinkField::License
     ) && own_pattern;
     if from_domains(url, EXTERNAL_BLOCKS) && !explicit_exception {
         return Some("external_blocklist_match");
@@ -622,17 +658,17 @@ mod tests {
     fn duplicates_compare_only_raw_strings_including_license() {
         let targets = [
             LinkTarget {
-                field: "site".into(),
+                field: LinkField::Platform(LinkPlatform::Site),
                 url: "https://project.dev/docs".into(),
                 image: false,
             },
             LinkTarget {
-                field: "wiki".into(),
+                field: LinkField::Platform(LinkPlatform::Wiki),
                 url: "https://project.dev/docs/".into(),
                 image: false,
             },
             LinkTarget {
-                field: "license".into(),
+                field: LinkField::License,
                 url: "https://project.dev/docs".into(),
                 image: false,
             },
@@ -649,7 +685,7 @@ mod tests {
     #[test]
     fn repeated_fields_only_report_duplicates_with_other_fields() {
         let license = LinkTarget {
-            field: "license".into(),
+            field: LinkField::License,
             url: "https://project.dev/license".into(),
             image: false,
         };
@@ -658,7 +694,7 @@ mod tests {
         assert!(!nags.iter().any(|nag| nag.details["reason"] == "duplicate"));
 
         targets.push(LinkTarget {
-            field: "site".into(),
+            field: LinkField::Platform(LinkPlatform::Site),
             url: "https://project.dev/license".into(),
             image: false,
         });

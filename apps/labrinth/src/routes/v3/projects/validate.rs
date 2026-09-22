@@ -10,6 +10,7 @@ use crate::database::{
     PgPool, PgTransaction, ReadOnlyPgPool, models as db_models,
 };
 use crate::models::ids::ProjectId;
+use crate::models::link_platform::LinkPlatform;
 use crate::models::pats::Scopes;
 use crate::models::projects::{Project, Version};
 use crate::models::teams::ProjectPermissions;
@@ -47,15 +48,9 @@ pub(crate) fn apply_link_changes(
                 crate::models::projects::Link {
                     platform: field.clone(),
                     url: url.clone(),
-                    donation: !matches!(
-                        field.as_str(),
-                        "source"
-                            | "issues"
-                            | "wiki"
-                            | "discord"
-                            | "site"
-                            | "store"
-                    ),
+					donation: field
+						.parse::<LinkPlatform>()
+						.map_or(true, LinkPlatform::is_donation),
                 },
             );
         } else {

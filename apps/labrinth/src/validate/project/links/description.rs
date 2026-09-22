@@ -6,7 +6,7 @@ use pulldown_cmark::{Event, Parser, Tag, TagEnd};
 use regex::Regex;
 use url::Url;
 
-use super::LinkTarget;
+use super::{LinkField, LinkTarget};
 
 static HTML_TAG: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"(?is)<(a|img|source|video|audio|iframe)\b[^>]*>").unwrap()
@@ -102,7 +102,7 @@ fn push(targets: &mut Vec<LinkTarget>, url: &str, image: bool) {
         && matches!(parsed.scheme(), "http" | "https" | "file")
     {
         targets.push(LinkTarget {
-            field: "description".into(),
+			field: LinkField::Description,
             url: parsed.to_string(),
             image,
         });

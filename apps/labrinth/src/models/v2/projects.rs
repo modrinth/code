@@ -6,6 +6,7 @@ use super::super::ids::OrganizationId;
 use crate::database::models::{DBProjectDisclosure, DBProjectId, version_item};
 use crate::models::disclosures::ProjectDisclosureType;
 use crate::models::ids::{ProjectId, TeamId, ThreadId, VersionId};
+use crate::models::link_platform::LinkPlatform;
 use crate::models::projects::{
     Dependency, License, Link, Loader, ModeratorMessage, MonetizationStatus,
     Project, ProjectStatus, Version, VersionFile, VersionStatus, VersionType,
@@ -468,10 +469,11 @@ pub fn validate_donation_platforms(
 ) -> Result<(), crate::routes::ApiError> {
     let mut platforms = std::collections::HashSet::new();
     for link in links {
-        if !matches!(
-            link.id.as_str(),
-            "patreon" | "bmac" | "paypal" | "github" | "ko-fi" | "other"
-        ) {
+        if !link
+            .id
+            .parse::<LinkPlatform>()
+            .is_ok_and(LinkPlatform::is_donation)
+        {
             return Err(crate::routes::ApiError::Request(eyre::eyre!(
                 "each donation link must specify a donation platform"
             )));
