@@ -17,12 +17,12 @@ import {
 	getTargetInstallPreferences,
 	injectModrinthClient,
 	injectNotificationManager,
+	injectServerOnboardingInviteFlow,
 	readStoredServerInstallQueue,
 	requestInstall,
 	resolveServerAddonInstallPlans,
 	stripServerRuntimeInstallFilters,
 	stripServerRuntimeInstallOverrides,
-	useDismissServerIntro,
 	useServerContextRuntime,
 	useServerPanelSync,
 	useVIntl,
@@ -33,7 +33,7 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import type { ComputedRef, Ref } from 'vue'
 import { computed, nextTick, ref, watch } from 'vue'
 
-import { navigateTo, useRoute } from '#app'
+import { navigateTo, useRoute, useRuntimeConfig } from '#app'
 import { queryAsString } from '~/utils/router'
 
 type ServerInstallBrowseSearchState = Pick<
@@ -95,8 +95,9 @@ export function useServerInstallContent({
 }: UseServerInstallContentOptions) {
 	const { formatMessage } = useVIntl()
 	const client = injectModrinthClient()
+	const inviteFlow = injectServerOnboardingInviteFlow()
 	const queryClient = useQueryClient()
-	const dismissServerIntro = useDismissServerIntro()
+	const siteUrl = useRuntimeConfig().public.siteUrl as string
 	const route = useRoute()
 	const { handleError } = injectNotificationManager()
 	let browseSearchState: ServerInstallBrowseSearchState | null = null
@@ -604,9 +605,11 @@ export function useServerInstallContent({
 			}
 
 			if (fromContext.value === 'onboarding') {
-				await dismissServerIntro.mutateAsync(currentServerId.value)
-				navigateTo(`/hosting/manage/${currentServerId.value}/content`)
+				const serverId = currentServerId.value
+				await inviteFlow.open({ serverId, worldId: currentWorldId.value, siteUrl })
+				await navigateTo(`/hosting/manage/${serverId}`)
 			} else {
+				onboardingModalRef.value?.hide()
 				navigateTo(`/hosting/manage/${currentServerId.value}?openSettings=installation`)
 			}
 		} catch (e) {

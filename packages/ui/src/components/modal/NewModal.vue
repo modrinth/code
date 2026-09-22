@@ -33,7 +33,8 @@
 					role="dialog"
 					aria-modal="true"
 					tabindex="-1"
-					:aria-labelledby="headerId"
+					:aria-labelledby="hideHeader ? undefined : headerId"
+					:aria-label="hideHeader ? header : undefined"
 					class="modal-body flex flex-col bg-bg-raised rounded-2xl border border-solid border-surface-5 outline-none"
 					v-bind="$attrs"
 				>
@@ -63,16 +64,17 @@
 						</div>
 					</div>
 
-					<IconButton
-						v-if="props.mergeHeader && closable"
-						v-tooltip="closeLabel"
-						:label="closeLabel"
-						class="absolute top-4 right-4 z-10"
-						:disabled="disableClose"
-						@click="hide"
-					>
-						<XIcon aria-hidden="true" />
-					</IconButton>
+					<div v-if="props.mergeHeader && closable" class="absolute top-4 right-4 z-10">
+						<IconButton
+							v-tooltip="closeLabel"
+							:label="closeLabel"
+							type="quiet"
+							:disabled="disableClose"
+							@click="hide"
+						>
+							<XIcon aria-hidden="true" />
+						</IconButton>
+					</div>
 
 					<div v-if="scrollable" class="relative flex-1 min-h-0 flex flex-col">
 						<Transition
@@ -188,6 +190,7 @@ const props = withDefaults(
 		onHide?: () => void
 		onAfterHide?: () => void
 		onShow?: () => void
+		onAfterShow?: () => void
 		beforeHide?: () => boolean
 		mergeHeader?: boolean
 		scrollable?: boolean
@@ -216,6 +219,7 @@ const props = withDefaults(
 		onHide: () => {},
 		onAfterHide: () => {},
 		onShow: () => {},
+		onAfterShow: () => {},
 		beforeHide: undefined,
 		mergeHeader: false,
 		// TODO: migrate all modals to use scrollable and remove this prop
@@ -394,6 +398,7 @@ function show(event?: MouseEvent) {
 		visible.value = true
 		nextTick(() => {
 			scheduleFocus()
+			props.onAfterShow?.()
 		})
 	}, 50)
 }

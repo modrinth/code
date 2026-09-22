@@ -76,13 +76,17 @@ const messages = defineMessages({
 		id: 'content.enabled-for.label',
 		defaultMessage: 'Enabled for',
 	},
-	server: {
-		id: 'content.enabled-for.server',
-		defaultMessage: 'Server',
+	serverOnly: {
+		id: 'content.enabled-for.server-only',
+		defaultMessage: 'Server only',
 	},
-	player: {
-		id: 'content.enabled-for.player',
-		defaultMessage: 'Player',
+	playerOnly: {
+		id: 'content.enabled-for.player-only',
+		defaultMessage: 'Player only',
+	},
+	serverAndPlayer: {
+		id: 'content.enabled-for.server-and-player',
+		defaultMessage: 'Server and player',
 	},
 	clientSideOnly: {
 		id: 'project.settings.environment.client_only.title',
@@ -155,6 +159,17 @@ export function useContentMetadataFilters(
 	const selectedMetadataFilters = persistKey
 		? useSessionStorage<ContentMetadataFilterValue>(`content-metadata-filters:${persistKey}`, {})
 		: ref<ContentMetadataFilterValue>({})
+	const savedEnabledFor = selectedMetadataFilters.value.enabled_for
+	if (savedEnabledFor?.some((value) => value === 'server' || value === 'player')) {
+		selectedMetadataFilters.value = {
+			...selectedMetadataFilters.value,
+			enabled_for: [
+				...(savedEnabledFor.includes('server') ? ['server_only'] : []),
+				...(savedEnabledFor.includes('player') ? ['player_only'] : []),
+				'server_and_player',
+			],
+		}
+	}
 
 	function option(value: string, label: string, searchTerms?: string[]): DropdownFilterBarOption {
 		return { value, label, searchTerms }
@@ -188,13 +203,22 @@ export function useContentMetadataFilters(
 					key: 'enabled_for',
 					label: formatMessage(messages.enabledFor),
 					options: [
-						option('server', formatMessage(messages.server)),
-						option('player', formatMessage(messages.player)),
+						option('server_only', formatMessage(messages.serverOnly)),
+						option('player_only', formatMessage(messages.playerOnly)),
+						option('server_and_player', formatMessage(messages.serverAndPlayer)),
 					],
-					values: (item) => [
-						...(item.enabledFor?.server ? [option('server', formatMessage(messages.server))] : []),
-						...(item.enabledFor?.player ? [option('player', formatMessage(messages.player))] : []),
-					],
+					values: (item) => {
+						if (item.enabledFor?.server && item.enabledFor.player) {
+							return [option('server_and_player', formatMessage(messages.serverAndPlayer))]
+						}
+						if (item.enabledFor?.server) {
+							return [option('server_only', formatMessage(messages.serverOnly))]
+						}
+						if (item.enabledFor?.player) {
+							return [option('player_only', formatMessage(messages.playerOnly))]
+						}
+						return []
+					},
 				}
 			: {
 					key: 'environment',

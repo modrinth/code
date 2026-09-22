@@ -150,7 +150,10 @@ const {
 })
 
 function isVisibleFileItem(item: Kyros.Files.v0.DirectoryItem) {
-	return !item.path.split('/').includes('.modrinth-staged')
+	return (
+		!item.path.split('/').includes('.modrinth-staged') &&
+		item.path.replace(/^\/+/, '') !== 'server-icon-config.json'
+	)
 }
 
 const items = computed<FileItem[]>(() =>

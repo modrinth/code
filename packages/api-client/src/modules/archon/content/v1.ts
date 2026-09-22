@@ -10,6 +10,7 @@ export class ArchonContentV1Module extends AbstractModule {
 		serverId: string,
 		worldId: string,
 		configPaths: string[] = [],
+		options?: { timeout?: number },
 	): Promise<Archon.Content.v1.ShareWorldContentResponse> {
 		return this.client.request(
 			`/servers/${encodeURIComponent(serverId)}/worlds/${encodeURIComponent(worldId)}/content/share`,
@@ -17,7 +18,7 @@ export class ArchonContentV1Module extends AbstractModule {
 				api: 'archon',
 				version: 1,
 				method: 'POST',
-				timeout: 600_000,
+				timeout: options?.timeout ?? 600_000,
 				retry: false,
 				body: { config_paths: configPaths },
 			},
