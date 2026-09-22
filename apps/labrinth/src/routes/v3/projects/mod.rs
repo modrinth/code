@@ -20,7 +20,7 @@ use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::disclosures::{
     DisclosureLockStatus, ProjectDisclosure, ProjectDisclosureType,
 };
-use crate::models::ids::{ProjectId, VersionId};
+use crate::models::ids::{ProjectId, ProjectRef, VersionId};
 use crate::models::images::ImageContext;
 use crate::models::link_platform::LinkPlatform;
 use crate::models::notifications::NotificationBody;
@@ -287,7 +287,7 @@ pub async fn projects_get(
 #[get("/{id}")]
 pub async fn project_get(
     req: HttpRequest,
-    info: web::Path<(String,)>,
+    info: web::Path<(ProjectRef,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -297,16 +297,25 @@ pub async fn project_get(
 
 pub async fn project_get_internal(
     req: HttpRequest,
-    info: web::Path<(String,)>,
+    info: web::Path<(ProjectRef,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<Project>, ApiError> {
-    let (string,) = info.into_inner();
-
-    let project_data = db_models::DBProject::get(&string, &**pool, &redis)
-        .await
-        .wrap_internal_err("failed to fetch project")?;
+    let (project_ref,) = info.into_inner();
+    let project_id = db_models::DBProject::resolve_ref(
+        &project_ref,
+        pool.as_ref(),
+        redis.as_ref(),
+    )
+    .await
+    .wrap_internal_err("resolving project reference")?
+    .wrap_not_found_err("resource not found")?;
+    let project_data =
+        db_models::DBProject::get_id(project_id.into(), &**pool, &redis)
+            .await
+            .wrap_internal_err("failed to fetch project")?
+            .wrap_not_found_err("resource not found")?;
     let user_option = get_user_from_headers(
         &req,
         &**pool,
@@ -318,12 +327,11 @@ pub async fn project_get_internal(
     .map(|(_, user)| user)
     .ok();
 
-    if let Some(data) = project_data
-        && is_visible_project(&data.inner, &user_option, &pool, false)
-            .await
-            .wrap_internal_err("failed to check project visibility")?
+    if is_visible_project(&project_data.inner, &user_option, &pool, false)
+        .await
+        .wrap_internal_err("failed to check project visibility")?
     {
-        return Ok(web::Json(Project::from(data)));
+        return Ok(web::Json(Project::from(project_data)));
     }
     Err(ApiError::NotFound(eyre::eyre!("resource not found")))
 }

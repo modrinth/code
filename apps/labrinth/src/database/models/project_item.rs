@@ -7,7 +7,7 @@ use super::{DBUser, ids::*};
 use crate::database::{PgTransaction, models};
 use crate::file_hosting::FileHost;
 use crate::models::exp;
-use crate::models::ids::ProjectId;
+use crate::models::ids::{ProjectId, ProjectRef};
 use crate::models::link_platform::LinkPlatform;
 use crate::models::projects::{
     MonetizationStatus, ProjectStatus, SideTypesMigrationReviewStatus,
@@ -542,6 +542,20 @@ impl DBProject {
             .await
             .wrap_err("fetching project")
             .map(|x| x.into_iter().next())
+    }
+
+    pub async fn resolve_ref<'a, E>(
+        project_ref: &ProjectRef,
+        executor: E,
+        redis: &RedisPool,
+    ) -> Result<Option<ProjectId>>
+    where
+        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
+    {
+        Self::get(project_ref.as_str(), executor, redis)
+            .await
+            .wrap_err("resolving project reference")
+            .map(|project| project.map(|project| project.inner.id.into()))
     }
 
     pub async fn get_id<'a, 'b, E>(

@@ -3,6 +3,7 @@ use crate::database::models::{project_item, version_item};
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::file_hosting::FileHost;
 use crate::models::disclosures::ProjectDisclosureType;
+use crate::models::ids::ProjectRef;
 use crate::models::link_platform::LinkPlatform;
 use crate::models::projects::{
     Link, MonetizationStatus, Project, ProjectStatus, Version,
@@ -289,13 +290,11 @@ pub async fn projects_get(
 #[get("/{id}")]
 pub async fn project_get(
     req: HttpRequest,
-    info: web::Path<(String,)>,
+    info: web::Path<(ProjectRef,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    // Convert V2 data to V3 data
-    // Call V3 project creation
     let project = match v3::projects::project_get_internal(
         req,
         info,

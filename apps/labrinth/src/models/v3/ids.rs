@@ -1,4 +1,17 @@
 use ariadne::ids::base62_id;
+use serde::{Deserialize, Serialize};
+
+#[derive(
+    Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize, utoipa::ToSchema,
+)]
+#[serde(transparent)]
+pub struct ProjectRef(pub String);
+
+impl ProjectRef {
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
 
 base62_id!(AttributionGroupId);
 base62_id!(ChargeId);
