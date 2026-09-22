@@ -132,10 +132,14 @@ const messages = defineMessages({
 		id: 'content.metadata-filter.warning.client-depends',
 		defaultMessage: 'Client depends on file',
 	},
-	clientOnly: {
-		id: 'content.metadata-filter.warning.client-only',
-		defaultMessage: 'Client-only content',
-	},
+		clientOnly: {
+			id: 'content.metadata-filter.warning.client-only',
+			defaultMessage: 'Client-only content',
+		},
+		serverOnly: {
+			id: 'content.metadata-filter.warning.server-only',
+			defaultMessage: 'Server-only content',
+		},
 	unknownEnvironment: {
 		id: 'content.metadata-filter.warning.unknown-environment',
 		defaultMessage: 'Unknown environment',
@@ -258,6 +262,8 @@ export function useContentMetadataFilters(
 						return [option(warning, formatMessage(messages.clientDepends))]
 					case 'environment':
 						return [option(warning, formatMessage(messages.clientOnly))]
+					case 'server-only':
+						return [option(warning, formatMessage(messages.serverOnly))]
 					case 'unknown-environment':
 						return [option(warning, formatMessage(messages.unknownEnvironment))]
 					default:

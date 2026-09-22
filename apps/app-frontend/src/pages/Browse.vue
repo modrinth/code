@@ -436,6 +436,12 @@ const instanceFilters = computed(() => {
 })
 
 const serverOnly = ref(route.query.so === 'true')
+watch(
+	() => route.query.so,
+	(value) => {
+		serverOnly.value = value === 'true'
+	},
+)
 const showServerOnly = computed(() => isServerContext.value && projectType.value === 'mod')
 const serverEnvironmentOverride = computed(() =>
 	showServerOnly.value

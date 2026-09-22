@@ -9,23 +9,18 @@ import { get_instance_worlds } from '@/helpers/worlds'
 
 type HostingInstanceMetadata = {
 	sharedInstanceId: string
-	serverId?: string
-	worldId?: string
 	address: string
 	region?: string
 }
 
 export function hostingInstanceMetadata(
 	server: Archon.Servers.v1.ServerFull,
-	worldId: string,
 	sharedInstanceId: string,
 	address: string,
 ): HostingInstanceMetadata {
 	const location = server.location
 	return {
 		sharedInstanceId,
-		serverId: server.id,
-		worldId,
 		address,
 		region:
 			location.status === 'assigned' && location.location_metadata.region_should_be_user_displayed
@@ -54,57 +49,66 @@ export function useHostingInstance(instance: Ref<GameInstance | undefined>, offl
 			!!auth.user.value?.id &&
 			auth.user.value.id === instance.value.shared_instance.linked_user_id,
 	)
-	const serverQuery = useQuery({
-		queryKey: computed(() => ['instances', instance.value?.id, 'hosting', auth.user.value?.id]),
+	const hostingQuery = useQuery({
+		queryKey: computed(() => [
+			'instances',
+			instance.value?.id,
+			'hosting',
+			instance.value?.shared_instance?.id,
+			auth.user.value?.id,
+		]),
 		enabled: canQuery,
 		queryFn: async () => {
 			const current = instance.value!
 			const sharedId = current.shared_instance!.id
-			const known = saved.value
+			const userId = auth.user.value?.id
 			const shared = await client.sharedinstances.instances_v1.get(sharedId, {
-				query_linked_server: false,
+				query_linked_server: true,
 			})
-			if (!shared.linked_server) return null
 			return {
 				instanceId: current.id,
-				metadata: {
-					...known,
-					sharedInstanceId: sharedId,
-					address: shared.linked_server.domain,
-					region: shared.linked_server.region,
-				},
+				sharedId,
+				userId,
+				linkedServer: shared.linked_server,
 			}
 		},
-		staleTime: 60_000,
-		retry: false,
-	})
-	watch(serverQuery.data, (result) => {
-		if (result) cache.value[result.instanceId] = result.metadata
-	})
-	const isHostingInstance = computed(
-		() => !!saved.value || !!instance.value?.shared_instance?.server_manager_name,
-	)
-	const statusQuery = useQuery({
-		queryKey: computed(() => [
-			'instances',
-			instance.value?.id,
-			'hosting-status',
-			instance.value?.shared_instance?.id,
-			auth.user.value?.id,
-		]),
-		enabled: computed(() => canQuery.value && isHostingInstance.value),
-		queryFn: () =>
-			client.sharedinstances.instances_v1.get(instance.value!.shared_instance!.id, {
-				query_linked_server: true,
-			}),
 		staleTime: 30_000,
 		refetchInterval: 30_000,
 		retry: false,
 	})
+	const liveServer = computed(() => {
+		const result = hostingQuery.data.value
+		if (!result) return undefined
+		return result?.instanceId === instance.value?.id &&
+			result?.sharedId === instance.value?.shared_instance?.id &&
+			result?.userId === auth.user.value?.id
+			? result.linkedServer
+			: undefined
+	})
+	watch(liveServer, (server) => {
+		const current = instance.value
+		if (!current || server === undefined) return
+		if (!server) {
+			delete cache.value[current.id]
+			return
+		}
+		cache.value[current.id] = {
+			...saved.value,
+			sharedInstanceId: current.shared_instance!.id,
+			address: server.domain,
+			region: server.region,
+		}
+	})
+	const isHostingInstance = computed(
+		() =>
+			liveServer.value !== undefined
+				? !!liveServer.value
+				: !!saved.value || !!instance.value?.shared_instance?.server_manager_name,
+	)
 	async function refreshOnlineStatus() {
 		if (!canQuery.value || !isHostingInstance.value) return null
-		const result = await statusQuery.refetch({ throwOnError: false })
-		return result.isError ? null : (result.data?.linked_server?.online_status ?? null)
+		const result = await hostingQuery.refetch({ throwOnError: false })
+		return result.isError ? null : (result.data?.linkedServer?.online_status ?? null)
 	}
 	const worldsQuery = useQuery({
 		queryKey: computed(() => ['instances', instance.value?.id, 'hosting-worlds']),
@@ -115,6 +119,7 @@ export function useHostingInstance(instance: Ref<GameInstance | undefined>, offl
 		queryFn: () => get_instance_worlds(instance.value!.id),
 	})
 	const address = computed(() => {
+		if (liveServer.value !== undefined) return liveServer.value?.domain
 		if (saved.value?.address) return saved.value.address
 		const world = worldsQuery.data.value?.find(
 			(world) =>
@@ -126,12 +131,14 @@ export function useHostingInstance(instance: Ref<GameInstance | undefined>, offl
 	return {
 		isHostingInstance,
 		onlineStatus: computed(() =>
-			!canQuery.value || statusQuery.isError.value
+			!canQuery.value || hostingQuery.isError.value
 				? null
-				: (statusQuery.data.value?.linked_server?.online_status ?? null),
+				: (liveServer.value?.online_status ?? null),
 		),
 		refreshOnlineStatus,
-		region: computed(() => saved.value?.region),
+		region: computed(() =>
+			liveServer.value !== undefined ? liveServer.value?.region : saved.value?.region,
+		),
 		address,
 	}
 }

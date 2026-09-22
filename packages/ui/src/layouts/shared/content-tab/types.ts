@@ -28,6 +28,7 @@ export interface ContentSource {
 }
 
 export type ClientWarningType = 'retained' | 'depends' | 'environment'
+export type ContentWarningType = ClientWarningType | 'server-only' | 'unknown-environment'
 
 export type ContentSourceKind =
 	| 'local'
@@ -59,6 +60,7 @@ export interface ContentEnabledForState {
 	lockedTooltip?: string
 	disabledSides?: ContentSide[]
 	warningTooltip?: string | null
+	warningKind?: ContentWarningType | null
 }
 
 export interface ContentCardEmbeddedIcon {

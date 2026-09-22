@@ -1,3 +1,5 @@
+import { defineMessages } from '#ui/composables/i18n'
+
 export type InvitedPlayerMethod = 'direct' | 'link'
 
 export type InvitedPlayerRow = {
@@ -10,7 +12,7 @@ export type InvitedPlayerRow = {
 	pending?: boolean
 }
 
-export const invitedPlayerMethodLabels: Record<InvitedPlayerMethod, string> = {
-	direct: 'Direct invite',
-	link: 'Share link',
-}
+export const invitedPlayerMethodMessages = defineMessages({
+	direct: { id: 'servers.play.players.method.direct', defaultMessage: 'Direct invite' },
+	link: { id: 'servers.play.players.method.link', defaultMessage: 'Share link' },
+})
