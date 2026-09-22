@@ -350,15 +350,13 @@ pub async fn project_create_internal(
             return Err(e.into());
         }
     } else {
-        transaction.commit().await?;
-        super::projects::clear_project_cache_and_queue_search(
-            &redis,
-            &search_state,
+        super::projects::mutation::finalize_mutation(
             project_id.into(),
-            None,
-            None,
+            transaction,
+            &redis,
         )
         .await?;
+        search_state.queue.push_project_change(project_id).await;
     }
 
     result
@@ -416,15 +414,13 @@ pub async fn project_create_with_id(
             return Err(e.into());
         }
     } else {
-        transaction.commit().await?;
-        super::projects::clear_project_cache_and_queue_search(
-            &redis,
-            &search_state,
+        super::projects::mutation::finalize_mutation(
             project_id.into(),
-            None,
-            None,
+            transaction,
+            &redis,
         )
         .await?;
+        search_state.queue.push_project_change(project_id).await;
     }
 
     result

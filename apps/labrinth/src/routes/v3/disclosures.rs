@@ -7,14 +7,14 @@ use xredis::RedisPool;
 
 use crate::auth::checks::{is_team_member_project, is_visible_project};
 use crate::auth::get_user_from_headers;
-use crate::database::{DBProject, models as db_models};
+use crate::database::models as db_models;
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::disclosures::{
     DisclosureLockStatus, ProjectDisclosure, ProjectDisclosureData,
     ProjectDisclosureType,
 };
 use crate::models::pats::Scopes;
-use crate::models::projects::ProjectStatus;
+
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
@@ -280,24 +280,12 @@ pub async fn modify_project_disclosures(
         .wrap_internal_err("failed to remove project disclosure")?;
     }
 
-    if project.inner.status == ProjectStatus::Processing {
-        super::projects::validate::ensure_project_is_valid_for_review(
-            project.inner.id,
-            &pool,
-            &mut transaction,
-            &redis,
-        )
-        .await?;
-    }
-
-    transaction
-        .commit()
-        .await
-        .wrap_internal_err("failed to commit project disclosure changes")?;
-
-    DBProject::clear_cache(project.inner.id, project.inner.slug, None, &redis)
-        .await
-        .wrap_internal_err("clearing cached data from Redis")?;
+    super::projects::mutation::finalize_mutation(
+        project.inner.id,
+        transaction,
+        &redis,
+    )
+    .await?;
 
     search_state
         .queue

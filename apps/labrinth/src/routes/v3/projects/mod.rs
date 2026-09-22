@@ -52,6 +52,7 @@ use serde::{Deserialize, Serialize};
 use validator::Validate;
 use xredis::RedisPool;
 
+pub mod mutation;
 pub mod validate;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
@@ -501,30 +502,38 @@ pub async fn project_edit_internal(
     let submit_for_review = new_project.status
         == Some(ProjectStatus::Processing)
         && !user.role.is_mod();
-    let leave_review = matches!(
-        new_project.status,
-        Some(ProjectStatus::Draft | ProjectStatus::Rejected)
-    );
-    let validate_for_review = submit_for_review
-        || (project_item.inner.status == ProjectStatus::Processing
-            && !leave_review);
-    if submit_for_review {
-        if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-            return Err(ApiError::Auth(eyre!(
-                "you do not have permission to submit this project for review"
-            )));
-        }
-        if project_item.inner.status.is_approved() {
-            return Err(ApiError::Auth(eyre!(
-                "you do not have permission to submit this project for review"
-            )));
-        }
+
+    if submit_for_review && !perms.contains(ProjectPermissions::EDIT_DETAILS) {
+        return Err(ApiError::Auth(eyre!(
+            "you do not have permission to submit this project for review"
+        )));
     }
 
     let mut transaction = pool
         .begin()
         .await
         .wrap_internal_err("starting database transaction")?;
+    let locked_project = sqlx::query!(
+        r#"
+        SELECT status, slug
+        FROM mods
+        WHERE id = $1
+        FOR UPDATE
+        "#,
+        id as db_ids::DBProjectId,
+    )
+    .fetch_one(&mut transaction)
+    .await
+    .wrap_internal_err("locking project for editing")?;
+    project_item.inner.status =
+        ProjectStatus::from_string(&locked_project.status);
+    project_item.inner.slug = locked_project.slug;
+
+    if submit_for_review && project_item.inner.status.is_approved() {
+        return Err(ApiError::Auth(eyre!(
+            "you do not have permission to submit this project for review"
+        )));
+    }
 
     if let Some(name) = &new_project.name {
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
@@ -1365,69 +1374,42 @@ pub async fn project_edit_internal(
     .await
     .wrap_api_err("deleting unused images")?;
 
-    if validate_for_review {
-        let reloaded_project = validate::ensure_project_is_valid_for_review(
-            id,
-            &pool,
+    if submit_for_review {
+        submit_project_for_review(
+            &project_item,
+            &user,
+            team_member.as_ref().is_none_or(|member| !member.accepted),
+            sync_archival_disclosure,
             &mut transaction,
             &redis,
         )
         .await?;
-
-        if submit_for_review {
-            submit_project_for_review(
-                &reloaded_project,
-                &user,
-                team_member.as_ref().is_none_or(|member| !member.accepted),
-                sync_archival_disclosure,
-                &mut transaction,
-                &redis,
-            )
-            .await?;
-        }
     }
 
-    transaction
-        .commit()
-        .await
-        .wrap_internal_err("committing database transaction")?;
+    mutation::finalize_project_edit(
+        id,
+        project_item.inner.status,
+        project_item.inner.slug.clone(),
+        transaction,
+        &redis,
+    )
+    .await?;
 
     if became_unsearchable {
-        db_models::DBProject::clear_cache(
-            project_item.inner.id,
-            project_item.inner.slug,
-            None,
-            &redis,
-        )
-        .await
-        .wrap_internal_err("clearing cached data from Redis")?;
         search_state
             .queue
             .push_project_removal(project_item.inner.id.into())
             .await;
     } else if reindex_versions || became_searchable {
-        db_models::DBProject::clear_cache(
-            project_item.inner.id,
-            project_item.inner.slug,
-            None,
-            &redis,
-        )
-        .await
-        .wrap_internal_err("clearing cached data from Redis")?;
         search_state
             .queue
             .push_project_with_all_versions_change(project_item.inner.id.into())
             .await;
     } else {
-        clear_project_cache_and_queue_search(
-            &redis,
-            &search_state,
-            project_item.inner.id,
-            project_item.inner.slug,
-            None,
-        )
-        .await
-        .wrap_api_err("executing `clear_project_cache_and_queue_search`")?;
+        search_state
+            .queue
+            .push_project_change(project_item.inner.id.into())
+            .await;
     }
 
     Ok(HttpResponse::NoContent().body(""))
@@ -2122,30 +2104,24 @@ pub async fn projects_edit(
         ));
     }
 
-    transaction
-        .commit()
-        .await
-        .wrap_internal_err("committing database transaction")?;
+    let changed_project_ids = changed_projects
+        .iter()
+        .map(|(project_id, _, _)| *project_id)
+        .collect::<Vec<_>>();
+    mutation::finalize_mutations(&changed_project_ids, transaction, &redis)
+        .await?;
 
-    for (project_id, slug, reindex_versions) in changed_projects {
+    for (project_id, _, reindex_versions) in changed_projects {
         if reindex_versions {
-            db_models::DBProject::clear_cache(project_id, slug, None, &redis)
-                .await
-                .wrap_internal_err("clearing cached data from Redis")?;
             search_state
                 .queue
                 .push_project_with_all_versions_change(project_id.into())
                 .await;
         } else {
-            clear_project_cache_and_queue_search(
-                &redis,
-                &search_state,
-                project_id,
-                slug,
-                None,
-            )
-            .await
-            .wrap_api_err("executing `clear_project_cache_and_queue_search`")?;
+            search_state
+                .queue
+                .push_project_change(project_id.into())
+                .await;
         }
     }
 
@@ -2379,19 +2355,12 @@ pub async fn project_icon_edit_internal(
     .await
     .wrap_internal_err("querying database for `project_icon_edit_internal`")?;
 
-    transaction
-        .commit()
-        .await
-        .wrap_internal_err("committing database transaction")?;
-    clear_project_cache_and_queue_search(
-        &redis,
-        &search_state,
-        project_item.inner.id,
-        project_item.inner.slug,
-        None,
-    )
-    .await
-    .wrap_api_err("executing `clear_project_cache_and_queue_search`")?;
+    mutation::finalize_mutation(project_item.inner.id, transaction, &redis)
+        .await?;
+    search_state
+        .queue
+        .push_project_change(project_item.inner.id.into())
+        .await;
 
     Ok(HttpResponse::NoContent().body(""))
 }
@@ -2509,19 +2478,12 @@ pub async fn delete_project_icon_internal(
         "querying database for `delete_project_icon_internal`",
     )?;
 
-    transaction
-        .commit()
-        .await
-        .wrap_internal_err("committing database transaction")?;
-    clear_project_cache_and_queue_search(
-        &redis,
-        &search_state,
-        project_item.inner.id,
-        project_item.inner.slug,
-        None,
-    )
-    .await
-    .wrap_api_err("executing `clear_project_cache_and_queue_search`")?;
+    mutation::finalize_mutation(project_item.inner.id, transaction, &redis)
+        .await?;
+    search_state
+        .queue
+        .push_project_change(project_item.inner.id.into())
+        .await;
 
     Ok(HttpResponse::NoContent().body(""))
 }
@@ -2722,44 +2684,12 @@ pub async fn add_gallery_item_internal(
     .await
     .wrap_internal_err("inserting galleries into database")?;
 
-    let validation_error = match project_item.inner.status {
-        ProjectStatus::Processing => {
-            validate::ensure_project_is_valid_for_review(
-                project_item.inner.id,
-                &pool,
-                &mut transaction,
-                &redis,
-            )
-            .await
-            .err()
-        }
-        _ => None,
-    };
-    if let Some(error) = validation_error {
-        delete_old_images(
-            Some(upload_result.url),
-            Some(upload_result.raw_url),
-            FileHostPublicity::Public,
-            &**file_host,
-        )
-        .await
-        .wrap_api_err("deleting rejected gallery image upload")?;
-        return Err(error);
-    }
-
-    transaction
-        .commit()
-        .await
-        .wrap_internal_err("committing database transaction")?;
-    clear_project_cache_and_queue_search(
-        &redis,
-        &search_state,
-        project_item.inner.id,
-        project_item.inner.slug,
-        None,
-    )
-    .await
-    .wrap_api_err("executing `clear_project_cache_and_queue_search`")?;
+    mutation::finalize_mutation(project_item.inner.id, transaction, &redis)
+        .await?;
+    search_state
+        .queue
+        .push_project_change(project_item.inner.id.into())
+        .await;
 
     Ok(HttpResponse::NoContent().body(""))
 }
@@ -2985,30 +2915,12 @@ pub async fn edit_gallery_item_internal(
         )?;
     }
 
-    if project_item.inner.status == ProjectStatus::Processing {
-        validate::ensure_project_is_valid_for_review(
-            project_item.inner.id,
-            &pool,
-            &mut transaction,
-            &redis,
-        )
+    mutation::finalize_mutation(project_item.inner.id, transaction, &redis)
         .await?;
-    }
-
-    transaction
-        .commit()
-        .await
-        .wrap_internal_err("committing database transaction")?;
-
-    clear_project_cache_and_queue_search(
-        &redis,
-        &search_state,
-        project_item.inner.id,
-        project_item.inner.slug,
-        None,
-    )
-    .await
-    .wrap_api_err("executing `clear_project_cache_and_queue_search`")?;
+    search_state
+        .queue
+        .push_project_change(project_item.inner.id.into())
+        .await;
 
     Ok(HttpResponse::NoContent().body(""))
 }
@@ -3146,20 +3058,8 @@ pub async fn delete_gallery_item_internal(
         "querying database for `delete_gallery_item_internal`",
     )?;
 
-    if project_item.inner.status == ProjectStatus::Processing {
-        validate::ensure_project_is_valid_for_review(
-            project_item.inner.id,
-            &pool,
-            &mut transaction,
-            &redis,
-        )
+    mutation::finalize_mutation(project_item.inner.id, transaction, &redis)
         .await?;
-    }
-
-    transaction
-        .commit()
-        .await
-        .wrap_internal_err("committing database transaction")?;
 
     delete_old_images(
         Some(item.image_url),
@@ -3170,15 +3070,10 @@ pub async fn delete_gallery_item_internal(
     .await
     .wrap_api_err("deleting old images")?;
 
-    clear_project_cache_and_queue_search(
-        &redis,
-        &search_state,
-        project_item.inner.id,
-        project_item.inner.slug,
-        None,
-    )
-    .await
-    .wrap_api_err("executing `clear_project_cache_and_queue_search`")?;
+    search_state
+        .queue
+        .push_project_change(project_item.inner.id.into())
+        .await;
 
     Ok(HttpResponse::NoContent().body(""))
 }
@@ -3268,6 +3163,21 @@ pub async fn project_delete_internal(
         .begin()
         .await
         .wrap_internal_err("failed to start transaction")?;
+    let locked_project = sqlx::query!(
+        r#"
+        SELECT status, slug
+        FROM mods
+        WHERE id = $1
+        FOR UPDATE
+        "#,
+        project.inner.id as db_ids::DBProjectId,
+    )
+    .fetch_one(&mut transaction)
+    .await
+    .wrap_internal_err("locking project for deletion")?;
+    let original_status = ProjectStatus::from_string(&locked_project.status);
+    let original_slug = locked_project.slug;
+
     delphi::tech_review_queue::remove_projects(
         &[project.inner.id],
         delphi::tech_review_queue::TechReviewRemovalReason::FileDeleted,
@@ -3278,12 +3188,12 @@ pub async fn project_delete_internal(
 
     // rejected & withheld projects are transferred to ghost so moderation data is preserved
     if matches!(
-        project.inner.status,
+        original_status,
         ProjectStatus::Rejected | ProjectStatus::Withheld
     ) {
         let deleted_user: db_ids::DBUserId = DELETED_USER.into();
 
-        let deleted_slug = if let Some(slug) = &project.inner.slug {
+        let deleted_slug = if let Some(slug) = &original_slug {
             let candidate = format!(
                 "{slug}--deleted-{}",
                 ProjectId::from(project.inner.id)
@@ -3409,10 +3319,14 @@ pub async fn project_delete_internal(
         .await
         .wrap_internal_err("failed to delete project followers")?;
 
-        transaction
-            .commit()
-            .await
-            .wrap_internal_err("failed to commit transaction")?;
+        mutation::finalize_project_edit(
+            project.inner.id,
+            original_status,
+            original_slug,
+            transaction,
+            &redis,
+        )
+        .await?;
 
         let mut cache_user_ids = affected_user_ids;
         cache_user_ids.push(deleted_user);
@@ -3422,14 +3336,6 @@ pub async fn project_delete_internal(
         DBTeamMember::clear_cache(project.inner.team_id, &redis)
             .await
             .wrap_internal_err("clearing cached data from Redis")?;
-        db_models::DBProject::clear_cache(
-            project.inner.id,
-            project.inner.slug.clone(),
-            None,
-            &redis,
-        )
-        .await
-        .wrap_internal_err("clearing cached data from Redis")?;
         search_state
             .queue
             .push_project_removal(project.inner.id.into())

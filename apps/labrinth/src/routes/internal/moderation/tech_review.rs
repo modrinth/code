@@ -221,7 +221,7 @@ pub struct GetIssue {
     pub include_hidden: bool,
 }
 
-/// Get a Delphi report issue.  
+/// Get a Delphi report issue.
 #[utoipa::path(
 	context_path = "/moderation/tech-review",
 	tag = "moderation",
@@ -1107,6 +1107,20 @@ pub async fn submit_report(
         .await
         .wrap_internal_err("failed to begin transaction")?;
 
+    sqlx::query!(
+        r#"
+        SELECT id
+        FROM mods
+        WHERE id = $1
+        FOR UPDATE
+        "#,
+        project_id as DBProjectId,
+    )
+    .fetch_optional(&mut txn)
+    .await
+    .wrap_internal_err("locking project for technical review submission")?
+    .wrap_not_found_err("project not found")?;
+
     let pending_issue_details = sqlx::query!(
         r#"
         SELECT
@@ -1236,22 +1250,19 @@ pub async fn submit_report(
         .wrap_internal_err("failed to add tech review message")?;
     }
 
-    txn.commit()
-        .await
-        .wrap_internal_err("failed to commit transaction")?;
-
     if verdict == DelphiVerdict::Unsafe {
-        crate::routes::v3::projects::clear_project_cache_and_queue_search(
-            &redis,
-            &search_state,
-            project_id,
-            None,
-            None,
+        crate::routes::v3::projects::mutation::finalize_mutation(
+            project_id, txn, &redis,
         )
-        .await
-        .wrap_api_err(
-            "executing `projects::clear_project_cache_and_queue_search`",
-        )?;
+        .await?;
+        search_state
+            .queue
+            .push_project_change(project_id.into())
+            .await;
+    } else {
+        txn.commit()
+            .await
+            .wrap_internal_err("failed to commit transaction")?;
     }
 
     Ok(())

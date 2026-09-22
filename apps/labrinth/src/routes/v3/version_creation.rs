@@ -185,9 +185,12 @@ pub async fn version_create(
             return Err(e.into());
         }
     } else if let Ok((_, project_id, version_id)) = &result {
-        transaction.commit().await?;
-        models::DBProject::clear_cache(*project_id, None, Some(true), &redis)
-            .await?;
+        super::projects::mutation::finalize_mutation(
+            *project_id,
+            transaction,
+            &redis,
+        )
+        .await?;
         search_state
             .queue
             .push_version_changes(
@@ -671,9 +674,12 @@ pub async fn upload_file_to_version(
             return Err(e.into());
         }
     } else if let Ok((_, project_id)) = &result {
-        transaction.commit().await?;
-        models::DBProject::clear_cache(*project_id, None, Some(true), &redis)
-            .await?;
+        super::projects::mutation::finalize_mutation(
+            *project_id,
+            transaction,
+            &redis,
+        )
+        .await?;
         search_state
             .queue
             .push_version_changes((*project_id).into(), [version_id])
