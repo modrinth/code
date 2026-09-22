@@ -64,10 +64,6 @@ const openSourceLicenseIds = new Set([
 ])
 
 const messages = defineMessages({
-	author: {
-		id: 'content.metadata-filter.author',
-		defaultMessage: 'Author',
-	},
 	openSource: {
 		id: 'content.metadata-filter.open-source',
 		defaultMessage: 'Open source',
@@ -136,10 +132,6 @@ const messages = defineMessages({
 		id: 'content.metadata-filter.warning.client-only',
 		defaultMessage: 'Client-only content',
 	},
-	noWarnings: {
-		id: 'content.metadata-filter.warning.none',
-		defaultMessage: 'No warnings',
-	},
 	unknownEnvironment: {
 		id: 'content.metadata-filter.warning.unknown-environment',
 		defaultMessage: 'Unknown environment',
@@ -191,15 +183,6 @@ export function useContentMetadataFilters(
 	}
 
 	const definitions = computed<MetadataFilterDefinition[]>(() => [
-		{
-			key: 'author',
-			label: formatMessage(messages.author),
-			searchable: true,
-			values: (item) =>
-				item.owner
-					? [option(`${item.owner.type}:${item.owner.id}`, item.owner.name, [item.owner.id])]
-					: [],
-		},
 		config?.showEnabledFor
 			? {
 					key: 'enabled_for',
@@ -254,7 +237,7 @@ export function useContentMetadataFilters(
 					case 'unknown-environment':
 						return [option(warning, formatMessage(messages.unknownEnvironment))]
 					default:
-						return [option('none', formatMessage(messages.noWarnings))]
+						return []
 				}
 			},
 		},
