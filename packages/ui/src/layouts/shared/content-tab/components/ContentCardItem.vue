@@ -177,11 +177,7 @@ const toggleTooltip = computed(() => {
 	if (!isToggleDisabled.value) return undefined
 	return props.toggleDisabledTooltip ?? props.disabledTooltip ?? undefined
 })
-const isContentDisabled = computed(
-	() =>
-		props.enabled === false ||
-		(props.enabledFor && !props.enabledFor.server && !props.enabledFor.player),
-)
+const isContentDisabled = computed(() => props.enabled === false)
 
 const clientWarningMessage = computed(() => {
 	switch (props.clientWarning) {

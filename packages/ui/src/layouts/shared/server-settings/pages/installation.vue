@@ -501,23 +501,22 @@ async function uploadLocalModpackWithSoftOverride() {
 }
 
 async function disableAddonsEverywhere(addons: Archon.Content.v1.Addon[]) {
-	await Promise.all(
-		addons.flatMap((addon) => {
-			const request: Archon.Content.v1.SetAddonEnabledRequest = {
-				kind: addon.kind,
-				filename: addon.filename,
-				enabled: false,
-			}
-			return [
-				...(!addon.disabled_server
-					? [client.archon.content_v1.setAddonEnabledServer(serverId, worldId.value!, request)]
-					: []),
-				...(!addon.disabled_player
-					? [client.archon.content_v1.setAddonEnabledPlayer(serverId, worldId.value!, request)]
-					: []),
-			]
-		}),
-	)
+	const targetWorldId = worldId.value!
+	const requests: Array<() => Promise<void>> = []
+	for (const addon of addons) {
+		const request: Archon.Content.v1.SetAddonEnabledRequest = {
+			kind: addon.kind,
+			filename: addon.filename,
+			enabled: false,
+		}
+		if (!addon.disabled_server)
+			requests.push(() => client.archon.content_v1.setAddonEnabledServer(serverId, targetWorldId, request))
+		if (!addon.disabled_player)
+			requests.push(() => client.archon.content_v1.setAddonEnabledPlayer(serverId, targetWorldId, request))
+	}
+	for (let index = 0; index < requests.length; index += 8) {
+		await Promise.all(requests.slice(index, index + 8).map((request) => request()))
+	}
 }
 
 provideInstallationSettings({

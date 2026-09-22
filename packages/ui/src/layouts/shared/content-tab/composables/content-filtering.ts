@@ -5,7 +5,7 @@ import { computed, ref, watch } from 'vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonProjectTypeCategoryMessages, normalizeProjectType } from '#ui/utils/common-messages'
 
-import type { ClientWarningType, ContentItem } from '../types'
+import type { ClientWarningType, ContentItem, ContentWarningType } from '../types'
 
 const CLIENT_ONLY_ENVIRONMENTS = new Set(['client_only', 'singleplayer_only'])
 
@@ -26,14 +26,9 @@ export function getClientWarningType(
 export function getContentWarningType(
 	item: ContentItem,
 	showEnvironmentWarnings = false,
-): ClientWarningType | 'unknown-environment' | null {
+): ContentWarningType | null {
 	if (!item.enabledFor) return getClientWarningType(item, showEnvironmentWarnings)
-	if (!item.enabledFor.warningTooltip) return null
-	if (item.enabledFor.server) {
-		if (item.pack_client_retained) return 'retained'
-		if (item.pack_client_depends) return 'depends'
-	}
-	return 'unknown-environment'
+	return item.enabledFor.warningKind ?? null
 }
 
 export interface ContentFilterOption {

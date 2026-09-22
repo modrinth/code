@@ -303,7 +303,6 @@ import {
 	UsersIcon,
 } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { useStorage } from '@vueuse/core'
 import DOMPurify from 'dompurify'
 import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
@@ -341,6 +340,7 @@ import type {
 } from '#ui/composables/server-installation-tracker'
 import { useServerManageCoreRuntime } from '#ui/composables/server-manage-core-runtime'
 import { useServerPanelSync } from '#ui/composables/server-panel-sync'
+import { useServerPreferences } from '#ui/composables/server-preferences'
 import type { LogLine } from '#ui/layouts/shared/console'
 import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
 import {
@@ -439,9 +439,7 @@ const isReconnecting = ref(false)
 const isLoading = ref(true)
 const isMounted = ref(true)
 
-const serverPreferences = useStorage(`pyro-server-${props.serverId}-preferences`, {
-	hideSubdomainLabel: false,
-})
+const serverPreferences = useServerPreferences(props.serverId)
 
 const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>(null)
 const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()

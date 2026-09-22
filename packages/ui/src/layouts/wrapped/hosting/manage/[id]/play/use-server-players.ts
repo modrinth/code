@@ -165,8 +165,8 @@ export function useServerPlayers(instanceId: Ref<string | null>, canManage: Ref<
 			queryClient.invalidateQueries({ queryKey: ['shared-instances', id, 'invites'] }),
 	})
 
-	async function ensureLink(id: string) {
-		await ensureServerInviteLink(client, id)
+	async function ensureLink(id: string, remainingSlots?: number) {
+		await ensureServerInviteLink(client, id, remainingSlots)
 		await queryClient.invalidateQueries({ queryKey: ['shared-instances', id, 'invites'] })
 	}
 

@@ -37,7 +37,7 @@ import ContentUpdaterModal from '../../../shared/content-tab/components/modals/c
 import ContentPageLayout from '../../../shared/content-tab/layout.vue'
 import type { ManagedContentData } from '../../../shared/content-tab/providers/content-manager'
 import { provideContentManager } from '../../../shared/content-tab/providers/content-manager'
-import type { ContentItem, ContentSide } from '../../../shared/content-tab/types'
+import type { ContentItem, ContentSide, ContentWarningType } from '../../../shared/content-tab/types'
 import { summarizeManagedContent } from '../../../shared/content-tab/utils/managed-content'
 
 type AddonWithUiState = Archon.Content.v1.Addon & { installing?: boolean }
@@ -353,23 +353,31 @@ function isIncompatibleEnvironment(addon: Archon.Content.v1.Addon, side: Content
 		: environment === 'server_only' || environment === 'dedicated_server_only'
 }
 
-function getEnabledForWarning(addon: Archon.Content.v1.Addon) {
+function getEnabledForWarning(
+	addon: Archon.Content.v1.Addon,
+): { kind: ContentWarningType; tooltip: string } | null {
 	if (isPlayerOnlyContent(addon)) return null
 	if (!addon.disabled_server) {
-		if (addon.pack_client_retained) return formatMessage(commonMessages.clientRetainedWarning)
-		if (addon.pack_client_depends) return formatMessage(commonMessages.clientDependsWarning)
+		if (addon.pack_client_retained)
+			return { kind: 'retained', tooltip: formatMessage(commonMessages.clientRetainedWarning) }
+		if (addon.pack_client_depends)
+			return { kind: 'depends', tooltip: formatMessage(commonMessages.clientDependsWarning) }
 		if (isIncompatibleEnvironment(addon, 'server')) {
-			return formatMessage(
-				getAddonEnvironment(addon) === 'singleplayer_only'
-					? messages.singleplayerOnlyEnabledForServer
-					: messages.clientOnlyEnabledForServer,
-			)
+			return {
+				kind: 'environment',
+				tooltip: formatMessage(
+					getAddonEnvironment(addon) === 'singleplayer_only'
+						? messages.singleplayerOnlyEnabledForServer
+						: messages.clientOnlyEnabledForServer,
+				),
+			}
 		}
 	}
 	if (!addon.disabled_player && isIncompatibleEnvironment(addon, 'player')) {
-		return formatMessage(messages.serverOnlyEnabledForPlayers)
+		return { kind: 'server-only', tooltip: formatMessage(messages.serverOnlyEnabledForPlayers) }
 	}
-	if (!hasDetectedEnvironment(addon)) return formatMessage(messages.unknownEnvironment)
+	if (!hasDetectedEnvironment(addon))
+		return { kind: 'unknown-environment', tooltip: formatMessage(messages.unknownEnvironment) }
 	return null
 }
 
@@ -1088,6 +1096,7 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 	const serverEnabled = !isPlayerOnlyContent(addon) && !addon.disabled_server
 	const playerEnabled = !addon.disabled_player
 	const lockedSides: ContentSide[] = isPlayerOnlyContent(addon) ? ['server'] : []
+	const warning = getEnabledForWarning(addon)
 	return {
 		project: {
 			...(projectMetadata ?? {}),
@@ -1128,7 +1137,8 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 					)
 				: undefined,
 			disabledSides: lockedSides,
-			warningTooltip: getEnabledForWarning(addon),
+			warningTooltip: warning?.tooltip,
+			warningKind: warning?.kind,
 		},
 		embeddedIcon,
 		file_name: addon.filename,

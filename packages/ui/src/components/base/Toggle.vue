@@ -2,7 +2,7 @@
 	<button
 		:id="id"
 		type="button"
-		role="switch"
+			:role="indeterminate ? 'checkbox' : 'switch'"
 		:aria-checked="indeterminate ? 'mixed' : modelValue"
 		:disabled="disabled"
 		class="group inline-flex shrink-0 touch-manipulation items-center rounded-full m-0 p-1 transition-all duration-200 cursor-pointer border border-solid border-surface-5"

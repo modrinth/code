@@ -1,5 +1,5 @@
 export {
-	invitedPlayerMethodLabels as methodLabels,
+	invitedPlayerMethodMessages as methodMessages,
 	normalizeInviteKey,
 	type InvitedPlayerMethod as ShareMethod,
 	type InvitedPlayerRow as ShareRow,

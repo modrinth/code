@@ -1,9 +1,9 @@
 import type { SharedInstances } from '@modrinth/api-client'
 import { useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { useStorage } from '@vueuse/core'
 import { computed } from 'vue'
 
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { useServerPreferences } from '#ui/composables/server-preferences'
 import {
 	injectAuth,
 	injectModrinthClient,
@@ -22,12 +22,7 @@ export function useServerSharingSettings() {
 	const { handleError } = injectNotificationManager()
 	const { serverId, worldId, serverFull, busyReasons } = injectModrinthServerContext()
 	const { canSetup, permissionDeniedMessage } = useServerPermissions()
-	const preferences = useStorage(
-		`pyro-server-${serverId}-preferences`,
-		{ reviewChangesBeforePlaying: false },
-		undefined,
-		{ mergeDefaults: true },
-	)
+	const preferences = useServerPreferences(serverId)
 	const userId = computed(() => auth.user.value?.id)
 	const sharedInstanceId = computed(
 		() =>

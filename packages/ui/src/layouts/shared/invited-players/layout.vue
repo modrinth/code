@@ -5,7 +5,7 @@
 				<Input
 					v-model="search"
 					:icon="SearchIcon"
-					:placeholder="`Search ${rows.length} users...`"
+					:placeholder="formatMessage(messages.searchUsers, { count: rows.length })"
 					wrapper-class="min-w-0 flex-1"
 					size="medium"
 					clearable
@@ -44,7 +44,7 @@
 					:aria-pressed="methodFilter === 'all'"
 					@click="methodFilter = 'all'"
 				>
-					All
+						{{ formatMessage(messages.all) }}
 				</button>
 				<button
 					v-for="option in methodFilterOptions"
@@ -68,8 +68,15 @@
 		>
 			<template #empty-state>
 				<div class="flex h-64 items-center justify-center px-4 text-center text-secondary">
+					<SpinnerIcon v-if="loading" class="size-6 animate-spin" aria-hidden="true" />
 					{{
-						formatMessage(rows.length === 0 ? messages.noUsersJoined : messages.noUsersMatchFilters)
+						formatMessage(
+							loading
+								? messages.loadingUsers
+								: rows.length === 0
+									? messages.noUsersJoined
+									: messages.noUsersMatchFilters,
+						)
 					}}
 				</div>
 			</template>
@@ -82,7 +89,7 @@
 					>
 						<Avatar
 							:src="row.avatarUrl"
-							:alt="`${row.username}'s avatar`"
+								:alt="formatMessage(messages.avatarAlt, { username: row.username })"
 							:tint-by="row.username"
 							size="24px"
 							circle
@@ -100,7 +107,7 @@
 				<span
 					v-if="row.pending"
 					class="inline-flex h-7 items-center rounded-full border border-surface-5 border-solid bg-surface-4 px-2.5 py-1 text-sm font-semibold text-secondary"
-					>Pending</span
+					>{{ formatMessage(messages.pending) }}</span
 				>
 				<span v-else-if="row.joinedAt" v-tooltip="formatDateTime(row.joinedAt)">{{
 					formatRelativeTime(row.joinedAt)
@@ -110,22 +117,22 @@
 				<span v-if="row.lastPlayedAt" v-tooltip="formatDateTime(row.lastPlayedAt)">{{
 					formatRelativeTime(row.lastPlayedAt)
 				}}</span>
-				<span v-else>Never</span>
+					<span v-else>{{ formatMessage(messages.never) }}</span>
 			</template>
 			<template #cell-method="{ row }">
 				<span class="inline-flex min-w-0 max-w-full items-center gap-2">
 					<UserPlusIcon v-if="row.method === 'direct'" class="size-5 shrink-0" aria-hidden="true" />
 					<LinkIcon v-else class="size-5 shrink-0" aria-hidden="true" />
-					<span class="min-w-0 truncate">{{ methodLabels[row.method] }}</span>
+					<span class="min-w-0 truncate">{{ labels.methods[row.method] }}</span>
 				</span>
 			</template>
 			<template #cell-actions="{ row }">
 				<div v-if="canManage" class="flex items-center justify-end">
 					<IconButton
-						v-tooltip="'Revoke access'"
+						v-tooltip="formatMessage(messages.revokeAccess)"
 						:disabled="disabled"
 						type="quiet"
-						:label="`Revoke access for ${row.username}`"
+						:label="formatMessage(messages.revokeAccessFor, { username: row.username })"
 						class="text-secondary hover:!filter-none hover:text-red focus-visible:!filter-none"
 						@click="emit('remove', row)"
 					>
@@ -159,13 +166,14 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { truncatedTooltip } from '#ui/utils/truncate'
 
 import { useInvitedPlayersTable } from './composables/use-invited-players-table'
-import { invitedPlayerMethodLabels as methodLabels, type InvitedPlayerRow } from './types'
+import { invitedPlayerMethodMessages, type InvitedPlayerRow } from './types'
 
 type InvitedPlayerColumn = 'username' | 'lastPlayed' | 'joined' | 'method' | 'actions'
 
 const props = withDefaults(
 	defineProps<{
 		rows: InvitedPlayerRow[]
+		loading?: boolean
 		canManage?: boolean
 		disabled?: boolean
 		showPushUpdate?: boolean
@@ -188,6 +196,51 @@ const usernameRefs = ref<Record<string, HTMLElement | null>>({})
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime({ style: 'narrow' })
 const formatDateTime = useFormatDateTime({ dateStyle: 'medium', timeStyle: 'short' })
+const messages = defineMessages({
+	pushUpdate: {
+		id: 'app.instance.admonitions.shared-instance.publish-button',
+		defaultMessage: 'Push update',
+	},
+	invitePlayers: {
+		id: 'servers.play.card.app.invite-button',
+		defaultMessage: 'Invite players',
+	},
+	searchUsers: {
+		id: 'servers.play.players.search-users',
+		defaultMessage: 'Search {count} users...',
+	},
+	all: { id: 'servers.play.players.all', defaultMessage: 'All' },
+	username: { id: 'servers.play.players.username', defaultMessage: 'Username' },
+	joined: { id: 'servers.play.players.joined', defaultMessage: 'Joined' },
+	lastPlayed: { id: 'servers.play.players.last-played', defaultMessage: 'Last played' },
+	method: { id: 'servers.play.players.method', defaultMessage: 'Method' },
+	actions: { id: 'servers.play.players.actions', defaultMessage: 'Actions' },
+	pending: { id: 'servers.play.players.pending', defaultMessage: 'Pending' },
+	never: { id: 'servers.play.players.never', defaultMessage: 'Never' },
+	avatarAlt: { id: 'servers.play.players.avatar-alt', defaultMessage: "{username}'s avatar" },
+	revokeAccess: { id: 'servers.play.players.revoke-access', defaultMessage: 'Revoke access' },
+	revokeAccessFor: {
+		id: 'servers.play.players.revoke-access-for',
+		defaultMessage: 'Revoke access for {username}',
+	},
+	loadingUsers: { id: 'servers.play.players.loading', defaultMessage: 'Loading users...' },
+	noUsersJoined: {
+		id: 'app.instance.share.members.empty',
+		defaultMessage: 'No users have joined yet',
+	},
+	noUsersMatchFilters: {
+		id: 'app.instance.share.members.no-filter-results',
+		defaultMessage: 'No users match your filters.',
+	},
+})
+const labels = computed(() => ({
+	methods: {
+		direct: formatMessage(invitedPlayerMethodMessages.direct),
+		link: formatMessage(invitedPlayerMethodMessages.link),
+	},
+	never: formatMessage(messages.never),
+	pending: formatMessage(messages.pending),
+}))
 const {
 	search,
 	methodFilter,
@@ -197,13 +250,13 @@ const {
 	hasMultipleMethods,
 	sortedRows,
 	toggleMethodFilter,
-} = useInvitedPlayersTable(toRef(props, 'rows'), formatRelativeTime)
+} = useInvitedPlayersTable(toRef(props, 'rows'), formatRelativeTime, labels)
 
 const columns = computed<TableColumn<InvitedPlayerColumn>[]>(() => {
 	const result: TableColumn<InvitedPlayerColumn>[] = [
 		{
 			key: 'username',
-			label: 'Username',
+			label: formatMessage(messages.username),
 			width: 'clamp(14rem, 30%, 26rem)',
 			enableSorting: true,
 			headerClass: '!pr-3',
@@ -211,7 +264,7 @@ const columns = computed<TableColumn<InvitedPlayerColumn>[]>(() => {
 		},
 		{
 			key: 'joined',
-			label: 'Joined',
+			label: formatMessage(messages.joined),
 			width: 'clamp(7rem, 14%, 12rem)',
 			enableSorting: true,
 			defaultSortDirection: 'desc',
@@ -220,7 +273,7 @@ const columns = computed<TableColumn<InvitedPlayerColumn>[]>(() => {
 		},
 		{
 			key: 'lastPlayed',
-			label: 'Last played',
+			label: formatMessage(messages.lastPlayed),
 			width: 'clamp(7rem, 15%, 13rem)',
 			enableSorting: true,
 			headerClass: 'whitespace-nowrap !px-2',
@@ -228,7 +281,7 @@ const columns = computed<TableColumn<InvitedPlayerColumn>[]>(() => {
 		},
 		{
 			key: 'method',
-			label: 'Method',
+			label: formatMessage(messages.method),
 			enableSorting: true,
 			headerClass: 'whitespace-nowrap !px-2',
 			cellClass: 'whitespace-nowrap !px-2',
@@ -237,7 +290,7 @@ const columns = computed<TableColumn<InvitedPlayerColumn>[]>(() => {
 	if (props.canManage)
 		result.push({
 			key: 'actions',
-			label: 'Actions',
+			label: formatMessage(messages.actions),
 			align: 'right',
 			width: 'clamp(5.5rem, 7%, 7rem)',
 			headerClass: 'whitespace-nowrap !pl-2 !pr-4',
@@ -255,24 +308,6 @@ function filterClass(active: boolean) {
 	]
 }
 
-const messages = defineMessages({
-	pushUpdate: {
-		id: 'app.instance.admonitions.shared-instance.publish-button',
-		defaultMessage: 'Push update',
-	},
-	invitePlayers: {
-		id: 'servers.play.card.app.invite-button',
-		defaultMessage: 'Invite players',
-	},
-	noUsersJoined: {
-		id: 'app.instance.share.members.empty',
-		defaultMessage: 'No users have joined yet',
-	},
-	noUsersMatchFilters: {
-		id: 'app.instance.share.members.no-filter-results',
-		defaultMessage: 'No users match your filters.',
-	},
-})
 function userProfileLink(username: string) {
 	return !username || username.includes('@') ? undefined : `/user/${encodeURIComponent(username)}`
 }
