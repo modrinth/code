@@ -239,6 +239,14 @@ function setupKeyTooltip() {
 
 function registerKeyboardShortcuts(panelOpen: Ref<boolean>, keyReveal: Ref<boolean>) {
 	useEventListener(document, 'keydown', (e: KeyboardEvent) => {
+		// Prevent the browser/app print dialog from opening with Ctrl+P / Cmd+P
+		if (e.ctrlKey || e.metaKey) {
+			if (e.code === 'KeyP') {
+				e.preventDefault()
+				return
+			}
+		}
+
 		// Use Cmd on macOS, Ctrl on other platforms
 		const mod = e.metaKey || e.ctrlKey
 		if (!mod || !e.shiftKey) return
