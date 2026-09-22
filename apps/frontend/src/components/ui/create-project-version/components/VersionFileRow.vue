@@ -98,7 +98,6 @@ const versionTypes = computed(
 	() =>
 		[
 			!editingVersion && { class: 'text-sm', value: 'primary', label: fileTypeLabels.primary },
-			{ class: 'text-sm', value: 'unknown', label: fileTypeLabels.unknown },
 			isDatapackProject.value && {
 				class: 'text-sm',
 				value: 'required-resource-pack',
