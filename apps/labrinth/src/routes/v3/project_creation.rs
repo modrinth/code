@@ -14,6 +14,7 @@ use crate::models::error::ApiError;
 use crate::models::exp;
 use crate::models::ids::{ImageId, OrganizationId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
+use crate::models::link_platform::LinkPlatform;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
     License, Link, MonetizationStatus, Project, ProjectStatus,
@@ -935,35 +936,15 @@ async fn project_create_inner(
 
         let mut link_urls = vec![];
 
-        let link_platforms =
-            models::categories::LinkPlatform::list(&mut *transaction, redis)
-                .await?;
         for (platform, url) in &project_create_data.link_urls {
-            let platform_id = models::categories::LinkPlatform::get_id(
-                platform,
-                &mut *transaction,
-            )
-            .await?
-            .ok_or_else(|| {
+            let platform = platform.parse::<LinkPlatform>().map_err(|_| {
                 CreateError::InvalidInput(format!(
-                    "Link platform {} does not exist.",
-                    platform.clone()
+                    "Link platform {platform} does not exist."
                 ))
             })?;
-            let link_platform = link_platforms
-                .iter()
-                .find(|x| x.id == platform_id)
-                .ok_or_else(|| {
-                    CreateError::InvalidInput(format!(
-                        "Link platform {} does not exist.",
-                        platform.clone()
-                    ))
-                })?;
             link_urls.push(models::project_item::LinkUrl {
-                platform_id,
-                platform_name: link_platform.name.clone(),
+                platform,
                 url: url.clone(),
-                donation: link_platform.donation,
             })
         }
 
@@ -1118,7 +1099,7 @@ async fn project_create_inner(
                 .link_urls
                 .clone()
                 .into_iter()
-                .map(|x| (x.platform_name.clone(), Link::from(x)))
+                .map(|x| (x.platform.to_string(), Link::from(x)))
                 .collect(),
             gallery: gallery_urls,
             color: project_builder.color,

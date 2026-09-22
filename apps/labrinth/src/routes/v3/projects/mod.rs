@@ -22,6 +22,7 @@ use crate::models::disclosures::{
 };
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::images::ImageContext;
+use crate::models::link_platform::LinkPlatform;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
@@ -1033,17 +1034,25 @@ pub async fn project_edit_internal(
             )));
         }
 
-        let ids_to_delete = links.keys().cloned().collect::<Vec<String>>();
+        let platforms_to_delete = links
+            .keys()
+            .map(|platform| {
+                platform
+                    .parse::<LinkPlatform>()
+                    .map(|platform| platform.to_string())
+                    .wrap_request_err_with(|| {
+                        format!("platform `{platform}` does not exist")
+                    })
+            })
+            .collect::<Result<Vec<_>, ApiError>>()?;
         // Deletes all links from hashmap- either will be deleted or be replaced
         sqlx::query!(
             "
                 DELETE FROM mods_links
-                WHERE joining_mod_id = $1 AND joining_platform_id IN (
-                    SELECT id FROM link_platforms WHERE name = ANY($2)
-                )
+                WHERE joining_mod_id = $1 AND platform = ANY($2)
                 ",
             id as db_ids::DBProjectId,
-            &ids_to_delete
+            &platforms_to_delete
         )
         .execute(&mut transaction)
         .await
@@ -1051,26 +1060,26 @@ pub async fn project_edit_internal(
 
         for (platform, url) in links {
             if let Some(url) = url {
-                let platform_id = db_models::categories::LinkPlatform::get_id(
-                    platform,
-                    &mut transaction,
-                )
-                .await
-                .wrap_internal_err("fetching link platform from database")?
-                .wrap_request_err_with(|| {
-                    format!("platform `{}` does not exist", platform.clone())
-                })?;
+                let platform = platform
+                    .parse::<LinkPlatform>()
+                    .wrap_request_err_with(|| {
+                        format!("platform `{platform}` does not exist")
+                    })?
+                    .to_string();
                 sqlx::query!(
-                        "
-                        INSERT INTO mods_links (joining_mod_id, joining_platform_id, url)
+                    "
+                        INSERT INTO mods_links (joining_mod_id, platform, url)
                         VALUES ($1, $2, $3)
                         ",
-                        id as db_ids::DBProjectId,
-                        platform_id as db_ids::LinkPlatformId,
-                        url
-                    )
-                    .execute(&mut transaction)
-                    .await.wrap_internal_err("querying database for `project_edit_internal`")?;
+                    id as db_ids::DBProjectId,
+                    platform,
+                    url
+                )
+                .execute(&mut transaction)
+                .await
+                .wrap_internal_err(
+                    "querying database for `project_edit_internal`",
+                )?;
             }
         }
     }
@@ -1981,10 +1990,6 @@ pub async fn projects_edit(
     let categories = db_models::categories::Category::list(&**pool, &redis)
         .await
         .wrap_internal_err("fetching category from Redis")?;
-    let link_platforms =
-        db_models::categories::LinkPlatform::list(&**pool, &redis)
-            .await
-            .wrap_internal_err("fetching link platform from Redis")?;
 
     let mut transaction = pool
         .begin()
@@ -2087,17 +2092,25 @@ pub async fn projects_edit(
         .wrap_api_err("executing `bulk_edit_project_categories`")?;
 
         if let Some(links) = &bulk_edit_project.link_urls {
-            let ids_to_delete = links.keys().cloned().collect::<Vec<String>>();
+            let platforms_to_delete = links
+                .keys()
+                .map(|platform| {
+                    platform
+                        .parse::<LinkPlatform>()
+                        .map(|platform| platform.to_string())
+                        .wrap_request_err_with(|| {
+                            format!("platform `{platform}` does not exist")
+                        })
+                })
+                .collect::<Result<Vec<_>, ApiError>>()?;
             // Deletes all links from hashmap- either will be deleted or be replaced
             sqlx::query!(
                 "
                 DELETE FROM mods_links
-                WHERE joining_mod_id = $1 AND joining_platform_id IN (
-                    SELECT id FROM link_platforms WHERE name = ANY($2)
-                )
+                WHERE joining_mod_id = $1 AND platform = ANY($2)
                 ",
                 project.inner.id as db_ids::DBProjectId,
-                &ids_to_delete
+                &platforms_to_delete
             )
             .execute(&mut transaction)
             .await
@@ -2105,27 +2118,26 @@ pub async fn projects_edit(
 
             for (platform, url) in links {
                 if let Some(url) = url {
-                    let platform_id = link_platforms
-                        .iter()
-                        .find(|x| &x.name == platform)
+                    let platform = platform
+                        .parse::<LinkPlatform>()
                         .wrap_request_err_with(|| {
-                            format!(
-                                "platform `{}` does not exist",
-                                platform.clone()
-                            )
+                            format!("platform `{platform}` does not exist")
                         })?
-                        .id;
+                        .to_string();
                     sqlx::query!(
                         "
-                        INSERT INTO mods_links (joining_mod_id, joining_platform_id, url)
+                        INSERT INTO mods_links (joining_mod_id, platform, url)
                         VALUES ($1, $2, $3)
                         ",
                         project.inner.id as db_ids::DBProjectId,
-                        platform_id as db_ids::LinkPlatformId,
+                        platform,
                         url
                     )
                     .execute(&mut transaction)
-                    .await.wrap_internal_err("querying database for `projects_edit`")?;
+                    .await
+                    .wrap_internal_err(
+                        "querying database for `projects_edit`",
+                    )?;
                 }
             }
         }
