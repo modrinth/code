@@ -4,9 +4,9 @@
 		:class="isActive ? 'project-review-tab-active text-contrast' : 'text-secondary'"
 	>
 		{{ formatMessage(projectReviewMessages[params.params.tab]) }}
-		<span v-if="count !== undefined" class="ml-1.5 rounded px-1 text-xs tabular-nums">{{
-			count
-		}}</span>
+		<span v-if="count !== undefined" class="ml-0 rounded px-1 text-xs tabular-nums"
+			>({{ count }})</span
+		>
 	</span>
 </template>
 

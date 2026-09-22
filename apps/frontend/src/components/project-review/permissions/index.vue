@@ -1,12 +1,12 @@
 <template>
-	<section class="flex h-full min-h-0 flex-col overflow-hidden">
+	<section class="flex h-full min-h-0 flex-col gap-2.5 overflow-hidden">
 		<ReviewPanel
 			v-if="panels.resolve({ kind: 'permissions' })"
 			mode="inline"
 			:target="{ kind: 'permissions' }"
-			class="mb-1 shrink-0 !overflow-visible"
+			class="shrink-0 !overflow-visible"
 		/>
-		<div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-1 pb-1 pt-3">
+		<div class="min-h-0 flex-1 overflow-y-auto overscroll-contain">
 			<ProjectPermissions
 				v-if="project"
 				:key="project.id"
