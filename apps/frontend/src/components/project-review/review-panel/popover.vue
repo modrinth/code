@@ -7,7 +7,7 @@
 			:aria-labelledby="titleId"
 			:data-review-panel="anchor.id"
 			tabindex="-1"
-			class="z-[99990] box-border w-[28rem] max-w-[calc(100vw-1rem)] overflow-y-auto rounded-xl border border-solid border-surface-5 bg-surface-3 p-4 text-sm text-primary"
+			class="z-[99990] box-border flex w-[28rem] max-w-[calc(100vw-1rem)] flex-col gap-2 overflow-y-auto rounded-xl border border-solid border-surface-5 bg-surface-3 p-2.5 pb-3 text-sm text-primary"
 			:style="floatingStyles"
 			@pointerenter="cancelClose"
 			@pointerleave="leave(anchor.id)"
@@ -65,7 +65,7 @@ const { floatingStyles, isPositioned } = useFloating(reference, element, {
 	whileElementsMounted: autoUpdate,
 	middleware: [
 		offset(10),
-		flip(),
+		flip({ crossAxis: false, flipAlignment: false }),
 		shift({ padding: 8 }),
 		size({
 			padding: 8,
