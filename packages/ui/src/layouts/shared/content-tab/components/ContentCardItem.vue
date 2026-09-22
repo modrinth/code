@@ -95,6 +95,8 @@ interface Props {
 	hideDelete?: boolean
 	hideActions?: boolean
 	inline?: boolean
+	tableLayout?: 'wide' | 'compact' | 'stacked' | 'narrow'
+	enabledForColumn?: boolean
 	enabledFor?: ContentEnabledForState
 	embeddedIcon?: ContentCardEmbeddedIcon
 }
@@ -127,9 +129,14 @@ const props = withDefaults(defineProps<Props>(), {
 	hideDelete: false,
 	hideActions: false,
 	inline: false,
+	tableLayout: undefined,
+	enabledForColumn: false,
 	enabledFor: undefined,
 	embeddedIcon: undefined,
 })
+
+const stacked = computed(() => props.tableLayout === 'stacked' || props.tableLayout === 'narrow')
+const separateVersion = computed(() => props.tableLayout === 'wide')
 
 const selected = defineModel<boolean>('selected')
 
@@ -193,26 +200,20 @@ const installTooltip = computed(() => {
 <template>
 	<div
 		role="row"
-		class="flex items-center"
-		:class="{
-			'h-[74px] gap-4 px-3': !inline && !enabledFor,
-			'h-[152px] flex-wrap gap-x-2 gap-y-0 px-3 py-3 @[450px]:h-[112px] @[600px]:h-[72px] @[600px]:grid @[600px]:grid-cols-[var(--content-columns)] @[600px]:py-0 @[900px]:grid-cols-[var(--content-columns-wide)]':
-				!inline && enabledFor,
-			'gap-3': inline,
-			'justify-between': !enabledFor,
-			'opacity-50 grayscale': disabled && !installing,
-			'opacity-50': installing,
-		}"
+		class="items-center"
+		:class="[
+			tableLayout
+				? [
+						'grid h-[var(--content-row-height)] grid-cols-[var(--content-columns)] gap-x-4 px-3',
+						stacked ? 'gap-y-2 py-3' : '',
+					]
+				: ['flex justify-between', inline ? 'gap-3' : 'h-[74px] gap-4 px-3'],
+			{ 'opacity-50 grayscale': disabled && !installing, 'opacity-50': installing },
+		]"
 	>
 		<div
 			class="flex min-w-0 items-center gap-4"
-			:class="
-				enabledFor
-					? 'w-full flex-none @[600px]:w-auto @[600px]:flex-[1.2]'
-					: hideActions || !showVersion
-						? 'flex-1'
-						: 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none'
-			"
+			:class="tableLayout ? { 'col-span-full': stacked } : 'flex-1'"
 		>
 			<Checkbox
 				v-if="showCheckbox"
@@ -314,7 +315,7 @@ const installTooltip = computed(() => {
 									: undefined
 							"
 							:to="owner.link"
-							class="flex shrink-0 items-center gap-1 !decoration-secondary"
+							class="flex min-w-0 items-center gap-1 !decoration-secondary"
 							:class="{ 'hover:underline': owner.link }"
 						>
 							<Avatar
@@ -325,7 +326,7 @@ const installTooltip = computed(() => {
 								no-shadow
 								class="shrink-0"
 							/>
-							<span class="text-sm leading-5 text-secondary">{{ owner.name }}</span>
+							<span class="truncate text-sm leading-5 text-secondary">{{ owner.name }}</span>
 						</AutoLink>
 						<span v-else-if="external" class="flex items-center gap-1 text-secondary">
 							<UploadIcon class="size-4 shrink-0" />
@@ -334,7 +335,7 @@ const installTooltip = computed(() => {
 						<template v-if="showVersion && version && !external">
 							<BulletDivider
 								class="shrink-0"
-								:class="enabledFor ? '@[900px]:hidden' : '@[800px]:hidden'"
+								:class="tableLayout ? { hidden: separateVersion } : '@[800px]:hidden'"
 							/>
 							<AutoLink
 								:target="
@@ -345,7 +346,7 @@ const installTooltip = computed(() => {
 								:to="versionLink"
 								class="min-w-0 text-sm leading-5 text-secondary !decoration-secondary"
 								:class="[
-									enabledFor ? '@[900px]:hidden' : '@[800px]:hidden',
+									tableLayout ? { hidden: separateVersion } : '@[800px]:hidden',
 									{ 'hover:underline': versionLink },
 								]"
 							>
@@ -363,11 +364,10 @@ const installTooltip = computed(() => {
 			</div>
 		</div>
 
-		<div
-			v-if="enabledFor"
-			class="w-full shrink-0 @[450px]:w-[var(--enabled-for-column-width,max-content)]"
-		>
+		<div v-if="enabledForColumn || enabledFor" class="min-w-0">
 			<ContentEnabledFor
+				v-if="enabledFor"
+				:reserve-status-space="enabledForColumn"
 				:model-value="enabledFor"
 				:disabled="isDisabled"
 				:disabled-tooltip="isDisabled ? disabledTooltip : undefined"
@@ -377,9 +377,9 @@ const installTooltip = computed(() => {
 
 		<div
 			v-if="showVersion"
-			class="hidden min-w-0 flex-1 flex-col gap-0.5 transition-[filter,opacity] duration-200"
+			class="min-w-0 flex-col gap-0.5 transition-[filter,opacity] duration-200"
 			:class="[
-				enabledFor ? '@[900px]:flex' : '@[800px]:flex',
+				tableLayout ? (separateVersion ? 'flex' : 'hidden') : 'hidden flex-1 @[800px]:flex',
 				isContentDisabled && !disabled && !installing ? 'grayscale opacity-50' : '',
 			]"
 		>
@@ -393,7 +393,7 @@ const installTooltip = computed(() => {
 					class="inline-flex min-w-0 font-semibold leading-6 text-contrast !decoration-contrast"
 					:class="{ 'hover:underline': versionLink, 'cursor-pointer': versionLink }"
 				>
-					<span ref="versionNumberRef" class="truncate">{{
+					<span ref="versionNumberRef" class="min-w-0 truncate">{{
 						version.version_number.slice(0, Math.ceil(version.version_number.length / 2))
 					}}</span
 					><span class="min-w-0 max-w-[50%] truncate">{{
@@ -404,7 +404,7 @@ const installTooltip = computed(() => {
 					v-tooltip="truncatedTooltip(fileNameRef, version.file_name)"
 					class="flex min-w-0 leading-6 text-secondary"
 				>
-					<span ref="fileNameRef" class="truncate">{{
+					<span ref="fileNameRef" class="min-w-0 truncate">{{
 						version.file_name.slice(0, Math.ceil(version.file_name.length / 2))
 					}}</span
 					><span class="min-w-0 max-w-[50%] truncate">{{
@@ -417,7 +417,11 @@ const installTooltip = computed(() => {
 		<div
 			v-if="!hideActions"
 			class="flex shrink-0 items-center justify-end gap-2 transition-colors duration-200"
-			:class="enabledFor ? 'ml-auto w-[168px]' : 'min-w-[160px]'"
+			:class="
+				tableLayout
+					? tableLayout === 'narrow' ? 'justify-self-start' : 'justify-self-end'
+					: 'min-w-[160px]'
+			"
 		>
 			<slot name="additionalButtonsLeft" />
 			<span
@@ -437,7 +441,7 @@ const installTooltip = computed(() => {
 					(hasUpdateListener && hasUpdate) ||
 					(hasSwitchVersionListener && version && !hideSwitchVersion)
 				"
-				class="flex w-8 items-center justify-center"
+				class="flex w-9 shrink-0 items-center justify-center"
 			>
 				<IconButton
 					v-if="locked"
@@ -491,7 +495,7 @@ const installTooltip = computed(() => {
 			<Toggle
 				v-if="enabled !== undefined && !hideToggle"
 				v-tooltip="toggleTooltip"
-				:model-value="enabled"
+				:model-value="!isContentDisabled"
 				:disabled="isToggleDisabled"
 				:aria-label="projectTitle"
 				class="my-auto"
