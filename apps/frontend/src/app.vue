@@ -5,6 +5,7 @@
 			<LoadingBar />
 		</ClientOnly>
 		<NotificationPanel />
+		<ServerOnboardingInviteModal />
 		<AccountSwitchOverlay :show="isSwitchingAccount" />
 		<AdsConsentNotification />
 		<I18nDebugPanel />
@@ -19,6 +20,9 @@ import {
 	injectI18n,
 	LoadingBar,
 	NotificationPanel,
+	ServerOnboardingInviteModal,
+	createServerOnboardingInviteFlow,
+	provideServerOnboardingInviteFlow,
 } from '@modrinth/ui'
 
 import AdsConsentNotification from '~/components/ui/AdsConsentNotification.vue'
@@ -34,6 +38,7 @@ import { useAuth } from './composables/auth'
 
 const auth = await useAuth()
 const { userPreferences } = setupProviders(auth)
+provideServerOnboardingInviteFlow(createServerOnboardingInviteFlow())
 const cosmetics = useCosmetics()
 const theme = useTheme()
 const { locale, setLocale } = injectI18n()

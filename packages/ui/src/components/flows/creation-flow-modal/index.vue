@@ -6,6 +6,8 @@
 		:fade="fade"
 		disable-progress
 		@hide="handleHide"
+		@after-hide="emit('after-hide')"
+		@after-show="emit('after-show')"
 	/>
 </template>
 
@@ -66,7 +68,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-	(e: 'hide' | 'browse-modpacks'): void
+	(e: 'hide' | 'after-hide' | 'after-show' | 'browse-modpacks'): void
 	(e: 'create', config: CreationFlowContextValue): void
 }>()
 

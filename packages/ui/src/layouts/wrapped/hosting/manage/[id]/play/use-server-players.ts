@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, type Ref } from 'vue'
 
 import type { InviteLinkSettings, InvitePlayersUser } from '#ui/components/sharing'
-import { sharedInstanceInvitesQueryOptions } from '#ui/layouts/shared/server-sharing'
+import { ensureServerInviteLink, sharedInstanceInvitesQueryOptions } from '#ui/layouts/shared/server-sharing'
 import { injectAuth, injectModrinthClient } from '#ui/providers'
 
 import type { ServerPlayerRow } from './types'
@@ -163,24 +163,8 @@ export function useServerPlayers(instanceId: Ref<string | null>, canManage: Ref<
 	})
 
 	async function ensureLink(id: string) {
-		const available = await queryClient.fetchQuery({
-			...sharedInstanceInvitesQueryOptions(client, id, userId.value),
-			staleTime: 0,
-		})
-		if (
-			available.some(
-				(link) => new Date(link.expiration).getTime() > Date.now() && link.uses < link.max_uses,
-			)
-		)
-			return
-		if (remaining.value <= 0) return
-		await linkMutation.mutateAsync({
-			id,
-			settings: {
-				maxUses: Math.min(10, remaining.value),
-				expiresAt: new Date(Date.now() + 86400_000),
-			},
-		})
+		await ensureServerInviteLink(client, id)
+		await queryClient.invalidateQueries({ queryKey: ['shared-instances', id, 'invites'] })
 	}
 
 	async function search(query: string) {

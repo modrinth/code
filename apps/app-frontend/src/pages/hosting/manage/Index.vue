@@ -6,6 +6,7 @@
 			:reload-page="() => router.go(0)"
 			:resolve-viewer="resolveViewer"
 			:show-copy-id-action="appSettings.devMode"
+			:site-url="config.siteUrl"
 			:auth-user="authUser"
 			:navigate-to-billing="() => openUrl('https://modrinth.com/settings/billing')"
 			:navigate-to-servers="() => router.push('/hosting/manage')"
@@ -59,6 +60,7 @@ import { computed, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { config } from '@/config'
 import { get_user } from '@/helpers/cache'
 import { get as getCreds } from '@/helpers/mr_auth'
 import { provideBreadcrumbParent, useBreadcrumb } from '@/providers/breadcrumbs'

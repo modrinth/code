@@ -1,13 +1,19 @@
 <template>
 	<NewModal
 		ref="modal"
+		:header="resolvedTitle"
 		:scrollable="true"
 		max-content-height="72vh"
 		:on-hide="onModalHide"
+		:on-after-hide="onModalAfterHide"
+		:on-after-show="onModalAfterShow"
+		:before-hide="handleBeforeHide"
 		:closable="true"
 		:close-on-click-outside="closeOnClickOutside"
 		:width="resolvedMaxWidth"
 		:fade="fade"
+		:hide-header="resolveCtxFn(currentStage.hideHeader, context)"
+		:merge-header="resolveCtxFn(currentStage.mergeHeader, context)"
 		:disable-close="resolveCtxFn(currentStage.disableClose, context)"
 	>
 		<template #title>
@@ -70,7 +76,7 @@
 		<template #actions>
 			<div
 				class="flex flex-col justify-end gap-2 sm:flex-row"
-				:class="leftButtonConfig || rightButtonConfig ? 'mt-4' : ''"
+				:class="leftButtonConfig || rightButtonConfig ? actionsTopMarginClass : ''"
 			>
 				<Button
 					v-if="leftButtonConfig"
@@ -154,10 +160,14 @@ export interface StageConfigInput<T> {
 	nonProgressStage?: MaybeCtxFn<T, boolean>
 	cannotNavigateForward?: MaybeCtxFn<T, boolean>
 	disableClose?: MaybeCtxFn<T, boolean>
+	hideHeader?: MaybeCtxFn<T, boolean>
+	mergeHeader?: MaybeCtxFn<T, boolean>
+	beforeHide?: MaybeCtxFn<T, boolean>
 	leftButtonConfig: MaybeCtxFn<T, StageButtonConfig | null>
 	rightButtonConfig: MaybeCtxFn<T, StageButtonConfig | null>
 	/** Max width for the modal content and header defined in px (e.g., '460px', '600px'). Defaults to '460px'. */
 	maxWidth?: MaybeCtxFn<T, string>
+	actionsTopMargin?: MaybeCtxFn<T, 'sm' | 'md'>
 }
 
 export function resolveCtxFn<T, R>(value: MaybeCtxFn<T, R>, ctx: T): R {
@@ -239,6 +249,15 @@ const prevStage = () => {
 }
 
 const currentStage = computed(() => props.stages[currentStageIndex.value])
+const actionsTopMarginClass = computed(() => {
+	const margin = currentStage.value?.actionsTopMargin
+	return margin && resolveCtxFn(margin, props.context) === 'sm' ? 'mt-2' : 'mt-4'
+})
+
+function handleBeforeHide(): boolean {
+	const stage = currentStage.value
+	return stage?.beforeHide ? resolveCtxFn(stage.beforeHide, props.context) : true
+}
 
 const resolvedTitle = computed(() => {
 	const stage = currentStage.value
@@ -379,11 +398,19 @@ watch(currentStageIndex, () => {
 })
 
 const emit = defineEmits<{
-	(e: 'refresh-data' | 'hide'): void
+	(e: 'refresh-data' | 'hide' | 'after-hide' | 'after-show'): void
 }>()
 
 function onModalHide() {
 	emit('hide')
+}
+
+function onModalAfterHide() {
+	emit('after-hide')
+}
+
+function onModalAfterShow() {
+	emit('after-show')
 }
 
 defineExpose({

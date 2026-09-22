@@ -558,7 +558,10 @@ const { data: image } = useQuery({
 			const fsAuth = await archon.servers_v0.getFilesystemAuth(props.server_id)
 
 			try {
-				const blob = await kyros.files_v0.downloadFileWithAuth(fsAuth, '/server-icon.png')
+				const blob = await kyros.files_v0.downloadFileWithAuth(
+					fsAuth,
+					'/server-icon-original.png',
+				)
 				return await processImageBlob(blob, 64)
 			} catch (error) {
 				const statusCode = (error as { statusCode?: number })?.statusCode
@@ -567,15 +570,15 @@ const { data: image } = useQuery({
 				}
 
 				try {
-					const originalBlob = await kyros.files_v0.downloadFileWithAuth(
+					const gameIconBlob = await kyros.files_v0.downloadFileWithAuth(
 						fsAuth,
-						'/server-icon-original.png',
+						'/server-icon.png',
 					)
-					return await processImageBlob(originalBlob, 64)
-				} catch (originalError) {
-					const originalStatusCode = (originalError as { statusCode?: number })?.statusCode
-					if (originalStatusCode != null && originalStatusCode !== 404) {
-						throw originalError
+					return await processImageBlob(gameIconBlob, 64)
+				} catch (gameIconError) {
+					const gameIconStatusCode = (gameIconError as { statusCode?: number })?.statusCode
+					if (gameIconStatusCode != null && gameIconStatusCode !== 404) {
+						throw gameIconError
 					}
 				}
 

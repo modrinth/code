@@ -17,6 +17,7 @@ import type { ImportableLauncher } from '../../../providers/instance-import'
 import type { MultiStageModal, StageConfigInput } from '../../base'
 import type { ComboboxOption } from '../../base/Combobox.vue'
 import { installServerContent, prepareServerContent, searchServerContent } from './server-content'
+import { createServerOnboardingInvite } from './server-onboarding-invite'
 import { stageConfigs } from './stages'
 
 export type FlowType = 'world' | 'server-onboarding' | 'reset-server' | 'instance'
@@ -220,6 +221,11 @@ export interface CreationFlowContextValue {
 	loading: Ref<boolean>
 	finishDisabled: ComputedRef<boolean>
 	finishDisabledTooltip: ComputedRef<string | undefined>
+	inviteLink: Ref<string | null>
+	inviteLoading: Ref<boolean>
+	inviteError: Ref<string | null>
+	inviteSubmitted: Ref<boolean>
+	inviteCompleted: Ref<boolean>
 
 	// Backup state (set by InlineBackupCreator in reset-server flow)
 	isBackingUp: Ref<boolean>
@@ -240,6 +246,14 @@ export interface CreationFlowContextValue {
 	selectProject: (projectId: string, projectType: string, versionId?: string) => Promise<void>
 	installServerContent: (serverId: string, worldId: string) => Promise<void>
 	finish: () => void
+	showInvite: (
+		serverId: string,
+		worldId: string,
+		siteUrl: string,
+		onDone: () => void | Promise<void>,
+	) => void
+	retryInvite: () => Promise<void>
+	completeInvite: () => void
 	buildProperties: () => Archon.Content.v1.PropertiesFields
 	fetchLoaderMetadata: (loader?: string | null) => Promise<void>
 	prefetchLoaderMetadata: () => Promise<void>
@@ -384,6 +398,14 @@ export function createCreationFlowContext(
 
 	const hardReset = ref(isInitialSetup)
 	const loading = ref(false)
+	const inviteLink = ref<string | null>(null)
+	const inviteLoading = ref(false)
+	const inviteError = ref<string | null>(null)
+	const inviteSubmitted = ref(false)
+	const inviteCompleted = ref(false)
+	let inviteRun = 0
+	let inviteTarget: { serverId: string; worldId: string; siteUrl: string } | null = null
+	let inviteOnDone: (() => void | Promise<void>) | null = null
 	const isBackingUp = ref(false)
 	const cancelBackup = ref<(() => void) | null>(null)
 
@@ -476,6 +498,14 @@ export function createCreationFlowContext(
 	}
 
 	async function reset() {
+		inviteRun++
+		inviteLink.value = null
+		inviteLoading.value = false
+		inviteError.value = null
+		inviteSubmitted.value = false
+		inviteCompleted.value = false
+		inviteTarget = null
+		inviteOnDone = null
 		if (fetchExistingInstanceNames) {
 			existingInstanceNames.value = await fetchExistingInstanceNames()
 		}
@@ -620,6 +650,55 @@ export function createCreationFlowContext(
 		emit.create(contextValue)
 	}
 
+	async function retryInvite() {
+		if (!inviteTarget || inviteLoading.value) return
+		const run = ++inviteRun
+		inviteLoading.value = true
+		inviteError.value = null
+		try {
+			const link = await createServerOnboardingInvite(
+				client,
+				inviteTarget.serverId,
+				inviteTarget.worldId,
+				inviteTarget.siteUrl,
+				() => run === inviteRun,
+			)
+			if (run === inviteRun) inviteLink.value = link
+		} catch (error) {
+			if (run === inviteRun) {
+				inviteError.value = error instanceof Error ? error.message : String(error)
+			}
+		} finally {
+			if (run === inviteRun) inviteLoading.value = false
+		}
+	}
+
+	function showInvite(
+		serverId: string,
+		worldId: string,
+		siteUrl: string,
+		onDone: () => void | Promise<void>,
+	) {
+		if (flowType !== 'server-onboarding') return
+		inviteTarget = { serverId, worldId, siteUrl }
+		inviteOnDone = onDone
+		inviteSubmitted.value = true
+		loading.value = false
+		modal.value?.setStage('invite-friends')
+		void retryInvite()
+	}
+
+	function completeInvite() {
+		if (!inviteSubmitted.value || inviteCompleted.value) return
+		inviteCompleted.value = true
+		inviteRun++
+		inviteLoading.value = false
+		modal.value?.hide()
+		void Promise.resolve()
+			.then(() => inviteOnDone?.())
+			.catch((error) => handleError(error as Error))
+	}
+
 	function buildProperties(): Archon.Content.v1.PropertiesFields {
 		const isHardcore = gamemode.value === 'hardcore'
 		const known: Archon.Content.v1.KnownPropertiesFields = {
@@ -694,6 +773,11 @@ export function createCreationFlowContext(
 		loading,
 		finishDisabled,
 		finishDisabledTooltip,
+		inviteLink,
+		inviteLoading,
+		inviteError,
+		inviteSubmitted,
+		inviteCompleted,
 		isBackingUp,
 		cancelBackup,
 		modal,
@@ -707,6 +791,9 @@ export function createCreationFlowContext(
 		installServerContent: (serverId, worldId) =>
 			installServerContent(client, contextValue, serverId, worldId),
 		finish,
+		showInvite,
+		retryInvite,
+		completeInvite,
 		buildProperties,
 		fetchLoaderMetadata,
 		prefetchLoaderMetadata,
