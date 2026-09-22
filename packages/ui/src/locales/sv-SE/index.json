@@ -383,9 +383,6 @@
   "content.card.synced": {
     "defaultMessage": "Synkroniserade mellan instanser"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Uppladdad"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Är du säker på att du vill uppdatera {count, plural, one {# projekt} other {# projekt}} till deras senaste kompatibla version? Det är rekommenderat att uppdatera innehållet individuellt."
   },
@@ -638,9 +635,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Visa innehåll"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Författare"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Miljö"
   },
@@ -671,9 +665,6 @@
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Klientinnehåll endast"
   },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Inga varningar"
-  },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Varningar"
   },
@@ -703,9 +694,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count} författare"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Läser in innehåll..."
@@ -2267,12 +2255,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Aktiverad"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Extern"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Den här filer är inte publicerad på Modrinth."
-  },
   "instances.managed-content-modal.loading": {
     "defaultMessage": "Läser in innehåll..."
   },
@@ -2284,9 +2266,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Sök {count} projekt"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Varningar"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nuvarande"

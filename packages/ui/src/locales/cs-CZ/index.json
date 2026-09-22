@@ -362,9 +362,6 @@
   "content.card.select-project": {
     "defaultMessage": "Vybrat {project}"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Nahráno"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Skutečně chceš aktualizovat {count, plural, one {# projekt} other {# projektů}} na jejich poslední kompatibilní verzi? Doporučujeme aktualizovat obsah jeden po jednom."
   },
@@ -605,9 +602,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Zobrazit obsah"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Autor"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Prostředí"
   },
@@ -631,9 +625,6 @@
   },
   "content.metadata-filter.update.available": {
     "defaultMessage": "Je dostupná aktualizace"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Žádná upozornění"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Upozornění"
@@ -664,9 +655,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Třídit podle"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# autor} few {# autoři} other {# autorů}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Načítání obsahu..."
@@ -2176,9 +2164,6 @@
   },
   "instances.managed-content-modal.empty-title": {
     "defaultMessage": "Nebyl nalezen obsah"
-  },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Externí"
   },
   "instances.managed-content-modal.loading": {
     "defaultMessage": "Načítání obsahu..."

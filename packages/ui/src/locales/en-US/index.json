@@ -401,6 +401,9 @@
   "content-type.item.lowercase": {
     "defaultMessage": "{count, plural, one {item} other {items}}"
   },
+  "content.card.external-file": {
+    "defaultMessage": "External file"
+  },
   "content.card.frozen": {
     "defaultMessage": "This project is locked to its current version until unfrozen."
   },
@@ -413,8 +416,8 @@
   "content.card.synced": {
     "defaultMessage": "Synced across instances"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Uploaded"
+  "content.card.uploaded-file": {
+    "defaultMessage": "Uploaded file"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Are you sure you want to update {count, plural, one {# project} other {# projects}} to their latest compatible version? It's recommended to update content one-by-one."
@@ -609,7 +612,7 @@
     "defaultMessage": "{count} updated"
   },
   "content.enabled-for.description": {
-    "defaultMessage": "Choose where this content is enabled."
+    "defaultMessage": "Choose where this content is enabled. Use the Actions toggle to enable or disable it entirely."
   },
   "content.enabled-for.label": {
     "defaultMessage": "Enabled for"
@@ -623,6 +626,9 @@
   "content.enabled-for.player": {
     "defaultMessage": "Player"
   },
+  "content.enabled-for.player-only": {
+    "defaultMessage": "Player only"
+  },
   "content.enabled-for.player-tooltip": {
     "defaultMessage": "Include this content in the shared instance or .mrpack that players download."
   },
@@ -634,6 +640,12 @@
   },
   "content.enabled-for.server": {
     "defaultMessage": "Server"
+  },
+  "content.enabled-for.server-and-player": {
+    "defaultMessage": "Server and player"
+  },
+  "content.enabled-for.server-only": {
+    "defaultMessage": "Server only"
   },
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "Install this content on your server."
@@ -722,9 +734,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "View content"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Author"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Environment"
   },
@@ -758,9 +767,6 @@
   "content.metadata-filter.warning.client-retained": {
     "defaultMessage": "Client file retained"
   },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "No warnings"
-  },
   "content.metadata-filter.warning.unknown-environment": {
     "defaultMessage": "Unknown environment"
   },
@@ -793,9 +799,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# author} other {# authors}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Loading content..."
@@ -2033,11 +2036,20 @@
   "header.category.resolutions": {
     "defaultMessage": "Resolution"
   },
+  "hosting.content.enabled-for.client-only-enabled-for-server": {
+    "defaultMessage": "Enabled for the server, but this content is client-only."
+  },
   "hosting.content.enabled-for.resource-pack-lock": {
     "defaultMessage": "Resource packs can only be enabled for players."
   },
+  "hosting.content.enabled-for.server-only-enabled-for-players": {
+    "defaultMessage": "Enabled for players, but this content is server-only."
+  },
   "hosting.content.enabled-for.shader-lock": {
     "defaultMessage": "Shaders can only be enabled for players."
+  },
+  "hosting.content.enabled-for.singleplayer-only-enabled-for-server": {
+    "defaultMessage": "Enabled for the server, but this content is singleplayer-only."
   },
   "hosting.content.enabled-for.unknown-environment": {
     "defaultMessage": "We couldn't tell where this content should be enabled."
@@ -2112,7 +2124,7 @@
     "defaultMessage": "Reset server"
   },
   "hosting.loader.reset-server-description": {
-    "defaultMessage": "Removes all data on your server, including your worlds, mods, and configuration files. Backups will remain and can be restored."
+    "defaultMessage": "Removes all data on your server, including your worlds, mods, and configuration files. Backups will remain and can be restored. Invited players will keep their access."
   },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Reset to onboarding"
@@ -2447,6 +2459,219 @@
   "instance.confirm-repair.server-label": {
     "defaultMessage": "server"
   },
+  "instance.icon-editor.background": {
+    "defaultMessage": "Background"
+  },
+  "instance.icon-editor.background.blue": {
+    "defaultMessage": "Blue"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "defaultMessage": "Dark gray"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "defaultMessage": "Dark green"
+  },
+  "instance.icon-editor.background.gray": {
+    "defaultMessage": "Gray"
+  },
+  "instance.icon-editor.background.green": {
+    "defaultMessage": "Green"
+  },
+  "instance.icon-editor.background.indigo": {
+    "defaultMessage": "Indigo"
+  },
+  "instance.icon-editor.background.lavender": {
+    "defaultMessage": "Lavender"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "defaultMessage": "Light gray"
+  },
+  "instance.icon-editor.background.lime": {
+    "defaultMessage": "Lime"
+  },
+  "instance.icon-editor.background.orange": {
+    "defaultMessage": "Orange"
+  },
+  "instance.icon-editor.background.pink": {
+    "defaultMessage": "Pink"
+  },
+  "instance.icon-editor.background.purple": {
+    "defaultMessage": "Purple"
+  },
+  "instance.icon-editor.background.red": {
+    "defaultMessage": "Red"
+  },
+  "instance.icon-editor.background.rose": {
+    "defaultMessage": "Rose"
+  },
+  "instance.icon-editor.background.yellow": {
+    "defaultMessage": "Yellow"
+  },
+  "instance.icon-editor.description": {
+    "defaultMessage": "Mix and match elements to create a custom icon."
+  },
+  "instance.icon-editor.recents": {
+    "defaultMessage": "Recents"
+  },
+  "instance.icon-editor.save": {
+    "defaultMessage": "Save icon"
+  },
+  "instance.icon-editor.surprise-me": {
+    "defaultMessage": "Randomize"
+  },
+  "instance.icon-editor.symbol": {
+    "defaultMessage": "Symbol"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "defaultMessage": "Backpack"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "defaultMessage": "Beacon"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "defaultMessage": "Blue Shark"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "defaultMessage": "Bookshelf"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "defaultMessage": "Brown Bear"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "defaultMessage": "Cake"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "defaultMessage": "Campfire"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "defaultMessage": "Chest"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "defaultMessage": "Cogwheel"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "defaultMessage": "Command Block"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "defaultMessage": "Cooking Pot"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "defaultMessage": "Couch"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "defaultMessage": "Crafting Table"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "defaultMessage": "Wrench"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "defaultMessage": "Creeper"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "defaultMessage": "Enchanting Table"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "defaultMessage": "Ender Chest"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "defaultMessage": "Ender Dragon"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "defaultMessage": "Engine"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "defaultMessage": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "defaultMessage": "Furnace"
+  },
+  "instance.icon-editor.symbol.gizmo": {
+    "defaultMessage": "Gizmo"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "defaultMessage": "Globe"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "defaultMessage": "Grass Block"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "defaultMessage": "Lantern"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "defaultMessage": "Moobloom"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "defaultMessage": "Mr Pack"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "defaultMessage": "Orb"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "defaultMessage": "Oxygen Distributor"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "defaultMessage": "Pancakes"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "defaultMessage": "Pickaxe"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "defaultMessage": "Poke Ball"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "defaultMessage": "Redstone Block"
+  },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "defaultMessage": "Sculk Sensor"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "defaultMessage": "Skeleton"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "defaultMessage": "Skillet"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "defaultMessage": "Slime Block"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "defaultMessage": "Space Helmet"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "defaultMessage": "Sticky Piston"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "defaultMessage": "Sword"
+  },
+  "instance.icon-editor.symbol.terminal": {
+    "defaultMessage": "Terminal"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "defaultMessage": "Tiny Potato"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "defaultMessage": "Tire"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "defaultMessage": "TNT"
+  },
+  "instance.icon-editor.symbol.wrenth-rinth": {
+    "defaultMessage": "Modrinth Wrench"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "defaultMessage": "Zombie"
+  },
+  "instance.icon-editor.title": {
+    "defaultMessage": "Icon editor"
+  },
   "instance.settings.sharing.active-invites.actions": {
     "defaultMessage": "Actions"
   },
@@ -2567,12 +2792,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Enabled"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "External"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "This file is not published on Modrinth."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Managed content"
   },
@@ -2587,9 +2806,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Search {count, number} {count, plural, one {project} other {projects}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Warnings"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Current"
@@ -5757,7 +5973,7 @@
     "defaultMessage": "Download modpack"
   },
   "servers.play.card.launcher.title": {
-    "defaultMessage": "Using a Different Launcher?"
+    "defaultMessage": "Using a different launcher?"
   },
   "servers.play.config-files.context-changed": {
     "defaultMessage": "The world or account changed. Open Push update again."
@@ -5821,6 +6037,12 @@
   },
   "servers.play.share-changes-body": {
     "defaultMessage": "These changes will be available to players when they update their instance."
+  },
+  "servers.play.start-failed": {
+    "defaultMessage": "The server stopped before it was ready. Check the console before trying again."
+  },
+  "servers.play.start-timeout": {
+    "defaultMessage": "The server is taking too long to start. Check the console before trying again."
   },
   "servers.play.unpublished-body": {
     "defaultMessage": "Push an update to share your server’s content changes with players."
@@ -5999,6 +6221,30 @@
   "servers.setup.onboarding.installation-failed.title": {
     "defaultMessage": "Installation failed"
   },
+  "servers.setup.onboarding.invite.copied": {
+    "defaultMessage": "Link copied"
+  },
+  "servers.setup.onboarding.invite.copy-failed": {
+    "defaultMessage": "Failed to copy link"
+  },
+  "servers.setup.onboarding.invite.description": {
+    "defaultMessage": "Share this link and they’ll get an instance you manage from your server, with everything they need to play!"
+  },
+  "servers.setup.onboarding.invite.done": {
+    "defaultMessage": "Done"
+  },
+  "servers.setup.onboarding.invite.preparing": {
+    "defaultMessage": "Preparing your invite link..."
+  },
+  "servers.setup.onboarding.invite.retry": {
+    "defaultMessage": "Retry"
+  },
+  "servers.setup.onboarding.invite.title": {
+    "defaultMessage": "Invite players to join"
+  },
+  "servers.setup.onboarding.invite.unavailable": {
+    "defaultMessage": "Invite link unavailable"
+  },
   "servers.setup.onboarding.modpack-upload-failed.text": {
     "defaultMessage": "An unexpected error occurred while uploading. Please try again later."
   },
@@ -6021,7 +6267,7 @@
     "defaultMessage": "Configure your world"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
-    "defaultMessage": "Share your server with friends by copying the address and letting them know which mods they'll need to join."
+    "defaultMessage": "Invite friends to your server with a link and let them join in one click from the Modrinth App."
   },
   "servers.setup.onboarding.step.invite-friends.title": {
     "defaultMessage": "Invite your friends"

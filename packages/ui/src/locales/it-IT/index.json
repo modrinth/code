@@ -392,9 +392,6 @@
   "content.card.synced": {
     "defaultMessage": "Sincronizzato tra le istanze"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Caricato"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Vuoi davvero aggiornare {count, plural, one {# progetto alla sua} other {# progetti alla loro}} ultima versione compatibile? È consigliabile aggiornare i contenuti uno ad uno."
   },
@@ -632,9 +629,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Mostra contenuto"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Autore"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Ambiente"
   },
@@ -668,9 +662,6 @@
   "content.metadata-filter.warning.client-retained": {
     "defaultMessage": "File lato client trattenuto"
   },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Nessun avviso"
-  },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Avvisi"
   },
@@ -700,9 +691,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtro"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# autore} other {# autori}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Caricamento contenuti..."
@@ -2360,12 +2348,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Abilitati"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Esterno"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Questo file non è su Modrinth."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Contenuti gestiti"
   },
@@ -2380,9 +2362,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Cerca tra {count, number} {count, plural, one {progetto} other {progetti}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Avvisi"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Attuale"

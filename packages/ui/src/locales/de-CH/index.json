@@ -395,9 +395,6 @@
   "content.card.synced": {
     "defaultMessage": "Über Instanzen synchronisiert"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Hochgeladen"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Bist du sicher, dass du {count, plural, one {# Projekt} other {# Projekte}} auf die neuste kompatible version aktualisieren willst? Es wird empfohlen, Inhalte einzeln zu aktualisieren."
   },
@@ -656,9 +653,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Inhalt ansehen"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Autor"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Umgebung"
   },
@@ -692,9 +686,6 @@
   "content.metadata-filter.warning.client-retained": {
     "defaultMessage": "Client-Datei beibehalten"
   },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Keine Warnungen"
-  },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Warnungen"
   },
@@ -724,9 +715,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# Autor} other {# Autoren}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Lade Inhalte..."
@@ -2420,12 +2408,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Aktiviert"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Extern"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Diese Datei ist nicht auf Modrinth veröffentlicht."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Verwaltete Inhalte"
   },
@@ -2440,9 +2422,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Durchsuche {count, number} {count, plural, one {Projekt} other {Projekte}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Warnungen"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Aktuell"

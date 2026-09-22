@@ -395,9 +395,6 @@
   "content.card.synced": {
     "defaultMessage": "Sinhronizovano među instancama"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Učitano"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Jesi li siguran da želiš ažuirati {count, plural, one {# projekat} few {# projekta} other {# projekata}} na najnoviju verziju? Preporučeno je ažuirati sadržaje jedan po jedan."
   },
@@ -656,9 +653,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Pogledaj sadržaj"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Autor"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Okruženje"
   },
@@ -692,9 +686,6 @@
   "content.metadata-filter.warning.client-retained": {
     "defaultMessage": "Client dadoteka zadržana"
   },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Nema upozorenja"
-  },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Upozorenja"
   },
@@ -724,9 +715,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# Autor} other {# Autora}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Učitavanje sadržaja..."

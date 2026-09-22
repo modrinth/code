@@ -24,7 +24,10 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	},
 	leftButtonConfig: null,
 	rightButtonConfig: (ctx) => ({
-		label: ctx.formatMessage({ id: 'servers.setup.onboarding.invite.done', defaultMessage: 'Done' }),
+		label: ctx.formatMessage({
+			id: 'servers.setup.onboarding.invite.done',
+			defaultMessage: 'Done',
+		}),
 		icon: CheckIcon,
 		iconPosition: 'before',
 		onClick: ctx.completeInvite,

@@ -395,9 +395,6 @@
   "content.card.synced": {
     "defaultMessage": "Gesynchroniseerd tussen instanties"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Geüpload"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Weet je zeker dat je {count, plural, one {# project} other {# projecten}} wilt bijwerken naar de nieuwste compatibele versie? Het wordt aanbevolen om de inhoud één voor één bij te werken."
   },
@@ -656,9 +653,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Bekijk inhoud"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Auteur"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Omgeving"
   },
@@ -692,9 +686,6 @@
   "content.metadata-filter.warning.client-retained": {
     "defaultMessage": "Clientbestand bewaard"
   },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Geen waarschuwingen"
-  },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Waarschuwingen"
   },
@@ -724,9 +715,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# author} other {# authors}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Inhoud aan het laden..."
@@ -2417,12 +2405,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Aan"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Extern"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Dit bestand is niet gepubliceerd op Modrinth."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Beheer content"
   },
@@ -2437,9 +2419,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Zoek naar {count, number} {count, plural, one {project} other {projecten}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Waarschuwingen"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Huidige"

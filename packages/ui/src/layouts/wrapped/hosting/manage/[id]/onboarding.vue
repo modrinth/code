@@ -16,11 +16,7 @@
 
 			<div class="rounded-[20px] border border-solid border-surface-5 bg-surface-3 p-5">
 				<div class="flex flex-col">
-					<div
-						v-for="(step, i) in steps"
-						:key="i"
-						class="flex gap-3"
-					>
+					<div v-for="(step, i) in steps" :key="i" class="flex gap-3">
 						<div class="flex w-10 shrink-0 flex-col items-center">
 							<div
 								class="flex size-10 items-center justify-center rounded-full border border-solid border-surface-5 bg-surface-4"

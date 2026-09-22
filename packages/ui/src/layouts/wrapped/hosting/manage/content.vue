@@ -678,7 +678,8 @@ function applyAddonToggleChanges(addon: Archon.Content.v1.Addon, changes: AddonT
 		...(changes.enabled !== undefined ? { disabled: !changes.enabled } : {}),
 		...(changes.server !== undefined ? { disabled_server: !changes.server } : {}),
 		...(changes.player !== undefined ? { disabled_player: !changes.player } : {}),
-		...((changes.server !== undefined || changes.player !== undefined) && !isPlayerOnlyContent(addon)
+		...((changes.server !== undefined || changes.player !== undefined) &&
+		!isPlayerOnlyContent(addon)
 			? { side_toggle_unlocked: true }
 			: {}),
 	}
@@ -727,7 +728,9 @@ const toggleAddonMutation = useMutation({
 		addNotification({
 			type: 'error',
 			title: formatMessage(
-				batch.changes.enabled !== undefined ? messages.failedToToggle : messages.failedToSetEnabledFor,
+				batch.changes.enabled !== undefined
+					? messages.failedToToggle
+					: messages.failedToSetEnabledFor,
 				{ name: friendlyAddonName(batch.addon) },
 			),
 			text: error instanceof Error ? error.message : undefined,
@@ -890,7 +893,9 @@ async function handleBulkDelete(items: ContentItem[]) {
 	const rollback = await optimisticallyUpdateAddons((addons) =>
 		addons.filter(
 			(addon) =>
-				!requests.some((request) => request.filename === addon.filename && request.kind === addon.kind),
+				!requests.some(
+					(request) => request.filename === addon.filename && request.kind === addon.kind,
+				),
 		),
 	)
 	try {

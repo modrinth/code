@@ -395,9 +395,6 @@
   "content.card.synced": {
     "defaultMessage": "Sincronizado entre instancias"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Subido"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Estás seguro de querer actualizar {count, plural,one {# proyecto} other {# proyectos}} a su última versión compatible? Se recomienda actualizar el contenido de uno-en-uno."
   },
@@ -656,9 +653,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Ver contenido"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Autor"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Entorno"
   },
@@ -692,9 +686,6 @@
   "content.metadata-filter.warning.client-retained": {
     "defaultMessage": "Archivo de cliente retenido"
   },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Sin advertencias"
-  },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Advertencias"
   },
@@ -724,9 +715,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtro"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# autor} other {# autores}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Cargando contenido..."
@@ -2420,12 +2408,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Activado"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Externo"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Este archivo no está publicado en Modrinth."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Contenido gestionado"
   },
@@ -2440,9 +2422,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Buscar en {count, number} {count, plural, one {proyecto} other {proyectos}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Advertencias"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Actual"

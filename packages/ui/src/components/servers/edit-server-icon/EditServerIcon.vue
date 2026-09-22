@@ -57,7 +57,9 @@
 					<EditIcon v-else aria-hidden="true" class="h-10 w-10 text-primary" />
 				</div>
 				<template #upload> <UploadIcon /> Upload icon </template>
-				<template #create> <PaletteIcon /> {{ generatedConfig ? 'Edit created icon' : 'Create an icon' }} </template>
+				<template #create>
+					<PaletteIcon /> {{ generatedConfig ? 'Edit created icon' : 'Create an icon' }}
+				</template>
 				<template #sync> <TransferIcon /> Reset icon </template>
 			</TeleportOverflowMenu>
 		</div>
@@ -70,11 +72,11 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { computed, onMounted, ref } from 'vue'
 
 import TeleportOverflowMenu from '#ui/components/base/buttons/TeleportOverflowMenu.vue'
+import { type IconConfig, renderIcon } from '#ui/components/base/icon-editor-modal'
 import IconEditorModal from '#ui/components/base/icon-editor-modal/index.vue'
-import { renderIcon, type IconConfig } from '#ui/components/base/icon-editor-modal'
 import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
-import { processImageBlob, useServerImage } from '#ui/composables/use-server-image'
 import { useVIntl } from '#ui/composables/i18n'
+import { processImageBlob, useServerImage } from '#ui/composables/use-server-image'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -151,14 +153,19 @@ async function saveRecentConfig(config: IconConfig) {
 		const key = JSON.stringify(config)
 		localStorage.setItem(
 			recentsKey,
-			JSON.stringify([config, ...recent.filter((entry) => JSON.stringify(entry) !== key)].slice(0, 16)),
+			JSON.stringify(
+				[config, ...recent.filter((entry) => JSON.stringify(entry) !== key)].slice(0, 16),
+			),
 		)
 	} catch {
 		return
 	}
 }
 
-async function deleteFile(fsAuth: Awaited<ReturnType<typeof client.archon.servers_v0.getFilesystemAuth>>, path: string) {
+async function deleteFile(
+	fsAuth: Awaited<ReturnType<typeof client.archon.servers_v0.getFilesystemAuth>>,
+	path: string,
+) {
 	try {
 		await client.kyros.files_v0.deleteFileOrFolderWithAuth(fsAuth, path, false)
 	} catch (error) {
@@ -172,8 +179,11 @@ async function loadGeneratedConfig() {
 		const blob = await client.kyros.files_v0.downloadFileWithAuth(fsAuth, configPath)
 		const config: unknown = JSON.parse(await blob.text())
 		generatedConfig.value =
-			config && typeof config === 'object' && 'symbol' in config &&
-			typeof config.symbol === 'string' && 'background' in config
+			config &&
+			typeof config === 'object' &&
+			'symbol' in config &&
+			typeof config.symbol === 'string' &&
+			'background' in config
 				? (config as IconConfig)
 				: null
 	} catch (error) {
@@ -223,7 +233,7 @@ async function uploadIcon(file: File, config: IconConfig | null) {
 		const fsAuth = await client.archon.servers_v0.getFilesystemAuth(serverId)
 		try {
 			await client.kyros.files_v0.uploadFileWithAuth(fsAuth, '/server-icon.png', scaledFile).promise
-		} catch (uploadError) {
+		} catch {
 			await deleteFile(fsAuth, '/server-icon.png')
 			await client.kyros.files_v0.uploadFileWithAuth(fsAuth, '/server-icon.png', scaledFile).promise
 		}
@@ -268,7 +278,11 @@ async function uploadFile(event: Event) {
 	try {
 		await uploadIcon(file, null)
 	} catch {
-		addNotification({ type: 'error', title: 'Upload failed', text: 'Failed to upload server icon.' })
+		addNotification({
+			type: 'error',
+			title: 'Upload failed',
+			text: 'Failed to upload server icon.',
+		})
 	}
 }
 

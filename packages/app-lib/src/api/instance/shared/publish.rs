@@ -195,7 +195,12 @@ pub(super) async fn remote_publish_content(
         version
             .external_files
             .iter()
-            .filter(|file| !matches!(file.file_type.as_str(), CONFIG_BUNDLE_FILE_TYPE | CONFIG_FILE_TYPE))
+            .filter(|file| {
+                !matches!(
+                    file.file_type.as_str(),
+                    CONFIG_BUNDLE_FILE_TYPE | CONFIG_FILE_TYPE
+                )
+            })
             .map(|file| {
                 shared_external_file_key(&file.file_type, &file.file_name)
             })

@@ -37,11 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-	ClipboardCopyIcon,
-	ServerInviteFriendsIllustration,
-	SpinnerIcon,
-} from '@modrinth/assets'
+import { ClipboardCopyIcon, ServerInviteFriendsIllustration, SpinnerIcon } from '@modrinth/assets'
 
 import { Button } from '#ui/components/base/buttons'
 import { injectCreationFlowContext } from '#ui/components/flows/creation-flow-modal/creation-flow-context'

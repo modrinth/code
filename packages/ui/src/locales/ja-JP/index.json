@@ -386,9 +386,6 @@
   "content.card.synced": {
     "defaultMessage": "インスタンス間で同期済み"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "アップロードしました"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "プロジェクトを互換性のある最新バージョンにアップデートしてもよろしいですか？ 1つずつアップデートすることをおすすめします。"
   },
@@ -644,9 +641,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "コンテンツを表示"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "作者"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "環境"
   },
@@ -679,9 +673,6 @@
   },
   "content.metadata-filter.warning.client-retained": {
     "defaultMessage": "クライアントファイルが保存されました"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "警告はありません"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "警告"
@@ -2392,12 +2383,6 @@
   },
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "有効化済み"
-  },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "外部コンテンツ"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "このファイルは Modrinth 上で公開されていません"
   },
   "instances.managed-content-modal.header": {
     "defaultMessage": "コンテンツを管理"

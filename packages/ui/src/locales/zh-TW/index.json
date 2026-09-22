@@ -395,9 +395,6 @@
   "content.card.synced": {
     "defaultMessage": "已跨實例同步"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "上傳內容"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "確定要將這 {count, plural, other {# 個專案}}更新至最新的相容版本嗎？建議你逐一進行更新。"
   },
@@ -656,9 +653,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "查看內容"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "作者"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "環境"
   },
@@ -692,9 +686,6 @@
   "content.metadata-filter.warning.client-retained": {
     "defaultMessage": "用戶端檔案已保留"
   },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "沒有警告"
-  },
   "content.metadata-filter.warnings": {
     "defaultMessage": "警告"
   },
@@ -724,9 +715,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "篩選條件"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, other {# 位作者}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "正在載入內容..."
@@ -2420,12 +2408,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "已啟用"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "外部"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "這個檔案未在 Modrinth 上發布。"
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "受管理內容"
   },
@@ -2440,9 +2422,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "搜尋 {count, number} {count, plural, other {個專案}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "警告"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "目前"

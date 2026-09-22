@@ -390,7 +390,9 @@ const checkingSharedInstanceLaunch = ref(false)
 const subpagePending = ref(false)
 const stopping = ref(false)
 const serverOfflineModal = ref<InstanceType<typeof ConfirmModal>>()
-const pendingOfflineLaunch = ref<{ instanceId: string; context: string; address?: string } | null>(null)
+const pendingOfflineLaunch = ref<{ instanceId: string; context: string; address?: string } | null>(
+	null,
+)
 const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
 const sharedInstanceUpdateModal = ref<InstanceType<typeof SharedInstanceUpdateModal>>()
@@ -452,12 +454,11 @@ const serverStatusQuery = useQuery({
 	refetchInterval: 30_000,
 	retry: false,
 })
-const statusOnline = computed(
-	() =>
-		hosting.isHostingInstance.value
-			? hosting.onlineStatus.value === 'running'
-			: !serverStatusQuery.isError.value &&
-				(!!serverStatusQuery.data.value || !!javaServerPingData.value),
+const statusOnline = computed(() =>
+	hosting.isHostingInstance.value
+		? hosting.onlineStatus.value === 'running'
+		: !serverStatusQuery.isError.value &&
+			(!!serverStatusQuery.data.value || !!javaServerPingData.value),
 )
 const playersOnline = computed(() =>
 	serverStatusQuery.isError.value ? undefined : serverStatusQuery.data.value?.players?.online,

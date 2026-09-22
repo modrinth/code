@@ -34,11 +34,11 @@ pub(super) enum SharedInstanceRemoteResponse<T> {
 
 #[derive(Clone, Debug, Deserialize)]
 pub(super) struct RemoteInstanceResponse {
-	pub(super) name: String,
-	pub(super) icon: Option<String>,
-	#[serde(default)]
-	pub(super) linked_server:
-		Option<crate::install::model::SharedInstanceLinkedServer>,
+    pub(super) name: String,
+    pub(super) icon: Option<String>,
+    #[serde(default)]
+    pub(super) linked_server:
+        Option<crate::install::model::SharedInstanceLinkedServer>,
     #[serde(default)]
     pub(super) quarantine: bool,
 }

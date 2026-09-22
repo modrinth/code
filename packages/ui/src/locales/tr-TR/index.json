@@ -395,9 +395,6 @@
   "content.card.synced": {
     "defaultMessage": "Süreçler arası senkronize edildi"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Yüklendi"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "{count, plural, one {# projeyi} other {# projeyi}} en yeni uyumlu sürümüne güncellemek istediğinden emin misin? İçeriklerin tek tek güncellenmesi önerilir."
   },
@@ -653,9 +650,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "İçeriği görüntüle"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Yaratıcı"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Ortam"
   },
@@ -689,9 +683,6 @@
   "content.metadata-filter.warning.client-retained": {
     "defaultMessage": "İstemci dosyası korundu"
   },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Uyarı yok"
-  },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Uyarılar"
   },
@@ -721,9 +712,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtre"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# yapımcı} other {# yapımcı}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "İçerik yükleniyor..."
@@ -2417,12 +2405,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Etkin"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Harici"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Bu dosya Modrinth üzerinde yayınlanmamıştır."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Yönetilen içerik"
   },
@@ -2437,9 +2419,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "{count, number} {count, plural, one {projede} other {projede}} ara"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Uyarılar"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Şu anki"

@@ -214,14 +214,14 @@ pub struct InstallPostInstallEdit {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct SharedInstanceLinkedServer {
-	pub domain: String,
-	pub region: String,
+    pub domain: String,
+    pub region: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct SharedInstanceInstallData {
-	#[serde(default)]
-	pub linked_server: Option<SharedInstanceLinkedServer>,
+    #[serde(default)]
+    pub linked_server: Option<SharedInstanceLinkedServer>,
     pub shared_instance_id: String,
     pub manager_id: Option<String>,
     #[serde(default)]

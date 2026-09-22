@@ -395,9 +395,6 @@
   "content.card.synced": {
     "defaultMessage": "在不同实例之间同步"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "已上传"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "是否确定要将 {count, plural,  other {# 个项目}}更新至最新的兼容版本？建议逐个更新内容。"
   },
@@ -656,9 +653,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "查看内容"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "作者"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "运行环境"
   },
@@ -692,9 +686,6 @@
   "content.metadata-filter.warning.client-retained": {
     "defaultMessage": "客户端文件已保存"
   },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "无警告"
-  },
   "content.metadata-filter.warnings": {
     "defaultMessage": "警告"
   },
@@ -724,9 +715,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "筛选过滤"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# 作者} other {# 更多作者}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "正在加载内容…"
@@ -2420,12 +2408,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "启用"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "外部储存"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "此文件未发布于 Modrinth 平台。"
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "管理内容"
   },
@@ -2440,9 +2422,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "搜索到了 {count, number} {count, plural, other {个项目}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "警告"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "当前"

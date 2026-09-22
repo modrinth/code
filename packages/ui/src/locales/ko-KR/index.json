@@ -377,9 +377,6 @@
   "content.card.select-project": {
     "defaultMessage": "{project} 선택"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "업로드됨"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "{count}개의 프로젝트를 최신 호환 버전으로 업데이트하시겠습니까? 콘텐츠는 하나씩 업데이트 하는 것을 권장합니다."
   },
@@ -629,9 +626,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "콘텐츠 보기"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "저자"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "환경"
   },
@@ -655,9 +649,6 @@
   },
   "content.metadata-filter.update.available": {
     "defaultMessage": "업데이트 가능"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "경고 없음"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "경고"
@@ -2321,12 +2312,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "활성화됨"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "외부"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "이 파일은 Modrinth에 게시되지 않았습니다."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "콘텐츠 관리"
   },
@@ -2335,9 +2320,6 @@
   },
   "instances.managed-content-modal.open-in-slicer": {
     "defaultMessage": "Slicer에서 열기"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "경고"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "현재"

@@ -12,13 +12,7 @@
 				</p>
 			</div>
 			<div class="flex shrink-0 flex-col items-start gap-2">
-				<Button
-					type="colored"
-					color="brand"
-					size="lg"
-					:disabled="disabled"
-					@click="emit('play')"
-				>
+				<Button type="colored" color="brand" size="lg" :disabled="disabled" @click="emit('play')">
 					<SpinnerIcon v-if="pendingAction === 'play'" class="animate-spin" aria-hidden="true" />
 					<PlayIcon v-else aria-hidden="true" />
 					{{ formatMessage(messages.playServerButton) }}
