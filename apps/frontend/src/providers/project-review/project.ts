@@ -86,16 +86,15 @@ export function useReviewProject(selection: Ref<string>) {
 					message.body.type === 'status_change' && rejected.includes(message.body.new_status),
 			)
 	})
-	const attributionQuery = useQuery({
-		queryKey: computed(() => ['project', projectId.value, 'attribution']),
-		queryFn: () => client.labrinth.attribution_internal.listProjectAttribution(projectId.value),
-		enabled: computed(
-			() =>
+	const attributionQuery = useQuery(
+		computed(() => ({
+			...projectQueryOptions.attribution(projectId.value, client),
+			enabled:
 				!!projectId.value &&
 				!!projectQuery.data.value?.project_types.includes('modpack') &&
 				!projectQuery.data.value.minecraft_server,
-		),
-	})
+		})),
+	)
 	const permissions = computed(() => ({
 		groups: attributionQuery.data.value ?? [],
 		unresolvedCount: (attributionQuery.data.value ?? []).filter(
@@ -126,6 +125,7 @@ export function useReviewProject(selection: Ref<string>) {
 				queryKey: ['project', 'v2', projectId.value],
 			}),
 			queryClient.invalidateQueries({ queryKey: ['project', projectId.value] }),
+			queryClient.invalidateQueries({ queryKey: ['project-attribution', projectId.value] }),
 			identity.refetch(),
 		])
 	}

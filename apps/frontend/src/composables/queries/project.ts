@@ -37,6 +37,11 @@ export function warmProjectCheckCaches(
  * When you only have a route slug (or unknown id-or-slug), resolve with `check` first.
  */
 export const projectQueryOptions = {
+	attribution: (projectId: string, client: AbstractModrinthClient) => ({
+		queryKey: ['project-attribution', projectId] as const,
+		queryFn: () => client.labrinth.attribution_internal.listProjectAttribution(projectId),
+	}),
+
 	/** Resolve a slug or ID to the canonical project ID. */
 	check: (idOrSlug: string, client: AbstractModrinthClient) => ({
 		queryKey: ['project', 'check', idOrSlug] as const,

@@ -51,6 +51,7 @@ const props = withDefaults(
 	defineProps<{
 		projectId: string
 		group: Labrinth.Attribution.Internal.AttributionGroup
+		members?: Labrinth.Projects.v3.TeamMember[]
 		isModerator?: boolean
 	}>(),
 	{
@@ -86,7 +87,8 @@ const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
-const { allMembers } = injectProjectPageContext()
+const projectContext = injectProjectPageContext(null)
+const allMembers = computed(() => props.members ?? projectContext?.allMembers.value ?? [])
 const attributionModeration = injectAttributionModeration(null)
 
 const attributorMember = computed(() => {
