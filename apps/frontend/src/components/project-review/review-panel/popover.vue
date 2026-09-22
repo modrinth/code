@@ -16,8 +16,8 @@
 				<slot name="title" />
 				<div class="flex shrink-0 items-center gap-1">
 					<IconButton
-						size="sm"
 						v-tooltip="formatMessage(pinned ? messages.unpinReview : messages.pinReview)"
+						size="sm"
 						:label="formatMessage(pinned ? messages.unpinReview : messages.pinReview)"
 						:aria-pressed="pinned"
 						:type="pinned ? 'colored-text' : 'quiet'"

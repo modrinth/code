@@ -29,29 +29,45 @@ export const licenseReviewPanel = panel({
 	title: 'License',
 	hint: 'Is this license and link valid?',
 	icon: BookTextIcon,
-	shown: ({ ProjectV3 }) => !ProjectV3.minecraft_server,
 }).content(
 	toggle({
 		issue: licenseInvalidLinkIssue,
 		label: 'Invalid Link',
-		shown: ({ ProjectV3 }) => !!ProjectV3.license.url,
+		shown: (ctx) => !ctx.ProjectV3.minecraft_server && !!ctx.ProjectV3.license.url,
 	}),
 	section({
 		shown: (ctx) =>
-			ctx.selected.issueIds.includes(licenseInvalidLinkIssue.id) && !!ctx.ProjectV3.license.url,
+			!ctx.ProjectV3.minecraft_server &&
+			ctx.selected.issueIds.includes(licenseInvalidLinkIssue.id) &&
+			!!ctx.ProjectV3.license.url,
 	}).content(
 		toggle({
+			shown: (ctx) => !ctx.ProjectV3.minecraft_server,
 			issue: licenseInvalidLinkIssue,
 			label: 'Invalid Link: Custom License',
 			id: 'license-custom-license',
 		}),
 	),
 	section({
-		shown: ({ ProjectV3 }) => promptSourceRequired(ProjectV3.license.id, ProjectV3.project_types),
+		shown: (ctx) =>
+			!ctx.ProjectV3.minecraft_server &&
+			promptSourceRequired(ctx.ProjectV3.license.id, ctx.ProjectV3.project_types),
 	}).content(
-		toggle({ issue: licenseNoSourceIssue, label: 'No Source' }),
-		section({ shown: (ctx) => ctx.selected.issueIds.includes(licenseNoSourceIssue.id) }).content(
-			toggle({ issue: licenseNoSourceIssue, label: 'No Source: Fork', id: 'license-fork' }),
+		toggle({
+			shown: (ctx) => !ctx.ProjectV3.minecraft_server,
+			issue: licenseNoSourceIssue,
+			label: 'No Source',
+		}),
+		section({
+			shown: (ctx) =>
+				!ctx.ProjectV3.minecraft_server && ctx.selected.issueIds.includes(licenseNoSourceIssue.id),
+		}).content(
+			toggle({
+				shown: (ctx) => !ctx.ProjectV3.minecraft_server,
+				issue: licenseNoSourceIssue,
+				label: 'No Source: Fork',
+				id: 'license-fork',
+			}),
 		),
 	),
 )

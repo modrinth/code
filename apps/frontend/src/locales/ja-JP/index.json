@@ -1061,9 +1061,6 @@
   "conversation-thread.action.approve": {
     "message": "承認"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "送信して承認"
-  },
   "conversation-thread.action.close-report": {
     "message": "レポートを閉じる"
   },
@@ -1072,9 +1069,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "却下済み"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "返信して拒否する"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "スレッドを再開する\n"
@@ -1108,9 +1102,6 @@
   },
   "conversation-thread.action.withhold": {
     "message": "保留にする\n"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "返信付きで保留にする\n"
   },
   "conversation-thread.closed-thread.description": {
     "message": "このスレッドは閉じられているため、新しいメッセージを送信できません。\n"

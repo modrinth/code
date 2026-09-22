@@ -11,14 +11,9 @@
 		<template v-else>
 			<ReviewPanel mode="anchored" as="section" :target="{ kind: 'title' }" class="review-section">
 				<h3 class="review-section-label">
-					{{ formatMessage(messages.projectTitle) }}
+					{{ formatMessage(messages.titleAndSlug) }}
 				</h3>
 				<h1 class="m-0 text-xl">{{ project.name }}</h1>
-			</ReviewPanel>
-			<ReviewPanel mode="anchored" as="section" :target="{ kind: 'slug' }" class="review-section">
-				<h3 class="review-section-label">
-					{{ formatMessage(messages.slug) }}
-				</h3>
 				<Slug />
 			</ReviewPanel>
 			<ReviewPanel
@@ -43,12 +38,18 @@
 				</h3>
 				<Summary />
 			</ReviewPanel>
-			<section class="review-section" :aria-label="formatMessage(messages.license)">
+			<ReviewPanel
+				mode="anchored"
+				as="section"
+				:target="{ kind: 'license' }"
+				class="review-section"
+				:aria-label="formatMessage(messages.license)"
+			>
 				<h3 class="review-section-label">
 					{{ formatMessage(messages.license) }}
 				</h3>
 				<License />
-			</section>
+			</ReviewPanel>
 			<ReviewPanel mode="anchored" as="section" :target="{ kind: 'tags' }" class="review-section">
 				<h3 class="review-section-label">
 					{{ formatMessage(messages.tags) }}

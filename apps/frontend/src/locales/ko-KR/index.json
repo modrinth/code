@@ -1025,9 +1025,6 @@
   "conversation-thread.action.approve": {
     "message": "승인"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "답글과 함께 승인"
-  },
   "conversation-thread.action.close-report": {
     "message": "티켓 닫기"
   },
@@ -1036,9 +1033,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "거부"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "답글과 함께 거부"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "스레드 다시 열기"
@@ -1072,9 +1066,6 @@
   },
   "conversation-thread.action.withhold": {
     "message": "보류"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "답글과 함께 보류"
   },
   "conversation-thread.closed-thread.description": {
     "message": "이 스레드는 닫혔으며, 더 이상 새로운 메시지를 작성할 수 없습니다."

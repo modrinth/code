@@ -34,6 +34,10 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.noReviewActions',
 		defaultMessage: 'No review actions available for this section',
 	},
+	noIssues: {
+		id: 'moderation.project-review.noIssues',
+		defaultMessage: 'No issues.',
+	},
 	reviewScope: {
 		id: 'moderation.project-review.reviewScope',
 		defaultMessage: 'These selections apply to the {stage} review for the whole project',
@@ -145,6 +149,10 @@ export const projectReviewMessages = defineMessages({
 	projectTitle: {
 		id: 'moderation.project-review.projectTitle',
 		defaultMessage: 'Title',
+	},
+	titleAndSlug: {
+		id: 'moderation.project-review.titleAndSlug',
+		defaultMessage: 'Title and slug',
 	},
 	slug: {
 		id: 'moderation.project-review.slug',

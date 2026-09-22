@@ -1067,9 +1067,6 @@
   "conversation-thread.action.approve": {
     "message": "Aprovar"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Aprovar com resposta"
-  },
   "conversation-thread.action.close-report": {
     "message": "Fechar denúncia"
   },
@@ -1078,9 +1075,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Rejeitar"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Rejeitar com resposta"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Reabrir tópico"
@@ -1114,9 +1108,6 @@
   },
   "conversation-thread.action.withhold": {
     "message": "Reter"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Reter com resposta"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Este tópico foi encerrado e não é possível enviar mensagens nele."

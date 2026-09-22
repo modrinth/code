@@ -1067,9 +1067,6 @@
   "conversation-thread.action.approve": {
     "message": "Approve"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Approve with reply"
-  },
   "conversation-thread.action.close-report": {
     "message": "Close report"
   },
@@ -1078,9 +1075,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Reject"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Reject with reply"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Reopen thread"
@@ -1115,9 +1109,6 @@
   "conversation-thread.action.withhold": {
     "message": "Withhold"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Withhold with reply"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "This thread is closed and new messages cannot be sent to it."
   },
@@ -1150,9 +1141,6 @@
   },
   "conversation-thread.reply-modal.help-center-note": {
     "message": "If you need to get in contact with the moderation team, please use the <help-center-link>Modrinth Help Center</help-center-link> and click the blue bubble in the bottom right corner to contact support."
-  },
-  "conversation-thread.resize-editor": {
-    "message": "Resize message editor"
   },
   "conversation-thread.resubmit-modal.confirmation.description": {
     "message": "Confirm I have addressed the messages from the moderators"
@@ -3068,6 +3056,9 @@
   "moderation.project-review.collapseAll": {
     "message": "Collapse all"
   },
+  "moderation.project-review.collapseVersion": {
+    "message": "Hide details"
+  },
   "moderation.project-review.compatibility": {
     "message": "Compatibility"
   },
@@ -3076,6 +3067,12 @@
   },
   "moderation.project-review.completedFiles": {
     "message": "Reviewed files ({count})"
+  },
+  "moderation.project-review.conversationThread": {
+    "message": "Conversation thread"
+  },
+  "moderation.project-review.copyHash": {
+    "message": "Copy {algorithm}"
   },
   "moderation.project-review.created": {
     "message": "Created"
@@ -3088,6 +3085,9 @@
   },
   "moderation.project-review.dependencies": {
     "message": "Dependencies"
+  },
+  "moderation.project-review.dependencyCount": {
+    "message": "{count, plural, one {# dep} other {# deps}}"
   },
   "moderation.project-review.description": {
     "message": "Description"
@@ -3148,6 +3148,9 @@
   },
   "moderation.project-review.expandAll": {
     "message": "Expand all"
+  },
+  "moderation.project-review.expandVersion": {
+    "message": "Show details"
   },
   "moderation.project-review.featured": {
     "message": "Featured"
@@ -3230,11 +3233,17 @@
   "moderation.project-review.noPendingFiles": {
     "message": "No files with unresolved flags"
   },
+	"moderation.project-review.noIssues": {
+		"message": "No issues."
+	},
   "moderation.project-review.noReports": {
     "message": "No technical-review reports are available for this project"
   },
   "moderation.project-review.noReviewActions": {
     "message": "No review actions available for this section"
+  },
+  "moderation.project-review.noSelectedIssues": {
+    "message": "No issues added. Select issues while reviewing the project to see the message here."
   },
   "moderation.project-review.openImage": {
     "message": "Open image {number}"
@@ -3253,6 +3262,9 @@
   },
   "moderation.project-review.permissionsPlaceholder": {
     "message": "Permissions review is coming soon"
+  },
+  "moderation.project-review.pinReview": {
+    "message": "Pin review controls"
   },
   "moderation.project-review.platforms": {
     "message": "Platforms"
@@ -3277,6 +3289,9 @@
   },
   "moderation.project-review.published": {
     "message": "Published"
+  },
+  "moderation.project-review.publishedBy": {
+    "message": "Published by"
   },
   "moderation.project-review.queueError": {
     "message": "Could not change projects. Please try again"
@@ -3307,6 +3322,9 @@
   },
   "moderation.project-review.reupload": {
     "message": "Reupload"
+  },
+  "moderation.project-review.reviewIssues": {
+    "message": "Issues"
   },
   "moderation.project-review.reviewProgress": {
     "message": "Reviewed flags indicate progress, not a safe verdict. Files without flags have no flag verdict"
@@ -3362,6 +3380,9 @@
   "moderation.project-review.tech-review": {
     "message": "Tech Review"
   },
+	"moderation.project-review.titleAndSlug": {
+		"message": "Title and slug"
+	},
   "moderation.project-review.title": {
     "message": "Project review"
   },
@@ -3386,6 +3407,9 @@
   "moderation.project-review.unlistedCount": {
     "message": "{count} unlisted"
   },
+  "moderation.project-review.unpinReview": {
+    "message": "Unpin review controls"
+  },
   "moderation.project-review.updated": {
     "message": "Updated"
   },
@@ -3394,6 +3418,12 @@
   },
   "moderation.project-review.versionId": {
     "message": "Version ID"
+  },
+  "moderation.project-review.versionNumber": {
+    "message": "Version Number"
+  },
+  "moderation.project-review.versionSubtitle": {
+    "message": "Version Subtitle"
   },
   "moderation.project-review.versions": {
     "message": "Versions"
@@ -3881,6 +3911,12 @@
   "project-review.corrections.project-changed": {
     "message": "The selected project changed. Review the corrections again."
   },
+  "project-review.disclosures.unsaved": {
+    "message": "Save or reset your disclosure changes before sending a reply or changing the project status."
+  },
+  "project-review.resize-actions": {
+    "message": "Resize project actions"
+  },
   "project-type.collection.plural": {
     "message": "Collections"
   },
@@ -4003,6 +4039,30 @@
   },
   "project.description.title": {
     "message": "Description"
+  },
+  "project.disclosures.load-error": {
+    "message": "Could not load disclosures."
+  },
+  "project.disclosures.loading": {
+    "message": "Loading disclosures…"
+  },
+  "project.disclosures.lock-status.cannot-disable": {
+    "message": "Cannot disable"
+  },
+  "project.disclosures.lock-status.fully-locked": {
+    "message": "Fully locked"
+  },
+  "project.disclosures.lock-status.label": {
+    "message": "Lock status"
+  },
+  "project.disclosures.lock-status.unlocked": {
+    "message": "Unlocked"
+  },
+  "project.disclosures.retry": {
+    "message": "Retry"
+  },
+  "project.disclosures.save-error": {
+    "message": "Could not save all disclosure changes. Your edits have been kept. Try saving again."
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "This game version is incompatible with the base project."

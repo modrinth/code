@@ -44,7 +44,6 @@ import { postApprovalReviewPanel } from '@modrinth/moderation/src/data/issues/po
 import { reReviewReviewPanel } from '@modrinth/moderation/src/data/issues/re-review'
 import { reuploadReviewPanel } from '@modrinth/moderation/src/data/issues/reupload'
 import { rulesReviewPanel } from '@modrinth/moderation/src/data/issues/rules'
-import { slugReviewPanel } from '@modrinth/moderation/src/data/issues/slug'
 import { statusAlertsReviewPanel } from '@modrinth/moderation/src/data/issues/status-alerts'
 import { summaryReviewPanel } from '@modrinth/moderation/src/data/issues/summary'
 import { titleReviewPanel } from '@modrinth/moderation/src/data/issues/title'
@@ -58,7 +57,6 @@ import type { createReviewSession } from './review-session'
 
 const reviewPanels = {
 	title: titleReviewPanel,
-	slug: slugReviewPanel,
 	summary: summaryReviewPanel,
 	description: descriptionReviewPanel,
 	'issues-link': issuesReviewPanel,
@@ -305,7 +303,6 @@ export function createReviewPanels(
 			}
 
 			const sections = resolveNodes(panel.children)
-			if (sections.length === 0) continue
 			bindings.set(key, {
 				key,
 				projectId: ProjectV3.id,
@@ -323,6 +320,7 @@ export function createReviewPanels(
 
 	function resolve(target: ReviewTarget) {
 		const aliases: Partial<Record<ReviewTarget['kind'], string>> = {
+			slug: 'title',
 			tags: 'categories',
 			compatibility: 'metadata',
 			'license-url': 'license',

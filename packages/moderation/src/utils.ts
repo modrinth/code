@@ -1,5 +1,14 @@
 import type { Labrinth } from '@modrinth/api-client'
 
+export function generateUrlSlug(value: string) {
+	return value
+		.trim()
+		.toLowerCase()
+		.replaceAll(' ', '-')
+		.replaceAll(/[^a-zA-Z0-9._-]/g, '')
+		.replaceAll(/--+/gm, '-')
+}
+
 export function expandVariables(
 	template: string,
 	project: Labrinth.Projects.v2.Project,

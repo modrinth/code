@@ -13,10 +13,10 @@
 
 <script setup lang="ts">
 import { CheckIcon } from '@modrinth/assets'
+import { generateUrlSlug } from '@modrinth/moderation/src/utils'
 import { useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { generateUrlSlug } from '~/composables/project-slug-suggestions'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { projectReviewMessages as messages } from '../../messages'

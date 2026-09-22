@@ -1,20 +1,13 @@
 <template>
 	<div v-if="project" class="flex flex-col gap-1">
-		<ReviewPanel
-			mode="anchored"
-			:target="{ kind: 'license' }"
-			class="flex items-center gap-3"
-		>
+		<div class="flex items-center gap-3">
 			<span
 				class="min-w-0 flex-1 truncate"
 				:title="project.license.name || projectV2?.license.name || project.license.id"
 				>{{ project.license.name || projectV2?.license.name || project.license.id }}</span
 			>
-		</ReviewPanel>
-		<ReviewPanel
-			mode="anchored"
-			:target="{ kind: 'license-url' }"
-		>
+		</div>
+		<div>
 			<a
 				v-if="url"
 				:href="url"
@@ -26,7 +19,7 @@
 				<ExternalIcon class="size-3 shrink-0" />
 			</a>
 			<span v-else class="text-secondary">{{ formatMessage(messages.noLicenseUrl) }}</span>
-		</ReviewPanel>
+		</div>
 	</div>
 </template>
 
@@ -39,7 +32,6 @@ import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { reviewExternalUrl } from '~/providers/project-review/project-links'
 
 import { projectReviewMessages as messages } from '../../messages'
-import ReviewPanel from '../../review-panel/index.vue'
 
 const { project, projectV2 } = injectProjectReviewPageContext()
 const { formatMessage } = useVIntl()

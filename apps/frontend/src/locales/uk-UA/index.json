@@ -1064,9 +1064,6 @@
   "conversation-thread.action.approve": {
     "message": "Підтвердити"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Підтвердити з відповіддю"
-  },
   "conversation-thread.action.close-report": {
     "message": "Закрити скаргу"
   },
@@ -1075,9 +1072,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Відхилити"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Відхилити з відповіддю"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Знову відкрити потік"
@@ -1111,9 +1105,6 @@
   },
   "conversation-thread.action.withhold": {
     "message": "Утримуватися"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Утримуватися з відповіддю"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Цю тему зачинено, і в нього не можна надсилати нові повідомлення."

@@ -1,11 +1,11 @@
 import { ModrinthApiError } from '@modrinth/api-client'
+import { generateUrlSlug } from '@modrinth/moderation/src/utils'
 import { injectModrinthClient } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { type MaybeRefOrGetter, onScopeDispose, ref, toValue, watch } from 'vue'
 
 const STALE_TIME = 1000 * 60 * 5
 const CHECK_DEBOUNCE = 300
-const PROJECT_SLUG_UNSAFE_CHARS = /[^a-zA-Z0-9._-]/g
 const PROJECT_SLUG_REGEX = /^[a-zA-Z0-9._-]{3,64}$/
 
 interface ProjectSlugSuggestionOptions {
@@ -15,14 +15,7 @@ interface ProjectSlugSuggestionOptions {
 	enabled?: MaybeRefOrGetter<boolean>
 }
 
-export function generateUrlSlug(value: string) {
-	return value
-		.trim()
-		.toLowerCase()
-		.replaceAll(' ', '-')
-		.replaceAll(PROJECT_SLUG_UNSAFE_CHARS, '')
-		.replaceAll(/--+/gm, '-')
-}
+export { generateUrlSlug }
 
 function isValidProjectSlug(value: string) {
 	return PROJECT_SLUG_REGEX.test(value)
