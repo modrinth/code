@@ -96,12 +96,6 @@
 					</AutoLink>
 				</div>
 			</template>
-			<template #cell-lastPlayed="{ row }">
-				<span v-if="row.lastPlayedAt" v-tooltip="formatDateTime(row.lastPlayedAt)">{{
-					formatRelativeTime(row.lastPlayedAt)
-				}}</span>
-				<span v-else>Never</span>
-			</template>
 			<template #cell-joined="{ row }">
 				<span
 					v-if="row.pending"
@@ -111,6 +105,12 @@
 				<span v-else-if="row.joinedAt" v-tooltip="formatDateTime(row.joinedAt)">{{
 					formatRelativeTime(row.joinedAt)
 				}}</span>
+			</template>
+			<template #cell-lastPlayed="{ row }">
+				<span v-if="row.lastPlayedAt" v-tooltip="formatDateTime(row.lastPlayedAt)">{{
+					formatRelativeTime(row.lastPlayedAt)
+				}}</span>
+				<span v-else>Never</span>
 			</template>
 			<template #cell-method="{ row }">
 				<span class="inline-flex min-w-0 max-w-full items-center gap-2">
@@ -210,19 +210,19 @@ const columns = computed<TableColumn<InvitedPlayerColumn>[]>(() => {
 			cellClass: '!pr-3',
 		},
 		{
-			key: 'lastPlayed',
-			label: 'Last played',
-			width: 'clamp(7rem, 15%, 13rem)',
-			enableSorting: true,
-			headerClass: 'whitespace-nowrap !px-2',
-			cellClass: 'whitespace-nowrap !px-2',
-		},
-		{
 			key: 'joined',
 			label: 'Joined',
 			width: 'clamp(7rem, 14%, 12rem)',
 			enableSorting: true,
 			defaultSortDirection: 'desc',
+			headerClass: 'whitespace-nowrap !px-2',
+			cellClass: 'whitespace-nowrap !px-2',
+		},
+		{
+			key: 'lastPlayed',
+			label: 'Last played',
+			width: 'clamp(7rem, 15%, 13rem)',
+			enableSorting: true,
 			headerClass: 'whitespace-nowrap !px-2',
 			cellClass: 'whitespace-nowrap !px-2',
 		},
