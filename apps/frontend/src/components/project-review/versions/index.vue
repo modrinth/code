@@ -1,5 +1,5 @@
 <template>
-	<div class="flex h-full min-h-0 flex-col gap-3 overflow-hidden">
+	<div class="flex h-full min-h-0 flex-col gap-1 overflow-hidden">
 		<ReviewPanel
 			v-if="resolve({ kind: 'undefined-project' })"
 			mode="inline"

@@ -1,10 +1,6 @@
 <template>
-	<div v-if="project" class="flex h-full min-h-0 flex-col overflow-hidden">
-		<ReviewPanel
-			mode="inline"
-			:target="{ kind: 'disclosures' }"
-			class="mb-1 shrink-0 !overflow-visible"
-		/>
+	<div v-if="project" class="flex h-full min-h-0 flex-col gap-1 overflow-hidden">
+		<ReviewPanel mode="inline" :target="{ kind: 'disclosures' }" />
 		<p v-if="isPending" role="status">{{ formatMessage(statusMessages.loading) }}</p>
 		<div v-else-if="isError" role="alert">
 			<p>{{ formatMessage(statusMessages.loadError) }}</p>
