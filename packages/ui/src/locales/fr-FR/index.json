@@ -759,7 +759,7 @@
     "defaultMessage": "Nom (A-Z)"
   },
   "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "Nom (A-Z)"
+    "defaultMessage": "Nom (Z-A)"
   },
   "content.page-layout.sort.date-added-newest": {
     "defaultMessage": "Plus récent en premier"
