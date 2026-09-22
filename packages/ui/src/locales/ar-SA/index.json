@@ -656,9 +656,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "عرض المحتوى"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "المؤلف"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "البيئة"
   },
@@ -691,9 +688,6 @@
   },
   "content.metadata-filter.warning.client-retained": {
     "defaultMessage": "تم الاحتفاظ بملف العميل"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "لا توجد تحذيرات"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "تحذيرات"
@@ -730,9 +724,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "تصفية"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {مؤلف واحد} two {مؤلفان} few {# مؤلفين} many {# مؤلفًا} other {# مؤلف}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "جارٍ تحميل المحتوى..."
@@ -1944,4 +1935,3 @@
     "defaultMessage": "ماينكرافت: إصدار جافا"
   }
 }
-

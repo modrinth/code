@@ -427,7 +427,9 @@ const installTooltip = computed(() => {
 			class="flex shrink-0 items-center justify-end gap-2 transition-colors duration-200"
 			:class="
 				tableLayout
-					? tableLayout === 'narrow' ? 'justify-self-start' : 'justify-self-end'
+					? tableLayout === 'narrow'
+						? 'justify-self-start'
+						: 'justify-self-end'
 					: 'min-w-[160px]'
 			"
 		>

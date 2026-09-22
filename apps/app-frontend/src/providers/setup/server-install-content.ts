@@ -24,7 +24,6 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { config as appConfig } from '@/config'
 
-
 type ServerFlowFrom = 'onboarding' | 'reset-server'
 
 type InstallableSearchResult = Labrinth.Search.v3.ResultSearchProject & {

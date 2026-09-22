@@ -68,15 +68,16 @@ pub(super) async fn finalize_shared_instance_attachment(
     data: &SharedInstanceInstallData,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-	if let Some(server) = &data.linked_server {
-		crate::api::worlds::ensure_managed_server_in_instance(
-			instance_id,
-			data.server_manager_name.clone()
-				.unwrap_or_else(|| data.name.clone()),
-			server.domain.clone(),
-		)
-		.await?;
-	}
+    if let Some(server) = &data.linked_server {
+        crate::api::worlds::ensure_managed_server_in_instance(
+            instance_id,
+            data.server_manager_name
+                .clone()
+                .unwrap_or_else(|| data.name.clone()),
+            server.domain.clone(),
+        )
+        .await?;
+    }
     crate::state::attach_shared_instance(
         instance_id,
         SharedInstanceAttachmentInput {
