@@ -53,9 +53,6 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "הורדה נכשלה"
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "התקנה לא נמצאה"
-  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "נתיב הקובץ לא קיים"
   },

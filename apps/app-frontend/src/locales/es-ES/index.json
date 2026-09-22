@@ -53,9 +53,6 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "La descarga no ha podido terminar"
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "La instancia no se ha encontrado"
-  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "La ruta de archivo no es válida"
   },

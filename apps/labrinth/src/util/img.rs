@@ -6,6 +6,7 @@ use crate::models::images::ImageContext;
 use crate::routes::ApiError;
 use crate::util::error::Context as _;
 use color_thief::ColorFormat;
+use eyre::{Result, eyre};
 use hex::ToHex;
 use image::imageops::FilterType;
 use image::{
@@ -128,15 +129,17 @@ fn process_image(
     content_type: &str,
     target_width: Option<u32>,
     min_aspect_ratio: Option<f32>,
-) -> Result<(bytes::Bytes, String), ImageError> {
+) -> Result<(bytes::Bytes, String)> {
     if content_type.to_lowercase() == "image/gif" {
         return Ok((image_bytes, "gif".to_string()));
     }
 
-    let mut img = image::load_from_memory(&image_bytes)?;
+    let mut img = image::load_from_memory(&image_bytes)
+        .wrap_err("loading image from memory")?;
 
-    let webp_bytes = convert_to_webp(&img)?;
-    img = image::load_from_memory(&webp_bytes)?;
+    let webp_bytes = convert_to_webp(&img).wrap_err("converting to WebP")?;
+    img = image::load_from_memory(&webp_bytes)
+        .wrap_err("loading WebP image from memory")?;
 
     // Resize the image
     let (orig_width, orig_height) = img.dimensions();
@@ -161,15 +164,19 @@ fn process_image(
 
     // Optimize and compress
     let mut output = Vec::new();
-    img.write_to(&mut Cursor::new(&mut output), ImageFormat::WebP)?;
+    img.write_to(&mut Cursor::new(&mut output), ImageFormat::WebP)
+        .wrap_err("writing image")?;
 
     Ok((bytes::Bytes::from(output), "webp".to_string()))
 }
 
-fn convert_to_webp(img: &DynamicImage) -> Result<Vec<u8>, ImageError> {
+fn convert_to_webp(img: &DynamicImage) -> Result<Vec<u8>> {
     let rgba = img.to_rgba8();
     let encoder = Encoder::from_rgba(&rgba, img.width(), img.height());
-    let webp = encoder.encode(75.0); // Quality factor: 0-100, 75 is a good balance
+    // Quality factor: 0-100, 75 is a good balance
+    let webp = encoder
+        .encode_simple(false, 75.0)
+        .map_err(|_| eyre!("encoding image"))?;
     Ok(webp.to_vec())
 }
 

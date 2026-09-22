@@ -19,6 +19,8 @@ pub struct Collection {
 
     /// An icon URL for the collection.
     pub icon_url: Option<String>,
+    /// The raw icon URL for the collection.
+    pub raw_icon_url: Option<String>,
     /// Color of the collection.
     pub color: Option<u32>,
 
@@ -46,6 +48,7 @@ impl From<database::models::DBCollection> for Collection {
             updated: c.updated,
             projects: c.projects.into_iter().map(|x| x.into()).collect(),
             icon_url: c.icon_url,
+            raw_icon_url: c.raw_icon_url,
             color: c.color,
             status: c.status,
         }

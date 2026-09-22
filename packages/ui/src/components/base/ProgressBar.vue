@@ -11,6 +11,7 @@ const props = withDefaults(
 		fullWidth?: boolean
 		striped?: boolean
 		gradientBorder?: boolean
+		animated?: boolean
 		label?: string
 		labelClass?: string
 		showProgress?: boolean
@@ -22,6 +23,7 @@ const props = withDefaults(
 		fullWidth: false,
 		striped: false,
 		gradientBorder: true,
+		animated: true,
 		showProgress: false,
 	},
 )
@@ -83,6 +85,7 @@ const percent = computed(() => props.progress / props.max)
 				class="rounded-full progress-bar"
 				:class="[
 					colors[props.color].fg,
+					{ 'progress-bar--animated': animated },
 					{ 'progress-bar--waiting': waiting },
 					{ 'progress-bar--gradient-border': gradientBorder },
 					striped ? `progress-bar--striped--${color}` : '',
@@ -93,7 +96,7 @@ const percent = computed(() => props.progress / props.max)
 	</div>
 </template>
 <style scoped lang="scss">
-.progress-bar {
+.progress-bar--animated {
 	transition: width 0.2s ease-in-out;
 }
 
