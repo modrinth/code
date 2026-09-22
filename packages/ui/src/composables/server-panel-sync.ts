@@ -316,7 +316,11 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 			]),
 		)
 		const addons = event.content
-			.filter((item) => ['mods', 'plugins', 'datapacks'].includes(item.parent_directory))
+			.filter((item) =>
+				['mods', 'plugins', 'datapacks', 'resourcepacks', 'shaderpacks'].includes(
+					item.parent_directory,
+				),
+			)
 			.map((item) =>
 				worldContentItemToAddon(
 					item,

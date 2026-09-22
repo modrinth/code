@@ -136,7 +136,7 @@ const messages = defineMessages({
 	resetServerDescription: {
 		id: 'hosting.loader.reset-server-description',
 		defaultMessage:
-			'Removes all data on your server, including your worlds, mods, and configuration files. Backups will remain and can be restored.',
+			'Removes all data on your server, including your worlds, mods, and configuration files. Backups will remain and can be restored. Invited players will keep their access.',
 	},
 	loaderVersionLabel: {
 		id: 'hosting.loader.loader-version',
