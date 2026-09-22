@@ -67,12 +67,26 @@
 				</div>
 			</ReviewPanel>
 		</div>
-		<ImageViewerEditor :key="projectId" ref="viewer" :items="viewerItems" editor="disabled" />
+		<ImageViewerEditor :key="projectId" ref="viewer" :items="viewerItems" editor="disabled">
+			<template #actions="{ item }">
+				<ButtonLink
+					v-tooltip="formatMessage(messages.openImageInNewTab)"
+					type="quiet"
+					class="!w-9 !rounded-full !p-0"
+					:aria-label="formatMessage(messages.openImageInNewTab)"
+					:href="item.src"
+					target="_blank"
+				>
+					<ExternalIcon aria-hidden="true" />
+				</ButtonLink>
+			</template>
+		</ImageViewerEditor>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { Button, ImageViewerEditor, useFormatDateTime, useVIntl } from '@modrinth/ui'
+import { ExternalIcon } from '@modrinth/assets'
+import { Button, ButtonLink, ImageViewerEditor, useFormatDateTime, useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
