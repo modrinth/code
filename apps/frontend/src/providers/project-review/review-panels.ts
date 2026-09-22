@@ -1,5 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { categoriesReviewPanel } from '@modrinth/moderation/src/data/issues/categories'
+import { reviewPanels } from '@modrinth/moderation/src/data/issues'
 import { aggregateCorrections } from '@modrinth/moderation/src/data/issues/component-builders/corrections'
 import type {
 	Issue,
@@ -8,93 +8,11 @@ import type {
 	ReviewContext,
 	WithContext,
 } from '@modrinth/moderation/src/data/issues/component-builders/types'
-import { descriptionReviewPanel } from '@modrinth/moderation/src/data/issues/description'
-import {
-	adsDisclosureReviewPanel,
-	aiDisclosureReviewPanel,
-	aiFunctionalityDisclosureReviewPanel,
-	archiveDisclosureReviewPanel,
-	derivativeContentDisclosureReviewPanel,
-	disclosuresReviewPanel,
-	paidFeaturesDisclosureReviewPanel,
-	photosensitivityDisclosureReviewPanel,
-	systemInteractionsDisclosureReviewPanel,
-	telemetryDisclosureReviewPanel,
-} from '@modrinth/moderation/src/data/issues/disclosures'
-import { galleryReviewPanel } from '@modrinth/moderation/src/data/issues/gallery'
-import { iconReviewPanel } from '@modrinth/moderation/src/data/issues/icon'
-import { licenseReviewPanel } from '@modrinth/moderation/src/data/issues/license'
-import {
-	bmacReviewPanel,
-	discordReviewPanel,
-	githubReviewPanel,
-	issuesReviewPanel,
-	koFiReviewPanel,
-	otherReviewPanel,
-	patreonReviewPanel,
-	paypalReviewPanel,
-	siteReviewPanel,
-	sourceReviewPanel,
-	storeReviewPanel,
-	wikiReviewPanel,
-} from '@modrinth/moderation/src/data/issues/links'
-import { metadataReviewPanel } from '@modrinth/moderation/src/data/issues/metadata'
-import { permissionsReviewPanel } from '@modrinth/moderation/src/data/issues/permissions'
-import { postApprovalReviewPanel } from '@modrinth/moderation/src/data/issues/post-approval'
-import { reReviewReviewPanel } from '@modrinth/moderation/src/data/issues/re-review'
-import { reuploadReviewPanel } from '@modrinth/moderation/src/data/issues/reupload'
-import { rulesReviewPanel } from '@modrinth/moderation/src/data/issues/rules'
-import { statusAlertsReviewPanel } from '@modrinth/moderation/src/data/issues/status-alerts'
-import { summaryReviewPanel } from '@modrinth/moderation/src/data/issues/summary'
-import { titleReviewPanel } from '@modrinth/moderation/src/data/issues/title'
-import { undefinedProjectReviewPanel } from '@modrinth/moderation/src/data/issues/undefined-project'
-import { versionsReviewPanel } from '@modrinth/moderation/src/data/issues/versions'
 import { createContext } from '@modrinth/ui'
 import { computed, type Ref } from 'vue'
 
 import type { ReviewTarget } from './review'
 import type { createReviewSession } from './review-session'
-
-const reviewPanels = {
-	title: titleReviewPanel,
-	summary: summaryReviewPanel,
-	description: descriptionReviewPanel,
-	'issues-link': issuesReviewPanel,
-	'source-link': sourceReviewPanel,
-	'wiki-link': wikiReviewPanel,
-	'discord-link': discordReviewPanel,
-	'site-link': siteReviewPanel,
-	'store-link': storeReviewPanel,
-	'patreon-link': patreonReviewPanel,
-	'bmac-link': bmacReviewPanel,
-	'paypal-link': paypalReviewPanel,
-	'github-link': githubReviewPanel,
-	'ko-fi-link': koFiReviewPanel,
-	'other-link': otherReviewPanel,
-	categories: categoriesReviewPanel,
-	disclosures: disclosuresReviewPanel,
-	'ai-disclosure': aiDisclosureReviewPanel,
-	'ai-functionality-disclosure': aiFunctionalityDisclosureReviewPanel,
-	'ads-disclosure': adsDisclosureReviewPanel,
-	'paid-features-disclosure': paidFeaturesDisclosureReviewPanel,
-	'telemetry-disclosure': telemetryDisclosureReviewPanel,
-	'derivative-content-disclosure': derivativeContentDisclosureReviewPanel,
-	'photosensitivity-disclosure': photosensitivityDisclosureReviewPanel,
-	'system-interactions-disclosure': systemInteractionsDisclosureReviewPanel,
-	'archive-disclosure': archiveDisclosureReviewPanel,
-	gallery: galleryReviewPanel,
-	icon: iconReviewPanel,
-	license: licenseReviewPanel,
-	metadata: metadataReviewPanel,
-	permissions: permissionsReviewPanel,
-	'post-approval': postApprovalReviewPanel,
-	're-review': reReviewReviewPanel,
-	reupload: reuploadReviewPanel,
-	rules: rulesReviewPanel,
-	'status-alerts': statusAlertsReviewPanel,
-	'undefined-project': undefinedProjectReviewPanel,
-	versions: versionsReviewPanel,
-} satisfies Record<string, Panel>
 
 interface ResolvedIssueControlOptions {
 	disabled: boolean
