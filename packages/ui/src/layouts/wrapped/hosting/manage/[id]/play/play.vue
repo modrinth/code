@@ -20,6 +20,7 @@
 			</Admonition>
 			<InvitedPlayersTableLayout
 				:rows="players.rows.value"
+				:loading="players.members.isLoading.value"
 				:can-manage="canSetup"
 				:disabled="players.membershipMutation.isPending.value || actionsLocked"
 				:show-push-update="!!sharedInstanceId"
@@ -71,7 +72,7 @@
 				formatMessage(previewAction === 'play' ? messages.pushAndPlay : messages.pushUpdate)
 			"
 			:confirm-icon="UploadIcon"
-			:confirm-disabled="actionsLocked || previewQuery.isError.value || !previewQuery.data.value"
+			:confirm-disabled="!canSetup || actionsLocked || previewQuery.isError.value || !previewQuery.data.value"
 			:added-label="formatMessage(messages.added)"
 			:removed-label="formatMessage(messages.removed)"
 			@confirm="perform(previewAction, true)"
@@ -112,8 +113,7 @@
 
 <script setup lang="ts">
 import { SpinnerIcon, UploadIcon } from '@modrinth/assets'
-import { useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { useIntersectionObserver, useStorage } from '@vueuse/core'
+import { useIntersectionObserver } from '@vueuse/core'
 import { computed, nextTick, onScopeDispose, ref, watch } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
@@ -128,8 +128,13 @@ import {
 } from '#ui/components/sharing'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { useServerPreferences } from '#ui/composables/server-preferences'
 import ContentDiffModal from '#ui/layouts/shared/installation-settings/components/ContentDiffModal.vue'
 import InvitedPlayersTableLayout from '#ui/layouts/shared/invited-players/layout.vue'
+import {
+	type ServerShareActionTarget,
+	useServerShareReview,
+} from '#ui/layouts/shared/server-sharing/use-server-share-review'
 import {
 	getHostingServerAddress,
 	injectAuth,
@@ -141,7 +146,6 @@ import {
 import { injectPageContext } from '#ui/providers/page-context'
 
 import ServerPlayCard from './ServerPlayCard.vue'
-import { resolveServerShareDiff } from './share-diff'
 import type { ServerPlayerRow } from './types'
 import { useServerPlayers } from './use-server-players'
 
@@ -154,7 +158,6 @@ const props = defineProps<{
 const { formatMessage } = useVIntl()
 const pageContext = injectPageContext(null)
 const pageBottom = ref<HTMLElement | null>(null)
-let disposed = false
 const intercomHiddenRequestId = Symbol('server-play-bottom')
 useIntersectionObserver(pageBottom, ([entry]) => {
 	pageContext?.intercomBubble?.requestHidden?.(
@@ -163,13 +166,11 @@ useIntersectionObserver(pageBottom, ([entry]) => {
 	)
 })
 onScopeDispose(() => {
-	disposed = true
 	pageContext?.intercomBubble?.requestHidden?.(intercomHiddenRequestId, false)
 })
 const { handleError } = injectNotificationManager()
 const client = injectModrinthClient()
 const auth = injectAuth()
-const queryClient = useQueryClient()
 const { serverId, worldId, server, serverFull, busyReasons, powerState, isConnected } =
 	injectModrinthServerContext()
 const { canSetup, canUsePowerActions, permissionDeniedMessage } = useServerPermissions()
@@ -178,100 +179,67 @@ const sharedInstanceId = computed(() => world.value?.content?.shared_instance_id
 const needsUpdate = computed(() => world.value?.content?.shared_instance_needs_update ?? false)
 const players = useServerPlayers(sharedInstanceId, canSetup)
 const invitePlayersModal = ref<InstanceType<typeof InvitePlayersModal>>()
-const diffModal = ref<InstanceType<typeof ContentDiffModal>>()
-const configPicker = ref<InstanceType<typeof ServerConfigFilePicker>>()
-const resolvingConfigs = ref(false)
+const shareReview = useServerShareReview<Action>({
+	execute: performAction,
+	disabled: computed(() => players.linkMutation.isPending.value),
+})
+const {
+	diffModal,
+	configPicker,
+	previewOpen,
+	previewQuery,
+	actionMutation,
+	pending: actionsLocked,
+	runAction,
+} = shareReview
 const removeModal = ref<InstanceType<typeof ConfirmModal>>()
 const playerToRemove = ref<ServerPlayerRow>()
-const previewOpen = ref(false)
 const previewAction = ref<'play' | 'push'>('push')
-const preferences = useStorage(`pyro-server-${serverId}-preferences`, {
-	reviewChangesBeforePlaying: false,
-})
+const preferences = useServerPreferences(serverId)
 const serverAddress = computed(() =>
 	getHostingServerAddress(server.value.net, serverFull.value?.subdomain),
 )
-const previewQuery = useQuery({
-	queryKey: computed(() => ['servers', 'share-diff', serverId, worldId.value, auth.user.value?.id]),
-	enabled: computed(() => previewOpen.value && !!worldId.value && !!sharedInstanceId.value),
-	queryFn: async () => {
-		const diff = await client.archon.content_v1.getShareDiff(serverId, worldId.value!)
-		return { diff, items: resolveServerShareDiff(diff) }
-	},
-	retry: false,
-})
-const actionMutation = useMutation({
-	mutationKey: ['servers', 'share-action', serverId],
-	mutationFn: async ({
-		action,
-		targetWorldId,
-		userId,
-		configPaths,
-	}: {
-		action: Action
-		targetWorldId: string
-		userId: string | undefined
-		configPaths: string[]
-	}) => {
-		if (busyReasons.value.length) throw new Error(formatMessage(messages.busy))
-		if (auth.user.value?.id !== userId) return
-		const sameContext = () =>
-			!disposed && worldId.value === targetWorldId && auth.user.value?.id === userId
-		let id = serverFull.value?.worlds.find((world) => world.id === targetWorldId)?.content
-			?.shared_instance_id
-		if (
-			canSetup.value &&
-			(action !== 'play' || !id || needsUpdate.value || configPaths.length > 0)
-		) {
-			const shared = await client.archon.content_v1.share(serverId, targetWorldId, configPaths)
-			id = shared.shared_instance_id
-			await queryClient.invalidateQueries({
-				queryKey: ['servers', 'v1', 'detail', serverId],
-			})
-		} else if (action === 'invite' || action === 'push') {
-			throw new Error(formatMessage(messages.permission))
-		}
-		if (!id) throw new Error(formatMessage(messages.notShared))
+async function performAction(action: Action, target: ServerShareActionTarget) {
+	const { worldId: targetWorldId, configPaths, isCurrent: sameContext } = target
+	let id = serverFull.value?.worlds.find((world) => world.id === targetWorldId)?.content
+		?.shared_instance_id
+	const shouldShare =
+		canSetup.value &&
+		(!id ||
+			action === 'push' ||
+			((action === 'play' || action === 'download') &&
+				(needsUpdate.value || configPaths.length > 0)))
+	if (shouldShare) {
+		const shared = await shareReview.publish(target)
+		id = shared.shared_instance_id
+	} else if (!canSetup.value && (action === 'invite' || action === 'push')) {
+		throw new Error(formatMessage(messages.permission))
+	}
+	if (!id) throw new Error(formatMessage(messages.notShared))
+	if (!sameContext()) return
+	if (action === 'play') {
+		await ensureServerRunning(sameContext)
 		if (!sameContext()) return
-		if (action === 'play') {
-			await ensureServerRunning(sameContext)
-			if (!sameContext()) return
-			await props.onPlayServer({ serverId, worldId: targetWorldId })
-		} else if (action === 'invite') {
-			await nextTick()
-			await players.members.refetch({ throwOnError: true })
-			if (!sameContext()) return
-			await players.ensureLink(id)
-			if (sameContext()) invitePlayersModal.value?.show()
-		} else if (action === 'download') {
-			const latest = await client.sharedinstances.instances_v1.getLatestVersion(id)
-			if (!latest.ready) throw new Error(formatMessage(messages.notReady))
-			const blob = await client.sharedinstances.instances_v1.downloadMrpack(id, latest.version)
-			if (sameContext())
-				await props.onDownloadMrpack(
-					blob,
-					`${server.value.name.replace(/[\\/:*?"<>|]/g, '_')}.mrpack`,
-				)
-		} else {
-			previewOpen.value = false
-			await queryClient.invalidateQueries({
-				queryKey: ['servers', 'share-diff', serverId, targetWorldId],
-			})
-		}
-	},
-	onError: (error) => handleError(error),
-})
+		await props.onPlayServer({ serverId, worldId: targetWorldId })
+	} else if (action === 'invite') {
+		await nextTick()
+		const members = await players.members.refetch({ throwOnError: true })
+		if (!sameContext()) return
+		await players.ensureLink(id, members.data?.remaining)
+		if (sameContext()) invitePlayersModal.value?.show()
+	} else if (action === 'download') {
+		const latest = await client.sharedinstances.instances_v1.getLatestVersion(id)
+		if (!latest.ready) throw new Error(formatMessage(messages.notReady))
+		const blob = await client.sharedinstances.instances_v1.downloadMrpack(id, latest.version)
+		if (sameContext())
+			await props.onDownloadMrpack(
+				blob,
+				`${server.value.name.replace(/[\\/:*?"<>|]/g, '_')}.mrpack`,
+			)
+	}
+}
 const pendingAction = computed(() =>
 	actionMutation.isPending.value ? actionMutation.variables.value?.action : undefined,
-)
-const shareActions = useIsMutating({ mutationKey: ['servers', 'share-action', serverId] })
-const actionsLocked = computed(
-	() =>
-		resolvingConfigs.value ||
-		shareActions.value > 0 ||
-		previewQuery.isFetching.value ||
-		players.linkMutation.isPending.value ||
-		busyReasons.value.length > 0,
 )
 async function ensureServerRunning(sameContext: () => boolean) {
 	const deadline = Date.now() + 180_000
@@ -308,39 +276,12 @@ async function perform(action: Action, reviewed = false) {
 		void showPreview(true)
 		return
 	}
-	const targetWorldId = worldId.value
-	const userId = auth.user.value?.id
-	resolvingConfigs.value = true
-	try {
-		const configPaths = reviewed ? ((await configPicker.value?.resolvePaths()) ?? []) : []
-		if (
-			worldId.value !== targetWorldId ||
-			auth.user.value?.id !== userId ||
-			(reviewed && !previewOpen.value)
-		)
-			return
-		previewOpen.value = false
-		actionMutation.mutate({ action, targetWorldId, userId, configPaths })
-	} catch (error) {
-		handleError(error)
-		if (previewOpen.value && worldId.value === targetWorldId && auth.user.value?.id === userId)
-			diffModal.value?.show()
-	} finally {
-		resolvingConfigs.value = false
-	}
+	await runAction(action, reviewed)
 }
 async function showPreview(playAfter = false) {
 	if (actionsLocked.value) return
-	const target = worldId.value
 	previewAction.value = playAfter ? 'play' : 'push'
-	previewOpen.value = true
-	const result = await previewQuery.refetch()
-	if (target !== worldId.value) return
-	if (!previewOpen.value) return
-	if (result.error) {
-		previewOpen.value = false
-		handleError(result.error)
-	} else diffModal.value?.show()
+	await shareReview.showPreview()
 }
 function changeMember(userId: string, remove: boolean, user?: InvitePlayersUser) {
 	if (!sharedInstanceId.value || players.membershipMutation.isPending.value || !canSetup.value)
@@ -370,9 +311,7 @@ async function updateInviteLink(settings: InviteLinkSettings) {
 }
 watch([worldId, sharedInstanceId, () => auth.user.value?.id], () => {
 	invitePlayersModal.value?.hide()
-	diffModal.value?.hide()
 	removeModal.value?.hide()
-	previewOpen.value = false
 	playerToRemove.value = undefined
 })
 const messages = defineMessages({

@@ -7,6 +7,7 @@ export function useServerPreferences(serverId: string) {
 			hideSubdomainLabel: false,
 			ramAsNumber: false,
 			warnOnIncompatibleContent: true,
+			reviewChangesBeforePlaying: false,
 		},
 		undefined,
 		{ mergeDefaults: true },

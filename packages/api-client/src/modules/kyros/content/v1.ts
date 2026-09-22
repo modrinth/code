@@ -17,6 +17,7 @@ export class KyrosContentV1Module extends AbstractModule {
 			api: '',
 			version: 'v1',
 			method: 'GET',
+			responseType: 'blob',
 			params: {
 				parent_directory: parentDirectory,
 				filename,

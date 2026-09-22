@@ -4,7 +4,6 @@ import type { SortDirection } from '#ui/components/base/Table.vue'
 
 import {
 	type InvitedPlayerMethod,
-	invitedPlayerMethodLabels as methodLabels,
 	type InvitedPlayerRow,
 } from '../types'
 
@@ -13,15 +12,16 @@ type MethodFilter = InvitedPlayerMethod | 'all'
 export function useInvitedPlayersTable(
 	rows: Ref<InvitedPlayerRow[]>,
 	formatRelativeTime: (date: Date) => string,
+	labels: Ref<{ methods: Record<InvitedPlayerMethod, string>; never: string; pending: string }>,
 ) {
 	const search = ref('')
 	const methodFilter = ref<MethodFilter>('all')
 	const sortColumn = ref<string | undefined>('joined')
 	const sortDirection = ref<SortDirection>('desc')
-	const methodFilterOptions: Array<{ id: InvitedPlayerMethod; label: string }> = [
-		{ id: 'direct', label: methodLabels.direct },
-		{ id: 'link', label: methodLabels.link },
-	]
+	const methodFilterOptions = computed<Array<{ id: InvitedPlayerMethod; label: string }>>(() => [
+		{ id: 'direct', label: labels.value.methods.direct },
+		{ id: 'link', label: labels.value.methods.link },
+	])
 	const hasMultipleMethods = computed(() => new Set(rows.value.map((row) => row.method)).size > 1)
 	const filteredRows = computed(() => {
 		const query = search.value.trim().toLowerCase()
@@ -30,9 +30,9 @@ export function useInvitedPlayersTable(
 			if (!query) return true
 			return [
 				row.username,
-				row.lastPlayedAt ? formatRelativeTime(row.lastPlayedAt) : 'Never',
-				row.pending ? 'Pending' : row.joinedAt ? formatRelativeTime(row.joinedAt) : '',
-				methodLabels[row.method],
+				row.lastPlayedAt ? formatRelativeTime(row.lastPlayedAt) : labels.value.never,
+				row.pending ? labels.value.pending : row.joinedAt ? formatRelativeTime(row.joinedAt) : '',
+				labels.value.methods[row.method],
 			].some((value) => value.toLowerCase().includes(query))
 		})
 	})
@@ -46,7 +46,7 @@ export function useInvitedPlayersTable(
 				(a.lastPlayedAt?.getTime() ?? Number.NEGATIVE_INFINITY) -
 				(b.lastPlayedAt?.getTime() ?? Number.NEGATIVE_INFINITY)
 		else if (sortColumn.value === 'method')
-			compared = methodLabels[a.method].localeCompare(methodLabels[b.method])
+			compared = labels.value.methods[a.method].localeCompare(labels.value.methods[b.method])
 		else
 			compared =
 				(a.pending

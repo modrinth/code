@@ -556,7 +556,7 @@ export function useServerInstallContent({
 			console.error(e)
 			if (isModpack) {
 				setProjectInstalling(project.project_id, false)
-			} else {
+			} else if (!isSetupServerContext.value) {
 				removeQueuedServerInstall(project.project_id)
 			}
 			handleError(e instanceof Error ? e : new Error(`Error installing content ${e}`))
@@ -606,6 +606,7 @@ export function useServerInstallContent({
 
 			if (fromContext.value === 'onboarding') {
 				const serverId = currentServerId.value
+				onboardingModalRef.value?.hide()
 				await inviteFlow.open({ serverId, worldId: currentWorldId.value, siteUrl })
 				await navigateTo(`/hosting/manage/${serverId}`)
 			} else {
