@@ -1,6 +1,14 @@
 import { defineMessages } from '@modrinth/ui'
 
 export const projectReviewMessages = defineMessages({
+	generalSettings: {
+		id: 'moderation.project-review.generalSettings',
+		defaultMessage: 'General',
+	},
+	keybindsSettings: {
+		id: 'moderation.project-review.keybindsSettings',
+		defaultMessage: 'Keybinds',
+	},
 	reviewIssues: {
 		id: 'moderation.project-review.reviewIssues',
 		defaultMessage: 'Issues',
@@ -169,6 +177,10 @@ export const projectReviewMessages = defineMessages({
 	openIcon: {
 		id: 'moderation.project-review.openIcon',
 		defaultMessage: 'View enlarged project icon',
+	},
+	openMemberAvatar: {
+		id: 'moderation.project-review.openMemberAvatar',
+		defaultMessage: 'View enlarged avatar for {username}',
 	},
 	summary: {
 		id: 'moderation.project-review.summary',

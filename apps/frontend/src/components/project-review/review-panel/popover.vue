@@ -52,12 +52,14 @@ import { computed, nextTick, onBeforeUnmount, shallowRef, watch } from 'vue'
 
 import { projectReviewMessages as messages } from '../messages'
 import { injectReviewContext, type ReviewAnchor } from './context'
+import { useActionKeybinds } from './use-action-keybinds'
 
 const { formatMessage } = useVIntl()
 const props = defineProps<{ anchor: ReviewAnchor; titleId: string }>()
 const { active, panel, panelId, pinned, close, leave, cancelClose, contains } =
 	injectReviewContext()
 const element = shallowRef<HTMLElement | null>(null)
+useActionKeybinds(element, () => active.value?.id === props.anchor.id)
 const reference = computed(() => props.anchor.trigger ?? props.anchor.element)
 const { floatingStyles, isPositioned } = useFloating(reference, element, {
 	placement: 'right-start',

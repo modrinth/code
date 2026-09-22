@@ -2,6 +2,20 @@ import { setting } from '../types/settings.ts'
 
 const settings = {
 	General: {
+		ShowShortcutKeybindHints: setting.asToggle({
+			type: 'toggle',
+			id: 'show-shortcut-keybind-hints',
+			title: 'Show shortcut keybind hints',
+			description: 'Show keyboard shortcut hints on review tabs, Reply, and Private note.',
+			default: true,
+		}),
+		ShowToggleIssueButtonShortcutHint: setting.asToggle({
+			type: 'toggle',
+			id: 'show-toggle-issue-button-shortcut-hint',
+			title: 'Show toggle issue button shortcut hints',
+			description: 'Show number key shortcut hints on issue toggle buttons.',
+			default: true,
+		}),
 		ChecklistPosition: setting.asEnum({
 			type: 'enum',
 			id: 'checklist-position',

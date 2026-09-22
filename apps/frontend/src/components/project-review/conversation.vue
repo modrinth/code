@@ -1,5 +1,5 @@
 <template>
-	<div class="flex h-full min-h-0 min-w-0 flex-col gap-2.5 overflow-hidden">
+	<div class="flex h-full min-h-0 min-w-0 flex-col gap-2.5">
 		<ProjectActions />
 		<div
 			v-if="project"
@@ -18,8 +18,11 @@
 					:set-status="setStatus"
 					:before-send-reply="beforeSendReply"
 					initial-preview
+					project-review
+					review-keybinds
 					class="rounded-none border-none bg-transparent p-0 text-xs"
 					@update-thread="updateThread"
+					@open-editor="openEditor"
 				/>
 				<div v-else-if="isError" class="flex flex-col gap-3 p-4">
 					<p class="m-0 text-red" role="alert">
@@ -49,7 +52,7 @@ import {
 } from '@modrinth/ui'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useResizeObserver } from '@vueuse/core'
-import { ref, watch } from 'vue'
+import { nextTick, ref, watch } from 'vue'
 
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
@@ -58,6 +61,7 @@ import { injectReviewPanels } from '~/providers/project-review/review-panels'
 
 import { projectReviewMessages as messages } from './messages'
 import ProjectActions from './project-actions.vue'
+import { injectProjectReviewContext } from './layout/context'
 
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
@@ -72,6 +76,14 @@ const { data: thread, isError, refetch } = threadQuery
 const scrollContainer = ref<HTMLElement>()
 const conversationContent = ref<HTMLElement>()
 const isAtBottom = ref(true)
+const { rightVisible, toggleSidebar } = injectProjectReviewContext()
+
+async function openEditor() {
+	if (!rightVisible.value) toggleSidebar('right')
+	isAtBottom.value = true
+	await nextTick()
+	scrollToBottom()
+}
 
 function updateScrollPosition() {
 	const container = scrollContainer.value

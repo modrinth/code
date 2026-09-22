@@ -62,11 +62,32 @@ export type ModerationGlobalContext = {
 	notifyCopied: (value: string, title: string) => void
 }
 
+export type ModerationProjectReviewContext = {
+	scope: 'project-review'
+	openTab: (
+		tab:
+			| 'description'
+			| 'gallery'
+			| 'disclosures'
+			| 'versions'
+			| 'permissions'
+			| 'history'
+			| 'tech-review',
+	) => void
+}
+
 export type ModerationContext =
 	| ModerationProjectContext
 	| ModerationChecklistContext
 	| ModerationTechReviewContext
 	| ModerationGlobalContext
+	| ModerationProjectReviewContext
+	| ModerationConversationContext
+
+export type ModerationConversationContext = {
+	scope: 'review-conversation'
+	openEditor: (mode: 'reply' | 'note') => void
+}
 
 export interface KeybindDefinition {
 	key: string
@@ -80,7 +101,7 @@ export interface KeybindDefinition {
 export type BaseKeybindListener<T> = {
 	keybind: KeybindDefinition | KeybindDefinition[] | string | string[]
 	description: string
-	scope: 'project' | 'checklist' | 'tech-review' | 'global'
+	scope: ModerationContext['scope']
 	enabled?: (ctx: T) => boolean
 	action: (ctx: T) => void
 }
@@ -97,11 +118,16 @@ export type KeybindTechReviewListener = BaseKeybindListener<ModerationTechReview
 export type KeybindGlobalListener = BaseKeybindListener<ModerationGlobalContext> & {
 	scope: 'global'
 }
+export type KeybindProjectReviewListener = BaseKeybindListener<ModerationProjectReviewContext> & {
+	scope: 'project-review'
+}
 export type KeybindListener =
 	| KeybindProjectListener
 	| KeybindChecklistListener
 	| KeybindTechReviewListener
 	| KeybindGlobalListener
+	| KeybindProjectReviewListener
+	| (BaseKeybindListener<ModerationConversationContext> & { scope: 'review-conversation' })
 
 export function parseKeybind(keybindString: string): KeybindDefinition {
 	const parts = keybindString.split('+').map((p) => p.trim().toLowerCase())

@@ -3,10 +3,16 @@
 		class="project-review-tab box-border flex h-full w-full items-center whitespace-nowrap rounded-lg border border-solid border-transparent px-2 text-[13px] font-semibold leading-none transition-colors duration-150 hover:text-contrast motion-reduce:transition-none"
 		:class="isActive ? 'project-review-tab-active text-contrast' : 'text-secondary'"
 	>
-		{{ formatMessage(projectReviewMessages[params.params.tab]) }}
-		<span v-if="count !== undefined" class="ml-0 rounded px-1 text-xs tabular-nums"
+		<span>
+			{{ formatMessage(projectReviewMessages[params.params.tab]) }}
+		</span>
+		<span v-if="count !== undefined" class="relative top-px ml-1 rounded text-xs tabular-nums"
 			>({{ count }})</span
 		>
+		<KbdChip
+			:keybind="`review-tab-${params.params.tab}`"
+			class="relative bottom-px ml-1"
+		/>
 	</span>
 </template>
 
@@ -17,6 +23,7 @@ import { computed, ref, watchEffect } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
+import KbdChip from '../../KbdChip.vue'
 import { projectReviewMessages } from '../../messages'
 import type { ProjectReviewTab } from '../types'
 

@@ -18,7 +18,16 @@
 				<h3 class="review-section-label">
 					{{ formatMessage(messages.titleAndSlug) }}
 				</h3>
-				<h1 class="m-0 text-xl">{{ project.name }}</h1>
+				<h1 class="m-0 text-xl">
+					<NuxtLink
+						:to="`/${projectV2?.project_type ?? project.project_types[0]}/${project.slug ?? project.id}`"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="hover:underline"
+					>
+						{{ project.name }}
+					</NuxtLink>
+				</h1>
 				<Slug />
 			</ReviewPanel>
 			<ReviewPanel mode="anchored" as="section" :target="{ kind: 'icon' }" class="review-section">
@@ -110,7 +119,7 @@ import Slug from './project/slug.vue'
 import Summary from './project/summary.vue'
 import Tags from './project/tags.vue'
 
-const { project, isLoading, error, refresh } = injectProjectReviewPageContext()
+const { project, projectV2, isLoading, error, refresh } = injectProjectReviewPageContext()
 const { formatMessage } = useVIntl()
 const hasTags = computed(
 	() => !!(project.value?.categories.length || project.value?.additional_categories.length),

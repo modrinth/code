@@ -9,6 +9,14 @@
 			:aria-busy="busy"
 		>
 			<div class="flex items-center gap-3 text-[0.6875rem] font-medium" aria-live="polite">
+				<button
+					type="button"
+					class="queue-action"
+					:aria-label="formatMessage(commonMessages.settingsLabel)"
+					@click="settingsModal?.show($event)"
+				>
+					<SettingsIcon aria-hidden="true" />
+				</button>
 				<span
 					>{{ formatMessage(messages.complete) }}
 					<span class="ml-1 tabular-nums text-primary">{{
@@ -47,16 +55,49 @@
 			</div>
 		</nav>
 	</footer>
+	<TabbedModal
+		ref="settingsModal"
+		:header="formatMessage(commonMessages.settingsLabel)"
+		:tabs="settingsTabs"
+		width="60rem"
+	>
+		<template #content="{ tab }">
+			<component :is="tab.content" v-if="tab?.content" embedded />
+		</template>
+	</TabbedModal>
 </template>
 
 <script setup lang="ts">
-import { LeftArrowIcon, LogOutIcon, RightArrowIcon, UndoIcon } from '@modrinth/assets'
-import { useVIntl } from '@modrinth/ui'
-import { computed } from 'vue'
+import {
+	KeyboardIcon,
+	LeftArrowIcon,
+	LogOutIcon,
+	RightArrowIcon,
+	SettingsIcon,
+	UndoIcon,
+} from '@modrinth/assets'
+import { commonMessages, TabbedModal, type TabbedModalTab, useVIntl } from '@modrinth/ui'
+import { computed, ref } from 'vue'
 
+import ModerationKeybinds from '~/components/ui/moderation/settings/ModerationKeybinds.vue'
+import ModerationSettings from '~/components/ui/moderation/settings/ModerationSettings.vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { projectReviewMessages as messages } from './messages'
+
+const settingsModal = ref<InstanceType<typeof TabbedModal> | null>(null)
+const settingsTabs: TabbedModalTab[] = [
+	{
+		name: messages.generalSettings,
+		icon: SettingsIcon,
+		content: ModerationSettings,
+	},
+	{
+		name: messages.keybindsSettings,
+		icon: KeyboardIcon,
+		content: ModerationKeybinds,
+	},
+]
 
 const { queue, isLoading, navigation } = injectProjectReviewPageContext()
 const {

@@ -254,8 +254,8 @@
 		<InputFrame :class="{ hide: previewMode }" :disabled="disabled" multiline>
 			<div ref="editorRef" class="min-w-0 w-full flex-1 self-stretch" />
 		</InputFrame>
-		<div v-if="!previewMode" class="info-blurb mt-2">
-			<div class="info-blurb">
+		<div v-if="!previewMode && (!hideMarkdownHint || maxLength)" class="info-blurb mt-2">
+			<div v-if="!hideMarkdownHint" class="info-blurb">
 				<InfoIcon />
 				<IntlFormatted :message-id="messages.editorMarkdownFormattingSupport">
 					<template #markdown-link="{ children }">
@@ -283,8 +283,9 @@
 				</span>
 			</div>
 		</div>
-		<div v-else>
+		<div v-if="previewMode">
 			<div class="markdown-body-wrapper">
+				<slot v-if="!currentValue?.trim()" name="empty-preview" />
 				<div
 					style="width: 100%"
 					:style="{
@@ -327,7 +328,7 @@ import {
 } from '@modrinth/assets'
 import { markdownCommands, modrinthMarkdownEditorKeymap } from '@modrinth/utils/codemirror'
 import { renderHighlightedString } from '@modrinth/utils/highlightjs/index'
-import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, useId, watch } from 'vue'
+import { type Component, computed, nextTick, onBeforeUnmount, onMounted, ref, toRef, useId, watch } from 'vue'
 
 import Button from '#ui/components/base/buttons/Button.vue'
 import IconButton from '#ui/components/base/buttons/IconButton.vue'
@@ -546,6 +547,7 @@ const props = withDefaults(
 		disabled?: boolean
 		headingButtons?: boolean
 		initialPreview?: boolean
+		hideMarkdownHint?: boolean
 		/**
 		 * @param file The file to upload
 		 * @throws If the file is invalid or the upload fails
@@ -561,6 +563,7 @@ const props = withDefaults(
 		disabled: false,
 		headingButtons: true,
 		initialPreview: false,
+		hideMarkdownHint: false,
 		onImageUpload: undefined,
 		placeholder: undefined,
 		maxLength: undefined,
@@ -874,6 +877,15 @@ const updateCurrentValue = (newValue: string) => {
 }
 
 const previewMode = ref(props.initialPreview)
+
+async function focus() {
+	if (props.disabled) return
+	previewMode.value = false
+	await nextTick()
+	editor?.focus()
+}
+
+defineExpose({ focus })
 
 const linkText = ref('')
 const linkUrl = ref('')

@@ -19,6 +19,9 @@
 import 'dockview-vue/dist/styles/dockview.css'
 
 import { useVIntl } from '@modrinth/ui'
+import { useEventListener } from '@vueuse/core'
+
+import { useModerationKeybinds } from '~/composables/moderation'
 
 import { projectReviewMessages as messages } from '../messages'
 import ProjectReviewColumns from './columns.vue'
@@ -37,6 +40,20 @@ const layout = useProjectReviewLayout(
 const { leftVisible, rightVisible, onDividerDoubleClick } = layout
 
 provideProjectReviewContext({ ...layout, slots })
+
+const keybinds = useModerationKeybinds()
+useEventListener('keydown', (event) => {
+	if (event.defaultPrevented || event.repeat || event.isComposing) return
+	const target = event.target
+	if (
+		target instanceof HTMLElement &&
+		(target.isContentEditable ||
+			target.closest('input, textarea, select, [role="textbox"], [role="dialog"]'))
+	) {
+		return
+	}
+	keybinds.value.handle(event, { scope: 'project-review', openTab: layout.openTab })
+})
 </script>
 
 <style scoped>
