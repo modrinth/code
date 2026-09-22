@@ -1,12 +1,35 @@
 <template>
 	<li class="flex min-w-0 items-start gap-2">
-		<Avatar
-			:src="member.user.avatar_url"
-			:alt="member.user.username"
-			size="2rem"
-			circle
-			no-shadow
-		/>
+		<button
+			v-if="avatarUrl"
+			type="button"
+			class="shrink-0 cursor-zoom-in rounded-full border-0 bg-transparent p-0"
+			:aria-label="formatMessage(messages.openMemberAvatar, { username: member.user.username })"
+			@click="viewer?.show(0)"
+		>
+			<Avatar
+				:src="member.user.avatar_url || avatarUrl"
+				:alt="member.user.username"
+				size="2rem"
+				circle
+				no-shadow
+			/>
+		</button>
+		<Avatar v-else :alt="member.user.username" size="2rem" circle no-shadow />
+		<ImageViewerEditor :key="member.user.id" ref="viewer" :items="viewerItems" editor="disabled">
+			<template #actions="{ item }">
+				<ButtonLink
+					v-tooltip="formatMessage(messages.openImageInNewTab)"
+					type="quiet"
+					class="!w-9 !rounded-full !p-0"
+					:aria-label="formatMessage(messages.openImageInNewTab)"
+					:href="item.src"
+					target="_blank"
+				>
+					<ExternalIcon aria-hidden="true" />
+				</ButtonLink>
+			</template>
+		</ImageViewerEditor>
 		<div class="min-w-0">
 			<div class="flex items-center gap-1.5">
 				<NuxtLink
@@ -41,9 +64,16 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { CheckIcon, CrownIcon } from '@modrinth/assets'
-import { Avatar, PROJECT_STATUS_ICONS, Tooltip, useVIntl } from '@modrinth/ui'
-import { computed } from 'vue'
+import { CheckIcon, CrownIcon, ExternalIcon } from '@modrinth/assets'
+import {
+	Avatar,
+	ButtonLink,
+	ImageViewerEditor,
+	PROJECT_STATUS_ICONS,
+	Tooltip,
+	useVIntl,
+} from '@modrinth/ui'
+import { computed, ref } from 'vue'
 
 import { projectReviewMessages as messages } from '../../messages'
 
@@ -52,6 +82,13 @@ const props = defineProps<{
 	stats: { status: string; count: number }[]
 }>()
 const { formatMessage } = useVIntl()
+const viewer = ref<InstanceType<typeof ImageViewerEditor>>()
+const avatarUrl = computed(() => props.member.user.raw_avatar_url || props.member.user.avatar_url)
+const viewerItems = computed(() =>
+	avatarUrl.value
+		? [{ id: avatarUrl.value, src: avatarUrl.value, alt: props.member.user.username }]
+		: [],
+)
 const statusMessages = {
 	approved: messages.approvedCount,
 	archived: messages.archivedCount,

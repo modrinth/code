@@ -29,9 +29,11 @@
 	<component
 		:is="as ?? 'section'"
 		v-else
+		ref="inlinePanel"
 		v-bind="$attrs"
+		:data-review-panel="id"
 		:aria-labelledby="title ? titleId : undefined"
-		class="box-border flex w-full flex-col gap-2.5 overflow-y-auto text-sm text-primary"
+		class="box-border flex w-full flex-col gap-2.5 overflow-y-auto text-sm text-primary opacity-60 transition-opacity duration-150 hover:opacity-100"
 	>
 		<div v-if="title" class="flex items-center gap-2">
 			<h2 :id="titleId" class="m-0 text-sm font-semibold text-contrast">{{ title }}</h2>
@@ -49,7 +51,7 @@
 <script setup lang="ts">
 import { InfoIcon } from '@modrinth/assets'
 import { Tooltip, useVIntl } from '@modrinth/ui'
-import { computed, useId } from 'vue'
+import { computed, shallowRef, useId } from 'vue'
 
 import type { ReviewTarget } from '~/providers/project-review/review'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
@@ -59,6 +61,7 @@ import Anchor from './anchor.vue'
 import { injectReviewContext } from './context'
 import Controls from './controls.vue'
 import Popover from './popover.vue'
+import { useActionKeybinds } from './use-action-keybinds'
 
 defineOptions({ inheritAttrs: false })
 const props = defineProps<{
@@ -70,6 +73,8 @@ const props = defineProps<{
 }>()
 
 const id = useId()
+const inlinePanel = shallowRef<HTMLElement | null>(null)
+useActionKeybinds(inlinePanel)
 const { formatMessage } = useVIntl()
 const { active, setDropdownOpen } = injectReviewContext()
 const panels = injectReviewPanels()

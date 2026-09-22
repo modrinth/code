@@ -29,6 +29,7 @@
 						</p>
 						<MarkdownEditor
 							v-if="control.type === 'markdown'"
+							:ref="(field) => setFieldRef(fieldKey(control), field)"
 							:disabled="control.disabled"
 							:model-value="panels.textValue(panelBinding, control)"
 							:heading-buttons="false"
@@ -37,6 +38,7 @@
 						/>
 						<Input
 							v-else-if="control.type === 'text'"
+							:ref="(field) => setFieldRef(fieldKey(control), field)"
 							:model-value="panels.textValue(panelBinding, control)"
 							:placeholder="control.placeholder"
 							:disabled="control.disabled"
@@ -79,10 +81,12 @@
 					<Tooltip v-else :disabled="!control.tooltip" :text="control.tooltip">
 						<ActionButton
 							:label="control.label"
+							:keybind="keybinds.get(control)"
+							:show-keybind-hint="settings.get(moderationSettings.General.ShowToggleIssueButtonShortcutHint)"
 							:disabled="control.disabled"
 							:model-value="panels.selected(panelBinding, control)"
 							:aria-pressed="panels.selected(panelBinding, control)"
-							@update:model-value="panelBinding && panels.write(panelBinding, control, $event)"
+							@update:model-value="toggleAction(control, $event)"
 						/>
 					</Tooltip>
 				</template>
@@ -104,7 +108,7 @@
 			{{ formatMessage(controlMessages.conflicts) }}
 		</p>
 		<div
-			v-for="correction in panels.correctionPanels.value"
+			v-for="(correction, correctionIndex) in panels.correctionPanels.value"
 			:key="correction.key"
 			class="flex flex-col gap-2"
 		>
@@ -112,6 +116,7 @@
 			<Controls
 				:target="target"
 				:binding="correction"
+				:keybind-offset="correctionOffsets[correctionIndex]"
 				@dropdown-open="emit('dropdown-open')"
 				@dropdown-close="emit('dropdown-close')"
 			/>
@@ -120,6 +125,7 @@
 </template>
 
 <script setup lang="ts">
+import { moderationSettings } from '@modrinth/moderation'
 import ActionButton from '@modrinth/moderation/src/types/node/components/ActionButton.vue'
 import {
 	Combobox,
@@ -130,9 +136,10 @@ import {
 	Tooltip,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, useId } from 'vue'
+import { type ComponentPublicInstance, computed, nextTick, useId } from 'vue'
 
 import type { ReviewTarget } from '~/providers/project-review/review'
+import { useModerationSettings } from '~/composables/moderation'
 import {
 	injectReviewPanels,
 	type ReviewPanelBinding,
@@ -140,7 +147,11 @@ import {
 
 import { projectReviewMessages as messages } from '../messages'
 
-const props = defineProps<{ target: ReviewTarget; binding?: ReviewPanelBinding }>()
+const props = defineProps<{
+	target: ReviewTarget
+	binding?: ReviewPanelBinding
+	keybindOffset?: number
+}>()
 const emit = defineEmits<{
 	'dropdown-open': []
 	'dropdown-close': []
@@ -170,7 +181,84 @@ const controlMessages = defineMessages({
 })
 const { formatMessage } = useVIntl()
 const panels = injectReviewPanels()
+const settings = useModerationSettings()
 const panelBinding = computed(() => props.binding ?? panels.resolve(props.target))
+type PanelControl = ReviewPanelBinding['panel']['sections'][number]['controls'][number]
+const fields = new Map<string, { focus: () => void }>()
+let pendingFocus: string | undefined
+
+function fieldKey(control: { issueId: string; key: string }) {
+	return `${control.issueId}:${control.key}`
+}
+
+async function focusPendingField() {
+	await nextTick()
+	if (!pendingFocus) return
+	const field = fields.get(pendingFocus)
+	if (!field) return
+	pendingFocus = undefined
+	field.focus()
+}
+
+function setFieldRef(key: string, field: Element | ComponentPublicInstance | null) {
+	if (field && 'focus' in field && typeof field.focus === 'function') {
+		fields.set(key, field as { focus: () => void })
+		if (pendingFocus === key) void focusPendingField()
+	} else {
+		fields.delete(key)
+	}
+}
+
+function textFields() {
+	return (
+		panelBinding.value?.panel.sections.flatMap((section) =>
+			section.controls.filter(
+				(control): control is Extract<PanelControl, { type: 'text' | 'markdown' }> =>
+					(control.type === 'text' || control.type === 'markdown') && !control.disabled,
+			),
+		) ?? []
+	)
+}
+
+function toggleAction(control: PanelControl, value: boolean) {
+	const binding = panelBinding.value
+	if (!binding) return
+	const previousFields = new Set(textFields().map(fieldKey))
+	pendingFocus = undefined
+	panels.write(binding, control, value)
+	const revealed = textFields().find((field) => !previousFields.has(fieldKey(field)))
+	if (!revealed) return
+	pendingFocus = fieldKey(revealed)
+	void focusPendingField()
+}
+
+function toggleControls(binding?: ReviewPanelBinding) {
+	return (
+		binding?.panel.sections.flatMap((section) =>
+			section.controls.filter((control) => control.type === 'toggle'),
+		) ?? []
+	)
+}
+const keybinds = computed(() =>
+	new Map(
+		toggleControls(panelBinding.value).map((control, index) => [
+			control,
+			actionKeybind(index + (props.keybindOffset ?? 0)),
+		]),
+	),
+)
+function actionKeybind(index: number) {
+	if (index >= 20) return undefined
+	return `${index >= 10 ? 'Shift+' : ''}${'1234567890'[index % 10]}`
+}
+const correctionOffsets = computed(() => {
+	let offset = (props.keybindOffset ?? 0) + toggleControls(panelBinding.value).length
+	return panels.correctionPanels.value.map((binding) => {
+		const start = offset
+		offset += toggleControls(binding).length
+		return start
+	})
+})
 const hasToggles = computed(() =>
 	panelBinding.value?.panel.sections.some((section) =>
 		section.controls.some((control) => control.type === 'toggle'),

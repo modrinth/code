@@ -2,7 +2,7 @@
 	<div
 		v-if="visibleTargets.length"
 		ref="actionsElement"
-		class="relative flex min-h-0 shrink-0 flex-col border-0 border-b border-solid border-divider"
+		class="relative flex min-h-0 min-w-0 shrink-0 flex-col border-0 border-b border-solid border-divider"
 		:style="{
 			height: actionsHeight === null ? undefined : `${actionsHeight}px`,
 			maxHeight:
@@ -11,7 +11,7 @@
 					: 'max(80px, calc(100% - 300px))',
 		}"
 	>
-		<div class="flex min-h-0 flex-col gap-4 overflow-y-auto overscroll-contain pb-4">
+		<div class="-mx-1 flex min-h-0 min-w-0 flex-col gap-4 overflow-y-auto overscroll-contain px-1 pt-1 pb-4">
 			<Tabs
 				:value="selectedTarget"
 				:tabs="tabs"
@@ -23,7 +23,7 @@
 				v-if="visibleTargets.includes(selectedTarget)"
 				:key="selectedTarget"
 				mode="inline"
-				class="shrink-0"
+				class="min-w-0 shrink-0 !overflow-visible"
 				:target="{ kind: selectedTarget }"
 			/>
 		</div>

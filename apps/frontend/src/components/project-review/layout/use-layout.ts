@@ -146,6 +146,11 @@ export function useProjectReviewLayout(
 		updateCornerGroups()
 	}
 
+	function openTab(tab: ProjectReviewTab) {
+		if (!getTabs().includes(tab)) return
+		tabs?.getPanel(tab)?.api.setActive()
+	}
+
 	function toggleSidebar(side: 'left' | 'right') {
 		const visible = side === 'left' ? leftVisible : rightVisible
 		const panel = columns?.getPanel(side)
@@ -262,6 +267,7 @@ export function useProjectReviewLayout(
 
 	return {
 		leftVisible,
+		openTab,
 		rightVisible,
 		topLeftGroupId,
 		topRightGroupId,

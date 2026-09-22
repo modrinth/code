@@ -79,8 +79,8 @@
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>
 					<Button
-						type="colored"
-						color="brand"
+						:type="projectReview ? 'base' : 'colored'"
+						:color="projectReview ? undefined : 'brand'"
 						:disabled="!replyConfirmation || isLoading"
 						@click="runBlockingAction('reply-modal', () => sendReplyFromModal())"
 					>
@@ -145,10 +145,13 @@
 							v-for="mode in isStaff(auth.user) ? ['reply', 'note'] : ['reply']"
 							v-show="editorMode === mode"
 							:key="`${thread.id}-${mode}`"
+							@keydown="onEditorKeydown($event, mode)"
 						>
 							<MarkdownEditor
+								:ref="(editor) => (editors[mode] = editor)"
 								:model-value="mode === 'note' ? privateNoteBody : replyBody"
 								:initial-preview="mode === 'reply' && initialPreview"
+								:hide-markdown-hint="projectReview"
 								:disabled="isLoading"
 								:placeholder="
 									formatMessage(
@@ -164,20 +167,30 @@
 									mode === 'note' ? (privateNoteBody = $event) : (replyBody = $event)
 								"
 							>
+								<template v-if="projectReview && mode === 'reply'" #empty-preview>
+									<p class="m-0 italic text-secondary">
+										{{ formatMessage(messages.noIssuesFlagged) }}
+									</p>
+								</template>
 								<template v-if="isStaff(auth.user)" #after-preview>
 									<Tabs
 										v-model:value="editorMode"
+										@change="openEditor($event.value)"
 										class="!ml-auto !h-7 shrink-0 !gap-0.5 overflow-hidden !rounded-lg [&>button]:!rounded-md [&>button]:!px-2 [&>button]:!text-xs"
 										:tabs="[
 											{ value: 'reply', label: formatMessage(messages.actionReply) },
 											{ value: 'note', label: formatMessage(messages.privateNoteTab) },
 										]"
-									/>
+									>
+										<template v-if="reviewKeybinds" #after-label="{ tab }">
+											<KbdChip :keybind="`review-tab-${tab.value}`" class="px-1" />
+										</template>
+									</Tabs>
 								</template>
 							</MarkdownEditor>
 						</div>
 					</div>
-					<div class="mx-2 mt-3 flex shrink-0 flex-col gap-4">
+					<div class="mx-2 mt-0 flex shrink-0 flex-col gap-4">
 						<div class="flex flex-wrap items-center justify-end gap-2">
 							<template v-if="editorMode === 'reply' && currentMember && !currentMember.staffOnly">
 								<template v-if="isRejected(project)">
@@ -216,8 +229,8 @@
 							</Button>
 							<Button
 								v-else-if="sortedMessages.length > 0"
-								type="colored"
-								color="brand"
+								:type="projectReview ? 'base' : 'colored'"
+								:color="projectReview ? undefined : 'brand'"
 								:disabled="!replyBody || isLoading"
 								@click="
 									isApproved(project) && !isStaff(auth.user)
@@ -488,10 +501,13 @@ import {
 	TeleportOverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, ref, watch } from 'vue'
+import { useEventListener } from '@vueuse/core'
+import { computed, nextTick, ref, watch } from 'vue'
 
+import KbdChip from '~/components/project-review/KbdChip.vue'
 import ThreadMessage from '~/components/ui/thread/ThreadMessage.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
+import { useModerationKeybinds } from '~/composables/moderation'
 import { isApproved, isRejected } from '~/helpers/projects.js'
 import { isStaff } from '~/helpers/users.js'
 
@@ -499,6 +515,10 @@ const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	noIssuesFlagged: {
+		id: 'conversation-thread.no-issues-flagged',
+		defaultMessage: 'No issues flagged.',
+	},
 	privateNoteTab: {
 		id: 'conversation-thread.private-note.tab',
 		defaultMessage: 'Private note',
@@ -650,6 +670,8 @@ const messages = defineMessages({
 })
 
 const props = defineProps({
+	projectReview: Boolean,
+	reviewKeybinds: Boolean,
 	beforeSendReply: { type: Function, default: null },
 	initialPreview: Boolean,
 	generatingMessage: Boolean,
@@ -688,7 +710,7 @@ const props = defineProps({
 	},
 })
 
-const emit = defineEmits(['update-thread'])
+const emit = defineEmits(['update-thread', 'open-editor'])
 
 const app = useNuxtApp()
 const flags = useFeatureFlags()
@@ -704,6 +726,58 @@ const members = computed(() => {
 const replyBody = defineModel('replyBody', { type: String, default: '' })
 const privateNoteBody = ref('')
 const editorMode = ref('reply')
+const editors = {}
+
+async function openEditor(mode) {
+	editorMode.value = mode
+	emit('open-editor')
+	await nextTick()
+	await editors[mode]?.focus()
+}
+const keybinds = useModerationKeybinds()
+useEventListener('keydown', (event) => {
+	if (!props.reviewKeybinds || !isStaff(props.auth.user)) return
+	if (event.defaultPrevented || event.repeat || event.isComposing) return
+	const target = event.target
+	if (
+		target instanceof HTMLElement &&
+		(target.isContentEditable ||
+			target.closest('input, textarea, select, [role="textbox"], [role="dialog"]'))
+	) {
+		return
+	}
+	keybinds.value.handle(event, {
+		scope: 'review-conversation',
+		openEditor,
+	})
+})
+
+function onEditorKeydown(event, mode) {
+	if (event.defaultPrevented || event.repeat || event.isComposing) return
+	const target = event.target
+	if (!(target instanceof HTMLElement)) return
+	if (!target.isContentEditable && !target.matches('textarea, input, [role="textbox"]')) return
+	if (event.key === 'Escape') {
+		event.preventDefault()
+		event.stopPropagation()
+		target.blur()
+		return
+	}
+
+	if (!props.reviewKeybinds || mode !== 'note' || editorMode.value !== 'note') return
+	if (!isStaff(props.auth.user) || !privateNoteBody.value || isLoading.value) return
+	if (
+		event.key !== 'Enter' ||
+		!(event.ctrlKey || event.metaKey) ||
+		event.altKey ||
+		event.shiftKey
+	) {
+		return
+	}
+	event.preventDefault()
+	event.stopPropagation()
+	void runBlockingAction('private-note', () => sendReply(null, true))
+}
 
 const sortedMessages = computed(() => {
 	if (props.thread !== null) {

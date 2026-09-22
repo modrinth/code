@@ -39,6 +39,7 @@
 				"
 			/>
 			<span v-if="tab.label" class="text-nowrap">{{ tab.label }}</span>
+			<slot name="after-label" :tab="tab" />
 		</button>
 	</div>
 </template>

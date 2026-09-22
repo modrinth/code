@@ -35,6 +35,60 @@ function isOfficialModrinthHost(): boolean {
 }
 
 const keybinds: { [id: string]: KeybindListener } = {
+	'review-tab-reply': {
+		keybind: 'Shift+R',
+		description: 'Open reply tab',
+		scope: 'review-conversation',
+		action: (ctx) => ctx.openEditor('reply'),
+	},
+	'review-tab-note': {
+		keybind: 'Shift+N',
+		description: 'Open note tab',
+		scope: 'review-conversation',
+		action: (ctx) => ctx.openEditor('note'),
+	},
+	'review-tab-description': {
+		keybind: 'D',
+		description: 'Open description tab',
+		scope: 'project-review',
+		action: (ctx) => ctx.openTab('description'),
+	},
+	'review-tab-gallery': {
+		keybind: 'G',
+		description: 'Open gallery tab',
+		scope: 'project-review',
+		action: (ctx) => ctx.openTab('gallery'),
+	},
+	'review-tab-disclosures': {
+		keybind: 'S',
+		description: 'Open disclosures tab',
+		scope: 'project-review',
+		action: (ctx) => ctx.openTab('disclosures'),
+	},
+	'review-tab-versions': {
+		keybind: 'V',
+		description: 'Open versions tab',
+		scope: 'project-review',
+		action: (ctx) => ctx.openTab('versions'),
+	},
+	'review-tab-permissions': {
+		keybind: 'P',
+		description: 'Open permissions tab',
+		scope: 'project-review',
+		action: (ctx) => ctx.openTab('permissions'),
+	},
+	'review-tab-history': {
+		keybind: 'H',
+		description: 'Open history tab',
+		scope: 'project-review',
+		action: (ctx) => ctx.openTab('history'),
+	},
+	'review-tab-tech-review': {
+		keybind: 'T',
+		description: 'Open tech review tab',
+		scope: 'project-review',
+		action: (ctx) => ctx.openTab('tech-review'),
+	},
 	'next-stage': {
 		keybind: 'ArrowRight',
 		description: 'Go to next stage',
