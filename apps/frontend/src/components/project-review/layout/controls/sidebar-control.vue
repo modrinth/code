@@ -9,14 +9,18 @@
 			class="opacity-70 hover:opacity-100"
 			@click="toggleSidebar(side)"
 		>
-			<PanelLeftOpenIcon v-if="side === 'left'" aria-hidden="true" />
-			<PanelRightOpenIcon v-else aria-hidden="true" />
+			<component :is="icon" aria-hidden="true" />
 		</IconButton>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { PanelLeftOpenIcon, PanelRightOpenIcon } from '@modrinth/assets'
+import {
+	PanelLeftCloseIcon,
+	PanelLeftOpenIcon,
+	PanelRightCloseIcon,
+	PanelRightOpenIcon,
+} from '@modrinth/assets'
 import { IconButton, useVIntl } from '@modrinth/ui'
 import type { IDockviewHeaderActionsProps } from 'dockview-vue'
 import { computed } from 'vue'
@@ -30,6 +34,10 @@ const { formatMessage } = useVIntl()
 const { leftVisible, rightVisible, topLeftGroupId, topRightGroupId, toggleSidebar } =
 	injectProjectReviewContext()
 const visible = computed(() => (props.side === 'left' ? leftVisible.value : rightVisible.value))
+const icon = computed(() => {
+	if (props.side === 'left') return visible.value ? PanelLeftCloseIcon : PanelLeftOpenIcon
+	return visible.value ? PanelRightCloseIcon : PanelRightOpenIcon
+})
 const cornerGroupId = computed(() =>
 	props.side === 'left' ? topLeftGroupId.value : topRightGroupId.value,
 )
