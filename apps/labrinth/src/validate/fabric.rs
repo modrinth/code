@@ -1,3 +1,4 @@
+use crate::database::models::DatabaseError;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::models::projects::Loader;
 use crate::validate::{
@@ -8,10 +9,6 @@ use std::io::Cursor;
 use zip::ZipArchive;
 
 pub struct FabricValidator;
-
-const FABRIC_18W43B_TIMESTAMP: i64 = 1_540_393_350;
-const LEGACY_FABRIC_1_3_TIMESTAMP: i64 = 1_343_253_600;
-const LEGACY_FABRIC_1_13_2_TIMESTAMP: i64 = 1_540_208_467;
 
 impl super::Validator for FabricValidator {
     fn get_file_extensions(&self) -> &[&str] {
@@ -82,26 +79,49 @@ fn has_bta_loader_dependency(requirement: &serde_json::Value) -> bool {
 pub(super) fn validate_game_versions(
     loaders: &[Loader],
     game_versions: &[MinecraftGameVersion],
+    all_game_versions: &[MinecraftGameVersion],
 ) -> Result<(), ValidationError> {
+    let release_date = |name: &str| {
+        all_game_versions
+        .iter()
+        .find(|version| version.version == name)
+        .map(|version| version.created)
+        .ok_or_else(|| {
+          DatabaseError::SchemaError(format!(
+            "missing minecraft game version `{name}` required for loader validation"
+          ))
+        })
+    };
+
     for loader in loaders {
-        let valid = !game_versions.is_empty()
-            && game_versions.iter().all(|version| match loader.0.as_str() {
-                "fabric" => {
-                    version.created.timestamp() >= FABRIC_18W43B_TIMESTAMP
-                }
-                "legacy-fabric" => (LEGACY_FABRIC_1_3_TIMESTAMP
-                    ..=LEGACY_FABRIC_1_13_2_TIMESTAMP)
-                    .contains(&version.created.timestamp()),
-                "babric" | "bta-babric" => version.version == "b1.7.3",
-                _ => true,
-            });
-        let requirement = match loader.0.as_str() {
-            "fabric" => "`18w43b` or later",
-            "legacy-fabric" => "between `1.3` and `1.13.2`, inclusive",
-            "babric" | "bta-babric" => "`b1.7.3` only",
+        let (valid, requirement) = match loader.0.as_str() {
+            "fabric" => {
+                let minimum = release_date("18w43b")?;
+                (
+                    game_versions
+                        .iter()
+                        .all(|version| version.created >= minimum),
+                    "`18w43b` or later",
+                )
+            }
+            "legacy-fabric" => {
+                let supported = release_date("1.3")?..=release_date("1.13.2")?;
+                (
+                    game_versions
+                        .iter()
+                        .all(|version| supported.contains(&version.created)),
+                    "between `1.3` and `1.13.2`, inclusive",
+                )
+            }
+            "babric" | "bta-babric" => (
+                game_versions
+                    .iter()
+                    .all(|version| version.version == "b1.7.3"),
+                "`b1.7.3` only",
+            ),
             _ => continue,
         };
-        if !valid {
+        if game_versions.is_empty() || !valid {
             return Err(ValidationError::InvalidInput(
                 format!(
                     "the `{}` loader requires minecraft versions {requirement}",

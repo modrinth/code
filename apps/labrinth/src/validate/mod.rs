@@ -45,6 +45,7 @@ mod rift;
 mod risugami;
 mod shader;
 
+// BTA loader must exist if HalpLibe project is selected as a dependency
 const HALPLIBE_PROJECT_ID: &str = "IIu8YulV";
 
 #[derive(Error, Debug)]
@@ -214,7 +215,11 @@ pub async fn validate_file(
 
     validate_dependencies(&loaders, dependencies)?;
 
-    fabric::validate_game_versions(&loaders, &game_versions)?;
+    fabric::validate_game_versions(
+        &loaders,
+        &game_versions,
+        &all_game_versions,
+    )?;
 
     validate_minecraft_file(
         data,
