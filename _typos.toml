@@ -34,5 +34,7 @@ Cpy = "Cpy"
 ND = "ND"
 
 [default.extend-identifiers]
+# BTA dependency project name
+HalpLibe = "HalpLibe"
 # Constant from the `zip` crate
 ZIP64_BYTES_THR = "ZIP64_BYTES_THR"
