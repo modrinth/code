@@ -11,12 +11,11 @@
 					{{ formatMessage(messages.playWithAppDescription) }}
 				</p>
 			</div>
-			<div class="flex shrink-0 flex-col gap-2 md:w-[164px]">
+			<div class="flex shrink-0 flex-col items-start gap-2">
 				<Button
 					type="colored"
 					color="brand"
 					size="lg"
-					class="w-full"
 					:disabled="disabled"
 					@click="emit('play')"
 				>

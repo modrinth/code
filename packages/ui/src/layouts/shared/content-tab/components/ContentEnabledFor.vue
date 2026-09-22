@@ -40,10 +40,12 @@ const messages = defineMessages({
 const props = withDefaults(
 	defineProps<{
 		modelValue: ContentEnabledForState
+		reserveStatusSpace?: boolean
 		disabled?: boolean
 		disabledTooltip?: string | null
 	}>(),
 	{
+		reserveStatusSpace: false,
 		disabled: false,
 		disabledTooltip: undefined,
 	},
@@ -106,7 +108,8 @@ function toggle(side: ContentSide) {
 		</button>
 
 		<span
-			v-if="modelValue.locked && disabledSides.size > 0"
+			v-if="reserveStatusSpace || (modelValue.locked && disabledSides.size > 0)"
+			:class="{ invisible: !modelValue.locked || disabledSides.size === 0 }"
 			v-tooltip="modelValue.lockedTooltip ?? formatMessage(messages.locked)"
 			class="inline-flex size-5 shrink-0 cursor-help items-center justify-center text-secondary"
 			tabindex="0"
@@ -115,7 +118,8 @@ function toggle(side: ContentSide) {
 		</span>
 
 		<span
-			v-if="modelValue.warningTooltip"
+			v-if="reserveStatusSpace || modelValue.warningTooltip"
+			:class="{ invisible: !modelValue.warningTooltip }"
 			v-tooltip="modelValue.warningTooltip"
 			class="inline-flex size-5 shrink-0 cursor-help items-center justify-center"
 			tabindex="0"

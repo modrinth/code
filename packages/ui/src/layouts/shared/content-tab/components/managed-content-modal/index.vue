@@ -610,6 +610,10 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 							:highlighted-item-id="highlightedItemId"
 							:show-selection="props.enableToggle"
 							:show-item-actions="showTableActions"
+							:get-additional-action-widths="(item) => [
+								...(externalSlicerUrls[item.id] ? [36] : []),
+								...(externalUrls[item.id] ? [36] : []),
+							]"
 							:show-version="showVersion"
 							:show-enabled-for-column="props.enableEnabledFor"
 							hide-delete
