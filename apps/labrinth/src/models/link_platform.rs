@@ -25,9 +25,7 @@ pub enum LinkPlatform {
     Paypal,
     Github,
     #[display("ko-fi")]
-    #[serde(rename = "ko-fi")]
-    #[strum(serialize = "ko-fi")]
-    Kofi,
+    KoFi,
     Other,
     Issues,
     Wiki,
@@ -45,7 +43,7 @@ impl LinkPlatform {
                 | Self::Bmac
                 | Self::Paypal
                 | Self::Github
-                | Self::Kofi
+                | Self::KoFi
                 | Self::Other
         )
     }
