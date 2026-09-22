@@ -128,32 +128,58 @@
 						class="w-fit"
 						@click="runBlockingAction('reopen', () => reopenReport())"
 					>
-						<SpinnerIcon v-if="loadingAction === 'reopen'" class="animate-spin" aria-hidden="true" />
+						<SpinnerIcon
+							v-if="loadingAction === 'reopen'"
+							class="animate-spin"
+							aria-hidden="true"
+						/>
 						<CheckCircleIcon v-else aria-hidden="true" />
 						{{ formatMessage(messages.actionReopenThread) }}
 					</Button>
 				</div>
 				<template v-else-if="!report || !report.closed">
 					<div
-						class="relative mb-2 mt-2.5 shrink-0 border-0 border-t border-solid border-divider pt-2.5"
+						class="relative mb-2 mt-2.5 shrink-0 border-0 border-t border-solid border-divider px-1 pt-2.5"
 					>
-						<MarkdownEditor
-							v-model="replyBody"
-							:initial-preview="initialPreview"
-							:disabled="generatingMessage"
-							:placeholder="
-								formatMessage(
-									sortedMessages.length > 0
-										? messages.replyEditorPlaceholderReply
-										: messages.replyEditorPlaceholderSend,
-								)
-							"
-							:on-image-upload="onUploadImage"
-						/>
+						<div
+							v-for="mode in isStaff(auth.user) ? ['reply', 'note'] : ['reply']"
+							v-show="editorMode === mode"
+							:key="`${thread.id}-${mode}`"
+						>
+							<MarkdownEditor
+								:model-value="mode === 'note' ? privateNoteBody : replyBody"
+								:initial-preview="mode === 'reply' && initialPreview"
+								:disabled="isLoading"
+								:placeholder="
+									formatMessage(
+										mode === 'note'
+											? messages.privateNotePlaceholder
+											: sortedMessages.length > 0
+												? messages.replyEditorPlaceholderReply
+												: messages.replyEditorPlaceholderSend,
+									)
+								"
+								:on-image-upload="(file) => onUploadImage(file, mode)"
+								@update:model-value="
+									mode === 'note' ? (privateNoteBody = $event) : (replyBody = $event)
+								"
+							>
+								<template v-if="isStaff(auth.user)" #after-preview>
+									<Tabs
+										v-model:value="editorMode"
+										class="!ml-auto !h-7 shrink-0 !gap-0.5 overflow-hidden !rounded-lg [&>button]:!rounded-md [&>button]:!px-2 [&>button]:!text-xs"
+										:tabs="[
+											{ value: 'reply', label: formatMessage(messages.actionReply) },
+											{ value: 'note', label: formatMessage(messages.privateNoteTab) },
+										]"
+									/>
+								</template>
+							</MarkdownEditor>
+						</div>
 					</div>
 					<div class="mx-2 mt-3 flex shrink-0 flex-col gap-4">
 						<div class="flex flex-wrap items-center justify-end gap-2">
-							<template v-if="currentMember && !currentMember.staffOnly">
+							<template v-if="editorMode === 'reply' && currentMember && !currentMember.staffOnly">
 								<template v-if="isRejected(project)">
 									<Button
 										v-if="replyBody"
@@ -172,8 +198,8 @@
 								</template>
 							</template>
 							<Button
-								v-if="isStaff(auth.user)"
-								:disabled="!replyBody || isLoading"
+								v-if="isStaff(auth.user) && editorMode === 'note'"
+								:disabled="!privateNoteBody || isLoading"
 								@click="runBlockingAction('private-note', () => sendReply(null, true))"
 							>
 								<SpinnerIcon
@@ -185,7 +211,7 @@
 								{{ formatMessage(messages.actionAddPrivateNote) }}
 							</Button>
 							<Button
-								v-if="sortedMessages.length > 0"
+								v-else-if="sortedMessages.length > 0"
 								type="colored"
 								color="brand"
 								:disabled="!replyBody || isLoading"
@@ -222,7 +248,7 @@
 							</Button>
 						</div>
 						<div
-							v-if="report || (project && isStaff(auth.user))"
+							v-if="editorMode === 'reply' && (report || (project && isStaff(auth.user)))"
 							class="flex flex-wrap items-center gap-2"
 						>
 							<template v-if="report">
@@ -413,10 +439,11 @@ import {
 	IntlFormatted,
 	MarkdownEditor,
 	NewModal,
+	Tabs,
 	TeleportOverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
-import { ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import ThreadMessage from '~/components/ui/thread/ThreadMessage.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
@@ -427,6 +454,14 @@ const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	privateNoteTab: {
+		id: 'conversation-thread.private-note.tab',
+		defaultMessage: 'Private note',
+	},
+	privateNotePlaceholder: {
+		id: 'conversation-thread.private-note.placeholder',
+		defaultMessage: 'Leave a private note for staff...',
+	},
 	resubmitModalHeaderResubmitting: {
 		id: 'conversation-thread.resubmit-modal.header.resubmitting',
 		defaultMessage: 'Resubmitting for review',
@@ -618,6 +653,9 @@ const members = computed(() => {
 })
 
 const replyBody = defineModel('replyBody', { type: String, default: '' })
+const privateNoteBody = ref('')
+const editorMode = ref('reply')
+
 const sortedMessages = computed(() => {
 	if (props.thread !== null) {
 		return props.thread.messages
@@ -660,13 +698,23 @@ async function updateThreadLocal() {
 }
 
 const imageIDs = ref([])
+const privateNoteImageIDs = ref([])
 
-async function onUploadImage(file) {
+watch(
+	() => props.thread.id,
+	() => {
+		privateNoteBody.value = ''
+		editorMode.value = 'reply'
+		imageIDs.value = []
+		privateNoteImageIDs.value = []
+	},
+)
+
+async function onUploadImage(file, mode) {
+	const draftImages = mode === 'note' ? privateNoteImageIDs : imageIDs
 	const response = await useImageUpload(file, { context: 'thread_message' })
 
-	imageIDs.value.push(response.id)
-	// Keep the last 10 entries of image IDs
-	imageIDs.value = imageIDs.value.slice(-10)
+	draftImages.value = [...draftImages.value, response.id].slice(-10)
 
 	return response.url
 }
@@ -677,19 +725,21 @@ async function sendReplyFromModal(status = null, privateMessage = false) {
 }
 
 async function sendReply(status = null, privateMessage = false) {
+	const draftBody = privateMessage ? privateNoteBody : replyBody
+	const draftImages = privateMessage ? privateNoteImageIDs : imageIDs
 	try {
 		const body = {
 			body: {
 				type: 'text',
-				body: replyBody.value,
+				body: draftBody.value,
 				private: privateMessage,
 			},
 		}
 
-		if (imageIDs.value.length > 0) {
+		if (draftImages.value.length > 0) {
 			body.body = {
 				...body.body,
-				uploaded_images: imageIDs.value,
+				uploaded_images: draftImages.value,
 			}
 		}
 
@@ -700,7 +750,8 @@ async function sendReply(status = null, privateMessage = false) {
 			body,
 		})
 
-		replyBody.value = ''
+		draftBody.value = ''
+		draftImages.value = []
 
 		await updateThreadLocal()
 		if (status !== null) {
