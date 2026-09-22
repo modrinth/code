@@ -111,7 +111,6 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon } from '@modrinth/api-client'
 import { SpinnerIcon, UploadIcon } from '@modrinth/assets'
 import { useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useIntersectionObserver, useStorage } from '@vueuse/core'
@@ -155,6 +154,7 @@ const props = defineProps<{
 const { formatMessage } = useVIntl()
 const pageContext = injectPageContext(null)
 const pageBottom = ref<HTMLElement | null>(null)
+let disposed = false
 const intercomHiddenRequestId = Symbol('server-play-bottom')
 useIntersectionObserver(pageBottom, ([entry]) => {
 	pageContext?.intercomBubble?.requestHidden?.(
@@ -163,14 +163,16 @@ useIntersectionObserver(pageBottom, ([entry]) => {
 	)
 })
 onScopeDispose(() => {
+	disposed = true
 	pageContext?.intercomBubble?.requestHidden?.(intercomHiddenRequestId, false)
 })
 const { handleError } = injectNotificationManager()
 const client = injectModrinthClient()
 const auth = injectAuth()
 const queryClient = useQueryClient()
-const { serverId, worldId, server, serverFull, busyReasons } = injectModrinthServerContext()
-const { canSetup } = useServerPermissions()
+const { serverId, worldId, server, serverFull, busyReasons, powerState, isConnected } =
+	injectModrinthServerContext()
+const { canSetup, canUsePowerActions, permissionDeniedMessage } = useServerPermissions()
 const world = computed(() => serverFull.value?.worlds.find((world) => world.id === worldId.value))
 const sharedInstanceId = computed(() => world.value?.content?.shared_instance_id ?? null)
 const needsUpdate = computed(() => world.value?.content?.shared_instance_needs_update ?? false)
@@ -213,7 +215,8 @@ const actionMutation = useMutation({
 	}) => {
 		if (busyReasons.value.length) throw new Error(formatMessage(messages.busy))
 		if (auth.user.value?.id !== userId) return
-		const sameContext = () => worldId.value === targetWorldId && auth.user.value?.id === userId
+		const sameContext = () =>
+			!disposed && worldId.value === targetWorldId && auth.user.value?.id === userId
 		let id = serverFull.value?.worlds.find((world) => world.id === targetWorldId)?.content
 			?.shared_instance_id
 		if (
@@ -222,37 +225,17 @@ const actionMutation = useMutation({
 		) {
 			const shared = await client.archon.content_v1.share(serverId, targetWorldId, configPaths)
 			id = shared.shared_instance_id
-			queryClient.setQueryData<Archon.Servers.v1.ServerFull>(
-				['servers', 'v1', 'detail', serverId],
-				(current) =>
-					current
-						? {
-								...current,
-								worlds: current.worlds.map((world) =>
-									world.id === targetWorldId && world.content
-										? {
-												...world,
-												content: {
-													...world.content,
-													shared_instance_id: shared.shared_instance_id,
-												},
-											}
-										: world,
-								),
-							}
-						: current,
-			)
-			const refresh = queryClient.invalidateQueries({
+			await queryClient.invalidateQueries({
 				queryKey: ['servers', 'v1', 'detail', serverId],
 			})
-			if (action === 'play') void refresh
-			else await refresh
 		} else if (action === 'invite' || action === 'push') {
 			throw new Error(formatMessage(messages.permission))
 		}
 		if (!id) throw new Error(formatMessage(messages.notShared))
 		if (!sameContext()) return
 		if (action === 'play') {
+			await ensureServerRunning(sameContext)
+			if (!sameContext()) return
 			await props.onPlayServer({ serverId, worldId: targetWorldId })
 		} else if (action === 'invite') {
 			await nextTick()
@@ -290,6 +273,29 @@ const actionsLocked = computed(
 		players.linkMutation.isPending.value ||
 		busyReasons.value.length > 0,
 )
+async function ensureServerRunning(sameContext: () => boolean) {
+	const deadline = Date.now() + 180_000
+	let startRequested = false
+	let sawStarting = false
+	while (sameContext()) {
+		if (busyReasons.value.length) throw new Error(formatMessage(messages.busy))
+		if (isConnected.value) {
+			const state = powerState.value
+			if (state === 'running') return
+			if (state === 'starting') sawStarting = true
+			if (sawStarting && (state === 'stopped' || state === 'crashed' || state === 'stopping')) {
+				throw new Error(formatMessage(messages.startFailed))
+			}
+			if (!startRequested && (state === 'stopped' || state === 'crashed')) {
+				if (!canUsePowerActions.value) throw new Error(permissionDeniedMessage.value)
+				startRequested = true
+				await client.archon.servers_v0.power(serverId, 'Start')
+			}
+		}
+		if (Date.now() >= deadline) throw new Error(formatMessage(messages.startTimeout))
+		await new Promise((resolve) => setTimeout(resolve, 500))
+	}
+}
 async function perform(action: Action, reviewed = false) {
 	if (!worldId.value || actionsLocked.value) return
 	if (
@@ -370,6 +376,14 @@ watch([worldId, sharedInstanceId, () => auth.user.value?.id], () => {
 	playerToRemove.value = undefined
 })
 const messages = defineMessages({
+	startFailed: {
+		id: 'servers.play.start-failed',
+		defaultMessage: 'The server stopped before it was ready. Check the console before trying again.',
+	},
+	startTimeout: {
+		id: 'servers.play.start-timeout',
+		defaultMessage: 'The server is taking too long to start. Check the console before trying again.',
+	},
 	invitedPlayersTitle: { id: 'servers.play.players.title', defaultMessage: 'Invited players' },
 	pushUpdate: { id: 'servers.play.push-update', defaultMessage: 'Push update' },
 	pushAndPlay: { id: 'servers.play.push-and-play', defaultMessage: 'Push update and play' },

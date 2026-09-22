@@ -15,7 +15,6 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon } from '@modrinth/api-client'
 import { DownloadIcon } from '@modrinth/assets'
 import {
 	type ContentDiffItem,
@@ -40,6 +39,7 @@ import {
 	useHostingInstanceCache,
 } from '@/composables/instances/use-hosting-instance'
 import { useInstanceLaunchState } from '@/composables/instances/use-instance-launch-state'
+import { handleSevereError } from '@/composables/use-error.js'
 import { toError } from '@/helpers/errors'
 import {
 	install_get_shared_instance_preview,
@@ -144,7 +144,12 @@ async function join(target: LaunchTarget, instanceId: string) {
 		address,
 	)
 	await assertAccount(target)
-	await start_join_server(instanceId, address)
+	try {
+		await start_join_server(instanceId, address)
+	} catch (error) {
+		handleSevereError(toError(error), { instanceId })
+		return
+	}
 	queryClient.setQueryData(instanceKeys.processes(instanceId), [true])
 }
 const launchMutation = useMutation({
@@ -238,13 +243,7 @@ const prepareMutation = useMutation({
 		if (!auth.session_token.value && !(await accountModal.value?.show())) return
 		const credentials = await getCredentials()
 		if (!credentials) return
-		const server =
-			queryClient.getQueryData<Archon.Servers.v1.ServerFull>([
-				'servers',
-				'v1',
-				'detail',
-				serverId,
-			]) ?? (await client.archon.servers_v1.get(serverId))
+		const server = await client.archon.servers_v1.get(serverId)
 		const world = server.worlds.find((world) => world.id === worldId && world.is_active)
 		const sharedInstanceId = world?.content?.shared_instance_id
 		if (!sharedInstanceId) throw new Error(formatMessage(messages.worldChanged))

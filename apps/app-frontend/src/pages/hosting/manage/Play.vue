@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import { injectServerPlay, ServersManagePlayPage } from '@modrinth/ui'
-import { save } from '@tauri-apps/plugin-dialog'
-import { writeFile } from '@tauri-apps/plugin-fs'
 
 import { config } from '@/config'
 
 const { play } = injectServerPlay()
 async function downloadMrpack(blob: Blob, filename: string) {
-	const path = await save({
-		defaultPath: filename,
-		filters: [{ name: 'Modrinth modpack', extensions: ['mrpack'] }],
-	})
-	if (path) await writeFile(path, new Uint8Array(await blob.arrayBuffer()))
+	const url = URL.createObjectURL(blob)
+	const anchor = document.createElement('a')
+	anchor.href = url
+	anchor.download = filename
+	document.body.appendChild(anchor)
+	anchor.click()
+	anchor.remove()
+	setTimeout(() => URL.revokeObjectURL(url), 60_000)
 }
 </script>
 
