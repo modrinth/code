@@ -28,9 +28,17 @@ export function createReviewContext(
 	let openTimer: ReturnType<typeof setTimeout> | undefined
 	let closeTimer: ReturnType<typeof setTimeout> | undefined
 	let pendingAnchor: ReviewAnchor | undefined
+	let openDropdowns = 0
 
 	function cancelClose() {
 		clearTimeout(closeTimer)
+	}
+
+	function setDropdownOpen(id: string, open: boolean) {
+		if (active.value?.id !== id) return
+		openDropdowns = Math.max(0, openDropdowns + (open ? 1 : -1))
+		if (open) cancelClose()
+		else leave(id)
 	}
 
 	function contains(target: Node) {
@@ -52,6 +60,7 @@ export function createReviewContext(
 		clearTimeout(openTimer)
 		pendingAnchor = undefined
 		active.value = undefined
+		openDropdowns = 0
 		pinned.value = false
 		if (restoreFocus) {
 			void nextTick(() => {
@@ -65,11 +74,14 @@ export function createReviewContext(
 		pendingAnchor = undefined
 		const show = () => {
 			pendingAnchor = undefined
-			if (pinned.value && !explicit) return
+			if ((pinned.value || openDropdowns > 0) && !explicit) return
 			if (!anchor.element.isConnected || !anchor.available() || !isAvailable(anchor.target)) return
 			cancelClose()
+			if (active.value?.id !== anchor.id) {
+				openDropdowns = 0
+				pinned.value = false
+			}
 			active.value = anchor
-			pinned.value = explicit
 		}
 		if (explicit) show()
 		else {
@@ -87,7 +99,7 @@ export function createReviewContext(
 		cancelClose()
 		closeTimer = setTimeout(() => {
 			if (active.value?.id !== id) return
-			if (pinned.value) return
+			if (pinned.value || openDropdowns > 0) return
 			if (
 				active.value.element.matches(':hover') ||
 				panel.value?.matches(':hover') ||
@@ -132,6 +144,7 @@ export function createReviewContext(
 		release,
 		leave,
 		cancelClose,
+		setDropdownOpen,
 		contains,
 		registerChildPanel,
 	}

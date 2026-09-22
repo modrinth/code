@@ -54,6 +54,9 @@
 							:disabled="control.disabled"
 							:aria-label="control.label"
 							:aria-required="control.required"
+							:dropdown-gap="0"
+							@open="emit('dropdown-open')"
+							@close="emit('dropdown-close')"
 							@update:model-value="panelBinding && panels.write(panelBinding, control, $event)"
 						/>
 						<Combobox
@@ -67,6 +70,9 @@
 							:disabled="control.disabled"
 							:aria-label="control.label"
 							:aria-required="control.required"
+							:dropdown-gap="0"
+							@open="emit('dropdown-open')"
+							@close="emit('dropdown-close')"
 							@update:model-value="panelBinding && panels.write(panelBinding, control, $event)"
 						/>
 					</div>
@@ -103,7 +109,12 @@
 			class="flex flex-col gap-2"
 		>
 			<p class="m-0 font-semibold text-contrast">{{ correction.panel.title }}</p>
-			<Controls :target="target" :binding="correction" />
+			<Controls
+				:target="target"
+				:binding="correction"
+				@dropdown-open="emit('dropdown-open')"
+				@dropdown-close="emit('dropdown-close')"
+			/>
 		</div>
 	</div>
 </template>
@@ -130,6 +141,10 @@ import {
 import { projectReviewMessages as messages } from '../messages'
 
 const props = defineProps<{ target: ReviewTarget; binding?: ReviewPanelBinding }>()
+const emit = defineEmits<{
+	'dropdown-open': []
+	'dropdown-close': []
+}>()
 const id = useId()
 const controlMessages = defineMessages({
 	corrections: {
