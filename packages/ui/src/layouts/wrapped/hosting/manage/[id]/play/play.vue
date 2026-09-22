@@ -378,11 +378,13 @@ watch([worldId, sharedInstanceId, () => auth.user.value?.id], () => {
 const messages = defineMessages({
 	startFailed: {
 		id: 'servers.play.start-failed',
-		defaultMessage: 'The server stopped before it was ready. Check the console before trying again.',
+		defaultMessage:
+			'The server stopped before it was ready. Check the console before trying again.',
 	},
 	startTimeout: {
 		id: 'servers.play.start-timeout',
-		defaultMessage: 'The server is taking too long to start. Check the console before trying again.',
+		defaultMessage:
+			'The server is taking too long to start. Check the console before trying again.',
 	},
 	invitedPlayersTitle: { id: 'servers.play.players.title', defaultMessage: 'Invited players' },
 	pushUpdate: { id: 'servers.play.push-update', defaultMessage: 'Push update' },

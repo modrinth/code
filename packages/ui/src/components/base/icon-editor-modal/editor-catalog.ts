@@ -1,5 +1,3 @@
-import { defineMessages, type MessageDescriptor } from '#ui/composables/i18n'
-
 import backpack from '@modrinth/assets/illustrations/instance-icons/backpack.png'
 import beacon from '@modrinth/assets/illustrations/instance-icons/beacon.png'
 import blueShark from '@modrinth/assets/illustrations/instance-icons/blue-shark.png'
@@ -49,6 +47,8 @@ import tnt from '@modrinth/assets/illustrations/instance-icons/tnt.png'
 import wrench from '@modrinth/assets/illustrations/instance-icons/wrench.png'
 import wrenchRinth from '@modrinth/assets/illustrations/instance-icons/wrench-rinth.png'
 import zombie from '@modrinth/assets/illustrations/instance-icons/zombie.png'
+
+import { defineMessages, type MessageDescriptor } from '#ui/composables/i18n'
 
 const names = defineMessages({
 	yellow: {

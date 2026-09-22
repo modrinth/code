@@ -1,4 +1,4 @@
-import { shallowRef, type ShallowRef } from 'vue'
+import { type ShallowRef, shallowRef } from 'vue'
 
 import { createContext } from './create-context'
 

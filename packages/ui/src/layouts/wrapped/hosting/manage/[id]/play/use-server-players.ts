@@ -2,7 +2,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, type Ref } from 'vue'
 
 import type { InviteLinkSettings, InvitePlayersUser } from '#ui/components/sharing'
-import { ensureServerInviteLink, sharedInstanceInvitesQueryOptions } from '#ui/layouts/shared/server-sharing'
+import {
+	ensureServerInviteLink,
+	sharedInstanceInvitesQueryOptions,
+} from '#ui/layouts/shared/server-sharing'
 import { injectAuth, injectModrinthClient } from '#ui/providers'
 
 import type { ServerPlayerRow } from './types'

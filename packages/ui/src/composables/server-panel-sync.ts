@@ -281,7 +281,9 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 						content: {
 							...world.content,
 							modloader:
-								event.platform_data.platform === 'neoforge' ? 'neo_forge' : event.platform_data.platform,
+								event.platform_data.platform === 'neoforge'
+									? 'neo_forge'
+									: event.platform_data.platform,
 							modloader_version: event.platform_data.platform_version ?? '',
 							game_version: event.platform_data.game_version,
 						},
