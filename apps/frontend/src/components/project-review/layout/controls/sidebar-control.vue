@@ -1,5 +1,5 @@
 <template>
-	<div v-if="params.group.id === cornerGroupId" class="flex h-full items-center px-1">
+	<div v-if="params.group.id === cornerGroupId" class="flex h-full items-center">
 		<IconButton
 			type="quiet"
 			size="sm"

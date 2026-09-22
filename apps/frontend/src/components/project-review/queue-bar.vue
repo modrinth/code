@@ -8,10 +8,7 @@
 			:aria-label="formatMessage(messages.queueNavigation)"
 			:aria-busy="busy"
 		>
-			<div
-				class="flex items-center gap-3 text-[0.6875rem] font-bold uppercase tracking-widest"
-				aria-live="polite"
-			>
+			<div class="flex items-center gap-3 text-[0.6875rem] font-medium" aria-live="polite">
 				<span
 					>{{ formatMessage(messages.complete) }}
 					<span class="ml-1 tabular-nums text-primary">{{

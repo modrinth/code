@@ -51,7 +51,7 @@ const theme: DockviewTheme = {
 	--dv-icon-hover-background-color: var(--surface-3);
 	--dv-tabs-container-scrollbar-color: var(--surface-5);
 	--dv-tab-divider-color: var(--surface-4);
-	--dv-tabs-and-actions-container-height: 32px;
+	--dv-tabs-and-actions-container-height: 28px;
 	--dv-tabs-and-actions-container-font-size: 13px;
 	--dv-drag-over-background-color: color-mix(in srgb, var(--color-text-default) 5%, transparent);
 	--dv-drag-over-border-color: color-mix(in srgb, var(--color-text-default) 10%, transparent);
@@ -62,7 +62,7 @@ const theme: DockviewTheme = {
 	height: auto;
 	min-height: var(--dv-tabs-and-actions-container-height);
 	align-items: flex-start;
-	padding: 8px 2px;
+	padding: 10px 2px 0 2px;
 	gap: 4px;
 }
 

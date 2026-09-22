@@ -15,6 +15,7 @@
 			<Tabs
 				:value="selectedTarget"
 				:tabs="tabs"
+				wrap
 				class="max-w-full shrink-0"
 				@update:value="selectedTarget = $event as ActionTarget"
 			/>

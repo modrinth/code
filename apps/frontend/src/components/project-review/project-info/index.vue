@@ -9,19 +9,19 @@
 		</div>
 		<p v-else-if="!project" class="m-0">{{ formatMessage(messages.empty) }}</p>
 		<template v-else>
-			<ReviewPanel mode="anchored" as="section" :target="{ kind: 'title' }" class="review-section">
+			<ReviewPanel
+				mode="anchored"
+				as="section"
+				:target="{ kind: 'title' }"
+				class="review-section !pt-1"
+			>
 				<h3 class="review-section-label">
 					{{ formatMessage(messages.titleAndSlug) }}
 				</h3>
 				<h1 class="m-0 text-xl">{{ project.name }}</h1>
 				<Slug />
 			</ReviewPanel>
-			<ReviewPanel
-				mode="anchored"
-				as="section"
-				:target="{ kind: 'icon' }"
-				class="review-section review-section-icon"
-			>
+			<ReviewPanel mode="anchored" as="section" :target="{ kind: 'icon' }" class="review-section">
 				<h3 class="review-section-label">
 					{{ formatMessage(messages.icon) }}
 				</h3>
@@ -122,13 +122,10 @@ const hasLinks = computed(() =>
 
 <style scoped>
 .review-section {
-	@apply flex flex-col gap-3 border-0 border-t border-solid border-divider px-0.5 pb-4 pt-3;
+	@apply flex flex-col gap-2 border-0 border-t border-solid border-divider px-0.5 pb-3 pt-3;
 }
 .review-section:first-child {
 	@apply border-t-0;
-}
-.review-section-icon {
-	@apply items-start gap-3;
 }
 .review-section-label {
 	@apply m-0 text-sm font-normal text-secondary;

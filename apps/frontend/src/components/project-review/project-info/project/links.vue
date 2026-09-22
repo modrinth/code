@@ -1,5 +1,5 @@
 <template>
-	<div v-if="links.length" class="flex flex-col">
+	<div v-if="links.length" class="-mt-1.5 flex flex-col">
 		<ReviewPanel
 			v-for="link in links"
 			:key="link.key"

@@ -1,7 +1,8 @@
 <template>
 	<div
 		v-if="tabs.length > 0"
-		class="inline-flex w-fit items-center overflow-x-auto rounded-xl border border-solid border-surface-5 p-0.5 shadow-sm gap-1 h-[38px]"
+		class="inline-flex w-fit items-center gap-1 rounded-xl border border-solid border-surface-5 p-0.5 shadow-sm"
+		:class="wrap ? 'h-auto max-w-full flex-wrap' : 'h-[38px] overflow-x-auto'"
 		role="tablist"
 	>
 		<button
@@ -9,14 +10,15 @@
 			:key="tab.value"
 			ref="tabButtons"
 			type="button"
-			class="flex min-h-6 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-[10px] border border-solid px-2.5 h-full text-sm font-medium outline-none transition-all active:scale-[0.97] focus-visible:ring-4 focus-visible:ring-brand-shadow disabled:cursor-not-allowed disabled:opacity-50"
-			:class="
+			class="flex min-h-6 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-[10px] border border-solid px-2.5 text-sm font-medium outline-none transition-all active:scale-[0.97] focus-visible:ring-4 focus-visible:ring-brand-shadow disabled:cursor-not-allowed disabled:opacity-50"
+			:class="[
+				wrap ? 'h-8' : 'h-full',
 				tab.value === value
 					? color === 'gray'
 						? 'border-surface-5 bg-surface-4 text-contrast'
 						: 'border-green bg-highlight-green text-green'
-					: 'border-transparent bg-transparent text-primary hover:bg-surface-4'
-			"
+					: 'border-transparent bg-transparent text-primary hover:bg-surface-4',
+			]"
 			role="tab"
 			:disabled="disabled"
 			:aria-selected="tab.value === value"
@@ -56,6 +58,7 @@ export interface TabsTab {
 const props = defineProps<{
 	value: TabsValue
 	tabs: TabsTab[]
+	wrap?: boolean
 	color?: 'green' | 'gray'
 	disabled?: boolean
 }>()
