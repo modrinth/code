@@ -31,7 +31,6 @@ use chrono::Utc;
 use futures::FutureExt;
 use futures::stream::{FuturesUnordered, StreamExt};
 use std::collections::HashSet;
-use std::error::Error;
 use std::str::FromStr;
 use std::time::Instant;
 use stripe::{self, Currency};
