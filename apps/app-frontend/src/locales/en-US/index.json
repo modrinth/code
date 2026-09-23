@@ -206,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Home and content"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Bring Modrinth App to the foreground when Minecraft exits."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Refocus app when Minecraft closes"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Startup and navigation"
   },

@@ -780,6 +780,20 @@ async function setupApp() {
 		show_worlds_tab_in_instances,
 		show_screenshots_tab_in_instances,
 		show_skin_selector_in_sidebar,
+		refocus_on_game_close,
+		compact_instance_cards,
+		show_play_time,
+		warn_on_unknown_modpacks,
+		skip_non_essential_warnings,
+		show_jump_in,
+		always_show_copy_details,
+		hide_installed_modpacks,
+		advanced_filters_collapsed,
+		dismissed_photosensitivity_filter_warning,
+		friends_active_collapsed,
+		friends_online_collapsed,
+		friends_offline_collapsed,
+		friends_pending_collapsed,
 		developer_mode,
 		feature_flags,
 		pending_update_toast_for_version,
@@ -819,6 +833,20 @@ async function setupApp() {
 	appSettings.showWorldsTabInInstances = show_worlds_tab_in_instances
 	appSettings.showScreenshotsTabInInstances = show_screenshots_tab_in_instances
 	appSettings.showSkinSelectorInSidebar = show_skin_selector_in_sidebar
+	appSettings.refocusOnGameClose = refocus_on_game_close
+	appSettings.compactInstanceCards = compact_instance_cards
+	appSettings.showPlayTime = show_play_time
+	appSettings.warnOnUnknownModpacks = warn_on_unknown_modpacks
+	appSettings.skipNonEssentialWarnings = skip_non_essential_warnings
+	appSettings.showJumpIn = show_jump_in
+	appSettings.alwaysShowCopyDetails = always_show_copy_details
+	appSettings.hideInstalledModpacks = hide_installed_modpacks
+	appSettings.advancedFiltersCollapsed = advanced_filters_collapsed
+	appSettings.dismissedPhotosensitivityFilterWarning = dismissed_photosensitivity_filter_warning
+	appSettings.friendsActiveCollapsed = friends_active_collapsed
+	appSettings.friendsOnlineCollapsed = friends_online_collapsed
+	appSettings.friendsOfflineCollapsed = friends_offline_collapsed
+	appSettings.friendsPendingCollapsed = friends_pending_collapsed
 	appSettings.devMode = developer_mode
 	stateInitialized.value = true
 	debugStartup('App state initialized')
@@ -1241,16 +1269,24 @@ watch(
 				}
 
 				if (behavior && appSettings.syncBehaviorAcrossDevices) {
-					const behaviorFeatureFlags = {
-						compact_instance_cards: behavior.compact_instance_cards,
-						show_instance_play_time: behavior.show_play_time,
-						skip_unknown_pack_warning: !behavior.warn_on_unknown_modpacks,
-						skip_non_essential_warnings: behavior.skip_non_essential_warnings,
+					const behaviorSettings = {
+						refocus_on_game_close: 'refocusOnGameClose',
+						compact_instance_cards: 'compactInstanceCards',
+						show_play_time: 'showPlayTime',
+						warn_on_unknown_modpacks: 'warnOnUnknownModpacks',
+						skip_non_essential_warnings: 'skipNonEssentialWarnings',
+					}
+					for (const [key, stateKey] of Object.entries(behaviorSettings)) {
+						const value = behavior[key] ?? settings[key]
+						appSettings[stateKey] = value
+						if (settings[key] !== value) {
+							settings[key] = value
+							settingsChanged = true
+						}
 					}
 
 					appSettings.toggleSidebar = behavior.hide_right_sidebar
 					appSettings.hideNametagSkinsPage = behavior.hide_nametag
-					Object.assign(appSettings.featureFlags, behaviorFeatureFlags)
 
 					if (settings.hide_on_process_start !== behavior.minimize_app) {
 						settings.hide_on_process_start = behavior.minimize_app
@@ -1264,20 +1300,11 @@ watch(
 						settings.hide_nametag_skins_page = behavior.hide_nametag
 						settingsChanged = true
 					}
-
-					for (const [flag, value] of Object.entries(behaviorFeatureFlags)) {
-						if (settings.feature_flags[flag] !== value) {
-							settings.feature_flags[flag] = value
-							settingsChanged = true
-						}
-					}
 				}
 
 				if (behavior && appSettings.syncFeaturesAcrossDevices) {
-					const featureFlags = {
-						worlds_in_home: behavior.show_jump_in,
-					}
 					const featureSettings = {
+						show_jump_in: 'showJumpIn',
 						show_files_tab_in_instances: 'showFilesTabInInstances',
 						show_worlds_tab_in_instances: 'showWorldsTabInInstances',
 						show_screenshots_tab_in_instances: 'showScreenshotsTabInInstances',
@@ -1291,7 +1318,6 @@ watch(
 							settingsChanged = true
 						}
 					}
-					Object.assign(appSettings.featureFlags, featureFlags)
 					if (typeof behavior.quick_instance_count === 'number') {
 						quickInstances.setLimit(behavior.quick_instance_count)
 					}
@@ -1308,13 +1334,6 @@ watch(
 							)
 							queryClient.setQueryData(syncedOptionsKeys.global, updatedGlobalSyncedOptions)
 							await queryClient.invalidateQueries({ queryKey: screenshotKeys.all })
-						}
-					}
-
-					for (const [flag, value] of Object.entries(featureFlags)) {
-						if (settings.feature_flags[flag] !== value) {
-							settings.feature_flags[flag] = value
-							settingsChanged = true
 						}
 					}
 				}

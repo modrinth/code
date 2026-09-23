@@ -32,21 +32,28 @@ const props = defineProps<{
 	signIn: () => void
 }>()
 
-type FriendsSectionCollapsedFlag =
+type FriendsSectionCollapsedSetting =
 	| 'friends_active_collapsed'
 	| 'friends_online_collapsed'
 	| 'friends_offline_collapsed'
 	| 'friends_pending_collapsed'
 
-function isFriendsSectionCollapsed(flag: FriendsSectionCollapsedFlag) {
-	return appSettings.getFeatureFlag(flag)
+const friendsSectionSettings = {
+	friends_active_collapsed: 'friendsActiveCollapsed',
+	friends_online_collapsed: 'friendsOnlineCollapsed',
+	friends_offline_collapsed: 'friendsOfflineCollapsed',
+	friends_pending_collapsed: 'friendsPendingCollapsed',
+} as const
+
+function isFriendsSectionCollapsed(setting: FriendsSectionCollapsedSetting) {
+	return appSettings[friendsSectionSettings[setting]]
 }
 
-function setFriendsSectionCollapsed(flag: FriendsSectionCollapsedFlag, collapsed: boolean) {
-	appSettings.featureFlags[flag] = collapsed
+function setFriendsSectionCollapsed(setting: FriendsSectionCollapsedSetting, collapsed: boolean) {
+	appSettings[friendsSectionSettings[setting]] = collapsed
 	getSettings()
 		.then((settings) => {
-			settings.feature_flags[flag] = collapsed
+			settings[setting] = collapsed
 			return setSettings(settings)
 		})
 		.catch(handleError)
