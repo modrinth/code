@@ -914,7 +914,9 @@ pub async fn open_link<R: Runtime>(
     let state = app.state::<RwLock<AdsState>>();
     let mut state = state.write().await;
 
-    if url::Url::parse(&path).is_ok()
+    // Only web links: other schemes hand the URL to an OS protocol handler.
+    if url::Url::parse(&path)
+        .is_ok_and(|url| matches!(url.scheme(), "http" | "https"))
         && !state.malicious_origins.contains(&origin)
         && let Some(last_click) = state.last_click
         && last_click.elapsed() < Duration::from_millis(100)
