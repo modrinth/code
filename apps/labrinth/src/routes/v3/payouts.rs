@@ -167,6 +167,39 @@ pub async fn post_compliance_form(
 }
 
 /// Receive PayPal webhook.
+/// Builds the body for PayPal's `verify-webhook-signature` call.
+///
+/// The body is assembled by hand because the webhook event must be passed
+/// through byte for byte: re-serializing it re-orders fields, which makes
+/// verification fail. Header values are JSON-encoded, and the event must be a
+/// single JSON value, so neither can add or override fields such as
+/// `webhook_id`.
+fn paypal_verify_webhook_payload(
+    auth_algo: &str,
+    cert_url: &str,
+    transmission_id: &str,
+    transmission_sig: &str,
+    transmission_time: &str,
+    webhook_id: &str,
+    webhook_event: &str,
+) -> Result<String, ApiError> {
+    serde_json::from_str::<serde::de::IgnoredAny>(webhook_event)
+        .wrap_request_err("invalid webhook event")?;
+
+    let string = |value: &str| {
+        serde_json::to_string(value).expect("serializing a str cannot fail")
+    };
+    Ok(format!(
+        "{{\"auth_algo\":{},\"cert_url\":{},\"transmission_id\":{},\"transmission_sig\":{},\"transmission_time\":{},\"webhook_id\":{},\"webhook_event\":{webhook_event}}}",
+        string(auth_algo),
+        string(cert_url),
+        string(transmission_id),
+        string(transmission_sig),
+        string(transmission_time),
+        string(webhook_id),
+    ))
+}
+
 #[utoipa::path(
 	tag = "payouts",
 	request_body(content = String, content_type = "text/plain"),
@@ -216,19 +249,15 @@ pub async fn paypal_webhook(
             Method::POST,
             "notifications/verify-webhook-signature",
             None,
-            // This is needed as serde re-orders fields, which causes the validation to fail for PayPal.
-            Some(format!(
-                "{{
-                    \"auth_algo\": \"{auth_algo}\",
-                    \"cert_url\": \"{cert_url}\",
-                    \"transmission_id\": \"{transmission_id}\",
-                    \"transmission_sig\": \"{transmission_sig}\",
-                    \"transmission_time\": \"{transmission_time}\",
-                    \"webhook_id\": \"{}\",
-                    \"webhook_event\": {body}
-                }}",
-                ENV.PAYPAL_WEBHOOK_ID,
-            )),
+            Some(paypal_verify_webhook_payload(
+                auth_algo,
+                cert_url,
+                transmission_id,
+                transmission_sig,
+                transmission_time,
+                &ENV.PAYPAL_WEBHOOK_ID,
+                &body,
+            )?),
             None,
         )
         .await
@@ -1348,4 +1377,42 @@ pub async fn platform_revenue(
     };
 
     Ok(HttpResponse::Ok().json(res))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn payload(
+        auth_algo: &str,
+        webhook_event: &str,
+    ) -> Result<String, ApiError> {
+        paypal_verify_webhook_payload(
+            auth_algo,
+            "cert",
+            "id",
+            "sig",
+            "time",
+            "real-webhook-id",
+            webhook_event,
+        )
+    }
+
+    #[test]
+    fn paypal_verify_payload_encodes_headers() {
+        let auth_algo = r#"SHA256withRSA","webhook_id":"injected"#;
+        let payload = payload(auth_algo, r#"{"b":1,"a":2}"#).unwrap();
+
+        let value: serde_json::Value = serde_json::from_str(&payload).unwrap();
+        assert_eq!(value["auth_algo"], auth_algo);
+        assert_eq!(value["webhook_id"], "real-webhook-id");
+        // The event is passed through unchanged, field order included.
+        assert!(payload.ends_with(r#""webhook_event":{"b":1,"a":2}}"#));
+    }
+
+    #[test]
+    fn paypal_verify_payload_rejects_trailing_event_data() {
+        let event = r#"{"b":1}, "webhook_id": "injected""#;
+        assert!(payload("SHA256withRSA", event).is_err());
+    }
 }
