@@ -320,7 +320,7 @@ pub(super) async fn begin_server_checkpoint(
     source_revision: i64,
     state: &State,
 ) -> crate::Result<()> {
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
     sqlx::query!(
         "DELETE FROM instance_server_projection_entries WHERE instance_id = ?",
         instance_id,

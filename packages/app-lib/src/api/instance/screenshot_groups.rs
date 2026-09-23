@@ -64,7 +64,7 @@ pub async fn create_screenshot_group(
     let name = validate_group_name(&name)?;
     let state = State::get().await?;
     let id = Uuid::new_v4().to_string();
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
 
     sqlx::query!(
         "UPDATE screenshot_groups SET display_order = display_order + 1",

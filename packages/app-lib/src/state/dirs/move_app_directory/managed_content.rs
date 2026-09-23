@@ -191,7 +191,7 @@ pub(super) async fn commit(pool: &SqlitePool) -> crate::Result<()> {
         return Ok(());
     };
     let bindings: Vec<MovedFileBinding> = serde_json::from_str(&checkpoint)?;
-    let mut tx = pool.begin().await?;
+    let mut tx = pool.begin_with("BEGIN IMMEDIATE").await?;
     for binding in bindings {
         content_store::set_file_storage(
             &mut tx,

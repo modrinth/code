@@ -267,7 +267,7 @@ async fn index_installed_sources(state: &State) -> crate::Result<()> {
         resolver
             .index_snapshot(state, &snapshot_id, snapshot.clone())
             .await?;
-        let mut tx = state.pool.begin().await?;
+        let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
         for (id, key) in &keys {
             let observation = Observation {
                 snapshot: snapshot_id.clone(),

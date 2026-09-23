@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use futures::{Stream, StreamExt, stream};
-use sqlx::Connection;
+use sqlx::SqlitePool;
 use uuid::{Uuid, fmt::Hyphenated};
 
 use super::MinecraftSkinVariant;
@@ -51,13 +51,12 @@ impl CustomMinecraftSkin {
         variant: MinecraftSkinVariant,
         cape_id: Option<Uuid>,
         insert_position: CustomMinecraftSkinInsertPosition,
-        db: impl sqlx::Acquire<'_, Database = sqlx::Sqlite>,
+        db: &SqlitePool,
     ) -> crate::Result<()> {
         let minecraft_user_id = minecraft_user_id.as_hyphenated();
         let cape_id = cape_id.map(|id| id.hyphenated());
 
-        let mut connection = db.acquire().await?;
-        let mut transaction = connection.begin_with("BEGIN IMMEDIATE").await?;
+        let mut transaction = db.begin_with("BEGIN IMMEDIATE").await?;
 
         let existing_order = sqlx::query_scalar!(
             "SELECT display_order FROM custom_minecraft_skins WHERE minecraft_user_uuid = ? AND texture_key = ?",
@@ -227,11 +226,10 @@ impl CustomMinecraftSkin {
     pub async fn set_order(
         minecraft_user_id: Uuid,
         texture_keys: &[String],
-        db: impl sqlx::Acquire<'_, Database = sqlx::Sqlite>,
+        db: &SqlitePool,
     ) -> crate::Result<()> {
         let minecraft_user_id = minecraft_user_id.as_hyphenated();
-        let mut connection = db.acquire().await?;
-        let mut transaction = connection.begin_with("BEGIN IMMEDIATE").await?;
+        let mut transaction = db.begin_with("BEGIN IMMEDIATE").await?;
 
         let existing_rows = sqlx::query!(
             "SELECT texture_key FROM custom_minecraft_skins \
