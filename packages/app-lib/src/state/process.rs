@@ -6,6 +6,9 @@ use crate::util::io::IOError;
 use crate::util::rpc::RpcServer;
 use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
 use dashmap::DashMap;
+use modrinth_sandbox::{
+    MinecraftCommand, SandboxChild, SandboxEnv, create_minecraft_command,
+};
 use quick_xml::Reader;
 use quick_xml::events::Event;
 use serde::Deserialize;
@@ -17,10 +20,10 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::ExitStatus;
 use std::sync::LazyLock;
-use std::time::Instant;
+use std::time::{Duration, Instant};
 use tempfile::TempDir;
 use tokio::io::{AsyncBufReadExt, BufReader};
-use tokio::process::{Child, Command};
+use tokio::process::Command;
 use uuid::Uuid;
 
 const LAUNCHER_LOG_PATH: &str = "launcher_log.txt";
@@ -171,7 +174,8 @@ impl ProcessManager {
         instance_id: &str,
         instance_path: &str,
         instance_name: &str,
-        mut mc_command: Command,
+        sandbox_env: &SandboxEnv,
+        mc_command: MinecraftCommand,
         post_exit_command: Option<String>,
         post_exit_env_vars: Vec<(String, String)>,
         logs_folder: PathBuf,
@@ -183,12 +187,9 @@ impl ProcessManager {
             &RpcServer,
         ) -> crate::Result<()>,
     ) -> crate::Result<ProcessMetadata> {
-        mc_command.stdout(std::process::Stdio::piped());
-        mc_command.stderr(std::process::Stdio::piped());
-        mc_command.stdin(std::process::Stdio::piped());
         let executable = mc_command
-            .as_std()
-            .get_program()
+            .jre_path
+            .join("bin/java")
             .to_string_lossy()
             .into_owned();
 
@@ -222,11 +223,12 @@ impl ProcessManager {
             writeln!(log_file).map_err(|e| IOError::with_path(e, &log_path))?;
         }
 
-        let mut mc_proc = mc_command.spawn().map_err(IOError::from)?;
+        let command = create_minecraft_command(mc_command)?;
+        let mut mc_proc = sandbox_env.spawn(command).await?;
         let child_pid = mc_proc.id();
 
-        let stdout = mc_proc.stdout.take();
-        let stderr = mc_proc.stderr.take();
+        let stdout = mc_proc.take_stdout();
+        let stderr = mc_proc.take_stderr();
 
         let mut process = Process {
             metadata: ProcessMetadata {
@@ -281,13 +283,24 @@ impl ProcessManager {
             }
         }
 
-        if let Err(e) =
-            post_process_init(&process.metadata, &process.rpc_server).await
+        let post_process_result = match tokio::time::timeout(
+            Duration::from_secs(30),
+            post_process_init(&process.metadata, &process.rpc_server),
+        )
+        .await
         {
-            tracing::error!("Failed to run post-process init: {e}");
+            Ok(result) => result,
+            Err(_) => Err(crate::ErrorKind::LauncherError(
+                "Timed out waiting for Minecraft launcher initialization"
+                    .to_owned(),
+            )
+            .as_error()),
+        };
+        if let Err(error) = post_process_result {
+            tracing::error!("Failed to run post-process init: {error}");
             clear_persisted_process(&state, persisted_process).await;
             let _ = process.child.kill().await;
-            return Err(e);
+            return Err(error);
         }
 
         let metadata = process.metadata.clone();
@@ -406,7 +419,7 @@ pub struct ProcessMetadata {
 #[derive(Debug)]
 struct Process {
     metadata: ProcessMetadata,
-    child: Child,
+    child: SandboxChild,
     _main_class_keep_alive: TempDir,
     rpc_server: RpcServer,
 }

@@ -6,7 +6,7 @@ readme = "README.md"
 
 [dependencies]
 tracing = { workspace = true }
-tokio = { workspace = true, features = ["process"] }
+tokio = { workspace = true, features = ["fs", "process"] }
 eyre = { workspace = true }
 async-trait = { workspace = true }
 derive_more = { workspace = true, features = ["debug"] }

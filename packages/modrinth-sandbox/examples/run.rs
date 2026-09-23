@@ -1,11 +1,13 @@
 use std::path::PathBuf;
 
 use eyre::{Context, Result};
-use modrinth_sandbox::SandboxCommand;
+use modrinth_sandbox::{SandboxCommand, SandboxOutput};
 use tracing::info;
 
 #[derive(Debug, clap::Parser)]
 struct Cli {
+    #[arg(long, value_name = "PATH")]
+    read_only_path: Vec<PathBuf>,
     #[arg(long, value_name = "PATH")]
     writable_path: Vec<PathBuf>,
     #[arg(long, value_name = "PATH")]
@@ -29,10 +31,24 @@ async fn main() -> Result<()> {
         .spawn(SandboxCommand {
             executable: cli.executable,
             args: cli.args,
-            read_only_paths: Vec::new(),
-            writable_paths: cli.writable_path,
+            read_only_paths: cli
+                .read_only_path
+                .into_iter()
+                .map(|path| (path.clone(), path))
+                .collect(),
+            read_write_paths: cli
+                .writable_path
+                .into_iter()
+                .map(|path| (path.clone(), path))
+                .collect(),
             working_directory: cli.working_directory,
-            allow_network: true,
+            passthrough_environment: Vec::new(),
+            extra_environment: Vec::new(),
+            output: SandboxOutput::Inherit,
+            system_runtime: true,
+            network: true,
+            graphics: true,
+            audio: true,
         })
         .await
         .context("spawning process in sandbox")?;

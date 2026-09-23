@@ -7,7 +7,7 @@ use crate::{
     state::{MemorySettings, WindowSize},
     util::{io::IOError, platform::classpath_separator},
 };
-use daedalus::minecraft::LoggingConfiguration;
+
 use daedalus::{
     get_path_from_artifact,
     minecraft::{Argument, ArgumentValue, Library, VersionType},
@@ -15,36 +15,32 @@ use daedalus::{
 };
 use dunce::canonicalize;
 use itertools::Itertools;
+use modrinth_sandbox::MINECRAFT_JVM_ARGUMENTS;
 use std::io::{BufRead, BufReader, ErrorKind};
-use std::net::SocketAddr;
-use std::{collections::HashMap, path::Path};
+
+use std::{
+    collections::HashMap,
+    path::{Path, PathBuf},
+};
 use uuid::Uuid;
 
 // Replaces the space separator with a newline character, as to not split the arguments
 const TEMPORARY_REPLACE_CHAR: &str = "\n";
 
+const LAUNCHER_MANAGED_JVM_ARGUMENTS: &[&str] = &[
+    "-Dmodrinth.internal.ipc.host",
+    "-Dmodrinth.internal.ipc.port",
+];
+
 pub fn get_class_paths(
     libraries_path: &Path,
     libraries: &[Library],
-    launcher_class_path: &[&Path],
     java_arch: &str,
     minecraft_updated: bool,
-) -> crate::Result<String> {
-    launcher_class_path
+) -> crate::Result<Vec<PathBuf>> {
+    libraries
         .iter()
-        .map(|path| {
-            Ok(canonicalize(path)
-                .map_err(|_| {
-                    crate::ErrorKind::LauncherError(format!(
-                        "Specified class path {} does not exist",
-                        path.to_string_lossy()
-                    ))
-                    .as_error()
-                })?
-                .to_string_lossy()
-                .to_string())
-        })
-        .chain(libraries.iter().filter_map(|library| {
+        .filter_map(|library| {
             if let Some(rules) = &library.rules
                 && !parse_rules(
                     rules,
@@ -60,15 +56,16 @@ pub fn get_class_paths(
                 return None;
             }
 
-            Some(get_lib_path(
-                libraries_path,
-                &library.name,
-                library.natives_os_key_and_classifiers(java_arch).is_some(),
-            ))
-        }))
-        .process_results(|iter| {
-            iter.unique().join(classpath_separator(java_arch))
+            Some(
+                get_lib_path(
+                    libraries_path,
+                    &library.name,
+                    library.natives_os_key_and_classifiers(java_arch).is_some(),
+                )
+                .map(PathBuf::from),
+            )
         })
+        .process_results(|iter| iter.unique().collect())
 }
 
 pub fn get_class_paths_jar<T: AsRef<str>>(
@@ -108,22 +105,14 @@ pub fn get_lib_path(
     Ok(path.to_string_lossy().to_string())
 }
 
-#[allow(clippy::too_many_arguments)]
 pub fn get_jvm_arguments(
     arguments: Option<&[Argument]>,
-    natives_path: &Path,
-    libraries_path: &Path,
-    log_configs_path: &Path,
-    class_paths: &str,
-    agent_path: &Path,
     version_name: &str,
     memory: MemorySettings,
     custom_args: Vec<String>,
     java_arch: &str,
     quick_play_type: &QuickPlayType,
     quick_play_version: QuickPlayVersion,
-    log_config: Option<&LoggingConfiguration>,
-    ipc_addr: SocketAddr,
 ) -> crate::Result<Vec<String>> {
     let mut parsed_arguments = Vec::new();
 
@@ -132,60 +121,16 @@ pub fn get_jvm_arguments(
             args,
             &mut parsed_arguments,
             |arg| {
-                parse_jvm_argument(
-                    arg.to_string(),
-                    natives_path,
-                    libraries_path,
-                    class_paths,
-                    version_name,
-                    java_arch,
-                )
+                Ok(parse_jvm_argument(arg.to_string(), version_name, java_arch))
             },
             java_arch,
             quick_play_type,
         )?;
-    } else {
-        parsed_arguments.push(format!(
-            "-Djava.library.path={}",
-            canonicalize(natives_path)
-                .map_err(|_| crate::ErrorKind::LauncherError(format!(
-                    "Specified natives path {} does not exist",
-                    natives_path.to_string_lossy()
-                ))
-                .as_error())?
-                .to_string_lossy()
-        ));
-        parsed_arguments.push("-cp".to_string());
-        parsed_arguments.push(class_paths.to_string());
+        parsed_arguments
+            .retain(|argument| !is_launcher_managed_jvm_argument(argument));
     }
 
     parsed_arguments.push(format!("-Xmx{}M", memory.maximum));
-
-    if let Some(LoggingConfiguration::Log4j2Xml { argument, file }) = log_config
-    {
-        let full_path = log_configs_path.join(&file.id);
-        let full_path = full_path.to_string_lossy();
-        parsed_arguments.push(argument.replace("${path}", &full_path));
-    }
-
-    parsed_arguments.push(format!(
-        "-javaagent:{}",
-        canonicalize(agent_path)
-            .map_err(|_| {
-                crate::ErrorKind::LauncherError(format!(
-                    "Specified Java Agent path {} does not exist",
-                    libraries_path.to_string_lossy()
-                ))
-                .as_error()
-            })?
-            .to_string_lossy()
-    ));
-
-    parsed_arguments
-        .push(format!("-Dmodrinth.internal.ipc.host={}", ipc_addr.ip()));
-    parsed_arguments
-        .push(format!("-Dmodrinth.internal.ipc.port={}", ipc_addr.port()));
-
     parsed_arguments.push(format!(
         "-Dmodrinth.internal.quickPlay.serverVersion={}",
         serde_json::to_value(quick_play_version.server)?
@@ -202,10 +147,17 @@ pub fn get_jvm_arguments(
         ]);
     }
 
-    for arg in custom_args {
-        if !arg.is_empty() {
-            parsed_arguments.push(arg);
+    for argument in custom_args {
+        if argument.is_empty() {
+            continue;
         }
+        if is_launcher_managed_jvm_argument(&argument) {
+            return Err(crate::ErrorKind::LauncherError(format!(
+                "Java argument `{argument}` overrides a launcher-managed option"
+            ))
+            .as_error());
+        }
+        parsed_arguments.push(argument);
     }
 
     Ok(parsed_arguments)
@@ -213,43 +165,31 @@ pub fn get_jvm_arguments(
 
 fn parse_jvm_argument(
     mut argument: String,
-    natives_path: &Path,
-    libraries_path: &Path,
-    class_paths: &str,
     version_name: &str,
     java_arch: &str,
-) -> crate::Result<String> {
+) -> String {
     argument.retain(|c| !c.is_whitespace());
-    Ok(argument
-        .replace(
-            "${natives_directory}",
-            &canonicalize(natives_path)
-                .map_err(|_| {
-                    crate::ErrorKind::LauncherError(format!(
-                        "Specified natives path {} does not exist",
-                        natives_path.to_string_lossy()
-                    ))
-                    .as_error()
-                })?
-                .to_string_lossy(),
-        )
-        .replace(
-            "${library_directory}",
-            &canonicalize(libraries_path)
-                .map_err(|_| {
-                    crate::ErrorKind::LauncherError(format!(
-                        "Specified libraries path {} does not exist",
-                        libraries_path.to_string_lossy()
-                    ))
-                    .as_error()
-                })?
-                .to_string_lossy(),
-        )
+    argument
         .replace("${classpath_separator}", classpath_separator(java_arch))
         .replace("${launcher_name}", "theseus")
         .replace("${launcher_version}", env!("CARGO_PKG_VERSION"))
         .replace("${version_name}", version_name)
-        .replace("${classpath}", class_paths))
+}
+
+fn is_launcher_managed_jvm_argument(argument: &str) -> bool {
+    let argument_name = argument
+        .find(['=', ':'])
+        .map_or(argument, |separator| &argument[..separator]);
+    let argument_name = match argument_name {
+        "--class-path" | "-classpath" => "-cp",
+        argument_name => argument_name,
+    };
+
+    MINECRAFT_JVM_ARGUMENTS.contains(&argument_name)
+        || LAUNCHER_MANAGED_JVM_ARGUMENTS.contains(&argument_name)
+        || argument.contains("${classpath}")
+        || argument.contains("${natives_directory}")
+        || argument.contains("${library_directory}")
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -354,42 +294,9 @@ fn parse_minecraft_argument(
         .replace("${user_type}", "msa")
         .replace("${version_name}", version)
         .replace("${assets_index_name}", asset_index_name)
-        .replace(
-            "${game_directory}",
-            &canonicalize(game_directory)
-                .map_err(|_| {
-                    crate::ErrorKind::LauncherError(format!(
-                        "Specified game directory {} does not exist",
-                        game_directory.to_string_lossy()
-                    ))
-                    .as_error()
-                })?
-                .to_string_lossy(),
-        )
-        .replace(
-            "${assets_root}",
-            &canonicalize(assets_directory)
-                .map_err(|_| {
-                    crate::ErrorKind::LauncherError(format!(
-                        "Specified assets directory {} does not exist",
-                        assets_directory.to_string_lossy()
-                    ))
-                    .as_error()
-                })?
-                .to_string_lossy(),
-        )
-        .replace(
-            "${game_assets}",
-            &canonicalize(assets_directory)
-                .map_err(|_| {
-                    crate::ErrorKind::LauncherError(format!(
-                        "Specified assets directory {} does not exist",
-                        assets_directory.to_string_lossy()
-                    ))
-                    .as_error()
-                })?
-                .to_string_lossy(),
-        )
+        .replace("${game_directory}", &game_directory.to_string_lossy())
+        .replace("${assets_root}", &assets_directory.to_string_lossy())
+        .replace("${game_assets}", &assets_directory.to_string_lossy())
         .replace("${version_type}", version_type.as_str())
         .replace("${resolution_width}", &resolution.0.to_string())
         .replace("${resolution_height}", &resolution.1.to_string())

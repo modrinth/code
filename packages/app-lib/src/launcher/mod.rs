@@ -23,8 +23,14 @@ use crate::util::rpc::RpcServerBuilder;
 use crate::{State, get_resource_file, process};
 use chrono::Utc;
 use daedalus as d;
-use daedalus::minecraft::{LoggingSide, RuleAction, VersionInfo};
+use daedalus::minecraft::{
+    LoggingConfiguration, LoggingSide, RuleAction, VersionInfo,
+};
 use daedalus::modded::{LoaderVersion, Manifest};
+use modrinth_sandbox::{
+    MinecraftCommand, MinecraftLoggingConfig, SANDBOX_ASSETS_PATH,
+    SANDBOX_INSTANCE_PATH, SandboxOutput,
+};
 use serde::Deserialize;
 use std::future::Future;
 use std::path::{Path, PathBuf};
@@ -35,6 +41,9 @@ pub(crate) mod hooks;
 
 pub mod download;
 pub mod quick_play_version;
+
+const THESEUS_MINECRAFT_LAUNCHER_MAIN_CLASS: &str =
+    "com.modrinth.theseus.MinecraftLaunch";
 
 // All nones -> disallowed
 // 1+ true -> allowed
@@ -931,27 +940,25 @@ pub async fn launch_minecraft(
         .join(format!("{version_jar}.jar"));
 
     let args = version_info.arguments.clone().unwrap_or_default();
-    let mut command = match wrapper {
-        Some(hook) => {
-            let mut cmd = shlex::split(hook)
-                .ok_or_else(|| {
-                    crate::ErrorKind::LauncherError(format!(
-                        "Invalid wrapper command: {hook}",
-                    ))
-                })?
-                .into_iter();
-            let mut command = Command::new(cmd.next().ok_or(
-                crate::ErrorKind::LauncherError(
-                    "Empty wrapper command".to_owned(),
-                ),
-            )?);
-            command.args(cmd);
-            command.arg(&java_version.path);
-            command
-        }
-        None => Command::new(&java_version.path),
-    };
+    if wrapper.is_some() {
+        return Err(crate::ErrorKind::LauncherError(
+            "Custom wrappers are not supported for sandboxed Minecraft launches"
+                .to_owned(),
+        )
+        .as_error());
+    }
 
+    let java_path = Path::new(&java_version.path);
+    let jre_path = java_path
+        .parent()
+        .and_then(Path::parent)
+        .ok_or_else(|| {
+            crate::ErrorKind::LauncherError(format!(
+                "Could not determine Java runtime directory from {}",
+                java_version.path
+            ))
+        })?
+        .to_path_buf();
     let env_args = Vec::from(env_args);
 
     // Check if instance has a running process, and reject running the command if it does
@@ -1031,80 +1038,97 @@ pub async fn launch_minecraft(
 
     let rpc_server = RpcServerBuilder::new().launch().await?;
 
-    command.args(
-        args::get_jvm_arguments(
-            args.get(&d::minecraft::ArgumentType::Jvm)
-                .map(|x| x.as_slice()),
-            &natives_dir,
-            &state.directories.libraries_dir(),
-            &state.directories.log_configs_dir(),
-            &args::get_class_paths(
-                &state.directories.libraries_dir(),
-                version_info.libraries.as_slice(),
-                &[&main_class_path, &client_path],
-                &java_version.architecture,
-                minecraft_updated,
-            )?,
-            &main_class_path,
-            &version_jar,
-            *memory,
-            Vec::from(java_args),
-            &java_version.architecture,
-            &quick_play_type,
-            quick_play_version,
-            version_info
-                .logging
-                .as_ref()
-                .and_then(|x| x.get(&LoggingSide::Client)),
-            rpc_server.address(),
-        )?
-        .into_iter(),
-    );
+    let mut classpath = vec![main_class_path.clone(), client_path];
+    classpath.extend(args::get_class_paths(
+        &state.directories.libraries_dir(),
+        version_info.libraries.as_slice(),
+        &java_version.architecture,
+        minecraft_updated,
+    )?);
+    let mut jvm_args = args::get_jvm_arguments(
+        args.get(&d::minecraft::ArgumentType::Jvm)
+            .map(|x| x.as_slice()),
+        &version_jar,
+        *memory,
+        Vec::from(java_args),
+        &java_version.architecture,
+        &quick_play_type,
+        quick_play_version,
+    )?;
+
+    let rpc_address = rpc_server.address();
+    jvm_args.extend([
+        format!("-Dmodrinth.internal.ipc.host={}", rpc_address.ip()),
+        format!("-Dmodrinth.internal.ipc.port={}", rpc_address.port()),
+    ]);
 
     // The java launcher requires access to java.lang.reflect in order to force access in to
     // whatever module the main class is in
     if java_version.parsed_version >= 9 {
-        command.arg("--add-opens=java.base/java.lang.reflect=ALL-UNNAMED");
+        jvm_args.push(
+            "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED".to_owned(),
+        );
     }
 
     // The java launcher code requires internal JDK code in Java 25+ in order to support JEP 512
     if java_version.parsed_version >= 25 {
-        command.arg("--add-opens=jdk.internal/jdk.internal.misc=ALL-UNNAMED");
+        jvm_args.push(
+            "--add-opens=jdk.internal/jdk.internal.misc=ALL-UNNAMED".to_owned(),
+        );
     }
 
-    command
-        .arg("com.modrinth.theseus.MinecraftLaunch")
-        .arg(version_info.main_class.clone())
-        .args(
-            args::get_minecraft_arguments(
-                args.get(&d::minecraft::ArgumentType::Game)
-                    .map(|x| x.as_slice()),
-                version_info.minecraft_arguments.as_deref(),
-                credentials,
-                &version.id,
-                &version_info.asset_index.id,
-                &instance_path,
-                &state.directories.assets_dir(),
-                &version.type_,
-                *resolution,
-                &java_version.architecture,
-                &quick_play_type,
-                quick_play_version,
-            )
-            .await?
-            .into_iter(),
-        )
-        .current_dir(instance_path.clone());
+    let game_args = args::get_minecraft_arguments(
+        args.get(&d::minecraft::ArgumentType::Game)
+            .map(|x| x.as_slice()),
+        version_info.minecraft_arguments.as_deref(),
+        credentials,
+        &version.id,
+        &version_info.asset_index.id,
+        Path::new(SANDBOX_INSTANCE_PATH),
+        Path::new(SANDBOX_ASSETS_PATH),
+        &version.type_,
+        *resolution,
+        &java_version.architecture,
+        &quick_play_type,
+        quick_play_version,
+    )
+    .await?;
 
-    // CARGO-set DYLD_LIBRARY_PATH breaks Minecraft on macOS during testing on playground
-    #[cfg(target_os = "macos")]
-    if std::env::var("CARGO").is_ok() {
-        command.env_remove("DYLD_FALLBACK_LIBRARY_PATH");
-    }
-    // Java options should be set in instance options (the existence of _JAVA_OPTIONS overwrites them)
-    command.env_remove("_JAVA_OPTIONS");
+    let mut launcher_args = Vec::with_capacity(game_args.len() + 1);
+    launcher_args.push(version_info.main_class.clone());
+    launcher_args.extend(game_args);
 
-    command.envs(env_args.iter().cloned());
+    let logging_config = version_info
+        .logging
+        .as_ref()
+        .and_then(|logging| logging.get(&LoggingSide::Client))
+        .map(|logging| match logging {
+            LoggingConfiguration::Log4j2Xml { argument, file } => {
+                MinecraftLoggingConfig {
+                    path: state.directories.log_configs_dir().join(&file.id),
+                    argument: argument.clone(),
+                }
+            }
+        });
+
+    let command = MinecraftCommand {
+        jre_path,
+        java_agent: Some(main_class_path),
+        classpath,
+        natives_path: natives_dir,
+        assets_path: state.directories.assets_dir(),
+        logging_config,
+        instance_path: instance_path.clone(),
+        jvm_args,
+        main_class: THESEUS_MINECRAFT_LAUNCHER_MAIN_CLASS.into(),
+        main_class_args: launcher_args,
+        extra_environment: env_args
+            .iter()
+            .cloned()
+            .map(|(key, value)| (key.into(), value.into()))
+            .collect(),
+        output: SandboxOutput::Piped,
+    };
 
     if let Err(error) =
         crate::api::instance::reconcile_synced_packs(&instance.id).await
@@ -1186,6 +1210,7 @@ pub async fn launch_minecraft(
             &instance.id,
             &instance.path,
             &instance.name,
+            &state.sandbox_env,
             command,
             post_exit_hook,
             env_args,

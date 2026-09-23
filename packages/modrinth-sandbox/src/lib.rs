@@ -1,12 +1,14 @@
 mod backend;
+mod minecraft;
 mod util;
 
-use std::{path::PathBuf, sync::Arc};
+use std::sync::Arc;
 
 use derive_more::Debug;
 use eyre::Result;
 
-use crate::backend::SandboxChild;
+pub use backend::{SandboxChild, SandboxCommand, SandboxOutput};
+pub use minecraft::*;
 
 /// Creates the environment and initializes the required resources to perform
 /// sandboxing.
@@ -21,20 +23,8 @@ pub async fn create_env() -> Result<SandboxEnv> {
     })
 }
 
-#[derive(Debug)]
-pub struct SandboxCommand {
-    pub executable: String,
-    pub args: Vec<String>,
-    /// Host paths mounted read-only at the same absolute path in the sandbox.
-    pub read_only_paths: Vec<PathBuf>,
-    /// Host paths mounted read-write at the same absolute path in the sandbox.
-    pub writable_paths: Vec<PathBuf>,
-    pub working_directory: Option<PathBuf>,
-    pub allow_network: bool,
-}
-
 /// Allows spawning processes in a sandboxed environment, configured by
-/// [`Sandbox`].
+/// [`SandboxCommand`].
 #[derive(Debug, Clone)]
 #[debug("{:?}", &self.inner)]
 pub struct SandboxEnv {
@@ -42,10 +32,7 @@ pub struct SandboxEnv {
 }
 
 impl SandboxEnv {
-    pub async fn spawn(
-        &self,
-        sandbox: SandboxCommand,
-    ) -> Result<Box<dyn SandboxChild>> {
-        self.inner.spawn(sandbox).await
+    pub async fn spawn(&self, command: SandboxCommand) -> Result<SandboxChild> {
+        self.inner.spawn(command).await
     }
 }
