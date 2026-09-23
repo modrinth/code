@@ -110,9 +110,6 @@
   "nags.gallery.title": {
     "defaultMessage": "Látogasd meg a Képek fület"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "A(z) {type} licencének feltétele, hogy a forráskód közzé legyen téve. Adj meg egy forráskódra mutató hivatkozást, adj hozzá forrásfájlokat, vagy válassz másik licencet."
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Adj meg egy forráskódot"
   },
@@ -354,3 +351,4 @@
     "defaultMessage": "A projektnevek nem tartalmazhatnak verziószámokat."
   }
 }
+

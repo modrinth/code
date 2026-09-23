@@ -134,6 +134,39 @@
   "nags.invalid-project-summary.title": {
     "defaultMessage": "Измените сводку"
   },
+  "nags.license-url.not-in-allowlist.title": {
+    "defaultMessage": "Проверьте ссылку на лицензию"
+  },
+  "nags.link-validation.discord-invite.title": {
+    "defaultMessage": "Замените Discord"
+  },
+  "nags.link-validation.duplicate.title": {
+    "defaultMessage": "Уберите копии ссылок"
+  },
+  "nags.link-validation.external-blocklist-match.title": {
+    "defaultMessage": "Замените ссылки"
+  },
+  "nags.link-validation.global-blocklist-match.title": {
+    "defaultMessage": "Измените ссылки"
+  },
+  "nags.link-validation.malformed.title": {
+    "defaultMessage": "Исправьте ссылки"
+  },
+  "nags.link-validation.source-repository.title": {
+    "defaultMessage": "Ссылка на репозиторий исходного кода"
+  },
+  "nags.link-validation.title": {
+    "defaultMessage": "Проверьте ссылку"
+  },
+  "nags.link-validation.unverifiable": {
+    "defaultMessage": "Не удалось проверить ссылку на {linkField, select, issues {трекер проблем} source {исходный код} wiki {вики} discord {Discord} site {сайт} store {магазин} license {лицензию} description {описание} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {поддержку}}. Проверьте её работу и доступность."
+  },
+  "nags.link-validation.unverifiable.title": {
+    "defaultMessage": "Проверьте доступность ссылки"
+  },
+  "nags.link-validation.wrong-field.title": {
+    "defaultMessage": "Исправьте ссылки"
+  },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# заголовок} few {# заголовка} other {# заголовков}} в описании слишком {count, plural, one {длинный} other {длинные}}. Заголовки должны быть краткими названиями разделов, а не предложениями."
   },
@@ -166,6 +199,9 @@
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Укажите одно разрешение"
+  },
+  "nags.project-description-content.title": {
+    "defaultMessage": "Проверьте описание"
   },
   "nags.project-description-non-english.description": {
     "defaultMessage": "Описание проекта должно быть написано или переведено на английский."
@@ -344,6 +380,9 @@
   "nags.visit-links-settings.title": {
     "defaultMessage": "Настроить ссылки"
   },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "Описание должно иметь уникальную информацию и не повторять сводку проекта."
+  },
   "project.text-validation.summary-matches-title": {
     "defaultMessage": "Сводка должна иметь уникальную информацию и не повторять название проекта."
   },
@@ -354,3 +393,4 @@
     "defaultMessage": "В названиях проектов не должно быть номеров версий."
   }
 }
+

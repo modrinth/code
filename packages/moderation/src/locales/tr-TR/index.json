@@ -1,4 +1,7 @@
 {
+  "nags.add-description.description": {
+    "defaultMessage": "Projenizin içeriğini, amacını, neden kabul edilmesini açıklayan bir açıklama gereklidir."
+  },
   "nags.add-description.title": {
     "defaultMessage": "Açıklama ekle"
   },
@@ -26,6 +29,12 @@
   "nags.add-links.title": {
     "defaultMessage": "Dış bağlantı ekle"
   },
+  "nags.adjacent-headers.description": {
+    "defaultMessage": "Aynı seviyenin başlıkları yan yana koyulmamalıdır."
+  },
+  "nags.adjacent-headers.title": {
+    "defaultMessage": "Bitişik başlıkları kaldırın"
+  },
   "nags.all-languages.description": {
     "defaultMessage": "Mevcut olan bütün dilleri seçtiniz. Lütfen sadece sunucunuzun desteklediği dilleri seçin."
   },
@@ -38,17 +47,35 @@
   "nags.check-disclosures.description": {
     "defaultMessage": "{type} açıklamanızı oyuncuların tüm önemli detaylardan haberdar olabileceği şekilde doldurun."
   },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "Açıklamaları gözden geçirin"
+  },
+  "nags.description-ends-with-header.title": {
+    "defaultMessage": "Bitiş başlığını kaldırın"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Projenizin açıklaması çok kısa. Projenin içeriğini, amacını ve cazibesini daha net bir şekilde açıklamak için daha fazla detay ekleyin."
+  },
   "nags.description-too-short.title": {
     "defaultMessage": "Açıklamayı genişlet"
   },
+  "nags.disclosures-special-formatting.title": {
+    "defaultMessage": "Açıklamanın şeklini düzeltin."
+  },
   "nags.edit-description.title": {
     "defaultMessage": "Açıklamayı düzenle"
+  },
+  "nags.edit-gallery.title": {
+    "defaultMessage": "Galeriyi düzenle"
   },
   "nags.edit-summary.title": {
     "defaultMessage": "Özeti düzenle"
   },
   "nags.edit-tags.title": {
     "defaultMessage": "Etiketleri düzenle"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "İsmi düzenle"
   },
   "nags.feature-gallery-image.description": {
     "defaultMessage": "Öne çıkarılan galeri görseli, projenizin genellikle ilk izlenimini oluşturur."
@@ -62,11 +89,23 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Kaynak kodu sun"
   },
+  "nags.invalid-gallery-text.title": {
+    "defaultMessage": "Galeri ikon testini değiştirin"
+  },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "Lisans URL'in bozuk gibi görünüyor. Lütfen geçerli bir lisans URL'i gir."
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Geçerli bir lisans bağlantısı ekle"
+  },
+  "nags.invalid-project-description.title": {
+    "defaultMessage": "Tanımlamayı değiştirin"
+  },
+  "nags.invalid-project-name.title": {
+    "defaultMessage": "Proje ismini değiştirin"
+  },
+  "nags.invalid-project-summary.title": {
+    "defaultMessage": "Özeti değiştirin"
   },
   "nags.long-headers.description": {
     "defaultMessage": "Açıklamandaki {count, plural, one {# başlık} other {# başlık}} fazla {count, plural, one {uzun} other {uzun}}. Başlıklar kısa olmalı ve tam cümleler değil, bölüm başlıkları olmalı."
@@ -97,6 +136,21 @@
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Doğru boyutu seç"
+  },
+  "nags.project-description-content.title": {
+    "defaultMessage": "Tanımlamayı gözden geçirin"
+  },
+  "nags.project-description-non-english.title": {
+    "defaultMessage": "Tanımı çevirin"
+  },
+  "nags.project-summary-content.title": {
+    "defaultMessage": "Özeti gözden geçirin"
+  },
+  "nags.project-summary-links.title": {
+    "defaultMessage": "Özet linklerini kaldırın"
+  },
+  "nags.project-summary-non-english.title": {
+    "defaultMessage": "Özeti çevirin"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "Sunucunuzun desteklediği sürümleri seçin ve bir Mod Paketi seçin ya da kendinizinkini yükleyin."
@@ -186,3 +240,4 @@
     "defaultMessage": "Bağlantı ayarlarına göz at"
   }
 }
+

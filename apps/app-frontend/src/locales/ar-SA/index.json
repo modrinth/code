@@ -53,6 +53,9 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "لم يكتمل التنزيل"
   },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "تعذر تحضير النسخة"
+  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "مسار الملف غير صالح"
   },
@@ -281,8 +284,44 @@
   "app.content.desync-pack": {
     "message": "إلغاء المزامنة"
   },
+  "app.content.sync-data-packs-disabled": {
+    "message": "يرجى تشغيل مزامنة داتا باك عبر إعدادات التطبيق."
+  },
   "app.content.sync-pack": {
     "message": "مزامنة"
+  },
+  "app.download-manager.active": {
+    "message": "فعال"
+  },
+  "app.download-manager.attention": {
+    "message": "يحتاج إلى الاهتمام"
+  },
+  "app.download-manager.cancel": {
+    "message": "إلغاء التثبيت"
+  },
+  "app.download-manager.clear-all": {
+    "message": "مسح الكل"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "مسح جميع المهام المكتملة"
+  },
+  "app.download-manager.complete": {
+    "message": "مكتمل"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "نسخة متكررة"
+  },
+  "app.download-manager.empty": {
+    "message": "لا يوجد مهام تثبيت"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "سرعة التحميل المقدرة"
+  },
+  "app.download-manager.tasks": {
+    "message": "المهام"
+  },
+  "app.download-manager.title": {
+    "message": "مدير التحميل"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "فتح مجلد النسخ الاحتياطية"
@@ -313,6 +352,15 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.features-settings.instance-pages.title": {
+    "message": "نسخ"
+  },
+  "app.features-settings.play-page.title": {
+    "message": "صفحة التشغيل"
+  },
+  "app.features-settings.sidebar.title": {
+    "message": "الشريط الجانبي"
   },
   "app.home.jump-back-in.actions.label": {
     "message": "إجراءات النسخة"
@@ -1583,6 +1631,9 @@
   "app.settings.game-options.choice.all": {
     "message": "الكل"
   },
+  "app.settings.game-options.choice.by-player": {
+    "message": "من قبل اللاعب"
+  },
   "app.settings.game-options.choice.chat": {
     "message": "المحادثة"
   },
@@ -1592,8 +1643,68 @@
   "app.settings.game-options.choice.constant": {
     "message": "ثابت"
   },
+  "app.settings.game-options.choice.crosshair": {
+    "message": "مؤشّر التصويب"
+  },
+  "app.settings.game-options.choice.custom": {
+    "message": "مخصص"
+  },
+  "app.settings.game-options.choice.decreased": {
+    "message": "ناقص"
+  },
+  "app.settings.game-options.choice.fabulous": {
+    "message": "رائع"
+  },
+  "app.settings.game-options.choice.fancy": {
+    "message": "أنيق"
+  },
+  "app.settings.game-options.choice.far": {
+    "message": "بعيد"
+  },
+  "app.settings.game-options.choice.fast": {
+    "message": "سريع"
+  },
+  "app.settings.game-options.choice.frequent": {
+    "message": "متكرر"
+  },
+  "app.settings.game-options.choice.hidden": {
+    "message": "مخفي"
+  },
+  "app.settings.game-options.choice.left": {
+    "message": "اليسار"
+  },
+  "app.settings.game-options.choice.limited": {
+    "message": "محدود"
+  },
   "app.settings.game-options.choice.max-fps": {
     "message": "الحد الأقصى لعدد الإطارات في الثانية"
+  },
+  "app.settings.game-options.choice.maximum": {
+    "message": "اقصى"
+  },
+  "app.settings.game-options.choice.never": {
+    "message": "ابداً"
+  },
+  "app.settings.game-options.choice.normal": {
+    "message": "عادي"
+  },
+  "app.settings.game-options.choice.on": {
+    "message": "مفعل"
+  },
+  "app.settings.game-options.choice.right": {
+    "message": "يمين"
+  },
+  "app.settings.game-options.choice.short": {
+    "message": "قصير"
+  },
+  "app.settings.game-options.choice.system": {
+    "message": "النظام"
+  },
+  "app.settings.game-options.choice.tiny": {
+    "message": "صغيرة جدًا"
+  },
+  "app.settings.game-options.choice.vulkan": {
+    "message": "Vulkan"
   },
   "app.settings.java-installations.location.title": {
     "message": "موقع Java {version, number}"

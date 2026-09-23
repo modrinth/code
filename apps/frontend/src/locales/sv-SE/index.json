@@ -590,6 +590,9 @@
   "app-marketing.features.mod-management.version": {
     "message": "Version"
   },
+  "app-marketing.features.open-source.description": {
+    "message": "Modrinth App är helt och hållet öppen källkod. Du kan läsa källkoden på våran <github-link>GitHub</github-link>!"
+  },
   "app-marketing.features.open-source.title": {
     "message": "Öppen källkod"
   },
@@ -631,6 +634,12 @@
   },
   "app-marketing.features.play.title": {
     "message": "Spela dina favoritmoddar"
+  },
+  "app-marketing.features.settings-sync.description": {
+    "message": "Använd samma inställningar, resurspaket och mer mellan alla dina instanser."
+  },
+  "app-marketing.features.settings-sync.title": {
+    "message": "Synkronisera dina inställningar"
   },
   "app-marketing.features.sharing.description": {
     "message": "Skapa, dela och spela modpaket från alla tusentals moddar och modpaket som finns här på Modrinth."
@@ -779,11 +788,17 @@
   "auth.reauthenticate.last-signed-in-with": {
     "message": "Det loggades senast in med {method, select, password {ett lösenord} passkey {en passkey} github {GitHub} discord {Discord} google {Google} microsoft {Microsoft} gitlab {GitLab} steam {Steam} paypal {PayPal} other {{method}} }."
   },
+  "auth.reauthenticate.page-title": {
+    "message": "Logga in igen"
+  },
   "auth.reauthenticate.sign-in-another-way": {
     "message": "Logga in på ett annat sätt"
   },
   "auth.reauthenticate.sign-in-with-provider": {
     "message": "Logga in med {provider}"
+  },
+  "auth.reauthenticate.title": {
+    "message": "{name} måste logga in igen."
   },
   "auth.reset-password.method-choice.action": {
     "message": "Skicka återställningsmejl"
@@ -2061,7 +2076,7 @@
     "message": "Du kan ha skrivit fel på samlingens URL."
   },
   "error.collection.404.list_item.2": {
-    "message": "Samlingen kanske är privat."
+    "message": "Samlingen kan vara privat."
   },
   "error.collection.404.list_item.3": {
     "message": "Samlingen kan ha tagits ner av Modrinths modereringsteam eftersom att den bryter mot våra <tou-link>användarvillkor</tou-link>."
@@ -2810,6 +2825,9 @@
   "modal.shared-instance.open-in-app.benefit.join": {
     "message": "Spela samma innehåll som dina vänner"
   },
+  "modal.shared-instance.open-in-app.benefit.update": {
+    "message": "Håll delat innehåll uppdaterat när det ändras"
+  },
   "modal.shared-instance.open-in-app.get-app": {
     "message": "Skaffa Modrinth App"
   },
@@ -3106,6 +3124,9 @@
   },
   "project-member-header.success-join": {
     "message": "Du har gått med i projektteamet"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Ditt projekt har skickats in för granskning!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Publicerings-checklista"

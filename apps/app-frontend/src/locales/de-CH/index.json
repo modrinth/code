@@ -30,55 +30,58 @@
     "message": "Wiederholen"
   },
   "app.action-bar.install.summary.app-closing": {
-    "message": "Aufgrund von Schließung der App abgebrochen"
+    "message": "Abgebrochen, da die App geschlossen wurde"
   },
   "app.action-bar.install.summary.bad-modpack-file": {
-    "message": "Modpack konnte nicht gelesen werden"
+    "message": "Das Modpack konnte nicht gelesen werden"
   },
   "app.action-bar.install.summary.canceled": {
     "message": "Abgebrochen"
   },
   "app.action-bar.install.summary.cleanup-incomplete": {
-    "message": "Bereinigung konnte nicht abgeschlossen werden"
+    "message": "Bereinigung nicht beendet"
   },
   "app.action-bar.install.summary.content-download-failed": {
-    "message": "Dateien konnten nicht heruntergeladen werden"
+    "message": "Einige Dateien konnten nicht heruntergeladen werden"
   },
   "app.action-bar.install.summary.corrupt-download": {
     "message": "Heruntergeladene Datei ist beschädigt"
   },
   "app.action-bar.install.summary.could-not-save-files": {
-    "message": "Dateien konnten nicht gespeichert werden"
+    "message": "Die Datei konnte nicht gesichert werden"
   },
   "app.action-bar.install.summary.download-failed": {
     "message": "Download konnte nicht abgeschlossen werden"
+  },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Instanz konnte nicht vorbereitet werden"
   },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Dateipfad ist ungültig"
   },
   "app.action-bar.install.summary.invalid-modpack": {
-    "message": "Daten des Modpacks sind ungültig"
+    "message": "Modpackdaten ungültig"
   },
   "app.action-bar.install.summary.invalid-modpack-files": {
-    "message": "Dateien des Modpacks enthalten ungültige Metadaten"
+    "message": "Modpackdateien haben ungültige Metadaten"
   },
   "app.action-bar.install.summary.java-setup-failed": {
     "message": "Die Einrichtung von Java konnte nicht abgeschlossen werden"
   },
   "app.action-bar.install.summary.loader-setup-failed": {
-    "message": "Einrichtung des Loaders ist fehlgeschlagen"
+    "message": "Ladevorgang fehlgeschlagen"
   },
   "app.action-bar.install.summary.local-data-error": {
     "message": "Lokale Daten konnten nicht aktualisiert werden"
   },
   "app.action-bar.install.summary.minecraft-setup-failed": {
-    "message": "Einrichtung von Minecraft ist fehlgeschlagen"
+    "message": "Einrichtung von Minecraft fehlgeschlagen"
   },
   "app.action-bar.install.summary.modrinth-unreachable": {
     "message": "Modrinth konnte nicht erreicht werden"
   },
   "app.action-bar.install.summary.no-write-permission": {
-    "message": "Keine Berechtigung zum Schreiben"
+    "message": "Keine Schreibberechtigung"
   },
   "app.action-bar.install.summary.pack-download-failed": {
     "message": "Das Pack konnte nicht heruntergeladen werden"
@@ -156,25 +159,25 @@
     "message": "Bibliothek"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Verbirgt deinen Benutzernamen über der Spielervorschau auf der Skin-Auswahlseite."
+    "message": "Verstecke deinen Benutzernamen oberhalb der Spieler-Vorschau auf der Skin-Auswahl-Seite."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Namensschild ausblenden"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimiere die Modrinth App, wenn Minecraft startet."
+    "message": "Minimiere die Modrinth-App wenn Minecraft startet."
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "App minimieren"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "Zeige an, wie lange du Instanzen gespielt hast."
+    "message": "Zeige an, wie lange du jede Instanz gespielt hast."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Spielzeit anzeigen"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Bestätigungen für risikoarme Aktionen überspringen (z. B. doppelte Installationen, normales Löschen, Massen-Updates, Entkoppeln und Reparieren). Warnungen für gefährliche Aktionen werden weiterhin angezeigt."
+    "message": "Bestätigungen für risikoarme Aktionen überspringen. Dazu gehören doppelte Installationen, normales Löschen, Massen-Updates, Entkoppeln und Reparieren. Warnungen für gefährliche Aktionen werden weiterhin angezeigt."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Unwichtige Warnungen überspringen"
@@ -246,13 +249,13 @@
     "message": "Bereits hinzugefügte Server ausblenden"
   },
   "app.browse.hide-installed-modpacks": {
-    "message": "Bereits installiert ausblenden"
+    "message": "Bereits installierte Inhalte ausblenden"
   },
   "app.browse.project-actions.label": {
     "message": "Projektaktionen"
   },
   "app.browse.project-type.data-packs": {
-    "message": "Datenpakete"
+    "message": "Datapacks"
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
@@ -292,6 +295,87 @@
   },
   "app.content.sync-resource-packs-disabled": {
     "message": "Aktiviere zuerst die Synchronisierung der Ressourcenpakete in den Einstellungen der App ein."
+  },
+  "app.download-manager.active": {
+    "message": "Aktiv"
+  },
+  "app.download-manager.attention": {
+    "message": "Erfordert Aufmerksamkeit"
+  },
+  "app.download-manager.cancel": {
+    "message": "Installation abbrechen"
+  },
+  "app.download-manager.canceling": {
+    "message": "Installation wird abgebrochen..."
+  },
+  "app.download-manager.clear-all": {
+    "message": "Alle entfernen"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Alle erledigten Aufgaben löschen"
+  },
+  "app.download-manager.complete": {
+    "message": "Fertig"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Doppelte Instanz"
+  },
+  "app.download-manager.empty": {
+    "message": "Keine Installationsaufgaben"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Geschätzte Downloadgeschwindigkeit"
+  },
+  "app.download-manager.eta": {
+    "message": "Geschätzte verbleibende Zeit für diesen Download"
+  },
+  "app.download-manager.hide": {
+    "message": "Installationsaufgaben ausblenden"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Importierte Instanz"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "Instanz Installation"
+  },
+  "app.download-manager.modpack": {
+    "message": "Modpack"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Modpack-Installation"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Neue Instanz"
+  },
+  "app.download-manager.pause": {
+    "message": "Installation pausieren"
+  },
+  "app.download-manager.paused": {
+    "message": "Pausiert"
+  },
+  "app.download-manager.remove": {
+    "message": "Aus Verlauf löschen"
+  },
+  "app.download-manager.resume": {
+    "message": "Installation fortsetzen"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Geteilte Instanz"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "Update der geteilten Instanz"
+  },
+  "app.download-manager.show": {
+    "message": "Installationsaufgaben anzeigen"
+  },
+  "app.download-manager.tasks": {
+    "message": "Aufgaben"
+  },
+  "app.download-manager.title": {
+    "message": "Download-Manager"
+  },
+  "app.download-manager.verifying": {
+    "message": "Wird überprüft"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Sicherungsordner öffnen"
@@ -2720,6 +2804,78 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Maximale gleichzeitige Schreibvorgänge"
   },
+  "app.settings.resource-management.store.attention": {
+    "message": "Einige Dateien benötigen noch Aufmerksamkeit"
+  },
+  "app.settings.resource-management.store.cache-limit.description": {
+    "message": "Behalte diese Menge an ungenutztem Inhalten für zukünftige Installationen bei. Wenn du mehr behältst, sparst du eventuell Downloadzeit."
+  },
+  "app.settings.resource-management.store.cache-limit.label": {
+    "message": "Unbenutzte Downloads behalten"
+  },
+  "app.settings.resource-management.store.cache-limit.unit": {
+    "message": "GiB"
+  },
+  "app.settings.resource-management.store.calculating": {
+    "message": "Wird berechnet"
+  },
+  "app.settings.resource-management.store.clear": {
+    "message": "Unbenutzte löschen"
+  },
+  "app.settings.resource-management.store.clear.description": {
+    "message": "Nicht genutzte Inhalte löschen"
+  },
+  "app.settings.resource-management.store.cleared": {
+    "message": "Freigabe von {size} von Speicherplatz."
+  },
+  "app.settings.resource-management.store.clearing": {
+    "message": "Wird bereinigt…"
+  },
+  "app.settings.resource-management.store.description": {
+    "message": "Spare Platz, indem du Spielinstallationen, Mods und Pakete für alle deine Instanzen wiederverwendest."
+  },
+  "app.settings.resource-management.store.empty": {
+    "message": "Installiere Mods oder Packs, um deinen Speicherverbrauch hier zu sehen."
+  },
+  "app.settings.resource-management.store.issues": {
+    "message": "Siehe {count, plural, one {# issue} other {# issues}}"
+  },
+  "app.settings.resource-management.store.nothing-to-clear": {
+    "message": "Keine ungenutzten Inhalte zum Löschen."
+  },
+  "app.settings.resource-management.store.repair": {
+    "message": "Überprüfen und reparieren"
+  },
+  "app.settings.resource-management.store.repair.running-description": {
+    "message": "Dies schließt alle laufenden Instanzen."
+  },
+  "app.settings.resource-management.store.repair.verify-description": {
+    "message": "Überprüfen Sie fehlende oder beschädigte Dateien und reparieren Sie sie."
+  },
+  "app.settings.resource-management.store.repairing": {
+    "message": "Wird überprüft und repariert…"
+  },
+  "app.settings.resource-management.store.shared.label": {
+    "message": "Geteilt"
+  },
+  "app.settings.resource-management.store.title": {
+    "message": "Inhaltsspeicher"
+  },
+  "app.settings.resource-management.store.total": {
+    "message": "{size} Gespeichert"
+  },
+  "app.settings.resource-management.store.unique.label": {
+    "message": "Einzigartig"
+  },
+  "app.settings.resource-management.store.unused.label": {
+    "message": "Nicht zugeordnet"
+  },
+  "app.settings.resource-management.store.verification-result": {
+    "message": "Überprüft {checked, plural, one {# file} other {# files}} and made {repaired, plural, one {# repair} other {# repairs}}."
+  },
+  "app.settings.resource-management.store.verified": {
+    "message": "Verifizierung erfolgreich"
+  },
   "app.settings.sidebar.label.instances": {
     "message": "Instanzen"
   },
@@ -3556,6 +3712,9 @@
   },
   "instance.files.adding-files": {
     "message": "Dateien werden hinzugefügt ({completed}/{total})"
+  },
+  "instance.files.managed-content-read-only": {
+    "message": "Verwalte deine installierten Inhalte über den Inhalte-Tab"
   },
   "instance.files.save-as": {
     "message": "Speichern unter..."

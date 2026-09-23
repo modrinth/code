@@ -1400,6 +1400,12 @@
   "external-project-license-status.yes": {
     "defaultMessage": "Da"
   },
+  "file-button.file-too-large.description": {
+    "defaultMessage": "Fajl {filename} je prevelik. Maksimalna velicina fajla je {maxSize}."
+  },
+  "file-button.file-too-large.title": {
+    "defaultMessage": "Fajl je prevelik."
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "Raspakuj rezime"
   },
@@ -2408,6 +2414,42 @@
   "instances.content-install.show-unavailable": {
     "defaultMessage": "Prikaži nedostupno"
   },
+  "instances.managed-content-modal.disabled": {
+    "defaultMessage": "Isključeno"
+  },
+  "instances.managed-content-modal.download-file": {
+    "defaultMessage": "Skini fajl"
+  },
+  "instances.managed-content-modal.empty-description": {
+    "defaultMessage": "Ovaj izvor ne sadrži sadržaj kojim se upravlja."
+  },
+  "instances.managed-content-modal.empty-title": {
+    "defaultMessage": "Sadržaj nije pronađen"
+  },
+  "instances.managed-content-modal.enabled": {
+    "defaultMessage": "Uključeno"
+  },
+  "instances.managed-content-modal.external-content": {
+    "defaultMessage": "Spoljašnje"
+  },
+  "instances.managed-content-modal.external-content-description": {
+    "defaultMessage": "Ovaj fajl nije objavljen na Modrinth-u."
+  },
+  "instances.managed-content-modal.header": {
+    "defaultMessage": "Upravljan sadržaj"
+  },
+  "instances.managed-content-modal.loading": {
+    "defaultMessage": "Učitavanje sadržaja..."
+  },
+  "instances.managed-content-modal.no-results": {
+    "defaultMessage": "Nijedan projekat ne odgovara vašoj pretrazi."
+  },
+  "instances.managed-content-modal.open-in-slicer": {
+    "defaultMessage": "Otvori u Slicer-u"
+  },
+  "instances.managed-content-modal.warnings": {
+    "defaultMessage": "Upozorenja"
+  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Upravo"
   },
@@ -2540,6 +2582,9 @@
   "label.details": {
     "defaultMessage": "Detalji"
   },
+  "label.discover-content": {
+    "defaultMessage": "Istraži sadržaj"
+  },
   "label.done": {
     "defaultMessage": "Gotovo"
   },
@@ -2554,6 +2599,9 @@
   },
   "label.error": {
     "defaultMessage": "Greška"
+  },
+  "label.explanation": {
+    "defaultMessage": "Objašnjenje"
   },
   "label.extract-failed": {
     "defaultMessage": "Neuspešno raspakovanje"
@@ -2617,6 +2665,9 @@
   },
   "label.password": {
     "defaultMessage": "Lozinka"
+  },
+  "label.permissions": {
+    "defaultMessage": "Dozvole"
   },
   "label.plan-custom": {
     "defaultMessage": "Prilagođeno"
@@ -2731,6 +2782,9 @@
   },
   "label.yes": {
     "defaultMessage": "Da"
+  },
+  "layout.account-switcher.switching": {
+    "defaultMessage": "Menjanje naloga..."
   },
   "locale.cs-CZ": {
     "defaultMessage": "Češki"
@@ -3002,6 +3056,33 @@
   "notification.error.title": {
     "defaultMessage": "Došlo je do greške"
   },
+  "notifications.actor.unknown": {
+    "defaultMessage": "Neko"
+  },
+  "notifications.close": {
+    "defaultMessage": "Zatvori"
+  },
+  "notifications.dismiss": {
+    "defaultMessage": "Skloni obaveštenje"
+  },
+  "notifications.friend-request.body": {
+    "defaultMessage": "<actor>{actor}</actor> vam je poslao/la zahtev za prijateljstvo."
+  },
+  "notifications.instance-ready.launch-game": {
+    "defaultMessage": "Pokreni igru"
+  },
+  "notifications.instance-ready.open-instance": {
+    "defaultMessage": "Instanca"
+  },
+  "notifications.instance-ready.status": {
+    "defaultMessage": "Instalirano i spremno za igru."
+  },
+  "notifications.invite.accept": {
+    "defaultMessage": "Prihvati"
+  },
+  "notifications.invite.decline": {
+    "defaultMessage": "Odbij"
+  },
   "omorphia.component.badge.label.accepted": {
     "defaultMessage": "Prihvaćeno"
   },
@@ -3148,6 +3229,48 @@
   },
   "payment-method.visa": {
     "defaultMessage": "Viza"
+  },
+  "profile.bio.fallback.creator": {
+    "defaultMessage": "Modrinth kreator."
+  },
+  "profile.bio.fallback.user": {
+    "defaultMessage": "Modrinth korisnik."
+  },
+  "profile.block-user.admonition-body": {
+    "defaultMessage": "{username} nece moci da vam šalje zahteve za prijateljstvo, poziva vas u zajedničke instance niti da vas poziva na Modrinth Hosting servere."
+  },
+  "profile.block-user.admonition-title": {
+    "defaultMessage": "Da li ste sigurni da želite blokirati ovog korisnika?"
+  },
+  "profile.block-user.error-description": {
+    "defaultMessage": "Došlo je do greške pri blokiranju korisnika. Molimo vas pokušajte ponovo."
+  },
+  "profile.block-user.error-title": {
+    "defaultMessage": "Blokiranje korisnika nije uspelo"
+  },
+  "profile.block-user.success-description": {
+    "defaultMessage": "{username} je uspešno blokiran."
+  },
+  "profile.block-user.success-title": {
+    "defaultMessage": "Korisnik blokiran"
+  },
+  "profile.block-user.title": {
+    "defaultMessage": "Blokiraj {username}"
+  },
+  "profile.button.analytics": {
+    "defaultMessage": "Pregled analitike korisnika"
+  },
+  "profile.button.block": {
+    "defaultMessage": "Blokiraj"
+  },
+  "profile.button.create-collection": {
+    "defaultMessage": "Napravi kolekciju"
+  },
+  "profile.button.create-project": {
+    "defaultMessage": "Napravi projekat"
+  },
+  "profile.button.info": {
+    "defaultMessage": "Pregled detalja korisnika"
   },
   "profile.details.error.github-profile-message": {
     "defaultMessage": "Profil sa GitHub-a nije mogao biti preuzet. Molimo pokušajte ponovo."

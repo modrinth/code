@@ -276,7 +276,7 @@
     "defaultMessage": "Ripara"
   },
   "button.repairing": {
-    "defaultMessage": "Riparando..."
+    "defaultMessage": "Riparazione..."
   },
   "button.report": {
     "defaultMessage": "Segnala"
@@ -1358,6 +1358,12 @@
   "external-project-license-status.yes": {
     "defaultMessage": "Sì"
   },
+  "file-button.file-too-large.description": {
+    "defaultMessage": "{filename} è troppo grande. La dimensione massima supportata è {maxSize}."
+  },
+  "file-button.file-too-large.title": {
+    "defaultMessage": "File troppo grande"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "Riepilogo dell'estrazione"
   },
@@ -2253,7 +2259,7 @@
     "defaultMessage": "Scollega"
   },
   "installation-settings.verifying": {
-    "defaultMessage": "Verificando..."
+    "defaultMessage": "Verifica..."
   },
   "instance.confirm-reinstall.admonition-body": {
     "defaultMessage": "Reinstallare reimposterà tutti i contenuti installati o modificati a quelli forniti dal pacchetto di mod, rimuovendo qualsiasi mod o contenuti aggiunti all'installazione originale."
@@ -3285,7 +3291,7 @@
     "defaultMessage": "Affiliato"
   },
   "profile.label.badges": {
-    "defaultMessage": "Distintivi"
+    "defaultMessage": "Medaglie"
   },
   "profile.label.collection": {
     "defaultMessage": "Raccolta"
@@ -3297,13 +3303,13 @@
     "defaultMessage": "Iscrizione"
   },
   "profile.label.no-collections": {
-    "defaultMessage": "Nessuna raccolta qui!"
+    "defaultMessage": "Nessuna raccolta"
   },
   "profile.label.no-collections-auth-description": {
     "defaultMessage": "Ancora nessuna raccolta."
   },
   "profile.label.no-projects": {
-    "defaultMessage": "Nessun progetto qui!"
+    "defaultMessage": "Nessun progetto"
   },
   "profile.label.no-projects-auth-description": {
     "defaultMessage": "Ancora nessun progetto."

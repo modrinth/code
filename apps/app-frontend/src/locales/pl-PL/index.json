@@ -53,6 +53,9 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Nie można było ukończyć pobierania"
   },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Nie udało się przygotować instancji"
+  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Ścieżka plików jest niewłaściwa"
   },
@@ -258,7 +261,7 @@
     "message": "Paczki modów"
   },
   "app.browse.project-type.mods": {
-    "message": "Modyfikacje"
+    "message": "Mody"
   },
   "app.browse.project-type.resource-packs": {
     "message": "Paczki zasobów"
@@ -292,6 +295,87 @@
   },
   "app.content.sync-resource-packs-disabled": {
     "message": "Najpierw włącz synchronizację paczek zasobów w ustawieniach aplikacji."
+  },
+  "app.download-manager.active": {
+    "message": "Aktywne"
+  },
+  "app.download-manager.attention": {
+    "message": "Wymaga działania"
+  },
+  "app.download-manager.cancel": {
+    "message": "Przerwij instalację"
+  },
+  "app.download-manager.canceling": {
+    "message": "Przerywanie instalacji"
+  },
+  "app.download-manager.clear-all": {
+    "message": "Wyczyść wszystko"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Wyczyść wszystkie ukończone zadania"
+  },
+  "app.download-manager.complete": {
+    "message": "Gotowe"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Duplikuj instancję"
+  },
+  "app.download-manager.empty": {
+    "message": "Brak zadań instalacyjnych"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Szacowana prędkość pobierania"
+  },
+  "app.download-manager.eta": {
+    "message": "Szacowany czas pozostały na pobranie"
+  },
+  "app.download-manager.hide": {
+    "message": "Ukryj zadania instalacji"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Importowana instancja"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "Instalacja instancji"
+  },
+  "app.download-manager.modpack": {
+    "message": "Paczka modów"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Instalacja paczki modów"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Nowa instancja"
+  },
+  "app.download-manager.pause": {
+    "message": "Wstrzymaj instalacje"
+  },
+  "app.download-manager.paused": {
+    "message": "Wstrzymano"
+  },
+  "app.download-manager.remove": {
+    "message": "Usuń z historii"
+  },
+  "app.download-manager.resume": {
+    "message": "Wznów instalację"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Współdzielona instancja"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "Aktualizacja współdzielonej instancji"
+  },
+  "app.download-manager.show": {
+    "message": "Pokaż zadania instalacji"
+  },
+  "app.download-manager.tasks": {
+    "message": "Zadania"
+  },
+  "app.download-manager.title": {
+    "message": "Menedżer pobierania"
+  },
+  "app.download-manager.verifying": {
+    "message": "Weryfikowanie"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Otwórz folder kopii zapasowych"
@@ -696,7 +780,7 @@
     "message": "Awatar użytkownika {username}"
   },
   "app.instance.share.remove-user-modal.warning-body": {
-    "message": "Jeśli cofniesz dostęp dla {username} do tej współdzielonej instalacji, będziesz musiał zaprosić go ponownie, aby mógł otrzymać aktualizację."
+    "message": "Jeśli pozbawisz użytkownika {username} dostępu do tej współdzielonej instancji, musisz zaprosić go ponownie, aby mógł otrzymywać aktualizacje."
   },
   "app.instance.share.sign-in.button": {
     "message": "Zaloguj się"
@@ -1362,7 +1446,7 @@
     "message": "Przeciągnij, aby wyświetlić ostatnie instancje"
   },
   "app.quick-instance-switcher.drag-tooltip": {
-    "message": "Przeciągnij, by zmienić rozmiar"
+    "message": "Przeciągnij, aby zmienić rozmiar"
   },
   "app.quick-instance-switcher.instance-locked": {
     "message": "Ta instancja jest zablokowana"
@@ -2708,6 +2792,78 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Maksymalna liczba równoczesnych operacji na dysku"
   },
+  "app.settings.resource-management.store.attention": {
+    "message": "Niektóre pliki nadal wymagają uwagi"
+  },
+  "app.settings.resource-management.store.cache-limit.description": {
+    "message": "Zachowaj do tej bardzo nieużywanej zawartości dla przyszłych instalacji. Zachowywanie więcej może zaoszczędzić czas pobierania."
+  },
+  "app.settings.resource-management.store.cache-limit.label": {
+    "message": "Zachowaj nieużywane pobierania"
+  },
+  "app.settings.resource-management.store.cache-limit.unit": {
+    "message": "GiB"
+  },
+  "app.settings.resource-management.store.calculating": {
+    "message": "Obliczanie"
+  },
+  "app.settings.resource-management.store.clear": {
+    "message": "Wyczyść nieużywane"
+  },
+  "app.settings.resource-management.store.clear.description": {
+    "message": "Usuń niewykorzystane pobrane treści"
+  },
+  "app.settings.resource-management.store.cleared": {
+    "message": "Zwolniono {size} miejsca na dysku."
+  },
+  "app.settings.resource-management.store.clearing": {
+    "message": "Czyszczenie…"
+  },
+  "app.settings.resource-management.store.description": {
+    "message": "Oszczędzaj miejsce poprzez ponowne użycie instalacji gry, modów i paczek w swoich instancjach."
+  },
+  "app.settings.resource-management.store.empty": {
+    "message": "Zainstaluj mody lub paczki, aby zobaczyć użycie miejsca na dysku."
+  },
+  "app.settings.resource-management.store.issues": {
+    "message": "{count, plural, one {# godzina} few {# godziny} other {# godzin}}"
+  },
+  "app.settings.resource-management.store.nothing-to-clear": {
+    "message": "Brak niewykorzystanej zawartości do usunięcia."
+  },
+  "app.settings.resource-management.store.repair": {
+    "message": "Zweryfikuj i napraw"
+  },
+  "app.settings.resource-management.store.repair.running-description": {
+    "message": "Spowoduje to zamknięcie wszystkich uruchomionych instancji."
+  },
+  "app.settings.resource-management.store.repair.verify-description": {
+    "message": "Sprawdź, czy nie ma brakujących lub uszkodzonych plików i napraw je."
+  },
+  "app.settings.resource-management.store.repairing": {
+    "message": "Weryfikacja i naprawa…"
+  },
+  "app.settings.resource-management.store.shared.label": {
+    "message": "Współdzielone"
+  },
+  "app.settings.resource-management.store.title": {
+    "message": "Magazyn zawartości"
+  },
+  "app.settings.resource-management.store.total": {
+    "message": "{size} przechowywane"
+  },
+  "app.settings.resource-management.store.unique.label": {
+    "message": "Unikalne"
+  },
+  "app.settings.resource-management.store.unused.label": {
+    "message": "Nieużywany"
+  },
+  "app.settings.resource-management.store.verification-result": {
+    "message": "Sprawdzono {checked, plural, one {# plik} few {# pliki} other {# plików}} i wykonano {repaired, plural, one {# naprawę} few {# naprawy} other {# napraw}}."
+  },
+  "app.settings.resource-management.store.verified": {
+    "message": "Weryfikacja zakończona"
+  },
   "app.settings.sidebar.label.instances": {
     "message": "Instancje"
   },
@@ -3544,6 +3700,9 @@
   },
   "instance.files.adding-files": {
     "message": "Dodawanie plików ({completed}/{total})"
+  },
+  "instance.files.managed-content-read-only": {
+    "message": "Zarządzaj swoimi zainstalowanymi zasobami poprzez zakładkę \"Zawartość\""
   },
   "instance.files.save-as": {
     "message": "Zapisz jako..."

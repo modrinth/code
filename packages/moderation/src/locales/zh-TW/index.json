@@ -110,9 +110,6 @@
   "nags.gallery.title": {
     "defaultMessage": "前往圖庫頁面"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "你的{type}使用的授權條款要求必須公開原始碼。請提供原始碼連結、附加原始碼檔案，或是更換授權條款。"
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "提供原始碼"
   },
@@ -147,7 +144,7 @@
     "defaultMessage": "避免品牌侵權"
   },
   "nags.missing-alt-text.description": {
-    "defaultMessage": "您的部分圖片缺少替代文字，這對於無障礙存取至關重要，特別是對視障用戶而言。"
+    "defaultMessage": "你的部分圖片缺少替代文字，替代文字對於無障礙體驗至關重要，是協助視障使用者的重要工具。"
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "新增圖片替代文字"
@@ -166,6 +163,9 @@
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "選擇正確的解析度"
+  },
+  "nags.project-description-content.title": {
+    "defaultMessage": "檢查描述"
   },
   "nags.project-description-non-english.description": {
     "defaultMessage": "專案描述必須以英文撰寫或附上英文翻譯。"
@@ -344,6 +344,9 @@
   "nags.visit-links-settings.title": {
     "defaultMessage": "前往連結設定"
   },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "專案描述應提供獨特資訊，避免重複摘要內容。"
+  },
   "project.text-validation.summary-matches-title": {
     "defaultMessage": "專案摘要應提供獨特資訊，避免重複專案名稱。"
   },
@@ -354,3 +357,4 @@
     "defaultMessage": "專案名稱不應包含版本號碼。"
   }
 }
+

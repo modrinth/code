@@ -53,6 +53,9 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Download interrotto"
   },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Impossibile preparare l'istanza"
+  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Percorso del file non valido"
   },
@@ -156,7 +159,7 @@
     "message": "Libreria"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Nasconde il tuo nome dall'anteprima nella pagina del selettore skin."
+    "message": "Nascondi il tuo nome dall'anteprima nella pagina del selettore skin."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Nascondi nome"
@@ -292,6 +295,87 @@
   },
   "app.content.sync-resource-packs-disabled": {
     "message": "Attiva prima la sincronizzazione dei pacchetti di risorse nelle impostazioni."
+  },
+  "app.download-manager.active": {
+    "message": "Attivi"
+  },
+  "app.download-manager.attention": {
+    "message": "Richiede attenzione"
+  },
+  "app.download-manager.cancel": {
+    "message": "Annulla installazione"
+  },
+  "app.download-manager.canceling": {
+    "message": "Annullamento installazione…"
+  },
+  "app.download-manager.clear-all": {
+    "message": "Rimuovi tutto"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Rimuovi i download completati"
+  },
+  "app.download-manager.complete": {
+    "message": "Completati"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Istanza duplicata"
+  },
+  "app.download-manager.empty": {
+    "message": "Nessun processo"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Velocità di download stimata"
+  },
+  "app.download-manager.eta": {
+    "message": "Tempo residuo stimato per il download"
+  },
+  "app.download-manager.hide": {
+    "message": "Nascondi i processi"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Istanza importata"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "Installazione istanza"
+  },
+  "app.download-manager.modpack": {
+    "message": "Pacchetto di mod"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Installazione pacchetto"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Nuova istanza"
+  },
+  "app.download-manager.pause": {
+    "message": "Pausa installazione"
+  },
+  "app.download-manager.paused": {
+    "message": "In pausa"
+  },
+  "app.download-manager.remove": {
+    "message": "Rimuovi dalla cronologia"
+  },
+  "app.download-manager.resume": {
+    "message": "Riprendi installazione"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Istanza condivisa"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "Aggiornamento istanza condivisa"
+  },
+  "app.download-manager.show": {
+    "message": "Mostra i processi"
+  },
+  "app.download-manager.tasks": {
+    "message": "Processi"
+  },
+  "app.download-manager.title": {
+    "message": "Gestore di download"
+  },
+  "app.download-manager.verifying": {
+    "message": "Verifica"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Apri la cartella dei backup"
@@ -531,7 +615,7 @@
     "message": "Invia aggiornamento"
   },
   "app.instance.admonitions.shared-instance.review-description": {
-    "message": "Revisiona i contenuti modificati che saranno condivisi con l'intera istanza."
+    "message": "Rivedi i contenuti modificati che saranno condivisi con l'intera istanza."
   },
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Revisione modifiche"
@@ -2714,6 +2798,78 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Massimo di scritture simultanee"
   },
+  "app.settings.resource-management.store.attention": {
+    "message": "Alcuni file richiedono attenzione"
+  },
+  "app.settings.resource-management.store.cache-limit.description": {
+    "message": "Memorizzane fino a questo limite. Risparmia tempo sul download delle installazioni future."
+  },
+  "app.settings.resource-management.store.cache-limit.label": {
+    "message": "Tieni i contenuti inutilizzati"
+  },
+  "app.settings.resource-management.store.cache-limit.unit": {
+    "message": "GiB"
+  },
+  "app.settings.resource-management.store.calculating": {
+    "message": "Calcolo"
+  },
+  "app.settings.resource-management.store.clear": {
+    "message": "Rimuovi inutilizzati"
+  },
+  "app.settings.resource-management.store.clear.description": {
+    "message": "Elimina i contenuti scaricati non utilizzati"
+  },
+  "app.settings.resource-management.store.cleared": {
+    "message": "Liberati {size} di spazio sul disco."
+  },
+  "app.settings.resource-management.store.clearing": {
+    "message": "Pulizia…"
+  },
+  "app.settings.resource-management.store.description": {
+    "message": "Risparmia spazio riutilizzando le installazioni, le mod e i pacchetti tra le istanze."
+  },
+  "app.settings.resource-management.store.empty": {
+    "message": "Installa delle mod o dei pacchetti per vedere l'utilizzo di archiviazione qui."
+  },
+  "app.settings.resource-management.store.issues": {
+    "message": "Mostra {count, plural, one {# problema} other {# problemi}}"
+  },
+  "app.settings.resource-management.store.nothing-to-clear": {
+    "message": "Nessun contenuto inutilizzato da rimuovere."
+  },
+  "app.settings.resource-management.store.repair": {
+    "message": "Verifica e ripara"
+  },
+  "app.settings.resource-management.store.repair.running-description": {
+    "message": "Le istanze in esecuzione saranno chiuse."
+  },
+  "app.settings.resource-management.store.repair.verify-description": {
+    "message": "Controlla per file mancanti o danneggiati e riparali."
+  },
+  "app.settings.resource-management.store.repairing": {
+    "message": "Verifica e riparazione…"
+  },
+  "app.settings.resource-management.store.shared.label": {
+    "message": "Condivisi"
+  },
+  "app.settings.resource-management.store.title": {
+    "message": "Spazio di archiviazione"
+  },
+  "app.settings.resource-management.store.total": {
+    "message": "{size} utilizzati"
+  },
+  "app.settings.resource-management.store.unique.label": {
+    "message": "Univoci"
+  },
+  "app.settings.resource-management.store.unused.label": {
+    "message": "Inutilizzati"
+  },
+  "app.settings.resource-management.store.verification-result": {
+    "message": "{checked, plural, one {Controllato #} other {Controllati #}} file e fatto {repaired, plural, one {# riparazione} other {# riparazioni}}."
+  },
+  "app.settings.resource-management.store.verified": {
+    "message": "Verifica completata"
+  },
   "app.settings.sidebar.label.instances": {
     "message": "Istanze"
   },
@@ -3551,6 +3707,9 @@
   "instance.files.adding-files": {
     "message": "Aggiungendo i file ({completed}/{total})..."
   },
+  "instance.files.managed-content-read-only": {
+    "message": "Gestisci i contenuti installati dalla scheda Contenuti"
+  },
   "instance.files.save-as": {
     "message": "Salva come..."
   },
@@ -3846,7 +4005,7 @@
     "message": "Modifica i pacchetti sincronizzati"
   },
   "instance.settings.synced-options.packs-override": {
-    "message": "Disattiva la sovrascrittura per modificare i pacchetti sincronizzati. I pacchetti indipendenti possono essere gestiti nella scheda contenuti."
+    "message": "Disattiva la sovrascrittura per modificare i pacchetti sincronizzati. I pacchetti indipendenti possono essere gestiti nella scheda Contenuti."
   },
   "instance.settings.synced-options.resource-packs": {
     "message": "Desincronizza i pacchetti di risorse"
@@ -4161,7 +4320,7 @@
     "message": "Seleziona i file di configurazione"
   },
   "instance.shared-instance.publish-review.description": {
-    "message": "Revisiona i contenuti modificati e scegli i file di configurazione da includere nell'aggiornamento."
+    "message": "Rivedi i contenuti modificati e scegli i file di configurazione da includere nell'aggiornamento."
   },
   "instance.shared-instance.publish-review.header": {
     "message": "Revisione modifiche"
