@@ -20,7 +20,7 @@ use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::disclosures::{
     DisclosureLockStatus, ProjectDisclosure, ProjectDisclosureType,
 };
-use crate::models::ids::{ProjectId, ProjectRef, VersionId};
+use crate::models::ids::{ProjectId, VersionId};
 use crate::models::images::ImageContext;
 use crate::models::link_platform::LinkPlatform;
 use crate::models::notifications::NotificationBody;
@@ -254,23 +254,11 @@ pub async fn projects_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let project_refs = serde_json::from_str::<Vec<ProjectRef>>(&ids.ids)
+    let ids = serde_json::from_str::<Vec<&str>>(&ids.ids)
         .wrap_request_err("deserializing JSON data")?;
-    let project_ids = db_models::DBProject::resolve_refs(
-        &project_refs,
-        pool.as_ref(),
-        redis.as_ref(),
-    )
-    .await
-    .wrap_internal_err("resolving project references")?
-    .into_iter()
-    .flatten()
-    .map(DBProjectId::from)
-    .collect::<Vec<_>>();
-    let projects_data =
-        db_models::DBProject::get_many_ids(&project_ids, &**pool, &redis)
-            .await
-            .wrap_internal_err("fetching requested projects")?;
+    let projects_data = db_models::DBProject::get_many(&ids, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching requested projects")?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -299,7 +287,7 @@ pub async fn projects_get(
 #[get("/{id}")]
 pub async fn project_get(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -309,25 +297,16 @@ pub async fn project_get(
 
 pub async fn project_get_internal(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<Project>, ApiError> {
-    let (project_ref,) = info.into_inner();
-    let project_id = db_models::DBProject::resolve_ref(
-        &project_ref,
-        pool.as_ref(),
-        redis.as_ref(),
-    )
-    .await
-    .wrap_internal_err("resolving project reference")?
-    .wrap_not_found_err("resource not found")?;
-    let project_data =
-        db_models::DBProject::get_id(project_id.into(), &**pool, &redis)
-            .await
-            .wrap_internal_err("failed to fetch project")?
-            .wrap_not_found_err("resource not found")?;
+    let (string,) = info.into_inner();
+
+    let project_data = db_models::DBProject::get(&string, &**pool, &redis)
+        .await
+        .wrap_internal_err("failed to fetch project")?;
     let user_option = get_user_from_headers(
         &req,
         &**pool,
@@ -339,11 +318,12 @@ pub async fn project_get_internal(
     .map(|(_, user)| user)
     .ok();
 
-    if is_visible_project(&project_data.inner, &user_option, &pool, false)
-        .await
-        .wrap_internal_err("failed to check project visibility")?
+    if let Some(data) = project_data
+        && is_visible_project(&data.inner, &user_option, &pool, false)
+            .await
+            .wrap_internal_err("failed to check project visibility")?
     {
-        return Ok(web::Json(Project::from(project_data)));
+        return Ok(web::Json(Project::from(data)));
     }
     Err(ApiError::NotFound(eyre::eyre!("resource not found")))
 }
@@ -442,7 +422,7 @@ pub struct EditProject {
 #[patch("/{id}")]
 pub async fn project_edit(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     web::Json(new_project): web::Json<EditProject>,
     redis: web::Data<RedisPool>,
@@ -464,7 +444,7 @@ pub async fn project_edit(
 
 pub async fn project_edit_internal(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     web::Json(new_project): web::Json<EditProject>,
     redis: web::Data<RedisPool>,
@@ -490,17 +470,8 @@ pub async fn project_edit_internal(
         ApiError::Request(eyre!(message))
     })?;
 
-    let (project_ref,) = info.into_inner();
-    let project_id = db_models::DBProject::resolve_ref(
-        &project_ref,
-        pool.as_ref(),
-        redis.as_ref(),
-    )
-    .await
-    .wrap_internal_err("resolving project reference")?
-    .wrap_not_found_err("resource not found")?;
     let Some(mut project_item) =
-        db_models::DBProject::get_id(project_id.into(), &**pool, &redis)
+        db_models::DBProject::get(&info.into_inner().0, &**pool, &redis)
             .await
             .wrap_internal_err("fetching project")?
     else {
@@ -969,17 +940,14 @@ pub async fn project_edit_internal(
             )));
         }
 
-        let slug_ref = ProjectRef(slug.clone());
-        let existing = db_models::DBProject::resolve_ref(
-            &slug_ref,
+        let existing = db_models::DBProject::get(
+            &slug.to_lowercase(),
             &mut transaction,
             &redis,
         )
         .await
         .wrap_internal_err("checking project slug availability")?;
-        if existing.is_some_and(|existing_id| {
-            db_ids::DBProjectId::from(existing_id) != id
-        }) {
+        if existing.is_some() {
             return Err(ApiError::Request(eyre::eyre!(
                 "Slug collides with other project's id!",
             )));
@@ -987,9 +955,7 @@ pub async fn project_edit_internal(
 
         // Make sure the new slug is different from the old one
         // We are able to unwrap here because the slug is always set
-        if !slug.eq_ignore_ascii_case(
-            &project_item.inner.slug.clone().unwrap_or_default(),
-        ) {
+        if !slug.eq(&project_item.inner.slug.clone().unwrap_or_default()) {
             let results = sqlx::query!(
                 "
                 SELECT EXISTS(
@@ -1723,7 +1689,7 @@ pub async fn project_search_post(
 )]
 #[get("/{id}/check")]
 pub async fn project_get_check(
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
@@ -1731,26 +1697,20 @@ pub async fn project_get_check(
 }
 
 pub async fn project_get_check_internal(
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let (project_ref,) = info.into_inner();
-    let project_id = db_models::DBProject::resolve_ref(
-        &project_ref,
-        pool.as_ref(),
-        redis.as_ref(),
-    )
-    .await
-    .wrap_internal_err("resolving project reference")?
-    .wrap_not_found_err("resource not found")?;
-    let project_data =
-        db_models::DBProject::get_id(project_id.into(), &**pool, &redis)
-            .await
-            .wrap_internal_err("fetching project from database")?;
+    let slug = info.into_inner().0;
 
-    if project_data.is_some() {
-        Ok(HttpResponse::Ok().json(ProjectCheckResponse { id: project_id }))
+    let project_data = db_models::DBProject::get(&slug, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching project from database")?;
+
+    if let Some(project) = project_data {
+        Ok(HttpResponse::Ok().json(ProjectCheckResponse {
+            id: models::ids::ProjectId::from(project.inner.id),
+        }))
     } else {
         Err(ApiError::NotFound(eyre::eyre!("resource not found")))
     }
@@ -1770,7 +1730,7 @@ pub struct DependencyInfo {
 #[get("/{project_id}/dependencies")]
 pub async fn dependency_list(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
@@ -1782,27 +1742,17 @@ pub async fn dependency_list(
 
 pub async fn dependency_list_internal(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let (project_ref,) = info.into_inner();
-    let project_id = db_models::DBProject::resolve_ref(
-        &project_ref,
-        &***ro_pool,
-        redis.as_ref(),
-    )
-    .await
-    .wrap_internal_err("resolving project reference")?;
-    let result = if let Some(project_id) = project_id {
-        db_models::DBProject::get_id(project_id.into(), &***ro_pool, &redis)
-            .await
-            .wrap_internal_err("fetching project from database")?
-    } else {
-        None
-    };
+    let string = info.into_inner().0;
+
+    let result = db_models::DBProject::get(&string, &***ro_pool, &redis)
+        .await
+        .wrap_internal_err("fetching project from database")?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -1978,27 +1928,12 @@ pub async fn projects_edit(
         .map_err(|err| eyre::eyre!(err))
         .wrap_request_err("validating request")?;
 
-    let project_refs = serde_json::from_str::<Vec<ProjectRef>>(&ids.ids)
-        .wrap_request_err("deserializing JSON data")?;
-    let resolved_project_ids = db_models::DBProject::resolve_refs(
-        &project_refs,
-        pool.as_ref(),
-        redis.as_ref(),
-    )
-    .await
-    .wrap_internal_err("resolving project references")?;
-    let project_ids = project_refs
-        .iter()
-        .zip(resolved_project_ids)
-        .map(|(project_ref, project_id)| {
-            project_id.map(DBProjectId::from).ok_or_else(|| {
-                ApiError::Request(eyre::eyre!(format!(
-                    "Project {} not found",
-                    project_ref.as_str()
-                )))
-            })
-        })
-        .collect::<Result<Vec<_>, _>>()?;
+    let project_ids: Vec<db_ids::DBProjectId> =
+        serde_json::from_str::<Vec<ProjectId>>(&ids.ids)
+            .wrap_request_err("deserializing JSON data")?
+            .into_iter()
+            .map(|x| x.into())
+            .collect();
 
     let projects_data =
         db_models::DBProject::get_many_ids(&project_ids, &**pool, &redis)
@@ -2324,7 +2259,7 @@ pub struct Extension {
 pub async fn project_icon_edit(
     web::Query(ext): web::Query<Extension>,
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     file_host: web::Data<dyn FileHost>,
@@ -2349,7 +2284,7 @@ pub async fn project_icon_edit(
 pub async fn project_icon_edit_internal(
     web::Query(ext): web::Query<Extension>,
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     file_host: web::Data<dyn FileHost>,
@@ -2367,24 +2302,14 @@ pub async fn project_icon_edit_internal(
     .await
     .wrap_auth_err("authenticating API request")?
     .1;
-    let (project_ref,) = info.into_inner();
-    let project_id = db_models::DBProject::resolve_ref(
-        &project_ref,
-        pool.as_ref(),
-        redis.as_ref(),
-    )
-    .await
-    .wrap_internal_err("resolving project reference")?
-    .wrap_request_err_with(|| {
-        "the specified project does not exist!".to_string()
-    })?;
-    let project_item =
-        db_models::DBProject::get_id(project_id.into(), &**pool, &redis)
-            .await
-            .wrap_internal_err("fetching project from database")?
-            .wrap_request_err_with(|| {
-                "the specified project does not exist!".to_string()
-            })?;
+    let string = info.into_inner().0;
+
+    let project_item = db_models::DBProject::get(&string, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching project from database")?
+        .wrap_request_err_with(|| {
+            "the specified project does not exist!".to_string()
+        })?;
 
     if !user.role.is_mod() {
         let (team_member, organization_team_member) =
@@ -2491,7 +2416,7 @@ pub async fn project_icon_edit_internal(
 #[delete("/{id}/icon")]
 pub async fn delete_project_icon(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     file_host: web::Data<dyn FileHost>,
@@ -2512,7 +2437,7 @@ pub async fn delete_project_icon(
 
 pub async fn delete_project_icon_internal(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     file_host: web::Data<dyn FileHost>,
@@ -2529,24 +2454,14 @@ pub async fn delete_project_icon_internal(
     .await
     .wrap_auth_err("authenticating API request")?
     .1;
-    let (project_ref,) = info.into_inner();
-    let project_id = db_models::DBProject::resolve_ref(
-        &project_ref,
-        pool.as_ref(),
-        redis.as_ref(),
-    )
-    .await
-    .wrap_internal_err("resolving project reference")?
-    .wrap_request_err_with(|| {
-        "the specified project does not exist!".to_string()
-    })?;
-    let project_item =
-        db_models::DBProject::get_id(project_id.into(), &**pool, &redis)
-            .await
-            .wrap_internal_err("fetching project from database")?
-            .wrap_request_err_with(|| {
-                "the specified project does not exist!".to_string()
-            })?;
+    let string = info.into_inner().0;
+
+    let project_item = db_models::DBProject::get(&string, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching project from database")?
+        .wrap_request_err_with(|| {
+            "the specified project does not exist!".to_string()
+        })?;
 
     if !user.role.is_mod() {
         let (team_member, organization_team_member) =
@@ -2653,7 +2568,7 @@ pub async fn add_gallery_item(
     web::Query(ext): web::Query<Extension>,
     req: HttpRequest,
     web::Query(item): web::Query<GalleryCreateQuery>,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     file_host: web::Data<dyn FileHost>,
@@ -2680,7 +2595,7 @@ pub async fn add_gallery_item_internal(
     web::Query(ext): web::Query<Extension>,
     req: HttpRequest,
     web::Query(item): web::Query<GalleryCreateQuery>,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     file_host: web::Data<dyn FileHost>,
@@ -2702,24 +2617,14 @@ pub async fn add_gallery_item_internal(
     .await
     .wrap_auth_err("authenticating API request")?
     .1;
-    let (project_ref,) = info.into_inner();
-    let project_id = db_models::DBProject::resolve_ref(
-        &project_ref,
-        pool.as_ref(),
-        redis.as_ref(),
-    )
-    .await
-    .wrap_internal_err("resolving project reference")?
-    .wrap_request_err_with(|| {
-        "the specified project does not exist!".to_string()
-    })?;
-    let project_item =
-        db_models::DBProject::get_id(project_id.into(), &**pool, &redis)
-            .await
-            .wrap_internal_err("fetching project from database")?
-            .wrap_request_err_with(|| {
-                "the specified project does not exist!".to_string()
-            })?;
+    let string = info.into_inner().0;
+
+    let project_item = db_models::DBProject::get(&string, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching project from database")?
+        .wrap_request_err_with(|| {
+            "the specified project does not exist!".to_string()
+        })?;
 
     if project_item.gallery_items.len() > 64 {
         return Err(ApiError::Auth(eyre::eyre!(
@@ -2907,7 +2812,6 @@ pub struct GalleryEditQuery {
 #[patch("/{id}/gallery")]
 pub async fn edit_gallery_item(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
     web::Query(item): web::Query<GalleryEditQuery>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -2916,7 +2820,6 @@ pub async fn edit_gallery_item(
 ) -> Result<HttpResponse, ApiError> {
     edit_gallery_item_internal(
         req,
-        info,
         web::Query(item),
         pool,
         redis,
@@ -2928,7 +2831,6 @@ pub async fn edit_gallery_item(
 
 pub async fn edit_gallery_item_internal(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
     web::Query(item): web::Query<GalleryEditQuery>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -2950,26 +2852,6 @@ pub async fn edit_gallery_item_internal(
         .map_err(|err| eyre::eyre!(err))
         .wrap_request_err("validating request")?;
 
-    let (project_ref,) = info.into_inner();
-    let project_id = db_models::DBProject::resolve_ref(
-        &project_ref,
-        pool.as_ref(),
-        redis.as_ref(),
-    )
-    .await
-    .wrap_internal_err("resolving project reference")?
-    .wrap_request_err_with(|| {
-        "the specified project does not exist!".to_string()
-    })?;
-    let project_id = DBProjectId::from(project_id);
-    let project_item =
-        db_models::DBProject::get_id(project_id, &**pool, &redis)
-            .await
-            .wrap_internal_err("fetching project from database")?
-            .wrap_request_err_with(|| {
-                "the specified project does not exist!".to_string()
-            })?;
-
     let result = sqlx::query!(
         "
         SELECT id, mod_id FROM mods_gallery
@@ -2980,12 +2862,22 @@ pub async fn edit_gallery_item_internal(
     .fetch_optional(&**pool)
     .await
     .wrap_internal_err("querying database for `edit_gallery_item_internal`")?
-    .filter(|item| DBProjectId(item.mod_id) == project_id)
     .wrap_request_err_with(|| {
         format!(
             "gallery item at URL `{}` is not part of the project's gallery",
             item.url
         )
+    })?;
+
+    let project_item = db_models::DBProject::get_id(
+        database::models::DBProjectId(result.mod_id),
+        &**pool,
+        &redis,
+    )
+    .await
+    .wrap_internal_err("fetching project from database")?
+    .wrap_request_err_with(|| {
+        "the specified project does not exist!".to_string()
     })?;
 
     if !user.role.is_mod() {
@@ -3148,7 +3040,6 @@ pub struct GalleryDeleteQuery {
 #[delete("/{id}/gallery")]
 pub async fn delete_gallery_item(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
     web::Query(item): web::Query<GalleryDeleteQuery>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -3158,7 +3049,6 @@ pub async fn delete_gallery_item(
 ) -> Result<HttpResponse, ApiError> {
     delete_gallery_item_internal(
         req,
-        info,
         web::Query(item),
         pool,
         redis,
@@ -3171,7 +3061,6 @@ pub async fn delete_gallery_item(
 
 pub async fn delete_gallery_item_internal(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
     web::Query(item): web::Query<GalleryDeleteQuery>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -3190,26 +3079,6 @@ pub async fn delete_gallery_item_internal(
     .wrap_auth_err("authenticating API request")?
     .1;
 
-    let (project_ref,) = info.into_inner();
-    let project_id = db_models::DBProject::resolve_ref(
-        &project_ref,
-        pool.as_ref(),
-        redis.as_ref(),
-    )
-    .await
-    .wrap_internal_err("resolving project reference")?
-    .wrap_request_err_with(|| {
-        "the specified project does not exist!".to_string()
-    })?;
-    let project_id = DBProjectId::from(project_id);
-    let project_item =
-        db_models::DBProject::get_id(project_id, &**pool, &redis)
-            .await
-            .wrap_internal_err("fetching project from database")?
-            .wrap_request_err_with(|| {
-                "the specified project does not exist!".to_string()
-            })?;
-
     let item = sqlx::query!(
         "
         SELECT id, image_url, raw_image_url, mod_id FROM mods_gallery
@@ -3220,12 +3089,22 @@ pub async fn delete_gallery_item_internal(
     .fetch_optional(&**pool)
     .await
     .wrap_internal_err("querying database for `delete_gallery_item_internal`")?
-    .filter(|item| DBProjectId(item.mod_id) == project_id)
     .wrap_request_err_with(|| {
         format!(
             "gallery item at URL `{}` is not part of the project's gallery",
             item.url
         )
+    })?;
+
+    let project_item = db_models::DBProject::get_id(
+        database::models::DBProjectId(item.mod_id),
+        &**pool,
+        &redis,
+    )
+    .await
+    .wrap_internal_err("fetching project from database")?
+    .wrap_request_err_with(|| {
+        "the specified project does not exist!".to_string()
     })?;
 
     if !user.role.is_mod() {
@@ -3322,7 +3201,7 @@ pub async fn delete_gallery_item_internal(
 #[delete("/{id}")]
 pub async fn project_delete(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -3334,7 +3213,7 @@ pub async fn project_delete(
 
 pub async fn project_delete_internal(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -3349,7 +3228,7 @@ pub async fn project_delete_internal(
     )
     .await
     .wrap_auth_err("authenticating API request")?;
-    let (project_ref,) = info.into_inner();
+    let string = info.into_inner().0;
 
     // In two cases, we return `The specified project does not exist!`:
     // - the project really doesn't exist
@@ -3359,19 +3238,10 @@ pub async fn project_delete_internal(
     // because our permissions tests assert that failing under the 2nd use                  case
     // gives a 401 or 404, but `Request` gives only a 400.
 
-    let project_id = db_models::DBProject::resolve_ref(
-        &project_ref,
-        pool.as_ref(),
-        redis.as_ref(),
-    )
-    .await
-    .wrap_internal_err("resolving project reference")?
-    .wrap_auth_err("the specified project does not exist")?;
-    let project =
-        db_models::DBProject::get_id(project_id.into(), &**pool, &redis)
-            .await
-            .wrap_internal_err("failed to get project")?
-            .wrap_auth_err("the specified project does not exist")?;
+    let project = db_models::DBProject::get(&string, &**pool, &redis)
+        .await
+        .wrap_internal_err("failed to get project")?
+        .wrap_auth_err("the specified project does not exist")?;
 
     if !user.role.is_admin() {
         let (team_member, organization_team_member) =
@@ -3604,18 +3474,6 @@ pub async fn project_delete_internal(
     .await
     .wrap_internal_err("failed to delete project from collections_mods")?;
 
-    let redirect_identifiers = sqlx::query_scalar!(
-        r#"
-        SELECT identifier
-        FROM project_redirects
-        WHERE target_project_id = $1
-        "#,
-        project.inner.id as db_ids::DBProjectId,
-    )
-    .fetch_all(&mut transaction)
-    .await
-    .wrap_internal_err("fetching project redirect identifiers")?;
-
     let result = db_models::DBProject::remove(
         project.inner.id,
         &mut transaction,
@@ -3638,9 +3496,6 @@ pub async fn project_delete_internal(
         )
         .await
         .wrap_internal_err("clearing cached data from Redis")?;
-        db_models::DBProject::clear_ref_cache(&redirect_identifiers, &redis)
-            .await
-            .wrap_internal_err("clearing cached project redirects")?;
         search_state
             .queue
             .push_project_removal(project.inner.id.into())
@@ -3659,7 +3514,7 @@ pub async fn project_delete_internal(
 #[post("/{id}/follow")]
 pub async fn project_follow(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -3669,7 +3524,7 @@ pub async fn project_follow(
 
 pub async fn project_follow_internal(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -3684,24 +3539,14 @@ pub async fn project_follow_internal(
     .await
     .wrap_auth_err("authenticating API request")?
     .1;
-    let (project_ref,) = info.into_inner();
-    let project_id = db_models::DBProject::resolve_ref(
-        &project_ref,
-        pool.as_ref(),
-        redis.as_ref(),
-    )
-    .await
-    .wrap_internal_err("resolving project reference")?
-    .wrap_request_err_with(|| {
-        "the specified project does not exist!".to_string()
-    })?;
-    let project =
-        db_models::DBProject::get_id(project_id.into(), &**pool, &redis)
-            .await
-            .wrap_internal_err("fetching project from database")?
-            .wrap_request_err_with(|| {
-                "the specified project does not exist!".to_string()
-            })?;
+    let string = info.into_inner().0;
+
+    let project = db_models::DBProject::get(&string, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching project from database")?
+        .wrap_request_err_with(|| {
+            "the specified project does not exist!".to_string()
+        })?;
 
     let user_id: db_ids::DBUserId = user.id.into();
     let project_id: db_ids::DBProjectId = project.inner.id;
@@ -3774,7 +3619,7 @@ pub async fn project_follow_internal(
 #[delete("/{id}/follow")]
 pub async fn project_unfollow(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -3784,7 +3629,7 @@ pub async fn project_unfollow(
 
 pub async fn project_unfollow_internal(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -3799,24 +3644,14 @@ pub async fn project_unfollow_internal(
     .await
     .wrap_auth_err("authenticating API request")?
     .1;
-    let (project_ref,) = info.into_inner();
-    let project_id = db_models::DBProject::resolve_ref(
-        &project_ref,
-        pool.as_ref(),
-        redis.as_ref(),
-    )
-    .await
-    .wrap_internal_err("resolving project reference")?
-    .wrap_request_err_with(|| {
-        "the specified project does not exist!".to_string()
-    })?;
-    let project =
-        db_models::DBProject::get_id(project_id.into(), &**pool, &redis)
-            .await
-            .wrap_internal_err("fetching project from database")?
-            .wrap_request_err_with(|| {
-                "the specified project does not exist!".to_string()
-            })?;
+    let string = info.into_inner().0;
+
+    let project = db_models::DBProject::get(&string, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching project from database")?
+        .wrap_request_err_with(|| {
+            "the specified project does not exist!".to_string()
+        })?;
 
     let user_id: db_ids::DBUserId = user.id.into();
     let project_id = project.inner.id;
@@ -3881,7 +3716,7 @@ pub async fn project_unfollow_internal(
 #[get("/{id}/organization")]
 pub async fn project_get_organization(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -3898,24 +3733,13 @@ pub async fn project_get_organization(
     .ok();
     let user_id = current_user.as_ref().map(|x| x.id.into());
 
-    let (project_ref,) = info.into_inner();
-    let project_id = db_models::DBProject::resolve_ref(
-        &project_ref,
-        pool.as_ref(),
-        redis.as_ref(),
-    )
-    .await
-    .wrap_internal_err("resolving project reference")?
-    .wrap_request_err_with(|| {
-        "the specified project does not exist!".to_string()
-    })?;
-    let result =
-        db_models::DBProject::get_id(project_id.into(), &**pool, &redis)
-            .await
-            .wrap_internal_err("fetching project from database")?
-            .wrap_request_err_with(|| {
-                "the specified project does not exist!".to_string()
-            })?;
+    let string = info.into_inner().0;
+    let result = db_models::DBProject::get(&string, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching project from database")?
+        .wrap_request_err_with(|| {
+            "the specified project does not exist!".to_string()
+        })?;
 
     if !is_visible_project(&result.inner, &current_user, &pool, false)
         .await

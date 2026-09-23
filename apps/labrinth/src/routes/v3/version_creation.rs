@@ -13,14 +13,14 @@ use crate::database::models::{self, DBOrganization, image_item};
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::exp;
-use crate::models::ids::{ImageId, ProjectId, ProjectRef, VersionId};
+use crate::models::ids::{ImageId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::notifications::NotificationBody;
 use crate::models::pack::PackFileHash;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    Dependency, DependencyAttribution, FileType, Loader, Version, VersionFile,
-    VersionStatus, VersionType,
+    Dependency, FileType, Loader, Version, VersionFile, VersionStatus,
+    VersionType,
 };
 use crate::models::projects::{DependencyType, skip_nulls};
 use crate::models::teams::ProjectPermissions;
@@ -48,20 +48,10 @@ fn default_requested_status() -> VersionStatus {
     VersionStatus::Listed
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, utoipa::ToSchema)]
-pub struct DependencyRequest {
-    pub version_id: Option<VersionId>,
-    pub project_id: Option<ProjectRef>,
-    pub file_name: Option<String>,
-    pub dependency_type: DependencyType,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub attribution: Option<DependencyAttribution>,
-}
-
 #[derive(Serialize, Deserialize, Validate, Clone)]
 pub struct InitialVersionData {
     #[serde(alias = "mod_id")]
-    pub project_id: Option<ProjectRef>,
+    pub project_id: Option<ProjectId>,
     #[validate(length(min = 1, max = 256))]
     pub file_parts: Vec<String>,
     #[validate(
@@ -82,7 +72,7 @@ pub struct InitialVersionData {
         length(min = 0, max = 4096),
         custom(function = "crate::util::validate::validate_deps")
     )]
-    pub dependencies: Vec<DependencyRequest>,
+    pub dependencies: Vec<Dependency>,
     #[serde(alias = "version_type")]
     pub release_channel: VersionType,
     #[validate(length(min = 1))]
@@ -226,7 +216,6 @@ async fn version_create_inner(
 {
     let mut initial_version_data = None;
     let mut version_builder = None;
-    let mut response_dependencies = None;
     let mut selected_loaders = None;
 
     let user = get_user_from_headers(
@@ -278,19 +267,17 @@ async fn version_create_inner(
                     ));
                 }
 
-                let project_ref = version_create_data.project_id.as_ref().unwrap();
-                let project_id = models::DBProject::resolve_ref(
-                    project_ref,
-                    &mut *transaction,
-                    redis,
-                )
-                .await?
-                .ok_or_else(|| {
-                    CreateError::InvalidInput(
+                let project_id: models::DBProjectId = version_create_data.project_id.unwrap().into();
+
+                // Ensure that the project this version is being added to exists
+                if models::DBProject::get_id(project_id, &mut *transaction, redis)
+                    .await?
+                    .is_none()
+                {
+                    return Err(CreateError::InvalidInput(
                         "An invalid project id was supplied".to_string(),
-                    )
-                })?;
-                let project_id: models::DBProjectId = project_id.into();
+                    ));
+                }
 
                 // Check that the user creating this version is a team member
                 // of the project the version is being added to.
@@ -388,65 +375,16 @@ async fn version_create_inner(
                     &mut loader_field_enum_values,
                 )?;
 
-                let dependency_project_refs = version_create_data
+                let dependencies = version_create_data
                     .dependencies
                     .iter()
-                    .filter_map(|dependency| dependency.project_id.clone())
-                    .collect::<Vec<_>>();
-                let mut resolved_dependency_project_ids =
-                    models::DBProject::resolve_refs(
-                        &dependency_project_refs,
-                        &mut *transaction,
-                        redis,
-                    )
-                    .await?
-                    .into_iter();
-                let mut dependencies =
-                    Vec::with_capacity(version_create_data.dependencies.len());
-                let mut canonical_dependencies =
-                    Vec::with_capacity(version_create_data.dependencies.len());
-                let mut unique_dependencies = HashSet::new();
-                for dependency in &version_create_data.dependencies {
-                    let dependency_project_id = if dependency.project_id.is_some()
-                    {
-                        Some(
-                            resolved_dependency_project_ids
-                                .next()
-                                .flatten()
-                                .ok_or_else(|| {
-                                    CreateError::InvalidInput(
-                                        "An invalid project id was supplied"
-                                            .to_string(),
-                                    )
-                                })?,
-                        )
-                    } else {
-                        None
-                    };
-                    if !unique_dependencies.insert((
-                        dependency.version_id,
-                        dependency_project_id,
-                        dependency.file_name.clone(),
-                    )) {
-                        return Err(CreateError::InvalidInput(
-                            "duplicate dependency".to_string(),
-                        ));
-                    }
-                    dependencies.push(models::version_item::DependencyBuilder {
-                        version_id: dependency.version_id.map(Into::into),
-                        project_id: dependency_project_id.map(Into::into),
-                        dependency_type: dependency.dependency_type.to_string(),
+                    .map(|d| models::version_item::DependencyBuilder {
+                        version_id: d.version_id.map(|x| x.into()),
+                        project_id: d.project_id.map(|x| x.into()),
+                        dependency_type: d.dependency_type.to_string(),
                         file_name: None,
-                    });
-                    canonical_dependencies.push(Dependency {
-                        version_id: dependency.version_id,
-                        project_id: dependency_project_id,
-                        file_name: dependency.file_name.clone(),
-                        dependency_type: dependency.dependency_type,
-                        attribution: dependency.attribution.clone(),
-                    });
-                }
-                response_dependencies = Some(canonical_dependencies);
+                    })
+                    .collect::<Vec<_>>();
 
                 version_builder = Some(VersionBuilder {
                     version_id: version_id.into(),
@@ -611,7 +549,7 @@ async fn version_create_inner(
                 file_type: file.file_type,
             })
             .collect::<Vec<_>>(),
-        dependencies: response_dependencies.unwrap_or_default(),
+        dependencies: version_data.dependencies,
         loaders: version_data.loaders,
         fields: version_data.fields,
         components: exp::VersionQuery::default(),

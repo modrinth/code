@@ -8,7 +8,7 @@ use crate::database::models::{
 };
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::collections::{Collection, CollectionStatus};
-use crate::models::ids::{CollectionId, ProjectId, ProjectRef};
+use crate::models::ids::{CollectionId, ProjectId};
 use crate::models::pats::Scopes;
 use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
@@ -54,7 +54,7 @@ pub struct CollectionCreateData {
     #[validate(length(max = 1024))]
     #[serde(default = "Vec::new")]
     /// A list of initial projects to use with the created collection
-    pub projects: Vec<ProjectRef>,
+    pub projects: Vec<String>,
 }
 
 #[utoipa::path(tag = "collections", responses((status = OK)))]
@@ -91,22 +91,21 @@ pub async fn collection_create(
         CreateError::InvalidInput(validation_errors_to_string(err, None))
     })?;
 
-    let initial_project_ids = project_item::DBProject::resolve_refs(
-        &collection_create_data.projects,
-        client.as_ref(),
-        redis.as_ref(),
-    )
-    .await
-    .wrap_internal_err("failed to fetch created projects")?
-    .into_iter()
-    .flatten()
-    .unique()
-    .collect::<Vec<ProjectId>>();
-
     let mut transaction = client.begin().await?;
 
     let collection_id: CollectionId =
         generate_collection_id(&mut transaction).await?.into();
+
+    let initial_project_ids = project_item::DBProject::get_many(
+        &collection_create_data.projects,
+        &mut transaction,
+        &redis,
+    )
+    .await
+    .wrap_internal_err("failed to fetch created projects")?
+    .into_iter()
+    .map(|x| x.inner.id.into())
+    .collect::<Vec<ProjectId>>();
 
     let collection_builder_actual = collection_item::CollectionBuilder {
         collection_id: collection_id.into(),
@@ -250,7 +249,7 @@ pub struct EditCollection {
     #[schema(value_type = Option<String>)]
     pub status: Option<CollectionStatus>,
     #[validate(length(max = 1024))]
-    pub new_projects: Option<Vec<ProjectRef>>,
+    pub new_projects: Option<Vec<String>>,
 }
 
 #[utoipa::path(tag = "collections", responses((status = NO_CONTENT)))]
@@ -370,28 +369,18 @@ pub async fn collection_edit(
                 .iter()
                 .map(|_| collection_item.id.0)
                 .collect_vec();
-            let resolved_project_ids =
-                database::models::DBProject::resolve_refs(
-                    new_project_ids,
-                    pool.as_ref(),
-                    redis.as_ref(),
+            let mut validated_project_ids = Vec::new();
+            for project_id in new_project_ids {
+                let project = database::models::DBProject::get(
+                    project_id, &**pool, &redis,
                 )
                 .await
-                .wrap_internal_err("fetching projects from database")?;
-            let validated_project_ids = new_project_ids
-                .iter()
-                .zip(resolved_project_ids)
-                .map(|(project_ref, project_id)| {
-                    project_id.map(|project_id| project_id.0 as i64).ok_or_else(
-                        || {
-                            ApiError::Request(eyre!(
-                                "the specified project `{}` does not exist",
-                                project_ref.as_str()
-                            ))
-                        },
-                    )
-                })
-                .collect::<Result<Vec<_>, _>>()?;
+                .wrap_internal_err("fetching project from database")?
+                .wrap_request_err_with(|| {
+                    eyre!("the specified project `{project_id}` does not exist")
+                })?;
+                validated_project_ids.push(project.inner.id.0);
+            }
             // Insert- don't throw an error if it already exists
             sqlx::query!(
                 "

@@ -7,7 +7,7 @@ use super::{DBUser, ids::*};
 use crate::database::{PgTransaction, models};
 use crate::file_hosting::FileHost;
 use crate::models::exp;
-use crate::models::ids::{ProjectId, ProjectRef};
+use crate::models::ids::ProjectId;
 use crate::models::link_platform::LinkPlatform;
 use crate::models::projects::{
     MonetizationStatus, ProjectStatus, SideTypesMigrationReviewStatus,
@@ -28,7 +28,6 @@ use xredis::RedisPool;
 pub const PROJECTS_NAMESPACE: &str = "projects:v5";
 pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs:v4";
 const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies:v4";
-const PROJECT_REFS_NAMESPACE: &str = "project_refs:v1";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct LinkUrl {
@@ -543,144 +542,6 @@ impl DBProject {
             .await
             .wrap_err("fetching project")
             .map(|x| x.into_iter().next())
-    }
-
-    pub async fn resolve_ref<'a, E>(
-        project_ref: &ProjectRef,
-        executor: E,
-        redis: &RedisPool,
-    ) -> Result<Option<ProjectId>>
-    where
-        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
-    {
-        Ok(Self::resolve_refs(
-            std::slice::from_ref(project_ref),
-            executor,
-            redis,
-        )
-        .await?
-        .into_iter()
-        .next()
-        .flatten())
-    }
-
-    pub async fn resolve_refs<'a, E>(
-        project_refs: &[ProjectRef],
-        executor: E,
-        redis: &RedisPool,
-    ) -> Result<Vec<Option<ProjectId>>>
-    where
-        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
-    {
-        let identifiers = project_refs
-            .iter()
-            .flat_map(|project_ref| {
-                let identifier = project_ref.as_str();
-                let normalized_identifier = identifier.to_lowercase();
-                if normalized_identifier == identifier {
-                    vec![identifier.to_string()]
-                } else {
-                    vec![identifier.to_string(), normalized_identifier]
-                }
-            })
-            .collect::<Vec<_>>();
-
-        let resolved = redis
-            .get_cached_keys_raw_with_slug(
-                PROJECT_REFS_NAMESPACE,
-                None,
-                true,
-                &identifiers,
-                |identifiers| async move {
-                    let project_ids = identifiers
-                        .iter()
-                        .map(|identifier| {
-                            parse_base62(identifier)
-                                .ok()
-                                .map(|project_id| project_id as i64)
-                        })
-                        .collect::<Vec<_>>();
-                    let slugs = identifiers
-                        .iter()
-                        .map(|identifier| identifier.to_lowercase())
-                        .collect::<Vec<_>>();
-                    let mut executor = executor.acquire().await.wrap_err(
-                        "acquiring database connection for project references",
-                    )?;
-                    let resolved = sqlx::query!(
-                        r#"
-                        SELECT
-                            identifier AS "identifier!",
-                            project_id AS "project_id!"
-                        FROM (
-                            SELECT
-                                refs.identifier,
-                                COALESCE(
-                                    id_project.id,
-                                    slug_project.id,
-                                    redirect.target_project_id
-                                ) AS project_id
-                            FROM UNNEST(
-                                $1::text[],
-                                $2::bigint[],
-                                $3::text[]
-                            ) AS refs(identifier, project_id, slug)
-                            LEFT JOIN mods id_project
-                                ON id_project.id = refs.project_id
-                            LEFT JOIN mods slug_project
-                                ON slug_project.slug = refs.slug
-                            LEFT JOIN project_redirects redirect
-                                ON redirect.identifier = refs.identifier
-                        ) resolved
-                        WHERE project_id IS NOT NULL
-                        "#,
-                        &identifiers,
-                        &project_ids as &[Option<i64>],
-                        &slugs,
-                    )
-                    .fetch_all(&mut executor)
-                    .await
-                    .wrap_err("resolving project references")?;
-
-                    eyre::Ok(
-                        resolved
-                            .into_iter()
-                            .map(|resolved| {
-                                (
-                                    resolved.identifier,
-                                    (
-                                        None::<String>,
-                                        DBProjectId(resolved.project_id),
-                                    ),
-                                )
-                            })
-                            .collect::<DashMap<_, _>>(),
-                    )
-                },
-            )
-            .await
-            .wrap_err("fetching cached project references")?;
-
-        Ok(project_refs
-            .iter()
-            .map(|project_ref| {
-                let identifier = project_ref.as_str();
-                let normalized_identifier = identifier.to_lowercase();
-                let exact = resolved.get(identifier).copied();
-                let exact_is_project_id = exact.is_some_and(|resolved_id| {
-                    parse_base62(identifier).is_ok_and(|parsed_id| {
-                        resolved_id == DBProjectId(parsed_id as i64)
-                    })
-                });
-
-                if normalized_identifier == identifier || exact_is_project_id {
-                    exact
-                } else {
-                    resolved.get(&normalized_identifier).copied()
-                }
-                .map(ProjectId::from)
-            })
-            .collect())
     }
 
     pub async fn get_id<'a, 'b, E>(
@@ -1229,36 +1090,6 @@ impl DBProject {
         Ok(dependencies)
     }
 
-    pub async fn clear_ref_cache(
-        project_refs: &[String],
-        redis: &RedisPool,
-    ) -> Result<()> {
-        let mut redis = redis
-            .connect()
-            .await
-            .wrap_err("connecting to redis to clear project reference cache")?;
-        let mut keys = Vec::with_capacity(project_refs.len() * 2);
-        for project_ref in project_refs {
-            keys.push(redis.key().entity(PROJECT_REFS_NAMESPACE, project_ref));
-            let normalized_project_ref = project_ref.to_lowercase();
-            if normalized_project_ref != *project_ref {
-                keys.push(
-                    redis
-                        .key()
-                        .entity(PROJECT_REFS_NAMESPACE, normalized_project_ref),
-                );
-            }
-        }
-
-        if !keys.is_empty() {
-            redis
-                .delete_many(&keys)
-                .await
-                .wrap_err("clearing project reference cache")?;
-        }
-        Ok(())
-    }
-
     pub async fn clear_cache(
         id: DBProjectId,
         slug: Option<String>,
@@ -1269,17 +1100,13 @@ impl DBProject {
             .connect()
             .await
             .wrap_err("connecting to redis to clear project cache")?;
-        let mut keys = vec![
-            redis.key().entity(PROJECTS_NAMESPACE, id.0),
-            redis.key().entity(
-                PROJECT_REFS_NAMESPACE,
-                ProjectId::from(id).to_string(),
-            ),
-        ];
+        let mut keys = vec![redis.key().entity(PROJECTS_NAMESPACE, id.0)];
         if let Some(slug) = slug {
-            let slug = slug.to_lowercase();
-            keys.push(redis.key().entity(PROJECTS_SLUGS_NAMESPACE, &slug));
-            keys.push(redis.key().entity(PROJECT_REFS_NAMESPACE, slug));
+            keys.push(
+                redis
+                    .key()
+                    .entity(PROJECTS_SLUGS_NAMESPACE, slug.to_lowercase()),
+            );
         }
         if clear_dependencies.unwrap_or(false) {
             keys.push(

@@ -5,7 +5,7 @@ use crate::database::PgPool;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::team_item::TeamAssociationId;
 use crate::database::models::{DBOrganization, DBTeam, DBTeamMember, DBUser};
-use crate::models::ids::{ProjectRef, TeamId};
+use crate::models::ids::TeamId;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
@@ -43,7 +43,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 #[get("/{project_id}/members")]
 pub async fn team_members_get_project(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -54,20 +54,16 @@ pub async fn team_members_get_project(
 
 pub async fn team_members_get_project_internal(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let (project_ref,) = info.into_inner();
-    let project_id =
-        DBProject::resolve_ref(&project_ref, pool.as_ref(), redis.as_ref())
+    let string = info.into_inner().0;
+    let project_data =
+        crate::database::models::DBProject::get(&string, &**pool, &redis)
             .await
-            .wrap_internal_err("resolving project reference")?
-            .wrap_not_found_err("resource not found")?;
-    let project_data = DBProject::get_id(project_id.into(), &**pool, &redis)
-        .await
-        .wrap_internal_err("fetching project from database")?;
+            .wrap_internal_err("fetching project from database")?;
 
     if let Some(project) = project_data {
         let current_user = get_user_from_headers(

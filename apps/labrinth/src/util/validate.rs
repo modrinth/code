@@ -72,15 +72,16 @@ pub fn validation_errors_to_string(
 }
 
 pub fn validate_deps(
-    values: &[crate::routes::v3::version_creation::DependencyRequest],
+    values: &[crate::models::projects::Dependency],
 ) -> Result<(), validator::ValidationError> {
     if values
         .iter()
-        .duplicates_by(|dependency| {
-            (
-                dependency.version_id,
-                dependency.project_id.clone(),
-                dependency.file_name.clone(),
+        .duplicates_by(|x| {
+            format!(
+                "{}-{}-{}",
+                x.version_id.unwrap_or(crate::models::ids::VersionId(0)),
+                x.project_id.unwrap_or(crate::models::ids::ProjectId(0)),
+                x.file_name.as_deref().unwrap_or_default()
             )
         })
         .next()

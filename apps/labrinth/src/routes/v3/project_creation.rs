@@ -12,9 +12,7 @@ use crate::database::models::{self, DBUser, image_item};
 use crate::file_hosting::{FileHost, FileHostPublicity, FileHostingError};
 use crate::models::error::ApiError;
 use crate::models::exp;
-use crate::models::ids::{
-    ImageId, OrganizationId, ProjectId, ProjectRef, VersionId,
-};
+use crate::models::ids::{ImageId, OrganizationId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::link_platform::LinkPlatform;
 use crate::models::pats::Scopes;
@@ -44,7 +42,7 @@ use image::ImageError;
 use itertools::Itertools;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use thiserror::Error;
 use validator::Validate;
 use xredis::RedisPool;
@@ -586,12 +584,27 @@ async fn project_create_inner(
             }
         }
 
-        let slug_ref = ProjectRef(create_data.slug.clone());
-        if models::DBProject::resolve_ref(&slug_ref, &mut *transaction, redis)
-            .await?
-            .is_some()
-        {
-            return Err(CreateError::SlugCollision);
+        let slug_project_id_option: Option<ProjectId> = serde_json::from_str(
+            &format!("\"{}\"", create_data.slug.to_lowercase()),
+        )
+        .ok();
+
+        if let Some(slug_project_id) = slug_project_id_option {
+            let slug_project_id: models::ids::DBProjectId =
+                slug_project_id.into();
+            let results = sqlx::query!(
+                "
+                SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)
+                ",
+                slug_project_id as models::ids::DBProjectId
+            )
+            .fetch_one(&mut *transaction)
+            .await
+            .map_err(CreateError::SqlxDatabaseError)?;
+
+            if results.exists.unwrap_or(false) {
+                return Err(CreateError::SlugCollision);
+            }
         }
 
         {
@@ -1134,51 +1147,16 @@ async fn create_initial_version(
         &mut loader_field_enum_values,
     )?;
 
-    let dependency_project_refs = version_data
+    let dependencies = version_data
         .dependencies
         .iter()
-        .filter_map(|dependency| dependency.project_id.clone())
-        .collect::<Vec<_>>();
-    let mut resolved_dependency_project_ids = models::DBProject::resolve_refs(
-        &dependency_project_refs,
-        &mut *transaction,
-        redis,
-    )
-    .await?
-    .into_iter();
-    let mut dependencies = Vec::with_capacity(version_data.dependencies.len());
-    let mut unique_dependencies = HashSet::new();
-    for dependency in &version_data.dependencies {
-        let dependency_project_id = if dependency.project_id.is_some() {
-            Some(
-                resolved_dependency_project_ids
-                    .next()
-                    .flatten()
-                    .ok_or_else(|| {
-                        CreateError::InvalidInput(
-                            "An invalid project id was supplied".to_string(),
-                        )
-                    })?,
-            )
-        } else {
-            None
-        };
-        if !unique_dependencies.insert((
-            dependency.version_id,
-            dependency_project_id,
-            dependency.file_name.clone(),
-        )) {
-            return Err(CreateError::InvalidInput(
-                "duplicate dependency".to_string(),
-            ));
-        }
-        dependencies.push(models::version_item::DependencyBuilder {
-            version_id: dependency.version_id.map(Into::into),
-            project_id: dependency_project_id.map(Into::into),
-            dependency_type: dependency.dependency_type.to_string(),
+        .map(|d| models::version_item::DependencyBuilder {
+            version_id: d.version_id.map(|x| x.into()),
+            project_id: d.project_id.map(|x| x.into()),
+            dependency_type: d.dependency_type.to_string(),
             file_name: None,
-        });
-    }
+        })
+        .collect::<Vec<_>>();
 
     let version = models::version_item::VersionBuilder {
         version_id: version_id.into(),

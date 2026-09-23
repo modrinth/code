@@ -42,7 +42,7 @@ use crate::{
         },
     },
     models::{
-        ids::{AffiliateCodeId, ProjectId, ProjectRef, VersionId},
+        ids::{AffiliateCodeId, ProjectId, VersionId},
         pats::Scopes,
         projects::ProjectStatus,
         teams::ProjectPermissions,
@@ -78,7 +78,7 @@ pub struct GetRequest {
     ///
     /// If this is empty, all of the user's projects will be included.
     #[serde(default)]
-    pub project_ids: Vec<ProjectRef>,
+    pub project_ids: Vec<ProjectId>,
 }
 
 /// Time range for fetching analytics.
@@ -239,44 +239,19 @@ pub async fn fetch_analytics(
         )));
     }
 
-    let requested_project_ids = if req.project_ids.is_empty() {
-        None
-    } else {
-        Some(
-            DBProject::resolve_refs(&req.project_ids, &**pool, &redis)
-                .await
-                .wrap_internal_err("resolving requested project references")?
-                .into_iter()
-                .flatten()
-                .map(DBProjectId::from)
-                .collect::<Vec<_>>(),
-        )
-    };
-    let dependent_project_ids =
-        if let Some(metrics) = &req.return_metrics.project_downloads {
-            DBProject::resolve_refs(
-                &metrics.filter_by.dependent_project_id,
-                &**pool,
-                &redis,
-            )
-            .await
-            .wrap_internal_err("resolving dependent project references")?
-            .into_iter()
-            .flatten()
-            .map(DBProjectId::from)
-            .collect()
-        } else {
-            Vec::new()
-        };
-
     let mut time_slices = vec![TimeSlice::default(); num_time_slices];
 
-    let project_ids = if let Some(project_ids) = requested_project_ids {
-        project_ids
-    } else {
-        DBUser::get_projects(user.id.into(), &**pool, &redis)
-            .await
-            .wrap_internal_err("fetching users from database")?
+    let project_ids = {
+        if req.project_ids.is_empty() {
+            DBUser::get_projects(user.id.into(), &**pool, &redis)
+                .await
+                .wrap_internal_err("fetching users from database")?
+        } else {
+            req.project_ids
+                .iter()
+                .map(|id| DBProjectId::from(*id))
+                .collect::<Vec<_>>()
+        }
     };
 
     let project_ids =
@@ -375,13 +350,9 @@ pub async fn fetch_analytics(
     }
 
     if let Some(metrics) = &req.return_metrics.project_downloads {
-        metrics::fetch_project_downloads(
-            &mut query_clickhouse_cx,
-            metrics,
-            &dependent_project_ids,
-        )
-        .await
-        .wrap_api_err("fetching project downloads")?;
+        metrics::fetch_project_downloads(&mut query_clickhouse_cx, metrics)
+            .await
+            .wrap_api_err("fetching project downloads")?;
     }
 
     if let Some(metrics) = &req.return_metrics.project_playtime {

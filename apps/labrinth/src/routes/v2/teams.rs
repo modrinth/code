@@ -1,5 +1,5 @@
 use crate::database::PgPool;
-use crate::models::ids::{ProjectRef, TeamId};
+use crate::models::ids::TeamId;
 use crate::models::teams::{
     OrganizationPermissions, ProjectPermissions, TeamMember,
 };
@@ -51,7 +51,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 #[get("/{id}/members")]
 pub async fn team_members_get_project(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,

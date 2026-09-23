@@ -3,22 +3,21 @@ use crate::auth::checks::{
     filter_visible_versions, is_visible_project, is_visible_version,
 };
 use crate::auth::get_user_from_headers;
-use crate::database::models::ids::{DBProjectId, DBVersionId};
+use crate::database::models::ids::DBVersionId;
 use crate::database::models::version_item::VersionQueryResult;
 use crate::database::models::{DBProject, DBVersion};
 use crate::database::{PgPool, ReadOnlyPgPool};
-use crate::models::ids::ProjectRef;
 use crate::models::pats::Scopes;
 use crate::models::projects::{DependencyType, Version};
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
-use crate::util::error::{ApiContext as _, Context as _};
+use crate::util::error::ApiContext as _;
 use actix_web::{HttpRequest, post, web};
 use ariadne::ids::base62_impl::parse_base62;
 use async_trait::async_trait;
 use modrinth_content_management::{
-    ContentMetadataProvider, ContentType, Error as ResolveError,
-    ResolutionPreferences, ResolveContentPlan, ResolveContentRequest,
+    ContentMetadataProvider, Error as ResolveError, ResolveContentPlan,
+    ResolveContentRequest,
 };
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -34,19 +33,6 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(resolve_content);
 }
 
-#[derive(Deserialize)]
-pub struct ResolveContentRouteRequest {
-    pub project_id: ProjectRef,
-    pub version_id: Option<String>,
-    pub content_type: ContentType,
-    #[serde(default)]
-    pub selected: ResolutionPreferences,
-    #[serde(default)]
-    pub target: ResolutionPreferences,
-    #[serde(default)]
-    pub existing_project_ids: Vec<ProjectRef>,
-}
-
 /// Resolve content.
 #[utoipa::path(
 	tag = "content",
@@ -56,7 +42,7 @@ pub struct ResolveContentRouteRequest {
 #[post("/content/resolve")]
 pub async fn resolve_content(
     req: HttpRequest,
-    request: web::Json<ResolveContentRouteRequest>,
+    request: web::Json<ResolveContentRequest>,
     pool: web::Data<PgPool>,
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
@@ -72,12 +58,6 @@ pub async fn resolve_content(
     .await
     .map(|x| x.1)
     .ok();
-    let request = canonicalize_resolve_content_request(
-        request.into_inner(),
-        pool.as_ref(),
-        redis.as_ref(),
-    )
-    .await?;
     let cache_public_result = user_option.is_none();
     let mut provider = LabrinthContentProvider {
         pool: pool.get_ref(),
@@ -86,6 +66,7 @@ pub async fn resolve_content(
         user_option: &user_option,
         trace: ResolveContentTrace::default(),
     };
+    let request = request.into_inner();
     let plan = if cache_public_result {
         resolve_content_with_cache(&mut provider, request).await
     } else {
@@ -96,38 +77,6 @@ pub async fn resolve_content(
     .wrap_api_err("executing `modrinth_content_management::resolve_content`")?;
 
     Ok(web::Json(plan))
-}
-
-async fn canonicalize_resolve_content_request(
-    request: ResolveContentRouteRequest,
-    pool: &PgPool,
-    redis: &RedisPool,
-) -> Result<ResolveContentRequest, ApiError> {
-    let mut project_refs =
-        Vec::with_capacity(request.existing_project_ids.len() + 1);
-    project_refs.push(request.project_id.clone());
-    project_refs.extend(request.existing_project_ids.iter().cloned());
-    let mut project_ids = DBProject::resolve_refs(&project_refs, pool, redis)
-        .await
-        .wrap_internal_err("resolving project references")?
-        .into_iter();
-    let project_id =
-        project_ids.next().flatten().wrap_request_err_with(|| {
-            format!("project `{}` was not found", request.project_id.as_str())
-        })?;
-    let existing_project_ids = project_ids
-        .flatten()
-        .map(|project_id| project_id.to_string())
-        .collect();
-
-    Ok(ResolveContentRequest {
-        project_id: project_id.to_string(),
-        version_id: request.version_id,
-        content_type: request.content_type,
-        selected: request.selected,
-        target: request.target,
-        existing_project_ids,
-    })
 }
 
 struct LabrinthContentProvider<'a> {
@@ -217,11 +166,7 @@ impl ContentMetadataProvider for &mut LabrinthContentProvider<'_> {
         &mut self,
         project_id: &str,
     ) -> Result<Vec<modrinth_content_management::Version>, ResolveError> {
-        let Some(db_project_id) = parse_project_id(project_id) else {
-            self.record_project_versions(project_id, &[]);
-            return Ok(Vec::new());
-        };
-        let project = DBProject::get_id(db_project_id, self.pool, self.redis)
+        let project = DBProject::get(project_id, self.pool, self.redis)
             .await
             .map_err(resolve_provider_error)?;
         let Some(project) = project else {
@@ -613,12 +558,6 @@ fn hash_serializable(value: &impl Serialize) -> String {
     let mut hasher = Sha256::new();
     hasher.update(bytes);
     format!("{:x}", hasher.finalize())
-}
-
-fn parse_project_id(project_id: &str) -> Option<DBProjectId> {
-    parse_base62(project_id)
-        .ok()
-        .map(|id| DBProjectId(id as i64))
 }
 
 fn parse_version_id(version_id: &str) -> Option<DBVersionId> {

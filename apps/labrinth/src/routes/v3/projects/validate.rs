@@ -9,7 +9,7 @@ use crate::database::models::project_item::ProjectQueryResult;
 use crate::database::{
     PgPool, PgTransaction, ReadOnlyPgPool, models as db_models,
 };
-use crate::models::ids::{ProjectId, ProjectRef};
+use crate::models::ids::ProjectId;
 use crate::models::pats::Scopes;
 use crate::models::projects::{Project, Version};
 use crate::models::teams::ProjectPermissions;
@@ -95,7 +95,7 @@ pub(crate) async fn ensure_project_is_valid_for_review(
 #[get("/{id}/validate")]
 pub async fn validate(
     req: HttpRequest,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
@@ -112,17 +112,8 @@ pub async fn validate(
     .wrap_auth_err("authenticating API request")?
     .1;
 
-    let (project_ref,) = info.into_inner();
-    let project_id = db_models::DBProject::resolve_ref(
-        &project_ref,
-        &***ro_pool,
-        redis.as_ref(),
-    )
-    .await
-    .wrap_internal_err("resolving project reference")?
-    .wrap_not_found_err("resource not found")?;
     let project =
-        db_models::DBProject::get_id(project_id.into(), &***ro_pool, &redis)
+        db_models::DBProject::get(&info.into_inner().0, &***ro_pool, &redis)
             .await
             .wrap_internal_err("fetching project from database")?
             .wrap_not_found_err("resource not found")?;

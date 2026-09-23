@@ -6,7 +6,7 @@ use crate::database::models::moderation_external_item;
 use crate::database::models::{
     DBModerationLock, DBOrganization, DBOrganizationId, DBProject, DBProjectId,
 };
-use crate::models::ids::{OrganizationId, ProjectId, ProjectRef};
+use crate::models::ids::{OrganizationId, ProjectId};
 use crate::models::projects::{ProjectStatus, VersionStatus};
 use crate::queue::moderation::{ApprovalType, IdentifiedFile, MissingMetadata};
 use crate::queue::session::AuthQueue;
@@ -1080,7 +1080,7 @@ pub async fn get_project_meta(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    info: web::Path<(ProjectRef,)>,
+    info: web::Path<(String,)>,
 ) -> Result<web::Json<MissingMetadata>, ApiError> {
     check_is_moderator_from_headers(
         &req,
@@ -1092,16 +1092,13 @@ pub async fn get_project_meta(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    let project_ref = info.into_inner().0;
-    let project_id = DBProject::resolve_ref(&project_ref, &**pool, &redis)
-        .await
-        .wrap_internal_err("resolving project reference")?;
-
-    if let Some(project_id) = project_id {
-        let project = DBProject::get_id(project_id.into(), &**pool, &redis)
+    let project_id = info.into_inner().0;
+    let project =
+        database::models::DBProject::get(&project_id, &**pool, &redis)
             .await
-            .wrap_internal_err("fetching project from database")?
-            .wrap_not_found_err("resource not found")?;
+            .wrap_internal_err("fetching project from database")?;
+
+    if let Some(project) = project {
         let rows = sqlx::query!(
             "
             SELECT
@@ -1352,7 +1349,7 @@ pub async fn acquire_lock(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    path: web::Path<(ProjectRef,)>,
+    path: web::Path<(String,)>,
 ) -> Result<web::Json<LockAcquireResponse>, ApiError> {
     let user = check_is_moderator_from_headers(
         &req,
@@ -1364,15 +1361,12 @@ pub async fn acquire_lock(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    let project_ref = path.into_inner().0;
-    let project_id = DBProject::resolve_ref(&project_ref, &**pool, &redis)
-        .await
-        .wrap_internal_err("resolving project reference")?
-        .wrap_not_found_err("resource not found")?;
-    let project = DBProject::get_id(project_id.into(), &**pool, &redis)
-        .await
-        .wrap_internal_err("fetching project from database")?
-        .wrap_not_found_err("resource not found")?;
+    let project_id_str = path.into_inner().0;
+    let project =
+        database::models::DBProject::get(&project_id_str, &**pool, &redis)
+            .await
+            .wrap_internal_err("fetching project from database")?
+            .wrap_not_found_err("resource not found")?;
 
     let db_project_id = project.inner.id;
     let db_user_id = database::models::DBUserId::from(user.id);
@@ -1419,7 +1413,7 @@ pub async fn override_lock(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    path: web::Path<(ProjectRef,)>,
+    path: web::Path<(String,)>,
 ) -> Result<web::Json<LockAcquireResponse>, ApiError> {
     let user = check_is_moderator_from_headers(
         &req,
@@ -1431,15 +1425,12 @@ pub async fn override_lock(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    let project_ref = path.into_inner().0;
-    let project_id = DBProject::resolve_ref(&project_ref, &**pool, &redis)
-        .await
-        .wrap_internal_err("resolving project reference")?
-        .wrap_not_found_err("resource not found")?;
-    let project = DBProject::get_id(project_id.into(), &**pool, &redis)
-        .await
-        .wrap_internal_err("fetching project from database")?
-        .wrap_not_found_err("resource not found")?;
+    let project_id_str = path.into_inner().0;
+    let project =
+        database::models::DBProject::get(&project_id_str, &**pool, &redis)
+            .await
+            .wrap_internal_err("fetching project from database")?
+            .wrap_not_found_err("resource not found")?;
 
     let db_project_id = project.inner.id;
     let db_user_id = database::models::DBUserId::from(user.id);
@@ -1473,7 +1464,7 @@ pub async fn get_lock_status(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    path: web::Path<(ProjectRef,)>,
+    path: web::Path<(String,)>,
 ) -> Result<web::Json<LockStatusResponse>, ApiError> {
     let user = check_is_moderator_from_headers(
         &req,
@@ -1485,15 +1476,12 @@ pub async fn get_lock_status(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    let project_ref = path.into_inner().0;
-    let project_id = DBProject::resolve_ref(&project_ref, &**pool, &redis)
-        .await
-        .wrap_internal_err("resolving project reference")?
-        .wrap_not_found_err("resource not found")?;
-    let project = DBProject::get_id(project_id.into(), &**pool, &redis)
-        .await
-        .wrap_internal_err("fetching project from database")?
-        .wrap_not_found_err("resource not found")?;
+    let project_id_str = path.into_inner().0;
+    let project =
+        database::models::DBProject::get(&project_id_str, &**pool, &redis)
+            .await
+            .wrap_internal_err("fetching project from database")?
+            .wrap_not_found_err("resource not found")?;
 
     let db_project_id = project.inner.id;
     let db_user_id = database::models::DBUserId::from(user.id);
@@ -1543,7 +1531,7 @@ pub async fn release_lock(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    path: web::Path<(ProjectRef,)>,
+    path: web::Path<(String,)>,
 ) -> Result<web::Json<LockReleaseResponse>, ApiError> {
     let user = check_is_moderator_from_headers(
         &req,
@@ -1555,15 +1543,12 @@ pub async fn release_lock(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    let project_ref = path.into_inner().0;
-    let project_id = DBProject::resolve_ref(&project_ref, &**pool, &redis)
-        .await
-        .wrap_internal_err("resolving project reference")?
-        .wrap_not_found_err("resource not found")?;
-    let project = DBProject::get_id(project_id.into(), &**pool, &redis)
-        .await
-        .wrap_internal_err("fetching project from database")?
-        .wrap_not_found_err("resource not found")?;
+    let project_id_str = path.into_inner().0;
+    let project =
+        database::models::DBProject::get(&project_id_str, &**pool, &redis)
+            .await
+            .wrap_internal_err("fetching project from database")?
+            .wrap_not_found_err("resource not found")?;
 
     let db_project_id = project.inner.id;
     let db_user_id = database::models::DBUserId::from(user.id);
@@ -1601,7 +1586,7 @@ pub async fn release_lock_beacon(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    path: web::Path<(ProjectRef,)>,
+    path: web::Path<(String,)>,
     body: String,
 ) -> Result<web::Json<LockReleaseResponse>, ApiError> {
     let token = body.trim();
@@ -1634,15 +1619,12 @@ pub async fn release_lock_beacon(
         )));
     }
 
-    let project_ref = path.into_inner().0;
-    let project_id = DBProject::resolve_ref(&project_ref, &**pool, &redis)
-        .await
-        .wrap_internal_err("resolving project reference")?
-        .wrap_not_found_err("resource not found")?;
-    let project = DBProject::get_id(project_id.into(), &**pool, &redis)
-        .await
-        .wrap_internal_err("fetching project from database")?
-        .wrap_not_found_err("resource not found")?;
+    let project_id_str = path.into_inner().0;
+    let project =
+        database::models::DBProject::get(&project_id_str, &**pool, &redis)
+            .await
+            .wrap_internal_err("fetching project from database")?
+            .wrap_not_found_err("resource not found")?;
 
     let db_project_id = project.inner.id;
     let db_user_id = database::models::DBUserId::from(user.id);

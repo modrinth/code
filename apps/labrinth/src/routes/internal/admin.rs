@@ -1,8 +1,7 @@
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::database::PgPool;
-use crate::database::models::DBProject;
 use crate::models::analytics::{Download, DownloadReason};
-use crate::models::ids::{ProjectRef, VersionId};
+use crate::models::ids::{ProjectId, VersionId};
 use crate::models::pats::Scopes;
 use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::session::AuthQueue;
@@ -37,7 +36,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 #[derive(Deserialize, utoipa::ToSchema)]
 pub struct DownloadBody {
     pub url: String,
-    pub project_id: ProjectRef,
+    pub project_id: ProjectId,
     pub version_name: String,
 
     pub ip: String,
@@ -135,7 +134,7 @@ async fn resolve_download_attribution_version(
 }
 
 // This is an internal route, cannot be used without key
-/// Count a download.
+/// Count a download.  
 #[utoipa::path(
 	context_path = "/admin",
 	tag = "v2 admin",
@@ -174,16 +173,8 @@ pub async fn count_download(
     .ok()
     .flatten();
 
-    let project_id = DBProject::resolve_ref(
-        &download_body.project_id,
-        pool.as_ref(),
-        redis.as_ref(),
-    )
-    .await
-    .wrap_internal_err("resolving project reference")?
-    .wrap_request_err("specified project does not exist")?;
-    let project_id =
-        crate::database::models::ids::DBProjectId::from(project_id);
+    let project_id: crate::database::models::ids::DBProjectId =
+        download_body.project_id.into();
 
     let id_option = parse_base62(&download_body.version_name)
         .ok()
@@ -328,7 +319,7 @@ pub async fn count_download(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-/// Reindex all projects.
+/// Reindex all projects.  
 #[utoipa::path(
 	context_path = "/admin",
 	tag = "v2 admin",
@@ -353,7 +344,7 @@ pub async fn force_reindex(
     Ok(HttpResponse::NoContent().finish())
 }
 
-/// Reindex a project.
+/// Reindex a project.  
 #[utoipa::path(
 	context_path = "/admin",
 	tag = "v2 admin",
@@ -366,17 +357,12 @@ pub async fn force_reindex(
 )]
 #[post("/_force_reindex/{project_id}", guard = "admin_key_guard")]
 pub async fn force_reindex_project(
-    path: web::Path<(ProjectRef,)>,
+    path: web::Path<(ProjectId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     search_backend: web::Data<dyn SearchBackend>,
 ) -> Result<HttpResponse, ApiError> {
-    let (project_ref,) = path.into_inner();
-    let project_id =
-        DBProject::resolve_ref(&project_ref, pool.as_ref(), redis.as_ref())
-            .await
-            .wrap_internal_err("resolving project reference")?
-            .wrap_not_found_err("resource not found")?;
+    let (project_id,) = path.into_inner();
     reindex_project_document(
         pool.as_ref(),
         redis.as_ref(),

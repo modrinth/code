@@ -3,7 +3,7 @@ use crate::database::PgPool;
 use crate::database::models::DBProject;
 use crate::env::ENV;
 use crate::models::analytics::{MinecraftServerPlay, PageView, Playtime};
-use crate::models::ids::ProjectRef;
+use crate::models::ids::ProjectId;
 use crate::models::pats::Scopes;
 use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::session::AuthQueue;
@@ -154,20 +154,15 @@ pub async fn page_view_ingest(
             ];
 
             if PROJECT_TYPES.contains(&segments_vec[0]) {
-                let project_ref = ProjectRef(segments_vec[1].to_string());
-                let project_id =
-                    DBProject::resolve_ref(&project_ref, &**pool, &redis)
-                        .await
-                        .wrap_internal_err("fetching project from database")?;
+                let project = crate::database::models::DBProject::get(
+                    segments_vec[1],
+                    &**pool,
+                    &redis,
+                )
+                .await
+                .wrap_internal_err("fetching project from database")?;
 
-                if let Some(project_id) = project_id
-                    && let Some(project) =
-                        DBProject::get_id(project_id.into(), &**pool, &redis)
-                            .await
-                            .wrap_internal_err(
-                                "fetching project from database",
-                            )?
-                {
+                if let Some(project) = project {
                     view.project_id = project.inner.id.0 as u64;
                 }
             }
@@ -272,7 +267,7 @@ struct MinecraftProfile {
 
 #[derive(Deserialize, utoipa::ToSchema)]
 pub struct MinecraftJavaServerPlayInput {
-    project_id: ProjectRef,
+    project_id: ProjectId,
     username: String,
     server_id: String,
 }
@@ -306,12 +301,9 @@ pub async fn minecraft_server_play_ingest(
     .map(|(_, user)| user)
     .ok();
 
-    let project_id =
-        DBProject::resolve_ref(&play_input.project_id, &**pool, &redis)
-            .await
-            .wrap_internal_err("fetching project from database")?
-            .wrap_not_found_err("resource not found")?;
-    let project = DBProject::get_id(project_id.into(), &**pool, &redis)
+    let project_id = play_input.project_id;
+
+    let project = DBProject::get(&project_id.to_string(), &**pool, &redis)
         .await
         .wrap_internal_err("fetching project from database")?
         .wrap_not_found_err("resource not found")?;

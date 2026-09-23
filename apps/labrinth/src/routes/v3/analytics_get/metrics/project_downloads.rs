@@ -18,7 +18,7 @@ use crate::{
         models::{DBProjectId, DBVersionId},
     },
     models::{
-        ids::{ProjectId, ProjectRef, VersionId},
+        ids::{ProjectId, VersionId},
         v3::analytics::DownloadReason,
     },
     routes::ApiError,
@@ -75,7 +75,7 @@ pub struct ProjectDownloadsFilters {
     pub version_id: Vec<VersionId>,
     /// Dependent project IDs to include.
     #[serde(default)]
-    pub dependent_project_id: Vec<ProjectRef>,
+    pub dependent_project_id: Vec<ProjectId>,
     /// Referrer domains to include.
     #[serde(default)]
     pub domain: Vec<String>,
@@ -281,16 +281,18 @@ struct DownloadBucket {
 }
 
 async fn fetch_dependent_on_version_filter(
-    dependent_project_ids: &[DBProjectId],
+    metrics: &Metrics<ProjectDownloadsField, ProjectDownloadsFilters>,
     pool: &PgPool,
 ) -> Result<Vec<VersionId>, ApiError> {
-    if dependent_project_ids.is_empty() {
+    if metrics.filter_by.dependent_project_id.is_empty() {
         return Ok(Vec::new());
     }
 
-    let project_ids = dependent_project_ids
+    let project_ids = metrics
+        .filter_by
+        .dependent_project_id
         .iter()
-        .map(|id| id.0)
+        .map(|id| DBProjectId::from(*id).0)
         .collect::<Vec<_>>();
     let versions = sqlx::query!(
         "
@@ -353,12 +355,11 @@ async fn fetch_dependent_version_projects(
 pub(crate) async fn fetch(
     cx: &mut QueryClickhouseContext<'_>,
     metrics: &Metrics<ProjectDownloadsField, ProjectDownloadsFilters>,
-    dependent_project_ids: &[DBProjectId],
 ) -> Result<(), ApiError> {
     use ProjectDownloadsField as F;
     let uses = |field| metrics.bucket_by.contains(&field);
     let dependent_on_version_filter =
-        fetch_dependent_on_version_filter(dependent_project_ids, cx.pool)
+        fetch_dependent_on_version_filter(metrics, cx.pool)
             .await
             .wrap_api_err("fetching dependent on version filter")?;
     if !metrics.filter_by.dependent_project_id.is_empty()

@@ -2,9 +2,9 @@ use crate::database::PgPool;
 use crate::database::models::loader_fields::VersionField;
 use crate::database::models::{project_item, version_item};
 use crate::file_hosting::FileHost;
-use crate::models::ids::{ImageId, ProjectRef, VersionId};
+use crate::models::ids::{ImageId, ProjectId, VersionId};
 use crate::models::projects::{
-    FileType, Loader, Version, VersionStatus, VersionType,
+    Dependency, FileType, Loader, Version, VersionStatus, VersionType,
 };
 use crate::models::v2::projects::LegacyVersion;
 use crate::queue::session::AuthQueue;
@@ -30,7 +30,7 @@ pub fn default_requested_status() -> VersionStatus {
 #[derive(Serialize, Deserialize, Validate, Clone)]
 pub struct InitialVersionData {
     #[serde(alias = "mod_id")]
-    pub project_id: Option<ProjectRef>,
+    pub project_id: Option<ProjectId>,
     #[validate(length(min = 1, max = 256))]
     pub file_parts: Vec<String>,
     #[validate(
@@ -51,7 +51,7 @@ pub struct InitialVersionData {
         length(min = 0, max = 4096),
         custom(function = "crate::util::validate::validate_deps")
     )]
-    pub dependencies: Vec<version_creation::DependencyRequest>,
+    pub dependencies: Vec<Dependency>,
     #[validate(length(min = 1))]
     pub game_versions: Vec<String>,
     pub environment: Option<String>,
@@ -167,7 +167,7 @@ pub async fn version_create(
                         } else {
                             // If so, we get the field of an example version of the project, and set the side types to match.
                             get_example_version_fields(
-                                legacy_create.project_id.as_ref(),
+                                legacy_create.project_id,
                                 client,
                                 &redis,
                             )
@@ -278,20 +278,14 @@ pub async fn version_create(
 
 // Gets version fields of an example version of a project, if one exists.
 async fn get_example_version_fields(
-    project_ref: Option<&ProjectRef>,
+    project_id: Option<ProjectId>,
     pool: Data<PgPool>,
     redis: &RedisPool,
 ) -> Result<Option<Vec<VersionField>>, CreateError> {
-    let Some(project_ref) = project_ref else {
+    let Some(project_id) = project_id else {
         return Ok(None);
     };
 
-    let Some(project_id) =
-        project_item::DBProject::resolve_ref(project_ref, &**pool, redis)
-            .await?
-    else {
-        return Ok(None);
-    };
     let Some(vid) =
         project_item::DBProject::get_id(project_id.into(), &**pool, redis)
             .await?
