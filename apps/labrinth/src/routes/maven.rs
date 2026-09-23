@@ -6,7 +6,7 @@ use crate::database::models::project_item::ProjectQueryResult;
 use crate::database::models::version_item::{
     FileQueryResult, VersionQueryResult,
 };
-use crate::models::ids::{ProjectId, VersionId};
+use crate::models::ids::{ProjectRef, VersionId};
 use crate::models::pats::Scopes;
 use crate::models::projects::FileType;
 use crate::queue::session::AuthQueue;
@@ -80,14 +80,22 @@ pub struct MavenPom {
 #[get("/maven/modrinth/{id}/maven-metadata.xml")]
 pub async fn maven_metadata(
     req: HttpRequest,
-    params: web::Path<(String,)>,
+    params: web::Path<(ProjectRef,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let project_id = params.into_inner().0;
+    let project_ref = params.into_inner().0;
+    let requested_project_id = project_ref.as_str().to_string();
+    let Some(project_id) =
+        database::models::DBProject::resolve_ref(&project_ref, &**pool, &redis)
+            .await
+            .wrap_internal_err("fetching Maven project")?
+    else {
+        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+    };
     let Some(project) =
-        database::models::DBProject::get(&project_id, &**pool, &redis)
+        database::models::DBProject::get_id(project_id.into(), &**pool, &redis)
             .await
             .wrap_internal_err("fetching Maven project")?
     else {
@@ -148,11 +156,9 @@ pub async fn maven_metadata(
         new_versions.push(value);
     }
 
-    let project_id: ProjectId = project.inner.id.into();
-
     let respdata = Metadata {
         group_id: "maven.modrinth".to_string(),
-        artifact_id: project_id.to_string(),
+        artifact_id: requested_project_id,
         versioning: Versioning {
             latest: new_versions
                 .last()
@@ -318,19 +324,28 @@ fn find_file<'a>(
 )]
 pub async fn version_file(
     req: HttpRequest,
-    params: web::Path<(String, String, String)>,
+    params: web::Path<(ProjectRef, String, String)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let (project_id, vnum, file) = params.into_inner();
-    let Some(project) =
-        database::models::DBProject::get(&project_id, &**pool, &redis)
+    let (project_ref, vnum, file) = params.into_inner();
+    let requested_project_id = project_ref.as_str().to_string();
+    let Some(project_id) =
+        database::models::DBProject::resolve_ref(&project_ref, &**pool, &redis)
             .await
             .wrap_internal_err("fetching Maven project")?
     else {
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };
+    let Some(project) =
+        database::models::DBProject::get_id(project_id.into(), &**pool, &redis)
+            .await
+            .wrap_internal_err("fetching Maven project")?
+    else {
+        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+    };
+    let project_id = requested_project_id;
 
     let user_option = get_user_from_headers(
         &req,
@@ -405,19 +420,28 @@ pub async fn version_file(
 #[get("/maven/modrinth/{id}/{versionnum}/{file}.sha1")]
 pub async fn version_file_sha1(
     req: HttpRequest,
-    params: web::Path<(String, String, String)>,
+    params: web::Path<(ProjectRef, String, String)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let (project_id, vnum, file) = params.into_inner();
-    let Some(project) =
-        database::models::DBProject::get(&project_id, &**pool, &redis)
+    let (project_ref, vnum, file) = params.into_inner();
+    let requested_project_id = project_ref.as_str().to_string();
+    let Some(project_id) =
+        database::models::DBProject::resolve_ref(&project_ref, &**pool, &redis)
             .await
             .wrap_internal_err("fetching Maven project")?
     else {
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };
+    let Some(project) =
+        database::models::DBProject::get_id(project_id.into(), &**pool, &redis)
+            .await
+            .wrap_internal_err("fetching Maven project")?
+    else {
+        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+    };
+    let project_id = requested_project_id;
 
     let user_option = get_user_from_headers(
         &req,
@@ -471,19 +495,28 @@ pub async fn version_file_sha1(
 #[get("/maven/modrinth/{id}/{versionnum}/{file}.sha512")]
 pub async fn version_file_sha512(
     req: HttpRequest,
-    params: web::Path<(String, String, String)>,
+    params: web::Path<(ProjectRef, String, String)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let (project_id, vnum, file) = params.into_inner();
-    let Some(project) =
-        database::models::DBProject::get(&project_id, &**pool, &redis)
+    let (project_ref, vnum, file) = params.into_inner();
+    let requested_project_id = project_ref.as_str().to_string();
+    let Some(project_id) =
+        database::models::DBProject::resolve_ref(&project_ref, &**pool, &redis)
             .await
             .wrap_internal_err("fetching Maven project")?
     else {
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };
+    let Some(project) =
+        database::models::DBProject::get_id(project_id.into(), &**pool, &redis)
+            .await
+            .wrap_internal_err("fetching Maven project")?
+    else {
+        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+    };
+    let project_id = requested_project_id;
 
     let user_option = get_user_from_headers(
         &req,

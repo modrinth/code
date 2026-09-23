@@ -13,6 +13,7 @@ use crate::models::disclosures::{
     DisclosureLockStatus, ProjectDisclosure, ProjectDisclosureData,
     ProjectDisclosureType,
 };
+use crate::models::ids::ProjectRef;
 use crate::models::pats::Scopes;
 use crate::models::projects::ProjectStatus;
 use crate::models::teams::ProjectPermissions;
@@ -40,15 +41,19 @@ pub struct GetProjectDisclosures {
 #[get("/{project_id}/disclosures")]
 pub async fn get_project_disclosures(
     req: HttpRequest,
-    info: web::Path<(String,)>,
+    info: web::Path<(ProjectRef,)>,
     pool: web::Data<PgPool>,
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<GetProjectDisclosures>, ApiError> {
-    let (string,) = info.into_inner();
-
-    let project = db_models::DBProject::get(&string, &***ro_pool, &redis)
+    let (project_ref,) = info.into_inner();
+    let project_id =
+        DBProject::resolve_ref(&project_ref, &***ro_pool, redis.as_ref())
+            .await
+            .wrap_internal_err("resolving project reference")?
+            .wrap_not_found_err("resource not found")?;
+    let project = DBProject::get_id(project_id.into(), &***ro_pool, &redis)
         .await
         .wrap_internal_err("failed to fetch project")?
         .wrap_not_found_err("resource not found")?;
@@ -119,14 +124,14 @@ pub struct ModifyProjectDisclosures {
 #[patch("/{project_id}/disclosures")]
 pub async fn modify_project_disclosures(
     req: HttpRequest,
-    info: web::Path<(String,)>,
+    info: web::Path<(ProjectRef,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     search_state: web::Data<SearchState>,
     session_queue: web::Data<AuthQueue>,
     body: web::Json<ModifyProjectDisclosures>,
 ) -> Result<(), ApiError> {
-    let (string,) = info.into_inner();
+    let (project_ref,) = info.into_inner();
     let body = body.into_inner();
 
     if body.set.is_empty() && body.remove.is_empty() {
@@ -146,7 +151,12 @@ pub async fn modify_project_disclosures(
     .wrap_auth_err("authenticating API request")?
     .1;
 
-    let project = db_models::DBProject::get(&string, &**pool, &redis)
+    let project_id =
+        DBProject::resolve_ref(&project_ref, pool.as_ref(), redis.as_ref())
+            .await
+            .wrap_internal_err("resolving project reference")?
+            .wrap_not_found_err("resource not found")?;
+    let project = DBProject::get_id(project_id.into(), &**pool, &redis)
         .await
         .wrap_internal_err("failed to fetch project")?
         .wrap_not_found_err("resource not found")?;

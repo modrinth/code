@@ -12,6 +12,7 @@ use crate::auth::checks::{filter_visible_versions, is_visible_project};
 use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
+use crate::models::ids::ProjectRef;
 use crate::models::pats::Scopes;
 use crate::models::projects::VersionType;
 use crate::queue::session::AuthQueue;
@@ -46,7 +47,7 @@ fn default_neoforge() -> String {
 pub async fn forge_updates(
     req: HttpRequest,
     web::Query(neo): web::Query<NeoForge>,
-    info: web::Path<(String,)>,
+    info: web::Path<(ProjectRef,)>,
     pool: web::Data<PgPool>,
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
@@ -54,12 +55,18 @@ pub async fn forge_updates(
 ) -> Result<HttpResponse, ApiError> {
     const ERROR: &str = "The specified project does not exist!";
 
-    let (id,) = info.into_inner();
+    let (project_ref,) = info.into_inner();
 
-    let project = database::models::DBProject::get(&id, &**pool, &redis)
-        .await
-        .wrap_internal_err("fetching project from database")?
-        .wrap_request_err_with(|| ERROR.to_string())?;
+    let project_id =
+        database::models::DBProject::resolve_ref(&project_ref, &**pool, &redis)
+            .await
+            .wrap_internal_err("fetching project from database")?
+            .wrap_request_err_with(|| ERROR.to_string())?;
+    let project =
+        database::models::DBProject::get_id(project_id.into(), &**pool, &redis)
+            .await
+            .wrap_internal_err("fetching project from database")?
+            .wrap_request_err_with(|| ERROR.to_string())?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -115,7 +122,7 @@ pub async fn forge_updates(
     }
 
     let mut response = ForgeUpdates {
-        homepage: format!("{}/mod/{}", ENV.SITE_URL, id),
+        homepage: format!("{}/mod/{}", ENV.SITE_URL, project_id),
         promos: HashMap::new(),
     };
 

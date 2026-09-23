@@ -12,7 +12,7 @@ use crate::database::models::{
     DBModerationNote, DBOrganization, generate_organization_id, team_item,
 };
 use crate::file_hosting::{FileHost, FileHostPublicity};
-use crate::models::ids::OrganizationId;
+use crate::models::ids::{OrganizationId, ProjectRef};
 use crate::models::pats::Scopes;
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::v3::user_limits::UserLimits;
@@ -911,7 +911,7 @@ pub async fn organization_delete(
 
 #[derive(Deserialize, utoipa::ToSchema)]
 pub struct OrganizationProjectAdd {
-    pub project_id: String, // Also allow name/slug
+    pub project_id: ProjectRef,
 }
 #[utoipa::path(tag = "organizations", responses((status = NO_CONTENT)))]
 #[post("/organization/{id}/projects")]
@@ -944,10 +944,20 @@ pub async fn organization_projects_add(
                 "the specified organization does not exist!".to_string()
             })?;
 
-    let project_item = database::models::DBProject::get(
+    let project_id = database::models::DBProject::resolve_ref(
         &project_info.project_id,
-        &**pool,
-        &redis,
+        pool.as_ref(),
+        redis.as_ref(),
+    )
+    .await
+    .wrap_internal_err("resolving project reference")?
+    .wrap_request_err_with(|| {
+        "the specified project does not exist!".to_string()
+    })?;
+    let project_item = database::models::DBProject::get_id(
+        project_id.into(),
+        pool.as_ref(),
+        redis.as_ref(),
     )
     .await
     .wrap_internal_err("fetching project from database")?
@@ -1099,7 +1109,7 @@ pub struct OrganizationProjectRemoval {
 #[delete("/organization/{id}/projects/{project_id}")]
 pub async fn organization_projects_remove(
     req: HttpRequest,
-    info: web::Path<(String, String)>,
+    info: web::Path<(String, ProjectRef)>,
     pool: web::Data<PgPool>,
     data: web::Json<OrganizationProjectRemoval>,
     redis: web::Data<RedisPool>,
@@ -1129,13 +1139,26 @@ pub async fn organization_projects_remove(
         "the specified organization does not exist!".to_string()
     })?;
 
-    let project_item =
-        database::models::DBProject::get(&project_id, &**pool, &redis)
-            .await
-            .wrap_internal_err("fetching project from database")?
-            .wrap_request_err_with(|| {
-                "the specified project does not exist!".to_string()
-            })?;
+    let project_id = database::models::DBProject::resolve_ref(
+        &project_id,
+        pool.as_ref(),
+        redis.as_ref(),
+    )
+    .await
+    .wrap_internal_err("resolving project reference")?
+    .wrap_request_err_with(|| {
+        "the specified project does not exist!".to_string()
+    })?;
+    let project_item = database::models::DBProject::get_id(
+        project_id.into(),
+        pool.as_ref(),
+        redis.as_ref(),
+    )
+    .await
+    .wrap_internal_err("fetching project from database")?
+    .wrap_request_err_with(|| {
+        "the specified project does not exist!".to_string()
+    })?;
 
     if !project_item
         .inner

@@ -7,7 +7,7 @@ use crate::database::models::{
     project_item, report_item, thread_item, version_item,
 };
 use crate::file_hosting::{FileHost, FileHostPublicity};
-use crate::models::ids::{ReportId, ThreadMessageId, VersionId};
+use crate::models::ids::{ProjectRef, ReportId, ThreadMessageId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
@@ -32,7 +32,7 @@ pub struct ImageUpload {
     pub context: String,
 
     // Optional context id to associate with
-    pub project_id: Option<String>, // allow slug or id
+    pub project_id: Option<ProjectRef>,
     pub version_id: Option<VersionId>,
     pub thread_message_id: Option<ThreadMessageId>,
     pub report_id: Option<ReportId>,
@@ -43,7 +43,7 @@ pub struct ImageUpload {
 	params(
 		("ext" = String, Query),
 		("context" = String, Query),
-		("project_id" = Option<String>, Query),
+		("project_id" = Option<ProjectRef>, Query),
 		("version_id" = Option<VersionId>, Query),
 		("thread_message_id" = Option<ThreadMessageId>, Query),
 		("report_id" = Option<ReportId>, Query)
@@ -77,12 +77,28 @@ pub async fn images_add(
     // Attempt to associated a supplied id with the context
     // If the context cannot be found, or the user is not authorized to upload images for the context, return an error
     match &mut context {
-        ImageContext::Project { project_id } => {
-            if let Some(id) = data.project_id {
-                let project =
-                    project_item::DBProject::get(&id, &**pool, &redis)
-                        .await
-                        .wrap_internal_err("fetching project from database")?;
+        ImageContext::Project {
+            project_id: context_project_id,
+        } => {
+            if let Some(project_ref) = &data.project_id {
+                let resolved_project_id = project_item::DBProject::resolve_ref(
+                    project_ref,
+                    pool.as_ref(),
+                    redis.as_ref(),
+                )
+                .await
+                .wrap_internal_err("resolving project reference")?;
+                let project = if let Some(project_id) = resolved_project_id {
+                    project_item::DBProject::get_id(
+                        project_id.into(),
+                        pool.as_ref(),
+                        redis.as_ref(),
+                    )
+                    .await
+                    .wrap_internal_err("fetching project from database")?
+                } else {
+                    None
+                };
                 if let Some(project) = project {
                     if is_team_member_project(
                         &project.inner,
@@ -92,7 +108,7 @@ pub async fn images_add(
                     .await
                     .wrap_api_err("checking team member project")?
                     {
-                        *project_id = Some(project.inner.id.into());
+                        context_project_id.replace(project.inner.id.into());
                     } else {
                         return Err(ApiError::Auth(eyre::eyre!(
                             "You are not authorized to upload images for this project",

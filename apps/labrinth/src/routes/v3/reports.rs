@@ -9,7 +9,7 @@ use crate::database::models::thread_item::{
 };
 use crate::env::ENV;
 use crate::models::ids::{ImageId, OrganizationId};
-use crate::models::ids::{ProjectId, VersionId};
+use crate::models::ids::{ProjectId, ProjectRef, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
@@ -124,27 +124,30 @@ pub async fn report_create(
 
     match new_report.item_type {
         ItemType::Project => {
-            let project_id = ProjectId(
-                parse_base62(new_report.item_id.as_str())
-                    .wrap_request_err("parsing reported project ID")?,
-            );
-
-            let result = sqlx::query!(
-                "SELECT EXISTS(SELECT 1 FROM mods WHERE id = $1)",
-                project_id.0 as i64
+            let project_ref = ProjectRef(new_report.item_id.clone());
+            let project_id = database::models::DBProject::resolve_ref(
+                &project_ref,
+                &mut transaction,
+                redis.as_ref(),
             )
-            .fetch_one(&mut transaction)
             .await
-            .wrap_internal_err("querying database for `report_create`")?;
+            .wrap_internal_err("querying database for `report_create`")?
+            .wrap_request_err_with(|| {
+                format!("Project could not be found: {}", new_report.item_id)
+            })?;
+            let project_id = project_id.into();
+            database::models::DBProject::get_id(
+                project_id,
+                &mut transaction,
+                redis.as_ref(),
+            )
+            .await
+            .wrap_internal_err("querying database for `report_create`")?
+            .wrap_request_err_with(|| {
+                format!("Project could not be found: {}", new_report.item_id)
+            })?;
 
-            if !result.exists.unwrap_or(false) {
-                return Err(ApiError::Request(eyre::eyre!(format!(
-                    "Project could not be found: {}",
-                    new_report.item_id
-                ))));
-            }
-
-            report.project_id = Some(project_id.into())
+            report.project_id = Some(project_id)
         }
         ItemType::Version => {
             let version_id = VersionId(
@@ -349,9 +352,15 @@ pub async fn report_create(
     Ok(HttpResponse::Ok().json(Report {
         id: id.into(),
         report_type: new_report.report_type.clone(),
-        item_id: match report.shared_instance_id {
-            Some(shared_instance_id) => to_base62(shared_instance_id.0 as u64),
-            None => new_report.item_id.clone(),
+        item_id: if let Some(project_id) = report.project_id {
+            ProjectId::from(project_id).to_string()
+        } else {
+            match report.shared_instance_id {
+                Some(shared_instance_id) => {
+                    to_base62(shared_instance_id.0 as u64)
+                }
+                None => new_report.item_id.clone(),
+            }
         },
         item_type: new_report.item_type.clone(),
         shared_instance_version_id: report.shared_instance_version_id,

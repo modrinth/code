@@ -553,12 +553,37 @@ impl DBProject {
     where
         E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
-        let identifier = project_ref.as_str();
-        let normalized_identifier = identifier.to_lowercase();
-        let mut identifiers = vec![identifier.to_string()];
-        if normalized_identifier != identifier {
-            identifiers.push(normalized_identifier);
-        }
+        Ok(Self::resolve_refs(
+            std::slice::from_ref(project_ref),
+            executor,
+            redis,
+        )
+        .await?
+        .into_iter()
+        .next()
+        .flatten())
+    }
+
+    pub async fn resolve_refs<'a, E>(
+        project_refs: &[ProjectRef],
+        executor: E,
+        redis: &RedisPool,
+    ) -> Result<Vec<Option<ProjectId>>>
+    where
+        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
+    {
+        let identifiers = project_refs
+            .iter()
+            .flat_map(|project_ref| {
+                let identifier = project_ref.as_str();
+                let normalized_identifier = identifier.to_lowercase();
+                if normalized_identifier == identifier {
+                    vec![identifier.to_string()]
+                } else {
+                    vec![identifier.to_string(), normalized_identifier]
+                }
+            })
+            .collect::<Vec<_>>();
 
         let resolved = redis
             .get_cached_keys_raw_with_slug(
@@ -636,10 +661,26 @@ impl DBProject {
             .await
             .wrap_err("fetching cached project references")?;
 
-        Ok(identifiers
+        Ok(project_refs
             .iter()
-            .find_map(|identifier| resolved.get(identifier).copied())
-            .map(ProjectId::from))
+            .map(|project_ref| {
+                let identifier = project_ref.as_str();
+                let normalized_identifier = identifier.to_lowercase();
+                let exact = resolved.get(identifier).copied();
+                let exact_is_project_id = exact.is_some_and(|resolved_id| {
+                    parse_base62(identifier).is_ok_and(|parsed_id| {
+                        resolved_id == DBProjectId(parsed_id as i64)
+                    })
+                });
+
+                if normalized_identifier == identifier || exact_is_project_id {
+                    exact
+                } else {
+                    resolved.get(&normalized_identifier).copied()
+                }
+                .map(ProjectId::from)
+            })
+            .collect())
     }
 
     pub async fn get_id<'a, 'b, E>(
@@ -1186,6 +1227,36 @@ impl DBProject {
             .await
             .wrap_err("caching project dependencies")?;
         Ok(dependencies)
+    }
+
+    pub async fn clear_ref_cache(
+        project_refs: &[String],
+        redis: &RedisPool,
+    ) -> Result<()> {
+        let mut redis = redis
+            .connect()
+            .await
+            .wrap_err("connecting to redis to clear project reference cache")?;
+        let mut keys = Vec::with_capacity(project_refs.len() * 2);
+        for project_ref in project_refs {
+            keys.push(redis.key().entity(PROJECT_REFS_NAMESPACE, project_ref));
+            let normalized_project_ref = project_ref.to_lowercase();
+            if normalized_project_ref != *project_ref {
+                keys.push(
+                    redis
+                        .key()
+                        .entity(PROJECT_REFS_NAMESPACE, normalized_project_ref),
+                );
+            }
+        }
+
+        if !keys.is_empty() {
+            redis
+                .delete_many(&keys)
+                .await
+                .wrap_err("clearing project reference cache")?;
+        }
+        Ok(())
     }
 
     pub async fn clear_cache(

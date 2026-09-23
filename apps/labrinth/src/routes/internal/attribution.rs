@@ -14,7 +14,9 @@ use crate::database::models::{
     },
 };
 use crate::file_hosting::FileHost;
-use crate::models::ids::{AttributionGroupId, FileId, ProjectId, VersionId};
+use crate::models::ids::{
+    AttributionGroupId, FileId, ProjectId, ProjectRef, VersionId,
+};
 use crate::models::pats::Scopes;
 use crate::models::projects::{
     AttributionModerationStatusKind, AttributionResolution,
@@ -304,7 +306,7 @@ async fn force_scan_file(
 	context_path = "/attribution",
 	tag = "attribution",
 	params(
-		("project_id" = ProjectId, Path)
+		("project_id" = ProjectRef, Path)
 	),
 	responses((status = OK, body = inline(Vec<AttributionGroupResponse>)))
 )]
@@ -314,9 +316,9 @@ pub async fn list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    path: web::Path<ProjectId>,
+    path: web::Path<ProjectRef>,
 ) -> Result<web::Json<Vec<AttributionGroupResponse>>, ApiError> {
-    let project_id: DBProjectId = path.into_inner().into();
+    let project_ref = path.into_inner();
     let user = get_user_from_headers(
         &req,
         &**pool,
@@ -329,6 +331,12 @@ pub async fn list(
     .1;
     let requester_is_mod = user.role.is_mod();
 
+    let project_id =
+        DBProject::resolve_ref(&project_ref, pool.as_ref(), redis.as_ref())
+            .await
+            .wrap_internal_err("resolving project reference")?
+            .wrap_not_found_err("resource not found")?;
+    let project_id = DBProjectId::from(project_id);
     let project = DBProject::get_id(project_id, pool.as_ref(), redis.as_ref())
         .await
         .wrap_internal_err("fetching attribution project")?
@@ -759,7 +767,7 @@ pub async fn delete_groups(
 
 #[derive(Deserialize, utoipa::ToSchema)]
 struct DeleteAllGroupsBody {
-    project_id: ProjectId,
+    project_id: ProjectRef,
 }
 
 /// Delete all attribution groups and files for a project.
@@ -787,7 +795,12 @@ pub async fn delete_all_groups(
     .await
     .wrap_auth_err("deleting database records for `delete_all_groups`")?;
 
-    let project_id = DBProjectId::from(body.project_id).0;
+    let project_id =
+        DBProject::resolve_ref(&body.project_id, pool.as_ref(), redis.as_ref())
+            .await
+            .wrap_internal_err("resolving project reference")?
+            .wrap_not_found_err("resource not found")?;
+    let project_id = DBProjectId::from(project_id).0;
     let group_ids = sqlx::query_scalar!(
         r#"
 		SELECT id AS "id: DBAttributionGroupId"
@@ -880,7 +893,7 @@ async fn delete_attribution_groups(
 struct AssignBody {
     sha1: String,
     target_group_id: i64,
-    project_id: ProjectId,
+    project_id: ProjectRef,
 }
 
 /// Move a file to an attribution group.
@@ -913,7 +926,12 @@ pub async fn assign(
         return Err(ApiError::Request(eyre::eyre!("invalid sha1 hex string",)));
     }
     let sha1_bytes = sha1.as_bytes().to_vec();
-    let project_id: DBProjectId = body.project_id.into();
+    let project_id =
+        DBProject::resolve_ref(&body.project_id, pool.as_ref(), redis.as_ref())
+            .await
+            .wrap_internal_err("resolving project reference")?
+            .wrap_not_found_err("resource not found")?;
+    let project_id = DBProjectId::from(project_id);
 
     let source_group_id = sqlx::query_scalar!(
         "
@@ -1043,7 +1061,7 @@ pub async fn assign(
 #[derive(Deserialize, utoipa::ToSchema)]
 struct SplitBody {
     sha1: String,
-    project_id: ProjectId,
+    project_id: ProjectRef,
 }
 
 /// Split a file into a new attribution group.
@@ -1076,7 +1094,12 @@ pub async fn split(
         return Err(ApiError::Request(eyre::eyre!("invalid sha1 hex string",)));
     }
     let sha1_bytes = sha1.as_bytes().to_vec();
-    let project_id: DBProjectId = body.project_id.into();
+    let project_id =
+        DBProject::resolve_ref(&body.project_id, pool.as_ref(), redis.as_ref())
+            .await
+            .wrap_internal_err("resolving project reference")?
+            .wrap_not_found_err("resource not found")?;
+    let project_id = DBProjectId::from(project_id);
 
     let existing = sqlx::query!(
         "

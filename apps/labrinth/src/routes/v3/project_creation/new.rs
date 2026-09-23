@@ -20,7 +20,7 @@ use crate::{
     file_hosting::FileHost,
     models::{
         exp::{self, ProjectComponentKind, component::ComponentRelationError},
-        ids::ProjectId,
+        ids::{ProjectId, ProjectRef},
         pats::Scopes,
         projects::{
             MonetizationStatus, ProjectStatus, VersionStatus, VersionType,
@@ -201,6 +201,15 @@ pub async fn create(
         .begin()
         .await
         .wrap_internal_err("failed to begin transaction")?;
+
+    let slug_ref = ProjectRef(slug.clone());
+    if models::DBProject::resolve_ref(&slug_ref, &mut txn, &redis)
+        .await
+        .wrap_internal_err("checking project slug availability")?
+        .is_some()
+    {
+        return Err(CreateError::SlugCollision);
+    }
 
     let same_slug_record = sqlx::query!(
         "SELECT EXISTS(

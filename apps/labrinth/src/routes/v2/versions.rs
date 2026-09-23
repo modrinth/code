@@ -5,12 +5,11 @@ use std::collections::HashMap;
 use super::ApiError;
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models;
-use crate::models::ids::VersionId;
-use crate::models::projects::{
-    Dependency, FileType, Version, VersionStatus, VersionType,
-};
+use crate::models::ids::{ProjectRef, VersionId};
+use crate::models::projects::{FileType, Version, VersionStatus, VersionType};
 use crate::models::v2::projects::LegacyVersion;
 use crate::queue::session::AuthQueue;
+use crate::routes::v3::version_creation::DependencyRequest;
 use crate::routes::{v2_reroute, v3};
 use crate::search::SearchState;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
@@ -46,7 +45,7 @@ fn default_true() -> bool {
     true
 }
 
-/// List versions for a project.  
+/// List versions for a project.
 #[utoipa::path(
 	context_path = "/project/{project_id}",
 	tag = "versions",
@@ -73,7 +72,7 @@ fn default_true() -> bool {
 #[get("/version")]
 pub async fn version_list(
     req: HttpRequest,
-    info: web::Path<(String,)>,
+    info: web::Path<(ProjectRef,)>,
     web::Query(filters): web::Query<VersionListFilters>,
     pool: web::Data<PgPool>,
     ro_pool: web::Data<ReadOnlyPgPool>,
@@ -157,7 +156,7 @@ pub async fn version_list(
 }
 
 // Given a project ID/slug and a version slug
-/// Get a project version by ID or version number.  
+/// Get a project version by ID or version number.
 #[utoipa::path(
 	context_path = "/project/{project_id}",
 	tag = "versions",
@@ -178,7 +177,7 @@ pub async fn version_list(
 #[get("/version/{slug}")]
 pub async fn version_project_get(
     req: HttpRequest,
-    info: web::Path<(String, String)>,
+    info: web::Path<(ProjectRef, String)>,
     pool: web::Data<PgPool>,
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
@@ -213,7 +212,7 @@ pub struct VersionIds {
     pub include_changelog: bool,
 }
 
-/// Get multiple versions by ID.  
+/// Get multiple versions by ID.
 #[utoipa::path(
 	tag = "versions",
     get,
@@ -262,7 +261,7 @@ pub async fn versions_get(
     }
 }
 
-/// Get a version by ID.  
+/// Get a version by ID.
 #[utoipa::path(
 	context_path = "/version",
 	tag = "versions",
@@ -330,7 +329,7 @@ pub struct EditVersion {
         length(min = 0, max = 4096),
         custom(function = "crate::util::validate::validate_deps")
     )]
-    pub dependencies: Option<Vec<Dependency>>,
+    pub dependencies: Option<Vec<DependencyRequest>>,
     pub game_versions: Option<Vec<String>>,
     pub loaders: Option<Vec<models::projects::Loader>>,
     pub featured: Option<bool>,
@@ -346,7 +345,7 @@ pub struct EditVersionFileType {
     pub file_type: Option<FileType>,
 }
 
-/// Update an existing version.  
+/// Update an existing version.
 #[utoipa::path(
 	context_path = "/version",
 	tag = "versions",
@@ -471,7 +470,7 @@ pub async fn version_edit(
     Ok(response)
 }
 
-/// Delete a version by ID.  
+/// Delete a version by ID.
 #[utoipa::path(
 	context_path = "/version",
 	tag = "versions",

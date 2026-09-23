@@ -356,7 +356,7 @@ pub async fn project_get(
 )]
 #[get("/{id}/check")]
 pub async fn project_get_check(
-    info: web::Path<(String,)>,
+    info: web::Path<(ProjectRef,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
@@ -392,7 +392,7 @@ struct DependencyInfo {
 #[get("/dependencies")]
 pub async fn dependency_list(
     req: HttpRequest,
-    info: web::Path<(String,)>,
+    info: web::Path<(ProjectRef,)>,
     pool: web::Data<PgPool>,
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
@@ -567,7 +567,7 @@ pub struct EditProject {
 #[allow(clippy::too_many_arguments)]
 pub async fn project_edit(
     req: HttpRequest,
-    info: web::Path<(String,)>,
+    info: web::Path<(ProjectRef,)>,
     pool: web::Data<PgPool>,
     new_project: web::Json<EditProject>,
     redis: web::Data<RedisPool>,
@@ -577,7 +577,14 @@ pub async fn project_edit(
     let v2_new_project = new_project.into_inner();
     let client_side = v2_new_project.client_side;
     let server_side = v2_new_project.server_side;
-    let new_slug = v2_new_project.slug.clone();
+    let project_id = db_models::DBProject::resolve_ref(
+        &info.0,
+        pool.as_ref(),
+        redis.as_ref(),
+    )
+    .await
+    .wrap_internal_err("resolving project reference")?
+    .map(db_models::DBProjectId::from);
 
     // TODO: Some kind of handling here to ensure project type is fine.
     // We expect the version uploaded to be of loader type modpack, but there might  not be a way to check here for that.
@@ -625,10 +632,13 @@ pub async fn project_edit(
     // (resetting to the new ones)
     if let Some(donation_urls) = v2_new_project.donation_urls {
         // Fetch current donation links from project so we know what to delete
-        let fetched_example_project =
-            project_item::DBProject::get(&info.0, &**pool, &redis)
+        let fetched_example_project = if let Some(project_id) = project_id {
+            project_item::DBProject::get_id(project_id, &**pool, &redis)
                 .await
-                .wrap_internal_err("fetching project from database")?;
+                .wrap_internal_err("fetching project from database")?
+        } else {
+            None
+        };
         let donation_links = fetched_example_project
             .map(|x| {
                 x.urls
@@ -679,7 +689,6 @@ pub async fn project_edit(
     };
 
     // This returns 204 or failure so we don't need to do anything with it
-    let project_id = info.clone().0;
     let mut response = v3::projects::project_edit_internal(
         req.clone(),
         info,
@@ -698,13 +707,13 @@ pub async fn project_edit(
     if response.status().is_success()
         && (client_side.is_some() || server_side.is_some())
     {
-        let project_item = project_item::DBProject::get(
-            &new_slug.unwrap_or(project_id),
-            &**pool,
-            &redis,
-        )
-        .await
-        .wrap_internal_err("fetching project from database")?;
+        let project_item = if let Some(project_id) = project_id {
+            project_item::DBProject::get_id(project_id, &**pool, &redis)
+                .await
+                .wrap_internal_err("fetching project from database")?
+        } else {
+            None
+        };
         let version_ids = project_item.map(|x| x.versions).unwrap_or_default();
         let versions =
             version_item::DBVersion::get_many(&version_ids, &**pool, &redis)
@@ -959,7 +968,7 @@ pub struct Extension {
 pub async fn project_icon_edit(
     web::Query(ext): web::Query<Extension>,
     req: HttpRequest,
-    info: web::Path<(String,)>,
+    info: web::Path<(ProjectRef,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     file_host: web::Data<dyn FileHost>,
@@ -1005,7 +1014,7 @@ pub async fn project_icon_edit(
 #[delete("/{id}/icon")]
 pub async fn delete_project_icon(
     req: HttpRequest,
-    info: web::Path<(String,)>,
+    info: web::Path<(ProjectRef,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     file_host: web::Data<dyn FileHost>,
@@ -1080,7 +1089,7 @@ pub async fn add_gallery_item(
     web::Query(ext): web::Query<Extension>,
     req: HttpRequest,
     web::Query(item): web::Query<GalleryCreateQuery>,
-    info: web::Path<(String,)>,
+    info: web::Path<(ProjectRef,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     file_host: web::Data<dyn FileHost>,
@@ -1162,6 +1171,7 @@ pub struct GalleryEditQuery {
 #[patch("/{id}/gallery")]
 pub async fn edit_gallery_item(
     req: HttpRequest,
+    info: web::Path<(ProjectRef,)>,
     web::Query(item): web::Query<GalleryEditQuery>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -1171,6 +1181,7 @@ pub async fn edit_gallery_item(
     // Returns NoContent, so no need to convert
     v3::projects::edit_gallery_item_internal(
         req,
+        info,
         web::Query(v3::projects::GalleryEditQuery {
             url: item.url,
             featured: item.featured,
@@ -1215,6 +1226,7 @@ pub struct GalleryDeleteQuery {
 #[delete("/{id}/gallery")]
 pub async fn delete_gallery_item(
     req: HttpRequest,
+    info: web::Path<(ProjectRef,)>,
     web::Query(item): web::Query<GalleryDeleteQuery>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -1225,6 +1237,7 @@ pub async fn delete_gallery_item(
     // Returns NoContent, so no need to convert
     v3::projects::delete_gallery_item_internal(
         req,
+        info,
         web::Query(v3::projects::GalleryDeleteQuery { url: item.url }),
         pool,
         redis,
@@ -1258,7 +1271,7 @@ pub async fn delete_gallery_item(
 #[delete("/{id}")]
 pub async fn project_delete(
     req: HttpRequest,
-    info: web::Path<(String,)>,
+    info: web::Path<(ProjectRef,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -1300,7 +1313,7 @@ pub async fn project_delete(
 #[post("/{id}/follow")]
 pub async fn project_follow(
     req: HttpRequest,
-    info: web::Path<(String,)>,
+    info: web::Path<(ProjectRef,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -1333,7 +1346,7 @@ pub async fn project_follow(
 #[delete("/{id}/follow")]
 pub async fn project_unfollow(
     req: HttpRequest,
-    info: web::Path<(String,)>,
+    info: web::Path<(ProjectRef,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,

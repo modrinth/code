@@ -29,7 +29,9 @@ use crate::{
         },
     },
     models::{
-        ids::{FileId, ProjectId, ThreadId, ThreadMessageId, VersionId},
+        ids::{
+            FileId, ProjectId, ProjectRef, ThreadId, ThreadMessageId, VersionId,
+        },
         pats::Scopes,
         projects::{Project, ProjectStatus},
         threads::{MessageBody, Thread},
@@ -1000,7 +1002,7 @@ pub async fn get_project_report(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    path: web::Path<(ProjectId,)>,
+    path: web::Path<(ProjectRef,)>,
 ) -> Result<web::Json<ProjectReportResponse>, ApiError> {
     let user = check_is_moderator_from_headers(
         &req,
@@ -1012,7 +1014,12 @@ pub async fn get_project_report(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    let (project_id,) = path.into_inner();
+    let (project_ref,) = path.into_inner();
+    let project_id =
+        DBProject::resolve_ref(&project_ref, pool.as_ref(), redis.as_ref())
+            .await
+            .wrap_internal_err("resolving project reference")?
+            .wrap_not_found_err("resource not found")?;
     let db_project_id = DBProjectId::from(project_id);
 
     let row = sqlx::query!(
@@ -1103,7 +1110,7 @@ pub async fn submit_report(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
     web::Json(submit_report): web::Json<SubmitReport>,
-    path: web::Path<(ProjectId,)>,
+    path: web::Path<(ProjectRef,)>,
 ) -> Result<(), ApiError> {
     let user = check_is_moderator_from_headers(
         &req,
@@ -1114,7 +1121,12 @@ pub async fn submit_report(
     )
     .await
     .wrap_auth_err("authenticating API request")?;
-    let (project_id,) = path.into_inner();
+    let (project_ref,) = path.into_inner();
+    let project_id =
+        DBProject::resolve_ref(&project_ref, pool.as_ref(), redis.as_ref())
+            .await
+            .wrap_internal_err("resolving project reference")?
+            .wrap_not_found_err("resource not found")?;
     let project_id = DBProjectId::from(project_id);
 
     let mut txn = pool

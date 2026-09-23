@@ -1,5 +1,5 @@
 use crate::util::error::ApiContext as _;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use super::ApiError;
 use crate::auth::checks::{
@@ -16,17 +16,18 @@ use crate::database::models::version_item::{
 use crate::database::models::{DBOrganization, image_item};
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models;
-use crate::models::ids::VersionId;
+use crate::models::ids::{ProjectRef, VersionId};
 use crate::models::images::ImageContext;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    Dependency, FileType, ProjectStatus, VersionStatus, VersionType,
+    FileType, ProjectStatus, VersionStatus, VersionType,
 };
 use crate::models::projects::{Loader, skip_nulls};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::file_scan::get_files_missing_attribution;
 use crate::queue::session::AuthQueue;
 use crate::routes::internal::delphi;
+use crate::routes::v3::version_creation::DependencyRequest;
 use crate::search::SearchState;
 use crate::util::error::Context;
 use crate::util::img;
@@ -62,7 +63,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 #[get("/{project_id}/version/{slug}")]
 pub async fn version_project_get(
     req: HttpRequest,
-    info: web::Path<(String, String)>,
+    info: web::Path<(ProjectRef, String)>,
     pool: web::Data<PgPool>,
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
@@ -74,15 +75,28 @@ pub async fn version_project_get(
 }
 pub async fn version_project_get_helper(
     req: HttpRequest,
-    id: (String, String),
+    id: (ProjectRef, String),
     pool: web::Data<PgPool>,
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let result = database::models::DBProject::get(&id.0, &***ro_pool, &redis)
-        .await
-        .wrap_internal_err("fetching project from database")?;
+    let (project_ref, version_ref) = id;
+    let project_id = database::models::DBProject::resolve_ref(
+        &project_ref,
+        &***ro_pool,
+        redis.as_ref(),
+    )
+    .await
+    .wrap_internal_err("resolving project reference")?
+    .wrap_not_found_err("resource not found")?;
+    let result = database::models::DBProject::get_id(
+        project_id.into(),
+        &***ro_pool,
+        &redis,
+    )
+    .await
+    .wrap_internal_err("fetching project from database")?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -111,10 +125,10 @@ pub async fn version_project_get_helper(
         .await
         .wrap_internal_err("fetching versions from database")?;
 
-        let id_opt = parse_base62(&id.1).ok();
+        let id_opt = parse_base62(&version_ref).ok();
         let version = versions.into_iter().find(|x| {
             Some(x.inner.id.0 as u64) == id_opt
-                || x.inner.version_number == id.1
+                || x.inner.version_number == version_ref
         });
 
         if let Some(version) = version
@@ -362,7 +376,7 @@ pub struct EditVersion {
         length(min = 0, max = 4096),
         custom(function = "crate::util::validate::validate_deps")
     )]
-    pub dependencies: Option<Vec<Dependency>>,
+    pub dependencies: Option<Vec<DependencyRequest>>,
     pub loaders: Option<Vec<Loader>>,
     pub featured: Option<bool>,
     pub downloads: Option<u32>,
@@ -611,6 +625,54 @@ pub async fn version_edit_helper(
             }
 
             if let Some(dependencies) = &new_version.dependencies {
+                let dependency_project_refs = dependencies
+                    .iter()
+                    .filter_map(|dependency| dependency.project_id.clone())
+                    .collect::<Vec<_>>();
+                let mut resolved_dependency_project_ids =
+                    database::models::DBProject::resolve_refs(
+                        &dependency_project_refs,
+                        &mut transaction,
+                        &redis,
+                    )
+                    .await
+                    .wrap_internal_err(
+                        "resolving dependency project references",
+                    )?
+                    .into_iter();
+                let mut builders = Vec::with_capacity(dependencies.len());
+                let mut unique_dependencies = HashSet::new();
+                for dependency in dependencies {
+                    let project_id = if dependency.project_id.is_some() {
+                        Some(
+                            resolved_dependency_project_ids
+                                .next()
+                                .flatten()
+                                .wrap_request_err_with(|| {
+                                    "An invalid project id was supplied"
+                                        .to_string()
+                                })?,
+                        )
+                    } else {
+                        None
+                    };
+                    if !unique_dependencies.insert((
+                        dependency.version_id,
+                        project_id,
+                        dependency.file_name.clone(),
+                    )) {
+                        return Err(ApiError::Request(eyre::eyre!(
+                            "duplicate dependency"
+                        )));
+                    }
+                    builders.push(DependencyBuilder {
+                        project_id: project_id.map(Into::into),
+                        version_id: dependency.version_id.map(Into::into),
+                        file_name: dependency.file_name.clone(),
+                        dependency_type: dependency.dependency_type.to_string(),
+                    });
+                }
+
                 sqlx::query!(
                     "
                     DELETE FROM dependencies WHERE dependent_id = $1
@@ -620,16 +682,6 @@ pub async fn version_edit_helper(
                 .execute(&mut transaction)
                 .await
                 .wrap_internal_err("fetching dependencies from database")?;
-
-                let builders = dependencies
-                    .iter()
-                    .map(|x| database::models::version_item::DependencyBuilder {
-                        project_id: x.project_id.map(|x| x.into()),
-                        version_id: x.version_id.map(|x| x.into()),
-                        file_name: x.file_name.clone(),
-                        dependency_type: x.dependency_type.to_string(),
-                    })
-                    .collect::<Vec<database::models::version_item::DependencyBuilder>>();
 
                 DependencyBuilder::insert_many(
                     builders,
@@ -1040,7 +1092,7 @@ pub struct VersionListFilters {
 #[get("/{project_id}/version")]
 pub async fn version_list(
     req: HttpRequest,
-    info: web::Path<(String,)>,
+    info: web::Path<(ProjectRef,)>,
     web::Query(filters): web::Query<VersionListFilters>,
     pool: web::Data<PgPool>,
     ro_pool: web::Data<ReadOnlyPgPool>,
@@ -1061,18 +1113,29 @@ pub async fn version_list(
 
 pub async fn version_list_internal(
     req: HttpRequest,
-    info: web::Path<(String,)>,
+    info: web::Path<(ProjectRef,)>,
     web::Query(filters): web::Query<VersionListFilters>,
     pool: web::Data<PgPool>,
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let string = info.into_inner().0;
-
-    let result = database::models::DBProject::get(&string, &***ro_pool, &redis)
-        .await
-        .wrap_internal_err("fetching project from database")?;
+    let (project_ref,) = info.into_inner();
+    let project_id = database::models::DBProject::resolve_ref(
+        &project_ref,
+        &***ro_pool,
+        redis.as_ref(),
+    )
+    .await
+    .wrap_internal_err("resolving project reference")?
+    .wrap_not_found_err("resource not found")?;
+    let result = database::models::DBProject::get_id(
+        project_id.into(),
+        &***ro_pool,
+        &redis,
+    )
+    .await
+    .wrap_internal_err("fetching project from database")?;
 
     let user_option = get_user_from_headers(
         &req,
