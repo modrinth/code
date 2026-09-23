@@ -14,7 +14,7 @@ impl ContentStore {
         stored_files: &[String],
     ) -> crate::Result<()> {
         let _lease = self.lease().await;
-        let mut tx = self.pool.begin().await?;
+        let mut tx = self.pool.begin_with("BEGIN IMMEDIATE").await?;
         for stored_file in stored_files {
             catalog::retain(&mut tx, kind, owner, stored_file).await?;
         }
@@ -29,7 +29,7 @@ impl ContentStore {
         stored_files: &[String],
     ) -> crate::Result<()> {
         let _lease = self.lease().await;
-        let mut tx = self.pool.begin().await?;
+        let mut tx = self.pool.begin_with("BEGIN IMMEDIATE").await?;
         catalog::release(&mut tx, kind, owner).await?;
         for stored_file in stored_files {
             catalog::retain(&mut tx, kind, owner, stored_file).await?;
@@ -43,7 +43,7 @@ impl ContentStore {
         kind: &str,
         owner: &str,
     ) -> crate::Result<()> {
-        let mut tx = self.pool.begin().await?;
+        let mut tx = self.pool.begin_with("BEGIN IMMEDIATE").await?;
         catalog::release(&mut tx, kind, owner).await?;
         tx.commit().await?;
         Ok(())
