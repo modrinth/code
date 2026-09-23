@@ -1,6 +1,6 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "请描述您的项目。"
+    "defaultMessage": "请描述您的项目，包括项目的主要内容、目的和特色。"
   },
   "nags.add-description.title": {
     "defaultMessage": "添加描述"
@@ -54,7 +54,7 @@
     "defaultMessage": "选择准确的标签"
   },
   "nags.check-disclosures.description": {
-    "defaultMessage": "请通过填写适用于你 {type} 的内容披露信息，确保用户充分了解所有重要信息"
+    "defaultMessage": "请填写适用于你的{type}的内容披露信息，确保用户充分了解所有重要信息。"
   },
   "nags.check-disclosures.title": {
     "defaultMessage": "审查披露"
@@ -110,9 +110,6 @@
   "nags.gallery.title": {
     "defaultMessage": "前往图库页"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "你的{type}所使用的许可证要求公开源文件，请提供源文件链接、添加源文件或者更换许可证。"
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "提供源代码"
   },
@@ -133,6 +130,12 @@
   },
   "nags.invalid-project-summary.title": {
     "defaultMessage": "修改简介"
+  },
+  "nags.license-url.not-in-allowlist.title": {
+    "defaultMessage": "检查您的许可证链接"
+  },
+  "nags.link-validation.duplicate.title": {
+    "defaultMessage": "删除重复链接"
   },
   "nags.long-headers.description": {
     "defaultMessage": "描述中有 {count, plural, other {# 个标题}}过长。标题应简洁，用作章节名，不应是完整的句子。"
@@ -166,6 +169,9 @@
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "选择正确的分辨率"
+  },
+  "nags.project-description-content.title": {
+    "defaultMessage": "查看描述"
   },
   "nags.project-description-non-english.description": {
     "defaultMessage": "您的项目描述必须以英语编写或者包含英语翻译。"
@@ -344,6 +350,9 @@
   "nags.visit-links-settings.title": {
     "defaultMessage": "访问链接设置"
   },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "您的项目描述应该提供独特的信息，且不要重复项目的摘要。"
+  },
   "project.text-validation.summary-matches-title": {
     "defaultMessage": "您的项目简介应该提供独特的信息，不要重复项目的名称。"
   },
@@ -354,3 +363,4 @@
     "defaultMessage": "项目名称不应包含版本号。"
   }
 }
+

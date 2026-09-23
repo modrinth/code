@@ -581,6 +581,9 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
+  "app-marketing.features.importing.description": {
+    "message": "以前に使用していたランチャーから既存のゲームインスタンスをすべてインポートし、数秒でModrinth Appを開始しましょう！"
+  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
@@ -589,6 +592,12 @@
   },
   "app-marketing.features.importing.title": {
     "message": "インスタンスのインポート"
+  },
+  "app-marketing.features.manage-skins.description": {
+    "message": "アプリから Minecraft のスキンをすべて切り替えます。"
+  },
+  "app-marketing.features.manage-skins.title": {
+    "message": "スキンセレクター"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "アクション"
@@ -661,6 +670,12 @@
   },
   "app-marketing.features.play.title": {
     "message": "お気に入りのModで遊ぶ"
+  },
+  "app-marketing.features.settings-sync.description": {
+    "message": "すべてのインスタンスで同じオプション、リソースパックなどを使用できます。"
+  },
+  "app-marketing.features.settings-sync.title": {
+    "message": "設定の同期"
   },
   "app-marketing.features.sharing.description": {
     "message": "Modrinthでホストされている何千ものModやModパックのいずれかを使用して、Modパックを構築、共有、プレイできます。"
@@ -890,6 +905,12 @@
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Modrinth Appを開く"
   },
+  "auth.sign-in.launcher.complete.title": {
+    "message": "サインインしています"
+  },
+  "auth.sign-in.launcher.opening.description": {
+    "message": "アプリが開かない場合は、下のボタンを使用してサインインしてください。"
+  },
   "auth.sign-in.no-account": {
     "message": "アカウントを持っていませんか？"
   },
@@ -922,6 +943,9 @@
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "アカウントの作成"
+  },
+  "auth.two-factor.incorrect-code": {
+    "message": "二段階認証コードが正しくありません。もう一度試すか、バックアップコードを使用してください。"
   },
   "auth.verify-email.action.account-settings": {
     "message": "アカウント設定"
@@ -1258,6 +1282,9 @@
   },
   "create-project-version.create-modal.stage.metadata.no-versions-selected": {
     "message": "バージョンが選択されていません。"
+  },
+  "create-project-version.create-modal.stage.metadata.prefilled-environment-tooltip": {
+    "message": "以前の類似バージョンから入力済み"
   },
   "create-project-version.create-modal.stage.metadata.suggested": {
     "message": "おすすめ"
@@ -1712,6 +1739,9 @@
   "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
     "message": "金額を入力してください"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.need-at-least-gift-card": {
+    "message": "このギフトカードを使用するには少なくとも {min} が必要です。"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "支払い方法"
   },
@@ -1726,6 +1756,9 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
     "message": "検索金額"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-category-placeholder": {
+    "message": "{category}を検索…"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-category-placeholder": {
     "message": "{category}を選択"

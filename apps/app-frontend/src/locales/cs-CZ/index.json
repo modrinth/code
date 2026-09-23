@@ -278,6 +278,36 @@
   "app.content-install.no-compatible-versions": {
     "message": "Žádné dostupné verze se neshodují s {compatibilityLabel}. Vyberte verzi, kterou chcete přesto nainstalovat. Závislosti nebudou nainstalovány automaticky."
   },
+  "app.download-manager.active": {
+    "message": "Aktivní"
+  },
+  "app.download-manager.cancel": {
+    "message": "Zrušit instalaci"
+  },
+  "app.download-manager.canceling": {
+    "message": "Rušení instalace..."
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Importovaná instance"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "Instalace instance"
+  },
+  "app.download-manager.modpack": {
+    "message": "Modpack"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Instalace Modpacku"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Nová instance"
+  },
+  "app.download-manager.remove": {
+    "message": "Odebrat z historie"
+  },
+  "app.download-manager.verifying": {
+    "message": "Ověřování"
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "Otevřít složku zaloh"
   },
@@ -307,6 +337,9 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.features-settings.instance-pages.title": {
+    "message": "Instance"
   },
   "app.home.jump-back-in.actions.label": {
     "message": "Akce instance"
@@ -1456,6 +1489,39 @@
   },
   "app.settings.downloading": {
     "message": "Stahování v{version}"
+  },
+  "app.settings.game-options.category.chat.description": {
+    "message": "Viditelnost a vzhled chatu"
+  },
+  "app.settings.game-options.category.chat.label": {
+    "message": "Chat"
+  },
+  "app.settings.game-options.category.custom.label": {
+    "message": "Vlastní nastavení"
+  },
+  "app.settings.game-options.category.language.label": {
+    "message": "Jazyk"
+  },
+  "app.settings.game-options.category.music-and-sound.description": {
+    "message": "Nastavení hlasitosti a zvuku"
+  },
+  "app.settings.game-options.category.music-and-sound.label": {
+    "message": "Hudba a zvuk"
+  },
+  "app.settings.game-options.category.online.label": {
+    "message": "Online"
+  },
+  "app.settings.game-options.category.video.description": {
+    "message": "Nastavení kamery a zobrazení"
+  },
+  "app.settings.game-options.choice.all": {
+    "message": "Vše"
+  },
+  "app.settings.game-options.choice.chat": {
+    "message": "Chat"
+  },
+  "app.settings.game-options.choice.commands-only": {
+    "message": "Pouze příkazy"
   },
   "app.settings.java-installations.location.title": {
     "message": "Umístění Javy {version, number}"

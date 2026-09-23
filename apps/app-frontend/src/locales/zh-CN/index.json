@@ -53,6 +53,9 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "无法完成下载"
   },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "无法准备实例"
+  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "文件路径无效"
   },
@@ -132,7 +135,7 @@
     "message": "全部接受"
   },
   "app.ads-consent.body": {
-    "message": "广告使 Modrinth 得以运营，并为创作者报酬提供资金支持。我们的合作伙伴可能会在应用中存储或访问 Cookie，以便实现广告个性化和效果衡量。"
+    "message": "​广告维持着 Modrinth 的持续运营，并为创作者收益提供资金支持。我们的合作伙伴可能会在应用中存储或读取 Cookie，以提供个性化广告并评估广告效果。"
   },
   "app.ads-consent.manage": {
     "message": "管理偏好设置"
@@ -168,7 +171,7 @@
     "message": "最小化 App"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "显示你在每个实例中游玩的时间。"
+    "message": "显示您在每个实例中游玩的时间。"
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "显示总游玩时间"
@@ -186,7 +189,7 @@
     "message": "隐藏右侧边栏"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "在安装非 Modrinth 托管的 Modrinth 整合包文件 (.mrpack) 前显示安全警告。"
+    "message": "在安装非 Modrinth 托管的 Modrinth 整合包文件（.mrpack）前显示安全警告。"
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "安装未知整合包前提醒我"
@@ -201,7 +204,7 @@
     "message": "安全确认"
   },
   "app.behavior-settings.content.title": {
-    "message": "主页及内容"
+    "message": "主页与内容"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "启动与导航"
@@ -293,6 +296,87 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "首先在应用设置中打开资源包同步。"
   },
+  "app.download-manager.active": {
+    "message": "启用"
+  },
+  "app.download-manager.attention": {
+    "message": "需要注意"
+  },
+  "app.download-manager.cancel": {
+    "message": "取消安装"
+  },
+  "app.download-manager.canceling": {
+    "message": "正在取消安装……"
+  },
+  "app.download-manager.clear-all": {
+    "message": "全部清空"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "清除全部已完成的任务"
+  },
+  "app.download-manager.complete": {
+    "message": "完成"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "复制实例"
+  },
+  "app.download-manager.empty": {
+    "message": "无安装任务"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "预计下载速度"
+  },
+  "app.download-manager.eta": {
+    "message": "此次下载的预计剩余时间"
+  },
+  "app.download-manager.hide": {
+    "message": "隐藏安装任务"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "导入实例"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "安装的实例"
+  },
+  "app.download-manager.modpack": {
+    "message": "整合包"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "安装的整合包"
+  },
+  "app.download-manager.new-instance": {
+    "message": "新建实例"
+  },
+  "app.download-manager.pause": {
+    "message": "暂停安装"
+  },
+  "app.download-manager.paused": {
+    "message": "已暂停"
+  },
+  "app.download-manager.remove": {
+    "message": "从历史记录中移除"
+  },
+  "app.download-manager.resume": {
+    "message": "继续安装"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "共享实例"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "共享实例更新"
+  },
+  "app.download-manager.show": {
+    "message": "显示安装任务"
+  },
+  "app.download-manager.tasks": {
+    "message": "任务"
+  },
+  "app.download-manager.title": {
+    "message": "下载管理"
+  },
+  "app.download-manager.verifying": {
+    "message": "正在验证"
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "打开备份文件夹"
   },
@@ -329,6 +413,9 @@
   "app.features-settings.play-page.title": {
     "message": "游玩界面"
   },
+  "app.features-settings.quick-instances.description": {
+    "message": "选择左侧边栏显示的最近实例的最大数量。您也可以通过拖动分隔符来调整它。"
+  },
   "app.features-settings.quick-instances.title": {
     "message": "侧边栏中的快速实例"
   },
@@ -344,8 +431,14 @@
   "app.features-settings.show-jump-in.description": {
     "message": "在游戏页面顶部显示最近播放的世界和实例。"
   },
+  "app.features-settings.show-jump-in.title": {
+    "message": "在节中显示跳转"
+  },
   "app.features-settings.show-screenshots-tab.title": {
     "message": "在实例中显示截图栏"
+  },
+  "app.features-settings.show-skin-selector.description": {
+    "message": "在左侧边栏显示一个按钮以打开皮肤选择器。"
   },
   "app.features-settings.show-skin-selector.title": {
     "message": "在侧边栏显示皮肤选择器"
@@ -355,6 +448,9 @@
   },
   "app.features-settings.sidebar.title": {
     "message": "侧边栏"
+  },
+  "app.features-settings.sync-across-devices.description": {
+    "message": "在你登录的所有设备上使用这些行为设置。关闭它后可以在设备上单独设置。"
   },
   "app.features-settings.sync-across-devices.signed-out-tooltip": {
     "message": "登录到一个Modrinth账号以同步设置。"
@@ -1367,6 +1463,9 @@
   "app.quick-instance-switcher.instance-locked": {
     "message": "此实例已被锁定"
   },
+  "app.quick-instance-switcher.title": {
+    "message": "最近的实例"
+  },
   "app.quick-instance-switcher.view-instance": {
     "message": "查看实例"
   },
@@ -1971,7 +2070,7 @@
     "message": "Minecraft无法使用此输入。请按另一个键。"
   },
   "app.settings.game-options.setting.advanced-opengl.label": {
-    "message": "高级OpenGL"
+    "message": "高级 OpenGL"
   },
   "app.settings.game-options.setting.allow-cursor-changes.label": {
     "message": "允许鼠标改动"
@@ -2026,6 +2125,9 @@
   },
   "app.settings.game-options.setting.brightness.label": {
     "message": "亮度"
+  },
+  "app.settings.game-options.setting.cape.description": {
+    "message": "显示玩家的披风，包括其鞘翅纹理。"
   },
   "app.settings.game-options.setting.cape.label": {
     "message": "披风"
@@ -2104,6 +2206,9 @@
   },
   "app.settings.game-options.setting.directional-audio.label": {
     "message": "定向音频"
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.description": {
+    "message": "将每次鼠标滚轮输入视为一个单一的滚动。"
   },
   "app.settings.game-options.setting.discrete-mouse-scroll.label": {
     "message": "离散滚动"
@@ -2376,7 +2481,7 @@
     "message": "切换电影视角"
   },
   "app.settings.game-options.setting.key-sneak.label": {
-    "message": "蹲下"
+    "message": "潜行"
   },
   "app.settings.game-options.setting.key-social-interactions.label": {
     "message": "社交互动"
@@ -2388,7 +2493,7 @@
     "message": "高亮旁观者"
   },
   "app.settings.game-options.setting.key-sprint.label": {
-    "message": "冲刺"
+    "message": "疾跑"
   },
   "app.settings.game-options.setting.key-swap-offhand.label": {
     "message": "与副手交换物品"
@@ -2447,6 +2552,9 @@
   "app.settings.game-options.setting.music-frequency.label": {
     "message": "音乐播放频率"
   },
+  "app.settings.game-options.setting.music-toast.description": {
+    "message": "选择音乐标题是否出现在暂停菜单和弹窗中。"
+  },
   "app.settings.game-options.setting.music-toast.label": {
     "message": "音乐弹窗"
   },
@@ -2483,11 +2591,20 @@
   "app.settings.game-options.setting.players-volume.label": {
     "message": "玩家"
   },
+  "app.settings.game-options.setting.prioritize-chunk-updates.label": {
+    "message": "优先处理区块更新"
+  },
   "app.settings.game-options.setting.quit-shortcuts.label": {
     "message": "退出游戏快捷键"
   },
+  "app.settings.game-options.setting.raw-mouse-input.label": {
+    "message": "鼠标原始输入"
+  },
   "app.settings.game-options.setting.realms-notifications.label": {
     "message": "Relams通知"
+  },
+  "app.settings.game-options.setting.record-volume.label": {
+    "message": "唱片机/音符盒"
   },
   "app.settings.game-options.setting.reduced-debug-info.label": {
     "message": "减少调试信息"
@@ -2495,8 +2612,14 @@
   "app.settings.game-options.setting.render-distance.label": {
     "message": "渲染距离"
   },
+  "app.settings.game-options.setting.right-pants-leg.label": {
+    "message": "右裤腿"
+  },
   "app.settings.game-options.setting.right-sleeve.label": {
     "message": "右袖"
+  },
+  "app.settings.game-options.setting.rotate-with-minecart.label": {
+    "message": "同步矿车转动"
   },
   "app.settings.game-options.setting.save-chat-drafts.label": {
     "message": "保存聊天草稿"
@@ -2504,14 +2627,20 @@
   "app.settings.game-options.setting.screen-effects.label": {
     "message": "屏幕效果"
   },
+  "app.settings.game-options.setting.secure-chat-only.label": {
+    "message": "仅显示安全的聊天"
+  },
   "app.settings.game-options.setting.sensitivity.label": {
     "message": "鼠标灵敏度"
   },
   "app.settings.game-options.setting.server-textures.label": {
-    "message": "服务器材质包"
+    "message": "服务器纹理"
   },
   "app.settings.game-options.setting.share-presence.label": {
     "message": "分享游玩信息"
+  },
+  "app.settings.game-options.setting.simulation-distance.description": {
+    "message": "实体在多远范围内更新，以及方块和流体在多远范围内进行刻更新。"
   },
   "app.settings.game-options.setting.simulation-distance.label": {
     "message": "模拟距离"
@@ -2564,6 +2693,9 @@
   "app.settings.game-options.setting.use-vbo.label": {
     "message": "使用VBO"
   },
+  "app.settings.game-options.setting.view-bobbing.description": {
+    "message": "行走时添加视角摇晃。"
+  },
   "app.settings.game-options.setting.view-bobbing.label": {
     "message": "视角摇晃"
   },
@@ -2572,6 +2704,9 @@
   },
   "app.settings.game-options.setting.voice-volume.label": {
     "message": "复述功能/语音"
+  },
+  "app.settings.game-options.setting.vsync.description": {
+    "message": "将帧率限制为显示器刷新率，以防止屏幕撕裂。"
   },
   "app.settings.game-options.setting.vsync.label": {
     "message": "垂直同步"
@@ -2669,6 +2804,78 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "最大并发写入数"
   },
+  "app.settings.resource-management.store.attention": {
+    "message": "有些文件仍然需要注意"
+  },
+  "app.settings.resource-management.store.cache-limit.description": {
+    "message": "保留这些未使用的内容以备未来安装。\n保留更多可以节省下载时间。"
+  },
+  "app.settings.resource-management.store.cache-limit.label": {
+    "message": "保留未使用的下载"
+  },
+  "app.settings.resource-management.store.cache-limit.unit": {
+    "message": "GiB"
+  },
+  "app.settings.resource-management.store.calculating": {
+    "message": "计算中"
+  },
+  "app.settings.resource-management.store.clear": {
+    "message": "清除未使用的"
+  },
+  "app.settings.resource-management.store.clear.description": {
+    "message": "删除未使用的下载内容"
+  },
+  "app.settings.resource-management.store.cleared": {
+    "message": "已释放 {size} 磁盘空间。"
+  },
+  "app.settings.resource-management.store.clearing": {
+    "message": "正在清除……"
+  },
+  "app.settings.resource-management.store.description": {
+    "message": "通过在多个实例之间复用游戏安装、模组和各类包来节省空间。"
+  },
+  "app.settings.resource-management.store.empty": {
+    "message": "安装模组或包来查看您的存储使用情况。"
+  },
+  "app.settings.resource-management.store.issues": {
+    "message": "查看 {count, plural, other {# 个问题}}"
+  },
+  "app.settings.resource-management.store.nothing-to-clear": {
+    "message": "没有未使用的内容要清除。"
+  },
+  "app.settings.resource-management.store.repair": {
+    "message": "验证并修复"
+  },
+  "app.settings.resource-management.store.repair.running-description": {
+    "message": "这将关闭所有运行中的实例。"
+  },
+  "app.settings.resource-management.store.repair.verify-description": {
+    "message": "检查丢失或损坏的文件并予以修复。"
+  },
+  "app.settings.resource-management.store.repairing": {
+    "message": "验证并修复……"
+  },
+  "app.settings.resource-management.store.shared.label": {
+    "message": "已分享"
+  },
+  "app.settings.resource-management.store.title": {
+    "message": "内容存储"
+  },
+  "app.settings.resource-management.store.total": {
+    "message": "已存储 {size}"
+  },
+  "app.settings.resource-management.store.unique.label": {
+    "message": "各实例独立"
+  },
+  "app.settings.resource-management.store.unused.label": {
+    "message": "未使用"
+  },
+  "app.settings.resource-management.store.verification-result": {
+    "message": "已检查 {checked, plural, other {# 个文件}}，并进行了 {repaired, plural, other {# 次修复}}。"
+  },
+  "app.settings.resource-management.store.verified": {
+    "message": "验证完成"
+  },
   "app.settings.sidebar.label.instances": {
     "message": "实例"
   },
@@ -2678,11 +2885,17 @@
   "app.settings.synced-options.choose-sync-source.command-history-title": {
     "message": "选择命令历史来源"
   },
+  "app.settings.synced-options.choose-sync-source.creative-hotbars-description": {
+    "message": "选择要从哪个实例复制你已保存的创造模式快捷栏。 此快捷栏仅用于初始同步，您可以在其后从任何实例编辑它。"
+  },
   "app.settings.synced-options.choose-sync-source.creative-hotbars-title": {
     "message": "选择创造模式快捷栏来源"
   },
   "app.settings.synced-options.choose-sync-source.data-packs-title": {
     "message": "选择数据包来源"
+  },
+  "app.settings.synced-options.choose-sync-source.game-settings-description": {
+    "message": "选择要从哪个实例复制你的游戏设置。 此设置仅用于初始同步，您可以在其后从任何实例编辑它。"
   },
   "app.settings.synced-options.choose-sync-source.game-settings-title": {
     "message": "选择游戏设置源"
@@ -2692,6 +2905,9 @@
   },
   "app.settings.synced-options.choose-sync-source.load-error": {
     "message": "无法加载同步源。请稍后再试。"
+  },
+  "app.settings.synced-options.choose-sync-source.multiplayer-servers-description": {
+    "message": "选择要从哪个实例复制你的多人模式服务器列表。 此列表仅用于初始同步，您可以在其后从任何实例编辑它。"
   },
   "app.settings.synced-options.choose-sync-source.multiplayer-servers-title": {
     "message": "选择多人服务器资源包"
@@ -2729,8 +2945,17 @@
   "app.settings.synced-options.data-packs": {
     "message": "同步数据包"
   },
+  "app.settings.synced-options.data-packs.description": {
+    "message": "在不同的实例之间同步数据包"
+  },
   "app.settings.synced-options.data-packs.none-synced-yet": {
     "message": "你尚未同步任何数据包"
+  },
+  "app.settings.synced-options.edit.no-instances": {
+    "message": "编辑同步数据前添加一个实例。"
+  },
+  "app.settings.synced-options.edit.no-synced-data": {
+    "message": "编辑此设置前选择一个同步源。"
   },
   "app.settings.synced-options.game-settings": {
     "message": "同步游戏设置"
@@ -2741,8 +2966,20 @@
   "app.settings.synced-options.game-settings.conflict-text": {
     "message": "我们加载了最新设置。请检查您的更改，然后再次保存。"
   },
+  "app.settings.synced-options.game-settings.conflict-title": {
+    "message": "这些设置已在别处修改"
+  },
+  "app.settings.synced-options.game-settings.custom-empty": {
+    "message": "当 Modrinth 在你的某个实例中找到模组添加的设置后，它们就会显示在这里。"
+  },
+  "app.settings.synced-options.game-settings.description": {
+    "message": "在不同的实例之间同步游戏设置。"
+  },
   "app.settings.synced-options.game-settings.disable-all": {
     "message": "取消全部同步"
+  },
+  "app.settings.synced-options.game-settings.disabled-tooltip": {
+    "message": "在选择个别设置之前启用游戏设置同步。"
   },
   "app.settings.synced-options.game-settings.empty": {
     "message": "没有符合搜索或筛选条件的设置。"
@@ -2771,6 +3008,9 @@
   "app.settings.synced-options.game-settings.search": {
     "message": "搜索设置……"
   },
+  "app.settings.synced-options.game-settings.sync-description": {
+    "message": "同步选项适用于每个实例，并覆盖包含整合包的值。"
+  },
   "app.settings.synced-options.game-settings.sync-setting": {
     "message": "在各实例间同步 {setting}"
   },
@@ -2788,6 +3028,9 @@
   },
   "app.settings.synced-options.game-settings.unsync-setting": {
     "message": "停止在各实例间同步 {setting}"
+  },
+  "app.settings.synced-options.game-settings.value-mixed": {
+    "message": "不同的实例"
   },
   "app.settings.synced-options.game-settings.value-off": {
     "message": "关闭"
@@ -2846,8 +3089,14 @@
   "app.settings.synced-options.multiplayer-servers.status": {
     "message": "在线人数"
   },
+  "app.settings.synced-options.packs.disabled": {
+    "message": "在编辑共享资源包之前，请先启用同步。"
+  },
   "app.settings.synced-options.resource-packs": {
-    "message": "同步材质包"
+    "message": "同步资源包"
+  },
+  "app.settings.synced-options.resource-packs.description": {
+    "message": "在不同的实例之间同步资源包。"
   },
   "app.settings.synced-options.resource-packs.none-synced-yet": {
     "message": "你尚未同步任何资源包"
@@ -3059,14 +3308,32 @@
   "app.sync-instances-update.badge": {
     "message": "本次更新的新功能"
   },
+  "app.sync-instances-update.choose-source.all": {
+    "message": "选择要从哪个实例复制你的游戏设置、资源包、命令历史记录、创造模式快捷栏和多人模式服务器列表。 此设置仅用于初始同步，您可以在其后从任何实例编辑它。"
+  },
   "app.sync-instances-update.choose-source.all-title": {
     "message": "选择同步源"
+  },
+  "app.sync-instances-update.choose-source.data-packs": {
+    "message": "选择要从哪个实例复制你的数据包。 此数据包仅用于初始同步，您可以在其后从任何实例编辑它。"
+  },
+  "app.sync-instances-update.choose-source.resource-packs": {
+    "message": "选择要从哪个实例复制你的资源包。 此资源包仅用于初始同步，您可以在其后从任何实例编辑它。"
   },
   "app.sync-instances-update.creative-hotbars": {
     "message": "同步创造模式快捷栏"
   },
+  "app.sync-instances-update.description": {
+    "message": "现在，你可以跨实例同步游戏设置、服务器、资源包等选项，这样每次游玩时一切都能保持一致！"
+  },
   "app.sync-instances-update.load-error": {
     "message": "无法加载同步设置。请稍后再试。"
+  },
+  "app.sync-instances-update.manage-later": {
+    "message": "你现在就可以启用同步，之后可在应用设置中管理。"
+  },
+  "app.sync-instances-update.notification.description": {
+    "message": "让游戏设置、服务器、资源包等在你的多个实例间保持同步。"
   },
   "app.sync-instances-update.notification.dismiss": {
     "message": "忽略"
@@ -3089,8 +3356,14 @@
   "app.sync-instances-update.title": {
     "message": "同步你的实例"
   },
+  "app.synced-content.change.disable-description": {
+    "message": "在所有已同步的实例中禁用此内容，或仅在此实例中禁用。仅在此实例禁用会为此实例启用覆盖。"
+  },
   "app.synced-content.change.disable-everywhere": {
     "message": "在每一处都禁用"
+  },
+  "app.synced-content.change.disable-everywhere-description": {
+    "message": "在所有已同步的实例中禁用此内容。"
   },
   "app.synced-content.change.disable-here": {
     "message": "在此禁用"
@@ -3098,8 +3371,14 @@
   "app.synced-content.change.disable-title": {
     "message": "禁用内容？"
   },
+  "app.synced-content.change.enable-description": {
+    "message": "在所有已同步的实例中启用此内容，或仅在此实例中启用。仅在此实例启用会为此实例启用覆盖。"
+  },
   "app.synced-content.change.enable-everywhere": {
     "message": "在每一处都启用"
+  },
+  "app.synced-content.change.enable-everywhere-description": {
+    "message": "在所有已同步的实例中启用此内容。"
   },
   "app.synced-content.change.enable-here": {
     "message": "在此启用"
@@ -3113,6 +3392,9 @@
   "app.synced-content.delete.delete-here": {
     "message": "在此处删除"
   },
+  "app.synced-content.delete.description": {
+    "message": "删除此内容将在所有已同步的实例中删除此内容。"
+  },
   "app.synced-content.delete.mixed": {
     "message": "未同步的选定内容只会从此实例中删除。"
   },
@@ -3124,6 +3406,9 @@
   },
   "app.synced-content.delete.resource-pack-header": {
     "message": "{count, plural, other {这些资源包已同步}}"
+  },
+  "app.synced-content.desync.description": {
+    "message": "此实例将保留自己的副本。您想要在其他情况下保持同步，还是将其从其他实例中移除？"
   },
   "app.synced-content.desync.keep": {
     "message": "保留"
@@ -3428,6 +3713,9 @@
   "instance.files.adding-files": {
     "message": "正在添加文件（{completed}/{total}）"
   },
+  "instance.files.managed-content-read-only": {
+    "message": "通过内容选项卡管理已安装的内容"
+  },
   "instance.files.save-as": {
     "message": "保存为……"
   },
@@ -3726,13 +4014,13 @@
     "message": "关闭此覆盖以编辑同步的包。可以在内容选项卡中管理独立包。"
   },
   "instance.settings.synced-options.resource-packs": {
-    "message": "取消同步材质包"
+    "message": "取消同步资源包"
   },
   "instance.settings.synced-options.resource-packs.description": {
     "message": "将此实例的资源包与材质包分开。"
   },
   "instance.settings.synced-options.resource-packs.disabled": {
-    "message": "材质包同步功能已在应用设置中关闭。"
+    "message": "资源包同步功能已在应用设置中关闭。"
   },
   "instance.settings.tabs.behavior.description": {
     "message": "选择在实例页面要显示的标签页。"

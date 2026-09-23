@@ -1397,6 +1397,12 @@
   "external-project-license-status.yes": {
     "defaultMessage": "Evet"
   },
+  "file-button.file-too-large.description": {
+    "defaultMessage": "{filename} dosyası çok büyük. En fazla dosya boyutu {maxSize}."
+  },
+  "file-button.file-too-large.title": {
+    "defaultMessage": "Dosya çok büyük"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "Özeti ayıkla"
   },

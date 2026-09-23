@@ -62,6 +62,12 @@
   "analytics.chart.render-limit.header": {
     "message": "להציג את כל {count} הקווים בגרף?"
   },
+  "analytics.chart.tooltip.total": {
+    "message": "סך הכול"
+  },
+  "analytics.chart.view.area": {
+    "message": "שטח"
+  },
   "app-marketing.download.description": {
     "message": "היישום השולחני שלנו זמין לכל הפלטפורמות. אנא בחר את הגרסה הרצויה."
   },

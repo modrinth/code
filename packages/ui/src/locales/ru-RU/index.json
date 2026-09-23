@@ -378,7 +378,7 @@
     "defaultMessage": "контент"
   },
   "content-type.item.lowercase": {
-    "defaultMessage": "{count, plural,  one {# элемент}  few {# элемента} many {# элементов} other {#элементов}}"
+    "defaultMessage": "{count, plural,  one {элемент} few {элемента} other {элементов}}"
   },
   "content.card.frozen": {
     "defaultMessage": "Этот проект заблокирован на его текущей версии до разморозки."
@@ -1339,6 +1339,12 @@
   },
   "external-project-license-status.yes": {
     "defaultMessage": "Да"
+  },
+  "file-button.file-too-large.description": {
+    "defaultMessage": "Файл {filename} слишком большой. Лимит — {maxSize}."
+  },
+  "file-button.file-too-large.title": {
+    "defaultMessage": "Файл слишком большой"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Итоги распаковки"

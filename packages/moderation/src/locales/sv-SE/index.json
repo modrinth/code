@@ -47,6 +47,9 @@
   "nags.check-disclosures.title": {
     "defaultMessage": "Granska upplysningar"
   },
+  "nags.description-ends-with-header.description": {
+    "defaultMessage": "Din projektbeskrivning borde inte avsluta med en rubrik som inte följs av någon text."
+  },
   "nags.description-too-short.title": {
     "defaultMessage": "Utöka beskrivningen"
   },
@@ -86,6 +89,9 @@
   "nags.invalid-license-url.title": {
     "defaultMessage": "Lägg till en giltig licenslänk"
   },
+  "nags.invalid-project-description.title": {
+    "defaultMessage": "Ändra beskrivningen"
+  },
   "nags.invalid-project-name.title": {
     "defaultMessage": "Ändra projektnamn"
   },
@@ -122,6 +128,9 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Välj korrekt upplösning"
   },
+  "nags.project-description-content.title": {
+    "defaultMessage": "Granska beskrivningen"
+  },
   "nags.project-description-non-english.description": {
     "defaultMessage": "Din projektbeskrivning måste vara skriven på engelska eller inkludera en engelsk översättning."
   },
@@ -144,7 +153,7 @@
     "defaultMessage": "Granska sammanfattningen"
   },
   "nags.project-summary-links.description": {
-    "defaultMessage": "Länkar, URL:er och IP-adresser ska inte finnas med i beskrivningen. Upptäckte: ”{value}”"
+    "defaultMessage": "Länkar, URL:er och IP-adresser borde inte finnas med i beskrivningen. Upptäckte: ”{value}”"
   },
   "nags.project-summary-links.title": {
     "defaultMessage": "Ta bort länkar i sammanfattningen"
@@ -204,7 +213,7 @@
     "defaultMessage": "Besök versionsinställningar"
   },
   "nags.summary-special-formatting.description": {
-    "defaultMessage": "Din sammanfattning bör inte innehålla Markdown eller HTML eftersom den endast kan visa oformaterad text."
+    "defaultMessage": "Din sammanfattning borde inte innehålla Markdown eller HTML eftersom den endast visar oformaterad text."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Fixa sammanfattningsformatering"
@@ -245,13 +254,17 @@
   "nags.visit-links-settings.title": {
     "defaultMessage": "Besök länkinställningar"
   },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "Din projektbeskrivning borde ge unik information och inte upprepa projektsammanfattningen."
+  },
   "project.text-validation.summary-matches-title": {
-    "defaultMessage": "Ditt projekts sammanfattning bör ge unik information och inte upprepa projektnamnet."
+    "defaultMessage": "Din projektsammanfattning borde ge unik information och inte upprepa projektnamnet."
   },
   "project.text-validation.summary-too-short": {
     "defaultMessage": "Din sammanfattning är för kort. Lägg till en eller två meningar som beskriver ditt projekt."
   },
   "project.text-validation.title-version-number": {
-    "defaultMessage": "Projektnamn bör inte inkludera versionsnummer."
+    "defaultMessage": "Projektnamn borde inte inkludera versionsnummer."
   }
 }
+

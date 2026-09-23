@@ -53,6 +53,9 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Nedladdning kunde inte slutföras"
   },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Kunde inte förbereda instansen"
+  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Sökväg är ogiltig"
   },
@@ -292,6 +295,66 @@
   },
   "app.content.sync-resource-packs-disabled": {
     "message": "Aktivera synkronisering av resurs­paket i appens inställningar först."
+  },
+  "app.download-manager.active": {
+    "message": "Aktiv"
+  },
+  "app.download-manager.attention": {
+    "message": "Behöver uppmärksamhet"
+  },
+  "app.download-manager.cancel": {
+    "message": "Avbryt installation"
+  },
+  "app.download-manager.canceling": {
+    "message": "Avbryter installation…"
+  },
+  "app.download-manager.clear-all": {
+    "message": "Rensa alla"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Rensa alla slutförda uppgifter"
+  },
+  "app.download-manager.complete": {
+    "message": "Slutförd"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Uppskattad nedladdningshastighet"
+  },
+  "app.download-manager.eta": {
+    "message": "Uppskattad tid kvar för den här nedladdningen"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Importerad instans"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "Instans installation"
+  },
+  "app.download-manager.modpack": {
+    "message": "Modpaket"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Ny instans"
+  },
+  "app.download-manager.pause": {
+    "message": "Pausa installation"
+  },
+  "app.download-manager.paused": {
+    "message": "Pausad"
+  },
+  "app.download-manager.remove": {
+    "message": "Ta bort från historik"
+  },
+  "app.download-manager.resume": {
+    "message": "Fortsätt installation"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Delad instans"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "Delad instansuppdatering"
+  },
+  "app.download-manager.verifying": {
+    "message": "Verifierar"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Öppna mappen för säkerhetskopior"
@@ -1370,6 +1433,9 @@
   "app.quick-instance-switcher.instance-locked": {
     "message": "Den här instansen har låsts"
   },
+  "app.quick-instance-switcher.title": {
+    "message": "Senaste instanser"
+  },
   "app.quick-instance-switcher.view-instance": {
     "message": "Visa instans"
   },
@@ -1393,6 +1459,9 @@
   },
   "app.screenshots.deselect": {
     "message": "Avmarkera {name}"
+  },
+  "app.screenshots.edit": {
+    "message": "Redigera skärmdump"
   },
   "app.screenshots.empty-description": {
     "message": "Skärmdumpar du tar i spelet kommer visas här."
@@ -1694,8 +1763,20 @@
   "app.settings.game-options.choice.left": {
     "message": "Vänster"
   },
+  "app.settings.game-options.choice.limited": {
+    "message": "Begränsad"
+  },
+  "app.settings.game-options.choice.maximum": {
+    "message": "Maximum"
+  },
   "app.settings.game-options.choice.minimal": {
     "message": "Minimalt"
+  },
+  "app.settings.game-options.choice.minimum": {
+    "message": "Minimum"
+  },
+  "app.settings.game-options.choice.nearby": {
+    "message": "I närheten"
   },
   "app.settings.game-options.choice.never": {
     "message": "Aldrig"
@@ -1778,6 +1859,12 @@
   "app.settings.game-options.keybind.key.caps-lock": {
     "message": "Skiftlås"
   },
+  "app.settings.game-options.keybind.key.delete": {
+    "message": "Radera"
+  },
+  "app.settings.game-options.keybind.key.home": {
+    "message": "Hem"
+  },
   "app.settings.game-options.keybind.key.left-alt": {
     "message": "Vänster Alt"
   },
@@ -1790,8 +1877,14 @@
   "app.settings.game-options.keybind.key.left-shift": {
     "message": "Vänster shift"
   },
+  "app.settings.game-options.keybind.key.menu": {
+    "message": "Meny"
+  },
   "app.settings.game-options.keybind.key.num-lock": {
     "message": "Numeriskt lås"
+  },
+  "app.settings.game-options.keybind.key.pause": {
+    "message": "Paus"
   },
   "app.settings.game-options.keybind.key.right-alt": {
     "message": "Höger alt"
@@ -1822,6 +1915,9 @@
   },
   "app.settings.game-options.keybind.modifier.alt": {
     "message": "Alt"
+  },
+  "app.settings.game-options.keybind.modifier.command": {
+    "message": "Kommando"
   },
   "app.settings.game-options.keybind.modifier.control": {
     "message": "Ctrl"
@@ -2892,7 +2988,7 @@
     "message": "Rymdhjälm"
   },
   "instance.icon-editor.symbol.sticky-piston": {
-    "message": "Klibbig Kolv"
+    "message": "Klibbig kolv"
   },
   "instance.icon-editor.symbol.sword": {
     "message": "Svärd"
@@ -2913,7 +3009,7 @@
     "message": "Zombie"
   },
   "instance.icon-editor.title": {
-    "message": "Ikon redigerare"
+    "message": "Ikonredigerare"
   },
   "instance.last-played": {
     "message": "Senast spelad"
