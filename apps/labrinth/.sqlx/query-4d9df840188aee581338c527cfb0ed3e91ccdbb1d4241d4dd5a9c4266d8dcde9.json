@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT target_project_id AS \"target_project_id: DBProjectId\"\n            FROM project_redirects\n            WHERE identifier = $1 OR identifier = LOWER($1)\n            ORDER BY identifier = $1 DESC\n            LIMIT 1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "target_project_id: DBProjectId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "4d9df840188aee581338c527cfb0ed3e91ccdbb1d4241d4dd5a9c4266d8dcde9"
+}

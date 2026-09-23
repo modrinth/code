@@ -52,6 +52,13 @@ pub async fn forge_updates(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) =
+        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
+            .await?
+    {
+        return Ok(response);
+    }
+
     const ERROR: &str = "The specified project does not exist!";
 
     let (id,) = info.into_inner();

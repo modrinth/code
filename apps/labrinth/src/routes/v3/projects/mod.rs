@@ -291,8 +291,17 @@ pub async fn project_get(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<Project>, ApiError> {
-    project_get_internal(req, info, pool, redis, session_queue).await
+) -> Result<HttpResponse, ApiError> {
+    if let Some(response) =
+        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
+            .await?
+    {
+        return Ok(response);
+    }
+
+    let project =
+        project_get_internal(req, info, pool, redis, session_queue).await?;
+    Ok(HttpResponse::Ok().json(project.into_inner()))
 }
 
 pub async fn project_get_internal(
@@ -429,6 +438,13 @@ pub async fn project_edit(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) =
+        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
+            .await?
+    {
+        return Ok(response);
+    }
+
     project_edit_internal(
         req,
         info,
@@ -1689,10 +1705,18 @@ pub async fn project_search_post(
 )]
 #[get("/{id}/check")]
 pub async fn project_get_check(
+    req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) =
+        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
+            .await?
+    {
+        return Ok(response);
+    }
+
     project_get_check_internal(info, pool, redis).await
 }
 
@@ -1736,6 +1760,17 @@ pub async fn dependency_list(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "project_id",
+        pool.as_ref(),
+        redis.as_ref(),
+    )
+    .await?
+    {
+        return Ok(response);
+    }
+
     dependency_list_internal(req, info, pool, ro_pool, redis, session_queue)
         .await
 }
@@ -2267,6 +2302,13 @@ pub async fn project_icon_edit(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) =
+        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
+            .await?
+    {
+        return Ok(response);
+    }
+
     project_icon_edit_internal(
         web::Query(ext),
         req,
@@ -2423,6 +2465,13 @@ pub async fn delete_project_icon(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) =
+        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
+            .await?
+    {
+        return Ok(response);
+    }
+
     delete_project_icon_internal(
         req,
         info,
@@ -2576,6 +2625,13 @@ pub async fn add_gallery_item(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) =
+        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
+            .await?
+    {
+        return Ok(response);
+    }
+
     add_gallery_item_internal(
         web::Query(ext),
         req,
@@ -2818,6 +2874,13 @@ pub async fn edit_gallery_item(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) =
+        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
+            .await?
+    {
+        return Ok(response);
+    }
+
     edit_gallery_item_internal(
         req,
         web::Query(item),
@@ -3047,6 +3110,13 @@ pub async fn delete_gallery_item(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) =
+        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
+            .await?
+    {
+        return Ok(response);
+    }
+
     delete_gallery_item_internal(
         req,
         web::Query(item),
@@ -3206,9 +3276,24 @@ pub async fn project_delete(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
-) -> Result<(), ApiError> {
-    project_delete_internal(req, info, pool, redis, session_queue, search_state)
-        .await
+) -> Result<HttpResponse, ApiError> {
+    if let Some(response) =
+        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
+            .await?
+    {
+        return Ok(response);
+    }
+
+    project_delete_internal(
+        req,
+        info,
+        pool,
+        redis,
+        session_queue,
+        search_state,
+    )
+    .await?;
+    Ok(HttpResponse::NoContent().finish())
 }
 
 pub async fn project_delete_internal(
@@ -3519,6 +3604,13 @@ pub async fn project_follow(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) =
+        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
+            .await?
+    {
+        return Ok(response);
+    }
+
     project_follow_internal(req, info, pool, redis, session_queue).await
 }
 
@@ -3624,6 +3716,13 @@ pub async fn project_unfollow(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) =
+        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
+            .await?
+    {
+        return Ok(response);
+    }
+
     project_unfollow_internal(req, info, pool, redis, session_queue).await
 }
 
@@ -3721,6 +3820,13 @@ pub async fn project_get_organization(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) =
+        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
+            .await?
+    {
+        return Ok(response);
+    }
+
     let current_user = get_user_from_headers(
         &req,
         &**pool,

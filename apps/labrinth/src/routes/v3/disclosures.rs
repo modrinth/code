@@ -1,4 +1,4 @@
-use actix_web::{HttpRequest, get, patch, web};
+use actix_web::{HttpRequest, HttpResponse, get, patch, web};
 use chrono::Utc;
 use eyre::eyre;
 use serde::{Deserialize, Serialize};
@@ -45,7 +45,18 @@ pub async fn get_project_disclosures(
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<GetProjectDisclosures>, ApiError> {
+) -> Result<HttpResponse, ApiError> {
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "project_id",
+        pool.as_ref(),
+        redis.as_ref(),
+    )
+    .await?
+    {
+        return Ok(response);
+    }
+
     let (string,) = info.into_inner();
 
     let project = db_models::DBProject::get(&string, &***ro_pool, &redis)
@@ -88,7 +99,7 @@ pub async fn get_project_disclosures(
     .await
     .wrap_internal_err("failed to fetch project disclosures")?;
 
-    Ok(web::Json(GetProjectDisclosures {
+    Ok(HttpResponse::Ok().json(GetProjectDisclosures {
         disclosures: disclosures
             .into_iter()
             .map(|disclosure| {
@@ -125,7 +136,18 @@ pub async fn modify_project_disclosures(
     search_state: web::Data<SearchState>,
     session_queue: web::Data<AuthQueue>,
     body: web::Json<ModifyProjectDisclosures>,
-) -> Result<(), ApiError> {
+) -> Result<HttpResponse, ApiError> {
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "project_id",
+        pool.as_ref(),
+        redis.as_ref(),
+    )
+    .await?
+    {
+        return Ok(response);
+    }
+
     let (string,) = info.into_inner();
     let body = body.into_inner();
 
@@ -304,5 +326,5 @@ pub async fn modify_project_disclosures(
         .push_project_change(project.inner.id.into())
         .await;
 
-    Ok(())
+    Ok(HttpResponse::NoContent().finish())
 }

@@ -1,12 +1,17 @@
+use crate::database::PgPool;
+use crate::database::models::DBProjectId;
 use crate::env::ENV;
+use crate::models::ids::ProjectId;
 use crate::util::cors::default_cors;
+use crate::util::error::Context;
 use actix_cors::Cors;
 use actix_files::Files;
-use actix_web::http::StatusCode;
-use actix_web::{HttpResponse, web};
+use actix_web::http::{StatusCode, header};
+use actix_web::{HttpRequest, HttpResponse, web};
 use futures::FutureExt;
 use utoipa::openapi::extensions::ExtensionsBuilder;
 use utoipa::openapi::security::{HttpAuthScheme, HttpBuilder, SecurityScheme};
+use xredis::RedisPool;
 
 pub mod debug;
 pub mod internal;
@@ -21,6 +26,95 @@ mod not_found;
 mod updates;
 
 pub use self::not_found::not_found;
+
+const PROJECT_REDIRECTS_NAMESPACE: &str = "project_redirects:v1";
+const PROJECT_REDIRECT_CACHE_TTL_SECONDS: i64 = 300;
+
+pub async fn redirect_ref(
+    req: &HttpRequest,
+    parameter_name: &str,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<Option<HttpResponse>, ApiError> {
+    let Some(project_ref) = req.match_info().get(parameter_name) else {
+        return Ok(None);
+    };
+
+    let mut redis = redis
+        .connect()
+        .await
+        .wrap_internal_err("connecting to Redis for project redirect")?;
+    let key = redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, project_ref);
+    let cached_target = redis
+        .get_deserialized::<Option<i64>>(&key)
+        .await
+        .wrap_internal_err("reading cached project redirect")?;
+
+    let target_project_id = if let Some(cached_target) = cached_target {
+        cached_target.map(DBProjectId)
+    } else {
+        let target_project_id = sqlx::query_scalar!(
+            r#"
+            SELECT target_project_id AS "target_project_id: DBProjectId"
+            FROM project_redirects
+            WHERE identifier = $1 OR identifier = LOWER($1)
+            ORDER BY identifier = $1 DESC
+            LIMIT 1
+            "#,
+            project_ref,
+        )
+        .fetch_optional(pool)
+        .await
+        .wrap_internal_err("looking up project redirect")?;
+
+        redis
+            .set_serialized(
+                &key,
+                &target_project_id.map(|project_id| project_id.0),
+                Some(PROJECT_REDIRECT_CACHE_TTL_SECONDS),
+            )
+            .await
+            .wrap_internal_err("caching project redirect")?;
+
+        target_project_id
+    };
+    let Some(target_project_id) = target_project_id else {
+        return Ok(None);
+    };
+
+    let Some(route_pattern) = req.match_pattern() else {
+        return Ok(None);
+    };
+    let parameter = format!("{{{parameter_name}}}");
+    let constrained_parameter = format!("{{{parameter_name}:");
+    let Some(parameter_index) = route_pattern.split('/').position(|segment| {
+        segment == parameter || segment.starts_with(&constrained_parameter)
+    }) else {
+        return Ok(None);
+    };
+    let mut path_segments = req
+        .uri()
+        .path()
+        .split('/')
+        .map(ToOwned::to_owned)
+        .collect::<Vec<_>>();
+    let Some(path_segment) = path_segments.get_mut(parameter_index) else {
+        return Ok(None);
+    };
+    *path_segment = ProjectId::from(target_project_id).to_string();
+
+    let mut location = path_segments.join("/");
+    if let Some(query) = req.uri().query() {
+        location.push('?');
+        location.push_str(query);
+    }
+
+    Ok(Some(
+        HttpResponse::PermanentRedirect()
+            .append_header((header::LOCATION, location))
+            .finish(),
+    ))
+}
 
 // utoipa-specific struct to use a value_type for docs.
 /// A sha1 or sha512 hash.

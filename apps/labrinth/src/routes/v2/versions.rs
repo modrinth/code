@@ -46,7 +46,7 @@ fn default_true() -> bool {
     true
 }
 
-/// List versions for a project.  
+/// List versions for a project.
 #[utoipa::path(
 	context_path = "/project/{project_id}",
 	tag = "versions",
@@ -80,6 +80,17 @@ pub async fn version_list(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "project_id",
+        pool.as_ref(),
+        redis.as_ref(),
+    )
+    .await?
+    {
+        return Ok(response);
+    }
+
     let loaders = if let Some(loaders) = filters.loaders {
         if let Ok(mut loaders) = serde_json::from_str::<Vec<String>>(&loaders) {
             loaders.push("mrpack".to_string());
@@ -157,7 +168,7 @@ pub async fn version_list(
 }
 
 // Given a project ID/slug and a version slug
-/// Get a project version by ID or version number.  
+/// Get a project version by ID or version number.
 #[utoipa::path(
 	context_path = "/project/{project_id}",
 	tag = "versions",
@@ -184,6 +195,17 @@ pub async fn version_project_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "project_id",
+        pool.as_ref(),
+        redis.as_ref(),
+    )
+    .await?
+    {
+        return Ok(response);
+    }
+
     let id = info.into_inner();
     let response = v3::versions::version_project_get_helper(
         req,
@@ -213,7 +235,7 @@ pub struct VersionIds {
     pub include_changelog: bool,
 }
 
-/// Get multiple versions by ID.  
+/// Get multiple versions by ID.
 #[utoipa::path(
 	tag = "versions",
     get,
@@ -262,7 +284,7 @@ pub async fn versions_get(
     }
 }
 
-/// Get a version by ID.  
+/// Get a version by ID.
 #[utoipa::path(
 	context_path = "/version",
 	tag = "versions",
@@ -346,7 +368,7 @@ pub struct EditVersionFileType {
     pub file_type: Option<FileType>,
 }
 
-/// Update an existing version.  
+/// Update an existing version.
 #[utoipa::path(
 	context_path = "/version",
 	tag = "versions",
@@ -471,7 +493,7 @@ pub async fn version_edit(
     Ok(response)
 }
 
-/// Delete a version by ID.  
+/// Delete a version by ID.
 #[utoipa::path(
 	context_path = "/version",
 	tag = "versions",

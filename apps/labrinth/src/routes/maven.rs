@@ -85,6 +85,13 @@ pub async fn maven_metadata(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) =
+        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
+            .await?
+    {
+        return Ok(response);
+    }
+
     let project_id = params.into_inner().0;
     let Some(project) =
         database::models::DBProject::get(&project_id, &**pool, &redis)
@@ -323,6 +330,13 @@ pub async fn version_file(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) =
+        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
+            .await?
+    {
+        return Ok(response);
+    }
+
     let (project_id, vnum, file) = params.into_inner();
     let Some(project) =
         database::models::DBProject::get(&project_id, &**pool, &redis)
@@ -410,6 +424,13 @@ pub async fn version_file_sha1(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) =
+        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
+            .await?
+    {
+        return Ok(response);
+    }
+
     let (project_id, vnum, file) = params.into_inner();
     let Some(project) =
         database::models::DBProject::get(&project_id, &**pool, &redis)
@@ -476,6 +497,13 @@ pub async fn version_file_sha512(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) =
+        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
+            .await?
+    {
+        return Ok(response);
+    }
+
     let (project_id, vnum, file) = params.into_inner();
     let Some(project) =
         database::models::DBProject::get(&project_id, &**pool, &redis)

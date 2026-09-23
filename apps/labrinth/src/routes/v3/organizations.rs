@@ -1106,6 +1106,17 @@ pub async fn organization_projects_remove(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "project_id",
+        pool.as_ref(),
+        redis.as_ref(),
+    )
+    .await?
+    {
+        return Ok(response);
+    }
+
     let (organization_id, project_id) = info.into_inner();
     let current_user = get_user_from_headers(
         &req,
