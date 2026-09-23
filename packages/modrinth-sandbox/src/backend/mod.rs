@@ -5,7 +5,9 @@ use std::{ffi::OsString, fmt::Debug, path::PathBuf, process::ExitStatus};
 use async_trait::async_trait;
 use eyre::Result;
 
+// TODO cfgs
 mod bubblewrap;
+mod linux;
 
 /// Entry point into the sandboxing mechanism.
 ///
@@ -47,16 +49,23 @@ pub async fn init_env() -> Result<Box<dyn SandboxEnv>> {
 ///
 /// This is a low-level configuration struct which is not aware of Minecraft,
 /// Java, etc.
+///
+/// # Implementation notes
+///
+/// - Standard output/error cannot be read from the spawned child process, since
+///   on some platforms we cannot reliably inherit these handles.
+/// - Graphics and audio devices will always be passed to the child process when
+///   possible.
 #[derive(Debug)]
 pub struct SandboxCommand {
     /// Path to the executable to run.
-    pub executable: String,
+    pub executable: OsString,
     /// Arguments passed to the executable.
-    pub args: Vec<String>,
-    /// Host paths mounted read-only at the configured path in the sandbox.
-    pub read_only_paths: Vec<(PathBuf, PathBuf)>,
-    /// Host paths mounted read-write at the configured path in the sandbox.
-    pub read_write_paths: Vec<(PathBuf, PathBuf)>,
+    pub args: Vec<OsString>,
+    /// Host paths mounted read-only at the same path in the sandbox.
+    pub read_only_paths: Vec<OsString>,
+    /// Host paths mounted read-write at the same path in the sandbox.
+    pub read_write_paths: Vec<OsString>,
     /// What directory the executable is ran from.
     pub working_directory: Option<PathBuf>,
     /// Names of environment variables copied from the host when present.
@@ -65,16 +74,18 @@ pub struct SandboxCommand {
     ///
     /// These take precedence over passthrough variables with the same name.
     pub extra_environment: Vec<(OsString, OsString)>,
+    /// How the child process's output is routed to the parent process.
     pub output: SandboxOutput,
-    /// Expose read-only operating-system libraries and configuration needed by
-    /// dynamically linked applications.
-    pub system_runtime: bool,
     /// Allow access to the host network namespace.
     pub network: bool,
-    /// Allow access to GPU devices and the active Wayland or X11 display.
-    pub graphics: bool,
-    /// Allow access to audio devices and the active PipeWire or PulseAudio socket.
-    pub audio: bool,
+    /// Whether the program to run is a Java virtual machine.
+    ///
+    /// If set, performs some extra platform-specific setup to get the JVM to
+    /// work.
+    pub is_jvm: bool,
+    /// Whether the spawned child should terminate when the parent process
+    /// terminates.
+    pub die_with_parent: bool,
 }
 
 #[derive(Debug, Clone, Copy, Default)]
@@ -86,31 +97,32 @@ pub enum SandboxOutput {
 
 #[derive(Debug)]
 pub struct SandboxChild {
-    child: tokio::process::Child,
+    // TODO cfg
+    imp: linux::SandboxChild,
 }
 
 impl SandboxChild {
     pub fn id(&self) -> Option<u32> {
-        self.child.id()
+        self.imp.id()
     }
 
     pub fn take_stdout(&mut self) -> Option<tokio::process::ChildStdout> {
-        self.child.stdout.take()
+        self.imp.take_stdout()
     }
 
     pub fn take_stderr(&mut self) -> Option<tokio::process::ChildStderr> {
-        self.child.stderr.take()
+        self.imp.take_stderr()
     }
 
     pub fn try_wait(&mut self) -> Result<Option<ExitStatus>> {
-        Ok(self.child.try_wait()?)
+        self.imp.try_wait()
     }
 
     pub async fn wait(&mut self) -> Result<ExitStatus> {
-        Ok(self.child.wait().await?)
+        self.imp.wait().await
     }
 
     pub async fn kill(&mut self) -> Result<()> {
-        Ok(self.child.kill().await?)
+        self.imp.kill().await
     }
 }

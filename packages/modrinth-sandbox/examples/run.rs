@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{ffi::OsString, path::PathBuf};
 
 use eyre::{Context, Result};
 use modrinth_sandbox::{SandboxCommand, SandboxOutput};
@@ -12,9 +12,9 @@ struct Cli {
     writable_path: Vec<PathBuf>,
     #[arg(long, value_name = "PATH")]
     working_directory: Option<PathBuf>,
-    executable: String,
+    executable: OsString,
     #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
-    args: Vec<String>,
+    args: Vec<OsString>,
 }
 
 #[tokio::main]
@@ -34,21 +34,20 @@ async fn main() -> Result<()> {
             read_only_paths: cli
                 .read_only_path
                 .into_iter()
-                .map(|path| (path.clone(), path))
+                .map(PathBuf::into_os_string)
                 .collect(),
             read_write_paths: cli
                 .writable_path
                 .into_iter()
-                .map(|path| (path.clone(), path))
+                .map(PathBuf::into_os_string)
                 .collect(),
             working_directory: cli.working_directory,
             passthrough_environment: Vec::new(),
             extra_environment: Vec::new(),
             output: SandboxOutput::Inherit,
-            system_runtime: true,
             network: true,
-            graphics: true,
-            audio: true,
+            is_jvm: false,
+            die_with_parent: true,
         })
         .await
         .context("spawning process in sandbox")?;

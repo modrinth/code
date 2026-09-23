@@ -28,8 +28,7 @@ use daedalus::minecraft::{
 };
 use daedalus::modded::{LoaderVersion, Manifest};
 use modrinth_sandbox::{
-    MinecraftCommand, MinecraftLoggingConfig, SANDBOX_ASSETS_PATH,
-    SANDBOX_INSTANCE_PATH, SandboxOutput,
+    MinecraftCommand, MinecraftLoggingConfig, SandboxOutput,
 };
 use serde::Deserialize;
 use std::future::Future;
@@ -858,6 +857,7 @@ pub async fn launch_minecraft(
     let mut runtime_lease = state.content_store.runtime_cache_lock.read().await;
 
     let instance_path = get_instance_full_path(&instance.path).await?;
+    let assets_path = state.directories.assets_dir();
 
     let (minecraft, version_index) =
         resolve_minecraft_manifest(&content_set.game_version, &state).await?;
@@ -1084,8 +1084,8 @@ pub async fn launch_minecraft(
         credentials,
         &version.id,
         &version_info.asset_index.id,
-        Path::new(SANDBOX_INSTANCE_PATH),
-        Path::new(SANDBOX_ASSETS_PATH),
+        &instance_path,
+        &assets_path,
         &version.type_,
         *resolution,
         &java_version.architecture,
@@ -1116,10 +1116,10 @@ pub async fn launch_minecraft(
         java_agent: Some(main_class_path),
         classpath,
         natives_path: natives_dir,
-        assets_path: state.directories.assets_dir(),
+        assets_path,
         logging_config,
         instance_path: instance_path.clone(),
-        jvm_args,
+        jvm_args: jvm_args.into_iter().map(Into::into).collect(),
         main_class: THESEUS_MINECRAFT_LAUNCHER_MAIN_CLASS.into(),
         main_class_args: launcher_args,
         extra_environment: env_args

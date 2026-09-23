@@ -10,42 +10,29 @@ use crate::{SandboxCommand, SandboxOutput};
 #[derive(Debug)]
 pub struct MinecraftCommand {
     /// Path to the Java Runtime Environment on the host.
-    ///
-    /// This will be mounted read-only as `/app/jre` in the sandbox.
     pub jre_path: PathBuf,
     /// Optional Java agent JAR on the host.
-    ///
-    /// This will be mounted read-only as `/app/agent.jar`.
     pub java_agent: Option<PathBuf>,
     /// Complete Java classpath on the host, in classpath order.
-    ///
-    /// Each entry is mounted individually and read-only under `/app/classpath`.
     pub classpath: Vec<PathBuf>,
     /// Path to the extracted native libraries on the host.
-    ///
-    /// This will be mounted read-only as `/app/natives`.
     pub natives_path: PathBuf,
     /// Path to the Minecraft assets directory on the host.
-    ///
-    /// This will be mounted read-only as `/app/assets`.
     pub assets_path: PathBuf,
     /// Optional version-specific logging configuration.
     pub logging_config: Option<MinecraftLoggingConfig>,
     /// Path to the Minecraft instance directory on the host.
     ///
-    /// This is the only persistent read-write mount and is exposed as
-    /// `/app/minecraft`.
+    /// This is the only persistent read-write mount.
     pub instance_path: PathBuf,
     /// JVM arguments which do not contain sandbox-managed paths.
     ///
     /// Classpath, Java agent, native-library, and logging arguments are generated
     /// by [`create_minecraft_command`].
-    pub jvm_args: Vec<String>,
+    pub jvm_args: Vec<OsString>,
     /// Java main class to invoke.
     pub main_class: String,
-    /// Arguments passed to [`MinecraftCommand::main_class`]. Path arguments must
-    /// use paths visible inside the sandbox, such as [`SANDBOX_INSTANCE_PATH`]
-    /// and [`SANDBOX_ASSETS_PATH`].
+    /// Arguments passed to [`MinecraftCommand::main_class`].
     pub main_class_args: Vec<String>,
     /// Additional environment variables set for the sandboxed process.
     pub extra_environment: Vec<(OsString, OsString)>,
@@ -61,16 +48,6 @@ pub struct MinecraftLoggingConfig {
     /// file's path inside the sandbox.
     pub argument: String,
 }
-
-const JRE_PATH: &str = "/app/jre";
-const JAVA_PATH: &str = "/app/jre/bin/java";
-const JAVA_AGENT_PATH: &str = "/app/agent.jar";
-const CLASSPATH_PATH: &str = "/app/classpath";
-const NATIVES_PATH: &str = "/app/natives";
-pub const SANDBOX_ASSETS_PATH: &str = "/app/assets";
-pub const SANDBOX_INSTANCE_PATH: &str = "/app/minecraft";
-
-const LOGGING_CONFIG_PATH: &str = "/app/logging.xml";
 
 const CLASSPATH_JVM_ARGUMENT: &str = "-cp";
 const JAVA_LIBRARY_PATH_JVM_ARGUMENT: &str = "-Djava.library.path";
@@ -143,30 +120,33 @@ const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
 pub fn create_minecraft_command(
     minecraft: MinecraftCommand,
 ) -> Result<SandboxCommand> {
-    let mut read_only_paths = vec![
-        (minecraft.jre_path, PathBuf::from(JRE_PATH)),
-        (minecraft.natives_path, PathBuf::from(NATIVES_PATH)),
-        (minecraft.assets_path, PathBuf::from(SANDBOX_ASSETS_PATH)),
-    ];
-
-    let mut classpath = Vec::with_capacity(minecraft.classpath.len());
-    for (index, host_path) in minecraft.classpath.into_iter().enumerate() {
-        let sandbox_path = sandbox_classpath_path(index, &host_path)?;
-        read_only_paths.push((host_path, sandbox_path.clone()));
-        classpath.push(sandbox_path);
+    let java_path = minecraft.jre_path.join("bin/java");
+    let classpath = minecraft.classpath;
+    let mut read_only_paths = Vec::with_capacity(classpath.len() + 5);
+    push_unique_path(&mut read_only_paths, &minecraft.jre_path);
+    push_unique_path(&mut read_only_paths, &minecraft.natives_path);
+    push_unique_path(&mut read_only_paths, &minecraft.assets_path);
+    for path in &classpath {
+        push_unique_path(&mut read_only_paths, path);
     }
 
     let mut args = minecraft.jvm_args;
     args.extend([
-        format!("{JAVA_LIBRARY_PATH_JVM_ARGUMENT}={NATIVES_PATH}"),
-        format!("{JNA_TMPDIR_JVM_ARGUMENT}=/tmp"),
-        format!("{LWJGL_LIBRARY_EXTRACT_PATH_JVM_ARGUMENT}=/tmp"),
-        format!("{NETTY_NATIVE_WORKDIR_JVM_ARGUMENT}=/tmp"),
+        jvm_path_argument(
+            JAVA_LIBRARY_PATH_JVM_ARGUMENT,
+            "=",
+            &minecraft.natives_path,
+        ),
+        OsString::from(format!("{JNA_TMPDIR_JVM_ARGUMENT}=/tmp")),
+        OsString::from(format!(
+            "{LWJGL_LIBRARY_EXTRACT_PATH_JVM_ARGUMENT}=/tmp"
+        )),
+        OsString::from(format!("{NETTY_NATIVE_WORKDIR_JVM_ARGUMENT}=/tmp")),
     ]);
 
     if let Some(java_agent) = minecraft.java_agent {
-        read_only_paths.push((java_agent, PathBuf::from(JAVA_AGENT_PATH)));
-        args.push(format!("{JAVA_AGENT_JVM_ARGUMENT}:{JAVA_AGENT_PATH}"));
+        push_unique_path(&mut read_only_paths, &java_agent);
+        args.push(jvm_path_argument(JAVA_AGENT_JVM_ARGUMENT, ":", &java_agent));
     }
 
     if let Some(logging_config) = minecraft.logging_config {
@@ -174,63 +154,69 @@ pub fn create_minecraft_command(
             logging_config.argument.contains("${path}"),
             "logging configuration argument must contain a `${{path}}` placeholder"
         );
-        read_only_paths
-            .push((logging_config.path, PathBuf::from(LOGGING_CONFIG_PATH)));
-        args.push(
-            logging_config
-                .argument
-                .replace("${path}", LOGGING_CONFIG_PATH),
-        );
+        push_unique_path(&mut read_only_paths, &logging_config.path);
+        args.push(replace_path_placeholder(
+            &logging_config.argument,
+            &logging_config.path,
+        ));
     }
 
-    args.push(CLASSPATH_JVM_ARGUMENT.to_string());
-    args.push(
-        classpath
-            .iter()
-            .map(|path| path.to_string_lossy())
-            .collect::<Vec<_>>()
-            .join(":"),
-    );
-    args.push(minecraft.main_class);
-    args.extend(minecraft.main_class_args);
+    args.push(OsString::from(CLASSPATH_JVM_ARGUMENT));
+    args.push(std::env::join_paths(&classpath)?);
+    args.push(OsString::from(minecraft.main_class));
+    args.extend(minecraft.main_class_args.into_iter().map(OsString::from));
 
     let mut extra_environment = vec![
-        (OsString::from("JAVA_HOME"), OsString::from(JRE_PATH)),
+        (
+            OsString::from("JAVA_HOME"),
+            minecraft.jre_path.as_os_str().to_os_string(),
+        ),
         (
             OsString::from("PATH"),
-            OsString::from(format!("{JRE_PATH}/bin")),
+            minecraft.jre_path.join("bin").into_os_string(),
         ),
     ];
     extra_environment.extend(minecraft.extra_environment);
 
     Ok(SandboxCommand {
-        executable: JAVA_PATH.to_string(),
+        executable: java_path.into_os_string(),
         args,
         read_only_paths,
-        read_write_paths: vec![(
-            minecraft.instance_path,
-            PathBuf::from(SANDBOX_INSTANCE_PATH),
-        )],
-        working_directory: Some(PathBuf::from(SANDBOX_INSTANCE_PATH)),
+        read_write_paths: vec![
+            minecraft.instance_path.as_os_str().to_os_string(),
+        ],
+        working_directory: Some(minecraft.instance_path),
         passthrough_environment: MINECRAFT_PASSTHROUGH_ENVIRONMENT
             .iter()
             .map(OsString::from)
             .collect(),
         extra_environment,
         output: minecraft.output,
-        system_runtime: true,
         network: true,
-        graphics: true,
-        audio: true,
+        is_jvm: true,
+        die_with_parent: true,
     })
 }
 
-fn sandbox_classpath_path(index: usize, host_path: &Path) -> Result<PathBuf> {
-    let file_name = host_path.file_name().ok_or_else(|| {
-        eyre::eyre!("classpath entry has no filename: {host_path:?}")
-    })?;
-    let mut sandbox_file_name = OsString::from(format!("{index}-"));
-    sandbox_file_name.push(file_name);
+fn push_unique_path(paths: &mut Vec<OsString>, path: &Path) {
+    if !paths.iter().any(|existing| existing == path.as_os_str()) {
+        paths.push(path.as_os_str().to_os_string());
+    }
+}
 
-    Ok(PathBuf::from(CLASSPATH_PATH).join(sandbox_file_name))
+fn jvm_path_argument(argument: &str, separator: &str, path: &Path) -> OsString {
+    let mut result = OsString::from(argument);
+    result.push(separator);
+    result.push(path);
+    result
+}
+
+fn replace_path_placeholder(argument: &str, path: &Path) -> OsString {
+    let (prefix, suffix) = argument
+        .split_once("${path}")
+        .expect("logging argument placeholder was validated");
+    let mut result = OsString::from(prefix);
+    result.push(path);
+    result.push(suffix);
+    result
 }

@@ -45,12 +45,7 @@ impl SandboxEnv for BubblewrapEnv {
 const SYSTEM_RUNTIME_PATHS: &[&str] = &[
     "/lib",
     "/lib64",
-    "/usr/lib",
-    "/usr/lib64",
-    "/usr/share/fontconfig",
-    "/usr/share/fonts",
-    "/usr/local/share/fonts",
-    "/usr/share/zoneinfo",
+    "/usr",
     "/etc/fonts",
     "/etc/hosts",
     "/etc/hostname",
@@ -66,14 +61,9 @@ const SYSTEM_RUNTIME_PATHS: &[&str] = &[
     "/var/cache/fontconfig",
 ];
 
-const GRAPHICS_RUNTIME_PATHS: &[&str] = &[
-    "/usr/share/glvnd",
-    "/usr/share/vulkan",
-    "/etc/glvnd",
-    "/etc/vulkan",
-];
+const GRAPHICS_RUNTIME_PATHS: &[&str] = &["/etc/glvnd", "/etc/vulkan"];
 
-const AUDIO_RUNTIME_PATHS: &[&str] = &["/usr/share/alsa", "/etc/alsa"];
+const AUDIO_RUNTIME_PATHS: &[&str] = &["/etc/alsa"];
 
 const GRAPHICS_DEVICES: &[&str] = &[
     "/dev/dri",
@@ -115,28 +105,25 @@ async fn spawn(
     let sandbox_environment = resolve_environment(&command);
     let mut os_command = Command::new(&env.bwrap);
     os_command.arg("--unshare-all");
-    os_command.arg("--die-with-parent");
 
-    if command.system_runtime {
-        add_read_only_paths(&mut os_command, SYSTEM_RUNTIME_PATHS);
+    if command.die_with_parent {
+        os_command.arg("--die-with-parent");
     }
+
+    add_read_only_paths(&mut os_command, SYSTEM_RUNTIME_PATHS);
 
     os_command.args(["--proc", "/proc"]);
     os_command.args(["--dev", "/dev"]);
 
-    if command.graphics {
-        add_read_only_paths(&mut os_command, GRAPHICS_RUNTIME_PATHS);
-        add_device_paths(&mut os_command, GRAPHICS_DEVICES);
-        for index in 0..16 {
-            let path = format!("/dev/nvidia{index}");
-            add_device_path(&mut os_command, &path);
-        }
-        add_read_only_paths(&mut os_command, GRAPHICS_SYSFS_PATHS);
+    add_read_only_paths(&mut os_command, GRAPHICS_RUNTIME_PATHS);
+    add_device_paths(&mut os_command, GRAPHICS_DEVICES);
+    for index in 0..16 {
+        let path = format!("/dev/nvidia{index}");
+        add_device_path(&mut os_command, &path);
     }
-    if command.audio {
-        add_read_only_paths(&mut os_command, AUDIO_RUNTIME_PATHS);
-        add_device_path(&mut os_command, "/dev/snd");
-    }
+    add_read_only_paths(&mut os_command, GRAPHICS_SYSFS_PATHS);
+    add_read_only_paths(&mut os_command, AUDIO_RUNTIME_PATHS);
+    add_device_path(&mut os_command, "/dev/snd");
 
     os_command.args(["--tmpfs", "/tmp"]);
     os_command.args(["--tmpfs", "/var/tmp"]);
@@ -144,21 +131,21 @@ async fn spawn(
         os_command.args(["--dir", path]);
     }
 
-    if command.graphics {
-        expose_graphics_sockets(&mut os_command, &sandbox_environment);
-    }
-    if command.audio {
-        expose_audio_sockets(&mut os_command, &sandbox_environment);
-    }
+    expose_graphics_sockets(&mut os_command, &sandbox_environment);
+    expose_audio_sockets(&mut os_command, &sandbox_environment);
     if command.network {
         os_command.arg("--share-net");
     }
 
-    for (from, to) in &command.read_only_paths {
-        os_command.args([Path::new("--ro-bind"), from, to]);
+    for path in &command.read_only_paths {
+        os_command.arg("--ro-bind");
+        os_command.arg(path);
+        os_command.arg(path);
     }
-    for (from, to) in &command.read_write_paths {
-        os_command.args([Path::new("--bind"), from, to]);
+    for path in &command.read_write_paths {
+        os_command.arg("--bind");
+        os_command.arg(path);
+        os_command.arg(path);
     }
     if let Some(path) = &command.working_directory {
         os_command.args([Path::new("--chdir"), path]);
@@ -183,7 +170,9 @@ async fn spawn(
     os_command.args(command.args);
 
     let child = os_command.spawn().wrap_err("spawning child")?;
-    Ok(SandboxChild { child })
+    Ok(SandboxChild {
+        imp: super::linux::SandboxChild::new(child),
+    })
 }
 
 fn add_read_only_paths(command: &mut Command, paths: &[&str]) {
