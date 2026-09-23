@@ -1,23 +1,27 @@
-use crate::auth::get_user_from_headers;
+use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
 use crate::database;
 use crate::database::PgPool;
 use crate::database::models::image_item;
 use crate::database::models::notification_item::NotificationBuilder;
+use crate::database::models::thread_issue_item::ThreadIssueBuilder;
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
-use crate::models::ids::{ThreadId, ThreadMessageId};
+use crate::models::ids::{ThreadId, ThreadIssueId, ThreadMessageId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::ProjectStatus;
+use crate::models::thread_issues::ThreadIssueTarget;
 use crate::models::threads::{MessageBody, Thread, ThreadType};
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
-use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
+use actix_web::{
+    HttpRequest, HttpResponse, delete, get, patch, post, put, web,
+};
 use futures::TryStreamExt;
 use serde::Deserialize;
 use xredis::RedisPool;
@@ -25,6 +29,9 @@ use xredis::RedisPool;
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(thread_get_route)
         .service(thread_send_message_route)
+        .service(thread_issues_create)
+        .service(thread_issue_edit)
+        .service(thread_issue_delete)
         .service(message_delete_route)
         .service(threads_get_route);
 }
@@ -216,13 +223,13 @@ pub async fn filter_authorized_threads(
     user_ids.append(
         &mut return_threads
             .iter()
-            .flat_map(|x| {
-                x.messages
-                    .iter()
-                    .filter_map(|x| x.author_id)
-                    .collect::<Vec<_>>()
-            })
+            .flat_map(|x| x.messages.iter().filter_map(|x| x.author_id))
             .collect::<Vec<database::models::DBUserId>>(),
+    );
+    user_ids.extend(
+        return_threads.iter().flat_map(|thread| {
+            thread.issues.iter().map(|issue| issue.created_by)
+        }),
     );
 
     let users: Vec<User> =
@@ -251,6 +258,7 @@ pub async fn filter_authorized_threads(
                 })
                 .collect::<Vec<_>>(),
         );
+        authors.extend(thread.issues.iter().map(|issue| issue.created_by));
 
         final_threads.push(Thread::from(
             thread,
@@ -322,6 +330,7 @@ pub async fn thread_get(
                 })
                 .collect::<Vec<_>>(),
         );
+        authors.extend(data.issues.iter().map(|issue| issue.created_by));
 
         let users: Vec<User> =
             database::models::DBUser::get_many_ids(authors, &**pool, &redis)
@@ -392,6 +401,337 @@ pub async fn threads_get(
         .wrap_api_err("filtering authorized threads")?;
 
     Ok(HttpResponse::Ok().json(threads))
+}
+
+#[derive(Deserialize, utoipa::ToSchema)]
+pub struct NewThreadIssue {
+    pub what: ThreadIssueTarget,
+    pub why: serde_json::Value,
+}
+
+#[derive(Deserialize, utoipa::ToSchema)]
+pub struct NewThreadIssues {
+    pub issues: Vec<NewThreadIssue>,
+}
+
+#[derive(Deserialize, utoipa::ToSchema)]
+pub struct EditThreadIssue {
+    pub user_addressed: Option<bool>,
+    pub moderator_verified: Option<bool>,
+}
+
+async fn thread_project_id(
+    thread_id: database::models::DBThreadId,
+    pool: &PgPool,
+) -> Result<Option<database::models::DBProjectId>, ApiError> {
+    Ok(sqlx::query_scalar!(
+        "SELECT mod_id FROM threads WHERE id = $1",
+        thread_id as database::models::DBThreadId,
+    )
+    .fetch_optional(pool)
+    .await
+    .wrap_internal_err("fetching thread project")?
+    .flatten()
+    .map(database::models::DBProjectId))
+}
+
+async fn thread_issue_project_id(
+    issue_id: database::models::DBThreadIssueId,
+    pool: &PgPool,
+) -> Result<Option<database::models::DBProjectId>, ApiError> {
+    Ok(sqlx::query_scalar!(
+        r#"
+        SELECT thread.mod_id
+        FROM threads_issues issue
+        INNER JOIN threads thread ON thread.id = issue.thread_id
+        WHERE issue.id = $1
+        "#,
+        issue_id as database::models::DBThreadIssueId,
+    )
+    .fetch_optional(pool)
+    .await
+    .wrap_internal_err("fetching thread issue project")?
+    .flatten()
+    .map(database::models::DBProjectId))
+}
+
+async fn project_exists(
+    project_id: database::models::DBProjectId,
+    pool: &PgPool,
+) -> Result<bool, ApiError> {
+    Ok(sqlx::query_scalar!(
+        r#"SELECT EXISTS(SELECT 1 FROM mods WHERE id = $1) AS "exists!""#,
+        project_id as database::models::DBProjectId,
+    )
+    .fetch_one(pool)
+    .await
+    .wrap_internal_err("checking whether thread issue project exists")?)
+}
+
+async fn is_project_team_member(
+    project_id: database::models::DBProjectId,
+    user_id: database::models::DBUserId,
+    transaction: &mut database::PgTransaction<'_>,
+) -> Result<bool, ApiError> {
+    Ok(sqlx::query_scalar!(
+        r#"
+        SELECT EXISTS (
+            SELECT 1
+            FROM mods project
+            INNER JOIN team_members member
+                ON member.team_id = project.team_id
+            WHERE
+                project.id = $1
+                AND member.user_id = $2
+                AND member.accepted
+            UNION
+            SELECT 1
+            FROM mods project
+            INNER JOIN organizations organization
+                ON organization.id = project.organization_id
+            INNER JOIN team_members member
+                ON member.team_id = organization.team_id
+            WHERE
+                project.id = $1
+                AND member.user_id = $2
+                AND member.accepted
+        ) AS "exists!"
+        "#,
+        project_id as database::models::DBProjectId,
+        user_id as database::models::DBUserId,
+    )
+    .fetch_one(&mut *transaction)
+    .await
+    .wrap_internal_err("checking project team membership")?)
+}
+
+async fn prepare_thread_issue_mutation(
+    project_id: database::models::DBProjectId,
+    transaction: &mut database::PgTransaction<'_>,
+) -> Result<(), ApiError> {
+    crate::routes::internal::delphi::tech_review_queue::remove_projects_without_details(
+        &[project_id],
+        crate::routes::internal::delphi::tech_review_queue::TechReviewRemovalReason::FileDeleted,
+        transaction,
+    )
+    .await
+    .wrap_api_err("synchronizing project technical review state")?;
+    sqlx::query!("SELECT pg_advisory_xact_lock($1)", project_id.0)
+        .fetch_one(&mut *transaction)
+        .await
+        .wrap_internal_err("locking project thread issues")?;
+
+    Ok(())
+}
+
+#[utoipa::path(
+    tag = "threads",
+    request_body = NewThreadIssues,
+    responses((status = NO_CONTENT))
+)]
+#[put("/thread/{id}/issue")]
+pub async fn thread_issues_create(
+    req: HttpRequest,
+    info: web::Path<(ThreadId,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    web::Json(new_issues): web::Json<NewThreadIssues>,
+) -> Result<(), ApiError> {
+    let moderator = check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::THREAD_WRITE,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
+
+    if new_issues.issues.is_empty() {
+        return Err(ApiError::Request(eyre::eyre!(
+            "must provide at least one thread issue"
+        )));
+    }
+
+    let thread_id: database::models::DBThreadId = info.into_inner().0.into();
+    let project_id = thread_project_id(thread_id, &**pool)
+        .await?
+        .wrap_not_found_err("resource not found")?;
+    if !project_exists(project_id, &**pool).await? {
+        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+    }
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
+    prepare_thread_issue_mutation(project_id, &mut transaction).await?;
+
+    database::models::DBThreadIssue::insert_many(
+        thread_id,
+        moderator.id.into(),
+        new_issues
+            .issues
+            .into_iter()
+            .map(|issue| ThreadIssueBuilder {
+                what: issue.what,
+                why: issue.why,
+            })
+            .collect(),
+        &mut transaction,
+    )
+    .await
+    .wrap_internal_err("creating thread issues")?;
+
+    super::projects::mutation::finalize_mutation(
+        project_id,
+        transaction,
+        &redis,
+    )
+    .await
+}
+
+#[utoipa::path(
+    tag = "threads",
+    request_body = EditThreadIssue,
+    responses((status = NO_CONTENT))
+)]
+#[patch("/thread/issue/{id}")]
+pub async fn thread_issue_edit(
+    req: HttpRequest,
+    info: web::Path<(ThreadIssueId,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    web::Json(edit): web::Json<EditThreadIssue>,
+) -> Result<(), ApiError> {
+    if edit.user_addressed.is_none() && edit.moderator_verified.is_none() {
+        return Err(ApiError::Request(eyre::eyre!(
+            "must provide a thread issue field to update"
+        )));
+    }
+    if edit.moderator_verified == Some(false) {
+        return Err(ApiError::Request(eyre::eyre!(
+            "a verified thread issue cannot be unverified"
+        )));
+    }
+
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::THREAD_WRITE,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?
+    .1;
+    let issue_id: database::models::DBThreadIssueId =
+        info.into_inner().0.into();
+    let project_id = thread_issue_project_id(issue_id, &**pool)
+        .await?
+        .wrap_not_found_err("resource not found")?;
+    let project_exists = project_exists(project_id, &**pool).await?;
+
+    if edit.moderator_verified.is_some() && !user.role.is_mod() {
+        return Err(ApiError::Auth(eyre::eyre!(
+            "only moderators can verify thread issues"
+        )));
+    }
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
+    if project_exists {
+        prepare_thread_issue_mutation(project_id, &mut transaction).await?;
+    }
+    if edit.user_addressed.is_some()
+        && !is_project_team_member(project_id, user.id.into(), &mut transaction)
+            .await?
+    {
+        return Err(ApiError::Auth(eyre::eyre!(
+            "only project team members can address thread issues"
+        )));
+    }
+    let updated = database::models::DBThreadIssue::update_flags(
+        issue_id,
+        edit.user_addressed,
+        edit.moderator_verified,
+        &mut transaction,
+    )
+    .await
+    .wrap_internal_err("updating thread issue")?;
+    if !updated {
+        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+    }
+
+    if project_exists {
+        super::projects::mutation::finalize_mutation(
+            project_id,
+            transaction,
+            &redis,
+        )
+        .await
+    } else {
+        transaction
+            .commit()
+            .await
+            .wrap_internal_err("committing thread issue update")
+    }
+}
+
+#[utoipa::path(tag = "threads", responses((status = NO_CONTENT)))]
+#[delete("/thread/issue/{id}")]
+pub async fn thread_issue_delete(
+    req: HttpRequest,
+    info: web::Path<(ThreadIssueId,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<(), ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::THREAD_WRITE,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
+
+    let issue_id: database::models::DBThreadIssueId =
+        info.into_inner().0.into();
+    let project_id = thread_issue_project_id(issue_id, &**pool)
+        .await?
+        .wrap_not_found_err("resource not found")?;
+    let project_exists = project_exists(project_id, &**pool).await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
+    if project_exists {
+        prepare_thread_issue_mutation(project_id, &mut transaction).await?;
+    }
+    if !database::models::DBThreadIssue::remove(issue_id, &mut transaction)
+        .await
+        .wrap_internal_err("deleting thread issue")?
+    {
+        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+    }
+
+    if project_exists {
+        super::projects::mutation::finalize_mutation(
+            project_id,
+            transaction,
+            &redis,
+        )
+        .await
+    } else {
+        transaction
+            .commit()
+            .await
+            .wrap_internal_err("committing thread issue deletion")
+    }
 }
 
 #[derive(Deserialize, utoipa::ToSchema)]

@@ -21,6 +21,7 @@ pub struct DBThread {
     pub type_: ThreadType,
 
     pub messages: Vec<DBThreadMessage>,
+    pub issues: Vec<super::DBThreadIssue>,
     pub members: Vec<DBUserId>,
 }
 
@@ -144,7 +145,7 @@ impl DBThread {
 
         let thread_ids_parsed: Vec<i64> =
             thread_ids.iter().map(|x| x.0).collect();
-        let threads = sqlx::query!(
+        let mut threads = sqlx::query!(
             "
             SELECT t.id, t.thread_type, t.mod_id, t.report_id,
             ARRAY_AGG(DISTINCT tm.user_id) filter (where tm.user_id is not null) members,
@@ -172,11 +173,28 @@ impl DBThread {
                     messages.sort_by_key(|a| a.created);
                     messages
                 },
+                issues: Vec::new(),
                 members: x.members.unwrap_or_default().into_iter().map(DBUserId).collect(),
             })
         .try_collect::<Vec<DBThread>>()
         .await
         .wrap_err("fetching threads")?;
+
+        let mut issues =
+            super::DBThreadIssue::get_many_for_threads(thread_ids, exec)
+                .await
+                .wrap_err("fetching thread issues")?
+                .into_iter()
+                .fold(
+                    std::collections::HashMap::<DBThreadId, Vec<_>>::new(),
+                    |mut issues, issue| {
+                        issues.entry(issue.thread_id).or_default().push(issue);
+                        issues
+                    },
+                );
+        for thread in &mut threads {
+            thread.issues = issues.remove(&thread.id).unwrap_or_default();
+        }
 
         Ok(threads)
     }

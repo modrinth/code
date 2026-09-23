@@ -3,6 +3,7 @@ use crate::models::ids::{
     ImageId, ProjectId, ReportId, ThreadId, ThreadMessageId,
 };
 use crate::models::projects::ProjectStatus;
+use crate::models::thread_issues::ThreadIssue;
 use crate::models::users::User;
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
@@ -16,6 +17,7 @@ pub struct Thread {
     pub project_id: Option<ProjectId>,
     pub report_id: Option<ReportId>,
     pub messages: Vec<ThreadMessage>,
+    pub issues: Vec<ThreadIssue>,
     pub members: Vec<User>,
 }
 
@@ -130,6 +132,7 @@ impl Thread {
                 .filter(|x| user.role.is_mod() || !x.body.is_private())
                 .map(|x| ThreadMessage::from(x, user))
                 .collect(),
+            issues: data.issues.into_iter().map(ThreadIssue::from).collect(),
             members: users,
         }
     }

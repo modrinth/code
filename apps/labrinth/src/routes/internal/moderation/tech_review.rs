@@ -921,6 +921,7 @@ pub async fn search_projects(
                 .messages
                 .iter()
                 .filter_map(|message| message.author_id)
+                .chain(thread.issues.iter().map(|issue| issue.created_by))
         })
         .collect::<Vec<_>>();
     let thread_authors =
@@ -1030,6 +1031,7 @@ pub async fn get_project_report(
                 .messages
                 .iter()
                 .filter_map(|message| message.author_id)
+                .chain(thread.issues.iter().map(|issue| issue.created_by))
         })
         .collect::<Vec<_>>();
     let thread_authors =

@@ -35,6 +35,7 @@ pub struct ThreadIssueTeamMember {
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ThreadIssue {
     pub id: ThreadIssueId,
+    pub created_by: UserId,
     pub created_at: DateTime<Utc>,
     /// What part of a project this issue applies to.
     pub what: ThreadIssueTarget,
@@ -52,9 +53,6 @@ pub struct ThreadIssue {
     /// If a moderator marks this issue as verified, then it will locked to
     /// [`ThreadIssueVerdict::Resolved`].
     pub moderator_verified: bool,
-    /// Has the user changed the affected project part since this issue was
-    /// added?
-    pub value_state: ThreadIssueValueState,
     /// Final derived verdict of this issue.
     pub verdict: ThreadIssueVerdict,
 }
@@ -722,17 +720,14 @@ fn value_state(target: &TextTarget, current: &str) -> ThreadIssueValueState {
 }
 
 impl ThreadIssue {
-    pub fn from(
-        data: crate::database::models::DBThreadIssue,
-        value_state: ThreadIssueValueState,
-    ) -> Self {
+    pub fn from(data: crate::database::models::DBThreadIssue) -> Self {
         Self {
             id: data.id.into(),
+            created_by: data.created_by.into(),
             what: data.what,
             why: data.why,
             user_addressed: data.user_addressed,
             moderator_verified: data.moderator_verified,
-            value_state,
             verdict: data.verdict,
             created_at: data.created_at,
         }
