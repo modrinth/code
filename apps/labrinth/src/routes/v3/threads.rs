@@ -459,13 +459,13 @@ async fn project_exists(
     project_id: database::models::DBProjectId,
     pool: &PgPool,
 ) -> Result<bool, ApiError> {
-    Ok(sqlx::query_scalar!(
+    sqlx::query_scalar!(
         r#"SELECT EXISTS(SELECT 1 FROM mods WHERE id = $1) AS "exists!""#,
         project_id as database::models::DBProjectId,
     )
     .fetch_one(pool)
     .await
-    .wrap_internal_err("checking whether thread issue project exists")?)
+    .wrap_internal_err("checking whether thread issue project exists")
 }
 
 async fn is_project_team_member(
@@ -473,7 +473,7 @@ async fn is_project_team_member(
     user_id: database::models::DBUserId,
     transaction: &mut database::PgTransaction<'_>,
 ) -> Result<bool, ApiError> {
-    Ok(sqlx::query_scalar!(
+    sqlx::query_scalar!(
         r#"
         SELECT EXISTS (
             SELECT 1
@@ -502,7 +502,7 @@ async fn is_project_team_member(
     )
     .fetch_one(&mut *transaction)
     .await
-    .wrap_internal_err("checking project team membership")?)
+    .wrap_internal_err("checking project team membership")
 }
 
 async fn prepare_thread_issue_mutation(
@@ -555,10 +555,10 @@ pub async fn thread_issues_create(
     }
 
     let thread_id: database::models::DBThreadId = info.into_inner().0.into();
-    let project_id = thread_project_id(thread_id, &**pool)
+    let project_id = thread_project_id(thread_id, &pool)
         .await?
         .wrap_not_found_err("resource not found")?;
-    if !project_exists(project_id, &**pool).await? {
+    if !project_exists(project_id, &pool).await? {
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     }
     let mut transaction = pool
@@ -628,10 +628,10 @@ pub async fn thread_issue_edit(
     .1;
     let issue_id: database::models::DBThreadIssueId =
         info.into_inner().0.into();
-    let project_id = thread_issue_project_id(issue_id, &**pool)
+    let project_id = thread_issue_project_id(issue_id, &pool)
         .await?
         .wrap_not_found_err("resource not found")?;
-    let project_exists = project_exists(project_id, &**pool).await?;
+    let project_exists = project_exists(project_id, &pool).await?;
 
     if edit.moderator_verified.is_some() && !user.role.is_mod() {
         return Err(ApiError::Auth(eyre::eyre!(
@@ -701,10 +701,10 @@ pub async fn thread_issue_delete(
 
     let issue_id: database::models::DBThreadIssueId =
         info.into_inner().0.into();
-    let project_id = thread_issue_project_id(issue_id, &**pool)
+    let project_id = thread_issue_project_id(issue_id, &pool)
         .await?
         .wrap_not_found_err("resource not found")?;
-    let project_exists = project_exists(project_id, &**pool).await?;
+    let project_exists = project_exists(project_id, &pool).await?;
     let mut transaction = pool
         .begin()
         .await

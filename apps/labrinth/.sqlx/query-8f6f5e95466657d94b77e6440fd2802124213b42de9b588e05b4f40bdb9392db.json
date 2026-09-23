@@ -1,0 +1,70 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tSELECT\n\t\t\t\tid,\n\t\t\t\tthread_id,\n\t\t\t\tcreated_by,\n\t\t\t\twhat AS \"what: Json<ThreadIssueTarget>\",\n\t\t\t\twhy,\n\t\t\t\tuser_addressed,\n\t\t\t\tmoderator_verified,\n\t\t\t\tverdict,\n\t\t\t\tcreated_at\n\t\t\tFROM threads_issues\n\t\t\tWHERE thread_id = $1\n\t\t\tORDER BY id\n\t\t\tFOR UPDATE\n\t\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "thread_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "created_by",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "what: Json<ThreadIssueTarget>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 4,
+        "name": "why",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 5,
+        "name": "user_addressed",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 6,
+        "name": "moderator_verified",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 7,
+        "name": "verdict",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "8f6f5e95466657d94b77e6440fd2802124213b42de9b588e05b4f40bdb9392db"
+}

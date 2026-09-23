@@ -1100,17 +1100,18 @@ mod tests {
                 Some(Some("Suggested note")),
             ),
         };
-        let value_state = |target: &ThreadIssueTarget, disclosures| {
-            target.value_state(
-                &ThreadIssueContext {
-                    project: &project,
-                    versions: &[],
-                    disclosures,
-                    team_members: &[],
-                },
-                false,
-            )
-        };
+        let value_state =
+            |target: &ThreadIssueTarget, disclosures: &[ProjectDisclosure]| {
+                target.value_state(
+                    &ThreadIssueContext {
+                        project: &project,
+                        versions: &[],
+                        disclosures,
+                        team_members: &[],
+                    },
+                    false,
+                )
+            };
 
         assert_eq!(
             value_state(&remove, &disclosures),

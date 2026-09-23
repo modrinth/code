@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                    SELECT DISTINCT mod_id, mg.image_url, mg.raw_image_url, mg.featured, mg.name, mg.description, mg.created, mg.ordering\n                    FROM mods_gallery mg\n                    INNER JOIN mods m ON mg.mod_id = m.id\n                    WHERE m.id = ANY($1) OR m.slug = ANY($2)\n                    ",
+  "query": "\n                    SELECT DISTINCT mod_id, mg.id gallery_id, mg.image_url, mg.raw_image_url, mg.featured, mg.name, mg.description, mg.created, mg.ordering\n                    FROM mods_gallery mg\n                    INNER JOIN mods m ON mg.mod_id = m.id\n                    WHERE m.id = ANY($1) OR m.slug = ANY($2)\n                    ",
   "describe": {
     "columns": [
       {
@@ -10,36 +10,41 @@
       },
       {
         "ordinal": 1,
+        "name": "gallery_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
         "name": "image_url",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 2,
+        "ordinal": 3,
         "name": "raw_image_url",
         "type_info": "Text"
       },
       {
-        "ordinal": 3,
+        "ordinal": 4,
         "name": "featured",
         "type_info": "Bool"
       },
       {
-        "ordinal": 4,
+        "ordinal": 5,
         "name": "name",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 5,
+        "ordinal": 6,
         "name": "description",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "created",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "ordering",
         "type_info": "Int8"
       }
@@ -54,6 +59,7 @@
       false,
       false,
       false,
+      false,
       true,
       true,
       true,
@@ -61,5 +67,5 @@
       false
     ]
   },
-  "hash": "ff7ff5b202609f1e68dc4a18eed1183b1077b15577b52083c2cf0b2cc0818a29"
+  "hash": "48ec43b768e372807e3873bdc0d2466a348cbed0cfc2447524c04e0f64f06029"
 }
