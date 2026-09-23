@@ -286,7 +286,7 @@ async fn rewrite_database_paths(
                 .await?,
         );
     }
-    let mut tx = pool.begin().await?;
+    let mut tx = pool.begin_with("BEGIN IMMEDIATE").await?;
     for (_, mut java) in java_versions {
         java.path = dunce::simplified(&remap(Path::new(&java.path), mappings))
             .to_string_lossy()

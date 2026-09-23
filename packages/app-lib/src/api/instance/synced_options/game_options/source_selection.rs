@@ -43,7 +43,7 @@ pub(in crate::api::instance) async fn initialize_from_source_instance(
         } else {
             None
         };
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
     let catalog_revision = CATALOG_REVISION as i64;
 
     sqlx::query!(
