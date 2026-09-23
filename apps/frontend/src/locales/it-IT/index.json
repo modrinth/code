@@ -4125,7 +4125,7 @@
     "message": "Contenuti di origine sconosciuta"
   },
   "project.settings.permissions.bad-proof.description": {
-    "message": "Il team di moderazione di Modrinth ha rifiutato i permessi che hai dimostrato per alcuni contenuti esterni. Ricontrolla gli elementi rifiutati riportati di seguito e fornisci delle prove valide oppure rimuovi i contenuti."
+    "message": "Il team di moderazione di Modrinth ha rifiutato i permessi che hai dimostrato per alcuni contenuti esterni. Rivedi gli elementi rifiutati riportati di seguito e fornisci delle prove valide oppure rimuovili."
   },
   "project.settings.permissions.bad-proof.title": {
     "message": "Alcune prove sono state rifiutate"
@@ -5166,7 +5166,7 @@
     "message": "Niente pubblicità su modrinth.com e nella Modrinth App"
   },
   "settings.billing.midas.benefits.badge": {
-    "message": "Distintivo Modrinth+ sul tuo profilo"
+    "message": "Medaglia Modrinth+ sul tuo profilo"
   },
   "settings.billing.midas.benefits.support": {
     "message": "Supporta Modrinth e i creatori direttamente"

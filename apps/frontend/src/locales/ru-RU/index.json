@@ -537,7 +537,7 @@
     "message": "Без монетизации"
   },
   "app-marketing.download.description": {
-    "message": "Наше приложение доступно на всех платформах — выберите желаемую версию."
+    "message": "Наше приложение доступно на всех платформах — выберите нужную версию."
   },
   "app-marketing.download.download-appimage": {
     "message": "Скачать AppImage"
@@ -3875,6 +3875,15 @@
   "project.settings.delete-project.title": {
     "message": "Удаление проекта"
   },
+  "project.settings.description.title": {
+    "message": "Описание"
+  },
+  "project.settings.description.updated": {
+    "message": "Описание обновлено"
+  },
+  "project.settings.description.updated-text": {
+    "message": "Описание обновлено."
+  },
   "project.settings.disclosures.advertising.description.1": {
     "message": "Включите если проект содержит рекламу, спонсорство или продвижение других проектов."
   },
@@ -4105,6 +4114,132 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.license.all-rights": {
+    "message": "Все права защищены/Без лицензии"
+  },
+  "project.settings.license.custom": {
+    "message": "Своя"
+  },
+  "project.settings.license.has-spdx": {
+    "message": "Использует SPDX"
+  },
+  "project.settings.license.missing-name": {
+    "message": "Укажите название (или идентификатор SPDX) у своей лицензии."
+  },
+  "project.settings.license.name": {
+    "message": "Название лицензии"
+  },
+  "project.settings.license.name-placeholder": {
+    "message": "Название лицензии"
+  },
+  "project.settings.license.optional-url": {
+    "message": "Ссылка на лицензию (необязательно)"
+  },
+  "project.settings.license.select": {
+    "message": "Выберите лицензию"
+  },
+  "project.settings.license.select-description": {
+    "message": "Как можно и нельзя использовать проект."
+  },
+  "project.settings.license.select-placeholder": {
+    "message": "Выберите лицензию..."
+  },
+  "project.settings.license.spdx": {
+    "message": "Идентификатор SPDX"
+  },
+  "project.settings.license.spdx-placeholder": {
+    "message": "Идентификатор SPDX"
+  },
+  "project.settings.license.title": {
+    "message": "Лицензия"
+  },
+  "project.settings.license.updated": {
+    "message": "Лицензия обновлена"
+  },
+  "project.settings.license.updated-text": {
+    "message": "Лицензия обновлена."
+  },
+  "project.settings.license.url": {
+    "message": "Ссылка на лицензию"
+  },
+  "project.settings.links.add-link": {
+    "message": "Добавить ссылку"
+  },
+  "project.settings.links.discord": {
+    "message": "Приглашение в Discord"
+  },
+  "project.settings.links.discord-description": {
+    "message": "Ссылка на Discord."
+  },
+  "project.settings.links.donation-link": {
+    "message": "Ссылка"
+  },
+  "project.settings.links.donation-platform": {
+    "message": "Платформа"
+  },
+  "project.settings.links.donation-url": {
+    "message": "URL"
+  },
+  "project.settings.links.donation-username": {
+    "message": "Профиль"
+  },
+  "project.settings.links.donation-username-placeholder": {
+    "message": "Введите имя на {platform}"
+  },
+  "project.settings.links.donations": {
+    "message": "Ссылки для поддержки"
+  },
+  "project.settings.links.issues": {
+    "message": "Трекер проблем"
+  },
+  "project.settings.links.link-type": {
+    "message": "Тип ссылки"
+  },
+  "project.settings.links.server-discord": {
+    "message": "Discord"
+  },
+  "project.settings.links.server-updated": {
+    "message": "Ссылки сервера обновлены."
+  },
+  "project.settings.links.server-wiki-description": {
+    "message": "Страница с информацией, документацией и помощью по серверу."
+  },
+  "project.settings.links.site": {
+    "message": "Сайт"
+  },
+  "project.settings.links.site-description": {
+    "message": "Официальный сайт сервера."
+  },
+  "project.settings.links.source": {
+    "message": "Исходный код"
+  },
+  "project.settings.links.source-description": {
+    "message": "Страница/репозиторий с исходным кодом проекта"
+  },
+  "project.settings.links.store": {
+    "message": "Магазин"
+  },
+  "project.settings.links.store-description": {
+    "message": "Ссылка на магазин сервера."
+  },
+  "project.settings.links.title": {
+    "message": "Ссылки"
+  },
+  "project.settings.links.updated": {
+    "message": "Ссылки обновлены."
+  },
+  "project.settings.links.updated-title": {
+    "message": "Ссылки обновлены"
+  },
+  "project.settings.links.visit-link": {
+    "message": "Открыть {url}"
+  },
+  "project.settings.links.wiki": {
+    "message": "Вики"
+  },
+  "project.settings.links.wiki-description": {
+    "message": "Страница с информацией, документацией и помощью по проекту."
   },
   "project.settings.monetization.description": {
     "message": "Проекты на Modrinth автоматически зачисляются в <rewards-program-link>программу наград</rewards-program-link>. Если вы не хотите (или не можете по юридическим причинам) получать доход от этого проекта, вы можете отключить его здесь."

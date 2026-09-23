@@ -53,6 +53,9 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Downloaden kon niet worden voltooid"
   },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Kon instantie niet voorbereiden"
+  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Bestandspad is ongeldig"
   },
@@ -292,6 +295,87 @@
   },
   "app.content.sync-resource-packs-disabled": {
     "message": "Schakel eerst resource pakket syncen aan in de appinstellingen."
+  },
+  "app.download-manager.active": {
+    "message": "Actief"
+  },
+  "app.download-manager.attention": {
+    "message": "Heeft aandacht nodig"
+  },
+  "app.download-manager.cancel": {
+    "message": "Installatie annuleren"
+  },
+  "app.download-manager.canceling": {
+    "message": "Installatie annuleren..."
+  },
+  "app.download-manager.clear-all": {
+    "message": "Alles wissen"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Alle voltooide taken wissen"
+  },
+  "app.download-manager.complete": {
+    "message": "Klaar"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Gedupliceerde instantie"
+  },
+  "app.download-manager.empty": {
+    "message": "Geen installatietaken"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Verwachte downloadsnelheid"
+  },
+  "app.download-manager.eta": {
+    "message": "Geschatte resterende tijd voor deze download"
+  },
+  "app.download-manager.hide": {
+    "message": "Verberg installatietaken"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Geïmporteerde instantie"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "Instantie installatie"
+  },
+  "app.download-manager.modpack": {
+    "message": "Modpack"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Modpack installatie"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Nieuwe instantie"
+  },
+  "app.download-manager.pause": {
+    "message": "Pauzeer installatie"
+  },
+  "app.download-manager.paused": {
+    "message": "Gepauzeerd"
+  },
+  "app.download-manager.remove": {
+    "message": "Verwijder uit geschiedenis"
+  },
+  "app.download-manager.resume": {
+    "message": "Hervat installatie"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Gedeelde instantie"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "Update gedeelde instantie"
+  },
+  "app.download-manager.show": {
+    "message": "Toon installatietaken"
+  },
+  "app.download-manager.tasks": {
+    "message": "Taken"
+  },
+  "app.download-manager.title": {
+    "message": "Downloadbeheerder"
+  },
+  "app.download-manager.verifying": {
+    "message": "Bezig met controleren"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Open back-up-map"
@@ -1379,6 +1463,9 @@
   "app.quick-instance-switcher.instance-locked": {
     "message": "Deze instantie is vergrendeld"
   },
+  "app.quick-instance-switcher.title": {
+    "message": "Recente instanties"
+  },
   "app.quick-instance-switcher.view-instance": {
     "message": "Bekijk instantie"
   },
@@ -2462,8 +2549,14 @@
   "app.settings.game-options.setting.music-toast.description": {
     "message": "Kies of je muziek titels wil zien in het pauzemenu als pop-ups."
   },
+  "app.settings.game-options.setting.music-toast.label": {
+    "message": "Muziekmelding"
+  },
   "app.settings.game-options.setting.music-volume.label": {
     "message": "Muziek"
+  },
+  "app.settings.game-options.setting.narrator-hotkey.label": {
+    "message": "Verteller hotkey"
   },
   "app.settings.game-options.setting.narrator.description": {
     "message": "Kies wat de Verteller voorleest."
@@ -2473,6 +2566,12 @@
   },
   "app.settings.game-options.setting.neutral-volume.label": {
     "message": "Vriendelijke wezens"
+  },
+  "app.settings.game-options.setting.notification-time.description": {
+    "message": "Hoe lang meldingen zichtbaar blijven."
+  },
+  "app.settings.game-options.setting.notification-time.label": {
+    "message": "Meldingstijd"
   },
   "app.settings.game-options.setting.panorama-speed.label": {
     "message": "Panorama snelheid"
@@ -2488,6 +2587,9 @@
   },
   "app.settings.game-options.setting.record-volume.label": {
     "message": "Platenspeler/nootblokken"
+  },
+  "app.settings.game-options.setting.right-pants-leg.label": {
+    "message": "Rechter broek been"
   },
   "app.settings.game-options.setting.subtitles.label": {
     "message": "Ondertiteling"

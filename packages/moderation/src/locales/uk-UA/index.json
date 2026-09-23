@@ -110,9 +110,6 @@
   "nags.gallery.title": {
     "defaultMessage": "Відвідайте сторінку галереї"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Ваша ліцензія ({type}) вимагає публікації вихідного коду. Будь ласка, додайте посилання чи файли вихідного коду, або ж змініть тип ліцензії."
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Надайте вихідний код"
   },
@@ -166,6 +163,9 @@
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Виберіть правильну роздільність"
+  },
+  "nags.project-description-content.title": {
+    "defaultMessage": "Перевірте опис"
   },
   "nags.project-description-non-english.description": {
     "defaultMessage": "Опис проєкту повинний бути англійською або містити переклад англійською."
@@ -344,6 +344,9 @@
   "nags.visit-links-settings.title": {
     "defaultMessage": "Відвідайте налаштування посилань"
   },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "Опис проєкту повинний надавати унікальну інформацію, а не повторювати короткий зміст."
+  },
   "project.text-validation.summary-matches-title": {
     "defaultMessage": "Короткий зміст проєкту повинний надавати унікальну інформацію, а не повторювати назву проєкту."
   },
@@ -354,3 +357,4 @@
     "defaultMessage": "Назва проєкту не повинна містити номер версії."
   }
 }
+

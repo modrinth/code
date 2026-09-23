@@ -1352,6 +1352,12 @@
   "external-project-license-status.yes": {
     "defaultMessage": "Так"
   },
+  "file-button.file-too-large.description": {
+    "defaultMessage": "Файл {filename} завеликий. Максимальний розмір файлу {maxSize}."
+  },
+  "file-button.file-too-large.title": {
+    "defaultMessage": "Файл завеликий"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "Підсумок видобування"
   },

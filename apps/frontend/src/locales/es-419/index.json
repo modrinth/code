@@ -3884,6 +3884,18 @@
   "project.settings.delete-project.title": {
     "message": "Eliminar proyecto"
   },
+  "project.settings.description.intro": {
+    "message": "Puede escribir aquí una descripción extendida de tu proyecto. La descripción debe describir clara y honestamente el propósito y la función del proyecto. Consulte la sección 2.1 de la <rules>Reglas de Contenido</rules> para ver los requisitos completos."
+  },
+  "project.settings.description.title": {
+    "message": "Descripción"
+  },
+  "project.settings.description.updated": {
+    "message": "Descripción actualizada"
+  },
+  "project.settings.description.updated-text": {
+    "message": "Tu descripción ha sido actualizada."
+  },
   "project.settings.disclosures.advertising.description.1": {
     "message": "Habilitar si este proyecto contiene anuncios, patrocinios, o promociones de otros trabajos."
   },
@@ -4114,6 +4126,171 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.license.all-rights": {
+    "message": "Todos los derechos reservados/Sin licencia"
+  },
+  "project.settings.license.allow-later": {
+    "message": "Permitir ediciones posteriores"
+  },
+  "project.settings.license.custom": {
+    "message": "Personalizada"
+  },
+  "project.settings.license.custom-url-description": {
+    "message": "La ubicación web del texto completo de la licencia. Debes proporcionar un link ya que se trata de una licencia personalizada."
+  },
+  "project.settings.license.has-spdx": {
+    "message": "Usar identificador SPDX"
+  },
+  "project.settings.license.intro": {
+    "message": "Es importante elegir una licencia adecuada para tu {type}. Puedes elegir una de nuestra lista o proporcionar una licencia personalizada. También puede proporcionar una URL personalizada a su licencia elegida; de lo contrario, se mostrará el texto de la licencia. Consulte nuestra <guide>guía de licencias</guide> para obtener más información."
+  },
+  "project.settings.license.later": {
+    "message": "Ediciones posteriores"
+  },
+  "project.settings.license.later-description": {
+    "message": "La licencia que seleccionó tiene una cláusula \"o posterior\". Si marca esta casilla, los usuarios pueden utilizar su proyecto bajo ediciones posteriores de la licencia."
+  },
+  "project.settings.license.missing-name": {
+    "message": "Introduzca un nombre o identificador SPDX para su licencia personalizada."
+  },
+  "project.settings.license.missing-url": {
+    "message": "Introduzca una URL al texto completo de su licencia personalizada."
+  },
+  "project.settings.license.name": {
+    "message": "Nombre de la licencia"
+  },
+  "project.settings.license.name-description": {
+    "message": "El nombre completo de la licencia. Si la licencia tiene un identificador SPDX, por favor marque la casilla de verificación y utilice el identificador en su lugar."
+  },
+  "project.settings.license.name-placeholder": {
+    "message": "Nombre de la licencia"
+  },
+  "project.settings.license.optional-url": {
+    "message": "URL de la licencia (opcional)"
+  },
+  "project.settings.license.select": {
+    "message": "Selecciona una licencia"
+  },
+  "project.settings.license.select-description": {
+    "message": "Cómo los usuarios son y no están autorizados a utilizar su proyecto."
+  },
+  "project.settings.license.select-placeholder": {
+    "message": "Seleccionar licencia..."
+  },
+  "project.settings.license.spdx": {
+    "message": "Identificador SPDX"
+  },
+  "project.settings.license.spdx-description": {
+    "message": "Si su licencia no tiene un <spdx>identificador oficial de licencia SPDX</spdx>, desmarque la casilla e introduzca el nombre de la licencia en su lugar."
+  },
+  "project.settings.license.spdx-placeholder": {
+    "message": "Identificador SPDX"
+  },
+  "project.settings.license.title": {
+    "message": "Licencia"
+  },
+  "project.settings.license.updated": {
+    "message": "Licencia actualizada"
+  },
+  "project.settings.license.updated-text": {
+    "message": "Tu licencia ha sido actualizada."
+  },
+  "project.settings.license.url": {
+    "message": "URL de la licencia"
+  },
+  "project.settings.license.url-description": {
+    "message": "La ubicación web del texto completo de la licencia. Si no proporcionas un link, el texto de la licencia se mostrará en su lugar."
+  },
+  "project.settings.links.add-link": {
+    "message": "Añadir link"
+  },
+  "project.settings.links.discord": {
+    "message": "Invitación de Discord"
+  },
+  "project.settings.links.discord-description": {
+    "message": "Una invitación a tu servidor de Discord."
+  },
+  "project.settings.links.donation-link": {
+    "message": "Link"
+  },
+  "project.settings.links.donation-platform": {
+    "message": "Plataforma"
+  },
+  "project.settings.links.donation-url": {
+    "message": "URL"
+  },
+  "project.settings.links.donation-username": {
+    "message": "Nombre de usuario"
+  },
+  "project.settings.links.donation-username-placeholder": {
+    "message": "Introduce tu usuario de {platform}"
+  },
+  "project.settings.links.donations": {
+    "message": "Links de donación"
+  },
+  "project.settings.links.donations-description": {
+    "message": "Añada links de donación para que los usuarios te apoyen directamente."
+  },
+  "project.settings.links.issues": {
+    "message": "Reporte de errores"
+  },
+  "project.settings.links.issues-description": {
+    "message": "Un lugar para que los usuarios reporten bugs, errores, y preocupaciones sobre tu proyecto."
+  },
+  "project.settings.links.link-type": {
+    "message": "Tipo de link"
+  },
+  "project.settings.links.remove-donation-link": {
+    "message": "Eliminar link de donación"
+  },
+  "project.settings.links.server-discord": {
+    "message": "Discord"
+  },
+  "project.settings.links.server-updated": {
+    "message": "Los links de tu servidor han sido actualizados."
+  },
+  "project.settings.links.server-wiki-description": {
+    "message": "Una página que contiene información, documentación, y ayuda sobre el server."
+  },
+  "project.settings.links.site": {
+    "message": "Sitio web"
+  },
+  "project.settings.links.site-description": {
+    "message": "Sitio web oficial de su server."
+  },
+  "project.settings.links.source": {
+    "message": "Código fuente"
+  },
+  "project.settings.links.source-description": {
+    "message": "Una página/repositorio que contenga el código fuente de tu proyecto"
+  },
+  "project.settings.links.store": {
+    "message": "Tienda"
+  },
+  "project.settings.links.store-description": {
+    "message": "Un link a la tienda de tu server."
+  },
+  "project.settings.links.title": {
+    "message": "Links"
+  },
+  "project.settings.links.updated": {
+    "message": "Tus links han sido actualizados."
+  },
+  "project.settings.links.updated-title": {
+    "message": "Links actualizados"
+  },
+  "project.settings.links.url-placeholder": {
+    "message": "Introduzca una URL válida"
+  },
+  "project.settings.links.visit-link": {
+    "message": "Visitar {url}"
+  },
+  "project.settings.links.wiki": {
+    "message": "Página wiki"
+  },
+  "project.settings.links.wiki-description": {
+    "message": "Una página que contenga información y documentación que ayude al proyecto."
   },
   "project.settings.monetization.description": {
     "message": "Los proyectos en Modrinth están inscritos automáticamente en el <rewards-program-link>Rewards Program</rewards-program-link>. Si usted no quiere (o no puede por razones legales) obtener ingresos de este proyecto, puede desactivarlo aquí."

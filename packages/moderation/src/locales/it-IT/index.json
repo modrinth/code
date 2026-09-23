@@ -107,9 +107,6 @@
   "nags.gallery.title": {
     "defaultMessage": "Galleria"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "La licenza selezionata richiede la pubblicazione del codice sorgente. Fornisci un link, i file come allegati o cambia licenza."
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Fornisci il codice sorgente"
   },
@@ -163,6 +160,9 @@
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Seleziona la risoluzione corretta"
+  },
+  "nags.project-description-content.title": {
+    "defaultMessage": "Rivedi la descrizione"
   },
   "nags.project-description-non-english.description": {
     "defaultMessage": "La descrizione deve essere scritta in inglese o contenere una traduzione."
@@ -334,6 +334,9 @@
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Impostazioni dei link"
+  },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "La descrizione dovrebbe dare informazioni utili e non ripetere la sintesi del progetto."
   },
   "project.text-validation.summary-matches-title": {
     "defaultMessage": "La sintesi dovrebbe dare informazioni utili e non ripetere il nome del progetto."

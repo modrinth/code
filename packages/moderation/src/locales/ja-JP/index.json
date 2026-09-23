@@ -20,6 +20,9 @@
   "nags.add-license-details.title": {
     "defaultMessage": "ライセンス詳細を追加"
   },
+  "nags.add-links-server.description": {
+    "defaultMessage": "ウェブサイト、ストア、無期限なDiscord招待リンクなど、関連する外部リソースへのリンクを追加してください。"
+  },
   "nags.add-links-server.title": {
     "defaultMessage": "外部リンクを追加する"
   },
@@ -49,6 +52,9 @@
   },
   "nags.edit-tags.title": {
     "defaultMessage": "タグを編集する"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "名前を変更"
   },
   "nags.feature-gallery-image.description": {
     "defaultMessage": "あなたのプロジェクトの第一印象はギャラリーに含まれる画像に大きく左右されます。"
@@ -186,3 +192,4 @@
     "defaultMessage": "リンク設定を表示"
   }
 }
+

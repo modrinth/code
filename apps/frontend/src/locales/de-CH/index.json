@@ -3884,6 +3884,18 @@
   "project.settings.delete-project.title": {
     "message": "Projekt löschen"
   },
+  "project.settings.description.intro": {
+    "message": "Hier kannst du eine ausführliche Beschreibung deines Projekts eingeben. Die Beschreibung muss den Zweck und die Funktion des Projekts klar und ehrlich darstellen. Die vollständigen Anforderungen findest du in Abschnitt 2.1 der <rules>Inhaltsrichtlinien</rules>."
+  },
+  "project.settings.description.title": {
+    "message": "Beschreibung"
+  },
+  "project.settings.description.updated": {
+    "message": "Beschreibung aktualisiert"
+  },
+  "project.settings.description.updated-text": {
+    "message": "Deine Beschreibung wurde aktualisiert."
+  },
   "project.settings.disclosures.advertising.description.1": {
     "message": "Muss aktiviert werden, wenn dieses Projekt Werbung, Sponsoring oder Werbeaktionen anderer Werke enthält."
   },
@@ -3915,7 +3927,7 @@
     "message": "z. B. Die chinesische und arabische Übersetzung wurden mit KI generiert."
   },
   "project.settings.disclosures.ai.still-unsure": {
-    "message": "Noch unsicher? Weitere Informationen gibt es in unserem Guide zur <faq-link>Offenlegung und Nutzung von KI</faq-link> und in Abschnitt 6 von <rules>Modrinths Inhaltsregeln</rules>."
+    "message": "Noch unsicher? Weitere Informationen findest du in unserem Leitfaden zru <faq-link>Offenlegung und Nutzung von KI</faq-link> sowie in Abschnitt 6 der <rules>Inhaltsrichtlinien von Modrinth</rules>."
   },
   "project.settings.disclosures.ai.title": {
     "message": "Enthält KI-generierte Inhalte"
@@ -4114,6 +4126,147 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.license.all-rights": {
+    "message": "Alle Rechte vorbehalten/Keine Lizenz"
+  },
+  "project.settings.license.allow-later": {
+    "message": "Spätere Ausgaben zulassen"
+  },
+  "project.settings.license.custom": {
+    "message": "Benutzerdefiniert"
+  },
+  "project.settings.license.custom-url-description": {
+    "message": "Die Webadresse des vollständigen Lizenztextes. Du musst einen Link angeben, da es sich um eine benutzerdefinierte Lizenz handelt."
+  },
+  "project.settings.license.has-spdx": {
+    "message": "SPDX-Kennung verwenden"
+  },
+  "project.settings.license.later": {
+    "message": "Später Ausgaben"
+  },
+  "project.settings.license.later-description": {
+    "message": "Die von dir ausgewählte Lizenz enthält eine „oder höher“-Klausel. Wenn du dieses Kästchen auswählst, dürfen Benutzer dein Projekt unter späteren Versionen der Lizenz nutzen."
+  },
+  "project.settings.license.missing-name": {
+    "message": "Gib einen Namen oder eine SPDX-Kennung für deine benutzerdefinierte Lizenz ein."
+  },
+  "project.settings.license.missing-url": {
+    "message": "Gib eine URL zum vollen Text deiner benutzerdefinierten Lizenz ein."
+  },
+  "project.settings.license.name": {
+    "message": "Lizenzname"
+  },
+  "project.settings.license.name-description": {
+    "message": "Der vollständige Name der Lizenz. Falls die Lizenz über eine SPDX-Kennung verfügt, wähle bitte das Kästchen aus und verwende stattdessen die Kennung."
+  },
+  "project.settings.license.name-placeholder": {
+    "message": "Lizenzname"
+  },
+  "project.settings.license.optional-url": {
+    "message": "Lizenz-URL (optional)"
+  },
+  "project.settings.license.select": {
+    "message": "Eine Lizenz auswählen"
+  },
+  "project.settings.license.select-description": {
+    "message": "Wie Benutzer dein Projekt nutzen dürfen und wie nicht."
+  },
+  "project.settings.license.select-placeholder": {
+    "message": "Lizenz auswählen..."
+  },
+  "project.settings.license.spdx": {
+    "message": "SPDX-Kennung"
+  },
+  "project.settings.license.spdx-description": {
+    "message": "Falls deine Lizenz keine offizielle <spdx>SPDX-Lizenzkennung</spdx> besitzt, deaktiviere das Kästchen und gib stattdessen den Namen der Lizenz ein."
+  },
+  "project.settings.license.spdx-placeholder": {
+    "message": "SPDX-Kennung"
+  },
+  "project.settings.license.title": {
+    "message": "Lizenz"
+  },
+  "project.settings.license.updated": {
+    "message": "Lizenz aktualisiert"
+  },
+  "project.settings.license.updated-text": {
+    "message": "Deine Lizenz wurde aktualisiert."
+  },
+  "project.settings.license.url": {
+    "message": "Lizenz-URL"
+  },
+  "project.settings.license.url-description": {
+    "message": "Die Webadresse des vollständigen Lizenztextes. Falls du keinen Link angibst, wird stattdessen der Lizenztext angezeigt."
+  },
+  "project.settings.links.add-link": {
+    "message": "Link hinzufügen"
+  },
+  "project.settings.links.discord": {
+    "message": "Discord-Einladung"
+  },
+  "project.settings.links.discord-description": {
+    "message": "Ein Einladungslink zu deinem Discord-Server."
+  },
+  "project.settings.links.donation-link": {
+    "message": "Link"
+  },
+  "project.settings.links.donation-platform": {
+    "message": "Plattform"
+  },
+  "project.settings.links.donation-url": {
+    "message": "URL"
+  },
+  "project.settings.links.donation-username": {
+    "message": "Benutzername"
+  },
+  "project.settings.links.donation-username-placeholder": {
+    "message": "Gib deinen {platform} Benutzernamen ein"
+  },
+  "project.settings.links.donations": {
+    "message": "Spenden-Links"
+  },
+  "project.settings.links.server-discord": {
+    "message": "Discord"
+  },
+  "project.settings.links.site": {
+    "message": "Webseite"
+  },
+  "project.settings.links.site-description": {
+    "message": "Die offizielle Webseite deines Servers."
+  },
+  "project.settings.links.source": {
+    "message": "Quellcode"
+  },
+  "project.settings.links.source-description": {
+    "message": "Ein Seite/ein Repository mit dem Quellcode deines Projekts"
+  },
+  "project.settings.links.store": {
+    "message": "Store"
+  },
+  "project.settings.links.store-description": {
+    "message": "Ein Link zum Store oder Shop deines Servers."
+  },
+  "project.settings.links.title": {
+    "message": "Links"
+  },
+  "project.settings.links.updated": {
+    "message": "Deine Links wurden aktualisiert."
+  },
+  "project.settings.links.updated-title": {
+    "message": "Links aktualisiert"
+  },
+  "project.settings.links.url-placeholder": {
+    "message": "Gib eine gültige URL ein"
+  },
+  "project.settings.links.visit-link": {
+    "message": "{url} besuchen"
+  },
+  "project.settings.links.wiki": {
+    "message": "Wiki-Seite"
+  },
+  "project.settings.links.wiki-description": {
+    "message": "Eine Seite mit Informationen, Dokumentation und Hilfe zum Projekt."
   },
   "project.settings.monetization.description": {
     "message": "Projekte auf Modrinth nehmen automatisch am <rewards-program-link>Belohnungsprogramm</rewards-program-link> teil. Falls du mit diesem Projekt keine Einnahmen erzielen möchtest (oder aus rechtlichen Gründen nicht darfst), kannst du dies hier deaktivieren."

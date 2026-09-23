@@ -4205,6 +4205,9 @@
   "project.settings.tags.group-title.features": {
     "message": "{showType, select, yes {{types} özellikler} other {Özellikler}}"
   },
+  "project.settings.tags.performance-impact-description": {
+    "message": "{type} gerçekçi performans etkisini seçin. Eğer {type} farklı performans etkisi düzeylerine göre yapılandırılabiliyorsa, birden fazla seçenek seçin."
+  },
   "project.settings.tags.resolutions-description": {
     "message": "{type} içindeki dokuların çözünürlüğünü seçin."
   },
@@ -4213,6 +4216,15 @@
   },
   "project.settings.tags.title": {
     "message": "Etiketler"
+  },
+  "project.settings.tags.too-many-tags-project-warning": {
+    "message": "{count} adet etiket seçtiniz. Sunucunuzun odağını korumak ve daha kolay bulunmasını sağlamak için lütfen bu sayıyı 8 veya daha azına indirmeyi düşünün."
+  },
+  "project.settings.tags.too-many-tags-server-hard-warning": {
+    "message": "{count} adet etiket seçtiniz. Sunucunuzun odağını korumak ve daha kolay bulunmasını sağlamak için lütfen bu sayıyı 18 veya daha azına indirin."
+  },
+  "project.settings.tags.too-many-tags-server-soft-warning": {
+    "message": "{count} adet etiket seçtiniz. Sunucunuzun odağını korumak ve daha kolay bulunmasını sağlamak için bu sayıyı 12 veya daha azına indirmeyi düşünün."
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Etiket eklemeden önce sürümleri yükleyin"
@@ -4231,6 +4243,9 @@
   },
   "project.versions.delete-button": {
     "message": "Sil"
+  },
+  "project.versions.delete-confirm.description": {
+    "message": "Bu sürümü sonsuza kadar kaldıracaktır (cidden sonsuza kadar)."
   },
   "project.versions.delete-confirm.title": {
     "message": "Bu sürümü kaldırmak istediğinizden emin misiniz?"
@@ -4312,6 +4327,12 @@
   },
   "report.not-for.dmca.description": {
     "message": "<policy-link>Telif Hakkı Politikası</policy-link>'mızı inceleyin."
+  },
+  "report.note.ai-images.1": {
+    "message": "Simgelerde, galerilerde ve açıklamalarda yapay zeka tarafından üretilen görsellerin kullanılmasını yasaklamak üzere kurallarımızı güncelledik. Bu görsellerle ilgili bildirimleri kabul etmeye başlamadan önce, içerik oluşturuculara projelerinden yapay zeka görsellerini kaldırmaları için bir geçiş süresi tanıyoruz."
+  },
+  "report.note.check-back-later": {
+    "message": "Bekleme süresi sona erdiğinde lütfen daha sonra tekrar kontrol edin. Şu anda bu tür bildirimler kabul edilmemektedir."
   },
   "report.note.copyright.1": {
     "message": "Lütfen bir DMCA kaldırma talebi *değil* ama yeniden yüklenmiş içeriğin bir bildirisini göndereceğinizi dikkate alın."
@@ -4919,6 +4940,9 @@
   "settings.account.two-factor.error.incorrect-code": {
     "message": "Girilen kod yanlış!"
   },
+  "settings.account.two-factor.field.code.description": {
+    "message": "Doğrulama uygulamanızdaki kodu girin veya yedek kodlarınızdan birini kullanın."
+  },
   "settings.account.two-factor.field.code.label": {
     "message": "Çift aşamalı kodu girin"
   },
@@ -5165,6 +5189,9 @@
   "settings.billing.plan.title": {
     "message": "{size} Plan"
   },
+  "settings.billing.price.includes-tax": {
+    "message": "{amount} vergi içerir"
+  },
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
@@ -5389,6 +5416,21 @@
   },
   "ui.newsletter-button.tooltip": {
     "message": "Modrinth haber mektuplarına abone ol"
+  },
+  "ui.two-factor-code.authentication-code": {
+    "message": "Altı haneli doğrulama kodu"
+  },
+  "ui.two-factor-code.backup-code": {
+    "message": "Yedek kod"
+  },
+  "ui.two-factor-code.backup-code.placeholder": {
+    "message": "Yedek kod girin"
+  },
+  "ui.two-factor-code.use-authentication-code": {
+    "message": "Doğrulama kodunu girin"
+  },
+  "ui.two-factor-code.use-backup-code": {
+    "message": "Yedek kodu kullan"
   },
   "version.all-versions": {
     "message": "Tüm sürümler"

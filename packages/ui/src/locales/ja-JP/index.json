@@ -206,6 +206,9 @@
   "button.download": {
     "defaultMessage": "ダウンロード"
   },
+  "button.download-files": {
+    "defaultMessage": "ファイルをダウンロード"
+  },
   "button.downloading": {
     "defaultMessage": "ダウンロード中"
   },
@@ -365,6 +368,9 @@
   "collections.label.private": {
     "defaultMessage": "非公開"
   },
+  "console.actions.share": {
+    "defaultMessage": "共有"
+  },
   "content-type.content.lowercase": {
     "defaultMessage": "コンテンツ"
   },
@@ -376,6 +382,9 @@
   },
   "content.card.select-project": {
     "defaultMessage": "{project}を選択"
+  },
+  "content.card.synced": {
+    "defaultMessage": "インスタンス間で同期済み"
   },
   "content.card.uploaded": {
     "defaultMessage": "アップロードしました"
@@ -2378,6 +2387,9 @@
   "instances.content-install.show-unavailable": {
     "defaultMessage": "利用できない場合でも表示"
   },
+  "instances.managed-content-modal.disabled": {
+    "defaultMessage": "無効化済み"
+  },
   "instances.managed-content-modal.download-file": {
     "defaultMessage": "ファイルをダウンロード"
   },
@@ -2386,6 +2398,9 @@
   },
   "instances.managed-content-modal.empty-title": {
     "defaultMessage": "コンテンツが見つかりません"
+  },
+  "instances.managed-content-modal.enabled": {
+    "defaultMessage": "有効化済み"
   },
   "instances.managed-content-modal.external-content": {
     "defaultMessage": "外部コンテンツ"
@@ -2404,6 +2419,9 @@
   },
   "instances.managed-content-modal.open-in-slicer": {
     "defaultMessage": "Slicer で開く"
+  },
+  "instances.managed-content-modal.warnings": {
+    "defaultMessage": "警告"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "現在"
@@ -3278,11 +3296,38 @@
   "profile.details.label.payment-methods": {
     "defaultMessage": "支払い方法"
   },
+  "profile.details.label.view-github-profile": {
+    "defaultMessage": "プロフィールを表示"
+  },
+  "profile.details.title": {
+    "defaultMessage": "ユーザー詳細"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "defaultMessage": "メール認証がされていません"
+  },
+  "profile.details.tooltip.email-verified": {
+    "defaultMessage": "メール認証済み"
+  },
+  "profile.error.load-description": {
+    "defaultMessage": "ユーザープロファイルを読み込めませんでした。"
+  },
   "profile.error.not-found": {
     "defaultMessage": "ユーザーが見つかりません"
   },
+  "profile.label.affiliate": {
+    "defaultMessage": "アフィリエイト"
+  },
   "profile.label.badges": {
     "defaultMessage": "バッジ"
+  },
+  "profile.label.collection": {
+    "defaultMessage": "コレクション"
+  },
+  "profile.label.no-collections": {
+    "defaultMessage": "このユーザーはコレクションがありません！"
+  },
+  "profile.label.no-collections-auth-description": {
+    "defaultMessage": "まだコレクションがないようです。"
   },
   "profile.label.no-projects": {
     "defaultMessage": "このユーザーはまだプロジェクトがありません！"
@@ -3295,6 +3340,9 @@
   },
   "profile.official-account": {
     "defaultMessage": "Modrinth 公式アカウント"
+  },
+  "profile.unblock-user.error-description": {
+    "defaultMessage": "このユーザーのブロック解除中にエラーが発生しました。もう一度やり直してください。"
   },
   "profile.unblock-user.success-title": {
     "defaultMessage": "ユーザーのブロックを解除しました"
@@ -3908,6 +3956,9 @@
   "project.settings.disclosures.ai.types-text": {
     "defaultMessage": "テキスト"
   },
+  "project.settings.disclosures.telemetry.consent-always-active": {
+    "defaultMessage": "常にアクティブ"
+  },
   "project.settings.disclosures.title": {
     "defaultMessage": "開示"
   },
@@ -4049,6 +4100,9 @@
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
   },
+  "project.versions.filter.channel": {
+    "defaultMessage": "チャンネル"
+  },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "{filter}のフィルターを切り替える"
   },
@@ -4106,8 +4160,20 @@
   "report.item-type.version": {
     "defaultMessage": "バージョン"
   },
+  "report.type.spam": {
+    "defaultMessage": "スパム行為"
+  },
   "s.bg": {
     "defaultMessage": "バックグラウンドタスクが実行中です"
+  },
+  "search.filter.dependent_project": {
+    "defaultMessage": "{project} に依存"
+  },
+  "search.filter.included_content.remove_project.tooltip": {
+    "defaultMessage": "プロジェクトを削除"
+  },
+  "search.filter.included_content.search_placeholder": {
+    "defaultMessage": "コンテンツを検索…"
   },
   "search.filter.locked.default": {
     "defaultMessage": "フィルターロック済み"
@@ -4139,11 +4205,20 @@
   "search.filter.option.show_more": {
     "defaultMessage": "さらに表示"
   },
+  "search.filter.option.sub_options.collapse.tooltip": {
+    "defaultMessage": "詳細オプションを非表示"
+  },
+  "search.filter.option.sub_options.expand.tooltip": {
+    "defaultMessage": "詳細オプションを表示"
+  },
   "search.filter_type.advanced.disclosure.ai_content": {
     "defaultMessage": "AI生成コンテンツ"
   },
   "search.filter_type.advanced.disclosure.ai_content.usage": {
     "defaultMessage": "AI{usage}"
+  },
+  "search.filter_type.advanced.disclosure.archived": {
+    "defaultMessage": "アーカイブ済み"
   },
   "search.filter_type.advanced.disclosure.paid_features": {
     "defaultMessage": "有料機能"
@@ -4199,6 +4274,9 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "ローダー"
   },
+  "search.photosensitivity-warning-modal.dont-show-again": {
+    "defaultMessage": "次回から表示しない"
+  },
   "search.server_content_type.modpack": {
     "defaultMessage": "Mod導入済み"
   },
@@ -4208,11 +4286,23 @@
   "servers.access-page.activity-log-filter.action-group.backups": {
     "defaultMessage": "バックアップ"
   },
+  "servers.access-page.activity-log-filter.action-group.content": {
+    "defaultMessage": "コンテンツとModパック"
+  },
   "servers.access-page.activity-log-filter.action-group.server": {
     "defaultMessage": "サーバー"
   },
+  "servers.access-page.activity-log-filter.action-group.users": {
+    "defaultMessage": "ユーザーおよび招待"
+  },
   "servers.access-page.activity-log-filter.action-types": {
     "defaultMessage": "アクション"
+  },
+  "servers.access-page.activity-log-filter.action.addon-added": {
+    "defaultMessage": "コンテンツが追加されました"
+  },
+  "servers.access-page.activity-log-filter.action.addon-deleted": {
+    "defaultMessage": "コンテンツが削除されました"
   },
   "servers.access-page.activity-log-filter.action.addon-disabled": {
     "defaultMessage": "無効化されたコンテンツ"
@@ -4685,6 +4775,18 @@
   "servers.audit-log.event.server-reset": {
     "defaultMessage": "サーバーをリセットしました"
   },
+  "servers.audit-log.event.server-restarted": {
+    "defaultMessage": "サーバーが再起動されました"
+  },
+  "servers.audit-log.event.server-started": {
+    "defaultMessage": "サーバーが起動しました"
+  },
+  "servers.audit-log.event.server-stopped": {
+    "defaultMessage": "サーバーが停止されました"
+  },
+  "servers.audit-log.event.unknown": {
+    "defaultMessage": "不明なイベント"
+  },
   "servers.audit-log.scope.server": {
     "defaultMessage": "サーバー"
   },
@@ -4846,6 +4948,15 @@
   },
   "servers.busy.installing": {
     "defaultMessage": "サーバーがインストール中です"
+  },
+  "servers.download.failed.title": {
+    "defaultMessage": "ダウンロードに失敗しました"
+  },
+  "servers.download.unavailable.description": {
+    "defaultMessage": "このワールドファイルは現在ダウンロードできません。"
+  },
+  "servers.download.unavailable.title": {
+    "defaultMessage": "ダウンロードできません"
   },
   "servers.files.zip-created": {
     "defaultMessage": "ZIPファイルを作成しました"
