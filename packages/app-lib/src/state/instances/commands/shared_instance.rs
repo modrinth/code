@@ -24,7 +24,7 @@ pub(crate) async fn attach_shared_instance(
     let sync_state =
         shared_sync_state(&content_set_id, &attachment, Some(Utc::now()));
 
-    let mut tx = pool.begin().await?;
+    let mut tx = pool.begin_with("BEGIN IMMEDIATE").await?;
     instance_rows::set_shared_instance_attachment(
         instance_id,
         Some(&attachment),
@@ -82,7 +82,7 @@ async fn detach_shared_instance(
         _ => None,
     };
 
-    let mut tx = pool.begin().await?;
+    let mut tx = pool.begin_with("BEGIN IMMEDIATE").await?;
     instance_rows::set_shared_instance_attachment(instance_id, None, &mut tx)
         .await?;
     if quarantine {
@@ -131,7 +131,7 @@ pub(crate) async fn set_shared_instance_sync_status(
         &attachment,
         Some(Utc::now()),
     );
-    let mut tx = pool.begin().await?;
+    let mut tx = pool.begin_with("BEGIN IMMEDIATE").await?;
     content_rows::upsert_content_set_sync_state(&sync_state, &mut tx).await?;
     tx.commit().await?;
 
@@ -143,7 +143,7 @@ pub(crate) async fn mark_shared_instance_stale(
     pool: &SqlitePool,
 ) -> crate::Result<()> {
     if let Some(sync_state) = stale_sync_state(instance_id, pool).await? {
-        let mut tx = pool.begin().await?;
+        let mut tx = pool.begin_with("BEGIN IMMEDIATE").await?;
         content_rows::upsert_content_set_sync_state(&sync_state, &mut tx)
             .await?;
         tx.commit().await?;

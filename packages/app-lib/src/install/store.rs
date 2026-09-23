@@ -389,7 +389,7 @@ pub async fn complete_success(
     let now = Utc::now().timestamp();
     let json = serde_json::to_string(state)?;
     let id_value = id.to_string();
-    let mut transaction = app_state.pool.begin().await?;
+    let mut transaction = app_state.pool.begin_with("BEGIN IMMEDIATE").await?;
 
     let job_result = sqlx::query(
         "

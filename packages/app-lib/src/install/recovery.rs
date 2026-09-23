@@ -292,7 +292,7 @@ async fn restore_instance_metadata(
     state: &State,
 ) -> crate::Result<()> {
     let content_set_id = metadata.applied_content_set.id.as_str();
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
     instance_rows::update_instance(&metadata.instance, &mut tx).await?;
     content_rows::update_content_set(&metadata.applied_content_set, &mut tx)
         .await?;
