@@ -125,7 +125,7 @@ export function useDownloadManager() {
 				canCopyDetails:
 					job.status === 'failed' ||
 					job.status === 'interrupted' ||
-					appSettings.getFeatureFlag('always_show_copy_details'),
+					appSettings.alwaysShowCopyDetails,
 				copied: copiedJobs.value.has(job.job_id),
 				busy: busyJobs.value.has(job.job_id),
 			}
