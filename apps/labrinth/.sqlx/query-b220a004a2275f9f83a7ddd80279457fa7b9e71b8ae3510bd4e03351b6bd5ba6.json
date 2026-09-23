@@ -1,0 +1,76 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                issue.id,\n                issue.thread_id,\n                issue.created_by,\n                issue.why,\n                issue.user_addressed,\n                issue.moderator_verified,\n                issue.created_at,\n                facet.id AS \"facet_id!\",\n                facet.what AS \"what: Json<ThreadIssueTarget>\",\n                facet.verdict\n            FROM threads_issues issue\n            INNER JOIN threads_issue_facets facet\n                ON facet.issue_id = issue.id\n            WHERE issue.thread_id = ANY($1)\n            ORDER BY issue.created_at, issue.id, facet.id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "thread_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "created_by",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "why",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 4,
+        "name": "user_addressed",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "moderator_verified",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 6,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "facet_id!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 8,
+        "name": "what: Json<ThreadIssueTarget>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 9,
+        "name": "verdict",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "b220a004a2275f9f83a7ddd80279457fa7b9e71b8ae3510bd4e03351b6bd5ba6"
+}

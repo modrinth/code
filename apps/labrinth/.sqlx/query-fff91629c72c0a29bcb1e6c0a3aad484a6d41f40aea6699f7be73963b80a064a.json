@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE threads_issue_facets\n                SET verdict = $2\n                WHERE issue_id = $1\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "fff91629c72c0a29bcb1e6c0a3aad484a6d41f40aea6699f7be73963b80a064a"
+}

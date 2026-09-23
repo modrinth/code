@@ -36,6 +36,7 @@ base62_id!(SessionId);
 base62_id!(TeamId);
 base62_id!(TeamMemberId);
 base62_id!(ThreadId);
+base62_id!(ThreadIssueFacetId);
 base62_id!(ThreadIssueId);
 base62_id!(ThreadMessageId);
 base62_id!(UserSubscriptionId);

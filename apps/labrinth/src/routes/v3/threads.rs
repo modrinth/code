@@ -404,8 +404,13 @@ pub async fn threads_get(
 }
 
 #[derive(Deserialize, utoipa::ToSchema)]
-pub struct NewThreadIssue {
+pub struct NewThreadIssueFacet {
     pub what: ThreadIssueTarget,
+}
+
+#[derive(Deserialize, utoipa::ToSchema)]
+pub struct NewThreadIssue {
+    pub facets: Vec<NewThreadIssueFacet>,
     pub why: serde_json::Value,
 }
 
@@ -553,6 +558,15 @@ pub async fn thread_issues_create(
             "must provide at least one thread issue"
         )));
     }
+    if new_issues
+        .issues
+        .iter()
+        .any(|issue| issue.facets.is_empty())
+    {
+        return Err(ApiError::Request(eyre::eyre!(
+            "each thread issue must have at least one facet"
+        )));
+    }
 
     let thread_id: database::models::DBThreadId = info.into_inner().0.into();
     let project_id = thread_project_id(thread_id, &pool)
@@ -574,7 +588,11 @@ pub async fn thread_issues_create(
             .issues
             .into_iter()
             .map(|issue| ThreadIssueBuilder {
-                what: issue.what,
+                facets: issue
+                    .facets
+                    .into_iter()
+                    .map(|facet| facet.what)
+                    .collect(),
                 why: issue.why,
             })
             .collect(),

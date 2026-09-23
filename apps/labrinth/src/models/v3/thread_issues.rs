@@ -1,7 +1,8 @@
 use crate::models::disclosures::ProjectDisclosure;
 use crate::models::exp::minecraft::Language;
 use crate::models::ids::{
-    FileId, GalleryImageId, TeamId, ThreadIssueId, VersionId,
+    FileId, GalleryImageId, TeamId, ThreadIssueFacetId, ThreadIssueId,
+    VersionId,
 };
 use crate::models::projects::{Dependency, FileType, Project, Version};
 use ariadne::ids::UserId;
@@ -27,19 +28,14 @@ pub struct ThreadIssueTeamMember {
 
 /// Issue that a moderator has flagged on a project in its moderation thread.
 ///
-/// If a moderator has a specific, targeted, actionable piece of feedback on a
-/// specific part of a project (e.g. the description, summary, a gallery image,
-/// etc.), they can add an issue to the moderation thread which targets that
-/// part specifically, along with one of an enumerated set of reasons for why
-/// the issue was applied.
+/// An issue groups related actionable facets under one reason. The creator
+/// addresses the issue as a whole, and a moderator verifies it as a whole.
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ThreadIssue {
     pub id: ThreadIssueId,
     pub created_by: UserId,
     pub created_at: DateTime<Utc>,
-    /// What part of a project this issue applies to.
-    pub what: ThreadIssueTarget,
-    /// Why the issue was raised on this part.
+    /// Why the issue was raised.
     ///
     /// This is treated as an opaque JSON blob by the backend; it is up to the
     /// frontend to define a schema for it, and to render/localize it properly.
@@ -50,14 +46,27 @@ pub struct ThreadIssue {
     /// Has a moderator seen the user's resolution and explicitly marked it as
     /// resolved?
     ///
-    /// If a moderator marks this issue as verified, then it will locked to
+    /// If a moderator marks this issue as verified, then it will be locked to
     /// [`ThreadIssueVerdict::Resolved`].
     pub moderator_verified: bool,
-    /// Final derived verdict of this issue.
+    /// The immutable project parts that must be changed to resolve this issue.
+    pub facets: Vec<ThreadIssueFacet>,
+    /// Verdict derived from all facet verdicts.
     pub verdict: ThreadIssueVerdict,
 }
 
-/// What part of a project must change for a [`ThreadIssue`] to be resolved?
+#[derive(
+    Debug, Clone, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
+)]
+pub struct ThreadIssueFacet {
+    pub id: ThreadIssueFacetId,
+    /// What part of a project this facet applies to.
+    pub what: ThreadIssueTarget,
+    /// Verdict derived from the current project state and issue-level flags.
+    pub verdict: ThreadIssueVerdict,
+}
+
+/// What part of a project must change for a [`ThreadIssueFacet`] to be resolved?
 #[derive(
     Debug, Clone, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
 )]
@@ -130,7 +139,7 @@ pub enum ThreadIssueTarget {
     Debug, Clone, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
 )]
 pub struct TextTarget {
-    /// Original value of this field when the [`ThreadIssue`] was made.
+    /// Original value of this field when the [`ThreadIssueFacet`] was made.
     pub original: String,
     /// Moderator-proposed value for this field.
     pub suggestion: Option<String>,
@@ -210,7 +219,7 @@ pub enum ThreadIssueAcknowledgement {
     Reply,
 }
 
-/// Current state of the action required to resolve a [`ThreadIssue`].
+/// Current state of the action required to resolve a [`ThreadIssueFacet`].
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
 )]
@@ -243,6 +252,20 @@ impl ThreadIssueVerdict {
             Self::Open => "open",
             Self::Addressed => "addressed",
             Self::Resolved => "resolved",
+        }
+    }
+
+    pub(crate) fn from_facets(facets: &[ThreadIssueFacet]) -> Self {
+        if !facets.is_empty()
+            && facets.iter().all(|facet| facet.verdict == Self::Resolved)
+        {
+            Self::Resolved
+        } else if !facets.is_empty()
+            && facets.iter().all(|facet| facet.verdict != Self::Open)
+        {
+            Self::Addressed
+        } else {
+            Self::Open
         }
     }
 }
@@ -724,10 +747,10 @@ impl ThreadIssue {
         Self {
             id: data.id.into(),
             created_by: data.created_by.into(),
-            what: data.what,
             why: data.why,
             user_addressed: data.user_addressed,
             moderator_verified: data.moderator_verified,
+            facets: data.facets,
             verdict: data.verdict,
             created_at: data.created_at,
         }
@@ -1234,6 +1257,49 @@ mod tests {
         assert_eq!(
             target.verdict(&context(&project), false, true),
             ThreadIssueVerdict::Resolved
+        );
+    }
+
+    #[test]
+    fn issue_verdict_aggregates_facet_verdicts() {
+        let facets = |verdicts: &[ThreadIssueVerdict]| {
+            verdicts
+                .iter()
+                .enumerate()
+                .map(|(id, verdict)| ThreadIssueFacet {
+                    id: ThreadIssueFacetId(id as u64),
+                    what: ThreadIssueTarget::Acknowledge {
+                        mode: ThreadIssueAcknowledgement::Checkbox,
+                    },
+                    verdict: *verdict,
+                })
+                .collect::<Vec<_>>()
+        };
+
+        assert_eq!(
+            ThreadIssueVerdict::from_facets(&[]),
+            ThreadIssueVerdict::Open
+        );
+        assert_eq!(
+            ThreadIssueVerdict::from_facets(&facets(&[
+                ThreadIssueVerdict::Resolved,
+                ThreadIssueVerdict::Resolved,
+            ])),
+            ThreadIssueVerdict::Resolved
+        );
+        assert_eq!(
+            ThreadIssueVerdict::from_facets(&facets(&[
+                ThreadIssueVerdict::Addressed,
+                ThreadIssueVerdict::Resolved,
+            ])),
+            ThreadIssueVerdict::Addressed
+        );
+        assert_eq!(
+            ThreadIssueVerdict::from_facets(&facets(&[
+                ThreadIssueVerdict::Open,
+                ThreadIssueVerdict::Resolved,
+            ])),
+            ThreadIssueVerdict::Open
         );
     }
 

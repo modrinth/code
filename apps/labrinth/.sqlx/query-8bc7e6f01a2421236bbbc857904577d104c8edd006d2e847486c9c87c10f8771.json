@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE threads_issues\n            SET\n                user_addressed = COALESCE($2, user_addressed),\n                moderator_verified = COALESCE($3, moderator_verified)\n            WHERE id = $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Bool",
+        "Bool"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "8bc7e6f01a2421236bbbc857904577d104c8edd006d2e847486c9c87c10f8771"
+}
