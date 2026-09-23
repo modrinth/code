@@ -860,7 +860,7 @@ export function createContentInstall(opts: {
 			const packs = await list()
 			const existingPack = packs.find((pack) => pack.link?.project_id === project.id)
 
-			if (existingPack && !appSettings.getFeatureFlag('skip_non_essential_warnings')) {
+			if (existingPack && !appSettings.skipNonEssentialWarnings) {
 				pendingModpackInstall = { project, version, source, callback, createInstanceCallback }
 				modpackAlreadyInstalledModalRef?.show(existingPack.name, existingPack.id)
 				return
