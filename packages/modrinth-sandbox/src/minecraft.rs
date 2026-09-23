@@ -1,4 +1,7 @@
-use std::{ffi::OsString, path::PathBuf};
+use std::{
+    ffi::OsString,
+    path::{Path, PathBuf},
+};
 
 use eyre::{Result, ensure};
 
@@ -148,8 +151,7 @@ pub fn create_minecraft_command(
 
     let mut classpath = Vec::with_capacity(minecraft.classpath.len());
     for (index, host_path) in minecraft.classpath.into_iter().enumerate() {
-        let sandbox_path =
-            PathBuf::from(CLASSPATH_PATH).join(index.to_string());
+        let sandbox_path = sandbox_classpath_path(index, &host_path)?;
         read_only_paths.push((host_path, sandbox_path.clone()));
         classpath.push(sandbox_path);
     }
@@ -221,4 +223,14 @@ pub fn create_minecraft_command(
         graphics: true,
         audio: true,
     })
+}
+
+fn sandbox_classpath_path(index: usize, host_path: &Path) -> Result<PathBuf> {
+    let file_name = host_path.file_name().ok_or_else(|| {
+        eyre::eyre!("classpath entry has no filename: {host_path:?}")
+    })?;
+    let mut sandbox_file_name = OsString::from(format!("{index}-"));
+    sandbox_file_name.push(file_name);
+
+    Ok(PathBuf::from(CLASSPATH_PATH).join(sandbox_file_name))
 }
