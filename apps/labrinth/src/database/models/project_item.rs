@@ -28,6 +28,7 @@ use xredis::RedisPool;
 pub const PROJECTS_NAMESPACE: &str = "projects:v5";
 pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs:v4";
 const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies:v4";
+const PROJECT_REFS_NAMESPACE: &str = "project_refs:v1";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct LinkUrl {
@@ -552,10 +553,93 @@ impl DBProject {
     where
         E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
-        Self::get(project_ref.as_str(), executor, redis)
+        let identifier = project_ref.as_str();
+        let normalized_identifier = identifier.to_lowercase();
+        let mut identifiers = vec![identifier.to_string()];
+        if normalized_identifier != identifier {
+            identifiers.push(normalized_identifier);
+        }
+
+        let resolved = redis
+            .get_cached_keys_raw_with_slug(
+                PROJECT_REFS_NAMESPACE,
+                None,
+                true,
+                &identifiers,
+                |identifiers| async move {
+                    let project_ids = identifiers
+                        .iter()
+                        .map(|identifier| {
+                            parse_base62(identifier)
+                                .ok()
+                                .map(|project_id| project_id as i64)
+                        })
+                        .collect::<Vec<_>>();
+                    let slugs = identifiers
+                        .iter()
+                        .map(|identifier| identifier.to_lowercase())
+                        .collect::<Vec<_>>();
+                    let mut executor = executor.acquire().await.wrap_err(
+                        "acquiring database connection for project references",
+                    )?;
+                    let resolved = sqlx::query!(
+                        r#"
+                        SELECT
+                            identifier AS "identifier!",
+                            project_id AS "project_id!"
+                        FROM (
+                            SELECT
+                                refs.identifier,
+                                COALESCE(
+                                    id_project.id,
+                                    slug_project.id,
+                                    redirect.target_project_id
+                                ) AS project_id
+                            FROM UNNEST(
+                                $1::text[],
+                                $2::bigint[],
+                                $3::text[]
+                            ) AS refs(identifier, project_id, slug)
+                            LEFT JOIN mods id_project
+                                ON id_project.id = refs.project_id
+                            LEFT JOIN mods slug_project
+                                ON slug_project.slug = refs.slug
+                            LEFT JOIN project_redirects redirect
+                                ON redirect.identifier = refs.identifier
+                        ) resolved
+                        WHERE project_id IS NOT NULL
+                        "#,
+                        &identifiers,
+                        &project_ids as &[Option<i64>],
+                        &slugs,
+                    )
+                    .fetch_all(&mut executor)
+                    .await
+                    .wrap_err("resolving project references")?;
+
+                    eyre::Ok(
+                        resolved
+                            .into_iter()
+                            .map(|resolved| {
+                                (
+                                    resolved.identifier,
+                                    (
+                                        None::<String>,
+                                        DBProjectId(resolved.project_id),
+                                    ),
+                                )
+                            })
+                            .collect::<DashMap<_, _>>(),
+                    )
+                },
+            )
             .await
-            .wrap_err("resolving project reference")
-            .map(|project| project.map(|project| project.inner.id.into()))
+            .wrap_err("fetching cached project references")?;
+
+        Ok(identifiers
+            .iter()
+            .find_map(|identifier| resolved.get(identifier).copied())
+            .map(ProjectId::from))
     }
 
     pub async fn get_id<'a, 'b, E>(
@@ -1114,13 +1198,17 @@ impl DBProject {
             .connect()
             .await
             .wrap_err("connecting to redis to clear project cache")?;
-        let mut keys = vec![redis.key().entity(PROJECTS_NAMESPACE, id.0)];
+        let mut keys = vec![
+            redis.key().entity(PROJECTS_NAMESPACE, id.0),
+            redis.key().entity(
+                PROJECT_REFS_NAMESPACE,
+                ProjectId::from(id).to_string(),
+            ),
+        ];
         if let Some(slug) = slug {
-            keys.push(
-                redis
-                    .key()
-                    .entity(PROJECTS_SLUGS_NAMESPACE, slug.to_lowercase()),
-            );
+            let slug = slug.to_lowercase();
+            keys.push(redis.key().entity(PROJECTS_SLUGS_NAMESPACE, &slug));
+            keys.push(redis.key().entity(PROJECT_REFS_NAMESPACE, slug));
         }
         if clear_dependencies.unwrap_or(false) {
             keys.push(
