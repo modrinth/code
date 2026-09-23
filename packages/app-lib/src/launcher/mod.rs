@@ -996,6 +996,13 @@ pub async fn launch_minecraft(
         io::create_dir_all(&natives_dir).await?;
     }
 
+    io::create_dir_all(instance_path.join("mods")).await?;
+
+    let persistent_dir = state.directories.instance_data_dir();
+    for directory in ["home", "data", "config", "cache", "state"] {
+        io::create_dir_all(persistent_dir.join(directory)).await?;
+    }
+
     let quick_play_version =
         QuickPlayVersion::find_version(version_index, &minecraft.versions);
     tracing::debug!(
@@ -1119,6 +1126,7 @@ pub async fn launch_minecraft(
         assets_path,
         logging_config,
         instance_path: instance_path.clone(),
+        persistent_dir,
         jvm_args: jvm_args.into_iter().map(Into::into).collect(),
         main_class: THESEUS_MINECRAFT_LAUNCHER_MAIN_CLASS.into(),
         main_class_args: launcher_args,

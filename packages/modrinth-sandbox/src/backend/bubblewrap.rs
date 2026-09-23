@@ -137,16 +137,19 @@ async fn spawn(
         os_command.arg("--share-net");
     }
 
-    for path in &command.read_only_paths {
-        os_command.arg("--ro-bind");
-        os_command.arg(path);
-        os_command.arg(path);
-    }
     for path in &command.read_write_paths {
         os_command.arg("--bind");
         os_command.arg(path);
         os_command.arg(path);
     }
+    for path in &command.read_only_paths {
+        os_command.arg("--ro-bind");
+        os_command.arg(path);
+        os_command.arg(path);
+    }
+
+    os_command.args(["--remount-ro", "/"]);
+
     if let Some(path) = &command.working_directory {
         os_command.args([Path::new("--chdir"), path]);
     }

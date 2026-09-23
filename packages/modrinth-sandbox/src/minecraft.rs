@@ -22,9 +22,10 @@ pub struct MinecraftCommand {
     /// Optional version-specific logging configuration.
     pub logging_config: Option<MinecraftLoggingConfig>,
     /// Path to the Minecraft instance directory on the host.
-    ///
-    /// This is the only persistent read-write mount.
     pub instance_path: PathBuf,
+    /// Directory for persistent home, data, configuration, cache, and state,
+    /// shared across all game instances.
+    pub persistent_dir: PathBuf,
     /// JVM arguments which do not contain sandbox-managed paths.
     ///
     /// Classpath, Java agent, native-library, and logging arguments are generated
@@ -55,6 +56,7 @@ const JNA_TMPDIR_JVM_ARGUMENT: &str = "-Djna.tmpdir";
 const LWJGL_LIBRARY_EXTRACT_PATH_JVM_ARGUMENT: &str =
     "-Dorg.lwjgl.system.SharedLibraryExtractPath";
 const NETTY_NATIVE_WORKDIR_JVM_ARGUMENT: &str = "-Dio.netty.native.workdir";
+const USER_HOME_JVM_ARGUMENT: &str = "-Duser.home";
 const LOGGING_CONFIG_JVM_ARGUMENT: &str = "-Dlog4j.configurationFile";
 const JAVA_AGENT_JVM_ARGUMENT: &str = "-javaagent";
 
@@ -67,6 +69,7 @@ pub const MINECRAFT_JVM_ARGUMENTS: &[&str] = &[
     JNA_TMPDIR_JVM_ARGUMENT,
     LWJGL_LIBRARY_EXTRACT_PATH_JVM_ARGUMENT,
     NETTY_NATIVE_WORKDIR_JVM_ARGUMENT,
+    USER_HOME_JVM_ARGUMENT,
     LOGGING_CONFIG_JVM_ARGUMENT,
     JAVA_AGENT_JVM_ARGUMENT,
 ];
@@ -121,14 +124,21 @@ pub fn create_minecraft_command(
     minecraft: MinecraftCommand,
 ) -> Result<SandboxCommand> {
     let java_path = minecraft.jre_path.join("bin/java");
+    let persistent_home = minecraft.persistent_dir.join("home");
+    let persistent_data = minecraft.persistent_dir.join("data");
+    let persistent_config = minecraft.persistent_dir.join("config");
+    let persistent_cache = minecraft.persistent_dir.join("cache");
+    let persistent_state = minecraft.persistent_dir.join("state");
+    let mods_path = minecraft.instance_path.join("mods");
     let classpath = minecraft.classpath;
-    let mut read_only_paths = Vec::with_capacity(classpath.len() + 5);
-    push_unique_path(&mut read_only_paths, &minecraft.jre_path);
-    push_unique_path(&mut read_only_paths, &minecraft.natives_path);
-    push_unique_path(&mut read_only_paths, &minecraft.assets_path);
-    for path in &classpath {
-        push_unique_path(&mut read_only_paths, path);
-    }
+    let mut read_only_paths = vec![
+        minecraft.jre_path.as_os_str().to_os_string(),
+        minecraft.natives_path.as_os_str().to_os_string(),
+        minecraft.assets_path.as_os_str().to_os_string(),
+        mods_path.into_os_string(),
+    ];
+    read_only_paths
+        .extend(classpath.iter().map(|path| path.as_os_str().to_os_string()));
 
     let mut args = minecraft.jvm_args;
     args.extend([
@@ -142,10 +152,11 @@ pub fn create_minecraft_command(
             "{LWJGL_LIBRARY_EXTRACT_PATH_JVM_ARGUMENT}=/tmp"
         )),
         OsString::from(format!("{NETTY_NATIVE_WORKDIR_JVM_ARGUMENT}=/tmp")),
+        jvm_path_argument(USER_HOME_JVM_ARGUMENT, "=", &persistent_home),
     ]);
 
     if let Some(java_agent) = minecraft.java_agent {
-        push_unique_path(&mut read_only_paths, &java_agent);
+        read_only_paths.push(java_agent.as_os_str().to_os_string());
         args.push(jvm_path_argument(JAVA_AGENT_JVM_ARGUMENT, ":", &java_agent));
     }
 
@@ -154,7 +165,7 @@ pub fn create_minecraft_command(
             logging_config.argument.contains("${path}"),
             "logging configuration argument must contain a `${{path}}` placeholder"
         );
-        push_unique_path(&mut read_only_paths, &logging_config.path);
+        read_only_paths.push(logging_config.path.as_os_str().to_os_string());
         args.push(replace_path_placeholder(
             &logging_config.argument,
             &logging_config.path,
@@ -166,7 +177,8 @@ pub fn create_minecraft_command(
     args.push(OsString::from(minecraft.main_class));
     args.extend(minecraft.main_class_args.into_iter().map(OsString::from));
 
-    let mut extra_environment = vec![
+    let mut extra_environment = minecraft.extra_environment;
+    extra_environment.extend([
         (
             OsString::from("JAVA_HOME"),
             minecraft.jre_path.as_os_str().to_os_string(),
@@ -175,16 +187,40 @@ pub fn create_minecraft_command(
             OsString::from("PATH"),
             minecraft.jre_path.join("bin").into_os_string(),
         ),
+        (OsString::from("HOME"), persistent_home.into_os_string()),
+        (
+            OsString::from("XDG_DATA_HOME"),
+            persistent_data.into_os_string(),
+        ),
+        (
+            OsString::from("XDG_CONFIG_HOME"),
+            persistent_config.into_os_string(),
+        ),
+        (
+            OsString::from("XDG_CACHE_HOME"),
+            persistent_cache.into_os_string(),
+        ),
+        (
+            OsString::from("XDG_STATE_HOME"),
+            persistent_state.into_os_string(),
+        ),
+    ]);
+
+    read_only_paths.sort_unstable();
+    read_only_paths.dedup();
+
+    let mut read_write_paths = vec![
+        minecraft.instance_path.as_os_str().to_os_string(),
+        minecraft.persistent_dir.as_os_str().to_os_string(),
     ];
-    extra_environment.extend(minecraft.extra_environment);
+    read_write_paths.sort_unstable();
+    read_write_paths.dedup();
 
     Ok(SandboxCommand {
         executable: java_path.into_os_string(),
         args,
         read_only_paths,
-        read_write_paths: vec![
-            minecraft.instance_path.as_os_str().to_os_string(),
-        ],
+        read_write_paths,
         working_directory: Some(minecraft.instance_path),
         passthrough_environment: MINECRAFT_PASSTHROUGH_ENVIRONMENT
             .iter()
@@ -196,12 +232,6 @@ pub fn create_minecraft_command(
         is_jvm: true,
         die_with_parent: true,
     })
-}
-
-fn push_unique_path(paths: &mut Vec<OsString>, path: &Path) {
-    if !paths.iter().any(|existing| existing == path.as_os_str()) {
-        paths.push(path.as_os_str().to_os_string());
-    }
 }
 
 fn jvm_path_argument(argument: &str, separator: &str, path: &Path) -> OsString {
