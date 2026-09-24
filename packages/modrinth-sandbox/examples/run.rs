@@ -1,4 +1,8 @@
-use std::{collections::{BTreeMap, HashSet}, ffi::OsString, path::PathBuf};
+use std::{
+    collections::{BTreeMap, HashSet},
+    ffi::OsString,
+    path::PathBuf,
+};
 
 use eyre::{Context, Result};
 use modrinth_sandbox::{SandboxArg, SandboxCommand};
@@ -31,6 +35,7 @@ async fn main() -> Result<()> {
         .spawn(SandboxCommand {
             executable: cli.executable,
             args: cli.args.into_iter().map(SandboxArg::from).collect(),
+            ensure_dirs_exist: Vec::new(),
             read_only_paths: cli.read_only_path,
             read_write_paths: cli.writable_path,
             working_directory: cli.working_directory,

@@ -1,16 +1,20 @@
 use std::{
-    borrow::Cow, collections::BTreeMap, ffi::{OsStr, OsString}, os::fd::{AsRawFd, OwnedFd}, path::{Path, PathBuf}, sync::OnceLock,
+    borrow::Cow,
+    collections::BTreeMap,
+    ffi::{OsStr, OsString},
+    os::fd::{AsRawFd, OwnedFd},
+    path::{Path, PathBuf},
+    sync::OnceLock,
 };
 
 use async_trait::async_trait;
 use derive_more::Debug;
-use eyre::{Context, Result, eyre};
+use eyre::{Context, ContextCompat, Result, eyre};
 use uuid::Uuid;
 
 use crate::{
-    backend::{
-        Backend, SandboxChild, SandboxCommand, SandboxEnv,
-    }, util::{argument::SandboxArg, path::find_command},
+    backend::{Backend, SandboxChild, SandboxCommand, SandboxEnv},
+    util::{argument::SandboxArg, path::find_command},
 };
 
 #[derive(Debug)]
@@ -22,10 +26,12 @@ impl Backend for Bubblewrap {
         let bwrap = find_command(OsStr::new("bwrap"))
             .await
             .wrap_err("searching for `bwrap` executable")?;
-        let xdg_dbus_proxy = find_command(OsStr::new("xdg-dbus-proxy"))
-            .await
-            .wrap_err("searching for `xdg-dbus-proxy` executable")?;
-        let dev_null = super::unix::open_dev_null().wrap_err("opening /dev/null")?;
+        let xdg_dbus_proxy =
+            find_command(OsStr::new("xdg-dbus-proxy"))
+                .await
+                .wrap_err("searching for `xdg-dbus-proxy` executable")?;
+        let dev_null =
+            super::unix::open_dev_null().wrap_err("opening /dev/null")?;
         Ok(Box::new(BubblewrapEnv {
             bwrap,
             xdg_dbus_proxy,
@@ -40,7 +46,7 @@ impl Backend for Bubblewrap {
 pub struct BubblewrapEnv {
     bwrap: PathBuf,
     xdg_dbus_proxy: PathBuf,
-    dbus_proxy: OnceLock<Option<DbusProxy>>,
+    dbus_proxy: OnceLock<eyre::Result<DbusProxy>>,
     dev_null: libc::c_int,
 }
 
@@ -72,7 +78,7 @@ const DEV_BINDS: &[&str] = &[
     // Raw ALSA
     "/dev/snd",
     // AMD Compute
-    "/dev/kfd"
+    "/dev/kfd",
 ];
 
 const SYSTEM_FILES_RO: &[&str] = &[
@@ -137,11 +143,21 @@ impl BubblewrapCommandBuilder {
         self.arguments.push(arg.into());
     }
 
-    pub fn bind_if_exists(&mut self, bind_type: BindType, path: impl Into<Cow<'static, Path>>, follow_symlinks: bool) {
+    pub fn bind_if_exists(
+        &mut self,
+        bind_type: BindType,
+        path: impl Into<Cow<'static, Path>>,
+        follow_symlinks: bool,
+    ) {
         self.bind_if_exists_inner(bind_type, path.into(), follow_symlinks);
     }
 
-    fn bind_if_exists_inner(&mut self, bind_type: BindType, mut path: Cow<'static, Path>, follow_symlinks: bool) {
+    fn bind_if_exists_inner(
+        &mut self,
+        bind_type: BindType,
+        mut path: Cow<'static, Path>,
+        follow_symlinks: bool,
+    ) {
         if follow_symlinks {
             loop {
                 let Ok(resolved) = path.canonicalize() else {
@@ -265,7 +281,11 @@ fn spawn(
                     let driver = device.join("driver");
                     builder.bind_if_exists(BindType::ReadOnly, device, true);
                     if let Ok(driver) = driver.canonicalize() {
-                        builder.bind_if_exists(BindType::ReadOnly, driver, true);
+                        builder.bind_if_exists(
+                            BindType::ReadOnly,
+                            driver,
+                            true,
+                        );
                     }
                 }
             }
@@ -280,12 +300,16 @@ fn spawn(
     }
 
     // Bind files in xdg runtime dir
-    let xdg_runtime_dir = directories.runtime_dir().unwrap_or(Path::new("/run/user/1000"));
+    let xdg_runtime_dir = directories
+        .runtime_dir()
+        .unwrap_or(Path::new("/run/user/1000"));
     builder.push("--dir");
     builder.push(xdg_runtime_dir.to_path_buf());
 
     let wayland_display_path = xdg_runtime_dir.join(
-        std::env::var_os("WAYLAND_DISPLAY").as_deref().unwrap_or(OsStr::new("wayland-0"))
+        std::env::var_os("WAYLAND_DISPLAY")
+            .as_deref()
+            .unwrap_or(OsStr::new("wayland-0")),
     );
     builder.bind_if_exists(BindType::ReadOnly, wayland_display_path, true);
 
@@ -296,9 +320,17 @@ fn spawn(
     builder.bind_if_exists(BindType::ReadWrite, document_portal_path, true);
 
     if let Some(pulse_server) = std::env::var_os("PULSE_SERVER") {
-        if let Some(pulse_server_path) = pulse_server.as_encoded_bytes().strip_prefix(b"unix:") {
-            let pulse_server_path = unsafe { OsStr::from_encoded_bytes_unchecked(pulse_server_path) };
-            builder.bind_if_exists(BindType::ReadOnly, PathBuf::from(pulse_server_path), true);
+        if let Some(pulse_server_path) =
+            pulse_server.as_encoded_bytes().strip_prefix(b"unix:")
+        {
+            let pulse_server_path = unsafe {
+                OsStr::from_encoded_bytes_unchecked(pulse_server_path)
+            };
+            builder.bind_if_exists(
+                BindType::ReadOnly,
+                PathBuf::from(pulse_server_path),
+                true,
+            );
         }
     } else {
         let pulse_path = xdg_runtime_dir.join("pulse");
@@ -316,28 +348,54 @@ fn spawn(
     builder.bind_if_exists(BindType::ReadWrite, Path::new("/run/pulse"), true);
 
     if let Some(pulse_clientconfig) = std::env::var_os("PULSE_CLIENTCONFIG") {
-        builder.bind_if_exists(BindType::ReadOnly, PathBuf::from(pulse_clientconfig), true);
+        builder.bind_if_exists(
+            BindType::ReadOnly,
+            PathBuf::from(pulse_clientconfig),
+            true,
+        );
     }
 
     // Bind X11 sockets/xauthority
-    let display_index = std::env::var_os("DISPLAY").and_then(|display| {
-        let display_bytes = display.as_encoded_bytes();
-        if display_bytes.len() == 2 && display_bytes[0] == b':' && display_bytes[1] >= b'0' && display_bytes[1] <= b'9' {
-            Some(display_bytes[1] - b'0')
-        } else {
-            None
-        }
-    }).unwrap_or(0);
+    let display_index = std::env::var_os("DISPLAY")
+        .and_then(|display| {
+            let display_bytes = display.as_encoded_bytes();
+            if display_bytes.len() == 2
+                && display_bytes[0] == b':'
+                && display_bytes[1] >= b'0'
+                && display_bytes[1] <= b'9'
+            {
+                Some(display_bytes[1] - b'0')
+            } else {
+                None
+            }
+        })
+        .unwrap_or(0);
 
-    builder.bind_if_exists(BindType::ReadOnly, PathBuf::from(format!("/tmp/.X11-unix/X{display_index}")), true);
+    builder.bind_if_exists(
+        BindType::ReadOnly,
+        PathBuf::from(format!("/tmp/.X11-unix/X{display_index}")),
+        true,
+    );
     if let Some(xauthority) = std::env::var_os("XAUTHORITY") {
-        builder.bind_if_exists(BindType::ReadOnly, PathBuf::from(xauthority), true);
+        builder.bind_if_exists(
+            BindType::ReadOnly,
+            PathBuf::from(xauthority),
+            true,
+        );
     } else {
-        builder.bind_if_exists(BindType::ReadOnly, directories.home_dir().join(".Xauthority"), true);
+        builder.bind_if_exists(
+            BindType::ReadOnly,
+            directories.home_dir().join(".Xauthority"),
+            true,
+        );
     }
 
     // Bind executable
-    builder.bind_if_exists(BindType::ReadOnly, command.executable.clone(), true);
+    builder.bind_if_exists(
+        BindType::ReadOnly,
+        command.executable.clone(),
+        true,
+    );
 
     // Bind custom paths
     for path in command.read_only_paths {
@@ -351,9 +409,13 @@ fn spawn(
     // todo: dbus proxy
 
     // Set up /.flatpak-info
-    let flatpak_info_fd1 = super::unix::WriteableMemoryFile::open(c"modrinth-sandbox-bwrap-flatpak-info1")?;
+    let flatpak_info_fd1 = super::unix::WriteableMemoryFile::open(
+        c"modrinth-sandbox-bwrap-flatpak-info1",
+    )?;
     let flatpak_info_fd1 = flatpak_info_fd1.write(c"[Application]\nname=com.modrinth.sandbox.ModrinthSandbox\n\n[Instance]\ninstance-id=0")?;
-    let flatpak_info_fd2 = super::unix::WriteableMemoryFile::open(c"modrinth-sandbox-bwrap-flatpak-info2")?;
+    let flatpak_info_fd2 = super::unix::WriteableMemoryFile::open(
+        c"modrinth-sandbox-bwrap-flatpak-info2",
+    )?;
     let flatpak_info_fd2 = flatpak_info_fd2.write(c"[Application]\nname=com.modrinth.sandbox.ModrinthSandbox\n\n[Instance]\ninstance-id=0")?;
 
     builder.push("--file");
@@ -367,32 +429,42 @@ fn spawn(
     if !Path::new("/tmp").is_dir() {
         return Err(eyre!("/tmp folder doesn't exist"));
     }
-    let tmp_bwrapinfo = format!("/tmp/modrinth-sandbox-bwrapinfo-{}.json", Uuid::new_v4());
-    let tmp_bwrapinfo_fd: OwnedFd = std::fs::File::create(tmp_bwrapinfo.clone())?.into();
+    let tmp_bwrapinfo =
+        format!("/tmp/modrinth-sandbox-bwrapinfo-{}.json", Uuid::now_v7());
+    let tmp_bwrapinfo_fd: OwnedFd =
+        std::fs::File::create(tmp_bwrapinfo.clone())?.into();
     builder.push("--info-fd");
     builder.push(format!("{}", tmp_bwrapinfo_fd.as_raw_fd()));
 
     builder.push("--ro-bind");
     builder.push(tmp_bwrapinfo);
-    builder.push(xdg_runtime_dir.join(".flatpak").join("0").join("bwrapinfo.json"));
+    builder.push(
+        xdg_runtime_dir
+            .join(".flatpak")
+            .join("0")
+            .join("bwrapinfo.json"),
+    );
 
     // Set up xdg-dbus-proxy
-    if let Some(dbus_proxy) = start_dbus_proxy(env, &xdg_runtime_dir, command.die_with_parent) {
-        builder.push("--bind");
-        builder.push(dbus_proxy.proxy_session_path.clone());
-        let mapped_bus_dir = xdg_runtime_dir.join("bus");
-        builder.push(mapped_bus_dir.clone());
+    let dbus_proxy =
+        start_dbus_proxy(env, xdg_runtime_dir, command.die_with_parent)
+            .map_err(|err| eyre!("{err:#}").wrap_err("starting dbus proxy"))?;
 
-        let mut dbus_session_bus_address = OsString::new();
-        dbus_session_bus_address.push("unix:path=");
-        dbus_session_bus_address.push(mapped_bus_dir);
+    builder.push("--bind");
+    builder.push(dbus_proxy.proxy_session_path.clone());
+    let mapped_bus_dir = xdg_runtime_dir.join("bus");
+    builder.push(mapped_bus_dir.clone());
 
-        environment.insert("DBUS_SESSION_BUS_ADDRESS".into(), dbus_session_bus_address.into());
-        if directories.runtime_dir().is_none() {
-            environment.insert("XDG_RUNTIME_DIR".into(), "/run/user/1000".into());
-        }
-    } else {
-        tracing::warn!("Unable to start xdg-dbus-proxy, some things may not work correctly");
+    let mut dbus_session_bus_address = OsString::new();
+    dbus_session_bus_address.push("unix:path=");
+    dbus_session_bus_address.push(mapped_bus_dir);
+
+    environment.insert(
+        "DBUS_SESSION_BUS_ADDRESS".into(),
+        dbus_session_bus_address.into(),
+    );
+    if directories.runtime_dir().is_none() {
+        environment.insert("XDG_RUNTIME_DIR".into(), "/run/user/1000".into());
     }
 
     // todo: wait for dbus proxy to start
@@ -403,6 +475,12 @@ fn spawn(
         builder.push(arg);
     }
 
+    // Make sure any required dirs exist, create them if not
+    for path in command.ensure_dirs_exist {
+        std::fs::create_dir_all(&path)
+            .wrap_err_with(|| eyre!("creating directory {path:?}"))?;
+    }
+
     Ok(SandboxChild {
         imp: super::unix::spawn(
             env.bwrap.clone().into(),
@@ -411,8 +489,8 @@ fn spawn(
             command.working_directory,
             vec![flatpak_info_fd1, flatpak_info_fd2, tmp_bwrapinfo_fd],
             env.dev_null,
-            command.die_with_parent
-        )?
+            command.die_with_parent,
+        )?,
     })
 }
 
@@ -420,13 +498,16 @@ struct DbusProxy {
     proxy_session_path: PathBuf,
 }
 
+const DBUS_ADDRESS_ENV: &str = "DBUS_SESSION_BUS_ADDRESS";
+
 fn start_dbus_proxy<'a>(
     env: &'a BubblewrapEnv,
     runtime_dir: &Path,
     die_with_parent: bool,
-) -> Option<&'a DbusProxy> {
+) -> Result<&'a DbusProxy, &'a eyre::Report> {
     env.dbus_proxy.get_or_init(|| {
-        let session_bus_address = std::env::var_os("DBUS_SESSION_BUS_ADDRESS")?;
+        let session_bus_address = std::env::var_os(DBUS_ADDRESS_ENV)
+            .wrap_err_with(|| eyre!("reading `{DBUS_ADDRESS_ENV}`"))?;
 
         let mut builder = BubblewrapCommandBuilder::default();
 
@@ -439,10 +520,14 @@ fn start_dbus_proxy<'a>(
         builder.bind_if_exists(BindType::ReadOnly, Path::new("/nix/store"), true);
         builder.bind_if_exists(BindType::ReadWrite, runtime_dir.to_path_buf(), true);
 
-        let flatpak_info_fd1 = super::unix::WriteableMemoryFile::open(c"modrinth-sandbox-proxy-flatpak-info1").ok()?;
-        let flatpak_info_fd1 = flatpak_info_fd1.write(c"[Application]\nname=com.modrinth.sandbox.ModrinthSandbox\n\n[Instance]\ninstance-id=0").ok()?;
-        let flatpak_info_fd2 = super::unix::WriteableMemoryFile::open(c"modrinth-sandbox-proxy-flatpak-info2").ok()?;
-        let flatpak_info_fd2 = flatpak_info_fd2.write(c"[Application]\nname=com.modrinth.sandbox.ModrinthSandbox\n\n[Instance]\ninstance-id=0").ok()?;
+        let flatpak_info_fd1 = super::unix::WriteableMemoryFile::open(c"modrinth-sandbox-proxy-flatpak-info1")
+            .wrap_err("creating flatpak-info memory file 1")?;
+        let flatpak_info_fd1 = flatpak_info_fd1.write(c"[Application]\nname=com.modrinth.sandbox.ModrinthSandbox\n\n[Instance]\ninstance-id=0")
+            .wrap_err("writing to flatpak-info memory file 1")?;
+        let flatpak_info_fd2 = super::unix::WriteableMemoryFile::open(c"modrinth-sandbox-proxy-flatpak-info2")
+            .wrap_err("creating flatpak-info memory file 2")?;
+        let flatpak_info_fd2 = flatpak_info_fd2.write(c"[Application]\nname=com.modrinth.sandbox.ModrinthSandbox\n\n[Instance]\ninstance-id=0")
+            .wrap_err("writing to flatpak-info memory file 2")?;
 
         builder.push("--file");
         builder.push(format!("{}", flatpak_info_fd1.as_raw_fd()));
@@ -484,9 +569,9 @@ fn start_dbus_proxy<'a>(
             vec![flatpak_info_fd1, flatpak_info_fd2],
             env.dev_null,
             die_with_parent
-        ).ok()?;
+        ).wrap_err("spawning child")?;
 
-        Some(DbusProxy {
+        eyre::Ok(DbusProxy {
             proxy_session_path
         })
     }).as_ref()
@@ -498,10 +583,8 @@ fn get_card_names() -> Vec<OsString> {
         return card_names;
     };
 
-    for entry in read_dir {
-        if let Ok(entry) = entry {
-            card_names.push(entry.file_name());
-        }
+    for entry in read_dir.flatten() {
+        card_names.push(entry.file_name());
     }
 
     card_names

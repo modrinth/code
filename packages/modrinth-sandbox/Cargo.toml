@@ -10,7 +10,7 @@ tokio = { workspace = true, features = ["fs", "process"] }
 eyre = { workspace = true }
 async-trait = { workspace = true }
 derive_more = { workspace = true, features = ["debug"] }
-uuid = { workspace = true }
+uuid = { workspace = true, features = ["v7"] }
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["full"] }

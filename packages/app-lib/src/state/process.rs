@@ -7,7 +7,8 @@ use crate::util::rpc::RpcServer;
 use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
 use dashmap::DashMap;
 use modrinth_sandbox::{
-    MinecraftCommand, SandboxChild, SandboxEnv, SandboxExitStatus, create_minecraft_command,
+    MinecraftCommand, SandboxChild, SandboxEnv, SandboxExitStatus,
+    create_minecraft_command,
 };
 use quick_xml::Reader;
 use quick_xml::events::Event;
@@ -226,7 +227,8 @@ impl ProcessManager {
         let mc_proc = tokio::task::spawn_blocking({
             let sandbox_env = sandbox_env.clone();
             move || sandbox_env.spawn(command)
-        }).await??;
+        })
+        .await??;
         let child_pid = mc_proc.id();
 
         let mut process = Process {

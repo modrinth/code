@@ -1,5 +1,7 @@
 use std::{
-    collections::BTreeMap, ffi::OsString, path::{Path, PathBuf},
+    collections::BTreeMap,
+    ffi::OsString,
+    path::{Path, PathBuf},
 };
 
 use eyre::{Result, ensure};
@@ -139,10 +141,14 @@ pub fn create_minecraft_command(
     ];
 
     // Some java installations will contain symlinks to external folders (e.g. arch symlinks conf, legal and man)
-    for folder in ["bin", "conf", "demo", "include", "jmods", "legal", "lib", "man"] {
+    for folder in [
+        "bin", "conf", "demo", "include", "jmods", "legal", "lib", "man",
+    ] {
         let real_dir = minecraft.jre_path.join(folder).canonicalize();
-        if let Ok(real_dir) = real_dir && !real_dir.starts_with(&minecraft.jre_path) {
-            read_only_paths.push(real_dir.into());
+        if let Ok(real_dir) = real_dir
+            && !real_dir.starts_with(&minecraft.jre_path)
+        {
+            read_only_paths.push(real_dir);
         }
     }
 
@@ -154,17 +160,22 @@ pub fn create_minecraft_command(
             JAVA_LIBRARY_PATH_JVM_ARGUMENT,
             "=",
             &minecraft.natives_path,
-        ).into(),
+        )
+        .into(),
         OsString::from(format!("{JNA_TMPDIR_JVM_ARGUMENT}=/tmp")).into(),
         OsString::from(format!(
             "{LWJGL_LIBRARY_EXTRACT_PATH_JVM_ARGUMENT}=/tmp"
-        )).into(),
-        OsString::from(format!("{NETTY_NATIVE_WORKDIR_JVM_ARGUMENT}=/tmp")).into(),
+        ))
+        .into(),
+        OsString::from(format!("{NETTY_NATIVE_WORKDIR_JVM_ARGUMENT}=/tmp"))
+            .into(),
         jvm_path_argument(USER_HOME_JVM_ARGUMENT, "=", &persistent_home).into(),
     ]);
 
     if let Some(java_agent) = minecraft.java_agent.clone() {
-        args.push(jvm_path_argument(JAVA_AGENT_JVM_ARGUMENT, ":", &java_agent).into());
+        args.push(
+            jvm_path_argument(JAVA_AGENT_JVM_ARGUMENT, ":", &java_agent).into(),
+        );
         read_only_paths.push(java_agent);
     }
 
@@ -174,10 +185,13 @@ pub fn create_minecraft_command(
             "logging configuration argument must contain a `${{path}}` placeholder"
         );
         read_only_paths.push(logging_config.path.clone());
-        args.push(replace_path_placeholder(
-            &logging_config.argument,
-            &logging_config.path,
-        ).into());
+        args.push(
+            replace_path_placeholder(
+                &logging_config.argument,
+                &logging_config.path,
+            )
+            .into(),
+        );
     }
 
     args.push(CLASSPATH_JVM_ARGUMENT.into());
@@ -185,49 +199,35 @@ pub fn create_minecraft_command(
     args.push(minecraft.main_class);
     args.extend(minecraft.main_class_args);
 
-    _ = std::fs::create_dir_all(&persistent_data);
-    _ = std::fs::create_dir_all(&persistent_config);
-    _ = std::fs::create_dir_all(&persistent_cache);
-    _ = std::fs::create_dir_all(&persistent_state);
+    let ensure_dirs_exist = vec![
+        persistent_data.clone(),
+        persistent_config.clone(),
+        persistent_cache.clone(),
+        persistent_state.clone(),
+    ];
 
     let mut extra_environment = minecraft.extra_environment;
     extra_environment.extend([
-        (
-            "JAVA_HOME".into(),
-            minecraft.jre_path.into(),
-        ),
+        ("JAVA_HOME".into(), minecraft.jre_path.into()),
         ("HOME".into(), persistent_home.into()),
-        (
-            "XDG_DATA_HOME".into(),
-            persistent_data.into(),
-        ),
-        (
-            "XDG_CONFIG_HOME".into(),
-            persistent_config.into(),
-        ),
-        (
-            "XDG_CACHE_HOME".into(),
-            persistent_cache.into(),
-        ),
-        (
-            "XDG_STATE_HOME".into(),
-            persistent_state.into(),
-        ),
+        ("XDG_DATA_HOME".into(), persistent_data.into()),
+        ("XDG_CONFIG_HOME".into(), persistent_config.into()),
+        ("XDG_CACHE_HOME".into(), persistent_cache.into()),
+        ("XDG_STATE_HOME".into(), persistent_state.into()),
     ]);
 
     read_only_paths.sort_unstable();
     read_only_paths.dedup();
 
-    let mut read_write_paths = vec![
-        minecraft.instance_path.clone(),
-        minecraft.persistent_dir,
-    ];
+    let mut read_write_paths =
+        vec![minecraft.instance_path.clone(), minecraft.persistent_dir];
     read_write_paths.sort_unstable();
     read_write_paths.dedup();
 
     Ok(SandboxCommand {
         executable: java_path,
         args,
+        ensure_dirs_exist,
         read_only_paths,
         read_write_paths,
         working_directory: Some(minecraft.instance_path),

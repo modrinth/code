@@ -1,6 +1,10 @@
 //! Backend sandbox implementations, using OS-specific primitives.
 
-use std::{collections::{BTreeMap, HashSet}, fmt::Debug, path::PathBuf};
+use std::{
+    collections::{BTreeMap, HashSet},
+    fmt::Debug,
+    path::PathBuf,
+};
 
 use async_trait::async_trait;
 use eyre::Result;
@@ -63,6 +67,9 @@ pub struct SandboxCommand {
     pub executable: PathBuf,
     /// Arguments passed to the executable.
     pub args: Vec<SandboxArg>,
+    /// When spawning a process, ensure that each of these paths exists as a
+    /// directory on the host, using `create_dir_all`.
+    pub ensure_dirs_exist: Vec<PathBuf>,
     /// Host paths mounted read-only at the same path in the sandbox.
     pub read_only_paths: Vec<PathBuf>,
     /// Host paths mounted read-write at the same path in the sandbox.
@@ -120,7 +127,9 @@ impl SandboxChild {
     }
 
     pub fn try_wait(&mut self) -> Result<Option<SandboxExitStatus>> {
-        self.imp.try_wait().map(|imp| Some(SandboxExitStatus { imp: imp? }))
+        self.imp
+            .try_wait()
+            .map(|imp| Some(SandboxExitStatus { imp: imp? }))
     }
 
     pub async fn wait(&mut self) -> Result<SandboxExitStatus> {
