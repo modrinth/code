@@ -35,7 +35,7 @@
 				<NuxtLink
 					:to="`/user/${member.user.username}`"
 					target="_blank"
-					class="truncate font-semibold text-primary"
+					class="truncate font-medium text-primary hover:underline"
 					>{{ member.user.username }}</NuxtLink
 				>
 				<CrownIcon
@@ -45,16 +45,16 @@
 				/>
 			</div>
 			<p class="m-0 text-xs">{{ member.role }}</p>
-			<div class="flex flex-wrap gap-x-2 gap-y-1 text-xs">
+			<div class="mt-1 flex flex-wrap gap-x-2 gap-y-1 text-xs">
 				<Tooltip
 					v-for="stat in statusStats"
 					:key="stat.status"
 					:text="formatMessage(stat.message, { count: stat.count })"
 					:aria-label="formatMessage(stat.message, { count: stat.count })"
-					class="flex items-center gap-1 font-semibold tabular-nums"
+					class="flex items-center gap-0.5 font-medium tabular-nums"
 					:class="stat.color"
 				>
-					<component :is="stat.icon" class="size-4 shrink-0" aria-hidden="true" />
+					<component :is="stat.icon" class="size-[12px] shrink-0" aria-hidden="true" />
 					<span aria-hidden="true">{{ stat.count }}</span>
 				</Tooltip>
 			</div>

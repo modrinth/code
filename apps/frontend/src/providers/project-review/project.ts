@@ -32,14 +32,33 @@ export function useReviewProject(selection: Ref<string>) {
 			enabled: !!projectId.value,
 		})),
 	)
+	const organizationQuery = useQuery(
+		computed(() => ({
+			...projectQueryOptions.organization(projectId.value, client),
+			enabled: !!projectId.value && !!projectQuery.data.value?.organization,
+		})),
+	)
+	const organization = computed(() =>
+		projectQuery.data.value?.organization ? (organizationQuery.data.value ?? null) : null,
+	)
 	const members = computed(() =>
 		(memberQuery.data.value ?? [])
 			.filter((member) => member.accepted)
 			.toSorted((a, b) => Number(b.is_owner) - Number(a.is_owner) || a.ordering - b.ordering),
 	)
+	const organizationMembers = computed(() =>
+		(organization.value?.members ?? [])
+			.filter((member) => member.accepted)
+			.toSorted((a, b) => Number(b.is_owner) - Number(a.is_owner) || a.ordering - b.ordering),
+	)
+	const membersForStats = computed(() => [
+		...new Map(
+			[...organizationMembers.value, ...members.value].map((member) => [member.user.id, member]),
+		).values(),
+	])
 	const memberProjects = useQueries({
 		queries: computed(() =>
-			members.value.map((member) => ({
+			membersForStats.value.map((member) => ({
 				queryKey: ['user', member.user.id, 'projects', 'v3'],
 				queryFn: () => client.labrinth.users_v3.getProjects(member.user.id),
 				staleTime: 60_000,
@@ -48,7 +67,7 @@ export function useReviewProject(selection: Ref<string>) {
 	})
 	const memberStats = computed(() =>
 		Object.fromEntries(
-			members.value.map((member, index) => {
+			membersForStats.value.map((member, index) => {
 				const projects = memberProjects.value[index]?.data
 				return [
 					member.user.id,
@@ -97,6 +116,10 @@ export function useReviewProject(selection: Ref<string>) {
 	)
 	const permissions = computed(() => ({
 		groups: attributionQuery.data.value ?? [],
+		awaitingReviewCount: (attributionQuery.data.value ?? []).filter(
+			({ attribution }) =>
+				attribution && attribution.kind !== 'globally_allowed' && !attribution.moderation_status,
+		).length,
 		unresolvedCount: (attributionQuery.data.value ?? []).filter(
 			({ attribution }) =>
 				!attribution ||
@@ -137,6 +160,8 @@ export function useReviewProject(selection: Ref<string>) {
 		),
 		project: projectQuery.data,
 		projectV2: legacyQuery.data,
+		organization,
+		organizationMembers,
 		threadQuery,
 		wasReviewed,
 		permissions,
@@ -144,6 +169,12 @@ export function useReviewProject(selection: Ref<string>) {
 		memberStats,
 		membersLoading: memberQuery.isPending,
 		membersError: memberQuery.isError,
+		organizationLoading: computed(
+			() => !!projectQuery.data.value?.organization && organizationQuery.isPending.value,
+		),
+		organizationError: computed(
+			() => !!projectQuery.data.value?.organization && organizationQuery.isError.value,
+		),
 		compatibilityError: legacyQuery.isError,
 		submissionCount,
 		isLoading: computed(

@@ -1,5 +1,8 @@
 <template>
-	<div class="flex h-full min-h-0 flex-col gap-2.5 overflow-hidden">
+	<div
+		ref="hotkeyScope"
+		class="group/versions flex h-full min-h-0 flex-col gap-2.5 overflow-hidden"
+	>
 		<ReviewPanel
 			v-if="resolve({ kind: 'undefined-project' })"
 			mode="inline"
@@ -8,9 +11,11 @@
 		<ReviewPanel
 			mode="inline"
 			:target="{ kind: 'versions' }"
+			:hotkey-scope="hotkeyScope"
 			:disabled="
 				isLoading || !!error || versionsQuery.isPending.value || versionsQuery.isError.value
 			"
+			class="group-hover/versions:opacity-100"
 		>
 		</ReviewPanel>
 		<div class="min-h-0 flex-1 overflow-auto">
@@ -74,7 +79,7 @@
 <script setup lang="ts">
 import { ListChevronsDownUpIcon, ListChevronsUpDownIcon } from '@modrinth/assets'
 import { Button, useVIntl } from '@modrinth/ui'
-import { computed, ref } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
@@ -85,6 +90,7 @@ import VersionCard from './version-card.vue'
 
 const { formatMessage } = useVIntl()
 const { resolve } = injectReviewPanels()
+const hotkeyScope = useTemplateRef<HTMLElement>('hotkeyScope')
 const { selection, versions, versionsQuery, isLoading, error, refresh } =
 	injectProjectReviewPageContext()
 const expanded = ref<Set<string> | null>(null)

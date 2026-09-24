@@ -12,17 +12,18 @@ export function useActionKeybinds(
 			event.isComposing ||
 			event.ctrlKey ||
 			event.metaKey ||
-			event.altKey
+			(event.shiftKey && event.altKey)
 		) {
 			return
 		}
-		const digit = /^\d$/.test(event.key)
+		const digit = /^[1-9]$/.test(event.key)
 			? event.key
-			: event.shiftKey && /^Digit\d$/.test(event.code)
+			: (event.shiftKey || event.altKey) && /^Digit[1-9]$/.test(event.code)
 				? event.code.slice(-1)
 				: undefined
 		if (!digit) return
-		const keybind = `${event.shiftKey ? 'Shift+' : ''}${digit}`
+		const modifier = event.altKey ? 'Alt+' : event.shiftKey ? 'Shift+' : ''
+		const keybind = `${modifier}${digit}`
 
 		const target = event.target
 		if (
@@ -53,6 +54,8 @@ export function useActionKeybinds(
 		if (!button || button.disabled || button.closest('[data-review-panel]') !== panel) return
 
 		event.preventDefault()
+		if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
 		button.click()
+		button.blur()
 	})
 }

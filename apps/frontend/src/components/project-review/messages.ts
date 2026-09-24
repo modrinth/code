@@ -274,6 +274,14 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.members',
 		defaultMessage: 'Members',
 	},
+	organization: {
+		id: 'moderation.project-review.organization',
+		defaultMessage: 'Organization',
+	},
+	openOrganizationIcon: {
+		id: 'moderation.project-review.openOrganizationIcon',
+		defaultMessage: 'View enlarged icon for {organization}',
+	},
 	owner: {
 		id: 'moderation.project-review.owner',
 		defaultMessage: 'Owner',

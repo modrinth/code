@@ -293,8 +293,9 @@ const keybinds = computed(
 		),
 )
 function actionKeybind(index: number) {
-	if (index >= 20) return undefined
-	return `${index >= 10 ? 'Shift+' : ''}${'1234567890'[index % 10]}`
+	if (index >= 27) return undefined
+	const modifier = index >= 18 ? 'Alt+' : index >= 9 ? 'Shift+' : ''
+	return `${modifier}${(index % 9) + 1}`
 }
 const correctionOffsets = computed(() => {
 	let offset = (props.keybindOffset ?? 0) + toggleControls(panelBinding.value).length

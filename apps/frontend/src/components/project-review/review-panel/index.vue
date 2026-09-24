@@ -109,11 +109,12 @@ const props = defineProps<{
 	as?: 'section' | 'div' | 'article'
 	disabled?: boolean
 	triggerPlacement?: 'inset' | 'header' | 'overlay' | 'above'
+	hotkeyScope?: HTMLElement | null
 }>()
 
 const id = useId()
 const inlinePanel = shallowRef<HTMLElement | null>(null)
-useActionKeybinds(inlinePanel)
+useActionKeybinds(inlinePanel, () => props.hotkeyScope?.matches(':hover') ?? false)
 const { formatMessage } = useVIntl()
 const { active, setDropdownOpen } = injectReviewContext()
 const panels = injectReviewPanels()

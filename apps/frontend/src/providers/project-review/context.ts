@@ -79,6 +79,9 @@ export function createProjectReviewPageContext() {
 			disclosures: disclosures.disclosuresQuery.isSuccess.value
 				? disclosures.currentSnapshot.value.disclosures.length
 				: undefined,
+			permissions: data.permissions.value.loaded
+				? data.permissions.value.awaitingReviewCount
+				: undefined,
 		})),
 		selection,
 		queue,
