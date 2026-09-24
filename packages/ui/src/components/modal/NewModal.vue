@@ -484,7 +484,7 @@ onUnmounted(() => {
 })
 
 function handleWindowKeyDown(event: KeyboardEvent) {
-	if (!isTopmostModal()) {
+	if (!isTopmostModal() || event.defaultPrevented) {
 		return
 	}
 
