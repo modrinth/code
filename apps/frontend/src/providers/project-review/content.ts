@@ -26,9 +26,9 @@ export function useReviewContent(projectId: Ref<string>) {
 		})),
 	)
 	const versions = computed(() =>
-		(versionsQuery.data.value ?? []).toSorted(
-			(a, b) => Date.parse(b.date_published) - Date.parse(a.date_published),
-		),
+		(versionsQuery.data.value ?? [])
+			.filter((version) => version.name !== '__synthetic')
+			.toSorted((a, b) => Date.parse(b.date_published) - Date.parse(a.date_published)),
 	)
 	const reports = computed(() =>
 		flattenFileReports(reportsQuery.data.value?.project_report?.versions ?? []),

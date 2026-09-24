@@ -3116,6 +3116,24 @@
   "moderation.project-review.discord": {
     "message": "Discord invite"
   },
+  "moderation.project-review.donationBmac": {
+    "message": "Buy Me A Coffee"
+  },
+  "moderation.project-review.donationGithub": {
+    "message": "GitHub Sponsors"
+  },
+  "moderation.project-review.donationKoFi": {
+    "message": "Ko-fi"
+  },
+  "moderation.project-review.donationOther": {
+    "message": "Other"
+  },
+  "moderation.project-review.donationPatreon": {
+    "message": "Patreon"
+  },
+  "moderation.project-review.donationPaypal": {
+    "message": "PayPal"
+  },
   "moderation.project-review.download": {
     "message": "Download"
   },
@@ -3254,6 +3272,15 @@
   "moderation.project-review.members": {
     "message": "Members"
   },
+  "moderation.project-review.modpack": {
+    "message": "Modpack"
+  },
+  "moderation.project-review.modpackVersion": {
+    "message": "Version {version}"
+  },
+  "moderation.project-review.mrpack": {
+    "message": ".mrpack"
+  },
   "moderation.project-review.next": {
     "message": "Next"
   },
@@ -3278,6 +3305,12 @@
   "moderation.project-review.noSelectedIssues": {
     "message": "No issues added. Select issues while reviewing the project to see the message here."
   },
+  "moderation.project-review.noServerAddress": {
+    "message": "No address."
+  },
+  "moderation.project-review.noServerLanguages": {
+    "message": "No languages."
+  },
   "moderation.project-review.openIcon": {
     "message": "View enlarged project icon"
   },
@@ -3290,11 +3323,17 @@
   "moderation.project-review.openMemberAvatar": {
     "message": "View enlarged avatar for {username}"
   },
+  "moderation.project-review.openOrganizationIcon": {
+    "message": "View enlarged icon for {organization}"
+  },
   "moderation.project-review.openReviewGuidance": {
     "message": "Open review guidance in new tab"
   },
   "moderation.project-review.optional": {
     "message": "Optional"
+  },
+  "moderation.project-review.organization": {
+    "message": "Organization"
   },
   "moderation.project-review.owner": {
     "message": "Owner"
@@ -3347,6 +3386,9 @@
   "moderation.project-review.re-review": {
     "message": "Re-review"
   },
+  "moderation.project-review.recommended": {
+    "message": "(Recommended)"
+  },
   "moderation.project-review.rejectedCount": {
     "message": "{count} rejected"
   },
@@ -3389,6 +3431,24 @@
   "moderation.project-review.scheduledCount": {
     "message": "{count} scheduled"
   },
+  "moderation.project-review.serverAddress": {
+    "message": "Address"
+  },
+  "moderation.project-review.serverContent": {
+    "message": "Content"
+  },
+  "moderation.project-review.serverDetails": {
+    "message": "Server details"
+  },
+  "moderation.project-review.serverDiscord": {
+    "message": "Discord"
+  },
+  "moderation.project-review.serverLanguages": {
+    "message": "Languages"
+  },
+  "moderation.project-review.serverRegion": {
+    "message": "Region"
+  },
   "moderation.project-review.showLeft": {
     "message": "Show project details"
   },
@@ -3412,6 +3472,9 @@
   },
   "moderation.project-review.status-alerts": {
     "message": "Status alerts"
+  },
+  "moderation.project-review.store": {
+    "message": "Store"
   },
   "moderation.project-review.submissions": {
     "message": "{count, plural, one {# submission} other {# submissions}}"
@@ -3464,6 +3527,9 @@
   "moderation.project-review.uploaded": {
     "message": "Uploaded {date}"
   },
+  "moderation.project-review.vanilla": {
+    "message": "Vanilla"
+  },
   "moderation.project-review.versionId": {
     "message": "Version ID"
   },
@@ -3479,8 +3545,11 @@
   "moderation.project-review.viewVersion": {
     "message": "View version"
   },
+  "moderation.project-review.website": {
+    "message": "Website"
+  },
   "moderation.project-review.wiki": {
-    "message": "Wiki"
+    "message": "Wiki page"
   },
   "moderation.project-review.withheld": {
     "message": "Withheld"

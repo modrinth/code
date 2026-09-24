@@ -238,17 +238,101 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.issues',
 		defaultMessage: 'Issue tracker',
 	},
+	website: {
+		id: 'moderation.project-review.website',
+		defaultMessage: 'Website',
+	},
+	store: {
+		id: 'moderation.project-review.store',
+		defaultMessage: 'Store',
+	},
 	discord: {
 		id: 'moderation.project-review.discord',
 		defaultMessage: 'Discord invite',
 	},
+	serverDiscord: {
+		id: 'moderation.project-review.serverDiscord',
+		defaultMessage: 'Discord',
+	},
 	wiki: {
 		id: 'moderation.project-review.wiki',
-		defaultMessage: 'Wiki',
+		defaultMessage: 'Wiki page',
+	},
+	donationPatreon: {
+		id: 'moderation.project-review.donationPatreon',
+		defaultMessage: 'Patreon',
+	},
+	donationBmac: {
+		id: 'moderation.project-review.donationBmac',
+		defaultMessage: 'Buy Me A Coffee',
+	},
+	donationPaypal: {
+		id: 'moderation.project-review.donationPaypal',
+		defaultMessage: 'PayPal',
+	},
+	donationGithub: {
+		id: 'moderation.project-review.donationGithub',
+		defaultMessage: 'GitHub Sponsors',
+	},
+	donationKoFi: {
+		id: 'moderation.project-review.donationKoFi',
+		defaultMessage: 'Ko-fi',
+	},
+	donationOther: {
+		id: 'moderation.project-review.donationOther',
+		defaultMessage: 'Other',
 	},
 	compatibility: {
 		id: 'moderation.project-review.compatibility',
 		defaultMessage: 'Compatibility',
+	},
+	serverDetails: {
+		id: 'moderation.project-review.serverDetails',
+		defaultMessage: 'Server details',
+	},
+	serverAddress: {
+		id: 'moderation.project-review.serverAddress',
+		defaultMessage: 'Address',
+	},
+	noServerAddress: {
+		id: 'moderation.project-review.noServerAddress',
+		defaultMessage: 'No address.',
+	},
+	serverLanguages: {
+		id: 'moderation.project-review.serverLanguages',
+		defaultMessage: 'Languages',
+	},
+	noServerLanguages: {
+		id: 'moderation.project-review.noServerLanguages',
+		defaultMessage: 'No languages.',
+	},
+	serverRegion: {
+		id: 'moderation.project-review.serverRegion',
+		defaultMessage: 'Region',
+	},
+	serverContent: {
+		id: 'moderation.project-review.serverContent',
+		defaultMessage: 'Content',
+	},
+	vanilla: {
+		id: 'moderation.project-review.vanilla',
+		defaultMessage: 'Vanilla',
+	},
+	modpack: {
+		id: 'moderation.project-review.modpack',
+		defaultMessage: 'Modpack',
+	},
+	modpackVersion: {
+		id: 'moderation.project-review.modpackVersion',
+		defaultMessage: 'Version {version}',
+	},
+	mrpack: {
+		id: 'moderation.project-review.mrpack',
+		defaultMessage: '.mrpack',
+	},
+	recommended: {
+		id: 'moderation.project-review.recommended',
+		defaultMessage: '(Recommended)',
 	},
 	gameVersions: {
 		id: 'moderation.project-review.gameVersions',

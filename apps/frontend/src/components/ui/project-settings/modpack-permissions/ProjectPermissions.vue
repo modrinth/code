@@ -13,7 +13,7 @@ import {
 	UnfoldVerticalIcon,
 	XCircleIcon,
 } from '@modrinth/assets'
-import { Button } from '@modrinth/ui'
+import { Button, IconButton } from '@modrinth/ui'
 import {
 	Admonition,
 	Combobox,
@@ -43,6 +43,8 @@ const props = defineProps<{
 	project: { id: string; status: string }
 	members: Labrinth.Projects.v3.TeamMember[]
 	isModerator: boolean
+	collapseAllIconOnly?: boolean
+	collapseAttributedByDefault?: boolean
 	refreshProjectValidation?: () => Promise<unknown>
 }>()
 const flags = useFeatureFlags()
@@ -432,7 +434,7 @@ function defaultCardCollapsed(group: Labrinth.Attribution.Internal.AttributionGr
 	if (group?.attribution?.kind === 'globally_allowed') {
 		return true
 	}
-	if (!props.isModerator) {
+	if (!props.isModerator || props.collapseAttributedByDefault) {
 		const hasAttribution = !!group.attribution
 		const rejectedProof = group.attribution?.moderation_status?.kind === 'bad_proof'
 		return hasAttribution && !rejectedProof
@@ -609,7 +611,21 @@ function dismissInfoBanner() {
 						</template>
 					</Combobox>
 				</div>
-				<Button native-type="button" size="lg" @click="toggleAllCardsCollapsed">
+				<IconButton
+					v-if="collapseAllIconOnly"
+					v-tooltip="expandCollapseAllLabel"
+					:label="expandCollapseAllLabel"
+					size="lg"
+					:circular="false"
+					@click="toggleAllCardsCollapsed"
+				>
+					<UnfoldVerticalIcon
+						v-if="allCardsCollapsed"
+						class="size-5 flex-shrink-0 text-secondary"
+					/>
+					<FoldVerticalIcon v-else class="size-5 flex-shrink-0 text-secondary" />
+				</IconButton>
+				<Button v-else native-type="button" size="lg" @click="toggleAllCardsCollapsed">
 					<UnfoldVerticalIcon
 						v-if="allCardsCollapsed"
 						class="size-5 flex-shrink-0 text-secondary"

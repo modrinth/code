@@ -74,6 +74,7 @@
 				<span v-else>{{ formatMessage(messages.emptyLinks) }}</span>
 			</section>
 			<ReviewPanel
+				v-if="!project.minecraft_server"
 				mode="anchored"
 				as="section"
 				:target="{ kind: 'compatibility' }"
@@ -84,6 +85,12 @@
 				</h3>
 				<Compatibility />
 			</ReviewPanel>
+			<section v-else class="review-section">
+				<h3 class="review-section-label">
+					{{ formatMessage(messages.serverDetails) }}
+				</h3>
+				<ServerDetails />
+			</section>
 			<section class="review-section">
 				<h3 class="review-section-label">
 					{{ formatMessage(messages.members) }}
@@ -109,12 +116,13 @@ import { reviewExternalUrl } from '~/providers/project-review/project-links'
 
 import { projectReviewMessages as messages } from '../messages'
 import ReviewPanel from '../review-panel/index.vue'
+import Members from './members/index.vue'
 import Compatibility from './project/compatibility.vue'
 import Details from './project/details.vue'
 import Icon from './project/icon.vue'
 import License from './project/license.vue'
 import Links from './project/links.vue'
-import Members from './members/index.vue'
+import ServerDetails from './project/server-details.vue'
 import Slug from './project/slug.vue'
 import Summary from './project/summary.vue'
 import Tags from './project/tags.vue'

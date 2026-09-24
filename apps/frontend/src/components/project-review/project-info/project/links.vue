@@ -39,10 +39,39 @@ import ReviewPanel from '../../review-panel/index.vue'
 
 const { project } = injectProjectReviewPageContext()
 const { formatMessage } = useVIntl()
-const links = computed(() =>
-	Object.entries(project.value?.link_urls ?? {})
+const links = computed(() => {
+	const isServerProject = project.value?.minecraft_server != null
+	const order = isServerProject
+		? ['site', 'store', 'wiki', 'discord']
+		: [
+				'issues',
+				'source',
+				'wiki',
+				'discord',
+				'patreon',
+				'bmac',
+				'paypal',
+				'github',
+				'ko-fi',
+				'other',
+			]
+	const labels = {
+		site: messages.website,
+		store: messages.store,
+		source: messages.source,
+		issues: messages.issues,
+		discord: isServerProject ? messages.serverDiscord : messages.discord,
+		wiki: messages.wiki,
+		patreon: messages.donationPatreon,
+		bmac: messages.donationBmac,
+		paypal: messages.donationPaypal,
+		github: messages.donationGithub,
+		'ko-fi': messages.donationKoFi,
+		other: messages.donationOther,
+	}
+
+	return Object.entries(project.value?.link_urls ?? {})
 		.sort(([a], [b]) => {
-			const order = ['source', 'issues', 'discord', 'wiki']
 			return (
 				(order.includes(a) ? order.indexOf(a) : order.length) -
 				(order.includes(b) ? order.indexOf(b) : order.length)
@@ -50,12 +79,6 @@ const links = computed(() =>
 		})
 		.flatMap(([key, link]) => {
 			const url = reviewExternalUrl(link.url)
-			const labels = {
-				source: messages.source,
-				issues: messages.issues,
-				discord: messages.discord,
-				wiki: messages.wiki,
-			}
 			const message = labels[key as keyof typeof labels]
 			return url
 				? [
@@ -66,6 +89,6 @@ const links = computed(() =>
 						},
 					]
 				: []
-		}),
-)
+		})
+})
 </script>
