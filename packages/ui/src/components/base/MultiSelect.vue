@@ -953,9 +953,8 @@ function calculateHorizontalPosition(
 	const minLeft = viewport.offsetLeft + DROPDOWN_VIEWPORT_MARGIN
 	const maxRight = viewport.offsetLeft + viewport.width - DROPDOWN_VIEWPORT_MARGIN
 	const left =
-		(props.dropdownAlign === 'right'
-			? triggerRect.right - dropdownRect.width
-			: triggerRect.left) + viewport.offsetLeft
+		(props.dropdownAlign === 'right' ? triggerRect.right - dropdownRect.width : triggerRect.left) +
+		viewport.offsetLeft
 
 	return Math.max(minLeft, Math.min(left, maxRight - dropdownRect.width))
 }

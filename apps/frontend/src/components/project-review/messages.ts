@@ -64,7 +64,7 @@ export const projectReviewMessages = defineMessages({
 	},
 	title: {
 		id: 'moderation.project-review.title',
-		defaultMessage: 'Project review',
+		defaultMessage: 'Project Review',
 	},
 	left: {
 		id: 'moderation.project-review.left',

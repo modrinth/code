@@ -436,7 +436,6 @@ export const archiveDisclosureReviewPanel = panel({
 )
 
 export const disclosuresReviewPanel = panel({
-	title: 'Disclosures',
 	hint: 'Has this project selected all proper content disclosures?',
 	icon: TriangleAlertIcon,
 }).content(

@@ -104,10 +104,16 @@ type ActionTarget = (typeof targets)[number]
 const selectedTarget = ref<ActionTarget>('re-review')
 const visibleTargets = computed(() => targets.filter((kind) => resolve({ kind })))
 const tabs = computed(() =>
-	visibleTargets.value.map((kind) => ({
-		value: kind,
-		label: resolve({ kind })!.panel.title,
-	})),
+	visibleTargets.value.map((kind) => {
+		const panel = resolve({ kind })!.panel
+		return {
+			value: kind,
+			label:
+				panel.title ??
+				panel.sections.flatMap((section) => section.controls)[0]?.issue.category ??
+				kind,
+		}
+	}),
 )
 
 watch(

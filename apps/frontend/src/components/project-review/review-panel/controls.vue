@@ -103,6 +103,18 @@
 						/>
 					</Tooltip>
 				</template>
+				<Tooltip
+					v-if="
+						index === panelBinding.panel.sections.length - 1 &&
+						!panelBinding.panel.title &&
+						panelBinding.panel.hint
+					"
+					:text="panelBinding.panel.hint"
+					:aria-label="panelBinding.panel.hint"
+					class="ml-px flex shrink-0 self-center text-secondary"
+				>
+					<InfoIcon class="size-4" aria-hidden="true" />
+				</Tooltip>
 			</div>
 		</div>
 	</div>
@@ -127,7 +139,7 @@
 			:key="correction.key"
 			class="flex flex-col gap-2"
 		>
-			<p class="m-0 font-semibold text-contrast">
+			<p v-if="correction.panel.title" class="m-0 font-semibold text-contrast">
 				{{ correction.panel.title }}
 			</p>
 			<Controls
@@ -142,6 +154,7 @@
 </template>
 
 <script setup lang="ts">
+import { InfoIcon } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
 import ActionButton from '@modrinth/moderation/src/types/node/components/ActionButton.vue'
 import {

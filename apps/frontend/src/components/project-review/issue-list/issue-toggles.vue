@@ -144,15 +144,19 @@ function optionLabel(entry: ReviewIssueControl) {
 		return entry.control.issueListLabel
 	if (!multiplePanels.value) return entry.control.label
 	return formatMessage(messages.fieldOption, {
-		field: entry.binding.panel.title,
+		field: panelLabel(entry),
 		option: entry.control.label,
 	})
 }
 
 function rowOptionLabel(entry: ReviewIssueControl) {
 	return entry.control.type === 'toggle'
-		? (entry.control.issueListLabel ?? entry.binding.panel.title)
-		: entry.binding.panel.title
+		? (entry.control.issueListLabel ?? panelLabel(entry))
+		: panelLabel(entry)
+}
+
+function panelLabel(entry: ReviewIssueControl) {
+	return entry.binding.panel.title ?? entry.control.issue.category
 }
 
 function optionValue({ control }: ReviewIssueControl) {

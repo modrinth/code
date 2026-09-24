@@ -5,6 +5,7 @@
 			ref="element"
 			role="dialog"
 			:aria-labelledby="titleId"
+			:aria-label="titleId ? undefined : label"
 			:data-review-panel="anchor.id"
 			tabindex="-1"
 			class="z-[100] box-border flex w-[28rem] max-w-[calc(100vw-1rem)] flex-col gap-2 overflow-y-auto rounded-xl border border-solid border-surface-5 bg-surface-3 p-2.5 pb-3 text-sm text-primary"
@@ -55,7 +56,7 @@ import { injectReviewContext, type ReviewAnchor } from './context'
 import { useActionKeybinds } from './use-action-keybinds'
 
 const { formatMessage } = useVIntl()
-const props = defineProps<{ anchor: ReviewAnchor; titleId: string }>()
+const props = defineProps<{ anchor: ReviewAnchor; titleId?: string; label?: string }>()
 const { active, panel, panelId, pinned, close, leave, cancelClose, contains } =
 	injectReviewContext()
 const element = shallowRef<HTMLElement | null>(null)

@@ -116,7 +116,7 @@ export type IssueControl = IssueToggle | IssueMarkdown | IssueText | IssueSelect
 export interface Panel {
 	icon: FunctionalComponent<SVGAttributes>
 	shown?: WithContext<boolean>
-	title: WithContext<string>
+	title?: WithContext<string>
 	hint: WithContext<string>
 	children: PanelNode[]
 }

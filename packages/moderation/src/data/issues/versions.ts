@@ -89,7 +89,6 @@ export const versionsUnsupportedIssue = issue({
 })
 
 export const versionsReviewPanel = panel({
-	title: 'Versions',
 	hint: "Are this project's files correct?",
 	icon: VersionIcon,
 	shown: ({ ProjectV3 }) => !ProjectV3.minecraft_server,

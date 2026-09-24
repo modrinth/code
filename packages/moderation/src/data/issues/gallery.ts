@@ -31,7 +31,6 @@ export const galleryShowcaseClarityIssue = issue({
 })
 
 export const galleryReviewPanel = panel({
-	title: 'Gallery',
 	hint: "Are this project's gallery images sufficient?",
 	icon: ImageIcon,
 }).content(

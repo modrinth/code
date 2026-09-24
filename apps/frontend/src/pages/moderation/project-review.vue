@@ -26,7 +26,10 @@ definePageMeta({
 useHead({
 	htmlAttrs: { style: 'scrollbar-gutter: auto; overflow: hidden;' },
 	bodyAttrs: { style: 'overflow: hidden;' },
-	title: () => `${project.value?.title ?? formatMessage(projectReviewMessages.title)} - Modrinth`,
+	title: () =>
+		project.value?.name
+			? `${project.value.name} - ${formatMessage(projectReviewMessages.title)}`
+			: formatMessage(projectReviewMessages.title),
 })
 useFavicon('review')
 </script>

@@ -10,9 +10,14 @@
 		:trigger-placement="triggerPlacement"
 	>
 		<slot />
-		<Popover v-if="active?.id === id" :anchor="active" :title-id="titleId">
+		<Popover
+			v-if="active?.id === id"
+			:anchor="active"
+			:title-id="title ? titleId : undefined"
+			:label="accessibleTitle"
+		>
 			<template #title>
-				<div class="flex items-center gap-2">
+				<div v-if="title" class="flex items-center gap-2">
 					<h2 :id="titleId" class="m-0 text-lg font-semibold text-contrast">{{ title }}</h2>
 					<Tooltip v-if="hint" :text="hint" :aria-label="hint" class="flex shrink-0 text-secondary">
 						<InfoIcon class="size-4" aria-hidden="true" />
@@ -81,8 +86,8 @@ const panels = injectReviewPanels()
 const titleId = `${id}-title`
 const panel = computed(() => panels.resolve(props.target)?.panel)
 const title = computed(() => panel.value?.title)
-const accessibleTitle = computed(() =>
-	formatMessage(messages.reviewSection, { section: title.value ?? '' }),
-)
 const hint = computed(() => panel.value?.hint)
+const accessibleTitle = computed(() =>
+	formatMessage(messages.reviewSection, { section: title.value ?? hint.value ?? '' }),
+)
 </script>

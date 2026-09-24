@@ -91,7 +91,6 @@ export const unclearDescriptionIssue = issue({
 })
 
 export const descriptionReviewPanel = panel({
-	title: 'Description',
 	hint: 'Is the description sufficient, accurate, and accessible?',
 	icon: LibraryIcon,
 }).content(

@@ -61,7 +61,7 @@ export interface ReviewPanelBinding {
 	projectId: string
 	panel: {
 		icon: Panel['icon']
-		title: string
+		title: string | undefined
 		hint: string
 		sections: ResolvedPanelSection[]
 	}
