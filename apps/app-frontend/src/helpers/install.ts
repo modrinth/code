@@ -82,6 +82,7 @@ export interface SharedInstanceInstallPreview {
 
 export interface SharedInstanceInviteInstallPreview {
 	sharedInstanceId: string
+	inviter?: { id: string; name: string; avatar: string | null } | null
 	managerId?: string | null
 	serverManagerName?: string | null
 	serverManagerIconUrl?: string | null

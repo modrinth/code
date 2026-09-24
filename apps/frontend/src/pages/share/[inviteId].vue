@@ -245,16 +245,11 @@ const hiddenUserCount = computed(() =>
 
 onServerPrefetch(() => suspense())
 
-const inviter = computed(
-	() =>
-		invite.value?.managers.find((manager) => manager.type === 'user') ?? invite.value?.managers[0],
+const inviterName = computed(
+	() => invite.value?.inviter?.name ?? formatMessage(messages.unknownInviter),
 )
-const inviterName = computed(() => inviter.value?.name ?? formatMessage(messages.unknownInviter))
-const inviterAvatar = computed(() => {
-	if (!inviter.value) return null
-	return inviter.value.type === 'user' ? inviter.value.avatar : inviter.value.icon
-})
-const moderationUserId = computed(() => (inviter.value?.type === 'user' ? inviter.value.id : null))
+const inviterAvatar = computed(() => invite.value?.inviter?.avatar ?? null)
+const moderationUserId = computed(() => invite.value?.inviter?.id ?? null)
 const isStaff = computed(() => {
 	const role = auth.value.user?.role
 	return role === 'admin' || role === 'moderator'

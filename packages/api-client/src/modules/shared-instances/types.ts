@@ -1,6 +1,12 @@
 export namespace SharedInstances {
 	export namespace Invites {
 		export namespace v1 {
+			export type Inviter = {
+				id: string
+				name: string
+				avatar: string | null
+			}
+
 			export type UserManager = {
 				id: string
 				name: string
@@ -36,6 +42,7 @@ export namespace SharedInstances {
 				instance_icon?: string | null
 				game_version: string
 				loader_version: string
+				inviter: Inviter | null
 				managers: Manager[]
 				instance_users?: InviteUser[]
 			}
