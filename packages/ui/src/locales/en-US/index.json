@@ -5747,6 +5747,27 @@
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "SFTP credentials rotated"
   },
+  "servers.settings.support.action-log-title": {
+    "defaultMessage": "Action log"
+  },
+  "servers.settings.support.clear-action-log-button": {
+    "defaultMessage": "Clear action log"
+  },
+  "servers.settings.support.clear-action-log-confirmation": {
+    "defaultMessage": "This permanently deletes all action log entries for this server. Continue?"
+  },
+  "servers.settings.support.clear-action-log-description": {
+    "defaultMessage": "Delete all action log entries for this server."
+  },
+  "servers.settings.support.clear-action-log-error": {
+    "defaultMessage": "Failed to clear action log"
+  },
+  "servers.settings.support.clear-action-log-success": {
+    "defaultMessage": "Action log cleared"
+  },
+  "servers.settings.support.clear-action-log-title": {
+    "defaultMessage": "Clear action log?"
+  },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "An unexpected error occurred while installing. Please try again later."
   },
