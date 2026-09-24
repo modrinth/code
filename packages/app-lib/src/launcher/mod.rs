@@ -28,7 +28,7 @@ use daedalus::minecraft::{
 };
 use daedalus::modded::{LoaderVersion, Manifest};
 use modrinth_sandbox::{
-    MinecraftCommand, MinecraftLoggingConfig, SandboxOutput,
+    MinecraftCommand, MinecraftLoggingConfig,
 };
 use serde::Deserialize;
 use std::future::Future;
@@ -1102,8 +1102,8 @@ pub async fn launch_minecraft(
     .await?;
 
     let mut launcher_args = Vec::with_capacity(game_args.len() + 1);
-    launcher_args.push(version_info.main_class.clone());
-    launcher_args.extend(game_args);
+    launcher_args.push(version_info.main_class.clone().into());
+    launcher_args.extend(game_args.into_iter().map(|arg| arg.into()));
 
     let logging_config = version_info
         .logging
@@ -1135,7 +1135,6 @@ pub async fn launch_minecraft(
             .cloned()
             .map(|(key, value)| (key.into(), value.into()))
             .collect(),
-        output: SandboxOutput::Piped,
     };
 
     if let Err(error) =

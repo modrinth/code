@@ -7,7 +7,7 @@ use crate::util::rpc::RpcServer;
 use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
 use dashmap::DashMap;
 use modrinth_sandbox::{
-    MinecraftCommand, SandboxChild, SandboxEnv, create_minecraft_command,
+    MinecraftCommand, SandboxChild, SandboxEnv, SandboxExitStatus, create_minecraft_command,
 };
 use quick_xml::Reader;
 use quick_xml::events::Event;
@@ -18,7 +18,6 @@ use std::fmt::Debug;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::{Path, PathBuf};
-use std::process::ExitStatus;
 use std::sync::LazyLock;
 use std::time::{Duration, Instant};
 use tempfile::TempDir;
@@ -224,11 +223,11 @@ impl ProcessManager {
         }
 
         let command = create_minecraft_command(mc_command)?;
-        let mut mc_proc = sandbox_env.spawn(command).await?;
+        let mc_proc = tokio::task::spawn_blocking({
+            let sandbox_env = sandbox_env.clone();
+            move || sandbox_env.spawn(command)
+        }).await??;
         let child_pid = mc_proc.id();
-
-        let stdout = mc_proc.take_stdout();
-        let stderr = mc_proc.take_stderr();
 
         let mut process = Process {
             metadata: ProcessMetadata {
@@ -305,40 +304,6 @@ impl ProcessManager {
 
         let metadata = process.metadata.clone();
 
-        if let Some(stdout) = stdout {
-            let log_path_clone = log_path.clone();
-
-            let instance_id = metadata.instance_id.clone();
-            let instance_path = metadata.instance_path.clone();
-            tokio::spawn(async move {
-                Process::process_output(
-                    &instance_id,
-                    &instance_path,
-                    stdout,
-                    log_path_clone,
-                    xml_logging,
-                )
-                .await;
-            });
-        }
-
-        if let Some(stderr) = stderr {
-            let log_path_clone = log_path.clone();
-
-            let instance_id = metadata.instance_id.clone();
-            let instance_path = metadata.instance_path.clone();
-            tokio::spawn(async move {
-                Process::process_output(
-                    &instance_id,
-                    &instance_path,
-                    stderr,
-                    log_path_clone,
-                    xml_logging,
-                )
-                .await;
-            });
-        }
-
         self.processes.insert(process.metadata.uuid, process);
 
         tokio::spawn(Process::sequential_process_manager(
@@ -379,7 +344,7 @@ impl ProcessManager {
     pub fn try_wait(
         &self,
         id: Uuid,
-    ) -> crate::Result<Option<Option<ExitStatus>>> {
+    ) -> crate::Result<Option<Option<SandboxExitStatus>>> {
         if let Some(mut process) = self.processes.get_mut(&id) {
             Ok(Some(process.child.try_wait()?))
         } else {
@@ -928,7 +893,7 @@ impl Process {
                     break;
                 }
             } else {
-                mc_exit_status = ExitStatus::default();
+                mc_exit_status = SandboxExitStatus::default();
                 break;
             }
 

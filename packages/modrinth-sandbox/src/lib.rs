@@ -7,7 +7,8 @@ use std::sync::Arc;
 use derive_more::Debug;
 use eyre::Result;
 
-pub use backend::{SandboxChild, SandboxCommand, SandboxOutput};
+pub use backend::{SandboxChild, SandboxCommand, SandboxExitStatus};
+pub use util::argument::SandboxArg;
 pub use minecraft::*;
 
 /// Creates the environment and initializes the required resources to perform
@@ -32,7 +33,7 @@ pub struct SandboxEnv {
 }
 
 impl SandboxEnv {
-    pub async fn spawn(&self, command: SandboxCommand) -> Result<SandboxChild> {
-        self.inner.spawn(command).await
+    pub fn spawn(&self, command: SandboxCommand) -> Result<SandboxChild> {
+        self.inner.spawn(command)
     }
 }

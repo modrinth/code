@@ -1,13 +1,15 @@
 //! Backend sandbox implementations, using OS-specific primitives.
 
-use std::{ffi::OsString, fmt::Debug, path::PathBuf, process::ExitStatus};
+use std::{collections::{BTreeMap, HashSet}, fmt::Debug, path::PathBuf};
 
 use async_trait::async_trait;
 use eyre::Result;
 
+use crate::util::argument::SandboxArg;
+
 // TODO cfgs
 mod bubblewrap;
-mod linux;
+mod unix;
 
 /// Entry point into the sandboxing mechanism.
 ///
@@ -33,10 +35,9 @@ pub trait Backend {
 ///
 /// [`SandboxEnv`]s are not aware of Minecraft, Java, or any other high-level
 /// details. They are purely low-level sandboxing mechanisms.
-#[async_trait]
 pub trait SandboxEnv: Debug + Send + Sync {
     /// Spawn a sandboxed process and get a [`SandboxChild`] handle to it.
-    async fn spawn(&self, command: SandboxCommand) -> Result<SandboxChild>;
+    fn spawn(&self, command: SandboxCommand) -> Result<SandboxChild>;
 }
 
 /// Creates a [`SandboxEnv`] by automatically determining the best environment
@@ -59,23 +60,21 @@ pub async fn init_env() -> Result<Box<dyn SandboxEnv>> {
 #[derive(Debug)]
 pub struct SandboxCommand {
     /// Path to the executable to run.
-    pub executable: OsString,
+    pub executable: PathBuf,
     /// Arguments passed to the executable.
-    pub args: Vec<OsString>,
+    pub args: Vec<SandboxArg>,
     /// Host paths mounted read-only at the same path in the sandbox.
-    pub read_only_paths: Vec<OsString>,
+    pub read_only_paths: Vec<PathBuf>,
     /// Host paths mounted read-write at the same path in the sandbox.
-    pub read_write_paths: Vec<OsString>,
+    pub read_write_paths: Vec<PathBuf>,
     /// What directory the executable is ran from.
     pub working_directory: Option<PathBuf>,
     /// Names of environment variables copied from the host when present.
-    pub passthrough_environment: Vec<OsString>,
+    pub passthrough_environment: HashSet<SandboxArg>,
     /// Environment variables explicitly set in the sandbox.
     ///
     /// These take precedence over passthrough variables with the same name.
-    pub extra_environment: Vec<(OsString, OsString)>,
-    /// How the child process's output is routed to the parent process.
-    pub output: SandboxOutput,
+    pub extra_environment: BTreeMap<SandboxArg, SandboxArg>,
     /// Allow access to the host network namespace.
     pub network: bool,
     /// Whether the program to run is a Java virtual machine.
@@ -88,41 +87,69 @@ pub struct SandboxCommand {
     pub die_with_parent: bool,
 }
 
-#[derive(Debug, Clone, Copy, Default)]
-pub enum SandboxOutput {
-    #[default]
-    Piped,
-    Inherit,
+impl SandboxCommand {
+    pub fn take_environment(&mut self) -> BTreeMap<SandboxArg, SandboxArg> {
+        if !self.passthrough_environment.is_empty() {
+            for (k, v) in std::env::vars_os() {
+                let k: SandboxArg = k.into();
+                if self.extra_environment.contains_key(&k) {
+                    continue;
+                }
+                if !self.passthrough_environment.contains(&k) {
+                    continue;
+                }
+                self.extra_environment.insert(k, v.into());
+            }
+        }
+        std::mem::take(&mut self.extra_environment)
+    }
 }
 
 #[derive(Debug)]
 pub struct SandboxChild {
     // TODO cfg
-    imp: linux::SandboxChild,
+    imp: unix::SandboxChild,
 }
 
 impl SandboxChild {
     pub fn id(&self) -> Option<u32> {
-        self.imp.id()
+        if self.imp.has_waited() {
+            return None;
+        }
+        Some(self.imp.id())
     }
 
-    pub fn take_stdout(&mut self) -> Option<tokio::process::ChildStdout> {
-        self.imp.take_stdout()
+    pub fn try_wait(&mut self) -> Result<Option<SandboxExitStatus>> {
+        self.imp.try_wait().map(|imp| Some(SandboxExitStatus { imp: imp? }))
     }
 
-    pub fn take_stderr(&mut self) -> Option<tokio::process::ChildStderr> {
-        self.imp.take_stderr()
-    }
-
-    pub fn try_wait(&mut self) -> Result<Option<ExitStatus>> {
-        self.imp.try_wait()
-    }
-
-    pub async fn wait(&mut self) -> Result<ExitStatus> {
-        self.imp.wait().await
+    pub async fn wait(&mut self) -> Result<SandboxExitStatus> {
+        self.imp.wait().await.map(|imp| SandboxExitStatus { imp })
     }
 
     pub async fn kill(&mut self) -> Result<()> {
         self.imp.kill().await
+    }
+}
+
+#[derive(Default, Debug)]
+pub struct SandboxExitStatus {
+    // TODO cfg
+    imp: unix::SandboxExitStatus,
+}
+
+impl SandboxExitStatus {
+    pub fn success(&self) -> bool {
+        self.imp.success()
+    }
+
+    pub fn code(&self) -> Option<i32> {
+        self.imp.code()
+    }
+}
+
+impl std::fmt::Display for SandboxExitStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(&self.imp, f)
     }
 }
