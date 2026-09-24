@@ -2399,12 +2399,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Uključeno"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Spoljašnje"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Ovaj fajl nije objavljen na Modrinth-u."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Upravljan sadržaj"
   },
@@ -2419,9 +2413,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Pretraga {count, number} {count, plural, one {projekta} few {projekta} other {projekata}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Upozorenja"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Upravo"

@@ -980,16 +980,16 @@ async fn fetch_advanced_with_target(
         .map(|m| (DOWNLOAD_META_HEADER.to_string(), m.to_header_value()));
 
     for attempt in 1..=(FETCH_ATTEMPTS + 1) {
-		if is_api_url && let Err(error) = GLOBAL_API_RATE_LIMIT.check() {
-			warn!(
-				request_path = %url.split('?').next().unwrap_or(url),
-				?uri_path,
-				attempt,
-				error = %error,
-				"Modrinth API request blocked by local rate limiter"
-			);
-			return Err(error);
-		}
+        if is_api_url && let Err(error) = GLOBAL_API_RATE_LIMIT.check() {
+            warn!(
+                request_path = %url.split('?').next().unwrap_or(url),
+                ?uri_path,
+                attempt,
+                error = %error,
+                "Modrinth API request blocked by local rate limiter"
+            );
+            return Err(error);
+        }
 
         if let Some(fence_key) = fence_key
             && GLOBAL_FETCH_FENCE.is_blocked(fence_key)
