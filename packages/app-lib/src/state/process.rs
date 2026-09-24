@@ -224,11 +224,7 @@ impl ProcessManager {
         }
 
         let command = create_minecraft_command(mc_command)?;
-        let mc_proc = tokio::task::spawn_blocking({
-            let sandbox_env = sandbox_env.clone();
-            move || sandbox_env.spawn(command)
-        })
-        .await??;
+        let mc_proc = sandbox_env.spawn(command).await?;
         let child_pid = mc_proc.id();
 
         let mut process = Process {

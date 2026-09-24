@@ -4,7 +4,7 @@ use std::{
     ffi::{OsStr, OsString},
     os::fd::{AsRawFd, OwnedFd},
     path::{Path, PathBuf},
-    sync::OnceLock,
+    sync::{Arc, OnceLock},
 };
 
 use async_trait::async_trait;
@@ -39,23 +39,27 @@ async fn init() -> Result<BubblewrapEnv> {
     Ok(BubblewrapEnv {
         bwrap,
         xdg_dbus_proxy,
-        dbus_proxy: OnceLock::new(),
+        dbus_proxy: Arc::new(OnceLock::new()),
         dev_null,
     })
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[debug("BubblewrapEnv")]
 pub struct BubblewrapEnv {
     bwrap: PathBuf,
     xdg_dbus_proxy: PathBuf,
-    dbus_proxy: OnceLock<eyre::Result<DbusProxy>>,
+    dbus_proxy: Arc<OnceLock<eyre::Result<DbusProxy>>>,
     dev_null: libc::c_int,
 }
 
+#[async_trait]
 impl SandboxEnv for BubblewrapEnv {
-    fn spawn(&self, command: SandboxCommand) -> Result<SandboxChild> {
-        spawn(self, command)
+    async fn spawn(&self, command: SandboxCommand) -> Result<SandboxChild> {
+        let this = self.clone();
+        tokio::task::spawn_blocking(move || spawn(&this, command))
+            .await
+            .context("spawn task dropped")?
     }
 }
 
@@ -475,6 +479,8 @@ fn spawn(
     }
 
     // Make sure any required dirs exist, create them if not
+    // Do this right before we do the actual spawn, so that we don't create these
+    // if we have an error earlier on
     for path in command.ensure_dirs_exist {
         std::fs::create_dir_all(&path)
             .wrap_err_with(|| eyre!("creating directory {path:?}"))?;

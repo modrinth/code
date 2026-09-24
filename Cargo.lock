@@ -7213,16 +7213,20 @@ name = "modrinth-sandbox"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "bitflags 2.9.4",
  "clap 4.5.48",
  "derive_more 2.1.1",
  "directories",
  "eyre",
+ "foldhash 0.2.0",
  "libc",
  "libseccomp",
+ "serde",
  "tokio",
  "tracing",
  "tracing-subscriber",
  "uuid 1.23.3",
+ "zbus",
 ]
 
 [[package]]

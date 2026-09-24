@@ -9,8 +9,12 @@ tracing = { workspace = true }
 tokio = { workspace = true, features = ["fs", "process"] }
 eyre = { workspace = true }
 async-trait = { workspace = true }
+bitflags = { workspace = true, features = ["serde"] }
 derive_more = { workspace = true, features = ["debug"] }
 uuid = { workspace = true, features = ["v7"] }
+foldhash = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+zbus = { workspace = true }
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["full"] }

@@ -4,7 +4,7 @@ use std::{
     path::PathBuf,
 };
 
-use eyre::{Context, Result};
+use eyre::{Result, WrapErr};
 use modrinth_sandbox::{SandboxArg, SandboxCommand};
 use tracing::info;
 
@@ -45,12 +45,13 @@ async fn main() -> Result<()> {
             is_jvm: false,
             die_with_parent: true,
         })
-        .context("spawning process in sandbox")?;
+        .await
+        .wrap_err("spawning process in sandbox")?;
 
     let status = child
         .wait()
         .await
-        .context("waiting for process in sandbox")?;
+        .wrap_err("waiting for process in sandbox")?;
     eyre::ensure!(status.success(), "sandboxed process exited with {status}");
 
     Ok(())

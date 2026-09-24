@@ -1,4 +1,8 @@
-use std::{borrow::Cow, ffi::{OsStr, OsString}, path::{Path, PathBuf}};
+use std::{
+    borrow::Cow,
+    ffi::{OsStr, OsString},
+    path::{Path, PathBuf},
+};
 
 /// Wrapper over Cow<'static OsStr> implementing conversions from str/String, OsStr/OsString and Path/PathBuf
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]

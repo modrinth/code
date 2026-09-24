@@ -42,9 +42,10 @@ pub trait Backend {
 ///
 /// [`SandboxEnv`]s are not aware of Minecraft, Java, or any other high-level
 /// details. They are purely low-level sandboxing mechanisms.
+#[async_trait]
 pub trait SandboxEnv: Debug + Send + Sync {
     /// Spawn a sandboxed process and get a [`SandboxChild`] handle to it.
-    fn spawn(&self, command: SandboxCommand) -> Result<SandboxChild>;
+    async fn spawn(&self, command: SandboxCommand) -> Result<SandboxChild>;
 }
 
 /// Creates a [`SandboxEnv`] by automatically determining the best environment

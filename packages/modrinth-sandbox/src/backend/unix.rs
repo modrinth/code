@@ -1,4 +1,13 @@
-use std::{collections::BTreeMap, ffi::{CStr, CString, OsString}, io::ErrorKind, os::{fd::{AsRawFd, FromRawFd, OwnedFd, RawFd}, unix::ffi::OsStringExt}, path::PathBuf};
+use std::{
+    collections::BTreeMap,
+    ffi::{CStr, CString, OsString},
+    io::ErrorKind,
+    os::{
+        fd::{AsRawFd, FromRawFd, OwnedFd, RawFd},
+        unix::ffi::OsStringExt,
+    },
+    path::PathBuf,
+};
 
 use eyre::Result;
 
@@ -11,8 +20,7 @@ pub(crate) fn spawn(
     working_directory: Option<PathBuf>,
     pass_fds: Vec<OwnedFd>,
     dev_null: libc::c_int,
-    #[cfg(target_os = "linux")]
-    die_with_parent: bool,
+    #[cfg(target_os = "linux")] die_with_parent: bool,
 ) -> Result<SandboxChild> {
     let program = CString::new(program.into_os_string().into_vec())?;
 
@@ -72,8 +80,7 @@ fn exec(
     workdir: Option<*const libc::c_char>,
     pass_fds: &[OwnedFd],
     dev_null: libc::c_int,
-    #[cfg(target_os = "linux")]
-    die_with_parent: bool,
+    #[cfg(target_os = "linux")] die_with_parent: bool,
 ) -> std::io::Result<()> {
     unsafe {
         *environ() = env;
@@ -97,7 +104,9 @@ fn exec(
         // This will kill the process when the parent thread or process dies
         #[cfg(target_os = "linux")]
         if die_with_parent {
-            cvt_r(|| libc::prctl(libc::PR_SET_PDEATHSIG, libc::SIGKILL, 0, 0, 0))?;
+            cvt_r(|| {
+                libc::prctl(libc::PR_SET_PDEATHSIG, libc::SIGKILL, 0, 0, 0)
+            })?;
         }
 
         cvt(libc::execvp(program, argv))?;
@@ -127,7 +136,9 @@ impl SandboxChild {
         }
 
         let mut status = 0 as libc::c_int;
-        let pid = cvt_r(|| unsafe { libc::waitpid(self.pid, &mut status, libc::WNOHANG) })?;
+        let pid = cvt_r(|| unsafe {
+            libc::waitpid(self.pid, &mut status, libc::WNOHANG)
+        })?;
 
         if pid == 0 {
             return Ok(None);
@@ -148,7 +159,8 @@ impl SandboxChild {
             let mut status = 0 as libc::c_int;
             cvt_r(|| unsafe { libc::waitpid(wait_for_pid, &mut status, 0) })?;
             eyre::Ok(status)
-        }).await??;
+        })
+        .await??;
 
         self.exit_status = Some(SandboxExitStatus(status));
         return Ok(SandboxExitStatus(status));
@@ -158,7 +170,8 @@ impl SandboxChild {
         let kill_pid = self.pid;
         tokio::task::spawn_blocking(move || {
             cvt_r(|| unsafe { libc::kill(kill_pid, libc::SIGKILL) })
-        }).await??;
+        })
+        .await??;
         Ok(())
     }
 }
@@ -217,10 +230,13 @@ pub(crate) struct WriteableMemoryFile {
 
 impl WriteableMemoryFile {
     pub fn open(name: &CStr) -> eyre::Result<Self> {
-        let fd = unsafe { OwnedFd::from_raw_fd(cvt(libc::memfd_create(name.as_ptr(), libc::MFD_CLOEXEC | libc::MFD_ALLOW_SEALING))?) };
-        Ok(Self {
-            fd
-        })
+        let fd = unsafe {
+            OwnedFd::from_raw_fd(cvt(libc::memfd_create(
+                name.as_ptr(),
+                libc::MFD_CLOEXEC | libc::MFD_ALLOW_SEALING,
+            ))?)
+        };
+        Ok(Self { fd })
     }
 
     pub fn as_raw_fd(&self) -> RawFd {
@@ -234,9 +250,20 @@ impl WriteableMemoryFile {
     pub fn write(self, data: &CStr) -> eyre::Result<OwnedFd> {
         unsafe {
             let fd = self.fd.as_raw_fd();
-            cvt(libc::write(fd, data.as_ptr().cast(), data.count_bytes() as libc::size_t))?;
+            cvt(libc::write(
+                fd,
+                data.as_ptr().cast(),
+                data.count_bytes() as libc::size_t,
+            ))?;
             libc::lseek(fd, 0, libc::SEEK_SET);
-            cvt(libc::fcntl(fd, libc::F_ADD_SEALS, libc::F_SEAL_SEAL | libc::F_SEAL_SHRINK | libc::F_SEAL_GROW | libc::F_SEAL_WRITE))?;
+            cvt(libc::fcntl(
+                fd,
+                libc::F_ADD_SEALS,
+                libc::F_SEAL_SEAL
+                    | libc::F_SEAL_SHRINK
+                    | libc::F_SEAL_GROW
+                    | libc::F_SEAL_WRITE,
+            ))?;
         }
         Ok(self.fd)
     }
@@ -260,7 +287,11 @@ impl_is_minus_one! { i8 i16 i32 i64 isize }
 /// Converts native return values to Result using the *-1 means error is in `errno`*  convention.
 /// Non-error values are `Ok`-wrapped.
 pub fn cvt<T: IsMinusOne>(t: T) -> std::io::Result<T> {
-    if t.is_minus_one() { Err(std::io::Error::last_os_error()) } else { Ok(t) }
+    if t.is_minus_one() {
+        Err(std::io::Error::last_os_error())
+    } else {
+        Ok(t)
+    }
 }
 
 /// `-1` → look at `errno` → retry on `EINTR`. Otherwise `Ok()`-wrap the closure return value.
@@ -320,7 +351,9 @@ impl RawStringVec {
     }
 
     pub fn ensure_null_terminated(&mut self) {
-        if let Some(last) = self.0.last() && last.is_null() {
+        if let Some(last) = self.0.last()
+            && last.is_null()
+        {
             return;
         }
         self.0.push(std::ptr::null_mut());

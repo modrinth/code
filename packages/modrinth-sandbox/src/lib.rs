@@ -8,8 +8,8 @@ use derive_more::Debug;
 use eyre::Result;
 
 pub use backend::{SandboxChild, SandboxCommand, SandboxExitStatus};
-pub use util::argument::SandboxArg;
 pub use minecraft::*;
+pub use util::argument::SandboxArg;
 
 /// Creates the environment and initializes the required resources to perform
 /// sandboxing.
@@ -33,7 +33,7 @@ pub struct SandboxEnv {
 }
 
 impl SandboxEnv {
-    pub fn spawn(&self, command: SandboxCommand) -> Result<SandboxChild> {
-        self.inner.spawn(command)
+    pub async fn spawn(&self, command: SandboxCommand) -> Result<SandboxChild> {
+        self.inner.spawn(command).await
     }
 }

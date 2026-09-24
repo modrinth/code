@@ -151,6 +151,7 @@ objc2-app-kit = { version = "0.3.2", default-features = false }
 p256 = "0.13.2"
 parking_lot = "0.12.5"
 paste = "1.0.15"
+foldhash = { version = "0.2.0" }
 path-util = { path = "packages/path-util" }
 pathdiff = "0.2.3"
 phf = { version = "0.13.1", features = ["macros"] }
