@@ -677,14 +677,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Atualização disponível"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "O cliente depende do arquivo"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Conteúdo apenas para clientes"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Arquivo do cliente retido"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Avisos"
@@ -2506,15 +2500,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Alterações salvas"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Este mod depende de um mod do lado do cliente e pode causar problemas ao iniciar o seu servidor"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Este é um mod do lado do cliente e pode causar problemas ao iniciar o seu servidor"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Este é um mod do lado do cliente instalado como uma dependência e pode causar problemas ao iniciar o seu servidor"
   },
   "label.collections": {
     "defaultMessage": "Coleções"

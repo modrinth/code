@@ -677,14 +677,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Update beschikbaar"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Client is afhankelijk van bestand"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Inhoud exclusief voor klanten"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Clientbestand bewaard"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Waarschuwingen"
@@ -2497,15 +2491,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Wijzigingen opgeslagen"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Deze mod is afhankelijk van een client-side mod en kan problemen veroorzaken bij het opstarten van je server"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Dit is een client-side mod en kan problemen veroorzaken bij het opstarten van je server"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Dit is een client-side mod die als afhankelijkheid is geïnstalleerd en mogelijk problemen kan veroorzaken bij het opstarten van je server"
   },
   "label.collections": {
     "defaultMessage": "Collecties"

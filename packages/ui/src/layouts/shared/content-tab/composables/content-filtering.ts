@@ -42,6 +42,7 @@ export interface ContentFilterConfig {
 	showWarningsFilter?: boolean
 	showStatusFilters?: boolean
 	showEnvironmentWarnings?: boolean
+	retainSelectedWarnings?: Readonly<Ref<boolean>>
 	isPackLocked?: Ref<boolean>
 	persistKey?: string
 }
@@ -103,9 +104,10 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 
 		if (
 			config?.showWarningsFilter &&
-			items.value.some(
+			(items.value.some(
 				(item) => getContentWarningType(item, config.showEnvironmentWarnings) !== null,
-			)
+			) ||
+				(config.retainSelectedWarnings?.value && selectedFilters.value.includes('warnings')))
 		) {
 			options.push({ id: 'warnings', label: formatMessage(messages.warnings) })
 		}

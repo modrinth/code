@@ -647,14 +647,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Необновлённые"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Клиент зависит от файла"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Контент только для клиента"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Файл для клиента сохранен"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Предупреждения"
@@ -2425,15 +2419,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Изменения сохранены"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Этот мод зависит от клиентского мода и может вызвать проблемы при запуске сервера"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Это клиентский мод — он может вызвать проблемы при запуске сервера"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Это клиентский мод, который был установлен в качестве зависимости — он может вызвать проблемы при запуске сервера"
   },
   "label.collections": {
     "defaultMessage": "Коллекции"

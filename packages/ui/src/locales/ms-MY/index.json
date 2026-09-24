@@ -1724,15 +1724,6 @@
   "label.changes-saved": {
     "defaultMessage": "Perubahan disimpan"
   },
-  "label.client-depends-warning": {
-    "defaultMessage": "Mod ini bergantung pada mod bahagian pelanggan dan mungkin menyebabkan masalah semasa memulakan pelayan anda"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Ini adalah sebuah mod bahagian pelanggan dan mungkin menyebabkan masalah semasa memulakan pelayan anda"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Ini ialah mod bahagian pelanggan yang dipasang sebagai kebergantungan dan mungkin menyebabkan masalah semasa memulakan pelayan anda"
-  },
   "label.collections": {
     "defaultMessage": "Koleksi"
   },

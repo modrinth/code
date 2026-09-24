@@ -677,14 +677,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Update verfügbar"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Client ist von der Datei abhängig"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Nur-Client-Inhalt"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Client-Datei beibehalten"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Warnungen"
@@ -2506,15 +2500,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Änderungen gespeichert"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Diese Mod ist von einem clientseitigen Mod abhängig und kann beim Starten deines Servers zu Problemen führen"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Dieser ist ein clientseitiger Mod und kann beim Starten deines Servers zu Problemen führen"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Dies ist eine clientseitige Mod, welche als Abhängigkeit installiert wurde und beim Starten deines Servers zu Problemen führen kann"
   },
   "label.collections": {
     "defaultMessage": "Kollektionen"

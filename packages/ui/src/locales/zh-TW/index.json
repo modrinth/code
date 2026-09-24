@@ -677,14 +677,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "有可用的更新"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "用戶端相依於檔案"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "用戶端內容"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "用戶端檔案已保留"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "警告"
@@ -2506,15 +2500,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "變更已儲存"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "這個模組相依於用戶端模組，啟動伺服器時可能會導致問題"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "此為用戶端模組，啟動伺服器時可能會導致問題"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "這是一個作為相依項安裝的用戶端模組，啟動伺服器時可能會導致問題"
   },
   "label.collections": {
     "defaultMessage": "收藏"

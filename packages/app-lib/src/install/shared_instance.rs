@@ -238,6 +238,13 @@ pub(super) async fn apply_shared_instance_update(
     })?;
     let plan = SharedInstanceApplyPlan::build(&metadata, data, state).await?;
 
+    if !plan.configuration_changed && data.linked_server.is_some() {
+        crate::api::instance::synced_servers::discard_modpack_servers(
+            instance_id,
+        )
+        .await?;
+    }
+
     if plan.configuration_changed {
         crate::api::instance::prepare_instance_update(instance_id).await?;
         remove_existing_shared_instance_content(instance_id, state).await?;
@@ -636,6 +643,7 @@ pub(super) async fn apply_shared_instance_content(
             location,
             instance_id.to_string(),
             DownloadReason::Modpack,
+            data.linked_server.is_some(),
         ))
         .await?;
     } else {
@@ -679,6 +687,12 @@ pub(super) async fn apply_shared_instance_content(
             Some(InstallProgressReporter::new(job_id, job_state.clone())),
         )
         .await?;
+        if data.linked_server.is_some() {
+            crate::api::instance::synced_servers::discard_modpack_servers(
+                instance_id,
+            )
+            .await?;
+        }
     }
 
     if !data.modrinth_ids.is_empty() || !data.external_files.is_empty() {

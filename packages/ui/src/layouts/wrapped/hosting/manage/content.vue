@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { type Archon, type Labrinth, ModrinthApiError } from '@modrinth/api-client'
-import { ClipboardCopyIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import type { OverflowMenuOption } from '#ui/components/base/buttons'
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import UnknownFileWarningModal from '#ui/components/modal/UnknownFileWarningModal.vue'
 import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
@@ -37,7 +35,11 @@ import ContentUpdaterModal from '../../../shared/content-tab/components/modals/c
 import ContentPageLayout from '../../../shared/content-tab/layout.vue'
 import type { ManagedContentData } from '../../../shared/content-tab/providers/content-manager'
 import { provideContentManager } from '../../../shared/content-tab/providers/content-manager'
-import type { ContentItem, ContentSide, ContentWarningType } from '../../../shared/content-tab/types'
+import type {
+	ContentItem,
+	ContentSide,
+	ContentWarningType,
+} from '../../../shared/content-tab/types'
 import { summarizeManagedContent } from '../../../shared/content-tab/utils/managed-content'
 
 type AddonWithUiState = Archon.Content.v1.Addon & { installing?: boolean }
@@ -115,20 +117,24 @@ const messages = defineMessages({
 		defaultMessage: 'Failed to install content',
 	},
 	unknownEnvironment: {
-		id: 'hosting.content.enabled-for.unknown-environment',
-		defaultMessage: "We couldn't tell where this content should be enabled.",
+		id: 'hosting.content.enabled-for.compatibility-unknown-warning',
+		defaultMessage:
+			"We couldn't determine whether this content works on the server, for players, or both.",
 	},
 	clientOnlyEnabledForServer: {
-		id: 'hosting.content.enabled-for.client-only-enabled-for-server',
-		defaultMessage: 'Enabled for the server, but this content is client-only.',
+		id: 'hosting.content.enabled-for.client-only-on-server-warning',
+		defaultMessage:
+			'This client-only content is enabled on the server and may prevent the server from starting.',
 	},
 	singleplayerOnlyEnabledForServer: {
-		id: 'hosting.content.enabled-for.singleplayer-only-enabled-for-server',
-		defaultMessage: 'Enabled for the server, but this content is singleplayer-only.',
+		id: 'hosting.content.enabled-for.singleplayer-only-on-server-warning',
+		defaultMessage:
+			'This singleplayer-only content is enabled on the server and may prevent the server from starting.',
 	},
 	serverOnlyEnabledForPlayers: {
-		id: 'hosting.content.enabled-for.server-only-enabled-for-players',
-		defaultMessage: 'Enabled for players, but this content is server-only.',
+		id: 'hosting.content.enabled-for.server-only-for-players-warning',
+		defaultMessage:
+			'This server-only content is included for players and may cause issues when they launch the game.',
 	},
 })
 
@@ -1392,26 +1398,6 @@ function handleModpackUpdateCancel() {
 	pendingModpackUpdateVersion.value = null
 }
 
-function getOverflowOptions(item: ContentItem): OverflowMenuOption[] {
-	const options: OverflowMenuOption[] = []
-	const addon = getAddonForItem(item)
-
-	if (addon?.project_id && item.project?.slug) {
-		options.push({
-			id: 'copy-link',
-			label: formatMessage(commonMessages.copyLinkButton),
-			icon: ClipboardCopyIcon,
-			action: async () => {
-				await navigator.clipboard.writeText(
-					`https://modrinth.com/${item.project_type}/${item.project?.slug}`,
-				)
-			},
-		})
-	}
-
-	return options
-}
-
 provideContentManager({
 	items: contentItems,
 	loading: computed(() => contentQuery.isLoading.value),
@@ -1443,7 +1429,6 @@ provideContentManager({
 	unlinkModpack: handleModpackUnlink,
 	openManagedContentSettings: () => openServerSettings({ tabId: 'installation' }),
 	switchVersion: handleSwitchVersion,
-	getOverflowOptions,
 	getItemId: getContentItemId,
 	mapToTableItem: (item) => {
 		const projectType = item.project_type ?? type.value

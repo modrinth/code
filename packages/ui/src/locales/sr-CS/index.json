@@ -677,14 +677,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Dostupno jе ažuriranjе"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Client zavisi od datoteke"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Samo-client sadržaj"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Client dadoteka zadržana"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Upozorenja"
@@ -2512,15 +2506,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Promene sačuvane"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Ovaj mod zavisi od moda na strani klijenta i može izazvati probleme prilikom pokretanja tvog servera"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Ovo je mod za klijent i može izazvati probleme prilikom pokretanja tvog servera"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Ovo je mod na strani klijenta koji je instaliran kao zavisnost i može izazvati probleme prilikom pokretanja tvog servera"
   },
   "label.collections": {
     "defaultMessage": "Kolekcije"

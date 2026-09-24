@@ -674,14 +674,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Доступне оновлення"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Клієнт залежить від файлу"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Вміст лише для клієнта"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Файл клієнта збережено"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Попередження"
@@ -2458,15 +2452,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Зміни збережено"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Цей мод залежить від клієнтського мода, що може спричинити проблеми під час запуску сервера"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Це клієнтський мод, який може викликати проблеми під час запуску сервера"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Це клієнтський мод, який був встановлений як залежність і може спричинити проблеми під час запуску сервера"
   },
   "label.collections": {
     "defaultMessage": "Добірки"

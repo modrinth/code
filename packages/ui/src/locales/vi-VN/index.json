@@ -1757,15 +1757,6 @@
   "label.changes-saved": {
     "defaultMessage": "Đã lưu thay đổi"
   },
-  "label.client-depends-warning": {
-    "defaultMessage": "Mod này phụ thuộc vào bản mod cho phía người chơi và có thể gây ra vấn đề khi khơi chạy máy chủ"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Đây là mod dành cho phía người chơi và có thể gây ra vấn đề khi đang chạy máy chủ"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Đây là mod phía máy khách, được cài đặt làm phần phụ thuộc, và có thể gây ra vấn đề khi khởi động máy chủ của bạn"
-  },
   "label.collections": {
     "defaultMessage": "Bộ sưu tập"
   },

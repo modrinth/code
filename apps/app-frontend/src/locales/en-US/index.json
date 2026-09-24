@@ -758,6 +758,9 @@
   "app.instance.share.empty.invite-friends-button": {
     "message": "Invite friends"
   },
+  "app.instance.share.invite-friends": {
+    "message": "Invite friends"
+  },
   "app.instance.share.invite-modal.heading": {
     "message": "Share {name}"
   },

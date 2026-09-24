@@ -674,14 +674,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Güncelleme mevcut"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "İstemci dosyaya bağımlı"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Sadece istemciye özel içerik"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "İstemci dosyası korundu"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Uyarılar"
@@ -2503,15 +2497,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Değişiklikler kaydedildi"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Bu mod, istemci tarafı (client-side) bir moda bağımlıdır ve sunucunuzu başlatırken sorunlara neden olabilir"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Bu işlemci-tarafı bir mod ve sunucunuzu başlatırken sorunlara yol açabilir"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Bu, bağımlılık olarak yüklenmiş bir istemci tarafı (client-side) modudur ve sunucunuzu başlatırken sorunlara neden olabilir"
   },
   "label.collections": {
     "defaultMessage": "Koleksiyonlar"

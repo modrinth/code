@@ -465,7 +465,7 @@ export async function refreshServers(
 	}
 
 	await Promise.all(
-		Object.keys(serverData).map((address) =>
+		[...new Set(servers.map((server) => server.address))].map((address) =>
 			refreshServerData(serverData[address], protocolVersion, address),
 		),
 	)

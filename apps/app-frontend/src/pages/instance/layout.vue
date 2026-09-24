@@ -134,7 +134,7 @@ import SharedInstanceInstallModal from '@/components/ui/shared-instances/shared-
 import SharedInstanceUpdateModal from '@/components/ui/shared-instances/SharedInstanceUpdateModal.vue'
 import { useHostingInstance } from '@/composables/instances/use-hosting-instance'
 import { useInstanceLaunchState } from '@/composables/instances/use-instance-launch-state'
-import { getServerStatusQueryKey } from '@/composables/instances/use-server-status-query'
+import { serverStatusQueryOptions } from '@/composables/instances/use-server-status-query'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { handleSevereError } from '@/composables/use-error.js'
@@ -161,7 +161,7 @@ import {
 import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
 import { createInstanceShortcut, showInstanceInFolder } from '@/helpers/utils.js'
-import { get_server_status, start_join_server } from '@/helpers/worlds'
+import { start_join_server } from '@/helpers/worlds'
 import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 import { provideInstanceBackup } from '@/providers/instance-backup'
 import { injectServerInstall } from '@/providers/server-install'
@@ -446,26 +446,47 @@ const serverAddress = computed(() =>
 		? hosting.address.value
 		: linkedProjectV3.value?.minecraft_java_server?.address,
 )
-const serverStatusQuery = useQuery({
-	queryKey: computed(() => getServerStatusQueryKey(serverAddress.value ?? '')),
-	queryFn: () => get_server_status(serverAddress.value!),
-	enabled: computed(() => isServerInstance.value && !!serverAddress.value && !offline.value),
-	staleTime: 30_000,
-	refetchInterval: 30_000,
-	retry: false,
+const serverStatusQuery = useQuery(
+	computed(() => ({
+		...serverStatusQueryOptions(serverAddress.value ?? ''),
+		enabled: isServerInstance.value && !!serverAddress.value && !offline.value,
+		refetchInterval: 30_000,
+	})),
+)
+const serverStatus = computed(() =>
+	serverStatusQuery.isError.value ||
+	(hosting.isHostingInstance.value && hosting.onlineStatus.value === 'stopped')
+		? undefined
+		: serverStatusQuery.data.value,
+)
+const serverStatusLoading = computed(
+	() =>
+		isServerInstance.value &&
+		!offline.value &&
+		hosting.onlineStatus.value !== 'stopped' &&
+		serverStatusQuery.isPending.value,
+)
+async function refreshServerStatus() {
+	if (!serverAddress.value || offline.value) return
+	await serverStatusQuery.refetch({ throwOnError: false })
+}
+watch(hosting.onlineStatus, (status, previous) => {
+	if (
+		hosting.isHostingInstance.value &&
+		status === 'running' &&
+		previous !== 'running' &&
+		!serverStatusQuery.isFetching.value
+	) {
+		void refreshServerStatus()
+	}
 })
 const statusOnline = computed(() =>
 	hosting.isHostingInstance.value
 		? hosting.onlineStatus.value === 'running'
-		: !serverStatusQuery.isError.value &&
-			(!!serverStatusQuery.data.value || !!javaServerPingData.value),
+		: !!serverStatus.value || !!javaServerPingData.value,
 )
-const playersOnline = computed(() =>
-	serverStatusQuery.isError.value ? undefined : serverStatusQuery.data.value?.players?.online,
-)
-const ping = computed(() =>
-	serverStatusQuery.isError.value ? undefined : serverStatusQuery.data.value?.ping,
-)
+const playersOnline = computed(() => serverStatus.value?.players?.online)
+const ping = computed(() => serverStatus.value?.ping)
 const loadingServerPing = computed(() => serverStatusQuery.isFetched.value || offline.value)
 
 async function refreshInstance() {
@@ -920,6 +941,9 @@ provideInstancePage({
 	instance: instance as ComputedRef<GameInstance>,
 	linkedProject: linkedProjectV3,
 	isServerInstance,
+	serverAddress,
+	serverStatus,
+	serverStatusLoading,
 	sharedInstanceUpdateAvailable,
 	offline,
 	playing,
@@ -927,6 +951,7 @@ provideInstancePage({
 	stopping,
 	refreshInstance,
 	refreshPlayState,
+	refreshServerStatus,
 	play: startInstance,
 	stop: stopInstance,
 	playServer: handlePlayServer,

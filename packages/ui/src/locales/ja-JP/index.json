@@ -665,14 +665,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "更新が利用可能"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "クライアントはファイルに依存します"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "クライアント専用コンテンツ"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "クライアントファイルが保存されました"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "警告"
@@ -2482,15 +2476,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "変更が保存されました"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "このMODはクライアント側のMODに依存しているため、サーバーの起動時に問題が発生する可能性があります。"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "これはクライアント側のMODであり、サーバーの起動時に問題を引き起こす可能性があります。"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "これは依存関係としてインストールされたクライアント側のMODであり、サーバーの起動時に問題を引き起こす可能性があります。"
   },
   "label.collections": {
     "defaultMessage": "コレクション"

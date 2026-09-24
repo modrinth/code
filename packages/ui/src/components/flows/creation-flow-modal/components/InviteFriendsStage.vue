@@ -13,22 +13,25 @@
 				{{ formatMessage(messages.description) }}
 			</p>
 		</div>
-		<Button
-			native-type="button"
-			size="lg"
-			class="-mx-2 self-stretch !justify-between text-left"
-			:disabled="!ctx.inviteLink.value"
-			@click="copyInviteLink"
-		>
-			<span class="min-w-0 truncate text-base font-semibold text-primary">
-				{{
-					ctx.inviteLink.value ??
-					formatMessage(ctx.inviteLoading.value ? messages.preparing : messages.unavailable)
-				}}
-			</span>
-			<SpinnerIcon v-if="ctx.inviteLoading.value" class="size-5 shrink-0 animate-spin" />
-			<ClipboardCopyIcon v-else class="size-5 shrink-0 text-secondary" aria-hidden="true" />
-		</Button>
+		<div class="flex flex-col gap-2">
+			<Button
+				native-type="button"
+				size="lg"
+				class="-mx-2 self-stretch !justify-between text-left"
+				:disabled="!ctx.inviteLink.value"
+				@click="copyInviteLink"
+			>
+				<span class="min-w-0 truncate text-base font-semibold text-primary">
+					{{
+						ctx.inviteLink.value ??
+						formatMessage(ctx.inviteLoading.value ? messages.preparing : messages.unavailable)
+					}}
+				</span>
+				<SpinnerIcon v-if="ctx.inviteLoading.value" class="size-5 shrink-0 animate-spin" />
+				<ClipboardCopyIcon v-else class="size-5 shrink-0 text-secondary" aria-hidden="true" />
+			</Button>
+			<p class="m-0 text-sm text-secondary">{{ formatMessage(messages.inviteLater) }}</p>
+		</div>
 		<div v-if="ctx.inviteError.value" class="flex flex-wrap items-center gap-2 text-sm text-red">
 			<span>{{ ctx.inviteError.value }}</span>
 			<Button size="sm" @click="ctx.retryInvite()">{{ formatMessage(messages.retry) }}</Button>
@@ -57,6 +60,10 @@ const messages = defineMessages({
 		id: 'servers.setup.onboarding.invite.description',
 		defaultMessage:
 			'Share this link and they’ll get an instance you manage from your server, with everything they need to play!',
+	},
+	inviteLater: {
+		id: 'servers.setup.onboarding.invite.invite-later',
+		defaultMessage: 'Invite more players anytime from your server’s Play page.',
 	},
 	preparing: {
 		id: 'servers.setup.onboarding.invite.preparing',

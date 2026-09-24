@@ -677,14 +677,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "有可用更新"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "客户端依赖文件"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "仅客户端的内容"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "客户端文件已保存"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "警告"
@@ -2506,15 +2500,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "更改已保存"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "该模组依赖客户端模组，启动服务器时可能出现问题"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "这是一个客户端模组，启动服务器时可能会导致问题"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "该模组是作为依赖安装的客户端模组，启动服务器时可能出现问题"
   },
   "label.collections": {
     "defaultMessage": "收藏"

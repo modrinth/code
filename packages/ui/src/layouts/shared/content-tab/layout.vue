@@ -27,7 +27,11 @@ import FilterPills from '#ui/components/base/FilterPills.vue'
 import Input from '#ui/components/base/inputs/Input.vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
+import {
+	commonMessages,
+	formatContentTypeSentence,
+	normalizeProjectType,
+} from '#ui/utils/common-messages'
 
 import ContentCardTable from './components/ContentCardTable.vue'
 import ContentSelectionBar from './components/ContentSelectionBar.vue'
@@ -38,7 +42,9 @@ import ConfirmDisableModal from './components/modals/ConfirmDisableModal.vue'
 import ConfirmUnlinkModal from './components/modals/ConfirmUnlinkModal.vue'
 import ContentDependencyWarningModal from './components/modals/ContentDependencyWarningModal.vue'
 import {
+	type ContentMetadataFilterValue,
 	getClientWarningType,
+	getContentWarningType,
 	useBulkOperation,
 	useChangingItems,
 	useContentFilters,
@@ -267,14 +273,16 @@ const { searchQuery, search } = useContentSearch(sortedItems, [
 	'file_name',
 ])
 
+const retainedRowIds = ref(new Set<string>())
 const { selectedFilters, filterOptions, toggleFilter, applyFilters } = useContentFilters(
 	ctx.items,
 	{
 		showTypeFilters: true,
 		showUpdateFilter: false,
-		showWarningsFilter: false,
+		showWarningsFilter: true,
 		showStatusFilters: false,
 		showEnvironmentWarnings: ctx.showEnvironmentWarnings,
+		retainSelectedWarnings: computed(() => retainedRowIds.value.size > 0),
 		isPackLocked: ctx.isPackLocked,
 		persistKey: ctx.filterPersistKey,
 	},
@@ -286,6 +294,46 @@ const { selectedMetadataFilters, metadataFilterCategories, applyMetadataFilters 
 		showEnabledFor: !!ctx.setEnabledFor,
 		showEnvironmentWarnings: ctx.showEnvironmentWarnings,
 	})
+
+const visibleFilterOptions = computed(() => {
+	const metadataMatches = applyMetadataFilters(ctx.items.value)
+	const warningMatches = metadataMatches.filter(
+		(item) => getContentWarningType(item, ctx.showEnvironmentWarnings) !== null,
+	)
+	const availableTypes = new Set(
+		(selectedFilters.value.includes('warnings') ? warningMatches : metadataMatches).map((item) =>
+			normalizeProjectType(item.project_type),
+		),
+	)
+	for (const item of ctx.items.value) {
+		if (retainedRowIds.value.has(getItemId(item))) {
+			availableTypes.add(normalizeProjectType(item.project_type))
+		}
+	}
+	return filterOptions.value.filter((option) =>
+		option.id === 'warnings'
+			? warningMatches.length > 0 ||
+				(selectedFilters.value.includes('warnings') && retainedRowIds.value.size > 0)
+			: availableTypes.has(option.id),
+	)
+})
+
+watch(
+	visibleFilterOptions,
+	(options) => {
+		const availableTypes = new Set(options.map((option) => option.id))
+		const validFilters = selectedFilters.value.filter((filter) => availableTypes.has(filter))
+		if (validFilters.length !== selectedFilters.value.length) selectedFilters.value = validFilters
+	},
+	{ immediate: true },
+)
+
+watch(searchQuery, () => retainedRowIds.value.clear())
+
+function updateMetadataFilters(filters: ContentMetadataFilterValue) {
+	retainedRowIds.value.clear()
+	selectedMetadataFilters.value = filters
+}
 
 watch(
 	() => props.highlightedItemId,
@@ -343,6 +391,7 @@ onBeforeUnmount(() => {
 })
 
 function updateFilterChips(nextFilters: string[]) {
+	retainedRowIds.value.clear()
 	if (nextFilters.length === 0) {
 		selectedFilters.value = []
 		return
@@ -377,6 +426,7 @@ const bulkItemCount = ref(0)
 const refreshing = ref(false)
 async function handleRefresh() {
 	if (refreshing.value) return
+	retainedRowIds.value.clear()
 	refreshing.value = true
 	try {
 		await ctx.refresh()
@@ -388,7 +438,13 @@ async function handleRefresh() {
 const filteredItems = computed(() => {
 	const sorted = sortedItems.value
 	const searched = search(sorted)
-	return applyMetadataFilters(applyFilters(searched))
+	const matching = applyMetadataFilters(applyFilters(searched))
+	if (retainedRowIds.value.size === 0) return matching
+	const matchingIds = new Set(matching.map(getItemId))
+	return searched.filter((item) => {
+		const id = getItemId(item)
+		return matchingIds.has(id) || retainedRowIds.value.has(id)
+	})
 })
 const tableItems = computed<ContentCardTableItem[]>(() => {
 	const items = filteredItems.value.map((item) => {
@@ -403,6 +459,7 @@ const tableItems = computed<ContentCardTableItem[]>(() => {
 		return {
 			...base,
 			id,
+			projectType: item.project_type,
 			locked,
 			disabled: mutationPending || ctx.isBusy.value || item.installing === true,
 			disabledTooltip: ctx.isBusy.value
@@ -723,6 +780,7 @@ async function confirmDisable() {
 		const id = getItemId(item)
 		markChanging(id)
 		try {
+			retainedRowIds.value.add(id)
 			if (ctx.bulkDisableItems) {
 				await ctx.bulkDisableItems(itemsToDisable)
 			} else {
@@ -751,6 +809,7 @@ async function handleToggleEnabledById(id: string, _value: boolean) {
 	if (ctx.confirmAction && !(await ctx.confirmAction('enable', [item]))) return
 	markChanging(id)
 	try {
+		retainedRowIds.value.add(id)
 		await ctx.toggleEnabled(item)
 	} finally {
 		unmarkChanging(id)
@@ -809,6 +868,7 @@ async function handleSetEnabledForById(id: string, side: 'server' | 'player', en
 	const item = ctx.items.value.find((candidate) => getItemId(candidate) === id)
 	if (!item) return
 
+	retainedRowIds.value.add(id)
 	await ctx.setEnabledFor(item, side, enabled)
 }
 
@@ -1023,7 +1083,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 									<div class="h-6 w-px shrink-0 bg-surface-5" />
 									<FilterPills
 										:model-value="selectedFilters"
-										:options="filterOptions"
+										:options="visibleFilterOptions"
 										@update:model-value="updateFilterChips"
 									>
 										<template #all>
@@ -1041,7 +1101,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 										:class="{ invisible: metadataFiltersWrapped }"
 									/>
 									<DropdownFilterBar
-										v-model="selectedMetadataFilters"
+										:model-value="selectedMetadataFilters"
 										:categories="metadataFilterCategories"
 										:show-label="false"
 										:add-label="formatMessage(messages.filter)"
@@ -1050,6 +1110,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 										add-button-size="sm"
 										checkbox-position="right"
 										apply-immediately
+										@update:model-value="updateMetadataFilters"
 									>
 										<template #preview-content="{ label, summary }">
 											<span class="min-w-0 flex-1 truncate">

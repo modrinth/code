@@ -22,6 +22,8 @@ interface MetadataFilterDefinition {
 	label: string
 	searchable?: boolean
 	direct?: boolean
+	submenuClass?: string
+	previewDropdownWidth?: string
 	options?: DropdownFilterBarOption[]
 	values: (item: ContentItem) => DropdownFilterBarOption[]
 }
@@ -77,12 +79,12 @@ const messages = defineMessages({
 		defaultMessage: 'Enabled for',
 	},
 	serverOnly: {
-		id: 'content.enabled-for.server-only',
-		defaultMessage: 'Server only',
+		id: 'content.enabled-for.server-only-filter',
+		defaultMessage: 'Server-only',
 	},
 	playerOnly: {
-		id: 'content.enabled-for.player-only',
-		defaultMessage: 'Player only',
+		id: 'content.enabled-for.player-only-filter',
+		defaultMessage: 'Player-only',
 	},
 	serverAndPlayer: {
 		id: 'content.enabled-for.server-and-player',
@@ -125,24 +127,24 @@ const messages = defineMessages({
 		defaultMessage: 'Update available',
 	},
 	clientRetained: {
-		id: 'content.metadata-filter.warning.client-retained',
-		defaultMessage: 'Client file retained',
+		id: 'content.metadata-filter.warning.client-only-dependency-on-server',
+		defaultMessage: 'Client-only mod on server',
 	},
 	clientDepends: {
-		id: 'content.metadata-filter.warning.client-depends',
-		defaultMessage: 'Client depends on file',
+		id: 'content.metadata-filter.warning.requires-client-only-dependency',
+		defaultMessage: 'Needs client-only mod',
 	},
-		clientOnly: {
-			id: 'content.metadata-filter.warning.client-only',
-			defaultMessage: 'Client-only content',
-		},
-		serverOnly: {
-			id: 'content.metadata-filter.warning.server-only',
-			defaultMessage: 'Server-only content',
-		},
+	clientOnly: {
+		id: 'content.metadata-filter.warning.client-only',
+		defaultMessage: 'Client-only content',
+	},
+	serverOnlyWarning: {
+		id: 'content.metadata-filter.warning.server-only',
+		defaultMessage: 'Server-only content',
+	},
 	unknownEnvironment: {
-		id: 'content.metadata-filter.warning.unknown-environment',
-		defaultMessage: 'Unknown environment',
+		id: 'content.metadata-filter.warning.compatibility-unknown',
+		defaultMessage: 'Compatibility unknown',
 	},
 	external: {
 		id: 'content.metadata-filter.source.external',
@@ -253,6 +255,8 @@ export function useContentMetadataFilters(
 		{
 			key: 'warnings',
 			label: formatMessage(messages.warnings),
+			submenuClass: 'w-[24rem]',
+			previewDropdownWidth: 'min(24rem, calc(100vw - 1rem))',
 			values: (item) => {
 				const warning = getContentWarningType(item, config?.showEnvironmentWarnings)
 				switch (warning) {
@@ -263,7 +267,7 @@ export function useContentMetadataFilters(
 					case 'environment':
 						return [option(warning, formatMessage(messages.clientOnly))]
 					case 'server-only':
-						return [option(warning, formatMessage(messages.serverOnly))]
+						return [option(warning, formatMessage(messages.serverOnlyWarning))]
 					case 'unknown-environment':
 						return [option(warning, formatMessage(messages.unknownEnvironment))]
 					default:
@@ -334,6 +338,8 @@ export function useContentMetadataFilters(
 					label: definition.label,
 					direct: definition.direct,
 					searchable: definition.searchable,
+					submenuClass: definition.submenuClass,
+					previewDropdownWidth: definition.previewDropdownWidth,
 					options: visibleOptions,
 				}
 			})

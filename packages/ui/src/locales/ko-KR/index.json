@@ -2405,15 +2405,6 @@
   "label.changes-saved": {
     "defaultMessage": "변경 내용이 저장됨"
   },
-  "label.client-depends-warning": {
-    "defaultMessage": "이 모드는 클라이언트 측 모드에 의존하므로 서버를 시작할 때 문제가 발생할 수 있습니다"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "이 모드는 클라이언트 측 모드이므로 서버를 시작할 때 문제가 발생할 수 있습니다"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "이것은 종속성으로 설치된 클라이언트 측 모드이므로 서버를 시작할 때 문제가 발생할 수 있습니다"
-  },
   "label.collections": {
     "defaultMessage": "컬렉션"
   },

@@ -510,9 +510,13 @@ async function disableAddonsEverywhere(addons: Archon.Content.v1.Addon[]) {
 			enabled: false,
 		}
 		if (!addon.disabled_server)
-			requests.push(() => client.archon.content_v1.setAddonEnabledServer(serverId, targetWorldId, request))
+			requests.push(() =>
+				client.archon.content_v1.setAddonEnabledServer(serverId, targetWorldId, request),
+			)
 		if (!addon.disabled_player)
-			requests.push(() => client.archon.content_v1.setAddonEnabledPlayer(serverId, targetWorldId, request))
+			requests.push(() =>
+				client.archon.content_v1.setAddonEnabledPlayer(serverId, targetWorldId, request),
+			)
 	}
 	for (let index = 0; index < requests.length; index += 8) {
 		await Promise.all(requests.slice(index, index + 8).map((request) => request()))

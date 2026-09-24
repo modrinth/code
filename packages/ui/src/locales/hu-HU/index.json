@@ -671,14 +671,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Frissítés elérhető"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Kliens fájlfüggő"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Kliensoldali tartalom"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Kliensfájl megtartva"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Figyelmeztetések"
@@ -2488,15 +2482,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Módosítások elmentve"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Ez a mod egy kliensoldali modtól függ, és problémákat okozhat a szerver indításakor"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Ez egy kliensoldali módosítás, amely problémákat okozhat a szerver indításakor"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Ez egy kliensoldali mod, amelyet függőségként telepítettek, és problémákat okozhat a szerver indításakor"
   },
   "label.collections": {
     "defaultMessage": "Gyűjtemények"

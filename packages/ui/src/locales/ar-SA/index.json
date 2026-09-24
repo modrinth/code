@@ -614,14 +614,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "التحديث المتاح"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "العميل يعتمد على الملف"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "محتوى خاص بالعميل"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "تم الاحتفاظ بملف العميل"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "تحذيرات"

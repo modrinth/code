@@ -626,8 +626,8 @@
   "content.enabled-for.player": {
     "defaultMessage": "Player"
   },
-  "content.enabled-for.player-only": {
-    "defaultMessage": "Player only"
+  "content.enabled-for.player-only-filter": {
+    "defaultMessage": "Player-only"
   },
   "content.enabled-for.player-tooltip": {
     "defaultMessage": "Include this content in the shared instance or .mrpack that players download."
@@ -644,8 +644,8 @@
   "content.enabled-for.server-and-player": {
     "defaultMessage": "Server and player"
   },
-  "content.enabled-for.server-only": {
-    "defaultMessage": "Server only"
+  "content.enabled-for.server-only-filter": {
+    "defaultMessage": "Server-only"
   },
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "Install this content on your server."
@@ -758,17 +758,20 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Update available"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Client depends on file"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Client-only content"
   },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Client file retained"
+  "content.metadata-filter.warning.client-only-dependency-on-server": {
+    "defaultMessage": "Client-only mod on server"
   },
-  "content.metadata-filter.warning.unknown-environment": {
-    "defaultMessage": "Unknown environment"
+  "content.metadata-filter.warning.compatibility-unknown": {
+    "defaultMessage": "Compatibility unknown"
+  },
+  "content.metadata-filter.warning.requires-client-only-dependency": {
+    "defaultMessage": "Needs client-only mod"
+  },
+  "content.metadata-filter.warning.server-only": {
+    "defaultMessage": "Server-only content"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Warnings"
@@ -2036,23 +2039,23 @@
   "header.category.resolutions": {
     "defaultMessage": "Resolution"
   },
-  "hosting.content.enabled-for.client-only-enabled-for-server": {
-    "defaultMessage": "Enabled for the server, but this content is client-only."
+  "hosting.content.enabled-for.client-only-on-server-warning": {
+    "defaultMessage": "This client-only content is enabled on the server and may prevent the server from starting."
+  },
+  "hosting.content.enabled-for.compatibility-unknown-warning": {
+    "defaultMessage": "We couldn't determine whether this content works on the server, for players, or both."
   },
   "hosting.content.enabled-for.resource-pack-lock": {
     "defaultMessage": "Resource packs can only be enabled for players."
   },
-  "hosting.content.enabled-for.server-only-enabled-for-players": {
-    "defaultMessage": "Enabled for players, but this content is server-only."
+  "hosting.content.enabled-for.server-only-for-players-warning": {
+    "defaultMessage": "This server-only content is included for players and may cause issues when they launch the game."
   },
   "hosting.content.enabled-for.shader-lock": {
     "defaultMessage": "Shaders can only be enabled for players."
   },
-  "hosting.content.enabled-for.singleplayer-only-enabled-for-server": {
-    "defaultMessage": "Enabled for the server, but this content is singleplayer-only."
-  },
-  "hosting.content.enabled-for.unknown-environment": {
-    "defaultMessage": "We couldn't tell where this content should be enabled."
+  "hosting.content.enabled-for.singleplayer-only-on-server-warning": {
+    "defaultMessage": "This singleplayer-only content is enabled on the server and may prevent the server from starting."
   },
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Failed to delete content"
@@ -2891,14 +2894,11 @@
   "label.changes-saved": {
     "defaultMessage": "Changes saved"
   },
-  "label.client-depends-warning": {
-    "defaultMessage": "This mod depends on a client-side mod and may cause issues when starting your server"
+  "label.client-only-dependency-on-server-warning": {
+    "defaultMessage": "This client-only mod was installed on the server as a dependency and may prevent the server from starting."
   },
-  "label.client-only-warning": {
-    "defaultMessage": "This is a client-side mod and may cause issues when starting your server"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "This client-side mod was also installed on the server because another mod depends on it"
+  "label.client-only-mod-on-server-warning": {
+    "defaultMessage": "This client-only mod is installed on the server and may prevent the server from starting."
   },
   "label.collections": {
     "defaultMessage": "Collections"
@@ -3058,6 +3058,9 @@
   },
   "label.rename-failed": {
     "defaultMessage": "Rename failed"
+  },
+  "label.requires-client-only-dependency-warning": {
+    "defaultMessage": "This mod requires a client-only dependency and may prevent the server from starting."
   },
   "label.rewards-program-terms-agreement": {
     "defaultMessage": "I agree to the <terms-link>Rewards Program Terms</terms-link>"
@@ -6008,8 +6011,53 @@
   "servers.play.players-error": {
     "defaultMessage": "Could not load invited players"
   },
+  "servers.play.players.actions": {
+    "defaultMessage": "Actions"
+  },
+  "servers.play.players.all": {
+    "defaultMessage": "All"
+  },
+  "servers.play.players.avatar-alt": {
+    "defaultMessage": "{username}'s avatar"
+  },
+  "servers.play.players.joined": {
+    "defaultMessage": "Joined"
+  },
+  "servers.play.players.last-played": {
+    "defaultMessage": "Last played"
+  },
+  "servers.play.players.loading": {
+    "defaultMessage": "Loading users..."
+  },
+  "servers.play.players.method": {
+    "defaultMessage": "Method"
+  },
+  "servers.play.players.method.direct": {
+    "defaultMessage": "Direct invite"
+  },
+  "servers.play.players.method.link": {
+    "defaultMessage": "Share link"
+  },
+  "servers.play.players.never": {
+    "defaultMessage": "Never"
+  },
+  "servers.play.players.pending": {
+    "defaultMessage": "Pending"
+  },
+  "servers.play.players.revoke-access": {
+    "defaultMessage": "Revoke access"
+  },
+  "servers.play.players.revoke-access-for": {
+    "defaultMessage": "Revoke access for {username}"
+  },
+  "servers.play.players.search-users": {
+    "defaultMessage": "Search {count} users..."
+  },
   "servers.play.players.title": {
     "defaultMessage": "Invited players"
+  },
+  "servers.play.players.username": {
+    "defaultMessage": "Username"
   },
   "servers.play.preview-error": {
     "defaultMessage": "Could not refresh the changes. Retry before publishing."
@@ -6232,6 +6280,9 @@
   },
   "servers.setup.onboarding.invite.done": {
     "defaultMessage": "Done"
+  },
+  "servers.setup.onboarding.invite.invite-later": {
+    "defaultMessage": "Invite more players anytime from your server’s Play page."
   },
   "servers.setup.onboarding.invite.preparing": {
     "defaultMessage": "Preparing your invite link..."

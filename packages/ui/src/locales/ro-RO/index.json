@@ -1115,15 +1115,6 @@
   "label.changes-saved": {
     "defaultMessage": "Schimbările au fost salvate"
   },
-  "label.client-depends-warning": {
-    "defaultMessage": "Acest mod depinde de un mod client-side și poate cauza probleme în timp ce îți pornești serverul"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Acest mod este client-side și poate cauza probleme în timp ce îți pornești serverul"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Acest mod este client-side care a fost instalat ca o dependență și poate cauza probleme în timp ce îți pornești serverul"
-  },
   "label.collections": {
     "defaultMessage": "Colecții"
   },
