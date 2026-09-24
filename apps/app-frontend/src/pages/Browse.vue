@@ -42,6 +42,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAppServerBrowse } from '@/composables/browse/use-app-server-browse'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { useCachedServerIcon } from '@/composables/use-cached-server-icon'
 import { get_project, get_search_results_v3, get_version_many } from '@/helpers/cache.js'
 import {
 	get_installed_project_ids as getInstalledProjectIds,
@@ -197,7 +198,7 @@ const instanceBreadcrumbDefinition = {
 const serversBreadcrumbDefinition = {
 	slot: 'root',
 	id: 'servers',
-	label: () => formatMessage(commonMessages.serversLabel),
+	label: 'Hosting',
 	to: '/hosting/manage/',
 	visual: { type: 'icon', component: ServerStackIcon },
 } satisfies BreadcrumbDefinition
@@ -207,11 +208,19 @@ watch(serverBackUrl, (value) => {
 		serverBreadcrumbTo.value = value
 	}
 })
+const serverIcon = useCachedServerIcon(
+	() => String(displayedBrowseRoute.value.query.sid ?? ''),
+	() => serverContextServerData.value?.upstream?.project_id,
+)
 const serverBreadcrumbDefinition = {
 	slot: 'server',
 	id: () => `server:${String(displayedBrowseRoute.value.query.sid ?? '')}`,
 	label: () => serverContextServerData.value?.name ?? formatMessage(commonMessages.loadingLabel),
-	visual: { type: 'icon', component: ServerStackIcon },
+	visual: () => ({
+		type: 'image' as const,
+		src: serverIcon.value,
+		alt: serverContextServerData.value?.name,
+	}),
 	to: serverBreadcrumbTo,
 } satisfies BreadcrumbDefinition
 const breadcrumbDefinition = {
@@ -1399,7 +1408,7 @@ provideBrowseManager({
 			</template>
 		</BrowsePageLayout>
 		<CreationFlowModal
-			v-if="isServerContext"
+			v-if="isServerContext && serverFlowFrom !== 'onboarding'"
 			ref="serverSetupModalRef"
 			:type="serverFlowFrom === 'reset-server' ? 'reset-server' : 'server-onboarding'"
 			:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"

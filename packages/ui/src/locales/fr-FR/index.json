@@ -5687,18 +5687,6 @@
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "Identifiants SFTP renouvelés"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Une erreur inattendue s'est produite lors de l'installation. Veuillez réessayer plus tard."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "L'installation a échoué"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Une erreur inattendue s'est produite lors du téléchargement. Veuillez réessayer plus tard."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Impossible de publier le modpack"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Mettre mon serveur en place"
   },

@@ -17,7 +17,7 @@ import {
 	getTargetInstallPreferences,
 	injectModrinthClient,
 	injectNotificationManager,
-	injectServerOnboardingInviteFlow,
+	injectServerOnboardingFlow,
 	readStoredServerInstallQueue,
 	requestInstall,
 	resolveServerAddonInstallPlans,
@@ -95,7 +95,7 @@ export function useServerInstallContent({
 }: UseServerInstallContentOptions) {
 	const { formatMessage } = useVIntl()
 	const client = injectModrinthClient()
-	const inviteFlow = injectServerOnboardingInviteFlow()
+	const onboardingFlow = injectServerOnboardingFlow()
 	const queryClient = useQueryClient()
 	const siteUrl = useRuntimeConfig().public.siteUrl as string
 	const route = useRoute()
@@ -524,6 +524,24 @@ export function useServerInstallContent({
 				getProjectVersions: getInstallProjectVersions,
 				queue: serverInstallQueue,
 				install: async (plan) => {
+					if (fromContext.value === 'onboarding') {
+						await onboardingFlow.open({
+							serverId: currentServerId.value!,
+							worldId: currentWorldId.value!,
+							siteUrl,
+							project: {
+								projectId: plan.projectId,
+								versionId: plan.versionId,
+								contentType: plan.contentType,
+								name: getInstallProjectName(plan.project),
+								iconUrl: plan.project.icon_url ?? undefined,
+							},
+							backToBrowse: true,
+							onHide: () => setProjectInstalling(plan.projectId, false),
+						})
+						return
+					}
+
 					const modalInstance = onboardingModalRef.value
 					if (!modalInstance) {
 						setProjectInstalling(plan.projectId, false)
@@ -604,15 +622,8 @@ export function useServerInstallContent({
 				} satisfies Archon.Content.v1.InstallWorldContent)
 			}
 
-			if (fromContext.value === 'onboarding') {
-				const serverId = currentServerId.value
-				onboardingModalRef.value?.hide()
-				await inviteFlow.open({ serverId, worldId: currentWorldId.value, siteUrl })
-				await navigateTo(`/hosting/manage/${serverId}`)
-			} else {
-				onboardingModalRef.value?.hide()
-				navigateTo(`/hosting/manage/${currentServerId.value}?openSettings=installation`)
-			}
+			onboardingModalRef.value?.hide()
+			navigateTo(`/hosting/manage/${currentServerId.value}?openSettings=installation`)
 		} catch (e) {
 			handleError(new Error(`Error installing content: ${e}`))
 			config.loading.value = false

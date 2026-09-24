@@ -650,7 +650,7 @@ const { isStuck: isInstallHeaderStuck } = useStickyObserver(
 	</div>
 
 	<CreationFlowModal
-		v-if="currentServerId"
+		v-if="currentServerId && fromContext !== 'onboarding'"
 		ref="onboardingModalRef"
 		:type="fromContext === 'reset-server' ? 'reset-server' : 'server-onboarding'"
 		:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"

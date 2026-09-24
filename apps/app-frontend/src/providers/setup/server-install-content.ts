@@ -10,7 +10,7 @@ import {
 	getTargetInstallPreferences,
 	injectModrinthClient,
 	injectNotificationManager,
-	injectServerOnboardingInviteFlow,
+	injectServerOnboardingFlow,
 	readStoredServerInstallQueue,
 	resolveServerAddonInstallPlans,
 	useServerContextRuntime,
@@ -102,7 +102,7 @@ export function createServerInstallContent(opts: {
 	const route = useRoute()
 	const router = useRouter()
 	const client = injectModrinthClient()
-	const inviteFlow = injectServerOnboardingInviteFlow()
+	const onboardingFlow = injectServerOnboardingFlow()
 	const { handleError } = injectNotificationManager()
 	const queryClient = useQueryClient()
 
@@ -304,6 +304,17 @@ export function createServerInstallContent(opts: {
 	async function openServerModpackInstallFlow(request: ServerModpackSelectionRequest) {
 		if (!serverIdQuery.value || !effectiveServerWorldId.value) {
 			throw new Error('Missing server context')
+		}
+
+		if (serverFlowFrom.value === 'onboarding') {
+			await onboardingFlow.open({
+				serverId: serverIdQuery.value,
+				worldId: effectiveServerWorldId.value,
+				siteUrl: appConfig.siteUrl,
+				project: request,
+				backToBrowse: true,
+			})
+			return
 		}
 
 		const modalInstance = serverSetupModalRef.value
@@ -526,12 +537,6 @@ export function createServerInstallContent(opts: {
 					soft_override: false,
 					properties: config.buildProperties(),
 				} satisfies Archon.Content.v1.InstallWorldContent)
-			}
-			if (serverFlowFrom.value === 'onboarding') {
-				serverSetupModalRef.value?.hide()
-				await inviteFlow.open({ serverId: sid, worldId: wid, siteUrl: appConfig.siteUrl })
-				await router.push(`/hosting/manage/${sid}`)
-				return
 			}
 
 			serverSetupModalRef.value?.hide()
