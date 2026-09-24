@@ -91,6 +91,8 @@ const LICENSE_DOMAINS: &[&str] = &[
     "gnu.org",
     "apache.org",
     "creativecommons.org",
+    "polyformproject.com",
+    "polyformproject.org",
 ];
 const DONATION_DOMAINS: &[(LinkPlatform, &[&str])] = &[
     (LinkPlatform::Patreon, &["patreon.com"]),
@@ -608,6 +610,8 @@ mod tests {
                 "license",
                 "https://github.com/modrinth/code/blob/main/LICENSE",
             ),
+			("license", "https://polyformproject.com/licenses/mit"),
+			("license", "https://polyformproject.org/licenses/mit"),
             ("github", "https://github.com/sponsors/modrinth"),
             (
                 "issues",
