@@ -14,7 +14,9 @@ import {
 } from '~/providers/project-review'
 
 const { formatMessage } = useVIntl()
-const { confirmLeaveModal } = provideProjectReviewPageContext(createProjectReviewPageContext())
+const { confirmLeaveModal, project } = provideProjectReviewPageContext(
+	createProjectReviewPageContext(),
+)
 
 definePageMeta({
 	layout: 'empty',
@@ -24,6 +26,7 @@ definePageMeta({
 useHead({
 	htmlAttrs: { style: 'scrollbar-gutter: auto; overflow: hidden;' },
 	bodyAttrs: { style: 'overflow: hidden;' },
-	title: () => `${formatMessage(projectReviewMessages.title)} - Modrinth`,
+	title: () => `${project.value?.title ?? formatMessage(projectReviewMessages.title)} - Modrinth`,
 })
+useFavicon('review')
 </script>

@@ -21,6 +21,8 @@ This includes, but may not be limited to, the following files:
 - src/public/favicon-light-32x32.png
 - src/public/favicon-settings-32x32.png
 - src/public/favicon-light-settings-32x32.png
+- src/public/favicon-review.svg
+- src/public/favicon-light-review.svg
 - src/public/dev-favicons/\*
 - src/public/news/\*
 

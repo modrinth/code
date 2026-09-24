@@ -1,4 +1,4 @@
-export type FaviconVariant = 'default' | 'settings'
+export type FaviconVariant = 'default' | 'review' | 'settings'
 export type FaviconEnvironment = 'local' | 'preview' | 'staging'
 
 const PRODUCTION_FAVICON_HREFS = {
@@ -9,6 +9,10 @@ const PRODUCTION_FAVICON_HREFS = {
 	settings: {
 		light: '/favicon-light-settings-32x32.png',
 		dark: '/favicon-settings-32x32.png',
+	},
+	review: {
+		light: '/favicon-light-review.svg',
+		dark: '/favicon-review.svg',
 	},
 } as const
 
@@ -49,8 +53,18 @@ function getFaviconHrefs(variant: FaviconVariant, environment: FaviconEnvironmen
 	if (!environment) {
 		return {
 			...PRODUCTION_FAVICON_HREFS[variant],
-			type: 'image/png',
-			sizes: '32x32',
+			type: variant === 'review' ? 'image/svg+xml' : 'image/png',
+			sizes: variant === 'review' ? 'any' : '32x32',
+		}
+	}
+
+	if (variant === 'review') {
+		const href = `/dev-favicons/favicon-${environment}-review.svg`
+		return {
+			light: href,
+			dark: href,
+			type: 'image/svg+xml',
+			sizes: 'any',
 		}
 	}
 
