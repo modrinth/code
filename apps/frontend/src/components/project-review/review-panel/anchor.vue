@@ -4,7 +4,6 @@
 		ref="element"
 		class="review-anchor relative"
 		:class="{
-			'!pr-10': available && triggerPlacement === 'inset',
 			'review-anchor-header': available && triggerPlacement === 'header',
 		}"
 		:data-review-anchor="id"
@@ -86,12 +85,8 @@ function onPointerOver(event: PointerEvent) {
 watch(available, (value) => {
 	if (!value) release(id)
 })
-watch(
-	[
-		() => props.target.kind,
-		() => ('key' in props.target ? props.target.key : undefined),
-	],
-	() => release(id),
+watch([() => props.target.kind, () => ('key' in props.target ? props.target.key : undefined)], () =>
+	release(id),
 )
 onBeforeUnmount(() => release(id))
 </script>

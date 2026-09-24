@@ -12,12 +12,13 @@
 					{{ link.label }}
 				</h4>
 				<a
+					v-tooltip="link.url"
 					:href="link.url"
 					target="_blank"
 					rel="noopener noreferrer"
-					class="inline-flex max-w-full items-center gap-1 break-all font-mono text-xs !transition-colors hover:text-contrast"
+					class="inline-flex w-fit min-w-0 max-w-full items-center gap-1 font-mono text-xs !transition-colors hover:text-contrast"
 				>
-					<span class="min-w-0">{{ link.url.replace(/^https?:\/\//, '') }}</span>
+					<span class="min-w-0 truncate">{{ link.url.replace(/^https?:\/\//, '') }}</span>
 					<ExternalIcon class="mb-0.5 size-3.5 shrink-0" aria-hidden="true" />
 				</a>
 			</div>

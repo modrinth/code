@@ -76,6 +76,9 @@ export function createProjectReviewPageContext() {
 		tabCounts: computed(() => ({
 			...content.contentCounts.value,
 			gallery: data.project.value ? data.gallery.value.length : undefined,
+			disclosures: disclosures.disclosuresQuery.isSuccess.value
+				? disclosures.currentSnapshot.value.disclosures.length
+				: undefined,
 		})),
 		selection,
 		queue,
