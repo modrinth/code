@@ -36,7 +36,10 @@ function channelClasses(channel: UpdateAllVersion['version_type']) {
 }
 
 function channelFor(versionId: string) {
-	return props.versions.find((candidate) => candidate.id === versionId)?.version_type ?? props.version.version_type
+	return (
+		props.versions.find((candidate) => candidate.id === versionId)?.version_type ??
+		props.version.version_type
+	)
 }
 </script>
 
@@ -60,7 +63,11 @@ function channelFor(versionId: string) {
 			</template>
 			<template #selected>
 				<span class="sr-only">{{ label }}: </span>
-				<span ref="versionLabel" class="inline-block max-w-full truncate align-middle font-medium">{{ version.version_number }}</span>
+				<span
+					ref="versionLabel"
+					class="inline-block max-w-full truncate align-middle font-medium"
+					>{{ version.version_number }}</span
+				>
 			</template>
 			<template #option="{ item }">
 				<VersionChannelIndicator
@@ -72,17 +79,17 @@ function channelFor(versionId: string) {
 			</template>
 		</Combobox>
 	</div>
-	<div v-else v-tooltip="tooltip" class="flex min-h-8 min-w-0 items-center gap-1.5 text-sm font-medium text-contrast">
+	<div
+		v-else
+		v-tooltip="tooltip"
+		class="flex min-h-8 min-w-0 items-center gap-1.5 text-sm font-medium text-contrast"
+	>
 		<VersionChannelIndicator
 			:channel="version.version_type"
 			class="!size-6 shrink-0 !font-medium"
 			:class="channelClasses(version.version_type)"
 		/>
-		<span
-			ref="versionLabel"
-			class="min-w-0"
-			:class="wrap ? 'break-all' : 'block truncate'"
-		>
+		<span ref="versionLabel" class="min-w-0" :class="wrap ? 'break-all' : 'block truncate'">
 			{{ version.version_number }}
 		</span>
 	</div>

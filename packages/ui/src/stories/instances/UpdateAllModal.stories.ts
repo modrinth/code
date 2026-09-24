@@ -189,7 +189,9 @@ const meta = {
 		onChangelog: fn(),
 	},
 	argTypes: {
-		items: { description: 'Content items and compatible update candidates, ordered by preference.' },
+		items: {
+			description: 'Content items and compatible update candidates, ordered by preference.',
+		},
 		loading: { control: 'boolean' },
 		loadingChangelog: { control: 'boolean' },
 		actionLoading: { control: 'boolean' },
@@ -238,7 +240,8 @@ export const Default: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story: 'Open and close a project changelog to see the panel slide over the unchanged table.',
+				story:
+					'Open and close a project changelog to see the panel slide over the unchanged table.',
 			},
 		},
 	},
@@ -274,7 +277,8 @@ export const ChangelogOpen: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story: 'Click a project row to view its changelog. The checkbox still selects the project, and modifier-clicks still change selection.',
+				story:
+					'Click a project row to view its changelog. The checkbox still selects the project, and modifier-clicks still change selection.',
 			},
 		},
 	},
@@ -288,7 +292,8 @@ export const AllSelected: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story: 'Shift-click a selected row, then another selected row, to deselect the range between them. A third Shift-click starts a new range.',
+				story:
+					'Shift-click a selected row, then another selected row, to deselect the range between them. A third Shift-click starts a new range.',
 			},
 		},
 	},
@@ -300,7 +305,8 @@ export const NoneSelected: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story: 'Shift-click two project rows to select the range between them. The next Shift-click starts a new range. Ctrl-click or Command-click a row to toggle it individually.',
+				story:
+					'Shift-click two project rows to select the range between them. The next Shift-click starts a new range. Ctrl-click or Command-click a row to toggle it individually.',
 			},
 		},
 	},

@@ -64,7 +64,10 @@ export function useUpdateAllSelection(items: () => UpdateAllItem[]) {
 
 	function selectVersion(id: string, versionId: string) {
 		const selection = state.value.get(id)
-		if (selection && rows.value.find((row) => row.id === id)?.versions.some((v) => v.id === versionId)) {
+		if (
+			selection &&
+			rows.value.find((row) => row.id === id)?.versions.some((v) => v.id === versionId)
+		) {
 			selection.versionId = versionId
 			selection.selected = true
 		}
