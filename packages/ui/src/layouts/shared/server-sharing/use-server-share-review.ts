@@ -117,10 +117,16 @@ export function useServerShareReview<Action extends string = 'push'>(options?: {
 
 	async function publish(target: ServerShareActionTarget) {
 		if (!canSetup.value) throw new Error(formatMessage(messages.permission))
-		const shared = await client.archon.content_v1.share(serverId, target.worldId, target.configPaths)
+		const shared = await client.archon.content_v1.share(
+			serverId,
+			target.worldId,
+			target.configPaths,
+		)
 		await Promise.all([
 			queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),
-			queryClient.invalidateQueries({ queryKey: ['servers', 'share-diff', serverId, target.worldId] }),
+			queryClient.invalidateQueries({
+				queryKey: ['servers', 'share-diff', serverId, target.worldId],
+			}),
 		])
 		return shared
 	}

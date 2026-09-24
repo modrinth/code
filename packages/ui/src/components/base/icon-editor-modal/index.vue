@@ -86,7 +86,10 @@ function onBackgroundWheel(event: WheelEvent) {
 	if (!el || el.scrollWidth <= el.clientWidth) return
 
 	const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY
-	const nextScrollLeft = Math.max(0, Math.min(el.scrollLeft + delta, el.scrollWidth - el.clientWidth))
+	const nextScrollLeft = Math.max(
+		0,
+		Math.min(el.scrollLeft + delta, el.scrollWidth - el.clientWidth),
+	)
 	if (nextScrollLeft === el.scrollLeft) return
 	event.preventDefault()
 	el.scrollLeft = nextScrollLeft
@@ -381,7 +384,7 @@ const messages = defineMessages({
 							@pointerup="finishBackgroundDrag"
 							@pointercancel="finishBackgroundDrag"
 							@click.capture="onBackgroundClick"
-								@wheel="onBackgroundWheel"
+							@wheel="onBackgroundWheel"
 							@scroll="updateBackgroundScrollShadows"
 						>
 							<button

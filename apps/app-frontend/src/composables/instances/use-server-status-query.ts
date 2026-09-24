@@ -1,4 +1,4 @@
-import type { QueryClient } from '@tanstack/vue-query'
+import { type QueryClient, queryOptions } from '@tanstack/vue-query'
 
 import {
 	get_server_status,
@@ -23,6 +23,27 @@ export function getServerStatusQueryKey(
 		normalizeServerAddress(address) || address.trim().toLowerCase(),
 		getProtocolVersionKey(protocolVersion),
 	] as const
+}
+
+export function serverStatusQueryOptions(
+	address: string,
+	protocolVersion: ProtocolVersion | null = null,
+) {
+	return queryOptions({
+		queryKey: getServerStatusQueryKey(address, protocolVersion),
+		queryFn: async () => {
+			try {
+				return await get_server_status(address, protocolVersion)
+			} catch (error) {
+				if (protocolVersion?.legacy) throw error
+				return await get_server_status(address, { version: 74, legacy: true })
+			}
+		},
+		staleTime: 30_000,
+		gcTime: SERVER_STATUS_CACHE_MS,
+		refetchOnWindowFocus: false,
+		retry: false,
+	})
 }
 
 export function getFreshCachedServerStatus(

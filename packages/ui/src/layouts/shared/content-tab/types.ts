@@ -72,6 +72,7 @@ export interface ContentCardEmbeddedIcon {
 export interface ContentCardTableItem {
 	id: string
 	project: ContentCardProject
+	projectType?: string
 	projectLink?: string | RouteLocationRaw
 	version?: ContentCardVersion
 	versionLink?: string | RouteLocationRaw

@@ -72,7 +72,9 @@
 				formatMessage(previewAction === 'play' ? messages.pushAndPlay : messages.pushUpdate)
 			"
 			:confirm-icon="UploadIcon"
-			:confirm-disabled="!canSetup || actionsLocked || previewQuery.isError.value || !previewQuery.data.value"
+			:confirm-disabled="
+				!canSetup || actionsLocked || previewQuery.isError.value || !previewQuery.data.value
+			"
 			:added-label="formatMessage(messages.added)"
 			:removed-label="formatMessage(messages.removed)"
 			@confirm="perform(previewAction, true)"

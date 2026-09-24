@@ -29,7 +29,7 @@ import {
 	normalizeProjectType,
 } from '#ui/utils/common-messages'
 
-import { getClientWarningType } from '../../composables/content-filtering'
+import { getClientWarningType, getContentWarningType } from '../../composables/content-filtering'
 import {
 	type ContentMetadataFilterValue,
 	useContentMetadataFilters,
@@ -116,6 +116,10 @@ const messages = defineMessages({
 	filter: {
 		id: 'content.page-layout.filter.add',
 		defaultMessage: 'Filter',
+	},
+	warnings: {
+		id: 'content.filter.warnings',
+		defaultMessage: 'Warnings',
 	},
 	openInSlicer: {
 		id: 'instances.managed-content-modal.open-in-slicer',
@@ -213,6 +217,14 @@ const filterOptions = computed(() => {
 			}
 		})
 
+	if (
+		applyMetadataFilters(items.value).some(
+			(item) => getContentWarningType(item, props.showEnvironmentWarnings) !== null,
+		)
+	) {
+		options.push({ id: 'warnings', label: formatMessage(messages.warnings) })
+	}
+
 	return options
 })
 
@@ -232,15 +244,18 @@ const stats = computed(() => {
 	return counts
 })
 
-const attributeFilterIds = new Set(['enabled', 'disabled'])
+const attributeFilterIds = new Set(['enabled', 'disabled', 'warnings'])
 
 function matchesSelectedFilters(item: ContentItem) {
 	const typeFilters = selectedFilters.value.filter((f) => !attributeFilterIds.has(f))
 	const hasEnabledFilter = props.enableToggle && selectedFilters.value.includes('enabled')
 	const hasDisabledFilter = props.enableToggle && selectedFilters.value.includes('disabled')
+	const hasWarningsFilter = selectedFilters.value.includes('warnings')
 	if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type)))
 		return false
 	if (hasEnabledFilter !== hasDisabledFilter && Boolean(item.enabled) !== hasEnabledFilter)
+		return false
+	if (hasWarningsFilter && getContentWarningType(item, props.showEnvironmentWarnings) === null)
 		return false
 	return true
 }
@@ -272,6 +287,7 @@ function contentVersionLabel(item: ContentItem): string {
 const tableItems = computed<ContentCardTableItem[]>(() =>
 	filteredItems.value.map((item) => ({
 		id: item.id,
+		projectType: item.project_type,
 		project: item.project ?? {
 			id: item.id,
 			slug: null,
