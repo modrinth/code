@@ -87,11 +87,14 @@ import Versions from './versions/index.vue'
 const { formatMessage } = useVIntl()
 const { projectId, project, projectV2, wasReviewed, permissions, selection } =
 	injectProjectReviewPageContext()
-const visibleTabs = computed(() =>
-	projectReviewTabs.filter(
+const visibleTabs = computed((previousTabs) => {
+	if (!project.value) {
+		return previousTabs ?? projectReviewTabs.filter((tab) => tab !== 'permissions')
+	}
+	return projectReviewTabs.filter(
 		(tab) => tab !== 'permissions' || project.value?.project_types.includes('modpack'),
-	),
-)
+	)
+})
 const reviewProjectId = computed(() => project.value?.id)
 const session = provideReviewSession(createReviewSession())
 const panels = provideReviewPanels(

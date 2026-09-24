@@ -1,6 +1,6 @@
 import type { SerializedDockview } from 'dockview-vue'
 
-import { projectReviewTabs } from './types'
+import { type ProjectReviewTab, projectReviewTabs } from './types'
 
 const STORAGE_KEY = 'moderation.project-review.layout.v1'
 
@@ -20,6 +20,41 @@ export interface SavedWorkspaceLayout {
 	leftVisible: boolean
 	rightVisible: boolean
 	tabs: SerializedDockview
+	tabLayouts?: Record<string, SerializedDockview>
+}
+
+export function workspaceTabLayoutKey(tabs: readonly ProjectReviewTab[]) {
+	return projectReviewTabs.filter((tab) => tabs.includes(tab)).join(',')
+}
+
+function isValidTabLayout(layout: SerializedDockview) {
+	if (
+		!layout?.grid ||
+		!layout.panels ||
+		Object.keys(layout.panels).some(
+			(tab) => !projectReviewTabs.includes(tab as ProjectReviewTab),
+		) ||
+		layout.floatingGroups?.length ||
+		layout.popoutGroups?.length ||
+		layout.edgeGroups
+	) {
+		return false
+	}
+
+	for (const tab of projectReviewTabs) {
+		const panel = layout.panels[tab]
+		if (tab === 'permissions' && !panel) continue
+		if (
+			panel?.id !== tab ||
+			panel.contentComponent !== 'ProjectReviewPanel' ||
+			panel.params?.tab !== tab ||
+			panel.params?.slot !== tab
+		) {
+			return false
+		}
+	}
+
+	return true
 }
 
 export function readWorkspaceLayout(): SavedWorkspaceLayout | undefined {
@@ -35,29 +70,17 @@ export function readWorkspaceLayout(): SavedWorkspaceLayout | undefined {
 			(saved.bottomVisible !== undefined && typeof saved.bottomVisible !== 'boolean') ||
 			typeof saved.leftVisible !== 'boolean' ||
 			typeof saved.rightVisible !== 'boolean' ||
-			!saved.tabs?.grid ||
-			!saved.tabs.panels ||
-			Object.keys(saved.tabs.panels).some(
-				(tab) => !projectReviewTabs.includes(tab as (typeof projectReviewTabs)[number]),
-			) ||
-			saved.tabs.floatingGroups?.length ||
-			saved.tabs.popoutGroups?.length ||
-			saved.tabs.edgeGroups
+			!isValidTabLayout(saved.tabs) ||
+			(saved.tabLayouts !== undefined &&
+				(typeof saved.tabLayouts !== 'object' ||
+					saved.tabLayouts === null ||
+					Object.entries(saved.tabLayouts).some(
+						([key, layout]) =>
+							!isValidTabLayout(layout) ||
+							key !== workspaceTabLayoutKey(Object.keys(layout.panels) as ProjectReviewTab[]),
+					)))
 		) {
 			return
-		}
-
-		for (const tab of projectReviewTabs) {
-			const panel = saved.tabs.panels[tab]
-			if (tab === 'permissions' && !panel) continue
-			if (
-				panel?.id !== tab ||
-				panel.contentComponent !== 'ProjectReviewPanel' ||
-				panel.params?.tab !== tab ||
-				panel.params?.slot !== tab
-			) {
-				return
-			}
 		}
 
 		return saved

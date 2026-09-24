@@ -10,7 +10,12 @@ import type {
 import { getGridLocation, LayoutPriority } from 'dockview-vue'
 import { onBeforeUnmount, ref, watchEffect } from 'vue'
 
-import { readWorkspaceLayout, saveWorkspaceLayout, workspacePanelSizes } from './layout-storage'
+import {
+	readWorkspaceLayout,
+	saveWorkspaceLayout,
+	workspacePanelSizes,
+	workspaceTabLayoutKey,
+} from './layout-storage'
 import { type ProjectReviewTab, projectReviewTabs } from './types'
 
 export function useProjectReviewLayout(
@@ -31,6 +36,14 @@ export function useProjectReviewLayout(
 	let tabsReady = false
 	let saveTimer: ReturnType<typeof setTimeout> | undefined
 	let tabs: DockviewApi | undefined
+	let currentTabLayoutKey: string | undefined
+	const tabLayouts = new Map(Object.entries(savedLayout?.tabLayouts ?? {}))
+	if (savedLayout) {
+		tabLayouts.set(
+			workspaceTabLayoutKey(Object.keys(savedLayout.tabs.panels) as ProjectReviewTab[]),
+			savedLayout.tabs,
+		)
+	}
 	const subscriptions: DockviewIDisposable[] = []
 
 	function saveLayout() {
@@ -42,6 +55,8 @@ export function useProjectReviewLayout(
 		if (leftVisible.value && currentLeftWidth > 0) leftWidth = currentLeftWidth
 		if (rightVisible.value && currentRightWidth > 0) rightWidth = currentRightWidth
 		if (bottomVisible.value && currentBottomHeight > 0) bottomHeight = currentBottomHeight
+		const currentTabs = tabs.toJSON()
+		if (currentTabLayoutKey) tabLayouts.set(currentTabLayoutKey, currentTabs)
 		saveWorkspaceLayout({
 			leftWidth,
 			rightWidth,
@@ -49,7 +64,8 @@ export function useProjectReviewLayout(
 			bottomVisible: bottomVisible.value,
 			leftVisible: leftVisible.value,
 			rightVisible: rightVisible.value,
-			tabs: tabs.toJSON(),
+			tabs: currentTabs,
+			tabLayouts: Object.fromEntries(tabLayouts),
 		})
 	}
 
@@ -134,13 +150,16 @@ export function useProjectReviewLayout(
 			api.onDidLayoutChange(scheduleSave),
 			api.onDidActivePanelChange(scheduleSave),
 		)
+		currentTabLayoutKey = workspaceTabLayoutKey(getTabs())
 		let restored = false
-		if (savedLayout) {
+		const savedTabLayout = tabLayouts.get(currentTabLayoutKey)
+		if (savedTabLayout) {
 			try {
-				api.fromJSON(savedLayout.tabs)
+				api.fromJSON(savedTabLayout)
 				restored = true
 			} catch {
 				api.clear()
+				tabLayouts.delete(currentTabLayoutKey)
 			}
 		}
 		tabsReady = true
@@ -253,8 +272,22 @@ export function useProjectReviewLayout(
 
 	function syncTabs() {
 		const visibleTabs = getTabs()
+		const nextTabLayoutKey = workspaceTabLayoutKey(visibleTabs)
 		const titles = new Map(visibleTabs.map((tab) => [tab, getTitle(tab)]))
 		if (!tabs || !tabsReady) return
+		if (currentTabLayoutKey !== nextTabLayoutKey) {
+			if (currentTabLayoutKey) tabLayouts.set(currentTabLayoutKey, tabs.toJSON())
+			currentTabLayoutKey = nextTabLayoutKey
+			const savedTabLayout = tabLayouts.get(nextTabLayoutKey)
+			if (savedTabLayout) {
+				try {
+					tabs.fromJSON(savedTabLayout)
+				} catch {
+					tabs.clear()
+					tabLayouts.delete(nextTabLayoutKey)
+				}
+			}
+		}
 		for (const tab of projectReviewTabs) {
 			const panel = tabs.getPanel(tab)
 			if (!visibleTabs.includes(tab)) {
