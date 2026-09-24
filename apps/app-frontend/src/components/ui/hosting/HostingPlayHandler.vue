@@ -137,7 +137,11 @@ async function join(target: LaunchTarget, instanceId: string) {
 	if (!address) throw new Error(formatMessage(messages.noAddress))
 	await assertAccount(target)
 	await ensureManagedServerWorldExists(instanceId, target.name, address)
-	hostingInstances.value[instanceId] = hostingInstanceMetadata(server, target.sharedInstanceId, address)
+	hostingInstances.value[instanceId] = hostingInstanceMetadata(
+		server,
+		target.sharedInstanceId,
+		address,
+	)
 	await assertAccount(target)
 	try {
 		await start_join_server(instanceId, address)
@@ -269,9 +273,16 @@ const prepareMutation = useMutation({
 		if (existing) {
 			await playExisting(target, existing, false)
 		} else {
-			const remote = await client.sharedinstances.instances_v1.get(sharedInstanceId)
+			const [remote, legacyServer] = await Promise.all([
+				client.sharedinstances.instances_v1.get(sharedInstanceId),
+				client.archon.servers_v0.get(serverId),
+			])
 			target.name = remote.name
 			target.icon = remote.icon
+			if (legacyServer.owner_id === credentials.user_id) {
+				await launchMutation.mutateAsync({ target }).catch(() => {})
+				return
+			}
 			const preview = await install_get_shared_instance_preview(sharedInstanceId, target.name)
 			await assertAccount(target)
 			if (remote.icon) preview.iconUrl = remote.icon

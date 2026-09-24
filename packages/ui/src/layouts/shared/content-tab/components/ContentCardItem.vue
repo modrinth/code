@@ -24,7 +24,8 @@ import Checkbox from '#ui/components/base/Checkbox.vue'
 import ProgressSpinner from '#ui/components/base/ProgressSpinner.vue'
 import Toggle from '#ui/components/base/Toggle.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { commonMessages } from '#ui/utils/common-messages'
+import { PROJECT_TYPE_ICONS } from '#ui/utils/auto-icons'
+import { commonMessages, getProjectTypeTitleMessage } from '#ui/utils/common-messages'
 import { truncatedTooltip } from '#ui/utils/truncate'
 
 import type {
@@ -72,6 +73,7 @@ const messages = defineMessages({
 
 interface Props {
 	project: ContentCardProject
+	projectType?: string
 	projectLink?: string | RouteLocationRaw
 	version?: ContentCardVersion
 	showVersion?: boolean
@@ -107,6 +109,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+	projectType: undefined,
 	projectLink: undefined,
 	version: undefined,
 	showVersion: true,
@@ -147,6 +150,15 @@ const separateVersion = computed(() => props.tableLayout === 'wide')
 const selected = defineModel<boolean>('selected')
 
 const projectTitle = computed(() => props.project.title.replace(/§[0-9a-fk-orx]/gi, ''))
+const projectTypeIcon = computed(() => {
+	const type = props.projectType === 'shaderpack' ? 'shader' : props.projectType
+	return type && type in PROJECT_TYPE_ICONS
+		? PROJECT_TYPE_ICONS[type as keyof typeof PROJECT_TYPE_ICONS]
+		: undefined
+})
+const projectTypeLabel = computed(() =>
+	formatMessage(getProjectTypeTitleMessage(props.projectType), { count: 1 }),
+)
 
 const emit = defineEmits<{
 	'update:enabled': [value: boolean]
@@ -259,10 +271,18 @@ const installTooltip = computed(() => {
 									: undefined
 							"
 							:to="projectLink"
-							class="truncate font-semibold leading-6 text-contrast !decoration-contrast"
+							class="inline-flex min-w-0 items-center gap-1 font-semibold leading-6 text-contrast !decoration-contrast"
 							:class="{ 'hover:underline': projectLink }"
 						>
-							{{ projectTitle }}
+							<component
+								:is="projectTypeIcon"
+								v-if="projectTypeIcon"
+								v-tooltip="projectTypeLabel"
+								class="mx-0.5 size-5 shrink-0 text-icon"
+								aria-hidden="true"
+							/>
+							<span v-if="projectTypeIcon" class="sr-only">{{ projectTypeLabel }}: </span>
+							<span class="min-w-0 truncate">{{ projectTitle }}</span>
 						</AutoLink>
 						<slot name="title-badges" />
 						<span
@@ -302,7 +322,7 @@ const installTooltip = computed(() => {
 									:tint-by="source.project.id"
 									size="1.25rem"
 									no-shadow
-									class="shrink-0 rounded-md"
+									class="mx-0.5 shrink-0 rounded-md"
 								/>
 								<span class="truncate text-sm leading-5 text-secondary">
 									{{ source.project.title }}
@@ -331,7 +351,7 @@ const installTooltip = computed(() => {
 							<span class="truncate text-sm leading-5 text-secondary">{{ owner.name }}</span>
 						</AutoLink>
 						<span v-else-if="external" class="flex items-center gap-1 text-secondary">
-							<UploadIcon class="size-4 shrink-0" />
+							<UploadIcon class="mx-1 size-4 shrink-0" />
 							<span class="text-sm leading-5">{{
 								formatMessage(externalFile ? messages.externalFile : messages.uploaded)
 							}}</span>

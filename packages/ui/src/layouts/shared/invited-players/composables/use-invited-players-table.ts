@@ -2,10 +2,7 @@ import { computed, type Ref, ref, watch } from 'vue'
 
 import type { SortDirection } from '#ui/components/base/Table.vue'
 
-import {
-	type InvitedPlayerMethod,
-	type InvitedPlayerRow,
-} from '../types'
+import type { InvitedPlayerMethod, InvitedPlayerRow } from '../types'
 
 type MethodFilter = InvitedPlayerMethod | 'all'
 

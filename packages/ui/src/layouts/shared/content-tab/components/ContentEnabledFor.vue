@@ -108,11 +108,17 @@ function toggle(side: ContentSide) {
 		</button>
 
 		<span
-			v-if="reserveStatusSpace || modelValue.warningTooltip || (modelValue.locked && disabledSides.size > 0)"
+			v-if="
+				reserveStatusSpace ||
+				modelValue.warningTooltip ||
+				(modelValue.locked && disabledSides.size > 0)
+			"
 			v-tooltip="
 				modelValue.warningTooltip ?? modelValue.lockedTooltip ?? formatMessage(messages.locked)
 			"
-			:class="{ invisible: !modelValue.warningTooltip && (!modelValue.locked || disabledSides.size === 0) }"
+			:class="{
+				invisible: !modelValue.warningTooltip && (!modelValue.locked || disabledSides.size === 0),
+			}"
 			class="inline-flex size-5 shrink-0 cursor-help items-center justify-center"
 			tabindex="0"
 		>

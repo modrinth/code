@@ -44,7 +44,7 @@
 					:aria-pressed="methodFilter === 'all'"
 					@click="methodFilter = 'all'"
 				>
-						{{ formatMessage(messages.all) }}
+					{{ formatMessage(messages.all) }}
 				</button>
 				<button
 					v-for="option in methodFilterOptions"
@@ -89,7 +89,7 @@
 					>
 						<Avatar
 							:src="row.avatarUrl"
-								:alt="formatMessage(messages.avatarAlt, { username: row.username })"
+							:alt="formatMessage(messages.avatarAlt, { username: row.username })"
 							:tint-by="row.username"
 							size="24px"
 							circle
@@ -117,7 +117,7 @@
 				<span v-if="row.lastPlayedAt" v-tooltip="formatDateTime(row.lastPlayedAt)">{{
 					formatRelativeTime(row.lastPlayedAt)
 				}}</span>
-					<span v-else>{{ formatMessage(messages.never) }}</span>
+				<span v-else>{{ formatMessage(messages.never) }}</span>
 			</template>
 			<template #cell-method="{ row }">
 				<span class="inline-flex min-w-0 max-w-full items-center gap-2">

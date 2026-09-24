@@ -89,7 +89,9 @@ export function useHostingInstance(instance: Ref<GameInstance | undefined>, offl
 		const current = instance.value
 		if (!current || server === undefined) return
 		if (!server) {
-			delete cache.value[current.id]
+			cache.value = Object.fromEntries(
+				Object.entries(cache.value).filter(([id]) => id !== current.id),
+			)
 			return
 		}
 		cache.value[current.id] = {
@@ -99,11 +101,10 @@ export function useHostingInstance(instance: Ref<GameInstance | undefined>, offl
 			region: server.region,
 		}
 	})
-	const isHostingInstance = computed(
-		() =>
-			liveServer.value !== undefined
-				? !!liveServer.value
-				: !!saved.value || !!instance.value?.shared_instance?.server_manager_name,
+	const isHostingInstance = computed(() =>
+		liveServer.value !== undefined
+			? !!liveServer.value
+			: !!saved.value || !!instance.value?.shared_instance?.server_manager_name,
 	)
 	async function refreshOnlineStatus() {
 		if (!canQuery.value || !isHostingInstance.value) return null

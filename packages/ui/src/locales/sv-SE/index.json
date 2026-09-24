@@ -659,9 +659,6 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Uppdatering tillgänglig"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Klient beror på fil"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Klientinnehåll endast"
   },
@@ -2347,15 +2344,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Ändringar sparade"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Den här modden beror på en klientsidesmodd och kan orsaka problem när du startar din server"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Det här är en klientsidesmodd och kan orsaka problem när du startar din server"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Det här är en klientsidesmodd som installerades som ett beroende och kan orsaka problem när du startar din server"
   },
   "label.collections": {
     "defaultMessage": "Samlingar"
