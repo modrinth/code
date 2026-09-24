@@ -20,6 +20,7 @@ import 'dockview-vue/dist/styles/dockview.css'
 
 import { useVIntl } from '@modrinth/ui'
 import { useEventListener } from '@vueuse/core'
+import { watch } from 'vue'
 
 import { useModerationKeybinds } from '~/composables/moderation'
 
@@ -30,7 +31,7 @@ import { workspacePanelSizes } from './layout-storage'
 import type { ProjectReviewSlots, ProjectReviewTab } from './types'
 import { useProjectReviewLayout } from './use-layout'
 
-const props = defineProps<{ tabs: readonly ProjectReviewTab[] }>()
+const props = defineProps<{ tabs: readonly ProjectReviewTab[]; resetKey: string }>()
 const slots = defineSlots<ProjectReviewSlots>()
 const { formatMessage } = useVIntl()
 const layout = useProjectReviewLayout(
@@ -38,6 +39,13 @@ const layout = useProjectReviewLayout(
 	() => props.tabs,
 )
 const { leftVisible, rightVisible, onDividerDoubleClick } = layout
+
+watch(
+	() => props.resetKey,
+	(resetKey, previousResetKey) => {
+		if (resetKey && previousResetKey) layout.resetActiveTabs()
+	},
+)
 
 provideProjectReviewContext({ ...layout, slots })
 

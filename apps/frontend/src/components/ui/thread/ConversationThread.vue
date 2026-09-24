@@ -504,7 +504,7 @@ import {
 import { useEventListener } from '@vueuse/core'
 import { computed, nextTick, ref, watch } from 'vue'
 
-import KbdChip from '~/components/project-review/KbdChip.vue'
+import KbdChip from '~/components/project-review/kdb-chip.vue'
 import ThreadMessage from '~/components/ui/thread/ThreadMessage.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { useModerationKeybinds } from '~/composables/moderation'

@@ -1,6 +1,6 @@
 <template>
 	<ClientOnly>
-		<ProjectReviewLayout :tabs="visibleTabs">
+		<ProjectReviewLayout :tabs="visibleTabs" :reset-key="selection">
 			<template #left><ProjectInfo /></template>
 			<template #right>
 				<div
@@ -85,7 +85,8 @@ import TechReview from './tech-review/index.vue'
 import Versions from './versions/index.vue'
 
 const { formatMessage } = useVIntl()
-const { projectId, project, projectV2, wasReviewed, permissions } = injectProjectReviewPageContext()
+const { projectId, project, projectV2, wasReviewed, permissions, selection } =
+	injectProjectReviewPageContext()
 const visibleTabs = computed(() =>
 	projectReviewTabs.filter(
 		(tab) => tab !== 'permissions' || project.value?.project_types.includes('modpack'),

@@ -16,6 +16,7 @@ export interface SavedWorkspaceLayout {
 	leftWidth: number
 	rightWidth: number
 	bottomHeight: number
+	bottomVisible?: boolean
 	leftVisible: boolean
 	rightVisible: boolean
 	tabs: SerializedDockview
@@ -31,6 +32,7 @@ export function readWorkspaceLayout(): SavedWorkspaceLayout | undefined {
 			![saved.leftWidth, saved.rightWidth, saved.bottomHeight].every(
 				(size) => typeof size === 'number' && Number.isFinite(size) && size > 0,
 			) ||
+			(saved.bottomVisible !== undefined && typeof saved.bottomVisible !== 'boolean') ||
 			typeof saved.leftVisible !== 'boolean' ||
 			typeof saved.rightVisible !== 'boolean' ||
 			!saved.tabs?.grid ||

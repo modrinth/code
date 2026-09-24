@@ -34,7 +34,7 @@ export function createReviewSubmission(
 	const auth = useAuthState()
 	const { project, threadQuery, disclosures } = injectProjectReviewPageContext()
 	const draft = ref('')
-	let pendingDecision: { id: string; status: ProjectStatus; body: string } | undefined
+	const pendingDecision = ref<{ id: string; status: ProjectStatus; body: string }>()
 	const uploadedImages = ref<string[]>([])
 	let disposed = false
 	watch(
@@ -42,7 +42,7 @@ export function createReviewSubmission(
 		() => {
 			draft.value = ''
 			uploadedImages.value = []
-			pendingDecision = undefined
+			pendingDecision.value = undefined
 		},
 		{ flush: 'sync' },
 	)
@@ -89,6 +89,7 @@ export function createReviewSubmission(
 			images,
 			privateMessage,
 			status,
+			statusAlreadyApplied = false,
 			corrections,
 		}: {
 			id: string
@@ -97,10 +98,11 @@ export function createReviewSubmission(
 			images: string[]
 			privateMessage: boolean
 			status?: ProjectStatus
+			statusAlreadyApplied?: boolean
 			corrections: typeof panels.corrections.value | undefined
 		}) => {
 			assertCurrent(id)
-			if (status) {
+			if (status && !statusAlreadyApplied) {
 				if (disclosures.hasChanges.value || disclosures.saving.value)
 					throw new Error(formatMessage(errors.unsaved))
 				if (panels.validationErrors.value.length) throw new Error(formatMessage(errors.missing))
@@ -122,6 +124,11 @@ export function createReviewSubmission(
 				}
 			}
 			assertCurrent(id)
+			if (status && !statusAlreadyApplied) {
+				await client.labrinth.projects_v3.edit(id, { status })
+				if (body) pendingDecision.value = { id, status, body }
+			}
+			assertCurrent(id)
 			if (body) {
 				await client.labrinth.threads_v3.sendMessage(threadId, {
 					body: {
@@ -132,17 +139,13 @@ export function createReviewSubmission(
 					},
 				})
 				if (status) {
-					pendingDecision = { id, status, body }
+					pendingDecision.value = undefined
 				} else if (!disposed && project.value?.id === id) {
 					draft.value = ''
 					uploadedImages.value = []
 				}
 			}
-			if (status) {
-				assertCurrent(id)
-				await client.labrinth.projects_v3.edit(id, { status })
-				pendingDecision = undefined
-			}
+			if (status && !body) pendingDecision.value = undefined
 		},
 		onError: (error) =>
 			addNotification({
@@ -194,6 +197,12 @@ export function createReviewSubmission(
 				(submission.variables.value?.privateMessage ? 'note' : 'reply'))
 			: undefined,
 	)
+	const pendingDecisionStatus = computed(() => {
+		const currentPendingDecision = pendingDecision.value
+		return currentPendingDecision?.id === project.value?.id
+			? currentPendingDecision.status
+			: undefined
+	})
 
 	async function submit(mode: ReviewEditorMode = 'reply') {
 		const current = project.value
@@ -214,22 +223,29 @@ export function createReviewSubmission(
 		const current = project.value
 		if (!canSubmit.value || !current || messages.generating.value) return
 		const body = messages.generated.value
-		const retryStatus =
-			pendingDecision?.id === current.id &&
-			pendingDecision.status === status &&
-			pendingDecision.body === body
-		await submission
-			.mutateAsync({
+		const currentPendingDecision = pendingDecision.value
+		const statusAlreadyApplied =
+			currentPendingDecision?.id === current.id &&
+			currentPendingDecision.status === status &&
+			currentPendingDecision.body === body
+		try {
+			await submission.mutateAsync({
 				id: current.id,
 				threadId: current.thread_id,
-				body: retryStatus || !body.trim() ? '' : body,
+				body: body.trim() ? body : '',
 				images: [],
 				privateMessage: false,
 				status,
+				statusAlreadyApplied,
 				corrections:
-					!retryStatus && panels.correctionsRequested.value ? panels.corrections.value : undefined,
+					!statusAlreadyApplied && panels.correctionsRequested.value
+						? panels.corrections.value
+						: undefined,
 			})
-			.catch(() => undefined)
+			return true
+		} catch {
+			return false
+		}
 	}
 
 	return {
@@ -237,6 +253,7 @@ export function createReviewSubmission(
 		pending,
 		canSubmit,
 		loadingAction,
+		pendingDecisionStatus,
 		submit,
 		submitDecision,
 		uploadImage: (file: File) => upload.mutateAsync({ file, id: project.value?.id ?? '' }),

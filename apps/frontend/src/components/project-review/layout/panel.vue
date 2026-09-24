@@ -9,7 +9,7 @@
 				? 'overflow-hidden'
 				: 'overflow-auto'
 		"
-		:inert="sidebarHidden"
+		:inert="panelHidden"
 		:aria-label="formatMessage(messages[slotName])"
 	>
 		<component :is="content" v-if="content" />
@@ -37,16 +37,17 @@ type PanelParams = { slot: ProjectReviewSlot }
 const props = defineProps<{
 	params: PanelParams | IDockviewPanelProps<PanelParams>
 }>()
-const { slots, leftVisible, rightVisible } = injectProjectReviewContext()
+const { slots, bottomVisible, leftVisible, rightVisible } = injectProjectReviewContext()
 const { formatMessage } = useVIntl()
 const slotName = computed(() =>
 	'slot' in props.params ? props.params.slot : props.params.params.slot,
 )
 const content = computed(() => slots[slotName.value])
-const sidebarHidden = computed(
+const panelHidden = computed(
 	() =>
 		(slotName.value === 'left' && !leftVisible.value) ||
-		(slotName.value === 'right' && !rightVisible.value),
+		(slotName.value === 'right' && !rightVisible.value) ||
+		(slotName.value === 'bottom' && !bottomVisible.value),
 )
 </script>
 

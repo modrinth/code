@@ -55,10 +55,12 @@ export function useReviewQueue(
 		await queue.visitProject(id, back)
 	}
 
-	async function next() {
+	async function advance(completedProjectId?: string) {
+		if (completedProjectId && completedProjectId !== projectId.value) return
 		await run(async () => {
 			const id = projectId.value
-			if (!id || !inQueue.value) return
+			if (!id || !inQueue.value || (completedProjectId && completedProjectId !== id)) return
+			if (completedProjectId && !completed.value) await queue.completeProject(id)
 			const candidates = remaining.value
 			const next = await findNextEligibleQueueProject(client, queue, candidates, true)
 			if (next) await queryClient.fetchQuery(projectQueryOptions.v3(next.project, client))
@@ -73,6 +75,14 @@ export function useReviewQueue(
 				})
 			}
 		})
+	}
+
+	async function next() {
+		await advance()
+	}
+
+	async function completeAndNext(id: string) {
+		await advance(id)
 	}
 
 	async function back() {
@@ -98,6 +108,7 @@ export function useReviewQueue(
 		completed,
 		remaining,
 		next,
+		completeAndNext,
 		back,
 		exit,
 	}

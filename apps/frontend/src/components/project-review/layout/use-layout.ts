@@ -20,6 +20,7 @@ export function useProjectReviewLayout(
 	const savedLayout = readWorkspaceLayout()
 	const leftVisible = ref(savedLayout?.leftVisible ?? true)
 	const rightVisible = ref(savedLayout?.rightVisible ?? true)
+	const bottomVisible = ref(savedLayout?.bottomVisible ?? true)
 	let leftWidth = savedLayout?.leftWidth ?? workspacePanelSizes.left.default
 	let rightWidth = savedLayout?.rightWidth ?? workspacePanelSizes.right.default
 	let bottomHeight = savedLayout?.bottomHeight ?? workspacePanelSizes.bottom.default
@@ -40,11 +41,12 @@ export function useProjectReviewLayout(
 		const currentBottomHeight = rows.getPanel('bottom')?.api.height ?? 0
 		if (leftVisible.value && currentLeftWidth > 0) leftWidth = currentLeftWidth
 		if (rightVisible.value && currentRightWidth > 0) rightWidth = currentRightWidth
-		if (currentBottomHeight > 0) bottomHeight = currentBottomHeight
+		if (bottomVisible.value && currentBottomHeight > 0) bottomHeight = currentBottomHeight
 		saveWorkspaceLayout({
 			leftWidth,
 			rightWidth,
 			bottomHeight,
+			bottomVisible: bottomVisible.value,
 			leftVisible: leftVisible.value,
 			rightVisible: rightVisible.value,
 			tabs: tabs.toJSON(),
@@ -100,6 +102,7 @@ export function useProjectReviewLayout(
 			minimumSize: workspacePanelSizes.bottom.minimum,
 			size: bottomHeight,
 		})
+		api.getPanel('bottom')?.api.setVisible(bottomVisible.value)
 		subscriptions.push(api.onDidLayoutChange(scheduleSave))
 	}
 
@@ -151,6 +154,17 @@ export function useProjectReviewLayout(
 		tabs?.getPanel(tab)?.api.setActive()
 	}
 
+	function resetActiveTabs() {
+		for (const group of tabs?.groups ?? []) {
+			const firstPanel = group.panels[0]
+			if (firstPanel) {
+				group.model.openPanel(firstPanel, {
+					skipSetGroupActive: true,
+				})
+			}
+		}
+	}
+
 	function toggleSidebar(side: 'left' | 'right') {
 		const visible = side === 'left' ? leftVisible : rightVisible
 		const panel = columns?.getPanel(side)
@@ -161,6 +175,15 @@ export function useProjectReviewLayout(
 		}
 		visible.value = !visible.value
 		panel.api.setVisible(visible.value)
+		scheduleSave()
+	}
+
+	function toggleToolsPanel() {
+		const panel = rows?.getPanel('bottom')
+		if (!panel || !rows) return
+		if (bottomVisible.value) bottomHeight = panel.api.height
+		bottomVisible.value = !bottomVisible.value
+		panel.api.setVisible(bottomVisible.value)
 		scheduleSave()
 	}
 
@@ -266,8 +289,10 @@ export function useProjectReviewLayout(
 	})
 
 	return {
+		bottomVisible,
 		leftVisible,
 		openTab,
+		resetActiveTabs,
 		rightVisible,
 		topLeftGroupId,
 		topRightGroupId,
@@ -276,5 +301,6 @@ export function useProjectReviewLayout(
 		onTabsReady,
 		onDividerDoubleClick,
 		toggleSidebar,
+		toggleToolsPanel,
 	}
 }

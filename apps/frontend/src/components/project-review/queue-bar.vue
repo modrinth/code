@@ -10,12 +10,29 @@
 		>
 			<div class="flex items-center gap-3 text-[0.6875rem] font-medium" aria-live="polite">
 				<button
+					v-tooltip="{ text: formatMessage(commonMessages.settingsLabel), delay: 500 }"
 					type="button"
 					class="queue-action"
 					:aria-label="formatMessage(commonMessages.settingsLabel)"
 					@click="settingsModal?.show($event)"
 				>
 					<SettingsIcon aria-hidden="true" />
+				</button>
+				<button
+					v-tooltip="{
+						text: formatMessage(bottomVisible ? messages.hideTools : messages.showTools),
+						delay: 500,
+					}"
+					type="button"
+					class="queue-action"
+					:aria-label="formatMessage(bottomVisible ? messages.hideTools : messages.showTools)"
+					:aria-expanded="bottomVisible"
+					@click="toggleToolsPanel"
+				>
+					<component
+						:is="bottomVisible ? PanelTopCloseIcon : PanelTopOpenIcon"
+						aria-hidden="true"
+					/>
 				</button>
 				<span
 					>{{ formatMessage(messages.complete) }}
@@ -72,6 +89,8 @@ import {
 	KeyboardIcon,
 	LeftArrowIcon,
 	LogOutIcon,
+	PanelTopCloseIcon,
+	PanelTopOpenIcon,
 	RightArrowIcon,
 	SettingsIcon,
 	UndoIcon,
@@ -83,6 +102,7 @@ import ModerationKeybinds from '~/components/ui/moderation/settings/ModerationKe
 import ModerationSettings from '~/components/ui/moderation/settings/ModerationSettings.vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
+import { injectProjectReviewContext } from './layout/context'
 import { projectReviewMessages as messages } from './messages'
 
 const settingsModal = ref<InstanceType<typeof TabbedModal> | null>(null)
@@ -100,6 +120,7 @@ const settingsTabs: TabbedModalTab[] = [
 ]
 
 const { queue, isLoading, navigation } = injectProjectReviewPageContext()
+const { bottomVisible, toggleToolsPanel } = injectProjectReviewContext()
 const {
 	busy,
 	error: navigationError,

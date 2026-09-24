@@ -150,6 +150,14 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.hideRight',
 		defaultMessage: 'Hide panel',
 	},
+	showTools: {
+		id: 'moderation.project-review.showTools',
+		defaultMessage: 'Show tools panel',
+	},
+	hideTools: {
+		id: 'moderation.project-review.hideTools',
+		defaultMessage: 'Hide tools panel',
+	},
 	empty: {
 		id: 'moderation.project-review.empty',
 		defaultMessage: 'No project selected',
@@ -246,9 +254,17 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.platforms',
 		defaultMessage: 'Platforms',
 	},
+	emptyPlatforms: {
+		id: 'moderation.project-review.emptyPlatforms',
+		defaultMessage: 'No platforms',
+	},
 	environments: {
 		id: 'moderation.project-review.environments',
 		defaultMessage: 'Environments',
+	},
+	emptyEnvironments: {
+		id: 'moderation.project-review.emptyEnvironments',
+		defaultMessage: 'No environments',
 	},
 	members: {
 		id: 'moderation.project-review.members',

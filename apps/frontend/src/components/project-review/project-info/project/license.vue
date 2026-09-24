@@ -4,7 +4,7 @@
 			<span v-tooltip="project.license.id" class="flex min-h-6 min-w-0 items-center">
 				{{ licenseName }}
 			</span>
-			<TagItem class="!border-surface-4 !bg-surface-3 !text-secondary" v-if="isCustomLicense">
+			<TagItem v-if="isCustomLicense" class="!border-surface-4 !bg-surface-3 !text-secondary">
 				Custom
 			</TagItem>
 		</div>

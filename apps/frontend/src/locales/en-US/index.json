@@ -3143,11 +3143,17 @@
   "moderation.project-review.emptyDescription": {
     "message": "No description"
   },
+  "moderation.project-review.emptyEnvironments": {
+    "message": "No environments"
+  },
   "moderation.project-review.emptyGallery": {
     "message": "No gallery images"
   },
   "moderation.project-review.emptyLinks": {
     "message": "No links"
+  },
+  "moderation.project-review.emptyPlatforms": {
+    "message": "No platforms"
   },
   "moderation.project-review.emptyTags": {
     "message": "No tags"
@@ -3196,6 +3202,9 @@
   },
   "moderation.project-review.hideRight": {
     "message": "Hide panel"
+  },
+  "moderation.project-review.hideTools": {
+    "message": "Hide tools panel"
   },
   "moderation.project-review.history": {
     "message": "History"
@@ -3382,6 +3391,9 @@
   },
   "moderation.project-review.showRight": {
     "message": "Show panel"
+  },
+  "moderation.project-review.showTools": {
+    "message": "Show tools panel"
   },
   "moderation.project-review.skip": {
     "message": "Skip"

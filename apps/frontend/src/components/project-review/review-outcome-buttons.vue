@@ -7,10 +7,19 @@
 			size="sm"
 			:type="action.type"
 			:color="action.color"
-			:disabled="!canSubmit || generating || project.status === action.status"
-			@click="submitDecision(action.status)"
+			:disabled="
+				!canSubmit ||
+				generating ||
+				advancingAction !== undefined ||
+				(project.status === action.status && pendingDecisionStatus !== action.status)
+			"
+			@click="submitDecisionAndContinue(action.status)"
 		>
-			<SpinnerIcon v-if="loadingAction === action.status" class="animate-spin" aria-hidden="true" />
+			<SpinnerIcon
+				v-if="loadingAction === action.status || advancingAction === action.status"
+				class="animate-spin"
+				aria-hidden="true"
+			/>
 			{{ formatMessage(action.label) }}
 		</Button>
 	</div>
@@ -19,15 +28,17 @@
 <script setup lang="ts">
 import { SpinnerIcon } from '@modrinth/assets'
 import { Button, defineMessages, useVIntl } from '@modrinth/ui'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewMessages } from '~/providers/project-review/review-messages'
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
-const { project } = injectProjectReviewPageContext()
-const { canSubmit, loadingAction, submitDecision } = injectReviewSubmission()
+const { project, navigation } = injectProjectReviewPageContext()
+const { canSubmit, loadingAction, pendingDecisionStatus, submitDecision } =
+	injectReviewSubmission()
 const { generating } = injectReviewMessages()
+const advancingAction = ref<Parameters<typeof submitDecision>[0]>()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	approve: { id: 'project-review.decision.approve', defaultMessage: 'Approve' },
@@ -57,4 +68,15 @@ const actions = computed(() => [
 		color: 'red' as const,
 	},
 ])
+
+async function submitDecisionAndContinue(status: Parameters<typeof submitDecision>[0]) {
+	const id = project.value?.id
+	if (!id) return
+	advancingAction.value = status
+	try {
+		if (await submitDecision(status)) await navigation.completeAndNext(id)
+	} finally {
+		advancingAction.value = undefined
+	}
+}
 </script>
