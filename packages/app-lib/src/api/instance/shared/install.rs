@@ -13,6 +13,27 @@ pub async fn install_shared_instance(
     server_manager_icon_url: Option<String>,
     instance_icon_url: Option<String>,
 ) -> crate::Result<InstallJobSnapshot> {
+    crate::util::fetch::wait_for_local_api_rate_limit(
+        install_shared_instance_inner(
+            shared_instance_id,
+            name,
+            manager_id,
+            server_manager_name,
+            server_manager_icon_url,
+            instance_icon_url,
+        ),
+    )
+    .await
+}
+
+async fn install_shared_instance_inner(
+    shared_instance_id: &str,
+    name: String,
+    manager_id: Option<String>,
+    server_manager_name: Option<String>,
+    server_manager_icon_url: Option<String>,
+    instance_icon_url: Option<String>,
+) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;
     let version = get_latest_remote_version(shared_instance_id, &state).await?;
     let data = shared_instance_install_data(
@@ -44,6 +65,16 @@ pub(super) fn shared_instance_invite_install_name(
 
 #[tracing::instrument]
 pub async fn get_shared_instance_install_preview(
+    shared_instance_id: &str,
+    name: String,
+) -> crate::Result<SharedInstanceInstallPreview> {
+    crate::util::fetch::wait_for_local_api_rate_limit(
+        get_shared_instance_install_preview_inner(shared_instance_id, name),
+    )
+    .await
+}
+
+async fn get_shared_instance_install_preview_inner(
     shared_instance_id: &str,
     name: String,
 ) -> crate::Result<SharedInstanceInstallPreview> {
@@ -176,6 +207,15 @@ pub(super) async fn shared_instance_install_preview_from_version(
 pub async fn get_shared_instance_update_preview(
     instance_id: &str,
 ) -> crate::Result<Option<SharedInstanceUpdatePreview>> {
+    crate::util::fetch::wait_for_local_api_rate_limit(
+        get_shared_instance_update_preview_inner(instance_id),
+    )
+    .await
+}
+
+async fn get_shared_instance_update_preview_inner(
+    instance_id: &str,
+) -> crate::Result<Option<SharedInstanceUpdatePreview>> {
     let state = State::get().await?;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
@@ -276,6 +316,15 @@ pub(crate) async fn check_shared_instance_availability_before_launch(
 
 #[tracing::instrument]
 pub async fn update_shared_instance(
+    instance_id: &str,
+) -> crate::Result<InstallJobSnapshot> {
+    crate::util::fetch::wait_for_local_api_rate_limit(
+        update_shared_instance_inner(instance_id),
+    )
+    .await
+}
+
+async fn update_shared_instance_inner(
     instance_id: &str,
 ) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;

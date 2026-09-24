@@ -193,6 +193,17 @@ static GLOBAL_FETCH_FENCE: LazyLock<FetchFence> =
     });
 
 const API_RETRY_AFTER_FALLBACK: Duration = Duration::from_secs(60);
+const LOCAL_API_RATE_LIMIT_WAIT: Duration = Duration::from_secs(30);
+
+tokio::task_local! {
+    static WAIT_FOR_LOCAL_API_RATE_LIMIT: ();
+}
+
+pub(crate) async fn wait_for_local_api_rate_limit<F: Future>(
+    future: F,
+) -> F::Output {
+    WAIT_FOR_LOCAL_API_RATE_LIMIT.scope((), future).await
+}
 
 // This means the unit recovery time will be:
 // replenish one unit time in seconds = (60 / (units recovered per minute))
@@ -959,12 +970,15 @@ async fn fetch_advanced_with_target(
     to_file: bool,
     file_staging: Option<&Path>,
 ) -> crate::Result<FetchBody> {
-    let _permit =
-        crate::install::control::download_step(semaphore.0.acquire()).await??;
-
     let is_api_url = url.starts_with(env!("MODRINTH_API_URL"))
         || url.starts_with(env!("MODRINTH_API_URL_V3"));
     let fence_key = if is_api_url { uri_path } else { None };
+    let wait_for_local_rate_limit = is_api_url
+        && (crate::install::control::CURRENT_INSTALL
+            .try_with(|_| ())
+            .is_ok()
+            || WAIT_FOR_LOCAL_API_RATE_LIMIT.try_with(|_| ()).is_ok());
+    let mut rate_limit_deadline = None;
 
     let creds = if header
         .as_ref()
@@ -980,17 +994,6 @@ async fn fetch_advanced_with_target(
         .map(|m| (DOWNLOAD_META_HEADER.to_string(), m.to_header_value()));
 
     for attempt in 1..=(FETCH_ATTEMPTS + 1) {
-        if is_api_url && let Err(error) = GLOBAL_API_RATE_LIMIT.check() {
-            warn!(
-                request_path = %url.split('?').next().unwrap_or(url),
-                ?uri_path,
-                attempt,
-                error = %error,
-                "Modrinth API request blocked by local rate limiter"
-            );
-            return Err(error);
-        }
-
         if let Some(fence_key) = fence_key
             && GLOBAL_FETCH_FENCE.is_blocked(fence_key)
         {
@@ -999,6 +1002,50 @@ async fn fetch_advanced_with_target(
             )
             .into());
         }
+
+        let _permit = loop {
+            let permit =
+                crate::install::control::download_step(semaphore.0.acquire())
+                    .await??;
+            if is_api_url && let Err(error) = GLOBAL_API_RATE_LIMIT.check() {
+                let retry_after = Duration::from_secs(
+                    GLOBAL_API_RATE_LIMIT.retry_in_seconds().unwrap_or(0),
+                );
+                if wait_for_local_rate_limit {
+                    let deadline =
+                        rate_limit_deadline.get_or_insert_with(|| {
+                            Instant::now() + LOCAL_API_RATE_LIMIT_WAIT
+                        });
+                    if retry_after
+                        <= deadline.saturating_duration_since(Instant::now())
+                    {
+                        drop(permit);
+                        crate::install::control::download_step(
+                            tokio::time::sleep(retry_after),
+                        )
+                        .await?;
+                        continue;
+                    }
+                }
+                warn!(
+                    request_path = %url.split('?').next().unwrap_or(url),
+                    ?uri_path,
+                    attempt,
+                    error = %error,
+                    "Modrinth API request blocked by local rate limiter"
+                );
+                return Err(error);
+            }
+            if let Some(fence_key) = fence_key
+                && GLOBAL_FETCH_FENCE.is_blocked(fence_key)
+            {
+                return Err(ErrorKind::ApiIsDownError(
+                    GLOBAL_FETCH_FENCE.latest_block_minutes(),
+                )
+                .into());
+            }
+            break permit;
+        };
 
         let mut req = client.request(method.clone(), url);
 
@@ -1021,7 +1068,18 @@ async fn fetch_advanced_with_target(
             req = req.header(name.as_str(), value.as_str());
         }
 
-        let result = crate::install::control::download_step(req.send()).await?;
+        let result = crate::install::control::download_step(async {
+            if let Some(fence_key) = fence_key
+                && GLOBAL_FETCH_FENCE.is_blocked(fence_key)
+            {
+                return Err(ErrorKind::ApiIsDownError(
+                    GLOBAL_FETCH_FENCE.latest_block_minutes(),
+                )
+                .into());
+            }
+            Ok::<_, crate::Error>(req.send().await)
+        })
+        .await??;
         match result {
             Ok(resp) => {
                 if is_api_url
