@@ -7,12 +7,14 @@ use std::{
 };
 
 use async_trait::async_trait;
-use eyre::Result;
+use eyre::{Context, Result, eyre};
+use tokio::fs;
 
 use crate::util::argument::SandboxArg;
 
 // TODO cfgs
 mod bubblewrap;
+mod flatpak;
 mod unix;
 
 /// Entry point into the sandboxing mechanism.
@@ -24,6 +26,7 @@ mod unix;
 ///
 /// Each platform has its own sandboxing backend(s):
 /// - Linux
+///   - In Flatpak: [`flatpak`]
 ///   - Outside of Flatpak: [`bubblewrap`]
 #[async_trait]
 pub trait Backend {
@@ -47,7 +50,16 @@ pub trait SandboxEnv: Debug + Send + Sync {
 /// Creates a [`SandboxEnv`] by automatically determining the best environment
 /// to create.
 pub async fn init_env() -> Result<Box<dyn SandboxEnv>> {
-    bubblewrap::Bubblewrap::init().await
+    const FLATPAK_INFO_PATH: &str = "/.flatpak-info";
+
+    if fs::try_exists(FLATPAK_INFO_PATH)
+        .await
+        .wrap_err_with(|| eyre!("checking if `{FLATPAK_INFO_PATH}` exists"))?
+    {
+        flatpak::Flatpak::init().await
+    } else {
+        bubblewrap::Bubblewrap::init().await
+    }
 }
 
 /// Configuration for launching a sandboxed process.

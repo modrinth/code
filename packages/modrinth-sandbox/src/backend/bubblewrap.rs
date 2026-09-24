@@ -23,22 +23,25 @@ pub struct Bubblewrap;
 #[async_trait]
 impl Backend for Bubblewrap {
     async fn init() -> Result<Box<dyn SandboxEnv>> {
-        let bwrap = find_command(OsStr::new("bwrap"))
-            .await
-            .wrap_err("searching for `bwrap` executable")?;
-        let xdg_dbus_proxy =
-            find_command(OsStr::new("xdg-dbus-proxy"))
-                .await
-                .wrap_err("searching for `xdg-dbus-proxy` executable")?;
-        let dev_null =
-            super::unix::open_dev_null().wrap_err("opening /dev/null")?;
-        Ok(Box::new(BubblewrapEnv {
-            bwrap,
-            xdg_dbus_proxy,
-            dbus_proxy: OnceLock::new(),
-            dev_null,
-        }) as Box<dyn SandboxEnv>)
+        init().await.map(|env| Box::new(env) as Box<dyn SandboxEnv>)
     }
+}
+
+async fn init() -> Result<BubblewrapEnv> {
+    let bwrap = find_command("bwrap")
+        .await
+        .wrap_err("searching for `bwrap` executable")?;
+    let xdg_dbus_proxy = find_command("xdg-dbus-proxy")
+        .await
+        .wrap_err("searching for `xdg-dbus-proxy` executable")?;
+    let dev_null =
+        super::unix::open_dev_null().wrap_err("opening /dev/null")?;
+    Ok(BubblewrapEnv {
+        bwrap,
+        xdg_dbus_proxy,
+        dbus_proxy: OnceLock::new(),
+        dev_null,
+    })
 }
 
 #[derive(Debug)]
@@ -276,17 +279,13 @@ fn spawn(
             let Some(filename) = path.file_name() else {
                 continue;
             };
-            if card_names.contains(&filename.to_os_string()) {
-                if let Ok(device) = path.join("device").canonicalize() {
-                    let driver = device.join("driver");
-                    builder.bind_if_exists(BindType::ReadOnly, device, true);
-                    if let Ok(driver) = driver.canonicalize() {
-                        builder.bind_if_exists(
-                            BindType::ReadOnly,
-                            driver,
-                            true,
-                        );
-                    }
+            if card_names.contains(&filename.to_os_string())
+                && let Ok(device) = path.join("device").canonicalize()
+            {
+                let driver = device.join("driver");
+                builder.bind_if_exists(BindType::ReadOnly, device, true);
+                if let Ok(driver) = driver.canonicalize() {
+                    builder.bind_if_exists(BindType::ReadOnly, driver, true);
                 }
             }
         }
@@ -498,13 +497,13 @@ struct DbusProxy {
     proxy_session_path: PathBuf,
 }
 
-const DBUS_ADDRESS_ENV: &str = "DBUS_SESSION_BUS_ADDRESS";
-
 fn start_dbus_proxy<'a>(
     env: &'a BubblewrapEnv,
     runtime_dir: &Path,
     die_with_parent: bool,
 ) -> Result<&'a DbusProxy, &'a eyre::Report> {
+    const DBUS_ADDRESS_ENV: &str = "DBUS_SESSION_BUS_ADDRESS";
+
     env.dbus_proxy.get_or_init(|| {
         let session_bus_address = std::env::var_os(DBUS_ADDRESS_ENV)
             .wrap_err_with(|| eyre!("reading `{DBUS_ADDRESS_ENV}`"))?;
