@@ -145,7 +145,9 @@ const {
 	getQueuedServerInstallPlans,
 	setQueuedServerInstallPlans,
 	resolveQueuedServerInstallPlan,
+	activeServerModpackInstallProjectId,
 	openServerModpackInstallFlow,
+	onServerFlowHide,
 	onServerFlowBack,
 	handleServerModpackFlowCreate,
 	markServerProjectInstalled,
@@ -946,7 +948,9 @@ function getCardActions(
 		allInstalledIds.value.has(projectResult.project_id || '') ||
 		serverContentProjectIds.value.has(projectResult.project_id || '') ||
 		serverContextServerData.value?.upstream?.project_id === projectResult.project_id
-	const isInstalling = installingProjectIds.value.has(projectResult.project_id)
+	const isInstalling =
+		installingProjectIds.value.has(projectResult.project_id) ||
+		activeServerModpackInstallProjectId.value === projectResult.project_id
 	const showAsInstalled =
 		isInstalled && currentProjectType !== 'modpack' && !isSetupServerContext.value
 
@@ -1416,7 +1420,7 @@ provideBrowseManager({
 			:on-back="onServerFlowBack"
 			:get-project-versions="getServerProjectVersions"
 			:get-loader-manifest="getLoaderManifest"
-			@hide="() => {}"
+			@hide="onServerFlowHide"
 			@browse-modpacks="() => {}"
 			@create="handleServerModpackFlowCreate"
 		/>

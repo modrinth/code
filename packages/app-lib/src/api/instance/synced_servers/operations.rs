@@ -216,7 +216,25 @@ pub(in crate::api::instance) async fn reconcile_servers(
             .as_ref()
             .is_some_and(|value| value.source_revision == revision)
         {
-            return Ok(());
+            let projections =
+                load_projection_entries(&metadata.instance.id, state).await?;
+            let records = compose_records(metadata, state).await?;
+            if projections.len() == records.len()
+                && projections.iter().zip(&records).enumerate().all(
+                    |(position, (projection, record))| {
+                        let owner = match record.source {
+                            ServerSource::UserSynced => ProjectionOwner::Synced,
+                            _ => ProjectionOwner::Instance,
+                        };
+                        projection.id == record.id
+                            && projection.owner == owner
+                            && projection.data == record.data
+                            && projection.position == position as i64
+                    },
+                )
+            {
+                return Ok(());
+            }
         }
         return compose_instance(metadata, state).await;
     }

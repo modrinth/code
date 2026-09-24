@@ -94,10 +94,7 @@ export function createSharedInstanceContext(
 
 	const updatePreviewQuery = useQuery(
 		computed(() => ({
-			...sharedInstanceUpdatePreviewQueryOptions(
-				instance.value?.id ?? '',
-				auth.user.value?.id,
-			),
+			...sharedInstanceUpdatePreviewQueryOptions(instance.value?.id ?? '', auth.user.value?.id),
 			enabled:
 				!!instance.value?.id &&
 				instance.value.install_stage === 'installed' &&

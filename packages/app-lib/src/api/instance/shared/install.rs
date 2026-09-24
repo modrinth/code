@@ -13,7 +13,7 @@ pub async fn install_shared_instance(
     server_manager_icon_url: Option<String>,
     instance_icon_url: Option<String>,
 ) -> crate::Result<InstallJobSnapshot> {
-    crate::util::fetch::wait_for_local_api_rate_limit(
+    crate::util::fetch::wait_for_local_api_rate_limit(Box::pin(
         install_shared_instance_inner(
             shared_instance_id,
             name,
@@ -22,7 +22,7 @@ pub async fn install_shared_instance(
             server_manager_icon_url,
             instance_icon_url,
         ),
-    )
+    ))
     .await
 }
 
