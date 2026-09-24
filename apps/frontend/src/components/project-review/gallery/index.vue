@@ -1,7 +1,12 @@
 <template>
-	<div class="flex h-full min-h-0 flex-col gap-2.5 overflow-hidden">
-		<ReviewPanel mode="inline" :target="{ kind: 'gallery' }" :disabled="isLoading || !!error">
-		</ReviewPanel>
+	<div ref="hotkeyScope" class="group/gallery flex h-full min-h-0 flex-col gap-2.5 overflow-hidden">
+		<ReviewPanel
+			mode="inline"
+			:target="{ kind: 'gallery' }"
+			:disabled="isLoading || !!error"
+			:hotkey-scope="hotkeyScope"
+			class="group-hover/gallery:opacity-100"
+		/>
 		<div class="min-h-0 flex-1 overflow-y-auto overscroll-contain">
 			<p v-if="!selection" class="m-0 text-secondary">
 				{{ formatMessage(messages.empty) }}
@@ -17,13 +22,9 @@
 				{{ formatMessage(messages.emptyGallery) }}
 			</p>
 			<div v-else class="gallery-grid">
-				<ReviewPanel
+				<article
 					v-for="(item, index) in gallery"
 					:key="item.url"
-					mode="anchored"
-					as="article"
-					trigger-placement="overlay"
-					:target="{ kind: 'gallery-image', key: item.url }"
 					class="flex min-w-0 flex-col overflow-hidden rounded-xl border border-solid border-surface-4"
 				>
 					<button
@@ -58,7 +59,7 @@
 							})
 						}}</time>
 					</div>
-				</ReviewPanel>
+				</article>
 			</div>
 		</div>
 		<ImageViewerEditor :key="projectId" ref="viewer" :items="viewerItems" editor="disabled">
@@ -81,7 +82,7 @@
 <script setup lang="ts">
 import { ExternalIcon } from '@modrinth/assets'
 import { Button, ButtonLink, ImageViewerEditor, useFormatDateTime, useVIntl } from '@modrinth/ui'
-import { computed, ref } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
@@ -89,6 +90,7 @@ import { projectReviewMessages as messages } from '../messages'
 import ReviewPanel from '../review-panel/index.vue'
 
 const { formatMessage } = useVIntl()
+const hotkeyScope = useTemplateRef<HTMLElement>('hotkeyScope')
 const formatDateTime = useFormatDateTime({
 	dateStyle: 'long',
 	timeStyle: 'short',
