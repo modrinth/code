@@ -1,9 +1,6 @@
 import type { Labrinth } from '@modrinth/api-client'
 
-export type UpdateAllVersion = Pick<
-	Labrinth.Versions.v2.Version,
-	'id' | 'version_number'
-> &
+export type UpdateAllVersion = Pick<Labrinth.Versions.v2.Version, 'id' | 'version_number'> &
 	Partial<Pick<Labrinth.Versions.v2.Version, 'version_type' | 'changelog'>>
 
 export interface UpdateAllItem {

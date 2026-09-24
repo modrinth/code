@@ -605,15 +605,6 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "實例"
   },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "正在下載專案 {current, number}/{total, number}..."
-  },
-  "app.instance.mods.bulk-update.finishing": {
-    "message": "正在結束更新..."
-  },
-  "app.instance.mods.bulk-update.resolving-versions": {
-    "message": "正在解析版本..."
-  },
   "app.instance.mods.content-type-project": {
     "message": "專案"
   },

@@ -980,7 +980,12 @@ async function handleBulkUpdate(selections: UpdateAllSelection[]) {
 	if (contentActionDisabled.value) return
 	const addons = selections.flatMap((selection) => {
 		const item = contentItems.value.find((item) => getContentItemId(item) === selection.id)
-		if (!item?.has_update || item.locked || item.installing || item.project.id !== selection.projectId)
+		if (
+			!item?.has_update ||
+			item.locked ||
+			item.installing ||
+			item.project.id !== selection.projectId
+		)
 			return []
 		return [{ filename: item.file_name, version_id: selection.version.id }]
 	})

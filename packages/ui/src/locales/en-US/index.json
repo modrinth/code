@@ -722,6 +722,12 @@
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Failed to load content"
   },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "Failed to load changelog"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "Failed to load available updates"
+  },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
   },

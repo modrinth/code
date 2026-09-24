@@ -255,7 +255,11 @@ defineExpose({ show, hide })
 				<div
 					v-if="!loading && rows.length"
 					class="update-all-modal-scroll-header relative z-[1] grid shrink-0 border-0 border-b border-solid border-surface-5 bg-surface-3"
-					:class="compactTable ? 'grid-cols-1' : '@[720px]:grid-cols-[240px_minmax(0,1fr)_120px] @[900px]:grid-cols-[240px_minmax(0,1fr)_128px] @[940px]:grid-cols-[304px_minmax(0,1fr)_128px] @[1080px]:grid-cols-[360px_minmax(0,1fr)_128px]'"
+					:class="
+						compactTable
+							? 'grid-cols-1'
+							: '@[720px]:grid-cols-[240px_minmax(0,1fr)_120px] @[900px]:grid-cols-[240px_minmax(0,1fr)_128px] @[940px]:grid-cols-[304px_minmax(0,1fr)_128px] @[1080px]:grid-cols-[360px_minmax(0,1fr)_128px]'
+					"
 					:data-show-fade="showTopFade"
 				>
 					<div class="flex items-center gap-3 px-4 py-3 font-semibold">
@@ -273,7 +277,10 @@ defineExpose({ show, hide })
 					<div v-if="!compactTable" class="hidden px-4 py-3 font-semibold @[720px]:block">
 						{{ formatMessage(messages.versions) }}
 					</div>
-					<div v-if="!compactTable" class="hidden truncate px-4 py-3 text-right font-semibold @[720px]:block">
+					<div
+						v-if="!compactTable"
+						class="hidden truncate px-4 py-3 text-right font-semibold @[720px]:block"
+					>
 						{{ formatMessage(commonMessages.changelogLabel) }}
 					</div>
 				</div>
@@ -285,7 +292,9 @@ defineExpose({ show, hide })
 						>
 							<colgroup>
 								<col
-									:class="compactTable ? 'w-full' : 'w-[240px] @[940px]:w-[304px] @[1080px]:w-[360px]'"
+									:class="
+										compactTable ? 'w-full' : 'w-[240px] @[940px]:w-[304px] @[1080px]:w-[360px]'
+									"
 								/>
 								<col v-if="!compactTable" />
 								<col v-if="!compactTable" class="w-[120px] @[900px]:w-[128px]" />
@@ -294,7 +303,9 @@ defineExpose({ show, hide })
 								<tr>
 									<th scope="col">{{ formatMessage(messages.project) }}</th>
 									<th v-if="!compactTable" scope="col">{{ formatMessage(messages.versions) }}</th>
-									<th v-if="!compactTable" scope="col">{{ formatMessage(commonMessages.changelogLabel) }}</th>
+									<th v-if="!compactTable" scope="col">
+										{{ formatMessage(commonMessages.changelogLabel) }}
+									</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -304,7 +315,9 @@ defineExpose({ show, hide })
 									class="h-[57px] border-0 border-b border-solid border-surface-5"
 									:class="[
 										index % 2 ? 'bg-surface-1.5' : 'bg-surface-2',
-										row.version && !controlsDisabled ? 'cursor-pointer transition-colors hover:bg-surface-3' : '',
+										row.version && !controlsDisabled
+											? 'cursor-pointer transition-colors hover:bg-surface-3'
+											: '',
 									]"
 									@mouseenter="preloadChangelog(row.id)"
 									@click="handleRowClick(row.id, $event)"
@@ -359,18 +372,24 @@ defineExpose({ show, hide })
 													:disabled="controlsDisabled"
 													@select="selectVersion(row.id, $event)"
 												/>
-												<span v-else-if="!row.version" class="block truncate text-sm text-secondary">{{
-													formatMessage(messages.noVersion)
-												}}</span>
+												<span
+													v-else-if="!row.version"
+													class="block truncate text-sm text-secondary"
+													>{{ formatMessage(messages.noVersion) }}</span
+												>
 											</div>
 										</div>
 									</td>
 									<td v-show="!compactTable" class="px-4 py-3">
 										<div class="flex justify-end">
 											<IconButton
-												v-tooltip="formatMessage(messages.viewChangelog, { project: row.project.title })"
+												v-tooltip="
+													formatMessage(messages.viewChangelog, { project: row.project.title })
+												"
 												size="sm"
-												:label="formatMessage(messages.viewChangelog, { project: row.project.title })"
+												:label="
+													formatMessage(messages.viewChangelog, { project: row.project.title })
+												"
 												:disabled="!row.version || controlsDisabled"
 												@focus="preloadChangelog(row.id)"
 												@click="openChangelog(row.id)"
@@ -389,7 +408,9 @@ defineExpose({ show, hide })
 									:key="row.id"
 									class="min-w-0 rounded-2xl border border-solid border-surface-5 bg-surface-2 p-4"
 									:class="
-										row.version && !controlsDisabled ? 'cursor-pointer transition-colors hover:bg-surface-3' : ''
+										row.version && !controlsDisabled
+											? 'cursor-pointer transition-colors hover:bg-surface-3'
+											: ''
 									"
 									@mouseenter="preloadChangelog(row.id)"
 									@click="handleRowClick(row.id, $event)"
@@ -412,14 +433,18 @@ defineExpose({ show, hide })
 											class="min-w-0 flex-1 cursor-pointer break-words border-0 bg-transparent p-0 text-left font-medium text-contrast hover:underline"
 											:disabled="!row.version || controlsDisabled"
 											:data-changelog-id="row.id"
-											:aria-label="formatMessage(messages.viewChangelog, { project: row.project.title })"
+											:aria-label="
+												formatMessage(messages.viewChangelog, { project: row.project.title })
+											"
 											@focus="preloadChangelog(row.id)"
 											@click="openChangelog(row.id)"
 										>
 											{{ row.project.title }}
 										</button>
 										<IconButton
-											v-tooltip="formatMessage(messages.viewChangelog, { project: row.project.title })"
+											v-tooltip="
+												formatMessage(messages.viewChangelog, { project: row.project.title })
+											"
 											size="md"
 											:label="formatMessage(messages.viewChangelog, { project: row.project.title })"
 											:disabled="!row.version || controlsDisabled"
@@ -447,7 +472,9 @@ defineExpose({ show, hide })
 												class="mt-1 w-full"
 												:versions="row.versions"
 												:version="row.version"
-												:label="formatMessage(messages.selectVersion, { project: row.project.title })"
+												:label="
+													formatMessage(messages.selectVersion, { project: row.project.title })
+												"
 												:disabled="controlsDisabled"
 												wrap
 												@select="selectVersion(row.id, $event)"
@@ -496,12 +523,12 @@ defineExpose({ show, hide })
 					>
 						<div class="order-1 flex min-w-0 items-center gap-2 @[560px]:flex-1">
 							<Avatar :src="activeRow.project.icon_url" size="36px" class="!rounded-lg" />
-											<UpdateAllModalTruncatedProjectTitle
-												:id="changelogHeadingId"
-												as="h3"
-												:title="activeRow.project.title"
-												class="m-0 min-w-0 flex-1 truncate text-xl font-semibold text-contrast"
-											/>
+							<UpdateAllModalTruncatedProjectTitle
+								:id="changelogHeadingId"
+								as="h3"
+								:title="activeRow.project.title"
+								class="m-0 min-w-0 flex-1 truncate text-xl font-semibold text-contrast"
+							/>
 						</div>
 						<div
 							class="order-3 col-span-2 flex min-w-0 items-center gap-2 @[560px]:order-2 @[560px]:col-span-1"

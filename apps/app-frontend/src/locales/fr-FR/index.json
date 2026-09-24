@@ -605,15 +605,6 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "Instance"
   },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "Téléchargement de {current, number}/{total, number} projets..."
-  },
-  "app.instance.mods.bulk-update.finishing": {
-    "message": "Finalisation de la mise à jour..."
-  },
-  "app.instance.mods.bulk-update.resolving-versions": {
-    "message": "Résolution des versions..."
-  },
   "app.instance.mods.content-type-project": {
     "message": "projet"
   },

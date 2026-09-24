@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	ArrowDownAZIcon,
 	ArrowUpZAIcon,
@@ -19,7 +20,6 @@ import {
 	TrashIcon,
 	UserIcon,
 } from '@modrinth/assets'
-import type { Labrinth } from '@modrinth/api-client'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useSessionStorage } from '@vueuse/core'
 import { chunk } from 'es-toolkit'
@@ -32,7 +32,10 @@ import EmptyState from '#ui/components/base/EmptyState.vue'
 import FilterPills from '#ui/components/base/FilterPills.vue'
 import Input from '#ui/components/base/inputs/Input.vue'
 import UpdateAllModal from '#ui/components/modal/update-all-modal/index.vue'
-import type { UpdateAllItem, UpdateAllSelection } from '#ui/components/modal/update-all-modal/update-all-modal-types'
+import type {
+	UpdateAllItem,
+	UpdateAllSelection,
+} from '#ui/components/modal/update-all-modal/update-all-modal-types'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectModrinthClient } from '#ui/providers/api-client'
@@ -57,11 +60,7 @@ import {
 	useContentSelection,
 } from './composables'
 import { injectContentManager } from './providers/content-manager'
-import type {
-	ContentActionWarning,
-	ContentCardTableItem,
-	ContentItem,
-} from './types'
+import type { ContentActionWarning, ContentCardTableItem, ContentItem } from './types'
 
 const { formatMessage } = useVIntl()
 const debug = useDebugLogger('ContentPageLayout')
@@ -891,7 +890,12 @@ async function loadRecommendedUpdateVersions(items: ContentItem[]) {
 }
 
 async function openUpdateAll(items: ContentItem[]) {
-	if (!ctx.bulkUpdateSelections || ctx.isBusy.value || isBulkOperating.value || loadingUpdateAll.value)
+	if (
+		!ctx.bulkUpdateSelections ||
+		ctx.isBusy.value ||
+		isBulkOperating.value ||
+		loadingUpdateAll.value
+	)
 		return
 	const candidates = getUpdateAllCandidates(items)
 	if (candidates.length === 0) return
@@ -1023,7 +1027,12 @@ async function loadUpdateAllChangelog(selection: UpdateAllSelection) {
 }
 
 async function updateAllSelected(selections: UpdateAllSelection[]) {
-	if (!ctx.bulkUpdateSelections || ctx.isBusy.value || isBulkOperating.value || selections.length === 0)
+	if (
+		!ctx.bulkUpdateSelections ||
+		ctx.isBusy.value ||
+		isBulkOperating.value ||
+		selections.length === 0
+	)
 		return
 	++updateAllRequestId
 	isBulkOperating.value = true
@@ -1579,7 +1588,10 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:action-disabled="ctx.isBusy.value"
 			@changelog="loadUpdateAllChangelog"
 			@preload-changelog="preloadUpdateAllChangelog"
-			@cancel="++updateAllRequestId; loadingUpdateAll = false"
+			@cancel="
+				++updateAllRequestId
+				loadingUpdateAll = false
+			"
 			@update="updateAllSelected"
 		/>
 		<ConfirmUnlinkModal
