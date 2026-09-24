@@ -125,13 +125,7 @@
 <script setup lang="ts">
 import { ChevronDownIcon, EditIcon, RefreshCwIcon, XIcon } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
-import {
-	Button,
-	commonMessages,
-	defineMessages,
-	MarkdownEditor,
-	useVIntl,
-} from '@modrinth/ui'
+import { Button, commonMessages, defineMessages, MarkdownEditor, useVIntl } from '@modrinth/ui'
 import { renderHighlightedString } from '@modrinth/utils/highlightjs/index'
 import { computed, ref, useId } from 'vue'
 

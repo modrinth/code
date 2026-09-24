@@ -110,10 +110,17 @@
 						panelBinding.panel.hint
 					"
 					:text="panelBinding.panel.hint"
-					:aria-label="panelBinding.panel.hint"
 					class="ml-px flex shrink-0 self-center text-secondary"
 				>
-					<InfoIcon class="size-4" aria-hidden="true" />
+					<a
+						:href="panelBinding.panel.guidanceUrl"
+						target="_blank"
+						rel="noopener noreferrer"
+						:aria-label="formatMessage(messages.openReviewGuidance)"
+						class="flex text-secondary hover:text-contrast"
+					>
+						<InfoIcon class="size-4" aria-hidden="true" />
+					</a>
 				</Tooltip>
 			</div>
 		</div>
@@ -142,7 +149,7 @@
 			<p v-if="correction.panel.title" class="m-0 font-semibold text-contrast">
 				{{ correction.panel.title }}
 			</p>
-			<Controls
+			<RecursiveControls
 				:target="target"
 				:binding="correction"
 				:keybind-offset="correctionOffsets[correctionIndex]"
@@ -166,7 +173,7 @@ import {
 	Tooltip,
 	useVIntl,
 } from '@modrinth/ui'
-import { type ComponentPublicInstance, computed, nextTick, useId } from 'vue'
+import { type ComponentPublicInstance, computed, getCurrentInstance, nextTick, useId } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
 import type { ReviewTarget } from '~/providers/project-review/review'
@@ -182,6 +189,7 @@ const props = defineProps<{
 	binding?: ReviewPanelBinding
 	keybindOffset?: number
 }>()
+const RecursiveControls = getCurrentInstance()!.type
 const emit = defineEmits<{
 	'dropdown-open': []
 	'dropdown-close': []

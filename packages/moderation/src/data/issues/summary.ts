@@ -51,6 +51,8 @@ export const summaryReviewPanel = panel({
 	title: 'Summary',
 	hint: "Is the project's summary sufficient?",
 	icon: AlignLeftIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf080bfb5e5c7c6211c693b',
 }).content(
 	section().content(
 		toggle({

@@ -42,6 +42,7 @@ export const permissionsReviewPanel = panel({
 	title: 'Modpack Permissions',
 	hint: "Does this project's external content have any issues?",
 	icon: SignatureIcon,
+	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
 	shown: ({ ProjectV3, permissions }) =>
 		ProjectV3.project_types.includes('modpack') &&
 		!ProjectV3.minecraft_server &&

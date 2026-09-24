@@ -118,6 +118,7 @@ export interface Panel {
 	shown?: WithContext<boolean>
 	title?: WithContext<string>
 	hint: WithContext<string>
+	guidanceUrl: string
 	children: PanelNode[]
 }
 

@@ -142,6 +142,8 @@ export const rulesReviewPanel = panel({
 	title: 'Rule Following',
 	hint: 'Does this project violate the rules?',
 	icon: ListBulletedIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080709084f6269835607f',
 }).content(
 	section().content(
 		toggle({

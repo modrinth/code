@@ -63,6 +63,7 @@ export interface ReviewPanelBinding {
 		icon: Panel['icon']
 		title: string | undefined
 		hint: string
+		guidanceUrl: string
 		sections: ResolvedPanelSection[]
 	}
 }
@@ -245,6 +246,7 @@ export function createReviewPanels(
 					icon: panel.icon,
 					title: resolveWithContext(panel.title, context),
 					hint: resolveWithContext(panel.hint, context),
+					guidanceUrl: panel.guidanceUrl,
 					sections,
 				},
 			})

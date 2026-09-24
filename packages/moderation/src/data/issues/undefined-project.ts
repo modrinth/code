@@ -15,6 +15,8 @@ export const undefinedProjectReviewPanel = panel({
 	title: 'Undefined Project',
 	hint: 'This project is undefined!',
 	icon: XIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#3475ee711bf080018bf3d822a2f51a35',
 	shown: ({ ProjectV3 }) => !ProjectV3.minecraft_server && ProjectV3.versions.length === 0,
 }).content(
 	toggle({

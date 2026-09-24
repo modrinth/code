@@ -35,8 +35,7 @@ import { injectReviewMessages } from '~/providers/project-review/review-messages
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
 const { project, navigation } = injectProjectReviewPageContext()
-const { canSubmit, loadingAction, pendingDecisionStatus, submitDecision } =
-	injectReviewSubmission()
+const { canSubmit, loadingAction, pendingDecisionStatus, submitDecision } = injectReviewSubmission()
 const { generating } = injectReviewMessages()
 const advancingAction = ref<Parameters<typeof submitDecision>[0]>()
 const { formatMessage } = useVIntl()

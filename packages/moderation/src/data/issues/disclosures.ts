@@ -181,6 +181,7 @@ export const aiDisclosureReviewPanel = panel({
 	title: 'AI Usage',
 	hint: 'Has this project accurately disclosed this content?',
 	icon: TriangleAlertIcon,
+	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
 }).content(
 	toggle({
 		issue: disclosuresIssue,
@@ -252,6 +253,7 @@ export const aiFunctionalityDisclosureReviewPanel = panel({
 	title: 'AI Functionality',
 	hint: 'Has this project accurately disclosed this content?',
 	icon: TriangleAlertIcon,
+	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
 }).content(
 	toggle({
 		issue: disclosuresIssue,
@@ -271,6 +273,7 @@ export const adsDisclosureReviewPanel = panel({
 	title: 'Advertisements',
 	hint: 'Has this project accurately disclosed this content?',
 	icon: TriangleAlertIcon,
+	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
 }).content(
 	toggle({
 		issue: disclosuresIssue,
@@ -290,6 +293,7 @@ export const paidFeaturesDisclosureReviewPanel = panel({
 	title: 'Paid Features',
 	hint: 'Has this project accurately disclosed this content?',
 	icon: TriangleAlertIcon,
+	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
 }).content(
 	toggle({
 		issue: disclosuresIssue,
@@ -309,6 +313,7 @@ export const telemetryDisclosureReviewPanel = panel({
 	title: 'Telemetry',
 	hint: 'Has this project accurately disclosed this content?',
 	icon: TriangleAlertIcon,
+	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
 }).content(
 	toggle({
 		issue: disclosuresIssue,
@@ -363,6 +368,7 @@ export const derivativeContentDisclosureReviewPanel = panel({
 	title: 'Derivative Content',
 	hint: 'Has this project accurately disclosed this content?',
 	icon: TriangleAlertIcon,
+	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
 }).content(
 	toggle({
 		issue: disclosuresIssue,
@@ -382,6 +388,7 @@ export const photosensitivityDisclosureReviewPanel = panel({
 	title: 'Photosensitivity',
 	hint: 'Has this project accurately disclosed this content?',
 	icon: TriangleAlertIcon,
+	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
 }).content(
 	toggle({
 		issue: disclosuresIssue,
@@ -401,6 +408,7 @@ export const systemInteractionsDisclosureReviewPanel = panel({
 	title: 'System Interactions',
 	hint: 'Has this project accurately disclosed this content?',
 	icon: TriangleAlertIcon,
+	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
 }).content(
 	toggle({
 		issue: disclosuresIssue,
@@ -420,6 +428,7 @@ export const archiveDisclosureReviewPanel = panel({
 	title: 'Archive',
 	hint: 'Has this project accurately disclosed this content?',
 	icon: TriangleAlertIcon,
+	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
 }).content(
 	toggle({
 		issue: disclosuresIssue,
@@ -438,6 +447,7 @@ export const archiveDisclosureReviewPanel = panel({
 export const disclosuresReviewPanel = panel({
 	hint: 'Has this project selected all proper content disclosures?',
 	icon: TriangleAlertIcon,
+	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
 }).content(
 	toggle({
 		issue: disclosuresNonEnglishIssue,

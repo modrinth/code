@@ -32,6 +32,8 @@ export const licenseReviewPanel = panel({
 	title: 'License',
 	hint: 'Is this license and link valid?',
 	icon: BookTextIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf080f8805df7d012a8f770',
 }).content(
 	toggle({
 		issue: licenseInvalidLinkIssue,

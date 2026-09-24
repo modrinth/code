@@ -26,6 +26,10 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.reviewSection',
 		defaultMessage: 'Review {section}',
 	},
+	openReviewGuidance: {
+		id: 'moderation.project-review.openReviewGuidance',
+		defaultMessage: 'Open review guidance in new tab',
+	},
 	closeReview: {
 		id: 'moderation.project-review.closeReview',
 		defaultMessage: 'Close review controls',

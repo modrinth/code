@@ -136,6 +136,8 @@ export const issuesReviewPanel = panel({
 	title: 'Issue tracker',
 	hint: "Is the project's link accurate and accessible?",
 	icon: LinkIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
 	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.issues?.url),
 }).content(
 	toggle({
@@ -161,6 +163,8 @@ export const sourceReviewPanel = panel({
 	title: 'Source code',
 	hint: "Is the project's link accurate and accessible?",
 	icon: LinkIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
 	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.source?.url),
 }).content(
 	toggle({
@@ -186,6 +190,8 @@ export const wikiReviewPanel = panel({
 	title: 'Wiki page',
 	hint: "Is the project's link accurate and accessible?",
 	icon: LinkIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
 	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.wiki?.url),
 }).content(
 	toggle({
@@ -211,6 +217,8 @@ export const discordReviewPanel = panel({
 	title: 'Discord invite',
 	hint: "Is the project's link accurate and accessible?",
 	icon: LinkIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
 	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.discord?.url),
 }).content(
 	toggle({
@@ -236,6 +244,8 @@ export const siteReviewPanel = panel({
 	title: 'Website',
 	hint: "Is the project's link accurate and accessible?",
 	icon: LinkIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
 	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.site?.url),
 }).content(
 	toggle({
@@ -254,6 +264,8 @@ export const storeReviewPanel = panel({
 	title: 'Store',
 	hint: "Is the project's link accurate and accessible?",
 	icon: LinkIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
 	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.store?.url),
 }).content(
 	toggle({
@@ -272,6 +284,8 @@ export const patreonReviewPanel = panel({
 	title: 'Patreon',
 	hint: "Is the project's link accurate and accessible?",
 	icon: LinkIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
 	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.patreon?.url),
 }).content(
 	toggle({
@@ -290,6 +304,8 @@ export const bmacReviewPanel = panel({
 	title: 'Buy Me A Coffee',
 	hint: "Is the project's link accurate and accessible?",
 	icon: LinkIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
 	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.bmac?.url),
 }).content(
 	toggle({
@@ -308,6 +324,8 @@ export const paypalReviewPanel = panel({
 	title: 'PayPal',
 	hint: "Is the project's link accurate and accessible?",
 	icon: LinkIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
 	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.paypal?.url),
 }).content(
 	toggle({
@@ -326,6 +344,8 @@ export const githubReviewPanel = panel({
 	title: 'GitHub Sponsors',
 	hint: "Is the project's link accurate and accessible?",
 	icon: LinkIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
 	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.github?.url),
 }).content(
 	toggle({
@@ -344,6 +364,8 @@ export const koFiReviewPanel = panel({
 	title: 'Ko-fi',
 	hint: "Is the project's link accurate and accessible?",
 	icon: LinkIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
 	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls['ko-fi']?.url),
 }).content(
 	toggle({
@@ -362,6 +384,8 @@ export const otherReviewPanel = panel({
 	title: 'Other',
 	hint: "Is the project's link accurate and accessible?",
 	icon: LinkIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
 	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.other?.url),
 }).content(
 	toggle({

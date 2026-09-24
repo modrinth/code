@@ -170,7 +170,7 @@ import ModerationQueueCard from '~/components/ui/moderation/ModerationQueueCard.
 import ModerationQueueSkeleton from '~/components/ui/moderation/ModerationQueueSkeleton.vue'
 import ModerationQueueToolbar from '~/components/ui/moderation/ModerationQueueToolbar.vue'
 import QueueSummaryModal from '~/components/ui/moderation/QueueSummaryModal.vue'
-import { type ModerationProject, toModerationProjects } from '~/helpers/moderation.ts'
+import { toModerationProjects } from '~/helpers/moderation.ts'
 import { useModerationQueue } from '~/services/moderation/queue.ts'
 import { findNextEligibleQueueProject } from '~/services/moderation/queue-eligibility.ts'
 

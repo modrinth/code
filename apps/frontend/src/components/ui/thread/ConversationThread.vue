@@ -478,8 +478,6 @@
 <script setup>
 import {
 	CheckCircleIcon,
-	FileTextIcon,
-	MoreHorizontalIcon,
 	ReplyIcon,
 	ScaleIcon,
 	SendIcon,
@@ -498,7 +496,6 @@ import {
 	MarkdownEditor,
 	NewModal,
 	Tabs,
-	TeleportOverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
 import { useEventListener } from '@vueuse/core'

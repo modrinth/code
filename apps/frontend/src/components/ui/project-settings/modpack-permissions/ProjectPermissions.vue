@@ -638,21 +638,25 @@ function dismissInfoBanner() {
 		<div v-if="isModerator" class="mt-4 flex flex-wrap items-center gap-3">
 			<template v-if="noPermissionCount > 0">
 				<span class="flex items-center gap-1 text-red">
-					<XCircleIcon class="size-4 shrink-0" /> {{ formatMessage(messages.noPermissionCount, { count: noPermissionCount }) }}
+					<XCircleIcon class="size-4 shrink-0" />
+					{{ formatMessage(messages.noPermissionCount, { count: noPermissionCount }) }}
 				</span>
 				<span class="text-surface-5">•</span>
 			</template>
 			<template v-if="pendingCount > 0">
 				<span class="flex items-center gap-1 text-orange">
-					<PauseIcon class="size-4 shrink-0" /> {{ formatMessage(messages.userActionCount, { count: pendingCount }) }}
+					<PauseIcon class="size-4 shrink-0" />
+					{{ formatMessage(messages.userActionCount, { count: pendingCount }) }}
 				</span>
 				<span class="text-surface-5">•</span>
 			</template>
 			<span v-if="pendingApprovalCount > 0" class="flex items-center gap-1 text-contrast">
-				<ScaleIcon class="size-4 shrink-0" /> {{ formatMessage(messages.awaitingReviewCount, { count: pendingApprovalCount }) }}
+				<ScaleIcon class="size-4 shrink-0" />
+				{{ formatMessage(messages.awaitingReviewCount, { count: pendingApprovalCount }) }}
 			</span>
 			<span v-else class="flex items-center gap-1 text-secondary">
-				<ScaleIcon class="size-4 shrink-0" /> {{ formatMessage(messages.awaitingReviewCount, { count: 0 }) }}
+				<ScaleIcon class="size-4 shrink-0" />
+				{{ formatMessage(messages.awaitingReviewCount, { count: 0 }) }}
 			</span>
 		</div>
 		<div class="mt-4 flex flex-col gap-3">

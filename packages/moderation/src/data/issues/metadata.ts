@@ -69,6 +69,8 @@ export const metadataReviewPanel = panel({
 	title: 'Metadata',
 	hint: "Are there any issues with this project's metadata?",
 	icon: DatabaseIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e25ee711bf0802d9a9bdb82dce040eb',
 	shown: ({ ProjectV3 }) => !ProjectV3.minecraft_server,
 }).content(
 	toggle({

@@ -18,9 +18,26 @@
 		>
 			<template #title>
 				<div v-if="title" class="flex items-center gap-2">
-					<h2 :id="titleId" class="m-0 text-lg font-semibold text-contrast">{{ title }}</h2>
-					<Tooltip v-if="hint" :text="hint" :aria-label="hint" class="flex shrink-0 text-secondary">
-						<InfoIcon class="size-4" aria-hidden="true" />
+					<h2 :id="titleId" class="m-0 text-lg font-semibold text-contrast">
+						{{ title }}
+					</h2>
+					<Tooltip
+						v-if="hint"
+						:text="hint"
+						:aria-label="guidanceUrl ? undefined : hint"
+						class="flex shrink-0 text-secondary"
+					>
+						<a
+							v-if="guidanceUrl"
+							:href="guidanceUrl"
+							target="_blank"
+							rel="noopener noreferrer"
+							:aria-label="formatMessage(messages.openReviewGuidance)"
+							class="flex text-secondary hover:text-contrast"
+						>
+							<InfoIcon class="size-4" aria-hidden="true" />
+						</a>
+						<InfoIcon v-else class="size-4" aria-hidden="true" />
 					</Tooltip>
 				</div>
 			</template>
@@ -41,9 +58,26 @@
 		class="box-border flex w-full flex-col gap-2.5 overflow-y-auto text-sm text-primary opacity-60 transition-opacity duration-150 hover:opacity-100"
 	>
 		<div v-if="title" class="flex items-center gap-2">
-			<h2 :id="titleId" class="m-0 text-sm font-semibold text-contrast">{{ title }}</h2>
-			<Tooltip v-if="hint" :text="hint" :aria-label="hint" class="flex shrink-0 text-secondary">
-				<InfoIcon class="size-4" aria-hidden="true" />
+			<h2 :id="titleId" class="m-0 text-sm font-semibold text-contrast">
+				{{ title }}
+			</h2>
+			<Tooltip
+				v-if="hint"
+				:text="hint"
+				:aria-label="guidanceUrl ? undefined : hint"
+				class="flex shrink-0 text-secondary"
+			>
+				<a
+					v-if="guidanceUrl"
+					:href="guidanceUrl"
+					target="_blank"
+					rel="noopener noreferrer"
+					:aria-label="formatMessage(messages.openReviewGuidance)"
+					class="flex text-secondary hover:text-contrast"
+				>
+					<InfoIcon class="size-4" aria-hidden="true" />
+				</a>
+				<InfoIcon v-else class="size-4" aria-hidden="true" />
 			</Tooltip>
 		</div>
 		<template v-if="!disabled">
@@ -87,6 +121,7 @@ const titleId = `${id}-title`
 const panel = computed(() => panels.resolve(props.target)?.panel)
 const title = computed(() => panel.value?.title)
 const hint = computed(() => panel.value?.hint)
+const guidanceUrl = computed(() => panel.value?.guidanceUrl)
 const accessibleTitle = computed(() =>
 	formatMessage(messages.reviewSection, { section: title.value ?? hint.value ?? '' }),
 )

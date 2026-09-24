@@ -3290,6 +3290,9 @@
   "moderation.project-review.openMemberAvatar": {
     "message": "View enlarged avatar for {username}"
   },
+  "moderation.project-review.openReviewGuidance": {
+    "message": "Open review guidance in new tab"
+  },
   "moderation.project-review.optional": {
     "message": "Optional"
   },

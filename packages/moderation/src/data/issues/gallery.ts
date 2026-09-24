@@ -33,6 +33,8 @@ export const galleryShowcaseClarityIssue = issue({
 export const galleryReviewPanel = panel({
 	hint: "Are this project's gallery images sufficient?",
 	icon: ImageIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08096828bd1c3f24d8b8e',
 }).content(
 	toggle({
 		issue: galleryInsufficientIssue,

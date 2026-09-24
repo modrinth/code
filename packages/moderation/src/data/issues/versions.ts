@@ -91,6 +91,8 @@ export const versionsUnsupportedIssue = issue({
 export const versionsReviewPanel = panel({
 	hint: "Are this project's files correct?",
 	icon: VersionIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e25ee711bf0804bad38e9055951ff31',
 	shown: ({ ProjectV3 }) => !ProjectV3.minecraft_server,
 }).content(
 	toggle({

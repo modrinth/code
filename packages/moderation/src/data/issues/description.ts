@@ -93,6 +93,8 @@ export const unclearDescriptionIssue = issue({
 export const descriptionReviewPanel = panel({
 	hint: 'Is the description sufficient, accurate, and accessible?',
 	icon: LibraryIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf080508042e70089dd787e',
 }).content(
 	toggle({
 		label: 'Insufficient',

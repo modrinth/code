@@ -51,6 +51,8 @@ export const titleReviewPanel = panel({
 	title: 'Title',
 	hint: "Are the project's name and URL accurate and appropriate?",
 	icon: BookOpenIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf0803c9660e90f0fead705',
 }).content(
 	section().content(
 		toggle({

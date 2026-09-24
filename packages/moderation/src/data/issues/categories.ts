@@ -37,6 +37,8 @@ export const categoriesReviewPanel = panel({
 	title: 'Tags',
 	hint: "Are the project's tags accurate?",
 	icon: TagsIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf0802f96aafc0397a9f6d3',
 	shown: ({ ProjectV3 }) =>
 		ProjectV3.categories.length > 0 || ProjectV3.additional_categories.length > 0,
 }).content(

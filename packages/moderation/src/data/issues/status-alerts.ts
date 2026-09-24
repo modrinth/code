@@ -79,6 +79,8 @@ export const statusAlertsReviewPanel = panel({
 	title: 'Status Alerts',
 	hint: "Is anything else affecting this project's status?",
 	icon: MegaphoneIcon,
+	guidanceUrl:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080968699c397e470eca6',
 }).content(
 	toggle({
 		issue: statusAlertsCorrectionsAppliedIssue,
