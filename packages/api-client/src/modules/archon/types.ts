@@ -1181,6 +1181,20 @@ export namespace Archon {
 				}
 				content: WorldContentItem[]
 			}
+			export type WorldContentFileSideEvent = {
+				type: 'world.content.file.side.server.updated' | 'world.content.file.side.client.updated'
+				world_id: string
+				parent_directory: 'mods' | 'plugins' | 'datapacks' | 'resourcepacks' | 'shaderpacks'
+				filename: string
+				enabled: boolean
+			}
+			export type WorldContentFileSideLockEvent = {
+				type: 'world.content.file.side.lock.updated'
+				world_id: string
+				parent_directory: 'mods' | 'plugins' | 'datapacks' | 'resourcepacks' | 'shaderpacks'
+				filename: string
+				locked: boolean
+			}
 
 			export type WorldSharedInstanceUpdateEvent = {
 				type: 'world.shared_instance.update'
@@ -1214,6 +1228,8 @@ export namespace Archon {
 				| WorldContentAddonPatchEvent
 				| WorldContentBaseUpdateEvent
 				| WorldContentUpdateEvent
+				| WorldContentFileSideEvent
+				| WorldContentFileSideLockEvent
 				| WorldSharedInstanceUpdateEvent
 				| WorldSharedInstanceDeleteEvent
 		}

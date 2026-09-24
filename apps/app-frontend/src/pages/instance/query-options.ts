@@ -1,6 +1,7 @@
 import { queryOptions } from '@tanstack/vue-query'
 
 import { get_project_v3 } from '@/helpers/cache.js'
+import { install_get_shared_instance_update_preview } from '@/helpers/install'
 import {
 	get as getInstance,
 	list as listInstances,
@@ -9,7 +10,6 @@ import {
 	list_synced_screenshots,
 } from '@/helpers/instance'
 import { loadInstanceContentData } from '@/helpers/instance-content'
-import { install_get_shared_instance_update_preview } from '@/helpers/install'
 import { get_by_instance_id } from '@/helpers/process'
 import { refreshWorlds } from '@/helpers/worlds'
 

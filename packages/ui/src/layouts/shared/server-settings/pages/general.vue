@@ -175,20 +175,20 @@ const isValidServerName = computed(() => (serverName.value?.length ?? 0) > 0)
 // Preferences
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
-	incompatibleContentTitle: {
-		id: 'hosting.settings.warn-incompatible-content.title',
-		defaultMessage: 'Warn before enabling incompatible content',
+	environmentChangesTitle: {
+		id: 'hosting.settings.warn-environment-changes.title',
+		defaultMessage: 'Warn about incompatible or required content',
 	},
-	incompatibleContentDescription: {
-		id: 'hosting.settings.warn-incompatible-content.description',
+	environmentChangesDescription: {
+		id: 'hosting.settings.warn-environment-changes.description',
 		defaultMessage:
-			'Ask for confirmation when enabling content for an environment it may not support.',
+			'Ask for confirmation before enabling content on an unsupported side or disabling it on a required side.',
 	},
 })
 const preferences = computed(() => ({
 	warnOnIncompatibleContent: {
-		displayName: formatMessage(messages.incompatibleContentTitle),
-		description: formatMessage(messages.incompatibleContentDescription),
+		displayName: formatMessage(messages.environmentChangesTitle),
+		description: formatMessage(messages.environmentChangesDescription),
 		implemented: true,
 	},
 	hideSubdomainLabel: {

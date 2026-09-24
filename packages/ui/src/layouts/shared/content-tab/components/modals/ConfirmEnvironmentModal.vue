@@ -1,13 +1,13 @@
 <template>
 	<NewModal
 		ref="modal"
-		:header="formatMessage(side === 'server' ? messages.serverTitle : messages.playerTitle)"
+		:header="formatMessage(titleMessage)"
 		fade="warning"
 		max-width="500px"
 		:on-hide="() => resolveConfirmation(false)"
 	>
 		<div class="flex flex-col gap-6">
-			<Admonition type="warning" :header="formatMessage(messages.admonitionTitle)">
+			<Admonition type="warning" :header="formatMessage(admonitionMessage)">
 				{{ formatMessage(bodyMessage, { project }) }}
 			</Admonition>
 		</div>
@@ -19,7 +19,7 @@
 				</Button>
 				<Button type="colored" color="orange" :disabled="actionDisabled" @click="confirm">
 					<CheckIcon />
-					{{ formatMessage(commonMessages.enableButton) }}
+					{{ formatMessage(enabled ? commonMessages.enableButton : commonMessages.disableButton) }}
 				</Button>
 			</div>
 		</template>
@@ -49,9 +49,21 @@ const messages = defineMessages({
 		id: 'content.confirm-environment.player-title',
 		defaultMessage: 'Enable for players?',
 	},
+	disableServerTitle: {
+		id: 'content.confirm-environment.disable-server-title',
+		defaultMessage: 'Disable for your server?',
+	},
+	disablePlayerTitle: {
+		id: 'content.confirm-environment.disable-player-title',
+		defaultMessage: 'Disable for players?',
+	},
 	admonitionTitle: {
 		id: 'content.confirm-environment.admonition-title',
 		defaultMessage: 'This content may be incompatible',
+	},
+	requiredAdmonitionTitle: {
+		id: 'content.confirm-environment.required-admonition-title',
+		defaultMessage: 'This content is required here',
 	},
 	serverBody: {
 		id: 'content.confirm-environment.server-body',
@@ -68,20 +80,37 @@ const messages = defineMessages({
 		defaultMessage:
 			'{project} is intended for singleplayer. Enabling it on your server could cause errors or prevent your server from starting.',
 	},
+	disableServerBody: {
+		id: 'content.confirm-environment.disable-server-body',
+		defaultMessage:
+			'{project} is required on the server. Disabling it may prevent your server from working correctly.',
+	},
+	disablePlayerBody: {
+		id: 'content.confirm-environment.disable-player-body',
+		defaultMessage:
+			'{project} is required on players’ clients. Disabling it may prevent players from using this content correctly.',
+	},
 })
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const project = ref('')
 const side = ref<ContentSide>('server')
+const enabled = ref(true)
 const singleplayer = ref(false)
 let pendingConfirmation: ((confirmed: boolean) => void) | undefined
-const bodyMessage = computed(() =>
-	side.value === 'player'
-		? messages.playerBody
-		: singleplayer.value
-			? messages.singleplayerBody
-			: messages.serverBody,
+const titleMessage = computed(() => {
+	if (enabled.value) return side.value === 'server' ? messages.serverTitle : messages.playerTitle
+	return side.value === 'server' ? messages.disableServerTitle : messages.disablePlayerTitle
+})
+const admonitionMessage = computed(() =>
+	enabled.value ? messages.admonitionTitle : messages.requiredAdmonitionTitle,
 )
+const bodyMessage = computed(() => {
+	if (!enabled.value)
+		return side.value === 'server' ? messages.disableServerBody : messages.disablePlayerBody
+	if (side.value === 'player') return messages.playerBody
+	return singleplayer.value ? messages.singleplayerBody : messages.serverBody
+})
 
 function resolveConfirmation(confirmed: boolean) {
 	const resolve = pendingConfirmation
@@ -95,10 +124,16 @@ function confirm() {
 	modal.value?.hide()
 }
 
-function show(name: string, targetSide: ContentSide, isSingleplayer: boolean) {
+function show(
+	name: string,
+	targetSide: ContentSide,
+	targetEnabled: boolean,
+	isSingleplayer: boolean,
+) {
 	if (pendingConfirmation) return Promise.resolve(false)
 	project.value = name
 	side.value = targetSide
+	enabled.value = targetEnabled
 	singleplayer.value = isSingleplayer
 	return new Promise<boolean>((resolve) => {
 		pendingConfirmation = resolve

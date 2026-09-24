@@ -452,11 +452,26 @@
   "content.confirm-environment.admonition-title": {
     "defaultMessage": "This content may be incompatible"
   },
+  "content.confirm-environment.disable-player-body": {
+    "defaultMessage": "{project} is required on players’ clients. Disabling it may prevent players from using this content correctly."
+  },
+  "content.confirm-environment.disable-player-title": {
+    "defaultMessage": "Disable for players?"
+  },
+  "content.confirm-environment.disable-server-body": {
+    "defaultMessage": "{project} is required on the server. Disabling it may prevent your server from working correctly."
+  },
+  "content.confirm-environment.disable-server-title": {
+    "defaultMessage": "Disable for your server?"
+  },
   "content.confirm-environment.player-body": {
     "defaultMessage": "{project} isn’t intended to run on players’ clients. Enabling it could cause errors or prevent their game from starting."
   },
   "content.confirm-environment.player-title": {
     "defaultMessage": "Enable for players?"
+  },
+  "content.confirm-environment.required-admonition-title": {
+    "defaultMessage": "This content is required here"
   },
   "content.confirm-environment.server-body": {
     "defaultMessage": "{project} isn’t intended to run on a server. Enabling it could cause errors or prevent your server from starting."
@@ -2147,11 +2162,11 @@
   "hosting.loader.support-options-title": {
     "defaultMessage": "Support options"
   },
-  "hosting.settings.warn-incompatible-content.description": {
-    "defaultMessage": "Ask for confirmation when enabling content for an environment it may not support."
+  "hosting.settings.warn-environment-changes.description": {
+    "defaultMessage": "Ask for confirmation before enabling content on an unsupported side or disabling it on a required side."
   },
-  "hosting.settings.warn-incompatible-content.title": {
-    "defaultMessage": "Warn before enabling incompatible content"
+  "hosting.settings.warn-environment-changes.title": {
+    "defaultMessage": "Warn about incompatible or required content"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Bursts up to {cpus} CPUs"
