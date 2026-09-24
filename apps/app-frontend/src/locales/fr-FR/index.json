@@ -3056,9 +3056,6 @@
   "instance.files.save-as": {
     "message": "Sauvegarder en tant que..."
   },
-  "instance.icon-editor.symbol.crafting-table": {
-    "message": "Établi"
-  },
   "instance.last-played": {
     "message": "Dernière fois joué :"
   },

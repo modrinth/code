@@ -2390,9 +2390,6 @@
   "instances.managed-content-modal.open-in-slicer": {
     "defaultMessage": "Slicer で開く"
   },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "警告"
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "現在"
   },
