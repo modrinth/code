@@ -268,7 +268,7 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 					? ctx.serverHits.value.length === 0
 					: ctx.projectHits.value.length === 0
 			"
-			class="offline"
+			class="offline text-center"
 		>
 			<p>{{ formatMessage(messages.noResults) }}</p>
 		</section>
