@@ -69,7 +69,8 @@ export const messages = defineMessages({
 	},
 	results: {
 		id: 'update-all-modal.results',
-		defaultMessage: '{count, plural, one {# project ready to update} other {# projects ready to update}}',
+		defaultMessage:
+			'{count, plural, one {# project ready to update} other {# projects ready to update}}',
 	},
 	noCompatibleUpdates: {
 		id: 'update-all-modal.no-compatible-updates',

@@ -1603,7 +1603,10 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:action-disabled="ctx.isBusy.value"
 			@changelog="loadUpdateAllChangelog"
 			@preload-changelog="preloadUpdateAllChangelog"
-			@cancel="++updateAllRequestId; loadingUpdateAll = false"
+			@cancel="
+				++updateAllRequestId
+				loadingUpdateAll = false
+			"
 			@update="updateAllSelected"
 		/>
 		<ConfirmUnlinkModal

@@ -165,13 +165,14 @@ function handleChangelogExitComplete() {
 	const id = focusAfterChangelogExit.value
 	if (!id || activeRow.value || !isOpen.value) return
 	focusAfterChangelogExit.value = undefined
-	const trigger = Array.from(tableContainer.value?.querySelectorAll<HTMLElement>('[data-changelog-id]') ?? [])
-		.find(
-			(button) =>
-				button.dataset.changelogId === id &&
-				!button.hasAttribute('disabled') &&
-				button.getClientRects().length > 0,
-		)
+	const trigger = Array.from(
+		tableContainer.value?.querySelectorAll<HTMLElement>('[data-changelog-id]') ?? [],
+	).find(
+		(button) =>
+			button.dataset.changelogId === id &&
+			!button.hasAttribute('disabled') &&
+			button.getClientRects().length > 0,
+	)
 	const focusTarget = trigger ?? modalHeading.value
 	focusTarget?.focus({ preventScroll: true })
 }
@@ -312,7 +313,10 @@ defineExpose({ show, hide })
 						<span class="hidden @[720px]:inline">{{ formatMessage(messages.project) }}</span>
 						<span class="@[720px]:hidden">{{ formatMessage(messages.selectAll) }}</span>
 					</div>
-					<div v-if="!compactTable" class="hidden items-center px-4 py-3 font-semibold @[720px]:flex">
+					<div
+						v-if="!compactTable"
+						class="hidden items-center px-4 py-3 font-semibold @[720px]:flex"
+					>
 						{{ formatMessage(messages.versions) }}
 					</div>
 					<div
@@ -546,10 +550,7 @@ defineExpose({ show, hide })
 							</div>
 						</div>
 					</template>
-					<div
-						v-else
-						class="flex h-full items-center justify-center gap-2 p-6 text-secondary"
-					>
+					<div v-else class="flex h-full items-center justify-center gap-2 p-6 text-secondary">
 						<SpinnerIcon v-if="loading" class="size-6 animate-spin" aria-hidden="true" />
 						{{ formatMessage(loading ? messages.loading : messages.empty) }}
 					</div>
