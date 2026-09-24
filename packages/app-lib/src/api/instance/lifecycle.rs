@@ -68,6 +68,21 @@ pub async fn edit(
     patch: EditInstance,
 ) -> crate::Result<InstanceMetadata> {
     let state = State::get().await?;
+    if patch.content_set_patch.is_some()
+        || patch.link.is_some()
+        || patch.update_channel.is_some()
+        || patch.install_stage.is_some()
+    {
+        let instance =
+            instance_rows::get_instance_by_id(instance_id, &state.pool)
+                .await?
+                .ok_or_else(|| {
+                    crate::state::content_store::input("Unknown instance")
+                })?;
+        super::projects::ensure_installation_content_unlocked(
+            instance.install_stage,
+        )?;
+    }
     crate::state::edit_instance(instance_id, patch, &state.pool).await?;
 
     let instance = crate::state::get_instance(instance_id, &state.pool)

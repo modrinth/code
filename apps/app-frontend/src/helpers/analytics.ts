@@ -21,7 +21,6 @@ type AnalyticsEventMap = {
 	InstanceRepair: InstanceProperties
 	InstanceSetIcon: Record<string, never>
 	InstanceRemoveIcon: Record<string, never>
-	InstanceUpdateAll: InstanceProperties & { count: number; selected: boolean }
 	InstanceProjectUpdate: InstanceProperties & { id: string; name: string; project_type: string }
 	InstanceProjectDisable: InstanceProperties & {
 		id: string

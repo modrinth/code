@@ -33,12 +33,14 @@ import { useUpdateAllSelection } from './use-update-all-selection'
 const props = withDefaults(
 	defineProps<{
 		items: UpdateAllItem[]
+		server?: boolean
 		loading?: boolean
 		loadingChangelog?: boolean
 		actionLoading?: boolean
 		actionDisabled?: boolean
 	}>(),
 	{
+		server: false,
 		loading: false,
 		loadingChangelog: false,
 		actionLoading: false,
@@ -664,7 +666,9 @@ defineExpose({ show, hide })
 		>
 			<div class="flex min-w-0 flex-1 items-start gap-2">
 				<CircleAlertIcon class="size-6 shrink-0 text-orange" aria-hidden="true" />
-				<p class="m-0 leading-6">{{ formatMessage(messages.warning) }}</p>
+				<p class="m-0 leading-6">
+					{{ formatMessage(server ? messages.serverWarning : messages.warning) }}
+				</p>
 			</div>
 			<div
 				class="flex w-full min-w-0 flex-col gap-2 @[480px]:w-auto @[480px]:flex-row @[480px]:flex-wrap @[480px]:self-end @[720px]:ml-auto @[720px]:shrink-0"

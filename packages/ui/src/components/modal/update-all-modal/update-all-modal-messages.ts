@@ -54,6 +54,11 @@ export const messages = defineMessages({
 		defaultMessage:
 			'We can’t guarantee updates are safe for your worlds. Review the changelogs and consider a backup.',
 	},
+	serverWarning: {
+		id: 'update-all-modal.warning-server',
+		defaultMessage:
+			'We can’t guarantee updates will be safe for your server. Review the changelogs and consider a backup.',
+	},
 	update: {
 		id: 'update-all-modal.update',
 		defaultMessage: 'Update {count, plural, one {# project} other {# projects}}',

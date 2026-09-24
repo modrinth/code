@@ -117,7 +117,7 @@ import {
 	useVIntl,
 	versionChangesGameVersion,
 } from '@modrinth/ui'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -133,6 +133,7 @@ import { useAppEvent } from '@/composables/use-app-event'
 import { type FeatureFlag, useAppSettings } from '@/composables/use-app-settings.ts'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version, get_version_many } from '@/helpers/cache.js'
+import { install_bulk_update_content } from '@/helpers/install'
 import {
 	add_project_from_path,
 	edit,
@@ -957,47 +958,35 @@ async function getDeleteDependencyWarning(items: ContentItem[]) {
 	return dependents.length > 0 ? { items, dependents } : null
 }
 
-async function bulkUpdateSelections(
-	selections: UpdateAllSelection[],
-	onProgress?: (completed: number) => void,
-) {
-	let completed = 0
-	onProgress?.(completed)
-	try {
-		for (const selection of selections) {
-			const item =
-				projects.value.find((project) => getContentItemId(project) === selection.id) ??
-				projects.value.find((project) => project.project?.id === selection.projectId)
-			if (
-				!item ||
-				!canChangeContentVersion(item) ||
-				!item.file_path ||
-				item.version?.id === selection.version.id
-			) {
-				onProgress?.(++completed)
-				continue
-			}
-			await switch_project_version_with_dependencies(
-				instance.value.id,
-				item.file_path,
-				selection.version.id,
-			)
-			trackEvent('InstanceProjectUpdate', {
-				loader: instance.value.loader,
-				game_version: instance.value.game_version,
-				id: item.project?.id,
-				name: item.project?.title ?? item.file_name,
-				project_type: item.project_type,
-			})
-			await initProjects('must_revalidate')
-			onProgress?.(++completed)
-		}
-	} catch (err) {
-		handleError(err as Error)
-		throw err
-	} finally {
-		await refreshContentState('must_revalidate')
-	}
+const bulkUpdateMutation = useMutation({
+	mutationFn: ({
+		instanceId,
+		updates,
+	}: {
+		instanceId: string
+		updates: Parameters<typeof install_bulk_update_content>[1]
+	}) => install_bulk_update_content(instanceId, updates),
+	onError: (error) => handleError(error),
+})
+
+async function bulkUpdateSelections(selections: UpdateAllSelection[]) {
+	if (isInstanceBusy.value || bulkUpdateMutation.isPending.value) return
+	const instanceId = instance.value.id
+	const updates = selections.flatMap((selection) => {
+		const item =
+			projects.value.find((project) => getContentItemId(project) === selection.id) ??
+			projects.value.find((project) => project.project?.id === selection.projectId)
+		if (
+			!item ||
+			!canChangeContentVersion(item) ||
+			!item.file_path ||
+			item.version?.id === selection.version.id
+		)
+			return []
+		return [{ project_path: item.file_path, version_id: selection.version.id }]
+	})
+	if (!updates.length) return
+	await bulkUpdateMutation.mutateAsync({ instanceId, updates })
 }
 
 async function updateProject(mod: ContentItem) {
@@ -1656,6 +1645,7 @@ provideContentManager({
 	hasUpdateSupport: true,
 	updateItem: handleUpdate,
 	bulkUpdateSelections,
+	bulkUpdatesInBackground: true,
 	currentGameVersion: computed(() => instance.value.game_version),
 	currentLoader: computed(() => instance.value.loader),
 	runManagedContentPrimaryAction:
@@ -1780,7 +1770,7 @@ useAppEvent('instance', async (event) => {
 onMounted(() => {
 	void getCurrentWebview()
 		.onDragDropEvent(async (event) => {
-			if (event.payload.type !== 'drop' || !instance.value) return
+			if (event.payload.type !== 'drop' || !instance.value || isInstanceBusy.value) return
 
 			for (const file of event.payload.paths) {
 				if (file.endsWith('.mrpack')) continue
@@ -1815,7 +1805,6 @@ watch(
 	async (newInstanceLink, oldInstanceLink) => {
 		if (oldInstanceLink && !newInstanceLink) {
 			await initProjects('must_revalidate')
-			onProgress?.(++completed)
 		}
 	},
 )
@@ -1825,7 +1814,6 @@ watch(
 	async (newValue, oldValue) => {
 		if (newValue !== oldValue) {
 			await initProjects('must_revalidate')
-			onProgress?.(++completed)
 		}
 	},
 )

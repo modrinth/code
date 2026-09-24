@@ -1,5 +1,5 @@
-use crate::event::emit::{emit_instance, emit_loading, init_loading};
-use crate::event::{InstancePayloadType, LoadingBarType};
+use crate::event::InstancePayloadType;
+use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::instance_rows;
 use crate::state::{
     CacheBehaviour, CachedEntry, ContentSourceKind, ProjectType, State,
@@ -8,7 +8,6 @@ use crate::util::fetch;
 use modrinth_content_management::{
     ContentType, ResolutionPreferences, ResolveContentPlan,
 };
-use std::collections::HashMap;
 use std::path::Path;
 
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
@@ -18,40 +17,6 @@ pub struct InstallProjectWithDependenciesRequest {
     pub content_type: ContentType,
     #[serde(default)]
     pub selected: ResolutionPreferences,
-}
-
-#[tracing::instrument]
-pub async fn update_all_projects(
-    instance_id: &str,
-) -> crate::Result<HashMap<String, String>> {
-    let state = State::get().await?;
-    ensure_instance_content_unlocked(instance_id, &state).await?;
-    let instance = get_instance_display_info(instance_id, &state).await?;
-    let loading_bar = init_loading(
-        LoadingBarType::InstanceUpdate {
-            instance_id: instance.id.clone(),
-            instance_name: instance.name.clone(),
-        },
-        100.0,
-        "Updating instance",
-    )
-    .await?;
-    let map = crate::state::instances::commands::update_all_projects(
-        instance_id,
-        &state,
-    )
-    .await?;
-    if map
-        .keys()
-        .chain(map.values())
-        .any(|path| super::synced_packs::is_pack_path(path))
-    {
-        super::synced_packs::reconcile_after_content_change(instance_id).await;
-    }
-    emit_loading(&loading_bar, 100.0, Some("Updated instance"))?;
-    emit_instance(&instance.id, InstancePayloadType::Edited).await?;
-
-    Ok(map)
 }
 
 #[tracing::instrument]
@@ -530,7 +495,12 @@ async fn ensure_instance_content_unlocked(
         return Err(quarantined_content_error().into());
     }
 
-    Ok(())
+    let instance = instance_rows::get_instance_by_id(instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| {
+            crate::state::content_store::input("Unknown instance")
+        })?;
+    ensure_installation_content_unlocked(instance.install_stage)
 }
 
 pub(super) fn ensure_metadata_content_unlocked(
@@ -540,6 +510,24 @@ pub(super) fn ensure_metadata_content_unlocked(
         return Err(quarantined_content_error().into());
     }
 
+    ensure_installation_content_unlocked(metadata.instance.install_stage)
+}
+
+pub(super) fn ensure_installation_content_unlocked(
+    stage: crate::state::InstanceInstallStage,
+) -> crate::Result<()> {
+    if matches!(
+        stage,
+        crate::state::InstanceInstallStage::MinecraftInstalling
+            | crate::state::InstanceInstallStage::PackInstalling
+    ) && crate::install::control::CURRENT_INSTALL
+        .try_with(|_| ())
+        .is_err()
+    {
+        return Err(crate::state::content_store::input(
+            "Content cannot be changed while this instance is installing or updating",
+        ));
+    }
     Ok(())
 }
 
@@ -547,15 +535,4 @@ fn quarantined_content_error() -> crate::ErrorKind {
     crate::ErrorKind::InputError(
         "Content in quarantined instances cannot be changed.".to_string(),
     )
-}
-
-async fn get_instance_display_info(
-    instance_id: &str,
-    state: &State,
-) -> crate::Result<instance_rows::InstanceDisplayInfo> {
-    instance_rows::get_instance_display_info(instance_id, &state.pool)
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string()).into()
-        })
 }

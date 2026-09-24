@@ -1462,6 +1462,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 		</template>
 
 		<ContentSelectionBar
+			v-if="!ctx.bulkUpdatesInBackground || bulkOperation !== 'update'"
 			:selected-items="bulkOperation === 'update' ? bulkUpdateItems : selectedItems"
 			:content-type-label="ctx.contentTypeLabel.value"
 			:is-busy="ctx.isBusy.value"
@@ -1596,6 +1597,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			v-if="hasBulkUpdateSupport"
 			ref="updateAllModal"
 			:items="updateAllItems"
+			:server="ctx.deletionContext === 'server'"
 			:loading="loadingUpdateAll"
 			:loading-changelog="loadingUpdateAllChangelog"
 			:action-disabled="ctx.isBusy.value"

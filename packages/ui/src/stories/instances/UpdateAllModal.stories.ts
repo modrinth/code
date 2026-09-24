@@ -195,6 +195,7 @@ const meta = {
 			description: 'Content items and compatible update candidates, ordered by preference.',
 		},
 		loading: { control: 'boolean' },
+		server: { control: 'boolean' },
 		loadingChangelog: { control: 'boolean' },
 		actionLoading: { control: 'boolean' },
 		actionDisabled: { control: 'boolean' },
@@ -247,6 +248,11 @@ export const Default: Story = {
 			},
 		},
 	},
+}
+
+export const Server: Story = {
+	render: renderModal(),
+	args: { server: true },
 }
 
 export const Tablet: Story = {

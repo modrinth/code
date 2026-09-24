@@ -159,7 +159,8 @@ async fn recover_unrecorded_instance_update_backup(
     if job.state.paths.staging_dir.is_some()
         || !matches!(
             &job.state.request,
-            InstallRequest::UpdateSharedInstance { .. }
+            InstallRequest::BulkUpdateContent { .. }
+                | InstallRequest::UpdateSharedInstance { .. }
                 | InstallRequest::InstallPackToExistingInstance { .. }
         )
     {
@@ -607,6 +608,7 @@ fn display_from_request(state: &InstallJobState) -> Option<InstallJobDisplay> {
         InstallRequest::DuplicateInstance { .. }
         | InstallRequest::InstallExistingInstance { .. }
         | InstallRequest::InstallPackToExistingInstance { .. }
+		| InstallRequest::BulkUpdateContent { .. }
         | InstallRequest::UpdateSharedInstance { .. } => {
             state.rollback.as_ref().map(|rollback| InstallJobDisplay {
                 title: rollback.instance.instance.name.clone(),

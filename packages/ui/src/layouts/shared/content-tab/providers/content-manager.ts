@@ -70,6 +70,7 @@ export interface ContentManagerContext {
 
 	// Update support (optional per-platform)
 	hasUpdateSupport: boolean
+	bulkUpdatesInBackground?: boolean
 	updateItem?: (id: string) => void
 	bulkUpdateSelections?: (
 		selections: UpdateAllSelection[],

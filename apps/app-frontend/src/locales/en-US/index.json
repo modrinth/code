@@ -302,6 +302,9 @@
   "app.download-manager.attention": {
     "message": "Needs attention"
   },
+  "app.download-manager.bulk-update-content": {
+    "message": "Updating {count, plural, one {# item} other {# items}}"
+  },
   "app.download-manager.cancel": {
     "message": "Cancel installation"
   },
