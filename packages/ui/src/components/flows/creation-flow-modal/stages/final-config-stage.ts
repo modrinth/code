@@ -49,7 +49,12 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 					? ctx.formatMessage(creationFlowMessages.setupServerButton)
 					: ctx.formatMessage(commonMessages.continueButton)
 		return {
-			label,
+			label:
+				ctx.uploadProgress.value === null
+					? label
+					: ctx.formatMessage(creationFlowMessages.uploadingProgress, {
+							percent: ctx.uploadProgress.value,
+						}),
 			icon: isFinish ? PlusIcon : RightArrowIcon,
 			iconPosition: isFinish ? ('before' as const) : ('after' as const),
 			color: isReset ? ('red' as const) : isFinish ? ('brand' as const) : undefined,
