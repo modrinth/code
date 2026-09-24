@@ -128,7 +128,8 @@ pub use self::publish::{
 };
 pub use self::types::{
     SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
-    SharedInstanceInvite, SharedInstanceInviteInstallPreview,
+    SharedInstanceInvite, SharedInstanceInviteCreator,
+    SharedInstanceInviteInstallPreview,
     SharedInstanceInviteLink, SharedInstanceJoinType,
     SharedInstancePublishPreview, SharedInstanceUpdateDiff,
     SharedInstanceUpdateDiffType, SharedInstanceUpdatePreview,

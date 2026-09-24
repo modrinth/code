@@ -269,9 +269,6 @@ export function useSharedInstanceInviteHandler(
 		try {
 			if (!(await requireAccount())) return
 			const invite = await install_accept_shared_instance_invite(inviteId)
-			const manager = invite.managerId
-				? await get_user(invite.managerId, 'bypass').catch(() => null)
-				: null
 			await showInstallOrAlreadyInstalled(
 				invite.sharedInstanceId,
 				invite.preview,
@@ -286,11 +283,11 @@ export function useSharedInstanceInviteHandler(
 					)
 					await queryClient.invalidateQueries({ queryKey: ['instances'] })
 				},
-				manager
+				invite.inviter
 					? {
-							id: manager.id,
-							username: manager.username,
-							avatarUrl: manager.avatar_url ?? null,
+							id: invite.inviter.id,
+							username: invite.inviter.name,
+							avatarUrl: invite.inviter.avatar,
 						}
 					: undefined,
 			)

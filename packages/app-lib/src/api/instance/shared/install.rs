@@ -97,6 +97,7 @@ pub async fn accept_shared_instance_invite_for_install(
     let invite = get_shared_instance_invite_info(invite_id, &state).await?;
     let shared_instance_id = invite.instance_id;
     let instance_icon_url = invite.instance_icon;
+    let inviter = invite.inviter;
     let (manager_id, server_manager_name, server_manager_icon_url) =
         shared_instance_invite_manager(invite.managers);
     let name = shared_instance_invite_install_name(
@@ -120,6 +121,7 @@ pub async fn accept_shared_instance_invite_for_install(
 
     Ok(SharedInstanceInviteInstallPreview {
         shared_instance_id,
+        inviter,
         manager_id,
         server_manager_name,
         server_manager_icon_url,
