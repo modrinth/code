@@ -12,11 +12,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { inject, onBeforeUnmount, onMounted } from 'vue'
 
-import {
-	DEFAULT_FEATURE_FLAGS,
-	type FeatureFlag,
-	useAppSettings,
-} from '@/composables/use-app-settings.ts'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import {
 	QUICK_INSTANCE_LIMIT_MAX,
 	useQuickInstanceLimit,
@@ -41,8 +37,6 @@ const { updatePreferences } = injectUserPreferences()
 const settingsModal = inject(appSettingsModalContextKey, null)
 const quickInstances = useQuickInstanceLimit()
 const queryClient = useQueryClient()
-
-const showJumpInFlag: FeatureFlag = 'worlds_in_home'
 
 const messages = defineMessages({
 	syncAcrossDevicesTitle: {
@@ -145,7 +139,7 @@ function getFeaturesSettingsState(
 		showAllScreenshots: globalSyncedOptions.screenshots,
 		showSkinSelector: settings.show_skin_selector_in_sidebar,
 		quickInstanceCount: quickInstances.limit.value ?? QUICK_INSTANCE_LIMIT_MAX,
-		showJumpIn: settings.feature_flags[showJumpInFlag] ?? DEFAULT_FEATURE_FLAGS[showJumpInFlag],
+		showJumpIn: settings.show_jump_in,
 	}
 }
 
@@ -181,10 +175,7 @@ const settingsMutation = useMutation({
 			show_worlds_tab_in_instances: value.showWorldsTab,
 			show_screenshots_tab_in_instances: value.showScreenshotsTab,
 			show_skin_selector_in_sidebar: value.showSkinSelector,
-			feature_flags: {
-				...latestSettings.feature_flags,
-				[showJumpInFlag]: value.showJumpIn,
-			},
+			show_jump_in: value.showJumpIn,
 		}
 
 		const screenshotsChanged =
@@ -205,7 +196,7 @@ const settingsMutation = useMutation({
 		appSettings.showWorldsTabInInstances = value.showWorldsTab
 		appSettings.showScreenshotsTabInInstances = value.showScreenshotsTab
 		appSettings.showSkinSelectorInSidebar = value.showSkinSelector
-		appSettings.featureFlags[showJumpInFlag] = value.showJumpIn
+		appSettings.showJumpIn = value.showJumpIn
 
 		if (updateQuickInstanceCount) {
 			quickInstances.setLimit(value.quickInstanceCount)

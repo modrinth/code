@@ -988,11 +988,13 @@ impl Process {
 
         let _ = state.friends_socket.update_status(None).await;
 
-        // If in tauri, window should show itself again after process exists if it was hidden
         #[cfg(feature = "tauri")]
         {
-            let window = crate::EventState::get_main_window().await?;
-            if let Some(window) = window {
+            let settings = crate::state::Settings::get(&state.pool).await?;
+            if settings.refocus_on_game_close
+                && let Some(window) =
+                    crate::EventState::get_main_window().await?
+            {
                 window.unminimize()?;
                 window.set_focus()?;
             }

@@ -77,6 +77,12 @@
   "app.action-bar.view-logs": {
     "message": "ดู Log"
   },
+  "app.ads-consent.accept": {
+    "message": "ยอมรับทั้งหมด"
+  },
+  "app.ads-consent.reject": {
+    "message": "ปฏิเสธทั้งหมด"
+  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "หน้าหลัก"
   },

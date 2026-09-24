@@ -293,6 +293,84 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Öncelikle uygulama ayarlarından Kaynak Paketi eşitlemeyi açın."
   },
+  "app.download-manager.active": {
+    "message": "Aktif"
+  },
+  "app.download-manager.cancel": {
+    "message": "İndirmeyi iptal et"
+  },
+  "app.download-manager.canceling": {
+    "message": "İndirme iptal ediliyor..."
+  },
+  "app.download-manager.clear-all": {
+    "message": "Hepsini sil"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Tamamlanmış işlemlerin hepsini sil"
+  },
+  "app.download-manager.complete": {
+    "message": "Tamamlandı"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Yinelenen kurulum"
+  },
+  "app.download-manager.empty": {
+    "message": "İndirme görevi yok"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Tahmini indirme hızı"
+  },
+  "app.download-manager.eta": {
+    "message": "Bu indirme için kalan tahmini süre"
+  },
+  "app.download-manager.hide": {
+    "message": "İndirme işlemlerini gizle"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "İçeri aktarılmış kurulum"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "Kurulum indirmesi"
+  },
+  "app.download-manager.modpack": {
+    "message": "Mod paketi"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Mod paketi indirmesi"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Yeni kurulum"
+  },
+  "app.download-manager.pause": {
+    "message": "İndirmeyi duraklat"
+  },
+  "app.download-manager.paused": {
+    "message": "Duraklatıldı"
+  },
+  "app.download-manager.remove": {
+    "message": "Geçmişten kaldır"
+  },
+  "app.download-manager.resume": {
+    "message": "İndirmeyi devam ettir"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Paylaşılmış grup"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "Paylaşılmış kurulum güncellemesi"
+  },
+  "app.download-manager.show": {
+    "message": "İndirme işlemlerini göster"
+  },
+  "app.download-manager.tasks": {
+    "message": "İşlemler"
+  },
+  "app.download-manager.title": {
+    "message": "İndirilenler"
+  },
+  "app.download-manager.verifying": {
+    "message": "Doğrulanıyor"
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "Yedekler klasörünü aç"
   },
@@ -1972,6 +2050,147 @@
   },
   "app.settings.game-options.keybind.mouse.right": {
     "message": "Sağ Fare"
+  },
+  "app.settings.game-options.setting.advanced-opengl.label": {
+    "message": "Gelişmiş OpenGL"
+  },
+  "app.settings.game-options.setting.ambient-occlusion.label": {
+    "message": "Yumuşak aydınlatma"
+  },
+  "app.settings.game-options.setting.ambient-volume.label": {
+    "message": "Ortam/Çevre"
+  },
+  "app.settings.game-options.setting.attack-indicator.label": {
+    "message": "Saldırı göstergesi"
+  },
+  "app.settings.game-options.setting.auto-jump.description": {
+    "message": "Bir blok yükseklikteki engelleri otomatik olarak zıplar."
+  },
+  "app.settings.game-options.setting.auto-jump.label": {
+    "message": "Otomatik zıplama"
+  },
+  "app.settings.game-options.setting.auto-suggestions.label": {
+    "message": "Komut önerileri"
+  },
+  "app.settings.game-options.setting.autosave-indicator.label": {
+    "message": "Otomatik kaydetme simgesi"
+  },
+  "app.settings.game-options.setting.blocks-volume.label": {
+    "message": "Bloklar"
+  },
+  "app.settings.game-options.setting.brightness.label": {
+    "message": "Parlaklık"
+  },
+  "app.settings.game-options.setting.cape.description": {
+    "message": "Oyuncunun pelerinini elitra dokusu dahil olmak üzere göster."
+  },
+  "app.settings.game-options.setting.cape.label": {
+    "message": "Pelerin"
+  },
+  "app.settings.game-options.setting.chat-colors.label": {
+    "message": "Sohbet renkleri"
+  },
+  "app.settings.game-options.setting.chat-delay.label": {
+    "message": "Sohbet gecikmesi"
+  },
+  "app.settings.game-options.setting.chat-opacity.label": {
+    "message": "Sohbet opaklığı"
+  },
+  "app.settings.game-options.setting.chat-preview.label": {
+    "message": "Sohbet önizlemesi"
+  },
+  "app.settings.game-options.setting.chat-scale.label": {
+    "message": "Sohbet ölçeği"
+  },
+  "app.settings.game-options.setting.chat-visibility.label": {
+    "message": "Sohbet görünürlüğü"
+  },
+  "app.settings.game-options.setting.chat-width.label": {
+    "message": "Sohbet genişliği"
+  },
+  "app.settings.game-options.setting.cloud-range.label": {
+    "message": "Bulut mesafesi"
+  },
+  "app.settings.game-options.setting.clouds.label": {
+    "message": "Bulutlar"
+  },
+  "app.settings.game-options.setting.dark-splash.description": {
+    "message": "Mojang Studios yüklenme ekranını kırmızıdan siyaha çevir."
+  },
+  "app.settings.game-options.setting.entity-distance.label": {
+    "message": "Varlık mesafesi"
+  },
+  "app.settings.game-options.setting.entity-shadows.label": {
+    "message": "Varlık gölgeleri"
+  },
+  "app.settings.game-options.setting.exclusive-fullscreen.label": {
+    "message": "Özel tam ekran"
+  },
+  "app.settings.game-options.setting.extra-telemetry.label": {
+    "message": "İsteğe bağlı ölçüm verileri"
+  },
+  "app.settings.game-options.setting.focused-chat-height.label": {
+    "message": "Odaklanmış sohbet yüksekliği"
+  },
+  "app.settings.game-options.setting.fov-effects.label": {
+    "message": "Görüş Açısı Efektleri"
+  },
+  "app.settings.game-options.setting.fov.label": {
+    "message": "Görüş Açısı"
+  },
+  "app.settings.game-options.setting.fullscreen.label": {
+    "message": "Tam Ekran"
+  },
+  "app.settings.game-options.setting.graphics.label": {
+    "message": "Grafikler"
+  },
+  "app.settings.game-options.setting.gui-scale.label": {
+    "message": "Arayüz Ölçeği"
+  },
+  "app.settings.game-options.setting.hat.label": {
+    "message": "Şapka"
+  },
+  "app.settings.game-options.setting.high-contrast.label": {
+    "message": "Yüksek karşıtlık"
+  },
+  "app.settings.game-options.setting.hostile-volume.label": {
+    "message": "Düşman yaratıklar"
+  },
+  "app.settings.game-options.setting.improved-transparency.label": {
+    "message": "Artırılmış şeffaflık"
+  },
+  "app.settings.game-options.setting.in-game-notifications.label": {
+    "message": "Oyun içi bildirimler"
+  },
+  "app.settings.game-options.setting.key-advancements.label": {
+    "message": "Başarımlar"
+  },
+  "app.settings.game-options.setting.key-attack.label": {
+    "message": "Saldır"
+  },
+  "app.settings.game-options.setting.key-back.label": {
+    "message": "Geriye yürü"
+  },
+  "app.settings.game-options.setting.key-chat.label": {
+    "message": "Sohbeti aç"
+  },
+  "app.settings.game-options.setting.key-command.label": {
+    "message": "Komut"
+  },
+  "app.settings.game-options.setting.key-debug-chunk-borders.label": {
+    "message": "Yığın sınırlarını göster"
+  },
+  "app.settings.game-options.setting.key-debug-clear-chat.label": {
+    "message": "Sohbeti temizle"
+  },
+  "app.settings.game-options.setting.key-debug-copy-location.label": {
+    "message": "Konumu kopyala"
+  },
+  "app.settings.game-options.setting.key-debug-fps-charts.label": {
+    "message": "FPS grafikleri"
+  },
+  "app.settings.game-options.setting.key-debug-hitboxes.label": {
+    "message": "Vuruş kutularını göster"
   },
   "app.settings.java-installations.location.title": {
     "message": "Java {version, number} konumu"

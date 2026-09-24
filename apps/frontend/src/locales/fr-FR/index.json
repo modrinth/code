@@ -581,11 +581,20 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
+  "app-marketing.features.importing.description": {
+    "message": "Importez toutes vos instances depuis l’ancien launcher et commencez avec Modrinth App en quelques secondes !"
+  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "Importez une instance"
+  },
+  "app-marketing.features.manage-skins.description": {
+    "message": "Changez entre tous vos skins Minecraft dans l'app."
   },
   "app-marketing.features.manage-skins.title": {
     "message": "Sélecteur de skin"
@@ -614,6 +623,9 @@
   "app-marketing.features.mod-management.version": {
     "message": "Versions"
   },
+  "app-marketing.features.open-source.description": {
+    "message": "Modrinth App est Open Source. Vous pouvez voir le code source sur <github-link>GitHub</github-link>!"
+  },
   "app-marketing.features.open-source.title": {
     "message": "Open source"
   },
@@ -622,6 +634,9 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% Processeur"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "Modrinth App est plus performante que la plupart des autres gestionnaires de mods !"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -655,6 +670,9 @@
   },
   "app-marketing.features.play.title": {
     "message": "Jouez avec vos mods préférés"
+  },
+  "app-marketing.features.settings-sync.description": {
+    "message": "Utilise les mêmes options, packs de ressource, et plus avec toutes vos instances."
   },
   "app-marketing.features.settings-sync.title": {
     "message": "Synchronisez vos paramètres"
@@ -3863,6 +3881,15 @@
   "project.settings.delete-project.title": {
     "message": "Supprimer le projet"
   },
+  "project.settings.description.title": {
+    "message": "Description"
+  },
+  "project.settings.description.updated": {
+    "message": "Description mise à jour"
+  },
+  "project.settings.description.updated-text": {
+    "message": "Votre description a été mise à jour."
+  },
   "project.settings.disclosures.advertising.description.1": {
     "message": "Doit être activé si ce projet contient des publicités, des sponsorings ou de la promotion d'autres œuvres."
   },
@@ -4091,11 +4118,86 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.links.donation.duplicate-type": {
-    "message": "Vous avez déjà un autre lien {platform}."
+  "project.settings.license.all-rights": {
+    "message": "Tous droits réservés / Aucune licence"
   },
-  "project.settings.links.donation.no-type": {
-    "message": "Veuillez sélectionner une plateforme pour ce lien de donation."
+  "project.settings.license.allow-later": {
+    "message": "Autoriser les éditions futures"
+  },
+  "project.settings.license.custom": {
+    "message": "Personnalisé"
+  },
+  "project.settings.license.later": {
+    "message": "Éditions futures"
+  },
+  "project.settings.license.select": {
+    "message": "Sélectionner une licence"
+  },
+  "project.settings.license.select-description": {
+    "message": "Comment les utilisateurs sont et ne sont pas autorisés à utiliser votre projet."
+  },
+  "project.settings.license.select-placeholder": {
+    "message": "Sélectionner une licence..."
+  },
+  "project.settings.license.title": {
+    "message": "Licence"
+  },
+  "project.settings.license.updated": {
+    "message": "Licence mise à jour"
+  },
+  "project.settings.license.updated-text": {
+    "message": "Votre licence a été mise à jour."
+  },
+  "project.settings.license.url": {
+    "message": "URL de la licence"
+  },
+  "project.settings.links.add-link": {
+    "message": "Ajouter un lien"
+  },
+  "project.settings.links.discord": {
+    "message": "Invitation Discord"
+  },
+  "project.settings.links.discord-description": {
+    "message": "Un lien d'invitation vers votre serveur Discord."
+  },
+  "project.settings.links.donation-link": {
+    "message": "Lien"
+  },
+  "project.settings.links.donation-platform": {
+    "message": "Plateforme"
+  },
+  "project.settings.links.donation-url": {
+    "message": "URL"
+  },
+  "project.settings.links.donation-username": {
+    "message": "Nom d'utilisateur"
+  },
+  "project.settings.links.link-type": {
+    "message": "Type de lien"
+  },
+  "project.settings.links.server-discord": {
+    "message": "Discord"
+  },
+  "project.settings.links.site": {
+    "message": "Site web"
+  },
+  "project.settings.links.source": {
+    "message": "Code source"
+  },
+  "project.settings.links.store": {
+    "message": "Boutique"
+  },
+  "project.settings.links.title": {
+    "message": "Liens"
+  },
+  "project.settings.links.updated-title": {
+    "message": "Liens mis à jour"
+  },
+  "project.settings.links.visit-link": {
+    "message": "Visiter {url}"
+  },
+  "project.settings.links.wiki": {
+    "message": "Page Wiki"
   },
   "project.settings.monetization.description": {
     "message": "Les projets sur Modrinth sont automatiquement inscrits au <rewards-program-link>programme de récompenses</rewards-program-link>. Si vous ne souhaitez pas (ou ne pouvez pas, pour des raisons légales) générer des revenus avec ce projet, vous pouvez désactiver cette option ici."

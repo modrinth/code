@@ -1,7 +1,7 @@
 use super::{PackLibrary, SyncedPack};
 use crate::state::content_store::{
     StoredFileHandle, content_file_path, hash_file, input, validate_digest,
-    validate_relative,
+    validate_instance_path, validate_relative,
 };
 use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use crate::state::{CachedEntry, State};
@@ -360,7 +360,7 @@ async fn recover_legacy_pack(
         return Ok(stored_file);
     }
     for instance in instance_rows::list_instances(&state.pool).await? {
-        validate_relative(&instance.path)?;
+        validate_instance_path(&instance.path)?;
         let base = state.directories.instances_dir().join(&instance.path);
         if let Some(placement) = library
             .instances

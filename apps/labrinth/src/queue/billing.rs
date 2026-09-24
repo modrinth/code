@@ -771,8 +771,8 @@ pub async fn process_chargeable_charges(
             Currency::from_str(&product_price.currency_code.to_lowercase())
         else {
             warn!(
-                "Could not find currency for {}",
-                product_price.currency_code
+                charge.id = charge.id.0,
+                "Could not find currency for {}", product_price.currency_code
             );
             continue;
         };
@@ -817,6 +817,7 @@ pub async fn process_chargeable_charges(
                     charge.payment_platform = PaymentPlatform::Stripe;
                 } else {
                     error!(
+                        charge.id = charge.id.0,
                         "Payment bootstrap succeeded but no payment intent was created"
                     );
                     failure = true;
@@ -824,7 +825,11 @@ pub async fn process_chargeable_charges(
             }
 
             Err(error) => {
-                error!(%error, "Failed to bootstrap payment for renewal");
+                error!(
+                    ?error,
+                    charge.id = charge.id.0,
+                    "Failed to bootstrap payment for renewal"
+                );
                 failure = true;
             }
         };

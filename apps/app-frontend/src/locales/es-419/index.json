@@ -53,6 +53,9 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "No se pudo completar la descarga"
   },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "No se pudo preparar la instancia"
+  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "La ruta del archivo no es válida"
   },
@@ -293,6 +296,87 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Activa la sincronización de resourcepacks en la configuración de la aplicación primero."
   },
+  "app.download-manager.active": {
+    "message": "Activos"
+  },
+  "app.download-manager.attention": {
+    "message": "Requiere atención"
+  },
+  "app.download-manager.cancel": {
+    "message": "Cancelar la instalación"
+  },
+  "app.download-manager.canceling": {
+    "message": "Cancelando instalación…"
+  },
+  "app.download-manager.clear-all": {
+    "message": "Borrar todo"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Borrar todas las tareas completadas"
+  },
+  "app.download-manager.complete": {
+    "message": "Completados"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Instancia duplicada"
+  },
+  "app.download-manager.empty": {
+    "message": "No hay tareas de instalación"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Velocidad estimada para descargar"
+  },
+  "app.download-manager.eta": {
+    "message": "Tiempo restante estimado para esta descarga"
+  },
+  "app.download-manager.hide": {
+    "message": "Ocultar tareas de instalación"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Instancia importada"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "Instalación de instancia"
+  },
+  "app.download-manager.modpack": {
+    "message": "Modpack"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Instalación de modpack"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Nueva instancia"
+  },
+  "app.download-manager.pause": {
+    "message": "Pausar la instalación"
+  },
+  "app.download-manager.paused": {
+    "message": "En pausa"
+  },
+  "app.download-manager.remove": {
+    "message": "Eliminar del historial"
+  },
+  "app.download-manager.resume": {
+    "message": "Reanudar instalación"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Instancia compartida"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "Actualización de instancia compartida"
+  },
+  "app.download-manager.show": {
+    "message": "Mostrar tareas de instalación"
+  },
+  "app.download-manager.tasks": {
+    "message": "Tareas"
+  },
+  "app.download-manager.title": {
+    "message": "Administrador de descargas"
+  },
+  "app.download-manager.verifying": {
+    "message": "Verificando"
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "Abrir la carpeta de respaldos"
   },
@@ -354,10 +438,10 @@
     "message": "Mostrar la pestaña de Capturas de Pantalla en instancias"
   },
   "app.features-settings.show-skin-selector.description": {
-    "message": "Mostrar un botón en la barra lateral izquierda para abrir el selector de skins."
+    "message": "Mostrar un botón en la barra lateral izquierda para abrir el selector de skin."
   },
   "app.features-settings.show-skin-selector.title": {
-    "message": "Mostrar selector de skins en la barra lateral"
+    "message": "Mostrar selector de skin en la barra lateral"
   },
   "app.features-settings.show-worlds-tab.title": {
     "message": "Mostrar pestaña de mundos en instancias"
@@ -1379,6 +1463,9 @@
   "app.quick-instance-switcher.instance-locked": {
     "message": "Esta instancia ha sido bloqueada"
   },
+  "app.quick-instance-switcher.title": {
+    "message": "Instancias recientes"
+  },
   "app.quick-instance-switcher.view-instance": {
     "message": "Ver instancia"
   },
@@ -1563,7 +1650,7 @@
     "message": "Ingresa la altura..."
   },
   "app.settings.default-instance-options.height.title": {
-    "message": "Largo"
+    "message": "Altura"
   },
   "app.settings.default-instance-options.java-and-memory.title": {
     "message": "Java y memoria"
@@ -2163,7 +2250,7 @@
     "message": "Motor gráfico"
   },
   "app.settings.game-options.setting.graphics.description": {
-    "message": "Controla la calidad visual y el rendimiento."
+    "message": "Controlan la calidad visual y el rendimiento."
   },
   "app.settings.game-options.setting.graphics.label": {
     "message": "Gráficos"
@@ -2224,6 +2311,12 @@
   },
   "app.settings.game-options.setting.invert-mouse.label": {
     "message": "Invertir Ratón"
+  },
+  "app.settings.game-options.setting.jacket.description": {
+    "message": "Mostrar la capa de piel del quete."
+  },
+  "app.settings.game-options.setting.jacket.label": {
+    "message": "Chaqueta"
   },
   "app.settings.game-options.setting.japanese-glyph-variants.label": {
     "message": "Variantes de glifos japoneses"
@@ -2316,7 +2409,7 @@
     "message": "Soltar item"
   },
   "app.settings.game-options.setting.key-forward.label": {
-    "message": "Avanzar"
+    "message": "Moverse hacia adelante"
   },
   "app.settings.game-options.setting.key-friends.label": {
     "message": "Amigos"
@@ -2326,6 +2419,9 @@
   },
   "app.settings.game-options.setting.key-hotbar-1.label": {
     "message": "Barra de acceso 1"
+  },
+  "app.settings.game-options.setting.key-hotbar-2.label": {
+    "message": "Barra de acceso 2"
   },
   "app.settings.game-options.setting.key-hotbar-3.label": {
     "message": "Barra de acceso 3"
@@ -2385,7 +2481,7 @@
     "message": "Cambiar a cámara cinemática"
   },
   "app.settings.game-options.setting.key-sneak.label": {
-    "message": "Sigilo"
+    "message": "Agacharse"
   },
   "app.settings.game-options.setting.key-social-interactions.label": {
     "message": "Interacciones sociales"
@@ -2399,14 +2495,23 @@
   "app.settings.game-options.setting.key-sprint.label": {
     "message": "Correr"
   },
+  "app.settings.game-options.setting.key-swap-offhand.label": {
+    "message": "Cambiar de mano"
+  },
   "app.settings.game-options.setting.key-toggle-gui.label": {
     "message": "Alternar HUD"
+  },
+  "app.settings.game-options.setting.key-toggle-spectator-shader.label": {
+    "message": "Alternar sombreado del espectador"
   },
   "app.settings.game-options.setting.key-use.label": {
     "message": "Usar objeto"
   },
   "app.settings.game-options.setting.language.label": {
     "message": "Idioma"
+  },
+  "app.settings.game-options.setting.left-pants-leg.label": {
+    "message": "Pantalón Pierna Izquierda"
   },
   "app.settings.game-options.setting.left-sleeve.label": {
     "message": "Manga izquierda"
@@ -2435,6 +2540,9 @@
   "app.settings.game-options.setting.menu-background-blur.label": {
     "message": "Desenfoque del fondo del menú"
   },
+  "app.settings.game-options.setting.mipmap-levels.description": {
+    "message": "La textura se suaviza a distancia."
+  },
   "app.settings.game-options.setting.mipmap-levels.label": {
     "message": "Nivel de mipmap"
   },
@@ -2443,6 +2551,9 @@
   },
   "app.settings.game-options.setting.music-frequency.label": {
     "message": "Frecuencia de la música"
+  },
+  "app.settings.game-options.setting.music-toast.description": {
+    "message": "Elija si los títulos de música aparecen en el menú de pausa y como tostadas."
   },
   "app.settings.game-options.setting.music-toast.label": {
     "message": "Notificaciones de música"
@@ -2468,6 +2579,12 @@
   "app.settings.game-options.setting.notification-time.label": {
     "message": "Tiempo de la notificación"
   },
+  "app.settings.game-options.setting.operator-items-tab.label": {
+    "message": "Pestaña de elementos del operador"
+  },
+  "app.settings.game-options.setting.panorama-speed.label": {
+    "message": "Velocidad panorámica"
+  },
   "app.settings.game-options.setting.particles.label": {
     "message": "Partículas"
   },
@@ -2477,14 +2594,26 @@
   "app.settings.game-options.setting.prioritize-chunk-updates.label": {
     "message": "Priorizar actualizaciones de chunk"
   },
+  "app.settings.game-options.setting.quit-shortcuts.label": {
+    "message": "Cerrar atajos"
+  },
+  "app.settings.game-options.setting.raw-mouse-input.label": {
+    "message": "Entrada ruda del ratón"
+  },
   "app.settings.game-options.setting.realms-notifications.label": {
     "message": "Notificaciones de Realms"
   },
   "app.settings.game-options.setting.record-volume.label": {
     "message": "Tocadiscos/Bloques musicales"
   },
+  "app.settings.game-options.setting.reduced-debug-info.label": {
+    "message": "Reducción de información de depuración"
+  },
   "app.settings.game-options.setting.render-distance.label": {
     "message": "Distancia de renderizado"
+  },
+  "app.settings.game-options.setting.right-pants-leg.label": {
+    "message": "Pantalones de Pierna Derecha"
   },
   "app.settings.game-options.setting.right-sleeve.label": {
     "message": "Manga derecha"
@@ -2517,7 +2646,7 @@
     "message": "Distancia de simulación"
   },
   "app.settings.game-options.setting.snooper.label": {
-    "message": "Fisgón"
+    "message": "Snooper"
   },
   "app.settings.game-options.setting.sprint-window.label": {
     "message": "Ventana de correr"
@@ -2541,13 +2670,13 @@
     "message": "Presione una vez para permanecer agachado."
   },
   "app.settings.game-options.setting.toggle-crouch.label": {
-    "message": "Activar/desactivar agacharse"
+    "message": "Alternar agacharse"
   },
   "app.settings.game-options.setting.toggle-sprint.description": {
-    "message": "Presione una vez para seguir corriendo."
+    "message": "Presiona una vez para seguir corriendo."
   },
   "app.settings.game-options.setting.toggle-sprint.label": {
-    "message": "Activar/desactivar correr"
+    "message": "Alternar Correr"
   },
   "app.settings.game-options.setting.toggle-use.label": {
     "message": "Activar/desactivar uso"
@@ -2675,11 +2804,83 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Máximas escrituras a la vez"
   },
+  "app.settings.resource-management.store.attention": {
+    "message": "Algunos archivos aún necesitan atención"
+  },
+  "app.settings.resource-management.store.cache-limit.description": {
+    "message": "Mantener hasta esta cantidad de contenido sin usar para instalaciones futuras. Mantener más puede ahorrar tiempo de descarga."
+  },
+  "app.settings.resource-management.store.cache-limit.label": {
+    "message": "Mantener descargas sin usar"
+  },
+  "app.settings.resource-management.store.cache-limit.unit": {
+    "message": "GiB"
+  },
+  "app.settings.resource-management.store.calculating": {
+    "message": "Calculando"
+  },
+  "app.settings.resource-management.store.clear": {
+    "message": "Borrar lo no usado"
+  },
+  "app.settings.resource-management.store.clear.description": {
+    "message": "Borrar contenido descargado sin usar"
+  },
+  "app.settings.resource-management.store.cleared": {
+    "message": "Se liberó {size} del espacio en disco."
+  },
+  "app.settings.resource-management.store.clearing": {
+    "message": "Borrando…"
+  },
+  "app.settings.resource-management.store.description": {
+    "message": "Ahorra espacio reutilizando instalaciones, mods y packs en todas tus instancias."
+  },
+  "app.settings.resource-management.store.empty": {
+    "message": "Instala mods o packs para ver su uso del almacenamiento aquí."
+  },
+  "app.settings.resource-management.store.issues": {
+    "message": "Ver {count, plural, one {# conflicto} other {# conflictos}}"
+  },
+  "app.settings.resource-management.store.nothing-to-clear": {
+    "message": "No hay contenido que esté sin usar para borrar."
+  },
+  "app.settings.resource-management.store.repair": {
+    "message": "Verificar y reparar"
+  },
+  "app.settings.resource-management.store.repair.running-description": {
+    "message": "Esto cerrará cualquier instancia en ejecución."
+  },
+  "app.settings.resource-management.store.repair.verify-description": {
+    "message": "Comprobar si hay archivos que falten o estén dañados y repararlos."
+  },
+  "app.settings.resource-management.store.repairing": {
+    "message": "Verificando y reparando…"
+  },
+  "app.settings.resource-management.store.shared.label": {
+    "message": "Compartido"
+  },
+  "app.settings.resource-management.store.title": {
+    "message": "Almacenamiento de contenido"
+  },
+  "app.settings.resource-management.store.total": {
+    "message": "{size} almacenados"
+  },
+  "app.settings.resource-management.store.unique.label": {
+    "message": "Único"
+  },
+  "app.settings.resource-management.store.unused.label": {
+    "message": "Huérfano"
+  },
+  "app.settings.resource-management.store.verification-result": {
+    "message": "Se {checked, plural, one {revisó # documento} other {revisaron # documentos}} y se {repaired, plural, one {hizo # arreglo} other {hicieron # arreglos}}."
+  },
+  "app.settings.resource-management.store.verified": {
+    "message": "Verificación exitosa"
+  },
   "app.settings.sidebar.label.instances": {
     "message": "Instancias"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
-    "message": "Elija desde qué instancia copiar su historial de comandos. Este historial sólo se utiliza para la sincronización inicial, y puede editarlo desde cualquier instancia posterior."
+    "message": "Elija desde qué instancia copiar su historial de comandos. Este historial solo se utiliza para la sincronización inicial, y puede editarlo desde cualquier instancia posterior."
   },
   "app.settings.synced-options.choose-sync-source.command-history-title": {
     "message": "Elegir fuente del historial de comandos"
@@ -2691,7 +2892,7 @@
     "message": "Elegir barra de acceso creativa"
   },
   "app.settings.synced-options.choose-sync-source.data-packs-title": {
-    "message": "Elegir fuente de paquetes de datos"
+    "message": "Elegir fuente de datapacks"
   },
   "app.settings.synced-options.choose-sync-source.game-settings-description": {
     "message": "Elija desde qué instancia copiar tus ajustes del juego guardados. Estos ajustes solo son usados para la sincronización inicial, y puedes editarlos desde cualquier instancia después."
@@ -2772,7 +2973,7 @@
     "message": "Los ajustes añadidos por mods aparecerán aquí después de que Modrinth los encuentre en una de tus instancias."
   },
   "app.settings.synced-options.game-settings.description": {
-    "message": "Usar el mismo paquete de datos entre todas tus instancias."
+    "message": "Usa las mismas opciones de juego en tus instancias."
   },
   "app.settings.synced-options.game-settings.disable-all": {
     "message": "Desincronizar todo"
@@ -2814,7 +3015,7 @@
     "message": "Sincronizar {setting} entre instancias"
   },
   "app.settings.synced-options.game-settings.sync-title": {
-    "message": "Ajustes de sincronización"
+    "message": "Sincronizar ajustes del juego"
   },
   "app.settings.synced-options.game-settings.synced-across-instances": {
     "message": "Sincronizado entre instancias"
@@ -2827,6 +3028,9 @@
   },
   "app.settings.synced-options.game-settings.unsync-setting": {
     "message": "Detener la sincronización de {setting} entre instancias"
+  },
+  "app.settings.synced-options.game-settings.value-mixed": {
+    "message": "Diferente entre instancias"
   },
   "app.settings.synced-options.game-settings.value-off": {
     "message": "Apagado"
@@ -3102,7 +3306,7 @@
     "message": "¡Hola, usuario de Modrinth!"
   },
   "app.sync-instances-update.badge": {
-    "message": "Nueva actualización"
+    "message": "Nuevo en esta actualización"
   },
   "app.sync-instances-update.choose-source.all": {
     "message": "Elija de qué instancia copiar la configuración del juego, los paquetes de recursos, el historial de comandos, las barras de acceso creativas y los servidores multijugador. Estos ajustes sólo se utilizan para la sincronización inicial, y puede editarlos desde cualquier instancia posterior."
@@ -3115,6 +3319,9 @@
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "Elija desde qué instancia copiar tus ajustes del juego guardados. Estos ajustes solo son usados para la sincronización inicial, y puedes editarlos desde cualquier instancia después."
+  },
+  "app.sync-instances-update.creative-hotbars": {
+    "message": "Sincronizar barras del modo creativo"
   },
   "app.sync-instances-update.description": {
     "message": "Ahora puedes sincronizar opciones como ajustes de juego, servidores, paquetes de recursos y más entre tus instancias, ¡para que todo se mantenga igual cada vez que juegas!"
@@ -3216,7 +3423,7 @@
     "message": "Este contenido está sincronizado"
   },
   "app.synced-packs.data-packs.title": {
-    "message": "Sincronizar paquetes de datos"
+    "message": "Datapacks sincronizados"
   },
   "app.synced-packs.empty": {
     "message": "Añade paquetes desde la página de contenido de una instancia para empezar a sincronizar."
@@ -3505,6 +3712,9 @@
   },
   "instance.files.adding-files": {
     "message": "Añadiendo archivos ({completed}/{total})"
+  },
+  "instance.files.managed-content-read-only": {
+    "message": "Administrarel contenido instalado a través de la pestaña Contenido"
   },
   "instance.files.save-as": {
     "message": "Guardar como..."
@@ -4032,7 +4242,7 @@
     "message": "Mantenga esta instancia options.txt separada de la copia sincronizada."
   },
   "instance.settings.tabs.synced-options.game-settings.disabled-in-app": {
-    "message": "La sincronización de ajustes del juego está desactivado en los ajustes de la aplicación."
+    "message": ""
   },
   "instance.settings.tabs.synced-options.hotbars-conflict.backup-description": {
     "message": "La versión que se está reemplazando será respaldada antes de que nada cambie."

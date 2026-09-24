@@ -293,6 +293,45 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Először kapcsold be az erőforráscsomagok szinkronizálását az alkalmazás beállításaiban."
   },
+  "app.download-manager.active": {
+    "message": "Aktív"
+  },
+  "app.download-manager.attention": {
+    "message": "Figyelmet igényel"
+  },
+  "app.download-manager.cancel": {
+    "message": "Telepítés megszakítása"
+  },
+  "app.download-manager.canceling": {
+    "message": "Telepítés megszakítása..."
+  },
+  "app.download-manager.clear-all": {
+    "message": "Összes törlése"
+  },
+  "app.download-manager.complete": {
+    "message": "Befejezés"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Példány megkettőzése"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Becsült letöltési sebesség"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Importált példány"
+  },
+  "app.download-manager.modpack": {
+    "message": "Modcsomag"
+  },
+  "app.download-manager.tasks": {
+    "message": "Feladatok"
+  },
+  "app.download-manager.title": {
+    "message": "Letöltéskezelő"
+  },
+  "app.download-manager.verifying": {
+    "message": "Ellenőrzés"
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "A biztonsági mentések mappájának megnyitása"
   },
@@ -2717,6 +2756,21 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Maximális egyidejű írási műveletek"
   },
+  "app.settings.resource-management.store.cache-limit.unit": {
+    "message": "GiB"
+  },
+  "app.settings.resource-management.store.calculating": {
+    "message": "Kiszámítás"
+  },
+  "app.settings.resource-management.store.shared.label": {
+    "message": "Megosztott"
+  },
+  "app.settings.resource-management.store.unique.label": {
+    "message": "Egyedi"
+  },
+  "app.settings.resource-management.store.verified": {
+    "message": "Sikeres hitelesítés"
+  },
   "app.settings.sidebar.label.instances": {
     "message": "Példányok"
   },
@@ -3462,7 +3516,7 @@
     "message": "Leválasztás..."
   },
   "installation-settings.shared-instance.unpublish-button": {
-    "message": "Megosztott példány megosztásának visszavonása"
+    "message": "Pédány megosztásának visszavonása"
   },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Eltávolítja ezt a megosztott példányt a Modrinthból, és nem küld többé frissítéseket azoknak, akik használják. A helyi példányodat ez nem érinti."

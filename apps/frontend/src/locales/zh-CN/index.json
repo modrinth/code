@@ -2604,10 +2604,10 @@
     "message": "关注你喜欢的项目"
   },
   "landing.feature.launcher.description": {
-    "message": "Modrinth 的开源 API 可供启动器添加与 Modrinth 的深度集成。通过<link>我们的应用程序</link>，以及 ATLauncher、MultiMC、Prism Launcher 等高人气启动器，都可使用 Modrinth。"
+    "message": "Modrinth 的开源 API 允许启动器深度集成于Modrinth 。通过<link>我们的应用程序</link>，以及 ATLauncher、MultiMC、Prism Launcher 等高人气启动器，均可直接访问 Modrinth。"
   },
   "landing.feature.launcher.heading": {
-    "message": "与你喜欢的启动器协同并行"
+    "message": "与你心仪的启动器协同并行"
   },
   "landing.feature.search.description": {
     "message": "Modrinth 的搜索快如闪电，配合强大的筛选功能，心仪内容就在弹指一挥间。"
@@ -2664,7 +2664,7 @@
     "message": "新版本 {version} 已发布，适用于 {gameVersion}"
   },
   "landing.section.for-creators.description": {
-    "message": "给你的作品在网上安家，并触达广大的忠实玩家群体。"
+    "message": "为你的创作安一个家，连接全球千万忠实玩家。"
   },
   "landing.section.for-creators.label": {
     "message": "面向创作者"
@@ -3567,7 +3567,7 @@
     "message": "不允许使用AI生成的图片来表示您的项目，不接受检测工作可能导致您的 Modrints 帐户被封禁。"
   },
   "project.ai-image-warning-modal.body.2": {
-    "message": "了解更多信息，请参阅 <rules>第6节的 Modrinth的Content Rules</rules>。"
+    "message": "有关我们生成式AI政策的更多信息，请参阅Modrinth《<rules>内容规范</rules>》的第6节。"
   },
   "project.ai-image-warning-modal.title": {
     "message": "不允许使用AI生成的图片"
@@ -3897,13 +3897,13 @@
     "message": "包含广告推广内容"
   },
   "project.settings.disclosures.ai-functionality.description": {
-    "message": "如果项目具有使用生成的AI的功能，如游戏中的聊天机器人或动态生成的纹理，则必须启用。"
+    "message": "如果项目具有使用生成式AI的功能，如游戏中的聊天机器人或动态生成的纹理，则必须启用。"
   },
   "project.settings.disclosures.ai-functionality.note-placeholder": {
-    "message": "例如：NPC 使用 generative AI 进行对话选项。"
+    "message": "例如：NPC利用生成式AI生成对话选项。"
   },
   "project.settings.disclosures.ai-functionality.title": {
-    "message": "包含AI生成的功能"
+    "message": "包含生成AI式功能"
   },
   "project.settings.disclosures.ai.description": {
     "message": "如果此项目包含任何AI生成的资产或文本，或者包含大量的AI生成的代码，则必须启用此选项。"
@@ -4114,12 +4114,6 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
-  },
-  "project.settings.links.donation.duplicate-type": {
-    "message": "你已经有了一个{platform}链接了。"
-  },
-  "project.settings.links.donation.no-type": {
-    "message": "请为此捐赠链接选择一个平台。"
   },
   "project.settings.monetization.description": {
     "message": "Modrinth上的项目会自动加入<rewards-program-link>激励计划</rewards-program-link>。如果你不想（或由于法律原因不能）从这个项目赚取收入，你可以在这里关闭它。"

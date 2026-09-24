@@ -215,7 +215,7 @@ watch(
 	{ immediate: true },
 )
 const appSettings = useAppSettings()
-const showInstancePlayTime = computed(() => appSettings.getFeatureFlag('show_instance_play_time'))
+const showInstancePlayTime = computed(() => appSettings.showPlayTime)
 
 const online = useOnline()
 const offline = computed(() => !online.value)

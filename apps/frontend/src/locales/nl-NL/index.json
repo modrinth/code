@@ -581,11 +581,20 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
+  "app-marketing.features.importing.description": {
+    "message": "Importeer al je bestaande spel instanties vanuit de launcher die je eerder gebruikte, en ga binnen enkele seconden aan de slag met de Modrinth-app!"
+  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
+  },
+  "app-marketing.features.manage-skins.description": {
+    "message": "Schakel direct tussen al je Minecraft skins vanuit de app."
+  },
+  "app-marketing.features.manage-skins.title": {
+    "message": "Skinkiezer"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Acties"
@@ -611,6 +620,9 @@
   "app-marketing.features.mod-management.version": {
     "message": "Versie"
   },
+  "app-marketing.features.open-source.description": {
+    "message": "De Modrinth-app is volledig open source. Je kunt de broncode bekijken op onze <github-link>GitHub</github-link>!"
+  },
   "app-marketing.features.open-source.title": {
     "message": "Open Source"
   },
@@ -619,6 +631,9 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "De Modrinth-app presteert beter dan veel van de toonaangevende mod-managers!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -652,6 +667,9 @@
   },
   "app-marketing.features.play.title": {
     "message": "Speel met je favorieten mods"
+  },
+  "app-marketing.features.settings-sync.title": {
+    "message": "Synchroniseer je instellingen"
   },
   "app-marketing.features.sharing.description": {
     "message": "Maak, deel en speel modpacks met een van de duizenden mods en modpacks die hier op Modrinth worden gehost."
@@ -884,6 +902,9 @@
   "auth.sign-in.launcher.complete.title": {
     "message": "Je bent aangemeld"
   },
+  "auth.sign-in.launcher.opening.description": {
+    "message": "Als de app niet wordt geopend, gebruik dan de knop hieronder om je aan te melden."
+  },
   "auth.sign-in.launcher.opening.title": {
     "message": "Modrinth-app aan het openen..."
   },
@@ -916,6 +937,9 @@
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Een account aanmaken"
+  },
+  "auth.two-factor.incorrect-code": {
+    "message": "De tweestapsverificatiecode is onjuist. Probeer het opnieuw of gebruik een back-upcode."
   },
   "auth.verify-email.action.account-settings": {
     "message": "Account instellingen"
@@ -3854,6 +3878,9 @@
   "project.settings.disclosures.advertising.title": {
     "message": "Bevat advertenties"
   },
+  "project.settings.disclosures.ai-functionality.title": {
+    "message": "Bevat generatieve AI-functionaliteit"
+  },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "Bijvoorbeeld: De Chinese en Arabische vertalingen zijn door AI gegenereerd."
   },
@@ -4039,12 +4066,6 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
-  },
-  "project.settings.links.donation.duplicate-type": {
-    "message": "Je hebt al een andere {platform} link."
-  },
-  "project.settings.links.donation.no-type": {
-    "message": "Selecteer een platform voor deze donatie link."
   },
   "project.settings.monetization.description": {
     "message": "Projecten op Modrinth worden automatisch ingeschreven in het <rewards-program-link>Beloningen Programma</rewards-program-link>. Als je geen inkomsten wilt (of niet kunt verdienen om juridische redenen) van dit project, kun je het hier uitschakelen."

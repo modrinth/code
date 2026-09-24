@@ -33,9 +33,19 @@ pub(crate) fn validate_relative(path: &str) -> crate::Result<()> {
             .components()
             .any(|part| !matches!(part, Component::Normal(_)))
     {
-        return Err(input("Invalid instance-relative path"));
+        return Err(input(format!("Invalid instance-relative path: {path:?}")));
     }
     Ok(())
+}
+
+pub(crate) fn validate_instance_path(path: &str) -> crate::Result<()> {
+    // Legacy instance names can end in dots or spaces; preserve their on-disk path.
+    let normalized = path
+        .split('/')
+        .map(|part| part.trim_end_matches(['.', ' ']))
+        .join("/");
+    validate_relative(&normalized)
+        .map_err(|_| input(format!("Invalid instance folder path: {path:?}")))
 }
 
 pub(crate) fn is_managed_content_path(path: &str) -> bool {
