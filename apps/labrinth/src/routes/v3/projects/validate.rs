@@ -1,4 +1,4 @@
-use actix_web::{HttpRequest, HttpResponse, get, web};
+use actix_web::{HttpRequest, get, web};
 use eyre::eyre;
 use serde::Serialize;
 use xredis::RedisPool;
@@ -100,14 +100,7 @@ pub async fn validate(
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
-    if let Some(response) =
-        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
-            .await?
-    {
-        return Ok(response);
-    }
-
+) -> Result<web::Json<ProjectValidationResponse>, ApiError> {
     let user = get_user_from_headers(
         &req,
         &**pool,
@@ -179,5 +172,5 @@ pub async fn validate(
     })
     .await
     .wrap_internal_err("validating project")?;
-    Ok(HttpResponse::Ok().json(ProjectValidationResponse { nags }))
+    Ok(web::Json(ProjectValidationResponse { nags }))
 }

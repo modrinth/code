@@ -241,6 +241,20 @@ pub async fn projects_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    let project_refs = serde_json::from_str::<Vec<String>>(&ids.ids)
+        .wrap_request_err("deserializing project references")?;
+    if let Some(response) = crate::routes::redirect_query_refs(
+        &req,
+        "ids",
+        &project_refs,
+        pool.as_ref(),
+        redis.as_ref(),
+    )
+    .await?
+    {
+        return Ok(response);
+    }
+
     // Call V3 project creation
     let response = v3::projects::projects_get(
         req,
@@ -869,6 +883,20 @@ pub async fn projects_edit(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
+    let project_refs = serde_json::from_str::<Vec<String>>(&ids.ids)
+        .wrap_request_err("deserializing project references")?;
+    if let Some(response) = crate::routes::redirect_query_refs(
+        &req,
+        "ids",
+        &project_refs,
+        pool.as_ref(),
+        redis.as_ref(),
+    )
+    .await?
+    {
+        return Ok(response);
+    }
+
     let bulk_edit_project = bulk_edit_project.into_inner();
 
     let mut link_urls = HashMap::new();

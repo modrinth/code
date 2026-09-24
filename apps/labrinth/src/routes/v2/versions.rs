@@ -402,7 +402,29 @@ pub async fn version_edit(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
-    let new_version = new_version.into_inner();
+    let mut new_version = new_version.into_inner();
+    if let Some(dependencies) = &mut new_version.dependencies {
+        let dependency_project_refs = dependencies
+            .iter()
+            .filter_map(|dependency| dependency.project_id)
+            .map(|project_id| project_id.to_string())
+            .collect::<Vec<_>>();
+        let resolved_dependency_project_ids = crate::routes::resolve_refs(
+            &dependency_project_refs,
+            pool.as_ref(),
+            redis.as_ref(),
+        )
+        .await?;
+        for (dependency, resolved_project_id) in dependencies
+            .iter_mut()
+            .filter(|dependency| dependency.project_id.is_some())
+            .zip(resolved_dependency_project_ids)
+        {
+            if let Some(project_id) = resolved_project_id {
+                dependency.project_id = Some(project_id);
+            }
+        }
+    }
 
     let mut fields = HashMap::new();
     if new_version.game_versions.is_some() {

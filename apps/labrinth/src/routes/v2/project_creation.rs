@@ -165,109 +165,142 @@ pub async fn project_create(
     search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
     // Convert V2 multipart payload to V3 multipart payload
+    let redirect_client = client.clone();
+    let redirect_redis = redis.clone();
     let payload = v2_reroute::alter_actix_multipart(
         payload,
         req.headers().clone(),
-        |legacy_create: ProjectCreateData, _| async move {
-            // Side types will be applied to each version
-            let client_side = legacy_create.client_side;
-            let server_side = legacy_create.server_side;
+        |mut legacy_create: ProjectCreateData, _| {
+            let redirect_client = redirect_client.clone();
+            let redirect_redis = redirect_redis.clone();
+            async move {
+                // Side types will be applied to each version
+                let client_side = legacy_create.client_side;
+                let server_side = legacy_create.server_side;
 
-            let project_type = legacy_create.project_type;
+                let project_type = legacy_create.project_type;
 
-            let initial_versions = legacy_create
-                .initial_versions
-                .into_iter()
-                .map(|v| {
-                    let mut fields = HashMap::new();
-                    fields.extend(
-                        v2_reroute::convert_v2_side_types_to_v3_side_types(
-                            client_side,
-                            server_side,
-                        ),
-                    );
-                    if let Some(environment) = v.environment {
-                        fields.insert(
-                            "environment".to_string(),
-                            json!(environment),
-                        );
+                let dependency_project_refs = legacy_create
+                    .initial_versions
+                    .iter()
+                    .flat_map(|version| version.dependencies.iter())
+                    .filter_map(|dependency| dependency.project_id)
+                    .map(|project_id| project_id.to_string())
+                    .collect::<Vec<_>>();
+                let resolved_dependency_project_ids =
+                    crate::routes::resolve_refs(
+                        &dependency_project_refs,
+                        redirect_client.as_ref(),
+                        redirect_redis.as_ref(),
+                    )
+                    .await?;
+                for (dependency, resolved_project_id) in legacy_create
+                    .initial_versions
+                    .iter_mut()
+                    .flat_map(|version| version.dependencies.iter_mut())
+                    .filter(|dependency| dependency.project_id.is_some())
+                    .zip(resolved_dependency_project_ids)
+                {
+                    if let Some(project_id) = resolved_project_id {
+                        dependency.project_id = Some(project_id);
                     }
-                    fields.insert(
-                        "game_versions".to_string(),
-                        json!(v.game_versions),
-                    );
-
-                    // Modpacks now use the "mrpack" loader, and loaders are converted to loader fields.
-                    // Setting of 'project_type' directly is removed, it's loader-based now.
-                    if project_type == "modpack" {
-                        fields.insert(
-                            "mrpack_loaders".to_string(),
-                            json!(v.loaders),
-                        );
-                    }
-
-                    let loaders = if project_type == "modpack" {
-                        vec![Loader("mrpack".to_string())]
-                    } else {
-                        v.loaders
-                    };
-
-                    v3::version_creation::InitialVersionData {
-                        project_id: v.project_id,
-                        file_parts: v.file_parts,
-                        version_number: v.version_number,
-                        version_title: v.version_title,
-                        version_body: v.version_body,
-                        dependencies: v.dependencies,
-                        release_channel: v.release_channel,
-                        loaders,
-                        featured: v.featured,
-                        primary_file: v.primary_file,
-                        status: v.status,
-                        file_types: v.file_types,
-                        uploaded_images: v.uploaded_images,
-                        ordering: v.ordering,
-                        fields,
-                    }
-                })
-                .collect();
-
-            let mut link_urls = HashMap::new();
-            if let Some(issue_url) = legacy_create.issues_url {
-                link_urls.insert("issues".to_string(), issue_url);
-            }
-            if let Some(source_url) = legacy_create.source_url {
-                link_urls.insert("source".to_string(), source_url);
-            }
-            if let Some(wiki_url) = legacy_create.wiki_url {
-                link_urls.insert("wiki".to_string(), wiki_url);
-            }
-            if let Some(discord_url) = legacy_create.discord_url {
-                link_urls.insert("discord".to_string(), discord_url);
-            }
-            if let Some(donation_urls) = legacy_create.donation_urls {
-                for donation_url in donation_urls {
-                    link_urls.insert(donation_url.platform, donation_url.url);
                 }
-            }
 
-            Ok(v3::project_creation::ProjectCreateData {
-                name: legacy_create.title,
-                slug: legacy_create.slug,
-                summary: legacy_create.description, // Description becomes summary
-                description: legacy_create.body,    // Body becomes description
-                initial_versions,
-                categories: legacy_create.categories,
-                additional_categories: legacy_create.additional_categories,
-                license_url: legacy_create.license_url,
-                link_urls,
-                is_draft: legacy_create.is_draft,
-                license_id: legacy_create.license_id,
-                gallery_items: legacy_create.gallery_items,
-                requested_status: legacy_create.requested_status,
-                uploaded_images: legacy_create.uploaded_images,
-                organization_id: legacy_create.organization_id,
-            })
+                let initial_versions = legacy_create
+                    .initial_versions
+                    .into_iter()
+                    .map(|v| {
+                        let mut fields = HashMap::new();
+                        fields.extend(
+                            v2_reroute::convert_v2_side_types_to_v3_side_types(
+                                client_side,
+                                server_side,
+                            ),
+                        );
+                        if let Some(environment) = v.environment {
+                            fields.insert(
+                                "environment".to_string(),
+                                json!(environment),
+                            );
+                        }
+                        fields.insert(
+                            "game_versions".to_string(),
+                            json!(v.game_versions),
+                        );
+
+                        // Modpacks now use the "mrpack" loader, and loaders are converted to loader fields.
+                        // Setting of 'project_type' directly is removed, it's loader-based now.
+                        if project_type == "modpack" {
+                            fields.insert(
+                                "mrpack_loaders".to_string(),
+                                json!(v.loaders),
+                            );
+                        }
+
+                        let loaders = if project_type == "modpack" {
+                            vec![Loader("mrpack".to_string())]
+                        } else {
+                            v.loaders
+                        };
+
+                        v3::version_creation::InitialVersionData {
+                            project_id: v.project_id,
+                            file_parts: v.file_parts,
+                            version_number: v.version_number,
+                            version_title: v.version_title,
+                            version_body: v.version_body,
+                            dependencies: v.dependencies,
+                            release_channel: v.release_channel,
+                            loaders,
+                            featured: v.featured,
+                            primary_file: v.primary_file,
+                            status: v.status,
+                            file_types: v.file_types,
+                            uploaded_images: v.uploaded_images,
+                            ordering: v.ordering,
+                            fields,
+                        }
+                    })
+                    .collect();
+
+                let mut link_urls = HashMap::new();
+                if let Some(issue_url) = legacy_create.issues_url {
+                    link_urls.insert("issues".to_string(), issue_url);
+                }
+                if let Some(source_url) = legacy_create.source_url {
+                    link_urls.insert("source".to_string(), source_url);
+                }
+                if let Some(wiki_url) = legacy_create.wiki_url {
+                    link_urls.insert("wiki".to_string(), wiki_url);
+                }
+                if let Some(discord_url) = legacy_create.discord_url {
+                    link_urls.insert("discord".to_string(), discord_url);
+                }
+                if let Some(donation_urls) = legacy_create.donation_urls {
+                    for donation_url in donation_urls {
+                        link_urls
+                            .insert(donation_url.platform, donation_url.url);
+                    }
+                }
+
+                Ok(v3::project_creation::ProjectCreateData {
+                    name: legacy_create.title,
+                    slug: legacy_create.slug,
+                    summary: legacy_create.description, // Description becomes summary
+                    description: legacy_create.body, // Body becomes description
+                    initial_versions,
+                    categories: legacy_create.categories,
+                    additional_categories: legacy_create.additional_categories,
+                    license_url: legacy_create.license_url,
+                    link_urls,
+                    is_draft: legacy_create.is_draft,
+                    license_id: legacy_create.license_id,
+                    gallery_items: legacy_create.gallery_items,
+                    requested_status: legacy_create.requested_status,
+                    uploaded_images: legacy_create.uploaded_images,
+                    organization_id: legacy_create.organization_id,
+                })
+            }
         },
     )
     .await?;

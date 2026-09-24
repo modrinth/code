@@ -9,6 +9,7 @@ use actix_files::Files;
 use actix_web::http::{StatusCode, header};
 use actix_web::{HttpRequest, HttpResponse, web};
 use futures::FutureExt;
+use std::collections::{HashMap, HashSet};
 use utoipa::openapi::extensions::ExtensionsBuilder;
 use utoipa::openapi::security::{HttpAuthScheme, HttpBuilder, SecurityScheme};
 use xredis::RedisPool;
@@ -30,6 +31,148 @@ pub use self::not_found::not_found;
 const PROJECT_REDIRECTS_NAMESPACE: &str = "project_redirects:v1";
 const PROJECT_REDIRECT_CACHE_TTL_SECONDS: i64 = 300;
 
+pub async fn resolve_ref(
+    project_ref: &str,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<Option<ProjectId>, ApiError> {
+    let project_refs = [project_ref.to_string()];
+    Ok(resolve_refs(&project_refs, pool, redis)
+        .await?
+        .into_iter()
+        .next()
+        .flatten())
+}
+
+pub async fn resolve_refs(
+    project_refs: &[String],
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<Vec<Option<ProjectId>>, ApiError> {
+    if project_refs.is_empty() {
+        return Ok(Vec::new());
+    }
+
+    let mut redis = redis
+        .connect()
+        .await
+        .wrap_internal_err("connecting to Redis for project redirects")?;
+    let keys = project_refs
+        .iter()
+        .map(|project_ref| {
+            redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, project_ref)
+        })
+        .collect::<Vec<_>>();
+    let cached_targets = redis
+        .get_many_deserialized::<Option<i64>>(&keys)
+        .await
+        .wrap_internal_err("reading cached project redirects")?;
+
+    let missing_refs = project_refs
+        .iter()
+        .zip(&cached_targets)
+        .filter_map(|(project_ref, cached_target)| {
+            cached_target.is_none().then_some(project_ref.clone())
+        })
+        .collect::<HashSet<_>>()
+        .into_iter()
+        .collect::<Vec<_>>();
+    let normalized_missing_refs = missing_refs
+        .iter()
+        .map(|project_ref| project_ref.to_lowercase())
+        .collect::<Vec<_>>();
+    let redirects = if missing_refs.is_empty() {
+        HashMap::new()
+    } else {
+        sqlx::query!(
+            r#"
+            SELECT
+                identifier,
+                target_project_id AS "target_project_id: DBProjectId"
+            FROM project_redirects
+            WHERE identifier = ANY($1) OR identifier = ANY($2)
+            "#,
+            &missing_refs,
+            &normalized_missing_refs,
+        )
+        .fetch_all(pool)
+        .await
+        .wrap_internal_err("looking up project redirects")?
+        .into_iter()
+        .map(|redirect| (redirect.identifier, redirect.target_project_id))
+        .collect::<HashMap<_, _>>()
+    };
+
+    let mut resolved = Vec::with_capacity(project_refs.len());
+    for ((project_ref, key), cached_target) in
+        project_refs.iter().zip(&keys).zip(cached_targets)
+    {
+        let target_project_id = if let Some(cached_target) = cached_target {
+            cached_target.map(DBProjectId)
+        } else {
+            let target_project_id = redirects
+                .get(project_ref)
+                .or_else(|| redirects.get(&project_ref.to_lowercase()))
+                .copied();
+            redis
+                .set_serialized(
+                    key,
+                    &target_project_id.map(|project_id| project_id.0),
+                    Some(PROJECT_REDIRECT_CACHE_TTL_SECONDS),
+                )
+                .await
+                .wrap_internal_err("caching project redirect")?;
+            target_project_id
+        };
+        resolved.push(target_project_id.map(ProjectId::from));
+    }
+
+    Ok(resolved)
+}
+
+pub async fn redirect_query_refs(
+    req: &HttpRequest,
+    parameter_name: &str,
+    project_refs: &[String],
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<Option<HttpResponse>, ApiError> {
+    let resolved_refs = resolve_refs(project_refs, pool, redis).await?;
+    if resolved_refs.iter().all(Option::is_none) {
+        return Ok(None);
+    }
+
+    let canonical_refs = project_refs
+        .iter()
+        .zip(resolved_refs)
+        .map(|(project_ref, resolved_ref)| {
+            resolved_ref.map_or_else(
+                || project_ref.clone(),
+                |project_id| project_id.to_string(),
+            )
+        })
+        .collect::<Vec<_>>();
+    let canonical_refs = serde_json::to_string(&canonical_refs)
+        .wrap_internal_err("serializing redirected project references")?;
+    let mut query = url::form_urlencoded::Serializer::new(String::new());
+    for (name, value) in
+        url::form_urlencoded::parse(req.query_string().as_bytes())
+    {
+        if name == parameter_name {
+            query.append_pair(&name, &canonical_refs);
+        } else {
+            query.append_pair(&name, &value);
+        }
+    }
+    let location = format!("{}?{}", req.path(), query.finish());
+
+    Ok(Some(
+        HttpResponse::PermanentRedirect()
+            .append_header((header::LOCATION, location))
+            .finish(),
+    ))
+}
+
 pub async fn redirect_ref(
     req: &HttpRequest,
     parameter_name: &str,
@@ -39,46 +182,8 @@ pub async fn redirect_ref(
     let Some(project_ref) = req.match_info().get(parameter_name) else {
         return Ok(None);
     };
-
-    let mut redis = redis
-        .connect()
-        .await
-        .wrap_internal_err("connecting to Redis for project redirect")?;
-    let key = redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, project_ref);
-    let cached_target = redis
-        .get_deserialized::<Option<i64>>(&key)
-        .await
-        .wrap_internal_err("reading cached project redirect")?;
-
-    let target_project_id = if let Some(cached_target) = cached_target {
-        cached_target.map(DBProjectId)
-    } else {
-        let target_project_id = sqlx::query_scalar!(
-            r#"
-            SELECT target_project_id AS "target_project_id: DBProjectId"
-            FROM project_redirects
-            WHERE identifier = $1 OR identifier = LOWER($1)
-            ORDER BY identifier = $1 DESC
-            LIMIT 1
-            "#,
-            project_ref,
-        )
-        .fetch_optional(pool)
-        .await
-        .wrap_internal_err("looking up project redirect")?;
-
-        redis
-            .set_serialized(
-                &key,
-                &target_project_id.map(|project_id| project_id.0),
-                Some(PROJECT_REDIRECT_CACHE_TTL_SECONDS),
-            )
-            .await
-            .wrap_internal_err("caching project redirect")?;
-
-        target_project_id
-    };
-    let Some(target_project_id) = target_project_id else {
+    let Some(target_project_id) = resolve_ref(project_ref, pool, redis).await?
+    else {
         return Ok(None);
     };
 
@@ -101,7 +206,7 @@ pub async fn redirect_ref(
     let Some(path_segment) = path_segments.get_mut(parameter_index) else {
         return Ok(None);
     };
-    *path_segment = ProjectId::from(target_project_id).to_string();
+    *path_segment = target_project_id.to_string();
 
     let mut location = path_segments.join("/");
     if let Some(query) = req.uri().query() {
