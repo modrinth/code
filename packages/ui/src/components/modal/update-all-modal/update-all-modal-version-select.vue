@@ -5,12 +5,14 @@ import Combobox from '#ui/components/base/Combobox.vue'
 import VersionChannelIndicator from '#ui/components/version/VersionChannelIndicator.vue'
 
 import type { UpdateAllVersion } from './update-all-modal-types'
+import { useUpdateAllTruncatedTooltip } from './use-update-all-truncated-tooltip'
 
 const props = defineProps<{
 	versions: UpdateAllVersion[]
 	version: UpdateAllVersion
 	label: string
 	disabled?: boolean
+	wrap?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -19,6 +21,10 @@ const emit = defineEmits<{
 
 const options = computed(() =>
 	props.versions.map((version) => ({ value: version.id, label: version.version_number })),
+)
+const { element: versionLabel, tooltip } = useUpdateAllTruncatedTooltip(
+	() => props.version.version_number,
+	() => !props.wrap || props.versions.length > 1,
 )
 
 function channelClasses(channel: UpdateAllVersion['version_type']) {
@@ -35,43 +41,49 @@ function channelFor(versionId: string) {
 </script>
 
 <template>
-	<Combobox
-		v-if="versions.length > 1"
-		class="!w-auto min-w-0 max-w-full"
-		:model-value="version.id"
-		:options="options"
-		:disabled="disabled"
-		trigger-size="sm"
-		trigger-class="!gap-1.5 !rounded-xl !px-3 !font-medium"
-		:dropdown-min-width="240"
-		@update:model-value="emit('select', $event)"
-	>
-		<template #prefix>
-			<VersionChannelIndicator
-				:channel="version.version_type"
-				class="!size-6 shrink-0 !font-medium"
-				:class="channelClasses(version.version_type)"
-			/>
-		</template>
-		<template #selected>
-			<span class="sr-only">{{ label }}: </span>
-			<span class="font-medium">{{ version.version_number }}</span>
-		</template>
-		<template #option="{ item }">
-			<VersionChannelIndicator
-				:channel="channelFor(item.value)"
-				class="!size-6 shrink-0 !font-medium"
-				:class="channelClasses(channelFor(item.value))"
-			/>
-			<span>{{ item.label }}</span>
-		</template>
-	</Combobox>
-	<div v-else class="flex h-8 min-w-0 items-center gap-1.5 text-sm font-medium text-contrast">
+	<div v-if="versions.length > 1" v-tooltip="tooltip" class="min-w-0 max-w-full">
+		<Combobox
+			:model-value="version.id"
+			:options="options"
+			:disabled="disabled"
+			trigger-size="sm"
+			trigger-class="!gap-1.5 !rounded-xl !px-3 !font-medium"
+			:dropdown-min-width="240"
+			@update:model-value="emit('select', $event)"
+		>
+			<template #prefix>
+				<VersionChannelIndicator
+					:channel="version.version_type"
+					class="!size-6 shrink-0 !font-medium"
+					:class="channelClasses(version.version_type)"
+				/>
+			</template>
+			<template #selected>
+				<span class="sr-only">{{ label }}: </span>
+				<span ref="versionLabel" class="inline-block max-w-full truncate align-middle font-medium">{{ version.version_number }}</span>
+			</template>
+			<template #option="{ item }">
+				<VersionChannelIndicator
+					:channel="channelFor(item.value)"
+					class="!size-6 shrink-0 !font-medium"
+					:class="channelClasses(channelFor(item.value))"
+				/>
+				<span class="min-w-0 break-all">{{ item.label }}</span>
+			</template>
+		</Combobox>
+	</div>
+	<div v-else v-tooltip="tooltip" class="flex min-h-8 min-w-0 items-center gap-1.5 text-sm font-medium text-contrast">
 		<VersionChannelIndicator
 			:channel="version.version_type"
 			class="!size-6 shrink-0 !font-medium"
 			:class="channelClasses(version.version_type)"
 		/>
-		<span class="truncate" :title="version.version_number">{{ version.version_number }}</span>
+		<span
+			ref="versionLabel"
+			class="min-w-0"
+			:class="wrap ? 'break-all' : 'block truncate'"
+		>
+			{{ version.version_number }}
+		</span>
 	</div>
 </template>

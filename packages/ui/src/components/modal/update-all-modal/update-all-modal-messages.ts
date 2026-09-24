@@ -13,6 +13,14 @@ export const messages = defineMessages({
 		id: 'update-all-modal.versions',
 		defaultMessage: 'Current version / New version',
 	},
+	currentVersion: {
+		id: 'update-all-modal.current-version',
+		defaultMessage: 'Current version',
+	},
+	newVersion: {
+		id: 'update-all-modal.new-version',
+		defaultMessage: 'New version',
+	},
 	selectAll: {
 		id: 'update-all-modal.select-all',
 		defaultMessage: 'Select all projects',

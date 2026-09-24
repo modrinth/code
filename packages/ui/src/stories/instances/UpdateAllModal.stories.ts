@@ -244,6 +244,31 @@ export const Default: Story = {
 	},
 }
 
+export const Tablet: Story = {
+	render: renderModal(),
+	parameters: { viewport: { defaultViewport: 'tablet' } },
+}
+
+export const TabletChangelogOpen: Story = {
+	render: renderModal('mods/iris.jar'),
+	parameters: { viewport: { defaultViewport: 'tablet' } },
+}
+
+export const Mobile: Story = {
+	render: renderModal(),
+	parameters: { viewport: { defaultViewport: 'mobile2' } },
+}
+
+export const MobileChangelogOpen: Story = {
+	render: renderModal('mods/iris.jar'),
+	parameters: { viewport: { defaultViewport: 'mobile2' } },
+}
+
+export const NarrowMobile: Story = {
+	render: renderModal(),
+	parameters: { viewport: { defaultViewport: 'mobile1' } },
+}
+
 export const ChangelogOpen: Story = {
 	render: renderModal('mods/iris.jar'),
 	parameters: {
@@ -343,6 +368,10 @@ export const LongNames: Story = {
 		items: items.map((item) => ({
 			...item,
 			project: { ...item.project, title: `${item.project.title} with a very long project name` },
+			currentVersion: {
+				...item.currentVersion,
+				version_number: `${item.currentVersion.version_number}-experimental-build-with-a-long-version-number`,
+			},
 			versions: item.versions.map((version) => ({
 				...version,
 				version_number: `${version.version_number}-experimental-build-with-a-long-version-number`,
