@@ -5693,18 +5693,6 @@
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "SFTP-Zugangsdaten wurden rotiert"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Bei der Installation ist ein unerwarteter Fehler aufgetreten. Bitte versuche es später erneut."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Installation fehlgeschlagen"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Beim Hochladen ist ein unerwarteter Fehler aufgetreten. Bitte versuche es später erneut."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Hochladen des Modpacks ist fehlgeschlagen"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Server einrichten"
   },

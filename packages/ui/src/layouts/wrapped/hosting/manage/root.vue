@@ -114,7 +114,7 @@
 					: 'min-h-[calc(100svh-100px)] pb-6',
 		]"
 	>
-		<template v-if="revealState !== 'pending' || keepOnboardingMounted || globalInviteForServer">
+		<template v-if="revealState !== 'pending' || isOnboarding || globalInviteForServer">
 			<div
 				v-if="!isOnboarding"
 				class="w-full flex flex-col gap-4"
@@ -198,14 +198,9 @@
 			</div>
 
 			<ServerOnboardingPanelPage
-				v-if="keepOnboardingMounted"
-				v-show="isOnboarding"
+				v-if="isOnboarding"
 				:class="fillLayout ? 'my-auto' : 'mt-16'"
 				:site-url="siteUrl ?? 'https://modrinth.com'"
-				:browse-modpacks="handleBrowseModpacks"
-				@setup-started="onboardingFlowActive = true"
-				@invite-started="inviteFlowActive = true"
-				@setup-finished="finishOnboardingFlow"
 			/>
 
 			<template v-if="!isOnboarding">
@@ -346,7 +341,7 @@ import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
 import {
 	injectModrinthClient,
 	injectNotificationManager,
-	injectServerOnboardingInviteFlow,
+	injectServerOnboardingFlow,
 	provideServerSettingsModal,
 } from '#ui/providers'
 import type { ServerStats } from '#ui/providers/server-context'
@@ -432,7 +427,7 @@ const isNuxt = computed(() => client instanceof NuxtModrinthClient)
 const queryClient = useQueryClient()
 const route = useRoute()
 const router = useRouter()
-const globalInviteFlow = injectServerOnboardingInviteFlow(null)
+const onboardingFlow = injectServerOnboardingFlow(null)
 const debug = useDebugLogger('ServerManage')
 
 const isReconnecting = ref(false)
@@ -542,24 +537,13 @@ const {
 	onStateEvent,
 })
 
-const onboardingFlowActive = ref(false)
-const inviteFlowActive = ref(false)
 const globalInviteForServer = computed(
-	() => globalInviteFlow?.request.value?.serverId === props.serverId,
+	() =>
+		onboardingFlow?.inviteActive.value && onboardingFlow.request.value?.serverId === props.serverId,
 )
 const isOnboarding = computed(
-	() =>
-		!inviteFlowActive.value &&
-		!globalInviteForServer.value &&
-		!!serverData.value?.flows?.intro &&
-		!installation.value,
+	() => !globalInviteForServer.value && !!serverData.value?.flows?.intro && !installation.value,
 )
-const keepOnboardingMounted = computed(() => onboardingFlowActive.value || isOnboarding.value)
-
-function finishOnboardingFlow() {
-	onboardingFlowActive.value = false
-	inviteFlowActive.value = false
-}
 
 const serverHeaderImage = computed(() =>
 	serverData.value?.is_medal ? 'https://cdn.modrinth.com/medal_icon.webp' : serverImage.value,

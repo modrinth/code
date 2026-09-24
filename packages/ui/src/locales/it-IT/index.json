@@ -5633,18 +5633,6 @@
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "Credenziali generate"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Si è verificato un errore durante l'installazione. Riprova più tardi."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Installazione fallita"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "C'è stato un problema inaspettato nel caricamento. Riprova più tardi."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Errore durante il caricamento"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Configura server"
   },

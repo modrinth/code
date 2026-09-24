@@ -4169,18 +4169,6 @@
   "servers.region.western-europe": {
     "defaultMessage": "Tây Âu"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Có lỗi xảy ra trong khi tải. Thử lại sau."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Cài đặt thất bại"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Có lỗi xảy ra trong khi tải lên. Thử lại sau."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Tải lên modpack thất bại"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Thiết lập máy chủ"
   },

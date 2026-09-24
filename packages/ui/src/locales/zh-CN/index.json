@@ -5693,18 +5693,6 @@
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "SFTP凭据已更换"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "安装时出现了未被预料的错误。请稍后再试。"
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "安装失败"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "上传时出现了未被预料的错误。请稍后再试。"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "整合包上传失败"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "初始化服务器"
   },

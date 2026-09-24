@@ -1,6 +1,6 @@
 import type { Archon, LauncherMeta } from '@modrinth/api-client'
 import { useQueryClient } from '@tanstack/vue-query'
-import { computed, type ComputedRef, type Ref, ref, type ShallowRef, watch } from 'vue'
+import { computed, type ComputedRef, nextTick, type Ref, ref, type ShallowRef, watch } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
@@ -62,6 +62,10 @@ export const creationFlowMessages = defineMessages({
 	createInstanceButton: {
 		id: 'creation-flow.button.create-instance',
 		defaultMessage: 'Create instance',
+	},
+	uploadingProgress: {
+		id: 'servers.setup.onboarding.uploading.progress',
+		defaultMessage: 'Uploading ({percent, number}%)',
 	},
 	setupServerButton: {
 		id: 'creation-flow.button.setup-server',
@@ -219,12 +223,15 @@ export interface CreationFlowContextValue {
 
 	// Loading state (set when finish() is called, cleared on reset)
 	loading: Ref<boolean>
+	uploadProgress: Ref<number | null>
 	finishDisabled: ComputedRef<boolean>
 	finishDisabledTooltip: ComputedRef<string | undefined>
 	inviteLink: Ref<string | null>
 	inviteLoading: Ref<boolean>
 	inviteError: Ref<string | null>
 	inviteSubmitted: Ref<boolean>
+	inviteCopied: Ref<boolean>
+	navigating: Ref<boolean>
 	inviteCompleted: Ref<boolean>
 
 	// Backup state (set by InlineBackupCreator in reset-server flow)
@@ -242,7 +249,7 @@ export interface CreationFlowContextValue {
 	reset: (instanceCount?: number) => Promise<void>
 	setSetupType: (type: SetupType) => void
 	setImportMode: () => void
-	browseModpacks: () => void
+	browseModpacks: () => Promise<void>
 	selectProject: (projectId: string, projectType: string, versionId?: string) => Promise<void>
 	installServerContent: (serverId: string, worldId: string) => Promise<void>
 	finish: () => void
@@ -253,7 +260,7 @@ export interface CreationFlowContextValue {
 		onDone: () => void | Promise<void>,
 	) => void
 	retryInvite: () => Promise<void>
-	completeInvite: () => void
+	completeInvite: () => Promise<void>
 	buildProperties: () => Archon.Content.v1.PropertiesFields
 	fetchLoaderMetadata: (loader?: string | null) => Promise<void>
 	prefetchLoaderMetadata: () => Promise<void>
@@ -279,6 +286,7 @@ export interface CreationFlowOptions {
 	initialGameVersion?: string
 	fetchExistingInstanceNames?: () => Promise<string[]>
 	onBack?: () => void
+	browseModpacks?: () => Promise<void>
 	searchProjects?: (query: string, limit?: number) => Promise<ProjectSearchResult>
 	prepareProjectInstall?: (
 		projectId: string,
@@ -398,11 +406,17 @@ export function createCreationFlowContext(
 
 	const hardReset = ref(isInitialSetup)
 	const loading = ref(false)
+	const uploadProgress = ref<number | null>(null)
 	const inviteLink = ref<string | null>(null)
 	const inviteLoading = ref(false)
 	const inviteError = ref<string | null>(null)
 	const inviteSubmitted = ref(false)
 	const inviteCompleted = ref(false)
+	const inviteCopied = ref(false)
+	const navigating = ref(false)
+	watch(inviteLink, () => {
+		inviteCopied.value = false
+	})
 	let inviteRun = 0
 	let inviteTarget: { serverId: string; worldId: string; siteUrl: string } | null = null
 	let inviteOnDone: (() => void | Promise<void>) | null = null
@@ -504,6 +518,9 @@ export function createCreationFlowContext(
 		inviteError.value = null
 		inviteSubmitted.value = false
 		inviteCompleted.value = false
+		inviteCopied.value = false
+		navigating.value = false
+		uploadProgress.value = null
 		inviteTarget = null
 		inviteOnDone = null
 		if (fetchExistingInstanceNames) {
@@ -581,9 +598,24 @@ export function createCreationFlowContext(
 		modal.value?.setStage('import-instance')
 	}
 
-	function browseModpacks() {
-		modal.value?.hide()
-		emit.browseModpacks()
+	async function browseModpacks() {
+		if (navigating.value || finishDisabled.value) return
+		if (!options.browseModpacks) {
+			modal.value?.hide()
+			emit.browseModpacks()
+			return
+		}
+		navigating.value = true
+		try {
+			await options.browseModpacks()
+			navigating.value = false
+			await nextTick()
+			modal.value?.hide()
+		} catch (error) {
+			handleError(error as Error)
+		} finally {
+			navigating.value = false
+		}
 	}
 
 	async function selectProject(projectId: string, projectType: string, versionId?: string) {
@@ -683,20 +715,23 @@ export function createCreationFlowContext(
 		inviteTarget = { serverId, worldId, siteUrl }
 		inviteOnDone = onDone
 		inviteSubmitted.value = true
-		loading.value = false
 		modal.value?.setStage('invite-friends')
+		loading.value = false
 		void retryInvite()
 	}
 
-	function completeInvite() {
-		if (!inviteSubmitted.value || inviteCompleted.value) return
+	async function completeInvite() {
+		if (!inviteSubmitted.value || inviteCompleted.value || loading.value || navigating.value) return
+		const onDone = inviteOnDone
 		inviteCompleted.value = true
 		inviteRun++
 		inviteLoading.value = false
 		modal.value?.hide()
-		void Promise.resolve()
-			.then(() => inviteOnDone?.())
-			.catch((error) => handleError(error as Error))
+		try {
+			await onDone?.()
+		} catch (error) {
+			handleError(error as Error)
+		}
 	}
 
 	function buildProperties(): Archon.Content.v1.PropertiesFields {
@@ -771,6 +806,7 @@ export function createCreationFlowContext(
 		importSearchQuery,
 		hardReset,
 		loading,
+		uploadProgress,
 		finishDisabled,
 		finishDisabledTooltip,
 		inviteLink,
@@ -778,6 +814,8 @@ export function createCreationFlowContext(
 		inviteError,
 		inviteSubmitted,
 		inviteCompleted,
+		inviteCopied,
+		navigating,
 		isBackingUp,
 		cancelBackup,
 		modal,

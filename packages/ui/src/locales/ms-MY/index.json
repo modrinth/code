@@ -4187,12 +4187,6 @@
   "servers.remove-access-modal.warning-body": {
     "defaultMessage": "Jika anda membatalkan akses pengguna ke pelayan anda, anda perlu menjemput semula mereka untuk memulihkan akses."
   },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Pemasangan gagal"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Pemuatnaikan pek mod gagal"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Sediakan pelayan"
   },

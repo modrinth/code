@@ -5675,18 +5675,6 @@
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "SFTP kimlik bilgileri döndürüldü"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Kurulum sırasında beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Kurulum başarısız oldu"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Yükleme sırasında beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Mod paketi yüklemesi başarısız oldu"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Sunucu kur"
   },

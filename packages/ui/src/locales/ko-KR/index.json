@@ -5378,18 +5378,6 @@
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "무슨 일이 벌어지나요?"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "설치 중 예기치 않은 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "설치 실패"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "업로드 중 예기치 않은 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "모드팩 업로드 실패"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "서버 설정"
   },

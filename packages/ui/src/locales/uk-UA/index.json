@@ -5645,18 +5645,6 @@
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "Облікові дані SFTP оновлено."
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Під час установлення сталася несподівана помилка. Спробуйте ще раз пізніше."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Не вдалося встановити"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Під час вивантаження сталася несподівана помилка. Спробуйте ще раз пізніше."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Не вдалося вивантажити збірку"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Налаштування сервера"
   },

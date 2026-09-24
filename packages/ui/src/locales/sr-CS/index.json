@@ -5426,18 +5426,6 @@
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "Šta se desi?"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Došlo je do neočekivane greške tokom instalacije. Molimo pokušaj ponovo kasnije."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Neuspešna instalacija"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Došlo je do neočekivane greške prilikom otpremanja. Molimo pokušaj ponovo kasnije."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Otpremanje Modpack-a nije uspelo"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Podesi server"
   },

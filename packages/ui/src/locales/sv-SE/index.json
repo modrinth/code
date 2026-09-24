@@ -5327,18 +5327,6 @@
   "servers.settings.advanced.sftp.roll-credentials-modal-description": {
     "defaultMessage": "Det tidigare användarnamnet och lösenordet kommer att sluta fungera."
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Ett oväntat fel inträffade under installeringen. Vänligen försök igen senare."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Installation misslyckades"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Ett oväntat fel inträffade under uppladdningen. Vänligen försök igen senare."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Modpaketsuppladdning misslyckades"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Ställ in server"
   },

@@ -17,6 +17,7 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	nonProgressStage: true,
 	hideHeader: true,
 	mergeHeader: true,
+	disableClose: (ctx) => ctx.loading.value,
 	beforeHide: (ctx) => {
 		if (ctx.inviteCompleted.value) return true
 		ctx.completeInvite()
@@ -30,6 +31,9 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 		}),
 		icon: CheckIcon,
 		iconPosition: 'before',
+		color: ctx.inviteCopied.value ? 'brand' : 'standard',
+		buttonClass: 'transition-colors duration-200 motion-reduce:transition-none',
+		ariaDisabled: ctx.navigating.value,
 		onClick: ctx.completeInvite,
 	}),
 	maxWidth: '448px',

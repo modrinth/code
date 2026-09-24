@@ -40,7 +40,7 @@ import {
 	commonSettingsMessages,
 	ContentInstallModal,
 	ContentUpdaterModal,
-	createServerOnboardingInviteFlow,
+	createServerOnboardingFlow,
 	CreationFlowModal,
 	defineMessages,
 	I18nDebugPanel,
@@ -54,9 +54,9 @@ import {
 	provideNotificationManager,
 	providePageContext,
 	providePopupNotificationManager,
-	provideServerOnboardingInviteFlow,
+	provideServerOnboardingFlow,
 	provideServerPlay,
-	ServerOnboardingInviteModal,
+	ServerOnboardingModal,
 	TeleportOverflowMenu,
 	TextLogo,
 	TooltipDirective,
@@ -349,7 +349,7 @@ const tauriApiClient = new TauriModrinthClient({
 	],
 })
 provideModrinthClient(tauriApiClient)
-provideServerOnboardingInviteFlow(createServerOnboardingInviteFlow())
+provideServerOnboardingFlow(createServerOnboardingFlow())
 const { data: authenticatedModrinthUser } = useQuery({
 	queryKey: computed(() => ['authenticated-user', 'campaigns', credentials.value?.user?.id]),
 	queryFn: () => tauriApiClient.labrinth.users_v3.getAuthenticated(),
@@ -970,6 +970,7 @@ let routerToken = null
 let suspenseToken = null
 
 let suspensePending = false
+const onboardingPageReady = ref(true)
 
 const sidebarOverlayScrollbarsOptions = Object.freeze({
 	overflow: {
@@ -1012,6 +1013,7 @@ router.afterEach((to, from, failure) => {
 })
 
 function onSuspensePending() {
+	onboardingPageReady.value = false
 	debugStartup('Route Suspense pending', { route: route.path })
 	suspensePending = true
 	if (suspenseToken) loading.end(suspenseToken)
@@ -1019,6 +1021,7 @@ function onSuspensePending() {
 }
 
 function onSuspenseResolve() {
+	onboardingPageReady.value = true
 	debugStartup('Route Suspense resolved', { route: route.path })
 	if (suspenseToken) {
 		loading.end(suspenseToken)
@@ -2267,7 +2270,12 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			@create="handleCreate"
 			@browse-modpacks="handleBrowseModpacks"
 		/>
-		<ServerOnboardingInviteModal />
+		<ServerOnboardingModal
+			browse-path="/browse/modpack"
+			:get-loader-manifest="getLoaderManifest"
+			:navigate="(to) => router.push(to)"
+			:page-ready="onboardingPageReady"
+		/>
 		<IconEditorModal
 			ref="creationIconEditorModal"
 			:config="creationGeneratedIcon?.config"

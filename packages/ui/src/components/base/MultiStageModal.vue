@@ -14,7 +14,7 @@
 		:fade="fade"
 		:hide-header="resolveCtxFn(currentStage.hideHeader, context)"
 		:merge-header="resolveCtxFn(currentStage.mergeHeader, context)"
-		:disable-close="resolveCtxFn(currentStage.disableClose, context)"
+		:disable-close="disableClose || resolveCtxFn(currentStage.disableClose, context)"
 	>
 		<template #title>
 			<div
@@ -71,10 +71,11 @@
 			class="w-full h-1 appearance-none border-none absolute top-0 left-0"
 		></progress>
 
-		<component :is="currentStage?.stageContent" />
+		<component :is="currentStage?.stageContent" :key="currentStage?.id" />
 
 		<template #actions>
 			<div
+				:key="currentStage?.id"
 				class="flex flex-col justify-end gap-2 sm:flex-row"
 				:class="leftButtonConfig || rightButtonConfig ? actionsTopMarginClass : ''"
 			>
@@ -98,6 +99,7 @@
 					:color="rightButtonConfig.color === 'standard' ? undefined : rightButtonConfig.color"
 					:class="rightButtonConfig.buttonClass"
 					:disabled="rightButtonConfig.disabled || rightButtonConfig.loading"
+					:aria-disabled="rightButtonConfig.ariaDisabled || undefined"
 					@click="rightButtonConfig.onClick"
 				>
 					<SpinnerIcon
@@ -128,7 +130,7 @@
 <script lang="ts">
 import { ChevronRightIcon, SpinnerIcon } from '@modrinth/assets'
 import type { Component } from 'vue'
-import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
 
 import type { ButtonColor } from '#ui/components/base/buttons'
 import { Button } from '#ui/components/base/buttons'
@@ -141,6 +143,7 @@ export interface StageButtonConfig {
 	iconPosition?: 'before' | 'after'
 	color?: ButtonColor | 'standard'
 	disabled?: boolean
+	ariaDisabled?: boolean
 	loading?: boolean
 	tooltip?: string
 	iconClass?: string | null
@@ -185,14 +188,24 @@ const props = withDefaults(
 		fade?: 'standard' | 'warning' | 'danger'
 		disableProgress?: boolean
 		closeOnClickOutside?: boolean
+		animateStages?: boolean
+		disableClose?: boolean
 	}>(),
 	{
 		closeOnClickOutside: true,
+		animateStages: false,
+		disableClose: false,
 	},
 )
 
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
 const currentStageIndex = ref<number>(0)
+const displayedStageIndex = ref(0)
+const frozenButtons = shallowRef<{
+	left: StageButtonConfig | null
+	right: StageButtonConfig | null
+} | null>(null)
+let transitioning = false
 
 function show() {
 	modal.value?.show()
@@ -248,7 +261,7 @@ const prevStage = () => {
 	}
 }
 
-const currentStage = computed(() => props.stages[currentStageIndex.value])
+const currentStage = computed(() => props.stages[displayedStageIndex.value])
 const actionsTopMarginClass = computed(() => {
 	const margin = currentStage.value?.actionsTopMargin
 	return margin && resolveCtxFn(margin, props.context) === 'sm' ? 'mt-2' : 'mt-4'
@@ -266,12 +279,14 @@ const resolvedTitle = computed(() => {
 })
 
 const leftButtonConfig = computed(() => {
+	if (frozenButtons.value) return frozenButtons.value.left
 	const stage = currentStage.value
 	if (!stage) return null
 	return resolveCtxFn(stage.leftButtonConfig, props.context)
 })
 
 const rightButtonConfig = computed(() => {
+	if (frozenButtons.value) return frozenButtons.value.right
 	const stage = currentStage.value
 	if (!stage) return null
 	return resolveCtxFn(stage.rightButtonConfig, props.context)
@@ -297,7 +312,7 @@ const progressValue = computed(() => {
 	}
 
 	const completedCount = props.stages
-		.slice(0, currentStageIndex.value + 1)
+		.slice(0, displayedStageIndex.value + 1)
 		.filter(isProgressStage).length
 	const totalCount = props.stages.filter(isProgressStage).length
 
@@ -393,9 +408,36 @@ watch([breadcrumbStages, currentStageIndex], () => nextTick(() => updateScrollSh
 	immediate: true,
 })
 
-watch(currentStageIndex, () => {
-	scrollToCurrentBreadcrumb()
-})
+watch(
+	currentStageIndex,
+	async () => {
+		if (transitioning) return
+		transitioning = true
+		try {
+			do {
+				const nextIndex = currentStageIndex.value
+				frozenButtons.value = {
+					left: leftButtonConfig.value,
+					right: rightButtonConfig.value,
+				}
+				const displayStage = () => {
+					displayedStageIndex.value = nextIndex
+					frozenButtons.value = null
+				}
+				if (props.animateStages && modal.value) {
+					await modal.value.transitionContent(displayStage)
+				} else {
+					displayStage()
+				}
+			} while (displayedStageIndex.value !== currentStageIndex.value)
+		} finally {
+			frozenButtons.value = null
+			transitioning = false
+		}
+		scrollToCurrentBreadcrumb()
+	},
+	{ flush: 'sync' },
+)
 
 const emit = defineEmits<{
 	(e: 'refresh-data' | 'hide' | 'after-hide' | 'after-show'): void

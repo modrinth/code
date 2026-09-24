@@ -6162,10 +6162,10 @@
     "defaultMessage": "Review"
   },
   "servers.region.australia": {
-    "defaultMessage": "Australia"
+    "defaultMessage": "Australia (Sydney)"
   },
   "servers.region.central-europe": {
-    "defaultMessage": "Central Europe"
+    "defaultMessage": "Germany (Limburg)"
   },
   "servers.region.custom.prompt": {
     "defaultMessage": "How much RAM do you want your server to have?"
@@ -6174,13 +6174,13 @@
     "defaultMessage": "RAM"
   },
   "servers.region.north-america-central": {
-    "defaultMessage": "Central North America"
+    "defaultMessage": "United States (Dallas)"
   },
   "servers.region.north-america-east": {
-    "defaultMessage": "Eastern North America"
+    "defaultMessage": "United States (Virginia)"
   },
   "servers.region.north-america-west": {
-    "defaultMessage": "Western North America"
+    "defaultMessage": "United States (San Jose)"
   },
   "servers.region.prompt": {
     "defaultMessage": "Where would you like your server to be located?"
@@ -6189,10 +6189,10 @@
     "defaultMessage": "Region not listed? <link>Let us know where you'd like to see Modrinth Hosting next!</link>"
   },
   "servers.region.southeast-asia": {
-    "defaultMessage": "Southeast Asia"
+    "defaultMessage": "Singapore"
   },
   "servers.region.western-europe": {
-    "defaultMessage": "Western Europe"
+    "defaultMessage": "United Kingdom (Coventry)"
   },
   "servers.remove-access-modal.added-label": {
     "defaultMessage": "Added {time}"
@@ -6263,12 +6263,6 @@
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "SFTP credentials rotated"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "An unexpected error occurred while installing. Please try again later."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Installation failed"
-  },
   "servers.setup.onboarding.invite.copied": {
     "defaultMessage": "Link copied"
   },
@@ -6295,12 +6289,6 @@
   },
   "servers.setup.onboarding.invite.unavailable": {
     "defaultMessage": "Invite link unavailable"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "An unexpected error occurred while uploading. Please try again later."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Modpack upload failed"
   },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Setup server"

@@ -5693,18 +5693,6 @@
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "Credenciais SFTP rotacionadas"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Ocorreu um erro inesperado durante a instalação. Por favor, tente novamente mais tarde."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "A instalação falhou"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Ocorreu um erro inesperado durante o envio. Por favor, tente novamente mais tarde."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "O envio do pacote de mods falhou\n    \t\t\t\t\t\t"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Configurar servidor"
   },

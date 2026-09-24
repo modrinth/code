@@ -4586,12 +4586,6 @@
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "Co se stane?"
   },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Instalace selhala"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Nahrávání modpacku selhalo"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Nastavit server"
   },

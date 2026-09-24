@@ -5606,18 +5606,6 @@
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "Учётные данные SFTP обновлены"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Произошла непредвиденная ошибка во время установки. Пожалуйста, попробуйте позже."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Установка не удалась"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Произошла непредвиденная ошибка во время загрузки. Пожалуйста, попробуйте снова позже."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Загрузка сборки не удалась"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Установить сервер"
   },

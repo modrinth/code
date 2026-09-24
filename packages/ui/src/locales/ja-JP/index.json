@@ -5270,18 +5270,6 @@
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "どうなるの？"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "インストール中に予期しないエラーが発生しました。時間をおいて再度お試しください。"
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "インストールの失敗"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "アップロード中に予期しないエラーが発生しました。時間をおいて再度お試しください。"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "モッドパックのアップロード失敗"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "サーバーをセットアップ"
   },

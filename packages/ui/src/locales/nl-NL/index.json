@@ -5681,18 +5681,6 @@
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "SFTP-referenties gedraaid"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Er is een onverwachte fout opgetreden tijdens de installatie. Probeer het later nog eens."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Installeren is mislukt"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Er is een onverwachte fout opgetreden tijdens het uploaden. Probeer het later nog eens."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Uploaden van modpack is mislukt"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Server instellen"
   },

@@ -17,8 +17,9 @@
 			<Button
 				native-type="button"
 				size="lg"
-				class="-mx-2 self-stretch !justify-between text-left"
+				class="self-stretch !justify-between text-left"
 				:disabled="!ctx.inviteLink.value"
+				:aria-label="recentlyCopied ? formatMessage(messages.copied) : undefined"
 				@click="copyInviteLink"
 			>
 				<span class="min-w-0 truncate text-base font-semibold text-primary">
@@ -28,9 +29,14 @@
 					}}
 				</span>
 				<SpinnerIcon v-if="ctx.inviteLoading.value" class="size-5 shrink-0 animate-spin" />
+				<CheckIcon
+					v-else-if="recentlyCopied"
+					class="size-5 shrink-0 text-brand"
+					aria-hidden="true"
+				/>
 				<ClipboardCopyIcon v-else class="size-5 shrink-0 text-secondary" aria-hidden="true" />
 			</Button>
-			<p class="m-0 text-sm text-secondary">{{ formatMessage(messages.inviteLater) }}</p>
+			<p class="m-0 text-base text-secondary">{{ formatMessage(messages.inviteLater) }}</p>
 		</div>
 		<div v-if="ctx.inviteError.value" class="flex flex-wrap items-center gap-2 text-sm text-red">
 			<span>{{ ctx.inviteError.value }}</span>
@@ -40,7 +46,14 @@
 </template>
 
 <script setup lang="ts">
-import { ClipboardCopyIcon, ServerInviteFriendsIllustration, SpinnerIcon } from '@modrinth/assets'
+import {
+	CheckIcon,
+	ClipboardCopyIcon,
+	ServerInviteFriendsIllustration,
+	SpinnerIcon,
+} from '@modrinth/assets'
+import { useTimeoutFn } from '@vueuse/core'
+import { ref, watch } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
 import { injectCreationFlowContext } from '#ui/components/flows/creation-flow-modal/creation-flow-context'
@@ -50,6 +63,19 @@ import { injectNotificationManager } from '#ui/providers'
 const ctx = injectCreationFlowContext()
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
+const recentlyCopied = ref(false)
+const { start: resetCopiedTimer, stop: stopCopiedTimer } = useTimeoutFn(
+	() => {
+		recentlyCopied.value = false
+	},
+	1500,
+	{ immediate: false },
+)
+
+watch(ctx.inviteLink, () => {
+	stopCopiedTimer()
+	recentlyCopied.value = false
+})
 
 const messages = defineMessages({
 	title: {
@@ -88,10 +114,15 @@ const messages = defineMessages({
 })
 
 async function copyInviteLink() {
-	if (!ctx.inviteLink.value) return
+	const link = ctx.inviteLink.value
+	if (!link) return
 	try {
-		await navigator.clipboard.writeText(ctx.inviteLink.value)
-		addNotification({ type: 'success', title: formatMessage(messages.copied) })
+		await navigator.clipboard.writeText(link)
+		if (ctx.inviteLink.value === link) {
+			ctx.inviteCopied.value = true
+			recentlyCopied.value = true
+			resetCopiedTimer()
+		}
 	} catch (error) {
 		addNotification({
 			type: 'error',

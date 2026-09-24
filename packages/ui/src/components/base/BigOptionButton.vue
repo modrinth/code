@@ -1,7 +1,8 @@
 <template>
 	<button
-		class="group flex w-full hover:cursor-pointer items-center gap-3 rounded-[20px] p-3 text-left transition-all hover:brightness-110 active:scale-[0.98] border-none"
+		class="group flex w-full enabled:hover:cursor-pointer items-center gap-3 rounded-[20px] p-3 text-left transition-all enabled:hover:brightness-110 enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 border-none"
 		:class="selected ? 'bg-brand-highlight' : 'bg-surface-4'"
+		:disabled="disabled"
 		@click="$emit('click')"
 	>
 		<div
@@ -20,7 +21,8 @@
 			<span class="text-sm font-medium text-primary">{{ description }}</span>
 		</div>
 		<ChevronRightIcon
-			class="size-5 shrink-0 text-secondary opacity-0 transition-opacity duration-100 group-hover:opacity-100"
+			class="size-5 shrink-0 text-secondary opacity-0 transition-opacity duration-100"
+			:class="{ 'group-hover:opacity-100': !disabled }"
 		/>
 	</button>
 </template>
@@ -34,6 +36,7 @@ defineProps<{
 	title: string
 	description: string
 	selected?: boolean
+	disabled?: boolean
 }>()
 
 defineEmits<{

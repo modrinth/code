@@ -5675,18 +5675,6 @@
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "SFTP-hitelesítő adatok lecserélve"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "A telepítés során váratlan hiba történt. Kérlek, próbáld újra később."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "A telepítés nem sikerült"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "A feltöltés során váratlan hiba történt. Kérlek, próbáld újra később."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "A modcsomag feltöltése sikertelen volt"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "A szerver beállítása"
   },

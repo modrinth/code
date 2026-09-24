@@ -5684,18 +5684,6 @@
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "Wygenerowano nowe dane logowania SFTP"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Wystąpił nieoczekiwany błąd podczas instalacji. Spróbuj ponownie później."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Instalacja nie powiodła się"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Wystąpił nieoczekiwany błąd podczas przesyłania. Spróbuj ponownie później."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Przesyłanie paczki modów nie powiodło się"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Ustaw serwer"
   },

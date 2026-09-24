@@ -5693,18 +5693,6 @@
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "已輪替 SFTP 憑證"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "安裝時發生非預期的錯誤。請稍後再試。"
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "無法安裝"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "上傳時發生非預期的錯誤。請稍後再試。"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "無法上傳模組包"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "設定伺服器"
   },
