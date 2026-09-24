@@ -129,11 +129,10 @@ pub use self::publish::{
 pub use self::types::{
     SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
     SharedInstanceInvite, SharedInstanceInviteCreator,
-    SharedInstanceInviteInstallPreview,
-    SharedInstanceInviteLink, SharedInstanceJoinType,
-    SharedInstancePublishPreview, SharedInstanceUpdateDiff,
-    SharedInstanceUpdateDiffType, SharedInstanceUpdatePreview,
-    SharedInstanceUser, SharedInstanceUsers,
+    SharedInstanceInviteInstallPreview, SharedInstanceInviteLink,
+    SharedInstanceJoinType, SharedInstancePublishPreview,
+    SharedInstanceUpdateDiff, SharedInstanceUpdateDiffType,
+    SharedInstanceUpdatePreview, SharedInstanceUser, SharedInstanceUsers,
 };
 
 pub async fn can_active_user_use_shared_instances() -> crate::Result<bool> {

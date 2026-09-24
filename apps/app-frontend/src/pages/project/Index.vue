@@ -227,7 +227,7 @@
 			:search-modpacks="serverInstallContent.searchServerModpacks"
 			:get-project-versions="serverInstallContent.getServerProjectVersions"
 			:get-loader-manifest="getLoaderManifest"
-			@hide="() => {}"
+			@hide="serverInstallContent.onServerFlowHide"
 			@browse-modpacks="() => {}"
 			@create="serverInstallContent.handleServerModpackFlowCreate"
 		/>
@@ -559,7 +559,10 @@ const serverProjectInstalled = computed(
 			serverInstallContent.serverContextServerData.value?.upstream?.project_id === data.value.id),
 )
 const installButtonLoading = computed(
-	() => installing.value || serverInstallContent.isInstallingQueuedServerInstalls.value,
+	() =>
+		installing.value ||
+		serverInstallContent.isInstallingQueuedServerInstalls.value ||
+		serverInstallContent.activeServerModpackInstallProjectId.value === data.value?.id,
 )
 const installButtonValidating = computed(
 	() =>

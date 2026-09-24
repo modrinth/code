@@ -81,7 +81,9 @@ export interface ServerInstallContentContext {
 	resolveQueuedServerInstallPlan: (
 		plan: BrowseInstallPlan<InstallableSearchResult>,
 	) => Promise<void>
+	activeServerModpackInstallProjectId: Ref<string | null>
 	openServerModpackInstallFlow: (request: ServerModpackSelectionRequest) => Promise<void>
+	onServerFlowHide: () => void
 	onServerFlowBack: () => void
 	handleServerModpackFlowCreate: (config: CreationFlowContextValue) => Promise<void>
 	markServerProjectInstalled: (id: string) => void
@@ -163,6 +165,7 @@ export function createServerInstallContent(opts: {
 		})),
 	)
 	const isInstallingQueuedServerInstalls = ref(false)
+	const activeServerModpackInstallProjectId = ref<string | null>(null)
 	const queuedInstallProgress = ref({ completed: 0, total: 0 })
 	const effectiveServerWorldId = computed(() => worldIdQuery.value ?? serverContextWorldId.value)
 	useServerPanelSync({
@@ -306,39 +309,50 @@ export function createServerInstallContent(opts: {
 			throw new Error('Missing server context')
 		}
 
-		if (serverFlowFrom.value === 'onboarding') {
-			await onboardingFlow.open({
-				serverId: serverIdQuery.value,
-				worldId: effectiveServerWorldId.value,
-				siteUrl: appConfig.siteUrl,
-				project: request,
-				backToBrowse: true,
-			})
-			return
+		activeServerModpackInstallProjectId.value = request.projectId
+		try {
+			if (serverFlowFrom.value === 'onboarding') {
+				await onboardingFlow.open({
+					serverId: serverIdQuery.value,
+					worldId: effectiveServerWorldId.value,
+					siteUrl: appConfig.siteUrl,
+					project: request,
+					backToBrowse: true,
+					onHide: onServerFlowHide,
+				})
+				return
+			}
+
+			const modalInstance = serverSetupModalRef.value
+			if (!modalInstance) throw new Error('Server setup modal is unavailable')
+
+			await modalInstance.show()
+			await nextTick()
+
+			const ctx = modalInstance.ctx
+			if (!ctx) throw new Error('Server setup modal is unavailable')
+
+			if (request.contentType && request.contentType !== 'modpack') {
+				await ctx.selectProject(request.projectId, request.contentType, request.versionId)
+				return
+			}
+
+			ctx.setupType.value = 'modpack'
+			ctx.modpackSelection.value = {
+				projectId: request.projectId,
+				versionId: request.versionId,
+				name: request.name,
+				iconUrl: request.iconUrl,
+			}
+			ctx.modal.value?.setStage('final-config')
+		} catch (error) {
+			onServerFlowHide()
+			throw error
 		}
+	}
 
-		const modalInstance = serverSetupModalRef.value
-		if (!modalInstance) return
-
-		await modalInstance.show()
-		await nextTick()
-
-		const ctx = modalInstance.ctx
-		if (!ctx) return
-
-		if (request.contentType && request.contentType !== 'modpack') {
-			await ctx.selectProject(request.projectId, request.contentType, request.versionId)
-			return
-		}
-
-		ctx.setupType.value = 'modpack'
-		ctx.modpackSelection.value = {
-			projectId: request.projectId,
-			versionId: request.versionId,
-			name: request.name,
-			iconUrl: request.iconUrl,
-		}
-		ctx.modal.value?.setStage('final-config')
+	function onServerFlowHide() {
+		activeServerModpackInstallProjectId.value = null
 	}
 
 	function clearQueuedServerInstalls() {
@@ -583,7 +597,9 @@ export function createServerInstallContent(opts: {
 		getQueuedServerInstallPlans,
 		setQueuedServerInstallPlans,
 		resolveQueuedServerInstallPlan,
+		activeServerModpackInstallProjectId,
 		openServerModpackInstallFlow,
+		onServerFlowHide,
 		onServerFlowBack,
 		handleServerModpackFlowCreate,
 		markServerProjectInstalled,

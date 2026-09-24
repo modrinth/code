@@ -7,6 +7,14 @@ import { clearServerSharedInstance } from '#ui/layouts/shared/server-sharing'
 import { injectModrinthClient } from '#ui/providers'
 
 import {
+	addonToggleKey,
+	applyPendingAddonToggle,
+	clearPendingAddonToggleField,
+	clearPendingAddonTogglesForServer,
+	confirmPendingAddonToggle,
+	normalizeAddonFilename,
+} from './server-content-toggle-state'
+import {
 	retainServerContextRuntime,
 	type ServerContextRuntimeLease,
 } from './server-context-runtime'
@@ -46,6 +54,7 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 		activeServerId = targetServerId
 
 		if (!client.archon.sync.getStatus(targetServerId)?.lastEventId) {
+			clearPendingAddonTogglesForServer(queryClient, targetServerId)
 			void invalidateCorePanelQueries(targetServerId)
 		}
 
@@ -74,6 +83,7 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 
 	function handleSyncEvent(serverId: string, event: Archon.Sync.v1.SyncEvent) {
 		if (event.type === 'protocol.reset' || event.type === 'protocol.invalid') {
+			clearPendingAddonTogglesForServer(queryClient, serverId)
 			void invalidateCorePanelQueries(serverId)
 			return
 		}
@@ -146,6 +156,11 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 				break
 			case 'world.content.update':
 				handleWorldContentUpdate(serverId, event)
+				break
+			case 'world.content.file.side.server.updated':
+			case 'world.content.file.side.client.updated':
+			case 'world.content.file.side.lock.updated':
+				handleWorldContentFileSideUpdate(serverId, event)
 				break
 		}
 	}
@@ -307,6 +322,57 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 		})
 	}
 
+	function handleWorldContentFileSideUpdate(
+		serverId: string,
+		event: Archon.Sync.v1.WorldContentFileSideEvent | Archon.Sync.v1.WorldContentFileSideLockEvent,
+	) {
+		if (event.world_id !== options.worldId.value) return
+
+		const identity = {
+			kind: parentDirectoryToAddonKind(event.parent_directory),
+			filename: event.filename,
+		}
+		if (event.type === 'world.content.file.side.server.updated') {
+			confirmPendingAddonToggle(
+				queryClient,
+				serverId,
+				event.world_id,
+				identity,
+				'server',
+				event.enabled,
+			)
+		} else if (event.type === 'world.content.file.side.client.updated') {
+			confirmPendingAddonToggle(
+				queryClient,
+				serverId,
+				event.world_id,
+				identity,
+				'player',
+				event.enabled,
+			)
+		}
+
+		for (const key of [contentListKey(serverId), modpackContentListKey(serverId)]) {
+			queryClient.setQueryData<Archon.Content.v1.Addons>(key, (current) => {
+				if (!current?.addons) return current
+				const targetKey = addonToggleKey(identity)
+				let matched = false
+				const addons = current.addons.map((addon) => {
+					if (addonToggleKey(addon) !== targetKey) return addon
+					matched = true
+					const updated =
+						event.type === 'world.content.file.side.server.updated'
+							? { ...addon, disabled_server: !event.enabled }
+							: event.type === 'world.content.file.side.client.updated'
+								? { ...addon, disabled_player: !event.enabled }
+								: { ...addon, side_toggle_unlocked: !event.locked }
+					return applyPendingAddonToggle(queryClient, serverId, event.world_id, updated)
+				})
+				return matched ? { ...current, addons } : current
+			})
+		}
+	}
+
 	function worldContentUpdateToAddons(
 		event: Archon.Sync.v1.WorldContentUpdateEvent,
 		currentAddons: Archon.Content.v1.Addon[],
@@ -323,14 +389,27 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 					item.parent_directory,
 				),
 			)
-			.map((item) =>
-				worldContentItemToAddon(
+			.map((item) => {
+				const addon = worldContentItemToAddon(
 					item,
 					currentByFilename.get(
 						`${parentDirectoryToAddonKind(item.parent_directory)}:${normalizeAddonFilename(item.filename)}`,
 					),
-				),
-			)
+				)
+				if (item.status === 'installed') {
+					confirmPendingAddonToggle(
+						queryClient,
+						serverId,
+						event.world_id,
+						addon,
+						'enabled',
+						!addon.disabled,
+					)
+				} else if (typeof item.status === 'object' && 'failed' in item.status) {
+					clearPendingAddonToggleField(queryClient, serverId, event.world_id, addon, 'enabled')
+				}
+				return applyPendingAddonToggle(queryClient, serverId, event.world_id, addon)
+			})
 		return {
 			modloader:
 				event.platform_data?.platform === 'neoforge'
@@ -517,10 +596,6 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 					}
 				: current.version,
 		}
-	}
-
-	function normalizeAddonFilename(filename: string): string {
-		return filename.endsWith('.disabled') ? filename.slice(0, -'.disabled'.length) : filename
 	}
 
 	onMounted(() => {

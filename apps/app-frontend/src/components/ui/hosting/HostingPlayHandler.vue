@@ -43,7 +43,6 @@ import { handleSevereError } from '@/composables/use-error.js'
 import { toError } from '@/helpers/errors'
 import {
 	install_get_shared_instance_preview,
-	install_job_list,
 	install_shared_instance,
 	install_update_shared_instance,
 	installJobInstanceId,
@@ -54,7 +53,10 @@ import { get, list } from '@/helpers/instance'
 import { get as getCredentials, type ModrinthAuthFlow } from '@/helpers/mr_auth'
 import { get_by_instance_id } from '@/helpers/process'
 import { ensureManagedServerWorldExists, start_join_server } from '@/helpers/worlds'
-import { instanceKeys, sharedInstanceUpdatePreviewQueryOptions } from '@/pages/instance/query-options'
+import {
+	instanceKeys,
+	sharedInstanceUpdatePreviewQueryOptions,
+} from '@/pages/instance/query-options'
 import { injectAppEvents } from '@/providers/app-events'
 
 type LaunchTarget = ServerPlayTarget & {
@@ -78,28 +80,18 @@ const installModal = ref<InstanceType<typeof SharedInstanceInstallModal>>()
 const updateModal = ref<InstanceType<typeof ContentDiffModal>>()
 const updateDiffs = ref<ContentDiffItem[]>([])
 const pendingUpdate = ref<{ target: LaunchTarget; instanceId: string }>()
+const activeInstall = ref<{ serverId: string; worldId: string; instanceId: string }>()
 
 async function assertAccount(target: LaunchTarget) {
 	if ((await getCredentials())?.user_id !== target.userId)
 		throw new Error(formatMessage(messages.accountChanged))
 }
 async function findInstance(target: LaunchTarget) {
-	const instance = (await list()).find(
+	return (await list()).find(
 		(instance) =>
 			instance.shared_instance?.id === target.sharedInstanceId &&
 			instance.shared_instance.linked_user_id === target.userId,
 	)
-	if (instance && instance.install_stage !== 'installed') {
-		const job = (await install_job_list(false)).find(
-			(job) => installJobInstanceId(job) === instance.id,
-		)
-		if (job) {
-			await wait_for_install_job(appEvents, job.job_id)
-			await assertAccount(target)
-			return (await get(instance.id)) ?? undefined
-		}
-	}
-	return instance
 }
 async function openAndLaunch(instanceId: string, launch: () => Promise<void>) {
 	await instanceLaunch.run(instanceId, async () => {
@@ -156,8 +148,10 @@ async function playExisting(
 	existing: NonNullable<Awaited<ReturnType<typeof findInstance>>>,
 	approveUpdate: boolean,
 ) {
-	if (existing.quarantined || existing.install_stage !== 'installed')
-		throw new Error(formatMessage(messages.notReady))
+	if (existing.quarantined || existing.install_stage !== 'installed') {
+		await router.push(`/instance/${encodeURIComponent(existing.id)}`)
+		return
+	}
 	const previewKey = instanceKeys.sharedUpdatePreview(existing.id, target.userId)
 	if (!approveUpdate)
 		await queryClient.invalidateQueries({ queryKey: previewKey, refetchType: 'none' })
@@ -169,9 +163,7 @@ async function playExisting(
 			await queryClient.invalidateQueries({ queryKey: previewKey })
 		} else {
 			const preview = await instanceLaunch.runPreviewCheck(existing.id, () =>
-				queryClient.fetchQuery(
-					sharedInstanceUpdatePreviewQueryOptions(existing.id, target.userId),
-				),
+				queryClient.fetchQuery(sharedInstanceUpdatePreviewQueryOptions(existing.id, target.userId)),
 			)
 			await assertAccount(target)
 			if (preview?.updateAvailable) {
@@ -182,6 +174,56 @@ async function playExisting(
 		await join(target, existing.id)
 	})
 }
+
+function invalidateInstanceQueries() {
+	return queryClient.invalidateQueries({
+		queryKey: instanceKeys.all,
+		predicate: (query) => !query.queryKey.includes('shared-update-preview'),
+	})
+}
+
+async function launchInstalledInstance(target: LaunchTarget, instanceId: string) {
+	try {
+		await assertAccount(target)
+		const existing = await get(instanceId)
+		if (
+			!existing ||
+			existing.shared_instance?.id !== target.sharedInstanceId ||
+			existing.shared_instance?.linked_user_id !== target.userId ||
+			existing.quarantined ||
+			existing.install_stage !== 'installed'
+		)
+			throw new Error(formatMessage(messages.notReady))
+		await playExisting(target, existing, false)
+	} catch (error) {
+		handleError(toError(error))
+	}
+}
+
+function notifyWhenInstalled(target: LaunchTarget, jobId: string, instanceId: string) {
+	void wait_for_install_job(appEvents, jobId)
+		.then(async () => {
+			await assertAccount(target)
+			popupNotificationManager.addPopupNotification({
+				contentType: 'toast',
+				type: 'instance-ready',
+				title: target.name,
+				entityName: target.name,
+				entityIconUrl: target.icon,
+				onLaunch: () => launchInstalledInstance(target, instanceId),
+				onOpenInstance: async () => {
+					await router.push(`/instance/${encodeURIComponent(instanceId)}`)
+				},
+				autoCloseMs: null,
+			})
+		})
+		.catch((error) => handleError(toError(error)))
+		.finally(() => {
+			if (activeInstall.value?.instanceId === instanceId) activeInstall.value = undefined
+			void invalidateInstanceQueries()
+		})
+}
+
 const launchMutation = useMutation({
 	mutationFn: async ({ target, instanceId }: { target: LaunchTarget; instanceId?: string }) => {
 		await assertAccount(target)
@@ -206,29 +248,19 @@ const launchMutation = useMutation({
 			)
 			const installedId = installJobInstanceId(job)
 			if (!installedId) throw new Error(formatMessage(messages.notReady))
-			await queryClient.invalidateQueries({ queryKey: instanceKeys.list() })
-			await wait_for_install_job(appEvents, job.job_id)
-			await assertAccount(target)
-			popupNotificationManager.addPopupNotification({
-				contentType: 'toast',
-				type: 'instance-ready',
-				title: target.name,
-				entityName: target.name,
-				entityIconUrl: target.icon,
-				onLaunch: () => play(target),
-				onOpenInstance: async () => {
-					await router.push(`/instance/${encodeURIComponent(installedId)}`)
-				},
-				autoCloseMs: null,
-			})
+			activeInstall.value = {
+				serverId: target.serverId,
+				worldId: target.worldId,
+				instanceId: installedId,
+			}
+			notifyWhenInstalled(target, job.job_id, installedId)
+			await router.push(`/instance/${encodeURIComponent(installedId)}`)
 		}
 	},
 	onError: (error) => handleError(toError(error)),
-	onSettled: () =>
-		queryClient.invalidateQueries({
-			queryKey: instanceKeys.all,
-			predicate: (query) => !query.queryKey.includes('shared-update-preview'),
-		}),
+	onSettled: () => {
+		void invalidateInstanceQueries()
+	},
 })
 function showUpdate(
 	target: LaunchTarget,
@@ -307,6 +339,11 @@ const prepareMutation = useMutation({
 	onError: (error) => handleError(toError(error)),
 })
 async function play(target: ServerPlayTarget) {
+	const installing = activeInstall.value
+	if (installing?.serverId === target.serverId && installing.worldId === target.worldId) {
+		await router.push(`/instance/${encodeURIComponent(installing.instanceId)}`)
+		return
+	}
 	if (prepareMutation.isPending.value || launchMutation.isPending.value) return
 	await prepareMutation.mutateAsync(target).catch(() => {})
 }

@@ -9,6 +9,15 @@ import UnknownFileWarningModal from '#ui/components/modal/UnknownFileWarningModa
 import type { UpdateAllSelection } from '#ui/components/modal/update-all-modal/update-all-modal-types'
 import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import {
+	type AddonToggleChanges,
+	addonToggleKey,
+	applyPendingAddonToggle,
+	clearPendingAddonToggle,
+	discardFailedAddonToggle,
+	markPendingAddonToggleSent,
+	queuePendingAddonToggle,
+} from '#ui/composables/server-content-toggle-state'
 import { waitForServerContextRuntimeReady } from '#ui/composables/server-context-runtime'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import { useServerPreferences } from '#ui/composables/server-preferences'
@@ -180,8 +189,19 @@ function getContentOwnerAvatarUrl(owner: ContentOwnerAvatarSource) {
 
 const contentQuery = useQuery({
 	queryKey,
-	queryFn: () =>
-		client.archon.content_v1.getAddons(serverId, worldId.value!, { from_modpack: false }),
+	queryFn: async () => {
+		const targetWorldId = worldId.value!
+		const content = await client.archon.content_v1.getAddons(serverId, targetWorldId, {
+			from_modpack: false,
+		})
+		return {
+			...content,
+			addons:
+				content.addons?.map((addon) =>
+					applyPendingAddonToggle(queryClient, serverId, targetWorldId, addon),
+				) ?? null,
+		}
+	},
 	enabled: computed(() => worldId.value !== null),
 	staleTime: 30_000,
 })
@@ -189,10 +209,19 @@ const contentQuery = useQuery({
 const isModpackContentModalOpen = ref(false)
 const modpackContentQuery = useQuery({
 	queryKey: modpackContentQueryKey,
-	queryFn: () =>
-		client.archon.content_v1.getAddons(serverId, worldId.value!, {
+	queryFn: async () => {
+		const targetWorldId = worldId.value!
+		const content = await client.archon.content_v1.getAddons(serverId, targetWorldId, {
 			from_modpack: true,
-		}),
+		})
+		return {
+			...content,
+			addons:
+				content.addons?.map((addon) =>
+					applyPendingAddonToggle(queryClient, serverId, targetWorldId, addon),
+				) ?? null,
+		}
+	},
 	enabled: computed(() => worldId.value !== null && !!contentQuery.data.value?.modpack),
 	staleTime: 30_000,
 })
@@ -341,7 +370,9 @@ function friendlyAddonName(addon: Archon.Content.v1.Addon): string {
 function getAddonEnvironment(
 	addon: Archon.Content.v1.Addon,
 ): Labrinth.Projects.v3.Environment | undefined {
-	return addon.version?.environment ?? addon.manifest?.environment ?? undefined
+	const versionEnvironment = addon.version?.environment
+	if (versionEnvironment && versionEnvironment !== 'unknown') return versionEnvironment
+	return addon.manifest?.environment ?? versionEnvironment ?? undefined
 }
 
 function hasDetectedEnvironment(addon: Archon.Content.v1.Addon) {
@@ -436,6 +467,25 @@ const contentProjectsQuery = useQuery({
 const contentProjectsById = computed(
 	() => new Map((contentProjectsQuery.data.value ?? []).map((project) => [project.id, project])),
 )
+
+function isRequiredEnvironment(addon: Archon.Content.v1.Addon, side: ContentSide) {
+	const environment = getAddonEnvironment(addon)
+	if (!environment || environment === 'unknown') {
+		const project = addon.project_id ? contentProjectsById.value.get(addon.project_id) : undefined
+		return side === 'server'
+			? project?.server_side === 'required'
+			: project?.client_side === 'required'
+	}
+	return side === 'server'
+		? environment === 'client_and_server' ||
+				environment === 'server_only' ||
+				environment === 'server_only_client_optional' ||
+				environment === 'dedicated_server_only'
+		: environment === 'client_and_server' ||
+				environment === 'client_only' ||
+				environment === 'client_only_server_optional' ||
+				environment === 'singleplayer_only'
+}
 
 function normalizeInstallFilename(filename: string) {
 	const normalized = filename.endsWith('.disabled')
@@ -651,18 +701,11 @@ const deleteMutation = useMutation({
 	},
 })
 
-type AddonToggleChanges = {
-	enabled?: boolean
-	server?: boolean
-	player?: boolean
-}
-
 type AddonToggleBatch = {
 	addon: Archon.Content.v1.Addon
 	worldId: string
 	queryKey: string[]
 	changes: AddonToggleChanges
-	dataUpdateCount: number | undefined
 }
 
 type AddonToggleQueue = {
@@ -673,11 +716,8 @@ type AddonToggleQueue = {
 
 const addonToggleQueues = new Map<string, AddonToggleQueue>()
 
-function addonToggleKey(addon: Archon.Content.v1.Addon) {
-	return `${addon.kind}:${addon.filename.replace(/\.disabled$/, '')}`
-}
-
 function cancelQueuedAddonToggle(addon: Archon.Content.v1.Addon) {
+	if (worldId.value) clearPendingAddonToggle(queryClient, serverId, worldId.value, addon)
 	const key = `${worldId.value}:${addonToggleKey(addon)}`
 	const queue = addonToggleQueues.get(key)
 	if (!queue) return
@@ -685,19 +725,6 @@ function cancelQueuedAddonToggle(addon: Archon.Content.v1.Addon) {
 	queue.timer = undefined
 	queue.pending = undefined
 	if (!queue.running) addonToggleQueues.delete(key)
-}
-
-function applyAddonToggleChanges(addon: Archon.Content.v1.Addon, changes: AddonToggleChanges) {
-	return {
-		...addon,
-		...(changes.enabled !== undefined ? { disabled: !changes.enabled } : {}),
-		...(changes.server !== undefined ? { disabled_server: !changes.server } : {}),
-		...(changes.player !== undefined ? { disabled_player: !changes.player } : {}),
-		...((changes.server !== undefined || changes.player !== undefined) &&
-		!isPlayerOnlyContent(addon)
-			? { side_toggle_unlocked: true }
-			: {}),
-	}
 }
 
 const toggleAddonMutation = useMutation({
@@ -728,18 +755,6 @@ const toggleAddonMutation = useMutation({
 		}
 	},
 	onError: (error, batch) => {
-		if (queryClient.getQueryState(batch.queryKey)?.dataUpdateCount === batch.dataUpdateCount) {
-			queryClient.setQueryData<Archon.Content.v1.Addons>(batch.queryKey, (current) =>
-				current
-					? {
-							...current,
-							addons: (current.addons ?? []).map((addon) =>
-								addonToggleKey(addon) === addonToggleKey(batch.addon) ? batch.addon : addon,
-							),
-						}
-					: current,
-			)
-		}
 		addNotification({
 			type: 'error',
 			title: formatMessage(
@@ -758,10 +773,12 @@ async function flushAddonToggle(key: string, queue: AddonToggleQueue) {
 	const batch = queue.pending
 	queue.pending = undefined
 	queue.running = true
+	markPendingAddonToggleSent(queryClient, serverId, batch.worldId, batch.addon, batch.changes)
 	try {
 		await toggleAddonMutation.mutateAsync(batch)
 	} catch {
-		// The mutation reports the error and rolls back if no newer state has arrived.
+		discardFailedAddonToggle(queryClient, serverId, batch.worldId, batch.addon, batch.changes)
+		void queryClient.invalidateQueries({ queryKey: batch.queryKey, exact: true })
 	} finally {
 		queue.running = false
 		if (!queue.pending) {
@@ -785,23 +802,22 @@ function queueAddonToggle(addon: Archon.Content.v1.Addon, changes: AddonToggleCh
 		worldId: targetWorldId,
 		queryKey: targetQueryKey,
 		changes: {},
-		dataUpdateCount: undefined,
 	}
 	batch.changes = { ...batch.changes, ...changes }
 	queue.pending = batch
+	queuePendingAddonToggle(queryClient, serverId, targetWorldId, addon, changes)
 	queryClient.setQueryData<Archon.Content.v1.Addons>(targetQueryKey, (current) =>
 		current
 			? {
 					...current,
 					addons: (current.addons ?? []).map((candidate) =>
 						addonToggleKey(candidate) === addonToggleKey(addon)
-							? applyAddonToggleChanges(candidate, batch.changes)
+							? applyPendingAddonToggle(queryClient, serverId, targetWorldId, candidate)
 							: candidate,
 					),
 				}
 			: current,
 	)
-	batch.dataUpdateCount = queryClient.getQueryState(targetQueryKey)?.dataUpdateCount
 	if (queue.timer) clearTimeout(queue.timer)
 	queue.timer = setTimeout(() => {
 		queue.timer = undefined
@@ -823,14 +839,15 @@ async function handleSetEnabledFor(item: ContentItem, side: ContentSide, enabled
 	if (!addon || (side === 'server' && isPlayerOnlyContent(addon))) return
 	const targetWorldId = worldId.value
 	if (
-		enabled &&
 		userPreferences.value.warnOnIncompatibleContent &&
-		!(side === 'server' && addon.pack_client_depends) &&
-		isIncompatibleEnvironment(addon, side)
+		(enabled
+			? !(side === 'server' && addon.pack_client_depends) && isIncompatibleEnvironment(addon, side)
+			: isRequiredEnvironment(addon, side))
 	) {
 		const confirmed = await environmentWarningModal.value?.show(
 			item.project.title,
 			side,
+			enabled,
 			getAddonEnvironment(addon) === 'singleplayer_only',
 		)
 		if (!confirmed || contentActionDisabled.value || worldId.value !== targetWorldId) return
