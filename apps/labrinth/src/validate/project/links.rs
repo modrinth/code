@@ -91,7 +91,6 @@ const LICENSE_DOMAINS: &[&str] = &[
     "gnu.org",
     "apache.org",
     "creativecommons.org",
-    "polyformproject.com",
     "polyformproject.org",
 ];
 const DONATION_DOMAINS: &[(LinkPlatform, &[&str])] = &[
