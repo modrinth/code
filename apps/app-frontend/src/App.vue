@@ -27,7 +27,7 @@ import {
 	commonSettingsMessages,
 	ContentInstallModal,
 	ContentUpdaterModal,
-	createServerOnboardingInviteFlow,
+	createServerOnboardingFlow,
 	CreationFlowModal,
 	defineMessages,
 	I18nDebugPanel,
@@ -41,9 +41,9 @@ import {
 	provideNotificationManager,
 	providePageContext,
 	providePopupNotificationManager,
-	provideServerOnboardingInviteFlow,
+	provideServerOnboardingFlow,
 	provideServerPlay,
-	ServerOnboardingInviteModal,
+	ServerOnboardingModal,
 	TeleportOverflowMenu,
 	TooltipDirective,
 	useDebugLogger,
@@ -288,7 +288,7 @@ useAppEvent('ads_consent_required', handleAdsConsentRequired, appEvents)
 
 const tauriApiClient = createAppClient()
 provideModrinthClient(tauriApiClient)
-provideServerOnboardingInviteFlow(createServerOnboardingInviteFlow())
+provideServerOnboardingFlow(createServerOnboardingFlow())
 const { data: authenticatedModrinthUser } = useQuery({
 	queryKey: computed(() => ['authenticated-user', 'campaigns', credentials.value?.user?.id]),
 	queryFn: () => tauriApiClient.labrinth.users_v3.getAuthenticated(),
@@ -810,8 +810,14 @@ async function setupApp() {
 }
 
 const stateFailed = ref(false)
-const { loading, canNavigateBack, canNavigateForward, onSuspensePending, onSuspenseResolve } =
-	useRouteLoading({ stateInitialized, stateFailed })
+const {
+	loading,
+	canNavigateBack,
+	canNavigateForward,
+	onboardingPageReady,
+	onSuspensePending,
+	onSuspenseResolve,
+} = useRouteLoading({ stateInitialized, stateFailed })
 provideLoadingState(loading)
 
 traceStartupStep('Initialize backend state', () => initialize_state(appEventChannel))
@@ -2020,7 +2026,12 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			@create="handleCreate"
 			@browse-modpacks="handleBrowseModpacks"
 		/>
-		<ServerOnboardingInviteModal />
+		<ServerOnboardingModal
+			browse-path="/browse/modpack"
+			:get-loader-manifest="getLoaderManifest"
+			:navigate="(to) => router.push(to)"
+			:page-ready="onboardingPageReady"
+		/>
 		<IconEditorModal
 			ref="creationIconEditorModal"
 			:config="creationGeneratedIcon?.config"

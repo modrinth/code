@@ -2177,12 +2177,6 @@
   "servers.region.western-europe": {
     "defaultMessage": "Kanlurang Yuropa"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Isang di-inaasahang error ang naganap habang nag-install. Mangyaring subukan muli mamaya."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Isang di-inaasahang error ang naganap habang nag-upload. Mangyaring subukan muli mamaya."
-  },
   "servers.setup.reinstall-failed.text": {
     "defaultMessage": "Isang di-inaasahang error ang naganap habang nag-reinstall. Mangyaring subukan muli mamaya."
   },
