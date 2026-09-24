@@ -204,7 +204,8 @@ pub use self::publish::{
 pub use self::report::get_shared_instance_publish_support_details;
 pub use self::types::{
     SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
-    SharedInstanceInvite, SharedInstanceInviteInstallPreview,
+    SharedInstanceInvite, SharedInstanceInviteCreator,
+    SharedInstanceInviteInstallPreview,
     SharedInstanceInviteLink, SharedInstanceJoinType,
     SharedInstancePublishFile, SharedInstancePublishPreview,
     SharedInstanceUpdateDiff, SharedInstanceUpdateDiffType,
