@@ -6,7 +6,7 @@ import { SERVER_REGIONS } from '../../../utils'
 import { regionOverrides } from '../../../utils/regions'
 import { TagItem } from '../../base'
 
-const { region, flagOnly = false } = defineProps<{
+const { region, flagOnly = true } = defineProps<{
 	region: string
 	flagOnly?: boolean
 }>()
@@ -18,15 +18,18 @@ const tooltip = defineMessage({
 	defaultMessage: 'Server hosted in {regionName}',
 })
 
+const hostingRegion = computed(
+	() => regionOverrides[region.replace(/-public$/, '') as keyof typeof regionOverrides],
+)
+
 const regionName = computed(() => {
-	const hostingRegion = regionOverrides[region as keyof typeof regionOverrides]
-	if (hostingRegion) return formatMessage(hostingRegion.name)
+	if (hostingRegion.value) return formatMessage(hostingRegion.value.name)
 	const name = SERVER_REGIONS[region]
 	if (name) return formatMessage(name)
 
 	return region
 })
-const regionFlag = computed(() => regionOverrides[region as keyof typeof regionOverrides]?.flag)
+const regionFlag = computed(() => hostingRegion.value?.flag)
 </script>
 <template>
 	<img
