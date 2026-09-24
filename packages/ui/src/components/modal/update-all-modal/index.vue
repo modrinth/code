@@ -57,10 +57,10 @@ const { formatMessage } = useVIntl()
 const modal = ref<InstanceType<typeof NewModal>>()
 const contentContainer = ref<HTMLElement | null>(null)
 const tableContainer = ref<HTMLElement | null>(null)
+const modalHeading = ref<HTMLElement | null>(null)
 const { showTopFade, showBottomFade } = useScrollIndicator(tableContainer)
 const changelogItemId = ref<string>()
 const changelogEntered = ref(false)
-const changelogCloseButton = ref<InstanceType<typeof IconButton>>()
 const changelogHeadingId = useId()
 const isOpen = ref(false)
 const selectionAnchorId = ref<string>()
@@ -87,6 +87,13 @@ const activeRow = computed(() =>
 		: rows.value.find((row) => row.id === changelogItemId.value && row.version),
 )
 const controlsDisabled = computed(() => props.loading || props.actionLoading)
+const availableCount = computed(() => rows.value.filter((row) => row.version).length)
+const listStatus = computed(() => {
+	if (props.loading) return formatMessage(messages.loading)
+	if (!rows.value.length) return formatMessage(messages.empty)
+	if (!availableCount.value) return formatMessage(messages.noCompatibleUpdates)
+	return formatMessage(messages.results, { count: availableCount.value })
+})
 const updateDisabled = computed(
 	() => controlsDisabled.value || props.actionDisabled || selections.value.length === 0,
 )
@@ -104,7 +111,13 @@ const compactTable = computed(
 watch(
 	() => !!activeRow.value,
 	(open) => {
-		if (!open) changelogEntered.value = false
+		if (!open) {
+			changelogEntered.value = false
+			if (isOpen.value && changelogItemId.value) {
+				focusAfterChangelogExit.value = changelogItemId.value
+				changelogItemId.value = undefined
+			}
+		}
 	},
 	{ flush: 'sync' },
 )
@@ -130,7 +143,7 @@ async function openChangelog(id: string) {
 	await nextTick()
 	if (activeRow.value?.id === id) {
 		if (tableContainer.value) tableContainer.value.scrollLeft = 0
-		changelogCloseButton.value?.element?.focus({ preventScroll: true })
+		document.getElementById(changelogHeadingId)?.focus({ preventScroll: true })
 	}
 }
 
@@ -148,11 +161,21 @@ function closeChangelog() {
 
 function handleChangelogExitComplete() {
 	const id = focusAfterChangelogExit.value
-	if (!id || activeRow.value) return
+	if (!id || activeRow.value || !isOpen.value) return
 	focusAfterChangelogExit.value = undefined
-	Array.from(tableContainer.value?.querySelectorAll<HTMLElement>('[data-changelog-id]') ?? [])
-		.find((button) => button.dataset.changelogId === id && button.getClientRects().length > 0)
-		?.focus({ preventScroll: true })
+	const trigger = Array.from(tableContainer.value?.querySelectorAll<HTMLElement>('[data-changelog-id]') ?? [])
+		.find(
+			(button) =>
+				button.dataset.changelogId === id &&
+				!button.hasAttribute('disabled') &&
+				button.getClientRects().length > 0,
+		)
+	const focusTarget = trigger ?? modalHeading.value
+	focusTarget?.focus({ preventScroll: true })
+}
+
+function initialFocus() {
+	return activeRow.value ? document.getElementById(changelogHeadingId) : modalHeading.value
 }
 
 function show(options?: { changelogItemId?: string }) {
@@ -238,11 +261,24 @@ defineExpose({ show, hide })
 		class="update-all-modal @container !rounded-[20px] !bg-surface-3"
 		no-padding
 		:disable-close="actionLoading"
+		:initial-focus="initialFocus"
 		:on-hide="handleHide"
 	>
+		<template #title>
+			<h2
+				ref="modalHeading"
+				tabindex="-1"
+				class="m-0 text-2xl font-semibold text-contrast focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow"
+			>
+				{{ formatMessage(messages.header) }}
+			</h2>
+		</template>
+		<div role="status" class="sr-only">
+			{{ listStatus }}
+		</div>
 		<div
 			ref="contentContainer"
-			class="relative flex h-[643px] min-h-0 shrink overflow-clip bg-surface-2"
+			class="relative flex h-[643px] max-h-[643px] min-h-0 shrink overflow-clip bg-surface-2"
 		>
 			<div
 				class="flex w-full min-h-0 min-w-0 flex-col bg-surface-3"
@@ -274,17 +310,23 @@ defineExpose({ show, hide })
 						<span class="hidden @[720px]:inline">{{ formatMessage(messages.project) }}</span>
 						<span class="@[720px]:hidden">{{ formatMessage(messages.selectAll) }}</span>
 					</div>
-					<div v-if="!compactTable" class="hidden px-4 py-3 font-semibold @[720px]:block">
+					<div v-if="!compactTable" class="hidden items-center px-4 py-3 font-semibold @[720px]:flex">
 						{{ formatMessage(messages.versions) }}
 					</div>
 					<div
 						v-if="!compactTable"
-						class="hidden truncate px-4 py-3 text-right font-semibold @[720px]:block"
+						class="hidden items-center justify-end truncate px-4 py-3 text-right font-semibold @[720px]:flex"
 					>
 						{{ formatMessage(commonMessages.changelogLabel) }}
 					</div>
 				</div>
-				<div ref="tableContainer" class="min-h-0 flex-1 overflow-auto bg-surface-3">
+				<div
+					ref="tableContainer"
+					class="min-h-0 flex-1 overflow-auto bg-surface-3 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-brand-shadow"
+					role="region"
+					:aria-label="formatMessage(messages.projectList)"
+					:tabindex="!loading && rows.length ? 0 : -1"
+				>
 					<template v-if="!loading && rows.length">
 						<table
 							class="hidden w-full table-fixed border-collapse text-left @[720px]:table"
@@ -322,7 +364,7 @@ defineExpose({ show, hide })
 									@mouseenter="preloadChangelog(row.id)"
 									@click="handleRowClick(row.id, $event)"
 								>
-									<td class="px-4 py-3">
+									<th scope="row" :aria-label="row.project.title" class="px-4 py-3 font-normal">
 										<div class="flex min-w-0 items-center gap-3">
 											<Checkbox
 												class="shrink-0 [&>span:first-child]:!size-6 [&>span:first-child]:!rounded-lg"
@@ -341,7 +383,7 @@ defineExpose({ show, hide })
 													as="button"
 													:title="row.project.title"
 													type="button"
-													class="min-w-0 cursor-pointer truncate border-0 bg-transparent p-0 text-left font-medium text-contrast hover:underline"
+													class="min-w-0 cursor-pointer truncate border-0 bg-transparent p-0 text-left font-medium text-contrast hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow"
 													:disabled="!row.version || controlsDisabled"
 													:aria-label="
 														formatMessage(messages.viewChangelog, { project: row.project.title })
@@ -352,16 +394,24 @@ defineExpose({ show, hide })
 												/>
 											</div>
 										</div>
-									</td>
-									<td v-show="!compactTable" class="px-4 py-3">
+									</th>
+									<td
+										v-show="!compactTable"
+										:inert="!!activeRow || !!focusAfterChangelogExit"
+										class="px-4 py-3"
+									>
 										<div class="flex min-w-0 items-center gap-2">
 											<div class="w-[120px] min-w-0 shrink-0 @[800px]:w-[150px] @[900px]:w-[190px]">
+												<span class="sr-only">{{ formatMessage(messages.currentVersion) }}: </span>
 												<UpdateAllModalTruncatedVersion
 													:version="row.currentVersion.version_number"
 												/>
 											</div>
 											<RightArrowIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
 											<div class="w-[152px] min-w-0 shrink-0 @[800px]:w-[180px] @[900px]:w-[220px]">
+												<span v-if="row.versions.length === 1" class="sr-only">
+													{{ formatMessage(messages.newVersion) }}:
+												</span>
 												<UpdateAllModalVersionSelect
 													v-if="row.version && !compactTable"
 													:versions="row.versions"
@@ -380,7 +430,11 @@ defineExpose({ show, hide })
 											</div>
 										</div>
 									</td>
-									<td v-show="!compactTable" class="px-4 py-3">
+									<td
+										v-show="!compactTable"
+										:inert="!!activeRow || !!focusAfterChangelogExit"
+										class="px-4 py-3"
+									>
 										<div class="flex justify-end">
 											<IconButton
 												v-tooltip="
@@ -407,6 +461,8 @@ defineExpose({ show, hide })
 									v-for="row in rows"
 									:key="row.id"
 									class="min-w-0 rounded-2xl border border-solid border-surface-5 bg-surface-2 p-4"
+									role="group"
+									:aria-label="row.project.title"
 									:class="
 										row.version && !controlsDisabled
 											? 'cursor-pointer transition-colors hover:bg-surface-3'
@@ -430,7 +486,7 @@ defineExpose({ show, hide })
 										<Avatar :src="row.project.icon_url" size="28px" class="!rounded-lg" />
 										<button
 											type="button"
-											class="min-w-0 flex-1 cursor-pointer break-words border-0 bg-transparent p-0 text-left font-medium text-contrast hover:underline"
+											class="min-w-0 flex-1 cursor-pointer break-words border-0 bg-transparent p-0 text-left font-medium text-contrast hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow"
 											:disabled="!row.version || controlsDisabled"
 											:data-changelog-id="row.id"
 											:aria-label="
@@ -491,7 +547,6 @@ defineExpose({ show, hide })
 					<div
 						v-else
 						class="flex h-full items-center justify-center gap-2 p-6 text-secondary"
-						role="status"
 					>
 						<SpinnerIcon v-if="loading" class="size-6 animate-spin" aria-hidden="true" />
 						{{ formatMessage(loading ? messages.loading : messages.empty) }}
@@ -518,6 +573,17 @@ defineExpose({ show, hide })
 					:exit="noChangelogMotion ? { x: 0, opacity: 1 } : { x: '100%', opacity: 0 }"
 					:transition="{ duration: noChangelogMotion ? 0 : 0.3, ease: 'easeInOut' }"
 				>
+					<div role="status" class="sr-only">
+						{{
+							formatMessage(
+								loadingChangelog
+									? messages.loadingChangelog
+									: activeRow.version.changelog
+										? messages.changelogLoaded
+										: messages.noChangelog,
+							)
+						}}
+					</div>
 					<div
 						class="grid min-h-[68px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-0 border-b border-solid border-surface-5 p-4 @[560px]:flex @[560px]:flex-wrap"
 					>
@@ -527,7 +593,11 @@ defineExpose({ show, hide })
 								:id="changelogHeadingId"
 								as="h3"
 								:title="activeRow.project.title"
-								class="m-0 min-w-0 flex-1 truncate text-xl font-semibold text-contrast"
+								:aria-label="
+									formatMessage(messages.changelogFor, { project: activeRow.project.title })
+								"
+								tabindex="-1"
+								class="m-0 min-w-0 flex-1 truncate text-xl font-semibold text-contrast focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow"
 							/>
 						</div>
 						<div
@@ -550,7 +620,6 @@ defineExpose({ show, hide })
 							</div>
 						</div>
 						<IconButton
-							ref="changelogCloseButton"
 							v-tooltip="formatMessage(messages.closeChangelog)"
 							type="quiet"
 							size="sm"
@@ -563,13 +632,15 @@ defineExpose({ show, hide })
 					</div>
 					<div
 						:key="activeRow.version.id"
-						class="relative min-h-0 flex-1 overflow-y-auto p-4 pb-14"
+						class="relative min-h-0 flex-1 overflow-y-auto p-4 pb-14 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-brand-shadow"
+						role="region"
+						:aria-labelledby="changelogHeadingId"
+						tabindex="0"
 						:aria-busy="loadingChangelog"
 					>
 						<div
 							v-if="loadingChangelog"
 							class="flex items-center justify-center gap-2 p-6 text-secondary"
-							role="status"
 						>
 							<SpinnerIcon class="size-6 animate-spin" aria-hidden="true" />
 							{{ formatMessage(messages.loadingChangelog) }}

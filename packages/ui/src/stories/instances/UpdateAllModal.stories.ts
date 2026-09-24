@@ -243,7 +243,7 @@ export const Default: Story = {
 		docs: {
 			description: {
 				story:
-					'Open and close a project changelog to see the panel slide over the unchanged table.',
+					'Use Tab to move through project selection and version controls. Open a changelog, scroll its content with arrow keys, then close it to return focus to the project.',
 			},
 		},
 	},
@@ -286,7 +286,17 @@ export const ChangelogOpen: Story = {
 	},
 }
 
-export const ChangelogVersionSelection: Story = { render: renderModal('mods/cobblemon.jar') }
+export const ChangelogVersionSelection: Story = {
+	render: renderModal('mods/cobblemon.jar'),
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'Focus starts on the changelog heading. Tab to the version Combobox and use arrow keys to change versions.',
+			},
+		},
+	},
+}
 
 export const AllSelected: Story = {
 	render: renderModal(),

@@ -427,6 +427,7 @@ const { isChanging, markChanging, unmarkChanging } = useChangingItems()
 const bulkWaiting = ref(false)
 const bulkStatusMessage = ref<string | null>(null)
 const bulkItemCount = ref(0)
+const bulkUpdateItems = ref<ContentItem[]>([])
 
 const refreshing = ref(false)
 async function handleRefresh() {
@@ -1038,9 +1039,18 @@ async function updateAllSelected(selections: UpdateAllSelection[]) {
 	isBulkOperating.value = true
 	bulkOperation.value = 'update'
 	bulkItemCount.value = selections.length
+	bulkTotal.value = selections.length
+	bulkProgress.value = 0
+	bulkUpdateItems.value = selections.flatMap((selection) => {
+		const item = ctx.items.value.find((item) => getItemId(item) === selection.id)
+		return item ? [item] : []
+	})
 	bulkWaiting.value = true
 	try {
-		await ctx.bulkUpdateSelections(selections)
+		await ctx.bulkUpdateSelections(selections, (completed) => {
+			bulkWaiting.value = false
+			bulkProgress.value = completed
+		})
 		clearSelection()
 	} catch {
 		return
@@ -1048,6 +1058,9 @@ async function updateAllSelected(selections: UpdateAllSelection[]) {
 		isBulkOperating.value = false
 		bulkOperation.value = null
 		bulkItemCount.value = 0
+		bulkTotal.value = 0
+		bulkProgress.value = 0
+		bulkUpdateItems.value = []
 		bulkWaiting.value = false
 	}
 }
@@ -1449,7 +1462,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 		</template>
 
 		<ContentSelectionBar
-			:selected-items="selectedItems"
+			:selected-items="bulkOperation === 'update' ? bulkUpdateItems : selectedItems"
 			:content-type-label="ctx.contentTypeLabel.value"
 			:is-busy="ctx.isBusy.value"
 			:busy-tooltip="ctx.busyMessage?.value"

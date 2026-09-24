@@ -957,14 +957,26 @@ async function getDeleteDependencyWarning(items: ContentItem[]) {
 	return dependents.length > 0 ? { items, dependents } : null
 }
 
-async function bulkUpdateSelections(selections: UpdateAllSelection[]) {
+async function bulkUpdateSelections(
+	selections: UpdateAllSelection[],
+	onProgress?: (completed: number) => void,
+) {
+	let completed = 0
+	onProgress?.(completed)
 	try {
 		for (const selection of selections) {
 			const item =
 				projects.value.find((project) => getContentItemId(project) === selection.id) ??
 				projects.value.find((project) => project.project?.id === selection.projectId)
-			if (!item || !canChangeContentVersion(item) || !item.file_path) continue
-			if (item.version?.id === selection.version.id) continue
+			if (
+				!item ||
+				!canChangeContentVersion(item) ||
+				!item.file_path ||
+				item.version?.id === selection.version.id
+			) {
+				onProgress?.(++completed)
+				continue
+			}
 			await switch_project_version_with_dependencies(
 				instance.value.id,
 				item.file_path,
@@ -978,6 +990,7 @@ async function bulkUpdateSelections(selections: UpdateAllSelection[]) {
 				project_type: item.project_type,
 			})
 			await initProjects('must_revalidate')
+			onProgress?.(++completed)
 		}
 	} catch (err) {
 		handleError(err as Error)
@@ -1802,6 +1815,7 @@ watch(
 	async (newInstanceLink, oldInstanceLink) => {
 		if (oldInstanceLink && !newInstanceLink) {
 			await initProjects('must_revalidate')
+			onProgress?.(++completed)
 		}
 	},
 )
@@ -1811,6 +1825,7 @@ watch(
 	async (newValue, oldValue) => {
 		if (newValue !== oldValue) {
 			await initProjects('must_revalidate')
+			onProgress?.(++completed)
 		}
 	},
 )

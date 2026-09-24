@@ -145,7 +145,8 @@
 
 <script setup lang="ts">
 import { XIcon } from '@modrinth/assets'
-import { computed, nextTick, onUnmounted, ref } from 'vue'
+import { useMediaQuery, useResizeObserver } from '@vueuse/core'
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 
 import { IconButton } from '#ui/components/base/buttons'
 
@@ -187,6 +188,7 @@ const props = withDefaults(
 		onAfterHide?: () => void
 		onShow?: () => void
 		beforeHide?: () => boolean
+		initialFocus?: () => HTMLElement | null
 		mergeHeader?: boolean
 		scrollable?: boolean
 		maxContentHeight?: string
@@ -196,6 +198,7 @@ const props = withDefaults(
 		maxWidth?: string
 		/** Width for the modal body (e.g., '460px', '600px'). */
 		width?: string
+		animateResize?: boolean
 		/** Disables all close actions (close button, ESC key, click outside). */
 		disableClose?: boolean
 		actionsDivider?: boolean
@@ -215,6 +218,7 @@ const props = withDefaults(
 		onAfterHide: () => {},
 		onShow: () => {},
 		beforeHide: undefined,
+		initialFocus: undefined,
 		mergeHeader: false,
 		// TODO: migrate all modals to use scrollable and remove this prop
 		scrollable: false,
@@ -222,6 +226,7 @@ const props = withDefaults(
 		noPadding: false,
 		maxWidth: undefined,
 		width: undefined,
+		animateResize: true,
 		disableClose: false,
 		actionsDivider: false,
 	},
@@ -271,6 +276,50 @@ const open = ref(false)
 const visible = ref(false)
 const stackDepth = ref(0)
 const modalBodyRef = ref<HTMLElement | null>(null)
+const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
+let previousHeight: number | undefined
+let resizeAnimation: Animation | undefined
+
+function resetResizeAnimation() {
+	resizeAnimation?.cancel()
+	resizeAnimation = undefined
+	previousHeight = undefined
+}
+
+watch([modalBodyRef, visible, () => props.animateResize, prefersReducedMotion], () => {
+	if (!modalBodyRef.value || !visible.value || !props.animateResize || prefersReducedMotion.value) {
+		resetResizeAnimation()
+	}
+})
+
+useResizeObserver(modalBodyRef, ([entry]) => {
+	if (!entry || resizeAnimation) return
+
+	const height = entry.borderBoxSize[0]?.blockSize ?? modalBodyRef.value?.offsetHeight
+	if (height === undefined) return
+
+	const fromHeight = previousHeight
+	previousHeight = height
+	if (
+		!visible.value ||
+		!props.animateResize ||
+		prefersReducedMotion.value ||
+		fromHeight === undefined ||
+		Math.abs(height - fromHeight) < 1
+	) {
+		return
+	}
+
+	const animation = entry.target.animate(
+		[{ height: `${fromHeight}px` }, { height: `${height}px` }],
+		{ duration: 200, easing: 'ease-in-out' },
+	)
+	resizeAnimation = animation
+	animation.onfinish = () => {
+		if (resizeAnimation === animation) resizeAnimation = undefined
+	}
+})
+
 let previousFocusEl: Element | null = null
 let hideTimeout: ReturnType<typeof setTimeout> | null = null
 
@@ -306,7 +355,9 @@ function getFocusableElements(): HTMLElement[] {
 		return []
 	}
 	return Array.from(modalBodyRef.value.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
-		(el) => el.offsetWidth > 0 || el.offsetHeight > 0 || el.getClientRects().length > 0,
+		(el) =>
+			!el.closest('[inert]') &&
+			(el.offsetWidth > 0 || el.offsetHeight > 0 || el.getClientRects().length > 0),
 	)
 }
 
@@ -322,6 +373,13 @@ function focusModal() {
 	const dialog = modalBodyRef.value
 	if (!dialog) {
 		return false
+	}
+	const initialFocus = props.initialFocus?.()
+	if (initialFocus && dialog.contains(initialFocus)) {
+		focusElement(initialFocus)
+		if (isFocusInsideModal()) {
+			return true
+		}
 	}
 
 	if (inputModality.keyboard) {
@@ -468,6 +526,7 @@ function resetMousePosition() {
 }
 
 onUnmounted(() => {
+	resetResizeAnimation()
 	if (hideTimeout) {
 		clearTimeout(hideTimeout)
 		hideTimeout = null
@@ -515,6 +574,8 @@ function trapFocus(event: KeyboardEvent) {
 	const last = focusable[focusable.length - 1]
 	const active = document.activeElement
 	const inside = dialog.contains(active)
+	const beforeFirst = !!(active?.compareDocumentPosition(first) & Node.DOCUMENT_POSITION_FOLLOWING)
+	const afterLast = !!(active?.compareDocumentPosition(last) & Node.DOCUMENT_POSITION_PRECEDING)
 
 	if (!inside) {
 		event.preventDefault()
@@ -522,10 +583,10 @@ function trapFocus(event: KeyboardEvent) {
 		return
 	}
 
-	if (event.shiftKey && (active === first || active === dialog)) {
+	if (event.shiftKey && (active === first || active === dialog || beforeFirst)) {
 		event.preventDefault()
 		focusElement(last)
-	} else if (!event.shiftKey && active === last) {
+	} else if (!event.shiftKey && (active === last || afterLast)) {
 		event.preventDefault()
 		focusElement(first)
 	}

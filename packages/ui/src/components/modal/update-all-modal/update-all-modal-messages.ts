@@ -9,6 +9,10 @@ export const messages = defineMessages({
 		id: 'update-all-modal.project',
 		defaultMessage: 'Project',
 	},
+	projectList: {
+		id: 'update-all-modal.project-list',
+		defaultMessage: 'Project updates',
+	},
 	versions: {
 		id: 'update-all-modal.versions',
 		defaultMessage: 'Current version / New version',
@@ -37,6 +41,10 @@ export const messages = defineMessages({
 		id: 'update-all-modal.view-changelog',
 		defaultMessage: 'View changelog for {project}',
 	},
+	changelogFor: {
+		id: 'update-all-modal.changelog-for',
+		defaultMessage: 'Changelog for {project}',
+	},
 	closeChangelog: {
 		id: 'update-all-modal.close-changelog',
 		defaultMessage: 'Close changelog',
@@ -54,6 +62,14 @@ export const messages = defineMessages({
 		id: 'update-all-modal.loading',
 		defaultMessage: 'Loading updates…',
 	},
+	results: {
+		id: 'update-all-modal.results',
+		defaultMessage: '{count, plural, one {# project ready to update} other {# projects ready to update}}',
+	},
+	noCompatibleUpdates: {
+		id: 'update-all-modal.no-compatible-updates',
+		defaultMessage: 'No compatible updates available.',
+	},
 	empty: {
 		id: 'update-all-modal.empty',
 		defaultMessage: 'No updates available.',
@@ -65,6 +81,10 @@ export const messages = defineMessages({
 	loadingChangelog: {
 		id: 'update-all-modal.loading-changelog',
 		defaultMessage: 'Loading changelog…',
+	},
+	changelogLoaded: {
+		id: 'update-all-modal.changelog-loaded',
+		defaultMessage: 'Changelog loaded.',
 	},
 	noChangelog: {
 		id: 'update-all-modal.no-changelog',

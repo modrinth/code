@@ -71,7 +71,10 @@ export interface ContentManagerContext {
 	// Update support (optional per-platform)
 	hasUpdateSupport: boolean
 	updateItem?: (id: string) => void
-	bulkUpdateSelections?: (selections: UpdateAllSelection[]) => Promise<void>
+	bulkUpdateSelections?: (
+		selections: UpdateAllSelection[],
+		onProgress?: (completed: number) => void,
+	) => Promise<void>
 
 	// Managed-content actions (optional)
 	runManagedContentPrimaryAction?: (event?: MouseEvent) => void
