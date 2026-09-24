@@ -3,6 +3,7 @@ import {
 	CircleAlertIcon,
 	DownloadIcon,
 	FileTextIcon,
+	PanelRightCloseIcon,
 	RightArrowIcon,
 	SpinnerIcon,
 	XIcon,
@@ -23,6 +24,7 @@ import { commonMessages } from '#ui/utils/common-messages'
 import { getModifiedSelection } from '#ui/utils/modified-selection'
 
 import { messages } from './update-all-modal-messages'
+import UpdateAllModalTruncatedProjectTitle from './update-all-modal-truncated-project-title.vue'
 import UpdateAllModalTruncatedVersion from './update-all-modal-truncated-version.vue'
 import type { UpdateAllItem, UpdateAllSelection } from './update-all-modal-types'
 import UpdateAllModalVersionSelect from './update-all-modal-version-select.vue'
@@ -48,6 +50,7 @@ const emit = defineEmits<{
 	update: [selections: UpdateAllSelection[]]
 	cancel: []
 	changelog: [selection: UpdateAllSelection]
+	preloadChangelog: [selection: UpdateAllSelection]
 }>()
 
 const { formatMessage } = useVIntl()
@@ -56,6 +59,7 @@ const contentContainer = ref<HTMLElement | null>(null)
 const tableContainer = ref<HTMLElement | null>(null)
 const { showTopFade, showBottomFade } = useScrollIndicator(tableContainer)
 const changelogItemId = ref<string>()
+const changelogEntered = ref(false)
 const changelogCloseButton = ref<InstanceType<typeof IconButton>>()
 const changelogHeadingId = useId()
 const isOpen = ref(false)
@@ -93,6 +97,22 @@ const noChangelogMotion = computed(
 		!!prefersReducedMotion.value,
 )
 
+const compactTable = computed(
+	() => !!activeRow.value && (noChangelogMotion.value || changelogEntered.value),
+)
+
+watch(
+	() => !!activeRow.value,
+	(open) => {
+		if (!open) changelogEntered.value = false
+	},
+	{ flush: 'sync' },
+)
+
+function handleChangelogAnimationComplete(definition: unknown) {
+	if (definition === 'open' && activeRow.value) changelogEntered.value = true
+}
+
 watch(
 	() => [isOpen.value, activeRow.value?.id, activeRow.value?.version?.id] as const,
 	([open]) => {
@@ -108,8 +128,17 @@ async function openChangelog(id: string) {
 	focusAfterChangelogExit.value = undefined
 	changelogItemId.value = id
 	await nextTick()
-	if (activeRow.value?.id === id)
+	if (activeRow.value?.id === id) {
+		if (tableContainer.value) tableContainer.value.scrollLeft = 0
 		changelogCloseButton.value?.element?.focus({ preventScroll: true })
+	}
+}
+
+function preloadChangelog(id: string) {
+	if (!isOpen.value || controlsDisabled.value) return
+	const row = rows.value.find((row) => row.id === id)
+	if (!row?.version || row.version.changelog != null) return
+	emit('preloadChangelog', { id: row.id, projectId: row.project.id, version: row.version })
 }
 
 function closeChangelog() {
@@ -123,12 +152,13 @@ function handleChangelogExitComplete() {
 	focusAfterChangelogExit.value = undefined
 	Array.from(tableContainer.value?.querySelectorAll<HTMLElement>('[data-changelog-id]') ?? [])
 		.find((button) => button.dataset.changelogId === id && button.getClientRects().length > 0)
-		?.focus()
+		?.focus({ preventScroll: true })
 }
 
 function show(options?: { changelogItemId?: string }) {
 	if (isOpen.value) return
 	reset()
+	changelogEntered.value = false
 	selectionAnchorId.value = undefined
 	focusAfterChangelogExit.value = undefined
 	submitted = false
@@ -181,24 +211,11 @@ function isInteractiveRowTarget(event: MouseEvent): boolean {
 	)
 }
 
-function handleRowMouseDown(event: MouseEvent) {
-	if (event.shiftKey && !isInteractiveRowTarget(event)) event.preventDefault()
-}
-
 function handleRowClick(id: string, event: MouseEvent) {
 	if (event.button !== 0 || isInteractiveRowTarget(event)) return
-	if (handleModifiedSelection(id, event)) return
-	if (
-		activeRow.value &&
-		!controlsDisabled.value &&
-		rows.value.some((row) => row.id === id && row.version)
-	) {
+	if (!controlsDisabled.value && rows.value.some((row) => row.id === id && row.version)) {
 		openChangelog(id)
 	}
-}
-
-function handleProjectClick(id: string, event: MouseEvent) {
-	if (!handleModifiedSelection(id, event)) openChangelog(id)
 }
 
 function update() {
@@ -216,8 +233,8 @@ defineExpose({ show, hide })
 	<NewModal
 		ref="modal"
 		:header="formatMessage(messages.header)"
-		width="960px"
-		max-width="960px"
+		width="1200px"
+		max-width="1200px"
 		class="update-all-modal @container !rounded-[20px] !bg-surface-3"
 		no-padding
 		:disable-close="actionLoading"
@@ -225,63 +242,158 @@ defineExpose({ show, hide })
 	>
 		<div
 			ref="contentContainer"
-			class="relative flex h-[643px] min-h-0 shrink overflow-hidden bg-surface-2"
+			class="relative flex h-[643px] min-h-0 shrink overflow-clip bg-surface-2"
 		>
 			<div
-				ref="tableContainer"
-				class="w-full min-w-0 overflow-auto motion-safe:transition-opacity motion-safe:duration-300 motion-safe:ease-out"
-				:class="activeRow ? 'hidden opacity-60 @[720px]:block' : 'opacity-100'"
+				class="flex w-full min-h-0 min-w-0 flex-col bg-surface-3"
+				:class="{
+					'hidden @[720px]:flex @[720px]:w-[240px] @[940px]:w-[304px] @[1080px]:w-[360px]':
+						compactTable,
+				}"
 				:aria-busy="loading"
 			>
-				<template v-if="!loading && rows.length">
-					<table
-						class="hidden w-full table-fixed border-collapse text-left @[720px]:table"
-						:aria-label="formatMessage(messages.header)"
-					>
-						<colgroup>
-							<col class="w-[240px] @[940px]:w-[304px]" />
-							<col />
-							<col class="w-[120px] @[900px]:w-[128px]" />
-						</colgroup>
-						<thead class="sticky top-0 z-[1] bg-surface-3">
-							<tr class="h-12 border-0 border-b border-solid border-surface-5">
-								<th scope="col" class="px-4 py-3 font-semibold">
-									<div class="flex items-center gap-3">
-										<Checkbox
-											class="[&>span:first-child]:!size-6 [&>span:first-child]:!rounded-lg"
-											:model-value="allSelected"
-											:indeterminate="indeterminate"
-											:description="formatMessage(messages.selectAll)"
-											:disabled="controlsDisabled || !rows.some((row) => row.version)"
-											@update:model-value="handleSelectAll"
-										/>
-										{{ formatMessage(messages.project) }}
-									</div>
-								</th>
-								<th scope="col" class="px-4 py-3 font-semibold" :inert="!!activeRow">
-									{{ formatMessage(messages.versions) }}
-								</th>
-								<th scope="col" class="px-4 py-3 text-right font-semibold" :inert="!!activeRow">
-									<span class="block truncate">{{
-										formatMessage(commonMessages.changelogLabel)
-									}}</span>
-								</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr
-								v-for="(row, index) in rows"
-								:key="row.id"
-								class="h-[57px] border-0 border-b border-solid border-surface-5"
-								:class="[
-									index % 2 ? 'bg-surface-1.5' : 'bg-surface-2',
-									row.version && !controlsDisabled ? 'transition-colors hover:bg-surface-3' : '',
-									activeRow && row.version && !controlsDisabled ? 'cursor-pointer' : '',
-								]"
-								@mousedown="handleRowMouseDown"
-								@click="handleRowClick(row.id, $event)"
-							>
-								<td class="px-4 py-3">
+				<div
+					v-if="!loading && rows.length"
+					class="update-all-modal-scroll-header relative z-[1] grid shrink-0 border-0 border-b border-solid border-surface-5 bg-surface-3"
+					:class="compactTable ? 'grid-cols-1' : '@[720px]:grid-cols-[240px_minmax(0,1fr)_120px] @[900px]:grid-cols-[240px_minmax(0,1fr)_128px] @[940px]:grid-cols-[304px_minmax(0,1fr)_128px] @[1080px]:grid-cols-[360px_minmax(0,1fr)_128px]'"
+					:data-show-fade="showTopFade"
+				>
+					<div class="flex items-center gap-3 px-4 py-3 font-semibold">
+						<Checkbox
+							class="[&>span:first-child]:!size-6 [&>span:first-child]:!rounded-lg"
+							:model-value="allSelected"
+							:indeterminate="indeterminate"
+							:description="formatMessage(messages.selectAll)"
+							:disabled="controlsDisabled || !rows.some((row) => row.version)"
+							@update:model-value="handleSelectAll"
+						/>
+						<span class="hidden @[720px]:inline">{{ formatMessage(messages.project) }}</span>
+						<span class="@[720px]:hidden">{{ formatMessage(messages.selectAll) }}</span>
+					</div>
+					<div v-if="!compactTable" class="hidden px-4 py-3 font-semibold @[720px]:block">
+						{{ formatMessage(messages.versions) }}
+					</div>
+					<div v-if="!compactTable" class="hidden truncate px-4 py-3 text-right font-semibold @[720px]:block">
+						{{ formatMessage(commonMessages.changelogLabel) }}
+					</div>
+				</div>
+				<div ref="tableContainer" class="min-h-0 flex-1 overflow-auto bg-surface-3">
+					<template v-if="!loading && rows.length">
+						<table
+							class="hidden w-full table-fixed border-collapse text-left @[720px]:table"
+							:aria-label="formatMessage(messages.header)"
+						>
+							<colgroup>
+								<col
+									:class="compactTable ? 'w-full' : 'w-[240px] @[940px]:w-[304px] @[1080px]:w-[360px]'"
+								/>
+								<col v-if="!compactTable" />
+								<col v-if="!compactTable" class="w-[120px] @[900px]:w-[128px]" />
+							</colgroup>
+							<thead class="sr-only">
+								<tr>
+									<th scope="col">{{ formatMessage(messages.project) }}</th>
+									<th v-if="!compactTable" scope="col">{{ formatMessage(messages.versions) }}</th>
+									<th v-if="!compactTable" scope="col">{{ formatMessage(commonMessages.changelogLabel) }}</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr
+									v-for="(row, index) in rows"
+									:key="row.id"
+									class="h-[57px] border-0 border-b border-solid border-surface-5"
+									:class="[
+										index % 2 ? 'bg-surface-1.5' : 'bg-surface-2',
+										row.version && !controlsDisabled ? 'cursor-pointer transition-colors hover:bg-surface-3' : '',
+									]"
+									@mouseenter="preloadChangelog(row.id)"
+									@click="handleRowClick(row.id, $event)"
+								>
+									<td class="px-4 py-3">
+										<div class="flex min-w-0 items-center gap-3">
+											<Checkbox
+												class="shrink-0 [&>span:first-child]:!size-6 [&>span:first-child]:!rounded-lg"
+												:model-value="row.selected"
+												:description="
+													formatMessage(messages.selectProject, { project: row.project.title })
+												"
+												:disabled="controlsDisabled || !row.version"
+												@update:model-value="
+													(selected, event) => handleCheckboxSelection(row.id, selected, event)
+												"
+											/>
+											<div class="flex min-w-0 items-center gap-2">
+												<Avatar :src="row.project.icon_url" size="28px" class="!rounded-lg" />
+												<UpdateAllModalTruncatedProjectTitle
+													as="button"
+													:title="row.project.title"
+													type="button"
+													class="min-w-0 cursor-pointer truncate border-0 bg-transparent p-0 text-left font-medium text-contrast hover:underline"
+													:disabled="!row.version || controlsDisabled"
+													:aria-label="
+														formatMessage(messages.viewChangelog, { project: row.project.title })
+													"
+													:data-changelog-id="row.id"
+													@focus="preloadChangelog(row.id)"
+													@click="openChangelog(row.id)"
+												/>
+											</div>
+										</div>
+									</td>
+									<td v-show="!compactTable" class="px-4 py-3">
+										<div class="flex min-w-0 items-center gap-2">
+											<div class="w-[120px] min-w-0 shrink-0 @[800px]:w-[150px] @[900px]:w-[190px]">
+												<UpdateAllModalTruncatedVersion
+													:version="row.currentVersion.version_number"
+												/>
+											</div>
+											<RightArrowIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
+											<div class="w-[152px] min-w-0 shrink-0 @[800px]:w-[180px] @[900px]:w-[220px]">
+												<UpdateAllModalVersionSelect
+													v-if="row.version && !compactTable"
+													:versions="row.versions"
+													:version="row.version"
+													:label="
+														formatMessage(messages.selectVersion, { project: row.project.title })
+													"
+													:disabled="controlsDisabled"
+													@select="selectVersion(row.id, $event)"
+												/>
+												<span v-else-if="!row.version" class="block truncate text-sm text-secondary">{{
+													formatMessage(messages.noVersion)
+												}}</span>
+											</div>
+										</div>
+									</td>
+									<td v-show="!compactTable" class="px-4 py-3">
+										<div class="flex justify-end">
+											<IconButton
+												v-tooltip="formatMessage(messages.viewChangelog, { project: row.project.title })"
+												size="sm"
+												:label="formatMessage(messages.viewChangelog, { project: row.project.title })"
+												:disabled="!row.version || controlsDisabled"
+												@focus="preloadChangelog(row.id)"
+												@click="openChangelog(row.id)"
+											>
+												<FileTextIcon aria-hidden="true" />
+											</IconButton>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<div class="@[720px]:hidden">
+							<div class="flex flex-col gap-3 p-3">
+								<div
+									v-for="row in rows"
+									:key="row.id"
+									class="min-w-0 rounded-2xl border border-solid border-surface-5 bg-surface-2 p-4"
+									:class="
+										row.version && !controlsDisabled ? 'cursor-pointer transition-colors hover:bg-surface-3' : ''
+									"
+									@mouseenter="preloadChangelog(row.id)"
+									@click="handleRowClick(row.id, $event)"
+								>
 									<div class="flex min-w-0 items-center gap-3">
 										<Checkbox
 											class="shrink-0 [&>span:first-child]:!size-6 [&>span:first-child]:!rounded-lg"
@@ -294,177 +406,71 @@ defineExpose({ show, hide })
 												(selected, event) => handleCheckboxSelection(row.id, selected, event)
 											"
 										/>
-										<div class="flex min-w-0 items-center gap-2">
-											<Avatar :src="row.project.icon_url" size="28px" class="!rounded-lg" />
-											<button
-												v-if="activeRow"
-												type="button"
-												class="min-w-0 cursor-pointer truncate border-0 bg-transparent p-0 text-left font-medium text-contrast hover:underline"
-												:disabled="!row.version || controlsDisabled"
-												:aria-label="
-													formatMessage(messages.viewChangelog, { project: row.project.title })
-												"
-												@click="handleProjectClick(row.id, $event)"
-											>
-												{{ row.project.title }}
-											</button>
-											<span
-												v-else
-												class="truncate font-medium text-contrast"
-												:title="row.project.title"
-											>
-												{{ row.project.title }}
-											</span>
-										</div>
-									</div>
-								</td>
-								<td class="px-4 py-3" :inert="!!activeRow">
-									<div class="flex min-w-0 items-center gap-2">
-										<div class="w-[120px] min-w-0 shrink-0 @[800px]:w-[150px] @[900px]:w-[190px]">
-											<UpdateAllModalTruncatedVersion
-												:version="row.currentVersion.version_number"
-											/>
-										</div>
-										<RightArrowIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
-										<div class="w-[152px] min-w-0 shrink-0 @[800px]:w-[180px] @[900px]:w-[220px]">
-											<UpdateAllModalVersionSelect
-												v-if="row.version"
-												:versions="row.versions"
-												:version="row.version"
-												:label="
-													formatMessage(messages.selectVersion, { project: row.project.title })
-												"
-												:disabled="controlsDisabled"
-												@select="selectVersion(row.id, $event)"
-											/>
-											<span v-else class="block truncate text-sm text-secondary">{{
-												formatMessage(messages.noVersion)
-											}}</span>
-										</div>
-									</div>
-								</td>
-								<td class="px-4 py-3" :inert="!!activeRow">
-									<div class="flex justify-end">
-										<IconButton
-											v-tooltip="
-												activeRow
-													? null
-													: formatMessage(messages.viewChangelog, { project: row.project.title })
-											"
-											size="sm"
-											:data-changelog-id="row.id"
-											:label="formatMessage(messages.viewChangelog, { project: row.project.title })"
+										<Avatar :src="row.project.icon_url" size="28px" class="!rounded-lg" />
+										<button
+											type="button"
+											class="min-w-0 flex-1 cursor-pointer break-words border-0 bg-transparent p-0 text-left font-medium text-contrast hover:underline"
 											:disabled="!row.version || controlsDisabled"
+											:data-changelog-id="row.id"
+											:aria-label="formatMessage(messages.viewChangelog, { project: row.project.title })"
+											@focus="preloadChangelog(row.id)"
 											@click="openChangelog(row.id)"
 										>
-											<FileTextIcon class="size-4" aria-hidden="true" />
+											{{ row.project.title }}
+										</button>
+										<IconButton
+											v-tooltip="formatMessage(messages.viewChangelog, { project: row.project.title })"
+											size="md"
+											:label="formatMessage(messages.viewChangelog, { project: row.project.title })"
+											:disabled="!row.version || controlsDisabled"
+											@focus="preloadChangelog(row.id)"
+											@click="openChangelog(row.id)"
+										>
+											<FileTextIcon aria-hidden="true" />
 										</IconButton>
 									</div>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-					<div class="@[720px]:hidden">
-						<div
-							class="sticky top-0 z-[1] border-0 border-b border-solid border-surface-5 bg-surface-3 px-4 py-3"
-						>
-							<Checkbox
-								class="[&>span:first-child]:!size-6 [&>span:first-child]:!rounded-lg"
-								:model-value="allSelected"
-								:indeterminate="indeterminate"
-								:label="formatMessage(messages.selectAll)"
-								:disabled="controlsDisabled || !rows.some((row) => row.version)"
-								@update:model-value="handleSelectAll"
-							/>
-						</div>
-						<div class="flex flex-col gap-3 p-3">
-							<div
-								v-for="row in rows"
-								:key="row.id"
-								class="min-w-0 rounded-2xl border border-solid border-surface-5 bg-surface-2 p-4"
-								:class="
-									row.version && !controlsDisabled ? 'transition-colors hover:bg-surface-3' : ''
-								"
-								@mousedown="handleRowMouseDown"
-								@click="handleRowClick(row.id, $event)"
-							>
-								<div class="flex min-w-0 items-center gap-3">
-									<Checkbox
-										class="shrink-0 [&>span:first-child]:!size-6 [&>span:first-child]:!rounded-lg"
-										:model-value="row.selected"
-										:description="
-											formatMessage(messages.selectProject, { project: row.project.title })
-										"
-										:disabled="controlsDisabled || !row.version"
-										@update:model-value="
-											(selected, event) => handleCheckboxSelection(row.id, selected, event)
-										"
-									/>
-									<Avatar :src="row.project.icon_url" size="28px" class="!rounded-lg" />
-									<span class="min-w-0 flex-1 break-words font-medium text-contrast">{{
-										row.project.title
-									}}</span>
-									<IconButton
-										v-tooltip="
-											activeRow
-												? null
-												: formatMessage(messages.viewChangelog, { project: row.project.title })
-										"
-										size="md"
-										:data-changelog-id="row.id"
-										:label="formatMessage(messages.viewChangelog, { project: row.project.title })"
-										:disabled="!row.version || controlsDisabled"
-										@click="openChangelog(row.id)"
-									>
-										<FileTextIcon aria-hidden="true" />
-									</IconButton>
-								</div>
-								<div class="mt-4 flex min-w-0 flex-col gap-3">
-									<div class="min-w-0">
-										<div class="text-sm font-semibold text-secondary">
-											{{ formatMessage(messages.currentVersion) }}
+									<div class="mt-4 flex min-w-0 flex-col gap-3">
+										<div class="min-w-0">
+											<div class="text-sm font-semibold text-secondary">
+												{{ formatMessage(messages.currentVersion) }}
+											</div>
+											<div class="mt-1 break-all text-sm">
+												{{ row.currentVersion.version_number }}
+											</div>
 										</div>
-										<div class="mt-1 break-all text-sm">
-											{{ row.currentVersion.version_number }}
-										</div>
-									</div>
-									<div class="min-w-0">
-										<div class="text-sm font-semibold text-secondary">
-											{{ formatMessage(messages.newVersion) }}
-										</div>
-										<UpdateAllModalVersionSelect
-											v-if="row.version"
-											class="mt-1 w-full"
-											:versions="row.versions"
-											:version="row.version"
-											:label="formatMessage(messages.selectVersion, { project: row.project.title })"
-											:disabled="controlsDisabled"
-											wrap
-											@select="selectVersion(row.id, $event)"
-										/>
-										<div v-else class="mt-1 text-sm text-secondary">
-											{{ formatMessage(messages.noVersion) }}
+										<div class="min-w-0">
+											<div class="text-sm font-semibold text-secondary">
+												{{ formatMessage(messages.newVersion) }}
+											</div>
+											<UpdateAllModalVersionSelect
+												v-if="row.version && !compactTable"
+												class="mt-1 w-full"
+												:versions="row.versions"
+												:version="row.version"
+												:label="formatMessage(messages.selectVersion, { project: row.project.title })"
+												:disabled="controlsDisabled"
+												wrap
+												@select="selectVersion(row.id, $event)"
+											/>
+											<div v-else-if="!row.version" class="mt-1 text-sm text-secondary">
+												{{ formatMessage(messages.noVersion) }}
+											</div>
 										</div>
 									</div>
 								</div>
 							</div>
 						</div>
+					</template>
+					<div
+						v-else
+						class="flex h-full items-center justify-center gap-2 p-6 text-secondary"
+						role="status"
+					>
+						<SpinnerIcon v-if="loading" class="size-6 animate-spin" aria-hidden="true" />
+						{{ formatMessage(loading ? messages.loading : messages.empty) }}
 					</div>
-				</template>
-				<div
-					v-else
-					class="flex h-full items-center justify-center gap-2 p-6 text-secondary"
-					role="status"
-				>
-					<SpinnerIcon v-if="loading" class="size-6 animate-spin" aria-hidden="true" />
-					{{ formatMessage(loading ? messages.loading : messages.empty) }}
 				</div>
 			</div>
-			<div
-				aria-hidden="true"
-				class="pointer-events-none absolute inset-x-0 top-[49px] h-6 bg-gradient-to-b from-surface-2 to-transparent transition-opacity duration-150 @[720px]:top-12"
-				:class="showTopFade ? 'opacity-100' : 'opacity-0'"
-			/>
 			<div
 				aria-hidden="true"
 				class="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-surface-2 to-transparent transition-opacity duration-150"
@@ -476,41 +482,36 @@ defineExpose({ show, hide })
 					v-if="activeRow && activeRow.version"
 					key="changelog-panel"
 					as="section"
-					class="@container absolute inset-y-0 right-0 flex w-full min-w-0 flex-col border-0 border-l border-solid border-surface-5 bg-surface-2 @[720px]:w-[calc(100%_-_240px)] @[940px]:w-[calc(100%_-_304px)]"
+					class="@container absolute inset-y-0 right-0 z-10 flex w-full min-w-0 flex-col border-0 border-l border-solid border-surface-5 bg-surface-2 @[720px]:w-[calc(100%_-_240px)] @[940px]:w-[calc(100%_-_304px)] @[1080px]:w-[calc(100%_-_360px)]"
 					:aria-labelledby="changelogHeadingId"
 					:initial="noChangelogMotion ? { x: 0, opacity: 1 } : { x: '100%', opacity: 0 }"
-					:animate="{ x: 0, opacity: 1 }"
+					animate="open"
+					:variants="{ open: { x: 0, opacity: 1 } }"
+					:on-animation-complete="handleChangelogAnimationComplete"
 					:exit="noChangelogMotion ? { x: 0, opacity: 1 } : { x: '100%', opacity: 0 }"
-					:transition="{ duration: noChangelogMotion ? 0 : 0.3, ease: 'easeOut' }"
+					:transition="{ duration: noChangelogMotion ? 0 : 0.3, ease: 'easeInOut' }"
 				>
 					<div
 						class="grid min-h-[68px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-0 border-b border-solid border-surface-5 p-4 @[560px]:flex @[560px]:flex-wrap"
 					>
 						<div class="order-1 flex min-w-0 items-center gap-2 @[560px]:flex-1">
 							<Avatar :src="activeRow.project.icon_url" size="36px" class="!rounded-lg" />
-							<h3
-								:id="changelogHeadingId"
-								class="m-0 min-w-0 flex-1 truncate text-xl font-semibold text-contrast"
-							>
-								{{ activeRow.project.title }}
-							</h3>
+											<UpdateAllModalTruncatedProjectTitle
+												:id="changelogHeadingId"
+												as="h3"
+												:title="activeRow.project.title"
+												class="m-0 min-w-0 flex-1 truncate text-xl font-semibold text-contrast"
+											/>
 						</div>
 						<div
 							class="order-3 col-span-2 flex min-w-0 items-center gap-2 @[560px]:order-2 @[560px]:col-span-1"
 						>
-							<Checkbox
-								class="shrink-0 [&>span:first-child]:!size-6 [&>span:first-child]:!rounded-lg"
-								:model-value="activeRow.selected"
-								:description="
-									formatMessage(messages.selectProject, { project: activeRow.project.title })
-								"
-								:disabled="controlsDisabled"
-								@update:model-value="
-									(selected, event) => handleCheckboxSelection(activeRow.id, selected, event)
-								"
-							/>
-							<div class="min-w-0 flex-1 @[560px]:w-[220px] @[560px]:flex-none">
+							<div
+								class="min-w-0 flex-1 @[560px]:flex-none"
+								:class="activeRow.versions.length > 1 ? '@[560px]:w-[220px]' : ''"
+							>
 								<UpdateAllModalVersionSelect
+									:key="activeRow.id"
 									:versions="activeRow.versions"
 									:version="activeRow.version"
 									:label="
@@ -523,13 +524,14 @@ defineExpose({ show, hide })
 						</div>
 						<IconButton
 							ref="changelogCloseButton"
+							v-tooltip="formatMessage(messages.closeChangelog)"
 							type="quiet"
 							size="sm"
 							class="order-2 @[560px]:order-3"
 							:label="formatMessage(messages.closeChangelog)"
 							@click="closeChangelog"
 						>
-							<XIcon aria-hidden="true" />
+							<PanelRightCloseIcon aria-hidden="true" />
 						</IconButton>
 					</div>
 					<div
@@ -607,6 +609,23 @@ defineExpose({ show, hide })
 </template>
 
 <style>
+.update-all-modal-scroll-header::after {
+	position: absolute;
+	top: 100%;
+	right: 0;
+	left: 0;
+	height: 1.5rem;
+	pointer-events: none;
+	content: '';
+	background: linear-gradient(to bottom, var(--surface-2), transparent);
+	opacity: 0;
+}
+
+.update-all-modal-scroll-header[data-show-fade='true']::after {
+	opacity: 1;
+	transition: opacity 150ms;
+}
+
 .update-all-modal > [data-modal-content] {
 	display: flex;
 	min-height: 0;

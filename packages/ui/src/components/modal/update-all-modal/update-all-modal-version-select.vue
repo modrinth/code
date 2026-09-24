@@ -49,6 +49,7 @@ function channelFor(versionId: string) {
 			:model-value="version.id"
 			:options="options"
 			:disabled="disabled"
+			:animate-dropdown="false"
 			trigger-size="sm"
 			trigger-class="!gap-1.5 !rounded-xl !px-3 !font-medium"
 			:dropdown-min-width="240"
@@ -56,7 +57,8 @@ function channelFor(versionId: string) {
 		>
 			<template #prefix>
 				<VersionChannelIndicator
-					:channel="version.version_type"
+					v-if="version.version_type"
+					:channel="version.version_type ?? 'release'"
 					class="!size-6 shrink-0 !font-medium"
 					:class="channelClasses(version.version_type)"
 				/>
@@ -71,7 +73,8 @@ function channelFor(versionId: string) {
 			</template>
 			<template #option="{ item }">
 				<VersionChannelIndicator
-					:channel="channelFor(item.value)"
+					v-if="channelFor(item.value)"
+					:channel="channelFor(item.value) ?? 'release'"
 					class="!size-6 shrink-0 !font-medium"
 					:class="channelClasses(channelFor(item.value))"
 				/>
@@ -82,10 +85,11 @@ function channelFor(versionId: string) {
 	<div
 		v-else
 		v-tooltip="tooltip"
-		class="flex min-h-8 min-w-0 items-center gap-1.5 text-sm font-medium text-contrast"
+		class="flex min-h-8 min-w-0 items-center gap-1.5 px-3 text-sm font-medium text-contrast"
 	>
 		<VersionChannelIndicator
-			:channel="version.version_type"
+			v-if="version.version_type"
+			:channel="version.version_type ?? 'release'"
 			class="!size-6 shrink-0 !font-medium"
 			:class="channelClasses(version.version_type)"
 		/>

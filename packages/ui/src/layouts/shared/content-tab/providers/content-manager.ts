@@ -1,10 +1,10 @@
 import type { ComputedRef, Ref } from 'vue'
 
 import type { ButtonMenuOption } from '#ui/components/base/buttons'
+import type { UpdateAllSelection } from '#ui/components/modal/update-all-modal/update-all-modal-types'
 import { createContext } from '#ui/providers/create-context'
 
 import type {
-	BulkOperationStatus,
 	ContentActionWarning,
 	ContentCardTableItem,
 	ContentItem,
@@ -44,6 +44,8 @@ export interface ContentManagerContext {
 
 	// Labelling
 	contentTypeLabel: Ref<string> | ComputedRef<string>
+	currentGameVersion?: Ref<string> | ComputedRef<string>
+	currentLoader?: Ref<string> | ComputedRef<string>
 
 	// Core actions
 	toggleEnabled: (item: ContentItem) => Promise<void>
@@ -69,9 +71,7 @@ export interface ContentManagerContext {
 	// Update support (optional per-platform)
 	hasUpdateSupport: boolean
 	updateItem?: (id: string) => void
-	bulkUpdateAll?: (onProgress?: (status: BulkOperationStatus) => void) => Promise<void>
-	bulkUpdateItem?: (item: ContentItem) => Promise<void>
-	bulkUpdateItems?: (items: ContentItem[]) => Promise<void>
+	bulkUpdateSelections?: (selections: UpdateAllSelection[]) => Promise<void>
 
 	// Managed-content actions (optional)
 	runManagedContentPrimaryAction?: (event?: MouseEvent) => void

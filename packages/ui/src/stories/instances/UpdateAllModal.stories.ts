@@ -187,6 +187,8 @@ const meta = {
 		onUpdate: fn(),
 		onCancel: fn(),
 		onChangelog: fn(),
+		onPreloadChangelog: fn(),
+		onLoadVersions: fn(),
 	},
 	argTypes: {
 		items: {
