@@ -4,7 +4,6 @@ import { panel, toggle } from './component-builders/builders'
 import { rulesAiImagesIssue } from './rules'
 
 export const iconReviewPanel = panel({
-	field: 'icon',
 	title: 'Icon',
 	hint: "Is this project's icon appropriate?",
 	icon: ImageIcon,

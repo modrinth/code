@@ -11,18 +11,24 @@ import { misusedSlugIssue } from './slug'
 
 export const titleUselessInfoIssue = issue({
 	id: 'title-useless-info',
+	title: 'Unnecessary title information',
+	category: 'Title',
 	suggestedStatus: 'flagged',
 	message: uselessInfo,
 })
 
 export const minecraftTitleIssue = issue({
 	id: 'title-minecraft-branding',
+	title: 'Minecraft branding in title',
+	category: 'Title',
 	suggestedStatus: 'flagged',
 	message: minecraftBranding,
 })
 
 export const titleSimilaritiesIssue = issue({
 	id: 'title-similarities',
+	title: 'Misuse of project name',
+	category: 'Title',
 	suggestedStatus: 'flagged',
 	message: ({ selected }) => {
 		if (selected.toggleIds.includes('title-similarities-fork')) {
@@ -35,12 +41,13 @@ export const titleSimilaritiesIssue = issue({
 
 export const modpackTitleSimilaritiesIssue = issue({
 	id: 'title-similarities-modpack',
+	title: 'Modpack uses another project’s name',
+	category: 'Title',
 	suggestedStatus: 'flagged',
 	message: [similarities.trim(), modpackSimilarities.trim()].join('\n\n'),
 })
 
 export const titleReviewPanel = panel({
-	field: 'title',
 	title: 'Title',
 	hint: "Are the project's name and URL accurate and appropriate?",
 	icon: BookOpenIcon,

@@ -21,6 +21,8 @@ const isServerModpack = ({ ProjectV3 }: ReviewContext) =>
 
 export const reuploadReuploadIssue = issue({
 	id: 'reupload-reupload',
+	title: 'Reuploads are forbidden',
+	category: 'Project wide',
 	message: ({ getTextValue }) =>
 		reuploadMessage
 			.replaceAll('%ORIGINAL_PROJECT%', () => getTextValue('original-project'))
@@ -30,24 +32,32 @@ export const reuploadReuploadIssue = issue({
 
 export const reuploadUnclearForkIssue = issue({
 	id: 'reupload-unclear-fork',
+	title: 'Unclear fork',
+	category: 'Project wide',
 	message: unclearForkMessage,
 	suggestedStatus: 'rejected',
 })
 
 export const reuploadInsufficientForkIssue = issue({
 	id: 'reupload-insufficient-fork',
+	title: 'Insufficient fork',
+	category: 'Project wide',
 	message: insufficientForkMessage,
 	suggestedStatus: 'rejected',
 })
 
 export const reuploadRequestProofIssue = issue({
 	id: 'reupload-request-proof',
+	title: 'Proof of permissions',
+	category: 'Project wide',
 	message: requestProofMessage,
 	suggestedStatus: 'rejected',
 })
 
 export const reuploadIdentityVerificationIssue = issue({
 	id: 'reupload-identity-verification',
+	title: 'Identity verification',
+	category: 'Project wide',
 	message: ({ getTextValue }) =>
 		identityVerificationMessage.replaceAll('%PLATFORM%', () => getTextValue('platform')),
 	suggestedStatus: 'rejected',
@@ -55,6 +65,8 @@ export const reuploadIdentityVerificationIssue = issue({
 
 export const reuploadIdentityVerificationServerIssue = issue({
 	id: 'reupload-identity-verification-server',
+	title: 'Server identity verification',
+	category: 'Project wide',
 	message: ({ getTextValue }) =>
 		identityVerificationServerMessage.replaceAll('%CONTACT%', () => getTextValue('contact')),
 	suggestedStatus: 'rejected',
@@ -62,12 +74,16 @@ export const reuploadIdentityVerificationServerIssue = issue({
 
 export const reuploadRequestProofServerIssue = issue({
 	id: 'reupload-request-proof-server',
+	title: 'Server proof of permissions',
+	category: 'Project wide',
 	message: requestProofServerMessage,
 	suggestedStatus: 'rejected',
 })
 
 export const reuploadCustomPackProhibitedIssue = issue({
 	id: 'reupload-custom-pack-prohibited',
+	title: 'Prohibited custom modpack',
+	category: 'Project wide',
 	message: ({ getMarkdownValue }) =>
 		customPackProhibitedMessage.replaceAll('%OVERRIDES%', () => getMarkdownValue('overrides')),
 	suggestedStatus: 'rejected',
@@ -75,12 +91,16 @@ export const reuploadCustomPackProhibitedIssue = issue({
 
 export const reuploadMissingAttributionIssue = issue({
 	id: 'reupload-missing-attribution',
+	title: 'Missing attribution',
+	category: 'Project wide',
 	message: missingAttributionMessage,
 	suggestedStatus: 'rejected',
 })
 
 export const reuploadCustomPackVerificationIssue = issue({
 	id: 'reupload-custom-pack-verification',
+	title: 'Custom modpack verification',
+	category: 'Project wide',
 	message: ({ selected, getMarkdownValue }) =>
 		[
 			customPackVerificationMessage,
@@ -94,7 +114,6 @@ export const reuploadCustomPackVerificationIssue = issue({
 })
 
 export const reuploadReviewPanel = panel({
-	field: 'reupload',
 	title: 'Reupload',
 	hint: 'Does the author have proper permissions to post this project?',
 	icon: CopyrightIcon,
@@ -213,7 +232,9 @@ export const reuploadReviewPanel = panel({
 			label: 'List overrides?',
 			id: 'reupload-list',
 		}),
-		section({ shown: ({ selected }) => selected.toggleIds.includes('reupload-list') }).content(
+		section({
+			shown: ({ selected }) => selected.toggleIds.includes('reupload-list'),
+		}).content(
 			markdown({
 				issue: reuploadCustomPackVerificationIssue,
 				id: 'overrides',

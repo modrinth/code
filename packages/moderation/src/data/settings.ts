@@ -2,6 +2,13 @@ import { setting } from '../types/settings.ts'
 
 const settings = {
 	General: {
+		HideMarkdownFormattingButtons: setting.asToggle({
+			type: 'toggle',
+			id: 'hide-markdown-formatting-buttons',
+			title: 'Hide Markdown formatting buttons',
+			description: 'Hide the formatting buttons above all Markdown editors in project review.',
+			default: true,
+		}),
 		ShowShortcutKeybindHints: setting.asToggle({
 			type: 'toggle',
 			id: 'show-shortcut-keybind-hints',

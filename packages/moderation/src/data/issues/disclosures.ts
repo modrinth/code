@@ -1,5 +1,6 @@
 import { TriangleAlertIcon } from '@modrinth/assets'
 
+import disclosuresHeaderMessage from '../messages/checklist/messages/disclosures/header.md'
 import missingAdsMessage from '../messages/checklist/messages/disclosures/missing-disclosures/ads.md'
 import missingAiMessage from '../messages/checklist/messages/disclosures/missing-disclosures/ai/ai.md'
 import missingAiFunctionalityMessage from '../messages/checklist/messages/disclosures/missing-disclosures/ai/ai-functionality.md'
@@ -10,7 +11,6 @@ import missingAiListIntroMessage from '../messages/checklist/messages/disclosure
 import missingArchiveMessage from '../messages/checklist/messages/disclosures/missing-disclosures/archive.md'
 import missingDerivativeContentMessage from '../messages/checklist/messages/disclosures/missing-disclosures/derivative-content.md'
 import missingListIntroMessage from '../messages/checklist/messages/disclosures/missing-disclosures/list-intro.md'
-import missingHeaderMessage from '../messages/checklist/messages/disclosures/missing-disclosures/missing-disclosures-header.md'
 import missingPaidFeaturesMessage from '../messages/checklist/messages/disclosures/missing-disclosures/paid-features.md'
 import missingPhotosensitivityMessage from '../messages/checklist/messages/disclosures/missing-disclosures/photosensitivity.md'
 import missingSystemInteractionsMessage from '../messages/checklist/messages/disclosures/missing-disclosures/system-interactions.md'
@@ -28,7 +28,6 @@ import misusedAiListIntroMessage from '../messages/checklist/messages/disclosure
 import misusedArchiveMessage from '../messages/checklist/messages/disclosures/misused-disclosures/archive.md'
 import misusedDerivativeContentMessage from '../messages/checklist/messages/disclosures/misused-disclosures/derivative-content.md'
 import misusedListIntroMessage from '../messages/checklist/messages/disclosures/misused-disclosures/list-intro.md'
-import misusedHeaderMessage from '../messages/checklist/messages/disclosures/misused-disclosures/misused-disclosures-header.md'
 import misusedPaidFeaturesMessage from '../messages/checklist/messages/disclosures/misused-disclosures/paid-features.md'
 import misusedPhotosensitivityMessage from '../messages/checklist/messages/disclosures/misused-disclosures/photosensitivity.md'
 import misusedSystemInteractionsMessage from '../messages/checklist/messages/disclosures/misused-disclosures/system-interactions.md'
@@ -36,204 +35,413 @@ import misusedTelemetryMessage from '../messages/checklist/messages/disclosures/
 import nonEnglishMessage from '../messages/checklist/messages/disclosures/non-english.md'
 import { issue, panel, section, toggle } from './component-builders/builders'
 
-const missingDisclosureMessages: Record<string, string> = {
-	ai: missingAiMessage,
-	'ai-functionality': missingAiFunctionalityMessage,
-	ads: missingAdsMessage,
-	'paid-features': missingPaidFeaturesMessage,
-	telemetry: missingTelemetryMessage,
-	'derivative-content': missingDerivativeContentMessage,
-	photosensitivity: missingPhotosensitivityMessage,
-	'system-interactions': missingSystemInteractionsMessage,
-	archive: missingArchiveMessage,
-}
-
-const missingAiMessages: Record<string, string> = {
-	code: missingAiCodeMessage,
-	assets: missingAiAssetsMessage,
-	text: missingAiTextMessage,
-}
-
-const consentMessages: Record<string, string> = {
-	'opt-in': missingTelemetryOptInMessage,
-	'opt-out': missingTelemetryOptOutMessage,
-	always: missingTelemetryAlwaysMessage,
-}
-
-export const disclosuresMissingDisclosuresIssue = issue({
-	id: 'disclosures-missing-disclosures',
+export const disclosuresIssue = issue({
+	id: 'disclosures',
+	title: 'Invalid disclosures',
+	category: 'Disclosures',
 	message: ({ selected }) => {
-		const parts = Object.entries(missingDisclosureMessages).flatMap(([key, message]) => {
-			if (!selected.toggleIds.includes('disclosures-missing-' + key)) return []
-			const parts = [message]
-			if (key === 'ai') {
-				const usages = Object.entries(missingAiMessages)
-					.filter(([key]) => selected.toggleIds.includes('disclosures-missing-ai-' + key))
-					.map(([, message]) => message)
-				if (usages.length) parts.push(missingAiListIntroMessage, ...usages)
+		const toggleIds = new Set(selected.toggleIds)
+		const missingParts: string[] = []
+		const misusedParts: string[] = []
+
+		for (const field of [
+			'ai',
+			'ai-functionality',
+			'ads',
+			'paid-features',
+			'telemetry',
+			'derivative-content',
+			'photosensitivity',
+			'system-interactions',
+			'archive',
+		] as const) {
+			const missingSelected = toggleIds.has(`disclosures-missing-${field}`)
+			const misusedSelected = toggleIds.has(`disclosures-misused-${field}`)
+			if (!missingSelected && !misusedSelected) continue
+
+			let missingMessage: string
+			let misusedMessage: string
+			switch (field) {
+				case 'ai':
+					missingMessage = missingAiMessage
+					misusedMessage = misusedAiMessage
+					break
+				case 'ai-functionality':
+					missingMessage = missingAiFunctionalityMessage
+					misusedMessage = misusedAiFunctionalityMessage
+					break
+				case 'ads':
+					missingMessage = missingAdsMessage
+					misusedMessage = misusedAdsMessage
+					break
+				case 'paid-features':
+					missingMessage = missingPaidFeaturesMessage
+					misusedMessage = misusedPaidFeaturesMessage
+					break
+				case 'telemetry':
+					missingMessage = missingTelemetryMessage
+					misusedMessage = misusedTelemetryMessage
+					break
+				case 'derivative-content':
+					missingMessage = missingDerivativeContentMessage
+					misusedMessage = misusedDerivativeContentMessage
+					break
+				case 'photosensitivity':
+					missingMessage = missingPhotosensitivityMessage
+					misusedMessage = misusedPhotosensitivityMessage
+					break
+				case 'system-interactions':
+					missingMessage = missingSystemInteractionsMessage
+					misusedMessage = misusedSystemInteractionsMessage
+					break
+				case 'archive':
+					missingMessage = missingArchiveMessage
+					misusedMessage = misusedArchiveMessage
+					break
+				default:
+					continue
 			}
-			if (key === 'telemetry')
-				parts.push(
-					...Object.entries(consentMessages)
-						.filter(([key]) => selected.toggleIds.includes('disclosures-missing-telemetry-' + key))
-						.map(([, message]) => message),
-				)
-			return parts
-		})
-		return [
-			missingHeaderMessage,
-			...(parts.length ? [missingListIntroMessage, ...parts] : []),
-		].join('\n')
+
+			if (missingSelected) {
+				missingParts.push(missingMessage)
+				if (field === 'ai') {
+					const usages: string[] = []
+					if (toggleIds.has('disclosures-missing-ai-code')) usages.push(missingAiCodeMessage)
+					if (toggleIds.has('disclosures-missing-ai-assets')) usages.push(missingAiAssetsMessage)
+					if (toggleIds.has('disclosures-missing-ai-text')) usages.push(missingAiTextMessage)
+					if (usages.length) missingParts.push(missingAiListIntroMessage, ...usages)
+				}
+				if (field === 'telemetry') {
+					if (toggleIds.has('disclosures-missing-telemetry-opt-in')) {
+						missingParts.push(missingTelemetryOptInMessage)
+					}
+					if (toggleIds.has('disclosures-missing-telemetry-opt-out')) {
+						missingParts.push(missingTelemetryOptOutMessage)
+					}
+					if (toggleIds.has('disclosures-missing-telemetry-always')) {
+						missingParts.push(missingTelemetryAlwaysMessage)
+					}
+				}
+			}
+
+			if (misusedSelected) {
+				misusedParts.push(misusedMessage)
+				if (field === 'ai') {
+					const usages: string[] = []
+					if (toggleIds.has('disclosures-misused-ai-code')) usages.push(misusedAiCodeMessage)
+					if (toggleIds.has('disclosures-misused-ai-assets')) usages.push(misusedAiAssetsMessage)
+					if (toggleIds.has('disclosures-misused-ai-text')) usages.push(misusedAiTextMessage)
+					if (usages.length) misusedParts.push(misusedAiListIntroMessage, ...usages)
+				}
+			}
+		}
+
+		const groups: string[] = []
+		if (missingParts.length) {
+			const body = missingParts.map((part) => part.trimEnd()).join('\n')
+			groups.push(`${missingListIntroMessage.trim()}\n\n${body}`)
+		}
+		if (misusedParts.length) {
+			const body = misusedParts.map((part) => part.trimEnd()).join('\n')
+			groups.push(`${misusedListIntroMessage.trim()}\n\n${body}`)
+		}
+		return groups.length ? [disclosuresHeaderMessage.trim(), ...groups].join('\n\n') : ''
 	},
 	suggestedStatus: ({ selected }) => {
+		const toggleIds = new Set(selected.toggleIds)
 		const rejected = ['telemetry', 'derivative-content', 'photosensitivity', 'system-interactions']
-		if (rejected.some((key) => selected.toggleIds.includes('disclosures-missing-' + key)))
-			return 'rejected'
-		return ['ai', 'ai-functionality', 'ads', 'paid-features'].some((key) =>
-			selected.toggleIds.includes('disclosures-missing-' + key),
+		if (
+			rejected.some(
+				(field) =>
+					toggleIds.has(`disclosures-missing-${field}`) ||
+					toggleIds.has(`disclosures-misused-${field}`),
+			)
 		)
-			? 'flagged'
-			: undefined
-	},
-})
-
-const misusedDisclosureMessages: Record<string, string> = {
-	ai: misusedAiMessage,
-	'ai-functionality': misusedAiFunctionalityMessage,
-	ads: misusedAdsMessage,
-	'paid-features': misusedPaidFeaturesMessage,
-	telemetry: misusedTelemetryMessage,
-	'derivative-content': misusedDerivativeContentMessage,
-	photosensitivity: misusedPhotosensitivityMessage,
-	'system-interactions': misusedSystemInteractionsMessage,
-	archive: misusedArchiveMessage,
-}
-
-const misusedAiMessages: Record<string, string> = {
-	code: misusedAiCodeMessage,
-	assets: misusedAiAssetsMessage,
-	text: misusedAiTextMessage,
-}
-
-export const disclosuresMisusedDisclosuresIssue = issue({
-	id: 'disclosures-misused-disclosures',
-	message: ({ selected }) => {
-		const parts = Object.entries(misusedDisclosureMessages).flatMap(([key, message]) => {
-			if (!selected.toggleIds.includes('disclosures-misused-' + key)) return []
-			const parts = [message]
-			if (key === 'ai') {
-				const usages = Object.entries(misusedAiMessages)
-					.filter(([key]) => selected.toggleIds.includes('disclosures-misused-ai-' + key))
-					.map(([, message]) => message)
-				if (usages.length) parts.push(misusedAiListIntroMessage, ...usages)
-			}
-			return parts
-		})
-		return [
-			misusedHeaderMessage,
-			...(parts.length ? [misusedListIntroMessage, ...parts] : []),
-		].join('\n')
-	},
-	suggestedStatus: ({ selected }) => {
-		const rejected = ['telemetry', 'derivative-content', 'photosensitivity', 'system-interactions']
-		if (rejected.some((key) => selected.toggleIds.includes('disclosures-misused-' + key)))
 			return 'rejected'
-		return 'flagged'
+		if (
+			[...toggleIds].some((id) => id.startsWith('disclosures-misused-')) ||
+			['ai', 'ai-functionality', 'ads', 'paid-features'].some((field) =>
+				toggleIds.has(`disclosures-missing-${field}`),
+			)
+		)
+			return 'flagged'
+		return undefined
 	},
 })
 
 export const disclosuresNonEnglishIssue = issue({
 	id: 'disclosures-non-english',
+	title: 'Non-English disclosure information',
+	category: 'Disclosures',
 	message: nonEnglishMessage,
 	suggestedStatus: 'flagged',
 })
 
-const disclosureFields = {
-	ai: 'AI Usage',
-	'ai-functionality': 'AI Functionality',
-	ads: 'Advertisements',
-	'paid-features': 'Paid Features',
-	telemetry: 'Telemetry',
-	'derivative-content': 'Derivative Content',
-	photosensitivity: 'Photosensitivity',
-	'system-interactions': 'System Interactions',
-	archive: 'Archive',
-} as const
-
-type DisclosureField = keyof typeof disclosureFields
-
-function createDisclosurePanel(field: DisclosureField) {
-	return panel({
-		field: `${field}-disclosure`,
-		title: disclosureFields[field],
-		hint: 'Has this project accurately disclosed this content?',
-		icon: TriangleAlertIcon,
+export const aiDisclosureReviewPanel = panel({
+	title: 'AI Usage',
+	hint: 'Has this project accurately disclosed this content?',
+	icon: TriangleAlertIcon,
+}).content(
+	toggle({
+		issue: disclosuresIssue,
+		id: 'disclosures-missing-ai',
+		label: 'Disclosure Missing',
+		issueListLabel: 'AI Usage',
+	}),
+	section({
+		label: 'What kind of AI content?',
+		shown: ({ selected }) => selected.toggleIds.includes('disclosures-missing-ai'),
 	}).content(
-		...[
-			{
-				problem: 'missing',
-				label: 'Disclosure Missing',
-				issue: disclosuresMissingDisclosuresIssue,
-			},
-			{ problem: 'misused', label: 'Misused', issue: disclosuresMisusedDisclosuresIssue },
-		].flatMap(({ problem, label, issue }) => {
-			const id = `disclosures-${problem}-${field}`
-			return [
-				toggle({ issue, label, id }),
-				...(field === 'ai'
-					? [
-							section({
-								label: 'What kind of AI content?',
-								shown: ({ selected }) => selected.toggleIds.includes(id),
-							}).content(
-								...Object.entries({ code: 'Code', assets: 'Assets', text: 'Text' }).map(
-									([usage, label]) => toggle({ issue, label, id: `${id}-${usage}` }),
-								),
-							),
-						]
-					: []),
-				...(field === 'telemetry' && problem === 'missing'
-					? [
-							section({
-								label: 'What is the telemetry’s consent model?',
-								shown: ({ selected }) => selected.toggleIds.includes(id),
-							}).content(
-								...Object.entries({
-									'opt-in': 'Opt In',
-									'opt-out': 'Opt Out',
-									always: 'Always Online',
-								}).map(([consent, label]) =>
-									toggle({
-										issue,
-										label,
-										id: `${id}-${consent}`,
-										disabled: ({ selected }) =>
-											Object.keys(consentMessages).some(
-												(key) => key !== consent && selected.toggleIds.includes(`${id}-${key}`),
-											),
-									}),
-								),
-							),
-						]
-					: []),
-			]
+		toggle({
+			issue: disclosuresIssue,
+			id: 'disclosures-missing-ai-code',
+			label: 'Code',
+			issueListLabel: 'AI Usage: Code',
+			issueListGroup: 'Disclosure Missing',
 		}),
-	)
-}
+		toggle({
+			issue: disclosuresIssue,
+			id: 'disclosures-missing-ai-assets',
+			label: 'Assets',
+			issueListLabel: 'AI Usage: Assets',
+			issueListGroup: 'Disclosure Missing',
+		}),
+		toggle({
+			issue: disclosuresIssue,
+			id: 'disclosures-missing-ai-text',
+			label: 'Text',
+			issueListLabel: 'AI Usage: Text',
+			issueListGroup: 'Disclosure Missing',
+		}),
+	),
+	toggle({
+		issue: disclosuresIssue,
+		id: 'disclosures-misused-ai',
+		label: 'Misused',
+		issueListLabel: 'AI Usage',
+	}),
+	section({
+		label: 'What kind of AI content?',
+		shown: ({ selected }) => selected.toggleIds.includes('disclosures-misused-ai'),
+	}).content(
+		toggle({
+			issue: disclosuresIssue,
+			id: 'disclosures-misused-ai-code',
+			label: 'Code',
+			issueListLabel: 'AI Usage: Code',
+			issueListGroup: 'Misused',
+		}),
+		toggle({
+			issue: disclosuresIssue,
+			id: 'disclosures-misused-ai-assets',
+			label: 'Assets',
+			issueListLabel: 'AI Usage: Assets',
+			issueListGroup: 'Misused',
+		}),
+		toggle({
+			issue: disclosuresIssue,
+			id: 'disclosures-misused-ai-text',
+			label: 'Text',
+			issueListLabel: 'AI Usage: Text',
+			issueListGroup: 'Misused',
+		}),
+	),
+)
 
-export const aiDisclosureReviewPanel = createDisclosurePanel('ai')
-export const aiFunctionalityDisclosureReviewPanel = createDisclosurePanel('ai-functionality')
-export const adsDisclosureReviewPanel = createDisclosurePanel('ads')
-export const paidFeaturesDisclosureReviewPanel = createDisclosurePanel('paid-features')
-export const telemetryDisclosureReviewPanel = createDisclosurePanel('telemetry')
-export const derivativeContentDisclosureReviewPanel = createDisclosurePanel('derivative-content')
-export const photosensitivityDisclosureReviewPanel = createDisclosurePanel('photosensitivity')
-export const systemInteractionsDisclosureReviewPanel = createDisclosurePanel('system-interactions')
-export const archiveDisclosureReviewPanel = createDisclosurePanel('archive')
+export const aiFunctionalityDisclosureReviewPanel = panel({
+	title: 'AI Functionality',
+	hint: 'Has this project accurately disclosed this content?',
+	icon: TriangleAlertIcon,
+}).content(
+	toggle({
+		issue: disclosuresIssue,
+		id: 'disclosures-missing-ai-functionality',
+		label: 'Disclosure Missing',
+		issueListLabel: 'AI Functionality',
+	}),
+	toggle({
+		issue: disclosuresIssue,
+		id: 'disclosures-misused-ai-functionality',
+		label: 'Misused',
+		issueListLabel: 'AI Functionality',
+	}),
+)
+
+export const adsDisclosureReviewPanel = panel({
+	title: 'Advertisements',
+	hint: 'Has this project accurately disclosed this content?',
+	icon: TriangleAlertIcon,
+}).content(
+	toggle({
+		issue: disclosuresIssue,
+		id: 'disclosures-missing-ads',
+		label: 'Disclosure Missing',
+		issueListLabel: 'Advertisements',
+	}),
+	toggle({
+		issue: disclosuresIssue,
+		id: 'disclosures-misused-ads',
+		label: 'Misused',
+		issueListLabel: 'Advertisements',
+	}),
+)
+
+export const paidFeaturesDisclosureReviewPanel = panel({
+	title: 'Paid Features',
+	hint: 'Has this project accurately disclosed this content?',
+	icon: TriangleAlertIcon,
+}).content(
+	toggle({
+		issue: disclosuresIssue,
+		id: 'disclosures-missing-paid-features',
+		label: 'Disclosure Missing',
+		issueListLabel: 'Paid Features',
+	}),
+	toggle({
+		issue: disclosuresIssue,
+		id: 'disclosures-misused-paid-features',
+		label: 'Misused',
+		issueListLabel: 'Paid Features',
+	}),
+)
+
+export const telemetryDisclosureReviewPanel = panel({
+	title: 'Telemetry',
+	hint: 'Has this project accurately disclosed this content?',
+	icon: TriangleAlertIcon,
+}).content(
+	toggle({
+		issue: disclosuresIssue,
+		id: 'disclosures-missing-telemetry',
+		label: 'Disclosure Missing',
+		issueListLabel: 'Telemetry',
+	}),
+	section({
+		label: 'What is the telemetry’s consent model?',
+		shown: ({ selected }) => selected.toggleIds.includes('disclosures-missing-telemetry'),
+	}).content(
+		toggle({
+			issue: disclosuresIssue,
+			id: 'disclosures-missing-telemetry-opt-in',
+			label: 'Opt In',
+			issueListLabel: 'Telemetry: Opt In',
+			issueListGroup: 'Disclosure Missing',
+			disabled: ({ selected }) =>
+				selected.toggleIds.includes('disclosures-missing-telemetry-opt-out') ||
+				selected.toggleIds.includes('disclosures-missing-telemetry-always'),
+		}),
+		toggle({
+			issue: disclosuresIssue,
+			id: 'disclosures-missing-telemetry-opt-out',
+			label: 'Opt Out',
+			issueListLabel: 'Telemetry: Opt Out',
+			issueListGroup: 'Disclosure Missing',
+			disabled: ({ selected }) =>
+				selected.toggleIds.includes('disclosures-missing-telemetry-opt-in') ||
+				selected.toggleIds.includes('disclosures-missing-telemetry-always'),
+		}),
+		toggle({
+			issue: disclosuresIssue,
+			id: 'disclosures-missing-telemetry-always',
+			label: 'Always Online',
+			issueListLabel: 'Telemetry: Always Online',
+			issueListGroup: 'Disclosure Missing',
+			disabled: ({ selected }) =>
+				selected.toggleIds.includes('disclosures-missing-telemetry-opt-in') ||
+				selected.toggleIds.includes('disclosures-missing-telemetry-opt-out'),
+		}),
+	),
+	toggle({
+		issue: disclosuresIssue,
+		id: 'disclosures-misused-telemetry',
+		label: 'Misused',
+		issueListLabel: 'Telemetry',
+	}),
+)
+
+export const derivativeContentDisclosureReviewPanel = panel({
+	title: 'Derivative Content',
+	hint: 'Has this project accurately disclosed this content?',
+	icon: TriangleAlertIcon,
+}).content(
+	toggle({
+		issue: disclosuresIssue,
+		id: 'disclosures-missing-derivative-content',
+		label: 'Disclosure Missing',
+		issueListLabel: 'Derivative Content',
+	}),
+	toggle({
+		issue: disclosuresIssue,
+		id: 'disclosures-misused-derivative-content',
+		label: 'Misused',
+		issueListLabel: 'Derivative Content',
+	}),
+)
+
+export const photosensitivityDisclosureReviewPanel = panel({
+	title: 'Photosensitivity',
+	hint: 'Has this project accurately disclosed this content?',
+	icon: TriangleAlertIcon,
+}).content(
+	toggle({
+		issue: disclosuresIssue,
+		id: 'disclosures-missing-photosensitivity',
+		label: 'Disclosure Missing',
+		issueListLabel: 'Photosensitivity',
+	}),
+	toggle({
+		issue: disclosuresIssue,
+		id: 'disclosures-misused-photosensitivity',
+		label: 'Misused',
+		issueListLabel: 'Photosensitivity',
+	}),
+)
+
+export const systemInteractionsDisclosureReviewPanel = panel({
+	title: 'System Interactions',
+	hint: 'Has this project accurately disclosed this content?',
+	icon: TriangleAlertIcon,
+}).content(
+	toggle({
+		issue: disclosuresIssue,
+		id: 'disclosures-missing-system-interactions',
+		label: 'Disclosure Missing',
+		issueListLabel: 'System Interactions',
+	}),
+	toggle({
+		issue: disclosuresIssue,
+		id: 'disclosures-misused-system-interactions',
+		label: 'Misused',
+		issueListLabel: 'System Interactions',
+	}),
+)
+
+export const archiveDisclosureReviewPanel = panel({
+	title: 'Archive',
+	hint: 'Has this project accurately disclosed this content?',
+	icon: TriangleAlertIcon,
+}).content(
+	toggle({
+		issue: disclosuresIssue,
+		id: 'disclosures-missing-archive',
+		label: 'Disclosure Missing',
+		issueListLabel: 'Archive',
+	}),
+	toggle({
+		issue: disclosuresIssue,
+		id: 'disclosures-misused-archive',
+		label: 'Misused',
+		issueListLabel: 'Archive',
+	}),
+)
 
 export const disclosuresReviewPanel = panel({
-	field: 'disclosures',
 	title: 'Disclosures',
 	hint: 'Has this project selected all proper content disclosures?',
 	icon: TriangleAlertIcon,
-}).content(toggle({ issue: disclosuresNonEnglishIssue, label: 'Non-English' }))
+}).content(
+	toggle({
+		issue: disclosuresNonEnglishIssue,
+		label: 'Non-English',
+	}),
+)

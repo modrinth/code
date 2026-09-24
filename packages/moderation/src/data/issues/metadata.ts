@@ -17,6 +17,8 @@ const environments = Object.keys(ENVIRONMENTS_COPY).filter(
 
 export const metadataEnvironmentIssue = issue({
 	id: 'metadata-environment',
+	title: 'Incorrect environment',
+	category: 'Metadata',
 	message: ({ getSelectValue }) => {
 		const environment = getSelectValue('correct-environment')
 		const correction =
@@ -41,24 +43,29 @@ export const metadataEnvironmentIssue = issue({
 
 export const metadataDependenciesIssue = issue({
 	id: 'metadata-dependencies',
+	title: 'Incorrect dependencies',
+	category: 'Metadata',
 	message: dependenciesMessage,
 	suggestedStatus: 'flagged',
 })
 
 export const metadataGameVersionsIssue = issue({
 	id: 'metadata-game-versions',
+	title: 'Incorrect game versions',
+	category: 'Metadata',
 	message: gameVersionsMessage,
 	suggestedStatus: 'flagged',
 })
 
 export const metadataLoadersIssue = issue({
 	id: 'metadata-loaders',
+	title: 'Incorrect loaders',
+	category: 'Metadata',
 	message: loadersMessage,
 	suggestedStatus: 'rejected',
 })
 
 export const metadataReviewPanel = panel({
-	field: 'metadata',
 	title: 'Metadata',
 	hint: "Are there any issues with this project's metadata?",
 	icon: DatabaseIcon,

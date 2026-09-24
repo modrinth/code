@@ -9,81 +9,116 @@ import misusedHeader from '../messages/checklist/messages/links/misused-header.m
 import sourceEmpty from '../messages/checklist/messages/links/source/empty.md'
 import sourceInaccessible from '../messages/checklist/messages/links/source/inaccessible.md'
 import wikiDisabled from '../messages/checklist/messages/links/wiki/disabled.md'
-import { issue, panel, section, toggle } from './component-builders/builders'
-
-const linkProblemLabels = {
-	misused: 'Misused',
-	inaccessible: 'Inaccessible',
-	disabled: 'Disabled',
-	empty: 'Empty Repo',
-	expiring: 'Expiring',
-} as const
-
-type LinkProblem = keyof typeof linkProblemLabels
-
-const linkFields = {
-	'source-link': { label: 'Source code', problems: ['misused', 'inaccessible', 'empty'] },
-	'discord-link': { label: 'Discord invite', problems: ['misused', 'inaccessible', 'expiring'] },
-	'issues-link': { label: 'Issue tracker', problems: ['misused', 'inaccessible', 'disabled'] },
-	'wiki-link': { label: 'Wiki page', problems: ['misused', 'inaccessible', 'disabled'] },
-	'site-link': { label: 'Website', problems: ['misused', 'inaccessible'] },
-	'store-link': { label: 'Store', problems: ['misused', 'inaccessible'] },
-	'patreon-link': { label: 'Patreon', problems: ['misused', 'inaccessible'] },
-	'bmac-link': { label: 'Buy Me A Coffee', problems: ['misused', 'inaccessible'] },
-	'paypal-link': { label: 'PayPal', problems: ['misused', 'inaccessible'] },
-	'github-link': { label: 'GitHub Sponsors', problems: ['misused', 'inaccessible'] },
-	'ko-fi-link': { label: 'Ko-fi', problems: ['misused', 'inaccessible'] },
-	'other-link': { label: 'Other', problems: ['misused', 'inaccessible'] },
-} as const satisfies Record<string, { label: string; problems: readonly LinkProblem[] }>
-
-type LinkField = keyof typeof linkFields
-
-const linkProblemGroups: {
-	header: string
-	problems: { key: LinkProblem; notes?: Partial<Record<LinkField, string>> }[]
-}[] = [
-	{
-		header: inaccessibleHeader,
-		problems: [
-			{
-				key: 'inaccessible',
-				notes: {
-					'source-link': sourceInaccessible,
-					'discord-link': discordInaccessible,
-				},
-			},
-			{
-				key: 'disabled',
-				notes: { 'issues-link': issuesDisabled, 'wiki-link': wikiDisabled },
-			},
-			{ key: 'expiring', notes: { 'discord-link': discordExpiring } },
-		],
-	},
-	{
-		header: misusedHeader,
-		problems: [{ key: 'misused' }, { key: 'empty', notes: { 'source-link': sourceEmpty } }],
-	},
-]
+import { issue, panel, toggle } from './component-builders/builders'
 
 export const linksIssue = issue({
 	id: 'links',
+	title: 'Invalid project links',
+	category: 'Links',
 	suggestedStatus: 'flagged',
 	message: ({ ProjectV3, selected }) => {
 		const toggleIds = new Set(selected.toggleIds)
-		const groups = linkProblemGroups.flatMap(({ header, problems }) => {
-			const items = Object.entries(linkFields).flatMap(([field, { label }]) => {
-				const selectedProblems = problems.filter(({ key }) => toggleIds.has(`${field}:${key}`))
-				if (!selectedProblems.length) return []
-				const url = ProjectV3.link_urls[field.replace(/-link$/, '')]?.url
-				const notes = selectedProblems
-					.map(({ notes }) => notes?.[field as LinkField]?.trim())
-					.filter((note): note is string => !!note)
-				const item = url ? `- ${label}: \`${url}\`` : `- ${label}`
-				return [[item, ...new Set(notes)].join('\n    - ')]
-			})
-			return items.length ? [header.trim(), items.join('\n')] : []
-		})
-		return groups.length ? [linksHeader.trim(), ...groups].join('\n\n') : ''
+		const inaccessibleItems: string[] = []
+		const misusedItems: string[] = []
+
+		for (const type of [
+			'source',
+			'discord',
+			'issues',
+			'wiki',
+			'site',
+			'store',
+			'patreon',
+			'bmac',
+			'paypal',
+			'github',
+			'ko-fi',
+			'other',
+		] as const) {
+			const field = `${type}-link`
+			let inaccessibleSelected = toggleIds.has(`${field}:inaccessible`)
+			const misusedSelected = toggleIds.has(`${field}:misused`)
+			const notes: string[] = []
+			let label: string
+
+			switch (type) {
+				case 'source':
+					label = 'Source code'
+					if (inaccessibleSelected) notes.push(sourceInaccessible)
+					if (toggleIds.has('source-link:empty')) {
+						inaccessibleSelected = true
+						notes.push(sourceEmpty)
+					}
+					break
+				case 'discord':
+					label = 'Discord invite'
+					if (inaccessibleSelected) notes.push(discordInaccessible)
+					if (toggleIds.has('discord-link:expiring')) {
+						inaccessibleSelected = true
+						notes.push(discordExpiring)
+					}
+					break
+				case 'issues':
+					label = 'Issue tracker'
+					if (toggleIds.has('issues-link:disabled')) {
+						inaccessibleSelected = true
+						notes.push(issuesDisabled)
+					}
+					break
+				case 'wiki':
+					label = 'Wiki page'
+					if (toggleIds.has('wiki-link:disabled')) {
+						inaccessibleSelected = true
+						notes.push(wikiDisabled)
+					}
+					break
+				case 'site':
+					label = 'Website'
+					break
+				case 'store':
+					label = 'Store'
+					break
+				case 'patreon':
+					label = 'Patreon'
+					break
+				case 'bmac':
+					label = 'Buy Me A Coffee'
+					break
+				case 'paypal':
+					label = 'PayPal'
+					break
+				case 'github':
+					label = 'GitHub Sponsors'
+					break
+				case 'ko-fi':
+					label = 'Ko-fi'
+					break
+				case 'other':
+					label = 'Other'
+					break
+				default:
+					continue
+			}
+
+			if (!inaccessibleSelected && !misusedSelected) continue
+			const url = ProjectV3.link_urls[type]?.url
+			// "- Source code: `https://github.com/owner/repo`" or "- Source code"
+			const item = url ? `- ${label}: \`${url}\`` : `- ${label}`
+			if (inaccessibleSelected) {
+				const uniqueNotes = [...new Set(notes.map((note) => note.trim()).filter(Boolean))]
+				inaccessibleItems.push([item, ...uniqueNotes].join('\n    - '))
+			}
+			if (misusedSelected) misusedItems.push(item)
+		}
+
+		const sections: string[] = []
+		if (inaccessibleItems.length) {
+			sections.push(inaccessibleHeader.trim(), inaccessibleItems.join('\n'))
+		}
+		if (misusedItems.length) {
+			sections.push(misusedHeader.trim(), misusedItems.join('\n'))
+		}
+		return sections.length ? [linksHeader.trim(), ...sections].join('\n\n') : ''
 	},
 })
 
@@ -97,36 +132,246 @@ function isHttpUrl(value: string | undefined): boolean {
 	}
 }
 
-function createLinkToggle(field: LinkField, problem: LinkProblem) {
-	return toggle({
-		label: linkProblemLabels[problem],
-		id: `${field}:${problem}`,
+export const issuesReviewPanel = panel({
+	title: 'Issue tracker',
+	hint: "Is the project's link accurate and accessible?",
+	icon: LinkIcon,
+	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.issues?.url),
+}).content(
+	toggle({
 		issue: linksIssue,
-	})
-}
+		id: 'issues-link:misused',
+		label: 'Misused',
+	}),
+	toggle({
+		issue: linksIssue,
+		id: 'issues-link:inaccessible',
+		label: 'Inaccessible',
+	}),
+	toggle({
+		issue: linksIssue,
+		id: 'issues-link:disabled',
+		label: 'Disabled',
+		issueListGroup: 'Inaccessible',
+		issueListLabel: 'Issues: Disabled',
+	}),
+)
 
-function createLinkPanel(field: LinkField) {
-	const { label, problems } = linkFields[field]
-	const linkType = field.replace(/-link$/, '')
+export const sourceReviewPanel = panel({
+	title: 'Source code',
+	hint: "Is the project's link accurate and accessible?",
+	icon: LinkIcon,
+	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.source?.url),
+}).content(
+	toggle({
+		issue: linksIssue,
+		id: 'source-link:misused',
+		label: 'Misused',
+	}),
+	toggle({
+		issue: linksIssue,
+		id: 'source-link:inaccessible',
+		label: 'Inaccessible',
+	}),
+	toggle({
+		issue: linksIssue,
+		id: 'source-link:empty',
+		label: 'Empty Repo',
+		issueListGroup: 'Inaccessible',
+		issueListLabel: 'Source: Empty Repo',
+	}),
+)
 
-	return panel({
-		field,
-		title: label,
-		hint: "Is the project's link accurate and accessible?",
-		icon: LinkIcon,
-		shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls[linkType]?.url),
-	}).content(section().content(...problems.map((problem) => createLinkToggle(field, problem))))
-}
+export const wikiReviewPanel = panel({
+	title: 'Wiki page',
+	hint: "Is the project's link accurate and accessible?",
+	icon: LinkIcon,
+	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.wiki?.url),
+}).content(
+	toggle({
+		issue: linksIssue,
+		id: 'wiki-link:misused',
+		label: 'Misused',
+	}),
+	toggle({
+		issue: linksIssue,
+		id: 'wiki-link:inaccessible',
+		label: 'Inaccessible',
+	}),
+	toggle({
+		issue: linksIssue,
+		id: 'wiki-link:disabled',
+		label: 'Disabled',
+		issueListGroup: 'Inaccessible',
+		issueListLabel: 'Wiki: Disabled',
+	}),
+)
 
-export const issuesReviewPanel = createLinkPanel('issues-link')
-export const sourceReviewPanel = createLinkPanel('source-link')
-export const wikiReviewPanel = createLinkPanel('wiki-link')
-export const discordReviewPanel = createLinkPanel('discord-link')
-export const siteReviewPanel = createLinkPanel('site-link')
-export const storeReviewPanel = createLinkPanel('store-link')
-export const patreonReviewPanel = createLinkPanel('patreon-link')
-export const bmacReviewPanel = createLinkPanel('bmac-link')
-export const paypalReviewPanel = createLinkPanel('paypal-link')
-export const githubReviewPanel = createLinkPanel('github-link')
-export const koFiReviewPanel = createLinkPanel('ko-fi-link')
-export const otherReviewPanel = createLinkPanel('other-link')
+export const discordReviewPanel = panel({
+	title: 'Discord invite',
+	hint: "Is the project's link accurate and accessible?",
+	icon: LinkIcon,
+	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.discord?.url),
+}).content(
+	toggle({
+		issue: linksIssue,
+		id: 'discord-link:misused',
+		label: 'Misused',
+	}),
+	toggle({
+		issue: linksIssue,
+		id: 'discord-link:inaccessible',
+		label: 'Inaccessible',
+	}),
+	toggle({
+		issue: linksIssue,
+		id: 'discord-link:expiring',
+		label: 'Expiring',
+		issueListGroup: 'Inaccessible',
+		issueListLabel: 'Discord: Expiring',
+	}),
+)
+
+export const siteReviewPanel = panel({
+	title: 'Website',
+	hint: "Is the project's link accurate and accessible?",
+	icon: LinkIcon,
+	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.site?.url),
+}).content(
+	toggle({
+		issue: linksIssue,
+		id: 'site-link:misused',
+		label: 'Misused',
+	}),
+	toggle({
+		issue: linksIssue,
+		id: 'site-link:inaccessible',
+		label: 'Inaccessible',
+	}),
+)
+
+export const storeReviewPanel = panel({
+	title: 'Store',
+	hint: "Is the project's link accurate and accessible?",
+	icon: LinkIcon,
+	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.store?.url),
+}).content(
+	toggle({
+		issue: linksIssue,
+		id: 'store-link:misused',
+		label: 'Misused',
+	}),
+	toggle({
+		issue: linksIssue,
+		id: 'store-link:inaccessible',
+		label: 'Inaccessible',
+	}),
+)
+
+export const patreonReviewPanel = panel({
+	title: 'Patreon',
+	hint: "Is the project's link accurate and accessible?",
+	icon: LinkIcon,
+	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.patreon?.url),
+}).content(
+	toggle({
+		issue: linksIssue,
+		id: 'patreon-link:misused',
+		label: 'Misused',
+	}),
+	toggle({
+		issue: linksIssue,
+		id: 'patreon-link:inaccessible',
+		label: 'Inaccessible',
+	}),
+)
+
+export const bmacReviewPanel = panel({
+	title: 'Buy Me A Coffee',
+	hint: "Is the project's link accurate and accessible?",
+	icon: LinkIcon,
+	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.bmac?.url),
+}).content(
+	toggle({
+		issue: linksIssue,
+		id: 'bmac-link:misused',
+		label: 'Misused',
+	}),
+	toggle({
+		issue: linksIssue,
+		id: 'bmac-link:inaccessible',
+		label: 'Inaccessible',
+	}),
+)
+
+export const paypalReviewPanel = panel({
+	title: 'PayPal',
+	hint: "Is the project's link accurate and accessible?",
+	icon: LinkIcon,
+	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.paypal?.url),
+}).content(
+	toggle({
+		issue: linksIssue,
+		id: 'paypal-link:misused',
+		label: 'Misused',
+	}),
+	toggle({
+		issue: linksIssue,
+		id: 'paypal-link:inaccessible',
+		label: 'Inaccessible',
+	}),
+)
+
+export const githubReviewPanel = panel({
+	title: 'GitHub Sponsors',
+	hint: "Is the project's link accurate and accessible?",
+	icon: LinkIcon,
+	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.github?.url),
+}).content(
+	toggle({
+		issue: linksIssue,
+		id: 'github-link:misused',
+		label: 'Misused',
+	}),
+	toggle({
+		issue: linksIssue,
+		id: 'github-link:inaccessible',
+		label: 'Inaccessible',
+	}),
+)
+
+export const koFiReviewPanel = panel({
+	title: 'Ko-fi',
+	hint: "Is the project's link accurate and accessible?",
+	icon: LinkIcon,
+	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls['ko-fi']?.url),
+}).content(
+	toggle({
+		issue: linksIssue,
+		id: 'ko-fi-link:misused',
+		label: 'Misused',
+	}),
+	toggle({
+		issue: linksIssue,
+		id: 'ko-fi-link:inaccessible',
+		label: 'Inaccessible',
+	}),
+)
+
+export const otherReviewPanel = panel({
+	title: 'Other',
+	hint: "Is the project's link accurate and accessible?",
+	icon: LinkIcon,
+	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.other?.url),
+}).content(
+	toggle({
+		issue: linksIssue,
+		id: 'other-link:misused',
+		label: 'Misused',
+	}),
+	toggle({
+		issue: linksIssue,
+		id: 'other-link:inaccessible',
+		label: 'Inaccessible',
+	}),
+)

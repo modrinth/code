@@ -9,10 +9,7 @@
 		<span v-if="count !== undefined" class="relative top-px ml-1 rounded text-xs tabular-nums"
 			>({{ count }})</span
 		>
-		<KbdChip
-			:keybind="`review-tab-${params.params.tab}`"
-			class="relative bottom-px ml-1"
-		/>
+		<KbdChip :keybind="`review-tab-${params.params.tab}`" class="relative bottom-px ml-1" />
 	</span>
 </template>
 
@@ -23,7 +20,7 @@ import { computed, ref, watchEffect } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
-import KbdChip from '../../KbdChip.vue'
+import KbdChip from '../../kdb-chip.vue'
 import { projectReviewMessages } from '../../messages'
 import type { ProjectReviewTab } from '../types'
 

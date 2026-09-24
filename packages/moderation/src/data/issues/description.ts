@@ -19,6 +19,8 @@ import { rulesAiImagesIssue } from './rules'
 
 export const insufficientDescriptionIssue = issue({
 	id: 'description-insufficient',
+	title: 'Insufficient description',
+	category: 'Description',
 	suggestedStatus: 'flagged',
 	message: ({ ProjectV3, selected, getMarkdownValue }) => {
 		const { toggleIds } = selected
@@ -50,36 +52,45 @@ export const insufficientDescriptionIssue = issue({
 
 export const nonEnglishDescriptionIssue = issue({
 	id: 'description-non-english',
+	title: 'Non-English description',
+	category: 'Description',
 	suggestedStatus: 'flagged',
 	message: ({ ProjectV3 }) => (ProjectV3.minecraft_java_server ? nonEnglishServer : nonEnglish),
 })
 
 export const descriptionHeadersAsBodyIssue = issue({
 	id: 'description-headers-as-body',
+	title: 'Headers used as body text',
+	category: 'Description',
 	suggestedStatus: 'flagged',
 	message: headersAsBody,
 })
 
 export const imageOnlyDescriptionIssue = issue({
 	id: 'description-image-only',
+	title: 'Image-only description',
+	category: 'Description',
 	suggestedStatus: 'flagged',
 	message: imageOnly,
 })
 
 export const nonStandardDescriptionTextIssue = issue({
 	id: 'description-non-standard-text',
+	title: 'Non-standard description text',
+	category: 'Description',
 	suggestedStatus: 'flagged',
 	message: nonStandardText,
 })
 
 export const unclearDescriptionIssue = issue({
 	id: 'description-clarity',
+	title: 'Unclear or misleading description',
+	category: 'Description',
 	suggestedStatus: 'rejected',
 	message: clarity,
 })
 
 export const descriptionReviewPanel = panel({
-	field: 'description',
 	title: 'Description',
 	hint: 'Is the description sufficient, accurate, and accessible?',
 	icon: LibraryIcon,

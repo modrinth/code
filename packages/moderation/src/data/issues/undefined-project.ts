@@ -5,12 +5,13 @@ import { issue, panel, toggle } from './component-builders/builders'
 
 export const undefinedProjectNoVersionsIssue = issue({
 	id: 'undefined-project-no-versions',
+	title: 'No project versions',
+	category: 'Project wide',
 	message: noVersionsMessage,
 	suggestedStatus: 'rejected',
 })
 
 export const undefinedProjectReviewPanel = panel({
-	field: 'undefined-project',
 	title: 'Undefined Project',
 	hint: 'This project is undefined!',
 	icon: XIcon,

@@ -1,5 +1,5 @@
 <template>
-	<div v-if="panelBinding && hasToggles" class="flex flex-col gap-3">
+	<div v-if="panelBinding && hasControls" class="flex flex-col gap-3">
 		<div
 			v-for="(section, index) in panelBinding.panel.sections"
 			:key="`${panelBinding.projectId}:${panelBinding.key}:${index}`"
@@ -33,7 +33,15 @@
 							:disabled="control.disabled"
 							:model-value="panels.textValue(panelBinding, control)"
 							:heading-buttons="false"
-							:max-height="300"
+							:hide-formatting-buttons="
+								settings.get(moderationSettings.General.HideMarkdownFormattingButtons)
+							"
+							:max-height="240"
+							:min-height="72"
+							:placeholder="
+								control.placeholder ?? formatMessage(controlMessages.markdownPlaceholder)
+							"
+							hide-markdown-hint
 							@update:model-value="panelBinding && panels.write(panelBinding, control, $event)"
 						/>
 						<Input
@@ -65,7 +73,10 @@
 							v-else-if="control.type === 'select'"
 							:model-value="panels.selectValues(panelBinding, control)[0] ?? ''"
 							:options="[
-								{ value: '', label: control.placeholder ?? formatMessage(controlMessages.select) },
+								{
+									value: '',
+									label: control.placeholder ?? formatMessage(controlMessages.select),
+								},
 								...control.options,
 							]"
 							:placeholder="control.placeholder ?? formatMessage(controlMessages.select)"
@@ -82,7 +93,9 @@
 						<ActionButton
 							:label="control.label"
 							:keybind="keybinds.get(control)"
-							:show-keybind-hint="settings.get(moderationSettings.General.ShowToggleIssueButtonShortcutHint)"
+							:show-keybind-hint="
+								settings.get(moderationSettings.General.ShowToggleIssueButtonShortcutHint)
+							"
 							:disabled="control.disabled"
 							:model-value="panels.selected(panelBinding, control)"
 							:aria-pressed="panels.selected(panelBinding, control)"
@@ -97,10 +110,12 @@
 		{{ formatMessage(panelBinding ? messages.noIssues : messages.noReviewActions) }}
 	</p>
 	<div
-		v-if="!binding && target.kind === 'status-alerts' && panels.correctionsRequested.value"
+		v-if="!binding && target?.kind === 'status-alerts' && panels.correctionsRequested.value"
 		class="flex flex-col gap-3"
 	>
-		<p class="m-0 text-secondary">{{ formatMessage(controlMessages.corrections) }}</p>
+		<p class="m-0 text-secondary">
+			{{ formatMessage(controlMessages.corrections) }}
+		</p>
 		<p v-if="!panels.correctionPanels.value.length" class="m-0 text-orange" role="status">
 			{{ formatMessage(controlMessages.noCorrections) }}
 		</p>
@@ -112,7 +127,9 @@
 			:key="correction.key"
 			class="flex flex-col gap-2"
 		>
-			<p class="m-0 font-semibold text-contrast">{{ correction.panel.title }}</p>
+			<p class="m-0 font-semibold text-contrast">
+				{{ correction.panel.title }}
+			</p>
 			<Controls
 				:target="target"
 				:binding="correction"
@@ -138,8 +155,8 @@ import {
 } from '@modrinth/ui'
 import { type ComponentPublicInstance, computed, nextTick, useId } from 'vue'
 
-import type { ReviewTarget } from '~/providers/project-review/review'
 import { useModerationSettings } from '~/composables/moderation'
+import type { ReviewTarget } from '~/providers/project-review/review'
 import {
 	injectReviewPanels,
 	type ReviewPanelBinding,
@@ -148,7 +165,7 @@ import {
 import { projectReviewMessages as messages } from '../messages'
 
 const props = defineProps<{
-	target: ReviewTarget
+	target?: ReviewTarget
 	binding?: ReviewPanelBinding
 	keybindOffset?: number
 }>()
@@ -158,6 +175,10 @@ const emit = defineEmits<{
 }>()
 const id = useId()
 const controlMessages = defineMessages({
+	markdownPlaceholder: {
+		id: 'project-review.controls.markdown-placeholder',
+		defaultMessage: 'Explain what needs to change…',
+	},
 	corrections: {
 		id: 'project-review.controls.corrections',
 		defaultMessage: 'These corrections will be applied before sending your reply.',
@@ -182,7 +203,9 @@ const controlMessages = defineMessages({
 const { formatMessage } = useVIntl()
 const panels = injectReviewPanels()
 const settings = useModerationSettings()
-const panelBinding = computed(() => props.binding ?? panels.resolve(props.target))
+const panelBinding = computed(
+	() => props.binding ?? (props.target ? panels.resolve(props.target) : undefined),
+)
 type PanelControl = ReviewPanelBinding['panel']['sections'][number]['controls'][number]
 const fields = new Map<string, { focus: () => void }>()
 let pendingFocus: string | undefined
@@ -239,13 +262,14 @@ function toggleControls(binding?: ReviewPanelBinding) {
 		) ?? []
 	)
 }
-const keybinds = computed(() =>
-	new Map(
-		toggleControls(panelBinding.value).map((control, index) => [
-			control,
-			actionKeybind(index + (props.keybindOffset ?? 0)),
-		]),
-	),
+const keybinds = computed(
+	() =>
+		new Map(
+			toggleControls(panelBinding.value).map((control, index) => [
+				control,
+				actionKeybind(index + (props.keybindOffset ?? 0)),
+			]),
+		),
 )
 function actionKeybind(index: number) {
 	if (index >= 20) return undefined
@@ -259,9 +283,7 @@ const correctionOffsets = computed(() => {
 		return start
 	})
 })
-const hasToggles = computed(() =>
-	panelBinding.value?.panel.sections.some((section) =>
-		section.controls.some((control) => control.type === 'toggle'),
-	),
+const hasControls = computed(() =>
+	panelBinding.value?.panel.sections.some((section) => section.controls.length > 0),
 )
 </script>

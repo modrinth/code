@@ -8,30 +8,37 @@ import { issue, panel, toggle } from './component-builders/builders'
 
 export const permissionsInvalidPermissionsIssue = issue({
 	id: 'permissions-invalid-permissions',
+	title: 'Invalid permissions',
+	category: 'Permissions',
 	message: invalidPermissionsMessage,
 	suggestedStatus: 'rejected',
 })
 
 export const permissionsProhibitedExternalContentIssue = issue({
 	id: 'permissions-prohibited-external-content',
+	title: 'Prohibited external content',
+	category: 'Permissions',
 	message: prohibitedExternalContentMessage,
 	suggestedStatus: 'rejected',
 })
 
 export const permissionsMissingPermissionsIssue = issue({
 	id: 'permissions-missing-permissions',
+	title: 'Missing permissions',
+	category: 'Permissions',
 	message: missingPermissionsMessage,
 	suggestedStatus: 'rejected',
 })
 
 export const permissionsNonCommercialExternalContentIssue = issue({
 	id: 'permissions-non-commercial-external-content',
+	title: 'Non-commercial external content',
+	category: 'Permissions',
 	message: nonCommercialExternalContentMessage,
 	suggestedStatus: 'rejected',
 })
 
 export const permissionsReviewPanel = panel({
-	field: 'permissions',
 	title: 'Modpack Permissions',
 	hint: "Does this project's external content have any issues?",
 	icon: SignatureIcon,

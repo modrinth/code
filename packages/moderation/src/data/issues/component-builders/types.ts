@@ -35,6 +35,8 @@ export type WithContext<T> = T | ((ctx: ReviewContext) => T)
 
 export interface Issue {
 	id: string
+	title: string
+	category: string
 	message: WithContext<string>
 	suggestedStatus?: WithContext<ModerationStatus | undefined>
 	corrections?: WithContext<IssueCorrections>
@@ -59,6 +61,10 @@ interface IssueControlOptions {
 
 export interface IssueToggle extends IssueControlOptions {
 	type: 'toggle'
+	/** Optional label for this toggle in the issue list. */
+	issueListLabel?: WithContext<string>
+	/** Optional issue-list row for this toggle. Defaults to the toggle label. */
+	issueListGroup?: WithContext<string>
 	/**
 	 * Identifies a selection within its issue. Reuse the ID across panels to share selection state.
 	 * Without an ID, the toggle activates the issue directly and contributes no selected toggle ID.
@@ -109,7 +115,6 @@ export type IssueControl = IssueToggle | IssueMarkdown | IssueText | IssueSelect
 
 export interface Panel {
 	icon: FunctionalComponent<SVGAttributes>
-	field?: string
 	shown?: WithContext<boolean>
 	title: WithContext<string>
 	hint: WithContext<string>

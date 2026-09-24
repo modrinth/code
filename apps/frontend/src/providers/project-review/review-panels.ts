@@ -23,9 +23,9 @@ interface ResolvedIssueControlOptions {
 	tooltip?: string
 }
 
-type ResolvedIssueControl = ResolvedIssueControlOptions &
+export type ResolvedIssueControl = ResolvedIssueControlOptions &
 	(
-		| { type: 'toggle'; id?: string }
+		| { type: 'toggle'; id?: string; issueListLabel?: string; issueListGroup?: string }
 		| {
 				type: 'markdown' | 'text'
 				key: string
@@ -61,11 +61,22 @@ export interface ReviewPanelBinding {
 	projectId: string
 	panel: {
 		icon: Panel['icon']
-		field?: string
 		title: string
 		hint: string
 		sections: ResolvedPanelSection[]
 	}
+}
+
+export interface ReviewIssueControl {
+	binding: ReviewPanelBinding
+	control: ResolvedIssueControl
+}
+
+export interface ReviewIssue {
+	id: string
+	title: string
+	category: string
+	controls: ReviewIssueControl[]
 }
 
 function resolveWithContext<T>(value: WithContext<T>, context: ReviewContext): T {
@@ -183,7 +194,13 @@ export function createReviewPanels(
 					}
 					let control: ResolvedIssueControl
 					if (node.type === 'toggle') {
-						control = { ...options, type: 'toggle', id: node.id }
+						control = {
+							...options,
+							type: 'toggle',
+							id: node.id,
+							issueListLabel: resolveWithContext(node.issueListLabel, issueContext),
+							issueListGroup: resolveWithContext(node.issueListGroup, issueContext),
+						}
 					} else if (node.type === 'select') {
 						const initial = resolveWithContext(node.initial, issueContext)
 						control = {
@@ -226,7 +243,6 @@ export function createReviewPanels(
 				projectId: ProjectV3.id,
 				panel: {
 					icon: panel.icon,
-					field: panel.field,
 					title: resolveWithContext(panel.title, context),
 					hint: resolveWithContext(panel.hint, context),
 					sections,
@@ -336,18 +352,88 @@ export function createReviewPanels(
 		if (typeof value !== 'boolean') return
 		if (current.id === undefined) {
 			session.write(binding.projectId, 'issue-active', current.issueId, value || undefined)
+			updateIssueOrder(binding.projectId, current.issueId)
 			return
 		}
 		const keys = new Set(selectedToggleIds(binding.projectId, current.issueId))
 		if (value) keys.add(current.id)
 		else keys.delete(current.id)
 		session.write(binding.projectId, 'issues', current.issueId, keys.size ? keys : undefined)
+		updateIssueOrder(binding.projectId, current.issueId)
+	}
+
+	function updateIssueOrder(projectId: string, issueId: string) {
+		const active =
+			session.read(projectId, 'issue-active')[issueId] === true ||
+			selectedToggleIds(projectId, issueId).size > 0
+		const order = session.read(projectId, 'issue-order')
+		if (active && order[issueId] !== true) session.write(projectId, 'issue-order', issueId, true)
+		else if (!active && order[issueId] === true)
+			session.write(projectId, 'issue-order', issueId, undefined)
+	}
+
+	const availableIssues = computed(() => {
+		const issues = new Map<string, ReviewIssue>()
+		for (const binding of panels.value.values()) {
+			for (const section of binding.panel.sections) {
+				for (const control of section.controls) {
+					const issue: ReviewIssue = issues.get(control.issueId) ?? {
+						id: control.issueId,
+						title: control.issue.title,
+						category: control.issue.category,
+						controls: [],
+					}
+					if (
+						!issue.controls.some(
+							({ control: existing }) =>
+								existing.type === control.type &&
+								(existing.type === 'toggle' && control.type === 'toggle'
+									? existing.id === control.id
+									: existing.type !== 'toggle' &&
+										control.type !== 'toggle' &&
+										existing.key === control.key),
+						)
+					)
+						issue.controls.push({ binding, control })
+					issues.set(issue.id, issue)
+				}
+			}
+		}
+		return [...issues.values()].filter((issue) =>
+			issue.controls.some(({ control }) => control.type === 'toggle' && !control.disabled),
+		)
+	})
+
+	function addIssue(id: string) {
+		const current = project.value
+		const issue = availableIssues.value.find((issue) => issue.id === id)
+		if (!current || !issue) return
+		session.write(current.id, 'issue-active', id, true)
+		updateIssueOrder(current.id, id)
+	}
+
+	function removeIssue(id: string) {
+		if (!project.value) return
+		for (const scope of ['issue-active', 'issues', 'issue-text', 'issue-select', 'issue-order']) {
+			session.write(project.value.id, scope, id, undefined)
+		}
 	}
 
 	const activeIssues = computed(() => {
 		const ProjectV3 = project.value
 		if (!ProjectV3) return []
 		const issues = new Map<string, IssueSelection>()
+		for (const entry of availableIssues.value) {
+			if (!selectedIssueIds.value.includes(entry.id)) continue
+			issues.set(entry.id, {
+				issue: entry.controls[0].control.issue,
+				active: true,
+				keys: new Set(),
+				textValues: {},
+				selectValues: {},
+				missing: [],
+			})
+		}
 		for (const binding of panels.value.values()) {
 			for (const section of binding.panel.sections) {
 				for (const control of section.controls) {
@@ -375,8 +461,12 @@ export function createReviewPanels(
 				}
 			}
 		}
+		const order = new Map(
+			Object.keys(session.read(ProjectV3.id, 'issue-order')).map((id, index) => [id, index]),
+		)
 		return [...issues]
 			.filter(([, { active }]) => active)
+			.sort(([a], [b]) => (order.get(a) ?? -1) - (order.get(b) ?? -1))
 			.map(([id, { issue, keys, missing }]) => {
 				const context: ReviewContext = {
 					ProjectV3,
@@ -389,6 +479,13 @@ export function createReviewPanels(
 					getTextValue: (key, scope = id) => issues.get(scope)?.textValues[key] ?? '',
 					getSelectValue: (key, scope = id) => issues.get(scope)?.selectValues[key]?.[0] ?? '',
 					getSelectValues: (key, scope = id) => issues.get(scope)?.selectValues[key] ?? [],
+				}
+				const controls = availableIssues.value.find((entry) => entry.id === id)?.controls ?? []
+				if (
+					!keys.size &&
+					!controls.some(({ control }) => control.type === 'toggle' && control.id === undefined)
+				) {
+					missing.push('toggle')
 				}
 				return {
 					id,
@@ -427,6 +524,9 @@ export function createReviewPanels(
 	)
 
 	return {
+		availableIssues,
+		addIssue,
+		removeIssue,
 		resolve,
 		selected,
 		textValue,

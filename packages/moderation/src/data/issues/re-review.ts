@@ -6,6 +6,8 @@ import { issue, panel, section, toggle } from './component-builders/builders'
 
 export const reReviewIgnoredIssue = issue({
 	id: 're-review-ignored',
+	title: 'Previous review ignored',
+	category: 'Project wide',
 	message: ({ selected }) =>
 		[
 			ignoredMessage,
@@ -16,7 +18,6 @@ export const reReviewIgnoredIssue = issue({
 })
 
 export const reReviewReviewPanel = panel({
-	field: 're-review',
 	title: 'Re-Review',
 	hint: 'Did the author ignore previous review messages?',
 	icon: RefreshCwIcon,

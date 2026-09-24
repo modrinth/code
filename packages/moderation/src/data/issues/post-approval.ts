@@ -11,12 +11,16 @@ import { issue, panel, section, text, toggle } from './component-builders/builde
 
 export const postApprovalIssueWarningIssue = issue({
 	id: 'post-approval-issue-warning',
+	title: 'Post-approval issue warning',
+	category: 'Project wide',
 	message: issueWarningMessage,
 	suggestedStatus: 'approved',
 })
 
 export const postApprovalMissedDeadlineIssue = issue({
 	id: 'post-approval-missed-deadline',
+	title: 'Missed review deadline',
+	category: 'Project wide',
 	message: ({ getTextValue }) =>
 		missedDeadlineMessage.replaceAll('%STATUS%', () => getTextValue('status')),
 	suggestedStatus: 'flagged',
@@ -24,6 +28,8 @@ export const postApprovalMissedDeadlineIssue = issue({
 
 export const postApprovalMetadataIssueIssue = issue({
 	id: 'post-approval-metadata-issue',
+	title: 'Post-approval metadata issues',
+	category: 'Project wide',
 	message: ({ selected, getTextValue }) =>
 		[
 			metadataIssueMessage,
@@ -48,7 +54,6 @@ export const postApprovalMetadataIssueIssue = issue({
 })
 
 export const postApprovalReviewPanel = panel({
-	field: 'post-approval',
 	title: 'Post-Approval',
 	hint: 'Issue warnings, notices, or takedowns?',
 	icon: ScaleIcon,

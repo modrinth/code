@@ -9,6 +9,8 @@ import { issue, panel, section, toggle } from './component-builders/builders'
 
 export const licenseInvalidLinkIssue = issue({
 	id: 'license-invalid-link',
+	title: 'Invalid license link',
+	category: 'License',
 	message: ({ selected }) =>
 		[
 			invalidLinkMessage,
@@ -19,13 +21,14 @@ export const licenseInvalidLinkIssue = issue({
 
 export const licenseNoSourceIssue = issue({
 	id: 'license-no-source',
+	title: 'Missing source code',
+	category: 'License',
 	message: ({ selected }) =>
 		selected.toggleIds.includes('license-fork') ? noSourceForkMessage : noSourceMessage,
 	suggestedStatus: 'rejected',
 })
 
 export const licenseReviewPanel = panel({
-	field: 'license',
 	title: 'License',
 	hint: 'Is this license and link valid?',
 	icon: BookTextIcon,

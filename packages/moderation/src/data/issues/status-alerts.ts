@@ -14,6 +14,8 @@ import { issue, panel, toggle } from './component-builders/builders'
 
 export const statusAlertsCorrectionsAppliedIssue = issue({
 	id: 'status-alerts-corrections-applied',
+	title: 'Apply selected corrections',
+	category: 'Project wide',
 	message: ({ ProjectV3 }) =>
 		ProjectV3.status === 'approved' ? correctionsAppliedApprovedMessage : correctionsAppliedMessage,
 	suggestedStatus: 'approved',
@@ -22,6 +24,8 @@ export const statusAlertsCorrectionsAppliedIssue = issue({
 
 export const statusAlertsPrivateUseIssue = issue({
 	id: 'status-alerts-private-use',
+	title: 'Private-use project',
+	category: 'Project wide',
 	message: ({ ProjectV3 }) => {
 		const serverPack = ProjectV3.minecraft_java_server?.content?.kind === 'modpack'
 		return [
@@ -36,33 +40,42 @@ export const statusAlertsPrivateUseIssue = issue({
 
 export const statusAlertsTemporaryServerIssue = issue({
 	id: 'status-alerts-temporary-server',
+	title: 'Temporary server',
+	category: 'Project wide',
 	message: temporaryServerMessage,
 	suggestedStatus: 'flagged',
 })
 
 export const statusAlertsServerUseIssue = issue({
 	id: 'status-alerts-server-use',
+	title: 'Server-use project',
+	category: 'Project wide',
 	message: serverUseMessage,
 })
 
 export const statusAlertsAccountIssuesIssue = issue({
 	id: 'status-alerts-account-issues',
+	title: 'Account issues',
+	category: 'Project wide',
 	message: accountIssuesMessage,
 	suggestedStatus: 'rejected',
 })
 
 export const statusAlertsDemonetizedIssue = issue({
 	id: 'status-alerts-demonetized',
+	title: 'Demonetized project',
+	category: 'Project wide',
 	message: demonetizedMessage,
 })
 
 export const statusAlertsDemonetizedModpackIssue = issue({
 	id: 'status-alerts-demonetized-modpack',
+	title: 'Demonetized modpack',
+	category: 'Project wide',
 	message: demonetizedModpackMessage,
 })
 
 export const statusAlertsReviewPanel = panel({
-	field: 'status-alerts',
 	title: 'Status Alerts',
 	hint: "Is anything else affecting this project's status?",
 	icon: MegaphoneIcon,

@@ -8,24 +8,29 @@ import { rulesAiImagesIssue } from './rules'
 
 export const galleryInsufficientIssue = issue({
 	id: 'gallery-insufficient',
+	title: 'Insufficient gallery images',
+	category: 'Gallery',
 	message: insufficientMessage,
 	suggestedStatus: 'flagged',
 })
 
 export const galleryNotRelevantIssue = issue({
 	id: 'gallery-not-relevant',
+	title: 'Irrelevant gallery images',
+	category: 'Gallery',
 	message: notRelevantMessage,
 	suggestedStatus: 'flagged',
 })
 
 export const galleryShowcaseClarityIssue = issue({
 	id: 'gallery-showcase-clarity',
+	title: 'Unclear gallery showcase',
+	category: 'Gallery',
 	message: showcaseClarityMessage,
 	suggestedStatus: 'rejected',
 })
 
 export const galleryReviewPanel = panel({
-	field: 'gallery',
 	title: 'Gallery',
 	hint: "Are this project's gallery images sufficient?",
 	icon: ImageIcon,

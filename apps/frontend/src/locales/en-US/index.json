@@ -1121,6 +1121,15 @@
   "conversation-thread.error.sending-message": {
     "message": "Error sending message"
   },
+  "conversation-thread.no-issues-flagged": {
+    "message": "No issues flagged."
+  },
+  "conversation-thread.private-note.placeholder": {
+    "message": "Leave a private note for staff..."
+  },
+  "conversation-thread.private-note.tab": {
+    "message": "Private note"
+  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Reply to thread..."
   },
@@ -3005,6 +3014,12 @@
   "moderation.exclude-technical-review": {
     "message": "Exclude TR"
   },
+  "moderation.keybinds.general": {
+    "message": "General"
+  },
+  "moderation.keybinds.project-review": {
+    "message": "Project review page"
+  },
   "moderation.moderate": {
     "message": "Moderate"
   },
@@ -3170,6 +3185,9 @@
   "moderation.project-review.gameVersions": {
     "message": "Game versions"
   },
+  "moderation.project-review.generalSettings": {
+    "message": "General"
+  },
   "moderation.project-review.hashes": {
     "message": "Hashes"
   },
@@ -3182,6 +3200,9 @@
   "moderation.project-review.history": {
     "message": "History"
   },
+  "moderation.project-review.historyStub": {
+    "message": "Stub for history tab"
+  },
   "moderation.project-review.icon": {
     "message": "Icon"
   },
@@ -3193,6 +3214,9 @@
   },
   "moderation.project-review.issues": {
     "message": "Issue tracker"
+  },
+  "moderation.project-review.keybindsSettings": {
+    "message": "Keybinds"
   },
   "moderation.project-review.left": {
     "message": "Project details"
@@ -3227,15 +3251,15 @@
   "moderation.project-review.noFlagsFiles": {
     "message": "Files without flags ({count})"
   },
+  "moderation.project-review.noIssues": {
+    "message": "No issues."
+  },
   "moderation.project-review.noLicense": {
     "message": "No license URL"
   },
   "moderation.project-review.noPendingFiles": {
     "message": "No files with unresolved flags"
   },
-	"moderation.project-review.noIssues": {
-		"message": "No issues."
-	},
   "moderation.project-review.noReports": {
     "message": "No technical-review reports are available for this project"
   },
@@ -3245,8 +3269,17 @@
   "moderation.project-review.noSelectedIssues": {
     "message": "No issues added. Select issues while reviewing the project to see the message here."
   },
+  "moderation.project-review.openIcon": {
+    "message": "View enlarged project icon"
+  },
   "moderation.project-review.openImage": {
     "message": "Open image {number}"
+  },
+  "moderation.project-review.openImageInNewTab": {
+    "message": "Open image in new tab"
+  },
+  "moderation.project-review.openMemberAvatar": {
+    "message": "View enlarged avatar for {username}"
   },
   "moderation.project-review.optional": {
     "message": "Optional"
@@ -3380,11 +3413,11 @@
   "moderation.project-review.tech-review": {
     "message": "Tech Review"
   },
-	"moderation.project-review.titleAndSlug": {
-		"message": "Title and slug"
-	},
   "moderation.project-review.title": {
     "message": "Project review"
+  },
+  "moderation.project-review.titleAndSlug": {
+    "message": "Title and slug"
   },
   "moderation.project-review.total": {
     "message": "Total"
@@ -3887,11 +3920,23 @@
   "project-moderation-nags.warning": {
     "message": "Warning"
   },
+  "project-review.composer.add-note": {
+    "message": "Add private note"
+  },
+  "project-review.composer.reply": {
+    "message": "Reply"
+  },
+  "project-review.composer.reply-placeholder": {
+    "message": "Reply to thread…"
+  },
   "project-review.controls.correction-conflicts": {
     "message": "Resolve conflicting corrections before sending your reply."
   },
   "project-review.controls.corrections": {
     "message": "These corrections will be applied before sending your reply."
+  },
+  "project-review.controls.markdown-placeholder": {
+    "message": "Explain what needs to change…"
   },
   "project-review.controls.no-corrections": {
     "message": "No automatic corrections are selected."
@@ -3902,20 +3947,56 @@
   "project-review.controls.select": {
     "message": "Select an option"
   },
-  "project-review.corrections.conflicts": {
-    "message": "Resolve conflicting corrections before sending your reply."
+  "project-review.decision.approve": {
+    "message": "Approve"
   },
-  "project-review.corrections.missing-fields": {
-    "message": "Complete the required review fields before sending your reply."
+  "project-review.decision.reject": {
+    "message": "Reject"
   },
-  "project-review.corrections.project-changed": {
-    "message": "The selected project changed. Review the corrections again."
+  "project-review.decision.withhold": {
+    "message": "Withhold"
   },
-  "project-review.disclosures.unsaved": {
-    "message": "Save or reset your disclosure changes before sending a reply or changing the project status."
+  "project-review.issues.add": {
+    "message": "Issue"
   },
-  "project-review.resize-actions": {
-    "message": "Resize project actions"
+  "project-review.issues.add-option": {
+    "message": "Add issue option"
+  },
+  "project-review.issues.choose-option": {
+    "message": "Choose at least one option for this issue."
+  },
+  "project-review.issues.empty": {
+    "message": "No issues flagged."
+  },
+  "project-review.issues.field-option": {
+    "message": "{field}: {option}"
+  },
+  "project-review.issues.message": {
+    "message": "Message for {issue}"
+  },
+  "project-review.issues.no-results": {
+    "message": "No matching issues."
+  },
+  "project-review.issues.remove": {
+    "message": "Remove {issue}"
+  },
+  "project-review.issues.remove-option": {
+    "message": "Remove {option}"
+  },
+  "project-review.issues.reset-message": {
+    "message": "Reset message"
+  },
+  "project-review.issues.search": {
+    "message": "Search issues…"
+  },
+  "project-review.resize-checks": {
+    "message": "Resize project checks"
+  },
+  "project-review.right-panel.issues": {
+    "message": "Issues"
+  },
+  "project-review.right-panel.thread": {
+    "message": "Thread"
   },
   "project-type.collection.plural": {
     "message": "Collections"
@@ -4622,6 +4703,9 @@
   "project.settings.permissions.attention-needed.title": {
     "message": "Unknown external content"
   },
+  "project.settings.permissions.awaiting-review-count": {
+    "message": "{count, plural, =0 {None awaiting review} other {# awaiting review}}"
+  },
   "project.settings.permissions.bad-proof.description": {
     "message": "Modrinth's moderation team has rejected the permission information you provided for some external content. Please review the rejected items below and provide acceptable proof or remove the content."
   },
@@ -4676,6 +4760,9 @@
   "project.settings.permissions.learn-more": {
     "message": "Learn more"
   },
+  "project.settings.permissions.no-permission-count": {
+    "message": "{count} with no permission"
+  },
   "project.settings.permissions.no-results": {
     "message": "No external files match your search."
   },
@@ -4699,6 +4786,9 @@
   },
   "project.settings.permissions.sort.status": {
     "message": "Status"
+  },
+  "project.settings.permissions.user-action-count": {
+    "message": "{count} need user action"
   },
   "project.settings.server.bedrock-address-label": {
     "message": "Bedrock address"

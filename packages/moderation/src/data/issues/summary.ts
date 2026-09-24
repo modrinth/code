@@ -9,36 +9,45 @@ import { issue, panel, section, toggle } from './component-builders/builders'
 
 export const insufficientSummaryIssue = issue({
 	id: 'summary-insufficient',
+	title: 'Insufficient summary',
+	category: 'Summary',
 	suggestedStatus: 'flagged',
 	message: insufficient,
 })
 
 export const summaryRepeatsTitleIssue = issue({
 	id: 'summary-repeat-title',
+	title: 'Summary repeats the title',
+	category: 'Summary',
 	suggestedStatus: 'flagged',
 	message: repeatTitle,
 })
 
 export const summaryFormattingIssue = issue({
 	id: 'summary-formatting',
+	title: 'Invalid summary formatting',
+	category: 'Summary',
 	suggestedStatus: 'flagged',
 	message: formatting,
 })
 
 export const nonEnglishSummaryIssue = issue({
 	id: 'summary-non-english',
+	title: 'Non-English summary',
+	category: 'Summary',
 	suggestedStatus: 'flagged',
 	message: nonEnglish,
 })
 
 export const summaryRepeatsIpIssue = issue({
 	id: 'summary-repeat-ip',
+	title: 'Summary repeats the server address',
+	category: 'Summary',
 	suggestedStatus: 'flagged',
 	message: repeatIp,
 })
 
 export const summaryReviewPanel = panel({
-	field: 'summary',
 	title: 'Summary',
 	hint: "Is the project's summary sufficient?",
 	icon: AlignLeftIcon,

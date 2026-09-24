@@ -219,10 +219,10 @@
 			</div>
 		</div>
 	</NewModal>
-	<div class="block grow w-full">
+	<div class="block box-border min-w-0 grow w-full p-1">
 		<div class="editor-action-row w-full">
 			<div class="w-full flex justify-between items-center flex-wrap gap-2">
-				<div class="editor-actions">
+				<div v-if="!hideFormattingButtons" class="editor-actions">
 					<template
 						v-for="(buttonGroup, _i) in Object.values(BUTTONS).filter((bg) => bg.display)"
 						:key="_i"
@@ -328,7 +328,17 @@ import {
 } from '@modrinth/assets'
 import { markdownCommands, modrinthMarkdownEditorKeymap } from '@modrinth/utils/codemirror'
 import { renderHighlightedString } from '@modrinth/utils/highlightjs/index'
-import { type Component, computed, nextTick, onBeforeUnmount, onMounted, ref, toRef, useId, watch } from 'vue'
+import {
+	type Component,
+	computed,
+	nextTick,
+	onBeforeUnmount,
+	onMounted,
+	ref,
+	toRef,
+	useId,
+	watch,
+} from 'vue'
 
 import Button from '#ui/components/base/buttons/Button.vue'
 import IconButton from '#ui/components/base/buttons/IconButton.vue'
@@ -546,6 +556,7 @@ const props = withDefaults(
 		modelValue: string
 		disabled?: boolean
 		headingButtons?: boolean
+		hideFormattingButtons?: boolean
 		initialPreview?: boolean
 		hideMarkdownHint?: boolean
 		/**
@@ -562,6 +573,7 @@ const props = withDefaults(
 		modelValue: '',
 		disabled: false,
 		headingButtons: true,
+		hideFormattingButtons: false,
 		initialPreview: false,
 		hideMarkdownHint: false,
 		onImageUpload: undefined,
@@ -697,6 +709,7 @@ onMounted(() => {
 
 	const editorState = EditorState.create({
 		extensions: [
+			EditorView.lineWrapping,
 			eventHandlers,
 			updateListener,
 			keymap.of([indentWithTab]),
@@ -1209,5 +1222,9 @@ function openVideoModal() {
 	opacity: 0.6;
 	pointer-events: none;
 	cursor: not-allowed;
+}
+
+:deep(.cm-line) {
+	padding: 0 !important;
 }
 </style>

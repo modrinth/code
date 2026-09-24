@@ -31,36 +31,48 @@ import { issue, markdown, panel, section, toggle } from './component-builders/bu
 
 export const rulesPaidAccessServerIssue = issue({
 	id: 'rules-paid-access-server',
+	title: 'Paid access server',
+	category: 'Project wide',
 	message: paidAccessServerMessage,
 	suggestedStatus: 'rejected',
 })
 
 export const rulesCheatOrHackAdvertisingIssue = issue({
 	id: 'rules-cheat-or-hack-advertising',
+	title: 'Cheat or hack advertising',
+	category: 'Project wide',
 	message: cheatOrHackAdvertisingMessage,
 	suggestedStatus: 'rejected',
 })
 
 export const rulesServerSideOptOutIssue = issue({
 	id: 'rules-server-side-opt-out',
+	title: 'Server-side opt-out required',
+	category: 'Project wide',
 	message: serverSideOptOutMessage,
 	suggestedStatus: 'flagged',
 })
 
 export const rulesExcessiveLanguagesIssue = issue({
 	id: 'rules-excessive-languages',
+	title: 'Excessive languages',
+	category: 'Project wide',
 	message: excessiveLanguagesMessage,
 	suggestedStatus: 'flagged',
 })
 
 export const rulesAiGeneratedIssue = issue({
 	id: 'rules-ai-generated',
+	title: 'AI-generated content',
+	category: 'Project wide',
 	message: aiGeneratedMessage,
 	suggestedStatus: 'flagged',
 })
 
 export const rulesAiImagesIssue = issue({
 	id: 'rules-ai-images',
+	title: 'Prohibited images',
+	category: 'Project wide',
 	message: aiImagesMessage,
 	suggestedStatus: 'flagged',
 })
@@ -82,6 +94,8 @@ const prohibitedContentMessages: Record<string, string> = {
 
 export const rulesProhibitedContentIssue = issue({
 	id: 'rules-prohibited-content',
+	title: 'Prohibited content',
+	category: 'Project wide',
 	message: ({ selected }) =>
 		[
 			prohibitedContentHeaderMessage,
@@ -103,6 +117,8 @@ const serverSideOptInMessages: Record<string, string> = {
 
 export const rulesServerSideOptInIssue = issue({
 	id: 'rules-server-side-opt-in',
+	title: 'Server-side opt-in required',
+	category: 'Project wide',
 	message: ({ selected }) =>
 		[
 			serverSideOptInHeaderMessage,
@@ -115,13 +131,14 @@ export const rulesServerSideOptInIssue = issue({
 
 export const rulesRuleBreakingOtherIssue = issue({
 	id: 'rules-rule-breaking-other',
+	title: 'Other content rule violation',
+	category: 'Project wide',
 	message: ({ getMarkdownValue }) =>
 		ruleBreakingOtherMessage.replaceAll('%MESSAGE%', () => getMarkdownValue('message')),
 	suggestedStatus: 'rejected',
 })
 
 export const rulesReviewPanel = panel({
-	field: 'rules',
 	title: 'Rule Following',
 	hint: 'Does this project violate the rules?',
 	icon: ListBulletedIcon,

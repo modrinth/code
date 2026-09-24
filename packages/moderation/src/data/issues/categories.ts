@@ -9,6 +9,8 @@ const resolutionTags = new Set(['8x-', '16x', '32x', '48x', '64x', '128x', '256x
 
 export const categoriesInaccurateIssue = issue({
 	id: 'categories-inaccurate',
+	title: 'Inaccurate tags',
+	category: 'Tags',
 	message: ({ selected }) =>
 		[
 			inaccurateMessage,
@@ -32,7 +34,6 @@ export const categoriesInaccurateIssue = issue({
 })
 
 export const categoriesReviewPanel = panel({
-	field: 'categories',
 	title: 'Tags',
 	hint: "Are the project's tags accurate?",
 	icon: TagsIcon,

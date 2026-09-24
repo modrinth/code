@@ -4,14 +4,13 @@
 		ref="actionsElement"
 		class="relative flex min-h-0 min-w-0 shrink-0 flex-col border-0 border-b border-solid border-divider"
 		:style="{
-			height: actionsHeight === null ? undefined : `${actionsHeight}px`,
-			maxHeight:
-				actionsHeight === null
-					? 'min(400px, max(80px, calc(100% - 300px)))'
-					: 'max(80px, calc(100% - 300px))',
+			height: `${actionsHeight ?? 218}px`,
+			maxHeight: 'max(80px, calc(100% - 300px))',
 		}"
 	>
-		<div class="-mx-1 flex min-h-0 min-w-0 flex-col gap-4 overflow-y-auto overscroll-contain px-1 pt-1 pb-4">
+		<div
+			class="-mx-1 flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-1 pb-4 pt-1"
+		>
 			<Tabs
 				:value="selectedTarget"
 				:tabs="tabs"
@@ -61,8 +60,8 @@ import ReviewPanel from './review-panel/index.vue'
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	resizeActions: {
-		id: 'project-review.resize-actions',
-		defaultMessage: 'Resize project actions',
+		id: 'project-review.resize-checks',
+		defaultMessage: 'Resize project checks',
 	},
 })
 const actionsElement = ref<HTMLElement | null>(null)

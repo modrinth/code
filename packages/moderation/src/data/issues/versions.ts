@@ -18,24 +18,32 @@ import { issue, panel, section, select, text, toggle } from './component-builder
 
 export const versionsIncorrectAdditionalFilesIssue = issue({
 	id: 'versions-incorrect-additional-files',
+	title: 'Incorrect additional files',
+	category: 'Versions',
 	message: incorrectAdditionalFilesMessage,
 	suggestedStatus: 'flagged',
 })
 
 export const versionsVanillaAssetsIssue = issue({
 	id: 'versions-vanilla-assets',
+	title: 'Vanilla assets',
+	category: 'Versions',
 	message: vanillaAssetsMessage,
 	suggestedStatus: 'rejected',
 })
 
 export const versionsRedistLibsIssue = issue({
 	id: 'versions-redist-libs',
+	title: 'Redistributed libraries',
+	category: 'Versions',
 	message: redistLibsMessage,
 	suggestedStatus: 'rejected',
 })
 
 export const versionsDuplicatePrimaryFilesIssue = issue({
 	id: 'versions-duplicate-primary-files',
+	title: 'Duplicate primary files',
+	category: 'Versions',
 	message: duplicatePrimaryFilesMessage,
 	suggestedStatus: 'flagged',
 })
@@ -48,6 +56,8 @@ const incorrectProjectTypeMessages: Record<string, string> = {
 
 export const versionsIncorrectProjectTypeIssue = issue({
 	id: 'versions-incorrect-project-type',
+	title: 'Incorrect project type',
+	category: 'Versions',
 	message: ({ getSelectValue }) => incorrectProjectTypeMessages[getSelectValue('type')] ?? '',
 	suggestedStatus: 'rejected',
 })
@@ -63,19 +73,22 @@ const alternateVersionsMessages: Record<string, string> = {
 
 export const versionsAlternateVersionsIssue = issue({
 	id: 'versions-alternate-versions',
+	title: 'Alternate versions',
+	category: 'Versions',
 	message: ({ getSelectValue }) => alternateVersionsMessages[getSelectValue('distribution')] ?? '',
 	suggestedStatus: 'rejected',
 })
 
 export const versionsUnsupportedIssue = issue({
 	id: 'versions-unsupported',
+	title: 'Unsupported versions',
+	category: 'Versions',
 	message: ({ getTextValue }) =>
 		unsupportedMessage.replaceAll('%INVALID_TYPE%', () => getTextValue('invalid-type')),
 	suggestedStatus: 'rejected',
 })
 
 export const versionsReviewPanel = panel({
-	field: 'versions',
 	title: 'Versions',
 	hint: "Are this project's files correct?",
 	icon: VersionIcon,
@@ -100,7 +113,10 @@ export const versionsReviewPanel = panel({
 		issue: versionsDuplicatePrimaryFilesIssue,
 		label: 'Duplicate Primary Files',
 	}),
-	toggle({ issue: versionsIncorrectProjectTypeIssue, label: 'Incorrect Project Type' }),
+	toggle({
+		issue: versionsIncorrectProjectTypeIssue,
+		label: 'Incorrect Project Type',
+	}),
 	section({
 		shown: (ctx) => ctx.selected.issueIds.includes(versionsIncorrectProjectTypeIssue.id),
 	}).content(
@@ -117,7 +133,10 @@ export const versionsReviewPanel = panel({
 			],
 		}),
 	),
-	toggle({ issue: versionsAlternateVersionsIssue, label: 'Alternate Versions' }),
+	toggle({
+		issue: versionsAlternateVersionsIssue,
+		label: 'Alternate Versions',
+	}),
 	section({
 		shown: (ctx) => ctx.selected.issueIds.includes(versionsAlternateVersionsIssue.id),
 	}).content(
