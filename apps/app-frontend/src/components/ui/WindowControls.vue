@@ -26,7 +26,7 @@
 			<IconButton
 				type="quiet"
 				label="Close window"
-				class="relative expanded-button close-button"
+				class="relative expanded-button close-button hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)]"
 				@click="handleClose"
 			>
 				<XIcon />
