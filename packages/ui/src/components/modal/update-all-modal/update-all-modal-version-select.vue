@@ -85,7 +85,7 @@ function channelFor(versionId: string) {
 	<div
 		v-else
 		v-tooltip="tooltip"
-		class="flex min-h-8 min-w-0 items-center gap-1.5 px-3 text-sm font-medium text-contrast"
+		class="flex min-h-8 min-w-0 items-center gap-1.5 pl-3 text-sm font-medium text-contrast"
 	>
 		<VersionChannelIndicator
 			v-if="version.version_type"

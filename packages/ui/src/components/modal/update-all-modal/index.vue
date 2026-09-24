@@ -2,8 +2,8 @@
 import {
 	CircleAlertIcon,
 	DownloadIcon,
-	FileTextIcon,
 	PanelRightCloseIcon,
+	PanelRightOpenIcon,
 	RightArrowIcon,
 	SpinnerIcon,
 	XIcon,
@@ -364,7 +364,7 @@ defineExpose({ show, hide })
 									:class="[
 										index % 2 ? 'bg-surface-1.5' : 'bg-surface-2',
 										row.version && !controlsDisabled
-											? 'cursor-pointer transition-colors hover:bg-surface-3'
+											? 'cursor-pointer transition-[filter] hover:brightness-[--hover-brightness]'
 											: '',
 									]"
 									@mouseenter="preloadChangelog(row.id)"
@@ -442,20 +442,22 @@ defineExpose({ show, hide })
 										class="px-4 py-3"
 									>
 										<div class="flex justify-end">
-											<IconButton
+											<Button
 												v-tooltip="
 													formatMessage(messages.viewChangelog, { project: row.project.title })
 												"
 												size="sm"
-												:label="
+												class="!px-3"
+												:aria-label="
 													formatMessage(messages.viewChangelog, { project: row.project.title })
 												"
 												:disabled="!row.version || controlsDisabled"
 												@focus="preloadChangelog(row.id)"
 												@click="openChangelog(row.id)"
 											>
-												<FileTextIcon aria-hidden="true" />
-											</IconButton>
+												<PanelRightOpenIcon aria-hidden="true" />
+												{{ formatMessage(messages.view) }}
+											</Button>
 										</div>
 									</td>
 								</tr>
@@ -471,7 +473,7 @@ defineExpose({ show, hide })
 									:aria-label="row.project.title"
 									:class="
 										row.version && !controlsDisabled
-											? 'cursor-pointer transition-colors hover:bg-surface-3'
+											? 'cursor-pointer transition-[filter] hover:brightness-[--hover-brightness]'
 											: ''
 									"
 									@mouseenter="preloadChangelog(row.id)"
@@ -503,18 +505,22 @@ defineExpose({ show, hide })
 										>
 											{{ row.project.title }}
 										</button>
-										<IconButton
+										<Button
 											v-tooltip="
 												formatMessage(messages.viewChangelog, { project: row.project.title })
 											"
-											size="md"
-											:label="formatMessage(messages.viewChangelog, { project: row.project.title })"
+											size="sm"
+											class="!px-3"
+											:aria-label="
+												formatMessage(messages.viewChangelog, { project: row.project.title })
+											"
 											:disabled="!row.version || controlsDisabled"
 											@focus="preloadChangelog(row.id)"
 											@click="openChangelog(row.id)"
 										>
-											<FileTextIcon aria-hidden="true" />
-										</IconButton>
+											<PanelRightOpenIcon aria-hidden="true" />
+											{{ formatMessage(messages.view) }}
+										</Button>
 									</div>
 									<div class="mt-4 flex min-w-0 flex-col gap-3">
 										<div class="min-w-0">
@@ -588,9 +594,18 @@ defineExpose({ show, hide })
 						}}
 					</div>
 					<div
-						class="grid min-h-[68px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-0 border-b border-solid border-surface-5 p-4 @[560px]:flex @[560px]:flex-wrap"
+						class="grid min-h-[68px] grid-cols-[auto_minmax(0,1fr)] items-center gap-3 border-0 border-b border-solid border-surface-5 p-4 @[560px]:flex @[560px]:flex-wrap"
 					>
-						<div class="order-1 flex min-w-0 items-center gap-2 @[560px]:flex-1">
+						<IconButton
+							v-tooltip="formatMessage(messages.closeChangelog)"
+							type="quiet"
+							size="sm"
+							:label="formatMessage(messages.closeChangelog)"
+							@click="closeChangelog"
+						>
+							<PanelRightCloseIcon aria-hidden="true" />
+						</IconButton>
+						<div class="flex min-w-0 items-center gap-2 @[560px]:flex-1">
 							<Avatar :src="activeRow.project.icon_url" size="36px" class="!rounded-lg" />
 							<UpdateAllModalTruncatedProjectTitle
 								:id="changelogHeadingId"
@@ -603,9 +618,7 @@ defineExpose({ show, hide })
 								class="m-0 min-w-0 flex-1 truncate text-xl font-semibold text-contrast focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow"
 							/>
 						</div>
-						<div
-							class="order-3 col-span-2 flex min-w-0 items-center gap-2 @[560px]:order-2 @[560px]:col-span-1"
-						>
+						<div class="col-span-2 flex min-w-0 items-center gap-2 @[560px]:col-span-1">
 							<div
 								class="min-w-0 flex-1 @[560px]:flex-none"
 								:class="activeRow.versions.length > 1 ? '@[560px]:w-[220px]' : ''"
@@ -622,16 +635,6 @@ defineExpose({ show, hide })
 								/>
 							</div>
 						</div>
-						<IconButton
-							v-tooltip="formatMessage(messages.closeChangelog)"
-							type="quiet"
-							size="sm"
-							class="order-2 @[560px]:order-3"
-							:label="formatMessage(messages.closeChangelog)"
-							@click="closeChangelog"
-						>
-							<PanelRightCloseIcon aria-hidden="true" />
-						</IconButton>
 					</div>
 					<div
 						:key="activeRow.version.id"

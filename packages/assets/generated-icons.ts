@@ -235,6 +235,7 @@ import _PageRoundIcon from './icons/page-round.svg?component'
 import _PaintbrushIcon from './icons/paintbrush.svg?component'
 import _PaletteIcon from './icons/palette.svg?component'
 import _PanelRightCloseIcon from './icons/panel-right-close.svg?component'
+import _PanelRightOpenIcon from './icons/panel-right-open.svg?component'
 import _PauseIcon from './icons/pause.svg?component'
 import _PencilIcon from './icons/pencil.svg?component'
 import _PickaxeIcon from './icons/pickaxe.svg?component'
@@ -702,6 +703,7 @@ export const PageRoundIcon = _PageRoundIcon
 export const PaintbrushIcon = _PaintbrushIcon
 export const PaletteIcon = _PaletteIcon
 export const PanelRightCloseIcon = _PanelRightCloseIcon
+export const PanelRightOpenIcon = _PanelRightOpenIcon
 export const PauseIcon = _PauseIcon
 export const PencilIcon = _PencilIcon
 export const PickaxeIcon = _PickaxeIcon

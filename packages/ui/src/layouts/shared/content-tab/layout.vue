@@ -1069,6 +1069,11 @@ function promptUpdateAll() {
 	void openUpdateAll(ctx.items.value)
 }
 
+function cancelUpdateAll() {
+	++updateAllRequestId
+	loadingUpdateAll.value = false
+}
+
 function promptUpdateSelected() {
 	void openUpdateAll(selectedItems.value)
 }
@@ -1603,10 +1608,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:action-disabled="ctx.isBusy.value"
 			@changelog="loadUpdateAllChangelog"
 			@preload-changelog="preloadUpdateAllChangelog"
-			@cancel="
-				++updateAllRequestId
-				loadingUpdateAll = false
-			"
+			@cancel="cancelUpdateAll"
 			@update="updateAllSelected"
 		/>
 		<ConfirmUnlinkModal

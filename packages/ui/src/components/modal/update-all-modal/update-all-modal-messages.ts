@@ -41,6 +41,10 @@ export const messages = defineMessages({
 		id: 'update-all-modal.view-changelog',
 		defaultMessage: 'View changelog for {project}',
 	},
+	view: {
+		id: 'update-all-modal.view',
+		defaultMessage: 'View',
+	},
 	changelogFor: {
 		id: 'update-all-modal.changelog-for',
 		defaultMessage: 'Changelog for {project}',
