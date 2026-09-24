@@ -294,6 +294,13 @@ async fn apply_shared_instance_update_inner(
     .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     let plan = SharedInstanceApplyPlan::build(&metadata, data, state).await?;
 
+    if !plan.configuration_changed && data.linked_server.is_some() {
+        crate::api::instance::synced_servers::discard_modpack_servers(
+            instance_id,
+        )
+        .await?;
+    }
+
     if plan.configuration_changed {
         crate::api::instance::prepare_instance_update(instance_id).await?;
         remove_existing_shared_instance_content(instance_id, state).await?;
@@ -656,6 +663,7 @@ async fn apply_shared_instance_content_inner(
             instance_id.to_string(),
             DownloadReason::Modpack,
             &state.pool,
+            data.linked_server.is_some(),
         )
         .await?;
     } else {
@@ -702,6 +710,12 @@ async fn apply_shared_instance_content_inner(
             state,
         )
         .await?;
+        if data.linked_server.is_some() {
+            crate::api::instance::synced_servers::discard_modpack_servers(
+                instance_id,
+            )
+            .await?;
+        }
     }
 
     if !data.modrinth_ids.is_empty() || !data.external_files.is_empty() {

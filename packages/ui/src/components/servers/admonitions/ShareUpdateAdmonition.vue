@@ -36,22 +36,12 @@ const messages = defineMessages({
 	<Admonition type="info" :header="formatMessage(messages.unpublished)" inline-actions>
 		{{ formatMessage(messages.unpublishedBody) }}
 		<template #actions>
-			<Button
-				type="colored"
-				color="blue"
-				size="lg"
-				:disabled="disabled"
-				@click="emit('review')"
-			>
+			<Button type="colored" color="blue" size="lg" :disabled="disabled" @click="emit('review')">
 				<SpinnerIcon v-if="publishing || reviewing" class="animate-spin" aria-hidden="true" />
 				<UploadIcon v-else aria-hidden="true" />
 				{{
 					formatMessage(
-						publishing
-							? messages.publishing
-							: reviewing
-								? messages.reviewing
-								: messages.pushUpdate,
+						publishing ? messages.publishing : reviewing ? messages.reviewing : messages.pushUpdate,
 					)
 				}}
 			</Button>

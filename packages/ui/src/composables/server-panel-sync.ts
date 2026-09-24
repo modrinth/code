@@ -391,7 +391,7 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 			disabled_server: item.disabled_server ?? current?.disabled_server ?? false,
 			disabled_player: item.disabled_player ?? current?.disabled_player ?? false,
 			side_toggle_unlocked: item.side_toggle_unlocked ?? current?.side_toggle_unlocked ?? false,
-				manifest: item.manifest === undefined ? (current?.manifest ?? null) : item.manifest,
+			manifest: item.manifest === undefined ? (current?.manifest ?? null) : item.manifest,
 			kind: parentDirectoryToAddonKind(item.parent_directory),
 			from_modpack: item.from_modpack,
 			status: item.status,

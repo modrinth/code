@@ -1124,6 +1124,7 @@ async fn run_request_inner(
                 instance_id.clone(),
                 DownloadReason::Modpack,
                 &state.pool,
+                false,
             )
             .await?;
             apply_post_install_edit(&instance_id, post_install_edit, state)
@@ -1294,6 +1295,7 @@ async fn run_request_inner(
                 instance_id.clone(),
                 DownloadReason::Modpack,
                 &state.pool,
+                false,
             )
             .await?;
             restore_disabled_projects(
@@ -1569,6 +1571,7 @@ pub(super) fn install_pack<'a>(
     instance_id: String,
     reason: DownloadReason,
     pool: &'a SqlitePool,
+    ignore_modpack_servers: bool,
 ) -> impl Future<Output = crate::Result<()>> + Send + 'a {
     Box::pin(install_pack_inner(
         job_id,
@@ -1577,6 +1580,7 @@ pub(super) fn install_pack<'a>(
         instance_id,
         reason,
         pool,
+        ignore_modpack_servers,
     ))
 }
 
@@ -1587,6 +1591,7 @@ async fn install_pack_inner(
     instance_id: String,
     reason: DownloadReason,
     pool: &SqlitePool,
+    ignore_modpack_servers: bool,
 ) -> crate::Result<()> {
     let reporter =
         InstallProgressReporter::new(job_id, job_state.clone(), pool.clone());
@@ -1641,6 +1646,7 @@ async fn install_pack_inner(
         false,
         reason,
         reporter,
+        ignore_modpack_servers,
     )
     .await?;
 
