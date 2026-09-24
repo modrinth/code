@@ -706,13 +706,26 @@ pub(super) async fn apply_shared_instance_content(
             content_change_count,
         )
         .await?;
+        let versions_by_id =
+            shared_instance_versions_by_id(&data.modrinth_ids, state).await?;
         let mut completed_content_changes = 0;
         for version_id in &data.modrinth_ids {
-            crate::state::instances::commands::add_project_from_version(
+            let version = versions_by_id.get(version_id).ok_or_else(|| {
+                crate::ErrorKind::InputError(format!(
+                    "Shared instance version {version_id} was not found"
+                ))
+            })?;
+            let downloaded = crate::state::instances::commands::download_project_version_with_metadata(
                 instance_id,
-                version_id,
+                version,
                 DownloadReason::Standalone,
                 None,
+                state,
+            )
+            .await?;
+            crate::state::instances::commands::add_downloaded_project_version(
+                instance_id,
+                downloaded,
                 ContentSourceKind::SharedInstance,
                 state,
             )

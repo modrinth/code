@@ -9,6 +9,7 @@ import {
 	list_synced_screenshots,
 } from '@/helpers/instance'
 import { loadInstanceContentData } from '@/helpers/instance-content'
+import { install_get_shared_instance_update_preview } from '@/helpers/install'
 import { get_by_instance_id } from '@/helpers/process'
 import { refreshWorlds } from '@/helpers/worlds'
 
@@ -33,8 +34,10 @@ export const instanceKeys = {
 	linkedProject: (projectId: string) => ['project', 'v3', projectId] as const,
 	sharedEligibility: (userId: string | null | undefined) =>
 		['shared-instance-eligibility', userId] as const,
+	sharedUpdatePreviews: (instanceId: string) =>
+		[...instanceKeys.detail(instanceId), 'shared-update-preview'] as const,
 	sharedUpdatePreview: (instanceId: string, userId: string | null | undefined) =>
-		[...instanceKeys.detail(instanceId), 'shared-update-preview', userId] as const,
+		[...instanceKeys.sharedUpdatePreviews(instanceId), userId] as const,
 	sharedMembers: (instanceId: string) => ['sharedInstanceUsers', instanceId] as const,
 }
 
@@ -98,6 +101,19 @@ export function instanceProcessesQueryOptions(instanceId: string) {
 			return Array.isArray(processes) ? processes : []
 		},
 		staleTime: 0,
+	})
+}
+
+export function sharedInstanceUpdatePreviewQueryOptions(
+	instanceId: string,
+	userId: string | null | undefined,
+) {
+	return queryOptions({
+		queryKey: instanceKeys.sharedUpdatePreview(instanceId, userId),
+		queryFn: () => install_get_shared_instance_update_preview(instanceId),
+		retry: false,
+		staleTime: 30_000,
+		refetchOnWindowFocus: false,
 	})
 }
 
