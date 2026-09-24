@@ -98,6 +98,8 @@ pub(super) struct InstanceInviteInfoResponse {
     #[serde(default)]
     pub(super) instance_icon: Option<String>,
     #[serde(default)]
+    pub(super) inviter: Option<SharedInstanceInviteCreator>,
+    #[serde(default)]
     pub(super) managers: Vec<InstanceInviteManagerResponse>,
 }
 

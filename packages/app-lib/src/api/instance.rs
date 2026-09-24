@@ -80,7 +80,8 @@ pub(crate) use self::shared::{
 };
 pub use self::shared::{
     SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
-    SharedInstanceInvite, SharedInstanceInviteInstallPreview,
+    SharedInstanceInvite, SharedInstanceInviteCreator,
+    SharedInstanceInviteInstallPreview,
     SharedInstanceInviteLink, SharedInstanceJoinType,
     SharedInstancePublishPreview, SharedInstanceUpdateDiff,
     SharedInstanceUpdateDiffType, SharedInstanceUpdatePreview,
