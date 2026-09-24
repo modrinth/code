@@ -43,18 +43,18 @@ import { handleSevereError } from '@/composables/use-error.js'
 import { toError } from '@/helpers/errors'
 import {
 	install_get_shared_instance_preview,
-	install_get_shared_instance_update_preview,
 	install_job_list,
 	install_shared_instance,
 	install_update_shared_instance,
 	installJobInstanceId,
+	type SharedInstanceUpdatePreview,
 	wait_for_install_job,
 } from '@/helpers/install'
 import { get, list } from '@/helpers/instance'
 import { get as getCredentials, type ModrinthAuthFlow } from '@/helpers/mr_auth'
 import { get_by_instance_id } from '@/helpers/process'
 import { ensureManagedServerWorldExists, start_join_server } from '@/helpers/worlds'
-import { instanceKeys } from '@/pages/instance/query-options'
+import { instanceKeys, sharedInstanceUpdatePreviewQueryOptions } from '@/pages/instance/query-options'
 import { injectAppEvents } from '@/providers/app-events'
 
 type LaunchTarget = ServerPlayTarget & {
@@ -158,13 +158,21 @@ async function playExisting(
 ) {
 	if (existing.quarantined || existing.install_stage !== 'installed')
 		throw new Error(formatMessage(messages.notReady))
+	const previewKey = instanceKeys.sharedUpdatePreview(existing.id, target.userId)
+	if (!approveUpdate)
+		await queryClient.invalidateQueries({ queryKey: previewKey, refetchType: 'none' })
 	await openAndLaunch(existing.id, async () => {
 		await assertAccount(target)
 		if (approveUpdate) {
 			const job = await install_update_shared_instance(existing.id)
 			await wait_for_install_job(appEvents, job.job_id)
+			await queryClient.invalidateQueries({ queryKey: previewKey })
 		} else {
-			const preview = await install_get_shared_instance_update_preview(existing.id)
+			const preview = await instanceLaunch.runPreviewCheck(existing.id, () =>
+				queryClient.fetchQuery(
+					sharedInstanceUpdatePreviewQueryOptions(existing.id, target.userId),
+				),
+			)
 			await assertAccount(target)
 			if (preview?.updateAvailable) {
 				showUpdate(target, existing.id, preview)
@@ -198,7 +206,7 @@ const launchMutation = useMutation({
 			)
 			const installedId = installJobInstanceId(job)
 			if (!installedId) throw new Error(formatMessage(messages.notReady))
-			await queryClient.invalidateQueries({ queryKey: ['instances'] })
+			await queryClient.invalidateQueries({ queryKey: instanceKeys.list() })
 			await wait_for_install_job(appEvents, job.job_id)
 			await assertAccount(target)
 			popupNotificationManager.addPopupNotification({
@@ -216,12 +224,16 @@ const launchMutation = useMutation({
 		}
 	},
 	onError: (error) => handleError(toError(error)),
-	onSettled: () => queryClient.invalidateQueries({ queryKey: ['instances'] }),
+	onSettled: () =>
+		queryClient.invalidateQueries({
+			queryKey: instanceKeys.all,
+			predicate: (query) => !query.queryKey.includes('shared-update-preview'),
+		}),
 })
 function showUpdate(
 	target: LaunchTarget,
 	instanceId: string,
-	preview: NonNullable<Awaited<ReturnType<typeof install_get_shared_instance_update_preview>>>,
+	preview: SharedInstanceUpdatePreview,
 ) {
 	pendingUpdate.value = { target, instanceId }
 	updateDiffs.value = preview.diffs.map((diff) => ({

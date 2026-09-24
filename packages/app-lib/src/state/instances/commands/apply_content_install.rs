@@ -395,16 +395,6 @@ pub(crate) async fn download_project_version_with_progress(
     state: &State,
     progress: Option<&mut fetch::FetchProgressFn<'_>>,
 ) -> crate::Result<DownloadedProjectVersion> {
-    let scope = resolve_content_scope(instance_id, None, state).await?;
-    let content_set =
-        content_rows::get_content_set(&scope.content_set_id, &state.pool)
-            .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError(format!(
-                    "Unknown content set {}",
-                    scope.content_set_id
-                ))
-            })?;
     let version = CachedEntry::get_version(
         version_id,
         None,
@@ -417,6 +407,54 @@ pub(crate) async fn download_project_version_with_progress(
             "Unable to install version id {version_id}. Not found."
         ))
     })?;
+    download_project_version_with_metadata_and_progress(
+        instance_id,
+        &version,
+        reason,
+        dependent_on_version_id,
+        state,
+        progress,
+    )
+    .await
+}
+
+pub(crate) async fn download_project_version_with_metadata(
+    instance_id: &str,
+    version: &Version,
+    reason: DownloadReason,
+    dependent_on_version_id: Option<String>,
+    state: &State,
+) -> crate::Result<DownloadedProjectVersion> {
+	download_project_version_with_metadata_and_progress(
+		instance_id,
+		version,
+		reason,
+		dependent_on_version_id,
+		state,
+		None,
+	)
+	.await
+}
+
+async fn download_project_version_with_metadata_and_progress(
+	instance_id: &str,
+	version: &Version,
+	reason: DownloadReason,
+	dependent_on_version_id: Option<String>,
+	state: &State,
+	progress: Option<&mut fetch::FetchProgressFn<'_>>,
+) -> crate::Result<DownloadedProjectVersion> {
+    let scope = resolve_content_scope(instance_id, None, state).await?;
+    let content_set =
+        content_rows::get_content_set(&scope.content_set_id, &state.pool)
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::InputError(format!(
+                    "Unknown content set {}",
+                    scope.content_set_id
+                ))
+            })?;
+    let version_id = version.id.as_str();
     let file = version
         .files
         .iter()
