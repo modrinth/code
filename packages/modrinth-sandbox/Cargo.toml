@@ -15,6 +15,8 @@ uuid = { workspace = true, features = ["v7"] }
 foldhash = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 zbus = { workspace = true }
+enum_dispatch = { workspace = true }
+futures = { workspace = true }
 rand = { workspace = true }
 
 [dev-dependencies]

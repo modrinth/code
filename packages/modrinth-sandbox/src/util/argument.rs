@@ -4,7 +4,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-/// Wrapper over Cow<'static OsStr> implementing conversions from str/String, OsStr/OsString and Path/PathBuf
+/// Wrapper over Cow<'static OsStr> implementing conversions from str/String, OsStr/OsString and Path/PathBuf.
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct SandboxArg(Cow<'static, OsStr>);
 
@@ -59,7 +59,7 @@ impl From<String> for SandboxArg {
     }
 }
 
-// Path convesions
+// Path conversions
 impl From<Cow<'static, Path>> for SandboxArg {
     fn from(value: Cow<'static, Path>) -> Self {
         SandboxArg(match value {

@@ -7,7 +7,7 @@ use crate::util::rpc::RpcServer;
 use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
 use dashmap::DashMap;
 use modrinth_sandbox::{
-    MinecraftCommand, SandboxChild, SandboxChildTrait, SandboxEnv, SandboxExitStatus, create_minecraft_command,
+    SandboxChild, SandboxEnv, SandboxExitStatus, minecraft::MinecraftCommand,
 };
 use quick_xml::Reader;
 use quick_xml::events::Event;
@@ -222,17 +222,21 @@ impl ProcessManager {
             writeln!(log_file).map_err(|e| IOError::with_path(e, &log_path))?;
         }
 
-        let command = create_minecraft_command(mc_command)?;
+        let command = modrinth_sandbox::minecraft::create_command(mc_command)?;
         let mut mc_proc = sandbox_env.spawn(command).await?;
         let child_pid = mc_proc.id();
 
         let stdout = mc_proc
             .take_stdout()
-            .map(|reader| tokio::net::unix::pipe::Receiver::from_owned_fd(reader.into()))
+            .map(|reader| {
+                tokio::net::unix::pipe::Receiver::from_owned_fd(reader.into())
+            })
             .transpose()?;
         let stderr = mc_proc
             .take_stderr()
-            .map(|reader| tokio::net::unix::pipe::Receiver::from_owned_fd(reader.into()))
+            .map(|reader| {
+                tokio::net::unix::pipe::Receiver::from_owned_fd(reader.into())
+            })
             .transpose()?;
 
         let mut process = Process {

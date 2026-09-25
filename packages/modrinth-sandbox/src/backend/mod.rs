@@ -1,10 +1,14 @@
 //! Backend sandbox implementations, using OS-specific primitives.
 
 use std::{
-    collections::{BTreeMap, HashSet}, fmt::Debug, io::{PipeReader, PipeWriter}, path::PathBuf,
+    collections::{BTreeMap, HashSet},
+    fmt::Debug,
+    io::{PipeReader, PipeWriter},
+    path::PathBuf,
 };
 
 use async_trait::async_trait;
+use enum_dispatch::enum_dispatch;
 use eyre::{Context, Result, eyre};
 use tokio::fs;
 
@@ -15,40 +19,22 @@ mod bubblewrap;
 mod flatpak;
 mod unix;
 
-/// Entry point into the sandboxing mechanism.
-///
-/// Each backend can create a [`SandboxEnv`], from which you can spawn sandboxed
-/// processes.
-///
-/// # Platform
-///
-/// Each platform has its own sandboxing backend(s):
-/// - Linux
-///   - In Flatpak: [`flatpak`]
-///   - Outside of Flatpak: [`bubblewrap`]
+/// See [`crate::create_env`].
 #[async_trait]
 pub trait Backend {
-    /// Sets up the sandboxing mechanism.
-    ///
-    /// # Errors
-    ///
-    /// Errors if the implementation could not create a sandboxing environment.
+    /// See [`crate::create_env`].
     async fn init() -> Result<Box<dyn SandboxEnv>>;
 }
 
-/// Allows spawning a process in a sandbox.
-///
-/// [`SandboxEnv`]s are not aware of Minecraft, Java, or any other high-level
-/// details. They are purely low-level sandboxing mechanisms.
+/// See [`crate::SandboxEnv`].
 #[async_trait]
 pub trait SandboxEnv: Debug + Send + Sync {
-    /// Spawn a sandboxed process and get a [`SandboxChild`] handle to it.
+    /// See [`crate::SandboxEnv::spawn`].
     async fn spawn(&self, command: SandboxCommand) -> Result<SandboxChild>;
 }
 
-/// Creates a [`SandboxEnv`] by automatically determining the best environment
-/// to create.
-pub async fn init_env() -> Result<Box<dyn SandboxEnv>> {
+/// See [`crate::create_env`].
+pub async fn create_env() -> Result<Box<dyn SandboxEnv>> {
     const FLATPAK_INFO_PATH: &str = "/.flatpak-info";
 
     if fs::try_exists(FLATPAK_INFO_PATH)
@@ -137,67 +123,22 @@ impl SandboxCommand {
 }
 
 #[async_trait]
-pub trait SandboxChildTrait {
-     fn id(&self) -> Option<u32>;
-     fn try_wait(&mut self) -> Result<Option<SandboxExitStatus>>;
-     async fn wait(&mut self) -> Result<SandboxExitStatus>;
-     async fn kill(&mut self) -> Result<()>;
-     fn take_stdin(&mut self) -> Option<PipeWriter>;
-     fn take_stdout(&mut self) -> Option<PipeReader>;
-     fn take_stderr(&mut self) -> Option<PipeReader>;
+#[enum_dispatch]
+pub trait SandboxChildOp {
+    fn id(&self) -> Option<u32>;
+    fn try_wait(&mut self) -> Result<Option<SandboxExitStatus>>;
+    async fn wait(&mut self) -> Result<SandboxExitStatus>;
+    async fn kill(&mut self) -> Result<()>;
+    fn take_stdin(&mut self) -> Option<PipeWriter>;
+    fn take_stdout(&mut self) -> Option<PipeReader>;
+    fn take_stderr(&mut self) -> Option<PipeReader>;
 }
 
 #[derive(Debug)]
-pub enum SandboxChildImpl {
-    Bubblewrap(bubblewrap::BubblewrapSandboxChild),
-}
-
-#[derive(Debug)]
-pub struct SandboxChild(pub(crate) SandboxChildImpl);
-
-#[async_trait]
-impl SandboxChildTrait for SandboxChild {
-    fn id(&self) -> Option<u32> {
-        match &self.0 {
-            SandboxChildImpl::Bubblewrap(child) => SandboxChildTrait::id(child),
-        }
-    }
-
-    fn try_wait(&mut self) -> Result<Option<SandboxExitStatus>> {
-        match &mut self.0 {
-            SandboxChildImpl::Bubblewrap(child) => SandboxChildTrait::try_wait(child),
-        }
-    }
-
-    async fn wait(&mut self) -> Result<SandboxExitStatus> {
-        match &mut self.0 {
-            SandboxChildImpl::Bubblewrap(child) => SandboxChildTrait::wait(child).await,
-        }
-    }
-
-    async fn kill(&mut self) -> Result<()> {
-        match &mut self.0 {
-            SandboxChildImpl::Bubblewrap(child) => SandboxChildTrait::kill(child).await,
-        }
-    }
-
-    fn take_stdin(&mut self) -> Option<PipeWriter> {
-        match &mut self.0 {
-            SandboxChildImpl::Bubblewrap(child) => SandboxChildTrait::take_stdin(child),
-        }
-    }
-
-    fn take_stdout(&mut self) -> Option<PipeReader> {
-        match &mut self.0 {
-            SandboxChildImpl::Bubblewrap(child) => SandboxChildTrait::take_stdout(child),
-        }
-    }
-
-    fn take_stderr(&mut self) -> Option<PipeReader> {
-        match &mut self.0 {
-            SandboxChildImpl::Bubblewrap(child) => SandboxChildTrait::take_stderr(child),
-        }
-    }
+#[enum_dispatch(SandboxChildOp)]
+pub enum SandboxChild {
+    Flatpak(flatpak::FlatpakChild),
+    Bubblewrap(bubblewrap::BubblewrapChild),
 }
 
 #[derive(Default, Debug, Clone, Copy)]

@@ -1,15 +1,26 @@
 use std::{
-    borrow::Cow, collections::BTreeMap, ffi::{CStr, CString, OsStr, OsString}, io::{PipeReader, PipeWriter}, os::fd::{AsRawFd, OwnedFd}, path::{Path, PathBuf},
+    borrow::Cow,
+    collections::BTreeMap,
+    ffi::{CStr, CString, OsStr, OsString},
+    io::{PipeReader, PipeWriter},
+    os::fd::{AsRawFd, OwnedFd},
+    path::{Path, PathBuf},
 };
 
 use async_trait::async_trait;
 use derive_more::Debug;
 use eyre::{Context, ContextCompat, Result, eyre};
-use libseccomp::{ScmpAction, ScmpArgCompare, ScmpCompareOp, ScmpFilterContext, ScmpSyscall};
+use libseccomp::{
+    ScmpAction, ScmpArgCompare, ScmpCompareOp, ScmpFilterContext, ScmpSyscall,
+};
 use uuid::Uuid;
 
 use crate::{
-    backend::{Backend, SandboxChild, SandboxChildImpl, SandboxChildTrait, SandboxCommand, SandboxEnv, unix::UnixSandboxChild}, util::{argument::SandboxArg, path::find_command},
+    backend::{
+        Backend, SandboxChild, SandboxChildOp, SandboxCommand, SandboxEnv,
+        unix::UnixSandboxChild,
+    },
+    util::{argument::SandboxArg, path::find_command},
 };
 
 #[derive(Debug)]
@@ -50,10 +61,11 @@ pub struct BubblewrapEnv {
 impl SandboxEnv for BubblewrapEnv {
     async fn spawn(&self, command: SandboxCommand) -> Result<SandboxChild> {
         let this = self.clone();
-        let bubblewrap_child = tokio::task::spawn_blocking(move || spawn(&this, command))
-            .await
-            .context("spawn task dropped")??;
-        Ok(SandboxChild(SandboxChildImpl::Bubblewrap(bubblewrap_child)))
+        let bubblewrap_child =
+            tokio::task::spawn_blocking(move || spawn(&this, command))
+                .await
+                .context("spawn task dropped")??;
+        Ok(SandboxChild::Bubblewrap(bubblewrap_child))
     }
 }
 
@@ -209,7 +221,7 @@ impl BubblewrapCommandBuilder {
 fn spawn(
     env: &BubblewrapEnv,
     mut command: SandboxCommand,
-) -> Result<BubblewrapSandboxChild> {
+) -> Result<BubblewrapChild> {
     let mut builder = BubblewrapCommandBuilder::default();
 
     let Some(directories) = directories::BaseDirs::new() else {
@@ -412,7 +424,9 @@ fn spawn(
         }
 
         if attempt == 100 {
-            return Err(eyre!("Unable to find unique instance-id for .flatpak-info"));
+            return Err(eyre!(
+                "Unable to find unique instance-id for .flatpak-info"
+            ));
         } else {
             instance_id = rand::random::<u32>() & 0x7FFFFFFF;
             instance_dir = flatpak_instances_dir.join(instance_id.to_string());
@@ -424,7 +438,8 @@ fn spawn(
         "[Application]\nname=com.modrinth.sandbox.ModrinthSandbox\n\n[Instance]\ninstance-id={}\n\0",
         instance_id
     );
-    let flatpak_info: CString = CString::from_vec_with_nul(flatpak_info.into_bytes())?;
+    let flatpak_info: CString =
+        CString::from_vec_with_nul(flatpak_info.into_bytes())?;
     let flatpak_info_fd1 = super::unix::WriteableMemoryFile::open(
         c"modrinth-sandbox-bwrap-flatpak-info1",
     )?;
@@ -446,14 +461,19 @@ fn spawn(
         return Err(eyre!("/tmp folder doesn't exist"));
     }
     let bwrapinfo = instance_dir.join("bwrapinfo.json");
-    let bwrapinfo_fd: OwnedFd = std::fs::File::create(bwrapinfo.clone())?.into();
+    let bwrapinfo_fd: OwnedFd =
+        std::fs::File::create(bwrapinfo.clone())?.into();
     builder.push("--info-fd");
     builder.push(format!("{}", bwrapinfo_fd.as_raw_fd()));
 
     // Set up xdg-dbus-proxy
-    let dbus_proxy =
-        start_dbus_proxy(env, xdg_runtime_dir, &flatpak_info, command.die_with_parent)
-            .wrap_err("starting dbus proxy")?;
+    let dbus_proxy = start_dbus_proxy(
+        env,
+        xdg_runtime_dir,
+        &flatpak_info,
+        command.die_with_parent,
+    )
+    .wrap_err("starting dbus proxy")?;
 
     builder.push("--bind");
     builder.push(dbus_proxy.proxy_session_path.clone());
@@ -491,7 +511,7 @@ fn spawn(
             .wrap_err_with(|| eyre!("creating directory {path:?}"))?;
     }
 
-    Ok(BubblewrapSandboxChild {
+    Ok(BubblewrapChild {
         child: super::unix::spawn(
             env.bwrap.clone().into(),
             std::mem::take(&mut builder.arguments),
@@ -505,25 +525,25 @@ fn spawn(
             command.die_with_parent,
         )?,
         instance_dir,
-        _dbus_proxy: dbus_proxy
+        _dbus_proxy: dbus_proxy,
     })
 }
 
 #[derive(Debug)]
-pub(crate) struct BubblewrapSandboxChild {
+pub(crate) struct BubblewrapChild {
     child: UnixSandboxChild,
     instance_dir: PathBuf,
     _dbus_proxy: DbusProxy,
 }
 
-impl Drop for BubblewrapSandboxChild {
+impl Drop for BubblewrapChild {
     fn drop(&mut self) {
         _ = std::fs::remove_dir_all(&self.instance_dir);
     }
 }
 
 #[async_trait]
-impl SandboxChildTrait for BubblewrapSandboxChild {
+impl SandboxChildOp for BubblewrapChild {
     fn id(&self) -> Option<u32> {
         self.child.id()
     }
@@ -540,15 +560,15 @@ impl SandboxChildTrait for BubblewrapSandboxChild {
         self.child.kill().await
     }
 
-    fn take_stdin(&mut self) -> Option<PipeWriter>  {
+    fn take_stdin(&mut self) -> Option<PipeWriter> {
         self.child.take_stdin()
     }
 
-    fn take_stdout(&mut self) -> Option<PipeReader>  {
+    fn take_stdout(&mut self) -> Option<PipeReader> {
         self.child.take_stdout()
     }
 
-    fn take_stderr(&mut self) -> Option<PipeReader>  {
+    fn take_stderr(&mut self) -> Option<PipeReader> {
         self.child.take_stderr()
     }
 }
@@ -582,20 +602,33 @@ fn start_dbus_proxy(
 
     builder.push("--new-session");
 
-    let proxy_session_path = runtime_dir.join(format!("modrinth-xdg-dbus-proxy-session-{}", Uuid::now_v7()));
+    let proxy_session_path = runtime_dir.join(format!(
+        "modrinth-xdg-dbus-proxy-session-{}",
+        Uuid::now_v7()
+    ));
 
     builder.bind_if_exists(BindType::ReadOnly, Path::new("/usr"), true);
     builder.bind_if_exists(BindType::ReadOnly, Path::new("/lib64"), true);
     builder.bind_if_exists(BindType::ReadOnly, Path::new("/nix/store"), true);
-    builder.bind_if_exists(BindType::ReadWrite, runtime_dir.to_path_buf(), true);
+    builder.bind_if_exists(
+        BindType::ReadWrite,
+        runtime_dir.to_path_buf(),
+        true,
+    );
 
-    let flatpak_info_fd1 = super::unix::WriteableMemoryFile::open(c"modrinth-sandbox-proxy-flatpak-info1")
-        .wrap_err("creating flatpak-info memory file 1")?;
-    let flatpak_info_fd1 = flatpak_info_fd1.write(flatpak_info)
+    let flatpak_info_fd1 = super::unix::WriteableMemoryFile::open(
+        c"modrinth-sandbox-proxy-flatpak-info1",
+    )
+    .wrap_err("creating flatpak-info memory file 1")?;
+    let flatpak_info_fd1 = flatpak_info_fd1
+        .write(flatpak_info)
         .wrap_err("writing to flatpak-info memory file 1")?;
-    let flatpak_info_fd2 = super::unix::WriteableMemoryFile::open(c"modrinth-sandbox-proxy-flatpak-info2")
-        .wrap_err("creating flatpak-info memory file 2")?;
-    let flatpak_info_fd2 = flatpak_info_fd2.write(flatpak_info)
+    let flatpak_info_fd2 = super::unix::WriteableMemoryFile::open(
+        c"modrinth-sandbox-proxy-flatpak-info2",
+    )
+    .wrap_err("creating flatpak-info memory file 2")?;
+    let flatpak_info_fd2 = flatpak_info_fd2
+        .write(flatpak_info)
         .wrap_err("writing to flatpak-info memory file 2")?;
 
     builder.push("--file");
@@ -616,11 +649,15 @@ fn start_dbus_proxy(
     builder.push(format!("--fd={}", keep_alive_write_fd.as_raw_fd()));
     builder.push("--filter");
     builder.push("--talk=com.feralinteractive.GameMode");
-    builder.push("--call=com.feralinteractive.GameMode=/com/feralinteractive/GameMode");
+    builder.push(
+        "--call=com.feralinteractive.GameMode=/com/feralinteractive/GameMode",
+    );
     builder.push("--talk=org.kde.StatusNotifierWatcher");
     builder.push("--call=org.kde.StatusNotifierWatcher=/StatusNotifierWatcher");
     builder.push("--talk=org.freedesktop.Notifications");
-    builder.push("--call=org.freedesktop.Notifications=/org/freedesktop/Notifications");
+    builder.push(
+        "--call=org.freedesktop.Notifications=/org/freedesktop/Notifications",
+    );
     builder.push("--talk=org.freedesktop.portal.*");
     builder.push("--call=org.freedesktop.portal.Desktop=org.freedesktop.portal.Settings.Read@/org/freedesktop/portal/desktop");
     builder.push("--broadcast=org.freedesktop.portal.Desktop=org.freedesktop.portal.Settings.SettingChanged@/org/freedesktop/portal/desktop");
@@ -641,22 +678,31 @@ fn start_dbus_proxy(
         Some(runtime_dir.to_path_buf()),
         vec![flatpak_info_fd1, flatpak_info_fd2, keep_alive_write_fd],
         env.dev_null,
-        die_with_parent
-    ).wrap_err("spawning child")?;
+        die_with_parent,
+    )
+    .wrap_err("spawning child")?;
 
     // Wait for proxy to start by reading from fd
     let mut buf = 0 as libc::c_char;
     unsafe {
         let start = std::time::Instant::now();
-        if libc::read(keep_alive_read_fd.as_raw_fd(), &mut buf as *mut libc::c_char as *mut _, 1) != 1 {
+        if libc::read(
+            keep_alive_read_fd.as_raw_fd(),
+            &mut buf as *mut libc::c_char as *mut _,
+            1,
+        ) != 1
+        {
             return Err(eyre!("Failed to sync with xdg-dbus-proxy"));
         }
-        tracing::info!("xdg-dbus-proxy took {:?} to start", std::time::Instant::now() - start);
+        tracing::info!(
+            "xdg-dbus-proxy took {:?} to start",
+            std::time::Instant::now() - start
+        );
     }
 
     eyre::Ok(DbusProxy {
         proxy_session_path,
-        _keep_alive_read_fd: keep_alive_read_fd
+        _keep_alive_read_fd: keep_alive_read_fd,
     })
 }
 
@@ -675,7 +721,7 @@ fn get_card_names() -> Vec<OsString> {
 
 // Syscall allowlist copied from https://github.com/moby/profiles/blob/fa50b7287199d1c781284d1a34d1395a62e57f1e/seccomp/default.json
 // Licensed as Apache 2.0 (https://github.com/moby/profiles/blob/fa50b7287199d1c781284d1a34d1395a62e57f1e/LICENSE)
-const ALLOWED_SYSCALLS: &[&'static str] = &[
+const ALLOWED_SYSCALLS: &[&str] = &[
     "accept",
     "accept4",
     "access",
@@ -1045,60 +1091,102 @@ fn create_seccomp_filter() -> Result<std::os::fd::OwnedFd> {
     // We could cache the fd and dup, but I'm worried that this might allow the child
     // to modify the memfd even when it is sealed, so we just recreate the bpf memfd from scratch
 
-    let Ok(mut filter) = ScmpFilterContext::new(ScmpAction::Errno(libc::EPERM)) else {
+    let Ok(mut filter) = ScmpFilterContext::new(ScmpAction::Errno(libc::EPERM))
+    else {
         return Err(eyre!("unable to init seccomp filter context"));
     };
 
     for syscall in ALLOWED_SYSCALLS {
-        let Ok(syscall) = ScmpSyscall::from_name(*syscall) else {
+        let Ok(syscall) = ScmpSyscall::from_name(syscall) else {
             continue;
         };
         _ = filter.add_rule(ScmpAction::Allow, syscall);
     }
     if let Ok(syscall) = ScmpSyscall::from_name("clone") {
-        let disallowed_clones = libc::CLONE_NEWNS | libc::CLONE_NEWUTS | libc::CLONE_NEWIPC | libc::CLONE_NEWUSER
-            | libc::CLONE_NEWPID | libc::CLONE_NEWNET | libc::CLONE_NEWCGROUP;
-        _ = filter.add_rule_conditional(ScmpAction::Allow, syscall, &[
-           ScmpArgCompare::new(0, ScmpCompareOp::MaskedEqual(disallowed_clones as u64), 0)
-        ]);
+        let disallowed_clones = libc::CLONE_NEWNS
+            | libc::CLONE_NEWUTS
+            | libc::CLONE_NEWIPC
+            | libc::CLONE_NEWUSER
+            | libc::CLONE_NEWPID
+            | libc::CLONE_NEWNET
+            | libc::CLONE_NEWCGROUP;
+        _ = filter.add_rule_conditional(
+            ScmpAction::Allow,
+            syscall,
+            &[ScmpArgCompare::new(
+                0,
+                ScmpCompareOp::MaskedEqual(disallowed_clones as u64),
+                0,
+            )],
+        );
     }
     if let Ok(syscall) = ScmpSyscall::from_name("clone3") {
         _ = filter.add_rule(ScmpAction::Errno(libc::ENOSYS), syscall);
     }
     if let Ok(syscall) = ScmpSyscall::from_name("socket") {
-        _ = filter.add_rule_conditional(ScmpAction::Allow, syscall, &[
-           ScmpArgCompare::new(0, ScmpCompareOp::NotEqual, libc::AF_VSOCK as u64)
-        ]);
+        _ = filter.add_rule_conditional(
+            ScmpAction::Allow,
+            syscall,
+            &[ScmpArgCompare::new(
+                0,
+                ScmpCompareOp::NotEqual,
+                libc::AF_VSOCK as u64,
+            )],
+        );
     }
     if let Ok(syscall) = ScmpSyscall::from_name("personality") {
-        _ = filter.add_rule_conditional(ScmpAction::Allow, syscall, &[
-           ScmpArgCompare::new(0, ScmpCompareOp::Equal, 0x0)
-        ]);
-        _ = filter.add_rule_conditional(ScmpAction::Allow, syscall, &[
-           ScmpArgCompare::new(0, ScmpCompareOp::Equal, 0x8)
-        ]);
-        _ = filter.add_rule_conditional(ScmpAction::Allow, syscall, &[
-           ScmpArgCompare::new(0, ScmpCompareOp::Equal, 0x20000)
-        ]);
-        _ = filter.add_rule_conditional(ScmpAction::Allow, syscall, &[
-           ScmpArgCompare::new(0, ScmpCompareOp::Equal, 0x20008)
-        ]);
-        _ = filter.add_rule_conditional(ScmpAction::Allow, syscall, &[
-           ScmpArgCompare::new(0, ScmpCompareOp::Equal, 0xffffffff)
-        ]);
+        _ = filter.add_rule_conditional(
+            ScmpAction::Allow,
+            syscall,
+            &[ScmpArgCompare::new(0, ScmpCompareOp::Equal, 0x0)],
+        );
+        _ = filter.add_rule_conditional(
+            ScmpAction::Allow,
+            syscall,
+            &[ScmpArgCompare::new(0, ScmpCompareOp::Equal, 0x8)],
+        );
+        _ = filter.add_rule_conditional(
+            ScmpAction::Allow,
+            syscall,
+            &[ScmpArgCompare::new(0, ScmpCompareOp::Equal, 0x20000)],
+        );
+        _ = filter.add_rule_conditional(
+            ScmpAction::Allow,
+            syscall,
+            &[ScmpArgCompare::new(0, ScmpCompareOp::Equal, 0x20008)],
+        );
+        _ = filter.add_rule_conditional(
+            ScmpAction::Allow,
+            syscall,
+            &[ScmpArgCompare::new(0, ScmpCompareOp::Equal, 0xffffffff)],
+        );
     }
     if let Ok(syscall) = ScmpSyscall::from_name("ioctl") {
-        _ = filter.add_rule_conditional(ScmpAction::Errno(libc::EPERM), syscall, &[
-           ScmpArgCompare::new(1, ScmpCompareOp::MaskedEqual(0xFFFFFFFF), libc::TIOCSTI)
-        ]);
+        _ = filter.add_rule_conditional(
+            ScmpAction::Errno(libc::EPERM),
+            syscall,
+            &[ScmpArgCompare::new(
+                1,
+                ScmpCompareOp::MaskedEqual(0xFFFFFFFF),
+                libc::TIOCSTI,
+            )],
+        );
     }
     if let Ok(syscall) = ScmpSyscall::from_name("ioctl") {
-        _ = filter.add_rule_conditional(ScmpAction::Errno(libc::EPERM), syscall, &[
-           ScmpArgCompare::new(1, ScmpCompareOp::MaskedEqual(0xFFFFFFFF), libc::TIOCLINUX)
-        ]);
+        _ = filter.add_rule_conditional(
+            ScmpAction::Errno(libc::EPERM),
+            syscall,
+            &[ScmpArgCompare::new(
+                1,
+                ScmpCompareOp::MaskedEqual(0xFFFFFFFF),
+                libc::TIOCLINUX,
+            )],
+        );
     }
 
-    let fd = super::unix::WriteableMemoryFile::open(c"modrinth-sandbox-seccomp-bpf")?;
+    let fd = super::unix::WriteableMemoryFile::open(
+        c"modrinth-sandbox-seccomp-bpf",
+    )?;
     let fd = fd.write_filter(filter)?;
     Ok(fd)
 }

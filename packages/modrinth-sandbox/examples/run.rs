@@ -5,7 +5,7 @@ use std::{
 };
 
 use eyre::{Result, WrapErr};
-use modrinth_sandbox::{SandboxArg, SandboxChildTrait, SandboxCommand};
+use modrinth_sandbox::{SandboxArg, SandboxCommand, SandboxStdio};
 use tracing::info;
 
 #[derive(Debug, clap::Parser)]
@@ -29,7 +29,7 @@ async fn main() -> Result<()> {
     let env = modrinth_sandbox::create_env()
         .await
         .wrap_err("creating sandbox environment")?;
-    info!("using environment: {env:?}");
+    info!("using environment {env:?}");
 
     let mut child = env
         .spawn(SandboxCommand {
@@ -44,9 +44,9 @@ async fn main() -> Result<()> {
             network: true,
             is_jvm: false,
             die_with_parent: true,
-            stdin: modrinth_sandbox::SandboxStdio::Null,
-            stdout: modrinth_sandbox::SandboxStdio::Inherit,
-            stderr: modrinth_sandbox::SandboxStdio::Inherit,
+            stdin: SandboxStdio::Null,
+            stdout: SandboxStdio::Inherit,
+            stderr: SandboxStdio::Inherit,
         })
         .await
         .wrap_err("spawning process in sandbox")?;

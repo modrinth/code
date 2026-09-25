@@ -128,9 +128,7 @@ const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
     "SDL_IM_MODULE",
 ];
 
-pub fn create_minecraft_command(
-    minecraft: MinecraftCommand,
-) -> Result<SandboxCommand> {
+pub fn create_command(minecraft: MinecraftCommand) -> Result<SandboxCommand> {
     let java_path = minecraft.jre_path.join("bin/java");
     let persistent_home = minecraft.persistent_dir.join("home");
     let persistent_data = minecraft.persistent_dir.join("data");

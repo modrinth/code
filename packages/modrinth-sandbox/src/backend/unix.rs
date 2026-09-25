@@ -1,13 +1,21 @@
 use std::{
-    collections::BTreeMap, ffi::{CStr, CString, OsString}, io::{ErrorKind, PipeReader, PipeWriter}, os::{
-        fd::{AsRawFd, FromRawFd, OwnedFd, RawFd}, unix::ffi::OsStringExt,
-    }, path::PathBuf,
+    collections::BTreeMap,
+    ffi::{CStr, CString, OsString},
+    io::{ErrorKind, PipeReader, PipeWriter},
+    os::{
+        fd::{AsRawFd, FromRawFd, OwnedFd, RawFd},
+        unix::ffi::OsStringExt,
+    },
+    path::PathBuf,
 };
 
 use async_trait::async_trait;
 use eyre::Result;
 
-use crate::{SandboxExitStatus, SandboxStdio, backend::SandboxChildTrait, util::argument::SandboxArg};
+use crate::{
+    SandboxExitStatus, SandboxStdio, backend::SandboxChildOp,
+    util::argument::SandboxArg,
+};
 
 pub(crate) fn spawn(
     program: SandboxArg,
@@ -61,8 +69,8 @@ pub(crate) fn spawn(
     match stdin {
         SandboxStdio::Null => {
             stdin_read = Some(dev_null);
-        },
-        SandboxStdio::Inherit => {},
+        }
+        SandboxStdio::Inherit => {}
         SandboxStdio::Pipe => {
             let (read, write) = std::io::pipe()?;
             stdin_write = Some(write);
@@ -76,11 +84,11 @@ pub(crate) fn spawn(
             stdout_read = Some(read);
             stdout_write = Some(write.as_raw_fd());
             fds_to_drop.push(write.into());
-        },
+        }
         SandboxStdio::Null => {
             stdout_write = Some(dev_null);
-        },
-        SandboxStdio::Inherit => {},
+        }
+        SandboxStdio::Inherit => {}
     }
     match stderr {
         SandboxStdio::Pipe => {
@@ -88,11 +96,11 @@ pub(crate) fn spawn(
             stderr_read = Some(read);
             stderr_write = Some(write.as_raw_fd());
             fds_to_drop.push(write.into());
-        },
+        }
         SandboxStdio::Null => {
             stderr_write = Some(dev_null);
-        },
-        SandboxStdio::Inherit => {},
+        }
+        SandboxStdio::Inherit => {}
     }
 
     argv.ensure_null_terminated();
@@ -190,8 +198,8 @@ pub struct UnixSandboxChild {
     stderr: Option<PipeReader>,
 }
 
- #[async_trait]
-impl SandboxChildTrait for UnixSandboxChild {
+#[async_trait]
+impl SandboxChildOp for UnixSandboxChild {
     fn id(&self) -> Option<u32> {
         if self.exit_status.is_some() {
             return None;
@@ -213,7 +221,9 @@ impl SandboxChildTrait for UnixSandboxChild {
         if pid == 0 {
             return Ok(None);
         } else {
-            self.exit_status = Some(SandboxExitStatus { imp: UnixSandboxExitStatus(status) });
+            self.exit_status = Some(SandboxExitStatus {
+                imp: UnixSandboxExitStatus(status),
+            });
             return Ok(self.exit_status);
         }
     }
@@ -232,8 +242,12 @@ impl SandboxChildTrait for UnixSandboxChild {
         })
         .await??;
 
-        self.exit_status = Some(SandboxExitStatus { imp: UnixSandboxExitStatus(status) });
-        return Ok(SandboxExitStatus { imp: UnixSandboxExitStatus(status) });
+        self.exit_status = Some(SandboxExitStatus {
+            imp: UnixSandboxExitStatus(status),
+        });
+        return Ok(SandboxExitStatus {
+            imp: UnixSandboxExitStatus(status),
+        });
     }
 
     async fn kill(&mut self) -> eyre::Result<()> {
@@ -245,15 +259,15 @@ impl SandboxChildTrait for UnixSandboxChild {
         Ok(())
     }
 
-    fn take_stdin(&mut self) -> Option<PipeWriter>  {
+    fn take_stdin(&mut self) -> Option<PipeWriter> {
         self.stdin.take()
     }
 
-    fn take_stdout(&mut self) -> Option<PipeReader>  {
+    fn take_stdout(&mut self) -> Option<PipeReader> {
         self.stdout.take()
     }
 
-    fn take_stderr(&mut self) -> Option<PipeReader>  {
+    fn take_stderr(&mut self) -> Option<PipeReader> {
         self.stderr.take()
     }
 }
@@ -329,7 +343,10 @@ impl WriteableMemoryFile {
         Ok(Self { fd })
     }
 
-    pub fn write_filter(mut self, filter: libseccomp::ScmpFilterContext) -> eyre::Result<OwnedFd> {
+    pub fn write_filter(
+        mut self,
+        filter: libseccomp::ScmpFilterContext,
+    ) -> eyre::Result<OwnedFd> {
         filter.export_bpf(&self.fd)?;
         self.reset_and_seal()?;
         Ok(self.fd)
