@@ -506,9 +506,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Sai tài khoản"
   },
-  "app.instance.share.members.empty": {
-    "message": "Chưa có người dùng nào tham gia"
-  },
   "app.instance.worlds.add-server": {
     "message": "Thêm máy chủ"
   },

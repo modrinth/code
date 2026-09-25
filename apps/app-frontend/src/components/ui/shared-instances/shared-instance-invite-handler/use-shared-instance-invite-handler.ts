@@ -53,8 +53,7 @@ export function useSharedInstanceInviteHandler(
 	const auth = injectAuth()
 	const client = injectModrinthClient()
 	const { handleError } = injectNotificationManager()
-	const { notifySharedInstanceConnectionError, notifySharedInstanceError } =
-		useSharedInstanceErrors()
+	const { notifySharedInstanceError } = useSharedInstanceErrors()
 	const popupNotificationManager = injectPopupNotificationManager()
 	const queryClient = useQueryClient()
 	const router = useRouter()
@@ -83,21 +82,15 @@ export function useSharedInstanceInviteHandler(
 	}
 
 	async function resolveInvite(invite: SharedInstanceInvite) {
-		const [invitedBy, sharedInstance] = await Promise.all([
+		const invitedBy =
 			(!invite.invitedByUsername || !invite.invitedByAvatarUrl) && invite.invitedById
-				? get_user(invite.invitedById, 'bypass').catch(() => null)
-				: null,
-			client.sharedinstances.instances_v1.get(invite.sharedInstanceId).catch(() => {
-				notifySharedInstanceConnectionError()
-				return null
-			}),
-		])
+				? await get_user(invite.invitedById, 'bypass').catch(() => null)
+				: null
 
 		return {
 			...invite,
 			invitedByUsername: invite.invitedByUsername ?? invitedBy?.username ?? null,
 			invitedByAvatarUrl: invite.invitedByAvatarUrl ?? invitedBy?.avatar_url ?? null,
-			instanceIconUrl: sharedInstance ? sharedInstance.icon : invite.instanceIconUrl,
 		}
 	}
 
@@ -276,9 +269,6 @@ export function useSharedInstanceInviteHandler(
 		try {
 			if (!(await requireAccount())) return
 			const invite = await install_accept_shared_instance_invite(inviteId)
-			const manager = invite.managerId
-				? await get_user(invite.managerId, 'bypass').catch(() => null)
-				: null
 			await showInstallOrAlreadyInstalled(
 				invite.sharedInstanceId,
 				invite.preview,
@@ -293,11 +283,11 @@ export function useSharedInstanceInviteHandler(
 					)
 					await queryClient.invalidateQueries({ queryKey: ['instances'] })
 				},
-				manager
+				invite.inviter
 					? {
-							id: manager.id,
-							username: manager.username,
-							avatarUrl: manager.avatar_url ?? null,
+							id: invite.inviter.id,
+							username: invite.inviter.name,
+							avatarUrl: invite.inviter.avatar,
 						}
 					: undefined,
 			)

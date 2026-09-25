@@ -13,6 +13,27 @@ pub async fn install_shared_instance(
     server_manager_icon_url: Option<String>,
     instance_icon_url: Option<String>,
 ) -> crate::Result<InstallJobSnapshot> {
+    crate::util::fetch::wait_for_local_api_rate_limit(Box::pin(
+        install_shared_instance_inner(
+            shared_instance_id,
+            name,
+            manager_id,
+            server_manager_name,
+            server_manager_icon_url,
+            instance_icon_url,
+        ),
+    ))
+    .await
+}
+
+async fn install_shared_instance_inner(
+    shared_instance_id: &str,
+    name: String,
+    manager_id: Option<String>,
+    server_manager_name: Option<String>,
+    server_manager_icon_url: Option<String>,
+    instance_icon_url: Option<String>,
+) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;
     let version = get_latest_remote_version(shared_instance_id, &state).await?;
     let data = shared_instance_install_data(
@@ -47,6 +68,16 @@ pub async fn get_shared_instance_install_preview(
     shared_instance_id: &str,
     name: String,
 ) -> crate::Result<SharedInstanceInstallPreview> {
+    crate::util::fetch::wait_for_local_api_rate_limit(
+        get_shared_instance_install_preview_inner(shared_instance_id, name),
+    )
+    .await
+}
+
+async fn get_shared_instance_install_preview_inner(
+    shared_instance_id: &str,
+    name: String,
+) -> crate::Result<SharedInstanceInstallPreview> {
     let state = State::get().await?;
     let version = get_latest_remote_version(shared_instance_id, &state).await?;
     shared_instance_install_preview_from_version(
@@ -66,6 +97,7 @@ pub async fn accept_shared_instance_invite_for_install(
     let invite = get_shared_instance_invite_info(invite_id, &state).await?;
     let shared_instance_id = invite.instance_id;
     let instance_icon_url = invite.instance_icon;
+    let inviter = invite.inviter;
     let (manager_id, server_manager_name, server_manager_icon_url) =
         shared_instance_invite_manager(invite.managers);
     let name = shared_instance_invite_install_name(
@@ -89,6 +121,7 @@ pub async fn accept_shared_instance_invite_for_install(
 
     Ok(SharedInstanceInviteInstallPreview {
         shared_instance_id,
+        inviter,
         manager_id,
         server_manager_name,
         server_manager_icon_url,
@@ -142,7 +175,12 @@ pub(super) async fn shared_instance_install_preview_from_version(
     let external_files = version
         .external_files
         .iter()
-        .filter(|file| file.file_type != CONFIG_BUNDLE_FILE_TYPE)
+        .filter(|file| {
+            !matches!(
+                file.file_type.as_str(),
+                CONFIG_BUNDLE_FILE_TYPE | CONFIG_FILE_TYPE
+            )
+        })
         .map(|file| SharedInstanceExternalFilePreview {
             file_name: file.file_name.clone(),
             file_type: file.file_type.clone(),
@@ -169,6 +207,15 @@ pub(super) async fn shared_instance_install_preview_from_version(
 
 #[tracing::instrument]
 pub async fn get_shared_instance_update_preview(
+    instance_id: &str,
+) -> crate::Result<Option<SharedInstanceUpdatePreview>> {
+    crate::util::fetch::wait_for_local_api_rate_limit(
+        get_shared_instance_update_preview_inner(instance_id),
+    )
+    .await
+}
+
+async fn get_shared_instance_update_preview_inner(
     instance_id: &str,
 ) -> crate::Result<Option<SharedInstanceUpdatePreview>> {
     let state = State::get().await?;
@@ -271,6 +318,15 @@ pub(crate) async fn check_shared_instance_availability_before_launch(
 
 #[tracing::instrument]
 pub async fn update_shared_instance(
+    instance_id: &str,
+) -> crate::Result<InstallJobSnapshot> {
+    crate::util::fetch::wait_for_local_api_rate_limit(
+        update_shared_instance_inner(instance_id),
+    )
+    .await
+}
+
+async fn update_shared_instance_inner(
     instance_id: &str,
 ) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;
@@ -439,6 +495,12 @@ pub(super) async fn handle_unavailable_shared_instance_if_current_user(
     reason: SharedInstanceUnavailableReason,
     state: &State,
 ) -> crate::Result<()> {
+    // A missing ID can belong to another API environment. Keep the attachment
+    // so opening a production instance in a staging build cannot unlink it.
+    if reason == SharedInstanceUnavailableReason::Deleted {
+        return Ok(());
+    }
+
     if reason != SharedInstanceUnavailableReason::Quarantined
         && !shared_attachment_matches_current_user(attachment, state).await?
     {
@@ -523,6 +585,21 @@ pub(super) async fn shared_instance_install_data(
         .into());
     }
 
+    let remote =
+        match get_remote_instance_access(shared_instance_id, state).await? {
+            SharedInstanceRemoteResponse::Available(remote) => remote,
+            SharedInstanceRemoteResponse::Unavailable(reason) => {
+                return Err(shared_instance_unavailable_error(reason));
+            }
+        };
+    let (manager_id, server_manager_name, server_manager_icon_url) =
+        if remote.linked_server.is_some() {
+            (None, Some(remote.name), remote.icon.clone())
+        } else {
+            (manager_id, server_manager_name, server_manager_icon_url)
+        };
+    let instance_icon_url = remote.icon.or(instance_icon_url);
+
     let name = shared_instance_name(name);
     let linked_user_id = linked_modrinth_user_id(state).await?;
     let modpack = shared_instance_install_modpack(&version, state).await?;
@@ -534,7 +611,30 @@ pub(super) async fn shared_instance_install_data(
         .filter(|id| Some(id.as_str()) != modpack_version_id)
         .collect();
 
+    let mut config_count = 0;
+    let mut config_size = 0_u64;
+    for file in &version.external_files {
+        if file.file_type == CONFIG_FILE_TYPE {
+            config_count += 1;
+            config_size = config_size.saturating_add(
+                file.file_size
+                    .and_then(|size| u64::try_from(size).ok())
+                    .unwrap_or(u64::MAX),
+            );
+        }
+    }
+    if config_count > MAX_CONFIG_BUNDLE_ENTRIES
+        || config_size > MAX_CONFIG_BUNDLE_TOTAL_SIZE
+    {
+        return Err(crate::ErrorKind::InputError(
+            "Shared instance config files exceed the size or file count limit"
+                .to_string(),
+        )
+        .into());
+    }
+
     Ok(SharedInstanceInstallData {
+        linked_server: remote.linked_server,
         shared_instance_id: shared_instance_id.to_string(),
         manager_id,
         server_manager_name,

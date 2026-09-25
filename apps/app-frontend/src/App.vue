@@ -40,6 +40,7 @@ import {
 	commonSettingsMessages,
 	ContentInstallModal,
 	ContentUpdaterModal,
+	createServerOnboardingFlow,
 	CreationFlowModal,
 	defineMessages,
 	I18nDebugPanel,
@@ -53,6 +54,9 @@ import {
 	provideNotificationManager,
 	providePageContext,
 	providePopupNotificationManager,
+	provideServerOnboardingFlow,
+	provideServerPlay,
+	ServerOnboardingModal,
 	TeleportOverflowMenu,
 	TextLogo,
 	TooltipDirective,
@@ -80,6 +84,7 @@ import AppActionBar from '@/components/ui/AppActionBar.vue'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
+import HostingPlayHandler from '@/components/ui/hosting/HostingPlayHandler.vue'
 import HostingUpdateRequired from '@/components/ui/HostingUpdateRequired.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
@@ -344,6 +349,7 @@ const tauriApiClient = new TauriModrinthClient({
 	],
 })
 provideModrinthClient(tauriApiClient)
+provideServerOnboardingFlow(createServerOnboardingFlow())
 const { data: authenticatedModrinthUser } = useQuery({
 	queryKey: computed(() => ['authenticated-user', 'campaigns', credentials.value?.user?.id]),
 	queryFn: () => tauriApiClient.labrinth.users_v3.getAuthenticated(),
@@ -964,6 +970,7 @@ let routerToken = null
 let suspenseToken = null
 
 let suspensePending = false
+const onboardingPageReady = ref(true)
 
 const sidebarOverlayScrollbarsOptions = Object.freeze({
 	overflow: {
@@ -1006,6 +1013,7 @@ router.afterEach((to, from, failure) => {
 })
 
 function onSuspensePending() {
+	onboardingPageReady.value = false
 	debugStartup('Route Suspense pending', { route: route.path })
 	suspensePending = true
 	if (suspenseToken) loading.end(suspenseToken)
@@ -1013,6 +1021,7 @@ function onSuspensePending() {
 }
 
 function onSuspenseResolve() {
+	onboardingPageReady.value = true
 	debugStartup('Route Suspense resolved', { route: route.path })
 	if (suspenseToken) {
 		loading.end(suspenseToken)
@@ -1161,6 +1170,13 @@ const contentInstallModpackAlreadyInstalledModal = ref()
 const addServerToInstanceModal = ref()
 const incompatibilityWarningModal = ref()
 const installToPlayModal = ref()
+const hostingPlayHandler = ref()
+provideServerPlay({
+	async play(target) {
+		if (!hostingPlayHandler.value) throw new Error('Server play handler is not ready.')
+		await hostingPlayHandler.value.play(target)
+	},
+})
 const sharedInstanceInviteHandler = ref()
 const updateToPlayModal = ref()
 
@@ -1786,6 +1802,8 @@ async function handleCommand(e) {
 		} else {
 			await run(e.id).catch(handleError)
 		}
+	} else if (e.event === 'PlayHostingServer') {
+		await hostingPlayHandler.value?.play({ serverId: e.server_id, worldId: e.world_id })
 	} else if (e.event === 'InstallSharedInstanceInvite') {
 		await sharedInstanceInviteHandler.value?.installFromInviteId(e.invite_id)
 	} else if (e.event === 'InstallServer') {
@@ -2252,6 +2270,12 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			@create="handleCreate"
 			@browse-modpacks="handleBrowseModpacks"
 		/>
+		<ServerOnboardingModal
+			browse-path="/browse/modpack"
+			:get-loader-manifest="getLoaderManifest"
+			:navigate="(to) => router.push(to)"
+			:page-ready="onboardingPageReady"
+		/>
 		<IconEditorModal
 			ref="creationIconEditorModal"
 			:config="creationGeneratedIcon?.config"
@@ -2635,6 +2659,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		@create-anyway="handleContentInstallModpackDuplicateCreateAnyway"
 		@go-to-instance="handleContentInstallModpackDuplicateGoToInstance"
 	/>
+	<HostingPlayHandler ref="hostingPlayHandler" />
 	<SharedInstanceInviteHandler ref="sharedInstanceInviteHandler" />
 	<InstallToPlayModal ref="installToPlayModal" :show-external-warnings="false" />
 	<UpdateToPlayModal ref="updateToPlayModal" :show-external-warnings="false" />

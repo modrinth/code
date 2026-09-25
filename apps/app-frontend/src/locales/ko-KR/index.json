@@ -758,12 +758,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "잘못된 계정"
   },
-  "app.instance.share.members.empty": {
-    "message": "아직 참여한 사용자가 없습니다"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "필터에 일치하는 사용자가 없습니다."
-  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "이들은 더 이상 해당 공유 인스턴스의 업데이트를 받지 않습니다"
   },
@@ -3002,9 +2996,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "연동된 공유 인스턴스"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "인스턴스 게시 취소"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "공유 인스턴스 연동 해제"
   },
@@ -3014,14 +3005,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "연동 해제 중..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "공유 인스턴스 게시 취소"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Modrinth에서 이 공유 인스턴스를 삭제하고 이용자에게 업데이트 전송을 중단합니다. 본인의 로컬 인스턴스는 영향을 받지 않습니다."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "게시 취소 중..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "이 작업은 본인의 로컬 인스턴스에만 영향을 미칩니다. 설치된 콘텐츠는 이 기기에 유지되며, 공유 인스턴스 및 이를 이용하는 다른 사용자에게는 영향을 미치지 않습니다."
@@ -3034,12 +3019,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "이 작업은 Modrinth 서버에서 공유 인스턴스를 삭제합니다. Modrinth 앱에서 이를 이용 중인 사용자는 더 이상 업데이트를 받지 않지만, 본인의 로컬 인스턴스 및 콘텐츠는 이 기기에 유지됩니다."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "공유 인스턴스 게시 취소 중"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "공유 인스턴스 게시 취소"
   },
   "instance.action.create-shortcut": {
     "message": "바로가기 만들기"
@@ -3110,9 +3089,6 @@
   "instance.files.save-as": {
     "message": "다른 이름으로 저장..."
   },
-  "instance.icon-editor.symbol": {
-    "message": "문양"
-  },
   "instance.locked.delete-button": {
     "message": "인스턴스 삭제"
   },
@@ -3133,45 +3109,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "리소스 팩"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "작업"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "초대 링크"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "초대 링크가 유효한 동안 링크를 보유한 사람은 누구나 참여할 수 있습니다."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "활성화된 초대가 없습니다."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "만료일"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "초대 철회"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "초대 {code} 철회"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "활성화된 초대"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "사용 횟수"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "초대 링크 <monospace>{code}</monospace> 사용이 즉시 중단됩니다. 이미 참여한 사용자는 계속 접근 권한을 유지합니다."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "이 작업은 되돌릴 수 없습니다"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "초대 철회"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "초대 철회"
   },
   "instance.settings.tabs.general": {
     "message": "일반"
@@ -3352,9 +3289,6 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "공유 인스턴스 접근 권한이 취소되었습니다. 이 인스턴스는 계속 사용 가능하지만, 더 이상 연동되지 않으며 업데이트를 받지 않습니다."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "기본 인스턴스가 삭제되었습니다. 이 인스턴스는 계속 사용 가능하지만, 더 이상 연동되지 않으며 업데이트를 받지 않습니다."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "이 공유 인스턴스는 콘텐츠 조정 팀에 의해 잠겼습니다. 기본 인스턴스 업데이트를 받지 않으며 플레이할 수 없습니다."

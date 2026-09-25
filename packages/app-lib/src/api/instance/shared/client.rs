@@ -34,6 +34,11 @@ pub(super) enum SharedInstanceRemoteResponse<T> {
 
 #[derive(Clone, Debug, Deserialize)]
 pub(super) struct RemoteInstanceResponse {
+    pub(super) name: String,
+    pub(super) icon: Option<String>,
+    #[serde(default)]
+    pub(super) linked_server:
+        Option<crate::install::model::SharedInstanceLinkedServer>,
     #[serde(default)]
     pub(super) quarantine: bool,
 }
@@ -92,6 +97,8 @@ pub(super) struct InstanceInviteInfoResponse {
     pub(super) instance_name: String,
     #[serde(default)]
     pub(super) instance_icon: Option<String>,
+    #[serde(default)]
+    pub(super) inviter: Option<SharedInstanceInviteCreator>,
     #[serde(default)]
     pub(super) managers: Vec<InstanceInviteManagerResponse>,
 }
@@ -242,7 +249,7 @@ pub(super) async fn update_remote_instance(
 pub(super) async fn get_remote_instance_access(
     shared_instance_id: &str,
     state: &State,
-) -> crate::Result<SharedInstanceRemoteResponse<()>> {
+) -> crate::Result<SharedInstanceRemoteResponse<RemoteInstanceResponse>> {
     let operation = "get_instance";
     let method = Method::GET;
     let path = format!("/instances/{shared_instance_id}");
@@ -278,7 +285,7 @@ pub(super) async fn get_remote_instance_access(
         ));
     }
 
-    Ok(SharedInstanceRemoteResponse::Available(()))
+    Ok(SharedInstanceRemoteResponse::Available(instance))
 }
 
 pub(super) async fn update_remote_instance_icon(

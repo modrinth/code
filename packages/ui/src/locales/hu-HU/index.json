@@ -392,9 +392,6 @@
   "content.card.synced": {
     "defaultMessage": "Példányok között szinkronizálva"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Feltöltve"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Biztosan frissíteni szeretnél {count} projektet a legújabb kompatibilis verziójára? Javasoljuk, hogy a tartalmakat egyenként frissítsd."
   },
@@ -650,9 +647,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Tartalom megtekintése"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Készítő"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Környezet"
   },
@@ -677,17 +671,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Frissítés elérhető"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Kliens fájlfüggő"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Kliensoldali tartalom"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Kliensfájl megtartva"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Nincsenek figyelmeztetések"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Figyelmeztetések"
@@ -718,9 +703,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Szűrő"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count} készítő"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Tartalom betöltése..."
@@ -1946,12 +1928,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Nem sikerült törölni a tartalmat"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "A tartalom letiltása nem sikerült"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "A tartalom engedélyezése nem sikerült"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "A tartalom frissítése sikertelen"
   },
@@ -2408,12 +2384,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Engedélyezve"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Külső"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Ez a fájl nincs közzétéve a Modrinthon."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Kezelt tartalom"
   },
@@ -2428,9 +2398,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Keresés: {count, number} {count, plural, one {projekt} other {projekt}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Figyelmeztetések"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Jelenlegi"
@@ -2515,15 +2482,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Módosítások elmentve"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Ez a mod egy kliensoldali modtól függ, és problémákat okozhat a szerver indításakor"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Ez egy kliensoldali módosítás, amely problémákat okozhat a szerver indításakor"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Ez egy kliensoldali mod, amelyet függőségként telepítettek, és problémákat okozhat a szerver indításakor"
   },
   "label.collections": {
     "defaultMessage": "Gyűjtemények"
@@ -5483,15 +5441,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Mostantól itt található!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Ne mutasd újra"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "A szerver beállításait áthelyeztük"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Megosztott szerverek"
   },
@@ -5725,18 +5674,6 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "SFTP-hitelesítő adatok lecserélve"
-  },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "A telepítés során váratlan hiba történt. Kérlek, próbáld újra később."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "A telepítés nem sikerült"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "A feltöltés során váratlan hiba történt. Kérlek, próbáld újra később."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "A modcsomag feltöltése sikertelen volt"
   },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "A szerver beállítása"

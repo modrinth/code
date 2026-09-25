@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
+import { ChevronDownIcon, ChevronUpIcon, InfoIcon } from '@modrinth/assets'
+import { useElementSize } from '@vueuse/core'
 import { computed, getCurrentInstance, ref, toRef, watch } from 'vue'
 
 import Checkbox from '#ui/components/base/Checkbox.vue'
-import { useVIntl } from '#ui/composables/i18n'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useStickyObserver } from '#ui/composables/sticky-observer'
 import { useVirtualScroll } from '#ui/composables/virtual-scroll'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -14,8 +15,21 @@ import type {
 	ContentCardTableSortDirection,
 } from '../types'
 import ContentCardItem from './ContentCardItem.vue'
+import ContentEnabledFor from './ContentEnabledFor.vue'
 
 const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	enabledFor: {
+		id: 'content.enabled-for.label',
+		defaultMessage: 'Enabled for',
+	},
+	enabledForDescription: {
+		id: 'content.enabled-for.description',
+		defaultMessage:
+			'Choose where this content is enabled. Use the Actions toggle to enable or disable it entirely.',
+	},
+})
 
 interface Props {
 	items: ContentCardTableItem[]
@@ -30,6 +44,8 @@ interface Props {
 	flat?: boolean
 	showItemActions?: boolean
 	showVersion?: boolean
+	showEnabledForColumn?: boolean
+	getAdditionalActionWidths?: (item: ContentCardTableItem) => number[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -43,6 +59,8 @@ const props = withDefaults(defineProps<Props>(), {
 	flat: false,
 	showItemActions: false,
 	showVersion: true,
+	showEnabledForColumn: false,
+	getAdditionalActionWidths: () => [],
 })
 
 const stickyHeaderRef = ref<HTMLElement | null>(null)
@@ -52,6 +70,7 @@ const selectedIds = defineModel<string[]>('selectedIds', { default: () => [] })
 
 const emit = defineEmits<{
 	'update:enabled': [id: string, value: boolean]
+	'update:enabled-for': [id: string, side: 'server' | 'player', value: boolean]
 	delete: [id: string, event: MouseEvent]
 	update: [id: string]
 	switchVersion: [id: string]
@@ -68,6 +87,14 @@ const hasSwitchVersionListener = computed(
 const hasEnabledListener = computed(
 	() => typeof instance?.vnode.props?.['onUpdate:enabled'] === 'function',
 )
+const hasEnabledForColumn = computed(
+	() => props.showEnabledForColumn || props.items.some((item) => item.enabledFor !== undefined),
+)
+
+const enabledForMeasureRef = ref<HTMLElement | null>(null)
+const actionsLabelRef = ref<HTMLElement | null>(null)
+const { width: enabledForWidth } = useElementSize(enabledForMeasureRef)
+const { width: actionsLabelWidth } = useElementSize(actionsLabelRef)
 
 const hasAnyActions = computed(() => {
 	// Check if there are listeners for actions
@@ -83,16 +110,95 @@ const hasAnyActions = computed(() => {
 		(item) =>
 			(item.overflowOptions && item.overflowOptions.length > 0) ||
 			item.hasUpdate ||
-			item.enabled !== undefined,
+			item.synced ||
+			item.locked ||
+			props.getAdditionalActionWidths(item).length > 0 ||
+			(item.enabled !== undefined && !item.hideToggle),
 	)
 
 	return hasListeners || hasItemActions || props.showItemActions
 })
 
-// Virtualization
+const actionsWidth = computed(() =>
+	props.items.reduce((maximum, item) => {
+		const widths = props.getAdditionalActionWidths(item).slice()
+		if (item.synced) widths.push(42)
+		if (
+			item.locked ||
+			(hasUpdateListener.value && item.hasUpdate) ||
+			(hasSwitchVersionListener.value && item.version && !item.hideSwitchVersion)
+		) {
+			widths.push(36)
+		}
+		if (item.enabled !== undefined && !item.hideToggle) widths.push(48)
+		if (hasDeleteListener.value && !props.hideDelete && !item.hideDelete) widths.push(36)
+		if (item.overflowOptions?.length) widths.push(36)
+		const width = widths.reduce((sum, width) => sum + width, 0)
+		return Math.max(maximum, width + Math.max(0, widths.length - 1) * 8)
+	}, actionsLabelWidth.value),
+)
+
+function getItemListeners(id: string) {
+	return {
+		...(hasDeleteListener.value
+			? { delete: (event: MouseEvent) => emit('delete', id, event) }
+			: {}),
+		...(hasUpdateListener.value ? { update: () => emit('update', id) } : {}),
+		...(hasSwitchVersionListener.value ? { switchVersion: () => emit('switchVersion', id) } : {}),
+	}
+}
+
+const tableRef = ref<HTMLElement | null>(null)
+const { width: tableWidth } = useElementSize(tableRef)
+const controlColumns = computed(() => [
+	...(hasEnabledForColumn.value ? [Math.ceil(enabledForWidth.value)] : []),
+	...(hasAnyActions.value ? [Math.ceil(actionsWidth.value)] : []),
+])
+const layout = computed(() => {
+	const controls = controlColumns.value
+	const controlBudget = controls.reduce((sum, width) => sum + width, 0)
+	const compactBudget = 24 + controlBudget + controls.length * 16 + 240
+	const wideBudget = compactBudget + (props.showVersion ? 288 + 16 : 0)
+	if (tableWidth.value >= wideBudget) return 'wide'
+	if (tableWidth.value >= compactBudget) return 'compact'
+	if (tableWidth.value >= 24 + controlBudget + Math.max(0, controls.length - 1) * 16) {
+		return 'stacked'
+	}
+	return 'narrow'
+})
+const separateVersion = computed(() => props.showVersion && layout.value === 'wide')
+const stacked = computed(() => layout.value === 'stacked' || layout.value === 'narrow')
+const contentColumnStyles = computed(() => {
+	const controls = controlColumns.value.map((width) => `${width}px`)
+	let columns: string[]
+	if (layout.value === 'narrow') {
+		columns = ['minmax(0, 1fr)']
+	} else if (stacked.value) {
+		columns = controls.length > 1 ? [controls[0], 'minmax(0, 1fr)'] : ['minmax(0, 1fr)']
+	} else {
+		columns = [
+			'minmax(0, 1.2fr)',
+			...(hasEnabledForColumn.value ? [controls[0]] : []),
+			...(separateVersion.value ? ['minmax(0, 1fr)'] : []),
+			...(hasAnyActions.value ? [`${Math.ceil(actionsWidth.value)}px`] : []),
+		]
+	}
+	return {
+		'--content-columns': columns.join(' '),
+		'--content-row-height': `${itemHeight.value}px`,
+	}
+})
+const itemHeight = computed(() => {
+	if (!stacked.value) return 74
+	const controlRows =
+		layout.value === 'narrow'
+			? controlColumns.value.length
+			: Math.min(1, controlColumns.value.length)
+	return 25 + 48 + controlRows * 44
+})
 const { listContainer, totalHeight, visibleRange, visibleTop, visibleItems, scrollToIndex } =
 	useVirtualScroll(toRef(props, 'items'), {
-		itemHeight: 74,
+		itemHeight,
 		bufferSize: 5,
 		initialItemCount: 20,
 		enabled: toRef(props, 'virtualized'),
@@ -182,31 +288,45 @@ function handleSort(column: ContentCardTableSortColumn) {
 
 <template>
 	<div
+		ref="tableRef"
 		role="table"
-		class="@container border border-solid border-surface-4 shadow-sm overflow-clip"
+		class="@container relative border border-solid border-surface-4 shadow-sm overflow-clip"
 		:class="[flat ? '' : 'rounded-[20px]', isStuck || hideHeader ? 'border-t-0' : '']"
+		:style="contentColumnStyles"
 	>
+		<div aria-hidden="true" inert class="pointer-events-none invisible absolute left-0 top-0 w-max">
+			<div
+				v-if="hasEnabledForColumn"
+				ref="enabledForMeasureRef"
+				class="flex w-max flex-col items-start"
+			>
+				<span class="flex items-center gap-1.5 whitespace-nowrap font-semibold">
+					{{ formatMessage(messages.enabledFor) }}
+					<InfoIcon class="size-4 shrink-0" />
+				</span>
+				<ContentEnabledFor
+					:model-value="{ server: false, player: false, locked: false }"
+					reserve-status-space
+				/>
+			</div>
+			<span v-if="hasAnyActions" ref="actionsLabelRef" class="block w-max font-semibold">
+				{{ formatMessage(commonMessages.actionsLabel) }}
+			</span>
+		</div>
 		<div
 			v-if="!hideHeader"
 			ref="stickyHeaderRef"
 			role="rowgroup"
-			class="sticky top-0 z-10 flex h-12 items-center justify-between gap-4 bg-surface-3 px-3"
+			class="sticky top-0 z-10 grid grid-cols-[var(--content-columns)] items-center gap-x-4 bg-surface-3 px-3"
 			:class="[
+				stacked ? 'gap-y-2 py-2' : 'h-12',
 				flat || isStuck ? 'rounded-none' : 'rounded-t-[20px]',
 				isStuck
 					? 'transition-[border-radius] duration-100 border-0 border-y border-solid border-surface-4 shadow-md before:pointer-events-none before:absolute before:inset-x-0 before:-top-4 before:h-5 before:bg-surface-3'
 					: '',
 			]"
 		>
-			<div
-				role="row"
-				class="flex min-w-0 items-center gap-4"
-				:class="
-					hasAnyActions && showVersion
-						? 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none'
-						: 'flex-1'
-				"
-			>
+			<div role="row" class="flex min-w-0 items-center gap-4" :class="{ 'col-span-full': stacked }">
 				<Checkbox
 					v-if="showSelection"
 					:model-value="allSelected"
@@ -239,10 +359,21 @@ function handleSort(column: ContentCardTableSortColumn) {
 			</div>
 
 			<div
-				v-if="showVersion"
-				class="hidden @[800px]:flex"
-				:class="hasAnyActions ? 'flex-1 min-w-0' : 'flex-1'"
+				v-if="hasEnabledForColumn"
+				role="columnheader"
+				class="flex min-w-0 items-center gap-1.5 whitespace-nowrap font-semibold text-secondary"
 			>
+				<span>{{ formatMessage(messages.enabledFor) }}</span>
+				<span
+					v-tooltip="formatMessage(messages.enabledForDescription)"
+					class="inline-flex size-4 cursor-help items-center justify-center"
+					tabindex="0"
+				>
+					<InfoIcon class="size-4" />
+				</span>
+			</div>
+
+			<div v-if="separateVersion" class="min-w-0">
 				<button
 					v-if="sortable"
 					role="columnheader"
@@ -264,7 +395,12 @@ function handleSort(column: ContentCardTableSortColumn) {
 				}}</span>
 			</div>
 
-			<div v-if="hasAnyActions" role="columnheader" class="min-w-[160px] shrink-0 text-right">
+			<div
+				v-if="hasAnyActions"
+				role="columnheader"
+				class="shrink-0 text-right"
+				:class="layout === 'narrow' ? 'justify-self-start' : 'justify-self-end'"
+			>
 				<span class="font-semibold text-secondary">{{
 					formatMessage(commonMessages.actionsLabel)
 				}}</span>
@@ -285,13 +421,17 @@ function handleSort(column: ContentCardTableSortColumn) {
 					:key="item.id"
 					:data-content-card-item="item.id"
 					:project="item.project"
+					:project-type="item.projectType"
 					:project-link="item.projectLink"
 					:version="item.version"
 					:show-version="showVersion"
+					:table-layout="layout"
+					:enabled-for-column="hasEnabledForColumn"
 					:version-link="item.versionLink"
 					:owner="item.owner"
 					:source="item.source"
 					:external="item.external"
+					:external-file="item.externalFile"
 					:enabled="item.enabled"
 					:locked="item.locked"
 					:installing="item.installing"
@@ -308,6 +448,8 @@ function handleSort(column: ContentCardTableSortColumn) {
 					:toggle-disabled="item.toggleDisabled"
 					:toggle-disabled-tooltip="item.toggleDisabledTooltip"
 					:hide-toggle="item.hideToggle"
+					:enabled-for="item.enabledFor"
+					:embedded-icon="item.embeddedIcon"
 					:show-checkbox="showSelection"
 					:hide-delete="hideDelete || item.hideDelete"
 					:hide-actions="!hasAnyActions"
@@ -329,11 +471,8 @@ function handleSort(column: ContentCardTableSortColumn) {
 							toggleItemSelection(item.id, val ?? false, visibleRange.start + idx, event)
 					"
 					@update:enabled="(val) => emit('update:enabled', item.id, val)"
-					@delete="(e: MouseEvent) => emit('delete', item.id, e)"
-					@update="emit('update', item.id)"
-					v-on="
-						hasSwitchVersionListener ? { switchVersion: () => emit('switchVersion', item.id) } : {}
-					"
+					@update:enabled-for="(side, val) => emit('update:enabled-for', item.id, side, val)"
+					v-on="getItemListeners(item.id)"
 				>
 					<template #title-badges>
 						<slot name="itemTitleBadges" :item="item" :index="visibleRange.start + idx" />
@@ -359,13 +498,17 @@ function handleSort(column: ContentCardTableSortColumn) {
 				:key="item.id"
 				:data-content-card-item="item.id"
 				:project="item.project"
+				:project-type="item.projectType"
 				:project-link="item.projectLink"
 				:version="item.version"
 				:show-version="showVersion"
+				:table-layout="layout"
+				:enabled-for-column="hasEnabledForColumn"
 				:version-link="item.versionLink"
 				:owner="item.owner"
 				:source="item.source"
 				:external="item.external"
+				:external-file="item.externalFile"
 				:enabled="item.enabled"
 				:locked="item.locked"
 				:installing="item.installing"
@@ -382,6 +525,8 @@ function handleSort(column: ContentCardTableSortColumn) {
 				:toggle-disabled="item.toggleDisabled"
 				:toggle-disabled-tooltip="item.toggleDisabledTooltip"
 				:hide-toggle="item.hideToggle"
+				:enabled-for="item.enabledFor"
+				:embedded-icon="item.embeddedIcon"
 				:show-checkbox="showSelection"
 				:hide-delete="hideDelete || item.hideDelete"
 				:hide-actions="!hasAnyActions"
@@ -398,9 +543,8 @@ function handleSort(column: ContentCardTableSortColumn) {
 				]"
 				@select="(val, event) => toggleItemSelection(item.id, val ?? false, index, event)"
 				@update:enabled="(val) => emit('update:enabled', item.id, val)"
-				@delete="(e: MouseEvent) => emit('delete', item.id, e)"
-				@update="emit('update', item.id)"
-				@switch-version="emit('switchVersion', item.id)"
+				@update:enabled-for="(side, val) => emit('update:enabled-for', item.id, side, val)"
+				v-on="getItemListeners(item.id)"
 			>
 				<template #title-badges>
 					<slot name="itemTitleBadges" :item="item" :index="index" />

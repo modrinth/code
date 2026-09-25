@@ -758,12 +758,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "アカウントが違います"
   },
-  "app.instance.share.members.empty": {
-    "message": "まだ誰も参加していません"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "フィルターに一致するユーザーが見つかりません。"
-  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "このインスタンスのアップデートは受信できなくなります"
   },
@@ -2282,9 +2276,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "リンク済の共有インスタンス"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "インスタンスを非公開化"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "インスタンスの共有を解除"
   },
@@ -2294,14 +2285,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "共有を解除中…"
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "共有インスタンスを非公開にする"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "この共有インスタンスをModrinthから削除し、使用者へのアップデート送信を停止します。ローカルのインスタンスには影響しません。"
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "非公開に設定中…"
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "これはローカルインスタンスにのみ影響します。インストール済みのコンテンツはこのデバイスに残り、共有インスタンスやそれを使用している他のユーザーには影響しません。"
@@ -2314,12 +2299,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Modrinthのサーバーからこの共有インスタンスを削除します。Modrinthアプリでこれを使用しているユーザーへのアップデート配信は停止しますが、ローカルのインスタンスとそのコンテンツはこのデバイスに残ります。"
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "共有インスタンスの非公開化"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "共有インスタンスを非公開にする"
   },
   "instance.action.create-shortcut": {
     "message": "ショートカットを作成"
@@ -2390,219 +2369,6 @@
   "instance.files.save-as": {
     "message": "名前をつけて保存…"
   },
-  "instance.icon-editor.background": {
-    "message": "背景"
-  },
-  "instance.icon-editor.background.blue": {
-    "message": "青色"
-  },
-  "instance.icon-editor.background.dark-gray": {
-    "message": "濃い灰色"
-  },
-  "instance.icon-editor.background.dark-green": {
-    "message": "濃い緑色"
-  },
-  "instance.icon-editor.background.gray": {
-    "message": "灰色"
-  },
-  "instance.icon-editor.background.green": {
-    "message": "緑色"
-  },
-  "instance.icon-editor.background.indigo": {
-    "message": "藍色"
-  },
-  "instance.icon-editor.background.lavender": {
-    "message": "ラベンダー色"
-  },
-  "instance.icon-editor.background.light-gray": {
-    "message": "薄灰色"
-  },
-  "instance.icon-editor.background.lime": {
-    "message": "黄緑色"
-  },
-  "instance.icon-editor.background.orange": {
-    "message": "橙色"
-  },
-  "instance.icon-editor.background.pink": {
-    "message": "桃色"
-  },
-  "instance.icon-editor.background.purple": {
-    "message": "紫色"
-  },
-  "instance.icon-editor.background.red": {
-    "message": "赤色"
-  },
-  "instance.icon-editor.background.rose": {
-    "message": "薔薇色"
-  },
-  "instance.icon-editor.background.yellow": {
-    "message": "黄色"
-  },
-  "instance.icon-editor.description": {
-    "message": "要素を組み合わせてカスタムアイコンを作成しましょう。"
-  },
-  "instance.icon-editor.recents": {
-    "message": "最近使用した項目"
-  },
-  "instance.icon-editor.save": {
-    "message": "アイコンを保存"
-  },
-  "instance.icon-editor.surprise-me": {
-    "message": "ランダム化"
-  },
-  "instance.icon-editor.symbol": {
-    "message": "記号"
-  },
-  "instance.icon-editor.symbol.backpack": {
-    "message": "バックパック"
-  },
-  "instance.icon-editor.symbol.beacon": {
-    "message": "ビーコン"
-  },
-  "instance.icon-editor.symbol.blue-shark": {
-    "message": "ブルーシャーク"
-  },
-  "instance.icon-editor.symbol.bookshelf": {
-    "message": "本棚"
-  },
-  "instance.icon-editor.symbol.brown-bear": {
-    "message": "ヒグマ"
-  },
-  "instance.icon-editor.symbol.cake": {
-    "message": "ケーキ"
-  },
-  "instance.icon-editor.symbol.campfire": {
-    "message": "焚き火"
-  },
-  "instance.icon-editor.symbol.chest": {
-    "message": "チェスト"
-  },
-  "instance.icon-editor.symbol.cogwheel": {
-    "message": "歯車"
-  },
-  "instance.icon-editor.symbol.command-block": {
-    "message": "コマンドブロック"
-  },
-  "instance.icon-editor.symbol.cooking-pot": {
-    "message": "調理鍋"
-  },
-  "instance.icon-editor.symbol.couch": {
-    "message": "ソファー"
-  },
-  "instance.icon-editor.symbol.crafting-table": {
-    "message": "作業台"
-  },
-  "instance.icon-editor.symbol.create-wrench": {
-    "message": "レンチ"
-  },
-  "instance.icon-editor.symbol.creeper": {
-    "message": "クリーパー"
-  },
-  "instance.icon-editor.symbol.enchanting-table": {
-    "message": "エンチャントテーブル"
-  },
-  "instance.icon-editor.symbol.ender-chest": {
-    "message": "エンダーチェスト"
-  },
-  "instance.icon-editor.symbol.ender-dragon": {
-    "message": "エンダードラゴン"
-  },
-  "instance.icon-editor.symbol.engine": {
-    "message": "エンジン"
-  },
-  "instance.icon-editor.symbol.fabric": {
-    "message": "Fabric"
-  },
-  "instance.icon-editor.symbol.forge": {
-    "message": "Forge"
-  },
-  "instance.icon-editor.symbol.furnace": {
-    "message": "かまど"
-  },
-  "instance.icon-editor.symbol.gizmo": {
-    "message": "Gizmo"
-  },
-  "instance.icon-editor.symbol.globe": {
-    "message": "地球"
-  },
-  "instance.icon-editor.symbol.grass-block": {
-    "message": "草ブロック"
-  },
-  "instance.icon-editor.symbol.lantern": {
-    "message": "ランタン"
-  },
-  "instance.icon-editor.symbol.moobloom": {
-    "message": "ムーブルーム"
-  },
-  "instance.icon-editor.symbol.mr-pack": {
-    "message": "Mr Pack"
-  },
-  "instance.icon-editor.symbol.neoforge": {
-    "message": "NeoForge"
-  },
-  "instance.icon-editor.symbol.orb": {
-    "message": "オーブ"
-  },
-  "instance.icon-editor.symbol.oxygen-distributor": {
-    "message": "酸素分配機"
-  },
-  "instance.icon-editor.symbol.pancakes": {
-    "message": "パンケーキ"
-  },
-  "instance.icon-editor.symbol.pickaxe": {
-    "message": "ツルハシ"
-  },
-  "instance.icon-editor.symbol.poke-ball": {
-    "message": "モンスターボール"
-  },
-  "instance.icon-editor.symbol.quilt": {
-    "message": "Quilt"
-  },
-  "instance.icon-editor.symbol.redstone-block": {
-    "message": "レッドストーンブロック"
-  },
-  "instance.icon-editor.symbol.sculk-sensor": {
-    "message": "スカルクセンサー"
-  },
-  "instance.icon-editor.symbol.skeleton": {
-    "message": "スケルトン"
-  },
-  "instance.icon-editor.symbol.skillet": {
-    "message": "フライパン"
-  },
-  "instance.icon-editor.symbol.slime-block": {
-    "message": "スライムブロック"
-  },
-  "instance.icon-editor.symbol.space-helmet": {
-    "message": "宇宙ヘルメット"
-  },
-  "instance.icon-editor.symbol.sticky-piston": {
-    "message": "粘着ピストン"
-  },
-  "instance.icon-editor.symbol.sword": {
-    "message": "剣"
-  },
-  "instance.icon-editor.symbol.terminal": {
-    "message": "ターミナル"
-  },
-  "instance.icon-editor.symbol.tiny-potato": {
-    "message": "小さなジャガイモ"
-  },
-  "instance.icon-editor.symbol.tire": {
-    "message": "タイヤ"
-  },
-  "instance.icon-editor.symbol.tnt": {
-    "message": "TNT"
-  },
-  "instance.icon-editor.symbol.wrenth-rinth": {
-    "message": "Modrinthのレンチ"
-  },
-  "instance.icon-editor.symbol.zombie": {
-    "message": "ゾンビ"
-  },
-  "instance.icon-editor.title": {
-    "message": "アイコンエディター"
-  },
   "instance.last-played": {
     "message": "最終プレイ"
   },
@@ -2626,45 +2392,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "リソースパック"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "アクション"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "招待リンク"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "アクティブな招待リンクをお持ちの方なら誰でも参加できます。"
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "有効な招待はありません。"
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "有効期限"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "招待を取り消す"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "招待コード {code} を取り消す"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "有効な招待"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "ユーザー"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "招待リンク <monospace>{code}</monospace> は即座に無効化されます。すでに参加しているユーザーのアクセス権はそのまま保持されます。"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "この操作は取り消せません"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "招待を取り消す"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "招待を取り消す"
   },
   "instance.settings.tabs.behavior.description": {
     "message": "このインスタンスに表示するタブを選択してください。"
@@ -2977,9 +2704,6 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "共有インスタンスへのアクセス権が取り消されました。このインスタンスは引き続き利用可能ですが、リンクは解除され、今後のアップデートは受信されなくなります。"
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "プライマリインスタンスが削除されました。このインスタンスは引き続き利用可能ですが、リンクは解除され、今後のアップデートは受信されなくなります。"
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "この共有インスタンスはコンテンツモデレーションチームによってロックされました。プライマリインスタンスからのアップデートの受信は停止し、プレイすることもできません。"

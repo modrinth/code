@@ -761,12 +761,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Verkeerd account"
   },
-  "app.instance.share.members.empty": {
-    "message": "Nog geen gebruikers zijn lid geworden"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Geen gebruikers voldoen aan je filters."
-  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Ze zullen geen updates meer ontvangen voor deze gedeelde instantie"
   },
@@ -3197,9 +3191,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Gekoppelde gedeelde instantie"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "Instantie terugtrekken"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Gedeelde instantie ontkoppelen"
   },
@@ -3209,14 +3200,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Ontkoppelen..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Gedeelde instantie terugtrekken"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Verwijder deze gedeelde instantie uit Modrinth en stuur geen updates meer naar gebruikers ervan. Je lokale instantie merkt hier geen gevolgen van."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Terugtrekken..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Dit heeft alleen gevolgen voor je lokale instantie. Je geïnstalleerde inhoud blijft op dit apparaat staan, en de gedeelde instantie en andere gebruikers ervan ondervinden hier geen hinder van."
@@ -3229,12 +3214,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Hiermee wordt de gedeelde instantie van de servers van Modrinth verwijderd. Gebruikers die deze instantie in de Modrinth-app gebruiken, ontvangen geen updates meer, maar je lokale instantie en de inhoud daarvan blijven op dit apparaat staan."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Gedeelde instantie terugtrekken"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Gedeelde instantie terugtrekken"
   },
   "instance.action.create-shortcut": {
     "message": "Snelkoppeling maken"
@@ -3305,219 +3284,6 @@
   "instance.files.save-as": {
     "message": "Opslaan als..."
   },
-  "instance.icon-editor.background": {
-    "message": "Achtergrond"
-  },
-  "instance.icon-editor.background.blue": {
-    "message": "Blauw"
-  },
-  "instance.icon-editor.background.dark-gray": {
-    "message": "Donkergrijs"
-  },
-  "instance.icon-editor.background.dark-green": {
-    "message": "Donkergroen"
-  },
-  "instance.icon-editor.background.gray": {
-    "message": "Grijs"
-  },
-  "instance.icon-editor.background.green": {
-    "message": "Groen"
-  },
-  "instance.icon-editor.background.indigo": {
-    "message": "Indigo"
-  },
-  "instance.icon-editor.background.lavender": {
-    "message": "Lavendel"
-  },
-  "instance.icon-editor.background.light-gray": {
-    "message": "Lichtgrijs"
-  },
-  "instance.icon-editor.background.lime": {
-    "message": "Limoen"
-  },
-  "instance.icon-editor.background.orange": {
-    "message": "Oranje"
-  },
-  "instance.icon-editor.background.pink": {
-    "message": "Roze"
-  },
-  "instance.icon-editor.background.purple": {
-    "message": "Paars"
-  },
-  "instance.icon-editor.background.red": {
-    "message": "Rood"
-  },
-  "instance.icon-editor.background.rose": {
-    "message": "Roos"
-  },
-  "instance.icon-editor.background.yellow": {
-    "message": "Geel"
-  },
-  "instance.icon-editor.description": {
-    "message": "Mix en match elementen om een aangepast icoon te maken."
-  },
-  "instance.icon-editor.recents": {
-    "message": "Recente"
-  },
-  "instance.icon-editor.save": {
-    "message": "Pictogram opslaan"
-  },
-  "instance.icon-editor.surprise-me": {
-    "message": "Willekeurig"
-  },
-  "instance.icon-editor.symbol": {
-    "message": "Symbool"
-  },
-  "instance.icon-editor.symbol.backpack": {
-    "message": "Rugzak"
-  },
-  "instance.icon-editor.symbol.beacon": {
-    "message": "Baken"
-  },
-  "instance.icon-editor.symbol.blue-shark": {
-    "message": "Blauwe haai"
-  },
-  "instance.icon-editor.symbol.bookshelf": {
-    "message": "Boekenkast"
-  },
-  "instance.icon-editor.symbol.brown-bear": {
-    "message": "Bruine beer"
-  },
-  "instance.icon-editor.symbol.cake": {
-    "message": "Taart"
-  },
-  "instance.icon-editor.symbol.campfire": {
-    "message": "Kampvuur"
-  },
-  "instance.icon-editor.symbol.chest": {
-    "message": "Kist"
-  },
-  "instance.icon-editor.symbol.cogwheel": {
-    "message": "Tandwiel"
-  },
-  "instance.icon-editor.symbol.command-block": {
-    "message": "Opdrachtblok"
-  },
-  "instance.icon-editor.symbol.cooking-pot": {
-    "message": "Kookpot"
-  },
-  "instance.icon-editor.symbol.couch": {
-    "message": "Bank"
-  },
-  "instance.icon-editor.symbol.crafting-table": {
-    "message": "Werkbank"
-  },
-  "instance.icon-editor.symbol.create-wrench": {
-    "message": "Moersleutel"
-  },
-  "instance.icon-editor.symbol.creeper": {
-    "message": "Creeper"
-  },
-  "instance.icon-editor.symbol.enchanting-table": {
-    "message": "Betoveringstafel"
-  },
-  "instance.icon-editor.symbol.ender-chest": {
-    "message": "Enderkist"
-  },
-  "instance.icon-editor.symbol.ender-dragon": {
-    "message": "Enderdraak"
-  },
-  "instance.icon-editor.symbol.engine": {
-    "message": "Engine"
-  },
-  "instance.icon-editor.symbol.fabric": {
-    "message": "Fabric"
-  },
-  "instance.icon-editor.symbol.forge": {
-    "message": "Forge"
-  },
-  "instance.icon-editor.symbol.furnace": {
-    "message": "Oven"
-  },
-  "instance.icon-editor.symbol.gizmo": {
-    "message": "Gizmo"
-  },
-  "instance.icon-editor.symbol.globe": {
-    "message": "Wereldbol"
-  },
-  "instance.icon-editor.symbol.grass-block": {
-    "message": "Grasblok"
-  },
-  "instance.icon-editor.symbol.lantern": {
-    "message": "Lantaarn"
-  },
-  "instance.icon-editor.symbol.moobloom": {
-    "message": "Moobloom"
-  },
-  "instance.icon-editor.symbol.mr-pack": {
-    "message": "Meneer Pack"
-  },
-  "instance.icon-editor.symbol.neoforge": {
-    "message": "NeoForge"
-  },
-  "instance.icon-editor.symbol.orb": {
-    "message": "Orb"
-  },
-  "instance.icon-editor.symbol.oxygen-distributor": {
-    "message": "Zuurstofdistributeur"
-  },
-  "instance.icon-editor.symbol.pancakes": {
-    "message": "Pannenkoeken"
-  },
-  "instance.icon-editor.symbol.pickaxe": {
-    "message": "Pikhouweel"
-  },
-  "instance.icon-editor.symbol.poke-ball": {
-    "message": "Poke bal"
-  },
-  "instance.icon-editor.symbol.quilt": {
-    "message": "Quilt"
-  },
-  "instance.icon-editor.symbol.redstone-block": {
-    "message": "Redstone-blok"
-  },
-  "instance.icon-editor.symbol.sculk-sensor": {
-    "message": "Sculk sensor"
-  },
-  "instance.icon-editor.symbol.skeleton": {
-    "message": "Skelet"
-  },
-  "instance.icon-editor.symbol.skillet": {
-    "message": "Koekepan"
-  },
-  "instance.icon-editor.symbol.slime-block": {
-    "message": "Slijmblok"
-  },
-  "instance.icon-editor.symbol.space-helmet": {
-    "message": "Ruimte helm"
-  },
-  "instance.icon-editor.symbol.sticky-piston": {
-    "message": "Kleefzuiger"
-  },
-  "instance.icon-editor.symbol.sword": {
-    "message": "Zwaard"
-  },
-  "instance.icon-editor.symbol.terminal": {
-    "message": "Terminal"
-  },
-  "instance.icon-editor.symbol.tiny-potato": {
-    "message": "Kleine aardappel"
-  },
-  "instance.icon-editor.symbol.tire": {
-    "message": "Band"
-  },
-  "instance.icon-editor.symbol.tnt": {
-    "message": "Dynamiet"
-  },
-  "instance.icon-editor.symbol.wrenth-rinth": {
-    "message": "Modrinth moersleutel"
-  },
-  "instance.icon-editor.symbol.zombie": {
-    "message": "Zombie"
-  },
-  "instance.icon-editor.title": {
-    "message": "Pictogram bewerker"
-  },
   "instance.last-played": {
     "message": "Laatst gespeeld"
   },
@@ -3541,45 +3307,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Bronpakket"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Acties"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Uitnodigingslink"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Iedereen die zo'n uitnodigingslink heeft, kan meedoen zolang deze actief is."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "Er zijn geen actieve uitnodigingen."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Vervalt"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Uitnodiging intrekken"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "Uitnodiging {code} intrekken"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Actieve uitnodigingen"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Keren gebruikt"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "De uitnodigingslink <monospace>{code}</monospace> zal gelijk niet meer werken. Mensen die zich al hebben aangemeld, behouden hun toegang."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Deze actie kan niet ongedaan worden gemaakt"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Uitnodiging intrekken"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Uitnodiging intrekken"
   },
   "instance.settings.tabs.behavior.description": {
     "message": "Kies welke tabbladen worden weergegeven op deze instantie."
@@ -3892,9 +3619,6 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Je toegang tot de gedeelde instantie is ingetrokken. Deze instantie is nog steeds beschikbaar, maar is niet langer gekoppeld en ontvangt geen updates meer."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "De hoofdinstantie is verwijderd. Deze instantie is nog steeds beschikbaar, maar is niet meer gekoppeld en ontvangt geen updates meer."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Deze gedeelde instantie is vergrendeld door het inhoudsmoderatieteam. De instantie ontvangt geen updates meer van de hoofdinstantie en je kunt er niet meer in spelen."

@@ -136,7 +136,7 @@ const messages = defineMessages({
 	resetServerDescription: {
 		id: 'hosting.loader.reset-server-description',
 		defaultMessage:
-			'Removes all data on your server, including your worlds, mods, and configuration files. Backups will remain and can be restored.',
+			'Removes all data on your server, including your worlds, mods, and configuration files. Backups will remain and can be restored. Invited players will keep their access.',
 	},
 	loaderVersionLabel: {
 		id: 'hosting.loader.loader-version',
@@ -498,6 +498,29 @@ async function uploadLocalModpackWithSoftOverride() {
 	})
 	emit('reinstall')
 	return true
+}
+
+async function disableAddonsEverywhere(addons: Archon.Content.v1.Addon[]) {
+	const targetWorldId = worldId.value!
+	const requests: Array<() => Promise<void>> = []
+	for (const addon of addons) {
+		const request: Archon.Content.v1.SetAddonEnabledRequest = {
+			kind: addon.kind,
+			filename: addon.filename,
+			enabled: false,
+		}
+		if (!addon.disabled_server)
+			requests.push(() =>
+				client.archon.content_v1.setAddonEnabledServer(serverId, targetWorldId, request),
+			)
+		if (!addon.disabled_player)
+			requests.push(() =>
+				client.archon.content_v1.setAddonEnabledPlayer(serverId, targetWorldId, request),
+			)
+	}
+	for (let index = 0; index < requests.length; index += 8) {
+		await Promise.all(requests.slice(index, index + 8).map((request) => request()))
+	}
 }
 
 provideInstallationSettings({
@@ -899,12 +922,12 @@ provideInstallationSettings({
 		if (setupActionDisabled.value) return
 		debug('disableAllContent: fetching all addons')
 		const addons = await client.archon.content_v1.getAddons(serverId, worldId.value!)
-		const items = (addons.addons ?? [])
-			.filter((a) => !a.disabled)
-			.map((a) => ({ kind: a.kind, filename: a.filename }))
-		if (items.length > 0) {
-			debug('disableAllContent: disabling', items.length, 'addons')
-			await client.archon.content_v1.disableAddons(serverId, worldId.value!, items)
+		const activeAddons = (addons.addons ?? []).filter(
+			(addon) => !addon.disabled_server || !addon.disabled_player,
+		)
+		if (activeAddons.length > 0) {
+			debug('disableAllContent: disabling', activeAddons.length, 'addons')
+			await disableAddonsEverywhere(activeAddons)
 		}
 		debug('disableAllContent: done')
 	},
@@ -913,7 +936,9 @@ provideInstallationSettings({
 		if (setupActionDisabled.value) return
 		debug('disableIncompatibleContent: fetching addons')
 		const addons = await client.archon.content_v1.getAddons(serverId, worldId.value!)
-		const activeAddons = (addons.addons ?? []).filter((a) => !a.disabled)
+		const activeAddons = (addons.addons ?? []).filter(
+			(addon) => !addon.disabled_server || !addon.disabled_player,
+		)
 
 		const modrinthAddons = activeAddons.filter((a) => a.version?.id)
 		const customAddons = activeAddons.filter((a) => !a.version?.id)
@@ -936,7 +961,12 @@ provideInstallationSettings({
 
 		if (incompatibleItems.length > 0) {
 			debug('disableIncompatibleContent: disabling', incompatibleItems.length, 'addons')
-			await client.archon.content_v1.disableAddons(serverId, worldId.value!, incompatibleItems)
+			const incompatibleKeys = new Set(
+				incompatibleItems.map((item) => `${item.kind}:${item.filename}`),
+			)
+			await disableAddonsEverywhere(
+				activeAddons.filter((addon) => incompatibleKeys.has(`${addon.kind}:${addon.filename}`)),
+			)
 		}
 		debug('disableIncompatibleContent: done')
 	},

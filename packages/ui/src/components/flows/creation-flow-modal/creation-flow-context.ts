@@ -1,6 +1,6 @@
 import type { Archon, LauncherMeta } from '@modrinth/api-client'
 import { useQueryClient } from '@tanstack/vue-query'
-import { computed, type ComputedRef, type Ref, ref, type ShallowRef, watch } from 'vue'
+import { computed, type ComputedRef, nextTick, type Ref, ref, type ShallowRef, watch } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
@@ -16,6 +16,8 @@ import { createContext, injectModrinthClient, injectNotificationManager } from '
 import type { ImportableLauncher } from '../../../providers/instance-import'
 import type { MultiStageModal, StageConfigInput } from '../../base'
 import type { ComboboxOption } from '../../base/Combobox.vue'
+import { installServerContent, prepareServerContent, searchServerContent } from './server-content'
+import { createServerOnboardingInvite } from './server-onboarding-invite'
 import { stageConfigs } from './stages'
 
 export type FlowType = 'world' | 'server-onboarding' | 'reset-server' | 'instance'
@@ -60,6 +62,10 @@ export const creationFlowMessages = defineMessages({
 	createInstanceButton: {
 		id: 'creation-flow.button.create-instance',
 		defaultMessage: 'Create instance',
+	},
+	uploadingProgress: {
+		id: 'servers.setup.onboarding.uploading.progress',
+		defaultMessage: 'Uploading ({percent, number}%)',
 	},
 	setupServerButton: {
 		id: 'creation-flow.button.setup-server',
@@ -118,6 +124,8 @@ export interface ProjectSearchResult {
 }
 
 export interface ProjectInstallSelection {
+	versionId?: string
+	contentType?: 'mod' | 'plugin' | 'datapack'
 	projectId: string
 	title: string
 	iconUrl?: string | null
@@ -215,8 +223,16 @@ export interface CreationFlowContextValue {
 
 	// Loading state (set when finish() is called, cleared on reset)
 	loading: Ref<boolean>
+	uploadProgress: Ref<number | null>
 	finishDisabled: ComputedRef<boolean>
 	finishDisabledTooltip: ComputedRef<string | undefined>
+	inviteLink: Ref<string | null>
+	inviteLoading: Ref<boolean>
+	inviteError: Ref<string | null>
+	inviteSubmitted: Ref<boolean>
+	inviteCopied: Ref<boolean>
+	navigating: Ref<boolean>
+	inviteCompleted: Ref<boolean>
 
 	// Backup state (set by InlineBackupCreator in reset-server flow)
 	isBackingUp: Ref<boolean>
@@ -233,9 +249,18 @@ export interface CreationFlowContextValue {
 	reset: (instanceCount?: number) => Promise<void>
 	setSetupType: (type: SetupType) => void
 	setImportMode: () => void
-	browseModpacks: () => void
-	selectProject: (projectId: string, projectType: string) => Promise<void>
+	browseModpacks: () => Promise<void>
+	selectProject: (projectId: string, projectType: string, versionId?: string) => Promise<void>
+	installServerContent: (serverId: string, worldId: string) => Promise<void>
 	finish: () => void
+	showInvite: (
+		serverId: string,
+		worldId: string,
+		siteUrl: string,
+		onDone: () => void | Promise<void>,
+	) => void
+	retryInvite: () => Promise<void>
+	completeInvite: () => Promise<void>
 	buildProperties: () => Archon.Content.v1.PropertiesFields
 	fetchLoaderMetadata: (loader?: string | null) => Promise<void>
 	prefetchLoaderMetadata: () => Promise<void>
@@ -261,6 +286,7 @@ export interface CreationFlowOptions {
 	initialGameVersion?: string
 	fetchExistingInstanceNames?: () => Promise<string[]>
 	onBack?: () => void
+	browseModpacks?: () => Promise<void>
 	searchProjects?: (query: string, limit?: number) => Promise<ProjectSearchResult>
 	prepareProjectInstall?: (
 		projectId: string,
@@ -298,10 +324,14 @@ export function createCreationFlowContext(
 	const onBack = options.onBack ?? null
 	const randomizeInstanceIcon = options.randomizeInstanceIcon ?? null
 	const customizeInstanceIcon = options.customizeInstanceIcon ?? null
-	const searchProjects = options.searchProjects!
+	const searchProjects =
+		options.searchProjects ??
+		((query: string, limit?: number) => searchServerContent(client, query, limit))
 	const prepareProjectInstall = options.prepareProjectInstall
 	const createProjectInstall = options.createProjectInstall
-	const getProjectVersions = options.getProjectVersions!
+	const getProjectVersions =
+		options.getProjectVersions ??
+		((projectId: string) => client.labrinth.versions_v3.getProjectVersions(projectId))
 	const getLoaderManifest = options.getLoaderManifest ?? null
 	const finishDisabled = options.finishDisabled ?? computed(() => false)
 	const finishDisabledTooltip = options.finishDisabledTooltip ?? computed(() => undefined)
@@ -376,6 +406,20 @@ export function createCreationFlowContext(
 
 	const hardReset = ref(isInitialSetup)
 	const loading = ref(false)
+	const uploadProgress = ref<number | null>(null)
+	const inviteLink = ref<string | null>(null)
+	const inviteLoading = ref(false)
+	const inviteError = ref<string | null>(null)
+	const inviteSubmitted = ref(false)
+	const inviteCompleted = ref(false)
+	const inviteCopied = ref(false)
+	const navigating = ref(false)
+	watch(inviteLink, () => {
+		inviteCopied.value = false
+	})
+	let inviteRun = 0
+	let inviteTarget: { serverId: string; worldId: string; siteUrl: string } | null = null
+	let inviteOnDone: (() => void | Promise<void>) | null = null
 	const isBackingUp = ref(false)
 	const cancelBackup = ref<(() => void) | null>(null)
 
@@ -387,7 +431,7 @@ export function createCreationFlowContext(
 		() =>
 			setupType.value === 'vanilla' ||
 			selectedLoader.value === 'vanilla' ||
-			projectInstall.value !== null,
+			(flowType === 'instance' && projectInstall.value !== null),
 	)
 
 	function toApiLoaderName(loader: string): string {
@@ -468,6 +512,17 @@ export function createCreationFlowContext(
 	}
 
 	async function reset() {
+		inviteRun++
+		inviteLink.value = null
+		inviteLoading.value = false
+		inviteError.value = null
+		inviteSubmitted.value = false
+		inviteCompleted.value = false
+		inviteCopied.value = false
+		navigating.value = false
+		uploadProgress.value = null
+		inviteTarget = null
+		inviteOnDone = null
 		if (fetchExistingInstanceNames) {
 			existingInstanceNames.value = await fetchExistingInstanceNames()
 		}
@@ -543,16 +598,33 @@ export function createCreationFlowContext(
 		modal.value?.setStage('import-instance')
 	}
 
-	function browseModpacks() {
-		modal.value?.hide()
-		emit.browseModpacks()
+	async function browseModpacks() {
+		if (navigating.value || finishDisabled.value) return
+		if (!options.browseModpacks) {
+			modal.value?.hide()
+			emit.browseModpacks()
+			return
+		}
+		navigating.value = true
+		try {
+			await options.browseModpacks()
+			navigating.value = false
+			await nextTick()
+			modal.value?.hide()
+		} catch (error) {
+			handleError(error as Error)
+		} finally {
+			navigating.value = false
+		}
 	}
 
-	async function selectProject(projectId: string, projectType: string) {
-		if (!prepareProjectInstall) return
+	async function selectProject(projectId: string, projectType: string, versionId?: string) {
+		if (!prepareProjectInstall && flowType === 'instance') return
 
 		try {
-			const selection = await prepareProjectInstall(projectId, projectType)
+			const selection = prepareProjectInstall
+				? await prepareProjectInstall(projectId, projectType)
+				: await prepareServerContent(client, projectId, projectType, availableLoaders, versionId)
 			if (selection) {
 				setProjectInstall(selection)
 			} else {
@@ -608,6 +680,58 @@ export function createCreationFlowContext(
 			return
 		}
 		emit.create(contextValue)
+	}
+
+	async function retryInvite() {
+		if (!inviteTarget || inviteLoading.value) return
+		const run = ++inviteRun
+		inviteLoading.value = true
+		inviteError.value = null
+		try {
+			const link = await createServerOnboardingInvite(
+				client,
+				inviteTarget.serverId,
+				inviteTarget.worldId,
+				inviteTarget.siteUrl,
+				() => run === inviteRun,
+			)
+			if (run === inviteRun) inviteLink.value = link
+		} catch (error) {
+			if (run === inviteRun) {
+				inviteError.value = error instanceof Error ? error.message : String(error)
+			}
+		} finally {
+			if (run === inviteRun) inviteLoading.value = false
+		}
+	}
+
+	function showInvite(
+		serverId: string,
+		worldId: string,
+		siteUrl: string,
+		onDone: () => void | Promise<void>,
+	) {
+		if (flowType !== 'server-onboarding') return
+		inviteTarget = { serverId, worldId, siteUrl }
+		inviteOnDone = onDone
+		inviteSubmitted.value = true
+		modal.value?.setStage('invite-friends')
+		loading.value = false
+		void retryInvite()
+	}
+
+	async function completeInvite() {
+		if (!inviteSubmitted.value || inviteCompleted.value || loading.value || navigating.value) return
+		const onDone = inviteOnDone
+		inviteCompleted.value = true
+		inviteRun++
+		inviteLoading.value = false
+		modal.value?.hide()
+		try {
+			await onDone?.()
+		} catch (error) {
+			handleError(error as Error)
+		}
 	}
 
 	function buildProperties(): Archon.Content.v1.PropertiesFields {
@@ -682,8 +806,16 @@ export function createCreationFlowContext(
 		importSearchQuery,
 		hardReset,
 		loading,
+		uploadProgress,
 		finishDisabled,
 		finishDisabledTooltip,
+		inviteLink,
+		inviteLoading,
+		inviteError,
+		inviteSubmitted,
+		inviteCompleted,
+		inviteCopied,
+		navigating,
 		isBackingUp,
 		cancelBackup,
 		modal,
@@ -694,7 +826,12 @@ export function createCreationFlowContext(
 		setImportMode,
 		browseModpacks,
 		selectProject,
+		installServerContent: (serverId, worldId) =>
+			installServerContent(client, contextValue, serverId, worldId),
 		finish,
+		showInvite,
+		retryInvite,
+		completeInvite,
 		buildProperties,
 		fetchLoaderMetadata,
 		prefetchLoaderMetadata,

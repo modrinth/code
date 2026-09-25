@@ -1,14 +1,12 @@
 <template>
-	<div
-		class="h-full w-full pt-6"
-		:class="isContainedServerRoute ? 'box-border min-h-0 overflow-hidden' : ''"
-	>
+	<div class="w-full pt-6" :class="isOverviewRoute ? 'flex min-h-full flex-col' : 'h-full'">
 		<ServersManageRootLayout
 			:server-id="serverId"
-			:layout-mode="isContainedServerRoute ? 'contained' : 'page'"
+			:layout-mode="isOverviewRoute ? 'fill' : 'page'"
 			:reload-page="() => router.go(0)"
 			:resolve-viewer="resolveViewer"
 			:show-copy-id-action="appSettings.devMode"
+			:site-url="config.siteUrl"
 			:auth-user="authUser"
 			:navigate-to-billing="() => openUrl('https://modrinth.com/settings/billing')"
 			:navigate-to-servers="() => router.push('/hosting/manage')"
@@ -58,13 +56,15 @@ import {
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { useCachedServerIcon } from '@/composables/use-cached-server-icon'
+import { config } from '@/config'
 import { get_user } from '@/helpers/cache'
 import { get as getCreds } from '@/helpers/mr_auth'
-import { provideBreadcrumbParent, useBreadcrumb } from '@/providers/breadcrumbs'
+import { provideBreadcrumbParent, useBreadcrumb, useRootBreadcrumb } from '@/providers/breadcrumbs'
 
 const route = useRoute()
 const router = useRouter()
@@ -74,10 +74,21 @@ const queryClient = useQueryClient()
 const appSettings = useAppSettings()
 const { formatMessage } = useVIntl()
 
-const isContainedServerRoute = computed(() => route.name === 'ServerManageOverview')
+const serverRoute = shallowRef(router.currentRoute.value)
+watch(
+	router.currentRoute,
+	(nextRoute) => {
+		if (nextRoute.matched.some((record) => record.name === 'ServerManage')) {
+			serverRoute.value = nextRoute
+		}
+	},
+	{ flush: 'sync' },
+)
+
+const isOverviewRoute = computed(() => serverRoute.value.name === 'ServerManageOverview')
 
 const serverId = computed(() => {
-	const rawId = route.params.id
+	const rawId = serverRoute.value.params.id
 	return Array.isArray(rawId) ? (rawId[0] ?? '') : (rawId ?? '')
 })
 
@@ -120,13 +131,31 @@ watch(
 	{ immediate: true },
 )
 
-const serverBreadcrumb = useBreadcrumb({
-	slot: 'server',
-	id: () => `server:${breadcrumbServerId.value}`,
-	label: breadcrumbLabel,
+const serverIcon = useCachedServerIcon(
+	breadcrumbServerId,
+	() => serverData.value?.upstream?.project_id,
+)
+const hostingBreadcrumb = useRootBreadcrumb({
+	slot: 'root',
+	id: 'servers',
+	label: 'Hosting',
+	to: '/hosting/manage/',
 	visual: { type: 'icon', component: ServerStackIcon },
-	to: () => `/hosting/manage/${encodeURIComponent(breadcrumbServerId.value)}`,
 })
+const serverBreadcrumb = useBreadcrumb(
+	{
+		slot: 'server',
+		id: () => `server:${breadcrumbServerId.value}`,
+		label: breadcrumbLabel,
+		visual: () => ({
+			type: 'image',
+			src: serverIcon.value,
+			alt: breadcrumbLabel.value,
+		}),
+		to: () => `/hosting/manage/${encodeURIComponent(breadcrumbServerId.value)}`,
+	},
+	{ parent: hostingBreadcrumb },
+)
 provideBreadcrumbParent(serverBreadcrumb)
 
 watch(

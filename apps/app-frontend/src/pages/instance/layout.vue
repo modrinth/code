@@ -17,6 +17,16 @@
 				:offline="offline"
 				@unlinked="refreshInstance"
 			/>
+			<ConfirmModal
+				ref="serverOfflineModal"
+				:title="formatMessage(messages.serverOfflineTitle)"
+				:description="formatMessage(messages.serverOfflineDescription)"
+				:proceed-label="formatMessage(messages.launchAnyway)"
+				:proceed-icon="PlayIcon"
+				:danger="false"
+				:markdown="false"
+				@proceed="launchDespiteOfflineServer"
+			/>
 			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance" />
 			<SharedInstanceUpdateModal
 				ref="sharedInstanceUpdateModal"
@@ -36,11 +46,12 @@
 				:show-instance-play-time="showInstancePlayTime"
 				:time-played="timePlayed"
 				:playing="playing"
-				:loading="loading"
+				:loading="loading || checkingSharedInstanceLaunch || instanceLaunch.isStarting(instance.id)"
 				:stopping="stopping"
 				:loading-server-ping="loadingServerPing"
 				:players-online="playersOnline"
 				:status-online="statusOnline"
+				:hosting-status="hosting.isHostingInstance.value ? hosting.onlineStatus.value : undefined"
 				:ping="ping"
 				:minecraft-server="minecraftServer"
 				@repair="() => repairInstance()"
@@ -101,6 +112,7 @@ import {
 } from '@modrinth/assets'
 import {
 	commonMessages,
+	ConfirmModal,
 	ContextMenu,
 	defineMessages,
 	injectNotificationManager,
@@ -120,10 +132,9 @@ import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInsta
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import SharedInstanceInstallModal from '@/components/ui/shared-instances/shared-instance-install-modal/index.vue'
 import SharedInstanceUpdateModal from '@/components/ui/shared-instances/SharedInstanceUpdateModal.vue'
-import {
-	fetchCachedServerStatus,
-	getFreshCachedServerStatus,
-} from '@/composables/instances/use-server-status-query'
+import { useHostingInstance } from '@/composables/instances/use-hosting-instance'
+import { useInstanceLaunchState } from '@/composables/instances/use-instance-launch-state'
+import { serverStatusQueryOptions } from '@/composables/instances/use-server-status-query'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { handleSevereError } from '@/composables/use-error.js'
@@ -150,7 +161,7 @@ import {
 import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
 import { createInstanceShortcut, showInstanceInFolder } from '@/helpers/utils.js'
-import type { ServerStatus } from '@/helpers/worlds'
+import { start_join_server } from '@/helpers/worlds'
 import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 import { provideInstanceBackup } from '@/providers/instance-backup'
 import { injectServerInstall } from '@/providers/server-install'
@@ -177,6 +188,19 @@ const route = useRoute()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	serverOfflineTitle: {
+		id: 'app.instance.server.offline.title',
+		defaultMessage: 'Server is offline',
+	},
+	serverOfflineDescription: {
+		id: 'app.instance.server.offline.description',
+		defaultMessage:
+			'This server is currently offline. You can still launch Minecraft, but you may not be able to connect.',
+	},
+	launchAnyway: {
+		id: 'app.instance.server.offline.launch-anyway',
+		defaultMessage: 'Launch anyway',
+	},
 	play: { id: 'app.instance.action.play', defaultMessage: 'Play' },
 	stop: { id: 'app.instance.action.stop', defaultMessage: 'Stop' },
 	addContent: { id: 'app.instance.action.add-content', defaultMessage: 'Add content' },
@@ -296,7 +320,10 @@ const linkedProjectQuery = useQuery(
 	})),
 )
 const linkedProjectV3 = computed(() => linkedProjectQuery.data.value ?? undefined)
-const isServerInstance = computed(() => linkedProjectV3.value?.minecraft_server != null)
+const hosting = useHostingInstance(instance, offline)
+const isServerInstance = computed(
+	() => hosting.isHostingInstance.value || linkedProjectV3.value?.minecraft_server != null,
+)
 const processesQuery = useQuery(
 	computed(() => ({
 		...instanceProcessesQueryOptions(instanceId.value),
@@ -358,9 +385,14 @@ useRootBreadcrumb({
 })
 
 const loading = ref(false)
+const instanceLaunch = useInstanceLaunchState()
 const checkingSharedInstanceLaunch = ref(false)
 const subpagePending = ref(false)
 const stopping = ref(false)
+const serverOfflineModal = ref<InstanceType<typeof ConfirmModal>>()
+const pendingOfflineLaunch = ref<{ instanceId: string; context: string; address?: string } | null>(
+	null,
+)
 const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
 const sharedInstanceUpdateModal = ref<InstanceType<typeof SharedInstanceUpdateModal>>()
@@ -375,13 +407,12 @@ const { notifySharedInstanceError, notifySharedInstanceUnavailable } = useShared
 useLoadingBarToken(subpagePending)
 useLoadingBarToken(computed(() => instanceQuery.isPending.value && !instance.value))
 
-const minecraftServer = computed(() => linkedProjectV3.value?.minecraft_server)
+const minecraftServer = computed(() =>
+	hosting.isHostingInstance.value
+		? { region: hosting.region.value }
+		: linkedProjectV3.value?.minecraft_server,
+)
 const javaServerPingData = computed(() => linkedProjectV3.value?.minecraft_java_server?.ping?.data)
-const liveServerStatusOnline = ref(false)
-const statusOnline = computed(() => liveServerStatusOnline.value || !!javaServerPingData.value)
-const playersOnline = ref<number | undefined>(undefined)
-const ping = ref<number | undefined>(undefined)
-const loadingServerPing = ref(false)
 const sharedInstanceState = createSharedInstanceContext(
 	instance,
 	offline,
@@ -410,53 +441,53 @@ const sharedInstanceUpdateAvailable = computed(
 		sharedInstanceUpdateKey.value !== hiddenSharedInstanceUpdateKey.value,
 )
 
-function applyServerStatus(status: ServerStatus) {
-	playersOnline.value = status.players?.online
-	ping.value = status.ping
-	liveServerStatusOnline.value = true
-	loadingServerPing.value = true
-}
-
-function resetServerStatus() {
-	ping.value = undefined
-	playersOnline.value = undefined
-	liveServerStatusOnline.value = false
-	loadingServerPing.value = false
-}
-
-const serverAddress = computed(() => linkedProjectV3.value?.minecraft_java_server?.address)
-watch(
-	[instanceId, serverAddress, isServerInstance],
-	([requestedInstanceId, address, serverInstance]) => {
-		resetServerStatus()
-		if (serverInstance && address) {
-			const cachedStatus = getFreshCachedServerStatus(queryClient, address)
-			if (cachedStatus) {
-				applyServerStatus(cachedStatus)
-			} else {
-				playersOnline.value = undefined
-				ping.value = undefined
-				loadingServerPing.value = false
-			}
-
-			fetchCachedServerStatus(queryClient, address)
-				.then((status) => {
-					if (instanceId.value !== requestedInstanceId || serverAddress.value !== address) return
-					applyServerStatus(status)
-				})
-				.catch((error) => {
-					console.error(`Failed to fetch server status for ${address}:`, error)
-				})
-				.finally(() => {
-					if (instanceId.value !== requestedInstanceId) return
-					loadingServerPing.value = true
-				})
-		} else {
-			loadingServerPing.value = true
-		}
-	},
-	{ immediate: true },
+const serverAddress = computed(() =>
+	hosting.isHostingInstance.value
+		? hosting.address.value
+		: linkedProjectV3.value?.minecraft_java_server?.address,
 )
+const serverStatusQuery = useQuery(
+	computed(() => ({
+		...serverStatusQueryOptions(serverAddress.value ?? ''),
+		enabled: isServerInstance.value && !!serverAddress.value && !offline.value,
+		refetchInterval: 30_000,
+	})),
+)
+const serverStatus = computed(() =>
+	serverStatusQuery.isError.value ||
+	(hosting.isHostingInstance.value && hosting.onlineStatus.value === 'stopped')
+		? undefined
+		: serverStatusQuery.data.value,
+)
+const serverStatusLoading = computed(
+	() =>
+		isServerInstance.value &&
+		!offline.value &&
+		hosting.onlineStatus.value !== 'stopped' &&
+		serverStatusQuery.isPending.value,
+)
+async function refreshServerStatus() {
+	if (!serverAddress.value || offline.value) return
+	await serverStatusQuery.refetch({ throwOnError: false })
+}
+watch(hosting.onlineStatus, (status, previous) => {
+	if (
+		hosting.isHostingInstance.value &&
+		status === 'running' &&
+		previous !== 'running' &&
+		!serverStatusQuery.isFetching.value
+	) {
+		void refreshServerStatus()
+	}
+})
+const statusOnline = computed(() =>
+	hosting.isHostingInstance.value
+		? hosting.onlineStatus.value === 'running'
+		: !!serverStatus.value || !!javaServerPingData.value,
+)
+const playersOnline = computed(() => serverStatus.value?.players?.online)
+const ping = computed(() => serverStatus.value?.ping)
+const loadingServerPing = computed(() => serverStatusQuery.isFetched.value || offline.value)
 
 async function refreshInstance() {
 	await Promise.all([instanceQuery.refetch(), sharedInstanceState.refreshAvailability()])
@@ -575,13 +606,16 @@ watch(
 
 const options = ref<InstanceType<typeof ContextMenu> | null>(null)
 
-const launchInstance = async (context: string) => {
+const launchInstance = async (context: string, address?: string) => {
 	if (!instance.value || instance.value.quarantined) return
 	const currentInstance = instance.value
 	loading.value = true
 	try {
-		await run(currentInstance.id)
-		queryClient.setQueryData(instanceKeys.processes(currentInstance.id), [true])
+		await instanceLaunch.run(currentInstance.id, async () => {
+			if (address) await start_join_server(currentInstance.id, address)
+			else await run(currentInstance.id)
+			queryClient.setQueryData(instanceKeys.processes(currentInstance.id), [true])
+		})
 	} catch (err) {
 		handleSevereError(err, { instanceId: currentInstance.id })
 	}
@@ -634,11 +668,39 @@ function handleSharedInstanceUpdateComplete(successful: boolean) {
 	}
 }
 
-const startInstance = async (context: string) => {
+async function launchDespiteOfflineServer() {
+	const pending = pendingOfflineLaunch.value
+	pendingOfflineLaunch.value = null
+	if (!pending || instance.value?.id !== pending.instanceId) return
+	await startInstance(pending.context, pending.address, true)
+}
+
+const startInstance = async (context: string, address?: string, skipOfflineWarning = false) => {
 	if (!instance.value || instance.value.quarantined) return
-	if (checkingSharedInstanceLaunch.value || loading.value || playing.value) return
+	if (
+		checkingSharedInstanceLaunch.value ||
+		loading.value ||
+		playing.value ||
+		instanceLaunch.isStarting(instance.value.id)
+	)
+		return
 
 	const instanceId = instance.value.id
+	if (hosting.isHostingInstance.value && !skipOfflineWarning) {
+		checkingSharedInstanceLaunch.value = true
+		let status: Awaited<ReturnType<typeof hosting.refreshOnlineStatus>> = null
+		try {
+			status = await hosting.refreshOnlineStatus()
+		} finally {
+			checkingSharedInstanceLaunch.value = false
+		}
+		if (instance.value?.id !== instanceId) return
+		if (status === 'stopped') {
+			pendingOfflineLaunch.value = { instanceId, context, address }
+			serverOfflineModal.value?.show()
+			return
+		}
+	}
 	const isSharedInstanceMember = instance.value.shared_instance?.role === 'member'
 	const canCheckSharedInstanceUpdate =
 		!!instance.value.shared_instance && !sharedInstanceActionsLocked.value && !offline.value
@@ -663,7 +725,7 @@ const startInstance = async (context: string) => {
 		if (preview?.updateAvailable && sharedInstanceUpdateModal.value) {
 			sharedInstanceUpdateModal.value.show(instance.value, preview, async () => {
 				await refreshInstance()
-				await launchInstance(context)
+				await launchInstance(context, address)
 			})
 			return
 		}
@@ -673,7 +735,7 @@ const startInstance = async (context: string) => {
 		if (isSharedInstanceMember) {
 			updateToPlayModal.value.show(instance.value, null, async () => {
 				await refreshInstance()
-				await launchInstance(context)
+				await launchInstance(context, address)
 			})
 		} else {
 			updateToPlayModal.value.show(instance.value)
@@ -681,7 +743,7 @@ const startInstance = async (context: string) => {
 		return
 	}
 
-	await launchInstance(context)
+	await launchInstance(context, address)
 }
 
 const stopInstance = async (context: string) => {
@@ -700,6 +762,10 @@ const stopInstance = async (context: string) => {
 }
 
 const handlePlayServer = async () => {
+	if (hosting.isHostingInstance.value) {
+		if (serverAddress.value) await startInstance('InstancePage', serverAddress.value)
+		return
+	}
 	if (!instance.value?.link?.project_id || instance.value.quarantined) return
 	loading.value = true
 	try {
@@ -875,6 +941,9 @@ provideInstancePage({
 	instance: instance as ComputedRef<GameInstance>,
 	linkedProject: linkedProjectV3,
 	isServerInstance,
+	serverAddress,
+	serverStatus,
+	serverStatusLoading,
 	sharedInstanceUpdateAvailable,
 	offline,
 	playing,
@@ -882,6 +951,7 @@ provideInstancePage({
 	stopping,
 	refreshInstance,
 	refreshPlayState,
+	refreshServerStatus,
 	play: startInstance,
 	stop: stopInstance,
 	playServer: handlePlayServer,

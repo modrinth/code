@@ -1,0 +1,388 @@
+<template>
+	<ModrinthAccountRequiredModal ref="accountModal" :request-auth="requestAuth" />
+	<SharedInstanceInstallModal ref="installModal" />
+	<ContentDiffModal
+		ref="updateModal"
+		:header="formatMessage(messages.update)"
+		:admonition-header="formatMessage(messages.update)"
+		:description="formatMessage(messages.updateDescription)"
+		:diffs="updateDiffs"
+		:confirm-label="formatMessage(messages.update)"
+		:confirm-icon="DownloadIcon"
+		show-external-warnings
+		@confirm="confirmUpdate"
+	/>
+</template>
+
+<script setup lang="ts">
+import { DownloadIcon } from '@modrinth/assets'
+import {
+	type ContentDiffItem,
+	ContentDiffModal,
+	defineMessages,
+	getHostingServerAddress,
+	injectAuth,
+	injectModrinthClient,
+	injectNotificationManager,
+	type ServerPlayTarget,
+	useVIntl,
+} from '@modrinth/ui'
+import { injectPopupNotificationManager } from '@modrinth/ui'
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+
+import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
+import SharedInstanceInstallModal from '@/components/ui/shared-instances/shared-instance-install-modal/index.vue'
+import {
+	hostingInstanceMetadata,
+	useHostingInstanceCache,
+} from '@/composables/instances/use-hosting-instance'
+import { useInstanceLaunchState } from '@/composables/instances/use-instance-launch-state'
+import { handleSevereError } from '@/composables/use-error.js'
+import { toError } from '@/helpers/errors'
+import {
+	install_get_shared_instance_preview,
+	install_shared_instance,
+	install_update_shared_instance,
+	installJobInstanceId,
+	type SharedInstanceUpdatePreview,
+	wait_for_install_job,
+} from '@/helpers/install'
+import { get, list } from '@/helpers/instance'
+import { get as getCredentials, type ModrinthAuthFlow } from '@/helpers/mr_auth'
+import { get_by_instance_id } from '@/helpers/process'
+import { ensureManagedServerWorldExists, start_join_server } from '@/helpers/worlds'
+import {
+	instanceKeys,
+	sharedInstanceUpdatePreviewQueryOptions,
+} from '@/pages/instance/query-options'
+import { injectAppEvents } from '@/providers/app-events'
+
+type LaunchTarget = ServerPlayTarget & {
+	sharedInstanceId: string
+	name: string
+	userId: string
+	icon: string | null
+}
+const auth = injectAuth()
+const client = injectModrinthClient()
+const appEvents = injectAppEvents()
+const queryClient = useQueryClient()
+const router = useRouter()
+const hostingInstances = useHostingInstanceCache()
+const instanceLaunch = useInstanceLaunchState()
+const { handleError } = injectNotificationManager()
+const popupNotificationManager = injectPopupNotificationManager()
+const { formatMessage } = useVIntl()
+const accountModal = ref<InstanceType<typeof ModrinthAccountRequiredModal>>()
+const installModal = ref<InstanceType<typeof SharedInstanceInstallModal>>()
+const updateModal = ref<InstanceType<typeof ContentDiffModal>>()
+const updateDiffs = ref<ContentDiffItem[]>([])
+const pendingUpdate = ref<{ target: LaunchTarget; instanceId: string }>()
+const activeInstall = ref<{ serverId: string; worldId: string; instanceId: string }>()
+
+async function assertAccount(target: LaunchTarget) {
+	if ((await getCredentials())?.user_id !== target.userId)
+		throw new Error(formatMessage(messages.accountChanged))
+}
+async function findInstance(target: LaunchTarget) {
+	return (await list()).find(
+		(instance) =>
+			instance.shared_instance?.id === target.sharedInstanceId &&
+			instance.shared_instance.linked_user_id === target.userId,
+	)
+}
+async function openAndLaunch(instanceId: string, launch: () => Promise<void>) {
+	await instanceLaunch.run(instanceId, async () => {
+		await router.push(`/instance/${encodeURIComponent(instanceId)}`)
+		const processes = await get_by_instance_id(instanceId)
+		queryClient.setQueryData(
+			instanceKeys.processes(instanceId),
+			Array.isArray(processes) ? processes : [],
+		)
+		if (Array.isArray(processes) && processes.length) return
+		await launch()
+	})
+}
+async function join(target: LaunchTarget, instanceId: string) {
+	await assertAccount(target)
+	const [server, legacy] = await Promise.all([
+		client.archon.servers_v1.get(target.serverId),
+		client.archon.servers_v0.get(target.serverId),
+	])
+	if (
+		!server.worlds.some(
+			(world) =>
+				world.id === target.worldId &&
+				world.is_active &&
+				world.content?.shared_instance_id === target.sharedInstanceId,
+		)
+	) {
+		throw new Error(formatMessage(messages.worldChanged))
+	}
+	await assertAccount(target)
+	const instance = await get(instanceId)
+	if (!instance || instance.quarantined || instance.install_stage !== 'installed')
+		throw new Error(formatMessage(messages.notReady))
+	const address = getHostingServerAddress(legacy.net, server.subdomain)
+	if (!address) throw new Error(formatMessage(messages.noAddress))
+	await assertAccount(target)
+	await ensureManagedServerWorldExists(instanceId, target.name, address)
+	hostingInstances.value[instanceId] = hostingInstanceMetadata(
+		server,
+		target.sharedInstanceId,
+		address,
+	)
+	await assertAccount(target)
+	try {
+		await start_join_server(instanceId, address)
+	} catch (error) {
+		handleSevereError(toError(error), { instanceId })
+		return
+	}
+	queryClient.setQueryData(instanceKeys.processes(instanceId), [true])
+}
+async function playExisting(
+	target: LaunchTarget,
+	existing: NonNullable<Awaited<ReturnType<typeof findInstance>>>,
+	approveUpdate: boolean,
+) {
+	if (existing.quarantined || existing.install_stage !== 'installed') {
+		await router.push(`/instance/${encodeURIComponent(existing.id)}`)
+		return
+	}
+	const previewKey = instanceKeys.sharedUpdatePreview(existing.id, target.userId)
+	if (!approveUpdate)
+		await queryClient.invalidateQueries({ queryKey: previewKey, refetchType: 'none' })
+	await openAndLaunch(existing.id, async () => {
+		await assertAccount(target)
+		if (approveUpdate) {
+			const job = await install_update_shared_instance(existing.id)
+			await wait_for_install_job(appEvents, job.job_id)
+			await queryClient.invalidateQueries({ queryKey: previewKey })
+		} else {
+			const preview = await instanceLaunch.runPreviewCheck(existing.id, () =>
+				queryClient.fetchQuery(sharedInstanceUpdatePreviewQueryOptions(existing.id, target.userId)),
+			)
+			await assertAccount(target)
+			if (preview?.updateAvailable) {
+				showUpdate(target, existing.id, preview)
+				return
+			}
+		}
+		await join(target, existing.id)
+	})
+}
+
+function invalidateInstanceQueries() {
+	return queryClient.invalidateQueries({
+		queryKey: instanceKeys.all,
+		predicate: (query) => !query.queryKey.includes('shared-update-preview'),
+	})
+}
+
+async function launchInstalledInstance(target: LaunchTarget, instanceId: string) {
+	try {
+		await assertAccount(target)
+		const existing = await get(instanceId)
+		if (
+			!existing ||
+			existing.shared_instance?.id !== target.sharedInstanceId ||
+			existing.shared_instance?.linked_user_id !== target.userId ||
+			existing.quarantined ||
+			existing.install_stage !== 'installed'
+		)
+			throw new Error(formatMessage(messages.notReady))
+		await playExisting(target, existing, false)
+	} catch (error) {
+		handleError(toError(error))
+	}
+}
+
+function notifyWhenInstalled(target: LaunchTarget, jobId: string, instanceId: string) {
+	void wait_for_install_job(appEvents, jobId)
+		.then(async () => {
+			await assertAccount(target)
+			popupNotificationManager.addPopupNotification({
+				contentType: 'toast',
+				type: 'instance-ready',
+				title: target.name,
+				entityName: target.name,
+				entityIconUrl: target.icon,
+				onLaunch: () => launchInstalledInstance(target, instanceId),
+				onOpenInstance: async () => {
+					await router.push(`/instance/${encodeURIComponent(instanceId)}`)
+				},
+				autoCloseMs: null,
+			})
+		})
+		.catch((error) => handleError(toError(error)))
+		.finally(() => {
+			if (activeInstall.value?.instanceId === instanceId) activeInstall.value = undefined
+			void invalidateInstanceQueries()
+		})
+}
+
+const launchMutation = useMutation({
+	mutationFn: async ({ target, instanceId }: { target: LaunchTarget; instanceId?: string }) => {
+		await assertAccount(target)
+		const existing = instanceId ? await get(instanceId) : await findInstance(target)
+		if (
+			instanceId &&
+			(existing?.shared_instance?.id !== target.sharedInstanceId ||
+				existing?.shared_instance?.linked_user_id !== target.userId)
+		)
+			throw new Error(formatMessage(messages.notReady))
+		if (existing) {
+			await playExisting(target, existing, !!instanceId)
+		} else {
+			await assertAccount(target)
+			const job = await install_shared_instance(
+				target.sharedInstanceId,
+				target.name,
+				null,
+				target.name,
+				target.icon,
+				target.icon,
+			)
+			const installedId = installJobInstanceId(job)
+			if (!installedId) throw new Error(formatMessage(messages.notReady))
+			activeInstall.value = {
+				serverId: target.serverId,
+				worldId: target.worldId,
+				instanceId: installedId,
+			}
+			notifyWhenInstalled(target, job.job_id, installedId)
+			await router.push(`/instance/${encodeURIComponent(installedId)}`)
+		}
+	},
+	onError: (error) => handleError(toError(error)),
+	onSettled: () => {
+		void invalidateInstanceQueries()
+	},
+})
+function showUpdate(
+	target: LaunchTarget,
+	instanceId: string,
+	preview: SharedInstanceUpdatePreview,
+) {
+	pendingUpdate.value = { target, instanceId }
+	updateDiffs.value = preview.diffs.map((diff) => ({
+		type: diff.type,
+		projectName: diff.projectName ?? undefined,
+		fileName: diff.fileName ? encodeURIComponent(diff.fileName) : undefined,
+		currentVersionName: diff.currentVersionName ?? undefined,
+		newVersionName: diff.newVersionName ?? undefined,
+		fileCount: diff.configFileCount ?? undefined,
+		disabled: diff.disabled,
+		external: diff.type === 'added' && !diff.projectId && !!diff.fileName,
+	}))
+	updateModal.value?.show()
+}
+function confirmUpdate() {
+	if (!pendingUpdate.value || launchMutation.isPending.value) return
+	launchMutation.mutate(pendingUpdate.value)
+	pendingUpdate.value = undefined
+}
+const prepareMutation = useMutation({
+	mutationFn: async ({ serverId, worldId }: ServerPlayTarget) => {
+		if (auth.isReady && !auth.isReady.value) {
+			await new Promise<void>((resolve) => {
+				const stop = watch(auth.isReady!, (ready) => {
+					if (ready) {
+						stop()
+						resolve()
+					}
+				})
+			})
+		}
+		if (!auth.session_token.value && !(await accountModal.value?.show())) return
+		const credentials = await getCredentials()
+		if (!credentials) return
+		const server = await client.archon.servers_v1.get(serverId)
+		const world = server.worlds.find((world) => world.id === worldId && world.is_active)
+		const sharedInstanceId = world?.content?.shared_instance_id
+		if (!sharedInstanceId) throw new Error(formatMessage(messages.worldChanged))
+		const target: LaunchTarget = {
+			serverId,
+			worldId,
+			sharedInstanceId,
+			name: server.name,
+			userId: credentials.user_id,
+			icon: null,
+		}
+		await assertAccount(target)
+		const existing = await findInstance(target)
+		if (existing) {
+			await playExisting(target, existing, false)
+		} else {
+			const [remote, legacyServer] = await Promise.all([
+				client.sharedinstances.instances_v1.get(sharedInstanceId),
+				client.archon.servers_v0.get(serverId),
+			])
+			target.name = remote.name
+			target.icon = remote.icon
+			if (legacyServer.owner_id === credentials.user_id) {
+				await launchMutation.mutateAsync({ target }).catch(() => {})
+				return
+			}
+			const preview = await install_get_shared_instance_preview(sharedInstanceId, target.name)
+			await assertAccount(target)
+			if (remote.icon) preview.iconUrl = remote.icon
+			installModal.value?.show(preview, async () => {
+				if (launchMutation.isPending.value) return
+				await launchMutation.mutateAsync({ target }).catch(() => {})
+			})
+		}
+	},
+	onError: (error) => handleError(toError(error)),
+})
+async function play(target: ServerPlayTarget) {
+	const installing = activeInstall.value
+	if (installing?.serverId === target.serverId && installing.worldId === target.worldId) {
+		await router.push(`/instance/${encodeURIComponent(installing.instanceId)}`)
+		return
+	}
+	if (prepareMutation.isPending.value || launchMutation.isPending.value) return
+	await prepareMutation.mutateAsync(target).catch(() => {})
+}
+async function requestAuth(flow: ModrinthAuthFlow) {
+	await auth.requestSignIn('', flow, { showModal: false })
+	return !!(await getCredentials())
+}
+watch(
+	() => auth.user.value?.id,
+	() => {
+		installModal.value?.hide()
+		updateModal.value?.hide()
+		pendingUpdate.value = undefined
+	},
+)
+const messages = defineMessages({
+	update: { id: 'hosting.play.update-to-play', defaultMessage: 'Update to play' },
+	updateDescription: {
+		id: 'hosting.play.update-description',
+		defaultMessage: 'Update this instance to the server’s latest shared content before joining.',
+	},
+	accountChanged: {
+		id: 'hosting.play.account-changed',
+		defaultMessage: 'Your Modrinth account changed. Press Play server again to continue.',
+	},
+	worldChanged: {
+		id: 'hosting.play.world-changed',
+		defaultMessage:
+			'This world is no longer active or has not been shared. Open the server panel and press Play server again.',
+	},
+	notReady: {
+		id: 'hosting.play.not-ready',
+		defaultMessage:
+			'This instance is not available to launch. Check its installation status in your library.',
+	},
+	noAddress: {
+		id: 'hosting.play.no-address',
+		defaultMessage: 'This server does not have a connection address yet.',
+	},
+})
+defineExpose({ play })
+</script>

@@ -269,6 +269,9 @@
   "app.browse.project-type.mods": {
     "message": "Mods"
   },
+  "app.browse.project-type.plugins": {
+    "message": "Plugins"
+  },
   "app.browse.project-type.resource-packs": {
     "message": "Resource Packs"
   },
@@ -734,6 +737,18 @@
   "app.instance.navigation.back-to-instance": {
     "message": "Back to instance"
   },
+  "app.instance.server.offline.description": {
+    "message": "This server is currently offline. You can still launch Minecraft, but you may not be able to connect."
+  },
+  "app.instance.server.offline.launch-anyway": {
+    "message": "Launch anyway"
+  },
+  "app.instance.server.offline.title": {
+    "message": "Server is offline"
+  },
+  "app.instance.server.status.unknown": {
+    "message": "Status unknown"
+  },
   "app.instance.share.empty.description": {
     "message": "You can share this instance with your friends!"
   },
@@ -741,6 +756,9 @@
     "message": "No friends invited"
   },
   "app.instance.share.empty.invite-friends-button": {
+    "message": "Invite friends"
+  },
+  "app.instance.share.invite-friends": {
     "message": "Invite friends"
   },
   "app.instance.share.invite-modal.heading": {
@@ -766,12 +784,6 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Wrong account"
-  },
-  "app.instance.share.members.empty": {
-    "message": "No users have joined yet"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "No users match your filters."
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "They will no longer receive updates for this shared instance"
@@ -3611,11 +3623,26 @@
   "friends.sign-in-to-add-friends": {
     "message": "<link>Sign in to a Modrinth account</link> to add friends and see what they're playing!"
   },
+  "hosting.play.account-changed": {
+    "message": "Your Modrinth account changed. Press Play server again to continue."
+  },
+  "hosting.play.no-address": {
+    "message": "This server does not have a connection address yet."
+  },
+  "hosting.play.not-ready": {
+    "message": "This instance is not available to launch. Check its installation status in your library."
+  },
+  "hosting.play.update-description": {
+    "message": "Update this instance to the server’s latest shared content before joining."
+  },
+  "hosting.play.update-to-play": {
+    "message": "Update to play"
+  },
+  "hosting.play.world-changed": {
+    "message": "This world is no longer active or has not been shared. Open the server panel and press Play server again."
+  },
   "installation-settings.shared-instance.linked-title": {
     "message": "Linked shared instance"
-  },
-  "installation-settings.shared-instance.title": {
-    "message": "Unpublish instance"
   },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Unlink shared instance"
@@ -3626,14 +3653,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Unlinking..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Unpublish shared instance"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Remove this shared instance from Modrinth and stop sending updates to anyone using it. Your local instance will not be affected."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Unpublishing..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "This only affects your local instance. Your installed content will stay on this device, and the shared instance and other people using it will not be affected."
@@ -3646,12 +3667,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "This deletes the shared instance from Modrinth's servers. People using it in the Modrinth App will stop receiving updates, but your local instance and its content will stay on this device."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Unpublishing shared instance"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Unpublish shared instance"
   },
   "instance.action.create-shortcut": {
     "message": "Create shortcut"
@@ -3725,219 +3740,6 @@
   "instance.files.save-as": {
     "message": "Save as..."
   },
-  "instance.icon-editor.background": {
-    "message": "Background"
-  },
-  "instance.icon-editor.background.blue": {
-    "message": "Blue"
-  },
-  "instance.icon-editor.background.dark-gray": {
-    "message": "Dark gray"
-  },
-  "instance.icon-editor.background.dark-green": {
-    "message": "Dark green"
-  },
-  "instance.icon-editor.background.gray": {
-    "message": "Gray"
-  },
-  "instance.icon-editor.background.green": {
-    "message": "Green"
-  },
-  "instance.icon-editor.background.indigo": {
-    "message": "Indigo"
-  },
-  "instance.icon-editor.background.lavender": {
-    "message": "Lavender"
-  },
-  "instance.icon-editor.background.light-gray": {
-    "message": "Light gray"
-  },
-  "instance.icon-editor.background.lime": {
-    "message": "Lime"
-  },
-  "instance.icon-editor.background.orange": {
-    "message": "Orange"
-  },
-  "instance.icon-editor.background.pink": {
-    "message": "Pink"
-  },
-  "instance.icon-editor.background.purple": {
-    "message": "Purple"
-  },
-  "instance.icon-editor.background.red": {
-    "message": "Red"
-  },
-  "instance.icon-editor.background.rose": {
-    "message": "Rose"
-  },
-  "instance.icon-editor.background.yellow": {
-    "message": "Yellow"
-  },
-  "instance.icon-editor.description": {
-    "message": "Mix and match elements to create a custom icon."
-  },
-  "instance.icon-editor.recents": {
-    "message": "Recents"
-  },
-  "instance.icon-editor.save": {
-    "message": "Save icon"
-  },
-  "instance.icon-editor.surprise-me": {
-    "message": "Randomize"
-  },
-  "instance.icon-editor.symbol": {
-    "message": "Symbol"
-  },
-  "instance.icon-editor.symbol.backpack": {
-    "message": "Backpack"
-  },
-  "instance.icon-editor.symbol.beacon": {
-    "message": "Beacon"
-  },
-  "instance.icon-editor.symbol.blue-shark": {
-    "message": "Blue Shark"
-  },
-  "instance.icon-editor.symbol.bookshelf": {
-    "message": "Bookshelf"
-  },
-  "instance.icon-editor.symbol.brown-bear": {
-    "message": "Brown Bear"
-  },
-  "instance.icon-editor.symbol.cake": {
-    "message": "Cake"
-  },
-  "instance.icon-editor.symbol.campfire": {
-    "message": "Campfire"
-  },
-  "instance.icon-editor.symbol.chest": {
-    "message": "Chest"
-  },
-  "instance.icon-editor.symbol.cogwheel": {
-    "message": "Cogwheel"
-  },
-  "instance.icon-editor.symbol.command-block": {
-    "message": "Command Block"
-  },
-  "instance.icon-editor.symbol.cooking-pot": {
-    "message": "Cooking Pot"
-  },
-  "instance.icon-editor.symbol.couch": {
-    "message": "Couch"
-  },
-  "instance.icon-editor.symbol.crafting-table": {
-    "message": "Crafting Table"
-  },
-  "instance.icon-editor.symbol.create-wrench": {
-    "message": "Wrench"
-  },
-  "instance.icon-editor.symbol.creeper": {
-    "message": "Creeper"
-  },
-  "instance.icon-editor.symbol.enchanting-table": {
-    "message": "Enchanting Table"
-  },
-  "instance.icon-editor.symbol.ender-chest": {
-    "message": "Ender Chest"
-  },
-  "instance.icon-editor.symbol.ender-dragon": {
-    "message": "Ender Dragon"
-  },
-  "instance.icon-editor.symbol.engine": {
-    "message": "Engine"
-  },
-  "instance.icon-editor.symbol.fabric": {
-    "message": "Fabric"
-  },
-  "instance.icon-editor.symbol.forge": {
-    "message": "Forge"
-  },
-  "instance.icon-editor.symbol.furnace": {
-    "message": "Furnace"
-  },
-  "instance.icon-editor.symbol.gizmo": {
-    "message": "Gizmo"
-  },
-  "instance.icon-editor.symbol.globe": {
-    "message": "Globe"
-  },
-  "instance.icon-editor.symbol.grass-block": {
-    "message": "Grass Block"
-  },
-  "instance.icon-editor.symbol.lantern": {
-    "message": "Lantern"
-  },
-  "instance.icon-editor.symbol.moobloom": {
-    "message": "Moobloom"
-  },
-  "instance.icon-editor.symbol.mr-pack": {
-    "message": "Mr Pack"
-  },
-  "instance.icon-editor.symbol.neoforge": {
-    "message": "NeoForge"
-  },
-  "instance.icon-editor.symbol.orb": {
-    "message": "Orb"
-  },
-  "instance.icon-editor.symbol.oxygen-distributor": {
-    "message": "Oxygen Distributor"
-  },
-  "instance.icon-editor.symbol.pancakes": {
-    "message": "Pancakes"
-  },
-  "instance.icon-editor.symbol.pickaxe": {
-    "message": "Pickaxe"
-  },
-  "instance.icon-editor.symbol.poke-ball": {
-    "message": "Poke Ball"
-  },
-  "instance.icon-editor.symbol.quilt": {
-    "message": "Quilt"
-  },
-  "instance.icon-editor.symbol.redstone-block": {
-    "message": "Redstone Block"
-  },
-  "instance.icon-editor.symbol.sculk-sensor": {
-    "message": "Sculk Sensor"
-  },
-  "instance.icon-editor.symbol.skeleton": {
-    "message": "Skeleton"
-  },
-  "instance.icon-editor.symbol.skillet": {
-    "message": "Skillet"
-  },
-  "instance.icon-editor.symbol.slime-block": {
-    "message": "Slime Block"
-  },
-  "instance.icon-editor.symbol.space-helmet": {
-    "message": "Space Helmet"
-  },
-  "instance.icon-editor.symbol.sticky-piston": {
-    "message": "Sticky Piston"
-  },
-  "instance.icon-editor.symbol.sword": {
-    "message": "Sword"
-  },
-  "instance.icon-editor.symbol.terminal": {
-    "message": "Terminal"
-  },
-  "instance.icon-editor.symbol.tiny-potato": {
-    "message": "Tiny Potato"
-  },
-  "instance.icon-editor.symbol.tire": {
-    "message": "Tire"
-  },
-  "instance.icon-editor.symbol.tnt": {
-    "message": "TNT"
-  },
-  "instance.icon-editor.symbol.wrenth-rinth": {
-    "message": "Modrinth Wrench"
-  },
-  "instance.icon-editor.symbol.zombie": {
-    "message": "Zombie"
-  },
-  "instance.icon-editor.title": {
-    "message": "Icon editor"
-  },
   "instance.last-played": {
     "message": "Last played"
   },
@@ -3961,45 +3763,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Resource pack"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Actions"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Invite link"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Anyone with one of these invite links can join while it remains active."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "There are no active invites."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Expires"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Revoke invite"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "Revoke invite {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Active invites"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Uses"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "The invite link <monospace>{code}</monospace> will stop working immediately. People who already joined will keep access."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "This action cannot be undone"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Revoke invite"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Revoke invite"
   },
   "instance.settings.synced-options.data-override": {
     "message": "Turn off this override to edit synced data."
@@ -4349,9 +4112,6 @@
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Your access to the shared instance was revoked. This instance is still available, but it is no longer linked and will no longer receive updates."
   },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "The primary instance was deleted. This instance is still available, but it is no longer linked and will no longer receive updates."
-  },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "This shared instance was locked by the Content Moderation team. It will no longer receive updates from the primary instance and cannot be played."
   },
@@ -4360,6 +4120,12 @@
   },
   "instance.shared-instance.unavailable.manager-fallback": {
     "message": "the instance manager"
+  },
+  "instance.shared-instance.unavailable.not-found-text": {
+    "message": "We couldn’t find this shared instance. Your installed content is still on this device."
+  },
+  "instance.shared-instance.unavailable.not-found-title": {
+    "message": "Shared instance unavailable"
   },
   "instance.shared-instance.unavailable.text": {
     "message": "Your local instance is still available, but it is no longer linked and won't receive updates."
@@ -4532,6 +4298,12 @@
   "onboarding-checklist.title": {
     "message": "Getting started"
   },
+  "project.server.status.offline": {
+    "message": "Offline"
+  },
+  "project.server.status.online": {
+    "message": "Online"
+  },
   "search.filter.locked.instance": {
     "message": "Provided by the instance"
   },
@@ -4544,8 +4316,20 @@
   "search.filter.locked.instance.sync": {
     "message": "Sync with instance"
   },
+  "search.filter.locked.server": {
+    "message": "Provided by the server"
+  },
   "search.filter.locked.server-environment.title": {
     "message": "Only client-side mods can be added to the server instance"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Game version is provided by the server"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Loader is provided by the server"
+  },
+  "search.filter.locked.server.sync": {
+    "message": "Sync with server"
   },
   "settings.sidebar.label.account": {
     "message": "Account"

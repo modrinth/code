@@ -395,9 +395,6 @@
   "content.card.synced": {
     "defaultMessage": "Sinhronizovano među instancama"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Učitano"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Jesi li siguran da želiš ažuirati {count, plural, one {# projekat} few {# projekta} other {# projekata}} na najnoviju verziju? Preporučeno je ažuirati sadržaje jedan po jedan."
   },
@@ -656,9 +653,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Pogledaj sadržaj"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Autor"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Okruženje"
   },
@@ -683,17 +677,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Dostupno jе ažuriranjе"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Client zavisi od datoteke"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Samo-client sadržaj"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Client dadoteka zadržana"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Nema upozorenja"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Upozorenja"
@@ -724,9 +709,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# Autor} other {# Autora}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Učitavanje sadržaja..."
@@ -1967,12 +1949,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Greška sa brisanjem sadržaja"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Nije uspelo onemogućavanje sadržaja"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Nije uspelo omogućavanje sadržaja"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Ažuriranje sadržaja nije uspelo"
   },
@@ -1987,9 +1963,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Greška sa brisanjem sadržaja"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Greška sa preklapanjem {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Greška sa uklanjanjem veze od modpacka"
@@ -2429,12 +2402,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Uključeno"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Spoljašnje"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Ovaj fajl nije objavljen na Modrinth-u."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Upravljan sadržaj"
   },
@@ -2446,9 +2413,6 @@
   },
   "instances.managed-content-modal.open-in-slicer": {
     "defaultMessage": "Otvori u Slicer-u"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Upozorenja"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Upravo"
@@ -2533,15 +2497,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Promene sačuvane"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Ovaj mod zavisi od moda na strani klijenta i može izazvati probleme prilikom pokretanja tvog servera"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Ovo je mod za klijent i može izazvati probleme prilikom pokretanja tvog servera"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Ovo je mod na strani klijenta koji je instaliran kao zavisnost i može izazvati probleme prilikom pokretanja tvog servera"
   },
   "label.collections": {
     "defaultMessage": "Kolekcije"
@@ -5261,15 +5216,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth hostiranje"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Sada se mogu naći ovde!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Ne prikazuj ponovo"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Podešavanja tvojeg servera su pomerena"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Podeleni serveri"
   },
@@ -5479,18 +5425,6 @@
   },
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "Šta se desi?"
-  },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Došlo je do neočekivane greške tokom instalacije. Molimo pokušaj ponovo kasnije."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Neuspešna instalacija"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Došlo je do neočekivane greške prilikom otpremanja. Molimo pokušaj ponovo kasnije."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Otpremanje Modpack-a nije uspelo"
   },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Podesi server"
@@ -6366,4 +6300,3 @@
     "defaultMessage": "Tip"
   }
 }
-

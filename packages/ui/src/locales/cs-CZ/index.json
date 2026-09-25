@@ -362,9 +362,6 @@
   "content.card.select-project": {
     "defaultMessage": "Vybrat {project}"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Nahráno"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Skutečně chceš aktualizovat {count, plural, one {# projekt} other {# projektů}} na jejich poslední kompatibilní verzi? Doporučujeme aktualizovat obsah jeden po jednom."
   },
@@ -605,9 +602,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Zobrazit obsah"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Autor"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Prostředí"
   },
@@ -631,9 +625,6 @@
   },
   "content.metadata-filter.update.available": {
     "defaultMessage": "Je dostupná aktualizace"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Žádná upozornění"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Upozornění"
@@ -664,9 +655,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Třídit podle"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# autor} few {# autoři} other {# autorů}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Načítání obsahu..."
@@ -1820,12 +1808,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Obsah se nepodařilo smazat"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Obsah se nepodařilo vypnout"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Obsah se nepodařilo zapnout"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Obsah se nepodařilo nahrát"
   },
@@ -1840,9 +1822,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Obsah se nepodařilo odebrat"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Nepodařilo se přepnout {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Modpack se nepodařilo odpojit"
@@ -2185,9 +2164,6 @@
   },
   "instances.managed-content-modal.empty-title": {
     "defaultMessage": "Nebyl nalezen obsah"
-  },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Externí"
   },
   "instances.managed-content-modal.loading": {
     "defaultMessage": "Načítání obsahu..."
@@ -4448,9 +4424,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Znovu nezobrazovat"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Sdílené servery"
   },
@@ -4612,12 +4585,6 @@
   },
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "Co se stane?"
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Instalace selhala"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Nahrávání modpacku selhalo"
   },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Nastavit server"
@@ -5196,4 +5163,3 @@
     "defaultMessage": "Typ"
   }
 }
-

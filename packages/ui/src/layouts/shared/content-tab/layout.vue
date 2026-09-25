@@ -11,18 +11,15 @@ import {
 	FileIcon,
 	FolderOpenIcon,
 	LinkIcon,
-	OrganizationIcon,
 	RefreshCwIcon,
 	SearchIcon,
 	ShareIcon,
 	TextCursorInputIcon,
 	TrashIcon,
-	UserIcon,
 } from '@modrinth/assets'
 import { useSessionStorage } from '@vueuse/core'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
-import Avatar from '#ui/components/base/Avatar.vue'
 import { Button, type ButtonMenuOption, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import DropdownFilterBar from '#ui/components/base/DropdownFilterBar.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
@@ -30,7 +27,11 @@ import FilterPills from '#ui/components/base/FilterPills.vue'
 import Input from '#ui/components/base/inputs/Input.vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
+import {
+	commonMessages,
+	formatContentTypeSentence,
+	normalizeProjectType,
+} from '#ui/utils/common-messages'
 
 import ContentCardTable from './components/ContentCardTable.vue'
 import ContentSelectionBar from './components/ContentSelectionBar.vue'
@@ -41,7 +42,9 @@ import ConfirmDisableModal from './components/modals/ConfirmDisableModal.vue'
 import ConfirmUnlinkModal from './components/modals/ConfirmUnlinkModal.vue'
 import ContentDependencyWarningModal from './components/modals/ContentDependencyWarningModal.vue'
 import {
+	type ContentMetadataFilterValue,
 	getClientWarningType,
+	getContentWarningType,
 	useBulkOperation,
 	useChangingItems,
 	useContentFilters,
@@ -115,10 +118,6 @@ const messages = defineMessages({
 		id: 'content.page-layout.filter.add',
 		defaultMessage: 'Filter',
 	},
-	authorCount: {
-		id: 'content.page-layout.filter.author-count',
-		defaultMessage: '{count, plural, one {# author} other {# authors}}',
-	},
 	updateAll: {
 		id: 'content.page-layout.update-all',
 		defaultMessage: 'Update all',
@@ -181,9 +180,18 @@ function getItemId(item: ContentItem) {
 }
 
 type SortMode = 'alphabetical-asc' | 'alphabetical-desc' | 'date-added-newest' | 'date-added-oldest'
+const defaultSortMode: SortMode = 'alphabetical-asc'
 const sortMode = ctx.filterPersistKey
-	? useSessionStorage<SortMode>(`content-sort:${ctx.filterPersistKey}`, 'alphabetical-asc')
-	: ref<SortMode>('alphabetical-asc')
+	? useSessionStorage<SortMode>(`content-sort:${ctx.filterPersistKey}`, defaultSortMode)
+	: ref<SortMode>(defaultSortMode)
+
+const validSortModes: readonly string[] = [
+	'alphabetical-asc',
+	'alphabetical-desc',
+	'date-added-newest',
+	'date-added-oldest',
+]
+if (!validSortModes.includes(sortMode.value)) sortMode.value = defaultSortMode
 
 const sortLabels: Record<SortMode, () => string> = {
 	'alphabetical-asc': () => formatMessage(messages.sortAlphabeticalAscending),
@@ -192,32 +200,36 @@ const sortLabels: Record<SortMode, () => string> = {
 	'date-added-oldest': () => formatMessage(messages.sortDateAddedOldest),
 }
 
-const sortOptions = computed<ButtonMenuOption[]>(() => [
-	{
-		id: 'alphabetical-asc',
-		label: formatMessage(messages.sortAlphabeticalAscending),
-		icon: ArrowDownAZIcon,
-		action: () => (sortMode.value = 'alphabetical-asc'),
-	},
-	{
-		id: 'alphabetical-desc',
-		label: formatMessage(messages.sortAlphabeticalDescending),
-		icon: ArrowUpZAIcon,
-		action: () => (sortMode.value = 'alphabetical-desc'),
-	},
-	{
-		id: 'date-added-newest',
-		label: formatMessage(messages.sortDateAddedNewest),
-		icon: ClockArrowDownIcon,
-		action: () => (sortMode.value = 'date-added-newest'),
-	},
-	{
-		id: 'date-added-oldest',
-		label: formatMessage(messages.sortDateAddedOldest),
-		icon: ClockArrowUpIcon,
-		action: () => (sortMode.value = 'date-added-oldest'),
-	},
-])
+const sortOptions = computed<ButtonMenuOption[]>(() => {
+	const options: ButtonMenuOption[] = [
+		{
+			id: 'alphabetical-asc',
+			label: formatMessage(messages.sortAlphabeticalAscending),
+			icon: ArrowDownAZIcon,
+			action: () => (sortMode.value = 'alphabetical-asc'),
+		},
+		{
+			id: 'alphabetical-desc',
+			label: formatMessage(messages.sortAlphabeticalDescending),
+			icon: ArrowUpZAIcon,
+			action: () => (sortMode.value = 'alphabetical-desc'),
+		},
+		{
+			id: 'date-added-newest',
+			label: formatMessage(messages.sortDateAddedNewest),
+			icon: ClockArrowDownIcon,
+			action: () => (sortMode.value = 'date-added-newest'),
+		},
+		{
+			id: 'date-added-oldest',
+			label: formatMessage(messages.sortDateAddedOldest),
+			icon: ClockArrowUpIcon,
+			action: () => (sortMode.value = 'date-added-oldest'),
+		},
+	]
+
+	return options
+})
 
 const sortedItems = computed(() => {
 	const items = [...ctx.items.value]
@@ -261,14 +273,16 @@ const { searchQuery, search } = useContentSearch(sortedItems, [
 	'file_name',
 ])
 
+const retainedRowIds = ref(new Set<string>())
 const { selectedFilters, filterOptions, toggleFilter, applyFilters } = useContentFilters(
 	ctx.items,
 	{
 		showTypeFilters: true,
 		showUpdateFilter: false,
-		showWarningsFilter: false,
+		showWarningsFilter: true,
 		showStatusFilters: false,
 		showEnvironmentWarnings: ctx.showEnvironmentWarnings,
+		retainSelectedWarnings: computed(() => retainedRowIds.value.size > 0),
 		isPackLocked: ctx.isPackLocked,
 		persistKey: ctx.filterPersistKey,
 	},
@@ -277,8 +291,49 @@ const { selectedFilters, filterOptions, toggleFilter, applyFilters } = useConten
 const { selectedMetadataFilters, metadataFilterCategories, applyMetadataFilters } =
 	useContentMetadataFilters(ctx.items, ctx.filterPersistKey, {
 		showSharedContent: ctx.showSharedContentFilter,
+		showEnabledFor: !!ctx.setEnabledFor,
 		showEnvironmentWarnings: ctx.showEnvironmentWarnings,
 	})
+
+const visibleFilterOptions = computed(() => {
+	const metadataMatches = applyMetadataFilters(ctx.items.value)
+	const warningMatches = metadataMatches.filter(
+		(item) => getContentWarningType(item, ctx.showEnvironmentWarnings) !== null,
+	)
+	const availableTypes = new Set(
+		(selectedFilters.value.includes('warnings') ? warningMatches : metadataMatches).map((item) =>
+			normalizeProjectType(item.project_type),
+		),
+	)
+	for (const item of ctx.items.value) {
+		if (retainedRowIds.value.has(getItemId(item))) {
+			availableTypes.add(normalizeProjectType(item.project_type))
+		}
+	}
+	return filterOptions.value.filter((option) =>
+		option.id === 'warnings'
+			? warningMatches.length > 0 ||
+				(selectedFilters.value.includes('warnings') && retainedRowIds.value.size > 0)
+			: availableTypes.has(option.id),
+	)
+})
+
+watch(
+	visibleFilterOptions,
+	(options) => {
+		const availableTypes = new Set(options.map((option) => option.id))
+		const validFilters = selectedFilters.value.filter((filter) => availableTypes.has(filter))
+		if (validFilters.length !== selectedFilters.value.length) selectedFilters.value = validFilters
+	},
+	{ immediate: true },
+)
+
+watch(searchQuery, () => retainedRowIds.value.clear())
+
+function updateMetadataFilters(filters: ContentMetadataFilterValue) {
+	retainedRowIds.value.clear()
+	selectedMetadataFilters.value = filters
+}
 
 watch(
 	() => props.highlightedItemId,
@@ -290,54 +345,6 @@ watch(
 	},
 	{ immediate: true },
 )
-
-const metadataFilterAuthors = computed(() => {
-	const authors = new Map<string, NonNullable<ContentItem['owner']>>()
-	for (const item of ctx.items.value) {
-		if (!item.owner) continue
-		authors.set(`${item.owner.type}:${item.owner.id}`, item.owner)
-	}
-	return authors
-})
-
-function getMetadataFilterAuthor(value: string) {
-	return metadataFilterAuthors.value.get(value)
-}
-
-function getMetadataFilterPreviewAuthor(selectedValues: string[]) {
-	const [selectedValue] = selectedValues
-	return selectedValues.length === 1 && selectedValue
-		? getMetadataFilterAuthor(selectedValue)
-		: undefined
-}
-
-const metadataFilterPreviewAuthorLimit = 3
-const metadataFilterPreviewAuthorSize = 20
-const metadataFilterPreviewAuthorOffset = 14
-
-function getMetadataFilterPreviewAuthorValues(selectedValues: string[]) {
-	return selectedValues.slice(0, metadataFilterPreviewAuthorLimit)
-}
-
-function getMetadataFilterPreviewAuthorOverflow(selectedValues: string[]) {
-	return Math.max(0, selectedValues.length - metadataFilterPreviewAuthorLimit)
-}
-
-function getMetadataFilterPreviewAuthorStackWidth(selectedValues: string[]) {
-	const visibleCount = Math.min(selectedValues.length, metadataFilterPreviewAuthorLimit)
-	if (visibleCount === 0) return 0
-	return (
-		metadataFilterPreviewAuthorSize +
-		(visibleCount - 1 + (selectedValues.length > metadataFilterPreviewAuthorLimit ? 1 : 0)) *
-			metadataFilterPreviewAuthorOffset
-	)
-}
-
-function isMetadataFilterOrganization(value: string) {
-	return (
-		getMetadataFilterAuthor(value)?.type === 'organization' || value.startsWith('organization:')
-	)
-}
 
 const metadataFilterTriggerClass =
 	'!h-[34px] !rounded-xl !border !border-solid !border-surface-5 !bg-transparent !px-3 !text-sm !font-medium !text-primary !shadow-[0_1px_1.5px_rgba(0,0,0,0.15)] transition-all duration-100 active:scale-[0.97] hover:!bg-surface-3 focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5'
@@ -384,6 +391,7 @@ onBeforeUnmount(() => {
 })
 
 function updateFilterChips(nextFilters: string[]) {
+	retainedRowIds.value.clear()
 	if (nextFilters.length === 0) {
 		selectedFilters.value = []
 		return
@@ -418,6 +426,7 @@ const bulkItemCount = ref(0)
 const refreshing = ref(false)
 async function handleRefresh() {
 	if (refreshing.value) return
+	retainedRowIds.value.clear()
 	refreshing.value = true
 	try {
 		await ctx.refresh()
@@ -429,21 +438,37 @@ async function handleRefresh() {
 const filteredItems = computed(() => {
 	const sorted = sortedItems.value
 	const searched = search(sorted)
-	return applyMetadataFilters(applyFilters(searched))
+	const matching = applyMetadataFilters(applyFilters(searched))
+	if (retainedRowIds.value.size === 0) return matching
+	const matchingIds = new Set(matching.map(getItemId))
+	return searched.filter((item) => {
+		const id = getItemId(item)
+		return matchingIds.has(id) || retainedRowIds.value.has(id)
+	})
 })
 const tableItems = computed<ContentCardTableItem[]>(() => {
 	const items = filteredItems.value.map((item) => {
 		const base = ctx.mapToTableItem(item)
 		const id = getItemId(item)
+		const mutationPending =
+			ctx.disableWhileMutating !== false && (isChanging(id) || isBulkOperating.value)
 		const locked = base.locked ?? item.locked ?? false
-		const clientWarning = getClientWarningType(item, ctx.showEnvironmentWarnings)
+		const clientWarning = base.enabledFor
+			? null
+			: getClientWarningType(item, ctx.showEnvironmentWarnings)
 		return {
 			...base,
 			id,
+			projectType: item.project_type,
 			locked,
-			disabled:
-				isChanging(id) || ctx.isBusy.value || isBulkOperating.value || item.installing === true,
-			disabledTooltip: ctx.isBusy.value ? (ctx.busyMessage?.value ?? null) : null,
+			disabled: mutationPending || ctx.isBusy.value || item.installing === true,
+			disabledTooltip: ctx.isBusy.value
+				? (ctx.busyMessage?.value ?? null)
+				: mutationPending
+					? formatMessage(messages.pleaseWait)
+					: item.installing
+						? formatMessage(commonMessages.installingLabel)
+						: null,
 			toggleDisabled: ctx.isBusy.value || base.toggleDisabled,
 			toggleDisabledTooltip: ctx.isBusy.value
 				? (ctx.busyMessage?.value ?? null)
@@ -517,7 +542,10 @@ function canDeleteItem(item: ContentItem) {
 }
 
 function canToggleItem(item: ContentItem) {
-	return ctx.canToggleItem?.(item) ?? true
+	return (
+		ctx.canToggleItem?.(item) ??
+		!!(ctx.toggleEnabled || ctx.bulkEnableItems || ctx.bulkDisableItems)
+	)
 }
 
 const deletableSelectedItems = computed(() => selectedItems.value.filter(canDeleteItem))
@@ -640,6 +668,7 @@ async function disableItemsWithoutWarning(items: ContentItem[]) {
 		await ctx.bulkDisableItems(items)
 		return
 	}
+	if (!ctx.toggleEnabled) return
 
 	for (const item of items) {
 		const id = getItemId(item)
@@ -751,10 +780,11 @@ async function confirmDisable() {
 		const id = getItemId(item)
 		markChanging(id)
 		try {
+			retainedRowIds.value.add(id)
 			if (ctx.bulkDisableItems) {
 				await ctx.bulkDisableItems(itemsToDisable)
 			} else {
-				await ctx.toggleEnabled(item)
+				await ctx.toggleEnabled?.(item)
 			}
 		} finally {
 			unmarkChanging(id)
@@ -768,7 +798,7 @@ async function confirmDisable() {
 }
 
 async function handleToggleEnabledById(id: string, _value: boolean) {
-	if (ctx.isBusy.value) return
+	if (ctx.isBusy.value || !ctx.toggleEnabled) return
 	const item = ctx.items.value.find((i) => getItemId(i) === id)
 	if (!item) return
 	if (!canToggleItem(item)) return
@@ -779,6 +809,7 @@ async function handleToggleEnabledById(id: string, _value: boolean) {
 	if (ctx.confirmAction && !(await ctx.confirmAction('enable', [item]))) return
 	markChanging(id)
 	try {
+		retainedRowIds.value.add(id)
 		await ctx.toggleEnabled(item)
 	} finally {
 		unmarkChanging(id)
@@ -808,7 +839,8 @@ async function bulkEnable() {
 		}
 		return
 	}
-	await runBulk('enable', items, (item) => ctx.toggleEnabled(item), { onComplete: clearSelection })
+	if (!ctx.toggleEnabled) return
+	await runBulk('enable', items, (item) => ctx.toggleEnabled!(item), { onComplete: clearSelection })
 }
 
 async function bulkDisable() {
@@ -829,6 +861,15 @@ function handleSwitchVersionById(id: string) {
 	if (item && !item.locked) {
 		ctx.switchVersion?.(item)
 	}
+}
+
+async function handleSetEnabledForById(id: string, side: 'server' | 'player', enabled: boolean) {
+	if (ctx.isBusy.value || !ctx.setEnabledFor) return
+	const item = ctx.items.value.find((candidate) => getItemId(candidate) === id)
+	if (!item) return
+
+	retainedRowIds.value.add(id)
+	await ctx.setEnabledFor(item, side, enabled)
 }
 
 // Bulk updating
@@ -1021,7 +1062,10 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 						</div>
 
 						<div class="@container flex items-start gap-2">
-							<div ref="filterControlsRef" class="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+							<div
+								ref="filterControlsRef"
+								class="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-2"
+							>
 								<div ref="projectTypeFiltersRef" class="flex items-center gap-2">
 									<TeleportOverflowMenu
 										class="!h-[34px] !text-sm !font-medium"
@@ -1039,7 +1083,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 									<div class="h-6 w-px shrink-0 bg-surface-5" />
 									<FilterPills
 										:model-value="selectedFilters"
-										:options="filterOptions"
+										:options="visibleFilterOptions"
 										@update:model-value="updateFilterChips"
 									>
 										<template #all>
@@ -1050,14 +1094,14 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 								<div
 									v-if="metadataFilterCategories.length > 0"
 									ref="metadataFiltersRef"
-									class="flex flex-wrap items-center gap-1.5 [&>div:last-of-type]:!h-[34px] [&>div:last-of-type]:!gap-1.5 [&_[data-button]]:!h-[34px]"
+									class="relative flex flex-wrap items-center gap-1.5 [&>div:last-of-type]:!h-[34px] [&>div:last-of-type]:!gap-1.5 [&_[data-button]]:!h-[34px]"
 								>
 									<div
-										class="mr-0.5 h-6 w-px shrink-0 bg-surface-5"
+										class="absolute -left-2 top-[5px] h-6 w-px bg-surface-5"
 										:class="{ invisible: metadataFiltersWrapped }"
 									/>
 									<DropdownFilterBar
-										v-model="selectedMetadataFilters"
+										:model-value="selectedMetadataFilters"
 										:categories="metadataFilterCategories"
 										:show-label="false"
 										:add-label="formatMessage(messages.filter)"
@@ -1066,145 +1110,16 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 										add-button-size="sm"
 										checkbox-position="right"
 										apply-immediately
+										@update:model-value="updateMetadataFilters"
 									>
-										<template #preview-content="{ category, selectedValues, label, summary }">
-											<div
-												v-if="category.key === 'author'"
-												class="flex min-w-0 flex-1 items-center gap-2"
-											>
-												<template v-if="selectedValues.length === 1">
-													<span
-														class="flex size-5 shrink-0 items-center justify-center overflow-hidden bg-surface-2 text-brand"
-														:class="
-															getMetadataFilterPreviewAuthor(selectedValues)?.type ===
-															'organization'
-																? 'rounded'
-																: 'rounded-full'
-														"
-													>
-														<Avatar
-															v-if="getMetadataFilterPreviewAuthor(selectedValues)?.avatar_url"
-															:src="getMetadataFilterPreviewAuthor(selectedValues)?.avatar_url"
-															size="100%"
-															:circle="
-																getMetadataFilterPreviewAuthor(selectedValues)?.type !==
-																'organization'
-															"
-															no-shadow
-															class="!border-0"
-														/>
-														<OrganizationIcon
-															v-else-if="
-																getMetadataFilterPreviewAuthor(selectedValues)?.type ===
-																'organization'
-															"
-															class="size-4"
-														/>
-														<UserIcon v-else class="size-4" />
-													</span>
-													<span class="min-w-0 truncate font-semibold text-contrast">
-														{{ getMetadataFilterPreviewAuthor(selectedValues)?.name ?? summary }}
-													</span>
-												</template>
-												<template v-else>
-													<span class="font-medium">{{ label }}:</span>
-													<div
-														class="relative h-5 shrink-0"
-														:style="{
-															width: `${getMetadataFilterPreviewAuthorStackWidth(selectedValues)}px`,
-														}"
-														aria-hidden="true"
-													>
-														<div
-															v-for="(value, index) in getMetadataFilterPreviewAuthorValues(
-																selectedValues,
-															)"
-															:key="value"
-															class="absolute top-0 flex size-5 items-center justify-center overflow-hidden border border-solid border-surface-3 bg-surface-4 text-brand"
-															:class="
-																isMetadataFilterOrganization(value) ? 'rounded' : 'rounded-full'
-															"
-															:style="{
-																left: `${index * metadataFilterPreviewAuthorOffset}px`,
-																zIndex:
-																	getMetadataFilterPreviewAuthorValues(selectedValues).length -
-																	index,
-															}"
-														>
-															<Avatar
-																v-if="getMetadataFilterAuthor(value)?.avatar_url"
-																:src="getMetadataFilterAuthor(value)?.avatar_url"
-																size="100%"
-																:circle="!isMetadataFilterOrganization(value)"
-																no-shadow
-																class="!border-0"
-															/>
-															<OrganizationIcon
-																v-else-if="isMetadataFilterOrganization(value)"
-																class="size-3.5"
-															/>
-															<UserIcon v-else class="size-3.5" />
-														</div>
-														<div
-															v-if="getMetadataFilterPreviewAuthorOverflow(selectedValues) > 0"
-															class="absolute top-0 flex size-5 items-center justify-center rounded-full border border-solid border-surface-3 bg-surface-4 text-[10px] font-bold text-contrast"
-															:style="{
-																left: `${getMetadataFilterPreviewAuthorValues(selectedValues).length * metadataFilterPreviewAuthorOffset}px`,
-															}"
-														>
-															+{{ getMetadataFilterPreviewAuthorOverflow(selectedValues) }}
-														</div>
-													</div>
-													<span class="min-w-0 truncate font-semibold text-contrast">
-														{{
-															formatMessage(messages.authorCount, { count: selectedValues.length })
-														}}
-													</span>
-												</template>
-											</div>
-											<span v-else class="min-w-0 flex-1 truncate">
+										<template #preview-content="{ label, summary }">
+											<span class="min-w-0 flex-1 truncate">
 												<span class="font-medium">{{ label }}:</span>
 												<span class="ml-1 font-semibold text-contrast">{{ summary }}</span>
 											</span>
 										</template>
-										<template #option="{ category, option, selected }">
-											<div
-												v-if="category.key === 'author'"
-												class="flex min-w-0 flex-1 items-center gap-2"
-											>
-												<span
-													v-tooltip="option.label"
-													class="flex size-6 shrink-0 items-center justify-center overflow-hidden bg-surface-2 text-secondary"
-													:class="
-														getMetadataFilterAuthor(option.value)?.type === 'organization'
-															? 'rounded'
-															: 'rounded-full'
-													"
-												>
-													<img
-														v-if="getMetadataFilterAuthor(option.value)?.avatar_url"
-														:src="getMetadataFilterAuthor(option.value)?.avatar_url"
-														:alt="option.label"
-														class="size-full object-cover"
-													/>
-													<OrganizationIcon
-														v-else-if="
-															getMetadataFilterAuthor(option.value)?.type === 'organization'
-														"
-														class="size-5"
-													/>
-													<UserIcon v-else class="size-5" />
-												</span>
-												<span
-													v-tooltip="option.label"
-													class="min-w-0 truncate font-semibold leading-tight"
-													:class="selected ? 'text-contrast' : 'text-primary'"
-												>
-													{{ option.label }}
-												</span>
-											</div>
+										<template #option="{ option, selected }">
 											<span
-												v-else
 												class="min-w-0 truncate font-semibold leading-tight"
 												:class="selected ? 'text-contrast' : 'text-primary'"
 											>
@@ -1247,7 +1162,9 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							:items="tableItems"
 							:highlighted-item-id="highlightedItemId"
 							:show-selection="true"
+							:show-enabled-for-column="!!ctx.setEnabledFor"
 							@update:enabled="handleToggleEnabledById"
+							@update:enabled-for="handleSetEnabledForById"
 							@delete="handleDeleteById"
 							@update="handleUpdateById"
 							@switch-version="handleSwitchVersionById"

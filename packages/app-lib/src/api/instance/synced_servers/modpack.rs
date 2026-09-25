@@ -1,6 +1,6 @@
 use super::super::synced_options::instance_dir;
 use super::SERVERS_FILE;
-use super::codec::{read_servers, servers_from_bytes};
+use super::codec::{read_servers, servers_from_bytes, write_servers};
 use super::operations::{compose_instance, effective};
 use super::storage::{load_local, write_local_rows};
 use super::types::{LocalServer, ServerSource};
@@ -38,6 +38,47 @@ pub async fn clear_modpack_servers(instance_id: &str) -> crate::Result<()> {
         compose_instance(&metadata, &state).await?;
     }
     Ok(())
+}
+
+pub async fn discard_modpack_servers(instance_id: &str) -> crate::Result<()> {
+    let state = State::get().await?;
+    let _guard = state.lock_synced_options().await;
+    let metadata = crate::state::get_instance(instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
+    discard_modpack_servers_for_instance(&metadata, &state).await?;
+    if effective(&metadata, &state).await? {
+        compose_instance(&metadata, &state).await?;
+    }
+    Ok(())
+}
+
+async fn discard_modpack_servers_for_instance(
+    metadata: &InstanceMetadata,
+    state: &State,
+) -> crate::Result<()> {
+    let old_pack_servers = load_local(&metadata.instance.id, state)
+        .await?
+        .into_iter()
+        .filter(|server| server.source == ServerSource::Modpack)
+        .collect::<Vec<_>>();
+    if !old_pack_servers.is_empty() {
+        let path = instance_dir(metadata, state).join(SERVERS_FILE);
+        let mut servers = read_servers(&path).await?;
+        let mut changed = false;
+        for old in old_pack_servers {
+            if let Some(index) =
+                servers.iter().position(|server| *server == old.data)
+            {
+                servers.remove(index);
+                changed = true;
+            }
+        }
+        if changed {
+            write_servers(&path, &servers).await?;
+        }
+    }
+    replace_modpack_servers(metadata, Vec::new(), state).await
 }
 
 async fn replace_modpack_servers(
@@ -123,6 +164,9 @@ pub(super) async fn reconstruct_modpack_servers(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<()> {
+    if is_server_linked_shared_instance(metadata) {
+        return discard_modpack_servers_for_instance(metadata, state).await;
+    }
     let version_id = modpack_version_id(&metadata.link).ok_or_else(|| {
         ErrorKind::InputError(
             "This modpack does not have a recoverable Modrinth version."
@@ -195,6 +239,14 @@ pub(super) async fn reconstruct_modpack_servers(
         Vec::new()
     };
     replace_modpack_servers(metadata, servers, state).await
+}
+
+fn is_server_linked_shared_instance(metadata: &InstanceMetadata) -> bool {
+    matches!(&metadata.link, InstanceLink::SharedInstance { .. })
+        && metadata
+            .shared_instance
+            .as_ref()
+            .is_some_and(|attachment| attachment.server_manager_name.is_some())
 }
 
 pub(super) fn is_modpack_link(link: &InstanceLink) -> bool {

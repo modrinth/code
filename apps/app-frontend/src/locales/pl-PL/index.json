@@ -749,12 +749,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Złe konto"
   },
-  "app.instance.share.members.empty": {
-    "message": "Żaden użytkownik jeszcze nie dołączył"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Nie znaleziono użytkowników pasujących do tych filtrów."
-  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Nie będzie w stanie otrzymywać aktualizacji dla tej udostępnionej instancji"
   },
@@ -3596,9 +3590,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Powiązana udostępniona instancja"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "Wycofaj instancję"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Odłącz udostępnioną instancję"
   },
@@ -3608,14 +3599,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Odłączanie..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Wycofaj udostępnioną instancję"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Usuń tę udostępnioną instancję z Modrinth i przestań wysyłać aktualizacje do użytkowników, którym jest udostępniona. Nie wpłynie to na twoją lokalną instancję."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Anulowanie publikacji..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Dotyczy to tylko Twojej instancji lokalnej. Twoja zainstalowana zawartość pozostanie na tym urządzeniu, a współdzielona instancja i inne osoby korzystające z niej nie zostaną dotknięte."
@@ -3628,12 +3613,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Spowoduje to usunięcie przesyłanej instalacji z serwerów Modrith. Użytkownicy korzystający z niej na Modrinth App przestaną otrzymywać aktualizacje, ale twoja lokalna instalacja zostanie na tym urządzeniu."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Wycofywanie udostępnionej instancji"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Wycofaj udostępnioną instancję"
   },
   "instance.action.create-shortcut": {
     "message": "Utwórz skrót"
@@ -3707,219 +3686,6 @@
   "instance.files.save-as": {
     "message": "Zapisz jako..."
   },
-  "instance.icon-editor.background": {
-    "message": "Tło"
-  },
-  "instance.icon-editor.background.blue": {
-    "message": "Niebieskie"
-  },
-  "instance.icon-editor.background.dark-gray": {
-    "message": "Ciemnoszare"
-  },
-  "instance.icon-editor.background.dark-green": {
-    "message": "Ciemnozielone"
-  },
-  "instance.icon-editor.background.gray": {
-    "message": "Szare"
-  },
-  "instance.icon-editor.background.green": {
-    "message": "Zielone"
-  },
-  "instance.icon-editor.background.indigo": {
-    "message": "Indygo"
-  },
-  "instance.icon-editor.background.lavender": {
-    "message": "Lawendowe"
-  },
-  "instance.icon-editor.background.light-gray": {
-    "message": "Jasnoszare"
-  },
-  "instance.icon-editor.background.lime": {
-    "message": "Jasnozielone"
-  },
-  "instance.icon-editor.background.orange": {
-    "message": "Pomarańczowe"
-  },
-  "instance.icon-editor.background.pink": {
-    "message": "Różowe"
-  },
-  "instance.icon-editor.background.purple": {
-    "message": "Fioletowe"
-  },
-  "instance.icon-editor.background.red": {
-    "message": "Czerwone"
-  },
-  "instance.icon-editor.background.rose": {
-    "message": "Różane"
-  },
-  "instance.icon-editor.background.yellow": {
-    "message": "Żółte"
-  },
-  "instance.icon-editor.description": {
-    "message": "Wybierz elementy, by utworzyć własną ikonę."
-  },
-  "instance.icon-editor.recents": {
-    "message": "Ostatnio używane"
-  },
-  "instance.icon-editor.save": {
-    "message": "Zapisz ikonę"
-  },
-  "instance.icon-editor.surprise-me": {
-    "message": "Losuj"
-  },
-  "instance.icon-editor.symbol": {
-    "message": "Symbol"
-  },
-  "instance.icon-editor.symbol.backpack": {
-    "message": "Plecak"
-  },
-  "instance.icon-editor.symbol.beacon": {
-    "message": "Magiczna latarnia"
-  },
-  "instance.icon-editor.symbol.blue-shark": {
-    "message": "Niebieski rekin"
-  },
-  "instance.icon-editor.symbol.bookshelf": {
-    "message": "Biblioteczka"
-  },
-  "instance.icon-editor.symbol.brown-bear": {
-    "message": "Brązowy miś"
-  },
-  "instance.icon-editor.symbol.cake": {
-    "message": "Ciasto"
-  },
-  "instance.icon-editor.symbol.campfire": {
-    "message": "Ognisko"
-  },
-  "instance.icon-editor.symbol.chest": {
-    "message": "Skrzynia"
-  },
-  "instance.icon-editor.symbol.cogwheel": {
-    "message": "Koło zębate"
-  },
-  "instance.icon-editor.symbol.command-block": {
-    "message": "Blok poleceń"
-  },
-  "instance.icon-editor.symbol.cooking-pot": {
-    "message": "Garnek"
-  },
-  "instance.icon-editor.symbol.couch": {
-    "message": "Kanapa"
-  },
-  "instance.icon-editor.symbol.crafting-table": {
-    "message": "Stół rzemieślniczy"
-  },
-  "instance.icon-editor.symbol.create-wrench": {
-    "message": "Klucz"
-  },
-  "instance.icon-editor.symbol.creeper": {
-    "message": "Creeper"
-  },
-  "instance.icon-editor.symbol.enchanting-table": {
-    "message": "Stół do zaklinania"
-  },
-  "instance.icon-editor.symbol.ender-chest": {
-    "message": "Skrzynia Endu"
-  },
-  "instance.icon-editor.symbol.ender-dragon": {
-    "message": "Smok Endu"
-  },
-  "instance.icon-editor.symbol.engine": {
-    "message": "Silnik"
-  },
-  "instance.icon-editor.symbol.fabric": {
-    "message": "Fabric"
-  },
-  "instance.icon-editor.symbol.forge": {
-    "message": "Forge"
-  },
-  "instance.icon-editor.symbol.furnace": {
-    "message": "Piec"
-  },
-  "instance.icon-editor.symbol.gizmo": {
-    "message": "Gizmo"
-  },
-  "instance.icon-editor.symbol.globe": {
-    "message": "Globus"
-  },
-  "instance.icon-editor.symbol.grass-block": {
-    "message": "Blok trawy"
-  },
-  "instance.icon-editor.symbol.lantern": {
-    "message": "Latarnia"
-  },
-  "instance.icon-editor.symbol.moobloom": {
-    "message": "Moobloom"
-  },
-  "instance.icon-editor.symbol.mr-pack": {
-    "message": "Mr Pack"
-  },
-  "instance.icon-editor.symbol.neoforge": {
-    "message": "NeoForge"
-  },
-  "instance.icon-editor.symbol.orb": {
-    "message": "Kula"
-  },
-  "instance.icon-editor.symbol.oxygen-distributor": {
-    "message": "Dystrybutor tlenu"
-  },
-  "instance.icon-editor.symbol.pancakes": {
-    "message": "Naleśniki"
-  },
-  "instance.icon-editor.symbol.pickaxe": {
-    "message": "Kilof"
-  },
-  "instance.icon-editor.symbol.poke-ball": {
-    "message": "Poke Ball"
-  },
-  "instance.icon-editor.symbol.quilt": {
-    "message": "Quilt"
-  },
-  "instance.icon-editor.symbol.redstone-block": {
-    "message": "Blok redstone"
-  },
-  "instance.icon-editor.symbol.sculk-sensor": {
-    "message": "Sculkowy czujnik"
-  },
-  "instance.icon-editor.symbol.skeleton": {
-    "message": "Szkielet"
-  },
-  "instance.icon-editor.symbol.skillet": {
-    "message": "Patelnia"
-  },
-  "instance.icon-editor.symbol.slime-block": {
-    "message": "Blok szlamu"
-  },
-  "instance.icon-editor.symbol.space-helmet": {
-    "message": "Hełm Kosmiczny"
-  },
-  "instance.icon-editor.symbol.sticky-piston": {
-    "message": "Lepki tłok"
-  },
-  "instance.icon-editor.symbol.sword": {
-    "message": "Miecz"
-  },
-  "instance.icon-editor.symbol.terminal": {
-    "message": "Terminal"
-  },
-  "instance.icon-editor.symbol.tiny-potato": {
-    "message": "Ziemniaczek"
-  },
-  "instance.icon-editor.symbol.tire": {
-    "message": "Opona"
-  },
-  "instance.icon-editor.symbol.tnt": {
-    "message": "TNT"
-  },
-  "instance.icon-editor.symbol.wrenth-rinth": {
-    "message": "Klucz Modrinth"
-  },
-  "instance.icon-editor.symbol.zombie": {
-    "message": "Zombie"
-  },
-  "instance.icon-editor.title": {
-    "message": "Edytor ikon"
-  },
   "instance.last-played": {
     "message": "Ostatnio grane"
   },
@@ -3943,45 +3709,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Paczka zasobów"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Akcje"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Link zaproszenia"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Każdy, kto ma jeden z tych linków, może dołaczyć, dopóki jest aktywny"
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "Brak aktywnych zaproszeń."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Wygasa"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Cofnij zaproszenie"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "Cofnij zaproszenie {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Aktywne zaproszenia"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Użyć"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "Link zaproszenia <monospace>{code}</monospace> przestanie natychmiastowo działać. Osoby, które już dołączyły, będą mieć do niego dostęp."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Tej akcji nie można cofnąć"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Cofnij zaproszenie"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Cofnij zaproszenie"
   },
   "instance.settings.synced-options.data-override": {
     "message": "Wyłącz ten wyjątek synchronizacji, aby móc edytować synchronizowane dane."
@@ -4330,9 +4057,6 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Twój dostęp do udostępnionej instancji został odwołany. Instancja jest nadal dostępna, ale nie jest już połączona i nie będzie otrzymywać aktualizacji."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "Instancja źródłowa została usunięta. Instancja jest nadal dostępna, ale nie jest już połączona i nie będzie otrzymywać aktualizacji."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Ta udostępniona instancja została zablokowana przez zespół moderacyjny Modrinth. Nie będzie otrzymywać dalszych aktualizacji z instancji źródłowej."

@@ -5,6 +5,7 @@ import {
 	ModrinthIcon,
 	SettingsIcon,
 	TextQuoteIcon,
+	UsersIcon,
 	VersionIcon,
 	WrenchIcon,
 } from '@modrinth/assets'
@@ -13,6 +14,7 @@ import type { Component } from 'vue'
 export type ServerSettingsTabId =
 	| 'general'
 	| 'installation'
+	| 'sharing'
 	| 'network'
 	| 'properties'
 	| 'advanced'
@@ -25,6 +27,7 @@ export interface ServerSettingsTabContext {
 	serverStatus?: Archon.Servers.v0.Status | null
 	isOwner: boolean
 	isAdmin: boolean
+	isShared: boolean
 }
 
 export interface ServerSettingsTabDefinition {
@@ -46,6 +49,12 @@ export const serverSettingsTabDefinitions: ServerSettingsTabDefinition[] = [
 		id: 'installation',
 		label: 'Installation',
 		icon: WrenchIcon,
+	},
+	{
+		id: 'sharing',
+		label: 'Sharing',
+		icon: UsersIcon,
+		shown: ({ isShared }) => isShared,
 	},
 	{
 		id: 'network',

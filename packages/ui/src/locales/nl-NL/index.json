@@ -395,9 +395,6 @@
   "content.card.synced": {
     "defaultMessage": "Gesynchroniseerd tussen instanties"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Geüpload"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Weet je zeker dat je {count, plural, one {# project} other {# projecten}} wilt bijwerken naar de nieuwste compatibele versie? Het wordt aanbevolen om de inhoud één voor één bij te werken."
   },
@@ -656,9 +653,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Bekijk inhoud"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Auteur"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Omgeving"
   },
@@ -683,17 +677,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Update beschikbaar"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Client is afhankelijk van bestand"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Inhoud exclusief voor klanten"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Clientbestand bewaard"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Geen waarschuwingen"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Waarschuwingen"
@@ -724,9 +709,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# author} other {# authors}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Inhoud aan het laden..."
@@ -1964,12 +1946,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Het verwijderen van inhoud is mislukt"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Het uitschakelen van inhoud is mislukt"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Het inschakelen van inhoud is mislukt"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Het bijwerken van inhoud is mislukt"
   },
@@ -1984,9 +1960,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Het verwijderen van inhoud is mislukt"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Het omschakelen van {name} is mislukt"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Het ontkoppelen van het modpack is mislukt"
@@ -2426,12 +2399,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Aan"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Extern"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Dit bestand is niet gepubliceerd op Modrinth."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Beheer content"
   },
@@ -2446,9 +2413,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Zoek naar {count, number} {count, plural, one {project} other {projecten}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Waarschuwingen"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Huidige"
@@ -2527,15 +2491,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Wijzigingen opgeslagen"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Deze mod is afhankelijk van een client-side mod en kan problemen veroorzaken bij het opstarten van je server"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Dit is een client-side mod en kan problemen veroorzaken bij het opstarten van je server"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Dit is een client-side mod die als afhankelijkheid is geïnstalleerd en mogelijk problemen kan veroorzaken bij het opstarten van je server"
   },
   "label.collections": {
     "defaultMessage": "Collecties"
@@ -5492,15 +5447,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Je vindt ze nu hier!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Niet meer weergeven"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Je serverinstellingen zijn verplaatst"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Gedeelde servers"
   },
@@ -5734,18 +5680,6 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "SFTP-referenties gedraaid"
-  },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Er is een onverwachte fout opgetreden tijdens de installatie. Probeer het later nog eens."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Installeren is mislukt"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Er is een onverwachte fout opgetreden tijdens het uploaden. Probeer het later nog eens."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Uploaden van modpack is mislukt"
   },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Server instellen"

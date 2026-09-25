@@ -740,12 +740,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Fel konto"
   },
-  "app.instance.share.members.empty": {
-    "message": "Inga användare har anslutit än"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Ingen användare matchade dina filter."
-  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "De kommer inte längre att få uppdateringar för den här delade instansen"
   },
@@ -2720,23 +2714,14 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Länkad delad instans"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "Avpublicera instans"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Avlänka delad instans"
   },
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Avlänkar..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Avpublicera delad instans"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Ta bort den delade instansen från Modrinth och sluta skicka uppdateringar till alla som använder den. Din lokala instans kommer inte att påverkas."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Avpublicerar..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-header": {
     "message": "Avlänkar delad instans"
@@ -2746,12 +2731,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Det här raderar den delade instansen från Modrinths servrar. De som använder den i Modrinth App kommer inte längre få uppdateringar, men din lokala instans och dess innehåll är kvar på den här enheten."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Avpublicerar delad instans"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Avpublicera delad instans"
   },
   "instance.action.create-shortcut": {
     "message": "Skapa genväg"
@@ -2822,195 +2801,6 @@
   "instance.files.save-as": {
     "message": "Spara som..."
   },
-  "instance.icon-editor.background": {
-    "message": "Bakgrund"
-  },
-  "instance.icon-editor.background.blue": {
-    "message": "Blå"
-  },
-  "instance.icon-editor.background.dark-gray": {
-    "message": "Mörkgrå"
-  },
-  "instance.icon-editor.background.dark-green": {
-    "message": "Mörkgrön"
-  },
-  "instance.icon-editor.background.gray": {
-    "message": "Grå"
-  },
-  "instance.icon-editor.background.green": {
-    "message": "Grön"
-  },
-  "instance.icon-editor.background.indigo": {
-    "message": "Indigo"
-  },
-  "instance.icon-editor.background.lavender": {
-    "message": "Lavendel"
-  },
-  "instance.icon-editor.background.light-gray": {
-    "message": "Ljusgrå"
-  },
-  "instance.icon-editor.background.lime": {
-    "message": "Limegrön"
-  },
-  "instance.icon-editor.background.orange": {
-    "message": "Orange"
-  },
-  "instance.icon-editor.background.pink": {
-    "message": "Rosa"
-  },
-  "instance.icon-editor.background.purple": {
-    "message": "Lila"
-  },
-  "instance.icon-editor.background.red": {
-    "message": "Röd"
-  },
-  "instance.icon-editor.background.yellow": {
-    "message": "Gul"
-  },
-  "instance.icon-editor.recents": {
-    "message": "Senaste"
-  },
-  "instance.icon-editor.save": {
-    "message": "Spara ikon"
-  },
-  "instance.icon-editor.surprise-me": {
-    "message": "Slumpa"
-  },
-  "instance.icon-editor.symbol": {
-    "message": "Symbol"
-  },
-  "instance.icon-editor.symbol.backpack": {
-    "message": "Ryggsäck"
-  },
-  "instance.icon-editor.symbol.beacon": {
-    "message": "Fyr"
-  },
-  "instance.icon-editor.symbol.blue-shark": {
-    "message": "Blåhaj"
-  },
-  "instance.icon-editor.symbol.bookshelf": {
-    "message": "Bokhylla"
-  },
-  "instance.icon-editor.symbol.brown-bear": {
-    "message": "Brunbjörn"
-  },
-  "instance.icon-editor.symbol.cake": {
-    "message": "Tårta"
-  },
-  "instance.icon-editor.symbol.campfire": {
-    "message": "Lägereld"
-  },
-  "instance.icon-editor.symbol.chest": {
-    "message": "Kista"
-  },
-  "instance.icon-editor.symbol.cogwheel": {
-    "message": "Kugghjul"
-  },
-  "instance.icon-editor.symbol.command-block": {
-    "message": "Kommandoblock"
-  },
-  "instance.icon-editor.symbol.cooking-pot": {
-    "message": "Gryta"
-  },
-  "instance.icon-editor.symbol.couch": {
-    "message": "Soffa"
-  },
-  "instance.icon-editor.symbol.crafting-table": {
-    "message": "Arbetsbänk"
-  },
-  "instance.icon-editor.symbol.create-wrench": {
-    "message": "Skiftnyckel"
-  },
-  "instance.icon-editor.symbol.creeper": {
-    "message": "Creeper"
-  },
-  "instance.icon-editor.symbol.enchanting-table": {
-    "message": "Förtrollningsbord"
-  },
-  "instance.icon-editor.symbol.ender-chest": {
-    "message": "Enderkista"
-  },
-  "instance.icon-editor.symbol.ender-dragon": {
-    "message": "Enderdrake"
-  },
-  "instance.icon-editor.symbol.engine": {
-    "message": "Motor"
-  },
-  "instance.icon-editor.symbol.fabric": {
-    "message": "Fabric"
-  },
-  "instance.icon-editor.symbol.forge": {
-    "message": "Forge"
-  },
-  "instance.icon-editor.symbol.furnace": {
-    "message": "Ugn"
-  },
-  "instance.icon-editor.symbol.globe": {
-    "message": "Glob"
-  },
-  "instance.icon-editor.symbol.grass-block": {
-    "message": "Gräsblock"
-  },
-  "instance.icon-editor.symbol.lantern": {
-    "message": "Lykta"
-  },
-  "instance.icon-editor.symbol.moobloom": {
-    "message": "Moobloom"
-  },
-  "instance.icon-editor.symbol.mr-pack": {
-    "message": "Mr Pack"
-  },
-  "instance.icon-editor.symbol.neoforge": {
-    "message": "NeoForge"
-  },
-  "instance.icon-editor.symbol.oxygen-distributor": {
-    "message": "Syrefördelare"
-  },
-  "instance.icon-editor.symbol.pancakes": {
-    "message": "Pannkakor"
-  },
-  "instance.icon-editor.symbol.pickaxe": {
-    "message": "Hacka"
-  },
-  "instance.icon-editor.symbol.quilt": {
-    "message": "Quilt"
-  },
-  "instance.icon-editor.symbol.skeleton": {
-    "message": "Skelett"
-  },
-  "instance.icon-editor.symbol.skillet": {
-    "message": "Stekpanna"
-  },
-  "instance.icon-editor.symbol.slime-block": {
-    "message": "Slemblock"
-  },
-  "instance.icon-editor.symbol.space-helmet": {
-    "message": "Rymdhjälm"
-  },
-  "instance.icon-editor.symbol.sticky-piston": {
-    "message": "Klibbig kolv"
-  },
-  "instance.icon-editor.symbol.sword": {
-    "message": "Svärd"
-  },
-  "instance.icon-editor.symbol.tiny-potato": {
-    "message": "Liten potatis"
-  },
-  "instance.icon-editor.symbol.tire": {
-    "message": "Däck"
-  },
-  "instance.icon-editor.symbol.tnt": {
-    "message": "Dynamit"
-  },
-  "instance.icon-editor.symbol.wrenth-rinth": {
-    "message": "Modrinth skiftnyckel"
-  },
-  "instance.icon-editor.symbol.zombie": {
-    "message": "Zombie"
-  },
-  "instance.icon-editor.title": {
-    "message": "Ikonredigerare"
-  },
   "instance.last-played": {
     "message": "Senast spelad"
   },
@@ -3034,45 +2824,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Resurs pack"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Åtgärder"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Inbjudningslänk"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Vem som helst med en av de här inbjudningslänkarna kan ansluta medan den är aktiv."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "Det finns inga aktiva inbjudningar."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Går ut"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Återkalla inbjudan"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "Återkalla inbjudan {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Aktiva inbjudningar"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Användningar"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "Inbjudningslänken <monospace>{code}</monospace> kommer att sluta fungera omedelbart. De som redan gått med kommer att behålla sin åtkomst."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Den här åtgärden kan inte ångras"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Återkalla inbjudan"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Återkalla inbjudan"
   },
   "instance.settings.tabs.behavior.description": {
     "message": "Bestäm vilka flikar som syns på den här instansen."
@@ -3343,9 +3094,6 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Din åtkomst till den delade instansen återkallades. Den här instansen är fortfarande tillgänglig, men är inte längre länkad och kommer inte längre få uppdateringar."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "Primärinstansen raderades. Den här instansen är fortfarande tillgänglig, men är inte längre länkad och kommer inte längre få uppdateringar."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Den här instansen låstes av innehållsmodereringsteamet. Den kommer inte längre få uppdateringar från primärinstansen och kan inte spelas."

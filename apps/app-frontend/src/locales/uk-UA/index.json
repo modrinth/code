@@ -752,12 +752,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Неправильний обліковий запис"
   },
-  "app.instance.share.members.empty": {
-    "message": "Жоден користувач ще не приєднався"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Жоден користувач не відповідає вашим фільтрам."
-  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Він більше не зможе отримувати оновлення для цього спільного примірника"
   },
@@ -3599,9 +3593,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Пов'язаний спільний примірник"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "Скасувати публікацію примірника"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Відв'язати спільний примірник"
   },
@@ -3611,14 +3602,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Відв'язування..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Скасувати публікацію спільного примірника"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Видалити цей спільний примірник із Modrinth і припинити надсилати оновлення всім, хто ним користується. Це не вплине на ваш локальний примірник."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Скасування публікації..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Це вплине лише на ваш локальний примірник. Установлений уміст залишиться на цьому пристрої, а спільний примірник й інші користувачі не зазнають змін."
@@ -3631,12 +3616,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Це видалить спільний примірник із серверів Modrinth. Користувачі Modrinth App припинять отримувати оновлення, але ваш локальний примірник і його вміст залишаться на цьому пристрої."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Скасування публікації спільного примірника"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Скасувати публікацію спільного примірника"
   },
   "instance.action.create-shortcut": {
     "message": "Створити ярлик"
@@ -3710,219 +3689,6 @@
   "instance.files.save-as": {
     "message": "Зберегти як..."
   },
-  "instance.icon-editor.background": {
-    "message": "Тло"
-  },
-  "instance.icon-editor.background.blue": {
-    "message": "Синій"
-  },
-  "instance.icon-editor.background.dark-gray": {
-    "message": "Темно-сірий"
-  },
-  "instance.icon-editor.background.dark-green": {
-    "message": "Темно-зелений"
-  },
-  "instance.icon-editor.background.gray": {
-    "message": "Сірий"
-  },
-  "instance.icon-editor.background.green": {
-    "message": "Зелений"
-  },
-  "instance.icon-editor.background.indigo": {
-    "message": "Індиго"
-  },
-  "instance.icon-editor.background.lavender": {
-    "message": "Лавандовий"
-  },
-  "instance.icon-editor.background.light-gray": {
-    "message": "Світло-сірий"
-  },
-  "instance.icon-editor.background.lime": {
-    "message": "Світло-зелений"
-  },
-  "instance.icon-editor.background.orange": {
-    "message": "Жовтогарячий"
-  },
-  "instance.icon-editor.background.pink": {
-    "message": "Рожевий"
-  },
-  "instance.icon-editor.background.purple": {
-    "message": "Фіолетовий"
-  },
-  "instance.icon-editor.background.red": {
-    "message": "Червоний"
-  },
-  "instance.icon-editor.background.rose": {
-    "message": "Трояндовий"
-  },
-  "instance.icon-editor.background.yellow": {
-    "message": "Жовтий"
-  },
-  "instance.icon-editor.description": {
-    "message": "Поєднуйте елементи й створіть свій власний значок."
-  },
-  "instance.icon-editor.recents": {
-    "message": "Недавні"
-  },
-  "instance.icon-editor.save": {
-    "message": "Зберегти значок"
-  },
-  "instance.icon-editor.surprise-me": {
-    "message": "Випадковий"
-  },
-  "instance.icon-editor.symbol": {
-    "message": "Піктограма"
-  },
-  "instance.icon-editor.symbol.backpack": {
-    "message": "Наплічник"
-  },
-  "instance.icon-editor.symbol.beacon": {
-    "message": "Маяк"
-  },
-  "instance.icon-editor.symbol.blue-shark": {
-    "message": "Блакитна акула"
-  },
-  "instance.icon-editor.symbol.bookshelf": {
-    "message": "Книжкова полиця"
-  },
-  "instance.icon-editor.symbol.brown-bear": {
-    "message": "Бурий ведмідь"
-  },
-  "instance.icon-editor.symbol.cake": {
-    "message": "Торт"
-  },
-  "instance.icon-editor.symbol.campfire": {
-    "message": "Багаття"
-  },
-  "instance.icon-editor.symbol.chest": {
-    "message": "Скриня"
-  },
-  "instance.icon-editor.symbol.cogwheel": {
-    "message": "Шестірня"
-  },
-  "instance.icon-editor.symbol.command-block": {
-    "message": "Командний блок"
-  },
-  "instance.icon-editor.symbol.cooking-pot": {
-    "message": "Баняк"
-  },
-  "instance.icon-editor.symbol.couch": {
-    "message": "Диван"
-  },
-  "instance.icon-editor.symbol.crafting-table": {
-    "message": "Верстак"
-  },
-  "instance.icon-editor.symbol.create-wrench": {
-    "message": "Гайковий ключ"
-  },
-  "instance.icon-editor.symbol.creeper": {
-    "message": "Кріпер"
-  },
-  "instance.icon-editor.symbol.enchanting-table": {
-    "message": "Стіл зачарування"
-  },
-  "instance.icon-editor.symbol.ender-chest": {
-    "message": "Скриня Енду"
-  },
-  "instance.icon-editor.symbol.ender-dragon": {
-    "message": "Дракон Енду"
-  },
-  "instance.icon-editor.symbol.engine": {
-    "message": "Двигун"
-  },
-  "instance.icon-editor.symbol.fabric": {
-    "message": "Fabric"
-  },
-  "instance.icon-editor.symbol.forge": {
-    "message": "Forge"
-  },
-  "instance.icon-editor.symbol.furnace": {
-    "message": "Піч"
-  },
-  "instance.icon-editor.symbol.gizmo": {
-    "message": "Штуковина"
-  },
-  "instance.icon-editor.symbol.globe": {
-    "message": "Глобус"
-  },
-  "instance.icon-editor.symbol.grass-block": {
-    "message": "Трав’яний блок"
-  },
-  "instance.icon-editor.symbol.lantern": {
-    "message": "Ліхтар"
-  },
-  "instance.icon-editor.symbol.moobloom": {
-    "message": "Квіткорова"
-  },
-  "instance.icon-editor.symbol.mr-pack": {
-    "message": "Пан Пакет"
-  },
-  "instance.icon-editor.symbol.neoforge": {
-    "message": "NeoForge"
-  },
-  "instance.icon-editor.symbol.orb": {
-    "message": "Гало"
-  },
-  "instance.icon-editor.symbol.oxygen-distributor": {
-    "message": "Кисневий розповсюджувач"
-  },
-  "instance.icon-editor.symbol.pancakes": {
-    "message": "Млинці"
-  },
-  "instance.icon-editor.symbol.pickaxe": {
-    "message": "Кайло"
-  },
-  "instance.icon-editor.symbol.poke-ball": {
-    "message": "Покебол"
-  },
-  "instance.icon-editor.symbol.quilt": {
-    "message": "Quilt"
-  },
-  "instance.icon-editor.symbol.redstone-block": {
-    "message": "Блок редстоуну"
-  },
-  "instance.icon-editor.symbol.sculk-sensor": {
-    "message": "Скалковий сенсор"
-  },
-  "instance.icon-editor.symbol.skeleton": {
-    "message": "Скелет"
-  },
-  "instance.icon-editor.symbol.skillet": {
-    "message": "Сковорода"
-  },
-  "instance.icon-editor.symbol.slime-block": {
-    "message": "Блок слизу"
-  },
-  "instance.icon-editor.symbol.space-helmet": {
-    "message": "Скафандовий шолом"
-  },
-  "instance.icon-editor.symbol.sticky-piston": {
-    "message": "Липкий поршень"
-  },
-  "instance.icon-editor.symbol.sword": {
-    "message": "Меч"
-  },
-  "instance.icon-editor.symbol.terminal": {
-    "message": "Термінал"
-  },
-  "instance.icon-editor.symbol.tiny-potato": {
-    "message": "Бараболик"
-  },
-  "instance.icon-editor.symbol.tire": {
-    "message": "Колесо"
-  },
-  "instance.icon-editor.symbol.tnt": {
-    "message": "Динаміт"
-  },
-  "instance.icon-editor.symbol.wrenth-rinth": {
-    "message": "Гайковий ключ Modrinth"
-  },
-  "instance.icon-editor.symbol.zombie": {
-    "message": "Зомбі"
-  },
-  "instance.icon-editor.title": {
-    "message": "Редактор значків"
-  },
   "instance.last-played": {
     "message": "Востаннє зіграно:"
   },
@@ -3946,45 +3712,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Пакет ресурсів"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Дії"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Посилання"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Будь-хто з цим посиланням-запрошенням може приєднатися, поки воно залишається активним."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "Немає активних запрошень."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Чинний до"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Відкликати запрошення"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "Відкликати запрошення {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Активні запрошення"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Використання"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "Посилання для запрошення <monospace>{code}</monospace> негайно припинить діяти. Люди, які вже приєдналися, збережуть доступ."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Цю дію неможливо скасувати"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Відкликати запрошення"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Відкликати запрошення"
   },
   "instance.settings.synced-options.data-override": {
     "message": "Вимкніть це перевизначення для зміни синхронізованих даних."
@@ -4333,9 +4060,6 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Ваш доступ до цього спільного примірника відкликано. Примірник досі доступний, але вже не прив'язаний та не отримуватиме оновлення."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "Основний примірник видалено. Цей примірник досі доступний, але вже не прив'язаний та не отримуватиме оновлення."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Цей спільний примірник заблокували модератори вмісту. Він більше не отримуватиме оновлень від основного примірника і не може бути запущений."

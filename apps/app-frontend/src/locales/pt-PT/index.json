@@ -839,12 +839,6 @@
   "instance.server-modal.resource-pack": {
     "message": "Pacote de recursos"
   },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Ações"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Usos"
-  },
   "instance.settings.tabs.general": {
     "message": "Geral"
   },

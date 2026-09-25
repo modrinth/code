@@ -16,7 +16,7 @@ import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
 import type { ButtonMenuOption } from '#ui/components/base/buttons'
 import { ButtonLink } from '#ui/components/base/buttons'
-import Checkbox from '#ui/components/base/Checkbox.vue'
+import DropdownFilterBar from '#ui/components/base/DropdownFilterBar.vue'
 import FilterPills from '#ui/components/base/FilterPills.vue'
 import Input from '#ui/components/base/inputs/Input.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
@@ -29,8 +29,17 @@ import {
 	normalizeProjectType,
 } from '#ui/utils/common-messages'
 
-import { getClientWarningType } from '../../composables/content-filtering'
-import type { ContentCardProject, ContentCardTableItem, ContentItem } from '../../types'
+import { getClientWarningType, getContentWarningType } from '../../composables/content-filtering'
+import {
+	type ContentMetadataFilterValue,
+	useContentMetadataFilters,
+} from '../../composables/use-content-metadata-filters'
+import type {
+	ContentCardProject,
+	ContentCardTableItem,
+	ContentItem,
+	ContentSide,
+} from '../../types'
 import ContentCardTable from '../ContentCardTable.vue'
 import ContentSelectionBar from '../ContentSelectionBar.vue'
 
@@ -44,6 +53,7 @@ interface Props {
 	sourceName?: string
 	sourceIconUrl?: string
 	enableToggle?: boolean
+	enableEnabledFor?: boolean
 	actionDisabled?: boolean
 	actionDisabledTooltip?: string | null
 	getOverflowOptions?: (item: ContentItem) => ButtonMenuOption[]
@@ -60,6 +70,7 @@ const props = withDefaults(defineProps<Props>(), {
 	sourceName: undefined,
 	sourceIconUrl: undefined,
 	enableToggle: false,
+	enableEnabledFor: false,
 	actionDisabled: false,
 	actionDisabledTooltip: undefined,
 	getOverflowOptions: undefined,
@@ -71,6 +82,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
 	'update:enabled': [item: ContentItem, value: boolean]
+	'update:enabled-for': [item: ContentItem, side: ContentSide, value: boolean]
 	'bulk:enable': [items: ContentItem[]]
 	'bulk:disable': [items: ContentItem[]]
 	hide: []
@@ -101,13 +113,13 @@ const messages = defineMessages({
 		id: 'instances.managed-content-modal.no-results',
 		defaultMessage: 'No projects match your search.',
 	},
-	externalContent: {
-		id: 'instances.managed-content-modal.external-content',
-		defaultMessage: 'External',
+	filter: {
+		id: 'content.page-layout.filter.add',
+		defaultMessage: 'Filter',
 	},
-	externalContentDescription: {
-		id: 'instances.managed-content-modal.external-content-description',
-		defaultMessage: 'This file is not published on Modrinth.',
+	warnings: {
+		id: 'content.filter.warnings',
+		defaultMessage: 'Warnings',
 	},
 	openInSlicer: {
 		id: 'instances.managed-content-modal.open-in-slicer',
@@ -117,10 +129,6 @@ const messages = defineMessages({
 		id: 'instances.managed-content-modal.download-file',
 		defaultMessage: 'Download File',
 	},
-	warnings: {
-		id: 'instances.managed-content-modal.warnings',
-		defaultMessage: 'Warnings',
-	},
 	enabled: {
 		id: 'instances.managed-content-modal.enabled',
 		defaultMessage: 'Enabled',
@@ -129,12 +137,17 @@ const messages = defineMessages({
 		id: 'instances.managed-content-modal.disabled',
 		defaultMessage: 'Disabled',
 	},
+	pleaseWait: {
+		id: 'content.enabled-for.please-wait',
+		defaultMessage: 'Please wait',
+	},
 })
 
 export interface ManagedContentModalState {
 	items: ContentItem[]
 	searchQuery: string
 	selectedFilters: string[]
+	selectedMetadataFilters?: ContentMetadataFilterValue
 	scrollTop: number
 }
 
@@ -146,6 +159,15 @@ const disabledIds = ref(new Set<string>())
 const loading = ref(false)
 const searchQuery = ref('')
 const selectedFilters = ref<string[]>([])
+const { selectedMetadataFilters, metadataFilterCategories, applyMetadataFilters } =
+	useContentMetadataFilters(items, undefined, {
+		showEnabledFor: props.enableEnabledFor,
+		showEnvironmentWarnings: props.showEnvironmentWarnings,
+	})
+const metadataFilterTriggerClass =
+	'!h-[34px] !rounded-xl !border !border-solid !border-surface-5 !bg-transparent !px-3 !text-sm !font-medium !text-primary !shadow-[0_1px_1.5px_rgba(0,0,0,0.15)] transition-all duration-100 active:scale-[0.97] hover:!bg-surface-3 focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5'
+const metadataFilterPreviewTriggerClass =
+	'!h-[34px] !rounded-xl !border !border-solid !border-brand !bg-brand-highlight !px-3 !text-sm !font-medium !text-brand !shadow-[0_1px_1.5px_rgba(0,0,0,0.15)] transition-all duration-100 active:scale-[0.97] hover:!bg-brand-highlight focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5 [&>svg]:!text-brand'
 const selectedIds = ref<string[]>([])
 const highlightedItemId = ref<string>()
 
@@ -158,32 +180,14 @@ const selectedItems = computed(() =>
 )
 const toggleableSelectedItems = computed(() => selectedItems.value)
 
-const allSelected = computed(() => {
-	if (filteredItems.value.length === 0) return false
-	return filteredItems.value.every((item) => selectedIds.value.includes(item.id))
-})
-
-const someSelected = computed(() => {
-	return (
-		filteredItems.value.some((item) => selectedIds.value.includes(item.id)) && !allSelected.value
-	)
-})
-
-function toggleSelectAll() {
-	if (allSelected.value || someSelected.value) {
-		selectedIds.value = []
-	} else {
-		selectedIds.value = filteredItems.value.map((item) => item.id)
-	}
-}
-
-const fuse = new Fuse<ContentItem>([], {
-	keys: ['project.title', 'owner.name', 'file_name'],
-	threshold: 0.4,
-	distance: 100,
-})
-
-watchSyncEffect(() => fuse.setCollection(items.value))
+const fuse = computed(
+	() =>
+		new Fuse<ContentItem>(items.value, {
+			keys: ['project.title', 'owner.name', 'file_name'],
+			threshold: 0.4,
+			distance: 100,
+		}),
+)
 
 const filterOptions = computed(() => {
 	if (props.filterMode === 'status') {
@@ -214,16 +218,21 @@ const filterOptions = computed(() => {
 		})
 
 	if (
-		items.value.some((item) => getClientWarningType(item, props.showEnvironmentWarnings) !== null)
+		applyMetadataFilters(items.value).some(
+			(item) => getContentWarningType(item, props.showEnvironmentWarnings) !== null,
+		)
 	) {
 		options.push({ id: 'warnings', label: formatMessage(messages.warnings) })
 	}
 
-	if (props.enableToggle && items.value.some((item) => item.enabled === false)) {
-		options.push({ id: 'disabled', label: formatMessage(messages.disabled) })
-	}
-
 	return options
+})
+
+watchSyncEffect(() => {
+	if (items.value.length === 0) return
+	const availableFilters = new Set(filterOptions.value.map((option) => option.id))
+	const validFilters = selectedFilters.value.filter((filter) => availableFilters.has(filter))
+	if (validFilters.length !== selectedFilters.value.length) selectedFilters.value = validFilters
 })
 
 const stats = computed(() => {
@@ -246,7 +255,7 @@ function matchesSelectedFilters(item: ContentItem) {
 		return false
 	if (hasEnabledFilter !== hasDisabledFilter && Boolean(item.enabled) !== hasEnabledFilter)
 		return false
-	if (hasWarningsFilter && getClientWarningType(item, props.showEnvironmentWarnings) === null)
+	if (hasWarningsFilter && getContentWarningType(item, props.showEnvironmentWarnings) === null)
 		return false
 	return true
 }
@@ -258,7 +267,7 @@ const filteredItems = computed(() => {
 
 	let result: ContentItem[]
 	if (query) {
-		result = fuse.search(query).map(({ item }) => item)
+		result = fuse.value.search(query).map(({ item }) => item)
 	} else {
 		result = sortContentItems(items.value)
 	}
@@ -267,7 +276,7 @@ const filteredItems = computed(() => {
 		result = result.filter(matchesSelectedFilters)
 	}
 
-	return sortContentItems(result, !query)
+	return applyMetadataFilters(sortContentItems(result, !query))
 })
 
 function contentVersionLabel(item: ContentItem): string {
@@ -278,6 +287,7 @@ function contentVersionLabel(item: ContentItem): string {
 const tableItems = computed<ContentCardTableItem[]>(() =>
 	filteredItems.value.map((item) => ({
 		id: item.id,
+		projectType: item.project_type,
 		project: item.project ?? {
 			id: item.id,
 			slug: null,
@@ -285,6 +295,7 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 			icon_url: item.embedded_metadata?.icon_url ?? null,
 		},
 		projectLink: !item.external && item.project?.id ? `/project/${item.project.id}` : undefined,
+		embeddedIcon: item.embeddedIcon,
 		version: props.showVersion
 			? (item.version ?? {
 					id: item.id,
@@ -307,18 +318,32 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 					link: item.source.link ?? sourceProjectLink(item.source.project),
 				}
 			: undefined,
-		...(props.enableToggle ? { enabled: item.enabled } : {}),
+		external: item.external,
+		externalFile:
+			item.external &&
+			(!!item.external_url ||
+				item.source_kind === 'modrinth_modpack' ||
+				item.source_kind === 'imported_modpack'),
+		...(props.enableToggle || props.enableEnabledFor ? { enabled: item.enabled } : {}),
+		...(props.enableEnabledFor ? { enabledFor: item.enabledFor } : {}),
 		synced: !!item.synced_pack,
 		syncUpdatePending: item.synced_pack?.update_pending,
 		locked: item.locked,
 		installing: item.installing === true,
 		toggleDisabled: props.actionDisabled,
 		toggleDisabledTooltip: props.actionDisabled ? props.actionDisabledTooltip : undefined,
-		isClientOnly: getClientWarningType(item, props.showEnvironmentWarnings) !== null,
-		clientWarning: getClientWarningType(item, props.showEnvironmentWarnings),
+		isClientOnly:
+			!props.enableEnabledFor && getClientWarningType(item, props.showEnvironmentWarnings) !== null,
+		clientWarning: props.enableEnabledFor
+			? null
+			: getClientWarningType(item, props.showEnvironmentWarnings),
 		disabled:
 			props.actionDisabled || disabledIds.value.has(item.file_name) || item.installing === true,
-		disabledTooltip: props.actionDisabled ? props.actionDisabledTooltip : undefined,
+		disabledTooltip: props.actionDisabled
+			? props.actionDisabledTooltip
+			: disabledIds.value.has(item.file_name)
+				? formatMessage(messages.pleaseWait)
+				: undefined,
 		overflowOptions: [
 			...(props.switchVersion && !item.locked && item.project?.id && item.version?.id
 				? [
@@ -333,9 +358,6 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 			...(props.getOverflowOptions?.(item) ?? []),
 		],
 	})),
-)
-const externalItemIds = computed(
-	() => new Set(items.value.filter((item) => item.external && !item.source).map((item) => item.id)),
 )
 const externalSlicerUrls = computed(() => {
 	const urls: Record<string, string> = {}
@@ -356,7 +378,9 @@ const externalUrls = computed(() => {
 	return urls
 })
 const hasExternalSlicerUrls = computed(() => Object.keys(externalSlicerUrls.value).length > 0)
-const showTableActions = computed(() => props.enableToggle || hasExternalSlicerUrls.value)
+const showTableActions = computed(
+	() => props.enableToggle || props.enableEnabledFor || hasExternalSlicerUrls.value,
+)
 
 function getTypeIcon(type: string) {
 	switch (type) {
@@ -399,6 +423,13 @@ function handleEnabledChange(id: string, value: boolean) {
 	emit('update:enabled', item, value)
 }
 
+function handleEnabledForChange(id: string, side: ContentSide, value: boolean) {
+	if (props.actionDisabled || !props.enableEnabledFor) return
+	const item = items.value.find((item) => item.id === id)
+	if (!item) return
+	emit('update:enabled-for', item, side, value)
+}
+
 function bulkEnable() {
 	if (props.actionDisabled) return
 	emit('bulk:enable', [...toggleableSelectedItems.value])
@@ -416,6 +447,7 @@ function show(contentItems: ContentItem[], highlightId?: string) {
 	highlightedItemId.value = highlightId
 	searchQuery.value = ''
 	selectedFilters.value = []
+	selectedMetadataFilters.value = {}
 	selectedIds.value = []
 	disabledIds.value = new Set()
 	loading.value = false
@@ -427,6 +459,7 @@ function showLoading() {
 	highlightedItemId.value = undefined
 	searchQuery.value = ''
 	selectedFilters.value = []
+	selectedMetadataFilters.value = {}
 	selectedIds.value = []
 	loading.value = true
 	showModal()
@@ -454,6 +487,7 @@ function getState(): ManagedContentModalState | null {
 		items: items.value,
 		searchQuery: searchQuery.value,
 		selectedFilters: [...selectedFilters.value],
+		selectedMetadataFilters: { ...selectedMetadataFilters.value },
 		scrollTop: scrollContainer.value?.scrollTop ?? 0,
 	}
 }
@@ -463,6 +497,7 @@ async function restore(state: ManagedContentModalState) {
 	highlightedItemId.value = undefined
 	searchQuery.value = state.searchQuery
 	selectedFilters.value = state.selectedFilters
+	selectedMetadataFilters.value = state.selectedMetadataFilters ?? {}
 	loading.value = false
 	showModal()
 	await nextTick()
@@ -504,8 +539,12 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 <template>
 	<NewModal
 		ref="modal"
-		max-width="min(928px, calc(95vw - 10rem))"
-		width="min(928px, calc(95vw - 10rem))"
+		:max-width="
+			props.enableEnabledFor ? 'min(1080px, calc(95vw - 4rem))' : 'min(928px, calc(95vw - 10rem))'
+		"
+		:width="
+			props.enableEnabledFor ? 'min(1080px, calc(95vw - 4rem))' : 'min(928px, calc(95vw - 10rem))'
+		"
 		:on-hide="handleHide"
 		no-padding
 	>
@@ -537,16 +576,49 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 					clearable
 				/>
 
-				<FilterPills
-					v-if="filterOptions.length > 0"
-					:model-value="selectedFilters"
-					:options="filterOptions"
-					@update:model-value="updateFilters"
-				>
-					<template #all>
-						{{ formatMessage(commonMessages.allProjectType) }}
-					</template>
-				</FilterPills>
+				<div class="flex flex-wrap items-center gap-2">
+					<FilterPills
+						v-if="filterOptions.length > 0"
+						:model-value="selectedFilters"
+						:options="filterOptions"
+						@update:model-value="updateFilters"
+					>
+						<template #all>
+							{{ formatMessage(commonMessages.allProjectType) }}
+						</template>
+					</FilterPills>
+					<div
+						v-if="metadataFilterCategories.length > 0"
+						class="flex flex-wrap items-center gap-1.5 [&>div:last-of-type]:!h-[34px] [&>div:last-of-type]:!gap-1.5 [&_[data-button]]:!h-[34px]"
+					>
+						<DropdownFilterBar
+							v-model="selectedMetadataFilters"
+							:categories="metadataFilterCategories"
+							:show-label="false"
+							:add-label="formatMessage(messages.filter)"
+							:add-button-class="metadataFilterTriggerClass"
+							:preview-trigger-class="metadataFilterPreviewTriggerClass"
+							add-button-size="sm"
+							checkbox-position="right"
+							apply-immediately
+						>
+							<template #preview-content="{ label, summary }">
+								<span class="min-w-0 flex-1 truncate">
+									<span class="font-medium">{{ label }}:</span>
+									<span class="ml-1 font-semibold text-contrast">{{ summary }}</span>
+								</span>
+							</template>
+							<template #option="{ option, selected }">
+								<span
+									class="min-w-0 truncate font-semibold leading-tight"
+									:class="selected ? 'text-contrast' : 'text-primary'"
+								>
+									{{ option.label }}
+								</span>
+							</template>
+						</DropdownFilterBar>
+					</div>
+				</div>
 			</div>
 
 			<div class="flex min-h-0 flex-col overflow-hidden">
@@ -578,44 +650,6 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 				</div>
 
 				<div v-else class="@container flex min-h-0 flex-col">
-					<div
-						class="flex h-12 shrink-0 items-center justify-between gap-4 border-0 border-b border-solid border-surface-4 bg-surface-3 px-3"
-					>
-						<div
-							class="flex min-w-0 items-center gap-4"
-							:class="
-								showTableActions && showVersion
-									? 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none'
-									: 'flex-1'
-							"
-						>
-							<Checkbox
-								v-if="props.enableToggle"
-								:model-value="allSelected"
-								:indeterminate="someSelected"
-								:aria-label="formatMessage(commonMessages.selectAllLabel)"
-								class="shrink-0"
-								@update:model-value="toggleSelectAll"
-							/>
-							<span class="font-semibold text-secondary">{{
-								formatMessage(commonMessages.projectLabel)
-							}}</span>
-						</div>
-						<div
-							v-if="showVersion"
-							class="hidden @[800px]:flex"
-							:class="showTableActions ? 'flex-1 min-w-0' : 'flex-1'"
-						>
-							<span class="font-semibold text-secondary">{{
-								formatMessage(commonMessages.versionLabel)
-							}}</span>
-						</div>
-						<div v-if="showTableActions" class="min-w-[160px] shrink-0 text-right">
-							<span class="font-semibold text-secondary">{{
-								formatMessage(commonMessages.actionsLabel)
-							}}</span>
-						</div>
-					</div>
 					<div ref="scrollContainer" class="min-h-0 overflow-y-auto">
 						<ContentCardTable
 							v-model:selected-ids="selectedIds"
@@ -623,25 +657,23 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 							:highlighted-item-id="highlightedItemId"
 							:show-selection="props.enableToggle"
 							:show-item-actions="showTableActions"
+							:get-additional-action-widths="
+								(item) => [
+									...(externalSlicerUrls[item.id] ? [36] : []),
+									...(externalUrls[item.id] ? [36] : []),
+								]
+							"
 							:show-version="showVersion"
+							:show-enabled-for-column="props.enableEnabledFor"
 							hide-delete
-							hide-header
 							flat
 							v-on="
-								props.enableToggle
+								props.enableToggle || props.enableEnabledFor
 									? { 'update:enabled': (id: string, val: boolean) => handleEnabledChange(id, val) }
 									: {}
 							"
+							@update:enabled-for="handleEnabledForChange"
 						>
-							<template #itemTitleBadges="{ item }">
-								<span
-									v-if="externalItemIds.has(item.id)"
-									v-tooltip="formatMessage(messages.externalContentDescription)"
-									class="inline-flex shrink-0 items-center rounded-full border border-solid border-orange bg-orange-highlight px-2 py-0.5 text-xs font-semibold leading-4 text-orange"
-								>
-									{{ formatMessage(messages.externalContent) }}
-								</span>
-							</template>
 							<template #itemButtonsRight="{ item }">
 								<ButtonLink
 									v-if="externalSlicerUrls[item.id]"

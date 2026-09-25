@@ -1,6 +1,12 @@
 export namespace SharedInstances {
 	export namespace Invites {
 		export namespace v1 {
+			export type Inviter = {
+				id: string
+				name: string
+				avatar: string | null
+			}
+
 			export type UserManager = {
 				id: string
 				name: string
@@ -23,12 +29,20 @@ export namespace SharedInstances {
 				joined_at: string | null
 			}
 
+			export type InviteLink = {
+				id: string
+				expiration: string
+				max_uses: number
+				uses: number
+			}
+
 			export type Invite = {
 				instance_id: string
 				instance_name: string
 				instance_icon?: string | null
 				game_version: string
 				loader_version: string
+				inviter: Inviter | null
 				managers: Manager[]
 				instance_users?: InviteUser[]
 			}
@@ -37,10 +51,13 @@ export namespace SharedInstances {
 
 	export namespace Instances {
 		export namespace v1 {
+			export type OnlineStatus = 'unknown' | 'running' | 'stopped' | null
+
 			export type Instance = {
 				name: string
 				icon: string | null
 				quarantine: boolean
+				linked_server: { domain: string; region: string; online_status: OnlineStatus } | null
 			}
 
 			export type JoinType = 'owner' | 'invite' | 'link'

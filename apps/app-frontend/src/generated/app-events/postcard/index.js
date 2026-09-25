@@ -300,6 +300,14 @@ function deserialize_COMMAND_PAYLOAD(d) {
                 path: d.deserialize_string()
             }
         };
+    case 7:
+        return {
+            tag: "PlayHostingServer",
+            value: {
+                server_id: d.deserialize_string(),
+                world_id: d.deserialize_string()
+            }
+        };
     default:
         throw "variant not implemented"
     }

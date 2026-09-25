@@ -755,12 +755,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Hatalı hesap"
   },
-  "app.instance.share.members.empty": {
-    "message": "Henüz katılan kullanıcı yok"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Filtrelerinizle eşleşen kullanıcı yok."
-  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Artık bu paylaşılan kurulum için güncelleme almayacaklar"
   },
@@ -2690,9 +2684,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Bağlantılı paylaşımlı örnek"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "Örneği yayından kaldır"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Paylaşımlı örneğin bağlantısını kaldır"
   },
@@ -2702,14 +2693,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Bağlantı kesiliyor..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Paylaşımlı örneği yayından kaldır"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Bu paylaşımlı örneği Modrinth'ten kaldırın ve onu kullanan kişilere güncelleme göndermeyi durdurun. Yerel örneğiniz bundan etkilenmeyecektir."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Yayından kaldırılıyor..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Bu yalnızca yerel örneğinizi etkiler. Yüklediğiniz içerik bu cihazda kalacak, paylaşımlı örnek ve kullanan diğer kişiler etkilenmeyecek."
@@ -2722,12 +2707,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Bu paylaşımlı örneği Modrinth'in sunucularından kaldırır. Modrinth App'i kullanan kişiler güncelleme almayı bırakır fakat yerel örneğiniz ve içeriği bu cihazda kalacak."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Paylaşımlı örnek yayından kaldırılıyor"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Paylaşımlı örneği yayından kaldır"
   },
   "instance.action.create-shortcut": {
     "message": "Kısayol oluştur"
@@ -2798,219 +2777,6 @@
   "instance.files.save-as": {
     "message": "Farklı kaydet..."
   },
-  "instance.icon-editor.background": {
-    "message": "Arkaplan"
-  },
-  "instance.icon-editor.background.blue": {
-    "message": "Mavi"
-  },
-  "instance.icon-editor.background.dark-gray": {
-    "message": "Koyu gri"
-  },
-  "instance.icon-editor.background.dark-green": {
-    "message": "Koyu yeşil"
-  },
-  "instance.icon-editor.background.gray": {
-    "message": "Gri"
-  },
-  "instance.icon-editor.background.green": {
-    "message": "Yeşil"
-  },
-  "instance.icon-editor.background.indigo": {
-    "message": "Çivit mavisi"
-  },
-  "instance.icon-editor.background.lavender": {
-    "message": "Eflatun"
-  },
-  "instance.icon-editor.background.light-gray": {
-    "message": "Açık gri"
-  },
-  "instance.icon-editor.background.lime": {
-    "message": "Açık Yeşil"
-  },
-  "instance.icon-editor.background.orange": {
-    "message": "Turuncu"
-  },
-  "instance.icon-editor.background.pink": {
-    "message": "Pembe"
-  },
-  "instance.icon-editor.background.purple": {
-    "message": "Mor"
-  },
-  "instance.icon-editor.background.red": {
-    "message": "Kırmızı"
-  },
-  "instance.icon-editor.background.rose": {
-    "message": "Gül Pembesi"
-  },
-  "instance.icon-editor.background.yellow": {
-    "message": "Sarı"
-  },
-  "instance.icon-editor.description": {
-    "message": "Özel bir simge oluşturmak için öğeleri karıştırıp eşleştirin."
-  },
-  "instance.icon-editor.recents": {
-    "message": "En Son"
-  },
-  "instance.icon-editor.save": {
-    "message": "İkonu kaydet"
-  },
-  "instance.icon-editor.surprise-me": {
-    "message": "Rastgele"
-  },
-  "instance.icon-editor.symbol": {
-    "message": "Sembol"
-  },
-  "instance.icon-editor.symbol.backpack": {
-    "message": "Sırt Çantası"
-  },
-  "instance.icon-editor.symbol.beacon": {
-    "message": "Fener"
-  },
-  "instance.icon-editor.symbol.blue-shark": {
-    "message": "Mavi Köpekbalığı"
-  },
-  "instance.icon-editor.symbol.bookshelf": {
-    "message": "Kitaplık"
-  },
-  "instance.icon-editor.symbol.brown-bear": {
-    "message": "Boz Ayı"
-  },
-  "instance.icon-editor.symbol.cake": {
-    "message": "Pasta"
-  },
-  "instance.icon-editor.symbol.campfire": {
-    "message": "Kamp Ateşi"
-  },
-  "instance.icon-editor.symbol.chest": {
-    "message": "Sandık"
-  },
-  "instance.icon-editor.symbol.cogwheel": {
-    "message": "Dişli Çark"
-  },
-  "instance.icon-editor.symbol.command-block": {
-    "message": "Komut bloğu"
-  },
-  "instance.icon-editor.symbol.cooking-pot": {
-    "message": "Pişirme Kazanı"
-  },
-  "instance.icon-editor.symbol.couch": {
-    "message": "Kanepe"
-  },
-  "instance.icon-editor.symbol.crafting-table": {
-    "message": "Çalışma Masası"
-  },
-  "instance.icon-editor.symbol.create-wrench": {
-    "message": "İngiliz Anahtarı"
-  },
-  "instance.icon-editor.symbol.creeper": {
-    "message": "Creeper"
-  },
-  "instance.icon-editor.symbol.enchanting-table": {
-    "message": "Büyü Masası"
-  },
-  "instance.icon-editor.symbol.ender-chest": {
-    "message": "Ender Sandığı"
-  },
-  "instance.icon-editor.symbol.ender-dragon": {
-    "message": "Ender Ejderhası"
-  },
-  "instance.icon-editor.symbol.engine": {
-    "message": "Motor"
-  },
-  "instance.icon-editor.symbol.fabric": {
-    "message": "Fabric"
-  },
-  "instance.icon-editor.symbol.forge": {
-    "message": "Forge"
-  },
-  "instance.icon-editor.symbol.furnace": {
-    "message": "Fırın"
-  },
-  "instance.icon-editor.symbol.gizmo": {
-    "message": "Gizmo"
-  },
-  "instance.icon-editor.symbol.globe": {
-    "message": "Küre"
-  },
-  "instance.icon-editor.symbol.grass-block": {
-    "message": "Çimen Bloğu"
-  },
-  "instance.icon-editor.symbol.lantern": {
-    "message": "Fener"
-  },
-  "instance.icon-editor.symbol.moobloom": {
-    "message": "Moobloom İneği"
-  },
-  "instance.icon-editor.symbol.mr-pack": {
-    "message": "Mr Pack"
-  },
-  "instance.icon-editor.symbol.neoforge": {
-    "message": "NeoForge"
-  },
-  "instance.icon-editor.symbol.orb": {
-    "message": "Küre"
-  },
-  "instance.icon-editor.symbol.oxygen-distributor": {
-    "message": "Oksijen Dağıtıcısı"
-  },
-  "instance.icon-editor.symbol.pancakes": {
-    "message": "Pankekler"
-  },
-  "instance.icon-editor.symbol.pickaxe": {
-    "message": "Kazma"
-  },
-  "instance.icon-editor.symbol.poke-ball": {
-    "message": "Poke Topu"
-  },
-  "instance.icon-editor.symbol.quilt": {
-    "message": "Quilt"
-  },
-  "instance.icon-editor.symbol.redstone-block": {
-    "message": "Redstone Bloğu"
-  },
-  "instance.icon-editor.symbol.sculk-sensor": {
-    "message": "Sculk Sensörü"
-  },
-  "instance.icon-editor.symbol.skeleton": {
-    "message": "İskelet"
-  },
-  "instance.icon-editor.symbol.skillet": {
-    "message": "Tava"
-  },
-  "instance.icon-editor.symbol.slime-block": {
-    "message": "Balçık Bloğu"
-  },
-  "instance.icon-editor.symbol.space-helmet": {
-    "message": "Uzay Kaskı"
-  },
-  "instance.icon-editor.symbol.sticky-piston": {
-    "message": "Yapışkan Piston"
-  },
-  "instance.icon-editor.symbol.sword": {
-    "message": "Kılıç"
-  },
-  "instance.icon-editor.symbol.terminal": {
-    "message": "Terminal"
-  },
-  "instance.icon-editor.symbol.tiny-potato": {
-    "message": "Minik Patates"
-  },
-  "instance.icon-editor.symbol.tire": {
-    "message": "Tekerlek"
-  },
-  "instance.icon-editor.symbol.tnt": {
-    "message": "TNT"
-  },
-  "instance.icon-editor.symbol.wrenth-rinth": {
-    "message": "Modrinth Anahtarı"
-  },
-  "instance.icon-editor.symbol.zombie": {
-    "message": "Zombi"
-  },
-  "instance.icon-editor.title": {
-    "message": "Simge düzenleyicisi"
-  },
   "instance.last-played": {
     "message": "Son oynanış:"
   },
@@ -3034,45 +2800,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Kaynak paketi"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Eylemler"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Davet bağlantısı"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Bu davet bağlantısına sahip olan herhangi birisi aktif olduğu sürece katılabilecektir."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "Aktif davet bulunmuyor."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Süresi doluyor"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Daveti geri çek"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "{code} davetini geri çek"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Aktif davetler"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Kullanımlar"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "Davet linki <monospace>{code}</monospace>, hemen çalışmayı durduracaktır. Zaten katılmış kişiler erişimi sürdürecektir."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Bu eylem geri alınamaz"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Daveti geri çek"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Daveti geri çek"
   },
   "instance.settings.tabs.behavior.description": {
     "message": "Bu örnekte hangi sekmelerin görüneceğini seçin."
@@ -3385,9 +3112,6 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Bu paylaşımlı örneğe olan erişiminiz geri çekildi. Örnek hala erişilebilir fakat artık bağlantılı değil ve güncelleme almayacak."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "Ana örnek silindi. Bu örnek hala erişilebilir fakat artık bağlantılı değil ve güncelleme almayacak."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Bu paylaşımlı örnek İçerik Moderasyonu ekibi tarafından kilitlendi. Artık ana örnekten güncelleme almayacak ve oynanılamaz."

@@ -386,9 +386,6 @@
   "content.card.synced": {
     "defaultMessage": "インスタンス間で同期済み"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "アップロードしました"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "プロジェクトを互換性のある最新バージョンにアップデートしてもよろしいですか？ 1つずつアップデートすることをおすすめします。"
   },
@@ -644,9 +641,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "コンテンツを表示"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "作者"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "環境"
   },
@@ -671,17 +665,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "更新が利用可能"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "クライアントはファイルに依存します"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "クライアント専用コンテンツ"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "クライアントファイルが保存されました"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "警告はありません"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "警告"
@@ -1940,12 +1925,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "コンテンツの削除に失敗しました"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "コンテンツの無効化に失敗しました"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "コンテンツの有効化に失敗しました"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "コンテンツの更新に失敗しました"
   },
@@ -1960,9 +1939,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "コンテンツの削除に失敗しました"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "{name}の切り替えに失敗しました"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Modパックのリンク解除に失敗しました"
@@ -2402,12 +2378,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "有効化済み"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "外部コンテンツ"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "このファイルは Modrinth 上で公開されていません"
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "コンテンツを管理"
   },
@@ -2419,9 +2389,6 @@
   },
   "instances.managed-content-modal.open-in-slicer": {
     "defaultMessage": "Slicer で開く"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "警告"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "現在"
@@ -2506,15 +2473,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "変更が保存されました"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "このMODはクライアント側のMODに依存しているため、サーバーの起動時に問題が発生する可能性があります。"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "これはクライアント側のMODであり、サーバーの起動時に問題を引き起こす可能性があります。"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "これは依存関係としてインストールされたクライアント側のMODであり、サーバーの起動時に問題を引き起こす可能性があります。"
   },
   "label.collections": {
     "defaultMessage": "コレクション"
@@ -5102,15 +5060,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth ホスティング"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "こちらに移動しました！"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "次回から表示しない"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "サーバー設定の場所が移動しました"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "共有サーバー"
   },
@@ -5320,18 +5269,6 @@
   },
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "どうなるの？"
-  },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "インストール中に予期しないエラーが発生しました。時間をおいて再度お試しください。"
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "インストールの失敗"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "アップロード中に予期しないエラーが発生しました。時間をおいて再度お試しください。"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "モッドパックのアップロード失敗"
   },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "サーバーをセットアップ"

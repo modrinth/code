@@ -1,16 +1,25 @@
 <script setup lang="ts">
 import { type Archon, type Labrinth, ModrinthApiError } from '@modrinth/api-client'
-import { ClipboardCopyIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import UnknownFileWarningModal from '#ui/components/modal/UnknownFileWarningModal.vue'
 import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import {
+	type AddonToggleChanges,
+	addonToggleKey,
+	applyPendingAddonToggle,
+	clearPendingAddonToggle,
+	discardFailedAddonToggle,
+	markPendingAddonToggleSent,
+	queuePendingAddonToggle,
+} from '#ui/composables/server-content-toggle-state'
 import { waitForServerContextRuntimeReady } from '#ui/composables/server-context-runtime'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { useServerPreferences } from '#ui/composables/server-preferences'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -28,13 +37,18 @@ import {
 	resolveServerAddonInstallPlans,
 } from '../../../shared/browse-tab/composables/install-logic'
 import ManagedContentModal from '../../../shared/content-tab/components/managed-content-modal/index.vue'
+import ConfirmEnvironmentModal from '../../../shared/content-tab/components/modals/ConfirmEnvironmentModal.vue'
 import ConfirmModpackUpdateModal from '../../../shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmUnlinkModal from '../../../shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
 import ContentUpdaterModal from '../../../shared/content-tab/components/modals/content-updater-modal/index.vue'
 import ContentPageLayout from '../../../shared/content-tab/layout.vue'
 import type { ManagedContentData } from '../../../shared/content-tab/providers/content-manager'
 import { provideContentManager } from '../../../shared/content-tab/providers/content-manager'
-import type { ContentItem } from '../../../shared/content-tab/types'
+import type {
+	ContentItem,
+	ContentSide,
+	ContentWarningType,
+} from '../../../shared/content-tab/types'
 import { summarizeManagedContent } from '../../../shared/content-tab/utils/managed-content'
 
 type AddonWithUiState = Archon.Content.v1.Addon & { installing?: boolean }
@@ -55,6 +69,14 @@ const props = withDefaults(
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	resourcePackLock: {
+		id: 'hosting.content.enabled-for.resource-pack-lock',
+		defaultMessage: 'Resource packs can only be enabled for players.',
+	},
+	shaderLock: {
+		id: 'hosting.content.enabled-for.shader-lock',
+		defaultMessage: 'Shaders can only be enabled for players.',
+	},
 	modpackContent: {
 		id: 'hosting.content.managed-content.modpack-header',
 		defaultMessage: 'Modpack content',
@@ -65,7 +87,11 @@ const messages = defineMessages({
 	},
 	failedToToggle: {
 		id: 'hosting.content.failed-to-toggle',
-		defaultMessage: 'Failed to toggle {name}',
+		defaultMessage: 'Failed to enable or disable {name}',
+	},
+	failedToSetEnabledFor: {
+		id: 'hosting.content.failed-to-set-enabled-for',
+		defaultMessage: 'Failed to change where {name} is enabled',
 	},
 	failedToUpload: {
 		id: 'hosting.content.failed-to-upload',
@@ -91,14 +117,6 @@ const messages = defineMessages({
 		id: 'hosting.content.failed-to-bulk-delete',
 		defaultMessage: 'Failed to delete content',
 	},
-	failedToBulkEnable: {
-		id: 'hosting.content.failed-to-bulk-enable',
-		defaultMessage: 'Failed to enable content',
-	},
-	failedToBulkDisable: {
-		id: 'hosting.content.failed-to-bulk-disable',
-		defaultMessage: 'Failed to disable content',
-	},
 	failedToBulkUpdate: {
 		id: 'hosting.content.failed-to-bulk-update',
 		defaultMessage: 'Failed to update content',
@@ -106,6 +124,26 @@ const messages = defineMessages({
 	failedToInstallContent: {
 		id: 'hosting.content.failed-to-install',
 		defaultMessage: 'Failed to install content',
+	},
+	unknownEnvironment: {
+		id: 'hosting.content.enabled-for.compatibility-unknown-warning',
+		defaultMessage:
+			"We couldn't determine whether this content works on the server, for players, or both.",
+	},
+	clientOnlyEnabledForServer: {
+		id: 'hosting.content.enabled-for.client-only-on-server-warning',
+		defaultMessage:
+			'This client-only content is enabled on the server and may prevent the server from starting.',
+	},
+	singleplayerOnlyEnabledForServer: {
+		id: 'hosting.content.enabled-for.singleplayer-only-on-server-warning',
+		defaultMessage:
+			'This singleplayer-only content is enabled on the server and may prevent the server from starting.',
+	},
+	serverOnlyEnabledForPlayers: {
+		id: 'hosting.content.enabled-for.server-only-for-players-warning',
+		defaultMessage:
+			'This server-only content is included for players and may cause issues when they launch the game.',
 	},
 })
 
@@ -130,6 +168,8 @@ const route = useRoute()
 const router = useRouter()
 const queryClient = useQueryClient()
 const serverId = route.params.id as string
+const userPreferences = useServerPreferences(serverId)
+const environmentWarningModal = ref<InstanceType<typeof ConfirmEnvironmentModal>>()
 
 const type = computed(() => {
 	const loader = server.value?.loader?.toLowerCase()
@@ -148,8 +188,19 @@ function getContentOwnerAvatarUrl(owner: ContentOwnerAvatarSource) {
 
 const contentQuery = useQuery({
 	queryKey,
-	queryFn: () =>
-		client.archon.content_v1.getAddons(serverId, worldId.value!, { from_modpack: false }),
+	queryFn: async () => {
+		const targetWorldId = worldId.value!
+		const content = await client.archon.content_v1.getAddons(serverId, targetWorldId, {
+			from_modpack: false,
+		})
+		return {
+			...content,
+			addons:
+				content.addons?.map((addon) =>
+					applyPendingAddonToggle(queryClient, serverId, targetWorldId, addon),
+				) ?? null,
+		}
+	},
 	enabled: computed(() => worldId.value !== null),
 	staleTime: 30_000,
 })
@@ -157,10 +208,19 @@ const contentQuery = useQuery({
 const isModpackContentModalOpen = ref(false)
 const modpackContentQuery = useQuery({
 	queryKey: modpackContentQueryKey,
-	queryFn: () =>
-		client.archon.content_v1.getAddons(serverId, worldId.value!, {
+	queryFn: async () => {
+		const targetWorldId = worldId.value!
+		const content = await client.archon.content_v1.getAddons(serverId, targetWorldId, {
 			from_modpack: true,
-		}),
+		})
+		return {
+			...content,
+			addons:
+				content.addons?.map((addon) =>
+					applyPendingAddonToggle(queryClient, serverId, targetWorldId, addon),
+				) ?? null,
+		}
+	},
 	enabled: computed(() => worldId.value !== null && !!contentQuery.data.value?.modpack),
 	staleTime: 30_000,
 })
@@ -299,10 +359,63 @@ const managedContent = computed<ManagedContentData | null>(() => {
 
 function friendlyAddonName(addon: Archon.Content.v1.Addon): string {
 	if (addon.name) return addon.name
+	if (addon.manifest?.name) return addon.manifest.name
 	let cleanName = addon.filename
 	const lastDotIndex = cleanName.lastIndexOf('.')
 	if (lastDotIndex !== -1) cleanName = cleanName.substring(0, lastDotIndex)
 	return cleanName
+}
+
+function getAddonEnvironment(
+	addon: Archon.Content.v1.Addon,
+): Labrinth.Projects.v3.Environment | undefined {
+	const versionEnvironment = addon.version?.environment
+	if (versionEnvironment && versionEnvironment !== 'unknown') return versionEnvironment
+	return addon.manifest?.environment ?? versionEnvironment ?? undefined
+}
+
+function hasDetectedEnvironment(addon: Archon.Content.v1.Addon) {
+	const environment = getAddonEnvironment(addon)
+	return environment !== undefined && environment !== 'unknown'
+}
+
+function isPlayerOnlyContent(addon: Archon.Content.v1.Addon) {
+	return addon.kind === 'resourcepack' || addon.kind === 'shader'
+}
+
+function isIncompatibleEnvironment(addon: Archon.Content.v1.Addon, side: ContentSide) {
+	const environment = getAddonEnvironment(addon)
+	return side === 'server'
+		? environment === 'client_only' || environment === 'singleplayer_only'
+		: environment === 'server_only' || environment === 'dedicated_server_only'
+}
+
+function getEnabledForWarning(
+	addon: Archon.Content.v1.Addon,
+): { kind: ContentWarningType; tooltip: string } | null {
+	if (isPlayerOnlyContent(addon)) return null
+	if (!addon.disabled_server) {
+		if (addon.pack_client_retained)
+			return { kind: 'retained', tooltip: formatMessage(commonMessages.clientRetainedWarning) }
+		if (addon.pack_client_depends)
+			return { kind: 'depends', tooltip: formatMessage(commonMessages.clientDependsWarning) }
+		if (isIncompatibleEnvironment(addon, 'server')) {
+			return {
+				kind: 'environment',
+				tooltip: formatMessage(
+					getAddonEnvironment(addon) === 'singleplayer_only'
+						? messages.singleplayerOnlyEnabledForServer
+						: messages.clientOnlyEnabledForServer,
+				),
+			}
+		}
+	}
+	if (!addon.disabled_player && isIncompatibleEnvironment(addon, 'player')) {
+		return { kind: 'server-only', tooltip: formatMessage(messages.serverOnlyEnabledForPlayers) }
+	}
+	if (!hasDetectedEnvironment(addon))
+		return { kind: 'unknown-environment', tooltip: formatMessage(messages.unknownEnvironment) }
+	return null
 }
 
 const modpackAddons = ref<Archon.Content.v1.Addon[]>([])
@@ -312,11 +425,22 @@ const addonLookup = computed(() => {
 	for (const addon of contentQuery.data.value?.addons ?? []) {
 		map.set(addon.filename, addon)
 	}
-	for (const addon of modpackAddons.value) {
-		map.set(addon.filename, addon)
-	}
 	return map
 })
+
+const modpackAddonLookup = computed(
+	() => new Map(modpackAddons.value.map((addon) => [addon.filename, addon])),
+)
+
+function getAddonForItem(item: ContentItem) {
+	return item.source_kind === 'modrinth_modpack'
+		? modpackAddonLookup.value.get(item.file_name)
+		: addonLookup.value.get(item.file_name)
+}
+
+function getAddonQueryKey(addon: Archon.Content.v1.Addon) {
+	return addon.from_modpack ? modpackContentQueryKey.value : queryKey.value
+}
 
 const projectMetadataBatchSize = 800
 const contentProjectIds = computed(() =>
@@ -342,6 +466,25 @@ const contentProjectsQuery = useQuery({
 const contentProjectsById = computed(
 	() => new Map((contentProjectsQuery.data.value ?? []).map((project) => [project.id, project])),
 )
+
+function isRequiredEnvironment(addon: Archon.Content.v1.Addon, side: ContentSide) {
+	const environment = getAddonEnvironment(addon)
+	if (!environment || environment === 'unknown') {
+		const project = addon.project_id ? contentProjectsById.value.get(addon.project_id) : undefined
+		return side === 'server'
+			? project?.server_side === 'required'
+			: project?.client_side === 'required'
+	}
+	return side === 'server'
+		? environment === 'client_and_server' ||
+				environment === 'server_only' ||
+				environment === 'server_only_client_optional' ||
+				environment === 'dedicated_server_only'
+		: environment === 'client_and_server' ||
+				environment === 'client_only' ||
+				environment === 'client_only_server_optional' ||
+				environment === 'singleplayer_only'
+}
 
 function normalizeInstallFilename(filename: string) {
 	const normalized = filename.endsWith('.disabled')
@@ -485,10 +628,6 @@ async function flushStoredServerInstalls() {
 			})
 			return
 		}
-
-		if (result.flushedPlans.length > 0) {
-			await queryClient.invalidateQueries({ queryKey: queryKey.value })
-		}
 	} finally {
 		isFlushingStoredServerInstalls.value = false
 	}
@@ -531,6 +670,7 @@ const deleteMutation = useMutation({
 			kind: addon.kind,
 		}),
 	onMutate: async ({ addon }) => {
+		cancelQueuedAddonToggle(addon)
 		await queryClient.cancelQueries({ queryKey: queryKey.value })
 		const previousData = queryClient.getQueryData<Archon.Content.v1.Addons>(queryKey.value)
 		queryClient.setQueryData(queryKey.value, (oldData: Archon.Content.v1.Addons | undefined) => {
@@ -540,13 +680,16 @@ const deleteMutation = useMutation({
 				addons: (oldData.addons ?? []).filter((a) => a.filename !== addon.filename),
 			}
 		})
-		return { previousData }
-	},
-	onSuccess: () => {
-		queryClient.invalidateQueries({ queryKey: queryKey.value })
+		return {
+			previousData,
+			dataUpdateCount: queryClient.getQueryState(queryKey.value)?.dataUpdateCount,
+		}
 	},
 	onError: (err, _vars, context) => {
-		if (context?.previousData) {
+		if (
+			context?.previousData &&
+			queryClient.getQueryState(queryKey.value)?.dataUpdateCount === context.dataUpdateCount
+		) {
 			queryClient.setQueryData(queryKey.value, context.previousData)
 		}
 		addNotification({
@@ -557,44 +700,181 @@ const deleteMutation = useMutation({
 	},
 })
 
-const toggleMutation = useMutation({
-	mutationFn: async ({ addon }: { addon: Archon.Content.v1.Addon }) => {
-		const request: Archon.Content.v1.RemoveAddonRequest = {
-			filename: addon.filename,
-			kind: addon.kind,
-		}
-		if (addon.disabled) {
-			await client.archon.content_v1.enableAddon(serverId, worldId.value!, request)
-		} else {
-			await client.archon.content_v1.disableAddon(serverId, worldId.value!, request)
-		}
-		return { filename: addon.filename, newDisabled: !addon.disabled }
-	},
-	onSuccess: ({ filename, newDisabled }) => {
-		queryClient.setQueryData(queryKey.value, (oldData: Archon.Content.v1.Addons | undefined) => {
-			if (!oldData) return oldData
-			return {
-				...oldData,
-				addons: (oldData.addons ?? []).map((a) =>
-					a.filename === filename ? { ...a, disabled: newDisabled } : a,
-				),
+type AddonToggleBatch = {
+	addon: Archon.Content.v1.Addon
+	worldId: string
+	queryKey: string[]
+	changes: AddonToggleChanges
+}
+
+type AddonToggleQueue = {
+	pending?: AddonToggleBatch
+	timer?: ReturnType<typeof setTimeout>
+	running: boolean
+}
+
+const addonToggleQueues = new Map<string, AddonToggleQueue>()
+
+function cancelQueuedAddonToggle(addon: Archon.Content.v1.Addon) {
+	if (worldId.value) clearPendingAddonToggle(queryClient, serverId, worldId.value, addon)
+	const key = `${worldId.value}:${addonToggleKey(addon)}`
+	const queue = addonToggleQueues.get(key)
+	if (!queue) return
+	if (queue.timer) clearTimeout(queue.timer)
+	queue.timer = undefined
+	queue.pending = undefined
+	if (!queue.running) addonToggleQueues.delete(key)
+}
+
+const toggleAddonMutation = useMutation({
+	mutationFn: async ({ addon, worldId: targetWorldId, changes }: AddonToggleBatch) => {
+		const request = { filename: addon.filename, kind: addon.kind }
+		if (changes.enabled !== undefined) {
+			if (changes.enabled) {
+				await client.archon.content_v1.enableAddon(serverId, targetWorldId, request)
+			} else {
+				await client.archon.content_v1.disableAddon(serverId, targetWorldId, request)
 			}
-		})
-		queryClient.invalidateQueries({ queryKey: queryKey.value })
+		}
+		const sides = (['server', 'player'] as const).filter((side) => changes[side] !== undefined)
+		if (sides.length === 0) return
+		if (!isPlayerOnlyContent(addon) && !addon.side_toggle_unlocked) {
+			await client.archon.content_v1.setAddonSideToggleLocked(serverId, targetWorldId, {
+				...request,
+				locked: false,
+			})
+		}
+		for (const side of sides) {
+			const sideRequest = { ...request, enabled: changes[side]! }
+			if (side === 'server') {
+				await client.archon.content_v1.setAddonEnabledServer(serverId, targetWorldId, sideRequest)
+			} else {
+				await client.archon.content_v1.setAddonEnabledPlayer(serverId, targetWorldId, sideRequest)
+			}
+		}
 	},
-	onError: (_err, { addon }) => {
+	onError: (error, batch) => {
 		addNotification({
 			type: 'error',
-			title: formatMessage(messages.failedToToggle, { name: friendlyAddonName(addon) }),
+			title: formatMessage(
+				batch.changes.enabled !== undefined
+					? messages.failedToToggle
+					: messages.failedToSetEnabledFor,
+				{ name: friendlyAddonName(batch.addon) },
+			),
+			text: error instanceof Error ? error.message : undefined,
 		})
 	},
 })
 
+async function flushAddonToggle(key: string, queue: AddonToggleQueue) {
+	if (queue.running || !queue.pending) return
+	const batch = queue.pending
+	queue.pending = undefined
+	queue.running = true
+	markPendingAddonToggleSent(queryClient, serverId, batch.worldId, batch.addon, batch.changes)
+	try {
+		await toggleAddonMutation.mutateAsync(batch)
+	} catch {
+		discardFailedAddonToggle(queryClient, serverId, batch.worldId, batch.addon, batch.changes)
+		void queryClient.invalidateQueries({ queryKey: batch.queryKey, exact: true })
+	} finally {
+		queue.running = false
+		if (!queue.pending) {
+			addonToggleQueues.delete(key)
+		} else if (!queue.timer) {
+			void flushAddonToggle(key, queue)
+		}
+	}
+}
+
+function queueAddonToggle(addon: Archon.Content.v1.Addon, changes: AddonToggleChanges) {
+	const targetWorldId = worldId.value
+	if (!targetWorldId) return
+	const key = `${targetWorldId}:${addonToggleKey(addon)}`
+	const queue: AddonToggleQueue = addonToggleQueues.get(key) ?? { running: false }
+	addonToggleQueues.set(key, queue)
+	const targetQueryKey = getAddonQueryKey(addon)
+	void queryClient.cancelQueries({ queryKey: targetQueryKey, exact: true })
+	const batch: AddonToggleBatch = queue.pending ?? {
+		addon,
+		worldId: targetWorldId,
+		queryKey: targetQueryKey,
+		changes: {},
+	}
+	batch.changes = { ...batch.changes, ...changes }
+	queue.pending = batch
+	queuePendingAddonToggle(queryClient, serverId, targetWorldId, addon, changes)
+	queryClient.setQueryData<Archon.Content.v1.Addons>(targetQueryKey, (current) =>
+		current
+			? {
+					...current,
+					addons: (current.addons ?? []).map((candidate) =>
+						addonToggleKey(candidate) === addonToggleKey(addon)
+							? applyPendingAddonToggle(queryClient, serverId, targetWorldId, candidate)
+							: candidate,
+					),
+				}
+			: current,
+	)
+	if (queue.timer) clearTimeout(queue.timer)
+	queue.timer = setTimeout(() => {
+		queue.timer = undefined
+		void flushAddonToggle(key, queue)
+	}, 250)
+}
+
+onUnmounted(() => {
+	for (const [key, queue] of addonToggleQueues) {
+		if (queue.timer) clearTimeout(queue.timer)
+		queue.timer = undefined
+		void flushAddonToggle(key, queue)
+	}
+})
+
+async function handleSetEnabledFor(item: ContentItem, side: ContentSide, enabled: boolean) {
+	if (contentActionDisabled.value) return
+	const addon = getAddonForItem(item)
+	if (!addon || (side === 'server' && isPlayerOnlyContent(addon))) return
+	const targetWorldId = worldId.value
+	if (
+		userPreferences.value.warnOnIncompatibleContent &&
+		(enabled
+			? !(side === 'server' && addon.pack_client_depends) && isIncompatibleEnvironment(addon, side)
+			: isRequiredEnvironment(addon, side))
+	) {
+		const confirmed = await environmentWarningModal.value?.show(
+			item.project.title,
+			side,
+			enabled,
+			getAddonEnvironment(addon) === 'singleplayer_only',
+		)
+		if (!confirmed || contentActionDisabled.value || worldId.value !== targetWorldId) return
+	}
+	queueAddonToggle(addon, { [side]: enabled })
+}
+
 async function handleToggleEnabled(item: ContentItem) {
 	if (contentActionDisabled.value) return
-	const addon = addonLookup.value.get(item.file_name)
+	const addon = getAddonForItem(item)
 	if (!addon) return
-	await toggleMutation.mutateAsync({ addon })
+	queueAddonToggle(addon, { enabled: addon.disabled })
+}
+
+async function handleModpackSetEnabledFor(item: ContentItem, side: ContentSide, enabled: boolean) {
+	try {
+		await handleSetEnabledFor(item, side, enabled)
+	} catch {
+		return
+	}
+}
+
+async function handleModpackToggleEnabled(item: ContentItem) {
+	try {
+		await handleToggleEnabled(item)
+	} catch {
+		return
+	}
 }
 
 async function handleDeleteItem(item: ContentItem) {
@@ -613,49 +893,49 @@ function itemsToAddonRequests(items: ContentItem[]): Archon.Content.v1.RemoveAdd
 	})
 }
 
+async function optimisticallyUpdateAddons(
+	update: (addons: Archon.Content.v1.Addon[]) => Archon.Content.v1.Addon[],
+) {
+	const targetQueryKey = queryKey.value
+	await queryClient.cancelQueries({ queryKey: targetQueryKey, exact: true })
+	const previousData = queryClient.getQueryData<Archon.Content.v1.Addons>(targetQueryKey)
+	queryClient.setQueryData<Archon.Content.v1.Addons>(targetQueryKey, (current) =>
+		current ? { ...current, addons: update(current.addons ?? []) } : current,
+	)
+	const dataUpdateCount = queryClient.getQueryState(targetQueryKey)?.dataUpdateCount
+	return () => {
+		if (
+			previousData &&
+			queryClient.getQueryState(targetQueryKey)?.dataUpdateCount === dataUpdateCount
+		) {
+			queryClient.setQueryData(targetQueryKey, previousData)
+		}
+	}
+}
+
 async function handleBulkDelete(items: ContentItem[]) {
 	if (contentActionDisabled.value) return
 	const requests = itemsToAddonRequests(items)
 	if (requests.length === 0) return
+	for (const item of items) {
+		const addon = getAddonForItem(item)
+		if (addon) cancelQueuedAddonToggle(addon)
+	}
+	const rollback = await optimisticallyUpdateAddons((addons) =>
+		addons.filter(
+			(addon) =>
+				!requests.some(
+					(request) => request.filename === addon.filename && request.kind === addon.kind,
+				),
+		),
+	)
 	try {
 		await client.archon.content_v1.deleteAddons(serverId, worldId.value!, requests)
-		await queryClient.invalidateQueries({ queryKey: queryKey.value })
 	} catch (err) {
+		rollback()
 		addNotification({
 			type: 'error',
 			title: formatMessage(messages.failedToBulkDelete),
-			text: err instanceof Error ? err.message : undefined,
-		})
-	}
-}
-
-async function handleBulkEnable(items: ContentItem[]) {
-	if (contentActionDisabled.value) return
-	const requests = itemsToAddonRequests(items)
-	if (requests.length === 0) return
-	try {
-		await client.archon.content_v1.enableAddons(serverId, worldId.value!, requests)
-		await queryClient.invalidateQueries({ queryKey: queryKey.value })
-	} catch (err) {
-		addNotification({
-			type: 'error',
-			title: formatMessage(messages.failedToBulkEnable),
-			text: err instanceof Error ? err.message : undefined,
-		})
-	}
-}
-
-async function handleBulkDisable(items: ContentItem[]) {
-	if (contentActionDisabled.value) return
-	const requests = itemsToAddonRequests(items)
-	if (requests.length === 0) return
-	try {
-		await client.archon.content_v1.disableAddons(serverId, worldId.value!, requests)
-		await queryClient.invalidateQueries({ queryKey: queryKey.value })
-	} catch (err) {
-		addNotification({
-			type: 'error',
-			title: formatMessage(messages.failedToBulkDisable),
 			text: err instanceof Error ? err.message : undefined,
 		})
 	}
@@ -755,10 +1035,9 @@ function handleUploadFiles() {
 			}
 			if (confirmedFiles.length === 0) return
 
-			const result = await contentUploadSession.uploadFiles(
+			await contentUploadSession.uploadFiles(
 				confirmedFiles.map((file) => ({ file, filename: file.name })),
 			)
-			if (result === 'completed') await contentQuery.refetch()
 		} catch (err) {
 			addNotification({
 				type: 'error',
@@ -813,17 +1092,49 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 	const projectMetadata = addon.project_id
 		? contentProjectsById.value.get(addon.project_id)
 		: undefined
+	const environment = getAddonEnvironment(addon)
+	const embeddedIcon =
+		!addon.icon_url &&
+		addon.manifest?.icon_embedded &&
+		worldId.value &&
+		(addon.kind === 'mod' || addon.kind === 'plugin')
+			? {
+					queryKey: [
+						'kyros',
+						'content',
+						'embedded-icon',
+						worldId.value,
+						addon.kind,
+						addon.filename,
+					] as const,
+					queryFn: () =>
+						client.kyros.content_v1.getEmbeddedAddonIcon(
+							worldId.value!,
+							addon.kind === 'mod' ? 'mods' : 'plugins',
+							addon.filename,
+						),
+					fallbackUrl: projectMetadata?.icon_url,
+				}
+			: undefined
+	const serverEnabled = !isPlayerOnlyContent(addon) && !addon.disabled_server
+	const playerEnabled = !addon.disabled_player
+	const lockedSides: ContentSide[] = isPlayerOnlyContent(addon) ? ['server'] : []
+	const warning = getEnabledForWarning(addon)
 	return {
 		project: {
 			...(projectMetadata ?? {}),
 			id: addon.project_id ?? addon.filename,
 			slug: projectMetadata?.slug ?? addon.project_id ?? addon.filename,
 			title: projectMetadata?.title ?? friendlyAddonName(addon),
-			icon_url: addon.icon_url ?? projectMetadata?.icon_url ?? undefined,
+			icon_url:
+				addon.icon_url ?? (embeddedIcon ? undefined : projectMetadata?.icon_url) ?? undefined,
 		},
 		version: {
 			id: addon.version?.id ?? addon.filename,
-			version_number: addon.version?.name ?? formatMessage(commonMessages.unknownLabel),
+			version_number:
+				addon.version?.name ??
+				addon.manifest?.version ??
+				formatMessage(commonMessages.unknownLabel),
 			file_name: addon.filename,
 		},
 		owner: addon.owner
@@ -836,13 +1147,29 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 				}
 			: undefined,
 		id: addon.id ?? addon.filename,
+		external: !addon.project_id,
+		source_kind: addon.from_modpack ? 'modrinth_modpack' : undefined,
 		enabled: !addon.disabled,
+		enabledFor: {
+			server: serverEnabled,
+			player: playerEnabled,
+			locked: lockedSides.length > 0,
+			lockedTooltip: isPlayerOnlyContent(addon)
+				? formatMessage(
+						addon.kind === 'resourcepack' ? messages.resourcePackLock : messages.shaderLock,
+					)
+				: undefined,
+			disabledSides: lockedSides,
+			warningTooltip: warning?.tooltip,
+			warningKind: warning?.kind,
+		},
+		embeddedIcon,
 		file_name: addon.filename,
 		date_added: addon.btime,
 		project_type: addon.kind,
 		has_update: !!addon.has_update,
 		update_version_id: addon.has_update,
-		environment: addon.version?.environment ?? undefined,
+		environment,
 		pack_client_retained: addon.pack_client_retained,
 		pack_client_depends: addon.pack_client_depends,
 		installing: addon.installing ?? addon.status === 'pending',
@@ -855,7 +1182,6 @@ async function handleViewModpackContent() {
 	if (modpackContentQuery.data.value) {
 		modpackAddons.value = modpackContentQuery.data.value.addons ?? []
 		modpackContentModal.value?.show(modpackAddons.value.map(addonToContentItem))
-		void modpackContentQuery.refetch()
 		return
 	}
 
@@ -877,86 +1203,6 @@ async function handleViewModpackContent() {
 	}
 }
 
-async function handleModpackContentToggle(item: ContentItem) {
-	if (contentActionDisabled.value) return
-	const addon = addonLookup.value.get(item.file_name)
-	if (!addon) return
-	modpackContentModal.value?.updateItem(item.file_name, { disabled: true })
-	try {
-		await toggleMutation.mutateAsync({ addon })
-		modpackAddons.value = modpackAddons.value.map((a) =>
-			a.filename === addon.filename ? { ...a, disabled: !addon.disabled } : a,
-		)
-		queryClient.setQueryData(
-			modpackContentQueryKey.value,
-			(oldData: Archon.Content.v1.Addons | undefined) =>
-				oldData
-					? {
-							...oldData,
-							addons: (oldData.addons ?? []).map((a) =>
-								a.filename === addon.filename ? { ...a, disabled: !addon.disabled } : a,
-							),
-						}
-					: oldData,
-		)
-		modpackContentModal.value?.updateItem(item.file_name, {
-			enabled: !item.enabled,
-			disabled: false,
-		})
-	} catch {
-		modpackContentModal.value?.updateItem(item.file_name, { disabled: false })
-	}
-}
-
-async function handleModpackBulkToggle(items: ContentItem[], enable: boolean) {
-	if (contentActionDisabled.value) return
-	const requests = itemsToAddonRequests(items)
-	if (requests.length === 0) return
-
-	// Optimistic update
-	for (const item of items) {
-		modpackAddons.value = modpackAddons.value.map((a) =>
-			a.filename === item.file_name ? { ...a, disabled: !enable } : a,
-		)
-		modpackContentModal.value?.updateItem(item.file_name, { enabled: enable })
-	}
-
-	try {
-		if (enable) {
-			await client.archon.content_v1.enableAddons(serverId, worldId.value!, requests)
-		} else {
-			await client.archon.content_v1.disableAddons(serverId, worldId.value!, requests)
-		}
-		queryClient.setQueryData(
-			modpackContentQueryKey.value,
-			(oldData: Archon.Content.v1.Addons | undefined) =>
-				oldData
-					? {
-							...oldData,
-							addons: (oldData.addons ?? []).map((addon) =>
-								items.some((item) => item.file_name === addon.filename)
-									? { ...addon, disabled: !enable }
-									: addon,
-							),
-						}
-					: oldData,
-		)
-		await queryClient.invalidateQueries({ queryKey: queryKey.value })
-	} catch (err) {
-		for (const item of items) {
-			modpackAddons.value = modpackAddons.value.map((a) =>
-				a.filename === item.file_name ? { ...a, disabled: enable } : a,
-			)
-			modpackContentModal.value?.updateItem(item.file_name, { enabled: !enable })
-		}
-		addNotification({
-			type: 'error',
-			title: formatMessage(enable ? messages.failedToBulkEnable : messages.failedToBulkDisable),
-			text: err instanceof Error ? err.message : undefined,
-		})
-	}
-}
-
 function handleModpackUnlink() {
 	modpackUnlinkModal.value?.show()
 }
@@ -965,7 +1211,6 @@ async function handleModpackUnlinkConfirm() {
 	if (setupActionDisabled.value) return
 	try {
 		await client.archon.content_v1.unlinkModpack(serverId, worldId.value!)
-		await contentQuery.refetch()
 	} catch (err) {
 		addNotification({
 			type: 'error',
@@ -984,10 +1229,16 @@ async function handleBulkUpdate(items: ContentItem[]) {
 			version_id: item.update_version_id ?? undefined,
 		}))
 	if (addons.length === 0) return
+	const filenames = new Set(addons.map((addon) => addon.filename))
+	const rollback = await optimisticallyUpdateAddons((current) =>
+		current.map((addon) =>
+			filenames.has(addon.filename) ? { ...addon, installing: true } : addon,
+		),
+	)
 	try {
 		await client.archon.content_v1.updateAddons(serverId, worldId.value!, addons)
-		await queryClient.invalidateQueries({ queryKey: queryKey.value })
 	} catch (err) {
+		rollback()
 		addNotification({
 			type: 'error',
 			title: formatMessage(messages.failedToBulkUpdate),
@@ -1103,18 +1354,6 @@ function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version, event?
 	performUpdate(selectedVersion)
 }
 
-function setAddonInstalling(filename: string, installing: boolean) {
-	queryClient.setQueryData(queryKey.value, (oldData: Archon.Content.v1.Addons | undefined) => {
-		if (!oldData) return oldData
-		return {
-			...oldData,
-			addons: (oldData.addons ?? []).map((a) =>
-				a.filename === filename ? { ...a, installing } : a,
-			),
-		}
-	})
-}
-
 async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 	if (
 		(updatingModpack.value && setupActionDisabled.value) ||
@@ -1122,9 +1361,13 @@ async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 	)
 		return
 	const item = updatingProject.value
-	if (item) {
-		setAddonInstalling(item.file_name, true)
-	}
+	const rollback = item
+		? await optimisticallyUpdateAddons((addons) =>
+				addons.map((addon) =>
+					addon.filename === item.file_name ? { ...addon, installing: true } : addon,
+				),
+			)
+		: undefined
 	try {
 		if (updatingModpack.value) {
 			const mp = contentQuery.data.value?.modpack
@@ -1147,11 +1390,8 @@ async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 				})
 			}
 		}
-		await contentQuery.refetch()
 	} catch (err) {
-		if (item) {
-			setAddonInstalling(item.file_name, false)
-		}
+		rollback?.()
 		addNotification({
 			type: 'error',
 			title: formatMessage(messages.failedToUpdate),
@@ -1175,24 +1415,6 @@ function handleModpackUpdateCancel() {
 	pendingModpackUpdateVersion.value = null
 }
 
-function getOverflowOptions(item: ContentItem) {
-	const options: { id: string; icon?: typeof ClipboardCopyIcon; action: () => void }[] = []
-
-	if (item.project?.slug) {
-		options.push({
-			id: formatMessage(commonMessages.copyLinkButton),
-			icon: ClipboardCopyIcon,
-			action: async () => {
-				await navigator.clipboard.writeText(
-					`https://modrinth.com/${item.project_type}/${item.project?.slug}`,
-				)
-			},
-		})
-	}
-
-	return options
-}
-
 provideContentManager({
 	items: contentItems,
 	loading: computed(() => contentQuery.isLoading.value),
@@ -1200,15 +1422,15 @@ provideContentManager({
 	managedContent,
 	isPackLocked: ref(false),
 	isBusy: contentActionDisabled,
+	disableWhileMutating: false,
 	busyMessage: contentActionBusyMessage,
 	disableAddContent: computed(() => !canSetup.value),
 	disableAddContentTooltip: permissionDeniedMessage.value,
 	contentTypeLabel: type,
 	toggleEnabled: handleToggleEnabled,
+	setEnabledFor: handleSetEnabledFor,
 	deleteItem: handleDeleteItem,
 	bulkDeleteItems: handleBulkDelete,
-	bulkEnableItems: handleBulkEnable,
-	bulkDisableItems: handleBulkDisable,
 	refresh: async () => {
 		await contentQuery.refetch()
 	},
@@ -1224,7 +1446,6 @@ provideContentManager({
 	unlinkModpack: handleModpackUnlink,
 	openManagedContentSettings: () => openServerSettings({ tabId: 'installation' }),
 	switchVersion: handleSwitchVersion,
-	getOverflowOptions,
 	getItemId: getContentItemId,
 	mapToTableItem: (item) => {
 		const projectType = item.project_type ?? type.value
@@ -1245,6 +1466,8 @@ provideContentManager({
 				: undefined,
 			external: item.external ?? !hasModrinthProject,
 			enabled: item.enabled,
+			enabledFor: item.enabledFor,
+			embeddedIcon: item.embeddedIcon,
 		}
 	},
 	filterPersistKey: `server:${serverId}:${worldId.value}`,
@@ -1274,13 +1497,12 @@ provideContentManager({
 					:source-name="managedContent?.card.manager.name"
 					:source-icon-url="managedContent?.card.manager.iconUrl"
 					:header="formatMessage(messages.modpackContent)"
-					enable-toggle
+					enable-enabled-for
 					show-environment-warnings
 					:action-disabled="contentActionDisabled"
 					:action-disabled-tooltip="contentActionBusyMessage ?? undefined"
-					@update:enabled="handleModpackContentToggle"
-					@bulk:enable="handleModpackBulkToggle($event, true)"
-					@bulk:disable="handleModpackBulkToggle($event, false)"
+					@update:enabled="handleModpackToggleEnabled"
+					@update:enabled-for="handleModpackSetEnabledFor"
 					@hide="isModpackContentModalOpen = false"
 				/>
 				<ContentUpdaterModal
@@ -1322,6 +1544,7 @@ provideContentManager({
 			</template>
 		</ContentPageLayout>
 	</ReadyTransition>
+	<ConfirmEnvironmentModal ref="environmentWarningModal" :action-disabled="contentActionDisabled" />
 	<ConfirmModpackUpdateModal
 		ref="modpackUpdateModal"
 		:downgrade="isModpackUpdateDowngrade"

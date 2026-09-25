@@ -377,9 +377,6 @@
   "content.card.select-project": {
     "defaultMessage": "{project} 선택"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "업로드됨"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "{count}개의 프로젝트를 최신 호환 버전으로 업데이트하시겠습니까? 콘텐츠는 하나씩 업데이트 하는 것을 권장합니다."
   },
@@ -629,9 +626,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "콘텐츠 보기"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "저자"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "환경"
   },
@@ -655,9 +649,6 @@
   },
   "content.metadata-filter.update.available": {
     "defaultMessage": "업데이트 가능"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "경고 없음"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "경고"
@@ -1889,12 +1880,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "콘텐츠 삭제 실패"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "콘텐츠 비활성화 실패"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "콘텐츠 활성화 실패"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "콘텐츠 업데이트 실패"
   },
@@ -1909,9 +1894,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "콘텐츠 제거 실패"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "{name} 전환 실패"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "모드팩 연결 해제 실패"
@@ -2330,12 +2312,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "활성화됨"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "외부"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "이 파일은 Modrinth에 게시되지 않았습니다."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "콘텐츠 관리"
   },
@@ -2344,9 +2320,6 @@
   },
   "instances.managed-content-modal.open-in-slicer": {
     "defaultMessage": "Slicer에서 열기"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "경고"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "현재"
@@ -2431,15 +2404,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "변경 내용이 저장됨"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "이 모드는 클라이언트 측 모드에 의존하므로 서버를 시작할 때 문제가 발생할 수 있습니다"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "이 모드는 클라이언트 측 모드이므로 서버를 시작할 때 문제가 발생할 수 있습니다"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "이것은 종속성으로 설치된 클라이언트 측 모드이므로 서버를 시작할 때 문제가 발생할 수 있습니다"
   },
   "label.collections": {
     "defaultMessage": "컬렉션"
@@ -5204,15 +5168,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth 호스팅"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "여기서 찾을 수 있습니다!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "다시 보지 않기"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "서버 설정이 이동되었습니다"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "공유된 서버"
   },
@@ -5422,18 +5377,6 @@
   },
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "무슨 일이 벌어지나요?"
-  },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "설치 중 예기치 않은 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "설치 실패"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "업로드 중 예기치 않은 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "모드팩 업로드 실패"
   },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "서버 설정"
