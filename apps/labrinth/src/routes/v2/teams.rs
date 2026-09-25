@@ -31,7 +31,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 // also the members of the organization's team if the project is associated with an organization
 // (Unlike team_members_get_project, which only returns the members of the project's team)
 // They can be differentiated by the "organization_permissions" field being null or not
-/// Get a project's team members.  
+/// Get a project's team members.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "teams",
@@ -56,6 +56,13 @@ pub async fn team_members_get_project(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) =
+        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
+            .await?
+    {
+        return Ok(response);
+    }
+
     let response = v3::teams::team_members_get_project_internal(
         req,
         info,
@@ -80,7 +87,7 @@ pub async fn team_members_get_project(
 }
 
 // Returns all members of a team, but not necessarily those of a project-team's organization (unlike team_members_get_project)
-/// Get a team's members.  
+/// Get a team's members.
 #[utoipa::path(
 	context_path = "/team",
 	tag = "teams",
@@ -123,7 +130,7 @@ pub struct TeamIds {
     pub ids: String,
 }
 
-/// Get the members of multiple teams.  
+/// Get the members of multiple teams.
 #[utoipa::path(
 	tag = "teams",
     get,
@@ -172,7 +179,7 @@ pub async fn teams_get(
     }
 }
 
-/// Join a team with a pending invite.  
+/// Join a team with a pending invite.
 #[utoipa::path(
 	context_path = "/team",
 	tag = "teams",
@@ -232,7 +239,7 @@ pub struct NewTeamMember {
     pub ordering: i64,
 }
 
-/// Add a member to a team.  
+/// Add a member to a team.
 #[utoipa::path(
 	context_path = "/team",
 	tag = "teams",
@@ -293,7 +300,7 @@ pub struct EditTeamMember {
     pub ordering: Option<i64>,
 }
 
-/// Update a team member.  
+/// Update a team member.
 #[utoipa::path(
 	context_path = "/team",
 	tag = "teams",
@@ -350,7 +357,7 @@ pub struct TransferOwnership {
     pub user_id: UserId,
 }
 
-/// Transfer team ownership.  
+/// Transfer team ownership.
 #[utoipa::path(
 	context_path = "/team",
 	tag = "teams",
@@ -397,7 +404,7 @@ pub async fn transfer_ownership(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Remove a member from a team.  
+/// Remove a member from a team.
 #[utoipa::path(
 	context_path = "/team",
 	tag = "teams",

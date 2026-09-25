@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                refs.project_ref AS \"project_ref!\",\n                redirect.target_project_id AS \"target_project_id: DBProjectId\"\n            FROM UNNEST($1::text[], $2::bigint[])\n                AS refs(project_ref, project_id)\n            INNER JOIN project_redirects redirect\n                ON redirect.slug = LOWER(refs.project_ref)\n            LEFT JOIN mods id_project\n                ON id_project.id = refs.project_id\n            LEFT JOIN mods slug_project\n                ON slug_project.slug = LOWER(refs.project_ref)\n            WHERE id_project.id IS NULL AND slug_project.id IS NULL\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "project_ref!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "target_project_id: DBProjectId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "TextArray",
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      null,
+      false
+    ]
+  },
+  "hash": "e497b7ee2bb69ec23bc091c525a69666544b850f66b01635a1674bc50704f688"
+}

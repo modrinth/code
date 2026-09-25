@@ -108,11 +108,46 @@ pub async fn version_create(
     let payload = v2_reroute::alter_actix_multipart(
         payload,
         req.headers().clone(),
-        |legacy_create: InitialVersionData,
+        |mut legacy_create: InitialVersionData,
          content_dispositions: Vec<ContentDisposition>| {
             let client = client.clone();
             let redis = redis.clone();
             async move {
+                if let Some(project_id) = legacy_create.project_id {
+                    legacy_create.project_id = Some(
+                        crate::routes::resolve_ref(
+                            &project_id.to_string(),
+                            client.as_ref(),
+                            redis.as_ref(),
+                        )
+                        .await?
+                        .unwrap_or(project_id),
+                    );
+                }
+                let dependency_project_refs = legacy_create
+                    .dependencies
+                    .iter()
+                    .filter_map(|dependency| dependency.project_id)
+                    .map(|project_id| project_id.to_string())
+                    .collect::<Vec<_>>();
+                let resolved_dependency_project_ids =
+                    crate::routes::resolve_refs(
+                        &dependency_project_refs,
+                        client.as_ref(),
+                        redis.as_ref(),
+                    )
+                    .await?;
+                for (dependency, resolved_project_id) in legacy_create
+                    .dependencies
+                    .iter_mut()
+                    .filter(|dependency| dependency.project_id.is_some())
+                    .zip(resolved_dependency_project_ids)
+                {
+                    if let Some(project_id) = resolved_project_id {
+                        dependency.project_id = Some(project_id);
+                    }
+                }
+
                 // Convert input data to V3 format
                 let mut fields = HashMap::new();
                 fields.insert(
