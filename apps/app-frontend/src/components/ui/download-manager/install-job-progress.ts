@@ -46,6 +46,12 @@ const stagesByKind: Record<InstallJobSnapshot['kind'], readonly Stage[]> = {
 	install_existing_instance: instanceStages,
 	install_pack_to_existing_instance: packStages,
 	update_shared_instance: packStages,
+	bulk_update_content: [
+		['preparing_instance', 2],
+		['resolving_pack', 3],
+		['downloading_content', 90],
+		['finalizing', 5],
+	],
 }
 
 /** Estimates whole-job progress from stage counters, preserving progress within an attempt. */

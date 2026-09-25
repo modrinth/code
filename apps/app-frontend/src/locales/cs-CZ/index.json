@@ -569,15 +569,6 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "Instance"
   },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "Stahování {current, number}/{total, number} projektů..."
-  },
-  "app.instance.mods.bulk-update.finishing": {
-    "message": "Dokončení aktualizace..."
-  },
-  "app.instance.mods.bulk-update.resolving-versions": {
-    "message": "Vyhodnocování verzí..."
-  },
   "app.instance.mods.content-type-project": {
     "message": "projekt"
   },

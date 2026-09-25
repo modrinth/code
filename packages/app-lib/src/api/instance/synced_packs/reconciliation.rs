@@ -1063,9 +1063,7 @@ pub(in crate::api::instance) fn schedule_reconciliation() {
     super::worker::queue_all();
 }
 
-pub(in crate::api::instance) async fn reconcile_after_content_change(
-    instance_id: &str,
-) {
+pub(crate) async fn reconcile_after_content_change(instance_id: &str) {
     loop {
         match capture_after_change(instance_id).await {
             Err(error)

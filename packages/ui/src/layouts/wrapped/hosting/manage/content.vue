@@ -7,6 +7,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import UnknownFileWarningModal from '#ui/components/modal/UnknownFileWarningModal.vue'
+import type { UpdateAllSelection } from '#ui/components/modal/update-all-modal/update-all-modal-types'
 import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { waitForServerContextRuntimeReady } from '#ui/composables/server-context-runtime'
@@ -975,14 +976,19 @@ async function handleModpackUnlinkConfirm() {
 	}
 }
 
-async function handleBulkUpdate(items: ContentItem[]) {
+async function handleBulkUpdate(selections: UpdateAllSelection[]) {
 	if (contentActionDisabled.value) return
-	const addons = items
-		.filter((item) => item.has_update && !item.installing)
-		.map((item) => ({
-			filename: item.file_name,
-			version_id: item.update_version_id ?? undefined,
-		}))
+	const addons = selections.flatMap((selection) => {
+		const item = contentItems.value.find((item) => getContentItemId(item) === selection.id)
+		if (
+			!item?.has_update ||
+			item.locked ||
+			item.installing ||
+			item.project.id !== selection.projectId
+		)
+			return []
+		return [{ filename: item.file_name, version_id: selection.version.id }]
+	})
 	if (addons.length === 0) return
 	try {
 		await client.archon.content_v1.updateAddons(serverId, worldId.value!, addons)
@@ -993,6 +999,7 @@ async function handleBulkUpdate(items: ContentItem[]) {
 			title: formatMessage(messages.failedToBulkUpdate),
 			text: err instanceof Error ? err.message : undefined,
 		})
+		throw err
 	}
 }
 
@@ -1218,7 +1225,9 @@ provideContentManager({
 	showEnvironmentWarnings: true,
 	hasUpdateSupport: true,
 	updateItem: handleUpdateItem,
-	bulkUpdateItems: handleBulkUpdate,
+	bulkUpdateSelections: handleBulkUpdate,
+	currentGameVersion,
+	currentLoader,
 	runManagedContentPrimaryAction: handleModpackUpdate,
 	viewManagedContent: handleViewModpackContent,
 	unlinkModpack: handleModpackUnlink,

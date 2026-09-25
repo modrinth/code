@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/vue-query'
 
 import type { InstancePayload } from '@/generated/app-events/InstancePayload'
+import { installJobInstanceId, isInstallJobFinished } from '@/helpers/install'
 import { syncedPackKeys } from '@/helpers/synced-packs'
 import { instanceKeys, instanceListQueryOptions } from '@/pages/instance/query-options'
 import type { AppEvents } from '@/providers/app-events'
@@ -63,6 +64,22 @@ export function useInstanceMetadataRefresh(events: AppEvents) {
 				packsRefreshQueued = true
 			}
 			if (INSTANCE_METADATA_EVENTS.has(event.event)) return queueRefresh()
+		},
+		events,
+	)
+	useAppEvent(
+		'install_job',
+		async (job) => {
+			if (job.kind !== 'bulk_update_content' || !isInstallJobFinished(job.status)) return
+			const instanceId = installJobInstanceId(job)
+			if (!instanceId) return
+			await queueRefresh()
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: instanceKeys.content(instanceId) }),
+				queryClient.invalidateQueries({ queryKey: instanceKeys.contentUpdateCheck(instanceId) }),
+				queryClient.invalidateQueries({ queryKey: instanceKeys.linkedContent(instanceId) }),
+				queryClient.invalidateQueries({ queryKey: syncedPackKeys.all }),
+			])
 		},
 		events,
 	)

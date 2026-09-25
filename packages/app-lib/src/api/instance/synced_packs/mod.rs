@@ -14,10 +14,10 @@ pub use operations::{
     set_synced_pack_enabled, sync_pack, upload_synced_pack,
 };
 pub(super) use operations::{seed_from_instance, sync_new_pack};
+pub(crate) use reconciliation::reconcile_after_content_change;
 pub(super) use reconciliation::{
     capture_resource_pack_selection_change, decorate_content, detach,
-    prepare_instance_update, reconcile, reconcile_after_content_change,
-    schedule_reconciliation,
+    prepare_instance_update, reconcile, schedule_reconciliation,
 };
 pub(crate) use worker::flush;
 
