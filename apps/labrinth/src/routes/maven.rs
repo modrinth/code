@@ -27,6 +27,86 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(version_file);
 }
 
+async fn redirect_maven_ref(
+    req: &HttpRequest,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<Option<HttpResponse>, ApiError> {
+    let Some(project_ref) = req.match_info().get("id") else {
+        return Ok(None);
+    };
+    let Some(target_project_id) =
+        crate::routes::resolve_ref(project_ref, pool, redis).await?
+    else {
+        return Ok(None);
+    };
+
+    let Some(route_pattern) = req.match_pattern() else {
+        return Ok(None);
+    };
+    let route_segments = route_pattern.split('/').collect::<Vec<_>>();
+    let Some(project_ref_index) =
+        route_segments.iter().position(|segment| *segment == "{id}")
+    else {
+        return Ok(None);
+    };
+    let mut path_segments = req
+        .uri()
+        .path()
+        .split('/')
+        .map(ToOwned::to_owned)
+        .collect::<Vec<_>>();
+    let Some(project_ref_segment) = path_segments.get_mut(project_ref_index)
+    else {
+        return Ok(None);
+    };
+    let target_project_ref = target_project_id.to_string();
+    *project_ref_segment = target_project_ref.clone();
+
+    if let (Some(version), Some(filename)) = (
+        req.match_info().get("versionnum"),
+        req.match_info().get("file"),
+    ) {
+        let source_prefix = format!("{project_ref}-{version}");
+        if filename
+            .get(..source_prefix.len())
+            .is_some_and(|prefix| prefix.eq_ignore_ascii_case(&source_prefix))
+        {
+            let target_prefix = format!("{target_project_ref}-{version}");
+            let rewritten_filename =
+                format!("{target_prefix}{}", &filename[source_prefix.len()..]);
+            if let Some(filename_index) = route_segments
+                .iter()
+                .position(|segment| segment.starts_with("{file}"))
+            {
+                let route_suffix = route_segments[filename_index]
+                    .strip_prefix("{file}")
+                    .unwrap_or_default();
+                if let Some(filename_segment) =
+                    path_segments.get_mut(filename_index)
+                {
+                    *filename_segment = format!(
+                        "{}{route_suffix}",
+                        urlencoding::encode(&rewritten_filename)
+                    );
+                }
+            }
+        }
+    }
+
+    let mut location = path_segments.join("/");
+    if let Some(query) = req.uri().query() {
+        location.push('?');
+        location.push_str(query);
+    }
+
+    Ok(Some(
+        HttpResponse::PermanentRedirect()
+            .append_header((actix_web::http::header::LOCATION, location))
+            .finish(),
+    ))
+}
+
 #[derive(Default, Debug, Clone, YaSerialize)]
 #[yaserde(rename = "metadata")]
 pub struct Metadata {
@@ -86,8 +166,7 @@ pub async fn maven_metadata(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(response) =
-        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
-            .await?
+        redirect_maven_ref(&req, pool.as_ref(), redis.as_ref()).await?
     {
         return Ok(response);
     }
@@ -331,8 +410,7 @@ pub async fn version_file(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(response) =
-        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
-            .await?
+        redirect_maven_ref(&req, pool.as_ref(), redis.as_ref()).await?
     {
         return Ok(response);
     }
@@ -425,8 +503,7 @@ pub async fn version_file_sha1(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(response) =
-        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
-            .await?
+        redirect_maven_ref(&req, pool.as_ref(), redis.as_ref()).await?
     {
         return Ok(response);
     }
@@ -498,8 +575,7 @@ pub async fn version_file_sha512(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(response) =
-        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
-            .await?
+        redirect_maven_ref(&req, pool.as_ref(), redis.as_ref()).await?
     {
         return Ok(response);
     }

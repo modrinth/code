@@ -8,6 +8,7 @@ use actix_cors::Cors;
 use actix_files::Files;
 use actix_web::http::{StatusCode, header};
 use actix_web::{HttpRequest, HttpResponse, web};
+use ariadne::ids::base62_impl::parse_base62;
 use futures::FutureExt;
 use std::collections::{HashMap, HashSet};
 use utoipa::openapi::extensions::ExtensionsBuilder;
@@ -77,9 +78,13 @@ pub async fn resolve_refs(
         .collect::<HashSet<_>>()
         .into_iter()
         .collect::<Vec<_>>();
-    let normalized_missing_refs = missing_refs
+    let parsed_project_ids = missing_refs
         .iter()
-        .map(|project_ref| project_ref.to_lowercase())
+        .map(|project_ref| {
+            parse_base62(project_ref)
+                .ok()
+                .map(|project_id| project_id as i64)
+        })
         .collect::<Vec<_>>();
     let redirects = if missing_refs.is_empty() {
         HashMap::new()
@@ -87,19 +92,26 @@ pub async fn resolve_refs(
         sqlx::query!(
             r#"
             SELECT
-                identifier,
-                target_project_id AS "target_project_id: DBProjectId"
-            FROM project_redirects
-            WHERE identifier = ANY($1) OR identifier = ANY($2)
+                refs.project_ref AS "project_ref!",
+                redirect.target_project_id AS "target_project_id: DBProjectId"
+            FROM UNNEST($1::text[], $2::bigint[])
+                AS refs(project_ref, project_id)
+            INNER JOIN project_redirects redirect
+                ON redirect.slug = LOWER(refs.project_ref)
+            LEFT JOIN mods id_project
+                ON id_project.id = refs.project_id
+            LEFT JOIN mods slug_project
+                ON slug_project.slug = LOWER(refs.project_ref)
+            WHERE id_project.id IS NULL AND slug_project.id IS NULL
             "#,
             &missing_refs,
-            &normalized_missing_refs,
+            &parsed_project_ids as &[Option<i64>],
         )
         .fetch_all(pool)
         .await
         .wrap_internal_err("looking up project redirects")?
         .into_iter()
-        .map(|redirect| (redirect.identifier, redirect.target_project_id))
+        .map(|redirect| (redirect.project_ref, redirect.target_project_id))
         .collect::<HashMap<_, _>>()
     };
 
@@ -110,10 +122,7 @@ pub async fn resolve_refs(
         let target_project_id = if let Some(cached_target) = cached_target {
             cached_target.map(DBProjectId)
         } else {
-            let target_project_id = redirects
-                .get(project_ref)
-                .or_else(|| redirects.get(&project_ref.to_lowercase()))
-                .copied();
+            let target_project_id = redirects.get(project_ref).copied();
             redis
                 .set_serialized(
                     key,

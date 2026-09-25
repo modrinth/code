@@ -1,5 +1,5 @@
 CREATE TABLE project_redirects (
-	identifier TEXT PRIMARY KEY,
+	slug TEXT PRIMARY KEY CHECK (slug = LOWER(slug)),
 	target_project_id BIGINT NOT NULL REFERENCES mods(id) ON DELETE CASCADE
 );
 
