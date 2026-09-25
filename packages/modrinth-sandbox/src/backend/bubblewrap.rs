@@ -1,10 +1,5 @@
 use std::{
-    borrow::Cow,
-    collections::BTreeMap,
-    ffi::{OsStr, OsString},
-    os::fd::{AsRawFd, OwnedFd},
-    path::{Path, PathBuf},
-    sync::{Arc, OnceLock},
+    borrow::Cow, collections::BTreeMap, ffi::{CStr, CString, OsStr, OsString}, os::fd::{AsRawFd, OwnedFd}, path::{Path, PathBuf},
 };
 
 use async_trait::async_trait;
@@ -14,8 +9,7 @@ use libseccomp::{ScmpAction, ScmpArgCompare, ScmpCompareOp, ScmpFilterContext, S
 use uuid::Uuid;
 
 use crate::{
-    backend::{Backend, SandboxChild, SandboxCommand, SandboxEnv},
-    util::{argument::SandboxArg, path::find_command},
+    backend::{Backend, SandboxChild, SandboxChildImpl, SandboxChildTrait, SandboxCommand, SandboxEnv, unix::UnixSandboxChild}, util::{argument::SandboxArg, path::find_command},
 };
 
 #[derive(Debug)]
@@ -40,7 +34,6 @@ async fn init() -> Result<BubblewrapEnv> {
     Ok(BubblewrapEnv {
         bwrap,
         xdg_dbus_proxy,
-        dbus_proxy: Arc::new(OnceLock::new()),
         dev_null,
     })
 }
@@ -50,7 +43,6 @@ async fn init() -> Result<BubblewrapEnv> {
 pub struct BubblewrapEnv {
     bwrap: PathBuf,
     xdg_dbus_proxy: PathBuf,
-    dbus_proxy: Arc<OnceLock<eyre::Result<DbusProxy>>>,
     dev_null: libc::c_int,
 }
 
@@ -58,9 +50,10 @@ pub struct BubblewrapEnv {
 impl SandboxEnv for BubblewrapEnv {
     async fn spawn(&self, command: SandboxCommand) -> Result<SandboxChild> {
         let this = self.clone();
-        tokio::task::spawn_blocking(move || spawn(&this, command))
+        let bubblewrap_child = tokio::task::spawn_blocking(move || spawn(&this, command))
             .await
-            .context("spawn task dropped")?
+            .context("spawn task dropped")??;
+        Ok(SandboxChild(SandboxChildImpl::Bubblewrap(bubblewrap_child)))
     }
 }
 
@@ -216,7 +209,7 @@ impl BubblewrapCommandBuilder {
 fn spawn(
     env: &BubblewrapEnv,
     mut command: SandboxCommand,
-) -> Result<SandboxChild> {
+) -> Result<BubblewrapSandboxChild> {
     let mut builder = BubblewrapCommandBuilder::default();
 
     let Some(directories) = directories::BaseDirs::new() else {
@@ -409,15 +402,37 @@ fn spawn(
         builder.bind_if_exists(BindType::ReadWrite, path.clone(), false);
     }
 
+    let flatpak_instances_dir = xdg_runtime_dir.join(".flatpak");
+    let mut instance_id = rand::random::<u32>() & 0x7FFFFFFF;
+    let mut instance_dir = flatpak_instances_dir.join(instance_id.to_string());
+    _ = std::fs::create_dir_all(&flatpak_instances_dir);
+    for attempt in 0..=100 {
+        if std::fs::create_dir(&instance_dir).is_ok() {
+            break;
+        }
+
+        if attempt == 100 {
+            return Err(eyre!("Unable to find unique instance-id for .flatpak-info"));
+        } else {
+            instance_id = rand::random::<u32>() & 0x7FFFFFFF;
+            instance_dir = flatpak_instances_dir.join(instance_id.to_string());
+        }
+    }
+
     // Set up /.flatpak-info
+    let flatpak_info = format!(
+        "[Application]\nname=com.modrinth.sandbox.ModrinthSandbox\n\n[Instance]\ninstance-id={}\n\0",
+        instance_id
+    );
+    let flatpak_info: CString = CString::from_vec_with_nul(flatpak_info.into_bytes())?;
     let flatpak_info_fd1 = super::unix::WriteableMemoryFile::open(
         c"modrinth-sandbox-bwrap-flatpak-info1",
     )?;
-    let flatpak_info_fd1 = flatpak_info_fd1.write(c"[Application]\nname=com.modrinth.sandbox.ModrinthSandbox\n\n[Instance]\ninstance-id=0")?;
+    let flatpak_info_fd1 = flatpak_info_fd1.write(flatpak_info.as_c_str())?;
     let flatpak_info_fd2 = super::unix::WriteableMemoryFile::open(
         c"modrinth-sandbox-bwrap-flatpak-info2",
     )?;
-    let flatpak_info_fd2 = flatpak_info_fd2.write(c"[Application]\nname=com.modrinth.sandbox.ModrinthSandbox\n\n[Instance]\ninstance-id=0")?;
+    let flatpak_info_fd2 = flatpak_info_fd2.write(flatpak_info.as_c_str())?;
 
     builder.push("--file");
     builder.push(format!("{}", flatpak_info_fd1.as_raw_fd()));
@@ -426,30 +441,19 @@ fn spawn(
     builder.push(format!("{}", flatpak_info_fd2.as_raw_fd()));
     builder.push("/.flatpak-info");
 
-    // Set up $XDG_RUNTIME_DIRS/.flatpak/0/bwrapinfo.json
+    // Set up $XDG_RUNTIME_DIRS/.flatpak/{instance_id}/bwrapinfo.json
     if !Path::new("/tmp").is_dir() {
         return Err(eyre!("/tmp folder doesn't exist"));
     }
-    let tmp_bwrapinfo =
-        format!("/tmp/modrinth-sandbox-bwrapinfo-{}.json", Uuid::now_v7());
-    let tmp_bwrapinfo_fd: OwnedFd =
-        std::fs::File::create(tmp_bwrapinfo.clone())?.into();
+    let bwrapinfo = instance_dir.join("bwrapinfo.json");
+    let bwrapinfo_fd: OwnedFd = std::fs::File::create(bwrapinfo.clone())?.into();
     builder.push("--info-fd");
-    builder.push(format!("{}", tmp_bwrapinfo_fd.as_raw_fd()));
-
-    builder.push("--ro-bind");
-    builder.push(tmp_bwrapinfo);
-    builder.push(
-        xdg_runtime_dir
-            .join(".flatpak")
-            .join("0")
-            .join("bwrapinfo.json"),
-    );
+    builder.push(format!("{}", bwrapinfo_fd.as_raw_fd()));
 
     // Set up xdg-dbus-proxy
     let dbus_proxy =
-        start_dbus_proxy(env, xdg_runtime_dir, command.die_with_parent)
-            .map_err(|err| eyre!("{err:#}").wrap_err("starting dbus proxy"))?;
+        start_dbus_proxy(env, xdg_runtime_dir, &flatpak_info, command.die_with_parent)
+            .wrap_err("starting dbus proxy")?;
 
     builder.push("--bind");
     builder.push(dbus_proxy.proxy_session_path.clone());
@@ -487,115 +491,143 @@ fn spawn(
             .wrap_err_with(|| eyre!("creating directory {path:?}"))?;
     }
 
-    Ok(SandboxChild {
-        imp: super::unix::spawn(
+    environment.insert("SDL_VIDEO_DRIVER".into(), "wayland".into());
+
+    Ok(BubblewrapSandboxChild {
+        child: super::unix::spawn(
             env.bwrap.clone().into(),
             std::mem::take(&mut builder.arguments),
             environment,
             command.working_directory,
-            vec![flatpak_info_fd1, flatpak_info_fd2, tmp_bwrapinfo_fd, seccomp_fd],
+            vec![flatpak_info_fd1, flatpak_info_fd2, bwrapinfo_fd, seccomp_fd],
             env.dev_null,
             command.die_with_parent,
         )?,
+        _dbus_proxy: dbus_proxy
     })
 }
 
+#[derive(Debug)]
+pub(crate) struct BubblewrapSandboxChild {
+    child: UnixSandboxChild,
+    _dbus_proxy: DbusProxy,
+}
+
+#[async_trait]
+impl SandboxChildTrait for BubblewrapSandboxChild {
+    fn id(&self) -> Option<u32> {
+        self.child.id()
+    }
+
+    fn try_wait(&mut self) -> Result<Option<super::SandboxExitStatus>> {
+        self.child.try_wait()
+    }
+
+    async fn wait(&mut self) -> Result<super::SandboxExitStatus> {
+        self.child.wait().await
+    }
+
+    async fn kill(&mut self) -> Result<()> {
+        self.child.kill().await
+    }
+}
+
+#[derive(Debug)]
 struct DbusProxy {
     proxy_session_path: PathBuf,
     _keep_alive_read_fd: OwnedFd,
 }
 
-fn start_dbus_proxy<'a>(
-    env: &'a BubblewrapEnv,
+fn start_dbus_proxy(
+    env: &BubblewrapEnv,
     runtime_dir: &Path,
+    flatpak_info: &CStr,
     die_with_parent: bool,
-) -> Result<&'a DbusProxy, &'a eyre::Report> {
+) -> Result<DbusProxy> {
     const DBUS_ADDRESS_ENV: &str = "DBUS_SESSION_BUS_ADDRESS";
 
-    env.dbus_proxy.get_or_init(|| {
-        let (keep_alive_read_fd, keep_alive_write_fd) = super::unix::open_pipe()?;
+    let (keep_alive_read_fd, keep_alive_write_fd) = super::unix::open_pipe()?;
 
-        let session_bus_address = std::env::var_os(DBUS_ADDRESS_ENV)
-            .wrap_err_with(|| eyre!("reading `{DBUS_ADDRESS_ENV}`"))?;
+    let session_bus_address = std::env::var_os(DBUS_ADDRESS_ENV)
+        .wrap_err_with(|| eyre!("reading `{DBUS_ADDRESS_ENV}`"))?;
 
-        let mut builder = BubblewrapCommandBuilder::default();
+    let mut builder = BubblewrapCommandBuilder::default();
 
-        builder.push("--new-session");
+    builder.push("--new-session");
 
-        let proxy_session_path = runtime_dir.join(format!("modrinth-xdg-dbus-proxy-session-{}", Uuid::new_v4()));
+    let proxy_session_path = runtime_dir.join(format!("modrinth-xdg-dbus-proxy-session-{}", Uuid::now_v7()));
 
-        builder.bind_if_exists(BindType::ReadOnly, Path::new("/usr"), true);
-        builder.bind_if_exists(BindType::ReadOnly, Path::new("/lib64"), true);
-        builder.bind_if_exists(BindType::ReadOnly, Path::new("/nix/store"), true);
-        builder.bind_if_exists(BindType::ReadWrite, runtime_dir.to_path_buf(), true);
+    builder.bind_if_exists(BindType::ReadOnly, Path::new("/usr"), true);
+    builder.bind_if_exists(BindType::ReadOnly, Path::new("/lib64"), true);
+    builder.bind_if_exists(BindType::ReadOnly, Path::new("/nix/store"), true);
+    builder.bind_if_exists(BindType::ReadWrite, runtime_dir.to_path_buf(), true);
 
-        let flatpak_info_fd1 = super::unix::WriteableMemoryFile::open(c"modrinth-sandbox-proxy-flatpak-info1")
-            .wrap_err("creating flatpak-info memory file 1")?;
-        let flatpak_info_fd1 = flatpak_info_fd1.write(c"[Application]\nname=com.modrinth.sandbox.ModrinthSandbox\n\n[Instance]\ninstance-id=0")
-            .wrap_err("writing to flatpak-info memory file 1")?;
-        let flatpak_info_fd2 = super::unix::WriteableMemoryFile::open(c"modrinth-sandbox-proxy-flatpak-info2")
-            .wrap_err("creating flatpak-info memory file 2")?;
-        let flatpak_info_fd2 = flatpak_info_fd2.write(c"[Application]\nname=com.modrinth.sandbox.ModrinthSandbox\n\n[Instance]\ninstance-id=0")
-            .wrap_err("writing to flatpak-info memory file 2")?;
+    let flatpak_info_fd1 = super::unix::WriteableMemoryFile::open(c"modrinth-sandbox-proxy-flatpak-info1")
+        .wrap_err("creating flatpak-info memory file 1")?;
+    let flatpak_info_fd1 = flatpak_info_fd1.write(flatpak_info)
+        .wrap_err("writing to flatpak-info memory file 1")?;
+    let flatpak_info_fd2 = super::unix::WriteableMemoryFile::open(c"modrinth-sandbox-proxy-flatpak-info2")
+        .wrap_err("creating flatpak-info memory file 2")?;
+    let flatpak_info_fd2 = flatpak_info_fd2.write(flatpak_info)
+        .wrap_err("writing to flatpak-info memory file 2")?;
 
-        builder.push("--file");
-        builder.push(format!("{}", flatpak_info_fd1.as_raw_fd()));
-        builder.push("/.flatpak-info");
-        builder.push("--ro-bind-data");
-        builder.push(format!("{}", flatpak_info_fd2.as_raw_fd()));
-        builder.push("/.flatpak-info");
+    builder.push("--file");
+    builder.push(format!("{}", flatpak_info_fd1.as_raw_fd()));
+    builder.push("/.flatpak-info");
+    builder.push("--ro-bind-data");
+    builder.push(format!("{}", flatpak_info_fd2.as_raw_fd()));
+    builder.push("/.flatpak-info");
 
-        if die_with_parent {
-            builder.push("--die-with-parent");
+    if die_with_parent {
+        builder.push("--die-with-parent");
+    }
+
+    builder.push("--");
+    builder.push(env.xdg_dbus_proxy.clone());
+    builder.push(session_bus_address);
+    builder.push(proxy_session_path.clone());
+    builder.push(format!("--fd={}", keep_alive_write_fd.as_raw_fd()));
+    builder.push("--filter");
+    builder.push("--talk=com.feralinteractive.GameMode");
+    builder.push("--call=com.feralinteractive.GameMode=/com/feralinteractive/GameMode");
+    builder.push("--talk=org.kde.StatusNotifierWatcher");
+    builder.push("--call=org.kde.StatusNotifierWatcher=/StatusNotifierWatcher");
+    builder.push("--talk=org.freedesktop.Notifications");
+    builder.push("--call=org.freedesktop.Notifications=/org/freedesktop/Notifications");
+    builder.push("--talk=org.freedesktop.portal.*");
+    builder.push("--call=org.freedesktop.portal.Desktop=org.freedesktop.portal.Settings.Read@/org/freedesktop/portal/desktop");
+    builder.push("--broadcast=org.freedesktop.portal.Desktop=org.freedesktop.portal.Settings.SettingChanged@/org/freedesktop/portal/desktop");
+    builder.push("--talk=org.mpris.MediaPlayer2.*");
+
+    let mut environment = BTreeMap::default();
+    for (arg, value) in std::env::vars_os() {
+        environment.insert(arg.into(), value.into());
+    }
+
+    super::unix::spawn(
+        env.bwrap.clone().into(),
+        std::mem::take(&mut builder.arguments),
+        environment,
+        Some(runtime_dir.to_path_buf()),
+        vec![flatpak_info_fd1, flatpak_info_fd2, keep_alive_write_fd],
+        env.dev_null,
+        die_with_parent
+    ).wrap_err("spawning child")?;
+
+    // Wait for proxy to start by reading from fd
+    let mut buf = 0 as libc::c_char;
+    unsafe {
+        let start = std::time::Instant::now();
+        if libc::read(keep_alive_read_fd.as_raw_fd(), &mut buf as *mut libc::c_char as *mut _, 1) != 1 {
+            return Err(eyre!("Failed to sync with xdg-dbus-proxy"));
         }
+        tracing::info!("xdg-dbus-proxy took {:?} to start", std::time::Instant::now() - start);
+    }
 
-        builder.push("--");
-        builder.push(env.xdg_dbus_proxy.clone());
-        builder.push(session_bus_address);
-        builder.push(proxy_session_path.clone());
-        builder.push(format!("--fd={}", keep_alive_write_fd.as_raw_fd()));
-        builder.push("--filter");
-        builder.push("--talk=com.feralinteractive.GameMode");
-        builder.push("--call=com.feralinteractive.GameMode=/com/feralinteractive/GameMode");
-        builder.push("--talk=org.kde.StatusNotifierWatcher");
-        builder.push("--call=org.kde.StatusNotifierWatcher=/StatusNotifierWatcher");
-        builder.push("--talk=org.freedesktop.Notifications");
-        builder.push("--call=org.freedesktop.Notifications=/org/freedesktop/Notifications");
-        builder.push("--talk=org.freedesktop.portal.*");
-        builder.push("--call=org.freedesktop.portal.Desktop=org.freedesktop.portal.Settings.Read@/org/freedesktop/portal/desktop");
-        builder.push("--broadcast=org.freedesktop.portal.Desktop=org.freedesktop.portal.Settings.SettingChanged@/org/freedesktop/portal/desktop");
-        builder.push("--talk=org.mpris.MediaPlayer2.*");
-
-        let mut environment = BTreeMap::default();
-        for (arg, value) in std::env::vars_os() {
-            environment.insert(arg.into(), value.into());
-        }
-
-        super::unix::spawn(
-            env.bwrap.clone().into(),
-            std::mem::take(&mut builder.arguments),
-            environment,
-            Some(runtime_dir.to_path_buf()),
-            vec![flatpak_info_fd1, flatpak_info_fd2, keep_alive_write_fd],
-            env.dev_null,
-            die_with_parent
-        ).wrap_err("spawning child")?;
-
-        // Wait for proxy to start by reading from fd
-        let mut buf = 0 as libc::c_char;
-        unsafe {
-            let start = std::time::Instant::now();
-            if libc::read(keep_alive_read_fd.as_raw_fd(), &mut buf as *mut libc::c_char as *mut _, 1) != 1 {
-                return Err(eyre!("Failed to sync with xdg-dbus-proxy"));
-            }
-            tracing::info!("xdg-dbus-proxy took {:?} to start", std::time::Instant::now() - start);
-        }
-
-        eyre::Ok(DbusProxy {
-            proxy_session_path,
-            _keep_alive_read_fd: keep_alive_read_fd
-        })
-    }).as_ref()
+    eyre::Ok(DbusProxy {
+        proxy_session_path,
+        _keep_alive_read_fd: keep_alive_read_fd
+    })
 }
 
 fn get_card_names() -> Vec<OsString> {

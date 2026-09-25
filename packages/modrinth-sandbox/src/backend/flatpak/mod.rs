@@ -111,7 +111,7 @@ async fn spawn(
         .await
         .wrap_err("spawning child process through Flatpak portal")?;
 
-    Ok(SandboxChild { imp: todo!() })
+    Ok(todo!())
 }
 
 fn option_with_value(option: &str, value: &Path) -> SandboxArg {

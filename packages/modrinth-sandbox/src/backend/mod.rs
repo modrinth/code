@@ -125,39 +125,53 @@ impl SandboxCommand {
     }
 }
 
+#[async_trait]
+pub trait SandboxChildTrait {
+     fn id(&self) -> Option<u32>;
+     fn try_wait(&mut self) -> Result<Option<SandboxExitStatus>>;
+     async fn wait(&mut self) -> Result<SandboxExitStatus>;
+     async fn kill(&mut self) -> Result<()>;
+}
+
 #[derive(Debug)]
-pub struct SandboxChild {
-    // TODO cfg
-    imp: unix::SandboxChild,
+pub enum SandboxChildImpl {
+    Bubblewrap(bubblewrap::BubblewrapSandboxChild),
 }
 
-impl SandboxChild {
-    pub fn id(&self) -> Option<u32> {
-        if self.imp.has_waited() {
-            return None;
+#[derive(Debug)]
+pub struct SandboxChild(pub(crate) SandboxChildImpl);
+
+#[async_trait]
+impl SandboxChildTrait for SandboxChild {
+    fn id(&self) -> Option<u32> {
+        match &self.0 {
+            SandboxChildImpl::Bubblewrap(child) => SandboxChildTrait::id(child),
         }
-        Some(self.imp.id())
     }
 
-    pub fn try_wait(&mut self) -> Result<Option<SandboxExitStatus>> {
-        self.imp
-            .try_wait()
-            .map(|imp| Some(SandboxExitStatus { imp: imp? }))
+    fn try_wait(&mut self) -> Result<Option<SandboxExitStatus>> {
+        match &mut self.0 {
+            SandboxChildImpl::Bubblewrap(child) => SandboxChildTrait::try_wait(child),
+        }
     }
 
-    pub async fn wait(&mut self) -> Result<SandboxExitStatus> {
-        self.imp.wait().await.map(|imp| SandboxExitStatus { imp })
+    async fn wait(&mut self) -> Result<SandboxExitStatus> {
+        match &mut self.0 {
+            SandboxChildImpl::Bubblewrap(child) => SandboxChildTrait::wait(child).await,
+        }
     }
 
-    pub async fn kill(&mut self) -> Result<()> {
-        self.imp.kill().await
+    async fn kill(&mut self) -> Result<()> {
+        match &mut self.0 {
+            SandboxChildImpl::Bubblewrap(child) => SandboxChildTrait::kill(child).await,
+        }
     }
 }
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone, Copy)]
 pub struct SandboxExitStatus {
     // TODO cfg
-    imp: unix::SandboxExitStatus,
+    imp: unix::UnixSandboxExitStatus,
 }
 
 impl SandboxExitStatus {

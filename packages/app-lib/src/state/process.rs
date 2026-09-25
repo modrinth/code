@@ -7,8 +7,7 @@ use crate::util::rpc::RpcServer;
 use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
 use dashmap::DashMap;
 use modrinth_sandbox::{
-    MinecraftCommand, SandboxChild, SandboxEnv, SandboxExitStatus,
-    create_minecraft_command,
+    MinecraftCommand, SandboxChild, SandboxChildTrait, SandboxEnv, SandboxExitStatus, create_minecraft_command,
 };
 use quick_xml::Reader;
 use quick_xml::events::Event;

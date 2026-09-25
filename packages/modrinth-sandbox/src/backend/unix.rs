@@ -9,9 +9,10 @@ use std::{
     path::PathBuf,
 };
 
+use async_trait::async_trait;
 use eyre::Result;
 
-use crate::util::argument::SandboxArg;
+use crate::{SandboxExitStatus, backend::SandboxChildTrait, util::argument::SandboxArg};
 
 pub(crate) fn spawn(
     program: SandboxArg,
@@ -21,7 +22,7 @@ pub(crate) fn spawn(
     pass_fds: Vec<OwnedFd>,
     dev_null: libc::c_int,
     #[cfg(target_os = "linux")] die_with_parent: bool,
-) -> Result<SandboxChild> {
+) -> Result<UnixSandboxChild> {
     let program = CString::new(program.into_os_string().into_vec())?;
 
     // Arguments
@@ -67,7 +68,7 @@ pub(crate) fn spawn(
         unsafe { libc::_exit(1) }
     }
 
-    Ok(SandboxChild {
+    Ok(UnixSandboxChild {
         pid,
         exit_status: None,
     })
@@ -115,21 +116,21 @@ fn exec(
 }
 
 #[derive(Debug)]
-pub struct SandboxChild {
+pub struct UnixSandboxChild {
     pid: libc::pid_t,
     exit_status: Option<SandboxExitStatus>,
 }
 
-impl SandboxChild {
-    pub fn id(&self) -> u32 {
-        self.pid as u32
+ #[async_trait]
+impl SandboxChildTrait for UnixSandboxChild {
+    fn id(&self) -> Option<u32> {
+        if self.exit_status.is_some() {
+            return None;
+        }
+        Some(self.pid as u32)
     }
 
-    pub fn has_waited(&self) -> bool {
-        self.exit_status.is_some()
-    }
-
-    pub fn try_wait(&mut self) -> Result<Option<SandboxExitStatus>> {
+    fn try_wait(&mut self) -> Result<Option<SandboxExitStatus>> {
         // Need to remember the exit status due to waitpid at-most-once semantics
         if let Some(exit_status) = self.exit_status {
             return Ok(Some(exit_status));
@@ -143,12 +144,12 @@ impl SandboxChild {
         if pid == 0 {
             return Ok(None);
         } else {
-            self.exit_status = Some(SandboxExitStatus(status));
+            self.exit_status = Some(SandboxExitStatus { imp: UnixSandboxExitStatus(status) });
             return Ok(self.exit_status);
         }
     }
 
-    pub async fn wait(&mut self) -> Result<SandboxExitStatus> {
+    async fn wait(&mut self) -> Result<SandboxExitStatus> {
         // Need to remember the exit status due to waitpid at-most-once semantics
         if let Some(exit_status) = self.exit_status {
             return Ok(exit_status);
@@ -162,11 +163,11 @@ impl SandboxChild {
         })
         .await??;
 
-        self.exit_status = Some(SandboxExitStatus(status));
-        return Ok(SandboxExitStatus(status));
+        self.exit_status = Some(SandboxExitStatus { imp: UnixSandboxExitStatus(status) });
+        return Ok(SandboxExitStatus { imp: UnixSandboxExitStatus(status) });
     }
 
-    pub async fn kill(&mut self) -> eyre::Result<()> {
+    async fn kill(&mut self) -> eyre::Result<()> {
         let kill_pid = self.pid;
         tokio::task::spawn_blocking(move || {
             cvt_r(|| unsafe { libc::kill(kill_pid, libc::SIGKILL) })
@@ -177,9 +178,9 @@ impl SandboxChild {
 }
 
 #[derive(Default, Clone, Copy)]
-pub(crate) struct SandboxExitStatus(pub(crate) libc::c_int);
+pub(crate) struct UnixSandboxExitStatus(pub(crate) libc::c_int);
 
-impl SandboxExitStatus {
+impl UnixSandboxExitStatus {
     pub(crate) fn success(&self) -> bool {
         self.code() == Some(0)
     }
@@ -193,7 +194,7 @@ impl SandboxExitStatus {
     }
 }
 
-impl std::fmt::Display for SandboxExitStatus {
+impl std::fmt::Display for UnixSandboxExitStatus {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         // std::process::ExitStatus
         if libc::WIFEXITED(self.0) {
@@ -206,7 +207,7 @@ impl std::fmt::Display for SandboxExitStatus {
     }
 }
 
-impl std::fmt::Debug for SandboxExitStatus {
+impl std::fmt::Debug for UnixSandboxExitStatus {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut debug = f.debug_struct("PandoraExitStatus");
         debug.field("raw", &self.0);

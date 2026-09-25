@@ -5,7 +5,7 @@ use std::{
 };
 
 use eyre::{Result, WrapErr};
-use modrinth_sandbox::{SandboxArg, SandboxCommand};
+use modrinth_sandbox::{SandboxArg, SandboxChildTrait, SandboxCommand};
 use tracing::info;
 
 #[derive(Debug, clap::Parser)]

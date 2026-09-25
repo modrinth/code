@@ -7221,6 +7221,7 @@ dependencies = [
  "foldhash 0.2.0",
  "libc",
  "libseccomp",
+ "rand 0.8.5",
  "serde",
  "tokio",
  "tracing",
