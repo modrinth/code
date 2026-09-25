@@ -491,8 +491,6 @@ fn spawn(
             .wrap_err_with(|| eyre!("creating directory {path:?}"))?;
     }
 
-    environment.insert("SDL_VIDEO_DRIVER".into(), "wayland".into());
-
     Ok(BubblewrapSandboxChild {
         child: super::unix::spawn(
             env.bwrap.clone().into(),
