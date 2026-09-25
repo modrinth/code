@@ -1,10 +1,11 @@
 use std::{
     collections::{BTreeMap, HashSet},
     ffi::OsString,
+    io::{BufRead, BufReader, PipeReader, Write},
     path::PathBuf,
 };
 
-use eyre::{Result, WrapErr};
+use eyre::{Result, WrapErr, ensure};
 use modrinth_sandbox::{SandboxArg, SandboxCommand, SandboxStdio};
 use tracing::info;
 
@@ -45,17 +46,61 @@ async fn main() -> Result<()> {
             is_jvm: false,
             die_with_parent: true,
             stdin: SandboxStdio::Null,
-            stdout: SandboxStdio::Inherit,
-            stderr: SandboxStdio::Inherit,
+            stdout: SandboxStdio::Pipe,
+            stderr: SandboxStdio::Pipe,
         })
         .await
         .wrap_err("spawning process in sandbox")?;
+
+    let stdout = forward_pipe(
+        child.stdout.take().expect("we set `stdout` to `Pipe`"),
+        || std::io::stdout().lock(),
+    );
+    let stderr = forward_pipe(
+        child.stderr.take().expect("we set `stderr` to `Pipe`"),
+        || std::io::stderr().lock(),
+    );
 
     let status = child
         .wait()
         .await
         .wrap_err("waiting for process in sandbox")?;
-    eyre::ensure!(status.success(), "sandboxed process exited with {status}");
+
+    stdout
+        .await
+        .wrap_err("joining stdout reader task")?
+        .wrap_err("forwarding sandboxed process stdout")?;
+    stderr
+        .await
+        .wrap_err("joining stderr reader task")?
+        .wrap_err("forwarding sandboxed process stderr")?;
+
+    ensure!(status.success(), "sandboxed process exited with {status}");
 
     Ok(())
+}
+
+fn forward_pipe<W>(
+    pipe: PipeReader,
+    make_output: fn() -> W,
+) -> tokio::task::JoinHandle<std::io::Result<()>>
+where
+    W: Write + 'static,
+{
+    tokio::task::spawn_blocking(move || {
+        let mut output = make_output();
+        let mut reader = BufReader::new(pipe);
+        let mut line = String::new();
+
+        while reader.read_line(&mut line)? != 0 {
+            write!(output, "child: {line}")?;
+            if !line.ends_with('\n') {
+                writeln!(output)?;
+            }
+            output.flush()?;
+            line.clear();
+        }
+
+        Ok(())
+    })
 }

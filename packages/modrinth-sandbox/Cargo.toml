@@ -39,3 +39,6 @@ directories =  { workspace = true }
 # windows =  { workspace = true }
 # junction =  { workspace = true }
 # scopeguard =  { workspace = true }
+
+[lints]
+workspace = true

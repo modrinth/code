@@ -28,7 +28,7 @@ pub(crate) fn spawn(
     pass_fds: Vec<OwnedFd>,
     dev_null: libc::c_int,
     #[cfg(target_os = "linux")] die_with_parent: bool,
-) -> Result<UnixSandboxChild> {
+) -> Result<(Pipes, UnixChild)> {
     let program = CString::new(program.into_os_string().into_vec())?;
 
     // Arguments
@@ -123,13 +123,17 @@ pub(crate) fn spawn(
         unsafe { libc::_exit(1) }
     }
 
-    Ok(UnixSandboxChild {
-        pid,
-        exit_status: None,
-        stdin: stdin_write,
-        stdout: stdout_read,
-        stderr: stderr_read,
-    })
+    Ok((
+        Pipes {
+            stdin: stdin_write,
+            stdout: stdout_read,
+            stderr: stderr_read,
+        },
+        UnixChild {
+            pid,
+            exit_status: None,
+        },
+    ))
 }
 
 fn exec(
@@ -190,16 +194,20 @@ fn exec(
 }
 
 #[derive(Debug)]
-pub struct UnixSandboxChild {
+pub struct Pipes {
+    pub stdin: Option<PipeWriter>,
+    pub stdout: Option<PipeReader>,
+    pub stderr: Option<PipeReader>,
+}
+
+#[derive(Debug)]
+pub struct UnixChild {
     pid: libc::pid_t,
     exit_status: Option<SandboxExitStatus>,
-    stdin: Option<PipeWriter>,
-    stdout: Option<PipeReader>,
-    stderr: Option<PipeReader>,
 }
 
 #[async_trait]
-impl SandboxChildOp for UnixSandboxChild {
+impl SandboxChildOp for UnixChild {
     fn id(&self) -> Option<u32> {
         if self.exit_status.is_some() {
             return None;
@@ -215,16 +223,16 @@ impl SandboxChildOp for UnixSandboxChild {
 
         let mut status = 0 as libc::c_int;
         let pid = cvt_r(|| unsafe {
-            libc::waitpid(self.pid, &mut status, libc::WNOHANG)
+            libc::waitpid(self.pid, &raw mut status, libc::WNOHANG)
         })?;
 
         if pid == 0 {
-            return Ok(None);
+            Ok(None)
         } else {
             self.exit_status = Some(SandboxExitStatus {
                 imp: UnixSandboxExitStatus(status),
             });
-            return Ok(self.exit_status);
+            Ok(self.exit_status)
         }
     }
 
@@ -237,7 +245,9 @@ impl SandboxChildOp for UnixSandboxChild {
         let wait_for_pid = self.pid;
         let status = tokio::task::spawn_blocking(move || {
             let mut status = 0 as libc::c_int;
-            cvt_r(|| unsafe { libc::waitpid(wait_for_pid, &mut status, 0) })?;
+            cvt_r(|| unsafe {
+                libc::waitpid(wait_for_pid, &raw mut status, 0)
+            })?;
             eyre::Ok(status)
         })
         .await??;
@@ -257,18 +267,6 @@ impl SandboxChildOp for UnixSandboxChild {
         })
         .await??;
         Ok(())
-    }
-
-    fn take_stdin(&mut self) -> Option<PipeWriter> {
-        self.stdin.take()
-    }
-
-    fn take_stdout(&mut self) -> Option<PipeReader> {
-        self.stdout.take()
-    }
-
-    fn take_stderr(&mut self) -> Option<PipeReader> {
-        self.stderr.take()
     }
 }
 
@@ -328,11 +326,11 @@ pub fn open_pipe() -> eyre::Result<(OwnedFd, OwnedFd)> {
     }
 }
 
-pub(crate) struct WriteableMemoryFile {
+pub(crate) struct WritableMemoryFile {
     fd: OwnedFd,
 }
 
-impl WriteableMemoryFile {
+impl WritableMemoryFile {
     pub fn open(name: &CStr) -> eyre::Result<Self> {
         let fd = unsafe {
             OwnedFd::from_raw_fd(cvt(libc::memfd_create(

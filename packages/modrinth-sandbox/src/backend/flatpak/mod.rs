@@ -1,18 +1,20 @@
-use std::{
-    io::{PipeReader, PipeWriter},
-    os::unix::ffi::OsStringExt,
+use std::os::{
+    fd::{AsFd, OwnedFd},
+    unix::ffi::OsStringExt,
 };
 
 use async_trait::async_trait;
 use derive_more::Debug;
-use eyre::{Context, OptionExt, Result, bail, eyre};
+use eyre::{Context, OptionExt, Result, bail, ensure, eyre};
 use foldhash::{HashMap, HashMapExt};
-use futures::StreamExt;
+use futures::{StreamExt, TryStreamExt, stream::FuturesUnordered};
+use libc::SIGKILL;
 use tokio::{fs, sync::oneshot};
 use tracing::error;
+use zbus::zvariant::Fd;
 
 use crate::{
-    SandboxCommand, SandboxExitStatus,
+    SandboxCommand, SandboxExitStatus, SandboxStdio,
     backend::{
         Backend, SandboxChild, SandboxChildOp, SandboxEnv,
         flatpak::dbus::{SandboxFlags, SpawnFlags, SpawnOptions},
@@ -50,15 +52,18 @@ pub struct FlatpakEnv {
 
 #[async_trait]
 impl SandboxEnv for FlatpakEnv {
-    async fn spawn(&self, command: SandboxCommand) -> Result<SandboxChild> {
-        spawn(self, command).await.map(SandboxChild::Flatpak)
+    async fn spawn(
+        &self,
+        command: SandboxCommand,
+    ) -> Result<crate::SandboxChild> {
+        spawn(self, command).await
     }
 }
 
 async fn spawn(
     env: &FlatpakEnv,
     mut command: SandboxCommand,
-) -> Result<FlatpakChild> {
+) -> Result<crate::SandboxChild> {
     let envs = command
         .take_environment()
         .into_iter()
@@ -73,22 +78,139 @@ async fn spawn(
         })
         .collect::<Result<HashMap<_, _>>>()?;
 
-    let cwd_path = command
-        .working_directory
-        .map(|buf| buf.into_os_string().into_vec())
-        .unwrap_or_default();
+    let cwd_path = match command.working_directory {
+        Some(path) => nul_terminate(
+            path.into_os_string().into_vec(),
+            "working directory",
+        )?,
+        None => vec![0],
+    };
 
-    let mut argv = vec![command.executable.into_os_string().into_vec()];
+    let mut argv = Vec::with_capacity(command.args.len() + 1);
+    argv.push(nul_terminate(
+        command.executable.into_os_string().into_vec(),
+        "executable path",
+    )?);
     for arg in command.args {
-        argv.push(arg.into_os_string().into_vec());
+        argv.push(nul_terminate(
+            arg.into_os_string().into_vec(),
+            "process argument",
+        )?);
     }
 
-    let fds = HashMap::new();
+    let mut fds = HashMap::new();
+
+    let inherited = std::io::stdin();
+    let stdin = {
+        let (fd, write) = match command.stdin {
+            SandboxStdio::Null => open_dev_null()
+                .map(OwnedFd::from)
+                .map(Fd::Owned)
+                .map(|fd| (fd, None))
+                .wrap_err("creating /dev/null fd")?,
+            SandboxStdio::Inherit => {
+                let fd = Fd::Borrowed(inherited.as_fd());
+                (fd, None)
+            }
+            SandboxStdio::Pipe => {
+                let (read, write) =
+                    std::io::pipe().wrap_err("creating child stdin pipe")?;
+                (OwnedFd::from(read).into(), Some(write))
+            }
+        };
+
+        fds.insert(libc::STDIN_FILENO as u32, fd);
+        write
+    };
+
+    let inherited = std::io::stdout();
+    let stdout = {
+        let (fd, read) = match command.stdout {
+            SandboxStdio::Null => open_dev_null()
+                .map(OwnedFd::from)
+                .map(Fd::Owned)
+                .map(|fd| (fd, None))
+                .wrap_err("creating /dev/null fd")?,
+            SandboxStdio::Inherit => {
+                let fd = Fd::Borrowed(inherited.as_fd());
+                (fd, None)
+            }
+            SandboxStdio::Pipe => {
+                let (read, write) =
+                    std::io::pipe().wrap_err("creating child stdout pipe")?;
+                (OwnedFd::from(write).into(), Some(read))
+            }
+        };
+
+        fds.insert(libc::STDOUT_FILENO as u32, fd);
+        read
+    };
+
+    let inherited = std::io::stderr();
+    let stderr = {
+        let (fd, read) = match command.stderr {
+            SandboxStdio::Null => open_dev_null()
+                .map(OwnedFd::from)
+                .map(Fd::Owned)
+                .map(|fd| (fd, None))
+                .wrap_err("creating /dev/null fd")?,
+            SandboxStdio::Inherit => {
+                let fd = Fd::Borrowed(inherited.as_fd());
+                (fd, None)
+            }
+            SandboxStdio::Pipe => {
+                let (read, write) =
+                    std::io::pipe().wrap_err("creating child stderr pipe")?;
+                (OwnedFd::from(write).into(), Some(read))
+            }
+        };
+
+        fds.insert(libc::STDERR_FILENO as u32, fd);
+        read
+    };
 
     let flags = SpawnFlags::CLEAR_ENV
         | SpawnFlags::SANDBOX
         | SpawnFlags::WATCH_BUS
         | SpawnFlags::EMPTY_APP;
+
+    let sandbox_expose_fd = command
+        .read_write_paths
+        .into_iter()
+        .map(|path| async move {
+            let file = fs::OpenOptions::new()
+                .write(true)
+                .custom_flags(libc::O_PATH | libc::O_NOFOLLOW)
+                .open(&path)
+                .await
+                .wrap_err_with(|| eyre!("opening file {path:?} for writing"))?;
+            let file = file.into_std().await;
+            let fd = OwnedFd::from(file);
+            let fd = zbus::zvariant::OwnedFd::from(fd);
+            eyre::Ok(fd)
+        })
+        .collect::<FuturesUnordered<_>>()
+        .try_collect::<Vec<_>>()
+        .await?;
+
+    let sandbox_expose_fd_ro = command
+        .read_only_paths
+        .into_iter()
+        .map(|path| async move {
+            let file = fs::OpenOptions::new()
+                .read(true)
+                .custom_flags(libc::O_PATH | libc::O_NOFOLLOW)
+                .open(&path)
+                .await
+                .wrap_err_with(|| eyre!("opening file {path:?} for reading"))?;
+            let file = file.into_std().await;
+            let fd = OwnedFd::from(file);
+            let fd = zbus::zvariant::OwnedFd::from(fd);
+            eyre::Ok(fd)
+        })
+        .collect::<FuturesUnordered<_>>()
+        .try_collect::<Vec<_>>()
+        .await?;
 
     let options = SpawnOptions {
         sandbox_flags: Some(
@@ -98,6 +220,8 @@ async fn spawn(
                 | SandboxFlags::SESSION_BUS
                 | SandboxFlags::INPUT_DEVICES,
         ),
+        sandbox_expose_fd: Some(sandbox_expose_fd),
+        sandbox_expose_fd_ro: Some(sandbox_expose_fd_ro),
         ..Default::default()
     };
 
@@ -117,7 +241,7 @@ async fn spawn(
         .await
         .context("creating SpawnExited stream")?;
 
-    let pid = env
+    let flatpak_pid = env
         .flatpak_portal
         .spawn(&cwd_path, &argv, &fds, &envs, flags, &options)
         .await
@@ -158,7 +282,7 @@ async fn spawn(
                 }
             };
 
-            if exited.pid == pid {
+            if exited.pid == flatpak_pid {
                 let exit_status = exited.exit_status as libc::c_int;
                 tx_exited
                     .send(SandboxExitStatus {
@@ -170,22 +294,47 @@ async fn spawn(
         }
     });
 
-    Ok(FlatpakChild {
-        pid,
-        rx_exited: Some(rx_exited),
+    Ok(crate::SandboxChild {
+        stdin,
+        stdout,
+        stderr,
+        imp: SandboxChild::Flatpak(FlatpakChild {
+            flatpak_pid,
+            flatpak_portal: env.flatpak_portal.clone(),
+            rx_exited: Some(rx_exited),
+        }),
     })
+}
+
+fn nul_terminate(mut value: Vec<u8>, description: &str) -> Result<Vec<u8>> {
+    ensure!(
+        !value.contains(&0),
+        "{description} contains an embedded NUL byte"
+    );
+    value.push(0);
+    Ok(value)
+}
+
+fn open_dev_null() -> Result<std::fs::File> {
+    std::fs::OpenOptions::new()
+        .read(true)
+        .write(true)
+        .open("/dev/null")
+        .wrap_err("opening /dev/null")
 }
 
 #[derive(Debug)]
 pub struct FlatpakChild {
-    pid: u32,
+    /// Flatpak's opaque process ID for this child - *not* a Unix process ID.
+    flatpak_pid: u32,
+    flatpak_portal: dbus::FlatpakPortalProxy<'static>,
     rx_exited: Option<oneshot::Receiver<SandboxExitStatus>>,
 }
 
 #[async_trait]
 impl SandboxChildOp for FlatpakChild {
     fn id(&self) -> Option<u32> {
-        todo!();
+        None
     }
 
     fn try_wait(&mut self) -> Result<Option<SandboxExitStatus>> {
@@ -211,15 +360,9 @@ impl SandboxChildOp for FlatpakChild {
     }
 
     async fn kill(&mut self) -> Result<()> {
-        todo!();
-    }
-    fn take_stdin(&mut self) -> Option<PipeWriter> {
-        todo!();
-    }
-    fn take_stdout(&mut self) -> Option<PipeReader> {
-        todo!();
-    }
-    fn take_stderr(&mut self) -> Option<PipeReader> {
-        todo!();
+        self.flatpak_portal
+            .spawn_signal(self.flatpak_pid, SIGKILL as u32, true)
+            .await
+            .wrap_err("sending SIGKILL to child process")
     }
 }

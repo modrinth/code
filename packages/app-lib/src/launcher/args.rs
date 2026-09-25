@@ -15,7 +15,7 @@ use daedalus::{
 };
 use dunce::canonicalize;
 use itertools::Itertools;
-use modrinth_sandbox::MINECRAFT_JVM_ARGUMENTS;
+use modrinth_sandbox::minecraft::JVM_ARGUMENTS;
 use std::io::{BufRead, BufReader, ErrorKind};
 
 use std::{
@@ -185,7 +185,7 @@ fn is_launcher_managed_jvm_argument(argument: &str) -> bool {
         argument_name => argument_name,
     };
 
-    MINECRAFT_JVM_ARGUMENTS.contains(&argument_name)
+    JVM_ARGUMENTS.contains(&argument_name)
         || LAUNCHER_MANAGED_JVM_ARGUMENTS.contains(&argument_name)
         || argument.contains("${classpath}")
         || argument.contains("${natives_directory}")

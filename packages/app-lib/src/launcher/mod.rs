@@ -28,7 +28,8 @@ use daedalus::minecraft::{
 };
 use daedalus::modded::{LoaderVersion, Manifest};
 use modrinth_sandbox::{
-    MinecraftCommand, MinecraftLoggingConfig, SandboxStdio,
+    SandboxStdio,
+    minecraft::{MinecraftCommand, MinecraftLoggingConfig},
 };
 use serde::Deserialize;
 use std::future::Future;

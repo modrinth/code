@@ -3,7 +3,6 @@
 use std::{
     collections::{BTreeMap, HashSet},
     fmt::Debug,
-    io::{PipeReader, PipeWriter},
     path::PathBuf,
 };
 
@@ -30,7 +29,10 @@ pub trait Backend {
 #[async_trait]
 pub trait SandboxEnv: Debug + Send + Sync {
     /// See [`crate::SandboxEnv::spawn`].
-    async fn spawn(&self, command: SandboxCommand) -> Result<SandboxChild>;
+    async fn spawn(
+        &self,
+        command: SandboxCommand,
+    ) -> Result<crate::SandboxChild>;
 }
 
 /// See [`crate::create_env`].
@@ -129,9 +131,6 @@ pub trait SandboxChildOp {
     fn try_wait(&mut self) -> Result<Option<SandboxExitStatus>>;
     async fn wait(&mut self) -> Result<SandboxExitStatus>;
     async fn kill(&mut self) -> Result<()>;
-    fn take_stdin(&mut self) -> Option<PipeWriter>;
-    fn take_stdout(&mut self) -> Option<PipeReader>;
-    fn take_stderr(&mut self) -> Option<PipeReader>;
 }
 
 #[derive(Debug)]

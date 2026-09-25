@@ -23,6 +23,7 @@ use std::time::{Duration, Instant};
 use tempfile::TempDir;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command;
+use tracing::info;
 use uuid::Uuid;
 
 const LAUNCHER_LOG_PATH: &str = "launcher_log.txt";
@@ -223,21 +224,24 @@ impl ProcessManager {
         }
 
         let command = modrinth_sandbox::minecraft::create_command(mc_command)?;
+        info!("spawning Minecraft process using sandbox {sandbox_env:?}");
         let mut mc_proc = sandbox_env.spawn(command).await?;
         let child_pid = mc_proc.id();
 
         let stdout = mc_proc
-            .take_stdout()
+            .stdout
+            .take()
             .map(|reader| {
                 tokio::net::unix::pipe::Receiver::from_owned_fd(reader.into())
             })
-            .transpose()?;
+            .expect("`stdout` is set to `Pipe` so should be available")?;
         let stderr = mc_proc
-            .take_stderr()
+            .stderr
+            .take()
             .map(|reader| {
                 tokio::net::unix::pipe::Receiver::from_owned_fd(reader.into())
             })
-            .transpose()?;
+            .expect("`stderr` is set to `Pipe` so should be available")?;
 
         let mut process = Process {
             metadata: ProcessMetadata {
@@ -314,7 +318,7 @@ impl ProcessManager {
 
         let metadata = process.metadata.clone();
 
-        if let Some(stdout) = stdout {
+        {
             let log_path_clone = log_path.clone();
 
             let instance_id = metadata.instance_id.clone();
@@ -331,7 +335,7 @@ impl ProcessManager {
             });
         }
 
-        if let Some(stderr) = stderr {
+        {
             let log_path_clone = log_path.clone();
 
             let instance_id = metadata.instance_id.clone();

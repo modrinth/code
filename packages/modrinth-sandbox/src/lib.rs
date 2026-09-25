@@ -74,10 +74,7 @@ impl SandboxEnv {
     /// what you can configure, such as what program to run, and what files are
     /// exposed in the sandbox.
     pub async fn spawn(&self, command: SandboxCommand) -> Result<SandboxChild> {
-        self.imp
-            .spawn(command)
-            .await
-            .map(|imp| SandboxChild { imp })
+        self.imp.spawn(command).await
     }
 }
 
@@ -89,6 +86,18 @@ impl SandboxEnv {
 #[derive(Debug)]
 #[debug("{imp:?}")]
 pub struct SandboxChild {
+    /// Handle for writing to the child's standard input (stdin).
+    ///
+    /// Analogous to [`std::process::Child::stdin`].
+    pub stdin: Option<PipeWriter>,
+    /// Handle for reading from the child's standard output (stdout).
+    ///
+    /// Analogous to [`std::process::Child::stdout`].
+    pub stdout: Option<PipeReader>,
+    /// Handle for reading from the child's standard error (stderr).
+    ///
+    /// Analogous to [`std::process::Child::stderr`].
+    pub stderr: Option<PipeReader>,
     imp: backend::SandboxChild,
 }
 
@@ -107,17 +116,5 @@ impl SandboxChild {
 
     pub async fn kill(&mut self) -> Result<()> {
         SandboxChildOp::kill(&mut self.imp).await
-    }
-
-    pub fn take_stdin(&mut self) -> Option<PipeWriter> {
-        SandboxChildOp::take_stdin(&mut self.imp)
-    }
-
-    pub fn take_stdout(&mut self) -> Option<PipeReader> {
-        SandboxChildOp::take_stdout(&mut self.imp)
-    }
-
-    pub fn take_stderr(&mut self) -> Option<PipeReader> {
-        SandboxChildOp::take_stderr(&mut self.imp)
     }
 }

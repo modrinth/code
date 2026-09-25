@@ -2,7 +2,6 @@ use std::{
     borrow::Cow,
     collections::BTreeMap,
     ffi::{CStr, CString, OsStr, OsString},
-    io::{PipeReader, PipeWriter},
     os::fd::{AsRawFd, OwnedFd},
     path::{Path, PathBuf},
 };
@@ -18,7 +17,7 @@ use uuid::Uuid;
 use crate::{
     backend::{
         Backend, SandboxChild, SandboxChildOp, SandboxCommand, SandboxEnv,
-        unix::UnixSandboxChild,
+        unix::UnixChild,
     },
     util::{argument::SandboxArg, path::find_command},
 };
@@ -59,13 +58,15 @@ pub struct BubblewrapEnv {
 
 #[async_trait]
 impl SandboxEnv for BubblewrapEnv {
-    async fn spawn(&self, command: SandboxCommand) -> Result<SandboxChild> {
+    async fn spawn(
+        &self,
+        command: SandboxCommand,
+    ) -> Result<crate::SandboxChild> {
         let this = self.clone();
-        let bubblewrap_child =
-            tokio::task::spawn_blocking(move || spawn(&this, command))
-                .await
-                .context("spawn task dropped")??;
-        Ok(SandboxChild::Bubblewrap(bubblewrap_child))
+        let child = tokio::task::spawn_blocking(move || spawn(&this, command))
+            .await
+            .context("spawn task dropped")??;
+        Ok(child)
     }
 }
 
@@ -221,7 +222,7 @@ impl BubblewrapCommandBuilder {
 fn spawn(
     env: &BubblewrapEnv,
     mut command: SandboxCommand,
-) -> Result<BubblewrapChild> {
+) -> Result<crate::SandboxChild> {
     let mut builder = BubblewrapCommandBuilder::default();
 
     let Some(directories) = directories::BaseDirs::new() else {
@@ -434,17 +435,25 @@ fn spawn(
     }
 
     // Set up /.flatpak-info
+    // The `Application.name` here may be used by desktop environments
+    // as the name of the icon to use for e.g. window icons, dock icons.
+    // TODO: make this per-launcher configurable
     let flatpak_info = format!(
-        "[Application]\nname=com.modrinth.sandbox.ModrinthSandbox\n\n[Instance]\ninstance-id={}\n\0",
-        instance_id
+        "
+[Application]
+name=com.modrinth.ModrinthApp
+
+[Instance]
+instance-id={instance_id}
+\0"
     );
     let flatpak_info: CString =
         CString::from_vec_with_nul(flatpak_info.into_bytes())?;
-    let flatpak_info_fd1 = super::unix::WriteableMemoryFile::open(
+    let flatpak_info_fd1 = super::unix::WritableMemoryFile::open(
         c"modrinth-sandbox-bwrap-flatpak-info1",
     )?;
     let flatpak_info_fd1 = flatpak_info_fd1.write(flatpak_info.as_c_str())?;
-    let flatpak_info_fd2 = super::unix::WriteableMemoryFile::open(
+    let flatpak_info_fd2 = super::unix::WritableMemoryFile::open(
         c"modrinth-sandbox-bwrap-flatpak-info2",
     )?;
     let flatpak_info_fd2 = flatpak_info_fd2.write(flatpak_info.as_c_str())?;
@@ -511,27 +520,35 @@ fn spawn(
             .wrap_err_with(|| eyre!("creating directory {path:?}"))?;
     }
 
-    Ok(BubblewrapChild {
-        child: super::unix::spawn(
-            env.bwrap.clone().into(),
-            std::mem::take(&mut builder.arguments),
-            environment,
-            command.stdin,
-            command.stdout,
-            command.stderr,
-            command.working_directory,
-            vec![flatpak_info_fd1, flatpak_info_fd2, bwrapinfo_fd, seccomp_fd],
-            env.dev_null,
-            command.die_with_parent,
-        )?,
-        instance_dir,
-        _dbus_proxy: dbus_proxy,
+    let (pipes, child) = super::unix::spawn(
+        env.bwrap.clone().into(),
+        std::mem::take(&mut builder.arguments),
+        environment,
+        command.stdin,
+        command.stdout,
+        command.stderr,
+        command.working_directory,
+        vec![flatpak_info_fd1, flatpak_info_fd2, bwrapinfo_fd, seccomp_fd],
+        env.dev_null,
+        command.die_with_parent,
+    )
+    .wrap_err("spawning child")?;
+
+    Ok(crate::SandboxChild {
+        stdin: pipes.stdin,
+        stdout: pipes.stdout,
+        stderr: pipes.stderr,
+        imp: SandboxChild::Bubblewrap(BubblewrapChild {
+            child,
+            instance_dir,
+            _dbus_proxy: dbus_proxy,
+        }),
     })
 }
 
 #[derive(Debug)]
 pub(crate) struct BubblewrapChild {
-    child: UnixSandboxChild,
+    child: UnixChild,
     instance_dir: PathBuf,
     _dbus_proxy: DbusProxy,
 }
@@ -558,18 +575,6 @@ impl SandboxChildOp for BubblewrapChild {
 
     async fn kill(&mut self) -> Result<()> {
         self.child.kill().await
-    }
-
-    fn take_stdin(&mut self) -> Option<PipeWriter> {
-        self.child.take_stdin()
-    }
-
-    fn take_stdout(&mut self) -> Option<PipeReader> {
-        self.child.take_stdout()
-    }
-
-    fn take_stderr(&mut self) -> Option<PipeReader> {
-        self.child.take_stderr()
     }
 }
 
@@ -616,14 +621,14 @@ fn start_dbus_proxy(
         true,
     );
 
-    let flatpak_info_fd1 = super::unix::WriteableMemoryFile::open(
+    let flatpak_info_fd1 = super::unix::WritableMemoryFile::open(
         c"modrinth-sandbox-proxy-flatpak-info1",
     )
     .wrap_err("creating flatpak-info memory file 1")?;
     let flatpak_info_fd1 = flatpak_info_fd1
         .write(flatpak_info)
         .wrap_err("writing to flatpak-info memory file 1")?;
-    let flatpak_info_fd2 = super::unix::WriteableMemoryFile::open(
+    let flatpak_info_fd2 = super::unix::WritableMemoryFile::open(
         c"modrinth-sandbox-proxy-flatpak-info2",
     )
     .wrap_err("creating flatpak-info memory file 2")?;
@@ -1184,9 +1189,8 @@ fn create_seccomp_filter() -> Result<std::os::fd::OwnedFd> {
         );
     }
 
-    let fd = super::unix::WriteableMemoryFile::open(
-        c"modrinth-sandbox-seccomp-bpf",
-    )?;
+    let fd =
+        super::unix::WritableMemoryFile::open(c"modrinth-sandbox-seccomp-bpf")?;
     let fd = fd.write_filter(filter)?;
     Ok(fd)
 }
