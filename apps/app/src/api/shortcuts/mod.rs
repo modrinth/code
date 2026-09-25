@@ -1,4 +1,5 @@
 use crate::api::Result;
+use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 use tauri::Runtime;
 use url::Url;
@@ -84,7 +85,12 @@ fn shortcut_path_with_extension(mut path: PathBuf) -> PathBuf {
         .extension()
         .is_none_or(|current_extension| current_extension != SHORTCUT_EXTENSION)
     {
-        path.set_extension(SHORTCUT_EXTENSION);
+        if let Some(file_name) = path.file_name() {
+            let mut file_name = OsString::from(file_name);
+            file_name.push(".");
+            file_name.push(SHORTCUT_EXTENSION);
+            path.set_file_name(file_name);
+        }
     }
 
     path
