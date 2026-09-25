@@ -224,6 +224,14 @@ pub fn open_dev_null() -> eyre::Result<libc::c_int> {
     Ok(unsafe { cvt(libc::open(c"/dev/null".as_ptr(), libc::O_RDWR))? })
 }
 
+pub fn open_pipe() -> eyre::Result<(OwnedFd, OwnedFd)> {
+    let mut fds = [0, 0];
+    unsafe {
+        super::unix::cvt(libc::pipe2(&mut fds as *mut _, libc::O_CLOEXEC))?;
+        Ok((OwnedFd::from_raw_fd(fds[0]), OwnedFd::from_raw_fd(fds[1])))
+    }
+}
+
 pub(crate) struct WriteableMemoryFile {
     fd: OwnedFd,
 }

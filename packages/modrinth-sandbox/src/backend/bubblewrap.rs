@@ -468,8 +468,6 @@ fn spawn(
         environment.insert("XDG_RUNTIME_DIR".into(), "/run/user/1000".into());
     }
 
-    // todo: wait for dbus proxy to start
-
     // Set up seccomp filtering
     let seccomp_fd = create_seccomp_filter()?;
     builder.push("--seccomp");
@@ -504,6 +502,7 @@ fn spawn(
 
 struct DbusProxy {
     proxy_session_path: PathBuf,
+    _keep_alive_read_fd: OwnedFd,
 }
 
 fn start_dbus_proxy<'a>(
@@ -514,6 +513,8 @@ fn start_dbus_proxy<'a>(
     const DBUS_ADDRESS_ENV: &str = "DBUS_SESSION_BUS_ADDRESS";
 
     env.dbus_proxy.get_or_init(|| {
+        let (keep_alive_read_fd, keep_alive_write_fd) = super::unix::open_pipe()?;
+
         let session_bus_address = std::env::var_os(DBUS_ADDRESS_ENV)
             .wrap_err_with(|| eyre!("reading `{DBUS_ADDRESS_ENV}`"))?;
 
@@ -552,6 +553,7 @@ fn start_dbus_proxy<'a>(
         builder.push(env.xdg_dbus_proxy.clone());
         builder.push(session_bus_address);
         builder.push(proxy_session_path.clone());
+        builder.push(format!("--fd={}", keep_alive_write_fd.as_raw_fd()));
         builder.push("--filter");
         builder.push("--talk=com.feralinteractive.GameMode");
         builder.push("--call=com.feralinteractive.GameMode=/com/feralinteractive/GameMode");
@@ -574,13 +576,24 @@ fn start_dbus_proxy<'a>(
             std::mem::take(&mut builder.arguments),
             environment,
             Some(runtime_dir.to_path_buf()),
-            vec![flatpak_info_fd1, flatpak_info_fd2],
+            vec![flatpak_info_fd1, flatpak_info_fd2, keep_alive_write_fd],
             env.dev_null,
             die_with_parent
         ).wrap_err("spawning child")?;
 
+        // Wait for proxy to start by reading from fd
+        let mut buf = 0 as libc::c_char;
+        unsafe {
+            let start = std::time::Instant::now();
+            if libc::read(keep_alive_read_fd.as_raw_fd(), &mut buf as *mut libc::c_char as *mut _, 1) != 1 {
+                return Err(eyre!("Failed to sync with xdg-dbus-proxy"));
+            }
+            tracing::info!("xdg-dbus-proxy took {:?} to start", std::time::Instant::now() - start);
+        }
+
         eyre::Ok(DbusProxy {
-            proxy_session_path
+            proxy_session_path,
+            _keep_alive_read_fd: keep_alive_read_fd
         })
     }).as_ref()
 }
