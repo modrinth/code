@@ -1,5 +1,5 @@
 use std::{
-    borrow::Cow, collections::BTreeMap, ffi::{CStr, CString, OsStr, OsString}, os::fd::{AsRawFd, OwnedFd}, path::{Path, PathBuf},
+    borrow::Cow, collections::BTreeMap, ffi::{CStr, CString, OsStr, OsString}, io::{PipeReader, PipeWriter}, os::fd::{AsRawFd, OwnedFd}, path::{Path, PathBuf},
 };
 
 use async_trait::async_trait;
@@ -498,6 +498,9 @@ fn spawn(
             env.bwrap.clone().into(),
             std::mem::take(&mut builder.arguments),
             environment,
+            command.stdin,
+            command.stdout,
+            command.stderr,
             command.working_directory,
             vec![flatpak_info_fd1, flatpak_info_fd2, bwrapinfo_fd, seccomp_fd],
             env.dev_null,
@@ -537,6 +540,18 @@ impl SandboxChildTrait for BubblewrapSandboxChild {
 
     async fn kill(&mut self) -> Result<()> {
         self.child.kill().await
+    }
+
+    fn take_stdin(&mut self) -> Option<PipeWriter>  {
+        self.child.take_stdin()
+    }
+
+    fn take_stdout(&mut self) -> Option<PipeReader>  {
+        self.child.take_stdout()
+    }
+
+    fn take_stderr(&mut self) -> Option<PipeReader>  {
+        self.child.take_stderr()
     }
 }
 
@@ -622,6 +637,9 @@ fn start_dbus_proxy(
         env.bwrap.clone().into(),
         std::mem::take(&mut builder.arguments),
         environment,
+        crate::SandboxStdio::Null,
+        crate::SandboxStdio::Null,
+        crate::SandboxStdio::Null,
         Some(runtime_dir.to_path_buf()),
         vec![flatpak_info_fd1, flatpak_info_fd2, keep_alive_write_fd],
         env.dev_null,

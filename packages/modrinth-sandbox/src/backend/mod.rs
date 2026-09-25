@@ -1,9 +1,7 @@
 //! Backend sandbox implementations, using OS-specific primitives.
 
 use std::{
-    collections::{BTreeMap, HashSet},
-    fmt::Debug,
-    path::PathBuf,
+    collections::{BTreeMap, HashSet}, fmt::Debug, io::{PipeReader, PipeWriter}, path::PathBuf,
 };
 
 use async_trait::async_trait;
@@ -105,6 +103,19 @@ pub struct SandboxCommand {
     /// Whether the spawned child should terminate when the parent process
     /// terminates.
     pub die_with_parent: bool,
+    /// Default io behaviour for stdin
+    pub stdin: SandboxStdio,
+    /// Default io behaviour for stdout
+    pub stdout: SandboxStdio,
+    /// Default io behaviour for stderr
+    pub stderr: SandboxStdio,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum SandboxStdio {
+    Null,
+    Inherit,
+    Pipe,
 }
 
 impl SandboxCommand {
@@ -131,6 +142,9 @@ pub trait SandboxChildTrait {
      fn try_wait(&mut self) -> Result<Option<SandboxExitStatus>>;
      async fn wait(&mut self) -> Result<SandboxExitStatus>;
      async fn kill(&mut self) -> Result<()>;
+     fn take_stdin(&mut self) -> Option<PipeWriter>;
+     fn take_stdout(&mut self) -> Option<PipeReader>;
+     fn take_stderr(&mut self) -> Option<PipeReader>;
 }
 
 #[derive(Debug)]
@@ -164,6 +178,24 @@ impl SandboxChildTrait for SandboxChild {
     async fn kill(&mut self) -> Result<()> {
         match &mut self.0 {
             SandboxChildImpl::Bubblewrap(child) => SandboxChildTrait::kill(child).await,
+        }
+    }
+
+    fn take_stdin(&mut self) -> Option<PipeWriter> {
+        match &mut self.0 {
+            SandboxChildImpl::Bubblewrap(child) => SandboxChildTrait::take_stdin(child),
+        }
+    }
+
+    fn take_stdout(&mut self) -> Option<PipeReader> {
+        match &mut self.0 {
+            SandboxChildImpl::Bubblewrap(child) => SandboxChildTrait::take_stdout(child),
+        }
+    }
+
+    fn take_stderr(&mut self) -> Option<PipeReader> {
+        match &mut self.0 {
+            SandboxChildImpl::Bubblewrap(child) => SandboxChildTrait::take_stderr(child),
         }
     }
 }

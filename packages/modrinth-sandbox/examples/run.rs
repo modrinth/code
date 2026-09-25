@@ -44,6 +44,9 @@ async fn main() -> Result<()> {
             network: true,
             is_jvm: false,
             die_with_parent: true,
+            stdin: modrinth_sandbox::SandboxStdio::Null,
+            stdout: modrinth_sandbox::SandboxStdio::Inherit,
+            stderr: modrinth_sandbox::SandboxStdio::Inherit,
         })
         .await
         .wrap_err("spawning process in sandbox")?;

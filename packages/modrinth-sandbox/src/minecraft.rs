@@ -6,7 +6,7 @@ use std::{
 
 use eyre::{Result, ensure};
 
-use crate::{SandboxCommand, util::argument::SandboxArg};
+use crate::{SandboxCommand, SandboxStdio, util::argument::SandboxArg};
 
 #[derive(Debug)]
 pub struct MinecraftCommand {
@@ -38,6 +38,12 @@ pub struct MinecraftCommand {
     pub main_class_args: Vec<SandboxArg>,
     /// Additional environment variables set for the sandboxed process.
     pub extra_environment: BTreeMap<SandboxArg, SandboxArg>,
+    /// Default io behaviour for stdin
+    pub stdin: SandboxStdio,
+    /// Default io behaviour for stdout
+    pub stdout: SandboxStdio,
+    /// Default io behaviour for stderr
+    pub stderr: SandboxStdio,
 }
 
 #[derive(Debug)]
@@ -239,6 +245,9 @@ pub fn create_minecraft_command(
         network: true,
         is_jvm: true,
         die_with_parent: true,
+        stdin: minecraft.stdin,
+        stdout: minecraft.stdout,
+        stderr: minecraft.stderr,
     })
 }
 

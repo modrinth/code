@@ -1,23 +1,21 @@
 use std::{
-    collections::BTreeMap,
-    ffi::{CStr, CString, OsString},
-    io::ErrorKind,
-    os::{
-        fd::{AsRawFd, FromRawFd, OwnedFd},
-        unix::ffi::OsStringExt,
-    },
-    path::PathBuf,
+    collections::BTreeMap, ffi::{CStr, CString, OsString}, io::{ErrorKind, PipeReader, PipeWriter}, os::{
+        fd::{AsRawFd, FromRawFd, OwnedFd, RawFd}, unix::ffi::OsStringExt,
+    }, path::PathBuf,
 };
 
 use async_trait::async_trait;
 use eyre::Result;
 
-use crate::{SandboxExitStatus, backend::SandboxChildTrait, util::argument::SandboxArg};
+use crate::{SandboxExitStatus, SandboxStdio, backend::SandboxChildTrait, util::argument::SandboxArg};
 
 pub(crate) fn spawn(
     program: SandboxArg,
     arguments: Vec<SandboxArg>,
     environment: BTreeMap<SandboxArg, SandboxArg>,
+    stdin: SandboxStdio,
+    stdout: SandboxStdio,
+    stderr: SandboxStdio,
     working_directory: Option<PathBuf>,
     pass_fds: Vec<OwnedFd>,
     dev_null: libc::c_int,
@@ -50,6 +48,53 @@ pub(crate) fn spawn(
         None
     };
 
+    // Stdio
+    let mut stdin_write = None;
+    let mut stdout_read = None;
+    let mut stderr_read = None;
+
+    let mut fds_to_drop: Vec<OwnedFd> = Vec::new();
+    let mut stdin_read = None;
+    let mut stdout_write = None;
+    let mut stderr_write = None;
+
+    match stdin {
+        SandboxStdio::Null => {
+            stdin_read = Some(dev_null);
+        },
+        SandboxStdio::Inherit => {},
+        SandboxStdio::Pipe => {
+            let (read, write) = std::io::pipe()?;
+            stdin_write = Some(write);
+            stdin_read = Some(read.as_raw_fd());
+            fds_to_drop.push(read.into());
+        }
+    }
+    match stdout {
+        SandboxStdio::Pipe => {
+            let (read, write) = std::io::pipe()?;
+            stdout_read = Some(read);
+            stdout_write = Some(write.as_raw_fd());
+            fds_to_drop.push(write.into());
+        },
+        SandboxStdio::Null => {
+            stdout_write = Some(dev_null);
+        },
+        SandboxStdio::Inherit => {},
+    }
+    match stderr {
+        SandboxStdio::Pipe => {
+            let (read, write) = std::io::pipe()?;
+            stderr_read = Some(read);
+            stderr_write = Some(write.as_raw_fd());
+            fds_to_drop.push(write.into());
+        },
+        SandboxStdio::Null => {
+            stderr_write = Some(dev_null);
+        },
+        SandboxStdio::Inherit => {},
+    }
+
     argv.ensure_null_terminated();
     env.ensure_null_terminated();
 
@@ -59,9 +104,11 @@ pub(crate) fn spawn(
             program.as_ptr(),
             argv.into_null_terminated_ptr() as *const *const libc::c_char,
             env.into_null_terminated_ptr() as *const *const libc::c_char,
+            stdin_read,
+            stdout_write,
+            stderr_write,
             workdir.as_ref().map(|dir| dir.as_ptr()),
             &pass_fds,
-            dev_null,
             #[cfg(target_os = "linux")]
             die_with_parent,
         );
@@ -71,6 +118,9 @@ pub(crate) fn spawn(
     Ok(UnixSandboxChild {
         pid,
         exit_status: None,
+        stdin: stdin_write,
+        stdout: stdout_read,
+        stderr: stderr_read,
     })
 }
 
@@ -78,18 +128,34 @@ fn exec(
     program: *const libc::c_char,
     argv: *const *const libc::c_char,
     env: *const *const libc::c_char,
+    stdin: Option<RawFd>,
+    stdout: Option<RawFd>,
+    stderr: Option<RawFd>,
     workdir: Option<*const libc::c_char>,
     pass_fds: &[OwnedFd],
-    dev_null: libc::c_int,
     #[cfg(target_os = "linux")] die_with_parent: bool,
 ) -> std::io::Result<()> {
     unsafe {
         *environ() = env;
 
-        // Make stdin/stdout/stderr point to /dev/null
-        cvt_r(|| libc::dup2(dev_null, libc::STDIN_FILENO))?;
-        cvt_r(|| libc::dup2(dev_null, libc::STDOUT_FILENO))?;
-        cvt_r(|| libc::dup2(dev_null, libc::STDERR_FILENO))?;
+        if let Some(mut fd) = stdin {
+            if fd > 0 && fd <= libc::STDERR_FILENO {
+                fd = cvt_r(|| libc::dup(fd))?;
+            }
+            cvt_r(|| libc::dup2(fd, libc::STDIN_FILENO))?;
+        }
+        if let Some(mut fd) = stdout {
+            if fd > 0 && fd <= libc::STDERR_FILENO {
+                fd = cvt_r(|| libc::dup(fd))?;
+            }
+            cvt_r(|| libc::dup2(fd, libc::STDOUT_FILENO))?;
+        }
+        if let Some(mut fd) = stderr {
+            if fd > 0 && fd <= libc::STDERR_FILENO {
+                fd = cvt_r(|| libc::dup(fd))?;
+            }
+            cvt_r(|| libc::dup2(fd, libc::STDERR_FILENO))?;
+        }
 
         // Set working directory
         if let Some(workdir) = workdir {
@@ -119,6 +185,9 @@ fn exec(
 pub struct UnixSandboxChild {
     pid: libc::pid_t,
     exit_status: Option<SandboxExitStatus>,
+    stdin: Option<PipeWriter>,
+    stdout: Option<PipeReader>,
+    stderr: Option<PipeReader>,
 }
 
  #[async_trait]
@@ -174,6 +243,18 @@ impl SandboxChildTrait for UnixSandboxChild {
         })
         .await??;
         Ok(())
+    }
+
+    fn take_stdin(&mut self) -> Option<PipeWriter>  {
+        self.stdin.take()
+    }
+
+    fn take_stdout(&mut self) -> Option<PipeReader>  {
+        self.stdout.take()
+    }
+
+    fn take_stderr(&mut self) -> Option<PipeReader>  {
+        self.stderr.take()
     }
 }
 

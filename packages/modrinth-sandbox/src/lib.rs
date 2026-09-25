@@ -7,7 +7,7 @@ use std::sync::Arc;
 use derive_more::Debug;
 use eyre::Result;
 
-pub use backend::{SandboxChild, SandboxChildTrait, SandboxCommand, SandboxExitStatus};
+pub use backend::{SandboxChild, SandboxChildTrait, SandboxCommand, SandboxStdio, SandboxExitStatus};
 pub use minecraft::*;
 pub use util::argument::SandboxArg;
 

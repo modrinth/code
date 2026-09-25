@@ -223,8 +223,17 @@ impl ProcessManager {
         }
 
         let command = create_minecraft_command(mc_command)?;
-        let mc_proc = sandbox_env.spawn(command).await?;
+        let mut mc_proc = sandbox_env.spawn(command).await?;
         let child_pid = mc_proc.id();
+
+        let stdout = mc_proc
+            .take_stdout()
+            .map(|reader| tokio::net::unix::pipe::Receiver::from_owned_fd(reader.into()))
+            .transpose()?;
+        let stderr = mc_proc
+            .take_stderr()
+            .map(|reader| tokio::net::unix::pipe::Receiver::from_owned_fd(reader.into()))
+            .transpose()?;
 
         let mut process = Process {
             metadata: ProcessMetadata {
@@ -300,6 +309,40 @@ impl ProcessManager {
         }
 
         let metadata = process.metadata.clone();
+
+        if let Some(stdout) = stdout {
+            let log_path_clone = log_path.clone();
+
+            let instance_id = metadata.instance_id.clone();
+            let instance_path = metadata.instance_path.clone();
+            tokio::spawn(async move {
+                Process::process_output(
+                    &instance_id,
+                    &instance_path,
+                    stdout,
+                    log_path_clone,
+                    xml_logging,
+                )
+                .await;
+            });
+        }
+
+        if let Some(stderr) = stderr {
+            let log_path_clone = log_path.clone();
+
+            let instance_id = metadata.instance_id.clone();
+            let instance_path = metadata.instance_path.clone();
+            tokio::spawn(async move {
+                Process::process_output(
+                    &instance_id,
+                    &instance_path,
+                    stderr,
+                    log_path_clone,
+                    xml_logging,
+                )
+                .await;
+            });
+        }
 
         self.processes.insert(process.metadata.uuid, process);
 
