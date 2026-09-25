@@ -20,7 +20,7 @@ use crate::state::{
 };
 use crate::util::io;
 use crate::util::rpc::RpcServerBuilder;
-use crate::{State, get_resource_file, process};
+use crate::{State, process};
 use chrono::Utc;
 use daedalus as d;
 use daedalus::minecraft::{
@@ -1041,8 +1041,12 @@ pub async fn launch_minecraft(
         address.resolve().await?;
     }
 
-    let (main_class_keep_alive, main_class_path) =
-        get_resource_file!(env "JAVA_JARS_DIR" / "theseus.jar")?;
+    let (main_class_keep_alive, main_class_path) = io::temporary_file_in(
+        state.directories.metadata_dir().join("launcher-temp"),
+        "theseus.jar",
+        include_bytes!(concat!(env!("JAVA_JARS_DIR"), "/theseus.jar")),
+    )
+    .await?;
 
     let rpc_server = RpcServerBuilder::new().launch().await?;
 

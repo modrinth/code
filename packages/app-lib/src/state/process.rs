@@ -255,6 +255,39 @@ impl ProcessManager {
             rpc_server,
             _main_class_keep_alive: main_class_keep_alive,
         };
+        let metadata = process.metadata.clone();
+
+        {
+            let log_path = log_path.clone();
+            let instance_id = metadata.instance_id.clone();
+            let instance_path = metadata.instance_path.clone();
+            tokio::spawn(async move {
+                Process::process_output(
+                    &instance_id,
+                    &instance_path,
+                    stdout,
+                    log_path,
+                    xml_logging,
+                )
+                .await;
+            });
+        }
+
+        {
+            let log_path = log_path.clone();
+            let instance_id = metadata.instance_id.clone();
+            let instance_path = metadata.instance_path.clone();
+            tokio::spawn(async move {
+                Process::process_output(
+                    &instance_id,
+                    &instance_path,
+                    stderr,
+                    log_path,
+                    xml_logging,
+                )
+                .await;
+            });
+        }
 
         let state = match crate::State::get().await {
             Ok(state) => state,
@@ -296,18 +329,50 @@ impl ProcessManager {
             }
         }
 
-        let post_process_result = match tokio::time::timeout(
-            Duration::from_secs(30),
-            post_process_init(&process.metadata, &process.rpc_server),
-        )
-        .await
-        {
-            Ok(result) => result,
-            Err(_) => Err(crate::ErrorKind::LauncherError(
-                "Timed out waiting for Minecraft launcher initialization"
-                    .to_owned(),
-            )
-            .as_error()),
+        let rpc_address = process.rpc_server.address();
+        info!(
+            %rpc_address,
+            log_path = %log_path.display(),
+            "waiting for Minecraft launcher RPC initialization"
+        );
+
+        let post_process_result = {
+            let mut child_poll =
+                tokio::time::interval(Duration::from_millis(100));
+            child_poll.set_missed_tick_behavior(
+                tokio::time::MissedTickBehavior::Skip,
+            );
+            let timeout = tokio::time::sleep(Duration::from_secs(30));
+            tokio::pin!(timeout);
+            let initialization =
+                post_process_init(&process.metadata, &process.rpc_server);
+            tokio::pin!(initialization);
+
+            loop {
+                tokio::select! {
+                    result = &mut initialization => break result,
+                    _ = &mut timeout => {
+                        break Err(crate::ErrorKind::LauncherError(format!(
+                            "Timed out waiting for Minecraft launcher initialization at {rpc_address}; see {}",
+                            log_path.display(),
+                        )).as_error());
+                    }
+                    // TODO: it's not good that we're polling here. we should use `child.wait()`,
+                    // but that's not cancel-safe (bwrap's isnt cancel safe yet).
+                    _ = child_poll.tick() => {
+                        match process.child.try_wait() {
+                            Ok(Some(status)) => {
+                                break Err(crate::ErrorKind::LauncherError(format!(
+                                    "Minecraft launcher exited with {status} before initializing; see {}",
+                                    log_path.display(),
+                                )).as_error());
+                            }
+                            Ok(None) => {}
+                            Err(error) => break Err(error.into()),
+                        }
+                    }
+                }
+            }
         };
         if let Err(error) = post_process_result {
             tracing::error!("Failed to run post-process init: {error}");
@@ -315,42 +380,7 @@ impl ProcessManager {
             let _ = process.child.kill().await;
             return Err(error);
         }
-
-        let metadata = process.metadata.clone();
-
-        {
-            let log_path_clone = log_path.clone();
-
-            let instance_id = metadata.instance_id.clone();
-            let instance_path = metadata.instance_path.clone();
-            tokio::spawn(async move {
-                Process::process_output(
-                    &instance_id,
-                    &instance_path,
-                    stdout,
-                    log_path_clone,
-                    xml_logging,
-                )
-                .await;
-            });
-        }
-
-        {
-            let log_path_clone = log_path.clone();
-
-            let instance_id = metadata.instance_id.clone();
-            let instance_path = metadata.instance_path.clone();
-            tokio::spawn(async move {
-                Process::process_output(
-                    &instance_id,
-                    &instance_path,
-                    stderr,
-                    log_path_clone,
-                    xml_logging,
-                )
-                .await;
-            });
-        }
+        info!(%rpc_address, "Minecraft launcher RPC initialization completed");
 
         self.processes.insert(process.metadata.uuid, process);
 

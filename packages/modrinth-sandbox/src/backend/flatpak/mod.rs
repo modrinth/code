@@ -169,10 +169,13 @@ async fn spawn(
         read
     };
 
-    let flags = SpawnFlags::CLEAR_ENV
+    let mut flags = SpawnFlags::CLEAR_ENV
         | SpawnFlags::SANDBOX
         | SpawnFlags::WATCH_BUS
         | SpawnFlags::EMPTY_APP;
+    if !command.network {
+        flags |= SpawnFlags::NO_NETWORK;
+    }
 
     let sandbox_expose_fd = command
         .read_write_paths
@@ -302,6 +305,7 @@ async fn spawn(
             flatpak_pid,
             flatpak_portal: env.flatpak_portal.clone(),
             rx_exited: Some(rx_exited),
+            exit_status: None,
         }),
     })
 }
@@ -329,6 +333,7 @@ pub struct FlatpakChild {
     flatpak_pid: u32,
     flatpak_portal: dbus::FlatpakPortalProxy<'static>,
     rx_exited: Option<oneshot::Receiver<SandboxExitStatus>>,
+    exit_status: Option<SandboxExitStatus>,
 }
 
 #[async_trait]
@@ -338,12 +343,20 @@ impl SandboxChildOp for FlatpakChild {
     }
 
     fn try_wait(&mut self) -> Result<Option<SandboxExitStatus>> {
+        if let Some(exit_status) = self.exit_status {
+            return Ok(Some(exit_status));
+        }
+
         let rx_exited = self
             .rx_exited
             .as_mut()
-            .ok_or_eyre("already received exit status")?;
+            .ok_or_eyre("missing exit status receiver")?;
         match rx_exited.try_recv() {
-            Ok(t) => Ok(Some(t)),
+            Ok(exit_status) => {
+                self.rx_exited = None;
+                self.exit_status = Some(exit_status);
+                Ok(Some(exit_status))
+            }
             Err(oneshot::error::TryRecvError::Empty) => Ok(None),
             Err(oneshot::error::TryRecvError::Closed) => {
                 bail!("channel closed")
@@ -352,11 +365,19 @@ impl SandboxChildOp for FlatpakChild {
     }
 
     async fn wait(&mut self) -> Result<SandboxExitStatus> {
-        self.rx_exited
-            .take()
-            .ok_or_eyre("already received exit status")?
+        if let Some(exit_status) = self.exit_status {
+            return Ok(exit_status);
+        }
+
+        let exit_status = self
+            .rx_exited
+            .as_mut()
+            .ok_or_eyre("missing exit status receiver")?
             .await
-            .wrap_err("channel closed")
+            .wrap_err("channel closed")?;
+        self.rx_exited = None;
+        self.exit_status = Some(exit_status);
+        Ok(exit_status)
     }
 
     async fn kill(&mut self) -> Result<()> {
