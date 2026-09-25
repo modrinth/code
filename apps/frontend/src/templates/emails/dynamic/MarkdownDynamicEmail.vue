@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { renderString } from '@modrinth/utils'
-import { Heading } from '@vue-email/components'
+import { Heading, Markdown } from '@vue-email/components'
 
 import StyledEmail from '../shared/StyledEmail.vue'
 
@@ -16,6 +15,6 @@ const props = defineProps<{
 			{{ props.title }}
 		</Heading>
 
-		<div v-html="renderString(props.body)" />
+		<Markdown :source="props.body" />
 	</StyledEmail>
 </template>

@@ -53,7 +53,15 @@
 	},
 	"pnpm": {
 		"patchedDependencies": {
-			"readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"
+			"readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch",
+			"@vue-email/markdown@0.0.7": "patches/@vue-email__markdown@0.0.7.patch"
+		},
+		"packageExtensions": {
+			"@vue-email/markdown@0.0.7": {
+				"dependencies": {
+					"xss": "^1.0.14"
+				}
+			}
 		},
 		"peerDependencyRules": {
 			"allowedVersions": {

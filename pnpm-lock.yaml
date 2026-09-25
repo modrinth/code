@@ -4,7 +4,12 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+packageExtensionsChecksum: sha256-GmICvIni5Nch5wyrJ+6StQ+BPUkvMjJcmw6K5FzXkg0=
+
 patchedDependencies:
+  '@vue-email/markdown@0.0.7':
+    hash: 74b9a61c29070865eb56aae15f58d6974cf081e4239a6fce97d7085544381666
+    path: patches/@vue-email__markdown@0.0.7.patch
   readable-stream@2.3.8:
     hash: 3045f7adf989b4e668a4a13819b7285b0de186b79bbf22408acaf2a41c6eaa86
     path: patches/readable-stream@2.3.8.patch
@@ -15000,7 +15005,7 @@ snapshots:
       '@vue-email/html': 0.0.3(vue@3.5.27(typescript@5.9.3))
       '@vue-email/img': 0.0.3(vue@3.5.27(typescript@5.9.3))
       '@vue-email/link': 0.0.3(vue@3.5.27(typescript@5.9.3))
-      '@vue-email/markdown': 0.0.7(vue@3.5.27(typescript@5.9.3))
+      '@vue-email/markdown': 0.0.7(patch_hash=74b9a61c29070865eb56aae15f58d6974cf081e4239a6fce97d7085544381666)(vue@3.5.27(typescript@5.9.3))
       '@vue-email/preview': 0.0.3(vue@3.5.27(typescript@5.9.3))
       '@vue-email/render': 0.0.9(typescript@5.9.3)
       '@vue-email/row': 0.0.3(vue@3.5.27(typescript@5.9.3))
@@ -15044,10 +15049,11 @@ snapshots:
     dependencies:
       vue: 3.5.27(typescript@5.9.3)
 
-  '@vue-email/markdown@0.0.7(vue@3.5.27(typescript@5.9.3))':
+  '@vue-email/markdown@0.0.7(patch_hash=74b9a61c29070865eb56aae15f58d6974cf081e4239a6fce97d7085544381666)(vue@3.5.27(typescript@5.9.3))':
     dependencies:
       marked: 7.0.4
       vue: 3.5.27(typescript@5.9.3)
+      xss: 1.0.15
 
   '@vue-email/preview@0.0.3(vue@3.5.27(typescript@5.9.3))':
     dependencies:
