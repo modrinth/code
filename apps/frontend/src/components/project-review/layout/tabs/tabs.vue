@@ -44,15 +44,15 @@ const theme: DockviewTheme = {
 
 <style scoped>
 .project-review-tabs :deep(.project-review-dock) {
-	--dv-activegroup-visiblepanel-tab-color: var(--color-contrast);
-	--dv-inactivegroup-visiblepanel-tab-color: var(--color-contrast);
-	--dv-activegroup-hiddenpanel-tab-color: var(--color-secondary);
-	--dv-inactivegroup-hiddenpanel-tab-color: var(--color-secondary);
+	--dv-activegroup-visiblepanel-tab-color: var(--color-green);
+	--dv-inactivegroup-visiblepanel-tab-color: var(--color-green);
+	--dv-activegroup-hiddenpanel-tab-color: var(--color-text-default);
+	--dv-inactivegroup-hiddenpanel-tab-color: var(--color-text-default);
 	--dv-icon-hover-background-color: var(--surface-3);
 	--dv-tabs-container-scrollbar-color: var(--surface-5);
-	--dv-tab-divider-color: var(--surface-4);
-	--dv-tabs-and-actions-container-height: 28px;
-	--dv-tabs-and-actions-container-font-size: 13px;
+	--dv-tab-divider-color: transparent;
+	--dv-tabs-and-actions-container-height: 32px;
+	--dv-tabs-and-actions-container-font-size: 14px;
 	--dv-drag-over-background-color: color-mix(in srgb, var(--color-text-default) 5%, transparent);
 	--dv-drag-over-border-color: color-mix(in srgb, var(--color-text-default) 10%, transparent);
 	--dv-drag-over-border: 1px solid var(--dv-drag-over-border-color);
@@ -63,27 +63,36 @@ const theme: DockviewTheme = {
 	min-height: var(--dv-tabs-and-actions-container-height);
 	align-items: flex-start;
 	padding: 10px 6px 0 10px;
-	gap: 0px;
+	gap: 4px;
 }
 
 .project-review-tabs :deep(.dv-tabs-container) {
+	@apply rounded-xl border border-solid border-surface-5 p-0.5 shadow-sm;
+
 	flex-wrap: wrap;
 	height: auto;
 	overflow: visible;
 	align-content: flex-start;
-	row-gap: 4px;
+	gap: 4px;
 }
 
 .project-review-tabs :deep(.dv-pre-actions-container),
 .project-review-tabs :deep(.dv-left-actions-container),
 .project-review-tabs :deep(.dv-right-actions-container),
 .project-review-tabs :deep(.dv-void-container) {
-	height: var(--dv-tabs-and-actions-container-height);
+	height: calc(var(--dv-tabs-and-actions-container-height) + 6px);
 }
 
 .project-review-tabs :deep(.dv-tab) {
 	height: var(--dv-tabs-and-actions-container-height);
-	padding: 0 2px;
+	padding: 0;
+	border-radius: 10px;
+}
+
+.project-review-tabs :deep(.dv-tab:focus-visible::after),
+.project-review-tabs :deep(.dv-tab:has(:focus-visible)::after) {
+	border-radius: 10px;
+	box-shadow: 0 0 0 4px var(--color-brand-shadow);
 }
 
 .project-review-tabs

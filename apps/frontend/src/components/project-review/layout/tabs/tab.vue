@@ -1,7 +1,11 @@
 <template>
 	<span
-		class="project-review-tab box-border flex h-full w-full items-center whitespace-nowrap rounded-lg border border-solid border-transparent px-2 text-[13px] font-semibold leading-none transition-colors duration-150 hover:text-contrast motion-reduce:transition-none"
-		:class="isActive ? 'project-review-tab-active text-contrast' : 'text-secondary'"
+		class="box-border flex h-full w-full items-center justify-center whitespace-nowrap rounded-[10px] border border-solid px-2.5 text-sm font-medium transition-all active:scale-[0.97] motion-reduce:transition-none"
+		:class="
+			isActive
+				? 'border-green bg-highlight-green text-green'
+				: 'border-transparent bg-transparent text-primary hover:bg-surface-4'
+		"
 	>
 		<span>
 			{{ formatMessage(projectReviewMessages[params.params.tab]) }}
@@ -44,13 +48,3 @@ watchEffect((onCleanup) => {
 	onCleanup(() => subscription.dispose())
 })
 </script>
-
-<style scoped>
-.project-review-tab:not(.project-review-tab-active):hover {
-	background-color: var(--surface-3);
-}
-
-.project-review-tab-active {
-	background-color: var(--surface-4);
-}
-</style>
