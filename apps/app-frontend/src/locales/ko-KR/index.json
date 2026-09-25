@@ -686,15 +686,6 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "인스턴스"
   },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "{current, number}/{total, number} 프로젝트 다운로드 중..."
-  },
-  "app.instance.mods.bulk-update.finishing": {
-    "message": "업데이트 마무리 중..."
-  },
-  "app.instance.mods.bulk-update.resolving-versions": {
-    "message": "버전 해결 중..."
-  },
   "app.instance.mods.content-type-project": {
     "message": "프로젝트"
   },

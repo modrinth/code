@@ -257,12 +257,6 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "Tilfelle"
   },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "Laster ned {current, number}/{total, number} prosjekter..."
-  },
-  "app.instance.mods.bulk-update.finishing": {
-    "message": "Fullfører oppdatering..."
-  },
   "app.instance.mods.content-type-project": {
     "message": "prosjekt"
   },

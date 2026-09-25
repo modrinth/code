@@ -668,15 +668,6 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "Instans"
   },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "Laddar ner {current, number}/{total, number} projekt..."
-  },
-  "app.instance.mods.bulk-update.finishing": {
-    "message": "Slutför uppdatering..."
-  },
-  "app.instance.mods.bulk-update.resolving-versions": {
-    "message": "Fastställer versioner..."
-  },
   "app.instance.mods.content-type-project": {
     "message": "projekt"
   },
