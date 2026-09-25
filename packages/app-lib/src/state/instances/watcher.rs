@@ -7,8 +7,15 @@ use crate::state::{
 };
 use crate::worlds::WorldType;
 use dashmap::{DashMap, mapref::entry::Entry};
-use notify::{RecommendedWatcher, RecursiveMode};
-use notify_debouncer_mini::{DebounceEventResult, Debouncer, new_debouncer};
+use notify::event::AccessKind;
+use notify::{
+    EventHandler, EventKind, RecommendedWatcher, RecursiveMode, Watcher,
+    WatcherKind,
+};
+use notify_debouncer_mini::{
+    DebounceEventResult, Debouncer, new_debouncer_opt,
+};
+use std::path::Path;
 use std::sync::LazyLock;
 use std::{
     collections::{HashMap, HashSet},
@@ -19,8 +26,50 @@ use tokio::sync::{RwLock, mpsc::channel};
 
 use super::adapters::sqlite::instance_rows;
 
+/// Wraps the platform watcher and drops open events, which inotify reports
+/// for plain reads. Without this, the app reading instance files (hashing
+/// mods, parsing `options.txt`) looks like a change and queues another pass
+/// that reads the same files again.
+struct ChangeWatcher(RecommendedWatcher);
+
+impl Watcher for ChangeWatcher {
+    fn new<F: EventHandler>(
+        mut event_handler: F,
+        config: notify::Config,
+    ) -> notify::Result<Self> {
+        RecommendedWatcher::new(
+            move |event: notify::Result<notify::Event>| {
+                let is_open = event.as_ref().is_ok_and(|event| {
+                    matches!(event.kind, EventKind::Access(AccessKind::Open(_)))
+                });
+                if !is_open {
+                    event_handler.handle_event(event);
+                }
+            },
+            config,
+        )
+        .map(Self)
+    }
+
+    fn watch(
+        &mut self,
+        path: &Path,
+        recursive_mode: RecursiveMode,
+    ) -> notify::Result<()> {
+        self.0.watch(path, recursive_mode)
+    }
+
+    fn unwatch(&mut self, path: &Path) -> notify::Result<()> {
+        self.0.unwatch(path)
+    }
+
+    fn kind() -> WatcherKind {
+        RecommendedWatcher::kind()
+    }
+}
+
 pub struct FileWatcher {
-    watcher: RwLock<Debouncer<RecommendedWatcher>>,
+    watcher: RwLock<Debouncer<ChangeWatcher>>,
     instance_ids: Arc<RwLock<HashMap<String, String>>>,
 }
 
@@ -97,8 +146,9 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
     let instance_ids = Arc::new(RwLock::new(HashMap::<String, String>::new()));
     let event_instance_ids = instance_ids.clone();
 
-    let file_watcher = new_debouncer(
-        Duration::from_secs_f32(1.0),
+    let file_watcher = new_debouncer_opt::<_, ChangeWatcher>(
+        notify_debouncer_mini::Config::default()
+            .with_timeout(Duration::from_secs_f32(1.0)),
         move |res: DebounceEventResult| {
             tx.blocking_send(res).ok();
         },
