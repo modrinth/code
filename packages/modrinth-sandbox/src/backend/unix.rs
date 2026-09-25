@@ -3,7 +3,7 @@ use std::{
     ffi::{CStr, CString, OsString},
     io::ErrorKind,
     os::{
-        fd::{AsRawFd, FromRawFd, OwnedFd, RawFd},
+        fd::{AsRawFd, FromRawFd, OwnedFd},
         unix::ffi::OsStringExt,
     },
     path::PathBuf,
@@ -239,15 +239,13 @@ impl WriteableMemoryFile {
         Ok(Self { fd })
     }
 
-    pub fn as_raw_fd(&self) -> RawFd {
-        self.fd.as_raw_fd()
+    pub fn write_filter(mut self, filter: libseccomp::ScmpFilterContext) -> eyre::Result<OwnedFd> {
+        filter.export_bpf(&self.fd)?;
+        self.reset_and_seal()?;
+        Ok(self.fd)
     }
 
-    pub fn into_owned_fd(self) -> OwnedFd {
-        self.fd
-    }
-
-    pub fn write(self, data: &CStr) -> eyre::Result<OwnedFd> {
+    pub fn write(mut self, data: &CStr) -> eyre::Result<OwnedFd> {
         unsafe {
             let fd = self.fd.as_raw_fd();
             cvt(libc::write(
@@ -255,6 +253,14 @@ impl WriteableMemoryFile {
                 data.as_ptr().cast(),
                 data.count_bytes() as libc::size_t,
             ))?;
+            self.reset_and_seal()?;
+        }
+        Ok(self.fd)
+    }
+
+    fn reset_and_seal(&mut self) -> eyre::Result<()> {
+        unsafe {
+            let fd = self.fd.as_raw_fd();
             libc::lseek(fd, 0, libc::SEEK_SET);
             cvt(libc::fcntl(
                 fd,
@@ -265,7 +271,7 @@ impl WriteableMemoryFile {
                     | libc::F_SEAL_WRITE,
             ))?;
         }
-        Ok(self.fd)
+        Ok(())
     }
 }
 

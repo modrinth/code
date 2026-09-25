@@ -10,6 +10,7 @@ use std::{
 use async_trait::async_trait;
 use derive_more::Debug;
 use eyre::{Context, ContextCompat, Result, eyre};
+use libseccomp::{ScmpAction, ScmpArgCompare, ScmpCompareOp, ScmpFilterContext, ScmpSyscall};
 use uuid::Uuid;
 
 use crate::{
@@ -408,9 +409,6 @@ fn spawn(
         builder.bind_if_exists(BindType::ReadWrite, path.clone(), false);
     }
 
-    // todo: seccomp filtering
-    // todo: dbus proxy
-
     // Set up /.flatpak-info
     let flatpak_info_fd1 = super::unix::WriteableMemoryFile::open(
         c"modrinth-sandbox-bwrap-flatpak-info1",
@@ -472,6 +470,11 @@ fn spawn(
 
     // todo: wait for dbus proxy to start
 
+    // Set up seccomp filtering
+    let seccomp_fd = create_seccomp_filter()?;
+    builder.push("--seccomp");
+    builder.push(format!("{}", seccomp_fd.as_raw_fd()));
+
     builder.push("--");
     builder.push(command.executable);
     for arg in command.args {
@@ -492,7 +495,7 @@ fn spawn(
             std::mem::take(&mut builder.arguments),
             environment,
             command.working_directory,
-            vec![flatpak_info_fd1, flatpak_info_fd2, tmp_bwrapinfo_fd],
+            vec![flatpak_info_fd1, flatpak_info_fd2, tmp_bwrapinfo_fd, seccomp_fd],
             env.dev_null,
             command.die_with_parent,
         )?,
@@ -593,4 +596,434 @@ fn get_card_names() -> Vec<OsString> {
     }
 
     card_names
+}
+
+// Syscall allowlist copied from https://github.com/moby/profiles/blob/fa50b7287199d1c781284d1a34d1395a62e57f1e/seccomp/default.json
+// Licensed as Apache 2.0 (https://github.com/moby/profiles/blob/fa50b7287199d1c781284d1a34d1395a62e57f1e/LICENSE)
+const ALLOWED_SYSCALLS: &[&'static str] = &[
+    "accept",
+    "accept4",
+    "access",
+    "adjtimex",
+    "alarm",
+    "bind",
+    "brk",
+    "cachestat",
+    "capget",
+    "capset",
+    "chdir",
+    "chmod",
+    "chown",
+    "chown32",
+    "clock_adjtime",
+    "clock_adjtime64",
+    "clock_getres",
+    "clock_getres_time64",
+    "clock_gettime",
+    "clock_gettime64",
+    "clock_nanosleep",
+    "clock_nanosleep_time64",
+    "close",
+    "close_range",
+    "connect",
+    "copy_file_range",
+    "creat",
+    "dup",
+    "dup2",
+    "dup3",
+    "epoll_create",
+    "epoll_create1",
+    "epoll_ctl",
+    "epoll_ctl_old",
+    "epoll_pwait",
+    "epoll_pwait2",
+    "epoll_wait",
+    "epoll_wait_old",
+    "eventfd",
+    "eventfd2",
+    "execve",
+    "execveat",
+    "exit",
+    "exit_group",
+    "faccessat",
+    "faccessat2",
+    "fadvise64",
+    "fadvise64_64",
+    "fallocate",
+    "fanotify_mark",
+    "fchdir",
+    "fchmod",
+    "fchmodat",
+    "fchmodat2",
+    "fchown",
+    "fchown32",
+    "fchownat",
+    "fcntl",
+    "fcntl64",
+    "fdatasync",
+    "fgetxattr",
+    "flistxattr",
+    "flock",
+    "fork",
+    "fremovexattr",
+    "fsetxattr",
+    "fstat",
+    "fstat64",
+    "fstatat64",
+    "fstatfs",
+    "fstatfs64",
+    "fsync",
+    "ftruncate",
+    "ftruncate64",
+    "futex",
+    "futex_requeue",
+    "futex_time64",
+    "futex_wait",
+    "futex_waitv",
+    "futex_wake",
+    "futimesat",
+    "getcpu",
+    "getcwd",
+    "getdents",
+    "getdents64",
+    "getegid",
+    "getegid32",
+    "geteuid",
+    "geteuid32",
+    "getgid",
+    "getgid32",
+    "getgroups",
+    "getgroups32",
+    "getitimer",
+    "getpeername",
+    "getpgid",
+    "getpgrp",
+    "getpid",
+    "getppid",
+    "getpriority",
+    "getrandom",
+    "getresgid",
+    "getresgid32",
+    "getresuid",
+    "getresuid32",
+    "getrlimit",
+    "get_robust_list",
+    "getrusage",
+    "getsid",
+    "getsockname",
+    "getsockopt",
+    "get_thread_area",
+    "gettid",
+    "gettimeofday",
+    "getuid",
+    "getuid32",
+    "getxattr",
+    "getxattrat",
+    "inotify_add_watch",
+    "inotify_init",
+    "inotify_init1",
+    "inotify_rm_watch",
+    "io_cancel",
+    "ioctl",
+    "io_destroy",
+    "io_getevents",
+    "io_pgetevents",
+    "io_pgetevents_time64",
+    "ioprio_get",
+    "ioprio_set",
+    "io_setup",
+    "io_submit",
+    "ipc",
+    "kill",
+    "landlock_add_rule",
+    "landlock_create_ruleset",
+    "landlock_restrict_self",
+    "lchown",
+    "lchown32",
+    "lgetxattr",
+    "link",
+    "linkat",
+    "listen",
+    "listmount",
+    "listxattr",
+    "listxattrat",
+    "llistxattr",
+    "_llseek",
+    "lremovexattr",
+    "lseek",
+    "lsetxattr",
+    "lstat",
+    "lstat64",
+    "madvise",
+    "map_shadow_stack",
+    "membarrier",
+    "memfd_create",
+    "memfd_secret",
+    "mincore",
+    "mkdir",
+    "mkdirat",
+    "mknod",
+    "mknodat",
+    "mlock",
+    "mlock2",
+    "mlockall",
+    "mmap",
+    "mmap2",
+    "mprotect",
+    "mq_getsetattr",
+    "mq_notify",
+    "mq_open",
+    "mq_timedreceive",
+    "mq_timedreceive_time64",
+    "mq_timedsend",
+    "mq_timedsend_time64",
+    "mq_unlink",
+    "mremap",
+    "mseal",
+    "msgctl",
+    "msgget",
+    "msgrcv",
+    "msgsnd",
+    "msync",
+    "munlock",
+    "munlockall",
+    "munmap",
+    "name_to_handle_at",
+    "nanosleep",
+    "newfstatat",
+    "_newselect",
+    "open",
+    "openat",
+    "openat2",
+    "pause",
+    "pidfd_open",
+    "pidfd_send_signal",
+    "pipe",
+    "pipe2",
+    "pkey_alloc",
+    "pkey_free",
+    "pkey_mprotect",
+    "poll",
+    "ppoll",
+    "ppoll_time64",
+    "prctl",
+    "pread64",
+    "preadv",
+    "preadv2",
+    "prlimit64",
+    "process_mrelease",
+    "pselect6",
+    "pselect6_time64",
+    "pwrite64",
+    "pwritev",
+    "pwritev2",
+    "read",
+    "readahead",
+    "readlink",
+    "readlinkat",
+    "readv",
+    "recv",
+    "recvfrom",
+    "recvmmsg",
+    "recvmmsg_time64",
+    "recvmsg",
+    "remap_file_pages",
+    "removexattr",
+    "removexattrat",
+    "rename",
+    "renameat",
+    "renameat2",
+    "restart_syscall",
+    "riscv_hwprobe",
+    "rmdir",
+    "rseq",
+    "rt_sigaction",
+    "rt_sigpending",
+    "rt_sigprocmask",
+    "rt_sigqueueinfo",
+    "rt_sigreturn",
+    "rt_sigsuspend",
+    "rt_sigtimedwait",
+    "rt_sigtimedwait_time64",
+    "rt_tgsigqueueinfo",
+    "sched_getaffinity",
+    "sched_getattr",
+    "sched_getparam",
+    "sched_get_priority_max",
+    "sched_get_priority_min",
+    "sched_getscheduler",
+    "sched_rr_get_interval",
+    "sched_rr_get_interval_time64",
+    "sched_setaffinity",
+    "sched_setattr",
+    "sched_setparam",
+    "sched_setscheduler",
+    "sched_yield",
+    "seccomp",
+    "select",
+    "semctl",
+    "semget",
+    "semop",
+    "semtimedop",
+    "semtimedop_time64",
+    "send",
+    "sendfile",
+    "sendfile64",
+    "sendmmsg",
+    "sendmsg",
+    "sendto",
+    "setfsgid",
+    "setfsgid32",
+    "setfsuid",
+    "setfsuid32",
+    "setgid",
+    "setgid32",
+    "setgroups",
+    "setgroups32",
+    "setitimer",
+    "setpgid",
+    "setpriority",
+    "setregid",
+    "setregid32",
+    "setresgid",
+    "setresgid32",
+    "setresuid",
+    "setresuid32",
+    "setreuid",
+    "setreuid32",
+    "setrlimit",
+    "set_robust_list",
+    "setsid",
+    "setsockopt",
+    "set_thread_area",
+    "set_tid_address",
+    "setuid",
+    "setuid32",
+    "setxattr",
+    "setxattrat",
+    "shmat",
+    "shmctl",
+    "shmdt",
+    "shmget",
+    "shutdown",
+    "sigaltstack",
+    "signalfd",
+    "signalfd4",
+    "sigprocmask",
+    "sigreturn",
+    "socketcall",
+    "socketpair",
+    "splice",
+    "stat",
+    "stat64",
+    "statfs",
+    "statfs64",
+    "statmount",
+    "statx",
+    "symlink",
+    "symlinkat",
+    "sync",
+    "sync_file_range",
+    "syncfs",
+    "sysinfo",
+    "tee",
+    "tgkill",
+    "time",
+    "timer_create",
+    "timer_delete",
+    "timer_getoverrun",
+    "timer_gettime",
+    "timer_gettime64",
+    "timer_settime",
+    "timer_settime64",
+    "timerfd_create",
+    "timerfd_gettime",
+    "timerfd_gettime64",
+    "timerfd_settime",
+    "timerfd_settime64",
+    "times",
+    "tkill",
+    "truncate",
+    "truncate64",
+    "ugetrlimit",
+    "umask",
+    "uname",
+    "unlink",
+    "unlinkat",
+    "uretprobe",
+    "utime",
+    "utimensat",
+    "utimensat_time64",
+    "utimes",
+    "vfork",
+    "vmsplice",
+    "wait4",
+    "waitid",
+    "waitpid",
+    "write",
+    "writev",
+    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+    "arch_prctl",
+];
+
+fn create_seccomp_filter() -> Result<std::os::fd::OwnedFd> {
+    // We could cache the fd and dup, but I'm worried that this might allow the child
+    // to modify the memfd even when it is sealed, so we just recreate the bpf memfd from scratch
+
+    let Ok(mut filter) = ScmpFilterContext::new(ScmpAction::Errno(libc::EPERM)) else {
+        return Err(eyre!("unable to init seccomp filter context"));
+    };
+
+    for syscall in ALLOWED_SYSCALLS {
+        let Ok(syscall) = ScmpSyscall::from_name(*syscall) else {
+            continue;
+        };
+        _ = filter.add_rule(ScmpAction::Allow, syscall);
+    }
+    if let Ok(syscall) = ScmpSyscall::from_name("clone") {
+        let disallowed_clones = libc::CLONE_NEWNS | libc::CLONE_NEWUTS | libc::CLONE_NEWIPC | libc::CLONE_NEWUSER
+            | libc::CLONE_NEWPID | libc::CLONE_NEWNET | libc::CLONE_NEWCGROUP;
+        _ = filter.add_rule_conditional(ScmpAction::Allow, syscall, &[
+           ScmpArgCompare::new(0, ScmpCompareOp::MaskedEqual(disallowed_clones as u64), 0)
+        ]);
+    }
+    if let Ok(syscall) = ScmpSyscall::from_name("clone3") {
+        _ = filter.add_rule(ScmpAction::Errno(libc::ENOSYS), syscall);
+    }
+    if let Ok(syscall) = ScmpSyscall::from_name("socket") {
+        _ = filter.add_rule_conditional(ScmpAction::Allow, syscall, &[
+           ScmpArgCompare::new(0, ScmpCompareOp::NotEqual, libc::AF_VSOCK as u64)
+        ]);
+    }
+    if let Ok(syscall) = ScmpSyscall::from_name("personality") {
+        _ = filter.add_rule_conditional(ScmpAction::Allow, syscall, &[
+           ScmpArgCompare::new(0, ScmpCompareOp::Equal, 0x0)
+        ]);
+        _ = filter.add_rule_conditional(ScmpAction::Allow, syscall, &[
+           ScmpArgCompare::new(0, ScmpCompareOp::Equal, 0x8)
+        ]);
+        _ = filter.add_rule_conditional(ScmpAction::Allow, syscall, &[
+           ScmpArgCompare::new(0, ScmpCompareOp::Equal, 0x20000)
+        ]);
+        _ = filter.add_rule_conditional(ScmpAction::Allow, syscall, &[
+           ScmpArgCompare::new(0, ScmpCompareOp::Equal, 0x20008)
+        ]);
+        _ = filter.add_rule_conditional(ScmpAction::Allow, syscall, &[
+           ScmpArgCompare::new(0, ScmpCompareOp::Equal, 0xffffffff)
+        ]);
+    }
+    if let Ok(syscall) = ScmpSyscall::from_name("ioctl") {
+        _ = filter.add_rule_conditional(ScmpAction::Errno(libc::EPERM), syscall, &[
+           ScmpArgCompare::new(1, ScmpCompareOp::MaskedEqual(0xFFFFFFFF), libc::TIOCSTI)
+        ]);
+    }
+    if let Ok(syscall) = ScmpSyscall::from_name("ioctl") {
+        _ = filter.add_rule_conditional(ScmpAction::Errno(libc::EPERM), syscall, &[
+           ScmpArgCompare::new(1, ScmpCompareOp::MaskedEqual(0xFFFFFFFF), libc::TIOCLINUX)
+        ]);
+    }
+
+    let fd = super::unix::WriteableMemoryFile::open(c"modrinth-sandbox-seccomp-bpf")?;
+    let fd = fd.write_filter(filter)?;
+    Ok(fd)
 }
