@@ -48,6 +48,7 @@ Each platform has its own specific capabilities, but we abstract over that using
 - What files are exposed inside the sandbox
 
 The general flow of spawning a sandboxed process is:
+
 - Create a `SandboxEnv`
 
 	This ensures that we have the right dependencies to actually perform sandboxing. On most platforms this should always be successful, but on Linux we may be missing `bwrap` - this is our chance to inform the user that they're missing dependencies.

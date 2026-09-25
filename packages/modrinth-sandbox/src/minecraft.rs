@@ -6,7 +6,7 @@ use std::{
 
 use eyre::{Result, ensure};
 
-use crate::{SandboxCommand, SandboxStdio, util::argument::SandboxArg};
+use crate::{SandboxCommand, SandboxStdio, util::SandboxArg};
 
 #[derive(Debug)]
 pub struct MinecraftCommand {

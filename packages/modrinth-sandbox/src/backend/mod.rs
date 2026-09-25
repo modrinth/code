@@ -4,14 +4,18 @@ use std::{collections::BTreeMap, fmt::Debug};
 
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
-use eyre::{Context, Result, eyre};
-use tokio::fs;
+use eyre::Result;
 
-use crate::{SandboxCommand, util::argument::SandboxArg};
+use crate::{SandboxCommand, util::SandboxArg};
 
-// TODO cfgs
+#[cfg(target_os = "linux")]
 mod bubblewrap;
+#[cfg(target_os = "linux")]
 mod flatpak;
+#[cfg(target_os = "linux")]
+mod linux;
+#[cfg(target_os = "macos")]
+mod macos;
 mod unix;
 
 /// See [`crate::create_env`].
@@ -33,15 +37,27 @@ pub trait SandboxEnv: Debug + Send + Sync {
 
 /// See [`crate::create_env`].
 pub async fn create_env() -> Result<Box<dyn SandboxEnv>> {
-    const FLATPAK_INFO_PATH: &str = "/.flatpak-info";
-
-    if fs::try_exists(FLATPAK_INFO_PATH)
-        .await
-        .wrap_err_with(|| eyre!("checking if `{FLATPAK_INFO_PATH}` exists"))?
+    #[cfg(target_os = "linux")]
     {
-        flatpak::Flatpak::init().await
-    } else {
-        bubblewrap::Bubblewrap::init().await
+        const FLATPAK_INFO_PATH: &str = "/.flatpak-info";
+
+        if tokio::fs::try_exists(FLATPAK_INFO_PATH)
+            .await
+            .map_err(|err| {
+                err.wrap_err(eyre::eyre!(
+                    "checking if `{FLATPAK_INFO_PATH}` exists"
+                ))
+            })?
+        {
+            flatpak::Flatpak::init().await
+        } else {
+            bubblewrap::Bubblewrap::init().await
+        }
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        return macos::Macos::init().await;
     }
 }
 
@@ -77,8 +93,12 @@ pub trait SandboxChildOp {
 #[derive(Debug)]
 #[enum_dispatch(SandboxChildOp)]
 pub enum SandboxChild {
+    #[cfg(target_os = "linux")]
     Flatpak(flatpak::FlatpakChild),
+    #[cfg(target_os = "linux")]
     Bubblewrap(bubblewrap::BubblewrapChild),
+    #[cfg(target_os = "macos")]
+    Macos(macos::MacosChild),
 }
 
 /// Describes the result of a process after it has terminated.

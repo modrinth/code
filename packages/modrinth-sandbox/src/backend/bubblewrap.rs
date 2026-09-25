@@ -8,7 +8,7 @@ use std::{
 
 use async_trait::async_trait;
 use derive_more::Debug;
-use eyre::{Context, ContextCompat, Result, eyre};
+use eyre::{Result, WrapErr, eyre};
 use libseccomp::{
     ScmpAction, ScmpArgCompare, ScmpCompareOp, ScmpFilterContext, ScmpSyscall,
 };
@@ -66,7 +66,7 @@ impl SandboxEnv for BubblewrapEnv {
         let this = self.clone();
         let child = tokio::task::spawn_blocking(move || spawn(&this, command))
             .await
-            .context("spawn task dropped")??;
+            .wrap_err("spawn task dropped")??;
         Ok(child)
     }
 }

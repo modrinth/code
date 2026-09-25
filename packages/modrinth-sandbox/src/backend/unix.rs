@@ -1,9 +1,9 @@
 use std::{
     collections::BTreeMap,
-    ffi::{CStr, CString, OsString},
+    ffi::CString,
     io::{ErrorKind, PipeReader, PipeWriter},
     os::{
-        fd::{AsRawFd, FromRawFd, OwnedFd, RawFd},
+        fd::{AsRawFd, OwnedFd, RawFd},
         unix::ffi::OsStringExt,
     },
     path::PathBuf,
@@ -13,8 +13,9 @@ use async_trait::async_trait;
 use eyre::Result;
 
 use crate::{
-    SandboxExitStatus, SandboxStdio, backend::SandboxChildOp,
-    util::argument::SandboxArg,
+    SandboxExitStatus, SandboxStdio,
+    backend::SandboxChildOp,
+    util::{RawStringVec, SandboxArg},
 };
 
 pub(crate) fn spawn(
@@ -323,68 +324,6 @@ pub fn open_dev_null() -> eyre::Result<libc::c_int> {
     Ok(unsafe { cvt(libc::open(c"/dev/null".as_ptr(), libc::O_RDWR))? })
 }
 
-pub fn open_pipe() -> eyre::Result<(OwnedFd, OwnedFd)> {
-    let mut fds = [0, 0];
-    unsafe {
-        super::unix::cvt(libc::pipe2(&raw mut fds as *mut _, libc::O_CLOEXEC))?;
-        Ok((OwnedFd::from_raw_fd(fds[0]), OwnedFd::from_raw_fd(fds[1])))
-    }
-}
-
-pub(crate) struct WritableMemoryFile {
-    fd: OwnedFd,
-}
-
-impl WritableMemoryFile {
-    pub fn open(name: &CStr) -> eyre::Result<Self> {
-        let fd = unsafe {
-            OwnedFd::from_raw_fd(cvt(libc::memfd_create(
-                name.as_ptr(),
-                libc::MFD_CLOEXEC | libc::MFD_ALLOW_SEALING,
-            ))?)
-        };
-        Ok(Self { fd })
-    }
-
-    pub fn write_filter(
-        mut self,
-        filter: libseccomp::ScmpFilterContext,
-    ) -> eyre::Result<OwnedFd> {
-        filter.export_bpf(&self.fd)?;
-        self.reset_and_seal()?;
-        Ok(self.fd)
-    }
-
-    pub fn write(mut self, data: &CStr) -> eyre::Result<OwnedFd> {
-        unsafe {
-            let fd = self.fd.as_raw_fd();
-            cvt(libc::write(
-                fd,
-                data.as_ptr().cast(),
-                data.count_bytes() as libc::size_t,
-            ))?;
-            self.reset_and_seal()?;
-        }
-        Ok(self.fd)
-    }
-
-    fn reset_and_seal(&mut self) -> eyre::Result<()> {
-        unsafe {
-            let fd = self.fd.as_raw_fd();
-            libc::lseek(fd, 0, libc::SEEK_SET);
-            cvt(libc::fcntl(
-                fd,
-                libc::F_ADD_SEALS,
-                libc::F_SEAL_SEAL
-                    | libc::F_SEAL_SHRINK
-                    | libc::F_SEAL_GROW
-                    | libc::F_SEAL_WRITE,
-            ))?;
-        }
-        Ok(())
-    }
-}
-
 #[doc(hidden)]
 pub trait IsMinusOne {
     fn is_minus_one(&self) -> bool;
@@ -424,67 +363,16 @@ where
     }
 }
 
-#[cfg(target_vendor = "apple")]
-pub unsafe fn environ() -> *mut *const *const c_char {
-    unsafe { libc::_NSGetEnviron() as *mut *const *const c_char }
+#[cfg(target_os = "macos")]
+pub unsafe fn environ() -> *mut *const *const libc::c_char {
+    unsafe { libc::_NSGetEnviron() as *mut *const *const libc::c_char }
 }
 
 // Use the `environ` static which is part of POSIX.
-#[cfg(not(target_vendor = "apple"))]
+#[cfg(not(target_os = "macos"))]
 pub unsafe fn environ() -> *mut *const *const libc::c_char {
     unsafe extern "C" {
         static mut environ: *const *const libc::c_char;
     }
     &raw mut environ
-}
-
-#[derive(Debug)]
-pub struct RawStringVec(Vec<*mut libc::c_char>);
-
-impl RawStringVec {
-    pub fn with_capacity(capacity: usize) -> Self {
-        Self(Vec::with_capacity(capacity + 1))
-    }
-
-    pub fn push_c(&mut self, string: CString) {
-        self.0.push(string.into_raw());
-    }
-
-    pub fn push_os(&mut self, string: OsString) -> eyre::Result<()> {
-        self.push_c(CString::new(string.into_vec())?);
-        Ok(())
-    }
-
-    pub fn into_null_terminated_ptr(mut self) -> *const *mut libc::c_char {
-        assert!(self.0.last().unwrap().is_null());
-        std::mem::take(&mut self.0).into_raw_parts().0
-    }
-
-    #[cfg(target_os = "macos")]
-    pub fn as_null_terminated_ptr(&self) -> *const *mut c_char {
-        assert!(self.0.last().unwrap().is_null());
-        self.0.as_ptr()
-    }
-
-    pub fn ensure_null_terminated(&mut self) {
-        if let Some(last) = self.0.last()
-            && last.is_null()
-        {
-            return;
-        }
-        self.0.push(std::ptr::null_mut());
-    }
-}
-
-unsafe impl Send for RawStringVec {}
-unsafe impl Sync for RawStringVec {}
-
-impl Drop for RawStringVec {
-    fn drop(&mut self) {
-        for ptr in self.0.drain(..) {
-            if !ptr.is_null() {
-                drop(unsafe { CString::from_raw(ptr) });
-            }
-        }
-    }
 }

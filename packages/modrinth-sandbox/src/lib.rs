@@ -16,7 +16,7 @@ use derive_more::Debug;
 use eyre::Result;
 
 pub use backend::SandboxExitStatus;
-pub use util::argument::SandboxArg;
+pub use util::SandboxArg;
 
 use crate::backend::SandboxChildOp;
 
