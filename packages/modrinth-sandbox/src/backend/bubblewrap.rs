@@ -503,6 +503,7 @@ fn spawn(
             env.dev_null,
             command.die_with_parent,
         )?,
+        instance_dir,
         _dbus_proxy: dbus_proxy
     })
 }
@@ -510,7 +511,14 @@ fn spawn(
 #[derive(Debug)]
 pub(crate) struct BubblewrapSandboxChild {
     child: UnixSandboxChild,
+    instance_dir: PathBuf,
     _dbus_proxy: DbusProxy,
+}
+
+impl Drop for BubblewrapSandboxChild {
+    fn drop(&mut self) {
+        _ = std::fs::remove_dir_all(&self.instance_dir);
+    }
 }
 
 #[async_trait]
@@ -536,6 +544,12 @@ impl SandboxChildTrait for BubblewrapSandboxChild {
 struct DbusProxy {
     proxy_session_path: PathBuf,
     _keep_alive_read_fd: OwnedFd,
+}
+
+impl Drop for DbusProxy {
+    fn drop(&mut self) {
+        _ = std::fs::remove_file(&self.proxy_session_path);
+    }
 }
 
 fn start_dbus_proxy(
