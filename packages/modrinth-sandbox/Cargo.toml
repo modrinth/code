@@ -12,7 +12,6 @@ async-trait = { workspace = true }
 bitflags = { workspace = true, features = ["serde"] }
 derive_more = { workspace = true, features = ["debug"] }
 uuid = { workspace = true, features = ["v7"] }
-foldhash = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 zbus = { workspace = true }
 enum_dispatch = { workspace = true }

@@ -15,6 +15,7 @@ use libseccomp::{
 use uuid::Uuid;
 
 use crate::{
+    SandboxStdio,
     backend::{
         Backend, SandboxChild, SandboxChildOp, SandboxCommand, SandboxEnv,
         unix::UnixChild,
@@ -470,8 +471,7 @@ instance-id={instance_id}
         return Err(eyre!("/tmp folder doesn't exist"));
     }
     let bwrapinfo = instance_dir.join("bwrapinfo.json");
-    let bwrapinfo_fd: OwnedFd =
-        std::fs::File::create(bwrapinfo.clone())?.into();
+    let bwrapinfo_fd: OwnedFd = std::fs::File::create(bwrapinfo)?.into();
     builder.push("--info-fd");
     builder.push(format!("{}", bwrapinfo_fd.as_raw_fd()));
 
@@ -677,9 +677,9 @@ fn start_dbus_proxy(
         env.bwrap.clone().into(),
         std::mem::take(&mut builder.arguments),
         environment,
-        crate::SandboxStdio::Null,
-        crate::SandboxStdio::Null,
-        crate::SandboxStdio::Null,
+        SandboxStdio::Null,
+        SandboxStdio::Null,
+        SandboxStdio::Null,
         Some(runtime_dir.to_path_buf()),
         vec![flatpak_info_fd1, flatpak_info_fd2, keep_alive_write_fd],
         env.dev_null,
@@ -693,16 +693,13 @@ fn start_dbus_proxy(
         let start = std::time::Instant::now();
         if libc::read(
             keep_alive_read_fd.as_raw_fd(),
-            &mut buf as *mut libc::c_char as *mut _,
+            &raw mut buf as *mut libc::c_char as *mut _,
             1,
         ) != 1
         {
             return Err(eyre!("Failed to sync with xdg-dbus-proxy"));
         }
-        tracing::info!(
-            "xdg-dbus-proxy took {:?} to start",
-            std::time::Instant::now() - start
-        );
+        tracing::info!("xdg-dbus-proxy took {:?} to start", start.elapsed());
     }
 
     eyre::Ok(DbusProxy {

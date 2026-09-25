@@ -1,12 +1,14 @@
-use std::os::{
-    fd::{AsFd, OwnedFd},
-    unix::ffi::OsStringExt,
+use std::{
+    collections::BTreeMap,
+    os::{
+        fd::{AsFd, OwnedFd},
+        unix::ffi::OsStringExt,
+    },
 };
 
 use async_trait::async_trait;
 use derive_more::Debug;
 use eyre::{Context, OptionExt, Result, bail, ensure, eyre};
-use foldhash::{HashMap, HashMapExt};
 use futures::{StreamExt, TryStreamExt, stream::FuturesUnordered};
 use libc::SIGKILL;
 use tokio::{fs, sync::oneshot};
@@ -76,7 +78,7 @@ async fn spawn(
             })?;
             eyre::Ok((key, val))
         })
-        .collect::<Result<HashMap<_, _>>>()?;
+        .collect::<Result<BTreeMap<_, _>>>()?;
 
     let cwd_path = match command.working_directory {
         Some(path) => nul_terminate(
@@ -98,7 +100,7 @@ async fn spawn(
         )?);
     }
 
-    let mut fds = HashMap::new();
+    let mut fds = BTreeMap::new();
 
     let inherited = std::io::stdin();
     let stdin = {
@@ -339,6 +341,7 @@ pub struct FlatpakChild {
 #[async_trait]
 impl SandboxChildOp for FlatpakChild {
     fn id(&self) -> Option<u32> {
+        // TODO: can we get some kind of persistent id here? not sure
         None
     }
 

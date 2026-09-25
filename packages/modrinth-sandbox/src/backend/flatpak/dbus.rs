@@ -1,4 +1,7 @@
-use foldhash::HashMap;
+#![allow(dead_code, reason = "kept for completeness' sake")]
+
+use std::collections::BTreeMap;
+
 use zbus::zvariant::{Fd, OwnedFd, SerializeDict, Signature, Type};
 
 pub use imp::{SpawnExitedStream, SpawnStartedStream};
@@ -199,8 +202,8 @@ impl<'p> FlatpakPortalProxy<'p> {
         &self,
         cwd_path: &[u8],
         argv: &[Vec<u8>],
-        fds: &HashMap<u32, Fd<'_>>,
-        envs: &HashMap<String, String>,
+        fds: &BTreeMap<u32, Fd<'_>>,
+        envs: &BTreeMap<String, String>,
         flags: SpawnFlags,
         options: &SpawnOptions,
     ) -> zbus::Result<u32> {
@@ -232,7 +235,8 @@ impl<'p> FlatpakPortalProxy<'p> {
 }
 
 mod imp {
-    use foldhash::HashMap;
+    use std::collections::BTreeMap;
+
     use zbus::zvariant::Fd;
 
     use super::SpawnOptions;
@@ -254,8 +258,8 @@ mod imp {
             &self,
             cwd_path: &[u8],
             argv: &[Vec<u8>],
-            fds: &HashMap<u32, Fd<'_>>,
-            envs: &HashMap<String, String>,
+            fds: &BTreeMap<u32, Fd<'_>>,
+            envs: &BTreeMap<String, String>,
             flags: u32,
             options: &SpawnOptions,
         ) -> zbus::Result<u32>;

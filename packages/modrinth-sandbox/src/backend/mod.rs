@@ -1,17 +1,13 @@
 //! Backend sandbox implementations, using OS-specific primitives.
 
-use std::{
-    collections::{BTreeMap, HashSet},
-    fmt::Debug,
-    path::PathBuf,
-};
+use std::{collections::BTreeMap, fmt::Debug};
 
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
 use eyre::{Context, Result, eyre};
 use tokio::fs;
 
-use crate::util::argument::SandboxArg;
+use crate::{SandboxCommand, util::argument::SandboxArg};
 
 // TODO cfgs
 mod bubblewrap;
@@ -49,65 +45,10 @@ pub async fn create_env() -> Result<Box<dyn SandboxEnv>> {
     }
 }
 
-/// Configuration for launching a sandboxed process.
-///
-/// This is a low-level configuration struct which is not aware of Minecraft,
-/// Java, etc.
-///
-/// # Implementation notes
-///
-/// - Standard output/error cannot be read from the spawned child process, since
-///   on some platforms we cannot reliably inherit these handles.
-/// - Graphics and audio devices will always be passed to the child process when
-///   possible.
-#[derive(Debug)]
-pub struct SandboxCommand {
-    /// Path to the executable to run.
-    pub executable: PathBuf,
-    /// Arguments passed to the executable.
-    pub args: Vec<SandboxArg>,
-    /// When spawning a process, ensure that each of these paths exists as a
-    /// directory on the host, using `create_dir_all`.
-    pub ensure_dirs_exist: Vec<PathBuf>,
-    /// Host paths mounted read-only at the same path in the sandbox.
-    pub read_only_paths: Vec<PathBuf>,
-    /// Host paths mounted read-write at the same path in the sandbox.
-    pub read_write_paths: Vec<PathBuf>,
-    /// What directory the executable is ran from.
-    pub working_directory: Option<PathBuf>,
-    /// Names of environment variables copied from the host when present.
-    pub passthrough_environment: HashSet<SandboxArg>,
-    /// Environment variables explicitly set in the sandbox.
-    ///
-    /// These take precedence over passthrough variables with the same name.
-    pub extra_environment: BTreeMap<SandboxArg, SandboxArg>,
-    /// Allow access to the host network namespace.
-    pub network: bool,
-    /// Whether the program to run is a Java virtual machine.
-    ///
-    /// If set, performs some extra platform-specific setup to get the JVM to
-    /// work.
-    pub is_jvm: bool,
-    /// Whether the spawned child should terminate when the parent process
-    /// terminates.
-    pub die_with_parent: bool,
-    /// Default io behaviour for stdin
-    pub stdin: SandboxStdio,
-    /// Default io behaviour for stdout
-    pub stdout: SandboxStdio,
-    /// Default io behaviour for stderr
-    pub stderr: SandboxStdio,
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub enum SandboxStdio {
-    Null,
-    Inherit,
-    Pipe,
-}
-
 impl SandboxCommand {
-    pub fn take_environment(&mut self) -> BTreeMap<SandboxArg, SandboxArg> {
+    pub(crate) fn take_environment(
+        &mut self,
+    ) -> BTreeMap<SandboxArg, SandboxArg> {
         if !self.passthrough_environment.is_empty() {
             for (k, v) in std::env::vars_os() {
                 let k: SandboxArg = k.into();
@@ -140,6 +81,9 @@ pub enum SandboxChild {
     Bubblewrap(bubblewrap::BubblewrapChild),
 }
 
+/// Describes the result of a process after it has terminated.
+///
+/// This is analogous to [`std::process::ExitStatus`].
 #[derive(Default, Debug, Clone, Copy)]
 pub struct SandboxExitStatus {
     // TODO cfg
@@ -147,10 +91,17 @@ pub struct SandboxExitStatus {
 }
 
 impl SandboxExitStatus {
+    /// Was termination successful? Signal termination is not considered a
+    /// success, and success is defined as a zero exit status.
+    ///
+    /// This is analogous to [`std::process::ExitStatus::success`].
     pub fn success(&self) -> bool {
         self.imp.success()
     }
 
+    /// Returns the exit code of the process, if any.
+    ///
+    /// This is analogous to [`std::process::ExitStatus::code`].
     pub fn code(&self) -> Option<i32> {
         self.imp.code()
     }

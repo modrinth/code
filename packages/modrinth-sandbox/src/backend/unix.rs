@@ -61,6 +61,10 @@ pub(crate) fn spawn(
     let mut stdout_read = None;
     let mut stderr_read = None;
 
+    #[expect(
+        clippy::collection_is_never_read,
+        reason = "keep fds alive until we drop them"
+    )]
     let mut fds_to_drop: Vec<OwnedFd> = Vec::new();
     let mut stdin_read = None;
     let mut stdout_write = None;
@@ -236,6 +240,7 @@ impl SandboxChildOp for UnixChild {
         }
     }
 
+    // TODO: this must be made cancel-safe - see how tokio::process does it?
     async fn wait(&mut self) -> Result<SandboxExitStatus> {
         // Need to remember the exit status due to waitpid at-most-once semantics
         if let Some(exit_status) = self.exit_status {
@@ -321,7 +326,7 @@ pub fn open_dev_null() -> eyre::Result<libc::c_int> {
 pub fn open_pipe() -> eyre::Result<(OwnedFd, OwnedFd)> {
     let mut fds = [0, 0];
     unsafe {
-        super::unix::cvt(libc::pipe2(&mut fds as *mut _, libc::O_CLOEXEC))?;
+        super::unix::cvt(libc::pipe2(&raw mut fds as *mut _, libc::O_CLOEXEC))?;
         Ok((OwnedFd::from_raw_fd(fds[0]), OwnedFd::from_raw_fd(fds[1])))
     }
 }

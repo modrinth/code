@@ -7231,7 +7231,6 @@ dependencies = [
  "directories",
  "enum_dispatch",
  "eyre",
- "foldhash 0.2.0",
  "futures",
  "libc",
  "libseccomp",

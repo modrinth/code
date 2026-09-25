@@ -1,5 +1,5 @@
 use std::{
-    collections::{BTreeMap, HashSet},
+    collections::{BTreeMap, BTreeSet},
     ffi::OsString,
     io::{BufRead, BufReader, PipeReader, Write},
     path::PathBuf,
@@ -40,7 +40,7 @@ async fn main() -> Result<()> {
             read_only_paths: cli.read_only_path,
             read_write_paths: cli.writable_path,
             working_directory: cli.working_directory,
-            passthrough_environment: HashSet::new(),
+            passthrough_environment: BTreeSet::new(),
             extra_environment: BTreeMap::new(),
             network: true,
             is_jvm: false,
