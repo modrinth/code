@@ -30,7 +30,7 @@
 					@click="toggleToolsPanel"
 				>
 					<component
-						:is="bottomVisible ? PanelTopCloseIcon : PanelTopOpenIcon"
+						:is="bottomVisible ? PanelTopOpenIcon : PanelTopCloseIcon"
 						aria-hidden="true"
 					/>
 				</button>

@@ -159,7 +159,9 @@
 						<div class="font-semibold text-contrast">
 							{{ environmentCopy.title }}
 						</div>
-						<div class="text-sm font-medium">{{ environmentCopy.description }}</div>
+						<div class="text-sm font-medium">
+							{{ environmentCopy.description }}
+						</div>
 					</div>
 
 					<span v-else class="text-sm font-medium">{{
@@ -212,7 +214,6 @@ import {
 	defineMessages,
 	ENVIRONMENTS_COPY,
 	FormattedTag,
-	injectProjectPageContext,
 	Tabs,
 	type TabsTab,
 	TagItem,
@@ -227,6 +228,7 @@ import SuggestedDependencies from '../components/SuggestedDependencies/Suggested
 import ViewOnlyFileRow from '../components/ViewOnlyFileRow.vue'
 
 const {
+	projectV2,
 	draftVersion,
 	inferredVersionData,
 	projectType,
@@ -237,8 +239,6 @@ const {
 	editingVersion,
 	visibleSuggestedDependencies,
 } = injectManageVersionContext()
-
-const { projectV2 } = injectProjectPageContext()
 
 const generatedState = useGeneratedState()
 const loaders = computed(() => generatedState.value.loaders)

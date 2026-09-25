@@ -6,7 +6,6 @@ import {
 	defineMessage,
 	injectModrinthClient,
 	injectNotificationManager,
-	injectProjectPageContext,
 	type MessageDescriptor,
 	type MultiStageModal,
 	resolveCtxFn,
@@ -70,7 +69,15 @@ export interface PrimaryFile {
 	existing?: boolean
 }
 
+export type EditVersionStage = 'metadata' | 'add-details' | 'add-files'
+
+export interface ManageVersionHost {
+	projectV2: Ref<Labrinth.Projects.v2.Project>
+	invalidate: (projectId: string, versionId?: string) => Promise<unknown>
+}
+
 export interface ManageVersionContextValue {
+	projectV2: Ref<Labrinth.Projects.v2.Project>
 	// State
 	draftVersion: Ref<Labrinth.Versions.v3.DraftVersion>
 	filesToAdd: Ref<Labrinth.Versions.v3.DraftVersionFile[]>
@@ -209,11 +216,12 @@ export const [injectManageVersionContext, provideManageVersionContext] =
 
 export function createManageVersionContext(
 	modal: ShallowRef<ComponentExposed<typeof MultiStageModal> | null>,
+	host: ManageVersionHost,
 	onSave?: () => void,
 ): ManageVersionContextValue {
 	const { labrinth } = injectModrinthClient()
 	const { addNotification } = injectNotificationManager()
-	const { invalidate, projectV2 } = injectProjectPageContext()
+	const { invalidate, projectV2 } = host
 
 	// State
 	const draftVersion = ref<Labrinth.Versions.v3.DraftVersion>(structuredClone(EMPTY_DRAFT_VERSION))
@@ -232,7 +240,11 @@ export function createManageVersionContext(
 
 	const isSubmitting = ref(false)
 	const isUploading = ref(false)
-	const uploadProgress = ref<UploadProgress>({ loaded: 0, total: 0, progress: 0 })
+	const uploadProgress = ref<UploadProgress>({
+		loaded: 0,
+		total: 0,
+		progress: 0,
+	})
 
 	const projectType = computed<Labrinth.Projects.v2.ProjectType>(() => {
 		const primaryFile = filesToAdd.value[0]?.file
@@ -694,7 +706,10 @@ export function createManageVersionContext(
 			const environment = await inferEnvironmentFromVersions(projectId, loaders)
 			if (environment && !draftVersion.value.environment) {
 				draftVersion.value.environment = environment
-				inferredVersionData.value = { ...inferredVersionData.value, environment }
+				inferredVersionData.value = {
+					...inferredVersionData.value,
+					environment,
+				}
 			}
 		},
 	)
@@ -805,7 +820,7 @@ export function createManageVersionContext(
 				text: 'The version has been successfully added to your project.',
 				type: 'success',
 			})
-			await invalidate()
+			await invalidate(version.project_id, version.version_id)
 			onSave?.()
 		} catch (err: any) {
 			addNotification({
@@ -879,7 +894,7 @@ export function createManageVersionContext(
 				text: 'The version has been successfully saved to your project.',
 				type: 'success',
 			})
-			await invalidate()
+			await invalidate(version.project_id, version.version_id)
 			onSave?.()
 		} catch (err: any) {
 			addNotification({
@@ -937,6 +952,7 @@ export function createManageVersionContext(
 	})
 
 	const contextValue: ManageVersionContextValue = {
+		projectV2,
 		// State
 		draftVersion,
 		filesToAdd,

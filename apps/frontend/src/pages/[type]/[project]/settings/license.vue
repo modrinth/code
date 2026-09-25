@@ -9,7 +9,9 @@
 				<p class="m-0 text-base text-secondary">
 					<IntlFormatted
 						:message-id="messages.intro"
-						:values="{ type: formatProjectType(project.project_type).toLowerCase() }"
+						:values="{
+							type: formatProjectType(project.project_type).toLowerCase(),
+						}"
 					>
 						<template #guide="{ children }">
 							<NuxtLink
@@ -78,7 +80,7 @@
 
 			<div v-if="current.license.friendly" class="flex min-w-0 flex-col gap-2">
 				<label for="license-url" class="w-fit text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.url) }}
+					{{ formatMessage(licenseUrlMessages.url) }}
 				</label>
 
 				<div class="flex min-w-0 flex-col gap-2">
@@ -89,7 +91,9 @@
 						:maxlength="2048"
 						:placeholder="
 							formatMessage(
-								current.license.friendly === 'Custom' ? messages.url : messages.optionalUrl,
+								current.license.friendly === 'Custom'
+									? licenseUrlMessages.url
+									: licenseUrlMessages.optionalUrl,
 							)
 						"
 						:disabled="saving || !hasPermission || licenseId === 'LicenseRef-Unknown'"
@@ -99,8 +103,8 @@
 						{{
 							formatMessage(
 								current.license.friendly === 'Custom'
-									? messages.customUrlDescription
-									: messages.urlDescription,
+									? licenseUrlMessages.customUrlDescription
+									: licenseUrlMessages.urlDescription,
 							)
 						}}
 					</p>
@@ -240,6 +244,7 @@ import ValidationMessage from '@/components/ValidationMessage.vue'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import { normalizeProjectUrl } from '~/helpers/project-url'
+import { licenseUrlMessages } from '~/utils/license-messages'
 
 const { projectV2: project, currentMember, patchProjectV3 } = injectProjectPageContext()
 
@@ -281,21 +286,6 @@ const messages = defineMessages({
 	allowLater: {
 		id: 'project.settings.license.allow-later',
 		defaultMessage: 'Allow later editions',
-	},
-	url: { id: 'project.settings.license.url', defaultMessage: 'License URL' },
-	optionalUrl: {
-		id: 'project.settings.license.optional-url',
-		defaultMessage: 'License URL (optional)',
-	},
-	urlDescription: {
-		id: 'project.settings.license.url-description',
-		defaultMessage:
-			"The web location of the full license text. If you don't provide a link, the license text will be displayed instead.",
-	},
-	customUrlDescription: {
-		id: 'project.settings.license.custom-url-description',
-		defaultMessage:
-			'The web location of the full license text. You have to provide a link since this is a custom license.',
 	},
 	spdx: {
 		id: 'project.settings.license.spdx',

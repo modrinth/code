@@ -256,7 +256,6 @@ export function createReviewPanels(
 
 	function resolve(target: ReviewTarget) {
 		const aliases: Partial<Record<ReviewTarget['kind'], string>> = {
-			slug: 'title',
 			tags: 'categories',
 			compatibility: 'metadata',
 			'license-url': 'license',

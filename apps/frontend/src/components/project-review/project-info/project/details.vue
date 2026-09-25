@@ -1,48 +1,50 @@
 <template>
-	<dl v-if="project" class="m-0 grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 gap-y-2">
-		<dt>{{ formatMessage(messages.projectType) }}</dt>
-		<dd class="m-0 capitalize">
-			<template v-for="(type, index) in projectTypes" :key="type">
-				<template v-if="index > 0">, </template>
-				<span
-					:class="{
-						underline: project.project_types.length > 1 && type === primaryProjectType,
-					}"
-					>{{ type }}</span
-				>
-			</template>
-		</dd>
-		<dt>{{ formatMessage(messages.created) }}</dt>
-		<dd class="m-0">
-			<time :datetime="project.published" :title="project.published">{{
-				relativeTime(project.published)
-			}}</time>
-		</dd>
-		<dt>{{ formatMessage(messages.updated) }}</dt>
-		<dd class="m-0">
-			<time :datetime="project.updated" :title="project.updated">{{
-				relativeTime(project.updated)
-			}}</time>
-		</dd>
-		<template v-if="project.queued">
-			<dt>{{ formatMessage(messages.submitted) }}</dt>
-			<dd class="m-0">
-				<time :datetime="project.queued" :title="project.queued">{{
-					relativeTime(project.queued)
-				}}</time
-				><template v-if="submissionCount">
-					·
-					{{ formatMessage(messages.submissions, { count: submissionCount }) }}</template
-				>
+	<Section :heading="formatMessage(messages.details)">
+		<dl v-if="project" class="m-0 grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 gap-y-2">
+			<dt>{{ formatMessage(messages.projectType) }}</dt>
+			<dd class="m-0 capitalize">
+				<template v-for="(type, index) in projectTypes" :key="type">
+					<template v-if="index > 0">, </template>
+					<span
+						:class="{
+							underline: project.project_types.length > 1 && type === primaryProjectType,
+						}"
+						>{{ type }}</span
+					>
+				</template>
 			</dd>
-		</template>
-		<dt>{{ formatMessage(messages.downloads) }}</dt>
-		<dd class="m-0">{{ formatNumber(project.downloads) }}</dd>
-		<template v-if="project.requested_status"
-			><dt>{{ formatMessage(messages.requesting) }}</dt>
-			<dd class="m-0 capitalize">{{ project.requested_status }}</dd></template
-		>
-	</dl>
+			<dt>{{ formatMessage(messages.created) }}</dt>
+			<dd class="m-0">
+				<time :datetime="project.published" :title="project.published">{{
+					relativeTime(project.published)
+				}}</time>
+			</dd>
+			<dt>{{ formatMessage(messages.updated) }}</dt>
+			<dd class="m-0">
+				<time :datetime="project.updated" :title="project.updated">{{
+					relativeTime(project.updated)
+				}}</time>
+			</dd>
+			<template v-if="project.queued">
+				<dt>{{ formatMessage(messages.submitted) }}</dt>
+				<dd class="m-0">
+					<time :datetime="project.queued" :title="project.queued">{{
+						relativeTime(project.queued)
+					}}</time
+					><template v-if="submissionCount">
+						·
+						{{ formatMessage(messages.submissions, { count: submissionCount }) }}</template
+					>
+				</dd>
+			</template>
+			<dt>{{ formatMessage(messages.downloads) }}</dt>
+			<dd class="m-0">{{ formatNumber(project.downloads) }}</dd>
+			<template v-if="project.requested_status"
+				><dt>{{ formatMessage(messages.requesting) }}</dt>
+				<dd class="m-0 capitalize">{{ project.requested_status }}</dd></template
+			>
+		</dl>
+	</Section>
 </template>
 
 <script setup lang="ts">
@@ -53,6 +55,7 @@ import { computed } from 'vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { projectReviewMessages as messages } from '../../messages'
+import Section from '../section.vue'
 
 const { project, submissionCount } = injectProjectReviewPageContext()
 const primaryProjectType = computed(() =>

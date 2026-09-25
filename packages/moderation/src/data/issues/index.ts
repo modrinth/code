@@ -36,6 +36,7 @@ import { postApprovalReviewPanel } from './post-approval'
 import { reReviewReviewPanel } from './re-review'
 import { reuploadReviewPanel } from './reupload'
 import { rulesReviewPanel } from './rules'
+import { slugReviewPanel } from './slug'
 import { statusAlertsReviewPanel } from './status-alerts'
 import { summaryReviewPanel } from './summary'
 import { titleReviewPanel } from './title'
@@ -44,6 +45,7 @@ import { versionsReviewPanel } from './versions'
 
 export const reviewPanels = {
 	title: titleReviewPanel,
+	slug: slugReviewPanel,
 	summary: summaryReviewPanel,
 	description: descriptionReviewPanel,
 	'issues-link': issuesReviewPanel,

@@ -3,6 +3,13 @@
 		ref="hotkeyScope"
 		class="group/versions flex h-full min-h-0 flex-col gap-2.5 overflow-hidden"
 	>
+		<CreateProjectVersionModal
+			v-if="editorHost"
+			:key="selection"
+			ref="editModal"
+			:host="editorHost"
+			:enable-drop-area="false"
+		/>
 		<ReviewPanel
 			v-if="resolve({ kind: 'undefined-project' })"
 			mode="inline"
@@ -68,6 +75,8 @@
 						:key="version.id"
 						:version="version"
 						:expanded="expandedIds.has(version.id)"
+						:editable="!!editorHost"
+						@edit="editModal?.openEditVersionModal(version.id, version.project_id, $event)"
 						@toggle="toggle(version.id)"
 					/>
 				</template>
@@ -79,10 +88,13 @@
 <script setup lang="ts">
 import { ListChevronsDownUpIcon, ListChevronsUpDownIcon } from '@modrinth/assets'
 import { Button, useVIntl } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef } from 'vue'
 
+import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
+import type { ManageVersionHost } from '~/providers/version/manage-version-modal'
 
 import { projectReviewMessages as messages } from '../messages'
 import ReviewPanel from '../review-panel/index.vue'
@@ -91,8 +103,38 @@ import VersionCard from './version-card.vue'
 const { formatMessage } = useVIntl()
 const { resolve } = injectReviewPanels()
 const hotkeyScope = useTemplateRef<HTMLElement>('hotkeyScope')
-const { selection, versions, versionsQuery, isLoading, error, refresh } =
+const { selection, projectV2, versions, versionsQuery, isLoading, error, refresh } =
 	injectProjectReviewPageContext()
+const queryClient = useQueryClient()
+const editModal = useTemplateRef<InstanceType<typeof CreateProjectVersionModal>>('editModal')
+const editorHost = computed<ManageVersionHost | undefined>(() => {
+	const project = projectV2.value
+	if (!project || isLoading.value || error.value) return undefined
+	return {
+		projectV2: computed(() => project),
+		invalidate: async (projectId, versionId) => {
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: ['project', projectId] }),
+				queryClient.invalidateQueries({
+					queryKey: ['project', 'v2', projectId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: ['project', 'v3', projectId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: ['version', 'v3', versionId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: ['project-attribution', projectId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: ['tech-review-project-report', projectId],
+				}),
+				queryClient.invalidateQueries({ queryKey: ['tech-reviews'] }),
+			])
+		},
+	}
+})
 const expanded = ref<Set<string> | null>(null)
 const expandedIds = computed(
 	() => expanded.value ?? new Set(versions.value[0] ? [versions.value[0].id] : []),

@@ -1,100 +1,102 @@
 <template>
-	<dl v-if="project" class="m-0 grid grid-cols-[max-content_minmax(0,1fr)] gap-x-3 gap-y-2.5">
-		<dt>{{ formatMessage(messages.serverAddress) }}</dt>
-		<dd class="m-0 break-all text-primary">
-			{{ project.minecraft_java_server?.address || formatMessage(messages.noServerAddress) }}
-		</dd>
-		<dt>{{ formatMessage(messages.serverRegion) }}</dt>
-		<dd class="m-0 text-primary">{{ region || '—' }}</dd>
-		<dt>{{ formatMessage(messages.serverLanguages) }}</dt>
-		<dd class="m-0 flex flex-wrap items-start gap-1">
-			<TagItem
-				v-for="language in languages"
-				:key="language.code"
-				class="!border-surface-4 !bg-surface-3 !text-secondary"
-			>
-				{{ language.name }}
-			</TagItem>
-			<span v-if="languages.length === 0">{{ formatMessage(messages.noServerLanguages) }}</span>
-		</dd>
-
-		<dt>{{ formatMessage(messages.serverContent) }}</dt>
-		<dd class="m-0 min-w-0">
-			<TagItem
-				v-if="content?.kind === 'vanilla'"
-				class="!border-surface-4 !bg-surface-3 !text-secondary"
-			>
-				{{ formatMessage(messages.vanilla) }}
-			</TagItem>
-			<TagItem v-else-if="isMrpack" class="!border-surface-4 !bg-surface-3 !text-secondary">
-				{{ formatMessage(messages.mrpack) }}
-			</TagItem>
-			<TagItem
-				v-else-if="content?.kind === 'modpack'"
-				class="!border-surface-4 !bg-surface-3 !text-secondary"
-			>
-				{{ formatMessage(messages.modpack) }}
-			</TagItem>
-			<span v-else>—</span>
-		</dd>
-		<template v-if="content?.kind === 'vanilla'">
-			<dt>{{ formatMessage(messages.gameVersions) }}</dt>
+	<Section :heading="formatMessage(messages.serverDetails)">
+		<dl v-if="project" class="m-0 grid grid-cols-[max-content_minmax(0,1fr)] gap-x-3 gap-y-2.5">
+			<dt>{{ formatMessage(messages.serverAddress) }}</dt>
+			<dd class="m-0 break-all text-primary">
+				{{ project.minecraft_java_server?.address || formatMessage(messages.noServerAddress) }}
+			</dd>
+			<dt>{{ formatMessage(messages.serverRegion) }}</dt>
+			<dd class="m-0 text-primary">{{ region || '—' }}</dd>
+			<dt>{{ formatMessage(messages.serverLanguages) }}</dt>
 			<dd class="m-0 flex flex-wrap items-start gap-1">
 				<TagItem
-					v-if="content.recommended_game_version"
+					v-for="language in languages"
+					:key="language.code"
 					class="!border-surface-4 !bg-surface-3 !text-secondary"
 				>
-					{{ content.recommended_game_version }}
-					{{ formatMessage(messages.recommended) }}
+					{{ language.name }}
+				</TagItem>
+				<span v-if="languages.length === 0">{{ formatMessage(messages.noServerLanguages) }}</span>
+			</dd>
+
+			<dt>{{ formatMessage(messages.serverContent) }}</dt>
+			<dd class="m-0 min-w-0">
+				<TagItem
+					v-if="content?.kind === 'vanilla'"
+					class="!border-surface-4 !bg-surface-3 !text-secondary"
+				>
+					{{ formatMessage(messages.vanilla) }}
+				</TagItem>
+				<TagItem v-else-if="isMrpack" class="!border-surface-4 !bg-surface-3 !text-secondary">
+					{{ formatMessage(messages.mrpack) }}
 				</TagItem>
 				<TagItem
-					v-for="version in supportedVersions"
-					:key="version"
+					v-else-if="content?.kind === 'modpack'"
 					class="!border-surface-4 !bg-surface-3 !text-secondary"
 				>
-					{{ version }}
+					{{ formatMessage(messages.modpack) }}
 				</TagItem>
-				<span v-if="!content.recommended_game_version && supportedVersions.length === 0">—</span>
+				<span v-else>—</span>
 			</dd>
-		</template>
-		<dd v-else-if="isPublishedModpack" class="col-span-2 m-0 min-w-0">
-			<div
-				class="flex min-w-0 items-center gap-2 rounded-lg border border-solid border-surface-4 bg-surface-2 p-2"
-			>
-				<Avatar
-					:src="content?.project_icon"
-					:alt="modpackName"
-					:tint-by="modpackName"
-					size="2.5rem"
-					no-shadow
-				/>
-				<div class="flex min-w-0 flex-col gap-0.5">
-					<NuxtLink
-						v-if="modpackProjectId"
-						:to="`/modpack/${modpackProjectId}`"
-						target="_blank"
-						rel="noopener noreferrer"
-						class="truncate font-medium text-primary hover:underline"
+			<template v-if="content?.kind === 'vanilla'">
+				<dt>{{ formatMessage(messages.gameVersions) }}</dt>
+				<dd class="m-0 flex flex-wrap items-start gap-1">
+					<TagItem
+						v-if="content.recommended_game_version"
+						class="!border-surface-4 !bg-surface-3 !text-secondary"
 					>
-						{{ modpackName }}
-					</NuxtLink>
-					<span v-else class="truncate font-medium text-primary">{{ modpackName }}</span>
-					<NuxtLink
-						v-if="modpackProjectId && content"
-						:to="`/modpack/${modpackProjectId}/version/${modpackVersionId}`"
-						target="_blank"
-						rel="noopener noreferrer"
-						class="truncate text-xs hover:underline"
+						{{ content.recommended_game_version }}
+						{{ formatMessage(messages.recommended) }}
+					</TagItem>
+					<TagItem
+						v-for="version in supportedVersions"
+						:key="version"
+						class="!border-surface-4 !bg-surface-3 !text-secondary"
 					>
-						{{ formatMessage(messages.modpackVersion, { version: modpackVersionLabel }) }}
-					</NuxtLink>
-					<span v-else class="truncate text-xs">
-						{{ formatMessage(messages.modpackVersion, { version: modpackVersionLabel }) }}
-					</span>
+						{{ version }}
+					</TagItem>
+					<span v-if="!content.recommended_game_version && supportedVersions.length === 0">—</span>
+				</dd>
+			</template>
+			<dd v-else-if="isPublishedModpack" class="col-span-2 m-0 min-w-0">
+				<div
+					class="flex min-w-0 items-center gap-2 rounded-lg border border-solid border-surface-4 bg-surface-2 p-2"
+				>
+					<Avatar
+						:src="content?.project_icon"
+						:alt="modpackName"
+						:tint-by="modpackName"
+						size="2.5rem"
+						no-shadow
+					/>
+					<div class="flex min-w-0 flex-col gap-0.5">
+						<NuxtLink
+							v-if="modpackProjectId"
+							:to="`/modpack/${modpackProjectId}`"
+							target="_blank"
+							rel="noopener noreferrer"
+							class="truncate font-medium text-primary hover:underline"
+						>
+							{{ modpackName }}
+						</NuxtLink>
+						<span v-else class="truncate font-medium text-primary">{{ modpackName }}</span>
+						<NuxtLink
+							v-if="modpackProjectId && content"
+							:to="`/modpack/${modpackProjectId}/version/${modpackVersionId}`"
+							target="_blank"
+							rel="noopener noreferrer"
+							class="truncate text-xs hover:underline"
+						>
+							{{ formatMessage(messages.modpackVersion, { version: modpackVersionLabel }) }}
+						</NuxtLink>
+						<span v-else class="truncate text-xs">
+							{{ formatMessage(messages.modpackVersion, { version: modpackVersionLabel }) }}
+						</span>
+					</div>
 				</div>
-			</div>
-		</dd>
-	</dl>
+			</dd>
+		</dl>
+	</Section>
 </template>
 
 <script setup lang="ts">
@@ -114,6 +116,7 @@ import { computed } from 'vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { projectReviewMessages as messages } from '../../messages'
+import Section from '../section.vue'
 
 const { project } = injectProjectReviewPageContext()
 const client = injectModrinthClient()

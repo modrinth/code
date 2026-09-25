@@ -17,11 +17,11 @@
 			v-if="available"
 			ref="trigger"
 			type="button"
-			class="review-trigger absolute flex cursor-pointer items-center gap-1 rounded-md border border-solid border-surface-5 bg-surface-3 px-2 py-1 text-xs text-secondary hover:text-contrast focus-visible:opacity-100"
+			class="review-trigger absolute flex cursor-pointer items-center gap-1 rounded border border-solid border-surface-5 bg-surface-3 px-1 py-px text-xs text-secondary hover:text-contrast"
 			:class="{
 				'review-trigger-active': active?.id === id,
 				'right-4 top-0 z-10 -translate-y-1/2': triggerPlacement === 'above',
-				'right-0.5 top-0.5': triggerPlacement !== 'above',
+				'right-0.5 top-2.5': triggerPlacement !== 'above',
 			}"
 			:aria-label="triggerLabel"
 			:aria-expanded="active?.id === id"
@@ -101,7 +101,7 @@ onBeforeUnmount(() => release(id))
 	transition: opacity 120ms ease;
 }
 .review-anchor:hover > .review-trigger,
-.review-anchor:focus-within > .review-trigger,
+.review-trigger:focus-visible,
 .review-trigger-active {
 	opacity: 1;
 }

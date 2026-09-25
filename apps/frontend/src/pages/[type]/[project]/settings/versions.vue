@@ -68,43 +68,7 @@
 			:open-modal="currentMember ? () => handleOpenCreateVersionModal() : undefined"
 		>
 			<template #actions="{ version }">
-				<TeleportOverflowMenu
-					type="quiet"
-					:label="formatMessage(messages.editVersionTooltip)"
-					:tooltip="formatMessage(messages.editVersionTooltip)"
-					class="hover:!bg-button-bg [&>svg]:!text-green"
-					:options="[
-						{
-							id: 'edit-metadata',
-							label: formatMessage(messages.editMetadataOption),
-							action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
-						},
-						{
-							id: 'edit-details',
-							label: formatMessage(messages.editDetailsOption),
-							action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
-						},
-						{
-							id: 'edit-files',
-							label: formatMessage(messages.editFilesOption),
-							action: () => handleOpenEditVersionModal(version.id, project.id, 'add-files'),
-						},
-					]"
-				>
-					<EditIcon aria-hidden="true" />
-					<template #edit-files>
-						<FileIcon aria-hidden="true" />
-						{{ formatMessage(messages.editFilesOption) }}
-					</template>
-					<template #edit-details>
-						<InfoIcon aria-hidden="true" />
-						{{ formatMessage(messages.editDetailsOption) }}
-					</template>
-					<template #edit-metadata>
-						<BoxIcon aria-hidden="true" />
-						{{ formatMessage(messages.editMetadataOption) }}
-					</template>
-				</TeleportOverflowMenu>
+				<EditVersionMenu @edit="handleOpenEditVersionModal(version.id, project.id, $event)" />
 				<TeleportOverflowMenu
 					type="quiet"
 					:label="formatMessage(commonMessages.moreOptionsButton)"
@@ -333,7 +297,6 @@ import {
 	BoxIcon,
 	ClipboardCopyIcon,
 	DownloadIcon,
-	EditIcon,
 	ExternalIcon,
 	FileIcon,
 	InfoIcon,
@@ -363,6 +326,7 @@ import {
 import { useTemplateRef, watch } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
+import EditVersionMenu from '~/components/ui/create-project-version/EditVersionMenu.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
@@ -507,10 +471,6 @@ const messages = defineMessages({
 	deleteButton: {
 		id: 'project.versions.delete-button',
 		defaultMessage: 'Delete',
-	},
-	editVersionTooltip: {
-		id: 'project.versions.edit-version-tooltip',
-		defaultMessage: 'Edit version',
 	},
 	editFilesOption: {
 		id: 'project.versions.edit-files-option',

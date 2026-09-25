@@ -22,9 +22,11 @@
 					formatMessage(messages[version.status] ?? messages.unknown)
 				}}</TagItem>
 			</div>
-			<div class="ml-auto flex flex-wrap items-center justify-end gap-2 text-sm text-secondary">
+			<div class="ml-auto flex flex-wrap items-center justify-end gap-1.5 text-sm text-secondary">
 				<span>{{
-					formatMessage(messages.dependencyCount, { count: version.dependencies.length })
+					formatMessage(messages.dependencyCount, {
+						count: version.dependencies.length,
+					})
 				}}</span>
 				<BulletDivider aria-hidden="true" />
 				<span
@@ -39,18 +41,21 @@
 				<time :datetime="version.date_published" :title="formatDateTime(version.date_published)">{{
 					relativeTime(version.date_published)
 				}}</time>
-				<ButtonLink
-					v-tooltip="formatMessage(messages.viewVersion)"
-					:to="versionHref"
-					:aria-label="formatMessage(messages.viewVersion)"
-					target="_blank"
-					type="quiet"
-					circular
-					size="sm"
-					icon-only
-				>
-					<ExternalIcon />
-				</ButtonLink>
+				<div class="flex gap-0">
+					<EditVersionMenu v-if="editable" color="default" size="sm" @edit="emit('edit', $event)" />
+					<ButtonLink
+						v-tooltip="formatMessage(messages.viewVersion)"
+						:to="versionHref"
+						:aria-label="formatMessage(messages.viewVersion)"
+						target="_blank"
+						type="quiet"
+						circular
+						size="sm"
+						icon-only
+					>
+						<ExternalIcon />
+					</ButtonLink>
+				</div>
 			</div>
 		</div>
 		<div class="flex flex-col gap-1.5">
@@ -97,11 +102,19 @@
 						<dl
 							class="m-0 grid min-w-0 grid-cols-[minmax(0,max-content)_minmax(0,1fr)] items-baseline gap-x-6 gap-y-3"
 						>
-							<dt class="text-secondary">{{ formatMessage(messages.versionNumber) }}</dt>
-							<dd class="m-0 min-w-0 break-all">{{ version.version_number }}</dd>
-							<dt class="text-secondary">{{ formatMessage(messages.versionSubtitle) }}</dt>
+							<dt class="text-secondary">
+								{{ formatMessage(messages.versionNumber) }}
+							</dt>
+							<dd class="m-0 min-w-0 break-all">
+								{{ version.version_number }}
+							</dd>
+							<dt class="text-secondary">
+								{{ formatMessage(messages.versionSubtitle) }}
+							</dt>
 							<dd class="m-0 min-w-0 break-words">{{ version.name }}</dd>
-							<dt class="text-secondary">{{ formatMessage(messages.publishedBy) }}</dt>
+							<dt class="text-secondary">
+								{{ formatMessage(messages.publishedBy) }}
+							</dt>
 							<dd class="m-0 min-w-0 break-words">
 								<NuxtLink
 									:to="`/user/${version.author_id}`"
@@ -110,7 +123,9 @@
 									>{{ author?.username ?? version.author_id }}</NuxtLink
 								>
 							</dd>
-							<dt class="text-secondary">{{ formatMessage(messages.versionId) }}</dt>
+							<dt class="text-secondary">
+								{{ formatMessage(messages.versionId) }}
+							</dt>
 							<dd class="m-0 min-w-0"><CopyCode :text="version.id" /></dd>
 						</dl>
 					</section>
@@ -237,17 +252,20 @@ import { formatVersionsForDisplay } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
+import EditVersionMenu from '~/components/ui/create-project-version/EditVersionMenu.vue'
 import { projectQueryOptions } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
+import type { EditVersionStage } from '~/providers/version/manage-version-modal'
 
 import { projectReviewMessages as messages } from '../messages'
 
 const props = defineProps<{
 	version: Labrinth.Versions.v3.Version
 	expanded: boolean
+	editable: boolean
 }>()
-const emit = defineEmits<{ toggle: [] }>()
+const emit = defineEmits<{ toggle: []; edit: [stage: EditVersionStage] }>()
 const { formatMessage } = useVIntl()
 const formatDateTime = useFormatDateTime({
 	dateStyle: 'long',

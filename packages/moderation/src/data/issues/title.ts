@@ -1,13 +1,11 @@
 import { BookOpenIcon } from '@modrinth/assets'
 
-import { generateUrlSlug } from '../../utils'
 import minecraftBranding from '../messages/checklist/messages/title-slug/title/minecraft-branding.md'
 import similarities from '../messages/checklist/messages/title-slug/title/similarities.md'
 import forkSimilarities from '../messages/checklist/messages/title-slug/title/similarities/fork.md'
 import modpackSimilarities from '../messages/checklist/messages/title-slug/title/similarities/modpack.md'
 import uselessInfo from '../messages/checklist/messages/title-slug/title/useless-info.md'
 import { issue, panel, section, toggle } from './component-builders/builders'
-import { misusedSlugIssue } from './slug'
 
 export const titleUselessInfoIssue = issue({
 	id: 'title-useless-info',
@@ -49,7 +47,7 @@ export const modpackTitleSimilaritiesIssue = issue({
 
 export const titleReviewPanel = panel({
 	title: 'Title',
-	hint: "Are the project's name and URL accurate and appropriate?",
+	hint: "Is the project's name accurate and appropriate?",
 	icon: BookOpenIcon,
 	guidanceUrl:
 		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf0803c9660e90f0fead705',
@@ -82,16 +80,6 @@ export const titleReviewPanel = panel({
 			label: 'Forked Project',
 			id: 'title-similarities-fork',
 			issue: titleSimilaritiesIssue,
-		}),
-	),
-	section({
-		label: 'Slug',
-		shown: ({ ProjectV3 }) => generateUrlSlug(ProjectV3.name) !== ProjectV3.slug,
-	}).content(
-		toggle({
-			label: 'Misused slug',
-			issue: misusedSlugIssue,
-			shown: ({ ProjectV3 }) => generateUrlSlug(ProjectV3.name) !== ProjectV3.slug,
 		}),
 	),
 )

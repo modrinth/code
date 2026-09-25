@@ -174,9 +174,13 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.projectTitle',
 		defaultMessage: 'Title',
 	},
-	titleAndSlug: {
-		id: 'moderation.project-review.titleAndSlug',
-		defaultMessage: 'Title and slug',
+	editSection: {
+		id: 'moderation.project-review.editSection',
+		defaultMessage: 'Edit {section}',
+	},
+	saveProject: {
+		id: 'moderation.project-review.saveProject',
+		defaultMessage: 'Save project',
 	},
 	slug: {
 		id: 'moderation.project-review.slug',

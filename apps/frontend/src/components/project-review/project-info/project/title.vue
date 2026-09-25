@@ -1,9 +1,9 @@
 <template>
-	<Section :heading="formatMessage(messages.slug)" :target="{ kind: 'slug' }">
+	<Section :heading="formatMessage(messages.projectTitle)" :target="{ kind: 'title' }">
 		<template #actions>
 			<EditButton
 				v-if="!editing"
-				:section="formatMessage(messages.slug)"
+				:section="formatMessage(messages.projectTitle)"
 				:disabled="saving"
 				@click="startEditing"
 			/>
@@ -12,14 +12,11 @@
 			<Input
 				ref="input"
 				v-model="draft"
-				:aria-label="formatMessage(messages.slug)"
+				:aria-label="formatMessage(messages.projectTitle)"
 				:maxlength="64"
-				autocomplete="off"
 				:disabled="saving"
 				wrapper-class="w-full"
-			>
-				<template #prefix>/{{ projectTypeForUrl }}/</template>
-			</Input>
+			/>
 			<p v-if="validationMessage" class="m-0 text-sm text-red" role="alert">
 				{{ validationMessage }}
 			</p>
@@ -39,12 +36,16 @@
 				</Button>
 			</div>
 		</div>
-		<div v-else-if="project" class="min-w-0">
-			<div class="break-all text-sm">
-				<span>/{{ projectTypeForUrl }}/</span>
-				<span class="inline-flex text-contrast">{{ project.slug ?? project.id }}</span>
-			</div>
-		</div>
+		<h1 v-else-if="project" class="m-0 min-w-0 text-xl">
+			<NuxtLink
+				:to="projectUrl"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="min-w-0 break-words text-contrast hover:underline"
+			>
+				{{ project.name }}
+			</NuxtLink>
+		</h1>
 	</Section>
 </template>
 
@@ -52,7 +53,7 @@
 import { Button, commonMessages, Input, useVIntl } from '@modrinth/ui'
 import { computed, useTemplateRef } from 'vue'
 
-import { getProjectTypeForUrl } from '~/helpers/projects.js'
+import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { projectReviewMessages as messages } from '../../messages'
 import EditButton from '../edit/button.vue'
@@ -60,6 +61,7 @@ import { useProjectTextEdit } from '../edit/use-project-text-edit'
 import Section from '../section.vue'
 
 const { formatMessage } = useVIntl()
+const { projectV2 } = injectProjectReviewPageContext()
 const input = useTemplateRef<InstanceType<typeof Input>>('input')
 const {
 	project,
@@ -71,11 +73,10 @@ const {
 	startEditing,
 	resetEditing,
 	save,
-} = useProjectTextEdit('slug', () => input.value?.focus())
+} = useProjectTextEdit('name', () => input.value?.focus())
 
-const projectTypeForUrl = computed(() => {
-	if (project.value?.minecraft_server != null) return 'server'
-	const type = project.value?.project_types[0] ?? 'mod'
-	return getProjectTypeForUrl(type, project.value?.loaders ?? [])
-})
+const projectUrl = computed(
+	() =>
+		`/${projectV2.value?.project_type ?? project.value?.project_types[0]}/${project.value?.slug ?? project.value?.id}`,
+)
 </script>

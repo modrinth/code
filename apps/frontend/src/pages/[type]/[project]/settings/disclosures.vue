@@ -14,11 +14,11 @@ import {
 import { isAdmin, isStaff, TeamMemberPermission } from '@modrinth/utils'
 import { computed } from 'vue'
 
+import DisclosureCards from '~/components/ui/project-settings/disclosures/DisclosureCards.vue'
 import { disclosureStatusMessages as statusMessages } from '~/components/ui/project-settings/disclosures/messages'
 import { useDisclosureEditor } from '~/components/ui/project-settings/disclosures/use-disclosure-editor'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
-import { useProjectSaveValidation } from '~/composables/project-save-validation'
 
 const {
 	projectV2: project,
