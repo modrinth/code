@@ -47,9 +47,8 @@ pub async fn create_env() -> Result<Box<dyn SandboxEnv>> {
         if tokio::fs::try_exists(FLATPAK_INFO_PATH)
             .await
             .map_err(|err| {
-                err.wrap_err(eyre::eyre!(
-                    "checking if `{FLATPAK_INFO_PATH}` exists"
-                ))
+                eyre::eyre!(err)
+                    .wrap_err("checking if `{FLATPAK_INFO_PATH}` exists")
             })?
         {
             flatpak::Flatpak::init().await

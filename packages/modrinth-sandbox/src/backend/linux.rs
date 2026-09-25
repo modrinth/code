@@ -1,3 +1,10 @@
+use std::{
+    ffi::CStr,
+    os::fd::{AsRawFd, FromRawFd, OwnedFd},
+};
+
+use crate::backend::unix::cvt;
+
 pub(crate) struct WritableMemoryFile {
     fd: OwnedFd,
 }

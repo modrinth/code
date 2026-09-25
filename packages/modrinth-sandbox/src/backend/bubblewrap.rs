@@ -18,9 +18,9 @@ use crate::{
     SandboxStdio,
     backend::{
         Backend, SandboxChild, SandboxChildOp, SandboxCommand, SandboxEnv,
-        unix::UnixChild,
+        linux::WritableMemoryFile, unix::UnixChild,
     },
-    util::{argument::SandboxArg, path::find_command},
+    util::{SandboxArg, find_command},
 };
 
 #[derive(Debug)]
@@ -241,8 +241,10 @@ fn spawn(
     // Special filesystems
     builder.push("--proc");
     builder.push("/proc");
+
     builder.push("--dev");
     builder.push("/dev");
+
     builder.push("--tmpfs");
     builder.push("/tmp");
 
@@ -450,13 +452,11 @@ instance-id={instance_id}
     );
     let flatpak_info: CString =
         CString::from_vec_with_nul(flatpak_info.into_bytes())?;
-    let flatpak_info_fd1 = super::unix::WritableMemoryFile::open(
-        c"modrinth-sandbox-bwrap-flatpak-info1",
-    )?;
+    let flatpak_info_fd1 =
+        WritableMemoryFile::open(c"modrinth-sandbox-bwrap-flatpak-info1")?;
     let flatpak_info_fd1 = flatpak_info_fd1.write(flatpak_info.as_c_str())?;
-    let flatpak_info_fd2 = super::unix::WritableMemoryFile::open(
-        c"modrinth-sandbox-bwrap-flatpak-info2",
-    )?;
+    let flatpak_info_fd2 =
+        WritableMemoryFile::open(c"modrinth-sandbox-bwrap-flatpak-info2")?;
     let flatpak_info_fd2 = flatpak_info_fd2.write(flatpak_info.as_c_str())?;
 
     builder.push("--file");
@@ -598,10 +598,10 @@ fn start_dbus_proxy(
 ) -> Result<DbusProxy> {
     const DBUS_ADDRESS_ENV: &str = "DBUS_SESSION_BUS_ADDRESS";
 
-    let (keep_alive_read_fd, keep_alive_write_fd) = super::unix::open_pipe()?;
+    let (keep_alive_read_fd, keep_alive_write_fd) = super::linux::open_pipe()?;
 
     let session_bus_address = std::env::var_os(DBUS_ADDRESS_ENV)
-        .wrap_err_with(|| eyre!("reading `{DBUS_ADDRESS_ENV}`"))?;
+        .ok_or_else(|| eyre!("reading `{DBUS_ADDRESS_ENV}`"))?;
 
     let mut builder = BubblewrapCommandBuilder::default();
 
@@ -621,17 +621,15 @@ fn start_dbus_proxy(
         true,
     );
 
-    let flatpak_info_fd1 = super::unix::WritableMemoryFile::open(
-        c"modrinth-sandbox-proxy-flatpak-info1",
-    )
-    .wrap_err("creating flatpak-info memory file 1")?;
+    let flatpak_info_fd1 =
+        WritableMemoryFile::open(c"modrinth-sandbox-proxy-flatpak-info1")
+            .wrap_err("creating flatpak-info memory file 1")?;
     let flatpak_info_fd1 = flatpak_info_fd1
         .write(flatpak_info)
         .wrap_err("writing to flatpak-info memory file 1")?;
-    let flatpak_info_fd2 = super::unix::WritableMemoryFile::open(
-        c"modrinth-sandbox-proxy-flatpak-info2",
-    )
-    .wrap_err("creating flatpak-info memory file 2")?;
+    let flatpak_info_fd2 =
+        WritableMemoryFile::open(c"modrinth-sandbox-proxy-flatpak-info2")
+            .wrap_err("creating flatpak-info memory file 2")?;
     let flatpak_info_fd2 = flatpak_info_fd2
         .write(flatpak_info)
         .wrap_err("writing to flatpak-info memory file 2")?;
@@ -1186,8 +1184,7 @@ fn create_seccomp_filter() -> Result<std::os::fd::OwnedFd> {
         );
     }
 
-    let fd =
-        super::unix::WritableMemoryFile::open(c"modrinth-sandbox-seccomp-bpf")?;
+    let fd = WritableMemoryFile::open(c"modrinth-sandbox-seccomp-bpf")?;
     let fd = fd.write_filter(filter)?;
     Ok(fd)
 }
