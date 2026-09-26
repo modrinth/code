@@ -1,6 +1,6 @@
 //! Backend sandbox implementations, using OS-specific primitives.
 
-use std::{collections::BTreeMap, fmt::Debug};
+use std::{collections::{BTreeMap, HashSet}, fmt::Debug};
 
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
@@ -16,7 +16,10 @@ mod flatpak;
 mod linux;
 #[cfg(target_os = "macos")]
 mod macos;
+#[cfg(unix)]
 mod unix;
+#[cfg(windows)]
+mod windows;
 
 /// See [`crate::create_env`].
 #[async_trait]
@@ -59,6 +62,11 @@ pub async fn create_env() -> Result<Box<dyn SandboxEnv>> {
     {
         return macos::Macos::init().await;
     }
+
+    #[cfg(windows)]
+    {
+        return windows::appcontainer::AppContainer::init().await;
+    }
 }
 
 impl SandboxCommand {
@@ -66,19 +74,31 @@ impl SandboxCommand {
         &mut self,
     ) -> BTreeMap<SandboxArg, SandboxArg> {
         if !self.passthrough_environment.is_empty() {
-            for (k, v) in std::env::vars_os() {
-                let k: SandboxArg = k.into();
-                if self.extra_environment.contains_key(&k) {
+            for (mut k, v) in std::env::vars_os() {
+                if k.as_encoded_bytes().contains(&b'=') || v.as_encoded_bytes().contains(&b'=') {
                     continue;
                 }
-                if !self.passthrough_environment.contains(&k) {
+                let original_k: SandboxArg = k.clone().into();
+                k.make_ascii_uppercase();
+                let upper_k: SandboxArg = k.into();
+                if self.extra_environment.contains_key(&upper_k) {
                     continue;
                 }
-                self.extra_environment.insert(k, v.into());
+                if !self.passthrough_environment.contains(&upper_k) {
+                    continue;
+                }
+                self.extra_environment.insert(original_k, v.into());
             }
         }
         std::mem::take(&mut self.extra_environment)
     }
+}
+
+#[derive(Debug)]
+pub struct Pipes {
+    pub stdin: Option<std::io::PipeWriter>,
+    pub stdout: Option<std::io::PipeReader>,
+    pub stderr: Option<std::io::PipeReader>,
 }
 
 #[async_trait]
@@ -99,6 +119,8 @@ pub enum SandboxChild {
     Bubblewrap(bubblewrap::BubblewrapChild),
     #[cfg(target_os = "macos")]
     Macos(macos::MacosChild),
+    #[cfg(target_os = "windows")]
+    AppContainer(windows::WindowsChild),
 }
 
 /// Describes the result of a process after it has terminated.
@@ -106,8 +128,10 @@ pub enum SandboxChild {
 /// This is analogous to [`std::process::ExitStatus`].
 #[derive(Default, Debug, Clone, Copy)]
 pub struct SandboxExitStatus {
-    // TODO cfg
+    #[cfg(unix)]
     imp: unix::UnixSandboxExitStatus,
+    #[cfg(windows)]
+    imp: windows::WindowsSandboxExitStatus,
 }
 
 impl SandboxExitStatus {

@@ -7235,11 +7235,13 @@ dependencies = [
  "libc",
  "libseccomp",
  "rand 0.8.5",
+ "scopeguard",
  "serde",
  "tokio",
  "tracing",
  "tracing-subscriber",
  "uuid 1.23.3",
+ "windows",
  "zbus",
 ]
 

@@ -130,6 +130,10 @@ pub struct SandboxCommand {
     pub stdout: SandboxStdio,
     /// Default io behaviour for stderr
     pub stderr: SandboxStdio,
+    #[cfg(windows)]
+    pub app_container_name: SandboxArg,
+    #[cfg(windows)]
+    pub app_container_description: SandboxArg,
 }
 
 /// Describes what to do with a standard I/O stream for a child process when

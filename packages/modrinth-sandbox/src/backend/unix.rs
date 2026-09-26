@@ -14,7 +14,7 @@ use eyre::Result;
 
 use crate::{
     SandboxExitStatus, SandboxStdio,
-    backend::SandboxChildOp,
+    backend::{SandboxChildOp, Pipes},
     util::{RawStringVec, SandboxArg},
 };
 
@@ -199,13 +199,6 @@ fn exec(
 }
 
 #[derive(Debug)]
-pub struct Pipes {
-    pub stdin: Option<PipeWriter>,
-    pub stdout: Option<PipeReader>,
-    pub stderr: Option<PipeReader>,
-}
-
-#[derive(Debug)]
 pub struct UnixChild {
     pid: libc::pid_t,
     exit_status: Option<SandboxExitStatus>,
@@ -266,7 +259,7 @@ impl SandboxChildOp for UnixChild {
         });
     }
 
-    async fn kill(&mut self) -> eyre::Result<()> {
+    async fn kill(&mut self) -> Result<()> {
         let kill_pid = self.pid;
         tokio::task::spawn_blocking(move || {
             cvt_r(|| unsafe { libc::kill(kill_pid, libc::SIGKILL) })

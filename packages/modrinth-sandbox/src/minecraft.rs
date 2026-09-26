@@ -79,6 +79,7 @@ pub const JVM_ARGUMENTS: &[&str] = &[
     JAVA_AGENT_JVM_ARGUMENT,
 ];
 
+#[cfg(target_os = "linux")]
 const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
     "GDMSESSION",
     "DESKTOP_SESSION",
@@ -128,12 +129,41 @@ const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
     "SDL_IM_MODULE",
 ];
 
+#[cfg(windows)]
+const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
+    "COMPUTERNAME",
+    "HOMEDRIVE",
+    "HOMEPATH",
+    "NUMBER_OF_PROCESSORS",
+    "OS",
+    "PROCESSOR_ARCHITECTURE",
+    "PROCESSOR_IDENTIFIER",
+    "PROCESSOR_LEVEL",
+    "PROCESSOR_REVISION",
+    "PROGRAMDATA",
+    "PROGRAMFILES",
+    "PROGRAMFILES(X86)",
+    "PROGRAMW6432",
+    "PUBLIC",
+    "SYSTEMDRIVE",
+    "SYSTEMROOT",
+    "USERDOMAIN"
+];
+
 pub fn create_command(minecraft: MinecraftCommand) -> Result<SandboxCommand> {
-    let java_path = minecraft.jre_path.join("bin/java");
+    #[cfg(unix)]
+    let java_path = minecraft.jre_path.join("bin").join("java");
+    #[cfg(windows)]
+    let java_path = minecraft.jre_path.join("bin").join("javaw.exe");
+    #[cfg(unix)]
     let persistent_home = minecraft.persistent_dir.join("home");
+    #[cfg(target_os = "linux")]
     let persistent_data = minecraft.persistent_dir.join("data");
+    #[cfg(target_os = "linux")]
     let persistent_config = minecraft.persistent_dir.join("config");
+    #[cfg(target_os = "linux")]
     let persistent_cache = minecraft.persistent_dir.join("cache");
+    #[cfg(target_os = "linux")]
     let persistent_state = minecraft.persistent_dir.join("state");
     let mods_path = minecraft.instance_path.join("mods");
     let classpath = minecraft.classpath;
@@ -166,13 +196,17 @@ pub fn create_command(minecraft: MinecraftCommand) -> Result<SandboxCommand> {
             &minecraft.natives_path,
         )
         .into(),
+        #[cfg(target_os = "linux")]
         OsString::from(format!("{JNA_TMPDIR_JVM_ARGUMENT}=/tmp")).into(),
+        #[cfg(target_os = "linux")]
         OsString::from(format!(
             "{LWJGL_LIBRARY_EXTRACT_PATH_JVM_ARGUMENT}=/tmp"
         ))
         .into(),
+        #[cfg(target_os = "linux")]
         OsString::from(format!("{NETTY_NATIVE_WORKDIR_JVM_ARGUMENT}=/tmp"))
             .into(),
+        #[cfg(unix)]
         jvm_path_argument(USER_HOME_JVM_ARGUMENT, "=", &persistent_home).into(),
     ]);
 
@@ -204,19 +238,30 @@ pub fn create_command(minecraft: MinecraftCommand) -> Result<SandboxCommand> {
     args.extend(minecraft.main_class_args);
 
     let ensure_dirs_exist = vec![
+        #[cfg(unix)]
+        persistent_home.clone(),
+        #[cfg(target_os = "linux")]
         persistent_data.clone(),
+        #[cfg(target_os = "linux")]
         persistent_config.clone(),
+        #[cfg(target_os = "linux")]
         persistent_cache.clone(),
+        #[cfg(target_os = "linux")]
         persistent_state.clone(),
     ];
 
     let mut extra_environment = minecraft.extra_environment;
     extra_environment.extend([
         ("JAVA_HOME".into(), minecraft.jre_path.into()),
+        #[cfg(unix)]
         ("HOME".into(), persistent_home.into()),
+        #[cfg(target_os = "linux")]
         ("XDG_DATA_HOME".into(), persistent_data.into()),
+        #[cfg(target_os = "linux")]
         ("XDG_CONFIG_HOME".into(), persistent_config.into()),
+        #[cfg(target_os = "linux")]
         ("XDG_CACHE_HOME".into(), persistent_cache.into()),
+        #[cfg(target_os = "linux")]
         ("XDG_STATE_HOME".into(), persistent_state.into()),
     ]);
 
@@ -246,6 +291,10 @@ pub fn create_command(minecraft: MinecraftCommand) -> Result<SandboxCommand> {
         stdin: minecraft.stdin,
         stdout: minecraft.stdout,
         stderr: minecraft.stderr,
+        #[cfg(windows)]
+        app_container_name: "ModrinthMinecraftSandbox".into(),
+        #[cfg(windows)]
+        app_container_description: "Sandbox for Minecraft instances created by modrinth-sandbox".into(),
     })
 }
 

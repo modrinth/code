@@ -256,7 +256,8 @@ webauthn-rs-proto = "0.5.5"
 webp = { version = "0.3.1", default-features = false }
 webview2-com = "0.38.0"  # Should be updated in lockstep with wry
 whoami = "1.6.1"
-windows = "=0.61.3"  # Locked on 0.61 until we can update windows-core to 0.62
+scopeguard = "1.2.0"
+windows = { version = "0.61.3", features = ["Win32_Foundation", "Win32_Storage_FileSystem", "Win32_System_Pipes", "Win32_System_JobObjects", "Win32_System_Registry", "Win32_System_Console", "Win32_System_Com", "Win32_System_Threading", "Win32_UI_Shell", "Win32_UI_WindowsAndMessaging", "Win32_System_StationsAndDesktops", "Wdk_System_SystemServices", "Win32_System_SystemServices", "Win32_System_SystemInformation", "Win32_System_WindowsProgramming", "Win32_Security", "Win32_Security_Isolation", "Win32_Security_Credentials", "Win32_Security_Authorization"] } # Locked on 0.61 until we can update windows-core to 0.62
 windows-core = "=0.61.2"  # Locked on 0.61 until webview2-com updates to 0.62
 winreg = "0.55.0"
 woothee = "0.13.0"

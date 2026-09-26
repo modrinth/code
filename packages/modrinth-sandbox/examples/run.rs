@@ -48,6 +48,10 @@ async fn main() -> Result<()> {
             stdin: SandboxStdio::Null,
             stdout: SandboxStdio::Pipe,
             stderr: SandboxStdio::Pipe,
+            #[cfg(windows)]
+            app_container_name: "ModrinthMinecraftSandbox".into(),
+            #[cfg(windows)]
+            app_container_description: "Sandbox for Minecraft instances created by modrinth-sandbox".into(),
         })
         .await
         .wrap_err("spawning process in sandbox")?;
