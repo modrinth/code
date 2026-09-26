@@ -137,16 +137,16 @@ const { addNotification } = injectNotificationManager()
 const { hasModal } = useModalStack()
 
 const crashHeader = computed(() => {
-	const problems = ctx.crashAnalysis?.value?.analysis.problems ?? []
+	const problems = ctx.crashAnalysis?.value?.problems ?? []
 	const count = problems.length
 	return `${count} problem${count !== 1 ? 's' : ''} detected`
 })
 
 const crashItems = computed<CollapsibleAdmonitionItem[]>(() => {
-	const problems = ctx.crashAnalysis?.value?.analysis.problems ?? []
+	const problems = ctx.crashAnalysis?.value?.problems ?? []
 	return problems.map((p) => ({
 		title: p.message,
-		descriptions: p.solutions.map((s) => s.message),
+		descriptions: p.solutions,
 	}))
 })
 
@@ -441,7 +441,7 @@ async function handleShare() {
 
 	isSharing.value = true
 	try {
-		const data = await client.mclogs.logs_v1.create(content)
+		const data = await client.minelog.logs_v2.create(content)
 		if (data.url) {
 			shareModal.value?.show(data.url)
 		}

@@ -59,8 +59,8 @@ import { LabrinthThreadsV3Module } from './labrinth/threads/v3'
 import { LabrinthUsersV2Module } from './labrinth/users/v2'
 import { LabrinthUsersV3Module } from './labrinth/users/v3'
 import { LauncherMetaManifestV0Module } from './launcher-meta/v0'
-import { MclogsInsightsV1Module } from './mclogs/insights/v1'
-import { MclogsLogsV1Module } from './mclogs/logs/v1'
+import { MinelogInsightsV2Module } from './minelog/insights/v2'
+import { MinelogLogsV2Module } from './minelog/logs/v2'
 import { PaperVersionsV3Module } from './paper/v3'
 import { PurpurVersionsV2Module } from './purpur/v2'
 import { SharedInstancesInstancesV1Module } from './shared-instances/instances/v1'
@@ -94,8 +94,8 @@ export const MODULE_REGISTRY = {
 	archon_servers_v1: ArchonServersV1Module,
 	archon_transfers_internal: ArchonTransfersInternalModule,
 	iso3166_data: ISO3166Module,
-	mclogs_insights_v1: MclogsInsightsV1Module,
-	mclogs_logs_v1: MclogsLogsV1Module,
+	minelog_insights_v2: MinelogInsightsV2Module,
+	minelog_logs_v2: MinelogLogsV2Module,
 	launchermeta_manifest_v0: LauncherMetaManifestV0Module,
 	kyros_content_v1: KyrosContentV1Module,
 	kyros_files_v0: KyrosFilesV0Module,

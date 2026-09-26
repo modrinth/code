@@ -32,7 +32,7 @@
 					"url": "https://*.nodes.modrinth.com/*"
 				},
 				{
-					"url": "https://api.mclo.gs/*"
+					"url": "https://api.minelog.org/*"
 				},
 				{
 					"url": "https://fill.papermc.io/*"

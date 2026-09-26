@@ -1485,7 +1485,7 @@
     "defaultMessage": "Failed to open file"
   },
   "files.editor.failed-to-share-text": {
-    "defaultMessage": "Could not upload to mclo.gs."
+    "defaultMessage": "Could not upload to Minelog."
   },
   "files.editor.failed-to-share-title": {
     "defaultMessage": "Failed to share file"
@@ -1650,7 +1650,7 @@
     "defaultMessage": "Search files"
   },
   "files.navbar.share-to-mclogs": {
-    "defaultMessage": "Share to mclo.gs"
+    "defaultMessage": "Share to Minelog"
   },
   "files.navbar.upload-file": {
     "defaultMessage": "Upload file"

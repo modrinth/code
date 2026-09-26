@@ -116,8 +116,8 @@ async function analyseForCrash() {
 
 	const content = lines.map((l) => l.text).join('\n')
 	try {
-		const data = await client.mclogs.insights_v1.analyse(content)
-		if (data.analysis?.problems?.length > 0) {
+		const data = await client.minelog.insights_v2.analyse(content)
+		if (data.problems?.length > 0) {
 			crashAnalysis.value = data
 		}
 	} catch {

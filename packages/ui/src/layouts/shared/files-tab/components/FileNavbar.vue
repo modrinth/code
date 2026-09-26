@@ -293,7 +293,7 @@ const messages = defineMessages({
 	},
 	shareToMclogs: {
 		id: 'files.navbar.share-to-mclogs',
-		defaultMessage: 'Share to mclo.gs',
+		defaultMessage: 'Share to Minelog',
 	},
 	findInFile: {
 		id: 'files.navbar.find-in-file',

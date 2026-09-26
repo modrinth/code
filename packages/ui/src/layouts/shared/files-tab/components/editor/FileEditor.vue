@@ -108,7 +108,7 @@ const messages = defineMessages({
 	},
 	failedToShareText: {
 		id: 'files.editor.failed-to-share-text',
-		defaultMessage: 'Could not upload to mclo.gs.',
+		defaultMessage: 'Could not upload to Minelog.',
 	},
 })
 
@@ -276,9 +276,9 @@ async function shareToMclogs() {
 	}
 
 	try {
-		const data = await client.mclogs.logs_v1.create(fileContent.value)
+		const data = await client.minelog.logs_v2.create(fileContent.value)
 
-		if (data.success && data.url) {
+		if (data.url) {
 			await navigator.clipboard.writeText(data.url)
 			addNotification({
 				title: formatMessage(messages.logUrlCopiedTitle),
@@ -286,7 +286,7 @@ async function shareToMclogs() {
 				type: 'success',
 			})
 		} else {
-			throw new Error('mclo.gs upload failed')
+			throw new Error('Minelog upload failed')
 		}
 	} catch (error) {
 		console.error('Error sharing file:', error)

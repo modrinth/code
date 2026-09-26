@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Mclogs } from '@modrinth/api-client'
+import type { Minelog } from '@modrinth/api-client'
 import { useStorage } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
@@ -88,7 +88,7 @@ watch(
 	{ immediate: true },
 )
 
-const crashAnalysis = ref<Mclogs.Insights.v1.InsightsResponse | null>(null)
+const crashAnalysis = ref<Minelog.Insights.v2.InsightsResponse | null>(null)
 const DISMISS_DURATION_MS = 30 * 60 * 1000
 const dismissedUntil = useStorage(`modrinth-crash-dismissed-${serverId}`, 0)
 
@@ -102,8 +102,8 @@ const inspectError = async () => {
 		const log = await blob.text()
 		if (!log) return
 
-		const data = await client.mclogs.insights_v1.analyse(log)
-		if (data.analysis?.problems?.length) {
+		const data = await client.minelog.insights_v2.analyse(log)
+		if (data.problems?.length) {
 			crashAnalysis.value = data
 		} else {
 			crashAnalysis.value = null
