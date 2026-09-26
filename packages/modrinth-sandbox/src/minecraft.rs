@@ -132,8 +132,10 @@ const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
 #[cfg(windows)]
 const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
     "COMPUTERNAME",
+    "HOME",
     "HOMEDRIVE",
     "HOMEPATH",
+    "HOSTNAME",
     "NUMBER_OF_PROCESSORS",
     "OS",
     "PROCESSOR_ARCHITECTURE",
@@ -147,7 +149,23 @@ const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
     "PUBLIC",
     "SYSTEMDRIVE",
     "SYSTEMROOT",
-    "USERDOMAIN"
+    "USERDOMAIN",
+    "APPDATA",
+    "LOCALAPPDATA",
+    "ALLUSERSPROFILE",
+    "PATH",
+    "PATHEXT",
+    "COMMONPROGRAMFILES",
+    "COMSPEC",
+    "DRIVERDATA",
+    "PROCESSOR_ARCHITECTURE",
+    "PROCESSOR_IDENTIFIER",
+    "PROCESSOR_LEVEL",
+    "SESSIONNAME",
+    "USERNAME",
+    "USERPROFILE",
+    "WINDIR",
+    "TEMP"
 ];
 
 pub fn create_command(minecraft: MinecraftCommand) -> Result<SandboxCommand> {

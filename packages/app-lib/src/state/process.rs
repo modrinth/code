@@ -228,20 +228,34 @@ impl ProcessManager {
         let mut mc_proc = sandbox_env.spawn(command).await?;
         let child_pid = mc_proc.id();
 
-        // let stdout = mc_proc
-        //     .stdout
-        //     .take()
-        //     .map(|reader| {
-        //         tokio::net::unix::pipe::Receiver::from_owned_fd(reader.into())
-        //     })
-        //     .expect("`stdout` is set to `Pipe` so should be available")?;
-        // let stderr = mc_proc
-        //     .stderr
-        //     .take()
-        //     .map(|reader| {
-        //         tokio::net::unix::pipe::Receiver::from_owned_fd(reader.into())
-        //     })
-        //     .expect("`stderr` is set to `Pipe` so should be available")?;
+        let stdout = mc_proc
+            .stdout
+            .take()
+            .map(|reader| -> eyre::Result<_> {
+                #[cfg(unix)]
+                {
+                    tokio::net::unix::pipe::Receiver::from_owned_fd(reader.into())
+                }
+                #[cfg(windows)]
+                {
+                    eyre::Result::Ok(crate::util::blocking_reader::Blocking::new(reader))
+                }
+            })
+            .expect("`stdout` is set to `Pipe` so should be available")?;
+        let stderr = mc_proc
+            .stderr
+            .take()
+            .map(|reader| -> eyre::Result<_> {
+                #[cfg(unix)]
+                {
+                    tokio::net::unix::pipe::Receiver::from_owned_fd(reader.into())
+                }
+                #[cfg(windows)]
+                {
+                    eyre::Result::Ok(crate::util::blocking_reader::Blocking::new(reader))
+                }
+            })
+            .expect("`stderr` is set to `Pipe` so should be available")?;
 
         let mut process = Process {
             metadata: ProcessMetadata {
@@ -257,37 +271,37 @@ impl ProcessManager {
         };
         let metadata = process.metadata.clone();
 
-        // {
-        //     let log_path = log_path.clone();
-        //     let instance_id = metadata.instance_id.clone();
-        //     let instance_path = metadata.instance_path.clone();
-        //     tokio::spawn(async move {
-        //         Process::process_output(
-        //             &instance_id,
-        //             &instance_path,
-        //             stdout,
-        //             log_path,
-        //             xml_logging,
-        //         )
-        //         .await;
-        //     });
-        // }
+        {
+            let log_path = log_path.clone();
+            let instance_id = metadata.instance_id.clone();
+            let instance_path = metadata.instance_path.clone();
+            tokio::spawn(async move {
+                Process::process_output(
+                    &instance_id,
+                    &instance_path,
+                    stdout,
+                    log_path,
+                    xml_logging,
+                )
+                .await;
+            });
+        }
 
-        // {
-        //     let log_path = log_path.clone();
-        //     let instance_id = metadata.instance_id.clone();
-        //     let instance_path = metadata.instance_path.clone();
-        //     tokio::spawn(async move {
-        //         Process::process_output(
-        //             &instance_id,
-        //             &instance_path,
-        //             stderr,
-        //             log_path,
-        //             xml_logging,
-        //         )
-        //         .await;
-        //     });
-        // }
+        {
+            let log_path = log_path.clone();
+            let instance_id = metadata.instance_id.clone();
+            let instance_path = metadata.instance_path.clone();
+            tokio::spawn(async move {
+                Process::process_output(
+                    &instance_id,
+                    &instance_path,
+                    stderr,
+                    log_path,
+                    xml_logging,
+                )
+                .await;
+            });
+        }
 
         let state = match crate::State::get().await {
             Ok(state) => state,

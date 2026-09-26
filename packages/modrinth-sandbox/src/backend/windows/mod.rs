@@ -23,12 +23,10 @@ pub(crate) fn spawn(
 ) -> Result<(Pipes, WindowsChild)> {
     let program = resolve_path(program)?;
     let working_directory = working_directory.map(resolve_path).transpose()?;
-    dbg!(&program);
-    dbg!(&working_directory);
     let application_name = program.as_os_str().encode_wide()
         .chain([0])
         .collect::<Vec<_>>();
-    dbg!(&arguments);
+    dbg!(&arguments, join_windows_shell_arg(arguments.as_slice()));
     let mut command_line = join_windows_shell_arg(arguments.as_slice()).encode_wide()
         .chain([0])
         .collect::<Vec<_>>();
@@ -191,7 +189,7 @@ pub(crate) fn spawn(
     drop(handles_to_close);
 
     unsafe {
-        // _ = AssignProcessToJobObject(job_handle, pi.hProcess);
+        _ = AssignProcessToJobObject(job_handle, pi.hProcess);
     }
 
     return Ok((

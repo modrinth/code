@@ -73,23 +73,37 @@ impl SandboxCommand {
     pub(crate) fn take_environment(
         &mut self,
     ) -> BTreeMap<SandboxArg, SandboxArg> {
-        if !self.passthrough_environment.is_empty() {
-            for (mut k, v) in std::env::vars_os() {
+        let mut passthrough = std::mem::take(&mut self.passthrough_environment).into_iter().map(|k| {
+            let mut k = k.into_os_string();
+            k.make_ascii_uppercase();
+            k
+        }).collect::<HashSet<_>>();
+
+        if cfg!(windows) {
+            passthrough.insert("APPDATA".into());
+            passthrough.insert("LOCALAPPDATA".into());
+        }
+
+        if !passthrough.is_empty() {
+            let ignore_overrides = self.extra_environment.keys().map(|k| k.as_os_str().to_ascii_uppercase()).collect::<HashSet<_>>();
+
+            for (k, v) in std::env::vars_os() {
                 if k.as_encoded_bytes().contains(&b'=') || v.as_encoded_bytes().contains(&b'=') {
                     continue;
                 }
-                let original_k: SandboxArg = k.clone().into();
-                k.make_ascii_uppercase();
-                let upper_k: SandboxArg = k.into();
-                if self.extra_environment.contains_key(&upper_k) {
+
+                let upper_k = k.to_ascii_uppercase();
+                if ignore_overrides.contains(&upper_k) {
                     continue;
                 }
-                if !self.passthrough_environment.contains(&upper_k) {
-                    continue;
-                }
-                self.extra_environment.insert(original_k, v.into());
+                // if !passthrough.contains(&upper_k) {
+                //     continue;
+                // }
+
+                self.extra_environment.insert(k.into(), v.into());
             }
         }
+
         std::mem::take(&mut self.extra_environment)
     }
 }

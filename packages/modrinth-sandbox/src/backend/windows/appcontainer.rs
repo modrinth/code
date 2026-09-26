@@ -1,6 +1,6 @@
 use std::{cell::OnceCell, collections::HashSet, ffi::{OsStr, OsString}, io::{Error, ErrorKind}, os::windows::{ffi::{OsStrExt, OsStringExt}, io::OwnedHandle}, path::Path, sync::OnceLock};
 
-use windows::{Win32::{Foundation::{ERROR_ACCESS_DENIED, ERROR_ALREADY_EXISTS, ERROR_INSUFFICIENT_BUFFER, ERROR_SUCCESS, GetLastError, HANDLE, LocalFree}, Security::{ACE_HEADER, ACL, Authorization::{ConvertSidToStringSidW, ConvertStringSidToSidW, EXPLICIT_ACCESS_W, GRANT_ACCESS, GetNamedSecurityInfoW, GetSecurityInfo, NO_MULTIPLE_TRUSTEE, SE_FILE_OBJECT, SE_WINDOW_OBJECT, SetEntriesInAclW, SetNamedSecurityInfoW, SetSecurityInfo, TRUSTEE_IS_GROUP, TRUSTEE_IS_SID}, CONTAINER_INHERIT_ACE, CreateWellKnownSid, DACL_SECURITY_INFORMATION, DeriveCapabilitySidsFromName, FreeSid, GetAce, InitializeSecurityDescriptor, Isolation::{CreateAppContainerProfile, DeriveAppContainerSidFromAppContainerName}, NO_INHERITANCE, OBJECT_INHERIT_ACE, PSECURITY_DESCRIPTOR, PSID, SECURITY_CAPABILITIES, SID_AND_ATTRIBUTES, SetFileSecurityW, SetSecurityDescriptorDacl, WELL_KNOWN_SID_TYPE, WinCapabilityInternetClientServerSid, WinCapabilityInternetClientSid, WinCapabilityPrivateNetworkClientServerSid}, Storage::FileSystem::{FILE_ALL_ACCESS, FILE_GENERIC_EXECUTE, FILE_GENERIC_READ, FILE_TRAVERSE, READ_CONTROL, WRITE_DAC}, System::{StationsAndDesktops::OpenWindowStationW, SystemServices::{SE_GROUP_ENABLED, SECURITY_DESCRIPTOR_REVISION}, Threading::{DeleteProcThreadAttributeList, InitializeProcThreadAttributeList, LPPROC_THREAD_ATTRIBUTE_LIST, PROC_THREAD_ATTRIBUTE_SECURITY_CAPABILITIES, UpdateProcThreadAttribute}}, UI::WindowsAndMessaging::WINSTA_WRITEATTRIBUTES}, core::{HRESULT, PCWSTR, PWSTR}};
+use windows::{Win32::{Foundation::{ERROR_ACCESS_DENIED, ERROR_ALREADY_EXISTS, ERROR_INSUFFICIENT_BUFFER, ERROR_SUCCESS, GetLastError, HANDLE, LocalFree}, Security::{ACE_HEADER, ACL, Authorization::{ConvertSidToStringSidW, ConvertStringSidToSidW, EXPLICIT_ACCESS_W, GRANT_ACCESS, GetNamedSecurityInfoW, GetSecurityInfo, NO_MULTIPLE_TRUSTEE, SE_FILE_OBJECT, SE_WINDOW_OBJECT, SetEntriesInAclW, SetNamedSecurityInfoW, SetSecurityInfo, TRUSTEE_IS_GROUP, TRUSTEE_IS_SID}, CONTAINER_INHERIT_ACE, CreateWellKnownSid, DACL_SECURITY_INFORMATION, DeriveCapabilitySidsFromName, FreeSid, GetAce, InitializeSecurityDescriptor, Isolation::{CreateAppContainerProfile, DeleteAppContainerProfile, DeriveAppContainerSidFromAppContainerName}, NO_INHERITANCE, OBJECT_INHERIT_ACE, PSECURITY_DESCRIPTOR, PSID, SECURITY_CAPABILITIES, SID_AND_ATTRIBUTES, SetFileSecurityW, SetSecurityDescriptorDacl, WELL_KNOWN_SID_TYPE, WinCapabilityInternetClientServerSid, WinCapabilityInternetClientSid, WinCapabilityPrivateNetworkClientServerSid}, Storage::FileSystem::{FILE_ALL_ACCESS, FILE_GENERIC_EXECUTE, FILE_GENERIC_READ, FILE_TRAVERSE, READ_CONTROL, WRITE_DAC}, System::{StationsAndDesktops::OpenWindowStationW, SystemServices::{SE_GROUP_ENABLED, SECURITY_DESCRIPTOR_REVISION}, Threading::{DeleteProcThreadAttributeList, InitializeProcThreadAttributeList, LPPROC_THREAD_ATTRIBUTE_LIST, PROC_THREAD_ATTRIBUTE_SECURITY_CAPABILITIES, UpdateProcThreadAttribute}}, UI::WindowsAndMessaging::WINSTA_WRITEATTRIBUTES}, core::{HRESULT, PCWSTR, PWSTR}};
 
 use async_trait::async_trait;
 use derive_more::Debug;
@@ -87,6 +87,13 @@ fn send_spawn(env: AppContainerEnv, command: SandboxCommand) -> tokio::sync::one
 
 fn spawn(env: &AppContainerEnv, mut command: SandboxCommand) -> Result<crate::SandboxChild> {
     let environment = command.take_environment();
+
+    if !environment.contains_key(&"APPDATA".into()) {
+        return Err(eyre!("Missing APPDATA environment variable"));
+    }
+    if !environment.contains_key(&"LOCALAPPDATA".into()) {
+        return Err(eyre!("Missing LOCALAPPDATA environment variable"));
+    }
 
     let app_container_sid = create_app_container(command.app_container_name.as_os_str(), command.app_container_description.as_os_str())?;
     scopeguard::defer! {
