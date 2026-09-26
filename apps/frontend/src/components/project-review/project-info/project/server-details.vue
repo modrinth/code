@@ -1,5 +1,5 @@
 <template>
-	<Section :heading="formatMessage(messages.serverDetails)">
+	<Section :heading="formatMessage(messages.serverDetails)" :target="{ kind: 'server' }">
 		<dl v-if="project" class="m-0 grid grid-cols-[max-content_minmax(0,1fr)] gap-x-3 gap-y-2.5">
 			<dt>{{ formatMessage(messages.serverAddress) }}</dt>
 			<dd class="m-0 break-all text-primary">

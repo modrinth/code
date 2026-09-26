@@ -7,6 +7,7 @@ export type ReviewTarget =
 				| 'summary'
 				| 'tags'
 				| 'compatibility'
+				| 'server'
 				| 'reupload'
 				| 're-review'
 				| 'post-approval'
