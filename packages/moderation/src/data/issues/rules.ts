@@ -3,7 +3,6 @@ import { ListBulletedIcon } from '@modrinth/assets'
 import aiGeneratedMessage from '../messages/checklist/messages/rules/ai-generated.md'
 import aiImagesMessage from '../messages/checklist/messages/rules/ai-images.md'
 import cheatOrHackAdvertisingMessage from '../messages/checklist/messages/rules/cheat-or-hack-advertising.md'
-import excessiveLanguagesMessage from '../messages/checklist/messages/rules/excessive-languages.md'
 import paidAccessServerMessage from '../messages/checklist/messages/rules/paid-access-server.md'
 import prohibitedContentDiscriminatoryMessage from '../messages/checklist/messages/rules/prohibited-content/discriminatory.md'
 import prohibitedContentFalseEndorsementMessage from '../messages/checklist/messages/rules/prohibited-content/false-endorsement.md'
@@ -50,14 +49,6 @@ export const rulesServerSideOptOutIssue = issue({
 	title: 'Server-side opt-out required',
 	category: 'Project wide',
 	message: serverSideOptOutMessage,
-	suggestedStatus: 'flagged',
-})
-
-export const rulesExcessiveLanguagesIssue = issue({
-	id: 'rules-excessive-languages',
-	title: 'Excessive languages',
-	category: 'Project wide',
-	message: excessiveLanguagesMessage,
 	suggestedStatus: 'flagged',
 })
 
@@ -158,12 +149,6 @@ export const rulesReviewPanel = panel({
 		toggle({
 			issue: rulesServerSideOptOutIssue,
 			label: 'Opt-out',
-		}),
-		toggle({
-			issue: rulesExcessiveLanguagesIssue,
-			label: 'Excessive languages',
-			shown: ({ ProjectV3 }) =>
-				!!ProjectV3.minecraft_server && (ProjectV3.minecraft_server.languages?.length ?? 0) > 4,
 		}),
 		toggle({
 			issue: rulesAiGeneratedIssue,

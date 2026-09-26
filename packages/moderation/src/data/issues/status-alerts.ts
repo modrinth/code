@@ -9,7 +9,7 @@ import privateUseNoteSharedInstanceMessage from '../messages/checklist/messages/
 import privateUseProjectMessage from '../messages/checklist/messages/status-alerts/private-use/project.md'
 import privateUseServerMessage from '../messages/checklist/messages/status-alerts/private-use/server.md'
 import serverUseMessage from '../messages/checklist/messages/status-alerts/server-use.md'
-import temporaryServerMessage from '../messages/checklist/messages/status-alerts/temporary-server.md'
+
 import { issue, panel, toggle } from './component-builders/builders'
 
 export const statusAlertsCorrectionsAppliedIssue = issue({
@@ -35,14 +35,6 @@ export const statusAlertsPrivateUseIssue = issue({
 				: '',
 		].join('\n')
 	},
-	suggestedStatus: 'flagged',
-})
-
-export const statusAlertsTemporaryServerIssue = issue({
-	id: 'status-alerts-temporary-server',
-	title: 'Temporary server',
-	category: 'Project wide',
-	message: temporaryServerMessage,
 	suggestedStatus: 'flagged',
 })
 
@@ -89,14 +81,6 @@ export const statusAlertsReviewPanel = panel({
 	toggle({
 		issue: statusAlertsPrivateUseIssue,
 		label: 'Private use',
-	}),
-	toggle({
-		issue: statusAlertsTemporaryServerIssue,
-		label: 'Temporary server',
-		shown: ({ ProjectV3 }) =>
-			['aternos', 'minekeep', 'minehut'].some((host) =>
-				ProjectV3.minecraft_java_server?.address?.includes(host),
-			),
 	}),
 	toggle({
 		issue: statusAlertsServerUseIssue,

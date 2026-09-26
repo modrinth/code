@@ -122,6 +122,14 @@ export function requiresEnvironmentInfo(projectTypes): boolean {
 	return projectTypes.includes('mod') || projectTypes.includes('modpack')
 }
 
+export function projectHasCustomServerModpack(projectV3: Labrinth.Projects.v3.Project): boolean {
+	return (
+		!!projectV3.minecraft_server &&
+		projectV3.minecraft_java_server?.content?.kind === 'modpack' &&
+		projectV3.minecraft_java_server.content.project_id === projectV3.id
+	)
+}
+
 export function flattenStaticVariables(): Record<string, string> {
 	const vars: Record<string, string> = {}
 
