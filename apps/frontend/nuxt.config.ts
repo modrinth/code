@@ -5,6 +5,9 @@ import { fileURLToPath } from 'url'
 import svgLoader from 'vite-svg-loader'
 
 import { GenericModrinthClient, type Labrinth } from '../../packages/api-client/src/index.ts'
+import moderationMessages, {
+	moderationMessagesDirectory,
+} from '../../packages/moderation/vite-plugin'
 
 const STAGING_API_URL = 'https://staging-api.modrinth.com/v2/'
 const STAGING_SHARED_INSTANCES_API_URL = 'https://staging-shared-instances.modrinth.com'
@@ -26,6 +29,7 @@ export default defineNuxtConfig({
 	srcDir: 'src/',
 	alias: {
 		'@modrinth/api-client': API_CLIENT_SOURCE,
+		'#messages': moderationMessagesDirectory,
 	},
 	app: {
 		head: {
@@ -81,6 +85,7 @@ export default defineNuxtConfig({
 			dedupe: ['vue'],
 		},
 		plugins: [
+			moderationMessages(),
 			svgLoader({
 				svgoConfig: {
 					plugins: [

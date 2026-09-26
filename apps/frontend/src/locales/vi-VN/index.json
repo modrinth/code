@@ -869,17 +869,11 @@
   "conversation-thread.action.approve": {
     "message": "Chấp thuận"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Chấp thuận với phản hồi"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Đóng với phản hồi"
   },
   "conversation-thread.action.reject": {
     "message": "Từ chối"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Từ chối với phản hồi"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Mở lại luồng"
@@ -913,9 +907,6 @@
   },
   "conversation-thread.action.withhold": {
     "message": "Thu hồi"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Thu hồi với phản hồi"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Luồng này đã bị đóng và tin nhắn mới không thể gửi được vào."

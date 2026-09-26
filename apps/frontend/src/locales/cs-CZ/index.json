@@ -917,17 +917,11 @@
   "conversation-thread.action.approve": {
     "message": "Schválit"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Schválit s odpovědí"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Uzavřít s odpovědí"
   },
   "conversation-thread.action.reject": {
     "message": "Zamítnout"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Zamítnout s odpovědí"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Znovuotevřít vlákno"
@@ -961,9 +955,6 @@
   },
   "conversation-thread.action.withhold": {
     "message": "Pozastavit"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Pozastavit s odpovědí"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Toto vlákno je uzavřené a nelze do něj posílat nové zprávy."

@@ -1067,9 +1067,6 @@
   "conversation-thread.action.approve": {
     "message": "Annehmen"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Mit Antwort annehmen"
-  },
   "conversation-thread.action.close-report": {
     "message": "Meldung schließen"
   },
@@ -1078,9 +1075,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Ablehnen"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Mit Antwort ablehnen"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Thread erneut öffnen"
@@ -1114,9 +1108,6 @@
   },
   "conversation-thread.action.withhold": {
     "message": "Zurückhalten"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Mit Antwort zurückhalten"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Dieser Thread ist geschlossen und keine neuen Nachrichten können mehr gesendet werden."

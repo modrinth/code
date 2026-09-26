@@ -1007,17 +1007,11 @@
   "conversation-thread.action.approve": {
     "message": "موافقة"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "الموافقة مع الرد"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "الإغلاق مع الرد"
   },
   "conversation-thread.action.reject": {
     "message": "رفض"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "الرفض مع الرد"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "إعادة فتح سلسلة المحادثة"
@@ -1051,9 +1045,6 @@
   },
   "conversation-thread.action.withhold": {
     "message": "حجب"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "الحجب مع الرد"
   },
   "conversation-thread.closed-thread.description": {
     "message": "هذه السلسلة مغلقة، ولا يمكن إرسال رسائل جديدة إليها."

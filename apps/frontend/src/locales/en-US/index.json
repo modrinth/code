@@ -1067,9 +1067,6 @@
   "conversation-thread.action.approve": {
     "message": "Approve"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Approve with reply"
-  },
   "conversation-thread.action.close-report": {
     "message": "Close report"
   },
@@ -1078,9 +1075,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Reject"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Reject with reply"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Reopen thread"
@@ -1115,9 +1109,6 @@
   "conversation-thread.action.withhold": {
     "message": "Withhold"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Withhold with reply"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "This thread is closed and new messages cannot be sent to it."
   },
@@ -1129,6 +1120,15 @@
   },
   "conversation-thread.error.sending-message": {
     "message": "Error sending message"
+  },
+  "conversation-thread.no-issues-flagged": {
+    "message": "No issues flagged."
+  },
+  "conversation-thread.private-note.placeholder": {
+    "message": "Leave a private note for staff..."
+  },
+  "conversation-thread.private-note.tab": {
+    "message": "Private note"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Reply to thread..."
@@ -3014,6 +3014,12 @@
   "moderation.exclude-technical-review": {
     "message": "Exclude TR"
   },
+  "moderation.keybinds.general": {
+    "message": "General"
+  },
+  "moderation.keybinds.project-review": {
+    "message": "Project review page"
+  },
   "moderation.moderate": {
     "message": "Moderate"
   },
@@ -3034,6 +3040,555 @@
   },
   "moderation.page.technicalReview": {
     "message": "Tech review"
+  },
+  "moderation.project-review.approvedCount": {
+    "message": "{count} approved"
+  },
+  "moderation.project-review.archived": {
+    "message": "Archived"
+  },
+  "moderation.project-review.archivedCount": {
+    "message": "{count} archived"
+  },
+  "moderation.project-review.author": {
+    "message": "Author"
+  },
+  "moderation.project-review.back": {
+    "message": "Back"
+  },
+  "moderation.project-review.backToFiles": {
+    "message": "Back to files"
+  },
+  "moderation.project-review.bottom": {
+    "message": "Tools"
+  },
+  "moderation.project-review.changelog": {
+    "message": "Changelog"
+  },
+  "moderation.project-review.closeReview": {
+    "message": "Close review controls"
+  },
+  "moderation.project-review.collapseAll": {
+    "message": "Collapse all"
+  },
+  "moderation.project-review.collapseVersion": {
+    "message": "Hide details"
+  },
+  "moderation.project-review.compatibility": {
+    "message": "Compatibility"
+  },
+  "moderation.project-review.complete": {
+    "message": "Complete"
+  },
+  "moderation.project-review.completedFiles": {
+    "message": "Reviewed files ({count})"
+  },
+  "moderation.project-review.conversationThread": {
+    "message": "Conversation thread"
+  },
+  "moderation.project-review.copyHash": {
+    "message": "Copy {algorithm}"
+  },
+  "moderation.project-review.created": {
+    "message": "Created"
+  },
+  "moderation.project-review.customLicense": {
+    "message": "Custom"
+  },
+  "moderation.project-review.customSlug": {
+    "message": "Differs from the project name"
+  },
+  "moderation.project-review.dependencies": {
+    "message": "Dependencies"
+  },
+  "moderation.project-review.dependencyCount": {
+    "message": "{count, plural, one {# dep} other {# deps}}"
+  },
+  "moderation.project-review.description": {
+    "message": "Description"
+  },
+  "moderation.project-review.details": {
+    "message": "Details"
+  },
+  "moderation.project-review.disclosures": {
+    "message": "Disclosures"
+  },
+  "moderation.project-review.discord": {
+    "message": "Discord invite"
+  },
+  "moderation.project-review.donationBmac": {
+    "message": "Buy Me A Coffee"
+  },
+  "moderation.project-review.donationGithub": {
+    "message": "GitHub Sponsors"
+  },
+  "moderation.project-review.donationKoFi": {
+    "message": "Ko-fi"
+  },
+  "moderation.project-review.donationOther": {
+    "message": "Other"
+  },
+  "moderation.project-review.donationPatreon": {
+    "message": "Patreon"
+  },
+  "moderation.project-review.donationPaypal": {
+    "message": "PayPal"
+  },
+  "moderation.project-review.download": {
+    "message": "Download"
+  },
+  "moderation.project-review.downloads": {
+    "message": "Downloads"
+  },
+  "moderation.project-review.draft": {
+    "message": "Draft"
+  },
+  "moderation.project-review.draftCount": {
+    "message": "{count} draft"
+  },
+  "moderation.project-review.editSection": {
+    "message": "Edit {section}"
+  },
+  "moderation.project-review.embedded": {
+    "message": "Embedded"
+  },
+  "moderation.project-review.empty": {
+    "message": "No project selected"
+  },
+  "moderation.project-review.emptyChangelog": {
+    "message": "No changelog"
+  },
+  "moderation.project-review.emptyDependencies": {
+    "message": "No dependencies"
+  },
+  "moderation.project-review.emptyDescription": {
+    "message": "No description"
+  },
+  "moderation.project-review.emptyEnvironments": {
+    "message": "No environments"
+  },
+  "moderation.project-review.emptyGallery": {
+    "message": "No gallery images"
+  },
+  "moderation.project-review.emptyLinks": {
+    "message": "No links"
+  },
+  "moderation.project-review.emptyPlatforms": {
+    "message": "No platforms"
+  },
+  "moderation.project-review.emptyTags": {
+    "message": "No tags"
+  },
+  "moderation.project-review.emptyVersions": {
+    "message": "No versions"
+  },
+  "moderation.project-review.environments": {
+    "message": "Environments"
+  },
+  "moderation.project-review.exit": {
+    "message": "Exit"
+  },
+  "moderation.project-review.expandAll": {
+    "message": "Expand all"
+  },
+  "moderation.project-review.expandVersion": {
+    "message": "Show details"
+  },
+  "moderation.project-review.featured": {
+    "message": "Featured"
+  },
+  "moderation.project-review.fileCount": {
+    "message": "{count, plural, one {# file} other {# files}}"
+  },
+  "moderation.project-review.files": {
+    "message": "Files"
+  },
+  "moderation.project-review.finish": {
+    "message": "Finish"
+  },
+  "moderation.project-review.gallery": {
+    "message": "Gallery"
+  },
+  "moderation.project-review.gameVersions": {
+    "message": "Game versions"
+  },
+  "moderation.project-review.generalSettings": {
+    "message": "General"
+  },
+  "moderation.project-review.hashes": {
+    "message": "Hashes"
+  },
+  "moderation.project-review.hideLeft": {
+    "message": "Hide project details"
+  },
+  "moderation.project-review.hideRight": {
+    "message": "Hide panel"
+  },
+  "moderation.project-review.hideTools": {
+    "message": "Hide tools panel"
+  },
+  "moderation.project-review.history": {
+    "message": "History"
+  },
+  "moderation.project-review.historyStub": {
+    "message": "Stub for history tab"
+  },
+  "moderation.project-review.icon": {
+    "message": "Icon"
+  },
+  "moderation.project-review.imageNumber": {
+    "message": "Image {number}"
+  },
+  "moderation.project-review.incompatible": {
+    "message": "Incompatible"
+  },
+  "moderation.project-review.issues": {
+    "message": "Issue tracker"
+  },
+  "moderation.project-review.keybindsSettings": {
+    "message": "Keybinds"
+  },
+  "moderation.project-review.left": {
+    "message": "Project details"
+  },
+  "moderation.project-review.license": {
+    "message": "License"
+  },
+  "moderation.project-review.licenseUrl": {
+    "message": "License URL"
+  },
+  "moderation.project-review.links": {
+    "message": "Links"
+  },
+  "moderation.project-review.listed": {
+    "message": "Listed"
+  },
+  "moderation.project-review.loadError": {
+    "message": "Could not load project data"
+  },
+  "moderation.project-review.loading": {
+    "message": "Loading..."
+  },
+  "moderation.project-review.matchesName": {
+    "message": "Matches the project name"
+  },
+  "moderation.project-review.members": {
+    "message": "Members"
+  },
+  "moderation.project-review.modpack": {
+    "message": "Modpack"
+  },
+  "moderation.project-review.modpackVersion": {
+    "message": "Version {version}"
+  },
+  "moderation.project-review.mrpack": {
+    "message": ".mrpack"
+  },
+  "moderation.project-review.next": {
+    "message": "Next"
+  },
+  "moderation.project-review.noFlagsFiles": {
+    "message": "Files without flags ({count})"
+  },
+  "moderation.project-review.noIssues": {
+    "message": "No issues."
+  },
+  "moderation.project-review.noLicense": {
+    "message": "No license URL"
+  },
+  "moderation.project-review.noPendingFiles": {
+    "message": "No files with unresolved flags"
+  },
+  "moderation.project-review.noReports": {
+    "message": "No technical-review reports are available for this project"
+  },
+  "moderation.project-review.noReviewActions": {
+    "message": "No review actions available for this section"
+  },
+  "moderation.project-review.noSelectedIssues": {
+    "message": "No issues added. Select issues while reviewing the project to see the message here."
+  },
+  "moderation.project-review.noServerAddress": {
+    "message": "No address."
+  },
+  "moderation.project-review.noServerLanguages": {
+    "message": "No languages."
+  },
+  "moderation.project-review.openIcon": {
+    "message": "View enlarged project icon"
+  },
+  "moderation.project-review.openImage": {
+    "message": "Open image {number}"
+  },
+  "moderation.project-review.openImageInNewTab": {
+    "message": "Open image in new tab"
+  },
+  "moderation.project-review.openMemberAvatar": {
+    "message": "View enlarged avatar for {username}"
+  },
+  "moderation.project-review.openOrganizationIcon": {
+    "message": "View enlarged icon for {organization}"
+  },
+  "moderation.project-review.openReviewGuidance": {
+    "message": "Open review guidance in new tab"
+  },
+  "moderation.project-review.optional": {
+    "message": "Optional"
+  },
+  "moderation.project-review.organization": {
+    "message": "Organization"
+  },
+  "moderation.project-review.owner": {
+    "message": "Owner"
+  },
+  "moderation.project-review.pendingFiles": {
+    "message": "Pending files ({count})"
+  },
+  "moderation.project-review.permissions": {
+    "message": "Permissions"
+  },
+  "moderation.project-review.permissionsPlaceholder": {
+    "message": "Permissions review is coming soon"
+  },
+  "moderation.project-review.pinReview": {
+    "message": "Pin review controls"
+  },
+  "moderation.project-review.platforms": {
+    "message": "Platforms"
+  },
+  "moderation.project-review.post-approval": {
+    "message": "Post-approval"
+  },
+  "moderation.project-review.primary": {
+    "message": "Primary file"
+  },
+  "moderation.project-review.privateCount": {
+    "message": "{count} private"
+  },
+  "moderation.project-review.processingCount": {
+    "message": "{count} under review"
+  },
+  "moderation.project-review.projectTitle": {
+    "message": "Title"
+  },
+  "moderation.project-review.projectType": {
+    "message": "Project type"
+  },
+  "moderation.project-review.published": {
+    "message": "Published"
+  },
+  "moderation.project-review.publishedBy": {
+    "message": "Published by"
+  },
+  "moderation.project-review.queueError": {
+    "message": "Could not change projects. Please try again"
+  },
+  "moderation.project-review.queueNavigation": {
+    "message": "Review queue navigation"
+  },
+  "moderation.project-review.re-review": {
+    "message": "Re-review"
+  },
+  "moderation.project-review.recommended": {
+    "message": "(Recommended)"
+  },
+  "moderation.project-review.rejectedCount": {
+    "message": "{count} rejected"
+  },
+  "moderation.project-review.requesting": {
+    "message": "Requesting"
+  },
+  "moderation.project-review.required": {
+    "message": "Required"
+  },
+  "moderation.project-review.reset": {
+    "message": "Reset"
+  },
+  "moderation.project-review.resolvePermissions": {
+    "message": "Review redistribution permissions"
+  },
+  "moderation.project-review.retry": {
+    "message": "Retry"
+  },
+  "moderation.project-review.reupload": {
+    "message": "Reupload"
+  },
+  "moderation.project-review.reviewIssues": {
+    "message": "Issues"
+  },
+  "moderation.project-review.reviewProgress": {
+    "message": "Reviewed flags indicate progress, not a safe verdict. Files without flags have no flag verdict"
+  },
+  "moderation.project-review.reviewScope": {
+    "message": "These selections apply to the {stage} review for the whole project"
+  },
+  "moderation.project-review.reviewSection": {
+    "message": "Review {section}"
+  },
+  "moderation.project-review.right": {
+    "message": "Right panel"
+  },
+  "moderation.project-review.saveProject": {
+    "message": "Save project"
+  },
+  "moderation.project-review.scheduled": {
+    "message": "Scheduled"
+  },
+  "moderation.project-review.scheduledCount": {
+    "message": "{count} scheduled"
+  },
+  "moderation.project-review.serverAddress": {
+    "message": "Address"
+  },
+  "moderation.project-review.serverContent": {
+    "message": "Content"
+  },
+  "moderation.project-review.serverDetails": {
+    "message": "Server details"
+  },
+  "moderation.project-review.serverDiscord": {
+    "message": "Discord"
+  },
+  "moderation.project-review.serverLanguages": {
+    "message": "Languages"
+  },
+  "moderation.project-review.serverRegion": {
+    "message": "Region"
+  },
+  "moderation.project-review.showLeft": {
+    "message": "Show project details"
+  },
+  "moderation.project-review.showRight": {
+    "message": "Show panel"
+  },
+  "moderation.project-review.showTools": {
+    "message": "Show tools panel"
+  },
+  "moderation.project-review.skip": {
+    "message": "Skip"
+  },
+  "moderation.project-review.slug": {
+    "message": "Slug"
+  },
+  "moderation.project-review.source": {
+    "message": "Source code"
+  },
+  "moderation.project-review.sourceError": {
+    "message": "Could not load source code. Try opening the flag again"
+  },
+  "moderation.project-review.status-alerts": {
+    "message": "Status alerts"
+  },
+  "moderation.project-review.store": {
+    "message": "Store"
+  },
+  "moderation.project-review.submissions": {
+    "message": "{count, plural, one {# submission} other {# submissions}}"
+  },
+  "moderation.project-review.submitted": {
+    "message": "Submitted"
+  },
+  "moderation.project-review.summary": {
+    "message": "Summary"
+  },
+  "moderation.project-review.tags": {
+    "message": "Tags"
+  },
+  "moderation.project-review.tech-review": {
+    "message": "Tech Review"
+  },
+  "moderation.project-review.title": {
+    "message": "Project Review"
+  },
+  "moderation.project-review.total": {
+    "message": "Total"
+  },
+  "moderation.project-review.unavailable": {
+    "message": "Unavailable"
+  },
+  "moderation.project-review.undefinedProject": {
+    "message": "Undefined project"
+  },
+  "moderation.project-review.unknown": {
+    "message": "Unknown"
+  },
+  "moderation.project-review.unknownCount": {
+    "message": "{count} unknown"
+  },
+  "moderation.project-review.unlisted": {
+    "message": "Unlisted"
+  },
+  "moderation.project-review.unlistedCount": {
+    "message": "{count} unlisted"
+  },
+  "moderation.project-review.unpinReview": {
+    "message": "Unpin review controls"
+  },
+  "moderation.project-review.updated": {
+    "message": "Updated"
+  },
+  "moderation.project-review.uploaded": {
+    "message": "Uploaded {date}"
+  },
+  "moderation.project-review.validation.length": {
+    "message": "Enter between {min} and {max} characters."
+  },
+  "moderation.project-review.validation.slug": {
+    "message": "Use only letters, numbers, periods, underscores, and hyphens."
+  },
+  "moderation.project-review.vanilla": {
+    "message": "Vanilla"
+  },
+  "moderation.project-review.versionId": {
+    "message": "Version ID"
+  },
+  "moderation.project-review.versionNumber": {
+    "message": "Version Number"
+  },
+  "moderation.project-review.versionSubtitle": {
+    "message": "Version Subtitle"
+  },
+  "moderation.project-review.versions": {
+    "message": "Versions"
+  },
+  "moderation.project-review.viewVersion": {
+    "message": "View version"
+  },
+  "moderation.project-review.website": {
+    "message": "Website"
+  },
+  "moderation.project-review.wiki": {
+    "message": "Wiki page"
+  },
+  "moderation.project-review.withheld": {
+    "message": "Withheld"
+  },
+  "moderation.project-review.withheldCount": {
+    "message": "{count} withheld"
+  },
+  "moderation.tech-review.file.download": {
+    "message": "Download"
+  },
+  "moderation.tech-review.file.download-file": {
+    "message": "Download {filename} ({size})"
+  },
+  "moderation.tech-review.file.flags": {
+    "message": "Flags"
+  },
+  "moderation.tech-review.file.manual": {
+    "message": "Manual review"
+  },
+  "moderation.tech-review.file.no-flags": {
+    "message": "No flags"
+  },
+  "moderation.tech-review.file.open-slicer": {
+    "message": "Open in Slicer"
+  },
+  "moderation.tech-review.file.slicer": {
+    "message": "Slicer"
+  },
+  "moderation.tech-review.file.view-version": {
+    "message": "View version"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} per batch"
@@ -3458,6 +4013,84 @@
   "project-moderation-nags.warning": {
     "message": "Warning"
   },
+  "project-review.composer.add-note": {
+    "message": "Add private note"
+  },
+  "project-review.composer.reply": {
+    "message": "Reply"
+  },
+  "project-review.composer.reply-placeholder": {
+    "message": "Reply to thread…"
+  },
+  "project-review.controls.correction-conflicts": {
+    "message": "Resolve conflicting corrections before sending your reply."
+  },
+  "project-review.controls.corrections": {
+    "message": "These corrections will be applied before sending your reply."
+  },
+  "project-review.controls.markdown-placeholder": {
+    "message": "Explain what needs to change…"
+  },
+  "project-review.controls.no-corrections": {
+    "message": "No automatic corrections are selected."
+  },
+  "project-review.controls.required-value": {
+    "message": "Complete this required field."
+  },
+  "project-review.controls.select": {
+    "message": "Select an option"
+  },
+  "project-review.decision.approve": {
+    "message": "Approve"
+  },
+  "project-review.decision.reject": {
+    "message": "Reject"
+  },
+  "project-review.decision.withhold": {
+    "message": "Withhold"
+  },
+  "project-review.issues.add": {
+    "message": "Issue"
+  },
+  "project-review.issues.add-option": {
+    "message": "Add issue option"
+  },
+  "project-review.issues.choose-option": {
+    "message": "Choose at least one option for this issue."
+  },
+  "project-review.issues.empty": {
+    "message": "No issues flagged."
+  },
+  "project-review.issues.field-option": {
+    "message": "{field}: {option}"
+  },
+  "project-review.issues.message": {
+    "message": "Message for {issue}"
+  },
+  "project-review.issues.no-results": {
+    "message": "No matching issues."
+  },
+  "project-review.issues.remove": {
+    "message": "Remove {issue}"
+  },
+  "project-review.issues.remove-option": {
+    "message": "Remove {option}"
+  },
+  "project-review.issues.reset-message": {
+    "message": "Reset message"
+  },
+  "project-review.issues.search": {
+    "message": "Search issues…"
+  },
+  "project-review.resize-checks": {
+    "message": "Resize project checks"
+  },
+  "project-review.right-panel.issues": {
+    "message": "Issues"
+  },
+  "project-review.right-panel.thread": {
+    "message": "Thread"
+  },
   "project-type.collection.plural": {
     "message": "Collections"
   },
@@ -3580,6 +4213,30 @@
   },
   "project.description.title": {
     "message": "Description"
+  },
+  "project.disclosures.load-error": {
+    "message": "Could not load disclosures."
+  },
+  "project.disclosures.loading": {
+    "message": "Loading disclosures…"
+  },
+  "project.disclosures.lock-status.cannot-disable": {
+    "message": "Cannot disable"
+  },
+  "project.disclosures.lock-status.fully-locked": {
+    "message": "Fully locked"
+  },
+  "project.disclosures.lock-status.label": {
+    "message": "Lock status"
+  },
+  "project.disclosures.lock-status.unlocked": {
+    "message": "Unlocked"
+  },
+  "project.disclosures.retry": {
+    "message": "Retry"
+  },
+  "project.disclosures.save-error": {
+    "message": "Could not save all disclosure changes. Your edits have been kept. Try saving again."
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "This game version is incompatible with the base project."
@@ -4145,6 +4802,9 @@
   "project.settings.license.intro": {
     "message": "It is important to choose a proper license for your {type}. You may choose one from our list or provide a custom license. You may also provide a custom URL to your chosen license; otherwise, the license text will be displayed. See our <guide>licensing guide</guide> for more information."
   },
+  "project.settings.license.invalid-url": {
+    "message": "Enter a valid HTTP or HTTPS license URL."
+  },
   "project.settings.license.later": {
     "message": "Later editions"
   },
@@ -4232,6 +4892,9 @@
   "project.settings.links.donations-description": {
     "message": "Add donation links for users to support you directly."
   },
+  "project.settings.links.invalid-url": {
+    "message": "Enter valid HTTP or HTTPS URLs before saving."
+  },
   "project.settings.links.issues": {
     "message": "Issue tracker"
   },
@@ -4310,6 +4973,9 @@
   "project.settings.permissions.attention-needed.title": {
     "message": "Unknown external content"
   },
+  "project.settings.permissions.awaiting-review-count": {
+    "message": "{count, plural, =0 {None awaiting review} other {# awaiting review}}"
+  },
   "project.settings.permissions.bad-proof.description": {
     "message": "Modrinth's moderation team has rejected the permission information you provided for some external content. Please review the rejected items below and provide acceptable proof or remove the content."
   },
@@ -4364,6 +5030,9 @@
   "project.settings.permissions.learn-more": {
     "message": "Learn more"
   },
+  "project.settings.permissions.no-permission-count": {
+    "message": "{count} with no permission"
+  },
   "project.settings.permissions.no-results": {
     "message": "No external files match your search."
   },
@@ -4387,6 +5056,9 @@
   },
   "project.settings.permissions.sort.status": {
     "message": "Status"
+  },
+  "project.settings.permissions.user-action-count": {
+    "message": "{count} need user action"
   },
   "project.settings.server.bedrock-address-label": {
     "message": "Bedrock address"
@@ -4492,6 +5164,9 @@
   },
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "You've selected {count} tags. Consider reducing to 12 or fewer to keep your server focused and easier to discover."
+  },
+  "project.settings.tags.upload-version-first.description": {
+    "message": "Upload a version before selecting project tags."
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Upload versions before adding tags"

@@ -3,12 +3,11 @@
 
 import type { FunctionalComponent, SVGAttributes } from 'vue'
 
-export type IconComponent = FunctionalComponent<SVGAttributes>
-
 import _AffiliateIcon from './icons/affiliate.svg?component'
 import _AlignLeftIcon from './icons/align-left.svg?component'
 import _ArchiveIcon from './icons/archive.svg?component'
 import _ArrowBigRightDashIcon from './icons/arrow-big-right-dash.svg?component'
+import _ArrowBigUpIcon from './icons/arrow-big-up.svg?component'
 import _ArrowBigUpDashIcon from './icons/arrow-big-up-dash.svg?component'
 import _ArrowDownIcon from './icons/arrow-down.svg?component'
 import _ArrowDown10Icon from './icons/arrow-down-1-0.svg?component'
@@ -187,6 +186,8 @@ import _LinkIcon from './icons/link.svg?component'
 import _Link2Icon from './icons/link-2.svg?component'
 import _ListIcon from './icons/list.svg?component'
 import _ListBulletedIcon from './icons/list-bulleted.svg?component'
+import _ListChevronsDownUpIcon from './icons/list-chevrons-down-up.svg?component'
+import _ListChevronsUpDownIcon from './icons/list-chevrons-up-down.svg?component'
 import _ListEndIcon from './icons/list-end.svg?component'
 import _ListFilterIcon from './icons/list-filter.svg?component'
 import _ListOrderedIcon from './icons/list-ordered.svg?component'
@@ -234,8 +235,12 @@ import _PackageSearchIcon from './icons/package-search.svg?component'
 import _PageRoundIcon from './icons/page-round.svg?component'
 import _PaintbrushIcon from './icons/paintbrush.svg?component'
 import _PaletteIcon from './icons/palette.svg?component'
+import _PanelLeftCloseIcon from './icons/panel-left-close.svg?component'
+import _PanelLeftOpenIcon from './icons/panel-left-open.svg?component'
 import _PanelRightCloseIcon from './icons/panel-right-close.svg?component'
 import _PanelRightOpenIcon from './icons/panel-right-open.svg?component'
+import _PanelTopCloseIcon from './icons/panel-top-close.svg?component'
+import _PanelTopOpenIcon from './icons/panel-top-open.svg?component'
 import _PauseIcon from './icons/pause.svg?component'
 import _PencilIcon from './icons/pencil.svg?component'
 import _PickaxeIcon from './icons/pickaxe.svg?component'
@@ -473,10 +478,13 @@ import _XCircleIcon from './icons/x-circle.svg?component'
 import _ZoomInIcon from './icons/zoom-in.svg?component'
 import _ZoomOutIcon from './icons/zoom-out.svg?component'
 
+export type IconComponent = FunctionalComponent<SVGAttributes>
+
 export const AffiliateIcon = _AffiliateIcon
 export const AlignLeftIcon = _AlignLeftIcon
 export const ArchiveIcon = _ArchiveIcon
 export const ArrowBigRightDashIcon = _ArrowBigRightDashIcon
+export const ArrowBigUpIcon = _ArrowBigUpIcon
 export const ArrowBigUpDashIcon = _ArrowBigUpDashIcon
 export const ArrowDownIcon = _ArrowDownIcon
 export const ArrowDown10Icon = _ArrowDown10Icon
@@ -655,6 +663,8 @@ export const LinkIcon = _LinkIcon
 export const Link2Icon = _Link2Icon
 export const ListIcon = _ListIcon
 export const ListBulletedIcon = _ListBulletedIcon
+export const ListChevronsDownUpIcon = _ListChevronsDownUpIcon
+export const ListChevronsUpDownIcon = _ListChevronsUpDownIcon
 export const ListEndIcon = _ListEndIcon
 export const ListFilterIcon = _ListFilterIcon
 export const ListOrderedIcon = _ListOrderedIcon
@@ -703,7 +713,11 @@ export const PageRoundIcon = _PageRoundIcon
 export const PaintbrushIcon = _PaintbrushIcon
 export const PaletteIcon = _PaletteIcon
 export const PanelRightCloseIcon = _PanelRightCloseIcon
+export const PanelLeftCloseIcon = _PanelLeftCloseIcon
+export const PanelLeftOpenIcon = _PanelLeftOpenIcon
 export const PanelRightOpenIcon = _PanelRightOpenIcon
+export const PanelTopCloseIcon = _PanelTopCloseIcon
+export const PanelTopOpenIcon = _PanelTopOpenIcon
 export const PauseIcon = _PauseIcon
 export const PencilIcon = _PencilIcon
 export const PickaxeIcon = _PickaxeIcon

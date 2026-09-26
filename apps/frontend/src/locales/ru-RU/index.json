@@ -1061,9 +1061,6 @@
   "conversation-thread.action.approve": {
     "message": "Одобрить"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Одобрить с ответом"
-  },
   "conversation-thread.action.close-report": {
     "message": "Закрыть жалобу"
   },
@@ -1072,9 +1069,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Отклонить"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Отклонить с ответом"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Возобновить ветку"
@@ -1108,9 +1102,6 @@
   },
   "conversation-thread.action.withhold": {
     "message": "Удержать"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Удержать с ответом"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Эта ветка закрыта. Отправка новых сообщений недоступна."

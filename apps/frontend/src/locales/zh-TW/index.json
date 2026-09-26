@@ -1067,9 +1067,6 @@
   "conversation-thread.action.approve": {
     "message": "核准"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "回覆並核准"
-  },
   "conversation-thread.action.close-report": {
     "message": "關閉檢舉"
   },
@@ -1078,9 +1075,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "拒絕"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "回覆並拒絕"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "重新開啟討論串"
@@ -1114,9 +1108,6 @@
   },
   "conversation-thread.action.withhold": {
     "message": "保留"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "回覆並保留"
   },
   "conversation-thread.closed-thread.description": {
     "message": "這個討論串已關閉，無法再傳送新訊息。"

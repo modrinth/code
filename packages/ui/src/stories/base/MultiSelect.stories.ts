@@ -278,6 +278,34 @@ export const DropdownMinWidth: Story = {
 	}),
 }
 
+export const RightAlignedDropdown: Story = {
+	args: {
+		...Default.args,
+		modelValue: [],
+		fitContent: true,
+		triggerType: 'base',
+		triggerSize: 'sm',
+		clearable: false,
+		showChevron: false,
+		dropdownWidth: 288,
+		dropdownAlign: 'right',
+	},
+	render: (args) => ({
+		components: { MultiSelect },
+		setup() {
+			const selected = ref(args.modelValue)
+			return { args, selected }
+		},
+		template: /*html*/ `
+			<div style="display: flex; justify-content: flex-end; width: 400px;">
+				<MultiSelect v-bind="args" v-model="selected">
+					<template #input-content>+ Issue</template>
+				</MultiSelect>
+			</div>
+		`,
+	}),
+}
+
 export const ManySelected: Story = {
 	args: {
 		...Default.args,

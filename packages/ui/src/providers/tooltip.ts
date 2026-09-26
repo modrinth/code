@@ -3,13 +3,14 @@ import type { App, Directive } from 'vue'
 import { ref } from 'vue'
 
 export type TooltipPlacement = Placement
-export type TooltipProps = string | { text: string } | null | undefined
+export type TooltipProps = string | { text: string; delay?: number } | null | undefined
 export type TooltipDirective = Directive<HTMLElement, TooltipProps>
 export type TooltipContent = () => unknown
 
 interface TooltipSource {
 	placement: TooltipPlacement
 	getText: () => string | null
+	delay?: number
 	render?: TooltipContent
 	theme?: string
 	pinned?: boolean
@@ -107,12 +108,13 @@ function show(immediate: boolean) {
 	}
 	stopShow()
 	stopHide()
-	if (immediate || activeTooltip.value.reference || Date.now() - lastOpen <= SHOW_DELAY) {
+	const delay = sources.get(el)?.delay ?? SHOW_DELAY
+	if (immediate || activeTooltip.value.reference || Date.now() - lastOpen <= delay) {
 		open(el)
 		return
 	}
 	pending = el
-	showTimer = setTimeout(() => open(el), SHOW_DELAY)
+	showTimer = setTimeout(() => open(el), delay)
 }
 
 function hide(el: HTMLElement, immediate: boolean) {
@@ -273,6 +275,7 @@ export function installTooltipDirective(app: App) {
 		bindTooltipSource(el, {
 			placement: tooltipPlacement(modifiers),
 			getText: () => tooltipText(value),
+			delay: tooltipDelay(value),
 		})
 	}
 }
@@ -282,6 +285,18 @@ function tooltipText(value: TooltipProps): string | null {
 		return null
 	}
 	return typeof value === 'string' ? value : (value.text ?? null)
+}
+
+function tooltipDelay(value: TooltipProps): number | undefined {
+	if (
+		value == null ||
+		typeof value === 'string' ||
+		typeof value.delay !== 'number' ||
+		!Number.isFinite(value.delay)
+	) {
+		return
+	}
+	return Math.max(0, value.delay)
 }
 
 function ensureAriaLabel(el: HTMLElement, text: string, added: WeakSet<HTMLElement>) {

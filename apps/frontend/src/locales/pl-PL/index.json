@@ -1064,9 +1064,6 @@
   "conversation-thread.action.approve": {
     "message": "Zatwierdź"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Zatwierdź z odpowiedzią "
-  },
   "conversation-thread.action.close-report": {
     "message": "Zamknij zgłoszenie"
   },
@@ -1075,9 +1072,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Odrzuć"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Odrzuć z odpowiedzią"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Otwórz ponownie wątek "
@@ -1111,9 +1105,6 @@
   },
   "conversation-thread.action.withhold": {
     "message": "Wstrzymaj"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Wstrzymaj z odpowiedzią"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Ten wątek jest zamknięty i nie można wysyłać do niego nowych wiadomości."

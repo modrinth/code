@@ -1,5 +1,14 @@
 import type { Labrinth } from '@modrinth/api-client'
 
+export function generateUrlSlug(value: string) {
+	return value
+		.trim()
+		.toLowerCase()
+		.replaceAll(' ', '-')
+		.replaceAll(/[^a-zA-Z0-9._-]/g, '')
+		.replaceAll(/--+/gm, '-')
+}
+
 export function expandVariables(
 	template: string,
 	project: Labrinth.Projects.v2.Project,
@@ -111,6 +120,14 @@ export function formatProjectTypes(type: string, lower: boolean = false) {
 
 export function requiresEnvironmentInfo(projectTypes): boolean {
 	return projectTypes.includes('mod') || projectTypes.includes('modpack')
+}
+
+export function projectHasCustomServerModpack(projectV3: Labrinth.Projects.v3.Project): boolean {
+	return (
+		!!projectV3.minecraft_server &&
+		projectV3.minecraft_java_server?.content?.kind === 'modpack' &&
+		projectV3.minecraft_java_server.content.project_id === projectV3.id
+	)
 }
 
 export function flattenStaticVariables(): Record<string, string> {

@@ -1067,9 +1067,6 @@
   "conversation-thread.action.approve": {
     "message": "批准"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "批准并回复"
-  },
   "conversation-thread.action.close-report": {
     "message": "关闭举报"
   },
@@ -1078,9 +1075,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "驳回"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "驳回并回复"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "重开对话消息"
@@ -1114,9 +1108,6 @@
   },
   "conversation-thread.action.withhold": {
     "message": "扣留"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "扣留并回复"
   },
   "conversation-thread.closed-thread.description": {
     "message": "此对话消息已关闭，无法发送新消息。"

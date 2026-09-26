@@ -785,17 +785,11 @@
   "conversation-thread.action.approve": {
     "message": "Luluskan"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Luluskan dengan balasan"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Tutup dengan balasan"
   },
   "conversation-thread.action.reject": {
     "message": "Tolak"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Tolak dengan balasan"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Buka semula bebenang"
@@ -829,9 +823,6 @@
   },
   "conversation-thread.action.withhold": {
     "message": "Tahan"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Tahan dengan balasan"
   },
   "conversation-thread.error.closing-report": {
     "message": "Ralat semasa menutup laporan"
