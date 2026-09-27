@@ -1,6 +1,7 @@
 import { TriangleAlertIcon } from '@modrinth/assets'
 
 import disclosuresHeaderMessage from '../messages/checklist/messages/disclosures/header.md'
+import disclosuresHeaderListlessMessage from '../messages/checklist/messages/disclosures/header-listless.md'
 import missingAdsMessage from '../messages/checklist/messages/disclosures/missing-disclosures/ads.md'
 import missingAiMessage from '../messages/checklist/messages/disclosures/missing-disclosures/ai/ai.md'
 import missingAiFunctionalityMessage from '../messages/checklist/messages/disclosures/missing-disclosures/ai/ai-functionality.md'
@@ -34,7 +35,6 @@ import misusedSystemInteractionsMessage from '../messages/checklist/messages/dis
 import misusedTelemetryMessage from '../messages/checklist/messages/disclosures/misused-disclosures/telemetry.md'
 import nonEnglishMessage from '../messages/checklist/messages/disclosures/non-english.md'
 import { issue, panel, section, toggle } from './component-builders/builders'
-import type { financialMessages } from '@modrinth/ui'
 
 export const disclosuresIssue = issue({
 	id: 'disclosures',
@@ -138,6 +138,15 @@ export const disclosuresIssue = issue({
 		}
 
 		const groups: string[] = []
+		if (
+			!missingParts.length &&
+			!misusedParts.length &&
+			(selected.toggleIds.includes('disclosures-missing') ||
+				selected.toggleIds.includes('disclosures-misused') ||
+				selected.toggleIds.length === 0)
+		) {
+			return disclosuresHeaderListlessMessage
+		}
 		if (missingParts.length) {
 			const body = missingParts.map((part) => part.trimEnd()).join('\n')
 			groups.push(`${missingListIntroMessage.trim()}\n\n${body}`)
@@ -197,7 +206,33 @@ export const aiDisclosureReviewPanel = panel({
 		issueListLabel: 'AI Usage',
 	}),
 	section({
-		label: 'What kind of AI content?',
+		label: 'Type of missing disclosure?',
+		shown: ({ selected }) => selected.toggleIds.includes('disclosures-missing-ai'),
+	}).content(
+		toggle({
+			issue: disclosuresIssue,
+			id: 'disclosures-missing-ai-code',
+			label: 'Code',
+			issueListLabel: 'AI Usage: Code',
+			issueListGroup: 'Disclosure Missing',
+		}),
+		toggle({
+			issue: disclosuresIssue,
+			id: 'disclosures-missing-ai-assets',
+			label: 'Assets',
+			issueListLabel: 'AI Usage: Assets',
+			issueListGroup: 'Disclosure Missing',
+		}),
+		toggle({
+			issue: disclosuresIssue,
+			id: 'disclosures-missing-ai-text',
+			label: 'Text',
+			issueListLabel: 'AI Usage: Text',
+			issueListGroup: 'Disclosure Missing',
+		}),
+	),
+	section({
+		label: 'Type of misused disclosure?',
 		shown: ({ selected }) => selected.toggleIds.includes('disclosures-misused-ai'),
 	}).content(
 		toggle({
@@ -221,32 +256,6 @@ export const aiDisclosureReviewPanel = panel({
 			issueListLabel: 'AI Usage: Text',
 			issueListGroup: 'Misused',
 		}),
-		section({
-			label: 'What kind of AI content?',
-			shown: ({ selected }) => selected.toggleIds.includes('disclosures-missing-ai'),
-		}).content(
-			toggle({
-				issue: disclosuresIssue,
-				id: 'disclosures-missing-ai-code',
-				label: 'Code',
-				issueListLabel: 'AI Usage: Code',
-				issueListGroup: 'Disclosure Missing',
-			}),
-			toggle({
-				issue: disclosuresIssue,
-				id: 'disclosures-missing-ai-assets',
-				label: 'Assets',
-				issueListLabel: 'AI Usage: Assets',
-				issueListGroup: 'Disclosure Missing',
-			}),
-			toggle({
-				issue: disclosuresIssue,
-				id: 'disclosures-missing-ai-text',
-				label: 'Text',
-				issueListLabel: 'AI Usage: Text',
-				issueListGroup: 'Disclosure Missing',
-			}),
-		),
 	),
 )
 
@@ -451,8 +460,17 @@ export const disclosuresReviewPanel = panel({
 	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
 }).content(
 	toggle({
+		issue: disclosuresIssue,
+		id: 'disclosures-missing',
+		label: 'Disclosure Missing',
+	}),
+	toggle({
+		issue: disclosuresIssue,
+		id: 'disclosures-misused',
+		label: 'Misused',
+	}),
+	toggle({
 		issue: disclosuresNonEnglishIssue,
 		label: 'Non-English',
-		shown: (ctx) => true,
 	}),
 )
