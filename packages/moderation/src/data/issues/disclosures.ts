@@ -34,6 +34,7 @@ import misusedSystemInteractionsMessage from '../messages/checklist/messages/dis
 import misusedTelemetryMessage from '../messages/checklist/messages/disclosures/misused-disclosures/telemetry.md'
 import nonEnglishMessage from '../messages/checklist/messages/disclosures/non-english.md'
 import { issue, panel, section, toggle } from './component-builders/builders'
+import type { financialMessages } from '@modrinth/ui'
 
 export const disclosuresIssue = issue({
 	id: 'disclosures',
@@ -189,32 +190,6 @@ export const aiDisclosureReviewPanel = panel({
 		label: 'Disclosure Missing',
 		issueListLabel: 'AI Usage',
 	}),
-	section({
-		label: 'What kind of AI content?',
-		shown: ({ selected }) => selected.toggleIds.includes('disclosures-missing-ai'),
-	}).content(
-		toggle({
-			issue: disclosuresIssue,
-			id: 'disclosures-missing-ai-code',
-			label: 'Code',
-			issueListLabel: 'AI Usage: Code',
-			issueListGroup: 'Disclosure Missing',
-		}),
-		toggle({
-			issue: disclosuresIssue,
-			id: 'disclosures-missing-ai-assets',
-			label: 'Assets',
-			issueListLabel: 'AI Usage: Assets',
-			issueListGroup: 'Disclosure Missing',
-		}),
-		toggle({
-			issue: disclosuresIssue,
-			id: 'disclosures-missing-ai-text',
-			label: 'Text',
-			issueListLabel: 'AI Usage: Text',
-			issueListGroup: 'Disclosure Missing',
-		}),
-	),
 	toggle({
 		issue: disclosuresIssue,
 		id: 'disclosures-misused-ai',
@@ -246,6 +221,32 @@ export const aiDisclosureReviewPanel = panel({
 			issueListLabel: 'AI Usage: Text',
 			issueListGroup: 'Misused',
 		}),
+		section({
+			label: 'What kind of AI content?',
+			shown: ({ selected }) => selected.toggleIds.includes('disclosures-missing-ai'),
+		}).content(
+			toggle({
+				issue: disclosuresIssue,
+				id: 'disclosures-missing-ai-code',
+				label: 'Code',
+				issueListLabel: 'AI Usage: Code',
+				issueListGroup: 'Disclosure Missing',
+			}),
+			toggle({
+				issue: disclosuresIssue,
+				id: 'disclosures-missing-ai-assets',
+				label: 'Assets',
+				issueListLabel: 'AI Usage: Assets',
+				issueListGroup: 'Disclosure Missing',
+			}),
+			toggle({
+				issue: disclosuresIssue,
+				id: 'disclosures-missing-ai-text',
+				label: 'Text',
+				issueListLabel: 'AI Usage: Text',
+				issueListGroup: 'Disclosure Missing',
+			}),
+		),
 	),
 )
 
@@ -321,6 +322,12 @@ export const telemetryDisclosureReviewPanel = panel({
 		label: 'Disclosure Missing',
 		issueListLabel: 'Telemetry',
 	}),
+	toggle({
+		issue: disclosuresIssue,
+		id: 'disclosures-misused-telemetry',
+		label: 'Misused',
+		issueListLabel: 'Telemetry',
+	}),
 	section({
 		label: 'What is the telemetry’s consent model?',
 		shown: ({ selected }) => selected.toggleIds.includes('disclosures-missing-telemetry'),
@@ -356,12 +363,6 @@ export const telemetryDisclosureReviewPanel = panel({
 				selected.toggleIds.includes('disclosures-missing-telemetry-opt-out'),
 		}),
 	),
-	toggle({
-		issue: disclosuresIssue,
-		id: 'disclosures-misused-telemetry',
-		label: 'Misused',
-		issueListLabel: 'Telemetry',
-	}),
 )
 
 export const derivativeContentDisclosureReviewPanel = panel({
@@ -452,5 +453,6 @@ export const disclosuresReviewPanel = panel({
 	toggle({
 		issue: disclosuresNonEnglishIssue,
 		label: 'Non-English',
+		shown: (ctx) => true,
 	}),
 )
