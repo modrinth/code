@@ -20,7 +20,6 @@ export const serversExcessiveLanguagesIssue = issue({
 	suggestedStatus: 'flagged',
 })
 
-// Temp servers
 export const serversTemporaryServerIssue = issue({
 	id: 'status-alerts-temporary-server',
 	title: 'Temporary server',

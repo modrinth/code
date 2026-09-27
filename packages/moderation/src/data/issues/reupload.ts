@@ -62,8 +62,13 @@ export const reuploadIdentityVerificationServerIssue = issue({
 	id: 'reupload-identity-verification-server',
 	title: 'Server identity verification',
 	category: 'Project wide',
-	message: ({ getTextValue }) =>
-		identityVerificationServerMessage.replaceAll('%CONTACT%', () => getTextValue('contact')),
+	message: ({ getTextValue }) => {
+		let msg = identityVerificationServerMessage
+		if (getTextValue('contact').length > 0) {
+			return msg.replaceAll('%CONTACT%', () => `, such as \`${getTextValue('contact')}\``)
+		}
+		return msg.replaceAll('%CONTACT%', '')
+	},
 	suggestedStatus: 'rejected',
 })
 
@@ -202,7 +207,7 @@ export const reuploadReviewPanel = panel({
 			issue: reuploadIdentityVerificationServerIssue,
 			id: 'contact',
 			label: 'Known public contact method',
-			required: true,
+			required: false,
 		}),
 	),
 
