@@ -1,4 +1,5 @@
 import type { AbstractModrinthClient } from '@modrinth/api-client'
+import { moderationSettings } from '@modrinth/moderation'
 
 import type { ModerationQueueService } from './queue.ts'
 
@@ -21,7 +22,7 @@ export interface EligibleQueueProject {
 const BATCH_SIZE = 5
 
 export function isEligibleQueueCandidate(result: QueueCandidateCheck | undefined): boolean {
-	if (!result?.isProcessing) return false
+	if (!result || (!result.isProcessing && !useModerationSettings().value.get(moderationSettings.Checklist.IgnoreConditions))) return false
 	return !result.locked || !!result.expired || !!result.isOwnLock
 }
 

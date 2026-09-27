@@ -15,8 +15,8 @@
 		:class="{
 			'!w-fit': collapsed,
 			locked: isLockedByOther,
-			'right-4': settings.get(moderationSettings.General.ChecklistPosition) === 'right',
-			'left-4': settings.get(moderationSettings.General.ChecklistPosition) === 'left',
+			'right-4': settings.get(moderationSettings.Checklist.Position) === 'right',
+			'left-4': settings.get(moderationSettings.Checklist.Position) === 'left',
 		}"
 	>
 		<div class="flex grow-0 flex-col gap-1">
@@ -1321,7 +1321,7 @@ onMounted(async () => {
 	window.addEventListener('keydown', handleKeybinds)
 	window.addEventListener('beforeunload', handleBeforeUnload)
 	document.addEventListener('visibilitychange', handleVisibilityChange)
-	if (settings.value.get(moderationSettings.General.ChecklistPosition) === 'right') {
+	if (settings.value.get(moderationSettings.Checklist.Position) === 'right') {
 		notifications.setNotificationLocation('left')
 	}
 
@@ -1618,7 +1618,7 @@ if (finishedId === projectV2.value.id) {
 	localStorage.removeItem('moderation-checklist-finished')
 	hasNextProject.value = moderationQueue.queueLength > 0
 	done.value = true
-} else if (projectV2.value.status !== 'processing' && !reviewedAnyway.value) {
+} else if (!reviewedAnyway.value && !isEligibleQueueCandidate({ isProcessing: projectV2.value.status === 'processing', locked: false })) {
 	alreadyReviewed.value = true
 }
 
