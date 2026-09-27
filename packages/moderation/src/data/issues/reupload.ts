@@ -18,10 +18,25 @@ export const reuploadReuploadIssue = issue({
 	id: 'reupload-reupload',
 	title: 'Reuploads are forbidden',
 	category: 'Project wide',
-	message: ({ getTextValue }) =>
-		reuploadMessage
-			.replaceAll('%ORIGINAL_PROJECT%', () => getTextValue('original-project'))
-			.replaceAll('%ORIGINAL_AUTHOR%', () => getTextValue('original-author')),
+	message: ({ getTextValue }) => {
+		let msg = reuploadMessage
+
+		if (!getTextValue('original-project') && !getTextValue('original-author')) {
+			return msg.replaceAll('%ORIGINAL_PROJECT%%ORIGINAL_AUTHOR%', 'from other creators')
+		} else if (getTextValue('original-project') && !getTextValue('original-author')) {
+			return msg
+				.replaceAll('%ORIGINAL_PROJECT%', () => `from ${getTextValue('original-project')}`)
+				.replaceAll('%ORIGINAL_AUTHOR%', '')
+		} else if (!getTextValue('original-project') && getTextValue('original-author')) {
+			return msg
+				.replaceAll('%ORIGINAL_PROJECT%', '')
+				.replaceAll('%ORIGINAL_AUTHOR%', () => `by ${getTextValue('original-author')}`)
+		} else {
+			return msg
+				.replaceAll('%ORIGINAL_PROJECT%', () => `from ${getTextValue('original-project')}`)
+				.replaceAll('%ORIGINAL_AUTHOR%', () => ` by ${getTextValue('original-author')}`)
+		}
+	},
 	suggestedStatus: 'rejected',
 })
 
