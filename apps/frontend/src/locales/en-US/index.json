@@ -2987,6 +2987,9 @@
   "layout.publish.email-verification-required.title": {
     "message": "Email verification required"
   },
+  "messages.noResults": {
+    "message": "No results found for your query!"
+  },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "Automatically install everything they’re playing"
   },
