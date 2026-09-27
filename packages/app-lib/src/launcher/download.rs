@@ -523,7 +523,19 @@ pub async fn download_version_info(
         .version_dir(&version_id)
         .join(format!("{version_id}.json"));
 
-    let res = if path.exists() && !force.unwrap_or(false) {
+    if let Some(loader) =
+        loader.filter(|loader| super::is_locally_installed_loader(loader))
+        && !path.exists()
+    {
+        return Err(crate::ErrorKind::LauncherError(format!(
+            "Loader version {} for Minecraft {} is no longer available",
+            loader.id, version.id
+        ))
+        .as_error());
+    }
+
+    let removed_loader = loader.is_some_and(super::is_locally_installed_loader);
+    let res = if path.exists() && (!force.unwrap_or(false) || removed_loader) {
         io::read(path)
             .err_into::<crate::Error>()
             .await
