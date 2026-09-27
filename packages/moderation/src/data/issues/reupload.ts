@@ -192,13 +192,13 @@ export const reuploadReviewPanel = panel({
 			issue: reuploadReuploadIssue,
 			id: 'original-project',
 			label: 'Original Project Title',
-			required: true,
+			required: false,
 		}),
 		text({
 			issue: reuploadReuploadIssue,
 			id: 'original-author',
 			label: 'Original project Author',
-			required: true,
+			required: false,
 		}),
 	),
 	section({

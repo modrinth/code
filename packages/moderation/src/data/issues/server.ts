@@ -66,7 +66,7 @@ export const serverReviewPanel = panel({
 			issue: reuploadIdentityVerificationServerIssue,
 			id: 'contact',
 			label: 'Known public contact method',
-			required: true,
+			required: false,
 		}),
 	),
 	section({
