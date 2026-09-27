@@ -196,7 +196,7 @@ export const aiDisclosureReviewPanel = panel({
 	toggle({
 		issue: disclosuresIssue,
 		id: 'disclosures-missing-ai',
-		label: 'Disclosure Missing',
+		label: 'Missing',
 		issueListLabel: 'AI Usage',
 	}),
 	toggle({
@@ -214,21 +214,21 @@ export const aiDisclosureReviewPanel = panel({
 			id: 'disclosures-missing-ai-code',
 			label: 'Code',
 			issueListLabel: 'AI Usage: Code',
-			issueListGroup: 'Disclosure Missing',
+			issueListGroup: 'Missing',
 		}),
 		toggle({
 			issue: disclosuresIssue,
 			id: 'disclosures-missing-ai-assets',
 			label: 'Assets',
 			issueListLabel: 'AI Usage: Assets',
-			issueListGroup: 'Disclosure Missing',
+			issueListGroup: 'Missing',
 		}),
 		toggle({
 			issue: disclosuresIssue,
 			id: 'disclosures-missing-ai-text',
 			label: 'Text',
 			issueListLabel: 'AI Usage: Text',
-			issueListGroup: 'Disclosure Missing',
+			issueListGroup: 'Missing',
 		}),
 	),
 	section({
@@ -268,7 +268,7 @@ export const aiFunctionalityDisclosureReviewPanel = panel({
 	toggle({
 		issue: disclosuresIssue,
 		id: 'disclosures-missing-ai-functionality',
-		label: 'Disclosure Missing',
+		label: 'Missing',
 		issueListLabel: 'AI Functionality',
 	}),
 	toggle({
@@ -288,7 +288,7 @@ export const adsDisclosureReviewPanel = panel({
 	toggle({
 		issue: disclosuresIssue,
 		id: 'disclosures-missing-ads',
-		label: 'Disclosure Missing',
+		label: 'Missing',
 		issueListLabel: 'Advertisements',
 	}),
 	toggle({
@@ -308,7 +308,7 @@ export const paidFeaturesDisclosureReviewPanel = panel({
 	toggle({
 		issue: disclosuresIssue,
 		id: 'disclosures-missing-paid-features',
-		label: 'Disclosure Missing',
+		label: 'Missing',
 		issueListLabel: 'Paid Features',
 	}),
 	toggle({
@@ -328,7 +328,7 @@ export const telemetryDisclosureReviewPanel = panel({
 	toggle({
 		issue: disclosuresIssue,
 		id: 'disclosures-missing-telemetry',
-		label: 'Disclosure Missing',
+		label: 'Missing',
 		issueListLabel: 'Telemetry',
 	}),
 	toggle({
@@ -346,7 +346,7 @@ export const telemetryDisclosureReviewPanel = panel({
 			id: 'disclosures-missing-telemetry-opt-in',
 			label: 'Opt In',
 			issueListLabel: 'Telemetry: Opt In',
-			issueListGroup: 'Disclosure Missing',
+			issueListGroup: 'Missing',
 			disabled: ({ selected }) =>
 				selected.toggleIds.includes('disclosures-missing-telemetry-opt-out') ||
 				selected.toggleIds.includes('disclosures-missing-telemetry-always'),
@@ -356,7 +356,7 @@ export const telemetryDisclosureReviewPanel = panel({
 			id: 'disclosures-missing-telemetry-opt-out',
 			label: 'Opt Out',
 			issueListLabel: 'Telemetry: Opt Out',
-			issueListGroup: 'Disclosure Missing',
+			issueListGroup: 'Missing',
 			disabled: ({ selected }) =>
 				selected.toggleIds.includes('disclosures-missing-telemetry-opt-in') ||
 				selected.toggleIds.includes('disclosures-missing-telemetry-always'),
@@ -366,7 +366,7 @@ export const telemetryDisclosureReviewPanel = panel({
 			id: 'disclosures-missing-telemetry-always',
 			label: 'Always Online',
 			issueListLabel: 'Telemetry: Always Online',
-			issueListGroup: 'Disclosure Missing',
+			issueListGroup: 'Missing',
 			disabled: ({ selected }) =>
 				selected.toggleIds.includes('disclosures-missing-telemetry-opt-in') ||
 				selected.toggleIds.includes('disclosures-missing-telemetry-opt-out'),
@@ -383,7 +383,7 @@ export const derivativeContentDisclosureReviewPanel = panel({
 	toggle({
 		issue: disclosuresIssue,
 		id: 'disclosures-missing-derivative-content',
-		label: 'Disclosure Missing',
+		label: 'Missing',
 		issueListLabel: 'Derivative Content',
 	}),
 	toggle({
@@ -403,7 +403,7 @@ export const photosensitivityDisclosureReviewPanel = panel({
 	toggle({
 		issue: disclosuresIssue,
 		id: 'disclosures-missing-photosensitivity',
-		label: 'Disclosure Missing',
+		label: 'Missing',
 		issueListLabel: 'Photosensitivity',
 	}),
 	toggle({
@@ -423,7 +423,7 @@ export const systemInteractionsDisclosureReviewPanel = panel({
 	toggle({
 		issue: disclosuresIssue,
 		id: 'disclosures-missing-system-interactions',
-		label: 'Disclosure Missing',
+		label: 'Missing',
 		issueListLabel: 'System Interactions',
 	}),
 	toggle({
@@ -443,7 +443,7 @@ export const archiveDisclosureReviewPanel = panel({
 	toggle({
 		issue: disclosuresIssue,
 		id: 'disclosures-missing-archive',
-		label: 'Disclosure Missing',
+		label: 'Missing',
 		issueListLabel: 'Archive',
 	}),
 	toggle({
@@ -462,7 +462,7 @@ export const disclosuresReviewPanel = panel({
 	toggle({
 		issue: disclosuresIssue,
 		id: 'disclosures-missing',
-		label: 'Disclosure Missing',
+		label: 'Missing',
 	}),
 	toggle({
 		issue: disclosuresIssue,
