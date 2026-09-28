@@ -85,8 +85,18 @@ import TechReview from './tech-review/index.vue'
 import Versions from './versions/index.vue'
 
 const { formatMessage } = useVIntl()
-const { projectId, project, projectV2, wasReviewed, permissions, selection } =
-	injectProjectReviewPageContext()
+const {
+	projectId,
+	project,
+	projectV2,
+	disclosures,
+	members,
+	organization,
+	organizationMembers,
+	wasReviewed,
+	permissions,
+	selection,
+} = injectProjectReviewPageContext()
 const visibleTabs = computed((previousTabs) => {
 	if (!project.value) {
 		return previousTabs ?? projectReviewTabs.filter((tab) => tab !== 'permissions')
@@ -102,6 +112,11 @@ const panels = provideReviewPanels(
 		project,
 		session,
 		computed(() => ({
+			projectV2: projectV2.value,
+			disclosures: disclosures.disclosuresQuery.data.value?.disclosures ?? [],
+			members: members.value,
+			organization: organization.value,
+			organizationMembers: organizationMembers.value,
 			wasReviewed: wasReviewed.value,
 			permissions: permissions.value,
 		})),

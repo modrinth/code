@@ -33,7 +33,7 @@ export const serverReviewPanel = panel({
 	hint: "Are there any issues with this project's server details?",
 	icon: ServerIcon,
 	guidanceUrl: '',
-	shown: ({ ProjectV3 }) => !!ProjectV3.minecraft_server,
+	shown: ({ projectV3 }) => !!projectV3.minecraft_server,
 }).content(
 	toggle({
 		issue: serversExcessiveLanguagesIssue,
@@ -43,9 +43,9 @@ export const serverReviewPanel = panel({
 	toggle({
 		issue: serversTemporaryServerIssue,
 		label: 'Temporary server',
-		shown: ({ ProjectV3 }) =>
+		shown: ({ projectV3 }) =>
 			['aternos', 'minekeep', 'minehut'].some((host) =>
-				ProjectV3.minecraft_java_server?.address?.includes(host),
+				projectV3.minecraft_java_server?.address?.includes(host),
 			),
 	}),
 	toggle({
@@ -60,7 +60,7 @@ export const serverReviewPanel = panel({
 	section({
 		shown: (ctx) =>
 			ctx.selected.issueIds.includes(reuploadIdentityVerificationServerIssue.id) &&
-			!!ctx.ProjectV3.minecraft_server,
+			!!ctx.projectV3.minecraft_server,
 	}).content(
 		text({
 			issue: reuploadIdentityVerificationServerIssue,
@@ -71,27 +71,27 @@ export const serverReviewPanel = panel({
 	),
 	section({
 		label: 'Custom Modpack',
-		shown: (ctx) => projectHasCustomServerModpack(ctx.ProjectV3),
+		shown: (ctx) => projectHasCustomServerModpack(ctx.projectV3),
 	}).content(
 		toggle({
 			issue: reuploadRequestProofServerIssue,
 			label: 'Reuploaded pack',
-			shown: (ctx) => projectHasCustomServerModpack(ctx.ProjectV3),
+			shown: (ctx) => projectHasCustomServerModpack(ctx.projectV3),
 		}),
 		toggle({
 			issue: reuploadCustomPackProhibitedIssue,
 			label: 'Forbidden Overrides',
-			shown: (ctx) => projectHasCustomServerModpack(ctx.ProjectV3),
+			shown: (ctx) => projectHasCustomServerModpack(ctx.projectV3),
 		}),
 		toggle({
 			issue: reuploadCustomPackVerificationIssue,
 			label: 'Override verification',
-			shown: (ctx) => projectHasCustomServerModpack(ctx.ProjectV3),
+			shown: (ctx) => projectHasCustomServerModpack(ctx.projectV3),
 		}),
 		section({
 			shown: (ctx) =>
 				ctx.selected.issueIds.includes(reuploadCustomPackProhibitedIssue.id) &&
-				projectHasCustomServerModpack(ctx.ProjectV3),
+				projectHasCustomServerModpack(ctx.projectV3),
 		}).content(
 			markdown({
 				issue: reuploadCustomPackProhibitedIssue,
@@ -103,7 +103,7 @@ export const serverReviewPanel = panel({
 		section({
 			shown: (ctx) =>
 				ctx.selected.issueIds.includes(reuploadCustomPackVerificationIssue.id) &&
-				projectHasCustomServerModpack(ctx.ProjectV3),
+				projectHasCustomServerModpack(ctx.projectV3),
 		}).content(
 			toggle({
 				issue: reuploadCustomPackVerificationIssue,

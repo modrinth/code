@@ -22,7 +22,7 @@ export const insufficientDescriptionIssue = issue({
 	title: 'Insufficient description',
 	category: 'Description',
 	suggestedStatus: 'flagged',
-	message: ({ ProjectV3, selected, getMarkdownValue }) => {
+	message: ({ projectV3, selected, getMarkdownValue }) => {
 		const { toggleIds } = selected
 		const parts: string[] = []
 
@@ -35,9 +35,9 @@ export const insufficientDescriptionIssue = issue({
 		if (toggleIds.includes('description-spoilers')) parts.push(spoilers.trim())
 
 		if (!parts.length) {
-			if (ProjectV3.minecraft_java_server) {
+			if (projectV3.minecraft_java_server) {
 				parts.push(insufficientServers.trim())
-			} else if (ProjectV3.project_types.includes('modpack')) {
+			} else if (projectV3.project_types.includes('modpack')) {
 				parts.push(insufficientPacks.trim())
 			} else {
 				parts.push(insufficientProjects.trim())
@@ -55,7 +55,7 @@ export const nonEnglishDescriptionIssue = issue({
 	title: 'Non-English description',
 	category: 'Description',
 	suggestedStatus: 'flagged',
-	message: ({ ProjectV3 }) => (ProjectV3.minecraft_java_server ? nonEnglishServer : nonEnglish),
+	message: ({ projectV3 }) => (projectV3.minecraft_java_server ? nonEnglishServer : nonEnglish),
 })
 
 export const descriptionHeadersAsBodyIssue = issue({
@@ -103,8 +103,8 @@ export const descriptionReviewPanel = panel({
 	toggle({
 		label: 'Non-English',
 		issue: nonEnglishDescriptionIssue,
-		shown: ({ ProjectV3 }) =>
-			!ProjectV3.minecraft_java_server || !!ProjectV3.minecraft_server?.languages?.includes('en'),
+		shown: ({ projectV3 }) =>
+			!projectV3.minecraft_java_server || !!projectV3.minecraft_server?.languages?.includes('en'),
 	}),
 	toggle({
 		label: 'Headers as body text',

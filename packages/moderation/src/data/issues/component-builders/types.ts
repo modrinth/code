@@ -4,7 +4,12 @@ import type { FunctionalComponent, SVGAttributes } from 'vue'
 import type { ModerationStatus } from '../../../types/node/state'
 
 export interface ReviewContext {
-	ProjectV3: Labrinth.Projects.v3.Project
+	projectV3: Labrinth.Projects.v3.Project
+	projectV2: Labrinth.Projects.v2.Project | undefined
+	disclosures: readonly Labrinth.Projects.v3.ProjectDisclosureData[]
+	members: readonly Labrinth.Projects.v3.TeamMember[]
+	organization: Labrinth.Organizations.v3.Organization | null
+	organizationMembers: readonly Labrinth.Projects.v3.TeamMember[]
 	wasReviewed: boolean
 	permissions: {
 		groups: readonly Labrinth.Attribution.Internal.AttributionGroup[]

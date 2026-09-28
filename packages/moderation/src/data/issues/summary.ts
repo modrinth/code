@@ -73,13 +73,13 @@ export const summaryReviewPanel = panel({
 			label: 'Non-english',
 			issue: nonEnglishSummaryIssue,
 			shown: (ctx) =>
-				!ctx.ProjectV3.minecraft_java_server ||
-				!!ctx.ProjectV3.minecraft_server?.languages?.includes('en'),
+				!ctx.projectV3.minecraft_java_server ||
+				!!ctx.projectV3.minecraft_server?.languages?.includes('en'),
 		}),
 		toggle({
 			label: 'Repeat of IP',
 			issue: summaryRepeatsIpIssue,
-			shown: (ctx) => !!ctx.ProjectV3.minecraft_server,
+			shown: (ctx) => !!ctx.projectV3.minecraft_server,
 		}),
 	),
 )

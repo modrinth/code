@@ -90,7 +90,18 @@ export const [injectReviewPanels, provideReviewPanels] =
 export function createReviewPanels(
 	project: Ref<Labrinth.Projects.v3.Project | undefined>,
 	session: ReturnType<typeof createReviewSession>,
-	reviewData: Ref<Pick<ReviewContext, 'wasReviewed' | 'permissions'>>,
+	reviewData: Ref<
+		Pick<
+			ReviewContext,
+			| 'projectV2'
+			| 'disclosures'
+			| 'members'
+			| 'organization'
+			| 'organizationMembers'
+			| 'wasReviewed'
+			| 'permissions'
+		>
+	>,
 	definitions: Record<string, Panel> = reviewPanels,
 ) {
 	function selectedToggleIds(projectId: string, issueId: string): Set<string> {
@@ -125,23 +136,23 @@ export function createReviewPanels(
 
 	const panels = computed(() => {
 		const bindings = new Map<string, ReviewPanelBinding>()
-		const ProjectV3 = project.value
-		if (!ProjectV3) return bindings
+		const projectV3 = project.value
+		if (!projectV3) return bindings
 		const context: ReviewContext = {
-			ProjectV3,
+			projectV3,
 			...reviewData.value,
-			getTextValue: (id, issueId) => (issueId ? (textValues(ProjectV3.id, issueId)[id] ?? '') : ''),
+			getTextValue: (id, issueId) => (issueId ? (textValues(projectV3.id, issueId)[id] ?? '') : ''),
 			getSelectValue: (id, issueId) =>
-				issueId ? (readSelectValues(ProjectV3.id, issueId, id)[0] ?? '') : '',
+				issueId ? (readSelectValues(projectV3.id, issueId, id)[0] ?? '') : '',
 			getSelectValues: (id, issueId) =>
-				issueId ? readSelectValues(ProjectV3.id, issueId, id) : [],
+				issueId ? readSelectValues(projectV3.id, issueId, id) : [],
 			getMarkdownValue: (id, issueId) =>
-				issueId ? (textValues(ProjectV3.id, issueId)[id] ?? '') : '',
+				issueId ? (textValues(projectV3.id, issueId)[id] ?? '') : '',
 			selected: {
 				issueIds: selectedIssueIds.value,
 				toggleIds: [
 					...new Set(
-						Object.values(session.read(ProjectV3.id, 'issues')).flatMap((keys) =>
+						Object.values(session.read(projectV3.id, 'issues')).flatMap((keys) =>
 							keys instanceof Set ? [...keys] : [],
 						),
 					),
@@ -173,14 +184,14 @@ export function createReviewPanels(
 					const issueId = node.issue.id
 					const issueContext: ReviewContext = {
 						...context,
-						getMarkdownValue: (id, scope = issueId) => textValues(ProjectV3.id, scope)[id] ?? '',
-						getTextValue: (id, scope = issueId) => textValues(ProjectV3.id, scope)[id] ?? '',
+						getMarkdownValue: (id, scope = issueId) => textValues(projectV3.id, scope)[id] ?? '',
+						getTextValue: (id, scope = issueId) => textValues(projectV3.id, scope)[id] ?? '',
 						getSelectValue: (id, scope = issueId) =>
-							readSelectValues(ProjectV3.id, scope, id)[0] ?? '',
-						getSelectValues: (id, scope = issueId) => readSelectValues(ProjectV3.id, scope, id),
+							readSelectValues(projectV3.id, scope, id)[0] ?? '',
+						getSelectValues: (id, scope = issueId) => readSelectValues(projectV3.id, scope, id),
 						selected: {
 							issueIds: selectedIssueIds.value,
-							toggleIds: [...selectedToggleIds(ProjectV3.id, issueId)],
+							toggleIds: [...selectedToggleIds(projectV3.id, issueId)],
 						},
 					}
 					if (resolveWithContext(node.shown, issueContext) === false) continue
@@ -241,7 +252,7 @@ export function createReviewPanels(
 			const sections = resolveNodes(panel.children)
 			bindings.set(key, {
 				key,
-				projectId: ProjectV3.id,
+				projectId: projectV3.id,
 				panel: {
 					icon: panel.icon,
 					title: resolveWithContext(panel.title, context),
@@ -421,8 +432,8 @@ export function createReviewPanels(
 	}
 
 	const activeIssues = computed(() => {
-		const ProjectV3 = project.value
-		if (!ProjectV3) return []
+		const projectV3 = project.value
+		if (!projectV3) return []
 		const issues = new Map<string, IssueSelection>()
 		for (const entry of availableIssues.value) {
 			if (!selectedIssueIds.value.includes(entry.id)) continue
@@ -463,14 +474,14 @@ export function createReviewPanels(
 			}
 		}
 		const order = new Map(
-			Object.keys(session.read(ProjectV3.id, 'issue-order')).map((id, index) => [id, index]),
+			Object.keys(session.read(projectV3.id, 'issue-order')).map((id, index) => [id, index]),
 		)
 		return [...issues]
 			.filter(([, { active }]) => active)
 			.sort(([a], [b]) => (order.get(a) ?? -1) - (order.get(b) ?? -1))
 			.map(([id, { issue, keys, missing }]) => {
 				const context: ReviewContext = {
-					ProjectV3,
+					projectV3,
 					...reviewData.value,
 					selected: {
 						issueIds: selectedIssueIds.value,

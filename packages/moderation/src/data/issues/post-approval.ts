@@ -59,7 +59,7 @@ export const postApprovalReviewPanel = panel({
 	icon: ScaleIcon,
 	guidanceUrl:
 		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#3475ee711bf080c5a13cda0b1e4ae9ed',
-	shown: ({ ProjectV3 }) => ProjectV3.status === 'approved',
+	shown: ({ projectV3 }) => projectV3.status === 'approved',
 }).content(
 	toggle({
 		issue: postApprovalIssueWarningIssue,

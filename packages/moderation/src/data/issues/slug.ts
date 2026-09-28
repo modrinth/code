@@ -21,6 +21,6 @@ export const slugReviewPanel = panel({
 	toggle({
 		label: 'Misused slug',
 		issue: misusedSlugIssue,
-		shown: ({ ProjectV3 }) => generateUrlSlug(ProjectV3.name) !== ProjectV3.slug,
+		shown: ({ projectV3 }) => generateUrlSlug(projectV3.name) !== projectV3.slug,
 	}),
 )

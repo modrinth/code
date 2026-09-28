@@ -138,18 +138,18 @@ export const reuploadReviewPanel = panel({
 	toggle({
 		issue: reuploadReuploadIssue,
 		label: 'Re-upload',
-		shown: (ctx) => !ctx.ProjectV3.minecraft_server,
+		shown: (ctx) => !ctx.projectV3.minecraft_server,
 	}),
 
 	toggle({
 		issue: reuploadUnclearForkIssue,
 		label: 'Unclear Fork',
-		shown: (ctx) => !ctx.ProjectV3.minecraft_server,
+		shown: (ctx) => !ctx.projectV3.minecraft_server,
 	}),
 	toggle({
 		issue: reuploadInsufficientForkIssue,
 		label: 'Insufficient Fork',
-		shown: (ctx) => !ctx.ProjectV3.minecraft_server,
+		shown: (ctx) => !ctx.projectV3.minecraft_server,
 	}),
 	toggle({
 		issue: reuploadRequestProofIssue,
@@ -158,22 +158,22 @@ export const reuploadReviewPanel = panel({
 	toggle({
 		issue: reuploadIdentityVerificationIssue,
 		label: 'Verify Identity',
-		shown: (ctx) => !ctx.ProjectV3.minecraft_server,
+		shown: (ctx) => !ctx.projectV3.minecraft_server,
 	}),
 	toggle({
 		issue: reuploadIdentityVerificationServerIssue,
 		label: 'Verify Identity',
-		shown: (ctx) => !!ctx.ProjectV3.minecraft_server,
+		shown: (ctx) => !!ctx.projectV3.minecraft_server,
 	}),
 	toggle({
 		issue: reuploadRequestProofServerIssue,
 		label: 'Reuploaded pack',
-		shown: (ctx) => projectHasCustomServerModpack(ctx.ProjectV3),
+		shown: (ctx) => projectHasCustomServerModpack(ctx.projectV3),
 	}),
 	toggle({
 		issue: reuploadCustomPackProhibitedIssue,
 		label: 'Forbidden Overrides',
-		shown: (ctx) => projectHasCustomServerModpack(ctx.ProjectV3),
+		shown: (ctx) => projectHasCustomServerModpack(ctx.projectV3),
 	}),
 	toggle({
 		issue: reuploadMissingAttributionIssue,
@@ -182,11 +182,11 @@ export const reuploadReviewPanel = panel({
 	toggle({
 		issue: reuploadCustomPackVerificationIssue,
 		label: 'Override verification',
-		shown: (ctx) => projectHasCustomServerModpack(ctx.ProjectV3),
+		shown: (ctx) => projectHasCustomServerModpack(ctx.projectV3),
 	}),
 	section({
 		shown: (ctx) =>
-			ctx.selected.issueIds.includes(reuploadReuploadIssue.id) && !ctx.ProjectV3.minecraft_server,
+			ctx.selected.issueIds.includes(reuploadReuploadIssue.id) && !ctx.projectV3.minecraft_server,
 	}).content(
 		text({
 			issue: reuploadReuploadIssue,
@@ -204,7 +204,7 @@ export const reuploadReviewPanel = panel({
 	section({
 		shown: (ctx) =>
 			ctx.selected.issueIds.includes(reuploadIdentityVerificationIssue.id) &&
-			!ctx.ProjectV3.minecraft_server,
+			!ctx.projectV3.minecraft_server,
 	}).content(
 		text({
 			issue: reuploadIdentityVerificationIssue,
@@ -216,7 +216,7 @@ export const reuploadReviewPanel = panel({
 	section({
 		shown: (ctx) =>
 			ctx.selected.issueIds.includes(reuploadIdentityVerificationServerIssue.id) &&
-			!!ctx.ProjectV3.minecraft_server,
+			!!ctx.projectV3.minecraft_server,
 	}).content(
 		text({
 			issue: reuploadIdentityVerificationServerIssue,
@@ -229,7 +229,7 @@ export const reuploadReviewPanel = panel({
 	section({
 		shown: (ctx) =>
 			ctx.selected.issueIds.includes(reuploadCustomPackProhibitedIssue.id) &&
-			projectHasCustomServerModpack(ctx.ProjectV3),
+			projectHasCustomServerModpack(ctx.projectV3),
 	}).content(
 		markdown({
 			issue: reuploadCustomPackProhibitedIssue,
@@ -242,7 +242,7 @@ export const reuploadReviewPanel = panel({
 	section({
 		shown: (ctx) =>
 			ctx.selected.issueIds.includes(reuploadCustomPackVerificationIssue.id) &&
-			projectHasCustomServerModpack(ctx.ProjectV3),
+			projectHasCustomServerModpack(ctx.projectV3),
 	}).content(
 		toggle({
 			issue: reuploadCustomPackVerificationIssue,

@@ -38,16 +38,16 @@ export const licenseReviewPanel = panel({
 	toggle({
 		issue: licenseInvalidLinkIssue,
 		label: 'Invalid Link',
-		shown: (ctx) => !ctx.ProjectV3.minecraft_server && !!ctx.ProjectV3.license.url,
+		shown: (ctx) => !ctx.projectV3.minecraft_server && !!ctx.projectV3.license.url,
 	}),
 	section({
 		shown: (ctx) =>
-			!ctx.ProjectV3.minecraft_server &&
+			!ctx.projectV3.minecraft_server &&
 			ctx.selected.issueIds.includes(licenseInvalidLinkIssue.id) &&
-			!!ctx.ProjectV3.license.url,
+			!!ctx.projectV3.license.url,
 	}).content(
 		toggle({
-			shown: (ctx) => !ctx.ProjectV3.minecraft_server,
+			shown: (ctx) => !ctx.projectV3.minecraft_server,
 			issue: licenseInvalidLinkIssue,
 			label: 'Invalid Link: Custom License',
 			id: 'license-custom-license',
@@ -55,20 +55,20 @@ export const licenseReviewPanel = panel({
 	),
 	section({
 		shown: (ctx) =>
-			!ctx.ProjectV3.minecraft_server &&
-			promptSourceRequired(ctx.ProjectV3.license.id, ctx.ProjectV3.project_types),
+			!ctx.projectV3.minecraft_server &&
+			promptSourceRequired(ctx.projectV3.license.id, ctx.projectV3.project_types),
 	}).content(
 		toggle({
-			shown: (ctx) => !ctx.ProjectV3.minecraft_server,
+			shown: (ctx) => !ctx.projectV3.minecraft_server,
 			issue: licenseNoSourceIssue,
 			label: 'No Source',
 		}),
 		section({
 			shown: (ctx) =>
-				!ctx.ProjectV3.minecraft_server && ctx.selected.issueIds.includes(licenseNoSourceIssue.id),
+				!ctx.projectV3.minecraft_server && ctx.selected.issueIds.includes(licenseNoSourceIssue.id),
 		}).content(
 			toggle({
-				shown: (ctx) => !ctx.ProjectV3.minecraft_server,
+				shown: (ctx) => !ctx.projectV3.minecraft_server,
 				issue: licenseNoSourceIssue,
 				label: 'No Source: Fork',
 				id: 'license-fork',

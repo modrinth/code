@@ -140,7 +140,7 @@ export const rulesReviewPanel = panel({
 		toggle({
 			issue: rulesPaidAccessServerIssue,
 			label: 'Paid access server',
-			shown: ({ ProjectV3 }) => !!ProjectV3.minecraft_server,
+			shown: ({ projectV3 }) => !!projectV3.minecraft_server,
 		}),
 		toggle({
 			issue: rulesCheatOrHackAdvertisingIssue,

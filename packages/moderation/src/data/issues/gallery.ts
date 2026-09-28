@@ -43,7 +43,7 @@ export const galleryReviewPanel = panel({
 	toggle({
 		issue: galleryNotRelevantIssue,
 		label: 'Not relevant',
-		shown: ({ ProjectV3 }) => ProjectV3.gallery.length > 0,
+		shown: ({ projectV3 }) => projectV3.gallery.length > 0,
 	}),
 	toggle({
 		issue: galleryShowcaseClarityIssue,

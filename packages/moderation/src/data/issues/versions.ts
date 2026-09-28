@@ -93,7 +93,7 @@ export const versionsReviewPanel = panel({
 	icon: VersionIcon,
 	guidanceUrl:
 		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e25ee711bf0804bad38e9055951ff31',
-	shown: ({ ProjectV3 }) => !ProjectV3.minecraft_server,
+	shown: ({ projectV3 }) => !projectV3.minecraft_server,
 }).content(
 	toggle({
 		issue: versionsIncorrectAdditionalFilesIssue,
@@ -102,13 +102,13 @@ export const versionsReviewPanel = panel({
 	toggle({
 		issue: versionsVanillaAssetsIssue,
 		label: 'Vanilla Assets',
-		shown: ({ ProjectV3 }) => ProjectV3.project_types.includes('resourcepack'),
+		shown: ({ projectV3 }) => projectV3.project_types.includes('resourcepack'),
 	}),
 	toggle({
 		issue: versionsRedistLibsIssue,
 		label: 'Packed Libs',
-		shown: ({ ProjectV3 }) =>
-			ProjectV3.project_types.includes('mod') || ProjectV3.project_types.includes('plugin'),
+		shown: ({ projectV3 }) =>
+			projectV3.project_types.includes('mod') || projectV3.project_types.includes('plugin'),
 	}),
 	toggle({
 		issue: versionsDuplicatePrimaryFilesIssue,
@@ -153,24 +153,24 @@ export const versionsReviewPanel = panel({
 				{
 					value: 'mono',
 					label: 'Monofile',
-					shown: ({ ProjectV3 }) =>
-						ProjectV3.project_types.includes('resourcepack') ||
-						ProjectV3.loaders.includes('datapack'),
+					shown: ({ projectV3 }) =>
+						projectV3.project_types.includes('resourcepack') ||
+						projectV3.loaders.includes('datapack'),
 				},
 				{
 					value: 'server',
 					label: 'Server Files (Primary Files)',
-					shown: ({ ProjectV3 }) => ProjectV3.project_types.includes('modpack'),
+					shown: ({ projectV3 }) => projectV3.project_types.includes('modpack'),
 				},
 				{
 					value: 'server-additional',
 					label: 'Server Files (Additional Files)',
-					shown: ({ ProjectV3 }) => ProjectV3.project_types.includes('modpack'),
+					shown: ({ projectV3 }) => projectV3.project_types.includes('modpack'),
 				},
 				{
 					value: 'zip',
 					label: 'mods.zip',
-					shown: ({ ProjectV3 }) => ProjectV3.project_types.includes('modpack'),
+					shown: ({ projectV3 }) => projectV3.project_types.includes('modpack'),
 				},
 			],
 		}),

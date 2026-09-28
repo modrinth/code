@@ -16,7 +16,7 @@ export const linksIssue = issue({
 	title: 'Invalid project links',
 	category: 'Links',
 	suggestedStatus: 'flagged',
-	message: ({ ProjectV3, selected }) => {
+	message: ({ projectV3, selected }) => {
 		const toggleIds = new Set(selected.toggleIds)
 		const inaccessibleItems: string[] = []
 		const misusedItems: string[] = []
@@ -101,7 +101,7 @@ export const linksIssue = issue({
 			}
 
 			if (!inaccessibleSelected && !misusedSelected) continue
-			const url = ProjectV3.link_urls[type]?.url
+			const url = projectV3.link_urls[type]?.url
 			// "- Source code: `https://github.com/owner/repo`" or "- Source code"
 			const item = url ? `- ${label}: \`${url}\`` : `- ${label}`
 			if (inaccessibleSelected) {
@@ -138,7 +138,7 @@ export const issuesReviewPanel = panel({
 	icon: LinkIcon,
 	guidanceUrl:
 		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
-	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.issues?.url),
+	shown: ({ projectV3 }) => isHttpUrl(projectV3.link_urls.issues?.url),
 }).content(
 	toggle({
 		issue: linksIssue,
@@ -165,7 +165,7 @@ export const sourceReviewPanel = panel({
 	icon: LinkIcon,
 	guidanceUrl:
 		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
-	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.source?.url),
+	shown: ({ projectV3 }) => isHttpUrl(projectV3.link_urls.source?.url),
 }).content(
 	toggle({
 		issue: linksIssue,
@@ -192,7 +192,7 @@ export const wikiReviewPanel = panel({
 	icon: LinkIcon,
 	guidanceUrl:
 		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
-	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.wiki?.url),
+	shown: ({ projectV3 }) => isHttpUrl(projectV3.link_urls.wiki?.url),
 }).content(
 	toggle({
 		issue: linksIssue,
@@ -219,7 +219,7 @@ export const discordReviewPanel = panel({
 	icon: LinkIcon,
 	guidanceUrl:
 		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
-	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.discord?.url),
+	shown: ({ projectV3 }) => isHttpUrl(projectV3.link_urls.discord?.url),
 }).content(
 	toggle({
 		issue: linksIssue,
@@ -246,7 +246,7 @@ export const siteReviewPanel = panel({
 	icon: LinkIcon,
 	guidanceUrl:
 		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
-	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.site?.url),
+	shown: ({ projectV3 }) => isHttpUrl(projectV3.link_urls.site?.url),
 }).content(
 	toggle({
 		issue: linksIssue,
@@ -266,7 +266,7 @@ export const storeReviewPanel = panel({
 	icon: LinkIcon,
 	guidanceUrl:
 		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
-	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.store?.url),
+	shown: ({ projectV3 }) => isHttpUrl(projectV3.link_urls.store?.url),
 }).content(
 	toggle({
 		issue: linksIssue,
@@ -286,7 +286,7 @@ export const patreonReviewPanel = panel({
 	icon: LinkIcon,
 	guidanceUrl:
 		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
-	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.patreon?.url),
+	shown: ({ projectV3 }) => isHttpUrl(projectV3.link_urls.patreon?.url),
 }).content(
 	toggle({
 		issue: linksIssue,
@@ -306,7 +306,7 @@ export const bmacReviewPanel = panel({
 	icon: LinkIcon,
 	guidanceUrl:
 		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
-	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.bmac?.url),
+	shown: ({ projectV3 }) => isHttpUrl(projectV3.link_urls.bmac?.url),
 }).content(
 	toggle({
 		issue: linksIssue,
@@ -326,7 +326,7 @@ export const paypalReviewPanel = panel({
 	icon: LinkIcon,
 	guidanceUrl:
 		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
-	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.paypal?.url),
+	shown: ({ projectV3 }) => isHttpUrl(projectV3.link_urls.paypal?.url),
 }).content(
 	toggle({
 		issue: linksIssue,
@@ -346,7 +346,7 @@ export const githubReviewPanel = panel({
 	icon: LinkIcon,
 	guidanceUrl:
 		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
-	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.github?.url),
+	shown: ({ projectV3 }) => isHttpUrl(projectV3.link_urls.github?.url),
 }).content(
 	toggle({
 		issue: linksIssue,
@@ -366,7 +366,7 @@ export const koFiReviewPanel = panel({
 	icon: LinkIcon,
 	guidanceUrl:
 		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
-	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls['ko-fi']?.url),
+	shown: ({ projectV3 }) => isHttpUrl(projectV3.link_urls['ko-fi']?.url),
 }).content(
 	toggle({
 		issue: linksIssue,
@@ -386,7 +386,7 @@ export const otherReviewPanel = panel({
 	icon: LinkIcon,
 	guidanceUrl:
 		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
-	shown: ({ ProjectV3 }) => isHttpUrl(ProjectV3.link_urls.other?.url),
+	shown: ({ projectV3 }) => isHttpUrl(projectV3.link_urls.other?.url),
 }).content(
 	toggle({
 		issue: linksIssue,

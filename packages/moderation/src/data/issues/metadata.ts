@@ -71,7 +71,7 @@ export const metadataReviewPanel = panel({
 	icon: DatabaseIcon,
 	guidanceUrl:
 		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e25ee711bf0802d9a9bdb82dce040eb',
-	shown: ({ ProjectV3 }) => !ProjectV3.minecraft_server,
+	shown: ({ projectV3 }) => !projectV3.minecraft_server,
 }).content(
 	toggle({
 		issue: metadataDependenciesIssue,
@@ -86,7 +86,7 @@ export const metadataReviewPanel = panel({
 		label: 'Loaders',
 	}),
 	section({
-		shown: ({ ProjectV3 }) => requiresEnvironmentInfo(ProjectV3.project_types),
+		shown: ({ projectV3 }) => requiresEnvironmentInfo(projectV3.project_types),
 	}).content(
 		toggle({
 			issue: metadataEnvironmentIssue,

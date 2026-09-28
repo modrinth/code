@@ -16,8 +16,8 @@ export const statusAlertsCorrectionsAppliedIssue = issue({
 	id: 'status-alerts-corrections-applied',
 	title: 'Apply selected corrections',
 	category: 'Project wide',
-	message: ({ ProjectV3 }) =>
-		ProjectV3.status === 'approved' ? correctionsAppliedApprovedMessage : correctionsAppliedMessage,
+	message: ({ projectV3 }) =>
+		projectV3.status === 'approved' ? correctionsAppliedApprovedMessage : correctionsAppliedMessage,
 	suggestedStatus: 'approved',
 	applyCorrections: true,
 })
@@ -26,11 +26,11 @@ export const statusAlertsPrivateUseIssue = issue({
 	id: 'status-alerts-private-use',
 	title: 'Private-use project',
 	category: 'Project wide',
-	message: ({ ProjectV3 }) => {
-		const serverPack = ProjectV3.minecraft_java_server?.content?.kind === 'modpack'
+	message: ({ projectV3 }) => {
+		const serverPack = projectV3.minecraft_java_server?.content?.kind === 'modpack'
 		return [
 			serverPack ? privateUseServerMessage : privateUseProjectMessage,
-			serverPack || ProjectV3.project_types.includes('modpack')
+			serverPack || projectV3.project_types.includes('modpack')
 				? privateUseNoteSharedInstanceMessage
 				: '',
 		].join('\n')
@@ -85,8 +85,8 @@ export const statusAlertsReviewPanel = panel({
 	toggle({
 		issue: statusAlertsServerUseIssue,
 		label: 'Server use',
-		shown: ({ ProjectV3 }) =>
-			ProjectV3.project_types.includes('modpack') && !ProjectV3.minecraft_server,
+		shown: ({ projectV3 }) =>
+			projectV3.project_types.includes('modpack') && !projectV3.minecraft_server,
 	}),
 	toggle({
 		issue: statusAlertsAccountIssuesIssue,
@@ -95,17 +95,17 @@ export const statusAlertsReviewPanel = panel({
 	toggle({
 		issue: statusAlertsDemonetizedIssue,
 		label: 'Demonetized',
-		shown: ({ ProjectV3 }) =>
-			ProjectV3.monetization_status === 'force-demonetized' &&
-			!ProjectV3.project_types.includes('modpack') &&
-			!ProjectV3.minecraft_server,
+		shown: ({ projectV3 }) =>
+			projectV3.monetization_status === 'force-demonetized' &&
+			!projectV3.project_types.includes('modpack') &&
+			!projectV3.minecraft_server,
 	}),
 	toggle({
 		issue: statusAlertsDemonetizedModpackIssue,
 		label: 'Demonetized',
-		shown: ({ ProjectV3 }) =>
-			ProjectV3.monetization_status === 'force-demonetized' &&
-			ProjectV3.project_types.includes('modpack') &&
-			!ProjectV3.minecraft_server,
+		shown: ({ projectV3 }) =>
+			projectV3.monetization_status === 'force-demonetized' &&
+			projectV3.project_types.includes('modpack') &&
+			!projectV3.minecraft_server,
 	}),
 )

@@ -43,9 +43,9 @@ export const permissionsReviewPanel = panel({
 	hint: "Does this project's external content have any issues?",
 	icon: SignatureIcon,
 	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
-	shown: ({ ProjectV3, permissions }) =>
-		ProjectV3.project_types.includes('modpack') &&
-		!ProjectV3.minecraft_server &&
+	shown: ({ projectV3, permissions }) =>
+		projectV3.project_types.includes('modpack') &&
+		!projectV3.minecraft_server &&
 		permissions.loaded &&
 		permissions.unresolvedCount > 0,
 }).content(
@@ -64,6 +64,6 @@ export const permissionsReviewPanel = panel({
 	toggle({
 		issue: permissionsNonCommercialExternalContentIssue,
 		label: 'Non-commercial externals',
-		shown: ({ ProjectV3 }) => ProjectV3.monetization_status === 'monetized',
+		shown: ({ projectV3 }) => projectV3.monetization_status === 'monetized',
 	}),
 )
