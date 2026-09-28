@@ -7,6 +7,7 @@ use crate::database::PgTransaction;
 use crate::database::models::flow_item::DBFlow;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::session_item::DBSession;
+use crate::database::models::user_lock_item::DBUserLock;
 use crate::database::models::{DBPasskey, DBPasskeyId, DBUser, DBUserId};
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
@@ -1361,6 +1362,10 @@ pub async fn auth_callback(
             let existing_user_id = existing_user_id.wrap_err(
                 "attempting to link a PayPal account without being logged in",
             )?;
+
+            if DBUserLock::exists(existing_user_id, &mut transaction).await? {
+                return Err(AuthenticationError::AccountLocked);
+            }
 
             sqlx::query!(
                 "
