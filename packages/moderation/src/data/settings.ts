@@ -23,24 +23,6 @@ const settings = {
 			description: 'Show number key shortcut hints on issue toggle buttons.',
 			default: true,
 		}),
-		ChecklistPosition: setting.asEnum({
-			type: 'enum',
-			id: 'checklist-position',
-			title: 'Checklist position',
-			description: 'Where the checklist should be displayed on the page',
-			entries: [
-				{ value: 'left', label: 'Left' },
-				{ value: 'right', label: 'Right' },
-			],
-			default: 'right',
-		}),
-		ProjectKeybinds: setting.asToggle({
-			type: 'toggle',
-			id: 'project-keybinds',
-			title: 'Enable project keybinds',
-			description: 'Weather certain keybinds should work without the checklist visible.',
-			default: false,
-		}),
 		PrivateMessageHighlight: setting.asToggle({
 			type: 'toggle',
 			id: 'private-message-highlight',
@@ -74,7 +56,7 @@ const settings = {
 			title: 'Alternative hostname',
 			description:
 				'When Open production/staging is used on an official host, open this hostname instead. Example: localhost:3000',
-			default: null,
+			default: '',
 		}),
 	},
 	Checklist: {
