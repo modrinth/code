@@ -73,16 +73,6 @@ function normalizeInstancePayload(value: unknown): WireObject {
 	}
 }
 
-function normalizeBulkUpdatePayload(value: unknown): WireObject {
-	const payload = wireObject(value)
-	return {
-		...payload,
-		stage: unitVariant(payload.stage),
-		current: number(payload.current),
-		total: number(payload.total),
-	}
-}
-
 function normalizeCommandPayload(value: unknown): WireObject {
 	const command = taggedObject(value, 'event')
 	if (command.event === 'LaunchInstance') {
@@ -224,8 +214,6 @@ export function decodeAppEvent(payload: ArrayBuffer): AppEvent {
 				return { type: event.tag, payload: wireObject(event.value) }
 			case 'onboarding_checklist':
 				return { type: event.tag, payload: wireObject(event.value) }
-			case 'instance_bulk_update_progress':
-				return { type: event.tag, payload: normalizeBulkUpdatePayload(event.value) }
 			case 'install_job':
 				return { type: event.tag, payload: normalizeInstallJob(event.value) }
 			case 'command':

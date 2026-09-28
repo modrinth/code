@@ -416,10 +416,6 @@ export async function check_installed(instanceId: string, projectId: string): Pr
 	return await invoke('plugin:instance|instance_check_installed', { instanceId, projectId })
 }
 
-export async function update_all(instanceId: string): Promise<Record<string, string>> {
-	return await invoke('plugin:instance|instance_update_all', { instanceId })
-}
-
 // Updates a specified project
 export async function update_project(instanceId: string, projectPath: string): Promise<string> {
 	return await invoke('plugin:instance|instance_update_project', { instanceId, projectPath })

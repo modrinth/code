@@ -625,22 +625,28 @@ async fn run_scan(
             },
         };
 
+        let context = build_rule_context(&input).wrap_err_with(|| {
+            format!(
+                "failed to build delphi rule context for detail {detail_id}"
+            )
+        })?;
         for rule in &rules {
             if !rule.applies_to_issue_type(&input.trace.issue_type) {
                 continue;
             }
 
-            let effect = evaluate_rule(
+            let effect = evaluate_rule_with_context(
                 &rule.program,
                 &rule.expression,
+                &context,
                 &input,
             )
-                .wrap_err_with(|| {
-                    format!(
-                        "failed to evaluate delphi rule '{}' for detail {detail_id}",
-                        rule.name
-                    )
-                })?;
+            .wrap_err_with(|| {
+                format!(
+                    "failed to evaluate delphi rule '{}' for detail {detail_id}",
+                    rule.name
+                )
+            })?;
             if let Some(effect) = effect {
                 effects.push(MaterializedEffect {
                     detail_id,
@@ -920,18 +926,29 @@ pub(crate) async fn materialize_current_rule_effects(
             },
         };
 
+        let context = build_rule_context(&input).wrap_err_with(|| {
+            format!(
+                "failed to build delphi rule context for detail {}",
+                detail.id
+            )
+        })?;
         for rule in &rules {
             if !rule.applies_to_issue_type(&input.trace.issue_type) {
                 continue;
             }
 
-            let effect = evaluate_rule(&rule.program, &rule.expression, &input)
-                .wrap_err_with(|| {
-                    format!(
-                        "failed to evaluate delphi rule '{}' for detail {}",
-                        rule.name, detail.id
-                    )
-                })?;
+            let effect = evaluate_rule_with_context(
+                &rule.program,
+                &rule.expression,
+                &context,
+                &input,
+            )
+            .wrap_err_with(|| {
+                format!(
+                    "failed to evaluate delphi rule '{}' for detail {}",
+                    rule.name, detail.id
+                )
+            })?;
             if let Some(effect) = effect {
                 effects.push(MaterializedEffect {
                     detail_id: detail.id,
@@ -1040,20 +1057,11 @@ pub(super) fn evaluate_rule(
     expression: &str,
     input: &RuleInput,
 ) -> Result<Option<DelphiRuleEffect>> {
-    evaluate_rule_inner(program, input)
-        .wrap_err_with(|| {
-            let input = serde_json::to_string(input).unwrap_or_else(|error| {
-                format!("<failed to serialize CEL input: {error}>")
-            });
-            format!("CEL input: {input}")
-        })
-        .wrap_err_with(|| format!("CEL expression: {expression}"))
+    let context = build_rule_context(input)?;
+    evaluate_rule_with_context(program, expression, &context, input)
 }
 
-fn evaluate_rule_inner(
-    program: &cel::Program,
-    input: &RuleInput,
-) -> Result<Option<DelphiRuleEffect>> {
+fn build_rule_context(input: &RuleInput) -> Result<cel::Context<'_>> {
     let mut context = cel::Context::default();
     context
         .add_variable("schema_version", input.schema_version)
@@ -1080,8 +1088,31 @@ fn evaluate_rule_inner(
         .add_variable("file", &input.file)
         .wrap_err("failed to add `file` to cel context")?;
 
+    Ok(context)
+}
+
+fn evaluate_rule_with_context(
+    program: &cel::Program,
+    expression: &str,
+    context: &cel::Context<'_>,
+    input: &RuleInput,
+) -> Result<Option<DelphiRuleEffect>> {
+    evaluate_rule_inner(program, context)
+        .wrap_err_with(|| {
+            let input = serde_json::to_string(input).unwrap_or_else(|error| {
+                format!("<failed to serialize CEL input: {error}>")
+            });
+            format!("CEL input: {input}")
+        })
+        .wrap_err_with(|| format!("CEL expression: {expression}"))
+}
+
+fn evaluate_rule_inner(
+    program: &cel::Program,
+    context: &cel::Context<'_>,
+) -> Result<Option<DelphiRuleEffect>> {
     let value = program
-        .execute(&context)
+        .execute(context)
         .wrap_err("failed to execute cel expression")?;
     let value = value.json().map_err(|error| {
         eyre!("failed to convert cel result to json: {error}")

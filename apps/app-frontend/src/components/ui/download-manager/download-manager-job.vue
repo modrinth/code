@@ -103,6 +103,12 @@ const instanceLink = computed(() =>
 					>
 						{{ job.title }}
 					</span>
+					<span
+						v-if="job.taskType && job.taskType !== job.text"
+						class="truncate text-xs font-medium leading-4 text-primary"
+					>
+						{{ job.taskType }}
+					</span>
 					<div
 						class="flex min-w-0 items-center gap-1 text-xs font-medium leading-4"
 						:class="

@@ -721,6 +721,7 @@ pub(super) async fn apply_shared_instance_content(
                 DownloadReason::Standalone,
                 None,
                 state,
+				None,
             )
             .await?;
             crate::state::instances::commands::add_downloaded_project_version(

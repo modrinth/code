@@ -5,8 +5,8 @@ use crate::event::{
     ProcessPayload, WarningPayload,
 };
 use crate::event::{
-    CommandPayload, EventError, InstanceBulkUpdateProgressPayload,
-    InstancePayloadType, LoadingBar, LoadingBarType, ProcessPayloadType,
+    CommandPayload, EventError, InstancePayloadType, LoadingBar,
+    LoadingBarType, ProcessPayloadType,
 };
 use crate::state::OnboardingChecklist;
 use futures::prelude::*;
@@ -164,18 +164,6 @@ pub async fn emit_warning(message: &str) -> crate::Result<()> {
         }))?;
     }
     tracing::warn!("{}", message);
-    Ok(())
-}
-
-#[allow(unused_variables)]
-pub async fn emit_instance_bulk_update_progress(
-    payload: InstanceBulkUpdateProgressPayload,
-) -> crate::Result<()> {
-    #[cfg(feature = "tauri")]
-    {
-        let event_state = crate::EventState::get();
-        event_state.send(AppEvent::InstanceBulkUpdateProgress(payload))?;
-    }
     Ok(())
 }
 
