@@ -26,6 +26,7 @@
 					>
 						<p class="m-0 font-semibold text-contrast">
 							{{ control.label }}
+							<span v-if="control.required" class="text-red" aria-hidden="true">*</span>
 						</p>
 						<MarkdownEditor
 							v-if="control.type === 'markdown'"
@@ -48,7 +49,7 @@
 							v-else-if="control.type === 'text'"
 							:ref="(field) => setFieldRef(fieldKey(control), field)"
 							:model-value="panels.textValue(panelBinding, control)"
-							:placeholder="control.placeholder"
+							:placeholder="control.placeholder || formatMessage(controlMessages.textPlaceholder)"
 							:disabled="control.disabled"
 							:aria-label="control.label"
 							:aria-required="control.required"
@@ -196,6 +197,10 @@ const emit = defineEmits<{
 }>()
 const id = useId()
 const controlMessages = defineMessages({
+	textPlaceholder: {
+		id: 'project-review.controls.text-placeholder',
+		defaultMessage: 'Enter text…',
+	},
 	markdownPlaceholder: {
 		id: 'project-review.controls.markdown-placeholder',
 		defaultMessage: 'Explain what needs to change…',
