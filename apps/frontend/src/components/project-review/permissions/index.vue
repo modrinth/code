@@ -19,7 +19,15 @@
 				is-moderator
 				collapse-all-icon-only
 				collapse-attributed-by-default
-			/>
+			>
+				<template #image-viewer-actions="{ item, pixelated, setPixelated }">
+					<ImageViewerActions
+						:src="item.src"
+						:pixelated="pixelated"
+						@update:pixelated="setPixelated"
+					/>
+				</template>
+			</ProjectPermissions>
 		</div>
 	</section>
 </template>
@@ -31,6 +39,7 @@ import ProjectPermissions from '~/components/ui/project-settings/modpack-permiss
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
 
+import ImageViewerActions from '../image-viewer-actions.vue'
 import ReviewPanel from '../review-panel/index.vue'
 
 const panels = injectReviewPanels()

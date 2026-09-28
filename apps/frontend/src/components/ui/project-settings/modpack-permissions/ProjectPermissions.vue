@@ -434,6 +434,9 @@ function defaultCardCollapsed(group: Labrinth.Attribution.Internal.AttributionGr
 	if (group?.attribution?.kind === 'globally_allowed') {
 		return true
 	}
+	if (props.isModerator && needsModerationApproval(group)) {
+		return false
+	}
 	if (!props.isModerator || props.collapseAttributedByDefault) {
 		const hasAttribution = !!group.attribution
 		const rejectedProof = group.attribution?.moderation_status?.kind === 'bad_proof'
@@ -686,7 +689,11 @@ function dismissInfoBanner() {
 					:members="members"
 					:is-moderator="isModerator"
 					@update:collapsed="setCardCollapsed(group.id, $event)"
-				/>
+				>
+					<template #image-viewer-actions="slotProps">
+						<slot name="image-viewer-actions" v-bind="slotProps" />
+					</template>
+				</ExternalProjectPermissionsCard>
 				<EmptyState
 					v-if="filteredGroups.length === 0"
 					:heading="formatMessage(messages.noResults)"

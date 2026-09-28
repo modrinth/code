@@ -20,6 +20,7 @@ import { computed, ref, useTemplateRef, watch } from 'vue'
 
 import { Collapsible, ConfirmModal } from '#ui/components'
 import type { ButtonMenuOption } from '#ui/components/base'
+import { CopyCode } from '#ui/components/base'
 import { Button, IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import { commonMessages } from '#ui/utils'
 
@@ -127,6 +128,10 @@ const messages = defineMessages({
 	includedFiles: {
 		id: 'external-files.permissions-card.included-files',
 		defaultMessage: 'Included files:',
+	},
+	fileDatabaseId: {
+		id: 'external-files.permissions-card.file-database-id',
+		defaultMessage: 'Database ID',
 	},
 	notUsedInVersions: {
 		id: 'external-files.permissions-card.not-used-in-versions',
@@ -575,10 +580,21 @@ const visibleQuickReplies = computed<ButtonMenuOption[]>(() => {
 						}"
 					>
 						<FileIcon class="size-4 shrink-0 mt-2.5" />
-						<div class="max-w-[22rem] min-w-0 flex flex-col gap-1 py-2">
+						<div class="min-w-0 flex flex-col gap-1 py-2">
 							<span class="truncate">
 								{{ file.name.split('/').pop() }}
 							</span>
+							<div
+								v-if="isModerator"
+								class="grid grid-cols-[max-content_minmax(0,1fr)] items-center gap-x-2 gap-y-1 text-xs"
+							>
+								<span class="text-secondary">SHA-1</span>
+								<CopyCode :text="file.sha1" class="max-w-full break-all" />
+								<template v-if="file.moderation_external_license_id != null">
+									<span class="text-secondary">{{ formatMessage(messages.fileDatabaseId) }}</span>
+									<CopyCode :text="String(file.moderation_external_license_id)" />
+								</template>
+							</div>
 						</div>
 						<div class="flex items-center gap-1 my-auto">
 							<IconButton
@@ -640,6 +656,9 @@ const visibleQuickReplies = computed<ButtonMenuOption[]>(() => {
 					:attributor-avatar-url="attributorMember?.user.avatar_url"
 					:moderator="isModerator"
 				>
+					<template #image-viewer-actions="slotProps">
+						<slot name="image-viewer-actions" v-bind="slotProps" />
+					</template>
 					<template
 						v-if="
 							group.attribution?.kind !== 'globally_allowed' &&
@@ -710,6 +729,8 @@ const visibleQuickReplies = computed<ButtonMenuOption[]>(() => {
 									<template v-else>
 										<Textarea
 											v-model="reviewReasonInput"
+											resize="vertical"
+											:rows="7"
 											placeholder="Explanation of review (optional)"
 											class="mt-3"
 										/>

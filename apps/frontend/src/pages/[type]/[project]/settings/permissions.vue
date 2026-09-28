@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { commonProjectSettingsMessages, injectProjectPageContext } from '@modrinth/ui'
+import { ExternalIcon } from '@modrinth/assets'
+import {
+	ButtonLink,
+	commonProjectSettingsMessages,
+	defineMessage,
+	injectProjectPageContext,
+	useVIntl,
+} from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
 import { computed } from 'vue'
 
@@ -14,6 +21,11 @@ const isModerator = computed(
 )
 const { projectV2: project, allMembers, refreshProjectValidation } = injectProjectPageContext()
 const permissionsValidation = useProjectNagMessages('permissions')
+const { formatMessage } = useVIntl()
+const openImageInNewTab = defineMessage({
+	id: 'project.settings.permissions.open-image-in-new-tab',
+	defaultMessage: 'Open image in new tab',
+})
 
 useProjectSettingsHeadTitle(commonProjectSettingsMessages.permissions)
 </script>
@@ -25,5 +37,18 @@ useProjectSettingsHeadTitle(commonProjectSettingsMessages.permissions)
 		:members="allMembers"
 		:is-moderator="isModerator"
 		:refresh-project-validation="refreshProjectValidation"
-	/>
+	>
+		<template #image-viewer-actions="{ item }">
+			<ButtonLink
+				v-tooltip="formatMessage(openImageInNewTab)"
+				type="quiet"
+				class="!w-9 !rounded-full !p-0"
+				:aria-label="formatMessage(openImageInNewTab)"
+				:href="item.src"
+				target="_blank"
+			>
+				<ExternalIcon aria-hidden="true" />
+			</ButtonLink>
+		</template>
+	</ProjectPermissions>
 </template>
