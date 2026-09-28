@@ -9,7 +9,7 @@
 		<div class="flex flex-col gap-4">
 			<Admonition type="critical" header="This account will become read-only">
 				{{ user.username }} will not be able to create, edit, or delete anything on Modrinth until
-				their account is unlocked. They will still be able to delete their account.
+				their account is unlocked.
 			</Admonition>
 
 			<div class="flex flex-col gap-2.5">
