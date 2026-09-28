@@ -1,5 +1,6 @@
 import { CopyrightIcon } from '@modrinth/assets'
 
+import { projectHasCustomServerModpack } from '../../utils'
 import customPackProhibitedMessage from '../messages/checklist/messages/reupload/custom-pack-prohibited.md'
 import customPackVerificationMessage from '../messages/checklist/messages/reupload/custom-pack-verification.md'
 import customPackVerificationListMessage from '../messages/checklist/messages/reupload/custom-pack-verification/list.md'
@@ -12,14 +13,13 @@ import requestProofServerMessage from '../messages/checklist/messages/reupload/r
 import reuploadMessage from '../messages/checklist/messages/reupload/reupload.md'
 import unclearForkMessage from '../messages/checklist/messages/reupload/unclear-fork.md'
 import { issue, markdown, panel, section, text, toggle } from './component-builders/builders'
-import { projectHasCustomServerModpack } from '../../utils'
 
 export const reuploadReuploadIssue = issue({
 	id: 'reupload-reupload',
 	title: 'Reuploads are forbidden',
 	category: 'Project wide',
 	message: ({ getTextValue }) => {
-		let msg = reuploadMessage
+		const msg = reuploadMessage
 
 		if (!getTextValue('original-project') && !getTextValue('original-author')) {
 			return msg.replaceAll('%ORIGINAL_PROJECT%%ORIGINAL_AUTHOR%', 'from other creators')
@@ -78,7 +78,7 @@ export const reuploadIdentityVerificationServerIssue = issue({
 	title: 'Server identity verification',
 	category: 'Project wide',
 	message: ({ getTextValue }) => {
-		let msg = identityVerificationServerMessage
+		const msg = identityVerificationServerMessage
 		if (getTextValue('contact').length > 0) {
 			return msg.replaceAll('%CONTACT%', () => `, such as \`${getTextValue('contact')}\``)
 		}

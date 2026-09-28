@@ -480,8 +480,7 @@ export function createReviewPanels(
 			.filter(([, { active }]) => active)
 			.sort(
 				([a, { issue: issueA }], [b, { issue: issueB }]) =>
-					(issueA.priority ?? IssuePriority.Default) -
-						(issueB.priority ?? IssuePriority.Default) ||
+					(issueA.priority ?? IssuePriority.Default) - (issueB.priority ?? IssuePriority.Default) ||
 					(order.get(a) ?? -1) - (order.get(b) ?? -1),
 			)
 			.map(([id, { issue, keys, missing }]) => {

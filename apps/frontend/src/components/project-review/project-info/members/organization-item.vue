@@ -18,18 +18,15 @@
 			/>
 		</button>
 		<Avatar v-else :alt="organization.name" :tint-by="organization.id" size="2rem" no-shadow />
-		<ImageViewerEditor :key="organization.id" ref="viewer" :items="viewerItems" editor="disabled">
+		<ImageViewerEditor
+			:key="organization.id"
+			ref="viewer"
+			:items="viewerItems"
+			editor="disabled"
+			:pixelated="pixelated"
+		>
 			<template #actions="{ item }">
-				<ButtonLink
-					v-tooltip="formatMessage(messages.openImageInNewTab)"
-					type="quiet"
-					class="!w-9 !rounded-full !p-0"
-					:aria-label="formatMessage(messages.openImageInNewTab)"
-					:href="item.src"
-					target="_blank"
-				>
-					<ExternalIcon aria-hidden="true" />
-				</ButtonLink>
+				<ImageViewerActions v-model:pixelated="pixelated" :src="item.src" />
 			</template>
 		</ImageViewerEditor>
 		<div class="min-w-0">
@@ -49,10 +46,11 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { CrownIcon, ExternalIcon } from '@modrinth/assets'
-import { Avatar, ButtonLink, ImageViewerEditor, useVIntl } from '@modrinth/ui'
+import { CrownIcon } from '@modrinth/assets'
+import { Avatar, ImageViewerEditor, useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
+import ImageViewerActions from '../../image-viewer-actions.vue'
 import { projectReviewMessages as messages } from '../../messages'
 
 const props = defineProps<{
@@ -60,6 +58,7 @@ const props = defineProps<{
 }>()
 const { formatMessage } = useVIntl()
 const viewer = ref<InstanceType<typeof ImageViewerEditor>>()
+const pixelated = ref(false)
 const iconUrl = computed(() => props.organization.raw_icon_url || props.organization.icon_url)
 const viewerItems = computed(() =>
 	iconUrl.value ? [{ id: iconUrl.value, src: iconUrl.value, alt: props.organization.name }] : [],

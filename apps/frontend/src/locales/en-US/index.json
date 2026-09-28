@@ -4049,6 +4049,15 @@
   "project-review.decision.withhold": {
     "message": "Withhold"
   },
+  "project-review.image.disable-pixelated": {
+    "message": "Disable pixel-art rendering"
+  },
+  "project-review.image.download": {
+    "message": "Download image"
+  },
+  "project-review.image.enable-pixelated": {
+    "message": "Enable pixel-art rendering"
+  },
   "project-review.issues.add": {
     "message": "Issue"
   },

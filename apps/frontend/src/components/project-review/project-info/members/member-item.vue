@@ -16,18 +16,15 @@
 			/>
 		</button>
 		<Avatar v-else :alt="member.user.username" size="2rem" circle no-shadow />
-		<ImageViewerEditor :key="member.user.id" ref="viewer" :items="viewerItems" editor="disabled">
+		<ImageViewerEditor
+			:key="member.user.id"
+			ref="viewer"
+			:items="viewerItems"
+			editor="disabled"
+			:pixelated="pixelated"
+		>
 			<template #actions="{ item }">
-				<ButtonLink
-					v-tooltip="formatMessage(messages.openImageInNewTab)"
-					type="quiet"
-					class="!w-9 !rounded-full !p-0"
-					:aria-label="formatMessage(messages.openImageInNewTab)"
-					:href="item.src"
-					target="_blank"
-				>
-					<ExternalIcon aria-hidden="true" />
-				</ButtonLink>
+				<ImageViewerActions v-model:pixelated="pixelated" :src="item.src" />
 			</template>
 		</ImageViewerEditor>
 		<div class="min-w-0">
@@ -64,17 +61,11 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { CheckIcon, CrownIcon, ExternalIcon } from '@modrinth/assets'
-import {
-	Avatar,
-	ButtonLink,
-	ImageViewerEditor,
-	PROJECT_STATUS_ICONS,
-	Tooltip,
-	useVIntl,
-} from '@modrinth/ui'
+import { CheckIcon, CrownIcon } from '@modrinth/assets'
+import { Avatar, ImageViewerEditor, PROJECT_STATUS_ICONS, Tooltip, useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
+import ImageViewerActions from '../../image-viewer-actions.vue'
 import { projectReviewMessages as messages } from '../../messages'
 
 const props = defineProps<{
@@ -83,6 +74,7 @@ const props = defineProps<{
 }>()
 const { formatMessage } = useVIntl()
 const viewer = ref<InstanceType<typeof ImageViewerEditor>>()
+const pixelated = ref(false)
 const avatarUrl = computed(() => props.member.user.raw_avatar_url || props.member.user.avatar_url)
 const viewerItems = computed(() =>
 	avatarUrl.value
