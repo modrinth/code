@@ -70,6 +70,10 @@ export class Keybinds {
 			const matches = definitions.some((def) => matchesKeybind(event, def))
 
 			if (matches) {
+				if (document.activeElement instanceof HTMLElement) {
+					document.activeElement.blur()
+				}
+
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				keybind.action(ctx as any)
 

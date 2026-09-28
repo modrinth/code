@@ -1,4 +1,5 @@
 import { createContext } from '@modrinth/ui'
+import { useRafFn } from '@vueuse/core'
 import { nextTick, onScopeDispose, type Ref, ref, shallowRef, useId, watch } from 'vue'
 
 import type { ReviewTarget } from '~/providers/project-review/review'
@@ -22,12 +23,12 @@ export function createReviewContext(
 ) {
 	const panelId = useId()
 	const active = shallowRef<ReviewAnchor>()
+	const pendingAnchor = shallowRef<ReviewAnchor>()
 	const panel = shallowRef<HTMLElement | null>(null)
 	const childPanels = new Set<HTMLElement>()
 	const pinned = ref(false)
 	let openTimer: ReturnType<typeof setTimeout> | undefined
 	let closeTimer: ReturnType<typeof setTimeout> | undefined
-	let pendingAnchor: ReviewAnchor | undefined
 	let openDropdowns = 0
 
 	function cancelClose() {
@@ -58,7 +59,7 @@ export function createReviewContext(
 		const trigger = active.value?.trigger
 		cancelClose()
 		clearTimeout(openTimer)
-		pendingAnchor = undefined
+		pendingAnchor.value = undefined
 		active.value = undefined
 		openDropdowns = 0
 		pinned.value = false
@@ -71,11 +72,11 @@ export function createReviewContext(
 
 	function open(anchor: ReviewAnchor, explicit = false) {
 		clearTimeout(openTimer)
-		pendingAnchor = undefined
+		pendingAnchor.value = undefined
 		const show = () => {
-			pendingAnchor = undefined
+			pendingAnchor.value = undefined
 			if ((pinned.value || openDropdowns > 0) && !explicit) return
-			if (!anchor.element.isConnected || !anchor.available() || !isAvailable(anchor.target)) return
+			if (!isAnchorVisible(anchor) || !anchor.available() || !isAvailable(anchor.target)) return
 			cancelClose()
 			if (active.value?.id !== anchor.id) {
 				openDropdowns = 0
@@ -85,15 +86,15 @@ export function createReviewContext(
 		}
 		if (explicit) show()
 		else {
-			pendingAnchor = anchor
+			pendingAnchor.value = anchor
 			openTimer = setTimeout(show, 100)
 		}
 	}
 
 	function leave(id: string) {
-		if (pendingAnchor?.id === id) {
+		if (pendingAnchor.value?.id === id) {
 			clearTimeout(openTimer)
-			pendingAnchor = undefined
+			pendingAnchor.value = undefined
 		}
 		if (active.value?.id !== id) return
 		cancelClose()
@@ -108,7 +109,7 @@ export function createReviewContext(
 				)
 			)
 				return
-			if (pendingAnchor && pendingAnchor.id !== id) {
+			if (pendingAnchor.value && pendingAnchor.value.id !== id) {
 				leave(id)
 				return
 			}
@@ -117,12 +118,39 @@ export function createReviewContext(
 	}
 
 	function release(id: string) {
-		if (pendingAnchor?.id === id) {
+		if (pendingAnchor.value?.id === id) {
 			clearTimeout(openTimer)
-			pendingAnchor = undefined
+			pendingAnchor.value = undefined
 		}
 		if (active.value?.id === id) close(!!panel.value?.contains(document.activeElement))
 	}
+
+	function isAnchorVisible(anchor: ReviewAnchor) {
+		const element = anchor.element
+		if (!element.isConnected || element.closest('[inert], [hidden]')) return false
+		if (element.getClientRects().length === 0) return false
+		const { visibility } = getComputedStyle(element)
+		return visibility !== 'hidden' && visibility !== 'collapse'
+	}
+
+	const { pause, resume } = useRafFn(
+		() => {
+			if (active.value && !isAnchorVisible(active.value)) close()
+			if (pendingAnchor.value && !isAnchorVisible(pendingAnchor.value)) {
+				clearTimeout(openTimer)
+				pendingAnchor.value = undefined
+			}
+		},
+		{ immediate: false },
+	)
+	watch(
+		[active, pendingAnchor],
+		([activeAnchor, pending]) => {
+			if (activeAnchor || pending) resume()
+			else pause()
+		},
+		{ flush: 'sync' },
+	)
 
 	watch(projectId, () => close(), { flush: 'sync' })
 	watch(
