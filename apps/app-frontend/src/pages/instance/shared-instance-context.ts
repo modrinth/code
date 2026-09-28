@@ -9,7 +9,7 @@ import {
 	isSharedInstanceUnavailableError,
 	type SharedInstanceUnavailableReason,
 } from '@/helpers/install'
-import { can_current_user_use_shared_instances } from '@/helpers/instance'
+import { can_current_user_use_shared_instances, getInstanceIconUrl } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 
 import { instanceKeys, sharedInstanceUpdatePreviewQueryOptions } from './query-options'
@@ -63,7 +63,9 @@ export function createSharedInstanceContext(
 			return {
 				type: 'server',
 				name: attachment.server_manager_name,
-				avatarUrl: attachment.server_manager_icon_url ?? undefined,
+				avatarUrl:
+					getInstanceIconUrl(instance.value?.icon_path ?? attachment.server_manager_icon_url) ??
+					undefined,
 				tintBy: attachment.server_manager_name,
 			}
 		}
