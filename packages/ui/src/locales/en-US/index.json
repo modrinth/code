@@ -1280,6 +1280,9 @@
   "external-files.permissions-card.file-count": {
     "defaultMessage": "{count, plural, one {# file} other {# files}}"
   },
+  "external-files.permissions-card.file-database-id": {
+    "defaultMessage": "Database ID"
+  },
   "external-files.permissions-card.included-files": {
     "defaultMessage": "Included files:"
   },

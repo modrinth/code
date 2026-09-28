@@ -39,10 +39,7 @@ const isToggleLocked = computed(() => !!props.disabled || (!!props.toggleDisable
 					:aria-labelledby="titleId"
 				/>
 			</div>
-			<div
-				v-if="$slots['updated-by'] || description || $slots.default"
-				class="flex flex-col gap-2"
-			>
+			<div v-if="$slots['updated-by'] || description || $slots.default" class="flex flex-col gap-2">
 				<div v-if="$slots['updated-by']" class="text-sm">
 					<slot name="updated-by" />
 				</div>

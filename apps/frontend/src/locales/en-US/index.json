@@ -3332,6 +3332,9 @@
   "moderation.project-review.openReviewGuidance": {
     "message": "Open review guidance in new tab"
   },
+  "moderation.project-review.openSlicer": {
+    "message": "Open in Slicer"
+  },
   "moderation.project-review.optional": {
     "message": "Optional"
   },
@@ -4040,6 +4043,9 @@
   "project-review.controls.select": {
     "message": "Select an option"
   },
+  "project-review.controls.text-placeholder": {
+    "message": "Enter text…"
+  },
   "project-review.decision.approve": {
     "message": "Approve"
   },
@@ -4095,7 +4101,7 @@
     "message": "Resize project checks"
   },
   "project-review.right-panel.issues": {
-    "message": "Issues"
+    "message": "Issues ({count})"
   },
   "project-review.right-panel.thread": {
     "message": "Thread"
@@ -4640,6 +4646,9 @@
   "project.settings.disclosures.derivative.note-placeholder": {
     "message": "This is a fork that adds a few new biomes and ports it to newer Minecraft versions."
   },
+  "project.settings.disclosures.derivative.open-link": {
+    "message": "Visit link"
+  },
   "project.settings.disclosures.derivative.title": {
     "message": "Contains derivative content"
   },
@@ -5047,6 +5056,9 @@
   },
   "project.settings.permissions.not-allowed.description": {
     "message": "Some of the external content included cannot be distributed on Modrinth because it violates our Content Rules and must be removed."
+  },
+  "project.settings.permissions.open-image-in-new-tab": {
+    "message": "Open image in new tab"
   },
   "project.settings.permissions.pending-approval-count": {
     "message": "{count, plural, =0 {No attributions need approval} one {# attribution needs approval} other {# attributions need approval}}"

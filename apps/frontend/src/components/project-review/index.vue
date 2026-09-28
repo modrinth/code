@@ -14,8 +14,13 @@
 								v-model:value="activeReviewTab"
 								wrap
 								:tabs="[
-									{ value: 'issues', label: formatMessage(reviewTabMessages.issues) },
 									{ value: 'thread', label: formatMessage(reviewTabMessages.thread) },
+									{
+										value: 'issues',
+										label: formatMessage(reviewTabMessages.issues, {
+											count: panels.activeIssues.value.length,
+										}),
+									},
 								]"
 							/>
 							<IssuePicker v-if="activeReviewTab === 'issues'" />
@@ -144,17 +149,17 @@ watch(
 	},
 	{ immediate: true },
 )
-const activeReviewTab = ref('issues')
+const activeReviewTab = ref('thread')
 const messageThread = ref<InstanceType<typeof MessageThread>>()
 const auth = useAuthState()
 const keybinds = useModerationKeybinds()
 const reviewTabMessages = defineMessages({
-	issues: { id: 'project-review.right-panel.issues', defaultMessage: 'Issues' },
+	issues: { id: 'project-review.right-panel.issues', defaultMessage: 'Issues ({count})' },
 	thread: { id: 'project-review.right-panel.thread', defaultMessage: 'Thread' },
 })
 
 watch(projectId, () => {
-	activeReviewTab.value = 'issues'
+	activeReviewTab.value = 'thread'
 })
 
 async function openEditor() {
