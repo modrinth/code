@@ -77,6 +77,33 @@ const settings = {
 			default: null,
 		}),
 	},
+	Checklist: {
+		Position: setting.asEnum({
+			type: 'enum',
+			id: 'checklist-position',
+			title: 'Position',
+			description: 'Where the checklist should be displayed on the page',
+			entries: [
+				{ value: 'left', label: 'Left' },
+				{ value: 'right', label: 'Right' },
+			],
+			default: 'right',
+		}),
+		AlwaysAllowKeybinds: setting.asToggle({
+			type: 'toggle',
+			id: 'checklist-always-allow-keybinds',
+			title: 'Always allow project keybinds',
+			description: 'Whether certain keybinds should work without the checklist visible.',
+			default: false,
+		}),
+		IgnoreConditions: setting.asToggle({
+			type: 'toggle',
+			id: 'checklist-ignore-conditions',
+			title: 'Ignore checklist conditions',
+			description: 'Allow moderating projects the checklist normally auto skips.',
+			default: false,
+		}),
+	},
 } as const
 
 export default settings
