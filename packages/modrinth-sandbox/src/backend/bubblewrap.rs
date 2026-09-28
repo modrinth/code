@@ -158,6 +158,17 @@ impl BubblewrapCommandBuilder {
         self.arguments.push(arg.into());
     }
 
+    pub fn create_dir(
+        &mut self,
+        path: impl Into<SandboxArg>,
+        permissions: u32,
+    ) {
+        self.push("--perms");
+        self.push(format!("{permissions:o}"));
+        self.push("--dir");
+        self.push(path);
+    }
+
     pub fn bind_if_exists(
         &mut self,
         bind_type: BindType,
@@ -247,6 +258,15 @@ fn spawn(
 
     builder.push("--tmpfs");
     builder.push("/tmp");
+    // set sticky bit on the tmp dir
+    // required for some mods which do weird stuff like Waylandcraft;
+    // it spawns xwayland-satellite, which spawns X11, which expects
+    // the temp dir to have the sticky bit set for safety.
+    builder.push("--chmod");
+    builder.push("1777");
+    builder.push("/tmp");
+
+    builder.create_dir("/tmp/.X11-unix", 0o1777);
 
     // Other arguments
     if command.die_with_parent {
@@ -316,8 +336,7 @@ fn spawn(
     let xdg_runtime_dir = directories
         .runtime_dir()
         .unwrap_or(Path::new("/run/user/1000"));
-    builder.push("--dir");
-    builder.push(xdg_runtime_dir.to_path_buf());
+    builder.create_dir(xdg_runtime_dir.to_path_buf(), 0o700);
 
     let wayland_display_path = xdg_runtime_dir.join(
         std::env::var_os("WAYLAND_DISPLAY")
@@ -331,6 +350,9 @@ fn spawn(
 
     let document_portal_path = xdg_runtime_dir.join("doc");
     builder.bind_if_exists(BindType::ReadWrite, document_portal_path, true);
+
+    let pulse_path = xdg_runtime_dir.join("pulse");
+    builder.create_dir(pulse_path.clone(), 0o700);
 
     if let Some(pulse_server) = std::env::var_os("PULSE_SERVER") {
         if let Some(pulse_server_path) =
@@ -346,8 +368,16 @@ fn spawn(
             );
         }
     } else {
-        let pulse_path = xdg_runtime_dir.join("pulse");
-        builder.bind_if_exists(BindType::ReadOnly, pulse_path, true);
+        let pulse_server_path = pulse_path.join("native");
+        builder.bind_if_exists(
+            BindType::ReadOnly,
+            pulse_server_path.clone(),
+            true,
+        );
+
+        let mut pulse_server = OsString::from("unix:");
+        pulse_server.push(pulse_server_path);
+        environment.insert("PULSE_SERVER".into(), pulse_server.into());
     }
 
     // Bind a bunch of pulse audio stuff
