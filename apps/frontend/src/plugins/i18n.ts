@@ -149,7 +149,6 @@ export default defineNuxtPlugin({
 	async setup(nuxtApp) {
 		const locale = useState<string>('i18n-locale', () => DEFAULT_LOCALE)
 
-		// Replaces nuxt.config's hardcoded lang so browsers pick the right regional glyphs.
 		useHead({ htmlAttrs: { lang: () => locale.value } })
 
 		function t(key: string, values?: Record<string, unknown>): string {
