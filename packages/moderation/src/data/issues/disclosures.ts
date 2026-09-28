@@ -472,5 +472,6 @@ export const disclosuresReviewPanel = panel({
 	toggle({
 		issue: disclosuresNonEnglishIssue,
 		label: 'Non-English',
+		shown: ({ disclosures }) => disclosures.length > 1,
 	}),
 )
