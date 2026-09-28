@@ -5,6 +5,8 @@ use crate::models::ids::{
     VersionId,
 };
 use crate::models::projects::{Dependency, FileType, Project, Version};
+use crate::models::users::User;
+use crate::util::non_empty_vec::NonEmptyVec;
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -33,7 +35,7 @@ pub struct ThreadIssueTeamMember {
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ThreadIssue {
     pub id: ThreadIssueId,
-    pub created_by: UserId,
+    pub created_by: Option<UserId>,
     pub created_at: DateTime<Utc>,
     /// Why the issue was raised.
     ///
@@ -84,7 +86,7 @@ pub enum ThreadIssueTarget {
         original_url: Option<String>,
     },
     RemoveTags {
-        tags: Vec<String>,
+        tags: NonEmptyVec<String>,
     },
     ModifyLinks {
         links: HashMap<String, TextTarget>,
@@ -99,10 +101,10 @@ pub enum ThreadIssueTarget {
         description: Option<OptionalTextTarget>,
     },
     RemoveGalleryImages {
-        image_ids: Vec<GalleryImageId>,
+        image_ids: NonEmptyVec<GalleryImageId>,
     },
     RemoveProjectDisclosures {
-        disclosure_types: Vec<String>,
+        disclosure_types: NonEmptyVec<String>,
     },
     ModifyProjectDisclosure {
         disclosure_type: String,
@@ -183,7 +185,8 @@ pub enum VersionIssueTarget {
     },
     ModifyChangelog(TextTarget),
     RemoveAdditionalFiles {
-        file_ids: Vec<FileId>,
+        #[schema(value_type = Vec<String>, min_items = 1)]
+        file_ids: NonEmptyVec<FileId>,
     },
     ModifyAdditionalFileType {
         file_id: FileId,
@@ -318,15 +321,15 @@ impl ThreadIssueTarget {
                 );
 
                 match (license_state, url_state) {
-                    (ThreadIssueValueState::DifferentToOriginal, _)
-                    | (_, ThreadIssueValueState::DifferentToOriginal) => {
-                        ThreadIssueValueState::DifferentToOriginal
-                    }
-                    (ThreadIssueValueState::SameAsSuggested, _)
-                    | (_, ThreadIssueValueState::SameAsSuggested) => {
-                        ThreadIssueValueState::SameAsSuggested
-                    }
-                    _ => ThreadIssueValueState::SameAsOriginal,
+                    (
+                        ThreadIssueValueState::SameAsOriginal,
+                        ThreadIssueValueState::SameAsOriginal,
+                    ) => ThreadIssueValueState::SameAsOriginal,
+                    (
+                        ThreadIssueValueState::SameAsSuggested,
+                        ThreadIssueValueState::SameAsSuggested,
+                    ) => ThreadIssueValueState::SameAsSuggested,
+                    _ => ThreadIssueValueState::DifferentToOriginal,
                 }
             }
             Self::ModifyIcon { original_url } => {
@@ -353,25 +356,28 @@ impl ThreadIssueTarget {
                 }
             }
             Self::ModifyLinks { links } => {
-                let mut state = ThreadIssueValueState::SameAsOriginal;
+                let mut all_original = true;
+                let mut all_suggested = true;
                 for (platform, target) in links {
                     let current = project
                         .link_urls
                         .get(platform)
                         .map(|link| link.url.as_str())
                         .unwrap_or_default();
-                    match value_state(target, current) {
-                        ThreadIssueValueState::DifferentToOriginal => {
-                            state = ThreadIssueValueState::DifferentToOriginal;
-                            break;
-                        }
-                        ThreadIssueValueState::SameAsSuggested => {
-                            state = ThreadIssueValueState::SameAsSuggested;
-                        }
-                        ThreadIssueValueState::SameAsOriginal => {}
-                    }
+                    let state = value_state(target, current);
+                    all_original &=
+                        state == ThreadIssueValueState::SameAsOriginal;
+                    all_suggested &=
+                        state == ThreadIssueValueState::SameAsSuggested;
                 }
-                state
+
+                if all_original {
+                    ThreadIssueValueState::SameAsOriginal
+                } else if all_suggested {
+                    ThreadIssueValueState::SameAsSuggested
+                } else {
+                    ThreadIssueValueState::DifferentToOriginal
+                }
             }
             Self::AddGalleryImages { original_count } => {
                 if project.gallery.len() > *original_count as usize {
@@ -743,10 +749,13 @@ fn value_state(target: &TextTarget, current: &str) -> ThreadIssueValueState {
 }
 
 impl ThreadIssue {
-    pub fn from(data: crate::database::models::DBThreadIssue) -> Self {
+    pub fn from(
+        data: crate::database::models::DBThreadIssue,
+        user: &User,
+    ) -> Self {
         Self {
             id: data.id.into(),
-            created_by: data.created_by.into(),
+            created_by: user.role.is_mod().then(|| data.created_by.into()),
             why: data.why,
             user_addressed: data.user_addressed,
             moderator_verified: data.moderator_verified,
@@ -876,6 +885,10 @@ mod tests {
         }
     }
 
+    fn non_empty<T>(values: Vec<T>) -> NonEmptyVec<T> {
+        values.try_into().unwrap()
+    }
+
     #[test]
     fn nullable_suggestions_round_trip() {
         let target = OptionalTextTarget {
@@ -937,7 +950,10 @@ mod tests {
         let mut project = project();
         let target = ThreadIssueTarget::ModifyLicense {
             license: text_target("MIT", Some("Apache-2.0")),
-            url: text_target("https://example.com/license", None),
+            url: text_target(
+                "https://example.com/license",
+                Some("https://example.com/new-license"),
+            ),
         };
 
         assert_eq!(
@@ -946,6 +962,13 @@ mod tests {
         );
 
         project.license.id = "Apache-2.0".to_string();
+        assert_eq!(
+            target.value_state(&context(&project), false),
+            ThreadIssueValueState::DifferentToOriginal
+        );
+
+        project.license.url =
+            Some("https://example.com/new-license".to_string());
         assert_eq!(
             target.value_state(&context(&project), false),
             ThreadIssueValueState::SameAsSuggested
@@ -973,7 +996,10 @@ mod tests {
                 ),
                 (
                     "issues".to_string(),
-                    text_target("https://example.com/issues", None),
+                    text_target(
+                        "https://example.com/issues",
+                        Some("https://example.com/new-issues"),
+                    ),
                 ),
             ]),
         };
@@ -985,6 +1011,13 @@ mod tests {
 
         project.link_urls.get_mut("source").unwrap().url =
             "https://example.com/new-source".to_string();
+        assert_eq!(
+            target.value_state(&context(&project), false),
+            ThreadIssueValueState::DifferentToOriginal
+        );
+
+        project.link_urls.get_mut("issues").unwrap().url =
+            "https://example.com/new-issues".to_string();
         assert_eq!(
             target.value_state(&context(&project), false),
             ThreadIssueValueState::SameAsSuggested
@@ -1005,7 +1038,10 @@ mod tests {
             original_url: project.icon_url.clone(),
         };
         let tags = ThreadIssueTarget::RemoveTags {
-            tags: vec!["technology".to_string(), "utility".to_string()],
+            tags: non_empty(vec![
+                "technology".to_string(),
+                "utility".to_string(),
+            ]),
         };
 
         assert_eq!(
@@ -1086,7 +1122,7 @@ mod tests {
     fn all_gallery_targets_must_be_removed() {
         let mut project = project();
         let target = ThreadIssueTarget::RemoveGalleryImages {
-            image_ids: vec![GalleryImageId(1), GalleryImageId(2)],
+            image_ids: non_empty(vec![GalleryImageId(1), GalleryImageId(2)]),
         };
 
         assert_eq!(
@@ -1114,7 +1150,7 @@ mod tests {
             note: Some("Original note".to_string()),
         }];
         let remove = ThreadIssueTarget::RemoveProjectDisclosures {
-            disclosure_types: vec!["advertisements".to_string()],
+            disclosure_types: non_empty(vec!["advertisements".to_string()]),
         };
         let note = ThreadIssueTarget::ModifyProjectDisclosureNote {
             disclosure_type: "advertisements".to_string(),
@@ -1307,7 +1343,7 @@ mod tests {
     fn gallery_and_acknowledgement_verdicts() {
         let mut project = project();
         let gallery = ThreadIssueTarget::RemoveGalleryImages {
-            image_ids: vec![GalleryImageId(1)],
+            image_ids: non_empty(vec![GalleryImageId(1)]),
         };
         let checkbox = ThreadIssueTarget::Acknowledge {
             mode: ThreadIssueAcknowledgement::Checkbox,

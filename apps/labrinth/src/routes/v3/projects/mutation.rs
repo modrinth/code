@@ -2,13 +2,16 @@ use eyre::eyre;
 use xredis::RedisPool;
 
 use crate::database::models::project_item::ProjectQueryResult;
-use crate::database::models::{DBProjectId, DBTeamId, DBThreadIssue, DBUserId};
+use crate::database::models::{
+    DBProjectId, DBTeamId, DBThreadIssue, DBUserId, DBVersionId,
+};
 use crate::database::{PgTransaction, models as db_models};
 use crate::models::ids::ProjectId;
 use crate::models::projects::{Project, ProjectStatus, Version};
 use crate::models::thread_issues::{
     ThreadIssueContext, ThreadIssueTeamMember, ThreadIssueVerdict,
 };
+use crate::models::users::User;
 use crate::routes::ApiError;
 use crate::routes::internal::delphi;
 use crate::util::error::{ApiContext as _, Context as _};
@@ -49,8 +52,19 @@ async fn sync_project_state(
     .await
     .wrap_internal_err("reloading project for state synchronization")?;
     let data = projects.pop().wrap_not_found_err("resource not found")?;
+    let project_ids = [project_id.0];
+    let version_ids = sqlx::query!(
+        "SELECT id FROM versions WHERE mod_id = ANY($1::bigint[]) ORDER BY id",
+        &project_ids,
+    )
+    .fetch_all(&mut *transaction)
+    .await
+    .wrap_internal_err("fetching all project version IDs")?
+    .into_iter()
+    .map(|row| DBVersionId(row.id))
+    .collect::<Vec<_>>();
     let versions = db_models::DBVersion::get_many_uncached(
-        &data.versions,
+        &version_ids,
         &mut *transaction,
         redis,
     )
@@ -129,14 +143,16 @@ pub(crate) async fn finalize_mutation(
     project_id: DBProjectId,
     transaction: PgTransaction<'_>,
     redis: &RedisPool,
+    project_editor: Option<&User>,
 ) -> Result<(), ApiError> {
-    finalize_mutations(&[project_id], transaction, redis).await
+    finalize_mutations(&[project_id], transaction, redis, project_editor).await
 }
 
 pub(crate) async fn finalize_mutations(
     project_ids: &[DBProjectId],
     mut transaction: PgTransaction<'_>,
     redis: &RedisPool,
+    project_editor: Option<&User>,
 ) -> Result<(), ApiError> {
     let mut project_ids = project_ids.to_vec();
     project_ids.sort_by_key(|project_id| project_id.0);
@@ -147,6 +163,28 @@ pub(crate) async fn finalize_mutations(
         states.push(
             sync_project_state(project_id, &mut transaction, redis).await?,
         );
+    }
+
+    if project_editor.is_some_and(|user| !user.role.is_mod()) {
+        for state in &states {
+            if state.project.status != ProjectStatus::Processing {
+                continue;
+            }
+            if state.has_required_nags {
+                return Err(ApiError::Request(eyre!(
+                    "project cannot have required validation nags while in review"
+                )));
+            }
+            if state
+                .thread_issues
+                .iter()
+                .any(|issue| issue.verdict == ThreadIssueVerdict::Open)
+            {
+                return Err(ApiError::Request(eyre!(
+                    "project cannot have open moderation issues while in review"
+                )));
+            }
+        }
     }
 
     transaction
@@ -174,6 +212,7 @@ pub(crate) async fn finalize_project_edit(
     original_slug: Option<String>,
     mut transaction: PgTransaction<'_>,
     redis: &RedisPool,
+    project_editor: Option<&User>,
 ) -> Result<(), ApiError> {
     let state = sync_project_state(project_id, &mut transaction, redis).await?;
 
@@ -182,32 +221,52 @@ pub(crate) async fn finalize_project_edit(
     let entered_approved_state =
         state.project.status.is_approved() && !original_status.is_approved();
 
-    if (entered_review || entered_approved_state) && state.has_required_nags {
+    let validate_review_state = entered_review
+        || project_editor.is_some_and(|user| {
+            !user.role.is_mod()
+                && state.project.status == ProjectStatus::Processing
+        });
+
+    if (validate_review_state || entered_approved_state)
+        && state.has_required_nags
+    {
         return Err(ApiError::Request(eyre!(
-            "project must have no required validation nags before review or approval"
+            "project must have no required validation nags before or during review or approval"
         )));
     }
 
-    if entered_review
+    if validate_review_state
         && state
             .thread_issues
             .iter()
             .any(|issue| issue.verdict == ThreadIssueVerdict::Open)
     {
         return Err(ApiError::Request(eyre!(
-            "all open moderation issues must be addressed before review"
+            "project must have no open moderation issues before or during review"
         )));
     }
 
-    if entered_approved_state
-        && state
+    if entered_approved_state {
+        if state
             .thread_issues
             .iter()
             .any(|issue| issue.verdict != ThreadIssueVerdict::Resolved)
-    {
-        return Err(ApiError::Request(eyre!(
-            "all moderation issues must be resolved before approval"
-        )));
+        {
+            return Err(ApiError::Request(eyre!(
+                "all moderation issues must be resolved before approval"
+            )));
+        }
+
+        for issue in &state.thread_issues {
+            DBThreadIssue::update_flags(
+                issue.id,
+                None,
+                Some(true),
+                &mut transaction,
+            )
+            .await
+            .wrap_internal_err("verifying project moderation issues")?;
+        }
     }
 
     transaction

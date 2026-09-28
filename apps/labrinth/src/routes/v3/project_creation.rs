@@ -21,6 +21,7 @@ use crate::models::projects::{
 };
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
+use crate::models::users::User;
 use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::search::SearchState;
@@ -326,18 +327,26 @@ pub async fn project_create_internal(
 
     let project_id: ProjectId =
         models::generate_project_id(&mut transaction).await?.into();
+    let current_user = get_user_from_headers(
+        &req,
+        &**client,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_CREATE,
+    )
+    .await?
+    .1;
 
     let result = project_create_inner(
-        req,
         &mut payload,
         &mut transaction,
         &**file_host,
         &mut uploaded_files,
         &client,
         &redis,
-        &session_queue,
         &http,
         project_id,
+        &current_user,
     )
     .await;
 
@@ -354,6 +363,7 @@ pub async fn project_create_internal(
             project_id.into(),
             transaction,
             &redis,
+            Some(&current_user),
         )
         .await?;
         search_state.queue.push_project_change(project_id).await;
@@ -390,18 +400,26 @@ pub async fn project_create_with_id(
     let mut uploaded_files = Vec::new();
 
     let (project_id,) = path.into_inner();
+    let current_user = get_user_from_headers(
+        &req,
+        &**client,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_CREATE,
+    )
+    .await?
+    .1;
 
     let result = project_create_inner(
-        req,
         &mut payload,
         &mut transaction,
         &**file_host,
         &mut uploaded_files,
         &client,
         &redis,
-        &session_queue,
         &http,
         project_id,
+        &current_user,
     )
     .await;
 
@@ -418,6 +436,7 @@ pub async fn project_create_with_id(
             project_id.into(),
             transaction,
             &redis,
+            Some(&current_user),
         )
         .await?;
         search_state.queue.push_project_change(project_id).await;
@@ -460,30 +479,19 @@ Project Creation Steps:
 
 #[allow(clippy::too_many_arguments)]
 async fn project_create_inner(
-    req: HttpRequest,
     payload: &mut Multipart,
     transaction: &mut PgTransaction<'_>,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
     pool: &PgPool,
     redis: &RedisPool,
-    session_queue: &AuthQueue,
     http: &reqwest::Client,
     project_id: ProjectId,
+    current_user: &User,
 ) -> Result<HttpResponse, CreateError> {
-    // The currently logged in user
-    let (_, current_user) = get_user_from_headers(
-        &req,
-        pool,
-        redis,
-        session_queue,
-        Scopes::PROJECT_CREATE,
-    )
-    .await?;
+    require_verified_email(current_user)?;
 
-    require_verified_email(&current_user)?;
-
-    let limits = UserLimits::get_for_projects(&current_user, pool).await?;
+    let limits = UserLimits::get_for_projects(current_user, pool).await?;
     if limits.current >= limits.max {
         return Err(CreateError::LimitReached);
     }

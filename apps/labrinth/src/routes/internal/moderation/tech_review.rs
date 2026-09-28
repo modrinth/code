@@ -1254,7 +1254,10 @@ pub async fn submit_report(
 
     if verdict == DelphiVerdict::Unsafe {
         crate::routes::v3::projects::mutation::finalize_mutation(
-            project_id, txn, &redis,
+            project_id,
+            txn,
+            &redis,
+            Some(&user),
         )
         .await?;
         search_state

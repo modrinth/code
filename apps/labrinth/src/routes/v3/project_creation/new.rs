@@ -344,6 +344,7 @@ pub async fn create(
         project_id.into(),
         txn,
         &redis,
+        Some(&user),
     )
     .await?;
     search_state.queue.push_project_change(project_id).await;

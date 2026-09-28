@@ -867,6 +867,7 @@ pub async fn organization_delete(
         &organization_project_ids,
         transaction,
         &redis,
+        Some(&user),
     )
     .await?;
 
@@ -1051,6 +1052,7 @@ pub async fn organization_projects_add(
             project_item.inner.id,
             transaction,
             &redis,
+            Some(&current_user),
         )
         .await?;
 
@@ -1256,6 +1258,7 @@ pub async fn organization_projects_remove(
             project_item.inner.id,
             transaction,
             &redis,
+            Some(&current_user),
         )
         .await?;
         database::models::DBUser::clear_project_cache(

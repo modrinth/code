@@ -1392,6 +1392,7 @@ pub async fn project_edit_internal(
         project_item.inner.slug.clone(),
         transaction,
         &redis,
+        Some(&user),
     )
     .await?;
 
@@ -2108,8 +2109,13 @@ pub async fn projects_edit(
         .iter()
         .map(|(project_id, _, _)| *project_id)
         .collect::<Vec<_>>();
-    mutation::finalize_mutations(&changed_project_ids, transaction, &redis)
-        .await?;
+    mutation::finalize_mutations(
+        &changed_project_ids,
+        transaction,
+        &redis,
+        Some(&user),
+    )
+    .await?;
 
     for (project_id, _, reindex_versions) in changed_projects {
         if reindex_versions {
@@ -2305,15 +2311,6 @@ pub async fn project_icon_edit_internal(
         }
     }
 
-    delete_old_images(
-        project_item.inner.icon_url,
-        project_item.inner.raw_icon_url,
-        FileHostPublicity::Public,
-        &**file_host,
-    )
-    .await
-    .wrap_api_err("deleting old images")?;
-
     let bytes = read_limited_from_payload(
         &mut payload,
         262144,
@@ -2355,8 +2352,31 @@ pub async fn project_icon_edit_internal(
     .await
     .wrap_internal_err("querying database for `project_icon_edit_internal`")?;
 
-    mutation::finalize_mutation(project_item.inner.id, transaction, &redis)
-        .await?;
+    mutation::finalize_mutation(
+        project_item.inner.id,
+        transaction,
+        &redis,
+        Some(&user),
+    )
+    .await?;
+
+    let old_icon_url = project_item
+        .inner
+        .icon_url
+        .filter(|url| url != &upload_result.url);
+    let old_raw_icon_url = project_item
+        .inner
+        .raw_icon_url
+        .filter(|url| url != &upload_result.raw_url);
+    delete_old_images(
+        old_icon_url,
+        old_raw_icon_url,
+        FileHostPublicity::Public,
+        &**file_host,
+    )
+    .await
+    .wrap_api_err("deleting old images")?;
+
     search_state
         .queue
         .push_project_change(project_item.inner.id.into())
@@ -2450,15 +2470,6 @@ pub async fn delete_project_icon_internal(
         }
     }
 
-    delete_old_images(
-        project_item.inner.icon_url,
-        project_item.inner.raw_icon_url,
-        FileHostPublicity::Public,
-        &**file_host,
-    )
-    .await
-    .wrap_api_err("deleting old images")?;
-
     let mut transaction = pool
         .begin()
         .await
@@ -2478,8 +2489,23 @@ pub async fn delete_project_icon_internal(
         "querying database for `delete_project_icon_internal`",
     )?;
 
-    mutation::finalize_mutation(project_item.inner.id, transaction, &redis)
-        .await?;
+    mutation::finalize_mutation(
+        project_item.inner.id,
+        transaction,
+        &redis,
+        Some(&user),
+    )
+    .await?;
+
+    delete_old_images(
+        project_item.inner.icon_url,
+        project_item.inner.raw_icon_url,
+        FileHostPublicity::Public,
+        &**file_host,
+    )
+    .await
+    .wrap_api_err("deleting old images")?;
+
     search_state
         .queue
         .push_project_change(project_item.inner.id.into())
@@ -2684,8 +2710,13 @@ pub async fn add_gallery_item_internal(
     .await
     .wrap_internal_err("inserting galleries into database")?;
 
-    mutation::finalize_mutation(project_item.inner.id, transaction, &redis)
-        .await?;
+    mutation::finalize_mutation(
+        project_item.inner.id,
+        transaction,
+        &redis,
+        Some(&user),
+    )
+    .await?;
     search_state
         .queue
         .push_project_change(project_item.inner.id.into())
@@ -2915,8 +2946,13 @@ pub async fn edit_gallery_item_internal(
         )?;
     }
 
-    mutation::finalize_mutation(project_item.inner.id, transaction, &redis)
-        .await?;
+    mutation::finalize_mutation(
+        project_item.inner.id,
+        transaction,
+        &redis,
+        Some(&user),
+    )
+    .await?;
     search_state
         .queue
         .push_project_change(project_item.inner.id.into())
@@ -3058,8 +3094,13 @@ pub async fn delete_gallery_item_internal(
         "querying database for `delete_gallery_item_internal`",
     )?;
 
-    mutation::finalize_mutation(project_item.inner.id, transaction, &redis)
-        .await?;
+    mutation::finalize_mutation(
+        project_item.inner.id,
+        transaction,
+        &redis,
+        Some(&user),
+    )
+    .await?;
 
     delete_old_images(
         Some(item.image_url),
@@ -3325,6 +3366,7 @@ pub async fn project_delete_internal(
             original_slug,
             transaction,
             &redis,
+            Some(&user),
         )
         .await?;
 

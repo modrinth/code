@@ -796,6 +796,7 @@ pub async fn add_team_member(
         &affected_project_ids,
         transaction,
         &redis,
+        Some(&current_user),
     )
     .await?;
     DBTeamMember::clear_cache(team_id, &redis)
@@ -1027,6 +1028,7 @@ pub async fn edit_team_member(
         &affected_project_ids,
         transaction,
         &redis,
+        Some(&current_user),
     )
     .await?;
     DBTeamMember::clear_cache(id, &redis)
@@ -1246,6 +1248,7 @@ pub async fn transfer_ownership(
             &affected_project_ids,
             transaction,
             &redis,
+            Some(&current_user),
         )
         .await?;
     } else {
@@ -1445,6 +1448,7 @@ pub async fn remove_team_member(
             &affected_project_ids,
             transaction,
             &redis,
+            Some(&current_user),
         )
         .await?;
 

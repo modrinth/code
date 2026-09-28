@@ -132,7 +132,11 @@ impl Thread {
                 .filter(|x| user.role.is_mod() || !x.body.is_private())
                 .map(|x| ThreadMessage::from(x, user))
                 .collect(),
-            issues: data.issues.into_iter().map(ThreadIssue::from).collect(),
+            issues: data
+                .issues
+                .into_iter()
+                .map(|issue| ThreadIssue::from(issue, user))
+                .collect(),
             members: users,
         }
     }

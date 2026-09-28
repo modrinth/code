@@ -974,6 +974,7 @@ pub async fn delete_file(
             row.project_id,
             transaction,
             &redis,
+            Some(&user),
         )
         .await?;
 

@@ -226,11 +226,11 @@ pub async fn filter_authorized_threads(
             .flat_map(|x| x.messages.iter().filter_map(|x| x.author_id))
             .collect::<Vec<database::models::DBUserId>>(),
     );
-    user_ids.extend(
-        return_threads.iter().flat_map(|thread| {
+    if user.role.is_mod() {
+        user_ids.extend(return_threads.iter().flat_map(|thread| {
             thread.issues.iter().map(|issue| issue.created_by)
-        }),
-    );
+        }));
+    }
 
     let users: Vec<User> =
         database::models::DBUser::get_many_ids(&user_ids, &***pool, redis)
@@ -258,7 +258,9 @@ pub async fn filter_authorized_threads(
                 })
                 .collect::<Vec<_>>(),
         );
-        authors.extend(thread.issues.iter().map(|issue| issue.created_by));
+        if user.role.is_mod() {
+            authors.extend(thread.issues.iter().map(|issue| issue.created_by));
+        }
 
         final_threads.push(Thread::from(
             thread,
@@ -330,7 +332,9 @@ pub async fn thread_get(
                 })
                 .collect::<Vec<_>>(),
         );
-        authors.extend(data.issues.iter().map(|issue| issue.created_by));
+        if user.role.is_mod() {
+            authors.extend(data.issues.iter().map(|issue| issue.created_by));
+        }
 
         let users: Vec<User> =
             database::models::DBUser::get_many_ids(authors, &**pool, &redis)
@@ -605,6 +609,7 @@ pub async fn thread_issues_create(
         project_id,
         transaction,
         &redis,
+        None,
     )
     .await
 }
@@ -684,10 +689,13 @@ pub async fn thread_issue_edit(
     }
 
     if project_exists {
+        let project_editor =
+            (edit.user_addressed == Some(false)).then_some(&user);
         super::projects::mutation::finalize_mutation(
             project_id,
             transaction,
             &redis,
+            project_editor,
         )
         .await
     } else {
@@ -742,6 +750,7 @@ pub async fn thread_issue_delete(
             project_id,
             transaction,
             &redis,
+            None,
         )
         .await
     } else {

@@ -284,6 +284,7 @@ pub async fn modify_project_disclosures(
         project.inner.id,
         transaction,
         &redis,
+        Some(&user),
     )
     .await?;
 
