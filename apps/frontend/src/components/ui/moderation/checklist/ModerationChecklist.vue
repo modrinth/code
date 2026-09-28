@@ -1618,7 +1618,13 @@ if (finishedId === projectV2.value.id) {
 	localStorage.removeItem('moderation-checklist-finished')
 	hasNextProject.value = moderationQueue.queueLength > 0
 	done.value = true
-} else if (!reviewedAnyway.value && !isEligibleQueueCandidate({ isProcessing: projectV2.value.status === 'processing', locked: false })) {
+} else if (
+	!reviewedAnyway.value &&
+	!isEligibleQueueCandidate({
+		isProcessing: projectV2.value.status === 'processing',
+		locked: false,
+	})
+) {
 	alreadyReviewed.value = true
 }
 

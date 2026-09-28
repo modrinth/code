@@ -22,7 +22,12 @@ export interface EligibleQueueProject {
 const BATCH_SIZE = 5
 
 export function isEligibleQueueCandidate(result: QueueCandidateCheck | undefined): boolean {
-	if (!result || (!result.isProcessing && !useModerationSettings().value.get(moderationSettings.Checklist.IgnoreConditions))) return false
+	if (
+		!result ||
+		(!result.isProcessing &&
+			!useModerationSettings().value.get(moderationSettings.Checklist.IgnoreConditions))
+	)
+		return false
 	return !result.locked || !!result.expired || !!result.isOwnLock
 }
 
