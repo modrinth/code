@@ -126,7 +126,9 @@ const panels = provideReviewPanels(
 )
 const messages = provideReviewMessages(createReviewMessages(project, projectV2, panels))
 provideReviewContext(createReviewContext(reviewProjectId, (target) => !!panels.resolve(target)))
-const { pending, loadingAction } = provideReviewSubmission(createReviewSubmission(messages, panels))
+const { pending, loadingAction } = provideReviewSubmission(
+	createReviewSubmission(messages, panels, session),
+)
 const loadingState = injectLoadingState()
 watch(
 	() =>

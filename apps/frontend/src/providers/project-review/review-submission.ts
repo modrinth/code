@@ -16,6 +16,7 @@ import { isStaff } from '~/helpers/users.js'
 import { injectProjectReviewPageContext } from './index'
 import type { createReviewMessages } from './review-messages'
 import type { createReviewPanels } from './review-panels'
+import type { createReviewSession } from './review-session'
 
 type ProjectStatus = Labrinth.Projects.v2.ProjectStatus
 type ReviewEditorMode = 'reply' | 'note'
@@ -26,6 +27,7 @@ export const [injectReviewSubmission, provideReviewSubmission] =
 export function createReviewSubmission(
 	messages: ReturnType<typeof createReviewMessages>,
 	panels: ReturnType<typeof createReviewPanels>,
+	session: ReturnType<typeof createReviewSession>,
 ) {
 	const client = injectModrinthClient()
 	const queryClient = useQueryClient()
@@ -146,6 +148,7 @@ export function createReviewSubmission(
 				}
 			}
 			if (status && !body) pendingDecision.value = undefined
+			if (status) session.clearProject(id)
 		},
 		onError: (error) =>
 			addNotification({
