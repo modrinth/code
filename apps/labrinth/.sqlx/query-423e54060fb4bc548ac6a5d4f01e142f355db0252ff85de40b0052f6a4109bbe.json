@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO user_locks (user_id, locked_by, reason)\n            VALUES ($1, $2, $3)\n            ON CONFLICT (user_id) DO UPDATE\n            SET locked_by = EXCLUDED.locked_by,\n                reason = EXCLUDED.reason,\n                created = NOW()\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "423e54060fb4bc548ac6a5d4f01e142f355db0252ff85de40b0052f6a4109bbe"
+}
