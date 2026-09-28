@@ -1151,6 +1151,19 @@ impl DBUser {
 
             sqlx::query!(
                 "
+				UPDATE user_locks
+				SET locked_by = $1
+				WHERE locked_by = $2
+				",
+                deleted_user as DBUserId,
+                id as DBUserId,
+            )
+            .execute(&mut *transaction)
+            .await
+            .wrap_err("failed to update user_locks locked_by")?;
+
+            sqlx::query!(
+                "
 				DELETE FROM users
 				WHERE id = $1
 				",
