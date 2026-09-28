@@ -1,25 +1,24 @@
-use std::{env, ffi::OsStr, path::PathBuf};
+use std::path::{Path, PathBuf};
 
-use eyre::{ContextCompat, Result, eyre};
-use tokio::fs;
+use eyre::{Context, Result, eyre};
 
-pub async fn find_command(
-    command: &(impl AsRef<OsStr> + ?Sized),
-) -> Result<PathBuf> {
-    find_command_(command.as_ref()).await
-}
+pub fn resolve_path(path: &Path) -> Result<PathBuf> {
+    let path = path
+        .canonicalize()
+        .wrap_err_with(|| eyre!("executable file {path:?} doesn't exist"))?;
 
-async fn find_command_(command: &OsStr) -> Result<PathBuf> {
-    let path = env::var_os("PATH").wrap_err("missing `PATH`")?;
-    for mut path in env::split_paths(&path) {
-        if !path.is_absolute() {
-            continue;
-        }
-        path.push(command);
-        if fs::try_exists(&path).await.unwrap_or(false) {
-            return Ok(path);
+    debug_assert!(path.is_absolute());
+
+    #[cfg(windows)]
+    {
+        // Try to remove the \\?\ verbatim path prefix since it can break some applications
+        let encoded_bytes = path.as_os_str().as_encoded_bytes();
+        if let Some(rest) = encoded_bytes.strip_prefix(b"\\\\?\\") {
+            return Ok(PathBuf::from(unsafe {
+                std::ffi::OsStr::from_encoded_bytes_unchecked(&rest)
+            }));
         }
     }
 
-    Err(eyre!("command not found in `PATH`"))
+    Ok(path)
 }

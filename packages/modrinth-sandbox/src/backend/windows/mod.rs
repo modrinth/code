@@ -1,10 +1,55 @@
-use std::{collections::BTreeMap, ffi::{OsStr, OsString, c_void}, os::windows::{ffi::OsStrExt, io::{AsRawHandle, HandleOrInvalid, OwnedHandle}}, path::{Path, PathBuf}};
+use std::{
+    collections::BTreeMap,
+    ffi::{OsStr, OsString, c_void},
+    os::windows::{
+        ffi::OsStrExt,
+        io::{AsRawHandle, HandleOrInvalid, OwnedHandle},
+    },
+    path::{Path, PathBuf},
+};
 
 use async_trait::async_trait;
-use eyre::{eyre, Result};
-use windows::{Win32::{Foundation::{DUPLICATE_SAME_ACCESS, DuplicateHandle, GENERIC_READ, GENERIC_WRITE, HANDLE, HANDLE_FLAG_INHERIT, SetHandleInformation, TRUE}, Security::SECURITY_ATTRIBUTES, Storage::FileSystem::{CreateFileW, FILE_SHARE_DELETE, FILE_SHARE_READ, FILE_SHARE_WRITE, OPEN_EXISTING}, System::{Console::{GetStdHandle, STD_ERROR_HANDLE, STD_INPUT_HANDLE, STD_OUTPUT_HANDLE}, JobObjects::{AssignProcessToJobObject, CreateJobObjectW, JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE, JOBOBJECT_EXTENDED_LIMIT_INFORMATION, JobObjectExtendedLimitInformation, SetInformationJobObject}, Threading::{CREATE_UNICODE_ENVIRONMENT, CreateProcessW, EXTENDED_STARTUPINFO_PRESENT, GetCurrentProcess, LPPROC_THREAD_ATTRIBUTE_LIST, PROCESS_CREATION_FLAGS, PROCESS_INFORMATION, STARTF_FORCEONFEEDBACK, STARTF_USESTDHANDLES, STARTUPINFOEXW, STARTUPINFOW}}}, core::Free};
+use eyre::{Result, eyre};
+use windows::{
+    Win32::{
+        Foundation::{
+            DUPLICATE_SAME_ACCESS, DuplicateHandle, GENERIC_READ,
+            GENERIC_WRITE, HANDLE, HANDLE_FLAG_INHERIT, SetHandleInformation,
+            TRUE,
+        },
+        Security::SECURITY_ATTRIBUTES,
+        Storage::FileSystem::{
+            CreateFileW, FILE_SHARE_DELETE, FILE_SHARE_READ, FILE_SHARE_WRITE,
+            OPEN_EXISTING,
+        },
+        System::{
+            Console::{
+                GetStdHandle, STD_ERROR_HANDLE, STD_INPUT_HANDLE,
+                STD_OUTPUT_HANDLE,
+            },
+            JobObjects::{
+                AssignProcessToJobObject, CreateJobObjectW,
+                JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE,
+                JOBOBJECT_EXTENDED_LIMIT_INFORMATION,
+                JobObjectExtendedLimitInformation, SetInformationJobObject,
+            },
+            Threading::{
+                CREATE_UNICODE_ENVIRONMENT, CreateProcessW,
+                EXTENDED_STARTUPINFO_PRESENT, GetCurrentProcess,
+                LPPROC_THREAD_ATTRIBUTE_LIST, PROCESS_CREATION_FLAGS,
+                PROCESS_INFORMATION, STARTF_FORCEONFEEDBACK,
+                STARTF_USESTDHANDLES, STARTUPINFOEXW, STARTUPINFOW,
+            },
+        },
+    },
+    core::Free,
+};
 
-use crate::{SandboxArg, SandboxExitStatus, SandboxStdio, backend::{Pipes, SandboxChildOp}};
+use crate::{
+    SandboxArg, SandboxExitStatus, SandboxStdio,
+    backend::{Pipes, SandboxChildOp},
+    util::resolve_path,
+};
 
 pub(crate) mod appcontainer;
 pub(crate) mod runas;
@@ -19,20 +64,26 @@ pub(crate) fn spawn(
     working_directory: Option<PathBuf>,
     job_handle: HANDLE,
     null_device: HANDLE,
-    attributes: Option<LPPROC_THREAD_ATTRIBUTE_LIST>
+    attributes: Option<LPPROC_THREAD_ATTRIBUTE_LIST>,
 ) -> Result<(Pipes, WindowsChild)> {
-    let program = resolve_path(program)?;
-    let working_directory = working_directory.map(resolve_path).transpose()?;
-    let application_name = program.as_os_str().encode_wide()
+    let program = resolve_path(&program).wrap_err("resolving program path")?;
+    let working_directory = working_directory
+        .map(|path| resolve_path(&path))
+        .transpose()
+        .wrap_err("resolving working directory path")?;
+    let application_name = program
+        .as_os_str()
+        .encode_wide()
         .chain([0])
         .collect::<Vec<_>>();
     dbg!(&arguments, join_windows_shell_arg(arguments.as_slice()));
-    let mut command_line = join_windows_shell_arg(arguments.as_slice()).encode_wide()
+    let mut command_line = join_windows_shell_arg(arguments.as_slice())
+        .encode_wide()
         .chain([0])
         .collect::<Vec<_>>();
-    let current_directory = working_directory.map(|dir| dir.as_os_str().encode_wide()
-        .chain([0])
-        .collect::<Vec<_>>());
+    let current_directory = working_directory.map(|dir| {
+        dir.as_os_str().encode_wide().chain([0]).collect::<Vec<_>>()
+    });
 
     // Create env
     let mut env = Vec::new();
@@ -40,10 +91,14 @@ pub(crate) fn spawn(
         env.push(0);
     }
     for (k, v) in environment {
-        if k.as_os_str().as_encoded_bytes().contains(&b'\0') || v.as_os_str().as_encoded_bytes().contains(&b'\0') {
+        if k.as_os_str().as_encoded_bytes().contains(&b'\0')
+            || v.as_os_str().as_encoded_bytes().contains(&b'\0')
+        {
             return Err(eyre!("environment variable contained null byte"));
         }
-        if k.as_os_str().as_encoded_bytes().contains(&b'=') || v.as_os_str().as_encoded_bytes().contains(&b'=') {
+        if k.as_os_str().as_encoded_bytes().contains(&b'=')
+            || v.as_os_str().as_encoded_bytes().contains(&b'=')
+        {
             return Err(eyre!("environment variable contained equals sign"));
         }
         env.extend(k.as_os_str().encode_wide());
@@ -67,7 +122,7 @@ pub(crate) fn spawn(
     match stdin {
         SandboxStdio::Null => {
             stdin_read = Some(null_device);
-        },
+        }
         SandboxStdio::Inherit => {
             let handle = unsafe { GetStdHandle(STD_INPUT_HANDLE) }?;
             if !handle.is_invalid() {
@@ -75,13 +130,19 @@ pub(crate) fn spawn(
                 handles_to_close.push(to_owned_handle(handle)?);
                 stdin_read = Some(handle);
             }
-        },
+        }
         SandboxStdio::Pipe => {
             let (read, write) = std::io::pipe()?;
             let owned: OwnedHandle = read.into();
 
             stdin_write = Some(write);
-            unsafe { SetHandleInformation(HANDLE(owned.as_raw_handle()), HANDLE_FLAG_INHERIT.0, HANDLE_FLAG_INHERIT)? };
+            unsafe {
+                SetHandleInformation(
+                    HANDLE(owned.as_raw_handle()),
+                    HANDLE_FLAG_INHERIT.0,
+                    HANDLE_FLAG_INHERIT,
+                )?
+            };
             stdin_read = Some(HANDLE(owned.as_raw_handle()));
             handles_to_close.push(owned);
         }
@@ -92,13 +153,19 @@ pub(crate) fn spawn(
             let owned: OwnedHandle = write.into();
 
             stdout_read = Some(read);
-            unsafe { SetHandleInformation(HANDLE(owned.as_raw_handle()), HANDLE_FLAG_INHERIT.0, HANDLE_FLAG_INHERIT)? };
+            unsafe {
+                SetHandleInformation(
+                    HANDLE(owned.as_raw_handle()),
+                    HANDLE_FLAG_INHERIT.0,
+                    HANDLE_FLAG_INHERIT,
+                )?
+            };
             stdout_write = Some(HANDLE(owned.as_raw_handle()));
             handles_to_close.push(owned);
-        },
+        }
         SandboxStdio::Null => {
             stdout_write = Some(null_device);
-        },
+        }
         SandboxStdio::Inherit => {
             let handle = unsafe { GetStdHandle(STD_OUTPUT_HANDLE) }?;
             if !handle.is_invalid() {
@@ -106,7 +173,7 @@ pub(crate) fn spawn(
                 handles_to_close.push(to_owned_handle(handle)?);
                 stdout_write = Some(handle);
             }
-        },
+        }
     }
     match stderr {
         SandboxStdio::Pipe => {
@@ -114,13 +181,19 @@ pub(crate) fn spawn(
             let owned: OwnedHandle = write.into();
 
             stderr_read = Some(read);
-            unsafe { SetHandleInformation(HANDLE(owned.as_raw_handle()), HANDLE_FLAG_INHERIT.0, HANDLE_FLAG_INHERIT)? };
+            unsafe {
+                SetHandleInformation(
+                    HANDLE(owned.as_raw_handle()),
+                    HANDLE_FLAG_INHERIT.0,
+                    HANDLE_FLAG_INHERIT,
+                )?
+            };
             stderr_write = Some(HANDLE(owned.as_raw_handle()));
             handles_to_close.push(owned);
-        },
+        }
         SandboxStdio::Null => {
             stderr_write = Some(null_device);
-        },
+        }
         SandboxStdio::Inherit => {
             let handle = unsafe { GetStdHandle(STD_ERROR_HANDLE) }?;
             if !handle.is_invalid() {
@@ -128,7 +201,7 @@ pub(crate) fn spawn(
                 handles_to_close.push(to_owned_handle(handle)?);
                 stderr_write = Some(handle);
             }
-        },
+        }
     }
 
     let mut process_creation_flags = PROCESS_CREATION_FLAGS::default();
@@ -171,16 +244,23 @@ pub(crate) fn spawn(
             Some(windows::core::PWSTR(command_line.as_mut_ptr())),
             None,
             None,
-            stdin_read.is_some() || stdout_write.is_some() || stderr_write.is_some(),
+            stdin_read.is_some()
+                || stdout_write.is_some()
+                || stderr_write.is_some(),
             process_creation_flags,
             Some(env.as_ptr() as *mut c_void),
-            current_directory.as_ref().map(|dir| windows::core::PCWSTR(dir.as_ptr())).unwrap_or_default(),
+            current_directory
+                .as_ref()
+                .map(|dir| windows::core::PCWSTR(dir.as_ptr()))
+                .unwrap_or_default(),
             sip,
-            &mut pi
+            &mut pi,
         )?
     }
 
-    unsafe { pi.hThread.free(); };
+    unsafe {
+        pi.hThread.free();
+    };
 
     if pi.hProcess.is_invalid() {
         return Err(eyre!("CreateProcessW returned invalid process handle"));
@@ -201,25 +281,9 @@ pub(crate) fn spawn(
         WindowsChild {
             process_handle: pi.hProcess,
             exit_status: None,
-        }
+        },
     ));
 }
-
-pub(crate) fn resolve_path(path: PathBuf) -> Result<PathBuf> {
-        let Ok(path) = path.canonicalize() else {
-            return Err(eyre!("executable file doesn't exist: {:?}", path));
-        };
-
-        debug_assert!(path.is_absolute());
-
-        // Try to remove the \\?\ verbatim path prefix since it can break some applications
-        let encoded_bytes = path.as_os_str().as_encoded_bytes();
-        if let Some(rest) = encoded_bytes.strip_prefix(b"\\\\?\\") {
-            return Ok(PathBuf::from(unsafe { OsStr::from_encoded_bytes_unchecked(&rest) }));
-        }
-
-        Ok(path)
-    }
 
 #[derive(Debug)]
 pub(crate) struct WindowsChild {
@@ -242,7 +306,7 @@ impl Drop for WindowsChild {
 
 #[async_trait]
 impl SandboxChildOp for WindowsChild {
-    fn id(&self) -> Option<u32>  {
+    fn id(&self) -> Option<u32> {
         if self.exit_status.is_some() {
             return None;
         }
@@ -257,7 +321,10 @@ impl SandboxChildOp for WindowsChild {
         }
 
         unsafe {
-            let wait = windows::Win32::System::Threading::WaitForSingleObject(self.process_handle, 0);
+            let wait = windows::Win32::System::Threading::WaitForSingleObject(
+                self.process_handle,
+                0,
+            );
             if wait == windows::Win32::Foundation::WAIT_FAILED {
                 return Err(eyre!("wait failed"));
             } else if wait == windows::Win32::Foundation::WAIT_TIMEOUT {
@@ -265,8 +332,13 @@ impl SandboxChildOp for WindowsChild {
             }
 
             let mut code = 0;
-            windows::Win32::System::Threading::GetExitCodeProcess(self.process_handle, &mut code)?;
-            self.exit_status = Some(SandboxExitStatus { imp: WindowsSandboxExitStatus(code) });
+            windows::Win32::System::Threading::GetExitCodeProcess(
+                self.process_handle,
+                &mut code,
+            )?;
+            self.exit_status = Some(SandboxExitStatus {
+                imp: WindowsSandboxExitStatus(code),
+            });
             return Ok(self.exit_status);
         }
     }
@@ -277,15 +349,25 @@ impl SandboxChildOp for WindowsChild {
         }
 
         unsafe {
-            let wait = windows::Win32::System::Threading::WaitForSingleObject(self.process_handle, windows::Win32::System::Threading::INFINITE);
+            let wait = windows::Win32::System::Threading::WaitForSingleObject(
+                self.process_handle,
+                windows::Win32::System::Threading::INFINITE,
+            );
             if wait == windows::Win32::Foundation::WAIT_FAILED {
                 return Err(eyre!("wait failed"));
             }
 
             let mut code = 0;
-            windows::Win32::System::Threading::GetExitCodeProcess(self.process_handle, &mut code)?;
-            self.exit_status = Some(SandboxExitStatus { imp: WindowsSandboxExitStatus(code) });
-            return Ok(SandboxExitStatus { imp: WindowsSandboxExitStatus(code) });
+            windows::Win32::System::Threading::GetExitCodeProcess(
+                self.process_handle,
+                &mut code,
+            )?;
+            self.exit_status = Some(SandboxExitStatus {
+                imp: WindowsSandboxExitStatus(code),
+            });
+            return Ok(SandboxExitStatus {
+                imp: WindowsSandboxExitStatus(code),
+            });
         }
     }
 
@@ -347,7 +429,7 @@ pub fn join_windows_shell_arg(args: &[SandboxArg]) -> OsString {
             if *byte == b'\\' {
                 backslashes += 1;
             } else if *byte == b'"' {
-                for _ in 0..backslashes*2 {
+                for _ in 0..backslashes * 2 {
                     string.push(b'\\');
                 }
                 string.push(b'\\');
@@ -363,7 +445,7 @@ pub fn join_windows_shell_arg(args: &[SandboxArg]) -> OsString {
         }
 
         if quoted {
-            for _ in 0..backslashes*2 {
+            for _ in 0..backslashes * 2 {
                 string.push(b'\\');
             }
         } else {
@@ -377,18 +459,12 @@ pub fn join_windows_shell_arg(args: &[SandboxArg]) -> OsString {
         }
     }
 
-    unsafe {
-        OsString::from_encoded_bytes_unchecked(string)
-    }
+    unsafe { OsString::from_encoded_bytes_unchecked(string) }
 }
 
 pub fn create_job_object() -> Result<HANDLE> {
-    let job_handle = unsafe {
-        CreateJobObjectW(
-            None,
-            windows::core::PCWSTR::default()
-        )?
-    };
+    let job_handle =
+        unsafe { CreateJobObjectW(None, windows::core::PCWSTR::default())? };
     if job_handle.is_invalid() {
         return Err(eyre!("CreateJobObjectW returned invalid handle"));
     }
@@ -399,7 +475,7 @@ pub fn create_job_object() -> Result<HANDLE> {
             job_handle,
             JobObjectExtendedLimitInformation,
             &info as *const JOBOBJECT_EXTENDED_LIMIT_INFORMATION as _,
-            size_of::<JOBOBJECT_EXTENDED_LIMIT_INFORMATION>() as u32
+            size_of::<JOBOBJECT_EXTENDED_LIMIT_INFORMATION>() as u32,
         )?
     }
     Ok(job_handle)

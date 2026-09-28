@@ -1,3 +1,6 @@
+#[cfg(target_os = "linux")]
+mod linux;
+
 use std::{
     collections::BTreeMap,
     ffi::OsString,
@@ -30,7 +33,7 @@ pub struct MinecraftCommand {
     /// JVM arguments which do not contain sandbox-managed paths.
     ///
     /// Classpath, Java agent, native-library, and logging arguments are generated
-    /// by [`create_minecraft_command`].
+    /// by [`create_command`].
     pub jvm_args: Vec<SandboxArg>,
     /// Java main class to invoke.
     pub main_class: SandboxArg,
@@ -38,11 +41,11 @@ pub struct MinecraftCommand {
     pub main_class_args: Vec<SandboxArg>,
     /// Additional environment variables set for the sandboxed process.
     pub extra_environment: BTreeMap<SandboxArg, SandboxArg>,
-    /// Default io behaviour for stdin
+    /// Default io behaviour for stdin.
     pub stdin: SandboxStdio,
-    /// Default io behaviour for stdout
+    /// Default io behaviour for stdout.
     pub stdout: SandboxStdio,
-    /// Default io behaviour for stderr
+    /// Default io behaviour for stderr.
     pub stderr: SandboxStdio,
 }
 
@@ -78,6 +81,48 @@ pub const JVM_ARGUMENTS: &[&str] = &[
     LOGGING_CONFIG_JVM_ARGUMENT,
     JAVA_AGENT_JVM_ARGUMENT,
 ];
+
+#[cfg(windows)]
+const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
+    "COMPUTERNAME",
+    "HOME",
+    "HOMEDRIVE",
+    "HOMEPATH",
+    "HOSTNAME",
+    "NUMBER_OF_PROCESSORS",
+    "OS",
+    "PROCESSOR_ARCHITECTURE",
+    "PROCESSOR_IDENTIFIER",
+    "PROCESSOR_LEVEL",
+    "PROCESSOR_REVISION",
+    "PROGRAMDATA",
+    "PROGRAMFILES",
+    "PROGRAMFILES(X86)",
+    "PROGRAMW6432",
+    "PUBLIC",
+    "SYSTEMDRIVE",
+    "SYSTEMROOT",
+    "USERDOMAIN",
+    "APPDATA",
+    "LOCALAPPDATA",
+    "ALLUSERSPROFILE",
+    "PATH",
+    "PATHEXT",
+    "COMMONPROGRAMFILES",
+    "COMSPEC",
+    "DRIVERDATA",
+    "PROCESSOR_ARCHITECTURE",
+    "PROCESSOR_IDENTIFIER",
+    "PROCESSOR_LEVEL",
+    "SESSIONNAME",
+    "USERNAME",
+    "USERPROFILE",
+    "WINDIR",
+    "TEMP",
+];
+
+#[cfg(target_os = "macos")]
+const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[];
 
 #[cfg(target_os = "linux")]
 const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
@@ -129,50 +174,18 @@ const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
     "SDL_IM_MODULE",
 ];
 
-#[cfg(windows)]
-const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
-    "COMPUTERNAME",
-    "HOME",
-    "HOMEDRIVE",
-    "HOMEPATH",
-    "HOSTNAME",
-    "NUMBER_OF_PROCESSORS",
-    "OS",
-    "PROCESSOR_ARCHITECTURE",
-    "PROCESSOR_IDENTIFIER",
-    "PROCESSOR_LEVEL",
-    "PROCESSOR_REVISION",
-    "PROGRAMDATA",
-    "PROGRAMFILES",
-    "PROGRAMFILES(X86)",
-    "PROGRAMW6432",
-    "PUBLIC",
-    "SYSTEMDRIVE",
-    "SYSTEMROOT",
-    "USERDOMAIN",
-    "APPDATA",
-    "LOCALAPPDATA",
-    "ALLUSERSPROFILE",
-    "PATH",
-    "PATHEXT",
-    "COMMONPROGRAMFILES",
-    "COMSPEC",
-    "DRIVERDATA",
-    "PROCESSOR_ARCHITECTURE",
-    "PROCESSOR_IDENTIFIER",
-    "PROCESSOR_LEVEL",
-    "SESSIONNAME",
-    "USERNAME",
-    "USERPROFILE",
-    "WINDIR",
-    "TEMP"
-];
-
 pub fn create_command(minecraft: MinecraftCommand) -> Result<SandboxCommand> {
-    #[cfg(unix)]
-    let java_path = minecraft.jre_path.join("bin").join("java");
-    #[cfg(windows)]
-    let java_path = minecraft.jre_path.join("bin").join("javaw.exe");
+    let java_path = {
+        #[cfg(unix)]
+        {
+            minecraft.jre_path.join("bin").join("java")
+        }
+        #[cfg(windows)]
+        {
+            minecraft.jre_path.join("bin").join("javaw.exe")
+        }
+    };
+
     #[cfg(unix)]
     let persistent_home = minecraft.persistent_dir.join("home");
     #[cfg(target_os = "linux")]
@@ -309,10 +322,10 @@ pub fn create_command(minecraft: MinecraftCommand) -> Result<SandboxCommand> {
         stdin: minecraft.stdin,
         stdout: minecraft.stdout,
         stderr: minecraft.stderr,
-        #[cfg(windows)]
         app_container_name: "ModrinthMinecraftSandbox".into(),
-        #[cfg(windows)]
-        app_container_description: "Sandbox for Minecraft instances created by modrinth-sandbox".into(),
+        app_container_description:
+            "Sandbox for Minecraft instances created by `modrinth-sandbox`"
+                .into(),
     })
 }
 

@@ -32,7 +32,7 @@ use crate::backend::SandboxChildOp;
 ///
 /// ## Windows
 ///
-/// TODO
+/// Uses the Windows [AppContainer] API for isolating the process from the host.
 ///
 /// ## macOS
 ///
@@ -50,6 +50,7 @@ use crate::backend::SandboxChildOp;
 ///
 /// Errors if the implementation cannot set up sandboxing.
 ///
+/// [AppContainer]: https://learn.microsoft.com/en-us/windows/win32/secauthz/appcontainer-isolation
 /// [`org.freedesktop.portal.Flatpak`]: https://docs.flatpak.org/en/latest/libflatpak-api-reference.html#gdbus-org.freedesktop.portal.Flatpak
 /// [Bubblewrap]: https://github.com/containers/bubblewrap
 pub async fn create_env() -> Result<SandboxEnv> {
@@ -124,15 +125,24 @@ pub struct SandboxCommand {
     /// Whether the spawned child should terminate when the parent process
     /// terminates.
     pub die_with_parent: bool,
-    /// Default io behaviour for stdin
+    /// Default io behaviour for stdin.
     pub stdin: SandboxStdio,
-    /// Default io behaviour for stdout
+    /// Default io behaviour for stdout.
     pub stdout: SandboxStdio,
-    /// Default io behaviour for stderr
+    /// Default io behaviour for stderr.
     pub stderr: SandboxStdio,
-    #[cfg(windows)]
+    /// (Windows only) Stable, machine-facing identifier for the [AppContainer]
+    /// which this process runs in.
+    ///
+    /// Must remain stable and unique, and may be displayed to users, but don't
+    /// treat it as a localized string.
+    ///
+    /// [AppContainer]: https://learn.microsoft.com/en-us/windows/win32/secauthz/appcontainer-isolation
     pub app_container_name: SandboxArg,
-    #[cfg(windows)]
+    /// (Windows only) Human-friendly description of the [AppContainer] which
+    /// this process runs in.
+    ///
+    /// [AppContainer]: https://learn.microsoft.com/en-us/windows/win32/secauthz/appcontainer-isolation
     pub app_container_description: SandboxArg,
 }
 

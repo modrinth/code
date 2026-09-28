@@ -231,28 +231,36 @@ impl ProcessManager {
         let stdout = mc_proc
             .stdout
             .take()
-            .map(|reader| -> eyre::Result<_> {
+            .map(|reader| {
                 #[cfg(unix)]
                 {
-                    tokio::net::unix::pipe::Receiver::from_owned_fd(reader.into())
+                    tokio::net::unix::pipe::Receiver::from_owned_fd(
+                        reader.into(),
+                    )
                 }
                 #[cfg(windows)]
                 {
-                    eyre::Result::Ok(crate::util::blocking_reader::Blocking::new(reader))
+                    eyre::Ok::<crate::util::blocking_reader::Blocking<_>, _>(
+                        crate::util::blocking_reader::Blocking::new(reader),
+                    )
                 }
             })
             .expect("`stdout` is set to `Pipe` so should be available")?;
         let stderr = mc_proc
             .stderr
             .take()
-            .map(|reader| -> eyre::Result<_> {
+            .map(|reader| {
                 #[cfg(unix)]
                 {
-                    tokio::net::unix::pipe::Receiver::from_owned_fd(reader.into())
+                    tokio::net::unix::pipe::Receiver::from_owned_fd(
+                        reader.into(),
+                    )
                 }
                 #[cfg(windows)]
                 {
-                    eyre::Result::Ok(crate::util::blocking_reader::Blocking::new(reader))
+                    eyre::Ok::<crate::util::blocking_reader::Blocking<_>, _>(
+                        crate::util::blocking_reader::Blocking::new(reader),
+                    )
                 }
             })
             .expect("`stderr` is set to `Pipe` so should be available")?;

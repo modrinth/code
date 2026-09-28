@@ -1,7 +1,7 @@
 use std::{
     collections::BTreeMap,
     ffi::CString,
-    io::{ErrorKind, PipeReader, PipeWriter},
+    io::ErrorKind,
     os::{
         fd::{AsRawFd, OwnedFd, RawFd},
         unix::ffi::OsStringExt,
@@ -10,15 +10,15 @@ use std::{
 };
 
 use async_trait::async_trait;
-use eyre::Result;
+use eyre::{Context, Result};
 
 use crate::{
     SandboxExitStatus, SandboxStdio,
-    backend::{SandboxChildOp, Pipes},
+    backend::{Pipes, SandboxChildOp},
     util::{RawStringVec, SandboxArg},
 };
 
-pub(crate) fn spawn(
+pub fn spawn(
     program: SandboxArg,
     arguments: Vec<SandboxArg>,
     environment: BTreeMap<SandboxArg, SandboxArg>,
@@ -29,6 +29,8 @@ pub(crate) fn spawn(
     pass_fds: Vec<OwnedFd>,
     dev_null: libc::c_int,
     #[cfg(target_os = "linux")] die_with_parent: bool,
+    #[cfg(target_os = "macos")] sandbox_profile: CString,
+    #[cfg(target_os = "macos")] mut sandbox_params: RawStringVec,
 ) -> Result<(Pipes, UnixChild)> {
     let program = CString::new(program.into_os_string().into_vec())?;
 
@@ -110,6 +112,8 @@ pub(crate) fn spawn(
 
     argv.ensure_null_terminated();
     env.ensure_null_terminated();
+    #[cfg(target_os = "macos")]
+    sandbox_params.ensure_null_terminated();
 
     let pid = unsafe { cvt(libc::fork())? };
     if pid == 0 {
@@ -124,6 +128,10 @@ pub(crate) fn spawn(
             &pass_fds,
             #[cfg(target_os = "linux")]
             die_with_parent,
+            #[cfg(target_os = "macos")]
+            sandbox_profile,
+            #[cfg(target_os = "macos")]
+            sandbox_params,
         );
         unsafe { libc::_exit(1) }
     }
@@ -151,51 +159,84 @@ fn exec(
     workdir: Option<*const libc::c_char>,
     pass_fds: &[OwnedFd],
     #[cfg(target_os = "linux")] die_with_parent: bool,
-) -> std::io::Result<()> {
-    unsafe {
-        *environ() = env;
+    #[cfg(target_os = "macos")] sandbox_profile: CString,
+    #[cfg(target_os = "macos")] sandbox_params: RawStringVec,
+) -> eyre::Result<()> {
+    unsafe { *environ() = env };
 
-        if let Some(mut fd) = stdin {
-            if fd > 0 && fd <= libc::STDERR_FILENO {
-                fd = cvt_r(|| libc::dup(fd))?;
-            }
-            cvt_r(|| libc::dup2(fd, libc::STDIN_FILENO))?;
+    if let Some(mut fd) = stdin {
+        if fd > 0 && fd <= libc::STDERR_FILENO {
+            fd = cvt_r(|| unsafe { libc::dup(fd) })
+                .wrap_err("duplicating stdin fd")?;
         }
-        if let Some(mut fd) = stdout {
-            if fd > 0 && fd <= libc::STDERR_FILENO {
-                fd = cvt_r(|| libc::dup(fd))?;
-            }
-            cvt_r(|| libc::dup2(fd, libc::STDOUT_FILENO))?;
-        }
-        if let Some(mut fd) = stderr {
-            if fd > 0 && fd <= libc::STDERR_FILENO {
-                fd = cvt_r(|| libc::dup(fd))?;
-            }
-            cvt_r(|| libc::dup2(fd, libc::STDERR_FILENO))?;
-        }
-
-        // Set working directory
-        if let Some(workdir) = workdir {
-            cvt_r(|| libc::chdir(workdir))?;
-        }
-
-        // Unset "close on exec" flag so fds are kept after the exec
-        for fd in pass_fds {
-            cvt_r(|| libc::ioctl(fd.as_raw_fd(), libc::FIONCLEX))?;
-        }
-
-        // Set PR_SET_PDEATHSIG to SIGKILL
-        // This will kill the process when the parent thread or process dies
-        #[cfg(target_os = "linux")]
-        if die_with_parent {
-            cvt_r(|| {
-                libc::prctl(libc::PR_SET_PDEATHSIG, libc::SIGKILL, 0, 0, 0)
-            })?;
-        }
-
-        cvt(libc::execvp(program, argv))?;
-        Ok(())
+        cvt_r(|| unsafe { libc::dup2(fd, libc::STDIN_FILENO) })
+            .wrap_err("setting stdin fd")?;
     }
+    if let Some(mut fd) = stdout {
+        if fd > 0 && fd <= libc::STDERR_FILENO {
+            fd = cvt_r(|| unsafe { libc::dup(fd) })
+                .wrap_err("duplicating stdout fd")?;
+        }
+        cvt_r(|| unsafe { libc::dup2(fd, libc::STDOUT_FILENO) })
+            .wrap_err("setting stdout fd")?;
+    }
+    if let Some(mut fd) = stderr {
+        if fd > 0 && fd <= libc::STDERR_FILENO {
+            fd = cvt_r(|| unsafe { libc::dup(fd) })
+                .wrap_err("duplicating stderr fd")?;
+        }
+        cvt_r(|| unsafe { libc::dup2(fd, libc::STDERR_FILENO) })
+            .wrap_err("setting stderr fd")?;
+    }
+
+    // Set working directory
+    if let Some(workdir) = workdir {
+        cvt_r(|| unsafe { libc::chdir(workdir) })
+            .wrap_err("setting working directory")?;
+    }
+
+    // Unset "close on exec" flag so fds are kept after the exec
+    for fd in pass_fds {
+        cvt_r(|| unsafe { libc::ioctl(fd.as_raw_fd(), libc::FIONCLEX) })
+            .wrap_err("unsetting close on exec")?;
+    }
+
+    // Set PR_SET_PDEATHSIG to SIGKILL
+    // This will kill the process when the parent thread or process dies
+    #[cfg(target_os = "linux")]
+    if die_with_parent {
+        cvt_r(|| unsafe {
+            libc::prctl(libc::PR_SET_PDEATHSIG, libc::SIGKILL, 0, 0, 0)
+        })
+        .wrap_err("setting PR_SET_PDEATHSIG")?;
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        let mut error_buf = std::ptr::null_mut();
+        let sandbox_profile = sandbox_profile.as_ptr();
+        let sandbox_params = sandbox_params.into_null_terminated_ptr().cast();
+        let status_code = unsafe {
+            sandbox_init_with_parameters(
+                sandbox_profile,
+                0,
+                sandbox_params,
+                &mut error_buf,
+            )
+        };
+
+        if !error_buf.is_null() {
+            let error = unsafe { std::ffi::CStr::from_ptr(error_buf) };
+            let error = error.to_string_lossy().to_string();
+            unsafe { sandbox_free_error(error_buf) };
+            return Err(eyre::eyre!(error).wrap_err("setting up sandbox"));
+        }
+
+        eyre::ensure!(status_code == 0, "sandbox setup failed");
+    }
+
+    cvt(unsafe { libc::execvp(program, argv) })?;
+    Ok(())
 }
 
 #[derive(Debug)]
@@ -368,4 +409,16 @@ pub unsafe fn environ() -> *mut *const *const libc::c_char {
         static mut environ: *const *const libc::c_char;
     }
     &raw mut environ
+}
+
+#[cfg(target_os = "macos")]
+unsafe extern "C" {
+    fn sandbox_init_with_parameters(
+        profile: *const libc::c_char,
+        flags: u64,
+        parameters: *const *const libc::c_char,
+        errorbuf: *mut *mut libc::c_char,
+    ) -> libc::c_int;
+
+    fn sandbox_free_error(errorbuf: *mut libc::c_char);
 }

@@ -1,6 +1,9 @@
 //! Backend sandbox implementations, using OS-specific primitives.
 
-use std::{collections::{BTreeMap, HashSet}, fmt::Debug};
+use std::{
+    collections::{BTreeMap, HashSet},
+    fmt::Debug,
+};
 
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
@@ -72,11 +75,14 @@ impl SandboxCommand {
     pub(crate) fn take_environment(
         &mut self,
     ) -> BTreeMap<SandboxArg, SandboxArg> {
-        let mut passthrough = std::mem::take(&mut self.passthrough_environment).into_iter().map(|k| {
-            let mut k = k.into_os_string();
-            k.make_ascii_uppercase();
-            k
-        }).collect::<HashSet<_>>();
+        let mut passthrough = std::mem::take(&mut self.passthrough_environment)
+            .into_iter()
+            .map(|k| {
+                let mut k = k.into_os_string();
+                k.make_ascii_uppercase();
+                k
+            })
+            .collect::<HashSet<_>>();
 
         if cfg!(windows) {
             passthrough.insert("APPDATA".into());
@@ -84,10 +90,16 @@ impl SandboxCommand {
         }
 
         if !passthrough.is_empty() {
-            let ignore_overrides = self.extra_environment.keys().map(|k| k.as_os_str().to_ascii_uppercase()).collect::<HashSet<_>>();
+            let ignore_overrides = self
+                .extra_environment
+                .keys()
+                .map(|k| k.as_os_str().to_ascii_uppercase())
+                .collect::<HashSet<_>>();
 
             for (k, v) in std::env::vars_os() {
-                if k.as_encoded_bytes().contains(&b'=') || v.as_encoded_bytes().contains(&b'=') {
+                if k.as_encoded_bytes().contains(&b'=')
+                    || v.as_encoded_bytes().contains(&b'=')
+                {
                     continue;
                 }
 

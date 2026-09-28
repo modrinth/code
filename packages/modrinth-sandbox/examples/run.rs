@@ -12,11 +12,11 @@ use tracing::info;
 #[derive(Debug, clap::Parser)]
 struct Cli {
     #[arg(long, value_name = "PATH")]
-    read_only_path: Vec<PathBuf>,
+    read: Vec<PathBuf>,
     #[arg(long, value_name = "PATH")]
-    writable_path: Vec<PathBuf>,
+    write: Vec<PathBuf>,
     #[arg(long, value_name = "PATH")]
-    working_directory: Option<PathBuf>,
+    cwd: Option<PathBuf>,
     executable: PathBuf,
     #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
     args: Vec<OsString>,
@@ -37,9 +37,9 @@ async fn main() -> Result<()> {
             executable: cli.executable,
             args: cli.args.into_iter().map(SandboxArg::from).collect(),
             ensure_dirs_exist: Vec::new(),
-            read_only_paths: cli.read_only_path,
-            read_write_paths: cli.writable_path,
-            working_directory: cli.working_directory,
+            read_only_paths: cli.read,
+            read_write_paths: cli.write,
+            working_directory: cli.cwd,
             passthrough_environment: BTreeSet::new(),
             extra_environment: BTreeMap::new(),
             network: true,
@@ -48,10 +48,10 @@ async fn main() -> Result<()> {
             stdin: SandboxStdio::Null,
             stdout: SandboxStdio::Pipe,
             stderr: SandboxStdio::Pipe,
-            #[cfg(windows)]
             app_container_name: "ModrinthMinecraftSandbox".into(),
-            #[cfg(windows)]
-            app_container_description: "Sandbox for Minecraft instances created by modrinth-sandbox".into(),
+            app_container_description:
+                "Sandbox for Minecraft instances created by modrinth-sandbox"
+                    .into(),
         })
         .await
         .wrap_err("spawning process in sandbox")?;

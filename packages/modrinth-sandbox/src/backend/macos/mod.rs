@@ -1,5 +1,5 @@
 use std::{
-    ffi::{OsStr, OsString},
+    ffi::{CString, OsStr, OsString},
     os::unix::ffi::OsStrExt,
     path::Path,
 };
@@ -10,8 +10,11 @@ use eyre::{Context, OptionExt, Result};
 
 use crate::{
     SandboxCommand, SandboxExitStatus,
-    backend::{Backend, SandboxChildOp, SandboxEnv},
-    util::RawStringVec,
+    backend::{
+        Backend, SandboxChild, SandboxChildOp, SandboxEnv,
+        unix::{self, UnixChild},
+    },
+    util::{RawStringVec, resolve_path},
 };
 
 #[derive(Debug)]
@@ -20,13 +23,17 @@ pub struct Macos;
 #[async_trait]
 impl Backend for Macos {
     async fn init() -> Result<Box<dyn SandboxEnv>> {
-        Ok(Box::new(MacosEnv(())))
+        let dev_null =
+            super::unix::open_dev_null().wrap_err("opening /dev/null")?;
+        Ok(Box::new(MacosEnv { dev_null }))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[debug("MacosEnv")]
-pub struct MacosEnv(());
+pub struct MacosEnv {
+    dev_null: libc::c_int,
+}
 
 #[async_trait]
 impl SandboxEnv for MacosEnv {
@@ -34,17 +41,26 @@ impl SandboxEnv for MacosEnv {
         &self,
         command: SandboxCommand,
     ) -> Result<crate::SandboxChild> {
-        let child = tokio::task::spawn_blocking(move || spawn(command))
+        let env = self.clone();
+        let child = tokio::task::spawn_blocking(move || spawn(&env, command))
             .await
             .wrap_err("spawn task dropped")??;
         Ok(child)
     }
 }
 
-fn spawn(command: SandboxCommand) -> Result<crate::SandboxChild> {
-    let mut profile = OsString::from(BASE_PROFILE);
+fn spawn(
+    env: &MacosEnv,
+    mut command: SandboxCommand,
+) -> Result<crate::SandboxChild> {
+    let environment = command.take_environment();
+    let mut sandbox_profile = OsString::from(BASE_PROFILE);
+
+    let resolved_executable = resolve_path(&command.executable)?;
+    allow_read(&mut sandbox_profile, &resolved_executable);
+
     if command.network {
-        profile.push(NETWORK);
+        sandbox_profile.push(NETWORK);
     }
 
     // Grant access to $TMPDIR/hsperfdata_
@@ -55,33 +71,33 @@ fn spawn(command: SandboxCommand) -> Result<crate::SandboxChild> {
         if let Ok(temp_path) =
             Path::new(OsStr::from_bytes(&temp_dir)).canonicalize()
         {
-            profile.push("(allow file-write* file-read* (prefix \"");
-            profile.push(temp_path.join("hsperfdata_"));
-            profile.push("\"))\n");
+            sandbox_profile.push("(allow file-write* file-read* (prefix \"");
+            sandbox_profile.push(temp_path.join("hsperfdata_"));
+            sandbox_profile.push("\"))\n");
 
-            profile.push("(allow file-write* file-read* file-map-executable process-exec (prefix \"");
-            profile.push(temp_path.join("libjcocoa"));
-            profile.push("\"))\n");
+            sandbox_profile.push("(allow file-write* file-read* file-map-executable process-exec (prefix \"");
+            sandbox_profile.push(temp_path.join("libjcocoa"));
+            sandbox_profile.push("\"))\n");
         }
 
         if let Some(cache_dir) = confstr(libc::_CS_DARWIN_USER_CACHE_DIR) {
             let cache_path = Path::new(OsStr::from_bytes(&cache_dir));
             if let Ok(cache_path) = cache_path.canonicalize() {
-                profile.push("(allow file-write* file-read* file-map-executable process-exec (subpath \"");
-                profile.push(cache_path.join("net.java.openjdk.java"));
-                profile.push("\"))\n");
+                sandbox_profile.push("(allow file-write* file-read* file-map-executable process-exec (subpath \"");
+                sandbox_profile.push(cache_path.join("net.java.openjdk.java"));
+                sandbox_profile.push("\"))\n");
             }
         }
     }
 
     for path in command.read_only_paths {
-        allow_read(&mut profile, &path);
+        allow_read(&mut sandbox_profile, &path);
     }
     for path in command.read_write_paths {
-        allow_read_write(&mut profile, &path);
+        allow_read_write(&mut sandbox_profile, &path);
     }
 
-    profile.push(PROTECT);
+    sandbox_profile.push(PROTECT);
 
     let mut sandbox_params = RawStringVec::with_capacity(1);
     let home =
@@ -89,28 +105,51 @@ fn spawn(command: SandboxCommand) -> Result<crate::SandboxChild> {
     sandbox_params.push_os("HOME".into())?;
     sandbox_params.push_os(home)?;
 
-    todo!();
+    let (pipes, child) = unix::spawn(
+        resolved_executable.into(),
+        command.args,
+        environment,
+        command.stdin,
+        command.stdout,
+        command.stderr,
+        command.working_directory,
+        Vec::new(),
+        env.dev_null,
+        CString::new(sandbox_profile.into_encoded_bytes())
+            .wrap_err("converting sandbox profile to C-string")?,
+        sandbox_params,
+    )
+    .wrap_err("spawning child")?;
+
+    Ok(crate::SandboxChild {
+        stdin: pipes.stdin,
+        stdout: pipes.stdout,
+        stderr: pipes.stderr,
+        imp: SandboxChild::Macos(MacosChild { child }),
+    })
 }
 
 #[derive(Debug)]
-pub struct MacosChild {}
+pub struct MacosChild {
+    child: UnixChild,
+}
 
 #[async_trait]
 impl SandboxChildOp for MacosChild {
     fn id(&self) -> Option<u32> {
-        todo!();
+        self.child.id()
     }
 
     fn try_wait(&mut self) -> Result<Option<SandboxExitStatus>> {
-        todo!();
+        self.child.try_wait()
     }
 
     async fn wait(&mut self) -> Result<SandboxExitStatus> {
-        todo!();
+        self.child.wait().await
     }
 
     async fn kill(&mut self) -> Result<()> {
-        todo!();
+        self.child.kill().await
     }
 }
 

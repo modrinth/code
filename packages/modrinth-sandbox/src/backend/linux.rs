@@ -5,7 +5,33 @@ use std::{
 
 use crate::backend::unix::cvt;
 
-pub(crate) struct WritableMemoryFile {
+use std::{env, ffi::OsStr, path::PathBuf};
+
+use eyre::{ContextCompat, Result, eyre};
+use tokio::fs;
+
+pub async fn find_command(
+    command: &(impl AsRef<OsStr> + ?Sized),
+) -> Result<PathBuf> {
+    find_command_(command.as_ref()).await
+}
+
+async fn find_command_(command: &OsStr) -> Result<PathBuf> {
+    let path = env::var_os("PATH").wrap_err("missing `PATH`")?;
+    for mut path in env::split_paths(&path) {
+        if !path.is_absolute() {
+            continue;
+        }
+        path.push(command);
+        if fs::try_exists(&path).await.unwrap_or(false) {
+            return Ok(path);
+        }
+    }
+
+    Err(eyre!("command not found in `PATH`"))
+}
+
+pub struct WritableMemoryFile {
     fd: OwnedFd,
 }
 

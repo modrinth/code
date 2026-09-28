@@ -18,9 +18,9 @@ use crate::{
     SandboxStdio,
     backend::{
         Backend, SandboxChild, SandboxChildOp, SandboxCommand, SandboxEnv,
-        linux::WritableMemoryFile, unix::UnixChild,
+        linux::{WritableMemoryFile, find_command, unix::UnixChild},
     },
-    util::{SandboxArg, find_command},
+    util::SandboxArg,
 };
 
 #[derive(Debug)]
