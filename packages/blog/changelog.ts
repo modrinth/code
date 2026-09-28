@@ -11,6 +11,33 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-09-27T18:59:10+00:00`,
+		product: 'app',
+		version: '0.21.6',
+		body: `## Added
+- Added a new modal for Update all in the Content tab of your instance. You can now select each version for each project that needs an update, and view the changelogs, all in one place.
+
+## Changed
+- Bulk update operations now go through the download manager, rather than preventing you from leaving the content tab while it installs the updates.
+
+## Fixed
+- Fixed relying on external metadata for already-installed loader verisons.
+- Fixed close button icon in the window controls not turning red on hover.
+- Fixed text overlapping into \`<details>\` in markdown descriptions.`,
+	},
+	{
+		date: `2026-09-27T18:59:10+00:00`,
+		product: 'hosting',
+		body: `## Added
+- Added a new modal for Update all in the Content tab of the server panel. You can now select each version for each project that needs an update, and view the changelogs, all in one place.`,
+	},
+	{
+		date: `2026-09-27T18:59:10+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed text overlapping into \`<details>\` in markdown descriptions.`,
+	},
+	{
 		date: `2026-09-23T09:31:02+00:00`,
 		product: 'app',
 		version: '0.21.5',

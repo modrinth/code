@@ -186,17 +186,67 @@ fn main() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_fs::init())
-        .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_opener::init());
+
+    #[cfg(target_os = "windows")]
+    {
+        use windows::Win32::UI::WindowsAndMessaging::{
+            SWP_FRAMECHANGED, SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE,
+            SWP_NOZORDER, SetWindowPos,
+        };
+
+        // Refresh the hidden window's frame before window-state measures its client area.
+        builder = builder.plugin(
+            tauri::plugin::Builder::new("window-frame")
+                .on_window_ready(|window| {
+                    if window.label() != "main" {
+                        return;
+                    }
+
+                    let hwnd = match window.hwnd() {
+                        Ok(hwnd) => hwnd,
+                        Err(e) => {
+                            tracing::warn!("Failed to get window handle: {e}");
+                            return;
+                        }
+                    };
+
+                    if let Err(e) = unsafe {
+                        SetWindowPos(
+                            hwnd,
+                            None,
+                            0,
+                            0,
+                            0,
+                            0,
+                            SWP_FRAMECHANGED
+                                | SWP_NOACTIVATE
+                                | SWP_NOMOVE
+                                | SWP_NOSIZE
+                                | SWP_NOZORDER,
+                        )
+                    } {
+                        tracing::warn!("Failed to refresh window frame: {e}");
+                    }
+                })
+                .build(),
+        );
+    }
+
+    let window_state_flags = tauri_plugin_window_state::StateFlags::POSITION
+        | tauri_plugin_window_state::StateFlags::SIZE
+        | tauri_plugin_window_state::StateFlags::MAXIMIZED;
+    #[cfg(target_os = "windows")]
+    let window_state_flags =
+        window_state_flags | tauri_plugin_window_state::StateFlags::DECORATIONS;
+
+    builder = builder
         .plugin(
             tauri_plugin_window_state::Builder::default()
                 .with_filename("app-window-state.json")
                 .with_denylist(&["signin"])
-                // Use *only* POSITION and SIZE state flags, because saving VISIBLE causes the `visible: false` to not take effect
-                .with_state_flags(
-                    tauri_plugin_window_state::StateFlags::POSITION
-                        | tauri_plugin_window_state::StateFlags::SIZE
-                        | tauri_plugin_window_state::StateFlags::MAXIMIZED,
-                )
+                // Restoring VISIBLE would override the hidden startup window.
+                .with_state_flags(window_state_flags)
                 .build(),
         )
         .setup(|app| {
