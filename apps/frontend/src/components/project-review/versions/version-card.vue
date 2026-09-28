@@ -130,60 +130,73 @@
 						</dl>
 					</section>
 					<section>
-						<h3 class="mb-3 mt-0 text-sm font-semibold text-secondary">
-							{{ formatMessage(messages.dependencies) }}
-						</h3>
-						<p v-if="!version.dependencies.length" class="m-0 text-secondary">
-							{{ formatMessage(messages.emptyDependencies) }}
-						</p>
-						<p v-else-if="dependenciesQuery.isPending.value" role="status" class="m-0">
-							{{ formatMessage(messages.loading) }}
-						</p>
-						<div v-else-if="dependenciesQuery.isError.value" role="alert">
-							<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
-							<Button @click="dependenciesQuery.refetch()">{{
-								formatMessage(messages.retry)
-							}}</Button>
-						</div>
-						<div v-else class="flex flex-col gap-1.5">
-							<div
-								v-for="(context, index) in dependencies"
-								:key="index"
-								class="min-w-0 rounded-lg bg-surface-1 px-3 py-2"
-							>
-								<div class="flex min-w-0 flex-wrap items-center gap-3">
-									<AutoLink
-										:to="dependencyHref(context)"
-										class="flex min-w-0 flex-1 items-center gap-3 text-contrast hover:underline"
-									>
-										<Avatar
-											:src="
-												context.project?.icon_url ??
-												context.dependency.attribution?.flame_project?.icon_url
-											"
-											alt=""
-											size="1.5rem"
-											no-shadow
-										/>
-										<span class="break-words">{{
-											context.project?.title ??
-											context.dependency.file_name ??
-											context.dependency.project_id ??
-											context.dependency.version_id
-										}}</span>
-									</AutoLink>
-									<span v-if="context.version" class="break-all font-mono text-sm text-secondary">{{
-										context.version.version_number
-									}}</span>
-									<TagItem class="text-xs">{{
-										formatMessage(messages[context.dependency.dependency_type])
-									}}</TagItem>
+						<Accordion
+							:open-by-default="dependenciesOpen"
+							button-class="w-full cursor-pointer border-0 bg-transparent mt-2 py-2 text-left text-sm font-medium hover:brightness-125 [&>div>svg]:ml-0 [&>div>svg]:size-4"
+							@on-open="dependenciesOpen = true"
+							@on-close="dependenciesOpen = false"
+						>
+							<template #title>
+								<span class="text-primary">
+									{{ formatMessage(messages.dependencies) }} ({{
+										formatNumber(version.dependencies.length)
+									}})
+								</span>
+							</template>
+							<p v-if="!version.dependencies.length" class="m-0 text-secondary">
+								{{ formatMessage(messages.emptyDependencies) }}
+							</p>
+							<p v-else-if="dependenciesQuery.isPending.value" role="status" class="m-0">
+								{{ formatMessage(messages.loading) }}
+							</p>
+							<div v-else-if="dependenciesQuery.isError.value" role="alert">
+								<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
+								<Button @click="dependenciesQuery.refetch()">{{
+									formatMessage(messages.retry)
+								}}</Button>
+							</div>
+							<div v-else class="flex flex-col gap-1.5">
+								<div
+									v-for="(context, index) in dependencies"
+									:key="index"
+									class="min-w-0 rounded-lg bg-surface-1 px-3 py-2"
+								>
+									<div class="flex min-w-0 flex-wrap items-center gap-3">
+										<AutoLink
+											:to="dependencyHref(context)"
+											class="flex min-w-0 flex-1 items-center gap-3 text-contrast hover:underline"
+										>
+											<Avatar
+												:src="
+													context.project?.icon_url ??
+													context.dependency.attribution?.flame_project?.icon_url
+												"
+												alt=""
+												size="1.5rem"
+												no-shadow
+											/>
+											<span class="break-words">{{
+												context.project?.title ??
+												context.dependency.file_name ??
+												context.dependency.project_id ??
+												context.dependency.version_id
+											}}</span>
+										</AutoLink>
+										<span
+											v-if="context.version"
+											class="break-all font-mono text-sm text-secondary"
+											>{{ context.version.version_number }}</span
+										>
+										<TagItem class="text-xs">{{
+											formatMessage(messages[context.dependency.dependency_type])
+										}}</TagItem>
+									</div>
 								</div>
 							</div>
-						</div>
+						</Accordion>
 						<Accordion
 							:open-by-default="changelogOpen"
-							button-class="w-full cursor-pointer border-0 bg-transparent mt-2 py-2 text-left text-sm font-medium hover:brightness-125 [&>div>svg]:ml-0 [&>div>svg]:size-4"
+							button-class="w-full cursor-pointer border-0 bg-transparent py-2 text-left text-sm font-medium hover:brightness-125 [&>div>svg]:ml-0 [&>div>svg]:size-4"
 							@on-open="changelogOpen = true"
 							@on-close="changelogOpen = false"
 						>
@@ -279,6 +292,7 @@ const client = injectModrinthClient()
 const tags = injectTags(null)
 const { project, members } = injectProjectReviewPageContext()
 const changelogOpen = ref(false)
+const dependenciesOpen = ref(true)
 const withheld = computed(() => !!props.version.files_missing_attribution?.length)
 const platforms = computed(() =>
 	props.version.loaders.includes('mrpack')
@@ -316,19 +330,36 @@ const authorQuery = useQuery({
 	enabled: computed(() => props.expanded && !memberAuthor.value),
 })
 const author = computed(() => memberAuthor.value ?? authorQuery.data.value)
+const dependencyTypeOrder = { required: 0, optional: 1, incompatible: 2, embedded: 3 }
+function dependencyName(context: DependencyContext) {
+	return (
+		context.project?.title ??
+		context.dependency.file_name ??
+		context.dependency.project_id ??
+		context.dependency.version_id ??
+		''
+	)
+}
 const dependencies = computed<DependencyContext[]>(() =>
-	props.version.dependencies.map((dependency) => {
-		const version = dependenciesQuery.data.value?.versions.find(
-			(version) => version.id === dependency.version_id,
-		)
-		return {
-			dependency,
-			version,
-			project: dependenciesQuery.data.value?.projects.find(
-				(project) => project.id === (dependency.project_id ?? version?.project_id),
-			),
-		}
-	}),
+	props.version.dependencies
+		.map((dependency) => {
+			const version = dependenciesQuery.data.value?.versions.find(
+				(version) => version.id === dependency.version_id,
+			)
+			return {
+				dependency,
+				version,
+				project: dependenciesQuery.data.value?.projects.find(
+					(project) => project.id === (dependency.project_id ?? version?.project_id),
+				),
+			}
+		})
+		.sort((a, b) => {
+			const typeDifference =
+				dependencyTypeOrder[a.dependency.dependency_type] -
+				dependencyTypeOrder[b.dependency.dependency_type]
+			return typeDifference || dependencyName(a).localeCompare(dependencyName(b))
+		}),
 )
 function fileActions(file: Labrinth.Versions.v3.Version['files'][number]): ButtonMenuOption[] {
 	const options: ButtonMenuOption[] = []
