@@ -189,6 +189,7 @@ function setOptionalField(
 						:id="`derivative-note-${index}`"
 						:model-value="source.note ?? undefined"
 						:rows="3"
+						:resize="showLockControls ? 'vertical' : 'none'"
 						:disabled="disabled"
 						:placeholder="formatMessage(messages.notePlaceholder)"
 						@update:model-value="(value) => setOptionalField(index, 'note', value)"

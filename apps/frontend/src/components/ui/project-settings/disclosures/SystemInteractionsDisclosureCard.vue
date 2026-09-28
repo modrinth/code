@@ -59,6 +59,7 @@ const messages = defineMessages({
 					id="system-interactions-disclosure-note"
 					v-model="model.note"
 					:rows="3"
+					:resize="showLockControls ? 'vertical' : 'none'"
 					class="max-w-[40rem]"
 					:disabled="disabled"
 					:placeholder="formatMessage(messages.notePlaceholder)"
