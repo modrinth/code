@@ -210,10 +210,7 @@ watch(serverBackUrl, (value) => {
 		serverBreadcrumbTo.value = value
 	}
 })
-const serverIcon = useCachedServerIcon(
-	() => String(displayedBrowseRoute.value.query.sid ?? ''),
-	() => serverContextServerData.value?.upstream?.project_id,
-)
+const serverIcon = useCachedServerIcon(() => String(displayedBrowseRoute.value.query.sid ?? ''))
 const serverBreadcrumbDefinition = {
 	slot: 'server',
 	id: () => `server:${String(displayedBrowseRoute.value.query.sid ?? '')}`,

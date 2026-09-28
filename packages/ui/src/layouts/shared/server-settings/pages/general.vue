@@ -58,7 +58,7 @@
 
 					<EditServerIcon
 						v-if="!data.is_medal"
-						:can-edit="canWriteFiles"
+						:can-edit="canSetup"
 						:permission-denied-message="permissionDeniedMessage"
 					/>
 				</div>
@@ -154,7 +154,7 @@ const { server: data, serverId, busyReasons } = injectModrinthServerContext()
 const { isApp } = injectServerSettings()
 const { featureFlags } = injectPageContext()
 const queryClient = useQueryClient()
-const { canUseAdvancedSettings, canWriteFiles, permissionDeniedMessage } = useServerPermissions()
+const { canUseAdvancedSettings, canSetup, permissionDeniedMessage } = useServerPermissions()
 const advancedActionTooltip = computed(() =>
 	canUseAdvancedSettings.value ? undefined : permissionDeniedMessage.value,
 )

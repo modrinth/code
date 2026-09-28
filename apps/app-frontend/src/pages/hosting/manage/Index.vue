@@ -131,10 +131,7 @@ watch(
 	{ immediate: true },
 )
 
-const serverIcon = useCachedServerIcon(
-	breadcrumbServerId,
-	() => serverData.value?.upstream?.project_id,
-)
+const serverIcon = useCachedServerIcon(breadcrumbServerId)
 const hostingBreadcrumb = useRootBreadcrumb({
 	slot: 'root',
 	id: 'servers',
