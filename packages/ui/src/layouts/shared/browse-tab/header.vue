@@ -40,9 +40,7 @@ const installContext = computed(() => props.installContext ?? ctx?.installContex
 const selectedProjectsLeaveModal = ref<InstanceType<typeof SelectedProjectsLeaveModal>>()
 
 const serverId = computed(() => installContext.value?.serverId ?? '')
-const upstream = computed(() => installContext.value?.upstream ?? null)
-
-const { image: fetchedIcon } = useServerImage(serverId, upstream, {
+const { image: fetchedIcon } = useServerImage(serverId, {
 	enabled: computed(() => !!installContext.value?.serverId),
 })
 

@@ -551,10 +551,7 @@ const { disconnect: disconnectPanelSync } = useServerPanelSync({
 	worldId,
 })
 
-const { image: serverImage } = useServerImage(
-	props.serverId,
-	computed(() => serverData.value?.upstream ?? null),
-)
+const { image: serverImage } = useServerImage(() => props.serverId)
 const { data: serverProject } = useServerProject(computed(() => serverData.value?.upstream ?? null))
 
 const onStateEvent = (data: Archon.Websocket.v0.WSStateEvent) => {
