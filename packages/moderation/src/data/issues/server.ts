@@ -1,16 +1,17 @@
 import { ServerIcon } from '@modrinth/assets'
 
-import { issue, markdown, panel, section, toggle, text } from './component-builders/builders'
+import { projectHasCustomServerModpack } from '../../utils'
 import excessiveLanguagesMessage from '../messages/checklist/messages/rules/excessive-languages.md'
 import temporaryServerMessage from '../messages/checklist/messages/status-alerts/temporary-server.md'
+import { issue, markdown, panel, section, text, toggle } from './component-builders/builders'
+import { IssuePriority } from './component-builders/priority'
 import { metadataGameVersionsIssue } from './metadata'
 import {
-	reuploadIdentityVerificationServerIssue,
-	reuploadRequestProofServerIssue,
 	reuploadCustomPackProhibitedIssue,
 	reuploadCustomPackVerificationIssue,
+	reuploadIdentityVerificationServerIssue,
+	reuploadRequestProofServerIssue,
 } from './reupload'
-import { projectHasCustomServerModpack } from '../../utils'
 
 export const serversExcessiveLanguagesIssue = issue({
 	id: 'servers-excessive-languages',
@@ -22,6 +23,7 @@ export const serversExcessiveLanguagesIssue = issue({
 
 export const serversTemporaryServerIssue = issue({
 	id: 'status-alerts-temporary-server',
+	priority: IssuePriority.Alerts,
 	title: 'Temporary server',
 	category: 'Project wide',
 	message: temporaryServerMessage,
