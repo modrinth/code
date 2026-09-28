@@ -176,7 +176,6 @@ impl Scopes {
             | Scopes::PAT_WRITE
             | Scopes::PAT_DELETE
             | Scopes::SESSION_DELETE
-            | Scopes::PERFORM_ANALYTICS
             | Scopes::COLLECTION_CREATE
             | Scopes::COLLECTION_WRITE
             | Scopes::COLLECTION_DELETE
