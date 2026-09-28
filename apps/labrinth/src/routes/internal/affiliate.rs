@@ -4,7 +4,7 @@ use xredis::RedisPool;
 use crate::database::PgPool;
 use crate::env::ENV;
 use crate::{
-    auth::get_user_from_headers,
+    auth::{get_user_from_headers, require_unlocked},
     database::models::{DBAffiliateCode, DBAffiliateCodeId, DBUser, DBUserId},
     models::{
         analytics::AffiliateCodeClick, ids::AffiliateCodeId, pats::Scopes,
@@ -217,6 +217,7 @@ pub async fn create(
     )
     .await
     .wrap_auth_err("authenticating API request")?;
+    require_unlocked(&creator)?;
 
     let is_admin = creator.role.is_admin();
     let is_affiliate = creator.badges.contains(Badges::AFFILIATE);
@@ -346,6 +347,7 @@ pub async fn delete(
     )
     .await
     .wrap_auth_err("authenticating API request")?;
+    require_unlocked(&user)?;
 
     let (affiliate_code_id,) = path.into_inner();
     let affiliate_code_id = DBAffiliateCodeId::from(affiliate_code_id);
@@ -403,6 +405,7 @@ pub async fn patch(
     )
     .await
     .wrap_auth_err("authenticating API request")?;
+    require_unlocked(&user)?;
 
     let (affiliate_code_id,) = path.into_inner();
     let affiliate_code_id = DBAffiliateCodeId::from(affiliate_code_id);

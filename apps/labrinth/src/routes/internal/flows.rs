@@ -327,6 +327,7 @@ impl TempUser {
             allow_friend_requests: true,
             is_subscribed_to_newsletter: sign_up_newsletter,
             eligibility_verified_at: Some(Utc::now()),
+            lock: None,
         }
         .insert(transaction)
         .await
@@ -1728,6 +1729,10 @@ pub async fn discord_community_link(
     .wrap_auth_err("authenticating API request")?
     .1;
 
+    if db_user.is_locked() {
+        return Err(ApiError::Auth(AuthenticationError::AccountLocked.into()));
+    }
+
     let Some(discord_id) = db_user.discord_id else {
         return Err(ApiError::Request(eyre!("discord account is not linked")));
     };
@@ -2114,6 +2119,7 @@ impl ReadyAccountRegisterFlow {
             allow_friend_requests: true,
             is_subscribed_to_newsletter: register_flow.sign_up_newsletter,
             eligibility_verified_at: Some(Utc::now()),
+            lock: None,
         }
         .insert(transaction)
         .await;
@@ -2912,7 +2918,7 @@ pub async fn reset_password_begin(
         id: user_id,
         email: user_email,
         ..
-    }) = user
+    }) = user.filter(|user| !user.is_locked())
     {
         let flow = DBFlow::ForgotPassword { user_id }
             .insert(Duration::hours(24), &redis)
@@ -2982,6 +2988,12 @@ pub async fn change_password(
             .wrap_internal_err("fetching user from database")?
             .ok_or_else(|| AuthenticationError::InvalidCredentials)
             .wrap_auth_err("fetching user from database")?;
+
+            if user.is_locked() {
+                return Err(ApiError::Auth(
+                    AuthenticationError::AccountLocked.into(),
+                ));
+            }
 
             Some(user)
         } else {

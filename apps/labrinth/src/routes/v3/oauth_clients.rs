@@ -10,7 +10,9 @@ use crate::file_hosting::FileHostPublicity;
 use crate::models::ids::OAuthClientId;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::{
-    auth::{checks::ValidateAuthorized, get_user_from_headers},
+    auth::{
+        checks::ValidateAuthorized, get_user_from_headers, require_unlocked,
+    },
     database::models::{
         DBOAuthClientId, DBUser, generate_oauth_client_id,
         generate_oauth_redirect_id,
@@ -203,6 +205,7 @@ pub async fn oauth_client_create(
     )
     .await?
     .1;
+    require_unlocked(&current_user)?;
 
     new_oauth_app.validate().map_err(|e| {
         CreateError::ValidationError(validation_errors_to_string(e, None))
@@ -272,6 +275,7 @@ pub async fn oauth_client_delete(
     .await
     .wrap_auth_err("authenticating API request")?
     .1;
+    require_unlocked(&current_user)?;
 
     let client = DBOAuthClient::get(client_id.into_inner().into(), &**pool)
         .await
@@ -342,6 +346,7 @@ pub async fn oauth_client_edit(
     .await
     .wrap_auth_err("authenticating API request")?
     .1;
+    require_unlocked(&current_user)?;
 
     client_updates
         .validate()
@@ -447,6 +452,7 @@ pub async fn oauth_client_icon_edit(
     .await
     .wrap_auth_err("authenticating API request")?
     .1;
+    require_unlocked(&user)?;
 
     let client = DBOAuthClient::get((*client_id).into(), &**pool)
         .await
@@ -536,6 +542,7 @@ pub async fn oauth_client_icon_delete(
     .await
     .wrap_auth_err("authenticating API request")?
     .1;
+    require_unlocked(&user)?;
 
     let client = DBOAuthClient::get((*client_id).into(), &**pool)
         .await
@@ -641,6 +648,7 @@ pub async fn revoke_oauth_authorization(
     .await
     .wrap_auth_err("authenticating API request")?
     .1;
+    require_unlocked(&current_user)?;
 
     DBOAuthClientAuthorization::remove(
         info.client_id.into(),

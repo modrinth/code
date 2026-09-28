@@ -68,7 +68,15 @@ where
     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
     if !scopes.contains(required_scopes) {
-        return Err(AuthenticationError::InvalidCredentials);
+        return Err(
+            if db_user.is_locked()
+                && required_scopes.intersects(Scopes::locked())
+            {
+                AuthenticationError::AccountLocked
+            } else {
+                AuthenticationError::InvalidCredentials
+            },
+        );
     }
 
     Ok((scopes, db_user))
@@ -229,7 +237,13 @@ where
         _ => return Err(AuthenticationError::InvalidAuthMethod),
     };
 
-    Ok(possible_user)
+    Ok(possible_user.map(|(scopes, user)| {
+        if user.is_locked() {
+            (scopes - Scopes::locked(), user)
+        } else {
+            (scopes, user)
+        }
+    }))
 }
 
 pub fn extract_authorization_header(
