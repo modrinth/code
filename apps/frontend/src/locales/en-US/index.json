@@ -2738,6 +2738,15 @@
   "layout.banner.account-action": {
     "message": "Account action required"
   },
+  "layout.banner.account-locked.description": {
+    "message": "A moderator has locked your account, so you cannot create, edit, or delete anything on Modrinth. Reason: {reason}"
+  },
+  "layout.banner.account-locked.support": {
+    "message": "Contact support"
+  },
+  "layout.banner.account-locked.title": {
+    "message": "Your account has been locked"
+  },
   "layout.banner.add-email.button": {
     "message": "Visit account settings"
   },

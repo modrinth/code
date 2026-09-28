@@ -38,6 +38,12 @@
 		</NewModal>
 
 		<EditUserModal v-if="variant === 'web'" ref="editUserModal" :user="user" :user-id="userId" />
+		<LockUserModal
+			v-if="variant === 'web' && isStaffViewing"
+			ref="lockUserModal"
+			:user="user"
+			:user-id="userId"
+		/>
 
 		<NewModal
 			v-if="variant === 'web' && isStaffViewing"
@@ -194,6 +200,7 @@
 						openPath(`/dashboard/analytics?user=${encodeURIComponent(user.username)}`)
 					"
 					@edit-user="editUserModal?.show()"
+					@toggle-lock="toggleLock"
 				>
 					<template v-if="isModrinthUser" #summary>
 						<IntlFormatted :message-id="messages.officialAccountBio">
@@ -444,6 +451,7 @@ import {
 } from '#ui/utils'
 
 import EditUserModal from './components/edit-user-modal.vue'
+import LockUserModal from './components/lock-user-modal.vue'
 import { blockedUsersQueryKey, injectUserProfile } from './providers'
 import { hasActivePride26Midas, hasPride26Badge, projectUserSorting } from './utils'
 
@@ -665,6 +673,22 @@ const messages = defineMessages({
 	blockUserErrorDescription: {
 		id: 'profile.block-user.error-description',
 		defaultMessage: 'An error occurred while blocking this user. Please try again.',
+	},
+	unlockUserSuccessTitle: {
+		id: 'profile.unlock-user.success-title',
+		defaultMessage: 'Account unlocked',
+	},
+	unlockUserSuccessDescription: {
+		id: 'profile.unlock-user.success-description',
+		defaultMessage: "{username}'s account has been unlocked.",
+	},
+	unlockUserErrorTitle: {
+		id: 'profile.unlock-user.error-title',
+		defaultMessage: 'Failed to unlock account',
+	},
+	unlockUserErrorDescription: {
+		id: 'profile.unlock-user.error-description',
+		defaultMessage: 'An error occurred while unlocking this account. Please try again.',
 	},
 })
 
@@ -967,6 +991,7 @@ async function retryQueries(): Promise<void> {
 
 const userDetailsModal = ref<ModalRef | null>(null)
 const editUserModal = ref<InstanceType<typeof EditUserModal> | null>(null)
+const lockUserModal = ref<InstanceType<typeof LockUserModal> | null>(null)
 const blockUserModal = ref<ModalRef | null>(null)
 const isBlockingUser = ref(false)
 const isUnblockingUser = ref(false)
@@ -1048,6 +1073,34 @@ async function unblockCurrentUser(): Promise<void> {
 		})
 	} finally {
 		isUnblockingUser.value = false
+	}
+}
+
+async function toggleLock(): Promise<void> {
+	if (!user.value) return
+
+	if (!user.value.lock) {
+		lockUserModal.value?.show()
+		return
+	}
+
+	const lockedUser = user.value
+	try {
+		await client.labrinth.moderation_internal.unlockUser(lockedUser.id)
+		await queryClient.invalidateQueries({ queryKey: ['user', props.userId] })
+		notificationManager.addNotification({
+			type: 'success',
+			title: formatMessage(messages.unlockUserSuccessTitle),
+			text: formatMessage(messages.unlockUserSuccessDescription, {
+				username: lockedUser.username,
+			}),
+		})
+	} catch {
+		notificationManager.addNotification({
+			type: 'error',
+			title: formatMessage(messages.unlockUserErrorTitle),
+			text: formatMessage(messages.unlockUserErrorDescription),
+		})
 	}
 }
 

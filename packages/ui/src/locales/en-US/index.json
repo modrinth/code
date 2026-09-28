@@ -3290,6 +3290,9 @@
   "profile.button.info": {
     "defaultMessage": "View user details"
   },
+  "profile.button.lock": {
+    "defaultMessage": "Lock account"
+  },
   "profile.button.manage-projects": {
     "defaultMessage": "Manage projects"
   },
@@ -3304,6 +3307,9 @@
   },
   "profile.button.unblock": {
     "defaultMessage": "Unblock"
+  },
+  "profile.button.unlock": {
+    "defaultMessage": "Unlock account"
   },
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural, one {# project} other {# projects}}"
@@ -3368,6 +3374,9 @@
   "profile.label.joined": {
     "defaultMessage": "Joined"
   },
+  "profile.label.locked": {
+    "defaultMessage": "Locked"
+  },
   "profile.label.no-collections": {
     "defaultMessage": "This user has no collections!"
   },
@@ -3403,6 +3412,18 @@
   },
   "profile.unblock-user.success-title": {
     "defaultMessage": "User unblocked"
+  },
+  "profile.unlock-user.error-description": {
+    "defaultMessage": "An error occurred while unlocking this account. Please try again."
+  },
+  "profile.unlock-user.error-title": {
+    "defaultMessage": "Failed to unlock account"
+  },
+  "profile.unlock-user.success-description": {
+    "defaultMessage": "{username}'s account has been unlocked."
+  },
+  "profile.unlock-user.success-title": {
+    "defaultMessage": "Account unlocked"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Published {date}"
