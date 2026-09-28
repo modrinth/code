@@ -6,7 +6,7 @@ readme = "README.md"
 
 [dependencies]
 tracing = { workspace = true }
-tokio = { workspace = true, features = ["fs", "process"] }
+tokio = { workspace = true, features = ["fs", "process", "rt"] }
 eyre = { workspace = true }
 async-trait = { workspace = true }
 bitflags = { workspace = true, features = ["serde"] }
@@ -30,7 +30,8 @@ libc =  { workspace = true }
 libseccomp =  { workspace = true }
 directories =  { workspace = true }
 
-# [target.'cfg(target_os = "macos")'.dependencies]
+[target.'cfg(target_os = "macos")'.dependencies]
+tempfile = { workspace = true }
 # security-framework =  { workspace = true }
 # security-framework-sys =  { workspace = true }
 

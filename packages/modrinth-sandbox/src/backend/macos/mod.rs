@@ -1,7 +1,7 @@
 use std::{
-    ffi::{CString, OsStr, OsString},
-    os::unix::ffi::OsStrExt,
-    path::Path,
+    ffi::{CString, OsString},
+    os::unix::ffi::OsStringExt,
+    path::{Path, PathBuf},
 };
 
 use async_trait::async_trait;
@@ -53,8 +53,30 @@ fn spawn(
     env: &MacosEnv,
     mut command: SandboxCommand,
 ) -> Result<crate::SandboxChild> {
+    let temp_root = confstr(libc::_CS_DARWIN_USER_TEMP_DIR)
+        .map(OsString::from_vec)
+        .map(PathBuf::from)
+        .ok_or_eyre("macOS user temporary directory is unavailable")?
+        .canonicalize()
+        .wrap_err("resolving macOS user temporary directory")?;
+    let temp_dir = tempfile::Builder::new()
+        .prefix("modrinth-sandbox-")
+        .tempdir_in(&temp_root)
+        .wrap_err("creating sandbox temporary directory")?;
+    let temp_path = temp_dir.path().to_path_buf();
+
+    command
+        .extra_environment
+        .insert("TMPDIR".into(), temp_path.clone().into());
+    if command.is_jvm {
+        let mut java_temp_argument = OsString::from("-Djava.io.tmpdir=");
+        java_temp_argument.push(&temp_path);
+        command.args.insert(0, java_temp_argument.into());
+    }
+
     let environment = command.take_environment();
     let mut sandbox_profile = OsString::from(BASE_PROFILE);
+    allow_read_write(&mut sandbox_profile, &temp_path);
 
     let resolved_executable = resolve_path(&command.executable)?;
     allow_read(&mut sandbox_profile, &resolved_executable);
@@ -63,31 +85,20 @@ fn spawn(
         sandbox_profile.push(NETWORK);
     }
 
-    // Grant access to $TMPDIR/hsperfdata_
     if command.is_jvm {
-        let temp_dir = confstr(libc::_CS_DARWIN_USER_TEMP_DIR)
-            .unwrap_or_else(|| b"/tmp".to_vec());
+        sandbox_profile.push("(allow file-write* file-read* (prefix \"");
+        sandbox_profile.push(temp_root.join("hsperfdata_"));
+        sandbox_profile.push("\"))\n");
 
-        if let Ok(temp_path) =
-            Path::new(OsStr::from_bytes(&temp_dir)).canonicalize()
-        {
-            sandbox_profile.push("(allow file-write* file-read* (prefix \"");
-            sandbox_profile.push(temp_path.join("hsperfdata_"));
-            sandbox_profile.push("\"))\n");
-
-            sandbox_profile.push("(allow file-write* file-read* file-map-executable process-exec (prefix \"");
-            sandbox_profile.push(temp_path.join("libjcocoa"));
-            sandbox_profile.push("\"))\n");
-        }
-
-        if let Some(cache_dir) = confstr(libc::_CS_DARWIN_USER_CACHE_DIR) {
-            let cache_path = Path::new(OsStr::from_bytes(&cache_dir));
-            if let Ok(cache_path) = cache_path.canonicalize() {
-                sandbox_profile.push("(allow file-write* file-read* file-map-executable process-exec (subpath \"");
-                sandbox_profile.push(cache_path.join("net.java.openjdk.java"));
-                sandbox_profile.push("\"))\n");
-            }
-        }
+        let cache_root = confstr(libc::_CS_DARWIN_USER_CACHE_DIR)
+            .map(OsString::from_vec)
+            .map(PathBuf::from)
+            .ok_or_eyre("macOS user cache directory is unavailable")?
+            .canonicalize()
+            .wrap_err("resolving macOS user cache directory")?;
+        sandbox_profile.push("(allow file-write* file-read* file-map-executable process-exec (subpath \"");
+        sandbox_profile.push(cache_root.join("net.java.openjdk.java"));
+        sandbox_profile.push("\"))\n");
     }
 
     for path in command.read_only_paths {
@@ -125,13 +136,17 @@ fn spawn(
         stdin: pipes.stdin,
         stdout: pipes.stdout,
         stderr: pipes.stderr,
-        imp: SandboxChild::Macos(MacosChild { child }),
+        imp: SandboxChild::Macos(MacosChild {
+            child,
+            _temp_dir: temp_dir,
+        }),
     })
 }
 
 #[derive(Debug)]
 pub struct MacosChild {
     child: UnixChild,
+    _temp_dir: tempfile::TempDir,
 }
 
 #[async_trait]
