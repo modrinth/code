@@ -27,6 +27,7 @@ import serverSideOptInXRayMessage from '../messages/checklist/messages/rules/ser
 import serverSideOptInHeaderMessage from '../messages/checklist/messages/rules/server-side-opt-in-header.md'
 import serverSideOptOutMessage from '../messages/checklist/messages/rules/server-side-opt-out.md'
 import { issue, markdown, panel, section, toggle } from './component-builders/builders'
+import { IssuePriority } from './component-builders/priority'
 
 export const rulesPaidAccessServerIssue = issue({
 	id: 'rules-paid-access-server',
@@ -54,6 +55,7 @@ export const rulesServerSideOptOutIssue = issue({
 
 export const rulesAiGeneratedIssue = issue({
 	id: 'rules-ai-generated',
+	priority: IssuePriority.Alerts,
 	title: 'AI-generated content',
 	category: 'Project wide',
 	message: aiGeneratedMessage,

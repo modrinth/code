@@ -8,9 +8,11 @@ import metadataIssueLoadersMessage from '../messages/checklist/messages/post-app
 import metadataIssueMcVersionsMessage from '../messages/checklist/messages/post-approval/metadata-issue/mc-versions.md'
 import missedDeadlineMessage from '../messages/checklist/messages/post-approval/missed-deadline.md'
 import { issue, panel, section, text, toggle } from './component-builders/builders'
+import { IssuePriority } from './component-builders/priority'
 
 export const postApprovalIssueWarningIssue = issue({
 	id: 'post-approval-issue-warning',
+	priority: IssuePriority.Last,
 	title: 'Post-approval issue warning',
 	category: 'Project wide',
 	message: issueWarningMessage,
@@ -19,6 +21,7 @@ export const postApprovalIssueWarningIssue = issue({
 
 export const postApprovalMissedDeadlineIssue = issue({
 	id: 'post-approval-missed-deadline',
+	priority: IssuePriority.Last,
 	title: 'Missed review deadline',
 	category: 'Project wide',
 	message: ({ getTextValue }) =>

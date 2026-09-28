@@ -9,11 +9,12 @@ import privateUseNoteSharedInstanceMessage from '../messages/checklist/messages/
 import privateUseProjectMessage from '../messages/checklist/messages/status-alerts/private-use/project.md'
 import privateUseServerMessage from '../messages/checklist/messages/status-alerts/private-use/server.md'
 import serverUseMessage from '../messages/checklist/messages/status-alerts/server-use.md'
-
 import { issue, panel, toggle } from './component-builders/builders'
+import { IssuePriority } from './component-builders/priority'
 
 export const statusAlertsCorrectionsAppliedIssue = issue({
 	id: 'status-alerts-corrections-applied',
+	priority: IssuePriority.Alerts,
 	title: 'Apply selected corrections',
 	category: 'Project wide',
 	message: ({ projectV3 }) =>
@@ -24,6 +25,7 @@ export const statusAlertsCorrectionsAppliedIssue = issue({
 
 export const statusAlertsPrivateUseIssue = issue({
 	id: 'status-alerts-private-use',
+	priority: IssuePriority.Alerts,
 	title: 'Private-use project',
 	category: 'Project wide',
 	message: ({ projectV3 }) => {
@@ -55,6 +57,7 @@ export const statusAlertsAccountIssuesIssue = issue({
 
 export const statusAlertsDemonetizedIssue = issue({
 	id: 'status-alerts-demonetized',
+	priority: IssuePriority.Alerts,
 	title: 'Demonetized project',
 	category: 'Project wide',
 	message: demonetizedMessage,
@@ -62,6 +65,7 @@ export const statusAlertsDemonetizedIssue = issue({
 
 export const statusAlertsDemonetizedModpackIssue = issue({
 	id: 'status-alerts-demonetized-modpack',
+	priority: IssuePriority.Alerts,
 	title: 'Demonetized modpack',
 	category: 'Project wide',
 	message: demonetizedModpackMessage,

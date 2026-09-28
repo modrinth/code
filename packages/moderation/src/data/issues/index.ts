@@ -87,4 +87,6 @@ export const reviewPanels = {
 	versions: versionsReviewPanel,
 } satisfies Record<string, Panel>
 
+export { IssuePriority } from './component-builders/priority'
+
 export type ReviewPanelKey = keyof typeof reviewPanels

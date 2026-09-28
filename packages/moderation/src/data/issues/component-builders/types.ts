@@ -2,6 +2,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import type { FunctionalComponent, SVGAttributes } from 'vue'
 
 import type { ModerationStatus } from '../../../types/node/state'
+import type { IssuePriority } from './priority'
 
 export interface ReviewContext {
 	projectV3: Labrinth.Projects.v3.Project
@@ -42,6 +43,8 @@ export interface Issue {
 	id: string
 	title: string
 	category: string
+	/** Orders selected issues; omitted priorities use the default group. */
+	priority?: IssuePriority
 	message: WithContext<string>
 	suggestedStatus?: WithContext<ModerationStatus | undefined>
 	corrections?: WithContext<IssueCorrections>
