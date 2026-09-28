@@ -28,6 +28,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { injectPopupNotificationManager } from '@modrinth/ui'
+import { serverIconQueryOptions } from '@modrinth/ui/src/queries/server-icon'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -49,7 +50,7 @@ import {
 	type SharedInstanceUpdatePreview,
 	wait_for_install_job,
 } from '@/helpers/install'
-import { get, list } from '@/helpers/instance'
+import { cache_icon, edit_icon, get, getInstanceIconUrl, list } from '@/helpers/instance'
 import { get as getCredentials, type ModrinthAuthFlow } from '@/helpers/mr_auth'
 import { get_by_instance_id } from '@/helpers/process'
 import { ensureManagedServerWorldExists, start_join_server } from '@/helpers/worlds'
@@ -64,6 +65,7 @@ type LaunchTarget = ServerPlayTarget & {
 	name: string
 	userId: string
 	icon: string | null
+	iconPath: string | null
 }
 const auth = injectAuth()
 const client = injectModrinthClient()
@@ -81,6 +83,13 @@ const updateModal = ref<InstanceType<typeof ContentDiffModal>>()
 const updateDiffs = ref<ContentDiffItem[]>([])
 const pendingUpdate = ref<{ target: LaunchTarget; instanceId: string }>()
 const activeInstall = ref<{ serverId: string; worldId: string; instanceId: string }>()
+
+async function cacheServerIcon(serverId: string) {
+	const icon = await queryClient.fetchQuery(serverIconQueryOptions(serverId, client))
+	if (!icon) return null
+	const bytes = Uint8Array.from(atob(icon.split(',')[1]), (byte) => byte.charCodeAt(0))
+	return await cache_icon(Array.from(bytes))
+}
 
 async function assertAccount(target: LaunchTarget) {
 	if ((await getCredentials())?.user_id !== target.userId)
@@ -148,6 +157,9 @@ async function playExisting(
 	existing: NonNullable<Awaited<ReturnType<typeof findInstance>>>,
 	approveUpdate: boolean,
 ) {
+	await assertAccount(target)
+	if (target.iconPath && existing.icon_path !== target.iconPath)
+		await edit_icon(existing.id, target.iconPath)
 	if (existing.quarantined || existing.install_stage !== 'installed') {
 		await router.push(`/instance/${encodeURIComponent(existing.id)}`)
 		return
@@ -243,8 +255,8 @@ const launchMutation = useMutation({
 				target.name,
 				null,
 				target.name,
-				target.icon,
-				target.icon,
+				target.iconPath ?? target.icon,
+				target.iconPath ?? target.icon,
 			)
 			const installedId = installJobInstanceId(job)
 			if (!installedId) throw new Error(formatMessage(messages.notReady))
@@ -304,13 +316,15 @@ const prepareMutation = useMutation({
 		const world = server.worlds.find((world) => world.id === worldId && world.is_active)
 		const sharedInstanceId = world?.content?.shared_instance_id
 		if (!sharedInstanceId) throw new Error(formatMessage(messages.worldChanged))
+		const iconPath = await cacheServerIcon(serverId)
 		const target: LaunchTarget = {
 			serverId,
 			worldId,
 			sharedInstanceId,
 			name: server.name,
 			userId: credentials.user_id,
-			icon: null,
+			icon: getInstanceIconUrl(iconPath),
+			iconPath,
 		}
 		await assertAccount(target)
 		const existing = await findInstance(target)
@@ -322,14 +336,14 @@ const prepareMutation = useMutation({
 				client.archon.servers_v0.get(serverId),
 			])
 			target.name = remote.name
-			target.icon = remote.icon
+			target.icon ??= remote.icon
 			if (legacyServer.owner_id === credentials.user_id) {
 				await launchMutation.mutateAsync({ target }).catch(() => {})
 				return
 			}
 			const preview = await install_get_shared_instance_preview(sharedInstanceId, target.name)
 			await assertAccount(target)
-			if (remote.icon) preview.iconUrl = remote.icon
+			if (target.icon) preview.iconUrl = target.icon
 			installModal.value?.show(preview, async () => {
 				if (launchMutation.isPending.value) return
 				await launchMutation.mutateAsync({ target }).catch(() => {})
