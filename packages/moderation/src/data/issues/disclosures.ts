@@ -202,6 +202,8 @@ export const aiDisclosureReviewPanel = panel({
 	toggle({
 		issue: disclosuresIssue,
 		id: 'disclosures-misused-ai',
+		shown: ({ disclosures }) =>
+			disclosures.some((disclosure) => disclosure.type === 'ai_content' && !disclosure.deleted_at),
 		label: 'Misused',
 		issueListLabel: 'AI Usage',
 	}),
@@ -233,11 +235,20 @@ export const aiDisclosureReviewPanel = panel({
 	),
 	section({
 		label: 'Type of misused disclosure?',
-		shown: ({ selected }) => selected.toggleIds.includes('disclosures-misused-ai'),
+		shown: ({ disclosures, selected }) =>
+			selected.toggleIds.includes('disclosures-misused-ai') &&
+			disclosures.some((disclosure) => disclosure.type === 'ai_content' && !disclosure.deleted_at),
 	}).content(
 		toggle({
 			issue: disclosuresIssue,
 			id: 'disclosures-misused-ai-code',
+			shown: ({ disclosures }) =>
+				disclosures.some(
+					(disclosure) =>
+						disclosure.type === 'ai_content' &&
+						!disclosure.deleted_at &&
+						disclosure.uses.includes('code'),
+				),
 			label: 'Code',
 			issueListLabel: 'AI Usage: Code',
 			issueListGroup: 'Misused',
@@ -245,6 +256,13 @@ export const aiDisclosureReviewPanel = panel({
 		toggle({
 			issue: disclosuresIssue,
 			id: 'disclosures-misused-ai-assets',
+			shown: ({ disclosures }) =>
+				disclosures.some(
+					(disclosure) =>
+						disclosure.type === 'ai_content' &&
+						!disclosure.deleted_at &&
+						disclosure.uses.includes('assets'),
+				),
 			label: 'Assets',
 			issueListLabel: 'AI Usage: Assets',
 			issueListGroup: 'Misused',
@@ -252,6 +270,13 @@ export const aiDisclosureReviewPanel = panel({
 		toggle({
 			issue: disclosuresIssue,
 			id: 'disclosures-misused-ai-text',
+			shown: ({ disclosures }) =>
+				disclosures.some(
+					(disclosure) =>
+						disclosure.type === 'ai_content' &&
+						!disclosure.deleted_at &&
+						disclosure.uses.includes('text'),
+				),
 			label: 'Text',
 			issueListLabel: 'AI Usage: Text',
 			issueListGroup: 'Misused',
@@ -274,6 +299,10 @@ export const aiFunctionalityDisclosureReviewPanel = panel({
 	toggle({
 		issue: disclosuresIssue,
 		id: 'disclosures-misused-ai-functionality',
+		shown: ({ disclosures }) =>
+			disclosures.some(
+				(disclosure) => disclosure.type === 'ai_functionality' && !disclosure.deleted_at,
+			),
 		label: 'Misused',
 		issueListLabel: 'AI Functionality',
 	}),
@@ -294,6 +323,10 @@ export const adsDisclosureReviewPanel = panel({
 	toggle({
 		issue: disclosuresIssue,
 		id: 'disclosures-misused-ads',
+		shown: ({ disclosures }) =>
+			disclosures.some(
+				(disclosure) => disclosure.type === 'advertisements' && !disclosure.deleted_at,
+			),
 		label: 'Misused',
 		issueListLabel: 'Advertisements',
 	}),
@@ -314,6 +347,10 @@ export const paidFeaturesDisclosureReviewPanel = panel({
 	toggle({
 		issue: disclosuresIssue,
 		id: 'disclosures-misused-paid-features',
+		shown: ({ disclosures }) =>
+			disclosures.some(
+				(disclosure) => disclosure.type === 'paid_features' && !disclosure.deleted_at,
+			),
 		label: 'Misused',
 		issueListLabel: 'Paid Features',
 	}),
@@ -334,6 +371,8 @@ export const telemetryDisclosureReviewPanel = panel({
 	toggle({
 		issue: disclosuresIssue,
 		id: 'disclosures-misused-telemetry',
+		shown: ({ disclosures }) =>
+			disclosures.some((disclosure) => disclosure.type === 'telemetry' && !disclosure.deleted_at),
 		label: 'Misused',
 		issueListLabel: 'Telemetry',
 	}),
@@ -389,6 +428,10 @@ export const derivativeContentDisclosureReviewPanel = panel({
 	toggle({
 		issue: disclosuresIssue,
 		id: 'disclosures-misused-derivative-content',
+		shown: ({ disclosures }) =>
+			disclosures.some(
+				(disclosure) => disclosure.type === 'derivative_work' && !disclosure.deleted_at,
+			),
 		label: 'Misused',
 		issueListLabel: 'Derivative Content',
 	}),
@@ -409,6 +452,10 @@ export const photosensitivityDisclosureReviewPanel = panel({
 	toggle({
 		issue: disclosuresIssue,
 		id: 'disclosures-misused-photosensitivity',
+		shown: ({ disclosures }) =>
+			disclosures.some(
+				(disclosure) => disclosure.type === 'epilepsy_triggers' && !disclosure.deleted_at,
+			),
 		label: 'Misused',
 		issueListLabel: 'Photosensitivity',
 	}),
@@ -429,6 +476,10 @@ export const systemInteractionsDisclosureReviewPanel = panel({
 	toggle({
 		issue: disclosuresIssue,
 		id: 'disclosures-misused-system-interactions',
+		shown: ({ disclosures }) =>
+			disclosures.some(
+				(disclosure) => disclosure.type === 'system_interactions' && !disclosure.deleted_at,
+			),
 		label: 'Misused',
 		issueListLabel: 'System Interactions',
 	}),
@@ -449,6 +500,8 @@ export const archiveDisclosureReviewPanel = panel({
 	toggle({
 		issue: disclosuresIssue,
 		id: 'disclosures-misused-archive',
+		shown: ({ disclosures }) =>
+			disclosures.some((disclosure) => disclosure.type === 'archived' && !disclosure.deleted_at),
 		label: 'Misused',
 		issueListLabel: 'Archive',
 	}),
@@ -467,6 +520,7 @@ export const disclosuresReviewPanel = panel({
 	toggle({
 		issue: disclosuresIssue,
 		id: 'disclosures-misused',
+		shown: ({ disclosures }) => disclosures.some((disclosure) => !disclosure.deleted_at),
 		label: 'Misused',
 	}),
 	toggle({
