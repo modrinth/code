@@ -85,7 +85,7 @@ impl actix_web::ResponseError for AuthenticationError {
                 StatusCode::BAD_REQUEST
             }
             AuthenticationError::SocketError => StatusCode::BAD_REQUEST,
-            AuthenticationError::AccountLocked => StatusCode::UNAUTHORIZED,
+            AuthenticationError::AccountLocked => StatusCode::FORBIDDEN,
         }
     }
 

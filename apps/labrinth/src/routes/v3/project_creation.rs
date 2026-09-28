@@ -108,6 +108,7 @@ pub enum CreateError {
 impl From<crate::routes::ApiError> for CreateError {
     fn from(value: crate::routes::ApiError) -> Self {
         match value {
+            err if err.is_account_locked() => Self::Request(err),
             crate::routes::ApiError::Auth(err) => {
                 Self::CustomAuthenticationError(format!("{err:#}"))
             }
@@ -146,7 +147,7 @@ impl actix_web::ResponseError for CreateError {
             CreateError::InvalidLoader(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidCategory(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidFileType(..) => StatusCode::BAD_REQUEST,
-            CreateError::Unauthorized(..) => StatusCode::UNAUTHORIZED,
+            CreateError::Unauthorized(err) => err.status_code(),
             CreateError::CustomAuthenticationError(..) => {
                 StatusCode::UNAUTHORIZED
             }
@@ -180,7 +181,7 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::InvalidLoader(..) => "invalid_input",
                 CreateError::InvalidCategory(..) => "invalid_input",
                 CreateError::InvalidFileType(..) => "invalid_input",
-                CreateError::Unauthorized(..) => "unauthorized",
+                CreateError::Unauthorized(err) => err.error_name(),
                 CreateError::CustomAuthenticationError(..) => "unauthorized",
                 CreateError::SlugCollision => "invalid_input",
                 CreateError::ValidationError(..) => "invalid_input",
