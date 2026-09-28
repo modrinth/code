@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineMessages, Tabs, useVIntl } from '@modrinth/ui'
+import { defineMessages, injectLoadingState, Tabs, useVIntl } from '@modrinth/ui'
 import { useEventListener } from '@vueuse/core'
 import { computed, nextTick, ref, watch } from 'vue'
 
@@ -72,7 +72,7 @@ import History from './history/index.vue'
 import IssueList from './issue-list/index.vue'
 import IssuePicker from './issue-list/issue-picker.vue'
 import ProjectReviewLayout from './layout/index.client.vue'
-import { projectReviewTabs } from './layout/types'
+import { type ProjectReviewTab, projectReviewTabs } from './layout/types'
 import MessageThread from './message-thread/index.vue'
 import { projectReviewMessages } from './messages'
 import Permissions from './permissions/index.vue'
@@ -96,8 +96,10 @@ const {
 	wasReviewed,
 	permissions,
 	selection,
+	isLoading,
+	navigation,
 } = injectProjectReviewPageContext()
-const visibleTabs = computed((previousTabs) => {
+const visibleTabs = computed<readonly ProjectReviewTab[]>((previousTabs) => {
 	if (!project.value) {
 		return previousTabs ?? projectReviewTabs.filter((tab) => tab !== 'permissions')
 	}
@@ -124,7 +126,22 @@ const panels = provideReviewPanels(
 )
 const messages = provideReviewMessages(createReviewMessages(project, projectV2, panels))
 provideReviewContext(createReviewContext(reviewProjectId, (target) => !!panels.resolve(target)))
-const { pending } = provideReviewSubmission(createReviewSubmission(messages, panels))
+const { pending, loadingAction } = provideReviewSubmission(createReviewSubmission(messages, panels))
+const loadingState = injectLoadingState()
+watch(
+	() =>
+		isLoading.value ||
+		navigation.busy.value ||
+		(loadingAction.value !== undefined &&
+			loadingAction.value !== 'reply' &&
+			loadingAction.value !== 'note'),
+	(loading, _, onCleanup) => {
+		if (!loading) return
+		const token = loadingState.begin()
+		onCleanup(() => loadingState.end(token))
+	},
+	{ immediate: true },
+)
 const activeReviewTab = ref('issues')
 const messageThread = ref<InstanceType<typeof MessageThread>>()
 const auth = useAuthState()

@@ -153,6 +153,7 @@ import {
 	commonMessages,
 	defineMessages,
 	EmptyState,
+	injectLoadingState,
 	injectModrinthClient,
 	injectNotificationManager,
 	Pagination,
@@ -184,6 +185,7 @@ const moderationQueue = useModerationQueue()
 const route = useRoute()
 const router = useRouter()
 const client = injectModrinthClient()
+const loadingState = injectLoadingState()
 
 const queueSummaryModal = ref()
 const moderateByIdsModal = ref<InstanceType<typeof ModerateByIdsModal>>()
@@ -544,20 +546,25 @@ async function navigateToModerationProject(projectId: string) {
 }
 
 async function startModeratingByIds(projectIds: string[]) {
-	await moderationQueue.setQueue(projectIds)
+	const token = loadingState.begin()
+	try {
+		await moderationQueue.setQueue(projectIds)
 
-	const targetProjectId = await findFirstEligibleProject()
+		const targetProjectId = await findFirstEligibleProject()
 
-	if (!targetProjectId) {
-		addNotification({
-			title: 'No projects available',
-			text: 'None of the provided projects are awaiting moderation or available to review.',
-			type: 'warning',
-		})
-		return
+		if (!targetProjectId) {
+			addNotification({
+				title: 'No projects available',
+				text: 'None of the provided projects are awaiting moderation or available to review.',
+				type: 'warning',
+			})
+			return
+		}
+
+		await navigateToModerationProject(targetProjectId)
+	} finally {
+		loadingState.end(token)
 	}
-
-	await navigateToModerationProject(targetProjectId)
 }
 
 async function getFilteredProjectIds(): Promise<string[]> {
@@ -572,58 +579,73 @@ async function getFilteredProjectIds(): Promise<string[]> {
 }
 
 async function moderateAllInFilter() {
-	const startIndex = (currentPage.value - 1) * itemsPerPage.value
-	const projectIds = (await getFilteredProjectIds()).slice(startIndex)
-	await moderationQueue.setQueue(projectIds)
+	const token = loadingState.begin()
+	try {
+		const startIndex = (currentPage.value - 1) * itemsPerPage.value
+		const projectIds = (await getFilteredProjectIds()).slice(startIndex)
+		await moderationQueue.setQueue(projectIds)
 
-	const targetProjectId = await findFirstEligibleProject()
+		const targetProjectId = await findFirstEligibleProject()
 
-	if (!targetProjectId) {
-		addNotification({
-			title: 'No projects available',
-			text: 'All projects in queue are already moderated or locked by others.',
-			type: 'warning',
-		})
-		return
+		if (!targetProjectId) {
+			addNotification({
+				title: 'No projects available',
+				text: 'All projects in queue are already moderated or locked by others.',
+				type: 'warning',
+			})
+			return
+		}
+
+		await navigateToModerationProject(targetProjectId)
+	} finally {
+		loadingState.end(token)
 	}
-
-	await navigateToModerationProject(targetProjectId)
 }
 
 async function startFromProject(projectId: string) {
-	const allFilteredProjectIds = await getFilteredProjectIds()
-	const projectIndex = allFilteredProjectIds.indexOf(projectId)
-	const projectIds = projectIndex === -1 ? [projectId] : allFilteredProjectIds.slice(projectIndex)
-	await moderationQueue.setQueue(projectIds)
+	const token = loadingState.begin()
+	try {
+		const allFilteredProjectIds = await getFilteredProjectIds()
+		const projectIndex = allFilteredProjectIds.indexOf(projectId)
+		const projectIds = projectIndex === -1 ? [projectId] : allFilteredProjectIds.slice(projectIndex)
+		await moderationQueue.setQueue(projectIds)
 
-	const targetProjectId = await findFirstEligibleProject()
+		const targetProjectId = await findFirstEligibleProject()
 
-	if (!targetProjectId) {
-		addNotification({
-			title: 'No projects available',
-			text: 'All projects in queue are already moderated or locked by others.',
-			type: 'warning',
-		})
-		return
+		if (!targetProjectId) {
+			addNotification({
+				title: 'No projects available',
+				text: 'All projects in queue are already moderated or locked by others.',
+				type: 'warning',
+			})
+			return
+		}
+
+		await navigateToModerationProject(targetProjectId)
+	} finally {
+		loadingState.end(token)
 	}
-
-	await navigateToModerationProject(targetProjectId)
 }
 
 async function reviewSkippedQueue() {
-	await moderationQueue.startSkippedReview()
+	const token = loadingState.begin()
+	try {
+		await moderationQueue.startSkippedReview()
 
-	const targetProjectId = await findFirstEligibleProject()
+		const targetProjectId = await findFirstEligibleProject()
 
-	if (!targetProjectId) {
-		addNotification({
-			title: 'No projects available',
-			text: 'All previously skipped projects are already moderated or locked by others.',
-			type: 'warning',
-		})
-		return
+		if (!targetProjectId) {
+			addNotification({
+				title: 'No projects available',
+				text: 'All previously skipped projects are already moderated or locked by others.',
+				type: 'warning',
+			})
+			return
+		}
+
+		await navigateToModerationProject(targetProjectId)
+	} finally {
+		loadingState.end(token)
 	}
-
-	await navigateToModerationProject(targetProjectId)
 }
 </script>
