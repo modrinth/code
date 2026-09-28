@@ -282,6 +282,7 @@ import {
 } from '../../../../assets/generated-icons'
 import { useFormatDateTime } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
+import { useServerImage } from '../../composables/use-server-image'
 import { injectModrinthClient } from '../../providers/api-client'
 import Avatar from '../base/Avatar.vue'
 import IntlFormatted from '../base/IntlFormatted.vue'
@@ -437,7 +438,7 @@ type ServerListingProps = {
 const props = defineProps<ServerListingProps>()
 const router = useRouter()
 
-const { archon, kyros, labrinth } = injectModrinthClient()
+const { labrinth } = injectModrinthClient()
 
 const isConfiguring = computed(() => props.flows?.intro)
 const isUpgrading = computed(
@@ -527,83 +528,8 @@ const { data: projectData } = useQuery({
 
 const iconUrl = computed(() => projectData.value?.icon_url)
 
-async function processImageBlob(blob: Blob, size: number): Promise<string> {
-	return new Promise((resolve) => {
-		const canvas = document.createElement('canvas')
-		const ctx = canvas.getContext('2d')!
-		const img = new Image()
-		img.onload = () => {
-			canvas.width = size
-			canvas.height = size
-			ctx.drawImage(img, 0, 0, size, size)
-			const dataURL = canvas.toDataURL('image/png')
-			URL.revokeObjectURL(img.src)
-			resolve(dataURL)
-		}
-		img.src = URL.createObjectURL(blob)
-	})
-}
-
-async function dataURLToBlob(dataURL: string): Promise<Blob> {
-	const res = await fetch(dataURL)
-	return res.blob()
-}
-
-const { data: image } = useQuery({
-	queryKey: ['server-icon', props.server_id] as const,
-	queryFn: async (): Promise<string | null> => {
-		if (!props.server_id || props.status !== 'available') return null
-
-		try {
-			const fsAuth = await archon.servers_v0.getFilesystemAuth(props.server_id)
-
-			try {
-				const blob = await kyros.files_v0.downloadFileWithAuth(fsAuth, '/server-icon-original.png')
-				return await processImageBlob(blob, 64)
-			} catch (error) {
-				const statusCode = (error as { statusCode?: number })?.statusCode
-				if (statusCode != null && statusCode !== 404) {
-					throw error
-				}
-
-				try {
-					const gameIconBlob = await kyros.files_v0.downloadFileWithAuth(fsAuth, '/server-icon.png')
-					return await processImageBlob(gameIconBlob, 64)
-				} catch (gameIconError) {
-					const gameIconStatusCode = (gameIconError as { statusCode?: number })?.statusCode
-					if (gameIconStatusCode != null && gameIconStatusCode !== 404) {
-						throw gameIconError
-					}
-				}
-
-				const projectIcon = iconUrl.value
-				if (projectIcon) {
-					const response = await fetch(projectIcon)
-					const blob = await response.blob()
-
-					const scaledDataUrl = await processImageBlob(blob, 64)
-					const scaledBlob = await dataURLToBlob(scaledDataUrl)
-					const scaledFile = new File([scaledBlob], 'server-icon.png', { type: 'image/png' })
-
-					await kyros.files_v0.uploadFileWithAuth(fsAuth, '/server-icon.png', scaledFile).promise
-
-					const originalFile = new File([blob], 'server-icon-original.png', {
-						type: 'image/png',
-					})
-					await kyros.files_v0.uploadFileWithAuth(fsAuth, '/server-icon-original.png', originalFile)
-						.promise
-
-					return scaledDataUrl
-				}
-			}
-
-			return null
-		} catch (error) {
-			console.debug('Icon processing failed:', error)
-			return null
-		}
-	},
-	enabled: computed(() => !!props.server_id && props.status === 'available'),
+const { image } = useServerImage(() => props.server_id, {
+	enabled: computed(() => props.status === 'available'),
 })
 
 const copied = ref(false)

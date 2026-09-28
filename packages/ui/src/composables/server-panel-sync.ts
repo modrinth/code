@@ -547,6 +547,7 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 
 	async function invalidateCorePanelQueries(serverId: string) {
 		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: ['server-icon', serverId] }),
 			queryClient.invalidateQueries({ queryKey: legacyServerDetailKey(serverId) }),
 			queryClient.invalidateQueries({ queryKey: serverV1DetailKey(serverId) }),
 			queryClient.invalidateQueries({ queryKey: contentListKey(serverId) }),
