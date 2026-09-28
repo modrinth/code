@@ -3,10 +3,20 @@
 		<dl v-if="project" class="m-0 grid grid-cols-[max-content_minmax(0,1fr)] gap-x-3 gap-y-2.5">
 			<dt>{{ formatMessage(messages.serverAddress) }}</dt>
 			<dd class="m-0 break-all text-primary">
-				{{ project.minecraft_java_server?.address || formatMessage(messages.noServerAddress) }}
+				<CopyCode
+					v-if="project.minecraft_java_server?.address"
+					:text="project.minecraft_java_server.address"
+					class="!-my-0.5"
+				/>
+				<span v-else>{{ formatMessage(messages.noServerAddress) }}</span>
 			</dd>
 			<dt>{{ formatMessage(messages.serverRegion) }}</dt>
-			<dd class="m-0 text-primary">{{ region || '—' }}</dd>
+			<dd class="m-0 text-primary">
+				<TagItem v-if="region" class="!border-surface-4 !bg-surface-3 !text-secondary">
+					{{ region }}
+				</TagItem>
+				<span v-else>—</span>
+			</dd>
 			<dt>{{ formatMessage(messages.serverLanguages) }}</dt>
 			<dd class="m-0 flex flex-wrap items-start gap-1">
 				<TagItem
@@ -102,6 +112,7 @@
 <script setup lang="ts">
 import {
 	Avatar,
+	CopyCode,
 	injectModrinthClient,
 	injectTags,
 	SERVER_LANGUAGES,

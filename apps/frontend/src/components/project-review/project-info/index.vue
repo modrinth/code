@@ -13,7 +13,7 @@
 			<Slug />
 			<Icon />
 			<Summary />
-			<License />
+			<License v-if="!project.minecraft_server" />
 			<Tags />
 			<Links />
 			<Compatibility v-if="!project.minecraft_server" />
