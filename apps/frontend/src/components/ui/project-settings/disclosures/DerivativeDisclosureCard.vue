@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { GitForkIcon, PlusIcon, TrashIcon } from '@modrinth/assets'
+import { ExternalIcon, GitForkIcon, PlusIcon, TrashIcon } from '@modrinth/assets'
 import {
 	Button,
+	ButtonLink,
 	commonMessages,
 	defineMessages,
 	Input,
@@ -50,6 +51,10 @@ const messages = defineMessages({
 	linkLabel: {
 		id: 'project.settings.disclosures.derivative.link-label',
 		defaultMessage: 'Link to original work',
+	},
+	openLink: {
+		id: 'project.settings.disclosures.derivative.open-link',
+		defaultMessage: 'Visit link',
 	},
 	linkPlaceholder: {
 		id: 'project.settings.disclosures.derivative.link-placeholder',
@@ -153,6 +158,19 @@ function setOptionalField(
 					:title-for="`derivative-link-${index}`"
 					class="max-w-[40rem]"
 				>
+					<template #title-right>
+						<ButtonLink
+							v-if="source.link"
+							:href="/^https?:\/\//i.test(source.link) ? source.link : `https://${source.link}`"
+							target="_blank"
+							type="quiet"
+							size="sm"
+							class="-my-1.5"
+						>
+							{{ formatMessage(messages.openLink) }}
+							<ExternalIcon />
+						</ButtonLink>
+					</template>
 					<Input
 						:id="`derivative-link-${index}`"
 						:model-value="source.link ?? undefined"
