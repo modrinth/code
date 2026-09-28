@@ -80,3 +80,32 @@ pub async fn wait_for(uuid: Uuid) -> crate::Result<()> {
 
     Ok(())
 }
+
+#[cfg(feature = "tauri")]
+pub async fn hide_to_tray_if_running(
+    window: &tauri::Window,
+) -> crate::Result<bool> {
+    let Some(state) = State::get_if_initialized() else {
+        return Ok(false);
+    };
+    if !Settings::get(&state.pool).await?.hide_on_process_start {
+        return Ok(false);
+    }
+    let Some(process) = state.process_manager.get_all().into_iter().next()
+    else {
+        return Ok(false);
+    };
+
+    let icon_path =
+        crate::state::get_instance(&process.instance_id, &state.pool)
+            .await?
+            .and_then(|metadata| metadata.instance.icon_path);
+    crate::util::tray::hide_to_tray(
+        &crate::EventState::get_app()?,
+        window,
+        process.instance_id,
+        &process.instance_name,
+        icon_path.as_deref(),
+    )?;
+    Ok(true)
+}

@@ -1163,7 +1163,14 @@ pub async fn launch_minecraft(
         if let Some(window) = window {
             let settings = crate::state::Settings::get(&state.pool).await?;
             if settings.hide_on_process_start {
-                window.minimize()?;
+                let app = EventState::get_app()?;
+                crate::util::tray::hide_to_tray(
+                    &app,
+                    &window,
+                    instance.id.clone(),
+                    &instance.name,
+                    instance.icon_path.as_deref(),
+                )?;
             }
         }
     }

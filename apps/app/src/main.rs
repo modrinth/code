@@ -199,6 +199,16 @@ fn main() {
                 )
                 .build(),
         )
+        .on_window_event(|window, event| {
+            if window.label() == "main"
+                && let tauri::WindowEvent::CloseRequested { api, .. } = event
+                && let Ok(true) = tauri::async_runtime::block_on(
+                    theseus::process::hide_to_tray_if_running(window),
+                )
+            {
+                api.prevent_close();
+            }
+        })
         .setup(|app| {
             #[cfg(target_os = "macos")]
             {

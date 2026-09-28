@@ -85,6 +85,11 @@ impl EventState {
         Ok(value.loading_bars.clone())
     }
 
+    #[cfg(feature = "tauri")]
+    pub fn get_app() -> crate::Result<tauri::AppHandle> {
+        Ok(Self::get().app.clone())
+    }
+
     /// The ads child webview makes the main window a multi-webview window,
     /// so Tauri's single-webview window lookup no longer returns it.
     #[cfg(feature = "tauri")]

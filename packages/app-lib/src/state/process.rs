@@ -991,6 +991,7 @@ impl Process {
         #[cfg(feature = "tauri")]
         {
             let settings = crate::state::Settings::get(&state.pool).await?;
+            crate::util::tray::restore_from_tray(&crate::EventState::get_app()?);
             if settings.refocus_on_game_close
                 && let Some(window) =
                     crate::EventState::get_main_window().await?

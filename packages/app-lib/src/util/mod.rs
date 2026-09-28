@@ -8,3 +8,5 @@ pub mod platform;
 pub mod protocol_version;
 pub mod rpc;
 pub mod server_ping;
+#[cfg(feature = "tauri")]
+pub mod tray;

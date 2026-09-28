@@ -539,6 +539,9 @@ onMounted(async () => {
 		const listeners = await Promise.all([
 			listen('edit-menu://undo', () => handleEditMenuAction('undo')),
 			listen('edit-menu://redo', () => handleEditMenuAction('redo')),
+			listen('tray://open-instance', (event) =>
+				router.push(`/instance/${encodeURIComponent(event.payload)}`),
+			),
 		])
 		unlistenEditMenu = () => listeners.forEach((unlisten) => unlisten())
 	} catch (error) {
