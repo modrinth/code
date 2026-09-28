@@ -71,10 +71,22 @@
 							({{ formatBytes(file.size) }})
 						</span>
 					</div>
-					<div class="flex flex-wrap items-center gap-2 text-sm text-secondary">
+					<div class="flex flex-wrap items-center gap-0.5 text-sm text-secondary">
 						<span v-if="file.file_type && file.file_type !== 'unknown'">{{
 							formatMessage(fileTypeMessages[file.file_type])
 						}}</span>
+						<ButtonLink
+							v-tooltip="formatMessage(messages.openSlicer)"
+							:href="`https://slicer.run/?url=${encodeURIComponent(file.url)}`"
+							:aria-label="formatMessage(messages.openSlicer)"
+							target="_blank"
+							type="quiet"
+							size="sm"
+							circular
+							icon-only
+						>
+							<CoffeeIcon aria-hidden="true" />
+						</ButtonLink>
 						<TeleportOverflowMenu
 							type="quiet"
 							size="sm"
@@ -233,7 +245,13 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ClipboardCopyIcon, DownloadIcon, ExternalIcon, MoreVerticalIcon } from '@modrinth/assets'
+import {
+	ClipboardCopyIcon,
+	CoffeeIcon,
+	DownloadIcon,
+	ExternalIcon,
+	MoreVerticalIcon,
+} from '@modrinth/assets'
 import {
 	Accordion,
 	AutoLink,

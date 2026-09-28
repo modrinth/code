@@ -614,6 +614,10 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.download',
 		defaultMessage: 'Download',
 	},
+	openSlicer: {
+		id: 'moderation.project-review.openSlicer',
+		defaultMessage: 'Open in Slicer',
+	},
 	dependencies: {
 		id: 'moderation.project-review.dependencies',
 		defaultMessage: 'Dependencies',
