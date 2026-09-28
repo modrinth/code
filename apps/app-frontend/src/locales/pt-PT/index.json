@@ -53,6 +53,9 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "O download não pôde ser concluído."
   },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Não foi possível preparar instância"
+  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Não foi possível encontrar a instância."
   },
@@ -203,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Início e conteúdo"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Trazer o Modrinth para primeiro plano ao sair do Minecraft"
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Refocar o Modrinth quando o Minecraft fechar"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Inicialização e navegação"
   },
@@ -293,6 +302,87 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Ative a sincronização de resource pack nas configurações do app primeiro."
   },
+  "app.download-manager.active": {
+    "message": "Ativo"
+  },
+  "app.download-manager.attention": {
+    "message": "Requer atenção"
+  },
+  "app.download-manager.cancel": {
+    "message": "Cancelar a instalação"
+  },
+  "app.download-manager.canceling": {
+    "message": "Cancelando a instalação…"
+  },
+  "app.download-manager.clear-all": {
+    "message": "Limpar tudo"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Limpar todas as tarefas concluídas"
+  },
+  "app.download-manager.complete": {
+    "message": "Concluído"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Instância duplicada"
+  },
+  "app.download-manager.empty": {
+    "message": "Não há tarefas de instalação"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Velocidade de transferência estimada"
+  },
+  "app.download-manager.eta": {
+    "message": "Tempo restante estimado para este transferência"
+  },
+  "app.download-manager.hide": {
+    "message": "Ocultar tarefas de instalação"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Instância importada"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "Instalação da instância"
+  },
+  "app.download-manager.modpack": {
+    "message": "Modpack"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Instalação do modpack"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Nova instância"
+  },
+  "app.download-manager.pause": {
+    "message": "Pausar a instalação"
+  },
+  "app.download-manager.paused": {
+    "message": "Em pausa"
+  },
+  "app.download-manager.remove": {
+    "message": "Remover do histórico"
+  },
+  "app.download-manager.resume": {
+    "message": "Continuar a instalação"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Instância partilhada"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "Atualização da instância compartilhada"
+  },
+  "app.download-manager.show": {
+    "message": "Mostrar tarefas de instalação"
+  },
+  "app.download-manager.tasks": {
+    "message": "Tarefas"
+  },
+  "app.download-manager.title": {
+    "message": "Gestor de transferências"
+  },
+  "app.download-manager.verifying": {
+    "message": "A verificar"
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "Abrir pasta de backups"
   },
@@ -325,6 +415,33 @@
   },
   "app.features-settings.instance-pages.title": {
     "message": "Instâncias"
+  },
+  "app.features-settings.play-page.title": {
+    "message": "Página de jogo"
+  },
+  "app.features-settings.quick-instances.description": {
+    "message": "Escolha o número máximo de instâncias recentes mostradas na barra lateral à esquerda. Também pode ajustá-la ao arrastar o divisor."
+  },
+  "app.features-settings.quick-instances.title": {
+    "message": "Instâncias rápidas na barra lateral"
+  },
+  "app.features-settings.show-all-screenshots.description": {
+    "message": "Mostrar um botão na barra lateral à esquerda para visualizar as capturas de ecrã de todas as suas instâncias"
+  },
+  "app.features-settings.show-all-screenshots.title": {
+    "message": "Mostrar todas as capturas de ecrã na barra lateral"
+  },
+  "app.features-settings.show-files-tab.title": {
+    "message": "Mostrar aba de Arquivos nas instâncias"
+  },
+  "app.features-settings.show-jump-in.description": {
+    "message": "Mostrar mundos e instâncias recentemente jogados no topo da Página de jogo."
+  },
+  "app.features-settings.show-jump-in.title": {
+    "message": "Mostrar secção de jogo rápido"
+  },
+  "app.features-settings.show-screenshots-tab.title": {
+    "message": "Mostrar aba de capturas de ecrã nas instâncias"
   },
   "app.install.phase.downloading_content": {
     "message": "Baixando conteúdo"

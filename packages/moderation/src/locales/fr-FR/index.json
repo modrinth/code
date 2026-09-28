@@ -131,6 +131,9 @@
   "nags.invalid-project-summary.title": {
     "defaultMessage": "Modifier le résumé"
   },
+  "nags.license-url.not-in-allowlist.description": {
+    "defaultMessage": "Votre URL de licence n'est pas un lien de licence reconnu. Veuillez vous assurer qu'il amène."
+  },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# en-tête} other {# en-têtes}} dans votre description {count, plural, one {est trop long} other {sont trop longs}}. Les en-têtes doivent être concis et servir de titres de section, et non de phrases complètes."
   },

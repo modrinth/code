@@ -3884,6 +3884,15 @@
   "project.settings.delete-project.title": {
     "message": "删除项目"
   },
+  "project.settings.description.title": {
+    "message": "描述"
+  },
+  "project.settings.description.updated": {
+    "message": "说明已更新"
+  },
+  "project.settings.description.updated-text": {
+    "message": "你的描述已更新。"
+  },
   "project.settings.disclosures.advertising.description.1": {
     "message": "如果你的项目包含其他作品的广告、赞助或宣传，您必须启用此选项。"
   },
@@ -4114,6 +4123,60 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.license.all-rights": {
+    "message": "保留所有权利/无许可证"
+  },
+  "project.settings.license.custom": {
+    "message": "自定义"
+  },
+  "project.settings.license.has-spdx": {
+    "message": "使用 SPDX 标识符"
+  },
+  "project.settings.license.missing-name": {
+    "message": "请输入自定义许可证的名称或SPDX标识符。"
+  },
+  "project.settings.license.name": {
+    "message": "许可证名称"
+  },
+  "project.settings.license.name-placeholder": {
+    "message": "许可证名称"
+  },
+  "project.settings.license.select": {
+    "message": "选择一个许可证"
+  },
+  "project.settings.license.select-placeholder": {
+    "message": "选择许可证……"
+  },
+  "project.settings.license.spdx-placeholder": {
+    "message": "SPDX 标识符"
+  },
+  "project.settings.license.title": {
+    "message": "许可证"
+  },
+  "project.settings.license.updated": {
+    "message": "许可证已更新"
+  },
+  "project.settings.license.updated-text": {
+    "message": "你的许可证已更新。"
+  },
+  "project.settings.license.url": {
+    "message": "许可证 URL"
+  },
+  "project.settings.links.add-link": {
+    "message": "添加链接"
+  },
+  "project.settings.links.discord": {
+    "message": "Discord 邀请"
+  },
+  "project.settings.links.donation-link": {
+    "message": "链接"
+  },
+  "project.settings.links.donation-username-placeholder": {
+    "message": "输入你的{platform}用户名"
+  },
+  "project.settings.links.site-description": {
+    "message": "您服务器的官方网页。"
   },
   "project.settings.monetization.description": {
     "message": "Modrinth上的项目会自动加入<rewards-program-link>激励计划</rewards-program-link>。如果你不想（或由于法律原因不能）从这个项目赚取收入，你可以在这里关闭它。"

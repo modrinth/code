@@ -231,7 +231,7 @@
     "message": "скачиваний"
   },
   "analytics.empty.no-data": {
-    "message": "Нет доступных данных"
+    "message": "Нет данных"
   },
   "analytics.empty.no-data-for-analytics": {
     "message": "Нет доступных данных для аналитики"
@@ -906,7 +906,7 @@
     "message": "Вход выполнен"
   },
   "auth.sign-in.launcher.opening.description": {
-    "message": "Если приложение не откроется, нажмите на кнопку ниже."
+    "message": "Если приложение не откроется, нажмите на кнопку ниже, чтобы завершить вход."
   },
   "auth.sign-in.launcher.opening.title": {
     "message": "Открытие Modrinth App..."
@@ -2199,10 +2199,10 @@
     "message": "Нет доступного мира сервера для установки."
   },
   "discover.install.error.unsupported-content-type": {
-    "message": "Контент этого типа нельзя установить на сервер через «Обзор»."
+    "message": "Этот тип контента нельзя установить на сервер из раздела «Найти»."
   },
   "discover.install.heading.reset-modpack": {
-    "message": "Выбор сборки модов для установки после сброса"
+    "message": "Выберите сборку модов, которая установится после сброса"
   },
   "discover.seo.description": {
     "message": "Находите лучшие Minecraft {projectType} на Modrinth с помощью мгновенного и точного поиска. Наши фильтры помогут быстро подобрать подходящие {projectType}."
@@ -3875,6 +3875,9 @@
   "project.settings.delete-project.title": {
     "message": "Удаление проекта"
   },
+  "project.settings.description.intro": {
+    "message": "Здесь можно ввести подробное описание вашего проекта. Описание должно четко и честно раскрывать цель и назначение проекта. Полный перечень требований см. в разделе 2.1 <rules>Правил размещения контента</rules>."
+  },
   "project.settings.description.title": {
     "message": "Описание"
   },
@@ -3882,7 +3885,7 @@
     "message": "Описание обновлено"
   },
   "project.settings.description.updated-text": {
-    "message": "Описание обновлено."
+    "message": "Описание проекта обновлено."
   },
   "project.settings.disclosures.advertising.description.1": {
     "message": "Включите если проект содержит рекламу, спонсорство или продвижение других проектов."
@@ -4118,17 +4121,38 @@
   "project.settings.license.all-rights": {
     "message": "Все права защищены/Без лицензии"
   },
+  "project.settings.license.allow-later": {
+    "message": "Допускать более поздние версии"
+  },
   "project.settings.license.custom": {
     "message": "Своя"
   },
+  "project.settings.license.custom-url-description": {
+    "message": "Расположение полного текста лицензии. Необходимо указать ссылку, так как это своя лицензия."
+  },
   "project.settings.license.has-spdx": {
-    "message": "Использует SPDX"
+    "message": "Использовать идентификатор SPDX"
+  },
+  "project.settings.license.intro": {
+    "message": "Важно выбрать подходящую лицензию для вашего {type}. Вы можете выбрать ее из нашего списка или предоставить свою лицензию. Вы также можете предоставить URL выбранной лицензии в противном случае будет лицензия будет показана в виде текста. Смотрите руководство <guide>по лицензированию</guide> для получения дополнительной информации."
+  },
+  "project.settings.license.later": {
+    "message": "Более поздние версии"
+  },
+  "project.settings.license.later-description": {
+    "message": "Выбранная лицензия поддерживается в варианте «или более поздняя». Установите флажок, если разрешаете использовать проект на условиях более поздних версий лицензии."
   },
   "project.settings.license.missing-name": {
-    "message": "Укажите название (или идентификатор SPDX) у своей лицензии."
+    "message": "Укажите название или идентификатор SPDX у своей лицензии."
+  },
+  "project.settings.license.missing-url": {
+    "message": "Укажите URL полного текста своей лицензии."
   },
   "project.settings.license.name": {
     "message": "Название лицензии"
+  },
+  "project.settings.license.name-description": {
+    "message": "Полное название лицензии. Если у неё есть идентификатор SPDX, поставьте галочку и используйте его."
   },
   "project.settings.license.name-placeholder": {
     "message": "Название лицензии"
@@ -4148,6 +4172,9 @@
   "project.settings.license.spdx": {
     "message": "Идентификатор SPDX"
   },
+  "project.settings.license.spdx-description": {
+    "message": "Если у лицензии нет официального <spdx>идентификатора SPDX</spdx>, снимите галочку и введите название лицензии."
+  },
   "project.settings.license.spdx-placeholder": {
     "message": "Идентификатор SPDX"
   },
@@ -4158,10 +4185,13 @@
     "message": "Лицензия обновлена"
   },
   "project.settings.license.updated-text": {
-    "message": "Лицензия обновлена."
+    "message": "Лицензия проекта обновлена."
   },
   "project.settings.license.url": {
     "message": "Ссылка на лицензию"
+  },
+  "project.settings.license.url-description": {
+    "message": "Расположение полного текста лицензии. Если ссылка не указана, будет отображаться текст лицензии."
   },
   "project.settings.links.add-link": {
     "message": "Добавить ссылку"
@@ -4185,16 +4215,25 @@
     "message": "Профиль"
   },
   "project.settings.links.donation-username-placeholder": {
-    "message": "Введите имя на {platform}"
+    "message": "Введите своё имя на {platform}"
   },
   "project.settings.links.donations": {
     "message": "Ссылки для поддержки"
   },
+  "project.settings.links.donations-description": {
+    "message": "Добавьте ссылки на пожертвования, чтобы пользователи могли поддерживать вас напрямую."
+  },
   "project.settings.links.issues": {
     "message": "Трекер проблем"
   },
+  "project.settings.links.issues-description": {
+    "message": "Ресурс, где пользователи могут сообщить о багах, проблемах или задать вопросы о вашем проекте."
+  },
   "project.settings.links.link-type": {
     "message": "Тип ссылки"
+  },
+  "project.settings.links.remove-donation-link": {
+    "message": "Удалить ссылку"
   },
   "project.settings.links.server-discord": {
     "message": "Discord"
@@ -4231,6 +4270,9 @@
   },
   "project.settings.links.updated-title": {
     "message": "Ссылки обновлены"
+  },
+  "project.settings.links.url-placeholder": {
+    "message": "Введите допустимый URL-адрес"
   },
   "project.settings.links.visit-link": {
     "message": "Открыть {url}"
@@ -5151,13 +5193,13 @@
     "message": "Код подтверждения"
   },
   "settings.account.two-factor.setup.intro": {
-    "message": "Двухфакторная аутентификация защищает аккаунт, требуя доступ ко второму устройству при входе в систему."
+    "message": "Двухфакторная аутентификация защищает аккаунт, требуя доступ ко второму устройству при входе."
   },
   "settings.account.two-factor.setup.manual-secret": {
     "message": "Если код не сканируется, введите ключ вручную:"
   },
   "settings.account.two-factor.setup.scan": {
-    "message": "Отсканируйте QR‑код через <authy-link>Authy</authy-link>, <microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> или любое другое приложение для генерации кодов, чтобы начать настройку."
+    "message": "Отсканируйте QR‑код в <authy-link>Authy</authy-link>, <microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> или любом другом приложении для генерации кодов, чтобы начать настройку."
   },
   "settings.account.two-factor.verify.description": {
     "message": "Введите одноразовый код подтверждения из приложения."

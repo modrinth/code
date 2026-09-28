@@ -4211,6 +4211,12 @@
   "search.filter.option.sub_options.expand.tooltip": {
     "defaultMessage": "詳細オプションを表示"
   },
+  "search.filter_type.advanced": {
+    "defaultMessage": "高度な除外設定"
+  },
+  "search.filter_type.advanced.disclosure.advertisements": {
+    "defaultMessage": "広告"
+  },
   "search.filter_type.advanced.disclosure.ai_content": {
     "defaultMessage": "AI生成コンテンツ"
   },

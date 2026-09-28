@@ -53,6 +53,9 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "İndirme tamamlanamadı"
   },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Örnek hazırlanamadı"
+  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Dosya yolu geçersiz"
   },
@@ -203,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Ana sayfa ve içerik"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Minecraft'tan çıkıldığında Modrinth App'i ön plana getirir."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Minecraft kapandığında uygulamaya yeniden odaklan"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Başlatma ve gezinme"
   },
@@ -295,6 +304,12 @@
   },
   "app.download-manager.active": {
     "message": "Aktif"
+  },
+  "app.download-manager.attention": {
+    "message": "İlgilenmen gerekiyor"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "{count, plural, one {# öğe} other {# öğe}} güncelleniyor"
   },
   "app.download-manager.cancel": {
     "message": "İndirmeyi iptal et"
@@ -1448,6 +1463,9 @@
   "app.quick-instance-switcher.instance-locked": {
     "message": "Bu kurulum kilitlenmiştir"
   },
+  "app.quick-instance-switcher.title": {
+    "message": "Son kurulumlar"
+  },
   "app.quick-instance-switcher.view-instance": {
     "message": "Kurulumu göster"
   },
@@ -2042,14 +2060,44 @@
   "app.settings.game-options.keybind.mouse.right": {
     "message": "Sağ Fare"
   },
+  "app.settings.game-options.keybind.recording-label": {
+    "message": "{setting}: bir tuş veya fare dinleniyor. Bu kısayolu temizlemek için Escape (ESC) tuşuna basın."
+  },
+  "app.settings.game-options.keybind.scancode": {
+    "message": "Tarama kodu {code}"
+  },
+  "app.settings.game-options.keybind.unsupported-status": {
+    "message": "Bu girdi Minecraft tarafından kullanılamaz. Başka bir tuşa basın."
+  },
   "app.settings.game-options.setting.advanced-opengl.label": {
     "message": "Gelişmiş OpenGL"
+  },
+  "app.settings.game-options.setting.allow-cursor-changes.label": {
+    "message": "İmleç değişikliklerine izin ver"
+  },
+  "app.settings.game-options.setting.allow-server-listing.description": {
+    "message": "Oyuncunun adının sunucu listelerinde görünmesine izin verir."
+  },
+  "app.settings.game-options.setting.allow-server-listing.label": {
+    "message": "Sunucu listeleri"
+  },
+  "app.settings.game-options.setting.alternate-blocks.label": {
+    "message": "Alternatif bloklar"
   },
   "app.settings.game-options.setting.ambient-occlusion.label": {
     "message": "Yumuşak aydınlatma"
   },
   "app.settings.game-options.setting.ambient-volume.label": {
     "message": "Ortam/Çevre"
+  },
+  "app.settings.game-options.setting.anaglyph-3d.label": {
+    "message": "3B Anaglif"
+  },
+  "app.settings.game-options.setting.anisotropic-filtering.label": {
+    "message": "Anizotropik filtreleme"
+  },
+  "app.settings.game-options.setting.anisotropy.label": {
+    "message": "Anizotropi"
   },
   "app.settings.game-options.setting.attack-indicator.label": {
     "message": "Saldırı göstergesi"
@@ -2066,6 +2114,12 @@
   "app.settings.game-options.setting.autosave-indicator.label": {
     "message": "Otomatik kaydetme simgesi"
   },
+  "app.settings.game-options.setting.biome-blend-radius.description": {
+    "message": "Biyom renklerinin geçiş yaptığı mesafe."
+  },
+  "app.settings.game-options.setting.biome-blend-radius.label": {
+    "message": "Biyom karışımı"
+  },
   "app.settings.game-options.setting.blocks-volume.label": {
     "message": "Bloklar"
   },
@@ -2078,11 +2132,32 @@
   "app.settings.game-options.setting.cape.label": {
     "message": "Pelerin"
   },
+  "app.settings.game-options.setting.chat-background-only.label": {
+    "message": "Yalnızca sohbet arka planı"
+  },
   "app.settings.game-options.setting.chat-colors.label": {
     "message": "Sohbet renkleri"
   },
   "app.settings.game-options.setting.chat-delay.label": {
     "message": "Sohbet gecikmesi"
+  },
+  "app.settings.game-options.setting.chat-line-spacing.label": {
+    "message": "Sohbet satırı aralığı"
+  },
+  "app.settings.game-options.setting.chat-links-prompt.description": {
+    "message": "Sohbetteki bağlantıları açmadan önce sor."
+  },
+  "app.settings.game-options.setting.chat-links-prompt.label": {
+    "message": "Bağlantılarda iletişim kutusu"
+  },
+  "app.settings.game-options.setting.chat-links.description": {
+    "message": "Sohbetteki web bağlantılarının açılmasına izin ver."
+  },
+  "app.settings.game-options.setting.chat-links.label": {
+    "message": "Web bağlantıları"
+  },
+  "app.settings.game-options.setting.chat-opacity.description": {
+    "message": "Sohbet metninin opaklığı."
   },
   "app.settings.game-options.setting.chat-opacity.label": {
     "message": "Sohbet opaklığı"
@@ -2099,6 +2174,9 @@
   "app.settings.game-options.setting.chat-width.label": {
     "message": "Sohbet genişliği"
   },
+  "app.settings.game-options.setting.chunk-fade-time.label": {
+    "message": "Chunk solma süresi"
+  },
   "app.settings.game-options.setting.cloud-range.label": {
     "message": "Bulut mesafesi"
   },
@@ -2107,6 +2185,18 @@
   },
   "app.settings.game-options.setting.dark-splash.description": {
     "message": "Mojang Studios yüklenme ekranını kırmızıdan siyaha çevir."
+  },
+  "app.settings.game-options.setting.dark-splash.label": {
+    "message": "Tek renkli logo"
+  },
+  "app.settings.game-options.setting.debug-gui-scale.label": {
+    "message": "Hata ayıklama GUI'ının ölçeği"
+  },
+  "app.settings.game-options.setting.directional-audio.label": {
+    "message": "Çok yönlü ses"
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.description": {
+    "message": "Her fare tekerleği girişini tek bir kaydırma adımı olarak değerlendirin."
   },
   "app.settings.game-options.setting.entity-distance.label": {
     "message": "Varlık mesafesi"

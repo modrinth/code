@@ -722,6 +722,12 @@
   "content.page-layout.failed-to-load": {
     "defaultMessage": "無法載入內容"
   },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "無法載入更新日誌"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "無法載入可用更新"
+  },
   "content.page-layout.filter.add": {
     "defaultMessage": "篩選條件"
   },
@@ -4476,7 +4482,7 @@
     "defaultMessage": "不再顯示"
   },
   "search.photosensitivity-warning-modal.title": {
-    "defaultMessage": "搜尋結果不能保證安全"
+    "defaultMessage": "搜尋結果無法保證安全"
   },
   "search.server_content_type.modpack": {
     "defaultMessage": "含模組"
@@ -6796,6 +6802,78 @@
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "無法辨識的檔案"
+  },
+  "update-all-modal.changelog-for": {
+    "defaultMessage": "{project} 的更新日誌"
+  },
+  "update-all-modal.changelog-loaded": {
+    "defaultMessage": "更新日誌已載入。"
+  },
+  "update-all-modal.close-changelog": {
+    "defaultMessage": "關閉更新日誌"
+  },
+  "update-all-modal.current-version": {
+    "defaultMessage": "目前版本"
+  },
+  "update-all-modal.empty": {
+    "defaultMessage": "沒有可用的更新。"
+  },
+  "update-all-modal.header": {
+    "defaultMessage": "更新專案"
+  },
+  "update-all-modal.loading": {
+    "defaultMessage": "正在載入更新…"
+  },
+  "update-all-modal.loading-changelog": {
+    "defaultMessage": "正在載入更新日誌…"
+  },
+  "update-all-modal.new-version": {
+    "defaultMessage": "新版本"
+  },
+  "update-all-modal.no-changelog": {
+    "defaultMessage": "這個版本沒有提供更新日誌。"
+  },
+  "update-all-modal.no-compatible-updates": {
+    "defaultMessage": "沒有可用的相容更新。"
+  },
+  "update-all-modal.no-version": {
+    "defaultMessage": "沒有相容的更新"
+  },
+  "update-all-modal.project": {
+    "defaultMessage": "專案"
+  },
+  "update-all-modal.project-list": {
+    "defaultMessage": "專案更新"
+  },
+  "update-all-modal.results": {
+    "defaultMessage": "{count, plural, other {# 個專案可供更新}}"
+  },
+  "update-all-modal.select-all": {
+    "defaultMessage": "選取所有專案"
+  },
+  "update-all-modal.select-project": {
+    "defaultMessage": "選取 {project} 以更新"
+  },
+  "update-all-modal.select-version": {
+    "defaultMessage": "{project} 的新版本"
+  },
+  "update-all-modal.update": {
+    "defaultMessage": "更新 {count, plural, other {# 個專案}}"
+  },
+  "update-all-modal.versions": {
+    "defaultMessage": "目前版本／新版本"
+  },
+  "update-all-modal.view": {
+    "defaultMessage": "查看"
+  },
+  "update-all-modal.view-changelog": {
+    "defaultMessage": "查看 {project} 的更新日誌"
+  },
+  "update-all-modal.warning": {
+    "defaultMessage": "我們無法保證更新不會影響你的世界。請檢閱更新日誌，並考慮進行備份。"
+  },
+  "update-all-modal.warning-server": {
+    "defaultMessage": "我們無法保證更新不會影響你的伺服器。請檢閱更新日誌，並考慮進行備份。"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "這個使用者自 Modrinth Alpha 時期便已加入，早在該版本於2020年11月結束之前。"

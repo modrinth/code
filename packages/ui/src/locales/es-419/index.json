@@ -722,6 +722,12 @@
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Error al cargar contenido"
   },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "No se ha podido cargar el contenido"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "Error al cargar las actualizaciones disponibles"
+  },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtro"
   },
@@ -6796,6 +6802,78 @@
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "Archivos no reconocidos"
+  },
+  "update-all-modal.changelog-for": {
+    "defaultMessage": "Cambios para {project}"
+  },
+  "update-all-modal.changelog-loaded": {
+    "defaultMessage": "Registro de cambios cargado."
+  },
+  "update-all-modal.close-changelog": {
+    "defaultMessage": "Cerrar registro de cambios"
+  },
+  "update-all-modal.current-version": {
+    "defaultMessage": "Versión actual"
+  },
+  "update-all-modal.empty": {
+    "defaultMessage": "No hay actualizaciones disponibles."
+  },
+  "update-all-modal.header": {
+    "defaultMessage": "Actualizar proyectos"
+  },
+  "update-all-modal.loading": {
+    "defaultMessage": "Loading updates…"
+  },
+  "update-all-modal.loading-changelog": {
+    "defaultMessage": "Cargando registro de cambios…"
+  },
+  "update-all-modal.new-version": {
+    "defaultMessage": "Nueva versión"
+  },
+  "update-all-modal.no-changelog": {
+    "defaultMessage": "Ningún registro de cambios proporcionado para esta versión."
+  },
+  "update-all-modal.no-compatible-updates": {
+    "defaultMessage": "No hay actualizaciones compatibles disponibles."
+  },
+  "update-all-modal.no-version": {
+    "defaultMessage": "No hay actualizaciones compatibles"
+  },
+  "update-all-modal.project": {
+    "defaultMessage": "Proyecto"
+  },
+  "update-all-modal.project-list": {
+    "defaultMessage": "Actualizaciones del proyecto"
+  },
+  "update-all-modal.results": {
+    "defaultMessage": "{count, plural,one {# proyecto seleccionado} other {# proyectos seleccionados}}"
+  },
+  "update-all-modal.select-all": {
+    "defaultMessage": "Select all projects"
+  },
+  "update-all-modal.select-project": {
+    "defaultMessage": "Seleccionar {project} para actualizar"
+  },
+  "update-all-modal.select-version": {
+    "defaultMessage": "Nueva versión para {project}"
+  },
+  "update-all-modal.update": {
+    "defaultMessage": "Actualizar {count, plural, one {# proyecto} other {# proyectos}}"
+  },
+  "update-all-modal.versions": {
+    "defaultMessage": "Versión actual / Nueva versión"
+  },
+  "update-all-modal.view": {
+    "defaultMessage": "Ver"
+  },
+  "update-all-modal.view-changelog": {
+    "defaultMessage": "Cambios para {project}"
+  },
+  "update-all-modal.warning": {
+    "defaultMessage": "No podemos garantizar que las actualizaciones sean seguras para tus mundos. Revisa el registro de cambios de todas las versiones intermedias y considera crear una copia de seguridad."
+  },
+  "update-all-modal.warning-server": {
+    "defaultMessage": "No podemos garantizar que las actualizaciones sean seguras para tus mundos. Revisa el registro de cambios de todas las versiones intermedias y considera crear una copia de seguridad."
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Este usuario ha estado presente desde la Alpha de Modrinth, la cuál terminó en noviembre de 2020."

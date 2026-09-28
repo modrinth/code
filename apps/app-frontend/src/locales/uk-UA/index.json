@@ -206,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Головна й уміст"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Виводити Modrinth App на передній план, коли Minecraft закривається."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Повернути фокус при закритті Minecraft"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Запуск і навігація"
   },
@@ -301,6 +307,9 @@
   },
   "app.download-manager.attention": {
     "message": "Потребує уваги"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "Оновлення {count, plural, one {# елемента} few {# елементів} many {# елементів} other {# елементів}}"
   },
   "app.download-manager.cancel": {
     "message": "Скасувати встановлення"
@@ -2721,7 +2730,7 @@
     "message": "Реклама підтримує існування Modrinth і фінансує виплати творцям. Наші партнери можуть зберігати й отримувати доступ до cookie в застосунку, щоб персоналізувати рекламу та збирати метрики. Ви можете відмовитися від них або керувати налаштуваннями нижче."
   },
   "app.settings.privacy.discord-rich-presence.description": {
-    "message": "Показувати застосунок Modrinth як вашу поточну активність у Discord. Це не впливає на активність, додану модами. Потребує перезапуску застосунку."
+    "message": "Показувати Modrinth App як вашу поточну активність у Discord. Це не впливає на активність, додану модами. Потребує перезапуску застосунку."
   },
   "app.settings.privacy.discord-rich-presence.title": {
     "message": "Discord Rich Presence"

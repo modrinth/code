@@ -722,6 +722,12 @@
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Inhalte konnten nicht geladen werden"
   },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "Änderungsprotokoll konnte nicht geladen werden"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "Fehler beim Laden der verfügbaren Updates"
+  },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
   },
@@ -6796,6 +6802,78 @@
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "Nicht erkannte Dateien"
+  },
+  "update-all-modal.changelog-for": {
+    "defaultMessage": "Änderungsprotokoll für {project}"
+  },
+  "update-all-modal.changelog-loaded": {
+    "defaultMessage": "Änderungsprotokoll geladen."
+  },
+  "update-all-modal.close-changelog": {
+    "defaultMessage": "Änderungsprotokoll schließen"
+  },
+  "update-all-modal.current-version": {
+    "defaultMessage": "Aktuelle Version"
+  },
+  "update-all-modal.empty": {
+    "defaultMessage": "Keine Aktualisierungen verfügbar."
+  },
+  "update-all-modal.header": {
+    "defaultMessage": "Projekte aktualisieren"
+  },
+  "update-all-modal.loading": {
+    "defaultMessage": "Aktualisierungen werden geladen…"
+  },
+  "update-all-modal.loading-changelog": {
+    "defaultMessage": "Änderungsprotokoll wird geladen…"
+  },
+  "update-all-modal.new-version": {
+    "defaultMessage": "Neue Version"
+  },
+  "update-all-modal.no-changelog": {
+    "defaultMessage": "Kein Änderungsprotokoll für diese Version verfügbar."
+  },
+  "update-all-modal.no-compatible-updates": {
+    "defaultMessage": "Keine kompatiblen Updates verfügbar."
+  },
+  "update-all-modal.no-version": {
+    "defaultMessage": "Keine kompatiblen Updates"
+  },
+  "update-all-modal.project": {
+    "defaultMessage": "Projekt"
+  },
+  "update-all-modal.project-list": {
+    "defaultMessage": "Projekt-Updates"
+  },
+  "update-all-modal.results": {
+    "defaultMessage": "{count, plural, one {# Projekt bereit zum Aktualisieren} other {# Projekte bereit}}"
+  },
+  "update-all-modal.select-all": {
+    "defaultMessage": "Alle Projekte auswählen"
+  },
+  "update-all-modal.select-project": {
+    "defaultMessage": "{project} für Update auswählen"
+  },
+  "update-all-modal.select-version": {
+    "defaultMessage": "Neue Version für {project}"
+  },
+  "update-all-modal.update": {
+    "defaultMessage": "  Aktualisiere {count, plural, one {# Projekt} other {# Projekte}}"
+  },
+  "update-all-modal.versions": {
+    "defaultMessage": "Aktuelle Version / Neue Version"
+  },
+  "update-all-modal.view": {
+    "defaultMessage": "Ansicht"
+  },
+  "update-all-modal.view-changelog": {
+    "defaultMessage": "  Änderungsprotokoll für {project} anzeigen"
+  },
+  "update-all-modal.warning": {
+    "defaultMessage": "Wir können nicht garantieren, dass Aktualisierungen für deine Welten sicher sind. Überprüfe das Änderungsprotokoll für alle Zwischenversionen und erstelle gegebenenfalls ein Backup."
+  },
+  "update-all-modal.warning-server": {
+    "defaultMessage": "Wir können nicht garantieren, dass Updates für deinen Server sicher sind. Überprüfe die Changelogs und erwäge eine Sicherung."
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Dieser Benutzer ist seit der Alpha von Modrinth dabei, die im November 2020 endete."

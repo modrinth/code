@@ -53,6 +53,9 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Không hoàn tất tải xuống"
   },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Không thể chuẩn bị instance"
+  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Đường dẫn tệp tin không hợp lệ"
   },
@@ -203,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Nhà và nội dung"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Đưa ứng dụng Modrinth lên phía trước khi Minecraft thoát."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Chuyển tiêu điểm về lại ứng dụng khi Minecraft đóng"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Khởi động và điều hướng"
   },
@@ -281,8 +290,101 @@
   "app.content.desync-pack": {
     "message": "Bỏ đồng bộ"
   },
+  "app.content.sync-data-packs-disabled": {
+    "message": "Trước tiên, hãy bật tính năng đồng bộ hóa gói dữ liệu trong phần cài đặt ứng dụng."
+  },
   "app.content.sync-pack": {
     "message": "Đồng bộ"
+  },
+  "app.content.sync-packs-override": {
+    "message": "Trước tiên, hãy tắt tính năng ghi đè đồng bộ gói trong phần cài đặt của phiên bản này."
+  },
+  "app.content.sync-resource-packs-disabled": {
+    "message": "Trước tiên, hãy bật tính năng đồng bộ hóa gói tài nguyên trong phần cài đặt ứng dụng."
+  },
+  "app.download-manager.active": {
+    "message": "Hoạt động"
+  },
+  "app.download-manager.attention": {
+    "message": "Cần được chú ý"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "Đang cập nhật {count, plural, one {# mục} other {# mục}}"
+  },
+  "app.download-manager.cancel": {
+    "message": "Hủy cài đặt"
+  },
+  "app.download-manager.canceling": {
+    "message": "Đang hủy cài đặt…"
+  },
+  "app.download-manager.clear-all": {
+    "message": "Xóa tất cả"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Xóa tất cả các tác vụ đã hoàn thành"
+  },
+  "app.download-manager.complete": {
+    "message": "Hoàn thành"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Phiên bản trùng lặp"
+  },
+  "app.download-manager.empty": {
+    "message": "Không có tác vụ cài đặt nào"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Tốc độ tải xuống ước tính"
+  },
+  "app.download-manager.eta": {
+    "message": "Thời gian còn lại ước tính cho quá trình tải xuống này"
+  },
+  "app.download-manager.hide": {
+    "message": "Ẩn tác vụ cài đặt"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Phiên bản đã nhập"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "Cài đặt phiên bản"
+  },
+  "app.download-manager.modpack": {
+    "message": "Modpack"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Cài đặt modpack"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Phiên bản mới"
+  },
+  "app.download-manager.pause": {
+    "message": "Tạm dừng cài đặt"
+  },
+  "app.download-manager.paused": {
+    "message": "Đã tạm dừng"
+  },
+  "app.download-manager.remove": {
+    "message": "Xóa khỏi lịch sử"
+  },
+  "app.download-manager.resume": {
+    "message": "Tiếp tục cài đặt"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Phiên bản được chia sẻ"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "Cập nhật phiên bản được chia sẻ"
+  },
+  "app.download-manager.show": {
+    "message": "Hiển thị tác vụ cài đặt"
+  },
+  "app.download-manager.tasks": {
+    "message": "Nhiệm vụ"
+  },
+  "app.download-manager.title": {
+    "message": "Trình quản lý tải xuống"
+  },
+  "app.download-manager.verifying": {
+    "message": "Đang xác minh"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Mở thư mục sao lưu"
@@ -314,11 +416,29 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.features-settings.instance-pages.title": {
+    "message": "Cấu hình"
+  },
+  "app.features-settings.quick-instances.description": {
+    "message": "Chọn số lượng tối đa các mục gần đây hiển thị ở thanh bên trái. Bạn cũng có thể điều chỉnh điều này bằng cách kéo thanh phân cách."
+  },
+  "app.features-settings.quick-instances.title": {
+    "message": "Các phiên bản nhanh trong thanh bên"
+  },
   "app.features-settings.show-skin-selector.title": {
     "message": "Hiển thị phần chọn skin ở thanh bên"
   },
   "app.features-settings.sidebar.title": {
     "message": "Thanh bên"
+  },
+  "app.features-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Đăng nhập vào tài khoản Modrinth để đồng bộ hóa cài đặt."
+  },
+  "app.features-settings.sync-across-devices.title": {
+    "message": "Đồng bộ hóa các tính năng trên các thiết bị"
+  },
+  "app.home.jump-back-in.actions.label": {
+    "message": "Các thao tác trên thực thể"
   },
   "app.home.jump-back-in.instance-locked": {
     "message": "Phiên bản này đã bị khóa"
@@ -479,6 +599,9 @@
   "app.instance.share.empty.heading": {
     "message": "Không có bạn để mời"
   },
+  "app.instance.share.invite-modal.heading": {
+    "message": "Chia sẻ {name}"
+  },
   "app.instance.share.invite-modal.user-limit-reached": {
     "message": "Phiên bản này đã đạt đến giới hạn {limit} người dùng."
   },
@@ -491,6 +614,9 @@
   "app.instance.share.locked.linked-account-fallback": {
     "message": "tài khoản được liên kết"
   },
+  "app.instance.share.locked.signed-out-heading": {
+    "message": "Chưa đăng nhập"
+  },
   "app.instance.share.locked.switch-account-button": {
     "message": "Đổi tài khoản"
   },
@@ -499,6 +625,9 @@
   },
   "app.instance.share.members.empty": {
     "message": "Chưa có người dùng nào tham gia"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "message": "Không có người dùng nào khớp với các bộ lọc của bạn."
   },
   "app.instance.worlds.add-server": {
     "message": "Thêm máy chủ"
@@ -556,6 +685,9 @@
   },
   "app.library.instance.action.delete": {
     "message": "Xoá"
+  },
+  "app.library.title": {
+    "message": "Thư viện"
   },
   "app.modal.install-to-play.header": {
     "message": "Tải xuống để chơi"

@@ -2525,6 +2525,21 @@
   "app.settings.game-options.setting.max-framerate.label": {
     "message": "최대 프레임 속도"
   },
+  "app.settings.game-options.setting.music-volume.label": {
+    "message": "음악"
+  },
+  "app.settings.game-options.setting.narrator.label": {
+    "message": "나레이터"
+  },
+  "app.settings.game-options.setting.particles.label": {
+    "message": "파티클"
+  },
+  "app.settings.game-options.setting.simulation-distance.label": {
+    "message": "시뮬레이션 거리"
+  },
+  "app.settings.game-options.setting.subtitles.label": {
+    "message": "자막"
+  },
   "app.settings.game-options.setting.unfocused-chat-height.label": {
     "message": "포커스 없는 채팅 높이"
   },

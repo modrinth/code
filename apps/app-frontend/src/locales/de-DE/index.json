@@ -206,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Startseite & Inhalte"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Bringe die Modrinth App in den Vordergrund, wenn Minecraft beendet wird."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "App neu fokussieren, wenn Minecraft geschlossen wird"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Start & Navigation"
   },
@@ -249,7 +255,7 @@
     "message": "Bereits hinzugefügte Server ausblenden"
   },
   "app.browse.hide-installed-modpacks": {
-    "message": "Bereits installiert ausblenden"
+    "message": "Bereits installierte ausblenden"
   },
   "app.browse.project-actions.label": {
     "message": "Projektaktionen"
@@ -301,6 +307,9 @@
   },
   "app.download-manager.attention": {
     "message": "Erfordert Aufmerksamkeit"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "{count, plural, one {# Element} other {# Elemente}}"
   },
   "app.download-manager.cancel": {
     "message": "Installation abbrechen"
@@ -2919,7 +2928,7 @@
     "message": "Synchronisieren"
   },
   "app.settings.synced-options.command-history": {
-    "message": "Synchronisiere den Befehlsverlauf"
+    "message": "Befehlsverlauf synchronisieren"
   },
   "app.settings.synced-options.command-history.description": {
     "message": "Verwende denselben Befehlsverlauf für alle deine Instanzen."
@@ -2928,7 +2937,7 @@
     "message": "Befehlsverlauf bearbeiten"
   },
   "app.settings.synced-options.creative-hotbars": {
-    "message": "Synchronisiere gespeicherte Kreativ-Schnellzugriffleisten"
+    "message": "Gespeicherte Kreativ-Schnellzugriffleisten synchronisieren"
   },
   "app.settings.synced-options.creative-hotbars.description": {
     "message": "Verwende dieselben gespeicherten Kreativ-Schnellzugriffleisten in all deinen Instanzen."
@@ -2967,7 +2976,7 @@
     "message": "Verwende dieselben Spieloptionen für alle deine Instanzen."
   },
   "app.settings.synced-options.game-settings.disable-all": {
-    "message": "Alles desynchronisieren"
+    "message": "Alle desynchronisieren"
   },
   "app.settings.synced-options.game-settings.disabled-tooltip": {
     "message": "Aktiviere die Synchronisierung der Spieleinstellungen, bevor du einzelne Einstellungen auswählst."
@@ -4209,7 +4218,7 @@
     "message": "Teilen"
   },
   "instance.settings.tabs.synced-options.command-history": {
-    "message": "Desynchronisiere den Befehlsverlauf"
+    "message": "Befehlsverlauf desynchronisieren"
   },
   "instance.settings.tabs.synced-options.command-history.disabled-in-app": {
     "message": "Synchronisierung des Befehlsverlaufs ist in den Einstellungen der App deaktiviert."
@@ -4218,7 +4227,7 @@
     "message": "Den Befehlsverlauf dieser Instanz separat von dem synchronisierten Befehlsverlauf halten."
   },
   "instance.settings.tabs.synced-options.creative-hotbars": {
-    "message": "Desynchronisiere gespeicherte Kreativ-Schnellzugriffleisten"
+    "message": "Gespeicherte Kreativ-Schnellzugriffleisten desynchronisieren"
   },
   "instance.settings.tabs.synced-options.creative-hotbars.disabled-in-app": {
     "message": "Synchronisierung der gespeicherten Kreativ-Schnellzugriffleisten ist in den Einstellungen der App deaktiviert."
