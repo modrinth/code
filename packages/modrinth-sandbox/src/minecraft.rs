@@ -1,6 +1,3 @@
-#[cfg(target_os = "linux")]
-mod linux;
-
 use std::{
     collections::BTreeMap,
     ffi::OsString,
