@@ -16,6 +16,7 @@
 			:target="{ kind: 'undefined-project' }"
 		/>
 		<ReviewPanel
+			v-if="resolve({ kind: 'versions' })"
 			mode="inline"
 			:target="{ kind: 'versions' }"
 			:hotkey-scope="hotkeyScope"
@@ -28,7 +29,10 @@
 		<div class="min-h-0 flex-1 overflow-auto">
 			<div class="mr-0.5 mt-0.5 flex flex-col gap-1">
 				<div class="flex justify-between">
-					<div class="flex flex-wrap items-center gap-x-6 gap-y-2 pl-2.5">
+					<div
+						v-if="versions.length || fileCount || withheldCount"
+						class="flex flex-wrap items-center gap-x-6 gap-y-2 pl-2.5"
+					>
 						<h2 class="m-0 flex items-center gap-2 text-sm font-semibold text-secondary">
 							{{ formatMessage(messages.versions) }}
 							<span class="text-contrast">{{ versions.length }}</span>

@@ -126,9 +126,26 @@
 			</div>
 		</div>
 	</div>
-	<p v-else class="m-0 text-base text-secondary">
-		{{ formatMessage(panelBinding ? messages.noIssues : messages.noReviewActions) }}
-	</p>
+	<div v-else class="flex items-center gap-2 text-secondary">
+		<p class="m-0 text-base">
+			{{ formatMessage(panelBinding ? messages.noIssues : messages.noReviewActions) }}
+		</p>
+		<Tooltip
+			v-if="panelBinding && !panelBinding.panel.title && panelBinding.panel.hint"
+			:text="panelBinding.panel.hint"
+			class="flex shrink-0 text-secondary"
+		>
+			<a
+				:href="panelBinding.panel.guidanceUrl"
+				target="_blank"
+				rel="noopener noreferrer"
+				:aria-label="formatMessage(messages.openReviewGuidance)"
+				class="flex text-secondary hover:text-contrast"
+			>
+				<InfoIcon class="size-4" aria-hidden="true" />
+			</a>
+		</Tooltip>
+	</div>
 	<div
 		v-if="!binding && target?.kind === 'status-alerts' && panels.correctionsRequested.value"
 		class="flex flex-col gap-3"
