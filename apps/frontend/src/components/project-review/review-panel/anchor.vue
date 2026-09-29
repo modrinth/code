@@ -22,28 +22,13 @@
 				:count="selectedFindingCount"
 				class="absolute right-0 top-0"
 			/>
-			<button
-				v-if="available"
-				ref="trigger"
-				type="button"
-				class="pointer-events-none absolute top-0 z-20 flex size-7 cursor-pointer items-center justify-center rounded-lg border border-solid border-surface-5 bg-surface-3 text-contrast opacity-0 focus-visible:pointer-events-auto focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow [@media(hover:none)]:pointer-events-auto [@media(hover:none)]:opacity-100"
-				:class="selectedFindingCount > 0 ? 'right-6' : 'right-0'"
-				:aria-label="label"
-				:aria-expanded="active?.id === id"
-				:aria-controls="active?.id === id ? panelId : undefined"
-				aria-haspopup="dialog"
-				@click.stop="openAndFocus"
-			>
-				<ListBulletedIcon class="size-4" aria-hidden="true" />
-			</button>
 		</Highlight>
 	</component>
 </template>
 
 <script setup lang="ts">
-import { ListBulletedIcon } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
 import type { ReviewTarget } from '~/providers/project-review/review'
@@ -57,18 +42,15 @@ const props = withDefaults(
 	defineProps<{
 		anchorId: string
 		target: ReviewTarget
-		label: string
 		as?: 'section' | 'div' | 'article'
 		disabled?: boolean
 		showFindingBadge?: boolean
 	}>(),
 	{ as: 'div', showFindingBadge: true },
 )
-const { active, panel, panelId, isAvailable, open, release, leave, cancelClose } =
-	injectReviewContext()
+const { active, isAvailable, open, release, leave, cancelClose } = injectReviewContext()
 const id = props.anchorId
 const element = ref<HTMLElement>()
-const trigger = ref<HTMLButtonElement>()
 const available = computed(() => !props.disabled && isAvailable(props.target))
 const settings = useModerationSettings()
 const panels = injectReviewPanels()
@@ -78,24 +60,14 @@ const selectedFindingCount = computed(() => {
 	return panels.selectedFindingCount(binding)
 })
 
-function show(explicit = false) {
+function show() {
 	if (!element.value || !available.value) return
-	open(
-		{
-			id,
-			target: props.target,
-			element: element.value,
-			trigger: trigger.value ?? null,
-			available: () => available.value,
-		},
-		explicit,
-	)
-}
-
-async function openAndFocus() {
-	show(true)
-	await nextTick()
-	if (active.value?.id === id) panel.value?.focus()
+	open({
+		id,
+		target: props.target,
+		element: element.value,
+		available: () => available.value,
+	})
 }
 
 function onPointerOver(event: PointerEvent) {

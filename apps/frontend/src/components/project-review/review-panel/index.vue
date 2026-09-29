@@ -4,7 +4,6 @@
 		v-bind="$attrs"
 		:anchor-id="id"
 		:target="target"
-		:label="accessibleTitle"
 		:as="as"
 		:disabled="disabled"
 		:show-finding-badge="showFindingBadge"

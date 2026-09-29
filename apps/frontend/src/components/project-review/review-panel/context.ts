@@ -1,6 +1,6 @@
 import { createContext } from '@modrinth/ui'
 import { useRafFn } from '@vueuse/core'
-import { nextTick, onScopeDispose, type Ref, ref, shallowRef, useId, watch } from 'vue'
+import { onScopeDispose, type Ref, ref, shallowRef, useId, watch } from 'vue'
 
 import type { ReviewTarget } from '~/providers/project-review/review'
 
@@ -8,7 +8,6 @@ export interface ReviewAnchor {
 	id: string
 	target: ReviewTarget
 	element: HTMLElement
-	trigger: HTMLElement | null
 	available: () => boolean
 }
 
@@ -55,27 +54,21 @@ export function createReviewContext(
 		}
 	}
 
-	function close(restoreFocus = false) {
-		const trigger = active.value?.trigger
+	function close() {
 		cancelClose()
 		clearTimeout(openTimer)
 		pendingAnchor.value = undefined
 		active.value = undefined
 		openDropdowns = 0
 		pinned.value = false
-		if (restoreFocus) {
-			void nextTick(() => {
-				if (trigger?.isConnected) trigger.focus()
-			})
-		}
 	}
 
-	function open(anchor: ReviewAnchor, explicit = false) {
+	function open(anchor: ReviewAnchor) {
 		clearTimeout(openTimer)
 		pendingAnchor.value = undefined
 		const show = () => {
 			pendingAnchor.value = undefined
-			if ((pinned.value || openDropdowns > 0) && !explicit) return
+			if (pinned.value || openDropdowns > 0) return
 			if (!isAnchorVisible(anchor) || !anchor.available() || !isAvailable(anchor.target)) return
 			cancelClose()
 			if (active.value?.id !== anchor.id) {
@@ -84,11 +77,8 @@ export function createReviewContext(
 			}
 			active.value = anchor
 		}
-		if (explicit) show()
-		else {
-			pendingAnchor.value = anchor
-			openTimer = setTimeout(show, 100)
-		}
+		pendingAnchor.value = anchor
+		openTimer = setTimeout(show, 100)
 	}
 
 	function leave(id: string) {
@@ -124,7 +114,7 @@ export function createReviewContext(
 			clearTimeout(openTimer)
 			pendingAnchor.value = undefined
 		}
-		if (active.value?.id === id) close(!!panel.value?.contains(document.activeElement))
+		if (active.value?.id === id) close()
 	}
 
 	function isAnchorVisible(anchor: ReviewAnchor) {

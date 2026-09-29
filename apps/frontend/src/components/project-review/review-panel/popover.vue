@@ -34,7 +34,7 @@
 						size="sm"
 						:label="formatMessage(messages.closeReview)"
 						type="quiet"
-						@click="dismiss(true)"
+						@click="dismiss()"
 					>
 						<XIcon />
 					</IconButton>
@@ -71,8 +71,13 @@ const { floatingStyles, isPositioned } = useFloating(reference, element, {
 	whileElementsMounted: autoUpdate,
 	middleware: [
 		offset(10),
-		flip({ crossAxis: false, flipAlignment: false }),
-		shift({ padding: 8 }),
+		flip({
+			padding: 8,
+			crossAxis: false,
+			flipAlignment: false,
+			fallbackPlacements: ['left-start', 'bottom-start', 'top-start'],
+		}),
+		shift({ padding: 8, crossAxis: false }),
 		size({
 			padding: 8,
 			apply: ({ availableHeight, elements }) => {
@@ -82,15 +87,15 @@ const { floatingStyles, isPositioned } = useFloating(reference, element, {
 	],
 })
 
-function dismiss(restoreFocus = false) {
-	if (active.value?.id === props.anchor.id) close(restoreFocus)
+function dismiss() {
+	if (active.value?.id === props.anchor.id) close()
 }
 
 function onKeydown(event: KeyboardEvent) {
 	if (event.key !== 'Escape' || event.defaultPrevented) return
 	event.preventDefault()
 	event.stopPropagation()
-	dismiss(true)
+	dismiss()
 }
 
 watch(element, (value, previous) => {
