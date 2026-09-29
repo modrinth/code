@@ -1,7 +1,7 @@
 #![doc = include_str!("../README.md")]
 
 mod backend;
-// pub mod ffi;
+pub mod ffi;
 pub mod minecraft;
 mod util;
 
@@ -116,7 +116,7 @@ pub struct SandboxCommand {
     /// These take precedence over passthrough variables with the same name.
     pub extra_environment: BTreeMap<SandboxArg, SandboxArg>,
     /// Allow access to the host network namespace.
-    pub network: bool,
+    pub allow_network: bool,
     /// Whether the program to run is a Java virtual machine.
     ///
     /// If set, performs some extra platform-specific setup to get the JVM to

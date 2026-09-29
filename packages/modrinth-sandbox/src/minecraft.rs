@@ -313,7 +313,7 @@ pub fn create_command(minecraft: MinecraftCommand) -> Result<SandboxCommand> {
             .map(|s| SandboxArg::from(*s))
             .collect(),
         extra_environment,
-        network: true,
+        allow_network: true,
         is_jvm: true,
         die_with_parent: true,
         stdin: minecraft.stdin,
