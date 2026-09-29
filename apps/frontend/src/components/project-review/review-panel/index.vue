@@ -104,7 +104,7 @@
 import { InfoIcon } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
 import { Tooltip, useVIntl } from '@modrinth/ui'
-import { useElementHover, useFocusWithin } from '@vueuse/core'
+import { useActiveElement, useElementHover } from '@vueuse/core'
 import { computed, shallowRef, useId, watch } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
@@ -137,7 +137,7 @@ const inlineDropdowns = shallowRef(new Set<string>())
 const panelHovered = useElementHover(inlinePanel)
 const scopeHovered = useElementHover(() => props.interactionScope)
 const { active, activePanelId, registerInlinePanel, setDropdownOpen } = injectReviewContext()
-const { focused: panelFocused } = useFocusWithin(inlinePanel)
+const focusedElement = useActiveElement()
 const inlineActive = computed(() => activePanelId.value === id)
 const { formatMessage } = useVIntl()
 const settings = useModerationSettings()
@@ -156,7 +156,9 @@ watch(
 				available: () => !props.disabled && !!binding.value,
 				hovered: () => panelHovered.value,
 				scopeHovered: () => scopeHovered.value,
-				focused: () => panelFocused.value,
+				focused: () =>
+					!!inlinePanel.value?.contains(focusedElement.value ?? null) &&
+					!!focusedElement.value?.matches(':focus-visible'),
 				dropdownOpen: () => inlineDropdowns.value.size > 0,
 			}),
 		)
