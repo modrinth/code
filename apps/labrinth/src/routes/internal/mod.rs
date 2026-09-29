@@ -144,6 +144,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		moderation::user_lock::lock_user,
 		moderation::user_lock::unlock_user,
 		moderation::user_sessions::revoke_user_sessions,
+		moderation::user_credentials::force_password_reset,
+		moderation::user_credentials::reset_2fa,
 		affiliate::ingest_click,
 		affiliate::get_all,
 		affiliate::create,

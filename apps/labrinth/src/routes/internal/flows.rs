@@ -2785,28 +2785,9 @@ pub async fn remove_2fa(
         )));
     }
 
-    sqlx::query!(
-        "
-        UPDATE users
-        SET totp_secret = NULL
-        WHERE (id = $1)
-        ",
-        user.id as crate::database::models::ids::DBUserId,
-    )
-    .execute(&mut transaction)
-    .await
-    .wrap_internal_err("querying database for `remove_2fa`")?;
-
-    sqlx::query!(
-        "
-        DELETE FROM user_backup_codes
-        WHERE user_id = $1
-        ",
-        user.id as crate::database::models::ids::DBUserId,
-    )
-    .execute(&mut transaction)
-    .await
-    .wrap_internal_err("querying database for `remove_2fa`")?;
+    DBUser::remove_2fa(user.id, &mut transaction)
+        .await
+        .wrap_internal_err("removing 2FA")?;
 
     NotificationBuilder {
         body: NotificationBody::TwoFactorRemoved,
@@ -2921,28 +2902,30 @@ pub async fn reset_password_begin(
 
     if let Some(DBUser {
         id: user_id,
-        email: user_email,
+        email: Some(user_email),
         ..
     }) = user.filter(|user| !user.is_locked())
+        && let Ok(mailbox) = user_email.parse()
     {
-        let flow = DBFlow::ForgotPassword { user_id }
-            .insert(Duration::hours(24), &redis)
-            .await
-            .wrap_internal_err("inserting authentication flow into database")?;
-
-        if let Ok(mailbox) = user_email.unwrap_or_default().parse() {
-            email
-                .send_one(
-                    &mut txn,
-                    NotificationBody::ResetPassword { flow },
-                    user_id,
-                    mailbox,
-                )
-                .await
-                .wrap_api_err("sending account email")?
-                .as_user_error()
-                .wrap_api_err("validating email delivery status")?;
+        let flow = DBFlow::ForgotPassword {
+            user_id,
+            email: user_email,
         }
+        .insert(Duration::hours(24), &redis)
+        .await
+        .wrap_internal_err("inserting authentication flow into database")?;
+
+        email
+            .send_one(
+                &mut txn,
+                NotificationBody::ResetPassword { flow },
+                user_id,
+                mailbox,
+            )
+            .await
+            .wrap_api_err("sending account email")?
+            .as_user_error()
+            .wrap_api_err("validating email delivery status")?;
     }
 
     txn.commit()
@@ -2985,27 +2968,39 @@ pub async fn change_password(
             .await
             .wrap_internal_err("fetching password-reset flow from Redis")?;
 
-        if let Some(DBFlow::ForgotPassword { user_id }) = flow {
-            let user = crate::database::models::DBUser::get_id(
-                user_id, &**pool, &redis,
-            )
+        let (user_id, flow_email, allow_locked) = match flow {
+            Some(DBFlow::ForgotPassword { user_id, email }) => {
+                (user_id, email, false)
+            }
+            Some(DBFlow::ForcedPasswordReset { user_id, email }) => {
+                (user_id, email, true)
+            }
+            _ => {
+                return Err(ApiError::Auth(eyre::eyre!(
+                    "The password change flow code is invalid or has expired. Did you copy it promptly and correctly?",
+                )));
+            }
+        };
+
+        let user = DBUser::get_id(user_id, &**pool, &redis)
             .await
             .wrap_internal_err("fetching user from database")?
             .ok_or_else(|| AuthenticationError::InvalidCredentials)
             .wrap_auth_err("fetching user from database")?;
 
-            if user.is_locked() {
-                return Err(ApiError::Auth(
-                    AuthenticationError::AccountLocked.into(),
-                ));
-            }
-
-            Some(user)
-        } else {
+        if user.email.as_deref() != Some(flow_email.as_str()) {
             return Err(ApiError::Auth(eyre::eyre!(
                 "The password change flow code is invalid or has expired. Did you copy it promptly and correctly?",
             )));
         }
+
+        if user.is_locked() && !allow_locked {
+            return Err(ApiError::Auth(
+                AuthenticationError::AccountLocked.into(),
+            ));
+        }
+
+        Some(user)
     } else {
         None
     };
