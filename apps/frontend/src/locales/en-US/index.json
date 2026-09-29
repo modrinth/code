@@ -3440,6 +3440,9 @@
   "moderation.project-review.scheduledCount": {
     "message": "{count} scheduled"
   },
+  "moderation.project-review.selectedFindings": {
+    "message": "{count, plural, one {# selected finding} other {# selected findings}}"
+  },
   "moderation.project-review.serverAddress": {
     "message": "Address"
   },
@@ -4017,7 +4020,7 @@
     "message": "Warning"
   },
   "project-review.composer.add-note": {
-    "message": "Add private note"
+    "message": "Private note"
   },
   "project-review.composer.reply": {
     "message": "Reply"

@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="flex max-h-[60%] min-h-0 shrink-0 flex-col gap-2 border-0 border-t border-solid border-divider py-2.5"
+		class="flex max-h-[60%] min-h-0 shrink-0 flex-col gap-1.5 border-0 border-t border-solid border-divider py-2.5 pb-px"
 	>
 		<div class="min-h-0 overflow-y-auto" @keydown="onKeydown">
 			<MarkdownEditor
@@ -48,7 +48,7 @@ const editor = ref<InstanceType<typeof MarkdownEditor>>()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	reply: { id: 'project-review.composer.reply', defaultMessage: 'Reply' },
-	addNote: { id: 'project-review.composer.add-note', defaultMessage: 'Add private note' },
+	addNote: { id: 'project-review.composer.add-note', defaultMessage: 'Private note' },
 	replyPlaceholder: {
 		id: 'project-review.composer.reply-placeholder',
 		defaultMessage: 'Reply to thread…',

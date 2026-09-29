@@ -4,7 +4,6 @@
 			v-for="action in actions"
 			:key="action.status"
 			class="grow"
-			size="sm"
 			:type="action.type"
 			:color="action.color"
 			:disabled="
