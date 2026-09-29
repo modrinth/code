@@ -84,8 +84,7 @@ pub async fn lock_user(
         .await
         .wrap_internal_err("revoking user sessions")?;
 
-    txn
-        .commit()
+    txn.commit()
         .await
         .wrap_internal_err("committing database transaction")?;
 
