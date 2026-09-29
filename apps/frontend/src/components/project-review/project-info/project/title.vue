@@ -36,7 +36,21 @@
 				</Button>
 			</div>
 		</div>
-		<h1 v-else-if="project" class="m-0 min-w-0 text-xl">
+		<h1 v-else-if="project" class="m-0 flex min-w-0 items-center gap-2 text-xl">
+			<Tooltip class="flex shrink-0">
+				<template #popper>
+					<ProjectStatusBadge
+						:status="project.status"
+						:style="{ color: `var(--color-${getProjectStatusColor(project.status)})` }"
+					/>
+				</template>
+				<component
+					:is="getProjectStatusIcon(project.status)"
+					class="size-4 shrink-0"
+					:style="{ color: `var(--color-${getProjectStatusColor(project.status)})` }"
+					aria-hidden="true"
+				/>
+			</Tooltip>
 			<NuxtLink
 				:to="projectUrl"
 				target="_blank"
@@ -50,7 +64,16 @@
 </template>
 
 <script setup lang="ts">
-import { Button, commonMessages, Input, useVIntl } from '@modrinth/ui'
+import {
+	Button,
+	commonMessages,
+	getProjectStatusColor,
+	getProjectStatusIcon,
+	Input,
+	ProjectStatusBadge,
+	Tooltip,
+	useVIntl,
+} from '@modrinth/ui'
 import { computed, useTemplateRef } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
