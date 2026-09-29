@@ -154,10 +154,10 @@ pub async fn page_view_ingest(
             ];
 
             if PROJECT_TYPES.contains(&segments_vec[0]) {
+                let slug = urlencoding::decode(segments_vec[1])
+                    .unwrap_or(segments_vec[1].into());
                 let project = crate::database::models::DBProject::get(
-                    segments_vec[1],
-                    &**pool,
-                    &redis,
+                    &slug, &**pool, &redis,
                 )
                 .await
                 .wrap_internal_err("fetching project from database")?;
