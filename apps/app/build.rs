@@ -287,7 +287,7 @@ fn main() {
                         "instance_kill",
                         "instance_edit",
                         "instance_edit_icon",
-						"instance_cache_icon",
+                        "instance_cache_icon",
                         "instance_edit_generated_icon",
                         "instance_cache_generated_icon",
                         "instance_get_recent_icon_configs",

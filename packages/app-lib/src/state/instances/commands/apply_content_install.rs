@@ -376,24 +376,24 @@ pub(crate) async fn download_project_version(
     dependent_on_version_id: Option<String>,
     state: &State,
 ) -> crate::Result<DownloadedProjectVersion> {
-	download_project_version_with_progress(
-		instance_id,
-		version_id,
-		reason,
-		dependent_on_version_id,
-		state,
-		None,
-	)
-	.await
+    download_project_version_with_progress(
+        instance_id,
+        version_id,
+        reason,
+        dependent_on_version_id,
+        state,
+        None,
+    )
+    .await
 }
 
 pub(crate) async fn download_project_version_with_progress(
-	instance_id: &str,
-	version_id: &str,
-	reason: DownloadReason,
-	dependent_on_version_id: Option<String>,
-	state: &State,
-	progress: Option<&mut fetch::FetchProgressFn<'_>>,
+    instance_id: &str,
+    version_id: &str,
+    reason: DownloadReason,
+    dependent_on_version_id: Option<String>,
+    state: &State,
+    progress: Option<&mut fetch::FetchProgressFn<'_>>,
 ) -> crate::Result<DownloadedProjectVersion> {
     let version = CachedEntry::get_version(
         version_id,
@@ -413,7 +413,7 @@ pub(crate) async fn download_project_version_with_progress(
         reason,
         dependent_on_version_id,
         state,
-		progress,
+        progress,
     )
     .await
 }
@@ -424,7 +424,7 @@ pub(crate) async fn download_project_version_with_metadata(
     reason: DownloadReason,
     dependent_on_version_id: Option<String>,
     state: &State,
-	progress: Option<&mut fetch::FetchProgressFn<'_>>,
+    progress: Option<&mut fetch::FetchProgressFn<'_>>,
 ) -> crate::Result<DownloadedProjectVersion> {
     let scope = resolve_content_scope(instance_id, None, state).await?;
     let content_set =

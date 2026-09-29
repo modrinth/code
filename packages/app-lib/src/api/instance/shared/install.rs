@@ -594,19 +594,19 @@ pub(super) async fn shared_instance_install_data(
         };
     let (manager_id, server_manager_name, server_manager_icon_url) =
         if remote.linked_server.is_some() {
-			(
-				None,
-				Some(remote.name),
-				server_manager_icon_url.or_else(|| remote.icon.clone()),
-			)
+            (
+                None,
+                Some(remote.name),
+                server_manager_icon_url.or_else(|| remote.icon.clone()),
+            )
         } else {
             (manager_id, server_manager_name, server_manager_icon_url)
         };
-	let instance_icon_url = if server_manager_name.is_some() {
-		instance_icon_url.or(remote.icon)
-	} else {
-		remote.icon.or(instance_icon_url)
-	};
+    let instance_icon_url = if server_manager_name.is_some() {
+        instance_icon_url.or(remote.icon)
+    } else {
+        remote.icon.or(instance_icon_url)
+    };
 
     let name = shared_instance_name(name);
     let linked_user_id = linked_modrinth_user_id(state).await?;
