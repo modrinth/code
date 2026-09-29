@@ -1,5 +1,6 @@
 use crate::{Error, ErrorKind};
 use bytes::Bytes;
+use daedalus::modded::{LoaderVersion, Manifest};
 use s3::creds::Credentials;
 use s3::{Bucket, Region};
 use serde::de::DeserializeOwned;
@@ -60,6 +61,53 @@ pub static REQWEST_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
 });
 
 static DOWNLOADED_FILE_COUNT: AtomicUsize = AtomicUsize::new(0);
+
+pub fn retain_manifest_versions(
+    manifest: &mut Manifest,
+    previous: Option<&Manifest>,
+) {
+    let Some(previous) = previous else {
+        return;
+    };
+
+    for old_game_version in &previous.game_versions {
+        if let Some(game_version) = manifest
+            .game_versions
+            .iter_mut()
+            .find(|version| version.id == old_game_version.id)
+        {
+            retain_loader_versions(
+                &mut game_version.loaders,
+                &old_game_version.loaders,
+            );
+        } else {
+            manifest.game_versions.push(old_game_version.clone());
+        }
+    }
+
+    for old_group in &previous.version_groups {
+        if let Some(group) = manifest
+            .version_groups
+            .iter_mut()
+            .find(|group| group.id == old_group.id)
+        {
+            retain_loader_versions(&mut group.loaders, &old_group.loaders);
+        } else {
+            manifest.version_groups.push(old_group.clone());
+        }
+    }
+}
+
+fn retain_loader_versions(
+    loaders: &mut Vec<LoaderVersion>,
+    previous: &[LoaderVersion],
+) {
+    for old_loader in previous {
+        if !loaders.iter().any(|loader| loader.id == old_loader.id) {
+            loaders.push(old_loader.clone());
+        }
+    }
+}
 
 #[tracing::instrument(skip(bytes, semaphore))]
 pub async fn upload_file_to_bucket(
@@ -331,6 +379,17 @@ pub async fn download_file(
     sha1: Option<&str>,
     semaphore: &Arc<Semaphore>,
 ) -> Result<bytes::Bytes, crate::Error> {
+    Ok(download_file_inner(url, sha1, semaphore, false)
+        .await?
+        .expect("required download cannot be absent"))
+}
+
+async fn download_file_inner(
+    url: &str,
+    sha1: Option<&str>,
+    semaphore: &Arc<Semaphore>,
+    allow_not_found: bool,
+) -> Result<Option<bytes::Bytes>, crate::Error> {
     let _permit = semaphore.acquire().await?;
     tracing::trace!("Starting file download");
 
@@ -372,7 +431,7 @@ pub async fn download_file(
                         );
                     }
 
-                    return Ok(bytes);
+                    return Ok(Some(bytes));
                 } else if attempt <= RETRIES {
                     continue;
                 } else if let Err(err) = bytes {
@@ -382,6 +441,13 @@ pub async fn download_file(
                     }
                     .into());
                 }
+            }
+            Err(err)
+                if allow_not_found
+                    && err.status() == Some(reqwest::StatusCode::NOT_FOUND) =>
+            {
+                tracing::warn!(%url, "Previous manifest not found; building a new manifest");
+                return Ok(None);
             }
             Err(_) if attempt <= RETRIES => continue,
             Err(err) => {
@@ -395,6 +461,16 @@ pub async fn download_file(
     }
 
     unreachable!()
+}
+
+pub async fn fetch_optional_json<T: DeserializeOwned>(
+    url: &str,
+    semaphore: &Arc<Semaphore>,
+) -> Result<Option<T>, Error> {
+    download_file_inner(url, None, semaphore, true)
+        .await?
+        .map(|bytes| serde_json::from_slice(&bytes).map_err(Error::from))
+        .transpose()
 }
 
 pub async fn fetch_json<T: DeserializeOwned>(
