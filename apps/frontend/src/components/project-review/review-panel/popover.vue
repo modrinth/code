@@ -24,7 +24,7 @@
 						size="sm"
 						:label="formatMessage(pinned ? messages.unpinReview : messages.pinReview)"
 						:aria-pressed="pinned"
-						:type="pinned ? 'colored-text' : 'quiet'"
+						type="quiet"
 						:color="pinned ? 'green' : undefined"
 						@click="pinned = !pinned"
 					>
