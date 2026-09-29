@@ -206,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Início e conteúdo"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Traga o aplicativo Modrinth para o primeiro plano quando o Minecraft for fechado."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Refocar o aplicativo quando o Minecraft fechar"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Inicialização e navegação"
   },
@@ -301,6 +307,9 @@
   },
   "app.download-manager.attention": {
     "message": "Requer atenção"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "Atualizando {count, plural, one {# item} other {# itens}}"
   },
   "app.download-manager.cancel": {
     "message": "Cancelar instalação"

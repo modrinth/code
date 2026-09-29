@@ -206,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Strona główna i zawartość"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Przynieś okno Modrinth App na wierzch po wyjściu z gry."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Pokaż aplikację po wyjściu z gry"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Uruchamianie i nawigacja"
   },
@@ -301,6 +307,9 @@
   },
   "app.download-manager.attention": {
     "message": "Wymaga działania"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "Aktualizowanie {count, plural, one {# przedmiotu} few {# przedmiotów} other {# przedmiotów}}"
   },
   "app.download-manager.cancel": {
     "message": "Przerwij instalację"

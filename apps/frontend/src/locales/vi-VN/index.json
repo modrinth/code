@@ -761,6 +761,12 @@
   "auth.reset-password.title.long": {
     "message": "Đặt lại mật khẩu của bạn"
   },
+  "auth.sign-in.launcher.complete.go-to-website": {
+    "message": "Truy cập Modrinth.com"
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "Mở ứng dụng Modrinth"
+  },
   "auth.sign-in.title": {
     "message": "Đăng nhập"
   },

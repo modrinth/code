@@ -522,7 +522,7 @@
     "defaultMessage": "Installera ändå"
   },
   "content.diff-modal.loader-updated": {
-    "defaultMessage": "Läsare"
+    "defaultMessage": "Loader"
   },
   "content.diff-modal.modpack-linked": {
     "defaultMessage": "Länkat modpaket"
@@ -858,7 +858,7 @@
     "defaultMessage": "Stabil"
   },
   "creation-flow.modal.custom-setup.loader-version.label": {
-    "defaultMessage": "Läsarversion"
+    "defaultMessage": "Loaderversion"
   },
   "creation-flow.modal.custom-setup.loader-version.placeholder": {
     "defaultMessage": "Välj läsarversion"
@@ -867,7 +867,7 @@
     "defaultMessage": "Söker läsarversioner..."
   },
   "creation-flow.modal.custom-setup.loader.label": {
-    "defaultMessage": "Läsare"
+    "defaultMessage": "Loader"
   },
   "creation-flow.modal.custom-setup.name.label": {
     "defaultMessage": "Namn"
@@ -2091,7 +2091,7 @@
     "defaultMessage": "Auto-fix"
   },
   "installation-settings.incompatible-content.change-loader-button": {
-    "defaultMessage": "Byt läsare"
+    "defaultMessage": "Byt loader"
   },
   "installation-settings.incompatible-content.disable-conflicts-button": {
     "defaultMessage": "Inaktivera konflikter"
@@ -2244,7 +2244,7 @@
     "defaultMessage": "Instanstyp"
   },
   "instances.content-install.loader-label": {
-    "defaultMessage": "Läsare"
+    "defaultMessage": "Loader"
   },
   "instances.content-install.name-label": {
     "defaultMessage": "Namn"
@@ -2463,7 +2463,7 @@
     "defaultMessage": "Spelversion"
   },
   "label.hide-installed-content": {
-    "defaultMessage": "Göm redan installerat innehåll"
+    "defaultMessage": "Dölj redan installerat innehåll"
   },
   "label.hide-selected-content": {
     "defaultMessage": "Göm valt innehåll"
@@ -2864,6 +2864,9 @@
   "markdown-editor.video-modal.url-field.placeholder": {
     "defaultMessage": "Ange YouTube video-URL"
   },
+  "markdown-editor.video-modal.url-field.title": {
+    "defaultMessage": "URL för YouTube-video"
+  },
   "modal.add-payment-method.action": {
     "defaultMessage": "Lägg till betalningsmetod"
   },
@@ -3082,6 +3085,9 @@
   },
   "profile.block-user.error-title": {
     "defaultMessage": "Kunde inte blocka användare"
+  },
+  "profile.block-user.success-description": {
+    "defaultMessage": "{username} har blockerats."
   },
   "profile.block-user.success-title": {
     "defaultMessage": "Användare blockerad"
@@ -4712,6 +4718,9 @@
   "servers.audit-log.event.server-properties-modified-label": {
     "defaultMessage": "Modifierade serveregenskaper"
   },
+  "servers.audit-log.event.server-repaired": {
+    "defaultMessage": "Reparerade server"
+  },
   "servers.audit-log.event.server-reset": {
     "defaultMessage": "Återställ server"
   },
@@ -4732,6 +4741,12 @@
   },
   "servers.audit-log.event.unknown": {
     "defaultMessage": "Okänd händelse"
+  },
+  "servers.audit-log.event.unknown-basic": {
+    "defaultMessage": "Dokumenterade serveraktivitet"
+  },
+  "servers.audit-log.event.user-invite-revoked": {
+    "defaultMessage": "Återkallade inbjudan för <target-user></target-user>"
   },
   "servers.audit-log.event.user-invited": {
     "defaultMessage": "Bjöd in <target-user></target-user>"
@@ -5388,7 +5403,7 @@
     "defaultMessage": "Ett oväntat fel inträffade under uppladdningen. Vänligen försök igen senare."
   },
   "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Modpaketsuppladdning misslyckades"
+    "defaultMessage": "Misslyckades att ladda upp modpaket"
   },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Ställ in server"
@@ -5436,7 +5451,7 @@
     "defaultMessage": "Vänligen stäng inte sidan medan uppladdningen pågår."
   },
   "servers.setup.uploading-modpack.header": {
-    "defaultMessage": "Läser in modpaket"
+    "defaultMessage": "Laddar upp modpaket"
   },
   "settings.account.title": {
     "defaultMessage": "Konto och säkerhet"
@@ -5453,11 +5468,14 @@
   "settings.billing.title": {
     "defaultMessage": "Prenumerationer"
   },
+  "settings.display.project-list-layouts.datapack": {
+    "defaultMessage": "Sidan för datapaket"
+  },
   "settings.display.project-list-layouts.description": {
     "defaultMessage": "Välj din föredragna layout för varje sida som visar projektlistor."
   },
   "settings.display.project-list-layouts.mod": {
-    "defaultMessage": "Moddsida"
+    "defaultMessage": "Sidan för moddar"
   },
   "settings.display.project-list-layouts.mode.grid": {
     "defaultMessage": "Rutnät"
@@ -5466,25 +5484,25 @@
     "defaultMessage": "Rader"
   },
   "settings.display.project-list-layouts.modpack": {
-    "defaultMessage": "Modpaketsida"
+    "defaultMessage": "Sidan för modpaket"
   },
   "settings.display.project-list-layouts.plugin": {
-    "defaultMessage": "Plugin-sida"
+    "defaultMessage": "Sidan för plugins"
   },
   "settings.display.project-list-layouts.resourcepack": {
-    "defaultMessage": "Resurspaketssida"
+    "defaultMessage": "Sidan för resurspaket"
   },
   "settings.display.project-list-layouts.server": {
-    "defaultMessage": "Shaderssida"
+    "defaultMessage": "Sidan för servrar"
   },
   "settings.display.project-list-layouts.shader": {
-    "defaultMessage": "Shaderssida"
+    "defaultMessage": "Sidan för shaders"
   },
   "settings.display.project-list-layouts.title": {
     "defaultMessage": "Projektlistors layout"
   },
   "settings.display.project-list-layouts.user": {
-    "defaultMessage": "Användarprofilsidor"
+    "defaultMessage": "Användarprofiler"
   },
   "settings.display.sidebar.external-links-new-tab.title": {
     "defaultMessage": "Öppna externa länkar i en ny flik"
@@ -6394,6 +6412,9 @@
   },
   "user.profile.badge.pride.link": {
     "defaultMessage": "Klicka för att besöka vår senaste Pride-insamling."
+  },
+  "user.profile.badge.pride.name": {
+    "defaultMessage": "Stödjer Pride-insamlingen"
   },
   "user.profile.badge.staff.about.1": {
     "defaultMessage": "Den här användaren arbetar för Modrinth."

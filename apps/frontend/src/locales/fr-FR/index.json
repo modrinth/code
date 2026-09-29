@@ -45,10 +45,10 @@
     "message": "Type de projet dépendant"
   },
   "analytics.breakdown.download-reason": {
-    "message": "Raison de téléchargement"
+    "message": "Raison du téléchargement"
   },
   "analytics.breakdown.download-source": {
-    "message": "Source de téléchargement"
+    "message": "Source du téléchargement"
   },
   "analytics.breakdown.game-version": {
     "message": "Version du jeu"
@@ -4130,6 +4130,15 @@
   "project.settings.license.later": {
     "message": "Éditions futures"
   },
+  "project.settings.license.name": {
+    "message": "Nom de la licence"
+  },
+  "project.settings.license.name-placeholder": {
+    "message": "Nom de la licence"
+  },
+  "project.settings.license.optional-url": {
+    "message": "URL de la licence (optionnel)"
+  },
   "project.settings.license.select": {
     "message": "Sélectionner une licence"
   },
@@ -4172,6 +4181,9 @@
   "project.settings.links.donation-username": {
     "message": "Nom d'utilisateur"
   },
+  "project.settings.links.donation-username-placeholder": {
+    "message": "Entrez votre nom d'utilisateur {platform}"
+  },
   "project.settings.links.link-type": {
     "message": "Type de lien"
   },
@@ -4187,17 +4199,29 @@
   "project.settings.links.store": {
     "message": "Boutique"
   },
+  "project.settings.links.store-description": {
+    "message": "Un lien vers la boutique ou le magasin de votre serveur."
+  },
   "project.settings.links.title": {
     "message": "Liens"
   },
+  "project.settings.links.updated": {
+    "message": "Vos liens ont été mis à jour."
+  },
   "project.settings.links.updated-title": {
     "message": "Liens mis à jour"
+  },
+  "project.settings.links.url-placeholder": {
+    "message": "Entrez une URL valide"
   },
   "project.settings.links.visit-link": {
     "message": "Visiter {url}"
   },
   "project.settings.links.wiki": {
     "message": "Page Wiki"
+  },
+  "project.settings.links.wiki-description": {
+    "message": "Une page qui contient des informations, de la documentation et de l'aide pour le projet."
   },
   "project.settings.monetization.description": {
     "message": "Les projets sur Modrinth sont automatiquement inscrits au <rewards-program-link>programme de récompenses</rewards-program-link>. Si vous ne souhaitez pas (ou ne pouvez pas, pour des raisons légales) générer des revenus avec ce projet, vous pouvez désactiver cette option ici."

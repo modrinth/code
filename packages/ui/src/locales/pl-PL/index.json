@@ -639,7 +639,7 @@
     "defaultMessage": "Brak dostarczonej treści"
   },
   "content.managed-card.switch-version": {
-    "defaultMessage": "Zmień wersje"
+    "defaultMessage": "Zmień wersję"
   },
   "content.managed-card.synced": {
     "defaultMessage": "Zsynchronizowano {time}"
@@ -721,6 +721,12 @@
   },
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Nie udało się załadować zawartości"
+  },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "Nie udało się załadować dziennika zmian"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "Nie udało się załadować dostępnych aktualizacji"
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtruj"
@@ -1440,10 +1446,10 @@
     "defaultMessage": "Nie można sprawdzić, czy ten plik już istnieje."
   },
   "files.create-zip-modal.create-button": {
-    "defaultMessage": "Stwórz ZIP"
+    "defaultMessage": "Utwórz ZIP"
   },
   "files.create-zip-modal.header": {
-    "defaultMessage": "Stwórz ZIP"
+    "defaultMessage": "Utwórz ZIP"
   },
   "files.create-zip-modal.invalid": {
     "defaultMessage": "Nazwa archiwum musi być pojedynczą nazwą pliku."
@@ -1566,7 +1572,7 @@
     "defaultMessage": "Operacje na plikach są wyłączone podczas trwania tej operacji."
   },
   "files.layout.create-zip": {
-    "defaultMessage": "Stwórz ZIP"
+    "defaultMessage": "Utwórz ZIP"
   },
   "files.layout.dry-run-failed-text": {
     "defaultMessage": "Wystąpił błąd podczas przebiegu próbnego"
@@ -1614,7 +1620,7 @@
     "defaultMessage": "Nawigacja do stron nadrzędnych"
   },
   "files.navbar.create-new": {
-    "defaultMessage": "Stwórz nowy..."
+    "defaultMessage": "Utwórz nowy..."
   },
   "files.navbar.file-navigation": {
     "defaultMessage": "Nawigacja plików"
@@ -1686,7 +1692,7 @@
     "defaultMessage": "Nowa nazwa"
   },
   "files.row.create-zip": {
-    "defaultMessage": "Stwórz ZIP"
+    "defaultMessage": "Utwórz ZIP"
   },
   "files.row.item-count": {
     "defaultMessage": "{count, plural, one {# przedmiot} few {# przedmioty} other {# przedmiotów}}"
@@ -2490,7 +2496,7 @@
     "defaultMessage": "Ładowanie wersji..."
   },
   "instances.updater-modal.no-changelog": {
-    "defaultMessage": "Nie ma dziennika zmian dla tej wersji."
+    "defaultMessage": "Nie podano dziennika zmian dla tej wersji."
   },
   "instances.updater-modal.no-versions": {
     "defaultMessage": "Nie znaleziono żadnej wersji"
@@ -6787,6 +6793,78 @@
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "Nieznane plki"
+  },
+  "update-all-modal.changelog-for": {
+    "defaultMessage": "Dziennik zmian dla {project}"
+  },
+  "update-all-modal.changelog-loaded": {
+    "defaultMessage": "Załadowano dziennik zmian."
+  },
+  "update-all-modal.close-changelog": {
+    "defaultMessage": "Zamknij dziennik zmian"
+  },
+  "update-all-modal.current-version": {
+    "defaultMessage": "Aktualna wersja"
+  },
+  "update-all-modal.empty": {
+    "defaultMessage": "Brak dostępnych aktualizacji."
+  },
+  "update-all-modal.header": {
+    "defaultMessage": "Aktualizuj projekty"
+  },
+  "update-all-modal.loading": {
+    "defaultMessage": "Ładowanie aktualizacji…"
+  },
+  "update-all-modal.loading-changelog": {
+    "defaultMessage": "Ładowanie dziennika zmian…"
+  },
+  "update-all-modal.new-version": {
+    "defaultMessage": "Nowa wersja"
+  },
+  "update-all-modal.no-changelog": {
+    "defaultMessage": "Nie podano dziennika zmian dla tej wersji."
+  },
+  "update-all-modal.no-compatible-updates": {
+    "defaultMessage": "Brak kompatybilnych aktualizacji."
+  },
+  "update-all-modal.no-version": {
+    "defaultMessage": "Brak kompatybilnych aktualizacji"
+  },
+  "update-all-modal.project": {
+    "defaultMessage": "Projekt"
+  },
+  "update-all-modal.project-list": {
+    "defaultMessage": "Aktualizacje projektów"
+  },
+  "update-all-modal.results": {
+    "defaultMessage": "{count, plural, one {# projekt gotowy do aktualizacji} few {# projekty gotowe do aktualizacji} other {# projektów gotowych do aktualizacji}}"
+  },
+  "update-all-modal.select-all": {
+    "defaultMessage": "Wybierz wszystkie projekty"
+  },
+  "update-all-modal.select-project": {
+    "defaultMessage": "Wybierz {project} do aktualizacji"
+  },
+  "update-all-modal.select-version": {
+    "defaultMessage": "Nowa wersja {project}"
+  },
+  "update-all-modal.update": {
+    "defaultMessage": "Aktualizuj {count, plural, one {# projekt} few {# projekty} other {# projektów}}"
+  },
+  "update-all-modal.versions": {
+    "defaultMessage": "Aktualna wersja / Nowa wersja"
+  },
+  "update-all-modal.view": {
+    "defaultMessage": "Pokaż"
+  },
+  "update-all-modal.view-changelog": {
+    "defaultMessage": "Pokaż dziennik zmian dla {project}"
+  },
+  "update-all-modal.warning": {
+    "defaultMessage": "Nie możemy zagwarantować, że aktualizacje są bezpieczna dla Twoich światów. Przejrzyj dzienniki zmian i rozważ zrobienie kopii zapasowej."
+  },
+  "update-all-modal.warning-server": {
+    "defaultMessage": "Nie możemy zagwarantować, że aktualizacje są bezpieczna dla Twojego serwera. Przejrzyj dzienniki zmian i rozważ zrobienie kopii zapasowej."
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Ten użytkownik utworzył konto za czasów wersji alfa Modrinth, trwającej do listopada 2020 r."

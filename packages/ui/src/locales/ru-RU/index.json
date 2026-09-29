@@ -692,6 +692,12 @@
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Не удалось загрузить контент"
   },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "Не удалось загрузить изменения"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "Не удалось загрузить обновления"
+  },
   "content.page-layout.filter.add": {
     "defaultMessage": "Фильтр"
   },
@@ -2418,7 +2424,7 @@
     "defaultMessage": "Загрузка версий..."
   },
   "instances.updater-modal.no-changelog": {
-    "defaultMessage": "У этой версии нет описания изменений."
+    "defaultMessage": "Список изменений отсутствует."
   },
   "instances.updater-modal.no-versions": {
     "defaultMessage": "Версии не найдены"
@@ -2451,7 +2457,7 @@
     "defaultMessage": "{amount} доступно."
   },
   "label.changelog": {
-    "defaultMessage": "Список изменений"
+    "defaultMessage": "Изменения"
   },
   "label.changes-saved": {
     "defaultMessage": "Изменения сохранены"
@@ -4563,7 +4569,7 @@
     "defaultMessage": "Варианты не найдены."
   },
   "servers.access-page.activity-log-filter.instances": {
-    "defaultMessage": "Экземпляры"
+    "defaultMessage": "Сборки"
   },
   "servers.access-page.activity-log-filter.server-scoped-instance": {
     "defaultMessage": "Сервер"
@@ -4713,10 +4719,10 @@
     "defaultMessage": "Пользователь"
   },
   "servers.audit-log.column.world": {
-    "defaultMessage": "Экземпляр"
+    "defaultMessage": "Сборка"
   },
   "servers.audit-log.column.world.tooltip-description": {
-    "defaultMessage": "Экземпляры сервера — это изолированные среды со своим установленным контентом и файлами мира."
+    "defaultMessage": "Сборки сервера — это изолированные среды со своим установленным контентом и файлами мира."
   },
   "servers.audit-log.column.world.tooltip-title": {
     "defaultMessage": "Скоро будет доступно!"
@@ -5721,7 +5727,7 @@
     "defaultMessage": "Пожалуйста, не закрывайте страницу во время загрузки."
   },
   "servers.setup.uploading-modpack.header": {
-    "defaultMessage": "Загрузка сборки модов"
+    "defaultMessage": "Загрузка сборки"
   },
   "settings.account.title": {
     "defaultMessage": "Аккаунт и безопасность"
@@ -6706,6 +6712,78 @@
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "Нераспознанные файлы"
+  },
+  "update-all-modal.changelog-for": {
+    "defaultMessage": "Список изменений {project}"
+  },
+  "update-all-modal.changelog-loaded": {
+    "defaultMessage": "Список изменений загружен."
+  },
+  "update-all-modal.close-changelog": {
+    "defaultMessage": "Закрыть список изменений"
+  },
+  "update-all-modal.current-version": {
+    "defaultMessage": "Текущая версия"
+  },
+  "update-all-modal.empty": {
+    "defaultMessage": "Обновления отсутствуют."
+  },
+  "update-all-modal.header": {
+    "defaultMessage": "Обновление проектов"
+  },
+  "update-all-modal.loading": {
+    "defaultMessage": "Загрузка обновлений..."
+  },
+  "update-all-modal.loading-changelog": {
+    "defaultMessage": "Загрузка списка изменений..."
+  },
+  "update-all-modal.new-version": {
+    "defaultMessage": "Новая версия"
+  },
+  "update-all-modal.no-changelog": {
+    "defaultMessage": "Список изменений отсутствует."
+  },
+  "update-all-modal.no-compatible-updates": {
+    "defaultMessage": "Совместимые обновления отсутствуют."
+  },
+  "update-all-modal.no-version": {
+    "defaultMessage": "Нет совместимых обновлений"
+  },
+  "update-all-modal.project": {
+    "defaultMessage": "Проект"
+  },
+  "update-all-modal.project-list": {
+    "defaultMessage": "Обновления проектов"
+  },
+  "update-all-modal.results": {
+    "defaultMessage": "{count, plural, one {# проект готов к обновлению} few {# проекта готовы к обновлению} other {# проектов готовы к обновлению}}"
+  },
+  "update-all-modal.select-all": {
+    "defaultMessage": "Выбрать все проекты"
+  },
+  "update-all-modal.select-project": {
+    "defaultMessage": "Выбрать {project} для обновления"
+  },
+  "update-all-modal.select-version": {
+    "defaultMessage": "Новая версия {project}"
+  },
+  "update-all-modal.update": {
+    "defaultMessage": "Обновить {count, plural, one {# проект} few {# проекта} other {# проектов}}"
+  },
+  "update-all-modal.versions": {
+    "defaultMessage": "Текущая версия / Новая версия"
+  },
+  "update-all-modal.view": {
+    "defaultMessage": "Посмотреть"
+  },
+  "update-all-modal.view-changelog": {
+    "defaultMessage": "Посмотреть список изменений {project}"
+  },
+  "update-all-modal.warning": {
+    "defaultMessage": "Чтобы избежать проблем, изучите изменения и сделайте резервную копию своих миров."
+  },
+  "update-all-modal.warning-server": {
+    "defaultMessage": "Чтобы избежать проблем, изучите изменения и сделайте резервную копию своего сервера."
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Этот пользователь присоединился к Modrinth до завершения альфа‑тестирования в ноябре 2020 года."

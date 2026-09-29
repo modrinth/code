@@ -698,6 +698,12 @@
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Errore nel caricamento dei contenuti"
   },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "Impossibile caricare le novità"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "Impossibile caricare gli aggiornamenti disponibili"
+  },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtro"
   },
@@ -1647,7 +1653,7 @@
     "defaultMessage": "Crea ZIP"
   },
   "files.row.item-count": {
-    "defaultMessage": "{count, plural, one {# oggetto} other {# oggetti}}"
+    "defaultMessage": "{count, plural, one {# elemento} other {# elementi}}"
   },
   "files.row.parent-folder": {
     "defaultMessage": "Indietro"
@@ -6727,6 +6733,78 @@
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "File non riconosciuti"
+  },
+  "update-all-modal.changelog-for": {
+    "defaultMessage": "Novità per {project}"
+  },
+  "update-all-modal.changelog-loaded": {
+    "defaultMessage": "Novità caricate."
+  },
+  "update-all-modal.close-changelog": {
+    "defaultMessage": "Chiudi le novità"
+  },
+  "update-all-modal.current-version": {
+    "defaultMessage": "Versione attuale"
+  },
+  "update-all-modal.empty": {
+    "defaultMessage": "Nessun aggiornamento disponibile."
+  },
+  "update-all-modal.header": {
+    "defaultMessage": "Aggiorna i progetti"
+  },
+  "update-all-modal.loading": {
+    "defaultMessage": "Caricamento aggiornamenti…"
+  },
+  "update-all-modal.loading-changelog": {
+    "defaultMessage": "Caricamento novità…"
+  },
+  "update-all-modal.new-version": {
+    "defaultMessage": "Nuova versione"
+  },
+  "update-all-modal.no-changelog": {
+    "defaultMessage": "Nessuna novità elencata per questa versione."
+  },
+  "update-all-modal.no-compatible-updates": {
+    "defaultMessage": "Nessun aggiornamento compatibile disponibile."
+  },
+  "update-all-modal.no-version": {
+    "defaultMessage": "Nessun aggiornamento compatibile"
+  },
+  "update-all-modal.project": {
+    "defaultMessage": "Progetto"
+  },
+  "update-all-modal.project-list": {
+    "defaultMessage": "Aggiornamenti"
+  },
+  "update-all-modal.results": {
+    "defaultMessage": "{count, plural, one {# progetto pronto} other {# progetti pronti}} all'aggiornamento"
+  },
+  "update-all-modal.select-all": {
+    "defaultMessage": "Seleziona tutti i progetti"
+  },
+  "update-all-modal.select-project": {
+    "defaultMessage": "Seleziona {project} da aggiornare"
+  },
+  "update-all-modal.select-version": {
+    "defaultMessage": "Nuova versione per {project}"
+  },
+  "update-all-modal.update": {
+    "defaultMessage": "Aggiorna {count, plural, one {# progetto} other {# progetti}}"
+  },
+  "update-all-modal.versions": {
+    "defaultMessage": "Versione attuale / Nuova versione"
+  },
+  "update-all-modal.view": {
+    "defaultMessage": "Mostra"
+  },
+  "update-all-modal.view-changelog": {
+    "defaultMessage": "Mostra le novità per {project}"
+  },
+  "update-all-modal.warning": {
+    "defaultMessage": "Non garantiamo che gli aggiornamenti siano sicuri per i tuoi mondi. Controlla le novità e fai un backup."
+  },
+  "update-all-modal.warning-server": {
+    "defaultMessage": "Non garantiamo che gli aggiornamenti siano sicuri per il server. Controlla le novità e fai un backup."
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Quest'utente è qui dai tempi dell'alpha di Modrinth, conclusasi a novembre 2020."
