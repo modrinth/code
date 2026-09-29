@@ -51,6 +51,7 @@ pub struct DBUser {
     pub avatar_url: Option<String>,
     pub raw_avatar_url: Option<String>,
     pub bio: Option<String>,
+    pub pronouns: Option<String>,
     pub created: DateTime<Utc>,
     pub role: String,
     pub badges: Badges,
@@ -94,7 +95,7 @@ impl DBUser {
             "
             INSERT INTO users (
                 id, username, email,
-                avatar_url, raw_avatar_url, bio, created,
+                avatar_url, raw_avatar_url, bio, pronouns, created,
                 github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
                 email_verified, password, paypal_id, paypal_country, paypal_email,
                 venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter,
@@ -102,10 +103,10 @@ impl DBUser {
             )
             VALUES (
                 $1, $2, $3, $4, $5,
-                $6, $7,
-                $8, $9, $10, $11, $12, $13,
-                $14, $15, $16, $17, $18, $19, $20, $21, $22,
-                $23
+                $6, $7, $8,
+                $9, $10, $11, $12, $13, $14,
+                $15, $16, $17, $18, $19, $20, $21, $22, $23,
+                $24
             )
             ",
             self.id as DBUserId,
@@ -114,6 +115,7 @@ impl DBUser {
             self.avatar_url.as_ref(),
             self.raw_avatar_url.as_ref(),
             self.bio.as_ref(),
+            self.pronouns.as_ref(),
             self.created,
             self.github_id,
             self.discord_id,
@@ -216,8 +218,8 @@ impl DBUser {
                 sqlx::query!(
                     r#"
                     SELECT id, email,
-                        avatar_url, raw_avatar_url, username, bio,
-                        users.created, role, badges,
+                        avatar_url, raw_avatar_url, username, bio, pronouns,
+                        created, role, badges,
                         (
                             SELECT MAX(campaign_donations.donated_at)
                             FROM campaign_donations
@@ -258,6 +260,7 @@ impl DBUser {
                             raw_avatar_url: u.raw_avatar_url,
                             username: u.username.clone(),
                             bio: u.bio,
+                            pronouns: u.pronouns,
                             created: u.created,
                             role: u.role,
                             badges: Badges::from_bits(u.badges as u64).unwrap_or_default(),

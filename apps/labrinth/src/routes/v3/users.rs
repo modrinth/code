@@ -951,6 +951,7 @@ pub struct EditUser {
     #[validate(length(max = 160))]
     pub venmo_handle: Option<String>,
     pub allow_friend_requests: Option<bool>,
+    pub pronouns: Option<String>,
 }
 
 #[utoipa::path(tag = "users", responses((status = NO_CONTENT)))]
@@ -1045,6 +1046,21 @@ pub async fn user_edit(
                 .execute(&mut transaction)
                 .await
                 .wrap_internal_err("fetching bio from database")?;
+            }
+
+            if let Some(pronouns) = &new_user.pronouns {
+                sqlx::query!(
+                    "
+                    UPDATE users
+                    SET pronouns = $1
+                    WHERE (id = $2)
+                    ",
+                    pronouns,
+                    id as crate::database::models::ids::DBUserId,
+                )
+                .execute(&mut transaction)
+                .await
+                .wrap_internal_err("updating pronouns in database")?;
             }
 
             if let Some(role) = &new_user.role {
