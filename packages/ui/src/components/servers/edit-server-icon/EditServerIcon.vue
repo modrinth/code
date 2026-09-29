@@ -177,8 +177,8 @@ async function loadGeneratedConfig(): Promise<IconConfig | null> {
 			'symbol' in config &&
 			typeof config.symbol === 'string' &&
 			'background' in config
-				? (config as IconConfig)
-				: null
+			? (config as IconConfig)
+			: null
 	} catch (error) {
 		if (isNotFound(error)) return null
 		throw error

@@ -8,36 +8,36 @@ use tracing_error::InstrumentError;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct LabrinthError {
-	pub error: String,
-	pub description: String,
-	#[serde(default, skip_serializing_if = "Option::is_none")]
-	pub details: Option<serde_json::Value>,
-	#[serde(default, skip_serializing_if = "Option::is_none")]
-	pub status: Option<u16>,
-	#[serde(default, skip_serializing_if = "Option::is_none")]
-	pub method: Option<String>,
-	#[serde(default, skip_serializing_if = "Option::is_none")]
-	pub url: Option<String>,
-	#[serde(default, skip_serializing_if = "Option::is_none")]
-	pub route: Option<String>,
+    pub error: String,
+    pub description: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Value>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<u16>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub method: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub url: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub route: Option<String>,
 }
 
 impl std::fmt::Display for LabrinthError {
-	fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		let message = self
-			.details
-			.as_ref()
-			.and_then(serde_json::Value::as_array)
-			.and_then(|details| {
-				details
-					.iter()
-					.rev()
-					.filter_map(serde_json::Value::as_str)
-					.find(|message| !message.trim().is_empty())
-			})
-			.unwrap_or(&self.description);
-		fmt.write_str(message)
-	}
+    fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let message = self
+            .details
+            .as_ref()
+            .and_then(serde_json::Value::as_array)
+            .and_then(|details| {
+                details
+                    .iter()
+                    .rev()
+                    .filter_map(serde_json::Value::as_str)
+                    .find(|message| !message.trim().is_empty())
+            })
+            .unwrap_or(&self.description);
+        fmt.write_str(message)
+    }
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
