@@ -41,6 +41,20 @@ export function useReviewProject(selection: Ref<string>) {
 	const organization = computed(() =>
 		projectQuery.data.value?.organization ? (organizationQuery.data.value ?? null) : null,
 	)
+	const organizationId = computed(() => organization.value?.id ?? '')
+	const organizationProjects = useQuery(
+		computed(() => ({
+			queryKey: ['organization', organizationId.value, 'projects'] as const,
+			queryFn: () => client.labrinth.organizations_v3.getProjects(organizationId.value),
+			staleTime: 60_000,
+			enabled: !!organizationId.value,
+		})),
+	)
+	const organizationStats = computed(() =>
+		Object.entries(
+			Object.groupBy(organizationProjects.data.value ?? [], (project) => project.status),
+		).map(([status, projects]) => ({ status, count: projects?.length ?? 0 })),
+	)
 	const members = computed(() =>
 		(memberQuery.data.value ?? [])
 			.filter((member) => member.accepted)
@@ -161,6 +175,7 @@ export function useReviewProject(selection: Ref<string>) {
 		project: projectQuery.data,
 		projectV2: legacyQuery.data,
 		organization,
+		organizationStats,
 		organizationMembers,
 		threadQuery,
 		wasReviewed,

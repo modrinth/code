@@ -90,18 +90,31 @@
 							{{ modpackName }}
 						</NuxtLink>
 						<span v-else class="truncate font-medium text-primary">{{ modpackName }}</span>
-						<NuxtLink
-							v-if="modpackProjectId && content"
-							:to="`/modpack/${modpackProjectId}/version/${modpackVersionId}`"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="truncate text-xs hover:underline"
-						>
-							{{ formatMessage(messages.modpackVersion, { version: modpackVersionLabel }) }}
-						</NuxtLink>
-						<span v-else class="truncate text-xs">
-							{{ formatMessage(messages.modpackVersion, { version: modpackVersionLabel }) }}
-						</span>
+						<div class="flex min-w-0 flex-wrap items-center gap-x-1.5 text-xs">
+							<NuxtLink
+								v-if="modpackProjectId && content"
+								:to="`/modpack/${modpackProjectId}/version/${modpackVersionId}`"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="truncate hover:underline"
+							>
+								{{ formatMessage(messages.modpackVersion, { version: modpackVersionLabel }) }}
+							</NuxtLink>
+							<span v-else class="truncate">
+								{{ formatMessage(messages.modpackVersion, { version: modpackVersionLabel }) }}
+							</span>
+							<template v-if="modpackAuthorId">
+								<BulletDivider aria-hidden="true" />
+								<NuxtLink
+									:to="`/user/${modpackAuthorId}`"
+									target="_blank"
+									rel="noopener noreferrer"
+									class="truncate hover:underline"
+								>
+									{{ modpackAuthorQuery.data.value?.username ?? modpackAuthorId }}
+								</NuxtLink>
+							</template>
+						</div>
 					</div>
 				</div>
 			</dd>
@@ -112,6 +125,7 @@
 <script setup lang="ts">
 import {
 	Avatar,
+	BulletDivider,
 	CopyCode,
 	injectModrinthClient,
 	injectTags,
@@ -124,6 +138,7 @@ import { formatVersionsForDisplay } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
+import { versionQueryOptions } from '~/composables/queries/version'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { projectReviewMessages as messages } from '../../messages'
@@ -139,8 +154,7 @@ const modpackVersionId = computed(() =>
 )
 const modpackVersionQuery = useQuery(
 	computed(() => ({
-		queryKey: ['version', 'v3', modpackVersionId.value],
-		queryFn: () => client.labrinth.versions_v3.getVersion(modpackVersionId.value),
+		...versionQueryOptions.v3(modpackVersionId.value, client),
 		enabled:
 			!!modpackVersionId.value &&
 			!(content.value?.kind === 'modpack' && content.value.project_id === project.value?.id),
@@ -154,6 +168,16 @@ const isMrpack = computed(
 	() => content.value?.kind === 'modpack' && modpackProjectId.value === project.value?.id,
 )
 const isPublishedModpack = computed(() => content.value?.kind === 'modpack' && !isMrpack.value)
+const modpackAuthorId = computed(() =>
+	isPublishedModpack.value ? (modpackVersionQuery.data.value?.author_id ?? '') : '',
+)
+const modpackAuthorQuery = useQuery(
+	computed(() => ({
+		queryKey: ['user', modpackAuthorId.value] as const,
+		queryFn: () => client.labrinth.users_v3.get(modpackAuthorId.value),
+		enabled: !!modpackAuthorId.value,
+	})),
+)
 const modpackName = computed(() => {
 	if (content.value?.kind !== 'modpack') return ''
 	return content.value.project_name || modpackProjectId.value || '—'

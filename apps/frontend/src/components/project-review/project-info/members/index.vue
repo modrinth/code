@@ -8,7 +8,7 @@
 		</p>
 		<ul v-else class="m-0 flex list-none flex-col gap-2 p-0">
 			<li v-if="organization" class="flex flex-col gap-2.5">
-				<OrganizationItem :organization="organization" />
+				<OrganizationItem :organization="organization" :stats="organizationStats" />
 				<ul
 					v-if="organizationMembers.length"
 					class="flex list-none flex-col gap-2 border-0 border-t border-solid border-surface-4 p-0 pt-2.5"
@@ -48,6 +48,7 @@ const {
 	membersLoading,
 	membersError,
 	organization,
+	organizationStats,
 	organizationMembers,
 	organizationLoading,
 	organizationError,

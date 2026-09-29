@@ -40,6 +40,7 @@
 				<CrownIcon class="size-3 shrink-0" :aria-label="formatMessage(messages.owner)" />
 			</div>
 			<p class="m-0 text-xs">{{ formatMessage(messages.organization) }}</p>
+			<ProjectStatusStats :stats="stats" />
 		</div>
 	</div>
 </template>
@@ -52,9 +53,11 @@ import { computed, ref } from 'vue'
 
 import ImageViewerActions from '../../image-viewer-actions.vue'
 import { projectReviewMessages as messages } from '../../messages'
+import ProjectStatusStats from './project-status-stats.vue'
 
 const props = defineProps<{
 	organization: Labrinth.Projects.v3.Organization
+	stats: { status: string; count: number }[]
 }>()
 const { formatMessage } = useVIntl()
 const viewer = ref<InstanceType<typeof ImageViewerEditor>>()

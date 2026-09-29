@@ -31,14 +31,14 @@
 			</dd>
 			<template v-if="project.queued">
 				<dt class="font-medium">{{ formatMessage(messages.submitted) }}</dt>
-				<dd class="m-0">
+				<dd class="m-0 flex flex-wrap items-center gap-x-1.5">
 					<time :datetime="project.queued" :title="project.queued">{{
 						relativeTime(project.queued)
-					}}</time
-					><template v-if="submissionCount">
-						·
-						{{ formatMessage(messages.submissions, { count: submissionCount }) }}</template
-					>
+					}}</time>
+					<template v-if="submissionCount">
+						<BulletDivider aria-hidden="true" />
+						<span>{{ formatMessage(messages.submissions, { count: submissionCount }) }}</span>
+					</template>
 				</dd>
 			</template>
 			<dt class="font-medium">{{ formatMessage(messages.downloads) }}</dt>
@@ -59,6 +59,7 @@
 <script setup lang="ts">
 import { ServerIcon } from '@modrinth/assets'
 import {
+	BulletDivider,
 	getProjectStatusColor,
 	getProjectTypeIcon,
 	getProjectTypeTitleMessage,
