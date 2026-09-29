@@ -89,13 +89,13 @@ pub async fn lock_user(
         .await
         .wrap_internal_err("committing database transaction")?;
 
-    DBSession::clear_user_sessions_cache(target.id, sessions, &redis)
-        .await
-        .wrap_internal_err("clearing session cache")?;
-
     DBUser::clear_caches(&[(target.id, Some(target.username))], &redis)
         .await
         .wrap_internal_err("clearing user cache")?;
+
+    DBSession::clear_user_sessions_cache(target.id, sessions, &redis)
+        .await
+        .wrap_internal_err("clearing session cache")?;
 
     Ok(())
 }
