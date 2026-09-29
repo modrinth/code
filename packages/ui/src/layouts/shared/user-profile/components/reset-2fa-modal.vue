@@ -87,7 +87,8 @@ const messages = defineMessages({
 	},
 	errorDescription: {
 		id: 'profile.reset-2fa.error-description',
-		defaultMessage: 'An error occurred while resetting two-factor authentication. Please try again.',
+		defaultMessage:
+			'An error occurred while resetting two-factor authentication. Please try again.',
 	},
 })
 
