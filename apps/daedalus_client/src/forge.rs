@@ -1,4 +1,6 @@
-use crate::util::{download_file, fetch_json, fetch_xml, format_url};
+use crate::util::{
+    REQWEST_CLIENT, download_file, fetch_json, fetch_xml, format_url,
+};
 use crate::{
     Error, FetchResult, MirrorArtifact, UploadFile, insert_mirrored_artifact,
 };
@@ -228,11 +230,28 @@ async fn fetch(
     .await
     .ok();
 
-    let fetch_versions = if let Some(modrinth_manifest) = modrinth_manifest {
+    let incoming_total = forge_versions.len();
+    if let Some(existing) = &modrinth_manifest {
+        let existing_total = count_manifest_loaders(existing);
+        if is_severe_shrink(existing_total, incoming_total) {
+            tracing::warn!(
+                mod_loader,
+                existing_total,
+                incoming_total,
+                "Refusing to publish severely shrunken loader index"
+            );
+            return Err(crate::ErrorKind::InvalidInput(format!(
+                "Refusing to publish severely shrunken {mod_loader} index: existing {existing_total} loaders, incoming {incoming_total}"
+            ))
+            .into());
+        }
+    }
+
+    let fetch_versions = if let Some(existing) = &modrinth_manifest {
         let mut fetch_versions = Vec::new();
 
         for version in &forge_versions {
-            if !modrinth_manifest.game_versions.iter().any(|x| {
+            if !existing.game_versions.iter().any(|x| {
                 x.id == version.game_version
                     && x.loaders.iter().any(|x| x.id == version.loader_version)
             }) {
@@ -246,7 +265,20 @@ async fn fetch(
     };
 
     if !fetch_versions.is_empty() {
-        let total_installers = fetch_versions.len();
+        let process_versions: Vec<&ForgeVersion> =
+            if modrinth_manifest.is_some() {
+                find_missing_versions(
+                    mod_loader,
+                    format_version,
+                    &fetch_versions,
+                    &semaphore,
+                )
+                .await?
+            } else {
+                fetch_versions.to_vec()
+            };
+
+        let total_installers = process_versions.len();
         let downloaded_installers = Arc::new(AtomicUsize::new(0));
 
         tracing::info!(
@@ -256,7 +288,7 @@ async fn fetch(
         );
 
         let forge_installers =
-            futures::future::try_join_all(fetch_versions.iter().map(|x| {
+            futures::future::try_join_all(process_versions.iter().map(|x| {
                 let downloaded_installers = downloaded_installers.clone();
                 let semaphore = semaphore.clone();
 
@@ -746,7 +778,7 @@ async fn fetch(
                 .into_iter()
                 .enumerate()
                 .map(|(index, raw)| {
-                    let loader = fetch_versions[index];
+                    let loader = process_versions[index];
 
                     read_forge_installer(
                         raw,
@@ -765,70 +797,204 @@ async fn fetch(
             .map(|x| serde_json::to_vec(x).map(bytes::Bytes::from))
             .collect::<Result<Vec<_>, serde_json::Error>>()?;
 
-        serialized_version_manifests
-            .into_iter()
-            .enumerate()
-            .for_each(|(index, bytes)| {
-                let loader = fetch_versions[index];
+        for (path, bytes) in pair_version_uploads(
+            mod_loader,
+            format_version,
+            &process_versions,
+            serialized_version_manifests,
+        ) {
+            upload_files.insert(
+                path,
+                UploadFile {
+                    file: bytes,
+                    content_type: Some("application/json".to_string()),
+                },
+            );
+        }
 
-                let version_path = format!(
-                    "{mod_loader}/v{format_version}/versions/{}.json",
-                    loader.loader_version
-                );
+        if should_defer_manifest(mod_loader, process_versions.len()) {
+            tracing::info!(
+                mod_loader,
+                pending_files = process_versions.len(),
+                "Deferring loader index until version artifacts exist"
+            );
+        } else {
+            let forge_manifest_path =
+                format!("{mod_loader}/v{format_version}/manifest.json",);
 
-                upload_files.insert(
-                    version_path,
-                    UploadFile {
-                        file: bytes,
-                        content_type: Some("application/json".to_string()),
-                    },
-                );
+            let manifest = build_manifest(forge_versions, |version| {
+                format_url(&version_path(
+                    mod_loader,
+                    format_version,
+                    &version.loader_version,
+                ))
             });
 
-        let forge_manifest_path =
-            format!("{mod_loader}/v{format_version}/manifest.json",);
-
-        let manifest = daedalus::modded::Manifest {
-            game_versions: forge_versions
-                .into_iter()
-                .sorted_by(|a, b| b.game_version.cmp(&a.game_version))
-                .rev()
-                .chunk_by(|x| x.game_version.clone())
-                .into_iter()
-                .map(|(game_version, loaders)| {
-                    daedalus::modded::Version {
-                        id: game_version,
-                        stable: true,
-                        version_group: None,
-                        loaders: loaders
-                            .map(|x| daedalus::modded::LoaderVersion {
-                                url: format_url(&format!(
-                                    "{mod_loader}/v{format_version}/versions/{}.json",
-                                    x.loader_version
-                                )),
-                                id: x.loader_version,
-                                stable: false,
-                            })
-                            .collect(),
-                    }
-                })
-                .collect(),
-            version_groups: Vec::new(),
-        };
-
-        upload_files.insert(
-            forge_manifest_path,
-            UploadFile {
-                file: bytes::Bytes::from(serde_json::to_vec(&manifest)?),
-                content_type: Some("application/json".to_string()),
-            },
-        );
+            upload_files.insert(
+                forge_manifest_path,
+                UploadFile {
+                    file: bytes::Bytes::from(serde_json::to_vec(&manifest)?),
+                    content_type: Some("application/json".to_string()),
+                },
+            );
+        }
     }
 
     Ok(FetchResult {
         upload_files,
         mirror_artifacts,
     })
+}
+
+fn count_manifest_loaders(manifest: &daedalus::modded::Manifest) -> usize {
+    manifest.game_versions.iter().map(|x| x.loaders.len()).sum()
+}
+
+fn is_severe_shrink(existing_total: usize, incoming_total: usize) -> bool {
+    if existing_total == 0 {
+        return false;
+    }
+    if incoming_total == 0 {
+        return true;
+    }
+    existing_total > 10 && incoming_total * 2 < existing_total
+}
+
+fn should_defer_manifest(mod_loader: &str, pending_versions: usize) -> bool {
+    mod_loader == "neo" && pending_versions > 0
+}
+
+fn version_path(
+    mod_loader: &str,
+    format_version: usize,
+    loader_version: &str,
+) -> String {
+    format!("{mod_loader}/v{format_version}/versions/{loader_version}.json")
+}
+
+fn pair_version_uploads(
+    mod_loader: &str,
+    format_version: usize,
+    processed: &[&ForgeVersion],
+    blobs: Vec<bytes::Bytes>,
+) -> Vec<(String, bytes::Bytes)> {
+    assert_eq!(processed.len(), blobs.len());
+    processed
+        .iter()
+        .zip(blobs)
+        .map(|(loader, bytes)| {
+            (
+                version_path(
+                    mod_loader,
+                    format_version,
+                    &loader.loader_version,
+                ),
+                bytes,
+            )
+        })
+        .collect()
+}
+
+fn build_manifest(
+    forge_versions: Vec<ForgeVersion>,
+    version_url: impl Fn(&ForgeVersion) -> String,
+) -> daedalus::modded::Manifest {
+    daedalus::modded::Manifest {
+        game_versions: forge_versions
+            .into_iter()
+            .sorted_by(|a, b| b.game_version.cmp(&a.game_version))
+            .rev()
+            .chunk_by(|x| x.game_version.clone())
+            .into_iter()
+            .map(|(game_version, loaders)| daedalus::modded::Version {
+                id: game_version,
+                stable: true,
+                version_group: None,
+                loaders: loaders
+                    .map(|x| daedalus::modded::LoaderVersion {
+                        url: version_url(&x),
+                        id: x.loader_version,
+                        stable: false,
+                    })
+                    .collect(),
+            })
+            .collect(),
+        version_groups: Vec::new(),
+    }
+}
+
+async fn find_missing_versions<'a>(
+    mod_loader: &str,
+    format_version: usize,
+    fetch_versions: &[&'a ForgeVersion],
+    semaphore: &Arc<Semaphore>,
+) -> Result<Vec<&'a ForgeVersion>, Error> {
+    let checked =
+        futures::future::try_join_all(fetch_versions.iter().map(|version| {
+            let semaphore = semaphore.clone();
+
+            async move {
+                let url = format_url(&version_path(
+                    mod_loader,
+                    format_version,
+                    &version.loader_version,
+                ));
+
+                match version_artifact_exists(&url, &semaphore).await {
+                    Ok(true) => {
+                        tracing::debug!(
+                            loader = version.loader_version.as_str(),
+                            "Reusing existing version artifact"
+                        );
+                        Ok::<_, Error>((*version, false))
+                    }
+                    Ok(false) => Ok((*version, true)),
+                    Err(err) => Err(err),
+                }
+            }
+        }))
+        .await?;
+
+    Ok(checked
+        .into_iter()
+        .filter_map(|(version, missing)| missing.then_some(version))
+        .collect())
+}
+
+async fn version_artifact_exists(
+    url: &str,
+    semaphore: &Arc<Semaphore>,
+) -> Result<bool, Error> {
+    let _permit = semaphore.acquire().await?;
+    const ATTEMPTS: usize = 3;
+    let mut attempt = 0;
+    loop {
+        attempt += 1;
+        let response =
+            REQWEST_CLIENT.head(url).send().await.map_err(|err| {
+                crate::ErrorKind::Fetch {
+                    inner: err,
+                    item: url.to_string(),
+                }
+            })?;
+
+        if response.status().is_success() {
+            return Ok(true);
+        } else if response.status() == reqwest::StatusCode::NOT_FOUND {
+            return Ok(false);
+        } else if attempt < ATTEMPTS
+            && (response.status() == reqwest::StatusCode::TOO_MANY_REQUESTS
+                || response.status().is_server_error())
+        {
+            continue;
+        } else {
+            return Err(crate::ErrorKind::InvalidInput(format!(
+                "Aborting to avoid incomplete index: unexpected status {} for {url}",
+                response.status()
+            ))
+            .into());
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -838,4 +1004,123 @@ struct ForgeVersion {
     pub loader_version: String,
     pub game_version: String,
     pub installer_url: String,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn forge_version(game: &str, loader: &str) -> ForgeVersion {
+        ForgeVersion {
+            format_version: 2,
+            raw: loader.to_string(),
+            loader_version: loader.to_string(),
+            game_version: game.to_string(),
+            installer_url: format!("https://example.com/{loader}"),
+        }
+    }
+
+    fn manifest_with_counts(counts: &[usize]) -> daedalus::modded::Manifest {
+        daedalus::modded::Manifest {
+            game_versions: counts
+                .iter()
+                .enumerate()
+                .map(|(i, count)| daedalus::modded::Version {
+                    id: format!("1.{i}"),
+                    stable: true,
+                    version_group: None,
+                    loaders: (0..*count)
+                        .map(|j| daedalus::modded::LoaderVersion {
+                            id: format!("loader-{i}-{j}"),
+                            url: format!("https://example.com/{i}/{j}"),
+                            stable: false,
+                        })
+                        .collect(),
+                })
+                .collect(),
+            version_groups: Vec::new(),
+        }
+    }
+
+    #[test]
+    fn detects_severe_shrink() {
+        assert!(is_severe_shrink(1759, 2));
+        assert!(is_severe_shrink(11, 5));
+        assert!(!is_severe_shrink(11, 6));
+        assert!(is_severe_shrink(10, 0));
+        assert!(is_severe_shrink(5, 0));
+        assert!(!is_severe_shrink(100, 60));
+        assert!(!is_severe_shrink(0, 0));
+        assert!(!is_severe_shrink(0, 5));
+    }
+
+    #[test]
+    fn counts_manifest_loaders() {
+        assert_eq!(count_manifest_loaders(&manifest_with_counts(&[2, 1])), 3);
+        assert_eq!(count_manifest_loaders(&manifest_with_counts(&[])), 0);
+    }
+
+    #[test]
+    fn builds_recovery_manifest_from_maven_list() {
+        let manifest = build_manifest(
+            vec![
+                forge_version("1.21", "21.1.252"),
+                forge_version("1.20.1", "47.1.0"),
+                forge_version("1.21", "21.4.158"),
+            ],
+            |version| {
+                format!(
+                    "https://cdn.example.com/neo/v0/versions/{}.json",
+                    version.loader_version
+                )
+            },
+        );
+
+        let total: usize =
+            manifest.game_versions.iter().map(|x| x.loaders.len()).sum();
+        assert_eq!(total, 3);
+        assert_eq!(manifest.game_versions.len(), 2);
+
+        let game_121 = manifest
+            .game_versions
+            .iter()
+            .find(|x| x.id == "1.21")
+            .expect("missing game version");
+        let ids: Vec<&str> =
+            game_121.loaders.iter().map(|x| x.id.as_str()).collect();
+        assert!(ids.contains(&"21.1.252"));
+        assert!(ids.contains(&"21.4.158"));
+        assert!(game_121.loaders.iter().all(|x| {
+            x.url
+                .starts_with("https://cdn.example.com/neo/v0/versions/")
+        }));
+    }
+
+    #[test]
+    fn defers_neo_manifest_while_versions_pending() {
+        assert!(should_defer_manifest("neo", 2));
+        assert!(!should_defer_manifest("neo", 0));
+        assert!(!should_defer_manifest("forge", 3));
+        assert!(!should_defer_manifest("forge", 0));
+    }
+
+    #[test]
+    fn pairs_uploads_with_filtered_versions() {
+        let reused = forge_version("1.21", "21.1.252");
+        let new = forge_version("1.21", "21.4.158");
+        let fetch_versions = [&reused, &new];
+        let processed = [&new];
+        let blobs = vec![bytes::Bytes::from_static(b"{}")];
+
+        let paired = pair_version_uploads("neo", 0, &processed, blobs);
+        assert_eq!(paired.len(), 1);
+        assert_eq!(
+            paired[0].0,
+            version_path("neo", 0, &processed[0].loader_version)
+        );
+        assert_ne!(
+            paired[0].0,
+            version_path("neo", 0, &fetch_versions[0].loader_version)
+        );
+    }
 }
