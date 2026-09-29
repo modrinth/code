@@ -199,6 +199,7 @@ pub async fn fetch_neo(
             // Unreachable / 404
             "1.20.1-47.1.7",
             "47.1.82",
+			"21.4.32-beta",
         ];
 
         !BLACKLIST.contains(&&*x.raw)
