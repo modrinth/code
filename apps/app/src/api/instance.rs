@@ -107,7 +107,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_kill,
             instance_edit,
             instance_edit_icon,
-			instance_cache_icon,
+            instance_cache_icon,
             instance_edit_generated_icon,
             instance_cache_generated_icon,
             instance_get_recent_icon_configs,
@@ -1350,7 +1350,7 @@ pub async fn instance_edit_icon(
 
 #[tauri::command]
 pub async fn instance_cache_icon(icon_bytes: Vec<u8>) -> Result<String> {
-	Ok(theseus::instance::cache_icon_bytes(icon_bytes).await?)
+    Ok(theseus::instance::cache_icon_bytes(icon_bytes).await?)
 }
 
 #[tauri::command]
