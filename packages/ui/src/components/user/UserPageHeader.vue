@@ -329,7 +329,7 @@ const moreActions = computed<ButtonMenuOption[]>(() => [
 		icon: props.user.lock ? LockOpenIcon : LockIcon,
 		action: () => emit('toggleLock'),
 		tone: 'red',
-		shown: props.showStaffActions && props.isStaff && props.user.role === 'developer',
+		shown: props.showStaffActions && props.isAdmin && props.user.role === 'developer',
 	},
 	{
 		id: 'open-shared-instances',

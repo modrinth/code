@@ -3,7 +3,7 @@ use eyre::eyre;
 use serde::Deserialize;
 use xredis::RedisPool;
 
-use crate::auth::check_is_moderator_from_headers;
+use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
 use crate::database::models::DBUser;
 use crate::database::models::user_lock_item::DBUserLock;
@@ -40,7 +40,7 @@ pub async fn lock_user(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<(), ApiError> {
-    let moderator = check_is_moderator_from_headers(
+    let admin = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -48,7 +48,12 @@ pub async fn lock_user(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .wrap_auth_err("authenticating API request")?
+    .1;
+
+    if admin.role != Role::Admin {
+        return Err(ApiError::Auth(eyre!("only admins can lock users")));
+    }
 
     let reason = body.reason.trim();
     if reason.is_empty() {
@@ -64,7 +69,7 @@ pub async fn lock_user(
         return Err(ApiError::Auth(eyre!("cannot lock a staff account")));
     }
 
-    DBUserLock::upsert(target.id, moderator.id.into(), reason, &**pool)
+    DBUserLock::upsert(target.id, admin.id.into(), reason, &**pool)
         .await
         .wrap_internal_err("locking user")?;
 
@@ -89,7 +94,7 @@ pub async fn unlock_user(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<(), ApiError> {
-    check_is_moderator_from_headers(
+    let admin = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -97,7 +102,12 @@ pub async fn unlock_user(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .wrap_auth_err("authenticating API request")?
+    .1;
+
+    if admin.role != Role::Admin {
+        return Err(ApiError::Auth(eyre!("only admins can unlock users")));
+    }
 
     let target = DBUser::get(&path.into_inner().0, &**pool, &redis)
         .await

@@ -39,7 +39,7 @@
 
 		<EditUserModal v-if="variant === 'web'" ref="editUserModal" :user="user" :user-id="userId" />
 		<LockUserModal
-			v-if="variant === 'web' && isStaffViewing"
+			v-if="variant === 'web' && isAdminViewing"
 			ref="lockUserModal"
 			:user="user"
 			:user-id="userId"
