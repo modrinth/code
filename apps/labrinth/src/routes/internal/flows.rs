@@ -3900,16 +3900,9 @@ pub async fn authenticate_passkey_finish(
                     .commit()
                     .await
                     .wrap_internal_err("committing database transaction")?;
-                DBSession::clear_cache(
-                    sessions
-                        .into_iter()
-                        .map(|(id, session)| (Some(id), Some(session), None))
-                        .chain(std::iter::once((
-                            None,
-                            None,
-                            Some(db_passkey.user_id),
-                        )))
-                        .collect(),
+                DBSession::clear_user_sessions_cache(
+                    db_passkey.user_id,
+                    sessions,
                     &redis,
                 )
                 .await

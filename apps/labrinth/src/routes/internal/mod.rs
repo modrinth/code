@@ -143,6 +143,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		moderation::external_license::update_license,
 		moderation::user_lock::lock_user,
 		moderation::user_lock::unlock_user,
+		moderation::user_sessions::revoke_user_sessions,
 		affiliate::ingest_click,
 		affiliate::get_all,
 		affiliate::create,

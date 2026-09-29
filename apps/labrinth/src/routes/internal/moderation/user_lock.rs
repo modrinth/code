@@ -6,6 +6,7 @@ use xredis::RedisPool;
 use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
 use crate::database::models::DBUser;
+use crate::database::models::session_item::DBSession;
 use crate::database::models::user_lock_item::DBUserLock;
 use crate::models::pats::Scopes;
 use crate::models::users::Role;
@@ -22,7 +23,8 @@ pub struct LockUserRequest {
     pub reason: String,
 }
 
-/// Locks a user's account, preventing it from performing any write operations.
+/// Locks a user's account, preventing it from performing any write operations,
+/// and revokes all of its sessions.
 ///
 /// Locking an already locked user replaces the existing lock's reason.
 #[utoipa::path(
@@ -69,9 +71,27 @@ pub async fn lock_user(
         return Err(ApiError::Auth(eyre!("cannot lock a staff account")));
     }
 
-    DBUserLock::upsert(target.id, user.id.into(), reason, &**pool)
+    let mut txn = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
+
+    DBUserLock::upsert(target.id, user.id.into(), reason, &mut txn)
         .await
         .wrap_internal_err("locking user")?;
+
+    let sessions = DBSession::remove_all_for_user(target.id, &mut txn)
+        .await
+        .wrap_internal_err("revoking user sessions")?;
+
+    txn
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
+
+    DBSession::clear_user_sessions_cache(target.id, sessions, &redis)
+        .await
+        .wrap_internal_err("clearing session cache")?;
 
     DBUser::clear_caches(&[(target.id, Some(target.username))], &redis)
         .await
