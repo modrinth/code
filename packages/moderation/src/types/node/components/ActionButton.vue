@@ -7,11 +7,11 @@
 		:aria-keyshortcuts="keybind"
 		:data-review-keybind="keybind"
 		:data-tone="tone"
-		class="action-toggle !gap-1.5 !rounded-lg !px-2.5 !font-medium !text-contrast [&>svg]:!text-inherit"
+		class="action-toggle !gap-1.5 !rounded-lg !px-2.5 !font-medium [&>svg]:!text-inherit"
 		:class="{
 			'!brightness-100': modelValue,
-			'enabled:hover:!brightness-125': !modelValue,
-			'action-toggle-selected': modelValue,
+			'enabled:hover:!brightness-125 !text-primary': !modelValue,
+			'action-toggle-selected !text-contrast': modelValue,
 		}"
 		size="sm"
 		@click="emit('update:modelValue', !modelValue)"
