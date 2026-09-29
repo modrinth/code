@@ -104,6 +104,14 @@ export class LabrinthModerationInternalModule extends AbstractModule {
 		})
 	}
 
+	public async revokeUserSessions(userId: string): Promise<void> {
+		return this.client.request<void>(`/moderation/user-sessions/${userId}`, {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'DELETE',
+		})
+	}
+
 	public async setProjectJudgements(
 		judgements: Labrinth.Moderation.Internal.ProjectJudgements,
 	): Promise<void> {

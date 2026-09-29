@@ -109,6 +109,7 @@ import {
 	InfoIcon,
 	LockIcon,
 	LockOpenIcon,
+	LogOutIcon,
 	MoreVerticalIcon,
 	ReportIcon,
 } from '@modrinth/assets'
@@ -196,6 +197,10 @@ const messages = defineMessages({
 		id: 'profile.button.unlock',
 		defaultMessage: 'Unlock account',
 	},
+	revokeSessionsButton: {
+		id: 'profile.button.revoke-sessions',
+		defaultMessage: 'Revoke all sessions',
+	},
 })
 
 const props = withDefaults(
@@ -247,6 +252,7 @@ const emit = defineEmits<{
 	openAnalytics: []
 	editUser: []
 	toggleLock: []
+	revokeSessions: []
 }>()
 
 const { formatMessage } = useVIntl()
@@ -330,6 +336,14 @@ const moreActions = computed<ButtonMenuOption[]>(() => [
 		action: () => emit('toggleLock'),
 		tone: 'red',
 		shown: props.showStaffActions && props.isAdmin && props.user.role === 'developer',
+	},
+	{
+		id: 'revoke-sessions',
+		label: formatMessage(messages.revokeSessionsButton),
+		icon: LogOutIcon,
+		action: () => emit('revokeSessions'),
+		tone: 'red',
+		shown: props.showStaffActions && props.isStaff,
 	},
 	{
 		id: 'open-shared-instances',

@@ -3299,6 +3299,9 @@
   "profile.button.remove-affiliate": {
     "defaultMessage": "Remove as affiliate"
   },
+  "profile.button.revoke-sessions": {
+    "defaultMessage": "Revoke all sessions"
+  },
   "profile.button.set-affiliate": {
     "defaultMessage": "Set as affiliate"
   },
@@ -3400,6 +3403,30 @@
   },
   "profile.official-account.bio": {
     "defaultMessage": "The official user account of Modrinth. Get support at <support-link></support-link> or via email at <email></email>"
+  },
+  "profile.revoke-sessions.admonition-body": {
+    "defaultMessage": "{username} will be signed out on every device and will need to sign in again. Personal access tokens are not affected."
+  },
+  "profile.revoke-sessions.admonition-title": {
+    "defaultMessage": "Are you sure you want to revoke all sessions?"
+  },
+  "profile.revoke-sessions.button": {
+    "defaultMessage": "Revoke sessions"
+  },
+  "profile.revoke-sessions.error-description": {
+    "defaultMessage": "An error occurred while revoking sessions. Please try again."
+  },
+  "profile.revoke-sessions.error-title": {
+    "defaultMessage": "Failed to revoke sessions"
+  },
+  "profile.revoke-sessions.success-description": {
+    "defaultMessage": "{username} has been signed out everywhere."
+  },
+  "profile.revoke-sessions.success-title": {
+    "defaultMessage": "Sessions revoked"
+  },
+  "profile.revoke-sessions.title": {
+    "defaultMessage": "Revoke sessions for {username}"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "An error occurred while unblocking this user. Please try again."
