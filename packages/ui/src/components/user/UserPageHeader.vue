@@ -343,7 +343,7 @@ const moreActions = computed<ButtonMenuOption[]>(() => [
 		icon: LogOutIcon,
 		action: () => emit('revokeSessions'),
 		tone: 'red',
-		shown: props.showStaffActions && props.isStaff,
+		shown: props.showStaffActions && props.isStaff && !props.isSelf,
 	},
 	{
 		id: 'open-shared-instances',
