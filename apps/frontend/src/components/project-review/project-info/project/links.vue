@@ -21,8 +21,9 @@
 						:href="link.url"
 						target="_blank"
 						rel="noopener noreferrer"
-						class="inline-flex w-fit min-w-0 max-w-full items-center gap-1 font-mono text-xs !transition-colors hover:text-contrast"
+						class="inline-flex w-fit min-w-0 max-w-full items-center gap-1 text-xs !transition-colors hover:text-contrast"
 					>
+						<component :is="link.icon" class="mt-px size-3.5 shrink-0" aria-hidden="true" />
 						<span class="min-w-0 truncate">{{ link.url.replace(/^https?:\/\//, '') }}</span>
 						<ExternalIcon class="mb-0.5 size-3.5 shrink-0" aria-hidden="true" />
 					</a>
@@ -34,7 +35,22 @@
 </template>
 
 <script setup lang="ts">
-import { ExternalIcon } from '@modrinth/assets'
+import {
+	BuyMeACoffeeIcon,
+	CodeIcon,
+	CurrencyIcon,
+	DiscordIcon,
+	ExternalIcon,
+	GlobeIcon,
+	HeartIcon,
+	IssuesIcon,
+	KoFiIcon,
+	OpenCollectiveIcon,
+	PatreonIcon,
+	PayPalIcon,
+	StoreIcon,
+	WikiIcon,
+} from '@modrinth/assets'
 import { useVIntl } from '@modrinth/ui'
 import { computed, useTemplateRef } from 'vue'
 
@@ -50,6 +66,20 @@ import Section from '../section.vue'
 const { project } = injectProjectReviewPageContext()
 const { formatMessage } = useVIntl()
 const editModal = useTemplateRef<InstanceType<typeof EditModal>>('editModal')
+const linkIcons = {
+	site: GlobeIcon,
+	store: StoreIcon,
+	source: CodeIcon,
+	issues: IssuesIcon,
+	discord: DiscordIcon,
+	wiki: WikiIcon,
+	patreon: PatreonIcon,
+	bmac: BuyMeACoffeeIcon,
+	paypal: PayPalIcon,
+	github: HeartIcon,
+	'ko-fi': KoFiIcon,
+	'open-collective': OpenCollectiveIcon,
+}
 const links = computed(() => {
 	const isServerProject = project.value?.minecraft_server != null
 	const order = isServerProject
@@ -96,6 +126,7 @@ const links = computed(() => {
 						{
 							key,
 							url,
+							icon: linkIcons[key as keyof typeof linkIcons] ?? CurrencyIcon,
 							label: message ? formatMessage(message) : link.platform,
 						},
 					]

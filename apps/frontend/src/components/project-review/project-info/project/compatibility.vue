@@ -19,9 +19,15 @@
 				<TagItem
 					v-for="loader in project?.loaders"
 					:key="loader"
-					class="!border-surface-4 !bg-surface-3 !text-secondary"
-					>{{ formatLoader(formatMessage, loader) }}</TagItem
+					:style="`--_color: var(--color-platform-${loader})`"
 				>
+					<component
+						:is="getLoaderIcon(loader)"
+						v-if="getLoaderIcon(loader)"
+						aria-hidden="true"
+					/>
+					{{ formatLoader(formatMessage, loader) }}
+				</TagItem>
 				<span v-if="!project?.loaders.length">{{ formatMessage(messages.emptyPlatforms) }}</span>
 			</dd>
 			<template v-if="requiresEnvironmentInfo(project?.project_types ?? [])">
@@ -43,6 +49,7 @@
 </template>
 
 <script setup lang="ts">
+import { getLoaderIcon } from '@modrinth/assets'
 import { requiresEnvironmentInfo } from '@modrinth/moderation'
 import { ENVIRONMENTS_COPY, formatLoader, injectTags, TagItem, useVIntl } from '@modrinth/ui'
 import { formatVersionsForDisplay } from '@modrinth/utils'
