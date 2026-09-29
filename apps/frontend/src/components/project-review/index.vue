@@ -1,5 +1,12 @@
 <template>
 	<ClientOnly>
+		<ConfirmModal
+			ref="clearIssuesModal"
+			:title="formatMessage(reviewTabMessages.clearAllIssues)"
+			:description="formatMessage(reviewTabMessages.clearAllIssuesDescription)"
+			:proceed-label="formatMessage(reviewTabMessages.clearIssues)"
+			@proceed="clearIssues"
+		/>
 		<ProjectReviewLayout :tabs="visibleTabs" :reset-key="selection">
 			<template #left><ProjectInfo /></template>
 			<template #right>
@@ -23,7 +30,23 @@
 									},
 								]"
 							/>
-							<IssuePicker v-if="activeReviewTab === 'issues'" />
+							<div v-if="activeReviewTab === 'issues'" class="flex items-center gap-1">
+								<Tooltip
+									v-if="!pending && panels.activeIssues.value.length"
+									:text="formatMessage(reviewTabMessages.clearIssues)"
+								>
+									<Button
+										type="quiet"
+										size="sm"
+										icon-only
+										:aria-label="formatMessage(reviewTabMessages.clearIssues)"
+										@click="clearIssuesModal?.show()"
+									>
+										<RotateCounterClockwiseIcon aria-hidden="true" />
+									</Button>
+								</Tooltip>
+								<IssuePicker />
+							</div>
 						</div>
 						<IssueList v-show="activeReviewTab === 'issues'" />
 						<MessageThread v-show="activeReviewTab === 'thread'" ref="messageThread" />
@@ -49,7 +72,16 @@
 </template>
 
 <script setup lang="ts">
-import { defineMessages, injectLoadingState, Tabs, useVIntl } from '@modrinth/ui'
+import { RotateCounterClockwiseIcon } from '@modrinth/assets'
+import {
+	Button,
+	ConfirmModal,
+	defineMessages,
+	injectLoadingState,
+	Tabs,
+	Tooltip,
+	useVIntl,
+} from '@modrinth/ui'
 import { useEventListener } from '@vueuse/core'
 import { computed, nextTick, ref, watch } from 'vue'
 
@@ -150,17 +182,36 @@ watch(
 	{ immediate: true },
 )
 const activeReviewTab = ref('thread')
+const clearIssuesModal = ref<InstanceType<typeof ConfirmModal>>()
 const messageThread = ref<InstanceType<typeof MessageThread>>()
 const auth = useAuthState()
 const keybinds = useModerationKeybinds()
 const reviewTabMessages = defineMessages({
 	issues: { id: 'project-review.right-panel.issues', defaultMessage: 'Issues ({count})' },
 	thread: { id: 'project-review.right-panel.thread', defaultMessage: 'Thread' },
+	clearIssues: { id: 'project-review.issues.clear', defaultMessage: 'Clear issues' },
+	clearAllIssues: {
+		id: 'project-review.issues.clear-all',
+		defaultMessage: 'Clear all issues',
+	},
+	clearAllIssuesDescription: {
+		id: 'project-review.issues.clear-all-description',
+		defaultMessage: 'This will remove all issues you currently have selected in the project.',
+	},
 })
 
 watch(projectId, () => {
 	activeReviewTab.value = 'thread'
+	clearIssuesModal.value?.hide()
 })
+
+function clearIssues() {
+	if (pending.value) return
+	for (const { id } of panels.activeIssues.value) {
+		panels.removeIssue(id)
+		messages.resetIssueMessage(id)
+	}
+}
 
 async function openEditor() {
 	activeReviewTab.value = 'thread'

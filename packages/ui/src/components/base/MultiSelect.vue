@@ -266,7 +266,7 @@
 										>
 											<span class="min-w-0 truncate">{{ item.label }}</span>
 											<button
-												v-if="hasSelectableSectionHeaderOptions(item)"
+												v-if="item.showSelectionActions !== false && hasSelectableSectionHeaderOptions(item)"
 												type="button"
 												class="shrink-0 border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-all hover:bg-transparent hover:text-contrast"
 												@click.stop="toggleSectionHeaderOptions(item)"
@@ -438,6 +438,7 @@ export interface MultiSelectSectionHeader {
 	label: string
 	key?: string
 	class?: string
+	showSelectionActions?: boolean
 }
 
 export type MultiSelectItem<T> = MultiSelectOption<T> | MultiSelectSectionHeader
@@ -1115,6 +1116,8 @@ function closeDropdown() {
 		triggerElement.value?.focus()
 	})
 }
+
+defineExpose({ close: closeDropdown })
 
 function handleTriggerClick(event: MouseEvent) {
 	if (event.detail === 0) return

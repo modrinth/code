@@ -18,17 +18,25 @@
 						aria-hidden="true"
 					/>
 				</button>
-				<Button
-					size="sm"
-					type="quiet"
-					circular
-					:disabled="pending"
-					:aria-label="formatMessage(messages.remove, { issue: issue.title })"
-					class="-my-1.5 -mr-1.5 size-8"
-					@click="removeIssue"
-				>
-					<XIcon aria-hidden="true" />
-				</Button>
+				<div class="flex items-center">
+					<Tooltip
+						v-if="reviewMessages.hasIssueOverride(issue.id)"
+						:text="formatMessage(messages.editedTooltip)"
+					>
+						<span class="text-xs">{{ formatMessage(messages.edited) }}</span>
+					</Tooltip>
+					<Button
+						size="sm"
+						type="quiet"
+						circular
+						:disabled="pending"
+						:aria-label="formatMessage(messages.remove, { issue: issue.title })"
+						class="-my-1.5 -mr-1.5 size-8"
+						@click="removeIssue"
+					>
+						<XIcon aria-hidden="true" />
+					</Button>
+				</div>
 			</div>
 			<Transition
 				name="issue-content"
@@ -72,9 +80,26 @@
 										v-html="renderHighlightedString(reviewMessages.issueMessage(issue.id))"
 									/>
 									<div
-										class="absolute right-1.5 z-10"
+										class="absolute right-1.5 z-10 flex items-center gap-1"
 										:class="editingMessage ? '-top-0' : 'top-1.5'"
 									>
+										<Tooltip
+											v-if="editingMessage && reviewMessages.hasIssueOverride(issue.id)"
+											:text="formatMessage(messages.reset)"
+										>
+											<Button
+												size="sm"
+												type="quiet"
+												circular
+												icon-only
+												class="!size-7"
+												:aria-label="formatMessage(messages.reset)"
+												:disabled="pending || generating"
+												@click="reviewMessages.resetIssueMessage(issue.id)"
+											>
+												<RefreshCwIcon class="size-4" aria-hidden="true" />
+											</Button>
+										</Tooltip>
 										<Button
 											size="sm"
 											:type="editingMessage ? 'colored' : 'quiet'"
@@ -97,18 +122,6 @@
 										</Button>
 									</div>
 								</div>
-								<Button
-									v-if="editingMessage && reviewMessages.hasIssueOverride(issue.id)"
-									size="sm"
-									type="quiet"
-									class="self-end"
-									:disabled="pending"
-									@click="reviewMessages.resetIssueMessage(issue.id)"
-								>
-									<RefreshCwIcon class="size-4" aria-hidden="true" />{{
-										formatMessage(messages.reset)
-									}}
-								</Button>
 							</div>
 						</div>
 					</div>
@@ -125,7 +138,14 @@
 <script setup lang="ts">
 import { ChevronDownIcon, EditIcon, RefreshCwIcon, XIcon } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
-import { Button, commonMessages, defineMessages, MarkdownEditor, useVIntl } from '@modrinth/ui'
+import {
+	Button,
+	commonMessages,
+	defineMessages,
+	MarkdownEditor,
+	Tooltip,
+	useVIntl,
+} from '@modrinth/ui'
 import { renderHighlightedString } from '@modrinth/utils/highlightjs/index'
 import { computed, ref, useId } from 'vue'
 
@@ -152,6 +172,14 @@ const editingMessage = ref(false)
 const contentId = useId()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
+	edited: {
+		id: 'project-review.issues.edited',
+		defaultMessage: '(Edited)',
+	},
+	editedTooltip: {
+		id: 'project-review.issues.edited-tooltip',
+		defaultMessage: 'Issue message has been edited',
+	},
 	remove: {
 		id: 'project-review.issues.remove',
 		defaultMessage: 'Remove {issue}',
@@ -223,7 +251,7 @@ function removeIssue() {
 
 .issue-message-editor :deep(.editor-action-row) {
 	box-sizing: border-box;
-	padding-right: 4.5rem;
+	padding-right: 6.5rem;
 }
 .issue-message :deep(h1),
 .issue-message :deep(h2),

@@ -1,5 +1,6 @@
 <template>
 	<MultiSelect
+		ref="picker"
 		:model-value="draft"
 		:options="options"
 		:disabled="pending"
@@ -19,7 +20,7 @@
 		checkbox-position="right"
 		@open="open"
 		@close="close"
-		@update:model-value="draft = $event"
+		@update:model-value="selectIssues"
 	>
 		<template #input-content>
 			<span class="flex items-center gap-1">
@@ -55,12 +56,15 @@ const messages = defineMessages({
 	},
 })
 const selected = computed(() => panels.activeIssues.value.map(({ id }) => id))
+const picker = ref<{ close: () => void }>()
 const draft = ref([...selected.value])
 const isOpen = ref(false)
 const options = computed<MultiSelectItem<string>[]>(() => {
 	const items: MultiSelectItem<string>[] = []
+	const selectedIds = new Set(selected.value)
 	const categories = new Map<string, ReviewIssue[]>()
 	for (const issue of panels.availableIssues.value) {
+		if (selectedIds.has(issue.id)) continue
 		const group = categories.get(issue.category) ?? []
 		group.push(issue)
 		categories.set(issue.category, group)
@@ -69,7 +73,12 @@ const options = computed<MultiSelectItem<string>[]>(() => {
 		([a], [b]) => Number(b === 'Project wide') - Number(a === 'Project wide'),
 	)
 	for (const [category, issues] of orderedCategories) {
-		items.push({ type: 'section-header', label: category, key: category })
+		items.push({
+			type: 'section-header',
+			label: category,
+			key: category,
+			showSelectionActions: false,
+		})
 		for (const issue of issues) {
 			items.push({
 				value: issue.id,
@@ -94,6 +103,11 @@ function updateIssues(value: string[]) {
 	for (const id of next) {
 		if (!current.has(id)) panels.addIssue(id)
 	}
+}
+
+function selectIssues(value: string[]) {
+	draft.value = value
+	picker.value?.close()
 }
 
 function open() {
