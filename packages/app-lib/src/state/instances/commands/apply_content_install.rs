@@ -407,7 +407,7 @@ pub(crate) async fn download_project_version_with_progress(
             "Unable to install version id {version_id}. Not found."
         ))
     })?;
-    download_project_version_with_metadata_and_progress(
+    download_project_version_with_metadata(
         instance_id,
         &version,
         reason,
@@ -424,25 +424,7 @@ pub(crate) async fn download_project_version_with_metadata(
     reason: DownloadReason,
     dependent_on_version_id: Option<String>,
     state: &State,
-) -> crate::Result<DownloadedProjectVersion> {
-	download_project_version_with_metadata_and_progress(
-		instance_id,
-		version,
-		reason,
-		dependent_on_version_id,
-		state,
-		None,
-	)
-	.await
-}
-
-async fn download_project_version_with_metadata_and_progress(
-	instance_id: &str,
-	version: &Version,
-	reason: DownloadReason,
-	dependent_on_version_id: Option<String>,
-	state: &State,
-	progress: Option<&mut fetch::FetchProgressFn<'_>>,
+    progress: Option<&mut fetch::FetchProgressFn<'_>>,
 ) -> crate::Result<DownloadedProjectVersion> {
     let scope = resolve_content_scope(instance_id, None, state).await?;
     let content_set =

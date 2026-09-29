@@ -57,9 +57,9 @@ pub async fn edit_icon(
 }
 
 pub async fn cache_icon_bytes(icon_bytes: Vec<u8>) -> crate::Result<String> {
-	let state = State::get().await?;
-	let icon_path = cache_icon(Bytes::from(icon_bytes), &state).await?;
-	Ok(icon_path.to_string_lossy().to_string())
+    let state = State::get().await?;
+    let icon_path = cache_icon(Bytes::from(icon_bytes), &state).await?;
+    Ok(icon_path.to_string_lossy().to_string())
 }
 
 pub async fn edit_generated_icon(
