@@ -1,10 +1,7 @@
 import { useEventListener } from '@vueuse/core'
 import type { Ref } from 'vue'
 
-export function useActionKeybinds(
-	element: Ref<HTMLElement | null>,
-	isShowing: () => boolean = () => false,
-) {
+export function useActionKeybinds(element: Readonly<Ref<HTMLElement | null>>) {
 	useEventListener('keydown', (event) => {
 		if (
 			event.defaultPrevented ||
@@ -34,7 +31,7 @@ export function useActionKeybinds(
 		}
 
 		const panel = element.value
-		if (!panel || panel.querySelector('[data-review-panel]:hover')) return
+		if (!panel || panel.closest('[inert], [hidden]')) return
 		const dialog = target instanceof Element ? target.closest('[role="dialog"]') : null
 		if (dialog && dialog !== panel && !dialog.contains(panel)) return
 		if (
@@ -44,10 +41,6 @@ export function useActionKeybinds(
 		) {
 			return
 		}
-		if (!panel.matches(':hover')) {
-			if (!isShowing() || document.querySelector('[data-review-panel]:hover')) return
-		}
-
 		const button = panel.querySelector<HTMLButtonElement>(
 			`button[data-review-keybind="${keybind}"]`,
 		)

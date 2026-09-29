@@ -117,7 +117,6 @@ import { injectReviewContext } from './context'
 import Controls from './controls.vue'
 import Highlight from './highlight.vue'
 import Popover from './popover.vue'
-import { useActionKeybinds } from './use-action-keybinds'
 
 defineOptions({ inheritAttrs: false })
 const props = withDefaults(
@@ -137,21 +136,33 @@ const inlinePanel = shallowRef<HTMLElement | null>(null)
 const inlineDropdowns = shallowRef(new Set<string>())
 const panelHovered = useElementHover(inlinePanel)
 const scopeHovered = useElementHover(() => props.interactionScope)
+const { active, activePanelId, registerInlinePanel, setDropdownOpen } = injectReviewContext()
 const { focused: panelFocused } = useFocusWithin(inlinePanel)
-const inlineActive = computed(
-	() =>
-		panelHovered.value ||
-		scopeHovered.value ||
-		panelFocused.value ||
-		inlineDropdowns.value.size > 0,
-)
-useActionKeybinds(inlinePanel, () => scopeHovered.value)
+const inlineActive = computed(() => activePanelId.value === id)
 const { formatMessage } = useVIntl()
 const settings = useModerationSettings()
-const { active, setDropdownOpen } = injectReviewContext()
 const panels = injectReviewPanels()
 const titleId = `${id}-title`
 const binding = computed(() => panels.resolve(props.target))
+watch(
+	() => props.mode,
+	(mode, _, onCleanup) => {
+		if (mode !== 'inline') return
+		onCleanup(
+			registerInlinePanel({
+				id,
+				target: () => props.target,
+				element: () => inlinePanel.value,
+				available: () => !props.disabled && !!binding.value,
+				hovered: () => panelHovered.value,
+				scopeHovered: () => scopeHovered.value,
+				focused: () => panelFocused.value,
+				dropdownOpen: () => inlineDropdowns.value.size > 0,
+			}),
+		)
+	},
+	{ immediate: true },
+)
 const panel = computed(() => binding.value?.panel)
 const controlsKey = computed(() =>
 	binding.value ? `${binding.value.projectId}:${binding.value.key}` : undefined,

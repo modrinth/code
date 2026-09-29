@@ -2,11 +2,12 @@
 	<component
 		:is="as"
 		ref="element"
-		class="relative [&:hover>[data-review-highlight]::before]:opacity-100"
+		class="relative"
 		:data-review-anchor="id"
 		:data-review-target="target.kind"
 		:data-review-key="'key' in target ? target.key : undefined"
 		@pointerover.stop="onPointerOver"
+		@pointermove="onPointerOver"
 		@pointerleave="leave(id)"
 		@focusin="active?.id === id && cancelClose()"
 		@focusout="leave(id)"

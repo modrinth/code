@@ -20,11 +20,12 @@ import 'dockview-vue/dist/styles/dockview.css'
 
 import { useVIntl } from '@modrinth/ui'
 import { useEventListener } from '@vueuse/core'
-import { watch } from 'vue'
+import { onScopeDispose, watch } from 'vue'
 
 import { useModerationKeybinds } from '~/composables/moderation'
 
 import { projectReviewMessages as messages } from '../messages'
+import { injectReviewContext } from '../review-panel/context'
 import ProjectReviewColumns from './columns.vue'
 import { provideProjectReviewContext } from './context'
 import { workspacePanelSizes } from './layout-storage'
@@ -39,10 +40,23 @@ const layout = useProjectReviewLayout(
 	() => props.tabs,
 )
 const { leftVisible, rightVisible, onDividerDoubleClick } = layout
+const { heldTab, shortcutTab } = injectReviewContext()
+let heldTabKey: string | undefined
+
+function releaseHeldTab() {
+	heldTab.value = undefined
+	heldTabKey = undefined
+}
+
+function clearShortcutTab() {
+	releaseHeldTab()
+	shortcutTab.value = undefined
+}
 
 watch(
 	() => props.resetKey,
 	(resetKey, previousResetKey) => {
+		clearShortcutTab()
 		if (resetKey && previousResetKey) layout.resetActiveTabs()
 	},
 )
@@ -60,8 +74,22 @@ useEventListener('keydown', (event) => {
 	) {
 		return
 	}
-	keybinds.value.handle(event, { scope: 'project-review', openTab: layout.openTab })
+	keybinds.value.handle(event, {
+		scope: 'project-review',
+		openTab: (tab) => {
+			if (!props.tabs.includes(tab)) return
+			layout.openTab(tab)
+			heldTab.value = tab
+			shortcutTab.value = tab
+			heldTabKey = event.code || event.key.toLowerCase()
+		},
+	})
 })
+useEventListener('keyup', (event) => {
+	if ((event.code || event.key.toLowerCase()) === heldTabKey) releaseHeldTab()
+})
+useEventListener('blur', clearShortcutTab)
+onScopeDispose(clearShortcutTab)
 </script>
 
 <style scoped>
