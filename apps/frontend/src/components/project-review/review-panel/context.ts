@@ -1,5 +1,5 @@
 import { createContext } from '@modrinth/ui'
-import { useEventListener, useFocusWithin, useRafFn } from '@vueuse/core'
+import { useActiveElement, useEventListener, useRafFn } from '@vueuse/core'
 import {
 	computed,
 	onScopeDispose,
@@ -34,7 +34,7 @@ interface InlineReviewPanel {
 	dropdownOpen: () => boolean
 }
 
-const CLOSE_DELAY = 350
+const CLOSE_DELAY = 250
 
 function mostSpecificPanel(panels: InlineReviewPanel[]) {
 	return panels.find(
@@ -54,7 +54,7 @@ export function createReviewContext(
 	const activeAnchor = shallowRef<ReviewAnchor>()
 	const pendingAnchor = shallowRef<ReviewAnchor>()
 	const panel = shallowRef<HTMLElement | null>(null)
-	const { focused: panelFocused } = useFocusWithin(panel)
+	const focusedElement = useActiveElement()
 	const childPanels = new Set<HTMLElement>()
 	const pinned = ref(false)
 	const heldTab = shallowRef<ProjectReviewTab>()
@@ -73,7 +73,10 @@ export function createReviewContext(
 			.map(({ panel }) => panel)
 		const tab = heldTab.value ?? shortcutTab.value
 		if (tab) return availablePanels.find((panel) => panel.target().kind === tab)?.id
-		if (activeAnchor.value && (pinned.value || openDropdowns.value > 0 || panelFocused.value))
+		if (
+			activeAnchor.value &&
+			(pinned.value || openDropdowns.value > 0 || hasVisibleFocus(panel.value))
+		)
 			return activeAnchor.value.id
 		const interacting = mostSpecificPanel(
 			availablePanels.filter((panel) => panel.dropdownOpen() || panel.focused()),
@@ -99,6 +102,11 @@ export function createReviewContext(
 		return active.value && panel.value?.dataset.reviewPanel === id ? panel.value : null
 	})
 	useActionKeybinds(activePanelElement)
+
+	function hasVisibleFocus(element: HTMLElement | null) {
+		const focused = focusedElement.value
+		return !!focused && !!element?.contains(focused) && focused.matches(':focus-visible')
+	}
 
 	function registerInlinePanel(panel: InlineReviewPanel) {
 		inlinePanels.set(panel.id, { panel, visible: ref(isElementVisible(panel.element())) })
@@ -170,12 +178,10 @@ export function createReviewContext(
 			if (pinned.value || openDropdowns.value > 0) return
 			if (
 				active.value.element.matches(':hover') ||
-				active.value.element.contains(document.activeElement) ||
+				hasVisibleFocus(active.value.element) ||
 				panel.value?.matches(':hover') ||
-				panel.value?.contains(document.activeElement) ||
-				[...childPanels].some(
-					(child) => child.matches(':hover') || child.contains(document.activeElement),
-				)
+				hasVisibleFocus(panel.value) ||
+				[...childPanels].some((child) => child.matches(':hover') || hasVisibleFocus(child))
 			)
 				return
 			if (pendingAnchor.value && pendingAnchor.value.id !== id) {
