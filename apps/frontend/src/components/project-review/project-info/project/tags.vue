@@ -1,6 +1,6 @@
 <template>
 	<Section :heading="formatMessage(messages.tags)" :target="{ kind: 'tags' }">
-		<template #actions>
+		<template #right>
 			<EditButton :section="formatMessage(messages.tags)" @click="editModal?.show()" />
 		</template>
 		<EditModal :key="project?.id" ref="editModal" />

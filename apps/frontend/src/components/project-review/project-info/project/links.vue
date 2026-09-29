@@ -1,6 +1,6 @@
 <template>
 	<Section :heading="formatMessage(messages.links)">
-		<template #actions>
+		<template #right>
 			<EditButton :section="formatMessage(messages.links)" @click="editModal?.show()" />
 		</template>
 		<EditModal :key="project?.id" ref="editModal" />

@@ -1,6 +1,6 @@
 <template>
 	<Section :heading="formatMessage(messages.license)" :target="{ kind: 'license' }">
-		<template #actions>
+		<template #right>
 			<EditButton :section="formatMessage(messages.license)" @click="editModal?.show()" />
 		</template>
 		<EditModal :key="project?.id" ref="editModal" />

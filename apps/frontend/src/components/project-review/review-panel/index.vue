@@ -7,6 +7,7 @@
 		:label="accessibleTitle"
 		:as="as"
 		:disabled="disabled"
+		:show-finding-badge="showFindingBadge"
 	>
 		<slot />
 		<Popover
@@ -120,13 +121,17 @@ import Popover from './popover.vue'
 import { useActionKeybinds } from './use-action-keybinds'
 
 defineOptions({ inheritAttrs: false })
-const props = defineProps<{
-	mode: 'anchored' | 'inline'
-	target: ReviewTarget
-	as?: 'section' | 'div' | 'article'
-	disabled?: boolean
-	interactionScope?: HTMLElement | null
-}>()
+const props = withDefaults(
+	defineProps<{
+		mode: 'anchored' | 'inline'
+		target: ReviewTarget
+		as?: 'section' | 'div' | 'article'
+		disabled?: boolean
+		showFindingBadge?: boolean
+		interactionScope?: HTMLElement | null
+	}>(),
+	{ showFindingBadge: true },
+)
 
 const id = useId()
 const inlinePanel = shallowRef<HTMLElement | null>(null)

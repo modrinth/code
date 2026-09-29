@@ -1,6 +1,6 @@
 <template>
 	<Section :heading="formatMessage(messages.projectTitle)" :target="{ kind: 'title' }">
-		<template #actions>
+		<template #right>
 			<EditButton
 				v-if="!editing"
 				:section="formatMessage(messages.projectTitle)"

@@ -8,7 +8,7 @@
 			:aria-label="titleId ? undefined : label"
 			:data-review-panel="anchor.id"
 			tabindex="-1"
-			class="z-[100] box-border flex w-[28rem] max-w-[calc(100vw-1rem)] flex-col gap-2 overflow-y-auto rounded-xl border border-solid border-highlight-orange bg-[color:color-mix(in_srgb,var(--color-orange)_3%,var(--surface-1))] p-2.5 pb-3 text-sm text-primary"
+			class="review-popover z-[100] box-border flex w-[28rem] max-w-[calc(100vw-1rem)] flex-col gap-2 overflow-y-auto rounded-xl border border-solid border-highlight-orange bg-surface-1 p-2.5 pb-3 text-sm text-primary"
 			:style="floatingStyles"
 			@pointerenter="cancelClose"
 			@pointerleave="leave(anchor.id)"
@@ -121,3 +121,15 @@ useEventListener('pointerdown', (event) => {
 	dismiss()
 })
 </script>
+
+<style scoped>
+.review-popover::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	border-radius: inherit;
+	background: color-mix(in srgb, var(--color-orange) 3%, transparent);
+	pointer-events: none;
+}
+</style>

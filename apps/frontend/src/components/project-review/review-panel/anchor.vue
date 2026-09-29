@@ -17,15 +17,11 @@
 			layer="behind"
 		>
 			<slot />
-			<span
-				v-if="selectedFindingCount > 0"
-				class="pointer-events-none absolute right-0 top-0 flex h-[18px] min-w-[18px] items-center justify-center rounded-full border border-solid border-highlight-orange bg-highlight-orange px-1 text-xs font-medium leading-none text-orange"
-			>
-				<span aria-hidden="true">{{ selectedFindingCount }}</span>
-				<span class="sr-only">{{
-					formatMessage(messages.selectedFindings, { count: selectedFindingCount })
-				}}</span>
-			</span>
+			<FindingsCountBadge
+				v-if="showFindingBadge"
+				:count="selectedFindingCount"
+				class="absolute right-0 top-0"
+			/>
 			<button
 				v-if="available"
 				ref="trigger"
@@ -47,15 +43,14 @@
 <script setup lang="ts">
 import { ListBulletedIcon } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
-import { useVIntl } from '@modrinth/ui'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
 import type { ReviewTarget } from '~/providers/project-review/review'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
 
-import { projectReviewMessages as messages } from '../messages'
 import { injectReviewContext } from './context'
+import FindingsCountBadge from './findings-count-badge.vue'
 import Highlight from './highlight.vue'
 
 const props = withDefaults(
@@ -65,8 +60,9 @@ const props = withDefaults(
 		label: string
 		as?: 'section' | 'div' | 'article'
 		disabled?: boolean
+		showFindingBadge?: boolean
 	}>(),
-	{ as: 'div' },
+	{ as: 'div', showFindingBadge: true },
 )
 const { active, panel, panelId, isAvailable, open, release, leave, cancelClose } =
 	injectReviewContext()
@@ -74,7 +70,6 @@ const id = props.anchorId
 const element = ref<HTMLElement>()
 const trigger = ref<HTMLButtonElement>()
 const available = computed(() => !props.disabled && isAvailable(props.target))
-const { formatMessage } = useVIntl()
 const settings = useModerationSettings()
 const panels = injectReviewPanels()
 const selectedFindingCount = computed(() => {

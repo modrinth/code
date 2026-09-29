@@ -9,7 +9,7 @@
 		}"
 	>
 		<div
-			class="-mx-1 flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-2 pb-4 pt-2"
+			class="-mx-1 flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-2 pb-4 pt-0"
 		>
 			<Tabs
 				:value="selectedTarget"

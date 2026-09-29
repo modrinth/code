@@ -62,7 +62,7 @@ const theme: DockviewTheme = {
 	height: auto;
 	min-height: var(--dv-tabs-and-actions-container-height);
 	align-items: flex-start;
-	padding: 10px 6px 0 10px;
+	padding: 12px 6px 0 10px;
 	gap: 4px;
 }
 
