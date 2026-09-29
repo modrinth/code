@@ -3227,12 +3227,6 @@
   "moderation.project-review.hideTools": {
     "message": "Hide tools panel"
   },
-  "moderation.project-review.history": {
-    "message": "History"
-  },
-  "moderation.project-review.historyStub": {
-    "message": "Stub for history tab"
-  },
   "moderation.project-review.icon": {
     "message": "Icon"
   },

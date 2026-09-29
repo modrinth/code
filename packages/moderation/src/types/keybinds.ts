@@ -71,7 +71,6 @@ export type ModerationProjectReviewContext = {
 			| 'disclosures'
 			| 'versions'
 			| 'permissions'
-			| 'history'
 			| 'tech-review',
 	) => void
 }

@@ -77,12 +77,6 @@ const keybinds: { [id: string]: KeybindListener } = {
 		scope: 'project-review',
 		action: (ctx) => ctx.openTab('permissions'),
 	},
-	'review-tab-history': {
-		keybind: 'H',
-		description: 'Open history tab',
-		scope: 'project-review',
-		action: (ctx) => ctx.openTab('history'),
-	},
 	'review-tab-tech-review': {
 		keybind: 'T',
 		description: 'Open tech review tab',

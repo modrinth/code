@@ -60,7 +60,6 @@
 			<template #disclosures><Disclosures :key="projectId" /></template>
 			<template #permissions><Permissions :key="projectId" /></template>
 			<template #versions><Versions :key="projectId" /></template>
-			<template #history><History :key="projectId" /></template>
 			<template #tech-review><TechReview :key="projectId" /></template>
 		</ProjectReviewLayout>
 		<template #fallback>
@@ -105,7 +104,6 @@ import {
 import Description from './description/index.vue'
 import Disclosures from './disclosures/index.vue'
 import Gallery from './gallery/index.vue'
-import History from './history/index.vue'
 import IssueList from './issue-list/index.vue'
 import IssuePicker from './issue-list/issue-picker.vue'
 import ProjectReviewLayout from './layout/index.client.vue'
