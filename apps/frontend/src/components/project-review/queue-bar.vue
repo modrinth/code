@@ -47,8 +47,13 @@
 				>
 			</div>
 			<div class="flex items-center gap-3">
+				<button type="button" class="queue-action" :disabled="busy" @click="exit">
+					{{ formatMessage(messages.exit) }}
+				</button>
+				<span class="h-3 w-px bg-divider" aria-hidden="true" />
 				<button type="button" class="queue-action" :disabled="disabled || !canGoBack" @click="back">
-					<LeftArrowIcon />{{ formatMessage(messages.back) }}
+					<LeftArrowIcon class="mb-px" />
+					{{ formatMessage(messages.back) }}
 				</button>
 				<button
 					type="button"
@@ -56,18 +61,12 @@
 					:disabled="disabled || (!inQueue && !completed)"
 					@click="next"
 				>
-					<RightArrowIcon />{{
+					{{
 						formatMessage(
 							completed ? (remaining.length ? messages.next : messages.finish) : messages.skip,
 						)
 					}}
-				</button>
-				<span class="h-3 w-px bg-divider" aria-hidden="true" />
-				<button type="button" class="queue-action" disabled>
-					<UndoIcon />{{ formatMessage(messages.reset) }}
-				</button>
-				<button type="button" class="queue-action" :disabled="busy" @click="exit">
-					<LogOutIcon />{{ formatMessage(messages.exit) }}
+					<RightArrowIcon class="mb-px" />
 				</button>
 			</div>
 		</nav>
@@ -93,7 +92,6 @@ import {
 	PanelTopOpenIcon,
 	RightArrowIcon,
 	SettingsIcon,
-	UndoIcon,
 } from '@modrinth/assets'
 import { commonMessages, TabbedModal, type TabbedModalTab, useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
@@ -140,7 +138,7 @@ const disabled = computed(() => busy.value || isLoading.value || !queue.hydrated
 .queue-action {
 	display: inline-flex;
 	align-items: center;
-	gap: 0.375rem;
+	gap: 0.25rem;
 	padding: 0.25rem 0;
 	background: transparent;
 	color: inherit;
