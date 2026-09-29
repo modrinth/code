@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'main'
+      - 'prod'
     paths:
       - .github/workflows/daedalus-docker.yml
       - 'apps/daedalus_client/**'
