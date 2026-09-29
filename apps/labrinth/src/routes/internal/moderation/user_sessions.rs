@@ -1,11 +1,13 @@
 use actix_web::{HttpRequest, delete, web};
+use eyre::eyre;
 use xredis::RedisPool;
 
-use crate::auth::check_is_moderator_from_headers;
+use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
 use crate::database::models::DBUser;
 use crate::database::models::session_item::DBSession;
 use crate::models::pats::Scopes;
+use crate::models::users::Role;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::Context as _;
@@ -28,7 +30,7 @@ pub async fn revoke_user_sessions(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<(), ApiError> {
-    check_is_moderator_from_headers(
+    let admin = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -36,7 +38,14 @@ pub async fn revoke_user_sessions(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .wrap_auth_err("authenticating API request")?
+    .1;
+
+    if admin.role != Role::Admin {
+        return Err(ApiError::Auth(eyre!(
+            "only admins can revoke user sessions"
+        )));
+    }
 
     let target = DBUser::get(&path.into_inner().0, &**pool, &redis)
         .await

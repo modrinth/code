@@ -46,7 +46,7 @@
 		/>
 
 		<NewModal
-			v-if="variant === 'web' && isStaffViewing"
+			v-if="variant === 'web' && isAdminViewing"
 			ref="revokeSessionsModal"
 			:header="formatMessage(messages.revokeSessionsTitle, { username: user.username })"
 			:closable="!isRevokingSessions"
