@@ -26,6 +26,10 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.reviewSection',
 		defaultMessage: 'Review {section}',
 	},
+	selectedFindings: {
+		id: 'moderation.project-review.selectedFindings',
+		defaultMessage: '{count, plural, one {# selected finding} other {# selected findings}}',
+	},
 	openReviewGuidance: {
 		id: 'moderation.project-review.openReviewGuidance',
 		defaultMessage: 'Open review guidance in new tab',

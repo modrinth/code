@@ -103,7 +103,9 @@ export function createReviewContext(
 			if (pinned.value || openDropdowns > 0) return
 			if (
 				active.value.element.matches(':hover') ||
+				active.value.element.contains(document.activeElement) ||
 				panel.value?.matches(':hover') ||
+				panel.value?.contains(document.activeElement) ||
 				[...childPanels].some(
 					(child) => child.matches(':hover') || child.contains(document.activeElement),
 				)

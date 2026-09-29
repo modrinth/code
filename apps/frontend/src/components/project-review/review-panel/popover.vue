@@ -8,10 +8,13 @@
 			:aria-label="titleId ? undefined : label"
 			:data-review-panel="anchor.id"
 			tabindex="-1"
-			class="z-[100] box-border flex w-[28rem] max-w-[calc(100vw-1rem)] flex-col gap-2 overflow-y-auto rounded-xl border border-solid border-surface-5 bg-surface-3 p-2.5 pb-3 text-sm text-primary"
+			class="z-[100] box-border flex w-[28rem] max-w-[calc(100vw-1rem)] flex-col gap-2 overflow-y-auto rounded-xl border border-solid border-highlight-orange bg-[color:color-mix(in_srgb,var(--color-orange)_3%,var(--surface-1))] p-2.5 pb-3 text-sm text-primary"
 			:style="floatingStyles"
 			@pointerenter="cancelClose"
 			@pointerleave="leave(anchor.id)"
+			@focusin="cancelClose"
+			@focusout="leave(anchor.id)"
+			@keydown="onKeydown"
 		>
 			<div class="flex items-center justify-between gap-3">
 				<slot name="title" />
@@ -61,7 +64,7 @@ const { active, panel, panelId, pinned, close, leave, cancelClose, contains } =
 	injectReviewContext()
 const element = shallowRef<HTMLElement | null>(null)
 useActionKeybinds(element, () => active.value?.id === props.anchor.id)
-const reference = computed(() => props.anchor.trigger ?? props.anchor.element)
+const reference = computed(() => props.anchor.element)
 const { floatingStyles, isPositioned } = useFloating(reference, element, {
 	placement: 'right-start',
 	strategy: 'fixed',
@@ -81,6 +84,13 @@ const { floatingStyles, isPositioned } = useFloating(reference, element, {
 
 function dismiss(restoreFocus = false) {
 	if (active.value?.id === props.anchor.id) close(restoreFocus)
+}
+
+function onKeydown(event: KeyboardEvent) {
+	if (event.key !== 'Escape' || event.defaultPrevented) return
+	event.preventDefault()
+	event.stopPropagation()
+	dismiss(true)
 }
 
 watch(element, (value, previous) => {

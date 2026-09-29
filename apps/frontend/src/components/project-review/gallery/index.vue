@@ -1,11 +1,11 @@
 <template>
-	<div ref="hotkeyScope" class="group/gallery flex h-full min-h-0 flex-col gap-2.5 overflow-hidden">
+	<div ref="interactionScope" class="flex h-full min-h-0 flex-col gap-2.5 overflow-hidden p-2">
 		<ReviewPanel
 			mode="inline"
 			:target="{ kind: 'gallery' }"
 			:disabled="isLoading || !!error"
-			:hotkey-scope="hotkeyScope"
-			class="group-hover/gallery:opacity-100"
+			:interaction-scope="interactionScope"
+			class="shrink-0"
 		/>
 		<div class="min-h-0 flex-1 overflow-y-auto overscroll-contain">
 			<p v-if="!selection" class="m-0 text-secondary">
@@ -87,7 +87,7 @@ import { projectReviewMessages as messages } from '../messages'
 import ReviewPanel from '../review-panel/index.vue'
 
 const { formatMessage } = useVIntl()
-const hotkeyScope = useTemplateRef<HTMLElement>('hotkeyScope')
+const interactionScope = useTemplateRef<HTMLElement>('interactionScope')
 const formatDateTime = useFormatDateTime({
 	dateStyle: 'long',
 	timeStyle: 'short',

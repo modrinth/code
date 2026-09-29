@@ -66,8 +66,8 @@
 							:aria-label="control.label"
 							:aria-required="control.required"
 							:dropdown-gap="0"
-							@open="emit('dropdown-open')"
-							@close="emit('dropdown-close')"
+							@open="setDropdownOpen(control, true)"
+							@close="setDropdownOpen(control, false)"
 							@update:model-value="panelBinding && panels.write(panelBinding, control, $event)"
 						/>
 						<Combobox
@@ -85,8 +85,8 @@
 							:aria-label="control.label"
 							:aria-required="control.required"
 							:dropdown-gap="0"
-							@open="emit('dropdown-open')"
-							@close="emit('dropdown-close')"
+							@open="setDropdownOpen(control, true)"
+							@close="setDropdownOpen(control, false)"
 							@update:model-value="panelBinding && panels.write(panelBinding, control, $event)"
 						/>
 					</div>
@@ -171,8 +171,8 @@
 				:target="target"
 				:binding="correction"
 				:keybind-offset="correctionOffsets[correctionIndex]"
-				@dropdown-open="emit('dropdown-open')"
-				@dropdown-close="emit('dropdown-close')"
+				@dropdown-open="emit('dropdown-open', $event)"
+				@dropdown-close="emit('dropdown-close', $event)"
 			/>
 		</div>
 	</div>
@@ -191,7 +191,15 @@ import {
 	Tooltip,
 	useVIntl,
 } from '@modrinth/ui'
-import { type ComponentPublicInstance, computed, getCurrentInstance, nextTick, useId } from 'vue'
+import {
+	type ComponentPublicInstance,
+	computed,
+	getCurrentInstance,
+	nextTick,
+	onBeforeUnmount,
+	useId,
+	watch,
+} from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
 import type { ReviewTarget } from '~/providers/project-review/review'
@@ -209,8 +217,8 @@ const props = defineProps<{
 }>()
 const RecursiveControls = getCurrentInstance()!.type
 const emit = defineEmits<{
-	'dropdown-open': []
-	'dropdown-close': []
+	'dropdown-open': [key: string]
+	'dropdown-close': [key: string]
 }>()
 const id = useId()
 const controlMessages = defineMessages({
@@ -250,6 +258,45 @@ const panelBinding = computed(
 	() => props.binding ?? (props.target ? panels.resolve(props.target) : undefined),
 )
 type PanelControl = ReviewPanelBinding['panel']['sections'][number]['controls'][number]
+const openDropdowns = new Set<string>()
+const dropdownKeys = computed(
+	() =>
+		new Set(
+			panelBinding.value?.panel.sections.flatMap((section) =>
+				section.controls.flatMap((control) =>
+					control.type === 'select' && !control.disabled ? [dropdownKey(control)] : [],
+				),
+			),
+		),
+)
+
+function dropdownKey(control: Extract<PanelControl, { type: 'select' }>) {
+	return `${id}:${control.issueId}:${control.key}`
+}
+
+function closeDropdown(key: string) {
+	if (openDropdowns.delete(key)) emit('dropdown-close', key)
+}
+
+function setDropdownOpen(control: PanelControl, open: boolean) {
+	if (control.type !== 'select') return
+	const key = dropdownKey(control)
+	if (!open) closeDropdown(key)
+	else if (dropdownKeys.value.has(key) && !openDropdowns.has(key)) {
+		openDropdowns.add(key)
+		emit('dropdown-open', key)
+	}
+}
+
+watch(dropdownKeys, (keys) => {
+	for (const key of openDropdowns) {
+		if (!keys.has(key)) closeDropdown(key)
+	}
+})
+onBeforeUnmount(() => {
+	for (const key of openDropdowns) closeDropdown(key)
+})
+
 const fields = new Map<string, { focus: () => void }>()
 let pendingFocus: string | undefined
 

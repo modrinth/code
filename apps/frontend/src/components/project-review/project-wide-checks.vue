@@ -9,7 +9,7 @@
 		}"
 	>
 		<div
-			class="-mx-1 flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-1 pb-4 pt-1"
+			class="-mx-1 flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-2 pb-4 pt-2"
 		>
 			<Tabs
 				:value="selectedTarget"
@@ -22,7 +22,7 @@
 				v-if="visibleTargets.includes(selectedTarget)"
 				:key="selectedTarget"
 				mode="inline"
-				class="min-w-0 shrink-0 !overflow-visible"
+				class="min-w-0 shrink-0"
 				:target="{ kind: selectedTarget }"
 			/>
 		</div>

@@ -1,19 +1,26 @@
 <template>
 	<Button
-		:type="color === 'standard' ? 'base' : 'colored'"
-		:color="color === 'standard' ? undefined : color"
+		type="outlined"
 		:disabled="disabled"
+		:aria-pressed="modelValue"
 		:aria-label="icon ? label : undefined"
 		:aria-keyshortcuts="keybind"
 		:data-review-keybind="keybind"
+		:data-tone="tone"
+		class="action-toggle !gap-1.5 !rounded-lg !px-2.5 !font-medium !text-contrast [&>svg]:!text-inherit"
+		:class="{
+			'!brightness-100': modelValue,
+			'enabled:hover:!brightness-125': !modelValue,
+			'action-toggle-selected': modelValue,
+		}"
 		size="sm"
 		@click="emit('update:modelValue', !modelValue)"
 	>
-		<component :is="icon" v-if="icon" />
+		<component :is="icon" v-if="icon" aria-hidden="true" />
 		<template v-else>{{ label }}</template>
 		<kbd
 			v-if="keybind && showKeybindHint !== false"
-			class="relative bottom-px ml-auto flex h-[18px] min-w-[18px] shrink-0 items-center justify-center rounded border border-solid border-surface-4 bg-surface-3 px-0.5 font-sans text-[10px] font-medium text-primary"
+			class="action-toggle-keybind ml-1 flex h-5 min-w-5 shrink-0 items-center justify-center gap-0.5 rounded px-1 font-sans text-[11px] font-medium leading-none"
 			aria-hidden="true"
 		>
 			<ArrowBigUpIcon v-if="keybind.startsWith('Shift+')" class="!size-3" />
@@ -43,9 +50,33 @@ const emit = defineEmits<{
 	'update:modelValue': [boolean]
 }>()
 
-const color = computed(() => {
-	if (!props.modelValue) return 'standard'
+const tone = computed(() => {
 	if (props.needsAttention) return 'orange'
-	return props.fixActionable ? 'blue' : 'brand'
+	return props.fixActionable ? 'blue' : 'orange'
 })
 </script>
+
+<style scoped>
+.action-toggle {
+	--action-color: var(--color-orange);
+	--action-highlight: var(--color-orange-highlight);
+}
+
+.action-toggle[data-tone='blue'] {
+	--action-color: var(--color-blue);
+	--action-highlight: var(--color-blue-highlight);
+}
+
+.action-toggle-selected {
+	background: var(--action-highlight);
+	box-shadow: inset 0 0 0 1px var(--action-color);
+}
+
+.action-toggle-keybind {
+	color: var(--color-primary);
+	background: var(--surface-3);
+	border: 1px solid var(--surface-5);
+	border-bottom-width: 2px;
+	box-shadow: 0 1px 0 var(--surface-1);
+}
+</style>

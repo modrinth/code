@@ -35,7 +35,6 @@ const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVis
 				variant === 'review'
 					? {
 							mode: 'anchored',
-							triggerPlacement: 'above',
 							target: { kind: 'disclosure', key: 'ai' },
 						}
 					: {}
@@ -58,7 +57,6 @@ const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVis
 				variant === 'review'
 					? {
 							mode: 'anchored',
-							triggerPlacement: 'above',
 							target: { kind: 'disclosure', key: 'ai-functionality' },
 						}
 					: {}
@@ -81,7 +79,6 @@ const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVis
 				variant === 'review'
 					? {
 							mode: 'anchored',
-							triggerPlacement: 'above',
 							target: { kind: 'disclosure', key: 'ads' },
 						}
 					: {}
@@ -104,7 +101,6 @@ const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVis
 				variant === 'review'
 					? {
 							mode: 'anchored',
-							triggerPlacement: 'above',
 							target: { kind: 'disclosure', key: 'paid-features' },
 						}
 					: {}
@@ -127,7 +123,6 @@ const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVis
 				variant === 'review'
 					? {
 							mode: 'anchored',
-							triggerPlacement: 'above',
 							target: { kind: 'disclosure', key: 'telemetry' },
 						}
 					: {}
@@ -150,7 +145,6 @@ const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVis
 				variant === 'review'
 					? {
 							mode: 'anchored',
-							triggerPlacement: 'above',
 							target: { kind: 'disclosure', key: 'derivative-content' },
 						}
 					: {}
@@ -173,7 +167,6 @@ const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVis
 				variant === 'review'
 					? {
 							mode: 'anchored',
-							triggerPlacement: 'above',
 							target: { kind: 'disclosure', key: 'photosensitivity' },
 						}
 					: {}
@@ -196,7 +189,6 @@ const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVis
 				variant === 'review'
 					? {
 							mode: 'anchored',
-							triggerPlacement: 'above',
 							target: { kind: 'disclosure', key: 'system-interactions' },
 						}
 					: {}
@@ -219,7 +211,6 @@ const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVis
 				variant === 'review'
 					? {
 							mode: 'anchored',
-							triggerPlacement: 'above',
 							target: { kind: 'disclosure', key: 'archive' },
 						}
 					: {}

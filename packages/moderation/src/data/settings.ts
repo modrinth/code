@@ -23,6 +23,21 @@ const settings = {
 			description: 'Show number key shortcut hints on issue toggle buttons.',
 			default: true,
 		}),
+		ShowFloatingPanelFieldHoverHighlight: setting.asToggle({
+			type: 'toggle',
+			id: 'show-floating-panel-field-hover-highlight',
+			title: 'Highlight fields for floating review panels',
+			description:
+				'Highlight the reviewed field when hovering over it or its floating review panel.',
+			default: true,
+		}),
+		ShowInlinePanelHoverHighlight: setting.asToggle({
+			type: 'toggle',
+			id: 'show-inline-panel-hover-highlight',
+			title: 'Highlight inline review panels',
+			description: 'Highlight inline review panels when hovering over or interacting with them.',
+			default: true,
+		}),
 		PrivateMessageHighlight: setting.asToggle({
 			type: 'toggle',
 			id: 'private-message-highlight',

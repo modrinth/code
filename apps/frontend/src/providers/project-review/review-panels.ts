@@ -283,6 +283,15 @@ export function createReviewPanels(
 		return isSelected(binding.projectId, control)
 	}
 
+	/** Counts selected toggle controls in this panel, rather than distinct issue IDs. */
+	function selectedFindingCount(binding: ReviewPanelBinding): number {
+		return binding.panel.sections.reduce(
+			(count, section) =>
+				count + section.controls.filter((control) => selected(binding, control)).length,
+			0,
+		)
+	}
+
 	function textValue(binding: ReviewPanelBinding, control: ResolvedIssueControl): string {
 		if (control.type !== 'markdown' && control.type !== 'text') return ''
 		return textValues(binding.projectId, control.issueId)[control.key] ?? control.initial
@@ -545,6 +554,7 @@ export function createReviewPanels(
 		removeIssue,
 		resolve,
 		selected,
+		selectedFindingCount,
 		textValue,
 		selectValues,
 		missing,

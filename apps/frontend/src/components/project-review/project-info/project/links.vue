@@ -4,7 +4,7 @@
 			<EditButton :section="formatMessage(messages.links)" @click="editModal?.show()" />
 		</template>
 		<EditModal :key="project?.id" ref="editModal" />
-		<div v-if="links.length" class="-mt-1.5 flex flex-col">
+		<div v-if="links.length" class="flex flex-col gap-3">
 			<ReviewPanel
 				v-for="link in links"
 				:key="link.key"
@@ -12,7 +12,7 @@
 				:target="{ kind: 'link', key: link.key }"
 				class="min-w-0"
 			>
-				<div class="flex flex-col gap-1 py-1.5">
+				<div class="flex flex-col gap-1">
 					<h4 class="m-0 text-sm font-normal text-secondary">
 						{{ link.label }}
 					</h4>

@@ -1,6 +1,8 @@
 <template>
 	<div v-if="project" class="flex h-full min-h-0 flex-col gap-1 overflow-hidden">
-		<ReviewPanel mode="inline" :target="{ kind: 'disclosures' }" />
+		<div class="shrink-0 p-2">
+			<ReviewPanel mode="inline" :target="{ kind: 'disclosures' }" />
+		</div>
 		<p v-if="isPending" role="status">{{ formatMessage(statusMessages.loading) }}</p>
 		<div v-else-if="isError" role="alert">
 			<p>{{ formatMessage(statusMessages.loadError) }}</p>
@@ -13,7 +15,7 @@
 			:description="formatMessage(commonMessages.uploadVersionsEmptyStateDescription)"
 		/>
 		<template v-else>
-			<div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-1 pb-1 pt-3">
+			<div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-2 pt-3">
 				<DisclosureCards
 					:editor="disclosures"
 					:project-title="project.name"

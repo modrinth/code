@@ -1,15 +1,17 @@
 <template>
 	<div
-		ref="hotkeyScope"
-		class="editable-review-section group/description flex h-full min-h-0 flex-col gap-2.5 overflow-y-auto overflow-x-hidden"
+		ref="interactionScope"
+		class="editable-review-section flex h-full min-h-0 flex-col gap-2.5 overflow-y-auto overflow-x-hidden px-2 pb-2"
 	>
-		<div class="sticky top-0 z-10 flex shrink-0 items-start justify-between gap-2 bg-bg">
+		<div
+			class="sticky top-0 z-10 flex shrink-0 items-start justify-between gap-4 bg-surface-1 pt-2"
+		>
 			<ReviewPanel
 				mode="inline"
 				:target="{ kind: 'description' }"
 				:disabled="isLoading || !!error"
-				:hotkey-scope="hotkeyScope"
-				class="!w-auto min-w-0 flex-1 pb-2.5 group-hover/description:opacity-100"
+				:interaction-scope="interactionScope"
+				class="!w-auto min-w-0 flex-1 pb-2.5"
 			/>
 			<div class="mt-0.5 flex shrink-0 justify-end gap-1">
 				<template v-if="editing">
@@ -82,7 +84,7 @@ import { useProjectTextEdit } from '../project-info/edit/use-project-text-edit'
 import ReviewPanel from '../review-panel/index.vue'
 
 const { formatMessage } = useVIntl()
-const hotkeyScope = useTemplateRef<HTMLElement>('hotkeyScope')
+const interactionScope = useTemplateRef<HTMLElement>('interactionScope')
 const { selection, isLoading, error, refresh } = injectProjectReviewPageContext()
 const editor = useTemplateRef<InstanceType<typeof MarkdownEditor>>('editor')
 const {

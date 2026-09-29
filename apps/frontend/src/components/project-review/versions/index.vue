@@ -1,8 +1,5 @@
 <template>
-	<div
-		ref="hotkeyScope"
-		class="group/versions flex h-full min-h-0 flex-col gap-2.5 overflow-hidden"
-	>
+	<div ref="interactionScope" class="flex h-full min-h-0 flex-col gap-2.5 overflow-hidden p-2">
 		<CreateProjectVersionModal
 			v-if="editorHost"
 			:key="selection"
@@ -19,11 +16,11 @@
 			v-if="resolve({ kind: 'versions' })"
 			mode="inline"
 			:target="{ kind: 'versions' }"
-			:hotkey-scope="hotkeyScope"
+			:interaction-scope="interactionScope"
 			:disabled="
 				isLoading || !!error || versionsQuery.isPending.value || versionsQuery.isError.value
 			"
-			class="group-hover/versions:opacity-100"
+			class="shrink-0"
 		>
 		</ReviewPanel>
 		<div class="min-h-0 flex-1 overflow-auto">
@@ -106,7 +103,7 @@ import VersionCard from './version-card.vue'
 
 const { formatMessage } = useVIntl()
 const { resolve } = injectReviewPanels()
-const hotkeyScope = useTemplateRef<HTMLElement>('hotkeyScope')
+const interactionScope = useTemplateRef<HTMLElement>('interactionScope')
 const { selection, projectV2, versions, versionsQuery, isLoading, error, refresh } =
 	injectProjectReviewPageContext()
 const queryClient = useQueryClient()

@@ -1,14 +1,11 @@
 <template>
-	<section
-		ref="hotkeyScope"
-		class="group/permissions flex h-full min-h-0 flex-col gap-2.5 overflow-hidden"
-	>
+	<section ref="interactionScope" class="flex h-full min-h-0 flex-col gap-2.5 overflow-hidden p-2">
 		<ReviewPanel
 			v-if="panels.resolve({ kind: 'permissions' })"
 			mode="inline"
 			:target="{ kind: 'permissions' }"
-			:hotkey-scope="hotkeyScope"
-			class="shrink-0 !overflow-visible group-hover/permissions:opacity-100"
+			:interaction-scope="interactionScope"
+			class="shrink-0"
 		/>
 		<div class="min-h-0 flex-1 overflow-y-auto overscroll-contain">
 			<ProjectPermissions
@@ -43,6 +40,6 @@ import ImageViewerActions from '../image-viewer-actions.vue'
 import ReviewPanel from '../review-panel/index.vue'
 
 const panels = injectReviewPanels()
-const hotkeyScope = useTemplateRef<HTMLElement>('hotkeyScope')
+const interactionScope = useTemplateRef<HTMLElement>('interactionScope')
 const { project, members } = injectProjectReviewPageContext()
 </script>
