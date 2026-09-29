@@ -114,17 +114,17 @@
 						<dl
 							class="m-0 grid min-w-0 grid-cols-[minmax(0,max-content)_minmax(0,1fr)] items-baseline gap-x-6 gap-y-3"
 						>
-							<dt class="text-secondary">
+							<dt class="font-medium text-secondary">
 								{{ formatMessage(messages.versionNumber) }}
 							</dt>
 							<dd class="m-0 min-w-0 break-all">
 								{{ version.version_number }}
 							</dd>
-							<dt class="text-secondary">
+							<dt class="font-medium text-secondary">
 								{{ formatMessage(messages.versionSubtitle) }}
 							</dt>
 							<dd class="m-0 min-w-0 break-words">{{ version.name }}</dd>
-							<dt class="text-secondary">
+							<dt class="font-medium text-secondary">
 								{{ formatMessage(messages.publishedBy) }}
 							</dt>
 							<dd class="m-0 min-w-0 break-words">
@@ -135,7 +135,7 @@
 									>{{ author?.username ?? version.author_id }}</NuxtLink
 								>
 							</dd>
-							<dt class="text-secondary">
+							<dt class="font-medium text-secondary">
 								{{ formatMessage(messages.versionId) }}
 							</dt>
 							<dd class="m-0 min-w-0"><CopyCode :text="version.id" /></dd>

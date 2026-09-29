@@ -1,7 +1,7 @@
 <template>
 	<Section :heading="formatMessage(messages.serverDetails)" :target="{ kind: 'server' }">
 		<dl v-if="project" class="m-0 grid grid-cols-[max-content_minmax(0,1fr)] gap-x-3 gap-y-2.5">
-			<dt>{{ formatMessage(messages.serverAddress) }}</dt>
+			<dt class="font-medium">{{ formatMessage(messages.serverAddress) }}</dt>
 			<dd class="m-0 break-all text-primary">
 				<CopyCode
 					v-if="project.minecraft_java_server?.address"
@@ -10,14 +10,14 @@
 				/>
 				<span v-else>{{ formatMessage(messages.noServerAddress) }}</span>
 			</dd>
-			<dt>{{ formatMessage(messages.serverRegion) }}</dt>
+			<dt class="font-medium">{{ formatMessage(messages.serverRegion) }}</dt>
 			<dd class="m-0 text-primary">
 				<TagItem v-if="region" class="!border-surface-4 !bg-surface-3 !text-secondary">
 					{{ region }}
 				</TagItem>
 				<span v-else>—</span>
 			</dd>
-			<dt>{{ formatMessage(messages.serverLanguages) }}</dt>
+			<dt class="font-medium">{{ formatMessage(messages.serverLanguages) }}</dt>
 			<dd class="m-0 flex flex-wrap items-start gap-1">
 				<TagItem
 					v-for="language in languages"
@@ -29,7 +29,7 @@
 				<span v-if="languages.length === 0">{{ formatMessage(messages.noServerLanguages) }}</span>
 			</dd>
 
-			<dt>{{ formatMessage(messages.serverContent) }}</dt>
+			<dt class="font-medium">{{ formatMessage(messages.serverContent) }}</dt>
 			<dd class="m-0 min-w-0">
 				<TagItem
 					v-if="content?.kind === 'vanilla'"
@@ -49,7 +49,7 @@
 				<span v-else>—</span>
 			</dd>
 			<template v-if="content?.kind === 'vanilla'">
-				<dt>{{ formatMessage(messages.gameVersions) }}</dt>
+				<dt class="font-medium">{{ formatMessage(messages.gameVersions) }}</dt>
 				<dd class="m-0 flex flex-wrap items-start gap-1">
 					<TagItem
 						v-if="content.recommended_game_version"

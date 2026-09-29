@@ -1,7 +1,7 @@
 <template>
 	<Section :heading="formatMessage(messages.compatibility)" :target="{ kind: 'compatibility' }">
 		<dl class="m-0 grid grid-cols-[max-content_minmax(0,1fr)] gap-x-3 gap-y-2.5">
-			<dt class="text-sm text-secondary">{{ formatMessage(messages.gameVersions) }}</dt>
+			<dt class="text-sm font-medium text-secondary">{{ formatMessage(messages.gameVersions) }}</dt>
 			<dd class="m-0 flex flex-wrap items-start gap-1">
 				<TagItem
 					v-for="version in gameVersions"
@@ -14,24 +14,22 @@
 					formatMessage(messages.emptyVersions)
 				}}</span>
 			</dd>
-			<dt class="text-sm text-secondary">{{ formatMessage(messages.platforms) }}</dt>
+			<dt class="text-sm font-medium text-secondary">{{ formatMessage(messages.platforms) }}</dt>
 			<dd class="m-0 flex flex-wrap items-start gap-1">
 				<TagItem
 					v-for="loader in project?.loaders"
 					:key="loader"
 					:style="`--_color: var(--color-platform-${loader})`"
 				>
-					<component
-						:is="getLoaderIcon(loader)"
-						v-if="getLoaderIcon(loader)"
-						aria-hidden="true"
-					/>
+					<component :is="getLoaderIcon(loader)" v-if="getLoaderIcon(loader)" aria-hidden="true" />
 					{{ formatLoader(formatMessage, loader) }}
 				</TagItem>
 				<span v-if="!project?.loaders.length">{{ formatMessage(messages.emptyPlatforms) }}</span>
 			</dd>
 			<template v-if="requiresEnvironmentInfo(project?.project_types ?? [])">
-				<dt class="text-sm text-secondary">{{ formatMessage(messages.environments) }}</dt>
+				<dt class="text-sm font-medium text-secondary">
+					{{ formatMessage(messages.environments) }}
+				</dt>
 				<dd class="m-0 flex flex-wrap items-start gap-1">
 					<TagItem
 						v-for="environment in project?.environment"

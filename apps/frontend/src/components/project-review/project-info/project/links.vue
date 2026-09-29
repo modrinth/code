@@ -13,7 +13,7 @@
 				class="min-w-0"
 			>
 				<div class="flex flex-col gap-1">
-					<h4 class="m-0 text-sm font-normal text-secondary">
+					<h4 class="m-0 text-sm font-medium text-secondary">
 						{{ link.label }}
 					</h4>
 					<a

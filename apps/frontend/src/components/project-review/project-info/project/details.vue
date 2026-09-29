@@ -1,7 +1,7 @@
 <template>
 	<Section :heading="formatMessage(messages.details)">
 		<dl v-if="project" class="m-0 grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 gap-y-2">
-			<dt>{{ formatMessage(messages.projectType) }}</dt>
+			<dt class="font-medium">{{ formatMessage(messages.projectType) }}</dt>
 			<dd class="m-0 flex flex-col gap-1">
 				<div
 					v-for="type in projectTypes"
@@ -17,20 +17,20 @@
 					>
 				</div>
 			</dd>
-			<dt>{{ formatMessage(messages.created) }}</dt>
+			<dt class="font-medium">{{ formatMessage(messages.created) }}</dt>
 			<dd class="m-0">
 				<time :datetime="project.published" :title="project.published">{{
 					relativeTime(project.published)
 				}}</time>
 			</dd>
-			<dt>{{ formatMessage(messages.updated) }}</dt>
+			<dt class="font-medium">{{ formatMessage(messages.updated) }}</dt>
 			<dd class="m-0">
 				<time :datetime="project.updated" :title="project.updated">{{
 					relativeTime(project.updated)
 				}}</time>
 			</dd>
 			<template v-if="project.queued">
-				<dt>{{ formatMessage(messages.submitted) }}</dt>
+				<dt class="font-medium">{{ formatMessage(messages.submitted) }}</dt>
 				<dd class="m-0">
 					<time :datetime="project.queued" :title="project.queued">{{
 						relativeTime(project.queued)
@@ -41,10 +41,10 @@
 					>
 				</dd>
 			</template>
-			<dt>{{ formatMessage(messages.downloads) }}</dt>
+			<dt class="font-medium">{{ formatMessage(messages.downloads) }}</dt>
 			<dd class="m-0">{{ formatNumber(project.downloads) }}</dd>
 			<template v-if="project.requested_status">
-				<dt>{{ formatMessage(messages.requesting) }}</dt>
+				<dt class="font-medium">{{ formatMessage(messages.requesting) }}</dt>
 				<dd class="m-0">
 					<ProjectStatusBadge
 						:status="project.requested_status"

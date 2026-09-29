@@ -7,7 +7,7 @@
 		:class="{ 'editable-review-section': !!$slots.actions }"
 	>
 		<div class="flex items-center gap-1">
-			<h3 class="m-0 text-sm font-normal text-secondary">{{ heading }}</h3>
+			<h3 class="m-0 text-sm font-semibold text-secondary">{{ heading }}</h3>
 			<slot name="actions" />
 		</div>
 		<slot />
