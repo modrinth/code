@@ -1,4 +1,7 @@
-use crate::util::{download_file, fetch_json, fetch_xml, format_url};
+use crate::util::{
+    download_file, fetch_json, fetch_optional_json, fetch_xml, format_url,
+    retain_manifest_versions,
+};
 use crate::{
     Error, FetchResult, MirrorArtifact, UploadFile, insert_mirrored_artifact,
 };
@@ -221,14 +224,15 @@ async fn fetch(
 ) -> Result<FetchResult, Error> {
     let upload_files = DashMap::new();
     let mirror_artifacts = DashMap::<String, MirrorArtifact>::new();
-    let modrinth_manifest = fetch_json::<daedalus::modded::Manifest>(
+    let modrinth_manifest = fetch_optional_json::<daedalus::modded::Manifest>(
         &format_url(&format!("{mod_loader}/v{format_version}/manifest.json",)),
         &semaphore,
     )
-    .await
-    .ok();
+    .await?;
 
-    let fetch_versions = if let Some(modrinth_manifest) = modrinth_manifest {
+    let fetch_versions = if let Some(modrinth_manifest) =
+        modrinth_manifest.as_ref()
+    {
         let mut fetch_versions = Vec::new();
 
         for version in &forge_versions {
@@ -788,7 +792,7 @@ async fn fetch(
         let forge_manifest_path =
             format!("{mod_loader}/v{format_version}/manifest.json",);
 
-        let manifest = daedalus::modded::Manifest {
+        let mut manifest = daedalus::modded::Manifest {
             game_versions: forge_versions
                 .into_iter()
                 .sorted_by(|a, b| b.game_version.cmp(&a.game_version))
@@ -815,6 +819,8 @@ async fn fetch(
                 .collect(),
             version_groups: Vec::new(),
         };
+
+        retain_manifest_versions(&mut manifest, modrinth_manifest.as_ref());
 
         upload_files.insert(
             forge_manifest_path,
