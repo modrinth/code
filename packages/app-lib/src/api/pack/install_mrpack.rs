@@ -529,6 +529,7 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
     reason: DownloadReason,
     reporter: InstallProgressReporter,
     ignore_modpack_servers: bool,
+	preserve_icon: bool,
 ) -> crate::Result<String> {
     let state = &State::get().await?;
 
@@ -538,7 +539,7 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
     let project_id = create_pack.description.project_id;
     let version_id = create_pack.description.version_id;
     let instance_id = create_pack.description.instance_id;
-    let mut icon_exists = icon.is_some();
+	let mut icon_exists = preserve_icon || icon.is_some();
     let source_path = pack_source_path(&file);
 
     reporter

@@ -10,14 +10,12 @@ import { injectAuth, injectModrinthClient } from '#ui/providers'
 
 import type { ServerPlayerRow } from './types'
 
-export function useServerPlayers(instanceId: Ref<string | null>, canManage: Ref<boolean>) {
+export function useServerPlayerMembers(instanceId: Ref<string | null>) {
 	const client = injectModrinthClient()
 	const auth = injectAuth()
-	const queryClient = useQueryClient()
 	const userId = computed(() => auth.user.value?.id)
-	const memberKey = (id: string) => ['shared-instances', id, 'players', userId.value] as const
-	const members = useQuery({
-		queryKey: computed(() => memberKey(instanceId.value ?? '')),
+	return useQuery({
+		queryKey: computed(() => ['shared-instances', instanceId.value ?? '', 'players', userId.value]),
 		enabled: computed(() => !!instanceId.value && !!userId.value),
 		queryFn: async () => {
 			const response = await client.sharedinstances.instances_v1.getUsers(instanceId.value!)
@@ -42,6 +40,15 @@ export function useServerPlayers(instanceId: Ref<string | null>, canManage: Ref<
 		},
 		refetchInterval: 30_000,
 	})
+}
+
+export function useServerPlayers(instanceId: Ref<string | null>, canManage: Ref<boolean>) {
+	const client = injectModrinthClient()
+	const auth = injectAuth()
+	const queryClient = useQueryClient()
+	const userId = computed(() => auth.user.value?.id)
+	const memberKey = (id: string) => ['shared-instances', id, 'players', userId.value] as const
+	const members = useServerPlayerMembers(instanceId)
 	const rows = computed(() => members.data.value?.rows ?? [])
 	const remaining = computed(() => members.data.value?.remaining ?? 0)
 	const friends = useQuery({

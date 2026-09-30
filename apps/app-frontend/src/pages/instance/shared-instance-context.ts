@@ -64,7 +64,7 @@ export function createSharedInstanceContext(
 				type: 'server',
 				name: attachment.server_manager_name,
 				avatarUrl:
-					getInstanceIconUrl(instance.value?.icon_path ?? attachment.server_manager_icon_url) ??
+					getInstanceIconUrl(attachment.server_manager_icon_url ?? instance.value?.icon_path) ??
 					undefined,
 				tintBy: attachment.server_manager_name,
 			}
