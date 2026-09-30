@@ -70,17 +70,20 @@ pub(super) async fn finalize_shared_instance_attachment(
     pool: &SqlitePool,
 ) -> crate::Result<()> {
     if let Some(server) = &data.linked_server {
-		if let Some(icon) = data.server_manager_icon_url.as_deref() {
-			let icon_path = crate::state::instances::commands::resolve_icon_path(
-				Some(icon),
-				false,
-				state,
-			).await?;
-			crate::api::instance::edit_icon(
-				instance_id,
-				icon_path.as_deref().map(std::path::Path::new),
-			).await?;
-		}
+        if let Some(icon) = data.server_manager_icon_url.as_deref() {
+            let icon_path =
+                crate::state::instances::commands::resolve_icon_path(
+                    Some(icon),
+                    false,
+                    state,
+                )
+                .await?;
+            crate::api::instance::edit_icon(
+                instance_id,
+                icon_path.as_deref().map(std::path::Path::new),
+            )
+            .await?;
+        }
         crate::api::worlds::ensure_managed_server_in_instance(
             instance_id,
             data.server_manager_name
@@ -289,14 +292,20 @@ impl SharedInstanceApplyPlan {
 #[inline(never)]
 pub(super) fn apply_shared_instance_update(
     job_id: Uuid,
-	job_state: &mut InstallJobState,
-	state: &State,
-	instance_id: &str,
-	data: &SharedInstanceInstallData,
+    job_state: &mut InstallJobState,
+    state: &State,
+    instance_id: &str,
+    data: &SharedInstanceInstallData,
 ) -> impl std::future::Future<Output = crate::Result<()>> + Send {
-	install_step(job_id, "plan_shared_instance_update", move || {
-		apply_shared_instance_update_inner(job_id, job_state, state, instance_id, data)
-	})
+    install_step(job_id, "plan_shared_instance_update", move || {
+        apply_shared_instance_update_inner(
+            job_id,
+            job_state,
+            state,
+            instance_id,
+            data,
+        )
+    })
 }
 
 async fn apply_shared_instance_update_inner(
@@ -321,62 +330,69 @@ async fn apply_shared_instance_update_inner(
         .await?;
     }
 
-	tracing::info!(%job_id, instance_id, full_apply = plan.configuration_changed, "Applying shared instance update");
+    tracing::info!(%job_id, instance_id, full_apply = plan.configuration_changed, "Applying shared instance update");
     if plan.configuration_changed {
-		install_step(job_id, "reinstall_shared_instance", || {
-			reinstall_shared_instance(job_id, job_state, state, instance_id, data)
-		}).await
-	} else {
-		install_step(job_id, "apply_shared_instance_changes", || {
-			apply_shared_instance_changes(job_id, job_state, state, instance_id, data, plan)
-		}).await
-	}
+        install_step(job_id, "reinstall_shared_instance", || {
+            reinstall_shared_instance(
+                job_id,
+                job_state,
+                state,
+                instance_id,
+                data,
+            )
+        })
+        .await
+    } else {
+        install_step(job_id, "apply_shared_instance_changes", || {
+            apply_shared_instance_changes(
+                job_id,
+                job_state,
+                state,
+                instance_id,
+                data,
+                plan,
+            )
+        })
+        .await
+    }
 }
 
 async fn reinstall_shared_instance(
-	job_id: Uuid,
-	job_state: &mut InstallJobState,
-	state: &State,
-	instance_id: &str,
-	data: &SharedInstanceInstallData,
+    job_id: Uuid,
+    job_state: &mut InstallJobState,
+    state: &State,
+    instance_id: &str,
+    data: &SharedInstanceInstallData,
 ) -> crate::Result<()> {
-        crate::api::instance::prepare_instance_update(instance_id).await?;
-        remove_existing_shared_instance_content(instance_id, state).await?;
-        apply_shared_instance_content(
-            job_id,
-            job_state,
-            state,
-            instance_id,
-            data,
-        )
+    crate::api::instance::prepare_instance_update(instance_id).await?;
+    remove_existing_shared_instance_content(instance_id, state).await?;
+    apply_shared_instance_content(job_id, job_state, state, instance_id, data)
         .await?;
-        if data.modpack.is_none() {
-            if let Err(error) =
-                crate::api::instance::capture_game_options_pack_base(
-                    instance_id,
-                    None,
-                )
-                .await
-            {
-                tracing::warn!(
-                    "The shared instance was updated, but its local options.txt could not be restored after removing the previous pack: {error}"
-                );
-            }
-                crate::api::instance::reconcile_instance_after_pack_update(
-                    instance_id,
+    if data.modpack.is_none() {
+        if let Err(error) =
+            crate::api::instance::capture_game_options_pack_base(
+                instance_id,
+                None,
             )
-            .await?;
+            .await
+        {
+            tracing::warn!(
+                "The shared instance was updated, but its local options.txt could not be restored after removing the previous pack: {error}"
+            );
         }
-	Ok(())
+        crate::api::instance::reconcile_instance_after_pack_update(instance_id)
+            .await?;
     }
+    Ok(())
+}
 
 async fn apply_shared_instance_changes(
-	job_id: Uuid,
-	job_state: &mut InstallJobState,
-	state: &State,
-	instance_id: &str,
-	data: &SharedInstanceInstallData,
-	plan: SharedInstanceApplyPlan,
+    job_id: Uuid,
+    job_state: &mut InstallJobState,
+    state: &State,
+    instance_id: &str,
+    data: &SharedInstanceInstallData,
+    plan: SharedInstanceApplyPlan,
 ) -> crate::Result<()> {
     update_progress(
         job_id,
@@ -473,7 +489,6 @@ async fn apply_shared_instance_changes(
 
     Ok(())
 }
-
 
 pub(super) fn shared_instance_update_requires_full_apply(
     metadata: &crate::state::InstanceMetadata,
@@ -791,14 +806,20 @@ async fn shared_instance_versions_by_id(
 #[inline(never)]
 pub(super) fn apply_shared_instance_content(
     job_id: Uuid,
-	job_state: &mut InstallJobState,
-	state: &State,
-	instance_id: &str,
-	data: &SharedInstanceInstallData,
+    job_state: &mut InstallJobState,
+    state: &State,
+    instance_id: &str,
+    data: &SharedInstanceInstallData,
 ) -> impl std::future::Future<Output = crate::Result<()>> + Send {
-	install_step(job_id, "apply_shared_instance_content", move || {
-		apply_shared_instance_content_inner(job_id, job_state, state, instance_id, data)
-	})
+    install_step(job_id, "apply_shared_instance_content", move || {
+        apply_shared_instance_content_inner(
+            job_id,
+            job_state,
+            state,
+            instance_id,
+            data,
+        )
+    })
 }
 
 async fn apply_shared_instance_content_inner(
@@ -819,20 +840,34 @@ async fn apply_shared_instance_content_inner(
     )
     .await?;
 
-	install_step(job_id, "install_shared_instance_base", || {
-		install_shared_instance_base(job_id, job_state, state, instance_id, data)
-	}).await?;
-	install_step(job_id, "install_shared_instance_additions", || {
-		install_shared_instance_additions(job_id, job_state, state, instance_id, data)
-	}).await
+    install_step(job_id, "install_shared_instance_base", || {
+        install_shared_instance_base(
+            job_id,
+            job_state,
+            state,
+            instance_id,
+            data,
+        )
+    })
+    .await?;
+    install_step(job_id, "install_shared_instance_additions", || {
+        install_shared_instance_additions(
+            job_id,
+            job_state,
+            state,
+            instance_id,
+            data,
+        )
+    })
+    .await
 }
 
 async fn install_shared_instance_base(
-	job_id: Uuid,
-	job_state: &mut InstallJobState,
-	state: &State,
-	instance_id: &str,
-	data: &SharedInstanceInstallData,
+    job_id: Uuid,
+    job_state: &mut InstallJobState,
+    state: &State,
+    instance_id: &str,
+    data: &SharedInstanceInstallData,
 ) -> crate::Result<()> {
     if let Some(modpack) = data.modpack.clone() {
         crate::api::instance::edit(
@@ -914,15 +949,15 @@ async fn install_shared_instance_base(
         }
     }
 
-	Ok(())
+    Ok(())
 }
 
 async fn install_shared_instance_additions(
-	job_id: Uuid,
-	job_state: &mut InstallJobState,
-	state: &State,
-	instance_id: &str,
-	data: &SharedInstanceInstallData,
+    job_id: Uuid,
+    job_state: &mut InstallJobState,
+    state: &State,
+    instance_id: &str,
+    data: &SharedInstanceInstallData,
 ) -> crate::Result<()> {
     let metadata = crate::state::instances::commands::get_instance_metadata(
         instance_id,
@@ -985,7 +1020,6 @@ async fn install_shared_instance_additions(
 
     Ok(())
 }
-
 
 pub(super) async fn remove_existing_shared_instance_content(
     instance_id: &str,
