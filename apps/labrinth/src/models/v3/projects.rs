@@ -200,7 +200,7 @@ impl From<ProjectQueryResult> for Project {
             link_urls: data
                 .urls
                 .into_iter()
-                .map(|d| (d.platform_name.clone(), Link::from(d)))
+                .map(|d| (d.platform.to_string(), Link::from(d)))
                 .collect(),
             gallery: data
                 .gallery_items
@@ -307,7 +307,7 @@ impl Project {
     //     let link_urls = m
     //         .links
     //         .into_iter()
-    //         .map(|d| (d.platform_name.clone(), Link::from(d)))
+    //         .map(|d| (d.platform.to_string(), Link::from(d)))
     //         .collect();
     //
     //     let gallery = m
@@ -431,8 +431,8 @@ pub struct Link {
 impl From<LinkUrl> for Link {
     fn from(data: LinkUrl) -> Self {
         Self {
-            platform: data.platform_name,
-            donation: data.donation,
+            platform: data.platform.to_string(),
+            donation: data.platform.is_donation(),
             url: data.url,
         }
     }

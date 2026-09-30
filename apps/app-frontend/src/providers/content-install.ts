@@ -26,6 +26,7 @@ import {
 	install_create_instance,
 	install_create_modpack_instance,
 	installJobInstanceId,
+	wait_for_install_job,
 } from '@/helpers/install'
 import {
 	add_project_from_version,
@@ -781,6 +782,7 @@ export function createContentInstall(opts: {
 			const id = installJobInstanceId(job)
 			if (!id) return
 			createdInstanceId = id
+			await wait_for_install_job(opts.appEvents, job.job_id)
 			addInstallingItem(id, currentProject!, version)
 
 			const plan = await install_project_with_dependencies(id, {
@@ -860,7 +862,7 @@ export function createContentInstall(opts: {
 			const packs = await list()
 			const existingPack = packs.find((pack) => pack.link?.project_id === project.id)
 
-			if (existingPack && !appSettings.getFeatureFlag('skip_non_essential_warnings')) {
+			if (existingPack && !appSettings.skipNonEssentialWarnings) {
 				pendingModpackInstall = { project, version, source, callback, createInstanceCallback }
 				modpackAlreadyInstalledModalRef?.show(existingPack.name, existingPack.id)
 				return

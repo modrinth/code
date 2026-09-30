@@ -72,7 +72,7 @@
 						<FileInput
 							id="collection-icon-input"
 							ref="iconInputRef"
-							:max-size="262144"
+							:max-size="524288"
 							:show-icon="false"
 							accept="image/png,image/jpeg,image/gif,image/webp"
 							class="hidden"

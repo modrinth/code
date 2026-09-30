@@ -581,11 +581,23 @@
   "app-marketing.download.windows": {
     "message": "ويندوز"
   },
+  "app-marketing.features.importing.description": {
+    "message": "استورد جميع ملفاتك الشخصية المفضلة من المشغل الذي كنت تستخدمه من قبل، وابدأ باستخدام تطبيق Modrinth في ثوانٍ!"
+  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "استيراد النسخة"
+  },
+  "app-marketing.features.manage-skins.description": {
+    "message": "التبديل بين جميع مظاهر شخصيات ماينكرافت الخاصة بك من التطبيق."
+  },
+  "app-marketing.features.manage-skins.title": {
+    "message": "اختيار المظهر"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "الإجراءات"
@@ -611,6 +623,9 @@
   "app-marketing.features.mod-management.version": {
     "message": "الإصدار"
   },
+  "app-marketing.features.open-source.description": {
+    "message": "المشغل الخاص بـ Modrinth مفتوح المصدر بالكامل. يمكنك عرض الشيفرة المصدرية على <github-link>GitHub</github-link>!"
+  },
   "app-marketing.features.open-source.title": {
     "message": "مفتوح المصدر"
   },
@@ -619,6 +634,9 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "يعمل تطبيق Modrinth بشكل أفضل من العديد من مديري المودات الرائدين!"
   },
   "app-marketing.features.performance.discord": {
     "message": "ديسكورد"
@@ -652,6 +670,12 @@
   },
   "app-marketing.features.play.title": {
     "message": "العب مع موداتك المفضلة"
+  },
+  "app-marketing.features.settings-sync.description": {
+    "message": "استخدم نفس الخيارات، وحزم الموارد، والمزيد عبر جميع النسخ الخاصة بك."
+  },
+  "app-marketing.features.settings-sync.title": {
+    "message": "زامن إعداداتك"
   },
   "app-marketing.features.sharing.description": {
     "message": "أنشئ وشارك والعب المودباكات باستخدام أي من آلاف المودات والمودباكات المستضافة هنا على Modrinth."

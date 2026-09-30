@@ -554,7 +554,11 @@ pub(crate) async fn copy_dotminecraft_with_reporter(
                     "Import cannot overwrite a symbolic link",
                 ));
             }
-            fetch::copy(&source, &target, io_semaphore).await?;
+            let same_file = tokio::fs::try_exists(&target).await?
+                && same_file::is_same_file(&source, &target)?;
+            if !same_file {
+                fetch::copy(&source, &target, io_semaphore).await?;
+            }
         }
         reporter
             .update(

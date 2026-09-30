@@ -53,9 +53,6 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Không hoàn tất tải xuống"
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "Không tìm thấy phiên bản"
-  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Đường dẫn tệp tin không hợp lệ"
   },
@@ -448,15 +445,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Hồ sơ"
-  },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "Đang tải xuống {current, number}/{total, number} dự án..."
-  },
-  "app.instance.mods.bulk-update.finishing": {
-    "message": "Đang hoàn tất cập nhật..."
-  },
-  "app.instance.mods.bulk-update.resolving-versions": {
-    "message": "Đang xác định các phiên bản..."
   },
   "app.instance.mods.content-type-project": {
     "message": "Dự án"

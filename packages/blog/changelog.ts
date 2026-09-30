@@ -11,6 +11,82 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-09-27T18:59:10+00:00`,
+		product: 'app',
+		version: '0.21.6',
+		body: `## Added
+- Added a new modal for Update all in the Content tab of your instance. You can now select each version for each project that needs an update, and view the changelogs, all in one place.
+
+## Changed
+- Bulk update operations now go through the download manager, rather than preventing you from leaving the content tab while it installs the updates.
+
+## Fixed
+- Fixed relying on external metadata for already-installed loader verisons.
+- Fixed close button icon in the window controls not turning red on hover.
+- Fixed text overlapping into \`<details>\` in markdown descriptions.`,
+	},
+	{
+		date: `2026-09-27T18:59:10+00:00`,
+		product: 'hosting',
+		body: `## Added
+- Added a new modal for Update all in the Content tab of the server panel. You can now select each version for each project that needs an update, and view the changelogs, all in one place.`,
+	},
+	{
+		date: `2026-09-27T18:59:10+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed text overlapping into \`<details>\` in markdown descriptions.`,
+	},
+	{
+		date: `2026-09-23T09:31:02+00:00`,
+		product: 'app',
+		version: '0.21.5',
+		body: `## Changed
+- Changed how some app settings are stored.
+- Added a setting to refocus Modrinth App when Minecraft closes - this is disabled by default.
+
+## Fixed
+- Fixed some issues where "Database is locked" errors would occur.
+- Fixed an issue where renaming an externally uploaded file in File Explorer or Finder would prevent an instance's linked modpack from being updated.
+- Fixed "Instance not found" issue with super old pre-0.9.0 instances with folder naming that isn't allowed now.
+- Fixed performance issues loading instance pages.
+- Fixed navigation crash issue.
+- Fixed download manager always showing "Needs attention" tooltip when no attention is needed.
+- Fixed issue where if you had any screenshots which were symlinked it would break the app's screenshot pages.
+- Fixed issue with keybind inputs treating Alt Gr as Left Ctrl on Windows.
+- Fixed issue where syncing command history would break instance duplication action.`,
+	},
+	{
+		date: `2026-09-23T09:31:02+00:00`,
+		product: 'web',
+		body: `## Changed
+- Increased icon file size limit from 256KiB to 512KiB`,
+	},
+	{
+		date: `2026-09-16T16:37:03+00:00`,
+		product: 'app',
+		version: '0.21.4',
+		body: `## Fixed
+- Fixes issue for some users not being able to launch the game
+- Fixed some styling and snapping issues with slider inputs.`,
+	},
+	{
+		date: `2026-09-15T17:44:10+00:00`,
+		product: 'app',
+		version: '0.21.3',
+		body: `## Added
+- Added validation of Minecraft libraries on launch.
+
+## Changed
+- Reverted usage of links instead of duplicated content due to issues with a couple mods.`,
+	},
+	{
+		date: `2026-09-15T17:44:10+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Make analytics chart tooltips render crisper on Chromium browsers.`,
+	},
+	{
 		date: `2026-09-14T17:25:37+00:00`,
 		product: 'app',
 		version: '0.21.2',

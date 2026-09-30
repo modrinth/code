@@ -1,9 +1,9 @@
 use super::ids::*;
 use crate::auth::oauth::uris::OAuthRedirectUris;
-use crate::database::models::DatabaseError;
 use crate::models::pats::Scopes;
 use crate::{auth::AuthProvider, routes::internal::flows::TempUser};
 use chrono::Duration;
+use eyre::{Result, WrapErr};
 use rand::Rng;
 use rand::distributions::Alphanumeric;
 use rand_chacha::ChaCha20Rng;
@@ -99,13 +99,17 @@ impl DBFlow {
         expires: Duration,
         redis: &RedisPool,
         state: &str,
-    ) -> Result<(), DatabaseError> {
-        let mut redis = redis.connect().await?;
+    ) -> Result<()> {
+        let mut redis = redis
+            .connect()
+            .await
+            .wrap_err("connecting to redis to insert flow")?;
         let key = redis.key().entity(FLOWS_NAMESPACE, state);
 
         redis
             .set_serialized(&key, &self, Some(expires.num_seconds()))
-            .await?;
+            .await
+            .wrap_err("inserting flow into redis")?;
         Ok(())
     }
 
@@ -113,25 +117,30 @@ impl DBFlow {
         &self,
         expires: Duration,
         redis: &RedisPool,
-    ) -> Result<String, DatabaseError> {
+    ) -> Result<String> {
         let state = ChaCha20Rng::from_entropy()
             .sample_iter(&Alphanumeric)
             .take(32)
             .map(char::from)
             .collect::<String>();
 
-        self.insert_with_state(expires, redis, &state).await?;
+        self.insert_with_state(expires, redis, &state)
+            .await
+            .wrap_err("inserting flow with generated state")?;
         Ok(state)
     }
 
-    pub async fn get(
-        id: &str,
-        redis: &RedisPool,
-    ) -> Result<Option<DBFlow>, DatabaseError> {
-        let mut redis = redis.connect().await?;
+    pub async fn get(id: &str, redis: &RedisPool) -> Result<Option<DBFlow>> {
+        let mut redis = redis
+            .connect()
+            .await
+            .wrap_err("connecting to redis to get flow")?;
         let key = redis.key().entity(FLOWS_NAMESPACE, id);
 
-        redis.get_deserialized(&key).await.map_err(Into::into)
+        redis
+            .get_deserialized(&key)
+            .await
+            .wrap_err("getting flow from redis")
     }
 
     /// Gets the flow and removes it from the cache, but only removes if the flow was present and the predicate returned true
@@ -140,24 +149,31 @@ impl DBFlow {
         id: &str,
         predicate: impl FnOnce(&DBFlow) -> bool,
         redis: &RedisPool,
-    ) -> Result<Option<DBFlow>, DatabaseError> {
-        let flow = Self::get(id, redis).await?;
+    ) -> Result<Option<DBFlow>> {
+        let flow = Self::get(id, redis)
+            .await
+            .wrap_err("getting flow before conditional removal")?;
         if let Some(flow) = flow.as_ref()
             && predicate(flow)
         {
-            Self::remove(id, redis).await?;
+            Self::remove(id, redis)
+                .await
+                .wrap_err("removing flow after predicate matched")?;
         }
         Ok(flow)
     }
 
-    pub async fn remove(
-        id: &str,
-        redis: &RedisPool,
-    ) -> Result<Option<()>, DatabaseError> {
-        let mut redis = redis.connect().await?;
+    pub async fn remove(id: &str, redis: &RedisPool) -> Result<Option<()>> {
+        let mut redis = redis
+            .connect()
+            .await
+            .wrap_err("connecting to redis to remove flow")?;
         let key = redis.key().entity(FLOWS_NAMESPACE, id);
 
-        redis.delete(&key).await?;
+        redis
+            .delete(&key)
+            .await
+            .wrap_err("removing flow from redis")?;
         Ok(Some(()))
     }
 }

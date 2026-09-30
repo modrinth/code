@@ -31,8 +31,7 @@ const debug = useDebugLogger('Files')
 const messages = defineMessages({
 	readOnly: {
 		id: 'instance.files.managed-content-read-only',
-		defaultMessage:
-			'Managed content is read-only here. Add, disable, update, or remove it from the Content tab.',
+		defaultMessage: 'Manage your installed content via the Content tab',
 	},
 	saveAs: {
 		id: 'instance.files.save-as',
@@ -337,9 +336,6 @@ provideFileManager({
 <template>
 	<ReadyTransition :pending="firstPaintPending">
 		<div>
-			<p v-if="isReadOnly(currentPath)" class="m-0 mb-4 text-sm text-secondary">
-				{{ formatMessage(messages.readOnly) }}
-			</p>
 			<FilePageLayout :show-refresh-button="true" />
 		</div>
 	</ReadyTransition>

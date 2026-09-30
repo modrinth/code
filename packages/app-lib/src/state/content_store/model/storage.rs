@@ -18,9 +18,6 @@ pub(crate) enum FileStorageKind {
     Copy,
 }
 
-/// Controls whether changing an instance file can also change the stored original.
-/// Use `Independent` when edits must stay local to the instance. Reflinks meet this
-/// requirement because the filesystem separates the data when either file changes.
 #[derive(Clone, Copy)]
 pub(crate) enum FileStoragePolicy {
     Shared,

@@ -298,7 +298,7 @@ pub async fn filter_visible_version_ids(
     let visible_project_ids = filter_visible_project_ids(
         DBProject::get_many_ids(&project_ids, pool, redis)
             .await
-            .wrap_api_err("fetching projects for visibility filtering")?
+            .wrap_internal_err("fetching projects for visibility filtering")?
             .iter()
             .map(|x| &x.inner)
             .collect(),
@@ -355,7 +355,7 @@ pub async fn filter_enlisted_version_ids(
     let authorized_project_ids = filter_enlisted_projects_ids(
         DBProject::get_many_ids(&project_ids, pool, redis)
             .await
-            .wrap_api_err("fetching projects for membership filtering")?
+            .wrap_internal_err("fetching projects for membership filtering")?
             .iter()
             .map(|x| &x.inner)
             .collect(),

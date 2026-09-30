@@ -303,10 +303,8 @@ pub async fn get_projects_internal(
                         $9::boolean = false
                         OR NOT EXISTS (
                             SELECT 1
-                            FROM delphi_issue_details_with_statuses didws
-                            WHERE didws.project_id = m.id
-                                AND didws.status = 'pending'
-                                AND didws.severity != 'hidden'
+                            FROM delphi_tech_review_queue trq
+                            WHERE trq.project_id = m.id
                         )
                     )
             ),
@@ -553,10 +551,8 @@ pub async fn get_projects_internal(
                         $6::boolean = false
                         OR NOT EXISTS (
                             SELECT 1
-                            FROM delphi_issue_details_with_statuses didws
-                            WHERE didws.project_id = m.id
-                                AND didws.status = 'pending'
-                                AND didws.severity != 'hidden'
+                            FROM delphi_tech_review_queue trq
+                            WHERE trq.project_id = m.id
                         )
                     )
             ),
@@ -785,10 +781,8 @@ pub async fn get_project_ids(
                         $7::boolean = false
                         OR NOT EXISTS (
                             SELECT 1
-                            FROM delphi_issue_details_with_statuses didws
-                            WHERE didws.project_id = m.id
-                                AND didws.status = 'pending'
-                                AND didws.severity != 'hidden'
+                            FROM delphi_tech_review_queue trq
+                            WHERE trq.project_id = m.id
                         )
                     )
             ),
@@ -914,10 +908,8 @@ pub async fn get_project_ids(
                     $3::boolean = false
                     OR NOT EXISTS (
                         SELECT 1
-                        FROM delphi_issue_details_with_statuses didws
-                        WHERE didws.project_id = mods.id
-                            AND didws.status = 'pending'
-                            AND didws.severity != 'hidden'
+                        FROM delphi_tech_review_queue trq
+                        WHERE trq.project_id = mods.id
                     )
                 )
             ORDER BY
@@ -1104,7 +1096,7 @@ pub async fn get_project_meta(
     let project =
         database::models::DBProject::get(&project_id, &**pool, &redis)
             .await
-            .wrap_api_err("fetching project from database")?;
+            .wrap_internal_err("fetching project from database")?;
 
     if let Some(project) = project {
         let rows = sqlx::query!(
@@ -1373,7 +1365,7 @@ pub async fn acquire_lock(
     let project =
         database::models::DBProject::get(&project_id_str, &**pool, &redis)
             .await
-            .wrap_api_err("fetching project from database")?
+            .wrap_internal_err("fetching project from database")?
             .wrap_not_found_err("resource not found")?;
 
     let db_project_id = project.inner.id;
@@ -1437,7 +1429,7 @@ pub async fn override_lock(
     let project =
         database::models::DBProject::get(&project_id_str, &**pool, &redis)
             .await
-            .wrap_api_err("fetching project from database")?
+            .wrap_internal_err("fetching project from database")?
             .wrap_not_found_err("resource not found")?;
 
     let db_project_id = project.inner.id;
@@ -1488,7 +1480,7 @@ pub async fn get_lock_status(
     let project =
         database::models::DBProject::get(&project_id_str, &**pool, &redis)
             .await
-            .wrap_api_err("fetching project from database")?
+            .wrap_internal_err("fetching project from database")?
             .wrap_not_found_err("resource not found")?;
 
     let db_project_id = project.inner.id;
@@ -1555,7 +1547,7 @@ pub async fn release_lock(
     let project =
         database::models::DBProject::get(&project_id_str, &**pool, &redis)
             .await
-            .wrap_api_err("fetching project from database")?
+            .wrap_internal_err("fetching project from database")?
             .wrap_not_found_err("resource not found")?;
 
     let db_project_id = project.inner.id;
@@ -1631,7 +1623,7 @@ pub async fn release_lock_beacon(
     let project =
         database::models::DBProject::get(&project_id_str, &**pool, &redis)
             .await
-            .wrap_api_err("fetching project from database")?
+            .wrap_internal_err("fetching project from database")?
             .wrap_not_found_err("resource not found")?;
 
     let db_project_id = project.inner.id;

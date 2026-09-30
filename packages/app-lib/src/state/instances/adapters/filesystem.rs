@@ -17,7 +17,7 @@ pub(crate) fn scan_content_files(
     instances_dir: &Path,
     instance_path: &str,
 ) -> crate::Result<Vec<ScannedContentFile>> {
-    crate::state::content_store::validate_relative(instance_path)?;
+    crate::state::content_store::validate_instance_path(instance_path)?;
     let instance_full_path = instances_dir.join(instance_path);
     let instance_dir = io::canonicalize(instance_full_path)?;
     let linked_instance =

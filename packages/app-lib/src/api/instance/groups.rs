@@ -105,7 +105,7 @@ pub async fn set_group_memberships(
     let updates = normalize_membership_updates(updates)?;
 
     let state = State::get().await?;
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
     let unique_group_ids = updates
         .iter()
         .flat_map(|update| update.group_ids.iter())
@@ -173,7 +173,7 @@ pub async fn rename_group(
 
     let new_name = validate_group_name(&new_name)?;
     let state = State::get().await?;
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
 
     let instance_ids = sqlx::query_scalar!(
         "
@@ -224,7 +224,7 @@ pub async fn delete_group(id: String) -> crate::Result<()> {
     }
 
     let state = State::get().await?;
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
     let instance_ids = sqlx::query_scalar!(
         "
 		SELECT instance_id

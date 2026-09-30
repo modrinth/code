@@ -118,6 +118,22 @@ pub async fn update_shared_instance(
     start(InstallRequest::UpdateSharedInstance { instance_id, data }).await
 }
 
+pub async fn bulk_update_content(
+    instance_id: String,
+    updates: Vec<super::model::ContentUpdateSelection>,
+) -> crate::Result<InstallJobSnapshot> {
+    if updates.is_empty() {
+        return Err(crate::state::content_store::input(
+            "No content selected to update",
+        ));
+    }
+    start(InstallRequest::BulkUpdateContent {
+        instance_id,
+        updates,
+    })
+    .await
+}
+
 pub async fn import_instance(
     launcher_type: crate::api::pack::import::ImportLauncherType,
     base_path: PathBuf,
@@ -650,6 +666,7 @@ async fn prepare_initial_instance(
         | InstallRequest::InstallPackToExistingInstance {
             instance_id, ..
         }
+        | InstallRequest::BulkUpdateContent { instance_id, .. }
         | InstallRequest::UpdateSharedInstance { instance_id, .. } => {
             prepare_existing_rollback(job_state, state, &instance_id).await?;
         }
@@ -781,6 +798,14 @@ async fn run_job(
                     tracing::warn!(
                         "Failed to reconcile synced options after installing {instance_id}: {error}"
                     );
+                }
+                if matches!(
+                    job_state.request,
+                    InstallRequest::BulkUpdateContent { .. }
+                ) {
+                    crate::api::instance::synced_packs::reconcile_after_content_change(
+						&instance_id,
+					).await;
                 }
                 recovery::clear_staging_dir(&job_state).await;
                 if let Err(error) =
@@ -1157,6 +1182,21 @@ async fn run_request(
             apply_post_install_edit(&instance_id, post_install_edit).await?;
             Ok(Some(instance_id))
         }
+        InstallRequest::BulkUpdateContent {
+            instance_id,
+            updates,
+        } => {
+            lock_instance(&instance_id, state).await?;
+            prepare_update_backup(job_id, job_state, state).await?;
+            crate::state::instances::commands::update_selected_projects(
+                &instance_id,
+                &updates,
+                InstallProgressReporter::new(job_id, job_state.clone()),
+                state,
+            )
+            .await?;
+            Ok(Some(instance_id))
+        }
         InstallRequest::UpdateSharedInstance { instance_id, data } => {
             prepare_existing_rollback(job_state, state, &instance_id).await?;
             lock_instance(&instance_id, state).await?;
@@ -1458,6 +1498,13 @@ async fn prepare_existing_rollback(
             "Content in quarantined instances cannot be changed.".to_string(),
         )
         .into());
+    }
+    if matches!(job_state.request, InstallRequest::BulkUpdateContent { .. })
+        && instance.instance.install_stage != InstanceInstallStage::Installed
+    {
+        return Err(crate::state::content_store::input(
+            "This instance is not ready to update content",
+        ));
     }
     let install_stage = instance.instance.install_stage;
     set_display(

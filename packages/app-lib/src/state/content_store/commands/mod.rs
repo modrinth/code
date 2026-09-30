@@ -8,4 +8,4 @@ mod recovery;
 mod verify_content;
 
 pub(crate) use file_changes::PendingFileChange;
-pub(crate) use migration::migrate;
+pub(crate) use migration::{migrate, migrate_instance_copies};

@@ -28,6 +28,7 @@ async-trait = { workspace = true }
 aws-sdk-s3 = { workspace = true }
 base64 = { workspace = true }
 bitflags = { workspace = true }
+blocklist = { workspace = true }
 bytes = { workspace = true }
 cel = { workspace = true }
 censor = { workspace = true }
@@ -72,6 +73,7 @@ image = { workspace = true, features = [
 itertools = { workspace = true }
 json-patch = { workspace = true }
 lettre = { workspace = true }
+lingua = { workspace = true }
 linkify = { workspace = true }
 modrinth-content-management = { workspace = true }
 modrinth-util = { workspace = true, features = ["decimal", "sentry", "utoipa"] }
@@ -83,6 +85,7 @@ path-util = { workspace = true }
 postcard = { workspace = true }
 prometheus = { workspace = true }
 psl = { workspace = true }
+pulldown-cmark = { workspace = true }
 quick-xml = { workspace = true }
 rand = { workspace = true }
 rand_chacha = { workspace = true }
@@ -114,6 +117,7 @@ sqlx = { workspace = true, features = [
   "runtime-tokio",
   "rust_decimal",
   "tls-rustls-aws-lc-rs",
+  "uuid",
 ] }
 sqlx-tracing = { workspace = true, features = ["postgres"] }
 strum = { workspace = true, features = ["derive"] }
@@ -136,7 +140,6 @@ webauthn-rs = { workspace = true, features = [
 ] }
 webauthn-rs-proto = { workspace = true }
 webp = { workspace = true }
-whatlang = { workspace = true }
 woothee = { workspace = true }
 xredis = { workspace = true }
 yaserde = { workspace = true, features = ["derive"] }

@@ -624,7 +624,7 @@ impl<'a> InstanceContent<'a> {
             &self.state.pool,
         )
         .await?;
-        let mut tx = self.state.pool.begin().await?;
+        let mut tx = self.state.pool.begin_with("BEGIN IMMEDIATE").await?;
         let content_scope = match &prepared.change {
             PreparedChange::Adopt { .. } => None,
             _ => Some(self.content_scope()?),

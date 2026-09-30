@@ -41,17 +41,14 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Välj lämpliga taggar"
   },
-  "nags.banned-link-usage.description": {
-    "defaultMessage": "Länken \"{url}\" är inte tillåten som en extern länk."
-  },
-  "nags.banned-link-usage.title": {
-    "defaultMessage": "Ta bort otillåtna länkar"
-  },
   "nags.check-disclosures.description": {
     "defaultMessage": "Se till att användare är upplysta om viktiga detaljer genom att fylla i innehållsupplysningar som gäller för ditt {type}."
   },
   "nags.check-disclosures.title": {
     "defaultMessage": "Granska upplysningar"
+  },
+  "nags.description-ends-with-header.description": {
+    "defaultMessage": "Din projektbeskrivning borde inte avsluta med en rubrik som inte följs av någon text."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Utöka beskrivningen"
@@ -64,9 +61,6 @@
   },
   "nags.edit-gallery.title": {
     "defaultMessage": "Ändra galleriet"
-  },
-  "nags.edit-license.title": {
-    "defaultMessage": "Redigera licens"
   },
   "nags.edit-summary.title": {
     "defaultMessage": "Redigera sammanfattning"
@@ -89,17 +83,14 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Tillförse källkod"
   },
-  "nags.identical-links.title": {
-    "defaultMessage": "Ta bort identiska länkar"
-  },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "Licens-URL är ogiltig."
-  },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "Din licens-URL ser ut att vara söndrig. Vänligen ange en URL till din licenstext."
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Lägg till en giltig licenslänk"
+  },
+  "nags.invalid-project-description.title": {
+    "defaultMessage": "Ändra beskrivningen"
   },
   "nags.invalid-project-name.title": {
     "defaultMessage": "Ändra projektnamn"
@@ -125,9 +116,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "Lägg till alternativ bildtext"
   },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Flytta Discord-inbjudan"
-  },
   "nags.moderation.title": {
     "defaultMessage": "Visa moderationstråd"
   },
@@ -140,8 +128,8 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Välj korrekt upplösning"
   },
-  "nags.project-description-banned-link.description": {
-    "defaultMessage": "Länken ”{fullUrl}” är inte tillåten i projektbeskrivningar."
+  "nags.project-description-content.title": {
+    "defaultMessage": "Granska beskrivningen"
   },
   "nags.project-description-non-english.description": {
     "defaultMessage": "Din projektbeskrivning måste vara skriven på engelska eller inkludera en engelsk översättning."
@@ -165,7 +153,7 @@
     "defaultMessage": "Granska sammanfattningen"
   },
   "nags.project-summary-links.description": {
-    "defaultMessage": "Länkar, URL:er och IP-adresser ska inte finnas med i beskrivningen. Upptäckte: ”{value}”"
+    "defaultMessage": "Länkar, URL:er och IP-adresser borde inte finnas med i beskrivningen. Upptäckte: ”{value}”"
   },
   "nags.project-summary-links.title": {
     "defaultMessage": "Ta bort länkar i sammanfattningen"
@@ -225,7 +213,7 @@
     "defaultMessage": "Besök versionsinställningar"
   },
   "nags.summary-special-formatting.description": {
-    "defaultMessage": "Din sammanfattning bör inte innehålla Markdown eller HTML eftersom den endast kan visa oformaterad text."
+    "defaultMessage": "Din sammanfattning borde inte innehålla Markdown eller HTML eftersom den endast visar oformaterad text."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Fixa sammanfattningsformatering"
@@ -263,23 +251,20 @@
   "nags.upload-version.title": {
     "defaultMessage": "Ladda upp en version"
   },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Några av dina externa länkar kan leda till domäner som är inte lämpar sig för den länktypen."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Granska externa länkar"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Besök länkinställningar"
   },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "Din projektbeskrivning borde ge unik information och inte upprepa projektsammanfattningen."
+  },
   "project.text-validation.summary-matches-title": {
-    "defaultMessage": "Ditt projekts sammanfattning bör ge unik information och inte upprepa projektnamnet."
+    "defaultMessage": "Din projektsammanfattning borde ge unik information och inte upprepa projektnamnet."
   },
   "project.text-validation.summary-too-short": {
     "defaultMessage": "Din sammanfattning är för kort. Lägg till en eller två meningar som beskriver ditt projekt."
   },
   "project.text-validation.title-version-number": {
-    "defaultMessage": "Projektnamn bör inte inkludera versionsnummer."
+    "defaultMessage": "Projektnamn borde inte inkludera versionsnummer."
   }
 }
 

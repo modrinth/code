@@ -178,7 +178,7 @@ pub async fn get_loader_version_from_profile(
     if let Some(loaders) =
         loader_versions_for_game_version(&versions, game_version)
     {
-        let loader_version =
+        let resolved =
             loaders
                 .iter()
                 .find(|x| filter(x))
@@ -188,10 +188,71 @@ pub async fn get_loader_version_from_profile(
                     None
                 });
 
-        Ok(loader_version.cloned())
-    } else {
-        Ok(None)
+        if let Some(resolved) = resolved {
+            return Ok(Some(resolved.clone()));
+        }
     }
+
+    if concrete_loader_version_id(version).is_none() {
+        return Ok(None);
+    }
+
+    let state = State::get().await?;
+    Ok(installed_loader_version(
+        &state.directories.versions_dir(),
+        game_version,
+        version,
+    ))
+}
+
+fn installed_loader_version(
+    versions_dir: &Path,
+    game_version: &str,
+    loader_version: &str,
+) -> Option<LoaderVersion> {
+    let loader_version = concrete_loader_version_id(loader_version)?;
+    let path = installed_loader_metadata_path(
+        versions_dir,
+        game_version,
+        loader_version,
+    );
+    if !path.is_file() {
+        return None;
+    }
+
+    tracing::info!(
+        game_version,
+        loader_version,
+        "Using an installed loader version that is no longer listed by the meta server"
+    );
+
+    Some(LoaderVersion {
+        id: loader_version.to_string(),
+        url: String::new(),
+        stable: false,
+    })
+}
+
+pub(super) fn is_locally_installed_loader(loader: &LoaderVersion) -> bool {
+    loader.url.is_empty()
+}
+
+fn concrete_loader_version_id(loader_version: &str) -> Option<&str> {
+    match loader_version {
+        "" | "latest" | "stable" => None,
+        id => Some(id),
+    }
+}
+
+fn installed_loader_metadata_path(
+    versions_dir: &Path,
+    game_version: &str,
+    loader_version: &str,
+) -> PathBuf {
+    let version_id = format!("{game_version}-{loader_version}");
+    versions_dir
+        .join(&version_id)
+        .join(format!("{version_id}.json"))
 }
 
 fn loader_versions_for_game_version<'a>(
@@ -846,7 +907,7 @@ pub async fn launch_minecraft(
     }
 
     let state = State::get().await?;
-    let _runtime_lease = state.content_store.runtime_cache_lock.read().await;
+    let mut runtime_lease = state.content_store.runtime_cache_lock.read().await;
 
     let instance_path = get_instance_full_path(&instance.path).await?;
 
@@ -970,6 +1031,19 @@ pub async fn launch_minecraft(
         ))
         .as_error());
     }
+
+    if let Some(path) = download::missing_runtime_file(
+        &state,
+        &version_info,
+        &java_version.architecture,
+        minecraft_updated,
+    )? {
+        tracing::info!(instance_id = %instance.id, path = %path.display(), "Restoring missing Minecraft runtime files before launch");
+        drop(runtime_lease);
+        install_minecraft_with_reporter(context, false, None).await?;
+        runtime_lease = state.content_store.runtime_cache_lock.read().await;
+    }
+    let _runtime_lease = runtime_lease;
 
     let natives_dir = state.directories.version_natives_dir(&version_jar);
     if !natives_dir.exists() {
@@ -1125,7 +1199,7 @@ pub async fn launch_minecraft(
     let _store_lock = state.content_store.files_lock.lock().await;
     let _store_lease = state.content_store.lease().await;
     state.content_store.recover(Some(&instance.id)).await?;
-    state.content_store.validate_instance(instance).await?;
+    // state.content_store.validate_instance(instance).await?;
     if crate::state::instance_has_running_process(&instance.id, &state).await? {
         return Err(crate::ErrorKind::LauncherError(format!(
             "Instance {} is already running",

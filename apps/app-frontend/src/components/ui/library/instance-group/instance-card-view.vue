@@ -22,7 +22,7 @@ const localIcon = computed(() => {
 	return path && !/^https?:/.test(path) && !path.toLowerCase().endsWith('.svg') ? path : undefined
 })
 const appSettings = useAppSettings()
-const compactMode = computed(() => appSettings.getFeatureFlag('compact_instance_cards'))
+const compactMode = computed(() => appSettings.compactInstanceCards)
 const thumbnail = useImageThumbnail(
 	localIcon,
 	() => (compactMode.value ? 96 : 384),

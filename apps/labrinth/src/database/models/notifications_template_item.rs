@@ -1,8 +1,8 @@
-use crate::database::models::DatabaseError;
 use crate::models::v3::notifications::{NotificationChannel, NotificationType};
 use crate::routes::ApiError;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
+use eyre::Result;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
@@ -54,13 +54,19 @@ impl NotificationTemplate {
         channel: NotificationChannel,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
         redis: &RedisPool,
-    ) -> Result<Vec<NotificationTemplate>, DatabaseError> {
+    ) -> Result<Vec<NotificationTemplate>> {
         {
-            let mut redis = redis.connect().await?;
+            let mut redis = redis
+                .connect()
+                .await
+                .wrap_err("connecting to Redis for notification templates")?;
             let key =
                 redis.key().metadata(TEMPLATES_NAMESPACE, channel.as_str());
 
-            let maybe_cached_templates = redis.get_deserialized(&key).await?;
+            let maybe_cached_templates = redis
+                .get_deserialized(&key)
+                .await
+                .wrap_err("fetching notification templates from cache")?;
 
             if let Some(cached) = maybe_cached_templates {
                 return Ok(cached);
@@ -75,16 +81,21 @@ impl NotificationTemplate {
             channel.as_str(),
         )
         .fetch_all(exec)
-        .await?;
+        .await
+        .wrap_err("fetching notification templates")?;
 
         let templates = results.into_iter().map(Into::into).collect();
 
-        let mut redis = redis.connect().await?;
+        let mut redis = redis
+            .connect()
+            .await
+            .wrap_err("connecting to Redis to cache notification templates")?;
         let key = redis.key().metadata(TEMPLATES_NAMESPACE, channel.as_str());
 
         redis
             .set_serialized(&key, &templates, Some(TEMPLATES_CACHE_EXPIRY))
-            .await?;
+            .await
+            .wrap_err("caching notification templates")?;
 
         Ok(templates)
     }
@@ -92,23 +103,30 @@ impl NotificationTemplate {
     pub async fn get_cached_html_data(
         &self,
         redis: &RedisPool,
-    ) -> Result<Option<String>, DatabaseError> {
-        let mut redis = redis.connect().await?;
+    ) -> Result<Option<String>> {
+        let mut redis = redis.connect().await.wrap_err(
+            "connecting to Redis for cached notification template HTML",
+        )?;
         let key = redis.key().metadata(TEMPLATES_HTML_DATA_NAMESPACE, self.id);
-        redis.get_deserialized(&key).await.map_err(Into::into)
+        redis
+            .get_deserialized(&key)
+            .await
+            .wrap_err("fetching cached notification template HTML")
     }
 
     pub async fn set_cached_html_data(
         &self,
         data: String,
         redis: &RedisPool,
-    ) -> Result<(), DatabaseError> {
-        let mut redis = redis.connect().await?;
+    ) -> Result<()> {
+        let mut redis = redis.connect().await.wrap_err(
+            "connecting to Redis to cache notification template HTML",
+        )?;
         let key = redis.key().metadata(TEMPLATES_HTML_DATA_NAMESPACE, self.id);
         redis
             .set_serialized(&key, &data, Some(HTML_DATA_CACHE_EXPIRY))
             .await
-            .map_err(Into::into)
+            .wrap_err("caching notification template HTML")
     }
 }
 
@@ -116,9 +134,9 @@ pub async fn get_or_set_cached_dynamic_html<F>(
     redis: &RedisPool,
     key: &str,
     get: impl FnOnce() -> F,
-) -> Result<String, ApiError>
+) -> std::result::Result<String, ApiError>
 where
-    F: Future<Output = Result<String, ApiError>>,
+    F: Future<Output = std::result::Result<String, ApiError>>,
 {
     #[derive(Debug, Clone, Serialize, Deserialize)]
     struct HtmlBody {

@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tSELECT DISTINCT file.id AS \"file_id!: DBFileId\"\n\t\tFROM delphi_tech_review_queue queue\n\t\tINNER JOIN versions version ON version.mod_id = queue.project_id\n\t\tINNER JOIN files file ON file.version_id = version.id\n\t\tORDER BY file.id\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "file_id!: DBFileId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "c10220e7e57e12df1a99ccb3c4fabe9c6433d930688152973e811a13bb5a6b1b"
+}

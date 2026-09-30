@@ -3,6 +3,14 @@ import { defineMessages } from '@modrinth/ui'
 import type { NagDefinitions } from './types.ts'
 
 const messages = defineMessages({
+	reviewTitle: {
+		id: 'nags.project-description-content.title',
+		defaultMessage: 'Review the description',
+	},
+	matchesSummary: {
+		id: 'project.text-validation.description-matches-summary',
+		defaultMessage: `Your project's description should provide unique information and not repeat the project's summary.`,
+	},
 	addTitle: { id: 'nags.add-description.title', defaultMessage: 'Add a description' },
 	add: {
 		id: 'nags.add-description.description',
@@ -42,10 +50,6 @@ const messages = defineMessages({
 		id: 'nags.invalid-project-description.title',
 		defaultMessage: 'Modify the description',
 	},
-	bannedLink: {
-		id: 'nags.project-description-banned-link.description',
-		defaultMessage: 'The link “{fullUrl}” is not allowed in project descriptions.',
-	},
 	nonEnglish: {
 		id: 'nags.project-description-non-english.description',
 		defaultMessage: `Your project's description must be written in English or include an English translation.`,
@@ -77,6 +81,11 @@ const messages = defineMessages({
 })
 
 export const descriptionNags = {
+	'project-description-matches-summary': {
+		title: messages.reviewTitle,
+		description: messages.matchesSummary,
+		destination: 'description',
+	},
 	'add-description': {
 		title: messages.addTitle,
 		description: messages.add,
@@ -105,11 +114,6 @@ export const descriptionNags = {
 	'missing-alt-text': {
 		title: messages.altTitle,
 		description: messages.alt,
-		destination: 'description',
-	},
-	'project-description-banned-link': {
-		title: messages.fixTitle,
-		description: messages.bannedLink,
 		destination: 'description',
 	},
 	'project-description-non-english': {

@@ -1,7 +1,7 @@
 <template>
-	<img
+	<FullImage
 		v-if="src && !failed"
-		ref="img"
+		ref="imgComponent"
 		class="avatar shrink-0"
 		:style="`--_size: ${cssSize}`"
 		:class="{
@@ -13,11 +13,11 @@
 			pixelated: pixelated,
 		}"
 		:src="src"
+		:raw-src="rawSrc"
 		:alt="alt"
 		:loading="loading"
 		@load="onLoad"
 		@error="onError"
-		@contextmenu="onFullImageContextMenu($event, rawSrc)"
 	/>
 	<svg
 		v-else
@@ -51,15 +51,16 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
 
-import { useDebugLogger, useFullImageContextMenu } from '../../composables'
+import { useDebugLogger } from '../../composables'
+import FullImage from './FullImage.vue'
 
-const onFullImageContextMenu = useFullImageContextMenu()
 const debug = useDebugLogger('Avatar')
 
 const pixelated = ref(false)
 const hasTransparentCorners = ref(false)
 const hasDetectedCorners = ref(false)
-const img = useTemplateRef<HTMLImageElement>('img')
+const imgComponent = useTemplateRef<InstanceType<typeof FullImage>>('imgComponent')
+const img = computed(() => imgComponent.value?.img ?? null)
 const failed = ref(false)
 let detectionTimeout: number | undefined
 let detectingSource: string | undefined

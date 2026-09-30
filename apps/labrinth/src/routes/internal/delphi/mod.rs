@@ -7,27 +7,31 @@ use crate::{database::PgPool, util::http::HttpClient};
 use actix_web::{HttpRequest, HttpResponse, get, post, web};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use tokio::sync::Mutex;
 use tracing::info;
+use uuid::Uuid;
 
 use crate::{
     auth::check_is_moderator_from_headers,
-    database::models::{
-        DBFileId, DBProjectId, DelphiReportId, DelphiReportIssueDetailsId,
-        DelphiReportIssueId,
-        delphi_report_item::{
-            DBDelphiReport, DBDelphiReportIssue, DelphiSeverity, DelphiStatus,
-            ReportIssueDetail,
+    database::{
+        advisory_lock::AdvisoryLock,
+        models::{
+            DBFileId, DBProjectId, DBVersionId, DelphiReportId,
+            DelphiReportIssueDetailsId, DelphiReportIssueId,
+            delphi_report_item::{
+                DBDelphiReport, DBDelphiReportIssue, DelphiSeverity,
+                DelphiStatus, ReportIssueDetail,
+            },
         },
     },
     models::{
-        ids::{ProjectId, VersionId},
+        ids::{FileId, ProjectId, VersionId},
         pats::Scopes,
     },
     queue::session::AuthQueue,
     routes::ApiError,
-    util::{error::Context, guards::admin_key_guard},
+    util::{error::Context, guards::admin_key_guard, kafka::KafkaClientState},
 };
 
 pub mod rescan;
@@ -38,6 +42,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         web::scope("/delphi")
             .service(ingest_report)
             .service(_run)
+            .service(get_file)
             .service(version)
             .service(issue_type_schema),
     );
@@ -69,7 +74,7 @@ impl<'de> Deserialize<'de> for IssueDetailKey {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 struct DelphiReportIssueDetails {
     pub file: String,
     pub key: IssueDetailKey,
@@ -80,6 +85,7 @@ struct DelphiReportIssueDetails {
 
 #[derive(Debug, Deserialize)]
 struct DelphiReport {
+    pub identifier: Uuid,
     pub url: String,
     pub project_id: crate::models::ids::ProjectId,
     #[serde(rename = "version_id")]
@@ -139,7 +145,7 @@ pub struct DelphiRunParameters {
     pub file_id: crate::models::ids::FileId,
 }
 
-/// Ingest a Delphi report.  
+/// Ingest a Delphi report.
 #[utoipa::path(
 	context_path = "/delphi",
 	tag = "delphi",
@@ -169,6 +175,7 @@ pub async fn ingest_report(
     level = "info",
     skip_all,
     fields(
+        %report.identifier,
         %report.url,
         %report.file_id,
         %report.project_id,
@@ -180,21 +187,41 @@ async fn ingest_report_deserialized(
     redis: web::Data<RedisPool>,
     report: DelphiReport,
 ) -> Result<(), ApiError> {
-    if report.issues.is_empty() {
+    let clean = report.issues.is_empty();
+    if clean {
         info!("No issues found for file");
-        return Ok(());
     }
-
-    report.send_to_slack(&pool, &redis).await.ok();
 
     let mut transaction = pool
         .begin()
         .await
         .wrap_internal_err("failed to begin Delphi ingest transaction")?;
+    let file_id = DBFileId(report.file_id.0 as i64);
+
+    AdvisoryLock::DelphiScan(report.identifier)
+        .acquire(&mut transaction)
+        .await
+        .wrap_internal_err("locking Delphi scan callback transition")?;
+
+    if let Some(outcome) = crate::queue::delphi_scan::scan_outcome(
+        &mut transaction,
+        report.identifier,
+    )
+    .await
+    .wrap_internal_err("checking Delphi scan callback state")?
+    {
+        info!(?outcome, "Ignoring callback for terminal Delphi file scan");
+        return Ok(());
+    }
+
+    AdvisoryLock::DelphiFile(file_id)
+        .acquire(&mut transaction)
+        .await
+        .wrap_internal_err("locking file for Delphi report ingest")?;
 
     let report_id = DBDelphiReport {
         id: DelphiReportId(0), // This will be set by the database
-        file_id: Some(DBFileId(report.file_id.0 as i64)),
+        file_id: Some(file_id),
         delphi_version: report.delphi_version,
         artifact_url: report.url.clone(),
         created: DateTime::<Utc>::MIN_UTC, // This will be set by the database
@@ -204,26 +231,41 @@ async fn ingest_report_deserialized(
     .await
     .wrap_internal_err("failed to upsert Delphi report")?;
 
-    info!(
-        num_issues = %report.issues.len(),
-        "Delphi found issues in file",
-    );
+    crate::queue::delphi_scan::record_succeeded_scan(
+        &mut transaction,
+        report.identifier,
+        file_id,
+        report.delphi_version,
+        report_id,
+    )
+    .await
+    .wrap_internal_err("recording successful Delphi file scan")?;
+
+    sqlx::query!(
+        "DELETE FROM delphi_report_issues WHERE report_id = $1",
+        report_id as DelphiReportId,
+    )
+    .execute(&mut transaction)
+    .await
+    .wrap_internal_err("failed to remove old Delphi report issues")?;
+
+    if !clean {
+        info!(
+            num_issues = %report.issues.len(),
+            "Delphi found issues in file",
+        );
+    }
 
     let mut inserted_detail_ids = Vec::new();
-    for (issue_type, issue_details) in report.issues {
+    for (issue_type, issue_details) in &report.issues {
         let issue_id = DBDelphiReportIssue {
             id: DelphiReportIssueId(0), // This will be set by the database
             report_id,
-            issue_type,
+            issue_type: issue_type.clone(),
         }
-        .upsert(&mut transaction)
+        .insert(&mut transaction)
         .await
-        .wrap_internal_err("failed to upsert Delphi report issue")?;
-
-        // This is required to handle the case where the same Delphi version is re-run on the same file
-        ReportIssueDetail::remove_all_by_issue_id(issue_id, &mut transaction)
-            .await
-            .wrap_internal_err("failed to remove old Delphi issue details")?;
+        .wrap_internal_err("failed to insert Delphi report issue")?;
 
         for issue_detail in issue_details {
             let decompiled_source =
@@ -232,11 +274,11 @@ async fn ingest_report_deserialized(
             let detail_id = ReportIssueDetail {
                 id: DelphiReportIssueDetailsId(0), // This will be set by the database
                 issue_id,
-                key: issue_detail.key.0,
-                jar: issue_detail.jar,
-                file_path: issue_detail.file,
+                key: issue_detail.key.0.clone(),
+                jar: issue_detail.jar.clone(),
+                file_path: issue_detail.file.clone(),
                 decompiled_source: decompiled_source.cloned().flatten(),
-                data: issue_detail.data,
+                data: issue_detail.data.clone(),
                 severity: issue_detail.severity,
                 local_status: None,
                 global_status: None,
@@ -256,8 +298,9 @@ async fn ingest_report_deserialized(
     .await
     .wrap_internal_err("failed to apply delphi rules to new issue details")?;
 
-    tech_review_queue::add_projects_with_review_details(
+    tech_review_queue::sync_projects(
         &[DBProjectId::from(report.project_id)],
+        tech_review_queue::TechReviewRemovalReason::ScanCompleted,
         &mut transaction,
     )
     .await
@@ -268,12 +311,17 @@ async fn ingest_report_deserialized(
         .await
         .wrap_internal_err("failed to commit Delphi ingest transaction")?;
 
+    if !clean {
+        report.send_to_slack(&pool, &redis).await.ok();
+    }
+
     Ok(())
 }
 
 pub async fn run(
     exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     run_parameters: DelphiRunParameters,
+    identifier: Uuid,
     http: &reqwest::Client,
 ) -> Result<HttpResponse, ApiError> {
     let file_data = sqlx::query!(
@@ -303,6 +351,7 @@ pub async fn run(
             "project_id": ProjectId(file_data.project_id.0 as u64),
             "version_id": VersionId(file_data.version_id.0 as u64),
             "file_id": run_parameters.file_id,
+            "identifier": identifier,
         }))
         .send()
         .await
@@ -312,7 +361,7 @@ pub async fn run(
     Ok(HttpResponse::NoContent().finish())
 }
 
-/// Run Delphi.  
+/// Run Delphi.
 #[utoipa::path(
 	context_path = "/delphi",
 	tag = "delphi",
@@ -326,7 +375,7 @@ pub async fn _run(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     run_parameters: web::Query<DelphiRunParameters>,
-    http: web::Data<HttpClient>,
+    kafka_client: web::Data<KafkaClientState>,
 ) -> Result<HttpResponse, ApiError> {
     check_is_moderator_from_headers(
         &req,
@@ -338,10 +387,80 @@ pub async fn _run(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    run(&**pool, run_parameters.into_inner(), &http).await
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("beginning Delphi scan enqueue transaction")?;
+    crate::queue::delphi_scan::force_enqueue_file(
+        &mut transaction,
+        &kafka_client,
+        DBFileId(run_parameters.file_id.0 as i64),
+    )
+    .await
+    .wrap_internal_err("enqueueing Delphi file scan")?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing Delphi scan enqueue transaction")?;
+
+    Ok(HttpResponse::NoContent().finish())
 }
 
-/// Get the Delphi version.  
+#[derive(Debug, Serialize, utoipa::ToSchema)]
+pub struct DelphiFile {
+    pub id: FileId,
+    pub url: String,
+    pub file_name: String,
+    pub size: i32,
+    pub version_id: VersionId,
+    pub project_id: ProjectId,
+}
+
+/// Resolve a file ID to the file it refers to.
+#[utoipa::path(
+	context_path = "/delphi",
+	tag = "delphi",
+	params(("file_id" = FileId, Path)),
+	responses(
+		(status = OK, body = DelphiFile),
+		(status = NOT_FOUND),
+	)
+)]
+#[get("/file/{file_id}", guard = "admin_key_guard")]
+pub async fn get_file(
+    pool: web::Data<PgPool>,
+    path: web::Path<FileId>,
+) -> Result<web::Json<DelphiFile>, ApiError> {
+    let file_id = path.into_inner();
+    let file = sqlx::query!(
+        r#"
+        SELECT
+            files.url,
+            files.filename,
+            files.size,
+            files.version_id AS "version_id: DBVersionId",
+            versions.mod_id AS "project_id: DBProjectId"
+        FROM files INNER JOIN versions ON files.version_id = versions.id
+        WHERE files.id = $1
+        "#,
+        DBFileId::from(file_id) as DBFileId,
+    )
+    .fetch_optional(&**pool)
+    .await
+    .wrap_internal_err("fetching file from database")?
+    .wrap_not_found_err("file not found")?;
+
+    Ok(web::Json(DelphiFile {
+        id: file_id,
+        url: file.url,
+        file_name: file.filename,
+        size: file.size,
+        version_id: file.version_id.into(),
+        project_id: file.project_id.into(),
+    }))
+}
+
+/// Get the Delphi version.
 #[utoipa::path(
 	context_path = "/delphi",
 	tag = "delphi",
@@ -372,7 +491,7 @@ pub async fn version(
     ))
 }
 
-/// Get the Delphi issue type schema.  
+/// Get the Delphi issue type schema.
 #[utoipa::path(
 	context_path = "/delphi",
 	tag = "delphi",

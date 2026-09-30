@@ -53,9 +53,6 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Download kunne ikke blive fuldført"
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "Instance kunne ikke blive fundet"
-  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Filstien er ugyldig"
   },
@@ -385,9 +382,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Instance"
-  },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "Downloader {current, number}/{total, number} projekter..."
   },
   "app.instance.mods.content-type-project": {
     "message": "projekt"

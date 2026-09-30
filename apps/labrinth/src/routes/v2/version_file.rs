@@ -412,9 +412,11 @@ pub struct ManyUpdateData {
 )]
 #[post("/update")]
 pub async fn update_files(
+    req: HttpRequest,
     pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     update_data: web::Json<ManyUpdateData>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let update_data = update_data.into_inner();
     let update_data = v3::version_file::ManyUpdateData {
@@ -426,9 +428,11 @@ pub async fn update_files(
     };
 
     let returned_versions = match v3::version_file::update_files(
+        req,
         pool,
         redis,
         web::Json(update_data),
+        session_queue,
     )
     .await
     {
@@ -465,9 +469,11 @@ pub async fn update_files(
 )]
 #[post("/update_many")]
 pub async fn update_files_many(
+    req: HttpRequest,
     pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     update_data: web::Json<ManyUpdateData>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let update_data = update_data.into_inner();
     let update_data = v3::version_file::ManyUpdateData {
@@ -479,9 +485,11 @@ pub async fn update_files_many(
     };
 
     let returned_versions = match v3::version_file::update_files_many(
+        req,
         pool,
         redis,
         web::Json(update_data),
+        session_queue,
     )
     .await
     {

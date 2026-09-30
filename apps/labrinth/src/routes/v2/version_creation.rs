@@ -12,7 +12,7 @@ use crate::routes::v3::project_creation::CreateError;
 use crate::routes::v3::version_creation;
 use crate::routes::{v2_reroute, v3};
 use crate::search::SearchState;
-use crate::util::http::HttpClient;
+use crate::util::kafka::KafkaClientState;
 use actix_multipart::Multipart;
 use actix_web::http::header::ContentDisposition;
 use actix_web::web::Data;
@@ -75,7 +75,7 @@ pub struct InitialVersionData {
 }
 
 // under `/api/v1/version`
-/// Create a version on an existing project.  
+/// Create a version on an existing project.
 #[utoipa::path(
 	tag = "version creation",
     post,
@@ -102,17 +102,52 @@ pub async fn version_create(
     redis: Data<RedisPool>,
     file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
-    http: Data<HttpClient>,
+    kafka_client: Data<KafkaClientState>,
     search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
     let payload = v2_reroute::alter_actix_multipart(
         payload,
         req.headers().clone(),
-        |legacy_create: InitialVersionData,
+        |mut legacy_create: InitialVersionData,
          content_dispositions: Vec<ContentDisposition>| {
             let client = client.clone();
             let redis = redis.clone();
             async move {
+                if let Some(project_id) = legacy_create.project_id {
+                    legacy_create.project_id = Some(
+                        crate::routes::resolve_ref(
+                            &project_id.to_string(),
+                            client.as_ref(),
+                            redis.as_ref(),
+                        )
+                        .await?
+                        .unwrap_or(project_id),
+                    );
+                }
+                let dependency_project_refs = legacy_create
+                    .dependencies
+                    .iter()
+                    .filter_map(|dependency| dependency.project_id)
+                    .map(|project_id| project_id.to_string())
+                    .collect::<Vec<_>>();
+                let resolved_dependency_project_ids =
+                    crate::routes::resolve_refs(
+                        &dependency_project_refs,
+                        client.as_ref(),
+                        redis.as_ref(),
+                    )
+                    .await?;
+                for (dependency, resolved_project_id) in legacy_create
+                    .dependencies
+                    .iter_mut()
+                    .filter(|dependency| dependency.project_id.is_some())
+                    .zip(resolved_dependency_project_ids)
+                {
+                    if let Some(project_id) = resolved_project_id {
+                        dependency.project_id = Some(project_id);
+                    }
+                }
+
                 // Convert input data to V3 format
                 let mut fields = HashMap::new();
                 fields.insert(
@@ -261,7 +296,7 @@ pub async fn version_create(
         redis.clone(),
         file_host,
         session_queue,
-        http,
+        kafka_client,
         search_state,
     )
     .await?;
@@ -303,7 +338,7 @@ async fn get_example_version_fields(
 }
 
 // under /api/v1/version/{version_id}
-/// Add files to an existing version.  
+/// Add files to an existing version.
 #[utoipa::path(
 	tag = "version creation",
     post,
@@ -337,7 +372,7 @@ pub async fn upload_file_to_version(
     redis: Data<RedisPool>,
     file_host: Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
-    http: web::Data<HttpClient>,
+    kafka_client: web::Data<KafkaClientState>,
     search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
     // Returns NoContent, so no need to convert to V2
@@ -349,7 +384,7 @@ pub async fn upload_file_to_version(
         redis.clone(),
         file_host,
         session_queue,
-        http,
+        kafka_client,
         search_state,
     )
     .await?;

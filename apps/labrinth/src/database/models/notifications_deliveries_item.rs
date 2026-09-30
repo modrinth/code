@@ -1,9 +1,9 @@
 use super::ids::*;
-use crate::database::models::DatabaseError;
 use crate::models::v3::notifications::{
     NotificationChannel, NotificationDeliveryStatus,
 };
 use chrono::{DateTime, Utc};
+use eyre::{Result, WrapErr};
 
 pub struct DBNotificationDelivery {
     pub id: i64,
@@ -61,14 +61,15 @@ impl DBNotificationDelivery {
     pub async fn get_all_user(
         user_id: DBUserId,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<DBNotificationDelivery>, DatabaseError> {
+    ) -> Result<Vec<DBNotificationDelivery>> {
         let user_id = user_id.0;
         let results = select_notification_deliveries_with_predicate!(
             "WHERE user_id = $1",
             user_id
         )
         .fetch_all(exec)
-        .await?;
+        .await
+        .wrap_err("fetching notification deliveries for user")?;
 
         Ok(results.into_iter().map(|r| r.into()).collect())
     }
@@ -79,7 +80,7 @@ impl DBNotificationDelivery {
         channel: NotificationChannel,
         limit: i64,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<DBNotificationDelivery>, DatabaseError> {
+    ) -> Result<Vec<DBNotificationDelivery>> {
         // This follows the `idx_notifications_deliveries_composite_queue` index.
         Ok(select_notification_deliveries_with_predicate!(
             "WHERE
@@ -98,7 +99,8 @@ impl DBNotificationDelivery {
             NotificationDeliveryStatus::Pending.as_str()
         )
         .fetch_all(exec)
-        .await?
+        .await
+        .wrap_err("locking processable notification deliveries")?
         .into_iter()
         .map(Into::into)
         .collect())
@@ -108,7 +110,7 @@ impl DBNotificationDelivery {
     pub async fn insert(
         &mut self,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<()> {
         let id = sqlx::query_scalar!(
             "
             INSERT INTO notifications_deliveries (
@@ -126,7 +128,8 @@ impl DBNotificationDelivery {
             self.attempt_count,
         )
         .fetch_one(exec)
-        .await?;
+        .await
+        .wrap_err("inserting notification delivery")?;
 
         self.id = id;
 
@@ -137,7 +140,7 @@ impl DBNotificationDelivery {
     pub async fn update(
         &self,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<()> {
         sqlx::query!(
             "
             UPDATE notifications_deliveries
@@ -155,7 +158,8 @@ impl DBNotificationDelivery {
             self.attempt_count,
         )
         .execute(exec)
-        .await?;
+        .await
+        .wrap_err("updating notification delivery")?;
 
         Ok(())
     }

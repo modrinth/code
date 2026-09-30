@@ -1,10 +1,11 @@
 use crate::database::models::{
-    DBProductPriceId, DBUserId, DBUserSubscriptionId, DatabaseError,
+    DBProductPriceId, DBUserId, DBUserSubscriptionId,
 };
 use crate::models::billing::{
     PriceDuration, ProductMetadata, SubscriptionMetadata, SubscriptionStatus,
 };
 use chrono::{DateTime, Utc};
+use eyre::{Result, WrapErr};
 use itertools::Itertools;
 use std::convert::{TryFrom, TryInto};
 
@@ -46,7 +47,9 @@ macro_rules! select_user_subscriptions_with_predicate {
 impl TryFrom<UserSubscriptionQueryResult> for DBUserSubscription {
     type Error = serde_json::Error;
 
-    fn try_from(r: UserSubscriptionQueryResult) -> Result<Self, Self::Error> {
+    fn try_from(
+        r: UserSubscriptionQueryResult,
+    ) -> std::result::Result<Self, Self::Error> {
         Ok(DBUserSubscription {
             id: DBUserSubscriptionId(r.id),
             user_id: DBUserId(r.user_id),
@@ -63,14 +66,18 @@ impl DBUserSubscription {
     pub async fn get(
         id: DBUserSubscriptionId,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Option<DBUserSubscription>, DatabaseError> {
-        Ok(Self::get_many(&[id], exec).await?.into_iter().next())
+    ) -> Result<Option<DBUserSubscription>> {
+        Ok(Self::get_many(&[id], exec)
+            .await
+            .wrap_err("fetching user subscription")?
+            .into_iter()
+            .next())
     }
 
     pub async fn get_many(
         ids: &[DBUserSubscriptionId],
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<DBUserSubscription>, DatabaseError> {
+    ) -> Result<Vec<DBUserSubscription>> {
         let ids = ids.iter().map(|id| id.0).collect_vec();
         let ids_ref: &[i64] = &ids;
         let results = select_user_subscriptions_with_predicate!(
@@ -78,36 +85,40 @@ impl DBUserSubscription {
             ids_ref
         )
         .fetch_all(exec)
-        .await?;
+        .await
+        .wrap_err("fetching user subscriptions")?;
 
-        Ok(results
+        results
             .into_iter()
-            .map(|r| r.try_into())
-            .collect::<Result<Vec<_>, serde_json::Error>>()?)
+            .map(TryInto::try_into)
+            .collect::<std::result::Result<Vec<_>, _>>()
+            .wrap_err("deserializing user subscription metadata")
     }
 
     pub async fn get_all_user(
         user_id: DBUserId,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<DBUserSubscription>, DatabaseError> {
+    ) -> Result<Vec<DBUserSubscription>> {
         let user_id = user_id.0;
         let results = select_user_subscriptions_with_predicate!(
             "WHERE us.user_id = $1",
             user_id
         )
         .fetch_all(exec)
-        .await?;
+        .await
+        .wrap_err("fetching user subscriptions for user")?;
 
-        Ok(results
+        results
             .into_iter()
-            .map(|r| r.try_into())
-            .collect::<Result<Vec<_>, serde_json::Error>>()?)
+            .map(TryInto::try_into)
+            .collect::<std::result::Result<Vec<_>, _>>()
+            .wrap_err("deserializing user subscription metadata")
     }
 
     pub async fn get_all_servers(
         status: Option<SubscriptionStatus>,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<DBUserSubscription>, DatabaseError> {
+    ) -> Result<Vec<DBUserSubscription>> {
         let status = status.map(|x| x.as_str());
 
         let results = select_user_subscriptions_with_predicate!(
@@ -120,18 +131,20 @@ impl DBUserSubscription {
             status
         )
         .fetch_all(exec)
-        .await?;
+        .await
+        .wrap_err("fetching server subscriptions")?;
 
-        Ok(results
+        results
             .into_iter()
-            .map(|r| r.try_into())
-            .collect::<Result<Vec<_>, serde_json::Error>>()?)
+            .map(TryInto::try_into)
+            .collect::<std::result::Result<Vec<_>, _>>()
+            .wrap_err("deserializing user subscription metadata")
     }
 
     pub async fn upsert(
         &self,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<()> {
         sqlx::query!(
             "
             INSERT INTO users_subscriptions (
@@ -153,10 +166,12 @@ impl DBUserSubscription {
             self.interval.as_str(),
             self.created,
             self.status.as_str(),
-            serde_json::to_value(&self.metadata)?,
+            serde_json::to_value(&self.metadata)
+                .wrap_err("serializing user subscription metadata")?,
         )
         .execute(exec)
-        .await?;
+        .await
+        .wrap_err("upserting user subscription")?;
 
         Ok(())
     }
@@ -164,7 +179,7 @@ impl DBUserSubscription {
     pub async fn get_many_by_server_ids(
         server_ids: &[String],
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<DBUserSubscription>, DatabaseError> {
+    ) -> Result<Vec<DBUserSubscription>> {
         if server_ids.is_empty() {
             return Ok(vec![]);
         }
@@ -179,12 +194,14 @@ impl DBUserSubscription {
             server_ids
         )
         .fetch_all(exec)
-        .await?;
+        .await
+        .wrap_err("fetching user subscriptions by server ID")?;
 
-        Ok(results
+        results
             .into_iter()
-            .map(|r| r.try_into())
-            .collect::<Result<Vec<_>, serde_json::Error>>()?)
+            .map(TryInto::try_into)
+            .collect::<std::result::Result<Vec<_>, _>>()
+            .wrap_err("deserializing user subscription metadata")
     }
 }
 

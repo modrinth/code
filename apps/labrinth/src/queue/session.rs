@@ -1,11 +1,12 @@
 use crate::database::models::pat_item::DBPersonalAccessToken;
 use crate::database::models::session_item::DBSession;
 use crate::database::models::{
-    DBOAuthAccessTokenId, DBPatId, DBSessionId, DBUserId, DatabaseError,
+    DBOAuthAccessTokenId, DBPatId, DBSessionId, DBUserId,
 };
 use crate::database::{PgPool, PgTransaction};
 use crate::routes::internal::session::SessionMetadata;
 use chrono::Utc;
+use eyre::{Result, WrapErr as _};
 use itertools::Itertools;
 use std::collections::{HashMap, HashSet};
 use tokio::sync::Mutex;
@@ -65,11 +66,7 @@ impl AuthQueue {
         std::mem::replace(&mut *queue, HashSet::with_capacity(len))
     }
 
-    pub async fn index(
-        &self,
-        pool: &PgPool,
-        redis: &RedisPool,
-    ) -> Result<(), DatabaseError> {
+    pub async fn index(&self, pool: &PgPool, redis: &RedisPool) -> Result<()> {
         let session_queue = self.take_sessions().await;
         let pat_queue = Self::take_hashset(&self.pat_queue).await;
         let oauth_access_token_queue =
@@ -79,7 +76,10 @@ impl AuthQueue {
             || !pat_queue.is_empty()
             || !oauth_access_token_queue.is_empty()
         {
-            let mut transaction = pool.begin().await?;
+            let mut transaction = pool
+                .begin()
+                .await
+                .wrap_err("starting database transaction")?;
             let mut clear_cache_sessions = Vec::new();
 
             for (id, metadata) in session_queue {
@@ -101,7 +101,8 @@ impl AuthQueue {
                     metadata.user_agent,
                 )
                 .execute(&mut transaction)
-                .await?;
+                .await
+                .wrap_err("updating session last login in database")?;
             }
 
             use futures::TryStreamExt;
@@ -115,7 +116,8 @@ impl AuthQueue {
             .fetch(&mut transaction)
             .map_ok(|x| (DBSessionId(x.id), x.session, DBUserId(x.user_id)))
             .try_collect::<Vec<(DBSessionId, String, DBUserId)>>()
-            .await?;
+            .await
+            .wrap_err("fetching expired sessions from database")?;
 
             for (id, session, user_id) in expired_ids {
                 clear_cache_sessions.push((
@@ -123,10 +125,14 @@ impl AuthQueue {
                     Some(session),
                     Some(user_id),
                 ));
-                DBSession::remove(id, &mut transaction).await?;
+                DBSession::remove(id, &mut transaction)
+                    .await
+                    .wrap_err("removing expired session from database")?;
             }
 
-            DBSession::clear_cache(clear_cache_sessions, redis).await?;
+            DBSession::clear_cache(clear_cache_sessions, redis)
+                .await
+                .wrap_err("clearing expired session cache")?;
 
             let ids = pat_queue.iter().map(|id| id.0).collect_vec();
             let clear_cache_pats = pat_queue
@@ -144,16 +150,23 @@ impl AuthQueue {
                 Utc::now(),
             )
             .execute(&mut transaction)
-            .await?;
+            .await
+            .wrap_err("updating personal access token last used in database")?;
 
             update_oauth_access_token_last_used(
                 oauth_access_token_queue,
                 &mut transaction,
             )
-            .await?;
+            .await
+            .wrap_err("updating oauth access token last used in database")?;
 
-            transaction.commit().await?;
-            DBPersonalAccessToken::clear_cache(clear_cache_pats, redis).await?;
+            transaction
+                .commit()
+                .await
+                .wrap_err("committing database transaction")?;
+            DBPersonalAccessToken::clear_cache(clear_cache_pats, redis)
+                .await
+                .wrap_err("clearing personal access token cache")?;
         }
 
         Ok(())
@@ -163,7 +176,7 @@ impl AuthQueue {
 async fn update_oauth_access_token_last_used(
     oauth_access_token_queue: HashSet<DBOAuthAccessTokenId>,
     transaction: &mut PgTransaction<'_>,
-) -> Result<(), DatabaseError> {
+) -> Result<()> {
     let ids = oauth_access_token_queue.iter().map(|id| id.0).collect_vec();
     sqlx::query!(
         "
@@ -176,6 +189,7 @@ async fn update_oauth_access_token_last_used(
         Utc::now()
     )
     .execute(&mut *transaction)
-    .await?;
+    .await
+    .wrap_err("updating oauth access token last used in database")?;
     Ok(())
 }

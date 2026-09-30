@@ -37,6 +37,7 @@ const recording = ref(false)
 const statusMessage = ref('')
 const controlElement = ref<HTMLElement | null>(null)
 let suppressNextClick = false
+let pendingLeftControl = false
 
 const messages = defineMessages({
 	listen: {
@@ -83,6 +84,7 @@ const messages = defineMessages({
 })
 
 const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform)
+const isWindows = /Win/.test(navigator.platform)
 const bindingLabel = computed(() => {
 	if (props.mixed) return formatMessage(messages.mixed)
 	if (!props.modelValue) return formatMessage(messages.choose)
@@ -114,13 +116,16 @@ function startRecording() {
 	recording.value = true
 	statusMessage.value = formatMessage(messages.listeningStatus)
 	window.addEventListener('keydown', handleKeydown, true)
+	window.addEventListener('keyup', handleKeyup, true)
 	window.addEventListener('pointerdown', handlePointerDown, true)
 	window.addEventListener('blur', cancelRecording)
 }
 
 function stopRecording() {
 	recording.value = false
+	pendingLeftControl = false
 	window.removeEventListener('keydown', handleKeydown, true)
+	window.removeEventListener('keyup', handleKeyup, true)
 	window.removeEventListener('pointerdown', handlePointerDown, true)
 	window.removeEventListener('blur', cancelRecording)
 	deactivateKeybindRecording(cancelRecording)
@@ -168,7 +173,20 @@ function handleKeydown(event: KeyboardEvent) {
 		statusMessage.value = formatMessage(messages.unsupportedStatus)
 		return
 	}
-	assign(token)
+	if (isWindows && event.code === 'ControlLeft') {
+		pendingLeftControl = true
+		return
+	}
+
+	assign(pendingLeftControl && event.code !== 'AltRight' ? 'key.keyboard.left.control' : token)
+}
+
+function handleKeyup(event: KeyboardEvent) {
+	if (!recording.value || !pendingLeftControl || event.code !== 'ControlLeft') return
+
+	event.preventDefault()
+	event.stopPropagation()
+	assign('key.keyboard.left.control')
 }
 
 function handlePointerDown(event: PointerEvent) {

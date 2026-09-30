@@ -270,7 +270,7 @@ pub(super) async fn reconcile_source_screenshots(
         ));
     }
 
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
     for row in unmatched_by_hash.into_values().flatten() {
         screenshot_rows::delete_screenshot(&row.id, &mut tx).await?;
     }

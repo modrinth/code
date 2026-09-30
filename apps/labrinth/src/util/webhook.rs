@@ -54,7 +54,7 @@ async fn get_webhook_metadata(
         redis,
     )
     .await
-    .wrap_api_err("fetching webhook project")?;
+    .wrap_internal_err("fetching webhook project")?;
 
     if let Some(mut project) = project {
         let mut owner = None;

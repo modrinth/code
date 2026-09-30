@@ -1,6 +1,6 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "请描述您的项目。"
+    "defaultMessage": "请描述您的项目，包括项目的主要内容、目的和特色。"
   },
   "nags.add-description.title": {
     "defaultMessage": "添加描述"
@@ -53,14 +53,8 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "选择准确的标签"
   },
-  "nags.banned-link-usage.description": {
-    "defaultMessage": "不允许将 {url} 作为外部链接。"
-  },
-  "nags.banned-link-usage.title": {
-    "defaultMessage": "移除违规链接"
-  },
   "nags.check-disclosures.description": {
-    "defaultMessage": "请通过填写适用于你 {type} 的内容披露信息，确保用户充分了解所有重要信息"
+    "defaultMessage": "请填写适用于你的{type}的内容披露信息，确保用户充分了解所有重要信息。"
   },
   "nags.check-disclosures.title": {
     "defaultMessage": "审查披露"
@@ -89,9 +83,6 @@
   "nags.edit-gallery.title": {
     "defaultMessage": "编辑相册"
   },
-  "nags.edit-license.title": {
-    "defaultMessage": "编辑许可证"
-  },
   "nags.edit-summary.title": {
     "defaultMessage": "编辑简介"
   },
@@ -119,26 +110,11 @@
   "nags.gallery.title": {
     "defaultMessage": "前往图库页"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "你的{type}所使用的许可证要求公开源文件，请提供源文件链接、添加源文件或者更换许可证。"
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "提供源代码"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "你的一些外部链接似乎重复了。每个链接只应输入一次，并设置合适的链接类型。"
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "移除重复链接"
-  },
   "nags.invalid-gallery-text.title": {
     "defaultMessage": "修改相册图片文本"
-  },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "许可证 URL 不可用。"
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "你提供的许可证 URL 指向 {domain}，该地址不适合用于提供许可证信息。许可证 URL 应直接链接至你的许可证文件。"
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "你提供的许可证 URL 格式有误。请提供一个指向许可证文本的有效的 URL 地址。"
@@ -154,6 +130,12 @@
   },
   "nags.invalid-project-summary.title": {
     "defaultMessage": "修改简介"
+  },
+  "nags.license-url.not-in-allowlist.title": {
+    "defaultMessage": "检查您的许可证链接"
+  },
+  "nags.link-validation.duplicate.title": {
+    "defaultMessage": "删除重复链接"
   },
   "nags.long-headers.description": {
     "defaultMessage": "描述中有 {count, plural, other {# 个标题}}过长。标题应简洁，用作章节名，不应是完整的句子。"
@@ -173,12 +155,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "添加图片替代文本"
   },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Discord 邀请链接不可用作其他类型的链接。请将你的 Discord 链接仅放置在 “Discord 邀请链接” 输入框中。"
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "移动 Discord 邀请链接位置"
-  },
   "nags.moderation.title": {
     "defaultMessage": "访问审核页面"
   },
@@ -194,8 +170,8 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "选择正确的分辨率"
   },
-  "nags.project-description-banned-link.description": {
-    "defaultMessage": "描述中不允许存在 “{fullUrl}”。"
+  "nags.project-description-content.title": {
+    "defaultMessage": "查看描述"
   },
   "nags.project-description-non-english.description": {
     "defaultMessage": "您的项目描述必须以英语编写或者包含英语翻译。"
@@ -371,14 +347,11 @@
   "nags.upload-version.title": {
     "defaultMessage": "上传一个版本"
   },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "你的部分外部链接可能与其所属类型不适配。"
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "检查外部链接"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "访问链接设置"
+  },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "您的项目描述应该提供独特的信息，且不要重复项目的摘要。"
   },
   "project.text-validation.summary-matches-title": {
     "defaultMessage": "您的项目简介应该提供独特的信息，不要重复项目的名称。"

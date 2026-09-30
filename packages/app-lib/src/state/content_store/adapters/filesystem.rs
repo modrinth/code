@@ -31,10 +31,16 @@ pub(crate) async fn writable_copy(
     source: &Path,
     destination: &Path,
 ) -> crate::Result<()> {
-    fs::copy(source, destination).await?;
+    let mut input = File::open(source).await?;
+    let permissions = input.metadata().await?.permissions();
+    let mut output = File::create(destination).await?;
+    tokio::io::copy(&mut input, &mut output).await?;
+    output.flush().await?;
+    fs::set_permissions(destination, permissions).await?;
     make_writable(destination).await
 }
 
+/*
 pub(crate) async fn try_reflink(
     source: &Path,
     destination: &Path,
@@ -51,8 +57,6 @@ pub(crate) async fn try_reflink(
             Ok(true)
         }
         Err(error) => {
-            // Windows can wrap filesystem errors in an HRESULT. Unwrap it before
-            // deciding whether another storage method can work.
             let error = match error.raw_os_error().map(|code| code as u32) {
                 Some(code)
                     if cfg!(windows) && code & 0xffff0000 == 0x80070000 =>
@@ -83,6 +87,7 @@ pub(crate) async fn try_reflink(
         }
     }
 }
+*/
 
 async fn make_writable(destination: &Path) -> crate::Result<()> {
     let mut permissions = fs::metadata(destination).await?.permissions();
@@ -121,6 +126,7 @@ pub(in crate::state::content_store) async fn move_instance_file(
     Ok(())
 }
 
+#[cfg(windows)]
 pub(crate) fn link_unavailable(error: &std::io::Error) -> bool {
     matches!(
         error.kind(),
@@ -128,6 +134,7 @@ pub(crate) fn link_unavailable(error: &std::io::Error) -> bool {
     ) || cfg!(windows) && matches!(error.raw_os_error(), Some(1 | 50 | 1314))
 }
 
+/*
 pub(in crate::state::content_store) async fn try_hardlink(
     source: &Path,
     target: &Path,
@@ -145,6 +152,7 @@ pub(in crate::state::content_store) async fn try_hardlink(
         Err(error) => Err(error.into()),
     }
 }
+*/
 
 pub(crate) async fn remove_instance_file(path: &Path) -> crate::Result<()> {
     let metadata = fs::symlink_metadata(path).await?;
@@ -182,13 +190,12 @@ pub(crate) async fn remove_instance_file(path: &Path) -> crate::Result<()> {
     Ok(())
 }
 
-/// Returns `None` when sharing is unavailable, without creating a full copy.
-/// Background migration uses this to avoid duplicating existing files just to adopt them.
 pub(crate) async fn try_shared_file(
     source: &Path,
     destination: &Path,
     policy: FileStoragePolicy,
 ) -> crate::Result<Option<FileStorageKind>> {
+    /*
     if try_reflink(source, destination).await? {
         return Ok(Some(FileStorageKind::Reflink));
     }
@@ -197,6 +204,8 @@ pub(crate) async fn try_shared_file(
     {
         return Ok(Some(FileStorageKind::Hardlink));
     }
+    */
+    let _ = (source, destination, policy);
     Ok(None)
 }
 
@@ -212,8 +221,6 @@ pub(crate) async fn create_content_file(
     Ok(FileStorageKind::Copy)
 }
 
-/// Rejects linked parent directories because they can redirect an otherwise valid
-/// relative path outside the instance or store.
 pub(crate) async fn validate_parent_directories(
     root: &Path,
     path: &Path,

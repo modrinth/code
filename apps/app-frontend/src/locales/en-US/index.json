@@ -53,8 +53,8 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Download couldn't finish"
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "Instance couldn't be found"
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Couldn't prepare instance"
   },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "File path is invalid"
@@ -206,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Home and content"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Bring Modrinth App to the foreground when Minecraft exits."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Refocus app when Minecraft closes"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Startup and navigation"
   },
@@ -301,6 +307,9 @@
   },
   "app.download-manager.attention": {
     "message": "Needs attention"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "Updating {count, plural, one {# item} other {# items}}"
   },
   "app.download-manager.cancel": {
     "message": "Cancel installation"
@@ -688,15 +697,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Instance"
-  },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "Downloading {current, number}/{total, number} projects..."
-  },
-  "app.instance.mods.bulk-update.finishing": {
-    "message": "Finishing update..."
-  },
-  "app.instance.mods.bulk-update.resolving-versions": {
-    "message": "Resolving versions..."
   },
   "app.instance.mods.content-type-project": {
     "message": "project"
@@ -3714,7 +3714,7 @@
     "message": "Adding files ({completed}/{total})"
   },
   "instance.files.managed-content-read-only": {
-    "message": "Managed content is read-only here. Add, disable, update, or remove it from the Content tab."
+    "message": "Manage your installed content via the Content tab"
   },
   "instance.files.save-as": {
     "message": "Save as..."

@@ -53,12 +53,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Wähle passende Tags"
   },
-  "nags.banned-link-usage.description": {
-    "defaultMessage": "Der Link “{url}” ist als externer Link nicht erlaubt."
-  },
-  "nags.banned-link-usage.title": {
-    "defaultMessage": "Verbotene Links entfernen"
-  },
   "nags.check-disclosures.description": {
     "defaultMessage": "Stelle sicher, dass Nutzer über alle wichtigen Details informiert sind, indem du die für dein {type} geltenden Angaben zum Inhalt ausfüllst."
   },
@@ -89,9 +83,6 @@
   "nags.edit-gallery.title": {
     "defaultMessage": "Galerie bearbeiten"
   },
-  "nags.edit-license.title": {
-    "defaultMessage": "Lizenz bearbeiten"
-  },
   "nags.edit-summary.title": {
     "defaultMessage": "Zusammenfassung bearbeiten"
   },
@@ -119,26 +110,11 @@
   "nags.gallery.title": {
     "defaultMessage": "Galerieseite besuchen"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Die Lizenz deines {type} erfordert die Veröffentlichung des Quellcodes. Bitte füge einen Link zum Quellcode hinzu, lade Quelldateien hoch oder ändere die Lizenz."
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Quellcode bereitstellen"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Einige deiner externen Links scheinen identisch zu sein. Jeder Link sollte nur einmal und mit dem entsprechenden Link-Typ aufgeführt werden."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Identische Links entfernen"
-  },
   "nags.invalid-gallery-text.title": {
     "defaultMessage": "Text eines Galeriebildes bearbeiten"
-  },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "Lizenz-URL ist ungültig."
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "Deine Lizenz-URL verweist auf {domain}, was für Lizenzinformationen nicht geeignet ist. Lizenz-URLs sollten direkt auf deinen Lizenztext verweisen."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "Deine Lizenz-URL scheint fehlerhaft zu sein. Bitte gib eine gültige URL zu deinem Lizenztext an."
@@ -154,6 +130,54 @@
   },
   "nags.invalid-project-summary.title": {
     "defaultMessage": "Die Zusammenfassung ändern"
+  },
+  "nags.link-validation.discord-invite": {
+    "defaultMessage": "Deine Discord-Einladung ist ungültig, abgelaufen oder lädt keine Benutzer zu einem Server ein. Ersetze sie durch eine aktive Server-Einladung."
+  },
+  "nags.link-validation.discord-invite.title": {
+    "defaultMessage": "Ungültige Discord-Einladungen ersetzen"
+  },
+  "nags.link-validation.download": {
+    "defaultMessage": "Links, die einen Download starten, sind nicht erlaubt. Bitte entferne solche Links aus deiner Beschreibung."
+  },
+  "nags.link-validation.download.title": {
+    "defaultMessage": "Downloadlinks entfernen"
+  },
+  "nags.link-validation.duplicate.title": {
+    "defaultMessage": "Doppelte Links entfernen"
+  },
+  "nags.link-validation.external-blocklist-match": {
+    "defaultMessage": "Dein {linkField}-Link ist nicht erlaubt. Bitte entferne diesen Link oder ersetze ihn durch einen Link, der für den Linktyp {linkField} geeignet ist."
+  },
+  "nags.link-validation.external-blocklist-match.title": {
+    "defaultMessage": "Falsche Links ersetzen"
+  },
+  "nags.link-validation.global-blocklist-match.title": {
+    "defaultMessage": "Verbotene Links entfernen"
+  },
+  "nags.link-validation.ip-address.title": {
+    "defaultMessage": "IP-Adressen-Link entfernen"
+  },
+  "nags.link-validation.malformed.title": {
+    "defaultMessage": "Ungültige Links korrigieren"
+  },
+  "nags.link-validation.source-repository": {
+    "defaultMessage": "Dein Quellcode-Link muss zu einem Repository auf einer unterstützten Host-Plattform oder zu einem selbst gehosteten Gitea-/Forgejo-Dienst führen."
+  },
+  "nags.link-validation.source-repository.title": {
+    "defaultMessage": "Link zu einem Quell-Repository"
+  },
+  "nags.link-validation.title": {
+    "defaultMessage": "Diesen Link überprüfen"
+  },
+  "nags.link-validation.unverifiable.title": {
+    "defaultMessage": "Link-Verfügbarkeit prüfen"
+  },
+  "nags.link-validation.wrong-field": {
+    "defaultMessage": "Der Link {linkField, select, issues {zum Issue-Tracker} source {zum Quellcode} wiki {zum Wiki} discord {zur Discord-Einladung} site {zur Website} store {zum Store} license {zur Lizenz} description {zur Beschreibung} patreon {zu Patreon} bmac {zu Buy Me a Coffee} paypal {zu PayPal} github {zu GitHub Sponsors} kofi {zu Ko-fi} other {zur Spende}} ist für {linkField, select, issues {Issue-Tracker} source {Quellcode} wiki {Wiki} discord {Discord-Einladungs} site {Website} store {Store} license {Lizenz} description {Beschreibungs} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi-} other {Spenden}}-Links nicht korrekt. Entferne ihn oder ersetze ihn durch den korrekten Link."
+  },
+  "nags.link-validation.wrong-field.title": {
+    "defaultMessage": "Falsche Links korrigieren"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# Überschrift} other {# Überschriften}} in deiner Beschreibung {count, plural, one {ist} other {sind}} zu lang. Überschriften sollten kurz sein und als Abschnittstitel dienen, nicht als vollständige Sätze."
@@ -173,12 +197,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "Alternativen Bild-Text hinzufügen"
   },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Discord-Einladungen können nicht für andere Link-Typen verwendet werden. Bitte füge deinen Discord-Link nur in das Feld „Discord-Einladungslink“ ein."
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Discord-Einladung verschieben"
-  },
   "nags.moderation.title": {
     "defaultMessage": "Moderationsthread besuchen"
   },
@@ -194,8 +212,8 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Richtige Auflösung auswählen"
   },
-  "nags.project-description-banned-link.description": {
-    "defaultMessage": "Der Link „{fullUrl}“ ist in Beschreibungen von Projekten nicht erlaubt."
+  "nags.project-description-content.title": {
+    "defaultMessage": "Prüfe die Beschreibung"
   },
   "nags.project-description-non-english.description": {
     "defaultMessage": "Die Beschreibung deines Projekts muss auf Englisch verfasst sein oder eine englische Übersetzung enthalten."
@@ -371,14 +389,11 @@
   "nags.upload-version.title": {
     "defaultMessage": "Version hochladen"
   },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Einige deiner externen Links führen möglicherweise zu Domains, die für diese Art von Link nicht geeignet sind."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Externe Links überprüfen"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Linkeinstellungen ansehen"
+  },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "Die Beschreibung deines Projekts sollte eigene Informationen enthalten und nicht eine Wiederholung der Zusammenfassung sein."
   },
   "project.text-validation.summary-matches-title": {
     "defaultMessage": "Die Zusammenfassung deines Projekts sollte eigene Informationen enthalten und den Namen des Projekts nicht wiederholen."

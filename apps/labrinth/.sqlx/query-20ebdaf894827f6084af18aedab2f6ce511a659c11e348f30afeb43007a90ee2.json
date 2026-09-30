@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tSELECT COUNT(*) AS \"count!\"\n\t\tFROM delphi_rule_effects effect\n\t\tINNER JOIN delphi_rule_revisions published\n\t\t\tON published.revision = effect.revision\n\t\tWHERE\n\t\t\teffect.rule_id = $1\n\t\t\tAND (\n\t\t\t\tNOT $2\n\t\t\t\tOR EXISTS (\n\t\t\t\t\tSELECT 1\n\t\t\t\t\tFROM delphi_report_issue_details detail\n\t\t\t\t\tINNER JOIN delphi_report_issues issue\n\t\t\t\t\t\tON issue.id = detail.issue_id\n\t\t\t\t\tINNER JOIN delphi_reports report\n\t\t\t\t\t\tON report.id = issue.report_id\n\t\t\t\t\tINNER JOIN files file ON file.id = report.file_id\n\t\t\t\t\tINNER JOIN versions version ON version.id = file.version_id\n\t\t\t\t\tINNER JOIN mods project ON project.id = version.mod_id\n\t\t\t\t\tWHERE\n\t\t\t\t\t\tdetail.id = effect.detail_id\n\t\t\t\t\t\tAND project.status = 'processing'\n\t\t\t\t)\n\t\t\t)\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Bool"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "20ebdaf894827f6084af18aedab2f6ce511a659c11e348f30afeb43007a90ee2"
+}

@@ -3,11 +3,10 @@ use std::convert::TryFrom;
 use std::collections::HashMap;
 
 use super::super::ids::OrganizationId;
-use crate::database::models::{
-    DBProjectDisclosure, DBProjectId, DatabaseError, version_item,
-};
+use crate::database::models::{DBProjectDisclosure, DBProjectId, version_item};
 use crate::models::disclosures::ProjectDisclosureType;
 use crate::models::ids::{ProjectId, TeamId, ThreadId, VersionId};
+use crate::models::link_platform::LinkPlatform;
 use crate::models::projects::{
     Dependency, License, Link, Loader, ModeratorMessage, MonetizationStatus,
     Project, ProjectStatus, Version, VersionFile, VersionStatus, VersionType,
@@ -15,6 +14,7 @@ use crate::models::projects::{
 use crate::routes::v2_reroute::{self, capitalize_first};
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
+use eyre::{Result, WrapErr};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -245,7 +245,7 @@ impl LegacyProject {
         data: Vec<Project>,
         pool: &crate::database::PgPool,
         redis: &RedisPool,
-    ) -> Result<Vec<Self>, DatabaseError> {
+    ) -> Result<Vec<Self>> {
         let version_ids: Vec<_> = data
             .iter()
             .filter_map(|p| p.versions.first().map(|i| (*i).into()))
@@ -255,13 +255,15 @@ impl LegacyProject {
 
         let example_versions =
             version_item::DBVersion::get_many(&version_ids, pool, redis)
-                .await?;
+                .await
+                .wrap_err("fetching example versions for legacy projects")?;
         let archived_disclosure_ids = DBProjectDisclosure::projects_with_type(
             ProjectDisclosureType::Archived,
             &project_ids,
             pool,
         )
-        .await?;
+        .await
+        .wrap_err("fetching archived disclosures for legacy projects")?;
 
         let mut legacy_projects = Vec::new();
         for project in data {
@@ -460,4 +462,27 @@ impl TryFrom<Link> for DonationLink {
             id: link.platform,
         })
     }
+}
+
+pub fn validate_donation_platforms(
+    links: &[DonationLink],
+) -> Result<(), crate::routes::ApiError> {
+    let mut platforms = std::collections::HashSet::new();
+    for link in links {
+        if !link
+            .id
+            .parse::<LinkPlatform>()
+            .is_ok_and(LinkPlatform::is_donation)
+        {
+            return Err(crate::routes::ApiError::Request(eyre::eyre!(
+                "each donation link must specify a donation platform"
+            )));
+        }
+        if !platforms.insert(&link.id) {
+            return Err(crate::routes::ApiError::Request(eyre::eyre!(
+                "donation platforms must not be repeated"
+            )));
+        }
+    }
+    Ok(())
 }

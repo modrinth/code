@@ -518,13 +518,6 @@ async fn prepare_thread_issue_mutation(
     project_id: database::models::DBProjectId,
     transaction: &mut database::PgTransaction<'_>,
 ) -> Result<(), ApiError> {
-    crate::routes::internal::delphi::tech_review_queue::remove_projects_without_details(
-        &[project_id],
-        crate::routes::internal::delphi::tech_review_queue::TechReviewRemovalReason::FileDeleted,
-        transaction,
-    )
-    .await
-    .wrap_api_err("synchronizing project technical review state")?;
     sqlx::query!("SELECT pg_advisory_xact_lock($1)", project_id.0)
         .fetch_one(&mut *transaction)
         .await
@@ -902,7 +895,7 @@ pub async fn thread_send_message_internal(
             let project =
                 database::models::DBProject::get_id(project_id, pool, redis)
                     .await
-                    .wrap_api_err("fetching thread project")?;
+                    .wrap_internal_err("fetching thread project")?;
 
             if let Some(project) = project
                 && project.inner.status != ProjectStatus::Processing

@@ -1400,6 +1400,12 @@
   "external-project-license-status.yes": {
     "defaultMessage": "Tak"
   },
+  "file-button.file-too-large.description": {
+    "defaultMessage": "Plik {filename} jest zbyt duży. Maksymalny rozmiar pliku to {maxSize}."
+  },
+  "file-button.file-too-large.title": {
+    "defaultMessage": "Zbyt duży plik"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "Podsumowanie rozpakowywania"
   },
@@ -3615,7 +3621,7 @@
     "defaultMessage": "Zawiera reklamy"
   },
   "project.disclosure.ai-functionality.title": {
-    "defaultMessage": "Funkcja Generatywnego AI"
+    "defaultMessage": "Funkcje używające AI"
   },
   "project.disclosure.ai-generated-content.title": {
     "defaultMessage": "Zawiera {types} przez sztuczną inteligencję"
@@ -3651,7 +3657,7 @@
     "defaultMessage": "Zawiera zewnętrzne interakcje z systemem"
   },
   "project.disclosure.telemetry.title": {
-    "defaultMessage": "Zawiera {consent, select, opt_in {telemetria opt-in} opt_out {telemetria opt-out} always_active {zawsze aktywna telemetria} other {telemetria}}"
+    "defaultMessage": "Zawiera {consent, select, opt_in {telemetrię za zgodą użytkownika} opt_out {telemetrię możliwą do wyłączenia} always_active {zawsze aktywną telemetrię} other {telemetrię}}"
   },
   "project.download-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {pobranie} few {pobrania} other {pobrań}}"
@@ -4029,10 +4035,10 @@
     "defaultMessage": "Zawsze aktywna"
   },
   "project.settings.disclosures.telemetry.consent-opt-in": {
-    "defaultMessage": "Dodaj"
+    "defaultMessage": "Za zgodą"
   },
   "project.settings.disclosures.telemetry.consent-opt-out": {
-    "defaultMessage": "Usuń"
+    "defaultMessage": "Możliwa do wyłączenia"
   },
   "project.settings.disclosures.title": {
     "defaultMessage": "Ujawnienie informacji"
@@ -4359,7 +4365,7 @@
     "defaultMessage": "Pokaż więcej opcji"
   },
   "search.filter_type.advanced": {
-    "defaultMessage": "Wyłączenia zaawansowane"
+    "defaultMessage": "Zaawansowane wykluczenia"
   },
   "search.filter_type.advanced.disclosure.advertisements": {
     "defaultMessage": "Reklamy"
@@ -4371,7 +4377,7 @@
     "defaultMessage": "AI {usage}"
   },
   "search.filter_type.advanced.disclosure.ai_functionality": {
-    "defaultMessage": "Funkcja Generatywnego AI"
+    "defaultMessage": "Funkcje używające AI"
   },
   "search.filter_type.advanced.disclosure.archived": {
     "defaultMessage": "Zarchiwizowane"
@@ -4380,7 +4386,7 @@
     "defaultMessage": "Zawartość pochodnych"
   },
   "search.filter_type.advanced.disclosure.epilepsy_triggers": {
-    "defaultMessage": "Ostrzeżenie dotyczące nadwrażliwości na światło"
+    "defaultMessage": "Ryzyko epilepsji"
   },
   "search.filter_type.advanced.disclosure.paid_features": {
     "defaultMessage": "Płatne funkcje"
@@ -4392,7 +4398,7 @@
     "defaultMessage": "Telemetria"
   },
   "search.filter_type.compatible_dependency_project_ids": {
-    "defaultMessage": "Zależy od"
+    "defaultMessage": "Wymaga"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Środowisko"

@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 
+use eyre::{Result, WrapErr};
+use futures::TryStreamExt;
 use xredis::RedisPool;
 
-use super::DatabaseError;
 use super::ids::*;
-use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 
 const TAGS_NAMESPACE: &str = "tags:v4";
@@ -28,13 +28,6 @@ pub struct ReportType {
     pub report_type: String,
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct LinkPlatform {
-    pub id: LinkPlatformId,
-    pub name: String,
-    pub donation: bool,
-}
-
 impl Category {
     // Gets hashmap of category ids matching a name
     // Multiple categories can have the same name, but different project types, so we need to return a hashmap
@@ -42,7 +35,7 @@ impl Category {
     pub async fn get_ids<'a, E>(
         name: &str,
         exec: E,
-    ) -> Result<HashMap<ProjectTypeId, CategoryId>, DatabaseError>
+    ) -> Result<HashMap<ProjectTypeId, CategoryId>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -54,7 +47,8 @@ impl Category {
             name,
         )
         .fetch_all(exec)
-        .await?;
+        .await
+        .wrap_err("fetching category ids")?;
 
         let mut map = HashMap::new();
         for r in result {
@@ -68,7 +62,7 @@ impl Category {
         name: &str,
         project_type: ProjectTypeId,
         exec: E,
-    ) -> Result<Option<CategoryId>, DatabaseError>
+    ) -> Result<Option<CategoryId>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -81,7 +75,8 @@ impl Category {
             project_type as ProjectTypeId
         )
         .fetch_optional(exec)
-        .await?;
+        .await
+        .wrap_err("fetching category id")?;
 
         Ok(result.map(|r| CategoryId(r.id)))
     }
@@ -89,16 +84,21 @@ impl Category {
     pub async fn list<'a, E>(
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<Category>, DatabaseError>
+    ) -> Result<Vec<Category>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         {
-            let mut redis = redis.connect().await?;
+            let mut redis = redis
+                .connect()
+                .await
+                .wrap_err("connecting to redis for cached categories")?;
             let key = redis.key().metadata(TAGS_NAMESPACE, "category");
 
-            let res: Option<Vec<Category>> =
-                redis.get_deserialized(&key).await?;
+            let res: Option<Vec<Category>> = redis
+                .get_deserialized(&key)
+                .await
+                .wrap_err("fetching cached categories")?;
 
             if let Some(res) = res {
                 return Ok(res);
@@ -122,75 +122,19 @@ impl Category {
             header: c.category_header
         })
         .try_collect::<Vec<Category>>()
-        .await?;
+        .await
+        .wrap_err("fetching categories")?;
 
-        let mut redis = redis.connect().await?;
+        let mut redis = redis
+            .connect()
+            .await
+            .wrap_err("connecting to redis to cache categories")?;
         let key = redis.key().metadata(TAGS_NAMESPACE, "category");
 
-        redis.set_serialized(&key, &result, None).await?;
-
-        Ok(result)
-    }
-}
-
-impl LinkPlatform {
-    pub async fn get_id<'a, E>(
-        id: &str,
-        exec: E,
-    ) -> Result<Option<LinkPlatformId>, DatabaseError>
-    where
-        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
-    {
-        let result = sqlx::query!(
-            "
-            SELECT id FROM link_platforms
-            WHERE name = $1
-            ",
-            id
-        )
-        .fetch_optional(exec)
-        .await?;
-
-        Ok(result.map(|r| LinkPlatformId(r.id)))
-    }
-
-    pub async fn list<'a, E>(
-        exec: E,
-        redis: &RedisPool,
-    ) -> Result<Vec<LinkPlatform>, DatabaseError>
-    where
-        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
-    {
-        {
-            let mut redis = redis.connect().await?;
-            let key = redis.key().metadata(TAGS_NAMESPACE, "link_platform");
-
-            let res: Option<Vec<LinkPlatform>> =
-                redis.get_deserialized(&key).await?;
-
-            if let Some(res) = res {
-                return Ok(res);
-            }
-        }
-
-        let result = sqlx::query!(
-            "
-            SELECT id, name, donation FROM link_platforms
-            "
-        )
-        .fetch(exec)
-        .map_ok(|c| LinkPlatform {
-            id: LinkPlatformId(c.id),
-            name: c.name,
-            donation: c.donation,
-        })
-        .try_collect::<Vec<LinkPlatform>>()
-        .await?;
-
-        let mut redis = redis.connect().await?;
-        let key = redis.key().metadata(TAGS_NAMESPACE, "link_platform");
-
-        redis.set_serialized(&key, &result, None).await?;
+        redis
+            .set_serialized(&key, &result, None)
+            .await
+            .wrap_err("caching categories")?;
 
         Ok(result)
     }
@@ -200,7 +144,7 @@ impl ReportType {
     pub async fn get_id<'a, E>(
         name: &str,
         exec: E,
-    ) -> Result<Option<ReportTypeId>, DatabaseError>
+    ) -> Result<Option<ReportTypeId>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -212,23 +156,28 @@ impl ReportType {
             name
         )
         .fetch_optional(exec)
-        .await?;
+        .await
+        .wrap_err("fetching report type id")?;
 
         Ok(result.map(|r| ReportTypeId(r.id)))
     }
 
-    pub async fn list<'a, E>(
-        exec: E,
-        redis: &RedisPool,
-    ) -> Result<Vec<String>, DatabaseError>
+    pub async fn list<'a, E>(exec: E, redis: &RedisPool) -> Result<Vec<String>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         {
-            let mut redis = redis.connect().await?;
+            let mut redis = redis
+                .connect()
+                .await
+                .wrap_err("connecting to redis for cached report types")?;
             let key = redis.key().metadata(TAGS_NAMESPACE, "report_type");
 
-            let res: Option<Vec<String>> = redis.get_deserialized(&key).await?;
+            let res: Option<Vec<String>> =
+                redis
+                    .get_deserialized(&key)
+                    .await
+                    .wrap_err("fetching cached report types")?;
 
             if let Some(res) = res {
                 return Ok(res);
@@ -243,12 +192,19 @@ impl ReportType {
         .fetch(exec)
         .map_ok(|c| c.name)
         .try_collect::<Vec<String>>()
-        .await?;
+        .await
+        .wrap_err("fetching report types")?;
 
-        let mut redis = redis.connect().await?;
+        let mut redis = redis
+            .connect()
+            .await
+            .wrap_err("connecting to redis to cache report types")?;
         let key = redis.key().metadata(TAGS_NAMESPACE, "report_type");
 
-        redis.set_serialized(&key, &result, None).await?;
+        redis
+            .set_serialized(&key, &result, None)
+            .await
+            .wrap_err("caching report types")?;
 
         Ok(result)
     }
@@ -258,7 +214,7 @@ impl ProjectType {
     pub async fn get_id<'a, E>(
         name: &str,
         exec: E,
-    ) -> Result<Option<ProjectTypeId>, DatabaseError>
+    ) -> Result<Option<ProjectTypeId>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -270,23 +226,28 @@ impl ProjectType {
             name
         )
         .fetch_optional(exec)
-        .await?;
+        .await
+        .wrap_err("fetching project type id")?;
 
         Ok(result.map(|r| ProjectTypeId(r.id)))
     }
 
-    pub async fn list<'a, E>(
-        exec: E,
-        redis: &RedisPool,
-    ) -> Result<Vec<String>, DatabaseError>
+    pub async fn list<'a, E>(exec: E, redis: &RedisPool) -> Result<Vec<String>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         {
-            let mut redis = redis.connect().await?;
+            let mut redis = redis
+                .connect()
+                .await
+                .wrap_err("connecting to redis for cached project types")?;
             let key = redis.key().metadata(TAGS_NAMESPACE, "project_type");
 
-            let res: Option<Vec<String>> = redis.get_deserialized(&key).await?;
+            let res: Option<Vec<String>> =
+                redis
+                    .get_deserialized(&key)
+                    .await
+                    .wrap_err("fetching cached project types")?;
 
             if let Some(res) = res {
                 return Ok(res);
@@ -301,12 +262,19 @@ impl ProjectType {
         .fetch(exec)
         .map_ok(|c| c.name)
         .try_collect::<Vec<String>>()
-        .await?;
+        .await
+        .wrap_err("fetching project types")?;
 
-        let mut redis = redis.connect().await?;
+        let mut redis = redis
+            .connect()
+            .await
+            .wrap_err("connecting to redis to cache project types")?;
         let key = redis.key().metadata(TAGS_NAMESPACE, "project_type");
 
-        redis.set_serialized(&key, &result, None).await?;
+        redis
+            .set_serialized(&key, &result, None)
+            .await
+            .wrap_err("caching project types")?;
 
         Ok(result)
     }

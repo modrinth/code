@@ -35,6 +35,12 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "عرض التحليلات"
   },
+  "app.appearance-settings.native-decorations.description": {
+    "defaultMessage": "استخدام شريط العنوان وعناصر التحكم في النافذة الخاصة بنظام التشغيل. يتطلب إعادة تشغيل التطبيق."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "defaultMessage": "إطار نافذة النظام"
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "عذر تحميل خادم الإعدادات"
   },
@@ -170,6 +176,9 @@
   "button.continue": {
     "defaultMessage": "استمر"
   },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "نُسخ إلى الحافظة"
+  },
   "button.copy-filename": {
     "defaultMessage": "انسخ اسم الملف"
   },
@@ -196,6 +205,9 @@
   },
   "button.download": {
     "defaultMessage": "تنزيل"
+  },
+  "button.download-files": {
+    "defaultMessage": "تحميل الملفات"
   },
   "button.downloading": {
     "defaultMessage": "جاري التنزيل"
@@ -355,6 +367,15 @@
   },
   "collections.label.private": {
     "defaultMessage": "خاص"
+  },
+  "console.actions.collapse": {
+    "defaultMessage": "انهيار"
+  },
+  "console.actions.expand": {
+    "defaultMessage": "توسيع"
+  },
+  "console.actions.share": {
+    "defaultMessage": "مشاركة"
   },
   "content-type.content.lowercase": {
     "defaultMessage": "المحتوى"

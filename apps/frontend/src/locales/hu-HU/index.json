@@ -713,6 +713,9 @@
   "app-marketing.hero.download-modrinth-app": {
     "message": "A Modrinth App letöltése"
   },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "A Modrinth App letöltése {os} rendszerre"
+  },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "A Cobblemon modcsomag főmenüjének képernyőképe."
   },
@@ -4102,12 +4105,6 @@
   },
   "project.settings.general.url.title": {
     "message": "Link"
-  },
-  "project.settings.links.donation.duplicate-type": {
-    "message": "Már rendelkezel egy másik {platform} hivatkozással."
-  },
-  "project.settings.links.donation.no-type": {
-    "message": "Válassz egy platformot ehhez az adományozási hivatkozáshoz."
   },
   "project.settings.monetization.description": {
     "message": "A Modrinthon található projektek automatikusan részt vesznek a <rewards-program-link>Jutalmazási programban</rewards-program-link>. Ha nem szeretnél (vagy jogi okokból nem tudsz) bevételt szerezni ebből a projektből, itt kikapcsolhatod."

@@ -123,11 +123,6 @@ pub(super) async fn snapshot_instance(
     let id = sha1_bytes(&bytes);
     let path = root(state).join("snapshots").join(format!("{id}.json"));
     if !io::read(&path).await.is_ok_and(|cached| cached == bytes) {
-        tracing::info!(
-            snapshot_id = id,
-            instance_id = metadata.instance.id,
-            "Game setting locales: writing missing or invalid snapshot cache"
-        );
         write_json(&path, &snapshot).await?;
     }
     Ok(id)
@@ -171,19 +166,9 @@ pub(super) async fn archive_index(
         .await
         .map_err(|error| input_error(error.to_string()))?;
         if let Some(index) = cached {
-            tracing::debug!(
-                hash = source.hash,
-                version = index.version,
-                bundles = index.bundles.len(),
-                "Game setting locales: archive cache hit"
-            );
             return Ok(index);
         }
     }
-    tracing::info!(
-        hash = source.hash,
-        "Game setting locales: rebuilding archive cache"
-    );
     let source = source.clone();
     let index = tokio::task::spawn_blocking(move || {
         archive::inspect(&source.path, &source.hash)

@@ -32,6 +32,25 @@ pub struct Settings {
     #[serde(default = "default_true")]
     pub show_skin_selector_in_sidebar: bool,
 
+    #[serde(default = "default_true")]
+    pub show_jump_in: bool,
+    #[serde(default)]
+    pub always_show_copy_details: bool,
+    #[serde(default)]
+    pub hide_installed_modpacks: bool,
+    #[serde(default = "default_true")]
+    pub advanced_filters_collapsed: bool,
+    #[serde(default)]
+    pub dismissed_photosensitivity_filter_warning: bool,
+    #[serde(default)]
+    pub friends_active_collapsed: bool,
+    #[serde(default)]
+    pub friends_online_collapsed: bool,
+    #[serde(default = "default_true")]
+    pub friends_offline_collapsed: bool,
+    #[serde(default = "default_true")]
+    pub friends_pending_collapsed: bool,
+
     pub telemetry: bool,
     pub discord_rpc: bool,
     pub personalized_ads: bool,
@@ -42,6 +61,16 @@ pub struct Settings {
     pub force_fullscreen: bool,
     pub game_resolution: WindowSize,
     pub hide_on_process_start: bool,
+    #[serde(default)]
+    pub refocus_on_game_close: bool,
+    #[serde(default)]
+    pub compact_instance_cards: bool,
+    #[serde(default = "default_true")]
+    pub show_play_time: bool,
+    #[serde(default = "default_true")]
+    pub warn_on_unknown_modpacks: bool,
+    #[serde(default)]
+    pub skip_non_essential_warnings: bool,
     pub hooks: Hooks,
 
     pub custom_dir: Option<String>,
@@ -67,26 +96,13 @@ fn default_true() -> bool {
 pub enum FeatureFlag {
     PagePath,
     ProjectBackground,
-    WorldsInHome,
     ServerRamAsBytesAlwaysOn,
     AlwaysShowAppControls,
     ShowSyncInstancesUpdateModal,
-    SkipUnknownPackWarning,
     PrideFundraiser,
     ServersInApp,
     ServerProjectQa,
     I18nDebug,
-    ShowInstancePlayTime,
-    CompactInstanceCards,
-    SkipNonEssentialWarnings,
-    AdvancedFiltersCollapsed,
-    AlwaysShowCopyDetails,
-    HideInstalledModpacks,
-    FriendsActiveCollapsed,
-    FriendsOnlineCollapsed,
-    FriendsOfflineCollapsed,
-    FriendsPendingCollapsed,
-    DismissedPhotosensitivityFilterWarning,
     LocalhostSignIn,
 }
 
@@ -110,6 +126,16 @@ impl Settings {
 				sync_theme_across_devices, sync_behavior_across_devices, sync_features_across_devices,
 				show_files_tab_in_instances, show_worlds_tab_in_instances,
 				show_screenshots_tab_in_instances, show_skin_selector_in_sidebar,
+				refocus_on_game_close, compact_instance_cards, show_play_time, warn_on_unknown_modpacks, skip_non_essential_warnings,
+				show_jump_in,
+				always_show_copy_details,
+				hide_installed_modpacks,
+				advanced_filters_collapsed,
+				dismissed_photosensitivity_filter_warning,
+				friends_active_collapsed,
+				friends_online_collapsed,
+				friends_offline_collapsed,
+				friends_pending_collapsed,
                 version
             FROM settings
             "
@@ -128,6 +154,17 @@ impl Settings {
             advanced_rendering: res.advanced_rendering == 1,
             native_decorations: res.native_decorations == 1,
             toggle_sidebar: res.toggle_sidebar == 1,
+            show_jump_in: res.show_jump_in == 1,
+            always_show_copy_details: res.always_show_copy_details == 1,
+            hide_installed_modpacks: res.hide_installed_modpacks == 1,
+            advanced_filters_collapsed: res.advanced_filters_collapsed == 1,
+            dismissed_photosensitivity_filter_warning: res
+                .dismissed_photosensitivity_filter_warning
+                == 1,
+            friends_active_collapsed: res.friends_active_collapsed == 1,
+            friends_online_collapsed: res.friends_online_collapsed == 1,
+            friends_offline_collapsed: res.friends_offline_collapsed == 1,
+            friends_pending_collapsed: res.friends_pending_collapsed == 1,
             telemetry: res.telemetry == 1,
             discord_rpc: res.discord_rpc == 1,
             developer_mode: res.developer_mode == 1,
@@ -151,6 +188,11 @@ impl Settings {
                 res.mc_game_resolution_y as u16,
             ),
             hide_on_process_start: res.hide_on_process_start == 1,
+            refocus_on_game_close: res.refocus_on_game_close == 1,
+            compact_instance_cards: res.compact_instance_cards == 1,
+            show_play_time: res.show_play_time == 1,
+            warn_on_unknown_modpacks: res.warn_on_unknown_modpacks == 1,
+            skip_non_essential_warnings: res.skip_non_essential_warnings == 1,
             hooks: Hooks {
                 pre_launch: res.hook_pre_launch,
                 wrapper: res.hook_wrapper,
@@ -246,7 +288,21 @@ impl Settings {
 				show_screenshots_tab_in_instances = $37,
 				show_skin_selector_in_sidebar = $38,
 
-				version = $39
+				version = $39,
+				refocus_on_game_close = $40,
+				compact_instance_cards = $41,
+				show_play_time = $42,
+				warn_on_unknown_modpacks = $43,
+				skip_non_essential_warnings = $44,
+				show_jump_in = $45,
+				always_show_copy_details = $46,
+				hide_installed_modpacks = $47,
+				advanced_filters_collapsed = $48,
+				dismissed_photosensitivity_filter_warning = $49,
+				friends_active_collapsed = $50,
+				friends_online_collapsed = $51,
+				friends_offline_collapsed = $52,
+				friends_pending_collapsed = $53
             ",
             max_concurrent_writes,
             max_concurrent_downloads,
@@ -287,6 +343,20 @@ impl Settings {
             self.show_screenshots_tab_in_instances,
             self.show_skin_selector_in_sidebar,
             version,
+            self.refocus_on_game_close,
+            self.compact_instance_cards,
+            self.show_play_time,
+            self.warn_on_unknown_modpacks,
+            self.skip_non_essential_warnings,
+            self.show_jump_in,
+            self.always_show_copy_details,
+            self.hide_installed_modpacks,
+            self.advanced_filters_collapsed,
+            self.dismissed_photosensitivity_filter_warning,
+            self.friends_active_collapsed,
+            self.friends_online_collapsed,
+            self.friends_offline_collapsed,
+            self.friends_pending_collapsed,
         )
         .execute(exec)
         .await?;

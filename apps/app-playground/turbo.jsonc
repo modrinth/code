@@ -1,0 +1,73 @@
+{
+	"$schema": "../../node_modules/turbo/schema.json",
+	"extends": ["//"],
+	"tasks": {
+		// Turborepo only knows the pnpm dependency graph, so the Cargo workspace
+		// files and sibling crates this crate compiles against are hashed explicitly.
+		// The app-lib entries mirror the rerun-if-changed list in its build.rs
+		"build": {
+			"inputs": [
+				"$TURBO_DEFAULT$",
+				".env*",
+				"$TURBO_ROOT$/Cargo.toml",
+				"$TURBO_ROOT$/Cargo.lock",
+				"$TURBO_ROOT$/rust-toolchain.toml",
+				"$TURBO_ROOT$/clippy.toml",
+				"$TURBO_ROOT$/rustfmt.toml",
+				"$TURBO_ROOT$/.cargo/config.toml",
+				"$TURBO_ROOT$/packages/*/Cargo.toml",
+				"$TURBO_ROOT$/packages/*/src/**/*.rs",
+				"$TURBO_ROOT$/packages/app-lib/build.rs",
+				"$TURBO_ROOT$/packages/app-lib/src/**",
+				"$TURBO_ROOT$/packages/app-lib/migrations/**",
+				"$TURBO_ROOT$/packages/app-lib/.sqlx/**",
+				"$TURBO_ROOT$/packages/app-lib/java/src/**",
+				"$TURBO_ROOT$/packages/app-lib/java/gradle/**",
+				"$TURBO_ROOT$/packages/app-lib/java/*.kts",
+				"$TURBO_ROOT$/packages/app-lib/java/gradle.properties"
+			]
+		},
+		"lint": {
+			"inputs": [
+				"$TURBO_DEFAULT$",
+				"$TURBO_ROOT$/Cargo.toml",
+				"$TURBO_ROOT$/Cargo.lock",
+				"$TURBO_ROOT$/rust-toolchain.toml",
+				"$TURBO_ROOT$/clippy.toml",
+				"$TURBO_ROOT$/rustfmt.toml",
+				"$TURBO_ROOT$/.cargo/config.toml",
+				"$TURBO_ROOT$/packages/*/Cargo.toml",
+				"$TURBO_ROOT$/packages/*/src/**/*.rs",
+				"$TURBO_ROOT$/packages/app-lib/build.rs",
+				"$TURBO_ROOT$/packages/app-lib/src/**",
+				"$TURBO_ROOT$/packages/app-lib/migrations/**",
+				"$TURBO_ROOT$/packages/app-lib/.sqlx/**",
+				"$TURBO_ROOT$/packages/app-lib/java/src/**",
+				"$TURBO_ROOT$/packages/app-lib/java/gradle/**",
+				"$TURBO_ROOT$/packages/app-lib/java/*.kts",
+				"$TURBO_ROOT$/packages/app-lib/java/gradle.properties"
+			]
+		},
+		"test": {
+			"inputs": [
+				"$TURBO_DEFAULT$",
+				"$TURBO_ROOT$/Cargo.toml",
+				"$TURBO_ROOT$/Cargo.lock",
+				"$TURBO_ROOT$/rust-toolchain.toml",
+				"$TURBO_ROOT$/clippy.toml",
+				"$TURBO_ROOT$/rustfmt.toml",
+				"$TURBO_ROOT$/.cargo/config.toml",
+				"$TURBO_ROOT$/packages/*/Cargo.toml",
+				"$TURBO_ROOT$/packages/*/src/**/*.rs",
+				"$TURBO_ROOT$/packages/app-lib/build.rs",
+				"$TURBO_ROOT$/packages/app-lib/src/**",
+				"$TURBO_ROOT$/packages/app-lib/migrations/**",
+				"$TURBO_ROOT$/packages/app-lib/.sqlx/**",
+				"$TURBO_ROOT$/packages/app-lib/java/src/**",
+				"$TURBO_ROOT$/packages/app-lib/java/gradle/**",
+				"$TURBO_ROOT$/packages/app-lib/java/*.kts",
+				"$TURBO_ROOT$/packages/app-lib/java/gradle.properties"
+			]
+		}
+	}
+}

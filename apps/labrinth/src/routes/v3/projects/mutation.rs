@@ -15,7 +15,9 @@ use crate::models::users::User;
 use crate::routes::ApiError;
 use crate::routes::internal::delphi;
 use crate::util::error::{ApiContext as _, Context as _};
-use crate::validate::project::has_required_nags_with_context;
+use crate::validate::project::{
+    ProjectNagSeverity, validate_with_context as validate_project,
+};
 
 struct SyncedProjectState {
     data: ProjectQueryResult,
@@ -29,15 +31,13 @@ async fn sync_project_state(
     transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
 ) -> Result<SyncedProjectState, ApiError> {
-    delphi::tech_review_queue::remove_projects_without_details(
+    delphi::tech_review_queue::sync_projects(
         &[project_id],
         delphi::tech_review_queue::TechReviewRemovalReason::FileDeleted,
         transaction,
     )
     .await
-    .wrap_api_err(
-        "removing project from technical review when no details remain",
-    )?;
+    .wrap_api_err("synchronizing project technical review state")?;
 
     sqlx::query!("SELECT pg_advisory_xact_lock($1)", project_id.0)
         .fetch_one(&mut *transaction)
@@ -113,12 +113,14 @@ async fn sync_project_state(
         role: member.role,
     })
     .collect::<Vec<_>>();
-    let has_required_nags = has_required_nags_with_context(
+    let has_required_nags = validate_project(
         &project,
         &versions,
         &available_categories,
         &disclosures,
-    );
+    )
+    .iter()
+    .any(|nag| nag.severity == ProjectNagSeverity::Required);
 
     let context = ThreadIssueContext {
         project: &project,

@@ -53,9 +53,6 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "O download não pôde ser concluído."
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "Não foi possível encontrar a instância."
-  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Não foi possível encontrar a instância."
   },
@@ -451,15 +448,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Instância"
-  },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "A descarregar projetos {current, number}/{total, number}..."
-  },
-  "app.instance.mods.bulk-update.finishing": {
-    "message": "A terminar a atualização..."
-  },
-  "app.instance.mods.bulk-update.resolving-versions": {
-    "message": "Resolvendo versões..."
   },
   "app.instance.mods.content-type-project": {
     "message": "projeto"

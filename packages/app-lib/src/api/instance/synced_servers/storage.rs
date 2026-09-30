@@ -74,7 +74,7 @@ pub(super) async fn commit_server_state(
     local: Option<(&str, &[LocalServer])>,
     state: &State,
 ) -> crate::Result<bool> {
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
     let mut canonical_changed = false;
     if let Some(canonical) = canonical {
         canonical_changed = write_canonical_rows(&mut tx, canonical).await?;
@@ -320,7 +320,7 @@ pub(super) async fn begin_server_checkpoint(
     source_revision: i64,
     state: &State,
 ) -> crate::Result<()> {
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
     sqlx::query!(
         "DELETE FROM instance_server_projection_entries WHERE instance_id = ?",
         instance_id,

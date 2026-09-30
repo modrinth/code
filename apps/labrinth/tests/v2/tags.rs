@@ -38,7 +38,10 @@ async fn get_tags() {
                     "1.20.4",
                     "1.20.3",
                     "1.20.2",
-                    "1.20.1"
+                    "1.20.1",
+                    "18w43b",
+                    "1.13.2",
+                    "1.3"
                 ]
                 .iter()
                 .map(|s| s.to_string())
@@ -49,7 +52,7 @@ async fn get_tags() {
                 loaders.into_iter().map(|x| x.name).collect::<HashSet<_>>();
             assert_eq!(
                 loader_names,
-                ["fabric", "forge", "bukkit", "waterfall"]
+                ["fabric", "forge", "bukkit", "waterfall", "datapack"]
                     .iter()
                     .map(|s| s.to_string())
                     .collect()

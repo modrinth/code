@@ -369,7 +369,7 @@
     "defaultMessage": "私人"
   },
   "console.actions.collapse": {
-    "defaultMessage": "摺疊"
+    "defaultMessage": "收合"
   },
   "console.actions.expand": {
     "defaultMessage": "展開"
@@ -1399,6 +1399,12 @@
   },
   "external-project-license-status.yes": {
     "defaultMessage": "是"
+  },
+  "file-button.file-too-large.description": {
+    "defaultMessage": "檔案 {filename} 過大。檔案大小上限為 {maxSize}。"
+  },
+  "file-button.file-too-large.title": {
+    "defaultMessage": "檔案過大"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "解壓縮摘要"
@@ -2532,13 +2538,13 @@
     "defaultMessage": "變更已儲存"
   },
   "label.client-depends-warning": {
-    "defaultMessage": "此模組依賴客戶端模組，啟動伺服器時可能會造成問題"
+    "defaultMessage": "這個模組相依於用戶端模組，啟動伺服器時可能會導致問題"
   },
   "label.client-only-warning": {
     "defaultMessage": "此為用戶端模組，啟動伺服器時可能會導致問題"
   },
   "label.client-retained-warning": {
-    "defaultMessage": "這是一個作為依賴項安裝的客戶端模組，啟動伺服器時可能會造成問題"
+    "defaultMessage": "這是一個作為相依項安裝的用戶端模組，啟動伺服器時可能會導致問題"
   },
   "label.collections": {
     "defaultMessage": "收藏"

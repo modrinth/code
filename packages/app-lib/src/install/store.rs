@@ -40,6 +40,13 @@ impl InstallJobRecord {
             InstallJobStatus::Queued | InstallJobStatus::Running
         );
         InstallJobSnapshot {
+            content_count: match &self.state.request {
+                super::model::InstallRequest::BulkUpdateContent {
+                    updates,
+                    ..
+                } => Some(updates.len() as u32),
+                _ => None,
+            },
             job_id: self.id.to_string(),
             instance_id: self.instance_id.clone(),
             kind: self.kind,
@@ -389,7 +396,7 @@ pub async fn complete_success(
     let now = Utc::now().timestamp();
     let json = serde_json::to_string(state)?;
     let id_value = id.to_string();
-    let mut transaction = app_state.pool.begin().await?;
+    let mut transaction = app_state.pool.begin_with("BEGIN IMMEDIATE").await?;
 
     let job_result = sqlx::query(
         "

@@ -43,6 +43,18 @@ export const WithSelectedOption: Story = {
 	},
 }
 
+export const WithoutDropdownAnimation: Story = {
+	args: {
+		modelValue: '2',
+		options: [
+			{ value: '1', label: 'Option 1' },
+			{ value: '2', label: 'Option 2' },
+			{ value: '3', label: 'Option 3' },
+		],
+		animateDropdown: false,
+	},
+}
+
 export const Searchable: Story = {
 	args: {
 		options: [

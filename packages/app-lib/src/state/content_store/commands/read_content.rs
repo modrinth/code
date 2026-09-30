@@ -7,7 +7,7 @@ use crate::state::content_store::{
     ContentStore, FileContent, InstanceFileStorage, ReadableContent,
     StoredFileHandle, StoredFileMetadata, StoredFileRecord, StoredFileStatus,
     content_file_path, hash_file_with_progress, input, validate_digest,
-    validate_relative,
+    validate_instance_path, validate_relative,
 };
 use crate::state::{InstanceFile, file_modified_at_ns};
 use itertools::Itertools;
@@ -197,7 +197,7 @@ impl ContentStore {
             }
             FileContent::Unmanaged => {}
         }
-        validate_relative(instance_path)?;
+        validate_instance_path(instance_path)?;
         let relative_path = content_file_path(file);
         validate_relative(&relative_path)?;
         let path = self.instance_path(instance_path, &relative_path).await?;
@@ -212,7 +212,7 @@ impl ContentStore {
         instance_path: &str,
         relative_path: &str,
     ) -> crate::Result<PathBuf> {
-        validate_relative(instance_path)?;
+        validate_instance_path(instance_path)?;
         if !relative_path.is_empty() {
             validate_relative(relative_path)?;
         }

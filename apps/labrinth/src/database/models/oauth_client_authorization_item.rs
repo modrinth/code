@@ -1,12 +1,11 @@
 use chrono::{DateTime, Utc};
+use eyre::{Result, WrapErr};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
 use crate::{database::PgTransaction, models::pats::Scopes};
 
-use super::{
-    DBOAuthClientAuthorizationId, DBOAuthClientId, DBUserId, DatabaseError,
-};
+use super::{DBOAuthClientAuthorizationId, DBOAuthClientId, DBUserId};
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct DBOAuthClientAuthorization {
@@ -42,7 +41,7 @@ impl DBOAuthClientAuthorization {
         client_id: DBOAuthClientId,
         user_id: DBUserId,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Option<DBOAuthClientAuthorization>, DatabaseError> {
+    ) -> Result<Option<DBOAuthClientAuthorization>> {
         let value = sqlx::query_as!(
             DBAuthClientAuthorizationQueryResult,
             "
@@ -54,7 +53,8 @@ impl DBOAuthClientAuthorization {
             user_id.0,
         )
         .fetch_optional(exec)
-        .await?;
+        .await
+        .wrap_err("fetching oauth client authorization")?;
 
         Ok(value.map(|r| r.into()))
     }
@@ -62,7 +62,7 @@ impl DBOAuthClientAuthorization {
     pub async fn get_all_for_user(
         user_id: DBUserId,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<DBOAuthClientAuthorization>, DatabaseError> {
+    ) -> Result<Vec<DBOAuthClientAuthorization>> {
         let results = sqlx::query_as!(
             DBAuthClientAuthorizationQueryResult,
             "
@@ -73,7 +73,8 @@ impl DBOAuthClientAuthorization {
             user_id.0
         )
         .fetch_all(exec)
-        .await?;
+        .await
+        .wrap_err("fetching oauth client authorizations for user")?;
 
         Ok(results.into_iter().map(|r| r.into()).collect_vec())
     }
@@ -84,7 +85,7 @@ impl DBOAuthClientAuthorization {
         user_id: DBUserId,
         scopes: Scopes,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<()> {
         sqlx::query!(
             "
             INSERT INTO oauth_client_authorizations (
@@ -102,7 +103,8 @@ impl DBOAuthClientAuthorization {
             scopes.bits() as i64,
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("upserting oauth client authorization")?;
 
         Ok(())
     }
@@ -111,7 +113,7 @@ impl DBOAuthClientAuthorization {
         client_id: DBOAuthClientId,
         user_id: DBUserId,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<()> {
         sqlx::query!(
             "
             DELETE FROM oauth_client_authorizations
@@ -121,7 +123,8 @@ impl DBOAuthClientAuthorization {
             user_id.0
         )
         .execute(exec)
-        .await?;
+        .await
+        .wrap_err("removing oauth client authorization")?;
 
         Ok(())
     }

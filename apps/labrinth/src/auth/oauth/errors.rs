@@ -155,8 +155,8 @@ pub enum OAuthErrorType {
     AccessDenied,
 }
 
-impl From<crate::database::models::DatabaseError> for OAuthErrorType {
-    fn from(value: crate::database::models::DatabaseError) -> Self {
+impl From<eyre::Report> for OAuthErrorType {
+    fn from(value: eyre::Report) -> Self {
         OAuthErrorType::AuthenticationError(value.into())
     }
 }

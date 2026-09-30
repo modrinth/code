@@ -19,6 +19,7 @@ use crate::{
 #[derive(Debug, Clone, Copy)]
 pub enum TechReviewRemovalReason {
     RulesChanged,
+    ScanCompleted,
     FileDeleted,
 }
 
@@ -108,7 +109,10 @@ pub async fn remove_projects(
     )?;
 
     let body = match reason {
-        TechReviewRemovalReason::RulesChanged => MessageBody::TechReviewExited,
+        TechReviewRemovalReason::RulesChanged
+        | TechReviewRemovalReason::ScanCompleted => {
+            MessageBody::TechReviewExited
+        }
         TechReviewRemovalReason::FileDeleted => {
             MessageBody::TechReviewExitFileDeleted
         }
@@ -129,8 +133,9 @@ pub async fn remove_projects(
     Ok(())
 }
 
-pub async fn add_projects_with_review_details(
+pub async fn sync_projects(
     project_ids: &[DBProjectId],
+    removal_reason: TechReviewRemovalReason,
     txn: &mut PgTransaction<'_>,
 ) -> Result<(), ApiError> {
     let project_ids = project_ids.iter().copied().unique().collect::<Vec<_>>();
@@ -140,63 +145,63 @@ pub async fn add_projects_with_review_details(
 
     let rows = sqlx::query!(
         r#"
-        SELECT DISTINCT detail.project_id AS "project_id!: DBProjectId"
-        FROM delphi_issue_details_with_statuses detail
-        WHERE
-            detail.project_id = ANY($1::bigint[])
-            AND detail.status IN ('pending', 'unsafe')
-            AND detail.severity != 'hidden'
-        "#,
-        &project_ids.iter().map(|id| id.0).collect::<Vec<_>>(),
-    )
-    .fetch_all(&mut *txn)
-    .await
-    .wrap_internal_err("failed to find projects requiring technical review")?;
-
-    add_projects(
-        &rows
-            .into_iter()
-            .map(|row| row.project_id)
-            .collect::<Vec<_>>(),
-        txn,
-    )
-    .await
-}
-
-pub async fn remove_projects_without_details(
-    project_ids: &[DBProjectId],
-    reason: TechReviewRemovalReason,
-    txn: &mut PgTransaction<'_>,
-) -> Result<(), ApiError> {
-    let project_ids = project_ids.iter().copied().unique().collect::<Vec<_>>();
-    if project_ids.is_empty() {
-        return Ok(());
-    }
-
-    let rows = sqlx::query!(
-        r#"
-        SELECT requested.project_id AS "project_id!: DBProjectId"
-        FROM unnest($1::bigint[]) AS requested(project_id)
-        WHERE NOT EXISTS (
-            SELECT 1
+        WITH current_details AS (
+            SELECT
+                detail.project_id,
+                detail.status,
+                detail.severity
             FROM delphi_issue_details_with_statuses detail
-            WHERE detail.project_id = requested.project_id
+            INNER JOIN delphi_report_issues issue ON issue.id = detail.issue_id
+            INNER JOIN delphi_reports report
+                ON report.id = issue.report_id
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM delphi_reports newer_report
+                    WHERE
+                        newer_report.file_id = report.file_id
+                        AND newer_report.delphi_version > report.delphi_version
+                )
         )
+        SELECT
+            requested.project_id AS "project_id!: DBProjectId",
+            BOOL_OR(current_details.project_id IS NOT NULL) AS "has_details!",
+            COALESCE(
+                BOOL_OR(
+                    current_details.status IN ('pending', 'unsafe')
+                    AND current_details.severity != 'hidden'
+                ),
+                FALSE
+            ) AS "needs_review!"
+        FROM unnest($1::bigint[]) AS requested(project_id)
+        LEFT JOIN current_details
+            ON current_details.project_id = requested.project_id
+        GROUP BY requested.project_id
         "#,
         &project_ids.iter().map(|id| id.0).collect::<Vec<_>>(),
     )
     .fetch_all(&mut *txn)
     .await
     .wrap_internal_err(
-        "failed to find projects without technical review details",
+        "failed to determine technical review queue membership",
     )?;
+
+    add_projects(
+        &rows
+            .iter()
+            .filter(|row| row.needs_review)
+            .map(|row| row.project_id)
+            .collect::<Vec<_>>(),
+        txn,
+    )
+    .await?;
 
     remove_projects(
         &rows
             .into_iter()
+            .filter(|row| !row.has_details)
             .map(|row| row.project_id)
             .collect::<Vec<_>>(),
-        reason,
+        removal_reason,
         txn,
     )
     .await

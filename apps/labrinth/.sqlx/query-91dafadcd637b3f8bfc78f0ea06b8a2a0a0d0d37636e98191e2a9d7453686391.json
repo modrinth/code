@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        DELETE FROM delphi_tech_review_queue\n        WHERE project_id = $1\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "91dafadcd637b3f8bfc78f0ea06b8a2a0a0d0d37636e98191e2a9d7453686391"
+}

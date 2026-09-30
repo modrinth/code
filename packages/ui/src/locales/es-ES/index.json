@@ -1080,7 +1080,7 @@
     "defaultMessage": "Instala un modpack desde un archivo .mrpack en tu dispositivo."
   },
   "creation-flow.modal.setup-type.option.upload-modpack.title": {
-    "defaultMessage": "Subiendo modpack"
+    "defaultMessage": "Subir un modpack"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "Minecraft clásico sin ningún mod o puglins."
@@ -1399,6 +1399,12 @@
   },
   "external-project-license-status.yes": {
     "defaultMessage": "Sí"
+  },
+  "file-button.file-too-large.description": {
+    "defaultMessage": "El archivo {filename} es demasiado grande. El tamaño máximo del archivo es {maxSize}."
+  },
+  "file-button.file-too-large.title": {
+    "defaultMessage": "Archivo demasiado grande"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Extraer sumario"
@@ -2142,7 +2148,7 @@
     "defaultMessage": "Borrar"
   },
   "image-viewer.editor.tool.highlight": {
-    "defaultMessage": "Destacar"
+    "defaultMessage": "Marcador"
   },
   "image-viewer.editor.tool.pen": {
     "defaultMessage": "Lápiz"
@@ -3429,13 +3435,13 @@
     "defaultMessage": "{count, plural, one {paquete de datos} other {paquetes de datos}}"
   },
   "project-type.mod.capital": {
-    "defaultMessage": "{count, plural, one {Modificación} other {Modificaciones}}"
+    "defaultMessage": "{count, plural, one {Mod} other {Mods}}"
   },
   "project-type.mod.category": {
-    "defaultMessage": "Modificaciones"
+    "defaultMessage": "Mods"
   },
   "project-type.mod.lowercase": {
-    "defaultMessage": "{count, plural, one {modificación} other {modificaciones}}"
+    "defaultMessage": "{count, plural, one {mod} other {mods}}"
   },
   "project-type.modpack.capital": {
     "defaultMessage": "{count, plural, one {Modpack} other {Modpacks}}"
@@ -3486,7 +3492,7 @@
     "defaultMessage": "{count, plural, one {Shader} other {Shaders}}"
   },
   "project-type.shader.category": {
-    "defaultMessage": "Sombreadores"
+    "defaultMessage": "Shaders"
   },
   "project-type.shader.lowercase": {
     "defaultMessage": "{count, plural, one {shader} other {shaders}}"
@@ -5622,7 +5628,7 @@
     "defaultMessage": "Pequeño"
   },
   "servers.purchase.step.plan.small.desc": {
-    "defaultMessage": "Perfecto para 1–5 amigos con algunas modificaciones ligeras."
+    "defaultMessage": "Perfecto para 1–5 amigos con algunos mods ligeros."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Plan"

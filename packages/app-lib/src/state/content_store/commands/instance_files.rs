@@ -68,6 +68,7 @@ impl ContentStore {
         self.check_instance_path(&path, &binding.blob_sha512).await
     }
 
+    #[expect(dead_code)]
     pub(crate) async fn validate_instance(
         &self,
         instance: &Instance,
@@ -166,7 +167,7 @@ impl ContentStore {
                 storage_kind,
             ));
         }
-        let mut tx = self.pool.begin().await?;
+        let mut tx = self.pool.begin_with("BEGIN IMMEDIATE").await?;
         for (id, stored_file, storage_kind) in restored {
             catalog::set_file_storage(&mut tx, id, stored_file, storage_kind)
                 .await?;
@@ -217,7 +218,7 @@ impl ContentStore {
         sha512: &str,
         storage_kind: FileStorageKind,
     ) -> crate::Result<()> {
-        let mut tx = self.pool.begin().await?;
+        let mut tx = self.pool.begin_with("BEGIN IMMEDIATE").await?;
         file.missing = false;
         content_rows::upsert_instance_file(file, &mut tx).await?;
         catalog::set_file_storage(&mut tx, &file.id, sha512, storage_kind)

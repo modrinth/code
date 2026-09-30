@@ -49,7 +49,7 @@ impl ThreadMessageBuilder {
     ) -> Result<DBThreadMessageId> {
         let thread_message_id = generate_thread_message_id(transaction)
             .await
-            .wrap_err("generating thread message ID")?;
+            .wrap_err("generating thread message id")?;
         let body = serde_json::value::to_value(self.body.clone())
             .wrap_err("serializing thread message body")?;
 
@@ -83,7 +83,7 @@ impl ThreadBuilder {
     ) -> Result<DBThreadId> {
         let thread_id = generate_thread_id(&mut *transaction)
             .await
-            .wrap_err("generating thread ID")?;
+            .wrap_err("generating thread id")?;
         sqlx::query!(
             "
             INSERT INTO threads (

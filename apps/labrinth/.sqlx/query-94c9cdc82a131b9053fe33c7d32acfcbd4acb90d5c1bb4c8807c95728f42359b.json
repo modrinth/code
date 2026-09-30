@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO delphi_file_scans (\n            id,\n            file_id,\n            delphi_version,\n            report_id,\n            outcome\n        )\n        VALUES ($1, $2, $3, $4, 'succeeded')\n        ON CONFLICT (id) DO NOTHING\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Int4",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "94c9cdc82a131b9053fe33c7d32acfcbd4acb90d5c1bb4c8807c95728f42359b"
+}

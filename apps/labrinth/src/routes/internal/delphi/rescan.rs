@@ -1,144 +1,66 @@
-use eyre::{Result, WrapErr, eyre};
-use futures::future::try_join_all;
+use eyre::{Result, WrapErr};
 use tracing::info;
 
-use super::DelphiRunParameters;
-use crate::{database::PgPool, env::ENV, models::ids::FileId};
+use crate::{
+    database::{PgPool, models::DBFileId},
+    queue::delphi_scan,
+    util::kafka::KafkaClientState,
+};
 
-pub async fn rescan_projects_in_queue(
+pub async fn enqueue_tech_review_files_for_new_delphi_version(
     pool: &PgPool,
-    http: &reqwest::Client,
+    kafka_client: &KafkaClientState,
 ) -> Result<()> {
-    let delphi_version = fetch_delphi_version(http).await?;
-    let old_delphi_version = fetch_stored_delphi_version(pool).await?;
-
-    if old_delphi_version == Some(delphi_version) {
-        info!(
-            ?delphi_version,
-            "Delphi version unchanged; skipping startup tech review rescan"
-        );
-        return Ok(());
-    }
-
-    info!(
-        ?old_delphi_version,
-        ?delphi_version,
-        delphi_version,
-        "Delphi version changed; rescanning tech review queue"
-    );
-
-    let project_ids = fetch_unreviewed_tech_review_project_ids(pool).await?;
-    if project_ids.is_empty() {
-        info!("No fully unreviewed tech review projects found to rescan");
-        return Ok(());
-    }
-
-    let file_ids = fetch_project_file_ids(pool, &project_ids).await?;
-    if file_ids.is_empty() {
-        info!(
-            project_count = project_ids.len(),
-            "No files found for tech review projects selected for rescan"
-        );
-        return Ok(());
-    }
-
-    let file_ids = file_ids
-        .into_iter()
-        .map(|file_id| FileId(file_id.cast_unsigned()));
-
-    try_join_all(file_ids.map(|file_id| async move {
-        super::run(pool, DelphiRunParameters { file_id }, http)
-            .await
-            .wrap_err_with(|| {
-                eyre!("failed to submit Delphi rescan for `{file_id:?}`")
-            })
-    }))
-    .await?;
-
-    info!(
-        project_count = project_ids.len(),
-        "Submitted Delphi rescans for all unreviewed tech review project files"
-    );
-
-    Ok(())
-}
-
-async fn fetch_delphi_version(http: &reqwest::Client) -> Result<i32> {
-    let response = http
-        .get(format!("{}/version", ENV.DELPHI_URL))
-        .send()
-        .await
-        .and_then(|res| res.error_for_status())
-        .wrap_err("failed to fetch Delphi version")?;
-
-    let version = response
-        .text()
-        .await
-        .wrap_err("failed to read Delphi version response body")?;
-    let version = version.trim().parse::<i32>().wrap_err_with(|| {
-        eyre!("invalid Delphi version response body: {version}")
-    })?;
-    Ok(version)
-}
-
-async fn fetch_stored_delphi_version(pool: &PgPool) -> Result<Option<i32>> {
-    let row =
+    let delphi_version = delphi_scan::fetch_delphi_version().await?;
+    let stored_delphi_version =
         sqlx::query_scalar!("SELECT MAX(delphi_version) FROM delphi_reports")
             .fetch_one(pool)
             .await
-            .wrap_err("failed to fetch latest stored Delphi version")?;
-    Ok(row)
-}
+            .wrap_err("fetching latest stored Delphi version")?;
 
-async fn fetch_unreviewed_tech_review_project_ids(
-    pool: &PgPool,
-) -> Result<Vec<i64>> {
-    sqlx::query_scalar!(
+    if stored_delphi_version == Some(delphi_version) {
+        info!(
+            %delphi_version,
+            "Delphi version unchanged; skipping tech review rescan enqueue"
+        );
+        return Ok(());
+    }
+
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_err("beginning Delphi tech review rescan transaction")?;
+    let file_ids = sqlx::query_scalar!(
         r#"
-        SELECT DISTINCT m.id
-        FROM mods m
-        INNER JOIN delphi_tech_review_queue queue ON queue.project_id = m.id
-        WHERE
-            EXISTS(
-                SELECT 1
-                FROM delphi_issue_details_with_statuses didws
-                WHERE
-                    didws.project_id = m.id
-                    AND didws.status = 'pending'
-                    AND didws.severity != 'hidden'
-            )
-            AND NOT EXISTS(
-                SELECT 1
-                FROM delphi_issue_details_with_statuses didws
-                WHERE
-                    didws.project_id = m.id
-                    AND didws.status IN ('safe', 'unsafe')
-                    AND didws.severity != 'hidden'
-            )
-        "#,
+		SELECT DISTINCT file.id AS "file_id!: DBFileId"
+		FROM delphi_tech_review_queue queue
+		INNER JOIN versions version ON version.mod_id = queue.project_id
+		INNER JOIN files file ON file.version_id = version.id
+		ORDER BY file.id
+		"#,
     )
-    .fetch_all(pool)
+    .fetch_all(&mut transaction)
     .await
-    .wrap_err("failed to fetch fully unreviewed tech review project ids")
-}
+    .wrap_err("fetching technical review files for Delphi rescan")?;
 
-async fn fetch_project_file_ids(
-    pool: &PgPool,
-    project_ids: &[i64],
-) -> Result<Vec<i64>> {
-    let rows = sqlx::query_scalar!(
-        r#"
-        SELECT DISTINCT dr.file_id
-        FROM delphi_reports dr
-        INNER JOIN files f ON f.id = dr.file_id
-        INNER JOIN versions v ON v.id = f.version_id
-        WHERE v.mod_id = ANY($1::bigint[])
-        "#,
-        project_ids,
-    )
-    .fetch_all(pool)
-    .await
-    .wrap_err("failed to fetch file ids for tech review Delphi rescan")?;
+    for file_id in &file_ids {
+        delphi_scan::enqueue_file(&mut transaction, kafka_client, *file_id)
+            .await
+            .wrap_err_with(|| {
+                format!("enqueueing file `{file_id:?}` for Delphi rescan")
+            })?;
+    }
 
-    Ok(rows.into_iter().flatten().collect())
+    transaction
+        .commit()
+        .await
+        .wrap_err("committing Delphi tech review rescan enqueue")?;
+
+    info!(
+        %delphi_version,
+        file_count = file_ids.len(),
+        "Enqueued technical review files for new Delphi version"
+    );
+
+    Ok(())
 }

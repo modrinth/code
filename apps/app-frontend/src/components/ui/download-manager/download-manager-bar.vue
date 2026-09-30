@@ -356,8 +356,9 @@ defineExpose({ focus: () => trigger.value?.focus() })
 					:aria-hidden="!hasAttention"
 				>
 					<CircleAlertIcon
-						v-tooltip="formatMessage(messages.attention)"
+						v-tooltip="hasAttention ? formatMessage(messages.attention) : null"
 						class="absolute left-0 top-0 size-4 text-orange"
+						:class="{ 'pointer-events-none': !hasAttention }"
 						:aria-label="formatMessage(messages.attention)"
 					/>
 				</Motion>

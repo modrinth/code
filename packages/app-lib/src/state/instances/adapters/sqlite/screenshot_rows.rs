@@ -176,7 +176,7 @@ pub(crate) async fn move_screenshot(
     target_file_name: &str,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-    let mut tx = pool.begin().await?;
+    let mut tx = pool.begin_with("BEGIN IMMEDIATE").await?;
     sqlx::query!(
         "DELETE FROM screenshots WHERE instance_id = ? AND file_name = ?",
         target_instance_id,

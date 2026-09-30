@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use hyper_rustls::HttpsConnectorBuilder;
 use hyper_util::rt::TokioExecutor;
 
@@ -30,6 +32,10 @@ fn connect() -> clickhouse::error::Result<clickhouse::Client> {
         .build();
     let hyper_client =
         hyper_util::client::legacy::Client::builder(TokioExecutor::new())
+            // ClickHouse closes idle keep-alive connections after 3s by default.
+            // Hyper's 90s default reuses dead sockets and fails with
+            // "connection closed before message completed".
+            .pool_idle_timeout(Duration::from_secs(2))
             .build(https_connector);
 
     Ok(clickhouse::Client::with_http_client(hyper_client)

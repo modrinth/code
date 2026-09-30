@@ -16,6 +16,7 @@ export class LabrinthModerationInternalModule extends AbstractModule {
 				version: 'internal',
 				method: 'GET',
 				params,
+				timeout: 20 * 1000,
 			},
 		)
 	}

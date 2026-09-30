@@ -37,6 +37,24 @@ export const WithSnapPoints: Story = {
 	},
 }
 
+export const DecimalSteps: Story = {
+	args: {
+		modelValue: 0.5,
+		min: 0,
+		max: 1,
+		step: 0.05,
+	},
+}
+
+export const Small: Story = {
+	args: {
+		size: 'small',
+		modelValue: 50,
+		min: 0,
+		max: 100,
+	},
+}
+
 export const Disabled: Story = {
 	args: {
 		modelValue: 50,
