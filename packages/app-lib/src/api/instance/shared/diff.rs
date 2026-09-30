@@ -1,4 +1,5 @@
 use super::client::*;
+use super::content::remote_shared_content;
 use super::publish::*;
 use super::types::*;
 use super::*;
@@ -16,16 +17,15 @@ pub(super) async fn shared_instance_update_diffs(
 ) -> crate::Result<Vec<SharedInstanceUpdateDiff>> {
     let before_configuration = local_configuration(metadata);
     let after_configuration = remote_configuration(version);
-    let modpack_unlinked = before_configuration.modpack_version_id.is_some()
-        && after_configuration.modpack_version_id.is_none();
     let (version_ids, external_files) =
-        current_shared_content(metadata, modpack_unlinked, state).await?;
+        current_shared_content(metadata, state).await?;
     let before = SharedContentSnapshot {
         version_ids,
         external_files,
         configuration: before_configuration,
     };
-    let (version_ids, external_files) = remote_shared_content(version)?;
+    let (version_ids, external_files) =
+        remote_shared_content(version, state).await?;
     let after = SharedContentSnapshot {
         version_ids,
         external_files,
@@ -69,8 +69,6 @@ pub(super) async fn shared_instance_publish_diffs(
 ) -> crate::Result<Vec<SharedInstanceUpdateDiff>> {
     let before_configuration = remote_configuration(version);
     let after_configuration = local_configuration(metadata);
-    let modpack_unlinked = before_configuration.modpack_version_id.is_some()
-        && after_configuration.modpack_version_id.is_none();
     let disabled_versions = async {
         if snapshot.disabled_version_ids.is_empty() {
             Ok(HashMap::new())
@@ -84,7 +82,7 @@ pub(super) async fn shared_instance_publish_diffs(
         }
     };
     let ((version_ids, external_files), disabled_versions) = tokio::try_join!(
-        remote_publish_content(version, modpack_unlinked, state),
+        remote_shared_content(version, state),
         disabled_versions,
     )?;
     let before = SharedContentSnapshot {
@@ -94,7 +92,7 @@ pub(super) async fn shared_instance_publish_diffs(
     };
     let after = SharedContentSnapshot {
         version_ids: snapshot
-            .version_ids
+            .effective_version_ids
             .iter()
             .filter(|id| {
                 after_configuration.modpack_version_id.as_deref()
@@ -461,26 +459,4 @@ pub(super) fn shared_external_file_key(
         )?,
         path: path.to_string(),
     })
-}
-
-fn remote_shared_content(
-    version: &InstanceVersionResponse,
-) -> crate::Result<(Vec<String>, BTreeSet<ExternalFileKey>)> {
-    let mut version_ids = version.modrinth_ids.clone();
-    if let Some(modpack_id) = version.modpack_id.as_deref() {
-        version_ids.retain(|id| id != modpack_id);
-    }
-    dedupe_strings(&mut version_ids);
-    let external_files = version
-        .external_files
-        .iter()
-        .filter(|file| {
-            !matches!(
-                file.file_type.as_str(),
-                CONFIG_BUNDLE_FILE_TYPE | CONFIG_FILE_TYPE
-            )
-        })
-        .map(|file| shared_external_file_key(&file.file_type, &file.file_name))
-        .collect::<crate::Result<_>>()?;
-    Ok((version_ids, external_files))
 }

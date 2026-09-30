@@ -10,7 +10,7 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	title: (ctx) =>
 		ctx.formatMessage({
 			id: 'servers.setup.onboarding.invite.title',
-			defaultMessage: 'Invite players to join',
+			defaultMessage: 'Invite friends to join',
 		}),
 	stageContent: markRaw(InviteFriendsStage),
 	skip: (ctx) => ctx.flowType !== 'server-onboarding',

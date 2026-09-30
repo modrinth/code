@@ -75,7 +75,11 @@ export function setupFileDownloadProvider(client: AbstractModrinthClient) {
 								await client.kyros.files_v0.downloadFileTo(auth, file.path, sink)
 								break
 							} catch (error) {
-								if (!(error instanceof ModrinthApiError) || error.statusCode !== 401 || attempt >= 2) {
+								if (
+									!(error instanceof ModrinthApiError) ||
+									error.statusCode !== 401 ||
+									attempt >= 2
+								) {
 									throw error
 								}
 							}

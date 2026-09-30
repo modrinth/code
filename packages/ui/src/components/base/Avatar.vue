@@ -111,16 +111,13 @@ const LEGACY_PRESETS: Record<string, string> = {
 const cssSize = computed(() => LEGACY_PRESETS[props.size] ?? props.size)
 const cachedSrc = useCachedIcon(() => props.src)
 
-watch(
-	cachedSrc,
-	() => {
-		clearDetectionTimeout()
-		detectingSource = undefined
-		failed.value = false
-		hasTransparentCorners.value = false
-		hasDetectedCorners.value = false
-	},
-)
+watch(cachedSrc, () => {
+	clearDetectionTimeout()
+	detectingSource = undefined
+	failed.value = false
+	hasTransparentCorners.value = false
+	hasDetectedCorners.value = false
+})
 
 onMounted(() => {
 	const image = img.value

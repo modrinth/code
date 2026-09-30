@@ -491,10 +491,10 @@ pub async fn download_minecraft(
 
     let (client, log_config, assets, libraries) = tokio::join! {
         // Total loading sums to 90/60
-        download_client(st, version, loading_bar, force, progress.clone()), // 9
-        download_log_config(st, version, loading_bar, force, progress.clone()),
-        download_assets(st, version.assets == "legacy", &assets_index, loading_bar, amount, force, progress.clone()), // 40
-        download_libraries(st, version.libraries.as_slice(), &version.id, loading_bar, amount, java_arch, force, minecraft_updated, progress.clone()) // 40
+        Box::pin(download_client(st, version, loading_bar, force, progress.clone())), // 9
+        Box::pin(download_log_config(st, version, loading_bar, force, progress.clone())),
+        Box::pin(download_assets(st, version.assets == "legacy", &assets_index, loading_bar, amount, force, progress.clone())), // 40
+        Box::pin(download_libraries(st, version.libraries.as_slice(), &version.id, loading_bar, amount, java_arch, force, minecraft_updated, progress.clone())) // 40
     };
     client?;
     log_config?;

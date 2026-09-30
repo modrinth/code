@@ -191,14 +191,11 @@ export function useDownloadManager() {
 	)
 	const rate = computed(() =>
 		display.formatRate(
-			activeJobs.value.reduce(
-				(total, job) => {
-					const file = externalFileDownloads.value.get(job.id)
-					const fileRate = file ? getExternalFileDownloadRate(file, now.value) : null
-					return total + (fileRate ?? transfer.get(job.id, now.value).rate ?? 0)
-				},
-				0,
-			),
+			activeJobs.value.reduce((total, job) => {
+				const file = externalFileDownloads.value.get(job.id)
+				const fileRate = file ? getExternalFileDownloadRate(file, now.value) : null
+				return total + (fileRate ?? transfer.get(job.id, now.value).rate ?? 0)
+			}, 0),
 		),
 	)
 
@@ -443,7 +440,7 @@ export function useDownloadManager() {
 	async function copyDetails(id: string) {
 		await runAction(id, async () => {
 			const file = externalFileDownloads.value.get(id)
-			const details = file ? file.error ?? '' : await install_job_support_details(id)
+			const details = file ? (file.error ?? '') : await install_job_support_details(id)
 			if (disposed) return
 			await navigator.clipboard.writeText(details)
 			if (disposed) return

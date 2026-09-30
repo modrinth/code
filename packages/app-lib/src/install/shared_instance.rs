@@ -11,6 +11,7 @@ use crate::api::instance::{
     CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS,
     CONFIG_FILE_TYPE, CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES,
     MAX_CONFIG_BUNDLE_FILE_SIZE, read_bounded_config_bundle_entry,
+    shared_modpack_files,
 };
 use crate::api::pack::install_from::CreatePackLocation;
 use crate::state::instances::adapters::sqlite::content_rows;
@@ -146,6 +147,7 @@ struct SharedInstanceApplyPlan {
     external_additions: Vec<DesiredSharedInstanceExternalFile>,
     config_bundle: Option<SharedInstanceExternalFileData>,
     config_files: Vec<SharedInstanceExternalFileData>,
+    modpack_toggles: Vec<(String, bool)>,
 }
 
 impl SharedInstanceApplyPlan {
@@ -163,6 +165,14 @@ impl SharedInstanceApplyPlan {
 
         let current = current_shared_instance_content(metadata, state).await?;
         let desired = desired_shared_instance_content(data, state).await?;
+        let (modpack_toggles, missing_inherited_file) =
+            shared_modpack_toggles(metadata, data, state).await?;
+        if missing_inherited_file {
+            return Ok(Self {
+                configuration_changed: true,
+                ..Default::default()
+            });
+        }
         let project_removals = current
             .projects
             .values()
@@ -182,6 +192,7 @@ impl SharedInstanceApplyPlan {
             external_removals,
             config_bundle: desired.config_bundle,
             config_files: desired.config_files,
+            modpack_toggles,
             ..Default::default()
         };
 
@@ -218,6 +229,7 @@ impl SharedInstanceApplyPlan {
             + self.external_additions.len()
             + usize::from(self.config_bundle.is_some())
             + self.config_files.len()) as u64
+            + self.modpack_toggles.len() as u64
     }
 }
 
@@ -318,6 +330,24 @@ pub(super) async fn apply_shared_instance_update(
     }
 
     let mut completed_content_changes = 0;
+    for (path, enabled) in plan.modpack_toggles {
+        crate::state::instances::commands::toggle_disable_project(
+            instance_id,
+            &path,
+            Some(enabled),
+            state,
+        )
+        .await?;
+        completed_content_changes += 1;
+        update_content_progress(
+            job_id,
+            job_state,
+            state,
+            completed_content_changes,
+            content_change_count,
+        )
+        .await?;
+    }
     for update in plan.project_updates {
         let new_path =
             crate::state::instances::commands::add_project_from_version(
@@ -401,6 +431,7 @@ pub(super) async fn apply_shared_instance_update(
         )
         .await?;
     }
+    ensure_shared_instance_additions_enabled(instance_id, data, state).await?;
 
     crate::api::instance::edit(
         instance_id,
@@ -509,6 +540,144 @@ async fn current_shared_instance_content(
     }
 
     Ok(content)
+}
+
+async fn shared_modpack_toggles(
+    metadata: &crate::state::InstanceMetadata,
+    data: &SharedInstanceInstallData,
+    state: &State,
+) -> crate::Result<(Vec<(String, bool)>, bool)> {
+    for removed in &data.removed_files {
+        removed.validate()?;
+    }
+    let Some(modpack) = &data.modpack else {
+        if !data.removed_files.is_empty() {
+            return Err(crate::ErrorKind::InputError(
+                "Removed modpack files require a modpack id".to_string(),
+            )
+            .into());
+        }
+        return Ok((Vec::new(), false));
+    };
+    let inherited = shared_modpack_files(&modpack.version_id, state).await?;
+    let explicit =
+        shared_instance_versions_by_id(&data.modrinth_ids, state).await?;
+    let explicit_by_project = explicit
+        .values()
+        .map(|version| (version.project_id.as_str(), version.id.as_str()))
+        .collect::<HashMap<_, _>>();
+    let entries = content_rows::get_content_entries(
+        &metadata.applied_content_set.id,
+        &state.pool,
+    )
+    .await?;
+    let files =
+        content_rows::get_instance_files(&metadata.instance.id, &state.pool)
+            .await?
+            .into_iter()
+            .map(|file| (file.id.clone(), file))
+            .collect::<HashMap<_, _>>();
+    let mut toggles = Vec::new();
+    let mut missing = false;
+    for inherited in inherited {
+        let overridden = inherited
+            .project_id
+            .as_deref()
+            .and_then(|id| explicit_by_project.get(id))
+            .is_some_and(|id| Some(*id) != inherited.version_id.as_deref())
+            || data.external_files.iter().any(|file| {
+                ProjectType::from_name(&file.file_type).is_some_and(|kind| {
+                    inherited.relative_path
+                        == format!("{}/{}", kind.get_folder(), file.file_name)
+                })
+            });
+        let enabled = !inherited.is_removed(&data.removed_files) && !overridden;
+        let current = entries
+            .iter()
+            .filter(|entry| {
+                entry.source_kind == ContentSourceKind::ModrinthModpack
+            })
+            .find_map(|entry| {
+                let file =
+                    entry.file_id.as_ref().and_then(|id| files.get(id))?;
+                (file.relative_path.trim_end_matches(".disabled")
+                    == inherited.relative_path
+                    && inherited.sha1.as_deref().map_or_else(
+                        || {
+                            inherited.version_id.is_none()
+                                || entry.version_id == inherited.version_id
+                        },
+                        |hash| file.sha1 == hash,
+                    ))
+                .then_some((entry, file))
+            });
+        if let Some((entry, file)) = current {
+            if file.enabled != enabled
+                || entry.enabled != enabled
+                || (enabled && file.missing)
+            {
+                toggles.push((file.relative_path.clone(), enabled));
+            }
+        } else if enabled {
+            // An explicit file can replace the pack's entry at the same path. Reinstall the pack to restore its bytes.
+            missing = true;
+        }
+    }
+    Ok((toggles, missing))
+}
+
+async fn ensure_shared_instance_additions_enabled(
+    instance_id: &str,
+    data: &SharedInstanceInstallData,
+    state: &State,
+) -> crate::Result<()> {
+    let metadata = crate::state::instances::commands::get_instance_metadata(
+        instance_id,
+        &state.pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError("Unknown instance".to_string())
+    })?;
+    let entries = content_rows::get_content_entries(
+        &metadata.applied_content_set.id,
+        &state.pool,
+    )
+    .await?;
+    let files = content_rows::get_instance_files(instance_id, &state.pool)
+        .await?
+        .into_iter()
+        .map(|file| (file.id.clone(), file))
+        .collect::<HashMap<_, _>>();
+    for entry in entries {
+        if entry.source_kind != ContentSourceKind::SharedInstance {
+            continue;
+        }
+        let Some(file) = entry.file_id.as_ref().and_then(|id| files.get(id))
+        else {
+            continue;
+        };
+        let desired = entry
+            .version_id
+            .as_ref()
+            .is_some_and(|id| data.modrinth_ids.contains(id))
+            || data.external_files.iter().any(|external| {
+                ProjectType::from_name(&external.file_type)
+                    == Some(entry.project_type)
+                    && external.file_name
+                        == file.file_name.trim_end_matches(".disabled")
+            });
+        if desired && (!entry.enabled || !file.enabled || file.missing) {
+            crate::state::instances::commands::toggle_disable_project(
+                instance_id,
+                &file.relative_path,
+                Some(true),
+                state,
+            )
+            .await?;
+        }
+    }
+    Ok(())
 }
 
 async fn desired_shared_instance_content(
@@ -695,6 +864,32 @@ pub(super) async fn apply_shared_instance_content(
         }
     }
 
+    let metadata = crate::state::instances::commands::get_instance_metadata(
+        instance_id,
+        &state.pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError("Unknown instance".to_string())
+    })?;
+    let (toggles, missing) =
+        shared_modpack_toggles(&metadata, data, state).await?;
+    if missing {
+        return Err(crate::ErrorKind::InputError(
+            "Shared modpack content is missing after installation".to_string(),
+        )
+        .into());
+    }
+    for (path, enabled) in toggles {
+        crate::state::instances::commands::toggle_disable_project(
+            instance_id,
+            &path,
+            Some(enabled),
+            state,
+        )
+        .await?;
+    }
+
     if !data.modrinth_ids.is_empty() || !data.external_files.is_empty() {
         let content_change_count =
             data.modrinth_ids.len() as u64 + data.external_files.len() as u64;
@@ -756,6 +951,7 @@ pub(super) async fn apply_shared_instance_content(
             .await?;
         }
     }
+    ensure_shared_instance_additions_enabled(instance_id, data, state).await?;
 
     crate::api::instance::edit(
         instance_id,

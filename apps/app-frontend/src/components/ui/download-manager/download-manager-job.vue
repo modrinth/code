@@ -32,7 +32,7 @@ import type { DownloadManagerJob } from './use-download-manager'
 const props = defineProps<{ job: DownloadManagerJob }>()
 const { icon: serverIcon } = useServerIcon(() => props.job.serverId ?? '')
 const displayIcon = computed(() =>
-	props.job.serverId ? serverIcon.value ?? MinecraftServerIcon : props.job.iconUrl,
+	props.job.serverId ? (serverIcon.value ?? MinecraftServerIcon) : props.job.iconUrl,
 )
 defineEmits<{
 	retry: [id: string]
@@ -140,7 +140,9 @@ const instanceLink = computed(() =>
 								: 'text-primary'
 						"
 					>
-						<template v-if="job.kind === 'external-file' && job.taskType && job.taskType !== job.text">
+						<template
+							v-if="job.kind === 'external-file' && job.taskType && job.taskType !== job.text"
+						>
 							<span class="min-w-0 truncate text-primary">{{ job.taskType }}</span>
 							<BulletDivider class="shrink-0 text-primary" />
 						</template>

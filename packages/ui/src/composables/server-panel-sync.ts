@@ -311,7 +311,7 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 		const currentAddons = [contentListKey(serverId), modpackContentListKey(serverId)].flatMap(
 			(key) => queryClient.getQueryData<Archon.Content.v1.Addons>(key)?.addons ?? [],
 		)
-		const content = worldContentUpdateToAddons(event, currentAddons)
+		const content = worldContentUpdateToAddons(serverId, event, currentAddons)
 		queryClient.setQueryData<Archon.Content.v1.Addons>(contentListKey(serverId), {
 			...content,
 			addons: content.addons?.filter((addon) => !addon.from_modpack) ?? [],
@@ -374,6 +374,7 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 	}
 
 	function worldContentUpdateToAddons(
+		serverId: string,
 		event: Archon.Sync.v1.WorldContentUpdateEvent,
 		currentAddons: Archon.Content.v1.Addon[],
 	): Archon.Content.v1.Addons {

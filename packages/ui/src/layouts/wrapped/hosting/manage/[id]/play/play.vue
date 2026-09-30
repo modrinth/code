@@ -155,7 +155,11 @@ type Action = 'play' | 'invite' | 'download' | 'push'
 const props = defineProps<{
 	onPlayServer: (target: ServerPlayTarget) => void | Promise<void>
 	onDownloadMrpack?: (blob: Blob, filename: string) => Promise<void>
-	onDownloadMrpackExternal?: (instanceId: string, version: number, filename: string) => Promise<void>
+	onDownloadMrpackExternal?: (
+		instanceId: string,
+		version: number,
+		filename: string,
+	) => Promise<void>
 	siteUrl: string
 }>()
 const { formatMessage } = useVIntl()
@@ -200,7 +204,7 @@ const playerToRemove = ref<ServerPlayerRow>()
 const previewAction = ref<'play' | 'push'>('push')
 const preferences = useServerPreferences(serverId)
 const serverAddress = computed(() =>
-	getHostingServerAddress(server.value.net, serverFull.value?.subdomain),
+	getHostingServerAddress(server.value?.net, serverFull.value?.subdomain),
 )
 async function performAction(action: Action, target: ServerShareActionTarget) {
 	const { worldId: targetWorldId, configPaths, isCurrent: sameContext } = target

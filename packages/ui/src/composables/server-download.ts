@@ -1,8 +1,8 @@
 import type { Archon } from '@modrinth/api-client'
 
 import { injectModrinthClient } from '../providers/api-client'
-import { injectModrinthServerContext } from '../providers/server-context'
 import { injectFileDownload } from '../providers/file-download'
+import { injectModrinthServerContext } from '../providers/server-context'
 import { injectNotificationManager } from '../providers/web-notifications'
 import { defineMessages, useVIntl } from './i18n'
 
@@ -68,8 +68,15 @@ export function useServerWorldDownload() {
 					filename: `${worldId}.zip`,
 				})
 			} else {
-				const { token } = await client.kyros.files_v1.authorizeFullWorldDownload(nodeUrlHost, worldId)
-				const downloadUrl = client.kyros.files_v1.getFullWorldDownloadUrl(nodeUrlHost, worldId, token)
+				const { token } = await client.kyros.files_v1.authorizeFullWorldDownload(
+					nodeUrlHost,
+					worldId,
+				)
+				const downloadUrl = client.kyros.files_v1.getFullWorldDownloadUrl(
+					nodeUrlHost,
+					worldId,
+					token,
+				)
 				window.location.assign(downloadUrl)
 			}
 		} catch {
