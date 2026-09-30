@@ -4,10 +4,10 @@
 	>
 		<template v-if="hasMounted">
 			<img
-				v-if="image"
+				v-if="cachedImage"
 				class="h-full w-full select-none object-fill"
 				alt="Server Icon"
-				:src="image"
+				:src="cachedImage"
 			/>
 			<img
 				v-else
@@ -30,14 +30,18 @@
 import { MinecraftServerIcon } from '@modrinth/assets'
 import { onMounted, ref } from 'vue'
 
+import { useCachedIcon } from '#ui/composables/use-cached-icon'
+
 const hasMounted = ref(false)
 
 onMounted(() => {
 	hasMounted.value = true
 })
 
-defineProps<{
+const props = defineProps<{
 	image: string | undefined
 	disabled?: boolean
 }>()
+
+const cachedImage = useCachedIcon(() => props.image)
 </script>

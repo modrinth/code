@@ -632,9 +632,6 @@
   "content.enabled-for.label": {
     "defaultMessage": "Enabled for"
   },
-  "content.enabled-for.locked": {
-    "defaultMessage": "This content can only be enabled for players."
-  },
   "content.enabled-for.not-supported-here": {
     "defaultMessage": "This content isn't designed to be enabled here."
   },

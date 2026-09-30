@@ -8,6 +8,7 @@ export type {
 export type { BackoffStrategy, RetryConfig } from '../features/retry'
 export type { Archon } from '../modules/archon/types'
 export type { BaseUrlConfig, ClientConfig, RequestHooks } from './client'
+export type { DownloadSink } from './download'
 export type { ApiErrorData, ModrinthErrorResponse } from './errors'
 export { isModrinthErrorResponse } from './errors'
 export type { HttpMethod, RequestContext, RequestOptions, ResponseData } from './request'

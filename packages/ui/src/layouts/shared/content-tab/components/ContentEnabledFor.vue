@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LockIcon, TriangleAlertIcon } from '@modrinth/assets'
+import { TriangleAlertIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -22,10 +22,6 @@ const messages = defineMessages({
 	playerTooltip: {
 		id: 'content.enabled-for.player-tooltip',
 		defaultMessage: 'Include this content in the shared instance or .mrpack that players download.',
-	},
-	locked: {
-		id: 'content.enabled-for.locked',
-		defaultMessage: 'This content can only be enabled for players.',
 	},
 	requiredHere: {
 		id: 'content.enabled-for.required-here',
@@ -108,22 +104,13 @@ function toggle(side: ContentSide) {
 		</button>
 
 		<span
-			v-if="
-				reserveStatusSpace ||
-				modelValue.warningTooltip ||
-				(modelValue.locked && disabledSides.size > 0)
-			"
-			v-tooltip="
-				modelValue.warningTooltip ?? modelValue.lockedTooltip ?? formatMessage(messages.locked)
-			"
-			:class="{
-				invisible: !modelValue.warningTooltip && (!modelValue.locked || disabledSides.size === 0),
-			}"
+			v-if="reserveStatusSpace || modelValue.warningTooltip"
+			v-tooltip="modelValue.warningTooltip"
+			:class="{ invisible: !modelValue.warningTooltip }"
 			class="inline-flex size-5 shrink-0 cursor-help items-center justify-center"
 			tabindex="0"
 		>
-			<TriangleAlertIcon v-if="modelValue.warningTooltip" class="size-5 text-orange" />
-			<LockIcon v-else class="size-5 text-secondary" />
+			<TriangleAlertIcon class="size-5 text-orange" />
 		</span>
 	</div>
 </template>

@@ -1,6 +1,8 @@
 import type { Archon } from '@modrinth/api-client'
 
 import { injectModrinthClient } from '../providers/api-client'
+import { injectModrinthServerContext } from '../providers/server-context'
+import { injectFileDownload } from '../providers/file-download'
 import { injectNotificationManager } from '../providers/web-notifications'
 import { defineMessages, useVIntl } from './i18n'
 
@@ -33,6 +35,8 @@ export function hasAvailableWorldDownload(
 
 export function useServerWorldDownload() {
 	const client = injectModrinthClient()
+	const fileDownload = injectFileDownload(null)
+	const serverContext = injectModrinthServerContext(null)
 	const { addNotification } = injectNotificationManager()
 	const { formatMessage } = useVIntl()
 
@@ -54,9 +58,20 @@ export function useServerWorldDownload() {
 
 	async function downloadWorldFiles(nodeUrlHost: string, worldId: string) {
 		try {
-			const { token } = await client.kyros.files_v1.authorizeFullWorldDownload(nodeUrlHost, worldId)
-			const downloadUrl = client.kyros.files_v1.getFullWorldDownloadUrl(nodeUrlHost, worldId, token)
-			window.location.assign(downloadUrl)
+			if (fileDownload) {
+				await fileDownload.download({
+					type: 'server-world',
+					serverId: serverContext?.serverId,
+					serverName: serverContext?.server.value.name,
+					nodeUrlHost,
+					worldId,
+					filename: `${worldId}.zip`,
+				})
+			} else {
+				const { token } = await client.kyros.files_v1.authorizeFullWorldDownload(nodeUrlHost, worldId)
+				const downloadUrl = client.kyros.files_v1.getFullWorldDownloadUrl(nodeUrlHost, worldId, token)
+				window.location.assign(downloadUrl)
+			}
 		} catch {
 			showDownloadFailedNotification()
 		}

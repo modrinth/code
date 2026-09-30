@@ -56,6 +56,7 @@ import {
 	providePopupNotificationManager,
 	provideServerOnboardingFlow,
 	provideServerPlay,
+	serverIconQueryOptions,
 	ServerOnboardingModal,
 	TeleportOverflowMenu,
 	TextLogo,
@@ -410,6 +411,7 @@ const {
 	handleModpackDuplicateCreateAnyway,
 	handleModpackDuplicateGoToInstance,
 	onboardingChecklist,
+	iconCache,
 	tags,
 } = setupProviders(
 	tauriApiClient,
@@ -1010,29 +1012,51 @@ watch(stateInitialized, (ready) => {
 			loading.end(routerToken)
 			routerToken = null
 		}
+	}
+})
 
-		queryClient.prefetchQuery({
-			queryKey: ['servers'],
-			queryFn: async () => {
-				const response = await tauriApiClient.archon.servers_v0.list({ limit: 100 })
-				const hasMedalServers = response.servers.some((s) => s.is_medal)
-				if (hasMedalServers) {
-					const subscriptions = await tauriApiClient.labrinth.billing_internal.getSubscriptions()
-					for (const server of response.servers) {
-						if (server.is_medal) {
-							const sub = subscriptions.find((s) => s.metadata?.id === server.server_id)
-							if (sub) {
-								server.medal_expires = new Date(
-									new Date(sub.created).getTime() + 5 * 86400000,
-								).toISOString()
+watch(
+	() => stateInitialized.value && credentials.value?.session,
+	(session) => {
+		if (!session) return
+
+		queryClient
+			.prefetchQuery({
+				queryKey: ['servers'],
+				queryFn: async () => {
+					const response = await tauriApiClient.archon.servers_v0.list({ limit: 100 })
+					const hasMedalServers = response.servers.some((s) => s.is_medal)
+					if (hasMedalServers) {
+						const subscriptions = await tauriApiClient.labrinth.billing_internal.getSubscriptions()
+						for (const server of response.servers) {
+							if (server.is_medal) {
+								const sub = subscriptions.find((s) => s.metadata?.id === server.server_id)
+								if (sub) {
+									server.medal_expires = new Date(
+										new Date(sub.created).getTime() + 5 * 86400000,
+									).toISOString()
+								}
 							}
 						}
 					}
-				}
-				return response
-			},
-			staleTime: 30_000,
-		})
+					return response
+				},
+				staleTime: 30_000,
+			})
+			.then(() => {
+				if (credentials.value?.session !== session) return
+				const response = queryClient.getQueryData(['servers'])
+				return Promise.allSettled(
+					(response?.servers ?? [])
+						.filter((server) => server.status === 'available' && !server.is_medal)
+						.map(async (server) => {
+							const icon = await queryClient.fetchQuery(
+								serverIconQueryOptions(server.server_id, tauriApiClient),
+							)
+							if (icon) await iconCache.cacheIcon(icon)
+						}),
+				)
+			})
 		queryClient.prefetchQuery({
 			queryKey: ['billing', 'subscriptions'],
 			queryFn: () => tauriApiClient.labrinth.billing_internal.getSubscriptions(),
@@ -1043,8 +1067,8 @@ watch(stateInitialized, (ready) => {
 			queryFn: () => tauriApiClient.labrinth.billing_internal.getPayments(),
 			staleTime: 30_000,
 		})
-	}
-})
+	},
+)
 
 const error = useError()
 const errorModal = ref()

@@ -362,7 +362,7 @@ import {
 	useLoadingBarToken,
 	useModrinthServersConsole,
 	useReadyState,
-	useServerImage,
+	useServerIcon,
 	useServerProject,
 } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -551,7 +551,7 @@ const { disconnect: disconnectPanelSync } = useServerPanelSync({
 	worldId,
 })
 
-const { image: serverImage } = useServerImage(() => props.serverId)
+const { icon: serverImage } = useServerIcon(() => props.serverId)
 const { data: serverProject } = useServerProject(computed(() => serverData.value?.upstream ?? null))
 
 const onStateEvent = (data: Archon.Websocket.v0.WSStateEvent) => {

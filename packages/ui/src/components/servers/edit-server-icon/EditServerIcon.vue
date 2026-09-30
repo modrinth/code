@@ -76,7 +76,7 @@ import { type IconConfig, renderIcon } from '#ui/components/base/icon-editor-mod
 import IconEditorModal from '#ui/components/base/icon-editor-modal/index.vue'
 import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
 import { useVIntl } from '#ui/composables/i18n'
-import { useServerImage } from '#ui/composables/use-server-image'
+import { useServerIcon } from '#ui/composables/use-server-icon'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -111,7 +111,7 @@ const editIconTooltip = computed(() =>
 		: (props.permissionDeniedMessage ?? formatMessage(commonMessages.noPermissionAction)),
 )
 
-const { image: displayIcon, queryKey: iconQueryKey } = useServerImage(serverId)
+const { icon: displayIcon, queryKey: iconQueryKey } = useServerIcon(serverId)
 
 function getStatusCode(error: unknown): number | undefined {
 	const err = error as { statusCode?: number; response?: { status?: number } }
