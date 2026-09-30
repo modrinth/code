@@ -70,6 +70,25 @@ export const Searchable: Story = {
 	},
 }
 
+export const SearchableWithMoreResults: Story = {
+	args: {
+		modelValue: 'quilt',
+		options: [
+			{ value: 'fabric', label: 'Fabric' },
+			{ value: 'forge', label: 'Forge' },
+		],
+		searchOptions: [
+			{ value: 'fabric', label: 'Fabric' },
+			{ value: 'forge', label: 'Forge' },
+			{ value: 'quilt', label: 'Quilt' },
+		],
+		searchable: true,
+		searchPlaceholder: 'Search loaders...',
+		syncWithSelection: true,
+		selectSearchTextOnFocus: true,
+	},
+}
+
 export const SearchableButtonVariant: Story = {
 	args: {
 		options: [

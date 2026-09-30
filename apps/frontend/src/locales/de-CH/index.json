@@ -4139,17 +4139,11 @@
   "project.settings.license.custom-url-description": {
     "message": "Die Webadresse des vollständigen Lizenztextes. Du musst einen Link angeben, da es sich um eine benutzerdefinierte Lizenz handelt."
   },
-  "project.settings.license.has-spdx": {
-    "message": "SPDX-Kennung verwenden"
-  },
   "project.settings.license.later": {
     "message": "Später Ausgaben"
   },
   "project.settings.license.later-description": {
     "message": "Die von dir ausgewählte Lizenz enthält eine „oder höher“-Klausel. Wenn du dieses Kästchen auswählst, dürfen Benutzer dein Projekt unter späteren Versionen der Lizenz nutzen."
-  },
-  "project.settings.license.missing-name": {
-    "message": "Gib einen Namen oder eine SPDX-Kennung für deine benutzerdefinierte Lizenz ein."
   },
   "project.settings.license.missing-url": {
     "message": "Gib eine URL zum vollen Text deiner benutzerdefinierten Lizenz ein."
@@ -4157,32 +4151,17 @@
   "project.settings.license.name": {
     "message": "Lizenzname"
   },
-  "project.settings.license.name-description": {
-    "message": "Der vollständige Name der Lizenz. Falls die Lizenz über eine SPDX-Kennung verfügt, wähle bitte das Kästchen aus und verwende stattdessen die Kennung."
-  },
   "project.settings.license.name-placeholder": {
     "message": "Lizenzname"
   },
-  "project.settings.license.optional-url": {
-    "message": "Lizenz-URL (optional)"
+  "project.settings.license.optional-label": {
+    "message": "Optional"
   },
   "project.settings.license.select": {
     "message": "Eine Lizenz auswählen"
   },
-  "project.settings.license.select-description": {
-    "message": "Wie Benutzer dein Projekt nutzen dürfen und wie nicht."
-  },
   "project.settings.license.select-placeholder": {
     "message": "Lizenz auswählen..."
-  },
-  "project.settings.license.spdx": {
-    "message": "SPDX-Kennung"
-  },
-  "project.settings.license.spdx-description": {
-    "message": "Falls deine Lizenz keine offizielle <spdx>SPDX-Lizenzkennung</spdx> besitzt, deaktiviere das Kästchen und gib stattdessen den Namen der Lizenz ein."
-  },
-  "project.settings.license.spdx-placeholder": {
-    "message": "SPDX-Kennung"
   },
   "project.settings.license.title": {
     "message": "Lizenz"
