@@ -17,14 +17,12 @@ zbus = { workspace = true }
 enum_dispatch = { workspace = true }
 futures = { workspace = true }
 rand = { workspace = true }
+libc =  { workspace = true }
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["full"] }
 tracing-subscriber = { workspace = true }
 clap = { workspace = true, features = ["derive"] }
-
-[target.'cfg(unix)'.dependencies]
-libc =  { workspace = true }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 libseccomp =  { workspace = true }

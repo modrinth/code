@@ -18,6 +18,9 @@ use windows::{
             ERROR_INSUFFICIENT_BUFFER, ERROR_SUCCESS, GetLastError, HANDLE,
             LocalFree,
         },
+        NetworkManagement::WindowsFirewall::{
+            NetworkIsolationGetAppContainerConfig, NetworkIsolationSetAppContainerConfig,
+        },
         Security::{
             ACE_HEADER, ACL,
             Authorization::{
@@ -28,8 +31,8 @@ use windows::{
                 SetSecurityInfo, TRUSTEE_IS_GROUP, TRUSTEE_IS_SID,
             },
             CONTAINER_INHERIT_ACE, CreateWellKnownSid,
-            DACL_SECURITY_INFORMATION, DeriveCapabilitySidsFromName, FreeSid,
-            GetAce, InitializeSecurityDescriptor,
+            DACL_SECURITY_INFORMATION, DeriveCapabilitySidsFromName, EqualSid,
+            FreeSid, GetAce, InitializeSecurityDescriptor,
             Isolation::{
                 CreateAppContainerProfile, DeleteAppContainerProfile,
                 DeriveAppContainerSidFromAppContainerName,
@@ -48,6 +51,7 @@ use windows::{
         System::{
             StationsAndDesktops::OpenWindowStationW,
             SystemServices::{SE_GROUP_ENABLED, SECURITY_DESCRIPTOR_REVISION},
+            Memory::{GetProcessHeap, HeapFree},
             Threading::{
                 DeleteProcThreadAttributeList,
                 InitializeProcThreadAttributeList,
@@ -446,11 +450,12 @@ fn try_set_network_isolation(app_container: &PSID) -> std::io::Result<()> {
     let result = unsafe { NetworkIsolationGetAppContainerConfig(&mut current_count, &mut current_containers) };
     scopeguard::defer! {
         // https://learn.microsoft.com/en-us/windows/win32/api/netfw/nf-netfw-networkisolationgetappcontainerconfig
+        let process_heap = unsafe { GetProcessHeap() };
         for index in 0..current_count {
-            HeapFree(GetProcessHeap(), 0, unsafe { current_containers.offset(index as isize).read() }.Sid);
+            HeapFree(process_heap, 0, unsafe { current_containers.offset(index as isize).read() }.Sid);
         }
         if !current_containers.is_null() {
-            HeapFree(GetProcessHeap(), 0, current_containers);
+            HeapFree(process_heap, 0, current_containers);
         }
     }
 
@@ -466,7 +471,7 @@ fn try_set_network_isolation(app_container: &PSID) -> std::io::Result<()> {
             return Ok(());
         }
 
-        new_containers.push(sid);
+        new_containers.push(sid_and_attributes);
     }
     new_containers.push(SID_AND_ATTRIBUTES {
         Sid: *app_container,

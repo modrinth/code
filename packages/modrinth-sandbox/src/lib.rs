@@ -60,8 +60,7 @@ pub async fn create_env() -> Result<SandboxEnv> {
 }
 
 pub fn try_handle_callback() {
-    #[cfg(windows)]
-    match crate::backend::windows::appcontainer::try_handle_callback() {
+    match crate::backend::try_handle_callback() {
         Ok(true) => {
             std::process::exit(0);
         },

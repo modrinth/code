@@ -1,6 +1,8 @@
-use std::{io::{Error, ErrorKind}, os::windows::io::AsRawHandle, path::Path};
+use std::{io::{Error, ErrorKind}, os::windows::io::AsRawHandle, path::{Path, PathBuf}};
 
 use windows::Win32::{Foundation::HANDLE, System::JobObjects::AssignProcessToJobObject, UI::Shell::SHELLEXECUTEINFOW};
+
+use crate::SandboxArg;
 
 pub fn spawn(
     program: PathBuf,
@@ -13,7 +15,7 @@ pub fn spawn(
         .encode_wide()
         .chain([0])
         .collect::<Vec<_>>();
-    let mut command_line = join_windows_shell_arg(arguments.as_slice())
+    let mut command_line = super::join_windows_shell_arg(arguments.as_slice())
         .encode_wide()
         .chain([0])
         .collect::<Vec<_>>();
@@ -34,8 +36,8 @@ pub fn spawn(
         return Err(Error::new(ErrorKind::Other, "ShellExecuteExW returned invalid process handle. Operation completed via DDE?"));
     }
 
-    Ok(WindowsChild {
-        process_handle: pi.hProcess,
+    Ok(super::WindowsChild {
+        process_handle: sei.hProcess,
         exit_status: None,
     })
 }

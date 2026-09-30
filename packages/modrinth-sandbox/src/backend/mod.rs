@@ -181,3 +181,10 @@ impl std::fmt::Display for SandboxExitStatus {
         std::fmt::Display::fmt(&self.imp, f)
     }
 }
+
+pub fn try_handle_callback() -> Result<bool> {
+    #[cfg(windows)]
+    return windows::appcontainer::try_handle_callback();
+    #[cfg(not(windows))]
+    return Ok(false);
+}
