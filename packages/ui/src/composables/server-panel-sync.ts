@@ -565,11 +565,11 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 		incomingAddons: Archon.Content.v1.Addon[],
 	): Archon.Content.v1.Addon[] {
 		const currentByFilename = new Map(
-			currentAddons.map((addon) => [normalizeAddonFilename(addon.filename), addon] as const),
+			currentAddons.map((addon) => [addonToggleKey(addon), addon] as const),
 		)
 
 		return incomingAddons.map((incoming) =>
-			mergeAddonSpec(currentByFilename.get(normalizeAddonFilename(incoming.filename)), incoming),
+			mergeAddonSpec(currentByFilename.get(addonToggleKey(incoming)), incoming),
 		)
 	}
 

@@ -159,8 +159,11 @@ async function playExisting(
 	approveUpdate: boolean,
 ) {
 	await assertAccount(target)
-	if (target.iconPath && existing.icon_path !== target.iconPath)
-		await edit_icon(existing.id, target.iconPath)
+	if (target.iconPath && existing.icon_path !== target.iconPath) {
+		await edit_icon(existing.id, target.iconPath).catch((error) => {
+			console.warn('Could not update the hosting instance icon', error)
+		})
+	}
 	if (existing.quarantined || existing.install_stage !== 'installed') {
 		await router.push(`/instance/${encodeURIComponent(existing.id)}`)
 		return
@@ -317,7 +320,10 @@ const prepareMutation = useMutation({
 		const world = server.worlds.find((world) => world.id === worldId && world.is_active)
 		const sharedInstanceId = world?.content?.shared_instance_id
 		if (!sharedInstanceId) throw new Error(formatMessage(messages.worldChanged))
-		const iconPath = await cacheServerIcon(serverId)
+		const iconPath = await cacheServerIcon(serverId).catch((error) => {
+			console.warn('Could not cache the hosting server icon', error)
+			return null
+		})
 		const target: LaunchTarget = {
 			serverId,
 			worldId,
