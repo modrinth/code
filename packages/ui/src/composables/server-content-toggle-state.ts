@@ -49,20 +49,8 @@ function removeEmptyToggle(
 }
 
 function clearPendingField(pending: PendingToggle, field: ToggleField) {
-	switch (field) {
-		case 'enabled':
-			delete pending.changes.enabled
-			delete pending.sent.enabled
-			break
-		case 'server':
-			delete pending.changes.server
-			delete pending.sent.server
-			break
-		case 'player':
-			delete pending.changes.player
-			delete pending.sent.player
-			break
-	}
+	delete pending.changes[field]
+	delete pending.sent[field]
 }
 
 export function queuePendingAddonToggle(
@@ -173,10 +161,5 @@ export function applyPendingAddonToggle(
 		...(changes.enabled !== undefined ? { disabled: !changes.enabled } : {}),
 		...(changes.server !== undefined ? { disabled_server: !changes.server } : {}),
 		...(changes.player !== undefined ? { disabled_player: !changes.player } : {}),
-		...((changes.server !== undefined || changes.player !== undefined) &&
-		addon.kind !== 'resourcepack' &&
-		addon.kind !== 'shader'
-			? { side_toggle_unlocked: true }
-			: {}),
 	}
 }

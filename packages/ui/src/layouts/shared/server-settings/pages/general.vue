@@ -204,6 +204,7 @@ const preferences = computed(() => ({
 }))
 
 type PreferenceKeys = keyof typeof preferences.value
+const preferenceKeys = Object.keys(preferences.value) as PreferenceKeys[]
 
 type UserPreferences = {
 	[K in PreferenceKeys]: boolean
@@ -337,7 +338,7 @@ const hasServerSettingsChanges = computed(
 		serverSubdomain.value !== data.value?.net?.domain,
 )
 const hasPreferenceChanges = computed(
-	() => JSON.stringify(newUserPreferences.value) !== JSON.stringify(userPreferences.value),
+	() => preferenceKeys.some((key) => newUserPreferences.value[key] !== userPreferences.value[key]),
 )
 const hasUnsavedChanges = computed(
 	() => hasServerSettingsChanges.value || hasPreferenceChanges.value,
@@ -381,7 +382,7 @@ const saveGeneral = async () => {
 		}
 
 		// Save preferences to localStorage
-		userPreferences.value = { ...newUserPreferences.value }
+		for (const key of preferenceKeys) userPreferences.value[key] = newUserPreferences.value[key]
 
 		await queryClient.invalidateQueries({
 			queryKey: ['servers', 'detail', serverId],

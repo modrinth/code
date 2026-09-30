@@ -320,7 +320,6 @@ pub struct SharedInstanceInstallModpack {
     pub version_id: String,
     pub title: String,
     pub icon_url: Option<String>,
-    pub dependency_count: usize,
 }
 
 impl InstallRequest {

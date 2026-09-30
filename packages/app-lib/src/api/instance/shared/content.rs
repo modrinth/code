@@ -200,14 +200,8 @@ pub(crate) async fn shared_modpack_files(
 }
 
 fn is_content_path(path: &str) -> bool {
-    let Some((parent, filename)) = path.split_once('/') else {
-        return false;
-    };
-    matches!(
-        parent,
-        "mods" | "datapacks" | "resourcepacks" | "shaderpacks"
-    ) && path_util::is_safe_file_name(filename)
-        && (filename.ends_with(".jar") || filename.ends_with(".zip"))
+    crate::state::content_store::is_managed_content_path(path)
+        && !path.ends_with(".disabled")
 }
 
 pub(super) async fn remote_shared_content(

@@ -117,12 +117,14 @@ const install = useMutation({
 		if (config.projectInstall.value) {
 			await config.installServerContent(serverId, worldId)
 		} else if (config.setupType.value === 'modpack' && config.modpackFile.value) {
+			const auth = await client.archon.servers_v0.getFilesystemAuth(serverId)
 			config.uploadProgress.value = 0
 			const upload = client.kyros.content_v1.uploadModpackFile(
 				worldId,
 				config.modpackFile.value,
 				config.buildProperties(),
 				{
+					auth,
 					softOverride: true,
 					onProgress: ({ loaded, total }) => {
 						config.uploadProgress.value = total > 0 ? Math.round((loaded / total) * 100) : 0
