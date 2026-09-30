@@ -36,7 +36,7 @@ pub(super) async fn shared_instance_update_diffs(
         &before,
         &after,
         &HashSet::new(),
-		&HashSet::new(),
+        &HashSet::new(),
         &BTreeSet::new(),
         CommonExternalFilePolicy::AssumeUpdated,
         state,
@@ -54,8 +54,8 @@ pub(super) async fn shared_instance_publish_diffs(
     let after_configuration = local_configuration(metadata);
     let modpack_unlinked = before_configuration.modpack_version_id.is_some()
         && after_configuration.modpack_version_id.is_none();
-	let (version_ids, external_files) =
-		remote_publish_content(version, modpack_unlinked, state).await?;
+    let (version_ids, external_files) =
+        remote_publish_content(version, modpack_unlinked, state).await?;
     let before = SharedContentSnapshot {
         version_ids,
         external_files,
@@ -83,8 +83,8 @@ pub(super) async fn shared_instance_publish_diffs(
     shared_content_diffs(
         &before,
         &after,
-		&snapshot.disabled_project_ids,
-		&snapshot.disabled_version_ids.iter().cloned().collect(),
+        &snapshot.disabled_project_ids,
+        &snapshot.disabled_version_ids.iter().cloned().collect(),
         &snapshot.disabled_external_files,
         CommonExternalFilePolicy::AssumeUnchanged,
         state,

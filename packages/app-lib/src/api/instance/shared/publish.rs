@@ -243,7 +243,11 @@ async fn extend_shared_modpack_dependencies(
     version_ids.extend(
         inherited
             .into_values()
-            .filter(|version| !explicit.values().any(|installed| installed.project_id == version.project_id))
+            .filter(|version| {
+                !explicit
+                    .values()
+                    .any(|installed| installed.project_id == version.project_id)
+            })
             .map(|version| version.id),
     );
     Ok(())
@@ -460,11 +464,11 @@ pub(super) async fn collect_publish_snapshot(
             continue;
         }
 
-		if item.version.is_none()
-			&& let Some(project) = item.project.as_ref()
-		{
-			disabled_project_ids.insert(project.id.clone());
-		}
+        if item.version.is_none()
+            && let Some(project) = item.project.as_ref()
+        {
+            disabled_project_ids.insert(project.id.clone());
+        }
 
         if let Some(version) = item.version {
             if seen_disabled_version_ids.insert(version.id.clone()) {

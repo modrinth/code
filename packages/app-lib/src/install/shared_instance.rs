@@ -493,7 +493,7 @@ async fn current_shared_instance_content(
             };
 
             content.projects.insert(
-				version_id.clone(),
+                version_id.clone(),
                 CurrentSharedInstanceProject {
                     project_id,
                     version_id,
@@ -528,7 +528,7 @@ async fn desired_shared_instance_content(
             ))
         })?;
         content.projects.insert(
-			version.id.clone(),
+            version.id.clone(),
             DesiredSharedInstanceProject {
                 project_id: version.project_id.clone(),
                 version_id: version.id.clone(),
