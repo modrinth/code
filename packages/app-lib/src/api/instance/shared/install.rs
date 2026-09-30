@@ -326,9 +326,9 @@ pub(crate) async fn check_shared_instance_availability_before_launch(
 pub async fn update_shared_instance(
     instance_id: &str,
 ) -> crate::Result<InstallJobSnapshot> {
-    crate::util::fetch::wait_for_local_api_rate_limit(
+    crate::util::fetch::wait_for_local_api_rate_limit(Box::pin(
         update_shared_instance_inner(instance_id),
-    )
+    ))
     .await
 }
 
@@ -622,8 +622,10 @@ pub(super) async fn shared_instance_install_data(
     } else {
         (manager_id, server_manager_name, server_manager_icon_url)
     };
-    let instance_icon_url = if server_manager_name.is_some() {
-        instance_icon_url.or(remote.icon)
+	let instance_icon_url = if remote.linked_server.is_some() {
+		server_manager_icon_url.clone().or(instance_icon_url).or(remote.icon)
+	} else if server_manager_name.is_some() {
+		instance_icon_url.or(remote.icon)
     } else {
         remote.icon.or(instance_icon_url)
     };

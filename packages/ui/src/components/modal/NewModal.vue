@@ -465,7 +465,7 @@ async function transitionContent(update: () => void) {
 	contentTransitioning.value = true
 	const outgoing = Array.from(body.children, (element) =>
 		element.animate([{ opacity: 1 }, { opacity: 0 }], {
-			duration: 320,
+			duration: 200,
 			easing: 'ease-in',
 			fill: 'both',
 		}),
@@ -480,7 +480,7 @@ async function transitionContent(update: () => void) {
 	for (const animation of outgoing) animation.cancel()
 	const after = { width: getComputedStyle(body).width, height: getComputedStyle(body).height }
 	const timing: KeyframeAnimationOptions = {
-		duration: 680,
+		duration: 200,
 		easing: 'cubic-bezier(0.2, 0, 0, 1)',
 		fill: 'both',
 	}
