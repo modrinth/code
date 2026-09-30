@@ -662,11 +662,12 @@ pub async fn thread_issue_edit(
         prepare_thread_issue_mutation(project_id, &mut transaction).await?;
     }
     if edit.user_addressed.is_some()
+        && !user.role.is_mod()
         && !is_project_team_member(project_id, user.id.into(), &mut transaction)
             .await?
     {
         return Err(ApiError::Auth(eyre::eyre!(
-            "only project team members can address thread issues"
+            "only project team members or moderators can address thread issues"
         )));
     }
     let updated = database::models::DBThreadIssue::update_flags(
