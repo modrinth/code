@@ -113,7 +113,7 @@ export class LabrinthModerationInternalModule extends AbstractModule {
 	}
 
 	public async forceUserPasswordReset(userId: string, email?: string): Promise<void> {
-		return this.client.request<void>(`/moderation/user-credentials/${userId}/password-reset`, {
+		return this.client.request<void>(`/admin/user/${userId}/password-reset`, {
 			api: 'labrinth',
 			version: 'internal',
 			method: 'POST',
@@ -122,7 +122,7 @@ export class LabrinthModerationInternalModule extends AbstractModule {
 	}
 
 	public async resetUser2fa(userId: string): Promise<void> {
-		return this.client.request<void>(`/moderation/user-credentials/${userId}/2fa`, {
+		return this.client.request<void>(`/admin/user/${userId}/2fa`, {
 			api: 'labrinth',
 			version: 'internal',
 			method: 'DELETE',

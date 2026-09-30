@@ -32,7 +32,7 @@ pub struct ForcePasswordResetRequest {
 
 /// Forces a password reset and revokes access.
 #[utoipa::path(
-	context_path = "/moderation/user-credentials",
+	context_path = "/admin/user",
 	tag = "moderation",
 	request_body = ForcePasswordResetRequest,
 	responses((status = NO_CONTENT))
@@ -160,7 +160,7 @@ pub async fn force_password_reset(
 
 /// Removes two-factor authentication and backup codes from a user's account.
 #[utoipa::path(
-	context_path = "/moderation/user-credentials",
+	context_path = "/admin/user",
 	tag = "moderation",
 	responses((status = NO_CONTENT))
 )]
