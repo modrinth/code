@@ -784,7 +784,7 @@ fn acl_eq(first: *const ACL, second: *const ACL) -> std::io::Result<bool> {
 }
 
 pub fn try_handle_callback() -> eyre::Result<bool> {
-    let args = std::env::args_os().collect::<Vec<_>>;
+    let args: Vec<OsString> = std::env::args_os().collect();
     if args.len() < 2 {
         return Ok(false);
     }
