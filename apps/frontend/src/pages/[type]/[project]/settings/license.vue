@@ -327,13 +327,12 @@ const availableLicenses = computed<LicenseOption[]>(() => {
 	)
 	const defaultIds = new Set<string>(defaultLicenseIds)
 	return [
+		{ friendly: 'Custom', short: '', requiresOnlyOrLater: false },
 		...defaultLicenseIds.map((short) => ({
 			friendly:
-				short === ''
-					? 'Custom'
-					: short === 'All-Rights-Reserved'
-						? 'All Rights Reserved/No License'
-						: (licensesById.get(short)?.name ?? short),
+				short === 'All-Rights-Reserved'
+					? 'All Rights Reserved/No License'
+					: (licensesById.get(short)?.name ?? short),
 			short,
 			requiresOnlyOrLater: orLaterLicenseIds.has(short),
 		})),
@@ -359,7 +358,9 @@ const allLicenseOptions = computed<ComboboxOption<string>[]>(() =>
 
 const licenseOptions = computed(() => {
 	const defaultIds = new Set<string>(defaultLicenseIds)
-	return allLicenseOptions.value.filter((license) => defaultIds.has(license.value))
+	return allLicenseOptions.value.filter(
+		(license) => license.value === '' || defaultIds.has(license.value),
+	)
 })
 
 function getInitialLicense() {
