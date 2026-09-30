@@ -240,7 +240,7 @@ impl ProcessManager {
                 }
                 #[cfg(windows)]
                 {
-                    eyre::Ok::<crate::util::blocking_reader::Blocking<_>, _>(
+                    eyre::Ok::<crate::util::blocking_reader::Blocking<_>>(
                         crate::util::blocking_reader::Blocking::new(reader),
                     )
                 }
@@ -258,7 +258,7 @@ impl ProcessManager {
                 }
                 #[cfg(windows)]
                 {
-                    eyre::Ok::<crate::util::blocking_reader::Blocking<_>, _>(
+                    eyre::Ok::<crate::util::blocking_reader::Blocking<_>>(
                         crate::util::blocking_reader::Blocking::new(reader),
                     )
                 }
