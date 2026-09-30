@@ -49,8 +49,8 @@ function removeEmptyToggle(
 }
 
 function clearPendingField(pending: PendingToggle, field: ToggleField) {
-	delete pending.changes[field]
-	delete pending.sent[field]
+	pending.changes[field] = undefined
+	pending.sent[field] = undefined
 }
 
 export function queuePendingAddonToggle(
