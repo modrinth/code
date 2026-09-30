@@ -1734,10 +1734,6 @@ pub async fn discord_community_link(
     .wrap_auth_err("authenticating API request")?
     .1;
 
-    if db_user.is_locked() {
-        return Err(ApiError::Auth(AuthenticationError::AccountLocked.into()));
-    }
-
     let Some(discord_id) = db_user.discord_id else {
         return Err(ApiError::Request(eyre!("discord account is not linked")));
     };

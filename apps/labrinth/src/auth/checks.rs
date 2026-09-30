@@ -1,4 +1,3 @@
-use crate::auth::AuthenticationError;
 use crate::database;
 use crate::database::models::project_item::ProjectQueryResult;
 use crate::database::models::version_item::VersionQueryResult;
@@ -23,14 +22,6 @@ pub fn require_verified_email(user: &User) -> Result<(), ApiError> {
         return Err(ApiError::Auth(eyre::eyre!(
             "Please verify your email before publishing!"
         )));
-    }
-
-    Ok(())
-}
-
-pub fn require_unlocked(user: &User) -> Result<(), ApiError> {
-    if user.lock.is_some() {
-        return Err(ApiError::Auth(AuthenticationError::AccountLocked.into()));
     }
 
     Ok(())

@@ -156,40 +156,6 @@ impl Scopes {
         self.intersects(Self::restricted())
     }
 
-    /// Scopes withheld from users whose account is locked.
-    pub fn locked() -> Scopes {
-        Scopes::USER_WRITE
-            | Scopes::USER_AUTH_WRITE
-            | Scopes::NOTIFICATION_WRITE
-            | Scopes::PAYOUTS_WRITE
-            | Scopes::PROJECT_CREATE
-            | Scopes::PROJECT_WRITE
-            | Scopes::PROJECT_DELETE
-            | Scopes::VERSION_CREATE
-            | Scopes::VERSION_WRITE
-            | Scopes::VERSION_DELETE
-            | Scopes::REPORT_CREATE
-            | Scopes::REPORT_WRITE
-            | Scopes::REPORT_DELETE
-            | Scopes::THREAD_WRITE
-            | Scopes::PAT_CREATE
-            | Scopes::PAT_WRITE
-            | Scopes::PAT_DELETE
-            | Scopes::SESSION_DELETE
-            | Scopes::COLLECTION_CREATE
-            | Scopes::COLLECTION_WRITE
-            | Scopes::COLLECTION_DELETE
-            | Scopes::ORGANIZATION_CREATE
-            | Scopes::ORGANIZATION_WRITE
-            | Scopes::ORGANIZATION_DELETE
-            | Scopes::SHARED_INSTANCE_CREATE
-            | Scopes::SHARED_INSTANCE_WRITE
-            | Scopes::SHARED_INSTANCE_DELETE
-            | Scopes::SHARED_INSTANCE_VERSION_CREATE
-            | Scopes::SHARED_INSTANCE_VERSION_WRITE
-            | Scopes::SHARED_INSTANCE_VERSION_DELETE
-    }
-
     pub fn parse_from_oauth_scopes(
         scopes: &str,
     ) -> Result<Scopes, bitflags::parser::ParseError> {

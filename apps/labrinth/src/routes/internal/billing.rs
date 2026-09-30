@@ -1,6 +1,6 @@
 use self::payments::*;
 use self::update_subscriptions::*;
-use crate::auth::{get_user_from_headers, require_unlocked};
+use crate::auth::get_user_from_headers;
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::ids::DBUserSubscriptionId;
 use crate::database::models::notification_item::NotificationBuilder;
@@ -715,7 +715,6 @@ pub async fn edit_subscription(
     .await
     .wrap_auth_err("authenticating API request")?
     .1;
-    require_unlocked(&user)?;
 
     #[derive(Clone, Copy, PartialEq, Eq)]
     enum PaymentRequirement {
@@ -1331,7 +1330,6 @@ pub async fn add_payment_method_flow(
     .await
     .wrap_auth_err("authenticating API request")?
     .1;
-    require_unlocked(&user)?;
 
     let customer = get_or_create_customer(
         user.id,
@@ -1394,7 +1392,6 @@ pub async fn edit_payment_method(
     .await
     .wrap_auth_err("authenticating API request")?
     .1;
-    require_unlocked(&user)?;
 
     let (id,) = info.into_inner();
 
@@ -1469,7 +1466,6 @@ pub async fn remove_payment_method(
     .await
     .wrap_auth_err("authenticating API request")?
     .1;
-    require_unlocked(&user)?;
 
     let (id,) = info.into_inner();
 
@@ -1748,7 +1744,6 @@ pub async fn initiate_payment(
     .await
     .wrap_auth_err("authenticating API request")?
     .1;
-    require_unlocked(&user)?;
 
     let payment_request = payment_request.into_inner();
 

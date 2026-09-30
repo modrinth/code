@@ -1766,7 +1766,7 @@ export namespace Labrinth {
 			}
 
 			export type UserLock = {
-				locked_by?: string
+				locked_by: string
 				reason: string
 				created: string
 			}
