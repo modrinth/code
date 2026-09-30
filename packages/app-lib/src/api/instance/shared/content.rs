@@ -1,6 +1,6 @@
 use super::client::InstanceVersionResponse;
 use super::diff::shared_external_file_key;
-use super::publish::{dedupe_strings, shared_versions_by_project};
+use super::publish::dedupe_strings;
 use super::*;
 use crate::api::pack::install_from::{
     EnvType, PackDependency, PackFileHash, PackFormat,
@@ -13,7 +13,6 @@ use std::collections::BTreeMap;
 pub(crate) struct SharedModpackFile {
     pub relative_path: String,
     pub sha1: Option<String>,
-    pub project_id: Option<String>,
     pub version_id: Option<String>,
     removed_path_alias: Option<String>,
 }
@@ -193,7 +192,6 @@ pub(crate) async fn shared_modpack_files(
             SharedModpackFile {
                 relative_path,
                 sha1: hash,
-                project_id: metadata.map(|file| file.project_id.clone()),
                 version_id: metadata.map(|file| file.version_id.clone()),
                 removed_path_alias,
             }
@@ -245,8 +243,6 @@ pub(super) async fn remote_shared_content(
     if let Some(modpack_id) =
         version.modpack_id.as_deref().filter(|id| !id.is_empty())
     {
-        let explicit_projects =
-            shared_versions_by_project(&version_ids, true, state).await?;
         for file in shared_modpack_files(modpack_id, state).await? {
             if file.is_removed(&version.removed_files)
                 || explicit_paths.contains(&file.relative_path)
@@ -254,13 +250,7 @@ pub(super) async fn remote_shared_content(
                 continue;
             }
             if let Some(version_id) = file.version_id {
-                if !file
-                    .project_id
-                    .as_ref()
-                    .is_some_and(|id| explicit_projects.contains_key(id))
-                {
-                    version_ids.push(version_id);
-                }
+                version_ids.push(version_id);
             } else if let Some((parent, filename)) =
                 file.relative_path.split_once('/')
             {

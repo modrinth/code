@@ -177,7 +177,7 @@ impl SharedInstanceApplyPlan {
             .projects
             .values()
             .filter(|current| {
-                !desired.projects.contains_key(&current.project_id)
+                !desired.projects.contains_key(&current.version_id)
             })
             .cloned()
             .collect();
@@ -196,16 +196,35 @@ impl SharedInstanceApplyPlan {
             ..Default::default()
         };
 
-        for desired in desired.projects.into_values() {
-            match current.projects.get(&desired.project_id) {
-                Some(current) if current.version_id != desired.version_id => {
-                    plan.project_updates.push(SharedInstanceProjectUpdate {
-                        current: current.clone(),
-                        desired,
-                    });
-                }
-                None => plan.project_additions.push(desired),
-                Some(_) => {}
+        let mut additions = desired
+            .projects
+            .into_values()
+            .filter(|desired| {
+                !current.projects.contains_key(&desired.version_id)
+            })
+            .collect::<Vec<_>>();
+        while let Some(desired) = additions.pop() {
+            let replacements = plan
+                .project_removals
+                .iter()
+                .enumerate()
+                .filter(|(_, current)| current.project_id == desired.project_id)
+                .map(|(index, _)| index)
+                .collect::<Vec<_>>();
+            let unambiguous = !additions
+                .iter()
+                .any(|other| other.project_id == desired.project_id)
+                && !plan
+                    .project_additions
+                    .iter()
+                    .any(|other| other.project_id == desired.project_id);
+            if replacements.len() == 1 && unambiguous {
+                plan.project_updates.push(SharedInstanceProjectUpdate {
+                    current: plan.project_removals.remove(replacements[0]),
+                    desired,
+                });
+            } else {
+                plan.project_additions.push(desired);
             }
         }
 
@@ -522,7 +541,7 @@ async fn current_shared_instance_content(
             };
 
             content.projects.insert(
-                project_id.clone(),
+                version_id.clone(),
                 CurrentSharedInstanceProject {
                     project_id,
                     version_id,
@@ -560,12 +579,6 @@ async fn shared_modpack_toggles(
         return Ok((Vec::new(), false));
     };
     let inherited = shared_modpack_files(&modpack.version_id, state).await?;
-    let explicit =
-        shared_instance_versions_by_id(&data.modrinth_ids, state).await?;
-    let explicit_by_project = explicit
-        .values()
-        .map(|version| (version.project_id.as_str(), version.id.as_str()))
-        .collect::<HashMap<_, _>>();
     let entries = content_rows::get_content_entries(
         &metadata.applied_content_set.id,
         &state.pool,
@@ -580,17 +593,12 @@ async fn shared_modpack_toggles(
     let mut toggles = Vec::new();
     let mut missing = false;
     for inherited in inherited {
-        let overridden = inherited
-            .project_id
-            .as_deref()
-            .and_then(|id| explicit_by_project.get(id))
-            .is_some_and(|id| Some(*id) != inherited.version_id.as_deref())
-            || data.external_files.iter().any(|file| {
-                ProjectType::from_name(&file.file_type).is_some_and(|kind| {
-                    inherited.relative_path
-                        == format!("{}/{}", kind.get_folder(), file.file_name)
-                })
-            });
+        let overridden = data.external_files.iter().any(|file| {
+            ProjectType::from_name(&file.file_type).is_some_and(|kind| {
+                inherited.relative_path
+                    == format!("{}/{}", kind.get_folder(), file.file_name)
+            })
+        });
         let enabled = !inherited.is_removed(&data.removed_files) && !overridden;
         let current = entries
             .iter()
@@ -695,7 +703,7 @@ async fn desired_shared_instance_content(
             ))
         })?;
         content.projects.insert(
-            version.project_id.clone(),
+            version.id.clone(),
             DesiredSharedInstanceProject {
                 project_id: version.project_id.clone(),
                 version_id: version.id.clone(),

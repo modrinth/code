@@ -445,7 +445,9 @@ pub(super) async fn collect_publish_snapshot(
             continue;
         }
 
-        if let Some(project) = item.project.as_ref() {
+        if item.version.is_none()
+            && let Some(project) = item.project.as_ref()
+        {
             disabled_project_ids.insert(project.id.clone());
         }
 
@@ -478,7 +480,7 @@ pub(super) async fn collect_publish_snapshot(
     })
 }
 
-pub(super) async fn shared_versions_by_project(
+pub(super) async fn shared_versions_by_id(
     version_ids: &[String],
     allow_missing: bool,
     state: &State,
@@ -507,15 +509,10 @@ pub(super) async fn shared_versions_by_project(
         ))
         .into());
     }
-    let mut snapshot = ContentSetSnapshot::default();
-    let mut by_project = HashMap::new();
-    for version in versions {
-        snapshot
-            .insert_project(version.project_id.clone(), version.id.clone())
-            .map_err(|error| crate::ErrorKind::InputError(error.to_string()))?;
-        by_project.insert(version.project_id.clone(), version);
-    }
-    Ok(by_project)
+    Ok(versions
+        .into_iter()
+        .map(|version| (version.id.clone(), version))
+        .collect())
 }
 
 pub(super) async fn shared_project_names(
