@@ -1,4 +1,4 @@
-use actix_web::{HttpRequest, delete, post, web};
+use actix_web::{HttpRequest, delete, put, web};
 use eyre::eyre;
 use serde::Deserialize;
 use xredis::RedisPool;
@@ -28,12 +28,12 @@ pub struct LockUserRequest {
 ///
 /// Locking an already locked user replaces the existing lock's reason.
 #[utoipa::path(
-	context_path = "/moderation/user-lock",
+	context_path = "/admin/user",
 	tag = "moderation",
 	request_body = LockUserRequest,
 	responses((status = NO_CONTENT))
 )]
-#[post("/{id}")]
+#[put("/{id}/lock")]
 pub async fn lock_user(
     req: HttpRequest,
     path: web::Path<(String,)>,
@@ -101,11 +101,11 @@ pub async fn lock_user(
 
 /// Removes the lock from a user's account.
 #[utoipa::path(
-	context_path = "/moderation/user-lock",
+	context_path = "/admin/user",
 	tag = "moderation",
 	responses((status = NO_CONTENT))
 )]
-#[delete("/{id}")]
+#[delete("/{id}/lock")]
 pub async fn unlock_user(
     req: HttpRequest,
     path: web::Path<(String,)>,

@@ -6,7 +6,7 @@ import { rememberStoredAccount } from '@/composables/accounts.ts'
 import { useAuthCookie } from '@/composables/auth-cookie.ts'
 
 type AuthState = {
-	user: Labrinth.Users.v3.User | null
+	user: Labrinth.Users.v2.User | null
 	token: string
 }
 
@@ -134,7 +134,7 @@ export const initAuth = async (
 					},
 				},
 				true,
-			)) as Labrinth.Users.v3.User
+			)) as Labrinth.Users.v2.User
 		} catch (error) {
 			// only refresh when the token was rejected. not on timeouts or other errors (think this was the cause of random logouts)
 			shouldRefresh = isAuthFailure(error)
@@ -167,7 +167,7 @@ export const initAuth = async (
 							},
 						},
 						true,
-					)) as Labrinth.Users.v3.User
+					)) as Labrinth.Users.v2.User
 				} catch (error) {
 					if (isAuthFailure(error)) {
 						clearAuthCookie(auth, authCookie)
