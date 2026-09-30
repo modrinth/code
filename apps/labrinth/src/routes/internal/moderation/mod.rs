@@ -30,7 +30,6 @@ use xredis::RedisPool;
 pub mod external_license;
 mod ownership;
 pub mod tech_review;
-pub mod user_lock;
 pub mod user_sessions;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
@@ -52,7 +51,6 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(
             web::scope("/external-license").configure(external_license::config),
         )
-        .service(web::scope("/user-lock").configure(user_lock::config))
         .service(web::scope("/user-sessions").configure(user_sessions::config));
 }
 
