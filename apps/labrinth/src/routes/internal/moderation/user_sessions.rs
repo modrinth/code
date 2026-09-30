@@ -7,7 +7,6 @@ use crate::database::PgPool;
 use crate::database::models::DBUser;
 use crate::database::models::session_item::DBSession;
 use crate::models::pats::Scopes;
-use crate::models::users::Role;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::Context as _;
