@@ -1,16 +1,18 @@
 <template>
-	<NuxtLayout>
-		<NuxtRouteAnnouncer />
-		<ClientOnly>
-			<LoadingBar />
-		</ClientOnly>
-		<NotificationPanel />
-		<AccountSwitchOverlay :show="isSwitchingAccount" />
-		<AdsConsentNotification />
-		<I18nDebugPanel />
-		<NuxtPage />
-		<div id="teleports"></div>
-	</NuxtLayout>
+	<div id="root" ref="root">
+		<NuxtLayout>
+			<NuxtRouteAnnouncer />
+			<ClientOnly>
+				<LoadingBar />
+			</ClientOnly>
+			<NotificationPanel />
+			<AccountSwitchOverlay :show="isSwitchingAccount" />
+			<AdsConsentNotification />
+			<I18nDebugPanel />
+			<NuxtPage/>
+			<div id="teleports"></div>
+		</NuxtLayout>
+	</div>
 </template>
 <script setup lang="ts">
 import {
@@ -31,6 +33,15 @@ import {
 	useIsSwitchingAccount,
 } from './composables/accounts'
 import { useAuth } from './composables/auth'
+import {provideAppRoot} from "@modrinth/ui/src/providers/app-root";
+import type {MaybeElement} from "@vueuse/core";
+import {ref, watch, computed} from "vue";
+
+const root = ref<MaybeElement>(null);
+
+provideAppRoot({
+	root: computed(() => root.value)
+})
 
 const auth = await useAuth()
 const { userPreferences } = setupProviders(auth)

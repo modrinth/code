@@ -187,11 +187,43 @@ export function tooltipEnter(el: HTMLElement) {
 	if (!hasTooltipContent(el)) {
 		return
 	}
+	closeWaitingTimeout();
 	hovered = el
 	show(false)
 }
 
-export function tooltipLeave(el: HTMLElement) {
+type TimeoutId = ReturnType<typeof setTimeout>;
+
+let hideTimeoutData: { id: TimeoutId | undefined, el: HTMLElement } | undefined = undefined;
+
+export function preventTooltipClosure(el: HTMLElement) {
+	if (hideTimeoutData?.el !== el) return;
+	clearTimeout(hideTimeoutData.id);
+	hideTimeoutData = undefined;
+}
+
+export function tooltipLeave(el: HTMLElement, timeout?: number): void {
+	if (timeout != undefined) {
+		// TODO: SHOULD ATTEMPT TO HIDE ANY PREVIOUS CALLS RIGHT AWAY?
+		let timeoutId = setTimeout(() => {
+			if (hideTimeoutData) tooltipLeaveBase(hideTimeoutData.el)
+		}, timeout);
+
+		hideTimeoutData = { id: timeoutId, el: el }
+	} else {
+		tooltipLeaveBase(el)
+	}
+}
+
+function closeWaitingTimeout() {
+	if (hideTimeoutData) {
+		clearTimeout(hideTimeoutData.id);
+		tooltipLeaveBase(hideTimeoutData.el);
+		hideTimeoutData = undefined;
+	}
+}
+
+function tooltipLeaveBase(el: HTMLElement) {
 	if (hovered === el) {
 		hovered = undefined
 	}
@@ -205,6 +237,7 @@ export function tooltipFocusIn(el: HTMLElement) {
 	if (!isFocusVisible(el) || !hasTooltipContent(el)) {
 		return
 	}
+	closeWaitingTimeout();
 	focused = el
 	show(true)
 }
@@ -260,7 +293,7 @@ export function installTooltipDirective(app: App) {
 		},
 	} satisfies TooltipDirective)
 
-	function sync(el: HTMLElement, value: TooltipProps, modifiers: Record<string, boolean>) {
+	function sync(el: HTMLElement, value: TooltipProps, modifiers: Partial<Record<string, boolean>>) {
 		const text = tooltipText(value)
 		if (!text) {
 			releaseFocusable(el, addedTabIndex)

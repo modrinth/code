@@ -11,10 +11,25 @@ import type {
 	UploadState,
 } from '../types'
 
+export interface DirectoryQuery {
+	items: ComputedRef<FileItem[]>,
+	isLoading: Ref<boolean>,
+	filesReadyPending: ComputedRef<boolean>
+	loadError: Ref<Error | null>,
+}
+
+export interface DirectoryTree {
+	getEntries: (path: string) => Ref<FileItem[]>
+	prefetch: (path: string) => void;
+	expandedEntries: Ref<string[]>
+}
+
 export interface FileManagerContext {
-	items: Ref<FileItem[]>
-	loading: Ref<boolean>
-	error: Ref<Error | null>
+	currentItems: ComputedRef<FileItem[]>
+	directoryTree: DirectoryTree
+
+	loading: ComputedRef<boolean>
+	error: ComputedRef<Error | null>
 
 	currentPath: Ref<string>
 	navigateTo: (path: string) => void
@@ -40,7 +55,8 @@ export interface FileManagerContext {
 	cancelUpload?: () => void
 	uploadState?: Ref<UploadState> | ComputedRef<UploadState>
 
-	refresh: () => void
+	isRefreshing: Ref<boolean>
+	refresh: () => Promise<void>
 
 	isBusy?: Ref<boolean> | ComputedRef<boolean>
 	busyTooltip?: Ref<string | undefined> | ComputedRef<string | undefined>

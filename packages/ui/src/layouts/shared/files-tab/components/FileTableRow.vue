@@ -1,72 +1,100 @@
 <template>
-	<li
-		role="button"
-		:class="[containerClasses, isDragSource ? 'opacity-50' : '']"
-		tabindex="0"
-		:data-file-path="path"
-		:data-file-type="type"
-		@click="selectItem"
-		@contextmenu="openContextMenu"
-		@keydown="(e) => e.key === 'Enter' && selectItem()"
-		@mouseenter="handleMouseEnter"
-		@pointerdown="handlePointerDown"
-	>
-		<div class="pointer-events-none flex flex-1 items-center gap-3 truncate">
-			<Checkbox
-				class="pointer-events-auto"
-				:model-value="selected"
-				@click.stop
-				@update:model-value="emit('toggle-select')"
-			/>
-			<div class="pointer-events-none flex size-5 items-center justify-center">
-				<component
-					:is="iconComponent"
-					class="size-5 group-hover:text-contrast group-focus:text-contrast"
-				/>
-			</div>
-			<div class="pointer-events-none flex flex-col truncate">
-				<span
-					class="pointer-events-none truncate group-hover:text-contrast group-focus:text-contrast"
-				>
-					{{ name }}
-				</span>
-			</div>
-		</div>
-		<div class="pointer-events-auto flex w-fit flex-shrink-0 items-center gap-4 @[800px]:gap-12">
-			<span class="hidden w-[100px] text-nowrap text-sm text-secondary @[800px]:block">
-				{{ formattedSize }}
-			</span>
-			<span class="hidden w-[160px] text-nowrap text-sm text-secondary @[800px]:block">
-				{{ formattedCreationDate }}
-			</span>
-			<span class="hidden w-[160px] text-nowrap text-sm text-secondary @[800px]:block">
-				{{ formattedModifiedDate }}
-			</span>
-			<div class="grid min-w-[51px] shrink-0 items-center justify-items-end">
-				<span
-					aria-hidden="true"
-					class="invisible col-start-1 row-start-1 text-nowrap font-semibold"
-				>
-					{{ formatMessage(commonMessages.actionsLabel) }}
-				</span>
-				<div
-					class="col-start-1 row-start-1 flex justify-end"
+	<Tooltip :disabled="containerWidth != null ? (containerWidth > 900 ? showDetails : false) : showDetails" :allow-hover="true">
+		<li
+			role="option"
+			:class="[containerClasses, isDragSource ? 'opacity-50' : '']"
+			tabindex="0"
+			:data-file-path="path"
+			:data-file-type="type"
+			@click="selectItem"
+			@contextmenu="openContextMenu"
+			@keydown="(e) => e.key === 'Enter' && selectItem()"
+			@mouseenter="handleMouseEnter"
+			@mouseleave="handleMouseLeave"
+			@pointerdown="handlePointerDown"
+			class="h-[52.8px]"
+		>
+			<div class="pointer-events-none flex flex-1 items-center gap-3 truncate">
+				<Checkbox v-if="!selectionWithinActionMenu"
+					class="pointer-events-auto"
+					:model-value="selected"
 					@click.stop
-					@contextmenu.stop
-					@keydown.stop
-					@pointerdown.stop
-				>
-					<TeleportOverflowMenu
-						type="quiet"
-						:label="formatMessage(commonMessages.actionsLabel)"
-						:options="menuOptions"
+					@update:model-value="emit('toggle-select')"
+				/>
+				<div class="pointer-events-none flex size-5 items-center justify-center">
+					<component
+						:is="iconComponent"
+						class="size-5 group-hover:text-contrast group-focus:text-contrast"
+					/>
+				</div>
+				<div class="pointer-events-none flex flex-col truncate">
+					<span class="pointer-events-none truncate group-hover:text-contrast group-focus:text-contrast">
+						{{ name }}
+					</span>
+				</div>
+				<EditIcon v-if="hoveringToEdit && isEditableFile" />
+			</div>
+			<div class="pointer-events-auto flex w-fit flex-shrink-0 items-center gap-4 @[900px]:gap-12">
+				<span v-if="showDetails" class="hidden w-[100px] text-nowrap text-sm text-secondary @[900px]:block">
+					{{ formattedSize }}
+				</span>
+				<span v-if="showDetails" class="hidden w-[160px] text-nowrap text-sm text-secondary @[900px]:block">
+					{{ formattedCreationDate }}
+				</span>
+				<span v-if="showDetails" class="hidden w-[160px] text-nowrap text-sm text-secondary @[900px]:block">
+					{{ formattedModifiedDate }}
+				</span>
+				<div class="grid min-w-[51px] shrink-0 items-center justify-items-end">
+					<span
+						aria-hidden="true"
+						class="invisible col-start-1 row-start-1 text-nowrap font-semibold"
 					>
-						<MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
-					</TeleportOverflowMenu>
+						{{ formatMessage(commonMessages.actionsLabel) }}
+					</span>
+					<div
+						class="col-start-1 row-start-1 flex justify-end"
+						@click.stop
+						@contextmenu.stop
+						@keydown.stop
+						@pointerdown.stop
+					>
+						<TeleportOverflowMenu
+							type="quiet"
+							:label="formatMessage(commonMessages.actionsLabel)"
+							:options="menuOptions"
+						>
+							<MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
+						</TeleportOverflowMenu>
+					</div>
 				</div>
 			</div>
-		</div>
-	</li>
+		</li>
+		<template #popper>
+			<div class="flex flex-col w-fit">
+				<h3 class="mb-2 pb-1 mt-0 text-base font-semibold border-0 border-b-[1px] border-solid border-divider">Details</h3>
+				<div class="gap-1 grid grid-cols-2">
+					<span class="text-nowrap text-sm text-secondary">
+						{{ formatMessage(messages.size) }}
+					</span>
+					<span class="text-nowrap text-sm text-secondary">
+						{{ formattedSize }}
+					</span>
+					<span class="text-nowrap text-sm text-secondary">
+						{{ formatMessage(messages.created) }}
+					</span>
+					<span class="text-nowrap text-sm text-secondary">
+						{{ formattedCreationDate }}
+					</span>
+					<span class="text-nowrap text-sm text-secondary">
+						{{ formatMessage(messages.modified) }}
+					</span>
+					<span class="text-nowrap text-sm text-secondary">
+						{{ formattedModifiedDate }}
+					</span>
+				</div>
+			</div>
+		</template>
+	</Tooltip>
 </template>
 
 <script setup lang="ts">
@@ -110,6 +138,7 @@ import {
 import { injectFileManager } from '../providers/file-manager'
 import type { FileItem } from '../types'
 import { joinDisplayPath } from '../utils'
+import {Tooltip} from "#ui/components";
 
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
@@ -124,6 +153,18 @@ const messages = defineMessages({
 		id: 'files.row.create-zip',
 		defaultMessage: 'Create ZIP',
 	},
+	size: {
+		id: 'files.table-header.size',
+		defaultMessage: 'Size',
+	},
+	created: {
+		id: 'files.table-header.created',
+		defaultMessage: 'Created',
+	},
+	modified: {
+		id: 'files.table-header.modified',
+		defaultMessage: 'Modified',
+	},
 })
 
 const props = defineProps<
@@ -133,6 +174,9 @@ const props = defineProps<
 		selected: boolean
 		writeDisabled?: boolean
 		writeDisabledTooltip?: string
+		showDetails: boolean
+		containerWidth?: number | undefined
+		selectionWithinActionMenu?: boolean
 	}
 >()
 
@@ -162,6 +206,7 @@ const isDropTarget = computed(
 	() => fileDragActive.value && fileDragTarget.value === props.path && props.type === 'directory',
 )
 const isDragSource = computed(() => fileDragActive.value && fileDragData.value?.path === props.path)
+const hoveringToEdit = ref<boolean>(false);
 
 const formatDateTime = useFormatDateTime({
 	year: '2-digit',
@@ -175,7 +220,7 @@ const formatBytes = useFormatBytes()
 const containerClasses = computed(() => {
 	const dropTarget = isDropTarget.value
 	return [
-		'group m-0 flex w-full select-none items-center justify-between overflow-hidden border-0 border-t border-solid border-surface-4 pl-3 pr-4 py-3 focus:!outline-none',
+		'group m-0 flex w-full select-none items-center justify-between overflow-hidden border-0 border-t border-solid border-surface-4 pl-3 pr-3 py-2 focus:!outline-none',
 		dropTarget
 			? '!bg-brand-highlight'
 			: props.selected
@@ -183,7 +228,7 @@ const containerClasses = computed(() => {
 				: props.index % 2 === 0
 					? 'bg-surface-2'
 					: 'bg-surface-1.5',
-		props.isLast ? 'rounded-b-[20px]' : '',
+		props.isLast ? '' : '',
 		isEditableFile.value || props.type === 'directory' ? 'cursor-pointer hover:bg-surface-2.5' : '',
 		'transition-colors duration-100 focus:!outline-none',
 	]
@@ -202,6 +247,15 @@ const menuOptions = computed<ButtonMenuOption[]>(() => {
 	const wd = props.writeDisabled
 	const wdTooltip = props.writeDisabledTooltip
 	return [
+		{
+			id: 'copy-filename',
+			label: formatMessage(commonMessages.selectEntryLabel),
+			icon: iconComponent.value,
+			action: () => {
+				emit('toggle-select')
+			},
+			shown: props.selectionWithinActionMenu,
+		},
 		{
 			id: 'copy-filename',
 			label: formatMessage(commonMessages.copyFilenameButton),
@@ -224,7 +278,7 @@ const menuOptions = computed<ButtonMenuOption[]>(() => {
 			},
 		},
 		{
-			id: 'open-in-folder',
+			id: 'select-entry',
 			label: formatMessage(commonMessages.openInFolderButton),
 			icon: FolderOpenIcon,
 			shown: !!ctx.openInFolder,
@@ -332,7 +386,12 @@ function openContextMenu(event: MouseEvent) {
 }
 
 function handleMouseEnter() {
+	hoveringToEdit.value = true;
 	emit('hover', { name: props.name, type: props.type, path: props.path })
+}
+
+function handleMouseLeave() {
+	hoveringToEdit.value = false;
 }
 
 const isNavigating = ref(false)

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Kyros } from '@modrinth/api-client'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, onMounted, ref, watch } from 'vue'
+import {computed, onMounted, type Ref, ref, watch} from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
@@ -17,12 +17,17 @@ import {
 import { commonMessages } from '#ui/utils/common-messages'
 
 import FilePageLayout from '../../../shared/files-tab/layout.vue'
-import { provideFileManager } from '../../../shared/files-tab/providers/file-manager'
+import {
+	type DirectoryTree,
+	type DirectoryQuery,
+	provideFileManager
+} from '../../../shared/files-tab/providers/file-manager'
 import type { EditingFile, FileItem } from '../../../shared/files-tab/types'
 
 const props = defineProps<{
 	showDebugInfo?: boolean
 	showRefreshButton?: boolean
+	constrainWidth?: boolean
 }>()
 
 const client = injectModrinthClient()
@@ -136,28 +141,32 @@ function initializeFileEdit() {
 	}
 }
 
-// Directory listing query
-const {
-	data: directoryData,
-	isLoading,
-	error: loadError,
-} = useQuery({
-	queryKey: computed(() => ['files', serverId, currentPath.value]),
-	queryFn: async () => {
-		return client.kyros.files_v0.listDirectory(currentPath.value, 1, 2000)
-	},
-	staleTime: 30_000,
-})
-
 function isVisibleFileItem(item: Kyros.Files.v0.DirectoryItem) {
 	return !item.path.split('/').includes('.modrinth-staged')
 }
 
-const items = computed<FileItem[]>(() =>
-	(directoryData.value?.items ?? []).filter(isVisibleFileItem),
-)
+function queryDirectoryEntries(path: string): DirectoryQuery{
+	const {
+		data: directoryData,
+		isLoading,
+		error: loadError,
+	} = useQuery({
+		queryKey: computed(() => ['files', serverId, path]),
+		queryFn: async () => {
+			return client.kyros.files_v0.listDirectory(path, 1, 2000)
+		},
+		staleTime: 30_000,
+	})
 
-const filesReadyPending = useReadyState({ isLoading, data: directoryData })
+	return {
+		items: computed<FileItem[]>(() =>
+			(directoryData.value?.items ?? []).filter(isVisibleFileItem),
+		),
+		isLoading: isLoading,
+		filesReadyPending: useReadyState({ isLoading, data: directoryData }),
+		loadError: loadError,
+	}
+}
 
 // Prefetching
 function prefetchDirectory(path: string) {
@@ -193,8 +202,12 @@ function getQueryKey() {
 	return ['files', serverId, currentPath.value]
 }
 
-function refreshList() {
-	queryClient.invalidateQueries({ queryKey: ['files', serverId] })
+const isRefreshing = ref<boolean>(false)
+
+async function refreshList() {
+	isRefreshing.value = true;
+	await queryClient.invalidateQueries({ queryKey: ['files', serverId] })
+	isRefreshing.value = false;
 }
 
 // Mutations
@@ -434,7 +447,7 @@ async function createZip(data: Kyros.Files.v1.ZipRequest, destination?: string):
 				: undefined,
 			type: 'success',
 		})
-		refreshList()
+		await refreshList()
 	} catch (error) {
 		updateOperation(
 			{ progress: 0, error: error instanceof Error ? error.message : undefined },
@@ -488,7 +501,7 @@ async function uploadFiles(files: File[]) {
 				filename: getSessionUploadFilename(file.name),
 			})),
 		)
-		if (result === 'completed') refreshList()
+		if (result === 'completed') await refreshList()
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.uploadFailedLabel),
@@ -502,11 +515,35 @@ function cancelUpload() {
 	fileUploadSession.cancelUpload()
 }
 
+const directories: Record<string, DirectoryQuery> = {};
+const expandedDirectories: Ref<string[]> = ref([]);
+
+const directoryTree = {
+	prefetch: (path: string) => {
+		if (directories[path] == null) {
+			prefetchDirectory(path);
+		}
+	},
+	get: (path: string) => {
+		let query = directories[path];
+		if (query == null) {
+			query = queryDirectoryEntries(path);
+			directories[path] = query;
+		}
+		return query
+	},
+	getEntries(path: string) {
+		return this.get(path).items;
+	},
+	expandedEntries: expandedDirectories
+};
+
 // Provide the file manager context
 provideFileManager({
-	items,
-	loading: computed(() => isLoading.value),
-	error: computed(() => loadError.value ?? null),
+	currentItems: computed(() => directoryTree.get(currentPath.value).items.value),
+	directoryTree,
+	loading: computed(() => directoryTree.get(currentPath.value).isLoading.value),
+	error: computed(() => directoryTree.get(currentPath.value).loadError.value ?? null),
 	currentPath,
 	navigateTo,
 	editingFile,
@@ -540,6 +577,7 @@ provideFileManager({
 	cancelUpload,
 	uploadState,
 	refresh: refreshList,
+	isRefreshing,
 	isBusy: fileWriteDisabled,
 	busyTooltip: fileWriteDisabledTooltip,
 	busyWarning,
@@ -554,10 +592,11 @@ provideFileManager({
 </script>
 
 <template>
-	<ReadyTransition :pending="filesReadyPending">
+	<ReadyTransition :pending="directoryTree.get(currentPath).filesReadyPending.value">
 		<FilePageLayout
 			:show-debug-info="props.showDebugInfo"
 			:show-refresh-button="props.showRefreshButton"
+			:constrain-width="constrainWidth"
 		/>
 	</ReadyTransition>
 </template>

@@ -1,4 +1,4 @@
-import type { Ref } from 'vue'
+import type {ComputedRef, Ref} from 'vue'
 import { computed, ref, watch, watchEffect } from 'vue'
 
 export interface ScrollViewportOptions {
@@ -131,7 +131,7 @@ export function useScrollViewport(options: ScrollViewportOptions = {}) {
 	}
 }
 
-export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptions) {
+export function useVirtualScroll<T>(items: ComputedRef<T[]>, options: VirtualScrollOptions) {
 	const {
 		itemHeight,
 		bufferSize = 5,

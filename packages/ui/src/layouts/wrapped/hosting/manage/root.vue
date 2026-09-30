@@ -2,9 +2,6 @@
 	<div
 		v-if="filteredNotices.length > 0"
 		class="relative mx-auto mb-4 flex w-full min-w-0 flex-col gap-3 px-6"
-		:class="{
-			'max-w-[1280px]': constrainWidth,
-		}"
 	>
 		<ServerNotice
 			v-for="notice in filteredNotices"
@@ -98,6 +95,7 @@
 	<!-- SERVER START -->
 	<div
 		v-else-if="serverData"
+		ref="serverDataContainer"
 		data-pyro-server-manager-root
 		class="relative mx-auto box-border flex w-full min-w-0 flex-col gap-4 px-6 transition-all duration-300"
 		:style="{
@@ -110,7 +108,7 @@
 			containedLayout
 				? 'h-full min-h-0 overflow-hidden pb-6'
 				: constrainWidth
-					? 'min-h-[100svh] max-w-[1280px] pb-16'
+					? ['min-h-[100svh] pb-16', centerEntries ? 'max-w-[1280px]' : '']
 					: 'min-h-[calc(100svh-100px)] pb-6',
 		]"
 	>
@@ -227,15 +225,29 @@
 			<ServerOnboardingPanelPage v-if="isOnboarding" :browse-modpacks="handleBrowseModpacks" />
 
 			<template v-else>
-				<div class="server-stagger-item -mb-3">
+				<div class="server-stagger-item flex items-center">
 					<NavTabs
 						:links="navLinks"
 						replace
 						page-nav
+						:no-padding="true"
+						:no-margin="true"
 						data-pyro-navigation
-						:class="containedLayout ? 'shrink-0' : ''"
+						:class="[containedLayout ? 'shrink-0' : '', 'px-0 py-0']"
 						:style="{ '--si': 1 }"
 					/>
+					<IconButton v-if="allowConstrainWidthToggle"
+						v-tooltip="constrainWidth ? 'Expand View' : 'Collapse View'"
+						size="md"
+						:label="constrainWidth ? 'Expand View' : 'Collapse View'"
+						native-type="button"
+						@click="() => constrainWidth = !constrainWidth"
+						class="ml-2"
+						:style="{ '--si': 1 }"
+					>
+						<ExpandIcon v-if="constrainWidth" />
+						<CollapseIcon v-else />
+					</IconButton>
 				</div>
 
 				<div
@@ -275,7 +287,7 @@
 						class="mb-4 shrink-0"
 						@installation-retry="handleInstallationRetry"
 					/>
-					<slot :on-reinstall="onReinstall" :on-reinstall-failed="onReinstallFailed" />
+					<slot :on-reinstall="onReinstall" :on-reinstall-failed="onReinstallFailed" :constrain-width="constrainWidth"/>
 				</div>
 			</template>
 		</template>
@@ -320,6 +332,8 @@ import {
 	MoreVerticalIcon,
 	ServerIcon as ServerAssetIcon,
 	SettingsIcon,
+	ExpandIcon,
+	CollapseIcon,
 	TimerIcon,
 	TransferIcon,
 	TriangleAlertIcon,
@@ -327,7 +341,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { useStorage } from '@vueuse/core'
+import {useLocalStorage, useStorage} from '@vueuse/core'
 import DOMPurify from 'dompurify'
 import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
@@ -378,6 +392,7 @@ import { commonMessages } from '#ui/utils/common-messages'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import ServerOnboardingPanelPage from './[id]/onboarding.vue'
+import {useResizeObserver} from "@vueuse/core/index";
 
 interface Tab {
 	label: string
@@ -412,6 +427,7 @@ const props = withDefaults(
 			type: 'mod' | 'plugin' | 'datapack'
 		}) => void | Promise<void>
 		constrainWidth?: boolean
+		centerEntries?: boolean
 		layoutMode?: 'page' | 'contained'
 	}>(),
 	{
@@ -428,6 +444,7 @@ const props = withDefaults(
 		browseModpacks: undefined,
 		browseContent: undefined,
 		constrainWidth: false,
+		centerEntries: true,
 		layoutMode: 'page',
 	},
 )
@@ -465,7 +482,14 @@ const DISABLE_LOADING_ANIM = true
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
-const constrainWidth = computed(() => props.constrainWidth)
+const serverDataContainer = ref<InstanceType<typeof HTMLDivElement>>()
+const allowConstrainWidthToggle = ref<boolean>(false);
+useResizeObserver(serverDataContainer, (entries) => {
+	const entry = entries[0]
+	allowConstrainWidthToggle.value = entry.contentRect.width > 1200
+})
+const constrainWidth = useLocalStorage('server-layout-constrained-width', props.constrainWidth, { initOnMounted: true })
+const centerEntries = computed(() => props.centerEntries);
 const containedLayout = computed(() => props.layoutMode === 'contained')
 const isNuxt = computed(() => client instanceof NuxtModrinthClient)
 const queryClient = useQueryClient()

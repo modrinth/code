@@ -24,133 +24,43 @@
 	/>
 	<FileDeleteItemModal ref="deleteItemModal" :item="selectedItem" @delete="handleDeleteItem" />
 	<ContextMenu ref="contextMenuRef" :label="formatMessage(commonMessages.actionsLabel)" />
-	<div v-if="!(ctx.loading.value && items.length === 0)" class="contents">
-		<div class="relative flex w-full flex-col">
-			<div class="relative isolate flex w-full flex-col gap-4">
-				<FileNavbar
-					:breadcrumbs="breadcrumbSegments"
-					:is-editing="isEditing"
-					:editing-file-name="ctx.editingFile.value?.name"
-					:editing-file-path="ctx.editingFile.value?.path"
-					:is-editing-image="fileEditorRef?.isEditingImage"
-					:is-editor-find-open="fileEditorRef?.isFindOpen"
-					:search-query="searchQuery"
-					:show-refresh-button="showRefreshButton"
-					:show-install-from-url="ctx.showInstallFromUrl"
-					:base-id="baseId"
-					:disabled="isBusy"
-					:disabled-tooltip="busyTooltip"
-					@navigate="navigateToSegment"
-					@navigate-home="() => navigateToSegment(-1)"
-					@prefetch-home="handlePrefetchHome"
-					@update:search-query="searchQuery = $event"
-					@create="showCreateModal"
-					@upload="initiateFileUpload"
-					@upload-zip="() => {}"
-					@unzip-from-url="showUnzipFromUrlModal"
-					@refresh="ctx.refresh"
-					@share="() => fileEditorRef?.shareToMclogs()"
-					@find="() => fileEditorRef?.toggleFind()"
-				/>
 
-				<div v-if="!isEditing">
-					<FileUploadDragAndDrop
-						ref="fileUploadRef"
-						class="@container relative flex flex-col overflow-clip rounded-[20px] border border-solid border-surface-4 shadow-sm"
-						:disabled="isBusy"
-						@drop-error="handleDropError"
-						@files-dropped="handleDroppedFiles"
-					>
-						<FileTableHeader
-							:sort-field="sortField"
-							:sort-desc="sortDescValue"
-							:all-selected="allSelected"
-							:some-selected="someSelected"
-							:is-stuck="isLabelBarStuck"
-							@sort="handleSort"
-							@toggle-all="toggleSelectAll"
-						/>
-						<div
-							v-if="filteredItems.length > 0"
-							ref="virtualListContainer"
-							class="relative w-full"
-							:style="{ minHeight: `${totalHeight}px`, overflowAnchor: 'none' }"
-						>
-							<div class="absolute w-full" :style="{ top: `${visibleTop}px` }">
-								<FileTableRow
-									v-for="(item, idx) in visibleItems"
-									:key="item.path"
-									:count="item.count"
-									:created="item.created"
-									:modified="item.modified"
-									:name="item.name"
-									:path="item.path"
-									:type="item.type"
-									:size="item.size"
-									:index="visibleRange.start + idx"
-									:is-last="visibleRange.start + idx === filteredItems.length - 1"
-									:selected="selectedItems.has(item.path)"
-									:write-disabled="isBusy || !!ctx.isReadOnly?.(item.path)"
-									:write-disabled-tooltip="
-										ctx.isReadOnly?.(item.path) ? ctx.readOnlyReason?.value : busyTooltip
-									"
-									@extract="() => handleExtractItem(item)"
-									@delete="() => showDeleteModal(item)"
-									@rename="() => showRenameModal(item)"
-									@download="() => handleDownload(item)"
-									@zip="() => handleZip(item)"
-									@move="() => showMoveModal(item)"
-									@move-direct-to="handleDirectMove"
-									@edit="() => handleEditFile(item)"
-									@navigate="() => handleNavigateToFolder(item)"
-									@hover="() => handleItemHover(item)"
-									@contextmenu="
-										(event, options) => contextMenuRef?.open(event as MouseEvent, options)
-									"
-									@toggle-select="() => toggleItemSelection(item.path)"
-								/>
-							</div>
-						</div>
-						<div
-							v-else-if="items.length === 0 && !ctx.error.value"
-							class="flex h-full w-full items-center justify-center rounded-b-[20px] bg-surface-2 p-20"
-						>
-							<div class="flex flex-col items-center gap-4 text-center">
-								<FolderOpenIcon class="h-16 w-16 text-secondary" />
-								<h3 class="m-0 text-2xl font-bold text-contrast">
-									{{ formatMessage(messages.emptyFolderTitle) }}
-								</h3>
-								<p class="m-0 text-sm text-secondary">
-									{{ formatMessage(messages.emptyFolderDescription) }}
-								</p>
-							</div>
-						</div>
-						<FileManagerError
-							v-else-if="ctx.error.value"
-							class="rounded-b-[20px]"
-							:title="formatMessage(messages.errorTitle)"
-							:message="formatMessage(messages.errorMessage)"
-							@refetch="ctx.refresh"
-							@home="navigateToSegment(-1)"
-						/>
-					</FileUploadDragAndDrop>
+	<div ref="fileViewer" v-if="!(ctx.loading.value && items.length === 0)" :class="[!smallMode ? 'h-[50rem]' : '']">
+		<KeepAlive>
+			<SplitviewVue v-if="!smallMode" class="h-[50rem]"
+				:theme="themeDark"
+				:orientation="Orientation.HORIZONTAL"
+				:components="{ fileSideBar: FileSideBar, fileBrowserPanel: FileBrowserPanel }"
+				@ready="onReady"
+			/>
+		</KeepAlive>
+		<template v-if="smallMode">
+			<FileBrowserPanel :small-mode="true"/>
+			<NewModal ref="sidebarModal"
+				:on-hide="() => {
+					if (smallMode) sidebarOpen = false;
+				}"
+				:noblur="true"
+				:no-padding="true"
+				:hideHeader="true"
+				:fill-width-when-small="false"
+				:maxWidth="fullWidthSidebar ? '100dvw' : 'fit-content'"
+				:max-width-min-check="false"
+				:scrollable="false"
+				pullout-direction="left"
+			>
+				<div class="p-2 h-full " :class="[fullWidthSidebar ? 'w-full' : '']">
+					<FileSideBar :constrain-width="!fullWidthSidebar" :scroll-file-entries="true" :add-border="false"/>
 				</div>
-				<FileEditor
-					v-else
-					ref="fileEditorRef"
-					:file="ctx.editingFile.value"
-					:editor-component="editorComponent"
-					@close="handleEditorClose"
-				/>
-			</div>
-		</div>
+			</NewModal>
+		</template>
 
 		<FloatingActionBar :shown="hasUnsavedChanges">
 			<p class="m-0 text-sm font-semibold md:text-base">
 				{{ formatMessage(messages.unsavedChanges) }}
 			</p>
 			<div class="ml-auto flex gap-2">
-				<Button type="quiet" @click="fileEditorRef?.revertChanges()">
+				<Button type="quiet" @click="revertChanges()">
 					<HistoryIcon /> {{ formatMessage(commonMessages.resetButton) }}
 				</Button>
 				<Button
@@ -158,7 +68,7 @@
 					type="colored"
 					color="brand"
 					:disabled="isBusy"
-					@click="fileEditorRef?.saveFileContent(false)"
+					@click="saveFileContent(false)"
 				>
 					<SaveIcon /> {{ formatMessage(commonMessages.saveButton) }}
 				</Button>
@@ -203,31 +113,31 @@
 </template>
 
 <script setup lang="ts">
+import 'dockview-vue/dist/styles/dockview.css'
+
+import {FolderArchiveIcon, HistoryIcon, SaveIcon, TrashIcon,} from '@modrinth/assets'
 import {
-	FolderArchiveIcon,
-	FolderOpenIcon,
-	HistoryIcon,
-	SaveIcon,
-	TrashIcon,
-} from '@modrinth/assets'
-import type { Component } from 'vue'
-import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
+	type ISplitviewPanel,
+	LayoutPriority,
+	Orientation,
+	type SplitviewReadyEvent,
+	SplitviewVue,
+	themeDark
+} from 'dockview-vue'
+import type {Component} from 'vue'
+import {computed, onMounted, onUnmounted, ref, shallowRef, watch} from 'vue'
 
-import { Button, ContextMenu } from '#ui/components/base/buttons'
+import {type ButtonMenuOption, NewModal} from '#ui/components'
+import {Button, ContextMenu} from '#ui/components/base/buttons'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
-import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { useStickyObserver } from '#ui/composables/sticky-observer'
-import { useVirtualScroll } from '#ui/composables/virtual-scroll'
-import { injectFilePicker } from '#ui/providers/file-picker'
-import { injectNotificationManager } from '#ui/providers/web-notifications'
-import { commonMessages } from '#ui/utils/common-messages'
-import { canOpenInFileEditor } from '#ui/utils/file-extensions'
+import {defineMessages, useVIntl} from '#ui/composables/i18n'
+import {injectFilePicker} from '#ui/providers/file-picker'
+import {injectNotificationManager} from '#ui/providers/web-notifications'
+import {commonMessages} from '#ui/utils/common-messages'
+import {canOpenInFileEditor} from '#ui/utils/file-extensions'
 
-import FileEditor from './components/editor/FileEditor.vue'
-import FileManagerError from './components/FileManagerError.vue'
-import FileNavbar from './components/FileNavbar.vue'
-import FileTableHeader from './components/FileTableHeader.vue'
-import FileTableRow from './components/FileTableRow.vue'
+import FileBrowserPanel from './components/FileBrowserPanel.vue'
+import FileSideBar from './components/FileSideBar.vue'
 import FileCreateItemModal from './components/modals/FileCreateItemModal.vue'
 import FileCreateZipModal from './components/modals/FileCreateZipModal.vue'
 import FileDeleteItemModal from './components/modals/FileDeleteItemModal.vue'
@@ -236,13 +146,15 @@ import FileRenameItemModal from './components/modals/FileRenameItemModal.vue'
 import FileUnsavedChangesModal from './components/modals/FileUnsavedChangesModal.vue'
 import FileUploadConflictModal from './components/modals/FileUploadConflictModal.vue'
 import FileUploadZipUrlModal from './components/modals/FileUploadZipUrlModal.vue'
-import FileUploadDragAndDrop from './components/upload/FileUploadDragAndDrop.vue'
-import { useFileSearch } from './composables/file-search'
-import { useFileSelection } from './composables/file-selection'
-import { useFileSorting } from './composables/file-sorting'
-import { useFileUndoRedo } from './composables/file-undo-redo'
-import { injectFileManager } from './providers/file-manager'
-import type { FileItem } from './types'
+import {useFileSearch} from './composables/file-search'
+import {useFileSelection} from './composables/file-selection'
+import {useFileSorting} from './composables/file-sorting'
+import {useFileUndoRedo} from './composables/file-undo-redo'
+import type {FileEditorBridge} from './providers/file-browser-ui'
+import {provideFileBrowserUI} from './providers/file-browser-ui'
+import {injectFileManager} from './providers/file-manager'
+import type {FileItem} from './types'
+import {type MaybeElement, useLocalStorage, useResizeObserver} from "@vueuse/core";
 
 const { formatMessage } = useVIntl()
 
@@ -289,9 +201,10 @@ const messages = defineMessages({
 	},
 })
 
-defineProps<{
+const props = defineProps<{
 	showDebugInfo?: boolean
 	showRefreshButton?: boolean
+	constrainWidth?: boolean
 }>()
 
 const { addNotification } = injectNotificationManager()
@@ -306,14 +219,10 @@ import('vue3-ace-editor').then(async (mod) => {
 
 const baseId = `files-${Math.random().toString(36).slice(2, 9)}`
 
-const items = computed(() => ctx.items.value)
+const items = computed(() => ctx.currentItems.value)
 const isEditing = computed(() => ctx.editingFile.value !== null)
-const isBusy = computed(
-	() => (ctx.isBusy?.value ?? false) || (ctx.isReadOnly?.(ctx.currentPath.value) ?? false),
-)
-const busyTooltip = computed(() =>
-	ctx.isReadOnly?.(ctx.currentPath.value) ? ctx.readOnlyReason?.value : ctx.busyTooltip?.value,
-)
+const isBusy = computed(() => (ctx.isBusy?.value ?? false) || (ctx.isReadOnly?.(ctx.currentPath.value) ?? false),)
+const busyTooltip = computed(() => ctx.isReadOnly?.(ctx.currentPath.value) ? ctx.readOnlyReason?.value : ctx.busyTooltip?.value,)
 
 const breadcrumbSegments = computed(() => {
 	const path = ctx.currentPath.value
@@ -327,7 +236,7 @@ const breadcrumbSegments = computed(() => {
 const { searchQuery, searchedItems } = useFileSearch(items)
 const {
 	sortField,
-	sortDesc: sortDescValue,
+	sortDesc,
 	handleSort,
 	sortedItems: filteredItems,
 	resetSort,
@@ -353,25 +262,32 @@ const { recordOperation, onKeydown } = useFileUndoRedo(
 	(title, text, type) => addNotification({ title, text, type }),
 )
 
-// Virtual scroll
-const {
-	listContainer: virtualListContainer,
-	totalHeight,
-	visibleRange,
-	visibleTop,
-	visibleItems,
-} = useVirtualScroll(filteredItems, {
-	itemHeight: 61,
-	bufferSize: 5,
-})
+// Bridge to whichever panel currently hosts the file editor (FileBrowserPanel).
+// Dockview mounts that panel itself, so there's no template ref to reach it through -
+// it registers its exposed API here on mount instead. See providers/file-browser-ui.ts.
+const fileEditorApi = shallowRef<FileEditorBridge | null>(null)
 
-// Sticky observer for the table header
-const fileUploadRef = ref<InstanceType<typeof FileUploadDragAndDrop>>()
-const fileUploadEl = computed(() => fileUploadRef.value?.$el as HTMLElement | null)
-const { isStuck: isLabelBarStuck } = useStickyObserver(fileUploadEl)
+const hasUnsavedChanges = computed(() => fileEditorApi.value?.hasUnsavedChanges?.value ?? false)
+
+async function saveFileContent(exit = false) {
+	await fileEditorApi.value?.saveFileContent(exit)
+}
+
+function revertChanges() {
+	fileEditorApi.value?.revertChanges()
+}
+
+async function shareToMclogs() {
+	await fileEditorApi.value?.shareToMclogs()
+}
+
+function toggleFind() {
+	fileEditorApi.value?.toggleFind()
+}
 
 // Refs
-const fileEditorRef = ref<InstanceType<typeof FileEditor>>()
+const fileViewer = ref<MaybeElement>();
+const sidebarModal = ref<InstanceType<typeof NewModal>>();
 const createItemModal = ref<InstanceType<typeof FileCreateItemModal>>()
 const createZipModal = ref<InstanceType<typeof FileCreateZipModal>>()
 const renameItemModal = ref<InstanceType<typeof FileRenameItemModal>>()
@@ -386,14 +302,83 @@ const selectedItem = ref<FileItem | null>(null)
 
 const unsavedChangesModal = ref<InstanceType<typeof FileUnsavedChangesModal>>()
 
-const hasUnsavedChanges = computed(() => fileEditorRef.value?.hasUnsavedChanges ?? false)
+const sidebar = ref<ISplitviewPanel | null>(null);
+const browser = ref<ISplitviewPanel | null>(null);
+
+// Initialize panels dynamically once the component mounts
+function onReady({api}: SplitviewReadyEvent) {
+	console.log("Split Ready")
+
+	// Render the left panel
+	sidebar.value = api.addPanel({
+		index: 0,
+		id: 'panel_left',
+		component: 'fileSideBar',
+		minimumSize: 300, // Initial width in pixels
+		size: 300,
+		priority: LayoutPriority.Low
+	});
+
+	if (!sidebarOpen.value) sidebar.value.api.setVisible(false);
+
+	// Render the right panel
+	browser.value = api.addPanel({
+		index: 1,
+		id: 'panel_right',
+		component: 'fileBrowserPanel',
+		minimumSize: browserMinSize.value,
+		priority: LayoutPriority.High
+	});
+}
+
+const constrainWidth = computed(() => props.constrainWidth);
+const browserMinSize = computed(() => constrainWidth.value ? 700 : 1200)
+
+watch(browserMinSize, (value) => browser.value?.api?.setConstraints({ minimumSize: value }))
+
+const sidebarOpenSetting = useLocalStorage('file-layout-sidebar-open', false, { initOnMounted: true });
+const sidebarOpen = ref(sidebarOpenSetting.value);
+
+watch(sidebarOpen, (value) => {
+	if(!smallMode.value) {
+		sidebar.value?.api?.setVisible(value);
+	} else {
+		if (value) {
+			sidebarModal.value?.show()
+		} else {
+			sidebarModal.value?.hide()
+		}
+	}
+})
+
+const containerWidth = ref<number>()
+
+useResizeObserver(fileViewer, (entries) => {
+	const entry = entries[0]
+	containerWidth.value = entry.contentRect.width
+})
+
+const smallMode = computed(() => containerWidth.value == null || containerWidth.value < 1100);
+const fullWidthSidebar = computed(() => containerWidth.value == null || containerWidth.value < 400); //356
+
+let pastInitialSetup = false;
+
+watch(smallMode, (value) => {
+	if (pastInitialSetup) {
+		sidebarOpen.value = !value;
+	} else {
+		pastInitialSetup = true;
+	}
+
+	browser.value?.api?.setConstraints({ minimumSize: constrainWidth ? 700 : 1200 })
+})
 
 async function confirmDiscardChanges(): Promise<boolean> {
 	if (!hasUnsavedChanges.value) return true
 	const result = await unsavedChangesModal.value?.prompt()
 	if (result === 'save') {
 		if (isBusy.value) return false
-		await fileEditorRef.value?.saveFileContent(false)
+		await saveFileContent(false)
 		return true
 	}
 	return result === 'discard'
@@ -689,6 +674,79 @@ function handlePrefetchHome() {
 		ctx.prefetchDirectory?.('/')
 	}, 150)
 }
+
+function handleContextMenu(event: MouseEvent, options: ButtonMenuOption[]) {
+	contextMenuRef.value?.open(event, options)
+}
+
+// Shared UI state/handlers for the dockview-hosted panels (FileSideBar, FileBrowserPanel).
+// Dockview mounts those panels itself via the `components` map + `addPanel()`, so they're
+// no longer direct template children - normal prop/emit/ref bindings can't reach them. They
+// stay true descendants in the Vue tree though (dockview-vue teleports them), so provide/inject
+// still works and is what they use instead. See providers/file-browser-ui.ts.
+provideFileBrowserUI({
+	baseId,
+	showDebugInfo: computed(() => props.showDebugInfo ?? false),
+	showRefreshButton: computed(() => props.showRefreshButton ?? false),
+
+	items,
+	filteredItems,
+	isEditing,
+	isBusy,
+	busyTooltip,
+	breadcrumbSegments,
+	sidebarOpen: computed(() => sidebarOpen.value),
+	setSidebarOpen: (value) => {
+		sidebarOpen.value = value;
+		sidebarOpenSetting.value = value;
+	},
+	containerWidth,
+
+	searchQuery,
+	sortField,
+	sortDesc,
+	handleSort,
+
+	selectedItems,
+	toggleItemSelection,
+	deselectAll,
+	toggleSelectAll,
+	allSelected,
+	someSelected,
+
+	editorComponent,
+	fileEditorApi,
+	hasUnsavedChanges,
+	saveFileContent,
+	revertChanges,
+	shareToMclogs,
+	toggleFind,
+
+	navigateToSegment,
+	handleNavigateToFolder,
+	handleEditFile,
+	handleEditorClose,
+	handlePrefetchHome,
+	handleItemHover,
+
+	showCreateModal,
+	showRenameModal,
+	showMoveModal,
+	showDeleteModal,
+	showBulkDeleteModal,
+	showUnzipFromUrlModal,
+
+	handleDownload,
+	handleZip,
+	handleDirectMove,
+	handleExtractItem,
+
+	handleDroppedFiles,
+	handleDropError,
+	initiateFileUpload,
+
+	handleContextMenu,
+})
 
 // Reset search/sort/selection on path change
 watch(

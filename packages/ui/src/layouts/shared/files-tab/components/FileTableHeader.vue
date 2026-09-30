@@ -5,7 +5,7 @@
 		:class="
 			isStuck
 				? 'rounded-none border-0 border-y border-solid border-surface-4 shadow-md before:pointer-events-none before:absolute before:inset-x-0 before:-top-4 before:h-5 before:bg-surface-3'
-				: 'rounded-t-[20px]'
+				: ''
 		"
 	>
 		<div class="flex flex-1 items-center gap-3">
@@ -32,9 +32,9 @@
 				/>
 			</button>
 		</div>
-		<div class="flex shrink-0 items-center gap-4 @[800px]:gap-12">
-			<button
-				class="hidden w-[100px] appearance-none items-center justify-start gap-1 border-0 bg-transparent p-0 font-semibold hover:text-primary @[800px]:flex"
+		<div class="flex shrink-0 items-center gap-4 @[900px]:gap-12">
+			<button v-if="showDetails"
+							class="hidden w-[100px] appearance-none items-center justify-start gap-1 border-0 bg-transparent p-0 font-semibold hover:text-primary @[900px]:flex"
 				:class="sortField === 'size' ? 'text-contrast' : 'text-secondary'"
 				@click="$emit('sort', 'size')"
 			>
@@ -50,8 +50,8 @@
 					aria-hidden="true"
 				/>
 			</button>
-			<button
-				class="hidden w-[160px] appearance-none items-center justify-start gap-1 border-0 bg-transparent p-0 font-semibold hover:text-primary @[800px]:flex"
+			<button v-if="showDetails"
+							class="hidden w-[160px] appearance-none items-center justify-start gap-1 border-0 bg-transparent p-0 font-semibold hover:text-primary @[900px]:flex"
 				:class="sortField === 'created' ? 'text-contrast' : 'text-secondary'"
 				@click="$emit('sort', 'created')"
 			>
@@ -67,8 +67,8 @@
 					aria-hidden="true"
 				/>
 			</button>
-			<button
-				class="hidden w-[160px] appearance-none items-center justify-start gap-1 border-0 bg-transparent p-0 font-semibold hover:text-primary @[800px]:flex"
+			<button v-if="showDetails"
+							class="hidden w-[160px] appearance-none items-center justify-start gap-1 border-0 bg-transparent p-0 font-semibold hover:text-primary @[900px]:flex"
 				:class="sortField === 'modified' ? 'text-contrast' : 'text-secondary'"
 				@click="$emit('sort', 'modified')"
 			>
@@ -127,6 +127,7 @@ defineProps<{
 	allSelected: boolean
 	someSelected: boolean
 	isStuck: boolean
+	showDetails: boolean
 }>()
 
 defineEmits<{

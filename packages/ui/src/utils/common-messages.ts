@@ -506,6 +506,10 @@ export const commonMessages = defineMessages({
 		id: 'label.select-all',
 		defaultMessage: 'Select all',
 	},
+	selectEntryLabel: {
+		id: 'label.select-entry',
+		defaultMessage: 'Select Entry',
+	},
 	selectionActionsLabel: {
 		id: 'label.selection-actions',
 		defaultMessage: 'Selection actions',
