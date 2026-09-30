@@ -8,6 +8,7 @@ use crate::state::instances::{
     ContentEntry, ContentSet, ContentSourceKind, Instance,
     InstanceInstallCandidate, InstanceInstallTarget, InstanceLink,
 };
+use crate::state::content_store::file_path_on_disk;
 use crate::state::{
     CacheBehaviour, CachedEntry, CachedFile, ContentFile, ContentItem,
     ContentItemOwner, ContentItemProject, ContentItemVersion, Dependency,
@@ -993,9 +994,11 @@ async fn content_files_to_content_items(
         .await?;
     let instance_path = state.directories.instances_dir().join(&instance.path);
     let paths = files
-        .iter()
-        .map(|(path, _)| instance_path.join(path))
-        .collect::<Vec<_>>();
+    	.iter()
+    	.map(|(path, file)| {
+        	instance_path.join(file_path_on_disk(path, file.enabled))
+    	})
+    	.collect::<Vec<_>>();
     let modification_times: Vec<Option<String>> =
         tokio::task::spawn_blocking(move || {
             paths
