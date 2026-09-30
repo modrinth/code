@@ -36,6 +36,7 @@ pub(super) async fn shared_instance_update_diffs(
         &before,
         &after,
         &HashSet::new(),
+		&HashSet::new(),
         &BTreeSet::new(),
         CommonExternalFilePolicy::AssumeUpdated,
         state,
@@ -53,22 +54,8 @@ pub(super) async fn shared_instance_publish_diffs(
     let after_configuration = local_configuration(metadata);
     let modpack_unlinked = before_configuration.modpack_version_id.is_some()
         && after_configuration.modpack_version_id.is_none();
-    let disabled_versions = async {
-        if snapshot.disabled_version_ids.is_empty() {
-            Ok(HashMap::new())
-        } else {
-            shared_versions_by_project(
-                &snapshot.disabled_version_ids,
-                true,
-                state,
-            )
-            .await
-        }
-    };
-    let ((version_ids, external_files), disabled_versions) = tokio::try_join!(
-        remote_publish_content(version, modpack_unlinked, state),
-        disabled_versions,
-    )?;
+	let (version_ids, external_files) =
+		remote_publish_content(version, modpack_unlinked, state).await?;
     let before = SharedContentSnapshot {
         version_ids,
         external_files,
@@ -93,14 +80,11 @@ pub(super) async fn shared_instance_publish_diffs(
             .collect::<crate::Result<_>>()?,
         configuration: after_configuration,
     };
-    let mut removed_disabled_project_ids =
-        snapshot.disabled_project_ids.clone();
-    removed_disabled_project_ids.extend(disabled_versions.into_keys());
-
     shared_content_diffs(
         &before,
         &after,
-        &removed_disabled_project_ids,
+		&snapshot.disabled_project_ids,
+		&snapshot.disabled_version_ids.iter().cloned().collect(),
         &snapshot.disabled_external_files,
         CommonExternalFilePolicy::AssumeUnchanged,
         state,
@@ -295,30 +279,24 @@ async fn shared_content_diffs(
     before: &SharedContentSnapshot,
     after: &SharedContentSnapshot,
     removed_disabled_project_ids: &HashSet<String>,
+    removed_disabled_version_ids: &HashSet<String>,
     removed_disabled_external_files: &BTreeSet<ExternalFileKey>,
     common_external_files: CommonExternalFilePolicy,
     state: &State,
 ) -> crate::Result<Vec<SharedInstanceUpdateDiff>> {
     let (before_versions, after_versions) = tokio::try_join!(
-        shared_versions_by_project(&before.version_ids, true, state),
-        shared_versions_by_project(&after.version_ids, false, state),
+        shared_versions_by_id(&before.version_ids, true, state),
+        shared_versions_by_id(&after.version_ids, false, state),
     )?;
-    let to_snapshot =
-        |source: &SharedContentSnapshot,
-         versions: &HashMap<String, crate::state::Version>| {
-            ContentSetSnapshot {
-                projects: versions
-                    .iter()
-                    .map(|(project_id, version)| {
-                        (project_id.clone(), version.id.clone())
-                    })
-                    .collect(),
-                external_files: source.external_files.clone(),
-            }
-        };
-    let diff = diff_content_sets(
-        &to_snapshot(before, &before_versions),
-        &to_snapshot(after, &after_versions),
+    let mut diff = diff_content_sets(
+        &ContentSetSnapshot {
+            projects: Default::default(),
+            external_files: before.external_files.clone(),
+        },
+        &ContentSetSnapshot {
+            projects: Default::default(),
+            external_files: after.external_files.clone(),
+        },
         &ContentSetDiffOptions {
             common_external_files,
         },
@@ -327,6 +305,52 @@ async fn shared_content_diffs(
         &before.configuration,
         &after.configuration,
     ));
+    let project_ids = before_versions
+        .values()
+        .chain(after_versions.values())
+        .map(|version| version.project_id.clone())
+        .collect::<BTreeSet<_>>();
+    for project_id in project_ids {
+        let removed = before_versions
+            .values()
+            .filter(|version| {
+                version.project_id == project_id
+                    && !after_versions.contains_key(&version.id)
+            })
+            .map(|version| version.id.clone())
+            .collect::<BTreeSet<_>>();
+        let added = after_versions
+            .values()
+            .filter(|version| {
+                version.project_id == project_id
+                    && !before_versions.contains_key(&version.id)
+            })
+            .map(|version| version.id.clone())
+            .collect::<BTreeSet<_>>();
+        // Only pair an unambiguous replacement; preserve every other version change.
+        if removed.len() == 1 && added.len() == 1 {
+            diff.content.push(ContentSetDiffEntry::Project {
+                project_id,
+                change: Change::Updated {
+                    before: removed.into_iter().next().unwrap(),
+                    after: added.into_iter().next().unwrap(),
+                },
+            });
+        } else {
+            for before in removed {
+                diff.content.push(ContentSetDiffEntry::Project {
+                    project_id: project_id.clone(),
+                    change: Change::Removed { before },
+                });
+            }
+            for after in added {
+                diff.content.push(ContentSetDiffEntry::Project {
+                    project_id: project_id.clone(),
+                    change: Change::Added { after },
+                });
+            }
+        }
+    }
     let resolved_before_ids = before_versions
         .values()
         .map(|version| version.id.as_str())
@@ -367,7 +391,10 @@ async fn shared_content_diffs(
         match entry {
             ContentSetDiffEntry::Project { project_id, change } => {
                 let disabled = change.kind() == ContentSetDiffKind::Removed
-                    && removed_disabled_project_ids.contains(&project_id);
+                    && (removed_disabled_project_ids.contains(&project_id)
+                        || change.before().is_some_and(|id| {
+                            removed_disabled_version_ids.contains(id)
+                        }));
                 content_diffs.push(SharedInstanceUpdateDiff {
                     type_: shared_update_diff_type(change.kind()),
                     project_name: Some(
@@ -378,13 +405,13 @@ async fn shared_content_diffs(
                     ),
                     current_version_name: change.before().map(|id| {
                         before_versions
-                            .get(&project_id)
+                            .get(id)
                             .map(|version| version.version_number.clone())
                             .unwrap_or_else(|| id.clone())
                     }),
                     new_version_name: change.after().map(|id| {
                         after_versions
-                            .get(&project_id)
+                            .get(id)
                             .map(|version| version.version_number.clone())
                             .unwrap_or_else(|| id.clone())
                     }),
