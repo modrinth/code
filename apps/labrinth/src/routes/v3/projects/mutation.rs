@@ -3,13 +3,15 @@ use xredis::RedisPool;
 
 use crate::database::models::project_item::ProjectQueryResult;
 use crate::database::models::{
-    DBProjectId, DBTeamId, DBThreadIssue, DBUserId, DBVersionId,
+    DBProjectId, DBTeamId, DBThreadIssue, DBThreadIssueId, DBUserId,
+    DBVersionId,
 };
 use crate::database::{PgTransaction, models as db_models};
 use crate::models::ids::ProjectId;
 use crate::models::projects::{Project, ProjectStatus, Version};
 use crate::models::thread_issues::{
-    ThreadIssueContext, ThreadIssueTeamMember, ThreadIssueVerdict,
+    ThreadIssueContext, ThreadIssueTarget, ThreadIssueTeamMember,
+    ThreadIssueValueState, ThreadIssueVerdict,
 };
 use crate::models::users::User;
 use crate::routes::ApiError;
@@ -19,14 +21,41 @@ use crate::validate::project::{
     ProjectNagSeverity, validate_with_context as validate_project,
 };
 
-struct SyncedProjectState {
+pub(crate) struct SyncedProjectState {
     data: ProjectQueryResult,
     project: Project,
+    versions: Vec<Version>,
+    disclosures: Vec<crate::models::disclosures::ProjectDisclosure>,
+    team_members: Vec<ThreadIssueTeamMember>,
     thread_issues: Vec<DBThreadIssue>,
     has_required_nags: bool,
 }
 
-async fn sync_project_state(
+impl SyncedProjectState {
+    pub(crate) fn can_address_issue(
+        &self,
+        issue_id: DBThreadIssueId,
+    ) -> Option<bool> {
+        let context = ThreadIssueContext {
+            project: &self.project,
+            versions: &self.versions,
+            disclosures: &self.disclosures,
+            team_members: &self.team_members,
+        };
+        self.thread_issues
+            .iter()
+            .find(|issue| issue.id == issue_id)
+            .map(|issue| {
+                issue.facets.iter().all(|facet| {
+                    matches!(&facet.what, ThreadIssueTarget::Acknowledge { .. })
+                        || facet.what.value_state(&context, false)
+                            != ThreadIssueValueState::SameAsOriginal
+                })
+            })
+    }
+}
+
+pub(crate) async fn sync_project_state(
     project_id: DBProjectId,
     transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
@@ -136,6 +165,9 @@ async fn sync_project_state(
     Ok(SyncedProjectState {
         data,
         project,
+        versions,
+        disclosures,
+        team_members,
         thread_issues,
         has_required_nags,
     })

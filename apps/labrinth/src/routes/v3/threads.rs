@@ -670,6 +670,22 @@ pub async fn thread_issue_edit(
             "only project team members or moderators can address thread issues"
         )));
     }
+    if edit.user_addressed == Some(true) && !user.role.is_mod() {
+        let state = super::projects::mutation::sync_project_state(
+            project_id,
+            &mut transaction,
+            &redis,
+        )
+        .await?;
+        if !state
+            .can_address_issue(issue_id)
+            .wrap_not_found_err("resource not found")?
+        {
+            return Err(ApiError::Request(eyre::eyre!(
+                "moderation issue requirements must be changed before addressing the issue"
+            )));
+        }
+    }
     let updated = database::models::DBThreadIssue::update_flags(
         issue_id,
         edit.user_addressed,
