@@ -1165,16 +1165,13 @@ async fn install_shared_instance_external_file(
     let bytes = bytes::Bytes::from(bytes);
 
     if file.file_type == CONFIG_FILE_TYPE {
-        let path = crate::api::instance::validate_instance_file_write(
+        return crate::api::instance::write_instance_file(
             instance_id,
             &file.file_name,
+            &bytes,
+            false,
         )
-        .await?;
-        if let Some(parent) = path.parent() {
-            crate::util::io::create_dir_all(parent).await?;
-        }
-        crate::util::io::write(path, bytes).await?;
-        return Ok(());
+        .await;
     }
 
     if file.file_type == CONFIG_BUNDLE_FILE_TYPE {

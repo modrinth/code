@@ -4,7 +4,6 @@ import { computed, onScopeDispose, ref, watch } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
 
-import { fetchEmbeddedIcon } from '../composables/embedded-icon'
 import type { ContentCardEmbeddedIcon } from '../types'
 
 const props = defineProps<{
@@ -23,7 +22,7 @@ const embeddedIconQuery = useQuery({
 	queryKey,
 	queryFn: () => {
 		if (!props.embeddedIcon) throw new Error('Missing embedded icon request')
-		return fetchEmbeddedIcon(props.embeddedIcon.queryFn)
+		return props.embeddedIcon.queryFn()
 	},
 	enabled: computed(
 		() => typeof window !== 'undefined' && !props.src && props.embeddedIcon !== undefined,

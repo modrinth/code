@@ -197,13 +197,9 @@ pub(super) async fn shared_instance_install_modpack(
     )
     .await?;
 
-    let dependency_count = shared_modpack_files(&modpack_version.id, state)
-        .await?
-        .len();
     Ok(Some(crate::install::SharedInstanceInstallModpack {
         project_id: modpack_version.project_id,
         version_id: modpack_version.id,
-        dependency_count,
         title: project
             .as_ref()
             .map(|project| project.title.clone())
