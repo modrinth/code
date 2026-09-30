@@ -40,10 +40,6 @@
 				</div>
 			</div>
 		</div>
-		<AccountLockedBanner
-			v-if="flags.showAllBanners || auth.user?.lock"
-			:reason="auth.user?.lock?.reason ?? ''"
-		/>
 		<RussiaBanner v-if="flags.showAllBanners || isRussia" />
 		<TaxIdMismatchBanner v-if="flags.showAllBanners || showTinMismatchBanner" />
 		<TaxComplianceBanner v-if="flags.showAllBanners || showTaxComplianceBanner" />
@@ -893,7 +889,6 @@ import { useQuery } from '@tanstack/vue-query'
 import { getTaxThreshold } from '@/providers/creator-withdraw.ts'
 import TextLogo from '~/components/brand/TextLogo.vue'
 import BatchCreditModal from '~/components/ui/admin/BatchCreditModal.vue'
-import AccountLockedBanner from '~/components/ui/banner/AccountLockedBanner.vue'
 import GeneratedStateErrorsBanner from '~/components/ui/banner/GeneratedStateErrorsBanner.vue'
 import PreviewBanner from '~/components/ui/banner/PreviewBanner.vue'
 import RussiaBanner from '~/components/ui/banner/RussiaBanner.vue'
