@@ -10,6 +10,7 @@ use chrono::{DateTime, Utc};
 use eyre::{Result, WrapErr, eyre};
 use serde::{Deserialize, Serialize};
 use sqlx::types::Json;
+use std::collections::HashSet;
 
 pub struct ThreadIssueBuilder {
     pub facets: Vec<ThreadIssueTarget>,
@@ -277,16 +278,38 @@ impl DBThreadIssue {
             "locking project thread issues for verdict synchronization",
         )?;
 
+        let reset_issue_ids = rows
+            .iter()
+            .filter(|row| {
+                row.user_addressed
+                    && row.what.0.verdict(
+                        context,
+                        row.user_addressed,
+                        row.moderator_verified,
+                    ) == ThreadIssueVerdict::Open
+            })
+            .map(|row| row.id)
+            .collect::<HashSet<_>>();
+        for issue_id in &reset_issue_ids {
+            Self::update_flags(
+                DBThreadIssueId(*issue_id),
+                Some(false),
+                None,
+                transaction,
+            )
+            .await
+            .wrap_err("resetting open thread issue addressed state")?;
+        }
+
         let mut issues = Vec::<Self>::new();
         for row in rows {
             let stored_verdict =
                 parse_verdict(row.id, row.facet_id, &row.verdict)?;
             let what = row.what.0;
-            let verdict = what.verdict(
-                context,
-                row.user_addressed,
-                row.moderator_verified,
-            );
+            let user_addressed =
+                row.user_addressed && !reset_issue_ids.contains(&row.id);
+            let verdict =
+                what.verdict(context, user_addressed, row.moderator_verified);
 
             if verdict != stored_verdict {
                 sqlx::query!(
@@ -309,7 +332,7 @@ impl DBThreadIssue {
                     thread_id: DBThreadId(row.thread_id),
                     created_by: DBUserId(row.created_by),
                     why: row.why,
-                    user_addressed: row.user_addressed,
+                    user_addressed,
                     moderator_verified: row.moderator_verified,
                     facets: Vec::new(),
                     verdict: ThreadIssueVerdict::Open,
