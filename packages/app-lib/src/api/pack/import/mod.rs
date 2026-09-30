@@ -628,39 +628,35 @@ pub(crate) async fn finish_import(
     Ok(())
 }
 
-/// Recursively get a list of all subfiles in src
-/// uses async recursion
-
-#[async_recursion::async_recursion]
+/// Lists descendant files without following symlinks or recursing on the stack.
 #[tracing::instrument]
 pub async fn get_all_subfiles(
-    src: &Path,
-    include_empty_dirs: bool,
+	src: &Path,
+	include_empty_dirs: bool,
 ) -> crate::Result<Vec<PathBuf>> {
-    let metadata = tokio::fs::symlink_metadata(src).await?;
-    if !metadata.is_dir() || metadata.file_type().is_symlink() {
-        return Ok(vec![src.to_path_buf()]);
-    }
+	let mut files = Vec::new();
+	let mut pending = vec![src.to_path_buf()];
+	while let Some(path) = pending.pop() {
+		let metadata = tokio::fs::symlink_metadata(&path).await?;
+		if !metadata.is_dir() || metadata.file_type().is_symlink() {
+			files.push(path);
+			continue;
+		}
 
-    let mut files = Vec::new();
-    let mut dir = io::read_dir(&src).await?;
+		let mut dir = io::read_dir(&path).await?;
+		let children_start = pending.len();
+		while let Some(child) = dir
+			.next_entry()
+			.await
+			.map_err(|error| IOError::with_path(error, &path))?
+		{
+			pending.push(child.path());
+		}
+		if pending.len() == children_start && include_empty_dirs {
+			files.push(path);
+		}
+		pending[children_start..].reverse();
+	}
 
-    let mut has_files = false;
-    while let Some(child) = dir
-        .next_entry()
-        .await
-        .map_err(|e| IOError::with_path(e, src))?
-    {
-        has_files = true;
-        let src_child = child.path();
-        files.append(
-            &mut get_all_subfiles(&src_child, include_empty_dirs).await?,
-        );
-    }
-
-    if !has_files && include_empty_dirs {
-        files.push(src.to_path_buf());
-    }
-
-    Ok(files)
+	Ok(files)
 }

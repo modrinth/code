@@ -15,6 +15,33 @@ use std::time::SystemTime;
 
 const INSTALL_SUPPORT_LOG_TAIL_BYTES: u64 = 128 * 1024;
 
+/// Constructs large futures outside the caller's polling frame.
+#[inline(never)]
+pub(super) fn install_step<T, F: std::future::Future<Output = crate::Result<T>>>(
+	job_id: uuid::Uuid,
+	step: &'static str,
+	create: impl FnOnce() -> F,
+) -> impl std::future::Future<Output = crate::Result<T>> {
+	tracing::debug!(
+		%job_id,
+		step,
+		future_size_bytes = std::mem::size_of::<F>(),
+		"Preparing install step future"
+	);
+	let future = Box::pin(create());
+	async move {
+		tracing::info!(%job_id, step, "Starting install step");
+		let result = future.await;
+		tracing::info!(
+			%job_id,
+			step,
+			succeeded = result.is_ok(),
+			"Finished install step"
+		);
+		result
+	}
+}
+
 pub async fn build_job_support_details(
     job: &store::InstallJobRecord,
     state: &State,
