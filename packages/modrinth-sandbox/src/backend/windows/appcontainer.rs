@@ -40,49 +40,12 @@ impl SandboxEnv for AppContainerEnv {
         &self,
         command: SandboxCommand,
     ) -> Result<crate::SandboxChild> {
-        let this = self.clone();
-        send_spawn(this, command).await?
+        let env = self.clone();
+        let child = tokio::task::spawn_blocking(move || spawn(&env, command))
+            .await
+            .wrap_err("spawn task dropped")??;
+        Ok(child)
     }
-}
-
-struct SpawnInfo {
-    env: AppContainerEnv,
-    command: SandboxCommand,
-    sender: tokio::sync::oneshot::Sender<eyre::Result<crate::SandboxChild>>
-}
-
-// probably not needed, just added to be as close to pandora as possible
-fn send_spawn(env: AppContainerEnv, command: SandboxCommand) -> tokio::sync::oneshot::Receiver<eyre::Result<crate::SandboxChild>> {
-    let (sender, receiver) = tokio::sync::oneshot::channel();
-
-    static SPAWNING_CHANNEL: OnceLock<std::sync::mpsc::Sender<SpawnInfo>> = OnceLock::new();
-    let channel = SPAWNING_CHANNEL.get_or_init(|| {
-        let (send, recv) = std::sync::mpsc::channel::<SpawnInfo>();
-
-        std::thread::Builder::new()
-            .name("Modrinth Command Spawner".to_string())
-            .stack_size(128 * 1024)
-            .spawn(|| {
-                // Initialize COM on this thread. In my testing this wasn't needed, but it shouldn't hurt
-                #[cfg(windows)]
-                unsafe {
-                    _ = windows::Win32::System::Com::CoInitializeEx(
-                        None,
-                        windows::Win32::System::Com::COINIT_APARTMENTTHREADED |  windows::Win32::System::Com::COINIT_DISABLE_OLE1DDE,
-                    );
-                }
-
-                for info in recv {
-                    _ = info.sender.send(spawn(&info.env, info.command));
-                }
-            })
-            .unwrap();
-
-        send
-    });
-    channel.send(SpawnInfo { env, command, sender }).unwrap();
-
-    receiver
 }
 
 fn spawn(env: &AppContainerEnv, mut command: SandboxCommand) -> Result<crate::SandboxChild> {
@@ -243,29 +206,33 @@ fn spawn(env: &AppContainerEnv, mut command: SandboxCommand) -> Result<crate::Sa
         false
     });
 
+    let mut need_set_network_isolation_elevated = false;
+    if command.network {
+        if let Err(err) = try_set_network_isolation(&app_container_sid) {
+            let raw_access_denied = err.raw_os_error().unwrap_or(0) == HRESULT::from_win32(ERROR_ACCESS_DENIED.0).0;
+            if err.kind() == ErrorKind::PermissionDenied || raw_access_denied {
+                tracing::warn!("Lacking permission to allow localhost access... will need to elevate");
+                need_set_network_isolation_elevated = true;
+            }
+        }
+    }
 
-    if !parents.is_empty() {
-        // let Some(self_elevate_for_acl_arg) = sandbox.self_elevate_for_acl_arg else {
-        //     return Err(eyre!("unable to do elevated acl modification because self_elevate_for_acl_arg wasn't set"));
-        // };
+    if !parents.is_empty() || need_set_network_isolation_elevated {
+        let mut stringsid = PWSTR::default();
+        unsafe { ConvertSidToStringSidW(app_container_sid, &mut stringsid)? };
+        assert!(!stringsid.is_null());
+        let app_container_osstring = OsString::from_wide(unsafe { stringsid.as_wide() });
 
-        // let mut stringsid = PWSTR::default();
-        // unsafe { ConvertSidToStringSidW(app_container_sid, &mut stringsid)? };
-        // assert!(!stringsid.is_null());
-        // let app_container_osstring = OsString::from_wide(unsafe { stringsid.as_wide() });
+        let mut arguments: Vec<SandboxArg> = Vec::new();
+        arguments.push("--modrinth-sandbox-callback".into());
+        arguments.push(app_container_osstring.into());
+        arguments.push(if need_set_network_isolation_elevated { "true".into() } else { "false".into() });
+        arguments.push(std::env::join_paths(parents)?.into());
 
-        // let mut command = PandoraCommand::new(std::env::current_exe()?);
-        // command.arg(self_elevate_for_acl_arg);
-        // command.arg(app_container_osstring);
-
-        // for path in parents {
-        //     command.arg(path);
-        // }
-
-        // tracing::info!("Spawning elevated self to modify acl");
-        // let elevated = crate::windows::runas::spawn(command, context)?;
-        // let elevated_status = elevated.process.wait()?;
-        // tracing::info!("Done spawning elevated self to modify acl: {elevated_status}");
+        tracing::info!("Spawning elevated self to modify acl");
+        let elevated = super::runas::spawn(std::env::current_exe()?, arguments)?;
+        let elevated_status = elevated.process.wait()?;
+        tracing::info!("Done spawning elevated self to modify acl: {elevated_status}");
     }
 
     _ = add_to_acl(&app_container_sid, &command.executable, PermissionType::Read);
@@ -337,6 +304,48 @@ fn create_app_container(name: &OsStr, description: &OsStr) -> windows::core::Res
     }
 
     result
+}
+
+fn try_set_network_isolation(app_container: &PSID) -> std::io::Result<()> {
+    let mut current_count: u32 = 0;
+    let mut current_containers: *mut SID_AND_ATTRIBUTES = std::ptr::null_mut();
+
+    let result = unsafe { NetworkIsolationGetAppContainerConfig(&mut current_count, &mut current_containers) };
+    scopeguard::defer! {
+        // https://learn.microsoft.com/en-us/windows/win32/api/netfw/nf-netfw-networkisolationgetappcontainerconfig
+        for index in 0..current_count {
+            HeapFree(GetProcessHeap(), 0, unsafe { current_containers.offset(index as isize).read() }.Sid);
+        }
+        if !current_containers.is_null() {
+            HeapFree(GetProcessHeap(), 0, current_containers);
+        }
+    }
+
+    if result != ERROR_SUCCESS {
+        return Err(windows::core::Error::from_hresult(HRESULT::from_win32(result.0)).into());
+    }
+
+    let mut new_containers = Vec::with_capacity(current_count + 1);
+    for index in 0..current_count {
+        let sid_and_attributes = unsafe { current_containers.offset(index as isize).read() };
+        if EqualSid(sid_and_attributes.Sid, *app_container) != 0 {
+            // Already allowed
+            return Ok(());
+        }
+
+        new_containers.push(sid);
+    }
+    new_containers.push(SID_AND_ATTRIBUTES {
+        Sid: *app_container,
+        Attributes: 0,
+    });
+
+    let result = unsafe { NetworkIsolationSetAppContainerConfig(new_containers.len(), new_containers.as_ptr()) };
+    if result != ERROR_SUCCESS {
+        return Err(windows::core::Error::from_hresult(HRESULT::from_win32(result.0)).into());
+    }
+
+    Ok(())
 }
 
 enum PermissionType {
@@ -444,7 +453,7 @@ fn add_to_acl(app_container: &PSID, path: &Path, perms: PermissionType) -> std::
         PermissionType::Read => (FILE_GENERIC_READ | FILE_TRAVERSE | FILE_GENERIC_EXECUTE).0,
     };
     ea.grfInheritance = if matches!(perms, PermissionType::TraverseNoInherit) {
-        NO_INHERITANCE//CONTAINER_INHERIT_ACE
+        NO_INHERITANCE
     } else {
         OBJECT_INHERIT_ACE | CONTAINER_INHERIT_ACE
     };
@@ -590,34 +599,44 @@ fn acl_eq(first: *const ACL, second: *const ACL) -> std::io::Result<bool> {
     Ok(true)
 }
 
-pub fn set_traverse_acls(args: Vec<OsString>) -> std::io::Result<()> {
-    if args.is_empty() {
-        return Err(Error::new(ErrorKind::InvalidInput, "missing sid"));
+pub fn try_handle_callback() -> eyre::Result<bool> {
+    let args = std::env::args_os();
+    if args.len() < 2 {
+        return Ok(false);
+    }
+    if args[1] != OsStr::new("--modrinth-sandbox-callback") {
+        return Ok(false);
+    }
+    if args.len() < 5 {
+        return Err(eyre!("expected 5 arguments for --modrinth-sandbox-callback"));
     }
 
-    let stringsid = args[0].as_os_str().encode_wide()
+    let stringsid = args[2].as_os_str().encode_wide()
         .chain([0])
         .collect::<Vec<_>>();
 
     let mut psid = PSID::default();
     unsafe { ConvertStringSidToSidW(PCWSTR(stringsid.as_ptr()), &mut psid)? };
     if psid.is_invalid() {
-        return Err(Error::new(ErrorKind::Other, "ConvertStringSidToSidW returned invalid sid"));
+        return Err(eyre!("ConvertStringSidToSidW returned invalid sid"));
     }
 
-    let mut first_error = None;
-    for arg in &args[1..] {
-        let path = Path::new(arg);
+    let need_set_network_isolation_elevated = args[3] == OsStr::new("true");
+    let traverse_paths = std::env::split_paths(args[4]);
+
+    if need_set_network_isolation_elevated {
+        try_set_network_isolation(&psid)?;
+    }
+
+    let mut result = Ok(true);
+
+    for path in traverse_paths {
         if let Err(err) = add_to_acl(&psid, &path, PermissionType::TraverseNoInherit) {
-            if first_error.is_none() {
-                first_error = Some(err);
+            if result.is_ok() {
+                result = Err(err);
             }
         }
     }
 
-    if let Some(err) = first_error {
-        return Err(err);
-    }
-
-    Ok(())
+    result
 }

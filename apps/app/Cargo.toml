@@ -17,6 +17,7 @@ enumset = { workspace = true, features = ["serde"] }
 hyper = { workspace = true, features = ["server"] }
 hyper-util = { workspace = true }
 image = { workspace = true, features = ["gif", "jpeg", "png", "webp"] }
+modrinth-sandbox = { workspace = true }
 native-dialog = { workspace = true }
 paste = { workspace = true }
 path-util = { workspace = true }

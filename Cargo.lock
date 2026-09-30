@@ -12483,6 +12483,7 @@ dependencies = [
  "hyper 1.7.0",
  "hyper-util",
  "image",
+ "modrinth-sandbox",
  "native-dialog",
  "objc2-app-kit",
  "paste",

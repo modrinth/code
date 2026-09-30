@@ -59,6 +59,20 @@ pub async fn create_env() -> Result<SandboxEnv> {
     })
 }
 
+pub fn try_handle_callback() {
+    #[cfg(windows)]
+    match crate::backend::windows::appcontainer::try_handle_callback() {
+        Ok(true) => {
+            std::process::exit(0);
+        },
+        Ok(false) => {},
+        Err(err) => {
+            eprintln!("Error handling modrinth callback: {err:?}");
+            std::process::exit(1);
+        }
+    }
+}
+
 /// Allows spawning processes in a sandboxed environment, configured by
 /// [`SandboxCommand`].
 ///

@@ -76,7 +76,6 @@ pub(crate) fn spawn(
         .encode_wide()
         .chain([0])
         .collect::<Vec<_>>();
-    dbg!(&arguments, join_windows_shell_arg(arguments.as_slice()));
     let mut command_line = join_windows_shell_arg(arguments.as_slice())
         .encode_wide()
         .chain([0])
