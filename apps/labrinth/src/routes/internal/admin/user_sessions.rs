@@ -18,11 +18,11 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 
 /// Revokes all sessions and personal access tokens of a user, signing them out everywhere.
 #[utoipa::path(
-	context_path = "/moderation/user-sessions",
+	context_path = "/admin/user",
 	tag = "moderation",
 	responses((status = NO_CONTENT))
 )]
-#[delete("/{id}")]
+#[delete("/{id}/sessions")]
 pub async fn revoke_user_sessions(
     req: HttpRequest,
     path: web::Path<(String,)>,

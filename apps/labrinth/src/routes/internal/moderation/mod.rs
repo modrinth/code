@@ -30,7 +30,6 @@ use xredis::RedisPool;
 pub mod external_license;
 mod ownership;
 pub mod tech_review;
-pub mod user_sessions;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(get_projects)
@@ -50,8 +49,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(web::scope("/tech-review").configure(tech_review::config))
         .service(
             web::scope("/external-license").configure(external_license::config),
-        )
-        .service(web::scope("/user-sessions").configure(user_sessions::config));
+        );
 }
 
 #[derive(Deserialize, utoipa::ToSchema)]
