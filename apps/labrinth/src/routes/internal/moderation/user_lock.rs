@@ -40,7 +40,7 @@ pub async fn lock_user(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<(), ApiError> {
-    let admin = get_user_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -51,7 +51,7 @@ pub async fn lock_user(
     .wrap_auth_err("authenticating API request")?
     .1;
 
-    if admin.role != Role::Admin {
+    if !user.role.is_admin() {
         return Err(ApiError::Auth(eyre!("only admins can lock users")));
     }
 
@@ -69,7 +69,7 @@ pub async fn lock_user(
         return Err(ApiError::Auth(eyre!("cannot lock a staff account")));
     }
 
-    DBUserLock::upsert(target.id, admin.id.into(), reason, &**pool)
+    DBUserLock::upsert(target.id, user.id.into(), reason, &**pool)
         .await
         .wrap_internal_err("locking user")?;
 
@@ -94,7 +94,7 @@ pub async fn unlock_user(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<(), ApiError> {
-    let admin = get_user_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -105,7 +105,7 @@ pub async fn unlock_user(
     .wrap_auth_err("authenticating API request")?
     .1;
 
-    if admin.role != Role::Admin {
+    if !user.role.is_admin() {
         return Err(ApiError::Auth(eyre!("only admins can unlock users")));
     }
 
