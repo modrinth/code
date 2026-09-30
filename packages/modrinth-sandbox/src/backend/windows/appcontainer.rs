@@ -345,7 +345,7 @@ fn spawn(env: &AppContainerEnv, mut command: SandboxCommand) -> Result<crate::Sa
         arguments.push(std::env::join_paths(parents)?.into());
 
         tracing::info!("Spawning elevated self to modify acl");
-        let elevated = super::runas::spawn(std::env::current_exe()?, arguments)?;
+        let mut elevated = super::runas::spawn(std::env::current_exe()?, arguments)?;
         let elevated_status = elevated.blocking_wait()?;
         tracing::info!("Done spawning elevated self to modify acl: {elevated_status}");
     }
@@ -450,13 +450,14 @@ fn try_set_network_isolation(app_container: &PSID) -> std::io::Result<()> {
     let result = unsafe { NetworkIsolationGetAppContainerConfig(&mut current_count, &mut current_containers) };
     scopeguard::defer! {
         // https://learn.microsoft.com/en-us/windows/win32/api/netfw/nf-netfw-networkisolationgetappcontainerconfig
-        let process_heap = unsafe { GetProcessHeap() };
-        if let Ok(process_heap) = process_heap {
-            for index in 0..current_count {
-                HeapFree(process_heap, HEAP_FLAGS(0), Some(unsafe { current_containers.offset(index as isize).read() }.Sid.0));
-            }
-            if !current_containers.is_null() {
-                HeapFree(process_heap, HEAP_FLAGS(0), Some(current_containers as *mut _));
+        unsafe {
+            if let Ok(process_heap) = GetProcessHeap() {
+                for index in 0..current_count {
+                    HeapFree(process_heap, HEAP_FLAGS(0), Some(current_containers.offset(index as isize).read().Sid.0));
+                }
+                if !current_containers.is_null() {
+                    HeapFree(process_heap, HEAP_FLAGS(0), Some(current_containers as *mut _));
+                }
             }
         }
     }
@@ -468,7 +469,8 @@ fn try_set_network_isolation(app_container: &PSID) -> std::io::Result<()> {
     let mut new_containers = Vec::with_capacity(current_count as usize + 1);
     for index in 0..current_count {
         let sid_and_attributes = unsafe { current_containers.offset(index as isize).read() };
-        if EqualSid(sid_and_attributes.Sid, *app_container).is_ok() {
+        let equals_app_container = unsafe { EqualSid(sid_and_attributes.Sid, *app_container).is_ok() };
+        if equals_app_container {
             // Already allowed
             return Ok(());
         }
