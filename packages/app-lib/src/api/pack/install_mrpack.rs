@@ -513,6 +513,8 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
     ignore_lock: bool,
     reason: DownloadReason,
     reporter: InstallProgressReporter,
+    ignore_modpack_servers: bool,
+    preserve_icon: bool,
 ) -> crate::Result<String> {
     let state = &State::get().await?;
 
@@ -522,7 +524,7 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
     let project_id = create_pack.description.project_id;
     let version_id = create_pack.description.version_id;
     let instance_id = create_pack.description.instance_id;
-    let mut icon_exists = icon.is_some();
+    let mut icon_exists = preserve_icon || icon.is_some();
     let source_path = pack_source_path(&file);
 
     reporter
@@ -1019,7 +1021,15 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                 && filename == "overrides/options.txt";
             let shadowed_yosbr_options = has_client_yosbr_options_override
                 && filename == "overrides/config/yosbr/options.txt";
-            (is_override && !shadowed_game_options && !shadowed_yosbr_options)
+            let ignored_servers = ignore_modpack_servers
+                && matches!(
+                    filename,
+                    "overrides/servers.dat" | "client-overrides/servers.dat"
+                );
+            (is_override
+                && !shadowed_game_options
+                && !shadowed_yosbr_options
+                && !ignored_servers)
                 .then(|| (index, file.clone()))
         })
         .collect::<Vec<_>>();
@@ -1222,7 +1232,12 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
         }
     }
 
-    if has_servers_override {
+    if ignore_modpack_servers {
+        crate::api::instance::synced_servers::discard_modpack_servers(
+            &instance_id,
+        )
+        .await?;
+    } else if has_servers_override {
         crate::api::instance::synced_servers::capture_modpack_servers(
             &instance_id,
         )

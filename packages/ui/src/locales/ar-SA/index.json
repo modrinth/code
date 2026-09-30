@@ -389,9 +389,6 @@
   "content.card.select-project": {
     "defaultMessage": "تحديد {project}"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "تم الرفع"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "هل تؤكد رغبتك بتحديث {count, plural, one {# مشروع} other {# مشاريع}} لاصداراتها المتوافقة الأخيرة؟ ينصح بتحديثها واحدا تلو الاۤخر."
   },
@@ -593,9 +590,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "عرض المحتوى"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "المؤلف"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "البيئة"
   },
@@ -620,17 +614,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "التحديث المتاح"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "العميل يعتمد على الملف"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "محتوى خاص بالعميل"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "تم الاحتفاظ بملف العميل"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "لا توجد تحذيرات"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "تحذيرات"
@@ -661,9 +646,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "تصفية"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {مؤلف واحد} two {مؤلفان} few {# مؤلفين} many {# مؤلفًا} other {# مؤلف}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "جارٍ تحميل المحتوى..."
@@ -1761,4 +1743,3 @@
     "defaultMessage": "ماينكرافت: إصدار جافا"
   }
 }
-

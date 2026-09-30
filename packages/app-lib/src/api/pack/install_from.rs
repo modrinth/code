@@ -630,12 +630,17 @@ pub async fn set_instance_information(
         &instance_id,
         EditInstance {
             install_stage: Some(InstanceInstallStage::PackInstalling),
-            name: Some(
-                description
-                    .override_title
-                    .clone()
-                    .unwrap_or_else(|| backup_name.to_string()),
-            ),
+            name: if matches!(&link, Some(InstanceLink::SharedInstance { .. }))
+            {
+                None
+            } else {
+                Some(
+                    description
+                        .override_title
+                        .clone()
+                        .unwrap_or_else(|| backup_name.to_string()),
+                )
+            },
             icon_path: description
                 .icon
                 .as_ref()

@@ -269,11 +269,15 @@ watch(projects, (newProjects) => {
 })
 
 const mergedProjects = computed<ContentItem[]>(() => {
+	const managedFiles = new Set(managedContentItems.value.map((item) => item.file_name))
+	const additionalProjects = projects.value.filter((item) => !managedFiles.has(item.file_name))
 	const active = installingItems.value.get(instance.value.id)
-	const pending = active ?? installingBuffer.value
-	if (pending.length === 0) return projects.value
+	const pending = (active ?? installingBuffer.value).filter(
+		(item) => !managedFiles.has(item.file_name),
+	)
+	if (pending.length === 0) return additionalProjects
 	const pendingProjectIds = new Set(pending.map((p) => p.project?.id).filter(Boolean))
-	const displayProjects = projects.value.map((project) =>
+	const displayProjects = additionalProjects.map((project) =>
 		project.project?.id && pendingProjectIds.has(project.project.id)
 			? { ...project, installing: true }
 			: project,
@@ -380,7 +384,7 @@ const hasSharedManagedContent = computed(() => {
 })
 
 const managedContentItems = computed(() => {
-	const linkedContent = modpackContentQuery.data.value ?? []
+	const linkedContent = instance.value.link ? (modpackContentQuery.data.value ?? []) : []
 	const sourcedContent = hasSharedManagedContent.value
 		? projects.value.filter((item) =>
 				['server_project', 'shared_instance'].includes(item.source_kind ?? ''),
@@ -442,7 +446,7 @@ const managedContent = computed<ManagedContentData | null>(() => {
 			: (sharedManager?.name ?? instance.value.name)
 		const managerIcon = serverManaged
 			? (sharedManager?.avatarUrl ??
-				attachment?.server_manager_icon_url ??
+				getInstanceIconUrl(attachment?.server_manager_icon_url) ??
 				linkedProject?.icon_url ??
 				undefined)
 			: (sharedManager?.avatarUrl ?? getInstanceIconUrl(instance.value.icon_path) ?? undefined)
@@ -526,7 +530,7 @@ const pendingModpackUpdateVersion = ref<Labrinth.Versions.v2.Version | null>(nul
 const isModpackUpdateDowngrade = ref(false)
 const activeContentOperationKeys = ref(new Set<string>())
 
-let activeContentOperationCount = 0
+let activeBulkContentOperationCount = 0
 let updateRequestId = 0
 const activeUpdateRequestId = ref(0)
 
@@ -601,46 +605,53 @@ async function reconcileSharedInstancePublishState() {
 	})
 }
 
-function setContentItemBusy(item: ContentItem, busy: boolean, originalFileName = item.file_name) {
-	item.installing = busy
+function setContentItemBusy(
+	item: ContentItem,
+	busy: boolean,
+	originalFileName = item.file_name,
+	showInstalling = true,
+) {
+	item.installing = busy && showInstalling
 	managedContentModal.value?.updateItem(originalFileName, {
-		installing: busy,
+		installing: item.installing,
 		disabled: busy,
 	})
 	if (item.file_name !== originalFileName) {
 		managedContentModal.value?.updateItem(item.file_name, {
-			installing: busy,
+			installing: item.installing,
 			disabled: busy,
 		})
 	}
 }
 
-function beginContentOperation(item: ContentItem) {
+function beginContentOperation(item: ContentItem, blocksList = true) {
 	if (hasContentOperation(item)) return null
 
 	const keys = getContentOperationKeys(item)
 	activeContentOperationKeys.value = new Set([...activeContentOperationKeys.value, ...keys])
-	activeContentOperationCount++
-	isBulkOperating.value = true
-	setContentItemBusy(item, true)
+	if (blocksList) {
+		activeBulkContentOperationCount++
+		isBulkOperating.value = true
+	}
+	setContentItemBusy(item, true, item.file_name, blocksList)
 
-	return { keys, originalFileName: item.file_name }
+	return { keys, originalFileName: item.file_name, blocksList }
 }
 
 function finishContentOperation(
 	item: ContentItem,
-	operation: { keys: string[]; originalFileName: string },
+	operation: { keys: string[]; originalFileName: string; blocksList: boolean },
 ) {
 	const nextKeys = new Set(activeContentOperationKeys.value)
 	for (const key of operation.keys) {
 		nextKeys.delete(key)
 	}
 	activeContentOperationKeys.value = nextKeys
-	activeContentOperationCount = Math.max(0, activeContentOperationCount - 1)
-	setContentItemBusy(item, false, operation.originalFileName)
-	if (activeContentOperationCount === 0) {
-		isBulkOperating.value = false
+	if (operation.blocksList) {
+		activeBulkContentOperationCount = Math.max(0, activeBulkContentOperationCount - 1)
+		isBulkOperating.value = activeBulkContentOperationCount > 0
 	}
+	setContentItemBusy(item, false, operation.originalFileName)
 }
 
 function beginUpdateRequest() {
@@ -810,56 +821,127 @@ async function handleUnknownFileContinue(dontShowAgain: boolean) {
 	resolveUnknownFileWarning(true)
 }
 
+type ContentToggleVariables = {
+	mod: ContentItem
+	instanceId: string
+	originalFileName: string
+	originalFilePath: string
+	enabled: boolean
+	previousEnabled: ContentItem['enabled']
+	reconcileSharedState: boolean
+}
+
+function updateToggledContent(
+	{ mod, instanceId, originalFileName, originalFilePath }: ContentToggleVariables,
+	updates: Partial<ContentItem>,
+) {
+	Object.assign(mod, updates)
+	managedContentModal.value?.updateItem(originalFileName, updates)
+	queryClient.setQueryData<ContentItem[]>(instanceKeys.linkedContent(instanceId), (items) =>
+		items?.map((item) =>
+			matchesContentItem(item, mod, originalFileName, originalFilePath)
+				? { ...item, ...updates }
+				: item,
+		),
+	)
+	queryClient.setQueryData<InstanceContentData>(instanceKeys.content(instanceId), (data) => {
+		if (!data) return data
+		return {
+			...data,
+			contentItems:
+				data.contentItems?.map((item) =>
+					matchesContentItem(item, mod, originalFileName, originalFilePath)
+						? { ...item, ...updates }
+						: item,
+				) ?? null,
+		}
+	})
+}
+
+const toggleContentMutation = useMutation({
+	mutationKey: ['instances', 'toggle-content'],
+	networkMode: 'always',
+	onMutate: async (variables: ContentToggleVariables) => {
+		await Promise.all([
+			queryClient.cancelQueries({ queryKey: instanceKeys.content(variables.instanceId) }),
+			queryClient.cancelQueries({ queryKey: instanceKeys.linkedContent(variables.instanceId) }),
+		])
+		updateToggledContent(variables, { enabled: variables.enabled })
+		return { previousEnabled: variables.previousEnabled }
+	},
+	mutationFn: async (variables: ContentToggleVariables) => {
+		const { mod, instanceId, originalFilePath, enabled } = variables
+		const packSyncOption = mod.project_type === 'resourcepack' ? 'resource_packs' : 'data_packs'
+		if (mod.synced_pack && instance.value.synced_options[packSyncOption]) {
+			await set_synced_pack_enabled(mod.synced_pack.id, enabled)
+			return null
+		}
+		return toggle_disable_project(instanceId, originalFilePath, enabled)
+	},
+	onSuccess: async (newPath, variables) => {
+		const { mod, enabled, reconcileSharedState } = variables
+		if (newPath !== null) {
+			updateToggledContent(variables, {
+				file_path: newPath,
+				file_name: fileNameFromPath(newPath),
+				enabled,
+			})
+			trackEvent('InstanceProjectDisable', {
+				loader: instance.value.loader,
+				game_version: instance.value.game_version,
+				id: mod.project?.id,
+				name: mod.project?.title ?? mod.file_name,
+				project_type: mod.project_type,
+				disabled: !enabled,
+			})
+		} else {
+			await refreshContentState('must_revalidate')
+			await queryClient.invalidateQueries({ queryKey: syncedPackKeys.all })
+		}
+		if (reconcileSharedState) await reconcileSharedInstancePublishState()
+	},
+	onError: (error, variables, context) => {
+		updateToggledContent(variables, {
+			enabled: context?.previousEnabled ?? variables.previousEnabled,
+		})
+		handleError(error)
+	},
+	onSettled: (_data, _error, { instanceId }) => {
+		return Promise.all([
+			queryClient.invalidateQueries({
+				queryKey: instanceKeys.content(instanceId),
+				refetchType: 'none',
+			}),
+			queryClient.invalidateQueries({
+				queryKey: instanceKeys.linkedContent(instanceId),
+				refetchType: 'none',
+			}),
+		])
+	},
+})
+
 async function toggleDisableMod(
 	mod: ContentItem,
 	desiredEnabled?: boolean,
 	reconcileSharedState = true,
 ) {
 	if (!mod.file_path || !canToggleContent(mod)) return
-	const operation = beginContentOperation(mod)
+	const variables: ContentToggleVariables = {
+		mod,
+		instanceId: instance.value.id,
+		originalFileName: mod.file_name,
+		originalFilePath: mod.file_path,
+		enabled: desiredEnabled ?? !mod.enabled,
+		previousEnabled: mod.enabled,
+		reconcileSharedState,
+	}
+	const operation = beginContentOperation(mod, false)
 	if (!operation) return
-	const originalFilePath = mod.file_path
 
 	try {
-		const packSyncOption = mod.project_type === 'resourcepack' ? 'resource_packs' : 'data_packs'
-		if (mod.synced_pack && instance.value.synced_options[packSyncOption]) {
-			await set_synced_pack_enabled(mod.synced_pack.id, desiredEnabled ?? !mod.enabled)
-			await refreshContentState('must_revalidate')
-			await queryClient.invalidateQueries({ queryKey: syncedPackKeys.all })
-			if (reconcileSharedState) await reconcileSharedInstancePublishState()
-			return
-		}
-		const newPath = await toggle_disable_project(instance.value.id, mod.file_path, desiredEnabled)
-		const newFileName = fileNameFromPath(newPath)
-		const enabled = desiredEnabled ?? !mod.enabled
-		mod.file_path = newPath
-		mod.file_name = newFileName
-		mod.enabled = enabled
-		managedContentModal.value?.updateItem(operation.originalFileName, {
-			file_path: newPath,
-			file_name: newFileName,
-			enabled,
-		})
-		updateLinkedModpackContentCache(mod, operation.originalFileName, originalFilePath, {
-			file_path: newPath,
-			file_name: newFileName,
-			enabled,
-		})
-
-		trackEvent('InstanceProjectDisable', {
-			loader: instance.value.loader,
-			game_version: instance.value.game_version,
-			id: mod.project?.id,
-			name: mod.project?.title ?? mod.file_name,
-			project_type: mod.project_type,
-			disabled: !enabled,
-		})
-
-		if (reconcileSharedState) {
-			await reconcileSharedInstancePublishState()
-		}
-	} catch (err) {
-		handleError(err as Error)
+		await toggleContentMutation.mutateAsync(variables)
+	} catch {
+		// The mutation rolls back and reports the error.
 	} finally {
 		finishContentOperation(mod, operation)
 	}
@@ -1758,7 +1840,8 @@ useAppEvent('instance', async (event) => {
 		event.instance_id === instance.value.id &&
 		event.event === 'synced' &&
 		instance.value.install_stage === 'installed' &&
-		!isBulkOperating.value
+		!isBulkOperating.value &&
+		activeContentOperationKeys.value.size === 0
 	) {
 		await initProjects()
 	}

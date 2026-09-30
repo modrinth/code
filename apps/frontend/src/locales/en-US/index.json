@@ -2208,7 +2208,7 @@
     "message": "This content type cannot be installed to a server from Discover."
   },
   "discover.install.heading.reset-modpack": {
-    "message": "Selecting modpack to install after reset"
+    "message": "Selecting content to install after reset"
   },
   "discover.seo.description": {
     "message": "Search and browse thousands of Minecraft {projectType} on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft {projectType}."

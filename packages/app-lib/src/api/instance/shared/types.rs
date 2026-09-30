@@ -80,6 +80,8 @@ pub struct SharedInstanceInstallPreview {
     pub modpack_version_id: Option<String>,
     pub content_version_ids: Vec<String>,
     pub external_files: Vec<SharedInstanceExternalFilePreview>,
+    #[serde(default)]
+    pub removed_files: Vec<SharedInstanceRemovedFile>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -129,11 +131,19 @@ pub struct SharedInstanceInvite {
 #[serde(rename_all = "camelCase")]
 pub struct SharedInstanceInviteInstallPreview {
     pub shared_instance_id: String,
+    pub inviter: Option<SharedInstanceInviteCreator>,
     pub manager_id: Option<String>,
     pub server_manager_name: Option<String>,
     pub server_manager_icon_url: Option<String>,
     pub instance_icon_url: Option<String>,
     pub preview: SharedInstanceInstallPreview,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct SharedInstanceInviteCreator {
+    pub id: String,
+    pub name: String,
+    pub avatar: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

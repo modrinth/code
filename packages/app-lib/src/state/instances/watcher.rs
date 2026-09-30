@@ -379,12 +379,7 @@ pub(crate) async fn watch_instance_folder(
     }
 
     let mut to_watch = Vec::new();
-    for sub_path in ProjectType::iterator().map(|x| x.get_folder()).chain([
-        "crash-reports",
-        "saves",
-        "screenshots",
-        CONFIG_DIRECTORY,
-    ]) {
+    for sub_path in watched_subpaths() {
         let full_path = full_instance_path.join(sub_path);
 
         let meta = tokio::fs::symlink_metadata(&full_path).await;
@@ -432,6 +427,54 @@ pub(crate) async fn watch_instance_folder(
         .write()
         .await
         .insert(instance_path.to_string(), instance_id.to_string());
+}
+
+fn watched_subpaths() -> impl Iterator<Item = &'static str> {
+    ProjectType::iterator().map(|x| x.get_folder()).chain([
+        "crash-reports",
+        "saves",
+        "screenshots",
+        CONFIG_DIRECTORY,
+    ])
+}
+
+pub(crate) async fn unwatch_instance_folder(
+    instance_id: &str,
+    instance_path: &str,
+    watcher: &FileWatcher,
+    dirs: &DirectoryInfo,
+) {
+    let mut instance_ids = watcher.instance_ids.write().await;
+    if instance_ids
+        .get(instance_path)
+        .is_none_or(|id| id != instance_id)
+    {
+        return;
+    }
+    instance_ids.remove(instance_path);
+    drop(instance_ids);
+
+    let full_instance_path = dirs.instances_dir().join(instance_path);
+    let mut watched_paths = watched_subpaths()
+        .map(|sub_path| full_instance_path.join(sub_path))
+        .collect::<Vec<_>>();
+    watched_paths.push(full_instance_path);
+
+    let mut debouncer = watcher.watcher.write().await;
+    for path in watched_paths {
+        if let Err(error) = debouncer.watcher().unwatch(&path)
+            && !matches!(
+                error.kind,
+                notify::ErrorKind::WatchNotFound
+                    | notify::ErrorKind::PathNotFound
+            )
+        {
+            tracing::warn!(
+                "Failed to unwatch instance path {}: {error}",
+                path.display()
+            );
+        }
+    }
 }
 
 fn crash_task(instance_id: String) {

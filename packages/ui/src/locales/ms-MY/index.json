@@ -1328,12 +1328,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Gagal memadamkan kandungan"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Gagal menyahdayakan kandungan"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Gagal mendayakan kandungan"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Gagal mengemas kini kandungan"
   },
@@ -1348,9 +1342,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Gagal mengalih keluar kandungan"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Gagal menogol {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Gagal menyahpaut pek mod"
@@ -1732,15 +1723,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Perubahan disimpan"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Mod ini bergantung pada mod bahagian pelanggan dan mungkin menyebabkan masalah semasa memulakan pelayan anda"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Ini adalah sebuah mod bahagian pelanggan dan mungkin menyebabkan masalah semasa memulakan pelayan anda"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Ini ialah mod bahagian pelanggan yang dipasang sebagai kebergantungan dan mungkin menyebabkan masalah semasa memulakan pelayan anda"
   },
   "label.collections": {
     "defaultMessage": "Koleksi"
@@ -4034,15 +4016,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Mereka kini boleh ditemui di sini!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Jangan tunjukkan lagi"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Tetapan pelayan anda telah dipindahkan"
-  },
   "servers.manage.your-servers-title": {
     "defaultMessage": "Pelayan anda"
   },
@@ -4213,12 +4186,6 @@
   },
   "servers.remove-access-modal.warning-body": {
     "defaultMessage": "Jika anda membatalkan akses pengguna ke pelayan anda, anda perlu menjemput semula mereka untuk memulihkan akses."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Pemasangan gagal"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Pemuatnaikan pek mod gagal"
   },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Sediakan pelayan"
@@ -4953,4 +4920,3 @@
     "defaultMessage": "Jenis"
   }
 }
-

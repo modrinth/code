@@ -29,6 +29,7 @@ const basicEvents = new Set([
 	'server_reallocated',
 	'server_repaired',
 	'server_reset',
+	'world_data_reset',
 	'server_started',
 	'server_stopped',
 	'server_restarted',
@@ -122,6 +123,27 @@ export function parseAuditEvent(
 						addon.versionLabel,
 					]),
 				])
+			}
+			case 'addon_server_enabled':
+			case 'addon_player_enabled':
+			case 'addon_side_toggle_locked': {
+				const record = metadataRecord(metadata)
+				const filename = stringField(record, 'filename')
+				const contentType = stringField(record, 'kind')
+				const value = record?.[action === 'addon_side_toggle_locked' ? 'locked' : 'enabled']
+				if (!filename || !contentType || typeof value !== 'boolean') return unknown(base, action)
+				const kind =
+					action === 'addon_side_toggle_locked'
+						? value
+							? 'side_locked'
+							: 'side_unlocked'
+						: `${action === 'addon_server_enabled' ? 'server' : 'player'}_${value ? 'enabled' : 'disabled'}`
+				return parsed(
+					AddonEvent,
+					base,
+					{ kind, fileNames: [fileEntity(filename, lookups.serverId, false)] },
+					[...actionSearchParts(action), filename, contentType, kind],
+				)
 			}
 			case 'addon_uploaded': {
 				const fileNames = stringArrayField(metadataRecord(metadata), 'file_names')

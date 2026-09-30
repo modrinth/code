@@ -3,7 +3,7 @@ use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::install::{
     InstallJobSnapshot, SharedInstanceExternalFileData,
-    SharedInstanceInstallData,
+    SharedInstanceInstallData, SharedInstanceRemovedFile,
 };
 use crate::state::instances::{InstanceLink, SharedInstanceAttachment};
 use crate::state::{
@@ -32,6 +32,7 @@ use std::io::Read;
 
 pub(crate) const CONFIG_BUNDLE_FILE_NAME: &str = "configs.zip";
 pub(crate) const CONFIG_BUNDLE_FILE_TYPE: &str = "configs";
+pub(crate) const CONFIG_FILE_TYPE: &str = "config";
 pub(crate) const CONFIG_SYNC_ENABLED: bool = true;
 pub(crate) const CONFIG_DIRECTORY: &str = "config";
 pub(crate) const MAX_CONFIG_BUNDLE_ENTRIES: usize = 4096;
@@ -101,19 +102,25 @@ pub(crate) fn read_bounded_config_bundle_entry(
 }
 
 mod client;
+mod content;
 mod diff;
+mod icons;
 mod install;
 mod invites;
 mod publish;
 mod types;
 
+pub(crate) use self::content::shared_modpack_files;
+pub use self::icons::cache_shared_instance_server_icon;
 pub(crate) use self::install::check_shared_instance_availability_before_launch;
 pub(crate) use self::publish::sync_shared_instance_icon;
 
 pub use self::install::{
     accept_shared_instance_invite_for_install,
-    get_shared_instance_install_preview, get_shared_instance_update_preview,
-    install_shared_instance, update_shared_instance,
+    get_shared_instance_install_preview,
+    get_shared_instance_invite_install_preview,
+    get_shared_instance_update_preview, install_shared_instance,
+    update_shared_instance,
 };
 pub use self::invites::{
     accept_pending_shared_instance_invite, create_shared_instance_invite_link,
@@ -127,11 +134,11 @@ pub use self::publish::{
 };
 pub use self::types::{
     SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
-    SharedInstanceInvite, SharedInstanceInviteInstallPreview,
-    SharedInstanceInviteLink, SharedInstanceJoinType,
-    SharedInstancePublishPreview, SharedInstanceUpdateDiff,
-    SharedInstanceUpdateDiffType, SharedInstanceUpdatePreview,
-    SharedInstanceUser, SharedInstanceUsers,
+    SharedInstanceInvite, SharedInstanceInviteCreator,
+    SharedInstanceInviteInstallPreview, SharedInstanceInviteLink,
+    SharedInstanceJoinType, SharedInstancePublishPreview,
+    SharedInstanceUpdateDiff, SharedInstanceUpdateDiffType,
+    SharedInstanceUpdatePreview, SharedInstanceUser, SharedInstanceUsers,
 };
 
 pub async fn can_active_user_use_shared_instances() -> crate::Result<bool> {

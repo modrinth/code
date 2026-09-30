@@ -395,9 +395,6 @@
   "content.card.synced": {
     "defaultMessage": "在不同实例之间同步"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "已上传"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "是否确定要将 {count, plural,  other {# 个项目}}更新至最新的兼容版本？建议逐个更新内容。"
   },
@@ -656,9 +653,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "查看内容"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "作者"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "运行环境"
   },
@@ -683,17 +677,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "有可用更新"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "客户端依赖文件"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "仅客户端的内容"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "客户端文件已保存"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "无警告"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "警告"
@@ -724,9 +709,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "筛选过滤"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# 作者} other {# 更多作者}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "正在加载内容…"
@@ -1967,12 +1949,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "删除内容失败"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "禁用内容失败"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "启用内容失败"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "更新内容失败"
   },
@@ -1987,9 +1963,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "移除内容失败"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "无法切换 {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "链接整合包失败"
@@ -2429,12 +2402,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "启用"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "外部储存"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "此文件未发布于 Modrinth 平台。"
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "管理内容"
   },
@@ -2449,9 +2416,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "搜索到了 {count, number} {count, plural, other {个项目}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "警告"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "当前"
@@ -2536,15 +2500,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "更改已保存"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "该模组依赖客户端模组，启动服务器时可能出现问题"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "这是一个客户端模组，启动服务器时可能会导致问题"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "该模组是作为依赖安装的客户端模组，启动服务器时可能出现问题"
   },
   "label.collections": {
     "defaultMessage": "收藏"
@@ -5504,15 +5459,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "他们现在可以在这里找到！"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "不再显示"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "你的服务器设置已移动"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "共享服务器"
   },
@@ -5746,18 +5692,6 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "SFTP凭据已更换"
-  },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "安装时出现了未被预料的错误。请稍后再试。"
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "安装失败"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "上传时出现了未被预料的错误。请稍后再试。"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "整合包上传失败"
   },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "初始化服务器"
@@ -6990,4 +6924,3 @@
     "defaultMessage": "类型"
   }
 }
-

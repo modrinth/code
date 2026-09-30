@@ -5,7 +5,7 @@ import { computed, ref, watch } from 'vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonProjectTypeCategoryMessages, normalizeProjectType } from '#ui/utils/common-messages'
 
-import type { ClientWarningType, ContentItem } from '../types'
+import type { ClientWarningType, ContentItem, ContentWarningType } from '../types'
 
 const CLIENT_ONLY_ENVIRONMENTS = new Set(['client_only', 'singleplayer_only'])
 
@@ -23,6 +23,14 @@ export function getClientWarningType(
 	return null
 }
 
+export function getContentWarningType(
+	item: ContentItem,
+	showEnvironmentWarnings = false,
+): ContentWarningType | null {
+	if (!item.enabledFor) return getClientWarningType(item, showEnvironmentWarnings)
+	return item.enabledFor.warningKind ?? null
+}
+
 export interface ContentFilterOption {
 	id: string
 	label: string
@@ -34,6 +42,7 @@ export interface ContentFilterConfig {
 	showWarningsFilter?: boolean
 	showStatusFilters?: boolean
 	showEnvironmentWarnings?: boolean
+	retainSelectedWarnings?: Readonly<Ref<boolean>>
 	isPackLocked?: Ref<boolean>
 	persistKey?: string
 }
@@ -95,9 +104,10 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 
 		if (
 			config?.showWarningsFilter &&
-			items.value.some(
-				(item) => getClientWarningType(item, config.showEnvironmentWarnings) !== null,
-			)
+			(items.value.some(
+				(item) => getContentWarningType(item, config.showEnvironmentWarnings) !== null,
+			) ||
+				(config.retainSelectedWarnings?.value && selectedFilters.value.includes('warnings')))
 		) {
 			options.push({ id: 'warnings', label: formatMessage(messages.warnings) })
 		}
@@ -168,7 +178,7 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 				if (filter === 'disabled' && item.enabled) return false
 				if (
 					filter === 'warnings' &&
-					getClientWarningType(item, config?.showEnvironmentWarnings) === null
+					getContentWarningType(item, config?.showEnvironmentWarnings) === null
 				)
 					return false
 			}

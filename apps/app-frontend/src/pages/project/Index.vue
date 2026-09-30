@@ -214,7 +214,10 @@
 			</template>
 		</ContextMenu>
 		<CreationFlowModal
-			v-if="serverInstallContent.isServerContext.value && data?.project_type === 'modpack'"
+			v-if="
+				serverInstallContent.isServerContext.value &&
+				serverInstallContent.serverFlowFrom.value !== 'onboarding'
+			"
 			ref="serverSetupModalRef"
 			:type="
 				serverInstallContent.serverFlowFrom.value === 'reset-server'
@@ -224,10 +227,9 @@
 			:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"
 			:show-snapshot-toggle="true"
 			:on-back="serverInstallContent.onServerFlowBack"
-			:search-modpacks="serverInstallContent.searchServerModpacks"
 			:get-project-versions="serverInstallContent.getServerProjectVersions"
 			:get-loader-manifest="getLoaderManifest"
-			@hide="() => {}"
+			@hide="serverInstallContent.onServerFlowHide"
 			@browse-modpacks="() => {}"
 			@create="serverInstallContent.handleServerModpackFlowCreate"
 		/>
@@ -547,19 +549,28 @@ const projectInstallContext = computed(() => {
 const serverProjectInstallContext = computed(
 	() =>
 		!!serverInstallContent.serverContextServerData.value &&
-		['modpack', 'mod', 'plugin', 'datapack'].includes(data.value?.project_type),
+		['modpack', 'mod', 'plugin', 'datapack', 'resourcepack', 'shader'].includes(
+			data.value?.project_type,
+		),
 )
 const serverProjectSelected = computed(
-	() => !!data.value && serverInstallContent.queuedServerInstallProjectIds.value.has(data.value.id),
+	() =>
+		!serverInstallContent.isSetupServerContext.value &&
+		!!data.value &&
+		serverInstallContent.queuedServerInstallProjectIds.value.has(data.value.id),
 )
 const serverProjectInstalled = computed(
 	() =>
+		!serverInstallContent.isSetupServerContext.value &&
 		!!data.value &&
 		(serverInstallContent.serverContentProjectIds.value.has(data.value.id) ||
 			serverInstallContent.serverContextServerData.value?.upstream?.project_id === data.value.id),
 )
 const installButtonLoading = computed(
-	() => installing.value || serverInstallContent.isInstallingQueuedServerInstalls.value,
+	() =>
+		installing.value ||
+		serverInstallContent.isInstallingQueuedServerInstalls.value ||
+		serverInstallContent.activeServerModpackInstallProjectId.value === data.value?.id,
 )
 const installButtonValidating = computed(
 	() =>
@@ -866,17 +877,22 @@ async function install(version) {
 					icon_url: data.value.icon_url,
 				},
 				contentType,
-				mode: contentType === 'modpack' ? 'immediate' : 'queue',
+				mode:
+					contentType === 'modpack' || serverInstallContent.isSetupServerContext.value
+						? 'immediate'
+						: 'queue',
 				selectedFilters: [],
 				providedFilters: [],
 				overriddenProvidedFilterTypes: [],
-				targetPreferences: getTargetInstallPreferences(
-					{
-						gameVersion: serverInstallContent.serverContextServerData.value?.mc_version,
-						loader: serverInstallContent.serverContextServerData.value?.loader,
-					},
-					contentType,
-				),
+				targetPreferences: serverInstallContent.isSetupServerContext.value
+					? {}
+					: getTargetInstallPreferences(
+							{
+								gameVersion: serverInstallContent.serverContextServerData.value?.mc_version,
+								loader: serverInstallContent.serverContextServerData.value?.loader,
+							},
+							contentType,
+						),
 				getProjectVersions: async () => versions.value,
 				queue: {
 					get: serverInstallContent.getQueuedServerInstallPlans,
@@ -885,6 +901,7 @@ async function install(version) {
 				install: (plan) =>
 					serverInstallContent.openServerModpackInstallFlow({
 						projectId: plan.projectId,
+						contentType: plan.contentType,
 						versionId: plan.versionId,
 						name: plan.project.title ?? plan.project.name ?? data.value.title,
 						iconUrl: plan.project.icon_url ?? undefined,

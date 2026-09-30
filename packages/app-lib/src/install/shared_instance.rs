@@ -1,3 +1,4 @@
+use super::diagnostics::install_step;
 use super::events::InstallProgressReporter;
 use super::model::{
     InstallJobState, InstallPhaseDetails, InstallPhaseId,
@@ -9,8 +10,9 @@ use super::runner::{
 };
 use crate::api::instance::{
     CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS,
-    CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES,
-    read_bounded_config_bundle_entry,
+    CONFIG_FILE_TYPE, CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES,
+    MAX_CONFIG_BUNDLE_FILE_SIZE, read_bounded_config_bundle_entry,
+    shared_modpack_files,
 };
 use crate::api::pack::install_from::CreatePackLocation;
 use crate::state::instances::adapters::sqlite::content_rows;
@@ -56,6 +58,30 @@ pub(super) async fn finalize_shared_instance_attachment(
     data: &SharedInstanceInstallData,
     state: &State,
 ) -> crate::Result<()> {
+    if let Some(server) = &data.linked_server {
+        if let Some(icon) = data.server_manager_icon_url.as_deref() {
+            let icon_path =
+                crate::state::instances::commands::resolve_icon_path(
+                    Some(icon),
+                    false,
+                    state,
+                )
+                .await?;
+            crate::api::instance::edit_icon(
+                instance_id,
+                icon_path.as_deref().map(std::path::Path::new),
+            )
+            .await?;
+        }
+        crate::api::worlds::ensure_managed_server_in_instance(
+            instance_id,
+            data.server_manager_name
+                .clone()
+                .unwrap_or_else(|| data.name.clone()),
+            server.domain.clone(),
+        )
+        .await?;
+    }
     crate::state::attach_shared_instance(
         instance_id,
         SharedInstanceAttachmentInput {
@@ -117,6 +143,7 @@ struct DesiredSharedInstanceContent {
         DesiredSharedInstanceExternalFile,
     >,
     config_bundle: Option<SharedInstanceExternalFileData>,
+    config_files: Vec<SharedInstanceExternalFileData>,
 }
 
 struct SharedInstanceProjectUpdate {
@@ -134,6 +161,8 @@ struct SharedInstanceApplyPlan {
     external_updates: Vec<DesiredSharedInstanceExternalFile>,
     external_additions: Vec<DesiredSharedInstanceExternalFile>,
     config_bundle: Option<SharedInstanceExternalFileData>,
+    config_files: Vec<SharedInstanceExternalFileData>,
+    modpack_toggles: Vec<(String, bool)>,
 }
 
 impl SharedInstanceApplyPlan {
@@ -151,11 +180,19 @@ impl SharedInstanceApplyPlan {
 
         let current = current_shared_instance_content(metadata, state).await?;
         let desired = desired_shared_instance_content(data, state).await?;
+        let (modpack_toggles, missing_inherited_file) =
+            shared_modpack_toggles(metadata, data, state).await?;
+        if missing_inherited_file {
+            return Ok(Self {
+                configuration_changed: true,
+                ..Default::default()
+            });
+        }
         let project_removals = current
             .projects
             .values()
             .filter(|current| {
-                !desired.projects.contains_key(&current.project_id)
+                !desired.projects.contains_key(&current.version_id)
             })
             .cloned()
             .collect();
@@ -169,19 +206,40 @@ impl SharedInstanceApplyPlan {
             project_removals,
             external_removals,
             config_bundle: desired.config_bundle,
+            config_files: desired.config_files,
+            modpack_toggles,
             ..Default::default()
         };
 
-        for desired in desired.projects.into_values() {
-            match current.projects.get(&desired.project_id) {
-                Some(current) if current.version_id != desired.version_id => {
-                    plan.project_updates.push(SharedInstanceProjectUpdate {
-                        current: current.clone(),
-                        desired,
-                    });
-                }
-                None => plan.project_additions.push(desired),
-                Some(_) => {}
+        let mut additions = desired
+            .projects
+            .into_values()
+            .filter(|desired| {
+                !current.projects.contains_key(&desired.version_id)
+            })
+            .collect::<Vec<_>>();
+        while let Some(desired) = additions.pop() {
+            let replacements = plan
+                .project_removals
+                .iter()
+                .enumerate()
+                .filter(|(_, current)| current.project_id == desired.project_id)
+                .map(|(index, _)| index)
+                .collect::<Vec<_>>();
+            let unambiguous = !additions
+                .iter()
+                .any(|other| other.project_id == desired.project_id)
+                && !plan
+                    .project_additions
+                    .iter()
+                    .any(|other| other.project_id == desired.project_id);
+            if replacements.len() == 1 && unambiguous {
+                plan.project_updates.push(SharedInstanceProjectUpdate {
+                    current: plan.project_removals.remove(replacements[0]),
+                    desired,
+                });
+            } else {
+                plan.project_additions.push(desired);
             }
         }
 
@@ -203,11 +261,33 @@ impl SharedInstanceApplyPlan {
             + self.project_additions.len()
             + self.external_updates.len()
             + self.external_additions.len()
-            + usize::from(self.config_bundle.is_some())) as u64
+            + usize::from(self.config_bundle.is_some())
+            + self.config_files.len()) as u64
+            + self.modpack_toggles.len() as u64
     }
 }
 
-pub(super) async fn apply_shared_instance_update(
+/// Boxes the stage before its caller polls it.
+#[inline(never)]
+pub(super) fn apply_shared_instance_update(
+    job_id: Uuid,
+    job_state: &mut InstallJobState,
+    state: &State,
+    instance_id: &str,
+    data: &SharedInstanceInstallData,
+) -> impl std::future::Future<Output = crate::Result<()>> + Send {
+    install_step(job_id, "plan_shared_instance_update", move || {
+        apply_shared_instance_update_inner(
+            job_id,
+            job_state,
+            state,
+            instance_id,
+            data,
+        )
+    })
+}
+
+async fn apply_shared_instance_update_inner(
     job_id: Uuid,
     job_state: &mut InstallJobState,
     state: &State,
@@ -224,37 +304,77 @@ pub(super) async fn apply_shared_instance_update(
     })?;
     let plan = SharedInstanceApplyPlan::build(&metadata, data, state).await?;
 
-    if plan.configuration_changed {
-        crate::api::instance::prepare_instance_update(instance_id).await?;
-        remove_existing_shared_instance_content(instance_id, state).await?;
-        Box::pin(apply_shared_instance_content(
-            job_id,
-            job_state,
-            state,
+    if !plan.configuration_changed && data.linked_server.is_some() {
+        crate::api::instance::synced_servers::discard_modpack_servers(
             instance_id,
-            data,
-        ))
+        )
         .await?;
-        if data.modpack.is_none() {
-            if let Err(error) =
-                crate::api::instance::capture_game_options_pack_base(
-                    instance_id,
-                    None,
-                )
-                .await
-            {
-                tracing::warn!(
-                    "The shared instance was updated, but its local options.txt could not be restored after removing the previous pack: {error}"
-                );
-            }
-            crate::api::instance::reconcile_instance_after_pack_update(
-                instance_id,
-            )
-            .await?;
-        }
-        return Ok(());
     }
 
+    tracing::info!(%job_id, instance_id, full_apply = plan.configuration_changed, "Applying shared instance update");
+    if plan.configuration_changed {
+        install_step(job_id, "reinstall_shared_instance", || {
+            reinstall_shared_instance(
+                job_id,
+                job_state,
+                state,
+                instance_id,
+                data,
+            )
+        })
+        .await
+    } else {
+        install_step(job_id, "apply_shared_instance_changes", || {
+            apply_shared_instance_changes(
+                job_id,
+                job_state,
+                state,
+                instance_id,
+                data,
+                plan,
+            )
+        })
+        .await
+    }
+}
+
+async fn reinstall_shared_instance(
+    job_id: Uuid,
+    job_state: &mut InstallJobState,
+    state: &State,
+    instance_id: &str,
+    data: &SharedInstanceInstallData,
+) -> crate::Result<()> {
+    crate::api::instance::prepare_instance_update(instance_id).await?;
+    remove_existing_shared_instance_content(instance_id, state).await?;
+    apply_shared_instance_content(job_id, job_state, state, instance_id, data)
+        .await?;
+    if data.modpack.is_none() {
+        if let Err(error) =
+            crate::api::instance::capture_game_options_pack_base(
+                instance_id,
+                None,
+            )
+            .await
+        {
+            tracing::warn!(
+                "The shared instance was updated, but its local options.txt could not be restored after removing the previous pack: {error}"
+            );
+        }
+        crate::api::instance::reconcile_instance_after_pack_update(instance_id)
+            .await?;
+    }
+    Ok(())
+}
+
+async fn apply_shared_instance_changes(
+    job_id: Uuid,
+    job_state: &mut InstallJobState,
+    state: &State,
+    instance_id: &str,
+    data: &SharedInstanceInstallData,
+    plan: SharedInstanceApplyPlan,
+) -> crate::Result<()> {
     update_progress(
         job_id,
         job_state,
@@ -297,6 +417,24 @@ pub(super) async fn apply_shared_instance_update(
     }
 
     let mut completed_content_changes = 0;
+    for (path, enabled) in plan.modpack_toggles {
+        crate::state::instances::commands::toggle_disable_project(
+            instance_id,
+            &path,
+            Some(enabled),
+            state,
+        )
+        .await?;
+        completed_content_changes += 1;
+        update_content_progress(
+            job_id,
+            job_state,
+            state,
+            completed_content_changes,
+            content_change_count,
+        )
+        .await?;
+    }
     for update in plan.project_updates {
         let new_path =
             crate::state::instances::commands::add_project_from_version(
@@ -367,13 +505,9 @@ pub(super) async fn apply_shared_instance_update(
         .await?;
     }
 
-    if let Some(config_bundle) = plan.config_bundle {
-        install_shared_instance_external_file(
-            instance_id,
-            &config_bundle,
-            state,
-        )
-        .await?;
+    for config_file in plan.config_bundle.into_iter().chain(plan.config_files) {
+        install_shared_instance_external_file(instance_id, &config_file, state)
+            .await?;
         completed_content_changes += 1;
         update_content_progress(
             job_id,
@@ -384,6 +518,7 @@ pub(super) async fn apply_shared_instance_update(
         )
         .await?;
     }
+    ensure_shared_instance_additions_enabled(instance_id, data, state).await?;
 
     crate::api::instance::edit(
         instance_id,
@@ -474,7 +609,7 @@ async fn current_shared_instance_content(
             };
 
             content.projects.insert(
-                project_id.clone(),
+                version_id.clone(),
                 CurrentSharedInstanceProject {
                     project_id,
                     version_id,
@@ -494,6 +629,133 @@ async fn current_shared_instance_content(
     Ok(content)
 }
 
+async fn shared_modpack_toggles(
+    metadata: &crate::state::InstanceMetadata,
+    data: &SharedInstanceInstallData,
+    state: &State,
+) -> crate::Result<(Vec<(String, bool)>, bool)> {
+    for removed in &data.removed_files {
+        removed.validate()?;
+    }
+    let Some(modpack) = &data.modpack else {
+        if !data.removed_files.is_empty() {
+            return Err(crate::ErrorKind::InputError(
+                "Removed modpack files require a modpack id".to_string(),
+            )
+            .into());
+        }
+        return Ok((Vec::new(), false));
+    };
+    let inherited = shared_modpack_files(&modpack.version_id, state).await?;
+    let entries = content_rows::get_content_entries(
+        &metadata.applied_content_set.id,
+        &state.pool,
+    )
+    .await?;
+    let files =
+        content_rows::get_instance_files(&metadata.instance.id, &state.pool)
+            .await?
+            .into_iter()
+            .map(|file| (file.id.clone(), file))
+            .collect::<HashMap<_, _>>();
+    let mut toggles = Vec::new();
+    let mut missing = false;
+    for inherited in inherited {
+        let overridden = data.external_files.iter().any(|file| {
+            ProjectType::from_name(&file.file_type).is_some_and(|kind| {
+                inherited.relative_path
+                    == format!("{}/{}", kind.get_folder(), file.file_name)
+            })
+        });
+        let enabled = !inherited.is_removed(&data.removed_files) && !overridden;
+        let current = entries
+            .iter()
+            .filter(|entry| {
+                entry.source_kind == ContentSourceKind::ModrinthModpack
+            })
+            .find_map(|entry| {
+                let file =
+                    entry.file_id.as_ref().and_then(|id| files.get(id))?;
+                (file.relative_path.trim_end_matches(".disabled")
+                    == inherited.relative_path
+                    && inherited.sha1.as_deref().map_or_else(
+                        || {
+                            inherited.version_id.is_none()
+                                || entry.version_id == inherited.version_id
+                        },
+                        |hash| file.sha1 == hash,
+                    ))
+                .then_some((entry, file))
+            });
+        if let Some((entry, file)) = current {
+            if file.enabled != enabled
+                || entry.enabled != enabled
+                || (enabled && file.missing)
+            {
+                toggles.push((file.relative_path.clone(), enabled));
+            }
+        } else if enabled {
+            // An explicit file can replace the pack's entry at the same path. Reinstall the pack to restore its bytes.
+            missing = true;
+        }
+    }
+    Ok((toggles, missing))
+}
+
+async fn ensure_shared_instance_additions_enabled(
+    instance_id: &str,
+    data: &SharedInstanceInstallData,
+    state: &State,
+) -> crate::Result<()> {
+    let metadata = crate::state::instances::commands::get_instance_metadata(
+        instance_id,
+        &state.pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError("Unknown instance".to_string())
+    })?;
+    let entries = content_rows::get_content_entries(
+        &metadata.applied_content_set.id,
+        &state.pool,
+    )
+    .await?;
+    let files = content_rows::get_instance_files(instance_id, &state.pool)
+        .await?
+        .into_iter()
+        .map(|file| (file.id.clone(), file))
+        .collect::<HashMap<_, _>>();
+    for entry in entries {
+        if entry.source_kind != ContentSourceKind::SharedInstance {
+            continue;
+        }
+        let Some(file) = entry.file_id.as_ref().and_then(|id| files.get(id))
+        else {
+            continue;
+        };
+        let desired = entry
+            .version_id
+            .as_ref()
+            .is_some_and(|id| data.modrinth_ids.contains(id))
+            || data.external_files.iter().any(|external| {
+                ProjectType::from_name(&external.file_type)
+                    == Some(entry.project_type)
+                    && external.file_name
+                        == file.file_name.trim_end_matches(".disabled")
+            });
+        if desired && (!entry.enabled || !file.enabled || file.missing) {
+            crate::state::instances::commands::toggle_disable_project(
+                instance_id,
+                &file.relative_path,
+                Some(true),
+                state,
+            )
+            .await?;
+        }
+    }
+    Ok(())
+}
+
 async fn desired_shared_instance_content(
     data: &SharedInstanceInstallData,
     state: &State,
@@ -509,7 +771,7 @@ async fn desired_shared_instance_content(
             ))
         })?;
         content.projects.insert(
-            version.project_id.clone(),
+            version.id.clone(),
             DesiredSharedInstanceProject {
                 project_id: version.project_id.clone(),
                 version_id: version.id.clone(),
@@ -518,6 +780,12 @@ async fn desired_shared_instance_content(
     }
 
     for file in &data.external_files {
+        if file.file_type == CONFIG_FILE_TYPE {
+            if CONFIG_SYNC_ENABLED {
+                content.config_files.push(file.clone());
+            }
+            continue;
+        }
         if file.file_type == CONFIG_BUNDLE_FILE_TYPE {
             if CONFIG_SYNC_ENABLED {
                 content.config_bundle = Some(file.clone());
@@ -578,7 +846,27 @@ async fn shared_instance_versions_by_id(
     Ok(versions_by_id)
 }
 
-pub(super) async fn apply_shared_instance_content(
+/// Boxes the stage before its caller polls it.
+#[inline(never)]
+pub(super) fn apply_shared_instance_content(
+    job_id: Uuid,
+    job_state: &mut InstallJobState,
+    state: &State,
+    instance_id: &str,
+    data: &SharedInstanceInstallData,
+) -> impl std::future::Future<Output = crate::Result<()>> + Send {
+    install_step(job_id, "apply_shared_instance_content", move || {
+        apply_shared_instance_content_inner(
+            job_id,
+            job_state,
+            state,
+            instance_id,
+            data,
+        )
+    })
+}
+
+async fn apply_shared_instance_content_inner(
     job_id: Uuid,
     job_state: &mut InstallJobState,
     state: &State,
@@ -596,6 +884,35 @@ pub(super) async fn apply_shared_instance_content(
     )
     .await?;
 
+    install_step(job_id, "install_shared_instance_base", || {
+        install_shared_instance_base(
+            job_id,
+            job_state,
+            state,
+            instance_id,
+            data,
+        )
+    })
+    .await?;
+    install_step(job_id, "install_shared_instance_additions", || {
+        install_shared_instance_additions(
+            job_id,
+            job_state,
+            state,
+            instance_id,
+            data,
+        )
+    })
+    .await
+}
+
+async fn install_shared_instance_base(
+    job_id: Uuid,
+    job_state: &mut InstallJobState,
+    state: &State,
+    instance_id: &str,
+    data: &SharedInstanceInstallData,
+) -> crate::Result<()> {
     if let Some(modpack) = data.modpack.clone() {
         crate::api::instance::edit(
             instance_id,
@@ -614,13 +931,14 @@ pub(super) async fn apply_shared_instance_content(
             modpack_details(&location),
         )
         .await?;
-        Box::pin(install_pack(
+        install_pack(
             job_id,
             job_state,
             location,
             instance_id.to_string(),
             DownloadReason::Modpack,
-        ))
+            data.linked_server.is_some(),
+        )
         .await?;
     } else {
         crate::api::instance::edit(
@@ -663,6 +981,48 @@ pub(super) async fn apply_shared_instance_content(
             Some(InstallProgressReporter::new(job_id, job_state.clone())),
         )
         .await?;
+        if data.linked_server.is_some() {
+            crate::api::instance::synced_servers::discard_modpack_servers(
+                instance_id,
+            )
+            .await?;
+        }
+    }
+
+    Ok(())
+}
+
+async fn install_shared_instance_additions(
+    job_id: Uuid,
+    job_state: &mut InstallJobState,
+    state: &State,
+    instance_id: &str,
+    data: &SharedInstanceInstallData,
+) -> crate::Result<()> {
+    let metadata = crate::state::instances::commands::get_instance_metadata(
+        instance_id,
+        &state.pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError("Unknown instance".to_string())
+    })?;
+    let (toggles, missing) =
+        shared_modpack_toggles(&metadata, data, state).await?;
+    if missing {
+        return Err(crate::ErrorKind::InputError(
+            "Shared modpack content is missing after installation".to_string(),
+        )
+        .into());
+    }
+    for (path, enabled) in toggles {
+        crate::state::instances::commands::toggle_disable_project(
+            instance_id,
+            &path,
+            Some(enabled),
+            state,
+        )
+        .await?;
     }
 
     if !data.modrinth_ids.is_empty() || !data.external_files.is_empty() {
@@ -676,13 +1036,27 @@ pub(super) async fn apply_shared_instance_content(
             content_change_count,
         )
         .await?;
+        let versions_by_id =
+            shared_instance_versions_by_id(&data.modrinth_ids, state).await?;
         let mut completed_content_changes = 0;
         for version_id in &data.modrinth_ids {
-            crate::state::instances::commands::add_project_from_version(
+            let version = versions_by_id.get(version_id).ok_or_else(|| {
+                crate::ErrorKind::InputError(format!(
+                    "Shared instance version {version_id} was not found"
+                ))
+            })?;
+            let downloaded = crate::state::instances::commands::download_project_version_with_metadata(
+				instance_id,
+				version,
+				DownloadReason::Standalone,
+				None,
+				state,
+				None,
+			)
+			.await?;
+            crate::state::instances::commands::add_downloaded_project_version(
                 instance_id,
-                version_id,
-                DownloadReason::Standalone,
-                None,
+                downloaded,
                 ContentSourceKind::SharedInstance,
                 state,
             )
@@ -712,6 +1086,7 @@ pub(super) async fn apply_shared_instance_content(
             .await?;
         }
     }
+    ensure_shared_instance_additions_enabled(instance_id, data, state).await?;
 
     crate::api::instance::edit(
         instance_id,
@@ -788,11 +1163,29 @@ async fn install_shared_instance_external_file(
     file: &SharedInstanceExternalFileData,
     state: &State,
 ) -> crate::Result<()> {
-    if file.file_type == CONFIG_BUNDLE_FILE_TYPE && !CONFIG_SYNC_ENABLED {
+    if matches!(
+        file.file_type.as_str(),
+        CONFIG_BUNDLE_FILE_TYPE | CONFIG_FILE_TYPE
+    ) && !CONFIG_SYNC_ENABLED
+    {
         return Ok(());
     }
 
-    validate_shared_instance_external_file_name(&file.file_name)?;
+    if file.file_type == CONFIG_FILE_TYPE {
+        crate::state::content_store::validate_relative(&file.file_name)?;
+        if file.file_name.split('/').any(|part| part.starts_with('.'))
+            || !is_supported_config_file(std::path::Path::new(&file.file_name))
+            || file.file_size > MAX_CONFIG_BUNDLE_FILE_SIZE
+        {
+            return Err(crate::ErrorKind::InputError(format!(
+                "Shared instance config file {} is unsupported or too large",
+                file.file_name
+            ))
+            .into());
+        }
+    } else {
+        validate_shared_instance_external_file_name(&file.file_name)?;
+    }
 
     if file.file_size > MAX_SHARED_INSTANCE_EXTERNAL_FILE_SIZE {
         return Err(crate::ErrorKind::InputError(format!(
@@ -862,6 +1255,16 @@ async fn install_shared_instance_external_file(
         .into());
     }
     let bytes = bytes::Bytes::from(bytes);
+
+    if file.file_type == CONFIG_FILE_TYPE {
+        return crate::api::instance::write_instance_file(
+            instance_id,
+            &file.file_name,
+            &bytes,
+            false,
+        )
+        .await;
+    }
 
     if file.file_type == CONFIG_BUNDLE_FILE_TYPE {
         return install_shared_instance_config_bundle(

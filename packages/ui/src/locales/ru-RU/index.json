@@ -392,9 +392,6 @@
   "content.card.synced": {
     "defaultMessage": "Синхронизировано между сборками"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Загружено"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Вы точно хотите обновить {count, plural, one {# проект} few {# проекта} other {# проектов}} до {count, plural, =1 {последней совместимой версии} other {последних совместимых версий}}? Рекомендуется обновлять контент по очереди."
   },
@@ -626,9 +623,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Посмотреть контент"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Автор"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Среда"
   },
@@ -653,17 +647,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Необновлённые"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Клиент зависит от файла"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Контент только для клиента"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Файл для клиента сохранен"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Без предупреждений"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Предупреждения"
@@ -694,9 +679,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Фильтр"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# автор} few {# автора} other {# авторов}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Загрузка контента..."
@@ -1889,12 +1871,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Не удалось удалить контент"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Не удалось отключить контент"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Не удалось включить контент"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Не удалось обновить контент"
   },
@@ -1909,9 +1885,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Не удалось удалить контент"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Не удалось переключить {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Не удалось отвязать сборку"
@@ -2348,12 +2321,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Включен"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Сторонний"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Этот файл не с Modrinth."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Управляемый контент"
   },
@@ -2368,9 +2335,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Поиск по {count, number} {count, plural, one {проекту} other {проектам}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Предупреждения"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Текущая"
@@ -2455,15 +2419,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Изменения сохранены"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Этот мод зависит от клиентского мода и может вызвать проблемы при запуске сервера"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Это клиентский мод — он может вызвать проблемы при запуске сервера"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Это клиентский мод, который был установлен в качестве зависимости — он может вызвать проблемы при запуске сервера"
   },
   "label.collections": {
     "defaultMessage": "Коллекции"
@@ -5417,15 +5372,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Теперь они находятся здесь!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Больше не показывать"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Настройки сервера перемещены"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Совместные серверы"
   },
@@ -5659,18 +5605,6 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "Учётные данные SFTP обновлены"
-  },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Произошла непредвиденная ошибка во время установки. Пожалуйста, попробуйте позже."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Установка не удалась"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Произошла непредвиденная ошибка во время загрузки. Пожалуйста, попробуйте снова позже."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Загрузка сборки не удалась"
   },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Установить сервер"

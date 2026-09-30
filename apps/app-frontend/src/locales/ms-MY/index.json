@@ -1679,54 +1679,6 @@
   "instance.files.save-as": {
     "message": "Simpan sebagai..."
   },
-  "instance.icon-editor.background.blue": {
-    "message": "Biru"
-  },
-  "instance.icon-editor.background.gray": {
-    "message": "Kelabu"
-  },
-  "instance.icon-editor.background.green": {
-    "message": "Hijau"
-  },
-  "instance.icon-editor.background.lime": {
-    "message": "Hijau Muda"
-  },
-  "instance.icon-editor.background.pink": {
-    "message": "Merah Jambu"
-  },
-  "instance.icon-editor.background.red": {
-    "message": "Merah"
-  },
-  "instance.icon-editor.background.rose": {
-    "message": "Mawar"
-  },
-  "instance.icon-editor.symbol.cake": {
-    "message": "Kek"
-  },
-  "instance.icon-editor.symbol.chest": {
-    "message": "Peti"
-  },
-  "instance.icon-editor.symbol.forge": {
-    "message": "Forge"
-  },
-  "instance.icon-editor.symbol.globe": {
-    "message": "Glob"
-  },
-  "instance.icon-editor.symbol.orb": {
-    "message": "Orb"
-  },
-  "instance.icon-editor.symbol.quilt": {
-    "message": "Quilt"
-  },
-  "instance.icon-editor.symbol.sword": {
-    "message": "Pedang"
-  },
-  "instance.icon-editor.symbol.tire": {
-    "message": "Tayar"
-  },
-  "instance.icon-editor.symbol.tnt": {
-    "message": "TNT"
-  },
   "instance.server-modal.address": {
     "message": "Alamat"
   },
@@ -1738,9 +1690,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Pek sumber"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Penggunaan"
   },
   "instance.settings.tabs.general": {
     "message": "Umum"

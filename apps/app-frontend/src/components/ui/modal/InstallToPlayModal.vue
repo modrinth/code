@@ -7,10 +7,6 @@
 		width="544px"
 	>
 		<div v-if="requiredContentProject" class="flex w-full flex-col gap-6">
-			<p class="m-0 text-primary">
-				{{ formatMessage(messages.inviteWarning) }}
-			</p>
-
 			<div class="flex flex-col gap-2.5">
 				<div class="flex items-center justify-between">
 					<span class="font-semibold text-contrast">
@@ -368,11 +364,6 @@ const messages = defineMessages({
 	installToPlay: {
 		id: 'app.modal.install-to-play.header',
 		defaultMessage: 'Install to play',
-	},
-	inviteWarning: {
-		id: 'app.modal.install-to-play.invite-warning',
-		defaultMessage:
-			'This invite was created by another Modrinth user, not Modrinth. Only accept invites from people you trust.',
 	},
 	sharedInstance: {
 		id: 'app.modal.install-to-play.shared-instance',

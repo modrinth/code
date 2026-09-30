@@ -1,8 +1,10 @@
 import type { InferredClientModules } from '../modules'
 import { buildModuleStructure } from '../modules'
 import type { BaseUrlConfig, ClientConfig } from '../types/client'
+import type { DownloadSink } from '../types/download'
 import type { RequestContext, RequestOptions } from '../types/request'
 import type { UploadMetadata, UploadProgress, UploadRequestOptions } from '../types/upload'
+import { appendRequestParams } from '../utils/fetch'
 import type { AbstractFeature } from './abstract-feature'
 import type { AbstractModule } from './abstract-module'
 import type { AbstractSyncClient } from './abstract-sync'
@@ -164,6 +166,47 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 			const apiError = this.normalizeError(error, context)
 			await this.config.hooks?.onError?.(apiError, context)
 
+			throw apiError
+		}
+	}
+
+	async download(path: string, options: RequestOptions, sink: DownloadSink): Promise<void> {
+		let baseUrl: string
+		if (options.api === 'labrinth') {
+			baseUrl = this.resolveBaseUrl(this.config.labrinthBaseUrl!)
+		} else if (options.api === 'archon') {
+			baseUrl = this.resolveBaseUrl(this.config.archonBaseUrl!)
+		} else if (options.api === 'sharedinstances') {
+			baseUrl = this.resolveBaseUrl(this.config.sharedInstancesBaseUrl!)
+		} else {
+			baseUrl = options.api
+		}
+
+		const mergedOptions: RequestOptions = {
+			method: 'GET',
+			retry: false,
+			circuitBreaker: false,
+			...options,
+			headers: {
+				...(await this.buildDefaultHeaders()),
+				...options.headers,
+			},
+		}
+		this.attachArchonSentryCaptureHeader(mergedOptions)
+		const context = this.buildContext(
+			this.buildUrl(path, baseUrl, options.version),
+			path,
+			mergedOptions,
+		)
+
+		try {
+			await this.executeFeatureChain<void>(context, () =>
+				sink(appendRequestParams(context.url, context.options.params), context.options),
+			)
+			await this.config.hooks?.onResponse?.(undefined, context)
+		} catch (error) {
+			const apiError = this.normalizeError(error, context)
+			await this.config.hooks?.onError?.(apiError, context)
 			throw apiError
 		}
 	}

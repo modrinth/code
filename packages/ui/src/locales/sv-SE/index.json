@@ -383,9 +383,6 @@
   "content.card.synced": {
     "defaultMessage": "Synkroniserade mellan instanser"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Uppladdad"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Är du säker på att du vill uppdatera {count, plural, one {# projekt} other {# projekt}} till deras senaste kompatibla version? Det är rekommenderat att uppdatera innehållet individuellt."
   },
@@ -638,9 +635,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Visa innehåll"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Författare"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Miljö"
   },
@@ -665,14 +659,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Uppdatering tillgänglig"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Klient beror på fil"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Klientinnehåll endast"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Inga varningar"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Varningar"
@@ -703,9 +691,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count} författare"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Läser in innehåll..."
@@ -1877,12 +1862,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Kunde inte radera innehåll"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Kunde inte inaktivera innehåll"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Kunde inte aktivera innehåll"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Kunde inte uppdatera innehåll"
   },
@@ -1897,9 +1876,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Kunde inte radera innehållet"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Kunde inte växla {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Kunde inte avlänka modpaketet"
@@ -2276,12 +2252,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Aktiverad"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Extern"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Den här filer är inte publicerad på Modrinth."
-  },
   "instances.managed-content-modal.loading": {
     "defaultMessage": "Läser in innehåll..."
   },
@@ -2293,9 +2263,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Sök {count} projekt"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Varningar"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nuvarande"
@@ -2377,15 +2344,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Ändringar sparade"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Den här modden beror på en klientsidesmodd och kan orsaka problem när du startar din server"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Det här är en klientsidesmodd och kan orsaka problem när du startar din server"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Det här är en klientsidesmodd som installerades som ett beroende och kan orsaka problem när du startar din server"
   },
   "label.collections": {
     "defaultMessage": "Samlingar"
@@ -5165,15 +5123,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "De kan nu hittas här!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Visa inte igen"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Dina server-inställningar har flyttats"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Delade servrar"
   },
@@ -5377,18 +5326,6 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-modal-description": {
     "defaultMessage": "Det tidigare användarnamnet och lösenordet kommer att sluta fungera."
-  },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Ett oväntat fel inträffade under installeringen. Vänligen försök igen senare."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Installation misslyckades"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Ett oväntat fel inträffade under uppladdningen. Vänligen försök igen senare."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Modpaketsuppladdning misslyckades"
   },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Ställ in server"

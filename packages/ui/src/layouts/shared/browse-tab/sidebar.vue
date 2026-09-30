@@ -9,6 +9,7 @@ import SearchSidebarFilter from '#ui/components/search/SearchSidebarFilter.vue'
 import { useVIntl } from '#ui/composables/i18n'
 import { useAdvancedPrefs } from '#ui/utils/advanced-filter-preferences'
 import { commonMessages } from '#ui/utils/common-messages'
+import { LOADER_FILTER_TYPES } from '#ui/utils/search'
 
 import AdvancedFiltersPersistenceNote from './components/AdvancedFiltersPersistenceNote.vue'
 import { injectBrowseManager } from './providers/browse-manager'
@@ -22,6 +23,16 @@ const advancedPrefs = useAdvancedPrefs()
 const isApp = computed(() => ctx.variant === 'app')
 const lockedMessages = computed(() => toValue(ctx.lockedFilterMessages))
 const hiddenFilterTypes = computed(() => ctx.hiddenFilterTypes?.value ?? [])
+const visibleFilters = computed(() => {
+	const filters = ctx.filters.value.filter(
+		(filter) => filter.display !== 'none' && !hiddenFilterTypes.value.includes(filter.id),
+	)
+	if (!isApp.value) return filters
+
+	const priority = (id: string) =>
+		id === 'game_version' ? 2 : LOADER_FILTER_TYPES.some((type) => type === id) ? 1 : 0
+	return filters.sort((a, b) => priority(b.id) - priority(a.id))
+})
 
 const advancedFiltersCollapsed = computed(() => ctx.advancedFiltersCollapsed?.value ?? true)
 const photosensitivityWarningModal = useTemplateRef('photosensitivityWarningModal')
@@ -242,9 +253,7 @@ function getFilterOpenByDefault(filterId: string): boolean {
 		</template>
 		<template v-else>
 			<SearchSidebarFilter
-				v-for="filter in ctx.filters.value.filter(
-					(f) => f.display !== 'none' && !hiddenFilterTypes.includes(f.id),
-				)"
+				v-for="filter in visibleFilters"
 				:key="`filter-${filter.id}`"
 				v-model:selected-filters="ctx.currentFilters.value"
 				v-model:toggled-groups="ctx.toggledGroups.value"

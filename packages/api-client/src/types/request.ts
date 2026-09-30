@@ -29,6 +29,9 @@ export type RequestOptions = {
 	 */
 	method?: HttpMethod
 
+	/** Explicit response decoding for binary downloads. */
+	responseType?: 'blob'
+
 	/**
 	 * Request headers
 	 */

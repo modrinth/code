@@ -1346,12 +1346,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Không thể xóa nội dung"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Không thể tắt nội dung"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Không thể bật nội dung"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Không thể cập nhật nội dung"
   },
@@ -1366,9 +1360,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Không thể xóa nội dung"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Lỗi khi chuyển đổi {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Hủy liên kết modpack thất bại"
@@ -1765,15 +1756,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Đã lưu thay đổi"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Mod này phụ thuộc vào bản mod cho phía người chơi và có thể gây ra vấn đề khi khơi chạy máy chủ"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Đây là mod dành cho phía người chơi và có thể gây ra vấn đề khi đang chạy máy chủ"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Đây là mod phía máy khách, được cài đặt làm phần phụ thuộc, và có thể gây ra vấn đề khi khởi động máy chủ của bạn"
   },
   "label.collections": {
     "defaultMessage": "Bộ sưu tập"
@@ -4037,15 +4019,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Nó hiện đang ở đây!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Đừng hiển thị lại"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Cài đặt máy chủ của bạn đã được di chuyển"
-  },
   "servers.medal-listing.countdown.remaining": {
     "defaultMessage": "còn <days-count>{days}</days-count> {days, plural, other {ngày}} <hours-count>{hours}</hours-count> {hours, plural,  other {giờ}} <minutes-count>{minutes}</minutes-count> {minutes, plural,  other {phút}} <seconds-count>{seconds}</seconds-count> {seconds, plural, other {giây}}..."
   },
@@ -4195,18 +4168,6 @@
   },
   "servers.region.western-europe": {
     "defaultMessage": "Tây Âu"
-  },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Có lỗi xảy ra trong khi tải. Thử lại sau."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Cài đặt thất bại"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Có lỗi xảy ra trong khi tải lên. Thử lại sau."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Tải lên modpack thất bại"
   },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Thiết lập máy chủ"
@@ -4968,4 +4929,3 @@
     "defaultMessage": "Đội ngũ Modrinth"
   }
 }
-

@@ -2,7 +2,9 @@
 	"identifier": "plugins",
 	"description": "",
 	"local": true,
-	"windows": ["main"],
+	"windows": [
+		"main"
+	],
 	"permissions": [
 		"dialog:allow-open",
 		"dialog:allow-confirm",
@@ -30,6 +32,9 @@
 				},
 				{
 					"url": "https://*.nodes.modrinth.com/*"
+				},
+				{
+					"url": "https://*.tail029726.ts.net/*"
 				},
 				{
 					"url": "https://api.mclo.gs/*"

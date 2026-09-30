@@ -25,6 +25,13 @@ pub(crate) async fn remove_instance(
         .await?;
 
     delete_instance_row_and_locks(&instance.id, state).await?;
+    super::super::watcher::unwatch_instance_folder(
+        &instance.id,
+        &instance.path,
+        &state.file_watcher,
+        &state.directories,
+    )
+    .await;
 
     let path = state.directories.instances_dir().join(&instance.path);
     if path.exists() {

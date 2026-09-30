@@ -395,9 +395,6 @@
   "content.card.synced": {
     "defaultMessage": "Sincronizado entre instancias"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Subido"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "¿Estás seguro de que quieres actualizar {count, plural, one {# proyecto} other {# proyectos}} a su última versión compatible? Se recomienda actualizar el contenido uno por uno."
   },
@@ -656,9 +653,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Ver contenido"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Autor"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Entorno"
   },
@@ -683,17 +677,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Actualización disponible"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "El cliente depende del archivo"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Contenido exclusivo del cliente"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Archivo cliente retenido"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "No hay advertencias"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Advertencias"
@@ -724,9 +709,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtro"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# autor} other {# autores}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Cargando contenido..."
@@ -1967,12 +1949,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "No se ha podido eliminar el contenido"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "No se ha podido desactivar el contenido"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "No se ha podido habilitar el contenido"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "No se ha podido actualizar el contenido"
   },
@@ -1987,9 +1963,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "No se ha podido eliminar el contenido"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "No se ha podido alternar {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "No se ha podido desvincular el modpack"
@@ -2429,12 +2402,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Habilitado"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Externo"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Este archivo no está publicado en Modrinth."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Administrar contenido"
   },
@@ -2449,9 +2416,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Buscar {count, number} {count, plural, one {proyecto} other {proyectos}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Advertencias"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Actual"
@@ -2533,15 +2497,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Cambios guardados"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Este mod depende de un mod del lado del cliente y puede provocar problemas al iniciar el servidor"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Este mod es diseñado para jugadores, no para el servidor, y podría causar problemas al iniciar tu servidor"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Este es un mod del lado del cliente que se instaló como dependencia y puede causar problemas al iniciar el servidor"
   },
   "label.collections": {
     "defaultMessage": "Colecciones"
@@ -5501,15 +5456,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Servidores de Modrinth"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "¡Ahora pueden encontrarse aquí!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "No volver a mostrar"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "La configuración de tu servidor se ha movido"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Servidores compartidos"
   },
@@ -5743,18 +5689,6 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "Credenciales SFTP rotadas"
-  },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Se ha producido un error inesperado durante la instalación. Inténtalo de nuevo más tarde."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Instalación fallida"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Se ha producido un error inesperado durante la carga. Inténtalo de nuevo más tarde."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Carga de modpack fallada"
   },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Configurar servidor"

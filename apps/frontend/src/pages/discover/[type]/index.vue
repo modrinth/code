@@ -177,6 +177,7 @@ const onboardingModalRef = ref<ServerInstallModalHandle | null>(null)
 const {
 	currentServerId,
 	fromContext,
+	isSetupServerContext,
 	serverData,
 	serverContentData,
 	serverFilters,
@@ -351,27 +352,31 @@ function getCardActions(
 	}
 
 	if (serverData.value) {
-		const isQueued = queuedServerInstallProjectIds.value.has(result.project_id)
-		const isQueuedRoot = queuedServerInstallRootProjectIds.value.has(result.project_id)
+		const isQueued =
+			!isSetupServerContext.value && queuedServerInstallProjectIds.value.has(result.project_id)
+		const isQueuedRoot =
+			!isSetupServerContext.value && queuedServerInstallRootProjectIds.value.has(result.project_id)
 		const isInstalled =
-			projectResult.installed ||
-			optimisticallyInstalledProjectIds.value.has(result.project_id) ||
-			(serverContentData.value &&
-				(serverContentData.value.addons ?? []).find((x) => x.project_id === result.project_id)) ||
-			serverData.value.upstream?.project_id === result.project_id
+			!isSetupServerContext.value &&
+			(projectResult.installed ||
+				optimisticallyInstalledProjectIds.value.has(result.project_id) ||
+				(serverContentData.value &&
+					(serverContentData.value.addons ?? []).find((x) => x.project_id === result.project_id)) ||
+				serverData.value.upstream?.project_id === result.project_id)
 		const isInstalling = installingProjectIds.value.has(result.project_id)
 		const isInstallingSelection = isInstallingQueuedServerInstalls.value
+		const showAsInstalling = isInstalling || (isInstallingSelection && isQueuedRoot)
 		const validatingInstall =
 			isInstalling && currentProjectType !== 'modpack' && !isInstallingSelection
 		const installLabel = isInstalled
 			? formatMessage(commonMessages.installedLabel)
 			: isQueued
-				? isInstalling || isInstallingSelection
+				? showAsInstalling
 					? validatingInstall
 						? formatMessage(commonMessages.validatingLabel)
 						: formatMessage(commonMessages.installingLabel)
 					: formatMessage(commonMessages.selectedLabel)
-				: isInstalling || isInstallingSelection
+				: showAsInstalling
 					? validatingInstall
 						? formatMessage(commonMessages.validatingLabel)
 						: formatMessage(commonMessages.installingLabel)
@@ -381,16 +386,11 @@ function getCardActions(
 			{
 				key: 'install',
 				label: installLabel,
-				icon:
-					isInstalling || isInstallingSelection
-						? SpinnerIcon
-						: isQueued || isInstalled
-							? CheckIcon
-							: DownloadIcon,
-				iconClass: isInstalling || isInstallingSelection ? 'animate-spin' : undefined,
+				icon: showAsInstalling ? SpinnerIcon : isQueued || isInstalled ? CheckIcon : DownloadIcon,
+				iconClass: showAsInstalling ? 'animate-spin' : undefined,
 				disabled:
 					!!isInstalled || isInstalling || isInstallingSelection || (isQueued && !isQueuedRoot),
-				color: isQueued && !isInstalling && !isInstallingSelection ? 'green' : 'brand',
+				color: isQueued && !showAsInstalling ? 'green' : 'brand',
 				type: 'outlined',
 				onClick: () => serverInstall(projectResult),
 			},
@@ -650,7 +650,7 @@ const { isStuck: isInstallHeaderStuck } = useStickyObserver(
 	</div>
 
 	<CreationFlowModal
-		v-if="currentServerId && projectType?.id === 'modpack'"
+		v-if="currentServerId && fromContext !== 'onboarding'"
 		ref="onboardingModalRef"
 		:type="fromContext === 'reset-server' ? 'reset-server' : 'server-onboarding'"
 		:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"

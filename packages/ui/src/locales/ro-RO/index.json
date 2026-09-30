@@ -854,12 +854,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Nu s-a putut șterge conținutul"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Nu s-a putut dezactiva conținutul"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Nu s-a putut activa conținutul"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Nu s-a putut actualiza conținutul"
   },
@@ -874,9 +868,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Nu s-a putut înlătura conținutul"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Nu s-a putut comuta {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Nu s-a putut nelinka pachetul de moduri"
@@ -1123,15 +1114,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Schimbările au fost salvate"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Acest mod depinde de un mod client-side și poate cauza probleme în timp ce îți pornești serverul"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Acest mod este client-side și poate cauza probleme în timp ce îți pornești serverul"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Acest mod este client-side care a fost instalat ca o dependență și poate cauza probleme în timp ce îți pornești serverul"
   },
   "label.collections": {
     "defaultMessage": "Colecții"

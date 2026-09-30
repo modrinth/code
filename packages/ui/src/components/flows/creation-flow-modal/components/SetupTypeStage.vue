@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-4">
+	<div class="flex flex-col gap-4" :aria-busy="ctx.navigating.value">
 		<span class="font-semibold text-contrast">
 			{{ formatMessage(messages.knownProjectPrompt) }}
 		</span>
@@ -11,7 +11,7 @@
 			searchable
 			show-search-icon
 			:show-chevron="false"
-			:disabled="ctx.finishDisabled.value"
+			:disabled="ctx.finishDisabled.value || ctx.navigating.value"
 			:search-placeholder="formatMessage(messages.searchProjectPlaceholder)"
 			:no-options-message="
 				searchLoading
@@ -28,7 +28,11 @@
 					<span>
 						{{
 							formatMessage(
-								isModpackOption(item.value) ? messages.installModpack : messages.createInstance,
+								isModpackOption(item.value)
+									? messages.installModpack
+									: ctx.flowType === 'instance'
+										? messages.createInstance
+										: commonMessages.continueButton,
 							)
 						}}
 					</span>
@@ -51,24 +55,28 @@
 		<template v-if="ctx.flowType === 'instance'">
 			<div class="flex flex-col gap-3">
 				<BigOptionButton
+					:disabled="ctx.navigating.value"
 					:icon="BoxesIcon"
 					:title="formatMessage(messages.customSetupTitle)"
 					:description="formatMessage(messages.customSetupDescription)"
 					@click="setSetupType('custom')"
 				/>
 				<BigOptionButton
+					:disabled="ctx.navigating.value"
 					:icon="CompassIcon"
 					:title="formatMessage(messages.modpackBaseTitle)"
 					:description="formatMessage(messages.modpackBaseDescription)"
 					@click="browseModpacks"
 				/>
 				<BigOptionButton
+					:disabled="ctx.navigating.value"
 					:icon="UploadIcon"
 					:title="formatMessage(messages.uploadModpackTitle)"
 					:description="formatMessage(messages.uploadModpackDescription)"
 					@click="triggerFileInput"
 				/>
 				<BigOptionButton
+					:disabled="ctx.navigating.value"
 					:icon="BoxImportIcon"
 					:title="formatMessage(messages.importInstanceTitle)"
 					:description="formatMessage(messages.importInstanceDescription)"
@@ -80,24 +88,28 @@
 		<template v-else>
 			<div class="flex flex-col gap-3">
 				<BigOptionButton
+					:disabled="ctx.navigating.value"
 					:icon="CompassIcon"
 					:title="formatMessage(messages.modpackBaseTitle)"
 					:description="formatMessage(messages.modpackBaseDescription)"
 					@click="browseModpacks"
 				/>
 				<BigOptionButton
+					:disabled="ctx.navigating.value"
 					:icon="UploadIcon"
 					:title="formatMessage(messages.uploadModpackTitle)"
 					:description="formatMessage(messages.uploadModpackDescription)"
 					@click="triggerFileInput"
 				/>
 				<BigOptionButton
+					:disabled="ctx.navigating.value"
 					:icon="BoxesIcon"
 					:title="formatMessage(messages.customSetupTitle)"
 					:description="formatMessage(messages.customSetupDescription)"
 					@click="setSetupType('custom')"
 				/>
 				<BigOptionButton
+					:disabled="ctx.navigating.value"
 					:icon="BoxIcon"
 					:title="formatMessage(messages.vanillaMinecraftTitle)"
 					:description="formatMessage(messages.vanillaMinecraftDescription)"
@@ -328,7 +340,7 @@ watch(
 		if (!projectId) return
 		const hit = ctx.projectSearchHits.value[projectId]
 
-		if (ctx.flowType === 'instance') {
+		if (ctx.flowType === 'instance' || hit?.projectType !== 'modpack') {
 			void ctx.selectProject(projectId, hit?.projectType ?? 'mod')
 			return
 		}

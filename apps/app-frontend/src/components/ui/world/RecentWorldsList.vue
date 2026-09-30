@@ -8,6 +8,7 @@ import {
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
+import { autoToHTML } from '@sfirew/minecraft-motd-parser'
 import { useQueries, useQuery, useQueryClient } from '@tanstack/vue-query'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
@@ -18,9 +19,9 @@ import {
 	instanceProtocolQueryOptions,
 	recentWorldsKey,
 	recentWorldsQueryOptions,
-	serverStatusQueryOptions,
 } from '@/components/ui/world/queries'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
+import { serverStatusQueryOptions } from '@/composables/instances/use-server-status-query'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { handleSevereError } from '@/composables/use-error.js'
@@ -36,6 +37,7 @@ import {
 	hasWorldQuickPlaySupport,
 	type ProtocolVersion,
 	type ServerData,
+	type ServerStatus,
 	start_join_server,
 	start_join_singleplayer_world,
 	type WorldWithInstance,
@@ -241,7 +243,13 @@ function markInstancePlayed(item: InstanceJumpBackInItem) {
 const serverWorlds = computed(() =>
 	jumpBackInItems.value.flatMap((item) =>
 		item.type === 'world' && item.world.type === 'server'
-			? [{ instance: item.instance, address: item.world.address }]
+			? [
+					{
+						instance: item.instance,
+						address: item.world.address,
+						managed: item.world.source === 'linked_server_project',
+					},
+				]
 			: [],
 	),
 )
@@ -264,28 +272,42 @@ const protocolVersions = computed(() => {
 	return versions
 })
 const serversToPing = computed(() => {
-	const servers = new Map<string, { address: string; protocol: ProtocolVersion | null }>()
-	for (const { instance, address } of serverWorlds.value) {
+	const servers = new Map<
+		string,
+		{ address: string; protocol: ProtocolVersion | null; managed: boolean }
+	>()
+	for (const { instance, address, managed } of serverWorlds.value) {
 		const protocol = protocolVersions.value[instance.id]
 		const index = serverInstances.value.findIndex((server) => server.id === instance.id)
-		if (protocol === undefined && !protocolQueries.value[index]?.isError) continue
-		if (!servers.has(address)) servers.set(address, { address, protocol: protocol ?? null })
+		if (!managed && protocol === undefined && !protocolQueries.value[index]?.isError) continue
+		if (!servers.has(address)) {
+			servers.set(address, { address, protocol: managed ? null : (protocol ?? null), managed })
+		}
 	}
 	return [...servers.values()]
 })
 const serverQueries = useQueries({
 	queries: computed(() =>
-		serversToPing.value.map(({ address, protocol }) => ({
+		serversToPing.value.map(({ address, protocol, managed }) => ({
 			...serverStatusQueryOptions(address, protocol),
-			select: (data: ServerData) => ({ address, data }),
+			refetchInterval: managed ? 30_000 : false,
+			select: (status: ServerStatus) => ({
+				address,
+				status,
+				renderedMotd: status.description ? autoToHTML(status.description) : undefined,
+			}),
 		})),
 	),
 })
 const serverData = computed(() => {
 	const data: Record<string, ServerData> = {}
-	for (const query of serverQueries.value) {
-		if (query.data) {
-			data[query.data.address] = { ...query.data.data, refreshing: query.isFetching }
+	for (const [index, query] of serverQueries.value.entries()) {
+		const address = serversToPing.value[index]?.address
+		if (!address) continue
+		data[address] = {
+			refreshing: query.isPending && !query.isError,
+			status: query.isError ? undefined : query.data?.status,
+			renderedMotd: query.isError ? undefined : query.data?.renderedMotd,
 		}
 	}
 	return data
