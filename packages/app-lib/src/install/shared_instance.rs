@@ -598,12 +598,6 @@ async fn shared_modpack_toggles(
         return Ok((Vec::new(), false));
     };
     let inherited = shared_modpack_files(&modpack.version_id, state).await?;
-    let explicit =
-        shared_instance_versions_by_id(&data.modrinth_ids, state).await?;
-    let explicit_by_project = explicit
-        .values()
-        .map(|version| (version.project_id.as_str(), version.id.as_str()))
-        .collect::<HashMap<_, _>>();
     let entries = content_rows::get_content_entries(
         &metadata.applied_content_set.id,
         &state.pool,
@@ -618,17 +612,12 @@ async fn shared_modpack_toggles(
     let mut toggles = Vec::new();
     let mut missing = false;
     for inherited in inherited {
-        let overridden = inherited
-            .project_id
-            .as_deref()
-            .and_then(|id| explicit_by_project.get(id))
-            .is_some_and(|id| Some(*id) != inherited.version_id.as_deref())
-            || data.external_files.iter().any(|file| {
-                ProjectType::from_name(&file.file_type).is_some_and(|kind| {
-                    inherited.relative_path
-                        == format!("{}/{}", kind.get_folder(), file.file_name)
-                })
-            });
+        let overridden = data.external_files.iter().any(|file| {
+            ProjectType::from_name(&file.file_type).is_some_and(|kind| {
+                inherited.relative_path
+                    == format!("{}/{}", kind.get_folder(), file.file_name)
+            })
+        });
         let enabled = !inherited.is_removed(&data.removed_files) && !overridden;
         let current = entries
             .iter()
