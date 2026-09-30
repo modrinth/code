@@ -22,7 +22,7 @@ use crate::{
         organizations::Organization,
         pats::Scopes,
         projects::Project,
-        users::{Badges, Role, User, UserLock},
+        users::{Badges, Role, User},
     },
     queue::session::AuthQueue,
     util::{img::delete_old_images, routes::read_limited_from_payload},
@@ -616,14 +616,10 @@ pub async fn users_get(
         .into_iter()
         .map(|data| {
             let mut user = crate::models::users::User::from(data.clone());
-            let is_self = auth_user.as_ref().is_some_and(|x| x.id == user.id);
             if is_mod {
                 user.moderation_notes =
                     Some(notes.get(&data.id).cloned().map(Into::into));
-            }
-            if is_mod || is_self {
-                user.lock =
-                    data.lock.map(|lock| UserLock::from_db(lock, is_mod));
+                user.lock = data.lock.map(Into::into);
             }
             user
         })
@@ -669,9 +665,6 @@ pub async fn user_get(
 
         let is_admin = auth_user.as_ref().is_some_and(|x| x.role.is_admin());
         let is_mod = auth_user.as_ref().is_some_and(|x| x.role.is_mod());
-        let is_self = auth_user
-            .as_ref()
-            .is_some_and(|x| x.id == UserId::from(data.id));
         let user_id = data.id;
         let lock = data.lock.clone();
 
@@ -694,10 +687,7 @@ pub async fn user_get(
                 .await
                 .wrap_internal_err("fetching moderation note from database")?;
             response.moderation_notes = Some(note.map(Into::into));
-        }
-
-        if is_mod || is_self {
-            response.lock = lock.map(|lock| UserLock::from_db(lock, is_mod));
+            response.lock = lock.map(Into::into);
         }
 
         Ok(HttpResponse::Ok().json(response))

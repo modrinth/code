@@ -82,16 +82,15 @@ pub struct User {
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct UserLock {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub locked_by: Option<UserId>,
+    pub locked_by: UserId,
     pub reason: String,
     pub created: DateTime<Utc>,
 }
 
-impl UserLock {
-    pub fn from_db(lock: DBUserLock, viewer_is_mod: bool) -> Self {
+impl From<DBUserLock> for UserLock {
+    fn from(lock: DBUserLock) -> Self {
         Self {
-            locked_by: viewer_is_mod.then(|| lock.locked_by.into()),
+            locked_by: lock.locked_by.into(),
             reason: lock.reason,
             created: lock.created,
         }
@@ -222,7 +221,7 @@ impl User {
             allow_friend_requests: Some(db_user.allow_friend_requests),
             eligibility_verified_at: db_user.eligibility_verified_at,
             moderation_notes: None,
-            lock: db_user.lock.map(|lock| UserLock::from_db(lock, false)),
+            lock: None,
         }
     }
 }
