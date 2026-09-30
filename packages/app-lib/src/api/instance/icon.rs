@@ -77,33 +77,28 @@ pub async fn cache_remote_icon(source: &str) -> crate::Result<PathBuf> {
         sha1_async(Bytes::copy_from_slice(source.as_bytes())).await?;
     let mapping = icons.join(format!("remote-{source_hash}.txt"));
     let mut cached_path = None;
-    if let Ok(metadata) = tokio::fs::metadata(&mapping).await {
-        if metadata.len() <= 44 {
-            if let Ok(filename) = tokio::fs::read_to_string(&mapping).await {
-                if filename.len() == 44
-                    && filename.ends_with(".png")
-                    && filename.as_bytes()[..40]
-                        .iter()
-                        .all(u8::is_ascii_hexdigit)
-                {
-                    let path = icons.join(filename);
-                    if tokio::fs::try_exists(&path).await? {
-                        let fresh = metadata
-                            .modified()
-                            .ok()
-                            .and_then(|modified| modified.elapsed().ok())
-                            .is_some_and(|age| age < REMOTE_ICON_MAX_AGE);
-                        if fresh {
-                            return Ok(io::canonicalize(path)?);
-                        }
-                        cached_path = Some(path);
-                    }
-                }
+    if let Ok(metadata) = tokio::fs::metadata(&mapping).await
+        && metadata.len() <= 44
+        && let Ok(filename) = tokio::fs::read_to_string(&mapping).await
+        && filename.len() == 44
+        && filename.ends_with(".png")
+        && filename.as_bytes()[..40].iter().all(u8::is_ascii_hexdigit)
+    {
+        let path = icons.join(filename);
+        if tokio::fs::try_exists(&path).await? {
+            let fresh = metadata
+                .modified()
+                .ok()
+                .and_then(|modified| modified.elapsed().ok())
+                .is_some_and(|age| age < REMOTE_ICON_MAX_AGE);
+            if fresh {
+                return Ok(io::canonicalize(path)?);
             }
+            cached_path = Some(path);
         }
     }
 
-	let _permit = REMOTE_ICON_DOWNLOADS.acquire().await?;
+    let _permit = REMOTE_ICON_DOWNLOADS.acquire().await?;
     let refreshed = async {
         let bytes = download_remote_icon(source).await?;
         let path = cache_icon(bytes, &state).await?;
@@ -423,20 +418,21 @@ async fn write_cached_icon(
     }
 
     let hash = sha1_async(bytes.clone()).await?;
-	let directory = state.directories.caches_dir().join("icons");
-	let path = directory.join(format!("{hash}.png"));
-	if let Ok(metadata) = tokio::fs::metadata(&path).await {
-		if metadata.is_file() && metadata.len() == bytes.len() as u64 {
-			return Ok(io::canonicalize(path)?);
-		}
-	}
-	let _permit = state.io_semaphore.0.acquire().await?;
-	tokio::fs::create_dir_all(&directory).await?;
-	let (mut file, temporary) = temporary_file(Some(&directory)).await?;
-	file.write_all(&bytes).await?;
-	file.flush().await?;
-	drop(file);
-	tokio::fs::rename(&temporary, &path).await?;
+    let directory = state.directories.caches_dir().join("icons");
+    let path = directory.join(format!("{hash}.png"));
+    if let Ok(metadata) = tokio::fs::metadata(&path).await
+        && metadata.is_file()
+        && metadata.len() == bytes.len() as u64
+    {
+        return Ok(io::canonicalize(path)?);
+    }
+    let _permit = state.io_semaphore.0.acquire().await?;
+    tokio::fs::create_dir_all(&directory).await?;
+    let (mut file, temporary) = temporary_file(Some(&directory)).await?;
+    file.write_all(&bytes).await?;
+    file.flush().await?;
+    drop(file);
+    tokio::fs::rename(&temporary, &path).await?;
 
     Ok(io::canonicalize(path)?)
 }

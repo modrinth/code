@@ -83,6 +83,7 @@ export interface PopupNotificationToast extends PopupNotificationBase {
 	progressType?: PopupNotificationProgressType
 	progressCurrent?: number
 	progressTotal?: number
+	onReview?: () => void | Promise<void>
 	onAccept?: () => void | Promise<void>
 	onDecline?: () => void | Promise<void>
 	onDismiss?: () => void | Promise<void>

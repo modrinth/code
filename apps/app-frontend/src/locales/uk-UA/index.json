@@ -329,17 +329,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "Дубльований примірник"
   },
-  "app.download-manager.empty": {
-    "message": "Немає завдань установлення"
-  },
   "app.download-manager.estimated-rate": {
     "message": "Приблизна швидкість завантаження"
   },
   "app.download-manager.eta": {
     "message": "Приблизний час, що залишився для цього завантаження"
-  },
-  "app.download-manager.hide": {
-    "message": "Приховати завдання встановлення"
   },
   "app.download-manager.imported-instance": {
     "message": "Імпортований примірник"
@@ -373,9 +367,6 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "Оновлення спільного примірника"
-  },
-  "app.download-manager.show": {
-    "message": "Показати завдання встановлення"
   },
   "app.download-manager.tasks": {
     "message": "Завдання"

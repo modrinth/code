@@ -344,17 +344,14 @@
   "app.download-manager.duplicated-instance": {
     "message": "Duplicated instance"
   },
-  "app.download-manager.empty": {
-    "message": "No installation tasks"
-  },
   "app.download-manager.estimated-rate": {
     "message": "Estimated download speed"
   },
   "app.download-manager.eta": {
     "message": "Estimated time remaining for this download"
   },
-  "app.download-manager.hide": {
-    "message": "Hide installation tasks"
+  "app.download-manager.hide-tasks": {
+    "message": "Hide tasks"
   },
   "app.download-manager.imported-instance": {
     "message": "Imported instance"
@@ -370,6 +367,9 @@
   },
   "app.download-manager.new-instance": {
     "message": "New instance"
+  },
+  "app.download-manager.no-tasks": {
+    "message": "No tasks"
   },
   "app.download-manager.pause": {
     "message": "Pause installation"
@@ -389,8 +389,8 @@
   "app.download-manager.shared-instance-update": {
     "message": "Shared instance update"
   },
-  "app.download-manager.show": {
-    "message": "Show installation tasks"
+  "app.download-manager.show-tasks": {
+    "message": "Show tasks"
   },
   "app.download-manager.tasks": {
     "message": "Tasks"
@@ -481,6 +481,15 @@
   },
   "app.features-settings.sync-across-devices.title": {
     "message": "Sync features across devices"
+  },
+  "app.file-download.canceling": {
+    "message": "Canceling download…"
+  },
+  "app.file-download.preparing": {
+    "message": "Preparing download…"
+  },
+  "app.file-download.waiting": {
+    "message": "Waiting for the server…"
   },
   "app.home.jump-back-in.actions.label": {
     "message": "Instance actions"

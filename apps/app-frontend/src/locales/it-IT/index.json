@@ -329,17 +329,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "Istanza duplicata"
   },
-  "app.download-manager.empty": {
-    "message": "Nessun processo"
-  },
   "app.download-manager.estimated-rate": {
     "message": "Velocità di download stimata"
   },
   "app.download-manager.eta": {
     "message": "Tempo residuo stimato per il download"
-  },
-  "app.download-manager.hide": {
-    "message": "Nascondi i processi"
   },
   "app.download-manager.imported-instance": {
     "message": "Istanza importata"
@@ -373,9 +367,6 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "Aggiornamento istanza condivisa"
-  },
-  "app.download-manager.show": {
-    "message": "Mostra i processi"
   },
   "app.download-manager.tasks": {
     "message": "Processi"

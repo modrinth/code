@@ -6,13 +6,17 @@ export class SharedInstancesInvitesV1Module extends AbstractModule {
 		return 'sharedinstances_invites_v1'
 	}
 
-	public async get(inviteId: string): Promise<SharedInstances.Invites.v1.Invite> {
+	public async get(
+		inviteId: string,
+		options?: { version?: boolean },
+	): Promise<SharedInstances.Invites.v1.Invite> {
 		return this.client.request<SharedInstances.Invites.v1.Invite>(
 			`/invites/${encodeURIComponent(inviteId)}`,
 			{
 				api: 'sharedinstances',
 				version: 1,
 				method: 'GET',
+				params: options,
 				skipAuth: true,
 				retry: false,
 			},

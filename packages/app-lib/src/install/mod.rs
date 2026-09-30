@@ -20,6 +20,7 @@ pub use model::{
     InstallPhaseId, InstallPostInstallEdit, InstallProgress,
     InstallProgressSecondary, InstallRequest, SharedInstanceExternalFileData,
     SharedInstanceInstallData, SharedInstanceInstallModpack,
+    SharedInstanceRemovedFile,
 };
 pub use runner::{
     bulk_update_content, cancel_job, create_instance, create_modpack_instance,

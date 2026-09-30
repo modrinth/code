@@ -547,7 +547,9 @@ const projectInstallContext = computed(() => {
 const serverProjectInstallContext = computed(
 	() =>
 		!!serverInstallContent.serverContextServerData.value &&
-		['modpack', 'mod', 'plugin', 'datapack'].includes(data.value?.project_type),
+		['modpack', 'mod', 'plugin', 'datapack', 'resourcepack', 'shader'].includes(
+			data.value?.project_type,
+		),
 )
 const serverProjectSelected = computed(
 	() => !!data.value && serverInstallContent.queuedServerInstallProjectIds.value.has(data.value.id),

@@ -329,17 +329,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "Instância duplicada"
   },
-  "app.download-manager.empty": {
-    "message": "Sem tarefas de instalação"
-  },
   "app.download-manager.estimated-rate": {
     "message": "Velocidade estimada de transferência"
   },
   "app.download-manager.eta": {
     "message": "Tempo restante estimado para esta transferência"
-  },
-  "app.download-manager.hide": {
-    "message": "Ocultar tarefas de instalação"
   },
   "app.download-manager.imported-instance": {
     "message": "Instância importada"
@@ -373,9 +367,6 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "Atualização de instância compartilhada"
-  },
-  "app.download-manager.show": {
-    "message": "Mostrar tarefas de instalação"
   },
   "app.download-manager.tasks": {
     "message": "Tarefas"
