@@ -10,6 +10,7 @@ import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-up
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
+	injectFileDownload,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
@@ -26,6 +27,7 @@ const props = defineProps<{
 }>()
 
 const client = injectModrinthClient()
+const fileDownload = injectFileDownload(null)
 const serverContext = injectModrinthServerContext()
 const {
 	serverId,
@@ -379,9 +381,17 @@ async function writeFile(path: string, content: string): Promise<void> {
 
 async function downloadFile(path: string, fileName: string): Promise<void> {
 	try {
-		const fileData = await client.kyros.files_v0.downloadFile(path)
-		if (fileData) {
-			saveBlob(fileData, fileName)
+		if (fileDownload) {
+			await fileDownload.download({
+				type: 'server-file',
+				serverId,
+				serverName: serverContext.server.value.name,
+				path,
+				filename: fileName,
+			})
+		} else {
+			const fileData = await client.kyros.files_v0.downloadFile(path)
+			if (fileData) saveBlob(fileData, fileName)
 		}
 	} catch {
 		addNotification({

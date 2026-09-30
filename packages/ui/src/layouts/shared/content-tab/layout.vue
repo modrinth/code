@@ -1173,7 +1173,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 										count: tableItems.length,
 										contentType: formatContentTypeSentence(
 											formatMessage,
-											ctx.contentTypeLabel.value,
+											'project',
 											tableItems.length,
 										),
 									})

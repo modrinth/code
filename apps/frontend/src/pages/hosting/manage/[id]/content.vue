@@ -68,5 +68,5 @@ useHead({
 </script>
 
 <template>
-	<ServersManageContentPage :owner-avatar-url-base="''" />
+	<ServersManageContentPage />
 </template>

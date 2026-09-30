@@ -4,6 +4,7 @@ use crate::state::instances::adapters::sqlite::instance_rows;
 use crate::state::{
     EditInstance, InstanceIconBackground, InstanceIconConfig, State,
 };
+use crate::util::content_hash::temporary_file;
 use crate::util::fetch::{sha1_async, write};
 use crate::util::io;
 use bytes::Bytes;
@@ -12,6 +13,7 @@ use image::{DynamicImage, ImageFormat, ImageReader, Rgba, RgbaImage};
 use std::fs::File as StdFile;
 use std::io::{BufRead, BufReader, Cursor, Seek};
 use std::path::{Path, PathBuf};
+use tokio::io::AsyncWriteExt;
 
 const INSTANCE_ICON_MAX_BYTES: usize = 4 * 1024 * 1024;
 const INSTANCE_ICON_MAX_DIMENSION: u32 = 512;
@@ -21,6 +23,12 @@ const GENERATED_ICON_SIZE: u32 = 256;
 const MAX_ICON_CONFIG_ID_LENGTH: usize = 64;
 const MAX_SYMBOL_BYTES: usize = 4 * 1024 * 1024;
 const MAX_SYMBOL_DIMENSION: u32 = 4096;
+
+const REMOTE_ICON_MAX_BYTES: usize = 4 * 1024 * 1024;
+const REMOTE_ICON_MAX_AGE: std::time::Duration =
+    std::time::Duration::from_secs(24 * 60 * 60);
+static REMOTE_ICON_DOWNLOADS: tokio::sync::Semaphore =
+    tokio::sync::Semaphore::const_new(4);
 
 enum LegacyIconAction {
     Keep,
@@ -60,6 +68,98 @@ pub async fn cache_icon_bytes(icon_bytes: Vec<u8>) -> crate::Result<String> {
     let state = State::get().await?;
     let icon_path = cache_icon(Bytes::from(icon_bytes), &state).await?;
     Ok(icon_path.to_string_lossy().to_string())
+}
+
+pub async fn cache_remote_icon(source: &str) -> crate::Result<PathBuf> {
+    let state = State::get().await?;
+    let icons = state.directories.caches_dir().join("icons");
+    let source_hash =
+        sha1_async(Bytes::copy_from_slice(source.as_bytes())).await?;
+    let mapping = icons.join(format!("remote-{source_hash}.txt"));
+    let mut cached_path = None;
+    if let Ok(metadata) = tokio::fs::metadata(&mapping).await {
+        if metadata.len() <= 44 {
+            if let Ok(filename) = tokio::fs::read_to_string(&mapping).await {
+                if filename.len() == 44
+                    && filename.ends_with(".png")
+                    && filename.as_bytes()[..40]
+                        .iter()
+                        .all(u8::is_ascii_hexdigit)
+                {
+                    let path = icons.join(filename);
+                    if tokio::fs::try_exists(&path).await? {
+                        let fresh = metadata
+                            .modified()
+                            .ok()
+                            .and_then(|modified| modified.elapsed().ok())
+                            .is_some_and(|age| age < REMOTE_ICON_MAX_AGE);
+                        if fresh {
+                            return Ok(io::canonicalize(path)?);
+                        }
+                        cached_path = Some(path);
+                    }
+                }
+            }
+        }
+    }
+
+	let _permit = REMOTE_ICON_DOWNLOADS.acquire().await?;
+    let refreshed = async {
+        let bytes = download_remote_icon(source).await?;
+        let path = cache_icon(bytes, &state).await?;
+        let filename = path
+            .file_name()
+            .ok_or_else(|| {
+                crate::ErrorKind::InputError(
+                    "Cached icon has no filename".to_string(),
+                )
+            })?
+            .to_string_lossy();
+        write(&mapping, filename.as_bytes(), &state.io_semaphore).await?;
+        Ok::<_, crate::Error>(path)
+    }
+    .await;
+
+    match refreshed {
+        Ok(path) => Ok(path),
+        Err(error) => {
+            if let Some(path) = cached_path {
+                tracing::warn!(source, %error, "Could not refresh cached icon");
+                Ok(io::canonicalize(path)?)
+            } else {
+                Err(error)
+            }
+        }
+    }
+}
+
+async fn download_remote_icon(source: &str) -> crate::Result<Bytes> {
+    let mut response = crate::util::fetch::REQWEST_CLIENT
+        .get(source)
+        .timeout(std::time::Duration::from_secs(15))
+        .send()
+        .await?
+        .error_for_status()?;
+    if response
+        .content_length()
+        .is_some_and(|length| length > REMOTE_ICON_MAX_BYTES as u64)
+    {
+        return Err(crate::ErrorKind::InputError(
+            "Remote icons must be at most 4 MiB".to_string(),
+        )
+        .into());
+    }
+    let mut bytes = Vec::new();
+    while let Some(chunk) = response.chunk().await? {
+        if bytes.len() + chunk.len() > REMOTE_ICON_MAX_BYTES {
+            return Err(crate::ErrorKind::InputError(
+                "Remote icons must be at most 4 MiB".to_string(),
+            )
+            .into());
+        }
+        bytes.extend_from_slice(&chunk);
+    }
+    Ok(Bytes::from(bytes))
 }
 
 pub async fn edit_generated_icon(
@@ -323,12 +423,20 @@ async fn write_cached_icon(
     }
 
     let hash = sha1_async(bytes.clone()).await?;
-    let path = state
-        .directories
-        .caches_dir()
-        .join("icons")
-        .join(format!("{hash}.png"));
-    write(&path, &bytes, &state.io_semaphore).await?;
+	let directory = state.directories.caches_dir().join("icons");
+	let path = directory.join(format!("{hash}.png"));
+	if let Ok(metadata) = tokio::fs::metadata(&path).await {
+		if metadata.is_file() && metadata.len() == bytes.len() as u64 {
+			return Ok(io::canonicalize(path)?);
+		}
+	}
+	let _permit = state.io_semaphore.0.acquire().await?;
+	tokio::fs::create_dir_all(&directory).await?;
+	let (mut file, temporary) = temporary_file(Some(&directory)).await?;
+	file.write_all(&bytes).await?;
+	file.flush().await?;
+	drop(file);
+	tokio::fs::rename(&temporary, &path).await?;
 
     Ok(io::canonicalize(path)?)
 }

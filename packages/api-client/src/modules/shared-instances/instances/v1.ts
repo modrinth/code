@@ -1,4 +1,5 @@
 import { AbstractModule } from '../../../core/abstract-module'
+import type { DownloadSink } from '../../../types/download'
 import type { SharedInstances } from '../types'
 
 export class SharedInstancesInstancesV1Module extends AbstractModule {
@@ -97,6 +98,18 @@ export class SharedInstancesInstancesV1Module extends AbstractModule {
 				responseType: 'blob',
 				timeout: 600_000,
 			},
+		)
+	}
+
+	public async downloadMrpackTo(
+		instanceId: string,
+		version: number,
+		sink: DownloadSink,
+	): Promise<void> {
+		return this.client.download(
+			`/instances/${encodeURIComponent(instanceId)}/versions/${version}/mrpack`,
+			{ api: 'sharedinstances', version: 1, method: 'GET' },
+			sink,
 		)
 	}
 }
