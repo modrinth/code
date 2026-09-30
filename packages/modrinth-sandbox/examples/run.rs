@@ -42,7 +42,7 @@ async fn main() -> Result<()> {
             working_directory: cli.cwd,
             passthrough_environment: BTreeSet::new(),
             extra_environment: BTreeMap::new(),
-            network: true,
+            allow_network: true,
             is_jvm: false,
             die_with_parent: true,
             stdin: SandboxStdio::Null,

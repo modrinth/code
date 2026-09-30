@@ -246,7 +246,7 @@ fn spawn(
 
     // Namespaces
     builder.push("--unshare-all");
-    if command.network {
+    if command.allow_network {
         builder.push("--share-net");
     }
 

@@ -175,7 +175,7 @@ async fn spawn(
         | SpawnFlags::SANDBOX
         | SpawnFlags::WATCH_BUS
         | SpawnFlags::EMPTY_APP;
-    if !command.network {
+    if !command.allow_network {
         flags |= SpawnFlags::NO_NETWORK;
     }
 
