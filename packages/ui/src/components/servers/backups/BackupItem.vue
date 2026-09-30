@@ -18,8 +18,8 @@ import { Button, TeleportOverflowMenu } from '#ui/components/base/buttons'
 
 import { useFormatDateTime } from '../../../composables'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
-import { commonMessages, truncatedTooltip } from '../../../utils'
 import { injectFileDownload } from '../../../providers/file-download'
+import { commonMessages, truncatedTooltip } from '../../../utils'
 import AutoLink from '../../base/AutoLink.vue'
 import Avatar from '../../base/Avatar.vue'
 

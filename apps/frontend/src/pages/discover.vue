@@ -11,7 +11,6 @@ const modSettings = useModerationSettings()
 const isServerSetup = computed(
 	() => !!route.query.sid && ['onboarding', 'reset-server'].includes(String(route.query.from)),
 )
-const allowTabChanging = computed(() => !route.query.sid || isServerSetup.value)
 const marginTarget = computed(() => getMarginTarget(modSettings.value))
 
 const selectableProjectTypes = [
@@ -58,13 +57,14 @@ const projectTypeLinks = computed(() => {
 		if (typeof value === 'string') query.set(key, value)
 	}
 	return selectableProjectTypes
-		.filter(
-			(type) =>
-				!isServerSetup.value || ['mods', 'plugins', 'modpacks', 'datapacks'].includes(type.type),
+		.filter((type) =>
+			isServerSetup.value
+				? ['mods', 'plugins', 'modpacks', 'datapacks'].includes(type.type)
+				: !route.query.sid || type.type !== 'servers',
 		)
 		.map((type) => ({
 			...type,
-			href: isServerSetup.value ? `${type.href}?${query.toString()}` : type.href,
+			href: query.size > 0 ? `${type.href}?${query.toString()}` : type.href,
 		}))
 })
 </script>
@@ -74,10 +74,10 @@ const projectTypeLinks = computed(() => {
 		:class="`m${marginTarget}-auto`"
 	>
 		<NavTabs
-			v-if="(!flags.projectTypesPrimaryNav || isServerSetup) && allowTabChanging"
+			v-if="!flags.projectTypesPrimaryNav || route.query.sid"
 			:links="projectTypeLinks"
 			replace
-			:class="isServerSetup ? 'flex' : 'hidden md:flex'"
+			:class="route.query.sid ? 'flex' : 'hidden md:flex'"
 		/>
 		<NuxtPage />
 	</div>

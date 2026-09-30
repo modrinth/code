@@ -246,6 +246,8 @@ pub struct SharedInstanceInstallData {
     pub version: i32,
     pub modrinth_ids: Vec<String>,
     #[serde(default)]
+    pub removed_files: Vec<SharedInstanceRemovedFile>,
+    #[serde(default)]
     pub external_files: Vec<SharedInstanceExternalFileData>,
     pub modpack: Option<SharedInstanceInstallModpack>,
     pub game_version: String,
@@ -259,6 +261,57 @@ pub struct SharedInstanceExternalFileData {
     pub file_type: String,
     pub url: String,
     pub file_size: u64,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum SharedInstanceRemovedFile {
+    Version { version_id: String },
+    Path { parent: String, filename: String },
+}
+
+impl SharedInstanceRemovedFile {
+    pub(crate) fn matches(
+        &self,
+        version_id: Option<&str>,
+        relative_path: &str,
+    ) -> bool {
+        match self {
+            Self::Version {
+                version_id: removed,
+            } => version_id == Some(removed.as_str()),
+            Self::Path { parent, filename } => {
+                let path = relative_path
+                    .strip_suffix(".disabled")
+                    .unwrap_or(relative_path);
+                let filename =
+                    filename.strip_suffix(".disabled").unwrap_or(filename);
+                path == format!("{parent}/{filename}")
+            }
+        }
+    }
+
+    pub(crate) fn validate(&self) -> crate::Result<()> {
+        if let Self::Path { parent, filename } = self
+            && (!matches!(
+                parent.as_str(),
+                "mods"
+                    | "plugins"
+                    | "datapacks"
+                    | "shaderpacks"
+                    | "resourcepacks"
+            ) || !path_util::is_safe_file_name(filename)
+                || ![".jar", ".zip", ".jar.disabled", ".zip.disabled"]
+                    .iter()
+                    .any(|suffix| filename.ends_with(*suffix)))
+        {
+            return Err(crate::ErrorKind::InputError(
+                "Invalid removed modpack file path".to_string(),
+            )
+            .into());
+        }
+        Ok(())
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]

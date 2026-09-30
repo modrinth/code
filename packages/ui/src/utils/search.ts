@@ -181,7 +181,7 @@ export function getHostingModEnvironmentOverride(serverOnly: boolean): Environme
 			}
 		: {
 				mode: 'exclude',
-				values: ['client_only', 'singleplayer_only'],
+				values: ['singleplayer_only'],
 			}
 }
 

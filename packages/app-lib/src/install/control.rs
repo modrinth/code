@@ -166,19 +166,23 @@ fn canceled() -> crate::Error {
     crate::ErrorKind::InputError("Install was canceled".to_string()).into()
 }
 
-pub(crate) async fn download_step<F: std::future::Future>(
+/// Boxes the download before polling so cancellation does not inherit its size.
+pub(crate) fn download_step<F: std::future::Future>(
     future: F,
-) -> crate::Result<F::Output> {
-    let Ok(control) = CURRENT_INSTALL.try_with(Clone::clone) else {
-        return Ok(future.await);
-    };
-    control.checkpoint().await?;
-    tokio::select! {
-        biased;
-        () = control.canceled() => Err(canceled()),
-        output = future => {
-            control.checkpoint().await?;
-            Ok(output)
+) -> impl std::future::Future<Output = crate::Result<F::Output>> {
+    let future = Box::pin(future);
+    async move {
+        let Ok(control) = CURRENT_INSTALL.try_with(Clone::clone) else {
+            return Ok(future.await);
+        };
+        control.checkpoint().await?;
+        tokio::select! {
+            biased;
+            () = control.canceled() => Err(canceled()),
+            output = future => {
+                control.checkpoint().await?;
+                Ok(output)
+            }
         }
     }
 }

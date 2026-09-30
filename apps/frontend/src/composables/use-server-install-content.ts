@@ -255,12 +255,12 @@ export function useServerInstallContent({
 			const platform = serverData.value.loader?.toLowerCase()
 
 			const modLoaders = ['fabric', 'forge', 'quilt', 'neoforge']
-			if (platform && modLoaders.includes(platform)) {
+			if (projectType.value?.id === 'mod' && platform && modLoaders.includes(platform)) {
 				filters.push({ type: 'mod_loader', option: platform })
 			}
 
 			const pluginLoaders = ['paper', 'purpur']
-			if (platform && pluginLoaders.includes(platform)) {
+			if (projectType.value?.id === 'plugin' && platform && pluginLoaders.includes(platform)) {
 				filters.push({ type: 'plugin_loader', option: platform })
 			}
 
@@ -303,7 +303,14 @@ export function useServerInstallContent({
 
 	function getCurrentServerInstallType(): BrowseInstallContentType {
 		const type = projectType.value?.id
-		if (type === 'modpack' || type === 'mod' || type === 'plugin' || type === 'datapack') {
+		if (
+			type === 'modpack' ||
+			type === 'mod' ||
+			type === 'plugin' ||
+			type === 'datapack' ||
+			type === 'resourcepack' ||
+			type === 'shader'
+		) {
 			return type
 		}
 		throw new Error(formatMessage(messages.unsupportedContentType))

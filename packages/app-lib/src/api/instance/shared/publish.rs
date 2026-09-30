@@ -168,96 +168,6 @@ pub async fn get_shared_instance_publish_preview(
     }))
 }
 
-pub(super) async fn remote_publish_content(
-    version: &InstanceVersionResponse,
-    include_modpack_dependencies: bool,
-    state: &State,
-) -> crate::Result<(Vec<String>, BTreeSet<ExternalFileKey>)> {
-    let mut version_ids = version.modrinth_ids.clone();
-    if let Some(modpack_id) =
-        version.modpack_id.as_deref().filter(|id| !id.is_empty())
-    {
-        version_ids.retain(|id| id != modpack_id);
-
-        if include_modpack_dependencies {
-            extend_shared_modpack_dependencies(
-                &mut version_ids,
-                modpack_id,
-                state,
-            )
-            .await?;
-        }
-    }
-    dedupe_strings(&mut version_ids);
-
-    Ok((
-        version_ids,
-        version
-            .external_files
-            .iter()
-            .filter(|file| {
-                !matches!(
-                    file.file_type.as_str(),
-                    CONFIG_BUNDLE_FILE_TYPE | CONFIG_FILE_TYPE
-                )
-            })
-            .map(|file| {
-                shared_external_file_key(&file.file_type, &file.file_name)
-            })
-            .collect::<crate::Result<_>>()?,
-    ))
-}
-
-pub(super) async fn modpack_dependency_version_ids(
-    modpack_id: &str,
-    state: &State,
-) -> crate::Result<Vec<String>> {
-    let modpack_version = CachedEntry::get_version(
-        modpack_id,
-        Some(CacheBehaviour::Bypass),
-        &state.pool,
-        &state.api_semaphore,
-    )
-    .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError(
-            "Shared instance modpack version was not found".to_string(),
-        )
-    })?;
-
-    Ok(modpack_version
-        .dependencies
-        .into_iter()
-        .filter_map(|dependency| dependency.version_id)
-        .collect())
-}
-
-/// Adds the modpack's dependencies to the list. If a project is already in the
-/// list, keep that version instead of the one bundled with the modpack.
-async fn extend_shared_modpack_dependencies(
-    version_ids: &mut Vec<String>,
-    modpack_id: &str,
-    state: &State,
-) -> crate::Result<()> {
-    let dependency_ids =
-        modpack_dependency_version_ids(modpack_id, state).await?;
-    let (explicit, inherited) = tokio::try_join!(
-        shared_versions_by_id(version_ids, false, state),
-        shared_versions_by_id(&dependency_ids, false, state),
-    )?;
-    version_ids.extend(
-        inherited
-            .into_values()
-            .filter(|version| {
-                !explicit
-                    .values()
-                    .any(|installed| installed.project_id == version.project_id)
-            })
-            .map(|version| version.id),
-    );
-    Ok(())
-}
-
 pub(super) async fn shared_instance_install_modpack(
     version: &InstanceVersionResponse,
     state: &State,
@@ -287,10 +197,13 @@ pub(super) async fn shared_instance_install_modpack(
     )
     .await?;
 
+    let dependency_count = shared_modpack_files(&modpack_version.id, state)
+        .await?
+        .len();
     Ok(Some(crate::install::SharedInstanceInstallModpack {
         project_id: modpack_version.project_id,
         version_id: modpack_version.id,
-        dependency_count: modpack_version.dependencies.len(),
+        dependency_count,
         title: project
             .as_ref()
             .map(|project| project.title.clone())
@@ -307,63 +220,66 @@ pub(super) fn shared_instance_loader_version(
 
 pub(super) async fn current_shared_content(
     metadata: &crate::state::InstanceMetadata,
-    include_linked_modpack_content: bool,
     state: &State,
 ) -> crate::Result<(Vec<String>, BTreeSet<ExternalFileKey>)> {
-    let entries =
-        crate::state::instances::adapters::sqlite::content_rows::get_content_entries(
-            &metadata.applied_content_set.id,
-            &state.pool,
-        )
-        .await?;
+    let entries = crate::state::instances::adapters::sqlite::content_rows::get_content_entries(
+		&metadata.applied_content_set.id, &state.pool,
+	).await?;
     let files = crate::state::instances::adapters::sqlite::content_rows::get_instance_files(
-        &metadata.instance.id,
+		&metadata.instance.id, &state.pool,
+	).await?.into_iter().map(|file| (file.id.clone(), file)).collect::<HashMap<_, _>>();
+    let unresolved_hashes = entries
+        .iter()
+        .filter(|entry| {
+            entry.source_kind == ContentSourceKind::ModrinthModpack
+                && entry.version_id.is_none()
+        })
+        .filter_map(|entry| entry.file_id.as_ref().and_then(|id| files.get(id)))
+        .filter(|file| file.enabled && !file.missing)
+        .map(|file| file.sha1.as_str())
+        .collect::<Vec<_>>();
+    let resolved_files = CachedEntry::get_file_many(
+        &unresolved_hashes,
+        Some(CacheBehaviour::MustRevalidate),
         &state.pool,
+        &state.api_semaphore,
     )
     .await?
     .into_iter()
-    .map(|file| (file.id.clone(), file))
+    .map(|file| (file.hash.clone(), file))
     .collect::<HashMap<_, _>>();
     let mut version_ids = Vec::new();
     let mut external_files = BTreeSet::new();
-
     for entry in entries {
-        let include_entry = entry.source_kind
-            == crate::state::ContentSourceKind::SharedInstance
-            || (include_linked_modpack_content
-                && entry.source_kind
-                    == crate::state::ContentSourceKind::ModrinthModpack);
-        if !include_entry {
+        if !entry.source_kind.is_shared_instance_managed() || !entry.enabled {
             continue;
         }
-
-        if let Some(version_id) = entry.version_id {
-            version_ids.push(version_id);
-            continue;
-        }
-
-        let Some(file_id) = entry.file_id else {
+        let Some(file) = entry.file_id.as_ref().and_then(|id| files.get(id))
+        else {
             continue;
         };
-        if let Some(file) = files.get(&file_id) {
+        if !file.enabled || file.missing {
+            continue;
+        }
+        let version_id = entry.version_id.or_else(|| {
+            (entry.source_kind == ContentSourceKind::ModrinthModpack)
+                .then(|| {
+                    resolved_files
+                        .get(&file.sha1)
+                        .map(|file| file.version_id.clone())
+                })
+                .flatten()
+        });
+        if let Some(version_id) = version_id {
+            version_ids.push(version_id);
+        } else {
             external_files.insert(ExternalFileKey {
                 content_type: entry.project_type.into(),
-                path: file.file_name.clone(),
+                path: enabled_file_name(&file.file_name),
             });
         }
     }
-    if include_linked_modpack_content
-        && let Some(modpack_id) = shared_modpack_id(&metadata.link)
-    {
-        extend_shared_modpack_dependencies(
-            &mut version_ids,
-            &modpack_id,
-            state,
-        )
-        .await?;
-    }
     dedupe_strings(&mut version_ids);
-
     Ok((version_ids, external_files))
 }
 
@@ -374,6 +290,8 @@ pub(super) struct CurrentPublishSnapshot {
     pub(super) disabled_version_ids: Vec<String>,
     pub(super) disabled_external_files: BTreeSet<ExternalFileKey>,
     pub(super) config_files: Vec<ConfigFile>,
+    pub(super) removed_files: Vec<SharedInstanceRemovedFile>,
+    pub(super) effective_version_ids: Vec<String>,
 }
 
 /// Cached metadata can outlive a deleted or hidden version. Only publish version
@@ -408,6 +326,62 @@ pub(super) async fn collect_publish_snapshot(
             Vec::new(),
         )
     };
+    let mut items = items;
+    let modpack_id = shared_modpack_id(&metadata.link);
+    let modpack_files = if let Some(modpack_id) = modpack_id.as_deref() {
+        let (managed, files) = tokio::try_join!(
+            crate::state::list_linked_modpack_content(
+                &metadata.instance.id,
+                None,
+                None,
+                state,
+            ),
+            shared_modpack_files(modpack_id, state),
+        )?;
+        items.extend(managed);
+        files
+    } else {
+        Vec::new()
+    };
+    let mut seen_paths = HashSet::new();
+    items.retain(|item| seen_paths.insert(item.file_path.clone()));
+    let enabled_versions = items
+        .iter()
+        .filter(|item| item.enabled)
+        .filter_map(|item| {
+            item.version.as_ref().map(|version| version.id.as_str())
+        })
+        .collect::<HashSet<_>>();
+    let enabled_paths = items
+        .iter()
+        .filter(|item| item.enabled)
+        .map(|item| item.file_path.trim_end_matches(".disabled"))
+        .collect::<HashSet<_>>();
+    let mut removed_files = Vec::new();
+    for file in &modpack_files {
+        if let Some(version_id) = &file.version_id {
+            if !enabled_versions.contains(version_id.as_str()) {
+                let removed = SharedInstanceRemovedFile::Version {
+                    version_id: version_id.clone(),
+                };
+                if !removed_files.contains(&removed) {
+                    removed_files.push(removed);
+                }
+            }
+        } else if !enabled_paths.contains(file.relative_path.as_str())
+            && let Some((parent, filename)) = file.relative_path.split_once('/')
+        {
+            removed_files.push(SharedInstanceRemovedFile::Path {
+                parent: parent.to_string(),
+                filename: filename.to_string(),
+            });
+        }
+    }
+    let inherited_versions = modpack_files
+        .iter()
+        .filter_map(|file| file.version_id.as_deref())
+        .collect::<HashSet<_>>();
+    let mut effective_version_ids = Vec::new();
     let installed_version_ids = items
         .iter()
         .filter(|item| item.enabled)
@@ -425,7 +399,6 @@ pub(super) async fn collect_publish_snapshot(
     .into_iter()
     .map(|version| version.id)
     .collect::<HashSet<_>>();
-    let modpack_id = shared_modpack_id(&metadata.link);
     let mut version_ids = Vec::new();
     let mut seen_version_ids = HashSet::new();
     let mut external_files = Vec::new();
@@ -441,7 +414,10 @@ pub(super) async fn collect_publish_snapshot(
                 && available_version_ids.contains(&version.id)
             {
                 if seen_version_ids.insert(version.id.clone()) {
-                    version_ids.push(version.id.clone());
+                    effective_version_ids.push(version.id.clone());
+                    if !inherited_versions.contains(version.id.as_str()) {
+                        version_ids.push(version.id.clone());
+                    }
                 }
                 continue;
             }
@@ -499,6 +475,8 @@ pub(super) async fn collect_publish_snapshot(
         disabled_version_ids,
         disabled_external_files,
         config_files,
+        removed_files,
+        effective_version_ids,
     })
 }
 
@@ -756,6 +734,7 @@ pub(super) async fn publish_current_content(
             "modrinth_ids": modrinth_ids,
             "external_files": external_file_data,
             "modpack_id": modpack_id,
+			"removed_files": snapshot.removed_files,
             "game_version": metadata.applied_content_set.game_version.clone(),
             "loader": metadata.applied_content_set.loader.as_str(),
             "loader_version": metadata
@@ -878,9 +857,19 @@ async fn build_config_bundle_candidate(
     }
 
     let previous_bundle = if let Some(previous_bundle) = previous_bundle {
+        let url = previous_bundle
+            .url
+            .as_deref()
+            .filter(|url| !url.is_empty())
+            .ok_or_else(|| {
+                crate::ErrorKind::InputError(
+                    "Shared instance config bundle is missing its download URL"
+                        .to_string(),
+                )
+            })?;
         Some(
             crate::util::fetch::fetch_file_mirrors(
-                &[&previous_bundle.url],
+                &[url],
                 None,
                 None,
                 None,
@@ -1124,11 +1113,15 @@ pub(super) async fn upload_external_files(
                 )
             }
         };
-        let upload_url = url::Url::parse(&upload.url).map_err(|error| {
-            crate::ErrorKind::OtherError(format!(
-                "Invalid shared instance external file upload URL: {error}"
-            ))
-        })?;
+        let upload_url_string = upload.url.as_deref().filter(|url| !url.is_empty()).ok_or_else(|| {
+			crate::ErrorKind::InputError(format!("Shared instance external file {} is missing its upload URL", upload.file_name))
+		})?;
+        let upload_url =
+            url::Url::parse(upload_url_string).map_err(|error| {
+                crate::ErrorKind::OtherError(format!(
+                    "Invalid shared instance external file upload URL: {error}"
+                ))
+            })?;
         let mut file = tokio::fs::File::open(path.path()).await?;
         let mut hasher = sha2::Sha512::new();
         let mut buffer = vec![0_u8; 64 * 1024];
@@ -1151,7 +1144,7 @@ pub(super) async fn upload_external_files(
             "upload_external_file",
             Method::PUT,
             upload_url.path(),
-            &upload.url,
+            upload_url_string,
             body,
             Some(size),
             Some(&file_sha512),

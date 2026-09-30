@@ -491,9 +491,9 @@ const serverContextFilters = computed(() => {
 		if (gameVersion) filters.push({ type: 'game_version', option: gameVersion })
 
 		const platform = serverContextServerData.value.loader?.toLowerCase()
-		if (platform && ['fabric', 'forge', 'quilt', 'neoforge'].includes(platform))
+		if (pt === 'mod' && platform && ['fabric', 'forge', 'quilt', 'neoforge'].includes(platform))
 			filters.push({ type: 'mod_loader', option: platform })
-		if (platform && ['paper', 'purpur'].includes(platform))
+		if (pt === 'plugin' && platform && ['paper', 'purpur'].includes(platform))
 			filters.push({ type: 'plugin_loader', option: platform })
 
 		if (hideSelectedServerInstalls.value && queuedServerInstallProjectIds.value.size > 0) {
@@ -751,6 +751,20 @@ const selectableProjectTypes = computed(() => {
 		]
 	}
 
+	if (isServerContext.value) {
+		return [
+			{ label: formatMessage(messages.modsProjectType), href: `/browse/mod${suffix}` },
+			{ label: formatMessage(messages.pluginsProjectType), href: `/browse/plugin${suffix}` },
+			{
+				label: formatMessage(messages.resourcePacksProjectType),
+				href: `/browse/resourcepack${suffix}`,
+			},
+			{ label: formatMessage(messages.dataPacksProjectType), href: `/browse/datapack${suffix}` },
+			{ label: formatMessage(messages.shadersProjectType), href: `/browse/shader${suffix}` },
+			{ label: formatMessage(messages.modpacksProjectType), href: `/browse/modpack${suffix}` },
+		]
+	}
+
 	if (isFromWorlds.value) {
 		return [{ label: formatMessage(messages.serversProjectType), href: `/browse/server${suffix}` }]
 	}
@@ -953,7 +967,7 @@ function getCardActions(
 
 	if (
 		isServerContext.value &&
-		['modpack', 'mod', 'plugin', 'datapack'].includes(currentProjectType)
+		['modpack', 'mod', 'plugin', 'datapack', 'resourcepack', 'shader'].includes(currentProjectType)
 	) {
 		const isQueued =
 			!isSetupServerContext.value &&
@@ -1336,7 +1350,7 @@ provideBrowseManager({
 		query: getProjectBrowseQuery(),
 	}),
 	selectableProjectTypes,
-	showProjectTypeTabs: computed(() => !isServerContext.value || isSetupServerContext.value),
+	showProjectTypeTabs: computed(() => true),
 	variant: 'app',
 	getCardActions,
 	installContext,

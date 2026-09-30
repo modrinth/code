@@ -2,7 +2,13 @@ import type { Labrinth } from '@modrinth/api-client'
 
 import type { FilterValue } from '#ui/utils/search'
 
-export type BrowseInstallContentType = 'modpack' | 'mod' | 'plugin' | 'datapack'
+export type BrowseInstallContentType =
+	| 'modpack'
+	| 'mod'
+	| 'plugin'
+	| 'datapack'
+	| 'resourcepack'
+	| 'shader'
 export type BrowseInstallAddonContentType = Exclude<BrowseInstallContentType, 'modpack'>
 
 /**
@@ -486,7 +492,10 @@ export function getTargetInstallPreferences(
 		loaders:
 			contentType === 'datapack'
 				? ['datapack']
-				: loader && shouldUseTargetRuntime
+				: loader &&
+					  shouldUseTargetRuntime &&
+					  contentType !== 'resourcepack' &&
+					  contentType !== 'shader'
 					? [loader]
 					: undefined,
 	})
@@ -960,7 +969,14 @@ function isStoredBrowseInstallProject(value: unknown): value is BrowseInstallPro
 }
 
 function isStoredBrowseInstallContentType(value: unknown): value is BrowseInstallContentType {
-	return value === 'modpack' || value === 'mod' || value === 'plugin' || value === 'datapack'
+	return (
+		value === 'modpack' ||
+		value === 'mod' ||
+		value === 'plugin' ||
+		value === 'datapack' ||
+		value === 'resourcepack' ||
+		value === 'shader'
+	)
 }
 
 function isStoredBrowseInstallPreferences(value: unknown): value is BrowseInstallPreferences {
