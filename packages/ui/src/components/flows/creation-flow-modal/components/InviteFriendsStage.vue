@@ -3,7 +3,7 @@
 		<img
 			:src="ServerInviteFriendsIllustration"
 			alt=""
-			class="-mt-8 mx-auto h-[172px] w-[250px] object-contain"
+			class="-mt-6 mx-auto mb-2 h-[172px] w-[250px] object-contain"
 		/>
 		<div class="flex flex-col gap-1.5">
 			<h2 class="m-0 text-2xl font-semibold text-contrast">
@@ -80,12 +80,12 @@ watch(ctx.inviteLink, () => {
 const messages = defineMessages({
 	title: {
 		id: 'servers.setup.onboarding.invite.title',
-		defaultMessage: 'Invite players to join',
+		defaultMessage: 'Invite friends to join',
 	},
 	description: {
 		id: 'servers.setup.onboarding.invite.description',
 		defaultMessage:
-			'Share this link and they’ll get an instance you manage from your server, with everything they need to play!',
+			'Share this link and they can create a shared instance with everything they need to play, managed right from your server!',
 	},
 	inviteLater: {
 		id: 'servers.setup.onboarding.invite.invite-later',

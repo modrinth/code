@@ -45,6 +45,7 @@ export namespace SharedInstances {
 				inviter: Inviter | null
 				managers: Manager[]
 				instance_users?: InviteUser[]
+				version?: Instances.v1.InstanceVersion
 			}
 		}
 	}
@@ -82,7 +83,7 @@ export namespace SharedInstances {
 			export type ExternalFile = {
 				file_name: string
 				file_type: string
-				url: string
+				url: string | null
 				file_size?: number
 				metadata?: FileMetadata[]
 			}
@@ -93,6 +94,10 @@ export namespace SharedInstances {
 				ready: boolean
 				external_files: ExternalFile[]
 				modpack_id: string | null
+				removed_files: (
+					| { type: 'version'; version_id: string }
+					| { type: 'path'; parent: string; filename: string }
+				)[]
 				game_version: string
 				loader: string
 				loader_version: string

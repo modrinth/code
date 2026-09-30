@@ -43,6 +43,7 @@ export function useServerIcon(
 		...query,
 		icon,
 		queryKey: computed(() => optionsRef.value.queryKey),
-		fetchIcon: (id = toValue(serverId)) => queryClient.fetchQuery(serverIconQueryOptions(id, client)),
+		fetchIcon: (id = toValue(serverId)) =>
+			queryClient.fetchQuery(serverIconQueryOptions(id, client)),
 	}
 }

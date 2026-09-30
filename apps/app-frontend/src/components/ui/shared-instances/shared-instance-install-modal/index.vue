@@ -6,7 +6,7 @@
 				? formatMessage(messages.reportSharedInstance)
 				: formatMessage(messages.installToPlay)
 		"
-		:closable="!submitLoading"
+		:closable="!submitLoading && !installing"
 		:on-hide="handleHide"
 		:max-width="reportMode ? '816px' : '544px'"
 		:width="reportMode ? '816px' : '544px'"
@@ -193,23 +193,23 @@
 				{{ formatMessage(messages.reviewedFiles) }}
 			</p>
 			<div v-if="!reportMode" class="flex w-full items-center justify-between gap-2">
-				<Button type="quiet" color="red" @click="reportMode = true">
+				<Button type="quiet" color="red" :disabled="installing" @click="reportMode = true">
 					<ReportIcon />{{ formatMessage(commonMessages.reportButton) }}
 				</Button>
 				<div class="flex items-center gap-2">
 					<template v-if="hasExternalFiles">
-						<Button type="quiet" color="orange" @click="accept">
+						<Button type="quiet" color="orange" :disabled="installing" @click="accept">
 							{{ formatMessage(messages.installAnyway) }}
 						</Button>
-						<Button type="colored" color="brand" @click="handleCancel">
+						<Button type="colored" color="brand" :disabled="installing" @click="handleCancel">
 							<BanIcon />{{ formatMessage(messages.dontInstall) }}
 						</Button>
 					</template>
 					<template v-else>
-						<Button type="outlined" class="!border" @click="handleCancel">
+						<Button type="outlined" class="!border" :disabled="installing" @click="handleCancel">
 							<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
 						</Button>
-						<Button type="colored" color="brand" @click="accept">
+						<Button type="colored" color="brand" :disabled="installing" @click="accept">
 							<DownloadIcon />{{ formatMessage(messages.installButton) }}
 						</Button>
 					</template>
@@ -218,7 +218,12 @@
 		</div>
 		<template v-if="reportMode" #actions>
 			<div class="flex justify-end gap-2">
-				<Button type="outlined" class="!border" :disabled="submitLoading" @click="handleCancel">
+				<Button
+					type="outlined"
+					class="!border"
+					:disabled="submitLoading || installing"
+					@click="handleCancel"
+				>
 					<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
 				<Button type="colored" color="brand" :disabled="!canSubmitReport" @click="submitReport">
@@ -292,6 +297,7 @@ const modal = ref<InstanceType<typeof NewModal>>()
 const contentModal = ref<InstanceType<typeof ManagedContentModal>>()
 const externalFileTable = ref<HTMLElement | null>(null)
 const preview = ref<SharedInstanceInstallPreview | null>(null)
+const installing = ref(false)
 const creator = ref<SharedInstanceCreator | null>(null)
 const install = ref<() => void | Promise<void>>(() => {})
 const reportMode = ref(false)
@@ -344,11 +350,16 @@ const creatorProfileLink = computed(() => {
 })
 
 async function accept() {
-	hide()
+	if (installing.value) return
+	const executeInstall = install.value
+	installing.value = true
 	try {
-		await install.value()
+		await executeInstall()
+		hide()
 	} catch (error) {
 		console.error('Failed to install shared instance:', error)
+	} finally {
+		installing.value = false
 	}
 }
 async function openViewContents() {
@@ -466,6 +477,7 @@ function show(
 	creatorValue?: SharedInstanceCreator,
 	event?: MouseEvent,
 ) {
+	if (installing.value) return
 	resetReportState()
 	creator.value = creatorValue ?? null
 	blockTargetUserId.value = creatorValue?.id ?? null

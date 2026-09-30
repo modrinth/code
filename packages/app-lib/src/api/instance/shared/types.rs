@@ -80,6 +80,8 @@ pub struct SharedInstanceInstallPreview {
     pub modpack_version_id: Option<String>,
     pub content_version_ids: Vec<String>,
     pub external_files: Vec<SharedInstanceExternalFilePreview>,
+    #[serde(default)]
+    pub removed_files: Vec<SharedInstanceRemovedFile>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

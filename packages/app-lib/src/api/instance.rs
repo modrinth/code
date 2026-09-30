@@ -80,6 +80,7 @@ pub(crate) use self::shared::{
     CONFIG_FILE_TYPE, CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES,
     MAX_SHARED_FILES_TOTAL_SIZE, is_shareable_file_path,
     is_supported_config_file, read_bounded_config_bundle_entry,
+    shared_modpack_files,
 };
 pub use self::shared::{
     SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
@@ -91,9 +92,10 @@ pub use self::shared::{
     SharedInstanceUpdatePreview, SharedInstanceUser, SharedInstanceUsers,
     accept_pending_shared_instance_invite,
     accept_shared_instance_invite_for_install,
-    can_active_user_use_shared_instances, create_shared_instance_invite_link,
-    decline_pending_shared_instance_invite,
-    get_shared_instance_install_preview, get_shared_instance_invites,
+    cache_shared_instance_server_icon, can_active_user_use_shared_instances,
+    create_shared_instance_invite_link, decline_pending_shared_instance_invite,
+    get_shared_instance_install_preview,
+    get_shared_instance_invite_install_preview, get_shared_instance_invites,
     get_shared_instance_publish_preview,
     get_shared_instance_publish_support_details,
     get_shared_instance_update_preview, get_shared_instance_users,
