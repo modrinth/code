@@ -337,8 +337,8 @@ const hasServerSettingsChanges = computed(
 		(serverName.value && serverName.value !== data.value?.name) ||
 		serverSubdomain.value !== data.value?.net?.domain,
 )
-const hasPreferenceChanges = computed(
-	() => preferenceKeys.some((key) => newUserPreferences.value[key] !== userPreferences.value[key]),
+const hasPreferenceChanges = computed(() =>
+	preferenceKeys.some((key) => newUserPreferences.value[key] !== userPreferences.value[key]),
 )
 const hasUnsavedChanges = computed(
 	() => hasServerSettingsChanges.value || hasPreferenceChanges.value,
