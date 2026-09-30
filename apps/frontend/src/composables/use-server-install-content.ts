@@ -24,7 +24,7 @@ import {
 	stripServerRuntimeInstallFilters,
 	stripServerRuntimeInstallOverrides,
 	useServerContextRuntime,
-	useServerImage,
+	useServerIcon,
 	useServerPanelSync,
 	useVIntl,
 	waitForServerContextRuntimeReady,
@@ -146,7 +146,7 @@ export function useServerInstallContent({
 		if (val) debug('serverData error:', val)
 	})
 
-	const { image: serverIcon } = useServerImage(() => currentServerId.value ?? '')
+	const { icon: serverIcon } = useServerIcon(() => currentServerId.value ?? '')
 
 	const serverHideInstalled = ref(false)
 	const serverContentServerOnly = ref(false)

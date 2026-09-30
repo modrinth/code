@@ -28,8 +28,8 @@ const props = defineProps<{
 }>()
 
 const client = injectModrinthClient()
-const fileDownload = injectFileDownload(null)
 const auth = injectAuth()
+const fileDownload = injectFileDownload(null)
 const serverContext = injectModrinthServerContext()
 const {
 	serverId,

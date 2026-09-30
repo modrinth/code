@@ -282,7 +282,7 @@ import {
 } from '../../../../assets/generated-icons'
 import { useFormatDateTime } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
-import { useServerImage } from '../../composables/use-server-image'
+import { useServerIcon } from '../../composables/use-server-icon'
 import { injectModrinthClient } from '../../providers/api-client'
 import Avatar from '../base/Avatar.vue'
 import IntlFormatted from '../base/IntlFormatted.vue'
@@ -528,7 +528,7 @@ const { data: projectData } = useQuery({
 
 const iconUrl = computed(() => projectData.value?.icon_url)
 
-const { image } = useServerImage(() => props.server_id, {
+const { icon: image } = useServerIcon(() => props.server_id, {
 	enabled: computed(() => props.status === 'available'),
 })
 

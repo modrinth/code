@@ -387,6 +387,7 @@ fn main() {
                         "progress_bars_list",
                         "get_opening_command",
                         "get_image_thumbnail",
+                        "cache_remote_icon",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
@@ -427,9 +428,9 @@ fn main() {
                         "file_rename",
                         "file_delete",
                         "file_save_as",
-                        "files_select_external",
-                        "files_save_external",
-                        "files_release_external",
+						"files_select_external",
+						"files_save_external",
+						"files_release_external",
                         "file_read_dragged_file",
                     ])
                     .default_permission(
