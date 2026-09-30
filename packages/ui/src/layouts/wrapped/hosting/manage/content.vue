@@ -1076,23 +1076,25 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 		? contentProjectsById.value.get(addon.project_id)
 		: undefined
 	const environment = getAddonEnvironment(addon)
+	const iconUrl = addon.icon_url ?? projectMetadata?.icon_url
+	const targetWorldId = worldId.value
 	const embeddedIcon =
-		!addon.icon_url &&
+		!iconUrl &&
 		addon.manifest?.icon_embedded &&
-		worldId.value &&
+		targetWorldId &&
 		(addon.kind === 'mod' || addon.kind === 'plugin')
 			? {
 					queryKey: [
 						'kyros',
 						'content',
 						'embedded-icon',
-						worldId.value,
+						targetWorldId,
 						addon.kind,
 						addon.filename,
 					] as const,
 					queryFn: () =>
 						client.kyros.content_v1.getEmbeddedAddonIcon(
-							worldId.value!,
+							targetWorldId,
 							addon.kind === 'mod' ? 'mods' : 'plugins',
 							addon.filename,
 						),
@@ -1109,8 +1111,7 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 			id: addon.project_id ?? addon.filename,
 			slug: projectMetadata?.slug ?? addon.project_id ?? addon.filename,
 			title: projectMetadata?.title ?? friendlyAddonName(addon),
-			icon_url:
-				addon.icon_url ?? (embeddedIcon ? undefined : projectMetadata?.icon_url) ?? undefined,
+			icon_url: iconUrl ?? undefined,
 		},
 		version: {
 			id: addon.version?.id ?? addon.filename,
