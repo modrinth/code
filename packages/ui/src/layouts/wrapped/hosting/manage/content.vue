@@ -406,19 +406,19 @@ const modpackAddons = ref<Archon.Content.v1.Addon[]>([])
 const addonLookup = computed(() => {
 	const map = new Map<string, Archon.Content.v1.Addon>()
 	for (const addon of contentQuery.data.value?.addons ?? []) {
-		map.set(addon.filename, addon)
+		map.set(addonToggleKey(addon), addon)
 	}
 	return map
 })
 
 const modpackAddonLookup = computed(
-	() => new Map(modpackAddons.value.map((addon) => [addon.filename, addon])),
+	() => new Map(modpackAddons.value.map((addon) => [addonToggleKey(addon), addon])),
 )
 
 function getAddonForItem(item: ContentItem) {
 	return item.source_kind === 'modrinth_modpack'
-		? modpackAddonLookup.value.get(item.file_name)
-		: addonLookup.value.get(item.file_name)
+		? modpackAddonLookup.value.get(item.id)
+		: addonLookup.value.get(item.id)
 }
 
 function getAddonQueryKey(addon: Archon.Content.v1.Addon) {
@@ -635,7 +635,7 @@ const contentReadyPending = computed(
 )
 
 function getContentItemId(item: ContentItem) {
-	return item.file_name ?? item.id
+	return item.id
 }
 
 watch(
@@ -660,7 +660,7 @@ const deleteMutation = useMutation({
 			if (!oldData) return oldData
 			return {
 				...oldData,
-				addons: (oldData.addons ?? []).filter((a) => a.filename !== addon.filename),
+				addons: (oldData.addons ?? []).filter((a) => addonToggleKey(a) !== addonToggleKey(addon)),
 			}
 		})
 		return {
@@ -862,7 +862,7 @@ async function handleModpackToggleEnabled(item: ContentItem) {
 
 async function handleDeleteItem(item: ContentItem) {
 	if (contentActionDisabled.value) return
-	const addon = addonLookup.value.get(item.file_name)
+	const addon = getAddonForItem(item)
 	if (!addon) return
 	await deleteMutation.mutateAsync({ addon })
 }
@@ -870,7 +870,7 @@ async function handleDeleteItem(item: ContentItem) {
 function itemsToAddonRequests(items: ContentItem[]): Archon.Content.v1.RemoveAddonRequest[] {
 	return items.flatMap((item) => {
 		if (item.installing) return []
-		const addon = addonLookup.value.get(item.file_name)
+		const addon = getAddonForItem(item)
 		if (!addon) return []
 		return [{ filename: addon.filename, kind: addon.kind }]
 	})
@@ -1076,25 +1076,23 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 		? contentProjectsById.value.get(addon.project_id)
 		: undefined
 	const environment = getAddonEnvironment(addon)
-	const iconUrl = addon.icon_url ?? projectMetadata?.icon_url
-	const targetWorldId = worldId.value
 	const embeddedIcon =
-		!iconUrl &&
+		!addon.icon_url &&
 		addon.manifest?.icon_embedded &&
-		targetWorldId &&
+		worldId.value &&
 		(addon.kind === 'mod' || addon.kind === 'plugin')
 			? {
 					queryKey: [
 						'kyros',
 						'content',
 						'embedded-icon',
-						targetWorldId,
+						worldId.value,
 						addon.kind,
 						addon.filename,
 					] as const,
 					queryFn: () =>
 						client.kyros.content_v1.getEmbeddedAddonIcon(
-							targetWorldId,
+							worldId.value!,
 							addon.kind === 'mod' ? 'mods' : 'plugins',
 							addon.filename,
 						),
@@ -1111,7 +1109,8 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 			id: addon.project_id ?? addon.filename,
 			slug: projectMetadata?.slug ?? addon.project_id ?? addon.filename,
 			title: projectMetadata?.title ?? friendlyAddonName(addon),
-			icon_url: iconUrl ?? undefined,
+			icon_url:
+				addon.icon_url ?? (embeddedIcon ? undefined : projectMetadata?.icon_url) ?? undefined,
 		},
 		version: {
 			id: addon.version?.id ?? addon.filename,
@@ -1130,7 +1129,7 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 					link: `/${addon.owner.type}/${addon.owner.id}`,
 				}
 			: undefined,
-		id: addon.id ?? addon.filename,
+		id: addonToggleKey(addon),
 		external: !addon.project_id,
 		source_kind: addon.from_modpack ? 'modrinth_modpack' : undefined,
 		enabled: !addon.disabled,
@@ -1206,6 +1205,7 @@ async function handleModpackUnlinkConfirm() {
 
 async function handleBulkUpdate(selections: UpdateAllSelection[]) {
 	if (contentActionDisabled.value) return
+	const addonIds = new Set<string>()
 	const addons = selections.flatMap((selection) => {
 		const item = contentItems.value.find((item) => getContentItemId(item) === selection.id)
 		if (
@@ -1215,13 +1215,13 @@ async function handleBulkUpdate(selections: UpdateAllSelection[]) {
 			item.project.id !== selection.projectId
 		)
 			return []
+		addonIds.add(item.id)
 		return [{ filename: item.file_name, version_id: selection.version.id }]
 	})
 	if (addons.length === 0) return
-	const filenames = new Set(addons.map((addon) => addon.filename))
 	const rollback = await optimisticallyUpdateAddons((current) =>
 		current.map((addon) =>
-			filenames.has(addon.filename) ? { ...addon, installing: true } : addon,
+			addonIds.has(addonToggleKey(addon)) ? { ...addon, installing: true } : addon,
 		),
 	)
 	try {
@@ -1354,7 +1354,7 @@ async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 	const rollback = item
 		? await optimisticallyUpdateAddons((addons) =>
 				addons.map((addon) =>
-					addon.filename === item.file_name ? { ...addon, installing: true } : addon,
+					addonToggleKey(addon) === item.id ? { ...addon, installing: true } : addon,
 				),
 			)
 		: undefined
@@ -1372,7 +1372,7 @@ async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 				soft_override: true,
 			})
 		} else if (item) {
-			const addon = addonLookup.value.get(item.file_name)
+			const addon = getAddonForItem(item)
 			if (addon) {
 				await client.archon.content_v1.updateAddon(serverId, worldId.value!, {
 					filename: addon.filename,
@@ -1441,7 +1441,7 @@ provideContentManager({
 	getItemId: getContentItemId,
 	mapToTableItem: (item) => {
 		const projectType = item.project_type ?? type.value
-		const addon = addonLookup.value.get(item.file_name)
+		const addon = getAddonForItem(item)
 		const hasModrinthProject = !!addon?.project_id || (!!item.installing && !!item.project?.id)
 		const projectSlugOrId = item.project.slug ?? item.project.id
 		return {

@@ -1,5 +1,6 @@
 import { AbstractModule } from '../../../core/abstract-module'
 import type { UploadHandle, UploadProgress } from '../../../types/upload'
+import { getNodeBaseUrl } from '../../../utils/node-url'
 import type { Archon } from '../../archon/types'
 
 export class KyrosContentV1Module extends AbstractModule {
@@ -64,6 +65,7 @@ export class KyrosContentV1Module extends AbstractModule {
 		options?: {
 			softOverride?: boolean
 			onProgress?: (progress: UploadProgress) => void
+			auth?: Archon.Servers.v0.JWTAuth
 		},
 	): UploadHandle<void> {
 		const formData = new FormData()
@@ -71,7 +73,7 @@ export class KyrosContentV1Module extends AbstractModule {
 		formData.append('properties', JSON.stringify(properties))
 
 		return this.client.upload<void>(`/worlds/${worldId}/content/upload-modpack-file`, {
-			api: '',
+			api: options?.auth ? getNodeBaseUrl(options.auth.url) : '',
 			version: 'v1',
 			formData,
 			params:
@@ -79,7 +81,9 @@ export class KyrosContentV1Module extends AbstractModule {
 					? { soft_override: String(options.softOverride) }
 					: undefined,
 			onProgress: options?.onProgress,
-			useNodeAuth: true,
+			...(options?.auth
+				? { headers: { Authorization: `Bearer ${options.auth.token}` }, skipAuth: true }
+				: { useNodeAuth: true }),
 		})
 	}
 }
