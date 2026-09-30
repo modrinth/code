@@ -53,19 +53,6 @@ import type {
 import { summarizeManagedContent } from '../../../shared/content-tab/utils/managed-content'
 
 type AddonWithUiState = Archon.Content.v1.Addon & { installing?: boolean }
-type ContentOwnerAvatarSource = {
-	id: string
-	name: string
-	type: 'user' | 'organization'
-}
-const props = withDefaults(
-	defineProps<{
-		ownerAvatarUrlBase?: string
-	}>(),
-	{
-		ownerAvatarUrlBase: 'https://modrinth.com',
-	},
-)
 
 const { formatMessage } = useVIntl()
 
@@ -181,11 +168,6 @@ const type = computed(() => {
 
 const queryKey = computed(() => ['content', 'list', 'v1', serverId])
 const modpackContentQueryKey = computed(() => ['content', 'list', 'v1', serverId, 'modpack'])
-
-function getContentOwnerAvatarUrl(owner: ContentOwnerAvatarSource) {
-	const ownerId = owner.type === 'user' ? owner.name || owner.id : owner.id
-	return `${props.ownerAvatarUrlBase}/${owner.type}/${encodeURIComponent(ownerId)}/avatar`
-}
 
 const contentQuery = useQuery({
 	queryKey,
@@ -1143,7 +1125,7 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 					id: addon.owner.id,
 					name: addon.owner.name,
 					type: addon.owner.type,
-					avatar_url: getContentOwnerAvatarUrl(addon.owner),
+					avatar_url: addon.owner.icon_url,
 					link: `/${addon.owner.type}/${addon.owner.id}`,
 				}
 			: undefined,

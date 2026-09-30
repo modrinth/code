@@ -19,10 +19,12 @@ import { Button, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import { useFormatDateTime } from '../../../composables'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { commonMessages, truncatedTooltip } from '../../../utils'
+import { injectFileDownload } from '../../../providers/file-download'
 import AutoLink from '../../base/AutoLink.vue'
 import Avatar from '../../base/Avatar.vue'
 
 const { formatMessage } = useVIntl()
+const fileDownload = injectFileDownload(null)
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
 	dateStyle: 'long',
@@ -112,8 +114,12 @@ const overflowMenuOptions = computed<ButtonMenuOption[]>(() => {
 	options.push({
 		id: 'download',
 		label: formatMessage(commonMessages.downloadButton),
-		type: 'link',
-		href: `https://${props.kyrosUrl}/modrinth/v0/backups/${props.backup.id}/download?auth=${props.jwt}`,
+		...(fileDownload
+			? { action: () => emit('download') }
+			: {
+					type: 'link' as const,
+					href: `https://${props.kyrosUrl}/modrinth/v0/backups/${props.backup.id}/download?auth=${props.jwt}`,
+				}),
 		disabled: !props.kyrosUrl || !props.jwt,
 	})
 
@@ -284,7 +290,7 @@ const creatorAvatarSrc = computed(() =>
 				type="quiet"
 				label="More options"
 				:options="overflowMenuOptions"
-				@select="(option) => option.id === 'download' && emit('download')"
+				@select="(option) => !fileDownload && option.id === 'download' && emit('download')"
 			>
 				<MoreVerticalIcon class="size-5" />
 				<template #copy-id>

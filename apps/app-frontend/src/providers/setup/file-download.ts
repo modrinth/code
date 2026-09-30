@@ -1,4 +1,9 @@
-import type { AbstractModrinthClient } from '@modrinth/api-client'
+import {
+	type AbstractModrinthClient,
+	type DownloadSink,
+	getNodeBaseUrl,
+	ModrinthApiError,
+} from '@modrinth/api-client'
 import { provideFileDownload } from '@modrinth/ui'
 import { Channel, invoke } from '@tauri-apps/api/core'
 
@@ -9,6 +14,7 @@ import {
 
 interface NativeSaveError {
 	message?: string
+	statusCode?: number
 }
 
 export function setupFileDownloadProvider(client: AbstractModrinthClient) {
@@ -16,7 +22,12 @@ export function setupFileDownloadProvider(client: AbstractModrinthClient) {
 		async download(file) {
 			const saveId = await invoke<string | null>('plugin:files|files_select_external', {
 				filename: file.filename,
-				filter: null,
+				filter:
+					file.type === 'mrpack'
+						? { name: 'Modrinth Modpack', extensions: ['mrpack'] }
+						: file.type === 'server-backup' || file.type === 'server-world'
+							? { name: 'ZIP archive', extensions: ['zip'] }
+							: null,
 			}).catch((error: NativeSaveError) => {
 				throw new Error(error.message ?? String(error))
 			})
@@ -24,6 +35,7 @@ export function setupFileDownloadProvider(client: AbstractModrinthClient) {
 
 			let cancelled = false
 			let finished = false
+			let savedFilename = file.filename
 			const task = trackExternalFileDownload(
 				saveId,
 				file.filename,
@@ -38,19 +50,76 @@ export function setupFileDownloadProvider(client: AbstractModrinthClient) {
 				task.update(progress)
 			})
 
+			const saveUrl = async (url: string, headers: Record<string, string> = {}) => {
+				if (cancelled) throw new Error('Download cancelled')
+				try {
+					savedFilename = await invoke<string>('plugin:files|files_save_external', {
+						saveId,
+						request: { url, headers },
+						onProgress,
+					})
+				} catch (error) {
+					const nativeError = error as NativeSaveError
+					throw new ModrinthApiError(nativeError.message ?? String(error), {
+						statusCode: nativeError.statusCode,
+					})
+				}
+			}
+			const sink: DownloadSink = (url, options) => saveUrl(url, options.headers)
+
 			try {
-				const { token } = await client.kyros.files_v1.authorizeFileDownload(
-					file.nodeUrlHost,
-					file.worldId,
-					file.path,
-				)
-				if (cancelled) return false
-				const url = client.kyros.files_v1.getFileDownloadUrl(file.nodeUrlHost, file.worldId, token)
-				const savedFilename = await invoke<string>('plugin:files|files_save_external', {
-					saveId,
-					request: { url },
-					onProgress,
-				})
+				switch (file.type) {
+					case 'server-file': {
+						const { token } = await client.kyros.files_v1.authorizeFileDownload(
+							file.nodeUrlHost,
+							file.worldId,
+							file.path,
+						)
+						await saveUrl(
+							client.kyros.files_v1.getFileDownloadUrl(file.nodeUrlHost, file.worldId, token),
+						)
+						break
+					}
+					case 'mrpack':
+						await client.sharedinstances.instances_v1.downloadMrpackTo(
+							file.instanceId,
+							file.version,
+							sink,
+						)
+						break
+					case 'server-world': {
+						const { token } = await client.kyros.files_v1.authorizeFullWorldDownload(
+							file.nodeUrlHost,
+							file.worldId,
+						)
+						await client.download(
+							`/worlds/${encodeURIComponent(file.worldId)}/files/download-full-zip`,
+							{
+								api: getNodeBaseUrl(file.nodeUrlHost),
+								version: 'v1',
+								params: { token },
+								skipAuth: true,
+							},
+							sink,
+						)
+						break
+					}
+					case 'server-backup': {
+						const server = await client.archon.servers_v0.get(file.serverId)
+						if (!server.node) throw new Error('Server is not assigned to a node')
+						await client.download(
+							`/backups/${encodeURIComponent(file.backupId)}/download`,
+							{
+								api: getNodeBaseUrl(server.node.instance),
+								version: 'modrinth/v0',
+								params: { auth: server.node.token },
+								skipAuth: true,
+							},
+							sink,
+						)
+						break
+					}
+				}
 				task.succeed(savedFilename)
 				return true
 			} catch (error) {
@@ -58,9 +127,8 @@ export function setupFileDownloadProvider(client: AbstractModrinthClient) {
 					task.canceled()
 					return false
 				}
-				const message = (error as NativeSaveError).message ?? String(error)
-				task.fail(message)
-				throw new Error(message)
+				task.fail(error instanceof Error ? error.message : String(error))
+				throw error
 			} finally {
 				finished = true
 				await invoke('plugin:files|files_release_external', { saveId }).catch(() => undefined)

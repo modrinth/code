@@ -11,7 +11,7 @@ import PageHeader from '#ui/components/base/page-header/index.vue'
 import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.vue'
 import PageHeaderMetadataItem from '#ui/components/base/page-header/metadata/page-header-metadata-item.vue'
 import TagIcon from '#ui/components/base/TagIcon.vue'
-import { useServerImage } from '#ui/composables/use-server-image'
+import { useServerIcon } from '#ui/composables/use-server-icon'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import SelectedProjectsLeaveModal from './components/SelectedProjectsLeaveModal.vue'
@@ -40,7 +40,7 @@ const installContext = computed(() => props.installContext ?? ctx?.installContex
 const selectedProjectsLeaveModal = ref<InstanceType<typeof SelectedProjectsLeaveModal>>()
 
 const serverId = computed(() => installContext.value?.serverId ?? '')
-const { image: fetchedIcon } = useServerImage(serverId, {
+const { icon: fetchedIcon } = useServerIcon(serverId, {
 	enabled: computed(() => !!installContext.value?.serverId),
 })
 

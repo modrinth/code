@@ -185,7 +185,7 @@
 										:jwt="server.node?.token"
 										:show-copy-id-action="showCopyIdAction"
 										:show-debug-info="showDebugInfo"
-										@download="() => triggerDownloadAnimation()"
+										@download="() => downloadBackup(backup)"
 										@rename="() => showRenameBackupModal(backup)"
 										@restore="() => showRestoreBackupModal(backup)"
 										@delete="
@@ -312,6 +312,7 @@ import { useServerWorldDownload } from '#ui/composables/server-download'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import { useBulkOperation } from '#ui/layouts/shared/content-tab/composables/bulk-operations'
 import {
+	injectFileDownload,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
@@ -383,6 +384,7 @@ const filterPillOptions = computed<FilterPillOption[]>(() => [
 	{ id: 'auto', label: formatMessage(messages.filterAuto) },
 ])
 const client = injectModrinthClient()
+const fileDownload = injectFileDownload(null)
 const queryClient = useQueryClient()
 const { server, worldId, busyReasons } = injectModrinthServerContext()
 const { downloadWorldFiles } = useServerWorldDownload()
@@ -398,6 +400,29 @@ async function downloadFiles() {
 		await downloadWorldFiles(node.instance, currentWorldId)
 	} finally {
 		isDownloadingFiles.value = false
+	}
+}
+
+async function downloadBackup(backup: Archon.BackupsQueue.v1.BackupQueueBackup) {
+	if (!fileDownload) {
+		triggerDownloadAnimation()
+		return
+	}
+	try {
+		const saved = await fileDownload.download({
+			type: 'server-backup',
+			serverId,
+			serverName: server.value.name,
+			backupId: backup.id,
+			filename: /\.zip$/i.test(backup.name) ? backup.name : `${backup.name}.zip`,
+		})
+		if (saved) triggerDownloadAnimation()
+	} catch (error) {
+		addNotification({
+			title: formatMessage(commonMessages.downloadFailedLabel),
+			text: error instanceof Error ? error.message : undefined,
+			type: 'error',
+		})
 	}
 }
 

@@ -25,10 +25,10 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	type ServerPlayTarget,
+	useServerIcon,
 	useVIntl,
 } from '@modrinth/ui'
 import { injectPopupNotificationManager } from '@modrinth/ui'
-import { serverIconQueryOptions } from '@modrinth/ui/src/queries/server-icon'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -71,6 +71,7 @@ const auth = injectAuth()
 const client = injectModrinthClient()
 const appEvents = injectAppEvents()
 const queryClient = useQueryClient()
+const { fetchIcon } = useServerIcon('', { enabled: false })
 const router = useRouter()
 const hostingInstances = useHostingInstanceCache()
 const instanceLaunch = useInstanceLaunchState()
@@ -85,9 +86,9 @@ const pendingUpdate = ref<{ target: LaunchTarget; instanceId: string }>()
 const activeInstall = ref<{ serverId: string; worldId: string; instanceId: string }>()
 
 async function cacheServerIcon(serverId: string) {
-	const icon = await queryClient.fetchQuery(serverIconQueryOptions(serverId, client))
+	const icon = await fetchIcon(serverId)
 	if (!icon) return null
-	const bytes = Uint8Array.from(atob(icon.split(',')[1]), (byte) => byte.charCodeAt(0))
+	const bytes = new Uint8Array(await icon.arrayBuffer())
 	return await cache_icon(Array.from(bytes))
 }
 

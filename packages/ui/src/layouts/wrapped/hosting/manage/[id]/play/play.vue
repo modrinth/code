@@ -154,7 +154,8 @@ import { useServerPlayers } from './use-server-players'
 type Action = 'play' | 'invite' | 'download' | 'push'
 const props = defineProps<{
 	onPlayServer: (target: ServerPlayTarget) => void | Promise<void>
-	onDownloadMrpack: (blob: Blob, filename: string) => Promise<void>
+	onDownloadMrpack?: (blob: Blob, filename: string) => Promise<void>
+	onDownloadMrpackExternal?: (instanceId: string, version: number, filename: string) => Promise<void>
 	siteUrl: string
 }>()
 const { formatMessage } = useVIntl()
@@ -232,12 +233,21 @@ async function performAction(action: Action, target: ServerShareActionTarget) {
 	} else if (action === 'download') {
 		const latest = await client.sharedinstances.instances_v1.getLatestVersion(id)
 		if (!latest.ready) throw new Error(formatMessage(messages.notReady))
-		const blob = await client.sharedinstances.instances_v1.downloadMrpack(id, latest.version)
-		if (sameContext())
-			await props.onDownloadMrpack(
-				blob,
-				`${server.value.name.replace(/[\\/:*?"<>|]/g, '_')}.mrpack`,
-			)
+		if (props.onDownloadMrpackExternal) {
+			if (sameContext())
+				await props.onDownloadMrpackExternal(
+					id,
+					latest.version,
+					`${server.value.name.replace(/[\\/:*?"<>|]/g, '_')}.mrpack`,
+				)
+		} else if (props.onDownloadMrpack) {
+			const blob = await client.sharedinstances.instances_v1.downloadMrpack(id, latest.version)
+			if (sameContext())
+				await props.onDownloadMrpack(
+					blob,
+					`${server.value.name.replace(/[\\/:*?"<>|]/g, '_')}.mrpack`,
+				)
+		}
 	}
 }
 const pendingAction = computed(() =>

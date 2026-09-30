@@ -1,25 +1,32 @@
 <script setup lang="ts">
-import { injectServerPlay, ServersManagePlayPage } from '@modrinth/ui'
+import {
+	injectFileDownload,
+	injectModrinthServerContext,
+	injectServerPlay,
+	ServersManagePlayPage,
+} from '@modrinth/ui'
 
 import { config } from '@/config'
 
 const { play } = injectServerPlay()
-async function downloadMrpack(blob: Blob, filename: string) {
-	const url = URL.createObjectURL(blob)
-	const anchor = document.createElement('a')
-	anchor.href = url
-	anchor.download = filename
-	document.body.appendChild(anchor)
-	anchor.click()
-	anchor.remove()
-	setTimeout(() => URL.revokeObjectURL(url), 60_000)
+const fileDownload = injectFileDownload()
+const { serverId, server } = injectModrinthServerContext()
+async function downloadMrpack(instanceId: string, version: number, filename: string) {
+	await fileDownload.download({
+		type: 'mrpack',
+		instanceId,
+		version,
+		filename,
+		serverId,
+		serverName: server.value.name,
+	})
 }
 </script>
 
 <template>
 	<ServersManagePlayPage
 		:on-play-server="play"
-		:on-download-mrpack="downloadMrpack"
+		:on-download-mrpack-external="downloadMrpack"
 		:site-url="config.siteUrl"
 	/>
 </template>
