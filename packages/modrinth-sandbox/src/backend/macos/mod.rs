@@ -81,7 +81,7 @@ fn spawn(
     let resolved_executable = resolve_path(&command.executable)?;
     allow_read(&mut sandbox_profile, &resolved_executable);
 
-    if command.network {
+    if command.allow_network {
         sandbox_profile.push(NETWORK);
     }
 
