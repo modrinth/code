@@ -9,7 +9,7 @@ use std::{
 };
 
 use async_trait::async_trait;
-use eyre::{Result, eyre};
+use eyre::{Result, WrapErr, eyre};
 use windows::{
     Win32::{
         Foundation::{

@@ -164,7 +164,7 @@ fn spawn(env: &AppContainerEnv, mut command: SandboxCommand) -> Result<crate::Sa
 
     let mut owned_capabilities: Vec<OwnedCapability> = Vec::new();
 
-    if command.network {
+    if command.allow_network {
         owned_capabilities
             .push(OwnedCapability::new(WinCapabilityInternetClientSid)?);
         owned_capabilities
@@ -322,7 +322,7 @@ fn spawn(env: &AppContainerEnv, mut command: SandboxCommand) -> Result<crate::Sa
     });
 
     let mut need_set_network_isolation_elevated = false;
-    if command.network {
+    if command.allow_network {
         if let Err(err) = try_set_network_isolation(&app_container_sid) {
             let raw_access_denied = err.raw_os_error().unwrap_or(0) == HRESULT::from_win32(ERROR_ACCESS_DENIED.0).0;
             if err.kind() == ErrorKind::PermissionDenied || raw_access_denied {
@@ -346,7 +346,7 @@ fn spawn(env: &AppContainerEnv, mut command: SandboxCommand) -> Result<crate::Sa
 
         tracing::info!("Spawning elevated self to modify acl");
         let elevated = super::runas::spawn(std::env::current_exe()?, arguments)?;
-        let elevated_status = elevated.process.wait()?;
+        let elevated_status = elevated.wait()?;
         tracing::info!("Done spawning elevated self to modify acl: {elevated_status}");
     }
 
@@ -451,22 +451,24 @@ fn try_set_network_isolation(app_container: &PSID) -> std::io::Result<()> {
     scopeguard::defer! {
         // https://learn.microsoft.com/en-us/windows/win32/api/netfw/nf-netfw-networkisolationgetappcontainerconfig
         let process_heap = unsafe { GetProcessHeap() };
-        for index in 0..current_count {
-            HeapFree(process_heap, 0, unsafe { current_containers.offset(index as isize).read() }.Sid);
-        }
-        if !current_containers.is_null() {
-            HeapFree(process_heap, 0, current_containers);
+        if let Ok(process_heap) = process_heap {
+            for index in 0..current_count {
+                HeapFree(process_heap, 0 as _, Some(unsafe { current_containers.offset(index as isize).read() }.Sid.0));
+            }
+            if !current_containers.is_null() {
+                HeapFree(process_heap, 0 as _, current_containers as *mut _);
+            }
         }
     }
 
-    if result != ERROR_SUCCESS {
-        return Err(windows::core::Error::from_hresult(HRESULT::from_win32(result.0)).into());
+    if result != 0 {
+        return Err(windows::core::Error::from_hresult(HRESULT::from_win32(result)).into());
     }
 
-    let mut new_containers = Vec::with_capacity(current_count + 1);
+    let mut new_containers = Vec::with_capacity(current_count as usize + 1);
     for index in 0..current_count {
         let sid_and_attributes = unsafe { current_containers.offset(index as isize).read() };
-        if EqualSid(sid_and_attributes.Sid, *app_container) != 0 {
+        if EqualSid(sid_and_attributes.Sid, *app_container).is_ok() {
             // Already allowed
             return Ok(());
         }
@@ -478,9 +480,9 @@ fn try_set_network_isolation(app_container: &PSID) -> std::io::Result<()> {
         Attributes: 0,
     });
 
-    let result = unsafe { NetworkIsolationSetAppContainerConfig(new_containers.len(), new_containers.as_ptr()) };
-    if result != ERROR_SUCCESS {
-        return Err(windows::core::Error::from_hresult(HRESULT::from_win32(result.0)).into());
+    let result = unsafe { NetworkIsolationSetAppContainerConfig(new_containers.as_slice()) };
+    if result != 0 {
+        return Err(windows::core::Error::from_hresult(HRESULT::from_win32(result)).into());
     }
 
     Ok(())
@@ -782,11 +784,11 @@ fn acl_eq(first: *const ACL, second: *const ACL) -> std::io::Result<bool> {
 }
 
 pub fn try_handle_callback() -> eyre::Result<bool> {
-    let args = std::env::args_os();
+    let args = std::env::args_os().collect::<Vec<_>>;
     if args.len() < 2 {
         return Ok(false);
     }
-    if args[1] != OsStr::new("--modrinth-sandbox-callback") {
+    if args[1].as_os_str() != OsStr::new("--modrinth-sandbox-callback") {
         return Ok(false);
     }
     if args.len() < 5 {
@@ -805,8 +807,8 @@ pub fn try_handle_callback() -> eyre::Result<bool> {
         return Err(eyre!("ConvertStringSidToSidW returned invalid sid"));
     }
 
-    let need_set_network_isolation_elevated = args[3] == OsStr::new("true");
-    let traverse_paths = std::env::split_paths(args[4]);
+    let need_set_network_isolation_elevated = args[3].as_os_str() == OsStr::new("true");
+    let traverse_paths = std::env::split_paths(args[4].as_os_str());
 
     if need_set_network_isolation_elevated {
         try_set_network_isolation(&psid)?;
@@ -822,5 +824,5 @@ pub fn try_handle_callback() -> eyre::Result<bool> {
         }
     }
 
-    result
+    Ok(result?)
 }

@@ -1,13 +1,14 @@
 use std::{io::{Error, ErrorKind}, os::windows::io::AsRawHandle, path::{Path, PathBuf}};
 
 use windows::Win32::{Foundation::HANDLE, System::JobObjects::AssignProcessToJobObject, UI::Shell::SHELLEXECUTEINFOW};
+use eyre::{Result, WrapErr, eyre};
 
 use crate::SandboxArg;
 
 pub fn spawn(
     program: PathBuf,
     arguments: Vec<SandboxArg>,
-) -> eyre::Result<super::WindowsChild> {
+) -> Result<super::WindowsChild> {
     use std::os::windows::ffi::OsStrExt;
     let program = super::resolve_path(&program).wrap_err("resolving program path")?;
     let application_name = program
@@ -33,7 +34,7 @@ pub fn spawn(
     }
 
     if sei.hProcess.is_invalid() {
-        return Err(Error::new(ErrorKind::Other, "ShellExecuteExW returned invalid process handle. Operation completed via DDE?"));
+        return Err(eyre!("ShellExecuteExW returned invalid process handle. Operation completed via DDE?"));
     }
 
     Ok(super::WindowsChild {
