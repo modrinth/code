@@ -51,7 +51,7 @@ use windows::{
         System::{
             StationsAndDesktops::OpenWindowStationW,
             SystemServices::{SE_GROUP_ENABLED, SECURITY_DESCRIPTOR_REVISION},
-            Memory::{GetProcessHeap, HeapFree},
+            Memory::{GetProcessHeap, HeapFree, HEAP_FLAGS},
             Threading::{
                 DeleteProcThreadAttributeList,
                 InitializeProcThreadAttributeList,
@@ -346,7 +346,7 @@ fn spawn(env: &AppContainerEnv, mut command: SandboxCommand) -> Result<crate::Sa
 
         tracing::info!("Spawning elevated self to modify acl");
         let elevated = super::runas::spawn(std::env::current_exe()?, arguments)?;
-        let elevated_status = elevated.wait()?;
+        let elevated_status = elevated.blocking_wait()?;
         tracing::info!("Done spawning elevated self to modify acl: {elevated_status}");
     }
 
@@ -453,10 +453,10 @@ fn try_set_network_isolation(app_container: &PSID) -> std::io::Result<()> {
         let process_heap = unsafe { GetProcessHeap() };
         if let Ok(process_heap) = process_heap {
             for index in 0..current_count {
-                HeapFree(process_heap, 0 as _, Some(unsafe { current_containers.offset(index as isize).read() }.Sid.0));
+                HeapFree(process_heap, HEAP_FLAGS(0), Some(unsafe { current_containers.offset(index as isize).read() }.Sid.0));
             }
             if !current_containers.is_null() {
-                HeapFree(process_heap, 0 as _, current_containers as *mut _);
+                HeapFree(process_heap, HEAP_FLAGS(0), Some(current_containers as *mut _));
             }
         }
     }

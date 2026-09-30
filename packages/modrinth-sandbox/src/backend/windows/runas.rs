@@ -16,7 +16,7 @@ pub fn spawn(
         .encode_wide()
         .chain([0])
         .collect::<Vec<_>>();
-    let mut command_line = super::join_windows_shell_arg(arguments.as_slice())
+    let command_line = super::join_windows_shell_arg(arguments.as_slice())
         .encode_wide()
         .chain([0])
         .collect::<Vec<_>>();

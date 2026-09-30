@@ -343,6 +343,18 @@ impl SandboxChildOp for WindowsChild {
     }
 
     async fn wait(&mut self) -> Result<SandboxExitStatus> {
+        // todo: make this async
+        self.blocking_wait()
+    }
+
+    async fn kill(&mut self) -> Result<()> {
+        unsafe { windows::Win32::System::Threading::TerminateProcess(self.process_handle, 1)?; }
+        Ok(())
+    }
+}
+
+impl WindowsChild {
+    pub(crate) fn blocking_wait(&mut self) -> Result<SandboxExitStatus> {
         if let Some(exit_status) = self.exit_status {
             return Ok(exit_status);
         }
@@ -368,10 +380,6 @@ impl SandboxChildOp for WindowsChild {
                 imp: WindowsSandboxExitStatus(code),
             });
         }
-    }
-
-    async fn kill(&mut self) -> Result<()> {
-        todo!()
     }
 }
 
