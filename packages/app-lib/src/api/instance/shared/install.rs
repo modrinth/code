@@ -622,10 +622,13 @@ pub(super) async fn shared_instance_install_data(
     } else {
         (manager_id, server_manager_name, server_manager_icon_url)
     };
-	let instance_icon_url = if remote.linked_server.is_some() {
-		server_manager_icon_url.clone().or(instance_icon_url).or(remote.icon)
-	} else if server_manager_name.is_some() {
-		instance_icon_url.or(remote.icon)
+    let instance_icon_url = if remote.linked_server.is_some() {
+        server_manager_icon_url
+            .clone()
+            .or(instance_icon_url)
+            .or(remote.icon)
+    } else if server_manager_name.is_some() {
+        instance_icon_url.or(remote.icon)
     } else {
         remote.icon.or(instance_icon_url)
     };
