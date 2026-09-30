@@ -15,6 +15,7 @@ import { useServerPermissions } from '#ui/composables/server-permissions'
 import type { FileOperation } from '#ui/layouts/shared/files-tab/types'
 import ContentDiffModal from '#ui/layouts/shared/installation-settings/components/ContentDiffModal.vue'
 import { useServerShareReview } from '#ui/layouts/shared/server-sharing/use-server-share-review'
+import { useServerPlayerMembers } from '#ui/layouts/wrapped/hosting/manage/[id]/play/use-server-players'
 import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
 
 import BackupAdmonition, { type BackupAdmonitionEntry } from './BackupAdmonition.vue'
@@ -44,11 +45,13 @@ const {
 	showPreview,
 	runAction,
 } = useServerShareReview()
-const needsShareUpdate = computed(
-	() =>
-		ctx.serverFull.value?.worlds.find((world) => world.id === ctx.worldId.value)?.content
-			?.shared_instance_needs_update ?? false,
+const world = computed(() =>
+	ctx.serverFull.value?.worlds.find((world) => world.id === ctx.worldId.value),
 )
+const sharedInstanceId = computed(() => world.value?.content?.shared_instance_id ?? null)
+const members = useServerPlayerMembers(sharedInstanceId)
+const hasInvitedPlayers = computed(() => (members.data.value?.rows.length ?? 0) > 0)
+const needsShareUpdate = computed(() => world.value?.content?.shared_instance_needs_update ?? false)
 const { activeOperations, backups, progressFor, invalidate } = useServerBackupsQueue(
 	computed(() => ctx.serverId),
 	ctx.worldId,
@@ -280,7 +283,7 @@ const stackItems = computed<ServerAdmonitionItem[]>(() => {
 		})
 	}
 
-	if (needsShareUpdate.value && canSetup.value) {
+	if (needsShareUpdate.value && canSetup.value && hasInvitedPlayers.value) {
 		out.push({
 			id: 'share-update',
 			type: 'info',

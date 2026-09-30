@@ -968,9 +968,8 @@ async fn fetch_advanced_with_target(
                 crate::install::control::download_step(semaphore.0.acquire())
                     .await??;
             if is_api_url && let Err(error) = GLOBAL_API_RATE_LIMIT.check() {
-                let retry_after = Duration::from_secs(
-                    GLOBAL_API_RATE_LIMIT.retry_in_seconds().unwrap_or(0),
-                );
+                let retry_after =
+                    GLOBAL_API_RATE_LIMIT.retry_in().unwrap_or_default();
                 if wait_for_local_rate_limit {
                     let deadline =
                         rate_limit_deadline.get_or_insert_with(|| {

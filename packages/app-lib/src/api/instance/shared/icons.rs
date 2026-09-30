@@ -24,7 +24,7 @@ pub(super) async fn shared_instance_server_icon(
     let credentials =
         ModrinthCredentials::get_and_refresh(&state.pool, &state.api_semaphore)
             .await?
-            .ok_or(crate::ErrorKind::NoCredentialsError)?;
+            .ok_or(crate::ErrorKind::NotLoggedIn)?;
     let key = sha1_smol::Sha1::from(
         format!("{}:{instance_id}", credentials.user_id).as_bytes(),
     )

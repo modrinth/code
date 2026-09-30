@@ -363,7 +363,7 @@ pub(super) async fn get_remote_server_icon(
     let credentials =
         ModrinthCredentials::get_and_refresh(&state.pool, &state.api_semaphore)
             .await?
-            .ok_or(crate::ErrorKind::NoCredentialsError)?;
+            .ok_or(crate::ErrorKind::NotLoggedIn)?;
     let _permit = state.api_semaphore.0.acquire().await?;
     let base_url = service_base_url();
     let path = format!("/instances/{instance_id}/server-icon");
@@ -374,9 +374,11 @@ pub(super) async fn get_remote_server_icon(
     if let Some(etag) = etag {
         request = request.header(reqwest::header::IF_NONE_MATCH, etag);
     }
-    request.send().await.map_err(|error| {
-        crate::ErrorKind::SharedInstancesApiError(error.to_string()).into()
-    })
+    request
+        .send()
+        .await
+        .map_err(|error| error.without_url())
+        .context(ErrorKind::SharedInstancesApiError)
 }
 
 pub(super) async fn get_latest_remote_version(
