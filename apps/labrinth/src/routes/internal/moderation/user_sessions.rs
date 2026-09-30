@@ -5,6 +5,7 @@ use xredis::RedisPool;
 use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
 use crate::database::models::DBUser;
+use crate::database::models::pat_item::DBPersonalAccessToken;
 use crate::database::models::session_item::DBSession;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
@@ -15,7 +16,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(revoke_user_sessions);
 }
 
-/// Revokes all sessions of a user, signing them out everywhere.
+/// Revokes all sessions and personal access tokens of a user, signing them out everywhere.
 #[utoipa::path(
 	context_path = "/moderation/user-sessions",
 	tag = "moderation",
@@ -60,6 +61,11 @@ pub async fn revoke_user_sessions(
         .await
         .wrap_internal_err("revoking user sessions")?;
 
+    let pats =
+        DBPersonalAccessToken::remove_all_for_user(target.id, &mut transaction)
+            .await
+            .wrap_internal_err("revoking user personal access tokens")?;
+
     transaction
         .commit()
         .await
@@ -68,6 +74,10 @@ pub async fn revoke_user_sessions(
     DBSession::clear_user_sessions_cache(target.id, sessions, &redis)
         .await
         .wrap_internal_err("clearing session cache")?;
+
+    DBPersonalAccessToken::clear_user_pats_cache(target.id, pats, &redis)
+        .await
+        .wrap_internal_err("clearing personal access token cache")?;
 
     Ok(())
 }
