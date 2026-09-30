@@ -30,7 +30,7 @@ pub async fn revoke_user_sessions(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<(), ApiError> {
-    let admin = get_user_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -41,7 +41,7 @@ pub async fn revoke_user_sessions(
     .wrap_auth_err("authenticating API request")?
     .1;
 
-    if admin.role != Role::Admin {
+    if !user.role.is_admin() {
         return Err(ApiError::Auth(eyre!(
             "only admins can revoke user sessions"
         )));
