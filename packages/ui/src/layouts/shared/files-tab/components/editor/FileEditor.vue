@@ -1,7 +1,7 @@
 <template>
 	<div
 		ref="editorContainer"
-		class="relative flex flex-col overflow-hidden rounded-[20px] border border-solid border-surface-4 shadow-sm"
+		class="relative flex flex-col overflow-hidden"
 	>
 		<EditorFindReplace
 			ref="findReplaceRef"

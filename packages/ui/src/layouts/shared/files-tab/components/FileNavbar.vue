@@ -1,252 +1,107 @@
 <template>
-	<header
-		class="@container flex select-none flex-col gap-4"
-		:aria-label="formatMessage(messages.fileNavigation)"
-	>
-		<div v-if="!isEditing" class="flex items-center gap-2 @[800px]:hidden">
-			<Input
-				:model-value="searchQuery"
-				:icon="SearchIcon"
-				type="search"
-				name="search"
-				autocomplete="off"
-				:placeholder="formatMessage(messages.searchFiles)"
-				size="medium"
-				wrapper-class="flex-1 min-w-0"
-				@update:model-value="$emit('update:searchQuery', $event)"
-			/>
-		</div>
-		<div class="flex items-center justify-between gap-2">
-			<nav
-				:aria-label="formatMessage(messages.breadcrumbNavigation)"
-				class="m-0 flex min-w-0 flex-shrink items-center p-0 text-contrast"
-			>
-				<ol class="m-0 flex min-w-0 flex-shrink list-none items-center p-0">
-					<li class="mr-4 flex-shrink-0">
-						<IconButton
-							v-tooltip="formatMessage(messages.backToHome)"
-							:label="formatMessage(messages.backToHome)"
-							native-type="button"
-							class="bg-surface-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-							@click="$emit('navigateHome')"
-							@mouseenter="$emit('prefetchHome')"
-						>
-							<HomeIcon />
-							<span class="sr-only">{{ formatMessage(messages.home) }}</span>
-						</IconButton>
-					</li>
-					<li class="m-0 -ml-2 min-w-0 flex-shrink p-0">
-						<ol
-							ref="breadcrumbOuter"
-							class="m-0 flex min-w-0 flex-shrink items-center overflow-hidden p-0"
-							:class="{ 'breadcrumb-fade-mask': isBreadcrumbOverflowing }"
-							:style="
+	<FileActionBar  ref="baseRef" v-bind="{ ...$props, ...$attrs }">
+		<nav v-if="breadcrumbs != null"
+		 	:aria-label="formatMessage(messages.breadcrumbNavigation)"
+		 	class="m-0 -ml-2 min-w-0 flex-shrink p-0"
+		>
+			<ol
+				ref="breadcrumbOuter"
+				class="m-0 flex min-w-0 flex-shrink items-center overflow-hidden p-0"
+				:class="{ 'breadcrumb-fade-mask': isBreadcrumbOverflowing }"
+				:style="
 								isBreadcrumbOverflowing
 									? { '--scroll-distance': `-${breadcrumbOverflowAmount}px` }
 									: undefined
 							"
-							@mouseenter="onBreadcrumbMouseEnter"
-							@mouseleave="onBreadcrumbMouseLeave"
-						>
-							<TransitionGroup
-								ref="breadcrumbInner"
-								name="breadcrumb"
-								tag="span"
-								class="relative flex w-fit items-center"
-								:class="{ 'breadcrumbs-scroll': isBreadcrumbAnimating }"
-								@animationiteration="onBreadcrumbAnimationIteration"
+				@mouseenter="onBreadcrumbMouseEnter"
+				@mouseleave="onBreadcrumbMouseLeave"
+			>
+				<TransitionGroup
+					ref="breadcrumbInner"
+					name="breadcrumb"
+					tag="span"
+					class="relative flex w-fit items-center"
+					:class="{ 'breadcrumbs-scroll': isBreadcrumbAnimating }"
+					@animationiteration="onBreadcrumbAnimationIteration"
+				>
+					<li
+						:key="`home`"
+						class="relative flex shrink-0 items-center text-sm"
+					>
+						<div class="flex shrink-0 items-center">
+							<Button
+								v-tooltip="formatMessage(messages.backToHome)"
+								:label="formatMessage(messages.backToHome)"
+								type="quiet"
+								class="cursor-pointer whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+								:aria-current="
+												!isEditing && breadcrumbs.length == 0 ? 'location' : undefined
+											"
+								:class="{
+												'!text-contrast': !isEditing && breadcrumbs.length == 0,
+											}"
+								@click="$emit('navigateHome')"
+								@mouseenter="$emit('prefetchHome')"
 							>
-								<li
-									v-for="(segment, index) in breadcrumbs"
-									:key="`${segment || index}-group`"
-									class="relative flex shrink-0 items-center text-sm"
-								>
-									<div class="flex shrink-0 items-center">
-										<Button
-											type="quiet"
-											class="cursor-pointer whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-											:aria-current="
+								<HomeIcon />
+								<span>Home</span>
+							</Button>
+							<ChevronRightIcon
+								v-if="breadcrumbs.length != 0 || isEditing"
+								class="size-4 flex-shrink-0 text-secondary"
+								aria-hidden="true"
+							/>
+						</div>
+					</li>
+					<li
+						v-for="(segment, index) in breadcrumbs"
+						:key="`${segment || index}-group`"
+						class="relative flex shrink-0 items-center text-sm"
+					>
+						<div class="flex shrink-0 items-center">
+							<Button
+								type="quiet"
+								class="cursor-pointer whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+								:aria-current="
 												!isEditing && index === breadcrumbs.length - 1 ? 'location' : undefined
 											"
-											:class="{
+								:class="{
 												'!text-contrast': !isEditing && index === breadcrumbs.length - 1,
 											}"
-											@click="$emit('navigate', index)"
-										>
-											{{ segment || '' }}
-										</Button>
-										<ChevronRightIcon
-											v-if="index < breadcrumbs.length - 1 || isEditing"
-											class="size-4 flex-shrink-0 text-secondary"
-											aria-hidden="true"
-										/>
-									</div>
-								</li>
-							</TransitionGroup>
-							<li v-if="isEditing && editingFileName" class="flex items-center px-3 text-base">
-								<span class="font-semibold !text-contrast" aria-current="location">
-									{{ editingFileName }}
-								</span>
-							</li>
-						</ol>
+								@click="$emit('navigate', 0)"
+							>
+								{{ segment || '' }}
+							</Button>
+							<ChevronRightIcon
+								v-if="index < breadcrumbs.length - 1 || isEditing"
+								class="size-4 flex-shrink-0 text-secondary"
+								aria-hidden="true"
+							/>
+						</div>
 					</li>
-				</ol>
-			</nav>
-
-			<div v-if="!isEditing" class="flex flex-shrink-0 items-center gap-2">
-				<Input
-					id="search-folder"
-					:model-value="searchQuery"
-					:icon="SearchIcon"
-					type="search"
-					name="search"
-					autocomplete="off"
-					:placeholder="formatMessage(messages.searchFiles)"
-					class="hidden @[800px]:inline-flex"
-					size="medium"
-					wrapper-class="w-full sm:w-[280px]"
-					@update:model-value="$emit('update:searchQuery', $event)"
-				/>
-
-				<Button
-					v-if="showRefreshButton"
-					type="outlined"
-					native-type="button"
-					size="lg"
-					:disabled="refreshing"
-					@click="handleRefresh"
-				>
-					<RefreshCwIcon
-						aria-hidden="true"
-						class="h-5 w-5 transition-transform"
-						:class="refreshing ? 'animate-spin' : ''"
-					/>
-					{{ formatMessage(commonMessages.refreshButton) }}
-				</Button>
-
-				<TeleportOverflowMenu
-					type="outlined"
-					:label="formatMessage(messages.createNew)"
-					:disabled="disabled"
-					:tooltip="disabled ? disabledTooltip : undefined"
-					size="lg"
-					class="justify-center gap-2 !w-auto !px-2.5 !rounded-xl"
-					:options="[
-						{
-							id: 'file',
-							label: formatMessage(messages.newFile),
-							action: () => $emit('create', 'file'),
-						},
-						{
-							id: 'directory',
-							label: formatMessage(messages.newFolder),
-							action: () => $emit('create', 'directory'),
-						},
-						{
-							id: 'upload',
-							label: formatMessage(messages.uploadFile),
-							action: () => $emit('upload'),
-						},
-						{ type: 'divider', shown: showInstallFromUrl ?? false },
-						{
-							id: 'upload-zip',
-							label: formatMessage(messages.uploadFromZip),
-							shown: false,
-							action: () => $emit('uploadZip'),
-						},
-						{
-							id: 'install-from-url',
-							label: formatMessage(messages.uploadFromZipUrl),
-							shown: showInstallFromUrl ?? false,
-							action: () => $emit('unzipFromUrl', false),
-						},
-						{
-							id: 'install-cf-pack',
-							label: formatMessage(messages.installCurseForgePack),
-							shown: showInstallFromUrl ?? false,
-							action: () => $emit('unzipFromUrl', true),
-						},
-					]"
-				>
-					<PlusIcon aria-hidden="true" class="h-5 w-5" />
-					<DropdownIcon aria-hidden="true" class="h-5 w-5" />
-					<template #file>
-						<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newFile) }}
-					</template>
-					<template #directory>
-						<FolderOpenIcon aria-hidden="true" /> {{ formatMessage(messages.newFolder) }}
-					</template>
-					<template #upload>
-						<UploadIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFile) }}
-					</template>
-					<template #upload-zip>
-						<FileArchiveIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFromZip) }}
-					</template>
-					<template #install-from-url>
-						<LinkIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFromZipUrl) }}
-					</template>
-					<template #install-cf-pack>
-						<CurseForgeIcon aria-hidden="true" />
-						{{ formatMessage(messages.installCurseForgePack) }}
-					</template>
-				</TeleportOverflowMenu>
-			</div>
-
-			<div v-else-if="!isEditingImage" class="flex gap-2">
-				<IconButton
-					v-if="isLogFile"
-					v-tooltip="formatMessage(messages.shareToMclogs)"
-					type="quiet"
-					:label="formatMessage(messages.shareToMclogs)"
-					@click="$emit('share')"
-				>
-					<ShareIcon />
-				</IconButton>
-				<IconButton
-					v-tooltip="formatMessage(messages.findInFile)"
-					:type="isEditorFindOpen ? 'colored' : 'quiet'"
-					:color="isEditorFindOpen ? 'brand' : undefined"
-					:label="formatMessage(messages.findInFile)"
-					:aria-pressed="isEditorFindOpen"
-					@click="$emit('find')"
-				>
-					<SearchIcon />
-				</IconButton>
-			</div>
-		</div>
-	</header>
+				</TransitionGroup>
+				<li v-if="isEditing && editingFileName" class="flex items-center px-3 text-base">
+					<span class="font-semibold !text-contrast" aria-current="location">
+						{{ editingFileName }}
+					</span>
+				</li>
+			</ol>
+		</nav>
+	</FileActionBar>
 </template>
 
 <script setup lang="ts">
-import {
-	BoxIcon,
-	ChevronRightIcon,
-	CurseForgeIcon,
-	DropdownIcon,
-	FileArchiveIcon,
-	FolderOpenIcon,
-	HomeIcon,
-	LinkIcon,
-	PlusIcon,
-	RefreshCwIcon,
-	SearchIcon,
-	ShareIcon,
-	UploadIcon,
-} from '@modrinth/assets'
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
-import { Button, IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
-import Input from '#ui/components/base/inputs/Input.vue'
-import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { commonMessages } from '#ui/utils/common-messages'
+import FileActionBar from "#ui/layouts/shared/files-tab/components/FileActionBar.vue";
+import type {Properties, EmitCallbacks} from "#ui/layouts/shared/files-tab/components/FileActionBar.vue";
+import {Button} from "#ui/components/base/buttons";
+import {ChevronRightIcon, HomeIcon} from "@modrinth/assets";
+import {onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {defineMessages, useVIntl} from "#ui/composables";
 
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
-	fileNavigation: {
-		id: 'files.navbar.file-navigation',
-		defaultMessage: 'File navigation',
-	},
 	breadcrumbNavigation: {
 		id: 'files.navbar.breadcrumb-navigation',
 		defaultMessage: 'Breadcrumb navigation',
@@ -259,86 +114,35 @@ const messages = defineMessages({
 		id: 'files.navbar.home',
 		defaultMessage: 'Home',
 	},
-	searchFiles: {
-		id: 'files.navbar.search-files',
-		defaultMessage: 'Search files',
-	},
-	createNew: {
-		id: 'files.navbar.create-new',
-		defaultMessage: 'Create new...',
-	},
-	newFile: {
-		id: 'files.navbar.new-file',
-		defaultMessage: 'New file',
-	},
-	newFolder: {
-		id: 'files.navbar.new-folder',
-		defaultMessage: 'New folder',
-	},
-	uploadFile: {
-		id: 'files.navbar.upload-file',
-		defaultMessage: 'Upload file',
-	},
-	uploadFromZip: {
-		id: 'files.navbar.upload-from-zip',
-		defaultMessage: 'Upload from .zip file',
-	},
-	uploadFromZipUrl: {
-		id: 'files.navbar.upload-from-zip-url',
-		defaultMessage: 'Upload from .zip URL',
-	},
-	installCurseForgePack: {
-		id: 'files.navbar.install-curseforge-pack',
-		defaultMessage: 'Install CurseForge pack',
-	},
-	shareToMclogs: {
-		id: 'files.navbar.share-to-mclogs',
-		defaultMessage: 'Share to mclo.gs',
-	},
-	findInFile: {
-		id: 'files.navbar.find-in-file',
-		defaultMessage: 'Find in file',
-	},
 })
 
-const props = defineProps<{
-	breadcrumbs: string[]
-	isEditing: boolean
-	editingFileName?: string
-	editingFilePath?: string
-	isEditingImage?: boolean
-	isEditorFindOpen?: boolean
-	searchQuery: string
-	showRefreshButton?: boolean
-	showInstallFromUrl?: boolean
-	baseId: string
-	disabled?: boolean
-	disabledTooltip?: string
-}>()
+defineOptions({
+	inheritAttrs: false
+})
 
-const emit = defineEmits<{
+const baseRef = ref<typeof FileActionBar | null>(null)
+
+// Expose the base component instance so parent refs can call BaseButton methods
+defineExpose({
+	baseRef
+})
+
+const props = withDefaults(
+	defineProps<{
+		breadcrumbs: string[]
+		isEditing: boolean
+		editingFileName?: string
+	} & Properties>(),
+	{
+		hasNav: true,
+	}
+)
+
+defineEmits<{
 	navigate: [index: number]
-	navigateHome: []
-	prefetchHome: []
-	'update:searchQuery': [value: string]
-	create: [type: 'file' | 'directory']
-	upload: []
-	uploadZip: []
-	unzipFromUrl: [cf: boolean]
-	refresh: []
-	share: []
-	find: []
-}>()
-
-const refreshing = ref(false)
-
-function handleRefresh() {
-	emit('refresh')
-	refreshing.value = true
-	setTimeout(() => {
-		refreshing.value = false
-	}, 1000)
-}
+	navigateHome?: []
+	prefetchHome?: []
+} /*& EmitCallbacks*/>()
 
 const breadcrumbOuter = ref<HTMLElement | null>(null)
 const breadcrumbInner = ref<{ $el: HTMLElement } | null>(null)
@@ -400,13 +204,6 @@ watch(
 	},
 )
 
-const isLogFile = computed(() => {
-	return (
-		props.editingFilePath?.startsWith('logs') ||
-		props.editingFilePath?.startsWith('crash-reports') ||
-		props.editingFilePath?.endsWith('.log')
-	)
-})
 </script>
 
 <style scoped>

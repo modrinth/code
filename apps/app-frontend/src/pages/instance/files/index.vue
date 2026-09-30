@@ -12,7 +12,7 @@ import {
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { invoke } from '@tauri-apps/api/core'
-import { computed, ref, watch } from 'vue'
+import {computed, Ref, ref, watch} from 'vue'
 
 import { useAppEvent } from '@/composables/use-app-event'
 import { get_full_path } from '@/helpers/instance'
@@ -113,9 +113,13 @@ await instanceRootQuery.suspense()
 await directoryQuery.refetch()
 firstPaintPending.value = false
 
+const isRefreshing = ref<boolean>(false)
+
 async function refresh() {
 	debug('refresh: called, currentPath =', currentPath.value, 'instanceRoot =', instanceRoot.value)
+	isRefreshing.value = true;
 	await directoryQuery.refetch()
+	isRefreshing.value = false;
 }
 
 function navigateTo(path: string) {
@@ -302,10 +306,22 @@ watch(instanceId, async () => {
 	await refresh()
 })
 
+const directories: Record<string, Ref<FileItem[]>> = {};
+const expandedDirectories: Ref<string[]> = ref([]);
+
 provideFileManager({
 	isReadOnly,
 	readOnlyReason: computed(() => formatMessage(messages.readOnly)),
-	items,
+	currentItems: items,
+	directoryTree: {
+		prefetch(path: string) {
+
+		},
+		getEntries(path: string) {
+
+		},
+		expandedEntries: expandedDirectories
+	},
 	loading,
 	error,
 	currentPath,
@@ -325,6 +341,7 @@ provideFileManager({
 	uploadState,
 	extractFile: handleExtractFile,
 	refresh,
+	isRefreshing,
 	basePath: instanceRoot,
 	openInFolder: (path: string) => highlightInFolder(path),
 	downloadButtonLabel: formatMessage(messages.saveAs),

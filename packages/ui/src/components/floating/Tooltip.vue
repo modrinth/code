@@ -6,13 +6,13 @@ import {
 	onBeforeUnmount,
 	type PropType,
 	ref,
-	useSlots,
 	useTemplateRef,
+	type VNode,
 	watch,
 } from 'vue'
 
 import {
-	bindTooltipSource,
+	bindTooltipSource, preventTooltipClosure,
 	type TooltipContent,
 	tooltipEnter,
 	tooltipFocusIn,
@@ -50,11 +50,12 @@ const props = withDefaults(
 		text?: string | null
 		content?: TooltipContent | null
 		panelClass?: string
+		allowHover?: boolean
 	}>(),
 	{ disabled: false, theme: 'tooltip', placement: 'top' },
 )
 
-const slots = useSlots()
+const slots = defineSlots<{popper?: () => VNode}>();
 const trigger = useTemplateRef<HTMLElement>('trigger')
 const floating = useTemplateRef<HTMLElement>('floating')
 const arrowEl = useTemplateRef<HTMLElement>('arrowEl')
@@ -204,9 +205,16 @@ function onEnter() {
 	tooltipEnter(trigger.value)
 }
 
+function onTooltipEnter() {
+	if (props.reference) {
+		preventTooltipClosure(props.reference);
+	}
+}
+
 function onLeave() {
-	if (trigger.value) {
-		tooltipLeave(trigger.value)
+	const triggerEl = trigger.value ?? props.reference;
+	if (triggerEl) {
+		tooltipLeave(triggerEl, props.allowHover ? 500 : undefined);
 	}
 }
 
@@ -247,9 +255,11 @@ function onFocusOut(event: FocusEvent) {
 				v-if="isOpen"
 				:key="jumpKey"
 				ref="floating"
-				class="v-popper__inner pointer-events-none z-[100010] rounded-lg border border-solid border-surface-5 bg-surface-3 px-3 py-1.5 text-sm font-medium text-contrast card-shadow"
-				:class="[`v-popper--theme-${theme}`, moving && 'tooltip-moving', panelClass]"
+				class="`v-popper__inner z-[100010] rounded-lg border border-solid border-surface-5 bg-surface-3 px-3 py-1.5 text-sm font-medium text-contrast card-shadow`"
+				:class="[`v-popper--theme-${theme}`, moving && 'tooltip-moving', panelClass, allowHover ? 'pointer-events-none' : '']"
 				:style="[floatingStyles, { transformOrigin }]"
+				@mouseenter="onTooltipEnter"
+				@mouseleave="onLeave"
 			>
 				<TooltipSlot v-if="content" :render="content" />
 				<template v-else>{{ text }}</template>

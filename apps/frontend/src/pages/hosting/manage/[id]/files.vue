@@ -24,11 +24,17 @@ try {
 useHead({
 	title: computed(() => `Files - ${server.value?.name ?? 'Server'} - Modrinth`),
 })
+
+defineProps<{
+	constrainWidth?: boolean
+}>()
+
 </script>
 
 <template>
 	<ServersManageFilesPage
 		:show-debug-info="flags.advancedDebugInfo"
 		:show-refresh-button="flags.FilesRefreshButton"
+		:constrain-width="constrainWidth"
 	/>
 </template>
