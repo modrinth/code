@@ -9,7 +9,7 @@ import type { CacheBehaviour } from '@/helpers/types'
 
 export type InstanceContentData = {
 	path: string
-	contentItems: ContentItem[] | null
+	contentItems: ContentItem[]
 	modpack: InstanceContentModpackData | null
 }
 
@@ -22,24 +22,17 @@ export type InstanceContentModpackData = {
 export async function loadInstanceContentData(
 	path: string,
 	cacheBehaviour?: CacheBehaviour,
-	onError?: (error: Error) => unknown,
 ): Promise<InstanceContentData> {
 	const [contentItems, modpackInfo] = await Promise.all([
-		get_content_items(path, cacheBehaviour).catch((error) => handleLoadError(error, onError)),
-		get_linked_modpack_info(path, cacheBehaviour).catch((error) => handleLoadError(error, onError)),
+		get_content_items(path, cacheBehaviour),
+		get_linked_modpack_info(path, cacheBehaviour),
 	])
 
 	return {
 		path,
-		contentItems: (contentItems as ContentItem[] | null | undefined) ?? null,
+		contentItems,
 		modpack: normalizeLinkedModpackInfo(modpackInfo as LinkedModpackInfo | null | undefined),
 	}
-}
-
-function handleLoadError(error: unknown, onError?: (error: Error) => unknown) {
-	if (!onError) throw error
-	onError(error as Error)
-	return null
 }
 
 function normalizeLinkedModpackInfo(

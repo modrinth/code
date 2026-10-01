@@ -350,8 +350,8 @@ export function createContentInstall(opts: {
 		])
 
 		const [projects, versions] = await Promise.all([
-			get_project_many(projectIds, 'bypass').catch(() => []),
-			get_version_many(versionIds, 'bypass').catch(() => []),
+			get_project_many(projectIds.filter((id) => !projectMap.has(id))).catch(() => []),
+			get_version_many(versionIds.filter((id) => !versionMap.has(id))).catch(() => []),
 		])
 
 		for (const project of projects as InstallingProjectDisplay[]) {

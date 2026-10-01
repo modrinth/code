@@ -117,7 +117,7 @@ import {
 	useVIntl,
 	versionChangesGameVersion,
 } from '@modrinth/ui'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { CancelledError, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -1257,7 +1257,7 @@ watch(
 	async (revision) => {
 		if (revision <= handledInstallRevision.value) return
 		handledInstallRevision.value = revision
-		await refreshContentState('must_revalidate')
+		await refreshContentState()
 	},
 )
 
@@ -1555,22 +1555,26 @@ async function handleContentFreeze(item: ContentItem, frozen: boolean) {
 async function initProjects(cacheBehaviour?: CacheBehaviour, staleTime = 0) {
 	if (!instance.value) return
 
-	const contentData = await queryClient.fetchQuery({
-		...instanceContentQueryOptions(instance.value.id),
-		queryFn: () => loadInstanceContentData(instance.value.id, cacheBehaviour, handleError),
-		staleTime,
-	})
-	applyContentData(contentData)
+	const targetInstanceId = instance.value.id
+	const queryKey = instanceKeys.content(targetInstanceId)
+	if (staleTime === 0) {
+		await queryClient.getQueryCache().find({ queryKey, exact: true })?.promise?.catch(() => {})
+	}
+	const contentData = await queryClient
+		.fetchQuery({
+			...instanceContentQueryOptions(targetInstanceId),
+			queryFn: () => loadInstanceContentData(targetInstanceId, cacheBehaviour),
+			staleTime,
+		})
+		.catch(() => {
+			// The query observer reports failures; keep its previous data on a failed refresh.
+		})
+	if (contentData) applyContentData(contentData)
 }
 
 function applyContentData(contentData: InstanceContentData) {
 	if (contentData.path !== instance.value.id) {
 		return false
-	}
-
-	if (!contentData.contentItems) {
-		loading.value = false
-		return true
 	}
 
 	projects.value = contentData.contentItems.map((item) => ({
@@ -1714,7 +1718,7 @@ function loadInitialContent() {
 	const installRevision = getInstallRevision()
 	if (installRevision > handledInstallRevision.value) {
 		handledInstallRevision.value = installRevision
-		return initProjects('must_revalidate')
+		return initProjects()
 	}
 
 	return initProjects(undefined, 30_000)
@@ -1728,7 +1732,7 @@ watch(
 	{ immediate: true },
 )
 watch(contentQuery.error, (error) => {
-	if (error) {
+	if (error && !(error instanceof CancelledError)) {
 		loading.value = false
 		handleError(error)
 	}

@@ -880,6 +880,8 @@ pub enum CacheBehaviour {
     MustRevalidate,
     // Ignore cache- always fetch updated data from origin
     Bypass,
+	/// Read cached values, including expired values, without fetching missing data.
+	CacheOnly,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1112,7 +1114,9 @@ impl CachedEntry {
             }
         }
 
-        if !remaining_keys.is_empty() {
+        if !remaining_keys.is_empty()
+			&& cache_behaviour != CacheBehaviour::CacheOnly
+		{
             let res = Self::fetch_many(
                 type_,
                 remaining_keys.clone(),

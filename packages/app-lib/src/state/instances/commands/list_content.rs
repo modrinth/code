@@ -89,17 +89,58 @@ pub(crate) async fn get_installed_project_ids_for_instance(
     content_set_id: Option<&str>,
     state: &State,
 ) -> crate::Result<Vec<String>> {
-    let projects =
-        get_content_projects(instance_id, content_set_id, None, state).await?;
+	let resolved = resolve_content_scope_with_instance(
+		instance_id,
+		content_set_id,
+		&state.pool,
+	)
+	.await?;
+	let files = sqlite::content_rows::get_instance_files(
+		&resolved.instance.id,
+		&state.pool,
+	)
+	.await?
+	.into_iter()
+	.filter(|file| !file.missing)
+	.map(|file| (file.id.clone(), file))
+	.collect::<HashMap<_, _>>();
+	let entries = sqlite::content_rows::get_content_entries(
+		&resolved.content_set.id,
+		&state.pool,
+	)
+	.await?;
+	let hashes = files
+		.values()
+		.map(|file| file.sha1.as_str())
+		.collect::<Vec<_>>();
+	let cached_files = CachedEntry::get_file_many(
+		&hashes,
+		Some(CacheBehaviour::CacheOnly),
+		&state.pool,
+		&state.api_semaphore,
+	)
+	.await?;
+	let cached_projects = cached_files
+		.into_iter()
+		.map(|file| (file.hash, file.project_id))
+		.collect::<HashMap<_, _>>();
+	let entries_by_file_id = entries
+		.iter()
+		.filter_map(|entry| entry.file_id.as_deref().map(|id| (id, entry)))
+		.collect::<HashMap<_, _>>();
 
-    Ok(projects
-        .into_iter()
-        .filter_map(|(_, file)| {
-            file.metadata.map(|metadata| metadata.project_id)
-        })
-        .collect::<HashSet<_>>()
-        .into_iter()
-        .collect())
+	Ok(files
+		.values()
+		.filter_map(|file| {
+			entries_by_file_id
+				.get(file.id.as_str())
+				.and_then(|entry| entry.project_id.as_ref())
+				.or_else(|| cached_projects.get(&file.sha1))
+				.cloned()
+		})
+		.collect::<HashSet<_>>()
+		.into_iter()
+		.collect())
 }
 
 #[derive(sqlx::FromRow)]
@@ -752,7 +793,7 @@ async fn content_projects_for_scope_inner(
     } else {
         get_installed_update_channels(
             &file_info_by_hash,
-            cache_behaviour,
+            Some(CacheBehaviour::CacheOnly),
             &state.pool,
             &state.api_semaphore,
         )
@@ -782,7 +823,7 @@ async fn content_projects_for_scope_inner(
         update_keys.iter().map(String::as_str).collect::<Vec<_>>();
     let file_updates = CachedEntry::get_file_update_many(
         &update_key_refs,
-        cache_behaviour,
+        Some(CacheBehaviour::CacheOnly),
         &state.pool,
         &state.api_semaphore,
     )
@@ -790,7 +831,7 @@ async fn content_projects_for_scope_inner(
     let mut updates_by_hash =
         super::check_content_updates::resolve_update_versions(
             file_updates,
-            cache_behaviour,
+            Some(CacheBehaviour::CacheOnly),
             state,
         )
         .await?;

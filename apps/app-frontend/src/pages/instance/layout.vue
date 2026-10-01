@@ -108,7 +108,7 @@ import {
 	useLoadingBarToken,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { CancelledError, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useOnline } from '@vueuse/core'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -228,16 +228,21 @@ const instanceQuery = useQuery(
 )
 useQuery(
 	computed(() => ({
-		...instanceContentQueryOptions(instanceId.value, (error) => handleError(toError(error))),
+		...instanceContentQueryOptions(instanceId.value),
 		enabled: !!instanceId.value,
 	})),
 )
 const instance = computed(() => instanceQuery.data.value)
 async function invalidateContent(targetInstanceId: string) {
-	await Promise.all([
-		queryClient.invalidateQueries({ queryKey: instanceKeys.content(targetInstanceId) }),
-		queryClient.invalidateQueries({ queryKey: instanceKeys.linkedContent(targetInstanceId) }),
-	])
+	await Promise.all(
+		[instanceKeys.content(targetInstanceId), instanceKeys.linkedContent(targetInstanceId)].map(
+			async (queryKey) => {
+				// Finish reads started before the change before fetching the updated content.
+				await queryClient.getQueryCache().find({ queryKey, exact: true })?.promise?.catch(() => {})
+				await queryClient.invalidateQueries({ queryKey }, { cancelRefetch: false })
+			},
+		),
+	)
 }
 
 const contentSyncQuery = useQuery(
@@ -306,9 +311,7 @@ const processesQuery = useQuery(
 const playing = computed(() => (processesQuery.data.value?.length ?? 0) > 0)
 
 async function ensureCriticalContent(targetInstanceId: string) {
-	await queryClient.ensureQueryData(
-		instanceContentQueryOptions(targetInstanceId, (error) => handleError(toError(error))),
-	)
+	await queryClient.ensureQueryData(instanceContentQueryOptions(targetInstanceId))
 }
 
 async function ensureCriticalInstanceData(targetInstanceId: string) {
@@ -326,7 +329,7 @@ try {
 	await ensureCriticalInstanceData(instanceId.value)
 } catch (error) {
 	if (isUnmanagedInstanceError(error)) await router.replace('/')
-	else handleError(toError(error))
+	else if (!(error instanceof CancelledError)) handleError(toError(error))
 }
 
 onBeforeRouteUpdate(async (to, from) => {
@@ -338,6 +341,7 @@ onBeforeRouteUpdate(async (to, from) => {
 		await ensureCriticalInstanceData(targetInstanceId)
 		instanceId.value = targetInstanceId
 	} catch (error) {
+		if (error instanceof CancelledError) return false
 		if (isUnmanagedInstanceError(error)) return { path: '/' }
 		handleError(toError(error))
 		return false

@@ -151,7 +151,7 @@ async fn check_content_updates_with_cache_behaviours(
     )
     .await?;
     let mut updates_by_hash =
-        resolve_update_versions(updates, update_cache_behaviour, state).await?;
+        resolve_update_versions(updates, cache_behaviour, state).await?;
 
     let mut output = Vec::new();
     for candidate in candidates {
