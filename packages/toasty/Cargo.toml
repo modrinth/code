@@ -1,0 +1,255 @@
+[package]
+edition = "2024"
+rust-version = "1.95"
+name = "toasty"
+version = "0.11.0"
+authors = ["Carl Lerche <me@carllerche.com>"]
+build = "build.rs"
+autolib = false
+autobins = false
+autoexamples = false
+autotests = false
+autobenches = false
+description = "An async ORM for Rust supporting SQL and NoSQL databases"
+homepage = "https://github.com/tokio-rs/toasty"
+documentation = "https://docs.rs/toasty"
+readme = "README.md"
+keywords = [
+	"orm",
+	"database",
+	"sql",
+	"nosql",
+	"async",
+]
+categories = ["database"]
+license = "MIT"
+repository = "https://github.com/tokio-rs/toasty"
+resolver = "2"
+
+[features]
+bigdecimal = [
+	"dep:bigdecimal",
+	"toasty-core/bigdecimal",
+	"toasty-driver-postgresql?/bigdecimal",
+	"toasty-driver-mysql?/bigdecimal",
+
+	"toasty-driver-turso?/bigdecimal",
+]
+default = ["rustls"]
+dynamodb = ["dep:toasty-driver-dynamodb"]
+jiff = [
+	"dep:jiff",
+	"toasty-core/jiff",
+	"toasty-driver-postgresql?/jiff",
+	"toasty-driver-mysql?/jiff",
+
+	"toasty-driver-turso?/jiff",
+]
+mariadb = ["dep:toasty-driver-mysql"]
+migration = [
+	"dep:serde",
+	"dep:toml",
+	"dep:toml_edit",
+	"toasty-core/migration",
+]
+mysql = ["dep:toasty-driver-mysql"]
+native-tls = ["toasty-driver-mysql?/native-tls"]
+net = [
+	"toasty-core/net",
+	"toasty-driver-postgresql?/net",
+	"toasty-driver-mysql?/net",
+
+	"toasty-driver-turso?/net",
+]
+postgresql = ["dep:toasty-driver-postgresql"]
+rust_decimal = [
+	"dep:rust_decimal",
+	"toasty-core/rust_decimal",
+	"toasty-driver-postgresql?/rust_decimal",
+	"toasty-driver-mysql?/rust_decimal",
+
+	"toasty-driver-turso?/rust_decimal",
+]
+rustls = ["toasty-driver-mysql?/rustls"]
+serde = [
+	"dep:serde_core",
+	"dep:serde_json",
+]
+
+turso = ["dep:toasty-driver-turso"]
+turso-serverless = [
+	"turso",
+	"toasty-driver-turso?/serverless",
+]
+turso-sync = [
+	"turso",
+	"toasty-driver-turso?/sync",
+]
+
+[lib]
+name = "toasty"
+path = "src/lib.rs"
+
+[[test]]
+name = "embedded_migrations"
+path = "tests/embedded_migrations.rs"
+
+[[test]]
+name = "generate_unique_id"
+path = "tests/generate_unique_id.rs"
+
+[[test]]
+name = "migration_generate"
+path = "tests/migration_generate.rs"
+
+[[test]]
+name = "pool_sweep"
+path = "tests/pool_sweep.rs"
+
+[[test]]
+name = "query_macro"
+path = "tests/query_macro.rs"
+
+[[test]]
+name = "relation_load"
+path = "tests/relation_load.rs"
+
+[[test]]
+name = "stmt_into_expr"
+path = "tests/stmt_into_expr.rs"
+
+[[test]]
+name = "stmt_into_scope"
+path = "tests/stmt_into_scope.rs"
+
+[dependencies.async-trait]
+version = "0.1.89"
+
+[dependencies.bigdecimal]
+version = "0.4.10"
+optional = true
+
+[dependencies.bit-set]
+version = "0.11.0"
+
+[dependencies.by_address]
+version = "1.2.1"
+
+[dependencies.deadpool]
+version = "0.13"
+features = ["rt_tokio_1"]
+
+[dependencies.hashbrown]
+version = "0.17"
+
+[dependencies.index_vec]
+version = "0.1.4"
+
+[dependencies.indexmap]
+version = "2.13.0"
+
+[dependencies.inventory]
+version = "0.3.24"
+
+[dependencies.jiff]
+version = "0.2.23"
+optional = true
+
+[dependencies.rust_decimal]
+version = "1.41.0"
+optional = true
+
+[dependencies.serde]
+version = "1.0.228"
+features = ["derive"]
+optional = true
+
+[dependencies.serde_core]
+version = "1.0.228"
+optional = true
+
+[dependencies.serde_json]
+version = "1.0.149"
+optional = true
+
+[dependencies.toasty-core]
+version = "0.11.0"
+
+[dependencies.toasty-driver-dynamodb]
+version = "0.11.0"
+optional = true
+
+[dependencies.toasty-driver-mysql]
+version = "0.11.0"
+optional = true
+default-features = false
+
+[dependencies.toasty-driver-postgresql]
+version = "0.11.0"
+optional = true
+
+[dependencies.toasty-driver-turso]
+version = "0.11.0"
+optional = true
+
+[dependencies.toasty-macros]
+version = "0.11.0"
+
+[dependencies.tokio]
+version = "1.50"
+features = [
+	"macros",
+	"rt",
+	"sync",
+	"time",
+]
+default-features = false
+
+[dependencies.tokio-stream]
+version = "0.1.18"
+default-features = false
+
+[dependencies.toml]
+version = "1.1.0"
+optional = true
+
+[dependencies.toml_edit]
+version = "0.25.8"
+features = ["serde"]
+optional = true
+
+[dependencies.tracing]
+version = "0.1"
+
+[dependencies.uuid]
+version = "1.23.0"
+features = [
+	"v4",
+	"v7",
+	"fast-rng",
+	"js",
+]
+
+[dev-dependencies.assert-struct]
+version = "0.5.0"
+
+[dev-dependencies.proptest]
+version = "1"
+
+[dev-dependencies.tempfile]
+version = "3.27"
+
+
+[dev-dependencies.tokio]
+version = "1.50"
+features = [
+	"macros",
+	"rt",
+	"sync",
+	"time",
+	"test-util",
+]
+default-features = false
+
+[lints.rust]
+unsafe_code = "deny"

@@ -1,0 +1,568 @@
+use super::{IntoExpr, List, Numeric, Path};
+use std::marker::PhantomData;
+use toasty_core::stmt;
+
+/// Apply a field mutation to an update statement's [`Assignments`] map.
+///
+/// Every update builder setter accepts `impl Assign<T>`. All types that
+/// implement [`IntoExpr<T>`] also implement `Assign<T>` with set semantics,
+/// so update setters accept the same types as create setters.
+///
+/// For has-many fields, arrays and [`Vec`]s implement
+/// `Assign<List<T>>` with set (replace) semantics. Use [`insert`],
+/// [`remove`], or [`apply`] for incremental mutations.
+///
+/// [`Assignments`]: toasty_core::stmt::Assignments
+pub trait Assign<T> {
+    /// Convert into an [`Assignment<T>`] value.
+    fn into_assignment(self) -> Assignment<T>;
+
+    /// Record one or more assignments into the given [`Assignments`] map at
+    /// the specified projection.
+    fn assign(self, assignments: &mut stmt::Assignments, projection: stmt::Projection)
+    where
+        Self: Sized,
+    {
+        self.into_assignment().kind.apply(assignments, projection);
+    }
+}
+
+/// A typed assignment produced by the [`insert`], [`remove`], [`set`], and
+/// [`patch`] combinators.
+///
+/// `Assignment<T>` implements `Assign<T>`, so it can be passed directly
+/// to any update builder setter that accepts `impl Assign<T>`.
+pub struct Assignment<T> {
+    kind: AssignmentKind,
+    _p: PhantomData<T>,
+}
+
+enum AssignmentKind {
+    Set(stmt::Expr),
+    Insert(stmt::Expr),
+    Remove(stmt::Expr),
+    Append(stmt::Expr),
+    Pop,
+    RemoveAt(stmt::Expr),
+    Add(stmt::Expr),
+    Subtract(stmt::Expr),
+    Patch {
+        path_projection: stmt::Projection,
+        inner: Box<AssignmentKind>,
+    },
+    Apply(Vec<AssignmentKind>),
+    /// An operation the builder API accepts but Toasty does not support.
+    /// Applying it records the reason on the [`Assignments`] map instead of
+    /// an entry; the statement then fails verification with an
+    /// `unsupported_feature` error before anything is written.
+    ///
+    /// [`Assignments`]: toasty_core::stmt::Assignments
+    Unsupported(String),
+}
+
+impl AssignmentKind {
+    fn apply(self, assignments: &mut stmt::Assignments, projection: stmt::Projection) {
+        match self {
+            AssignmentKind::Set(expr) => assignments.set(projection, expr),
+            AssignmentKind::Insert(expr) => assignments.insert(projection, expr),
+            AssignmentKind::Remove(expr) => assignments.remove(projection, expr),
+            AssignmentKind::Append(expr) => assignments.append(projection, expr),
+            AssignmentKind::Pop => assignments.pop(projection),
+            AssignmentKind::RemoveAt(expr) => assignments.remove_at(projection, expr),
+            AssignmentKind::Add(expr) => assignments.add(projection, expr),
+            AssignmentKind::Subtract(expr) => assignments.subtract(projection, expr),
+            AssignmentKind::Patch {
+                path_projection,
+                inner,
+            } => {
+                let mut projection = projection;
+                for &step in path_projection.as_slice() {
+                    projection.push(step);
+                }
+                inner.apply(assignments, projection);
+            }
+            AssignmentKind::Apply(ops) => {
+                for op in ops {
+                    op.apply(assignments, projection.clone());
+                }
+            }
+            AssignmentKind::Unsupported(reason) => assignments.reject_unsupported(reason),
+        }
+    }
+}
+
+// Assignment<T> implements Assign<T>
+impl<T> Assign<T> for Assignment<T> {
+    fn into_assignment(self) -> Assignment<T> {
+        self
+    }
+}
+
+/// Helper macro: generates `impl Assign<$target> for $source` with set
+/// semantics by delegating to `IntoExpr`. Used alongside every `IntoExpr`
+/// impl to keep the two traits in sync.
+macro_rules! impl_assign_via_expr {
+    // Simple: impl Assign<T> for S
+    ($source:ty => $target:ty) => {
+        impl super::assignment::Assign<$target> for $source {
+            fn into_assignment(self) -> super::assignment::Assignment<$target> {
+                $crate::stmt::set(
+                    super::IntoExpr::<$target>::into_expr(self),
+                )
+            }
+        }
+    };
+    // Generic: impl<generics> Assign<Target> for Source where bounds
+    // Uses { } instead of [ ] to avoid parsing ambiguity with array types.
+    ({ $($gen:tt)* } $source:ty => $target:ty) => {
+        impl<$($gen)*> super::assignment::Assign<$target> for $source {
+            fn into_assignment(self) -> super::assignment::Assignment<$target> {
+                $crate::stmt::set(
+                    super::IntoExpr::<$target>::into_expr(self),
+                )
+            }
+        }
+    };
+}
+
+// Make the macro available to into_expr.rs (sibling module)
+pub(super) use impl_assign_via_expr;
+
+/// Insert a value into a collection field.
+///
+/// Takes an expression of `T` (a single item) and produces an assignment for
+/// `List<T>` (the collection). The returned [`Assignment`] can be passed to any
+/// update builder setter that accepts `impl Assign<List<T>>`.
+///
+/// [`Assignments`]: toasty_core::stmt::Assignments
+///
+/// # Examples
+///
+/// ```ignore
+/// user.update()
+///     .todos(stmt::insert(Todo::create().title("Buy groceries")))
+///     .exec(&mut db)
+///     .await?;
+/// ```
+pub fn insert<T>(expr: impl IntoExpr<T>) -> Assignment<List<T>> {
+    Assignment {
+        kind: AssignmentKind::Insert(expr.into_expr().untyped),
+        _p: PhantomData,
+    }
+}
+
+/// Remove a value from a collection field.
+///
+/// Takes an expression of `T` (the item to remove) and produces an assignment
+/// for `List<T>` (the collection).
+///
+/// What "remove" means depends on the field kind:
+/// - **`Vec<scalar>` field**: every element equal to the value is removed,
+///   atomically against the existing column value. Backends that advertise
+///   [`Capability::vec_remove`](toasty_core::driver::Capability::vec_remove)
+///   support this — currently PostgreSQL only; other backends return an
+///   error.
+/// - **Has-many relation**: the related record is dissociated. With an
+///   optional foreign key the FK is set to `NULL`; with a required foreign
+///   key the related record is deleted.
+///
+/// # Examples
+///
+/// ```ignore
+/// // Vec<String> field
+/// user.update()
+///     .tags(stmt::remove("admin"))
+///     .exec(&mut db)
+///     .await?;
+///
+/// // Has-many relation
+/// user.update()
+///     .todos(stmt::remove(&todo_a))
+///     .exec(&mut db)
+///     .await?;
+/// ```
+pub fn remove<T>(expr: impl IntoExpr<T>) -> Assignment<List<T>> {
+    Assignment {
+        kind: AssignmentKind::Remove(expr.into_expr().untyped),
+        _p: PhantomData,
+    }
+}
+
+/// Replace a field's value entirely.
+///
+/// For collection fields, `set` replaces the entire collection: all current
+/// members are disassociated (following the same optional/required foreign key
+/// rules as [`remove`]), then the new set is associated.
+///
+/// Pass an empty slice to clear the collection:
+///
+/// ```ignore
+/// user.update()
+///     .todos(stmt::set::<List<Todo>>([]))
+///     .exec(&mut db)
+///     .await?;
+/// ```
+///
+/// For scalar fields, `set` is equivalent to passing a plain value (the
+/// setter already defaults to set semantics).
+///
+/// # Examples
+///
+/// ```ignore
+/// // Replace all todos
+/// user.update()
+///     .todos(stmt::set([
+///         Todo::create().title("Only todo"),
+///     ]))
+///     .exec(&mut db)
+///     .await?;
+/// ```
+pub fn set<T>(expr: impl IntoExpr<T>) -> Assignment<T> {
+    Assignment {
+        kind: AssignmentKind::Set(expr.into_expr().untyped),
+        _p: PhantomData,
+    }
+}
+
+/// Append one element to an ordered collection field (e.g. `Vec<scalar>`).
+///
+/// Takes an expression of `T` (the element to append) and produces an
+/// assignment for `List<T>` (the collection). The append is atomic
+/// against the existing column value on every supported backend.
+///
+/// After `.exec()`, the instance's field reflects the post-update value
+/// (old contents followed by the appended element).
+///
+/// # Examples
+///
+/// ```ignore
+/// user.update()
+///     .tags(stmt::push("admin"))
+///     .exec(&mut db)
+///     .await?;
+/// ```
+pub fn push<T>(expr: impl IntoExpr<T>) -> Assignment<List<T>> {
+    let element = expr.into_expr().untyped;
+    Assignment {
+        kind: AssignmentKind::Append(stmt::Expr::list([element])),
+        _p: PhantomData,
+    }
+}
+
+/// Append every element of a list to an ordered collection field.
+///
+/// Takes a list-shaped expression (anything that converts to `List<T>`
+/// — `Vec<T>`, `[T; N]`, `&[T]`, …) and produces an assignment for
+/// `List<T>`. Elements are appended in order and the operation is
+/// atomic against the existing column value, same as [`push`].
+///
+/// After `.exec()`, the instance's field reflects the post-update value.
+/// `stmt::extend(iter)` of an empty iterator is a no-op.
+///
+/// # Examples
+///
+/// ```ignore
+/// user.update()
+///     .tags(stmt::extend(["admin", "verified"]))
+///     .exec(&mut db)
+///     .await?;
+/// ```
+pub fn extend<T>(items: impl IntoExpr<List<T>>) -> Assignment<List<T>> {
+    Assignment {
+        kind: AssignmentKind::Append(items.into_expr().untyped),
+        _p: PhantomData,
+    }
+}
+
+/// Remove every element from an ordered collection field.
+///
+/// Produces an assignment for `List<T>` that replaces the column with an
+/// empty list. Equivalent to passing an empty Vec to the field setter,
+/// just more explicit at the call site.
+///
+/// # Examples
+///
+/// ```ignore
+/// user.update()
+///     .tags(stmt::clear())
+///     .exec(&mut db)
+///     .await?;
+/// ```
+pub fn clear<T>() -> Assignment<List<T>> {
+    Assignment {
+        kind: AssignmentKind::Set(stmt::Expr::list(Vec::<stmt::Expr>::new())),
+        _p: PhantomData,
+    }
+}
+
+/// Drop the last element of an ordered collection field.
+///
+/// Produces an assignment for `List<T>` that removes the trailing element
+/// of the existing column value. The popped element is discarded — the
+/// assignment API does not return values. Empty-collection is a no-op
+/// rather than an error; for failure-on-empty semantics, filter the
+/// collection first.
+///
+/// Atomic against the existing column value. Backends that advertise
+/// [`Capability::vec_pop`](toasty_core::driver::Capability::vec_pop)
+/// support this — currently PostgreSQL only; other backends return an
+/// error.
+///
+/// # Examples
+///
+/// ```ignore
+/// user.update()
+///     .tags(stmt::pop())
+///     .exec(&mut db)
+///     .await?;
+/// ```
+pub fn pop<T>() -> Assignment<List<T>> {
+    Assignment {
+        kind: AssignmentKind::Pop,
+        _p: PhantomData,
+    }
+}
+
+/// Drop the element at the given index from an ordered collection field.
+///
+/// Takes a `usize`-typed index and produces an assignment for `List<T>`
+/// that removes the element at that position. Out-of-bounds indices are
+/// a no-op rather than an error — per-row failure semantics on a bulk
+/// update are rarely useful.
+///
+/// Atomic against the existing column value. Backends that advertise
+/// [`Capability::vec_remove_at`](toasty_core::driver::Capability::vec_remove_at)
+/// support this — currently PostgreSQL only; other backends return an
+/// error.
+///
+/// # Examples
+///
+/// ```ignore
+/// user.update()
+///     .tags(stmt::remove_at(0))
+///     .exec(&mut db)
+///     .await?;
+/// ```
+pub fn remove_at<T>(idx: impl IntoExpr<usize>) -> Assignment<List<T>> {
+    Assignment {
+        kind: AssignmentKind::RemoveAt(idx.into_expr().untyped),
+        _p: PhantomData,
+    }
+}
+
+/// Partially update a sub-field of an embedded struct.
+///
+/// Takes a [`Path<T, U>`] (identifying which sub-field to update) and a
+/// value (`impl Assign<U>` — either a plain value or a nested
+/// [`Assignment<U>`] for deeper patching). Returns an [`Assignment<T>`]
+/// that can be passed to the parent field's setter.
+///
+/// The path may step through embedded structs, and it may end at an
+/// embedded enum field, which the patch then replaces as a whole. It may
+/// not enter an enum variant: setting or incrementing a field inside a
+/// variant is not supported on any backend. `patch` itself cannot fail, so
+/// the update statement carrying such a patch is rejected as a whole with an
+/// `unsupported_feature` error when it is executed, before any write. Change
+/// a variant's field by assigning a whole enum value instead.
+///
+/// # Examples
+///
+/// ```ignore
+/// // Update a single sub-field
+/// user.update()
+///     .address(stmt::patch(Address::fields().city(), "Portland"))
+///     .exec(&mut db)
+///     .await?;
+///
+/// // Nested patching
+/// company.update()
+///     .headquarters(stmt::patch(
+///         Office::fields().address().into(),
+///         stmt::patch(Address::fields().city(), "Boston"),
+///     ))
+///     .exec(&mut db)
+///     .await?;
+///
+/// // Replace an enum field nested inside a struct
+/// task.update()
+///     .meta(stmt::patch(
+///         Meta::fields().status().into(),
+///         Status::Failed { reason: "flaky".to_string() },
+///     ))
+///     .exec(&mut db)
+///     .await?;
+/// ```
+pub fn patch<T, U>(path: Path<T, U>, value: impl Assign<U>) -> Assignment<T> {
+    let inner = value.into_assignment();
+
+    // A variant root is dropped below along with the rest of the path root,
+    // which would leave the variant-local steps to name whichever field the
+    // parent type has at those indices. Reject the patch instead.
+    let kind = match path.untyped.root {
+        stmt::PathRoot::Model(_) => AssignmentKind::Patch {
+            path_projection: path.untyped.projection,
+            inner: Box::new(inner.kind),
+        },
+        stmt::PathRoot::Variant { .. } => AssignmentKind::Unsupported(
+            "patching a field inside an enum variant is not supported; \
+             assign a whole enum value instead"
+                .to_string(),
+        ),
+    };
+
+    Assignment {
+        kind,
+        _p: PhantomData,
+    }
+}
+
+/// Apply multiple operations to a single field.
+///
+/// Takes an array or [`Vec`] of [`Assignment<T>`] and applies each in order.
+///
+/// # Examples
+///
+/// ```ignore
+/// user.update()
+///     .todos(stmt::apply([
+///         stmt::insert(Todo::create().title("Buy groceries")),
+///         stmt::insert(Todo::create().title("Walk the dog")),
+///         stmt::remove(&old_todo),
+///     ]))
+///     .exec(&mut db)
+///     .await?;
+/// ```
+pub fn apply<T>(ops: impl IntoIterator<Item = Assignment<T>>) -> Assignment<T> {
+    let ops: Vec<AssignmentKind> = ops.into_iter().map(|a| a.kind).collect();
+    Assignment {
+        kind: AssignmentKind::Apply(ops),
+        _p: PhantomData,
+    }
+}
+
+/// Add a value to a numeric field (`col = col + value`).
+///
+/// The [`Numeric`] bound restricts `T` to types Toasty knows how to do
+/// database arithmetic on, so misuse on a non-numeric column (e.g.
+/// `String`) is a compile error rather than a runtime database error.
+///
+/// The update is atomic against the existing column value on every backend.
+/// Use this when you want a relative update — e.g. crediting a balance —
+/// without a read-modify-write round trip from the client.
+///
+/// # Examples
+///
+/// ```ignore
+/// user.update()
+///     .balance(stmt::add(10))
+///     .exec(&mut db)
+///     .await?;
+/// ```
+pub fn add<T: Numeric>(value: impl IntoExpr<T>) -> Assignment<T> {
+    Assignment {
+        kind: AssignmentKind::Add(value.into_expr().untyped),
+        _p: PhantomData,
+    }
+}
+
+/// Subtract a value from a numeric field (`col = col - value`).
+///
+/// Mirror of [`add`]. See its docs for the [`Numeric`] bound. Atomic
+/// against the existing column value on every backend.
+///
+/// # Examples
+///
+/// ```ignore
+/// user.update()
+///     .balance(stmt::subtract(5))
+///     .exec(&mut db)
+///     .await?;
+/// ```
+pub fn subtract<T: Numeric>(value: impl IntoExpr<T>) -> Assignment<T> {
+    Assignment {
+        kind: AssignmentKind::Subtract(value.into_expr().untyped),
+        _p: PhantomData,
+    }
+}
+
+/// Increment a numeric field by one.
+///
+/// The [`Numeric`] bound encodes the `1` literal in a value variant
+/// matching the field type, so `stmt::increment()` works on every
+/// supported numeric column (`i8`–`i64`, `u8`–`u64`, `f32`, `f64`) and
+/// on user newtypes that implement [`Numeric`].
+///
+/// Atomic against the existing column value on every backend, same as
+/// [`add`].
+///
+/// # Examples
+///
+/// ```ignore
+/// user.update()
+///     .login_count(stmt::increment())
+///     .exec(&mut db)
+///     .await?;
+/// ```
+pub fn increment<T: Numeric>() -> Assignment<T> {
+    Assignment {
+        kind: AssignmentKind::Add(stmt::Expr::Value(T::one())),
+        _p: PhantomData,
+    }
+}
+
+/// Decrement a numeric field by one.
+///
+/// Mirror of [`increment`]. See its docs for the [`Numeric`] bound and
+/// the set of supported field types.
+///
+/// # Examples
+///
+/// ```ignore
+/// user.update()
+///     .lives_left(stmt::decrement())
+///     .exec(&mut db)
+///     .await?;
+/// ```
+pub fn decrement<T: Numeric>() -> Assignment<T> {
+    Assignment {
+        kind: AssignmentKind::Subtract(stmt::Expr::Value(T::one())),
+        _p: PhantomData,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use toasty_core::schema::app::{ModelId, VariantId};
+
+    /// `field 1` of model 0, then field 0 of variant 0 of the enum at model 1.
+    fn path_into_variant() -> Path<(), i64> {
+        Path::<(), ()>::field_at(ModelId(0), 1)
+            .into_variant(VariantId {
+                model: ModelId(1),
+                index: 0,
+            })
+            .chain(Path::<(), i64>::field_at(ModelId(1), 0))
+    }
+
+    #[test]
+    fn patch_into_variant_records_unsupported() {
+        let mut assignments = stmt::Assignments::new();
+        patch(path_into_variant(), increment::<i64>())
+            .assign(&mut assignments, stmt::Projection::from_index(2));
+
+        assert!(assignments.is_empty());
+        assert_eq!(assignments.unsupported().len(), 1);
+    }
+
+    #[test]
+    fn patch_into_variant_nested_in_struct_patch_records_unsupported() {
+        let mut assignments = stmt::Assignments::new();
+        let outer = Path::<(), ()>::field_at(ModelId(0), 3);
+        patch(outer, patch(path_into_variant(), 9_i64))
+            .assign(&mut assignments, stmt::Projection::from_index(2));
+
+        assert!(assignments.is_empty());
+        assert_eq!(assignments.unsupported().len(), 1);
+    }
+}

@@ -1,0 +1,192 @@
+mod builder;
+mod connect;
+mod connection;
+mod connection_task;
+mod executor;
+mod pool;
+mod tx;
+
+pub use builder::Builder;
+pub use connect::Connect;
+pub use connection::Connection;
+pub use executor::Executor;
+pub use pool::{Pool, PoolStatus};
+pub use toasty_core::driver::{Capability, ConnectContext, Dialect, Driver, SqlPlaceholder};
+pub use tx::{Transaction, TransactionBuilder};
+
+/// Response from executing a statement, including pagination metadata.
+pub use toasty_core::driver::ExecResponse;
+
+pub(crate) use connection_task::ConnectionOperation;
+pub(crate) use tx::ConnRef;
+
+use crate::{Result, engine::Engine};
+
+use async_trait::async_trait;
+use toasty_core::{Schema, driver::operation::RawSql, stmt};
+
+use std::sync::Arc;
+
+/// Shared state between all `Db` clones.
+pub(crate) struct Shared {
+    pub(crate) engine: Engine,
+    pub(crate) pool: Pool,
+}
+
+/// A database handle backed by a connection pool.
+///
+/// Each operation acquires a connection from the pool, executes, and returns
+/// the connection. Use [`Db::connection`] to obtain a dedicated
+/// [`Connection`] when you need multiple statements to share the same
+/// physical connection (e.g. temporary tables or session-level state).
+///
+/// Cloning a `Db` is cheap — it shares the underlying pool.
+pub struct Db {
+    shared: Arc<Shared>,
+}
+
+impl Clone for Db {
+    fn clone(&self) -> Self {
+        Db {
+            shared: self.shared.clone(),
+        }
+    }
+}
+
+impl Db {
+    /// Create a new [`Builder`] for configuring and opening a database.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+    /// # #[derive(Debug, toasty::Model)]
+    /// # struct User {
+    /// #     #[key]
+    /// #     id: i64,
+    /// #     name: String,
+    /// # }
+    /// let driver = toasty_driver_sqlite::Sqlite::in_memory();
+    /// let db = toasty::Db::builder()
+    ///     .models(toasty::models!(User))
+    ///     .build(driver)
+    ///     .await
+    ///     .unwrap();
+    /// # });
+    /// ```
+    pub fn builder() -> Builder {
+        Builder::default()
+    }
+
+    /// Acquire a dedicated connection from the pool.
+    ///
+    /// The returned [`Connection`] implements [`Executor`] and pins all
+    /// operations to the same physical connection. This is useful when
+    /// multiple statements must share connection-level state such as
+    /// temporary tables or session variables.
+    ///
+    /// When the `Connection` is dropped it is returned to the pool for reuse.
+    pub async fn connection(&self) -> Result<Connection> {
+        self.shared.pool.get(self.shared.clone()).await
+    }
+
+    pub(crate) async fn exec_stmt(
+        &self,
+        stmt: stmt::Statement,
+        in_transaction: bool,
+    ) -> Result<ExecResponse> {
+        let conn = self.connection().await?;
+        conn.exec_stmt(stmt, in_transaction).await
+    }
+
+    /// Creates tables and indices defined in the schema on the database.
+    pub async fn push_schema(&self) -> Result<()> {
+        let conn = self.connection().await?;
+        conn.push_schema().await
+    }
+
+    /// Drops the entire database and recreates an empty one without applying migrations.
+    pub async fn reset_db(&self) -> Result<()> {
+        self.shared.pool.driver().reset_db().await
+    }
+
+    /// Returns a reference to the underlying database driver.
+    pub fn driver(&self) -> &dyn Driver {
+        self.shared.pool.driver()
+    }
+
+    /// Returns the compiled schema used by this database handle.
+    pub fn schema(&self) -> &Arc<Schema> {
+        &self.shared.engine.schema
+    }
+
+    /// Returns the capability flags reported by the driver.
+    ///
+    /// The query engine uses these to decide which operation types to generate
+    /// (e.g., SQL vs. key-value).
+    pub fn capability(&self) -> &Capability {
+        self.shared.engine.capability()
+    }
+
+    /// Begin a transaction, acquiring a connection from the pool.
+    ///
+    /// Takes `&mut self` so the `Db` handle is exclusively borrowed while the
+    /// transaction is open. This prevents accidentally running a statement
+    /// against the pool — which would execute on a separate connection and
+    /// bypass the transaction — when you meant to run it against `&mut tx`.
+    ///
+    /// If you need a second handle while the transaction is open, clone the
+    /// `Db` before calling this method. Clones share the same pool.
+    pub async fn transaction(&mut self) -> Result<Transaction<'_>> {
+        <Self as Executor>::transaction(self).await
+    }
+
+    /// Returns a [`TransactionBuilder`] that will acquire a connection from
+    /// the pool when [`begin`](TransactionBuilder::begin) is called.
+    ///
+    /// Like [`transaction`](Self::transaction), this takes `&mut self` so the
+    /// `Db` handle stays locked for the lifetime of the transaction. Clone
+    /// the `Db` beforehand if you need a separate handle.
+    pub fn transaction_builder(&mut self) -> TransactionBuilder<'_> {
+        TransactionBuilder::new(tx::TxSource::Db(self))
+    }
+
+    /// Returns a reference to the connection pool backing this handle.
+    #[doc(hidden)]
+    pub fn pool(&self) -> &Pool {
+        &self.shared.pool
+    }
+}
+
+impl std::fmt::Debug for Db {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Db")
+            .field("engine", &self.shared.engine)
+            .finish()
+    }
+}
+
+#[async_trait]
+impl Executor for Db {
+    async fn transaction(&mut self) -> Result<Transaction<'_>> {
+        let conn = self.connection().await?;
+        Transaction::begin(ConnRef::owned(conn)).await
+    }
+
+    async fn exec_untyped(&mut self, stmt: stmt::Statement) -> Result<ExecResponse> {
+        self.exec_stmt(stmt, false).await
+    }
+
+    async fn exec_raw_sql(&mut self, raw: RawSql) -> Result<ExecResponse> {
+        let conn = self.connection().await?;
+        conn.exec_raw_sql(raw).await
+    }
+
+    fn capability(&mut self) -> &Capability {
+        Db::capability(self)
+    }
+
+    fn schema(&mut self) -> &Arc<Schema> {
+        Db::schema(self)
+    }
+}

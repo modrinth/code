@@ -1,0 +1,27 @@
+[package]
+name = "modrinth-minecraft-meta"
+version = "0.1.0"
+rust-version.workspace = true
+edition.workspace = true
+default-run = "modrinth-minecraft-meta"
+
+[dependencies]
+anyhow = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+tracing = { workspace = true }
+toasty-cli = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["chrono", "env-filter"] }
+toasty = { workspace = true, features = ["postgresql", "serde", "jiff"] }
+modrinth-log = { workspace = true }
+uuid = { workspace = true }
+url = { workspace = true, features = ["serde"] }
+derive_more = { workspace = true, features = ["deref", "display"] }
+reqwest = { workspace = true, features = ["default"] }
+jiff = { workspace = true, features = ["serde"] }
+clap = { workspace = true, features = ["derive"] }
+serde = { workspace = true, features = ["derive"] }
+serde_path_to_error = { workspace = true }
+sha2 = { workspace = true }
+tracing-anyhow = { workspace = true }
+hex = { workspace = true }
+serde_json = { workspace = true }

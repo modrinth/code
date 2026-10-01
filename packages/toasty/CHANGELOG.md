@@ -1,0 +1,654 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [0.11.0](https://github.com/tokio-rs/toasty/compare/toasty-v0.10.0...toasty-v0.11.0) - 2026-09-24
+
+### Added
+
+- Preload relations inside embedded types ([#1228])
+- Explicit support for MariaDB ([#1227])
+- Accept borrowed values in JSON setters ([#1213])
+- [**breaking**] Turso serverless deployments now connect over HTTP ([#1211])
+- Reference embedded relations with model values ([#1172])
+- Support `jiff::tz::TimeZone` as a model field type ([#1221])
+- PostgreSQL support for unique Vec constraints ([#1199])
+- Conditional execution in query expressions ([#1182])
+
+### Fixed
+
+- `Deferred<T>` now derives `PartialEq`, `Eq`, and `Hash` ([#1238])
+- Variant-rooted includes now work on update queries ([#1237])
+- Enum fields now resolve by variant-local index correctly ([#1218])
+- `Not` operator now works in eval verify and type inference ([#1214])
+- `Connect` now reads `max_connection` from driver configuration ([#1195])
+- Fields named `path` and `from_path` now work in macros ([#1196])
+- [**breaking**] Batch insert no longer infers IDs on MySQL ([#1194])
+
+### Changed
+
+- [**breaking**] Generated model fields now preserve target types ([#1249])
+
+[#1172]: https://github.com/tokio-rs/toasty/pull/1172
+[#1182]: https://github.com/tokio-rs/toasty/pull/1182
+[#1194]: https://github.com/tokio-rs/toasty/pull/1194
+[#1195]: https://github.com/tokio-rs/toasty/pull/1195
+[#1196]: https://github.com/tokio-rs/toasty/pull/1196
+[#1199]: https://github.com/tokio-rs/toasty/pull/1199
+[#1211]: https://github.com/tokio-rs/toasty/pull/1211
+[#1213]: https://github.com/tokio-rs/toasty/pull/1213
+[#1214]: https://github.com/tokio-rs/toasty/pull/1214
+[#1218]: https://github.com/tokio-rs/toasty/pull/1218
+[#1221]: https://github.com/tokio-rs/toasty/pull/1221
+[#1227]: https://github.com/tokio-rs/toasty/pull/1227
+[#1228]: https://github.com/tokio-rs/toasty/pull/1228
+[#1237]: https://github.com/tokio-rs/toasty/pull/1237
+[#1238]: https://github.com/tokio-rs/toasty/pull/1238
+[#1249]: https://github.com/tokio-rs/toasty/pull/1249
+
+## [0.10.0](https://github.com/tokio-rs/toasty/compare/toasty-v0.9.0...toasty-v0.10.0) - 2026-08-11
+
+### Added
+
+- Re-export external statement value types ([#1181])
+- *(macros)* Generate asc/desc on newtype embed fields ([#1180])
+- Add network address types ([#1178])
+- Accept #[belongs_to] fields in embedded types ([#1170])
+- Embed migrations in application binaries ([#1095])
+
+### Fixed
+
+- Add wasm32 build support ([#1173])
+- *(mysql)* [**breaking**] Make TLS features additive with SQLx ([#1147])
+- *(engine)* Omit previous cursor on first page ([#1153])
+- *(engine)* Fix IN-subquery statement optimization ([#1138])
+- *(engine)* Preserve pagination cursors through includes ([#1152])
+- Preserve query offset when selecting one row ([#1151])
+- *(engine)* Exclude null foreign keys from relation subqueries ([#1148])
+- *(engine)* Make cursor pagination deterministic ([#1142])
+- Resolve authority-form sqlite and turso URLs to a file path ([#1127])
+- *(engine)* Fix newtype foreign keys in included relations ([#1137])
+- Support pagination with multiple order by keys ([#1124])
+
+### Changed
+
+- *(core)* [**breaking**] Name the SQL dialect on `Capability::sql` ([#1155])
+- [**breaking**] Remove unused schema and statement APIs ([#1149])
+
+[#1095]: https://github.com/tokio-rs/toasty/pull/1095
+[#1124]: https://github.com/tokio-rs/toasty/pull/1124
+[#1127]: https://github.com/tokio-rs/toasty/pull/1127
+[#1137]: https://github.com/tokio-rs/toasty/pull/1137
+[#1138]: https://github.com/tokio-rs/toasty/pull/1138
+[#1142]: https://github.com/tokio-rs/toasty/pull/1142
+[#1147]: https://github.com/tokio-rs/toasty/pull/1147
+[#1148]: https://github.com/tokio-rs/toasty/pull/1148
+[#1149]: https://github.com/tokio-rs/toasty/pull/1149
+[#1151]: https://github.com/tokio-rs/toasty/pull/1151
+[#1152]: https://github.com/tokio-rs/toasty/pull/1152
+[#1153]: https://github.com/tokio-rs/toasty/pull/1153
+[#1155]: https://github.com/tokio-rs/toasty/pull/1155
+[#1170]: https://github.com/tokio-rs/toasty/pull/1170
+[#1173]: https://github.com/tokio-rs/toasty/pull/1173
+[#1178]: https://github.com/tokio-rs/toasty/pull/1178
+[#1180]: https://github.com/tokio-rs/toasty/pull/1180
+[#1181]: https://github.com/tokio-rs/toasty/pull/1181
+
+## [0.9.0](https://github.com/tokio-rs/toasty/compare/toasty-v0.8.0...toasty-v0.9.0) - 2026-07-23
+
+### Added
+
+- support order_by in includes ([#1109])
+- relation link/unlink return a builder instead of executing eagerly ([#1118])
+- support serde_json::Value fields ([#1116])
+- support native JSON and JSONB column storage ([#1114])
+- [**breaking**] require explicit column types for JSON fields ([#1106])
+- support temporal Vec fields ([#1105])
+- filter associations in include ([#1089])
+- introduce Expr::Static for inline SQL literals, hook up LIMIT/OFFSET ([#1001])
+- support integer storage for enum discriminants ([#1101])
+- add upsert support ([#1091])
+- add #[shared] variant fields and enum-level #[index]/#[unique] ([#1078])
+- implement Scalar for unit enum embeds ([#1082])
+- add #[document] storage for embedded types with nested-path filtering ([#1028])
+
+### Fixed
+
+- type indexed key discovery as primary keys on DynamoDB ([#1113])
+- serialize unconstrained numeric migration snapshots ([#1115])
+- roll back transactions when finalization fails ([#1102])
+- support any() on many-to-many relations ([#1097])
+- store Vec<native-enum> as a native enum array on Postgres ([#1092])
+- compare composite-FK include filter against target fields ([#1086])
+- return None for optional belongs_to with NULL foreign key ([#1090])
+- lower IN-list over an embedded-field projection ([#1084])
+
+[#1001]: https://github.com/tokio-rs/toasty/pull/1001
+[#1028]: https://github.com/tokio-rs/toasty/pull/1028
+[#1078]: https://github.com/tokio-rs/toasty/pull/1078
+[#1082]: https://github.com/tokio-rs/toasty/pull/1082
+[#1084]: https://github.com/tokio-rs/toasty/pull/1084
+[#1086]: https://github.com/tokio-rs/toasty/pull/1086
+[#1089]: https://github.com/tokio-rs/toasty/pull/1089
+[#1090]: https://github.com/tokio-rs/toasty/pull/1090
+[#1091]: https://github.com/tokio-rs/toasty/pull/1091
+[#1092]: https://github.com/tokio-rs/toasty/pull/1092
+[#1097]: https://github.com/tokio-rs/toasty/pull/1097
+[#1101]: https://github.com/tokio-rs/toasty/pull/1101
+[#1102]: https://github.com/tokio-rs/toasty/pull/1102
+[#1105]: https://github.com/tokio-rs/toasty/pull/1105
+[#1106]: https://github.com/tokio-rs/toasty/pull/1106
+[#1109]: https://github.com/tokio-rs/toasty/pull/1109
+[#1113]: https://github.com/tokio-rs/toasty/pull/1113
+[#1114]: https://github.com/tokio-rs/toasty/pull/1114
+[#1115]: https://github.com/tokio-rs/toasty/pull/1115
+[#1116]: https://github.com/tokio-rs/toasty/pull/1116
+[#1118]: https://github.com/tokio-rs/toasty/pull/1118
+
+## [0.8.0](https://github.com/tokio-rs/toasty/compare/toasty-v0.7.0...toasty-v0.8.0) - 2026-07-06
+
+### Added
+
+- Emit one toasty::query event per statement and propagate caller spans ([#1071])
+- Support #[version] optimistic concurrency on SQL drivers ([#1065])
+- Infer `key` and `references` in `#[belongs_to]` ([#1063])
+- Share columns across enum variants via #[column("name")] ([#1064])
+- Add escape support for LIKE expressions ([#1039])
+- Add set_* replace-variants to Query builder ([#1037])
+- Implement serde serialization and deserialization for toasty::Json<T> ([#1035])
+- Allow index on unit enum ([#1027])
+- Add between operator to query DSL ([#1029])
+- Support Option<EmbeddedType> model fields ([#1021])
+- Support scalar terminal fields in has_many relations ([#1012])
+
+### Fixed
+
+- Avoid panic when updating a mixed enum to a unit variant ([#1069])
+- Fix enum decoding for OR'd variant filters ([#1067])
+- Make multi-key delete and update consistent ([#1053])
+- Increment #[version] field on query-based updates ([#1022])
+
+### Changed
+
+- [**breaking**] Make UpdateByKey returning columns explicit ([#1024])
+- [**breaking**] Rename RelationManyField/RelationOneField assoc type to Target ([#1015])
+- [**breaking**] Align stmt::Query with per-model Query ([#1011])
+- [**breaking**] Unify per-model query structs into Query<T> ([#995])
+- [**breaking**] Remove the Register trait ([#1006])
+- Remove compile-time field validation from create! macro ([#997])
+
+[#995]: https://github.com/tokio-rs/toasty/pull/995
+[#997]: https://github.com/tokio-rs/toasty/pull/997
+[#1006]: https://github.com/tokio-rs/toasty/pull/1006
+[#1011]: https://github.com/tokio-rs/toasty/pull/1011
+[#1012]: https://github.com/tokio-rs/toasty/pull/1012
+[#1015]: https://github.com/tokio-rs/toasty/pull/1015
+[#1021]: https://github.com/tokio-rs/toasty/pull/1021
+[#1022]: https://github.com/tokio-rs/toasty/pull/1022
+[#1024]: https://github.com/tokio-rs/toasty/pull/1024
+[#1027]: https://github.com/tokio-rs/toasty/pull/1027
+[#1029]: https://github.com/tokio-rs/toasty/pull/1029
+[#1035]: https://github.com/tokio-rs/toasty/pull/1035
+[#1037]: https://github.com/tokio-rs/toasty/pull/1037
+[#1039]: https://github.com/tokio-rs/toasty/pull/1039
+[#1053]: https://github.com/tokio-rs/toasty/pull/1053
+[#1063]: https://github.com/tokio-rs/toasty/pull/1063
+[#1064]: https://github.com/tokio-rs/toasty/pull/1064
+[#1065]: https://github.com/tokio-rs/toasty/pull/1065
+[#1067]: https://github.com/tokio-rs/toasty/pull/1067
+[#1069]: https://github.com/tokio-rs/toasty/pull/1069
+[#1071]: https://github.com/tokio-rs/toasty/pull/1071
+
+## [0.7.0](https://github.com/tokio-rs/toasty/compare/toasty-v0.6.1...toasty-v0.7.0) - 2026-05-29
+
+### Added
+
+- derive Clone and add Deserialize for Deferred<T> ([#994](https://github.com/tokio-rs/toasty/pull/994))
+- *(macros)* generate field projection methods on Query/Many/One ([#987](https://github.com/tokio-rs/toasty/pull/987))
+- [**breaking**] add increment, decrement, add, subtract update ops ([#979](https://github.com/tokio-rs/toasty/pull/979))
+- *(macros)* add update! macro for concise field updates ([#980](https://github.com/tokio-rs/toasty/pull/980))
+- reject create() on multi-step relation scopes at compile time ([#978](https://github.com/tokio-rs/toasty/pull/978))
+- add raw SQL execution API ([#965](https://github.com/tokio-rs/toasty/pull/965))
+- remove the `#[deferred]` field attribute in favor of `Deferred<T>` ([#961](https://github.com/tokio-rs/toasty/pull/961))
+- support eager relation fields ([#958](https://github.com/tokio-rs/toasty/pull/958))
+- *(engine)* support `.include()` of multi-step `via` relations ([#946](https://github.com/tokio-rs/toasty/pull/946))
+- expose migration core from toasty ([#944](https://github.com/tokio-rs/toasty/pull/944))
+- *(turso)* add Turso driver with TransactionMode-aware concurrent writes ([#938](https://github.com/tokio-rs/toasty/pull/938))
+- *(engine)* dispatch has-many `stmt::apply` batches per entry ([#932](https://github.com/tokio-rs/toasty/pull/932))
+- add TransactionMode for SQLite lock-acquisition control ([#931](https://github.com/tokio-rs/toasty/pull/931))
+- allow #[version] on tuple-newtype embeds of u64 ([#930](https://github.com/tokio-rs/toasty/pull/930))
+- *(sql)* serialize `SELECT DISTINCT` ([#934](https://github.com/tokio-rs/toasty/pull/934))
+- [**breaking**] replace `#[serialize(json)]` with `toasty::Json<T>` wrapper ([#926](https://github.com/tokio-rs/toasty/pull/926))
+- expose primary-key type via Model::PrimaryKey ([#921](https://github.com/tokio-rs/toasty/pull/921))
+- *(engine)* fold simple Batch assignments in update lowering ([#917](https://github.com/tokio-rs/toasty/pull/917))
+- add multi-step (via) has_many and has_one relations ([#890](https://github.com/tokio-rs/toasty/pull/890))
+- add non-panicking `try_get` to relation types ([#918](https://github.com/tokio-rs/toasty/pull/918))
+
+### Fixed
+
+- deserialize a present Deferred<T> value as loaded ([#999](https://github.com/tokio-rs/toasty/pull/999))
+- *(engine)* lift relation-path LIKE into a foreign-key subquery ([#992](https://github.com/tokio-rs/toasty/pull/992))
+- *(engine)* lift relation-path IN-subquery through BelongsTo chains ([#990](https://github.com/tokio-rs/toasty/pull/990))
+- make starts_with case-sensitive on SQLite and MySQL ([#983](https://github.com/tokio-rs/toasty/pull/983))
+- *(engine)* handle ExprOr in eval verify_expr ([#959](https://github.com/tokio-rs/toasty/pull/959))
+- [**breaking**] scope `.ilike()` to PostgreSQL and document operator pass-through ([#937](https://github.com/tokio-rs/toasty/pull/937))
+
+### Other
+
+- field projection methods on Query/Many/One ([#993](https://github.com/tokio-rs/toasty/pull/993))
+- *(engine)* move UpdateTarget::Query rewrite into lower ([#975](https://github.com/tokio-rs/toasty/pull/975))
+- simplify `Field` bounds now that `Load<Output = Self>` is required ([#976](https://github.com/tokio-rs/toasty/pull/976))
+- [**breaking**] merge one relation field traits ([#971](https://github.com/tokio-rs/toasty/pull/971))
+- [**breaking**] delete Relation trait, tighten relation field shapes ([#967](https://github.com/tokio-rs/toasty/pull/967))
+- *(core)* split via relations into field variant ([#966](https://github.com/tokio-rs/toasty/pull/966))
+- *(core)* [**breaking**] merge has relation field variants ([#964](https://github.com/tokio-rs/toasty/pull/964))
+- [**breaking**] require Deferred relation fields ([#954](https://github.com/tokio-rs/toasty/pull/954))
+- gate sqlite connect doctest ([#953](https://github.com/tokio-rs/toasty/pull/953))
+- split relation field traits from targets ([#950](https://github.com/tokio-rs/toasty/pull/950))
+- unify lazy-slot relation encoding ([#949](https://github.com/tokio-rs/toasty/pull/949))
+- *(core)* [**breaking**] move schema diff types to `schema::diff` ([#929](https://github.com/tokio-rs/toasty/pull/929))
+- consolidate migration types in toasty crate and reorganize db::diff API ([#928](https://github.com/tokio-rs/toasty/pull/928))
+## [0.6.1](https://github.com/tokio-rs/toasty/compare/toasty-v0.6.0...toasty-v0.6.1) - 2026-05-16
+
+### Added
+
+- Chain relation methods through multiple steps ([#903])
+- Order by multiple fields ([#901])
+
+### Fixed
+
+- Composite foreign keys in relation traversal ([#915])
+- Belongs-to relations with embed-typed primary keys ([#912])
+- Queries with composite keys in equality conditions ([#906])
+- Multiple order_by expressions now stack correctly ([#899])
+
+[#899]: https://github.com/tokio-rs/toasty/pull/899
+[#901]: https://github.com/tokio-rs/toasty/pull/901
+[#903]: https://github.com/tokio-rs/toasty/pull/903
+[#906]: https://github.com/tokio-rs/toasty/pull/906
+[#912]: https://github.com/tokio-rs/toasty/pull/912
+[#915]: https://github.com/tokio-rs/toasty/pull/915
+
+## [0.6.0](https://github.com/tokio-rs/toasty/compare/toasty-v0.5.0...toasty-v0.6.0) - 2026-05-14
+
+### Added
+
+- Vec<scalar> model fields with push, extend, clear, pop, remove_at, and remove operations on PostgreSQL, MySQL, SQLite, and DynamoDB ([#866], [#872], [#880], [#887])
+- Connection pooling improvements: lifetime capping, idle time limits, and automatic broken connection detection and eviction ([#879], [#882], [#874], [#867])
+- Query capabilities: .select() projection through BelongsTo relations, per-call column projection, ilike() filter method, filtering by associated model fields, all-condition filters for associations, and latest_by queries ([#827], [#820], [#801], [#781], [#784], [#707])
+- Compile-time validation for column storage types and create! macro field sets ([#832], [#648])
+- Auto proxying through tuple-newtype Embed types ([#836])
+- #[deferred] field attribute and Deferred<T> wrapper with embedded type support ([#793], [#799])
+- Backward pagination driver capability ([#757])
+- Full-table scan support on DynamoDB ([#821])
+- IN-list parameter optimization for PostgreSQL ([#818])
+
+### Fixed
+
+- Compile-time validation for explicit auto strategies ([#851])
+- Record equality comparisons now properly apply type casting rules ([#838])
+
+[#648]: https://github.com/tokio-rs/toasty/pull/648
+[#707]: https://github.com/tokio-rs/toasty/pull/707
+[#757]: https://github.com/tokio-rs/toasty/pull/757
+[#781]: https://github.com/tokio-rs/toasty/pull/781
+[#784]: https://github.com/tokio-rs/toasty/pull/784
+[#793]: https://github.com/tokio-rs/toasty/pull/793
+[#799]: https://github.com/tokio-rs/toasty/pull/799
+[#801]: https://github.com/tokio-rs/toasty/pull/801
+[#818]: https://github.com/tokio-rs/toasty/pull/818
+[#820]: https://github.com/tokio-rs/toasty/pull/820
+[#821]: https://github.com/tokio-rs/toasty/pull/821
+[#827]: https://github.com/tokio-rs/toasty/pull/827
+[#832]: https://github.com/tokio-rs/toasty/pull/832
+[#836]: https://github.com/tokio-rs/toasty/pull/836
+[#838]: https://github.com/tokio-rs/toasty/pull/838
+[#851]: https://github.com/tokio-rs/toasty/pull/851
+[#866]: https://github.com/tokio-rs/toasty/pull/866
+[#867]: https://github.com/tokio-rs/toasty/pull/867
+[#872]: https://github.com/tokio-rs/toasty/pull/872
+[#874]: https://github.com/tokio-rs/toasty/pull/874
+[#879]: https://github.com/tokio-rs/toasty/pull/879
+[#880]: https://github.com/tokio-rs/toasty/pull/880
+[#882]: https://github.com/tokio-rs/toasty/pull/882
+[#887]: https://github.com/tokio-rs/toasty/pull/887
+
+## [0.5.0](https://github.com/tokio-rs/toasty/compare/toasty-v0.4.0...toasty-v0.5.0) - 2026-04-27
+
+### Added
+
+- String prefix filter operators (`starts_with` and `LIKE`) ([#745])
+- Connection pool configuration ([#759])
+- Optimistic concurrency control for DynamoDB via `#[version]` attribute ([#694])
+- Pair attributes to disambiguate has_many/has_one relationships ([#746])
+- Limit::Offset pagination for DynamoDB ([#674])
+- Float field type support ([#687])
+- Native database enums for embedded enums ([#665])
+- Multiple external crate glob imports in models! macro ([#685])
+
+### Fixed
+
+- Preserve non-reference constraints when lifting BelongsTo IN-subquery ([#777])
+- Deduplicate GetByKey input keys and strengthen HashIndex invariant ([#750])
+- Gate simplification rules on expression stability ([#703])
+- Nested includes sharing a prefix being overwritten ([#699])
+- [**breaking**] `.first()` returns the first row instead of panicking on multiple matches ([#693])
+
+[#665]: https://github.com/tokio-rs/toasty/pull/665
+[#674]: https://github.com/tokio-rs/toasty/pull/674
+[#685]: https://github.com/tokio-rs/toasty/pull/685
+[#687]: https://github.com/tokio-rs/toasty/pull/687
+[#693]: https://github.com/tokio-rs/toasty/pull/693
+[#694]: https://github.com/tokio-rs/toasty/pull/694
+[#699]: https://github.com/tokio-rs/toasty/pull/699
+[#703]: https://github.com/tokio-rs/toasty/pull/703
+[#745]: https://github.com/tokio-rs/toasty/pull/745
+[#746]: https://github.com/tokio-rs/toasty/pull/746
+[#750]: https://github.com/tokio-rs/toasty/pull/750
+[#759]: https://github.com/tokio-rs/toasty/pull/759
+[#777]: https://github.com/tokio-rs/toasty/pull/777
+
+## [0.4.0](https://github.com/tokio-rs/toasty/compare/toasty-v0.3.0...toasty-v0.4.0) - 2026-04-11
+
+### Added
+
+- add support for newtype embedded structs ([#634](https://github.com/tokio-rs/toasty/pull/634))
+- auto-discover related models through fields ([#635](https://github.com/tokio-rs/toasty/pull/635))
+- support boxed and smart pointer foreign keys in has_many relations ([#630](https://github.com/tokio-rs/toasty/pull/630))
+
+### Other
+
+- make FieldName::app_name optional to support unnamed fields ([#633](https://github.com/tokio-rs/toasty/pull/633))
+
+## [0.3.0](https://github.com/tokio-rs/toasty/compare/toasty-v0.2.0...toasty-v0.3.0) - 2026-04-03
+
+### Added
+
+- [**breaking**] bring back `db.transaction_builder()` API, add non-trait methods for `executor.transaction()` ([#625](https://github.com/tokio-rs/toasty/pull/625))
+- add IN list support to query macro filter expressions ([#605](https://github.com/tokio-rs/toasty/pull/605))
+- automatic global model discovery with `models!(crate::*)` using the `inventory` crate ([#614](https://github.com/tokio-rs/toasty/pull/614))
+- [**breaking**] add `ModelSet` and `models!` macro to replace `.register::<T>()` ([#615](https://github.com/tokio-rs/toasty/pull/615))
+- add Assign<T> trait and stmt combinators for unified update mutations ([#607](https://github.com/tokio-rs/toasty/pull/607))
+- eliminate redundant casts when field type matches target ([#612](https://github.com/tokio-rs/toasty/pull/612))
+
+### Fixed
+
+- make Assignment<T> Send + Sync by removing boxed closures ([#627](https://github.com/tokio-rs/toasty/pull/627))
+- remove bogus `impl<T: IntoExpr<T>> IntoExpr<List<T>> for &T` ([#621](https://github.com/tokio-rs/toasty/pull/621))
+- replace broken BinaryOp::reverse with commute in index matching ([#611](https://github.com/tokio-rs/toasty/pull/611))
+
+### Other
+
+- remove transaction_builder() from Db and Connection ([#622](https://github.com/tokio-rs/toasty/pull/622))
+- replace IntoExpr<T> for &Option<T> with Field::key_constraint ([#619](https://github.com/tokio-rs/toasty/pull/619))
+- push pagination handling into engine ([#610](https://github.com/tokio-rs/toasty/pull/610))
+- add badges to README ([#606](https://github.com/tokio-rs/toasty/pull/606))
+- update README examples to use create! macro syntax ([#603](https://github.com/tokio-rs/toasty/pull/603))
+
+## [0.2.0](https://github.com/tokio-rs/toasty/compare/toasty-v0.1.1...toasty-v0.2.0) - 2026-03-30
+
+### Added
+
+- implement string discriminants for embedded enums ([#580](https://github.com/tokio-rs/toasty/pull/580))
+- add tracing-based logging across the ORM ([#586](https://github.com/tokio-rs/toasty/pull/586))
+- add IntoAssignment trait and has-many update combinators ([#576](https://github.com/tokio-rs/toasty/pull/576))
+- add Path<Origin> associated type and new_path/new_root_path methods to Model trait ([#574](https://github.com/tokio-rs/toasty/pull/574))
+- add Scope trait and implement it for HasMany ([#570](https://github.com/tokio-rs/toasty/pull/570))
+- implement basic query! macro with filter support ([#533](https://github.com/tokio-rs/toasty/pull/533))
+- add count() method to Query ([#534](https://github.com/tokio-rs/toasty/pull/534))
+- implement IntoExpr trait for Batch type ([#512](https://github.com/tokio-rs/toasty/pull/512))
+- support has-one conditional updates with existence checks on NoSQL drivers ([#506](https://github.com/tokio-rs/toasty/pull/506))
+- add pagination support for composite-key queries on NoSQL drivers ([#484](https://github.com/tokio-rs/toasty/pull/484))
+- add Bijection type for field-to-column mappings ([#433](https://github.com/tokio-rs/toasty/pull/433))
+- support update and delete statements in toasty::batch ([#428](https://github.com/tokio-rs/toasty/pull/428))
+- support create statements in toasty::batch ([#417](https://github.com/tokio-rs/toasty/pull/417))
+- implement batch queries for sending multiple independent queries in a single round-trip ([#411](https://github.com/tokio-rs/toasty/pull/411))
+- implement runtime serialization codegen for #[serialize(json)] fields ([#404](https://github.com/tokio-rs/toasty/pull/404))
+- add #[serialize] attribute bookkeeping and design doc ([#400](https://github.com/tokio-rs/toasty/pull/400))
+- create macro ([#398](https://github.com/tokio-rs/toasty/pull/398))
+- filter on embedded enum variants ([#389](https://github.com/tokio-rs/toasty/pull/389))
+- embedded enums with fields ([#381](https://github.com/tokio-rs/toasty/pull/381))
+- add support for limit(n) queries. ([#368](https://github.com/tokio-rs/toasty/pull/368))
+- embedded unit enums ([#355](https://github.com/tokio-rs/toasty/pull/355))
+- support embedded structs as field types ([#299](https://github.com/tokio-rs/toasty/pull/299))
+- better #[auto] handling for different types ([#262](https://github.com/tokio-rs/toasty/pull/262))
+- support auto incrementing IDs ([#192](https://github.com/tokio-rs/toasty/pull/192))
+- adds in list simplifications ([#251](https://github.com/tokio-rs/toasty/pull/251))
+- adds range to equality simplification ([#247](https://github.com/tokio-rs/toasty/pull/247))
+- adds canonicalization simplification ([#245](https://github.com/tokio-rs/toasty/pull/245))
+- adds boolean constant comparison simplifications ([#244](https://github.com/tokio-rs/toasty/pull/244))
+- adds complement law simplifications ([#243](https://github.com/tokio-rs/toasty/pull/243))
+- adds factoring simplifications ([#219](https://github.com/tokio-rs/toasty/pull/219))
+- adds the absorption law simplifications ([#218](https://github.com/tokio-rs/toasty/pull/218))
+- support smartpointers ([#233](https://github.com/tokio-rs/toasty/pull/233))
+- simplify is_null on non nullable fields ([#229](https://github.com/tokio-rs/toasty/pull/229))
+- adds idempotent law simplifications ([#217](https://github.com/tokio-rs/toasty/pull/217))
+- adds DeMorgan's law simplifications ([#216](https://github.com/tokio-rs/toasty/pull/216))
+- adds `ExprNot` ([#214](https://github.com/tokio-rs/toasty/pull/214))
+- introduces self-comparison simplifications ([#213](https://github.com/tokio-rs/toasty/pull/213))
+- introduces constant folding simplifications ([#212](https://github.com/tokio-rs/toasty/pull/212))
+- adds simplification for `ExprOr` statements ([#209](https://github.com/tokio-rs/toasty/pull/209))
+- adds `false` short-circuiting to the AND simplifications ([#206](https://github.com/tokio-rs/toasty/pull/206))
+- Implement fully dynamic model ID generation ([#130](https://github.com/tokio-rs/toasty/pull/130))
+
+### Fixed
+
+- use weak dependency features for postgresql and mysql drivers ([#590](https://github.com/tokio-rs/toasty/pull/590))
+- strip ExprCast from IsNull/IsNotNull to fix is_none() panic on Option<Uuid> columns  ([#584](https://github.com/tokio-rs/toasty/pull/584))
+- update error messages to reference ModelField instead of Field ([#565](https://github.com/tokio-rs/toasty/pull/565))
+- bring back associated type for `Model::Create` ([#555](https://github.com/tokio-rs/toasty/pull/555))
+- make create! macro syntax to be consistent with tuple and array ([#525](https://github.com/tokio-rs/toasty/pull/525))
+- reflect correct type in statement generics ([#517](https://github.com/tokio-rs/toasty/pull/517))
+- update IntoExpr comment to use List<Model> syntax ([#467](https://github.com/tokio-rs/toasty/pull/467))
+- error when creating a db with a bad url ([#452](https://github.com/tokio-rs/toasty/pull/452))
+- split composite KV filters in engine and enable batch update test ([#442](https://github.com/tokio-rs/toasty/pull/442))
+- enable ignored nested preload tests and DRY up set_returning_field ([#441](https://github.com/tokio-rs/toasty/pull/441))
+- correct batch_load_index for nested HasMany→HasOne inserts with auto-increment IDs ([#440](https://github.com/tokio-rs/toasty/pull/440))
+- lower ORDER BY expressions ([#439](https://github.com/tokio-rs/toasty/pull/439))
+- fix subtle cancellation safety issues ([#432](https://github.com/tokio-rs/toasty/pull/432))
+- preload HasOne<Option<_>> and refactor ExprLet to Vec bindings ([#402](https://github.com/tokio-rs/toasty/pull/402))
+- bound Relation by Sized ([#394](https://github.com/tokio-rs/toasty/pull/394))
+- DDB N+1 Select Fix ([#380](https://github.com/tokio-rs/toasty/pull/380))
+- Optimize O(N×M) association algorithm to O(N+M) for all relationship types ([#146](https://github.com/tokio-rs/toasty/pull/146))
+
+### Other
+
+- upgrade dependencies ([#598](https://github.com/tokio-rs/toasty/pull/598))
+- configure readme field in workspace package metadata ([#597](https://github.com/tokio-rs/toasty/pull/597))
+- organize imports and format code for consistency ([#595](https://github.com/tokio-rs/toasty/pull/595))
+- update README status from Incubating to Preview ([#594](https://github.com/tokio-rs/toasty/pull/594))
+- replace CreateMany in create! macro with path-based nested builders ([#575](https://github.com/tokio-rs/toasty/pull/575))
+- add warn(missing_docs) to toasty crate and document all public items ([#573](https://github.com/tokio-rs/toasty/pull/573))
+- switch Assignments to BTreeMap with multi-value support ([#566](https://github.com/tokio-rs/toasty/pull/566))
+- replace ManyField/OneField with per-model fields structs ([#571](https://github.com/tokio-rs/toasty/pull/571))
+- make Connection public and Db stateless ([#569](https://github.com/tokio-rs/toasty/pull/569))
+- delete unused Field trait and rename ModelField to Field ([#568](https://github.com/tokio-rs/toasty/pull/568))
+- inline Create trait into Model and Relation traits ([#567](https://github.com/tokio-rs/toasty/pull/567))
+- relax Auto trait bound from Field to ModelField ([#563](https://github.com/tokio-rs/toasty/pull/563))
+- move numeric type impls from schema/field.rs to schema/num.rs ([#562](https://github.com/tokio-rs/toasty/pull/562))
+- rename PoolConnection to Connection and move to db/connection.rs ([#561](https://github.com/tokio-rs/toasty/pull/561))
+- remove Load and ModelField supertraits from Field trait ([#559](https://github.com/tokio-rs/toasty/pull/559))
+- use minimal trait bounds on wrapper-type blanket impls ([#558](https://github.com/tokio-rs/toasty/pull/558))
+- move reload from Field trait to Load trait ([#556](https://github.com/tokio-rs/toasty/pull/556))
+- extract RegisterField trait for schema registration concerns ([#553](https://github.com/tokio-rs/toasty/pull/553))
+- remove driver type re-exports from toasty::db except Driver and Capability ([#552](https://github.com/tokio-rs/toasty/pull/552))
+- extract Create<T> trait from Model and Relation ([#549](https://github.com/tokio-rs/toasty/pull/549))
+- move ty() method from Field trait to Load trait ([#545](https://github.com/tokio-rs/toasty/pull/545))
+- remove `fn load` from Field trait, use Load supertrait ([#544](https://github.com/tokio-rs/toasty/pull/544))
+- reorganize db module exports and move executor/transaction ([#542](https://github.com/tokio-rs/toasty/pull/542))
+- remove async_trait reexport from toasty-core ([#539](https://github.com/tokio-rs/toasty/pull/539))
+- consolidate toasty-codegen into toasty-macros ([#536](https://github.com/tokio-rs/toasty/pull/536))
+- bump dependencies ([#530](https://github.com/tokio-rs/toasty/pull/530))
+- rm Path::new ([#528](https://github.com/tokio-rs/toasty/pull/528))
+- move batch, page, and create_many into stmt module ([#526](https://github.com/tokio-rs/toasty/pull/526))
+- rename unwrap methods to expect for consistency and clarity ([#518](https://github.com/tokio-rs/toasty/pull/518))
+- separate assignments from statement in update builder ([#516](https://github.com/tokio-rs/toasty/pull/516))
+- add API documentation to stmt module types ([#513](https://github.com/tokio-rs/toasty/pull/513))
+- remove unused union query functionality ([#515](https://github.com/tokio-rs/toasty/pull/515))
+- distinguish between single-row and multi-row updates with type system ([#514](https://github.com/tokio-rs/toasty/pull/514))
+- reorganize model and relation types under schema module ([#505](https://github.com/tokio-rs/toasty/pull/505))
+- replace wildcard import with explicit imports in schema module ([#493](https://github.com/tokio-rs/toasty/pull/493))
+- move driver types from toasty to toasty_core ([#492](https://github.com/tokio-rs/toasty/pull/492))
+- update code generation to use toasty::core namespace paths ([#491](https://github.com/tokio-rs/toasty/pull/491))
+- add comprehensive library documentation to toasty crate ([#489](https://github.com/tokio-rs/toasty/pull/489))
+- make Path generic over origin and target types ([#482](https://github.com/tokio-rs/toasty/pull/482))
+- simplify batch filtering with in_list helper and remove tuple IntoExpr impl ([#477](https://github.com/tokio-rs/toasty/pull/477))
+- remove unsafe ([#480](https://github.com/tokio-rs/toasty/pull/480))
+- fix API docs link and redesign crate index page ([#472](https://github.com/tokio-rs/toasty/pull/472))
+- rename terminal query method .all() to .exec() ([#471](https://github.com/tokio-rs/toasty/pull/471))
+- rename `in_set` to `in_list` ([#470](https://github.com/tokio-rs/toasty/pull/470))
+- add nightly API docs link to README ([#469](https://github.com/tokio-rs/toasty/pull/469))
+- add developer guide link to README ([#466](https://github.com/tokio-rs/toasty/pull/466))
+- replace mod.rs files with named module files ([#463](https://github.com/tokio-rs/toasty/pull/463))
+- rename toasty::stmt::Select to toasty::stmt::Query ([#460](https://github.com/tokio-rs/toasty/pull/460))
+- rename IntoStatement::Output to IntoStatement::Returning ([#459](https://github.com/tokio-rs/toasty/pull/459))
+- remove Cursor type and return Vec directly from query execution ([#448](https://github.com/tokio-rs/toasty/pull/448))
+- Add support for filtering parents by has_many associations ([#447](https://github.com/tokio-rs/toasty/pull/447))
+- add compile testing for documentation code snippets ([#446](https://github.com/tokio-rs/toasty/pull/446))
+- Allow tuples to be used as batch expressions for nested creates ([#443](https://github.com/tokio-rs/toasty/pull/443))
+- Add offset ([#438](https://github.com/tokio-rs/toasty/pull/438))
+- reuse connection bg-tasks ([#434](https://github.com/tokio-rs/toasty/pull/434))
+- DDB Client Creation Refactor ([#391](https://github.com/tokio-rs/toasty/pull/391))
+- Revert "feat: add Bijection type for field-to-column mappings ([#433](https://github.com/tokio-rs/toasty/pull/433))" ([#436](https://github.com/tokio-rs/toasty/pull/436))
+- Rename stmt::Primitive trait to model::Field and move Auto to model::Auto ([#416](https://github.com/tokio-rs/toasty/pull/416))
+- Dynamic batch support ([#415](https://github.com/tokio-rs/toasty/pull/415))
+- Add scope-depth-aware expression walker and refactor callers ([#414](https://github.com/tokio-rs/toasty/pull/414))
+- Use associated type on IntoStatement for output cardinality ([#412](https://github.com/tokio-rs/toasty/pull/412))
+- loosen M: Model bounds to M: Load or unconstrained ([#410](https://github.com/tokio-rs/toasty/pull/410))
+- give each trait its own file in the toasty crate ([#407](https://github.com/tokio-rs/toasty/pull/407))
+- extract Load trait from Model and simplify Cursor ([#406](https://github.com/tokio-rs/toasty/pull/406))
+- Support deeply nested association preloading ([#311](https://github.com/tokio-rs/toasty/pull/311))
+- remove unused ToStatement trait ([#405](https://github.com/tokio-rs/toasty/pull/405))
+- add missing single-level preload permutations ([#403](https://github.com/tokio-rs/toasty/pull/403))
+- remove Option<T> impls from model.rs ([#393](https://github.com/tokio-rs/toasty/pull/393))
+- OR tautology elimination for enum variants ([#395](https://github.com/tokio-rs/toasty/pull/395))
+- Interactive transactions ([#376](https://github.com/tokio-rs/toasty/pull/376))
+- rm Arc from Schema.db field. ([#387](https://github.com/tokio-rs/toasty/pull/387))
+- add Expr::Error ([#385](https://github.com/tokio-rs/toasty/pull/385))
+- ExprMatch simplification ([#383](https://github.com/tokio-rs/toasty/pull/383))
+- Connection per Db ([#379](https://github.com/tokio-rs/toasty/pull/379))
+- Add transaction isolation levels and read-only mode to Operation::Transaction ([#375](https://github.com/tokio-rs/toasty/pull/375))
+- wrap multi-op ExecPlan in BEGIN...COMMIT for atomicity ([#370](https://github.com/tokio-rs/toasty/pull/370))
+- proptest fuzz testing for simplification pipeline ([#372](https://github.com/tokio-rs/toasty/pull/372))
+- mv simplification tests ([#369](https://github.com/tokio-rs/toasty/pull/369))s
+- cleanup llm context files ([#365](https://github.com/tokio-rs/toasty/pull/365))
+- rm Expr::Key, ExprReference::Model already covers the case ([#359](https://github.com/tokio-rs/toasty/pull/359))
+- expression eval tests & improvements ([#358](https://github.com/tokio-rs/toasty/pull/358))
+- support OR queries over primary key ([#350](https://github.com/tokio-rs/toasty/pull/350))
+- index values in memory and use it for nested merge ([#352](https://github.com/tokio-rs/toasty/pull/352))
+- move Model.fields -> ModelRoot ([#347](https://github.com/tokio-rs/toasty/pull/347))
+- Fix #317 ([#342](https://github.com/tokio-rs/toasty/pull/342))
+- Add Primitive impl for Vec<u8> (Bytes) ([#344](https://github.com/tokio-rs/toasty/pull/344))
+- Add is_none() and is_some() filter methods for Option fields ([#337](https://github.com/tokio-rs/toasty/pull/337))
+- Remove dead enum code ([#341](https://github.com/tokio-rs/toasty/pull/341))
+- Migrate last tests to using errors. ([#339](https://github.com/tokio-rs/toasty/pull/339))
+- Remove Id type ([#334](https://github.com/tokio-rs/toasty/pull/334))
+- support partial updates for embedded structs ([#325](https://github.com/tokio-rs/toasty/pull/325))
+- add .not() method on Expr<bool> for NOT queries ([#315](https://github.com/tokio-rs/toasty/pull/315))
+- return errors from driver tests ([#319](https://github.com/tokio-rs/toasty/pull/319))
+- Add database reset functionality (+ serial tests) ([#322](https://github.com/tokio-rs/toasty/pull/322))
+- Support "postgres" URL scheme for PostgreSQL ([#320](https://github.com/tokio-rs/toasty/pull/320))
+- consolidate generated update builders ([#316](https://github.com/tokio-rs/toasty/pull/316))
+- switch assignments to be a map of Projection and not usize. ([#312](https://github.com/tokio-rs/toasty/pull/312))
+- Add database migration CLI tool ([#271](https://github.com/tokio-rs/toasty/pull/271))
+- support or queries ([#305](https://github.com/tokio-rs/toasty/pull/305))
+- allow embedded struct fields in queries ([#303](https://github.com/tokio-rs/toasty/pull/303))
+- move Capability to Driver ([#300](https://github.com/tokio-rs/toasty/pull/300))
+- remove anyhow dependency ([#297](https://github.com/tokio-rs/toasty/pull/297))
+- remove bail! ([#296](https://github.com/tokio-rs/toasty/pull/296))
+- misc tweaks ([#295](https://github.com/tokio-rs/toasty/pull/295))
+- rename some error types ([#292](https://github.com/tokio-rs/toasty/pull/292))
+- InvalidResultError ([#290](https://github.com/tokio-rs/toasty/pull/290))
+- add "too many records" error ([#289](https://github.com/tokio-rs/toasty/pull/289))
+- add condition failed error ([#286](https://github.com/tokio-rs/toasty/pull/286))
+- RecordNotFoundError ([#283](https://github.com/tokio-rs/toasty/pull/283))
+- introduce type conversion errors ([#282](https://github.com/tokio-rs/toasty/pull/282))
+- add a custom error type ([#279](https://github.com/tokio-rs/toasty/pull/279))
+- expose generated types when useful ([#278](https://github.com/tokio-rs/toasty/pull/278))
+- move more tests to the integration suite ([#274](https://github.com/tokio-rs/toasty/pull/274))
+- move more tests to the test suite ([#273](https://github.com/tokio-rs/toasty/pull/273))
+- move more tests to the integration suite ([#270](https://github.com/tokio-rs/toasty/pull/270))
+- Move more tests to the integration suite ([#268](https://github.com/tokio-rs/toasty/pull/268))
+- move more tests to integration suite. ([#265](https://github.com/tokio-rs/toasty/pull/265))
+- extract integration tests to a reusable crate ([#263](https://github.com/tokio-rs/toasty/pull/263))
+- Add database connection pooling ([#260](https://github.com/tokio-rs/toasty/pull/260))
+- Add bool primitive implementation ([#242](https://github.com/tokio-rs/toasty/pull/242))
+- Add native support for Postgres NUMERIC and MySQL DECIMAL with rust_decimal ([#248](https://github.com/tokio-rs/toasty/pull/248))
+- Update test function ([#241](https://github.com/tokio-rs/toasty/pull/241))
+- Add basic support for bigdecimal::BigDecimal ([#238](https://github.com/tokio-rs/toasty/pull/238))
+- add Primitive impl for Cow<T: ToOwned> ([#232](https://github.com/tokio-rs/toasty/pull/232))
+- Implement backwards navigation for paginated queries ([#234](https://github.com/tokio-rs/toasty/pull/234))
+- Extract cursor from last item in paginated result set ([#231](https://github.com/tokio-rs/toasty/pull/231))
+- remove auto-mapping many models to one table ([#225](https://github.com/tokio-rs/toasty/pull/225))
+- Update readme ([#230](https://github.com/tokio-rs/toasty/pull/230))
+- Add Page<M> as part of improved paginatation API ([#223](https://github.com/tokio-rs/toasty/pull/223))
+- uses Toasty macros for test model generation ([#211](https://github.com/tokio-rs/toasty/pull/211))
+- Adds high level docs to core engine components ([#205](https://github.com/tokio-rs/toasty/pull/205))
+- Adds docs for expression statements, tests for simplifications ([#204](https://github.com/tokio-rs/toasty/pull/204))
+- Add date/time times using `jiff` ([#201](https://github.com/tokio-rs/toasty/pull/201))
+- Use `Expr::Default` for model fields that have a `#[auto]` annotation ([#199](https://github.com/tokio-rs/toasty/pull/199))
+- Add `Expr::Default` ([#198](https://github.com/tokio-rs/toasty/pull/198))
+- rm normalize_insertion_values in favor of starting out Insert<M> with the correct amount of fields ([#197](https://github.com/tokio-rs/toasty/pull/197))
+- rm impl Default for stmt::Expr ([#196](https://github.com/tokio-rs/toasty/pull/196))
+- more post-refactor cleanup ([#194](https://github.com/tokio-rs/toasty/pull/194))
+- Allow specifying more storage types, e.g. `TEXT` for UUIDs ([#181](https://github.com/tokio-rs/toasty/pull/181))
+- more post refactor cleanup ([#184](https://github.com/tokio-rs/toasty/pull/184))
+- more post-refactor cleanup ([#182](https://github.com/tokio-rs/toasty/pull/182))
+- Add support for UUIDs using the uuid crate ([#178](https://github.com/tokio-rs/toasty/pull/178))
+- Add support for specifying a different database name for fields ([#174](https://github.com/tokio-rs/toasty/pull/174))
+- combine plan and exec mods ([#173](https://github.com/tokio-rs/toasty/pull/173))
+- remove 2 from types and fns ([#172](https://github.com/tokio-rs/toasty/pull/172))
+- Add fixed-size Rust primitive type support ([#170](https://github.com/tokio-rs/toasty/pull/170))
+- remove `ng` module ([#171](https://github.com/tokio-rs/toasty/pull/171))
+- handle empty tables when preloading ([#168](https://github.com/tokio-rs/toasty/pull/168))
+- move rest of planner to new engine. ([#167](https://github.com/tokio-rs/toasty/pull/167))
+- Combine lowering with new planner's "decompose" step ([#164](https://github.com/tokio-rs/toasty/pull/164))
+- Add stmt::Filter + some refactors. ([#163](https://github.com/tokio-rs/toasty/pull/163))
+- Integrate KV select path with the new planner ([#162](https://github.com/tokio-rs/toasty/pull/162))
+- Include association eager-loading when lowering statement ([#159](https://github.com/tokio-rs/toasty/pull/159))
+- refactor lowering to use expr context ([#160](https://github.com/tokio-rs/toasty/pull/160))
+- unify ExprReference and ExprColumn ([#158](https://github.com/tokio-rs/toasty/pull/158))
+- update readme to align with the working code ([#112](https://github.com/tokio-rs/toasty/pull/112))
+- Add `serde::Serialize` support ([#143](https://github.com/tokio-rs/toasty/pull/143))
+- refactor ExprColumn to remove direct ColumnId references. ([#156](https://github.com/tokio-rs/toasty/pull/156))
+- (toasty): Derive  on relation types ([#157](https://github.com/tokio-rs/toasty/pull/157))
+- stop hardcoding FieldId in expressions. ([#155](https://github.com/tokio-rs/toasty/pull/155))
+- don't hardcode ModelId in ExprReference ([#154](https://github.com/tokio-rs/toasty/pull/154))
+- Include all table refs at the top of a SourceTable ([#152](https://github.com/tokio-rs/toasty/pull/152))
+- track association includes on returning clause ([#150](https://github.com/tokio-rs/toasty/pull/150))
+- Update HasMany Debug impl ([#142](https://github.com/tokio-rs/toasty/pull/142))
+- implement HasOne preload support ([#144](https://github.com/tokio-rs/toasty/pull/144))
+- quick fix to support multiple includes with queries ([#140](https://github.com/tokio-rs/toasty/pull/140))
+- Enhance testing infrastructure and refactor tuple Like implementations ([#139](https://github.com/tokio-rs/toasty/pull/139))
+- add context documentation and reorganize project docs ([#137](https://github.com/tokio-rs/toasty/pull/137))
+- reduce glob imports in rest of crates ([#133](https://github.com/tokio-rs/toasty/pull/133))
+- use macro to generate repetitive Primitive implementations ([#131](https://github.com/tokio-rs/toasty/pull/131))
+- Switch Model::ID and Primitive::TYPE to methods to avoid const requirement ([#129](https://github.com/tokio-rs/toasty/pull/129))
+- Add support for unsigned types ([#122](https://github.com/tokio-rs/toasty/pull/122))
+- Unify ExprField and ExprReference ([#120](https://github.com/tokio-rs/toasty/pull/120))
+- Remove `Value::to_$ty() -> Result`. ([#117](https://github.com/tokio-rs/toasty/pull/117))
+- Add support for i16 ([#116](https://github.com/tokio-rs/toasty/pull/116))
+- Support i8 ([#115](https://github.com/tokio-rs/toasty/pull/115))
+- add support for i32 types ([#113](https://github.com/tokio-rs/toasty/pull/113))
+- Initial pagination implementation ([#111](https://github.com/tokio-rs/toasty/pull/111))
+- add support for "order by" ([#110](https://github.com/tokio-rs/toasty/pull/110))
+- rm Query from schema ([#109](https://github.com/tokio-rs/toasty/pull/109))
+- rm PartialEq from stmt and schema ([#108](https://github.com/tokio-rs/toasty/pull/108))
+- rename Relation2 -> Relation, codegen2 -> codegen ([#107](https://github.com/tokio-rs/toasty/pull/107))
+- Switch proc macro to `#[derive(Model)]` ([#105](https://github.com/tokio-rs/toasty/pull/105))
+- Add annotation to specify DB column type ([#104](https://github.com/tokio-rs/toasty/pull/104))
+- ran cargo `clippy --fix -- -Wclippy::use_self` ([#103](https://github.com/tokio-rs/toasty/pull/103))
+- Flatten capability struct and DRY db definitions ([#102](https://github.com/tokio-rs/toasty/pull/102))
+- switch `driver::Rows::Count` type to u64 ([#98](https://github.com/tokio-rs/toasty/pull/98))
+- complete driver, include in CI ([#97](https://github.com/tokio-rs/toasty/pull/97))
+- first pass at MySQL driver ([#96](https://github.com/tokio-rs/toasty/pull/96))
+- Refactor sql serializer ([#95](https://github.com/tokio-rs/toasty/pull/95))
+- move crates to flatter structure ([#91](https://github.com/tokio-rs/toasty/pull/91))
+- Switch Toasty to use proc macros for schema declaration ([#76](https://github.com/tokio-rs/toasty/pull/76))
+- Fix typo in README.md ([#4](https://github.com/tokio-rs/toasty/pull/4))
+- Initial commit

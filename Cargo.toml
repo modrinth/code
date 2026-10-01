@@ -1,5 +1,6 @@
 [workspace]
 resolver = "2"
+exclude = ["packages/toasty"]
 members = [
   "apps/app",
   "apps/app-playground",
@@ -17,7 +18,7 @@ members = [
   "packages/path-util",
   "packages/serde-binhum",
   "packages/xredis",
-  "apps/modrinth-launcher-meta"
+  "apps/modrinth-minecraft-meta"
 ]
 
 [workspace.package]
@@ -54,6 +55,8 @@ aws-sdk-s3 = { version = "=1.122.0", default-features = false, features = [
 ] }
 base64 = "0.22.1"
 bitflags = "2.9.4"
+tracing-anyhow = { version = "0.1.0" }
+anyhow = "1.0.104"
 blocklist = { version = "1.0.0" }
 bon = "3.9.3"
 bytemuck = "1.24.0"
@@ -75,7 +78,8 @@ core-graphics = "0.24.0"
 daedalus = { path = "packages/daedalus" }
 darling = { version = "0.23" }
 dashmap = "6.1.0"
-# toasty = { version = "0.11.0" }
+toasty = { version = "0.11.0" }
+toasty-cli = { version = "0.11.0" }
 data-url = "0.3.2"
 deadpool-redis = { git = "https://github.com/modrinth/deadpool", rev = "c7209b086829572f368f1194aba54bdea8dc540b", version = "0.23.0" }
 derive_more = "2.1.1"
@@ -113,6 +117,7 @@ iana-time-zone = "0.1.64"
 image = { version = "0.25.8", default-features = false, features = ["rayon"] }
 indexmap = "2.11.4"
 indicatif = "0.18.0"
+serde_path_to_error = { version = "0.1.20" }
 itertools = "0.14.0"
 jemalloc_pprof = "0.8.1"
 json-patch = { version = "4.1.0", default-features = false }
@@ -310,6 +315,8 @@ wildcard_dependencies = "warn"
 # Pin the upstream Tao 0.36 upgrade until a Tauri release includes the Windows input deadlock fix.
 # https://github.com/tauri-apps/tauri/pull/15307
 [patch.crates-io]
+# Toasty's unused SQLite driver conflicts with SQLx's native SQLite bindings.
+toasty = { path = "packages/toasty" }
 tauri = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
 tauri-build = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
 tauri-codegen = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }

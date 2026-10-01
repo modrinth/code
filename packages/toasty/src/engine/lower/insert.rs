@@ -1,0 +1,544 @@
+use bit_set::BitSet;
+use toasty_core::{schema::app, stmt};
+
+use crate::engine::lower::LowerStatement;
+
+/// Process the scope component of an insert statement.
+struct ApplyInsertScope<'a> {
+    expr: &'a mut stmt::Expr,
+}
+
+/// How to encode an auto-generated value for a given field. Each newtype
+/// embed layer adds one record wrapping around the leaf primitive value.
+struct AutoTarget<'a> {
+    ty: &'a stmt::Type,
+    wrap_depth: usize,
+}
+
+impl AutoTarget<'_> {
+    fn wrap(&self, mut value: stmt::Value) -> stmt::Value {
+        for _ in 0..self.wrap_depth {
+            value = stmt::Value::record_from_vec(vec![value]);
+        }
+        value
+    }
+
+    fn wrap_expr(&self, mut expr: stmt::Expr) -> stmt::Expr {
+        for _ in 0..self.wrap_depth {
+            expr = stmt::Expr::record_from_vec(vec![expr]);
+        }
+        expr
+    }
+}
+
+impl LowerStatement<'_, '_> {
+    // First, apply the insertion scope to the insertion values
+    pub(super) fn apply_insert_scope(
+        &mut self,
+        target: &mut stmt::InsertTarget,
+        source: &mut stmt::Query,
+    ) {
+        let stmt::InsertTarget::Scope(scope) = target else {
+            // Insertion is not targetting a scope
+            return;
+        };
+
+        let stmt::ExprSet::Values(values) = &mut source.body else {
+            todo!()
+        };
+
+        let scope = &scope.body.as_select_unwrap();
+
+        if let Some(filter) = &scope.filter.expr {
+            for expr in &mut values.rows {
+                ApplyInsertScope { expr }.apply_expr(filter)
+            }
+        }
+
+        *target = stmt::InsertTarget::Model(scope.source.model_id_unwrap());
+    }
+
+    pub(super) fn preprocess_insert_values(
+        &mut self,
+        source: &mut stmt::Query,
+        returning: &mut Option<stmt::Returning>,
+        preserve_returning_projection: bool,
+        returning_model: bool,
+    ) {
+        let stmt::ExprSet::Values(values) = &mut source.body else {
+            todo!()
+        };
+
+        let Some(model) = self.expr_cx.target_as_model() else {
+            return;
+        };
+
+        let mut set_fields: BitSet<usize> = BitSet::default();
+
+        // First, apply any defaults while also tracking all the fields that are set.
+        for (index, row) in values.rows.iter_mut().enumerate() {
+            self.lower_insert_with_row(index, |lower| {
+                lower.apply_app_level_insertion_defaults(model, row, &mut set_fields);
+            });
+        }
+
+        // `preserve_returning_projection` is true for `INSERT ... DO NOTHING`.
+        // Such an insert can return no rows after a conflict, so its returning
+        // clause must stay a projection over the database result. For example,
+        // converting `RETURNING id` to an expression for input row zero would
+        // try to project a row that does not exist. Other inserts return a row
+        // for every input row, so convert their returning projection into
+        // per-row expressions for relation planning.
+        if !preserve_returning_projection {
+            self.convert_returning_for_insert(values, returning, source.single);
+        }
+
+        for (index, row) in values.rows.iter_mut().enumerate() {
+            self.lower_insert_with_row(index, |lower| {
+                lower.plan_stmt_insert_relations(row, returning, index);
+                if returning_model {
+                    lower.plan_insert_returning_relations(
+                        row,
+                        returning,
+                        index,
+                        preserve_returning_projection,
+                    );
+                }
+                lower.verify_field_constraints(model, row);
+            });
+        }
+    }
+
+    /// Load eager relations after insert planning has resolved their foreign keys.
+    fn plan_insert_returning_relations(
+        &mut self,
+        row: &stmt::Expr,
+        returning: &mut Option<stmt::Returning>,
+        index: usize,
+        preserve_returning_projection: bool,
+    ) {
+        let Some(record) =
+            Self::insert_returning_record_mut(returning, index, preserve_returning_projection)
+        else {
+            return;
+        };
+
+        // A preserved projection is shared across rows, so it cannot hold
+        // a different relation load for each row.
+        if preserve_returning_projection && index > 0 {
+            for field in &self.model_unwrap().fields {
+                if let app::FieldTy::BelongsTo(rel) = &field.ty {
+                    assert!(
+                        field.deferred || Self::belongs_to_fk_is_unset(row, rel),
+                        "eager belongs_to in a multi-row insert with a preserved returning projection"
+                    );
+                }
+            }
+        }
+
+        self.process_top_level_includes(record, &[]);
+    }
+
+    /// Return whether the row has no usable foreign key for this relation.
+    fn belongs_to_fk_is_unset(row: &stmt::Expr, rel: &app::BelongsTo) -> bool {
+        rel.foreign_key.fields.iter().any(|fk_field| {
+            row.entry(fk_field.source.index).is_none_or(|entry| {
+                let expr = entry.to_expr();
+                expr.is_value_null() || expr.is_default()
+            })
+        })
+    }
+
+    /// Return the model record for one row of an INSERT's returning value.
+    fn insert_returning_record_mut(
+        returning: &mut Option<stmt::Returning>,
+        index: usize,
+        preserve_returning_projection: bool,
+    ) -> Option<&mut stmt::ExprRecord> {
+        match returning {
+            Some(stmt::Returning::Expr(stmt::Expr::List(rows)))
+                if !preserve_returning_projection =>
+            {
+                Some(rows.items[index].as_record_mut_unwrap())
+            }
+            Some(stmt::Returning::Expr(stmt::Expr::Record(record)))
+                if !preserve_returning_projection =>
+            {
+                Some(record)
+            }
+            Some(stmt::Returning::Project(stmt::Expr::Record(record)))
+                if preserve_returning_projection =>
+            {
+                Some(record)
+            }
+            _ => None,
+        }
+    }
+
+    /// Make a relation load wait for the database writes that can create its row.
+    pub(super) fn order_relation_load_after_enclosing_inserts(&mut self, load: &stmt::Expr) {
+        let stmt::Expr::Arg(expr_arg) = load else {
+            unreachable!("belongs_to subquery lowers to a sub-statement arg");
+        };
+        let crate::engine::hir::Arg::Sub {
+            stmt_id: sub_id, ..
+        } = self.curr_stmt_info().args[expr_arg.position]
+        else {
+            unreachable!("subquery arg refers to a sub-statement");
+        };
+
+        let state = &mut *self.state;
+        let (insert_stmts, hir) = (&state.insert_stmts, &mut state.hir);
+        for &target in insert_stmts {
+            hir[sub_id].add_dep(target, crate::engine::hir::DepKind::Effect);
+        }
+    }
+
+    /// Convert a relation query's row list into one nullable record.
+    pub(super) fn single_relation_from_load(load: stmt::Expr) -> stmt::Expr {
+        stmt::Expr::match_expr(
+            load.clone(),
+            vec![stmt::MatchArm {
+                pattern: stmt::Value::List(vec![]),
+                expr: stmt::Expr::null(),
+            }],
+            stmt::Expr::project(load, [0usize]),
+        )
+    }
+
+    // Checks all fields of a record and handles nulls
+    fn apply_app_level_insertion_defaults(
+        &mut self,
+        model: &app::ModelRoot,
+        expr: &mut stmt::Expr,
+        set_fields: &mut BitSet<usize>,
+    ) {
+        // First, we pad the record to account for all fields
+        if let stmt::Expr::Record(expr_record) = expr {
+            // TODO: get rid of this
+            assert_eq!(expr_record.len(), model.fields.len());
+        }
+
+        // Next, we have to find all belongs-to fields and normalize them to FK
+        // values
+        for field in &model.fields {
+            if let app::FieldTy::BelongsTo(rel) = &field.ty {
+                let mut field_expr = expr.entry_mut(field.id.index);
+
+                if field_expr.is_value_null() {
+                    continue;
+                }
+
+                if !field_expr.is_value() && !field_expr.is_record() {
+                    continue;
+                }
+                let value = field_expr.take();
+                super::relation::assign_belongs_to_key(&rel.foreign_key, value, |field, value| {
+                    expr.entry_mut(field.index).insert(value);
+                });
+            }
+        }
+
+        // Initialize version fields to 1 if not already set by the user.
+        // For embedded newtypes (e.g. `Version(u64)`), wrap in one Record per
+        // embed layer so the value round-trips through the embed's `Load` impl.
+        for field in &model.fields {
+            if field.is_versionable() {
+                let mut field_expr = expr.entry_mut(field.id.index);
+                if field_expr.is_default() || field_expr.is_value_null() {
+                    let target = self.auto_target(field.id);
+                    field_expr.insert(target.wrap(stmt::Value::U64(1)).into());
+                }
+            }
+        }
+
+        // We have to handle auto fields first because they are often the
+        // identifier which may be referenced to handle associations.
+        for field in &model.fields {
+            let mut field_expr = expr.entry_mut(field.id.index);
+
+            if field_expr.is_default() {
+                // If the field is defined to be auto-populated, then populate
+                // it here.
+                if let Some(auto) = &field.auto {
+                    // For an embedded newtype, the auto value is generated as
+                    // the inner primitive and wrapped in a single-element
+                    // record so it round-trips through the embed `Load` impl.
+                    let target = self.auto_target(field.id);
+                    match auto {
+                        app::AutoStrategy::Uuid(version) => {
+                            let id = match version {
+                                app::UuidVersion::V4 => uuid::Uuid::new_v4(),
+                                app::UuidVersion::V7 => uuid::Uuid::now_v7(),
+                            };
+                            let primitive = match &target.ty {
+                                stmt::Type::String => stmt::Value::String(id.to_string()),
+                                stmt::Type::Uuid => stmt::Value::Uuid(id),
+                                other => panic!(
+                                    "auto-generated UUID cannot be inserted into column of type {other:?}"
+                                ),
+                            };
+                            field_expr.insert(target.wrap(primitive).into());
+                        }
+                        app::AutoStrategy::Increment => {
+                            // Leave value as `Expr::Default` for primitives so
+                            // the database fills it in. For embedded newtypes
+                            // the column-projection step needs a Record of the
+                            // right shape (one wrapping per nested embed) so
+                            // it can extract `Default` per column.
+                            if target.wrap_depth > 0 {
+                                field_expr.insert(target.wrap_expr(stmt::Expr::Default));
+                            }
+                        }
+                    }
+                }
+            }
+
+            if !field_expr.is_value_null() {
+                set_fields.insert(field.id.index);
+            }
+        }
+    }
+
+    fn convert_returning_for_insert(
+        &mut self,
+        values: &stmt::Values,
+        returning: &mut Option<stmt::Returning>,
+        single: bool,
+    ) {
+        // If there is no returning statement, there is nothing to convert
+        let Some(stmt::Returning::Project(projection)) = returning else {
+            return;
+        };
+
+        #[derive(Debug)]
+        struct Input(usize);
+
+        impl stmt::Input for Input {
+            fn resolve_arg(
+                &mut self,
+                expr_arg: &stmt::ExprArg,
+                projection: &stmt::Projection,
+            ) -> Option<stmt::Expr> {
+                let _ = (expr_arg, projection);
+                None
+            }
+
+            fn resolve_ref(
+                &mut self,
+                expr_reference: &stmt::ExprReference,
+                projection: &stmt::Projection,
+            ) -> Option<stmt::Expr> {
+                let expr_column = expr_reference.as_expr_column()?;
+
+                assert!(
+                    expr_column.nesting == 0 && expr_column.table == 0,
+                    "expr_reference={expr_reference:#?}"
+                );
+                assert!(projection.is_identity(), "TODO");
+
+                Some(stmt::Expr::project(*expr_reference, self.0))
+            }
+        }
+
+        let mut converted = vec![];
+
+        for i in 0..values.rows.len() {
+            let mut converted_row = projection.clone();
+            converted_row.substitute(Input(i));
+            converted.push(converted_row);
+        }
+
+        *returning = Some(stmt::Returning::Expr(if single {
+            assert!(converted.len() == 1);
+            converted.into_iter().next().unwrap()
+        } else {
+            stmt::Expr::list_from_vec(converted)
+        }));
+    }
+
+    fn verify_field_constraints(&mut self, model: &app::ModelRoot, expr: &mut stmt::Expr) {
+        for field in &model.fields {
+            if field.nullable && field.constraints.is_empty() {
+                continue;
+            }
+
+            let field_expr = expr.entry(field.id.index).unwrap();
+
+            if !field.nullable && field_expr.is_value_null() {
+                // Relations are handled differently
+                if !field.ty.is_relation() && field.auto.is_none() {
+                    self.state
+                        .errors
+                        .push(toasty_core::Error::validation_failed(format!(
+                            "insert missing non-nullable field `{}` in model `{}`",
+                            field.name,
+                            model.name.upper_camel_case()
+                        )));
+                }
+            }
+
+            for constraint in &field.constraints {
+                if let Err(err) = constraint.check(&field_expr) {
+                    self.state.errors.push(err);
+                }
+            }
+        }
+    }
+}
+
+impl<'b> LowerStatement<'_, 'b> {
+    /// Returns the primitive type the auto value should be encoded as, plus
+    /// how many record wrappings to apply for the embed chain. Walks down
+    /// through nested newtype embeds (`Outer(Inner(u64))`) until it reaches
+    /// the leaf primitive.
+    fn auto_target(&self, field_id: app::FieldId) -> AutoTarget<'b> {
+        let mut ty = &self.schema().app.field(field_id).ty;
+        let mut wrap_depth = 0;
+        loop {
+            match ty {
+                app::FieldTy::Primitive(primitive) => {
+                    return AutoTarget {
+                        ty: &primitive.ty,
+                        wrap_depth,
+                    };
+                }
+                app::FieldTy::Embedded(embedded) => {
+                    let target = self.schema().app.model(embedded.target);
+                    let app::Model::EmbeddedStruct(es) = target else {
+                        panic!(
+                            "#[auto] on embedded enum is not supported (target {:?})",
+                            embedded.target
+                        );
+                    };
+                    let [inner] = es.fields.as_slice() else {
+                        panic!(
+                            "#[auto] on embedded type with {} fields; expected exactly one",
+                            es.fields.len()
+                        );
+                    };
+                    ty = &inner.ty;
+                    wrap_depth += 1;
+                }
+                _ => panic!("#[auto] not allowed on non-primitive fields"),
+            }
+        }
+    }
+
+    /// The target projection and per-row delta for a versionable field's update
+    /// assignment, used to build an atomic `version = version + 1` via
+    /// [`Assignment::Add`](stmt::Assignment::Add).
+    ///
+    /// The projection walks past any embed-newtype layers (`Version(u64)`) to
+    /// the leaf primitive column — `[field, 0, …]` — and the delta is the bare
+    /// literal `1`. Arithmetic operators apply only to primitive columns, so
+    /// unlike the whole-record `Set` the instance path uses, the increment must
+    /// reach the leaf rather than sit on the embed field.
+    pub(super) fn version_increment_target(
+        &self,
+        field_id: app::FieldId,
+    ) -> (stmt::Projection, stmt::Expr) {
+        let target = self.auto_target(field_id);
+
+        // `[field_id.index]` then one `0` per embed layer, reaching the leaf.
+        let mut steps = vec![field_id.index];
+        steps.resize(1 + target.wrap_depth, 0);
+
+        (
+            stmt::Projection::from(steps.as_slice()),
+            stmt::Expr::Value(stmt::Value::U64(1)),
+        )
+    }
+
+    /// Adds an atomic version increment unless the statement already assigns
+    /// the version field.
+    pub(super) fn inject_version_increment(
+        &self,
+        assignments: &mut stmt::Assignments,
+    ) -> Option<stmt::Projection> {
+        let version_id = self.model().and_then(|m| m.version_field()).map(|f| f.id)?;
+
+        let already_assigned = assignments
+            .keys()
+            .any(|projection| projection.as_slice().first() == Some(&version_id.index));
+        if already_assigned {
+            return None;
+        }
+
+        let (projection, delta) = self.version_increment_target(version_id);
+        assignments.add(projection.clone(), delta);
+        Some(projection)
+    }
+}
+
+impl ApplyInsertScope<'_> {
+    fn apply_expr(&mut self, stmt: &stmt::Expr) {
+        match stmt {
+            stmt::Expr::And(exprs) => {
+                for expr in exprs {
+                    self.apply_expr(expr);
+                }
+            }
+            stmt::Expr::BinaryOp(e) if e.op.is_eq() => match (&*e.lhs, &*e.rhs) {
+                (
+                    stmt::Expr::Reference(expr_ref @ stmt::ExprReference::Field { .. }),
+                    rhs @ stmt::Expr::Value(..),
+                ) => {
+                    self.apply_eq_constraint(expr_ref, rhs);
+                }
+                (
+                    lhs @ stmt::Expr::Value(..),
+                    stmt::Expr::Reference(expr_ref @ stmt::ExprReference::Field { .. }),
+                ) => {
+                    self.apply_eq_constraint(expr_ref, lhs);
+                }
+                (
+                    lhs_expr @ stmt::Expr::Reference(
+                        lhs @ stmt::ExprReference::Field {
+                            nesting: nesting_lhs,
+                            ..
+                        },
+                    ),
+                    rhs_expr @ stmt::Expr::Reference(
+                        rhs @ stmt::ExprReference::Field {
+                            nesting: nesting_rhs,
+                            ..
+                        },
+                    ),
+                ) => match (nesting_lhs, nesting_rhs) {
+                    (0, _) if *nesting_rhs > 0 => self.apply_eq_constraint(lhs, rhs_expr),
+                    (_, 0) if *nesting_lhs > 0 => self.apply_eq_constraint(rhs, lhs_expr),
+                    _ => panic!("exactly one field must reference parent"),
+                },
+                _ => todo!("EXPR = {:#?}", stmt),
+            },
+            // Constants are ignored
+            stmt::Expr::Value(_) => {}
+            _ => todo!("EXPR = {:#?}", stmt),
+        }
+    }
+
+    fn apply_eq_constraint(&mut self, expr_ref: &stmt::ExprReference, val: &stmt::Expr) {
+        let stmt::ExprReference::Field { nesting, index } = expr_ref else {
+            todo!("handle non-field reference");
+        };
+
+        assert!(*nesting == 0, "TODO: handle references to parent scopes");
+
+        let mut existing = self.expr.entry_mut(*index);
+
+        if !existing.is_value_null() && !existing.is_default() {
+            if let stmt::EntryMut::Value(existing) = existing {
+                if let stmt::Expr::Value(val) = val {
+                    assert_eq!(existing, val);
+                } else {
+                    todo!()
+                }
+            } else {
+                todo!()
+            }
+        } else {
+            existing.insert(val.clone());
+        }
+    }
+}

@@ -18,6 +18,23 @@ services:
       interval: 3s
       timeout: 5s
       retries: 3
+  postgres_launcher_meta:
+    image: postgres:15-alpine
+    container_name: labrinth-postgres-launcher-meta
+    volumes:
+      - db-launcher-meta-data:/var/lib/postgresql/data
+    ports:
+      - '127.0.0.1:5433:5432'
+    environment:
+      POSTGRES_USER: launchermeta
+      POSTGRES_PASSWORD: launchermeta
+      POSTGRES_HOST_AUTH_METHOD: trust
+      PGUSER: launchermeta
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'launchermeta']
+      interval: 3s
+      timeout: 5s
+      retries: 3
   typesense0:
     image: typesense/typesense:30.1
     container_name: labrinth-typesense0
@@ -578,6 +595,7 @@ volumes:
   elasticsearch2-data:
   elasticsearch-certs:
   db-data:
+  db-launcher-meta-data:
   redis-data:
   redis-insight-data:
   redpanda-data:
