@@ -11,15 +11,15 @@ use crate::{
     util::{ErrorVec, Sha1},
 };
 
-pub const META_MANIFEST_URL: &str =
+pub const CATALOG_URL: &str =
     "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
 
-/// Manifest of all game versions.
+/// Catalog of all game versions.
 ///
-/// Available at [`META_MANIFEST_URL`].
+/// Available at [`CATALOG_URL`].
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct MetaManifest {
+pub struct Catalog {
     pub latest: Latest,
     pub versions: Vec<Version>,
 }
@@ -69,16 +69,16 @@ pub async fn download(
     cx: &mut DownloadRunContext<'_>,
     errors: &mut ErrorVec,
 ) -> Result<()> {
-    let meta_manifest = cx
-        .download_json::<MetaManifest>(META_MANIFEST_URL)
-        .context(info_span!("fetching meta manifest"))
+    let catalog = cx
+        .download_json::<Catalog>(CATALOG_URL)
+        .context(info_span!("fetching catalog"))
         .await?;
     info!(
-        num_versions = meta_manifest.versions.len(),
-        "downloaded Mojang meta manifest"
+        num_versions = catalog.versions.len(),
+        "downloaded Mojang catalog"
     );
 
-    for (index, version) in meta_manifest.versions.into_iter().enumerate() {
+    for (index, version) in catalog.versions.into_iter().enumerate() {
         cx.download_json::<VersionManifest>(
             version.url.clone(),
         )
@@ -90,7 +90,7 @@ pub async fn download(
         .ok();
 
         if (index + 1) % 10 == 0 {
-            info!("downloaded {} version manifests", index);
+            info!("downloaded {index} version manifests");
         }
     }
 

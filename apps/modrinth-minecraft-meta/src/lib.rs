@@ -22,6 +22,10 @@ struct Cli {
 #[derive(Debug, clap::Subcommand)]
 enum Command {
     Download,
+    Prune {
+        #[arg(long)]
+        dry_run: bool,
+    },
 }
 
 pub async fn main() -> Result<()> {
@@ -62,6 +66,7 @@ pub async fn main() -> Result<()> {
 
     match cli.command {
         Command::Download => task::download_from_upstreams(&state).await,
+        Command::Prune { dry_run } => task::prune(&state, dry_run).await,
     }
 }
 

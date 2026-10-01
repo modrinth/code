@@ -7,7 +7,7 @@ use toasty::{
     stmt::{Assign, Assignment, Expr, IntoExpr, List, Path, Type, Value},
 };
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Sha256(pub [u8; 32]);
 
 impl Sha256 {

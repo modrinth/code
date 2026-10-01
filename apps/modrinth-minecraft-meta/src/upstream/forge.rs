@@ -8,10 +8,10 @@ use tracing_anyhow::FutureContext;
 
 use crate::{task::DownloadRunContext, util::ErrorVec};
 
-pub const META_MANIFEST_URL: &str = "https://files.minecraftforge.net/net/minecraftforge/forge/maven-metadata.json";
+pub const CATALOG_URL: &str = "https://files.minecraftforge.net/net/minecraftforge/forge/maven-metadata.json";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MetaManifest(pub HashMap<GameVersionName, Vec<VersionName>>);
+pub struct Catalog(pub HashMap<GameVersionName, Vec<VersionName>>);
 
 #[derive(
     Debug, Display, Clone, PartialEq, Eq, Hash, Serialize, Deserialize,
@@ -27,15 +27,14 @@ pub async fn download(
     cx: &mut DownloadRunContext<'_>,
     _errors: &mut ErrorVec,
 ) -> Result<()> {
-    let meta_manifest = cx
-        .download_json::<MetaManifest>(META_MANIFEST_URL)
-        .context(info_span!("fetching meta manifest"))
+    let catalog = cx
+        .download_json::<Catalog>(CATALOG_URL)
+        .context(info_span!("fetching catalog"))
         .await?;
-    let num_loader_versions =
-        meta_manifest.0.values().map(Vec::len).sum::<usize>();
+    let num_loader_versions = catalog.0.values().map(Vec::len).sum::<usize>();
     info!(
-        num_game_versions = meta_manifest.0.len(),
-        num_loader_versions, "downloaded Forge meta manifest"
+        num_game_versions = catalog.0.len(),
+        num_loader_versions, "downloaded Forge catalog"
     );
 
     Ok(())

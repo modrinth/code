@@ -10,11 +10,10 @@ use crate::{
     util::{ErrorVec, MavenCoordinate},
 };
 
-pub const META_MANIFEST_URL: &str = "https://meta.fabricmc.net/v2/versions";
+pub const CATALOG_URL: &str = "https://meta.fabricmc.net/v2/versions";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MetaManifest {
+pub struct Catalog {
     pub game: Vec<GameVersion>,
     pub mappings: Vec<MappingVersion>,
     pub intermediary: Vec<IntermediaryVersion>,
@@ -28,7 +27,6 @@ pub struct MetaManifest {
 pub struct GameVersionName(pub String);
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct GameVersion {
     pub version: GameVersionName,
     pub stable: bool,
@@ -56,7 +54,6 @@ pub struct MappingVersion {
 pub struct IntermediaryVersionName(pub String);
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct IntermediaryVersion {
     pub maven: MavenCoordinate,
     pub version: IntermediaryVersionName,
@@ -69,7 +66,6 @@ pub struct IntermediaryVersion {
 pub struct LoaderVersionName(pub String);
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct LoaderVersion {
     pub separator: String,
     pub build: u32,
@@ -84,7 +80,6 @@ pub struct LoaderVersion {
 pub struct InstallerVersionName(pub String);
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct InstallerVersion {
     pub url: Url,
     pub maven: MavenCoordinate,
@@ -92,19 +87,44 @@ pub struct InstallerVersion {
     pub stable: bool,
 }
 
+/// Example URL: <https://meta.fabricmc.net/v2/versions/loader/1.21/0.19.5/profile/json>
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GameLoaderProfile {
+    pub id: String,
+}
+
 pub async fn download(
     cx: &mut DownloadRunContext<'_>,
     errors: &mut ErrorVec,
 ) -> Result<()> {
-    let meta_manifest = cx
-        .download_json::<MetaManifest>(META_MANIFEST_URL)
-        .context(info_span!("fetching meta manifest"))
+    /// See `README.md` for an explanation of what we're doing here.
+    const GAME_VERSION: &str = "1.21";
+
+    let catalog = cx
+        .download_json::<Catalog>(CATALOG_URL)
+        .context(info_span!("fetching catalog"))
         .await?;
     info!(
-        num_game_versions = meta_manifest.game.len(),
-        num_loader_versions = meta_manifest.loader.len(),
-        "downloaded Fabric meta manifest"
+        num_game_versions = catalog.game.len(),
+        num_loader_versions = catalog.loader.len(),
+        "downloaded Fabric catalog"
     );
+
+    for (index, loader) in catalog.loader.into_iter().enumerate() {
+        let loader_version = &loader.version;
+        let url = format!(
+            "{CATALOG_URL}/loader/{GAME_VERSION}/{loader_version}/profile/json"
+        );
+
+        cx.download_json::<GameLoaderProfile>(&url)
+            .await
+            .inspect_err(|err| errors.push(err))
+            .ok();
+
+        if (index + 1) % 10 == 0 {
+            info!("downloaded {index} loader profiles");
+        }
+    }
 
     Ok(())
 }

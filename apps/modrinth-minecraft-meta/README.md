@@ -14,13 +14,16 @@ This means that:
 - Given the immutability, we can track the provenance of each entity (game version, loader version, etc.)
 - We still have the option to hide information by not including it in the final manifest upload - e.g. if we no longer want to show a version, we can mark it as `unlisted` in our database, and the final manifest creation won't include it, but it'll still exist in the DB.
 
-## Upstream sources
+## Fabric and Quilt
 
-For Minecraft, our basic building blocks are:
-- `MinecraftVersion`, a single version of the Minecraft game as released by Mojang, such as 26.3 or 25w46a.
-- `MinecraftLoader`, an enum of the kinds of Minecraft mod loaders we support (Fabric, Forge, etc.)
-- `MinecraftLoaderVersion`, a single version of a mod loader release, such as NeoForge 47.1.106 or Fabric 0.19.5.
+Fabric's and Quilt's manifests contain (among other things) two fields:
+- `game`, a list of Minecraft game versions, like `26.4-snapshot-2`
+- `loader`, a list of Fabric loader versions, like `0.19.5`
 
-All of the above data is gathered from upstreams and stored locally. We don't serve a mirror of this data like some other launchers, but we use it for processing into manifests that our app then uses to launch the game. We also mark whether one of these entities is no longer present in an upstream, but if it disappears from our upstream we don't delete it from our local database. This gives us an archive of all upstream manifests, and lets us keep serving an old version even if it's deleted from the upstream (in case the upstream misbehaves or has maintenance issues).
+For each pair of game and loader version, Fabric/Quilt serve a file at the path `/v2/versions/loader/{minecraft_version}/{loader_version}/profile/json`. However, it would be impractical to download and mirror every single file here, especially considering that for any given `loader_version`, the `profile/json` file doesn't change between `minecraft_version`s - usually (foreshadowing). Therefore, instead of downloading every `(minecraft_version, loader_version)` pair, we instead download every `(1.21, loader_version)` pair - that is, `minecraft_version` is always 1.21[^1], but `loader_version` varies. We fix up this downloadad manifest and replace `1.21` with `${modrinth.gameVersion}`; then when a client downloads our manifests, they replace `${modrinth.gameVersion}` back to whatever game version they want to play.
 
-##
+However, this doesn't always work. Specifically with Quilt, and Minecraft version 26 and later, there was a change to how the `hashed` field is treated, so we need special behavior here. This is where version groups come in.
+
+TODO explain version groups
+
+[^1]: Don't ask me why we picked 1.21 specifically, I don't know.
