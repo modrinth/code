@@ -13,9 +13,9 @@ use eyre::{Result, WrapErr, eyre};
 use windows::{
     Win32::{
         Foundation::{
-            DUPLICATE_SAME_ACCESS, DuplicateHandle, GENERIC_READ,
-            GENERIC_WRITE, HANDLE, HANDLE_FLAG_INHERIT, SetHandleInformation,
-            TRUE,
+            DUPLICATE_SAME_ACCESS, DuplicateHandle, ERROR_INSUFFICIENT_BUFFER,
+            GENERIC_READ, GENERIC_WRITE, HANDLE, HANDLE_FLAG_INHERIT,
+            SetHandleInformation, TRUE,
         },
         Security::SECURITY_ATTRIBUTES,
         Storage::FileSystem::{
@@ -47,7 +47,7 @@ use windows::{
             },
         },
     },
-    core::Free,
+    core::{HRESULT, Free},
 };
 
 use crate::{
