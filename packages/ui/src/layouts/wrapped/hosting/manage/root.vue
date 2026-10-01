@@ -129,6 +129,20 @@
 						/>
 					</template>
 
+					<template v-if="serverData.locked_since" #badges>
+						<PageHeaderBadgeItem
+							:icon="LockIcon"
+							:tooltip="
+								formatMessage(lockMessages.lockedBadgeTooltip, {
+									date: formatDateTime(serverData.locked_since),
+								})
+							"
+							class="border-highlight-red bg-highlight-red !text-red"
+						>
+							{{ formatMessage(lockMessages.lockedBadge) }}
+						</PageHeaderBadgeItem>
+					</template>
+
 					<template #metadata>
 						<PageHeaderMetadata>
 							<PageHeaderMetadataItem
@@ -361,6 +375,7 @@ import PageHeader from '#ui/components/base/page-header/index.vue'
 import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.vue'
 import PageHeaderMetadataItem from '#ui/components/base/page-header/metadata/page-header-metadata-item.vue'
 import PageHeaderActions from '#ui/components/base/page-header/page-header-actions.vue'
+import PageHeaderBadgeItem from '#ui/components/base/page-header/page-header-badge-item.vue'
 import ServerNotice from '#ui/components/base/ServerNotice.vue'
 import TagIcon from '#ui/components/base/TagIcon.vue'
 import { Tooltip } from '#ui/components/floating'
@@ -525,6 +540,14 @@ void props.resolveViewer().then(({ userRole }) => {
 const formatDateTime = useFormatDateTime({ dateStyle: 'long', timeStyle: 'short' })
 
 const lockMessages = defineMessages({
+	lockedBadge: {
+		id: 'servers.manage.locked.badge',
+		defaultMessage: 'Locked',
+	},
+	lockedBadgeTooltip: {
+		id: 'servers.manage.locked.badge-tooltip',
+		defaultMessage: 'Locked since {date}',
+	},
 	lockedHeader: {
 		id: 'servers.manage.locked.header',
 		defaultMessage: 'This server is locked',
