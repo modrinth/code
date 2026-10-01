@@ -11,7 +11,7 @@
 			/>
 		</template>
 
-		<template v-if="isOfficialAccount || showAffiliateBadge" #badges>
+		<template v-if="isOfficialAccount || showAffiliateBadge || user.lock" #badges>
 			<PageHeaderBadgeItem
 				v-if="isOfficialAccount"
 				:icon="BadgeCheckIcon"
@@ -27,6 +27,14 @@
 				class="border-brand-highlight bg-brand-highlight text-brand"
 			>
 				{{ formatMessage(messages.affiliateLabel) }}
+			</PageHeaderBadgeItem>
+			<PageHeaderBadgeItem
+				v-if="user.lock"
+				:icon="LockIcon"
+				:tooltip="user.lock.reason"
+				class="border-highlight-red bg-highlight-red !text-red"
+			>
+				{{ formatMessage(messages.lockedLabel) }}
 			</PageHeaderBadgeItem>
 		</template>
 
@@ -99,6 +107,8 @@ import {
 	DownloadIcon,
 	EditIcon,
 	InfoIcon,
+	LockIcon,
+	LockOpenIcon,
 	MoreVerticalIcon,
 	ReportIcon,
 } from '@modrinth/assets'
@@ -174,6 +184,18 @@ const messages = defineMessages({
 		id: 'profile.button.set-affiliate',
 		defaultMessage: 'Set as affiliate',
 	},
+	lockedLabel: {
+		id: 'profile.label.locked',
+		defaultMessage: 'Locked',
+	},
+	lockButton: {
+		id: 'profile.button.lock',
+		defaultMessage: 'Lock account',
+	},
+	unlockButton: {
+		id: 'profile.button.unlock',
+		defaultMessage: 'Unlock account',
+	},
 })
 
 const props = withDefaults(
@@ -224,6 +246,7 @@ const emit = defineEmits<{
 	openSharedInstances: []
 	openAnalytics: []
 	editUser: []
+	toggleLock: []
 }>()
 
 const { formatMessage } = useVIntl()
@@ -299,6 +322,14 @@ const moreActions = computed<ButtonMenuOption[]>(() => [
 		action: () => emit('openInfo'),
 		tone: 'orange',
 		shown: props.showStaffActions && props.isStaff,
+	},
+	{
+		id: 'toggle-lock',
+		label: formatMessage(props.user.lock ? messages.unlockButton : messages.lockButton),
+		icon: props.user.lock ? LockOpenIcon : LockIcon,
+		action: () => emit('toggleLock'),
+		tone: 'red',
+		shown: props.showStaffActions && props.isAdmin && props.user.role === 'developer',
 	},
 	{
 		id: 'open-shared-instances',
