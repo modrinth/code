@@ -344,7 +344,7 @@ impl<'a> InstanceContent<'a> {
     ) -> crate::Result<PendingContentChange> {
         self.content_scope()?;
         let canonical_path = canonical_content_path(project_path);
-        let file = content_rows::get_instance_file_by_relative_path(
+        let mut file = content_rows::get_instance_file_by_relative_path(
             &self.instance.id,
             canonical_path,
             &self.state.pool,
@@ -365,6 +365,7 @@ impl<'a> InstanceContent<'a> {
         )
         .await?;
         let enabled = desired_enabled.unwrap_or(!file.enabled);
+		file.missing = false;
         let file_change = match self
             .state
             .content_store
@@ -393,13 +394,14 @@ impl<'a> InstanceContent<'a> {
                             .await?
                     }
                     InstanceFileStatus::Missing => {
+						file.missing = !enabled;
                         self.state
                             .content_store
                             .prepare_file_change(
                                 &self.instance,
                                 FileChangeRequest {
                                     relative_path: canonical_path,
-                                    replacement: Some(&stored_file),
+                                    replacement: enabled.then_some(&stored_file),
                                     enabled,
                                     legacy_path: None,
                                     previous_content: None,
@@ -414,17 +416,31 @@ impl<'a> InstanceContent<'a> {
                     }
                 }
             }
-            FileContent::Damaged(binding) if !enabled => {
-                self.state
-                    .content_store
-                    .prepare_file_move(&self.instance, &file, &binding, false)
-                    .await?
-            }
-            FileContent::Damaged(_) => {
-                return Err(input(
-                    "Content needs repair or re-import before it can be enabled",
-                ));
-            }
+			FileContent::Damaged(binding) => {
+				match self.state.content_store.check_instance_file(&self.instance, &file, &binding).await? {
+					InstanceFileStatus::Healthy => self.state.content_store
+						.prepare_file_move(&self.instance, &file, &binding, enabled).await?,
+					InstanceFileStatus::Missing if !enabled => {
+						file.missing = true;
+						self.state.content_store.prepare_file_change(
+							&self.instance,
+							FileChangeRequest {
+								relative_path: canonical_path,
+								replacement: None,
+								enabled,
+								legacy_path: None,
+								previous_content: None,
+							},
+						).await?
+					}
+					InstanceFileStatus::Missing => return Err(input(
+						"Content needs repair or re-import before it can be enabled",
+					)),
+					InstanceFileStatus::Conflict => return Err(input(
+						"Content was changed outside the app; resolve the conflict first",
+					)),
+				}
+			}
             FileContent::Unmanaged => {
                 let physical_path = content_file_path(&file);
                 let path = self
@@ -685,7 +701,6 @@ impl<'a> InstanceContent<'a> {
             PreparedChange::Toggle { file, enabled } => {
                 let mut updated = file.clone();
                 updated.enabled = *enabled;
-                updated.missing = false;
                 updated.modified_at = Utc::now();
                 let updated =
                     content_rows::upsert_instance_file(&updated, &mut tx)
