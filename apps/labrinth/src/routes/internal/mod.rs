@@ -141,6 +141,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		moderation::external_license::add_file,
 		moderation::external_license::reassign_file,
 		moderation::external_license::update_license,
+		admin::user_lock::lock_user,
+		admin::user_lock::unlock_user,
 		affiliate::ingest_click,
 		affiliate::get_all,
 		affiliate::create,

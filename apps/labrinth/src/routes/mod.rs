@@ -1,3 +1,4 @@
+use crate::auth::AuthenticationError;
 use crate::database::PgPool;
 use crate::database::models::DBProjectId;
 use crate::env::ENV;
@@ -445,6 +446,16 @@ impl ApiError {
         }
     }
 
+    pub fn is_account_locked(&self) -> bool {
+        matches!(
+            self,
+            Self::Auth(report) if matches!(
+                report.downcast_ref::<AuthenticationError>(),
+                Some(AuthenticationError::AccountLocked)
+            )
+        )
+    }
+
     pub fn as_api_error<'a>(&self) -> crate::models::error::ApiError<'a> {
         let report = match self {
             Self::Internal(report)
@@ -466,8 +477,11 @@ impl ApiError {
         let validation = report
             .downcast_ref::<v3::projects::validate::ProjectValidationError>();
 
+        let account_locked = self.is_account_locked();
+
         crate::models::error::ApiError {
             error: match self {
+                _ if account_locked => "account_locked",
                 Self::Internal(..) => "internal_error",
                 Self::Request(..) => "request_error",
                 Self::Auth(..) => "auth_error",
@@ -478,7 +492,11 @@ impl ApiError {
                 Self::PreconditionFailed(..) => "precondition_failed",
                 Self::RateLimit(..) => "ratelimit_error",
             },
-            description: report.to_string(),
+            description: if account_locked {
+                AuthenticationError::AccountLocked.to_string()
+            } else {
+                report.to_string()
+            },
             details: validation
                 .map(|error| serde_json::json!({ "nags": error.0 }))
                 .or_else(|| {
@@ -493,6 +511,7 @@ impl actix_web::ResponseError for ApiError {
         match self {
             Self::Internal(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Request(..) => StatusCode::BAD_REQUEST,
+            Self::Auth(..) if self.is_account_locked() => StatusCode::FORBIDDEN,
             Self::Auth(..) => StatusCode::UNAUTHORIZED,
             Self::NotFound(..) => StatusCode::NOT_FOUND,
             Self::Conflict(..) => StatusCode::CONFLICT,
@@ -511,6 +530,20 @@ impl actix_web::ResponseError for ApiError {
 #[cfg(test)]
 mod tests {
     use super::ApiError;
+    use crate::auth::AuthenticationError;
+    use actix_web::ResponseError;
+    use actix_web::http::StatusCode;
+
+    #[test]
+    fn api_error_reports_locked_account_as_forbidden() {
+        let error = ApiError::Auth(
+            eyre::Report::new(AuthenticationError::AccountLocked)
+                .wrap_err("authenticating API request"),
+        );
+
+        assert_eq!(error.status_code(), StatusCode::FORBIDDEN);
+        assert_eq!(error.as_api_error().error, "account_locked");
+    }
 
     #[test]
     fn api_error_serializes_source_chain_as_details() {

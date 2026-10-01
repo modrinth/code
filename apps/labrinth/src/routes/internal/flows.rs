@@ -7,6 +7,7 @@ use crate::database::PgTransaction;
 use crate::database::models::flow_item::DBFlow;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::session_item::DBSession;
+use crate::database::models::user_lock_item::DBUserLock;
 use crate::database::models::{DBPasskey, DBPasskeyId, DBUser, DBUserId};
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
@@ -327,6 +328,7 @@ impl TempUser {
             allow_friend_requests: true,
             is_subscribed_to_newsletter: sign_up_newsletter,
             eligibility_verified_at: Some(Utc::now()),
+            lock: None,
         }
         .insert(transaction)
         .await
@@ -1361,6 +1363,10 @@ pub async fn auth_callback(
                 "attempting to link a PayPal account without being logged in",
             )?;
 
+            if DBUserLock::exists(existing_user_id, &mut transaction).await? {
+                return Err(AuthenticationError::AccountLocked);
+            }
+
             sqlx::query!(
                 "
                 UPDATE users
@@ -2114,6 +2120,7 @@ impl ReadyAccountRegisterFlow {
             allow_friend_requests: true,
             is_subscribed_to_newsletter: register_flow.sign_up_newsletter,
             eligibility_verified_at: Some(Utc::now()),
+            lock: None,
         }
         .insert(transaction)
         .await;
@@ -2912,7 +2919,7 @@ pub async fn reset_password_begin(
         id: user_id,
         email: user_email,
         ..
-    }) = user
+    }) = user.filter(|user| !user.is_locked())
     {
         let flow = DBFlow::ForgotPassword { user_id }
             .insert(Duration::hours(24), &redis)
@@ -2982,6 +2989,12 @@ pub async fn change_password(
             .wrap_internal_err("fetching user from database")?
             .ok_or_else(|| AuthenticationError::InvalidCredentials)
             .wrap_auth_err("fetching user from database")?;
+
+            if user.is_locked() {
+                return Err(ApiError::Auth(
+                    AuthenticationError::AccountLocked.into(),
+                ));
+            }
 
             Some(user)
         } else {
