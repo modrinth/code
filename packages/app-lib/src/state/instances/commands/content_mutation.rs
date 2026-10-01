@@ -365,7 +365,7 @@ impl<'a> InstanceContent<'a> {
         )
         .await?;
         let enabled = desired_enabled.unwrap_or(!file.enabled);
-		file.missing = false;
+        file.missing = false;
         let file_change = match self
             .state
             .content_store
@@ -394,14 +394,15 @@ impl<'a> InstanceContent<'a> {
                             .await?
                     }
                     InstanceFileStatus::Missing => {
-						file.missing = !enabled;
+                        file.missing = !enabled;
                         self.state
                             .content_store
                             .prepare_file_change(
                                 &self.instance,
                                 FileChangeRequest {
                                     relative_path: canonical_path,
-                                    replacement: enabled.then_some(&stored_file),
+                                    replacement: enabled
+                                        .then_some(&stored_file),
                                     enabled,
                                     legacy_path: None,
                                     previous_content: None,
@@ -416,31 +417,52 @@ impl<'a> InstanceContent<'a> {
                     }
                 }
             }
-			FileContent::Damaged(binding) => {
-				match self.state.content_store.check_instance_file(&self.instance, &file, &binding).await? {
-					InstanceFileStatus::Healthy => self.state.content_store
-						.prepare_file_move(&self.instance, &file, &binding, enabled).await?,
-					InstanceFileStatus::Missing if !enabled => {
-						file.missing = true;
-						self.state.content_store.prepare_file_change(
-							&self.instance,
-							FileChangeRequest {
-								relative_path: canonical_path,
-								replacement: None,
-								enabled,
-								legacy_path: None,
-								previous_content: None,
-							},
-						).await?
-					}
-					InstanceFileStatus::Missing => return Err(input(
-						"Content needs repair or re-import before it can be enabled",
-					)),
-					InstanceFileStatus::Conflict => return Err(input(
-						"Content was changed outside the app; resolve the conflict first",
-					)),
-				}
-			}
+            FileContent::Damaged(binding) => {
+                match self
+                    .state
+                    .content_store
+                    .check_instance_file(&self.instance, &file, &binding)
+                    .await?
+                {
+                    InstanceFileStatus::Healthy => {
+                        self.state
+                            .content_store
+                            .prepare_file_move(
+                                &self.instance,
+                                &file,
+                                &binding,
+                                enabled,
+                            )
+                            .await?
+                    }
+                    InstanceFileStatus::Missing if !enabled => {
+                        file.missing = true;
+                        self.state
+                            .content_store
+                            .prepare_file_change(
+                                &self.instance,
+                                FileChangeRequest {
+                                    relative_path: canonical_path,
+                                    replacement: None,
+                                    enabled,
+                                    legacy_path: None,
+                                    previous_content: None,
+                                },
+                            )
+                            .await?
+                    }
+                    InstanceFileStatus::Missing => {
+                        return Err(input(
+                            "Content needs repair or re-import before it can be enabled",
+                        ));
+                    }
+                    InstanceFileStatus::Conflict => {
+                        return Err(input(
+                            "Content was changed outside the app; resolve the conflict first",
+                        ));
+                    }
+                }
+            }
             FileContent::Unmanaged => {
                 let physical_path = content_file_path(&file);
                 let path = self
