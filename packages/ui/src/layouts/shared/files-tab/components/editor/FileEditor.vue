@@ -2,6 +2,7 @@
 	<div
 		ref="editorContainer"
 		class="relative flex flex-col overflow-hidden"
+		:class="{ 'h-full': props.fillHeight }"
 	>
 		<EditorFindReplace
 			ref="findReplaceRef"
@@ -25,15 +26,21 @@
 			theme="modrinth"
 			:readonly="isEditorReadOnly"
 			:print-margin="false"
-			:style="{ height: editorHeight, fontSize: '0.875rem' }"
-			class="ace-modrinth rounded-[20px]"
+			:style="{ height: props.fillHeight ? undefined : editorHeight, fontSize: '0.875rem' }"
+			class="ace-modrinth"
+			:class="props.fillHeight ? 'min-h-0 flex-1' : 'rounded-[20px]'"
 			@init="onEditorInit"
 		/>
-		<FileImageViewer v-else-if="isEditingImage && imagePreview" :image-blob="imagePreview" />
+		<FileImageViewer
+			v-else-if="isEditingImage && imagePreview"
+			:image-blob="imagePreview"
+			:class="{ '!h-full !rounded-none': props.fillHeight }"
+		/>
 		<div
 			v-else-if="isLoading || !props.editorComponent"
-			class="flex items-center justify-center rounded-[20px] bg-bg-raised"
-			:style="{ height: editorHeight }"
+			class="flex items-center justify-center bg-bg-raised"
+			:class="props.fillHeight ? 'min-h-0 flex-1' : 'rounded-[20px]'"
+			:style="{ height: props.fillHeight ? undefined : editorHeight }"
 		>
 			<SpinnerIcon class="h-8 w-8 animate-spin text-secondary" />
 		</div>
@@ -58,6 +65,8 @@ import FileImageViewer from './FileImageViewer.vue'
 const props = defineProps<{
 	file: EditingFile | null
 	editorComponent: Component | null
+	/** Fill the parent's height (e.g. a dockview panel) instead of sizing to the window. */
+	fillHeight?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -130,6 +139,7 @@ const findReplaceRef = ref<{ focusFindInput: () => void; openReplace: () => void
 watch(inFileFindQuery, handleFindInput)
 
 function updateEditorHeight() {
+	if (props.fillHeight) return
 	if (editorContainer.value) {
 		const top = editorContainer.value.getBoundingClientRect().top
 		const padding = 24
@@ -171,7 +181,7 @@ watch(
 async function loadFileContent(file: { name: string; path: string }) {
 	isLoading.value = true
 	try {
-		window.scrollTo(0, 0)
+		if (!props.fillHeight) window.scrollTo(0, 0)
 		const extension = getFileExtension(file.name)
 		const normalizedPath = file.path.startsWith('/') ? file.path : `/${file.path}`
 

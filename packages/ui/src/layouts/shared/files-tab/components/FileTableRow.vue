@@ -1,38 +1,65 @@
 <template>
-	<Tooltip :disabled="containerWidth != null ? (containerWidth > 900 ? showDetails : false) : showDetails" :allow-hover="true">
+	<Tooltip :disabled="detailsTooltipDisabled" :allow-hover="true">
 		<li
 			role="option"
-			:class="[containerClasses, isDragSource ? 'opacity-50' : '']"
+			:class="[containerClasses, isDragSource ? 'opacity-50' : '', compact ? 'h-9' : 'h-[52.8px]']"
+			:style="depth != null ? { paddingLeft: `${0.5 + depth}rem` } : undefined"
 			tabindex="0"
 			:data-file-path="path"
 			:data-file-type="type"
+			:aria-expanded="isTreeRow && type === 'directory' ? expanded : undefined"
+			:aria-current="active ? 'location' : undefined"
 			@click="selectItem"
+			@auxclick="handleAuxClick"
 			@contextmenu="openContextMenu"
-			@keydown="(e) => e.key === 'Enter' && selectItem()"
+			@keydown="handleKeydown"
 			@mouseenter="handleMouseEnter"
 			@mouseleave="handleMouseLeave"
 			@pointerdown="handlePointerDown"
-			class="h-[52.8px]"
 		>
-			<div class="pointer-events-none flex flex-1 items-center gap-3 truncate">
+			<span
+				v-for="level in depth ?? 0"
+				:key="level"
+				aria-hidden="true"
+				class="pointer-events-none absolute inset-y-0 w-px"
+				:class="level === activeGuideLevel ? 'bg-brand' : 'bg-surface-5'"
+				:style="{ left: `${level + 0.125}rem` }"
+			/>
+			<div class="pointer-events-none flex flex-1 items-center truncate" :class="compact ? 'gap-2' : 'gap-3'">
+				<button
+					v-if="isTreeRow && type === 'directory'"
+					type="button"
+					tabindex="-1"
+					class="pointer-events-auto -mr-1 flex size-5 shrink-0 items-center justify-center rounded border-none bg-transparent p-0 text-secondary hover:bg-surface-5 hover:text-contrast"
+					:aria-label="formatMessage(expanded ? messages.collapseFolder : messages.expandFolder)"
+					@click.stop="emit('toggle-expand')"
+					@pointerdown.stop
+				>
+					<ChevronRightIcon class="size-4 transition-transform duration-100" :class="{ 'rotate-90': expanded }" />
+				</button>
+				<span v-else-if="isTreeRow" class="-mr-1 size-5 shrink-0" aria-hidden="true" />
 				<Checkbox v-if="!selectionWithinActionMenu"
 					class="pointer-events-auto"
 					:model-value="selected"
 					@click.stop
 					@update:model-value="emit('toggle-select')"
 				/>
-				<div class="pointer-events-none flex size-5 items-center justify-center">
+				<div class="pointer-events-none flex size-5 shrink-0 items-center justify-center">
 					<component
 						:is="iconComponent"
-						class="size-5 group-hover:text-contrast group-focus:text-contrast"
+						class="group-hover:text-contrast group-focus:text-contrast"
+						:class="compact ? 'size-4' : 'size-5'"
 					/>
 				</div>
 				<div class="pointer-events-none flex flex-col truncate">
-					<span class="pointer-events-none truncate group-hover:text-contrast group-focus:text-contrast">
+					<span
+						class="pointer-events-none truncate group-hover:text-contrast group-focus:text-contrast"
+						:class="{ 'text-sm': compact, 'font-semibold text-contrast': active }"
+					>
 						{{ name }}
 					</span>
 				</div>
-				<EditIcon v-if="hoveringToEdit && isEditableFile" />
+				<EditIcon v-if="hoveringToEdit && isEditableFile && !compact" />
 			</div>
 			<div class="pointer-events-auto flex w-fit flex-shrink-0 items-center gap-4 @[900px]:gap-12">
 				<span v-if="showDetails" class="hidden w-[100px] text-nowrap text-sm text-secondary @[900px]:block">
@@ -101,6 +128,7 @@
 import {
 	BoxIcon,
 	BracesIcon,
+	ChevronRightIcon,
 	ClipboardCopyIcon,
 	DownloadIcon,
 	EditIcon,
@@ -112,6 +140,7 @@ import {
 	MoreHorizontalIcon,
 	PackageOpenIcon,
 	PaintbrushIcon,
+	PlusIcon,
 	RightArrowIcon,
 	TrashIcon,
 } from '@modrinth/assets'
@@ -135,6 +164,7 @@ import {
 	startFileDrag,
 	wasRecentDrag,
 } from '../composables/file-drag-state'
+import { useShiftKey } from '../composables/shift-key'
 import { injectFileManager } from '../providers/file-manager'
 import type { FileItem } from '../types'
 import { joinDisplayPath } from '../utils'
@@ -165,6 +195,18 @@ const messages = defineMessages({
 		id: 'files.table-header.modified',
 		defaultMessage: 'Modified',
 	},
+	openInNewTab: {
+		id: 'files.row.open-in-new-tab',
+		defaultMessage: 'Open in new tab',
+	},
+	expandFolder: {
+		id: 'files.row.expand-folder',
+		defaultMessage: 'Expand folder',
+	},
+	collapseFolder: {
+		id: 'files.row.collapse-folder',
+		defaultMessage: 'Collapse folder',
+	},
 })
 
 const props = defineProps<
@@ -177,6 +219,16 @@ const props = defineProps<
 		showDetails: boolean
 		containerWidth?: number | undefined
 		selectionWithinActionMenu?: boolean
+		/** Smaller row, used by the sidebar tree. */
+		compact?: boolean
+		/** Nesting level in the sidebar tree; indents the row. */
+		depth?: number
+		/** Whether this tree row's directory is expanded. Leave undefined for non-tree rows. */
+		expanded?: boolean
+		/** Highlights the row as the active tab's current location. */
+		active?: boolean
+		/** Tree guide level (1-based) to highlight, marking the directory the active location is in. */
+		activeGuideLevel?: number
 	}
 >()
 
@@ -191,7 +243,8 @@ const emit = defineEmits<{
 			| 'edit'
 			| 'extract'
 			| 'hover'
-			| 'navigate',
+			| 'navigate'
+			| 'open-in-new-tab',
 		item: Pick<FileItem, 'name' | 'type' | 'path'>,
 	): void
 	(
@@ -200,7 +253,20 @@ const emit = defineEmits<{
 	): void
 	(e: 'contextmenu', event: MouseEvent, options: ButtonMenuOption[]): void
 	(e: 'toggle-select'): void
+	(e: 'toggle-expand'): void
 }>()
+
+const isTreeRow = computed(() => props.expanded !== undefined)
+
+const shiftHeld = useShiftKey()
+
+/** Compact rows only show details while Shift is held; full rows show them when the columns are hidden. */
+const detailsTooltipDisabled = computed(() => {
+	if (props.compact) return !shiftHeld.value
+	if (props.containerWidth != null) return props.containerWidth > 900 ? props.showDetails : false
+	return props.showDetails
+})
+const canOpenInTab = computed(() => props.type === 'directory' || isEditableFile.value)
 
 const isDropTarget = computed(
 	() => fileDragActive.value && fileDragTarget.value === props.path && props.type === 'directory',
@@ -220,14 +286,19 @@ const formatBytes = useFormatBytes()
 const containerClasses = computed(() => {
 	const dropTarget = isDropTarget.value
 	return [
-		'group m-0 flex w-full select-none items-center justify-between overflow-hidden border-0 border-t border-solid border-surface-4 pl-3 pr-3 py-2 focus:!outline-none',
+		'group relative m-0 flex w-full select-none items-center justify-between overflow-hidden border-0 border-solid border-surface-4 pl-3 focus:!outline-none',
+		props.compact ? 'rounded-lg py-1 pr-1' : 'border-t py-2 pr-3',
 		dropTarget
 			? '!bg-brand-highlight'
-			: props.selected
-				? 'bg-surface-2.5'
-				: props.index % 2 === 0
-					? 'bg-surface-2'
-					: 'bg-surface-1.5',
+			: props.active
+				? 'bg-brand-highlight'
+				: props.selected
+					? 'bg-surface-2.5'
+					: props.compact
+						? 'bg-transparent'
+						: props.index % 2 === 0
+							? 'bg-surface-2'
+							: 'bg-surface-1.5',
 		props.isLast ? '' : '',
 		isEditableFile.value || props.type === 'directory' ? 'cursor-pointer hover:bg-surface-2.5' : '',
 		'transition-colors duration-100 focus:!outline-none',
@@ -255,6 +326,13 @@ const menuOptions = computed<ButtonMenuOption[]>(() => {
 				emit('toggle-select')
 			},
 			shown: props.selectionWithinActionMenu,
+		},
+		{
+			id: 'open-in-new-tab',
+			label: formatMessage(messages.openInNewTab),
+			icon: PlusIcon,
+			shown: canOpenInTab.value,
+			action: () => emit('open-in-new-tab', item),
 		},
 		{
 			id: 'copy-filename',
@@ -396,8 +474,13 @@ function handleMouseLeave() {
 
 const isNavigating = ref(false)
 
-function selectItem() {
-	if (isNavigating.value || wasRecentDrag()) return
+function selectItem(event?: MouseEvent) {
+	if (wasRecentDrag()) return
+	if (event?.ctrlKey || event?.metaKey) {
+		emit('toggle-select')
+		return
+	}
+	if (isNavigating.value) return
 	isNavigating.value = true
 
 	const item = { name: props.name, type: props.type, path: props.path }
@@ -410,6 +493,21 @@ function selectItem() {
 	setTimeout(() => {
 		isNavigating.value = false
 	}, 500)
+}
+
+function handleAuxClick(event: MouseEvent) {
+	if (event.button !== 1 || !canOpenInTab.value) return
+	event.preventDefault()
+	emit('open-in-new-tab', { name: props.name, type: props.type, path: props.path })
+}
+
+function handleKeydown(event: KeyboardEvent) {
+	if (event.key === 'Enter') {
+		selectItem()
+	} else if (isTreeRow.value && props.type === 'directory') {
+		if (event.key === 'ArrowRight' && !props.expanded) emit('toggle-expand')
+		if (event.key === 'ArrowLeft' && props.expanded) emit('toggle-expand')
+	}
 }
 
 function handlePointerDown(e: PointerEvent) {

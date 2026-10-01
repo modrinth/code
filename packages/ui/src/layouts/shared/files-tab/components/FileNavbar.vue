@@ -2,8 +2,28 @@
 	<FileActionBar  ref="baseRef" v-bind="{ ...$props, ...$attrs }">
 		<nav v-if="breadcrumbs != null"
 		 	:aria-label="formatMessage(messages.breadcrumbNavigation)"
-		 	class="m-0 -ml-2 min-w-0 flex-shrink p-0"
+		 	class="m-0 -ml-2 flex min-w-0 flex-shrink items-center p-0"
 		>
+			<div class="mr-1 flex shrink-0 items-center">
+				<IconButton
+					v-tooltip="formatMessage(messages.back)"
+					type="quiet"
+					:label="formatMessage(messages.back)"
+					:disabled="!canGoBack"
+					@click="$emit('back')"
+				>
+					<ChevronLeftIcon />
+				</IconButton>
+				<IconButton
+					v-tooltip="formatMessage(messages.forward)"
+					type="quiet"
+					:label="formatMessage(messages.forward)"
+					:disabled="!canGoForward"
+					@click="$emit('forward')"
+				>
+					<ChevronRightIcon />
+				</IconButton>
+			</div>
 			<ol
 				ref="breadcrumbOuter"
 				class="m-0 flex min-w-0 flex-shrink items-center overflow-hidden p-0"
@@ -68,7 +88,7 @@
 								:class="{
 												'!text-contrast': !isEditing && index === breadcrumbs.length - 1,
 											}"
-								@click="$emit('navigate', 0)"
+								@click="$emit('navigate', index)"
 							>
 								{{ segment || '' }}
 							</Button>
@@ -94,8 +114,8 @@
 
 import FileActionBar from "#ui/layouts/shared/files-tab/components/FileActionBar.vue";
 import type {Properties, EmitCallbacks} from "#ui/layouts/shared/files-tab/components/FileActionBar.vue";
-import {Button} from "#ui/components/base/buttons";
-import {ChevronRightIcon, HomeIcon} from "@modrinth/assets";
+import {Button, IconButton} from "#ui/components/base/buttons";
+import {ChevronLeftIcon, ChevronRightIcon, HomeIcon} from "@modrinth/assets";
 import {onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {defineMessages, useVIntl} from "#ui/composables";
 
@@ -113,6 +133,14 @@ const messages = defineMessages({
 	home: {
 		id: 'files.navbar.home',
 		defaultMessage: 'Home',
+	},
+	back: {
+		id: 'files.navbar.back',
+		defaultMessage: 'Back',
+	},
+	forward: {
+		id: 'files.navbar.forward',
+		defaultMessage: 'Forward',
 	},
 })
 
@@ -132,6 +160,8 @@ const props = withDefaults(
 		breadcrumbs: string[]
 		isEditing: boolean
 		editingFileName?: string
+		canGoBack?: boolean
+		canGoForward?: boolean
 	} & Properties>(),
 	{
 		hasNav: true,
@@ -142,6 +172,8 @@ defineEmits<{
 	navigate: [index: number]
 	navigateHome?: []
 	prefetchHome?: []
+	back: []
+	forward: []
 } /*& EmitCallbacks*/>()
 
 const breadcrumbOuter = ref<HTMLElement | null>(null)

@@ -11,16 +11,25 @@ import type {
 	UploadState,
 } from '../types'
 
-export interface DirectoryQuery {
-	items: ComputedRef<FileItem[]>,
-	isLoading: Ref<boolean>,
-	filesReadyPending: ComputedRef<boolean>
-	loadError: Ref<Error | null>,
+export interface DirectoryEntries {
+	items: ComputedRef<FileItem[]>
+	isLoading: Ref<boolean>
+	loadError: Ref<Error | null>
 }
 
+export interface DirectoryQuery extends DirectoryEntries {
+	filesReadyPending: ComputedRef<boolean>
+}
+
+/**
+ * Lazily loaded, cached directory listings used by the sidebar tree. Paths are absolute
+ * (`/`, `/config`, `/config/sub`), independent of `currentPath`.
+ */
 export interface DirectoryTree {
-	getEntries: (path: string) => Ref<FileItem[]>
-	prefetch: (path: string) => void;
+	/** Returns the (cached) listing for `path`, starting to load it on first access. */
+	get: (path: string) => DirectoryEntries
+	prefetch: (path: string) => void
+	/** Absolute paths of the directories expanded in the tree. Owned by the host so it survives remounts. */
 	expandedEntries: Ref<string[]>
 }
 

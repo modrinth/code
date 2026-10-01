@@ -3,41 +3,55 @@ import { computed, ref } from 'vue'
 
 import type { FileItem } from '../types'
 
+/**
+ * Selection of file entries, keyed by path. Entries can come from any directory (e.g. the sidebar
+ * tree), so the items themselves are kept rather than looked up in the current listing.
+ * `allSelected` / `someSelected` / `toggleSelectAll` refer to the given listing `items`.
+ */
 export function useFileSelection(items: Ref<FileItem[]>) {
-	const selectedItems = ref<Set<string>>(new Set())
+	const selectedItems = ref(new Map<string, FileItem>())
 
-	function toggleItemSelection(path: string) {
-		const newSet = new Set(selectedItems.value)
-		if (newSet.has(path)) {
-			newSet.delete(path)
+	function toggleItemSelection(item: FileItem) {
+		const next = new Map(selectedItems.value)
+		if (next.has(item.path)) {
+			next.delete(item.path)
 		} else {
-			newSet.add(path)
+			next.set(item.path, item)
 		}
-		selectedItems.value = newSet
+		selectedItems.value = next
 	}
 
 	function selectAll() {
-		selectedItems.value = new Set(items.value.map((i) => i.path))
+		const next = new Map(selectedItems.value)
+		for (const item of items.value) next.set(item.path, item)
+		selectedItems.value = next
 	}
 
 	function deselectAll() {
-		selectedItems.value = new Set()
+		selectedItems.value = new Map()
+	}
+
+	function deselectListed() {
+		const next = new Map(selectedItems.value)
+		for (const item of items.value) next.delete(item.path)
+		selectedItems.value = next
 	}
 
 	function toggleSelectAll() {
 		if (allSelected.value) {
-			deselectAll()
+			deselectListed()
 		} else {
 			selectAll()
 		}
 	}
 
 	const allSelected = computed(
-		() => items.value.length > 0 && selectedItems.value.size === items.value.length,
+		() =>
+			items.value.length > 0 && items.value.every((item) => selectedItems.value.has(item.path)),
 	)
 
 	const someSelected = computed(
-		() => selectedItems.value.size > 0 && selectedItems.value.size < items.value.length,
+		() => !allSelected.value && items.value.some((item) => selectedItems.value.has(item.path)),
 	)
 
 	return {

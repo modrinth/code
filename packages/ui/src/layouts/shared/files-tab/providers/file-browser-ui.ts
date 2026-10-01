@@ -3,13 +3,14 @@ import type { Component, ComputedRef, Ref, ShallowRef } from 'vue'
 import type { ButtonMenuOption } from '#ui/components'
 import { createContext } from '#ui/providers/create-context'
 
+import type { FileTabs } from '../composables/file-tabs'
 import type { FileItem, FileSortField } from '../types'
 
 export type FileInfo = Pick<FileItem, 'name' | 'type' | 'path'>
 
 /**
- * API exposed by whichever panel currently hosts the file editor (FileBrowserPanel),
- * registered here on mount since dockview panels aren't reachable via template refs.
+ * API exposed by each tab's file editor, registered on `FileTabs` on mount
+ * since dockview panels aren't reachable via template refs.
  */
 export interface FileEditorBridge {
 	hasUnsavedChanges: Ref<boolean> | ComputedRef<boolean>
@@ -33,7 +34,8 @@ export interface FileBrowserUIContext {
 	busyTooltip: ComputedRef<string | undefined>
 	breadcrumbSegments: ComputedRef<string[]>
 	sidebarOpen: ComputedRef<boolean>
-	setSidebarOpen: (value: boolean) => void;
+	setSidebarOpen: (value: boolean) => void
+	/** Width of the main content column, i.e. the space `FileBrowserPanel` actually has. */
 	containerWidth: Ref<number | undefined>
 
 	searchQuery: Ref<string>
@@ -41,15 +43,18 @@ export interface FileBrowserUIContext {
 	sortDesc: Ref<boolean>
 	handleSort: (field: FileSortField) => void
 
-	selectedItems: Ref<Set<string>>
-	toggleItemSelection: (path: string) => void
+	/** Selected entries keyed by path; may span directories. */
+	selectedItems: Ref<Map<string, FileItem>>
+	toggleItemSelection: (item: FileItem) => void
 	deselectAll: () => void
 	toggleSelectAll: () => void
 	allSelected: ComputedRef<boolean>
 	someSelected: ComputedRef<boolean>
 
 	editorComponent: ShallowRef<Component | null>
-	fileEditorApi: ShallowRef<FileEditorBridge | null>
+	fileTabs: FileTabs
+	/** The editor of the active tab. */
+	fileEditorApi: ComputedRef<FileEditorBridge | null>
 	hasUnsavedChanges: ComputedRef<boolean>
 	saveFileContent: (exit?: boolean) => Promise<void>
 	revertChanges: () => void
@@ -57,8 +62,9 @@ export interface FileBrowserUIContext {
 	toggleFind: () => void
 
 	navigateToSegment: (index: number) => void
-	handleNavigateToFolder: (item: FileItem) => void
+	handleNavigateToFolder: (item: FileInfo) => void
 	handleEditFile: (item: FileInfo) => void
+	handleOpenInNewTab: (item: FileInfo) => void
 	handleEditorClose: () => Promise<void>
 	handlePrefetchHome: () => void
 	handleItemHover: (item: FileInfo) => void
