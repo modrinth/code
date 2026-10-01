@@ -352,11 +352,6 @@ function isMetadataFilterOrganization(value: string) {
 	)
 }
 
-const metadataFilterTriggerClass =
-	'!h-[34px] !rounded-xl !border !border-solid !border-surface-5 !bg-transparent !px-3 !text-sm !font-medium !text-primary !shadow-[0_1px_1.5px_rgba(0,0,0,0.15)] transition-all duration-100 active:scale-[0.97] hover:!bg-surface-3 focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5'
-const metadataFilterPreviewTriggerClass =
-	'!h-[34px] !rounded-xl !border !border-solid !border-brand !bg-brand-highlight !px-3 !text-sm !font-medium !text-brand !shadow-[0_1px_1.5px_rgba(0,0,0,0.15)] transition-all duration-100 active:scale-[0.97] hover:!bg-brand-highlight focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5 [&>svg]:!text-brand'
-
 const filterControlsRef = ref<HTMLElement | null>(null)
 const projectTypeFiltersRef = ref<HTMLElement | null>(null)
 const metadataFiltersRef = ref<HTMLElement | null>(null)
@@ -1200,7 +1195,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 								<div
 									v-if="metadataFilterCategories.length > 0"
 									ref="metadataFiltersRef"
-									class="flex flex-wrap items-center gap-1.5 [&>div:last-of-type]:!h-[34px] [&>div:last-of-type]:!gap-1.5 [&_[data-button]]:!h-[34px]"
+									class="flex flex-wrap items-center gap-2"
 								>
 									<div
 										class="mr-0.5 h-6 w-px shrink-0 bg-surface-5"
@@ -1211,9 +1206,6 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 										:categories="metadataFilterCategories"
 										:show-label="false"
 										:add-label="formatMessage(messages.filter)"
-										:add-button-class="metadataFilterTriggerClass"
-										:preview-trigger-class="metadataFilterPreviewTriggerClass"
-										add-button-size="sm"
 										checkbox-position="right"
 										apply-immediately
 									>
