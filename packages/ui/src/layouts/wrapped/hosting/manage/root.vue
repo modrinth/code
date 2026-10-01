@@ -271,6 +271,19 @@
 						Hang on, we're reconnecting to your server.
 					</div>
 
+					<Admonition
+						v-if="serverData.locked_since"
+						type="critical"
+						:header="formatMessage(lockMessages.lockedHeader)"
+						class="mb-4 shrink-0"
+					>
+						{{
+							formatMessage(lockMessages.lockedBody, {
+								date: formatDateTime(serverData.locked_since),
+							})
+						}}
+					</Admonition>
+
 					<ServerPanelAdmonitions
 						class="mb-4 shrink-0"
 						@installation-retry="handleInstallationRetry"
@@ -296,6 +309,12 @@
 			:browse-modpacks="handleBrowseModpacks"
 		/>
 	</Suspense>
+	<LockServerModal
+		v-if="isAdminViewer && serverData"
+		ref="lockServerModal"
+		:server-id="serverId"
+		:server-name="serverData.name"
+	/>
 	<ConfirmLeaveModal
 		ref="confirmLeaveModal"
 		:header="formatMessage(leaveMessages.uploadInProgress)"
@@ -317,6 +336,7 @@ import {
 	LinkIcon,
 	LoaderCircleIcon,
 	LockIcon,
+	LockOpenIcon,
 	MoreVerticalIcon,
 	ServerIcon as ServerAssetIcon,
 	SettingsIcon,
@@ -332,6 +352,7 @@ import DOMPurify from 'dompurify'
 import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
+import Admonition from '#ui/components/base/Admonition.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
 import { IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import ErrorInformationCard from '#ui/components/base/ErrorInformationCard.vue'
@@ -346,12 +367,14 @@ import { Tooltip } from '#ui/components/floating'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPanelAdmonitions.vue'
 import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
+import LockServerModal from '#ui/components/servers/LockServerModal.vue'
 import MedalServerCountdown from '#ui/components/servers/marketing/MedalServerCountdown.vue'
 import { PanelServerActionButton } from '#ui/components/servers/server-header'
 import ServerSettingsModal from '#ui/components/servers/ServerSettingsModal.vue'
 import {
 	hasServerPermission,
 	useDebugLogger,
+	useFormatDateTime,
 	useLoadingBarToken,
 	useModrinthServersConsole,
 	useReadyState,
@@ -492,6 +515,50 @@ function dismissSettingsHint() {
 
 const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>(null)
 const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
+const lockServerModal = ref<InstanceType<typeof LockServerModal> | null>(null)
+
+const isAdminViewer = ref(false)
+void props.resolveViewer().then(({ userRole }) => {
+	isAdminViewer.value = userRole === 'admin'
+})
+
+const formatDateTime = useFormatDateTime({ dateStyle: 'long', timeStyle: 'short' })
+
+const lockMessages = defineMessages({
+	lockedHeader: {
+		id: 'servers.manage.locked.header',
+		defaultMessage: 'This server is locked',
+	},
+	lockedBody: {
+		id: 'servers.manage.locked.body',
+		defaultMessage:
+			'This server has been locked by Modrinth staff since {date} and is read-only. Contact Modrinth Support for more information.',
+	},
+	lockServer: {
+		id: 'servers.manage.lock-server',
+		defaultMessage: 'Lock server',
+	},
+	unlockServer: {
+		id: 'servers.manage.unlock-server',
+		defaultMessage: 'Unlock server',
+	},
+	unlockSuccessTitle: {
+		id: 'servers.manage.unlock.success-title',
+		defaultMessage: 'Server unlocked',
+	},
+	unlockSuccessText: {
+		id: 'servers.manage.unlock.success-text',
+		defaultMessage: '{name} has been unlocked.',
+	},
+	unlockErrorTitle: {
+		id: 'servers.manage.unlock.error-title',
+		defaultMessage: 'Failed to unlock server',
+	},
+	unlockErrorText: {
+		id: 'servers.manage.unlock.error-text',
+		defaultMessage: 'An error occurred while unlocking this server. Please try again.',
+	},
+})
 
 const {
 	data: serverData,
@@ -618,7 +685,46 @@ const serverMenuOptions = computed(() => [
 		action: copyServerId,
 		shown: props.showCopyIdAction,
 	},
+	{
+		id: 'toggle-lock',
+		label: formatMessage(
+			serverData.value?.locked_since ? lockMessages.unlockServer : lockMessages.lockServer,
+		),
+		icon: serverData.value?.locked_since ? LockOpenIcon : LockIcon,
+		action: toggleServerLock,
+		tone: 'red' as const,
+		shown: isAdminViewer.value,
+	},
 ])
+
+async function toggleServerLock() {
+	if (!serverData.value) return
+
+	if (!serverData.value.locked_since) {
+		lockServerModal.value?.show()
+		return
+	}
+
+	const name = serverData.value.name
+	try {
+		await client.archon.servers_internal.unlock(props.serverId)
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', props.serverId] }),
+			queryClient.invalidateQueries({ queryKey: ['servers', 'locks'] }),
+		])
+		addNotification({
+			type: 'success',
+			title: formatMessage(lockMessages.unlockSuccessTitle),
+			text: formatMessage(lockMessages.unlockSuccessText, { name }),
+		})
+	} catch {
+		addNotification({
+			type: 'error',
+			title: formatMessage(lockMessages.unlockErrorTitle),
+			text: formatMessage(lockMessages.unlockErrorText),
+		})
+	}
+}
 
 function formatUptime(uptime: number) {
 	const days = Math.floor(uptime / (24 * 3600))
