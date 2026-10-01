@@ -79,18 +79,16 @@ fn instance_launch_url(
 
     launch_url
 }
-
 fn shortcut_path_with_extension(mut path: PathBuf) -> PathBuf {
     if path
         .extension()
         .is_none_or(|current_extension| current_extension != SHORTCUT_EXTENSION)
+        && let Some(file_name) = path.file_name()
     {
-        if let Some(file_name) = path.file_name() {
-            let mut file_name = OsString::from(file_name);
-            file_name.push(".");
-            file_name.push(SHORTCUT_EXTENSION);
-            path.set_file_name(file_name);
-        }
+        let mut file_name = OsString::from(file_name);
+        file_name.push(".");
+        file_name.push(SHORTCUT_EXTENSION);
+        path.set_file_name(file_name);
     }
 
     path
