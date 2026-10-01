@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n\t\t\tSELECT\n\t\t\t\tid AS \"id!: String\",\n\t\t\t\tinstance_id,\n\t\t\t\tkind AS \"kind!: String\",\n\t\t\t\tstatus AS \"status!: String\",\n\t\t\t\tstate AS \"state!: String\",\n\t\t\t\tcreated AS \"created!: i64\",\n\t\t\t\tmodified AS \"modified!: i64\",\n\t\t\t\tfinished,\n\t\t\t\tdismissed AS \"dismissed!: i64\"\n\t\t\tFROM install_jobs\n\t\t\tWHERE dismissed = 0 AND status IN ('queued', 'running', 'failed', 'interrupted')\n\t\t\tORDER BY created ASC\n\t\t\t",
+  "query": "\n\t\t\tSELECT\n\t\t\t\tid AS \"id!: String\",\n\t\t\t\tinstance_id,\n\t\t\t\tkind AS \"kind!: String\",\n\t\t\t\tstatus AS \"status!: String\",\n\t\t\t\tjson(state) AS \"state!: String\",\n\t\t\t\tcreated AS \"created!: i64\",\n\t\t\t\tmodified AS \"modified!: i64\",\n\t\t\t\tfinished,\n\t\t\t\tdismissed AS \"dismissed!: i64\"\n\t\t\tFROM install_jobs\n\t\t\tWHERE dismissed = 0 AND status IN ('queued', 'running', 'failed', 'interrupted')\n\t\t\tORDER BY created ASC\n\t\t\t",
   "describe": {
     "columns": [
       {
@@ -57,12 +57,12 @@
       true,
       false,
       false,
-      false,
+      null,
       false,
       false,
       true,
       false
     ]
   },
-  "hash": "292785598cdf815a69bed6f31d2159d689861c0fa57571e727ac9602c4e05a6d"
+  "hash": "1f778f4aebf65f0ec289bad1448edc640dea4ba9b6974340ee97854efed8bae4"
 }
