@@ -48,6 +48,24 @@ pub async fn download_from_upstreams(state: &AppState) -> Result<()> {
         .inspect_err(|err| errors.push(err))
         .ok();
 
+    upstream::forge::download(&mut cx, &mut errors)
+        .context(info_span!("downloading Forge upstream"))
+        .await
+        .inspect_err(|err| errors.push(err))
+        .ok();
+
+    upstream::neoforge::download(&mut cx, &mut errors)
+        .context(info_span!("downloading NeoForge upstream"))
+        .await
+        .inspect_err(|err| errors.push(err))
+        .ok();
+
+    upstream::quilt::download(&mut cx, &mut errors)
+        .context(info_span!("downloading Quilt upstream"))
+        .await
+        .inspect_err(|err| errors.push(err))
+        .ok();
+
     toasty::update!(download_run {
         completed_at: Timestamp::now(),
         errors: toasty::Json(errors),

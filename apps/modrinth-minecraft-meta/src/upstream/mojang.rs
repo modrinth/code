@@ -11,6 +11,9 @@ use crate::{
     util::{ErrorVec, Sha1},
 };
 
+pub const META_MANIFEST_URL: &str =
+    "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
+
 /// Manifest of all game versions.
 ///
 /// Available at [`META_MANIFEST_URL`].
@@ -20,9 +23,6 @@ pub struct MetaManifest {
     pub latest: Latest,
     pub versions: Vec<Version>,
 }
-
-pub const META_MANIFEST_URL: &str =
-    "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
 
 #[derive(
     Debug, Display, Clone, PartialEq, Eq, Hash, Serialize, Deserialize,

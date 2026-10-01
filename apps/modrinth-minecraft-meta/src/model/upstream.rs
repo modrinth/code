@@ -43,9 +43,13 @@ pub struct DownloadRun {
     pub errors: Option<toasty::Json<ErrorVec>>,
 }
 
+/// ID of a [`DownloadBlob`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Embed)]
+pub struct DownloadBlobId(pub Uuid);
+
 /// Single file downloaded as part of a [`DownloadRun`].
 ///
-/// This is keyed by `(download_run_id, url)` - so during a single run, we will
+/// This is unique on `(download_run_id, url)` - so during a single run, we will
 /// only download any given file at a URL once.
 ///
 /// If we do two runs close together in time, and they download the same file,
@@ -54,8 +58,11 @@ pub struct DownloadRun {
 /// deduplicated by the [`JsonBlob`] table, and we just store a [`Sha256`] key
 /// into that.
 #[derive(Debug, Clone, Model)]
-#[key(download_run_id, url)]
+#[unique(download_run_id, url)]
 pub struct DownloadBlob {
+    #[key]
+    #[auto]
+    pub id: DownloadBlobId,
     /// ID of the [`DownloadRun`] during which we downloaded this blob.
     pub download_run_id: DownloadRunId,
     /// [`DownloadRun`] during which we downloaded this blob.
