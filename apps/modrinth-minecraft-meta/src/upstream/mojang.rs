@@ -1,9 +1,15 @@
+use anyhow::Result;
 use derive_more::Display;
 use jiff::Timestamp;
 use serde::{Deserialize, Serialize};
+use tracing::{info, info_span};
+use tracing_anyhow::FutureContext;
 use url::Url;
 
-use crate::util::Sha1;
+use crate::{
+    task::DownloadRunContext,
+    util::{ErrorVec, Sha1},
+};
 
 /// Manifest of all game versions.
 ///
@@ -58,3 +64,35 @@ pub enum VersionType {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VersionManifest {}
+
+pub async fn download(
+    cx: &mut DownloadRunContext<'_>,
+    errors: &mut ErrorVec,
+) -> Result<()> {
+    let meta_manifest = cx
+        .download_json::<MetaManifest>(META_MANIFEST_URL)
+        .context(info_span!("fetching meta manifest"))
+        .await?;
+    info!(
+        num_versions = meta_manifest.versions.len(),
+        "downloaded Mojang meta manifest"
+    );
+
+    for (index, version) in meta_manifest.versions.into_iter().enumerate() {
+        cx.download_json::<VersionManifest>(
+            version.url.clone(),
+        )
+        .context(
+            info_span!("fetching version manifest", version.id = %version.id, %version.url),
+        )
+        .await
+        .inspect_err(|err| errors.push(err))
+        .ok();
+
+        if (index + 1) % 10 == 0 {
+            info!("downloaded {} version manifests", index);
+        }
+    }
+
+    Ok(())
+}

@@ -45,7 +45,7 @@ pub async fn main() -> Result<()> {
         )
         .init();
 
-    let mut db = connect_to_db().await?;
+    let db = connect_to_db().await?;
     let report = MIGRATIONS
         .apply(&db)
         .context(info_span!("applying migrations"))

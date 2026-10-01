@@ -4,7 +4,7 @@ use anyhow::{Context, Result, anyhow};
 use jiff::Timestamp;
 use reqwest::IntoUrl;
 use serde::de::DeserializeOwned;
-use tracing::{info, info_span, warn};
+use tracing::{info, info_span};
 use tracing_anyhow::FutureContext;
 
 use crate::{
@@ -34,13 +34,18 @@ pub async fn download_from_upstreams(state: &AppState) -> Result<()> {
         http: &state.http,
         conn: &mut conn,
         download_run_id: download_run.id,
-        errors: &mut errors,
     };
 
-    download_from_mojang(&mut cx)
+    upstream::mojang::download(&mut cx, &mut errors)
         .context(info_span!("downloading Mojang upstream"))
         .await
-        .inspect_err(|err| warn!("failed to download Mojang upstream: {err:?}"))
+        .inspect_err(|err| errors.push(err))
+        .ok();
+
+    upstream::fabric::download(&mut cx, &mut errors)
+        .context(info_span!("downloading Fabric upstream"))
+        .await
+        .inspect_err(|err| errors.push(err))
         .ok();
 
     toasty::update!(download_run {
@@ -54,46 +59,14 @@ pub async fn download_from_upstreams(state: &AppState) -> Result<()> {
     Ok(())
 }
 
-async fn download_from_mojang(cx: &mut DownloadRunContext<'_>) -> Result<()> {
-    let meta_manifest = cx
-        .download_json::<upstream::mojang::MetaManifest>(
-            upstream::mojang::META_MANIFEST_URL,
-        )
-        .context(info_span!("fetching meta manifest"))
-        .await?;
-    info!(
-        num_versions = meta_manifest.versions.len(),
-        "downloaded Mojang meta manifest"
-    );
-
-    for (index, version) in meta_manifest.versions.into_iter().enumerate() {
-        cx.download_json::<upstream::mojang::VersionManifest>(
-            version.url.clone(),
-        )
-        .context(
-            info_span!("fetching version manifest", version.id = %version.id, %version.url),
-        )
-        .await
-        .inspect_err(|err| cx.errors.push(err))
-        .ok();
-
-        if (index + 1) % 10 == 0 {
-            info!("downloaded {} version manifests", index);
-        }
-    }
-
-    Ok(())
-}
-
-struct DownloadRunContext<'cx> {
-    http: &'cx reqwest::Client,
-    conn: &'cx mut toasty::Connection,
-    download_run_id: DownloadRunId,
-    errors: &'cx mut ErrorVec,
+pub struct DownloadRunContext<'cx> {
+    pub http: &'cx reqwest::Client,
+    pub conn: &'cx mut toasty::Connection,
+    pub download_run_id: DownloadRunId,
 }
 
 impl DownloadRunContext<'_> {
-    async fn download_json<T: DeserializeOwned>(
+    pub async fn download_json<T: DeserializeOwned>(
         &mut self,
         url: impl IntoUrl,
     ) -> Result<T> {
