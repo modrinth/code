@@ -59,20 +59,26 @@ const messages = defineMessages({
 		id: 'servers.files.zip-created-description',
 		defaultMessage: 'Created {destination}',
 	},
+	serverLocked: {
+		id: 'servers.files.server-locked',
+		defaultMessage: 'This server is locked and its files are read-only.',
+	},
 })
 
 const zippingFolder = ref(false)
 
+const serverLocked = computed(() => !!serverContext.server.value?.locked_since)
 const serverBusy = computed(() => busyReasons.value.length > 0)
 const busyTooltip = computed(() =>
 	busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : undefined,
 )
 const fileWriteDisabled = computed(
-	() => !canWriteFiles.value || serverBusy.value || zippingFolder.value,
+	() => serverLocked.value || !canWriteFiles.value || serverBusy.value || zippingFolder.value,
 )
-const fileWriteDisabledTooltip = computed(() =>
-	canWriteFiles.value ? busyTooltip.value : permissionDeniedMessage.value,
-)
+const fileWriteDisabledTooltip = computed(() => {
+	if (serverLocked.value) return formatMessage(messages.serverLocked)
+	return canWriteFiles.value ? busyTooltip.value : permissionDeniedMessage.value
+})
 const nonBackupBusyReasons = computed(() =>
 	busyReasons.value.filter(
 		(r) =>
