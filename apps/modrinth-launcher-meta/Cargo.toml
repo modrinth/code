@@ -1,0 +1,13 @@
+[package]
+name = "modrinth-launcher-meta"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+eyre = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+# toasty = { workspace = true, features = ["postgresql", "serde", "jiff"] }
+modrinth-log = { workspace = true }
+url = { workspace = true, features = ["serde"] }
+derive_more = { workspace = true, features = ["deref"] }
+jiff = { workspace = true }
