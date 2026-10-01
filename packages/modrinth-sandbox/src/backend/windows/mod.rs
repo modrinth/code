@@ -39,6 +39,11 @@ use windows::{
                 LPPROC_THREAD_ATTRIBUTE_LIST, PROCESS_CREATION_FLAGS,
                 PROCESS_INFORMATION, STARTF_FORCEONFEEDBACK,
                 STARTF_USESTDHANDLES, STARTUPINFOEXW, STARTUPINFOW,
+                DeleteProcThreadAttributeList,
+                InitializeProcThreadAttributeList,
+                PROC_THREAD_ATTRIBUTE_HANDLE_LIST,
+                PROC_THREAD_ATTRIBUTE_JOB_LIST,
+                UpdateProcThreadAttribute,
             },
         },
     },
@@ -54,6 +59,12 @@ use crate::{
 pub(crate) mod appcontainer;
 pub(crate) mod runas;
 
+pub(crate) struct ProcThreadAttribute {
+    pub(crate) attribute: usize,
+    pub(crate) value: *const std::ffi::c_void,
+    pub(crate) size: usize,
+}
+
 pub(crate) fn spawn(
     program: PathBuf,
     arguments: Vec<SandboxArg>,
@@ -64,7 +75,7 @@ pub(crate) fn spawn(
     working_directory: Option<PathBuf>,
     job_handle: HANDLE,
     null_device: HANDLE,
-    attributes: Option<LPPROC_THREAD_ATTRIBUTE_LIST>,
+    attributes: Vec<ProcThreadAttribute>,
 ) -> Result<(Pipes, WindowsChild)> {
     let program = resolve_path(&program).wrap_err("resolving program path")?;
     let working_directory = working_directory
@@ -209,32 +220,89 @@ pub(crate) fn spawn(
     let mut si: STARTUPINFOW = Default::default();
     si.cb = size_of::<STARTUPINFOW>() as u32;
 
+    let mut handle_list = Vec::new();
     if let Some(stdin_read) = stdin_read {
         si.dwFlags |= STARTF_USESTDHANDLES;
         si.hStdInput = stdin_read;
+        handle_list.push(stdin_read);
     }
     if let Some(stdout_write) = stdout_write {
         si.dwFlags |= STARTF_USESTDHANDLES;
         si.hStdOutput = stdout_write;
+        handle_list.push(stdout_write);
     }
     if let Some(stderr_write) = stderr_write {
         si.dwFlags |= STARTF_USESTDHANDLES;
         si.hStdError = stderr_write;
+        handle_list.push(stderr_write);
     }
 
     si.dwFlags |= STARTF_FORCEONFEEDBACK;
 
-    let mut sip = &si as *const STARTUPINFOW;
-    let si_ex;
-    if let Some(attributes) = attributes {
-        process_creation_flags |= EXTENDED_STARTUPINFO_PRESENT;
-        si.cb = size_of::<STARTUPINFOEXW>() as u32;
-        si_ex = STARTUPINFOEXW {
-            StartupInfo: si,
-            lpAttributeList: attributes,
-        };
-        sip = &si_ex as *const _ as *const STARTUPINFOW;
+    if !handle_list.is_empty() {
+        attributes.push(ProcThreadAttribute {
+            attribute: PROC_THREAD_ATTRIBUTE_HANDLE_LIST as usize,
+            value: handle_list.as_ptr() as *const _,
+            size: size_of::<HANDLE>() * handle_list.len()
+        });
     }
+    let job_list = &[job_handle];
+    attributes.push(ProcThreadAttribute {
+        attribute: PROC_THREAD_ATTRIBUTE_JOB_LIST as usize,
+        value: job_list.as_ptr() as *const _,
+        size: size_of::<HANDLE>() * job_list.len()
+    });
+
+    let mut lpsize = 0;
+    let result = unsafe {
+        InitializeProcThreadAttributeList(None, attributes.len(), None, &mut lpsize)
+    };
+
+    if result
+        != Err(windows::core::Error::from_hresult(HRESULT::from_win32(
+            ERROR_INSUFFICIENT_BUFFER.0,
+        )))
+    {
+        result?;
+    }
+
+    let mut proc_thread_attribute_list_alloc = vec![0; lpsize];
+    let lpproc_thread_attribute_list = LPPROC_THREAD_ATTRIBUTE_LIST(
+        proc_thread_attribute_list_alloc.as_mut_ptr() as *mut _,
+    );
+
+    unsafe {
+        InitializeProcThreadAttributeList(
+            Some(lpproc_thread_attribute_list),
+            attributes.len(),
+            None,
+            &mut lpsize,
+        )?
+    };
+    scopeguard::defer! {
+        unsafe { DeleteProcThreadAttributeList(lpproc_thread_attribute_list) };
+    }
+
+    for attribute in attributes {
+        unsafe {
+            UpdateProcThreadAttribute(
+                lpproc_thread_attribute_list,
+                0,
+                attribute.attribute,
+                Some(attribute.value),
+                attribute.size,
+                None,
+                None,
+            )?
+        };
+    }
+
+    process_creation_flags |= EXTENDED_STARTUPINFO_PRESENT;
+    si.cb = size_of::<STARTUPINFOEXW>() as u32;
+    let si_ex = STARTUPINFOEXW {
+        StartupInfo: si,
+        lpAttributeList: lpproc_thread_attribute_list,
+    };
 
     let mut pi: PROCESS_INFORMATION = Default::default();
     unsafe {
@@ -243,16 +311,14 @@ pub(crate) fn spawn(
             Some(windows::core::PWSTR(command_line.as_mut_ptr())),
             None,
             None,
-            stdin_read.is_some()
-                || stdout_write.is_some()
-                || stderr_write.is_some(),
+            !handle_list.is_empty(),
             process_creation_flags,
             Some(env.as_ptr() as *mut c_void),
             current_directory
                 .as_ref()
                 .map(|dir| windows::core::PCWSTR(dir.as_ptr()))
                 .unwrap_or_default(),
-            sip,
+            si_ex as *const _ as *const STARTUPINFOW,
             &mut pi,
         )?
     }
@@ -266,10 +332,6 @@ pub(crate) fn spawn(
     }
 
     drop(handles_to_close);
-
-    unsafe {
-        _ = AssignProcessToJobObject(job_handle, pi.hProcess);
-    }
 
     return Ok((
         Pipes {

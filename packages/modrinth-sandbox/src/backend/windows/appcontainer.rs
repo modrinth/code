@@ -52,13 +52,7 @@ use windows::{
             StationsAndDesktops::OpenWindowStationW,
             SystemServices::{SE_GROUP_ENABLED, SECURITY_DESCRIPTOR_REVISION},
             Memory::{GetProcessHeap, HeapFree, HEAP_FLAGS},
-            Threading::{
-                DeleteProcThreadAttributeList,
-                InitializeProcThreadAttributeList,
-                LPPROC_THREAD_ATTRIBUTE_LIST,
-                PROC_THREAD_ATTRIBUTE_SECURITY_CAPABILITIES,
-                UpdateProcThreadAttribute,
-            },
+            Threading::PROC_THREAD_ATTRIBUTE_SECURITY_CAPABILITIES,
         },
         UI::WindowsAndMessaging::WINSTA_WRITEATTRIBUTES,
     },
@@ -130,36 +124,6 @@ fn spawn(env: &AppContainerEnv, mut command: SandboxCommand) -> Result<crate::Sa
     )?;
     scopeguard::defer! {
         unsafe { FreeSid(app_container_sid) };
-    }
-
-    let mut lpsize = 0;
-    let result = unsafe {
-        InitializeProcThreadAttributeList(None, 1, None, &mut lpsize)
-    };
-
-    if result
-        != Err(windows::core::Error::from_hresult(HRESULT::from_win32(
-            ERROR_INSUFFICIENT_BUFFER.0,
-        )))
-    {
-        result?;
-    }
-
-    let mut proc_thread_attribute_list_alloc = vec![0; lpsize];
-    let lpproc_thread_attribute_list = LPPROC_THREAD_ATTRIBUTE_LIST(
-        proc_thread_attribute_list_alloc.as_mut_ptr() as *mut _,
-    );
-
-    unsafe {
-        InitializeProcThreadAttributeList(
-            Some(lpproc_thread_attribute_list),
-            1,
-            None,
-            &mut lpsize,
-        )?
-    };
-    scopeguard::defer! {
-        unsafe { DeleteProcThreadAttributeList(lpproc_thread_attribute_list) };
     }
 
     let mut owned_capabilities: Vec<OwnedCapability> = Vec::new();
@@ -245,20 +209,12 @@ fn spawn(env: &AppContainerEnv, mut command: SandboxCommand) -> Result<crate::Sa
     security_capabilities.Capabilities = capabilities.as_mut_ptr();
     security_capabilities.AppContainerSid = app_container_sid;
 
-    unsafe {
-        UpdateProcThreadAttribute(
-            lpproc_thread_attribute_list,
-            0,
-            PROC_THREAD_ATTRIBUTE_SECURITY_CAPABILITIES as usize,
-            Some(
-                &security_capabilities as *const SECURITY_CAPABILITIES
-                    as *const _,
-            ),
-            size_of::<SECURITY_CAPABILITIES>(),
-            None,
-            None,
-        )?
-    };
+    let attribute_list = Vec::new();
+    attribute_list.push(super::ProcThreadAttribute {
+        attribute: PROC_THREAD_ATTRIBUTE_SECURITY_CAPABILITIES as usize,
+        value: &security_capabilities as *const SECURITY_CAPABILITIES as *const _,
+        size: size_of::<SECURITY_CAPABILITIES>(),
+    });
 
     let mut readable: HashSet<std::path::PathBuf> = HashSet::default();
     let mut parents_to_add: HashSet<std::path::PathBuf> = HashSet::default();
@@ -366,7 +322,7 @@ fn spawn(env: &AppContainerEnv, mut command: SandboxCommand) -> Result<crate::Sa
         command.working_directory,
         env.job_handle.clone(),
         env.null_device.clone(),
-        Some(lpproc_thread_attribute_list),
+        attribute_list,
     )
     .wrap_err("spawning child")?;
 
