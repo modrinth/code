@@ -2,6 +2,7 @@ use super::client::*;
 use super::publish::*;
 use super::types::*;
 use super::*;
+use std::collections::BTreeMap;
 
 struct SharedContentSnapshot {
     version_ids: Vec<String>,
@@ -290,11 +291,11 @@ async fn shared_content_diffs(
     )?;
     let mut diff = diff_content_sets(
         &ContentSetSnapshot {
-            projects: Default::default(),
+            projects: BTreeMap::default(),
             external_files: before.external_files.clone(),
         },
         &ContentSetSnapshot {
-            projects: Default::default(),
+            projects: BTreeMap::default(),
             external_files: after.external_files.clone(),
         },
         &ContentSetDiffOptions {
