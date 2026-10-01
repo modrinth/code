@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Kyros } from '@modrinth/api-client'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import {computed, onMounted, type Ref, ref, watch} from 'vue'
+import { computed, effectScope, onMounted, onScopeDispose, type Ref, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
@@ -150,13 +150,16 @@ function queryDirectoryEntries(path: string): DirectoryQuery{
 		data: directoryData,
 		isLoading,
 		error: loadError,
-	} = useQuery({
-		queryKey: computed(() => ['files', serverId, path]),
-		queryFn: async () => {
-			return client.kyros.files_v0.listDirectory(path, 1, 2000)
+	} = useQuery(
+		{
+			queryKey: computed(() => ['files', serverId, path]),
+			queryFn: async () => {
+				return client.kyros.files_v0.listDirectory(path, 1, 2000)
+			},
+			staleTime: 30_000,
 		},
-		staleTime: 30_000,
-	})
+		queryClient,
+	)
 
 	return {
 		items: computed<FileItem[]>(() =>
@@ -169,7 +172,12 @@ function queryDirectoryEntries(path: string): DirectoryQuery{
 }
 
 // Prefetching
-function prefetchDirectory(path: string) {
+function normalizeDirectoryPath(path: string) {
+	return `/${path.split('/').filter(Boolean).join('/')}`
+}
+
+function prefetchDirectory(rawPath: string) {
+	const path = normalizeDirectoryPath(rawPath)
 	queryClient.prefetchQuery({
 		queryKey: ['files', serverId, path],
 		queryFn: async () => {
@@ -199,7 +207,7 @@ function prefetchFile(path: string) {
 }
 
 function getQueryKey() {
-	return ['files', serverId, currentPath.value]
+	return ['files', serverId, normalizeDirectoryPath(currentPath.value)]
 }
 
 const isRefreshing = ref<boolean>(false)
@@ -515,28 +523,31 @@ function cancelUpload() {
 	fileUploadSession.cancelUpload()
 }
 
-const directories: Record<string, DirectoryQuery> = {};
-const expandedDirectories: Ref<string[]> = ref([]);
+const directories = new Map<string, DirectoryQuery>()
+const expandedDirectories: Ref<string[]> = ref([])
+
+/** Owns the lazily created directory queries so they're disposed with this page, wherever they were first requested from. */
+const directoryScope = effectScope()
+onScopeDispose(() => directoryScope.stop())
 
 const directoryTree = {
 	prefetch: (path: string) => {
-		if (directories[path] == null) {
-			prefetchDirectory(path);
+		const normalized = normalizeDirectoryPath(path)
+		if (!directories.has(normalized)) {
+			prefetchDirectory(normalized)
 		}
 	},
-	get: (path: string) => {
-		let query = directories[path];
+	get: (path: string): DirectoryQuery => {
+		const normalized = normalizeDirectoryPath(path)
+		let query = directories.get(normalized)
 		if (query == null) {
-			query = queryDirectoryEntries(path);
-			directories[path] = query;
+			query = directoryScope.run(() => queryDirectoryEntries(normalized))!
+			directories.set(normalized, query)
 		}
 		return query
 	},
-	getEntries(path: string) {
-		return this.get(path).items;
-	},
-	expandedEntries: expandedDirectories
-};
+	expandedEntries: expandedDirectories,
+} satisfies DirectoryTree
 
 // Provide the file manager context
 provideFileManager({

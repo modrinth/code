@@ -1,14 +1,20 @@
 
 <template>
-	<div class="flex flex-col p-1 pl-2 gap-3 w-full">
+	<div
+		ref="panelRoot"
+		class="flex w-full scroll-mt-[var(--files-sticky-top,0px)] flex-col gap-3 p-1 pl-2"
+		:class="{ 'snap-start': isFileActive }"
+		:style="{ '--files-navbar-height': `${navbarHeight}px` }"
+	>
+		<div ref="navbarWrapper">
 		<FileNavbar
 			:sidebar-open="sidebarOpen"
 			:breadcrumbs="ui.breadcrumbSegments.value"
 			:is-editing="ui.isEditing.value"
 			:editing-file-name="ctx.editingFile.value?.name"
 			:editing-file-path="ctx.editingFile.value?.path"
-			:is-editing-image="fileEditorRef?.isEditingImage"
-			:is-editor-find-open="fileEditorRef?.isFindOpen"
+			:is-editing-image="ui.fileEditorApi.value?.isEditingImage.value ?? false"
+			:is-editor-find-open="ui.fileEditorApi.value?.isFindOpen.value ?? false"
 			:search-query="ui.searchQuery.value"
 			:show-refresh-button="ui.showRefreshButton.value"
 			:show-install-from-url="ctx.showInstallFromUrl"
@@ -16,6 +22,10 @@
 			:disabled="ui.isBusy.value"
 			:disabled-tooltip="ui.busyTooltip.value"
 			:small-mode="props.smallMode"
+			:can-go-back="ui.fileTabs.canGoBack.value"
+			:can-go-forward="ui.fileTabs.canGoForward.value"
+			@back="ui.fileTabs.back"
+			@forward="ui.fileTabs.forward"
 			@navigate="ui.navigateToSegment"
 			@navigate-home="() => {
 				ui.navigateToSegment(-1)
@@ -27,12 +37,33 @@
 			@upload-zip="() => {}"
 			@unzip-from-url="ui.showUnzipFromUrlModal"
 			@refresh="ctx.refresh"
-			@share="() => fileEditorRef?.shareToMclogs()"
-			@find="() => fileEditorRef?.toggleFind()"
+			@share="() => ui.shareToMclogs()"
+			@find="() => ui.toggleFind()"
 			@toggle-sidebar="() => ui.setSidebarOpen(!sidebarOpen)"
 		/>
-		<div class="@container relative flex flex-col overflow-clip rounded-[20px] border border-solid border-surface-4 shadow-sm">
-			<div v-if="!ui.isEditing.value">
+		</div>
+		<div
+			class="@container relative flex flex-col overflow-clip rounded-[20px] border border-solid border-surface-4 shadow-sm"
+		>
+			<div
+				class="shrink-0 overflow-hidden"
+				:class="
+					isFileActive
+						? 'h-[calc(var(--files-viewport-height,100dvh)_-_var(--files-sticky-top,0px)_-_var(--files-navbar-height,3rem)_-_1.25rem_-_2px)] min-h-[24rem]'
+						: 'h-10'
+				"
+			>
+				<FileTabs />
+			</div>
+			<FileManagerError
+				v-if="!isFileActive && ctx.error.value"
+				class="rounded-b-[20px]"
+				:title="formatMessage(messages.errorTitle)"
+				:message="formatMessage(messages.errorMessage)"
+				@refetch="ctx.refresh"
+				@home="() => ui.navigateToSegment(-1)"
+			/>
+			<div v-else-if="!isFileActive">
 				<FileUploadDragAndDrop
 					ref="fileUploadRef"
 					class=""
@@ -83,14 +114,15 @@
 								@move-direct-to="ui.handleDirectMove"
 								@edit="() => ui.handleEditFile(item)"
 								@navigate="() => ui.handleNavigateToFolder(item)"
+								@open-in-new-tab="() => ui.handleOpenInNewTab(item)"
 								@hover="() => ui.handleItemHover(item)"
 								@contextmenu="ui.handleContextMenu"
-								@toggle-select="() => ui.toggleItemSelection(item.path)"
+								@toggle-select="() => ui.toggleItemSelection(item)"
 							/>
 						</div>
 					</div>
 					<div
-						v-else-if="ui.items.value.length === 0 && !ctx.error.value"
+						v-else-if="ui.items.value.length === 0 && !ctx.error.value && !ctx.loading.value"
 						class="flex h-full w-full items-center justify-center rounded-b-[20px] bg-surface-2 p-20"
 					>
 						<div class="flex flex-col items-center gap-4 text-center">
@@ -105,41 +137,26 @@
 					</div>
 				</FileUploadDragAndDrop>
 			</div>
-			<FileManagerError
-				v-else-if="ctx.error.value"
-				class="rounded-b-[20px]"
-				:title="formatMessage(messages.errorTitle)"
-				:message="formatMessage(messages.errorMessage)"
-				@refetch="ctx.refresh"
-				@home="() => ui.navigateToSegment(-1)"
-			/>
-			<FileEditor
-				v-else
-				ref="fileEditorRef"
-				:file="ctx.editingFile.value"
-				:editor-component="ui.editorComponent.value"
-				@close="handleEditorClose"
-			/>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { FolderOpenIcon } from '@modrinth/assets'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { useElementSize } from '@vueuse/core'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '#ui/composables'
 import { useStickyObserver } from '#ui/composables/sticky-observer'
-import { useVirtualScroll } from '#ui/composables/virtual-scroll.ts'
+import { findScrollableAncestor, useVirtualScroll } from '#ui/composables/virtual-scroll.ts'
 import { injectFileManager } from '#ui/layouts'
 
 import { injectFileBrowserUI } from '../providers/file-browser-ui'
-import FileEditor from './editor/FileEditor.vue'
 import FileManagerError from './FileManagerError.vue'
 import FileNavbar from './FileNavbar.vue'
-import FileActionBar from './FileActionBar.vue'
 import FileTableHeader from './FileTableHeader.vue'
 import FileTableRow from './FileTableRow.vue'
+import FileTabs from './tabs/FileTabs.vue'
 import FileUploadDragAndDrop from './upload/FileUploadDragAndDrop.vue'
 
 const { formatMessage } = useVIntl()
@@ -173,8 +190,7 @@ const props = withDefaults(defineProps<{
 });
 
 const sidebarOpen = computed(() => ui.sidebarOpen.value);
-
-const fileEditorRef = ref<InstanceType<typeof FileEditor>>()
+const isFileActive = computed(() => ui.fileTabs.activeLocation.value.kind === 'file')
 
 const filteredItems = computed(() => ui.filteredItems.value)
 
@@ -195,41 +211,56 @@ const fileUploadRef = ref<InstanceType<typeof FileUploadDragAndDrop>>()
 const fileUploadEl = computed(() => fileUploadRef.value?.$el as HTMLElement | null)
 const { isStuck: isLabelBarStuck } = useStickyObserver(fileUploadEl)
 
-async function handleEditorClose() {
-	await ui.handleEditorClose()
+const panelRoot = ref<HTMLElement | null>(null)
+const navbarWrapper = ref<HTMLElement | null>(null)
+const { height: navbarHeight } = useElementSize(navbarWrapper, undefined, { box: 'border-box' })
+
+/** Brings the navbar and file viewer to the top of the scroll area, unless they're already there. */
+function scrollPanelIntoView() {
+	const panel = panelRoot.value
+	if (!panel) return
+
+	const container = findScrollableAncestor(panel)
+	const containerTop = container instanceof Window ? 0 : container.getBoundingClientRect().top
+	const scrollMargin = parseFloat(getComputedStyle(panel).scrollMarginTop) || 0
+	if (Math.abs(panel.getBoundingClientRect().top - containerTop - scrollMargin) < 2) return
+
+	panel.scrollIntoView({ block: 'start', behavior: 'smooth' })
 }
 
-const hasUnsavedChanges = computed(() => fileEditorRef.value?.hasUnsavedChanges ?? false)
-const isEditingImage = computed(() => fileEditorRef.value?.isEditingImage ?? false)
-const isFindOpen = computed(() => fileEditorRef.value?.isFindOpen ?? false)
-const saveFileContent = async (exit = false) => {
-	await fileEditorRef.value?.saveFileContent(exit)
-}
-const revertChanges = () => fileEditorRef.value?.revertChanges()
-const shareToMclogs = async () => {
-	await fileEditorRef.value?.shareToMclogs()
-}
-const toggleFind = () => fileEditorRef.value?.toggleFind()
+const activeFileKey = computed(() =>
+	isFileActive.value
+		? `${ui.fileTabs.activeTabId.value}:${ui.fileTabs.activeLocation.value.path}`
+		: null,
+)
 
-// Register this panel's editor API on the shared context so layout.vue and FileSideBar
-// (which can no longer hold a template ref to a dockview-hosted panel) can reach it.
-const fileEditorApi = {
-	hasUnsavedChanges,
-	isEditingImage,
-	isFindOpen,
-	saveFileContent,
-	revertChanges,
-	shareToMclogs,
-	toggleFind,
-}
-
-onMounted(() => {
-	ui.fileEditorApi.value = fileEditorApi
+watch(activeFileKey, (key) => {
+	if (key) nextTick(scrollPanelIntoView)
 })
 
-onUnmounted(() => {
-	if (ui.fileEditorApi.value === fileEditorApi) {
-		ui.fileEditorApi.value = null
+/**
+ * While a file is open, the scroll container snaps (by proximity) to the file viewer, so it is
+ * easy to bring the whole viewer into view without lining it up by hand.
+ */
+let snapContainer: HTMLElement | null = null
+let previousSnapType = ''
+
+function setViewerSnapping(enabled: boolean) {
+	if (enabled && !snapContainer && panelRoot.value) {
+		const container = findScrollableAncestor(panelRoot.value)
+		snapContainer = container instanceof Window ? document.documentElement : container
+		previousSnapType = snapContainer.style.scrollSnapType
+		snapContainer.style.scrollSnapType = 'y proximity'
+	} else if (!enabled && snapContainer) {
+		snapContainer.style.scrollSnapType = previousSnapType
+		snapContainer = null
 	}
+}
+
+watch(isFileActive, setViewerSnapping, { flush: 'post' })
+onMounted(() => {
+	setViewerSnapping(isFileActive.value)
+	if (isFileActive.value) nextTick(scrollPanelIntoView)
 })
+onBeforeUnmount(() => setViewerSnapping(false))
 </script>

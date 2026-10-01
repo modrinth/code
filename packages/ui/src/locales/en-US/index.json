@@ -1604,11 +1604,17 @@
   "files.layout.extraction-started-title": {
     "defaultMessage": "Extraction started"
   },
+  "files.layout.resize-sidebar": {
+    "defaultMessage": "Resize sidebar"
+  },
   "files.layout.selected-count": {
     "defaultMessage": "{count} selected"
   },
   "files.layout.unsaved-changes": {
     "defaultMessage": "You have unsaved changes."
+  },
+  "files.layout.zip-mixed-folders": {
+    "defaultMessage": "Only entries from the same folder can be zipped together"
   },
   "files.move-modal.current-location": {
     "defaultMessage": "Current location"
@@ -1621,6 +1627,9 @@
   },
   "files.move-modal.header": {
     "defaultMessage": "Move {type}"
+  },
+  "files.navbar.back": {
+    "defaultMessage": "Back"
   },
   "files.navbar.back-to-home": {
     "defaultMessage": "Back to home"
@@ -1636,6 +1645,9 @@
   },
   "files.navbar.find-in-file": {
     "defaultMessage": "Find in file"
+  },
+  "files.navbar.forward": {
+    "defaultMessage": "Forward"
   },
   "files.navbar.home": {
     "defaultMessage": "Home"
@@ -1700,11 +1712,20 @@
   "files.rename-modal.new-name-label": {
     "defaultMessage": "New name"
   },
+  "files.row.collapse-folder": {
+    "defaultMessage": "Collapse folder"
+  },
   "files.row.create-zip": {
     "defaultMessage": "Create ZIP"
   },
+  "files.row.expand-folder": {
+    "defaultMessage": "Expand folder"
+  },
   "files.row.item-count": {
     "defaultMessage": "{count, plural, one {# item} other {# items}}"
+  },
+  "files.row.open-in-new-tab": {
+    "defaultMessage": "Open in new tab"
   },
   "files.row.parent-folder": {
     "defaultMessage": "Parent folder"
@@ -1720,6 +1741,30 @@
   },
   "files.table-header.size": {
     "defaultMessage": "Size"
+  },
+  "files.tabs.close-tab": {
+    "defaultMessage": "Close {name}"
+  },
+  "files.tabs.home": {
+    "defaultMessage": "Home"
+  },
+  "files.tabs.new-tab": {
+    "defaultMessage": "New tab"
+  },
+  "files.tabs.unsaved-changes": {
+    "defaultMessage": "Unsaved changes"
+  },
+  "files.tree.empty-folder": {
+    "defaultMessage": "This folder is empty"
+  },
+  "files.tree.empty-subfolder": {
+    "defaultMessage": "Empty"
+  },
+  "files.tree.label": {
+    "defaultMessage": "File tree"
+  },
+  "files.tree.loading": {
+    "defaultMessage": "Loading..."
   },
   "files.unsaved-changes-modal.body": {
     "defaultMessage": "You have unsaved changes that will be lost if you leave. Would you like to save before leaving?"

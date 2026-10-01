@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { EditingFile, FileItem, UploadState } from '@modrinth/ui'
+import type { DirectoryEntries, EditingFile, FileItem, UploadState } from '@modrinth/ui'
 import {
 	commonMessages,
 	defineMessages,
@@ -10,9 +10,9 @@ import {
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { invoke } from '@tauri-apps/api/core'
-import {computed, Ref, ref, watch} from 'vue'
+import { computed, effectScope, onScopeDispose, type Ref, ref, watch } from 'vue'
 
 import { useAppEvent } from '@/composables/use-app-event'
 import { get_full_path } from '@/helpers/instance'
@@ -23,6 +23,7 @@ import { instanceKeys } from '../query-options'
 
 const instancePage = injectInstancePage()
 const instanceId = instancePage.instanceId
+const queryClient = useQueryClient()
 
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
@@ -68,10 +69,62 @@ async function listDirectory(dirPath: string): Promise<FileItem[]> {
 
 function isReadOnly(path: string): boolean {
 	const normalized = path.startsWith('/') ? path.slice(1) : path
+	const isReadOnlyItem = (item: FileItem) => item.path === normalized && item.readOnly === true
 	return (
 		normalized.split('/')[0].toLowerCase() === 'mods' ||
-		items.value.some((item) => item.path === normalized && item.readOnly === true)
+		items.value.some(isReadOnlyItem) ||
+		[...directories.values()].some((entries) => entries.items.value.some(isReadOnlyItem))
 	)
+}
+
+function toRelativePath(path: string) {
+	return path.split('/').filter(Boolean).join('/')
+}
+
+const directories = new Map<string, DirectoryEntries>()
+const expandedDirectories: Ref<string[]> = ref([])
+
+/** Owns the lazily created directory queries so they're disposed with this page, wherever they were first requested from. */
+const directoryScope = effectScope()
+onScopeDispose(() => directoryScope.stop())
+
+function queryDirectoryEntries(relativePath: string): DirectoryEntries {
+	const query = useQuery(
+		computed(() => ({
+			queryKey: instanceKeys.files(instancePage.instanceId.value, relativePath),
+			queryFn: () => listDirectory(relativePath),
+			enabled: !!instanceRoot.value,
+			staleTime: 30_000,
+		})),
+		queryClient,
+	)
+	return {
+		items: computed(() => query.data.value ?? []),
+		isLoading: query.isLoading,
+		loadError: query.error,
+	}
+}
+
+const directoryTree = {
+	get(path: string) {
+		const relativePath = toRelativePath(path)
+		let entries = directories.get(relativePath)
+		if (!entries) {
+			entries = directoryScope.run(() => queryDirectoryEntries(relativePath))!
+			directories.set(relativePath, entries)
+		}
+		return entries
+	},
+	prefetch(path: string) {
+		const relativePath = toRelativePath(path)
+		if (directories.has(relativePath)) return
+		queryClient.prefetchQuery({
+			queryKey: instanceKeys.files(instancePage.instanceId.value, relativePath),
+			queryFn: () => listDirectory(relativePath),
+			staleTime: 30_000,
+		})
+	},
+	expandedEntries: expandedDirectories,
 }
 
 async function writeBytes(path: string, bytes: Uint8Array, createOnly = false) {
@@ -118,12 +171,20 @@ const isRefreshing = ref<boolean>(false)
 async function refresh() {
 	debug('refresh: called, currentPath =', currentPath.value, 'instanceRoot =', instanceRoot.value)
 	isRefreshing.value = true;
-	await directoryQuery.refetch()
+	await Promise.all([
+		directoryQuery.refetch(),
+		queryClient.invalidateQueries({
+			queryKey: [...instanceKeys.detail(instancePage.instanceId.value), 'files'],
+			predicate: (query) =>
+				query.queryKey[query.queryKey.length - 1] !== currentPath.value,
+		}),
+	])
 	isRefreshing.value = false;
 }
 
 function navigateTo(path: string) {
 	debug('navigateTo:', path)
+	editingFile.value = null
 	currentPath.value = path.startsWith('/') ? path.slice(1) : path
 	refresh()
 }
@@ -302,26 +363,17 @@ watch(instanceId, async () => {
 	debug('watch instance.id: changed to', instanceId.value)
 	firstPaintPending.value = true
 	currentPath.value = ''
+	editingFile.value = null
+	expandedDirectories.value = []
 	await instanceRootQuery.refetch()
 	await refresh()
 })
-
-const directories: Record<string, Ref<FileItem[]>> = {};
-const expandedDirectories: Ref<string[]> = ref([]);
 
 provideFileManager({
 	isReadOnly,
 	readOnlyReason: computed(() => formatMessage(messages.readOnly)),
 	currentItems: items,
-	directoryTree: {
-		prefetch(path: string) {
-
-		},
-		getEntries(path: string) {
-
-		},
-		expandedEntries: expandedDirectories
-	},
+	directoryTree,
 	loading,
 	error,
 	currentPath,
@@ -352,7 +404,7 @@ provideFileManager({
 
 <template>
 	<ReadyTransition :pending="firstPaintPending">
-		<div>
+		<div class="[--files-viewport-height:calc(100vh_-_var(--top-bar-height))]">
 			<FilePageLayout :show-refresh-button="true" />
 		</div>
 	</ReadyTransition>

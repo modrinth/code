@@ -4,7 +4,7 @@
 	<FileCreateItemModal ref="createItemModal" :type="newItemType" @create="handleCreateNewItem" />
 	<FileCreateZipModal
 		ref="createZipModal"
-		:parent="ctx.currentPath.value"
+		:parent="selectionParent ?? ctx.currentPath.value"
 		:stat-file="ctx.statFile"
 		@create="handleZipSelection"
 	/>
@@ -19,23 +19,53 @@
 	<FileMoveItemModal
 		ref="moveItemModal"
 		:item="selectedItem"
-		:current-path="ctx.currentPath.value"
+		:current-path="selectedItem ? parentDirectory(normalizeFilePath(selectedItem.path)) : ctx.currentPath.value"
 		@move="handleMoveItem"
 	/>
 	<FileDeleteItemModal ref="deleteItemModal" :item="selectedItem" @delete="handleDeleteItem" />
 	<ContextMenu ref="contextMenuRef" :label="formatMessage(commonMessages.actionsLabel)" />
 
-	<div ref="fileViewer" v-if="!(ctx.loading.value && items.length === 0)" :class="[!smallMode ? 'h-[50rem]' : '']">
-		<KeepAlive>
-			<SplitviewVue v-if="!smallMode" class="h-[50rem]"
-				:theme="themeDark"
-				:orientation="Orientation.HORIZONTAL"
-				:components="{ fileSideBar: FileSideBar, fileBrowserPanel: FileBrowserPanel }"
-				@ready="onReady"
-			/>
-		</KeepAlive>
+	<div v-if="hasLoadedOnce" ref="fileViewer">
+		<div
+			class="grid items-start"
+			:class="{ 'cursor-col-resize select-none': isResizingSidebar }"
+			:style="{
+				gridTemplateColumns: showDockedSidebar
+					? `${sidebarWidth}px auto minmax(0, 1fr)`
+					: 'minmax(0, 1fr)',
+			}"
+		>
+			<template v-if="showDockedSidebar">
+				<aside
+					class="sticky top-[var(--files-sticky-top,0px)] flex max-h-[calc(var(--files-viewport-height,100dvh)_-_var(--files-sticky-top,0px))] flex-col"
+				>
+					<FileSideBar class="min-h-0" fill-height :add-border="false" />
+				</aside>
+				<div
+					role="separator"
+					tabindex="0"
+					aria-orientation="vertical"
+					:aria-label="formatMessage(messages.resizeSidebar)"
+					:aria-valuenow="sidebarWidth"
+					:aria-valuemin="SIDEBAR_MIN_WIDTH"
+					:aria-valuemax="maxSidebarWidth"
+					class="group flex w-3 cursor-col-resize touch-none justify-center self-stretch focus-visible:outline-none"
+					@pointerdown="startSidebarResize"
+					@keydown.left.prevent="nudgeSidebarWidth(-16)"
+					@keydown.right.prevent="nudgeSidebarWidth(16)"
+					@dblclick="resetSidebarWidth"
+				>
+					<div
+						class="h-full w-px bg-surface-5 transition-colors group-hover:bg-brand group-focus-visible:bg-brand"
+						:class="{ '!bg-brand': isResizingSidebar }"
+					/>
+				</div>
+			</template>
+			<div ref="mainColumn" class="min-w-0">
+				<FileBrowserPanel :small-mode="smallMode" />
+			</div>
+		</div>
 		<template v-if="smallMode">
-			<FileBrowserPanel :small-mode="true"/>
 			<NewModal ref="sidebarModal"
 				:on-hide="() => {
 					if (smallMode) sidebarOpen = false;
@@ -87,9 +117,9 @@
 			<div class="ml-auto flex items-center gap-0.5">
 				<Button
 					v-if="ctx.zipPaths"
-					v-tooltip="busyTooltip"
+					v-tooltip="isBusy ? busyTooltip : selectionParent === null ? formatMessage(messages.zipMixedFolders) : undefined"
 					type="quiet"
-					:disabled="isBusy"
+					:disabled="isBusy || selectionParent === null"
 					@click="createZipModal?.show()"
 				>
 					<FolderArchiveIcon />
@@ -113,17 +143,7 @@
 </template>
 
 <script setup lang="ts">
-import 'dockview-vue/dist/styles/dockview.css'
-
 import {FolderArchiveIcon, HistoryIcon, SaveIcon, TrashIcon,} from '@modrinth/assets'
-import {
-	type ISplitviewPanel,
-	LayoutPriority,
-	Orientation,
-	type SplitviewReadyEvent,
-	SplitviewVue,
-	themeDark
-} from 'dockview-vue'
 import type {Component} from 'vue'
 import {computed, onMounted, onUnmounted, ref, shallowRef, watch} from 'vue'
 
@@ -146,11 +166,18 @@ import FileRenameItemModal from './components/modals/FileRenameItemModal.vue'
 import FileUnsavedChangesModal from './components/modals/FileUnsavedChangesModal.vue'
 import FileUploadConflictModal from './components/modals/FileUploadConflictModal.vue'
 import FileUploadZipUrlModal from './components/modals/FileUploadZipUrlModal.vue'
+import {
+	directoryOf,
+	type FileLocation,
+	normalizeFilePath,
+	parentDirectory,
+	useFileTabs,
+} from './composables/file-tabs'
 import {useFileSearch} from './composables/file-search'
 import {useFileSelection} from './composables/file-selection'
 import {useFileSorting} from './composables/file-sorting'
 import {useFileUndoRedo} from './composables/file-undo-redo'
-import type {FileEditorBridge} from './providers/file-browser-ui'
+import type {FileEditorBridge, FileInfo} from './providers/file-browser-ui'
 import {provideFileBrowserUI} from './providers/file-browser-ui'
 import {injectFileManager} from './providers/file-manager'
 import type {FileItem} from './types'
@@ -199,6 +226,14 @@ const messages = defineMessages({
 		id: 'files.layout.create-zip',
 		defaultMessage: 'Create ZIP',
 	},
+	resizeSidebar: {
+		id: 'files.layout.resize-sidebar',
+		defaultMessage: 'Resize sidebar',
+	},
+	zipMixedFolders: {
+		id: 'files.layout.zip-mixed-folders',
+		defaultMessage: 'Only entries from the same folder can be zipped together',
+	},
 })
 
 const props = defineProps<{
@@ -220,17 +255,26 @@ import('vue3-ace-editor').then(async (mod) => {
 const baseId = `files-${Math.random().toString(36).slice(2, 9)}`
 
 const items = computed(() => ctx.currentItems.value)
+
+/**
+ * Only the very first load hides the viewer. Unmounting it on later navigations would tear down
+ * the tabs' dockview, and with it every other tab's open editor.
+ */
+const hasLoadedOnce = ref(false)
+watch(
+	() => !(ctx.loading.value && items.value.length === 0),
+	(loaded) => {
+		if (loaded) hasLoadedOnce.value = true
+	},
+	{ immediate: true },
+)
 const isEditing = computed(() => ctx.editingFile.value !== null)
 const isBusy = computed(() => (ctx.isBusy?.value ?? false) || (ctx.isReadOnly?.(ctx.currentPath.value) ?? false),)
 const busyTooltip = computed(() => ctx.isReadOnly?.(ctx.currentPath.value) ? ctx.readOnlyReason?.value : ctx.busyTooltip?.value,)
 
-const breadcrumbSegments = computed(() => {
-	const path = ctx.currentPath.value
-	if (typeof path === 'string') {
-		return path.split('/').filter(Boolean)
-	}
-	return []
-})
+const breadcrumbSegments = computed(() =>
+	directoryOf(fileTabs.activeLocation.value).split('/').filter(Boolean),
+)
 
 // Composables
 const { searchQuery, searchedItems } = useFileSearch(items)
@@ -252,8 +296,16 @@ const {
 } = useFileSelection(filteredItems)
 
 const selectionReadOnly = computed(() =>
-	[...selectedItems.value].some((path) => ctx.isReadOnly?.(path)),
+	[...selectedItems.value.keys()].some((path) => ctx.isReadOnly?.(path)),
 )
+
+/** The directory all selected entries share, or `null` when the selection is empty or spans directories. */
+const selectionParent = computed(() => {
+	const parents = new Set(
+		[...selectedItems.value.values()].map((item) => parentDirectory(normalizeFilePath(item.path))),
+	)
+	return parents.size === 1 ? [...parents][0] : null
+})
 
 const { recordOperation, onKeydown } = useFileUndoRedo(
 	(path, newName) => ctx.renameItem(path, newName),
@@ -262,19 +314,24 @@ const { recordOperation, onKeydown } = useFileUndoRedo(
 	(title, text, type) => addNotification({ title, text, type }),
 )
 
-// Bridge to whichever panel currently hosts the file editor (FileBrowserPanel).
-// Dockview mounts that panel itself, so there's no template ref to reach it through -
-// it registers its exposed API here on mount instead. See providers/file-browser-ui.ts.
-const fileEditorApi = shallowRef<FileEditorBridge | null>(null)
+const fileTabs = useFileTabs({
+	ctx,
+	confirmDiscard: confirmDiscardEditors,
+})
 
-const hasUnsavedChanges = computed(() => fileEditorApi.value?.hasUnsavedChanges?.value ?? false)
+const fileEditorApi = fileTabs.activeEditor
+const hasUnsavedChanges = fileTabs.hasUnsavedChanges
+
+function dirtyEditors(editors: Iterable<FileEditorBridge> = fileTabs.editors.values()) {
+	return [...editors].filter((editor) => editor.hasUnsavedChanges.value)
+}
 
 async function saveFileContent(exit = false) {
-	await fileEditorApi.value?.saveFileContent(exit)
+	await Promise.all(dirtyEditors().map((editor) => editor.saveFileContent(exit)))
 }
 
 function revertChanges() {
-	fileEditorApi.value?.revertChanges()
+	for (const editor of dirtyEditors()) editor.revertChanges()
 }
 
 async function shareToMclogs() {
@@ -302,64 +359,90 @@ const selectedItem = ref<FileItem | null>(null)
 
 const unsavedChangesModal = ref<InstanceType<typeof FileUnsavedChangesModal>>()
 
-const sidebar = ref<ISplitviewPanel | null>(null);
-const browser = ref<ISplitviewPanel | null>(null);
+const mainColumn = ref<MaybeElement>()
 
-// Initialize panels dynamically once the component mounts
-function onReady({api}: SplitviewReadyEvent) {
-	console.log("Split Ready")
+const SIDEBAR_MIN_WIDTH = 240
+const SIDEBAR_DEFAULT_WIDTH = 300
 
-	// Render the left panel
-	sidebar.value = api.addPanel({
-		index: 0,
-		id: 'panel_left',
-		component: 'fileSideBar',
-		minimumSize: 300, // Initial width in pixels
-		size: 300,
-		priority: LayoutPriority.Low
-	});
-
-	if (!sidebarOpen.value) sidebar.value.api.setVisible(false);
-
-	// Render the right panel
-	browser.value = api.addPanel({
-		index: 1,
-		id: 'panel_right',
-		component: 'fileBrowserPanel',
-		minimumSize: browserMinSize.value,
-		priority: LayoutPriority.High
-	});
-}
-
-const constrainWidth = computed(() => props.constrainWidth);
-const browserMinSize = computed(() => constrainWidth.value ? 700 : 1200)
-
-watch(browserMinSize, (value) => browser.value?.api?.setConstraints({ minimumSize: value }))
+const browserMinSize = computed(() => (props.constrainWidth ? 700 : 1200))
 
 const sidebarOpenSetting = useLocalStorage('file-layout-sidebar-open', false, { initOnMounted: true });
 const sidebarOpen = ref(sidebarOpenSetting.value);
+const sidebarWidthSetting = useLocalStorage('file-layout-sidebar-width', SIDEBAR_DEFAULT_WIDTH, {
+	initOnMounted: true,
+})
 
 watch(sidebarOpen, (value) => {
-	if(!smallMode.value) {
-		sidebar.value?.api?.setVisible(value);
+	if (!smallMode.value) return
+	if (value) {
+		sidebarModal.value?.show()
 	} else {
-		if (value) {
-			sidebarModal.value?.show()
-		} else {
-			sidebarModal.value?.hide()
-		}
+		sidebarModal.value?.hide()
 	}
 })
 
+/** Width of the whole files tab, used to pick between the docked sidebar and the pullout modal. */
+const shellWidth = ref<number>()
+/** Width of the main column, i.e. what `FileBrowserPanel` actually gets next to the sidebar. */
 const containerWidth = ref<number>()
 
 useResizeObserver(fileViewer, (entries) => {
-	const entry = entries[0]
-	containerWidth.value = entry.contentRect.width
+	shellWidth.value = entries[0].contentRect.width
 })
 
-const smallMode = computed(() => containerWidth.value == null || containerWidth.value < 1100);
-const fullWidthSidebar = computed(() => containerWidth.value == null || containerWidth.value < 400); //356
+useResizeObserver(mainColumn, (entries) => {
+	containerWidth.value = entries[0].contentRect.width
+})
+
+const smallMode = computed(() => shellWidth.value == null || shellWidth.value < 1100);
+const fullWidthSidebar = computed(() => shellWidth.value == null || shellWidth.value < 400);
+const showDockedSidebar = computed(() => !smallMode.value && sidebarOpen.value)
+
+const maxSidebarWidth = computed(() =>
+	Math.max(SIDEBAR_MIN_WIDTH, (shellWidth.value ?? 0) - browserMinSize.value),
+)
+
+function clampSidebarWidth(width: number) {
+	return Math.round(Math.min(Math.max(width, SIDEBAR_MIN_WIDTH), maxSidebarWidth.value))
+}
+
+const sidebarWidth = computed(() => clampSidebarWidth(sidebarWidthSetting.value))
+const isResizingSidebar = ref(false)
+
+function startSidebarResize(event: PointerEvent) {
+	if (event.button !== 0) return
+	event.preventDefault()
+
+	const handle = event.currentTarget as HTMLElement
+	const startX = event.clientX
+	const startWidth = sidebarWidth.value
+
+	handle.setPointerCapture(event.pointerId)
+	isResizingSidebar.value = true
+
+	function onMove(moveEvent: PointerEvent) {
+		sidebarWidthSetting.value = clampSidebarWidth(startWidth + moveEvent.clientX - startX)
+	}
+
+	function onEnd() {
+		isResizingSidebar.value = false
+		handle.removeEventListener('pointermove', onMove)
+		handle.removeEventListener('pointerup', onEnd)
+		handle.removeEventListener('pointercancel', onEnd)
+	}
+
+	handle.addEventListener('pointermove', onMove)
+	handle.addEventListener('pointerup', onEnd)
+	handle.addEventListener('pointercancel', onEnd)
+}
+
+function nudgeSidebarWidth(delta: number) {
+	sidebarWidthSetting.value = clampSidebarWidth(sidebarWidth.value + delta)
+}
+
+function resetSidebarWidth() {
+	sidebarWidthSetting.value = SIDEBAR_DEFAULT_WIDTH
+}
 
 let pastInitialSetup = false;
 
@@ -369,53 +452,54 @@ watch(smallMode, (value) => {
 	} else {
 		pastInitialSetup = true;
 	}
-
-	browser.value?.api?.setConstraints({ minimumSize: constrainWidth ? 700 : 1200 })
 })
 
-async function confirmDiscardChanges(): Promise<boolean> {
-	if (!hasUnsavedChanges.value) return true
+/**
+ * Prompts about any unsaved changes in the given editors.
+ * Resolves `true` once it is safe to discard them (saved, discarded, or nothing to lose).
+ */
+async function confirmDiscardEditors(editors: Iterable<FileEditorBridge>): Promise<boolean> {
+	const dirty = dirtyEditors(editors)
+	if (dirty.length === 0) return true
+
 	const result = await unsavedChangesModal.value?.prompt()
 	if (result === 'save') {
 		if (isBusy.value) return false
-		await saveFileContent(false)
-		return true
+		await Promise.all(dirty.map((editor) => editor.saveFileContent(false)))
+		return dirty.every((editor) => !editor.hasUnsavedChanges.value)
 	}
 	return result === 'discard'
 }
 
-// Navigation
+function locationOf(item: FileInfo): FileLocation {
+	const path = normalizeFilePath(item.path)
+	return item.type === 'directory'
+		? { kind: 'directory', path }
+		: { kind: 'file', path, name: item.name }
+}
+
 async function navigateToSegment(index: number) {
-	const newPath = index === -1 ? '/' : breadcrumbSegments.value.slice(0, index + 1).join('/')
-
-	if (newPath === ctx.currentPath.value && !isEditing.value) {
-		return
-	}
-
-	if (isEditing.value) {
-		if (!(await confirmDiscardChanges())) return
-		ctx.stopEditing()
-	}
-
-	ctx.navigateTo(newPath)
+	const path = `/${breadcrumbSegments.value.slice(0, index + 1).join('/')}`
+	await fileTabs.navigate({ kind: 'directory', path })
 }
 
-function handleNavigateToFolder(item: FileItem) {
-	const currentPath = ctx.currentPath.value
-	const newPath = currentPath.endsWith('/')
-		? `${currentPath}${item.name}`
-		: `${currentPath}/${item.name}`
-	ctx.navigateTo(newPath)
+async function handleNavigateToFolder(item: FileInfo) {
+	await fileTabs.navigate(locationOf({ ...item, type: 'directory' }))
 }
 
-// Editing
-function handleEditFile(item: { name: string; type: string; path: string }) {
-	ctx.startEditing({ name: item.name, path: item.path })
+async function handleEditFile(item: FileInfo) {
+	await fileTabs.navigate(locationOf({ ...item, type: 'file' }))
+}
+
+function handleOpenInNewTab(item: FileInfo) {
+	if (item.type !== 'directory' && !canOpenInFileEditor(item.name)) return
+	fileTabs.openTab(locationOf(item))
 }
 
 async function handleEditorClose() {
-	if (!(await confirmDiscardChanges())) return
-	ctx.stopEditing()
+	const location = fileTabs.activeLocation.value
+	if (location.kind !== 'file') return
+	await fileTabs.navigate({ kind: 'directory', path: directoryOf(location) })
 }
 
 // CRUD handlers
@@ -429,13 +513,13 @@ async function handleRenameItem(newName: string) {
 	const item = selectedItem.value
 	if (!item) return
 
-	const path = `${ctx.currentPath.value}/${item.name}`.replace('//', '/')
+	const path = normalizeFilePath(item.path)
 	await ctx.renameItem(path, newName)
 	recordOperation({
 		type: 'rename',
 		itemType: item.type,
 		fileName: item.name,
-		path: ctx.currentPath.value,
+		path: parentDirectory(path),
 		oldName: item.name,
 		newName,
 	})
@@ -446,8 +530,8 @@ async function handleMoveItem(destination: string) {
 	const item = selectedItem.value
 	if (!item) return
 
-	const sourcePath = ctx.currentPath.value
-	const source = `${sourcePath}/${item.name}`.replace('//', '/')
+	const source = normalizeFilePath(item.path)
+	const sourcePath = parentDirectory(source)
 	const dest = `${destination}/${item.name}`.replace('//', '/')
 
 	await ctx.moveItem(source, dest)
@@ -465,8 +549,7 @@ function handleDeleteItem() {
 	const item = selectedItem.value
 	if (!item) return
 
-	const path = `${ctx.currentPath.value}/${item.name}`.replace('//', '/')
-	ctx.deleteItem(path, item.type === 'directory')
+	ctx.deleteItem(normalizeFilePath(item.path), item.type === 'directory')
 }
 
 function handleDirectMove(moveData: {
@@ -503,12 +586,11 @@ async function handleZip(item: FileItem) {
 }
 
 async function handleZipSelection(target: string) {
-	if (isBusy.value || !ctx.zipPaths || selectedItems.value.size === 0) return
-	const include = items.value
-		.filter((item) => selectedItems.value.has(item.path))
-		.map((item) => item.name)
+	const parent = selectionParent.value
+	if (isBusy.value || !ctx.zipPaths || parent === null) return
+	const include = [...selectedItems.value.values()].map((item) => item.name)
 	deselectAll()
-	await ctx.zipPaths(ctx.currentPath.value, include, target)
+	await ctx.zipPaths(parent, include, target)
 }
 
 // Extract
@@ -587,12 +669,8 @@ function showBulkDeleteModal() {
 	if (isBusy.value || selectionReadOnly.value) return
 	if (selectedItems.value.size === 0) return
 
-	const itemsToDelete = Array.from(selectedItems.value)
-	for (const path of itemsToDelete) {
-		const item = items.value.find((i) => i.path === path)
-		if (item) {
-			ctx.deleteItem(path, item.type === 'directory')
-		}
+	for (const item of selectedItems.value.values()) {
+		ctx.deleteItem(normalizeFilePath(item.path), item.type === 'directory')
 	}
 	deselectAll()
 }
@@ -652,11 +730,7 @@ function handleItemHover(item: { type: string; path: string; name: string }) {
 
 	if (item.type === 'directory') {
 		prefetchTimeout = setTimeout(() => {
-			const currentPath = ctx.currentPath.value
-			const navPath = currentPath.endsWith('/')
-				? `${currentPath}${item.name}`
-				: `${currentPath}/${item.name}`
-			ctx.prefetchDirectory?.(navPath)
+			ctx.prefetchDirectory?.(normalizeFilePath(item.path))
 		}, 150)
 	} else if (canOpenInFileEditor(item.name)) {
 		prefetchTimeout = setTimeout(() => {
@@ -679,11 +753,9 @@ function handleContextMenu(event: MouseEvent, options: ButtonMenuOption[]) {
 	contextMenuRef.value?.open(event, options)
 }
 
-// Shared UI state/handlers for the dockview-hosted panels (FileSideBar, FileBrowserPanel).
-// Dockview mounts those panels itself via the `components` map + `addPanel()`, so they're
-// no longer direct template children - normal prop/emit/ref bindings can't reach them. They
-// stay true descendants in the Vue tree though (dockview-vue teleports them), so provide/inject
-// still works and is what they use instead. See providers/file-browser-ui.ts.
+// Shared UI state/handlers for FileSideBar, FileBrowserPanel and the dockview-hosted editor
+// tabs. Dockview mounts tab panels itself (teleported, so still Vue descendants), which means
+// prop/emit/ref bindings can't reach them but provide/inject does. See providers/file-browser-ui.ts.
 provideFileBrowserUI({
 	baseId,
 	showDebugInfo: computed(() => props.showDebugInfo ?? false),
@@ -715,6 +787,7 @@ provideFileBrowserUI({
 	someSelected,
 
 	editorComponent,
+	fileTabs,
 	fileEditorApi,
 	hasUnsavedChanges,
 	saveFileContent,
@@ -725,6 +798,7 @@ provideFileBrowserUI({
 	navigateToSegment,
 	handleNavigateToFolder,
 	handleEditFile,
+	handleOpenInNewTab,
 	handleEditorClose,
 	handlePrefetchHome,
 	handleItemHover,
@@ -748,13 +822,12 @@ provideFileBrowserUI({
 	handleContextMenu,
 })
 
-// Reset search/sort/selection on path change
+// Reset search/sort on path change; selection spans directories, so it is kept
 watch(
 	() => ctx.currentPath.value,
 	() => {
 		searchQuery.value = ''
 		resetSort()
-		deselectAll()
 	},
 )
 
