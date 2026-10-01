@@ -8,6 +8,7 @@ use tracing_subscriber::{
     EnvFilter, Layer, layer::SubscriberExt, util::SubscriberInitExt,
 };
 
+mod export;
 mod model;
 mod task;
 mod upstream;
@@ -21,11 +22,46 @@ struct Cli {
 
 #[derive(Debug, clap::Subcommand)]
 enum Command {
-    Download,
+    /// Download manifests and sources from upstreamms
+    Download {
+        /// Download Minecraft game version info from Mojang?
+        #[arg(long)]
+        mojang: bool,
+        /// Download Fabric loader info?
+        #[arg(long)]
+        fabric: bool,
+        /// Download Forge loader info?
+        #[arg(long)]
+        forge: bool,
+        /// Download NeoForge loader info?
+        #[arg(long)]
+        neoforge: bool,
+        /// Download Quilt loader info?
+        #[arg(long)]
+        quilt: bool,
+    },
+    /// Delete old or unreachable objects in the database
     Prune {
+        /// Don't commit the database transaction
         #[arg(long)]
         dry_run: bool,
+        /// How many of the last download runs to keep, sorted by time when
+        /// the run was started.
+        ///
+        /// Any download runs older than this will be deleted, and its entities
+        /// will be garbage collected.
+        #[arg(long)]
+        keep_last_runs: Option<usize>,
     },
+}
+
+#[derive(Debug, Clone, Copy, clap::ValueEnum)]
+enum Upstream {
+    Fabric,
+    Forge,
+    Mojang,
+    NeoForge,
+    Quilt,
 }
 
 pub async fn main() -> Result<()> {
@@ -61,12 +97,32 @@ pub async fn main() -> Result<()> {
             .timeout(Duration::from_secs(30))
             .build()
             .context("building HTTP client")?,
-        db: connect_to_db().await?,
+        db,
     };
 
     match cli.command {
-        Command::Download => task::download_from_upstreams(&state).await,
-        Command::Prune { dry_run } => task::prune(&state, dry_run).await,
+        Command::Download {
+            mojang,
+            fabric,
+            forge,
+            neoforge,
+            quilt,
+        } => {
+            let all_upstreams =
+                !mojang && !fabric && !forge && !neoforge && !quilt;
+            let upstreams = task::Upstreams {
+                mojang: all_upstreams || mojang,
+                fabric: all_upstreams || fabric,
+                forge: all_upstreams || forge,
+                neoforge: all_upstreams || neoforge,
+                quilt: all_upstreams || quilt,
+            };
+            task::download_from_upstreams(&state, upstreams).await
+        }
+        Command::Prune {
+            dry_run,
+            keep_last_runs,
+        } => task::prune(&state, dry_run, keep_last_runs).await,
     }
 }
 
@@ -83,6 +139,6 @@ pub async fn connect_to_db() -> Result<toasty::Db> {
     toasty::Db::builder()
         .models(toasty::models!(crate::*))
         .connect(&db_url)
-        .context(info_span!("connecting to database", %db_url))
+        .context(info_span!("connecting to database"))
         .await
 }

@@ -11,7 +11,7 @@ impl ErrorVec {
     }
 
     pub fn push(&mut self, err: &anyhow::Error) {
-        warn!("{err:?}");
+        warn!("error: {err:?}");
         self.0.push(format!("{err:#}").into_boxed_str());
     }
 }

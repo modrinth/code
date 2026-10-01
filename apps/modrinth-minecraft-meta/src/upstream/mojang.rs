@@ -78,7 +78,8 @@ pub async fn download(
         "downloaded Mojang catalog"
     );
 
-    for (index, version) in catalog.versions.into_iter().enumerate() {
+    let mut num_downloaded = 0usize;
+    for version in catalog.versions {
         cx.download_json::<VersionManifest>(
             version.url.clone(),
         )
@@ -89,8 +90,9 @@ pub async fn download(
         .inspect_err(|err| errors.push(err))
         .ok();
 
-        if (index + 1) % 10 == 0 {
-            info!("downloaded {index} version manifests");
+        num_downloaded += 1;
+        if num_downloaded.is_multiple_of(10) {
+            info!("downloaded {num_downloaded} version manifests");
         }
     }
 

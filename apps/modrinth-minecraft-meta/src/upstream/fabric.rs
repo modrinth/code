@@ -110,7 +110,8 @@ pub async fn download(
         "downloaded Fabric catalog"
     );
 
-    for (index, loader) in catalog.loader.into_iter().enumerate() {
+    let mut num_downloaded = 0usize;
+    for loader in catalog.loader {
         let loader_version = &loader.version;
         let url = format!(
             "{CATALOG_URL}/loader/{GAME_VERSION}/{loader_version}/profile/json"
@@ -121,8 +122,9 @@ pub async fn download(
             .inspect_err(|err| errors.push(err))
             .ok();
 
-        if (index + 1) % 10 == 0 {
-            info!("downloaded {index} loader profiles");
+        num_downloaded += 1;
+        if num_downloaded.is_multiple_of(10) {
+            info!("downloaded {num_downloaded} loader profiles");
         }
     }
 

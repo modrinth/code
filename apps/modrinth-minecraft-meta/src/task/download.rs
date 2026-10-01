@@ -14,7 +14,31 @@ use crate::{
     util::{ErrorVec, Sha256, json_from_str, json_from_value},
 };
 
-pub async fn download_from_upstreams(state: &AppState) -> Result<()> {
+#[derive(Debug, Clone, Copy)]
+pub struct Upstreams {
+    pub mojang: bool,
+    pub fabric: bool,
+    pub forge: bool,
+    pub neoforge: bool,
+    pub quilt: bool,
+}
+
+impl Default for Upstreams {
+    fn default() -> Self {
+        Self {
+            mojang: true,
+            fabric: true,
+            forge: true,
+            neoforge: true,
+            quilt: true,
+        }
+    }
+}
+
+pub async fn download_from_upstreams(
+    state: &AppState,
+    upstreams: Upstreams,
+) -> Result<()> {
     let mut conn = state
         .db
         .connection()
@@ -36,35 +60,45 @@ pub async fn download_from_upstreams(state: &AppState) -> Result<()> {
         download_run_id: download_run.id,
     };
 
-    upstream::mojang::download(&mut cx, &mut errors)
-        .context(info_span!("downloading Mojang upstream"))
-        .await
-        .inspect_err(|err| errors.push(err))
-        .ok();
+    if upstreams.mojang {
+        upstream::mojang::download(&mut cx, &mut errors)
+            .context(info_span!("downloading Mojang upstream"))
+            .await
+            .inspect_err(|err| errors.push(err))
+            .ok();
+    }
 
-    upstream::fabric::download(&mut cx, &mut errors)
-        .context(info_span!("downloading Fabric upstream"))
-        .await
-        .inspect_err(|err| errors.push(err))
-        .ok();
+    if upstreams.fabric {
+        upstream::fabric::download(&mut cx, &mut errors)
+            .context(info_span!("downloading Fabric upstream"))
+            .await
+            .inspect_err(|err| errors.push(err))
+            .ok();
+    }
 
-    upstream::forge::download(&mut cx, &mut errors)
-        .context(info_span!("downloading Forge upstream"))
-        .await
-        .inspect_err(|err| errors.push(err))
-        .ok();
+    if upstreams.forge {
+        upstream::forge::download(&mut cx, &mut errors)
+            .context(info_span!("downloading Forge upstream"))
+            .await
+            .inspect_err(|err| errors.push(err))
+            .ok();
+    }
 
-    upstream::neoforge::download(&mut cx, &mut errors)
-        .context(info_span!("downloading NeoForge upstream"))
-        .await
-        .inspect_err(|err| errors.push(err))
-        .ok();
+    if upstreams.neoforge {
+        upstream::neoforge::download(&mut cx, &mut errors)
+            .context(info_span!("downloading NeoForge upstream"))
+            .await
+            .inspect_err(|err| errors.push(err))
+            .ok();
+    }
 
-    upstream::quilt::download(&mut cx, &mut errors)
-        .context(info_span!("downloading Quilt upstream"))
-        .await
-        .inspect_err(|err| errors.push(err))
-        .ok();
+    if upstreams.quilt {
+        upstream::quilt::download(&mut cx, &mut errors)
+            .context(info_span!("downloading Quilt upstream"))
+            .await
+            .inspect_err(|err| errors.push(err))
+            .ok();
+    }
 
     toasty::update!(download_run {
         completed_at: Timestamp::now(),

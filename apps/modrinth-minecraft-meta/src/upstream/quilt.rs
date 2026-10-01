@@ -38,14 +38,15 @@ pub struct GameVersion {
 pub struct MappingVersionName(pub String);
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
 pub struct MappingVersion {
     pub maven: MavenCoordinate,
     pub version: MappingVersionName,
+    #[serde(rename = "gameVersion")]
     pub game_version: GameVersionName,
     pub build: u32,
     pub separator: String,
     pub hashed: HashedVersionName,
+    #[serde(rename = "file_size")]
     pub file_size: u64,
     pub hashes: Hashes,
 }
