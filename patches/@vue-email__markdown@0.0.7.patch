@@ -1,0 +1,118 @@
+diff --git a/dist/index.js b/dist/index.js
+index 6eb37e16468a4874aff034a28dc9189d2e136ed1..c65d2d1859754279ae23ba24bf184b0d658f23ee 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -27,6 +27,45 @@ var import_vue = require("vue");
+ 
+ // src/utils/parser.ts
+ var import_marked = require("marked");
++var import_xss = require("xss");
++var { FilterXSS, whiteList: xssWhiteList } = import_xss;
++var styledTags = [
++  "a",
++  "blockquote",
++  "br",
++  "code",
++  "del",
++  "em",
++  "h1",
++  "h2",
++  "h3",
++  "h4",
++  "h5",
++  "h6",
++  "hr",
++  "img",
++  "li",
++  "ol",
++  "p",
++  "pre",
++  "strong",
++  "table",
++  "tbody",
++  "td",
++  "th",
++  "thead",
++  "tr",
++  "ul"
++];
++var markdownWhiteList = { ...xssWhiteList };
++for (const tag of styledTags) {
++  markdownWhiteList[tag] = [...markdownWhiteList[tag] || [], "style"];
++}
++var markdownXss = new FilterXSS({
++  whiteList: markdownWhiteList,
++  stripIgnoreTag: true,
++  stripIgnoreTagBody: ["script", "style"]
++});
+ 
+ // src/utils/styles.ts
+ var emptyStyle = {};
+@@ -293,7 +332,7 @@ var parseMarkdownToJSX = ({
+   customStyles
+ }) => {
+   const parser = new MarkdownParser({ customStyles });
+-  return parser.parse(markdown);
++  return markdownXss.process(parser.parse(markdown));
+ };
+ 
+ // src/index.ts
+diff --git a/dist/index.mjs b/dist/index.mjs
+index e667177cc0b2b46d2c452453235efece46892f06..2f83968b4d8c676cec7ec515793a2d0e39d8cc0c 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -3,6 +3,45 @@ import { defineComponent, h } from "vue";
+ 
+ // src/utils/parser.ts
+ import { marked } from "marked";
++import xss from "xss";
++var { FilterXSS, whiteList: xssWhiteList } = xss;
++var styledTags = [
++  "a",
++  "blockquote",
++  "br",
++  "code",
++  "del",
++  "em",
++  "h1",
++  "h2",
++  "h3",
++  "h4",
++  "h5",
++  "h6",
++  "hr",
++  "img",
++  "li",
++  "ol",
++  "p",
++  "pre",
++  "strong",
++  "table",
++  "tbody",
++  "td",
++  "th",
++  "thead",
++  "tr",
++  "ul"
++];
++var markdownWhiteList = { ...xssWhiteList };
++for (const tag of styledTags) {
++  markdownWhiteList[tag] = [...markdownWhiteList[tag] || [], "style"];
++}
++var markdownXss = new FilterXSS({
++  whiteList: markdownWhiteList,
++  stripIgnoreTag: true,
++  stripIgnoreTagBody: ["script", "style"]
++});
+ 
+ // src/utils/styles.ts
+ var emptyStyle = {};
+@@ -269,7 +308,7 @@ var parseMarkdownToJSX = ({
+   customStyles
+ }) => {
+   const parser = new MarkdownParser({ customStyles });
+-  return parser.parse(markdown);
++  return markdownXss.process(parser.parse(markdown));
+ };
+ 
+ // src/index.ts

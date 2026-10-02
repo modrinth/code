@@ -4121,35 +4121,20 @@
   "project.settings.license.custom": {
     "message": "Своя"
   },
-  "project.settings.license.has-spdx": {
-    "message": "Использует SPDX"
-  },
-  "project.settings.license.missing-name": {
-    "message": "Укажите название (или идентификатор SPDX) у своей лицензии."
-  },
   "project.settings.license.name": {
     "message": "Название лицензии"
   },
   "project.settings.license.name-placeholder": {
     "message": "Название лицензии"
   },
-  "project.settings.license.optional-url": {
-    "message": "Ссылка на лицензию (необязательно)"
+  "project.settings.license.optional-label": {
+    "message": "необязательно"
   },
   "project.settings.license.select": {
     "message": "Выберите лицензию"
   },
-  "project.settings.license.select-description": {
-    "message": "Как можно и нельзя использовать проект."
-  },
   "project.settings.license.select-placeholder": {
     "message": "Выберите лицензию..."
-  },
-  "project.settings.license.spdx": {
-    "message": "Идентификатор SPDX"
-  },
-  "project.settings.license.spdx-placeholder": {
-    "message": "Идентификатор SPDX"
   },
   "project.settings.license.title": {
     "message": "Лицензия"
