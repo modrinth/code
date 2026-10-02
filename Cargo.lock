@@ -3562,6 +3562,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "enum_dispatch"
+version = "0.3.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aa18ce2bc66555b3218614519ac839ddb759a7d6720732f979ef8d13be147ecd"
+dependencies = [
+ "once_cell",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.106",
+]
+
+[[package]]
 name = "enumflags2"
 version = "0.7.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5947,9 +5959,9 @@ checksum = "2c4a545a15244c7d945065b5d392b2d2d7f21526fba56ce51467b06ed445e8f7"
 
 [[package]]
 name = "libc"
-version = "0.2.186"
+version = "0.2.189"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "68ab91017fe16c622486840e4c83c9a37afeff978bd239b5293d61ece587de66"
+checksum = "3eaf3ede3fee6db1a4c2ee091bf8a8b4dccdc6d17f656fb07896ee72867612f2"
 
 [[package]]
 name = "libdbus-sys"
@@ -6006,6 +6018,24 @@ dependencies = [
  "libc",
  "redox_syscall",
 ]
+
+[[package]]
+name = "libseccomp"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0e5310a2c5b6ffbc094b5f70a2ca7b79ed36ad90e6f90994b166489a1bce3fcc"
+dependencies = [
+ "bitflags 2.9.4",
+ "libc",
+ "libseccomp-sys",
+ "pkg-config",
+]
+
+[[package]]
+name = "libseccomp-sys"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "60276e2d41bbb68b323e566047a1bfbf952050b157d8b5cdc74c07c1bf4ca3b6"
 
 [[package]]
 name = "libsqlite3-sys"
@@ -7201,6 +7231,32 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
+]
+
+[[package]]
+name = "modrinth-sandbox"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "bitflags 2.9.4",
+ "clap 4.5.48",
+ "derive_more 2.1.1",
+ "directories",
+ "enum_dispatch",
+ "eyre",
+ "futures",
+ "libc",
+ "libseccomp",
+ "rand 0.8.5",
+ "scopeguard",
+ "serde",
+ "tempfile",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+ "uuid 1.23.3",
+ "windows",
+ "zbus",
 ]
 
 [[package]]
@@ -12226,7 +12282,7 @@ dependencies = [
  "serde_with",
  "swift-rs",
  "thiserror 2.0.17",
- "toml 0.9.8",
+ "toml 1.1.6+spec-1.1.0",
  "url",
  "urlpattern 0.6.0",
  "uuid 1.23.3",
@@ -12377,6 +12433,7 @@ dependencies = [
  "itertools 0.14.0",
  "json5",
  "modrinth-content-management",
+ "modrinth-sandbox",
  "notify",
  "notify-debouncer-mini",
  "p256",
@@ -12441,6 +12498,7 @@ dependencies = [
  "hyper 1.7.0",
  "hyper-util",
  "image",
+ "modrinth-sandbox",
  "native-dialog",
  "objc2-app-kit",
  "paste",

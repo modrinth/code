@@ -1,0 +1,42 @@
+[package]
+name = "modrinth-sandbox"
+version = "0.1.0"
+edition.workspace = true
+readme = "README.md"
+
+[dependencies]
+tracing = { workspace = true }
+tokio = { workspace = true, features = ["fs", "process", "rt"] }
+eyre = { workspace = true }
+async-trait = { workspace = true }
+bitflags = { workspace = true, features = ["serde"] }
+derive_more = { workspace = true, features = ["debug"] }
+uuid = { workspace = true, features = ["v7"] }
+serde = { workspace = true, features = ["derive"] }
+zbus = { workspace = true }
+enum_dispatch = { workspace = true }
+futures = { workspace = true }
+rand = { workspace = true }
+libc =  { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["full"] }
+tracing-subscriber = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+libseccomp =  { workspace = true }
+directories =  { workspace = true }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+tempfile = { workspace = true }
+# security-framework =  { workspace = true }
+# security-framework-sys =  { workspace = true }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows =  { workspace = true, features = ["Win32_System_Memory"] }
+# junction =  { workspace = true }
+scopeguard =  { workspace = true }
+
+[lints]
+workspace = true
