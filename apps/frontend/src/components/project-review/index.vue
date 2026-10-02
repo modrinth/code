@@ -17,13 +17,7 @@
 					<ProjectWideChecks :inert="pending" />
 					<section class="flex min-h-0 min-w-0 flex-1 flex-col">
 						<div class="flex shrink-0 flex-wrap items-center gap-2 pb-2.5">
-							<Tabs v-model:value="activeReviewTab" wrap :tabs="rightPanelTabs">
-								<template #after-label="{ tab }">
-									<span v-if="tab.value === 're-review'">
-										({{ previousIssues.reReviewIssues.value.length }})
-									</span>
-								</template>
-							</Tabs>
+							<Tabs v-model:value="activeReviewTab" wrap :tabs="rightPanelTabs" />
 							<div v-if="activeReviewTab !== 'thread'" class="ml-auto flex items-center gap-1">
 								<Tooltip
 									v-if="!pending && project"
@@ -218,7 +212,7 @@ const reviewTabMessages = defineMessages({
 	thread: { id: 'project-review.right-panel.thread', defaultMessage: 'Thread' },
 	reReview: {
 		id: 'project-review.right-panel.re-review',
-		defaultMessage: 'Re-review',
+		defaultMessage: 'Re-review ({count})',
 	},
 	resetIssues: {
 		id: 'project-review.issues.reset',
@@ -237,7 +231,14 @@ const reviewTabMessages = defineMessages({
 
 const rightPanelTabs = computed(() => [
 	...(hasPreviousIssues.value
-		? [{ value: 're-review', label: formatMessage(reviewTabMessages.reReview) }]
+		? [
+				{
+					value: 're-review',
+					label: formatMessage(reviewTabMessages.reReview, {
+						count: previousIssues.reReviewIssues.value.length,
+					}),
+				},
+			]
 		: []),
 	{ value: 'thread', label: formatMessage(reviewTabMessages.thread) },
 	{
