@@ -48,7 +48,7 @@ const messages = defineMessages({
 		v-bind="props"
 		v-model="model.enabled"
 		:icon="MegaphoneIcon"
-		:title="formatMessage(messages.title)"
+		:title="props.title ?? formatMessage(messages.title)"
 		info-link="https://support.modrinth.com/en/articles/16567675#h_d486036510"
 		@set-lock-status="emit('setLockStatus', $event)"
 	>

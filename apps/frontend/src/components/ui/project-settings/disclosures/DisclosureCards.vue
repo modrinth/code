@@ -3,6 +3,7 @@ import type { Labrinth } from '@modrinth/api-client'
 
 import ReviewPanel from '~/components/project-review/review-panel/index.vue'
 import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
+import { injectReviewPanels } from '~/providers/project-review/review-panels'
 
 import AdvertisingDisclosureCard from './AdvertisingDisclosureCard.vue'
 import AiDisclosureCard from './AiDisclosureCard.vue'
@@ -27,6 +28,14 @@ const props = withDefaults(
 )
 const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVisible } =
 	props.editor
+const panels = injectReviewPanels(null)
+
+function reviewTitle(key: string): string | undefined {
+	return props.variant === 'review'
+		? panels?.resolve({ kind: 'disclosure', key })?.panel.title
+		: undefined
+}
+
 const disclosureIssueTargets: Labrinth.Threads.v3.ThreadIssueTarget['type'][] = [
 	'remove_project_disclosures',
 	'modify_project_disclosure',
@@ -51,6 +60,7 @@ const disclosureIssueTargets: Labrinth.Threads.v3.ThreadIssueTarget['type'][] = 
 			<AiDisclosureCard
 				v-model="current.ai"
 				:hide-description="hideDescription"
+				:title="reviewTitle('ai')"
 				:variant="variant"
 				v-bind="disclosureUpdateProps('ai_content')"
 				@set-lock-status="
@@ -79,6 +89,7 @@ const disclosureIssueTargets: Labrinth.Threads.v3.ThreadIssueTarget['type'][] = 
 			<AiFunctionalityDisclosureCard
 				v-model="current.aiFunctionality"
 				:hide-description="hideDescription"
+				:title="reviewTitle('ai-functionality')"
 				:variant="variant"
 				v-bind="disclosureUpdateProps('ai_functionality')"
 				@set-lock-status="
@@ -107,6 +118,7 @@ const disclosureIssueTargets: Labrinth.Threads.v3.ThreadIssueTarget['type'][] = 
 			<AdvertisingDisclosureCard
 				v-model="current.advertising"
 				:hide-description="hideDescription"
+				:title="reviewTitle('ads')"
 				:variant="variant"
 				v-bind="disclosureUpdateProps('advertisements')"
 				@set-lock-status="
@@ -135,6 +147,7 @@ const disclosureIssueTargets: Labrinth.Threads.v3.ThreadIssueTarget['type'][] = 
 			<PaidFeaturesDisclosureCard
 				v-model="current.paidFeatures"
 				:hide-description="hideDescription"
+				:title="reviewTitle('paid-features')"
 				:variant="variant"
 				v-bind="disclosureUpdateProps('paid_features')"
 				@set-lock-status="
@@ -163,6 +176,7 @@ const disclosureIssueTargets: Labrinth.Threads.v3.ThreadIssueTarget['type'][] = 
 			<TelemetryDisclosureCard
 				v-model="current.telemetry"
 				:hide-description="hideDescription"
+				:title="reviewTitle('telemetry')"
 				:variant="variant"
 				v-bind="disclosureUpdateProps('telemetry')"
 				@set-lock-status="
@@ -191,6 +205,7 @@ const disclosureIssueTargets: Labrinth.Threads.v3.ThreadIssueTarget['type'][] = 
 			<DerivativeDisclosureCard
 				v-model="current.derivative"
 				:hide-description="hideDescription"
+				:title="reviewTitle('derivative-content')"
 				:variant="variant"
 				v-bind="disclosureUpdateProps('derivative_work')"
 				@set-lock-status="
@@ -219,6 +234,7 @@ const disclosureIssueTargets: Labrinth.Threads.v3.ThreadIssueTarget['type'][] = 
 			<PhotosensitivityDisclosureCard
 				v-model="current.photosensitivity"
 				:hide-description="hideDescription"
+				:title="reviewTitle('photosensitivity')"
 				:variant="variant"
 				v-bind="disclosureUpdateProps('epilepsy_triggers')"
 				@set-lock-status="
@@ -247,6 +263,7 @@ const disclosureIssueTargets: Labrinth.Threads.v3.ThreadIssueTarget['type'][] = 
 			<SystemInteractionsDisclosureCard
 				v-model="current.systemInteractions"
 				:hide-description="hideDescription"
+				:title="reviewTitle('system-interactions')"
 				:variant="variant"
 				v-bind="disclosureUpdateProps('system_interactions')"
 				@set-lock-status="
@@ -276,6 +293,7 @@ const disclosureIssueTargets: Labrinth.Threads.v3.ThreadIssueTarget['type'][] = 
 				v-model="current.archived"
 				:project-title="projectTitle"
 				:hide-description="hideDescription"
+				:title="reviewTitle('archive')"
 				:variant="variant"
 				v-bind="disclosureUpdateProps('archived')"
 				@set-lock-status="
