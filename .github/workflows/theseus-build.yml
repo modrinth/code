@@ -16,6 +16,11 @@ on:
       - 'packages/utils/**'
   workflow_dispatch:
     inputs:
+      sign-macos-binaries:
+        description: Sign macOS binaries
+        type: boolean
+        default: false
+        required: false
       sign-windows-binaries:
         description: Sign Windows binaries
         type: boolean
@@ -171,13 +176,13 @@ jobs:
         if: contains(matrix.artifact-target-name, 'darwin')
         env:
           TAURI_BUNDLER_DMG_IGNORE_CI: 'true'
-          ENABLE_CODE_SIGNING: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          ENABLE_CODE_SIGNING: ${{ (github.event_name != 'workflow_dispatch' || inputs.sign-macos-binaries) && secrets.APPLE_CERTIFICATE || '' }}
+          APPLE_CERTIFICATE: ${{ (github.event_name != 'workflow_dispatch' || inputs.sign-macos-binaries) && secrets.APPLE_CERTIFICATE || '' }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ (github.event_name != 'workflow_dispatch' || inputs.sign-macos-binaries) && secrets.APPLE_CERTIFICATE_PASSWORD || '' }}
+          APPLE_SIGNING_IDENTITY: ${{ (github.event_name != 'workflow_dispatch' || inputs.sign-macos-binaries) && secrets.APPLE_SIGNING_IDENTITY || '' }}
+          APPLE_ID: ${{ (github.event_name != 'workflow_dispatch' || inputs.sign-macos-binaries) && secrets.APPLE_ID || '' }}
+          APPLE_TEAM_ID: ${{ (github.event_name != 'workflow_dispatch' || inputs.sign-macos-binaries) && secrets.APPLE_TEAM_ID || '' }}
+          APPLE_PASSWORD: ${{ (github.event_name != 'workflow_dispatch' || inputs.sign-macos-binaries) && secrets.APPLE_PASSWORD || '' }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
