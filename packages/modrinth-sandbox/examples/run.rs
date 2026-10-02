@@ -6,7 +6,7 @@ use std::{
 };
 
 use eyre::{Result, WrapErr, ensure};
-use modrinth_sandbox::{SandboxArg, SandboxCommand, SandboxStdio};
+use modrinth_sandbox::{SandboxArg, SandboxCommand, SandboxEnv, SandboxStdio};
 use tracing::info;
 
 #[derive(Debug, clap::Parser)]
@@ -24,10 +24,13 @@ struct Cli {
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    if modrinth_sandbox::helper::run_default()? {
+        return Ok(());
+    }
     let cli = <Cli as clap::Parser>::parse();
     tracing_subscriber::fmt().init();
 
-    let env = modrinth_sandbox::create_env()
+    let env = SandboxEnv::new()
         .await
         .wrap_err("creating sandbox environment")?;
     info!("using environment {env:?}");

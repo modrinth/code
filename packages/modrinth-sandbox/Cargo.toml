@@ -34,7 +34,7 @@ tempfile = { workspace = true }
 # security-framework-sys =  { workspace = true }
 
 [target.'cfg(target_os = "windows")'.dependencies]
-windows =  { workspace = true }
+windows =  { workspace = true, features = ["Win32_System_Memory"] }
 # junction =  { workspace = true }
 scopeguard =  { workspace = true }
 

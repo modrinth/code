@@ -2,6 +2,7 @@
 
 use std::{
     collections::{BTreeMap, HashSet},
+    ffi::OsString,
     fmt::Debug,
 };
 
@@ -9,7 +10,7 @@ use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
 use eyre::Result;
 
-use crate::{SandboxCommand, util::SandboxArg};
+use crate::{SandboxCommand, helper::MakeHelper, util::SandboxArg};
 
 #[cfg(target_os = "linux")]
 mod bubblewrap;
@@ -28,7 +29,7 @@ mod windows;
 #[async_trait]
 pub trait Backend {
     /// See [`crate::create_env`].
-    async fn init() -> Result<Box<dyn SandboxEnv>>;
+    async fn init(make_helper: MakeHelper) -> Result<Box<dyn SandboxEnv>>;
 }
 
 /// See [`crate::SandboxEnv`].
@@ -42,7 +43,9 @@ pub trait SandboxEnv: Debug + Send + Sync {
 }
 
 /// See [`crate::create_env`].
-pub async fn create_env() -> Result<Box<dyn SandboxEnv>> {
+pub async fn create_env(
+    make_helper: MakeHelper,
+) -> Result<Box<dyn SandboxEnv>> {
     #[cfg(target_os = "linux")]
     {
         const FLATPAK_INFO_PATH: &str = "/.flatpak-info";
@@ -67,7 +70,7 @@ pub async fn create_env() -> Result<Box<dyn SandboxEnv>> {
 
     #[cfg(windows)]
     {
-        return windows::appcontainer::AppContainer::init().await;
+        return windows::appcontainer::AppContainer::init(make_helper).await;
     }
 }
 
@@ -182,9 +185,9 @@ impl std::fmt::Display for SandboxExitStatus {
     }
 }
 
-pub fn try_handle_callback() -> Result<bool> {
+pub fn run_helper(args: impl IntoIterator<Item = OsString>) -> Result<bool> {
     #[cfg(windows)]
-    return windows::appcontainer::try_handle_callback();
+    return windows::appcontainer::run_helper(args);
     #[cfg(not(windows))]
     return Ok(false);
 }

@@ -2,6 +2,7 @@
 
 mod backend;
 pub mod ffi;
+pub mod helper;
 pub mod minecraft;
 mod util;
 
@@ -18,59 +19,7 @@ use eyre::Result;
 pub use backend::SandboxExitStatus;
 pub use util::SandboxArg;
 
-use crate::backend::SandboxChildOp;
-
-/// Creates the environment and initializes the required resources to perform
-/// sandboxing.
-///
-/// On most platforms, sandboxing is done using operating system primitives, in
-/// which case creating the environment will always succeed. On other platforms,
-/// sandboxing may require extra dependencies to be installed in the app
-/// environment - if those are not fulfilled, this returns [`Err`].
-///
-/// # Backends
-///
-/// ## Windows
-///
-/// Uses the Windows [AppContainer] API for isolating the process from the host.
-///
-/// ## macOS
-///
-/// TODO
-///
-/// ## Linux
-///
-/// Inside a Flatpak environment, this uses the [`org.freedesktop.portal.Flatpak`]
-/// portal for spawning processes via the D-Bus session bus.
-///
-/// Outside of a Flatpak environment, this uses the [Bubblewrap] sandboxing
-/// tool via the command line (`bwrap` must be installed on the user's machine).
-///
-/// # Errors
-///
-/// Errors if the implementation cannot set up sandboxing.
-///
-/// [AppContainer]: https://learn.microsoft.com/en-us/windows/win32/secauthz/appcontainer-isolation
-/// [`org.freedesktop.portal.Flatpak`]: https://docs.flatpak.org/en/latest/libflatpak-api-reference.html#gdbus-org.freedesktop.portal.Flatpak
-/// [Bubblewrap]: https://github.com/containers/bubblewrap
-pub async fn create_env() -> Result<SandboxEnv> {
-    backend::create_env().await.map(|imp| SandboxEnv {
-        imp: Arc::from(imp),
-    })
-}
-
-pub fn try_handle_callback() {
-    match crate::backend::try_handle_callback() {
-        Ok(true) => {
-            std::process::exit(0);
-        },
-        Ok(false) => {},
-        Err(err) => {
-            eprintln!("Error handling modrinth callback: {err:?}");
-            std::process::exit(1);
-        }
-    }
-}
+use crate::{backend::SandboxChildOp, helper::MakeHelper};
 
 /// Allows spawning processes in a sandboxed environment, configured by
 /// [`SandboxCommand`].
@@ -86,6 +35,62 @@ pub struct SandboxEnv {
 }
 
 impl SandboxEnv {
+    /// Creates the environment and initializes the required resources to perform
+    /// sandboxing.
+    ///
+    /// On most platforms, sandboxing is done using operating system primitives, in
+    /// which case creating the environment will always succeed. On other platforms,
+    /// sandboxing may require extra dependencies to be installed in the app
+    /// environment - if those are not fulfilled, this returns [`Err`].
+    ///
+    /// # Backends
+    ///
+    /// ## Windows
+    ///
+    /// Uses the Windows [AppContainer] API for isolating the process from the host.
+    ///
+    /// ## macOS
+    ///
+    /// TODO
+    ///
+    /// ## Linux
+    ///
+    /// Inside a Flatpak environment, this uses the [`org.freedesktop.portal.Flatpak`]
+    /// portal for spawning processes via the D-Bus session bus.
+    ///
+    /// Outside of a Flatpak environment, this uses the [Bubblewrap] sandboxing
+    /// tool via the command line (`bwrap` must be installed on the user's machine).
+    ///
+    /// # Helper command
+    ///
+    /// This uses [`helper::default_command`] to create the helper command. If you
+    /// need to use a custom helper command, see [`create_env_with_helper`].
+    ///
+    /// For details on what the helper command does, see [`helper`].
+    ///
+    /// # Errors
+    ///
+    /// Errors if the implementation cannot set up sandboxing.
+    ///
+    /// [AppContainer]: https://learn.microsoft.com/en-us/windows/win32/secauthz/appcontainer-isolation
+    /// [`org.freedesktop.portal.Flatpak`]: https://docs.flatpak.org/en/latest/libflatpak-api-reference.html#gdbus-org.freedesktop.portal.Flatpak
+    /// [Bubblewrap]: https://github.com/containers/bubblewrap
+    pub async fn new() -> Result<Self> {
+        Self::with_helper(helper::make_default).await
+    }
+
+    /// Creates the environment and initializes the required resources to perform
+    /// sandboxing, passing a custom function to make the helper command.
+    ///
+    /// See [`SandboxEnv::new`] for more details.
+    ///
+    /// See [`helper`] for details on the make helper function.
+    pub async fn with_helper(make_helper: MakeHelper) -> Result<Self> {
+        backend::create_env(make_helper).await.map(|imp| Self {
+            imp: Arc::from(imp),
+        })
+    }
+
     /// Spawn a sandboxed process and get a [`SandboxChild`] handle to it.
     ///
     /// This function is analogous to [`std::process::Command::spawn`], but

@@ -2,11 +2,17 @@ Library for sandboxing Minecraft instances for modded game launchers
 
 ```rs
 use eyre::{Context, Result};
-use modrinth_sandbox::{minecraft::MinecraftCommand, SandboxOutput};
+use modrinth_sandbox::{minecraft::MinecraftCommand, SandboxEnv, SandboxOutput};
 
 #[tokio::main]
 async fn main() -> Result<()> {
-	let sandbox_env = modrinth_sandbox::create_env()
+	// required for some sandbox setup details
+  if modrinth_sandbox::helper::run_default()? {
+    return Ok(());
+  }
+
+	// create the sandbox
+	let sandbox_env = SandboxEnv::new()
 		.await
 		.wrap_err("creating sandbox environment")?;
 	let command = MinecraftCommand {
@@ -15,6 +21,8 @@ async fn main() -> Result<()> {
 		instance_path: "/path/to/instance".into(),
 		// etc.
 	};
+
+	// spawn Minecraft
 	let command = modrinth_sandbox::minecraft::create_command(command)
 		.wrap_err("creating Minecraft sandbox command")?;
 	let mut minecraft_process = sandbox_env

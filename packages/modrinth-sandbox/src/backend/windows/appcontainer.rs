@@ -1,16 +1,12 @@
 use std::{
-    cell::OnceCell,
     collections::HashSet,
     ffi::{OsStr, OsString},
     io::{Error, ErrorKind},
-    os::windows::{
-        ffi::{OsStrExt, OsStringExt},
-        io::OwnedHandle,
-    },
+    os::windows::ffi::{OsStrExt, OsStringExt},
     path::Path,
-    sync::OnceLock,
 };
 
+use tracing::info;
 use windows::{
     Win32::{
         Foundation::{
@@ -19,7 +15,8 @@ use windows::{
             LocalFree,
         },
         NetworkManagement::WindowsFirewall::{
-            NetworkIsolationGetAppContainerConfig, NetworkIsolationSetAppContainerConfig,
+            NetworkIsolationGetAppContainerConfig,
+            NetworkIsolationSetAppContainerConfig,
         },
         Security::{
             ACE_HEADER, ACL,
@@ -34,7 +31,7 @@ use windows::{
             DACL_SECURITY_INFORMATION, DeriveCapabilitySidsFromName, EqualSid,
             FreeSid, GetAce, InitializeSecurityDescriptor,
             Isolation::{
-                CreateAppContainerProfile, DeleteAppContainerProfile,
+                CreateAppContainerProfile,
                 DeriveAppContainerSidFromAppContainerName,
             },
             NO_INHERITANCE, OBJECT_INHERIT_ACE, PSECURITY_DESCRIPTOR, PSID,
@@ -49,9 +46,9 @@ use windows::{
             FILE_TRAVERSE, READ_CONTROL, WRITE_DAC,
         },
         System::{
+            Memory::{GetProcessHeap, HEAP_FLAGS, HeapFree},
             StationsAndDesktops::OpenWindowStationW,
             SystemServices::{SE_GROUP_ENABLED, SECURITY_DESCRIPTOR_REVISION},
-            Memory::{GetProcessHeap, HeapFree, HEAP_FLAGS},
             Threading::PROC_THREAD_ATTRIBUTE_SECURITY_CAPABILITIES,
         },
         UI::WindowsAndMessaging::WINSTA_WRITEATTRIBUTES,
@@ -61,11 +58,12 @@ use windows::{
 
 use async_trait::async_trait;
 use derive_more::Debug;
-use eyre::{Context, OptionExt, Result, eyre};
+use eyre::{Context, Result, bail, eyre};
 
 use crate::{
-    SandboxArg, SandboxCommand, SandboxExitStatus,
-    backend::{Backend, SandboxChild, SandboxChildOp, SandboxEnv},
+    SandboxArg, SandboxCommand,
+    backend::{Backend, SandboxChild, SandboxEnv},
+    helper::MakeHelper,
 };
 
 #[derive(Debug)]
@@ -73,8 +71,9 @@ pub struct AppContainer;
 
 #[async_trait]
 impl Backend for AppContainer {
-    async fn init() -> Result<Box<dyn SandboxEnv>> {
+    async fn init(make_helper: MakeHelper) -> Result<Box<dyn SandboxEnv>> {
         Ok(Box::new(AppContainerEnv {
+            make_helper,
             job_handle: super::create_job_object()
                 .wrap_err("error creating job object")?,
             null_device: super::open_null_device()
@@ -86,6 +85,7 @@ impl Backend for AppContainer {
 #[derive(Clone, Debug)]
 #[debug("AppContainerEnv")]
 pub struct AppContainerEnv {
+    make_helper: MakeHelper,
     job_handle: HANDLE,
     null_device: HANDLE,
 }
@@ -108,7 +108,10 @@ impl SandboxEnv for AppContainerEnv {
     }
 }
 
-fn spawn(env: &AppContainerEnv, mut command: SandboxCommand) -> Result<crate::SandboxChild> {
+fn spawn(
+    env: &AppContainerEnv,
+    mut command: SandboxCommand,
+) -> Result<crate::SandboxChild> {
     let environment = command.take_environment();
 
     if !environment.contains_key(&"APPDATA".into()) {
@@ -209,10 +212,11 @@ fn spawn(env: &AppContainerEnv, mut command: SandboxCommand) -> Result<crate::Sa
     security_capabilities.Capabilities = capabilities.as_mut_ptr();
     security_capabilities.AppContainerSid = app_container_sid;
 
-    let attribute_list = Vec::new();
+    let mut attribute_list = Vec::new();
     attribute_list.push(super::ProcThreadAttribute {
         attribute: PROC_THREAD_ATTRIBUTE_SECURITY_CAPABILITIES as usize,
-        value: &security_capabilities as *const SECURITY_CAPABILITIES as *const _,
+        value: &security_capabilities as *const SECURITY_CAPABILITIES
+            as *const _,
         size: size_of::<SECURITY_CAPABILITIES>(),
     });
 
@@ -280,9 +284,12 @@ fn spawn(env: &AppContainerEnv, mut command: SandboxCommand) -> Result<crate::Sa
     let mut need_set_network_isolation_elevated = false;
     if command.allow_network {
         if let Err(err) = try_set_network_isolation(&app_container_sid) {
-            let raw_access_denied = err.raw_os_error().unwrap_or(0) == HRESULT::from_win32(ERROR_ACCESS_DENIED.0).0;
+            let raw_access_denied = err.raw_os_error().unwrap_or(0)
+                == HRESULT::from_win32(ERROR_ACCESS_DENIED.0).0;
             if err.kind() == ErrorKind::PermissionDenied || raw_access_denied {
-                tracing::warn!("Lacking permission to allow localhost access... will need to elevate");
+                info!(
+                    "lacking permission to allow localhost access, elevating"
+                );
                 need_set_network_isolation_elevated = true;
             }
         }
@@ -292,18 +299,25 @@ fn spawn(env: &AppContainerEnv, mut command: SandboxCommand) -> Result<crate::Sa
         let mut stringsid = PWSTR::default();
         unsafe { ConvertSidToStringSidW(app_container_sid, &mut stringsid)? };
         assert!(!stringsid.is_null());
-        let app_container_osstring = OsString::from_wide(unsafe { stringsid.as_wide() });
+        let app_container_osstring =
+            OsString::from_wide(unsafe { stringsid.as_wide() });
 
-        let mut arguments: Vec<SandboxArg> = Vec::new();
-        arguments.push("--modrinth-sandbox-callback".into());
+        let mut arguments = Vec::<SandboxArg>::new();
         arguments.push(app_container_osstring.into());
-        arguments.push(if need_set_network_isolation_elevated { "true".into() } else { "false".into() });
+        arguments.push(if need_set_network_isolation_elevated {
+            "true".into()
+        } else {
+            "false".into()
+        });
         arguments.push(std::env::join_paths(parents)?.into());
 
-        tracing::info!("Spawning elevated self to modify acl");
-        let mut elevated = super::runas::spawn(std::env::current_exe()?, arguments)?;
-        let elevated_status = elevated.blocking_wait()?;
-        tracing::info!("Done spawning elevated self to modify acl: {elevated_status}");
+        info!(?arguments, "spawning elevated helper command");
+        let mut elevated = super::runas::spawn(env.make_helper, arguments)
+            .wrap_err("spawning elevated helper command")?;
+        let elevated_status = elevated
+            .blocking_wait()
+            .wrap_err("running elevated helper")?;
+        info!("elevated helper command finished: {elevated_status}");
     }
 
     _ = add_to_acl(
@@ -403,30 +417,38 @@ fn try_set_network_isolation(app_container: &PSID) -> std::io::Result<()> {
     let mut current_count: u32 = 0;
     let mut current_containers: *mut SID_AND_ATTRIBUTES = std::ptr::null_mut();
 
-    let result = unsafe { NetworkIsolationGetAppContainerConfig(&mut current_count, &mut current_containers) };
+    let result = unsafe {
+        NetworkIsolationGetAppContainerConfig(
+            &mut current_count,
+            &mut current_containers,
+        )
+    };
     scopeguard::defer! {
         // https://learn.microsoft.com/en-us/windows/win32/api/netfw/nf-netfw-networkisolationgetappcontainerconfig
-        unsafe {
-            if let Ok(process_heap) = GetProcessHeap() {
-                for index in 0..current_count {
-                    HeapFree(process_heap, HEAP_FLAGS(0), Some(current_containers.offset(index as isize).read().Sid.0));
-                }
-                if !current_containers.is_null() {
-                    HeapFree(process_heap, HEAP_FLAGS(0), Some(current_containers as *mut _));
-                }
+        let process_heap = unsafe { GetProcessHeap() };
+        if let Ok(process_heap) = process_heap {
+            for index in 0..current_count {
+                let sid = unsafe { current_containers.offset(index as isize).read() }.Sid;
+                let _ = unsafe { HeapFree(process_heap, HEAP_FLAGS(0), Some(sid.0)) };
+            }
+            if !current_containers.is_null() {
+                let _ = unsafe { HeapFree(process_heap, HEAP_FLAGS(0), Some(current_containers as *mut _)) };
             }
         }
     }
 
     if result != 0 {
-        return Err(windows::core::Error::from_hresult(HRESULT::from_win32(result)).into());
+        return Err(windows::core::Error::from_hresult(HRESULT::from_win32(
+            result,
+        ))
+        .into());
     }
 
     let mut new_containers = Vec::with_capacity(current_count as usize + 1);
     for index in 0..current_count {
-        let sid_and_attributes = unsafe { current_containers.offset(index as isize).read() };
-        let equals_app_container = unsafe { EqualSid(sid_and_attributes.Sid, *app_container).is_ok() };
-        if equals_app_container {
+        let sid_and_attributes =
+            unsafe { current_containers.offset(index as isize).read() };
+        if unsafe { EqualSid(sid_and_attributes.Sid, *app_container) }.is_ok() {
             // Already allowed
             return Ok(());
         }
@@ -438,9 +460,14 @@ fn try_set_network_isolation(app_container: &PSID) -> std::io::Result<()> {
         Attributes: 0,
     });
 
-    let result = unsafe { NetworkIsolationSetAppContainerConfig(new_containers.as_slice()) };
+    let result = unsafe {
+        NetworkIsolationSetAppContainerConfig(new_containers.as_slice())
+    };
     if result != 0 {
-        return Err(windows::core::Error::from_hresult(HRESULT::from_win32(result)).into());
+        return Err(windows::core::Error::from_hresult(HRESULT::from_win32(
+            result,
+        ))
+        .into());
     }
 
     Ok(())
@@ -741,19 +768,21 @@ fn acl_eq(first: *const ACL, second: *const ACL) -> std::io::Result<bool> {
     Ok(true)
 }
 
-pub fn try_handle_callback() -> eyre::Result<bool> {
-    let args: Vec<OsString> = std::env::args_os().collect();
-    if args.len() < 2 {
-        return Ok(false);
-    }
-    if args[1].as_os_str() != OsStr::new("--modrinth-sandbox-callback") {
-        return Ok(false);
-    }
-    if args.len() < 5 {
-        return Err(eyre!("expected 5 arguments for --modrinth-sandbox-callback"));
-    }
+pub fn run_helper(
+    args: impl IntoIterator<Item = OsString>,
+) -> eyre::Result<bool> {
+    let mut args = args.into_iter();
+    let (
+        Some(stringsid),
+        Some(need_set_network_isolation_elevated),
+        Some(traverse_paths),
+        None,
+    ) = (args.next(), args.next(), args.next(), args.next())
+    else {
+        bail!("invalid arguments");
+    };
 
-    let stringsid = args[2]
+    let stringsid = stringsid
         .as_os_str()
         .encode_wide()
         .chain([0])
@@ -765,8 +794,9 @@ pub fn try_handle_callback() -> eyre::Result<bool> {
         return Err(eyre!("ConvertStringSidToSidW returned invalid sid"));
     }
 
-    let need_set_network_isolation_elevated = args[3].as_os_str() == OsStr::new("true");
-    let traverse_paths = std::env::split_paths(args[4].as_os_str());
+    let need_set_network_isolation_elevated =
+        need_set_network_isolation_elevated == OsStr::new("true");
+    let traverse_paths = std::env::split_paths(traverse_paths.as_os_str());
 
     if need_set_network_isolation_elevated {
         try_set_network_isolation(&psid)?;
@@ -775,7 +805,9 @@ pub fn try_handle_callback() -> eyre::Result<bool> {
     let mut result = Ok(true);
 
     for path in traverse_paths {
-        if let Err(err) = add_to_acl(&psid, &path, PermissionType::TraverseNoInherit) {
+        if let Err(err) =
+            add_to_acl(&psid, &path, PermissionType::TraverseNoInherit)
+        {
             if result.is_ok() {
                 result = Err(err);
             }

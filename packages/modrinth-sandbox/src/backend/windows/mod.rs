@@ -1,11 +1,11 @@
 use std::{
     collections::BTreeMap,
-    ffi::{OsStr, OsString, c_void},
+    ffi::{OsString, c_void},
     os::windows::{
         ffi::OsStrExt,
         io::{AsRawHandle, HandleOrInvalid, OwnedHandle},
     },
-    path::{Path, PathBuf},
+    path::PathBuf,
 };
 
 use async_trait::async_trait;
@@ -28,26 +28,24 @@ use windows::{
                 STD_OUTPUT_HANDLE,
             },
             JobObjects::{
-                AssignProcessToJobObject, CreateJobObjectW,
-                JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE,
+                CreateJobObjectW, JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE,
                 JOBOBJECT_EXTENDED_LIMIT_INFORMATION,
                 JobObjectExtendedLimitInformation, SetInformationJobObject,
             },
             Threading::{
                 CREATE_UNICODE_ENVIRONMENT, CreateProcessW,
-                EXTENDED_STARTUPINFO_PRESENT, GetCurrentProcess,
-                LPPROC_THREAD_ATTRIBUTE_LIST, PROCESS_CREATION_FLAGS,
+                DeleteProcThreadAttributeList, EXTENDED_STARTUPINFO_PRESENT,
+                GetCurrentProcess, InitializeProcThreadAttributeList,
+                LPPROC_THREAD_ATTRIBUTE_LIST,
+                PROC_THREAD_ATTRIBUTE_HANDLE_LIST,
+                PROC_THREAD_ATTRIBUTE_JOB_LIST, PROCESS_CREATION_FLAGS,
                 PROCESS_INFORMATION, STARTF_FORCEONFEEDBACK,
                 STARTF_USESTDHANDLES, STARTUPINFOEXW, STARTUPINFOW,
-                DeleteProcThreadAttributeList,
-                InitializeProcThreadAttributeList,
-                PROC_THREAD_ATTRIBUTE_HANDLE_LIST,
-                PROC_THREAD_ATTRIBUTE_JOB_LIST,
                 UpdateProcThreadAttribute,
             },
         },
     },
-    core::{HRESULT, Free},
+    core::{Free, HRESULT},
 };
 
 use crate::{
@@ -75,7 +73,7 @@ pub(crate) fn spawn(
     working_directory: Option<PathBuf>,
     job_handle: HANDLE,
     null_device: HANDLE,
-    attributes: Vec<ProcThreadAttribute>,
+    mut attributes: Vec<ProcThreadAttribute>,
 ) -> Result<(Pipes, WindowsChild)> {
     let program = resolve_path(&program).wrap_err("resolving program path")?;
     let working_directory = working_directory
@@ -243,19 +241,25 @@ pub(crate) fn spawn(
         attributes.push(ProcThreadAttribute {
             attribute: PROC_THREAD_ATTRIBUTE_HANDLE_LIST as usize,
             value: handle_list.as_ptr() as *const _,
-            size: size_of::<HANDLE>() * handle_list.len()
+            size: size_of::<HANDLE>() * handle_list.len(),
         });
     }
     let job_list = &[job_handle];
     attributes.push(ProcThreadAttribute {
         attribute: PROC_THREAD_ATTRIBUTE_JOB_LIST as usize,
         value: job_list.as_ptr() as *const _,
-        size: size_of::<HANDLE>() * job_list.len()
+        size: size_of::<HANDLE>() * job_list.len(),
     });
 
+    let attribute_count = attributes.len() as u32;
     let mut lpsize = 0;
     let result = unsafe {
-        InitializeProcThreadAttributeList(None, attributes.len(), None, &mut lpsize)
+        InitializeProcThreadAttributeList(
+            None,
+            attribute_count,
+            None,
+            &mut lpsize,
+        )
     };
 
     if result
@@ -274,7 +278,7 @@ pub(crate) fn spawn(
     unsafe {
         InitializeProcThreadAttributeList(
             Some(lpproc_thread_attribute_list),
-            attributes.len(),
+            attribute_count,
             None,
             &mut lpsize,
         )?
@@ -318,7 +322,7 @@ pub(crate) fn spawn(
                 .as_ref()
                 .map(|dir| windows::core::PCWSTR(dir.as_ptr()))
                 .unwrap_or_default(),
-            si_ex as *const _ as *const STARTUPINFOW,
+            &si_ex.StartupInfo,
             &mut pi,
         )?
     }
@@ -410,7 +414,12 @@ impl SandboxChildOp for WindowsChild {
     }
 
     async fn kill(&mut self) -> Result<()> {
-        unsafe { windows::Win32::System::Threading::TerminateProcess(self.process_handle, 1)?; }
+        unsafe {
+            windows::Win32::System::Threading::TerminateProcess(
+                self.process_handle,
+                1,
+            )?;
+        }
         Ok(())
     }
 }

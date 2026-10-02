@@ -3,11 +3,14 @@ mod str;
 
 use eyre::{Context, ContextCompat, Result, bail};
 
-use crate::ffi::{
-    op::{free, try_return},
-    str::{
-        ModrinthSandboxString, ModrinthSandboxStringOption,
-        ModrinthSandboxStringPairsSlice, ModrinthSandboxStringSlice,
+use crate::{
+    SandboxEnv,
+    ffi::{
+        op::{free, try_return},
+        str::{
+            ModrinthSandboxString, ModrinthSandboxStringOption,
+            ModrinthSandboxStringPairsSlice, ModrinthSandboxStringSlice,
+        },
     },
 };
 
@@ -41,6 +44,8 @@ pub struct ModrinthSandboxCommand {
 }
 
 pub struct ModrinthSandboxChild {
+    // Owns the child until the FFI handle is freed; never read directly.
+    #[allow(dead_code)]
     inner: crate::SandboxChild,
 }
 
@@ -73,7 +78,7 @@ pub unsafe extern "C" fn modrinth_sandbox_create_env(
             let rt = tokio::runtime::Builder::new_current_thread()
                 .build()
                 .wrap_err("creating tokio runtime")?;
-            let env = rt.block_on(crate::create_env())?;
+            let env = rt.block_on(SandboxEnv::new())?;
             Ok(ModrinthSandboxEnv { env, rt })
         })
     }

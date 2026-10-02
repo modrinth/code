@@ -1,20 +1,24 @@
-use std::{io::{Error, ErrorKind}, os::windows::io::AsRawHandle, path::{Path, PathBuf}};
+use std::os::windows::ffi::OsStrExt;
 
-use windows::Win32::{Foundation::HANDLE, System::JobObjects::AssignProcessToJobObject, UI::Shell::SHELLEXECUTEINFOW};
-use eyre::{Result, WrapErr, eyre};
+use eyre::{Result, eyre};
+use windows::Win32::UI::Shell::SHELLEXECUTEINFOW;
 
-use crate::SandboxArg;
+use crate::{SandboxArg, helper::MakeHelper};
 
 pub fn spawn(
-    program: PathBuf,
-    arguments: Vec<SandboxArg>,
+    make_helper: MakeHelper,
+    extra_arguments: Vec<SandboxArg>,
 ) -> Result<super::WindowsChild> {
-    use std::os::windows::ffi::OsStrExt;
-    let program = super::resolve_path(&program).wrap_err("resolving program path")?;
-    let application_name = program
-        .as_os_str()
+    let helper = (make_helper)();
+    let application_name = helper
+        .get_program()
         .encode_wide()
         .chain([0])
+        .collect::<Vec<_>>();
+    let arguments = helper
+        .get_args()
+        .map(|argument| argument.to_os_string().into())
+        .chain(extra_arguments)
         .collect::<Vec<_>>();
     let command_line = super::join_windows_shell_arg(arguments.as_slice())
         .encode_wide()
@@ -22,7 +26,8 @@ pub fn spawn(
         .collect::<Vec<_>>();
 
     let mut sei: SHELLEXECUTEINFOW = SHELLEXECUTEINFOW::default();
-    sei.fMask = windows::Win32::UI::Shell::SEE_MASK_NOASYNC | windows::Win32::UI::Shell::SEE_MASK_NOCLOSEPROCESS;
+    sei.fMask = windows::Win32::UI::Shell::SEE_MASK_NOASYNC
+        | windows::Win32::UI::Shell::SEE_MASK_NOCLOSEPROCESS;
     sei.cbSize = std::mem::size_of::<SHELLEXECUTEINFOW>() as _;
     sei.lpVerb = windows::core::w!("runas");
     sei.lpFile = windows::core::PCWSTR(application_name.as_ptr());
@@ -34,7 +39,9 @@ pub fn spawn(
     }
 
     if sei.hProcess.is_invalid() {
-        return Err(eyre!("ShellExecuteExW returned invalid process handle. Operation completed via DDE?"));
+        return Err(eyre!(
+            "ShellExecuteExW returned invalid process handle. Operation completed via DDE?"
+        ));
     }
 
     Ok(super::WindowsChild {
