@@ -1245,7 +1245,7 @@
     "defaultMessage": "Save attribution"
   },
   "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "Select a license..."
+    "defaultMessage": "Search licenses..."
   },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "Permission reason"
@@ -1288,6 +1288,9 @@
   },
   "external-files.permissions-card.last-updated": {
     "defaultMessage": "Last updated on {date} by {user}"
+  },
+  "external-files.permissions-card.license.all-rights": {
+    "defaultMessage": "All Rights Reserved/No License"
   },
   "external-files.permissions-card.license.unknown": {
     "defaultMessage": "Unknown"

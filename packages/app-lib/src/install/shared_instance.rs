@@ -155,7 +155,7 @@ impl SharedInstanceApplyPlan {
             .projects
             .values()
             .filter(|current| {
-                !desired.projects.contains_key(&current.project_id)
+                !desired.projects.contains_key(&current.version_id)
             })
             .cloned()
             .collect();
@@ -172,16 +172,35 @@ impl SharedInstanceApplyPlan {
             ..Default::default()
         };
 
-        for desired in desired.projects.into_values() {
-            match current.projects.get(&desired.project_id) {
-                Some(current) if current.version_id != desired.version_id => {
-                    plan.project_updates.push(SharedInstanceProjectUpdate {
-                        current: current.clone(),
-                        desired,
-                    });
-                }
-                None => plan.project_additions.push(desired),
-                Some(_) => {}
+        let mut additions = desired
+            .projects
+            .into_values()
+            .filter(|desired| {
+                !current.projects.contains_key(&desired.version_id)
+            })
+            .collect::<Vec<_>>();
+        while let Some(desired) = additions.pop() {
+            let replacements = plan
+                .project_removals
+                .iter()
+                .enumerate()
+                .filter(|(_, current)| current.project_id == desired.project_id)
+                .map(|(index, _)| index)
+                .collect::<Vec<_>>();
+            let unambiguous = !additions
+                .iter()
+                .any(|other| other.project_id == desired.project_id)
+                && !plan
+                    .project_additions
+                    .iter()
+                    .any(|other| other.project_id == desired.project_id);
+            if replacements.len() == 1 && unambiguous {
+                plan.project_updates.push(SharedInstanceProjectUpdate {
+                    current: plan.project_removals.remove(replacements[0]),
+                    desired,
+                });
+            } else {
+                plan.project_additions.push(desired);
             }
         }
 
@@ -474,7 +493,7 @@ async fn current_shared_instance_content(
             };
 
             content.projects.insert(
-                project_id.clone(),
+                version_id.clone(),
                 CurrentSharedInstanceProject {
                     project_id,
                     version_id,
@@ -509,7 +528,7 @@ async fn desired_shared_instance_content(
             ))
         })?;
         content.projects.insert(
-            version.project_id.clone(),
+            version.id.clone(),
             DesiredSharedInstanceProject {
                 project_id: version.project_id.clone(),
                 version_id: version.id.clone(),

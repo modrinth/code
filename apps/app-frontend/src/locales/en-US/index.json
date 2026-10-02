@@ -3248,6 +3248,12 @@
   "app.skins.section.default-skins": {
     "message": "Default skins"
   },
+  "app.skins.section.dungeons-hero": {
+    "message": "Dungeons Hero"
+  },
+  "app.skins.section.dungeons-ii-hero": {
+    "message": "Dungeons II Hero"
+  },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
@@ -3277,6 +3283,9 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
+  },
+  "app.skins.section.wilderness-bound": {
+    "message": "Wilderness Bound"
   },
   "app.skins.sign-in.button": {
     "message": "Sign in to Microsoft"

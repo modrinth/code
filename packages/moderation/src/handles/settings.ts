@@ -33,7 +33,7 @@ export class Settings {
 
 export function getMarginTarget(settings: Settings): string {
 	return settings.get(moderationSettings.General.AdjustPageAlignment) == 'always'
-		? settings.get(moderationSettings.General.ChecklistPosition) == 'right'
+		? settings.get(moderationSettings.Checklist.Position) == 'right'
 			? 'r'
 			: 'l'
 		: 'x'
