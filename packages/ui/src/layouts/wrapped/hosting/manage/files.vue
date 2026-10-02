@@ -10,6 +10,7 @@ import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-up
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
+	injectAuth,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
@@ -26,6 +27,7 @@ const props = defineProps<{
 }>()
 
 const client = injectModrinthClient()
+const auth = injectAuth()
 const serverContext = injectModrinthServerContext()
 const {
 	serverId,
@@ -67,16 +69,19 @@ const messages = defineMessages({
 
 const zippingFolder = ref(false)
 
-const serverLocked = computed(() => !!serverContext.server.value?.locked_since)
+const serverLockedForViewer = computed(
+	() => !!serverContext.server.value?.locked_since && auth.user.value?.role !== 'admin',
+)
 const serverBusy = computed(() => busyReasons.value.length > 0)
 const busyTooltip = computed(() =>
 	busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : undefined,
 )
 const fileWriteDisabled = computed(
-	() => serverLocked.value || !canWriteFiles.value || serverBusy.value || zippingFolder.value,
+	() =>
+		serverLockedForViewer.value || !canWriteFiles.value || serverBusy.value || zippingFolder.value,
 )
 const fileWriteDisabledTooltip = computed(() => {
-	if (serverLocked.value) return formatMessage(messages.serverLocked)
+	if (serverLockedForViewer.value) return formatMessage(messages.serverLocked)
 	return canWriteFiles.value ? busyTooltip.value : permissionDeniedMessage.value
 })
 const nonBackupBusyReasons = computed(() =>
