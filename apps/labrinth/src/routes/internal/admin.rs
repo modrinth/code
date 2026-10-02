@@ -24,6 +24,7 @@ use std::sync::Arc;
 use tracing::trace;
 use xredis::RedisPool;
 
+pub mod user_credentials;
 pub mod user_lock;
 pub mod user_sessions;
 
@@ -35,6 +36,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .service(force_reindex_project)
             .service(
                 web::scope("/user")
+                    .configure(user_credentials::config)
                     .configure(user_lock::config)
                     .configure(user_sessions::config),
             ),
