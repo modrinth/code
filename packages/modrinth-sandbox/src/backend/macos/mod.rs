@@ -22,7 +22,7 @@ pub struct Macos;
 
 #[async_trait]
 impl Backend for Macos {
-    async fn init() -> Result<Box<dyn SandboxEnv>> {
+	async fn init(_make_helper: crate::helper::MakeHelper) -> Result<Box<dyn SandboxEnv>> {
         let dev_null =
             super::unix::open_dev_null().wrap_err("opening /dev/null")?;
         Ok(Box::new(MacosEnv { dev_null }))

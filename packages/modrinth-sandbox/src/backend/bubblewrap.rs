@@ -29,7 +29,7 @@ pub struct Bubblewrap;
 
 #[async_trait]
 impl Backend for Bubblewrap {
-    async fn init() -> Result<Box<dyn SandboxEnv>> {
+	async fn init(_make_helper: crate::helper::MakeHelper) -> Result<Box<dyn SandboxEnv>> {
         init().await.map(|env| Box::new(env) as Box<dyn SandboxEnv>)
     }
 }

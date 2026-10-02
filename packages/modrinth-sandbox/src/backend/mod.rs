@@ -57,15 +57,15 @@ pub async fn create_env(
                     .wrap_err("checking if `{FLATPAK_INFO_PATH}` exists")
             })?
         {
-            flatpak::Flatpak::init().await
+            flatpak::Flatpak::init(make_helper).await
         } else {
-            bubblewrap::Bubblewrap::init().await
+            bubblewrap::Bubblewrap::init(make_helper).await
         }
     }
 
     #[cfg(target_os = "macos")]
     {
-        return macos::Macos::init().await;
+        return macos::Macos::init(make_helper).await;
     }
 
     #[cfg(windows)]
