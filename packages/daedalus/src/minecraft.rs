@@ -68,6 +68,9 @@ pub struct LatestVersion {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 /// Data of all game versions of Minecraft
 pub struct VersionManifest {
+	/// SHA1 of the library patches used to generate this manifest.
+	#[serde(default, skip_serializing_if = "Option::is_none")]
+	pub library_patches_sha1: Option<String>,
     /// A struct containing the latest snapshot and release of the game
     pub latest: LatestVersion,
     /// A list of game versions of Minecraft
