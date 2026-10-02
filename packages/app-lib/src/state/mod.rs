@@ -377,7 +377,7 @@ impl State {
 
         let friends_socket = FriendsSocket::new();
 
-        let sandbox_env = modrinth_sandbox::create_env()
+        let sandbox_env = SandboxEnv::new()
             .await
             .wrap_err("failed to setup sandboxing")?;
 

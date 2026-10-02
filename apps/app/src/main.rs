@@ -115,7 +115,14 @@ async fn set_restart_after_pending_update(
 // if Tauri app is called with arguments, then those arguments will be treated as commands
 // ie: deep links or filepaths for .mrpacks
 fn main() {
-    modrinth_sandbox::try_handle_callback();
+    match modrinth_sandbox::helper::run_default() {
+        Ok(true) => return,
+        Ok(false) => {}
+        Err(error) => {
+            eprintln!("Error running sandbox helper: {error:?}");
+            std::process::exit(1);
+        }
+    }
 
     #[cfg(feature = "export-app-events")]
     theseus::export_app_event_bindings(

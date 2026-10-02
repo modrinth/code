@@ -1,14 +1,21 @@
 // Adapted from https://docs.rs/crate/tokio/1.26.0/source/src/io/blocking.rs
 
-use std::{io::Read, pin::Pin, task::{Context, Poll, ready}};
+use std::{
+    io::Read,
+    pin::Pin,
+    task::{Context, Poll, ready},
+};
 
-use tokio::{io::{AsyncRead, ReadBuf}, task::JoinHandle};
+use tokio::{
+    io::{AsyncRead, ReadBuf},
+    task::JoinHandle,
+};
 
 /// `T` should not implement _both_ Read and Write.
 #[derive(Debug)]
 pub(crate) struct Blocking<T> {
     inner: Option<T>,
-    state: State<T>
+    state: State<T>,
 }
 
 #[derive(Debug)]
@@ -57,10 +64,11 @@ where
                     buf.ensure_capacity_for(dst);
                     let mut inner = self.inner.take().unwrap();
 
-                    self.state = State::Busy(tokio::task::spawn_blocking(move || {
-                        let res = buf.read_from(&mut inner);
-                        (res, buf, inner)
-                    }));
+                    self.state =
+                        State::Busy(tokio::task::spawn_blocking(move || {
+                            let res = buf.read_from(&mut inner);
+                            (res, buf, inner)
+                        }));
                 }
                 State::Busy(ref mut rx) => {
                     let (res, mut buf, inner) = ready!(Pin::new(rx).poll(cx))?;
@@ -144,7 +152,10 @@ impl Buf {
         }
     }
 
-    pub(crate) fn read_from<T: Read>(&mut self, rd: &mut T) -> std::io::Result<usize> {
+    pub(crate) fn read_from<T: Read>(
+        &mut self,
+        rd: &mut T,
+    ) -> std::io::Result<usize> {
         let res = uninterruptibly!(rd.read(&mut self.buf));
 
         if let Ok(n) = res {
