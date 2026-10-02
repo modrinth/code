@@ -121,7 +121,7 @@
 									>
 										<div>
 											<span class="font-semibold text-primary"
-												>{{ formatMessage(commonMessages.sortByLabel) }}:
+												>{{ formatMessage(commonMessages.sortByLabel) }}
 											</span>
 											<span class="font-semibold text-secondary">{{ selected }}</span>
 										</div>
@@ -135,7 +135,13 @@
 									class="gradient-border"
 									:link="`/${result.project_type}/${result.slug ? result.slug : result.project_id}`"
 									:title="result.title"
-									:author="{ name: result.author, link: `/user/${result.author}` }"
+									:author="{
+										name: result.organization == null ? result.author : result.organization,
+										link:
+											result.organization_id == null
+												? `/user/${result.author}`
+												: `/organization/${result.organization_id}`,
+									}"
 									:summary="result.description"
 									:date-updated="result.date_modified"
 									:date-published="result.date_created"
