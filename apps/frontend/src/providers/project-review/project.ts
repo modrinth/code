@@ -50,11 +50,21 @@ export function useReviewProject(selection: Ref<string>) {
 			enabled: !!organizationId.value,
 		})),
 	)
-	const organizationStats = computed(() =>
-		Object.entries(
+	const organizationFlaggedProjects = useQuery(
+		computed(() => ({
+			queryKey: ['tech-reviews', 'flagged-projects', 'organization', organizationId.value] as const,
+			queryFn: () =>
+				client.labrinth.tech_review_internal.getOrganizationFlaggedProjects(organizationId.value),
+			staleTime: 60_000,
+			enabled: !!organizationId.value,
+		})),
+	)
+	const organizationStats = computed(() => [
+		...Object.entries(
 			Object.groupBy(organizationProjects.data.value ?? [], (project) => project.status),
 		).map(([status, projects]) => ({ status, count: projects?.length ?? 0 })),
-	)
+		{ status: 'tech_review_failed', count: organizationFlaggedProjects.data.value?.length ?? 0 },
+	])
 	const members = computed(() =>
 		(memberQuery.data.value ?? [])
 			.filter((member) => member.accepted)
@@ -70,6 +80,15 @@ export function useReviewProject(selection: Ref<string>) {
 			[...organizationMembers.value, ...members.value].map((member) => [member.user.id, member]),
 		).values(),
 	])
+	const memberIds = computed(() => membersForStats.value.map((member) => member.user.id).toSorted())
+	const memberFlaggedProjects = useQuery(
+		computed(() => ({
+			queryKey: ['tech-reviews', 'flagged-projects', 'users', memberIds.value] as const,
+			queryFn: () => client.labrinth.tech_review_internal.getUsersFlaggedProjects(memberIds.value),
+			staleTime: 60_000,
+			enabled: memberIds.value.length > 0,
+		})),
+	)
 	const memberProjects = useQueries({
 		queries: computed(() =>
 			membersForStats.value.map((member) => ({
@@ -85,14 +104,15 @@ export function useReviewProject(selection: Ref<string>) {
 				const projects = memberProjects.value[index]?.data
 				return [
 					member.user.id,
-					projects
-						? Object.entries(Object.groupBy(projects, (project) => project.status)).map(
-								([status, projects]) => ({
-									status,
-									count: projects?.length ?? 0,
-								}),
-							)
-						: [],
+					[
+						...Object.entries(Object.groupBy(projects ?? [], (project) => project.status)).map(
+							([status, projects]) => ({ status, count: projects?.length ?? 0 }),
+						),
+						{
+							status: 'tech_review_failed',
+							count: memberFlaggedProjects.data.value?.[member.user.id]?.length ?? 0,
+						},
+					],
 				]
 			}),
 		),
@@ -163,6 +183,7 @@ export function useReviewProject(selection: Ref<string>) {
 			}),
 			queryClient.invalidateQueries({ queryKey: ['project', projectId.value] }),
 			queryClient.invalidateQueries({ queryKey: ['project-attribution', projectId.value] }),
+			queryClient.invalidateQueries({ queryKey: ['tech-reviews', 'flagged-projects'] }),
 			identity.refetch(),
 		])
 	}
@@ -182,13 +203,19 @@ export function useReviewProject(selection: Ref<string>) {
 		permissions,
 		members,
 		memberStats,
-		membersLoading: memberQuery.isPending,
-		membersError: memberQuery.isError,
+		membersLoading: computed(
+			() => memberQuery.isPending.value || memberFlaggedProjects.isLoading.value,
+		),
+		membersError: computed(() => memberQuery.isError.value || memberFlaggedProjects.isError.value),
 		organizationLoading: computed(
-			() => !!projectQuery.data.value?.organization && organizationQuery.isPending.value,
+			() =>
+				!!projectQuery.data.value?.organization &&
+				(organizationQuery.isPending.value || organizationFlaggedProjects.isLoading.value),
 		),
 		organizationError: computed(
-			() => !!projectQuery.data.value?.organization && organizationQuery.isError.value,
+			() =>
+				!!projectQuery.data.value?.organization &&
+				(organizationQuery.isError.value || organizationFlaggedProjects.isError.value),
 		),
 		compatibilityError: legacyQuery.isError,
 		submissionCount,

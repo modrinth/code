@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { CheckIcon } from '@modrinth/assets'
+import { CheckIcon, ShieldAlertIcon } from '@modrinth/assets'
 import { PROJECT_STATUS_ICONS, Tooltip, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
@@ -36,6 +36,7 @@ const statusMessages = {
 	private: messages.privateCount,
 	scheduled: messages.scheduledCount,
 	unknown: messages.unknownCount,
+	tech_review_failed: messages.techReviewFailedCount,
 }
 const statusColors = {
 	approved: 'text-green',
@@ -48,6 +49,7 @@ const statusColors = {
 	private: 'text-purple',
 	scheduled: 'text-orange',
 	unknown: 'text-orange',
+	tech_review_failed: 'text-red',
 }
 const statusStats = computed(() =>
 	Object.entries(statusMessages)
@@ -57,7 +59,12 @@ const statusStats = computed(() =>
 				status,
 				message,
 				count: props.stats.find((stat) => stat.status === status)?.count ?? 0,
-				icon: status === 'approved' ? CheckIcon : PROJECT_STATUS_ICONS[status],
+				icon:
+					status === 'tech_review_failed'
+						? ShieldAlertIcon
+						: status === 'approved'
+							? CheckIcon
+							: PROJECT_STATUS_ICONS[status],
 				color: statusColors[status],
 			}
 		})

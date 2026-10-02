@@ -490,6 +490,10 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.rejectedCount',
 		defaultMessage: '{count} rejected',
 	},
+	techReviewFailedCount: {
+		id: 'moderation.project-review.techReviewFailedCount',
+		defaultMessage: '{count} failed technical review',
+	},
 	privateCount: {
 		id: 'moderation.project-review.privateCount',
 		defaultMessage: '{count} private',

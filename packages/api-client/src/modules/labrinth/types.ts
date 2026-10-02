@@ -2659,6 +2659,14 @@ export namespace Labrinth {
 
 	export namespace TechReview {
 		export namespace Internal {
+			export type FlaggedProject = {
+				project_id: string
+				thread_id: string
+				status: Projects.v3.Project['status']
+				message_id: string
+				reviewed: string
+			}
+
 			export type DelphiRule = {
 				id: number
 				name: string
