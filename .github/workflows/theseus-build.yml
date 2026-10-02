@@ -171,18 +171,26 @@ jobs:
             dasel delete -f apps/app/tauri-release.conf.json 'bundle.windows.signCommand'
           fi
 
-      - name: Build macOS app
+      - name: Build signed macOS app
         run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || inputs.app-version-override != '') && 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-dev.conf.json' }}
-        if: contains(matrix.artifact-target-name, 'darwin')
+        if: contains(matrix.artifact-target-name, 'darwin') && (github.event_name != 'workflow_dispatch' || inputs.sign-macos-binaries)
         env:
           TAURI_BUNDLER_DMG_IGNORE_CI: 'true'
-          ENABLE_CODE_SIGNING: ${{ (github.event_name != 'workflow_dispatch' || inputs.sign-macos-binaries) && secrets.APPLE_CERTIFICATE || '' }}
-          APPLE_CERTIFICATE: ${{ (github.event_name != 'workflow_dispatch' || inputs.sign-macos-binaries) && secrets.APPLE_CERTIFICATE || '' }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ (github.event_name != 'workflow_dispatch' || inputs.sign-macos-binaries) && secrets.APPLE_CERTIFICATE_PASSWORD || '' }}
-          APPLE_SIGNING_IDENTITY: ${{ (github.event_name != 'workflow_dispatch' || inputs.sign-macos-binaries) && secrets.APPLE_SIGNING_IDENTITY || '' }}
-          APPLE_ID: ${{ (github.event_name != 'workflow_dispatch' || inputs.sign-macos-binaries) && secrets.APPLE_ID || '' }}
-          APPLE_TEAM_ID: ${{ (github.event_name != 'workflow_dispatch' || inputs.sign-macos-binaries) && secrets.APPLE_TEAM_ID || '' }}
-          APPLE_PASSWORD: ${{ (github.event_name != 'workflow_dispatch' || inputs.sign-macos-binaries) && secrets.APPLE_PASSWORD || '' }}
+          ENABLE_CODE_SIGNING: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+
+      - name: Build unsigned macOS app
+        run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || inputs.app-version-override != '') && 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-dev.conf.json' }}
+        if: contains(matrix.artifact-target-name, 'darwin') && github.event_name == 'workflow_dispatch' && !inputs.sign-macos-binaries
+        env:
+          TAURI_BUNDLER_DMG_IGNORE_CI: 'true'
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
