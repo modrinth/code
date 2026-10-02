@@ -306,6 +306,7 @@ function showSyncedOptions(): void {
 
 function showInstanceDefaults(tab: InstanceDefaultsTab): void {
 	const content = {
+		sandbox: SandboxSettings,
 		java: JavaAndMemorySettings,
 		window: WindowSettings,
 		hooks: LaunchHooksSettings,
