@@ -6,12 +6,12 @@ use modrinth_sandbox::{minecraft::MinecraftCommand, SandboxEnv, SandboxOutput};
 
 #[tokio::main]
 async fn main() -> Result<()> {
-	// required for some sandbox setup details
-  if modrinth_sandbox::helper::run_default()? {
-    return Ok(());
-  }
+	// Handle sandbox setup when this executable is launched as a helper.
+	if modrinth_sandbox::helper::run_default()? {
+		return Ok(());
+	}
 
-	// create the sandbox
+	// Create the sandbox.
 	let sandbox_env = SandboxEnv::new()
 		.await
 		.wrap_err("creating sandbox environment")?;
@@ -22,16 +22,16 @@ async fn main() -> Result<()> {
 		// etc.
 	};
 
-	// spawn Minecraft
+	// Spawn Minecraft.
 	let command = modrinth_sandbox::minecraft::create_command(command)
 		.wrap_err("creating Minecraft sandbox command")?;
 	let mut minecraft_process = sandbox_env
 		.spawn(command)
 		.await
 		.wrap_err("running Minecraft")?;
-	// you now have Minecraft running in a sandbox!
+	// Minecraft is now running in a sandbox.
 
-  // wait for the user to close the game
+	// Wait for the user to close the game.
 	minecraft_process.wait().await?;
 	Ok(())
 }
@@ -56,6 +56,10 @@ Each platform has its own specific capabilities, but we abstract over that using
 - What files are exposed inside the sandbox
 
 The general flow of spawning a sandboxed process is:
+
+- Call `helper::run_default`
+
+	This handles sandbox setup when the application is relaunched as a helper process. If it returns `true`, exit without continuing normal application startup.
 
 - Create a `SandboxEnv`
 

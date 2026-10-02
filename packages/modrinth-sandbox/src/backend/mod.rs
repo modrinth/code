@@ -25,10 +25,10 @@ mod unix;
 #[cfg(windows)]
 mod windows;
 
-/// See [`crate::create_env`].
+/// See [`crate::SandboxEnv::new`].
 #[async_trait]
 pub trait Backend {
-    /// See [`crate::create_env`].
+    /// See [`crate::SandboxEnv::new`].
     async fn init(make_helper: MakeHelper) -> Result<Box<dyn SandboxEnv>>;
 }
 
@@ -42,7 +42,7 @@ pub trait SandboxEnv: Debug + Send + Sync {
     ) -> Result<crate::SandboxChild>;
 }
 
-/// See [`crate::create_env`].
+/// See [`crate::SandboxEnv::new`].
 pub async fn create_env(
     make_helper: MakeHelper,
 ) -> Result<Box<dyn SandboxEnv>> {

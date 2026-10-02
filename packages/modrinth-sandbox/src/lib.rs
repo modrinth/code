@@ -63,10 +63,12 @@ impl SandboxEnv {
     ///
     /// # Helper command
     ///
-    /// This uses [`helper::default_command`] to create the helper command. If you
-    /// need to use a custom helper command, see [`create_env_with_helper`].
+    /// This uses [`helper::make_default`] to create the helper command. If you
+    /// need to customize how the helper process is launched, use
+    /// [`SandboxEnv::with_helper`].
     ///
-    /// For details on what the helper command does, see [`helper`].
+    /// Call [`helper::run_default`] near the start of the executable, before
+    /// creating a sandbox environment. See [`helper`] for details.
     ///
     /// # Errors
     ///
@@ -84,7 +86,8 @@ impl SandboxEnv {
     ///
     /// See [`SandboxEnv::new`] for more details.
     ///
-    /// See [`helper`] for details on the make helper function.
+    /// `make_helper` must create a command whose process calls
+    /// [`helper::run_default`] during startup. See [`helper`] for details.
     pub async fn with_helper(make_helper: MakeHelper) -> Result<Self> {
         backend::create_env(make_helper).await.map(|imp| Self {
             imp: Arc::from(imp),
