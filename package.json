@@ -54,7 +54,8 @@
 	"pnpm": {
 		"patchedDependencies": {
 			"readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch",
-			"@vue-email/markdown@0.0.7": "patches/@vue-email__markdown@0.0.7.patch"
+			"@vue-email/markdown@0.0.7": "patches/@vue-email__markdown@0.0.7.patch",
+			"@vue-email/tailwind@0.2.0": "patches/@vue-email__tailwind@0.2.0.patch"
 		},
 		"packageExtensions": {
 			"@vue-email/markdown@0.0.7": {

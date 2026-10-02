@@ -10,6 +10,9 @@ patchedDependencies:
   '@vue-email/markdown@0.0.7':
     hash: 74b9a61c29070865eb56aae15f58d6974cf081e4239a6fce97d7085544381666
     path: patches/@vue-email__markdown@0.0.7.patch
+  '@vue-email/tailwind@0.2.0':
+    hash: 2041a0234c35df17aa8af3c870f60638349e9b7be5f239a6ab15fe096858613c
+    path: patches/@vue-email__tailwind@0.2.0.patch
   readable-stream@2.3.8:
     hash: 3045f7adf989b4e668a4a13819b7285b0de186b79bbf22408acaf2a41c6eaa86
     path: patches/readable-stream@2.3.8.patch
@@ -15011,7 +15014,7 @@ snapshots:
       '@vue-email/row': 0.0.3(vue@3.5.27(typescript@5.9.3))
       '@vue-email/section': 0.0.3(vue@3.5.27(typescript@5.9.3))
       '@vue-email/style': 0.0.3(vue@3.5.27(typescript@5.9.3))
-      '@vue-email/tailwind': 0.2.0(vue@3.5.27(typescript@5.9.3))
+      '@vue-email/tailwind': 0.2.0(patch_hash=2041a0234c35df17aa8af3c870f60638349e9b7be5f239a6ab15fe096858613c)(vue@3.5.27(typescript@5.9.3))
       '@vue-email/text': 0.0.3(vue@3.5.27(typescript@5.9.3))
       vue: 3.5.27(typescript@5.9.3)
     transitivePeerDependencies:
@@ -15079,7 +15082,7 @@ snapshots:
     dependencies:
       vue: 3.5.27(typescript@5.9.3)
 
-  '@vue-email/tailwind@0.2.0(vue@3.5.27(typescript@5.9.3))':
+  '@vue-email/tailwind@0.2.0(patch_hash=2041a0234c35df17aa8af3c870f60638349e9b7be5f239a6ab15fe096858613c)(vue@3.5.27(typescript@5.9.3))':
     dependencies:
       vue: 3.5.27(typescript@5.9.3)
 
