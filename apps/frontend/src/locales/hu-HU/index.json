@@ -899,17 +899,11 @@
   "auth.sign-in.launcher.callback.title": {
     "message": "Modrinth App bejelentkezési visszahívás"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Visszatérünk a Modrinth Appba. Ha semmi sem történik, használd az alábbi lehetőséget."
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Ugrás a Modrinth.com-ra"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Modrinth App megnyitása"
-  },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Be vagy jelentkezve"
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "Ha az alkalmazás nem nyílik meg, az alábbi gombbal fejezheted be a bejelentkezést."

@@ -893,17 +893,11 @@
   "auth.sign-in.launcher.callback.title": {
     "message": "Обработка входа в Modrinth App"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Вы вернётесь в Modrinth App. Если ничего не произойдёт, нажмите кнопку ниже."
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Перейти на Modrinth.com"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Открыть Modrinth App"
-  },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Вход выполнен"
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "Если приложение не откроется, нажмите на кнопку ниже."

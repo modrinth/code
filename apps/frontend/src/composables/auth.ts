@@ -1,18 +1,22 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { useStorage } from '@vueuse/core'
-import type { LocationQueryValue, RouteLocationNormalizedLoaded } from 'vue-router'
+import type { RouteLocationNormalizedLoaded } from 'vue-router'
 
 import { rememberStoredAccount } from '@/composables/accounts.ts'
 import { useAuthCookie } from '@/composables/auth-cookie.ts'
+import {
+	getQueryString,
+	isLauncherProtocolV2,
+	LAUNCHER_APP_SESSION_QUERY_PARAM,
+	LAUNCHER_AUTH_QUERY_PARAMS,
+} from '@/composables/launcher-auth.ts'
 
 type AuthState = {
 	user: Labrinth.Users.v2.User | null
 	token: string
 }
 
-type QueryValue = LocationQueryValue | LocationQueryValue[] | undefined
 type FullPathRoute = Pick<RouteLocationNormalizedLoaded, 'fullPath'>
-type LauncherRoute = Pick<RouteLocationNormalizedLoaded, 'query'>
 type AuthInitRoute = Pick<RouteLocationNormalizedLoaded, 'fullPath' | 'path' | 'query'>
 
 const normalizeAuthToken = (value: unknown) => {
@@ -43,13 +47,6 @@ const clearAuthCookie = (auth: AuthState, authCookie: { value: string | null }) 
 	authCookie.value = null
 	auth.token = ''
 	auth.user = null
-}
-
-const getQueryString = (value: QueryValue) => {
-	if (Array.isArray(value)) {
-		return value[0] ?? null
-	}
-	return value ?? null
 }
 
 export const useAuthState = () =>
@@ -95,7 +92,12 @@ export const initAuth = async (
 	}
 
 	const oauthCode = normalizeAuthToken(resolvedRoute.query.code)
-	if (oauthCode && !resolvedRoute.fullPath.includes('new_account=true')) {
+	const keepsExistingLauncherSession = isLauncherProtocolV2(resolvedRoute)
+	if (
+		oauthCode &&
+		!keepsExistingLauncherSession &&
+		!resolvedRoute.fullPath.includes('new_account=true')
+	) {
 		authCookie.value = oauthCode
 	}
 
@@ -205,7 +207,7 @@ export const getSignInRouteObj = (route: FullPathRoute, redirectOverride?: strin
 
 export const ADD_ACCOUNT_QUERY_PARAM = 'add_account'
 
-export const getAuthUrl = (provider: string, redirect?: string) => {
+export const getAuthUrl = (provider: string, redirect?: string, includeAppSession = false) => {
 	const config = useRuntimeConfig()
 	const route = useNativeRoute()
 	const launcher = getQueryString(route.query.launcher)
@@ -216,15 +218,14 @@ export const getAuthUrl = (provider: string, redirect?: string) => {
 	if (launcher) {
 		callbackUrl.searchParams.set('launcher', launcher)
 
-		const ipver = getQueryString(route.query.ipver)
-		const port = getQueryString(route.query.port)
-
-		if (ipver) {
-			callbackUrl.searchParams.set('ipver', ipver)
+		for (const param of LAUNCHER_AUTH_QUERY_PARAMS) {
+			const value = getQueryString(route.query[param])
+			if (value) {
+				callbackUrl.searchParams.set(param, value)
+			}
 		}
-
-		if (port) {
-			callbackUrl.searchParams.set('port', port)
+		if (includeAppSession) {
+			callbackUrl.searchParams.set(LAUNCHER_APP_SESSION_QUERY_PARAM, 'true')
 		}
 	} else if (redirect) {
 		callbackUrl.searchParams.set('redirect', redirect)
@@ -268,14 +269,4 @@ export const removeAuthProvider = async (provider: string) => {
 	await useAuth(auth.value.token)
 
 	stopLoading()
-}
-
-export const getLauncherRedirectUrl = (route: LauncherRoute) => {
-	const ipver = getQueryString(route.query.ipver)
-	const port = Number(getQueryString(route.query.port))
-	const usesLocalhostRedirectionScheme = ['4', '6'].includes(ipver ?? '') && port < 65536
-
-	return usesLocalhostRedirectionScheme
-		? `http://${ipver === '4' ? '127.0.0.1' : '[::1]'}:${port}`
-		: 'https://launcher-files.modrinth.com'
 }

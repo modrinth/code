@@ -866,17 +866,11 @@
   "auth.sign-in.last-sign-in": {
     "message": "마지막으로 사용됨"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Modrinth App으로 돌아갑니다. 아무 일도 일어나지 않으면 아래 버튼을 누르세요."
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Modrinth.com으로 이동"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Modrinth App 열기"
-  },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "로그인되었습니다"
   },
   "auth.sign-in.no-account": {
     "message": "계정이 없으신가요?"
