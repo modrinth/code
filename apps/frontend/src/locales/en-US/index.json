@@ -881,6 +881,9 @@
   "auth.sign-in.choose-account": {
     "message": "Choose an account to use in Modrinth App"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "Use an existing account"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Continue with Email"
   },
@@ -899,17 +902,14 @@
   "auth.sign-in.launcher.callback.title": {
     "message": "Modrinth App sign-in callback"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "We’re returning you to the Modrinth App. If nothing happens, use the button below."
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Go to Modrinth.com"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Open Modrinth App"
   },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "You’re signed in"
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "Couldn't finish signing in to the Modrinth App. Try again."
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "If the app doesn’t open, use the button below to finish signing in."
@@ -917,8 +917,14 @@
   "auth.sign-in.launcher.opening.title": {
     "message": "Opening Modrinth App..."
   },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Sign into Modrinth App"
+  },
   "auth.sign-in.no-account": {
     "message": "Don't have an account?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Use a different account"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Sign into Modrinth"

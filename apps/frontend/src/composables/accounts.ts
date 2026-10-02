@@ -250,6 +250,24 @@ export const rememberStoredAccountAppearance = (
 	setAccounts(accounts.map((stored) => (stored.id === id ? { ...stored, appearance } : stored)))
 }
 
+export const updateStoredAccountAuthMethod = (
+	account: StoredAccount,
+	authMethod: StoredAccountAuthMethod,
+) => {
+	if (!import.meta.client) {
+		return
+	}
+
+	const accounts = readLocal()
+	const stored = accounts.find((stored) => stored.id === account.id)
+	if (!stored) {
+		setAccounts([...accounts, { ...account, authMethod }])
+		return
+	}
+
+	setAccounts(accounts.map((item) => (item.id === account.id ? { ...item, authMethod } : item)))
+}
+
 export const forgetStoredAccount = (id: string) => {
 	if (!import.meta.client) return
 	setAccounts(readLocal().filter((stored) => stored.id !== id))

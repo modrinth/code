@@ -896,17 +896,11 @@
   "auth.sign-in.last-sign-in": {
     "message": "最後に使用"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Modrinth Appに戻ります。何も起こらない場合は、以下のボタンを使用してください。"
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Modrinth.comへ移動"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Modrinth Appを開く"
-  },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "サインインしています"
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "アプリが開かない場合は、下のボタンを使用してサインインしてください。"

@@ -860,17 +860,11 @@
   "auth.sign-in.last-sign-in": {
     "message": "Användes senast"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Vi skickar tillbaka dig till Modrinth App. Om ingen händer, använd knappen nedan."
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Gå till Modrinth.com"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Öppna Modrinth App"
-  },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Du är inloggad"
   },
   "auth.sign-in.launcher.opening.title": {
     "message": "Öppnar Modrinth App..."

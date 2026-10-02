@@ -899,17 +899,11 @@
   "auth.sign-in.launcher.callback.title": {
     "message": "Callback für die Anmeldung bei der Modrinth App"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Wir leiten dich zurück zur Modrinth-App. Sollte nichts passieren, klicke bitte auf die Schaltfläche unten."
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Gehe zu Modrinth.com"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Modrinth App öffnen"
-  },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Du bist angemeldet"
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "Falls sich die App nicht öffnet, klicke auf den Button unten, um die Anmeldung abzuschließen."
