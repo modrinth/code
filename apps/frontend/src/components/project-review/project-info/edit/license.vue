@@ -106,10 +106,12 @@ import {
 	Combobox,
 	type ComboboxOption,
 	defineMessages,
+	injectModrinthClient,
 	Input,
 	useVIntl,
 } from '@modrinth/ui'
-import { builtinLicenses } from '@modrinth/utils'
+import { defaultLicenseIds } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import { computed, reactive, ref, useTemplateRef } from 'vue'
 
 import { normalizeProjectUrl } from '~/helpers/project-url'
@@ -193,8 +195,36 @@ function licenseDisplayName(license: LicenseChoice) {
 	return license.friendly
 }
 
+const orLaterLicenseIds = new Set(['AGPL-3.0', 'LGPL-2.1', 'LGPL-3.0', 'GPL-2.0', 'GPL-3.0'])
+const { labrinth } = injectModrinthClient()
+const { data: spdxLicenses } = useQuery({
+	queryKey: ['tags', 'licenses', 'v2'],
+	queryFn: () => labrinth.tags_v2.getLicenses(),
+	staleTime: 1000 * 60 * 60,
+})
+const availableLicenses = computed<LicenseChoice[]>(() => {
+	const licensesById = new Map(
+		(spdxLicenses.value ?? []).map((license) => [license.short, license]),
+	)
+	const defaultIds = new Set<string>(defaultLicenseIds)
+	return [
+		{ friendly: 'Custom', short: '', requiresOnlyOrLater: false },
+		...defaultLicenseIds.map((short) => ({
+			friendly:
+				short === 'All-Rights-Reserved'
+					? 'All Rights Reserved/No License'
+					: (licensesById.get(short)?.name ?? short),
+			short,
+			requiresOnlyOrLater: orLaterLicenseIds.has(short),
+		})),
+		...(spdxLicenses.value ?? [])
+			.filter((license) => !defaultIds.has(license.short))
+			.map((license) => ({ friendly: license.name, short: license.short })),
+	]
+})
+
 const licenseOptions = computed<ComboboxOption<string>[]>(() =>
-	builtinLicenses.map((license) => ({
+	availableLicenses.value.map((license) => ({
 		value: license.short,
 		label: licenseDisplayName(license),
 	})),
@@ -212,7 +242,7 @@ function initialLicense(): LicenseChoice {
 	}
 
 	return (
-		builtinLicenses.find((license) => license.short === trimmedLicenseId) ?? {
+		availableLicenses.value.find((license) => license.short === trimmedLicenseId) ?? {
 			friendly: 'Custom',
 			short: trimmedLicenseId,
 			requiresOnlyOrLater: oldLicenseId.includes('-or-later'),
@@ -239,7 +269,7 @@ function show() {
 const selectedLicense = computed({
 	get: () => (currentLicense.friendly === 'Custom' ? '' : currentLicense.short),
 	set: (short: string) => {
-		const license = builtinLicenses.find((option) => option.short === short)
+		const license = availableLicenses.value.find((option) => option.short === short)
 		if (!license) return
 		Object.assign(currentLicense, license, {
 			requiresOnlyOrLater: license.requiresOnlyOrLater ?? false,
