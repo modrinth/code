@@ -18,6 +18,7 @@ pub mod projects;
 pub mod reports;
 pub mod sessions;
 pub mod teams;
+pub mod thread_issues;
 pub mod threads;
 pub mod user_limits;
 pub mod users;

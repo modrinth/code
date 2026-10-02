@@ -24,6 +24,7 @@ use crate::models::projects::{
 };
 use crate::models::projects::{DependencyType, skip_nulls};
 use crate::models::teams::ProjectPermissions;
+use crate::models::users::User;
 use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::search::SearchState;
@@ -160,15 +161,24 @@ pub async fn version_create(
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
 
+    let user = get_user_from_headers(
+        &req,
+        &**client,
+        &redis,
+        &session_queue,
+        Scopes::VERSION_CREATE,
+    )
+    .await?
+    .1;
+
     let result = version_create_inner(
-        req,
         &mut payload,
         &mut transaction,
         &redis,
         &**file_host,
         &mut uploaded_files,
+        &user,
         &client,
-        &session_queue,
         &kafka_client,
     )
     .await;
@@ -186,9 +196,13 @@ pub async fn version_create(
             return Err(e.into());
         }
     } else if let Ok((_, project_id, version_id)) = &result {
-        transaction.commit().await?;
-        models::DBProject::clear_cache(*project_id, None, Some(true), &redis)
-            .await?;
+        super::projects::mutation::finalize_mutation(
+            *project_id,
+            transaction,
+            &redis,
+            Some(&user),
+        )
+        .await?;
         search_state
             .queue
             .push_version_changes(
@@ -203,30 +217,19 @@ pub async fn version_create(
 
 #[allow(clippy::too_many_arguments)]
 async fn version_create_inner(
-    req: HttpRequest,
     payload: &mut Multipart,
     transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
+    user: &User,
     pool: &PgPool,
-    session_queue: &AuthQueue,
     kafka_client: &KafkaClientState,
 ) -> Result<(HttpResponse, models::DBProjectId, models::DBVersionId), CreateError>
 {
     let mut initial_version_data = None;
     let mut version_builder = None;
     let mut selected_loaders = None;
-
-    let user = get_user_from_headers(
-        &req,
-        pool,
-        redis,
-        session_queue,
-        Scopes::VERSION_CREATE,
-    )
-    .await?
-    .1;
 
     let mut error = None;
     while let Some(item) = payload.next().await {
@@ -322,7 +325,7 @@ async fn version_create_inner(
 
                 let project_version_limits =
                     UserLimits::get_for_versions_per_project(
-                        &user,
+                        user,
                         project_id,
                         pool,
                     )
@@ -333,7 +336,7 @@ async fn version_create_inner(
 
                 let daily_version_limits =
                     UserLimits::get_for_versions_per_day(
-                        &user,
+                        user,
                         Utc::now(),
                         pool,
                     )
@@ -669,8 +672,17 @@ pub async fn upload_file_to_version(
     let version_id = url_data.into_inner().0;
     let db_version_id = models::DBVersionId::from(version_id);
 
+    let user = get_user_from_headers(
+        &req,
+        &**client,
+        &redis,
+        &session_queue,
+        Scopes::VERSION_WRITE,
+    )
+    .await?
+    .1;
+
     let result = upload_file_to_version_inner(
-        req,
         &mut payload,
         client.clone(),
         &mut transaction,
@@ -678,7 +690,7 @@ pub async fn upload_file_to_version(
         &**file_host,
         &mut uploaded_files,
         db_version_id,
-        &session_queue,
+        &user,
         &kafka_client,
     )
     .await;
@@ -696,9 +708,13 @@ pub async fn upload_file_to_version(
             return Err(e.into());
         }
     } else if let Ok((_, project_id)) = &result {
-        transaction.commit().await?;
-        models::DBProject::clear_cache(*project_id, None, Some(true), &redis)
-            .await?;
+        super::projects::mutation::finalize_mutation(
+            *project_id,
+            transaction,
+            &redis,
+            Some(&user),
+        )
+        .await?;
         search_state
             .queue
             .push_version_changes((*project_id).into(), [version_id])
@@ -710,7 +726,6 @@ pub async fn upload_file_to_version(
 
 #[allow(clippy::too_many_arguments)]
 async fn upload_file_to_version_inner(
-    req: HttpRequest,
     payload: &mut Multipart,
     client: Data<PgPool>,
     transaction: &mut PgTransaction<'_>,
@@ -718,21 +733,11 @@ async fn upload_file_to_version_inner(
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
     version_id: models::DBVersionId,
-    session_queue: &AuthQueue,
+    user: &User,
     kafka_client: &KafkaClientState,
 ) -> Result<(HttpResponse, models::DBProjectId), CreateError> {
     let mut initial_file_data: Option<InitialFileData> = None;
     let mut file_builders: Vec<VersionFileBuilder> = Vec::new();
-
-    let user = get_user_from_headers(
-        &req,
-        &**client,
-        &redis,
-        session_queue,
-        Scopes::VERSION_WRITE,
-    )
-    .await?
-    .1;
 
     let result = models::DBVersion::get(version_id, &**client, &redis).await?;
 

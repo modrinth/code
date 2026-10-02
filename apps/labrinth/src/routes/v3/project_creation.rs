@@ -22,6 +22,7 @@ use crate::models::projects::{
 };
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
+use crate::models::users::User;
 use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::search::SearchState;
@@ -349,18 +350,26 @@ pub async fn project_create_internal(
 
     let project_id: ProjectId =
         models::generate_project_id(&mut transaction).await?.into();
+    let current_user = get_user_from_headers(
+        &req,
+        &**client,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_CREATE,
+    )
+    .await?
+    .1;
 
     let result = project_create_inner(
-        req,
         &mut payload,
         &mut transaction,
         &**file_host,
         &mut uploaded_files,
         &client,
         &redis,
-        &session_queue,
         &kafka_client,
         project_id,
+        &current_user,
     )
     .await;
 
@@ -373,15 +382,14 @@ pub async fn project_create_internal(
             return Err(e.into());
         }
     } else {
-        transaction.commit().await?;
-        super::projects::clear_project_cache_and_queue_search(
-            &redis,
-            &search_state,
+        super::projects::mutation::finalize_mutation(
             project_id.into(),
-            None,
-            None,
+            transaction,
+            &redis,
+            Some(&current_user),
         )
         .await?;
+        search_state.queue.push_project_change(project_id).await;
     }
 
     result
@@ -415,18 +423,26 @@ pub async fn project_create_with_id(
     let mut uploaded_files = Vec::new();
 
     let (project_id,) = path.into_inner();
+    let current_user = get_user_from_headers(
+        &req,
+        &**client,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_CREATE,
+    )
+    .await?
+    .1;
 
     let result = project_create_inner(
-        req,
         &mut payload,
         &mut transaction,
         &**file_host,
         &mut uploaded_files,
         &client,
         &redis,
-        &session_queue,
         &kafka_client,
         project_id,
+        &current_user,
     )
     .await;
 
@@ -439,15 +455,14 @@ pub async fn project_create_with_id(
             return Err(e.into());
         }
     } else {
-        transaction.commit().await?;
-        super::projects::clear_project_cache_and_queue_search(
-            &redis,
-            &search_state,
+        super::projects::mutation::finalize_mutation(
             project_id.into(),
-            None,
-            None,
+            transaction,
+            &redis,
+            Some(&current_user),
         )
         .await?;
+        search_state.queue.push_project_change(project_id).await;
     }
 
     result
@@ -487,36 +502,25 @@ Project Creation Steps:
 
 #[allow(clippy::too_many_arguments)]
 async fn project_create_inner(
-    req: HttpRequest,
     payload: &mut Multipart,
     transaction: &mut PgTransaction<'_>,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
     pool: &PgPool,
     redis: &RedisPool,
-    session_queue: &AuthQueue,
     kafka_client: &KafkaClientState,
     project_id: ProjectId,
+    current_user: &User,
 ) -> Result<HttpResponse, CreateError> {
-    // The currently logged in user
-    let (_, current_user) = get_user_from_headers(
-        &req,
-        pool,
-        redis,
-        session_queue,
-        Scopes::PROJECT_CREATE,
-    )
-    .await?;
+    require_verified_email(current_user)?;
 
-    require_verified_email(&current_user)?;
-
-    let limits = UserLimits::get_for_projects(&current_user, pool).await?;
+    let limits = UserLimits::get_for_projects(current_user, pool).await?;
     if limits.current >= limits.max {
         return Err(CreateError::LimitReached);
     }
 
     let daily_limits =
-        UserLimits::get_for_projects_per_day(&current_user, Utc::now(), pool)
+        UserLimits::get_for_projects_per_day(current_user, Utc::now(), pool)
             .await?;
     if daily_limits.current >= daily_limits.max {
         return Err(CreateError::DailyProjectLimitReached);
@@ -577,7 +581,7 @@ async fn project_create_inner(
         if versions_to_create > 0 {
             let project_version_limits =
                 UserLimits::get_for_versions_per_project(
-                    &current_user,
+                    current_user,
                     project_id.into(),
                     pool,
                 )
@@ -591,7 +595,7 @@ async fn project_create_inner(
             }
 
             let daily_version_limits = UserLimits::get_for_versions_per_day(
-                &current_user,
+                current_user,
                 Utc::now(),
                 pool,
             )
@@ -751,6 +755,7 @@ async fn project_create_inner(
                         publicity: FileHostPublicity::Public,
                     });
                     gallery_urls.push(crate::models::projects::GalleryItem {
+                        id: None,
                         url: upload_result.url,
                         raw_url: upload_result.raw_url,
                         featured: item.featured,
@@ -973,6 +978,7 @@ async fn project_create_inner(
             gallery_items: gallery_urls
                 .iter()
                 .map(|x| models::project_item::DBGalleryItem {
+                    id: None,
                     image_url: x.url.clone(),
                     raw_image_url: x.raw_url.clone(),
                     featured: x.featured,

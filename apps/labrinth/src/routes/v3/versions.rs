@@ -20,13 +20,13 @@ use crate::models::ids::VersionId;
 use crate::models::images::ImageContext;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    Dependency, FileType, ProjectStatus, VersionStatus, VersionType,
+    Dependency, FileType, VersionStatus, VersionType,
 };
 use crate::models::projects::{Loader, skip_nulls};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::file_scan::get_files_missing_attribution;
 use crate::queue::session::AuthQueue;
-use crate::routes::internal::delphi;
+
 use crate::search::SearchState;
 use crate::util::error::Context;
 use crate::util::img;
@@ -965,21 +965,16 @@ pub async fn version_edit_helper(
             .await
             .wrap_api_err("deleting unused images")?;
 
-            transaction
-                .commit()
-                .await
-                .wrap_internal_err("committing database transaction")?;
+            super::projects::mutation::finalize_mutation(
+                version_item.inner.project_id,
+                transaction,
+                &redis,
+                Some(&user),
+            )
+            .await?;
             database::models::DBVersion::clear_cache(&version_item, &redis)
                 .await
                 .wrap_internal_err("clearing cached data from Redis")?;
-            database::models::DBProject::clear_cache(
-                version_item.inner.project_id,
-                None,
-                Some(true),
-                &redis,
-            )
-            .await
-            .wrap_internal_err("clearing cached data from Redis")?;
             search_state
                 .queue
                 .push_version_changes(
@@ -1290,15 +1285,6 @@ pub async fn version_delete(
         .wrap_request_err_with(|| {
             "the specified version does not exist!".to_string()
         })?;
-    let project = database::models::DBProject::get_id(
-        version.inner.project_id,
-        &**pool,
-        &redis,
-    )
-    .await
-    .wrap_internal_err("fetching project from database")?
-    .wrap_not_found_err("resource not found")?;
-    let validate_for_review = project.inner.status == ProjectStatus::Processing;
 
     if !user.role.is_admin() {
         let team_member =
@@ -1373,37 +1359,13 @@ pub async fn version_delete(
     .await
     .wrap_internal_err("deleting version from database")?;
 
-    delphi::tech_review_queue::sync_projects(
-        &[version.inner.project_id],
-        delphi::tech_review_queue::TechReviewRemovalReason::FileDeleted,
-        &mut transaction,
-    )
-    .await
-    .wrap_api_err("executing `tech_review_queue::sync_projects`")?;
-
-    if validate_for_review {
-        super::projects::validate::ensure_project_is_valid_for_review(
-            version.inner.project_id,
-            &pool,
-            &mut transaction,
-            &redis,
-        )
-        .await?;
-    }
-
-    transaction
-        .commit()
-        .await
-        .wrap_internal_err("committing database transaction")?;
-
-    database::models::DBProject::clear_cache(
+    super::projects::mutation::finalize_mutation(
         version.inner.project_id,
-        None,
-        Some(true),
+        transaction,
         &redis,
+        Some(&user),
     )
-    .await
-    .wrap_internal_err("clearing cached data from Redis")?;
+    .await?;
     search_state
         .queue
         .push_version_changes(

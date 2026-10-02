@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT EXISTS (\n            SELECT 1\n            FROM mods project\n            INNER JOIN team_members member\n                ON member.team_id = project.team_id\n            WHERE\n                project.id = $1\n                AND member.user_id = $2\n                AND member.accepted\n            UNION\n            SELECT 1\n            FROM mods project\n            INNER JOIN organizations organization\n                ON organization.id = project.organization_id\n            INNER JOIN team_members member\n                ON member.team_id = organization.team_id\n            WHERE\n                project.id = $1\n                AND member.user_id = $2\n                AND member.accepted\n        ) AS \"exists!\"\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "exists!",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "d1aecab83032c7125381944b11ec0f064792b9314f737fe86c85f7527a83aa68"
+}

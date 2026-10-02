@@ -16,6 +16,7 @@ pub mod img;
 pub mod ip;
 pub mod kafka;
 pub mod neverbounce;
+pub mod non_empty_vec;
 pub mod ratelimit;
 pub mod routes;
 pub mod sentry;

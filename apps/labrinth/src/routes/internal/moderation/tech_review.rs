@@ -936,6 +936,7 @@ pub async fn search_projects(
                 .messages
                 .iter()
                 .filter_map(|message| message.author_id)
+                .chain(thread.issues.iter().map(|issue| issue.created_by))
         })
         .collect::<Vec<_>>();
     let thread_authors =
@@ -1045,6 +1046,7 @@ pub async fn get_project_report(
                 .messages
                 .iter()
                 .filter_map(|message| message.author_id)
+                .chain(thread.issues.iter().map(|issue| issue.created_by))
         })
         .collect::<Vec<_>>();
     let thread_authors =
@@ -1121,6 +1123,20 @@ pub async fn submit_report(
         .begin()
         .await
         .wrap_internal_err("failed to begin transaction")?;
+
+    sqlx::query!(
+        r#"
+        SELECT id
+        FROM mods
+        WHERE id = $1
+        FOR UPDATE
+        "#,
+        project_id as DBProjectId,
+    )
+    .fetch_optional(&mut txn)
+    .await
+    .wrap_internal_err("locking project for technical review submission")?
+    .wrap_not_found_err("project not found")?;
 
     let pending_issue_details = sqlx::query!(
         r#"
@@ -1259,22 +1275,22 @@ pub async fn submit_report(
         .wrap_internal_err("failed to add tech review message")?;
     }
 
-    txn.commit()
-        .await
-        .wrap_internal_err("failed to commit transaction")?;
-
     if verdict == DelphiVerdict::Unsafe {
-        crate::routes::v3::projects::clear_project_cache_and_queue_search(
-            &redis,
-            &search_state,
+        crate::routes::v3::projects::mutation::finalize_mutation(
             project_id,
-            None,
-            None,
+            txn,
+            &redis,
+            Some(&user),
         )
-        .await
-        .wrap_api_err(
-            "executing `projects::clear_project_cache_and_queue_search`",
-        )?;
+        .await?;
+        search_state
+            .queue
+            .push_project_change(project_id.into())
+            .await;
+    } else {
+        txn.commit()
+            .await
+            .wrap_internal_err("failed to commit transaction")?;
     }
 
     Ok(())
