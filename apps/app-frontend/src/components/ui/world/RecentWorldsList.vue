@@ -531,7 +531,7 @@ onUnmounted(() => {
 <style scoped lang="scss">
 .grid-when-huge {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(670px, 1fr));
+	grid-template-columns: repeat(auto-fill, minmax(min(670px, 100%), 1fr));
 }
 
 .jump-back-in-item {
