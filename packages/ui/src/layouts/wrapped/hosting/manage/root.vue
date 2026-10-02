@@ -137,7 +137,7 @@
 									date: formatDateTime(serverData.locked_since),
 								})
 							"
-							class="border-highlight-red bg-highlight-red !text-red"
+							class="border-brand-red bg-highlight-red !text-red"
 						>
 							{{ formatMessage(lockMessages.lockedBadge) }}
 						</PageHeaderBadgeItem>
@@ -291,11 +291,17 @@
 						:header="formatMessage(lockMessages.lockedHeader)"
 						class="mb-4 shrink-0"
 					>
-						{{
-							formatMessage(lockMessages.lockedBody, {
-								date: formatDateTime(serverData.locked_since),
-							})
-						}}
+						<IntlFormatted :message-id="lockMessages.lockedBody">
+							<template #support-link="{ children }">
+								<button
+									type="button"
+									class="m-0 cursor-pointer border-none bg-transparent p-0 font-semibold text-link hover:underline"
+									@click="showIntercom"
+								>
+									<component :is="() => children" />
+								</button>
+							</template>
+						</IntlFormatted>
 					</Admonition>
 
 					<ServerPanelAdmonitions
@@ -338,6 +344,7 @@
 </template>
 
 <script setup lang="ts">
+import { show as showIntercom } from '@intercom/messenger-js-sdk'
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import { ModrinthApiError, NuxtModrinthClient } from '@modrinth/api-client'
 import {
@@ -368,6 +375,7 @@ import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
+import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import { IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import ErrorInformationCard from '#ui/components/base/ErrorInformationCard.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
@@ -550,12 +558,12 @@ const lockMessages = defineMessages({
 	},
 	lockedHeader: {
 		id: 'servers.manage.locked.header',
-		defaultMessage: 'This server is locked',
+		defaultMessage: 'Server locked by support',
 	},
 	lockedBody: {
 		id: 'servers.manage.locked.body',
 		defaultMessage:
-			'This server has been locked by Modrinth staff since {date} and is read-only. Contact Modrinth Support for more information.',
+			'Support has temporarily locked this server, so you cannot make any changes. <support-link>Contact support</support-link> if you believe this is a mistake.',
 	},
 	lockServer: {
 		id: 'servers.manage.lock-server',
