@@ -5,12 +5,14 @@ import insufficient from '../messages/checklist/messages/summary/insufficient.md
 import nonEnglish from '../messages/checklist/messages/summary/non-english.md'
 import repeatIp from '../messages/checklist/messages/summary/repeat-ip.md'
 import repeatTitle from '../messages/checklist/messages/summary/repeat-title.md'
-import { issue, panel, section, toggle } from './component-builders/builders'
+import { issue, panel, section, textarea, toggle } from './component-builders/builders'
+import { issueTargets } from './component-builders/targets'
 
 export const insufficientSummaryIssue = issue({
 	id: 'summary-insufficient',
 	title: 'Insufficient summary',
 	category: 'Summary',
+	facets: [issueTargets.modifySummary()],
 	suggestedStatus: 'flagged',
 	message: insufficient,
 })
@@ -19,6 +21,7 @@ export const summaryRepeatsTitleIssue = issue({
 	id: 'summary-repeat-title',
 	title: 'Summary repeats the title',
 	category: 'Summary',
+	facets: [issueTargets.modifySummary()],
 	suggestedStatus: 'flagged',
 	message: repeatTitle,
 })
@@ -27,6 +30,12 @@ export const summaryFormattingIssue = issue({
 	id: 'summary-formatting',
 	title: 'Invalid summary formatting',
 	category: 'Summary',
+	facets: [
+		issueTargets.modifySummary(({ getTextValue }) => {
+			const suggestion = getTextValue('suggestion')
+			return suggestion.trim() ? suggestion : undefined
+		}),
+	],
 	suggestedStatus: 'flagged',
 	message: formatting,
 })
@@ -35,6 +44,7 @@ export const nonEnglishSummaryIssue = issue({
 	id: 'summary-non-english',
 	title: 'Non-English summary',
 	category: 'Summary',
+	facets: [issueTargets.modifySummary()],
 	suggestedStatus: 'flagged',
 	message: nonEnglish,
 })
@@ -43,6 +53,7 @@ export const summaryRepeatsIpIssue = issue({
 	id: 'summary-repeat-ip',
 	title: 'Summary repeats the server address',
 	category: 'Summary',
+	facets: [issueTargets.modifySummary()],
 	suggestedStatus: 'flagged',
 	message: repeatIp,
 })
@@ -80,6 +91,17 @@ export const summaryReviewPanel = panel({
 			label: 'Repeat of IP',
 			issue: summaryRepeatsIpIssue,
 			shown: (ctx) => !!ctx.projectV3.minecraft_server,
+		}),
+	),
+	section({
+		shown: ({ selected }) => selected.issueIds.includes(summaryFormattingIssue.id),
+	}).content(
+		textarea({
+			issue: summaryFormattingIssue,
+			id: 'suggestion',
+			label: 'Suggestion',
+			maxlength: 256,
+			rows: 3,
 		}),
 	),
 )

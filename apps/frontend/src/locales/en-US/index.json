@@ -1067,6 +1067,9 @@
   "conversation-thread.action.approve": {
     "message": "Approve"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Approve with reply"
+  },
   "conversation-thread.action.close-report": {
     "message": "Close report"
   },
@@ -1075,6 +1078,9 @@
   },
   "conversation-thread.action.reject": {
     "message": "Reject"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Reject with reply"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Reopen thread"
@@ -1109,6 +1115,9 @@
   "conversation-thread.action.withhold": {
     "message": "Withhold"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Withhold with reply"
+  },
   "conversation-thread.closed-thread.description": {
     "message": "This thread is closed and new messages cannot be sent to it."
   },
@@ -1120,15 +1129,6 @@
   },
   "conversation-thread.error.sending-message": {
     "message": "Error sending message"
-  },
-  "conversation-thread.no-issues-flagged": {
-    "message": "No issues flagged."
-  },
-  "conversation-thread.private-note.placeholder": {
-    "message": "Leave a private note for staff..."
-  },
-  "conversation-thread.private-note.tab": {
-    "message": "Private note"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Reply to thread..."
@@ -4070,6 +4070,21 @@
   "project-review.issues.choose-option": {
     "message": "Choose at least one option for this issue."
   },
+  "project-review.issues.clear": {
+    "message": "Clear issues"
+  },
+  "project-review.issues.clear-all": {
+    "message": "Clear all issues"
+  },
+  "project-review.issues.clear-all-description": {
+    "message": "This will remove all issues you currently have selected in the project."
+  },
+  "project-review.issues.edited": {
+    "message": "(Edited)"
+  },
+  "project-review.issues.edited-tooltip": {
+    "message": "Issue message has been edited"
+  },
   "project-review.issues.empty": {
     "message": "No issues flagged."
   },
@@ -6364,6 +6379,45 @@
   },
   "shared-instance.invite.unavailable.title": {
     "message": "This invite isn't available"
+  },
+  "thread-issues.addressed": {
+    "message": "Marked as addressed"
+  },
+  "thread-issues.hide-addressed": {
+    "message": "Hide addressed"
+  },
+  "thread-issues.hide-resolved": {
+    "message": "Hide resolved"
+  },
+  "thread-issues.mark-addressed": {
+    "message": "Mark as addressed"
+  },
+  "thread-issues.modify-first": {
+    "message": "You must modify your project to address the issue first."
+  },
+  "thread-issues.show-addressed": {
+    "message": "Show addressed"
+  },
+  "thread-issues.show-resolved": {
+    "message": "Show resolved"
+  },
+  "thread-issues.target.description": {
+    "message": "Description"
+  },
+  "thread-issues.target.edit-name": {
+    "message": "Edit name"
+  },
+  "thread-issues.target.edit-summary": {
+    "message": "Edit summary"
+  },
+  "thread-issues.target.edit-url": {
+    "message": "Edit URL"
+  },
+  "thread-issues.target.gallery-images": {
+    "message": "Gallery images"
+  },
+  "thread-issues.target.summary": {
+    "message": "Summary"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Latest news from Modrinth"

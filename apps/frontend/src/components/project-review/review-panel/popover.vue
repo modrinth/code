@@ -10,8 +10,8 @@
 			tabindex="-1"
 			class="review-popover z-[100] box-border flex w-[28rem] max-w-[calc(100vw-1rem)] flex-col gap-2 overflow-y-auto rounded-xl border border-solid border-highlight-orange bg-surface-1 p-2.5 pb-3 text-sm text-primary"
 			:style="floatingStyles"
-			@pointerenter="cancelClose"
-			@pointerleave="leave(anchor.id)"
+			@pointerenter="setPopoverHovered(anchor.id, true)"
+			@pointerleave="setPopoverHovered(anchor.id, false)"
 			@focusin="cancelClose"
 			@focusout="leave(anchor.id)"
 			@keydown="onKeydown"
@@ -59,7 +59,7 @@ import { injectReviewContext, type ReviewAnchor } from './context'
 
 const { formatMessage } = useVIntl()
 const props = defineProps<{ anchor: ReviewAnchor; titleId?: string; label?: string }>()
-const { active, panel, panelId, pinned, close, leave, cancelClose, contains } =
+const { active, panel, panelId, pinned, close, leave, setPopoverHovered, cancelClose, contains } =
 	injectReviewContext()
 const element = shallowRef<HTMLElement | null>(null)
 const reference = computed(() => props.anchor.element)
@@ -107,7 +107,8 @@ onBeforeUnmount(() => {
 watch([isPositioned, pinned], () => {
 	if (!isPositioned.value || !pinned.value) return
 	void nextTick(() => {
-		if (pinned.value && active.value?.id === props.anchor.id) element.value?.focus()
+		if (pinned.value && active.value?.id === props.anchor.id)
+			element.value?.focus({ preventScroll: true })
 	})
 })
 useEventListener('pointerdown', (event) => {

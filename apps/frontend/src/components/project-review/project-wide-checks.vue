@@ -51,10 +51,11 @@
 <script setup lang="ts">
 import { defineMessages, Tabs, useVIntl } from '@modrinth/ui'
 import { useElementSize } from '@vueuse/core'
-import { computed, ref, watch } from 'vue'
+import { computed, onScopeDispose, ref, watch } from 'vue'
 
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
 
+import { injectReviewContext } from './review-panel/context'
 import ReviewPanel from './review-panel/index.vue'
 
 const { formatMessage } = useVIntl()
@@ -99,9 +100,17 @@ function stopActionsResize(event: PointerEvent) {
 }
 
 const { resolve } = injectReviewPanels()
-const targets = ['re-review', 'reupload', 'rules', 'post-approval', 'status-alerts'] as const
+const targets = ['reupload', 'rules', 'post-approval', 'status-alerts'] as const
 type ActionTarget = (typeof targets)[number]
-const selectedTarget = ref<ActionTarget>('re-review')
+const selectedTarget = ref<ActionTarget>('reupload')
+const { registerRoute } = injectReviewContext()
+for (const target of targets) {
+	onScopeDispose(
+		registerRoute(target, () => {
+			selectedTarget.value = target
+		}),
+	)
+}
 const visibleTargets = computed(() => targets.filter((kind) => resolve({ kind })))
 const tabs = computed(() =>
 	visibleTargets.value.map((kind) => {
@@ -118,10 +127,8 @@ const tabs = computed(() =>
 
 watch(
 	visibleTargets,
-	(visible, previous = []) => {
-		if (visible.includes('re-review') && !previous.includes('re-review')) {
-			selectedTarget.value = 're-review'
-		} else if (!visible.includes(selectedTarget.value) && visible[0]) {
+	(visible) => {
+		if (!visible.includes(selectedTarget.value) && visible[0]) {
 			selectedTarget.value = visible[0]
 		}
 	},

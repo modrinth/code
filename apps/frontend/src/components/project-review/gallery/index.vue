@@ -3,6 +3,7 @@
 		<ReviewPanel
 			mode="inline"
 			:target="{ kind: 'gallery' }"
+			hide-title
 			:disabled="isLoading || !!error"
 			:interaction-scope="interactionScope"
 			class="shrink-0"

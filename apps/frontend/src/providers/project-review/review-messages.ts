@@ -14,6 +14,7 @@ export function createReviewMessages(
 	panels: ReturnType<typeof createReviewPanels>,
 ) {
 	const overrides = reactive(new Map<string, string>())
+	const defaults = reactive(new Map<string, string>())
 	const generating = computed(() => !!project.value && projectV2.value?.id !== project.value.id)
 	const issueMessages = computed(() => {
 		const current = project.value
@@ -27,19 +28,30 @@ export function createReviewMessages(
 		)
 	})
 	function issueMessage(id: string) {
-		return overrides.get(id) ?? issueMessages.value.get(id) ?? ''
+		return (
+			overrides.get(id) ??
+			(panels.isRestoredIssue(id) ? defaults.get(id) : undefined) ??
+			issueMessages.value.get(id) ??
+			defaults.get(id) ??
+			''
+		)
 	}
 	function editIssueMessage(id: string, message: string) {
 		if (message === issueMessage(id)) return
-		if (message === issueMessages.value.get(id)) overrides.delete(id)
+		const defaultMessage =
+			(panels.isRestoredIssue(id) ? defaults.get(id) : undefined) ??
+			issueMessages.value.get(id) ??
+			defaults.get(id)
+		if (message === defaultMessage) overrides.delete(id)
 		else overrides.set(id, message)
 	}
 	function resetIssueMessage(id: string) {
 		overrides.delete(id)
 	}
 	const generated = computed(() =>
-		[...issueMessages.value.keys()]
-			.map(issueMessage)
+		panels.activeIssues.value
+			.filter(({ id, facets }) => !facets && !panels.isRestoredIssue(id))
+			.map(({ id }) => issueMessage(id))
 			.filter((message) => message.trim())
 			.join('\n\n'),
 	)
@@ -47,6 +59,7 @@ export function createReviewMessages(
 		() => project.value?.id,
 		() => {
 			overrides.clear()
+			defaults.clear()
 		},
 		{ flush: 'sync' },
 	)
@@ -55,6 +68,9 @@ export function createReviewMessages(
 		generating,
 		generated,
 		issueMessage,
+		setIssueDefault: (id: string, message: string) => {
+			defaults.set(id, message)
+		},
 		editIssueMessage,
 		resetIssueMessage,
 		hasIssueOverride: (id: string) => overrides.has(id),

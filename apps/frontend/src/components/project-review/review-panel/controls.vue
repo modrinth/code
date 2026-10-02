@@ -43,7 +43,7 @@
 								control.placeholder ?? formatMessage(controlMessages.markdownPlaceholder)
 							"
 							hide-markdown-hint
-							@update:model-value="panelBinding && panels.write(panelBinding, control, $event)"
+							@update:model-value="writeControl(control, $event)"
 						/>
 						<Input
 							v-else-if="control.type === 'text'"
@@ -53,9 +53,20 @@
 							:disabled="control.disabled"
 							:aria-label="control.label"
 							:aria-required="control.required"
-							@update:model-value="
-								panelBinding && panels.write(panelBinding, control, String($event ?? ''))
-							"
+							@update:model-value="writeControl(control, String($event ?? ''))"
+						/>
+						<Textarea
+							v-else-if="control.type === 'textarea'"
+							:ref="(field) => setFieldRef(fieldKey(control), field)"
+							:model-value="panels.textValue(panelBinding, control)"
+							:placeholder="control.placeholder || formatMessage(controlMessages.textPlaceholder)"
+							:disabled="control.disabled"
+							:aria-label="control.label"
+							:aria-required="control.required"
+							:maxlength="control.maxlength"
+							:rows="control.rows"
+							resize="vertical"
+							@update:model-value="writeControl(control, String($event ?? ''))"
 						/>
 						<MultiSelect
 							v-else-if="control.type === 'select' && control.multiple"
@@ -68,7 +79,7 @@
 							:dropdown-gap="0"
 							@open="setDropdownOpen(control, true)"
 							@close="setDropdownOpen(control, false)"
-							@update:model-value="panelBinding && panels.write(panelBinding, control, $event)"
+							@update:model-value="writeControl(control, $event)"
 						/>
 						<Combobox
 							v-else-if="control.type === 'select'"
@@ -87,7 +98,7 @@
 							:dropdown-gap="0"
 							@open="setDropdownOpen(control, true)"
 							@close="setDropdownOpen(control, false)"
-							@update:model-value="panelBinding && panels.write(panelBinding, control, $event)"
+							@update:model-value="writeControl(control, $event)"
 						/>
 					</div>
 					<Tooltip v-else :disabled="!control.tooltip" :text="control.tooltip">
@@ -99,6 +110,7 @@
 							"
 							:disabled="control.disabled"
 							:model-value="panels.selected(panelBinding, control)"
+							:re-review="previousIssues.isReReviewControl(control)"
 							:aria-pressed="panels.selected(panelBinding, control)"
 							@update:model-value="toggleAction(control, $event)"
 						/>
@@ -188,6 +200,7 @@ import {
 	Input,
 	MarkdownEditor,
 	MultiSelect,
+	Textarea,
 	Tooltip,
 	useVIntl,
 } from '@modrinth/ui'
@@ -207,6 +220,7 @@ import {
 	injectReviewPanels,
 	type ReviewPanelBinding,
 } from '~/providers/project-review/review-panels'
+import { injectReviewPreviousIssues } from '~/providers/project-review/review-previous-issues'
 
 import { projectReviewMessages as messages } from '../messages'
 
@@ -253,6 +267,7 @@ const controlMessages = defineMessages({
 })
 const { formatMessage } = useVIntl()
 const panels = injectReviewPanels()
+const previousIssues = injectReviewPreviousIssues()
 const settings = useModerationSettings()
 const panelBinding = computed(
 	() => props.binding ?? (props.target ? panels.resolve(props.target) : undefined),
@@ -326,11 +341,18 @@ function textFields() {
 	return (
 		panelBinding.value?.panel.sections.flatMap((section) =>
 			section.controls.filter(
-				(control): control is Extract<PanelControl, { type: 'text' | 'markdown' }> =>
-					(control.type === 'text' || control.type === 'markdown') && !control.disabled,
+				(control): control is Extract<PanelControl, { type: 'text' | 'markdown' | 'textarea' }> =>
+					(control.type === 'text' || control.type === 'markdown' || control.type === 'textarea') &&
+					!control.disabled,
 			),
 		) ?? []
 	)
+}
+
+function writeControl(control: PanelControl, value: boolean | string | string[]) {
+	const binding = panelBinding.value
+	if (!binding) return
+	panels.write(binding, control, value)
 }
 
 function toggleAction(control: PanelControl, value: boolean) {
@@ -338,7 +360,7 @@ function toggleAction(control: PanelControl, value: boolean) {
 	if (!binding) return
 	const previousFields = new Set(textFields().map(fieldKey))
 	pendingFocus = undefined
-	panels.write(binding, control, value)
+	writeControl(control, value)
 	const revealed = textFields().find((field) => !previousFields.has(fieldKey(field)))
 	if (!revealed) return
 	pendingFocus = fieldKey(revealed)

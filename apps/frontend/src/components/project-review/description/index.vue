@@ -9,6 +9,7 @@
 			<ReviewPanel
 				mode="inline"
 				:target="{ kind: 'description' }"
+				hide-title
 				:disabled="isLoading || !!error"
 				:interaction-scope="interactionScope"
 				class="!w-auto min-w-0 flex-1 pb-2.5"

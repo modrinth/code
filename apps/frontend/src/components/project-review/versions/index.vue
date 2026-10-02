@@ -16,6 +16,7 @@
 			v-if="resolve({ kind: 'versions' })"
 			mode="inline"
 			:target="{ kind: 'versions' }"
+			hide-title
 			:interaction-scope="interactionScope"
 			:disabled="
 				isLoading || !!error || versionsQuery.isPending.value || versionsQuery.isError.value

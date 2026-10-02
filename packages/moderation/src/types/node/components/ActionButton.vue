@@ -16,6 +16,9 @@
 		size="sm"
 		@click="emit('update:modelValue', !modelValue)"
 	>
+		<span v-if="reReview" class="flex shrink-0 items-center text-orange">
+			<TagCategoryRefreshCcwIcon class="size-4" aria-hidden="true" />
+		</span>
 		<component :is="icon" v-if="icon" aria-hidden="true" />
 		<template v-else>{{ label }}</template>
 		<kbd
@@ -30,13 +33,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ArrowBigUpIcon } from '@modrinth/assets'
+import { ArrowBigUpIcon, TagCategoryRefreshCcwIcon } from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
 import type { Component } from 'vue'
 import { computed } from 'vue'
 
 const props = defineProps<{
 	modelValue: boolean
+	reReview?: boolean
 	label?: string
 	icon?: Component
 	disabled?: boolean

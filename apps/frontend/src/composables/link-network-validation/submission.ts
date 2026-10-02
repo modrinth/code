@@ -9,3 +9,11 @@ export function canSubmitProjectForReview(
 ): boolean {
 	return !loading && !!validation && !validation.nags.some((nag) => nag.severity === 'required')
 }
+
+export function canResubmitProjectForReview(
+	thread: Pick<Labrinth.Threads.v3.Thread, 'issues'> | null | undefined,
+): boolean {
+	return (
+		!!thread && thread.issues.every((issue) => issue.verdict === 'resolved' || issue.user_addressed)
+	)
+}

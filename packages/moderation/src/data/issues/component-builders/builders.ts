@@ -6,6 +6,8 @@ import type {
 	IssueSelect,
 	IssueSelectConfig,
 	IssueText,
+	IssueTextarea,
+	IssueTextareaConfig,
 	IssueTextConfig,
 	IssueToggle,
 	IssueToggleConfig,
@@ -45,6 +47,10 @@ export function markdown(config: IssueMarkdownConfig): IssueMarkdown {
 
 export function text(config: IssueTextConfig): IssueText {
 	return { ...config, type: 'text' }
+}
+
+export function textarea(config: IssueTextareaConfig): IssueTextarea {
+	return { ...config, type: 'textarea' }
 }
 
 export function select(config: IssueSelectConfig): IssueSelect {

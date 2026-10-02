@@ -508,6 +508,7 @@ export const archiveDisclosureReviewPanel = panel({
 )
 
 export const disclosuresReviewPanel = panel({
+	title: 'Disclosures',
 	hint: 'Has this project selected all proper content disclosures?',
 	icon: TriangleAlertIcon,
 	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',

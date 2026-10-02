@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
+
 import ReviewPanel from '~/components/project-review/review-panel/index.vue'
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 
 import AdvertisingDisclosureCard from './AdvertisingDisclosureCard.vue'
 import AiDisclosureCard from './AiDisclosureCard.vue'
@@ -24,6 +27,11 @@ const props = withDefaults(
 )
 const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVisible } =
 	props.editor
+const disclosureIssueTargets: Labrinth.Threads.v3.ThreadIssueTarget['type'][] = [
+	'remove_project_disclosures',
+	'modify_project_disclosure',
+	'modify_project_disclosure_note',
+]
 </script>
 
 <template>
@@ -49,6 +57,12 @@ const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVis
 					(status: DisclosureLockStatus) => setDisclosureLockStatus('ai_content', status)
 				"
 			/>
+			<ProjectIssueCard
+				v-if="variant === 'settings'"
+				:target="disclosureIssueTargets"
+				disclosure-type="ai_content"
+				class="mt-2"
+			/>
 		</component>
 		<component
 			:is="variant === 'review' ? ReviewPanel : 'div'"
@@ -70,6 +84,12 @@ const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVis
 				@set-lock-status="
 					(status: DisclosureLockStatus) => setDisclosureLockStatus('ai_functionality', status)
 				"
+			/>
+			<ProjectIssueCard
+				v-if="variant === 'settings'"
+				:target="disclosureIssueTargets"
+				disclosure-type="ai_functionality"
+				class="mt-2"
 			/>
 		</component>
 		<component
@@ -93,6 +113,12 @@ const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVis
 					(status: DisclosureLockStatus) => setDisclosureLockStatus('advertisements', status)
 				"
 			/>
+			<ProjectIssueCard
+				v-if="variant === 'settings'"
+				:target="disclosureIssueTargets"
+				disclosure-type="advertisements"
+				class="mt-2"
+			/>
 		</component>
 		<component
 			:is="variant === 'review' ? ReviewPanel : 'div'"
@@ -114,6 +140,12 @@ const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVis
 				@set-lock-status="
 					(status: DisclosureLockStatus) => setDisclosureLockStatus('paid_features', status)
 				"
+			/>
+			<ProjectIssueCard
+				v-if="variant === 'settings'"
+				:target="disclosureIssueTargets"
+				disclosure-type="paid_features"
+				class="mt-2"
 			/>
 		</component>
 		<component
@@ -137,6 +169,12 @@ const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVis
 					(status: DisclosureLockStatus) => setDisclosureLockStatus('telemetry', status)
 				"
 			/>
+			<ProjectIssueCard
+				v-if="variant === 'settings'"
+				:target="disclosureIssueTargets"
+				disclosure-type="telemetry"
+				class="mt-2"
+			/>
 		</component>
 		<component
 			:is="variant === 'review' ? ReviewPanel : 'div'"
@@ -158,6 +196,12 @@ const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVis
 				@set-lock-status="
 					(status: DisclosureLockStatus) => setDisclosureLockStatus('derivative_work', status)
 				"
+			/>
+			<ProjectIssueCard
+				v-if="variant === 'settings'"
+				:target="disclosureIssueTargets"
+				disclosure-type="derivative_work"
+				class="mt-2"
 			/>
 		</component>
 		<component
@@ -181,6 +225,12 @@ const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVis
 					(status: DisclosureLockStatus) => setDisclosureLockStatus('epilepsy_triggers', status)
 				"
 			/>
+			<ProjectIssueCard
+				v-if="variant === 'settings'"
+				:target="disclosureIssueTargets"
+				disclosure-type="epilepsy_triggers"
+				class="mt-2"
+			/>
 		</component>
 		<component
 			:is="variant === 'review' ? ReviewPanel : 'div'"
@@ -202,6 +252,12 @@ const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVis
 				@set-lock-status="
 					(status: DisclosureLockStatus) => setDisclosureLockStatus('system_interactions', status)
 				"
+			/>
+			<ProjectIssueCard
+				v-if="variant === 'settings'"
+				:target="disclosureIssueTargets"
+				disclosure-type="system_interactions"
+				class="mt-2"
 			/>
 		</component>
 		<component
@@ -225,6 +281,12 @@ const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVis
 				@set-lock-status="
 					(status: DisclosureLockStatus) => setDisclosureLockStatus('archived', status)
 				"
+			/>
+			<ProjectIssueCard
+				v-if="variant === 'settings'"
+				:target="disclosureIssueTargets"
+				disclosure-type="archived"
+				class="mt-2"
 			/>
 		</component>
 	</div>

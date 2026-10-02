@@ -8,8 +8,12 @@
 	>
 		<div class="flex items-center gap-1">
 			<h3 class="m-0 flex-1 text-sm font-semibold text-secondary">{{ heading }}</h3>
-			<div v-if="$slots.right || selectedFindingCount > 0" class="flex shrink-0 items-center gap-2">
+			<div
+				v-if="$slots.right || selectedFindingCount > 0 || reReviewFindingCount > 0"
+				class="flex shrink-0 items-center gap-2"
+			>
 				<slot name="right" />
+				<ReReviewFindingsCountBadge :count="reReviewFindingCount" />
 				<FindingsCountBadge :count="selectedFindingCount" />
 			</div>
 		</div>
@@ -22,8 +26,10 @@ import { computed } from 'vue'
 
 import type { ReviewTarget } from '~/providers/project-review/review'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
+import { injectReviewPreviousIssues } from '~/providers/project-review/review-previous-issues'
 
 import FindingsCountBadge from '../review-panel/findings-count-badge.vue'
+import ReReviewFindingsCountBadge from '../review-panel/re-review-findings-count-badge.vue'
 import ReviewPanel from '../review-panel/index.vue'
 
 const props = defineProps<{
@@ -31,6 +37,11 @@ const props = defineProps<{
 	target?: ReviewTarget
 }>()
 const panels = injectReviewPanels()
+const previousIssues = injectReviewPreviousIssues()
+const reReviewFindingCount = computed(() => {
+	const binding = props.target ? panels.resolve(props.target) : undefined
+	return binding ? previousIssues.reReviewFindingCount(binding) : 0
+})
 const selectedFindingCount = computed(() => {
 	const binding = props.target ? panels.resolve(props.target) : undefined
 	return binding ? panels.selectedFindingCount(binding) : 0

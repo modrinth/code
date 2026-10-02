@@ -1,6 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { reviewPanels } from '@modrinth/moderation/src/data/issues'
 import { aggregateCorrections } from '@modrinth/moderation/src/data/issues/component-builders/corrections'
+import { resolveIssueFacets } from '@modrinth/moderation/src/data/issues/component-builders/targets'
 import type {
 	Issue,
 	Panel,
@@ -27,10 +28,12 @@ export type ResolvedIssueControl = ResolvedIssueControlOptions &
 	(
 		| { type: 'toggle'; id?: string; issueListLabel?: string; issueListGroup?: string }
 		| {
-				type: 'markdown' | 'text'
+				type: 'markdown' | 'text' | 'textarea'
 				key: string
 				initial: string
 				placeholder?: string
+				rows?: number
+				maxlength?: number
 		  }
 		| {
 				type: 'select'
@@ -66,6 +69,13 @@ export interface ReviewPanelBinding {
 		guidanceUrl: string
 		sections: ResolvedPanelSection[]
 	}
+}
+
+export interface ReviewIssueSelection {
+	active: boolean
+	toggle_ids: string[]
+	text_values: Record<string, string>
+	select_values: Record<string, string[]>
 }
 
 export interface ReviewIssueControl {
@@ -236,11 +246,15 @@ export function createReviewPanels(
 							type: node.type,
 							key: node.id,
 							initial:
-								node.type === 'text' ? (resolveWithContext(node.initial, issueContext) ?? '') : '',
+								node.type === 'text' || node.type === 'textarea'
+									? (resolveWithContext(node.initial, issueContext) ?? '')
+									: '',
 							placeholder:
-								node.type === 'text'
+								node.type === 'text' || node.type === 'textarea'
 									? resolveWithContext(node.placeholder, issueContext)
 									: undefined,
+							rows: node.type === 'textarea' ? node.rows : undefined,
+							maxlength: node.type === 'textarea' ? node.maxlength : undefined,
 						}
 					}
 					controls.push(control)
@@ -293,7 +307,8 @@ export function createReviewPanels(
 	}
 
 	function textValue(binding: ReviewPanelBinding, control: ResolvedIssueControl): string {
-		if (control.type !== 'markdown' && control.type !== 'text') return ''
+		if (control.type !== 'markdown' && control.type !== 'text' && control.type !== 'textarea')
+			return ''
 		return textValues(binding.projectId, control.issueId)[control.key] ?? control.initial
 	}
 
@@ -433,6 +448,38 @@ export function createReviewPanels(
 		updateIssueOrder(current.id, id)
 	}
 
+	function issueSelection(id: string): ReviewIssueSelection {
+		const projectId = project.value?.id
+		if (!projectId) return { active: false, toggle_ids: [], text_values: {}, select_values: {} }
+		const selects = session.read(projectId, 'issue-select')[id]
+		return {
+			active: session.read(projectId, 'issue-active')[id] === true,
+			toggle_ids: [...selectedToggleIds(projectId, id)].sort(),
+			text_values: Object.fromEntries(
+				Object.entries(textValues(projectId, id)).sort(([a], [b]) => a.localeCompare(b)),
+			),
+			select_values:
+				selects && typeof selects === 'object' && !(selects instanceof Set)
+					? Object.fromEntries(
+							Object.entries(selects)
+								.sort(([a], [b]) => a.localeCompare(b))
+								.flatMap(([key, values]) =>
+									values instanceof Set ? [[key, [...values].sort()]] : [],
+								),
+						)
+					: {},
+		}
+	}
+
+	function isRestoredIssue(id: string) {
+		const projectId = project.value?.id
+		if (!projectId) return false
+		const selection = JSON.stringify({ id, ...issueSelection(id) })
+		return Object.values(session.read(projectId, 'previous-issue-selection')).some(
+			(saved) => saved === selection,
+		)
+	}
+
 	function removeIssue(id: string) {
 		if (!project.value) return
 		for (const scope of ['issue-active', 'issues', 'issue-text', 'issue-select', 'issue-order']) {
@@ -511,6 +558,7 @@ export function createReviewPanels(
 				return {
 					id,
 					missing: [...new Set(missing)],
+					facets: issue.facets ? resolveIssueFacets(issue.facets, context) : undefined,
 					hasCorrections: issue.corrections !== undefined,
 					corrections: missing.length ? undefined : resolveWithContext(issue.corrections, context),
 					applyCorrections: issue.applyCorrections === true,
@@ -541,12 +589,25 @@ export function createReviewPanels(
 		})
 	})
 	const validationErrors = computed(() =>
-		activeIssues.value.flatMap(({ id, missing }) => missing.map((key) => ({ issueId: id, key }))),
+		activeIssues.value
+			.filter(({ id }) => !isRestoredIssue(id))
+			.flatMap(({ id, missing }) => missing.map((key) => ({ issueId: id, key }))),
 	)
 
 	return {
+		issueBindings: (issueId: string) =>
+			[...panels.value.values()].filter((binding) =>
+				binding.panel.sections.some((section) =>
+					section.controls.some(
+						(control) =>
+							control.issueId === issueId && !control.disabled && selected(binding, control),
+					),
+				),
+			),
 		availableIssues,
 		addIssue,
+		issueSelection,
+		isRestoredIssue,
 		removeIssue,
 		resolve,
 		selected,

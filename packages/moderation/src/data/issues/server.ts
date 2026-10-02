@@ -5,6 +5,7 @@ import excessiveLanguagesMessage from '../messages/checklist/messages/rules/exce
 import temporaryServerMessage from '../messages/checklist/messages/status-alerts/temporary-server.md'
 import { issue, markdown, panel, section, text, toggle } from './component-builders/builders'
 import { IssuePriority } from './component-builders/priority'
+import { issueTargets } from './component-builders/targets'
 import { metadataGameVersionsIssue } from './metadata'
 import {
 	reuploadCustomPackProhibitedIssue,
@@ -17,6 +18,7 @@ export const serversExcessiveLanguagesIssue = issue({
 	id: 'servers-excessive-languages',
 	title: 'Excessive languages',
 	category: 'Server details',
+	facets: [issueTargets.modifyServerLanguages()],
 	message: excessiveLanguagesMessage,
 	suggestedStatus: 'flagged',
 })

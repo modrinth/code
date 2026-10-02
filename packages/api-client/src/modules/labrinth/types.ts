@@ -1103,6 +1103,7 @@ export namespace Labrinth {
 				| 'unknown'
 
 			export type GalleryItem = {
+				id?: number
 				url: string
 				raw_url: string
 				featured: boolean
@@ -2102,6 +2103,151 @@ export namespace Labrinth {
 		export namespace v3 {
 			export type ThreadType = 'report' | 'project' | 'direct_message'
 
+			export type TextTarget = {
+				original: string
+				suggestion?: string | null
+			}
+
+			export type OptionalTextTarget = {
+				original?: string | null
+				/** Omitted means no suggestion; null suggests removing the value. */
+				suggestion?: string | null
+			}
+
+			export type VersionIssueTarget =
+				| { type: 'remove' }
+				| { type: 'modify_environment'; value: TextTarget }
+				| {
+						type: 'modify_game_versions'
+						value: { original: string[]; suggestion?: string[] | null }
+				  }
+				| {
+						type: 'modify_dependencies'
+						value: {
+							original: Versions.v3.Dependency[]
+							suggestion?: Versions.v3.Dependency[] | null
+						}
+				  }
+				| { type: 'modify_changelog'; value: TextTarget }
+				| { type: 'remove_additional_files'; value: { file_ids: string[] } }
+				| {
+						type: 'modify_additional_file_type'
+						value: {
+							file_id: string
+							filename: string
+							original?: Versions.v3.FileType | null
+							suggestion?: Versions.v3.FileType | null
+						}
+				  }
+
+			export type ThreadIssueTarget =
+				| { type: 'modify_title'; value: TextTarget }
+				| { type: 'modify_slug'; value: TextTarget }
+				| { type: 'modify_summary'; value: TextTarget }
+				| { type: 'modify_description'; value: TextTarget }
+				| { type: 'modify_license'; value: { license: TextTarget; url: TextTarget } }
+				| { type: 'modify_icon'; value: { original_url: string | null } }
+				| { type: 'remove_tags'; value: { tags: string[] } }
+				| { type: 'modify_links'; value: { links: Record<string, TextTarget> } }
+				| { type: 'add_gallery_images'; value: { original_count: number } }
+				| {
+						type: 'modify_gallery_image'
+						value: {
+							image_id: number
+							original_url: string
+							name?: OptionalTextTarget | null
+							description?: OptionalTextTarget | null
+						}
+				  }
+				| { type: 'remove_gallery_images'; value: { image_ids: number[] } }
+				| { type: 'remove_project_disclosures'; value: { disclosure_types: string[] } }
+				| {
+						type: 'modify_project_disclosure'
+						value: {
+							disclosure_type: string
+							metadata: { original: unknown; suggestion?: unknown }
+						}
+				  }
+				| {
+						type: 'modify_project_disclosure_note'
+						value: { disclosure_type: string; note: OptionalTextTarget }
+				  }
+				| {
+						type: 'version'
+						value: {
+							version_id: string
+							version_number: string
+							target: VersionIssueTarget
+						}
+				  }
+				| {
+						type: 'modify_team_member_role'
+						value: { team_id: string; user_id: string; role: TextTarget }
+				  }
+				| {
+						type: 'modify_server_languages'
+						value: { original: string[]; suggestion?: string[] | null }
+				  }
+				| {
+						type: 'modify_server_address'
+						value: {
+							platform: 'minecraft_java' | 'minecraft_bedrock'
+							address: TextTarget
+						}
+				  }
+				| { type: 'acknowledge'; value: { mode: 'checkbox' | 'reply' } }
+
+			export type NewThreadIssueFacet = { what: ThreadIssueTarget }
+
+			/**
+			 * The backend stores `why` as an arbitrary JSON blob; this schema is interpreted by the frontend.
+			 * Fields are optional to support issues created before review metadata was added.
+			 */
+			export type ThreadIssueWhy = {
+				issue_id?: string
+				title?: string
+				message?: string
+				selection?: {
+					active: boolean
+					toggle_ids: string[]
+					text_values: Record<string, string>
+					select_values: Record<string, string[]>
+				}
+			}
+
+			export type NewThreadIssue = {
+				why: ThreadIssueWhy
+				facets: [NewThreadIssueFacet, ...NewThreadIssueFacet[]]
+			}
+
+			export type NewThreadIssues = {
+				issues: [NewThreadIssue, ...NewThreadIssue[]]
+			}
+
+			export type ThreadIssueVerdict = 'open' | 'addressed' | 'resolved'
+
+			export type ThreadIssue = {
+				id: string
+				created_by: string | null
+				created_at: string
+				why: ThreadIssueWhy
+				user_addressed: boolean
+				moderator_verified: boolean
+				facets: {
+					id: string
+					what: ThreadIssueTarget
+					verdict: ThreadIssueVerdict
+				}[]
+				verdict: ThreadIssueVerdict
+			}
+
+			export type EditThreadIssue = {
+				why?: ThreadIssueWhy
+				facets?: [NewThreadIssueFacet, ...NewThreadIssueFacet[]]
+				user_addressed?: boolean
+				moderator_verified?: boolean
+			}
+
 			export type MessageBody =
 				| {
 						type: 'text'
@@ -2163,6 +2309,7 @@ export namespace Labrinth {
 				project_id: string | null
 				report_id: string | null
 				messages: ThreadMessage[]
+				issues: ThreadIssue[]
 				members: ThreadMember[]
 			}
 

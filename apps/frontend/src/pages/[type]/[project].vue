@@ -640,6 +640,7 @@ import { getSignInRouteObj } from '~/composables/auth.ts'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { useProjectLinkValidation } from '~/composables/link-network-validation'
 import {
+	canResubmitProjectForReview,
 	canSubmitProjectForReview,
 	PROJECT_REVIEW_VALIDATION_ERROR,
 } from '~/composables/link-network-validation/submission'
@@ -648,6 +649,7 @@ import { STALE_TIME, STALE_TIME_LONG, warmProjectCheckCaches } from '~/composabl
 import { versionQueryOptions } from '~/composables/queries/version'
 import { useServerInstallContent } from '~/composables/use-server-install-content'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
+import { isRejected } from '~/helpers/projects.js'
 import { injectCurrentProjectId } from '~/providers/current-project.ts'
 import { loadChecklistState } from '~/services/moderation/checklist-storage.ts'
 import { useModerationQueue } from '~/services/moderation/queue.ts'
@@ -1336,6 +1338,9 @@ async function invalidateProject() {
 	await queryClient.invalidateQueries({ queryKey: ['project', 'v3', id] })
 	// Prefix match — invalidates members, versions, dependencies, organization
 	await queryClient.invalidateQueries({ queryKey: ['project', id] })
+	if (projectRaw.value?.thread_id) {
+		await queryClient.invalidateQueries({ queryKey: ['thread', projectRaw.value.thread_id] })
+	}
 }
 
 async function redirectIfNewSlug(newSlug, id) {
@@ -2203,7 +2208,8 @@ watch(
 async function setProcessing() {
 	if (
 		patchStatusMutation.isPending.value ||
-		!canSubmitProjectForReview(projectValidation.value, reviewSubmissionLoading.value)
+		!canSubmitProjectForReview(projectValidation.value, reviewSubmissionLoading.value) ||
+		(isRejected(project.value) && !canResubmitProjectForReview(thread.value))
 	) {
 		return false
 	}
@@ -2211,7 +2217,12 @@ async function setProcessing() {
 	startLoading()
 	try {
 		const validation = await refreshProjectValidation()
-		if (!canSubmitProjectForReview(validation, false)) return false
+		if (
+			!canSubmitProjectForReview(validation, false) ||
+			(isRejected(project.value) && !canResubmitProjectForReview(thread.value))
+		) {
+			return false
+		}
 		await patchStatusMutation.mutateAsync({
 			projectId: project.value.id,
 			status: 'processing',

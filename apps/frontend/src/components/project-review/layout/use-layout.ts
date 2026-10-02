@@ -16,7 +16,7 @@ import {
 	workspacePanelSizes,
 	workspaceTabLayoutKey,
 } from './layout-storage'
-import { type ProjectReviewTab, projectReviewTabs } from './types'
+import { type ProjectReviewSlot, type ProjectReviewTab, projectReviewTabs } from './types'
 
 export function useProjectReviewLayout(
 	getTitle: (tab: ProjectReviewTab) => string,
@@ -173,6 +173,17 @@ export function useProjectReviewLayout(
 		tabs?.getPanel(tab)?.api.setActive()
 	}
 
+	function revealSlot(slot: ProjectReviewSlot) {
+		if (slot === 'left' || slot === 'right') {
+			const visible = slot === 'left' ? leftVisible : rightVisible
+			if (!visible.value) toggleSidebar(slot)
+		} else if (slot === 'bottom') {
+			if (!bottomVisible.value) toggleToolsPanel()
+		} else {
+			openTab(slot)
+		}
+	}
+
 	function resetActiveTabs() {
 		for (const group of tabs?.groups ?? []) {
 			const firstPanel = group.panels[0]
@@ -325,6 +336,7 @@ export function useProjectReviewLayout(
 		bottomVisible,
 		leftVisible,
 		openTab,
+		revealSlot,
 		resetActiveTabs,
 		rightVisible,
 		topLeftGroupId,

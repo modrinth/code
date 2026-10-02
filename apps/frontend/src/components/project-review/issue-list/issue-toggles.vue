@@ -16,7 +16,7 @@
 						entry.control.type === 'toggle' ? (entry.control.id ?? 'active') : entry.control.key
 					"
 					size="sm"
-					:disabled="pending || entry.control.disabled"
+					:disabled="pending || disabled || entry.control.disabled"
 					:aria-label="formatMessage(messages.removeOption, { option: optionLabel(entry) })"
 					@click="removeOption(entry)"
 				>
@@ -26,7 +26,7 @@
 				<MultiSelect
 					:model-value="multiplePanels ? selectedRowValues(row) : optionDraft"
 					:options="optionsForRow(row)"
-					:disabled="pending"
+					:disabled="pending || disabled"
 					:dropdown-width="280"
 					lock-dropdown-horizontal-position
 					dropdown-align="left"
@@ -60,7 +60,6 @@ import { PlusIcon, XIcon } from '@modrinth/assets'
 import { Button, defineMessages, MultiSelect, type MultiSelectItem, useVIntl } from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 
-import { injectReviewMessages } from '~/providers/project-review/review-messages'
 import {
 	injectReviewPanels,
 	type ReviewIssue,
@@ -68,9 +67,11 @@ import {
 } from '~/providers/project-review/review-panels'
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
-const props = defineProps<{ issue: ReviewIssue }>()
+const props = withDefaults(defineProps<{ issue: ReviewIssue; disabled?: boolean }>(), {
+	disabled: false,
+})
+const emit = defineEmits<{ remove: [] }>()
 const panels = injectReviewPanels()
-const reviewMessages = injectReviewMessages()
 const { pending } = injectReviewSubmission()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
@@ -172,7 +173,7 @@ const optionItems = computed<MultiSelectItem<string>[]>(() => {
 		value: optionValue(entry),
 		label: optionLabel(entry),
 		searchTerms: multiplePanels.value ? [entry.control.label] : [],
-		disabled: pending.value || entry.control.disabled,
+		disabled: pending.value || props.disabled || entry.control.disabled,
 	}))
 })
 
@@ -181,19 +182,19 @@ function optionsForRow(row: ToggleRow): MultiSelectItem<string>[] {
 	return row.entries.map((entry) => ({
 		value: optionValue(entry),
 		label: rowOptionLabel(entry),
-		disabled: pending.value || entry.control.disabled,
+		disabled: pending.value || props.disabled || entry.control.disabled,
 	}))
 }
 
 function removeOption(entry: ReviewIssueControl) {
-	if (pending.value || entry.control.disabled) return
+	if (pending.value || props.disabled || entry.control.disabled) return
 	if (multiplePanels.value && selectedOptionValues.value.length === 1)
 		panels.addIssue(props.issue.id)
 	panels.write(entry.binding, entry.control, false)
 }
 
 function updateRow(row: ToggleRow, values: string[]) {
-	if (pending.value) return
+	if (pending.value || props.disabled) return
 	const next = new Set(values)
 	if (
 		!next.size &&
@@ -213,7 +214,7 @@ function updateRow(row: ToggleRow, values: string[]) {
 }
 
 function updateOptions(values: string[]) {
-	if (pending.value) return
+	if (pending.value || props.disabled) return
 	const next = new Set(values)
 	for (const entry of optionControls.value) {
 		if (!panels.selected(entry.binding, entry.control) && next.has(optionValue(entry)))
@@ -239,10 +240,9 @@ function openOptions() {
 function closeOptions() {
 	if (multiplePanels.value) return
 	optionsOpen.value = false
-	if (pending.value) return
+	if (pending.value || props.disabled) return
 	if (!optionDraft.value.length) {
-		panels.removeIssue(props.issue.id)
-		reviewMessages.resetIssueMessage(props.issue.id)
+		emit('remove')
 		return
 	}
 	const selected = new Set(selectedOptionValues.value)

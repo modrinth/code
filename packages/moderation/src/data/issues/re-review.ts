@@ -2,7 +2,7 @@ import { RefreshCwIcon } from '@modrinth/assets'
 
 import ignoredMessage from '../messages/checklist/messages/re-review/ignored.md'
 import ignoredWarningMessage from '../messages/checklist/messages/re-review/ignored/warning.md'
-import { issue, panel, section, toggle } from './component-builders/builders'
+import { issue, panel, toggle } from './component-builders/builders'
 
 export const reReviewIgnoredIssue = issue({
 	id: 're-review-ignored',
@@ -26,15 +26,12 @@ export const reReviewReviewPanel = panel({
 }).content(
 	toggle({
 		issue: reReviewIgnoredIssue,
-		label: 'Yes',
+		label: 'Ignored issues',
 	}),
-	section({
+	toggle({
+		issue: reReviewIgnoredIssue,
+		label: 'Multiple times in a row',
+		id: 're-review-warning',
 		shown: (ctx) => ctx.selected.issueIds.includes(reReviewIgnoredIssue.id),
-	}).content(
-		toggle({
-			issue: reReviewIgnoredIssue,
-			label: 'Multiple times in a row',
-			id: 're-review-warning',
-		}),
-	),
+	}),
 )

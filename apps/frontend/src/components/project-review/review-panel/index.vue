@@ -1,6 +1,7 @@
 <template>
 	<Anchor
 		v-if="mode === 'anchored'"
+		ref="anchor"
 		v-bind="$attrs"
 		:anchor-id="id"
 		:target="target"
@@ -12,11 +13,11 @@
 		<Popover
 			v-if="active?.id === id"
 			:anchor="active"
-			:title-id="title ? titleId : undefined"
+			:title-id="title && !hideTitle ? titleId : undefined"
 			:label="accessibleTitle"
 		>
 			<template #title>
-				<div v-if="title" class="flex items-center gap-2">
+				<div v-if="title && !hideTitle" class="flex items-center gap-2">
 					<h2 :id="titleId" class="m-0 text-lg font-semibold text-contrast">
 						{{ title }}
 					</h2>
@@ -53,9 +54,11 @@
 		:is="as ?? 'section'"
 		v-else
 		ref="inlinePanel"
+		tabindex="-1"
 		v-bind="$attrs"
 		:data-review-panel="id"
-		:aria-labelledby="title ? titleId : undefined"
+		:aria-labelledby="title && !hideTitle ? titleId : undefined"
+		:aria-label="hideTitle ? accessibleTitle : undefined"
 		class="box-border flex w-full flex-col gap-2.5 text-sm text-primary transition-opacity duration-150"
 		:class="inlineActive ? 'opacity-100' : 'opacity-50'"
 	>
@@ -63,7 +66,7 @@
 			:active="inlineActive"
 			:enabled="settings.get(moderationSettings.General.ShowInlinePanelHoverHighlight)"
 		>
-			<div v-if="title" class="flex items-center gap-2">
+			<div v-if="title && !hideTitle" class="flex items-center gap-2">
 				<h2 :id="titleId" class="m-0 text-sm font-semibold text-contrast">
 					{{ title }}
 				</h2>
@@ -105,15 +108,16 @@ import { InfoIcon } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
 import { Tooltip, useVIntl } from '@modrinth/ui'
 import { useActiveElement, useElementHover } from '@vueuse/core'
-import { computed, shallowRef, useId, watch } from 'vue'
+import { computed, nextTick, onScopeDispose, shallowRef, useId, watch } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
 import type { ReviewTarget } from '~/providers/project-review/review'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
 
+import { injectProjectReviewContext, injectReviewSlot } from '../layout/context'
 import { projectReviewMessages as messages } from '../messages'
 import Anchor from './anchor.vue'
-import { injectReviewContext } from './context'
+import { flashReviewElement, injectReviewContext, scrollReviewElement } from './context'
 import Controls from './controls.vue'
 import Highlight from './highlight.vue'
 import Popover from './popover.vue'
@@ -126,17 +130,23 @@ const props = withDefaults(
 		as?: 'section' | 'div' | 'article'
 		disabled?: boolean
 		showFindingBadge?: boolean
+		hideTitle?: boolean
 		interactionScope?: HTMLElement | null
 	}>(),
 	{ showFindingBadge: true },
 )
 
 const id = useId()
+const anchor = shallowRef<InstanceType<typeof Anchor> | null>(null)
+const layout = injectProjectReviewContext(null)
+const slot = injectReviewSlot(null)
 const inlinePanel = shallowRef<HTMLElement | null>(null)
 const inlineDropdowns = shallowRef(new Set<string>())
 const panelHovered = useElementHover(inlinePanel)
 const scopeHovered = useElementHover(() => props.interactionScope)
-const { active, activePanelId, registerInlinePanel, setDropdownOpen } = injectReviewContext()
+const reviewContext = injectReviewContext()
+const { active, activePanelId, registerInlinePanel, registerDestination, setDropdownOpen } =
+	reviewContext
 const focusedElement = useActiveElement()
 const inlineActive = computed(() => activePanelId.value === id)
 const { formatMessage } = useVIntl()
@@ -156,7 +166,9 @@ watch(
 				available: () => !props.disabled && !!binding.value,
 				hovered: () => panelHovered.value,
 				scopeHovered: () => scopeHovered.value,
+				scopeElement: () => props.interactionScope ?? null,
 				focused: () =>
+					focusedElement.value !== inlinePanel.value &&
 					!!inlinePanel.value?.contains(focusedElement.value ?? null) &&
 					!!focusedElement.value?.matches(':focus-visible'),
 				dropdownOpen: () => inlineDropdowns.value.size > 0,
@@ -168,6 +180,27 @@ watch(
 const panel = computed(() => binding.value?.panel)
 const controlsKey = computed(() =>
 	binding.value ? `${binding.value.projectId}:${binding.value.key}` : undefined,
+)
+onScopeDispose(
+	registerDestination(id, {
+		key: () => (!props.disabled ? binding.value?.key : undefined),
+		reveal: async () => {
+			if (slot) layout?.revealSlot(slot.value)
+			await nextTick()
+			await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+			await nextTick()
+			const element = props.mode === 'inline' ? inlinePanel.value : anchor.value?.element
+			if (!element) return
+			scrollReviewElement(element)
+			if (props.mode === 'anchored') {
+				anchor.value?.reveal()
+			} else {
+				reviewContext.revealInlinePanel(id)
+				element.focus({ preventScroll: true })
+			}
+			flashReviewElement(element)
+		},
+	}),
 )
 const title = computed(() => panel.value?.title)
 const hint = computed(() => panel.value?.hint)

@@ -58,6 +58,7 @@
 						class="mt-2"
 					/>
 					<ValidationMessage :check="saveValidation.forField('server-languages')" class="mt-2" />
+					<ProjectIssueCard target="modify_server_languages" class="mt-2" />
 				</div>
 
 				<!-- Java Address -->
@@ -154,6 +155,11 @@
 						class="mt-2"
 					/>
 					<ValidationMessage :check="saveValidation.forField('java-address')" class="mt-2" />
+					<ProjectIssueCard
+						target="modify_server_address"
+						platform="minecraft_java"
+						class="mt-2"
+					/>
 				</div>
 
 				<!-- Bedrock Address -->
@@ -176,6 +182,11 @@
 							autocomplete="off"
 						/>
 					</div>
+					<ProjectIssueCard
+						target="modify_server_address"
+						platform="minecraft_bedrock"
+						class="mt-2"
+					/>
 				</div>
 
 				<div>
@@ -235,6 +246,7 @@ import {
 import { isAdmin } from '@modrinth/utils'
 
 import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'

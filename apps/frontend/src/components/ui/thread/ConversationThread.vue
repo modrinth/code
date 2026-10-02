@@ -38,20 +38,25 @@
 						<XIcon aria-hidden="true" />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>
-					<Button
-						type="colored"
-						color="orange"
-						:disabled="!submissionConfirmation || isLoading || reviewSubmissionDisabled"
-						@click="runBlockingAction('resubmit-modal', resubmit)"
+					<Tooltip
+						:disabled="!reviewSubmissionDisabled"
+						:text="formatMessage(messages.resubmitRequiredActionsTooltip)"
 					>
-						<SpinnerIcon
-							v-if="loadingAction === 'resubmit-modal'"
-							class="animate-spin"
-							aria-hidden="true"
-						/>
-						<ScaleIcon v-else aria-hidden="true" />
-						{{ formatMessage(messages.actionResubmitForReview) }}
-					</Button>
+						<Button
+							type="colored"
+							color="orange"
+							:disabled="!submissionConfirmation || isLoading || reviewSubmissionDisabled"
+							@click="runBlockingAction('resubmit-modal', resubmit)"
+						>
+							<SpinnerIcon
+								v-if="loadingAction === 'resubmit-modal'"
+								class="animate-spin"
+								aria-hidden="true"
+							/>
+							<ScaleIcon v-else aria-hidden="true" />
+							{{ formatMessage(messages.actionResubmitForReview) }}
+						</Button>
+					</Tooltip>
 				</div>
 			</div>
 		</NewModal>
@@ -127,7 +132,7 @@
 				</Button>
 			</div>
 			<template v-else-if="!report || !report.closed">
-				<div class="mx-4 mb-2 mt-2">
+				<div class="mx-4 mt-2">
 					<MarkdownEditor
 						v-model="replyBody"
 						:placeholder="
@@ -140,7 +145,7 @@
 						:on-image-upload="onUploadImage"
 					/>
 				</div>
-				<div class="m-4 mt-3 flex flex-wrap items-center justify-between gap-4">
+				<div class="flex flex-wrap items-center justify-between gap-4 p-4 pt-2">
 					<div class="flex flex-wrap items-center gap-2">
 						<Button
 							v-if="sortedMessages.length > 0"
@@ -193,24 +198,29 @@
 						</Button>
 						<template v-if="currentMember && !currentMember.staffOnly">
 							<template v-if="isRejected(project)">
-								<Button
-									v-if="replyBody"
-									type="colored"
-									color="orange"
-									:disabled="isLoading || reviewSubmissionDisabled"
-									@click="openResubmitModal(true)"
+								<Tooltip
+									:disabled="!reviewSubmissionDisabled"
+									:text="formatMessage(messages.resubmitRequiredActionsTooltip)"
 								>
-									<ScaleIcon aria-hidden="true" />
-									{{ formatMessage(messages.actionResubmitForReviewWithReply) }}
-								</Button>
-								<Button
-									v-else
-									:disabled="isLoading || reviewSubmissionDisabled"
-									@click="openResubmitModal(false)"
-								>
-									<ScaleIcon aria-hidden="true" />
-									{{ formatMessage(messages.actionResubmitForReview) }}
-								</Button>
+									<Button
+										v-if="replyBody"
+										type="colored"
+										color="orange"
+										:disabled="isLoading || reviewSubmissionDisabled"
+										@click="openResubmitModal(true)"
+									>
+										<ScaleIcon aria-hidden="true" />
+										{{ formatMessage(messages.actionResubmitForReviewWithReply) }}
+									</Button>
+									<Button
+										v-else
+										:disabled="isLoading || reviewSubmissionDisabled"
+										@click="openResubmitModal(false)"
+									>
+										<ScaleIcon aria-hidden="true" />
+										{{ formatMessage(messages.actionResubmitForReview) }}
+									</Button>
+								</Tooltip>
 							</template>
 						</template>
 					</div>
@@ -427,6 +437,7 @@ import {
 	MarkdownEditor,
 	NewModal,
 	SplitButton,
+	Tooltip,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -506,6 +517,10 @@ const messages = defineMessages({
 	actionResubmitForReview: {
 		id: 'conversation-thread.action.resubmit-for-review',
 		defaultMessage: 'Resubmit for review',
+	},
+	resubmitRequiredActionsTooltip: {
+		id: 'conversation-thread.resubmit-required-actions-tooltip',
+		defaultMessage: 'You must complete all required actions above to resubmit',
 	},
 	actionReplyToThread: {
 		id: 'conversation-thread.action.reply-to-thread',

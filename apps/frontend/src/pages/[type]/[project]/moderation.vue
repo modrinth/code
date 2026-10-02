@@ -66,6 +66,9 @@
 				</ul>
 			</template>
 		</Admonition>
+		<div v-if="unresolvedIssues.length && thread?.id" class="mb-6 flex flex-col gap-3">
+			<ProjectIssueCard :issues="unresolvedIssues" show-project-area-link />
+		</div>
 		<div class="card-shadow mb-6 rounded-2xl border border-solid border-surface-4 bg-surface-3">
 			<div class="flex flex-col p-4">
 				<div class="flex items-center justify-between">
@@ -100,7 +103,7 @@
 						</IntlFormatted>
 					</p>
 					<p
-						v-if="isApproved(project)"
+						v-if="projectApproved"
 						class="mb-0 mt-3 flex items-center gap-2 font-semibold text-orange"
 					>
 						<IssuesIcon class="shrink-0" />
@@ -156,7 +159,11 @@ import dayjs from 'dayjs'
 import { computed, watch } from 'vue'
 
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
-import { canSubmitProjectForReview } from '~/composables/link-network-validation/submission'
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
+import {
+	canResubmitProjectForReview,
+	canSubmitProjectForReview,
+} from '~/composables/link-network-validation/submission'
 import { getProjectLink, isApproved, isRejected, isUnderReview } from '~/helpers/projects.js'
 
 defineEmits(['on-download', 'delete-version'])
@@ -229,7 +236,8 @@ const reviewSubmissionDisabled = computed(
 		!canSubmitProjectForReview(
 			projectValidation.value,
 			projectValidationLoading.value || projectLinksNetworkValidationLoading.value,
-		),
+		) ||
+		(isRejected(project.value) && !canResubmitProjectForReview(thread.value)),
 )
 
 const THREADS_RELEASE_DATE = '2023-08-05T12:00:00-07:00'
@@ -252,6 +260,11 @@ const prefixedThread = computed(() => {
 	return thread.value
 })
 
+const unresolvedIssues = computed(() =>
+	(thread.value?.issues ?? []).filter((issue) => issue.verdict !== 'resolved'),
+)
+
+const projectApproved = computed(() => isApproved(project.value))
 const canAccess = computed(() => !!currentMember.value)
 const staff = computed(() => isStaff(currentMember.value?.user))
 const userFacingUiVisible = computed(
@@ -319,7 +332,7 @@ const moderationAdmonition = computed<{
 		}
 	}
 
-	if (isApproved(currentProject) && approvedAdmonitionMessage.value) {
+	if (projectApproved.value && approvedAdmonitionMessage.value) {
 		return {
 			type: 'success',
 			header: defineMessage({

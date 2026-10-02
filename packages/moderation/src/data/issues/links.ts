@@ -10,11 +10,13 @@ import sourceEmpty from '../messages/checklist/messages/links/source/empty.md'
 import sourceInaccessible from '../messages/checklist/messages/links/source/inaccessible.md'
 import wikiDisabled from '../messages/checklist/messages/links/wiki/disabled.md'
 import { issue, panel, toggle } from './component-builders/builders'
+import { issueTargets } from './component-builders/targets'
 
 export const linksIssue = issue({
 	id: 'links',
 	title: 'Invalid project links',
 	category: 'Links',
+	facets: [issueTargets.modifySelectedLinks()],
 	suggestedStatus: 'flagged',
 	message: ({ projectV3, selected }) => {
 		const toggleIds = new Set(selected.toggleIds)

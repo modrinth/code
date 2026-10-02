@@ -89,6 +89,7 @@ export const versionsUnsupportedIssue = issue({
 })
 
 export const versionsReviewPanel = panel({
+	title: 'Versions',
 	hint: "Are this project's files correct?",
 	icon: VersionIcon,
 	guidanceUrl:

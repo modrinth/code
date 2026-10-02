@@ -67,6 +67,9 @@
 			"
 			:open-modal="currentMember ? () => handleOpenCreateVersionModal() : undefined"
 		>
+			<template #version-issue="{ version }">
+				<ProjectIssueCard target="version" :version-id="version.id" />
+			</template>
 			<template #actions="{ version }">
 				<EditVersionMenu @edit="handleOpenEditVersionModal(version.id, project.id, $event)" />
 				<TeleportOverflowMenu
@@ -327,6 +330,7 @@ import { useTemplateRef, watch } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import EditVersionMenu from '~/components/ui/create-project-version/EditVersionMenu.vue'
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'

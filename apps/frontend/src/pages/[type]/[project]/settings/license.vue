@@ -57,6 +57,7 @@
 						]"
 						class="mt-2"
 					/>
+					<ProjectIssueCard target="modify_license" class="mt-2" />
 				</div>
 			</div>
 
@@ -241,6 +242,7 @@ import { builtinLicenses, formatProjectType, isAdmin, TeamMemberPermission } fro
 import { computed } from 'vue'
 
 import ValidationMessage from '@/components/ValidationMessage.vue'
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import { normalizeProjectUrl } from '~/helpers/project-url'

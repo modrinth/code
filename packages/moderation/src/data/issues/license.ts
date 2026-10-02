@@ -6,11 +6,13 @@ import invalidLinkCustomLicenseMessage from '../messages/checklist/messages/lice
 import noSourceMessage from '../messages/checklist/messages/license/no-source.md'
 import noSourceForkMessage from '../messages/checklist/messages/license/no-source-fork.md'
 import { issue, panel, section, toggle } from './component-builders/builders'
+import { issueTargets } from './component-builders/targets'
 
 export const licenseInvalidLinkIssue = issue({
 	id: 'license-invalid-link',
 	title: 'Invalid license link',
 	category: 'License',
+	facets: [issueTargets.modifyLicense()],
 	message: ({ selected }) =>
 		[
 			invalidLinkMessage,

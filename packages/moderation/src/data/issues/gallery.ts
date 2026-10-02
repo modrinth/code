@@ -4,12 +4,14 @@ import insufficientMessage from '../messages/checklist/messages/gallery/insuffic
 import notRelevantMessage from '../messages/checklist/messages/gallery/not-relevant.md'
 import showcaseClarityMessage from '../messages/checklist/messages/gallery/showcase-clarity.md'
 import { issue, panel, toggle } from './component-builders/builders'
+import { issueTargets } from './component-builders/targets'
 import { rulesAiImagesIssue } from './rules'
 
 export const galleryInsufficientIssue = issue({
 	id: 'gallery-insufficient',
 	title: 'Insufficient gallery images',
 	category: 'Gallery',
+	facets: [issueTargets.addGalleryImages()],
 	message: insufficientMessage,
 	suggestedStatus: 'flagged',
 })
@@ -31,6 +33,7 @@ export const galleryShowcaseClarityIssue = issue({
 })
 
 export const galleryReviewPanel = panel({
+	title: 'Gallery',
 	hint: "Are this project's gallery images sufficient?",
 	icon: ImageIcon,
 	guidanceUrl:

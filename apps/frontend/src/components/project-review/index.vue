@@ -1,11 +1,11 @@
 <template>
 	<ClientOnly>
 		<ConfirmModal
-			ref="clearIssuesModal"
-			:title="formatMessage(reviewTabMessages.clearAllIssues)"
-			:description="formatMessage(reviewTabMessages.clearAllIssuesDescription)"
-			:proceed-label="formatMessage(reviewTabMessages.clearIssues)"
-			@proceed="clearIssues"
+			ref="resetIssuesModal"
+			:title="formatMessage(reviewTabMessages.resetAllIssues)"
+			:description="formatMessage(reviewTabMessages.resetIssuesDescription)"
+			:proceed-label="formatMessage(reviewTabMessages.resetIssues)"
+			@proceed="resetIssues"
 		/>
 		<ProjectReviewLayout :tabs="visibleTabs" :reset-key="selection">
 			<template #left><ProjectInfo /></template>
@@ -16,39 +16,35 @@
 				>
 					<ProjectWideChecks :inert="pending" />
 					<section class="flex min-h-0 min-w-0 flex-1 flex-col">
-						<div class="flex shrink-0 flex-wrap items-center justify-between gap-2 pb-2.5">
-							<Tabs
-								v-model:value="activeReviewTab"
-								wrap
-								:tabs="[
-									{ value: 'thread', label: formatMessage(reviewTabMessages.thread) },
-									{
-										value: 'issues',
-										label: formatMessage(reviewTabMessages.issues, {
-											count: panels.activeIssues.value.length,
-										}),
-									},
-								]"
-							/>
-							<div v-if="activeReviewTab === 'issues'" class="flex items-center gap-1">
+						<div class="flex shrink-0 flex-wrap items-center gap-2 pb-2.5">
+							<Tabs v-model:value="activeReviewTab" wrap :tabs="rightPanelTabs">
+								<template #after-label="{ tab }">
+									<span v-if="tab.value === 're-review'">
+										({{ previousIssues.reReviewIssues.value.length }})
+									</span>
+								</template>
+							</Tabs>
+							<div v-if="activeReviewTab !== 'thread'" class="ml-auto flex items-center gap-1">
 								<Tooltip
-									v-if="!pending && panels.activeIssues.value.length"
-									:text="formatMessage(reviewTabMessages.clearIssues)"
+									v-if="!pending && project"
+									:text="formatMessage(reviewTabMessages.resetIssues)"
 								>
 									<Button
 										type="quiet"
 										size="sm"
 										icon-only
-										:aria-label="formatMessage(reviewTabMessages.clearIssues)"
-										@click="clearIssuesModal?.show()"
+										:disabled="resetting"
+										:aria-label="formatMessage(reviewTabMessages.resetIssues)"
+										@click="resetIssuesModal?.show()"
 									>
 										<RotateCounterClockwiseIcon aria-hidden="true" />
 									</Button>
 								</Tooltip>
-								<IssuePicker />
+								<IssuePicker v-if="activeReviewTab === 'issues'" />
 							</div>
 						</div>
 						<IssueList v-show="activeReviewTab === 'issues'" />
+						<IssueList v-show="activeReviewTab === 're-review'" re-review />
 						<MessageThread v-show="activeReviewTab === 'thread'" ref="messageThread" />
 					</section>
 					<ReviewOutcomeButtons />
@@ -82,7 +78,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useEventListener } from '@vueuse/core'
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onScopeDispose, ref, watch } from 'vue'
 
 import { useModerationKeybinds } from '~/composables/moderation'
 import { isStaff } from '~/helpers/users.js'
@@ -92,6 +88,10 @@ import {
 	provideReviewMessages,
 } from '~/providers/project-review/review-messages'
 import { createReviewPanels, provideReviewPanels } from '~/providers/project-review/review-panels'
+import {
+	createReviewPreviousIssues,
+	provideReviewPreviousIssues,
+} from '~/providers/project-review/review-previous-issues'
 import {
 	createReviewSession,
 	provideReviewSession,
@@ -106,6 +106,7 @@ import Disclosures from './disclosures/index.vue'
 import Gallery from './gallery/index.vue'
 import IssueList from './issue-list/index.vue'
 import IssuePicker from './issue-list/issue-picker.vue'
+import { useReReviewIssues } from './issue-list/re-review-issues'
 import ProjectReviewLayout from './layout/index.client.vue'
 import { type ProjectReviewTab, projectReviewTabs } from './layout/types'
 import MessageThread from './message-thread/index.vue'
@@ -129,6 +130,7 @@ const {
 	organization,
 	organizationMembers,
 	wasReviewed,
+	threadQuery,
 	permissions,
 	selection,
 	isLoading,
@@ -160,9 +162,27 @@ const panels = provideReviewPanels(
 	),
 )
 const messages = provideReviewMessages(createReviewMessages(project, projectV2, panels))
-provideReviewContext(createReviewContext(reviewProjectId, (target) => !!panels.resolve(target)))
+const previousIssues = provideReviewPreviousIssues(
+	createReviewPreviousIssues(project, threadQuery.data, wasReviewed, session, panels, messages),
+)
+const issueCount = computed(() => {
+	const previousIds = previousIssues.associatedIssueIds.value
+	return (
+		panels.activeIssues.value.filter(({ id }) => !previousIds.has(id)).length +
+		previousIssues.appliedIssues.value.length
+	)
+})
+const reviewContext = provideReviewContext(
+	createReviewContext(reviewProjectId, (target) => !!panels.resolve(target)),
+)
 const { pending, loadingAction } = provideReviewSubmission(
-	createReviewSubmission(messages, panels, session),
+	createReviewSubmission(messages, panels, session, previousIssues),
+)
+const { resetting, resetIssues } = useReReviewIssues(
+	{ project, threadQuery },
+	session,
+	messages,
+	pending,
 )
 const loadingState = injectLoadingState()
 watch(
@@ -179,37 +199,64 @@ watch(
 	},
 	{ immediate: true },
 )
+const hasPreviousIssues = computed(() => previousIssues.issues.value.length > 0)
 const activeReviewTab = ref('thread')
-const clearIssuesModal = ref<InstanceType<typeof ConfirmModal>>()
+onScopeDispose(
+	reviewContext.registerRoute('re-review', () => {
+		activeReviewTab.value = hasPreviousIssues.value ? 're-review' : 'thread'
+	}),
+)
+const resetIssuesModal = ref<InstanceType<typeof ConfirmModal>>()
 const messageThread = ref<InstanceType<typeof MessageThread>>()
 const auth = useAuthState()
 const keybinds = useModerationKeybinds()
 const reviewTabMessages = defineMessages({
-	issues: { id: 'project-review.right-panel.issues', defaultMessage: 'Issues ({count})' },
-	thread: { id: 'project-review.right-panel.thread', defaultMessage: 'Thread' },
-	clearIssues: { id: 'project-review.issues.clear', defaultMessage: 'Clear issues' },
-	clearAllIssues: {
-		id: 'project-review.issues.clear-all',
-		defaultMessage: 'Clear all issues',
+	issues: {
+		id: 'project-review.right-panel.issues',
+		defaultMessage: 'Issues ({count})',
 	},
-	clearAllIssuesDescription: {
-		id: 'project-review.issues.clear-all-description',
-		defaultMessage: 'This will remove all issues you currently have selected in the project.',
+	thread: { id: 'project-review.right-panel.thread', defaultMessage: 'Thread' },
+	reReview: {
+		id: 'project-review.right-panel.re-review',
+		defaultMessage: 'Re-review',
+	},
+	resetIssues: {
+		id: 'project-review.issues.reset',
+		defaultMessage: 'Reset issues',
+	},
+	resetAllIssues: {
+		id: 'project-review.issues.reset-all',
+		defaultMessage: 'Reset all issues',
+	},
+	resetIssuesDescription: {
+		id: 'project-review.issues.reset-description',
+		defaultMessage:
+			'This will discard your issue changes and move all previous issues back to Re-rev. issues.',
 	},
 })
+
+const rightPanelTabs = computed(() => [
+	...(hasPreviousIssues.value
+		? [{ value: 're-review', label: formatMessage(reviewTabMessages.reReview) }]
+		: []),
+	{ value: 'thread', label: formatMessage(reviewTabMessages.thread) },
+	{
+		value: 'issues',
+		label: formatMessage(reviewTabMessages.issues, { count: issueCount.value }),
+	},
+])
+
+watch(
+	[projectId, hasPreviousIssues],
+	([, hasIssues]) => {
+		activeReviewTab.value = hasIssues ? 're-review' : 'thread'
+	},
+	{ immediate: true },
+)
 
 watch(projectId, () => {
-	activeReviewTab.value = 'thread'
-	clearIssuesModal.value?.hide()
+	resetIssuesModal.value?.hide()
 })
-
-function clearIssues() {
-	if (pending.value) return
-	for (const { id } of panels.activeIssues.value) {
-		panels.removeIssue(id)
-		messages.resetIssueMessage(id)
-	}
-}
 
 async function openEditor() {
 	activeReviewTab.value = 'thread'

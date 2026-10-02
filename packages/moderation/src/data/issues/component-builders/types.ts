@@ -39,6 +39,8 @@ export interface ReviewContext {
 
 export type WithContext<T> = T | ((ctx: ReviewContext) => T)
 
+export type IssueFacet = (ctx: ReviewContext) => Labrinth.Threads.v3.ThreadIssueTarget
+
 export interface Issue {
 	id: string
 	title: string
@@ -46,6 +48,8 @@ export interface Issue {
 	/** Orders selected issues; omitted priorities use the default group. */
 	priority?: IssuePriority
 	message: WithContext<string>
+	/** Targets to change, resolved from current project data when the issue is submitted. */
+	facets?: readonly [IssueFacet, ...IssueFacet[]]
 	suggestedStatus?: WithContext<ModerationStatus | undefined>
 	corrections?: WithContext<IssueCorrections>
 	/** Marks the issue that requests applying the aggregated corrections. */
@@ -100,6 +104,18 @@ export interface IssueText extends IssueControlOptions {
 
 export type IssueTextConfig = Omit<IssueText, 'type'>
 
+export interface IssueTextarea extends IssueControlOptions {
+	type: 'textarea'
+	id: string
+	required?: WithContext<boolean>
+	placeholder?: WithContext<string>
+	initial?: WithContext<string>
+	rows?: number
+	maxlength?: number
+}
+
+export type IssueTextareaConfig = Omit<IssueTextarea, 'type'>
+
 export interface IssueSelectOption {
 	value: string
 	label: WithContext<string>
@@ -119,7 +135,7 @@ export interface IssueSelect extends IssueControlOptions {
 
 export type IssueSelectConfig = Omit<IssueSelect, 'type'>
 
-export type IssueControl = IssueToggle | IssueMarkdown | IssueText | IssueSelect
+export type IssueControl = IssueToggle | IssueMarkdown | IssueText | IssueTextarea | IssueSelect
 
 export interface Panel {
 	icon: FunctionalComponent<SVGAttributes>

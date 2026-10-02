@@ -101,6 +101,9 @@
 						</div>
 					</div>
 				</AutoLink>
+				<div data-no-row-click>
+					<slot name="version-issue" :version="version" />
+				</div>
 			</div>
 		</template>
 
@@ -427,6 +430,9 @@
 								{{ formatCompactNumber(version.downloads) }}
 							</div>
 						</div>
+					</div>
+					<div class="smart-clickable:allow-pointer-events">
+						<slot name="version-issue" :version="version" />
 					</div>
 					<div v-if="showFiles" class="tag-list">
 						<div

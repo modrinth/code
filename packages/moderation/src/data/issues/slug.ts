@@ -3,11 +3,13 @@ import { LinkIcon } from '@modrinth/assets'
 import { generateUrlSlug } from '../../utils'
 import misused from '../messages/checklist/messages/title-slug/slug/misused.md'
 import { issue, panel, toggle } from './component-builders/builders'
+import { issueTargets } from './component-builders/targets'
 
 export const misusedSlugIssue = issue({
 	id: 'slug-misused',
 	title: 'Misused project URL',
 	category: 'Slug',
+	facets: [issueTargets.modifySlug()],
 	message: misused.replace('%CORRECT%', '').trim(),
 })
 

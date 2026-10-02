@@ -28,7 +28,7 @@ import type { IDockviewPanelProps } from 'dockview-vue'
 import { computed } from 'vue'
 
 import { projectReviewMessages as messages } from '../messages'
-import { injectProjectReviewContext } from './context'
+import { injectProjectReviewContext, provideReviewSlot } from './context'
 import type { ProjectReviewSlot } from './types'
 
 defineOptions({ inheritAttrs: false })
@@ -42,6 +42,7 @@ const { formatMessage } = useVIntl()
 const slotName = computed(() =>
 	'slot' in props.params ? props.params.slot : props.params.params.slot,
 )
+provideReviewSlot(slotName)
 const content = computed(() => slots[slotName.value])
 const panelHidden = computed(
 	() =>

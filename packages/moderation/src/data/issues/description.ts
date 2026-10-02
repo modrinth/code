@@ -15,12 +15,14 @@ import nonEnglish from '../messages/checklist/messages/description/non-english.m
 import nonEnglishServer from '../messages/checklist/messages/description/non-english-server.md'
 import nonStandardText from '../messages/checklist/messages/description/non-standard-text.md'
 import { issue, markdown, panel, section, toggle } from './component-builders/builders'
+import { issueTargets } from './component-builders/targets'
 import { rulesAiImagesIssue } from './rules'
 
 export const insufficientDescriptionIssue = issue({
 	id: 'description-insufficient',
 	title: 'Insufficient description',
 	category: 'Description',
+	facets: [issueTargets.modifyDescription()],
 	suggestedStatus: 'flagged',
 	message: ({ projectV3, selected, getMarkdownValue }) => {
 		const { toggleIds } = selected
@@ -54,6 +56,7 @@ export const nonEnglishDescriptionIssue = issue({
 	id: 'description-non-english',
 	title: 'Non-English description',
 	category: 'Description',
+	facets: [issueTargets.modifyDescription()],
 	suggestedStatus: 'flagged',
 	message: ({ projectV3 }) => (projectV3.minecraft_java_server ? nonEnglishServer : nonEnglish),
 })
@@ -62,6 +65,7 @@ export const descriptionHeadersAsBodyIssue = issue({
 	id: 'description-headers-as-body',
 	title: 'Headers used as body text',
 	category: 'Description',
+	facets: [issueTargets.modifyDescription()],
 	suggestedStatus: 'flagged',
 	message: headersAsBody,
 })
@@ -70,6 +74,7 @@ export const imageOnlyDescriptionIssue = issue({
 	id: 'description-image-only',
 	title: 'Image-only description',
 	category: 'Description',
+	facets: [issueTargets.modifyDescription()],
 	suggestedStatus: 'flagged',
 	message: imageOnly,
 })
@@ -78,6 +83,7 @@ export const nonStandardDescriptionTextIssue = issue({
 	id: 'description-non-standard-text',
 	title: 'Non-standard description text',
 	category: 'Description',
+	facets: [issueTargets.modifyDescription()],
 	suggestedStatus: 'flagged',
 	message: nonStandardText,
 })
@@ -86,11 +92,13 @@ export const unclearDescriptionIssue = issue({
 	id: 'description-clarity',
 	title: 'Unclear or misleading description',
 	category: 'Description',
+	facets: [issueTargets.modifyDescription()],
 	suggestedStatus: 'rejected',
 	message: clarity,
 })
 
 export const descriptionReviewPanel = panel({
+	title: 'Description',
 	hint: 'Is the description sufficient, accurate, and accessible?',
 	icon: LibraryIcon,
 	guidanceUrl:
