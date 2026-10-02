@@ -44,6 +44,18 @@
 			:user="user"
 			:user-id="userId"
 		/>
+		<ForcePasswordResetModal
+			v-if="variant === 'web' && isAdminViewing"
+			ref="forcePasswordResetModal"
+			:user="user"
+			:user-id="userId"
+		/>
+		<Reset2faModal
+			v-if="variant === 'web' && isAdminViewing"
+			ref="reset2faModal"
+			:user="user"
+			:user-id="userId"
+		/>
 
 		<NewModal
 			v-if="variant === 'web' && isAdminViewing"
@@ -240,6 +252,8 @@
 					@edit-user="editUserModal?.show()"
 					@toggle-lock="toggleLock"
 					@revoke-sessions="revokeSessionsModal?.show()"
+					@force-password-reset="forcePasswordResetModal?.show()"
+					@reset2fa="reset2faModal?.show()"
 				>
 					<template v-if="isModrinthUser" #summary>
 						<IntlFormatted :message-id="messages.officialAccountBio">
@@ -491,7 +505,9 @@ import {
 } from '#ui/utils'
 
 import EditUserModal from './components/edit-user-modal.vue'
+import ForcePasswordResetModal from './components/force-password-reset-modal.vue'
 import LockUserModal from './components/lock-user-modal.vue'
+import Reset2faModal from './components/reset-2fa-modal.vue'
 import { blockedUsersQueryKey, injectUserProfile } from './providers'
 import { hasActivePride26Midas, hasPride26Badge, projectUserSorting } from './utils'
 
@@ -1065,6 +1081,8 @@ async function retryQueries(): Promise<void> {
 const userDetailsModal = ref<ModalRef | null>(null)
 const editUserModal = ref<InstanceType<typeof EditUserModal> | null>(null)
 const lockUserModal = ref<InstanceType<typeof LockUserModal> | null>(null)
+const forcePasswordResetModal = ref<InstanceType<typeof ForcePasswordResetModal> | null>(null)
+const reset2faModal = ref<InstanceType<typeof Reset2faModal> | null>(null)
 const blockUserModal = ref<ModalRef | null>(null)
 const revokeSessionsModal = ref<ModalRef | null>(null)
 const isBlockingUser = ref(false)
