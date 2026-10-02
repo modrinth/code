@@ -1,5 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { reviewPanels } from '@modrinth/moderation/src/data/issues'
+import { IssuePriority, reviewPanels } from '@modrinth/moderation/src/data/issues'
 import { aggregateCorrections } from '@modrinth/moderation/src/data/issues/component-builders/corrections'
 import { resolveIssueFacets } from '@modrinth/moderation/src/data/issues/component-builders/targets'
 import type {
@@ -87,6 +87,7 @@ export interface ReviewIssue {
 	id: string
 	title: string
 	category: string
+	priority?: Issue['priority']
 	controls: ReviewIssueControl[]
 }
 
@@ -417,6 +418,7 @@ export function createReviewPanels(
 						id: control.issueId,
 						title: control.issue.title,
 						category: control.issue.category,
+						priority: control.issue.priority,
 						controls: [],
 					}
 					if (
@@ -534,7 +536,12 @@ export function createReviewPanels(
 		)
 		return [...issues]
 			.filter(([, { active }]) => active)
-			.sort(([a], [b]) => (order.get(a) ?? -1) - (order.get(b) ?? -1))
+			.sort(
+				([a, { issue: issueA }], [b, { issue: issueB }]) =>
+					(issueA.priority ?? IssuePriority.Default) -
+						(issueB.priority ?? IssuePriority.Default) ||
+					(order.get(a) ?? -1) - (order.get(b) ?? -1),
+			)
 			.map(([id, { issue, keys, missing }]) => {
 				const context: ReviewContext = {
 					projectV3,

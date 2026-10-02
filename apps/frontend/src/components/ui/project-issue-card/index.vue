@@ -114,7 +114,9 @@ import {
 	TriangleAlertIcon,
 	UnfoldVerticalIcon,
 } from '@modrinth/assets'
+import { IssuePriority, reviewPanels } from '@modrinth/moderation/src/data/issues'
 import { issueTargetLabels } from '@modrinth/moderation/src/data/issues/component-builders/targets'
+import type { Issue, PanelNode } from '@modrinth/moderation/src/data/issues/component-builders/types'
 import {
 	Button,
 	ButtonLink,
@@ -228,12 +230,35 @@ function matchesTarget(what: Target): boolean {
 	return true
 }
 
-const matchingIssues = computed(() =>
-	(props.issues ?? thread.value?.issues ?? []).filter(
-		(issue) =>
-			issue.verdict !== 'resolved' &&
-			(props.issues !== undefined || issue.facets.some(({ what }) => matchesTarget(what))),
+function panelIssues(nodes: readonly PanelNode[]): Issue[] {
+	return nodes.flatMap((node) =>
+		node.type === 'section' ? panelIssues(node.children) : [node.issue],
+	)
+}
+
+const issuePriorities = new Map(
+	Object.values(reviewPanels).flatMap((panel) =>
+		panelIssues(panel.children).map(
+			(issue) => [issue.id, issue.priority ?? IssuePriority.Default] as const,
+		),
 	),
+)
+
+function issuePriority(issue: ThreadIssue) {
+	const id = issueDetails(issue).issue_id
+	return typeof id === 'string'
+		? (issuePriorities.get(id) ?? IssuePriority.Default)
+		: IssuePriority.Default
+}
+
+const matchingIssues = computed(() =>
+	(props.issues ?? thread.value?.issues ?? [])
+		.filter(
+			(issue) =>
+				issue.verdict !== 'resolved' &&
+				(props.issues !== undefined || issue.facets.some(({ what }) => matchesTarget(what))),
+		)
+		.sort((a, b) => issuePriority(a) - issuePriority(b)),
 )
 
 function issueDetails(issue: ThreadIssue): Record<string, unknown> {

@@ -38,7 +38,7 @@
 			{{ formatMessage(reReview ? messages.emptyReReview : messages.empty) }}
 		</p>
 		<Accordion
-			v-if="reReview && previousIssues.resolvedIssues.value.length"
+			v-if="reReview && resolvedIssues.length"
 			class="mt-2"
 			button-class="w-full border-0 bg-transparent text-sm font-medium py-2 px-1"
 			content-class="flex flex-col gap-1 pt-1"
@@ -48,7 +48,7 @@
 				<span class="flex items-center gap-1 text-primary">
 					<span>
 						{{ formatMessage(messages.resolved) }} ({{
-							previousIssues.resolvedIssues.value.length
+							resolvedIssues.length
 						}})
 					</span>
 					<DropdownIcon
@@ -59,7 +59,7 @@
 				</span>
 			</template>
 			<IssueCard
-				v-for="issue in previousIssues.resolvedIssues.value"
+				v-for="issue in resolvedIssues"
 				:key="issue.id"
 				:issue="issue"
 				resolved
@@ -70,12 +70,14 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { DropdownIcon } from '@modrinth/assets'
+import { IssuePriority } from '@modrinth/moderation/src/data/issues'
 import { Accordion, Button, defineMessages, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
-import { injectReviewPanels } from '~/providers/project-review/review-panels'
+import { injectReviewPanels, type ReviewIssue } from '~/providers/project-review/review-panels'
 import { injectReviewPreviousIssues } from '~/providers/project-review/review-previous-issues'
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
@@ -89,8 +91,17 @@ const { wasReviewed, threadQuery } = injectProjectReviewPageContext()
 const panels = injectReviewPanels()
 const previousIssues = injectReviewPreviousIssues()
 const { pending } = injectReviewSubmission()
+function priority(issue: ReviewIssue | Labrinth.Threads.v3.ThreadIssue) {
+	return (
+		('controls' in issue ? issue : previousIssues.cardIssue(issue)).priority ?? IssuePriority.Default
+	)
+}
+const resolvedIssues = computed(() =>
+	[...previousIssues.resolvedIssues.value].sort((a, b) => priority(a) - priority(b)),
+)
 const issues = computed(() => {
-	if (props.reReview) return previousIssues.reReviewIssues.value
+	if (props.reReview)
+		return [...previousIssues.reReviewIssues.value].sort((a, b) => priority(a) - priority(b))
 	const available = new Map(panels.availableIssues.value.map((issue) => [issue.id, issue]))
 	const previousIds = previousIssues.associatedIssueIds.value
 	const activeIssues = panels.activeIssues.value.flatMap(({ id }) => {
@@ -100,7 +111,7 @@ const issues = computed(() => {
 	return [
 		...previousIssues.appliedIssues.value,
 		...activeIssues.filter(({ id }) => !previousIds.has(id)),
-	]
+	].sort((a, b) => priority(a) - priority(b))
 })
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
