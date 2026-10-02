@@ -7,6 +7,7 @@ import { get } from '@/helpers/settings.ts'
 
 import type { AppSettings } from '../../../../helpers/types'
 import { injectInstanceSettings } from './instance-settings-context'
+import DefaultSettingsIntro from './default-settings-intro.vue'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -59,13 +60,14 @@ watch(
 	{ deep: true },
 )
 const messages = defineMessages({
+	defaultSettingsDescription: {
+		id: 'instance.settings.tabs.hooks.default-settings-description',
+		defaultMessage:
+			'Your instance uses the default launch hooks unless you override them here.',
+	},
 	hooks: {
 		id: 'instance.settings.tabs.hooks.title',
 		defaultMessage: 'Custom game launch hooks',
-	},
-	hooksDescription: {
-		id: 'instance.settings.tabs.hooks.description',
-		defaultMessage: 'Run instance-specific system commands before and after launching the game.',
 	},
 	hookVariablesDescription: {
 		id: 'instance.settings.tabs.hooks.variables.description',
@@ -136,18 +138,21 @@ const messages = defineMessages({
 </script>
 
 <template>
-	<div>
-		<div class="flex items-center justify-between gap-4">
-			<div class="flex min-w-0 flex-col gap-1">
-				<h2 class="m-0 text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.hooks) }}
-				</h2>
-				<p class="m-0">{{ formatMessage(messages.hooksDescription) }}</p>
-			</div>
+	<div class="flex flex-col gap-6">
+		<DefaultSettingsIntro
+			tab="hooks"
+			:description="formatMessage(messages.defaultSettingsDescription)"
+		/>
+		<div
+			class="flex items-center justify-between gap-4 border-0 border-b border-solid border-surface-5 pb-6"
+		>
+			<label for="override-launch-hooks" class="text-lg font-semibold text-contrast">
+				{{ formatMessage(messages.hooks) }}
+			</label>
 			<Toggle id="override-launch-hooks" v-model="overrideHooks" />
 		</div>
 
-		<div class="pt-6" :class="{ 'opacity-50': !overrideHooks }">
+		<div :class="{ 'opacity-50': !overrideHooks }">
 			<h2 class="m-0 text-lg font-semibold text-contrast">
 				{{ formatMessage(messages.preLaunch) }}
 			</h2>

@@ -42,7 +42,10 @@
 						</div>
 					</div>
 
-					<div class="flex flex-col gap-2.5 rounded-2xl bg-surface-2 p-4">
+					<div
+						class="flex flex-col gap-2.5 rounded-2xl p-4"
+						:class="isApp ? 'bg-surface-3' : 'bg-surface-2'"
+					>
 						<span class="text-lg font-semibold text-contrast">Server Address</span>
 						<Button
 							v-tooltip="sftpCopyTooltip('Copy SFTP server address')"
@@ -245,6 +248,7 @@ import { Button, ButtonLink, IconButton } from '#ui/components/base/buttons'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { injectServerSettings } from '#ui/layouts/shared/server-settings/providers/server-settings'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -253,6 +257,7 @@ import {
 
 const { addNotification } = injectNotificationManager()
 const { server, serverId, worldId } = injectModrinthServerContext()
+const { isApp } = injectServerSettings()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const { formatMessage } = useVIntl()

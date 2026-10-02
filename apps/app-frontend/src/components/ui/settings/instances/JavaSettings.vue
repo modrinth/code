@@ -35,9 +35,9 @@ async function updateJavaVersion(version) {
 			:key="`java-${javaVersion}`"
 			class="flex flex-col gap-2.5"
 		>
-			<h2 class="m-0 text-lg font-semibold text-contrast" :class="{ 'mt-4': index !== 0 }">
+			<h3 class="m-0 text-lg font-semibold text-contrast" :class="{ 'mt-4': index !== 0 }">
 				{{ formatMessage(messages.javaLocation, { version: javaVersion }) }}
-			</h2>
+			</h3>
 			<JavaSelector
 				:id="'java-selector-' + javaVersion"
 				v-model="javaVersions[javaVersion]"

@@ -118,10 +118,6 @@ const messages = defineMessages({
 		id: 'app.settings.resource-management.store.unused.label',
 		defaultMessage: 'Orphaned',
 	},
-	empty: {
-		id: 'app.settings.resource-management.store.empty',
-		defaultMessage: 'Install mods or packs to see your storage usage here.',
-	},
 	clear: {
 		id: 'app.settings.resource-management.store.clear',
 		defaultMessage: 'Clear unused',
@@ -322,9 +318,6 @@ function saveCacheLimit() {
 					</dd>
 				</div>
 			</dl>
-			<p v-if="storeUsage && totalBytes === 0" class="m-0 text-sm text-secondary">
-				{{ formatMessage(messages.empty) }}
-			</p>
 		</div>
 
 		<div class="flex flex-wrap items-center gap-2">

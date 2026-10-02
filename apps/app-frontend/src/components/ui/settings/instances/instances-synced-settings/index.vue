@@ -34,7 +34,6 @@ import GameSettingsModal from '../game-settings-modal/index.vue'
 import SyncedPacksModal from '../SyncedPacksModal.vue'
 import SyncSourceModal from '../SyncSourceModal.vue'
 import CommandHistoryModal from './command-history-modal.vue'
-import LaunchOptions from './launch-options.vue'
 import SyncedServersModal from './servers-modal.vue'
 
 const { handleError } = injectNotificationManager()
@@ -582,7 +581,7 @@ onScopeDispose(clearBaseSource)
 			@retry="baseOption && chooseBaseInstance(baseOption)"
 		/>
 
-		<section class="border-0 border-b border-solid border-surface-4 pb-6">
+		<section>
 			<div class="flex flex-col gap-6">
 				<div class="flex flex-col gap-4">
 					<div
@@ -632,7 +631,5 @@ onScopeDispose(clearBaseSource)
 				</div>
 			</div>
 		</section>
-
-		<LaunchOptions />
 	</div>
 </template>

@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import {
+	CodeIcon,
 	CoffeeIcon,
+	EyeOffIcon,
+	GaugeIcon,
 	HeartHandshakeIcon,
 	LanguagesIcon,
 	LightBulbIcon,
-	MicrochipIcon,
 	ModrinthIcon,
 	PaintbrushIcon,
 	RefreshCwIcon,
@@ -12,6 +14,8 @@ import {
 	ShieldIcon,
 	ToggleRightIcon,
 	UserIcon,
+	WindowIcon,
+	WrenchIcon,
 } from '@modrinth/assets'
 import {
 	commonMessages,
@@ -38,13 +42,17 @@ import FeatureFlagSettings from '@/components/ui/settings/display/FeatureFlagSet
 import FeaturesSettings from '@/components/ui/settings/display/FeaturesSettings.vue'
 import LanguageSettings from '@/components/ui/settings/display/LanguageSettings.vue'
 import InstancesSyncedSettings from '@/components/ui/settings/instances/instances-synced-settings/index.vue'
-import JavaSettings from '@/components/ui/settings/instances/JavaSettings.vue'
-import ResourceManagementSettings from '@/components/ui/settings/instances/ResourceManagementSettings.vue'
+import JavaAndMemorySettings from '@/components/ui/settings/instances/JavaAndMemorySettings.vue'
+import LaunchHooksSettings from '@/components/ui/settings/instances/LaunchHooksSettings.vue'
 import SandboxSettings from '@/components/ui/settings/instances/SandboxSettings.vue'
+import WindowSettings from '@/components/ui/settings/instances/WindowSettings.vue'
+import ResourceManagementSettings from '@/components/ui/settings/system/ResourceManagementSettings.vue'
+import TroubleshootingSettings from '@/components/ui/settings/system/TroubleshootingSettings.vue'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { appSettingsKeys, appSettingsQueryOptions, set } from '@/helpers/settings.ts'
 import {
 	appSettingsModalContextKey,
+	type AppSettingsDefaultsTab,
 	type UnsavedChangesController,
 } from '@/providers/app-settings-modal'
 import { injectAppUpdateDownloadProgress } from '@/providers/download-progress.ts'
@@ -72,9 +80,13 @@ const tabCategories = defineMessages({
 		id: 'settings.sidebar.label.account',
 		defaultMessage: 'Account',
 	},
-	instances: {
-		id: 'app.settings.sidebar.label.instances',
-		defaultMessage: 'Instances',
+	instanceDefaults: {
+		id: 'app.settings.sidebar.label.instance-defaults',
+		defaultMessage: 'Instance defaults',
+	},
+	system: {
+		id: 'app.settings.sidebar.label.system',
+		defaultMessage: 'System',
 	},
 })
 
@@ -141,7 +153,7 @@ const tabs = [
 			defaultMessage: 'Privacy',
 		}),
 		category: tabCategories.account,
-		icon: ShieldIcon,
+		icon: EyeOffIcon,
 		content: PrivacySettings,
 	},
 	{
@@ -149,36 +161,63 @@ const tabs = [
 			id: 'app.settings.tabs.sandbox',
 			defaultMessage: 'Sandboxing',
 		}),
-		category: tabCategories.instances,
+		category: tabCategories.instanceDefaults,
 		icon: ShieldIcon,
 		content: SandboxSettings,
 	},
 	{
 		name: defineMessage({
-			id: 'app.settings.tabs.synced-options',
-			defaultMessage: 'Synced settings',
+			id: 'app.settings.tabs.java-and-memory',
+			defaultMessage: 'Java and memory',
 		}),
-		category: tabCategories.instances,
+		category: tabCategories.instanceDefaults,
+		icon: CoffeeIcon,
+		content: JavaAndMemorySettings,
+	},
+	{
+		name: defineMessage({
+			id: 'app.settings.tabs.window',
+			defaultMessage: 'Window',
+		}),
+		category: tabCategories.instanceDefaults,
+		icon: WindowIcon,
+		content: WindowSettings,
+	},
+	{
+		name: defineMessage({
+			id: 'app.settings.tabs.launch-hooks',
+			defaultMessage: 'Launch hooks',
+		}),
+		category: tabCategories.instanceDefaults,
+		icon: CodeIcon,
+		content: LaunchHooksSettings,
+	},
+	{
+		name: defineMessage({
+			id: 'app.settings.tabs.syncing',
+			defaultMessage: 'Syncing',
+		}),
+		category: tabCategories.instanceDefaults,
 		icon: RefreshCwIcon,
 		content: InstancesSyncedSettings,
 	},
 	{
 		name: defineMessage({
-			id: 'app.settings.tabs.java-installations',
-			defaultMessage: 'Java installations',
+			id: 'app.settings.tabs.resources',
+			defaultMessage: 'Resources',
 		}),
-		category: tabCategories.instances,
-		icon: CoffeeIcon,
-		content: JavaSettings,
+		category: tabCategories.system,
+		icon: GaugeIcon,
+		content: ResourceManagementSettings,
 	},
 	{
 		name: defineMessage({
-			id: 'app.settings.tabs.resource-management',
-			defaultMessage: 'Resource management',
+			id: 'app.settings.tabs.troubleshooting',
+			defaultMessage: 'Troubleshooting',
 		}),
-		category: tabCategories.instances,
-		icon: MicrochipIcon,
-		content: ResourceManagementSettings,
+		category: tabCategories.system,
+		icon: WrenchIcon,
+		content: TroubleshootingSettings,
 	},
 ]
 
@@ -267,7 +306,21 @@ function showSyncedOptions(): void {
 	modal.value?.show()
 }
 
-defineExpose({ show, showProfile, showFeatureFlags, showSyncedOptions })
+function showDefaults(tab: AppSettingsDefaultsTab): void {
+	const content = {
+		sandbox: SandboxSettings,
+		java: JavaAndMemorySettings,
+		window: WindowSettings,
+		hooks: LaunchHooksSettings,
+	}[tab]
+	const tabIndex = availableTabs.value.findIndex((tab) => tab.content === content)
+	if (tabIndex >= 0) {
+		modal.value?.setTab(tabIndex)
+	}
+	modal.value?.show()
+}
+
+defineExpose({ show, showProfile, showFeatureFlags, showSyncedOptions, showDefaults })
 
 const { progress, version: downloadingVersion } = injectAppUpdateDownloadProgress()
 
@@ -338,7 +391,8 @@ const messages = defineMessages({
 	<TabbedModal
 		ref="modal"
 		:tabs="availableTabs"
-		:width="'min(928px, calc(95vw - 10rem))'"
+		width="928px"
+		max-width="928px"
 		:before-hide="canLeaveCurrentTab"
 		:before-tab-change="canLeaveCurrentTab"
 		:floating-action-bar-shown="hasUnsavedChanges"

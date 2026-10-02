@@ -29,6 +29,7 @@ import { get, parseEnvVars, serializeEnvVars } from '@/helpers/settings.ts'
 
 import type { AppSettings } from '../../../../helpers/types'
 import { injectInstanceSettings } from './instance-settings-context'
+import DefaultSettingsIntro from './default-settings-intro.vue'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -151,13 +152,14 @@ watch(
 )
 
 const messages = defineMessages({
+	defaultSettingsDescription: {
+		id: 'instance.settings.tabs.java.default-settings-description',
+		defaultMessage:
+			'Your instance uses the default Java and memory settings unless you override them here.',
+	},
 	javaInstallation: {
 		id: 'instance.settings.tabs.java.java-installation',
 		defaultMessage: 'Custom Java installation',
-	},
-	customJavaInstallation: {
-		id: 'instance.settings.tabs.java.custom-java-installation',
-		defaultMessage: 'Choose a different Java installation for this instance.',
 	},
 	javaPathPlaceholder: {
 		id: 'instance.settings.tabs.java.java-path-placeholder',
@@ -167,17 +169,9 @@ const messages = defineMessages({
 		id: 'instance.settings.tabs.java.java-memory',
 		defaultMessage: 'Custom memory allocation',
 	},
-	customMemoryAllocation: {
-		id: 'instance.settings.tabs.java.custom-memory-allocation',
-		defaultMessage: 'Set the memory allocation separately for this instance.',
-	},
 	javaArguments: {
 		id: 'instance.settings.tabs.java.java-arguments',
 		defaultMessage: 'Custom Java arguments',
-	},
-	customJavaArguments: {
-		id: 'instance.settings.tabs.java.custom-java-arguments',
-		defaultMessage: 'Set Java arguments separately for this instance.',
 	},
 	enterJavaArguments: {
 		id: 'instance.settings.tabs.java.enter-java-arguments',
@@ -186,10 +180,6 @@ const messages = defineMessages({
 	javaEnvironmentVariables: {
 		id: 'instance.settings.tabs.java.environment-variables',
 		defaultMessage: 'Custom environment variables',
-	},
-	customEnvironmentVariables: {
-		id: 'instance.settings.tabs.java.custom-environment-variables',
-		defaultMessage: 'Set environment variables separately for this instance.',
 	},
 	enterEnvironmentVariables: {
 		id: 'instance.settings.tabs.java.enter-environment-variables',
@@ -205,6 +195,10 @@ const messages = defineMessages({
 <template>
 	<div class="flex flex-col gap-6">
 		<JavaDetectionModal ref="javaDetectionModal" @submit="(val) => (javaPath = val.path)" />
+		<DefaultSettingsIntro
+			tab="java"
+			:description="formatMessage(messages.defaultSettingsDescription)"
+		/>
 
 		<section class="flex flex-col">
 			<div class="flex items-center justify-between gap-4">
@@ -212,7 +206,6 @@ const messages = defineMessages({
 					<h2 class="m-0 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.javaMemory) }}
 					</h2>
-					<p class="m-0">{{ formatMessage(messages.customMemoryAllocation) }}</p>
 				</div>
 				<Toggle id="override-memory-allocation" v-model="overrideMemorySettings" />
 			</div>
@@ -249,7 +242,6 @@ const messages = defineMessages({
 					<h2 class="m-0 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.javaInstallation) }}
 					</h2>
-					<p class="m-0">{{ formatMessage(messages.customJavaInstallation) }}</p>
 				</div>
 				<Toggle id="override-java-installation" v-model="overrideJavaInstall" />
 			</div>
@@ -344,7 +336,6 @@ const messages = defineMessages({
 					<h2 class="m-0 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.javaArguments) }}
 					</h2>
-					<p class="m-0">{{ formatMessage(messages.customJavaArguments) }}</p>
 				</div>
 				<Toggle id="override-java-arguments" v-model="overrideJavaArgs" />
 			</div>
@@ -366,7 +357,6 @@ const messages = defineMessages({
 					<h2 class="m-0 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.javaEnvironmentVariables) }}
 					</h2>
-					<p class="m-0">{{ formatMessage(messages.customEnvironmentVariables) }}</p>
 				</div>
 				<Toggle id="override-environment-variables" v-model="overrideEnvVars" />
 			</div>

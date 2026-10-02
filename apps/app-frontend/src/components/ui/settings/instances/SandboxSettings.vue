@@ -27,6 +27,10 @@ const canAddFolder = computed(() => {
 })
 
 const messages = defineMessages({
+	customDescription: {
+		id: 'app.settings.sandbox.custom-description',
+		defaultMessage: 'Override app sandbox settings for this instance.',
+	},
 	custom: {
 		id: 'app.settings.sandbox.custom',
 		defaultMessage: 'Custom sandbox settings',
@@ -149,120 +153,131 @@ function selectAdjacentMode(event: KeyboardEvent, index: number) {
 </script>
 
 <template>
-	<div class="flex flex-col gap-6 pt-6">
+	<div class="flex flex-col gap-6">
 		<div
 			v-if="instanceSettings"
 			class="flex items-center justify-between gap-4 border-0 border-b border-solid border-surface-5 pb-6"
 		>
-			<label :for="`${id}-custom`" class="text-lg font-semibold text-contrast">
-				{{ formatMessage(messages.custom) }}
-			</label>
-			<Toggle :id="`${id}-custom`" v-model="customSettings" />
+			<div class="flex min-w-0 flex-col gap-0.5">
+				<label :for="`${id}-custom`" class="text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.custom) }}
+				</label>
+				<p :id="`${id}-custom-description`" class="m-0">
+					{{ formatMessage(messages.customDescription) }}
+				</p>
+			</div>
+			<Toggle
+				:id="`${id}-custom`"
+				v-model="customSettings"
+				:aria-describedby="`${id}-custom-description`"
+			/>
 		</div>
 		<fieldset
 			:disabled="disabled"
-			class="m-0 flex min-w-0 flex-col gap-6 border-0 p-0"
+			class="m-0 min-w-0 border-0 p-0"
 			:class="{ 'opacity-50': disabled }"
 		>
-			<div class="flex flex-col gap-4">
-				<div class="flex flex-col gap-0.5">
-					<h2 :id="`${id}-title`" class="m-0 text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.title) }}
-					</h2>
-					<p class="m-0 leading-6">{{ formatMessage(messages.description) }}</p>
-				</div>
-				<div role="radiogroup" :aria-labelledby="`${id}-title`" class="grid grid-cols-3 gap-3">
-					<LargeRadioButton
-						v-for="(option, index) in modes"
-						:key="option.value"
-						type="button"
-						:selected="mode === option.value"
-						:tabindex="mode === option.value ? 0 : -1"
-						class="!grid min-w-0 grid-cols-[20px_1fr] content-start items-center !gap-x-2 !gap-y-1.5 !rounded-[20px] !border !p-3 !font-normal !leading-6"
-						:class="
-							mode === option.value
-								? '!border-brand !bg-brand-highlight'
-								: '!border-surface-4 !bg-surface-3'
-						"
-						@select="mode = option.value"
-						@keydown="selectAdjacentMode($event, index)"
-					>
-						<span class="font-semibold text-contrast">{{ formatMessage(option.label) }}</span>
-						<span class="col-span-2">{{ formatMessage(option.description) }}</span>
-					</LargeRadioButton>
-				</div>
-				<div
-					class="flex items-start gap-2 rounded-2xl border border-solid border-orange bg-highlight-orange p-4 text-contrast"
-				>
-					<CircleAlertIcon class="size-6 shrink-0 text-orange" aria-hidden="true" />
-					<p class="m-0 leading-6">{{ formatMessage(messages.warning) }}</p>
-				</div>
-			</div>
-			<div class="flex flex-col gap-3 border-0 border-t border-solid border-surface-5 pt-6">
-				<div
-					v-for="option in permissionOptions"
-					:key="option.key"
-					class="flex items-center justify-between gap-4"
-				>
+			<div class="flex flex-col gap-6">
+				<div class="flex flex-col gap-4">
 					<div class="flex flex-col gap-0.5">
-						<label :for="`${id}-${option.key}`" class="text-lg font-semibold text-contrast">
-							{{ formatMessage(option.label) }}
-						</label>
-						<p :id="`${id}-${option.key}-description`" class="m-0 leading-6">
-							{{ formatMessage(option.description) }}
-						</p>
+						<h2 :id="`${id}-title`" class="m-0 text-lg font-semibold text-contrast">
+							{{ formatMessage(messages.title) }}
+						</h2>
+						<p class="m-0 leading-6">{{ formatMessage(messages.description) }}</p>
 					</div>
-					<Toggle
-						:id="`${id}-${option.key}`"
-						v-model="permissions[option.key]"
-						:aria-describedby="`${id}-${option.key}-description`"
-					/>
-				</div>
-			</div>
-			<div class="flex flex-col gap-2.5 border-0 border-t border-solid border-surface-5 pt-6">
-				<div class="flex flex-col gap-0.5">
-					<h2 class="m-0 text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.folders) }}
-					</h2>
-					<p class="m-0 leading-6">{{ formatMessage(messages.foldersDescription) }}</p>
-				</div>
-				<form class="flex gap-2" @submit.prevent="addFolder">
-					<Input
-						v-model="folderPath"
-						class="min-w-0 flex-1"
-						size="medium"
-						:aria-label="formatMessage(messages.folderPlaceholder)"
-						:placeholder="formatMessage(messages.folderPlaceholder)"
-					/>
-					<IconButton :label="formatMessage(messages.browse)" size="lg" disabled>
-						<FolderSearchIcon />
-					</IconButton>
-					<Button
-						native-type="submit"
-						type="colored"
-						color="brand"
-						size="lg"
-						:disabled="!canAddFolder"
+					<div role="radiogroup" :aria-labelledby="`${id}-title`" class="grid grid-cols-3 gap-3">
+						<LargeRadioButton
+							v-for="(option, index) in modes"
+							:key="option.value"
+							type="button"
+							:selected="mode === option.value"
+							:tabindex="mode === option.value ? 0 : -1"
+							class="!grid min-w-0 grid-cols-[20px_1fr] content-start items-center !gap-x-2 !gap-y-1.5 !rounded-[20px] !border !p-3 !font-normal !leading-6"
+							:class="
+								mode === option.value
+									? '!border-brand !bg-brand-highlight'
+									: '!border-surface-4 !bg-surface-3'
+							"
+							@select="mode = option.value"
+							@keydown="selectAdjacentMode($event, index)"
+						>
+							<span class="font-semibold text-contrast">{{ formatMessage(option.label) }}</span>
+							<span class="col-span-2">{{ formatMessage(option.description) }}</span>
+						</LargeRadioButton>
+					</div>
+					<div
+						class="flex items-start gap-2 rounded-2xl border border-solid border-orange bg-highlight-orange p-4 text-contrast"
 					>
-						<PlusIcon /> {{ formatMessage(messages.add) }}
-					</Button>
-				</form>
-				<div v-for="(folder, index) in folders" :key="folder" class="flex items-center gap-2">
-					<Input
-						:model-value="folder"
-						readonly
-						class="min-w-0 flex-1"
-						size="medium"
-						:aria-label="formatMessage(messages.folderPlaceholder)"
-					/>
-					<IconButton
-						:label="formatMessage(commonMessages.removeButton)"
-						type="quiet"
-						size="lg"
-						@click="folders.splice(index, 1)"
+						<CircleAlertIcon class="size-6 shrink-0 text-orange" aria-hidden="true" />
+						<p class="m-0 leading-6">{{ formatMessage(messages.warning) }}</p>
+					</div>
+				</div>
+				<div class="flex flex-col gap-3 border-0 border-t border-solid border-surface-5 pt-6">
+					<div
+						v-for="option in permissionOptions"
+						:key="option.key"
+						class="flex items-center justify-between gap-4"
 					>
-						<XIcon />
-					</IconButton>
+						<div class="flex flex-col gap-0.5">
+							<label :for="`${id}-${option.key}`" class="text-lg font-semibold text-contrast">
+								{{ formatMessage(option.label) }}
+							</label>
+							<p :id="`${id}-${option.key}-description`" class="m-0 leading-6">
+								{{ formatMessage(option.description) }}
+							</p>
+						</div>
+						<Toggle
+							:id="`${id}-${option.key}`"
+							v-model="permissions[option.key]"
+							:aria-describedby="`${id}-${option.key}-description`"
+						/>
+					</div>
+				</div>
+				<div class="flex flex-col gap-2.5 border-0 border-t border-solid border-surface-5 pt-6">
+					<div class="flex flex-col gap-0.5">
+						<h2 class="m-0 text-lg font-semibold text-contrast">
+							{{ formatMessage(messages.folders) }}
+						</h2>
+						<p class="m-0 leading-6">{{ formatMessage(messages.foldersDescription) }}</p>
+					</div>
+					<form class="flex gap-2" @submit.prevent="addFolder">
+						<Input
+							v-model="folderPath"
+							class="min-w-0 flex-1"
+							size="medium"
+							:aria-label="formatMessage(messages.folderPlaceholder)"
+							:placeholder="formatMessage(messages.folderPlaceholder)"
+						/>
+						<IconButton :label="formatMessage(messages.browse)" size="lg" disabled>
+							<FolderSearchIcon />
+						</IconButton>
+						<Button
+							native-type="submit"
+							type="colored"
+							color="brand"
+							size="lg"
+							:disabled="!canAddFolder"
+						>
+							<PlusIcon /> {{ formatMessage(messages.add) }}
+						</Button>
+					</form>
+					<div v-for="(folder, index) in folders" :key="folder" class="flex items-center gap-2">
+						<Input
+							:model-value="folder"
+							readonly
+							class="min-w-0 flex-1"
+							size="medium"
+							:aria-label="formatMessage(messages.folderPlaceholder)"
+						/>
+						<IconButton
+							:label="formatMessage(commonMessages.removeButton)"
+							type="quiet"
+							size="lg"
+							@click="folders.splice(index, 1)"
+						>
+							<XIcon />
+						</IconButton>
+					</div>
 				</div>
 			</div>
 		</fieldset>

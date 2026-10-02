@@ -1,5 +1,7 @@
 import type { InjectionKey } from 'vue'
 
+export type AppSettingsDefaultsTab = 'sandbox' | 'java' | 'window' | 'hooks'
+
 export type UnsavedChangesController = {
 	hasChanges: () => boolean
 	getOriginal: () => Record<string, unknown>
@@ -19,6 +21,9 @@ export const appSettingsModalContextKey: InjectionKey<AppSettingsModalContext> =
 export const appSettingsModalOpenProfileKey: InjectionKey<() => void> = Symbol(
 	'appSettingsModalOpenProfile',
 )
+export const appSettingsModalOpenDefaultsKey: InjectionKey<
+	(tab: AppSettingsDefaultsTab) => void
+> = Symbol('appSettingsModalOpenDefaults')
 export const appSettingsModalOpenSyncedOptionsKey: InjectionKey<() => void> = Symbol(
 	'appSettingsModalOpenSyncedOptions',
 )
