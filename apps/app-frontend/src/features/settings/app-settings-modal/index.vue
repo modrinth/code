@@ -11,6 +11,7 @@ import {
 	PaintbrushIcon,
 	RefreshCwIcon,
 	Settings2Icon,
+	ShieldIcon,
 	ToggleRightIcon,
 	UserIcon,
 	WindowIcon,
@@ -43,6 +44,7 @@ import FeaturesSettings from '@/features/settings/display/features-settings.vue'
 import LanguageSettings from '@/features/settings/display/language-settings.vue'
 import JavaAndMemorySettings from '@/features/settings/instance-defaults/java-and-memory-settings/index.vue'
 import LaunchHooksSettings from '@/features/settings/instance-defaults/launch-hooks-settings.vue'
+import SandboxSettings from '@/features/settings/instance-defaults/sandbox-settings.vue'
 import WindowSettings from '@/features/settings/instance-defaults/window-settings.vue'
 import type { InstanceDefaultsTab } from '@/features/settings/settings-actions'
 import SyncingSettings from '@/features/settings/syncing/syncing-settings.vue'
@@ -151,6 +153,15 @@ const tabs = [
 		category: tabCategories.account,
 		icon: EyeOffIcon,
 		content: PrivacySettings,
+	},
+	{
+		name: defineMessage({
+			id: 'app.settings.tabs.sandbox',
+			defaultMessage: 'Sandboxing',
+		}),
+		category: tabCategories.instanceDefaults,
+		icon: ShieldIcon,
+		content: SandboxSettings,
 	},
 	{
 		name: defineMessage({
