@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ChevronRightIcon, InfoIcon, Settings2Icon, UsersIcon, WrenchIcon } from '@modrinth/assets'
+import {
+	ChevronRightIcon,
+	InfoIcon,
+	Settings2Icon,
+	ShieldIcon,
+	UsersIcon,
+	WrenchIcon,
+} from '@modrinth/assets'
 import {
 	Avatar,
 	commonMessages,
@@ -22,6 +29,7 @@ import type { GameInstance } from '@/helpers/types'
 import GeneralSettings from './general-settings.vue'
 import InstallationSettings from './installation-settings.vue'
 import { provideInstanceSettings } from './instance-settings-context.ts'
+import SandboxSettings from './sandbox-settings.vue'
 import SharingSettings from './sharing-settings.vue'
 import SyncedOptionsSettings from './synced-options-settings.vue'
 
@@ -103,6 +111,14 @@ const tabs = computed<TabbedModalTab[]>(() => [
 		}),
 		icon: Settings2Icon,
 		content: SyncedOptionsSettings,
+	},
+	{
+		name: defineMessage({
+			id: 'instance.settings.tabs.sandbox',
+			defaultMessage: 'Sandboxing',
+		}),
+		icon: ShieldIcon,
+		content: SandboxSettings,
 	},
 	{
 		name: defineMessage({
