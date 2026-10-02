@@ -6,6 +6,15 @@ export class LabrinthTagsV2Module extends AbstractModule {
 		return 'labrinth_tags_v2'
 	}
 
+	/** Get SPDX licenses available from the backend. */
+	public async getLicenses(): Promise<Labrinth.Tags.v2.License[]> {
+		return this.client.request<Labrinth.Tags.v2.License[]>('/tag/license', {
+			api: 'labrinth',
+			version: 2,
+			method: 'GET',
+		})
+	}
+
 	/**
 	 * Get license text by SPDX identifier
 	 *

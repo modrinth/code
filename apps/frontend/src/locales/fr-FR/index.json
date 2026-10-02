@@ -4124,9 +4124,6 @@
   "project.settings.license.select": {
     "message": "Sélectionner une licence"
   },
-  "project.settings.license.select-description": {
-    "message": "Comment les utilisateurs sont et ne sont pas autorisés à utiliser votre projet."
-  },
   "project.settings.license.select-placeholder": {
     "message": "Sélectionner une licence..."
   },

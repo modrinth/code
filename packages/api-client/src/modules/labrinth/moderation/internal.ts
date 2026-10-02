@@ -87,6 +87,31 @@ export class LabrinthModerationInternalModule extends AbstractModule {
 		)
 	}
 
+	public async lockUser(userId: string, reason: string): Promise<void> {
+		return this.client.request<void>(`/admin/user/${userId}/lock`, {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'PUT',
+			body: { reason },
+		})
+	}
+
+	public async unlockUser(userId: string): Promise<void> {
+		return this.client.request<void>(`/admin/user/${userId}/lock`, {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'DELETE',
+		})
+	}
+
+	public async revokeUserSessions(userId: string): Promise<void> {
+		return this.client.request<void>(`/admin/user/${userId}/sessions`, {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'DELETE',
+		})
+	}
+
 	public async setProjectJudgements(
 		judgements: Labrinth.Moderation.Internal.ProjectJudgements,
 	): Promise<void> {

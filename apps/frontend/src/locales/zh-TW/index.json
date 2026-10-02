@@ -4124,14 +4124,8 @@
   "project.settings.license.custom": {
     "message": "自訂"
   },
-  "project.settings.license.has-spdx": {
-    "message": "使用 SPDX 識別碼"
-  },
   "project.settings.license.later": {
     "message": "較新版本"
-  },
-  "project.settings.license.missing-name": {
-    "message": "請輸入自訂授權條款的名稱或 SPDX 識別碼。"
   },
   "project.settings.license.missing-url": {
     "message": "請輸入指向自訂授權條款全文的網址。"
@@ -4139,26 +4133,17 @@
   "project.settings.license.name": {
     "message": "授權條款名稱"
   },
-  "project.settings.license.name-description": {
-    "message": "授權條款的完整名稱。如果授權條款具有 SPDX 識別碼，請勾選該核取方塊，並改用該識別碼。"
-  },
   "project.settings.license.name-placeholder": {
     "message": "授權條款名稱"
   },
-  "project.settings.license.optional-url": {
-    "message": "授權條款網址（可選）"
+  "project.settings.license.optional-label": {
+    "message": "可選"
   },
   "project.settings.license.select": {
     "message": "選擇授權條款"
   },
   "project.settings.license.select-placeholder": {
     "message": "選擇授權條款..."
-  },
-  "project.settings.license.spdx": {
-    "message": "SPDX 識別碼"
-  },
-  "project.settings.license.spdx-placeholder": {
-    "message": "SPDX 識別碼"
   },
   "project.settings.license.title": {
     "message": "授權條款"

@@ -26,24 +26,26 @@
 				</p>
 			</div>
 
-			<div class="flex min-w-0 flex-col gap-2">
+			<div class="flex min-w-0 max-w-[600px] flex-col gap-2">
 				<label for="license-multiselect" class="w-fit text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.select) }}
 				</label>
 
-				<div class="flex min-w-0 flex-col gap-2">
+				<div class="flex min-w-0 flex-col gap-1.5">
 					<Combobox
 						v-model="selectedLicense"
 						:options="licenseOptions"
+						:search-options="allLicenseOptions"
 						:display-value="licenseDisplayName(current.license) || undefined"
 						:placeholder="formatMessage(messages.selectPlaceholder)"
+						:search-placeholder="formatMessage(messages.selectPlaceholder)"
+						:searchable="true"
+						sync-with-selection
+						select-search-text-on-focus
 						:disabled="saving || !hasPermission"
 						trigger-type="base"
 						class="w-full max-w-[600px]"
 					/>
-					<p class="m-0 text-base text-secondary">
-						{{ formatMessage(messages.selectDescription) }}
-					</p>
 					<ValidationMessage
 						:check="licenseSelectionValidation"
 						:project-field="project.license.id"
@@ -79,9 +81,44 @@
 				</p>
 			</div>
 
-			<div v-if="current.license.friendly" class="flex min-w-0 flex-col gap-2">
+			<div
+				v-if="current.license.friendly === 'Custom'"
+				class="flex min-w-0 max-w-[600px] flex-col gap-2"
+			>
+				<label for="license-name" class="w-fit text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.name) }}
+				</label>
+
+				<div class="flex min-w-0 flex-col gap-2">
+					<Input
+						id="license-name"
+						v-model="current.license.short"
+						wrapper-class="w-full"
+						:maxlength="128"
+						:placeholder="formatMessage(messages.namePlaceholder)"
+						required
+						:disabled="saving || !hasPermission"
+					/>
+					<p class="m-0 text-base text-secondary">
+						{{ formatMessage(messages.nameDescription) }}
+					</p>
+					<ValidationMessage :check="customNameMessage" />
+					<ValidationMessage
+						:check="
+							saveValidation
+								.forField('custom-license', 'license')
+								.filter((message) => message.values?.missingName)
+						"
+					/>
+				</div>
+			</div>
+
+			<div v-if="current.license.friendly" class="flex min-w-0 max-w-[600px] flex-col gap-2">
 				<label for="license-url" class="w-fit text-lg font-semibold text-contrast">
 					{{ formatMessage(licenseUrlMessages.url) }}
+					<span v-if="current.license.friendly !== 'Custom'" class="font-normal text-secondary">
+						({{ formatMessage(messages.optionalLabel) }})
+					</span>
 				</label>
 
 				<div class="flex min-w-0 flex-col gap-2">
@@ -133,71 +170,6 @@
 					/>
 				</div>
 			</div>
-
-			<div v-if="current.license?.friendly === 'Custom'" class="flex min-w-0 flex-col gap-2">
-				<label
-					:for="current.hasSpdxLicense ? 'license-spdx' : 'license-name'"
-					class="w-fit text-lg font-semibold text-contrast"
-				>
-					{{ formatMessage(current.hasSpdxLicense ? messages.spdx : messages.name) }}
-				</label>
-
-				<div class="flex min-w-0 flex-col gap-2">
-					<Input
-						v-if="current.hasSpdxLicense"
-						id="license-spdx"
-						v-model="current.license.short"
-						wrapper-class="w-full"
-						:maxlength="128"
-						:placeholder="formatMessage(messages.spdxPlaceholder)"
-						:disabled="saving || !hasPermission"
-					/>
-					<Input
-						v-else
-						id="license-name"
-						v-model="current.license.short"
-						wrapper-class="w-full"
-						:maxlength="128"
-						:placeholder="formatMessage(messages.namePlaceholder)"
-						:disabled="saving || !hasPermission"
-					/>
-
-					<Checkbox
-						v-model="current.hasSpdxLicense"
-						:disabled="saving || !hasPermission"
-						:description="formatMessage(messages.hasSpdx)"
-					>
-						{{ formatMessage(messages.hasSpdx) }}
-					</Checkbox>
-
-					<p class="m-0 text-base text-secondary">
-						<IntlFormatted
-							:message-id="
-								current.hasSpdxLicense ? messages.spdxDescription : messages.nameDescription
-							"
-						>
-							<template #spdx="{ children }">
-								<a
-									href="https://spdx.org/licenses/"
-									target="_blank"
-									rel="noopener"
-									class="text-link"
-								>
-									<component :is="() => children" />
-								</a>
-							</template>
-						</IntlFormatted>
-					</p>
-					<ValidationMessage :check="customNameMessage" />
-					<ValidationMessage
-						:check="
-							saveValidation
-								.forField('custom-license', 'license')
-								.filter((message) => message.values?.missingName)
-						"
-					/>
-				</div>
-			</div>
 		</section>
 		<ValidationMessage
 			:check="
@@ -229,6 +201,7 @@ import {
 	commonProjectSettingsMessages,
 	ConfirmLeaveModal,
 	defineMessages,
+	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	Input,
@@ -238,7 +211,13 @@ import {
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
-import { builtinLicenses, formatProjectType, isAdmin, TeamMemberPermission } from '@modrinth/utils'
+import {
+	defaultLicenseIds,
+	formatProjectType,
+	isAdmin,
+	TeamMemberPermission,
+} from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
 import ValidationMessage from '@/components/ValidationMessage.vue'
@@ -249,6 +228,7 @@ import { normalizeProjectUrl } from '~/helpers/project-url'
 import { licenseUrlMessages } from '~/utils/license-messages'
 
 const { projectV2: project, currentMember, patchProjectV3 } = injectProjectPageContext()
+const { labrinth } = injectModrinthClient()
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -266,15 +246,11 @@ const messages = defineMessages({
 	},
 	select: {
 		id: 'project.settings.license.select',
-		defaultMessage: 'Select a license',
-	},
-	selectDescription: {
-		id: 'project.settings.license.select-description',
-		defaultMessage: "How users are and aren't allowed to use your project.",
+		defaultMessage: 'License',
 	},
 	selectPlaceholder: {
 		id: 'project.settings.license.select-placeholder',
-		defaultMessage: 'Select license...',
+		defaultMessage: 'Search licenses...',
 	},
 	later: {
 		id: 'project.settings.license.later',
@@ -289,18 +265,23 @@ const messages = defineMessages({
 		id: 'project.settings.license.allow-later',
 		defaultMessage: 'Allow later editions',
 	},
-	spdx: {
-		id: 'project.settings.license.spdx',
-		defaultMessage: 'SPDX identifier',
+	url: { id: 'project.settings.license.url', defaultMessage: 'License URL' },
+	urlPlaceholder: {
+		id: 'project.settings.license.url-placeholder',
+		defaultMessage: 'License URL',
 	},
-	spdxPlaceholder: {
-		id: 'project.settings.license.spdx-placeholder',
-		defaultMessage: 'SPDX identifier',
+	optionalLabel: {
+		id: 'project.settings.license.optional-label',
+		defaultMessage: 'optional',
 	},
-	spdxDescription: {
-		id: 'project.settings.license.spdx-description',
+	urlDescription: {
+		id: 'project.settings.license.url-description',
 		defaultMessage:
-			'If your license does not have an official <spdx>SPDX license identifier</spdx>, uncheck the box and enter the name of the license instead.',
+			"The web location of the full license text. If you don't provide a link, the license text will be displayed instead.",
+	},
+	customUrlDescription: {
+		id: 'project.settings.license.custom-url-description',
+		defaultMessage: 'The web location of the full license text.',
 	},
 	name: { id: 'project.settings.license.name', defaultMessage: 'License name' },
 	namePlaceholder: {
@@ -309,16 +290,11 @@ const messages = defineMessages({
 	},
 	nameDescription: {
 		id: 'project.settings.license.name-description',
-		defaultMessage:
-			'The full name of the license. If the license has a SPDX identifier, please check the checkbox and use the identifier instead.',
-	},
-	hasSpdx: {
-		id: 'project.settings.license.has-spdx',
-		defaultMessage: 'Use SPDX identifier',
+		defaultMessage: 'The full name of the custom license.',
 	},
 	missingName: {
-		id: 'project.settings.license.missing-name',
-		defaultMessage: 'Enter a name or SPDX identifier for your custom license.',
+		id: 'project.settings.license.custom-name-required',
+		defaultMessage: 'Enter a name for your custom license.',
 	},
 	missingUrl: {
 		id: 'project.settings.license.missing-url',
@@ -341,12 +317,61 @@ function licenseDisplayName(license: { short: string; friendly: string }) {
 	return license.friendly
 }
 
-const licenseOptions = computed<ComboboxOption<string>[]>(() =>
-	builtinLicenses.map((license) => ({
+interface LicenseOption {
+	short: string
+	friendly: string
+	requiresOnlyOrLater?: boolean
+}
+
+const orLaterLicenseIds = new Set(['AGPL-3.0', 'LGPL-2.1', 'LGPL-3.0', 'GPL-2.0', 'GPL-3.0'])
+
+const { data: spdxLicenses } = useQuery({
+	queryKey: ['tags', 'licenses', 'v2'],
+	queryFn: () => labrinth.tags_v2.getLicenses(),
+	staleTime: 1000 * 60 * 60,
+})
+
+const availableLicenses = computed<LicenseOption[]>(() => {
+	const licensesById = new Map(
+		(spdxLicenses.value ?? []).map((license) => [license.short, license]),
+	)
+	const defaultIds = new Set<string>(defaultLicenseIds)
+	return [
+		{ friendly: 'Custom', short: '', requiresOnlyOrLater: false },
+		...defaultLicenseIds.map((short) => ({
+			friendly:
+				short === 'All-Rights-Reserved'
+					? 'All Rights Reserved/No License'
+					: (licensesById.get(short)?.name ?? short),
+			short,
+			requiresOnlyOrLater: orLaterLicenseIds.has(short),
+		})),
+		...(spdxLicenses.value ?? [])
+			.filter((license) => !defaultIds.has(license.short))
+			.map((license) => ({ friendly: license.name, short: license.short })),
+	]
+})
+
+const allLicenseOptions = computed<ComboboxOption<string>[]>(() =>
+	availableLicenses.value.map((license) => ({
 		value: license.short,
-		label: licenseDisplayName(license),
+		label: license.short || licenseDisplayName(license),
+		subLabel: license.short ? licenseDisplayName(license) : undefined,
+		searchTerms: [
+			license.short,
+			license.short.replaceAll('-', ' '),
+			license.friendly,
+			license.friendly.replaceAll('-', ' '),
+		],
 	})),
 )
+
+const licenseOptions = computed(() => {
+	const defaultIds = new Set<string>(defaultLicenseIds)
+	return allLicenseOptions.value.filter(
+		(license) => license.value === '' || defaultIds.has(license.value),
+	)
+})
 
 function getInitialLicense() {
 	const oldLicenseId = project.value.license.id
@@ -362,12 +387,19 @@ function getInitialLicense() {
 			requiresOnlyOrLater: false,
 		}
 	}
+	if (oldLicenseId.startsWith('LicenseRef-') && oldLicenseId !== 'LicenseRef-All-Rights-Reserved') {
+		return {
+			friendly: 'Custom',
+			short: oldLicenseId.slice('LicenseRef-'.length),
+			requiresOnlyOrLater: false,
+		}
+	}
 
 	return (
-		builtinLicenses.find((x) => x.short === trimmedLicenseId) ?? {
-			friendly: 'Custom',
-			short: oldLicenseId.replaceAll('LicenseRef-', ''),
-			requiresOnlyOrLater: oldLicenseId.includes('-or-later'),
+		availableLicenses.value.find((license) => license.short === trimmedLicenseId) ?? {
+			friendly: project.value.license.name,
+			short: trimmedLicenseId,
+			requiresOnlyOrLater: orLaterLicenseIds.has(trimmedLicenseId),
 		}
 	)
 }
@@ -384,7 +416,6 @@ const {
 		license: getInitialLicense(),
 		licenseUrl: project.value.license.url ?? '',
 		allowOrLater: project.value.license.id.includes('-or-later'),
-		hasSpdxLicense: !project.value.license.id.includes('LicenseRef-'),
 	}),
 	async () => {
 		const payload: {
@@ -413,7 +444,7 @@ const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 const selectedLicense = computed({
 	get: () => (current.value.license.friendly === 'Custom' ? '' : current.value.license.short),
 	set: (short: string) => {
-		const license = builtinLicenses.find((option) => option.short === short)
+		const license = availableLicenses.value.find((option) => option.short === short)
 		if (license) current.value.license = license
 	},
 })
@@ -470,7 +501,7 @@ const licenseId = computed(() => {
 	let id = ''
 
 	if (
-		(!current.value.hasSpdxLicense && current.value.license.friendly === 'Custom') ||
+		current.value.license.friendly === 'Custom' ||
 		current.value.license.short === 'All-Rights-Reserved' ||
 		current.value.license.short === 'Unknown'
 	) {
@@ -482,7 +513,7 @@ const licenseId = computed(() => {
 		id += current.value.allowOrLater ? '-or-later' : '-only'
 	}
 
-	if (!current.value.hasSpdxLicense && current.value.license.friendly === 'Custom') {
+	if (current.value.license.friendly === 'Custom') {
 		id = id.replaceAll(' ', '-')
 	}
 

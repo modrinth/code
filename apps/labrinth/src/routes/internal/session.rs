@@ -3,6 +3,7 @@ use crate::auth::{AuthenticationError, get_user_from_headers};
 use crate::database::models::DBUserId;
 use crate::database::models::session_item::DBSession;
 use crate::database::models::session_item::SessionBuilder;
+use crate::database::models::user_lock_item::DBUserLock;
 use crate::database::{PgPool, PgTransaction};
 use crate::env::ENV;
 use crate::models::pats::Scopes;
@@ -92,6 +93,10 @@ pub async fn issue_session(
     redis: &RedisPool,
     session_expires: Option<DateTime<Utc>>,
 ) -> Result<DBSession, AuthenticationError> {
+    if DBUserLock::exists(user_id, &mut *transaction).await? {
+        return Err(AuthenticationError::AccountLocked);
+    }
+
     let metadata = get_session_metadata(&req).await?;
 
     let session = ChaCha20Rng::from_entropy()

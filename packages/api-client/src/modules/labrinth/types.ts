@@ -1765,6 +1765,12 @@ export namespace Labrinth {
 				user_rating: number
 				version: number
 			}
+
+			export type UserLock = {
+				locked_by: string
+				reason: string
+				created: string
+			}
 		}
 
 		export namespace v2 {
@@ -1896,6 +1902,7 @@ export namespace Labrinth {
 				stripe_customer_id?: string
 				allow_friend_requests?: boolean
 				moderation_notes?: Common.ModerationNote | null
+				lock?: Common.UserLock
 				github_id?: number
 				discord_id?: string
 				steam_id?: string
@@ -1969,6 +1976,11 @@ export namespace Labrinth {
 			}
 
 			export interface DonationPlatform {
+				short: string
+				name: string
+			}
+
+			export interface License {
 				short: string
 				name: string
 			}

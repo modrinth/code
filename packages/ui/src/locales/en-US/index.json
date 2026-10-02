@@ -1245,7 +1245,7 @@
     "defaultMessage": "Save attribution"
   },
   "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "Select a license..."
+    "defaultMessage": "Search licenses..."
   },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "Permission reason"
@@ -1291,6 +1291,9 @@
   },
   "external-files.permissions-card.last-updated": {
     "defaultMessage": "Last updated on {date} by {user}"
+  },
+  "external-files.permissions-card.license.all-rights": {
+    "defaultMessage": "All Rights Reserved/No License"
   },
   "external-files.permissions-card.license.unknown": {
     "defaultMessage": "Unknown"
@@ -3293,11 +3296,17 @@
   "profile.button.info": {
     "defaultMessage": "View user details"
   },
+  "profile.button.lock": {
+    "defaultMessage": "Lock account"
+  },
   "profile.button.manage-projects": {
     "defaultMessage": "Manage projects"
   },
   "profile.button.remove-affiliate": {
     "defaultMessage": "Remove as affiliate"
+  },
+  "profile.button.revoke-sessions": {
+    "defaultMessage": "Revoke all sessions"
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "Set as affiliate"
@@ -3307,6 +3316,9 @@
   },
   "profile.button.unblock": {
     "defaultMessage": "Unblock"
+  },
+  "profile.button.unlock": {
+    "defaultMessage": "Unlock account"
   },
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural, one {# project} other {# projects}}"
@@ -3371,6 +3383,9 @@
   "profile.label.joined": {
     "defaultMessage": "Joined"
   },
+  "profile.label.locked": {
+    "defaultMessage": "Locked"
+  },
   "profile.label.no-collections": {
     "defaultMessage": "This user has no collections!"
   },
@@ -3395,6 +3410,30 @@
   "profile.official-account.bio": {
     "defaultMessage": "The official user account of Modrinth. Get support at <support-link></support-link> or via email at <email></email>"
   },
+  "profile.revoke-sessions.admonition-body": {
+    "defaultMessage": "{username} will be signed out on every device and will need to sign in again. Personal access tokens are not affected."
+  },
+  "profile.revoke-sessions.admonition-title": {
+    "defaultMessage": "Are you sure you want to revoke all sessions?"
+  },
+  "profile.revoke-sessions.button": {
+    "defaultMessage": "Revoke sessions"
+  },
+  "profile.revoke-sessions.error-description": {
+    "defaultMessage": "An error occurred while revoking sessions. Please try again."
+  },
+  "profile.revoke-sessions.error-title": {
+    "defaultMessage": "Failed to revoke sessions"
+  },
+  "profile.revoke-sessions.success-description": {
+    "defaultMessage": "{username} has been signed out everywhere."
+  },
+  "profile.revoke-sessions.success-title": {
+    "defaultMessage": "Sessions revoked"
+  },
+  "profile.revoke-sessions.title": {
+    "defaultMessage": "Revoke sessions for {username}"
+  },
   "profile.unblock-user.error-description": {
     "defaultMessage": "An error occurred while unblocking this user. Please try again."
   },
@@ -3406,6 +3445,18 @@
   },
   "profile.unblock-user.success-title": {
     "defaultMessage": "User unblocked"
+  },
+  "profile.unlock-user.error-description": {
+    "defaultMessage": "An error occurred while unlocking this account. Please try again."
+  },
+  "profile.unlock-user.error-title": {
+    "defaultMessage": "Failed to unlock account"
+  },
+  "profile.unlock-user.success-description": {
+    "defaultMessage": "{username}'s account has been unlocked."
+  },
+  "profile.unlock-user.success-title": {
+    "defaultMessage": "Account unlocked"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Published {date}"
