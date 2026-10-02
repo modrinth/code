@@ -8,7 +8,8 @@
 	>
 		<div class="flex flex-col gap-4">
 			<Admonition type="critical" header="This account will become locked">
-				{{ user.username }} will not be able to login until their account is unlocked.
+				{{ user.username }} will be signed out on every device and will not be able to login until
+				their account is unlocked.
 			</Admonition>
 
 			<div class="flex flex-col gap-2.5">

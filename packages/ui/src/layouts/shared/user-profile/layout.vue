@@ -46,6 +46,44 @@
 		/>
 
 		<NewModal
+			v-if="variant === 'web' && isAdminViewing"
+			ref="revokeSessionsModal"
+			:header="formatMessage(messages.revokeSessionsTitle, { username: user.username })"
+			:closable="!isRevokingSessions"
+			fade="danger"
+			max-width="500px"
+		>
+			<Admonition type="critical" :header="formatMessage(messages.revokeSessionsAdmonitionTitle)">
+				{{ formatMessage(messages.revokeSessionsAdmonitionBody, { username: user.username }) }}
+			</Admonition>
+
+			<template #actions>
+				<div class="flex justify-end gap-2">
+					<Button
+						type="outlined"
+						native-type="button"
+						:disabled="isRevokingSessions"
+						@click="revokeSessionsModal?.hide()"
+					>
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
+					<Button
+						type="colored"
+						color="red"
+						native-type="button"
+						:disabled="isRevokingSessions"
+						@click="confirmRevokeSessions"
+					>
+						<SpinnerIcon v-if="isRevokingSessions" class="animate-spin" />
+						<LogOutIcon v-else />
+						{{ formatMessage(messages.revokeSessionsButton) }}
+					</Button>
+				</div>
+			</template>
+		</NewModal>
+
+		<NewModal
 			v-if="variant === 'web' && isStaffViewing"
 			ref="userDetailsModal"
 			:header="formatMessage(messages.userDetailsTitle)"
@@ -201,6 +239,7 @@
 					"
 					@edit-user="editUserModal?.show()"
 					@toggle-lock="toggleLock"
+					@revoke-sessions="revokeSessionsModal?.show()"
 				>
 					<template v-if="isModrinthUser" #summary>
 						<IntlFormatted :message-id="messages.officialAccountBio">
@@ -407,6 +446,7 @@ import {
 	LibraryIcon,
 	LinkIcon,
 	LockIcon,
+	LogOutIcon,
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -689,6 +729,39 @@ const messages = defineMessages({
 	unlockUserErrorDescription: {
 		id: 'profile.unlock-user.error-description',
 		defaultMessage: 'An error occurred while unlocking this account. Please try again.',
+	},
+	revokeSessionsTitle: {
+		id: 'profile.revoke-sessions.title',
+		defaultMessage: 'Revoke sessions for {username}',
+	},
+	revokeSessionsAdmonitionTitle: {
+		id: 'profile.revoke-sessions.admonition-title',
+		defaultMessage: 'Are you sure you want to revoke all sessions?',
+	},
+	revokeSessionsAdmonitionBody: {
+		id: 'profile.revoke-sessions.admonition-body',
+		defaultMessage:
+			'{username} will be signed out on every device and will need to sign in again. Personal access tokens are not affected.',
+	},
+	revokeSessionsButton: {
+		id: 'profile.revoke-sessions.button',
+		defaultMessage: 'Revoke sessions',
+	},
+	revokeSessionsSuccessTitle: {
+		id: 'profile.revoke-sessions.success-title',
+		defaultMessage: 'Sessions revoked',
+	},
+	revokeSessionsSuccessDescription: {
+		id: 'profile.revoke-sessions.success-description',
+		defaultMessage: '{username} has been signed out everywhere.',
+	},
+	revokeSessionsErrorTitle: {
+		id: 'profile.revoke-sessions.error-title',
+		defaultMessage: 'Failed to revoke sessions',
+	},
+	revokeSessionsErrorDescription: {
+		id: 'profile.revoke-sessions.error-description',
+		defaultMessage: 'An error occurred while revoking sessions. Please try again.',
 	},
 })
 
@@ -993,7 +1066,9 @@ const userDetailsModal = ref<ModalRef | null>(null)
 const editUserModal = ref<InstanceType<typeof EditUserModal> | null>(null)
 const lockUserModal = ref<InstanceType<typeof LockUserModal> | null>(null)
 const blockUserModal = ref<ModalRef | null>(null)
+const revokeSessionsModal = ref<ModalRef | null>(null)
 const isBlockingUser = ref(false)
+const isRevokingSessions = ref(false)
 const isUnblockingUser = ref(false)
 
 function openUserDetails(): void {
@@ -1101,6 +1176,32 @@ async function toggleLock(): Promise<void> {
 			title: formatMessage(messages.unlockUserErrorTitle),
 			text: formatMessage(messages.unlockUserErrorDescription),
 		})
+	}
+}
+
+async function confirmRevokeSessions(): Promise<void> {
+	if (!user.value || isRevokingSessions.value) return
+
+	const targetUser = user.value
+	isRevokingSessions.value = true
+	try {
+		await client.labrinth.moderation_internal.revokeUserSessions(targetUser.id)
+		revokeSessionsModal.value?.hide()
+		notificationManager.addNotification({
+			type: 'success',
+			title: formatMessage(messages.revokeSessionsSuccessTitle),
+			text: formatMessage(messages.revokeSessionsSuccessDescription, {
+				username: targetUser.username,
+			}),
+		})
+	} catch {
+		notificationManager.addNotification({
+			type: 'error',
+			title: formatMessage(messages.revokeSessionsErrorTitle),
+			text: formatMessage(messages.revokeSessionsErrorDescription),
+		})
+	} finally {
+		isRevokingSessions.value = false
 	}
 }
 
