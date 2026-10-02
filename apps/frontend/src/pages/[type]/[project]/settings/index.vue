@@ -361,8 +361,8 @@ import {
 import { fileIsValid, formatProjectStatus, isAdmin } from '@modrinth/utils'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
-import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
 import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
+import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useAuth } from '~/composables/auth.js'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'

@@ -6,10 +6,10 @@ import { computed, type Ref, watch } from 'vue'
 import type { ReviewTarget } from './review'
 import type { createReviewMessages } from './review-messages'
 import type {
+	createReviewPanels,
 	ResolvedIssueControl,
 	ReviewIssue,
 	ReviewPanelBinding,
-	createReviewPanels,
 } from './review-panels'
 import type { createReviewSession } from './review-session'
 

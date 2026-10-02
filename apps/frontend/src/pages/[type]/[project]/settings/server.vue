@@ -245,8 +245,8 @@ import {
 } from '@modrinth/ui'
 import { isAdmin } from '@modrinth/utils'
 
-import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'
 import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
+import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'

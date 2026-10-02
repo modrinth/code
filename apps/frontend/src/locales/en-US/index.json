@@ -1172,6 +1172,9 @@
   "conversation-thread.resubmit-modal.warning": {
     "message": "Repeated submissions without addressing the moderators' comments may result in an account suspension."
   },
+  "conversation-thread.resubmit-required-actions-tooltip": {
+    "message": "You must complete all required actions above to resubmit"
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Supplementary files are for supporting resources like source code, not for alternative versions or variants."
   },
@@ -3386,6 +3389,9 @@
   "moderation.project-review.re-review": {
     "message": "Re-review"
   },
+  "moderation.project-review.reReviewFindings": {
+    "message": "{count, plural, one {# re-review item} other {# re-review items}}"
+  },
   "moderation.project-review.recommended": {
     "message": "(Recommended)"
   },
@@ -4070,15 +4076,6 @@
   "project-review.issues.choose-option": {
     "message": "Choose at least one option for this issue."
   },
-  "project-review.issues.clear": {
-    "message": "Clear issues"
-  },
-  "project-review.issues.clear-all": {
-    "message": "Clear all issues"
-  },
-  "project-review.issues.clear-all-description": {
-    "message": "This will remove all issues you currently have selected in the project."
-  },
   "project-review.issues.edited": {
     "message": "(Edited)"
   },
@@ -4087,6 +4084,9 @@
   },
   "project-review.issues.empty": {
     "message": "No issues flagged."
+  },
+  "project-review.issues.empty-re-review": {
+    "message": "No previous issues to re-review."
   },
   "project-review.issues.field-option": {
     "message": "{field}: {option}"
@@ -4097,23 +4097,44 @@
   "project-review.issues.no-results": {
     "message": "No matching issues."
   },
+  "project-review.issues.open-panel": {
+    "message": "Open {panel} review panel"
+  },
   "project-review.issues.remove": {
     "message": "Remove {issue}"
   },
   "project-review.issues.remove-option": {
     "message": "Remove {option}"
   },
+  "project-review.issues.reset": {
+    "message": "Reset issues"
+  },
+  "project-review.issues.reset-all": {
+    "message": "Reset all issues"
+  },
+  "project-review.issues.reset-description": {
+    "message": "This will discard your issue changes and move all previous issues back to Re-rev. issues."
+  },
   "project-review.issues.reset-message": {
     "message": "Reset message"
   },
+  "project-review.issues.resolved": {
+    "message": "Resolved issues"
+  },
   "project-review.issues.search": {
     "message": "Search issues…"
+  },
+  "project-review.previous-issues.re-review": {
+    "message": "Re-review"
   },
   "project-review.resize-checks": {
     "message": "Resize project checks"
   },
   "project-review.right-panel.issues": {
     "message": "Issues ({count})"
+  },
+  "project-review.right-panel.re-review": {
+    "message": "Re-review"
   },
   "project-review.right-panel.thread": {
     "message": "Thread"
@@ -4827,7 +4848,10 @@
     "message": "Enter a name for your custom license."
   },
   "project.settings.license.custom-url-description": {
-    "message": "The web location of the full license text."
+    "message": "The web location of the full license text. You have to provide a link since this is a custom license."
+  },
+  "project.settings.license.has-spdx": {
+    "message": "Use SPDX identifier"
   },
   "project.settings.license.intro": {
     "message": "It is important to choose a proper license for your {type}. You may choose one from our list or provide a custom license. You may also provide a custom URL to your chosen license; otherwise, the license text will be displayed. See our <guide>licensing guide</guide> for more information."
@@ -4840,6 +4864,9 @@
   },
   "project.settings.license.later-description": {
     "message": "The license you selected has an \"or later\" clause. If you check this box, users may use your project under later editions of the license."
+  },
+  "project.settings.license.missing-name": {
+    "message": "Enter a name or SPDX identifier for your custom license."
   },
   "project.settings.license.missing-url": {
     "message": "Enter a URL to the full text of your custom license."
@@ -4856,11 +4883,20 @@
   "project.settings.license.optional-label": {
     "message": "optional"
   },
+  "project.settings.license.optional-url": {
+    "message": "License URL (optional)"
+  },
   "project.settings.license.select": {
-    "message": "License"
+    "message": "Select a license"
+  },
+  "project.settings.license.select-description": {
+    "message": "How users are and aren't allowed to use your project."
   },
   "project.settings.license.select-placeholder": {
-    "message": "Search licenses..."
+    "message": "Select license..."
+  },
+  "project.settings.license.spdx": {
+    "message": "SPDX identifier"
   },
   "project.settings.license.title": {
     "message": "License"
@@ -6371,26 +6407,20 @@
   "thread-issues.addressed": {
     "message": "Marked as addressed"
   },
+  "thread-issues.complete-actions-first": {
+    "message": "You must complete all required actions from the issue to mark it as addressed."
+  },
   "thread-issues.hide-addressed": {
     "message": "Hide addressed"
-  },
-  "thread-issues.hide-resolved": {
-    "message": "Hide resolved"
   },
   "thread-issues.mark-addressed": {
     "message": "Mark as addressed"
   },
-  "thread-issues.modify-first": {
-    "message": "You must modify your project to address the issue first."
+  "thread-issues.more-actions": {
+    "message": "More required actions"
   },
   "thread-issues.show-addressed": {
     "message": "Show addressed"
-  },
-  "thread-issues.show-resolved": {
-    "message": "Show resolved"
-  },
-  "thread-issues.target.description": {
-    "message": "Description"
   },
   "thread-issues.target.edit-name": {
     "message": "Edit name"
@@ -6400,12 +6430,6 @@
   },
   "thread-issues.target.edit-url": {
     "message": "Edit URL"
-  },
-  "thread-issues.target.gallery-images": {
-    "message": "Gallery images"
-  },
-  "thread-issues.target.summary": {
-    "message": "Summary"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Latest news from Modrinth"

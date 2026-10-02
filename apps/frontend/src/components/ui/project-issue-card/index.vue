@@ -107,11 +107,11 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	CheckCircleIcon,
 	CheckIcon,
 	CircleIcon,
-	TriangleAlertIcon,
-	CheckCircleIcon,
 	FoldVerticalIcon,
+	TriangleAlertIcon,
 	UnfoldVerticalIcon,
 } from '@modrinth/assets'
 import { issueTargetLabels } from '@modrinth/moderation/src/data/issues/component-builders/targets'

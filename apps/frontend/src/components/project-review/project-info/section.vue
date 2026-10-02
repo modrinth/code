@@ -29,8 +29,8 @@ import { injectReviewPanels } from '~/providers/project-review/review-panels'
 import { injectReviewPreviousIssues } from '~/providers/project-review/review-previous-issues'
 
 import FindingsCountBadge from '../review-panel/findings-count-badge.vue'
-import ReReviewFindingsCountBadge from '../review-panel/re-review-findings-count-badge.vue'
 import ReviewPanel from '../review-panel/index.vue'
+import ReReviewFindingsCountBadge from '../review-panel/re-review-findings-count-badge.vue'
 
 const props = defineProps<{
 	heading: string

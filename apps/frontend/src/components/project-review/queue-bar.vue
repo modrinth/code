@@ -87,7 +87,6 @@
 import {
 	KeyboardIcon,
 	LeftArrowIcon,
-	LogOutIcon,
 	PanelTopCloseIcon,
 	PanelTopOpenIcon,
 	RightArrowIcon,

@@ -175,7 +175,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
-	ArrowUpRightIcon,
 	ChevronDownIcon,
 	EditIcon,
 	PlusIcon,
@@ -184,13 +183,11 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
-import { issueTargetLabels } from '@modrinth/moderation/src/data/issues/component-builders/targets'
 import {
 	Button,
 	commonMessages,
 	defineMessages,
 	MarkdownEditor,
-	TagItem,
 	Tooltip,
 	useVIntl,
 } from '@modrinth/ui'
@@ -319,14 +316,6 @@ const needsToggle = computed(() =>
 	panels.validationErrors.value.some(
 		({ issueId, key }) => issueId === issue.value.id && key === 'toggle',
 	),
-)
-const facetTypes = computed(
-	() =>
-		panels.activeIssues.value
-			.find(({ id }) => id === issue.value.id)
-			?.facets?.map(({ what }) => what.type) ??
-		previousIssue.value?.facets.map(({ what }) => what.type) ??
-		[],
 )
 function removeIssue() {
 	if (pending.value || props.disabled) return

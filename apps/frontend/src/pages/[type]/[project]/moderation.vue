@@ -158,8 +158,8 @@ import { useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { computed, watch } from 'vue'
 
-import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
 import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
+import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
 import {
 	canResubmitProjectForReview,
 	canSubmitProjectForReview,

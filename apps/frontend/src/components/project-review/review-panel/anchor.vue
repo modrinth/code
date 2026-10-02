@@ -37,8 +37,8 @@ import { injectReviewPreviousIssues } from '~/providers/project-review/review-pr
 
 import { injectReviewContext } from './context'
 import FindingsCountBadge from './findings-count-badge.vue'
-import ReReviewFindingsCountBadge from './re-review-findings-count-badge.vue'
 import Highlight from './highlight.vue'
+import ReReviewFindingsCountBadge from './re-review-findings-count-badge.vue'
 
 const props = withDefaults(
 	defineProps<{
