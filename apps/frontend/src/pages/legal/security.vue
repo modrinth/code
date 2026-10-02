@@ -21,9 +21,7 @@
 			<li>a brief description of the vulnerability</li>
 			<li>
 				optionally the type of vulnerability and any related
-				<a href="https://community.owasp.org/vulnerabilities/">
-					OWASP category
-				</a>
+				<a href="https://community.owasp.org/vulnerabilities/"> OWASP category </a>
 			</li>
 			<li>non-destructive exploitation details</li>
 		</ul>

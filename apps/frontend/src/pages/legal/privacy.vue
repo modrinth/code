@@ -122,9 +122,7 @@
 		<h3>Creator Monetization Program data</h3>
 		<p>
 			When you sign up for our
-			<nuxt-link to="/news/article/creator-monetization">
-				Creator Monetization Program</nuxt-link
-			>
+			<nuxt-link to="/news/article/creator-monetization"> Creator Monetization Program</nuxt-link>
 			(the "CMP"), we collect:
 		</p>
 		<ul>
