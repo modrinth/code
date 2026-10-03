@@ -38,7 +38,6 @@ import { reuploadReviewPanel } from './reupload'
 import { rulesReviewPanel } from './rules'
 import { serverReviewPanel } from './server'
 import { slugReviewPanel } from './slug'
-import { statusAlertsReviewPanel } from './status-alerts'
 import { summaryReviewPanel } from './summary'
 import { titleReviewPanel } from './title'
 import { undefinedProjectReviewPanel } from './undefined-project'
@@ -82,7 +81,6 @@ export const reviewPanels = {
 	're-review': reReviewReviewPanel,
 	reupload: reuploadReviewPanel,
 	rules: rulesReviewPanel,
-	'status-alerts': statusAlertsReviewPanel,
 	'undefined-project': undefinedProjectReviewPanel,
 	versions: versionsReviewPanel,
 } satisfies Record<string, Panel>

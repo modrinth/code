@@ -3,7 +3,7 @@
 		ref="messageBox"
 		class="relative flex min-h-0 shrink-0 flex-col gap-1.5 border-0 border-t border-solid border-divider py-2.5 pb-px"
 		:style="{
-			height: `${height ?? 220}px`,
+			height: `${height ?? 300}px`,
 			maxHeight: 'max(180px, calc(100% - 300px))',
 		}"
 	>
@@ -27,10 +27,11 @@
 			@keydown.down.prevent="setHeight(measuredHeight - 20)"
 		/>
 		<div class="message-editor min-h-0 flex-1 overflow-hidden" @keydown="onKeydown">
-			<MarkdownEditor
+			<TemplateMarkdownEditor
 				ref="editor"
 				v-model="draft"
 				:disabled="pending"
+				:templates="templates"
 				:placeholder="formatMessage(messages.replyPlaceholder)"
 				:on-image-upload="uploadImage"
 				:heading-buttons="false"
@@ -58,23 +59,33 @@
 
 <script setup lang="ts">
 import { ReplyIcon, SpinnerIcon, StickyNotePlusIcon } from '@modrinth/assets'
-import { moderationSettings } from '@modrinth/moderation'
-import { Button, defineMessages, MarkdownEditor, useVIntl } from '@modrinth/ui'
+import { getMessageTemplates, moderationSettings } from '@modrinth/moderation'
+import { Button, defineMessages, useVIntl } from '@modrinth/ui'
 import { useElementSize } from '@vueuse/core'
-import { nextTick, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
+import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
+import TemplateMarkdownEditor from './template-markdown-editor.vue'
+
 const settings = useModerationSettings()
+const { project, projectV2 } = injectProjectReviewPageContext()
+const { formatMessage } = useVIntl()
+const templates = computed(() => {
+	const current = project.value
+	const legacy = projectV2.value
+	if (!current || !legacy || current.id !== legacy.id) return []
+	return getMessageTemplates({ project: current, projectV2: legacy })
+})
 const { draft, pending, canSubmit, loadingAction, submit, uploadImage } = injectReviewSubmission()
-const editor = ref<InstanceType<typeof MarkdownEditor>>()
+const editor = ref<InstanceType<typeof TemplateMarkdownEditor>>()
 const messageBox = ref<HTMLElement | null>(null)
 const { height: measuredHeight } = useElementSize(messageBox)
 const height = ref<number | null>(null)
 const resizeStart = ref<{ y: number; height: number } | null>(null)
 const maxHeight = ref(400)
-const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	resizeMessageBox: {
 		id: 'project-review.message-box.resize',

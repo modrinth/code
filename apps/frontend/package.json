@@ -38,6 +38,9 @@
 		"wrangler": "^4.115.0"
 	},
 	"dependencies": {
+		"@codemirror/commands": "^6.3.2",
+		"@codemirror/language": "^6.9.3",
+		"@codemirror/view": "^6.22.1",
 		"@contentauth/c2pa-web": "^0.13.1",
 		"@formatjs/intl-localematcher": "^0.5.4",
 		"@ltd/j-toml": "^1.38.0",

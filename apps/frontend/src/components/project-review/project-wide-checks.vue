@@ -100,7 +100,7 @@ function stopActionsResize(event: PointerEvent) {
 }
 
 const { resolve } = injectReviewPanels()
-const targets = ['reupload', 'rules', 'post-approval', 'status-alerts'] as const
+const targets = ['reupload', 'rules', 'post-approval'] as const
 type ActionTarget = (typeof targets)[number]
 const selectedTarget = ref<ActionTarget>('reupload')
 const { registerRoute } = injectReviewContext()

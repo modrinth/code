@@ -247,11 +247,16 @@
 					<label class="label" :for="previewId">
 						{{ formatMessage(messages.editorPreviewToggleLabel) }}
 					</label>
-					<slot name="after-preview" />
+					<slot name="after-preview" :preview-mode="previewMode" />
 				</div>
 			</div>
 		</div>
-		<InputFrame :class="{ hide: previewMode }" :disabled="disabled" multiline>
+		<InputFrame
+			:class="{ hide: previewMode }"
+			:disabled="disabled"
+			multiline
+			@mousedown="focusEditorFrame"
+		>
 			<div ref="editorRef" class="min-w-0 w-full flex-1 self-stretch" />
 		</InputFrame>
 		<div v-if="!previewMode && (!hideMarkdownHint || maxLength)" class="info-blurb mt-2">
@@ -303,7 +308,7 @@
 <script setup lang="ts">
 import { history, historyKeymap, indentWithTab } from '@codemirror/commands'
 import { markdown } from '@codemirror/lang-markdown'
-import { Compartment, EditorState } from '@codemirror/state'
+import { Compartment, EditorState, type Extension } from '@codemirror/state'
 import { EditorView, keymap, placeholder as cm_placeholder } from '@codemirror/view'
 import {
 	AlignLeftIcon,
@@ -554,6 +559,7 @@ const messages = defineMessages({
 const props = withDefaults(
 	defineProps<{
 		modelValue: string
+		extensions?: Extension[]
 		disabled?: boolean
 		headingButtons?: boolean
 		hideFormattingButtons?: boolean
@@ -588,10 +594,30 @@ const editorRef = ref<HTMLDivElement>()
 let editor: EditorView | null = null
 let isDisabledCompartment: Compartment | null = null
 let editorThemeCompartment: Compartment | null = null
+const extensionsCompartment = new Compartment()
 
 const previewId = useId()
 
-const emit = defineEmits(['update:modelValue'])
+function focusEditorFrame(event: MouseEvent) {
+	if (
+		event.button !== 0 ||
+		props.disabled ||
+		previewMode.value ||
+		!editor ||
+		editor.contentDOM.contains(event.target as Node)
+	)
+		return
+	const position =
+		editor.posAtCoords({ x: event.clientX, y: event.clientY }) ?? editor.state.doc.length
+	editor.dispatch({ selection: { anchor: position } })
+	editor.focus()
+	event.preventDefault()
+}
+
+const emit = defineEmits<{
+	'update:modelValue': [value: string]
+	ready: [view: EditorView]
+}>()
 const resolvedPlaceholder = computed(
 	() => props.placeholder ?? formatMessage(messages.editorPlaceholder),
 )
@@ -606,7 +632,7 @@ function createEditorTheme(disabled = props.disabled) {
 			outline: 'none',
 		},
 		'.cm-content': {
-			minHeight: props.minHeight ? `${props.minHeight}px` : '200px',
+			minHeight: props.minHeight ? `max(100%, ${props.minHeight}px)` : 'max(100%, 200px)',
 			padding: '0',
 			caretColor: 'var(--color-contrast)',
 			width: '100%',
@@ -710,6 +736,7 @@ onMounted(() => {
 	const editorState = EditorState.create({
 		extensions: [
 			EditorView.lineWrapping,
+			extensionsCompartment.of(props.extensions ?? []),
 			eventHandlers,
 			updateListener,
 			keymap.of([indentWithTab]),
@@ -740,7 +767,15 @@ onMounted(() => {
 			insert: props.modelValue,
 		},
 	})
+	emit('ready', editor)
 })
+
+watch(
+	() => props.extensions,
+	(extensions) => {
+		editor?.dispatch({ effects: extensionsCompartment.reconfigure(extensions ?? []) })
+	},
+)
 
 onBeforeUnmount(() => {
 	editor?.destroy()

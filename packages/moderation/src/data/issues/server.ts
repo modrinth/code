@@ -2,9 +2,7 @@ import { ServerIcon } from '@modrinth/assets'
 
 import { projectHasCustomServerModpack } from '../../utils'
 import excessiveLanguagesMessage from '../messages/checklist/messages/rules/excessive-languages.md'
-import temporaryServerMessage from '../messages/checklist/messages/status-alerts/temporary-server.md'
 import { issue, markdown, panel, section, text, toggle } from './component-builders/builders'
-import { IssuePriority } from './component-builders/priority'
 import { issueTargets } from './component-builders/targets'
 import { metadataGameVersionsIssue } from './metadata'
 import {
@@ -23,15 +21,6 @@ export const serversExcessiveLanguagesIssue = issue({
 	suggestedStatus: 'flagged',
 })
 
-export const serversTemporaryServerIssue = issue({
-	id: 'status-alerts-temporary-server',
-	priority: IssuePriority.Alerts,
-	title: 'Temporary server',
-	category: 'Project wide',
-	message: temporaryServerMessage,
-	suggestedStatus: 'flagged',
-})
-
 export const serverReviewPanel = panel({
 	title: 'Server details',
 	hint: "Are there any issues with this project's server details?",
@@ -45,18 +34,9 @@ export const serverReviewPanel = panel({
 		id: 'servers-excessive-languages',
 	}),
 	toggle({
-		issue: serversTemporaryServerIssue,
-		label: 'Temporary server',
-		shown: ({ projectV3 }) =>
-			['aternos', 'minekeep', 'minehut'].some((host) =>
-				projectV3.minecraft_java_server?.address?.includes(host),
-			),
-	}),
-	toggle({
 		issue: reuploadIdentityVerificationServerIssue,
 		label: 'Verify Identity',
 	}),
-
 	toggle({
 		issue: metadataGameVersionsIssue,
 		label: 'Game Versions',

@@ -1,33 +1,11 @@
 import { ScaleIcon } from '@modrinth/assets'
 
-import issueWarningMessage from '../messages/checklist/messages/post-approval/issue-warning.md'
 import metadataIssueMessage from '../messages/checklist/messages/post-approval/metadata-issue.md'
 import metadataIssueDependenciesMessage from '../messages/checklist/messages/post-approval/metadata-issue/dependencies.md'
 import metadataIssueLicenseMessage from '../messages/checklist/messages/post-approval/metadata-issue/license.md'
 import metadataIssueLoadersMessage from '../messages/checklist/messages/post-approval/metadata-issue/loaders.md'
 import metadataIssueMcVersionsMessage from '../messages/checklist/messages/post-approval/metadata-issue/mc-versions.md'
-import missedDeadlineMessage from '../messages/checklist/messages/post-approval/missed-deadline.md'
 import { issue, panel, section, text, toggle } from './component-builders/builders'
-import { IssuePriority } from './component-builders/priority'
-
-export const postApprovalIssueWarningIssue = issue({
-	id: 'post-approval-issue-warning',
-	priority: IssuePriority.Last,
-	title: 'Post-approval issue warning',
-	category: 'Project wide',
-	message: issueWarningMessage,
-	suggestedStatus: 'approved',
-})
-
-export const postApprovalMissedDeadlineIssue = issue({
-	id: 'post-approval-missed-deadline',
-	priority: IssuePriority.Last,
-	title: 'Missed review deadline',
-	category: 'Project wide',
-	message: ({ getTextValue }) =>
-		missedDeadlineMessage.replaceAll('%STATUS%', () => getTextValue('status')),
-	suggestedStatus: 'flagged',
-})
 
 export const postApprovalMetadataIssueIssue = issue({
 	id: 'post-approval-metadata-issue',
@@ -65,27 +43,9 @@ export const postApprovalReviewPanel = panel({
 	shown: ({ projectV3 }) => projectV3.status === 'approved',
 }).content(
 	toggle({
-		issue: postApprovalIssueWarningIssue,
-		label: 'Issue warning',
-	}),
-	toggle({
-		issue: postApprovalMissedDeadlineIssue,
-		label: 'Missed due date',
-	}),
-	toggle({
 		issue: postApprovalMetadataIssueIssue,
 		label: 'Incorrect metadata',
 	}),
-	section({
-		shown: (ctx) => ctx.selected.issueIds.includes(postApprovalMissedDeadlineIssue.id),
-	}).content(
-		text({
-			issue: postApprovalMissedDeadlineIssue,
-			id: 'status',
-			label: 'What status is the project being set to?',
-			required: true,
-		}),
-	),
 	section({
 		shown: (ctx) => ctx.selected.issueIds.includes(postApprovalMetadataIssueIssue.id),
 	}).content(

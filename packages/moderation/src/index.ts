@@ -1,5 +1,12 @@
 export { useStages } from './data/checklist'
 export { default as keybinds } from './data/keybinds'
+export {
+	getMessageTemplates,
+	messageLibrary,
+	type MessageLibraryContext,
+	type MessageLibraryEntry,
+	type MessageTemplate,
+} from './data/message-library'
 export * from './data/nags/index.ts'
 export { default as attributionQuickReplies } from './data/quick-replies/permissions-quick-replies'
 export { default as reportQuickReplies } from './data/quick-replies/report-quick-replies'
