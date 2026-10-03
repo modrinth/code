@@ -59,9 +59,9 @@ import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewMessages } from '~/providers/project-review/review-messages'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
 
+import { injectProjectReviewContext } from './layout/context'
 import { projectReviewMessages as messages } from './messages'
 import ProjectActions from './project-actions.vue'
-import { injectProjectReviewContext } from './layout/context'
 
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()

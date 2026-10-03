@@ -138,8 +138,8 @@ import {
 } from '@modrinth/ui'
 import { type ComponentPublicInstance, computed, nextTick, useId } from 'vue'
 
-import type { ReviewTarget } from '~/providers/project-review/review'
 import { useModerationSettings } from '~/composables/moderation'
+import type { ReviewTarget } from '~/providers/project-review/review'
 import {
 	injectReviewPanels,
 	type ReviewPanelBinding,

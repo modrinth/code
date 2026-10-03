@@ -11,15 +11,30 @@ import type {
 	UploadState,
 } from '../types'
 
-export interface DirectoryEntries {
-	items: ComputedRef<FileItem[]>
+export type FileInfo<T extends FileTypes = FileTypes> = Pick<FileItem, "path"> & { name: string, type: T};
+
+export interface FileItemResult<R, T extends FileTypes> extends FileInfo<T> {
+	data: ComputedRef<R>
 	isLoading: Ref<boolean>
 	loadError: Ref<Error | null>
 }
 
-export interface DirectoryQuery extends DirectoryEntries {
+export interface FileQueryResult extends FileItemResult<any, FileTypes> {
 	filesReadyPending: ComputedRef<boolean>
 }
+
+export interface DirectoryResult extends FileItemResult<FileItem[], 'directory'> {}
+
+export interface FileResult extends FileItemResult<ArrayBuffer | null, 'file'> {}
+
+export type FileTypes = FileItem['type'];
+
+export type FileItemResultFrom<T extends FileTypes> =
+	T extends 'directory'
+		? DirectoryResult
+		: T extends 'file'
+			? FileResult
+			: never
 
 /**
  * Lazily loaded, cached directory listings used by the sidebar tree. Paths are absolute
@@ -27,38 +42,33 @@ export interface DirectoryQuery extends DirectoryEntries {
  */
 export interface DirectoryTree {
 	/** Returns the (cached) listing for `path`, starting to load it on first access. */
-	get: (path: string) => DirectoryEntries
-	prefetch: (path: string) => void
+	get: <T extends FileTypes>(file: FileInfo<T>) => FileItemResultFrom<T>
+	prefetch: <T extends FileTypes>(file: FileInfo<T>) => void
 	/** Absolute paths of the directories expanded in the tree. Owned by the host so it survives remounts. */
 	expandedEntries: Ref<string[]>
 }
 
 export interface FileManagerContext {
-	currentItems: ComputedRef<FileItem[]>
+	currentFile: ComputedRef<FileInfo>
+	currentDirectory: ComputedRef<FileInfo<'directory'>>
+
 	directoryTree: DirectoryTree
 
 	loading: ComputedRef<boolean>
 	error: ComputedRef<Error | null>
 
-	currentPath: Ref<string>
-	navigateTo: (path: string) => void
+	navigateTo: (file: FileInfo) => void
 
-	editingFile: Ref<EditingFile | null>
-	startEditing: (file: EditingFile) => void
-	stopEditing: () => void
+	createItem: (name: string, type: 'file' | 'directory') => Promise<FileInfo | null>
+	renameItem: (file: FileInfo, newName: string) => Promise<FileInfo | null>
+	moveItem: (file: FileInfo, destination: string) => Promise<FileInfo | null>
+	deleteItem: (file: FileInfo, recursive: boolean) => Promise<void>
 
-	createItem: (name: string, type: 'file' | 'directory') => Promise<void>
-	renameItem: (path: string, newName: string) => Promise<void>
-	moveItem: (source: string, destination: string) => Promise<void>
-	deleteItem: (path: string, recursive: boolean) => Promise<void>
-
-	readFile: (path: string) => Promise<string>
-	readFileAsBlob: (path: string) => Promise<Blob>
-	writeFile: (path: string, content: string) => Promise<void>
-	downloadFile: (path: string, fileName: string) => Promise<void>
+	writeFile: (file: FileInfo, content: ArrayBuffer) => Promise<void>
+	downloadFile: (file: FileInfo) => Promise<void>
 	statFile?: (path: string) => Promise<Kyros.Files.v1.FileStatResponse>
-	zipFolder?: (path: string) => Promise<void>
-	zipPaths?: (parent: string, include: string[], target: string) => Promise<void>
+	zipFolder?: (file: FileInfo<'directory'>) => Promise<void>
+	zipPaths?: (files: FileInfo[], targetDirectory: FileInfo<'directory'>, archiveName: string) => Promise<void>
 
 	uploadFiles: (files: File[]) => void
 	cancelUpload?: () => void
@@ -70,7 +80,7 @@ export interface FileManagerContext {
 	isBusy?: Ref<boolean> | ComputedRef<boolean>
 	busyTooltip?: Ref<string | undefined> | ComputedRef<string | undefined>
 	busyWarning?: Ref<string | null> | ComputedRef<string | null>
-	isReadOnly?: (path: string) => boolean
+	isReadOnly?: (file: FileInfo | null) => boolean
 	readOnlyReason?: Ref<string> | ComputedRef<string>
 
 	extractFile?: (
@@ -80,9 +90,6 @@ export interface FileManagerContext {
 	) => Promise<ExtractDryRunResult | void>
 	activeOperations?: Ref<FileOperation[]> | ComputedRef<FileOperation[]>
 	dismissOperation?: (id: string, action: 'dismiss' | 'cancel') => void
-
-	prefetchDirectory?: (path: string) => void
-	prefetchFile?: (path: string) => void
 
 	showInstallFromUrl?: boolean
 	basePath?: Ref<string> | ComputedRef<string>

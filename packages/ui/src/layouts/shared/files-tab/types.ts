@@ -1,3 +1,5 @@
+import type {FileInfo} from "#ui/layouts/shared/files-tab/providers/file-manager.ts";
+
 export interface FileItem {
 	name: string
 	type: 'file' | 'directory' | 'symlink'
@@ -15,7 +17,7 @@ export interface EditingFile {
 	path: string
 }
 
-export type FileSortField = 'name' | 'size' | 'created' | 'modified'
+export type FileSortField = 'name' | 'size' | 'items' | 'created' | 'modified'
 
 export type FileViewFilter = 'all' | 'filesOnly' | 'foldersOnly'
 
@@ -34,21 +36,16 @@ export interface FileOperation {
 
 export interface UndoableOperation {
 	type: 'move' | 'rename'
-	itemType: string
-	fileName: string
+	prevFile: FileInfo
+	newFile: FileInfo
 }
 
 export interface MoveOperation extends UndoableOperation {
 	type: 'move'
-	sourcePath: string
-	destinationPath: string
 }
 
 export interface RenameOperation extends UndoableOperation {
 	type: 'rename'
-	path: string
-	oldName: string
-	newName: string
 }
 
 export type Operation = MoveOperation | RenameOperation

@@ -1,6 +1,7 @@
 <template>
 	<FileActionBar  ref="baseRef" v-bind="{ ...$props, ...$attrs }">
-		<nav v-if="breadcrumbs != null"
+		<nav
+v-if="breadcrumbs != null"
 		 	:aria-label="formatMessage(messages.breadcrumbNavigation)"
 		 	class="m-0 -ml-2 flex min-w-0 flex-shrink items-center p-0"
 		>
@@ -112,12 +113,13 @@
 
 <script setup lang="ts">
 
-import FileActionBar from "#ui/layouts/shared/files-tab/components/FileActionBar.vue";
-import type {Properties, EmitCallbacks} from "#ui/layouts/shared/files-tab/components/FileActionBar.vue";
-import {Button, IconButton} from "#ui/components/base/buttons";
 import {ChevronLeftIcon, ChevronRightIcon, HomeIcon} from "@modrinth/assets";
 import {onBeforeUnmount, onMounted, ref, watch} from "vue";
+
+import {Button, IconButton} from "#ui/components/base/buttons";
 import {defineMessages, useVIntl} from "#ui/composables";
+import type {EmitCallbacks,Properties} from "#ui/layouts/shared/files-tab/components/FileActionBar.vue";
+import FileActionBar from "#ui/layouts/shared/files-tab/components/FileActionBar.vue";
 
 const { formatMessage } = useVIntl()
 

@@ -1628,8 +1628,14 @@
   "files.navbar.breadcrumb-navigation": {
     "defaultMessage": "Breadcrumb navigation"
   },
+  "files.navbar.collapse": {
+    "defaultMessage": "Collapse"
+  },
   "files.navbar.create-new": {
     "defaultMessage": "Create new..."
+  },
+  "files.navbar.expand": {
+    "defaultMessage": "Expand"
   },
   "files.navbar.file-navigation": {
     "defaultMessage": "File navigation"
@@ -1721,14 +1727,26 @@
   "files.row.parent-folder": {
     "defaultMessage": "Parent folder"
   },
+  "files.row.upload-or-create": {
+    "defaultMessage": "New Entry"
+  },
+  "files.table-header.columns": {
+    "defaultMessage": "Columns"
+  },
   "files.table-header.created": {
     "defaultMessage": "Created"
+  },
+  "files.table-header.items": {
+    "defaultMessage": "Items"
   },
   "files.table-header.modified": {
     "defaultMessage": "Modified"
   },
   "files.table-header.name": {
     "defaultMessage": "Name"
+  },
+  "files.table-header.show-details": {
+    "defaultMessage": "Show details"
   },
   "files.table-header.size": {
     "defaultMessage": "Size"
@@ -2764,6 +2782,9 @@
   },
   "label.select-all": {
     "defaultMessage": "Select all"
+  },
+  "label.select-entry": {
+    "defaultMessage": "Select Entry"
   },
   "label.selected": {
     "defaultMessage": "Selected"

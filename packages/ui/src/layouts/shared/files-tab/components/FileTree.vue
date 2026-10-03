@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-col gap-0.5" :aria-label="formatMessage(messages.fileTree)">
-		<template v-for="row in rows" :key="row.key">
+		<template v-for="(row, index) in rows" :key="row.key">
 			<div
 				v-if="row.kind === 'loading'"
 				class="flex h-9 items-center gap-2 text-sm text-secondary"
@@ -16,8 +16,8 @@
 			>
 				{{ formatMessage(row.depth === 0 ? messages.emptyFolder : messages.emptySubfolder) }}
 			</div>
-			<FileTableRow
-				v-else
+			<FileRow
+				v-else-if="row.kind === 'item'"
 				:count="row.item.count"
 				:created="row.item.created"
 				:modified="row.item.modified"
@@ -25,18 +25,20 @@
 				:path="row.item.path"
 				:type="row.item.type"
 				:size="row.item.size"
-				:index="0"
-				:is-last="false"
+				:index="index"
+				:is-last="index + 1 == rows.length"
 				:selected="ui.selectedItems.value.has(row.item.path)"
-				:write-disabled="ui.isBusy.value || !!ctx.isReadOnly?.(row.item.path)"
+				:write-disabled="ui.isBusy.value || !!ctx.isReadOnly?.(row.item)"
 				:write-disabled-tooltip="
-					ctx.isReadOnly?.(row.item.path) ? ctx.readOnlyReason?.value : ui.busyTooltip.value
+					ctx.isReadOnly?.(row.item) ? ctx.readOnlyReason?.value : ui.busyTooltip.value
 				"
-				:show-details="false"
+				has-hidden-details
 				:selection-within-action-menu="true"
 				compact
 				:depth="row.depth"
 				:expanded="row.expanded"
+				:expandable="row.expandable"
+				is-tree-row
 				:active="row.path === activePath"
 				:active-guide-level="activeGuideLevel(row.path)"
 				@extract="() => ui.handleExtractItem(row.item)"
@@ -46,13 +48,15 @@
 				@zip="() => ui.handleZip(row.item)"
 				@move="() => ui.showMoveModal(row.item)"
 				@move-direct-to="ui.handleDirectMove"
-				@edit="() => ui.handleEditFile(row.item)"
+				@edit="() => ui.handleNavigateTo(row.item)"
 				@navigate="() => openDirectory(row.path, row.item)"
 				@open-in-new-tab="() => ui.handleOpenInNewTab(row.item)"
 				@toggle-expand="() => toggleExpanded(row.path)"
 				@hover="() => prefetch(row)"
 				@contextmenu="ui.handleContextMenu"
 				@toggle-select="() => ui.toggleItemSelection(row.item)"
+				@create="ui.showCreateModal"
+				@upload="ui.initiateFileUpload"
 			/>
 		</template>
 	</div>
@@ -63,16 +67,24 @@ import { SpinnerIcon } from '@modrinth/assets'
 import { computed, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import {infoFrom, parentInfoFrom} from "#ui/layouts/shared/files-tab/utils.ts";
 import { canOpenInFileEditor } from '#ui/utils/file-extensions'
 
-import { directoryOf, normalizeFilePath } from '../composables/file-tabs'
 import { injectFileBrowserUI } from '../providers/file-browser-ui'
 import { injectFileManager } from '../providers/file-manager'
 import type { FileItem } from '../types'
-import FileTableRow from './FileTableRow.vue'
+import FileRow from './FileRow.vue'
 
 type TreeRow =
-	| { kind: 'item'; key: string; item: FileItem; path: string; depth: number; expanded: boolean }
+	| {
+			kind: 'item'
+			key: string
+			item: FileItem
+			path: string
+			depth: number
+			expanded: boolean
+			expandable: boolean
+	  }
 	| { kind: 'loading' | 'empty'; key: string; depth: number }
 
 const ROOT_PATH = '/'
@@ -103,9 +115,9 @@ const ui = injectFileBrowserUI()
 const tree = ctx.directoryTree
 
 const activePath = computed(() => ui.fileTabs.activeLocation.value.path)
-const activeDirectory = computed(() => directoryOf(ui.fileTabs.activeLocation.value))
+const activeDirectory = computed(() => parentInfoFrom(ui.fileTabs.activeLocation.value))
 const activeDirectoryDepth = computed(
-	() => activeDirectory.value.split('/').filter(Boolean).length,
+	() => activeDirectory.value.path.split('/').filter(Boolean).length,
 )
 
 function activeGuideLevel(path: string) {
@@ -115,14 +127,19 @@ function activeGuideLevel(path: string) {
 const expandedPaths = computed(() => new Set(tree.expandedEntries.value))
 const query = computed(() => ui.searchQuery.value.trim().toLowerCase())
 
+/** Directories known to be empty can't be expanded; an unknown count stays expandable. */
+function isExpandable(item: FileItem) {
+	return item.type === 'directory' && item.count !== 0
+}
+
 function compareEntries(a: FileItem, b: FileItem) {
 	if (a.type !== b.type) return a.type === 'directory' ? -1 : 1
 	return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
 }
 
 function collectRows(path: string, depth: number): TreeRow[] {
-	const entries = tree.get(path)
-	const items = entries.items.value
+	const entries = tree.get(infoFrom(path))
+	const items = entries.data.value
 
 	if (items.length === 0) {
 		if (entries.isLoading.value) return [{ kind: 'loading', key: `loading:${path}`, depth }]
@@ -131,9 +148,9 @@ function collectRows(path: string, depth: number): TreeRow[] {
 
 	const rows: TreeRow[] = []
 	for (const item of [...items].sort(compareEntries)) {
-		const itemPath = normalizeFilePath(item.path)
-		const expanded = item.type === 'directory' && expandedPaths.value.has(itemPath)
-		const children = expanded ? collectRows(itemPath, depth + 1) : []
+		const expandable = isExpandable(item)
+		const expanded = expandable && expandedPaths.value.has(item.path)
+		const children = expanded ? collectRows(item.path, depth + 1) : []
 
 		if (query.value) {
 			const matches = item.name.toLowerCase().includes(query.value)
@@ -141,7 +158,10 @@ function collectRows(path: string, depth: number): TreeRow[] {
 			if (!matches && !hasMatchingChild) continue
 		}
 
-		rows.push({ kind: 'item', key: itemPath, item, path: itemPath, depth, expanded }, ...children)
+		rows.push(
+			{ kind: 'item', key: item.path, item, path: item.path, depth, expanded, expandable },
+			...children,
+		)
 	}
 	return rows
 }
@@ -161,22 +181,21 @@ function toggleExpanded(path: string) {
 }
 
 function openDirectory(path: string, item: FileItem) {
-	setExpanded(path, true)
-	ui.handleNavigateToFolder(item)
+	if (isExpandable(item)) setExpanded(path, true)
+	ui.handleNavigateTo(item)
 }
 
 function prefetch(row: Extract<TreeRow, { kind: 'item' }>) {
-	if (row.item.type === 'directory') {
-		tree.prefetch(row.path)
-	} else if (canOpenInFileEditor(row.item.name)) {
-		ctx.prefetchFile?.(row.item.path)
+	const { item } = row;
+	if (item.type === 'directory' || canOpenInFileEditor(item.name)) {
+		tree.prefetch(item)
 	}
 }
 
 watch(
-	() => directoryOf(ui.fileTabs.activeLocation.value),
+	() => parentInfoFrom(ui.fileTabs.activeLocation.value),
 	(directory) => {
-		const segments = directory.split('/').filter(Boolean)
+		const segments = directory.path.split('/').filter(Boolean)
 		const missing = segments
 			.map((_, index) => `/${segments.slice(0, index + 1).join('/')}`)
 			.filter((path) => !expandedPaths.value.has(path))

@@ -1,12 +1,11 @@
 import type { Component, ComputedRef, Ref, ShallowRef } from 'vue'
 
 import type { ButtonMenuOption } from '#ui/components'
+import type {FileInfo} from "#ui/layouts/shared/files-tab/providers/file-manager.ts";
 import { createContext } from '#ui/providers/create-context'
 
 import type { FileTabs } from '../composables/file-tabs'
 import type { FileItem, FileSortField } from '../types'
-
-export type FileInfo = Pick<FileItem, 'name' | 'type' | 'path'>
 
 /**
  * API exposed by each tab's file editor, registered on `FileTabs` on mount
@@ -62,12 +61,11 @@ export interface FileBrowserUIContext {
 	toggleFind: () => void
 
 	navigateToSegment: (index: number) => void
-	handleNavigateToFolder: (item: FileInfo) => void
-	handleEditFile: (item: FileInfo) => void
+	handleNavigateTo: (item: FileInfo) => void
 	handleOpenInNewTab: (item: FileInfo) => void
 	handleEditorClose: () => Promise<void>
-	handlePrefetchHome: () => void
-	handleItemHover: (item: FileInfo) => void
+	handleHomePrefetch: () => void
+	handleItemPrefetch: (item: FileInfo) => void
 
 	showCreateModal: (type: 'file' | 'directory') => void
 	showRenameModal: (item: FileItem) => void
@@ -78,7 +76,7 @@ export interface FileBrowserUIContext {
 
 	handleDownload: (item: FileItem) => Promise<void>
 	handleZip: (item: FileItem) => Promise<void>
-	handleDirectMove: (moveData: FileInfo & { destination: string }) => void
+	handleDirectMove: (moveData: FileInfo, destination: string) => Promise<void>
 	handleExtractItem: (item: FileInfo) => Promise<void>
 
 	handleDroppedFiles: (files: File[]) => void

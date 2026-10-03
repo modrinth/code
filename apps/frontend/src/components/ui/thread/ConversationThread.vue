@@ -175,12 +175,12 @@
 								<template v-if="isStaff(auth.user)" #after-preview>
 									<Tabs
 										v-model:value="editorMode"
-										@change="openEditor($event.value)"
 										class="!ml-auto !h-7 shrink-0 !gap-0.5 overflow-hidden !rounded-lg [&>button]:!rounded-md [&>button]:!px-2 [&>button]:!text-xs"
 										:tabs="[
 											{ value: 'reply', label: formatMessage(messages.actionReply) },
 											{ value: 'note', label: formatMessage(messages.privateNoteTab) },
 										]"
+										@change="openEditor($event.value)"
 									>
 										<template v-if="reviewKeybinds" #after-label="{ tab }">
 											<KbdChip :keybind="`review-tab-${tab.value}`" class="px-1" />

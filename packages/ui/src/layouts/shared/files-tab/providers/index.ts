@@ -1,6 +1,5 @@
 export type {
-	DirectoryEntries,
-	DirectoryQuery,
+	DirectoryResult,
 	DirectoryTree,
 	FileManagerContext,
 } from './file-manager'

@@ -1,28 +1,36 @@
 <script setup lang="ts">
-import type { Kyros } from '@modrinth/api-client'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, effectScope, onMounted, onScopeDispose, type Ref, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import type {Kyros} from '@modrinth/api-client'
+import {useMutation, useQuery, useQueryClient} from '@tanstack/vue-query'
+import {
+	computed,
+	type ComputedRef, effectScope, markRaw, onMounted, onScopeDispose, type Ref, ref, watch
+} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
 
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
-import { useReadyState } from '#ui/composables'
-import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
-import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { useServerPermissions } from '#ui/composables/server-permissions'
+import {useReadyState} from '#ui/composables'
+import {useUploadSessionUpload} from '#ui/composables/hosting/kyros-session-upload'
+import {defineMessages, useVIntl} from '#ui/composables/i18n'
+import {useServerPermissions} from '#ui/composables/server-permissions'
+import {normalizeDirectoryPath, parentInfoFrom} from "#ui/layouts";
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
-import { commonMessages } from '#ui/utils/common-messages'
+import {commonMessages} from '#ui/utils/common-messages'
 
 import FilePageLayout from '../../../shared/files-tab/layout.vue'
 import {
-	type DirectoryTree,
-	type DirectoryQuery,
-	provideFileManager
-} from '../../../shared/files-tab/providers/file-manager'
-import type { EditingFile, FileItem } from '../../../shared/files-tab/types'
+type DirectoryResult, 	type DirectoryTree,
+type FileInfo, type FileItemResult,
+type FileItemResultFrom, type FileQueryResult, type FileResult,
+	type FileTypes, 	provideFileManager} from '../../../shared/files-tab/providers/file-manager'
+import type {FileItem} from '../../../shared/files-tab/types'
+import {
+	infoFromQuery, type QueryableFileTypes,
+	queryFilterFor, queryKeyFor
+} from "./utils";
 
 const props = defineProps<{
 	showDebugInfo?: boolean
@@ -47,9 +55,9 @@ const fileUploadSession = useUploadSessionUpload({
 	uploadState,
 	cancelUpload: cancelUploadRef,
 })
-const { addNotification } = injectNotificationManager()
-const { formatMessage } = useVIntl()
-const { canWriteFiles, canUsePowerActions, permissionDeniedMessage } = useServerPermissions()
+const {addNotification} = injectNotificationManager()
+const {formatMessage} = useVIntl()
+const {canWriteFiles, canUsePowerActions, permissionDeniedMessage} = useServerPermissions()
 
 const route = useRoute()
 const router = useRouter()
@@ -94,116 +102,133 @@ const busyWarning = computed(() =>
 
 // Path & navigation
 const currentPath = computed(() => (typeof route.query.path === 'string' ? route.query.path : '/'))
+const currentLocation = ref<FileInfo>(infoFromQuery(route));
 
-function navigateTo(path: string) {
-	const { editing: _, ...query } = route.query
-	router.push({ query: { ...query, path } })
+function navigateTo(file: FileInfo) {
+	if (file.type == 'file') {
+		router.push({query: {...route.query, path: currentPath.value, editing: 'true'}})
+	} else {
+		const {editing: _, ...query} = route.query;
+		router.push({query: {...query, path: file.path}})
+	}
+
+	currentLocation.value = file;
 }
 
-// Editing state (synced with URL)
-const editingFile = ref<EditingFile | null>(null)
-
-function startEditing(file: EditingFile) {
-	editingFile.value = file
-	router.push({ query: { ...route.query, path: currentPath.value, editing: file.path } })
-}
-
-function stopEditing() {
-	editingFile.value = null
-	const newQuery = { ...route.query }
-	delete newQuery.editing
-	router.replace({ query: newQuery })
-}
-
+// TODO: MAYBE RESTRICT TO ONLY FILE EDITING?
 // Sync editing state from URL
 watch(
 	() => route.query,
 	(newQuery, oldQuery) => {
-		if (newQuery.editing && editingFile.value?.path !== newQuery.editing) {
-			editingFile.value = {
-				name: (newQuery.editing as string).split('/').pop() || '',
-				path: newQuery.editing as string,
-			}
-		} else if (oldQuery?.editing && !newQuery.editing) {
-			editingFile.value = null
+		const newInfo = infoFromQuery(newQuery);
+		const oldInfo = infoFromQuery(oldQuery);
+		if (newInfo.path != oldInfo.path) {
+			currentLocation.value = newInfo;
 		}
 	},
-	{ deep: true },
+	{deep: true},
 )
 
 // Initialize editing from URL on mount
-function initializeFileEdit() {
-	if (!route.query.editing) return
-	const filePath = route.query.editing as string
-	editingFile.value = {
-		name: filePath.split('/').pop() || '',
-		path: filePath,
-	}
+function initializeLocation() {
+	currentLocation.value = infoFromQuery(route);
 }
 
 function isVisibleFileItem(item: Kyros.Files.v0.DirectoryItem) {
 	return !item.path.split('/').includes('.modrinth-staged')
 }
 
-function queryDirectoryEntries(path: string): DirectoryQuery{
-	const {
-		data: directoryData,
-		isLoading,
-		error: loadError,
-	} = useQuery(
+type FileCache = { hash: string, buffer: ArrayBuffer }
+
+const fileQueryOptions: QueryOptions<'file', FileCache> = {
+	queryFn: async (file) => {
+		const buffer = await (await client.kyros.files_v0.downloadFile(file.path)).arrayBuffer();
+
+		const hash = await sha512(buffer)
+
+		return { hash: hash, buffer: markRaw(buffer) } as FileCache;
+	},
+	structuralSharing: (oldData, newData) => {
+		if (!oldData) return newData
+		return (oldData.hash === newData.hash) ? oldData : newData;
+	},
+};
+
+const directoryQueryOptions: QueryOptions<'directory', Kyros.Files.v0.DirectoryResponse> = {
+	queryFn: (file) => client.kyros.files_v0.listDirectory(file.path, 1, 2000),
+}
+
+function queryFileEntry(file: FileInfo<'file'>): FileResult & FileQueryResult {
+	return queryFile(file, (queryData) => computed(() => queryData.value?.buffer ?? null), fileQueryOptions);
+}
+
+// TODO: PAGE SIZE IS LIKE 2000 BUT IN CASES WHERE SOMEONE SOME HOW HAS MORE WE MAY WANT TO
+// LAZY LOAD THE REST OR SOMETHING?
+function queryDirectoryEntries(file: FileInfo<'directory'>): DirectoryResult & FileQueryResult {
+	return queryFile(
+		file,
+		(queryData) => computed<FileItem[]>(() => (queryData.value?.items ?? []).filter(isVisibleFileItem)),
+		directoryQueryOptions);
+}
+
+type QueryOptions<T extends QueryableFileTypes, Q> = {
+	queryFn: (file: FileInfo<T>) => Promise<Q>,
+	structuralSharing?: (oldData: Partial<Q> | undefined, newData: Partial<Q>) => Partial<Q>
+}
+
+function queryFile<T extends QueryableFileTypes, Q, R>(
+	fileInfo: FileInfo<T>,
+	func: (queryData: Ref<Q | undefined>) => ComputedRef<R>,
+	{ queryFn, structuralSharing }: QueryOptions<T, Q>
+): FileItemResult<R, T> & FileQueryResult {
+	const key = queryKeyFor(serverId, undefined, fileInfo);
+
+	const { data, isLoading, error: loadError } = useQuery(
 		{
-			queryKey: computed(() => ['files', serverId, path]),
-			queryFn: async () => {
-				return client.kyros.files_v0.listDirectory(path, 1, 2000)
-			},
+			queryKey: key as readonly string[],
+			queryFn: () => queryFn(fileInfo),
+			structuralSharing: structuralSharing as any,
 			staleTime: 30_000,
 		},
 		queryClient,
 	)
 
 	return {
-		items: computed<FileItem[]>(() =>
-			(directoryData.value?.items ?? []).filter(isVisibleFileItem),
-		),
+		...fileInfo,
+		data: func(data),
 		isLoading: isLoading,
-		filesReadyPending: useReadyState({ isLoading, data: directoryData }),
+		filesReadyPending: useReadyState({isLoading, data}),
 		loadError: loadError,
 	}
 }
 
-// Prefetching
-function normalizeDirectoryPath(path: string) {
-	return `/${path.split('/').filter(Boolean).join('/')}`
+async function sha512(buffer: ArrayBuffer) {
+	const hashBuffer = await crypto.subtle.digest('SHA-512', buffer);
+	return Array.from(new Uint8Array(hashBuffer))
+		.map(b => b.toString(16).padStart(2, '0'))
+		.join('');
 }
 
-function prefetchDirectory(rawPath: string) {
-	const path = normalizeDirectoryPath(rawPath)
-	queryClient.prefetchQuery({
-		queryKey: ['files', serverId, path],
-		queryFn: async () => {
-			try {
-				return await client.kyros.files_v0.listDirectory(path, 1, 2000)
-			} catch {
-				return { items: [], total: 0, current: 1 }
-			}
-		},
-		staleTime: 30_000,
-	})
+function prefetchDirectory(file: FileInfo<'directory'>) {
+	prefetchFile(file, directoryQueryOptions)
 }
 
-function prefetchFile(path: string) {
-	queryClient.prefetchQuery({
-		queryKey: ['file-content', serverId, path],
-		queryFn: async () => {
-			try {
-				const blob = await client.kyros.files_v0.downloadFile(path)
-				return await blob.text()
-			} catch {
-				return null
-			}
-		},
-		staleTime: 30_000,
-	})
+function prefetchFileEntry(file: FileInfo<'file'>) {
+	prefetchFile(file, fileQueryOptions)
+}
+
+function prefetchFile<T extends QueryableFileTypes, Q, R>(
+	file: FileInfo<T>, {queryFn, structuralSharing}: QueryOptions<T, Q>
+): void {
+	const key = queryKeyFor(serverId, undefined, file);
+	queryClient.prefetchQuery(
+		{
+			queryKey: key as readonly string[],
+			queryFn: () => queryFn(file),
+			structuralSharing: structuralSharing as any,
+			staleTime: 30_000,
+		}
+	)
 }
 
 function getQueryKey() {
@@ -214,23 +239,23 @@ const isRefreshing = ref<boolean>(false)
 
 async function refreshList() {
 	isRefreshing.value = true;
-	await queryClient.invalidateQueries({ queryKey: ['files', serverId] })
+	await queryClient.invalidateQueries({queryKey: ['files', serverId]})
 	isRefreshing.value = false;
 }
 
 // Mutations
 const deleteMutation = useMutation({
-	mutationFn: ({ path, recursive }: { path: string; recursive: boolean }) =>
-		client.kyros.files_v0.deleteFileOrFolder(path, recursive),
-	onMutate: async ({ path }) => {
+	mutationFn: async ({file, recursive}: { file: FileInfo; recursive: boolean }) =>
+		client.kyros.files_v0.deleteFileOrFolder(file.path, recursive),
+	onMutate: async ({file}) => {
 		const queryKey = getQueryKey()
-		await queryClient.cancelQueries({ queryKey })
+		await queryClient.cancelQueries({queryKey})
 		const previous = queryClient.getQueryData(queryKey)
 		queryClient.setQueryData(queryKey, (old: Kyros.Files.v0.DirectoryResponse | undefined) => {
 			if (!old) return old
-			return { ...old, items: old.items.filter((item) => item.path !== path) }
+			return {...old, items: old.items.filter((item) => item.path !== file.path)}
 		})
-		return { previous }
+		return {previous}
 	},
 	onError: (err: Error, _vars, context) => {
 		queryClient.setQueryData(getQueryKey(), context?.previous)
@@ -248,33 +273,40 @@ const deleteMutation = useMutation({
 		})
 	},
 	onSettled: () => {
-		queryClient.invalidateQueries({ queryKey: ['files', serverId] })
+		queryClient.invalidateQueries({queryKey: ['files', serverId]})
 	},
 })
 
 const renameMutation = useMutation({
-	mutationFn: ({ path, newName }: { path: string; newName: string }) =>
-		client.kyros.files_v0.renameFileOrFolder(path, newName),
-	onMutate: async ({ path, newName }) => {
+	mutationFn: async ({file, newName}: { file: FileInfo; newName: string }) => {
+		await client.kyros.files_v0.renameFileOrFolder(file.path, newName);
+		const parts = file.path.split('/');
+		return {
+			type: file.type,
+			name: newName,
+			path: normalizeDirectoryPath(parts.length > 0 ? parts.slice(0, parts.length - 1).join('/') : newName)
+		}
+	},
+	onMutate: async ({file, newName}) => {
 		const queryKey = getQueryKey()
-		await queryClient.cancelQueries({ queryKey })
+		await queryClient.cancelQueries({queryKey})
 		const previous = queryClient.getQueryData(queryKey)
 		queryClient.setQueryData(queryKey, (old: Kyros.Files.v0.DirectoryResponse | undefined) => {
 			if (!old) return old
 			return {
 				...old,
 				items: old.items.map((item) =>
-					item.path === path
+					item.path === file.path
 						? {
-								...item,
-								name: newName,
-								path: item.path.replace(/[^/]+$/, newName),
-							}
+							...item,
+							name: newName,
+							path: item.path.replace(/[^/]+$/, newName),
+						}
 						: item,
 				),
 			}
 		})
-		return { previous }
+		return {previous}
 	},
 	onError: (err: Error, _vars, context) => {
 		queryClient.setQueryData(getQueryKey(), context?.previous)
@@ -284,26 +316,32 @@ const renameMutation = useMutation({
 			type: 'error',
 		})
 	},
-	onSuccess: (_, { newName }) => {
-		addNotification({ title: 'Renamed', text: `Renamed to ${newName}`, type: 'success' })
+	onSuccess: (_, {newName}) => {
+		addNotification({title: 'Renamed', text: `Renamed to ${newName}`, type: 'success'})
 	},
 	onSettled: () => {
-		queryClient.invalidateQueries({ queryKey: ['files', serverId] })
+		queryClient.invalidateQueries({queryKey: ['files', serverId]})
 	},
 })
 
 const moveMutation = useMutation({
-	mutationFn: ({ source, destination }: { source: string; destination: string }) =>
-		client.kyros.files_v0.moveFileOrFolder(source, destination),
-	onMutate: async ({ source }) => {
+	mutationFn: async ({source, destination}: { source: FileInfo; destination: string }) => {
+		await client.kyros.files_v0.moveFileOrFolder(source.path, destination);
+		return {
+			name: source.name,
+			type: source.type,
+			path: normalizeDirectoryPath(destination + "/" + source.name)
+		}
+	},
+	onMutate: async ({source}) => {
 		const queryKey = getQueryKey()
-		await queryClient.cancelQueries({ queryKey })
+		await queryClient.cancelQueries({queryKey})
 		const previous = queryClient.getQueryData(queryKey)
 		queryClient.setQueryData(queryKey, (old: Kyros.Files.v0.DirectoryResponse | undefined) => {
 			if (!old) return old
-			return { ...old, items: old.items.filter((item) => item.path !== source) }
+			return {...old, items: old.items.filter((item) => item.path !== source.path)}
 		})
-		return { previous }
+		return {previous}
 	},
 	onError: (err: Error, _vars, context) => {
 		queryClient.setQueryData(getQueryKey(), context?.previous)
@@ -313,20 +351,20 @@ const moveMutation = useMutation({
 			type: 'error',
 		})
 	},
-	onSuccess: (_, { destination }) => {
-		addNotification({ title: 'Moved', text: `Moved to ${destination}`, type: 'success' })
+	onSuccess: (_, {destination}) => {
+		addNotification({title: 'Moved', text: `Moved to ${destination}`, type: 'success'})
 	},
 	onSettled: () => {
-		queryClient.invalidateQueries({ queryKey: ['files', serverId] })
+		queryClient.invalidateQueries({queryKey: ['files', serverId]})
 	},
 })
 
 const createMutation = useMutation({
-	mutationFn: ({ path, type }: { path: string; type: 'file' | 'directory' }) =>
+	mutationFn: ({path, type}: { path: string; type: 'file' | 'directory' }) =>
 		client.kyros.files_v0.createFileOrFolder(path, type),
-	onMutate: async ({ path, type }) => {
+	onMutate: async ({path, type}) => {
 		const queryKey = getQueryKey()
-		await queryClient.cancelQueries({ queryKey })
+		await queryClient.cancelQueries({queryKey})
 		const previous = queryClient.getQueryData(queryKey)
 		const name = path.split('/').pop()!
 		const now = Math.floor(Date.now() / 1000)
@@ -336,13 +374,13 @@ const createMutation = useMutation({
 			type,
 			modified: now,
 			created: now,
-			...(type === 'directory' ? { count: 0 } : { size: 0 }),
+			...(type === 'directory' ? {count: 0} : {size: 0}),
 		}
 		queryClient.setQueryData(queryKey, (old: Kyros.Files.v0.DirectoryResponse | undefined) => {
 			if (!old) return old
-			return { ...old, items: [newItem, ...old.items] }
+			return {...old, items: [newItem, ...old.items]}
 		})
-		return { previous }
+		return {previous}
 	},
 	onError: (err: Error, _vars, context) => {
 		queryClient.setQueryData(getQueryKey(), context?.previous)
@@ -352,7 +390,7 @@ const createMutation = useMutation({
 			type: 'error',
 		})
 	},
-	onSuccess: (_, { path, type }) => {
+	onSuccess: (_, {path, type}) => {
 		const name = path.split('/').pop()
 		addNotification({
 			title: `${type === 'directory' ? 'Folder' : 'File'} created`,
@@ -361,7 +399,7 @@ const createMutation = useMutation({
 		})
 	},
 	onSettled: () => {
-		queryClient.invalidateQueries({ queryKey: ['files', serverId] })
+		queryClient.invalidateQueries({queryKey: ['files', serverId]})
 	},
 })
 
@@ -375,31 +413,19 @@ async function extractFile(path: string, override: boolean, dry: boolean) {
 	await client.kyros.files_v0.extractFile(path, override, false, target)
 }
 
-// File I/O
-async function readFile(path: string): Promise<string> {
-	const normalizedPath = path.startsWith('/') ? path : `/${path}`
-	const cachedContent = queryClient.getQueryData<string>(['file-content', serverId, normalizedPath])
-	if (cachedContent) return cachedContent
-	const blob = await client.kyros.files_v0.downloadFile(normalizedPath)
-	return await blob.text()
+async function writeFile(file: FileInfo, buffer: ArrayBuffer): Promise<void> {
+	if (fileWriteDisabled.value || file.type != "file") return
+	await client.kyros.files_v0.updateFile(file.path, new Blob([buffer]))
+	await queryClient.invalidateQueries({queryKey: queryFilterFor(serverId, undefined, 'file')})
+	// TODO: POKE CAL ABOUT THIS
+	//queryClient.invalidateQueries({queryKey: ['servers', 'detail', serverId]})
 }
 
-async function readFileAsBlob(path: string): Promise<Blob> {
-	const normalizedPath = path.startsWith('/') ? path : `/${path}`
-	return await client.kyros.files_v0.downloadFile(normalizedPath)
-}
-
-async function writeFile(path: string, content: string): Promise<void> {
-	if (fileWriteDisabled.value) return
-	await client.kyros.files_v0.updateFile(path, content)
-	queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
-}
-
-async function downloadFile(path: string, fileName: string): Promise<void> {
+async function downloadFile(file: FileInfo): Promise<void> {
 	try {
-		const fileData = await client.kyros.files_v0.downloadFile(path)
+		const fileData = await client.kyros.files_v0.downloadFile(file.path)
 		if (fileData) {
-			saveBlob(fileData, fileName)
+			saveBlob(fileData, file.name ?? "modrinth-file-download")
 		}
 	} catch {
 		addNotification({
@@ -420,7 +446,7 @@ function saveBlob(blob: Blob, fileName: string) {
 
 async function statFile(path: string): Promise<Kyros.Files.v1.FileStatResponse> {
 	if (!worldId.value) throw new Error('No active world')
-	return client.kyros.files_v1.stat(worldId.value, { path })
+	return client.kyros.files_v1.stat(worldId.value, {path})
 }
 
 async function createZip(data: Kyros.Files.v1.ZipRequest, destination?: string): Promise<void> {
@@ -442,23 +468,23 @@ async function createZip(data: Kyros.Files.v1.ZipRequest, destination?: string):
 		})
 	}
 	zippingFolder.value = true
-	updateOperation({ progress: 0 })
+	updateOperation({progress: 0})
 	try {
 		await client.kyros.files_v1.createZip(worldId.value, data, (record) => {
 			updateOperation(record, record.done ? 'done' : 'ongoing')
 		})
-		updateOperation({ progress: 100 }, 'done')
+		updateOperation({progress: 100}, 'done')
 		addNotification({
 			title: formatMessage(messages.zipCreated),
 			text: destination
-				? formatMessage(messages.zipCreatedDescription, { destination })
+				? formatMessage(messages.zipCreatedDescription, {destination})
 				: undefined,
 			type: 'success',
 		})
 		await refreshList()
 	} catch (error) {
 		updateOperation(
-			{ progress: 0, error: error instanceof Error ? error.message : undefined },
+			{progress: 0, error: error instanceof Error ? error.message : undefined},
 			'failure-error',
 		)
 	} finally {
@@ -466,14 +492,15 @@ async function createZip(data: Kyros.Files.v1.ZipRequest, destination?: string):
 	}
 }
 
-async function zipFolder(path: string): Promise<void> {
-	await createZip({ target_type: 'Directory', path })
+async function zipFolder(file: FileInfo<'directory'>): Promise<void> {
+	await createZip({target_type: 'Directory', path: file.path})
 }
 
-async function zipPaths(parent: string, include: string[], target: string): Promise<void> {
+async function zipPaths(files: FileInfo[], targetDirectory: FileInfo<'directory'>, archiveName: string): Promise<void> {
+	const targetPath = targetDirectory.path;
 	await createZip(
-		{ target_type: 'ManyPaths', parent, include, target },
-		`${parent}/${target}`.replace('//', '/'),
+		{target_type: 'ManyPaths', parent: targetPath, include: files.map((file) => file.path), target: archiveName},
+		`${targetPath}/${archiveName}`.replace('//', '/'),
 	)
 }
 
@@ -485,7 +512,7 @@ watch(
 )
 
 onMounted(async () => {
-	initializeFileEdit()
+	initializeLocation()
 })
 
 // Restart
@@ -523,62 +550,78 @@ function cancelUpload() {
 	fileUploadSession.cancelUpload()
 }
 
-const directories = new Map<string, DirectoryQuery>()
+const fileQueries = new Map<string, FileItemResultFrom<any> & FileQueryResult>()
 const expandedDirectories: Ref<string[]> = ref([])
 
 /** Owns the lazily created directory queries so they're disposed with this page, wherever they were first requested from. */
-const directoryScope = effectScope()
-onScopeDispose(() => directoryScope.stop())
+const fileSystemScope = effectScope()
+onScopeDispose(() => fileSystemScope.stop())
 
 const directoryTree = {
-	prefetch: (path: string) => {
-		const normalized = normalizeDirectoryPath(path)
-		if (!directories.has(normalized)) {
-			prefetchDirectory(normalized)
+	prefetch: <T extends FileTypes>(info : FileInfo<T>) => {
+		if (info.type == "directory") {
+			if (!fileQueries.has(info.path)) {
+				prefetchDirectory(info as FileInfo<'directory'>)
+			}
+		} else if (info.type == 'file') {
+			prefetchFileEntry(info as FileInfo<'file'>)
 		}
 	},
-	get: (path: string): DirectoryQuery => {
-		const normalized = normalizeDirectoryPath(path)
-		let query = directories.get(normalized)
-		if (query == null) {
-			query = directoryScope.run(() => queryDirectoryEntries(normalized))!
-			directories.set(normalized, query)
+	get: <T extends FileTypes>(info : FileInfo<T>): FileItemResultFrom<T> & FileQueryResult => {
+		const type = info.type;
+		if (type != 'directory' || type != 'file') {
+			let query = fileQueries.get(info.path)
+			if (query == null) {
+				if (type == 'directory') {
+					query = fileSystemScope.run(() => queryDirectoryEntries(info as FileInfo<'directory'>))!
+				} else {
+					query = fileSystemScope.run(() => queryFileEntry(info as FileInfo<'file'>))!;
+				}
+				fileQueries.set(query.path, query)
+			}
+			return query as FileItemResultFrom<T> & FileQueryResult;
+		} else {
+			throw new Error(`Unable to handle getting query results for given type '${info.type as any}'`)
 		}
-		return query
 	},
 	expandedEntries: expandedDirectories,
 } satisfies DirectoryTree
 
 // Provide the file manager context
 provideFileManager({
-	currentItems: computed(() => directoryTree.get(currentPath.value).items.value),
 	directoryTree,
-	loading: computed(() => directoryTree.get(currentPath.value).isLoading.value),
-	error: computed(() => directoryTree.get(currentPath.value).loadError.value ?? null),
-	currentPath,
+	loading: computed(() => directoryTree.get(currentLocation.value).isLoading.value),
+	error: computed(() => directoryTree.get(currentLocation.value).loadError.value ?? null),
+	currentFile: computed(() => currentLocation.value),
+	currentDirectory: computed(() => {
+		const location = currentLocation.value;
+		return (location.type != 'file')
+			? location as FileInfo<'directory'>
+			: parentInfoFrom(location.path);
+	}),
 	navigateTo,
-	editingFile,
-	startEditing,
-	stopEditing,
 	createItem: async (name, type) => {
-		if (fileWriteDisabled.value) return
+		if (fileWriteDisabled.value) return null;
 		const path = `${currentPath.value}/${name}`.replace('//', '/')
-		await createMutation.mutateAsync({ path, type })
+		await createMutation.mutateAsync({path, type});
+		return {
+			name: name,
+			path: path,
+			type: type
+		} as FileInfo
 	},
-	renameItem: async (path, newName) => {
-		if (fileWriteDisabled.value) return
-		await renameMutation.mutateAsync({ path, newName })
+	renameItem: async (file, newName) => {
+		if (fileWriteDisabled.value) return null;
+		return await renameMutation.mutateAsync({file, newName})
 	},
 	moveItem: async (source, destination) => {
-		if (fileWriteDisabled.value) return
-		await moveMutation.mutateAsync({ source, destination })
+		if (fileWriteDisabled.value) return null;
+		return await moveMutation.mutateAsync({source, destination})
 	},
-	deleteItem: async (path, recursive) => {
+	deleteItem: async (file, recursive) => {
 		if (fileWriteDisabled.value) return
-		await deleteMutation.mutateAsync({ path, recursive })
+		await deleteMutation.mutateAsync({file, recursive})
 	},
-	readFile,
-	readFileAsBlob,
 	writeFile,
 	downloadFile,
 	statFile,
@@ -593,17 +636,28 @@ provideFileManager({
 	busyTooltip: fileWriteDisabledTooltip,
 	busyWarning,
 	extractFile,
-	prefetchDirectory,
-	prefetchFile,
 	showInstallFromUrl: true,
 	canRestart: canUsePowerActions.value,
 	restartServer,
 	canShareToMclogs: true,
 })
+
+/**
+ * Only the first directory load gates the whole page. Later directory loads are shown by the
+ * files layout itself, so its tabs and sidebar stay in place while a directory loads.
+ */
+const initialLoadPending = ref(true)
+watch(
+	() => directoryTree.get(currentLocation.value).filesReadyPending.value,
+	(pending) => {
+		if (!pending) initialLoadPending.value = false
+	},
+	{immediate: true},
+)
 </script>
 
 <template>
-	<ReadyTransition :pending="directoryTree.get(currentPath).filesReadyPending.value">
+	<ReadyTransition :pending="initialLoadPending">
 		<FilePageLayout
 			:show-debug-info="props.showDebugInfo"
 			:show-refresh-button="props.showRefreshButton"

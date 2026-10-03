@@ -1121,6 +1121,15 @@
   "conversation-thread.error.sending-message": {
     "message": "Error sending message"
   },
+  "conversation-thread.no-issues-flagged": {
+    "message": "No issues flagged."
+  },
+  "conversation-thread.private-note.placeholder": {
+    "message": "Leave a private note for staff..."
+  },
+  "conversation-thread.private-note.tab": {
+    "message": "Private note"
+  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Reply to thread..."
   },
@@ -2825,6 +2834,9 @@
   "layout.footer.developer-mode-deactivated.title": {
     "message": "Developer mode deactivated"
   },
+  "layout.footer.hide": {
+    "message": "Hide footer"
+  },
   "layout.footer.legal": {
     "message": "Legal"
   },
@@ -2878,6 +2890,9 @@
   },
   "layout.footer.resources.translate": {
     "message": "Translate"
+  },
+  "layout.footer.show": {
+    "message": "Show footer"
   },
   "layout.footer.social.bluesky": {
     "message": "Bluesky"
@@ -3004,6 +3019,12 @@
   },
   "moderation.exclude-technical-review": {
     "message": "Exclude TR"
+  },
+  "moderation.keybinds.general": {
+    "message": "General"
+  },
+  "moderation.keybinds.project-review": {
+    "message": "Project review page"
   },
   "moderation.moderate": {
     "message": "Moderate"
@@ -3170,6 +3191,9 @@
   "moderation.project-review.gameVersions": {
     "message": "Game versions"
   },
+  "moderation.project-review.generalSettings": {
+    "message": "General"
+  },
   "moderation.project-review.hashes": {
     "message": "Hashes"
   },
@@ -3182,6 +3206,9 @@
   "moderation.project-review.history": {
     "message": "History"
   },
+  "moderation.project-review.historyStub": {
+    "message": "Stub for history tab"
+  },
   "moderation.project-review.icon": {
     "message": "Icon"
   },
@@ -3193,6 +3220,9 @@
   },
   "moderation.project-review.issues": {
     "message": "Issue tracker"
+  },
+  "moderation.project-review.keybindsSettings": {
+    "message": "Keybinds"
   },
   "moderation.project-review.left": {
     "message": "Project details"
@@ -3227,15 +3257,15 @@
   "moderation.project-review.noFlagsFiles": {
     "message": "Files without flags ({count})"
   },
+  "moderation.project-review.noIssues": {
+    "message": "No issues."
+  },
   "moderation.project-review.noLicense": {
     "message": "No license URL"
   },
   "moderation.project-review.noPendingFiles": {
     "message": "No files with unresolved flags"
   },
-	"moderation.project-review.noIssues": {
-		"message": "No issues."
-	},
   "moderation.project-review.noReports": {
     "message": "No technical-review reports are available for this project"
   },
@@ -3245,8 +3275,17 @@
   "moderation.project-review.noSelectedIssues": {
     "message": "No issues added. Select issues while reviewing the project to see the message here."
   },
+  "moderation.project-review.openIcon": {
+    "message": "View enlarged project icon"
+  },
   "moderation.project-review.openImage": {
     "message": "Open image {number}"
+  },
+  "moderation.project-review.openImageInNewTab": {
+    "message": "Open image in new tab"
+  },
+  "moderation.project-review.openMemberAvatar": {
+    "message": "View enlarged avatar for {username}"
   },
   "moderation.project-review.optional": {
     "message": "Optional"
@@ -3380,11 +3419,11 @@
   "moderation.project-review.tech-review": {
     "message": "Tech Review"
   },
-	"moderation.project-review.titleAndSlug": {
-		"message": "Title and slug"
-	},
   "moderation.project-review.title": {
     "message": "Project review"
+  },
+  "moderation.project-review.titleAndSlug": {
+    "message": "Title and slug"
   },
   "moderation.project-review.total": {
     "message": "Total"
@@ -4622,6 +4661,9 @@
   "project.settings.permissions.attention-needed.title": {
     "message": "Unknown external content"
   },
+  "project.settings.permissions.awaiting-review-count": {
+    "message": "{count, plural, =0 {None awaiting review} other {# awaiting review}}"
+  },
   "project.settings.permissions.bad-proof.description": {
     "message": "Modrinth's moderation team has rejected the permission information you provided for some external content. Please review the rejected items below and provide acceptable proof or remove the content."
   },
@@ -4676,6 +4718,9 @@
   "project.settings.permissions.learn-more": {
     "message": "Learn more"
   },
+  "project.settings.permissions.no-permission-count": {
+    "message": "{count} with no permission"
+  },
   "project.settings.permissions.no-results": {
     "message": "No external files match your search."
   },
@@ -4699,6 +4744,9 @@
   },
   "project.settings.permissions.sort.status": {
     "message": "Status"
+  },
+  "project.settings.permissions.user-action-count": {
+    "message": "{count} need user action"
   },
   "project.settings.server.bedrock-address-label": {
     "message": "Bedrock address"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DirectoryEntries, EditingFile, FileItem, UploadState } from '@modrinth/ui'
+import type { DirectoryResult, EditingFile, FileItem, UploadState } from '@modrinth/ui'
 import {
 	commonMessages,
 	defineMessages,
@@ -10,6 +10,7 @@ import {
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
+import type { FileInfo } from '@modrinth/ui/src/layouts/shared/files-tab/providers/file-manager.ts'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { invoke } from '@tauri-apps/api/core'
 import { computed, effectScope, onScopeDispose, type Ref, ref, watch } from 'vue'
@@ -67,13 +68,14 @@ async function listDirectory(dirPath: string): Promise<FileItem[]> {
 	return invoke('plugin:files|file_list', { instanceId: instanceId.value, path: dirPath })
 }
 
-function isReadOnly(path: string): boolean {
-	const normalized = path.startsWith('/') ? path.slice(1) : path
-	const isReadOnlyItem = (item: FileItem) => item.path === normalized && item.readOnly === true
+function isReadOnly(file: FileInfo | null): boolean {
+	// TODO: HANDLE NULL BY CHECKING IF THE USER CAN CREATE FILES
+	if (file == null) return false
+	const isReadOnlyItem = (item: FileItem) => item.path === file.path && item.readOnly === true
 	return (
-		normalized.split('/')[0].toLowerCase() === 'mods' ||
+		file.path.split('/')[0].toLowerCase() === 'mods' ||
 		items.value.some(isReadOnlyItem) ||
-		[...directories.values()].some((entries) => entries.items.value.some(isReadOnlyItem))
+		[...directories.values()].some((entries) => entries.data.value.some(isReadOnlyItem))
 	)
 }
 
@@ -81,14 +83,14 @@ function toRelativePath(path: string) {
 	return path.split('/').filter(Boolean).join('/')
 }
 
-const directories = new Map<string, DirectoryEntries>()
+const directories = new Map<string, DirectoryResult>()
 const expandedDirectories: Ref<string[]> = ref([])
 
 /** Owns the lazily created directory queries so they're disposed with this page, wherever they were first requested from. */
 const directoryScope = effectScope()
 onScopeDispose(() => directoryScope.stop())
 
-function queryDirectoryEntries(relativePath: string): DirectoryEntries {
+function queryDirectoryEntries(relativePath: string): DirectoryResult {
 	const query = useQuery(
 		computed(() => ({
 			queryKey: instanceKeys.files(instancePage.instanceId.value, relativePath),
@@ -170,16 +172,15 @@ const isRefreshing = ref<boolean>(false)
 
 async function refresh() {
 	debug('refresh: called, currentPath =', currentPath.value, 'instanceRoot =', instanceRoot.value)
-	isRefreshing.value = true;
+	isRefreshing.value = true
 	await Promise.all([
 		directoryQuery.refetch(),
 		queryClient.invalidateQueries({
 			queryKey: [...instanceKeys.detail(instancePage.instanceId.value), 'files'],
-			predicate: (query) =>
-				query.queryKey[query.queryKey.length - 1] !== currentPath.value,
+			predicate: (query) => query.queryKey[query.queryKey.length - 1] !== currentPath.value,
 		}),
 	])
-	isRefreshing.value = false;
+	isRefreshing.value = false
 }
 
 function navigateTo(path: string) {
@@ -209,6 +210,11 @@ async function handleCreateItem(name: string, type: 'file' | 'directory') {
 			await writeBytes(targetPath, new Uint8Array(), true)
 		}
 		await refresh()
+		return {
+			name: name,
+			path: targetPath,
+			type: type,
+		}
 	} catch (e) {
 		addNotification({
 			title: formatMessage(commonMessages.createFailedLabel),
