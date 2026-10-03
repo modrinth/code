@@ -17,10 +17,12 @@ const props = withDefaults(
 	defineProps<{
 		items: ImageViewerEditorItem[]
 		editor?: 'enabled' | 'disabled'
+		pixelated?: boolean
 		saving?: boolean
 	}>(),
 	{
 		editor: 'disabled',
+		pixelated: false,
 		saving: false,
 	},
 )
@@ -253,6 +255,7 @@ defineExpose({ show, edit, hide, next, previous, markSavedAndView })
 				:index="activeIndex"
 				:count="items.length"
 				:can-edit="canEdit"
+				:pixelated="pixelated"
 				:saving="saving"
 				:load-data="loadItemData"
 				@close="hide"

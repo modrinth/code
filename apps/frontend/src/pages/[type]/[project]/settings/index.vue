@@ -36,9 +36,10 @@
 						class="mt-2"
 					/>
 					<ValidationMessage :check="saveValidation.forField('name')" class="mt-2" />
+					<ProjectIssueCard target="modify_title" class="mt-2" />
 				</div>
 
-				<div @focusin="onSlugSuggestionFocusIn" @focusout="onSlugSuggestionFocusOut">
+				<div>
 					<label for="project-slug" class="block w-fit">
 						<span class="label__title">URL</span>
 					</label>
@@ -49,6 +50,8 @@
 						autocomplete="off"
 						:disabled="!hasPermission"
 						wrapper-class="w-full"
+						@focusin="onSlugSuggestionFocusIn"
+						@focusout="onSlugSuggestionFocusOut"
 					>
 						<template #prefix>
 							<span class="whitespace-nowrap">
@@ -57,6 +60,7 @@
 						</template>
 					</Input>
 					<ValidationMessage :check="saveValidation.forField('slug')" class="mt-2" />
+					<ProjectIssueCard target="modify_slug" class="mt-2" />
 					<SlugSuggestions
 						:selected="slug"
 						:suggestions="slugSuggestions"
@@ -83,6 +87,7 @@
 						class="mt-2"
 					/>
 					<ValidationMessage :check="saveValidation.forField('summary')" class="mt-2" />
+					<ProjectIssueCard target="modify_summary" class="mt-2" />
 				</div>
 
 				<div>
@@ -129,6 +134,7 @@
 						class="mt-2"
 					/>
 					<ValidationMessage :check="saveValidation.forField('icon')" class="mt-2" />
+					<ProjectIssueCard target="modify_icon" class="mt-2" />
 				</div>
 
 				<!-- Server Project Settings -->
@@ -355,6 +361,7 @@ import {
 import { fileIsValid, formatProjectStatus, isAdmin } from '@modrinth/utils'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useAuth } from '~/composables/auth.js'

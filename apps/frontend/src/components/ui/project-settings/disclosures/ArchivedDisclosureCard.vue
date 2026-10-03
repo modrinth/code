@@ -57,7 +57,7 @@ const messages = defineMessages({
 		v-bind="props"
 		v-model="model.enabled"
 		:icon="ArchiveIcon"
-		:title="formatMessage(messages.title)"
+		:title="props.title ?? formatMessage(messages.title)"
 		info-link="https://support.modrinth.com/en/articles/16567675#h_76b62c699c"
 		@set-lock-status="emit('setLockStatus', $event)"
 	>
@@ -73,6 +73,7 @@ const messages = defineMessages({
 					id="archived-disclosure-note"
 					v-model="model.note"
 					:rows="3"
+					:resize="showLockControls ? 'vertical' : 'none'"
 					class="max-w-[40rem]"
 					:disabled="disabled"
 					:placeholder="formatMessage(messages.notePlaceholder)"

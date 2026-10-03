@@ -776,17 +776,11 @@
   "conversation-thread.action.approve": {
     "message": "Godkend"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Godkend med svar"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Luk med svar"
   },
   "conversation-thread.action.reject": {
     "message": "Afvis"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Afvis med svar"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Genåbn tråd"

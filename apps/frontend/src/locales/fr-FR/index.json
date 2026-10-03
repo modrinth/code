@@ -1064,9 +1064,6 @@
   "conversation-thread.action.approve": {
     "message": "Approuver"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Approuver avec réponse"
-  },
   "conversation-thread.action.close-report": {
     "message": "Fermer le signalement"
   },
@@ -1075,9 +1072,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Rejeter"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Rejeter avec réponse"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Rouvrir le fil"
@@ -1111,9 +1105,6 @@
   },
   "conversation-thread.action.withhold": {
     "message": "Retenir"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Retenir avec réponse"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Ce fil est fermé et aucun message ne peut y être envoyé."

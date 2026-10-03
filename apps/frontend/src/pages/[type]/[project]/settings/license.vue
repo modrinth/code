@@ -9,7 +9,9 @@
 				<p class="m-0 text-base text-secondary">
 					<IntlFormatted
 						:message-id="messages.intro"
-						:values="{ type: formatProjectType(project.project_type).toLowerCase() }"
+						:values="{
+							type: formatProjectType(project.project_type).toLowerCase(),
+						}"
 					>
 						<template #guide="{ children }">
 							<NuxtLink
@@ -57,6 +59,7 @@
 						]"
 						class="mt-2"
 					/>
+					<ProjectIssueCard target="modify_license" class="mt-2" />
 				</div>
 			</div>
 
@@ -112,7 +115,7 @@
 
 			<div v-if="current.license.friendly" class="flex min-w-0 max-w-[600px] flex-col gap-2">
 				<label for="license-url" class="w-fit text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.url) }}
+					{{ formatMessage(licenseUrlMessages.url) }}
 					<span v-if="current.license.friendly !== 'Custom'" class="font-normal text-secondary">
 						({{ formatMessage(messages.optionalLabel) }})
 					</span>
@@ -124,8 +127,13 @@
 						v-model="current.licenseUrl"
 						type="url"
 						:maxlength="2048"
-						:placeholder="formatMessage(messages.urlPlaceholder)"
-						:required="current.license.friendly === 'Custom'"
+						:placeholder="
+							formatMessage(
+								current.license.friendly === 'Custom'
+									? licenseUrlMessages.url
+									: licenseUrlMessages.optionalUrl,
+							)
+						"
 						:disabled="saving || !hasPermission || licenseId === 'LicenseRef-Unknown'"
 						wrapper-class="w-full"
 					/>
@@ -133,8 +141,8 @@
 						{{
 							formatMessage(
 								current.license.friendly === 'Custom'
-									? messages.customUrlDescription
-									: messages.urlDescription,
+									? licenseUrlMessages.customUrlDescription
+									: licenseUrlMessages.urlDescription,
 							)
 						}}
 					</p>
@@ -213,9 +221,11 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
 import ValidationMessage from '@/components/ValidationMessage.vue'
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import { normalizeProjectUrl } from '~/helpers/project-url'
+import { licenseUrlMessages } from '~/utils/license-messages'
 
 const { projectV2: project, currentMember, patchProjectV3 } = injectProjectPageContext()
 const { labrinth } = injectModrinthClient()

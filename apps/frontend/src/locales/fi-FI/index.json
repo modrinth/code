@@ -347,17 +347,11 @@
   "conversation-thread.action.approve": {
     "message": "Hyväksy"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Hyväksy vastauksella"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Sulje vastauksella"
   },
   "conversation-thread.action.reject": {
     "message": "Hylkää"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Hylkää vastauksella"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Avaa keskustelu uudelleen"

@@ -116,6 +116,7 @@
 									:current-field="current[row.field]"
 								/>
 								<ValidationMessage :check="saveValidation.forField(row.field)" />
+								<ProjectIssueCard target="modify_links" :platform="row.field" class="mt-2" />
 							</template>
 							<ValidationMessage v-else-if="row.donation" :check="donationMessages(row.donation)" />
 						</div>
@@ -160,6 +161,7 @@ import {
 import { isAdmin } from '@modrinth/utils'
 
 import ValidationMessage from '@/components/ValidationMessage.vue'
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import {

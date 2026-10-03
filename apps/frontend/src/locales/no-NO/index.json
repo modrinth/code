@@ -752,17 +752,11 @@
   "conversation-thread.action.approve": {
     "message": "Godkjenn"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Godkjenn med svar"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Lukk med svar"
   },
   "conversation-thread.action.reject": {
     "message": "Avvis"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Avvis med svar"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Gjenåpne tråd"

@@ -986,17 +986,11 @@
   "conversation-thread.action.approve": {
     "message": "Aprovar"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Aprovar com comentário"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Fechar com comentário"
   },
   "conversation-thread.action.reject": {
     "message": "Rejeitar"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Rejeitar com comentário"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Reabrir tópico"
@@ -1030,9 +1024,6 @@
   },
   "conversation-thread.action.withhold": {
     "message": "Reter"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Reter com comentário"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Este tópico está fechado e não aceita novas mensagens."

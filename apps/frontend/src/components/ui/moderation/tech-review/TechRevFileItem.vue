@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RightArrowIcon, VersionIcon } from '@modrinth/assets'
-import { Button, ButtonLink, useFormatBytes } from '@modrinth/ui'
+import { Button, ButtonLink, defineMessages, useFormatBytes, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
 import { getFileDetailCount, getVersionPageHref, truncateMiddle } from './helpers'
@@ -19,6 +19,13 @@ const emit = defineEmits<{
 }>()
 
 const formatBytes = useFormatBytes()
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	viewVersion: { id: 'moderation.tech-review.file.view-version', defaultMessage: 'View version' },
+	manual: { id: 'moderation.tech-review.file.manual', defaultMessage: 'Manual review' },
+	noFlags: { id: 'moderation.tech-review.file.no-flags', defaultMessage: 'No flags' },
+	flags: { id: 'moderation.tech-review.file.flags', defaultMessage: 'Flags' },
+})
 const { getFileMarkedCount } = injectTechReviewDecisions()
 const details = computed(() => props.file.issues.flatMap((issue) => issue.details))
 const hasFlags = computed(() => details.value.length > 0)
@@ -39,10 +46,11 @@ function viewFlags() {
 </script>
 
 <template>
-	<div class="flex items-center justify-between px-4 py-3">
-		<div class="flex items-center gap-2">
+	<div class="flex min-w-0 flex-wrap items-center justify-between gap-3 px-4 py-3">
+		<div class="flex min-w-0 flex-wrap items-center gap-2">
 			<ButtonLink
-				v-tooltip="'View version'"
+				v-tooltip="formatMessage(messages.viewVersion)"
+				:aria-label="formatMessage(messages.viewVersion)"
 				type="outlined"
 				target="_blank"
 				:href="versionHref"
@@ -52,14 +60,16 @@ function viewFlags() {
 			>
 				<VersionIcon aria-hidden="true" />
 			</ButtonLink>
-			<div
+			<button
 				v-tooltip="file.file_name === truncatedFileName ? undefined : file.file_name"
-				class="group flex h-9 cursor-pointer flex-col justify-center rounded-sm font-medium text-contrast hover:underline"
+				type="button"
+				:disabled="!hasFlags"
+				class="group min-w-0 cursor-pointer break-all rounded-sm border-0 bg-transparent p-0 text-left font-medium text-contrast hover:underline"
 				:class="{ 'opacity-50': allFlagsMarked }"
 				@click="viewFlags"
 			>
 				{{ truncatedFileName }}
-			</div>
+			</button>
 			<div
 				class="rounded-full border border-solid border-surface-5 bg-surface-3 px-2.5 py-1"
 				:class="{ 'opacity-50': allFlagsMarked }"
@@ -72,18 +82,20 @@ function viewFlags() {
 				v-else-if="isManualReview"
 				class="border-blue/60 flex items-center gap-1 rounded-full border border-solid bg-highlight-blue px-2.5 py-1 text-sm text-blue"
 			>
-				Manual review
+				{{ formatMessage(messages.manual) }}
 			</div>
 			<div
 				v-else
 				class="border-green/60 flex items-center gap-1 rounded-full border border-solid bg-highlight-green px-2.5 py-1 text-sm text-green"
 			>
-				No flags
+				{{ formatMessage(messages.noFlags) }}
 			</div>
 		</div>
 
-		<div class="flex items-center gap-2">
-			<Button v-if="hasFlags" @click="viewFlags"> Flags <RightArrowIcon /> </Button>
+		<div class="flex min-w-0 flex-wrap items-center gap-2">
+			<Button v-if="hasFlags" @click="viewFlags"
+				>{{ formatMessage(messages.flags) }} <RightArrowIcon />
+			</Button>
 			<TechRevFileActions :file="file" />
 		</div>
 	</div>

@@ -2,10 +2,11 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { CheckCircleIcon, ScaleIcon, UserRoundIcon, XCircleIcon } from '@modrinth/assets'
 import { useQuery } from '@tanstack/vue-query'
-import { computed } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 
 import { IntlFormatted } from '#ui/components'
 import { AutoLink, Avatar } from '#ui/components/base'
+import ImageViewerEditor from '#ui/components/image-viewer-editor/index.vue'
 
 import { useFormatDateTime } from '../../composables/format-date-time'
 import { defineMessage, defineMessages, useVIntl } from '../../composables/i18n'
@@ -129,6 +130,15 @@ const licenseReadDisplay = computed(() => {
 })
 
 const linkToWork = computed(() => attributionLinkToWork(props.attribution))
+const proofImageViewer = useTemplateRef<InstanceType<typeof ImageViewerEditor>>('proofImageViewer')
+const pixelated = ref(false)
+const proofImageItems = computed(() =>
+	(props.attribution.image_urls ?? []).map((src, index) => ({
+		id: `${src}-${index}`,
+		src,
+		alt: formatMessage(messages.proofImageThumbnailAlt, { n: index + 1 }),
+	})),
+)
 </script>
 
 <template>
@@ -202,21 +212,35 @@ const linkToWork = computed(() => attributionLinkToWork(props.attribution))
 								{{ formatMessage(messages.proofImagesLabel) }}
 							</span>
 							<div class="flex flex-wrap gap-2">
-								<a
+								<button
 									v-for="(src, idx) in attribution.image_urls"
 									:key="`${src}-${idx}`"
-									:href="src"
-									target="_blank"
-									rel="noopener"
-									class="block rounded-xl border-[1px] border-solid border-surface-5 overflow-hidden shrink-0"
+									type="button"
+									class="block cursor-zoom-in bg-transparent p-0 rounded-xl border-[1px] border-solid border-surface-5 overflow-hidden shrink-0"
+									@click="proofImageViewer?.show(idx)"
 								>
 									<img
 										:src="src"
 										:alt="formatMessage(messages.proofImageThumbnailAlt, { n: idx + 1 })"
 										class="max-h-40 max-w-full object-contain"
 									/>
-								</a>
+								</button>
 							</div>
+							<ImageViewerEditor
+								ref="proofImageViewer"
+								:items="proofImageItems"
+								editor="disabled"
+								:pixelated="pixelated"
+							>
+								<template #actions="{ item }">
+									<slot
+										name="image-viewer-actions"
+										:item="item"
+										:pixelated="pixelated"
+										:set-pixelated="(value: boolean) => (pixelated = value)"
+									/>
+								</template>
+							</ImageViewerEditor>
 						</div>
 					</div>
 				</div>

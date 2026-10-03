@@ -13,6 +13,8 @@ export interface ModerationQueue {
 	skipped: string[]
 	total: number
 	completed: string[]
+	history: string[]
+	activeProjectId: string | null
 	lastUpdated: Date
 }
 
@@ -39,11 +41,12 @@ export interface ModerationQueueService {
 	startSkippedReview(): Promise<void>
 	getCurrentProjectId(): string | null
 	resetQueue(): Promise<void>
+	visitProject(projectId: string, back?: boolean): Promise<void>
 
 	acquireLock(projectId: string): Promise<LockAcquireResponse>
 	overrideLock(projectId: string): Promise<LockAcquireResponse>
 	releaseLock(projectId: string): Promise<boolean>
-	checkLock(projectId: string): Promise<LockStatusResponse>
+	checkLock(projectId: string, throwOnError?: boolean): Promise<LockStatusResponse>
 	refreshLock(): Promise<LockAcquireResponse>
 }
 
@@ -52,11 +55,20 @@ const EMPTY_QUEUE: ModerationQueue = {
 	skipped: [],
 	total: 0,
 	completed: [],
+	history: [],
+	activeProjectId: null,
 	lastUpdated: new Date(),
 }
 
 function createEmptyQueue(): ModerationQueue {
-	return { ...EMPTY_QUEUE, lastUpdated: new Date(), items: [], skipped: [], completed: [] }
+	return {
+		...EMPTY_QUEUE,
+		lastUpdated: new Date(),
+		items: [],
+		skipped: [],
+		completed: [],
+		history: [],
+	}
 }
 
 function sanitizeQueue(raw: PersistedModerationQueueState['currentQueue']): ModerationQueue {
@@ -74,6 +86,8 @@ function sanitizeQueue(raw: PersistedModerationQueueState['currentQueue']): Mode
 		skipped,
 		total,
 		completed,
+		history: (raw.history ?? []).filter((id): id is string => typeof id === 'string'),
+		activeProjectId: typeof raw.activeProjectId === 'string' ? raw.activeProjectId : null,
 		lastUpdated: Number.isNaN(lastUpdated.getTime()) ? new Date() : lastUpdated,
 	}
 }
@@ -90,6 +104,8 @@ function persistedPayload(
 			skipped: [...queue.skipped],
 			total: queue.total,
 			completed: [...queue.completed],
+			history: [...queue.history],
+			activeProjectId: queue.activeProjectId,
 			lastUpdated: queue.lastUpdated.toISOString(),
 		},
 		isQueueMode,
@@ -159,6 +175,8 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 			skipped: [],
 			total: items.length,
 			completed: [],
+			history: [],
+			activeProjectId: null,
 			lastUpdated: new Date(),
 		}
 	}
@@ -180,6 +198,26 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 			currentQueue.value.lastUpdated = new Date()
 
 			return currentQueue.value.items.length > 0
+		})
+	}
+
+	async function visitProject(projectId: string, back = false): Promise<void> {
+		await withMutation(() => {
+			const queue = currentQueue.value
+			if (queue.activeProjectId === projectId) return
+			if (back) {
+				const index = queue.history.lastIndexOf(projectId)
+				if (index === -1) return
+				queue.history = queue.history.slice(0, index)
+			} else if (queue.activeProjectId) {
+				queue.history = [...queue.history, queue.activeProjectId]
+			}
+			queue.activeProjectId = projectId
+			if (queue.skipped.includes(projectId)) {
+				queue.skipped = queue.skipped.filter((id) => id !== projectId)
+				queue.items = [projectId, ...queue.items.filter((id) => id !== projectId)]
+			}
+			queue.lastUpdated = new Date()
 		})
 	}
 
@@ -281,7 +319,7 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 		}
 	}
 
-	async function checkLock(projectId: string): Promise<LockStatusResponse> {
+	async function checkLock(projectId: string, throwOnError = false): Promise<LockStatusResponse> {
 		await ready
 
 		try {
@@ -289,6 +327,7 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 			return response
 		} catch (error) {
 			console.error('Failed to check moderation lock:', error)
+			if (throwOnError) throw error
 			return { locked: false, is_own_lock: false }
 		}
 	}
@@ -327,6 +366,7 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 		startSkippedReview,
 		getCurrentProjectId,
 		resetQueue,
+		visitProject,
 
 		acquireLock,
 		overrideLock,

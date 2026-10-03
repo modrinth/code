@@ -8,6 +8,8 @@ export interface PersistedModerationQueueState {
 		skipped?: string[]
 		total: number
 		completed: string[]
+		history?: string[]
+		activeProjectId?: string | null
 		lastUpdated: string
 	}
 	isQueueMode: boolean
@@ -34,6 +36,8 @@ function isPersistedStateCandidate(value: unknown): value is PersistedModeration
 	if (queue.skipped !== undefined && !isStringArray(queue.skipped)) return false
 	if (typeof queue.total !== 'number' || Number.isNaN(queue.total)) return false
 	if (!isStringArray(queue.completed)) return false
+	if (queue.history !== undefined && !isStringArray(queue.history)) return false
+	if (queue.activeProjectId != null && typeof queue.activeProjectId !== 'string') return false
 	if (typeof queue.lastUpdated !== 'string') return false
 
 	return true

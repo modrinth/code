@@ -21,6 +21,7 @@ import {
 import { capitalizeString, sortedCategories } from '@modrinth/utils'
 import { computed } from 'vue'
 
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
@@ -429,6 +430,7 @@ const toggleFeatured = (tag: string) => {
 				:current-field="JSON.stringify(current)"
 			/>
 			<ValidationMessage :check="saveValidation.forField('tags')" />
+			<ProjectIssueCard target="remove_tags" class="mt-2" />
 		</div>
 		<ValidationMessage :check="saveValidation.withoutFields(['tags'])" class="my-4" />
 		<UnsavedChangesPopup

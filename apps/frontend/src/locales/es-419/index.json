@@ -1067,9 +1067,6 @@
   "conversation-thread.action.approve": {
     "message": "Aprovar"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Aprovar con respuesta"
-  },
   "conversation-thread.action.close-report": {
     "message": "Cerrar informe"
   },
@@ -1078,9 +1075,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Rechazar"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Rechazar con respuesta"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Reabrir hilo"
@@ -1114,9 +1108,6 @@
   },
   "conversation-thread.action.withhold": {
     "message": "Retener"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Retener con respuesta"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Este hilo está cerrado y no se pueden enviar nuevos mensajes."

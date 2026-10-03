@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { GitForkIcon, PlusIcon, TrashIcon } from '@modrinth/assets'
+import { ExternalIcon, GitForkIcon, PlusIcon, TrashIcon } from '@modrinth/assets'
 import {
 	Button,
+	ButtonLink,
 	commonMessages,
 	defineMessages,
 	Input,
@@ -50,6 +51,10 @@ const messages = defineMessages({
 	linkLabel: {
 		id: 'project.settings.disclosures.derivative.link-label',
 		defaultMessage: 'Link to original work',
+	},
+	openLink: {
+		id: 'project.settings.disclosures.derivative.open-link',
+		defaultMessage: 'Visit link',
 	},
 	linkPlaceholder: {
 		id: 'project.settings.disclosures.derivative.link-placeholder',
@@ -110,7 +115,7 @@ function setOptionalField(
 		v-bind="props"
 		v-model="model.enabled"
 		:icon="GitForkIcon"
-		:title="formatMessage(messages.title)"
+		:title="props.title ?? formatMessage(messages.title)"
 		:description="formatMessage(messages.description)"
 		info-link="https://support.modrinth.com/en/articles/16567675#h_6422cc821e"
 		@set-lock-status="emit('setLockStatus', $event)"
@@ -153,6 +158,19 @@ function setOptionalField(
 					:title-for="`derivative-link-${index}`"
 					class="max-w-[40rem]"
 				>
+					<template #title-right>
+						<ButtonLink
+							v-if="source.link"
+							:href="/^https?:\/\//i.test(source.link) ? source.link : `https://${source.link}`"
+							target="_blank"
+							type="quiet"
+							size="sm"
+							class="-my-1.5"
+						>
+							{{ formatMessage(messages.openLink) }}
+							<ExternalIcon />
+						</ButtonLink>
+					</template>
 					<Input
 						:id="`derivative-link-${index}`"
 						:model-value="source.link ?? undefined"
@@ -171,6 +189,7 @@ function setOptionalField(
 						:id="`derivative-note-${index}`"
 						:model-value="source.note ?? undefined"
 						:rows="3"
+						:resize="showLockControls ? 'vertical' : 'none'"
 						:disabled="disabled"
 						:placeholder="formatMessage(messages.notePlaceholder)"
 						@update:model-value="(value) => setOptionalField(index, 'note', value)"

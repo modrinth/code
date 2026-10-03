@@ -1,5 +1,7 @@
 <template>
+	<NuxtPage v-if="route.name === 'moderation-project-review'" />
 	<div
+		v-else
 		class="relative mb-6 mt-4 flex min-h-screen w-full max-w-[1280px] flex-col px-6"
 		:class="`m${marginTarget}-auto`"
 	>

@@ -27,6 +27,7 @@
 				class="mt-2"
 			/>
 			<ValidationMessage :check="saveValidation.forField('description')" class="mt-2" />
+			<ProjectIssueCard target="modify_description" class="mt-2" />
 		</div>
 		<UnsavedChangesPopup
 			:original="saved"
@@ -57,6 +58,7 @@ import { isAdmin, TeamMemberPermission } from '@modrinth/utils'
 import { computed, useTemplateRef } from 'vue'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'

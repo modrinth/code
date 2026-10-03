@@ -1064,9 +1064,6 @@
   "conversation-thread.action.approve": {
     "message": "Approva"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Approva con risposta"
-  },
   "conversation-thread.action.close-report": {
     "message": "Chiudi segnalazione"
   },
@@ -1075,9 +1072,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Rifiuta"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Rifiuta con risposta"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Riapri thread"
@@ -1111,9 +1105,6 @@
   },
   "conversation-thread.action.withhold": {
     "message": "Sospendi"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Sospendi con risposta"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Questo thread è stato chiuso. Non potranno essere inviati nuovi messaggi."

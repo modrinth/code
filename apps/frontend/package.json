@@ -59,6 +59,7 @@
 		"ansi-to-html": "^0.7.2",
 		"chart.js": "^4.5.1",
 		"dayjs": "^1.11.7",
+		"dockview-vue": "^8.2.0",
 		"dompurify": "^3.1.7",
 		"@floating-ui/vue": "^2.0.1",
 		"fuse.js": "^6.6.2",
