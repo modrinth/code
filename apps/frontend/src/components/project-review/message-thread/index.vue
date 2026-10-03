@@ -31,7 +31,7 @@
 				</p>
 			</div>
 		</div>
-		<Composer v-if="thread" ref="composer" />
+		<MessageBox v-if="thread" ref="messageBox" />
 	</div>
 </template>
 
@@ -45,7 +45,7 @@ import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { injectProjectReviewContext } from '../layout/context'
 import { projectReviewMessages as messages } from '../messages'
-import Composer from './composer.vue'
+import MessageBox from './message-box.vue'
 
 const { threadQuery } = injectProjectReviewPageContext()
 const { rightVisible, toggleSidebar } = injectProjectReviewContext()
@@ -58,7 +58,7 @@ const sortedMessages = computed(() =>
 const members = computed(() =>
 	Object.fromEntries((thread.value?.members ?? []).map((member) => [member.id, member])),
 )
-const composer = ref<InstanceType<typeof Composer>>()
+const messageBox = ref<InstanceType<typeof MessageBox>>()
 const scrollContainer = ref<HTMLElement>()
 const content = ref<HTMLElement>()
 const isAtBottom = ref(true)
@@ -87,7 +87,7 @@ async function openEditor() {
 	isAtBottom.value = true
 	await nextTick()
 	scrollToBottom()
-	await composer.value?.openEditor()
+	await messageBox.value?.openEditor()
 }
 defineExpose({ openEditor })
 </script>
