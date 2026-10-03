@@ -564,7 +564,7 @@ export function createReviewPanels(
 				return {
 					id,
 					missing: [...new Set(missing)],
-					facets: issue.facets ? resolveIssueFacets(issue.facets, context) : undefined,
+					facets: resolveIssueFacets(issue.facets, context),
 					issue: {
 						message: resolveWithContext(issue.message, context),
 						suggestedStatus: resolveWithContext(issue.suggestedStatus, context),

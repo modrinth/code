@@ -73,7 +73,10 @@
 								</TeleportOverflowMenu>
 							</div>
 							<Tooltip
-								v-if="!showProjectAreaLink && issue.verdict !== 'resolved'"
+								v-if="
+									(!showProjectAreaLink || !actionFacets(issue).length) &&
+									issue.verdict !== 'resolved'
+									"
 								:disabled="allActionsComplete(issue) || isAddressed(issue)"
 								:text="formatMessage(messages.completeActionsFirst)"
 								class="ml-auto"

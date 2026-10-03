@@ -186,10 +186,10 @@ export const issueTargets = {
 }
 
 export function resolveIssueFacets(
-	facets: WithContext<readonly IssueFacet[]>,
+	facets: WithContext<readonly IssueFacet[]> | undefined,
 	ctx: ReviewContext,
-): Labrinth.Threads.v3.NewThreadIssue['facets'] | undefined {
-	const [first, ...rest] = typeof facets === 'function' ? facets(ctx) : facets
-	if (!first) return undefined
+): Labrinth.Threads.v3.NewThreadIssue['facets'] {
+	const [first, ...rest] = (typeof facets === 'function' ? facets(ctx) : facets) ?? []
+	if (!first) return [{ what: issueTargets.acknowledge('checkbox')(ctx) }]
 	return [{ what: first(ctx) }, ...rest.map((facet) => ({ what: facet(ctx) }))]
 }

@@ -48,7 +48,7 @@ export interface Issue {
 	/** Orders selected issues; omitted priorities use the default group. */
 	priority?: IssuePriority
 	message: WithContext<string>
-	/** Targets to change, selected from current context and resolved when the issue is submitted. */
+	/** Targets to change, resolved from current context. Omitted or empty facets require checkbox acknowledgment. */
 	facets?: WithContext<readonly IssueFacet[]>
 	suggestedStatus?: WithContext<ModerationStatus | undefined>
 }

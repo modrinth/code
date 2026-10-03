@@ -48,13 +48,6 @@ export function createReviewMessages(
 	function resetIssueMessage(id: string) {
 		overrides.delete(id)
 	}
-	const generated = computed(() =>
-		panels.activeIssues.value
-			.filter(({ id, facets }) => !facets && !panels.isRestoredIssue(id))
-			.map(({ id }) => issueMessage(id))
-			.filter((message) => message.trim())
-			.join('\n\n'),
-	)
 	watch(
 		() => project.value?.id,
 		() => {
@@ -66,7 +59,6 @@ export function createReviewMessages(
 
 	return {
 		generating,
-		generated,
 		issueMessage,
 		setIssueDefault: (id: string, message: string) => {
 			defaults.set(id, message)

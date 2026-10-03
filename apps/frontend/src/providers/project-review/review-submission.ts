@@ -43,8 +43,6 @@ export function createReviewSubmission(
 	const pendingDecision = ref<{
 		id: string
 		status: ProjectStatus
-		body: string
-		messageSent: boolean
 		issues?: NewThreadIssues
 		issueUpdates: IssueUpdate[]
 	}>()
@@ -95,7 +93,7 @@ export function createReviewSubmission(
 		const previousIds = previousIssues.associatedIssueIds.value
 		const titles = new Map(panels.availableIssues.value.map(({ id, title }) => [id, title]))
 		for (const { id, facets } of panels.activeIssues.value) {
-			if (!facets || previousIds.has(id)) continue
+			if (previousIds.has(id)) continue
 			selected.push({
 				why: {
 					issue_id: id,
@@ -115,8 +113,8 @@ export function createReviewSubmission(
 			id,
 			threadId,
 			body,
-			images,
-			privateMessage,
+			images = [],
+			privateMessage = false,
 			status,
 			statusAlreadyApplied = false,
 			issues,
@@ -124,9 +122,9 @@ export function createReviewSubmission(
 		}: {
 			id: string
 			threadId: string
-			body: string
-			images: string[]
-			privateMessage: boolean
+			body?: string
+			images?: string[]
+			privateMessage?: boolean
 			status?: ProjectStatus
 			statusAlreadyApplied?: boolean
 			issues?: NewThreadIssues
@@ -141,10 +139,10 @@ export function createReviewSubmission(
 			assertCurrent(id)
 			if (status && !statusAlreadyApplied) {
 				await client.labrinth.projects_v3.edit(id, { status })
-				pendingDecision.value = { id, status, body, messageSent: false, issues, issueUpdates }
+				pendingDecision.value = { id, status, issues, issueUpdates }
 			}
 			assertCurrent(id)
-			if (body && (!status || !pendingDecision.value?.messageSent)) {
+			if (!status && body) {
 				await client.labrinth.threads_v3.sendMessage(threadId, {
 					body: {
 						type: 'text',
@@ -153,8 +151,7 @@ export function createReviewSubmission(
 						associated_images: images,
 					},
 				})
-				if (status && pendingDecision.value) pendingDecision.value.messageSent = true
-				else if (!status && !disposed && project.value?.id === id) {
+				if (!disposed && project.value?.id === id) {
 					draft.value = ''
 					uploadedImages.value = []
 				}
@@ -248,19 +245,13 @@ export function createReviewSubmission(
 	async function submitDecision(status: ProjectStatus) {
 		const current = project.value
 		if (!canSubmit.value || !current || messages.generating.value) return
-		const generatedBody = messages.generated.value
-		const normalizedBody = generatedBody.trim() ? generatedBody : ''
 		const currentPendingDecision = pendingDecision.value
 		const statusAlreadyApplied =
 			currentPendingDecision?.id === current.id && currentPendingDecision.status === status
-		const body = statusAlreadyApplied ? currentPendingDecision.body : normalizedBody
 		try {
 			await submission.mutateAsync({
 				id: current.id,
 				threadId: current.thread_id,
-				body,
-				images: [],
-				privateMessage: false,
 				status,
 				statusAlreadyApplied,
 				issues: statusAlreadyApplied ? currentPendingDecision.issues : selectedIssues(),
