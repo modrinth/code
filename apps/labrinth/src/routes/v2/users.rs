@@ -31,7 +31,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     );
 }
 
-/// Get the current user.  
+/// Get the current user.
 #[utoipa::path(
 	context_path = "/user",
 	tag = "users",
@@ -73,7 +73,7 @@ pub struct UserIds {
     pub ids: String,
 }
 
-/// Get multiple users by ID.  
+/// Get multiple users by ID.
 #[utoipa::path(
 	tag = "users",
     get,
@@ -113,7 +113,7 @@ pub async fn users_get(
     }
 }
 
-/// Get a user by ID or username.  
+/// Get a user by ID or username.
 #[utoipa::path(
 	context_path = "/user",
 	tag = "users",
@@ -153,7 +153,7 @@ pub async fn user_get(
     }
 }
 
-/// Get a user's projects.  
+/// Get a user's projects.
 #[utoipa::path(
 	context_path = "/user",
 	tag = "users",
@@ -225,9 +225,10 @@ pub struct EditUser {
     pub role: Option<Role>,
     pub badges: Option<Badges>,
     pub allow_friend_requests: Option<bool>,
+    pub pronouns: Option<String>,
 }
 
-/// Update a user.  
+/// Update a user.
 #[utoipa::path(
 	context_path = "/user",
 	tag = "users",
@@ -271,6 +272,7 @@ pub async fn user_edit(
             badges: new_user.badges,
             venmo_handle: None,
             allow_friend_requests: new_user.allow_friend_requests,
+            pronouns: new_user.pronouns,
         }),
         pool,
         redis,
@@ -285,7 +287,7 @@ pub struct Extension {
     pub ext: String,
 }
 
-/// Change a user's avatar.  
+/// Change a user's avatar.
 #[utoipa::path(
 	context_path = "/user",
 	tag = "users",
@@ -342,7 +344,7 @@ pub async fn user_icon_edit(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Remove a user's avatar.  
+/// Remove a user's avatar.
 #[utoipa::path(
 	context_path = "/user",
 	tag = "users",
@@ -383,7 +385,7 @@ pub async fn user_icon_delete(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Delete a user by ID or username.  
+/// Delete a user by ID or username.
 #[utoipa::path(
 	context_path = "/user",
 	tag = "users",
@@ -420,7 +422,7 @@ pub async fn user_delete(
         .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Get projects followed by a user.  
+/// Get projects followed by a user.
 #[utoipa::path(
 	context_path = "/user",
 	tag = "users",
@@ -476,7 +478,7 @@ pub async fn user_follows(
     }
 }
 
-/// Get notifications for a user.  
+/// Get notifications for a user.
 #[utoipa::path(
 	context_path = "/user",
 	tag = "users",

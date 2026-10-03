@@ -219,7 +219,7 @@ impl DBUser {
                     r#"
                     SELECT id, email,
                         avatar_url, raw_avatar_url, username, bio, pronouns,
-                        created, role, badges,
+                        users.created, role, badges,
                         (
                             SELECT MAX(campaign_donations.donated_at)
                             FROM campaign_donations

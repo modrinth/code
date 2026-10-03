@@ -11,7 +11,10 @@
 			/>
 		</template>
 
-		<template v-if="isOfficialAccount || showAffiliateBadge || user.lock" #badges>
+		<template v-if="isOfficialAccount || showAffiliateBadge || user.lock || user.pronouns" #badges>
+			<span v-if="user.pronouns" class="text-lg font-normal text-secondary">
+				· {{ user.pronouns }}
+			</span>
 			<PageHeaderBadgeItem
 				v-if="isOfficialAccount"
 				:icon="BadgeCheckIcon"

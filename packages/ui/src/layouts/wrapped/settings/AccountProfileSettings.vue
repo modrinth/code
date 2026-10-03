@@ -111,6 +111,21 @@
 
 			<div class="flex flex-col gap-2.5">
 				<h2 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.pronounsTitle) }}
+				</h2>
+				<Input
+					id="pronouns-field"
+					v-model="current.pronouns"
+					class="w-full max-w-md"
+					:error="current.pronouns.length > 40"
+				/>
+				<p class="m-0 text-secondary">
+					{{ formatMessage(messages.pronounsDescription) }}
+				</p>
+			</div>
+
+			<div class="flex flex-col gap-2.5">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.bioTitle) }}
 				</h2>
 				<Textarea id="bio-field" v-model="current.bio" :error="current.bio.length > 160" />
@@ -143,6 +158,7 @@ import { commonMessages } from '#ui/utils'
 type ProfileFields = {
 	username: string
 	bio: string
+	pronouns: string
 }
 
 const props = withDefaults(
@@ -166,8 +182,8 @@ const notificationManager = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const activeUserId = ref<string | null>(null)
-const original = ref<ProfileFields>({ username: '', bio: '' })
-const current = ref<ProfileFields>({ username: '', bio: '' })
+const original = ref<ProfileFields>({ username: '', bio: '', pronouns: '' })
+const current = ref<ProfileFields>({ username: '', bio: '', pronouns: '' })
 const avatarUrl = ref<string | null>(null)
 const avatarFile = shallowRef<File | null>(null)
 const previewImageUrl = ref<string | null>(null)
@@ -194,6 +210,7 @@ const hasChanges = computed(
 	() =>
 		current.value.username !== original.value.username ||
 		current.value.bio !== original.value.bio ||
+		current.value.pronouns !== original.value.pronouns ||
 		Boolean(avatarFile.value || pendingAvatarDeletion.value),
 )
 
@@ -213,6 +230,7 @@ function syncFromUser(user: AuthUser | null): void {
 	original.value = {
 		username: user?.username ?? '',
 		bio: user?.bio ?? '',
+		pronouns: user?.pronouns ?? '',
 	}
 	current.value = { ...original.value }
 	avatarUrl.value = user?.avatar_url ?? null
@@ -281,6 +299,9 @@ async function save(): Promise<void> {
 		if (current.value.bio !== original.value.bio) {
 			patch.bio = current.value.bio
 		}
+		if (current.value.pronouns !== original.value.pronouns) {
+			patch.pronouns = current.value.pronouns
+		}
 		if (Object.keys(patch).length > 0) {
 			await props.patchUser(user.id, patch)
 		}
@@ -331,6 +352,14 @@ const messages = defineMessages({
 	usernameDescription: {
 		id: 'settings.profile.username.description',
 		defaultMessage: 'A unique case-insensitive name to identify your profile.',
+	},
+	pronounsTitle: {
+		id: 'settings.profile.pronouns.title',
+		defaultMessage: 'Pronouns',
+	},
+	pronounsDescription: {
+		id: 'settings.profile.pronouns.description',
+		defaultMessage: 'Pronouns dec placeholder',
 	},
 	bioTitle: {
 		id: 'settings.profile.bio.title',

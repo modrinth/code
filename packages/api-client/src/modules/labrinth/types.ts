@@ -1783,6 +1783,7 @@ export namespace Labrinth {
 				name?: string
 				avatar_url?: string
 				bio?: string
+				pronouns?: string
 				created: string
 				role: Role
 				badges: number
@@ -1888,6 +1889,7 @@ export namespace Labrinth {
 				avatar_url?: string
 				raw_avatar_url?: string
 				bio?: string
+				pronouns?: string
 				created: string
 				role: Role
 				badges: number
