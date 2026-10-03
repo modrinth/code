@@ -168,7 +168,9 @@ export class LabrinthUsersV2Module extends AbstractModule {
 	 */
 	public async patch(
 		idOrUsername: string,
-		data: Partial<Pick<Labrinth.Users.v2.User, 'badges' | 'bio' | 'pronouns' | 'role' | 'username'>>,
+		data: Partial<
+			Pick<Labrinth.Users.v2.User, 'badges' | 'bio' | 'pronouns' | 'role' | 'username'>
+		>,
 	): Promise<void> {
 		return this.client.request(`/user/${idOrUsername}`, {
 			api: 'labrinth',

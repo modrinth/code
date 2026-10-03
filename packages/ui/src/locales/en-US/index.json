@@ -6104,6 +6104,12 @@
   "settings.profile.profile-picture.title": {
     "defaultMessage": "Profile picture"
   },
+  "settings.profile.pronouns.description": {
+    "defaultMessage": "Pronouns dec placeholder"
+  },
+  "settings.profile.pronouns.title": {
+    "defaultMessage": "Pronouns"
+  },
   "settings.profile.public-information.description": {
     "defaultMessage": "Your profile information is publicly <profile-link>viewable on Modrinth</profile-link> and through the <docs-link>Modrinth API</docs-link>."
   },
