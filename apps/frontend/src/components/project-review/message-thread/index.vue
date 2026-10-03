@@ -2,7 +2,7 @@
 	<div class="flex min-h-0 min-w-0 flex-1 flex-col">
 		<div
 			ref="scrollContainer"
-			class="min-h-0 flex-1 overflow-y-auto overscroll-contain"
+			class="min-h-0 flex-1 overflow-y-auto overscroll-contain [overflow-anchor:none]"
 			@scroll="updateScrollPosition"
 		>
 			<div ref="content" class="flex min-h-full flex-col justify-end">
@@ -62,17 +62,32 @@ const messageBox = ref<InstanceType<typeof MessageBox>>()
 const scrollContainer = ref<HTMLElement>()
 const content = ref<HTMLElement>()
 const isAtBottom = ref(true)
+let bottomOffset = 0
+let viewportHeight = 0
+let contentHeight = 0
 function updateScrollPosition() {
 	const container = scrollContainer.value
 	if (!container || !container.clientHeight) return
-	isAtBottom.value = container.scrollHeight - container.scrollTop - container.clientHeight <= 1
+	if (container.clientHeight !== viewportHeight || container.scrollHeight !== contentHeight) return
+	bottomOffset = Math.max(0, container.scrollHeight - container.scrollTop - container.clientHeight)
+	isAtBottom.value = bottomOffset <= 1
 }
 function scrollToBottom() {
 	const container = scrollContainer.value
+	bottomOffset = 0
 	if (container?.clientHeight) container.scrollTop = container.scrollHeight
 }
 useResizeObserver([scrollContainer, content], () => {
-	if (isAtBottom.value) scrollToBottom()
+	const container = scrollContainer.value
+	if (!container?.clientHeight) return
+	if (isAtBottom.value) {
+		scrollToBottom()
+	} else if (container.clientHeight !== viewportHeight) {
+		container.scrollTop = container.scrollHeight - container.clientHeight - bottomOffset
+	}
+	viewportHeight = container.clientHeight
+	contentHeight = container.scrollHeight
+	updateScrollPosition()
 })
 watch(
 	() => thread.value?.id,
