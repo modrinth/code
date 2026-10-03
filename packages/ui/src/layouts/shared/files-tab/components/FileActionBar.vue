@@ -18,8 +18,8 @@
 							class="bg-surface-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 							@click="() => $emit('toggleSidebar')"
 						>
-							<PanelLeftCloseIcon v-if="sidebarOpen && !smallMode" />
-							<PanelLeftOpenIcon v-else />
+							<PanelRightCloseIcon v-if="sidebarOpen && !smallMode" transform="rotate(180)" />
+							<PanelRightOpenIcon v-else transform="rotate(180)"/>
 							<span class="sr-only">{{ formatMessage(messages.expand) }}</span>
 						</IconButton>
 					</div>
@@ -114,8 +114,8 @@ import {
 	FileArchiveIcon,
 	FolderOpenIcon,
 	LinkIcon,
-	PanelLeftCloseIcon,
-	PanelLeftOpenIcon,
+	PanelRightCloseIcon,
+	PanelRightOpenIcon,
 	PlusIcon,
 	RefreshCwIcon,
 	SearchIcon,
