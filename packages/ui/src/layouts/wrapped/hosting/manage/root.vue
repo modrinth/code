@@ -106,10 +106,10 @@
 		:class="[
 			'server-panel-' + revealState,
 			containedLayout
-				? 'h-full min-h-0 overflow-hidden pb-6'
+				? 'h-full min-h-0 overflow-hidden'
 				: constrainWidth
-					? ['min-h-[100svh] pb-16', centerEntries ? 'max-w-[1280px]' : '']
-					: 'min-h-[calc(100svh-100px)] pb-6',
+					? ['min-h-[100svh] ', centerEntries ? 'max-w-[1280px]' : '']
+					: 'min-h-[calc(100svh-100px)]',
 		]"
 	>
 		<template v-if="revealState !== 'pending' || isOnboarding">
@@ -236,14 +236,15 @@
 						:class="[containedLayout ? 'shrink-0' : '', 'px-0 py-0']"
 						:style="{ '--si': 1 }"
 					/>
-					<IconButton v-if="allowConstrainWidthToggle"
+					<IconButton
+v-if="allowConstrainWidthToggle"
 						v-tooltip="constrainWidth ? 'Expand View' : 'Collapse View'"
 						size="md"
 						:label="constrainWidth ? 'Expand View' : 'Collapse View'"
 						native-type="button"
-						@click="() => constrainWidth = !constrainWidth"
 						class="ml-2"
 						:style="{ '--si': 1 }"
+						@click="() => constrainWidth = !constrainWidth"
 					>
 						<ExpandIcon v-if="constrainWidth" />
 						<CollapseIcon v-else />
@@ -321,8 +322,10 @@ import type { Archon, Labrinth } from '@modrinth/api-client'
 import { ModrinthApiError, NuxtModrinthClient } from '@modrinth/api-client'
 import {
 	BoxesIcon,
+	CollapseIcon,
 	CopyIcon,
 	DatabaseBackupIcon,
+	ExpandIcon,
 	FolderOpenIcon,
 	IssuesIcon,
 	LayoutTemplateIcon,
@@ -332,8 +335,6 @@ import {
 	MoreVerticalIcon,
 	ServerIcon as ServerAssetIcon,
 	SettingsIcon,
-	ExpandIcon,
-	CollapseIcon,
 	TimerIcon,
 	TransferIcon,
 	TriangleAlertIcon,
@@ -341,7 +342,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import {useLocalStorage, useStorage} from '@vueuse/core'
+import {useLocalStorage, useResizeObserver,useStorage} from '@vueuse/core'
 import DOMPurify from 'dompurify'
 import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
@@ -392,7 +393,6 @@ import { commonMessages } from '#ui/utils/common-messages'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import ServerOnboardingPanelPage from './[id]/onboarding.vue'
-import {useResizeObserver} from "@vueuse/core/index";
 
 interface Tab {
 	label: string

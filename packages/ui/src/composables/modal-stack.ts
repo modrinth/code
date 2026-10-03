@@ -1,9 +1,10 @@
+import {useScrollLock} from "@vueuse/core";
 import { computed, type Ref, ref } from 'vue'
+
+import {injectAppRoot} from "#ui/providers/app-root.ts";
 
 import { dismissFloatingMenus } from '../providers/floating-menu'
 import { dismissTooltip } from '../providers/tooltip'
-import {useScrollLock} from "@vueuse/core";
-import {injectAppRoot} from "#ui/providers/app-root.ts";
 
 const isClient = typeof window !== 'undefined'
 

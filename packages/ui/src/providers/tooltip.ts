@@ -183,7 +183,24 @@ function isFocusVisible(el: HTMLElement) {
 	return active.matches(':focus-visible')
 }
 
-export function tooltipEnter(el: HTMLElement) {
+let showTimeoutData: { id: TimeoutId | undefined, el: HTMLElement } | undefined = undefined;
+
+export function tooltipEnter(el: HTMLElement, timeout?: number): void {
+	if (timeout != undefined) {
+		// TODO: SHOULD ATTEMPT TO HIDE ANY PREVIOUS CALLS RIGHT AWAY?
+		const timeoutId = setTimeout(() => {
+			if (showTimeoutData) tooltipEnterBase(showTimeoutData.el)
+		}, timeout);
+		if (showTimeoutData) clearTimeout(showTimeoutData.id);
+		if (hideTimeoutData?.el === el) clearTimeout(hideTimeoutData.id);
+
+		showTimeoutData = { id: timeoutId, el: el }
+	} else {
+		tooltipEnterBase(el)
+	}
+}
+
+export function tooltipEnterBase(el: HTMLElement) {
 	if (!hasTooltipContent(el)) {
 		return
 	}
@@ -205,9 +222,11 @@ export function preventTooltipClosure(el: HTMLElement) {
 export function tooltipLeave(el: HTMLElement, timeout?: number): void {
 	if (timeout != undefined) {
 		// TODO: SHOULD ATTEMPT TO HIDE ANY PREVIOUS CALLS RIGHT AWAY?
-		let timeoutId = setTimeout(() => {
+		const timeoutId = setTimeout(() => {
 			if (hideTimeoutData) tooltipLeaveBase(hideTimeoutData.el)
 		}, timeout);
+		if (hideTimeoutData?.el === el) clearTimeout(hideTimeoutData.id);
+		if (showTimeoutData?.el === el) clearTimeout(showTimeoutData.id);
 
 		hideTimeoutData = { id: timeoutId, el: el }
 	} else {

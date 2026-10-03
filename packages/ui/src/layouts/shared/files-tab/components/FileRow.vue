@@ -1,13 +1,13 @@
 <template>
-	<Tooltip :disabled="detailsTooltipDisabled" :allow-hover="true">
+	<Tooltip :action-wait="{hover: 600, unhover: 200}">
 		<li
 			role="option"
-			:class="[containerClasses, isDragSource ? 'opacity-50' : '', compact ? 'h-9' : 'h-[52.8px]']"
-			:style="depth != null ? { paddingLeft: `${0.5 + depth}rem` } : undefined"
+			:class="[containerClasses, isDragSource ? 'opacity-50' : '', compact ? 'h-8' : 'h-[3.25rem]', ]"
+			:style="depth != null ? { paddingLeft: `${(depth * basePaddingFactor)}rem`} : undefined"
 			tabindex="0"
 			:data-file-path="path"
 			:data-file-type="type"
-			:aria-expanded="isTreeRow && type === 'directory' ? expanded : undefined"
+			:aria-expanded="canExpand ? expanded : undefined"
 			:aria-current="active ? 'location' : undefined"
 			@click="selectItem"
 			@auxclick="handleAuxClick"
@@ -22,15 +22,19 @@
 				:key="level"
 				aria-hidden="true"
 				class="pointer-events-none absolute inset-y-0 w-px"
-				:class="level === activeGuideLevel ? 'bg-brand' : 'bg-surface-5'"
-				:style="{ left: `${level + 0.125}rem` }"
+				:class="level === activeGuideLevel ? 'bg-brand-highlight' : 'bg-surface-5'"
+				:style="{
+					left: `${((level * basePaddingFactor) - 0.125)}rem`,
+					height: `calc(2rem + ${isLast && level == depth ? '0rem' : '(0.25rem / 2)'})`,
+					top: index != 0 ? `calc(-0.25rem / 2)` : ''
+				}"
 			/>
-			<div class="pointer-events-none flex flex-1 items-center truncate" :class="compact ? 'gap-2' : 'gap-3'">
+			<div class="pointer-events-none flex flex-1 items-center truncate h-full" :class="compact ? 'gap-2' : 'gap-3'">
 				<button
-					v-if="isTreeRow && type === 'directory'"
+					v-if="canExpand"
 					type="button"
 					tabindex="-1"
-					class="pointer-events-auto -mr-1 flex size-5 shrink-0 items-center justify-center rounded border-none bg-transparent p-0 text-secondary hover:bg-surface-5 hover:text-contrast"
+					class="pointer-events-auto -mr-1 flex size-5 shrink-0 items-center justify-center rounded border-none bg-transparent p-0 text-secondary hover:bg-surface-5 hover:text-contrast h-full"
 					:aria-label="formatMessage(expanded ? messages.collapseFolder : messages.expandFolder)"
 					@click.stop="emit('toggle-expand')"
 					@pointerdown.stop
@@ -38,7 +42,8 @@
 					<ChevronRightIcon class="size-4 transition-transform duration-100" :class="{ 'rotate-90': expanded }" />
 				</button>
 				<span v-else-if="isTreeRow" class="-mr-1 size-5 shrink-0" aria-hidden="true" />
-				<Checkbox v-if="!selectionWithinActionMenu"
+				<Checkbox
+v-if="!selectionWithinActionMenu"
 					class="pointer-events-auto"
 					:model-value="selected"
 					@click.stop
@@ -61,15 +66,14 @@
 				</div>
 				<EditIcon v-if="hoveringToEdit && isEditableFile && !compact" />
 			</div>
-			<div class="pointer-events-auto flex w-fit flex-shrink-0 items-center gap-4 @[900px]:gap-12">
-				<span v-if="showDetails" class="hidden w-[100px] text-nowrap text-sm text-secondary @[900px]:block">
-					{{ formattedSize }}
-				</span>
-				<span v-if="showDetails" class="hidden w-[160px] text-nowrap text-sm text-secondary @[900px]:block">
-					{{ formattedCreationDate }}
-				</span>
-				<span v-if="showDetails" class="hidden w-[160px] text-nowrap text-sm text-secondary @[900px]:block">
-					{{ formattedModifiedDate }}
+			<div v-if="!isTreeRow" class="pointer-events-auto flex w-fit flex-shrink-0 items-center gap-6">
+				<span
+					v-for="column in shownColumnDefinitions"
+					:key="column.id"
+					class="truncate text-nowrap text-sm text-secondary"
+					:style="{ width: `${column.width}px` }"
+				>
+					{{ columnValues[column.id] }}
 				</span>
 				<div class="grid min-w-[51px] shrink-0 items-center justify-items-end">
 					<span
@@ -100,12 +104,22 @@
 			<div class="flex flex-col w-fit">
 				<h3 class="mb-2 pb-1 mt-0 text-base font-semibold border-0 border-b-[1px] border-solid border-divider">Details</h3>
 				<div class="gap-1 grid grid-cols-2">
-					<span class="text-nowrap text-sm text-secondary">
-						{{ formatMessage(messages.size) }}
-					</span>
-					<span class="text-nowrap text-sm text-secondary">
-						{{ formattedSize }}
-					</span>
+					<template v-if="type === 'directory'">
+						<span class="text-nowrap text-sm text-secondary">
+							{{ formatMessage(messages.items) }}
+						</span>
+						<span class="text-nowrap text-sm text-secondary">
+							{{ columnValues.items }}
+						</span>
+					</template>
+					<template v-else>
+						<span class="text-nowrap text-sm text-secondary">
+							{{ formatMessage(messages.size) }}
+						</span>
+						<span class="text-nowrap text-sm text-secondary">
+							{{ columnValues.size }}
+						</span>
+					</template>
 					<span class="text-nowrap text-sm text-secondary">
 						{{ formatMessage(messages.created) }}
 					</span>
@@ -132,6 +146,7 @@ import {
 	ClipboardCopyIcon,
 	DownloadIcon,
 	EditIcon,
+	FileIcon,
 	FolderArchiveIcon,
 	FolderCogIcon,
 	FolderOpenIcon,
@@ -146,17 +161,21 @@ import {
 } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
-import type { ButtonMenuOption } from '#ui/components/base/buttons'
+import { Tooltip } from "#ui/components";
+import type {ButtonMenuLeafOption, ButtonMenuOption} from '#ui/components/base/buttons'
 import { TeleportOverflowMenu } from '#ui/components/base/buttons'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import { useFormatBytes } from '#ui/composables'
 import { useFormatDateTime } from '#ui/composables/format-date-time'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { injectFileManager } from '#ui/layouts'
+import { useFileActions } from "#ui/layouts/shared/files-tab/composables/folder-actions.ts";
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { getFileExtensionIcon } from '#ui/utils/auto-icons'
 import { commonMessages } from '#ui/utils/common-messages'
 import { canOpenInFileEditor, getFileExtension } from '#ui/utils/file-extensions'
 
+import { FILE_COLUMNS, type FileColumn } from '../composables/file-columns'
 import {
 	fileDragActive,
 	fileDragData,
@@ -164,15 +183,14 @@ import {
 	startFileDrag,
 	wasRecentDrag,
 } from '../composables/file-drag-state'
-import { useShiftKey } from '../composables/shift-key'
-import { injectFileManager } from '../providers/file-manager'
 import type { FileItem } from '../types'
 import { joinDisplayPath } from '../utils'
-import {Tooltip} from "#ui/components";
 
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
 const ctx = injectFileManager()
+
+const basePaddingFactor = 0.75;
 
 const messages = defineMessages({
 	itemCount: {
@@ -187,6 +205,10 @@ const messages = defineMessages({
 		id: 'files.table-header.size',
 		defaultMessage: 'Size',
 	},
+	items: {
+		id: 'files.table-header.items',
+		defaultMessage: 'Items',
+	},
 	created: {
 		id: 'files.table-header.created',
 		defaultMessage: 'Created',
@@ -198,6 +220,10 @@ const messages = defineMessages({
 	openInNewTab: {
 		id: 'files.row.open-in-new-tab',
 		defaultMessage: 'Open in new tab',
+	},
+	newOrUpload: {
+		id: 'files.row.upload-or-create',
+		defaultMessage: 'New Entry',
 	},
 	expandFolder: {
 		id: 'files.row.expand-folder',
@@ -216,15 +242,21 @@ const props = defineProps<
 		selected: boolean
 		writeDisabled?: boolean
 		writeDisabledTooltip?: string
-		showDetails: boolean
-		containerWidth?: number | undefined
+		/** Detail columns to render, in order. */
+		columns?: FileColumn[]
+		/** Whether some details aren't shown as columns, so hovering offers them in a tooltip. */
+		hasHiddenDetails?: boolean
 		selectionWithinActionMenu?: boolean
 		/** Smaller row, used by the sidebar tree. */
 		compact?: boolean
 		/** Nesting level in the sidebar tree; indents the row. */
 		depth?: number
-		/** Whether this tree row's directory is expanded. Leave undefined for non-tree rows. */
+		/** Renders as a sidebar tree row: expand chevron, no columns or inline actions menu. */
+		isTreeRow?: boolean
+		/** Whether this tree row's directory is expanded. */
 		expanded?: boolean
+		/** Whether this tree row's directory can be expanded, i.e. isn't known to be empty. */
+		expandable?: boolean
 		/** Highlights the row as the active tab's current location. */
 		active?: boolean
 		/** Tree guide level (1-based) to highlight, marking the directory the active location is in. */
@@ -247,25 +279,24 @@ const emit = defineEmits<{
 			| 'open-in-new-tab',
 		item: Pick<FileItem, 'name' | 'type' | 'path'>,
 	): void
+	(e: 'create', type: 'file' | 'directory'): void
+	(e: 'upload', type: 'file' | 'zip'): void,
 	(
 		e: 'moveDirectTo',
-		item: Pick<FileItem, 'name' | 'type' | 'path'> & { destination: string },
+		item: Pick<FileItem, 'name' | 'type' | 'path'>, destination: string,
 	): void
 	(e: 'contextmenu', event: MouseEvent, options: ButtonMenuOption[]): void
 	(e: 'toggle-select'): void
 	(e: 'toggle-expand'): void
 }>()
 
-const isTreeRow = computed(() => props.expanded !== undefined)
+const canExpand = computed(
+	() => !!props.isTreeRow && props.type === 'directory' && props.expandable !== false,
+)
 
-const shiftHeld = useShiftKey()
-
-/** Compact rows only show details while Shift is held; full rows show them when the columns are hidden. */
-const detailsTooltipDisabled = computed(() => {
-	if (props.compact) return !shiftHeld.value
-	if (props.containerWidth != null) return props.containerWidth > 900 ? props.showDetails : false
-	return props.showDetails
-})
+const shownColumnDefinitions = computed(() =>
+	(props.columns ?? []).flatMap((id) => FILE_COLUMNS.filter((column) => column.id === id)),
+)
 const canOpenInTab = computed(() => props.type === 'directory' || isEditableFile.value)
 
 const isDropTarget = computed(
@@ -286,8 +317,8 @@ const formatBytes = useFormatBytes()
 const containerClasses = computed(() => {
 	const dropTarget = isDropTarget.value
 	return [
-		'group relative m-0 flex w-full select-none items-center justify-between overflow-hidden border-0 border-solid border-surface-4 pl-3 focus:!outline-none',
-		props.compact ? 'rounded-lg py-1 pr-1' : 'border-t py-2 pr-3',
+		'group relative m-0 flex w-full select-none items-center justify-between overflow-x-clip border-0 border-solid border-surface-4 pl-3 focus:!outline-none',
+		props.compact ? 'rounded-lg pr-2 overflow-y-visible' : 'border-t py-2 pr-3 overflow-y-hidden',
 		dropTarget
 			? '!bg-brand-highlight'
 			: props.active
@@ -313,13 +344,25 @@ function getFullPath() {
 	return joinDisplayPath(ctx.basePath?.value, props.path)
 }
 
+const { options } = useFileActions(
+	(type) => emit('create', type),
+	(type) => emit('upload', type),
+);
+
 const menuOptions = computed<ButtonMenuOption[]>(() => {
 	const item = { name: props.name, type: props.type, path: props.path }
 	const wd = props.writeDisabled
 	const wdTooltip = props.writeDisabledTooltip
 	return [
 		{
-			id: 'copy-filename',
+			type: "submenu",
+			id: 'upload-create',
+			label: formatMessage(messages.newOrUpload),
+			icon: FileIcon,
+			options: options.value as ButtonMenuLeafOption[],
+		},
+		{
+			id: 'select-entry',
 			label: formatMessage(commonMessages.selectEntryLabel),
 			icon: iconComponent.value,
 			action: () => {
@@ -334,6 +377,7 @@ const menuOptions = computed<ButtonMenuOption[]>(() => {
 			shown: canOpenInTab.value,
 			action: () => emit('open-in-new-tab', item),
 		},
+		{ type: 'divider' },
 		{
 			id: 'copy-filename',
 			label: formatMessage(commonMessages.copyFilenameButton),
@@ -356,7 +400,7 @@ const menuOptions = computed<ButtonMenuOption[]>(() => {
 			},
 		},
 		{
-			id: 'select-entry',
+			id: 'open-in-folder',
 			label: formatMessage(commonMessages.openInFolderButton),
 			icon: FolderOpenIcon,
 			shown: !!ctx.openInFolder,
@@ -449,14 +493,13 @@ const isEditableFile = computed(() => {
 	return false
 })
 
-const formattedSize = computed(() => {
-	if (props.type === 'directory') {
-		return formatMessage(messages.itemCount, { count: props.count ?? 0 })
-	}
-
-	if (props.size == null) return ''
-	return formatBytes(props.size)
-})
+const columnValues = computed<Record<FileColumn, string>>(() => ({
+	size: props.size != null ? formatBytes(props.size) : '',
+	items:
+		props.type === 'directory' ? formatMessage(messages.itemCount, { count: props.count ?? 0 }) : '',
+	created: formattedCreationDate.value,
+	modified: formattedModifiedDate.value,
+}))
 
 function openContextMenu(event: MouseEvent) {
 	event.preventDefault()
@@ -504,7 +547,7 @@ function handleAuxClick(event: MouseEvent) {
 function handleKeydown(event: KeyboardEvent) {
 	if (event.key === 'Enter') {
 		selectItem()
-	} else if (isTreeRow.value && props.type === 'directory') {
+	} else if (canExpand.value) {
 		if (event.key === 'ArrowRight' && !props.expanded) emit('toggle-expand')
 		if (event.key === 'ArrowLeft' && props.expanded) emit('toggle-expand')
 	}
@@ -516,12 +559,7 @@ function handlePointerDown(e: PointerEvent) {
 		{ name: props.name, type: props.type, path: props.path },
 		e,
 		(source, destination) => {
-			emit('moveDirectTo', {
-				name: source.name,
-				type: source.type as FileItem['type'],
-				path: source.path,
-				destination,
-			})
+			emit('moveDirectTo', source, destination)
 		},
 	)
 }

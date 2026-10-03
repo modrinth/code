@@ -57,13 +57,13 @@ import { injectModrinthClient } from '#ui/providers'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { getEditorLanguage, getFileExtension, isImageFile } from '#ui/utils/file-extensions'
 
-import { injectFileManager } from '../../providers/file-manager'
+import {type FileInfo, injectFileManager} from '../../providers/file-manager'
 import type { EditingFile } from '../../types'
 import EditorFindReplace from './EditorFindReplace.vue'
 import FileImageViewer from './FileImageViewer.vue'
 
 const props = defineProps<{
-	file: EditingFile | null
+	file: FileInfo<'file'> | null
 	editorComponent: Component | null
 	/** Fill the parent's height (e.g. a dockview panel) instead of sizing to the window. */
 	fillHeight?: boolean
@@ -157,7 +157,7 @@ const editorLanguage = computed(() => {
 	return getEditorLanguage(ext)
 })
 const isEditorReadOnly = computed(
-	() => (ctx.isBusy?.value ?? false) || (ctx.isReadOnly?.(props.file?.path ?? '') ?? false),
+	() => (ctx.isBusy?.value ?? false) || (ctx.isReadOnly?.(props.file) ?? false),
 )
 
 watch(isEditorReadOnly, (readOnly) => {
@@ -178,20 +178,40 @@ watch(
 	{ immediate: true },
 )
 
-async function loadFileContent(file: { name: string; path: string }) {
+async function loadFileContent(file: FileInfo<'file'>) {
 	isLoading.value = true
 	try {
 		if (!props.fillHeight) window.scrollTo(0, 0)
 		const extension = getFileExtension(file.name)
-		const normalizedPath = file.path.startsWith('/') ? file.path : `/${file.path}`
+		const result = ctx.directoryTree.get(file);
+
+		const holder = Promise.withResolvers<ArrayBuffer>();
+
+		const intervalId = setInterval(() => {
+			if (!result.isLoading.value) {
+				const data = result.data.value;
+
+				if (data != null) {
+					clearInterval(intervalId);
+					holder.resolve(data);
+				}
+			}
+
+			if (result.loadError.value != null) {
+				clearInterval(intervalId);
+				holder.reject(result.loadError.value);
+			}
+		});
+
+		const data = await holder.promise;
 
 		if (isImageFile(extension)) {
-			const content = await ctx.readFileAsBlob(normalizedPath)
+			const content = new Blob([data])
 			isEditingImage.value = true
 			imagePreview.value = content
 		} else {
 			isEditingImage.value = false
-			const content = await ctx.readFile(normalizedPath)
+			const content = new TextDecoder().decode(data);
 			fileContent.value = content
 			originalContent.value = content
 		}
@@ -255,8 +275,7 @@ async function saveFileContent(exit: boolean = false) {
 	if (isEditorReadOnly.value) return
 
 	try {
-		const normalizedPath = props.file.path.startsWith('/') ? props.file.path : `/${props.file.path}`
-		await ctx.writeFile(normalizedPath, fileContent.value)
+		await ctx.writeFile(props.file, new TextEncoder().encode(fileContent.value).buffer)
 
 		originalContent.value = fileContent.value
 

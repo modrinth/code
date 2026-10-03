@@ -54,80 +54,10 @@
 					:tooltip="disabled ? disabledTooltip : undefined"
 					size="lg"
 					class="justify-center gap-2 !w-auto !px-2.5 !rounded-xl"
-					:options="[
-						{
-							id: 'file',
-							label: formatMessage(messages.newFile),
-							action: () => $emit('create', 'file'),
-						},
-						{
-							id: 'directory',
-							label: formatMessage(messages.newFolder),
-							action: () => $emit('create', 'directory'),
-						},
-						{
-							id: 'upload',
-							label: formatMessage(messages.uploadFile),
-							action: () => $emit('upload'),
-						},
-						{ type: 'divider', shown: showInstallFromUrl ?? false },
-						{
-							id: 'upload-zip',
-							label: formatMessage(messages.uploadFromZip),
-							shown: false,
-							action: () => $emit('uploadZip'),
-						},
-						{
-							id: 'install-from-url',
-							label: formatMessage(messages.uploadFromZipUrl),
-							shown: showInstallFromUrl ?? false,
-							action: () => $emit('unzipFromUrl', false),
-						},
-						{
-							id: 'install-cf-pack',
-							label: formatMessage(messages.installCurseForgePack),
-							shown: showInstallFromUrl ?? false,
-							action: () => $emit('unzipFromUrl', true),
-						},
-						{ type: 'divider', shown: showInstallFromUrl ?? false },
-						{
-							id: 'refresh',
-							label: formatMessage(commonMessages.refreshButton),
-							shown: showRefreshButton ?? false,
-							action: () => handleRefresh(),
-							disabled: isRefreshing,
-						},
-					]"
+					:options="options"
 				>
 					<PlusIcon aria-hidden="true" class="h-5 w-5" />
 					<DropdownIcon aria-hidden="true" class="h-5 w-5" />
-					<template #file>
-						<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newFile) }}
-					</template>
-					<template #directory>
-						<FolderOpenIcon aria-hidden="true" /> {{ formatMessage(messages.newFolder) }}
-					</template>
-					<template #upload>
-						<UploadIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFile) }}
-					</template>
-					<template #upload-zip>
-						<FileArchiveIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFromZip) }}
-					</template>
-					<template #install-from-url>
-						<LinkIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFromZipUrl) }}
-					</template>
-					<template #install-cf-pack>
-						<CurseForgeIcon aria-hidden="true" />
-						{{ formatMessage(messages.installCurseForgePack) }}
-					</template>
-					<template #refresh>
-						<RefreshCwIcon
-							aria-hidden="true"
-							class="h-5 w-5 transition-transform"
-							:class="refreshing ? 'animate-spin' : ''"
-						/>
-						{{ formatMessage(commonMessages.refreshButton) }}
-					</template>
 				</TeleportOverflowMenu>
 			</div>
 
@@ -136,6 +66,7 @@
 					v-if="isLogFile"
 					v-tooltip="formatMessage(messages.shareToMclogs)"
 					type="quiet"
+					size="lg"
 					:label="formatMessage(messages.shareToMclogs)"
 					@click="$emit('share')"
 				>
@@ -144,6 +75,7 @@
 				<IconButton
 					v-tooltip="formatMessage(messages.findInFile)"
 					:type="isEditorFindOpen ? 'colored' : 'quiet'"
+					size="lg"
 					:color="isEditorFindOpen ? 'brand' : undefined"
 					:label="formatMessage(messages.findInFile)"
 					:aria-pressed="isEditorFindOpen"
@@ -153,7 +85,8 @@
 				</IconButton>
 			</div>
 		</div>
-		<div v-if="!isEditing && !hasNav" class="flex items-center gap-2"
+		<div
+v-if="!isEditing && !hasNav" class="flex items-center gap-2"
 			 :class="[
 
 			]"
@@ -180,21 +113,23 @@ import {
 	DropdownIcon,
 	FileArchiveIcon,
 	FolderOpenIcon,
-	PanelLeftOpenIcon,
-	PanelLeftCloseIcon,
 	LinkIcon,
+	PanelLeftCloseIcon,
+	PanelLeftOpenIcon,
 	PlusIcon,
 	RefreshCwIcon,
 	SearchIcon,
 	ShareIcon,
 	UploadIcon,
 } from '@modrinth/assets'
-import { computed, ref } from 'vue'
+import {computed} from 'vue'
 
 import { IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
-import Input from '../../../../components/base/inputs/Input.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n.ts'
+import {useFileActions} from "#ui/layouts/shared/files-tab/composables/folder-actions.ts";
 import { commonMessages } from '#ui/utils/common-messages.ts'
+
+import Input from '../../../../components/base/inputs/Input.vue'
 
 const { formatMessage } = useVIntl()
 
@@ -323,4 +258,11 @@ const isLogFile = computed(() => {
 		props.editingFilePath?.endsWith('.log')
 	)
 })
+
+const { options } = useFileActions(
+	(type) => emit('create', type),
+	(type) => type == 'file' ? emit('upload') : emit('uploadZip'),
+	props.showInstallFromUrl ? (type) => emit('unzipFromUrl', type == 'cf') : undefined,
+	props.showRefreshButton ? { handleRefresh, isRefreshing: computed(() => refreshing.value ?? false) } : undefined,
+);
 </script>

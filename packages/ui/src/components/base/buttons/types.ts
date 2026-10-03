@@ -1,4 +1,4 @@
-import type { Component } from 'vue'
+import type {Component, ComputedRef, MaybeRefOrGetter} from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
 import type { AnchoredTeleportPlacement } from '../../../utils/use-anchored-teleport'
@@ -73,8 +73,9 @@ export interface ButtonMenuItemBase {
 	id: string
 	label: string
 	icon?: Component
+	iconClass?: ComputedRef<string>,
 	shown?: boolean
-	disabled?: boolean
+	disabled?: MaybeRefOrGetter<boolean>
 	tooltip?: string
 	remainOpen?: boolean
 	tone?: 'default' | ButtonColor

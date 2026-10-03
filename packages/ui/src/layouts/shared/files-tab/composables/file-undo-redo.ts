@@ -1,10 +1,13 @@
 import { ref } from 'vue'
 
+import type {FileInfo} from "#ui/layouts/shared/files-tab/providers/file-manager.ts";
+import {parentInfoFrom} from "#ui/layouts/shared/files-tab/utils.ts";
+
 import type { Operation } from '../types'
 
 export function useFileUndoRedo(
-	renameItem: (path: string, newName: string) => Promise<void>,
-	moveItem: (source: string, destination: string) => Promise<void>,
+	renameItem: (file: FileInfo, newName: string) => Promise<FileInfo | null>,
+	moveItem: (source: FileInfo, destination: string) => Promise<FileInfo | null>,
 	refresh: () => void,
 	notify: (title: string, text: string, type: 'success' | 'error') => void,
 ) {
@@ -23,16 +26,10 @@ export function useFileUndoRedo(
 		try {
 			switch (lastOperation.type) {
 				case 'move':
-					await moveItem(
-						`${lastOperation.destinationPath}/${lastOperation.fileName}`.replace('//', '/'),
-						`${lastOperation.sourcePath}/${lastOperation.fileName}`.replace('//', '/'),
-					)
+					await moveItem(lastOperation.newFile, parentInfoFrom(lastOperation.prevFile).path)
 					break
 				case 'rename':
-					await renameItem(
-						`${lastOperation.path}/${lastOperation.newName}`.replace('//', '/'),
-						lastOperation.oldName,
-					)
+					await renameItem(lastOperation.newFile, lastOperation.prevFile.name)
 					break
 			}
 
@@ -40,7 +37,7 @@ export function useFileUndoRedo(
 			refresh()
 			notify(
 				`${lastOperation.type === 'move' ? 'Move' : 'Rename'} undone`,
-				`${lastOperation.fileName} has been restored to its original ${lastOperation.type === 'move' ? 'location' : 'name'}`,
+				`${lastOperation.prevFile.name} has been restored to its original ${lastOperation.type === 'move' ? 'location' : 'name'}`,
 				'success',
 			)
 		} catch {
@@ -55,16 +52,10 @@ export function useFileUndoRedo(
 		try {
 			switch (lastOperation.type) {
 				case 'move':
-					await moveItem(
-						`${lastOperation.sourcePath}/${lastOperation.fileName}`.replace('//', '/'),
-						`${lastOperation.destinationPath}/${lastOperation.fileName}`.replace('//', '/'),
-					)
+					await moveItem(lastOperation.prevFile, parentInfoFrom(lastOperation.newFile).path)
 					break
 				case 'rename':
-					await renameItem(
-						`${lastOperation.path}/${lastOperation.oldName}`.replace('//', '/'),
-						lastOperation.newName,
-					)
+					await renameItem(lastOperation.prevFile, lastOperation.newFile.name)
 					break
 			}
 
@@ -72,7 +63,7 @@ export function useFileUndoRedo(
 			refresh()
 			notify(
 				`${lastOperation.type === 'move' ? 'Move' : 'Rename'} redone`,
-				`${lastOperation.fileName} has been ${lastOperation.type === 'move' ? 'moved' : 'renamed'} again`,
+				`${lastOperation.prevFile.name} has been ${lastOperation.type === 'move' ? 'moved' : 'renamed'} again`,
 				'success',
 			)
 		} catch {

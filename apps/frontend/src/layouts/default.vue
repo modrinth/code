@@ -809,7 +809,7 @@
 			<BatchCreditModal v-if="auth.user && isAdmin(auth.user)" ref="modal_batch_credit" />
 			<slot id="main" />
 		</main>
-		<ModrinthFooter />
+		<CollapsibleFooter />
 	</div>
 </template>
 <script setup>
@@ -898,10 +898,10 @@ import TaxComplianceBanner from '~/components/ui/banner/TaxComplianceBanner.vue'
 import TaxIdMismatchBanner from '~/components/ui/banner/TaxIdMismatchBanner.vue'
 import VerifyEmailBanner from '~/components/ui/banner/VerifyEmailBanner.vue'
 import ViewOnModrinthBanner from '~/components/ui/banner/ViewOnModrinthBanner.vue'
+import CollapsibleFooter from '~/components/ui/CollapsibleFooter.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
-import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
 import {
 	forgetStoredAccount,
 	switchToSignedOut,

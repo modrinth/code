@@ -1,6 +1,6 @@
 <template>
 	<FileEditor
-		v-if="location?.kind === 'file'"
+		v-if="location?.type === 'file'"
 		:key="location.path"
 		ref="fileEditorRef"
 		:file="location"
@@ -17,6 +17,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { currentLocation, type FileTabPanelParams } from '../../composables/file-tabs'
 import { type FileEditorBridge, injectFileBrowserUI } from '../../providers/file-browser-ui'
 import FileEditor from '../editor/FileEditor.vue'
+import type {FileInfo} from "#ui/layouts/shared/files-tab/providers/file-manager.ts";
 
 const props = defineProps<{
 	params: {
@@ -30,7 +31,9 @@ const ui = injectFileBrowserUI()
 const tabId = props.params.params.tabId
 const location = computed(() => {
 	const tab = ui.fileTabs.getTab(tabId)
-	return tab ? currentLocation(tab) : null
+	if (tab == null) return null;
+	const location = currentLocation(tab);
+	return location.type == 'file' ? location as FileInfo<'file'> : null;
 })
 
 const fileEditorRef = ref<InstanceType<typeof FileEditor>>()

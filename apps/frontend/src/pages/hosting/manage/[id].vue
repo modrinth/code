@@ -30,7 +30,7 @@
 		"
 	>
 		<template #default="{ onReinstall, onReinstallFailed, constrainWidth}">
-			<NuxtPage :route="route" @reinstall="onReinstall" @reinstall-failed="onReinstallFailed" :constrain-width="constrainWidth"/>
+			<NuxtPage :route="route" :constrain-width="constrainWidth" @reinstall="onReinstall" @reinstall-failed="onReinstallFailed"/>
 		</template>
 	</ServersManageRootLayout>
 </template>

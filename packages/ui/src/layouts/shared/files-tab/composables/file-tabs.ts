@@ -2,8 +2,10 @@ import type { DockviewApi, DockviewReadyEvent, IDisposable } from 'dockview-vue'
 import type { ComputedRef, Ref } from 'vue'
 import { computed, ref, shallowReactive, shallowRef, watch } from 'vue'
 
+import {isSameInfo, parentInfoFrom} from "#ui/layouts/shared/files-tab/utils.ts";
+
 import type { FileEditorBridge } from '../providers/file-browser-ui'
-import type { FileManagerContext } from '../providers/file-manager'
+import type { FileInfo, FileManagerContext } from '../providers/file-manager'
 
 export const FILE_TAB_PANEL_COMPONENT = 'fileTabPanel'
 export const FILE_TAB_COMPONENT = 'fileTab'
@@ -11,15 +13,10 @@ export const FILE_TAB_COMPONENT = 'fileTab'
 const MAX_HISTORY_LENGTH = 50
 const PENDING_LOCATION_TIMEOUT = 1000
 
-/** Where a tab currently is. Paths are absolute and normalized (`/`, `/config/file.toml`). */
-export type FileLocation =
-	| { kind: 'directory'; path: string }
-	| { kind: 'file'; path: string; name: string }
-
 /** A browser-like tab: its own history of visited directories and files. */
 export interface FileTab {
 	id: string
-	history: FileLocation[]
+	history: FileInfo[]
 	index: number
 }
 
@@ -27,30 +24,12 @@ export interface FileTabPanelParams {
 	tabId: string
 }
 
-export function normalizeFilePath(path: string) {
-	return `/${path.split('/').filter(Boolean).join('/')}`
-}
-
-export function parentDirectory(path: string) {
-	const segments = path.split('/').filter(Boolean)
-	segments.pop()
-	return `/${segments.join('/')}`
-}
-
-export function directoryOf(location: FileLocation) {
-	return location.kind === 'file' ? parentDirectory(location.path) : location.path
-}
-
 export function currentLocation(tab: FileTab) {
 	return tab.history[tab.index]
 }
 
-export function isSameLocation(a: FileLocation, b: FileLocation) {
-	return a.kind === b.kind && a.path === b.path
-}
-
 export interface FileTabsOptions {
-	ctx: Pick<FileManagerContext, 'currentPath' | 'editingFile' | 'navigateTo' | 'startEditing'>
+	ctx: Pick<FileManagerContext, 'currentDirectory' | 'currentFile' | 'navigateTo'>
 	/**
 	 * Asks the user what to do with the given editors' unsaved changes.
 	 * Resolves `true` when it is safe to discard the editors.
@@ -62,17 +41,17 @@ export interface FileTabs {
 	tabs: Ref<FileTab[]>
 	activeTabId: Ref<string>
 	activeTab: ComputedRef<FileTab>
-	activeLocation: ComputedRef<FileLocation>
+	activeLocation: ComputedRef<FileInfo>
 	canGoBack: ComputedRef<boolean>
 	canGoForward: ComputedRef<boolean>
 	editors: Map<string, FileEditorBridge>
 	activeEditor: ComputedRef<FileEditorBridge | null>
 	hasUnsavedChanges: ComputedRef<boolean>
 	getTab: (id: string) => FileTab | undefined
-	navigate: (location: FileLocation) => Promise<void>
+	navigate: (location: FileInfo) => Promise<void>
 	back: () => Promise<void>
 	forward: () => Promise<void>
-	openTab: (location: FileLocation) => void
+	openTab: (location: FileInfo) => void
 	activateTab: (id: string) => void
 	closeTab: (id: string) => Promise<void>
 	closeFile: (tabId: string) => void
@@ -95,14 +74,10 @@ export interface FileTabs {
 export function useFileTabs(options: FileTabsOptions): FileTabs {
 	const { ctx } = options
 
-	const contextLocation = computed<FileLocation>(() => {
-		const file = ctx.editingFile.value
-		if (file) return { kind: 'file', path: normalizeFilePath(file.path), name: file.name }
-		return { kind: 'directory', path: normalizeFilePath(ctx.currentPath.value) }
-	})
+	const contextLocation = computed<FileInfo>(() => ctx.currentFile.value);
 
 	let nextTabId = 0
-	function createTab(location: FileLocation): FileTab {
+	function createTab(location: FileInfo): FileTab {
 		return { id: `file-tab-${nextTabId++}`, history: [location], index: 0 }
 	}
 
@@ -132,8 +107,8 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 		return tabs.value.find((tab) => tab.id === id)
 	}
 
-	function pushLocation(tab: FileTab, location: FileLocation) {
-		if (isSameLocation(currentLocation(tab), location)) return
+	function pushLocation(tab: FileTab, location: FileInfo) {
+		if (isSameInfo(currentLocation(tab), location)) return
 		tab.history.splice(tab.index + 1)
 		tab.history.push(location)
 		if (tab.history.length > MAX_HISTORY_LENGTH) tab.history.shift()
@@ -144,28 +119,24 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 	 * The location we last pushed into the context. Hosts may apply it asynchronously (e.g. via
 	 * the router), so context changes are only recorded once it has been reached.
 	 */
-	let pendingLocation: FileLocation | null = null
+	let pendingLocation: FileInfo | null = null
 	let pendingTimeout: ReturnType<typeof setTimeout> | undefined
 
-	function applyToContext(location: FileLocation) {
-		if (isSameLocation(contextLocation.value, location)) return
+	function applyToContext(info: FileInfo) {
+		if (isSameInfo(contextLocation.value, info)) return
 
-		pendingLocation = location
+		pendingLocation = info
 		clearTimeout(pendingTimeout)
 		pendingTimeout = setTimeout(() => (pendingLocation = null), PENDING_LOCATION_TIMEOUT)
 
-		if (location.kind === 'file') {
-			ctx.startEditing({ name: location.name, path: location.path })
-		} else {
-			ctx.navigateTo(location.path)
-		}
+		ctx.navigateTo(info);
 	}
 
 	watch(
 		contextLocation,
 		(location) => {
 			if (pendingLocation) {
-				if (!isSameLocation(location, pendingLocation)) return
+				if (!isSameInfo(location, pendingLocation)) return
 				pendingLocation = null
 				clearTimeout(pendingTimeout)
 			}
@@ -176,13 +147,13 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 
 	async function confirmLeave(tab: FileTab) {
 		const editor = editors.get(tab.id)
-		if (currentLocation(tab).kind !== 'file' || !editor) return true
+		if (currentLocation(tab).type !== 'file' || !editor) return true
 		return options.confirmDiscard([editor])
 	}
 
-	async function navigate(location: FileLocation) {
+	async function navigate(location: FileInfo) {
 		const tab = activeTab.value
-		if (!isSameLocation(currentLocation(tab), location)) {
+		if (!isSameInfo(currentLocation(tab), location)) {
 			if (!(await confirmLeave(tab))) return
 			pushLocation(tab, location)
 		}
@@ -218,7 +189,7 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 		applyToContext(activeLocation.value)
 	}
 
-	function openTab(location: FileLocation) {
+	function openTab(location: FileInfo) {
 		const tab = createTab(location)
 		tabs.value.push(tab)
 		addPanel(tab)
@@ -244,9 +215,9 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 		const tab = getTab(tabId)
 		if (!tab) return
 		const location = currentLocation(tab)
-		if (location.kind !== 'file') return
+		if (location.type !== 'file') return
 
-		const parent: FileLocation = { kind: 'directory', path: parentDirectory(location.path) }
+		const parent: FileInfo = parentInfoFrom(location);
 		pushLocation(tab, parent)
 		if (tab.id === activeTabId.value) applyToContext(parent)
 	}

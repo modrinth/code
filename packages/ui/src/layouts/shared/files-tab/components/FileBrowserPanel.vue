@@ -4,15 +4,22 @@
 		ref="panelRoot"
 		class="flex w-full scroll-mt-[var(--files-sticky-top,0px)] flex-col gap-3 p-1 pl-2"
 		:class="{ 'snap-start': isFileActive }"
-		:style="{ '--files-navbar-height': `${navbarHeight}px` }"
+		:style="{
+			'--files-navbar-height': `${navbarHeight}px`,
+			'--files-trailing-space': `${trailingSpace}px`,
+			'--files-table-header-top': `calc(var(--files-sticky-top, 0px) + ${navbarHeight}px + ${TAB_STRIP_HEIGHT}px)`,
+		}"
 	>
-		<div ref="navbarWrapper">
+		<div
+			ref="navbarWrapper"
+			class="sticky top-[var(--files-sticky-top,0px)] z-30 bg-surface-1 py-1"
+		>
 		<FileNavbar
 			:sidebar-open="sidebarOpen"
 			:breadcrumbs="ui.breadcrumbSegments.value"
 			:is-editing="ui.isEditing.value"
-			:editing-file-name="ctx.editingFile.value?.name"
-			:editing-file-path="ctx.editingFile.value?.path"
+			:editing-file-name="ctx.currentFile.value?.name"
+			:editing-file-path="ctx.currentFile.value?.path"
 			:is-editing-image="ui.fileEditorApi.value?.isEditingImage.value ?? false"
 			:is-editor-find-open="ui.fileEditorApi.value?.isFindOpen.value ?? false"
 			:search-query="ui.searchQuery.value"
@@ -30,7 +37,7 @@
 			@navigate-home="() => {
 				ui.navigateToSegment(-1)
 			}"
-			@prefetch-home="ui.handlePrefetchHome"
+			@prefetch-home="ui.handleHomePrefetch"
 			@update:search-query="(value) => (ui.searchQuery.value = value)"
 			@create="ui.showCreateModal"
 			@upload="ui.initiateFileUpload"
@@ -49,8 +56,8 @@
 				class="shrink-0 overflow-hidden"
 				:class="
 					isFileActive
-						? 'h-[calc(var(--files-viewport-height,100dvh)_-_var(--files-sticky-top,0px)_-_var(--files-navbar-height,3rem)_-_1.25rem_-_2px)] min-h-[24rem]'
-						: 'h-10'
+						? 'h-[calc(var(--files-viewport-height,100dvh)_-_var(--files-sticky-top,0px)_-_var(--files-navbar-height,3rem)_-_18px_-_var(--files-trailing-space,0px))] min-h-[24rem]'
+						: 'sticky top-[calc(var(--files-sticky-top,0px)_+_var(--files-navbar-height,0px))] z-20 h-10'
 				"
 			>
 				<FileTabs />
@@ -77,10 +84,15 @@
 						:all-selected="ui.allSelected.value"
 						:some-selected="ui.someSelected.value"
 						:is-stuck="isLabelBarStuck"
-						:show-details="!ui.sidebarOpen.value"
+						:columns="shownColumns"
+						:enabled-columns="enabledColumns"
+						:details-enabled="detailsEnabled"
 						@sort="ui.handleSort"
 						@toggle-all="ui.toggleSelectAll"
+						@toggle-column="toggleColumn"
+						@toggle-details="detailsEnabled = !detailsEnabled"
 					/>
+					<ReadyTransition :pending="listingPending">
 					<div
 						v-if="filteredItems.length > 0"
 						ref="virtualListContainer"
@@ -88,9 +100,10 @@
 						:style="{ minHeight: `${totalHeight}px`, overflowAnchor: 'none' }"
 					>
 						<div class="absolute w-full" :style="{ top: `${visibleTop}px` }">
-							<FileTableRow
+							<FileRow
 								v-for="(item, idx) in visibleItems"
 								:key="item.path"
+								:class="`h-[${itemHeight}]`"
 								:count="item.count"
 								:created="item.created"
 								:modified="item.modified"
@@ -101,10 +114,10 @@
 								:index="visibleRange.start + idx"
 								:is-last="visibleRange.start + idx === filteredItems.length - 1"
 								:selected="ui.selectedItems.value.has(item.path)"
-								:write-disabled="ui.isBusy.value || !!ctx.isReadOnly?.(item.path)"
-								:write-disabled-tooltip="ctx.isReadOnly?.(item.path) ? ctx.readOnlyReason?.value : ui.busyTooltip.value"
-								:show-details="!ui.sidebarOpen.value"
-								:container-width="ui.containerWidth.value"
+								:write-disabled="ui.isBusy.value || !!ctx.isReadOnly?.(item)"
+								:write-disabled-tooltip="ctx.isReadOnly?.(item) ? ctx.readOnlyReason?.value : ui.busyTooltip.value"
+								:columns="shownColumns"
+								:has-hidden-details="hasHiddenDetails"
 								@extract="() => ui.handleExtractItem(item)"
 								@delete="() => ui.showDeleteModal(item)"
 								@rename="() => ui.showRenameModal(item)"
@@ -112,12 +125,14 @@
 								@zip="() => ui.handleZip(item)"
 								@move="() => ui.showMoveModal(item)"
 								@move-direct-to="ui.handleDirectMove"
-								@edit="() => ui.handleEditFile(item)"
-								@navigate="() => ui.handleNavigateToFolder(item)"
+								@edit="() => ui.handleNavigateTo(item)"
+								@navigate="() => ui.handleNavigateTo(item)"
 								@open-in-new-tab="() => ui.handleOpenInNewTab(item)"
-								@hover="() => ui.handleItemHover(item)"
+								@hover="() => ui.handleItemPrefetch(item)"
 								@contextmenu="ui.handleContextMenu"
 								@toggle-select="() => ui.toggleItemSelection(item)"
+								@create="ui.showCreateModal"
+								@upload="ui.initiateFileUpload"
 							/>
 						</div>
 					</div>
@@ -135,6 +150,7 @@
 							</p>
 						</div>
 					</div>
+					</ReadyTransition>
 				</FileUploadDragAndDrop>
 			</div>
 		</div>
@@ -143,19 +159,22 @@
 
 <script setup lang="ts">
 import { FolderOpenIcon } from '@modrinth/assets'
-import { useElementSize } from '@vueuse/core'
+import { useElementSize, useEventListener } from '@vueuse/core'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
+import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import { defineMessages, useVIntl } from '#ui/composables'
 import { useStickyObserver } from '#ui/composables/sticky-observer'
 import { findScrollableAncestor, useVirtualScroll } from '#ui/composables/virtual-scroll.ts'
 import { injectFileManager } from '#ui/layouts'
+import { injectLoadingState } from '#ui/providers/loading-state'
 
+import { useFileColumns } from '../composables/file-columns'
 import { injectFileBrowserUI } from '../providers/file-browser-ui'
 import FileManagerError from './FileManagerError.vue'
 import FileNavbar from './FileNavbar.vue'
+import FileRow from './FileRow.vue'
 import FileTableHeader from './FileTableHeader.vue'
-import FileTableRow from './FileTableRow.vue'
 import FileTabs from './tabs/FileTabs.vue'
 import FileUploadDragAndDrop from './upload/FileUploadDragAndDrop.vue'
 
@@ -190,30 +209,65 @@ const props = withDefaults(defineProps<{
 });
 
 const sidebarOpen = computed(() => ui.sidebarOpen.value);
-const isFileActive = computed(() => ui.fileTabs.activeLocation.value.kind === 'file')
+const isFileActive = computed(() => ui.fileTabs.activeLocation.value.type === 'file')
 
 const filteredItems = computed(() => ui.filteredItems.value)
+
+/** Only the listing fades while a directory loads for the first time; tabs, navbar and sidebar stay put. */
+const listingPending = computed(() => ctx.loading.value && ui.items.value.length === 0)
+
+const loadingState = injectLoadingState(null)
+let refreshToken: symbol | null = null
+
+function endRefreshLoading() {
+	if (refreshToken) loadingState?.end(refreshToken)
+	refreshToken = null
+}
+
+watch(
+	() => ctx.isRefreshing.value,
+	(refreshing) => {
+		if (!refreshing) return endRefreshLoading()
+		if (loadingState && !refreshToken) refreshToken = loadingState.begin()
+	},
+	{ immediate: true },
+)
+onBeforeUnmount(endRefreshLoading)
 
 // Virtual scroll
 const {
 	listContainer: virtualListContainer,
 	totalHeight,
+	itemHeight,
 	visibleRange,
 	visibleTop,
 	visibleItems,
 } = useVirtualScroll(filteredItems, {
-	itemHeight: 52.8,
+	itemHeight: 3.25,
+	itemUnit: 'rem',
 	bufferSize: 5,
 })
 
-// Sticky observer for the table header
-const fileUploadRef = ref<InstanceType<typeof FileUploadDragAndDrop>>()
-const fileUploadEl = computed(() => fileUploadRef.value?.$el as HTMLElement | null)
-const { isStuck: isLabelBarStuck } = useStickyObserver(fileUploadEl)
+const { detailsEnabled, enabledColumns, shownColumns, hasHiddenDetails, toggleColumn } =
+	useFileColumns(ui.containerWidth)
+
+const TAB_STRIP_HEIGHT = 40
 
 const panelRoot = ref<HTMLElement | null>(null)
 const navbarWrapper = ref<HTMLElement | null>(null)
 const { height: navbarHeight } = useElementSize(navbarWrapper, undefined, { box: 'border-box' })
+
+/** Where the table header sticks: below the host's sticky offset, the sticky navbar and the tab strip. */
+const tableHeaderStickyTop = computed(() => {
+	const hostOffset = navbarWrapper.value ? parseFloat(getComputedStyle(navbarWrapper.value).top) || 0 : 0
+	return hostOffset + navbarHeight.value + TAB_STRIP_HEIGHT
+})
+
+const fileUploadRef = ref<InstanceType<typeof FileUploadDragAndDrop>>()
+const fileUploadEl = computed(() => fileUploadRef.value?.$el as HTMLElement | null)
+const { isStuck: isLabelBarStuck } = useStickyObserver(fileUploadEl, undefined, {
+	topOffset: tableHeaderStickyTop,
+})
 
 /** Brings the navbar and file viewer to the top of the scroll area, unless they're already there. */
 function scrollPanelIntoView() {
@@ -234,8 +288,65 @@ const activeFileKey = computed(() =>
 		: null,
 )
 
+/**
+ * Scroll space below the file viewer within the page's content (stopping at `<main>`, so a site
+ * footer doesn't count). The editor is shortened by this much so that scrolling to the end of the
+ * page can never push the tab strip under the sticky navbar. Parents' `min-height` slack is
+ * deliberately ignored, since it shrinks as the editor grows.
+ */
+const trailingSpace = ref(0)
+
+function measureTrailingSpace() {
+	const panel = panelRoot.value
+	if (!panel) return
+
+	const scrollContainer = findScrollableAncestor(panel)
+	const boundary =
+		panel.closest('main') ??
+		(scrollContainer instanceof Window ? document.body : scrollContainer)
+
+	let total = 0
+	let element: HTMLElement = panel
+	while (element !== boundary && element.parentElement) {
+		const parent = element.parentElement
+		const elementBottom = element.getBoundingClientRect().bottom
+		let contentBottom = elementBottom + (parseFloat(getComputedStyle(element).marginBottom) || 0)
+
+		for (let sibling = element.nextElementSibling; sibling; sibling = sibling.nextElementSibling) {
+			const style = getComputedStyle(sibling)
+			if (style.display === 'none' || style.position === 'absolute' || style.position === 'fixed') {
+				continue
+			}
+			const siblingBottom = sibling.getBoundingClientRect().bottom + (parseFloat(style.marginBottom) || 0)
+			contentBottom = Math.max(contentBottom, siblingBottom)
+		}
+
+		const parentStyle = getComputedStyle(parent)
+		total +=
+			contentBottom -
+			elementBottom +
+			(parseFloat(parentStyle.paddingBottom) || 0) +
+			(parseFloat(parentStyle.borderBottomWidth) || 0)
+		element = parent
+	}
+
+	trailingSpace.value = Math.max(0, Math.round(total))
+}
+
 watch(activeFileKey, (key) => {
-	if (key) nextTick(scrollPanelIntoView)
+	if (!key) return
+	nextTick(() => {
+		measureTrailingSpace()
+		nextTick(scrollPanelIntoView)
+	})
+})
+
+watch(navbarHeight, () => {
+	if (isFileActive.value) nextTick(measureTrailingSpace)
+})
+
+useEventListener('resize', () => {
+	if (isFileActive.value) measureTrailingSpace()
 })
 
 /**
@@ -260,7 +371,9 @@ function setViewerSnapping(enabled: boolean) {
 watch(isFileActive, setViewerSnapping, { flush: 'post' })
 onMounted(() => {
 	setViewerSnapping(isFileActive.value)
-	if (isFileActive.value) nextTick(scrollPanelIntoView)
+	if (!isFileActive.value) return
+	measureTrailingSpace()
+	nextTick(scrollPanelIntoView)
 })
 onBeforeUnmount(() => setViewerSnapping(false))
 </script>

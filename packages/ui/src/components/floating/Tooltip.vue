@@ -40,6 +40,8 @@ const SIDES = {
 	left: { origin: 'right center', arrow: 'right', rotate: 315 },
 } as const
 
+type HoverWaitTimes = {hover?: number, unhover?: number};
+
 const props = withDefaults(
 	defineProps<{
 		disabled?: boolean
@@ -50,7 +52,10 @@ const props = withDefaults(
 		text?: string | null
 		content?: TooltipContent | null
 		panelClass?: string
-		allowHover?: boolean
+		/**
+		 * Wait time before closing or openning
+		 */
+		actionWait?: number | HoverWaitTimes
 	}>(),
 	{ disabled: false, theme: 'tooltip', placement: 'top' },
 )
@@ -86,6 +91,22 @@ watch(
 	},
 	{ flush: 'post' },
 )
+
+const isDisabled = computed(() => props.disabled)
+
+watch(isDisabled, (value) => {
+	if (trigger.value) {
+		if (value) {
+			if (trigger.value.matches(':hover')) {
+				onLeave();
+			}
+		} else {
+			if (trigger.value.matches(':hover')) {
+				onEnter();
+			}
+		}
+	}
+})
 
 watch(
 	referenceEl,
@@ -202,7 +223,8 @@ function onEnter() {
 	if (props.disabled || !trigger.value) {
 		return
 	}
-	tooltipEnter(trigger.value)
+	const waitTime = props.actionWait;
+	tooltipEnter(trigger.value, waitTime ? (typeof waitTime === 'number' ? waitTime : waitTime.unhover) : undefined)
 }
 
 function onTooltipEnter() {
@@ -213,8 +235,9 @@ function onTooltipEnter() {
 
 function onLeave() {
 	const triggerEl = trigger.value ?? props.reference;
+	const waitTime = props.actionWait;
 	if (triggerEl) {
-		tooltipLeave(triggerEl, props.allowHover ? 500 : undefined);
+		tooltipLeave(triggerEl, waitTime ? (typeof waitTime === 'number' ? waitTime : waitTime.unhover) : undefined);
 	}
 }
 
@@ -256,7 +279,7 @@ function onFocusOut(event: FocusEvent) {
 				:key="jumpKey"
 				ref="floating"
 				class="`v-popper__inner z-[100010] rounded-lg border border-solid border-surface-5 bg-surface-3 px-3 py-1.5 text-sm font-medium text-contrast card-shadow`"
-				:class="[`v-popper--theme-${theme}`, moving && 'tooltip-moving', panelClass, allowHover ? 'pointer-events-none' : '']"
+				:class="[`v-popper--theme-${theme}`, moving && 'tooltip-moving', panelClass, unhoverWait ? 'pointer-events-none' : '']"
 				:style="[floatingStyles, { transformOrigin }]"
 				@mouseenter="onTooltipEnter"
 				@mouseleave="onLeave"

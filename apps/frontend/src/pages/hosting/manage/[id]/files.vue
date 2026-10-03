@@ -25,6 +25,14 @@ useHead({
 	title: computed(() => `Files - ${server.value?.name ?? 'Server'} - Modrinth`),
 })
 
+const collapsibleFooter = useCollapsibleFooter()
+onMounted(() => {
+	collapsibleFooter.value = true
+})
+onBeforeUnmount(() => {
+	collapsibleFooter.value = false
+})
+
 defineProps<{
 	constrainWidth?: boolean
 }>()

@@ -22,6 +22,9 @@ import {
 	LoadingBar,
 	NotificationPanel,
 } from '@modrinth/ui'
+import {provideAppRoot} from "@modrinth/ui/src/providers/app-root";
+import type {MaybeElement} from "@vueuse/core";
+import {computed,ref, watch} from "vue";
 
 import AdsConsentNotification from '~/components/ui/AdsConsentNotification.vue'
 import { setupProviders } from '~/providers/setup.ts'
@@ -33,9 +36,6 @@ import {
 	useIsSwitchingAccount,
 } from './composables/accounts'
 import { useAuth } from './composables/auth'
-import {provideAppRoot} from "@modrinth/ui/src/providers/app-root";
-import type {MaybeElement} from "@vueuse/core";
-import {ref, watch, computed} from "vue";
 
 const root = ref<MaybeElement>(null);
 
