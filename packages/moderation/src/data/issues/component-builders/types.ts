@@ -48,8 +48,8 @@ export interface Issue {
 	/** Orders selected issues; omitted priorities use the default group. */
 	priority?: IssuePriority
 	message: WithContext<string>
-	/** Targets to change, resolved from current project data when the issue is submitted. */
-	facets?: readonly [IssueFacet, ...IssueFacet[]]
+	/** Targets to change, selected from current context and resolved when the issue is submitted. */
+	facets?: WithContext<readonly IssueFacet[]>
 	suggestedStatus?: WithContext<ModerationStatus | undefined>
 }
 

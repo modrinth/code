@@ -186,9 +186,10 @@ export const issueTargets = {
 }
 
 export function resolveIssueFacets(
-	facets: readonly [IssueFacet, ...IssueFacet[]],
+	facets: WithContext<readonly IssueFacet[]>,
 	ctx: ReviewContext,
-): Labrinth.Threads.v3.NewThreadIssue['facets'] {
-	const [first, ...rest] = facets
+): Labrinth.Threads.v3.NewThreadIssue['facets'] | undefined {
+	const [first, ...rest] = typeof facets === 'function' ? facets(ctx) : facets
+	if (!first) return undefined
 	return [{ what: first(ctx) }, ...rest.map((facet) => ({ what: facet(ctx) }))]
 }
