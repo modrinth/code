@@ -103,7 +103,7 @@ const { suggestions: availableSuggestions } = useProjectSlugSuggestions({
 })
 const suggestions = computed(() =>
 	availableSuggestions.value.filter(
-		(suggestion) => suggestion !== project.value?.slug.toLowerCase(),
+		(suggestion) => suggestion !== project.value?.slug?.toLowerCase(),
 	),
 )
 const isSuggestion = computed(() => suggestions.value.includes(slug.value))
@@ -117,14 +117,14 @@ const availability = useQuery(
 			!isSuggestion.value &&
 			isValidProjectSlug(checkedSlug.value) &&
 			checkedSlug.value === slug.value &&
-			checkedSlug.value !== project.value.slug.toLowerCase(),
+			checkedSlug.value !== project.value.slug?.toLowerCase(),
 	})),
 )
 const resolvedStatus = computed(() => {
 	if (!slug.value) return undefined
 	if (isSuggestion.value) return { type: 'success', message: messages.available }
 	if (!isValidProjectSlug(slug.value)) return { type: 'error', message: messages.invalid }
-	if (slug.value === project.value?.slug.toLowerCase())
+	if (slug.value === project.value?.slug?.toLowerCase())
 		return { type: 'error', message: messages.unchanged }
 	if (checkedSlug.value !== slug.value) return undefined
 	if (availability.isError.value) return { type: 'error', message: messages.error }
