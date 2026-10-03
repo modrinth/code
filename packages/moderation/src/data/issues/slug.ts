@@ -2,15 +2,27 @@ import { LinkIcon } from '@modrinth/assets'
 
 import { generateUrlSlug } from '../../utils'
 import misused from '../messages/checklist/messages/title-slug/slug/misused.md'
-import { issue, panel, toggle } from './component-builders/builders'
+import { issue, panel, section, text, toggle } from './component-builders/builders'
 import { issueTargets } from './component-builders/targets'
 
 export const misusedSlugIssue = issue({
 	id: 'slug-misused',
 	title: 'Misused project URL',
 	category: 'Slug',
-	facets: [issueTargets.modifySlug()],
-	message: misused.replace('%CORRECT%', '').trim(),
+	facets: [
+		issueTargets.modifySlug(({ getTextValue }) => {
+			const suggestion = getTextValue('correct-slug').toLowerCase()
+			return suggestion.trim() ? suggestion : undefined
+		}),
+	],
+	message: ({ getTextValue }) => {
+		const suggestion = getTextValue('correct-slug').toLowerCase()
+		return misused
+			.replaceAll('%CORRECT%', () =>
+				suggestion.trim() ? `We suggest using the slug \`${suggestion}\`.` : '',
+			)
+			.trim()
+	},
 })
 
 export const slugReviewPanel = panel({
@@ -25,4 +37,13 @@ export const slugReviewPanel = panel({
 		issue: misusedSlugIssue,
 		shown: ({ projectV3 }) => generateUrlSlug(projectV3.name) !== projectV3.slug,
 	}),
+	section({
+		shown: ({ selected }) => selected.issueIds.includes(misusedSlugIssue.id),
+	}).content(
+		text({
+			issue: misusedSlugIssue,
+			id: 'correct-slug',
+			label: 'Correct project URL',
+		}),
+	),
 )

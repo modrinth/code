@@ -35,10 +35,6 @@ export const metadataEnvironmentIssue = issue({
 		return environmentInaccurateMessage.replaceAll('%CORRECT%', () => correction)
 	},
 	suggestedStatus: 'flagged',
-	corrections: ({ getSelectValue }) => {
-		const environment = getSelectValue('correct-environment') as Labrinth.Projects.v3.Environment
-		return environments.includes(environment) ? { project: { environment } } : {}
-	},
 })
 
 export const metadataDependenciesIssue = issue({

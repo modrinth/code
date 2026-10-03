@@ -118,7 +118,7 @@ import { injectProjectReviewContext, injectReviewSlot } from '../layout/context'
 import { projectReviewMessages as messages } from '../messages'
 import Anchor from './anchor.vue'
 import { flashReviewElement, injectReviewContext, scrollReviewElement } from './context'
-import Controls from './controls.vue'
+import Controls from './controls/index.vue'
 import Highlight from './highlight.vue'
 import Popover from './popover.vue'
 

@@ -28,8 +28,8 @@ export interface ReviewContext {
 	/**
 	 * Returns a markdown value for the current issue, or an empty string if unavailable.
 	 * Panel and section callbacks must supply an issue ID to read stored input values.
-	 * Only visible, enabled controls contribute when resolving messages and corrections.
-	 * UI callbacks read stored values; message and correction callbacks also resolve defaults.
+	 * Only visible, enabled controls contribute when resolving messages.
+	 * UI callbacks read stored values; message callbacks also resolve defaults.
 	 */
 	getMarkdownValue(id: string, issueId?: string): string
 	getTextValue(id: string, issueId?: string): string
@@ -51,14 +51,6 @@ export interface Issue {
 	/** Targets to change, resolved from current project data when the issue is submitted. */
 	facets?: readonly [IssueFacet, ...IssueFacet[]]
 	suggestedStatus?: WithContext<ModerationStatus | undefined>
-	corrections?: WithContext<IssueCorrections>
-	/** Marks the issue that requests applying the aggregated corrections. */
-	applyCorrections?: boolean
-}
-
-export interface IssueCorrections {
-	project?: Labrinth.Projects.v3.EditProjectRequest
-	versions?: Record<string, Labrinth.Versions.v3.ModifyVersionRequest>
 }
 
 export type IssueConfig = Issue

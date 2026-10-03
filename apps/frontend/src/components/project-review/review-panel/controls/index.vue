@@ -45,6 +45,16 @@
 							hide-markdown-hint
 							@update:model-value="writeControl(control, $event)"
 						/>
+						<SlugInput
+							v-else-if="control.type === 'text' && control.key === 'correct-slug'"
+							:ref="(field) => setFieldRef(fieldKey(control), field)"
+							:model-value="panels.textValue(panelBinding, control)"
+							:placeholder="control.placeholder || formatMessage(controlMessages.textPlaceholder)"
+							:disabled="control.disabled"
+							:label="control.label"
+							:required="control.required"
+							@update:model-value="writeControl(control, $event)"
+						/>
 						<Input
 							v-else-if="control.type === 'text'"
 							:ref="(field) => setFieldRef(fieldKey(control), field)"
@@ -158,36 +168,6 @@
 			</a>
 		</Tooltip>
 	</div>
-	<div
-		v-if="!binding && target?.kind === 'status-alerts' && panels.correctionsRequested.value"
-		class="flex flex-col gap-3"
-	>
-		<p class="m-0 text-secondary">
-			{{ formatMessage(controlMessages.corrections) }}
-		</p>
-		<p v-if="!panels.correctionPanels.value.length" class="m-0 text-orange" role="status">
-			{{ formatMessage(controlMessages.noCorrections) }}
-		</p>
-		<p v-if="panels.corrections.value.conflicts.length" class="m-0 text-red" role="alert">
-			{{ formatMessage(controlMessages.conflicts) }}
-		</p>
-		<div
-			v-for="(correction, correctionIndex) in panels.correctionPanels.value"
-			:key="correction.key"
-			class="flex flex-col gap-2"
-		>
-			<p v-if="correction.panel.title" class="m-0 font-semibold text-contrast">
-				{{ correction.panel.title }}
-			</p>
-			<RecursiveControls
-				:target="target"
-				:binding="correction"
-				:keybind-offset="correctionOffsets[correctionIndex]"
-				@dropdown-open="emit('dropdown-open', $event)"
-				@dropdown-close="emit('dropdown-close', $event)"
-			/>
-		</div>
-	</div>
 </template>
 
 <script setup lang="ts">
@@ -207,7 +187,6 @@ import {
 import {
 	type ComponentPublicInstance,
 	computed,
-	getCurrentInstance,
 	nextTick,
 	onBeforeUnmount,
 	useId,
@@ -222,14 +201,14 @@ import {
 } from '~/providers/project-review/review-panels'
 import { injectReviewPreviousIssues } from '~/providers/project-review/review-previous-issues'
 
-import { projectReviewMessages as messages } from '../messages'
+import { projectReviewMessages as messages } from '../../messages'
+import SlugInput from './slug-input.vue'
 
 const props = defineProps<{
 	target?: ReviewTarget
 	binding?: ReviewPanelBinding
 	keybindOffset?: number
 }>()
-const RecursiveControls = getCurrentInstance()!.type
 const emit = defineEmits<{
 	'dropdown-open': [key: string]
 	'dropdown-close': [key: string]
@@ -243,18 +222,6 @@ const controlMessages = defineMessages({
 	markdownPlaceholder: {
 		id: 'project-review.controls.markdown-placeholder',
 		defaultMessage: 'Explain what needs to change…',
-	},
-	corrections: {
-		id: 'project-review.controls.corrections',
-		defaultMessage: 'These corrections will be applied before sending your reply.',
-	},
-	noCorrections: {
-		id: 'project-review.controls.no-corrections',
-		defaultMessage: 'No automatic corrections are selected.',
-	},
-	conflicts: {
-		id: 'project-review.controls.correction-conflicts',
-		defaultMessage: 'Resolve conflicting corrections before sending your reply.',
 	},
 	select: {
 		id: 'project-review.controls.select',
@@ -388,14 +355,7 @@ function actionKeybind(index: number) {
 	const modifier = index >= 18 ? 'Alt+' : index >= 9 ? 'Shift+' : ''
 	return `${modifier}${(index % 9) + 1}`
 }
-const correctionOffsets = computed(() => {
-	let offset = (props.keybindOffset ?? 0) + toggleControls(panelBinding.value).length
-	return panels.correctionPanels.value.map((binding) => {
-		const start = offset
-		offset += toggleControls(binding).length
-		return start
-	})
-})
+
 const hasControls = computed(() =>
 	panelBinding.value?.panel.sections.some((section) => section.controls.length > 0),
 )

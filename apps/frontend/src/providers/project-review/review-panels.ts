@@ -1,6 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { IssuePriority, reviewPanels } from '@modrinth/moderation/src/data/issues'
-import { aggregateCorrections } from '@modrinth/moderation/src/data/issues/component-builders/corrections'
 import { resolveIssueFacets } from '@modrinth/moderation/src/data/issues/component-builders/targets'
 import type {
 	Issue,
@@ -566,9 +565,6 @@ export function createReviewPanels(
 					id,
 					missing: [...new Set(missing)],
 					facets: issue.facets ? resolveIssueFacets(issue.facets, context) : undefined,
-					hasCorrections: issue.corrections !== undefined,
-					corrections: missing.length ? undefined : resolveWithContext(issue.corrections, context),
-					applyCorrections: issue.applyCorrections === true,
 					issue: {
 						message: resolveWithContext(issue.message, context),
 						suggestedStatus: resolveWithContext(issue.suggestedStatus, context),
@@ -577,24 +573,6 @@ export function createReviewPanels(
 			})
 	})
 
-	const corrections = computed(() => aggregateCorrections(activeIssues.value))
-	const correctionsRequested = computed(() =>
-		activeIssues.value.some((issue) => issue.applyCorrections),
-	)
-	const correctionPanels = computed(() => {
-		const issueIds = new Set(
-			activeIssues.value.filter((issue) => issue.hasCorrections).map((issue) => issue.id),
-		)
-		return [...panels.value.values()].flatMap((binding) => {
-			const sections = binding.panel.sections
-				.map((section) => ({
-					...section,
-					controls: section.controls.filter((control) => issueIds.has(control.issueId)),
-				}))
-				.filter((section) => section.controls.length > 0)
-			return sections.length ? [{ ...binding, panel: { ...binding.panel, sections } }] : []
-		})
-	})
 	const validationErrors = computed(() =>
 		activeIssues.value
 			.filter(({ id }) => !isRestoredIssue(id))
@@ -624,9 +602,6 @@ export function createReviewPanels(
 		missing,
 		write,
 		activeIssues,
-		corrections,
-		correctionsRequested,
-		correctionPanels,
 		validationErrors,
 	}
 }

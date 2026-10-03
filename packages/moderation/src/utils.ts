@@ -1,5 +1,9 @@
 import type { Labrinth } from '@modrinth/api-client'
 
+export function isValidProjectSlug(value: string) {
+	return /^[a-zA-Z0-9._-]{3,64}$/.test(value)
+}
+
 export function generateUrlSlug(value: string) {
 	return value
 		.trim()

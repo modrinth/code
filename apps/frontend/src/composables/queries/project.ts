@@ -1,4 +1,4 @@
-import type { AbstractModrinthClient } from '@modrinth/api-client'
+import { type AbstractModrinthClient, ModrinthApiError } from '@modrinth/api-client'
 import type { QueryClient } from '@tanstack/query-core'
 
 export const STALE_TIME = 1000 * 60 * 5 // 5 minutes
@@ -37,6 +37,21 @@ export function warmProjectCheckCaches(
  * When you only have a route slug (or unknown id-or-slug), resolve with `check` first.
  */
 export const projectQueryOptions = {
+	slugAvailability: (slug: string, projectId: string, client: AbstractModrinthClient) => ({
+		queryKey: ['project', 'slug-available', slug, projectId] as const,
+		queryFn: async () => {
+			try {
+				const result = await client.labrinth.projects_v2.check(slug)
+				return result.id === projectId
+			} catch (error) {
+				if (error instanceof ModrinthApiError && error.statusCode === 404) return true
+				throw error
+			}
+		},
+		staleTime: 0,
+		retry: false,
+	}),
+
 	attribution: (projectId: string, client: AbstractModrinthClient) => ({
 		queryKey: ['project-attribution', projectId] as const,
 		queryFn: () => client.labrinth.attribution_internal.listProjectAttribution(projectId),

@@ -136,6 +136,12 @@ export const issueTargets = {
 			type: 'modify_icon',
 			value: { original_url: projectV3.icon_url ?? null },
 		}),
+	removeTags:
+		(tags: WithContext<string[]>): IssueFacet =>
+		(ctx) => ({
+			type: 'remove_tags',
+			value: { tags: typeof tags === 'function' ? tags(ctx) : tags },
+		}),
 	modifySelectedLinks:
 		(): IssueFacet =>
 		({ projectV3, selected }) => {

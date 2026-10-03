@@ -72,13 +72,9 @@ export function createReviewSubmission(
 			id: 'project-review.corrections.missing-fields',
 			defaultMessage: 'Complete the required review fields before submitting a review decision.',
 		},
-		conflict: {
-			id: 'project-review.corrections.conflicts',
-			defaultMessage: 'Resolve conflicting corrections before submitting a review decision.',
-		},
 		changed: {
 			id: 'project-review.corrections.project-changed',
-			defaultMessage: 'The selected project changed. Review the corrections again.',
+			defaultMessage: 'The selected project changed. Review it again.',
 		},
 		imageType: {
 			id: 'project-review.reply.image-type',
@@ -123,7 +119,6 @@ export function createReviewSubmission(
 			privateMessage,
 			status,
 			statusAlreadyApplied = false,
-			corrections,
 			issues,
 			issueUpdates = [],
 		}: {
@@ -134,7 +129,6 @@ export function createReviewSubmission(
 			privateMessage: boolean
 			status?: ProjectStatus
 			statusAlreadyApplied?: boolean
-			corrections: typeof panels.corrections.value | undefined
 			issues?: NewThreadIssues
 			issueUpdates?: IssueUpdate[]
 		}) => {
@@ -143,22 +137,6 @@ export function createReviewSubmission(
 				if (disclosures.hasChanges.value || disclosures.saving.value)
 					throw new Error(formatMessage(errors.unsaved))
 				if (panels.validationErrors.value.length) throw new Error(formatMessage(errors.missing))
-			}
-			if (corrections) {
-				if (corrections.conflicts.length) throw new Error(formatMessage(errors.conflict))
-				if (
-					Object.keys(corrections.versions).some(
-						(version) => !project.value?.versions.includes(version),
-					)
-				)
-					throw new Error(formatMessage(errors.changed))
-				if (Object.keys(corrections.project).length)
-					await client.labrinth.projects_v3.edit(id, corrections.project)
-				for (const [versionId, patch] of Object.entries(corrections.versions)) {
-					assertCurrent(id)
-					if (Object.keys(patch).length)
-						await client.labrinth.versions_v3.modifyVersion(versionId, patch)
-				}
 			}
 			assertCurrent(id)
 			if (status && !statusAlreadyApplied) {
@@ -205,15 +183,12 @@ export function createReviewSubmission(
 				text: error instanceof Error ? error.message : String(error),
 				type: 'error',
 			}),
-		onSettled: async (_, __, { id, threadId, corrections }) => {
+		onSettled: async (_, __, { id, threadId }) => {
 			await Promise.all([
 				queryClient.invalidateQueries({ queryKey: ['project', 'v3', id] }),
 				queryClient.invalidateQueries({ queryKey: ['project', 'v2', id] }),
 				queryClient.invalidateQueries({ queryKey: ['project', id] }),
 				queryClient.invalidateQueries({ queryKey: ['thread', threadId] }),
-				...Object.keys(corrections?.versions ?? {}).map((versionId) =>
-					queryClient.invalidateQueries({ queryKey: ['version', versionId] }),
-				),
 			])
 		},
 	})
@@ -266,7 +241,6 @@ export function createReviewSubmission(
 				body: draft.value,
 				images: [...uploadedImages.value],
 				privateMessage: mode === 'note',
-				corrections: undefined,
 			})
 			.catch(() => undefined)
 	}
@@ -289,10 +263,6 @@ export function createReviewSubmission(
 				privateMessage: false,
 				status,
 				statusAlreadyApplied,
-				corrections:
-					!statusAlreadyApplied && panels.correctionsRequested.value
-						? panels.corrections.value
-						: undefined,
 				issues: statusAlreadyApplied ? currentPendingDecision.issues : selectedIssues(),
 				issueUpdates: statusAlreadyApplied
 					? currentPendingDecision.issueUpdates

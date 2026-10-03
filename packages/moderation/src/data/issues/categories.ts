@@ -4,33 +4,39 @@ import inaccurateMessage from '../messages/checklist/messages/tags/inaccurate.md
 import optimizationMisusedMessage from '../messages/checklist/messages/tags/optimization-misused.md'
 import resolutionsMisusedMessage from '../messages/checklist/messages/tags/resolutions-misused.md'
 import { issue, panel, section, select, toggle } from './component-builders/builders'
+import { issueTargets } from './component-builders/targets'
+import type { ReviewContext } from './component-builders/types'
 
 const resolutionTags = new Set(['8x-', '16x', '32x', '48x', '64x', '128x', '256x', '512x+'])
+
+function removedTags({ projectV3, selected, getSelectValues }: ReviewContext) {
+	const tags = new Set(getSelectValues('remove-tags'))
+	if (selected.toggleIds.includes('tags-optimization-misused')) tags.add('optimization')
+	if (selected.toggleIds.includes('tags-resolutions-misused'))
+		for (const tag of [...projectV3.categories, ...projectV3.additional_categories])
+			if (resolutionTags.has(tag)) tags.add(tag)
+	return [...tags]
+}
 
 export const categoriesInaccurateIssue = issue({
 	id: 'categories-inaccurate',
 	title: 'Inaccurate tags',
 	category: 'Tags',
-	message: ({ selected }) =>
-		[
+	facets: [issueTargets.removeTags(removedTags)],
+	message: (ctx) => {
+		const tags = removedTags(ctx)
+		return [
 			inaccurateMessage,
-			selected.toggleIds.includes('tags-optimization-misused') ? optimizationMisusedMessage : '',
-			selected.toggleIds.includes('tags-resolutions-misused') ? resolutionsMisusedMessage : '',
-		].join('\n'),
-	suggestedStatus: 'flagged',
-	corrections: ({ projectV3, selected, getSelectValues }) => {
-		const remove = new Set(getSelectValues('remove-tags'))
-		if (selected.toggleIds.includes('tags-optimization-misused')) remove.add('optimization')
-		if (selected.toggleIds.includes('tags-resolutions-misused'))
-			for (const tag of resolutionTags) remove.add(tag)
-		if (!remove.size) return {}
-		return {
-			project: {
-				categories: projectV3.categories.filter((tag) => !remove.has(tag)),
-				additional_categories: projectV3.additional_categories.filter((tag) => !remove.has(tag)),
-			},
-		}
+			ctx.selected.toggleIds.includes('tags-optimization-misused') ? optimizationMisusedMessage : '',
+			ctx.selected.toggleIds.includes('tags-resolutions-misused') ? resolutionsMisusedMessage : '',
+			tags.length
+				? `Please remove the following tags from your project\n\n${tags.map((tag) => `- ${tag}`).join('\n')}`
+				: '',
+		]
+			.filter((message) => message.trim())
+			.join('\n\n')
 	},
+	suggestedStatus: 'flagged',
 })
 
 export const categoriesReviewPanel = panel({

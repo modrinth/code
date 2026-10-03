@@ -1,8 +1,6 @@
 import { MegaphoneIcon } from '@modrinth/assets'
 
 import accountIssuesMessage from '../messages/checklist/messages/status-alerts/account-issues.md'
-import correctionsAppliedMessage from '../messages/checklist/messages/status-alerts/corrections-applied.md'
-import correctionsAppliedApprovedMessage from '../messages/checklist/messages/status-alerts/corrections-applied-approved.md'
 import demonetizedMessage from '../messages/checklist/messages/status-alerts/demonetized.md'
 import demonetizedModpackMessage from '../messages/checklist/messages/status-alerts/demonetized-modpack.md'
 import privateUseNoteSharedInstanceMessage from '../messages/checklist/messages/status-alerts/private-use/note/shared-instance.md'
@@ -11,17 +9,6 @@ import privateUseServerMessage from '../messages/checklist/messages/status-alert
 import serverUseMessage from '../messages/checklist/messages/status-alerts/server-use.md'
 import { issue, panel, toggle } from './component-builders/builders'
 import { IssuePriority } from './component-builders/priority'
-
-export const statusAlertsCorrectionsAppliedIssue = issue({
-	id: 'status-alerts-corrections-applied',
-	priority: IssuePriority.Alerts,
-	title: 'Apply selected corrections',
-	category: 'Project wide',
-	message: ({ projectV3 }) =>
-		projectV3.status === 'approved' ? correctionsAppliedApprovedMessage : correctionsAppliedMessage,
-	suggestedStatus: 'approved',
-	applyCorrections: true,
-})
 
 export const statusAlertsPrivateUseIssue = issue({
 	id: 'status-alerts-private-use',
@@ -78,10 +65,6 @@ export const statusAlertsReviewPanel = panel({
 	guidanceUrl:
 		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080968699c397e470eca6',
 }).content(
-	toggle({
-		issue: statusAlertsCorrectionsAppliedIssue,
-		label: 'Corrections applied',
-	}),
 	toggle({
 		issue: statusAlertsPrivateUseIssue,
 		label: 'Private use',

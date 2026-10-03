@@ -205,7 +205,7 @@ import { injectReviewPreviousIssues } from '~/providers/project-review/review-pr
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
 import { injectReviewContext } from '../review-panel/context'
-import Controls from '../review-panel/controls.vue'
+import Controls from '../review-panel/controls/index.vue'
 import IssueToggles from './issue-toggles.vue'
 
 const props = withDefaults(
