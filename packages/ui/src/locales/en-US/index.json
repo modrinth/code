@@ -3437,6 +3437,9 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, one {project} other {projects}}"
   },
+  "profile.label.pronouns": {
+    "defaultMessage": "Pronouns"
+  },
   "profile.official-account": {
     "defaultMessage": "Official Modrinth account"
   },
