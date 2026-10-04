@@ -31,7 +31,7 @@ export interface FileBrowserUIContext {
 	isEditing: ComputedRef<boolean>
 	isBusy: ComputedRef<boolean>
 	busyTooltip: ComputedRef<string | undefined>
-	breadcrumbSegments: ComputedRef<string[]>
+	activeLocation: ComputedRef<FileInfo>
 	sidebarOpen: ComputedRef<boolean>
 	setSidebarOpen: (value: boolean) => void
 	/** Width of the main content column, i.e. the space `FileBrowserPanel` actually has. */

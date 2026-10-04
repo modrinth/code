@@ -84,28 +84,25 @@ v-if="breadcrumbs != null"
 								type="quiet"
 								class="cursor-pointer whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 								:aria-current="
-												!isEditing && index === breadcrumbs.length - 1 ? 'location' : undefined
+												index === breadcrumbs.length - 1 ? 'location' : undefined
 											"
 								:class="{
-												'!text-contrast': !isEditing && index === breadcrumbs.length - 1,
+												'!text-contrast': index === breadcrumbs.length - 1,
 											}"
-								@click="$emit('navigate', index)"
+								@click="() => {
+									if (index < breadcrumbs.length - 1) $emit('navigate', index + 1)
+								}"
 							>
 								{{ segment || '' }}
 							</Button>
 							<ChevronRightIcon
-								v-if="index < breadcrumbs.length - 1 || isEditing"
+								v-if="index < breadcrumbs.length - 1"
 								class="size-4 flex-shrink-0 text-secondary"
 								aria-hidden="true"
 							/>
 						</div>
 					</li>
 				</TransitionGroup>
-				<li v-if="isEditing && editingFileName" class="flex items-center px-3 text-base">
-					<span class="font-semibold !text-contrast" aria-current="location">
-						{{ editingFileName }}
-					</span>
-				</li>
 			</ol>
 		</nav>
 	</FileActionBar>
@@ -114,12 +111,13 @@ v-if="breadcrumbs != null"
 <script setup lang="ts">
 
 import {ChevronLeftIcon, ChevronRightIcon, HomeIcon} from "@modrinth/assets";
-import {onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
 
 import {Button, IconButton} from "#ui/components/base/buttons";
 import {defineMessages, useVIntl} from "#ui/composables";
 import type {EmitCallbacks,Properties} from "#ui/layouts/shared/files-tab/components/FileActionBar.vue";
 import FileActionBar from "#ui/layouts/shared/files-tab/components/FileActionBar.vue";
+import type { FileInfo } from "../providers/file-manager";
 
 const { formatMessage } = useVIntl()
 
@@ -159,7 +157,7 @@ defineExpose({
 
 const props = withDefaults(
 	defineProps<{
-		breadcrumbs: string[]
+		activeLocation: FileInfo
 		isEditing: boolean
 		editingFileName?: string
 		canGoBack?: boolean
@@ -169,6 +167,8 @@ const props = withDefaults(
 		hasNav: true,
 	}
 )
+
+const breadcrumbs = computed(() => props.activeLocation.path.split('/').filter(Boolean))
 
 defineEmits<{
 	navigate: [index: number]
@@ -232,7 +232,7 @@ onBeforeUnmount(() => {
 })
 
 watch(
-	() => props.breadcrumbs,
+	() => props.activeLocation,
 	() => {
 		requestAnimationFrame(checkBreadcrumbOverflow)
 	},

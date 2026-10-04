@@ -273,9 +273,7 @@ const isEditing = computed(() => ctx.currentFile.value !== null && ctx.currentFi
 const isBusy = computed(() => (ctx.isBusy?.value ?? false) || (ctx.isReadOnly?.(ctx.currentFile.value) ?? false))
 const busyTooltip = computed(() => ctx.isReadOnly?.(ctx.currentFile.value) ? ctx.readOnlyReason?.value : ctx.busyTooltip?.value,)
 
-const breadcrumbSegments = computed(() =>
-	parentInfoFrom(fileTabs.activeLocation.value).path.split('/').filter(Boolean),
-)
+const activeLocation = computed(() => fileTabs.activeLocation.value)
 
 // Composables
 const { searchQuery, searchedItems } = useFileSearch(items)
@@ -473,9 +471,7 @@ async function confirmDiscardEditors(editors: Iterable<FileEditorBridge>): Promi
 }
 
 async function navigateToSegment(index: number) {
-	const segments = breadcrumbSegments.value.slice(0, index + 1);
-	const path = `/${segments.join('/')}`
-	await fileTabs.navigate(parentInfoFrom(path))
+	await fileTabs.navigate(parentInfoFrom(activeLocation.value, index))
 }
 
 async function handleNavigateTo(item: FileInfo) {
@@ -581,7 +577,7 @@ async function handleExtractItem(item: { name: string; type: string; path: strin
 		const dry = await ctx.extractFile(item.path, true, true)
 		if (dry) {
 			if (dry.conflicting_files.length === 0) {
-				handleExtractConfirm(item.path)
+				await handleExtractConfirm(item.path)
 			} else {
 				uploadConflictModal.value?.show(item.path, dry.conflicting_files)
 			}
@@ -736,7 +732,7 @@ provideFileBrowserUI({
 	isEditing,
 	isBusy,
 	busyTooltip,
-	breadcrumbSegments,
+	activeLocation,
 	sidebarOpen: computed(() => sidebarOpen.value),
 	setSidebarOpen: (value) => {
 		sidebarOpen.value = value;

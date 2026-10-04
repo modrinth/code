@@ -16,7 +16,7 @@
 		>
 		<FileNavbar
 			:sidebar-open="sidebarOpen"
-			:breadcrumbs="ui.breadcrumbSegments.value"
+			:active-location="ui.activeLocation.value"
 			:is-editing="ui.isEditing.value"
 			:editing-file-name="ctx.currentFile.value?.name"
 			:editing-file-path="ctx.currentFile.value?.path"
@@ -34,9 +34,7 @@
 			@back="ui.fileTabs.back"
 			@forward="ui.fileTabs.forward"
 			@navigate="ui.navigateToSegment"
-			@navigate-home="() => {
-				ui.navigateToSegment(-1)
-			}"
+			@navigate-home="() => ui.navigateToSegment(0)"
 			@prefetch-home="ui.handleHomePrefetch"
 			@update:search-query="(value) => (ui.searchQuery.value = value)"
 			@create="ui.showCreateModal"
@@ -68,7 +66,7 @@
 				:title="formatMessage(messages.errorTitle)"
 				:message="formatMessage(messages.errorMessage)"
 				@refetch="ctx.refresh"
-				@home="() => ui.navigateToSegment(-1)"
+				@home="() => ui.navigateToSegment(0)"
 			/>
 			<div v-else-if="!isFileActive">
 				<FileUploadDragAndDrop
