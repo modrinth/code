@@ -11,8 +11,12 @@
 			/>
 		</template>
 
-		<template v-if="isOfficialAccount || showAffiliateBadge || user.lock || user.pronouns" #badges>
-			<span v-if="user.pronouns" class="text-lg font-normal text-secondary">
+		<template #badges>
+			<span
+				v-if="user.pronouns"
+				v-tooltip="formatMessage(messages.pronounsLabel)"
+				class="text-base text-secondary"
+			>
 				· {{ user.pronouns }}
 			</span>
 			<PageHeaderBadgeItem
@@ -213,6 +217,10 @@ const messages = defineMessages({
 	reset2faButton: {
 		id: 'profile.button.reset-2fa',
 		defaultMessage: 'Reset two-factor authentication',
+	},
+	pronounsLabel: {
+		id: 'profile.label.pronouns',
+		defaultMessage: 'Pronouns',
 	},
 })
 
