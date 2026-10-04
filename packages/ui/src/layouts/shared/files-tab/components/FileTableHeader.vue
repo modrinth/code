@@ -19,8 +19,16 @@
 				@click="$emit('sort', 'name')"
 			>
 				<span>{{ formatMessage(messages.name) }}</span>
-				<ChevronUpIcon v-if="sortField === 'name' && !sortDesc" class="h-4 w-4" aria-hidden="true" />
-				<ChevronDownIcon v-if="sortField === 'name' && sortDesc" class="h-4 w-4" aria-hidden="true" />
+				<ChevronUpIcon
+					v-if="sortField === 'name' && !sortDesc"
+					class="h-4 w-4"
+					aria-hidden="true"
+				/>
+				<ChevronDownIcon
+					v-if="sortField === 'name' && sortDesc"
+					class="h-4 w-4"
+					aria-hidden="true"
+				/>
 			</button>
 		</div>
 		<div class="flex shrink-0 items-center gap-6">

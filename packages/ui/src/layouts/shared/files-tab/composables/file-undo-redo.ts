@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 
-import type {FileInfo} from "#ui/layouts/shared/files-tab/providers/file-manager.ts";
-import {parentInfoFrom} from "#ui/layouts/shared/files-tab/utils.ts";
+import type { FileInfo } from '#ui/layouts/shared/files-tab/providers/file-manager.ts'
+import { parentInfoFrom } from '#ui/layouts/shared/files-tab/utils.ts'
 
 import type { Operation } from '../types'
 

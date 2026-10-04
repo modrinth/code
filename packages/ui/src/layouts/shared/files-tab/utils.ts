@@ -1,4 +1,4 @@
-import type {FileInfo} from "#ui/layouts/shared/files-tab/providers/file-manager.ts";
+import type { FileInfo } from '#ui/layouts/shared/files-tab/providers/file-manager.ts'
 
 export function joinDisplayPath(basePath: string | undefined, itemPath: string) {
 	if (!basePath) return itemPath
@@ -11,18 +11,21 @@ export function joinDisplayPath(basePath: string | undefined, itemPath: string) 
 }
 
 export function parentInfoFrom(target: string | FileInfo, end?: number) {
-	return infoFrom(parentDirectory(typeof target === 'string' ? target : target.path, end));
+	return infoFrom(parentDirectory(typeof target === 'string' ? target : target.path, end))
 }
 
-export function infoFrom<BL extends boolean = false>(target: string | FileInfo, isFile?: BL): FileInfo<BL extends true ? 'file' : 'directory'> {
-	const path = normalizeDirectoryPath(typeof target == 'string' ? target : target.path);
-	const pathParts = path.split('/');
-	const name = pathParts[pathParts.length - 1] ?? '/';
+export function infoFrom<BL extends boolean = false>(
+	target: string | FileInfo,
+	isFile?: BL,
+): FileInfo<BL extends true ? 'file' : 'directory'> {
+	const path = normalizeDirectoryPath(typeof target == 'string' ? target : target.path)
+	const pathParts = path.split('/')
+	const name = pathParts[pathParts.length - 1] ?? '/'
 	return {
-		type: typeof target != 'string' ? target.type : (isFile ? 'file' : 'directory'),
+		type: typeof target != 'string' ? target.type : isFile ? 'file' : 'directory',
 		path: path,
-		name: name
-	} as FileInfo<BL extends true ? 'file' : 'directory'>;
+		name: name,
+	} as FileInfo<BL extends true ? 'file' : 'directory'>
 }
 
 export function normalizeDirectoryPath(path: string) {
@@ -30,7 +33,11 @@ export function normalizeDirectoryPath(path: string) {
 }
 
 export function parentDirectory(path: string, end?: number) {
-	return `/${path.split('/').filter(Boolean).slice(0, end ?? -1).join('/')}`
+	return `/${path
+		.split('/')
+		.filter(Boolean)
+		.slice(0, end ?? -1)
+		.join('/')}`
 }
 
 export function isSameInfo(a: FileInfo, b: FileInfo) {

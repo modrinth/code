@@ -1,9 +1,9 @@
 <template>
-	<Tooltip :action-wait="{hover: 600, unhover: 50}">
+	<Tooltip :action-wait="{ hover: 600, unhover: 50 }">
 		<li
 			role="option"
-			:class="[containerClasses, isDragSource ? 'opacity-50' : '', compact ? 'h-8' : 'h-[3.25rem]', ]"
-			:style="depth != null ? { paddingLeft: `${(depth * basePaddingFactor)}rem`} : undefined"
+			:class="[containerClasses, isDragSource ? 'opacity-50' : '', compact ? 'h-8' : 'h-[3.25rem]']"
+			:style="depth != null ? { paddingLeft: `${depth * basePaddingFactor}rem` } : undefined"
 			tabindex="0"
 			:data-file-path="file.path"
 			:data-file-type="file.type"
@@ -24,12 +24,15 @@
 				class="pointer-events-none absolute inset-y-0 w-px"
 				:class="level === activeGuideLevel ? 'bg-brand-highlight' : 'bg-surface-5'"
 				:style="{
-					left: `${((level * basePaddingFactor) - 0.125)}rem`,
+					left: `${level * basePaddingFactor - 0.125}rem`,
 					height: `calc(2rem + ${isLast && level == depth ? '0rem' : '(0.25rem / 2)'})`,
-					top: index != 0 ? `calc(-0.25rem / 2)` : ''
+					top: index != 0 ? `calc(-0.25rem / 2)` : '',
 				}"
 			/>
-			<div class="pointer-events-none flex flex-1 items-center truncate h-full" :class="compact ? 'gap-2' : 'gap-3'">
+			<div
+				class="pointer-events-none flex flex-1 items-center truncate h-full"
+				:class="compact ? 'gap-2' : 'gap-3'"
+			>
 				<button
 					v-if="canExpand"
 					type="button"
@@ -39,11 +42,14 @@
 					@click.stop="emit('toggle-expand')"
 					@pointerdown.stop
 				>
-					<ChevronRightIcon class="size-4 transition-transform duration-100" :class="{ 'rotate-90': expanded }" />
+					<ChevronRightIcon
+						class="size-4 transition-transform duration-100"
+						:class="{ 'rotate-90': expanded }"
+					/>
 				</button>
 				<span v-else-if="isTreeRow" class="-mr-1 size-5 shrink-0" aria-hidden="true" />
 				<Checkbox
-v-if="!selectionWithinActionMenu"
+					v-if="!selectionWithinActionMenu"
 					class="pointer-events-auto"
 					:model-value="selected"
 					@click.stop
@@ -66,7 +72,10 @@ v-if="!selectionWithinActionMenu"
 				</div>
 				<EditIcon v-if="hoveringToEdit && isEditableFile && !compact" />
 			</div>
-			<div v-if="!isTreeRow" class="pointer-events-auto flex w-fit flex-shrink-0 items-center gap-6">
+			<div
+				v-if="!isTreeRow"
+				class="pointer-events-auto flex w-fit flex-shrink-0 items-center gap-6"
+			>
 				<span
 					v-for="column in shownColumnDefinitions"
 					:key="column.id"
@@ -102,11 +111,15 @@ v-if="!selectionWithinActionMenu"
 		</li>
 		<template #popper>
 			<div class="flex flex-col w-fit">
-				<h3 class="mb-2 pb-1 mt-0 text-base font-semibold border-0 border-b-[1px] border-solid border-divider">{{ formatMessage(messages.details) }}</h3>
-				<div class="gap-1 grid grid-cols-2" v-for="(key) in FILE_COLUMNS_ORDER">
+				<h3
+					class="mb-2 pb-1 mt-0 text-base font-semibold border-0 border-b-[1px] border-solid border-divider"
+				>
+					{{ formatMessage(messages.details) }}
+				</h3>
+				<div v-for="key in FILE_COLUMNS_ORDER" :key="key" class="gap-1 grid grid-cols-2">
 					<template v-if="columnValues[key] != null">
 						<span class="text-nowrap text-sm text-secondary">
-						{{ formatMessage(messages[key]) }}
+							{{ formatMessage(messages[key]) }}
 						</span>
 						<span class="text-nowrap text-sm text-secondary">
 							{{ columnValues[key] ?? ' - ' }}
@@ -141,21 +154,21 @@ import {
 } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
-import { Tooltip } from "#ui/components";
-import type {ButtonMenuLeafOption, ButtonMenuOption} from '#ui/components/base/buttons'
+import { Tooltip } from '#ui/components'
+import type { ButtonMenuLeafOption, ButtonMenuOption } from '#ui/components/base/buttons'
 import { TeleportOverflowMenu } from '#ui/components/base/buttons'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import { useFormatBytes } from '#ui/composables'
 import { useFormatDateTime } from '#ui/composables/format-date-time'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import {infoFrom, injectFileManager} from '#ui/layouts'
-import { useFileActions } from "#ui/layouts/shared/files-tab/composables/folder-actions.ts";
+import { infoFrom, injectFileManager } from '#ui/layouts'
+import { useFileActions } from '#ui/layouts/shared/files-tab/composables/folder-actions.ts'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { getFileExtensionIcon } from '#ui/utils/auto-icons'
 import { commonMessages } from '#ui/utils/common-messages'
 import { canOpenInFileEditor, getFileExtension } from '#ui/utils/file-extensions'
 
-import {FILE_COLUMNS, FILE_COLUMNS_ORDER, type FileColumn} from '../composables/file-columns'
+import { FILE_COLUMNS, FILE_COLUMNS_ORDER, type FileColumn } from '../composables/file-columns'
 import {
 	fileDragActive,
 	fileDragData,
@@ -170,7 +183,7 @@ const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
 const ctx = injectFileManager()
 
-const basePaddingFactor = 0.75;
+const basePaddingFactor = 0.75
 
 const messages = defineMessages({
 	itemCount: {
@@ -219,35 +232,33 @@ const messages = defineMessages({
 	},
 })
 
-const props = defineProps<
-	{
-		index: number
-		file: FileItem,
-		isLast: boolean
-		selected: boolean
-		writeDisabled?: boolean
-		writeDisabledTooltip?: string
-		/** Detail columns to render, in order. */
-		columns?: FileColumn[]
-		/** Whether some details aren't shown as columns, so hovering offers them in a tooltip. */
-		hasHiddenDetails?: boolean
-		selectionWithinActionMenu?: boolean
-		/** Smaller row, used by the sidebar tree. */
-		compact?: boolean
-		/** Nesting level in the sidebar tree; indents the row. */
-		depth?: number
-		/** Renders as a sidebar tree row: expand chevron, no columns or inline actions menu. */
-		isTreeRow?: boolean
-		/** Whether this tree row's directory is expanded. */
-		expanded?: boolean
-		/** Whether this tree row's directory can be expanded, i.e. isn't known to be empty. */
-		expandable?: boolean
-		/** Highlights the row as the active tab's current location. */
-		active?: boolean
-		/** Tree guide level (1-based) to highlight, marking the directory the active location is in. */
-		activeGuideLevel?: number
-	}
->()
+const props = defineProps<{
+	index: number
+	file: FileItem
+	isLast: boolean
+	selected: boolean
+	writeDisabled?: boolean
+	writeDisabledTooltip?: string
+	/** Detail columns to render, in order. */
+	columns?: FileColumn[]
+	/** Whether some details aren't shown as columns, so hovering offers them in a tooltip. */
+	hasHiddenDetails?: boolean
+	selectionWithinActionMenu?: boolean
+	/** Smaller row, used by the sidebar tree. */
+	compact?: boolean
+	/** Nesting level in the sidebar tree; indents the row. */
+	depth?: number
+	/** Renders as a sidebar tree row: expand chevron, no columns or inline actions menu. */
+	isTreeRow?: boolean
+	/** Whether this tree row's directory is expanded. */
+	expanded?: boolean
+	/** Whether this tree row's directory can be expanded, i.e. isn't known to be empty. */
+	expandable?: boolean
+	/** Highlights the row as the active tab's current location. */
+	active?: boolean
+	/** Tree guide level (1-based) to highlight, marking the directory the active location is in. */
+	activeGuideLevel?: number
+}>()
 
 const emit = defineEmits<{
 	(
@@ -265,14 +276,10 @@ const emit = defineEmits<{
 		item: Pick<FileItem, 'name' | 'type' | 'path'>,
 	): void
 	(e: 'create', type: 'file' | 'directory'): void
-	(e: 'upload', type: 'file' | 'zip'): void,
-	(
-		e: 'moveDirectTo',
-		item: Pick<FileItem, 'name' | 'type' | 'path'>, destination: string,
-	): void
+	(e: 'upload', type: 'file' | 'zip'): void
+	(e: 'moveDirectTo', item: Pick<FileItem, 'name' | 'type' | 'path'>, destination: string): void
 	(e: 'contextmenu', event: MouseEvent, options: ButtonMenuOption[]): void
-	(e: 'toggle-select'): void
-	(e: 'toggle-expand'): void
+	(e: 'toggle-select' | 'toggle-expand'): void
 }>()
 
 const canExpand = computed(
@@ -285,10 +292,15 @@ const shownColumnDefinitions = computed(() =>
 const canOpenInTab = computed(() => props.file.type === 'directory' || isEditableFile.value)
 
 const isDropTarget = computed(
-	() => fileDragActive.value && fileDragTarget.value === props.file.path && props.file.type === 'directory',
+	() =>
+		fileDragActive.value &&
+		fileDragTarget.value === props.file.path &&
+		props.file.type === 'directory',
 )
-const isDragSource = computed(() => fileDragActive.value && fileDragData.value?.path === props.file.path)
-const hoveringToEdit = ref<boolean>(false);
+const isDragSource = computed(
+	() => fileDragActive.value && fileDragData.value?.path === props.file.path,
+)
+const hoveringToEdit = ref<boolean>(false)
 
 const formatDateTime = useFormatDateTime({
 	year: '2-digit',
@@ -316,7 +328,9 @@ const containerClasses = computed(() => {
 							? 'bg-surface-2'
 							: 'bg-surface-1.5',
 		props.isLast ? '' : '',
-		isEditableFile.value || props.file.type === 'directory' ? 'cursor-pointer hover:bg-surface-2.5' : '',
+		isEditableFile.value || props.file.type === 'directory'
+			? 'cursor-pointer hover:bg-surface-2.5'
+			: '',
 		'transition-colors duration-100 focus:!outline-none',
 	]
 })
@@ -332,7 +346,7 @@ function getFullPath() {
 const { options } = useFileActions(
 	(type) => emit('create', type),
 	(type) => emit('upload', type),
-);
+)
 
 const menuOptions = computed<ButtonMenuOption[]>(() => {
 	const item = infoFrom(props.file)
@@ -340,7 +354,7 @@ const menuOptions = computed<ButtonMenuOption[]>(() => {
 	const wdTooltip = props.writeDisabledTooltip
 	return [
 		{
-			type: "submenu",
+			type: 'submenu',
 			id: 'upload-create',
 			label: formatMessage(messages.newOrUpload),
 			icon: FileIcon,
@@ -481,7 +495,9 @@ const isEditableFile = computed(() => {
 const columnValues = computed<Record<FileColumn, string | null>>(() => ({
 	size: props.file.size != null ? formatBytes(props.file.size) : null,
 	items:
-		props.file.type === 'directory' ? formatMessage(messages.itemCount, { count: props.file.count ?? 0 }) : null,
+		props.file.type === 'directory'
+			? formatMessage(messages.itemCount, { count: props.file.count ?? 0 })
+			: null,
 	created: formattedCreationDate.value,
 	modified: formattedModifiedDate.value,
 }))
@@ -492,12 +508,12 @@ function openContextMenu(event: MouseEvent) {
 }
 
 function handleMouseEnter() {
-	hoveringToEdit.value = true;
+	hoveringToEdit.value = true
 	emit('hover', { name: props.file.name, type: props.file.type, path: props.file.path })
 }
 
 function handleMouseLeave() {
-	hoveringToEdit.value = false;
+	hoveringToEdit.value = false
 }
 
 const isNavigating = ref(false)

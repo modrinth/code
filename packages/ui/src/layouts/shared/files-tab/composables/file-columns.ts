@@ -6,7 +6,7 @@ import type { FileSortField } from '../types'
 
 export const FILE_COLUMNS_ORDER = ['size', 'items', 'created', 'modified'] as const
 
-export type FileColumn = typeof FILE_COLUMNS_ORDER[number]
+export type FileColumn = (typeof FILE_COLUMNS_ORDER)[number]
 
 export interface FileColumnDefinition {
 	id: FileColumn
@@ -33,7 +33,8 @@ const COLUMN_GAP = 24
 
 function columnsWidth(columns: FileColumn[]) {
 	return columns.reduce(
-		(total, id) => total + (FILE_COLUMNS.find((column) => column.id === id)?.width ?? 0) + COLUMN_GAP,
+		(total, id) =>
+			total + (FILE_COLUMNS.find((column) => column.id === id)?.width ?? 0) + COLUMN_GAP,
 		0,
 	)
 }
@@ -49,7 +50,7 @@ export function useFileColumns(containerWidth: Ref<number | undefined>) {
 		'size',
 		'items',
 		'modified',
-		'created'
+		'created',
 	])
 
 	const shownColumns = computed<FileColumn[]>(() => {

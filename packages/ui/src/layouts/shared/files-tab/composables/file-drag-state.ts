@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-import type {FileInfo} from "#ui/layouts/shared/files-tab/providers/file-manager.ts";
+import type { FileInfo } from '#ui/layouts/shared/files-tab/providers/file-manager.ts'
 
 const activeDrag = ref<FileInfo | null>(null)
 const dragTarget = ref<string | null>(null)

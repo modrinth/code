@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, type DefineSetupFnComponent, nextTick, onMounted, ref, useId, watch} from 'vue'
+import { computed, nextTick, onMounted, ref, useId, watch } from 'vue'
 
 import type { AnchoredTeleportAnchor } from '../../../utils/use-anchored-teleport'
 import { pointAnchor, useAnchoredTeleport } from '../../../utils/use-anchored-teleport'
@@ -118,13 +118,23 @@ defineExpose({ open: openMenu, close: closeMenu })
 				<ButtonMenuSubmenu v-else-if="isSubmenu(option)" :option="option" @select="handleSelect">
 					<template #trigger>
 						<slot :name="option.id" :option="option">
-							<component :is="option.icon" v-if="option.icon" :class="option.iconClass?.value ?? ''" aria-hidden="true" />
+							<component
+								:is="option.icon"
+								v-if="option.icon"
+								:class="option.iconClass?.value ?? ''"
+								aria-hidden="true"
+							/>
 							{{ option.label }}
 						</slot>
 					</template>
 					<template #item="{ option: child }">
 						<slot :name="child.id" :option="child">
-							<component :is="child.icon" v-if="child.icon" :class="child.iconClass?.value ?? ''" aria-hidden="true" />
+							<component
+								:is="child.icon"
+								v-if="child.icon"
+								:class="child.iconClass?.value ?? ''"
+								aria-hidden="true"
+							/>
 							{{ child.label }}
 						</slot>
 					</template>
@@ -137,7 +147,12 @@ defineExpose({ open: openMenu, close: closeMenu })
 					@focus="focusedIndex = getItems().indexOf($event)"
 				>
 					<slot :name="option.id" :option="option">
-						<component :is="option.icon" v-if="option.icon" :class="option.iconClass ?? ''" aria-hidden="true" />
+						<component
+							:is="option.icon"
+							v-if="option.icon"
+							:class="option.iconClass ?? ''"
+							aria-hidden="true"
+						/>
 						{{ option.label }}
 					</slot>
 				</ButtonMenuItem>

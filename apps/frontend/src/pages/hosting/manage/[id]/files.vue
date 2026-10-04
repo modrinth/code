@@ -36,7 +36,6 @@ onBeforeUnmount(() => {
 defineProps<{
 	constrainWidth?: boolean
 }>()
-
 </script>
 
 <template>

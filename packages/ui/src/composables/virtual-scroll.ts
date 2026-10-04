@@ -1,7 +1,7 @@
-import type {ComputedRef, Ref} from 'vue'
+import type { ComputedRef, Ref } from 'vue'
 import { computed, ref, watch, watchEffect } from 'vue'
 
-import {useRemToPx} from "#ui/composables/use-rem-to-px.ts";
+import { useRemToPx } from '#ui/composables/use-rem-to-px.ts'
 
 export interface ScrollViewportOptions {
 	onScroll?: () => void
@@ -160,9 +160,9 @@ export function useVirtualScroll<T>(items: ComputedRef<T[]>, options: VirtualScr
 		onScroll: checkNearEnd,
 	})
 
-	const { remToPx } = useRemToPx();
+	const { remToPx } = useRemToPx()
 
-	const height = itemUnit == 'rem' ? remToPx(itemHeight) : computed(() => itemHeight);
+	const height = itemUnit == 'rem' ? remToPx(itemHeight) : computed(() => itemHeight)
 
 	const totalHeight = computed(() => items.value.length * height.value)
 
@@ -203,7 +203,8 @@ export function useVirtualScroll<T>(items: ComputedRef<T[]>, options: VirtualScr
 		if (index < 0 || index >= items.value.length) return
 		syncScrollState()
 		if (!listContainer.value || !scrollContainer.value) return
-		const top = containerOffset.value + index * height.value - (viewportHeight.value - height.value) / 2
+		const top =
+			containerOffset.value + index * height.value - (viewportHeight.value - height.value) / 2
 		scrollContainer.value.scrollTo({ top: Math.max(0, top), behavior: 'instant' })
 		syncScrollState()
 	}

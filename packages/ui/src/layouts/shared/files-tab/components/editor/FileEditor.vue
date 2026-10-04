@@ -57,8 +57,7 @@ import { injectModrinthClient } from '#ui/providers'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { getEditorLanguage, getFileExtension, isImageFile } from '#ui/utils/file-extensions'
 
-import {type FileInfo, injectFileManager} from '../../providers/file-manager'
-import type { EditingFile } from '../../types'
+import { type FileInfo, injectFileManager } from '../../providers/file-manager'
 import EditorFindReplace from './EditorFindReplace.vue'
 import FileImageViewer from './FileImageViewer.vue'
 
@@ -183,27 +182,27 @@ async function loadFileContent(file: FileInfo<'file'>) {
 	try {
 		if (!props.fillHeight) window.scrollTo(0, 0)
 		const extension = getFileExtension(file.name)
-		const result = ctx.directoryTree.get(file);
+		const result = ctx.directoryTree.get(file)
 
-		const holder = Promise.withResolvers<ArrayBuffer>();
+		const holder = Promise.withResolvers<ArrayBuffer>()
 
 		const intervalId = setInterval(() => {
 			if (!result.isLoading.value) {
-				const data = result.data.value;
+				const data = result.data.value
 
 				if (data != null) {
-					clearInterval(intervalId);
-					holder.resolve(data);
+					clearInterval(intervalId)
+					holder.resolve(data)
 				}
 			}
 
 			if (result.loadError.value != null) {
-				clearInterval(intervalId);
-				holder.reject(result.loadError.value);
+				clearInterval(intervalId)
+				holder.reject(result.loadError.value)
 			}
-		});
+		})
 
-		const data = await holder.promise;
+		const data = await holder.promise
 
 		if (isImageFile(extension)) {
 			const content = new Blob([data])
@@ -211,7 +210,7 @@ async function loadFileContent(file: FileInfo<'file'>) {
 			imagePreview.value = content
 		} else {
 			isEditingImage.value = false
-			const content = new TextDecoder().decode(data);
+			const content = new TextDecoder().decode(data)
 			fileContent.value = content
 			originalContent.value = content
 		}

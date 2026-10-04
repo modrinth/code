@@ -2,7 +2,7 @@ import type { DockviewApi, DockviewReadyEvent, IDisposable } from 'dockview-vue'
 import type { ComputedRef, Ref } from 'vue'
 import { computed, ref, shallowReactive, shallowRef, watch } from 'vue'
 
-import {isSameInfo, parentInfoFrom} from "#ui/layouts/shared/files-tab/utils.ts";
+import { isSameInfo, parentInfoFrom } from '#ui/layouts/shared/files-tab/utils.ts'
 
 import type { FileEditorBridge } from '../providers/file-browser-ui'
 import type { FileInfo, FileManagerContext } from '../providers/file-manager'
@@ -74,7 +74,7 @@ export interface FileTabs {
 export function useFileTabs(options: FileTabsOptions): FileTabs {
 	const { ctx } = options
 
-	const contextLocation = computed<FileInfo>(() => ctx.currentFile.value);
+	const contextLocation = computed<FileInfo>(() => ctx.currentFile.value)
 
 	let nextTabId = 0
 	function createTab(location: FileInfo): FileTab {
@@ -90,9 +90,7 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 	)
 	const activeLocation = computed(() => currentLocation(activeTab.value))
 	const canGoBack = computed(() => activeTab.value.index > 0)
-	const canGoForward = computed(
-		() => activeTab.value.index < activeTab.value.history.length - 1,
-	)
+	const canGoForward = computed(() => activeTab.value.index < activeTab.value.history.length - 1)
 
 	const editors = shallowReactive(new Map<string, FileEditorBridge>())
 	const activeEditor = computed(() => editors.get(activeTabId.value) ?? null)
@@ -129,7 +127,7 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 		clearTimeout(pendingTimeout)
 		pendingTimeout = setTimeout(() => (pendingLocation = null), PENDING_LOCATION_TIMEOUT)
 
-		ctx.navigateTo(info);
+		ctx.navigateTo(info)
 	}
 
 	watch(
@@ -217,7 +215,7 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 		const location = currentLocation(tab)
 		if (location.type !== 'file') return
 
-		const parent: FileInfo = parentInfoFrom(location);
+		const parent: FileInfo = parentInfoFrom(location)
 		pushLocation(tab, parent)
 		if (tab.id === activeTabId.value) applyToContext(parent)
 	}

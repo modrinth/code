@@ -46,8 +46,7 @@ export function useFileSelection(items: Ref<FileItem[]>) {
 	}
 
 	const allSelected = computed(
-		() =>
-			items.value.length > 0 && items.value.every((item) => selectedItems.value.has(item.path)),
+		() => items.value.length > 0 && items.value.every((item) => selectedItems.value.has(item.path)),
 	)
 
 	const someSelected = computed(

@@ -1,5 +1,5 @@
 import type { DefaultError, UseQueryReturnType } from '@tanstack/vue-query'
-import type {ComputedRef, Ref} from 'vue'
+import type { ComputedRef } from 'vue'
 import { computed } from 'vue'
 
 /** Subset of {@link UseQueryReturnType} passed to {@link useReadyState}. */

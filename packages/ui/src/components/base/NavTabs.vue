@@ -1,7 +1,11 @@
 <template>
 	<div
 		v-if="filteredLinks.length > 1"
-		:class="pageNav ? [noMargin ? '' : '-mx-6 -mt-2 mb-1', noPadding ? '' : 'px-6 py-2', 'overflow-x-auto'] : 'contents'"
+		:class="
+			pageNav
+				? [noMargin ? '' : '-mx-6 -mt-2 mb-1', noPadding ? '' : 'px-6 py-2', 'overflow-x-auto']
+				: 'contents'
+		"
 		v-bind="pageNav ? $attrs : {}"
 	>
 		<nav
@@ -109,7 +113,7 @@ const props = withDefaults(
 		activeIndex: undefined,
 		pageNav: false,
 		noPadding: false,
-		noMargin: false
+		noMargin: false,
 	},
 )
 

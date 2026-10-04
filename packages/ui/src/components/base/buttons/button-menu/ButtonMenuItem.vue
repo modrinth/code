@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
-import { computed, ref, toValue} from 'vue'
+import { computed, ref, toValue } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import type { ButtonMenuAction, ButtonMenuLink } from '../types'
@@ -92,7 +92,9 @@ function handleFocus(event: FocusEvent) {
 <template>
 	<div ref="wrapperElement" class="group/button-menu-item flex items-center">
 		<RouterLink
-			v-if="isLink(props.option) && props.option.to !== undefined && !toValue(props.option.disabled)"
+			v-if="
+				isLink(props.option) && props.option.to !== undefined && !toValue(props.option.disabled)
+			"
 			v-tooltip="props.option.tooltip"
 			v-bind="itemAttrs"
 			:to="props.option.to"

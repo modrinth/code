@@ -1,7 +1,7 @@
 import type { Component, ComputedRef, Ref, ShallowRef } from 'vue'
 
 import type { ButtonMenuOption } from '#ui/components'
-import type {FileInfo} from "#ui/layouts/shared/files-tab/providers/file-manager.ts";
+import type { FileInfo } from '#ui/layouts/shared/files-tab/providers/file-manager.ts'
 import { createContext } from '#ui/providers/create-context'
 
 import type { FileTabs } from '../composables/file-tabs'
@@ -13,7 +13,6 @@ import type { FileItem, FileSortField } from '../types'
  */
 export interface FileEditorBridge {
 	hasUnsavedChanges: Ref<boolean> | ComputedRef<boolean>
-	isEditingImage: Ref<boolean> | ComputedRef<boolean>
 	isFindOpen: Ref<boolean> | ComputedRef<boolean>
 	saveFileContent: (exit?: boolean) => Promise<void>
 	revertChanges: () => void

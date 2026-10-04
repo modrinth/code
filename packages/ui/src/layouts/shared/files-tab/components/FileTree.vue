@@ -61,7 +61,7 @@ import { SpinnerIcon } from '@modrinth/assets'
 import { computed, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import {infoFrom, parentInfoFrom} from "#ui/layouts/shared/files-tab/utils.ts";
+import { infoFrom, parentInfoFrom } from '#ui/layouts/shared/files-tab/utils.ts'
 import { canOpenInFileEditor } from '#ui/utils/file-extensions'
 
 import { injectFileBrowserUI } from '../providers/file-browser-ui'
@@ -180,7 +180,7 @@ function openDirectory(path: string, item: FileItem) {
 }
 
 function prefetch(row: Extract<TreeRow, { type: 'item' }>) {
-	const { item } = row;
+	const { item } = row
 	if (item.type === 'directory' || canOpenInFileEditor(item.name)) {
 		tree.prefetch(item)
 	}

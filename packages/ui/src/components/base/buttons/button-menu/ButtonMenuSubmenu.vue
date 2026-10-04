@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronRightIcon } from '@modrinth/assets'
-import { computed, ref, toRef, toValue,useId } from 'vue'
+import { computed, ref, toRef, toValue, useId } from 'vue'
 
 import { useAnchoredTeleport } from '../../../../utils/use-anchored-teleport'
 import type {

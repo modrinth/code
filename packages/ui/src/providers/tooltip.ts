@@ -183,16 +183,16 @@ function isFocusVisible(el: HTMLElement) {
 	return active.matches(':focus-visible')
 }
 
-let showTimeoutData: { id: TimeoutId | undefined, el: HTMLElement } | undefined = undefined;
+let showTimeoutData: { id: TimeoutId | undefined; el: HTMLElement } | undefined = undefined
 
 export function tooltipEnter(el: HTMLElement, timeout?: number): void {
 	if (timeout != undefined) {
 		// TODO: SHOULD ATTEMPT TO HIDE ANY PREVIOUS CALLS RIGHT AWAY?
 		const timeoutId = setTimeout(() => {
 			if (showTimeoutData) tooltipEnterBase(showTimeoutData.el)
-		}, timeout);
-		if (showTimeoutData) clearTimeout(showTimeoutData.id);
-		if (hideTimeoutData?.el === el) clearTimeout(hideTimeoutData.id);
+		}, timeout)
+		if (showTimeoutData) clearTimeout(showTimeoutData.id)
+		if (hideTimeoutData?.el === el) clearTimeout(hideTimeoutData.id)
 
 		showTimeoutData = { id: timeoutId, el: el }
 	} else {
@@ -204,19 +204,19 @@ export function tooltipEnterBase(el: HTMLElement) {
 	if (!hasTooltipContent(el)) {
 		return
 	}
-	closeWaitingTimeout();
+	closeWaitingTimeout()
 	hovered = el
 	show(false)
 }
 
-type TimeoutId = ReturnType<typeof setTimeout>;
+type TimeoutId = ReturnType<typeof setTimeout>
 
-let hideTimeoutData: { id: TimeoutId | undefined, el: HTMLElement } | undefined = undefined;
+let hideTimeoutData: { id: TimeoutId | undefined; el: HTMLElement } | undefined = undefined
 
 export function preventTooltipClosure(el: HTMLElement) {
-	if (hideTimeoutData?.el !== el) return;
-	clearTimeout(hideTimeoutData.id);
-	hideTimeoutData = undefined;
+	if (hideTimeoutData?.el !== el) return
+	clearTimeout(hideTimeoutData.id)
+	hideTimeoutData = undefined
 }
 
 export function tooltipLeave(el: HTMLElement, timeout?: number): void {
@@ -224,9 +224,9 @@ export function tooltipLeave(el: HTMLElement, timeout?: number): void {
 		// TODO: SHOULD ATTEMPT TO HIDE ANY PREVIOUS CALLS RIGHT AWAY?
 		const timeoutId = setTimeout(() => {
 			if (hideTimeoutData) tooltipLeaveBase(hideTimeoutData.el)
-		}, timeout);
-		if (hideTimeoutData?.el === el) clearTimeout(hideTimeoutData.id);
-		if (showTimeoutData?.el === el) clearTimeout(showTimeoutData.id);
+		}, timeout)
+		if (hideTimeoutData?.el === el) clearTimeout(hideTimeoutData.id)
+		if (showTimeoutData?.el === el) clearTimeout(showTimeoutData.id)
 
 		hideTimeoutData = { id: timeoutId, el: el }
 	} else {
@@ -236,9 +236,9 @@ export function tooltipLeave(el: HTMLElement, timeout?: number): void {
 
 function closeWaitingTimeout() {
 	if (hideTimeoutData) {
-		clearTimeout(hideTimeoutData.id);
-		tooltipLeaveBase(hideTimeoutData.el);
-		hideTimeoutData = undefined;
+		clearTimeout(hideTimeoutData.id)
+		tooltipLeaveBase(hideTimeoutData.el)
+		hideTimeoutData = undefined
 	}
 }
 
@@ -256,7 +256,7 @@ export function tooltipFocusIn(el: HTMLElement) {
 	if (!isFocusVisible(el) || !hasTooltipContent(el)) {
 		return
 	}
-	closeWaitingTimeout();
+	closeWaitingTimeout()
 	focused = el
 	show(true)
 }

@@ -10,7 +10,10 @@
 				class="m-0 flex min-w-0 flex-shrink items-center p-0 text-contrast"
 			>
 				<div class="m-0 flex min-w-0 flex-shrink list-none items-center p-0">
-					<div v-if="hasNav ? (smallMode ? true : !sidebarOpen) : true" class="mr-2 flex flex-shrink-0 gap-3">
+					<div
+						v-if="hasNav ? (smallMode ? true : !sidebarOpen) : true"
+						class="mr-2 flex flex-shrink-0 gap-3"
+					>
 						<IconButton
 							v-tooltip="formatMessage(sidebarOpen ? messages.collapse : messages.expand)"
 							:label="formatMessage(sidebarOpen ? messages.collapse : messages.expand)"
@@ -19,17 +22,17 @@
 							@click="() => $emit('toggleSidebar')"
 						>
 							<PanelRightCloseIcon v-if="sidebarOpen && !smallMode" transform="rotate(180)" />
-							<PanelRightOpenIcon v-else transform="rotate(180)"/>
+							<PanelRightOpenIcon v-else transform="rotate(180)" />
 							<span class="sr-only">{{ formatMessage(messages.expand) }}</span>
 						</IconButton>
 					</div>
 					<div class="ml-2">
-						<slot/>
+						<slot />
 					</div>
 				</div>
 			</div>
 
-			<div v-if="!isEditing" class="flex flex-shrink-0 items-center gap-2">
+			<div v-if="!hasNav || !isEditing" class="flex flex-shrink-0 items-center gap-2">
 				<Input
 					v-if="hasNav ? !sidebarOpen : false"
 					id="search-folder"
@@ -39,9 +42,7 @@
 					name="search"
 					autocomplete="off"
 					:placeholder="formatMessage(messages.searchFiles)"
-					:class="[
-						hasNav ? 'hidden @[800px]:inline-flex' : 'hidden @[400px]:inline-flex'
-					]"
+					:class="[hasNav ? 'hidden @[800px]:inline-flex' : 'hidden @[400px]:inline-flex']"
 					size="medium"
 					wrapper-class="w-full sm:w-[280px]"
 					@update:model-value="$emit('update:searchQuery', $event)"
@@ -61,7 +62,7 @@
 				</TeleportOverflowMenu>
 			</div>
 
-			<div v-else-if="!isEditingImage" class="flex gap-2">
+			<div v-else-if="hasNav && !isEditingImage" class="flex gap-2">
 				<IconButton
 					v-if="isLogFile"
 					v-tooltip="formatMessage(messages.shareToMclogs)"
@@ -85,12 +86,7 @@
 				</IconButton>
 			</div>
 		</div>
-		<div
-v-if="!isEditing && !hasNav" class="flex items-center gap-2"
-			 :class="[
-
-			]"
-		>
+		<div v-if="!hasNav && !isEditing" class="flex items-center gap-2">
 			<Input
 				:model-value="searchQuery"
 				:icon="SearchIcon"
@@ -108,26 +104,20 @@ v-if="!isEditing && !hasNav" class="flex items-center gap-2"
 
 <script setup lang="ts">
 import {
-	BoxIcon,
-	CurseForgeIcon,
 	DropdownIcon,
-	FileArchiveIcon,
-	FolderOpenIcon,
-	LinkIcon,
 	PanelRightCloseIcon,
 	PanelRightOpenIcon,
 	PlusIcon,
-	RefreshCwIcon,
 	SearchIcon,
 	ShareIcon,
-	UploadIcon,
 } from '@modrinth/assets'
-import {computed} from 'vue'
+import { computed } from 'vue'
 
 import { IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n.ts'
-import {useFileActions} from "#ui/layouts/shared/files-tab/composables/folder-actions.ts";
-import { commonMessages } from '#ui/utils/common-messages.ts'
+import { useFileActions } from '#ui/layouts/shared/files-tab/composables/folder-actions.ts'
+import type { FileInfo } from '#ui/layouts/shared/files-tab/providers/file-manager.ts'
+import { getFileExtension, isImageFile } from '#ui/utils'
 
 import Input from '../../../../components/base/inputs/Input.vue'
 
@@ -200,29 +190,30 @@ const messages = defineMessages({
 	},
 })
 
+const isEditing = computed(() => props.activeLocation.type == 'file')
+const isEditingImage = computed(
+	() => isEditing.value && isImageFile(getFileExtension(props.activeLocation.path)),
+)
+const editingFilePath = computed(() => (isEditing.value ? props.activeLocation.path : null))
+
 export type Properties = {
-	isEditing: boolean
+	activeLocation: FileInfo
 	sidebarOpen: boolean
-	editingFilePath?: string
-	isEditingImage?: boolean
 	isEditorFindOpen?: boolean
 	searchQuery: string
 	showRefreshButton?: boolean
 	showInstallFromUrl?: boolean
 	disabled?: boolean
-	disabledTooltip?: string
-	hasNav?: boolean,
-	smallMode?: boolean,
+	disabledTooltip: string
+	hasNav?: boolean
+	smallMode?: boolean
 	isRefreshing?: boolean
-};
+}
 
-const props = withDefaults(
-	defineProps<Properties>(),
-	{
-		hasNav: false,
-		smallMode: false,
-	}
-)
+const props = withDefaults(defineProps<Properties>(), {
+	hasNav: false,
+	smallMode: false,
+})
 
 const smallMode = computed(() => props.smallMode)
 
@@ -233,10 +224,10 @@ export type EmitCallbacks = {
 	upload: []
 	uploadZip: []
 	unzipFromUrl: [cf: boolean]
-	refresh: [],
+	refresh: []
 	share: []
 	find: []
-};
+}
 
 const emit = defineEmits<EmitCallbacks>()
 
@@ -247,17 +238,19 @@ function handleRefresh() {
 }
 
 const isLogFile = computed(() => {
+	const path = editingFilePath.value
 	return (
-		props.editingFilePath?.startsWith('logs') ||
-		props.editingFilePath?.startsWith('crash-reports') ||
-		props.editingFilePath?.endsWith('.log')
+		path != null &&
+		(path.startsWith('logs') || path.startsWith('crash-reports') || path.endsWith('.log'))
 	)
 })
 
 const { options } = useFileActions(
 	(type) => emit('create', type),
-	(type) => type == 'file' ? emit('upload') : emit('uploadZip'),
+	(type) => (type == 'file' ? emit('upload') : emit('uploadZip')),
 	props.showInstallFromUrl ? (type) => emit('unzipFromUrl', type == 'cf') : undefined,
-	props.showRefreshButton ? { handleRefresh, isRefreshing: computed(() => refreshing.value ?? false) } : undefined,
-);
+	props.showRefreshButton
+		? { handleRefresh, isRefreshing: computed(() => refreshing.value ?? false) }
+		: undefined,
+)
 </script>

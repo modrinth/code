@@ -1,9 +1,9 @@
 <template>
-	<FileActionBar  ref="baseRef" v-bind="{ ...$props, ...$attrs }">
+	<FileActionBar ref="baseRef" v-bind="{ ...$props, ...$attrs }">
 		<nav
-v-if="breadcrumbs != null"
-		 	:aria-label="formatMessage(messages.breadcrumbNavigation)"
-		 	class="m-0 -ml-2 flex min-w-0 flex-shrink items-center p-0"
+			v-if="breadcrumbs != null"
+			:aria-label="formatMessage(messages.breadcrumbNavigation)"
+			class="m-0 -ml-2 flex min-w-0 flex-shrink items-center p-0"
 		>
 			<div class="mr-1 flex shrink-0 items-center">
 				<IconButton
@@ -30,10 +30,10 @@ v-if="breadcrumbs != null"
 				class="m-0 flex min-w-0 flex-shrink items-center overflow-hidden p-0"
 				:class="{ 'breadcrumb-fade-mask': isBreadcrumbOverflowing }"
 				:style="
-								isBreadcrumbOverflowing
-									? { '--scroll-distance': `-${breadcrumbOverflowAmount}px` }
-									: undefined
-							"
+					isBreadcrumbOverflowing
+						? { '--scroll-distance': `-${breadcrumbOverflowAmount}px` }
+						: undefined
+				"
 				@mouseenter="onBreadcrumbMouseEnter"
 				@mouseleave="onBreadcrumbMouseLeave"
 			>
@@ -45,22 +45,15 @@ v-if="breadcrumbs != null"
 					:class="{ 'breadcrumbs-scroll': isBreadcrumbAnimating }"
 					@animationiteration="onBreadcrumbAnimationIteration"
 				>
-					<li
-						:key="`home`"
-						class="relative flex shrink-0 items-center text-sm"
-					>
+					<li :key="`home`" class="relative flex shrink-0 items-center text-sm">
 						<div class="flex shrink-0 items-center">
 							<Button
 								v-tooltip="formatMessage(messages.backToHome)"
 								:label="formatMessage(messages.backToHome)"
 								type="quiet"
 								class="cursor-pointer whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-								:aria-current="
-												!isEditing && breadcrumbs.length == 0 ? 'location' : undefined
-											"
-								:class="{
-												'!text-contrast': !isEditing && breadcrumbs.length == 0,
-											}"
+								:aria-current="breadcrumbs.length == 0 ? 'location' : undefined"
+								:class="{ '!text-contrast': breadcrumbs.length == 0 }"
 								@click="$emit('navigateHome')"
 								@mouseenter="$emit('prefetchHome')"
 							>
@@ -68,7 +61,7 @@ v-if="breadcrumbs != null"
 								<span>Home</span>
 							</Button>
 							<ChevronRightIcon
-								v-if="breadcrumbs.length != 0 || isEditing"
+								v-if="breadcrumbs.length != 0"
 								class="size-4 flex-shrink-0 text-secondary"
 								aria-hidden="true"
 							/>
@@ -83,15 +76,13 @@ v-if="breadcrumbs != null"
 							<Button
 								type="quiet"
 								class="cursor-pointer whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-								:aria-current="
-												index === breadcrumbs.length - 1 ? 'location' : undefined
-											"
-								:class="{
-												'!text-contrast': index === breadcrumbs.length - 1,
-											}"
-								@click="() => {
-									if (index < breadcrumbs.length - 1) $emit('navigate', index + 1)
-								}"
+								:aria-current="index === breadcrumbs.length - 1 ? 'location' : undefined"
+								:class="{ '!text-contrast': index === breadcrumbs.length - 1 }"
+								@click="
+									() => {
+										if (index < breadcrumbs.length - 1) $emit('navigate', index + 1)
+									}
+								"
 							>
 								{{ segment || '' }}
 							</Button>
@@ -109,15 +100,13 @@ v-if="breadcrumbs != null"
 </template>
 
 <script setup lang="ts">
+import { ChevronLeftIcon, ChevronRightIcon, HomeIcon } from '@modrinth/assets'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
-import {ChevronLeftIcon, ChevronRightIcon, HomeIcon} from "@modrinth/assets";
-import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
-
-import {Button, IconButton} from "#ui/components/base/buttons";
-import {defineMessages, useVIntl} from "#ui/composables";
-import type {EmitCallbacks,Properties} from "#ui/layouts/shared/files-tab/components/FileActionBar.vue";
-import FileActionBar from "#ui/layouts/shared/files-tab/components/FileActionBar.vue";
-import type { FileInfo } from "../providers/file-manager";
+import { Button, IconButton } from '#ui/components/base/buttons'
+import { defineMessages, useVIntl } from '#ui/composables'
+import type { Properties } from '#ui/layouts/shared/files-tab/components/FileActionBar.vue'
+import FileActionBar from '#ui/layouts/shared/files-tab/components/FileActionBar.vue'
 
 const { formatMessage } = useVIntl()
 
@@ -145,27 +134,26 @@ const messages = defineMessages({
 })
 
 defineOptions({
-	inheritAttrs: false
+	inheritAttrs: false,
 })
 
 const baseRef = ref<typeof FileActionBar | null>(null)
 
 // Expose the base component instance so parent refs can call BaseButton methods
 defineExpose({
-	baseRef
+	baseRef,
 })
 
 const props = withDefaults(
-	defineProps<{
-		activeLocation: FileInfo
-		isEditing: boolean
-		editingFileName?: string
-		canGoBack?: boolean
-		canGoForward?: boolean
-	} & Properties>(),
+	defineProps<
+		{
+			canGoBack?: boolean
+			canGoForward?: boolean
+		} & Properties
+	>(),
 	{
 		hasNav: true,
-	}
+	},
 )
 
 const breadcrumbs = computed(() => props.activeLocation.path.split('/').filter(Boolean))
@@ -176,7 +164,7 @@ defineEmits<{
 	prefetchHome?: []
 	back: []
 	forward: []
-} /*& EmitCallbacks*/>()
+}>()
 
 const breadcrumbOuter = ref<HTMLElement | null>(null)
 const breadcrumbInner = ref<{ $el: HTMLElement } | null>(null)
@@ -237,7 +225,6 @@ watch(
 		requestAnimationFrame(checkBreadcrumbOverflow)
 	},
 )
-
 </script>
 
 <style scoped>

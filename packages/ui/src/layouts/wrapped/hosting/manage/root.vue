@@ -237,14 +237,14 @@
 						:style="{ '--si': 1 }"
 					/>
 					<IconButton
-v-if="allowConstrainWidthToggle"
+						v-if="allowConstrainWidthToggle"
 						v-tooltip="constrainWidth ? 'Expand View' : 'Collapse View'"
 						size="md"
 						:label="constrainWidth ? 'Expand View' : 'Collapse View'"
 						native-type="button"
 						class="ml-2"
 						:style="{ '--si': 1 }"
-						@click="() => constrainWidth = !constrainWidth"
+						@click="() => (constrainWidth = !constrainWidth)"
 					>
 						<ExpandIcon v-if="constrainWidth" />
 						<CollapseIcon v-else />
@@ -288,7 +288,11 @@ v-if="allowConstrainWidthToggle"
 						class="mb-4 shrink-0"
 						@installation-retry="handleInstallationRetry"
 					/>
-					<slot :on-reinstall="onReinstall" :on-reinstall-failed="onReinstallFailed" :constrain-width="constrainWidth"/>
+					<slot
+						:on-reinstall="onReinstall"
+						:on-reinstall-failed="onReinstallFailed"
+						:constrain-width="constrainWidth"
+					/>
 				</div>
 			</template>
 		</template>
@@ -342,7 +346,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import {useLocalStorage, useResizeObserver,useStorage} from '@vueuse/core'
+import { useLocalStorage, useResizeObserver, useStorage } from '@vueuse/core'
 import DOMPurify from 'dompurify'
 import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
@@ -483,13 +487,15 @@ const DISABLE_LOADING_ANIM = true
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const serverDataContainer = ref<InstanceType<typeof HTMLDivElement>>()
-const allowConstrainWidthToggle = ref<boolean>(false);
+const allowConstrainWidthToggle = ref<boolean>(false)
 useResizeObserver(serverDataContainer, (entries) => {
 	const entry = entries[0]
 	allowConstrainWidthToggle.value = entry.contentRect.width > 1200
 })
-const constrainWidth = useLocalStorage('server-layout-constrained-width', props.constrainWidth, { initOnMounted: true })
-const centerEntries = computed(() => props.centerEntries);
+const constrainWidth = useLocalStorage('server-layout-constrained-width', props.constrainWidth, {
+	initOnMounted: true,
+})
+const centerEntries = computed(() => props.centerEntries)
 const containedLayout = computed(() => props.layoutMode === 'contained')
 const isNuxt = computed(() => client instanceof NuxtModrinthClient)
 const queryClient = useQueryClient()

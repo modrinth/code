@@ -12,7 +12,8 @@ import {
 } from 'vue'
 
 import {
-	bindTooltipSource, preventTooltipClosure,
+	bindTooltipSource,
+	preventTooltipClosure,
 	type TooltipContent,
 	tooltipEnter,
 	tooltipFocusIn,
@@ -40,7 +41,7 @@ const SIDES = {
 	left: { origin: 'right center', arrow: 'right', rotate: 315 },
 } as const
 
-type HoverWaitTimes = {hover?: number, unhover?: number};
+type HoverWaitTimes = { hover?: number; unhover?: number }
 
 const props = withDefaults(
 	defineProps<{
@@ -60,7 +61,7 @@ const props = withDefaults(
 	{ disabled: false, theme: 'tooltip', placement: 'top' },
 )
 
-const slots = defineSlots<{popper?: () => VNode}>();
+const slots = defineSlots<{ popper?: () => VNode }>()
 const trigger = useTemplateRef<HTMLElement>('trigger')
 const floating = useTemplateRef<HTMLElement>('floating')
 const arrowEl = useTemplateRef<HTMLElement>('arrowEl')
@@ -98,11 +99,11 @@ watch(isDisabled, (value) => {
 	if (trigger.value) {
 		if (value) {
 			if (trigger.value.matches(':hover')) {
-				onLeave();
+				onLeave()
 			}
 		} else {
 			if (trigger.value.matches(':hover')) {
-				onEnter();
+				onEnter()
 			}
 		}
 	}
@@ -223,21 +224,27 @@ function onEnter() {
 	if (props.disabled || !trigger.value) {
 		return
 	}
-	const waitTime = props.actionWait;
-	tooltipEnter(trigger.value, waitTime ? (typeof waitTime === 'number' ? waitTime : waitTime.unhover) : undefined)
+	const waitTime = props.actionWait
+	tooltipEnter(
+		trigger.value,
+		waitTime ? (typeof waitTime === 'number' ? waitTime : waitTime.unhover) : undefined,
+	)
 }
 
 function onTooltipEnter() {
 	if (props.reference) {
-		preventTooltipClosure(props.reference);
+		preventTooltipClosure(props.reference)
 	}
 }
 
 function onLeave() {
-	const triggerEl = trigger.value ?? props.reference;
-	const waitTime = props.actionWait;
+	const triggerEl = trigger.value ?? props.reference
+	const waitTime = props.actionWait
 	if (triggerEl) {
-		tooltipLeave(triggerEl, waitTime ? (typeof waitTime === 'number' ? waitTime : waitTime.unhover) : undefined);
+		tooltipLeave(
+			triggerEl,
+			waitTime ? (typeof waitTime === 'number' ? waitTime : waitTime.unhover) : undefined,
+		)
 	}
 }
 
@@ -279,7 +286,12 @@ function onFocusOut(event: FocusEvent) {
 				:key="jumpKey"
 				ref="floating"
 				class="`v-popper__inner z-[100010] rounded-lg border border-solid border-surface-5 bg-surface-3 px-3 py-1.5 text-sm font-medium text-contrast card-shadow`"
-				:class="[`v-popper--theme-${theme}`, moving && 'tooltip-moving', panelClass, unhoverWait ? 'pointer-events-none' : '']"
+				:class="[
+					`v-popper--theme-${theme}`,
+					moving && 'tooltip-moving',
+					panelClass,
+					unhoverWait ? 'pointer-events-none' : '',
+				]"
 				:style="[floatingStyles, { transformOrigin }]"
 				@mouseenter="onTooltipEnter"
 				@mouseleave="onLeave"

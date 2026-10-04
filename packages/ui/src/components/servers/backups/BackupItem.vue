@@ -193,7 +193,7 @@ const creatorAvatarSrc = computed(() =>
 		:class="itemBorderClass"
 	>
 		<div class="flex items-center gap-4" :class="[showDebugInfo ? 'flex-col' : '']">
-			<div class="flex min-w-0 flex-1 items-center gap-4" >
+			<div class="flex min-w-0 flex-1 items-center gap-4">
 				<!-- Icon tile -->
 				<div
 					class="flex shrink-0 items-center justify-center rounded-2xl border border-solid border-surface-5 bg-surface-4"
@@ -209,19 +209,19 @@ const creatorAvatarSrc = computed(() =>
 				<!-- Name + badge + subtitle -->
 				<div class="flex min-w-0 flex-col gap-1.5">
 					<div class="flex min-w-0 items-center gap-2">
-					<span
-						ref="nameRef"
-						v-tooltip="truncatedTooltip(nameRef, backup.name)"
-						class="min-w-0 truncate font-semibold text-contrast"
-					>
-						{{ backup.name }}
-					</span>
+						<span
+							ref="nameRef"
+							v-tooltip="truncatedTooltip(nameRef, backup.name)"
+							class="min-w-0 truncate font-semibold text-contrast"
+						>
+							{{ backup.name }}
+						</span>
 						<span
 							v-if="backup.automated"
 							class="shrink-0 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1 text-sm font-medium text-secondary"
 						>
-						{{ formatMessage(messages.auto) }}
-					</span>
+							{{ formatMessage(messages.auto) }}
+						</span>
 					</div>
 					<div class="flex items-center gap-2 text-sm font-medium text-secondary">
 						<template v-if="preview">
@@ -247,16 +247,16 @@ const creatorAvatarSrc = computed(() =>
 									class="min-w-0 truncate font-medium"
 									:class="backupCreator.id === 'support' ? 'text-blue' : ''"
 								>
-								{{ creatorName }}
-							</span>
+									{{ creatorName }}
+								</span>
 							</AutoLink>
 						</template>
 						<template v-else>
-						<span>
-							{{
-								formatMessage(backup.automated ? messages.backupSchedule : messages.manualBackup)
-							}}
-						</span>
+							<span>
+								{{
+									formatMessage(backup.automated ? messages.backupSchedule : messages.manualBackup)
+								}}
+							</span>
 						</template>
 					</div>
 				</div>
@@ -264,7 +264,7 @@ const creatorAvatarSrc = computed(() =>
 
 			<!-- Date (middle column) -->
 			<div v-if="!preview" class="flex shrink-0 items-center">
-			<span class="whitespace-nowrap font-medium text-contrast">{{
+				<span class="whitespace-nowrap font-medium text-contrast">{{
 					formatDateTime(backup.created_at)
 				}}</span>
 			</div>

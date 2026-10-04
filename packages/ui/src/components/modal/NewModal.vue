@@ -29,7 +29,11 @@
 			/>
 			<div
 				class="modal-container"
-				:class="[{ shown: visible }, pulloutContainerClass, fillWidthWhenSmall ? 'fill-width-when-small' : '']"
+				:class="[
+					{ shown: visible },
+					pulloutContainerClass,
+					fillWidthWhenSmall ? 'fill-width-when-small' : '',
+				]"
 				:style="{ zIndex: stackContainerZ }"
 			>
 				<div
@@ -208,7 +212,7 @@ const props = withDefaults(
 		disableClose?: boolean
 		actionsDivider?: boolean
 		pulloutDirection?: 'left' | 'right' | 'top' | 'bottom'
-		fillWidthWhenSmall?: boolean,
+		fillWidthWhenSmall?: boolean
 	}>(),
 	{
 		type: true,
@@ -521,7 +525,11 @@ const stackOverlayZ = computed(() => stackZBase.value + MODAL_OVERLAY_Z_OFFSET)
 const stackTauriZ = computed(() => stackZBase.value + MODAL_TAURI_Z_OFFSET)
 const stackContainerZ = computed(() => stackZBase.value + MODAL_CONTAINER_Z_OFFSET)
 const resolvedMaxWidth = computed(() => props.maxWidth ?? '60rem')
-const modelBodyMaxWidth = computed(() => props.maxWidthMinCheck ? `min(${resolvedMaxWidth.value}, calc(100% - 2 * var(--gap-lg)))` : resolvedMaxWidth.value)
+const modelBodyMaxWidth = computed(() =>
+	props.maxWidthMinCheck
+		? `min(${resolvedMaxWidth.value}, calc(100% - 2 * var(--gap-lg)))`
+		: resolvedMaxWidth.value,
+)
 const resolvedWidth = computed(() => props.width ?? 'fit-content')
 
 // The mouse-tilt parallax only makes sense for a centered, floating modal - a pulled-out

@@ -1,4 +1,4 @@
-import type {FileInfo} from "#ui/layouts/shared/files-tab/providers/file-manager.ts";
+import type { FileInfo } from '#ui/layouts/shared/files-tab/providers/file-manager.ts'
 
 export interface FileItem {
 	name: string

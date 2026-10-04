@@ -67,10 +67,12 @@
 		</div>
 		<template v-if="smallMode">
 			<NewModal
-ref="sidebarModal"
-				:on-hide="() => {
-					if (smallMode) sidebarOpen = false;
-				}"
+				ref="sidebarModal"
+				:on-hide="
+					() => {
+						if (smallMode) sidebarOpen = false
+					}
+				"
 				:noblur="true"
 				:no-padding="true"
 				:hide-header="true"
@@ -80,8 +82,12 @@ ref="sidebarModal"
 				:scrollable="false"
 				pullout-direction="left"
 			>
-				<div class="p-2 h-full " :class="[fullWidthSidebar ? 'w-full' : '']">
-					<FileSideBar :constrain-width="!fullWidthSidebar" :scroll-file-entries="true" :add-border="false"/>
+				<div class="p-2 h-full" :class="[fullWidthSidebar ? 'w-full' : '']">
+					<FileSideBar
+						:constrain-width="!fullWidthSidebar"
+						:scroll-file-entries="true"
+						:add-border="false"
+					/>
 				</div>
 			</NewModal>
 		</template>
@@ -118,7 +124,13 @@ ref="sidebarModal"
 			<div class="ml-auto flex items-center gap-0.5">
 				<Button
 					v-if="ctx.zipPaths"
-					v-tooltip="isBusy ? busyTooltip : selectionParent === null ? formatMessage(messages.zipMixedFolders) : undefined"
+					v-tooltip="
+						isBusy
+							? busyTooltip
+							: selectionParent === null
+								? formatMessage(messages.zipMixedFolders)
+								: undefined
+					"
 					type="quiet"
 					:disabled="isBusy || selectionParent === null"
 					@click="createZipModal?.show()"
@@ -144,21 +156,21 @@ ref="sidebarModal"
 </template>
 
 <script setup lang="ts">
-import {FolderArchiveIcon, HistoryIcon, SaveIcon, TrashIcon,} from '@modrinth/assets'
-import {type MaybeElement, useLocalStorage, useResizeObserver} from "@vueuse/core";
-import type {Component} from 'vue'
-import {computed, onMounted, onUnmounted, ref, shallowRef, watch} from 'vue'
+import { FolderArchiveIcon, HistoryIcon, SaveIcon, TrashIcon } from '@modrinth/assets'
+import { type MaybeElement, useLocalStorage, useResizeObserver } from '@vueuse/core'
+import type { Component } from 'vue'
+import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 
-import {type ButtonMenuOption, NewModal} from '#ui/components'
-import {Button, ContextMenu} from '#ui/components/base/buttons'
+import { type ButtonMenuOption, NewModal } from '#ui/components'
+import { Button, ContextMenu } from '#ui/components/base/buttons'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
-import {defineMessages, useVIntl} from '#ui/composables/i18n'
-import {useFileTabs} from "#ui/layouts/shared/files-tab/composables/file-tabs.ts";
-import {parentDirectory, parentInfoFrom} from "#ui/layouts/shared/files-tab/utils.ts";
-import {injectFilePicker} from '#ui/providers/file-picker'
-import {injectNotificationManager} from '#ui/providers/web-notifications'
-import {commonMessages} from '#ui/utils/common-messages'
-import {canOpenInFileEditor} from '#ui/utils/file-extensions'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { useFileTabs } from '#ui/layouts/shared/files-tab/composables/file-tabs.ts'
+import { parentDirectory, parentInfoFrom } from '#ui/layouts/shared/files-tab/utils.ts'
+import { injectFilePicker } from '#ui/providers/file-picker'
+import { injectNotificationManager } from '#ui/providers/web-notifications'
+import { commonMessages } from '#ui/utils/common-messages'
+import { canOpenInFileEditor } from '#ui/utils/file-extensions'
 
 import FileBrowserPanel from './components/FileBrowserPanel.vue'
 import FileSideBar from './components/FileSideBar.vue'
@@ -170,14 +182,14 @@ import FileRenameItemModal from './components/modals/FileRenameItemModal.vue'
 import FileUnsavedChangesModal from './components/modals/FileUnsavedChangesModal.vue'
 import FileUploadConflictModal from './components/modals/FileUploadConflictModal.vue'
 import FileUploadZipUrlModal from './components/modals/FileUploadZipUrlModal.vue'
-import {useFileSearch} from './composables/file-search'
-import {useFileSelection} from './composables/file-selection'
-import {useFileSorting} from './composables/file-sorting'
-import {useFileUndoRedo} from './composables/file-undo-redo'
-import type {FileEditorBridge} from './providers/file-browser-ui'
-import {provideFileBrowserUI} from './providers/file-browser-ui'
-import {type FileInfo, injectFileManager} from './providers/file-manager'
-import type {FileItem} from './types'
+import { useFileSearch } from './composables/file-search'
+import { useFileSelection } from './composables/file-selection'
+import { useFileSorting } from './composables/file-sorting'
+import { useFileUndoRedo } from './composables/file-undo-redo'
+import type { FileEditorBridge } from './providers/file-browser-ui'
+import { provideFileBrowserUI } from './providers/file-browser-ui'
+import { type FileInfo, injectFileManager } from './providers/file-manager'
+import type { FileItem } from './types'
 
 const { formatMessage } = useVIntl()
 
@@ -259,19 +271,28 @@ const items = computed(() => ctx.directoryTree.get(ctx.currentDirectory.value).d
 const hasLoadedOnce = ref(false)
 watch(
 	() => {
-		const location = ctx.currentFile.value;
-		const result = location.type == 'directory' ? ctx.directoryTree.get<'directory'>(location as FileInfo<'directory'>).data : null;
+		const location = ctx.currentFile.value
+		const result =
+			location.type == 'directory'
+				? ctx.directoryTree.get<'directory'>(location as FileInfo<'directory'>).data
+				: null
 
-		return !(ctx.loading.value && result?.value.length === 0);
+		return !(ctx.loading.value && result?.value.length === 0)
 	},
 	(loaded) => {
 		if (loaded) hasLoadedOnce.value = true
 	},
 	{ immediate: true },
 )
-const isEditing = computed(() => ctx.currentFile.value !== null && ctx.currentFile.value.type == 'file')
-const isBusy = computed(() => (ctx.isBusy?.value ?? false) || (ctx.isReadOnly?.(ctx.currentFile.value) ?? false))
-const busyTooltip = computed(() => ctx.isReadOnly?.(ctx.currentFile.value) ? ctx.readOnlyReason?.value : ctx.busyTooltip?.value,)
+const isEditing = computed(
+	() => ctx.currentFile.value !== null && ctx.currentFile.value.type == 'file',
+)
+const isBusy = computed(
+	() => (ctx.isBusy?.value ?? false) || (ctx.isReadOnly?.(ctx.currentFile.value) ?? false),
+)
+const busyTooltip = computed(() =>
+	ctx.isReadOnly?.(ctx.currentFile.value) ? ctx.readOnlyReason?.value : ctx.busyTooltip?.value,
+)
 
 const activeLocation = computed(() => fileTabs.activeLocation.value)
 
@@ -300,9 +321,7 @@ const selectionReadOnly = computed(() =>
 
 /** The directory all selected entries share, or `null` when the selection is empty or spans directories. */
 const selectionParent = computed(() => {
-	const parents = new Set(
-		[...selectedItems.value.values()].map((item) => parentInfoFrom(item)),
-	)
+	const parents = new Set([...selectedItems.value.values()].map((item) => parentInfoFrom(item)))
 	return parents.size === 1 ? [...parents][0] : null
 })
 
@@ -342,8 +361,8 @@ function toggleFind() {
 }
 
 // Refs
-const fileViewer = ref<MaybeElement>();
-const sidebarModal = ref<InstanceType<typeof NewModal>>();
+const fileViewer = ref<MaybeElement>()
+const sidebarModal = ref<InstanceType<typeof NewModal>>()
 const createItemModal = ref<InstanceType<typeof FileCreateItemModal>>()
 const createZipModal = ref<InstanceType<typeof FileCreateZipModal>>()
 const renameItemModal = ref<InstanceType<typeof FileRenameItemModal>>()
@@ -365,8 +384,10 @@ const SIDEBAR_DEFAULT_WIDTH = 300
 
 const browserMinSize = computed(() => (props.constrainWidth ? 700 : 1200))
 
-const sidebarOpenSetting = useLocalStorage('file-layout-sidebar-open', false, { initOnMounted: true });
-const sidebarOpen = ref(sidebarOpenSetting.value);
+const sidebarOpenSetting = useLocalStorage('file-layout-sidebar-open', false, {
+	initOnMounted: true,
+})
+const sidebarOpen = ref(sidebarOpenSetting.value)
 const sidebarWidthSetting = useLocalStorage('file-layout-sidebar-width', SIDEBAR_DEFAULT_WIDTH, {
 	initOnMounted: true,
 })
@@ -393,8 +414,8 @@ useResizeObserver(mainColumn, (entries) => {
 	containerWidth.value = entries[0].contentRect.width
 })
 
-const smallMode = computed(() => shellWidth.value == null || shellWidth.value < 1100);
-const fullWidthSidebar = computed(() => shellWidth.value == null || shellWidth.value < 400);
+const smallMode = computed(() => shellWidth.value == null || shellWidth.value < 1100)
+const fullWidthSidebar = computed(() => shellWidth.value == null || shellWidth.value < 400)
 const showDockedSidebar = computed(() => !smallMode.value && sidebarOpen.value)
 
 const maxSidebarWidth = computed(() =>
@@ -443,13 +464,13 @@ function resetSidebarWidth() {
 	sidebarWidthSetting.value = SIDEBAR_DEFAULT_WIDTH
 }
 
-let pastInitialSetup = false;
+let pastInitialSetup = false
 
 watch(smallMode, (value) => {
 	if (pastInitialSetup) {
-		sidebarOpen.value = !value;
+		sidebarOpen.value = !value
 	} else {
-		pastInitialSetup = true;
+		pastInitialSetup = true
 	}
 })
 
@@ -505,7 +526,7 @@ async function handleRenameItem(newName: string) {
 		recordOperation({
 			type: 'rename',
 			prevFile: item,
-			newFile: newFile
+			newFile: newFile,
 		})
 	}
 }
@@ -517,7 +538,7 @@ async function handleMoveItem(destination: string) {
 
 	const dest = `${destination}/${item.name}`.replace('//', '/')
 
-	const newFile = await ctx.moveItem(item, dest);
+	const newFile = await ctx.moveItem(item, dest)
 	if (newFile != null) {
 		recordOperation({
 			type: 'move',
@@ -539,13 +560,13 @@ async function handleDirectMove(file: FileInfo, destination: string) {
 	if (isBusy.value) return
 	const dest = `${destination}/${file.name}`.replace('//', '/')
 
-	const newFile = await ctx.moveItem(file, dest);
+	const newFile = await ctx.moveItem(file, dest)
 
 	if (newFile != null) {
 		recordOperation({
 			type: 'move',
 			prevFile: file,
-			newFile: newFile
+			newFile: newFile,
 		})
 	}
 }
@@ -565,7 +586,7 @@ async function handleZip(item: FileInfo) {
 async function handleZipSelection(target: string) {
 	const parent = selectionParent.value
 	if (isBusy.value || !ctx.zipPaths || parent === null) return
-	const include = [...selectedItems.value.values()];
+	const include = [...selectedItems.value.values()]
 	deselectAll()
 	await ctx.zipPaths(include, parent, target)
 }
@@ -712,7 +733,7 @@ function handleItemPrefetch(item: Pick<FileItem, 'type' | 'path' | 'name'>) {
 }
 
 function handleHomePrefetch() {
-	handleItemPrefetch({ path: '/', type: 'directory', name: 'home'});
+	handleItemPrefetch({ path: '/', type: 'directory', name: 'home' })
 }
 
 function handleContextMenu(event: MouseEvent, options: ButtonMenuOption[]) {
@@ -735,8 +756,8 @@ provideFileBrowserUI({
 	activeLocation,
 	sidebarOpen: computed(() => sidebarOpen.value),
 	setSidebarOpen: (value) => {
-		sidebarOpen.value = value;
-		sidebarOpenSetting.value = value;
+		sidebarOpen.value = value
+		sidebarOpenSetting.value = value
 	},
 	containerWidth,
 

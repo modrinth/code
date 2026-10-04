@@ -3,12 +3,12 @@
 		class="flex flex-col p-1 gap-2 h-full"
 		:class="[
 			addBorder ? 'border-r border-0 border-solid border-surface-5 pr-2' : '',
-			constrainWidth ? 'w-[24rem]' : 'w-full'
+			constrainWidth ? 'w-[24rem]' : 'w-full',
 		]"
 	>
 		<FileActionBar
 			:sidebar-open="ui.sidebarOpen.value"
-			:is-editing="false"
+			:active-location="ui.activeLocation.value"
 			:search-query="ui.searchQuery.value"
 			:show-refresh-button="ui.showRefreshButton.value"
 			:show-install-from-url="ctx.showInstallFromUrl"
@@ -20,9 +20,7 @@
 			@upload="ui.initiateFileUpload"
 			@upload-zip="() => {}"
 			@unzip-from-url="ui.showUnzipFromUrlModal"
-			@refresh="() => {
-				ctx.refresh();
-			}"
+			@refresh="() => ctx.refresh()"
 			@share="() => ui.shareToMclogs()"
 			@find="() => ui.toggleFind()"
 			@toggle-sidebar="() => ui.setSidebarOpen(!ui.sidebarOpen.value)"
@@ -52,7 +50,7 @@ const ui = injectFileBrowserUI()
 withDefaults(
 	defineProps<{
 		constrainWidth?: boolean
-		scrollFileEntries?: boolean,
+		scrollFileEntries?: boolean
 		addBorder?: boolean
 		/** Fill the parent's height and scroll the entries within it, keeping the action bar pinned. */
 		fillHeight?: boolean
@@ -62,6 +60,6 @@ withDefaults(
 		scrollFileEntries: false,
 		addBorder: true,
 		fillHeight: false,
-	}
+	},
 )
 </script>

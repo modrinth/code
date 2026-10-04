@@ -9,7 +9,7 @@
 			<AccountSwitchOverlay :show="isSwitchingAccount" />
 			<AdsConsentNotification />
 			<I18nDebugPanel />
-			<NuxtPage/>
+			<NuxtPage />
 			<div id="teleports"></div>
 		</NuxtLayout>
 	</div>
@@ -22,9 +22,8 @@ import {
 	LoadingBar,
 	NotificationPanel,
 } from '@modrinth/ui'
-import {provideAppRoot} from "@modrinth/ui/src/providers/app-root";
-import type {MaybeElement} from "@vueuse/core";
-import {computed,ref, watch} from "vue";
+import { provideAppRoot } from '@modrinth/ui/src/providers/app-root'
+import { computed, ref, watch } from 'vue'
 
 import AdsConsentNotification from '~/components/ui/AdsConsentNotification.vue'
 import { setupProviders } from '~/providers/setup.ts'
@@ -37,10 +36,10 @@ import {
 } from './composables/accounts'
 import { useAuth } from './composables/auth'
 
-const root = ref<MaybeElement>(null);
+const root = ref<HTMLElement | null>(null)
 
 provideAppRoot({
-	root: computed(() => root.value)
+	root: computed(() => root.value),
 })
 
 const auth = await useAuth()

@@ -1,8 +1,14 @@
-import {BoxIcon, CurseForgeIcon, FileArchiveIcon, FolderOpenIcon, LinkIcon,
-	RefreshCwIcon, UploadIcon} from "@modrinth/assets";
-import {computed, type ComputedRef} from "vue";
+import {
+	BoxIcon,
+	CurseForgeIcon,
+	FolderOpenIcon,
+	LinkIcon,
+	RefreshCwIcon,
+	UploadIcon,
+} from '@modrinth/assets'
+import { computed, type ComputedRef } from 'vue'
 
-import type { ButtonMenuOption } from "#ui/components/index.ts";
+import type { ButtonMenuOption } from '#ui/components/index.ts'
 import { defineMessages, useVIntl } from '#ui/composables/i18n.ts'
 import { commonMessages } from '#ui/utils/common-messages.ts'
 
@@ -10,8 +16,8 @@ export function useFileActions(
 	createFile: (type: 'file' | 'directory') => void,
 	upload?: (type: 'file' | 'zip') => void,
 	unzip?: (type: 'cf' | 'zip') => void,
-	refresh?: { handleRefresh: () => void, isRefreshing: ComputedRef<boolean>}
-): { options: ComputedRef<ButtonMenuOption[]> }{
+	refresh?: { handleRefresh: () => void; isRefreshing: ComputedRef<boolean> },
+): { options: ComputedRef<ButtonMenuOption[]> } {
 	const { formatMessage } = useVIntl()
 
 	const messages = defineMessages({
@@ -42,12 +48,12 @@ export function useFileActions(
 		installCurseForgePack: {
 			id: 'files.navbar.install-curseforge-pack',
 			defaultMessage: 'Install CurseForge pack',
-		}
+		},
 	})
 
-	const canHandleZips = unzip != null;
-	const canHandleUpload = upload != null;
-	const canRefresh = refresh != null;
+	const canHandleZips = unzip != null
+	const canHandleUpload = upload != null
+	const canRefresh = refresh != null
 
 	return {
 		options: computed(() => {
@@ -90,13 +96,13 @@ export function useFileActions(
 				{
 					id: 'refresh',
 					icon: RefreshCwIcon,
-					iconClass: computed(() => refresh?.isRefreshing.value ? 'animate-spin' : ''),
+					iconClass: computed(() => (refresh?.isRefreshing.value ? 'animate-spin' : '')),
 					label: formatMessage(commonMessages.refreshButton),
 					shown: canRefresh,
 					action: () => refresh?.handleRefresh(),
 					disabled: refresh?.isRefreshing.value,
 				},
 			]
-		})
-	};
+		}),
+	}
 }

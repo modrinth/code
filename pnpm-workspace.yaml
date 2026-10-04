@@ -2,6 +2,3 @@ packages:
   - 'apps/*'
   - 'packages/*'
 minimumReleaseAge: 10080 # 7 days
-minimumReleaseAgeExclude:
-  - '@run-slicer/cfr'
-  - 'krakatau-web'

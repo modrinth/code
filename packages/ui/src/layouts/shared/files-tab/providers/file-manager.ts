@@ -3,15 +3,12 @@ import type { ComputedRef, Ref } from 'vue'
 
 import { createContext } from '#ui/providers/create-context'
 
-import type {
-	EditingFile,
-	ExtractDryRunResult,
-	FileItem,
-	FileOperation,
-	UploadState,
-} from '../types'
+import type { ExtractDryRunResult, FileItem, FileOperation, UploadState } from '../types'
 
-export type FileInfo<T extends FileTypes = FileTypes> = Pick<FileItem, "path"> & { name: string, type: T};
+export type FileInfo<T extends FileTypes = FileTypes> = Pick<FileItem, 'path'> & {
+	name: string
+	type: T
+}
 
 export interface FileItemResult<R, T extends FileTypes> extends FileInfo<T> {
 	data: ComputedRef<R>
@@ -19,22 +16,21 @@ export interface FileItemResult<R, T extends FileTypes> extends FileInfo<T> {
 	loadError: Ref<Error | null>
 }
 
-export interface FileQueryResult extends FileItemResult<any, FileTypes> {
+export interface FileQueryResult {
 	filesReadyPending: ComputedRef<boolean>
 }
 
-export interface DirectoryResult extends FileItemResult<FileItem[], 'directory'> {}
+export type DirectoryResult = FileItemResult<FileItem[], 'directory'>
 
-export interface FileResult extends FileItemResult<ArrayBuffer | null, 'file'> {}
+export type FileResult = FileItemResult<ArrayBuffer | null, 'file'>
 
-export type FileTypes = FileItem['type'];
+export type FileTypes = FileItem['type']
 
-export type FileItemResultFrom<T extends FileTypes> =
-	T extends 'directory'
-		? DirectoryResult
-		: T extends 'file'
-			? FileResult
-			: never
+export type FileItemResultFrom<T extends FileTypes> = T extends 'directory'
+	? DirectoryResult
+	: T extends 'file'
+		? FileResult
+		: never
 
 /**
  * Lazily loaded, cached directory listings used by the sidebar tree. Paths are absolute
@@ -68,7 +64,11 @@ export interface FileManagerContext {
 	downloadFile: (file: FileInfo) => Promise<void>
 	statFile?: (path: string) => Promise<Kyros.Files.v1.FileStatResponse>
 	zipFolder?: (file: FileInfo<'directory'>) => Promise<void>
-	zipPaths?: (files: FileInfo[], targetDirectory: FileInfo<'directory'>, archiveName: string) => Promise<void>
+	zipPaths?: (
+		files: FileInfo[],
+		targetDirectory: FileInfo<'directory'>,
+		archiveName: string,
+	) => Promise<void>
 
 	uploadFiles: (files: File[]) => void
 	cancelUpload?: () => void

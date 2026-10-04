@@ -1,11 +1,17 @@
 import {
-computed, type ComputedRef, type MaybeRefOrGetter,
-onMounted, onUnmounted, type Ref, 	ref, 	toValue
+	computed,
+	type ComputedRef,
+	type MaybeRefOrGetter,
+	onMounted,
+	onUnmounted,
+	type Ref,
+	ref,
+	toValue,
 } from 'vue'
 
 export interface RemCompute {
-	remToPx: (rem: MaybeRefOrGetter<number>) => ComputedRef<number>;
-	rootFontSize: Ref<number>;
+	remToPx: (rem: MaybeRefOrGetter<number>) => ComputedRef<number>
+	rootFontSize: Ref<number>
 }
 
 export function useRemToPx(): RemCompute {
@@ -26,7 +32,8 @@ export function useRemToPx(): RemCompute {
 		window.removeEventListener('resize', updateRootFontSize)
 	})
 
-	const remToPx = (rem: MaybeRefOrGetter<number>) => computed(() => toValue(rem) * rootFontSize.value)
+	const remToPx = (rem: MaybeRefOrGetter<number>) =>
+		computed(() => toValue(rem) * rootFontSize.value)
 
 	return { remToPx, rootFontSize }
 }
