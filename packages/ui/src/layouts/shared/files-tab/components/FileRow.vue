@@ -1,12 +1,12 @@
 <template>
-	<Tooltip :action-wait="{hover: 600, unhover: 200}">
+	<Tooltip :action-wait="{hover: 600, unhover: 50}">
 		<li
 			role="option"
 			:class="[containerClasses, isDragSource ? 'opacity-50' : '', compact ? 'h-8' : 'h-[3.25rem]', ]"
 			:style="depth != null ? { paddingLeft: `${(depth * basePaddingFactor)}rem`} : undefined"
 			tabindex="0"
-			:data-file-path="path"
-			:data-file-type="type"
+			:data-file-path="file.path"
+			:data-file-type="file.type"
 			:aria-expanded="canExpand ? expanded : undefined"
 			:aria-current="active ? 'location' : undefined"
 			@click="selectItem"
@@ -61,7 +61,7 @@ v-if="!selectionWithinActionMenu"
 						class="pointer-events-none truncate group-hover:text-contrast group-focus:text-contrast"
 						:class="{ 'text-sm': compact, 'font-semibold text-contrast': active }"
 					>
-						{{ name }}
+						{{ file.name }}
 					</span>
 				</div>
 				<EditIcon v-if="hoveringToEdit && isEditableFile && !compact" />
@@ -102,36 +102,16 @@ v-if="!selectionWithinActionMenu"
 		</li>
 		<template #popper>
 			<div class="flex flex-col w-fit">
-				<h3 class="mb-2 pb-1 mt-0 text-base font-semibold border-0 border-b-[1px] border-solid border-divider">Details</h3>
-				<div class="gap-1 grid grid-cols-2">
-					<template v-if="type === 'directory'">
+				<h3 class="mb-2 pb-1 mt-0 text-base font-semibold border-0 border-b-[1px] border-solid border-divider">{{ formatMessage(messages.details) }}</h3>
+				<div class="gap-1 grid grid-cols-2" v-for="(key) in FILE_COLUMNS_ORDER">
+					<template v-if="columnValues[key] != null">
 						<span class="text-nowrap text-sm text-secondary">
-							{{ formatMessage(messages.items) }}
+						{{ formatMessage(messages[key]) }}
 						</span>
 						<span class="text-nowrap text-sm text-secondary">
-							{{ columnValues.items }}
-						</span>
-					</template>
-					<template v-else>
-						<span class="text-nowrap text-sm text-secondary">
-							{{ formatMessage(messages.size) }}
-						</span>
-						<span class="text-nowrap text-sm text-secondary">
-							{{ columnValues.size }}
+							{{ columnValues[key] ?? ' - ' }}
 						</span>
 					</template>
-					<span class="text-nowrap text-sm text-secondary">
-						{{ formatMessage(messages.created) }}
-					</span>
-					<span class="text-nowrap text-sm text-secondary">
-						{{ formattedCreationDate }}
-					</span>
-					<span class="text-nowrap text-sm text-secondary">
-						{{ formatMessage(messages.modified) }}
-					</span>
-					<span class="text-nowrap text-sm text-secondary">
-						{{ formattedModifiedDate }}
-					</span>
 				</div>
 			</div>
 		</template>
@@ -168,14 +148,14 @@ import Checkbox from '#ui/components/base/Checkbox.vue'
 import { useFormatBytes } from '#ui/composables'
 import { useFormatDateTime } from '#ui/composables/format-date-time'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { injectFileManager } from '#ui/layouts'
+import {infoFrom, injectFileManager} from '#ui/layouts'
 import { useFileActions } from "#ui/layouts/shared/files-tab/composables/folder-actions.ts";
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { getFileExtensionIcon } from '#ui/utils/auto-icons'
 import { commonMessages } from '#ui/utils/common-messages'
 import { canOpenInFileEditor, getFileExtension } from '#ui/utils/file-extensions'
 
-import { FILE_COLUMNS, type FileColumn } from '../composables/file-columns'
+import {FILE_COLUMNS, FILE_COLUMNS_ORDER, type FileColumn} from '../composables/file-columns'
 import {
 	fileDragActive,
 	fileDragData,
@@ -204,6 +184,10 @@ const messages = defineMessages({
 	size: {
 		id: 'files.table-header.size',
 		defaultMessage: 'Size',
+	},
+	details: {
+		id: 'files.table-header.details',
+		defaultMessage: 'Details',
 	},
 	items: {
 		id: 'files.table-header.items',
@@ -236,8 +220,9 @@ const messages = defineMessages({
 })
 
 const props = defineProps<
-	FileItem & {
+	{
 		index: number
+		file: FileItem,
 		isLast: boolean
 		selected: boolean
 		writeDisabled?: boolean
@@ -291,18 +276,18 @@ const emit = defineEmits<{
 }>()
 
 const canExpand = computed(
-	() => !!props.isTreeRow && props.type === 'directory' && props.expandable !== false,
+	() => !!props.isTreeRow && props.file.type === 'directory' && props.expandable !== false,
 )
 
 const shownColumnDefinitions = computed(() =>
 	(props.columns ?? []).flatMap((id) => FILE_COLUMNS.filter((column) => column.id === id)),
 )
-const canOpenInTab = computed(() => props.type === 'directory' || isEditableFile.value)
+const canOpenInTab = computed(() => props.file.type === 'directory' || isEditableFile.value)
 
 const isDropTarget = computed(
-	() => fileDragActive.value && fileDragTarget.value === props.path && props.type === 'directory',
+	() => fileDragActive.value && fileDragTarget.value === props.file.path && props.file.type === 'directory',
 )
-const isDragSource = computed(() => fileDragActive.value && fileDragData.value?.path === props.path)
+const isDragSource = computed(() => fileDragActive.value && fileDragData.value?.path === props.file.path)
 const hoveringToEdit = ref<boolean>(false);
 
 const formatDateTime = useFormatDateTime({
@@ -331,17 +316,17 @@ const containerClasses = computed(() => {
 							? 'bg-surface-2'
 							: 'bg-surface-1.5',
 		props.isLast ? '' : '',
-		isEditableFile.value || props.type === 'directory' ? 'cursor-pointer hover:bg-surface-2.5' : '',
+		isEditableFile.value || props.file.type === 'directory' ? 'cursor-pointer hover:bg-surface-2.5' : '',
 		'transition-colors duration-100 focus:!outline-none',
 	]
 })
 
-const fileExtension = computed(() => getFileExtension(props.name))
+const fileExtension = computed(() => getFileExtension(props.file.name))
 
 const canExtract = computed(() => fileExtension.value === 'zip' && !!ctx.extractFile)
 
 function getFullPath() {
-	return joinDisplayPath(ctx.basePath?.value, props.path)
+	return joinDisplayPath(ctx.basePath?.value, props.file.path)
 }
 
 const { options } = useFileActions(
@@ -350,7 +335,7 @@ const { options } = useFileActions(
 );
 
 const menuOptions = computed<ButtonMenuOption[]>(() => {
-	const item = { name: props.name, type: props.type, path: props.path }
+	const item = infoFrom(props.file)
 	const wd = props.writeDisabled
 	const wdTooltip = props.writeDisabledTooltip
 	return [
@@ -383,7 +368,7 @@ const menuOptions = computed<ButtonMenuOption[]>(() => {
 			label: formatMessage(commonMessages.copyFilenameButton),
 			icon: ClipboardCopyIcon,
 			action: () => {
-				navigator.clipboard.writeText(props.name)
+				navigator.clipboard.writeText(props.file.name)
 				addNotification({
 					title: formatMessage(commonMessages.copiedFilenameLabel),
 					type: 'success',
@@ -421,12 +406,12 @@ const menuOptions = computed<ButtonMenuOption[]>(() => {
 			id: 'zip',
 			label: formatMessage(messages.createZip),
 			icon: FolderArchiveIcon,
-			shown: props.type === 'directory' && !!ctx.zipFolder,
+			shown: props.file.type === 'directory' && !!ctx.zipFolder,
 			disabled: wd,
 			tooltip: wd ? wdTooltip : undefined,
 			action: () => emit('zip', item),
 		},
-		{ type: 'divider', shown: props.type === 'directory' && !!ctx.zipFolder },
+		{ type: 'divider', shown: props.file.type === 'directory' && !!ctx.zipFolder },
 		{
 			id: 'rename',
 			label: formatMessage(commonMessages.renameButton),
@@ -448,7 +433,7 @@ const menuOptions = computed<ButtonMenuOption[]>(() => {
 			label: ctx.downloadButtonLabel ?? formatMessage(commonMessages.downloadButton),
 			icon: DownloadIcon,
 			action: () => emit('download', item),
-			shown: props.type !== 'directory',
+			shown: props.file.type !== 'directory',
 		},
 		{
 			id: 'delete',
@@ -463,13 +448,13 @@ const menuOptions = computed<ButtonMenuOption[]>(() => {
 })
 
 const iconComponent = computed(() => {
-	if (props.type === 'directory') {
-		if (props.name === 'config') return FolderCogIcon
-		if (props.name === 'world' || props.name === 'saves') return GlobeIcon
-		if (props.name === 'mods') return BoxIcon
-		if (props.name === 'resourcepacks') return PaintbrushIcon
-		if (props.name === 'shaderpacks') return GlassesIcon
-		if (props.name === 'datapacks') return BracesIcon
+	if (props.file.type === 'directory') {
+		if (props.file.name === 'config') return FolderCogIcon
+		if (props.file.name === 'world' || props.file.name === 'saves') return GlobeIcon
+		if (props.file.name === 'mods') return BoxIcon
+		if (props.file.name === 'resourcepacks') return PaintbrushIcon
+		if (props.file.name === 'shaderpacks') return GlassesIcon
+		if (props.file.name === 'datapacks') return BracesIcon
 		return FolderOpenIcon
 	}
 
@@ -477,26 +462,26 @@ const iconComponent = computed(() => {
 })
 
 const formattedModifiedDate = computed(() => {
-	const date = new Date(props.modified * 1000)
+	const date = new Date(props.file.modified * 1000)
 	return formatDateTime(date)
 })
 
 const formattedCreationDate = computed(() => {
-	const date = new Date(props.created * 1000)
+	const date = new Date(props.file.created * 1000)
 	return formatDateTime(date)
 })
 
 const isEditableFile = computed(() => {
-	if (props.type === 'file') {
-		return canOpenInFileEditor(props.name)
+	if (props.file.type === 'file') {
+		return canOpenInFileEditor(props.file.name)
 	}
 	return false
 })
 
-const columnValues = computed<Record<FileColumn, string>>(() => ({
-	size: props.size != null ? formatBytes(props.size) : '',
+const columnValues = computed<Record<FileColumn, string | null>>(() => ({
+	size: props.file.size != null ? formatBytes(props.file.size) : null,
 	items:
-		props.type === 'directory' ? formatMessage(messages.itemCount, { count: props.count ?? 0 }) : '',
+		props.file.type === 'directory' ? formatMessage(messages.itemCount, { count: props.file.count ?? 0 }) : null,
 	created: formattedCreationDate.value,
 	modified: formattedModifiedDate.value,
 }))
@@ -508,7 +493,7 @@ function openContextMenu(event: MouseEvent) {
 
 function handleMouseEnter() {
 	hoveringToEdit.value = true;
-	emit('hover', { name: props.name, type: props.type, path: props.path })
+	emit('hover', { name: props.file.name, type: props.file.type, path: props.file.path })
 }
 
 function handleMouseLeave() {
@@ -526,10 +511,10 @@ function selectItem(event?: MouseEvent) {
 	if (isNavigating.value) return
 	isNavigating.value = true
 
-	const item = { name: props.name, type: props.type, path: props.path }
-	if (props.type === 'directory') {
+	const item = { name: props.file.name, type: props.file.type, path: props.file.path }
+	if (props.file.type === 'directory') {
 		emit('navigate', item)
-	} else if (props.type === 'file' && isEditableFile.value) {
+	} else if (props.file.type === 'file' && isEditableFile.value) {
 		emit('edit', item)
 	}
 
@@ -541,7 +526,7 @@ function selectItem(event?: MouseEvent) {
 function handleAuxClick(event: MouseEvent) {
 	if (event.button !== 1 || !canOpenInTab.value) return
 	event.preventDefault()
-	emit('open-in-new-tab', { name: props.name, type: props.type, path: props.path })
+	emit('open-in-new-tab', { name: props.file.name, type: props.file.type, path: props.file.path })
 }
 
 function handleKeydown(event: KeyboardEvent) {
@@ -556,7 +541,7 @@ function handleKeydown(event: KeyboardEvent) {
 function handlePointerDown(e: PointerEvent) {
 	if (e.button !== 0) return
 	startFileDrag(
-		{ name: props.name, type: props.type, path: props.path },
+		{ name: props.file.name, type: props.file.type, path: props.file.path },
 		e,
 		(source, destination) => {
 			emit('moveDirectTo', source, destination)

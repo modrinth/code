@@ -2,7 +2,7 @@
 	<div class="flex flex-col gap-0.5" :aria-label="formatMessage(messages.fileTree)">
 		<template v-for="(row, index) in rows" :key="row.key">
 			<div
-				v-if="row.kind === 'loading'"
+				v-if="row.type === 'loading'"
 				class="flex h-9 items-center gap-2 text-sm text-secondary"
 				:style="{ paddingLeft: `${2 + row.depth}rem` }"
 			>
@@ -10,21 +10,15 @@
 				{{ formatMessage(messages.loading) }}
 			</div>
 			<div
-				v-else-if="row.kind === 'empty'"
+				v-else-if="row.type === 'empty'"
 				class="flex h-9 items-center text-sm italic text-secondary"
 				:style="{ paddingLeft: `${2 + row.depth}rem` }"
 			>
 				{{ formatMessage(row.depth === 0 ? messages.emptyFolder : messages.emptySubfolder) }}
 			</div>
 			<FileRow
-				v-else-if="row.kind === 'item'"
-				:count="row.item.count"
-				:created="row.item.created"
-				:modified="row.item.modified"
-				:name="row.item.name"
-				:path="row.item.path"
-				:type="row.item.type"
-				:size="row.item.size"
+				v-else-if="row.type === 'item'"
+				:file="row.item"
 				:index="index"
 				:is-last="index + 1 == rows.length"
 				:selected="ui.selectedItems.value.has(row.item.path)"
@@ -77,7 +71,7 @@ import FileRow from './FileRow.vue'
 
 type TreeRow =
 	| {
-			kind: 'item'
+			type: 'item'
 			key: string
 			item: FileItem
 			path: string
@@ -85,7 +79,7 @@ type TreeRow =
 			expanded: boolean
 			expandable: boolean
 	  }
-	| { kind: 'loading' | 'empty'; key: string; depth: number }
+	| { type: 'loading' | 'empty'; key: string; depth: number }
 
 const ROOT_PATH = '/'
 
@@ -142,8 +136,8 @@ function collectRows(path: string, depth: number): TreeRow[] {
 	const items = entries.data.value
 
 	if (items.length === 0) {
-		if (entries.isLoading.value) return [{ kind: 'loading', key: `loading:${path}`, depth }]
-		return query.value ? [] : [{ kind: 'empty', key: `empty:${path}`, depth }]
+		if (entries.isLoading.value) return [{ type: 'loading', key: `loading:${path}`, depth }]
+		return query.value ? [] : [{ type: 'empty', key: `empty:${path}`, depth }]
 	}
 
 	const rows: TreeRow[] = []
@@ -154,12 +148,12 @@ function collectRows(path: string, depth: number): TreeRow[] {
 
 		if (query.value) {
 			const matches = item.name.toLowerCase().includes(query.value)
-			const hasMatchingChild = children.some((child) => child.kind === 'item')
+			const hasMatchingChild = children.some((child) => child.type === 'item')
 			if (!matches && !hasMatchingChild) continue
 		}
 
 		rows.push(
-			{ kind: 'item', key: item.path, item, path: item.path, depth, expanded, expandable },
+			{ type: 'item', key: item.path, item, path: item.path, depth, expanded, expandable },
 			...children,
 		)
 	}
@@ -185,7 +179,7 @@ function openDirectory(path: string, item: FileItem) {
 	ui.handleNavigateTo(item)
 }
 
-function prefetch(row: Extract<TreeRow, { kind: 'item' }>) {
+function prefetch(row: Extract<TreeRow, { type: 'item' }>) {
 	const { item } = row;
 	if (item.type === 'directory' || canOpenInFileEditor(item.name)) {
 		tree.prefetch(item)

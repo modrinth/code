@@ -224,12 +224,7 @@ const props = withDefaults(
 	}
 )
 
-console.log(`Test: [hasNav: ${props.hasNav}, smallMode: ${props.smallMode}, sidebarOpen: ${props.sidebarOpen}]`);
-
-const smallMode = computed(() => {
-	if (props.hasNav) console.log(`Test: [${props.smallMode}, ${props.sidebarOpen}]`);
-	return props.smallMode;
-})
+const smallMode = computed(() => props.smallMode)
 
 export type EmitCallbacks = {
 	toggleSidebar: []

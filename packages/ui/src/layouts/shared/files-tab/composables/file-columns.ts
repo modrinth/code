@@ -4,7 +4,9 @@ import { computed } from 'vue'
 
 import type { FileSortField } from '../types'
 
-export type FileColumn = 'size' | 'items' | 'created' | 'modified'
+export const FILE_COLUMNS_ORDER = ['size', 'items', 'created', 'modified'] as const
+
+export type FileColumn = typeof FILE_COLUMNS_ORDER[number]
 
 export interface FileColumnDefinition {
 	id: FileColumn
@@ -21,7 +23,7 @@ export const FILE_COLUMNS: FileColumnDefinition[] = [
 ]
 
 /** The order columns are dropped in when there isn't room for them next to the name. */
-const COLUMN_DROP_ORDER: FileColumn[] = ['created', 'items', 'size', 'modified']
+const FILE_COLUMN_DROP_ORDER: FileColumn[] = ['created', 'items', 'size', 'modified']
 
 /** Space always kept for a file's name before any detail column is shown. */
 const NAME_MIN_WIDTH = 280
@@ -47,6 +49,7 @@ export function useFileColumns(containerWidth: Ref<number | undefined>) {
 		'size',
 		'items',
 		'modified',
+		'created'
 	])
 
 	const shownColumns = computed<FileColumn[]>(() => {
@@ -57,7 +60,7 @@ export function useFileColumns(containerWidth: Ref<number | undefined>) {
 			enabledColumns.value.includes(id),
 		)
 
-		for (const id of COLUMN_DROP_ORDER) {
+		for (const id of FILE_COLUMN_DROP_ORDER) {
 			if (columnsWidth(columns) <= available) break
 			columns = columns.filter((column) => column !== id)
 		}
