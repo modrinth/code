@@ -1770,6 +1770,14 @@ export namespace Labrinth {
 				reason: string
 				created: string
 			}
+
+			export type UserRestriction = {
+				removed_perms: number
+				reason: string | null
+				private_reason?: string
+				restricted_by?: string
+				updated: string
+			}
 		}
 
 		export namespace v2 {
@@ -1902,6 +1910,7 @@ export namespace Labrinth {
 				allow_friend_requests?: boolean
 				moderation_notes?: Common.ModerationNote | null
 				lock?: Common.UserLock
+				restriction?: Common.UserRestriction
 				github_id?: number
 				discord_id?: string
 				steam_id?: string
@@ -2324,6 +2333,12 @@ export namespace Labrinth {
 			export type ProjectJudgement = FlameJudgement | UnknownJudgement
 
 			export type ProjectJudgements = Record<string, ProjectJudgement>
+
+			export type RestrictUserRequest = {
+				removed_perms: number
+				reason?: string | null
+				private_reason?: string | null
+			}
 		}
 	}
 

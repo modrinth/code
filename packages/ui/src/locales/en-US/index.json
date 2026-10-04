@@ -3290,6 +3290,9 @@
   "profile.button.create-project": {
     "defaultMessage": "Create a project"
   },
+  "profile.button.edit-restrictions": {
+    "defaultMessage": "Edit restrictions"
+  },
   "profile.button.force-password-reset": {
     "defaultMessage": "Force password reset"
   },
@@ -3307,6 +3310,9 @@
   },
   "profile.button.reset-2fa": {
     "defaultMessage": "Reset two-factor authentication"
+  },
+  "profile.button.restrict": {
+    "defaultMessage": "Restrict user"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "Revoke all sessions"
@@ -3437,6 +3443,9 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, one {project} other {projects}}"
   },
+  "profile.label.restricted": {
+    "defaultMessage": "Restricted"
+  },
   "profile.official-account": {
     "defaultMessage": "Official Modrinth account"
   },
@@ -3466,6 +3475,54 @@
   },
   "profile.reset-2fa.title": {
     "defaultMessage": "Reset two-factor authentication for {username}"
+  },
+  "profile.restrict-user.admonition-body": {
+    "defaultMessage": "{username} will stay signed in, but every request that needs a removed permission will be rejected until the restriction is lifted."
+  },
+  "profile.restrict-user.admonition-title": {
+    "defaultMessage": "Selected permissions will be removed"
+  },
+  "profile.restrict-user.error-description": {
+    "defaultMessage": "An error occurred while updating this user. Please try again."
+  },
+  "profile.restrict-user.header": {
+    "defaultMessage": "Restrict {username}"
+  },
+  "profile.restrict-user.private-reason-label": {
+    "defaultMessage": "Private note (staff only)"
+  },
+  "profile.restrict-user.private-reason-placeholder": {
+    "defaultMessage": "Optional"
+  },
+  "profile.restrict-user.reason-label": {
+    "defaultMessage": "Reason (shown to user)"
+  },
+  "profile.restrict-user.reason-placeholder": {
+    "defaultMessage": "Optional"
+  },
+  "profile.restrict-user.remove-button": {
+    "defaultMessage": "Remove restrictions"
+  },
+  "profile.restrict-user.remove-error-title": {
+    "defaultMessage": "Failed to remove restrictions"
+  },
+  "profile.restrict-user.remove-success-description": {
+    "defaultMessage": "{username}'s restrictions have been lifted."
+  },
+  "profile.restrict-user.remove-success-title": {
+    "defaultMessage": "Restrictions removed"
+  },
+  "profile.restrict-user.save-button": {
+    "defaultMessage": "Save restrictions"
+  },
+  "profile.restrict-user.save-error-title": {
+    "defaultMessage": "Failed to save restrictions"
+  },
+  "profile.restrict-user.save-success-description": {
+    "defaultMessage": "{username}'s restrictions have been updated."
+  },
+  "profile.restrict-user.save-success-title": {
+    "defaultMessage": "Restrictions saved"
   },
   "profile.revoke-sessions.admonition-body": {
     "defaultMessage": "{username} will be signed out on every device and will need to sign in again. Personal access tokens are not affected."
@@ -6985,6 +7042,63 @@
   },
   "update-all-modal.warning-server": {
     "defaultMessage": "We can’t guarantee updates will be safe for your server. Review the changelogs and consider a backup."
+  },
+  "user-restrictions.group.collections": {
+    "defaultMessage": "Collections"
+  },
+  "user-restrictions.group.create-projects": {
+    "defaultMessage": "Create projects"
+  },
+  "user-restrictions.group.edit-projects": {
+    "defaultMessage": "Edit projects"
+  },
+  "user-restrictions.group.organizations": {
+    "defaultMessage": "Organizations"
+  },
+  "user-restrictions.group.profile": {
+    "defaultMessage": "Profile"
+  },
+  "user-restrictions.group.versions": {
+    "defaultMessage": "Versions"
+  },
+  "user-restrictions.scope.collection-create": {
+    "defaultMessage": "Create collections"
+  },
+  "user-restrictions.scope.collection-delete": {
+    "defaultMessage": "Delete collections"
+  },
+  "user-restrictions.scope.collection-write": {
+    "defaultMessage": "Edit collections"
+  },
+  "user-restrictions.scope.organization-create": {
+    "defaultMessage": "Create organizations"
+  },
+  "user-restrictions.scope.organization-delete": {
+    "defaultMessage": "Delete organizations"
+  },
+  "user-restrictions.scope.organization-write": {
+    "defaultMessage": "Edit organizations"
+  },
+  "user-restrictions.scope.project-create": {
+    "defaultMessage": "Create new projects"
+  },
+  "user-restrictions.scope.project-delete": {
+    "defaultMessage": "Delete projects"
+  },
+  "user-restrictions.scope.project-write": {
+    "defaultMessage": "Edit projects, manage team members, and accept invites"
+  },
+  "user-restrictions.scope.user-write": {
+    "defaultMessage": "Edit profile, follow projects, and change preferences"
+  },
+  "user-restrictions.scope.version-create": {
+    "defaultMessage": "Upload new versions"
+  },
+  "user-restrictions.scope.version-delete": {
+    "defaultMessage": "Delete versions and version files"
+  },
+  "user-restrictions.scope.version-write": {
+    "defaultMessage": "Edit versions and add files to versions"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "This user has been around since Modrinth Alpha, which ended in November 2020."

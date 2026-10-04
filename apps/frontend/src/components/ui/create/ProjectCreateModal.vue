@@ -9,6 +9,7 @@
 		:max-width="'550px'"
 	>
 		<div class="flex w-full flex-col gap-6">
+			<RestrictedActionAlert v-model="isRestricted" scope="PROJECT_CREATE" @navigate="cancel" />
 			<CreateLimitAlert v-model="hasHitLimit" type="project" />
 
 			<div class="flex flex-col gap-2.5">
@@ -166,6 +167,7 @@ import {
 } from '~/composables/project-slug-suggestions'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'
+import RestrictedActionAlert from './RestrictedActionAlert.vue'
 
 type ProjectTypes = 'server' | 'project'
 interface VisibilityOption {
@@ -284,6 +286,7 @@ const props = defineProps<{
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const hasHitLimit = ref(false)
+const isRestricted = ref(false)
 
 const name = ref('')
 const slug = ref('')
@@ -330,7 +333,7 @@ const visibilities = ref<VisibilityOption[]>([
 const visibility = ref<VisibilityOption>(visibilities.value[0])
 
 const disableCreate = computed(() => {
-	if (hasHitLimit.value) return true
+	if (hasHitLimit.value || isRestricted.value) return true
 	if (!name.value.trim() || !slug.value.trim()) return true
 	if (!manualSlug.value && checkingSlugSuggestions.value) return true
 	if (!manualSlug.value && !slugSuggestions.value.includes(slug.value)) return true
