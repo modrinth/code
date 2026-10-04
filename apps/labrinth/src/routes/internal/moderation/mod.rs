@@ -30,9 +30,11 @@ use xredis::RedisPool;
 pub mod external_license;
 mod ownership;
 pub mod tech_review;
+pub mod user_restrictions;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
-    cfg.service(get_projects)
+    cfg.configure(user_restrictions::config)
+        .service(get_projects)
         .service(get_project_ids)
         .service(get_project_meta)
         .service(set_project_meta)

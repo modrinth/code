@@ -446,14 +446,20 @@ impl ApiError {
         }
     }
 
-    pub fn is_account_locked(&self) -> bool {
-        matches!(
-            self,
-            Self::Auth(report) if matches!(
-                report.downcast_ref::<AuthenticationError>(),
-                Some(AuthenticationError::AccountLocked)
-            )
-        )
+    pub fn account_standing_error(&self) -> Option<&AuthenticationError> {
+        let Self::Auth(report) = self else {
+            return None;
+        };
+
+        report
+            .downcast_ref::<AuthenticationError>()
+            .filter(|error| {
+                matches!(
+                    error,
+                    AuthenticationError::AccountLocked
+                        | AuthenticationError::PermissionRemoved
+                )
+            })
     }
 
     pub fn as_api_error<'a>(&self) -> crate::models::error::ApiError<'a> {
@@ -477,11 +483,11 @@ impl ApiError {
         let validation = report
             .downcast_ref::<v3::projects::validate::ProjectValidationError>();
 
-        let account_locked = self.is_account_locked();
+        let standing = self.account_standing_error();
 
         crate::models::error::ApiError {
             error: match self {
-                _ if account_locked => "account_locked",
+                _ if let Some(error) = standing => error.error_name(),
                 Self::Internal(..) => "internal_error",
                 Self::Request(..) => "request_error",
                 Self::Auth(..) => "auth_error",
@@ -492,11 +498,8 @@ impl ApiError {
                 Self::PreconditionFailed(..) => "precondition_failed",
                 Self::RateLimit(..) => "ratelimit_error",
             },
-            description: if account_locked {
-                AuthenticationError::AccountLocked.to_string()
-            } else {
-                report.to_string()
-            },
+            description: standing
+                .map_or_else(|| report.to_string(), ToString::to_string),
             details: validation
                 .map(|error| serde_json::json!({ "nags": error.0 }))
                 .or_else(|| {
@@ -511,7 +514,9 @@ impl actix_web::ResponseError for ApiError {
         match self {
             Self::Internal(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Request(..) => StatusCode::BAD_REQUEST,
-            Self::Auth(..) if self.is_account_locked() => StatusCode::FORBIDDEN,
+            Self::Auth(..) if self.account_standing_error().is_some() => {
+                StatusCode::FORBIDDEN
+            }
             Self::Auth(..) => StatusCode::UNAUTHORIZED,
             Self::NotFound(..) => StatusCode::NOT_FOUND,
             Self::Conflict(..) => StatusCode::CONFLICT,
