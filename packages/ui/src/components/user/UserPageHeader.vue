@@ -11,7 +11,7 @@
 			/>
 		</template>
 
-		<template #badges>
+		<template v-if="isOfficialAccount || showAffiliateBadge || user.lock || user.pronouns" #badges>
 			<span
 				v-if="user.pronouns"
 				v-tooltip="formatMessage(messages.pronounsLabel)"
