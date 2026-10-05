@@ -1,11 +1,11 @@
 # Content set
 
-A content set represents a playable Minecraft setup for an instance or server.
+A content set represents a playable Minecraft setup for an installation. An installation is a client instance or server.
 
 It contains the Minecraft version, loader and content items.
 
 - `id`
-- `instance_id`: Optional, local instance this set belongs to. Required for sets with local content entries.
+- `installation_id`: Optional, instance or server this set belongs to. Required for sets with local content entries.
 - `name`: Display name.
 - `source_kind`: Source of the set. See [Content set sources](#Content-set-sources)
 - `status`: See [Status](#status).
@@ -28,7 +28,7 @@ It contains the Minecraft version, loader and content items.
 
 Items belong to the set through `content_set_id`. Entries belong to their item through `content_item_id`. File paths must be unique within a set.
 
-An instance can have multiple sets, with one applied at a time.
+An installation can have multiple sets, with one applied at a time.
 
 ## Content set sources
 
