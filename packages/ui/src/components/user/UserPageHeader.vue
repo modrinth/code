@@ -13,7 +13,7 @@
 
 		<template v-if="isOfficialAccount || showAffiliateBadge || user.lock || user.pronouns" #badges>
 			<span
-				v-if="user.pronouns"
+				v-if="user.pronouns && authUser"
 				v-tooltip="formatMessage(messages.pronounsLabel)"
 				class="text-base text-secondary"
 			>
