@@ -41,7 +41,7 @@ pub async fn verify(
     web::Query(MedalQuery { username }): web::Query<MedalQuery>,
 ) -> Result<HttpResponse, ApiError> {
     return Err(ApiError::Request(eyre::eyre!(
-        "This offer is not available anymore"
+        "This offer is no longer available"
     )));
 
     /*
@@ -80,7 +80,7 @@ pub async fn redeem(
     // In a transaction to avoid double inserts.
 
     return Err(ApiError::Request(eyre::eyre!(
-        "This offer is not available anymore"
+        "This offer is no longer available"
     )));
 
     /*
