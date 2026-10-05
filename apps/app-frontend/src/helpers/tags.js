@@ -15,6 +15,14 @@ export async function get_loaders() {
 	return await invoke('plugin:tags|tags_get_loaders')
 }
 
+// Gets cached loaders tags an instance can use, with vanilla first
+export async function get_modpack_loaders() {
+	const loaders = await get_loaders()
+	return loaders
+		.filter((item) => item.supported_project_types.includes('modpack') || item.name === 'vanilla')
+		.sort((a, b) => (a.name === 'vanilla' ? -1 : b.name === 'vanilla' ? 1 : 0))
+}
+
 // Gets cached game_versions tags
 export async function get_game_versions() {
 	return await invoke('plugin:tags|tags_get_game_versions')

@@ -84,6 +84,7 @@ pub enum ModLoader {
     Fabric,
     Quilt,
     NeoForge,
+    Ornithe,
 }
 
 impl ModLoader {
@@ -94,6 +95,7 @@ impl ModLoader {
             Self::Fabric => "fabric",
             Self::Quilt => "quilt",
             Self::NeoForge => "neoforge",
+            Self::Ornithe => "ornithe",
         }
     }
 
@@ -104,6 +106,7 @@ impl ModLoader {
             Self::Fabric => "fabric",
             Self::Quilt => "quilt",
             Self::NeoForge => "neo",
+            Self::Ornithe => "ornithe",
         }
     }
 
@@ -114,6 +117,7 @@ impl ModLoader {
             "fabric" => Self::Fabric,
             "quilt" => Self::Quilt,
             "neoforge" => Self::NeoForge,
+            "ornithe" => Self::Ornithe,
             _ => Self::Vanilla,
         }
     }
@@ -154,7 +158,7 @@ impl ProjectType {
     pub fn get_from_loaders(loaders: Vec<String>) -> Option<Self> {
         if loaders
             .iter()
-            .any(|x| ["fabric", "forge", "quilt", "neoforge"].contains(&&**x))
+            .any(|x| ProjectType::Mod.get_loaders().contains(&&**x))
         {
             Some(ProjectType::Mod)
         } else if loaders.iter().any(|x| x == "datapack") {
@@ -219,7 +223,9 @@ impl ProjectType {
 
     pub fn get_loaders(&self) -> &'static [&'static str] {
         match self {
-            ProjectType::Mod => &["fabric", "forge", "quilt", "neoforge"],
+            ProjectType::Mod => {
+                &["fabric", "forge", "quilt", "neoforge", "ornithe"]
+            }
             ProjectType::DataPack => &["datapack"],
             ProjectType::ResourcePack => &["vanilla", "canvas", "minecraft"],
             ProjectType::ShaderPack => &["iris", "optifine"],

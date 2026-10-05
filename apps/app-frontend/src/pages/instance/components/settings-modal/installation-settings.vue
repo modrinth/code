@@ -11,7 +11,7 @@ import {
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
-import type { GameVersionTag, PlatformTag } from '@modrinth/utils'
+import type { GameVersionTag } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
@@ -32,7 +32,7 @@ import {
 	update_repair_modrinth,
 } from '@/helpers/instance'
 import { get_loader_versions } from '@/helpers/metadata'
-import { get_game_versions, get_loaders } from '@/helpers/tags'
+import { get_game_versions, get_modpack_loaders } from '@/helpers/tags'
 import { injectAppEvents } from '@/providers/app-events'
 import { provideInstanceBackup } from '@/providers/instance-backup'
 
@@ -60,14 +60,6 @@ debug('metadata load: start', {
 	installStage: instance.value.install_stage,
 })
 
-function getSupportedModpackLoaders() {
-	return get_loaders().then((value: PlatformTag[]) =>
-		value
-			.filter((item) => item.supported_project_types.includes('modpack') || item.name === 'vanilla')
-			.sort((a, b) => (a.name === 'vanilla' ? -1 : b.name === 'vanilla' ? 1 : 0)),
-	)
-}
-
 const fabricVersionsQuery = useQuery({
 	queryKey: ['instance-settings', 'loader-versions', 'fabric'],
 	queryFn: () => get_loader_versions('fabric') as Promise<Manifest>,
@@ -80,6 +72,10 @@ const quiltVersionsQuery = useQuery({
 	queryKey: ['instance-settings', 'loader-versions', 'quilt'],
 	queryFn: () => get_loader_versions('quilt') as Promise<Manifest>,
 })
+const ornitheVersionsQuery = useQuery({
+	queryKey: ['instance-settings', 'loader-versions', 'ornithe'],
+	queryFn: () => get_loader_versions('ornithe') as Promise<Manifest>,
+})
 const neoforgeVersionsQuery = useQuery({
 	queryKey: ['instance-settings', 'loader-versions', 'neo'],
 	queryFn: () => get_loader_versions('neo') as Promise<Manifest>,
@@ -90,7 +86,7 @@ const gameVersionsQuery = useQuery({
 })
 const loadersQuery = useQuery({
 	queryKey: ['instance-settings', 'loaders', 'modpack'],
-	queryFn: getSupportedModpackLoaders,
+	queryFn: () => get_modpack_loaders() as Promise<Labrinth.Tags.v2.Loader[]>,
 })
 
 const metadataLoading = computed(() =>
@@ -98,6 +94,7 @@ const metadataLoading = computed(() =>
 		fabricVersionsQuery,
 		forgeVersionsQuery,
 		quiltVersionsQuery,
+		ornitheVersionsQuery,
 		neoforgeVersionsQuery,
 		gameVersionsQuery,
 		loadersQuery,
@@ -177,6 +174,7 @@ function getManifest(loader: string) {
 		fabric: fabricVersionsQuery.data.value,
 		forge: forgeVersionsQuery.data.value,
 		quilt: quiltVersionsQuery.data.value,
+		ornithe: ornitheVersionsQuery.data.value,
 		neoforge: neoforgeVersionsQuery.data.value,
 	}
 	const manifest = map[loader]

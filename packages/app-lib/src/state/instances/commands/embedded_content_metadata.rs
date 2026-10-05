@@ -179,7 +179,7 @@ fn inspect_mod<R: Read + Seek>(
 
 fn metadata_order(loader: Option<ModLoader>) -> [ModMetadataKind; 5] {
     match loader {
-        Some(ModLoader::Fabric) => [
+        Some(ModLoader::Fabric | ModLoader::Ornithe) => [
             ModMetadataKind::Fabric,
             ModMetadataKind::Quilt,
             ModMetadataKind::NeoForge,

@@ -634,6 +634,9 @@ pub async fn create_mrpack_json(
         (ModLoader::Quilt, Some(v)) => {
             dependencies.insert(PackDependency::QuiltLoader, v)
         }
+        (ModLoader::Ornithe, Some(v)) => {
+            dependencies.insert(PackDependency::OrnitheLoader, v)
+        }
         (ModLoader::Vanilla, _) => None,
         _ => {
             return Err(crate::ErrorKind::OtherError(

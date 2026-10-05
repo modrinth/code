@@ -144,7 +144,9 @@ pub fn get_jvm_arguments(
             java_arch,
             quick_play_type,
         )?;
-    } else {
+    }
+
+    if !parsed_arguments.iter().any(|x| x == "-cp") {
         parsed_arguments.push(format!(
             "-Djava.library.path={}",
             canonicalize(natives_path)

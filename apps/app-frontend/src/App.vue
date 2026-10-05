@@ -2241,6 +2241,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		<CreationFlowModal
 			ref="installationModal"
 			type="instance"
+			:available-loaders="['fabric', 'neoforge', 'forge', 'quilt', 'ornithe']"
 			show-snapshot-toggle
 			:fetch-existing-instance-names="fetchExistingInstanceNames"
 			:search-projects="searchProjects"

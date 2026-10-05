@@ -9,14 +9,13 @@ import {
 	type TabbedModalTab,
 	useVIntl,
 } from '@modrinth/ui'
-import type { PlatformTag } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref, watch } from 'vue'
 
 import { get_project_v3 } from '@/helpers/cache'
 import { get_linked_modpack_info, getInstanceIconUrl } from '@/helpers/instance'
 import { get_loader_versions } from '@/helpers/metadata'
-import { get_game_versions, get_loaders } from '@/helpers/tags'
+import { get_game_versions, get_modpack_loaders } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
 
 import GeneralSettings from './general-settings.vue'
@@ -115,14 +114,6 @@ const tabs = computed<TabbedModalTab[]>(() => [
 	},
 ])
 
-function getSupportedModpackLoaders() {
-	return get_loaders().then((value: PlatformTag[]) =>
-		value
-			.filter((item) => item.supported_project_types.includes('modpack') || item.name === 'vanilla')
-			.sort((a, b) => (a.name === 'vanilla' ? -1 : b.name === 'vanilla' ? 1 : 0)),
-	)
-}
-
 // Preload
 useQuery({
 	queryKey: ['instance-settings', 'loader-versions', 'fabric'],
@@ -137,6 +128,10 @@ useQuery({
 	queryFn: () => get_loader_versions('quilt'),
 })
 useQuery({
+	queryKey: ['instance-settings', 'loader-versions', 'ornithe'],
+	queryFn: () => get_loader_versions('ornithe'),
+})
+useQuery({
 	queryKey: ['instance-settings', 'loader-versions', 'neo'],
 	queryFn: () => get_loader_versions('neo'),
 })
@@ -146,7 +141,7 @@ useQuery({
 })
 useQuery({
 	queryKey: ['instance-settings', 'loaders', 'modpack'],
-	queryFn: getSupportedModpackLoaders,
+	queryFn: get_modpack_loaders,
 })
 useQuery({
 	queryKey: computed(() => ['linkedModpackInfo', props.instance.id]),

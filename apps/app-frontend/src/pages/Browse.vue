@@ -408,7 +408,7 @@ const instanceFilters = computed(() => {
 		}
 
 		const platform = instance.value.loader
-		const supportedModLoaders = ['fabric', 'forge', 'quilt', 'neoforge']
+		const supportedModLoaders = ['fabric', 'forge', 'quilt', 'neoforge', 'ornithe']
 
 		if (platform && projectType.value === 'mod' && supportedModLoaders.includes(platform)) {
 			filters.push({ type: 'mod_loader', option: platform })

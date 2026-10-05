@@ -63,8 +63,15 @@ type InstallingProjectDisplay = {
 	organization?: string | null
 	team?: string
 }
-const LOADER_ORDER = ['vanilla', 'fabric', 'quilt', 'neoforge', 'forge']
-const SUPPORTED_LOADERS: Set<string> = new Set(['vanilla', 'forge', 'fabric', 'quilt', 'neoforge'])
+const LOADER_ORDER = ['vanilla', 'fabric', 'quilt', 'neoforge', 'forge', 'ornithe']
+const SUPPORTED_LOADERS: Set<string> = new Set([
+	'vanilla',
+	'forge',
+	'fabric',
+	'quilt',
+	'neoforge',
+	'ornithe',
+])
 const VANILLA_COMPATIBLE_LOADERS: Set<string> = new Set(['minecraft', 'datapack'])
 const noCompatibleVersionsMessage = defineMessage({
 	id: 'app.content-install.no-compatible-versions',

@@ -266,6 +266,7 @@ fn shared_loader_label(loader: &LoaderReference) -> String {
         "fabric" => "Fabric",
         "quilt" => "Quilt",
         "neoforge" => "NeoForge",
+        "ornithe" => "Ornithe",
         name => name,
     };
     match loader.version.as_deref() {
