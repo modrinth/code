@@ -61,8 +61,7 @@ export function createReviewPreviousIssues(
 		const id = reviewIssue(issue)?.id
 		return id &&
 			isApplicable(issue) &&
-			panels.activeIssues.value.some((active) => active.id === id) &&
-			!panels.isRestoredIssue(id)
+			panels.activeIssues.value.some((active) => active.id === id)
 			? messages.issueMessage(id)
 			: issueMessage(issue)
 	}
@@ -130,6 +129,11 @@ export function createReviewPreviousIssues(
 		for (const { what } of issue.facets) {
 			if (what.type === 'modify_links') {
 				for (const key of Object.keys(what.value.links)) targets.push({ kind: 'link', key })
+			} else if (what.type === 'modify_gallery_image') {
+				targets.push({ kind: 'gallery-image', key: String(what.value.image_id) })
+			} else if (what.type === 'remove_gallery_images') {
+				for (const id of what.value.image_ids)
+					targets.push({ kind: 'gallery-image', key: String(id) })
 			} else if (what.type === 'remove_project_disclosures') {
 				for (const type of what.value.disclosure_types) {
 					const key = disclosureKeys[type]
@@ -149,7 +153,9 @@ export function createReviewPreviousIssues(
 		if (!targets.length && definitionBindings.size === 1) return [...definitionBindings.values()]
 		const bindings = new Map<string, ReviewPanelBinding>()
 		for (const target of targets) {
-			const binding = panels.resolve(target)
+			const binding =
+				panels.resolve(target) ??
+				(target.kind === 'gallery-image' ? panels.resolve({ kind: 'gallery' }) : undefined)
 			if (binding) bindings.set(binding.key, binding)
 		}
 		return [...bindings.values()]
@@ -341,8 +347,9 @@ export function createReviewPreviousIssues(
 	)
 	const issueUpdates = computed(() =>
 		issues.value
-			.filter((issue) => !isResolved(issue))
+			.filter((issue) => !issue.moderator_verified || isApplicable(issue))
 			.map((issue) => {
+				if (isResolved(issue)) return { id: issue.id, data: { moderator_verified: true } }
 				const applicable = isApplicable(issue)
 				const id = reviewIssue(issue)?.id
 				const active = panels.activeIssues.value.find((active) => active.id === id)
@@ -350,7 +357,7 @@ export function createReviewPreviousIssues(
 				const data: Labrinth.Threads.v3.EditThreadIssue = applicable
 					? { user_addressed: false }
 					: { moderator_verified: true }
-				if (changed || messages.hasIssueOverride(messageKey(issue))) {
+				if ((applicable && active) || messages.hasIssueOverride(messageKey(issue))) {
 					data.why = {
 						...issueDetails(issue),
 						message: reviewMessage(issue),

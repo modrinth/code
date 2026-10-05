@@ -23,9 +23,13 @@
 				{{ formatMessage(messages.emptyGallery) }}
 			</p>
 			<div v-else class="gallery-grid">
-				<article
+				<ReviewPanel
+					mode="anchored"
+					:target="{ kind: 'gallery-image', key: String(item.id) }"
+					:disabled="item.id === undefined"
+					as="article"
 					v-for="(item, index) in gallery"
-					:key="item.url"
+					:key="item.id ?? item.url"
 					class="flex min-w-0 flex-col overflow-hidden rounded-xl border border-solid border-surface-4"
 				>
 					<button
@@ -60,7 +64,7 @@
 							})
 						}}</time>
 					</div>
-				</article>
+				</ReviewPanel>
 			</div>
 		</div>
 		<ImageViewerEditor

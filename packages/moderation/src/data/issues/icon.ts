@@ -12,6 +12,8 @@ export const iconReviewPanel = panel({
 }).content(
 	toggle({
 		issue: rulesAiImagesIssue,
+		id: 'icon-ai-images',
 		label: 'AI Images',
+		shown: ({ projectV3 }) => !!projectV3.icon_url,
 	}),
 )

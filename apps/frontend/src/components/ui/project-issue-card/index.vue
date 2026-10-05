@@ -8,15 +8,18 @@
 			<div class="flex items-center justify-between gap-3">
 				<h2 class="m-0 flex min-w-0 items-center gap-2 text-base font-semibold text-contrast">
 					<CheckCircleIcon
-						v-if="isAddressed(issue)"
+						v-if="isComplete(issue)"
 						class="size-5 shrink-0 text-primary"
 						aria-hidden="true"
 					/>
 					<TriangleAlertIcon v-else class="size-5 shrink-0 text-red" aria-hidden="true" />
 					<span class="min-w-0 break-words">{{ issueTitle(issue) }}</span>
+					<span v-if="issue.verdict === 'resolved'" class="text-sm font-normal text-primary">
+						{{ formatMessage(messages.resolved) }}
+					</span>
 				</h2>
 				<Button
-					v-if="isAddressed(issue)"
+					v-if="isComplete(issue)"
 					type="quiet"
 					size="sm"
 					:aria-expanded="isExpanded(issue)"
@@ -25,7 +28,17 @@
 				>
 					<FoldVerticalIcon v-if="isExpanded(issue)" aria-hidden="true" />
 					<UnfoldVerticalIcon v-else aria-hidden="true" />
-					{{ formatMessage(isExpanded(issue) ? messages.hideAddressed : messages.showAddressed) }}
+					{{
+						formatMessage(
+							issue.verdict === 'resolved'
+								? isExpanded(issue)
+									? messages.hideResolved
+									: messages.showResolved
+								: isExpanded(issue)
+									? messages.hideAddressed
+									: messages.showAddressed,
+						)
+					}}
 				</Button>
 			</div>
 			<div
@@ -41,7 +54,10 @@
 							class="markdown-body min-w-0 text-sm text-primary"
 							v-html="renderString(issueMessage(issue))"
 						/>
-						<div class="flex w-full flex-wrap items-center justify-between gap-3">
+						<div
+							v-if="issue.verdict !== 'resolved'"
+							class="flex w-full flex-wrap items-center justify-between gap-3"
+						>
 							<div
 								v-if="showProjectAreaLink && actionFacets(issue).length"
 								class="flex flex-wrap gap-2"
@@ -73,10 +89,7 @@
 								</TeleportOverflowMenu>
 							</div>
 							<Tooltip
-								v-if="
-									(!showProjectAreaLink || !actionFacets(issue).length) &&
-									issue.verdict !== 'resolved'
-									"
+								v-if="!showProjectAreaLink || !actionFacets(issue).length"
 								:disabled="allActionsComplete(issue) || isAddressed(issue)"
 								:text="formatMessage(messages.completeActionsFirst)"
 								class="ml-auto"
@@ -119,7 +132,10 @@ import {
 } from '@modrinth/assets'
 import { IssuePriority, reviewPanels } from '@modrinth/moderation/src/data/issues'
 import { issueTargetLabels } from '@modrinth/moderation/src/data/issues/component-builders/targets'
-import type { Issue, PanelNode } from '@modrinth/moderation/src/data/issues/component-builders/types'
+import type {
+	Issue,
+	PanelNode,
+} from '@modrinth/moderation/src/data/issues/component-builders/types'
 import {
 	Button,
 	ButtonLink,
@@ -177,6 +193,9 @@ const messages = defineMessages({
 	addressed: { id: 'thread-issues.addressed', defaultMessage: 'Marked as addressed' },
 	showAddressed: { id: 'thread-issues.show-addressed', defaultMessage: 'Show addressed' },
 	hideAddressed: { id: 'thread-issues.hide-addressed', defaultMessage: 'Hide addressed' },
+	resolved: { id: 'thread-issues.resolved', defaultMessage: 'Resolved' },
+	showResolved: { id: 'thread-issues.show-resolved', defaultMessage: 'Show resolved' },
+	hideResolved: { id: 'thread-issues.hide-resolved', defaultMessage: 'Hide resolved' },
 	editName: { id: 'thread-issues.target.edit-name', defaultMessage: 'Edit name' },
 	editUrl: { id: 'thread-issues.target.edit-url', defaultMessage: 'Edit URL' },
 	editSummary: { id: 'thread-issues.target.edit-summary', defaultMessage: 'Edit summary' },
@@ -241,7 +260,7 @@ function panelIssues(nodes: readonly PanelNode[]): Issue[] {
 
 const issuePriorities = new Map(
 	Object.values(reviewPanels).flatMap((panel) =>
-		panelIssues(panel.children).map(
+		('type' in panel ? [] : panelIssues(panel.children)).map(
 			(issue) => [issue.id, issue.priority ?? IssuePriority.Default] as const,
 		),
 	),
@@ -258,7 +277,7 @@ const matchingIssues = computed(() =>
 	(props.issues ?? thread.value?.issues ?? [])
 		.filter(
 			(issue) =>
-				issue.verdict !== 'resolved' &&
+				!issue.moderator_verified &&
 				(props.issues !== undefined || issue.facets.some(({ what }) => matchesTarget(what))),
 		)
 		.sort((a, b) => issuePriority(a) - issuePriority(b)),
@@ -406,12 +425,16 @@ function isAddressed(issue: ThreadIssue): boolean {
 	return issue.user_addressed
 }
 
+function isComplete(issue: ThreadIssue): boolean {
+	return isAddressed(issue) || issue.verdict === 'resolved'
+}
+
 function isExpanded(issue: ThreadIssue): boolean {
-	return !isAddressed(issue) || expandedAddressed.has(issue.id)
+	return !isComplete(issue) || expandedAddressed.has(issue.id)
 }
 
 function isFullyExpanded(issue: ThreadIssue): boolean {
-	return !isAddressed(issue) || finishedExpanding.has(issue.id)
+	return !isComplete(issue) || finishedExpanding.has(issue.id)
 }
 
 function onContentTransitionEnd(event: TransitionEvent, issue: ThreadIssue) {
@@ -454,5 +477,65 @@ function toggle(id: string) {
 	.project-issue-content.open > div {
 		overflow: visible;
 	}
+}
+.markdown-body :deep(.review-card-image-targets) {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.markdown-body :deep(.review-card-image-target) {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.5rem;
+}
+
+.markdown-body :deep(.review-card-image-heading) {
+	font-weight: 600;
+}
+
+.markdown-body :deep(.review-card-image-list) {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.markdown-body :deep(.review-card-image-entry) {
+	width: 140px;
+	max-width: 100%;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.markdown-body :deep(.review-card-image-entry > a) {
+	display: block;
+}
+
+.markdown-body :deep(.review-card-image-entry .review-card-gallery-image) {
+	display: block;
+	box-sizing: border-box;
+	width: 100%;
+	max-width: 140px;
+	height: 112px;
+	padding: 0.5rem;
+	border-radius: 0.5rem;
+	background: var(--surface-3);
+	object-fit: contain;
+}
+
+.markdown-body :deep(.review-card-image-caption) {
+	display: block;
+	margin-top: 0.375rem;
+	overflow-wrap: anywhere;
+	font-size: 0.875em;
+}
+
+.markdown-body :deep(.review-card-image-target .review-card-image-description) {
+	margin: 0;
 }
 </style>

@@ -133,6 +133,7 @@ export const descriptionReviewPanel = panel({
 	toggle({
 		label: 'AI Images',
 		issue: rulesAiImagesIssue,
+		id: 'description-ai-images',
 	}),
 	section({
 		label: 'Why is this Description Insufficient?',

@@ -2,7 +2,7 @@
 	<Button
 		type="outlined"
 		:disabled="disabled"
-		:aria-pressed="modelValue"
+		:aria-pressed="mixed ? 'mixed' : modelValue"
 		:aria-label="icon ? label : undefined"
 		:aria-keyshortcuts="keybind"
 		:data-review-keybind="keybind"
@@ -11,11 +11,12 @@
 		:class="{
 			'!brightness-100': modelValue,
 			'enabled:hover:!brightness-125 !text-primary': !modelValue,
-			'action-toggle-selected !text-contrast': modelValue,
+			'action-toggle-selected !text-contrast': modelValue || mixed,
 		}"
 		size="sm"
 		@click="emit('update:modelValue', !modelValue)"
 	>
+		<MinusIcon v-if="mixed" class="size-4" aria-hidden="true" />
 		<span v-if="reReview" class="flex shrink-0 items-center text-orange">
 			<TagCategoryRefreshCcwIcon class="size-4" aria-hidden="true" />
 		</span>
@@ -33,13 +34,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ArrowBigUpIcon, TagCategoryRefreshCcwIcon } from '@modrinth/assets'
+import { ArrowBigUpIcon, MinusIcon, TagCategoryRefreshCcwIcon } from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
 import type { Component } from 'vue'
 import { computed } from 'vue'
 
 const props = defineProps<{
 	modelValue: boolean
+	mixed?: boolean
 	reReview?: boolean
 	label?: string
 	icon?: Component

@@ -30,7 +30,6 @@ export function createReviewMessages(
 	function issueMessage(id: string) {
 		return (
 			overrides.get(id) ??
-			(panels.isRestoredIssue(id) ? defaults.get(id) : undefined) ??
 			issueMessages.value.get(id) ??
 			defaults.get(id) ??
 			''
@@ -38,10 +37,7 @@ export function createReviewMessages(
 	}
 	function editIssueMessage(id: string, message: string) {
 		if (message === issueMessage(id)) return
-		const defaultMessage =
-			(panels.isRestoredIssue(id) ? defaults.get(id) : undefined) ??
-			issueMessages.value.get(id) ??
-			defaults.get(id)
+		const defaultMessage = issueMessages.value.get(id) ?? defaults.get(id)
 		if (message === defaultMessage) overrides.delete(id)
 		else overrides.set(id, message)
 	}

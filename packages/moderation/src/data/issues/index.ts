@@ -1,5 +1,6 @@
 import { categoriesReviewPanel } from './categories'
-import type { Panel } from './component-builders/types'
+import { each } from './component-builders/builders'
+import type { PanelRegistration } from './component-builders/types'
 import { descriptionReviewPanel } from './description'
 import {
 	adsDisclosureReviewPanel,
@@ -13,7 +14,7 @@ import {
 	systemInteractionsDisclosureReviewPanel,
 	telemetryDisclosureReviewPanel,
 } from './disclosures'
-import { galleryReviewPanel } from './gallery'
+import { galleryImageReviewPanel, galleryReviewPanel } from './gallery'
 import { iconReviewPanel } from './icon'
 import { licenseReviewPanel } from './license'
 import {
@@ -72,6 +73,14 @@ export const reviewPanels = {
 	'system-interactions-disclosure': systemInteractionsDisclosureReviewPanel,
 	'archive-disclosure': archiveDisclosureReviewPanel,
 	gallery: galleryReviewPanel,
+	'gallery-image': each(({ projectV3 }) =>
+		projectV3.gallery
+			.filter((image) => image.id !== undefined)
+			.map((image, index) => ({
+				key: String(image.id),
+				panel: galleryImageReviewPanel(image, index + 1),
+			})),
+	),
 	icon: iconReviewPanel,
 	license: licenseReviewPanel,
 	metadata: metadataReviewPanel,
@@ -83,7 +92,7 @@ export const reviewPanels = {
 	rules: rulesReviewPanel,
 	'undefined-project': undefinedProjectReviewPanel,
 	versions: versionsReviewPanel,
-} satisfies Record<string, Panel>
+} satisfies Record<string, PanelRegistration>
 
 export { IssuePriority } from './component-builders/priority'
 

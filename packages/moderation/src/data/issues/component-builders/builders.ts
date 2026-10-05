@@ -1,4 +1,5 @@
 import type {
+	EachPanel,
 	Issue,
 	IssueConfig,
 	IssueMarkdown,
@@ -55,4 +56,8 @@ export function textarea(config: IssueTextareaConfig): IssueTextarea {
 
 export function select(config: IssueSelectConfig): IssueSelect {
 	return { ...config, type: 'select' }
+}
+
+export function each(items: EachPanel['items']): EachPanel {
+	return { type: 'each', items }
 }

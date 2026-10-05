@@ -121,7 +121,7 @@
 							:disabled="control.disabled"
 							:model-value="panels.selected(panelBinding, control)"
 							:re-review="previousIssues.isReReviewControl(control)"
-							:aria-pressed="panels.selected(panelBinding, control)"
+							:mixed="panels.mixed(panelBinding, control)"
 							@update:model-value="toggleAction(control, $event)"
 						/>
 					</Tooltip>

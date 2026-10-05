@@ -374,8 +374,65 @@ function restoreIssue() {
 .issue-message :deep(p) {
 	margin-block: 0.5rem;
 }
+
 .issue-message :deep(pre) {
 	white-space: pre-wrap;
 	overflow-wrap: anywhere;
+}
+.markdown-body :deep(.review-card-image-targets) {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.markdown-body :deep(.review-card-image-target) {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.5rem;
+}
+
+.markdown-body :deep(.review-card-image-list) {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.markdown-body :deep(.review-card-image-entry) {
+	width: 140px;
+	max-width: 100%;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.markdown-body :deep(.review-card-image-entry > a) {
+	display: block;
+}
+
+.markdown-body :deep(.review-card-image-entry .review-card-gallery-image) {
+	display: block;
+	box-sizing: border-box;
+	width: 100%;
+	max-width: 140px;
+	height: 112px;
+	padding: 0.5rem;
+	border-radius: 0.5rem;
+	background: var(--surface-3);
+	object-fit: contain;
+}
+
+.markdown-body :deep(.review-card-image-caption) {
+	display: block;
+	margin-top: 0.375rem;
+	overflow-wrap: anywhere;
+	font-size: 0.875em;
+}
+
+.markdown-body :deep(.review-card-image-target .review-card-image-description) {
+	margin: 0;
 }
 </style>

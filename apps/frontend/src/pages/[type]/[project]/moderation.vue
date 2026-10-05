@@ -66,8 +66,8 @@
 				</ul>
 			</template>
 		</Admonition>
-		<div v-if="unresolvedIssues.length && thread?.id" class="mb-6 flex flex-col gap-3">
-			<ProjectIssueCard :issues="unresolvedIssues" show-project-area-link />
+		<div v-if="visibleIssues.length && thread?.id" class="mb-6 flex flex-col gap-3">
+			<ProjectIssueCard :issues="visibleIssues" show-project-area-link />
 		</div>
 		<div class="card-shadow mb-6 rounded-2xl border border-solid border-surface-4 bg-surface-3">
 			<div class="flex flex-col p-4">
@@ -260,8 +260,8 @@ const prefixedThread = computed(() => {
 	return thread.value
 })
 
-const unresolvedIssues = computed(() =>
-	(thread.value?.issues ?? []).filter((issue) => issue.verdict !== 'resolved'),
+const visibleIssues = computed(() =>
+	(thread.value?.issues ?? []).filter((issue) => !issue.moderator_verified),
 )
 
 const projectApproved = computed(() => isApproved(project.value))

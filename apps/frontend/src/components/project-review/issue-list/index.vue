@@ -96,12 +96,21 @@ function priority(issue: ReviewIssue | Labrinth.Threads.v3.ThreadIssue) {
 		('controls' in issue ? issue : previousIssues.cardIssue(issue)).priority ?? IssuePriority.Default
 	)
 }
+function compareIssues(
+	a: ReviewIssue | Labrinth.Threads.v3.ThreadIssue,
+	b: ReviewIssue | Labrinth.Threads.v3.ThreadIssue,
+) {
+	return (
+		Number('moderator_verified' in a && a.moderator_verified) -
+			Number('moderator_verified' in b && b.moderator_verified) ||
+		priority(a) - priority(b)
+	)
+}
 const resolvedIssues = computed(() =>
-	[...previousIssues.resolvedIssues.value].sort((a, b) => priority(a) - priority(b)),
+	[...previousIssues.resolvedIssues.value].sort(compareIssues),
 )
 const issues = computed(() => {
-	if (props.reReview)
-		return [...previousIssues.reReviewIssues.value].sort((a, b) => priority(a) - priority(b))
+	if (props.reReview) return [...previousIssues.reReviewIssues.value].sort(compareIssues)
 	const available = new Map(panels.availableIssues.value.map((issue) => [issue.id, issue]))
 	const previousIds = previousIssues.associatedIssueIds.value
 	const activeIssues = panels.activeIssues.value.flatMap(({ id }) => {
@@ -111,7 +120,7 @@ const issues = computed(() => {
 	return [
 		...previousIssues.appliedIssues.value,
 		...activeIssues.filter(({ id }) => !previousIds.has(id)),
-	].sort((a, b) => priority(a) - priority(b))
+	].sort(compareIssues)
 })
 const { formatMessage } = useVIntl()
 const messages = defineMessages({

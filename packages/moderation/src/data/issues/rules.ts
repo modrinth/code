@@ -2,6 +2,7 @@ import { ListBulletedIcon } from '@modrinth/assets'
 
 import aiGeneratedMessage from '../messages/checklist/messages/rules/ai-generated.md'
 import aiImagesMessage from '../messages/checklist/messages/rules/ai-images.md'
+import aiImagesTargetedMessage from '../messages/checklist/messages/rules/ai-images-targeted.md'
 import cheatOrHackAdvertisingMessage from '../messages/checklist/messages/rules/cheat-or-hack-advertising.md'
 import paidAccessServerMessage from '../messages/checklist/messages/rules/paid-access-server.md'
 import prohibitedContentDiscriminatoryMessage from '../messages/checklist/messages/rules/prohibited-content/discriminatory.md'
@@ -26,8 +27,10 @@ import serverSideOptInPvpMessage from '../messages/checklist/messages/rules/serv
 import serverSideOptInXRayMessage from '../messages/checklist/messages/rules/server-side-opt-in/x-ray.md'
 import serverSideOptInHeaderMessage from '../messages/checklist/messages/rules/server-side-opt-in-header.md'
 import serverSideOptOutMessage from '../messages/checklist/messages/rules/server-side-opt-out.md'
+import { removalImageEntry } from '../messages/gallery-images'
 import { issue, markdown, panel, section, toggle } from './component-builders/builders'
 import { IssuePriority } from './component-builders/priority'
+import type { IssueFacet } from './component-builders/types'
 
 export const rulesPaidAccessServerIssue = issue({
 	id: 'rules-paid-access-server',
@@ -66,7 +69,61 @@ export const rulesAiImagesIssue = issue({
 	id: 'rules-ai-images',
 	title: 'Prohibited images',
 	category: 'Project wide',
-	message: aiImagesMessage,
+	facets: ({ projectV3, selected }) => {
+		const keys = new Set((selected.items['gallery-image'] ?? []).map(({ key }) => key))
+		const imageIds = projectV3.gallery.flatMap((image) =>
+			image.id !== undefined && keys.has(String(image.id)) ? [image.id] : [],
+		)
+		const facets: IssueFacet[] = []
+		if (selected.toggleIds.includes('description-ai-images')) {
+			facets.push(() => ({
+				type: 'modify_description',
+				value: { original: projectV3.description },
+			}))
+		}
+		if (selected.toggleIds.includes('icon-ai-images')) {
+			facets.push(() => ({
+				type: 'modify_icon',
+				value: { original_url: projectV3.icon_url ?? null },
+			}))
+		}
+		if (imageIds.length) {
+			facets.push(() => ({ type: 'remove_gallery_images', value: { image_ids: imageIds } }))
+		}
+		return facets
+	},
+	message: ({ projectV3, selected }) => {
+		const entries: string[] = []
+		const settingsUrl = `https://modrinth.com/project/${encodeURIComponent(projectV3.id)}/settings`
+		if (selected.toggleIds.includes('icon-ai-images')) {
+			const image = projectV3.icon_url
+				? `<ul class="review-card-image-list">${removalImageEntry('', projectV3.icon_url)}</ul>`
+				: ''
+			entries.push(
+				`<div class="review-card-image-target"><a class="review-card-image-heading" href="${settingsUrl}">Project icon</a>${image}</div>`,
+			)
+		}
+		const keys = new Set((selected.items['gallery-image'] ?? []).map(({ key }) => key))
+		const images = projectV3.gallery.filter(
+			(image) => image.id !== undefined && keys.has(String(image.id)),
+		)
+		if (images.length) {
+			const previews = images.map((image) =>
+				removalImageEntry(image.name ?? '', image.raw_url || image.url),
+			)
+			entries.push(
+				`<div class="review-card-image-target"><a class="review-card-image-heading" href="${settingsUrl}/gallery">Gallery</a><ul class="review-card-image-list">${previews.join('\n')}</ul></div>`,
+			)
+		}
+		if (selected.toggleIds.includes('description-ai-images')) {
+			entries.push(
+				`<div class="review-card-image-target"><a class="review-card-image-heading" href="${settingsUrl}/description">Description</a><p class="review-card-image-description">Remove any prohibited images in the description.</p></div>`,
+			)
+		}
+		if (!entries.length) return aiImagesMessage.trimEnd()
+		const locations = `:\n\n<div class="review-card-image-targets">\n${entries.join('\n')}\n</div>`
+		return aiImagesTargetedMessage.replace('%AI_IMAGE_LOCATIONS%', locations).trimEnd()
+	},
 	suggestedStatus: 'flagged',
 })
 

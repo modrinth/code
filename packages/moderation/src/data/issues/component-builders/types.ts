@@ -20,10 +20,12 @@ export interface ReviewContext {
 		error: unknown
 	}
 	selected: {
-		/** Issue IDs selected directly by toggles without an explicit ID across the current project. */
+		/** Issue IDs selected directly or through explicit toggle IDs across the current project. */
 		issueIds: readonly string[]
 		/** Selected toggle IDs for the current issue; panel and section callbacks receive all selected toggle IDs. */
 		toggleIds: readonly string[]
+		/** Message and facet callbacks receive selected items for the current issue, grouped by their registry key. */
+		items: Readonly<Record<string, readonly { key: string; context: ReviewContext }[]>>
 	}
 	/**
 	 * Returns a markdown value for the current issue, or an empty string if unavailable.
@@ -46,7 +48,7 @@ export interface Issue {
 	title: string
 	category: string
 	/** Orders selected issues; omitted priorities use the default group. */
-	priority?: IssuePriority
+	priority?: IssuePriority | number
 	message: WithContext<string>
 	/** Targets to change, resolved from current context. Omitted or empty facets require checkbox acknowledgment. */
 	facets?: WithContext<readonly IssueFacet[]>
@@ -129,14 +131,29 @@ export type IssueSelectConfig = Omit<IssueSelect, 'type'>
 
 export type IssueControl = IssueToggle | IssueMarkdown | IssueText | IssueTextarea | IssueSelect
 
+export interface ReviewPanelItem {
+	key: string
+	panel: Panel
+}
+
 export interface Panel {
 	icon: FunctionalComponent<SVGAttributes>
+	/** Parent panel whose matching controls apply to this item. */
+	parent?: string
 	shown?: WithContext<boolean>
 	title?: WithContext<string>
 	hint: WithContext<string>
 	guidanceUrl: string
 	children: PanelNode[]
 }
+
+/** Registers keyed panels returned by a callback. */
+export interface EachPanel {
+	type: 'each'
+	items: (ctx: ReviewContext) => readonly ReviewPanelItem[]
+}
+
+export type PanelRegistration = Panel | EachPanel
 
 export type PanelConfig = Omit<Panel, 'children'>
 
