@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                    SELECT id, email,\n                        avatar_url, raw_avatar_url, username, bio,\n                        users.created, role, badges,\n                        (\n                            SELECT MAX(campaign_donations.donated_at)\n                            FROM campaign_donations\n                            WHERE campaign_donations.user_id = users.id\n                        ) AS campaign_pride_26_last_donated_at,\n                        (\n                            SELECT SUM(campaign_donations.amount_usd)\n                            FROM campaign_donations\n                            WHERE campaign_donations.user_id = users.id\n                        ) AS campaign_pride_26_total_amount_donated_usd,\n                        github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                        email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,\n                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter,\n                        eligibility_verified_at,\n                        user_locks.locked_by AS \"lock_locked_by?\",\n                        user_locks.reason AS \"lock_reason?\",\n                        user_locks.created AS \"lock_created?\"\n                    FROM users\n                    LEFT JOIN user_locks ON user_locks.user_id = users.id\n                    WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n                    ",
+  "query": "\n                    SELECT id, email,\n                        avatar_url, raw_avatar_url, username, bio, pronouns,\n                        users.created, role, badges,\n                        (\n                            SELECT MAX(campaign_donations.donated_at)\n                            FROM campaign_donations\n                            WHERE campaign_donations.user_id = users.id\n                        ) AS campaign_pride_26_last_donated_at,\n                        (\n                            SELECT SUM(campaign_donations.amount_usd)\n                            FROM campaign_donations\n                            WHERE campaign_donations.user_id = users.id\n                        ) AS campaign_pride_26_total_amount_donated_usd,\n                        github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                        email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,\n                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter,\n                        eligibility_verified_at,\n                        user_locks.locked_by AS \"lock_locked_by?\",\n                        user_locks.reason AS \"lock_reason?\",\n                        user_locks.created AS \"lock_created?\"\n                    FROM users\n                    LEFT JOIN user_locks ON user_locks.user_id = users.id\n                    WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n                    ",
   "describe": {
     "columns": [
       {
@@ -35,126 +35,131 @@
       },
       {
         "ordinal": 6,
+        "name": "pronouns",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
         "name": "created",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "role",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 8,
+        "ordinal": 9,
         "name": "badges",
         "type_info": "Int8"
       },
       {
-        "ordinal": 9,
+        "ordinal": 10,
         "name": "campaign_pride_26_last_donated_at",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 10,
+        "ordinal": 11,
         "name": "campaign_pride_26_total_amount_donated_usd",
         "type_info": "Numeric"
       },
       {
-        "ordinal": 11,
+        "ordinal": 12,
         "name": "github_id",
         "type_info": "Int8"
       },
       {
-        "ordinal": 12,
+        "ordinal": 13,
         "name": "discord_id",
         "type_info": "Int8"
       },
       {
-        "ordinal": 13,
+        "ordinal": 14,
         "name": "gitlab_id",
         "type_info": "Int8"
       },
       {
-        "ordinal": 14,
+        "ordinal": 15,
         "name": "google_id",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 15,
+        "ordinal": 16,
         "name": "steam_id",
         "type_info": "Int8"
       },
       {
-        "ordinal": 16,
+        "ordinal": 17,
         "name": "microsoft_id",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 17,
+        "ordinal": 18,
         "name": "email_verified",
         "type_info": "Bool"
       },
       {
-        "ordinal": 18,
+        "ordinal": 19,
         "name": "password",
         "type_info": "Text"
       },
       {
-        "ordinal": 19,
+        "ordinal": 20,
         "name": "totp_secret",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 20,
+        "ordinal": 21,
         "name": "paypal_id",
         "type_info": "Text"
       },
       {
-        "ordinal": 21,
+        "ordinal": 22,
         "name": "paypal_country",
         "type_info": "Text"
       },
       {
-        "ordinal": 22,
+        "ordinal": 23,
         "name": "paypal_email",
         "type_info": "Text"
       },
       {
-        "ordinal": 23,
+        "ordinal": 24,
         "name": "venmo_handle",
         "type_info": "Text"
       },
       {
-        "ordinal": 24,
+        "ordinal": 25,
         "name": "stripe_customer_id",
         "type_info": "Text"
       },
       {
-        "ordinal": 25,
+        "ordinal": 26,
         "name": "allow_friend_requests",
         "type_info": "Bool"
       },
       {
-        "ordinal": 26,
+        "ordinal": 27,
         "name": "is_subscribed_to_newsletter",
         "type_info": "Bool"
       },
       {
-        "ordinal": 27,
+        "ordinal": 28,
         "name": "eligibility_verified_at",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 28,
+        "ordinal": 29,
         "name": "lock_locked_by?",
         "type_info": "Int8"
       },
       {
-        "ordinal": 29,
+        "ordinal": 30,
         "name": "lock_reason?",
         "type_info": "Text"
       },
       {
-        "ordinal": 30,
+        "ordinal": 31,
         "name": "lock_created?",
         "type_info": "Timestamptz"
       }
@@ -171,6 +176,7 @@
       true,
       true,
       false,
+      true,
       true,
       false,
       false,
@@ -199,5 +205,5 @@
       true
     ]
   },
-  "hash": "85b6b47438e5d6c00e119bc4c06b42db2fd13f36bca1d25dfe54bfc8991aac8c"
+  "hash": "8ff1c1cb4eaebbe59e2d89fa23778ec6e87fd17e487973a74d4b74fdb6e6f8bc"
 }
