@@ -53,14 +53,7 @@ The project owner details must be:
 
 ## Content sources
 
-The content source is where a content item was added from.
-
-- Local: The user added this themselves, via the browse flow or by uploading it.
-- ModrinthModpack: The content comes from a linked modrinth modpack.
-- ServerProject: The content comes from a linked modrinth server project.
-<!-- - ModrinthHosting: App only, comes from a modrinth hosting server. -->
-- ImportedModpack: Comes from an imported modpack, from a third party launcher or a manually uplaoded mrpack file.
-- SharedInstance: Managed as part of a shared instance
+See [CONTENT_SOURCES.md](./CONTENT_SOURCES.md)
 
 ## Embedded metadata
 
@@ -77,8 +70,8 @@ External files will have metadata about them inside of the file which must be ex
 
 - **Fabric mods:** Read `fabric.mod.json` from the JAR root. Extracts `name` (falling back to `id`), `version`, and `icon`. [Fabric docs](https://docs.fabricmc.net/develop/loader/fabric-mod-json)
 - **Quilt mods:** Read [`quilt.mod.json`](https://github.com/QuiltMC/rfcs/blob/main/specification/0002-quilt.mod.json.md). Extract the name from `quilt_loader.metadata.name` (falling back to `quilt_loader.id`), the version from `quilt_loader.version`, and the icon from `quilt_loader.metadata.icon` (falling back to `quilt_loader.icon`).
-- **NeoForge mods:** Reads `META-INF/neoforge.mods.toml`. It extracts the first mod’s `displayName` (falling back to `modId`), `version`, and `logoFile`. [NeoForge docs](https://docs.neoforged.net/docs/gettingstarted/modfiles/)
-- **Forge mods:** Reads `META-INF/mods.toml` for those fields. Older Forge mods can use `mcmod.info`. [Forge docs](https://docs.minecraftforge.net/en/1.12.x/gettingstarted/structuring/)
+- **NeoForge mods:** Read `META-INF/neoforge.mods.toml`. Extract the mod’s `displayName` (falling back to `modId`), `version`, and `logoFile`. [NeoForge docs](https://docs.neoforged.net/docs/gettingstarted/modfiles/)
+- **Forge mods:** Read `META-INF/mods.toml` for those fields. Older Forge mods can use `mcmod.info`. [Forge docs](https://docs.minecraftforge.net/en/1.12.x/gettingstarted/structuring/)
 - **Spigot and Paper plugins:** Their JARs can contain `plugin.yml` or `paper-plugin.yml` with plugin metadata, including name and version. [Spigot docs](https://www.spigotmc.org/wiki/plugin-yml/), [Paper docs](https://docs.papermc.io/paper/dev/plugin-yml/)
 
 If a mod’s name or version is missing from its loader metadata, you may use `Implementation-Title` or `Implementation-Version` from `META-INF/MANIFEST.MF`.
