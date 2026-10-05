@@ -1,7 +1,5 @@
 use super::ApiError;
-use crate::auth::checks::{
-    filter_visible_version_ids, filter_visible_versions, is_visible_version,
-};
+use crate::auth::checks::{filter_visible_versions, is_visible_version};
 use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::PgPool;
 use crate::database::ReadOnlyPgPool;
@@ -16,8 +14,6 @@ use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
 use crate::{database, models};
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
-use dashmap::DashMap;
-use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -573,6 +569,13 @@ pub async fn update_files(
     Ok(web::Json(resp))
 }
 
+/// Finds, for each project, the newest version matching the filters that the
+/// user can see.
+///
+/// Visibility mirrors `filter_visible_version_ids`: moderators and members of
+/// the project's team or organization see every version, everyone else only
+/// sees non-hidden versions of non-hidden projects that aren't withheld for
+/// missing attribution (see `get_files_missing_attribution`).
 async fn update_files_internal(
     req: HttpRequest,
     pool: web::Data<ReadOnlyPgPool>,
@@ -605,71 +608,104 @@ async fn update_files_internal(
     .wrap_internal_err("updating versions in database")?;
 
     // TODO: de-hardcode this and actually use version fields system
-    let update_version_ids = sqlx::query!(
-        "
-        SELECT v.id version_id, v.mod_id mod_id
+    let latest_version_ids = sqlx::query_scalar!(
+        r#"
+        SELECT latest.id AS "id!"
         FROM mods m
-        INNER JOIN versions v ON m.id = v.mod_id AND (cardinality($4::varchar[]) = 0 OR v.version_type = ANY($4)) AND v.status = ANY($5)
-        INNER JOIN version_fields vf ON vf.field_id = 3 AND v.id = vf.version_id
-        INNER JOIN loader_field_enum_values lfev ON vf.enum_value = lfev.id AND (cardinality($2::varchar[]) = 0 OR lfev.value = ANY($2::varchar[]))
-        INNER JOIN loaders_versions lv ON lv.version_id = v.id
-        INNER JOIN loaders l on lv.loader_id = l.id AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3::varchar[]))
-        WHERE m.id = ANY($1) AND m.status = ANY($6)
-        ORDER BY v.date_published ASC
-        ",
+        CROSS JOIN LATERAL (
+            SELECT
+                $7::bool
+                OR EXISTS (
+                    SELECT 1 FROM team_members tm
+                    WHERE tm.team_id = m.team_id AND tm.user_id = $8::bigint
+                )
+                OR EXISTS (
+                    SELECT 1 FROM organizations o
+                    INNER JOIN team_members tm ON tm.team_id = o.team_id
+                    WHERE o.id = m.organization_id AND tm.user_id = $8::bigint
+                ) AS full_access
+        ) access
+        CROSS JOIN LATERAL (
+            SELECT v.id
+            FROM versions v
+            WHERE v.mod_id = m.id
+                AND (cardinality($4::varchar[]) = 0 OR v.version_type = ANY($4))
+                AND EXISTS (
+                    SELECT 1 FROM version_fields vf
+                    INNER JOIN loader_field_enum_values lfev ON lfev.id = vf.enum_value
+                    WHERE vf.version_id = v.id AND vf.field_id = 3
+                        AND (cardinality($2::varchar[]) = 0 OR lfev.value = ANY($2))
+                )
+                AND EXISTS (
+                    SELECT 1 FROM loaders_versions lv
+                    INNER JOIN loaders l ON l.id = lv.loader_id
+                    WHERE lv.version_id = v.id
+                        AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3))
+                )
+                AND (
+                    access.full_access
+                    OR (
+                        v.status = ANY($5::varchar[])
+                        AND NOT EXISTS (
+                            SELECT 1
+                            FROM project_attribution_groups pag
+                            INNER JOIN project_attribution_files paf ON paf.group_id = pag.id
+                            INNER JOIN override_file_sources ofs ON ofs.sha1 = paf.sha1
+                            INNER JOIN files f ON f.id = ofs.file_id
+                            INNER JOIN attribution_enforced_versions aev ON aev.id = f.version_id
+                            WHERE pag.project_id = v.mod_id
+                                AND f.version_id = v.id
+                                AND (
+                                    pag.attribution IS NULL
+                                    OR pag.attribution->>'kind' = 'no_permission'
+                                    OR coalesce(pag.attribution->'moderation_status'->>'kind', 'approved') != 'approved'
+                                )
+                        )
+                    )
+                )
+            ORDER BY v.date_published DESC, v.id DESC
+            LIMIT 1
+        ) latest
+        WHERE m.id = ANY($1)
+            AND (access.full_access OR m.status = ANY($6::varchar[]))
+        "#,
         &files.iter().map(|x| x.project_id.0).collect::<Vec<_>>(),
         &update_data.game_versions.clone().unwrap_or_default(),
         &update_data.loaders.clone().unwrap_or_default(),
-        &update_data.version_types.clone().unwrap_or_default().iter().map(|x| x.to_string()).collect::<Vec<_>>(),
-		&*VersionStatus::iterator()
-			.map(|x| x.to_string())
-			.collect::<Vec<String>>(),
-		&*ProjectStatus::iterator()
-			.map(|x| x.to_string())
-			.collect::<Vec<String>>(),
-    )
-        .fetch(&***pool)
-        .try_fold(DashMap::new(), |acc : DashMap<_,Vec<database::models::ids::DBVersionId>>, m| {
-            acc.entry(database::models::DBProjectId(m.mod_id))
-                .or_default()
-                .push(database::models::DBVersionId(m.version_id));
-            async move { Ok(acc) }
-        })
-        .await
-        .wrap_internal_err("fetching project version IDs from database")?;
-
-    let candidate_versions = database::models::DBVersion::get_many(
-        &update_version_ids
+        &update_data
+            .version_types
+            .clone()
+            .unwrap_or_default()
             .iter()
-            .flat_map(|x| x.value().clone())
+            .map(|x| x.to_string())
             .collect::<Vec<_>>(),
-        &***pool,
-        &redis,
-    )
-    .await
-    .wrap_internal_err("updating versions in database")?;
-    let visible_version_ids = filter_visible_version_ids(
-        candidate_versions.iter().map(|x| &x.inner).collect(),
-        &user_option,
-        &pool,
-        &redis,
-    )
-    .await
-    .wrap_api_err("filtering visible update versions")?;
-    let versions = database::models::DBVersion::get_many(
-        &update_version_ids
-            .into_iter()
-            .filter_map(|x| {
-                x.1.into_iter()
-                    .rev()
-                    .find(|id| visible_version_ids.contains(id))
-            })
+        &VersionStatus::iterator()
+            .filter(|x| !x.is_hidden())
+            .map(|x| x.to_string())
             .collect::<Vec<_>>(),
-        &***pool,
-        &redis,
+        &ProjectStatus::iterator()
+            .filter(|x| !x.is_hidden())
+            .map(|x| x.to_string())
+            .collect::<Vec<_>>(),
+        user_option.as_ref().is_some_and(|x| x.role.is_mod()),
+        user_option
+            .as_ref()
+            .map(|x| database::models::DBUserId::from(x.id).0),
     )
+    .fetch_all(&***pool)
     .await
     .wrap_internal_err("fetching latest visible update versions")?;
+
+    let versions = database::models::DBVersion::get_many(
+        &latest_version_ids
+            .into_iter()
+            .map(database::models::DBVersionId)
+            .collect::<Vec<_>>(),
+        &***pool,
+        &redis,
+    )
+    .await
+    .wrap_internal_err("fetching update versions")?;
 
     let mut response = HashMap::<String, Vec<models::projects::Version>>::new();
     for file in files {
