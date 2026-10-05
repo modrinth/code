@@ -77,6 +77,7 @@ import { computed, nextTick, onScopeDispose, ref, watch } from 'vue'
 import { useModerationKeybinds } from '~/composables/moderation'
 import { isStaff } from '~/helpers/users.js'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
+import { previousReviewLinkUrls } from '~/providers/project-review/project-links'
 import {
 	createReviewMessages,
 	provideReviewMessages,
@@ -152,6 +153,11 @@ const panels = provideReviewPanels(
 			organizationMembers: organizationMembers.value,
 			wasReviewed: wasReviewed.value,
 			permissions: permissions.value,
+			previousLinks: previousReviewLinkUrls(
+				wasReviewed.value && project.value?.thread_id === threadQuery.data.value?.id
+					? (threadQuery.data.value?.issues ?? [])
+					: [],
+			),
 		})),
 	),
 )

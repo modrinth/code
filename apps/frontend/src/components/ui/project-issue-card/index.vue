@@ -164,7 +164,7 @@ const props = defineProps<{
 	target?: Target['type'] | Target['type'][]
 	issues?: ThreadIssue[]
 	showProjectAreaLink?: boolean
-	platform?: string
+	platform?: string | string[]
 	versionId?: string
 	imageId?: number
 	userId?: string
@@ -230,10 +230,11 @@ const addressMutation = useMutation({
 function matchesTarget(what: Target): boolean {
 	const targets = Array.isArray(props.target) ? props.target : [props.target]
 	if (!targets.includes(what.type)) return false
+	const platforms = Array.isArray(props.platform) ? props.platform : [props.platform]
 	if (what.type === 'modify_links' && props.platform)
-		return Object.hasOwn(what.value.links, props.platform)
+		return platforms.some((platform) => platform && Object.hasOwn(what.value.links, platform))
 	if (what.type === 'modify_server_address' && props.platform)
-		return what.value.platform === props.platform
+		return platforms.includes(what.value.platform)
 	if (what.type === 'version' && props.versionId) return what.value.version_id === props.versionId
 	if (what.type === 'modify_gallery_image' && props.imageId !== undefined)
 		return what.value.image_id === props.imageId

@@ -122,6 +122,12 @@
 						</div>
 					</template>
 				</Table>
+				<ProjectIssueCard
+					v-if="section.id === 'donations'"
+					target="modify_links"
+					:platform="tags.donationPlatforms.map((platform) => platform.short)"
+					class="mt-3"
+				/>
 			</section>
 		</div>
 		<ValidationMessage :check="otherSaveMessages" class="my-4" />

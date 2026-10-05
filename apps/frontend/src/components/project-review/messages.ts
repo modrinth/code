@@ -234,6 +234,18 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.emptyLinks',
 		defaultMessage: 'No links',
 	},
+	linkRemoved: {
+		id: 'moderation.project-review.linkRemoved',
+		defaultMessage: 'Link removed: {link}',
+	},
+	linkUnavailable: {
+		id: 'moderation.project-review.linkUnavailable',
+		defaultMessage: 'Link unavailable',
+	},
+	previousLink: {
+		id: 'moderation.project-review.previousLink',
+		defaultMessage: 'Previous link: {url}',
+	},
 	source: {
 		id: 'moderation.project-review.source',
 		defaultMessage: 'Source code',

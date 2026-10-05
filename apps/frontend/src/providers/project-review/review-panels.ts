@@ -114,7 +114,7 @@ export function createReviewPanels(
 			| 'organizationMembers'
 			| 'wasReviewed'
 			| 'permissions'
-		>
+		> & { previousLinks: ReadonlyMap<string, string> }
 	>,
 	definitions: Record<string, PanelRegistration> = reviewPanels,
 ) {
@@ -187,7 +187,9 @@ export function createReviewPanels(
 			issues: itemIssues,
 		} = expandItemReviewPanels(definitions, context)
 		for (const [key, panel] of Object.entries(itemDefinitions)) {
-			if (resolveWithContext(panel.shown, context) === false) continue
+			const previousLink =
+				key.endsWith('-link') && reviewData.value.previousLinks.has(key.slice(0, -'-link'.length))
+			if (resolveWithContext(panel.shown, context) === false && !previousLink) continue
 			const resolveNodes = (
 				nodes: readonly PanelNode[],
 				label?: string,
@@ -641,6 +643,7 @@ export function createReviewPanels(
 	)
 
 	return {
+		previousLinks: computed(() => reviewData.value.previousLinks),
 		issueBindings: (issueId: string) =>
 			[...panels.value.values()].filter((binding) =>
 				binding.panel.sections.some((section) =>
