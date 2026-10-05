@@ -23,13 +23,15 @@ export const metadataEnvironmentIssue = issue({
 		const correction =
 			environment === 'mixed'
 				? environmentMixedMessage
-				: environment
-					? environmentCorrectionMessage.replaceAll(
-							'%SUGGESTED_ENVIRONMENT%',
-							() =>
-								ENVIRONMENTS_COPY[environment as Labrinth.Projects.v3.Environment]?.title
-									.defaultMessage ?? environment,
-						)
+				: environment !== 'unknown' && Object.hasOwn(ENVIRONMENTS_COPY, environment)
+					? environmentCorrectionMessage
+							.replaceAll(
+								'%SUGGESTED_ENVIRONMENT%',
+								() =>
+									ENVIRONMENTS_COPY[environment as Labrinth.Projects.v3.Environment].title
+										.defaultMessage ?? environment,
+							)
+							.replaceAll('%SUGGESTED_ENVIRONMENT_ID%', () => encodeURIComponent(environment))
 					: ''
 		return environmentInaccurateMessage.replaceAll('%CORRECT%', () => correction)
 	},

@@ -1,10 +1,17 @@
 <template>
 	<NewModal ref="modal" :scrollable="true" max-content-height="82vh" :closable="true">
 		<template #title>
-			<span class="text-lg font-extrabold text-contrast">Edit project Environment</span>
+			<span class="text-lg font-extrabold text-contrast">{{
+				formatMessage(bulkEnvironment ? messages.applyToAllVersions : messages.title)
+			}}</span>
 		</template>
 		<div class="max-w-[600px]">
-			<EnvironmentMigration ref="environmentMigration" :show-floating-save="false" />
+			<EnvironmentMigration
+				:key="bulkEnvironment ?? 'project'"
+				ref="environmentMigration"
+				:show-floating-save="false"
+				:bulk-environment="bulkEnvironment"
+			/>
 		</div>
 		<template #actions>
 			<div v-if="canSave" class="flex justify-end gap-2 mt-2">
@@ -33,9 +40,10 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { CheckIcon, HistoryIcon, SaveIcon, SpinnerIcon } from '@modrinth/assets'
-import { computed, onMounted, unref, useTemplateRef } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, onMounted, ref, unref, useTemplateRef, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import { Button } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -43,10 +51,22 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '../../../../utils/common-messages'
 import { NewModal } from '../../../modal'
 import EnvironmentMigration from './EnvironmentMigration.vue'
+import { ENVIRONMENTS_COPY } from './environments'
 
 const { formatMessage } = useVIntl()
+const route = useRoute()
+const router = useRouter()
+const bulkEnvironment = ref<Labrinth.Projects.v3.Environment>()
 
 const messages = defineMessages({
+	title: {
+		id: 'project.settings.environment.modal.title',
+		defaultMessage: 'Edit project environment',
+	},
+	applyToAllVersions: {
+		id: 'project.settings.environment.bulk.apply-button',
+		defaultMessage: 'Apply to all versions',
+	},
 	verifyButton: {
 		id: 'project.settings.environment.verification.verify-button',
 		defaultMessage: 'Verify',
@@ -66,13 +86,17 @@ const saveButtonLabel = computed(() => {
 	if (saving.value) {
 		return formatMessage(commonMessages.savingButton)
 	}
+	if (bulkEnvironment.value) {
+		return formatMessage(messages.applyToAllVersions)
+	}
 	if (needsToVerify.value) {
 		return formatMessage(messages.verifyButton)
 	}
 	return formatMessage(commonMessages.saveButton)
 })
 
-function show() {
+function show(environment?: Labrinth.Projects.v3.Environment) {
+	bulkEnvironment.value = environment
 	modal.value?.show()
 }
 
@@ -84,17 +108,33 @@ function resetEnvironment() {
 	environmentMigration.value?.reset()
 }
 
-function saveEnvironment() {
-	const shouldVerify = !!needsToVerify.value
-	environmentMigration.value?.save()
-	if (shouldVerify) {
+async function saveEnvironment() {
+	const shouldClose = !!bulkEnvironment.value || needsToVerify.value
+	const saved = await environmentMigration.value?.save()
+	if (saved && shouldClose) {
 		hide()
 	}
 }
 
 onMounted(() => {
-	const route = useRoute()
-	if (route.query.showEnvironmentMigrationWarning === 'true') {
+	watch(
+		() => route.query.applyEnvironmentOnAllVersions,
+		async (environment) => {
+			if (
+				typeof environment !== 'string' ||
+				environment === 'unknown' ||
+				!Object.hasOwn(ENVIRONMENTS_COPY, environment)
+			) {
+				return
+			}
+			show(environment as Labrinth.Projects.v3.Environment)
+			const query = { ...route.query }
+			delete query.applyEnvironmentOnAllVersions
+			await router.replace({ query, hash: route.hash })
+		},
+		{ immediate: true, flush: 'post' },
+	)
+	if (!bulkEnvironment.value && route.query.showEnvironmentMigrationWarning === 'true') {
 		show()
 	}
 })
