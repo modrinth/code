@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n\t\t\tSELECT\n\t\t\t\tid AS \"id!: String\",\n\t\t\t\tinstance_id,\n\t\t\t\tkind AS \"kind!: String\",\n\t\t\t\tstatus AS \"status!: String\",\n\t\t\t\tstate AS \"state!: String\",\n\t\t\t\tcreated AS \"created!: i64\",\n\t\t\t\tmodified AS \"modified!: i64\",\n\t\t\t\tfinished,\n\t\t\t\tdismissed AS \"dismissed!: i64\"\n\t\t\tFROM install_jobs\n\t\t\tWHERE dismissed = 0\n\t\t\tORDER BY created ASC\n\t\t\t",
+  "query": "\n\t\tSELECT\n\t\t\tid AS \"id!: String\",\n\t\t\tinstance_id,\n\t\t\tkind AS \"kind!: String\",\n\t\t\tstatus AS \"status!: String\",\n\t\t\tstate AS \"state!: String\",\n\t\t\tcreated AS \"created!: i64\",\n\t\t\tmodified AS \"modified!: i64\",\n\t\t\tfinished,\n\t\t\tdismissed AS \"dismissed!: i64\"\n\t\tFROM install_jobs\n\t\tORDER BY created ASC\n\t\t",
   "describe": {
     "columns": [
       {
@@ -64,5 +64,5 @@
       false
     ]
   },
-  "hash": "1dd81b3ad9385bee89722711f41056178bd088841064a4b3086cdcf2458632ad"
+  "hash": "63e80eba9e0265c3aeb9c3bc92e37a74f97623bfb37c2bc2ef90875a8546f13e"
 }

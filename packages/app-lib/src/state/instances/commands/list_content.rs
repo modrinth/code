@@ -1239,7 +1239,7 @@ fn content_item_project(project: &Project) -> ContentItemProject {
     }
 }
 
-fn file_metadata_from_entry_or_cache(
+pub(super) fn file_metadata_from_entry_or_cache(
     entry: Option<&ContentEntry>,
     cached: Option<CachedFile>,
 ) -> Option<crate::state::FileMetadata> {

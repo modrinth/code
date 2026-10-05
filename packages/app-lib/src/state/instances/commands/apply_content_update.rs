@@ -4,7 +4,7 @@ use crate::install::{
     InstallProgressSecondary,
 };
 use crate::state::instances::{
-    ContentEntry, ContentSet, ContentSourceKind, InstanceFile,
+    ContentSet, ContentSourceKind,
     adapters::sqlite::{content_rows, instance_rows},
 };
 use crate::state::{
@@ -27,7 +27,7 @@ use super::apply_content_install::{
 use super::check_content_updates::{ContentUpdate, check_content_updates};
 
 #[derive(Clone, Debug)]
-struct BulkUpdatePlan {
+pub(crate) struct BulkUpdatePlan {
     project_updates: Vec<PlannedProjectUpdate>,
     dependency_additions: Vec<PlannedDependencyInstall>,
 }
@@ -155,24 +155,7 @@ async fn apply_content_update(
     Ok(new_path)
 }
 
-pub(crate) async fn update_selected_projects(
-    instance_id: &str,
-    updates: &[ContentUpdateSelection],
-    reporter: InstallProgressReporter,
-    state: &State,
-) -> crate::Result<()> {
-    reporter
-        .update(
-            InstallPhaseId::ResolvingPack,
-            None,
-            InstallPhaseDetails::Empty,
-        )
-        .await?;
-    let plan = plan_bulk_update(instance_id, updates, state).await?;
-    apply_bulk_update(instance_id, plan, reporter, state).await
-}
-
-async fn apply_bulk_update(
+pub(crate) async fn apply_bulk_update(
     instance_id: &str,
     plan: BulkUpdatePlan,
     reporter: InstallProgressReporter,
@@ -376,7 +359,7 @@ async fn download_planned_projects(
     Ok(output)
 }
 
-async fn plan_bulk_update(
+pub(crate) async fn plan_bulk_update(
     instance_id: &str,
     selections: &[ContentUpdateSelection],
     state: &State,
@@ -610,30 +593,43 @@ async fn installed_projects(
     let files =
         content_rows::get_instance_files(&instance.id, &state.pool).await?;
 
+    let hashes = files
+        .iter()
+        .map(|file| file.sha1.as_str())
+        .collect::<Vec<_>>();
+    let file_info_by_hash = CachedEntry::get_file_many(
+        &hashes,
+        Some(CacheBehaviour::MustRevalidate),
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?
+    .into_iter()
+    .map(|file| (file.hash.clone(), file))
+    .collect::<HashMap<_, _>>();
+
     Ok(files
         .into_iter()
+        .filter(|file| !file.missing)
         .filter_map(|file| {
-            let entry = entries_by_file_id.get(file.id.as_str())?;
-            installed_project_from_row(&file, entry)
+            let entry = entries_by_file_id.get(file.id.as_str()).copied();
+            let metadata =
+                super::list_content::file_metadata_from_entry_or_cache(
+                    entry,
+                    file_info_by_hash.get(&file.sha1).cloned(),
+                )?;
+            Some(InstalledProject {
+                relative_path: file.relative_path,
+                project_id: Some(metadata.project_id),
+                version_id: Some(metadata.version_id),
+                source_kind: entry.map_or(ContentSourceKind::Local, |entry| {
+                    entry.source_kind
+                }),
+                enabled: file.enabled
+                    && entry.is_none_or(|entry| entry.enabled),
+            })
         })
         .collect())
-}
-
-fn installed_project_from_row(
-    file: &InstanceFile,
-    entry: &ContentEntry,
-) -> Option<InstalledProject> {
-    if entry.project_id.is_none() && entry.version_id.is_none() {
-        return None;
-    }
-
-    Some(InstalledProject {
-        relative_path: file.relative_path.clone(),
-        project_id: entry.project_id.clone(),
-        version_id: entry.version_id.clone(),
-        source_kind: entry.source_kind,
-        enabled: entry.enabled && file.enabled,
-    })
 }
 
 async fn is_shared_instance_member(

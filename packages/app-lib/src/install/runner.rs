@@ -160,6 +160,29 @@ pub async fn install_existing_instance(
     start(InstallRequest::InstallExistingInstance { instance_id, force }).await
 }
 
+pub(crate) async fn wait_for_job(job_id: Uuid) -> crate::Result<()> {
+    let state = State::get().await?;
+    loop {
+        let job = store::get_required(job_id, &state).await?;
+        if job.status == InstallJobStatus::Succeeded {
+            return Ok(());
+        }
+        if job.status.is_finished() {
+            return Err(crate::ErrorKind::LauncherError(
+                job.state
+                    .rollback_error
+                    .or(job.state.error)
+                    .map(|error| error.message)
+                    .unwrap_or_else(|| {
+                        format!("Installation {}", job.status.as_str())
+                    }),
+            )
+            .into());
+        }
+        tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+    }
+}
+
 pub async fn install_pack_to_existing_instance(
     instance_id: String,
     location: CreatePackLocation,
@@ -211,11 +234,20 @@ pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
         .into());
     }
 
+    if let Some(instance_id) = current_instance_id(&job.state) {
+        store::ensure_no_pending_recovery(&instance_id, Some(job_id), &state)
+            .await?;
+    }
+
     let cleanup_target_guard = reserve_target(&job.state.target)?;
 
     if job.state.rollback_error.is_some() {
         recovery::apply_cleanup(&job.state, &state).await?;
-        recovery::clear_staging_dir(&job.state).await;
+        let recovered = job.state.clone();
+        job.state.rollback_error = None;
+        job.state.paths.staging_dir = None;
+        store::update_status(job_id, job.status, &job.state, &state).await?;
+        recovery::clear_staging_dir(&recovered).await;
     }
 
     drop(cleanup_target_guard);
@@ -423,6 +455,9 @@ async fn start(request: InstallRequest) -> crate::Result<InstallJobSnapshot> {
     let _admission = INSTALL_ADMISSION.lock().await;
     let mut target_guard = reserve_target(&request.target())?;
     let state = State::get().await?;
+    if let InstallTarget::ExistingInstance { instance_id } = request.target() {
+        store::ensure_no_pending_recovery(&instance_id, None, &state).await?;
+    }
     let id = Uuid::new_v4();
     let mut job_state = InstallJobState::new(request);
     set_initial_display(&mut job_state);
@@ -1187,10 +1222,24 @@ async fn run_request(
             updates,
         } => {
             lock_instance(&instance_id, state).await?;
-            prepare_update_backup(job_id, job_state, state).await?;
-            crate::state::instances::commands::update_selected_projects(
+            update_progress(
+                job_id,
+                job_state,
+                state,
+                InstallPhaseId::ResolvingPack,
+                InstallPhaseDetails::Empty,
+            )
+            .await?;
+            let plan = crate::state::instances::commands::plan_bulk_update(
                 &instance_id,
                 &updates,
+                state,
+            )
+            .await?;
+            prepare_update_backup(job_id, job_state, state).await?;
+            crate::state::instances::commands::apply_bulk_update(
+                &instance_id,
+                plan,
                 InstallProgressReporter::new(job_id, job_state.clone()),
                 state,
             )
@@ -1564,6 +1613,12 @@ async fn lock_install_target(
 }
 
 async fn lock_instance(instance_id: &str, state: &State) -> crate::Result<()> {
+    let _content_lock = state.lock_instance_content(instance_id).await;
+    if crate::state::instance_has_running_process(instance_id, state).await? {
+        return Err(crate::state::content_store::input(
+            "Stop this instance before installing or updating its content",
+        ));
+    }
     crate::state::instances::commands::set_instance_install_stage(
         instance_id,
         InstanceInstallStage::MinecraftInstalling,

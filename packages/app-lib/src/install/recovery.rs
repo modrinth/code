@@ -275,7 +275,6 @@ async fn restore_instance_update(
         &state.pool,
     )
     .await?;
-    restore_instance_metadata(&rollback.instance, state).await?;
     state
         .content_store
         .restore_instance_files(
@@ -284,6 +283,7 @@ async fn restore_instance_update(
             &snapshot.bindings,
         )
         .await?;
+    restore_instance_metadata(&rollback.instance, state).await?;
 
     Ok(())
 }
@@ -451,6 +451,52 @@ pub async fn recover_interrupted_jobs(state: &State) -> crate::Result<()> {
         }
     }
 
+    if let Err(error) = recover_orphaned_install_stages(state).await {
+        tracing::error!(
+            "Could not recover orphaned installation states: {error}"
+        );
+    }
+    Ok(())
+}
+
+async fn recover_orphaned_install_stages(state: &State) -> crate::Result<()> {
+    let jobs = store::list_all(state).await?;
+    for instance in instance_rows::list_instances(&state.pool).await? {
+        let needs_recovery = jobs.iter().any(|job| {
+            job.instance_id.as_deref() == Some(instance.id.as_str())
+                && job.needs_recovery()
+        });
+        let stage = if needs_recovery {
+            crate::state::InstanceInstallStage::MinecraftInstalling
+        } else {
+            if !matches!(
+                instance.install_stage,
+                crate::state::InstanceInstallStage::MinecraftInstalling
+                    | crate::state::InstanceInstallStage::PackInstalling
+            ) || jobs.iter().any(|job| {
+                job.instance_id.as_deref() == Some(instance.id.as_str())
+                    && !job.status.is_finished()
+            }) || crate::state::instance_has_running_process(
+                &instance.id,
+                state,
+            )
+            .await?
+            {
+                continue;
+            }
+            crate::state::InstanceInstallStage::NotInstalled
+        };
+        if stage == instance.install_stage {
+            continue;
+        }
+        crate::state::instances::commands::set_instance_install_stage(
+            &instance.id,
+            stage,
+            &state.pool,
+        )
+        .await?;
+        emit_instance(&instance.id, InstancePayloadType::Edited).await?;
+    }
     Ok(())
 }
 
