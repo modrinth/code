@@ -1,1 +1,1 @@
-ALTER TABLE users ADD COLUMN pronouns VARCHAR(40);
+ALTER TABLE users ADD COLUMN pronouns VARCHAR(20);
