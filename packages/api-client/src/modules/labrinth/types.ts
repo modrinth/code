@@ -2211,12 +2211,32 @@ export namespace Labrinth {
 
 			export type NewThreadIssueFacet = { what: ThreadIssueTarget }
 
+			export type ThreadIssueLocation = {
+				field:
+					| 'title'
+					| 'slug'
+					| 'summary'
+					| 'icon'
+					| 'description'
+					| 'license'
+					| 'tags'
+					| 'links'
+					| 'gallery'
+					| 'disclosures'
+					| 'versions'
+					| 'members'
+					| 'server'
+					| 'permissions'
+				label?: { id: string; defaultMessage?: string }
+			}
+
 			/**
 			 * The backend stores `why` as an arbitrary JSON blob; this schema is interpreted by the frontend.
 			 * Fields are optional to support issues created before review metadata was added.
 			 */
 			export type ThreadIssueWhy = {
 				issue_id?: string
+				locations?: ThreadIssueLocation[]
 				title?: string
 				message?: string
 				selection?: {

@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<ProjectIssueCard location="links" class="mb-4" />
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
 		<div class="flex min-w-0 flex-col gap-8">
 			<section v-for="section in linkSections" :key="section.id" class="min-w-0">

@@ -17,6 +17,7 @@ import { computed } from 'vue'
 import DisclosureCards from '~/components/ui/project-settings/disclosures/DisclosureCards.vue'
 import { disclosureStatusMessages as statusMessages } from '~/components/ui/project-settings/disclosures/messages'
 import { useDisclosureEditor } from '~/components/ui/project-settings/disclosures/use-disclosure-editor'
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 
@@ -69,6 +70,7 @@ const { isPending, isError, refetch } = disclosuresQuery
 <template>
 	<div>
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
+		<ProjectIssueCard location="disclosures" class="mb-4" />
 		<h2 class="m-0 text-2xl font-semibold">{{ formatMessage(messages.title) }}</h2>
 		<p class="mb-0 mt-2">
 			<IntlFormatted :message-id="messages.description">

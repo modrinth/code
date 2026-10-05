@@ -59,9 +59,7 @@ export function createReviewPreviousIssues(
 		const key = messageKey(issue)
 		if (messages.hasIssueOverride(key)) return messages.issueMessage(key)
 		const id = reviewIssue(issue)?.id
-		return id &&
-			isApplicable(issue) &&
-			panels.activeIssues.value.some((active) => active.id === id)
+		return id && isApplicable(issue) && panels.activeIssues.value.some((active) => active.id === id)
 			? messages.issueMessage(id)
 			: issueMessage(issue)
 	}
@@ -338,7 +336,9 @@ export function createReviewPreviousIssues(
 						why: {
 							...issueDetails(issue),
 							message: reviewMessage(issue),
-							...(active ? { selection: panels.issueSelection(active.id) } : {}),
+							...(active
+								? { selection: panels.issueSelection(active.id), locations: active.locations }
+								: {}),
 						},
 						facets: [first, ...rest],
 					},
@@ -361,7 +361,9 @@ export function createReviewPreviousIssues(
 					data.why = {
 						...issueDetails(issue),
 						message: reviewMessage(issue),
-						...(changed ? { selection: panels.issueSelection(active.id) } : {}),
+						...(changed
+							? { selection: panels.issueSelection(active.id), locations: active.locations }
+							: {}),
 					}
 				}
 				if (changed && active.facets) data.facets = active.facets

@@ -16,11 +16,13 @@ import redistLibsMessage from '../messages/checklist/messages/versions/redist-li
 import unsupportedMessage from '../messages/checklist/messages/versions/unsupported.md'
 import vanillaAssetsMessage from '../messages/checklist/messages/versions/vanilla-assets.md'
 import { issue, panel, section, select, text, toggle } from './component-builders/builders'
+import { issueLocation } from './component-builders/locations'
 
 export const versionsIncorrectAdditionalFilesIssue = issue({
 	id: 'versions-incorrect-additional-files',
 	title: 'Incorrect additional files',
 	category: 'Versions',
+	locations: [issueLocation('versions')],
 	message: incorrectAdditionalFilesMessage,
 	suggestedStatus: 'flagged',
 })
@@ -29,6 +31,7 @@ export const versionsVanillaAssetsIssue = issue({
 	id: 'versions-vanilla-assets',
 	title: 'Vanilla assets',
 	category: 'Versions',
+	locations: [issueLocation('versions')],
 	message: vanillaAssetsMessage,
 	suggestedStatus: 'rejected',
 })
@@ -37,6 +40,7 @@ export const versionsRedistLibsIssue = issue({
 	id: 'versions-redist-libs',
 	title: 'Redistributed libraries',
 	category: 'Versions',
+	locations: [issueLocation('versions')],
 	message: redistLibsMessage,
 	suggestedStatus: 'rejected',
 })
@@ -45,6 +49,7 @@ export const versionsDuplicatePrimaryFilesIssue = issue({
 	id: 'versions-duplicate-primary-files',
 	title: 'Duplicate primary files',
 	category: 'Versions',
+	locations: [issueLocation('versions')],
 	message: duplicatePrimaryFilesMessage,
 	suggestedStatus: 'flagged',
 })
@@ -59,6 +64,7 @@ export const versionsIncorrectProjectTypeIssue = issue({
 	id: 'versions-incorrect-project-type',
 	title: 'Incorrect project type',
 	category: 'Versions',
+	locations: [issueLocation('versions')],
 	message: ({ getSelectValue }) => incorrectProjectTypeMessages[getSelectValue('type')] ?? '',
 	suggestedStatus: 'rejected',
 })
@@ -76,6 +82,7 @@ export const versionsAlternateVersionsIssue = issue({
 	id: 'versions-alternate-versions',
 	title: 'Alternate versions',
 	category: 'Versions',
+	locations: [issueLocation('versions')],
 	message: ({ getSelectValue }) => alternateVersionsMessages[getSelectValue('distribution')] ?? '',
 	suggestedStatus: 'rejected',
 })
@@ -84,6 +91,7 @@ export const versionsUnsupportedIssue = issue({
 	id: 'versions-unsupported',
 	title: 'Unsupported versions',
 	category: 'Versions',
+	locations: [issueLocation('versions')],
 	message: ({ getTextValue }) =>
 		unsupportedMessage.replaceAll('%INVALID_TYPE%', () => getTextValue('invalid-type')),
 	suggestedStatus: 'rejected',
@@ -93,6 +101,7 @@ export const metadataDependenciesIssue = issue({
 	id: 'metadata-dependencies',
 	title: 'Incorrect dependencies',
 	category: 'Metadata',
+	locations: [issueLocation('versions')],
 	message: dependenciesMessage,
 	suggestedStatus: 'flagged',
 })

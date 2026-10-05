@@ -6,6 +6,7 @@ import notRelevantMessage from '../messages/checklist/messages/gallery/not-relev
 import showcaseClarityMessage from '../messages/checklist/messages/gallery/showcase-clarity.md'
 import { galleryImagesMessage } from '../messages/gallery-images'
 import { issue, panel, toggle } from './component-builders/builders'
+import { issueLocation } from './component-builders/locations'
 import { IssuePriority } from './component-builders/priority'
 import { rulesAiImagesIssue } from './rules'
 
@@ -43,6 +44,7 @@ export const galleryNotRelevantIssue = issue({
 
 export const galleryShowcaseClarityIssue = issue({
 	id: 'gallery-showcase-clarity',
+	locations: [issueLocation('gallery')],
 	title: 'Unclear gallery showcase',
 	category: 'Gallery',
 	message: showcaseClarityMessage,

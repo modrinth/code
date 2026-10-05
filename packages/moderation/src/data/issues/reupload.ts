@@ -13,6 +13,7 @@ import requestProofServerMessage from '../messages/checklist/messages/reupload/r
 import reuploadMessage from '../messages/checklist/messages/reupload/reupload.md'
 import unclearForkMessage from '../messages/checklist/messages/reupload/unclear-fork.md'
 import { issue, markdown, panel, section, text, toggle } from './component-builders/builders'
+import { issueLocation } from './component-builders/locations'
 
 export const reuploadReuploadIssue = issue({
 	id: 'reupload-reupload',
@@ -106,6 +107,7 @@ export const reuploadCustomPackProhibitedIssue = issue({
 
 export const reuploadMissingAttributionIssue = issue({
 	id: 'reupload-missing-attribution',
+	locations: [issueLocation('disclosures')],
 	title: 'Missing attribution',
 	category: 'Project wide',
 	message: missingAttributionMessage,

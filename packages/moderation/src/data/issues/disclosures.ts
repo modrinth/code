@@ -35,9 +35,11 @@ import misusedSystemInteractionsMessage from '../messages/checklist/messages/dis
 import misusedTelemetryMessage from '../messages/checklist/messages/disclosures/misused-disclosures/telemetry.md'
 import nonEnglishMessage from '../messages/checklist/messages/disclosures/non-english.md'
 import { issue, panel, section, toggle } from './component-builders/builders'
+import { issueLocation } from './component-builders/locations'
 
 export const disclosuresIssue = issue({
 	id: 'disclosures',
+	locations: [issueLocation('disclosures')],
 	title: 'Invalid disclosures',
 	category: 'Disclosures',
 	message: ({ selected }) => {
@@ -181,6 +183,7 @@ export const disclosuresIssue = issue({
 
 export const disclosuresNonEnglishIssue = issue({
 	id: 'disclosures-non-english',
+	locations: [issueLocation('disclosures')],
 	title: 'Non-English disclosure information',
 	category: 'Disclosures',
 	message: nonEnglishMessage,

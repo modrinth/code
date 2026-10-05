@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<ProjectIssueCard location="members" class="mb-4" />
 		<ConfirmTransferProjectModal
 			v-if="transferData && project"
 			ref="transferModal"

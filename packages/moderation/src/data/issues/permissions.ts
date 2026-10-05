@@ -5,9 +5,11 @@ import missingPermissionsMessage from '../messages/checklist/messages/permission
 import nonCommercialExternalContentMessage from '../messages/checklist/messages/permissions/non-commercial-external-content.md'
 import prohibitedExternalContentMessage from '../messages/checklist/messages/permissions/prohibited-external-content.md'
 import { issue, panel, toggle } from './component-builders/builders'
+import { issueLocation } from './component-builders/locations'
 
 export const permissionsInvalidPermissionsIssue = issue({
 	id: 'permissions-invalid-permissions',
+	locations: [issueLocation('permissions')],
 	title: 'Invalid permissions',
 	category: 'Permissions',
 	message: invalidPermissionsMessage,
@@ -16,6 +18,7 @@ export const permissionsInvalidPermissionsIssue = issue({
 
 export const permissionsProhibitedExternalContentIssue = issue({
 	id: 'permissions-prohibited-external-content',
+	locations: [issueLocation('permissions')],
 	title: 'Prohibited external content',
 	category: 'Permissions',
 	message: prohibitedExternalContentMessage,
@@ -24,6 +27,7 @@ export const permissionsProhibitedExternalContentIssue = issue({
 
 export const permissionsMissingPermissionsIssue = issue({
 	id: 'permissions-missing-permissions',
+	locations: [issueLocation('permissions')],
 	title: 'Missing permissions',
 	category: 'Permissions',
 	message: missingPermissionsMessage,
@@ -32,6 +36,7 @@ export const permissionsMissingPermissionsIssue = issue({
 
 export const permissionsNonCommercialExternalContentIssue = issue({
 	id: 'permissions-non-commercial-external-content',
+	locations: [issueLocation('permissions')],
 	title: 'Non-commercial external content',
 	category: 'Permissions',
 	message: nonCommercialExternalContentMessage,

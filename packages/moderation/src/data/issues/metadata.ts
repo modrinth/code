@@ -9,6 +9,7 @@ import environmentMixedMessage from '../messages/checklist/messages/metadata/env
 import gameVersionsMessage from '../messages/checklist/messages/metadata/game-versions.md'
 import loadersMessage from '../messages/checklist/messages/metadata/loaders.md'
 import { issue, panel, section, select, toggle } from './component-builders/builders'
+import { issueLocation } from './component-builders/locations'
 
 const environments = Object.keys(ENVIRONMENTS_COPY).filter(
 	(id) => id !== 'unknown',
@@ -16,6 +17,7 @@ const environments = Object.keys(ENVIRONMENTS_COPY).filter(
 
 export const metadataEnvironmentIssue = issue({
 	id: 'metadata-environment',
+	locations: [issueLocation('versions')],
 	title: 'Incorrect environment',
 	category: 'Metadata',
 	message: ({ getSelectValue }) => {
@@ -40,6 +42,7 @@ export const metadataEnvironmentIssue = issue({
 
 export const metadataGameVersionsIssue = issue({
 	id: 'metadata-game-versions',
+	locations: [issueLocation('versions')],
 	title: 'Incorrect game versions',
 	category: 'Metadata',
 	message: gameVersionsMessage,
@@ -48,6 +51,7 @@ export const metadataGameVersionsIssue = issue({
 
 export const metadataLoadersIssue = issue({
 	id: 'metadata-loaders',
+	locations: [issueLocation('versions')],
 	title: 'Incorrect loaders',
 	category: 'Metadata',
 	message: loadersMessage,

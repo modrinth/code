@@ -120,6 +120,7 @@ export function expandItemReviewPanels(
 				)
 				return [...messages].join('\n\n')
 			},
+			locations: (ctx) => resolve(original.locations, selectedContext(ctx)) ?? [],
 			facets: (ctx) => {
 				const context = selectedContext(ctx)
 				return (resolve(original.facets, context) ?? []).map((facet) => () => facet(context))

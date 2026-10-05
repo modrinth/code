@@ -52,6 +52,8 @@ export interface Issue {
 	message: WithContext<string>
 	/** Targets to change, resolved from current context. Omitted or empty facets require checkbox acknowledgment. */
 	facets?: WithContext<readonly IssueFacet[]>
+	/** Additional navigation destinations and field placement, independent of facet completion. Locations sharing a field with a facet reuse its button; a custom location label overrides the button label. */
+	locations?: WithContext<readonly Labrinth.Threads.v3.ThreadIssueLocation[]>
 	suggestedStatus?: WithContext<ModerationStatus | undefined>
 }
 

@@ -1,5 +1,5 @@
 <template>
-	<div v-if="matchingIssues.length" class="flex flex-col gap-2">
+	<div v-if="matchingIssues.length" :id="fieldAnchor" class="flex flex-col gap-2">
 		<div
 			v-for="issue in matchingIssues"
 			:key="issue.id"
@@ -59,37 +59,48 @@
 							class="flex w-full flex-wrap items-center justify-between gap-3"
 						>
 							<div
-								v-if="showProjectAreaLink && actionFacets(issue).length"
+								v-if="showProjectAreaLink && issueActions(issue).length"
 								class="flex flex-wrap gap-2"
 							>
 								<ButtonLink
-									v-for="facet in actionFacets(issue).slice(0, 2)"
-									:key="facet.id"
+									v-for="action in issueActions(issue).slice(0, 2)"
+									:key="action.id"
 									type="outlined"
-									:to="settingsLink(facet.what)"
+									:to="action.to"
 								>
-									<CheckIcon v-if="isFacetComplete(facet)" aria-hidden="true" />
-									<CircleIcon v-else class="size-4" aria-hidden="true" />
-									{{ targetButtonLabel(facet.what) }}
+									<CheckIcon v-if="action.complete === true" aria-hidden="true" />
+									<CircleIcon
+										v-else-if="action.complete === false"
+										class="size-4"
+										aria-hidden="true"
+									/>
+									{{ action.label }}
+									<ChevronRightIcon
+										v-if="action.complete === undefined"
+										class="size-3"
+										aria-hidden="true"
+									/>
 								</ButtonLink>
 								<TeleportOverflowMenu
-									v-if="actionFacets(issue).length > 2"
+									v-if="issueActions(issue).length > 2"
 									:label="formatMessage(messages.moreActions)"
 									:options="overflowOptions(issue)"
 									type="outlined"
 									:icon-only="false"
 									:tooltip="
-										actionFacets(issue)
+										issueActions(issue)
 											.slice(2)
-											.map((facet) => targetButtonLabel(facet.what))
+											.map((action) => action.label)
 											.join(', ')
 									"
 								>
-									+{{ actionFacets(issue).length - 2 }}
+									+{{ issueActions(issue).length - 2 }}
 								</TeleportOverflowMenu>
 							</div>
 							<Tooltip
-								v-if="!showProjectAreaLink || !actionFacets(issue).length"
+								v-if="
+									hasAcknowledgment(issue) || !showProjectAreaLink || !issueActions(issue).length
+								"
 								:disabled="allActionsComplete(issue) || isAddressed(issue)"
 								:text="formatMessage(messages.completeActionsFirst)"
 								class="ml-auto"
@@ -125,12 +136,17 @@ import type { Labrinth } from '@modrinth/api-client'
 import {
 	CheckCircleIcon,
 	CheckIcon,
+	ChevronRightIcon,
 	CircleIcon,
 	FoldVerticalIcon,
 	TriangleAlertIcon,
 	UnfoldVerticalIcon,
 } from '@modrinth/assets'
 import { IssuePriority, reviewPanels } from '@modrinth/moderation/src/data/issues'
+import {
+	issueLocationRegistry,
+	readIssueLocations,
+} from '@modrinth/moderation/src/data/issues/component-builders/locations'
 import { issueTargetLabels } from '@modrinth/moderation/src/data/issues/component-builders/targets'
 import type {
 	Issue,
@@ -154,7 +170,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, reactive } from 'vue'
 
 import FilledCheckIcon from './filled-check-icon.vue'
-import { threadIssueSettingsArea } from './issue-targets'
+import { threadIssueField, threadIssueSettingsArea } from './issue-targets'
 
 type ThreadIssue = Labrinth.Threads.v3.ThreadIssue
 type Target = Labrinth.Threads.v3.ThreadIssueTarget
@@ -162,6 +178,7 @@ const issueHeadingPattern = /^##[ \t]+([^\r\n]*)(?:\r?\n)?/m
 
 const props = defineProps<{
 	target?: Target['type'] | Target['type'][]
+	location?: Labrinth.Threads.v3.ThreadIssueLocation['field']
 	issues?: ThreadIssue[]
 	showProjectAreaLink?: boolean
 	platform?: string | string[]
@@ -227,6 +244,35 @@ const addressMutation = useMutation({
 		}),
 })
 
+const fieldAnchor = computed(() => {
+	if (typeof props.target !== 'string' || hasItemSelector()) return undefined
+	const field = threadIssueField({ type: props.target })
+	return field ? `project-issue-field-${field}` : undefined
+})
+
+function hasItemSelector(): boolean {
+	return (
+		props.platform !== undefined ||
+		props.versionId !== undefined ||
+		props.imageId !== undefined ||
+		props.userId !== undefined ||
+		props.teamId !== undefined ||
+		props.disclosureType !== undefined
+	)
+}
+
+function matchesLocation(issue: ThreadIssue): boolean {
+	const locations = readIssueLocations(issueDetails(issue).locations)
+	if (props.location) return locations.some(({ field }) => field === props.location)
+	if (hasItemSelector()) return false
+	const targets = Array.isArray(props.target) ? props.target : props.target ? [props.target] : []
+	return locations.some(({ field }) =>
+		targets.some(
+			(type) => threadIssueField({ type }) === field && issueLocationRegistry[field].inline,
+		),
+	)
+}
+
 function matchesTarget(what: Target): boolean {
 	const targets = Array.isArray(props.target) ? props.target : [props.target]
 	if (!targets.includes(what.type)) return false
@@ -279,7 +325,9 @@ const matchingIssues = computed(() =>
 		.filter(
 			(issue) =>
 				!issue.moderator_verified &&
-				(props.issues !== undefined || issue.facets.some(({ what }) => matchesTarget(what))),
+				(props.issues !== undefined ||
+					matchesLocation(issue) ||
+					issue.facets.some(({ what }) => matchesTarget(what))),
 		)
 		.sort((a, b) => issuePriority(a) - issuePriority(b)),
 )
@@ -309,14 +357,44 @@ function issueMessage(issue: ThreadIssue): string {
 	return typeof message === 'string' ? message.replace(issueHeadingPattern, '').trimStart() : ''
 }
 
-function actionFacets(issue: ThreadIssue): ThreadIssue['facets'] {
-	return issue.facets
-		.filter(({ what }) => what.type !== 'acknowledge')
-		.sort(
-			(a, b) =>
-				Number(isFacetComplete(a)) - Number(isFacetComplete(b)) ||
-				targetButtonLabel(a.what).localeCompare(targetButtonLabel(b.what)),
-		)
+interface IssueAction {
+	id: string
+	to: string
+	label: string
+	complete?: boolean
+}
+
+function issueActions(issue: ThreadIssue): IssueAction[] {
+	const locations = readIssueLocations(issueDetails(issue).locations)
+	const facets = issue.facets.filter(({ what }) => what.type !== 'acknowledge')
+	const facetFields = new Set(facets.map(({ what }) => threadIssueField(what)))
+	const actions: IssueAction[] = facets.map((facet) => {
+		const label = locations.find(({ field }) => field === threadIssueField(facet.what))?.label
+		return {
+			id: facet.id,
+			to: settingsLink(facet.what),
+			label: label ? formatMessage(label) : targetButtonLabel(facet.what),
+			complete: isFacetComplete(facet),
+		}
+	})
+	for (const location of locations) {
+		if (facetFields.has(location.field)) continue
+		const { area, label } = issueLocationRegistry[location.field]
+		const base = `/${project.value.project_type}/${project.value.id}/settings`
+		actions.push({
+			id: `location-${location.field}`,
+			to: area ? `${base}/${area}` : `${base}#project-issue-field-${location.field}`,
+			label: formatMessage(location.label ?? label),
+		})
+	}
+	return actions.sort(
+		(a, b) =>
+			Number(a.complete === true) - Number(b.complete === true) || a.label.localeCompare(b.label),
+	)
+}
+
+function hasAcknowledgment(issue: ThreadIssue): boolean {
+	return issue.facets.some(({ what }) => what.type === 'acknowledge')
 }
 
 function isFacetComplete(facet: ThreadIssue['facets'][number]): boolean {
@@ -392,14 +470,19 @@ function allActionsComplete(issue: ThreadIssue): boolean {
 }
 
 function overflowOptions(issue: ThreadIssue): ButtonMenuOption[] {
-	return actionFacets(issue)
+	return issueActions(issue)
 		.slice(2)
-		.map((facet) => ({
-			id: facet.id,
+		.map((action) => ({
+			id: action.id,
 			type: 'link',
-			label: targetButtonLabel(facet.what),
-			icon: isFacetComplete(facet) ? FilledCheckIcon : CircleIcon,
-			to: settingsLink(facet.what),
+			label: action.label,
+			icon:
+				action.complete === undefined
+					? ChevronRightIcon
+					: action.complete
+						? FilledCheckIcon
+						: CircleIcon,
+			to: action.to,
 		}))
 }
 

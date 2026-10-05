@@ -92,11 +92,12 @@ export function createReviewSubmission(
 		const selected: Labrinth.Threads.v3.NewThreadIssue[] = [...previousIssues.recreatedIssues.value]
 		const previousIds = previousIssues.associatedIssueIds.value
 		const titles = new Map(panels.availableIssues.value.map(({ id, title }) => [id, title]))
-		for (const { id, facets } of panels.activeIssues.value) {
+		for (const { id, facets, locations } of panels.activeIssues.value) {
 			if (previousIds.has(id)) continue
 			selected.push({
 				why: {
 					issue_id: id,
+					locations,
 					title: titles.get(id) ?? id,
 					message: messages.issueMessage(id),
 					selection: panels.issueSelection(id),

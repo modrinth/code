@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<ProjectIssueCard location="server" class="mb-4" />
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
 		<section class="universal-card">
 			<div class="flex flex-col gap-6">

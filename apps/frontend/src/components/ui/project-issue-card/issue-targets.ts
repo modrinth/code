@@ -1,19 +1,24 @@
 import type { Labrinth } from '@modrinth/api-client'
+import { issueLocationRegistry } from '@modrinth/moderation/src/data/issues/component-builders/locations'
 
 type Target = Labrinth.Threads.v3.ThreadIssueTarget
 
-export function threadIssueSettingsArea(target: Target): string {
+export function threadIssueField(
+	target: Pick<Target, 'type'>,
+): Labrinth.Threads.v3.ThreadIssueLocation['field'] | undefined {
 	switch (target.type) {
 		case 'modify_title':
+			return 'title'
 		case 'modify_slug':
+			return 'slug'
 		case 'modify_summary':
-			return ''
+			return 'summary'
 		case 'modify_description':
 			return 'description'
 		case 'modify_license':
 			return 'license'
 		case 'modify_icon':
-			return ''
+			return 'icon'
 		case 'remove_tags':
 			return 'tags'
 		case 'modify_links':
@@ -34,6 +39,11 @@ export function threadIssueSettingsArea(target: Target): string {
 		case 'modify_server_address':
 			return 'server'
 		case 'acknowledge':
-			return ''
+			return undefined
 	}
+}
+
+export function threadIssueSettingsArea(target: Target): string {
+	const field = threadIssueField(target)
+	return field ? issueLocationRegistry[field].area : ''
 }

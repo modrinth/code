@@ -10,6 +10,7 @@ import {
 import { isStaff } from '@modrinth/utils'
 import { computed } from 'vue'
 
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import ProjectPermissions from '~/components/ui/project-settings/modpack-permissions/ProjectPermissions.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
@@ -31,6 +32,7 @@ useProjectSettingsHeadTitle(commonProjectSettingsMessages.permissions)
 </script>
 
 <template>
+	<ProjectIssueCard location="permissions" class="mb-4" />
 	<ValidationMessage :check="permissionsValidation" class="mb-4" />
 	<ProjectPermissions
 		:project="project"

@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<ProjectIssueCard location="versions" class="mb-4" />
 		<CreateProjectVersionModal
 			v-if="currentMember"
 			ref="create-project-version-modal"

@@ -6,6 +6,7 @@ import invalidLinkCustomLicenseMessage from '../messages/checklist/messages/lice
 import noSourceMessage from '../messages/checklist/messages/license/no-source.md'
 import noSourceForkMessage from '../messages/checklist/messages/license/no-source-fork.md'
 import { issue, panel, section, toggle } from './component-builders/builders'
+import { issueLocation } from './component-builders/locations'
 import { issueTargets } from './component-builders/targets'
 
 export const licenseInvalidLinkIssue = issue({
@@ -23,6 +24,7 @@ export const licenseInvalidLinkIssue = issue({
 
 export const licenseNoSourceIssue = issue({
 	id: 'license-no-source',
+	locations: [issueLocation('links'), issueLocation('versions'), issueLocation('license')],
 	title: 'Missing source code',
 	category: 'License',
 	message: ({ selected }) =>

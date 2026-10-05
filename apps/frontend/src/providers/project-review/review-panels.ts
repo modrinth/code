@@ -627,6 +627,7 @@ export function createReviewPanels(
 				return {
 					id,
 					missing: [...new Set(missing)],
+					locations: [...(resolveWithContext(issue.locations, context) ?? [])],
 					facets: resolveIssueFacets(issue.facets, context),
 					issue: {
 						message: resolveWithContext(issue.message, context),
