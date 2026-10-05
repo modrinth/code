@@ -113,12 +113,21 @@
 				<h2 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.pronounsTitle) }}
 				</h2>
-				<Input
-					id="pronouns-field"
-					v-model="current.pronouns"
-					class="w-full max-w-md"
-					:error="current.pronouns.length > 40"
-				/>
+				<div class="flex items-center gap-2">
+					<Input
+						id="pronouns-field"
+						v-model="current.pronouns"
+						class="w-full max-w-md"
+						:error="current.pronouns.length > 20"
+					/>
+					<span
+						v-if="current.pronouns.length >= 15"
+						class="shrink-0 text-secondary"
+						:class="{ 'text-red': current.pronouns.length > 20 }"
+					>
+						{{ current.pronouns.length }}/20
+					</span>
+				</div>
 				<p class="m-0 text-secondary">
 					{{ formatMessage(messages.pronounsDescription) }}
 				</p>

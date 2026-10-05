@@ -951,6 +951,7 @@ pub struct EditUser {
     #[validate(length(max = 160))]
     pub venmo_handle: Option<String>,
     pub allow_friend_requests: Option<bool>,
+    #[validate(length(max = 20))]
     pub pronouns: Option<String>,
 }
 

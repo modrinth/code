@@ -225,6 +225,7 @@ pub struct EditUser {
     pub role: Option<Role>,
     pub badges: Option<Badges>,
     pub allow_friend_requests: Option<bool>,
+    #[validate(length(max = 20))]
     pub pronouns: Option<String>,
 }
 
