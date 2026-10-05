@@ -368,7 +368,7 @@ const messages = defineMessages({
 	},
 	pronounsDescription: {
 		id: 'settings.profile.pronouns.description',
-		defaultMessage: 'Pronouns dec placeholder',
+		defaultMessage: 'Your pronouns!',
 	},
 	bioTitle: {
 		id: 'settings.profile.bio.title',
