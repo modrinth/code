@@ -1,15 +1,8 @@
 use crate::database::PgPool;
-use crate::util::error::Context as _;
 use actix_web::{HttpResponse, post, web};
 use ariadne::ids::UserId;
-use chrono::Utc;
 use serde::{Deserialize, Serialize};
-use tracing::warn;
 
-use crate::database::models::users_redeemals::{
-    Offer, RedeemalLookupFields, Status, UserRedeemal,
-};
-use crate::queue::billing::try_process_user_redeemal;
 use crate::routes::ApiError;
 use crate::util::guards::medal_key_guard;
 use xredis::RedisPool;
@@ -20,6 +13,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 
 #[derive(Deserialize)]
 struct MedalQuery {
+    #[expect(dead_code, reason = "medal offer is currently disabled")]
     username: String,
 }
 
@@ -37,12 +31,12 @@ struct VerifyResponse {
 )]
 #[post("/verify", guard = "medal_key_guard")]
 pub async fn verify(
-    pool: web::Data<PgPool>,
-    web::Query(MedalQuery { username }): web::Query<MedalQuery>,
+    _pool: web::Data<PgPool>,
+    web::Query(MedalQuery { username: _ }): web::Query<MedalQuery>,
 ) -> Result<HttpResponse, ApiError> {
-    return Err(ApiError::Request(eyre::eyre!(
+    Err(ApiError::Request(eyre::eyre!(
         "This offer is no longer available"
-    )));
+    )))
 
     /*
     let maybe_fields =
@@ -79,9 +73,9 @@ pub async fn redeem(
     // Check the offer hasn't been redeemed yet, then insert into the table.
     // In a transaction to avoid double inserts.
 
-    return Err(ApiError::Request(eyre::eyre!(
+    Err(ApiError::Request(eyre::eyre!(
         "This offer is no longer available"
-    )));
+    )))
 
     /*
     let mut txn = pool
