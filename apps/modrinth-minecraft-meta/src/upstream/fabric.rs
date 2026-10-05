@@ -93,10 +93,7 @@ pub struct GameLoaderProfile {
     pub id: String,
 }
 
-pub async fn download(
-    cx: &mut DownloadRunContext<'_>,
-    errors: &mut ErrorVec,
-) -> Result<()> {
+pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
     /// See `README.md` for an explanation of what we're doing here.
     const GAME_VERSION: &str = "1.21";
 

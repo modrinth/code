@@ -109,10 +109,7 @@ pub struct GameLoaderProfile {
     pub id: String,
 }
 
-pub async fn download(
-    cx: &mut DownloadRunContext<'_>,
-    errors: &mut ErrorVec,
-) -> Result<()> {
+pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
     let catalog = cx
         .download_json::<Catalog>(CATALOG_URL)
         .context(info_span!("fetching catalog"))

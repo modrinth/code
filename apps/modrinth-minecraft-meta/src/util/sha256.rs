@@ -25,6 +25,12 @@ impl fmt::Debug for Sha256 {
     }
 }
 
+impl fmt::Display for Sha256 {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&hex::encode(self.0))
+    }
+}
+
 impl Serialize for Sha256 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where

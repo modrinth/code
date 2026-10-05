@@ -6,15 +6,15 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    dotenvy::dotenv().ok();
     tracing_subscriber::registry()
         .with(tracing_anyhow::ErrorLayer::default())
         .init();
 
-    let config = toasty_cli::Config::load_from(Path::new(
-        "apps/modrinth-minecraft-meta/Toasty.toml",
-    ))?;
-    let db = modrinth_minecraft_meta::connect_to_db().await?;
-    let cli = ToastyCli::with_config(db, config);
+    let toasty_config = toasty_cli::Config::new();
+    let app_config = modrinth_minecraft_meta::create_config()?;
+    let db = modrinth_minecraft_meta::connect_to_db(&app_config).await?;
+    let cli = ToastyCli::with_config(db, toasty_config);
     cli.parse_and_run().await?;
     Ok(())
 }

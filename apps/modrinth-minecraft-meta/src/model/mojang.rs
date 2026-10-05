@@ -1,17 +1,21 @@
 use toasty::{Embed, Model};
 use uuid::Uuid;
 
-use crate::model::{DownloadBlob, DownloadBlobId};
+use crate::{
+    model::{DownloadRun, DownloadRunId},
+    util::Sha256,
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Embed)]
-pub struct MinecraftVersionId(pub Uuid);
+pub struct MojangCatalogId(pub Uuid);
 
 #[derive(Debug, Clone, Model)]
-pub struct MinecraftVersion {
+pub struct MojangCatalog {
     #[key]
     #[auto]
-    pub id: MinecraftVersionId,
-    pub source_blob_id: DownloadBlobId,
+    pub id: MojangCatalogId,
+    pub download_run_id: DownloadRunId,
     #[belongs_to]
-    pub source_blob: toasty::Deferred<DownloadBlob>,
+    pub download_run: toasty::Deferred<DownloadRun>,
+    pub sha256: Sha256,
 }

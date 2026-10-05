@@ -2,7 +2,7 @@
 //! and export artifacts.
 
 mod download;
-mod prune;
+mod extract_installers;
 
 pub use download::*;
-pub use prune::*;
+pub use extract_installers::*;

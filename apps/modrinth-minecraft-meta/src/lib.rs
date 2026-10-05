@@ -1,6 +1,7 @@
 use std::time::Duration;
 
 use anyhow::{Context, Result};
+use figment::Figment;
 use toasty::migration::MigrationSet;
 use tracing::{info, info_span, level_filters::LevelFilter};
 use tracing_anyhow::FutureContext;
@@ -8,8 +9,12 @@ use tracing_subscriber::{
     EnvFilter, Layer, layer::SubscriberExt, util::SubscriberInitExt,
 };
 
+use crate::{config::Config, store::BlobStore};
+
+mod config;
 mod export;
 mod model;
+mod store;
 mod task;
 mod upstream;
 mod util;
@@ -40,19 +45,6 @@ enum Command {
         #[arg(long)]
         quilt: bool,
     },
-    /// Delete old or unreachable objects in the database
-    Prune {
-        /// Don't commit the database transaction
-        #[arg(long)]
-        dry_run: bool,
-        /// How many of the last download runs to keep, sorted by time when
-        /// the run was started.
-        ///
-        /// Any download runs older than this will be deleted, and its entities
-        /// will be garbage collected.
-        #[arg(long)]
-        keep_last_runs: Option<usize>,
-    },
 }
 
 #[derive(Debug, Clone, Copy, clap::ValueEnum)]
@@ -67,6 +59,7 @@ enum Upstream {
 pub async fn main() -> Result<()> {
     static MIGRATIONS: MigrationSet = toasty::embed_migrations!();
 
+    dotenvy::dotenv().ok();
     let cli = <Cli as clap::Parser>::parse();
     tracing_subscriber::registry()
         .with(tracing_anyhow::ErrorLayer::default())
@@ -85,20 +78,25 @@ pub async fn main() -> Result<()> {
         )
         .init();
 
-    let db = connect_to_db().await?;
+    let config = create_config()?;
+
+    let http = reqwest::Client::builder()
+        .timeout(Duration::from_secs(30))
+        .build()
+        .context("building HTTP client")?;
+
+    let db = connect_to_db(&config).await?;
     let report = MIGRATIONS
         .apply(&db)
         .context(info_span!("applying migrations"))
         .await?;
     info!("applied {} migrations", report.applied());
 
-    let state = AppState {
-        http: reqwest::Client::builder()
-            .timeout(Duration::from_secs(30))
-            .build()
-            .context("building HTTP client")?,
-        db,
-    };
+    let blobs = BlobStore::new(&config)
+        .context(info_span!("creating blob store"))
+        .await?;
+
+    let state = AppState { http, blobs, db };
 
     match cli.command {
         Command::Download {
@@ -119,10 +117,6 @@ pub async fn main() -> Result<()> {
             };
             task::download_from_upstreams(&state, upstreams).await
         }
-        Command::Prune {
-            dry_run,
-            keep_last_runs,
-        } => task::prune(&state, dry_run, keep_last_runs).await,
     }
 }
 
@@ -130,15 +124,20 @@ pub async fn main() -> Result<()> {
 struct AppState {
     http: reqwest::Client,
     db: toasty::Db,
+    blobs: BlobStore,
 }
 
-pub async fn connect_to_db() -> Result<toasty::Db> {
-    let db_url =
-        "postgresql://launchermeta:launchermeta@localhost:5433/launchermeta"
-            .to_string();
+pub fn create_config() -> Result<Config> {
+    Figment::new()
+        .merge(figment::providers::Env::prefixed("MR_").split("__"))
+        .extract::<Config>()
+        .context("parsing config")
+}
+
+pub async fn connect_to_db(config: &Config) -> Result<toasty::Db> {
     toasty::Db::builder()
         .models(toasty::models!(crate::*))
-        .connect(&db_url)
+        .connect(config.database_url.as_str())
         .context(info_span!("connecting to database"))
         .await
 }

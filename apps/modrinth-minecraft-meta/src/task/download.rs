@@ -1,6 +1,7 @@
 use std::any::type_name;
 
 use anyhow::{Context, Result, anyhow};
+use bon::bon;
 use jiff::Timestamp;
 use reqwest::IntoUrl;
 use serde::de::DeserializeOwned;
@@ -10,8 +11,9 @@ use tracing_anyhow::FutureContext;
 use crate::{
     AppState,
     model::{self, DownloadRunId},
+    store::BlobStore,
     upstream,
-    util::{ErrorVec, Sha256, json_from_str, json_from_value},
+    util::{ErrorVec, Sha1, Sha256, from_json_str, from_json_value},
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -35,6 +37,14 @@ impl Default for Upstreams {
     }
 }
 
+pub struct DownloadRunContext<'cx> {
+    pub http: &'cx reqwest::Client,
+    pub blobs: &'cx BlobStore,
+    pub conn: &'cx mut toasty::Connection,
+    pub download_run_id: DownloadRunId,
+    pub errors: ErrorVec,
+}
+
 pub async fn download_from_upstreams(
     state: &AppState,
     upstreams: Upstreams,
@@ -53,56 +63,52 @@ pub async fn download_from_upstreams(
     .await?;
     info!(?download_run.id, "starting download run");
 
-    let mut errors = ErrorVec::new();
     let mut cx = DownloadRunContext {
         http: &state.http,
+        blobs: &state.blobs,
         conn: &mut conn,
         download_run_id: download_run.id,
+        errors: ErrorVec::new(),
     };
 
     if upstreams.mojang {
-        upstream::mojang::download(&mut cx, &mut errors)
+        let result = upstream::mojang::download(&mut cx)
             .context(info_span!("downloading Mojang upstream"))
-            .await
-            .inspect_err(|err| errors.push(err))
-            .ok();
+            .await;
+        result.inspect_err(|err| cx.errors.push(err)).ok();
     }
 
-    if upstreams.fabric {
-        upstream::fabric::download(&mut cx, &mut errors)
-            .context(info_span!("downloading Fabric upstream"))
-            .await
-            .inspect_err(|err| errors.push(err))
-            .ok();
-    }
-
-    if upstreams.forge {
-        upstream::forge::download(&mut cx, &mut errors)
-            .context(info_span!("downloading Forge upstream"))
-            .await
-            .inspect_err(|err| errors.push(err))
-            .ok();
-    }
-
-    if upstreams.neoforge {
-        upstream::neoforge::download(&mut cx, &mut errors)
-            .context(info_span!("downloading NeoForge upstream"))
-            .await
-            .inspect_err(|err| errors.push(err))
-            .ok();
-    }
-
-    if upstreams.quilt {
-        upstream::quilt::download(&mut cx, &mut errors)
-            .context(info_span!("downloading Quilt upstream"))
-            .await
-            .inspect_err(|err| errors.push(err))
-            .ok();
-    }
+    //     if upstreams.fabric {
+    //         let result = upstream::fabric::download(&mut cx)
+    //             .context(info_span!("downloading Fabric upstream"))
+    //             .await;
+    //         result.inspect_err(|err| cx.errors.push(err)).ok();
+    //     }
+    //
+    //     if upstreams.forge {
+    //         let result = upstream::forge::download(&mut cx)
+    //             .context(info_span!("downloading Forge upstream"))
+    //             .await;
+    //         result.inspect_err(|err| cx.errors.push(err)).ok();
+    //     }
+    //
+    //     if upstreams.neoforge {
+    //         let result = upstream::neoforge::download(&mut cx)
+    //             .context(info_span!("downloading NeoForge upstream"))
+    //             .await;
+    //         result.inspect_err(|err| cx.errors.push(err)).ok();
+    //     }
+    //
+    //     if upstreams.quilt {
+    //         let result = upstream::quilt::download(&mut cx)
+    //             .context(info_span!("downloading Quilt upstream"))
+    //             .await;
+    //         result.inspect_err(|err| cx.errors.push(err)).ok();
+    //     }
 
     toasty::update!(download_run {
         completed_at: Timestamp::now(),
-        errors: toasty::Json(errors),
+        errors: toasty::Json(cx.errors),
     })
     .exec(&mut conn)
     .context(info_span!("marking download run as completed"))
@@ -111,52 +117,86 @@ pub async fn download_from_upstreams(
     Ok(())
 }
 
-pub struct DownloadRunContext<'cx> {
-    pub http: &'cx reqwest::Client,
-    pub conn: &'cx mut toasty::Connection,
-    pub download_run_id: DownloadRunId,
-}
-
+#[bon]
 impl DownloadRunContext<'_> {
+    #[builder]
+    pub async fn download_blob(
+        &mut self,
+        skip_if_sha256: Option<Sha256>,
+        skip_if_sha1: Option<Sha1>,
+        url: impl IntoUrl,
+    ) -> Result<Sha256> {
+        let mut query = model::BlobHash::all();
+        if let Some(sha256) = skip_if_sha256 {
+            query = query.filter_by_sha256(sha256);
+        }
+        if let Some(sha1) = skip_if_sha1 {
+            query = query.filter_by_sha1(sha1);
+        }
+        let existing = query
+            .exec(self.conn)
+            .context(info_span!("checking if blob already exists"))
+            .await?
+            .into_iter()
+            .next();
+        if let Some(existing) = existing {
+            return Ok(existing.sha256);
+        }
+
+        let url = url.into_url().context("converting to URL")?;
+        let bytes =
+            async { self.http.get(url.clone()).send().await?.bytes().await }
+                .context(info_span!("fetching bytes"))
+                .await?;
+
+        let sha256 = self.insert_blob(url.as_str(), &bytes).await?;
+        Ok(sha256)
+    }
+
     pub async fn download_json<T: DeserializeOwned>(
         &mut self,
         url: impl IntoUrl,
-    ) -> Result<T> {
+    ) -> Result<(T, Sha256)> {
         let url = url.into_url().context("converting to URL")?;
         let text =
             async { self.http.get(url.clone()).send().await?.text().await }
                 .context(info_span!("fetching text"))
                 .await?;
-        let sha256 = Sha256::from_digest(text.as_bytes());
-        let json = json_from_str::<serde_json::Value>(&text)
+        let json = from_json_str::<serde_json::Value>(&text)
             .context("text is not valid JSON")?;
 
+        let sha256 = self.insert_blob(url.as_str(), text.as_bytes()).await?;
+
+        let t = from_json_value::<T>(&json)
+            .with_context(|| anyhow!("parsing as `{}`", type_name::<T>()))?;
+        Ok((t, sha256))
+    }
+
+    async fn insert_blob(&mut self, url: &str, data: &[u8]) -> Result<Sha256> {
         let mut txn = self
             .conn
             .transaction()
             .context(info_span!("starting transaction"))
             .await?;
 
-        model::JsonBlob::upsert_by_sha256(sha256)
-            .json(json.clone())
-            .or_ignore()
-            .exec(&mut txn)
-            .context(info_span!("inserting `JsonBlob`"))
+        let sha256 = self
+            .blobs
+            .put(&mut txn, data)
+            .context(info_span!("storing blob"))
             .await?;
-        toasty::create!(model::DownloadBlob {
+        toasty::create!(model::BlobDownload {
             download_run_id: self.download_run_id,
-            url: url.to_string(),
             sha256,
+            url,
         })
         .exec(&mut txn)
-        .context(info_span!("inserting `DownloadBlob`"))
+        .context(info_span!("inserting blob download"))
         .await?;
 
         txn.commit()
             .context(info_span!("committing transaction"))
             .await?;
 
-        json_from_value::<T>(&json)
-            .with_context(|| anyhow!("parsing as `{}`", type_name::<T>()))
+        Ok(sha256)
     }
 }

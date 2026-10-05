@@ -21,10 +21,7 @@ pub struct Catalog {
 )]
 pub struct VersionName(pub String);
 
-pub async fn download(
-    cx: &mut DownloadRunContext<'_>,
-    _errors: &mut ErrorVec,
-) -> Result<()> {
+pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
     let forge_catalog = cx
         .download_json::<Catalog>(FORGE_CATALOG_URL)
         .context(info_span!("fetching Forge catalog"))

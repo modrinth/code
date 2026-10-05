@@ -88,6 +88,7 @@ directories = "6.0.0"
 dirs = "6.0.0"
 discord-rich-presence = "1.0.0"
 dotenv-build = "0.1.1"
+figment = { version = "0.10.19" }
 dotenvy = "0.15.7"
 dunce = "1.0.5"
 either = "1.15.0"
