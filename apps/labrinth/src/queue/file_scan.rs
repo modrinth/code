@@ -1233,34 +1233,34 @@ where
 
     let rows = sqlx::query!(
         r#"
-        with problem_groups as (
-            select pag.id, pag.project_id, pag.flame_project
-            from project_attribution_groups pag
-            where pag.project_id = ANY($2)
-              and (
-                pag.attribution is null
-                or pag.attribution->>'kind' = 'no_permission'
-                or coalesce(
+        WITH problem_groups AS (
+            SELECT pag.id, pag.project_id, pag.flame_project
+            FROM project_attribution_groups pag
+            WHERE pag.project_id = ANY($2)
+              AND (
+                pag.attribution IS NULL
+                OR pag.attribution->>'kind' = 'no_permission'
+                OR COALESCE(
                   pag.attribution->'moderation_status'->>'kind',
                   'approved'
                 ) != 'approved'
               )
-              and not exists (
-                select 1
-                from attributions_exemptions ae
-                where ae.project_id = pag.project_id
+              AND NOT EXISTS (
+                SELECT 1
+                FROM attributions_exemptions ae
+                WHERE ae.project_id = pag.project_id
               )
         )
-        select distinct f.version_id as "version_id!: DBVersionId", f.id as "file_id!: DBFileId",
-            pg.flame_project as "flame_project?"
-        from problem_groups pg
-        inner join project_attribution_files paf on paf.group_id = pg.id
-        inner join override_file_sources ofs on ofs.sha1 = paf.sha1
-        inner join files f on f.id = ofs.file_id
-        inner join versions v on v.id = f.version_id and v.mod_id = pg.project_id
-        inner join attribution_enforced_versions aev on aev.id = f.version_id
-        where exists (select 1 from problem_groups)
-          and f.version_id = ANY($1)
+        SELECT DISTINCT f.version_id AS "version_id!: DBVersionId", f.id AS "file_id!: DBFileId",
+            pg.flame_project AS "flame_project?"
+        FROM problem_groups pg
+        INNER JOIN project_attribution_files paf ON paf.group_id = pg.id
+        INNER JOIN override_file_sources ofs ON ofs.sha1 = paf.sha1
+        INNER JOIN files f ON f.id = ofs.file_id
+        INNER JOIN versions v ON v.id = f.version_id AND v.mod_id = pg.project_id
+        INNER JOIN attribution_enforced_versions aev ON aev.id = f.version_id
+        WHERE EXISTS (SELECT 1 FROM problem_groups)
+          AND f.version_id = ANY($1)
         "#,
         &versions.iter().map(|(v, _)| v.0).collect::<Vec<_>>(),
         &versions

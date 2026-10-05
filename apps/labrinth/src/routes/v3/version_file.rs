@@ -594,38 +594,38 @@ async fn update_files_internal(
         FROM mods m
         CROSS JOIN LATERAL (
             SELECT
-                $7::bool
+                $7::BOOL
                 OR EXISTS (
                     SELECT 1 FROM team_members tm
-                    WHERE tm.team_id = m.team_id AND tm.user_id = $8::bigint
+                    WHERE tm.team_id = m.team_id AND tm.user_id = $8::BIGINT
                 )
                 OR EXISTS (
                     SELECT 1 FROM organizations o
                     INNER JOIN team_members tm ON tm.team_id = o.team_id
-                    WHERE o.id = m.organization_id AND tm.user_id = $8::bigint
+                    WHERE o.id = m.organization_id AND tm.user_id = $8::BIGINT
                 ) AS full_access
         ) access
         CROSS JOIN LATERAL (
             SELECT v.id
             FROM versions v
             WHERE v.mod_id = m.id
-                AND (cardinality($4::varchar[]) = 0 OR v.version_type = ANY($4))
+                AND (CARDINALITY($4::VARCHAR[]) = 0 OR v.version_type = ANY($4))
                 AND EXISTS (
                     SELECT 1 FROM version_fields vf
                     INNER JOIN loader_field_enum_values lfev ON lfev.id = vf.enum_value
                     WHERE vf.version_id = v.id AND vf.field_id = 3
-                        AND (cardinality($2::varchar[]) = 0 OR lfev.value = ANY($2))
+                        AND (CARDINALITY($2::VARCHAR[]) = 0 OR lfev.value = ANY($2))
                 )
                 AND EXISTS (
                     SELECT 1 FROM loaders_versions lv
                     INNER JOIN loaders l ON l.id = lv.loader_id
                     WHERE lv.version_id = v.id
-                        AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3))
+                        AND (CARDINALITY($3::VARCHAR[]) = 0 OR l.loader = ANY($3))
                 )
                 AND (
                     access.full_access
                     OR (
-                        v.status = ANY($5::varchar[])
+                        v.status = ANY($5::VARCHAR[])
                         AND NOT EXISTS (
                             SELECT 1
                             FROM project_attribution_groups pag
@@ -638,7 +638,7 @@ async fn update_files_internal(
                                 AND (
                                     pag.attribution IS NULL
                                     OR pag.attribution->>'kind' = 'no_permission'
-                                    OR coalesce(pag.attribution->'moderation_status'->>'kind', 'approved') != 'approved'
+                                    OR COALESCE(pag.attribution->'moderation_status'->>'kind', 'approved') != 'approved'
                                 )
                         )
                     )
@@ -647,7 +647,7 @@ async fn update_files_internal(
             LIMIT 1
         ) latest
         WHERE m.id = ANY($1)
-            AND (access.full_access OR m.status = ANY($6::varchar[]))
+            AND (access.full_access OR m.status = ANY($6::VARCHAR[]))
         "#,
         &files.iter().map(|x| x.project_id.0).collect::<Vec<_>>(),
         &update_data.game_versions.clone().unwrap_or_default(),
@@ -860,18 +860,18 @@ async fn get_latest_matching_versions(
     let rows = sqlx::query!(
         r#"
         SELECT q.hash AS "hash!", latest.id AS "version_id!"
-        FROM jsonb_to_recordset($1::jsonb) AS q(
-            hash text,
-            project_id bigint,
-            loaders varchar[],
-            version_types varchar[],
-            loader_fields jsonb
+        FROM JSONB_TO_RECORDSET($1::JSONB) AS q(
+            hash TEXT,
+            project_id BIGINT,
+            loaders VARCHAR[],
+            version_types VARCHAR[],
+            loader_fields JSONB
         )
         CROSS JOIN LATERAL (
             SELECT v.id
             FROM versions v
             WHERE v.mod_id = q.project_id
-                AND v.status = ANY($2::varchar[])
+                AND v.status = ANY($2::VARCHAR[])
                 AND (q.version_types IS NULL OR v.version_type = ANY(q.version_types))
                 AND (
                     q.loaders IS NULL
@@ -883,7 +883,7 @@ async fn get_latest_matching_versions(
                 )
                 AND NOT EXISTS (
                     SELECT 1
-                    FROM jsonb_each(q.loader_fields) AS req(field, vals)
+                    FROM JSONB_EACH(q.loader_fields) AS req(field, vals)
                     INNER JOIN loader_fields lf ON lf.field = req.field
                     WHERE EXISTS (
                         SELECT 1 FROM loaders_versions lv
@@ -893,7 +893,7 @@ async fn get_latest_matching_versions(
                     AND (
                         lf.field_type IN ('array_integer', 'array_text', 'array_boolean', 'array_enum')
                         OR (
-                            SELECT count(*) FROM version_fields vf
+                            SELECT COUNT(*) FROM version_fields vf
                             WHERE vf.version_id = v.id AND vf.field_id = lf.id
                         ) = 1
                     )
@@ -901,17 +901,17 @@ async fn get_latest_matching_versions(
                         SELECT 1
                         FROM version_fields vf
                         LEFT JOIN loader_field_enum_values lfev ON lfev.id = vf.enum_value
-                        CROSS JOIN jsonb_array_elements(req.vals) AS want(val)
+                        CROSS JOIN JSONB_ARRAY_ELEMENTS(req.vals) AS want(val)
                         WHERE vf.version_id = v.id AND vf.field_id = lf.id
                             AND CASE
                                 WHEN lf.field_type IN ('enum', 'array_enum')
-                                    THEN jsonb_typeof(want.val) = 'string' AND lfev.value = want.val #>> '{}'
+                                    THEN JSONB_TYPEOF(want.val) = 'string' AND lfev.value = want.val #>> '{}'
                                 WHEN lf.field_type IN ('text', 'array_text')
-                                    THEN jsonb_typeof(want.val) = 'string' AND vf.string_value = want.val #>> '{}'
+                                    THEN JSONB_TYPEOF(want.val) = 'string' AND vf.string_value = want.val #>> '{}'
                                 WHEN lf.field_type IN ('integer', 'array_integer')
-                                    THEN jsonb_typeof(want.val) = 'number' AND vf.int_value = (want.val #>> '{}')::numeric
+                                    THEN JSONB_TYPEOF(want.val) = 'number' AND vf.int_value = (want.val #>> '{}')::NUMERIC
                                 WHEN lf.field_type IN ('boolean', 'array_boolean')
-                                    THEN jsonb_typeof(want.val) = 'boolean' AND (vf.int_value <> 0) = (want.val #>> '{}')::boolean
+                                    THEN JSONB_TYPEOF(want.val) = 'boolean' AND (vf.int_value <> 0) = (want.val #>> '{}')::BOOLEAN
                             END
                     )
                 )
