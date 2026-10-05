@@ -3,6 +3,7 @@ use super::sync_content_files::{
 };
 use crate::State;
 use crate::pack::install_from::{PackFileHash, PackFormat};
+use crate::state::content_store::content_file_path;
 use crate::state::instances::adapters::sqlite;
 use crate::state::instances::{
     ContentEntry, ContentSet, ContentSourceKind, Instance,
@@ -874,6 +875,7 @@ async fn content_projects_for_scope_inner(
         output.insert(
             file.relative_path.clone(),
             ContentFile {
+                on_disk_path: content_file_path(&file),
                 update_version_id,
                 hash: file.sha1,
                 file_name: file.file_name,
@@ -994,7 +996,7 @@ async fn content_files_to_content_items(
     let instance_path = state.directories.instances_dir().join(&instance.path);
     let paths = files
         .iter()
-        .map(|(path, _)| instance_path.join(path))
+        .map(|(_, file)| instance_path.join(&file.on_disk_path))
         .collect::<Vec<_>>();
     let modification_times: Vec<Option<String>> =
         tokio::task::spawn_blocking(move || {
@@ -1239,7 +1241,7 @@ fn content_item_project(project: &Project) -> ContentItemProject {
     }
 }
 
-pub(super) fn file_metadata_from_entry_or_cache(
+fn file_metadata_from_entry_or_cache(
     entry: Option<&ContentEntry>,
     cached: Option<CachedFile>,
 ) -> Option<crate::state::FileMetadata> {

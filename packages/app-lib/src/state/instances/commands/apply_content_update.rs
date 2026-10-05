@@ -4,11 +4,12 @@ use crate::install::{
     InstallProgressSecondary,
 };
 use crate::state::instances::{
-    ContentSet, ContentSourceKind,
+	ContentEntry, ContentSet, ContentSourceKind, InstanceFile,
     adapters::sqlite::{content_rows, instance_rows},
 };
 use crate::state::{
-    CacheBehaviour, CachedEntry, Dependency, DependencyType, State, Version,
+    CacheBehaviour, CachedEntry, CachedFile, Dependency, DependencyType, State,
+    Version,
 };
 use crate::util::fetch::DownloadReason;
 use futures::stream::{self, StreamExt};
@@ -592,44 +593,56 @@ async fn installed_projects(
         .collect::<HashMap<_, _>>();
     let files =
         content_rows::get_instance_files(&instance.id, &state.pool).await?;
-
     let hashes = files
         .iter()
         .map(|file| file.sha1.as_str())
         .collect::<Vec<_>>();
-    let file_info_by_hash = CachedEntry::get_file_many(
+    let file_info = CachedEntry::get_file_many(
         &hashes,
         Some(CacheBehaviour::MustRevalidate),
         &state.pool,
         &state.api_semaphore,
     )
-    .await?
-    .into_iter()
-    .map(|file| (file.hash.clone(), file))
-    .collect::<HashMap<_, _>>();
+    .await?;
+    let file_info_by_hash = file_info
+        .into_iter()
+        .map(|file| (file.hash.clone(), file))
+        .collect::<HashMap<_, _>>();
 
     Ok(files
         .into_iter()
         .filter(|file| !file.missing)
         .filter_map(|file| {
             let entry = entries_by_file_id.get(file.id.as_str()).copied();
-            let metadata =
-                super::list_content::file_metadata_from_entry_or_cache(
-                    entry,
-                    file_info_by_hash.get(&file.sha1).cloned(),
-                )?;
-            Some(InstalledProject {
-                relative_path: file.relative_path,
-                project_id: Some(metadata.project_id),
-                version_id: Some(metadata.version_id),
-                source_kind: entry.map_or(ContentSourceKind::Local, |entry| {
-                    entry.source_kind
-                }),
-                enabled: file.enabled
-                    && entry.is_none_or(|entry| entry.enabled),
-            })
+            let metadata = file_info_by_hash.get(&file.sha1);
+            installed_project_from_row(&file, entry, metadata)
         })
         .collect())
+}
+
+fn installed_project_from_row(
+    file: &InstanceFile,
+    entry: Option<&ContentEntry>,
+    cached: Option<&CachedFile>,
+) -> Option<InstalledProject> {
+    let project_id = entry
+        .and_then(|entry| entry.project_id.clone())
+        .or_else(|| cached.map(|file| file.project_id.clone()));
+    let version_id = entry
+        .and_then(|entry| entry.version_id.clone())
+        .or_else(|| cached.map(|file| file.version_id.clone()));
+    if project_id.is_none() && version_id.is_none() {
+        return None;
+    }
+
+    Some(InstalledProject {
+        relative_path: file.relative_path.clone(),
+        project_id,
+        version_id,
+        source_kind: entry
+            .map_or(ContentSourceKind::Local, |entry| entry.source_kind),
+        enabled: entry.is_none_or(|entry| entry.enabled) && file.enabled,
+    })
 }
 
 async fn is_shared_instance_member(
