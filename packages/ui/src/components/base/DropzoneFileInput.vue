@@ -25,7 +25,7 @@
 		</div>
 
 		<div class="flex flex-col items-center justify-center gap-1 text-contrast text-center">
-			<div class="text-contrast font-medium text-pretty">
+			<div v-if="primaryPrompt" class="text-contrast font-medium text-pretty">
 				{{ primaryPrompt }}
 			</div>
 			<span class="text-primary text-sm text-pretty">
@@ -39,7 +39,7 @@
 			:multiple="multiple"
 			:accept="accept"
 			:disabled="disabled"
-			class="hidden"
+			class="sr-only"
 			@change="handleChange"
 		/>
 	</label>

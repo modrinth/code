@@ -941,6 +941,48 @@
   "creation-flow.button.setup-server": {
     "defaultMessage": "Setup server"
   },
+  "creation-flow.curseforge.description": {
+    "defaultMessage": "Use a modpack that isn’t available on Modrinth."
+  },
+  "creation-flow.curseforge.file-description": {
+    "defaultMessage": "You’ll need the regular modpack file, and can optionally add a server pack after if we can’t find one."
+  },
+  "creation-flow.curseforge.file-label": {
+    "defaultMessage": "CurseForge Modpack file"
+  },
+  "creation-flow.curseforge.installation-unavailable": {
+    "defaultMessage": "CurseForge installation is not available yet."
+  },
+  "creation-flow.curseforge.invalid-link": {
+    "defaultMessage": "Enter a CurseForge Minecraft modpack or modpack version link."
+  },
+  "creation-flow.curseforge.link-description": {
+    "defaultMessage": "You can use a link to a modpack or a specific modpack version."
+  },
+  "creation-flow.curseforge.link-label": {
+    "defaultMessage": "CurseForge modpack link"
+  },
+  "creation-flow.curseforge.or-upload": {
+    "defaultMessage": "Or upload it yourself"
+  },
+  "creation-flow.curseforge.remove-file": {
+    "defaultMessage": "Remove {filename}"
+  },
+  "creation-flow.curseforge.selected-file-label": {
+    "defaultMessage": "Modpack file"
+  },
+  "creation-flow.curseforge.server-pack-description": {
+    "defaultMessage": "You can optionally add a server pack to make it easier to determine what needs to be installed on the server."
+  },
+  "creation-flow.curseforge.server-pack-label": {
+    "defaultMessage": "Server pack <optional>(optional)</optional>"
+  },
+  "creation-flow.curseforge.title": {
+    "defaultMessage": "Upload a CurseForge modpack"
+  },
+  "creation-flow.curseforge.upload-prompt": {
+    "defaultMessage": "Drag and drop file or click to browse"
+  },
   "creation-flow.modal.custom-setup.build-number.label": {
     "defaultMessage": "Build number"
   },
@@ -5326,6 +5368,15 @@
   },
   "servers.admonitions.background-task-running": {
     "defaultMessage": "Background task running"
+  },
+  "servers.admonitions.curseforge-files.body": {
+    "defaultMessage": "We couldn’t determine where {count, plural, one {# file} other {# files}} from your modpack should be installed, so we’ve enabled them for both the server and players. Review them, as files that don’t belong on the server may prevent it from starting."
+  },
+  "servers.admonitions.curseforge-files.review": {
+    "defaultMessage": "Review files"
+  },
+  "servers.admonitions.curseforge-files.title": {
+    "defaultMessage": "Review where these files should be installed"
   },
   "servers.audit-log.actor.support": {
     "defaultMessage": "Support"

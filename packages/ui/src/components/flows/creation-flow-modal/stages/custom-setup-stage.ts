@@ -24,6 +24,7 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	stageContent: markRaw(CustomSetupStage),
 	skip: (ctx) =>
 		ctx.setupType.value === 'modpack' ||
+		ctx.setupType.value === 'curseforge' ||
 		ctx.setupType.value === 'vanilla' ||
 		ctx.isImportMode.value,
 	cannotNavigateForward: isForwardBlocked,
