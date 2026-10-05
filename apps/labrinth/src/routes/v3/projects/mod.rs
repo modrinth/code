@@ -648,7 +648,11 @@ pub async fn project_edit_internal(
                 sqlx::query!(
                     "
                     UPDATE mods
-                    SET moderation_message = NULL, moderation_message_body = NULL, queued = NOW()
+                    SET
+                        moderation_message = NULL,
+                        moderation_message_body = NULL,
+                        queued = NOW(),
+                        initial_queued = COALESCE(initial_queued, NOW())
                     WHERE (id = $1)
                     ",
                     id as db_ids::DBProjectId,
@@ -665,8 +669,8 @@ pub async fn project_edit_internal(
                 sqlx::query!(
                     "
                     UPDATE mods
-                    SET approved = NOW()
-                    WHERE id = $1 AND approved IS NULL
+                    SET approved = COALESCE(approved, NOW()), initial_queued = NULL
+                    WHERE id = $1
                     ",
                     id as db_ids::DBProjectId,
                 )
@@ -1469,7 +1473,11 @@ async fn submit_project_for_review(
     sqlx::query!(
         "
                     UPDATE mods
-                    SET moderation_message = NULL, moderation_message_body = NULL, queued = NOW()
+                    SET
+                        moderation_message = NULL,
+                        moderation_message_body = NULL,
+                        queued = NOW(),
+                        initial_queued = COALESCE(initial_queued, NOW())
                     WHERE (id = $1)
                     ",
         project.inner.id as db_ids::DBProjectId,

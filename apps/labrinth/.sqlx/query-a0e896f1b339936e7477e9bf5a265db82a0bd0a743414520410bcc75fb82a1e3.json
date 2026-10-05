@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    UPDATE mods\n                    SET\n                        moderation_message = NULL,\n                        moderation_message_body = NULL,\n                        queued = NOW(),\n                        initial_queued = COALESCE(initial_queued, NOW())\n                    WHERE (id = $1)\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a0e896f1b339936e7477e9bf5a265db82a0bd0a743414520410bcc75fb82a1e3"
+}
