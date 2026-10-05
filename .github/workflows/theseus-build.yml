@@ -9,9 +9,17 @@ on:
       - .github/workflows/theseus-build.yml
       - 'apps/app/**'
       - 'apps/app-frontend/**'
+      - 'packages/api-client/**'
       - 'packages/app-lib/**'
       - 'packages/app-macros/**'
+      - 'packages/ariadne/**'
       - 'packages/assets/**'
+      - 'packages/async-minecraft-ping/**'
+      - 'packages/blog/**'
+      - 'packages/daedalus/**'
+      - 'packages/modrinth-content-management/**'
+      - 'packages/path-util/**'
+      - 'packages/serde-binhum/**'
       - 'packages/ui/**'
       - 'packages/utils/**'
   workflow_dispatch:
