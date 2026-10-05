@@ -191,3 +191,163 @@ For a content set with `content_set.loader: neoforge` and a selected `content_se
 	- Server: Keep the server argument files supplied by the installer and use the one for the installation's OS. Keep `user_jvm_args.txt` for Java settings.
 
 11. **C4** - Finish.
+
+## Forge
+
+For a content set with `content_set.loader: forge` and a selected `content_set.loader_version`:
+
+1. **C0** - Start installation.
+2. **C1** - Get the details for Minecraft `content_set.game_version`.
+3. Find the full Forge version in the version list:
+
+	- Request: `GET https://files.minecraftforge.net/net/minecraftforge/forge/maven-metadata.json`.
+	- Find the entry for `content_set.game_version` matching `content_set.loader_version`.
+	- Keep the full version string as `forge_version`, including any suffix. **Stop if there is no match.**
+
+4. Download the Forge installer:
+
+	- Request: `GET https://maven.minecraftforge.net/net/minecraftforge/forge/{forge_version}/forge-{forge_version}-installer.jar`.
+	- SHA-1: `GET {installer_url}.sha1`.
+	- Check the installer against its SHA-1.
+
+5. Open `install_profile.json` inside the installer:
+
+	- Read the version details from the file named by `json`. Older installers store these directly in `versionInfo`.
+	- Check that the installer's Minecraft version matches `content_set.game_version`. **Stop if it does not.**
+	- Save the Forge version details separately from the vanilla version details.
+	- Versions without an installer are not covered by this flow.
+
+6. **C2** - Set up Java.
+7. **C3** - Download Minecraft for the client or server.
+8. Get the files listed in the install profile and Forge version details:
+
+	- Extract files included in the installer. Older installers identify the Forge file through `install.filePath` and its library location through `install.path`.
+	- Download other libraries using `GET {library.downloads.artifact.url}`.
+	- If no download URL is provided, use the library's repository URL and path, as in C3.
+	- Save under `libraries/` and check supplied hashes.
+	- Files produced by the installer steps do not need downloading.
+
+9. If the installer needs Minecraft mappings:
+
+**9a. Client:**
+
+- Request: `GET {downloads.client_mappings.url}`.
+- SHA-1: `downloads.client_mappings.sha1`.
+
+**9b. Server:**
+
+- Request: `GET {downloads.server_mappings.url}`.
+- SHA-1: `downloads.server_mappings.sha1`.
+
+10. Run the profile's `processors` in order, if present:
+
+	- Use the `client` or `server` values from `data`.
+	- Run steps for this side, including steps with no `sides` restriction.
+	- Use each step's `jar`, `classpath` and `args`, replacing references with the matching files and values.
+	- Check any listed output hashes. **Stop if a processor fails.**
+
+11. Save the launch details for this content set:
+
+	- Client: Use Forge's `mainClass`, libraries and arguments alongside the vanilla version details.
+	- Server: Use the server argument file for the installation's OS. Older versions use the installed Forge server JAR instead.
+
+12. **C4** - Finish.
+
+## Quilt
+
+For a content set with `content_set.loader: quilt` and a selected `content_set.loader_version`:
+
+1. **C0** - Start installation.
+2. **C1** - Get the details for Minecraft `content_set.game_version`.
+3. Get the Quilt profile for the selected versions. URL-encode both version values.
+
+**3a. Client:**
+
+- Request: `GET https://meta.quiltmc.org/v3/versions/loader/{content_set.game_version}/{content_set.loader_version}/profile/json`.
+
+**3b. Server:**
+
+- Request: `GET https://meta.quiltmc.org/v3/versions/loader/{content_set.game_version}/{content_set.loader_version}/server/json`.
+
+4. Save the profile separately from the vanilla version details. Stop if the selected versions are unsupported.
+5. **C2** - Set up Java.
+6. **C3** - Download Minecraft for the client or server.
+7. Download the libraries listed in the Quilt profile, including Quilt Loader:
+
+	- Request: `GET {library.url}{library_path}`.
+	- Build `library_path` from `library.name`. For `group:artifact:version`, use `group/as/path/artifact/version/artifact-version.jar`.
+	- Save to: `libraries/{library_path}`.
+	- Reuse files already downloaded. Check supplied hashes when available.
+
+8. Save the launch details for this content set:
+
+	- Use the Quilt profile's `mainClass` and additional arguments.
+	- Client: Keep Minecraft's launch arguments and include both Minecraft and Quilt libraries.
+	- Server: Include the server JAR and Quilt libraries. Point Quilt at the server JAR using `loader.gameJarPath`.
+
+9. **C4** - Finish.
+
+## Paper
+
+For a server content set with `content_set.loader: paper`. `content_set.loader_version` is the selected Paper build number.
+
+1. **C0** - Start installation. **Stop if this is a client installation.**
+2. **C1** - Get the details for Minecraft `content_set.game_version`.
+3. Get the Paper builds for this Minecraft version:
+
+	- Request: `GET https://fill.papermc.io/v3/projects/paper/versions/{content_set.game_version}/builds`.
+	- Include a `User-Agent` with the software name, version and contact URL in Paper download requests.
+	- Find the build whose `id` matches `content_set.loader_version`. **Stop if there is no match.**
+
+4. Download the selected build:
+
+	- Request: `GET {build.downloads["server:default"].url}`.
+	- Check the file against the SHA-256 supplied with the download details.
+	- Save to: `server.jar` in the installation folder.
+
+5. **C2** - Set up Java.
+6. Prepare the server files from the installation folder:
+
+	`java -Dpaperclip.patchonly=true -jar server.jar`
+
+	- Paperclip downloads the original Minecraft server JAR if needed, using the URL included in `server.jar`.
+	- It checks the download, applies Paper's patches and extracts the server libraries.
+	- Keep the generated files in the installation folder. **Stop if preparation fails.**
+	- This prepares the files without starting the server.
+
+7. Save `java -jar server.jar nogui` as the server launch command.
+8. **C4** - Finish, reading the protocol version from the prepared Minecraft server JAR.
+
+C3 is skipped because Paperclip prepares the Minecraft files it needs.
+
+## Purpur
+
+For a server content set with `content_set.loader: purpur`. `content_set.loader_version` is the selected Purpur build number.
+
+1. **C0** - Start installation. **Stop if this is a client installation.**
+2. **C1** - Get the details for Minecraft `content_set.game_version`.
+3. Get the selected build details:
+
+	- Request: `GET https://api.purpurmc.org/v2/purpur/{content_set.game_version}/{content_set.loader_version}`.
+	- Check that `version` and `build` match the content set and `result` is `SUCCESS`. **Stop if they do not match or the build failed.**
+
+4. Download the selected build:
+
+	- Request: `GET https://api.purpurmc.org/v2/purpur/{content_set.game_version}/{content_set.loader_version}/download`.
+	- Check the file against `md5` from the build details.
+	- Save to: `server.jar` in the installation folder.
+
+5. **C2** - Set up Java.
+6. Prepare the server files from the installation folder:
+
+	`java -Dpaperclip.patchonly=true -jar server.jar`
+
+	- Paperclip downloads the original Minecraft server JAR if needed, using the URL included in `server.jar`.
+	- It applies the patches and extracts the server libraries.
+	- Keep the generated files in the installation folder. **Stop if preparation fails.**
+	- This prepares the files without starting the server.
+
+7. Save `java -jar server.jar nogui` as the server launch command.
+8. **C4** - Finish, reading the protocol version from the prepared Minecraft server JAR.
+
+C3 is skipped because Paperclip prepares the Minecraft files it needs.
