@@ -1,5 +1,6 @@
 import { VersionIcon } from '@modrinth/assets'
 
+import dependenciesMessage from '../messages/checklist/messages/metadata/dependencies.md'
 import alternateVersionsAdditionalMessage from '../messages/checklist/messages/versions/alternate-versions/additional.md'
 import alternateVersionsMonoMessage from '../messages/checklist/messages/versions/alternate-versions/mono.md'
 import alternateVersionsPrimaryMessage from '../messages/checklist/messages/versions/alternate-versions/primary.md'
@@ -88,6 +89,14 @@ export const versionsUnsupportedIssue = issue({
 	suggestedStatus: 'rejected',
 })
 
+export const metadataDependenciesIssue = issue({
+	id: 'metadata-dependencies',
+	title: 'Incorrect dependencies',
+	category: 'Metadata',
+	message: dependenciesMessage,
+	suggestedStatus: 'flagged',
+})
+
 export const versionsReviewPanel = panel({
 	title: 'Versions',
 	hint: "Are this project's files correct?",
@@ -119,6 +128,18 @@ export const versionsReviewPanel = panel({
 		issue: versionsIncorrectProjectTypeIssue,
 		label: 'Incorrect Project Type',
 	}),
+	toggle({
+		issue: versionsAlternateVersionsIssue,
+		label: 'Alternate Versions',
+	}),
+	toggle({
+		issue: versionsUnsupportedIssue,
+		label: 'Unsupported',
+	}),
+	toggle({
+		issue: metadataDependenciesIssue,
+		label: 'Dependencies',
+	}),
 	section({
 		shown: (ctx) => ctx.selected.issueIds.includes(versionsIncorrectProjectTypeIssue.id),
 	}).content(
@@ -135,10 +156,6 @@ export const versionsReviewPanel = panel({
 			],
 		}),
 	),
-	toggle({
-		issue: versionsAlternateVersionsIssue,
-		label: 'Alternate Versions',
-	}),
 	section({
 		shown: (ctx) => ctx.selected.issueIds.includes(versionsAlternateVersionsIssue.id),
 	}).content(
@@ -176,7 +193,6 @@ export const versionsReviewPanel = panel({
 			],
 		}),
 	),
-	toggle({ issue: versionsUnsupportedIssue, label: 'Unsupported' }),
 	section({
 		shown: (ctx) => ctx.selected.issueIds.includes(versionsUnsupportedIssue.id),
 	}).content(

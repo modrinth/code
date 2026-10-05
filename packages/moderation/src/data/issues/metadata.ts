@@ -3,7 +3,6 @@ import { DatabaseIcon } from '@modrinth/assets'
 import { ENVIRONMENTS_COPY } from '@modrinth/ui'
 
 import { requiresEnvironmentInfo } from '../../utils'
-import dependenciesMessage from '../messages/checklist/messages/metadata/dependencies.md'
 import environmentCorrectionMessage from '../messages/checklist/messages/metadata/environment/correction.md'
 import environmentInaccurateMessage from '../messages/checklist/messages/metadata/environment/inaccurate.md'
 import environmentMixedMessage from '../messages/checklist/messages/metadata/environment/mixed.md'
@@ -37,14 +36,6 @@ export const metadataEnvironmentIssue = issue({
 	suggestedStatus: 'flagged',
 })
 
-export const metadataDependenciesIssue = issue({
-	id: 'metadata-dependencies',
-	title: 'Incorrect dependencies',
-	category: 'Metadata',
-	message: dependenciesMessage,
-	suggestedStatus: 'flagged',
-})
-
 export const metadataGameVersionsIssue = issue({
 	id: 'metadata-game-versions',
 	title: 'Incorrect game versions',
@@ -69,10 +60,6 @@ export const metadataReviewPanel = panel({
 		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e25ee711bf0802d9a9bdb82dce040eb',
 	shown: ({ projectV3 }) => !projectV3.minecraft_server,
 }).content(
-	toggle({
-		issue: metadataDependenciesIssue,
-		label: 'Dependencies',
-	}),
 	toggle({
 		issue: metadataGameVersionsIssue,
 		label: 'Game Versions',
