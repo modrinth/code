@@ -29,7 +29,7 @@ struct VerifyResponse {
     redeemed: bool,
 }
 
-/// Verify Medal credentials.  
+/// Verify Medal credentials.
 #[utoipa::path(
 	context_path = "/medal",
 	tag = "medal",
@@ -40,6 +40,11 @@ pub async fn verify(
     pool: web::Data<PgPool>,
     web::Query(MedalQuery { username }): web::Query<MedalQuery>,
 ) -> Result<HttpResponse, ApiError> {
+    return Err(ApiError::Request(eyre::eyre!(
+        "This offer is not available anymore"
+    )));
+
+    /*
     let maybe_fields =
         RedeemalLookupFields::redeemal_status_by_username_and_offer(
             &**pool,
@@ -56,9 +61,10 @@ pub async fn verify(
             redeemed: fields.redeemal_status.is_some(),
         })),
     }
+    */
 }
 
-/// Redeem Medal credit.  
+/// Redeem Medal credit.
 #[utoipa::path(
 	context_path = "/medal",
 	tag = "medal",
@@ -66,13 +72,18 @@ pub async fn verify(
 )]
 #[post("/redeem", guard = "medal_key_guard")]
 pub async fn redeem(
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    web::Query(MedalQuery { username }): web::Query<MedalQuery>,
+    _pool: web::Data<PgPool>,
+    _redis: web::Data<RedisPool>,
+    web::Query(MedalQuery { username: _ }): web::Query<MedalQuery>,
 ) -> Result<HttpResponse, ApiError> {
     // Check the offer hasn't been redeemed yet, then insert into the table.
     // In a transaction to avoid double inserts.
 
+    return Err(ApiError::Request(eyre::eyre!(
+        "This offer is not available anymore"
+    )));
+
+    /*
     let mut txn = pool
         .begin()
         .await
@@ -131,4 +142,5 @@ pub async fn redeem(
     } else {
         Ok(HttpResponse::Created().finish())
     }
+    */
 }
