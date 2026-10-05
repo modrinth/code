@@ -1209,9 +1209,15 @@ fn hash_flame_murmur32(input: Vec<u8>) -> u32 {
     )
 }
 
+/// Finds the files of `versions`, given as `(version, project)` pairs, that
+/// bundle an override whose attribution is missing, keyed by version.
+///
+/// Whether a project is exempt or has any unresolved attribution groups is
+/// checked first, so files are only looked at for the projects that have
+/// something to withhold. For most projects that's none of them.
 pub async fn get_files_missing_attribution<'a, E>(
     exec: E,
-    version_ids: &[DBVersionId],
+    versions: &[(DBVersionId, DBProjectId)],
 ) -> Result<
     std::collections::HashMap<
         DBVersionId,
@@ -1221,32 +1227,48 @@ pub async fn get_files_missing_attribution<'a, E>(
 where
     E: sqlx::Executor<'a, Database = sqlx::Postgres>,
 {
-    if version_ids.is_empty() {
+    if versions.is_empty() {
         return Ok(std::collections::HashMap::new());
     }
 
     let rows = sqlx::query!(
         r#"
-        select distinct f.version_id as "version_id: DBVersionId", f.id as "file_id: DBFileId",
-            pag.flame_project
-        from files f
+        with problem_groups as (
+            select pag.id, pag.project_id, pag.flame_project
+            from project_attribution_groups pag
+            where pag.project_id = ANY($2)
+              and (
+                pag.attribution is null
+                or pag.attribution->>'kind' = 'no_permission'
+                or coalesce(
+                  pag.attribution->'moderation_status'->>'kind',
+                  'approved'
+                ) != 'approved'
+              )
+              and not exists (
+                select 1
+                from attributions_exemptions ae
+                where ae.project_id = pag.project_id
+              )
+        )
+        select distinct f.version_id as "version_id!: DBVersionId", f.id as "file_id!: DBFileId",
+            pg.flame_project as "flame_project?"
+        from problem_groups pg
+        inner join project_attribution_files paf on paf.group_id = pg.id
+        inner join override_file_sources ofs on ofs.sha1 = paf.sha1
+        inner join files f on f.id = ofs.file_id
+        inner join versions v on v.id = f.version_id and v.mod_id = pg.project_id
         inner join attribution_enforced_versions aev on aev.id = f.version_id
-        inner join versions v on v.id = f.version_id
-        inner join override_file_sources ofs on ofs.file_id = f.id
-        inner join project_attribution_files paf on paf.sha1 = ofs.sha1
-        inner join project_attribution_groups pag on pag.id = paf.group_id
-        where f.version_id = ANY($1)
-          and pag.project_id = v.mod_id
-          and (
-            pag.attribution is null
-            or pag.attribution->>'kind' = 'no_permission'
-            or coalesce(
-              pag.attribution->'moderation_status'->>'kind',
-              'approved'
-            ) != 'approved'
-          )
+        where exists (select 1 from problem_groups)
+          and f.version_id = ANY($1)
         "#,
-        &version_ids.iter().map(|v| v.0).collect::<Vec<_>>(),
+        &versions.iter().map(|(v, _)| v.0).collect::<Vec<_>>(),
+        &versions
+            .iter()
+            .map(|(_, p)| p.0)
+            .collect::<std::collections::HashSet<_>>()
+            .into_iter()
+            .collect::<Vec<_>>(),
     )
     .fetch_all(exec)
     .await
