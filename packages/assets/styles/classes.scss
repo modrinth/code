@@ -930,6 +930,7 @@ a:not(.no-click-animation),
 	img {
 		max-width: 100%;
 		display: inline-block;
+        border-radius: var(--radius-md);
 	}
 	img:not([height]) {
 		height: auto;
