@@ -135,7 +135,7 @@
     "message": "Zaakceptuj wszystko"
   },
   "app.ads-consent.body": {
-    "message": "Reklamy pozwalają Modrinth oraz fundują wypłaty twórców. Nasi partnerzy mogą zachować lub uzyskać dostęp ciasteczek w aplikacji, żeby spersonalizować reklamy i zmierzyć wydajność."
+    "message": "Reklamy pozwalają na istnienie Modrinth oraz fundują wypłaty twórców. Nasi partnerzy mogą zachować lub uzyskać dostęp ciasteczek w aplikacji, żeby spersonalizować reklamy i zmierzyć wydajność."
   },
   "app.ads-consent.manage": {
     "message": "Zarządzaj preferencjami"
@@ -171,7 +171,7 @@
     "message": "Minimalizuj aplikację"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "Pokaż, jak długo grałeś w każdą grę."
+    "message": "Pokaż czas gry dla każdej instancji."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Pokaż czas gry"
@@ -189,7 +189,7 @@
     "message": "Ukryj prawy pasek boczny"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Pokaż ostrzeżenie o bezpieczeństwie przed zainstalowaniem Pakietu Modrinth (.mrpack), które nie jest hostowane na Modrinth."
+    "message": "Pokaż ostrzeżenie o bezpieczeństwie przed zainstalowaniem paczki typu Modrinth Pack (.mrpack), która nie jest hostowana na Modrinth."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Ostrzegaj mnie przed instalowaniem nieznanych paczek modów"
@@ -205,6 +205,12 @@
   },
   "app.behavior-settings.content.title": {
     "message": "Strona główna i zawartość"
+  },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Przynieś okno Modrinth App na wierzch po wyjściu z gry."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Pokaż aplikację po wyjściu z gry"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Uruchamianie i nawigacja"
@@ -302,11 +308,14 @@
   "app.download-manager.attention": {
     "message": "Wymaga działania"
   },
+  "app.download-manager.bulk-update-content": {
+    "message": "Aktualizowanie {count, plural, one {# przedmiotu} few {# przedmiotów} other {# przedmiotów}}"
+  },
   "app.download-manager.cancel": {
     "message": "Przerwij instalację"
   },
   "app.download-manager.canceling": {
-    "message": "Przerywanie instalacji"
+    "message": "Przerywanie instalacji..."
   },
   "app.download-manager.clear-all": {
     "message": "Wyczyść wszystko"
@@ -390,7 +399,7 @@
     "message": "Eksport ukończony"
   },
   "app.export-modal.export-complete-description": {
-    "message": "Wyeksportowano {name} pomyślnie."
+    "message": "Pomyślnie zakończono eksportowanie {name}."
   },
   "app.export-modal.header": {
     "message": "Eksportuj paczkę modów"
@@ -663,7 +672,7 @@
     "message": "Usuń instancję"
   },
   "app.instance.confirm-delete.instances-label": {
-    "message": "{count, plural,one {Instalacja} other {Instalacja({count})}}"
+    "message": "{count, plural,one {Instancja} other {Instancje ({count})}}"
   },
   "app.instance.content.managed-content.modpack-header": {
     "message": "Zawartość paczki modów"
@@ -681,7 +690,7 @@
     "message": "Paczka modów jest już zainstalowana"
   },
   "app.instance.modpack-already-installed.instance": {
-    "message": "Instalacja"
+    "message": "Instancja"
   },
   "app.instance.mods.content-type-project": {
     "message": "projekt"
@@ -690,7 +699,7 @@
     "message": "Zamróź wersje"
   },
   "app.instance.mods.locked-content": {
-    "message": "Treści w zablokowanej instalacji nie można zmienić."
+    "message": "Nie można zmieniać zawartości w zablokowanej instancji."
   },
   "app.instance.mods.project-was-added": {
     "message": "Dodano \"{name}\""
@@ -711,7 +720,7 @@
     "message": "Powrót do instancji"
   },
   "app.instance.share.empty.description": {
-    "message": "Możesz udostępnić tę instalację znajomym!"
+    "message": "Możesz udostępnić tę instancję znajomym!"
   },
   "app.instance.share.empty.heading": {
     "message": "Nie zaproszono żadnych znajomych"
@@ -750,10 +759,10 @@
     "message": "Nie będzie w stanie otrzymywać aktualizacji dla tej udostępnionej instancji"
   },
   "app.instance.share.remove-user-modal.effect-installed-copy": {
-    "message": "Każda zainstalowana kopia pozostanie na swoim urządzeniu"
+    "message": "Zainstalowana kopia pozostanie na urządzeniu tego użytkownika"
   },
   "app.instance.share.remove-user-modal.effect-invite-again": {
-    "message": "Możesz zaprosić je ponownie później"
+    "message": "Możesz zaprosić tego użytkownika ponownie później"
   },
   "app.instance.share.remove-user-modal.effect-last-user": {
     "message": "To jest ostatni użytkownik, udostępnianie zostanie wyłączone dla tej instancji"
@@ -780,19 +789,19 @@
     "message": "Usługa współdzielonych instancji jest obecnie niedostępna, spróbuj ponownie później"
   },
   "app.instance.share.unable-to-connect.heading": {
-    "message": "Nie można połączyć"
+    "message": "Nie można nawiązać połączenia"
   },
   "app.instance.share.unlink.body": {
-    "message": "Musisz odłączyć paczkę modów, aby udostępnić swoją rozgrywkę"
+    "message": "Musisz odłączyć paczkę modów, aby udostępnić swoją instancję"
   },
   "app.instance.share.unlink.header": {
     "message": "Udostępnianie wymaga odłączenia"
   },
   "app.instance.shared-instance-already-installed.body": {
-    "message": "Ta przesłana instalacja jest zainstalowana jako <bold>{instanceName} </bold>. Czy na pewno chcesz zainstalować jej kopię?"
+    "message": "Ta udostępniona instancja jest już zainstalowana jako <bold>{instanceName} </bold>. Czy na pewno chcesz zainstalować jej kopię?"
   },
   "app.instance.shared-instance-already-installed.header": {
-    "message": "Przesłana instalacja jest już zainstalowana"
+    "message": "Udostępniona instancja jest już zainstalowana"
   },
   "app.instance.shared-instance-already-installed.install-anyway": {
     "message": "Instaluj mimo to"
@@ -804,7 +813,7 @@
     "message": "połączone konto"
   },
   "app.instance.shared-instance-wrong-account.owner-admonition-body-v2": {
-    "message": "aby zarządzać przesłaną instalacją, gdy to zrobisz, twoja wersja instalacji wyprzedzi instalacje zainstalowaną przez innych użytkowników."
+    "message": "aby zarządzać udostępnioną instancją. Stracisz możliwość przesyłania aktualizacji dla innych użytkowników."
   },
   "app.instance.shared-instance-wrong-account.sign-in-as-label": {
     "message": "Zaloguj się jako"
@@ -813,10 +822,10 @@
     "message": "Musisz zalogować się na Modrinth"
   },
   "app.instance.shared-instance-wrong-account.user-admonition-body-v2": {
-    "message": ", by otrzymywać aktualizacje dla tej udostępnionej instancji."
+    "message": "aby otrzymywać aktualizacje dla tej udostępnionej instancji."
   },
   "app.instance.shared-instance-wrong-account.warning-header": {
-    "message": "Korzystasz z niewłaściwego konta Modrith"
+    "message": "Korzystasz z niewłaściwego konta Modrinth"
   },
   "app.instance.shortcut.created": {
     "message": "Skrót utworzony"
@@ -1023,13 +1032,13 @@
     "message": "Usuń grupę"
   },
   "app.library.group.delete-description": {
-    "message": "Instancje w tej grupie zostaną rozgrupowane."
+    "message": "Instancje w tej grupie nie będą już zgrupowane."
   },
   "app.library.group.edit-name": {
     "message": "Edytuj nazwę grupy"
   },
   "app.library.group.empty": {
-    "message": "Przeciągnij i upuść, aby dodać instalację."
+    "message": "Przeciągnij i upuść, aby dodać instancję."
   },
   "app.library.group.expand": {
     "message": "Rozwiń grupę"
@@ -1269,7 +1278,7 @@
     "message": "Którą zasadę narusza ta instancja?"
   },
   "app.modal.install-to-play.report-shared-instance-header": {
-    "message": "Zgłoś przesłaną Instalacje"
+    "message": "Zgłoś udostępnioną instancję"
   },
   "app.modal.install-to-play.report-submitted": {
     "message": "Zgłoszenie przesłane"
@@ -1281,10 +1290,10 @@
     "message": "Pliki nieopublikowane w Modrinth nie są sprawdzane."
   },
   "app.modal.install-to-play.shared-instance": {
-    "message": "Przesłana Instalacja"
+    "message": "Udostępniona instancja"
   },
   "app.modal.install-to-play.shared-instance-content": {
-    "message": "Treści w przesłanej ci instalacji"
+    "message": "Zawartość udostępnionej instancji"
   },
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "Ta udostępniona instancja zawiera pliki, które nie zostały opublikowane na Modrinth. Zalecamy instalowanie plików tylko ze źródeł, którym ufasz."
@@ -1296,7 +1305,7 @@
     "message": "Ostrzeżenie o nieznanych plikach"
   },
   "app.modal.install-to-play.unrecognized-files": {
-    "message": "Nieznane plki"
+    "message": "Nieznane pliki"
   },
   "app.modal.install-to-play.user-blocked": {
     "message": "Zablokowano użytkownika"
@@ -1473,7 +1482,7 @@
     "message": "Edytuj zrzut ekranu"
   },
   "app.screenshots.empty-description": {
-    "message": "Zrzuty ekranu, które zrobisz w grze pojawią się tutaj."
+    "message": "Zrzuty ekranu zrobione w grze pojawią się tutaj."
   },
   "app.screenshots.empty-heading": {
     "message": "Brak zrzutów ekranu"
@@ -3227,6 +3236,12 @@
   "app.skins.section.default-skins": {
     "message": "Domyślne skórki"
   },
+  "app.skins.section.dungeons-hero": {
+    "message": "Bohater Lochów"
+  },
+  "app.skins.section.dungeons-ii-hero": {
+    "message": "Bohater Lochów II"
+  },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
@@ -3256,6 +3271,9 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
+  },
+  "app.skins.section.wilderness-bound": {
+    "message": "Wilderness Bound"
   },
   "app.skins.sign-in.button": {
     "message": "Zaloguj się do Microsoft"
@@ -3315,7 +3333,7 @@
     "message": "Synchronizuj ustawienia gry, serwery, paczki zasobów i inne elementy między instancjami."
   },
   "app.sync-instances-update.notification.dismiss": {
-    "message": "Zamknij"
+    "message": "Odrzuć"
   },
   "app.sync-instances-update.notification.title": {
     "message": "Synchronizuj instancje"
@@ -3618,7 +3636,7 @@
     "message": "Odłącz wspólną instancję"
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
-    "message": "Spowoduje to usunięcie przesyłanej instalacji z serwerów Modrith. Użytkownicy korzystający z niej na Modrinth App przestaną otrzymywać aktualizacje, ale twoja lokalna instalacja zostanie na tym urządzeniu."
+    "message": "Spowoduje to usunięcie tej udostępnionej instancji z serwerów Modrinth. Użytkownicy korzystający z niej w Modrinth App przestaną otrzymywać aktualizacje, ale twoja lokalna instalacja i jej zawartość pozostanie na tym urządzeniu."
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-header": {
     "message": "Wycofywanie udostępnionej instancji"
@@ -3942,7 +3960,7 @@
     "message": "Link zaproszenia"
   },
   "instance.settings.sharing.active-invites.description": {
-    "message": "Każdy, kto ma jeden z tych linków, może dołaczyć, dopóki jest aktywny"
+    "message": "Każdy, kto ma jeden z tych linków może dołączyć, póki jest on aktywny."
   },
   "instance.settings.sharing.active-invites.empty": {
     "message": "Brak aktywnych zaproszeń."
@@ -4287,7 +4305,7 @@
     "message": "Coś poszło nie tak"
   },
   "instance.shared-instance.network-error.text": {
-    "message": "Nie można połączyć się ze współdzielonymi instancjami API"
+    "message": "Nie można połączyć się z API udostępnionych instancji"
   },
   "instance.shared-instance.network-error.title": {
     "message": "Błąd sieci"
@@ -4329,7 +4347,7 @@
     "message": "Ta udostępniona instancja została zablokowana przez zespół moderacyjny Modrinth. Nie będzie otrzymywać dalszych aktualizacji z instancji źródłowej."
   },
   "instance.shared-instance.unavailable.locked-title": {
-    "message": "Instancja zablokowana"
+    "message": "Zablokowana instancja"
   },
   "instance.shared-instance.unavailable.manager-fallback": {
     "message": "zarządcę instancji"
@@ -4416,7 +4434,7 @@
     "message": "Synchronizowane między instancjami"
   },
   "instance.worlds.view_instance": {
-    "message": "Zobacz instancję"
+    "message": "Pokaż instancję"
   },
   "instance.worlds.world_in_use": {
     "message": "Świat jest w użytku"
@@ -4461,7 +4479,7 @@
     "message": "Zaloguj się do Microsoft"
   },
   "modal.modrinth-account-required.browser-description": {
-    "message": "Nowa karta otwarta do zalogowania. Ukończ logowanie, a następnie wróć do aplikacji."
+    "message": "Otwarto nową kartę z ekranem logowania. Ukończ logowanie, a następnie wróć do aplikacji."
   },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "Kontynuuj w przeglądarce"
@@ -4470,7 +4488,7 @@
     "message": "Utwórz konto"
   },
   "modal.modrinth-account-required.description": {
-    "message": "Musisz zalogować się na swoje konto Modrinth, zanim będziesz mógł korzystać z tej funkcji."
+    "message": "Musisz zalogować się na swoje konto Modrinth, by móc korzystać z tej funkcji."
   },
   "modal.modrinth-account-required.header": {
     "message": "Konto wymagane"

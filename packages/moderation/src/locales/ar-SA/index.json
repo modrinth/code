@@ -1,4 +1,7 @@
 {
+  "nags.add-description.description": {
+    "defaultMessage": "يلزم تقديم وصف يوضح بوضوح محتوى مشروعك والغرض منه وعناصر الجذب فيه."
+  },
   "nags.add-description.title": {
     "defaultMessage": "أضف وصفًا"
   },

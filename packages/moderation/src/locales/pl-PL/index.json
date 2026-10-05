@@ -110,6 +110,9 @@
   "nags.gallery.title": {
     "defaultMessage": "Odwiedź stronę galerii"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Licencja twojego projektu ({type}) wymaga opublikowania kodu źródłowego. Podaj link do kodu źródłowego, dodaj pliki źródłowe lub zmień licencję."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Udostępnij kod źródłowy"
   },
@@ -130,6 +133,81 @@
   },
   "nags.invalid-project-summary.title": {
     "defaultMessage": "Zmień podsumowanie"
+  },
+  "nags.license-url.not-in-allowlist.description": {
+    "defaultMessage": "Adres URL licencji nie jest rozpoznanym linkiem do licencji. Upewnij się, że prowadzi bezpośrednio do tekstu licencji."
+  },
+  "nags.license-url.not-in-allowlist.title": {
+    "defaultMessage": "Sprawdź link do licencji"
+  },
+  "nags.link-validation.discord-invite": {
+    "defaultMessage": "Twoje zaproszenie do Discorda jest nieprawidłowe, wygasło lub nie zaprasza użytkowników na serwer. Zastąp je aktywnym zaproszeniem do serwera."
+  },
+  "nags.link-validation.discord-invite.title": {
+    "defaultMessage": "Wymień nieprawidłowe zaproszenia do Discorda"
+  },
+  "nags.link-validation.download": {
+    "defaultMessage": "Linki, które rozpoczynają pobieranie, są niedozwolone. Usuń wszystkie tego rodzaju linki z opisu."
+  },
+  "nags.link-validation.download.title": {
+    "defaultMessage": "Usuń linki do pobierania"
+  },
+  "nags.link-validation.duplicate": {
+    "defaultMessage": "Twój link {linkField, select, issues {do śledzenia problemów} source {do kodu źródłowego} wiki {do strony wiki} discord {do Discorda} site {do strony internetowej} store {do sklepu} license {do licencji} description {do opisu} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub} kofi {Ko-fi} other {do dotacji}} jest także używany jako link {otherLinkField, select, issues {do śledzenia problemów} source {do kodu źródłowego} wiki {do strony wiki} discord {do Discorda} site {do strony internetowej} store {do sklepu} license {do licencji} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub} kofi {Ko-fi} other {w innym polu}}. Każdy link powinien pojawić się tylko raz."
+  },
+  "nags.link-validation.duplicate.title": {
+    "defaultMessage": "Usuń identyczne linki"
+  },
+  "nags.link-validation.external-blocklist-match": {
+    "defaultMessage": "Twój link ({linkField}) jest niedozwolony. Proszę usunąć ten link lub zastąpić go czymś odpowiednim dla typu linku ({linkField})."
+  },
+  "nags.link-validation.external-blocklist-match.title": {
+    "defaultMessage": "Zastąp nieprawidłowe linki"
+  },
+  "nags.link-validation.global-blocklist-match": {
+    "defaultMessage": "Twój link {linkField, select, issues {do śledzenia problemów} source {do kodu źródłowego} wiki {do strony wiki} discord {do Discorda} site {do strony internetowej} store {do sklepu} license {do licencji} description {do opisu} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub} kofi {Ko-fi} other {do dotacji}} prowadzi do niedozwolonej domeny. Usuń lub wymień ten link."
+  },
+  "nags.link-validation.global-blocklist-match.title": {
+    "defaultMessage": "Usuń niedozwolone linki"
+  },
+  "nags.link-validation.ip-address": {
+    "defaultMessage": "Twój link {linkField, select, issues {do śledzenia problemów} source {do kodu źródłowego} wiki {do strony wiki} discord {do Discorda} site {do strony internetowej} store {do sklepu} license {do licencji} description {do opisu} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub} kofi {Ko-fi} other {do dotacji}} jest adresem IP. Podaj link z nazwaną domeną."
+  },
+  "nags.link-validation.ip-address.title": {
+    "defaultMessage": "Usuń link do adresu IP"
+  },
+  "nags.link-validation.malformed": {
+    "defaultMessage": "Twój link {linkField, select, issues {do śledzenia problemów} source {do kodu źródłowego} wiki {do strony wiki} discord {do Discorda} site {do strony internetowej} store {do sklepu} license {do licencji} description {do opisu} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub} kofi {Ko-fi} other {do dotacji}} jest nieprawidłowy. Podaj pełny adres URL HTTPS."
+  },
+  "nags.link-validation.malformed.title": {
+    "defaultMessage": "Napraw nieprawidłowe linki"
+  },
+  "nags.link-validation.not-in-allowlist": {
+    "defaultMessage": "Twój link {linkField, select, issues {do śledzenia problemów} source {do kodu źródłowego} wiki {do strony wiki} discord {do Discorda} site {do strony internetowej} store {do sklepu} license {do licencji} description {do opisu} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub} kofi {Ko-fi} other {do dotacji}} może nie być odpowiedni do tego rodzaju treści. Upewnij się, że jest to właściwy link."
+  },
+  "nags.link-validation.not-in-allowlist.title": {
+    "defaultMessage": "Sprawdź, czy link jest poprawny"
+  },
+  "nags.link-validation.source-repository": {
+    "defaultMessage": "Twój link do kodu źródłowego musi prowadzić do repozytorium na obsługiwanej platformie lub do własnej instancji Gitea/Forgejo."
+  },
+  "nags.link-validation.source-repository.title": {
+    "defaultMessage": "Podaj link do repozytorium źródłowego"
+  },
+  "nags.link-validation.title": {
+    "defaultMessage": "Sprawdź ten link"
+  },
+  "nags.link-validation.unverifiable": {
+    "defaultMessage": "Nie udało się zweryfikować Twojego linku {linkField, select, issues {do śledzenia problemów} source {do kodu źródłowego} wiki {do strony wiki} discord {do Discorda} site {do strony internetowej} store {do sklepu} license {do licencji} description {do opisu} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub} kofi {Ko-fi} other {do dotacji}}. Sprawdź, czy jest dostępny."
+  },
+  "nags.link-validation.unverifiable.title": {
+    "defaultMessage": "Sprawdź dostępność linku"
+  },
+  "nags.link-validation.wrong-field": {
+    "defaultMessage": "Twój link {linkField, select, issues {do śledzenia problemów} source {do kodu źródłowego} wiki {do strony wiki} discord {do Discorda} site {do strony internetowej} store {do sklepu} license {do licencji} description {do opisu} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub} kofi {Ko-fi} other {do dotacji}} nie jest poprawnym linkiem {linkField, select, issues {do śledzenia problemów} source {do kodu źródłowego} wiki {do strony wiki} discord {do Discorda} site {do strony internetowej} store {do sklepu} license {do licencji} description {do opisu} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub} kofi {Ko-fi} other {do dotacji}}. Usuń go lub zamień go na prawidłowy link."
+  },
+  "nags.link-validation.wrong-field.title": {
+    "defaultMessage": "Napraw nieprawidłowe linki"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# nagłówek} few {# nagłówki} other {# nagłówków}} w twoim opisie {count, plural, one {jest za długi} few {są za długie} other {jest za długich}}. Nagłówki powinny być zwięzłe i pełnić funkcję tytułów sekcji, a nie pełnych zdań."
