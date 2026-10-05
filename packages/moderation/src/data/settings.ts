@@ -2,24 +2,6 @@ import { setting } from '../types/settings.ts'
 
 const settings = {
 	General: {
-		ChecklistPosition: setting.asEnum({
-			type: 'enum',
-			id: 'checklist-position',
-			title: 'Checklist position',
-			description: 'Where the checklist should be displayed on the page',
-			entries: [
-				{ value: 'left', label: 'Left' },
-				{ value: 'right', label: 'Right' },
-			],
-			default: 'right',
-		}),
-		ProjectKeybinds: setting.asToggle({
-			type: 'toggle',
-			id: 'project-keybinds',
-			title: 'Enable project keybinds',
-			description: 'Weather certain keybinds should work without the checklist visible.',
-			default: false,
-		}),
 		PrivateMessageHighlight: setting.asToggle({
 			type: 'toggle',
 			id: 'private-message-highlight',
@@ -54,6 +36,33 @@ const settings = {
 			description:
 				'When Open production/staging is used on an official host, open this hostname instead. Example: localhost:3000',
 			default: null,
+		}),
+	},
+	Checklist: {
+		Position: setting.asEnum({
+			type: 'enum',
+			id: 'checklist-position',
+			title: 'Position',
+			description: 'Where the checklist should be displayed on the page',
+			entries: [
+				{ value: 'left', label: 'Left' },
+				{ value: 'right', label: 'Right' },
+			],
+			default: 'right',
+		}),
+		AlwaysAllowKeybinds: setting.asToggle({
+			type: 'toggle',
+			id: 'checklist-always-allow-keybinds',
+			title: 'Always allow project keybinds',
+			description: 'Whether certain keybinds should work without the checklist visible.',
+			default: false,
+		}),
+		IgnoreConditions: setting.asToggle({
+			type: 'toggle',
+			id: 'checklist-ignore-conditions',
+			title: 'Ignore checklist conditions',
+			description: 'Allow moderating projects the checklist normally auto skips.',
+			default: false,
 		}),
 	},
 } as const

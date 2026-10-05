@@ -2486,7 +2486,7 @@ function handleKeybinds(event) {
 	if (!isStaff(auth.value.user)) return
 	if (
 		!showModerationChecklist.value &&
-		!modSettings.value.get(moderationSettings.General.ProjectKeybinds)
+		!modSettings.value.get(moderationSettings.Checklist.AlwaysAllowKeybinds)
 	)
 		return
 

@@ -2987,6 +2987,9 @@
   "layout.publish.email-verification-required.title": {
     "message": "Email verification required"
   },
+  "messages.noResults": {
+    "message": "No results found for your query!"
+  },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "Automatically install everything they’re playing"
   },
@@ -4136,11 +4139,11 @@
   "project.settings.license.custom": {
     "message": "Custom"
   },
-  "project.settings.license.custom-url-description": {
-    "message": "The web location of the full license text. You have to provide a link since this is a custom license."
+  "project.settings.license.custom-name-required": {
+    "message": "Enter a name for your custom license."
   },
-  "project.settings.license.has-spdx": {
-    "message": "Use SPDX identifier"
+  "project.settings.license.custom-url-description": {
+    "message": "The web location of the full license text."
   },
   "project.settings.license.intro": {
     "message": "It is important to choose a proper license for your {type}. You may choose one from our list or provide a custom license. You may also provide a custom URL to your chosen license; otherwise, the license text will be displayed. See our <guide>licensing guide</guide> for more information."
@@ -4151,9 +4154,6 @@
   "project.settings.license.later-description": {
     "message": "The license you selected has an \"or later\" clause. If you check this box, users may use your project under later editions of the license."
   },
-  "project.settings.license.missing-name": {
-    "message": "Enter a name or SPDX identifier for your custom license."
-  },
   "project.settings.license.missing-url": {
     "message": "Enter a URL to the full text of your custom license."
   },
@@ -4161,31 +4161,19 @@
     "message": "License name"
   },
   "project.settings.license.name-description": {
-    "message": "The full name of the license. If the license has a SPDX identifier, please check the checkbox and use the identifier instead."
+    "message": "The full name of the custom license."
   },
   "project.settings.license.name-placeholder": {
     "message": "License name"
   },
-  "project.settings.license.optional-url": {
-    "message": "License URL (optional)"
+  "project.settings.license.optional-label": {
+    "message": "optional"
   },
   "project.settings.license.select": {
-    "message": "Select a license"
-  },
-  "project.settings.license.select-description": {
-    "message": "How users are and aren't allowed to use your project."
+    "message": "License"
   },
   "project.settings.license.select-placeholder": {
-    "message": "Select license..."
-  },
-  "project.settings.license.spdx": {
-    "message": "SPDX identifier"
-  },
-  "project.settings.license.spdx-description": {
-    "message": "If your license does not have an official <spdx>SPDX license identifier</spdx>, uncheck the box and enter the name of the license instead."
-  },
-  "project.settings.license.spdx-placeholder": {
-    "message": "SPDX identifier"
+    "message": "Search licenses..."
   },
   "project.settings.license.title": {
     "message": "License"
@@ -4201,6 +4189,9 @@
   },
   "project.settings.license.url-description": {
     "message": "The web location of the full license text. If you don't provide a link, the license text will be displayed instead."
+  },
+  "project.settings.license.url-placeholder": {
+    "message": "License URL"
   },
   "project.settings.links.add-link": {
     "message": "Add link"

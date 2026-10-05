@@ -425,6 +425,12 @@ fn repo_section(url: &Url, section: &str) -> bool {
                 && parts.windows(2).any(|pair| pair == ["-", section])))
 }
 
+fn is_github_issues(url: &Url) -> bool {
+    from_domains(url, GITHUB_DOMAINS)
+        && repository_path(url)
+        && path(url).get(2) == Some(&"issues")
+}
+
 pub(super) fn discord_code(url: &Url) -> Option<&str> {
     let parts = path(url);
     let code = if from_domains(url, DISCORD_SHORT_INVITE_DOMAINS)
@@ -452,11 +458,13 @@ fn allowed(field: &LinkField, url: &Url) -> bool {
         LinkField::Platform(LinkPlatform::Source) => {
             from_domains(url, SOURCE_DOMAINS)
                 && repository_path(url)
-                && !repo_section(url, "issues")
+                && !is_github_issues(url)
                 && !repo_section(url, "wiki")
         }
         LinkField::Platform(LinkPlatform::Issues) => {
-            (from_domains(url, SOURCE_DOMAINS) && repo_section(url, "issues"))
+            is_github_issues(url)
+                || from_domains(url, SOURCE_DOMAINS)
+                    && !from_domains(url, GITHUB_DOMAINS)
                 || (from_domains(url, CURSEFORGE_DOMAINS)
                     && parts.len() == 4
                     && parts[0] == "minecraft"
@@ -504,6 +512,9 @@ fn field_block(field: &LinkField, url: &Url) -> Option<&'static str> {
         return None;
     }
     let own_pattern = allowed(field, url);
+    if *field == LinkField::Platform(LinkPlatform::Issues) && own_pattern {
+        return None;
+    }
     for other in [
         LinkField::Platform(LinkPlatform::Issues),
         LinkField::Platform(LinkPlatform::Wiki),
@@ -517,6 +528,10 @@ fn field_block(field: &LinkField, url: &Url) -> Option<&'static str> {
     ] {
         let matches_other = if other == LinkField::License {
             from_domains(url, LICENSE_DOMAINS)
+        } else if other == LinkField::Platform(LinkPlatform::Issues)
+            && from_domains(url, SOURCE_DOMAINS)
+        {
+            is_github_issues(url)
         } else {
             allowed(&other, url)
         };

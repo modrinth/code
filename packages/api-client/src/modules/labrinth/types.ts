@@ -1979,6 +1979,11 @@ export namespace Labrinth {
 				name: string
 			}
 
+			export interface License {
+				short: string
+				name: string
+			}
+
 			export type LicenseText = {
 				title: string
 				body: string
