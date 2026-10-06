@@ -34,7 +34,7 @@
 		"@crowdin/crowdin-api-client": "^1.55.2",
 		"@formatjs/icu-messageformat-parser": "^2.11.4",
 		"@modrinth/tooling-config": "workspace:*",
-		"@moonrepo/cli": "2.5.6",
+		"@moonrepo/cli": "2.6.0",
 		"@tailwindcss/container-queries": "^0.1.1",
 		"@types/node": "^24",
 		"@typescript-eslint/typescript-estree": "^8.64.0",
