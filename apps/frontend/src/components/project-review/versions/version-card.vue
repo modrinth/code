@@ -1,6 +1,6 @@
 <template>
 	<article
-		class="version-card flex min-w-0 flex-col gap-3 overflow-hidden rounded-2xl border border-solid bg-surface-2 p-2.5 pb-0.5"
+		class="version-card flex min-w-0 flex-col gap-3 overflow-clip rounded-2xl border border-solid bg-surface-2 p-2.5 pb-0.5 @container/review-version"
 		:class="withheld ? 'border-orange' : 'border-transparent'"
 	>
 		<div class="flex min-w-0 flex-1 flex-wrap items-start gap-2 gap-x-4">
@@ -99,8 +99,9 @@
 				</div>
 			</div>
 			<Accordion
-				button-class="w-full cursor-pointer border-0 bg-transparent py-2 text-left text-sm font-medium hover:brightness-125 [&>div>svg]:ml-0 [&>div>svg]:size-4"
+				button-class="w-fit cursor-pointer border-0 bg-transparent py-2 text-left text-sm font-medium hover:[&>div]:brightness-125 [&>div>svg]:ml-0 [&>div>svg]:size-4"
 				:open-by-default="expanded"
+				overflow-visible
 				@on-open="!expanded && emit('toggle')"
 				@on-close="expanded && emit('toggle')"
 			>
@@ -109,10 +110,13 @@
 						{{ formatMessage(messages.details) }}
 					</span>
 				</template>
-				<div :id="`review-version-${version.id}`" class="mt-1 flex min-w-0 flex-col gap-5">
-					<section>
+				<div
+					:id="`review-version-${version.id}`"
+					class="mb-3 grid min-w-0 grid-cols-1 items-start gap-5 @[40rem]/review-version:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] @[48rem]/review-version:gap-8"
+				>
+					<section class="min-w-0">
 						<dl
-							class="m-0 grid min-w-0 grid-cols-[minmax(0,max-content)_minmax(0,1fr)] items-baseline gap-x-6 gap-y-3"
+							class="m-0 mt-1 grid min-w-0 grid-cols-[minmax(0,max-content)_minmax(0,1fr)] items-baseline gap-x-4 gap-y-3"
 						>
 							<dt class="font-medium text-secondary">
 								{{ formatMessage(messages.versionNumber) }}
@@ -125,117 +129,152 @@
 							</dt>
 							<dd class="m-0 min-w-0 break-words">{{ version.name }}</dd>
 							<dt class="font-medium text-secondary">
-								{{ formatMessage(messages.publishedBy) }}
-							</dt>
-							<dd class="m-0 min-w-0 break-words">
-								<NuxtLink
-									:to="`/user/${version.author_id}`"
-									target="_blank"
-									class="hover:underline"
-									>{{ author?.username ?? version.author_id }}</NuxtLink
-								>
-							</dd>
-							<dt class="font-medium text-secondary">
 								{{ formatMessage(messages.versionId) }}
 							</dt>
 							<dd class="m-0 min-w-0"><CopyCode :text="version.id" /></dd>
+							<dt class="self-center font-medium text-secondary">
+								{{ formatMessage(messages.publishedBy) }}
+							</dt>
+							<dd class="m-0 min-w-0 self-center break-words">
+								<NuxtLink
+									:to="`/user/${version.author_id}`"
+									target="_blank"
+									class="flex min-w-0 items-center gap-1 hover:underline"
+								>
+									<Avatar
+										:src="author?.avatar_url"
+										alt=""
+										size="1.25rem"
+										class="-my-1 shrink-0"
+										circle
+										no-shadow
+									/>
+									<span v-tooltip="author?.username ?? version.author_id" class="min-w-0 truncate">
+										{{ author?.username ?? version.author_id }}
+									</span>
+								</NuxtLink>
+							</dd>
 						</dl>
 					</section>
-					<section>
-						<Accordion
-							:open-by-default="dependenciesOpen"
-							button-class="w-full cursor-pointer border-0 bg-transparent mt-2 py-2 text-left text-sm font-medium hover:brightness-125 [&>div>svg]:ml-0 [&>div>svg]:size-4"
-							@on-open="dependenciesOpen = true"
-							@on-close="dependenciesOpen = false"
-						>
-							<template #title>
-								<span class="text-primary">
+					<section class="min-w-0">
+						<div class="min-w-0">
+							<h3 class="sticky top-0 z-10 m-0 bg-surface-2 py-2 text-sm font-medium text-primary">
+								<button
+									v-if="version.dependencies.length > 6"
+									type="button"
+									class="flex w-full cursor-pointer items-center gap-1 border-0 bg-transparent p-0 text-left text-sm font-medium text-primary hover:brightness-125"
+									:aria-expanded="dependenciesOpen"
+									:aria-controls="`review-version-dependencies-${version.id}`"
+									@click="dependenciesOpen = !dependenciesOpen"
+								>
+									{{ formatMessage(messages.dependencies) }} ({{
+										formatNumber(version.dependencies.length)
+									}})
+									<DropdownIcon
+										class="size-4 shrink-0 transition-transform duration-150 motion-reduce:transition-none"
+										:class="{ 'rotate-180': dependenciesOpen }"
+										aria-hidden="true"
+									/>
+								</button>
+								<span v-else>
 									{{ formatMessage(messages.dependencies) }} ({{
 										formatNumber(version.dependencies.length)
 									}})
 								</span>
-							</template>
-							<p v-if="!version.dependencies.length" class="m-0 text-secondary">
-								{{ formatMessage(messages.emptyDependencies) }}
-							</p>
-							<p v-else-if="dependenciesQuery.isPending.value" role="status" class="m-0">
-								{{ formatMessage(messages.loading) }}
-							</p>
-							<div v-else-if="dependenciesQuery.isError.value" role="alert">
-								<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
-								<Button @click="dependenciesQuery.refetch()">{{
-									formatMessage(messages.retry)
-								}}</Button>
-							</div>
-							<div v-else class="flex flex-col gap-1.5">
-								<div
-									v-for="(context, index) in dependencies"
-									:key="index"
-									class="min-w-0 rounded-lg bg-surface-1 px-3 py-2"
-								>
-									<div class="flex min-w-0 flex-wrap items-center gap-3">
-										<AutoLink
-											:to="dependencyHref(context)"
-											class="flex min-w-0 flex-1 items-center gap-3 text-contrast hover:underline"
-										>
-											<Avatar
-												:src="
-													context.project?.icon_url ??
-													context.dependency.attribution?.flame_project?.icon_url
-												"
-												alt=""
-												size="1.5rem"
-												no-shadow
-											/>
-											<span class="break-words">{{
-												context.project?.title ??
-												context.dependency.file_name ??
-												context.dependency.project_id ??
-												context.dependency.version_id
-											}}</span>
-										</AutoLink>
-										<span
-											v-if="context.version"
-											class="break-all font-mono text-sm text-secondary"
-											>{{ context.version.version_number }}</span
-										>
-										<TagItem class="text-xs">{{
-											formatMessage(messages[context.dependency.dependency_type])
-										}}</TagItem>
+							</h3>
+							<div
+								:id="`review-version-dependencies-${version.id}`"
+								class="grid transition-[grid-template-rows] duration-150 ease-out motion-reduce:transition-none"
+								:class="
+									version.dependencies.length <= 6 || dependenciesOpen
+										? 'grid-rows-[1fr]'
+										: 'grid-rows-[0fr]'
+								"
+								:inert="version.dependencies.length > 6 && !dependenciesOpen"
+							>
+								<div class="min-h-0 overflow-hidden">
+									<div class="pb-2.5">
+										<p v-if="!version.dependencies.length" class="m-0 text-secondary">
+											{{ formatMessage(messages.emptyDependencies) }}
+										</p>
+										<p v-else-if="dependenciesQuery.isPending.value" role="status" class="m-0">
+											{{ formatMessage(messages.loading) }}
+										</p>
+										<div v-else-if="dependenciesQuery.isError.value" role="alert">
+											<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
+											<Button @click="dependenciesQuery.refetch()">{{
+												formatMessage(messages.retry)
+											}}</Button>
+										</div>
+										<div v-else class="flex flex-col gap-1.5">
+											<div
+												v-for="(context, index) in dependencies"
+												:key="index"
+												class="min-w-0 rounded-lg bg-surface-1 px-3 py-2"
+											>
+												<div class="flex min-w-0 flex-wrap items-center gap-3">
+													<AutoLink
+														:to="dependencyHref(context)"
+														class="flex min-w-0 flex-1 items-center gap-3 text-contrast hover:underline"
+													>
+														<Avatar
+															:src="
+																context.project?.icon_url ??
+																context.dependency.attribution?.flame_project?.icon_url
+															"
+															alt=""
+															size="1.5rem"
+															no-shadow
+														/>
+														<span class="break-words">{{
+															context.project?.title ??
+															context.dependency.file_name ??
+															context.dependency.project_id ??
+															context.dependency.version_id
+														}}</span>
+													</AutoLink>
+													<span
+														v-if="context.version"
+														class="break-all font-mono text-sm text-secondary"
+														>{{ context.version.version_number }}</span
+													>
+													<TagItem class="text-xs">{{
+														formatMessage(messages[context.dependency.dependency_type])
+													}}</TagItem>
+												</div>
+											</div>
+										</div>
 									</div>
 								</div>
 							</div>
-						</Accordion>
+						</div>
 						<Accordion
-							:open-by-default="changelogOpen"
-							button-class="w-full cursor-pointer border-0 bg-transparent py-2 text-left text-sm font-medium hover:brightness-125 [&>div>svg]:ml-0 [&>div>svg]:size-4"
-							@on-open="changelogOpen = true"
-							@on-close="changelogOpen = false"
+							v-if="detailQuery.data.value?.changelog"
+							open-by-default
+							button-class="sticky top-0 z-10 w-full cursor-pointer border-0 bg-surface-2 py-2 text-left text-sm font-medium hover:[&>div]:brightness-125 [&>div>svg]:ml-0 [&>div>svg]:size-4"
 						>
 							<template #title>
-								<span class="text-primary">
-									{{ formatMessage(messages.changelog) }}
-								</span>
+								<span class="text-primary">{{ formatMessage(messages.changelog) }}</span>
 							</template>
-							<div class="mb-2.5">
-								<p v-if="detailQuery.isPending.value" role="status" class="m-0">
-									{{ formatMessage(messages.loading) }}
-								</p>
-								<div v-else-if="detailQuery.isError.value" role="alert">
-									<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
-									<Button @click="detailQuery.refetch()">{{
-										formatMessage(messages.retry)
-									}}</Button>
-								</div>
-								<ProjectPageDescription
-									v-else-if="detailQuery.data.value?.changelog"
-									:description="detailQuery.data.value.changelog"
-								/>
-								<p v-else class="m-0 text-secondary">
-									{{ formatMessage(messages.emptyChangelog) }}
-								</p>
+							<div class="mb-4">
+								<ProjectPageDescription :description="detailQuery.data.value.changelog" />
 							</div>
 						</Accordion>
+						<div v-else class="mb-4">
+							<h3 class="m-0 py-2 text-sm font-medium text-primary">
+								{{ formatMessage(messages.changelog) }}
+							</h3>
+							<p v-if="detailQuery.isPending.value" role="status" class="m-0">
+								{{ formatMessage(messages.loading) }}
+							</p>
+							<div v-else-if="detailQuery.isError.value" role="alert">
+								<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
+								<Button @click="detailQuery.refetch()">{{ formatMessage(messages.retry) }}</Button>
+							</div>
+							<p v-else class="m-0 text-secondary">
+								{{ formatMessage(messages.emptyChangelog) }}
+							</p>
+						</div>
 					</section>
 				</div>
 			</Accordion>
@@ -249,6 +288,7 @@ import {
 	ClipboardCopyIcon,
 	CoffeeIcon,
 	DownloadIcon,
+	DropdownIcon,
 	ExternalIcon,
 	MoreVerticalIcon,
 } from '@modrinth/assets'
@@ -309,8 +349,7 @@ const formatBytes = useFormatBytes()
 const client = injectModrinthClient()
 const tags = injectTags(null)
 const { project, members } = injectProjectReviewPageContext()
-const changelogOpen = ref(false)
-const dependenciesOpen = ref(true)
+const dependenciesOpen = ref(false)
 const withheld = computed(() => !!props.version.files_missing_attribution?.length)
 const platforms = computed(() =>
 	props.version.loaders.includes('mrpack')
@@ -330,7 +369,7 @@ const versionHref = computed(() => `${projectHref.value}/version/${props.version
 const detailQuery = useQuery(
 	computed(() => ({
 		...versionQueryOptions.v3(props.version.id, client),
-		enabled: props.expanded && changelogOpen.value,
+		enabled: props.expanded,
 	})),
 )
 const dependenciesQuery = useQuery(

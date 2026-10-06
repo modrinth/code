@@ -10,7 +10,7 @@
 		<span>
 			{{ formatMessage(projectReviewMessages[params.params.tab]) }}
 		</span>
-		<span v-if="count !== undefined" class="relative top-px ml-1 rounded text-xs tabular-nums"
+		<span v-if="count !== undefined" class="relative top-px ml-1 rounded text-xs"
 			>({{ count }})</span
 		>
 		<KbdChip :keybind="`review-tab-${params.params.tab}`" class="relative bottom-px ml-1" />
