@@ -244,9 +244,11 @@
 						native-type="button"
 						class="ml-2"
 						:style="{ '--si': 1 }"
-						@click="() => {
-							$emit('toggleConstrainWidth', (constrainWidth = !constrainWidth))
-						}"
+						@click="
+							() => {
+								$emit('toggleConstrainWidth', (constrainWidth = !constrainWidth))
+							}
+						"
 					>
 						<ExpandIcon v-if="constrainWidth" />
 						<CollapseIcon v-else />
@@ -498,12 +500,16 @@ useResizeObserver(serverDataContainer, (entries) => {
 	const entry = entries[0]
 	allowConstrainWidthToggle.value = entry.contentRect.width > 1200
 })
-const constrainWidth = useLocalStorage('server-layout-constrained-width', props.constrainWidth ?? true, {
-	initOnMounted: true,
-	listenToStorageChanges: true,
-})
+const constrainWidth = useLocalStorage(
+	'server-layout-constrained-width',
+	props.constrainWidth ?? true,
+	{
+		initOnMounted: true,
+		listenToStorageChanges: true,
+	},
+)
 if (props.constrainWidth != constrainWidth.value) {
-	constrainWidth.value = props.constrainWidth;
+	constrainWidth.value = props.constrainWidth
 }
 
 const centerEntries = computed(() => props.centerEntries)

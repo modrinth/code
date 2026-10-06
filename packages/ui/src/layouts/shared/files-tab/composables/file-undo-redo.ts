@@ -1,7 +1,6 @@
 import { ref } from 'vue'
 
 import type { FileInfo } from '#ui/layouts/shared/files-tab/providers/file-manager.ts'
-import { parentInfoFrom } from '#ui/layouts/shared/files-tab/utils.ts'
 
 import type { Operation } from '../types'
 
@@ -73,8 +72,8 @@ export function useFileUndoRedo(
 
 	function onKeydown(e: KeyboardEvent) {
 		// Note: Using raw key will have capitalization issues due
-		// to how shift works in keyboard event it seems... ): 
-		const key = e.key.toLowerCase();
+		// to how shift works in keyboard event it seems... ):
+		const key = e.key.toLowerCase()
 		if ((e.ctrlKey || e.metaKey) && !e.shiftKey && key === 'z') {
 			e.preventDefault()
 			undo()

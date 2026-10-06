@@ -1,16 +1,12 @@
 <template>
 	<div
 		class="sticky top-[var(--files-table-header-top,0px)] z-10 flex h-[3rem] w-full select-none flex-row items-center justify-between bg-surface-3 pl-3 pr-3 font-medium transition-[border-radius] duration-100"
-		:class="
-			[
-				isStuck
-					? 'rounded-none border-0 border-y border-solid border-surface-4 shadow-md before:pointer-events-none before:absolute before:inset-x-0 before:-top-4 before:h-5 before:bg-surface-3'
-					: '',
-				props.advancedView
-					? 'border-0 border-t border-solid border-surface-5'
-					: ''
-			]
-		"
+		:class="[
+			isStuck
+				? 'rounded-none border-0 border-y border-solid border-surface-4 shadow-md before:pointer-events-none before:absolute before:inset-x-0 before:-top-4 before:h-5 before:bg-surface-3'
+				: '',
+			props.advancedView ? 'border-0 border-t border-solid border-surface-5' : '',
+		]"
 	>
 		<div class="flex min-w-0 flex-1 items-center gap-3">
 			<Checkbox

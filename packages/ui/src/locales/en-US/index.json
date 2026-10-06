@@ -1739,8 +1739,11 @@
   "files.row.upload-or-create": {
     "defaultMessage": "New Entry"
   },
-  "files.table-header.columns": {
-    "defaultMessage": "Columns"
+  "files.table-header.advanced-view": {
+    "defaultMessage": "Advanced view"
+  },
+  "files.table-header.colored-icons": {
+    "defaultMessage": "Colored icons"
   },
   "files.table-header.created": {
     "defaultMessage": "Created"
@@ -1762,6 +1765,9 @@
   },
   "files.table-header.size": {
     "defaultMessage": "Size"
+  },
+  "files.table-header.view-settings": {
+    "defaultMessage": "View settings"
   },
   "files.tabs.close-tab": {
     "defaultMessage": "Close {name}"

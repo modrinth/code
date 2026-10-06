@@ -125,7 +125,10 @@ const currentDirectory = computed<FileInfo<'directory'>>(() => {
 function navigateTo(file: FileInfo) {
 	const { editing: _, ...query } = route.query
 	router.push({
-		query: file.type == 'file' ? { ...query, path: file.path, editing: 'true' } : { ...query, path: file.path },
+		query:
+			file.type == 'file'
+				? { ...query, path: file.path, editing: 'true' }
+				: { ...query, path: file.path },
 	})
 
 	currentLocation.value = file
@@ -183,9 +186,11 @@ function queryDirectoryEntries(file: FileInfo<'directory'>): DirectoryResult & F
 	return queryFile(
 		file,
 		(queryData) => {
-			return computed<FileItem[]>(() => (queryData.value?.items ?? [])
-				.filter(isVisibleFileItem)
-				.map((item) => { return {...item, path: normalizeDirectoryPath(item.path)} }))
+			return computed<FileItem[]>(() =>
+				(queryData.value?.items ?? []).filter(isVisibleFileItem).map((item) => {
+					return { ...item, path: normalizeDirectoryPath(item.path) }
+				}),
+			)
 		},
 		directoryQueryOptions,
 	)

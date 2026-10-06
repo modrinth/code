@@ -42,9 +42,11 @@ const SIDES = {
 } as const
 
 const props = withDefaults(
-	defineProps<TooltipBaseProps & {
-		disabled?: boolean
-	}>(),
+	defineProps<
+		TooltipBaseProps & {
+			disabled?: boolean
+		}
+	>(),
 	{ disabled: false, theme: 'tooltip', placement: 'top', allowTransfer: true },
 )
 
@@ -171,7 +173,7 @@ function syncSource() {
 	}
 	bindTooltipSource(el, {
 		...props,
-		content: slots.popper ? () => slots.popper?.() : undefined
+		content: slots.popper ? () => slots.popper?.() : undefined,
 	})
 }
 
@@ -208,16 +210,13 @@ function onEnter() {
 		return
 	}
 	const delay = props.delay
-	tooltipEnter(
-		trigger.value,
-		delay ? (typeof delay === 'number' ? delay : delay.hover) : undefined,
-	)
+	tooltipEnter(trigger.value, delay ? (typeof delay === 'number' ? delay : delay.hover) : undefined)
 }
 
 function onTooltipEnter() {
-	console.log("WWWWWWWWWWWWWWWWWWWW")
+	console.log('WWWWWWWWWWWWWWWWWWWW')
 	if ((props.hoverable || props.pinned) && props.reference) {
-		console.log("WEEEEEEEE")
+		console.log('WEEEEEEEE')
 		preventHide(props.reference)
 	}
 }
@@ -226,10 +225,7 @@ function onLeave() {
 	const triggerEl = trigger.value ?? props.reference
 	const delay = props.delay
 	if (triggerEl) {
-		tooltipLeave(
-			triggerEl,
-			delay ? (typeof delay === 'number' ? delay : delay.unhover) : undefined,
-		)
+		tooltipLeave(triggerEl, delay ? (typeof delay === 'number' ? delay : delay.unhover) : undefined)
 	}
 }
 

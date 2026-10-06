@@ -20,9 +20,12 @@ export interface TooltipBaseProps {
 	allowTransfer?: boolean
 }
 
-type RequiredFor<T, K extends keyof T> = Required<Pick<T, K>> & Pick<T, Exclude<keyof T, K>>;
+type RequiredFor<T, K extends keyof T> = Required<Pick<T, K>> & Pick<T, Exclude<keyof T, K>>
 
-type TooltipState = RequiredFor<Omit<TooltipBaseProps, 'pinned'>, 'placement' | 'theme' | 'reference'>;
+type TooltipState = RequiredFor<
+	Omit<TooltipBaseProps, 'pinned'>,
+	'placement' | 'theme' | 'reference'
+>
 
 type TimeoutId = ReturnType<typeof setTimeout>
 
@@ -70,13 +73,13 @@ function stopHide() {
 function hideWaiting(el?: HTMLElement) {
 	if (hideTimer == null) return false
 
-	const hidingEl = hideTimer.el;
-	stopHide();
+	const hidingEl = hideTimer.el
+	stopHide()
 
-	const isHidingElement = hidingEl == el;
+	const isHidingElement = hidingEl == el
 	if (!isHidingElement) hide(hidingEl, true)
 
-	return isHidingElement;
+	return isHidingElement
 }
 
 function clear() {
@@ -92,7 +95,7 @@ function clear() {
 
 function hasTooltipContent(el: HTMLElement) {
 	const source = sources.get(el)
-	return !!((typeof source?.text === 'function' ? source.text() : source?.text) || source?.content);
+	return !!((typeof source?.text === 'function' ? source.text() : source?.text) || source?.content)
 }
 
 function open(el: HTMLElement) {
@@ -123,26 +126,29 @@ function show(immediate: boolean, delay: number = SHOW_DELAY) {
 	if (!el || !hasTooltipContent(el)) {
 		return
 	}
-	if (hideWaiting(el)) return;
-	if (showTimer) stopShow();
-	const source = sources.get(el);
-	if (immediate || ((activeTooltip.value.reference || Date.now() - lastOpen <= delay) && source?.allowTransfer)) {
+	if (hideWaiting(el)) return
+	if (showTimer) stopShow()
+	const source = sources.get(el)
+	if (
+		immediate ||
+		((activeTooltip.value.reference || Date.now() - lastOpen <= delay) && source?.allowTransfer)
+	) {
 		open(el)
 		return
 	}
 	showTimer = {
 		id: setTimeout(() => {
-			open(el);
-			stopShow();
+			open(el)
+			stopShow()
 		}, delay),
-		el: el
+		el: el,
 	}
 }
 
 function hide(el: HTMLElement, immediate: boolean, delay: number = HIDE_DELAY) {
-	if (showTimer?.el === el) stopShow();
+	if (showTimer?.el === el) stopShow()
 
-	const source = sources.get(el);
+	const source = sources.get(el)
 
 	if (source?.pinned) {
 		return
@@ -172,7 +178,7 @@ function hide(el: HTMLElement, immediate: boolean, delay: number = HIDE_DELAY) {
 			clear()
 			stopHide()
 		}, delay),
-		el: el
+		el: el,
 	}
 }
 
@@ -216,15 +222,14 @@ export function tooltipEnter(el: HTMLElement, delay?: number): void {
 	if (!hasTooltipContent(el)) {
 		return
 	}
-	console.log("tooltipEnter", delay)
+	console.log('tooltipEnter', delay)
 	hovered = el
 	show(false, delay)
 }
 
-
 export function preventHide(el: HTMLElement) {
 	if (hideTimer?.el == el) {
-		stopHide();
+		stopHide()
 	}
 }
 
