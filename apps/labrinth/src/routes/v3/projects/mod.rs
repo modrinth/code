@@ -3381,7 +3381,7 @@ pub async fn project_delete(
         search_state,
     )
     .await?;
-    Ok(HttpResponse::Ok().finish())
+    Ok(HttpResponse::NoContent().finish())
 }
 
 pub async fn project_delete_internal(
