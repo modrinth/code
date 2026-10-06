@@ -26,6 +26,7 @@ import {
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { invoke } from '@tauri-apps/api/core'
+import { useDebounceFn } from '@vueuse/core'
 import { computed, effectScope, markRaw, onScopeDispose, ref, shallowReactive, watch } from 'vue'
 
 import { useAppEvent } from '@/composables/use-app-event'
@@ -204,17 +205,29 @@ function isReadOnly(file: FileInfo | null): boolean {
 
 const isRefreshing = ref<boolean>(false)
 
+/** Refetches every loaded listing in the background, without showing the loading bar. */
+async function invalidateListings() {
+	await queryClient.invalidateQueries({
+		queryKey: [...instanceKeys.detail(instanceId.value), 'files'],
+	})
+}
+
+/** A refresh the user asked for, which is shown as loading. */
 async function refresh() {
 	debug('refresh: called, currentDirectory =', currentDirectory.value.path)
 	isRefreshing.value = true
 	try {
-		await queryClient.invalidateQueries({
-			queryKey: [...instanceKeys.detail(instanceId.value), 'files'],
-		})
+		await invalidateListings()
 	} finally {
 		isRefreshing.value = false
 	}
 }
+
+/**
+ * The instance watcher reports a sync for any change in the instance folder (e.g. a running game
+ * writing its logs), so these are batched and refetched in the background.
+ */
+const invalidateListingsDebounced = useDebounceFn(invalidateListings, 500)
 
 function navigateTo(file: FileInfo) {
 	debug('navigateTo:', file.path)
@@ -240,7 +253,7 @@ async function createItem(name: string, type: 'file' | 'directory'): Promise<Fil
 		} else {
 			await writeBytes(file.path, new Uint8Array(), true)
 		}
-		await refresh()
+		await invalidateListings()
 		return file
 	} catch (e) {
 		notifyError(formatMessage(commonMessages.createFailedLabel), e)
@@ -255,7 +268,7 @@ async function renameFile(file: FileInfo, destination: string, failedLabel: stri
 			source: toRelativePath(file.path),
 			destination: toRelativePath(destination),
 		})
-		await refresh()
+		await invalidateListings()
 		return infoFrom({ name: file.name, type: file.type, path: destination })
 	} catch (e) {
 		notifyError(failedLabel, e)
@@ -282,7 +295,7 @@ async function deleteItem(file: FileInfo, recursive: boolean): Promise<boolean> 
 			path: toRelativePath(file.path),
 			recursive,
 		})
-		await refresh()
+		await invalidateListings()
 		return true
 	} catch (e) {
 		notifyError(formatMessage(commonMessages.deleteFailedLabel), e)
@@ -341,7 +354,7 @@ async function uploadFiles(files: File[]) {
 		notifyError(formatMessage(commonMessages.uploadFailedLabel), e)
 	} finally {
 		uploadState.value.isUploading = false
-		await refresh()
+		await invalidateListings()
 	}
 }
 
@@ -361,8 +374,8 @@ async function extractFile(path: string, override: boolean, dry: boolean) {
 useAppEvent('instance', async (event) => {
 	debug('app event: instance =', event.event, 'path =', event.instance_id)
 	if (event.instance_id === instanceId.value && event.event === 'synced') {
-		debug('app event: synced instance matched, calling refresh')
-		await refresh()
+		debug('app event: synced instance matched, refetching listings')
+		await invalidateListingsDebounced()
 	}
 })
 
@@ -422,7 +435,9 @@ provideFileManager({
 
 <template>
 	<ReadyTransition :pending="initialLoadPending">
-		<div class="[--files-viewport-height:calc(100vh_-_var(--top-bar-height))]">
+		<div
+			class="pt-2 [--files-sticky-top:1.5rem] [--files-viewport-height:calc(100vh_-_var(--top-bar-height,3rem))]"
+		>
 			<FilePageLayout :show-refresh-button="true" />
 		</div>
 	</ReadyTransition>

@@ -552,7 +552,7 @@ async function zipPaths(
 watch(
 	() => fsOps.value,
 	() => {
-		refreshList()
+		queryClient.invalidateQueries({ queryKey: ['files', serverId] })
 	},
 )
 

@@ -108,7 +108,7 @@
 			containedLayout
 				? 'h-full min-h-0 overflow-hidden'
 				: constrainWidth
-					? ['min-h-[100svh] ', centerEntries ? 'max-w-[1280px]' : '']
+					? ['min-h-[100svh] max-w-[1280px]']
 					: 'min-h-[calc(100svh-100px)]',
 		]"
 	>
@@ -435,7 +435,7 @@ const props = withDefaults(
 			type: 'mod' | 'plugin' | 'datapack'
 		}) => void | Promise<void>
 		constrainWidth?: boolean
-		centerEntries?: boolean
+		allowConstrainWidthToggle?: boolean
 		layoutMode?: 'page' | 'contained'
 	}>(),
 	{
@@ -452,7 +452,7 @@ const props = withDefaults(
 		browseModpacks: undefined,
 		browseContent: undefined,
 		constrainWidth: undefined,
-		centerEntries: true,
+		allowConstrainWidthToggle: false,
 		layoutMode: 'page',
 	},
 )
@@ -498,7 +498,7 @@ const serverDataContainer = ref<InstanceType<typeof HTMLDivElement>>()
 const allowConstrainWidthToggle = ref<boolean>(false)
 useResizeObserver(serverDataContainer, (entries) => {
 	const entry = entries[0]
-	allowConstrainWidthToggle.value = entry.contentRect.width > 1200
+	allowConstrainWidthToggle.value = entry.contentRect.width > 1200 && props.allowConstrainWidthToggle
 })
 const constrainWidth = useLocalStorage(
 	'server-layout-constrained-width',
@@ -512,7 +512,6 @@ if (props.constrainWidth != constrainWidth.value) {
 	constrainWidth.value = props.constrainWidth
 }
 
-const centerEntries = computed(() => props.centerEntries)
 const containedLayout = computed(() => props.layoutMode === 'contained')
 const isNuxt = computed(() => client instanceof NuxtModrinthClient)
 const queryClient = useQueryClient()

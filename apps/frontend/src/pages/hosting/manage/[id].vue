@@ -28,6 +28,7 @@
 			}
 		"
 		:constrain-width="constrainWidth"
+		:allow-constrain-width-toggle="true"
 		@toggle-constrain-width="
 			(value: boolean) => {
 				constrainWidth = value

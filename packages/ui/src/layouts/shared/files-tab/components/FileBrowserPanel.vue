@@ -1,17 +1,19 @@
 <template>
 	<div
 		ref="panelRoot"
-		class="flex w-full scroll-mt-[var(--files-sticky-top,0px)] flex-col gap-3 p-1 pl-2"
+		class="flex min-h-[calc(var(--files-viewer-height)_+_var(--files-navbar-height,3rem)_+_18px)] w-full scroll-mt-[var(--files-sticky-top,0px)] flex-col gap-3 p-1 pl-2 [overflow-y:clip]"
 		:class="{ 'snap-start': isFileActive }"
 		:style="{
 			'--files-navbar-height': `${navbarHeight}px`,
 			'--files-trailing-space': `${trailingSpace}px`,
 			'--files-table-header-top': `calc(var(--files-sticky-top, 0px) + ${navbarHeight}px + ${tabStripHeight}px)`,
+			'--files-viewer-height':
+				'max(24rem, calc(var(--files-viewport-height, 100dvh) - var(--files-sticky-top, 0px) - var(--files-navbar-height, 3rem) - 18px - var(--files-trailing-space, 0px)))',
 		}"
 	>
 		<div
 			ref="navbarWrapper"
-			class="sticky top-[var(--files-sticky-top,0px)] z-30 bg-surface-1 py-1"
+			class="sticky top-[var(--files-sticky-top,0px)] z-[29] bg-surface-1 py-1 before:pointer-events-none before:top-[calc(-1.5rem_+_1px)] before:absolute  before:inset-x-0  before:h-[var(--files-sticky-top,0px)] before:bg-[var(--color-bg,_var(--surface-1))] before:content-['']"
 		>
 			<FileNavbar
 				:sidebar-open="sidebarOpen"
@@ -50,7 +52,7 @@
 				class="shrink-0 overflow-hidden"
 				:class="
 					isFileActive
-						? 'h-[calc(var(--files-viewport-height,100dvh)_-_var(--files-sticky-top,0px)_-_var(--files-navbar-height,3rem)_-_18px_-_var(--files-trailing-space,0px))] min-h-[24rem]'
+						? 'h-[var(--files-viewer-height)]'
 						: ui.advancedView.value
 							? 'sticky top-[calc(var(--files-sticky-top,0px)_+_var(--files-navbar-height,0px))] z-20 h-10'
 							: 'h-0'
@@ -69,7 +71,6 @@
 			<div v-show="!isFileActive && !ui.error.value">
 				<FileUploadDragAndDrop
 					ref="fileUploadRef"
-					class=""
 					:disabled="ui.isBusy.value"
 					@drop-error="ui.handleDropError"
 					@files-dropped="ui.uploadFiles"
@@ -277,9 +278,10 @@ const activeFileKey = computed(() =>
 
 /**
  * Scroll space below the file viewer within the page's content (stopping at `<main>`, so a site
- * footer doesn't count). The editor is shortened by this much so that scrolling to the end of the
- * page can never push the tab strip under the sticky navbar. Parents' `min-height` slack is
- * deliberately ignored, since it shrinks as the editor grows.
+ * footer doesn't count). The viewer's height (the editor's, and the listing's minimum) is shortened
+ * by this much so that scrolling to the end of the page can never push the tab strip under the
+ * sticky navbar, and switching between files and folders keeps the page the same height. Parents'
+ * `min-height` slack is deliberately ignored, since it shrinks as the viewer grows.
  */
 const trailingSpace = ref(0)
 
@@ -328,13 +330,9 @@ watch(activeFileKey, (key) => {
 	})
 })
 
-watch(navbarHeight, () => {
-	if (isFileActive.value) nextTick(measureTrailingSpace)
-})
+watch(navbarHeight, () => nextTick(measureTrailingSpace))
 
-useEventListener('resize', () => {
-	if (isFileActive.value) measureTrailingSpace()
-})
+useEventListener('resize', measureTrailingSpace)
 
 /**
  * While a file is open, the scroll container snaps (by proximity) to the file viewer, so it is
@@ -363,9 +361,8 @@ watch(isFileActive, (active) => {
 })
 onMounted(() => {
 	setViewerSnapping(isFileActive.value)
-	if (!isFileActive.value) return
 	measureTrailingSpace()
-	nextTick(scrollPanelIntoView)
+	if (isFileActive.value) nextTick(scrollPanelIntoView)
 })
 onBeforeUnmount(() => setViewerSnapping(false))
 </script>
