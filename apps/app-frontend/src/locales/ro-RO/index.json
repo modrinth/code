@@ -53,6 +53,9 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Descărcarea nu s-a putut finaliza"
   },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Nu s-a putut pregăti instanța"
+  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Calea fișierului este invalidă"
   },
@@ -203,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Acasă și conținut"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Afișează aplicația Modrinth în prim-plan la închiderea Minecraft."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Reactivează aplicația Modrinth la închiderea Minecraft"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Pornire și navigare"
   },
@@ -281,8 +290,17 @@
   "app.content.desync-pack": {
     "message": "Desincronizare"
   },
+  "app.content.sync-data-packs-disabled": {
+    "message": "Activează mai întâi sincronizarea pachetelor de date din setările aplicației."
+  },
   "app.content.sync-pack": {
     "message": "Sincronizeaza"
+  },
+  "app.content.sync-packs-override": {
+    "message": "Mai întâi, dezactivați opțiunea de suprascriere a sincronizării pachetelor din setările acestei instanțe."
+  },
+  "app.content.sync-resource-packs-disabled": {
+    "message": "Activează mai întâi sincronizarea pachetelor de resurse din setările aplicației."
   },
   "app.download-manager.active": {
     "message": "Activ"
@@ -290,17 +308,53 @@
   "app.download-manager.attention": {
     "message": "Necesită atenție"
   },
+  "app.download-manager.bulk-update-content": {
+    "message": "Actualizare {count, plural, one {# item} other {# items}}"
+  },
   "app.download-manager.cancel": {
     "message": "Anulează instalarea"
   },
   "app.download-manager.canceling": {
     "message": "Se anulează instalarea..."
   },
+  "app.download-manager.clear-all": {
+    "message": "Șterge tot"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Șterge toate sarcinile finalizate"
+  },
   "app.download-manager.complete": {
     "message": "Complet"
   },
   "app.download-manager.duplicated-instance": {
     "message": "Instanță duplicată"
+  },
+  "app.download-manager.empty": {
+    "message": "Nu sunt operațiuni de instalare"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Viteza estimată de descărcare"
+  },
+  "app.download-manager.eta": {
+    "message": "Timpul estimat rămas pentru această descărcare"
+  },
+  "app.download-manager.hide": {
+    "message": "Ascunde sarcinile de instalare"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Instanță importată"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "Instalarea unei instanțe"
+  },
+  "app.download-manager.modpack": {
+    "message": "Modpack"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Instalarea unui modpack"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Instanță nouă"
   },
   "app.download-manager.pause": {
     "message": "Întrerupe instalarea"
@@ -317,8 +371,17 @@
   "app.download-manager.shared-instance": {
     "message": "Instanță comuna"
   },
+  "app.download-manager.shared-instance-update": {
+    "message": "Actualizare instanță partajată"
+  },
+  "app.download-manager.show": {
+    "message": "Afișează sarcinile de instalare"
+  },
   "app.download-manager.tasks": {
     "message": "Sarcini"
+  },
+  "app.download-manager.title": {
+    "message": "Manager de descărcări"
   },
   "app.download-manager.verifying": {
     "message": "Se verifică"
@@ -347,6 +410,9 @@
   "app.export-modal.modpack-name-placeholder": {
     "message": "Numele modpack-ului"
   },
+  "app.export-modal.version-number-label": {
+    "message": "Numărul versiunii"
+  },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
@@ -368,6 +434,9 @@
   "app.features-settings.show-all-screenshots.title": {
     "message": "Afișați toate capturile de ecran în bara laterală"
   },
+  "app.features-settings.show-files-tab.title": {
+    "message": "Afișează fila „Fișiere” în instanțe"
+  },
   "app.features-settings.show-jump-in.description": {
     "message": "Afișați lumile și instanțele jucate recent în partea de sus a paginii Joacă."
   },
@@ -377,11 +446,29 @@
   "app.features-settings.show-screenshots-tab.title": {
     "message": "Afișează fila Capturi de ecran în instanțe"
   },
+  "app.features-settings.show-skin-selector.description": {
+    "message": "Afișează un buton în bara laterală din stânga pentru a deschide selectorul de teme."
+  },
+  "app.features-settings.show-skin-selector.title": {
+    "message": "Afișează selectorul de teme în bara laterală"
+  },
   "app.features-settings.sidebar.title": {
     "message": "Bară laterală"
   },
+  "app.features-settings.sync-across-devices.description": {
+    "message": "Utilizează aceste setări ale funcțiilor oriunde ești conectat. Dezactivează această opțiune pentru a păstra setări separate pe acest dispozitiv."
+  },
   "app.features-settings.sync-across-devices.signed-out-tooltip": {
     "message": "Conectează-te la un cont Modrinth pentru a sincroniza setările."
+  },
+  "app.features-settings.sync-across-devices.title": {
+    "message": "Funcții de sincronizare între dispozitive"
+  },
+  "app.home.jump-back-in.instance-locked": {
+    "message": "Această instanță a fost blocată"
+  },
+  "app.home.jump-back-in.instance-open": {
+    "message": "Instanța este deja deschisă"
   },
   "app.home.jump-back-in.more-options": {
     "message": "Mai multe opțiuni"
@@ -392,8 +479,62 @@
   "app.home.jump-back-in.new-instance": {
     "message": "Instanță nouă"
   },
+  "app.home.jump-back-in.resize": {
+    "message": "Trageți pentru a modifica dimensiunea"
+  },
+  "app.home.jump-back-in.title": {
+    "message": "Dă-i drumul!"
+  },
+  "app.home.jump-back-in.view-instance": {
+    "message": "Vizualizează instanța"
+  },
+  "app.hosting.update-required.description": {
+    "message": "Trebuie să efectuați o actualizare pentru a putea utiliza serviciul Modrinth Hosting prin intermediul aplicației Modrinth"
+  },
+  "app.hosting.update-required.download": {
+    "message": "Descărcați pentru a actualiza"
+  },
+  "app.hosting.update-required.title": {
+    "message": "Este necesară actualizarea aplicației Modrinth"
+  },
+  "app.install.phase.downloading_content": {
+    "message": "Descărcarea conținutului"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Descărcarea Minecraft"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Descărcarea fișierului pachetului"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "Extragerea suprascrierilor"
+  },
   "app.install.phase.finalizing": {
     "message": "Se finalizează"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "În așteptare pentru instalare"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Pregătirea Java"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Descărcarea Java {version}"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Extragerea Java {version} "
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Se încarcă Java {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Pregătirea Java {version}"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Validarea Java {version}"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Citirea manifestului pachetului"
   },
   "app.instance.action.play": {
     "message": "Joacă"

@@ -35,6 +35,12 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Vis statistikk"
   },
+  "app.appearance-settings.native-decorations.description": {
+    "defaultMessage": "Bruk operativsystemets tittellinje og vindukontroller. Krever omstart av appen."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "defaultMessage": "Systemets vindusramme"
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Kunne ikke laste inn serverinnstillinger"
   },
@@ -50,11 +56,20 @@
   "badge.new": {
     "defaultMessage": "Ny"
   },
+  "badge.release": {
+    "defaultMessage": "Utgivelse"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Avbryt"
   },
   "billing.resubscribe-modal.cpus": {
     "defaultMessage": "{sharedCpus} Delte CPU-er"
+  },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "Du er i ferd med å abonnere på <server-name>{serverName}</server-name> på nytt. Abonnementet ditt blir reaktivert, og serveren din fortsetter å kjøre uten avbrudd."
+  },
+  "billing.resubscribe-modal.error.text": {
+    "defaultMessage": "Kan ikke abonnere på nytt. Kunne ikke laste inn abonnementsdetaljer."
   },
   "billing.resubscribe-modal.error.title": {
     "defaultMessage": "Feil"
@@ -62,11 +77,26 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Kunne ikke laste inn abonnementsdetaljer."
   },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "Din neste betaling skjer <charge-date>{date}</charge-date>."
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "Plan"
+  },
   "billing.resubscribe-modal.ram": {
     "defaultMessage": "{ramGb} GB RAM"
   },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "Abonner på nytt"
+  },
   "billing.resubscribe-modal.storage": {
     "defaultMessage": "{storageGb} GB Lagringsplass"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Abonner på nytt på server"
+  },
+  "browse.advanced-filters.apply-saved-preferences": {
+    "defaultMessage": "Bruk lagrede innstillinger"
   },
   "browse.filter-results": {
     "defaultMessage": "Filtrér resultater..."

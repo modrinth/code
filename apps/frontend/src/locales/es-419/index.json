@@ -2987,6 +2987,9 @@
   "layout.publish.email-verification-required.title": {
     "message": "Verificación de correo electrónico requerida"
   },
+  "messages.noResults": {
+    "message": "¡No se encontraron resultados para tu búsqueda!"
+  },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "Instala automáticamente todo lo que estén jugando"
   },
@@ -4136,8 +4139,11 @@
   "project.settings.license.custom": {
     "message": "Personalizada"
   },
+  "project.settings.license.custom-name-required": {
+    "message": "Ingresa un nombre para tu licencia personalizada."
+  },
   "project.settings.license.custom-url-description": {
-    "message": "La ubicación web del texto completo de la licencia. Debes proporcionar un link ya que se trata de una licencia personalizada."
+    "message": "La ubicación web del texto completo de la licencia."
   },
   "project.settings.license.intro": {
     "message": "Es importante elegir una licencia adecuada para tu {type}. Puedes elegir una de nuestra lista o proporcionar una licencia personalizada. También puede proporcionar una URL personalizada a su licencia elegida; de lo contrario, se mostrará el texto de la licencia. Consulte nuestra <guide>guía de licencias</guide> para obtener más información."
@@ -4154,6 +4160,9 @@
   "project.settings.license.name": {
     "message": "Nombre de la licencia"
   },
+  "project.settings.license.name-description": {
+    "message": "El nombre completo de la licencia personalizada."
+  },
   "project.settings.license.name-placeholder": {
     "message": "Nombre de la licencia"
   },
@@ -4161,10 +4170,10 @@
     "message": "opcional"
   },
   "project.settings.license.select": {
-    "message": "Selecciona una licencia"
+    "message": "Licencia"
   },
   "project.settings.license.select-placeholder": {
-    "message": "Seleccionar licencia..."
+    "message": "Buscar licencias..."
   },
   "project.settings.license.title": {
     "message": "Licencia"
@@ -4180,6 +4189,9 @@
   },
   "project.settings.license.url-description": {
     "message": "La ubicación web del texto completo de la licencia. Si no proporcionas un link, el texto de la licencia se mostrará en su lugar."
+  },
+  "project.settings.license.url-placeholder": {
+    "message": "URL de la licencia"
   },
   "project.settings.links.add-link": {
     "message": "Añadir link"

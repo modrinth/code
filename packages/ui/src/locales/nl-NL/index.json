@@ -1238,9 +1238,6 @@
   "external-files.permissions-card.editor.save": {
     "defaultMessage": "Bronvermelding opslaan"
   },
-  "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "Licentie kiezen..."
-  },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "Reden voor toestemming"
   },

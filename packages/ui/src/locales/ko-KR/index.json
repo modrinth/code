@@ -1175,9 +1175,6 @@
   "external-files.permissions-card.editor.save": {
     "defaultMessage": "속성 저장"
   },
-  "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "라이선스 선택..."
-  },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "허가 사유"
   },
@@ -2103,7 +2100,7 @@
     "defaultMessage": "갤러리 보기"
   },
   "input.view.grid": {
-    "defaultMessage": "바둑판식 보기"
+    "defaultMessage": "격자식 보기"
   },
   "input.view.list": {
     "defaultMessage": "행 보기"
@@ -5503,6 +5500,9 @@
   },
   "settings.display.project-list-layouts.mod": {
     "defaultMessage": "모드 페이지"
+  },
+  "settings.display.project-list-layouts.mode.grid": {
+    "defaultMessage": "격자"
   },
   "settings.display.project-list-layouts.mode.rows": {
     "defaultMessage": "행"

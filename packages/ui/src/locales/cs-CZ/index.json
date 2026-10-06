@@ -1154,9 +1154,6 @@
   "external-files.permissions-card.editor.save": {
     "defaultMessage": "Uložit uvedení autora"
   },
-  "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "Vyberte licenci..."
-  },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "Důvod práva"
   },
