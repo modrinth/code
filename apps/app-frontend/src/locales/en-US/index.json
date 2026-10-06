@@ -2792,6 +2792,15 @@
   "app.settings.resource-management.app-directory.title": {
     "message": "App directory"
   },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "Export app logs and diagnostic data to a ZIP file to share with Modrinth support."
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "Export debug info"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "Debug info"
+  },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "Number of files the app can download at once. Lower this if downloads are unreliable on your connection. Requires an app restart."
   },
