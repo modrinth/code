@@ -115,7 +115,9 @@
 					:report="report"
 					:auth="auth"
 					raised
+					image-previews
 					@update-thread="() => updateThreadLocal()"
+					@open-image="openImage"
 				/>
 			</div>
 			<div v-if="report && report.closed" class="m-4 mt-2 flex flex-col gap-4">
@@ -410,6 +412,25 @@
 				</div>
 			</template>
 		</div>
+		<ImageViewerEditor
+			ref="imageViewer"
+			:items="imageItems"
+			editor="disabled"
+			@hide="restoreImageFocus"
+		>
+			<template #actions="{ item }">
+				<ButtonLink
+					v-tooltip="formatMessage(messages.openImageExternally)"
+					type="quiet"
+					class="!w-9 !rounded-full !p-0"
+					:aria-label="formatMessage(messages.openImageExternally)"
+					:href="item.src"
+					target="_blank"
+				>
+					<ExternalIcon aria-hidden="true" />
+				</ButtonLink>
+			</template>
+		</ImageViewerEditor>
 	</div>
 </template>
 
@@ -417,6 +438,7 @@
 import {
 	CheckCircleIcon,
 	CheckIcon,
+	ExternalIcon,
 	EyeOffIcon,
 	FileTextIcon,
 	ReplyIcon,
@@ -428,10 +450,12 @@ import {
 } from '@modrinth/assets'
 import {
 	Button,
+	ButtonLink,
 	Checkbox,
 	commonMessages,
 	CopyCode,
 	defineMessages,
+	ImageViewerEditor,
 	injectNotificationManager,
 	IntlFormatted,
 	MarkdownEditor,
@@ -440,6 +464,7 @@ import {
 	Tooltip,
 	useVIntl,
 } from '@modrinth/ui'
+import { nextTick, watch } from 'vue'
 
 import ThreadMessage from '~/components/ui/thread/ThreadMessage.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
@@ -450,6 +475,10 @@ const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	openImageExternally: {
+		id: 'conversation-thread.image.open-externally',
+		defaultMessage: 'Open externally',
+	},
 	resubmitModalHeaderResubmitting: {
 		id: 'conversation-thread.resubmit-modal.header.resubmitting',
 		defaultMessage: 'Resubmitting for review',
@@ -658,6 +687,31 @@ const members = computed(() => {
 })
 
 const replyBody = ref('')
+
+const imageViewer = ref(null)
+const imageItems = ref([])
+let imageTrigger
+
+async function openImage(image) {
+	imageTrigger = image.element
+	imageItems.value = [{ id: image.src, src: image.src, alt: image.alt }]
+	await nextTick()
+	imageViewer.value?.show(0)
+}
+
+function restoreImageFocus() {
+	if (imageTrigger?.isConnected) imageTrigger.focus({ preventScroll: true })
+	imageTrigger = undefined
+}
+
+watch(
+	() => props.thread?.id,
+	() => {
+		imageTrigger = undefined
+		imageViewer.value?.hide()
+		imageItems.value = []
+	},
+)
 
 const sortedMessages = computed(() => {
 	if (props.thread !== null) {
