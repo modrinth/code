@@ -329,12 +329,6 @@
 			:browse-modpacks="handleBrowseModpacks"
 		/>
 	</Suspense>
-	<LockServerModal
-		v-if="isAdminViewer && serverData"
-		ref="lockServerModal"
-		:server-id="serverId"
-		:server-name="serverData.name"
-	/>
 	<ConfirmLeaveModal
 		ref="confirmLeaveModal"
 		:header="formatMessage(leaveMessages.uploadInProgress)"
@@ -357,7 +351,6 @@ import {
 	LinkIcon,
 	LoaderCircleIcon,
 	LockIcon,
-	LockOpenIcon,
 	MoreVerticalIcon,
 	ServerIcon as ServerAssetIcon,
 	SettingsIcon,
@@ -390,7 +383,6 @@ import { Tooltip } from '#ui/components/floating'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPanelAdmonitions.vue'
 import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
-import LockServerModal from '#ui/components/servers/LockServerModal.vue'
 import MedalServerCountdown from '#ui/components/servers/marketing/MedalServerCountdown.vue'
 import { PanelServerActionButton } from '#ui/components/servers/server-header'
 import ServerSettingsModal from '#ui/components/servers/ServerSettingsModal.vue'
@@ -538,13 +530,6 @@ function dismissSettingsHint() {
 
 const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>(null)
 const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
-const lockServerModal = ref<InstanceType<typeof LockServerModal> | null>(null)
-
-const isAdminViewer = ref(false)
-void props.resolveViewer().then(({ userRole }) => {
-	isAdminViewer.value = userRole === 'admin'
-})
-
 const formatDateTime = useFormatDateTime({ dateStyle: 'long', timeStyle: 'short' })
 
 const lockMessages = defineMessages({
@@ -564,30 +549,6 @@ const lockMessages = defineMessages({
 		id: 'servers.manage.locked.body',
 		defaultMessage:
 			'Support has temporarily locked this server, so you cannot make any changes. <support-link>Contact support</support-link> if you believe this is a mistake.',
-	},
-	lockServer: {
-		id: 'servers.manage.lock-server',
-		defaultMessage: 'Lock server',
-	},
-	unlockServer: {
-		id: 'servers.manage.unlock-server',
-		defaultMessage: 'Unlock server',
-	},
-	unlockSuccessTitle: {
-		id: 'servers.manage.unlock.success-title',
-		defaultMessage: 'Server unlocked',
-	},
-	unlockSuccessText: {
-		id: 'servers.manage.unlock.success-text',
-		defaultMessage: '{name} has been unlocked.',
-	},
-	unlockErrorTitle: {
-		id: 'servers.manage.unlock.error-title',
-		defaultMessage: 'Failed to unlock server',
-	},
-	unlockErrorText: {
-		id: 'servers.manage.unlock.error-text',
-		defaultMessage: 'An error occurred while unlocking this server. Please try again.',
 	},
 })
 
@@ -716,46 +677,7 @@ const serverMenuOptions = computed(() => [
 		action: copyServerId,
 		shown: props.showCopyIdAction,
 	},
-	{
-		id: 'toggle-lock',
-		label: formatMessage(
-			serverData.value?.locked_since ? lockMessages.unlockServer : lockMessages.lockServer,
-		),
-		icon: serverData.value?.locked_since ? LockOpenIcon : LockIcon,
-		action: toggleServerLock,
-		tone: 'red' as const,
-		shown: isAdminViewer.value,
-	},
 ])
-
-async function toggleServerLock() {
-	if (!serverData.value) return
-
-	if (!serverData.value.locked_since) {
-		lockServerModal.value?.show()
-		return
-	}
-
-	const name = serverData.value.name
-	try {
-		await client.archon.servers_internal.unlock(props.serverId)
-		await Promise.all([
-			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', props.serverId] }),
-			queryClient.invalidateQueries({ queryKey: ['servers', 'locks'] }),
-		])
-		addNotification({
-			type: 'success',
-			title: formatMessage(lockMessages.unlockSuccessTitle),
-			text: formatMessage(lockMessages.unlockSuccessText, { name }),
-		})
-	} catch {
-		addNotification({
-			type: 'error',
-			title: formatMessage(lockMessages.unlockErrorTitle),
-			text: formatMessage(lockMessages.unlockErrorText),
-		})
-	}
-}
 
 function formatUptime(uptime: number) {
 	const days = Math.floor(uptime / (24 * 3600))

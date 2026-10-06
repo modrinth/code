@@ -2054,9 +2054,6 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Server vraćen na početno podešavanje"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Opcije podrške"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Preopterećuje do {cpus} procesora"
   },
@@ -6432,4 +6429,3 @@
     "defaultMessage": "Tip"
   }
 }
-

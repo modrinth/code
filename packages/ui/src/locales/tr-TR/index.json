@@ -2060,9 +2060,6 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Sunucu, yeni başlayanlar için ayarlanmıştır."
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Destek seçenekleri"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "{cpus} CPUya kadar çıkar"
   },

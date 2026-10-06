@@ -1883,9 +1883,6 @@
   "hosting.loader.reset-server": {
     "defaultMessage": "Resetovat server"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Možnosti podpory"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Vylítne až na {cpus} CPUs"
   },
@@ -5193,4 +5190,3 @@
     "defaultMessage": "Typ"
   }
 }
-

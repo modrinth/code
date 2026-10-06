@@ -2054,9 +2054,6 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Serwer zresetowany do trybu onboardingu"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Opcje pomocy"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Możliwość burstu do {cpus} procesorów"
   },

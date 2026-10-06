@@ -2063,9 +2063,6 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "服务器已重置为初始设置"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "支持选项"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "爆发时最多 {cpus} CPU"
   },
@@ -7179,4 +7176,3 @@
     "defaultMessage": "类型"
   }
 }
-

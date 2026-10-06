@@ -2048,9 +2048,6 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Server teruggezet naar onboarding"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Ondersteuningsmogelijkheden"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Burst tot {cpus} CPU's"
   },

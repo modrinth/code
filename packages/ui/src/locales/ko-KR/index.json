@@ -1973,9 +1973,6 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "온보딩 상태로 서버 재설정"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "지원 옵션"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "최대 {cpus} CPU까지 버스트 가능"
   },

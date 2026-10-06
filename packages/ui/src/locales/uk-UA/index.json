@@ -2015,9 +2015,6 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Сервер скинуто до початкового стану"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Налаштування підтримки"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Короткочасно до {cpus} ЦП"
   },

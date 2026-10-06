@@ -2045,9 +2045,6 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Serveur réinitialisé à l'intégration"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Options de prise en charge"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Jusqu'à {cpus} processeurs"
   },

@@ -2063,9 +2063,6 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Servidor restablecido a la configuración inicial"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Opciones de soporte"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Aumenta hasta {cpus} CPUs"
   },
@@ -7179,4 +7176,3 @@
     "defaultMessage": "Tipo"
   }
 }
-

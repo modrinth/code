@@ -1985,9 +1985,6 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Сервер сброшен до первого запуска"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Настройки поддержки"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Рост до {cpus} CPU"
   },
