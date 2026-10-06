@@ -133,6 +133,17 @@ jobs:
           cp .env.local .env
           sqlx database setup
 
+      # Runners without the Namespace remote cache (fork PRs) restore the local Turborepo
+      # cache saved by the latest main build. Pull requests can read caches from the default
+      # branch, but whatever they save stays scoped to their own ref.
+      - name: Restore Turborepo cache from main
+        if: env.INTERNAL != 'true'
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .turbo/cache
+          key: turbo-ci-${{ runner.os }}-${{ runner.arch }}-${{ github.sha }}
+          restore-keys: turbo-ci-${{ runner.os }}-${{ runner.arch }}-
+
       # `pnpm run ci` excludes the `modrinth-rust` Cargo workspace package so Rust lint and
       # tests run and cache per crate. Otherwise any Rust change would invalidate the single
       # workspace-wide task and rerun the labrinth tests, which need the services above.
@@ -147,3 +158,11 @@ jobs:
           pnpm turbo run intl:extract --force
           pnpm scripts i18n-icu-contract prune-local --check
           git diff --exit-code --color */*/src/locales/*/index.json
+
+      # Remote cache hits are also written to the local cache, so this holds every task from the run
+      - name: Save Turborepo cache for fork builds
+        if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .turbo/cache
+          key: turbo-ci-${{ runner.os }}-${{ runner.arch }}-${{ github.sha }}
