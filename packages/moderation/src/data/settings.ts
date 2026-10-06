@@ -2,6 +2,13 @@ import { setting } from '../types/settings.ts'
 
 const settings = {
 	General: {
+		AutoGoNextOnReviewOutcome: setting.asToggle({
+			type: 'toggle',
+			id: 'auto-go-next-on-review-outcome',
+			title: 'Automatically go to the next project after review',
+			description: 'Move to the next project after successfully submitting a review outcome.',
+			default: true,
+		}),
 		HideMarkdownFormattingButtons: setting.asToggle({
 			type: 'toggle',
 			id: 'hide-markdown-formatting-buttons',

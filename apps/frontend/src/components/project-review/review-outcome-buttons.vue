@@ -26,14 +26,17 @@
 
 <script setup lang="ts">
 import { SpinnerIcon } from '@modrinth/assets'
+import { moderationSettings } from '@modrinth/moderation'
 import { Button, defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
+import { useModerationSettings } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewMessages } from '~/providers/project-review/review-messages'
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
-const { project, navigation } = injectProjectReviewPageContext()
+const { project, navigation, queue } = injectProjectReviewPageContext()
+const settings = useModerationSettings()
 const { canSubmit, loadingAction, pendingDecisionStatus, submitDecision } = injectReviewSubmission()
 const { generating } = injectReviewMessages()
 const advancingAction = ref<Parameters<typeof submitDecision>[0]>()
@@ -72,7 +75,13 @@ async function submitDecisionAndContinue(status: Parameters<typeof submitDecisio
 	if (!id) return
 	advancingAction.value = status
 	try {
-		if (await submitDecision(status)) await navigation.completeAndNext(id)
+		if (await submitDecision(status)) {
+			if (settings.value.get(moderationSettings.General.AutoGoNextOnReviewOutcome)) {
+				await navigation.completeAndNext(id)
+			} else {
+				await queue.completeProject(id)
+			}
+		}
 	} finally {
 		advancingAction.value = undefined
 	}
