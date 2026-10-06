@@ -33,7 +33,7 @@ use serde_json::json;
 use sha1::Digest;
 use xredis::RedisValue;
 
-pub mod common;
+use crate::common;
 
 #[actix_rt::test]
 async fn test_get_project() {

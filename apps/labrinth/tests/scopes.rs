@@ -30,7 +30,7 @@ use serde_json::json;
 // - test the function with the PAT with the given scopes
 // - test the function with the PAT with all other scopes
 
-pub mod common;
+use crate::common;
 
 // Test for users, emails, and payout scopes (not user auth scope or notifs)
 #[actix_rt::test]

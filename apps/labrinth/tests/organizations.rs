@@ -22,7 +22,7 @@ use common::{
 use labrinth::models::teams::{OrganizationPermissions, ProjectPermissions};
 use serde_json::json;
 
-pub mod common;
+use crate::common;
 
 #[actix_rt::test]
 async fn create_organization() {

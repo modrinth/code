@@ -4,7 +4,8 @@ $schema: 'https://moonrepo.dev/schemas/project.json'
 # crate. Separate per-crate cargo invocations resolve different feature sets and
 # recompile shared dependencies for each crate, while waiting on each other's
 # build directory lock. All Rust test tasks use identical cargo arguments so they
-# share build artifacts, and only differ in the nextest filter.
+# share build artifacts, and only differ in the nextest filter. Clippy uses its
+# own target directory so it doesn't wait on the test build's lock in CI.
 
 workspace:
   inheritedTasks:
@@ -43,6 +44,8 @@ tasks:
       - 'app-frontend:build'
     inputs:
       - '@group(rust)'
+    env:
+      CARGO_TARGET_DIR: 'target/clippy'
     options:
       runFromWorkspaceRoot: true
 
@@ -53,6 +56,8 @@ tasks:
       cargo fmt --all
     deps:
       - 'app-frontend:build'
+    env:
+      CARGO_TARGET_DIR: 'target/clippy'
     options:
       cache: false
       runInCI: false

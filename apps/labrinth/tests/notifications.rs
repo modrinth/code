@@ -5,7 +5,7 @@ use common::{
 
 use crate::common::api_common::ApiTeams;
 
-pub mod common;
+use crate::common;
 
 #[actix_rt::test]
 pub async fn get_user_notifications_after_team_invitation_returns_notification()

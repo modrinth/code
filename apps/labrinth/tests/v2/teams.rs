@@ -2,17 +2,14 @@ use actix_http::StatusCode;
 use labrinth::models::teams::ProjectPermissions;
 use serde_json::json;
 
-use crate::{
-    assert_status,
-    common::{
-        api_common::ApiTeams,
-        api_v2::ApiV2,
-        database::{
-            FRIEND_USER_ID, FRIEND_USER_ID_PARSED, FRIEND_USER_PAT,
-            USER_USER_ID_PARSED, USER_USER_PAT,
-        },
-        environment::{TestEnvironment, with_test_environment},
+use crate::common::{
+    api_common::ApiTeams,
+    api_v2::ApiV2,
+    database::{
+        FRIEND_USER_ID, FRIEND_USER_ID_PARSED, FRIEND_USER_PAT,
+        USER_USER_ID_PARSED, USER_USER_PAT,
     },
+    environment::{TestEnvironment, with_test_environment},
 };
 
 // transfer ownership (requires being owner, etc)

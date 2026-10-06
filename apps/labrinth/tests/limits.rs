@@ -15,7 +15,7 @@ use serde_json::Value;
 use crate::common::api_common::{ApiProject, ApiUser, ApiVersion};
 use crate::common::api_v3::request_data::get_public_project_creation_data;
 
-pub mod common;
+use crate::common;
 
 async fn set_project_daily_limit(pool: &PgPool, projects_per_day: u64) {
     let defaults = DBUserLimits::get_defaults(pool).await.unwrap();

@@ -25,7 +25,7 @@ use crate::common::dummy_data::{
     DummyProjectAlpha, DummyProjectBeta, TestFile,
 };
 
-pub mod common;
+use crate::common;
 
 #[actix_rt::test]
 

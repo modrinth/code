@@ -12,7 +12,7 @@ use common::{
 };
 use labrinth::test::api_v3::ApiV3;
 
-pub mod common;
+use crate::common;
 
 #[actix_rt::test]
 async fn discord_lookup_requires_admin_and_returns_public_user() {

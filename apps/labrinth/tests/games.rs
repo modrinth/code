@@ -5,7 +5,7 @@ use common::{
     environment::{TestEnvironment, with_test_environment},
 };
 
-pub mod common;
+use crate::common;
 
 #[actix_rt::test]
 async fn get_games() {

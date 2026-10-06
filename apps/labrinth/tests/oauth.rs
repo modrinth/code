@@ -16,7 +16,7 @@ use common::{
 };
 use labrinth::auth::oauth::TokenResponse;
 
-pub mod common;
+use crate::common;
 
 #[actix_rt::test]
 async fn oauth_flow_happy_path() {

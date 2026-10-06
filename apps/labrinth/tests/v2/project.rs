@@ -1,18 +1,15 @@
 use std::sync::Arc;
 
-use crate::{
-    assert_status,
-    common::{
-        api_common::{ApiProject, ApiVersion, AppendsOptionalPat},
-        api_v2::{ApiV2, request_data::get_public_project_creation_data_json},
-        database::{
-            ADMIN_USER_PAT, FRIEND_USER_ID, FRIEND_USER_PAT, USER_USER_PAT,
-            generate_random_name,
-        },
-        dummy_data::TestFile,
-        environment::{TestEnvironment, with_test_environment},
-        permissions::{PermissionsTest, PermissionsTestContext},
+use crate::common::{
+    api_common::{ApiProject, ApiVersion, AppendsOptionalPat},
+    api_v2::{ApiV2, request_data::get_public_project_creation_data_json},
+    database::{
+        ADMIN_USER_PAT, FRIEND_USER_ID, FRIEND_USER_PAT, USER_USER_PAT,
+        generate_random_name,
     },
+    dummy_data::TestFile,
+    environment::{TestEnvironment, with_test_environment},
+    permissions::{PermissionsTest, PermissionsTestContext},
 };
 use actix_http::StatusCode;
 use actix_web::test;

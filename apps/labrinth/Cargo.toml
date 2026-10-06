@@ -4,11 +4,17 @@ version = "2.7.0"
 edition.workspace = true
 license = "AGPL-3.0-only"
 default-run = "labrinth"
+# Integration tests are compiled into a single binary, see tests/main.rs
+autotests = false
 
 # This seems redundant, but it's necessary for Docker to work
 [[bin]]
 name = "labrinth"
 path = "src/main.rs"
+
+[[test]]
+name = "integration"
+path = "tests/main.rs"
 
 [dependencies]
 actix-cors = { workspace = true }

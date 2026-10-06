@@ -24,7 +24,7 @@ use tokio::time::timeout;
 use uuid::Uuid;
 use xredis::{KeyBuilder, RedisPool, RedisTopology, RedisValue};
 
-pub mod common;
+use crate::common;
 
 async fn isolated_redis_pool(label: &str) -> RedisPool {
     labrinth::env::init().expect("failed to initialize test environment");

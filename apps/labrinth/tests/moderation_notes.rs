@@ -7,7 +7,7 @@ use common::{
 };
 use serde_json::{Value, json};
 
-pub mod common;
+use crate::common;
 
 #[actix_rt::test]
 pub async fn moderation_notes_users() {

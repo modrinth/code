@@ -14,7 +14,7 @@ use serde_json::{Value, json};
 use std::sync::Arc;
 use tokio::sync::Barrier;
 
-pub mod common;
+use crate::common;
 
 /// Force a project into `processing` status directly in the database.
 /// Clears the Redis project row so `DBProject::get` used by PATCH sees the new status.

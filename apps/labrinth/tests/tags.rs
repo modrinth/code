@@ -9,7 +9,7 @@ use common::{
 
 use crate::common::api_common::ApiTags;
 
-pub mod common;
+use crate::common;
 
 #[actix_rt::test]
 async fn get_tags() {

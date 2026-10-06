@@ -17,7 +17,7 @@ use labrinth::{
 
 use common::database::USER_USER_ID_PARSED;
 
-pub mod common;
+use crate::common;
 
 #[actix_rt::test]
 async fn can_create_edit_get_oauth_client() {
