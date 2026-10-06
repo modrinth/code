@@ -3134,6 +3134,15 @@
   "moderation.project-review.details": {
     "message": "Details"
   },
+  "moderation.project-review.details.privateDescription": {
+    "message": "Not publicly visible. Only accessible to project members."
+  },
+  "moderation.project-review.details.publicDescription": {
+    "message": "Visible via URL, on your profile, and in search."
+  },
+  "moderation.project-review.details.unlistedDescription": {
+    "message": "Visible via URL only. Not shown on your profile or in search."
+  },
   "moderation.project-review.disclosures": {
     "message": "Disclosures"
   },
@@ -3296,6 +3305,9 @@
   "moderation.project-review.matchesName": {
     "message": "Matches the project name"
   },
+  "moderation.project-review.memberCount": {
+    "message": "{count, plural, one {# member} other {# members}}"
+  },
   "moderation.project-review.members": {
     "message": "Members"
   },
@@ -3310,6 +3322,9 @@
   },
   "moderation.project-review.monetizationStatus": {
     "message": "{status, select, monetized {Monetized} demonetized {Demonetized} forceDemonetized {Force demonetized} other {Unknown}}"
+  },
+  "moderation.project-review.monetizationValue": {
+    "message": "{status, select, monetized {Enabled} demonetized {Disabled} forceDemonetized {Force disabled} other {Unknown}}"
   },
   "moderation.project-review.mrpack": {
     "message": ".mrpack"

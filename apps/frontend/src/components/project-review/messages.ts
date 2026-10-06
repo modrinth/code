@@ -374,6 +374,10 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.members',
 		defaultMessage: 'Members',
 	},
+	memberCount: {
+		id: 'moderation.project-review.memberCount',
+		defaultMessage: '{count, plural, one {# member} other {# members}}',
+	},
 	organization: {
 		id: 'moderation.project-review.organization',
 		defaultMessage: 'Organization',

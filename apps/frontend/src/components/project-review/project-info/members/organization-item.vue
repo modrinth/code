@@ -39,7 +39,11 @@
 				>
 				<CrownIcon class="size-3 shrink-0" :aria-label="formatMessage(messages.owner)" />
 			</div>
-			<p class="m-0 text-xs">{{ formatMessage(messages.organization) }}</p>
+			<div class="flex items-center gap-1 text-xs">
+				<p class="m-0 text-xs">{{ formatMessage(messages.organization) }}</p>
+				<span aria-hidden="true">•</span>
+				<p class="m-0">{{ formatMessage(messages.memberCount, { count: memberCount }) }}</p>
+			</div>
 			<ProjectStatusStats :stats="stats" />
 		</div>
 	</div>
@@ -64,6 +68,9 @@ const props = defineProps<{
 const { formatMessage } = useVIntl()
 const viewer = ref<InstanceType<typeof ImageViewerEditor>>()
 const { pixelated } = injectProjectReviewPageContext()
+const memberCount = computed(
+	() => props.organization.members.filter((member) => member.accepted).length,
+)
 const iconUrl = computed(() => props.organization.raw_icon_url || props.organization.icon_url)
 const viewerItems = computed(() =>
 	iconUrl.value ? [{ id: iconUrl.value, src: iconUrl.value, alt: props.organization.name }] : [],

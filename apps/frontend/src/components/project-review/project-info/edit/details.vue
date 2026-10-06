@@ -103,12 +103,17 @@ const patch = computed<Labrinth.Projects.v3.EditProjectRequest>(() => {
 		if (hasPublishedStatus.value) result.status = visibility.value
 		else result.requested_status = visibility.value
 	}
-	if (!project.value?.minecraft_server && monetization.value !== project.value?.monetization_status) {
+	if (
+		!project.value?.minecraft_server &&
+		monetization.value !== project.value?.monetization_status
+	) {
 		result.monetization_status = monetization.value
 	}
 	return result
 })
-const canSave = computed(() => !!project.value && !saving.value && Object.keys(patch.value).length > 0)
+const canSave = computed(
+	() => !!project.value && !saving.value && Object.keys(patch.value).length > 0,
+)
 
 function reset() {
 	visibility.value = currentVisibility.value
