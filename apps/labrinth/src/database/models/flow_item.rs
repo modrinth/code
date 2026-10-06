@@ -37,6 +37,7 @@ pub enum DBFlow {
     },
     ForgotPassword {
         user_id: DBUserId,
+        email: String,
     },
     ConfirmEmail {
         user_id: DBUserId,
@@ -66,6 +67,10 @@ pub enum DBFlow {
     AuthenticatePasskey {
         #[serde_binhum(binary(with = "json_string"))]
         state: DiscoverableAuthentication,
+    },
+    ForcedPasswordReset {
+        user_id: DBUserId,
+        email: String,
     },
 }
 

@@ -603,6 +603,36 @@ impl DBUser {
         Ok(codes)
     }
 
+    pub async fn remove_2fa(
+        user_id: DBUserId,
+        transaction: &mut PgTransaction<'_>,
+    ) -> Result<()> {
+        sqlx::query!(
+            "
+            UPDATE users
+            SET totp_secret = NULL
+            WHERE id = $1
+            ",
+            user_id as DBUserId,
+        )
+        .execute(&mut *transaction)
+        .await
+        .wrap_err("clearing TOTP secret")?;
+
+        sqlx::query!(
+            "
+            DELETE FROM user_backup_codes
+            WHERE user_id = $1
+            ",
+            user_id as DBUserId,
+        )
+        .execute(&mut *transaction)
+        .await
+        .wrap_err("deleting backup codes")?;
+
+        Ok(())
+    }
+
     pub async fn clear_caches(
         user_ids: &[(DBUserId, Option<String>)],
         redis: &RedisPool,

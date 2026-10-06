@@ -107,11 +107,13 @@ import {
 	DownloadIcon,
 	EditIcon,
 	InfoIcon,
+	KeyIcon,
 	LockIcon,
 	LockOpenIcon,
 	LogOutIcon,
 	MoreVerticalIcon,
 	ReportIcon,
+	ShieldAlertIcon,
 } from '@modrinth/assets'
 import { computed } from 'vue'
 
@@ -201,6 +203,14 @@ const messages = defineMessages({
 		id: 'profile.button.revoke-sessions',
 		defaultMessage: 'Revoke all sessions',
 	},
+	forcePasswordResetButton: {
+		id: 'profile.button.force-password-reset',
+		defaultMessage: 'Force password reset',
+	},
+	reset2faButton: {
+		id: 'profile.button.reset-2fa',
+		defaultMessage: 'Reset two-factor authentication',
+	},
 })
 
 const props = withDefaults(
@@ -253,6 +263,8 @@ const emit = defineEmits<{
 	editUser: []
 	toggleLock: []
 	revokeSessions: []
+	forcePasswordReset: []
+	reset2fa: []
 }>()
 
 const { formatMessage } = useVIntl()
@@ -344,6 +356,26 @@ const moreActions = computed<ButtonMenuOption[]>(() => [
 		action: () => emit('revokeSessions'),
 		tone: 'red',
 		shown: props.showStaffActions && props.isAdmin && !props.isSelf,
+	},
+	{
+		id: 'force-password-reset',
+		label: formatMessage(messages.forcePasswordResetButton),
+		icon: KeyIcon,
+		action: () => emit('forcePasswordReset'),
+		tone: 'red',
+		shown: props.showStaffActions && props.isAdmin && props.user.role === 'developer',
+	},
+	{
+		id: 'reset-2fa',
+		label: formatMessage(messages.reset2faButton),
+		icon: ShieldAlertIcon,
+		action: () => emit('reset2fa'),
+		tone: 'red',
+		shown:
+			props.showStaffActions &&
+			props.isAdmin &&
+			props.user.role === 'developer' &&
+			Boolean(props.user.has_totp),
 	},
 	{
 		id: 'open-shared-instances',
