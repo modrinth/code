@@ -1,0 +1,10 @@
+$schema: 'https://moonrepo.dev/schemas/project.json'
+
+tags: ['app-lib']
+
+tasks:
+  build:
+    command: 'cargo build --release'
+  dev:
+    command: 'cargo run'
+    preset: 'server'

@@ -1,0 +1,18 @@
+$schema: 'https://moonrepo.dev/schemas/workspace.json'
+
+projects:
+  globs:
+    - 'apps/*/{Cargo.toml,package.json}'
+    - 'packages/*/{Cargo.toml,package.json}'
+  # The repo root can't be a project since its package.json scripts call moon
+  # and would be inferred as recursive tasks, so workspace-wide tasks live in:
+  sources:
+    repo: 'scripts'
+    rust: '.cargo'
+
+vcs:
+  client: 'git'
+  defaultBranch: 'main'
+
+pipeline:
+  installDependencies: false

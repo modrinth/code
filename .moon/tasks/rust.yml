@@ -1,0 +1,30 @@
+$schema: 'https://moonrepo.dev/schemas/tasks.json'
+
+inheritedBy:
+  toolchains: ['rust']
+
+# moon does not derive crate relationships from Cargo, so the workspace
+# files and sibling crates every crate compiles against are hashed explicitly
+fileGroups:
+  cargo:
+    - '/Cargo.toml'
+    - '/Cargo.lock'
+    - '/rust-toolchain.toml'
+    - '/clippy.toml'
+    - '/rustfmt.toml'
+    - '/.cargo/config.toml'
+    - '/packages/*/Cargo.toml'
+    - '/packages/*/src/**/*.rs'
+
+# Linting, fixing and testing run workspace-wide from `rust` (.cargo/moon.yml).
+# Rust files are formatted by rustfmt and Cargo.toml by tombi (`repo:tombi`)
+tasks:
+  build:
+    inputs:
+      - '@group(cargo)'
+  lint-ancillary:
+    command: 'prettier --check --no-error-on-unmatched-pattern . "!**/*.rs" "!**/Cargo.{toml,lock}"'
+    toolchains: ['javascript', 'node']
+  fix-ancillary:
+    command: 'prettier --write --no-error-on-unmatched-pattern . "!**/*.rs" "!**/Cargo.{toml,lock}"'
+    toolchains: ['javascript', 'node']

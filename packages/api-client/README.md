@@ -167,7 +167,7 @@ Uploads use `XMLHttpRequest` for progress tracking and are only available in bro
 ```bash
 pnpm --filter @modrinth/api-client build
 pnpm --filter @modrinth/api-client lint
-# or pnpm prepr:frontend:lib in turborepo root.
+# or pnpm prepr:frontend:lib in the monorepo root.
 ```
 
 When adding a module, add it to `src/modules/index.ts` so it is included in the typed client structure.

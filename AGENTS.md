@@ -4,7 +4,7 @@ This is the Modrinth monorepo — it contains all Modrinth projects, both fronte
 
 ## Architecture
 
-- **Monorepo tooling:** [Turborepo](https://turbo.build/) (`turbo.jsonc`) + [pnpm workspaces](https://pnpm.io/workspaces) (`pnpm-workspace.yaml`)
+- **Monorepo tooling:** [moon](https://moonrepo.dev/) (`.moon/`, per-project `moon.yml`) + [pnpm workspaces](https://pnpm.io/workspaces) (`pnpm-workspace.yaml`) + Cargo workspace (`Cargo.toml`). Rust lint, fix and test run workspace-wide via `rust:lint`, `rust:fix` and `rust:test` (`.cargo/moon.yml`), repo-wide checks live in `repo` (`scripts/moon.yml`)
 - **Frontend:** Vue 3 / Nuxt 3, Tailwind CSS v3
 - **Backend:** Rust (Labrinth API), Postgres, Clickhouse
 - **Indentation:** Use TAB everywhere, never spaces

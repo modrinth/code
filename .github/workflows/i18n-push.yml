@@ -62,12 +62,9 @@ jobs:
           fetch-depth: 2
 
       - name: Setup Node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: ./.github/actions/setup
         with:
-          node-version-file: .nvmrc
-
-      - name: Enable Corepack
-        run: corepack enable
+          namespace: 'false'
 
       - name: Install script dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts

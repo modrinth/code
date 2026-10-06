@@ -1,0 +1,27 @@
+$schema: 'https://moonrepo.dev/schemas/tasks.json'
+
+inheritedBy:
+  tags: ['app-lib']
+
+# Mirrors the rerun-if-changed list in app-lib's build.rs
+fileGroups:
+  app-lib:
+    - '/packages/app-lib/build.rs'
+    - '/packages/app-lib/src/**/*'
+    - '/packages/app-lib/migrations/**/*'
+    - '/packages/app-lib/.sqlx/**/*'
+    - '/packages/app-lib/java/src/**/*'
+    - '/packages/app-lib/java/gradle/**/*'
+    - '/packages/app-lib/java/*.kts'
+    - '/packages/app-lib/java/gradle.properties'
+
+tasks:
+  build:
+    inputs:
+      - '@group(app-lib)'
+  lint:
+    inputs:
+      - '@group(app-lib)'
+  test:
+    inputs:
+      - '@group(app-lib)'

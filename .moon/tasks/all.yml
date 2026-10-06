@@ -1,0 +1,95 @@
+$schema: 'https://moonrepo.dev/schemas/tasks.json'
+
+implicitInputs:
+  - '/packages/tooling-config/**/*'
+  - '/packages/app-lib/.env'
+  - '$MODRINTH_URL'
+  - '$MODRINTH_API_BASE_URL'
+  - '$SHARED_INSTANCES_API_BASE_URL'
+  - '$MODRINTH_ARCHON_BASE_URL'
+  - '$VITE_STRIPE_PUBLISHABLE_KEY'
+
+# Tasks are inferred from each package.json script (`:` becomes `-`).
+# These definitions only add caching config on top of them, and act as
+# no-ops in projects without the matching script.
+tasks:
+  build:
+    deps:
+      - 'repo:i18n-coverage'
+      - '^:build'
+    inputs:
+      - '**/*'
+      - '.env*'
+      - '$NODE_ENV'
+      - '$SITE_URL'
+      - '$BASE_URL'
+      - '$PREVIEW'
+      - '$BUILD_ENV'
+      - '$FLAG_OVERRIDES'
+      - '$BROWSER_BASE_URL'
+      - '$RATE_LIMIT_IGNORE_KEY'
+      - '$VERCEL_*'
+      - '$CF_PAGES_*'
+      - '$HEROKU_APP_NAME'
+      - '$STRIPE_PUBLISHABLE_KEY'
+      - '$INTERCOM_APP_ID'
+      - '$INTERCOM_IDENTITY_SECRET'
+      - '$PYRO_BASE_URL'
+      - '$PROD_OVERRIDE'
+      - '$PYRO_MASTER_KEY'
+      - '$PORT'
+      - '$SQLX_OFFLINE'
+      - '$DATABASE_URL'
+      - '$CARGO_*'
+      - '$RUST_*'
+      - '$RUSTFLAGS'
+      - '$FORCE_COLOR'
+      - '$NEXTEST_*'
+
+  lint:
+    inputs:
+      - '**/*'
+      - '$DATABASE_URL'
+      - '$SQLX_OFFLINE'
+      - '$CARGO_*'
+      - '$RUST_*'
+      - '$RUSTFLAGS'
+      - '$FORCE_COLOR'
+      - '$NEXTEST_*'
+
+  test:
+    inputs:
+      - '**/*'
+      - '$SQLX_OFFLINE'
+      - '$DATABASE_URL'
+      - '$REDIS_*'
+      - '$CARGO_*'
+      - '$RUST_*'
+      - '$RUSTFLAGS'
+      - '$FORCE_COLOR'
+      - '$NEXTEST_*'
+
+  fix: {}
+
+  fix-ancillary:
+    options:
+      cache: false
+
+  intl-extract:
+    options:
+      runInCI: true
+
+  intl-prune-local:
+    deps:
+      - 'intl-extract'
+    options:
+      cache: false
+
+  prepr:
+    deps:
+      - '^:prepr'
+      - 'fix'
+      - 'intl-extract'
+      - 'intl-prune-local'
+    options:
+      runInCI: false

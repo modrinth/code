@@ -1,0 +1,28 @@
+$schema: 'https://moonrepo.dev/schemas/project.json'
+
+tasks:
+  build:
+    command: 'cargo build --release'
+  dev:
+    command: 'cargo run'
+    preset: 'server'
+  # Builds with the same arguments as `rust:test` to share its artifacts.
+  # In CI, the Docker services and database are only started when this task
+  # misses the cache. The integration tests also need a lot of disk space, so
+  # unused tools are removed from the runner image first, freeing ~20 GiB.
+  # To debug what is taking up space, run:
+  # sudo du -xh --max-depth=4 / | sort -rh | curl -X POST --data-urlencode content@/dev/fd/0 https://api.mclo.gs/1/log
+  test:
+    script: |
+      set -e
+      if [ -n "$CI" ]; then
+        sudo rm -rf /usr/local/lib/android /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/share/swift
+        docker compose -f ../../docker-compose.yml --profile clustered-redis up --wait
+        cp .env.local .env
+        sqlx database setup
+      fi
+      cargo nextest run --workspace --all-targets --features sqlx-tracing/sqlite --no-fail-fast -E 'package(labrinth)'
+    deps:
+      - 'app-frontend:build'
+    inputs:
+      - '@group(cargo)'

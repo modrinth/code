@@ -58,6 +58,8 @@ apps/frontend/src/generated
 /packages/ui/src/layouts/wrapped/settings/language-settings/language-settings-coverage.generated.ts
 
 .turbo
+.moon/cache
+.moon/docker
 target
 generated
 !apps/app-frontend/src/generated/

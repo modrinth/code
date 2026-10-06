@@ -1,0 +1,50 @@
+$schema: 'https://moonrepo.dev/schemas/project.json'
+
+tasks:
+  i18n-coverage:
+    command: 'pnpm run i18n:coverage'
+    inputs:
+      - '/package.json'
+      - '/scripts/run.mjs'
+      - '/scripts/coverage-i18n.ts'
+      - '/scripts/i18n-icu-contract.ts'
+      - '/apps/app-frontend/src/**/*.vue'
+      - '/apps/app-frontend/src/locales/**/*.json'
+      - '/apps/frontend/src/**/*.vue'
+      - '/apps/frontend/src/locales/**/*.json'
+      - '/packages/moderation/src/**/*.vue'
+      - '/packages/moderation/src/locales/**/*.json'
+      - '/packages/ui/src/**/*.vue'
+      - '/packages/ui/src/locales/**/*.json'
+    outputs:
+      - '/packages/ui/src/layouts/wrapped/settings/language-settings/language-settings-coverage.generated.ts'
+    options:
+      runFromWorkspaceRoot: true
+
+  typos:
+    command: 'typos'
+    inputs:
+      - '/**/*'
+    options:
+      runFromWorkspaceRoot: true
+
+  tombi:
+    script: 'tombi lint && tombi fmt --check'
+    inputs:
+      - '/**/*.toml'
+    options:
+      runFromWorkspaceRoot: true
+
+  shear:
+    command: 'cargo shear'
+    inputs:
+      - '/**/Cargo.toml'
+      - '/**/*.rs'
+    options:
+      runFromWorkspaceRoot: true
+
+  lint:
+    deps:
+      - 'typos'
+      - 'tombi'
+      - 'shear'

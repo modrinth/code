@@ -1,0 +1,72 @@
+$schema: 'https://moonrepo.dev/schemas/project.json'
+
+# Rust lint, fix and test run once for the whole Cargo workspace instead of per
+# crate. Separate per-crate cargo invocations resolve different feature sets and
+# recompile shared dependencies for each crate, while waiting on each other's
+# build directory lock. All Rust test tasks use identical cargo arguments so they
+# share build artifacts, and only differ in the nextest filter.
+
+workspace:
+  inheritedTasks:
+    include: []
+
+fileGroups:
+  rust:
+    - '/Cargo.lock'
+    - '/rust-toolchain.toml'
+    - '/clippy.toml'
+    - '/rustfmt.toml'
+    - '/.cargo/config.toml'
+    - '/**/Cargo.toml'
+    - '/**/*.rs'
+    - '/**/.sqlx/**/*'
+    - '/**/migrations/**/*'
+    - '/apps/app/**/*'
+    - '/apps/labrinth/**/*'
+    - '/packages/app-lib/**/*'
+    - '/packages/app-lib/.env'
+    - '$CARGO_*'
+    - '$RUST_*'
+    - '$RUSTFLAGS'
+    - '$SQLX_OFFLINE'
+    - '$DATABASE_URL'
+
+# Tauri embeds the app frontend at compile time
+tasks:
+  lint:
+    script: |
+      set -e
+      cargo fmt --all --check
+      cargo clippy --workspace --all-targets --features sqlx-tracing/sqlite
+      cargo clippy --workspace --all-targets --features sqlx-tracing/sqlite,theseus_gui/updater
+    deps:
+      - 'app-frontend:build'
+    inputs:
+      - '@group(rust)'
+    options:
+      runFromWorkspaceRoot: true
+
+  fix:
+    script: |
+      set -e
+      cargo clippy --workspace --all-targets --features sqlx-tracing/sqlite,theseus_gui/updater --fix --allow-dirty
+      cargo fmt --all
+    deps:
+      - 'app-frontend:build'
+    options:
+      cache: false
+      runInCI: false
+      runFromWorkspaceRoot: true
+
+  # Labrinth's tests need Docker services, so they run in `labrinth:test`
+  test:
+    command: "cargo nextest run --workspace --all-targets --features sqlx-tracing/sqlite --no-fail-fast -E 'not package(labrinth)'"
+    deps:
+      - 'app-frontend:build'
+    inputs:
+      - '@group(rust)'
+      - '!/apps/labrinth/**/*'
+      - '$REDIS_*'
+      - '$NEXTEST_*'
+    options:
+      runFromWorkspaceRoot: true

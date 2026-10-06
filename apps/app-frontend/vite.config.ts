@@ -103,10 +103,10 @@ export default defineConfig({
 			},
 		},
 		// Tauri supports es2021
-		target: process.env.TAURI_ENV_PLATFORM == 'windows' ? 'chrome105' : 'safari13', // eslint-disable-line turbo/no-undeclared-env-vars
+		target: process.env.TAURI_ENV_PLATFORM == 'windows' ? 'chrome105' : 'safari13',
 		// don't minify for debug builds
-		minify: !process.env.TAURI_ENV_DEBUG, // eslint-disable-line turbo/no-undeclared-env-vars
+		minify: !process.env.TAURI_ENV_DEBUG,
 		// produce sourcemaps for debug builds
-		sourcemap: !!process.env.TAURI_ENV_DEBUG, // eslint-disable-line turbo/no-undeclared-env-vars
+		sourcemap: !!process.env.TAURI_ENV_DEBUG,
 	},
 })

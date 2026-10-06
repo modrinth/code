@@ -1,19 +1,8 @@
-import { fixupPluginRules } from '@eslint/compat'
 import { createConfigForNuxt } from '@nuxt/eslint-config/flat'
-import turboPlugin from 'eslint-plugin-turbo'
 import common from './common.mjs'
 
 export const configurationNuxtToAppend = [
 	...common,
-	{
-		name: 'turbo',
-		plugins: {
-			turbo: fixupPluginRules(turboPlugin),
-		},
-		rules: {
-			'turbo/no-undeclared-env-vars': 'error',
-		},
-	},
 	{
 		name: 'modrinth',
 		rules: {

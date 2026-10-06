@@ -1,0 +1,8 @@
+$schema: 'https://moonrepo.dev/schemas/project.json'
+
+tasks:
+  build:
+    command: 'pnpm run build'
+    outputs:
+      - '.nuxt/**/*'
+      - '.output/**/*'

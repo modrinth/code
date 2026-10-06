@@ -1,0 +1,54 @@
+name: Setup
+description: Set up Node.js, pnpm and caches (Namespace cache volume, or GitHub caches elsewhere)
+
+inputs:
+  namespace:
+    description: Whether the job runs on Namespace, which enables cache volumes
+    default: 'true'
+  cache:
+    description: Cache modes for nscloud-cache-action, in addition to the moon cache
+    default: pnpm
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node
+      uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      with:
+        node-version-file: .nvmrc
+
+    - name: Enable Corepack
+      shell: bash
+      run: corepack enable
+
+    - name: Set up caches
+      if: inputs.namespace == 'true'
+      uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
+      with:
+        cache: ${{ inputs.cache }}
+        path: |
+          ${{ github.workspace }}/.moon/cache
+
+    - name: Get pnpm store path
+      if: inputs.namespace != 'true'
+      id: pnpm-store
+      shell: bash
+      run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+    - name: Cache pnpm store
+      if: inputs.namespace != 'true'
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ${{ steps.pnpm-store.outputs.path }}
+        key: pnpm-store-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+        restore-keys: |
+          pnpm-store-${{ runner.os }}-
+
+    - name: Cache moon outputs
+      if: inputs.namespace != 'true'
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: .moon/cache
+        key: moon-${{ runner.os }}-${{ github.sha }}
+        restore-keys: |
+          moon-${{ runner.os }}-

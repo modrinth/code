@@ -36,6 +36,9 @@ jobs:
       REDIS_URL: redis://127.0.0.1:7000,redis://127.0.0.1:7001,redis://127.0.0.1:7002,redis://127.0.0.1:7003,redis://127.0.0.1:7004,redis://127.0.0.1:7005
       # Avoid stack overflows in tests
       RUST_MIN_STACK: 134217728
+      # Namespace's sccache backend is only available to internal runs
+      SCCACHE_CACHE_SIZE: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && '20G' || '' }}
+      RUSTC_WRAPPER: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && 'sccache' || '' }}
 
     steps:
       - name: Check out code
@@ -50,26 +53,14 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Setup Node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      - name: Setup Node and caches
+        uses: ./.github/actions/setup
         with:
-          node-version-file: .nvmrc
-
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Set up caches
-        if: env.INTERNAL == 'true'
-        uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
-        with:
+          namespace: ${{ env.INTERNAL }}
           cache: |
             rust
             pnpm
             apt
-
-      - name: Set up Turborepo caching
-        if: env.INTERNAL == 'true'
-        uses: namespace-actions/setup-turbocache@f96bd6befa13ae74b2858a5be49573640d4636f5 # v0.0.2
 
       - name: Install apt dependencies
         run: |
@@ -83,14 +74,33 @@ jobs:
           components: clippy, rustfmt
           cache: false
 
+      # External contributors run on GitHub runners without the Namespace cache volume.
+      # Pushes to main save their Rust build to GitHub's cache (only when dependencies
+      # change, without restoring it over the Namespace cache) so those runs start warm.
+      # RUSTC_WRAPPER is left out of the key since only Namespace runs use sccache.
+      - name: Set up GitHub Rust cache
+        if: env.INTERNAL != 'true' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          env-vars: CARGO CC CFLAGS CXX CMAKE RUSTFLAGS RUST_
+          lookup-only: ${{ env.INTERNAL == 'true' }}
+          save-if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+
       - name: Setup mold
         uses: rui314/setup-mold@9c9c13bf4c3f1adef0cc596abc155580bcb04444 # v1 / Mold 2.41.0
 
-      - name: Setup binstall
-        uses: cargo-bins/cargo-binstall@ead08b90bd7b2e6d81963fb9cf0b7239f66d5db4 # v1.21.0
+      - name: Setup sccache
+        if: env.INTERNAL == 'true'
+        uses: mozilla-actions/sccache-action@9e7fa8a12102821edf02ca5dbea1acd0f89a2696 # v0.0.10
 
-      - name: Setup nextest
-        run: cargo binstall --no-confirm --secure --locked cargo-nextest@0.9.133
+      - name: Configure sccache
+        if: env.INTERNAL == 'true'
+        run: nsc cache sccache setup --cache_name default >> "$GITHUB_ENV"
+
+      - name: Setup Rust tools
+        uses: taiki-e/install-action@b6ff580856c41316412a0b9b60540fbc6f8c82cc # v2.86.7
+        with:
+          tool: cargo-nextest@0.9.133,typos@1.48.0,tombi@1.4.1,cargo-shear
 
       # cargo-binstall does not have pre-built binaries for sqlx-cli, so we fall
       # back to a cached cargo install
@@ -109,34 +119,11 @@ jobs:
         working-directory: packages/app-lib
         run: cp .env.staging .env
 
-      # check if labrinth tests will actually run (cache miss)
-      - name: Check if labrinth tests need to run
-        id: check-labrinth
-        run: |
-          LABRINTH_TEST_STATUS=$(pnpm turbo run test --filter=@modrinth/labrinth --dry-run=json | jq -r '.tasks[] | select(.task == "test") | .cache.status')
-          echo "Labrinth test cache status: $LABRINTH_TEST_STATUS"
-          if [ "$LABRINTH_TEST_STATUS" = "HIT" ]; then
-            echo "needs_services=false" >> $GITHUB_OUTPUT
-          else
-            echo "needs_services=true" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Start services
-        if: steps.check-labrinth.outputs.needs_services == 'true'
-        run: docker compose --profile clustered-redis up --wait
-
-      - name: Setup labrinth environment and database
-        if: steps.check-labrinth.outputs.needs_services == 'true'
-        working-directory: apps/labrinth
-        run: |
-          cp .env.local .env
-          sqlx database setup
-
       - name: Lint and test
         run: pnpm run ci
 
       - name: Verify intl:extract has been run
         run: |
-          pnpm turbo run intl:extract --force
+          pnpm moon run :intl-extract --force
           pnpm scripts i18n-icu-contract prune-local --check
           git diff --exit-code --color */*/src/locales/*/index.json

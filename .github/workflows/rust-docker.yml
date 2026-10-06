@@ -1,0 +1,132 @@
+name: Rust Docker build
+
+on:
+  workflow_call:
+    inputs:
+      package:
+        description: Cargo package to build
+        type: string
+        required: true
+      profile:
+        description: Cargo profile to build with
+        type: string
+        default: release
+      project-dir:
+        description: Directory containing the Dockerfile
+        type: string
+        required: true
+      stage-paths:
+        description: Extra paths relative to project-dir to copy into the Docker context
+        type: string
+        default: ''
+      runner:
+        description: Namespace runner profile for internal builds
+        type: string
+        required: true
+      image-name:
+        type: string
+        required: true
+      application-set:
+        description: Argo CD application set deployed from the prod branch
+        type: string
+        required: true
+    secrets:
+      ARGOCD_DEPLOY_KEY:
+        required: false
+
+env:
+  INTERNAL: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+
+jobs:
+  build:
+    name: Build ${{ inputs.package }}
+    runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && inputs.runner || 'ubuntu-latest' }}
+    env:
+      SQLX_OFFLINE: 'true'
+      GIT_HASH: ${{ github.sha }}
+      SCCACHE_CACHE_SIZE: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && '20G' || '' }}
+      RUSTC_WRAPPER: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && 'sccache' || '' }}
+      RUST_MIN_STACK: '268435456'
+    steps:
+      - name: Check out code
+        if: env.INTERNAL != 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Check out code (Namespace)
+        if: env.INTERNAL == 'true'
+        uses: namespacelabs/nscloud-checkout-action@66f2dc6f6c42a8ac6c4e53473c4840006822831e # v9.0.1
+
+      - name: Setup Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@166cdcfd11aee3cb47222f9ddb555ce30ddb9659 # v1.17.0
+        with:
+          rustflags: ''
+          # Namespace runners cache Rust on their cache volume instead
+          cache: ${{ env.INTERNAL != 'true' }}
+
+      - name: Setup mold
+        uses: rui314/setup-mold@9c9c13bf4c3f1adef0cc596abc155580bcb04444 # v1 / Mold 2.41.0
+
+      - name: Setup sccache
+        uses: mozilla-actions/sccache-action@9e7fa8a12102821edf02ca5dbea1acd0f89a2696 # v0.0.10
+
+      - name: Set up caches
+        if: env.INTERNAL == 'true'
+        uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
+        with:
+          cache: |
+            rust
+            apt
+
+      - name: Configure sccache
+        if: env.INTERNAL == 'true'
+        run: nsc cache sccache setup --cache_name default >> "$GITHUB_ENV"
+
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends cmake libcurl4-openssl-dev
+
+      - name: Build ${{ inputs.package }}
+        env:
+          PACKAGE: ${{ inputs.package }}
+          PROFILE: ${{ inputs.profile }}
+        run: cargo build --profile "$PROFILE" --package "$PACKAGE"
+
+      - name: Stage Docker context
+        env:
+          PACKAGE: ${{ inputs.package }}
+          PROFILE: ${{ inputs.profile }}
+          PROJECT_DIR: ${{ inputs.project-dir }}
+          STAGE_PATHS: ${{ inputs.stage-paths }}
+        run: |
+          mkdir -p "$PROJECT_DIR/docker-stage"
+          cp "target/$PROFILE/$PACKAGE" "$PROJECT_DIR/docker-stage/"
+          for stage_path in $STAGE_PATHS; do
+            cp -r "$PROJECT_DIR/$stage_path" "$PROJECT_DIR/docker-stage/$stage_path"
+          done
+
+      - name: Upload Docker context
+        if: env.INTERNAL == 'true'
+        uses: namespace-actions/upload-artifact@f6ccaacc655aec41b93af180d1d7eef21af862d2 # v1.0.3
+        with:
+          name: ${{ inputs.image-name }}-docker-context
+          retention-days: 1
+          path: ${{ inputs.project-dir }}/docker-stage
+
+  docker-build:
+    needs: [build]
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+    uses: SparkUniverse/workflows/.github/workflows/docker-build.yaml@main
+    with:
+      image-name: ${{ inputs.image-name }}
+      dockerfile-path: ${{ inputs.project-dir }}/Dockerfile
+      artifacts-name: ${{ inputs.image-name }}-docker-context
+
+  deploy:
+    needs: [docker-build]
+    if: ${{ github.ref == 'refs/heads/prod' && github.event_name == 'push' }}
+    uses: SparkUniverse/workflows/.github/workflows/argo-update.yaml@main
+    secrets:
+      ARGOCD_DEPLOY_KEY: ${{ secrets.ARGOCD_DEPLOY_KEY }}
+    with:
+      application-set: ${{ inputs.application-set }}
+      branch: main
+      environment-name: production

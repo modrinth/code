@@ -15,6 +15,7 @@
 	},
 	"dependencies": {
 		"@dnd-kit/vue": "^0.5.0",
+		"@floating-ui/vue": "^2.0.1",
 		"@modrinth/api-client": "workspace:^",
 		"@modrinth/assets": "workspace:*",
 		"@modrinth/ui": "workspace:*",
@@ -34,7 +35,6 @@
 		"@vueuse/core": "^11.1.0",
 		"ace-builds": "^1.43.5",
 		"dayjs": "^1.11.10",
-		"@floating-ui/vue": "^2.0.1",
 		"fuse.js": "^6.6.2",
 		"intl-messageformat": "^10.7.7",
 		"motion-v": "2.2.1",
@@ -59,7 +59,6 @@
 		"@vitejs/plugin-vue": "^6.0.3",
 		"autoprefixer": "^10.4.19",
 		"eslint": "^9.9.1",
-		"eslint-plugin-turbo": "^2.5.4",
 		"postcss": "^8.4.39",
 		"prettier": "^3.2.5",
 		"sass": "^1.74.1",

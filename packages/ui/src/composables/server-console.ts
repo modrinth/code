@@ -5,7 +5,6 @@ import { detectLogLevel } from '../layouts/shared/console/composables/log-level'
 import type { Log4jEvent, LogLevel, LogLine } from '../layouts/shared/console/types'
 
 // Flip to true during development to enable console perf logging.
-// Uses a plain constant to avoid turbo env-var declarations.
 const DEBUG_PERF = false
 
 // TODO: for true unbounded history, consider IndexedDB or similar

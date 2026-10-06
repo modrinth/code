@@ -13,7 +13,7 @@ Every public-facing aspect of Modrinth, including everything from our [API/backe
 
 If you wish to contribute code to a specific project, here's the place to start. Most of Modrinth is written in the [Rust language](https://www.rust-lang.org), but some things are written in other languages/frameworks like [Nuxt.js](https://nuxtjs.org) or Java.
 
-Most of Modrinth's code is in our monorepo, which you can find [here](https://github.com/modrinth/code). Our monorepo is powered by [Turborepo](https://turborepo.org).
+Most of Modrinth's code is in our monorepo, which you can find [here](https://github.com/modrinth/code). Our monorepo is powered by [moon](https://moonrepo.dev).
 
 Follow the project-specific instructions below to get started:
 
