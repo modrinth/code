@@ -441,6 +441,57 @@
 		{
 			"actor": {
 				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "addon_server_enabled",
+				"metadata": {
+					"filename": "sodium-fabric-0.6.13+mc1.21.1.jar",
+					"kind": "mod",
+					"enabled": false
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T10:41:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "addon_player_enabled",
+				"metadata": {
+					"filename": "sodium-fabric-0.6.13+mc1.21.1.jar",
+					"kind": "mod",
+					"enabled": true
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T10:42:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "addon_side_toggle_locked",
+				"metadata": {
+					"filename": "sodium-fabric-0.6.13+mc1.21.1.jar",
+					"kind": "mod",
+					"locked": true
+				}
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T10:43:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
 				"user_id": "uk2lIMmm"
 			},
 			"action": {
@@ -501,6 +552,18 @@
 			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
 			"world_id": "ba1a5666-96fc-4de5-9b91-977dd7b58d09",
 			"timestamp": "2026-05-20T11:00:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "world_data_reset"
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": "7dd2f1a9-2a94-41fb-a0c7-92653ec980ab",
+			"timestamp": "2026-05-20T11:02:00Z"
 		},
 		{
 			"actor": {
@@ -719,6 +782,18 @@
 			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
 			"world_id": null,
 			"timestamp": "2026-05-20T12:15:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
+				"action": "sftp_credentials_rolled"
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": null,
+			"timestamp": "2026-05-20T12:17:00Z"
 		},
 		{
 			"actor": {

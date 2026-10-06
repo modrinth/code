@@ -29,11 +29,13 @@ const basicEvents = new Set([
 	'server_reallocated',
 	'server_repaired',
 	'server_reset',
+	'world_data_reset',
 	'server_started',
 	'server_stopped',
 	'server_restarted',
 	'server_killed',
 	'sftp_login',
+	'sftp_credentials_rolled',
 	'console_cleared',
 ])
 
@@ -131,6 +133,28 @@ export function parseAuditEvent(
 					...actionSearchParts(action),
 					...fileNames,
 				])
+			}
+			case 'addon_server_enabled':
+			case 'addon_player_enabled':
+			case 'addon_side_toggle_locked': {
+				const record = metadataRecord(metadata)
+				const filename = stringField(record, 'filename')
+				const value = booleanField(
+					record,
+					action === 'addon_side_toggle_locked' ? 'locked' : 'enabled',
+				)
+				if (!filename || value == null) return unknown(base, action)
+				const kind = {
+					addon_server_enabled: value ? 'server_enabled' : 'server_disabled',
+					addon_player_enabled: value ? 'player_enabled' : 'player_disabled',
+					addon_side_toggle_locked: value ? 'side_toggle_locked' : 'side_toggle_unlocked',
+				}[action]
+				return parsed(
+					AddonEvent,
+					base,
+					{ kind, fileNames: [fileEntity(filename, lookups.serverId, false)] },
+					[...actionSearchParts(action), filename],
+				)
 			}
 			case 'modpack_changed': {
 				const record = metadataRecord(metadata)
@@ -595,6 +619,11 @@ function stringField(record: Record<string, unknown> | null, key: string): strin
 function numberField(record: Record<string, unknown> | null, key: string): number | null {
 	const value = record?.[key]
 	return typeof value === 'number' && Number.isFinite(value) ? value : null
+}
+
+function booleanField(record: Record<string, unknown> | null, key: string): boolean | null {
+	const value = record?.[key]
+	return typeof value === 'boolean' ? value : null
 }
 
 function valueToString(value: unknown): string | null {
