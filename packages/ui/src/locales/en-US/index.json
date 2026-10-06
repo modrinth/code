@@ -2063,6 +2063,15 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Server reset to onboarding"
   },
+  "hosting.save-banner.resolve-errors": {
+    "defaultMessage": "Please resolve the errors in your changes before saving."
+  },
+  "hosting.settings.properties.motd-profanity": {
+    "defaultMessage": "Due to Minecraft Usage Guidelines, your server's MOTD cannot contain profanity. Detected: “{value}”."
+  },
+  "hosting.settings.properties.motd-profanity-save-error": {
+    "defaultMessage": "Due to Minecraft Usage Guidelines, your server's MOTD cannot contain profanity. Detected: “{value}”"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Bursts up to {cpus} CPUs"
   },
