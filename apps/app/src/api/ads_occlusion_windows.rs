@@ -85,7 +85,7 @@ fn ad_rect_in_screen(
 ) -> Option<RECT> {
     let mut origin = POINT { x: 0, y: 0 };
 
-    if !unsafe { ClientToScreen(main_hwnd, &mut origin).as_bool() } {
+    if !unsafe { ClientToScreen(main_hwnd, &raw mut origin).as_bool() } {
         return None;
     }
 
@@ -122,7 +122,7 @@ fn window_process_id(hwnd: HWND) -> Option<u32> {
     let mut process_id = 0u32;
 
     unsafe {
-        GetWindowThreadProcessId(hwnd, Some(&mut process_id));
+        GetWindowThreadProcessId(hwnd, Some(&raw mut process_id));
     }
 
     (process_id != 0).then_some(process_id)
@@ -135,7 +135,7 @@ fn is_dwm_cloaked(hwnd: HWND) -> bool {
         DwmGetWindowAttribute(
             hwnd,
             DWMWA_CLOAKED,
-            &mut cloaked as *mut u32 as *mut _,
+            &raw mut cloaked as *mut _,
             std::mem::size_of::<u32>() as u32,
         )
     }
@@ -150,12 +150,12 @@ fn window_rect(hwnd: HWND) -> Option<RECT> {
         DwmGetWindowAttribute(
             hwnd,
             DWMWA_EXTENDED_FRAME_BOUNDS,
-            &mut rect as *mut RECT as *mut _,
+            &raw mut rect as *mut _,
             std::mem::size_of::<RECT>() as u32,
         )
     }
     .is_err()
-        && unsafe { GetWindowRect(hwnd, &mut rect) }.is_err()
+        && unsafe { GetWindowRect(hwnd, &raw mut rect) }.is_err()
     {
         return None;
     }
