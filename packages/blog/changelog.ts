@@ -11,6 +11,13 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-10-06T19:48:42+00:00`,
+		product: 'app',
+		version: '0.21.8',
+		body: `## Fixed
+- Fixed an issue when opening the app relating to \`synced_options\``,
+	},
+	{
 		date: `2026-10-06T18:58:20+00:00`,
 		product: 'app',
 		version: '0.21.7',

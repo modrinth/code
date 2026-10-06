@@ -17,6 +17,7 @@ pub struct InstanceMetadata {
     #[serde(default)]
     pub quarantined: bool,
     pub group_ids: Vec<String>,
+    #[serde(default)]
     pub synced_options: InstanceSyncedOptions,
     pub launch_overrides: InstanceLaunchOverrides,
 }
