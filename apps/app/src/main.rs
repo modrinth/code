@@ -115,10 +115,8 @@ async fn set_restart_after_pending_update(
 // if Tauri app is called with arguments, then those arguments will be treated as commands
 // ie: deep links or filepaths for .mrpacks
 fn main() {
-	  // TEMP!! Need to use stacker in future for install jobs
     let runtime = tokio::runtime::Builder::new_multi_thread()
         .enable_all()
-        .thread_stack_size(8 * 1024 * 1024)
         .build()
         .expect("failed to create app async runtime");
     tauri::async_runtime::set(runtime.handle().clone());

@@ -17,6 +17,7 @@ use async_walkdir::WalkDir;
 use chrono::Utc;
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
+use std::future::Future;
 use std::path::{Path, PathBuf};
 use uuid::Uuid;
 
@@ -500,7 +501,17 @@ async fn recover_orphaned_install_stages(state: &State) -> crate::Result<()> {
     Ok(())
 }
 
-async fn recover_interrupted_job(
+fn recover_interrupted_job<'a>(
+	job: store::InstallJobRecord,
+	state: &'a State,
+) -> impl Future<Output = crate::Result<()>> + Send + 'a {
+	Box::pin(recover_interrupted_job_inner(
+		job,
+		state,
+	))
+}
+
+async fn recover_interrupted_job_inner(
     mut job: store::InstallJobRecord,
     state: &State,
 ) -> crate::Result<()> {

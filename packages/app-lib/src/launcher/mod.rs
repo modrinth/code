@@ -572,7 +572,7 @@ async fn install_minecraft_inner(
             )
             .await?;
     }
-	Box::pin(download::download_minecraft(
+	download::download_minecraft(
 		&state,
 		&version_info,
 		loading_bar.as_ref(),
@@ -581,7 +581,7 @@ async fn install_minecraft_inner(
 		minecraft_updated,
 		reporter.clone(),
 		phase_details.clone(),
-	))
+	)
 	.await?;
 
     let client_path = state
