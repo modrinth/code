@@ -30,6 +30,7 @@
 					@select-game-version="selectGameVersion"
 					@select-platform="selectPlatform"
 					@update:selection="updateProjectDownloadSelection"
+					@update:show-version-selector="showVersionSelector = $event"
 					@download="onDownload"
 				/>
 				<div class="flex flex-col gap-4 empty:hidden">
@@ -47,39 +48,10 @@
 				/>
 			</div>
 		</template>
-		<template v-if="showDependencyDownloadActions" #actions>
+		<template v-if="showDownloadActions" #actions>
 			<div class="flex flex-wrap justify-end gap-2 p-2">
 				<Button
-					:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
-					@click="downloadSelectedVersionZip"
-				>
-					<SpinnerIcon
-						v-if="downloadingActionType === 'zip'"
-						aria-hidden="true"
-						class="animate-spin"
-					/>
-					<DownloadIcon v-else aria-hidden="true" />
-					{{ formatMessage(messages.downloadAsZip) }}
-				</Button>
-				<SplitButton
-					v-if="hasRecommendedDownloadFiles"
-					type="colored"
-					color="brand"
-					:options="downloadWithRecommendedOptions"
-					:menu-label="formatMessage(messages.downloadWithRecommended)"
-					:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
-					@click="downloadFilesWithDependencies"
-				>
-					<SpinnerIcon
-						v-if="downloadingActionType === 'dependencies'"
-						aria-hidden="true"
-						class="animate-spin"
-					/>
-					<DownloadIcon v-else aria-hidden="true" />
-					{{ formatMessage(messages.downloadWithDependencies) }}
-				</SplitButton>
-				<Button
-					v-else
+					v-if="!showDependencyDownloadActions"
 					type="colored"
 					color="brand"
 					:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
@@ -91,8 +63,54 @@
 						class="animate-spin"
 					/>
 					<DownloadIcon v-else aria-hidden="true" />
-					{{ formatMessage(messages.downloadWithDependencies) }}
+					{{ formatMessage(messages.download) }}
 				</Button>
+				<template v-else>
+					<Button
+						:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
+						@click="downloadSelectedVersionZip"
+					>
+						<SpinnerIcon
+							v-if="downloadingActionType === 'zip'"
+							aria-hidden="true"
+							class="animate-spin"
+						/>
+						<DownloadIcon v-else aria-hidden="true" />
+						{{ formatMessage(messages.downloadAsZip) }}
+					</Button>
+					<SplitButton
+						v-if="hasRecommendedDownloadFiles"
+						type="colored"
+						color="brand"
+						:options="downloadWithRecommendedOptions"
+						:menu-label="formatMessage(messages.downloadWithRecommended)"
+						:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
+						@click="downloadFilesWithDependencies"
+					>
+						<SpinnerIcon
+							v-if="downloadingActionType === 'dependencies'"
+							aria-hidden="true"
+							class="animate-spin"
+						/>
+						<DownloadIcon v-else aria-hidden="true" />
+						{{ formatMessage(messages.downloadWithDependencies) }}
+					</SplitButton>
+					<Button
+						v-else
+						type="colored"
+						color="brand"
+						:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
+						@click="downloadFilesWithDependencies"
+					>
+						<SpinnerIcon
+							v-if="downloadingActionType === 'dependencies'"
+							aria-hidden="true"
+							class="animate-spin"
+						/>
+						<DownloadIcon v-else aria-hidden="true" />
+						{{ formatMessage(messages.downloadWithDependencies) }}
+					</Button>
+				</template>
 			</div>
 		</template>
 	</NewModal>
@@ -207,6 +225,7 @@ const showProjectId = ref<string | null>(null)
 const showOptions = ref<ResolvedProjectDownloadModalShowOptions>(getDefaultShowOptions())
 const downloadProjectResetKey = ref(0)
 const projectDownloadSelection = ref<ProjectDownloadSelection>(getDefaultProjectDownloadSelection())
+const showVersionSelector = ref(false)
 const pendingRouteSelection = ref({
 	gameVersion: getStringQueryValue(route.query.version),
 	platform: getStringQueryValue(route.query.loader),
@@ -350,6 +369,12 @@ const showDependencyDownloadActions = computed(
 			hasRecommendedDownloadFiles.value),
 )
 
+const showDownloadActions = computed(
+	() =>
+		selectedVersionDownloadFiles.value.length > 0 &&
+		(showVersionSelector.value || showDependencyDownloadActions.value),
+)
+
 const downloadWithRecommendedOptions = computed<ButtonMenuOption[]>(() => [
 	{
 		id: 'download-with-recommended',
@@ -372,6 +397,10 @@ watch(projectV2Error, (error) => {
 })
 
 const messages = defineMessages({
+	download: {
+		id: 'project.download.download',
+		defaultMessage: 'Download',
+	},
 	downloadTitle: {
 		id: 'project.download.title',
 		defaultMessage: 'Download {title}',
