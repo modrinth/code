@@ -55,6 +55,9 @@ jobs:
           cache: |
             pnpm
 
+      - name: Set up Turborepo caching
+        uses: namespace-actions/setup-turbocache@f96bd6befa13ae74b2858a5be49573640d4636f5 # v0.0.2
+
       - name: Inject build variables
         working-directory: ./apps/frontend
         run: |

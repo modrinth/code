@@ -19,6 +19,9 @@ members = [
   "packages/xredis",
 ]
 
+[workspace.metadata]
+name = "modrinth-rust"
+
 [workspace.package]
 edition = "2024"
 rust-version = "1.90.0"

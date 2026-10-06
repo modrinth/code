@@ -113,13 +113,21 @@ jobs:
       - name: Check if labrinth tests need to run
         id: check-labrinth
         run: |
-          LABRINTH_TEST_STATUS=$(pnpm turbo run test --filter=@modrinth/labrinth --dry-run=json | jq -r '.tasks[] | select(.task == "test") | .cache.status')
+          LABRINTH_TEST_STATUS=$(pnpm turbo run test --filter=labrinth --dry-run=json | jq -r '.tasks[] | select(.task == "test") | .cache.status')
           echo "Labrinth test cache status: $LABRINTH_TEST_STATUS"
           if [ "$LABRINTH_TEST_STATUS" = "HIT" ]; then
             echo "needs_services=false" >> $GITHUB_OUTPUT
           else
             echo "needs_services=true" >> $GITHUB_OUTPUT
           fi
+
+      # labrinth integration tests require a lot of disk space, so in the standard GitHub Actions
+      # runners we must remove useless development tools from the base image, which frees up ~20 GiB.
+      # The following command can be used to debug what is taking up space:
+      # sudo du -xh --max-depth=4 / | sort -rh | curl -X POST --data-urlencode content@/dev/fd/0 https://api.mclo.gs/1/log
+      - name: Free disk space for labrinth tests
+        if: steps.check-labrinth.outputs.needs_services == 'true'
+        run: sudo rm -rf /usr/local/lib/android /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/share/swift
 
       - name: Start services
         if: steps.check-labrinth.outputs.needs_services == 'true'
@@ -132,8 +140,14 @@ jobs:
           cp .env.local .env
           sqlx database setup
 
+      # `pnpm run ci` excludes the `modrinth-rust` Cargo workspace package so Rust lint and
+      # tests run and cache per crate. Otherwise any Rust change would invalidate the single
+      # workspace-wide task and rerun the labrinth tests, which need the services above.
       - name: Lint and test
         run: pnpm run ci
+
+      - name: Check Rust formatting
+        run: cargo fmt --all --check
 
       - name: Verify intl:extract has been run
         run: |

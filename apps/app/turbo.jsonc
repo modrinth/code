@@ -29,6 +29,9 @@
 		},
 		// Running Clippy and tests on a Tauri application requires
 		// the frontend to be built at least once first
+		"fix": {
+			"dependsOn": ["@modrinth/app-frontend#build"]
+		},
 		"lint": {
 			"dependsOn": ["@modrinth/app-frontend#build"],
 			"inputs": [
