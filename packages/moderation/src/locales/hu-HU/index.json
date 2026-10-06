@@ -53,12 +53,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Válaszd ki a pontos címkéket"
   },
-  "nags.banned-link-usage.description": {
-    "defaultMessage": "A(z) \"{url}\"hivatkozás nem engedélyezett külső hivatkozásként."
-  },
-  "nags.banned-link-usage.title": {
-    "defaultMessage": "Távolítsd el a tiltott hivatkozásokat"
-  },
   "nags.check-disclosures.description": {
     "defaultMessage": "Ügyelj arra, hogy a felhasználók tisztában legyenek a fontos részletekkel: töltsd ki a {type} típusra vonatkozó tartalmi tájékoztatókat."
   },
@@ -89,9 +83,6 @@
   "nags.edit-gallery.title": {
     "defaultMessage": "Galéria szerkesztése"
   },
-  "nags.edit-license.title": {
-    "defaultMessage": "Licensz szerkesztése"
-  },
   "nags.edit-summary.title": {
     "defaultMessage": "Összegzés szerkesztése"
   },
@@ -120,31 +111,19 @@
     "defaultMessage": "Látogasd meg a Képek fület"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "A(z) {type} licencének feltétele, hogy a forráskód közzé legyen téve. Adj meg egy forráskódra mutató hivatkozást, adj hozzá forrásfájlokat, vagy válassz másik licencet."
+    "defaultMessage": "A {type} licencének feltétele a forráskód közzététele. Adj meg egy hivatkozást a forráskódhoz, add hozzá a forrásfájlokat, vagy válassz másik licencet."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Adj meg egy forráskódot"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Néhány külső hivatkozásod azonosnak tűnik. Minden hivatkozást csak egyszer és a megfelelő hivatkozástípussal kell megadni."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Távolítsd el az azonos hivatkozásokat"
-  },
   "nags.invalid-gallery-text.title": {
     "defaultMessage": "Módosítsd a galériakép szövegét"
   },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "A licensz linkje érvénytelen."
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "A licenced URL-je a(z) {domain} domainre mutat, amely nem megfelelő a licencinformációkhoz. A licenc URL-jének közvetlenül a licenc szövegére kell mutatnia."
-  },
   "nags.invalid-license-url.description.malformed": {
-    "defaultMessage": "Úgy tűnik, hogy a licensz linkje hibás. Adj meg egy érvényes linket a licensz szövegéhez."
+    "defaultMessage": "Úgy tűnik, hogy a licenc linkje hibás. Adj meg egy érvényes linket a licenc szövegéhez."
   },
   "nags.invalid-license-url.title": {
-    "defaultMessage": "Adj meg egy érvényes licenszlinket"
+    "defaultMessage": "Adj meg egy érvényes licenclinket"
   },
   "nags.invalid-project-description.title": {
     "defaultMessage": "Módosítsd a leírást"
@@ -154,6 +133,81 @@
   },
   "nags.invalid-project-summary.title": {
     "defaultMessage": "Módosítsd az összefoglalót"
+  },
+  "nags.license-url.not-in-allowlist.description": {
+    "defaultMessage": "A licenced hivatkozása ismeretlen. Kérünk bizonyosodj meg, hogy a hivatkozás közvetlenül a licenced tartalmára mutat."
+  },
+  "nags.license-url.not-in-allowlist.title": {
+    "defaultMessage": "Ellenőrizd a licenced hivatkozását"
+  },
+  "nags.link-validation.discord-invite": {
+    "defaultMessage": "A Discord meghívód érvénytelen, lejárt vagy nem egy szerverbe hívja meg a felhasználókat. Cseréld le egy érvényes szerver-meghívóra."
+  },
+  "nags.link-validation.discord-invite.title": {
+    "defaultMessage": "Cseréld le az érvénytelen Discord meghívókat"
+  },
+  "nags.link-validation.download": {
+    "defaultMessage": "Hivatkozások amik letöltéseket indítanak el nem megengedettek. Kérjük távolítsd el az ilyesmi hivatkozásokat a leírásodból."
+  },
+  "nags.link-validation.download.title": {
+    "defaultMessage": "Távolítsd el a letöltő hivatkozásokat"
+  },
+  "nags.link-validation.duplicate": {
+    "defaultMessage": "{linkField, select, issues {A hibakereső} source {A forráskód} wiki {A wiki} discord {A Discord-meghívó} site {A weboldal} store {Az áruház} license {A licenc} description {A leírás} patreon {A Patreon} bmac {A Buy Me a Coffee} paypal {A PayPal} github {A GitHub szponzorok} kofi {A Ko-fi} other {Az adományozás}} hivatkozása {otherLinkField, select, issues {a Hibakereső} source {a Forráskód} wiki {a Wiki} discord {a Discord-meghívó} site {a Weoldal} store {az Áruház} license {a Licenc} patreon {a Patreon} bmac {a Vegyél nekem egy kávét} paypal {a PayPal} github {a GitHub szponzorok} kofi {a Ko-fi} other {egy másik}} mezőben is használatban van. Minden hivatkozást csak egyszer kell megadni."
+  },
+  "nags.link-validation.duplicate.title": {
+    "defaultMessage": "Távolítsd el a duplikált hivatkozásokat"
+  },
+  "nags.link-validation.external-blocklist-match": {
+    "defaultMessage": "A {linkField} hivatkozásod nem megengedett. Kérjük távolítsd el, vagy cseréld le egy, a {linkField} hivatkozás típusa által megengedettre."
+  },
+  "nags.link-validation.external-blocklist-match.title": {
+    "defaultMessage": "Cseréld le a helytelen hivatkozásokat"
+  },
+  "nags.link-validation.global-blocklist-match": {
+    "defaultMessage": "{linkField, select, issues {A hibakereső} source {A forráskód} wiki {A wiki} discord {A Discord-meghívó} site {A weboldal} store {Az áruház} license {A licenc} description {A leírás} patreon {A Patreon} bmac {A Buy Me a Coffee} paypal {A PayPal} github {A GitHub szponzorok} kofi {A Ko-fi} other {Az adományozás}} hivatkozása tiltott domaint használ. Távolítsd el vagy cseréld le ezt a hivatkozást."
+  },
+  "nags.link-validation.global-blocklist-match.title": {
+    "defaultMessage": "Távolítsd el a tiltott hivatkozásokat"
+  },
+  "nags.link-validation.ip-address": {
+    "defaultMessage": "{linkField, select, issues {A hibakereső} source {A forráskód} wiki {A wiki} discord {A Discord-meghívó} site {A weboldal} store {Az áruház} license {A licenc} description {A leírás} patreon {A Patreon} bmac {A Buy Me a Coffee} paypal {A PayPal} github {A GitHub szponzorok} kofi {A Ko-fi} other {Az adományozás}} hivatkozása IP-címet használ. Használj domainnevet tartalmazó URL-t."
+  },
+  "nags.link-validation.ip-address.title": {
+    "defaultMessage": "Távolítsd el az IP-címeket"
+  },
+  "nags.link-validation.malformed": {
+    "defaultMessage": "{linkField, select, issues {A hibakereső} source {A forráskód} wiki {A wiki} discord {A Discord-meghívó} site {A weboldal} store {Az áruház} license {A licenc} description {A leírás} patreon {A Patreon} bmac {A Buy Me a Coffee} paypal {A PayPal} github {A GitHub szponzorok} kofi {A Ko-fi} other {Az adományozás}} hivatkozása érvénytelen. Adj meg egy teljes HTTPS URL-t."
+  },
+  "nags.link-validation.malformed.title": {
+    "defaultMessage": "Orvosold az érvénytelen hivatkozásokat"
+  },
+  "nags.link-validation.not-in-allowlist": {
+    "defaultMessage": "{linkField, select, issues {A hibakereső} source {A forráskód} wiki {A wiki} discord {A Discord-meghívó} site {A weboldal} store {Az áruház} license {A licenc} description {A leírás} patreon {A Patreon} bmac {A Buy Me a Coffee} paypal {A PayPal} github {A GitHub szponzorok} kofi {A Ko-fi} other {Az adományozás}} hivatkozása nem biztos, hogy megfelelő ehhez a hivatkozástípushoz. Győződj meg róla, hogy megfelel a rendeltetésének."
+  },
+  "nags.link-validation.not-in-allowlist.title": {
+    "defaultMessage": "Ellenőrizd az hivatkozásod pontosságát"
+  },
+  "nags.link-validation.source-repository": {
+    "defaultMessage": "A forráskódra mutató hivatkozásnak egy támogatott tárhelyszolgáltatón található tárolóra, vagy saját üzemeltetésű Gitea- vagy Forgejo-szolgáltatásra kell mutatnia."
+  },
+  "nags.link-validation.source-repository.title": {
+    "defaultMessage": "Hivatkozz egy forrás-tárolóra"
+  },
+  "nags.link-validation.title": {
+    "defaultMessage": "Ellenőrizd ezt a hivatkozást"
+  },
+  "nags.link-validation.unverifiable": {
+    "defaultMessage": "{linkField, select, issues {A hibakereső} source {A forráskód} wiki {A wiki} discord {A Discord-meghívó} site {A weboldal} store {Az áruház} license {A licenc} description {A leírás} patreon {A Patreon} bmac {A Buy Me a Coffee} paypal {A PayPal} github {A GitHub szponzorok} kofi {A Ko-fi} other {Az adományozás}} hivatkozását nem sikerült ellenőrizni. Ellenőrizd, hogy online van-e és elérhető-e."
+  },
+  "nags.link-validation.unverifiable.title": {
+    "defaultMessage": "Ellenőrizd a hivatkozásod elérhetőségét"
+  },
+  "nags.link-validation.wrong-field": {
+    "defaultMessage": "{linkField, select, issues {A hibakereső} source {A forráskód} wiki {A wiki} discord {A Discord-meghívó} site {A weboldal} store {Az áruház} license {A licenc} description {A leírás} patreon {A Patreon} bmac {A Buy Me a Coffee} paypal {A PayPal} github {A GitHub szponzorok} kofi {A Ko-fi} other {Az adományozás}} hivatkozása nem megfelelő {linkField, select, issues {a hibakereső} source {a forráskód} wiki {a wiki} discord {a Discord-meghívó} site {a weboldal} store {az áruház} license {a licenc} description {a leírás} patreon {a Patreon} bmac {a Buy Me a Coffee} paypal {a PayPal} github {a GitHub szponzorok} kofi {a Ko-fi} other {az adományozás}} típusú hivatkozásokhoz. Távolítsd el, vagy cseréld le a megfelelő hivatkozásra."
+  },
+  "nags.link-validation.wrong-field.title": {
+    "defaultMessage": "Orvosold a hibás hivatkozásokat"
   },
   "nags.long-headers.description": {
     "defaultMessage": "A leírásodban {count} fejléc túl hosszú. A fejlécek legyenek tömörek, és csak szakaszcímként szolgáljanak, ne teljes mondatként."
@@ -173,12 +227,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "Adj hozzá helyettesítő szöveget"
   },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "A Discord-meghívók nem használhatók más hivatkozástípusokhoz. A Discord-hivatkozást csak a Discord-meghívó hivatkozás mezőjébe helyezd."
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Discord meghívó áthelyezése"
-  },
   "nags.moderation.title": {
     "defaultMessage": "Látogasd meg a Moderáció fület"
   },
@@ -194,8 +242,8 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Válaszd ki a megfelelő felbontást"
   },
-  "nags.project-description-banned-link.description": {
-    "defaultMessage": "A(z) {fullUrl} hivatkozás nem engedélyezett a projektleírásokban."
+  "nags.project-description-content.title": {
+    "defaultMessage": "Nézd át a leírást"
   },
   "nags.project-description-non-english.description": {
     "defaultMessage": "A projekted leírását angolul kell megadnod, vagy angol fordítást is kell tartalmaznia."
@@ -294,7 +342,7 @@
     "defaultMessage": "Válaszd ki a licencet ami a te {type}ed alapján megfelelő."
   },
   "nags.select-license.title": {
-    "defaultMessage": "Válassz egy licenszet"
+    "defaultMessage": "Válassz egy licencet"
   },
   "nags.select-tags.description": {
     "defaultMessage": "Válaszd ki azokat a címkéket, amelyek helyesen vonatkoznak a projektedre, hogy a megfelelő felhasználók megtalálhassák azt."
@@ -309,7 +357,7 @@
     "defaultMessage": "Nyilatkozat-beállítások meglátogatása"
   },
   "nags.settings.license.title": {
-    "defaultMessage": "Látogasd meg a licenszbeállításokat"
+    "defaultMessage": "Látogasd meg a licencbeállításokat"
   },
   "nags.settings.links.title": {
     "defaultMessage": "Látogasd meg a linkbeállításokat"
@@ -371,14 +419,11 @@
   "nags.upload-version.title": {
     "defaultMessage": "Tölts fel egy verziót"
   },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Néhány külső hivatkozásod olyan domainekre vezethet, amelyek nem megfelelőek az adott hivatkozástípushoz."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Ellenőrizd a külső hivatkozásokat"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Látogasd meg a linkbeállításokat"
+  },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "A projekt leírásának egyedi információkat kell tartalmaznia, és nem ismételheti meg a projekt összefoglalóját."
   },
   "project.text-validation.summary-matches-title": {
     "defaultMessage": "A projekted összefoglalójának egyedi információkat kell tartalmaznia, és nem ismételheti meg a projekt nevét."

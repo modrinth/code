@@ -227,10 +227,15 @@ pub async fn filter_visible_versions(
     .wrap_api_err("filtering visible version ids")?;
     versions.retain(|x| filtered_version_ids.contains(&x.inner.id));
 
-    let version_ids: Vec<_> = versions.iter().map(|v| v.inner.id).collect();
-    let missing = get_files_missing_attribution(&**ro_pool, &version_ids)
-        .await
-        .unwrap_or_default();
+    let missing = get_files_missing_attribution(
+        &**ro_pool,
+        &versions
+            .iter()
+            .map(|v| (v.inner.id, v.inner.project_id))
+            .collect_vec(),
+    )
+    .await
+    .unwrap_or_default();
 
     Ok(versions
         .into_iter()
@@ -298,7 +303,7 @@ pub async fn filter_visible_version_ids(
     let visible_project_ids = filter_visible_project_ids(
         DBProject::get_many_ids(&project_ids, pool, redis)
             .await
-            .wrap_api_err("fetching projects for visibility filtering")?
+            .wrap_internal_err("fetching projects for visibility filtering")?
             .iter()
             .map(|x| &x.inner)
             .collect(),
@@ -315,10 +320,12 @@ pub async fn filter_visible_version_ids(
             .await
             .wrap_api_err("filtering enlisted version ids")?;
 
-    let version_ids: Vec<_> = versions.iter().map(|v| v.id).collect();
-    let withheld_versions = get_files_missing_attribution(pool, &version_ids)
-        .await
-        .unwrap_or_default();
+    let withheld_versions = get_files_missing_attribution(
+        pool,
+        &versions.iter().map(|v| (v.id, v.project_id)).collect_vec(),
+    )
+    .await
+    .unwrap_or_default();
 
     // Return versions that are not hidden, we are a mod of, or we are enlisted on the team of
     for version in versions {
@@ -355,7 +362,7 @@ pub async fn filter_enlisted_version_ids(
     let authorized_project_ids = filter_enlisted_projects_ids(
         DBProject::get_many_ids(&project_ids, pool, redis)
             .await
-            .wrap_api_err("fetching projects for membership filtering")?
+            .wrap_internal_err("fetching projects for membership filtering")?
             .iter()
             .map(|x| &x.inner)
             .collect(),

@@ -5,9 +5,7 @@ use crate::database::models::notifications_template_item::{
     NotificationTemplate, get_or_set_cached_dynamic_html,
 };
 use crate::database::models::report_item::DBReport;
-use crate::database::models::{
-    DBOrganization, DBProject, DBUser, DatabaseError,
-};
+use crate::database::models::{DBOrganization, DBProject, DBUser};
 use crate::env::ENV;
 use crate::models::v3::notifications::NotificationBody;
 use crate::routes::ApiError;
@@ -177,8 +175,7 @@ pub async fn build_email(
     let db_user = DBUser::get_id(user_id, &mut *exec, redis)
         .await
         .wrap_internal_err("fetching user from database")?
-        .ok_or(DatabaseError::Database(sqlx::Error::RowNotFound))
-        .wrap_internal_err("fetching user from database")?;
+        .wrap_internal_err("finding email recipient in database")?;
 
     let map = [
         (USER_NAME, db_user.username),
@@ -424,9 +421,8 @@ async fn collect_template_variables(
                 redis,
             )
             .await
-            .wrap_api_err("fetching email project")?
-            .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))
-            .wrap_internal_err("fetching project from database")?
+            .wrap_internal_err("fetching email project")?
+            .wrap_internal_err("finding email project in database")?
             .inner;
 
             map.insert(PROJECT_ID, to_base62(project_id.0));
@@ -527,9 +523,8 @@ async fn collect_template_variables(
                 redis,
             )
             .await
-            .wrap_api_err("fetching email project")?
-            .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))
-            .wrap_internal_err("fetching project from database")?
+            .wrap_internal_err("fetching email project")?
+            .wrap_internal_err("finding email project in database")?
             .inner;
 
             map.insert(PROJECT_ID, to_base62(project_id.0));
@@ -551,9 +546,8 @@ async fn collect_template_variables(
                 redis,
             )
             .await
-            .wrap_api_err("fetching email project")?
-            .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))
-            .wrap_internal_err("fetching project from database")?
+            .wrap_internal_err("fetching email project")?
+            .wrap_internal_err("finding email project in database")?
             .inner;
 
             map.insert(PROJECT_ID, to_base62(project_id.0));
@@ -568,12 +562,7 @@ async fn collect_template_variables(
                 )
                 .await
                 .wrap_internal_err("fetching user from database")?
-                .ok_or_else(|| {
-                    DatabaseError::Database(sqlx::Error::RowNotFound)
-                })
-                .wrap_internal_err(
-                    "querying database for `collect_template_variables`",
-                )?;
+                .wrap_internal_err("finding new owner user in database")?;
 
                 map.insert(NEWOWNER_TYPE, "user".to_string());
                 map.insert(NEWOWNER_TYPE_CAPITALIZED, "User".to_string());
@@ -588,11 +577,8 @@ async fn collect_template_variables(
                 )
                 .await
                 .wrap_internal_err("fetching organization from database")?
-                .ok_or_else(|| {
-                    DatabaseError::Database(sqlx::Error::RowNotFound)
-                })
                 .wrap_internal_err(
-                    "querying database for `collect_template_variables`",
+                    "finding new owner organization in database",
                 )?;
 
                 map.insert(NEWOWNER_TYPE, "organization".to_string());
@@ -901,8 +887,7 @@ async fn collect_template_variables(
             )
             .await
             .wrap_internal_err("fetching user from database")?
-            .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))
-            .wrap_internal_err("fetching user from database")?;
+            .wrap_internal_err("finding server invite sender in database")?;
 
             map.insert(SERVERINVITE_INVITER_NAME, inviter.username);
             map.insert(SERVERINVITE_SERVER_NAME, server_name.clone());

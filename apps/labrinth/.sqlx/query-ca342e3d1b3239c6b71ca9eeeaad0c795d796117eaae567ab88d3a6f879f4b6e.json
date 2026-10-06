@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO user_limits (\n                user_id, projects, projects_per_day, organizations, collections,\n                versions_per_project, versions_per_day\n            )\n            VALUES ($1, $2, $3, $4, $5, $6, $7)\n            ON CONFLICT (user_id) DO UPDATE\n            SET projects = EXCLUDED.projects,\n                projects_per_day = EXCLUDED.projects_per_day,\n                organizations = EXCLUDED.organizations,\n                collections = EXCLUDED.collections,\n                versions_per_project = EXCLUDED.versions_per_project,\n                versions_per_day = EXCLUDED.versions_per_day",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ca342e3d1b3239c6b71ca9eeeaad0c795d796117eaae567ab88d3a6f879f4b6e"
+}

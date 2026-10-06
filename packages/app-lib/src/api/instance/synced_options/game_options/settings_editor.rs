@@ -376,7 +376,7 @@ pub async fn save_changes(
 
     let mut changed = false;
     let mut fullscreen_value = None;
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
     for (setting, change) in accepted {
         let resulting_enabled =
             change.sync_enabled.unwrap_or(setting.sync_enabled);

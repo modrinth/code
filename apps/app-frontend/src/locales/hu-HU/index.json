@@ -53,8 +53,8 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "A letöltés nem fejeződött be"
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "A példány nem található"
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Nem sikerült előkészíteni a példányt"
   },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "A fájl elérési útja érvénytelen"
@@ -206,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Kezdőlap és tartalom"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Előtérbe hozza a Modrinth appot amikor a Minecraft bezáródik."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Előtérbe hozás amikor a Minecraft bezáródik"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Indítás és navigáció"
   },
@@ -295,6 +301,90 @@
   },
   "app.content.sync-resource-packs-disabled": {
     "message": "Először kapcsold be az erőforráscsomagok szinkronizálását az alkalmazás beállításaiban."
+  },
+  "app.download-manager.active": {
+    "message": "Aktív"
+  },
+  "app.download-manager.attention": {
+    "message": "Figyelmet igényel"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "{count, plural, one {# elem} other {# elem}} frissítése"
+  },
+  "app.download-manager.cancel": {
+    "message": "Telepítés megszakítása"
+  },
+  "app.download-manager.canceling": {
+    "message": "Telepítés megszakítása..."
+  },
+  "app.download-manager.clear-all": {
+    "message": "Összes törlése"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Az összes befejezett feladat törlése"
+  },
+  "app.download-manager.complete": {
+    "message": "Befejezés"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Példány megkettőzése"
+  },
+  "app.download-manager.empty": {
+    "message": "Nincs telepítési feladat"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "A letöltés becsült sebessége"
+  },
+  "app.download-manager.eta": {
+    "message": "A letöltés becsült hátralévő ideje"
+  },
+  "app.download-manager.hide": {
+    "message": "Telepítési folyamatok elrejtése"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Importált példány"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "Példány telepítése"
+  },
+  "app.download-manager.modpack": {
+    "message": "Modcsomag"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Modcsomag telepítés"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Új példány"
+  },
+  "app.download-manager.pause": {
+    "message": "Telepítés szüneteltetése"
+  },
+  "app.download-manager.paused": {
+    "message": "Szüneteltetve"
+  },
+  "app.download-manager.remove": {
+    "message": "Eltávolítás az előzményekből"
+  },
+  "app.download-manager.resume": {
+    "message": "A telepítés folytatása"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Megosztott példány"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "Megosztott példány frissítése"
+  },
+  "app.download-manager.show": {
+    "message": "Telepítési feladatok megjelenítése"
+  },
+  "app.download-manager.tasks": {
+    "message": "Feladatok"
+  },
+  "app.download-manager.title": {
+    "message": "Letöltéskezelő"
+  },
+  "app.download-manager.verifying": {
+    "message": "Ellenőrzés..."
   },
   "app.error.state-init.open-backups-folder": {
     "message": "A biztonsági mentések mappájának megnyitása"
@@ -607,15 +697,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Példány"
-  },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "{current, number}/{total, number} projekt letöltése..."
-  },
-  "app.instance.mods.bulk-update.finishing": {
-    "message": "Frissítés befejezése..."
-  },
-  "app.instance.mods.bulk-update.resolving-versions": {
-    "message": "Verziók meghatározása..."
   },
   "app.instance.mods.content-type-project": {
     "message": "projekt"
@@ -1381,6 +1462,9 @@
   },
   "app.quick-instance-switcher.instance-locked": {
     "message": "Ez a példány zárolva van"
+  },
+  "app.quick-instance-switcher.title": {
+    "message": "Korábbi példányok"
   },
   "app.quick-instance-switcher.view-instance": {
     "message": "Játékprofil megnyitása"
@@ -2720,6 +2804,78 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Maximális egyidejű írási műveletek"
   },
+  "app.settings.resource-management.store.attention": {
+    "message": "Néhány fájl még figyelmet igényel"
+  },
+  "app.settings.resource-management.store.cache-limit.description": {
+    "message": "Tarts meg legfeljebb ennyi nem használt tartalmat a későbbi telepítésekhez. Több megtartása csökkentheti a letöltési időt."
+  },
+  "app.settings.resource-management.store.cache-limit.label": {
+    "message": "Felhasználatlan telepítések megtartása"
+  },
+  "app.settings.resource-management.store.cache-limit.unit": {
+    "message": "GiB"
+  },
+  "app.settings.resource-management.store.calculating": {
+    "message": "Kiszámítás"
+  },
+  "app.settings.resource-management.store.clear": {
+    "message": "Felhasználatlanok törlése"
+  },
+  "app.settings.resource-management.store.clear.description": {
+    "message": "Felhasználatlan telepítések törlése"
+  },
+  "app.settings.resource-management.store.cleared": {
+    "message": "Felszabadítottál {size} lemezterületet."
+  },
+  "app.settings.resource-management.store.clearing": {
+    "message": "Törlés…"
+  },
+  "app.settings.resource-management.store.description": {
+    "message": "Szabadíts fel helyet azzal, hogy újrahasználod a játék-telepítéseket, modokat, és csomagokat a példányaid között."
+  },
+  "app.settings.resource-management.store.empty": {
+    "message": "Telepítsd modokat vagy csomagokat hogy lásd a felhasznált mennyiségű tárhelyet."
+  },
+  "app.settings.resource-management.store.issues": {
+    "message": "{count, plural, one {Probléma} other {# probléma}} megtekintése"
+  },
+  "app.settings.resource-management.store.nothing-to-clear": {
+    "message": "Nincsen törlendő felhasználatlan tartalom."
+  },
+  "app.settings.resource-management.store.repair": {
+    "message": "Ellenőrzés és javítás"
+  },
+  "app.settings.resource-management.store.repair.running-description": {
+    "message": "Ez bezárja az összes futó példányt."
+  },
+  "app.settings.resource-management.store.repair.verify-description": {
+    "message": "Megkeresi a hiányzó vagy hibás fájlokat és megpróbálja megjavítani őket."
+  },
+  "app.settings.resource-management.store.repairing": {
+    "message": "Ellenőrzés és javítás…"
+  },
+  "app.settings.resource-management.store.shared.label": {
+    "message": "Megosztott"
+  },
+  "app.settings.resource-management.store.title": {
+    "message": "Tartalomtárhely"
+  },
+  "app.settings.resource-management.store.total": {
+    "message": "{size} tárolva"
+  },
+  "app.settings.resource-management.store.unique.label": {
+    "message": "Egyedi"
+  },
+  "app.settings.resource-management.store.unused.label": {
+    "message": "Árván maradt"
+  },
+  "app.settings.resource-management.store.verification-result": {
+    "message": "{checked} fájl ellenőrizve és {repaired} javítás elvégezve."
+  },
+  "app.settings.resource-management.store.verified": {
+    "message": "Sikeres ellenőrzés"
+  },
   "app.settings.sidebar.label.instances": {
     "message": "Példányok"
   },
@@ -3092,6 +3248,12 @@
   "app.skins.section.default-skins": {
     "message": "Alap kinézetek"
   },
+  "app.skins.section.dungeons-hero": {
+    "message": "Dungeons Hős"
+  },
+  "app.skins.section.dungeons-ii-hero": {
+    "message": "Dungeons II Hős"
+  },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
@@ -3121,6 +3283,9 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
+  },
+  "app.skins.section.wilderness-bound": {
+    "message": "Vadonhívó"
   },
   "app.skins.sign-in.button": {
     "message": "Bejelentkezés Microsofttal"
@@ -3465,7 +3630,7 @@
     "message": "Leválasztás..."
   },
   "installation-settings.shared-instance.unpublish-button": {
-    "message": "Megosztott példány megosztásának visszavonása"
+    "message": "Pédány megosztásának visszavonása"
   },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Eltávolítja ezt a megosztott példányt a Modrinthból, és nem küld többé frissítéseket azoknak, akik használják. A helyi példányodat ez nem érinti."
@@ -3556,6 +3721,9 @@
   },
   "instance.files.adding-files": {
     "message": "Fájlok hozzáadása ({completed}/{total})"
+  },
+  "instance.files.managed-content-read-only": {
+    "message": "Kezeld a telepített tartalmaidat a Tartalmak lapon"
   },
   "instance.files.save-as": {
     "message": "Mentés másként..."

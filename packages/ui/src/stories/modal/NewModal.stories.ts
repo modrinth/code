@@ -230,3 +230,24 @@ export const NoPadding: Story = {
 		`,
 	}),
 }
+
+export const InitialHeadingFocus: Story = {
+	render: () => ({
+		components: { NewModal, Button },
+		setup() {
+			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
+			const headingRef = ref<HTMLElement | null>(null)
+			const openModal = () => modalRef.value?.show()
+			const initialFocus = () => headingRef.value
+			return { modalRef, headingRef, openModal, initialFocus }
+		},
+		template: `
+			<Button type="colored" color="brand" @click="openModal">Open Modal with Heading Focus</Button>
+			<NewModal ref="modalRef" header="Review Updates" :initial-focus="initialFocus">
+				<h2 ref="headingRef" tabindex="-1" class="m-0 text-xl font-semibold">Review these updates</h2>
+				<p>Focus starts on this heading so the content can be read before the actions.</p>
+				<Button @click="modalRef?.hide()">Close</Button>
+			</NewModal>
+		`,
+	}),
+}

@@ -7,7 +7,7 @@ use crate::{database::PgPool, util::http::HttpClient};
 use actix_web::{HttpRequest, HttpResponse, get, post, web};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use tokio::sync::Mutex;
 use tracing::info;
 use uuid::Uuid;
@@ -17,8 +17,8 @@ use crate::{
     database::{
         advisory_lock::AdvisoryLock,
         models::{
-            DBFileId, DBProjectId, DelphiReportId, DelphiReportIssueDetailsId,
-            DelphiReportIssueId,
+            DBFileId, DBProjectId, DBVersionId, DelphiReportId,
+            DelphiReportIssueDetailsId, DelphiReportIssueId,
             delphi_report_item::{
                 DBDelphiReport, DBDelphiReportIssue, DelphiSeverity,
                 DelphiStatus, ReportIssueDetail,
@@ -26,7 +26,7 @@ use crate::{
         },
     },
     models::{
-        ids::{ProjectId, VersionId},
+        ids::{FileId, ProjectId, VersionId},
         pats::Scopes,
     },
     queue::session::AuthQueue,
@@ -42,6 +42,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         web::scope("/delphi")
             .service(ingest_report)
             .service(_run)
+            .service(get_file)
             .service(version)
             .service(issue_type_schema),
     );
@@ -403,6 +404,60 @@ pub async fn _run(
         .wrap_internal_err("committing Delphi scan enqueue transaction")?;
 
     Ok(HttpResponse::NoContent().finish())
+}
+
+#[derive(Debug, Serialize, utoipa::ToSchema)]
+pub struct DelphiFile {
+    pub id: FileId,
+    pub url: String,
+    pub file_name: String,
+    pub size: i32,
+    pub version_id: VersionId,
+    pub project_id: ProjectId,
+}
+
+/// Resolve a file ID to the file it refers to.
+#[utoipa::path(
+	context_path = "/delphi",
+	tag = "delphi",
+	params(("file_id" = FileId, Path)),
+	responses(
+		(status = OK, body = DelphiFile),
+		(status = NOT_FOUND),
+	)
+)]
+#[get("/file/{file_id}", guard = "admin_key_guard")]
+pub async fn get_file(
+    pool: web::Data<PgPool>,
+    path: web::Path<FileId>,
+) -> Result<web::Json<DelphiFile>, ApiError> {
+    let file_id = path.into_inner();
+    let file = sqlx::query!(
+        r#"
+        SELECT
+            files.url,
+            files.filename,
+            files.size,
+            files.version_id AS "version_id: DBVersionId",
+            versions.mod_id AS "project_id: DBProjectId"
+        FROM files INNER JOIN versions ON files.version_id = versions.id
+        WHERE files.id = $1
+        "#,
+        DBFileId::from(file_id) as DBFileId,
+    )
+    .fetch_optional(&**pool)
+    .await
+    .wrap_internal_err("fetching file from database")?
+    .wrap_not_found_err("file not found")?;
+
+    Ok(web::Json(DelphiFile {
+        id: file_id,
+        url: file.url,
+        file_name: file.filename,
+        size: file.size,
+        version_id: file.version_id.into(),
+        project_id: file.project_id.into(),
+    }))
 }
 
 /// Get the Delphi version.

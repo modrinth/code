@@ -32,15 +32,16 @@ INSERT INTO loaders (id, loader) VALUES (9, 'datapack');
 
 INSERT INTO loaders_project_types (joining_loader_id, joining_project_type_id)
 SELECT l.id, pt.id
-FROM loaders l
-CROSS JOIN project_types pt
+FROM
+	loaders AS l
+	CROSS JOIN project_types AS pt
 WHERE
 	(l.loader IN ('bukkit', 'waterfall') AND pt.name = 'plugin')
 	OR (l.loader = 'datapack' AND pt.name = 'datapack');
 
 INSERT INTO loaders_project_types_games (loader_id, project_type_id, game_id)
 SELECT lpt.joining_loader_id, lpt.joining_project_type_id, 1
-FROM loaders_project_types lpt
+FROM loaders_project_types AS lpt
 WHERE lpt.joining_loader_id IN (7, 8, 9);
 
 -- Adds dummies to mrpack_loaders
@@ -73,6 +74,11 @@ ON CONFLICT DO NOTHING;
 
 -- Sample game versions, loaders, categories
 -- Game versions is '2'
+INSERT INTO loader_field_enum_values (enum_id, value, metadata, created)
+VALUES
+	(2, '1.3', '{"type":"snapshot","major":false}', '2012-07-25 22:00:00+00'),
+	(2, '1.13.2', '{"type":"release","major":false}', '2018-10-22 11:41:07+00'),
+	(2, '18w43b', '{"type":"snapshot","major":false}', '2018-10-24 15:02:30+00');
 INSERT INTO loader_field_enum_values (enum_id, value, metadata, created)
 VALUES (2, '1.20.1', '{"type":"release","major":false}', '2021-08-18 15:48:58.435729+00');
 INSERT INTO loader_field_enum_values (enum_id, value, metadata, created)

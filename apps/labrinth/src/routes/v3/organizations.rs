@@ -95,7 +95,7 @@ pub async fn organization_projects_get(
             &redis,
         )
         .await
-        .wrap_api_err("fetching organization projects")?;
+        .wrap_internal_err("fetching organization projects")?;
 
         let projects =
             filter_visible_projects(projects_data, &current_user, &pool, true)
@@ -950,7 +950,7 @@ pub async fn organization_projects_add(
         &redis,
     )
     .await
-    .wrap_api_err("fetching project from database")?
+    .wrap_internal_err("fetching project from database")?
     .wrap_request_err_with(|| {
         "the specified project does not exist!".to_string()
     })?;
@@ -1132,7 +1132,7 @@ pub async fn organization_projects_remove(
     let project_item =
         database::models::DBProject::get(&project_id, &**pool, &redis)
             .await
-            .wrap_api_err("fetching project from database")?
+            .wrap_internal_err("fetching project from database")?
             .wrap_request_err_with(|| {
                 "the specified project does not exist!".to_string()
             })?;
@@ -1373,11 +1373,10 @@ pub async fn organization_icon_edit(
 
     let bytes = read_limited_from_payload(
         &mut payload,
-        262144,
-        "Icons must be smaller than 256KiB",
+        524288,
+        "Icons must be smaller than 512KiB",
     )
-    .await
-    .wrap_api_err("executing `read_limited_from_payload`")?;
+    .await?;
 
     let organization_id: OrganizationId = organization_item.id.into();
     let upload_result = crate::util::img::upload_image_optimized(

@@ -68,6 +68,7 @@ impl ContentStore {
         self.check_instance_path(&path, &binding.blob_sha512).await
     }
 
+    #[expect(dead_code)]
     pub(crate) async fn validate_instance(
         &self,
         instance: &Instance,
@@ -121,6 +122,8 @@ impl ContentStore {
         instance: &Instance,
         files: &[InstanceFile],
         bindings: &[InstanceFileStorage],
+        missing_file_ids: &std::collections::HashSet<String>,
+        copied_file_ids: &std::collections::HashSet<String>,
     ) -> crate::Result<()> {
         let files: HashMap<_, _> =
             files.iter().map(|file| (file.id.as_str(), file)).collect();
@@ -130,6 +133,22 @@ impl ContentStore {
                 files.get(binding.file_id.as_str()).ok_or_else(|| {
                     input("Rollback content reference has no file record")
                 })?;
+            if missing_file_ids.contains(&binding.file_id) {
+                restored.push((
+                    &binding.file_id,
+                    &binding.blob_sha512,
+                    binding.storage_kind,
+                ));
+                continue;
+            }
+            if copied_file_ids.contains(&binding.file_id) {
+                restored.push((
+                    &binding.file_id,
+                    &binding.blob_sha512,
+                    FileStorageKind::Copy,
+                ));
+                continue;
+            }
             let stored_file = self
                 .lookup(Some(&binding.blob_sha512), Some(file.size))
                 .await?
@@ -166,7 +185,7 @@ impl ContentStore {
                 storage_kind,
             ));
         }
-        let mut tx = self.pool.begin().await?;
+        let mut tx = self.pool.begin_with("BEGIN IMMEDIATE").await?;
         for (id, stored_file, storage_kind) in restored {
             catalog::set_file_storage(&mut tx, id, stored_file, storage_kind)
                 .await?;
@@ -217,7 +236,7 @@ impl ContentStore {
         sha512: &str,
         storage_kind: FileStorageKind,
     ) -> crate::Result<()> {
-        let mut tx = self.pool.begin().await?;
+        let mut tx = self.pool.begin_with("BEGIN IMMEDIATE").await?;
         file.missing = false;
         content_rows::upsert_instance_file(file, &mut tx).await?;
         catalog::set_file_storage(&mut tx, &file.id, sha512, storage_kind)

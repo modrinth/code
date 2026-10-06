@@ -123,7 +123,7 @@ impl RedisPool {
     where
         F: FnOnce(Vec<K>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, T>, E>>,
-        E: std::error::Error + Send + Sync + 'static,
+        E: Into<eyre::Report>,
         T: Serialize + DeserializeOwned,
         K: Display
             + Hash
@@ -139,6 +139,7 @@ impl RedisPool {
         } else {
             Ok(closure(keys.to_vec())
                 .await
+                .map_err(Into::<eyre::Report>::into)
                 .wrap_err("fetching uncached values")?
                 .into_iter()
                 .map(|(_, value)| value)
@@ -155,7 +156,7 @@ impl RedisPool {
     where
         F: FnOnce(Vec<K>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, T>, E>>,
-        E: std::error::Error + Send + Sync + 'static,
+        E: Into<eyre::Report>,
         T: Serialize + DeserializeOwned,
         K: Display
             + Hash
@@ -180,7 +181,7 @@ impl RedisPool {
     where
         F: FnOnce(Vec<K>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, T>, E>>,
-        E: std::error::Error + Send + Sync + 'static,
+        E: Into<eyre::Report>,
         T: Serialize + DeserializeOwned,
         K: Display
             + Hash
@@ -208,7 +209,7 @@ impl RedisPool {
     where
         F: FnOnce(Vec<I>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, E>>,
-        E: std::error::Error + Send + Sync + 'static,
+        E: Into<eyre::Report>,
         T: Serialize + DeserializeOwned,
         I: Display + Hash + Eq + PartialEq + Clone + Debug,
         K: Display
@@ -232,6 +233,7 @@ impl RedisPool {
         } else {
             Ok(closure(keys.to_vec())
                 .await
+                .map_err(Into::<eyre::Report>::into)
                 .wrap_err("fetching uncached values by slug")?
                 .into_iter()
                 .map(|(_, (_, value))| value)
@@ -250,7 +252,7 @@ impl RedisPool {
     where
         F: FnOnce(Vec<I>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, E>>,
-        E: std::error::Error + Send + Sync + 'static,
+        E: Into<eyre::Report>,
         T: Serialize + DeserializeOwned,
         I: Display + Hash + Eq + PartialEq + Clone + Debug,
         K: Display
@@ -285,7 +287,7 @@ impl RedisPool {
     where
         F: FnOnce(Vec<I>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, E>>,
-        E: std::error::Error + Send + Sync + 'static,
+        E: Into<eyre::Report>,
         T: Serialize + DeserializeOwned,
         I: Display + Hash + Eq + PartialEq + Clone + Debug,
         K: Display

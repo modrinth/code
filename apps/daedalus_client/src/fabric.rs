@@ -14,7 +14,10 @@
 use crate::metadata_groups::{
     UNIVERSAL_METADATA_GROUP, metadata_group_for_game_version, metadata_groups,
 };
-use crate::util::{download_file, fetch_json, format_url};
+use crate::util::{
+    download_file, fetch_json, fetch_optional_json, format_url,
+    retain_manifest_versions,
+};
 use crate::{
     Error, FetchResult, MirrorArtifact, UploadFile, insert_mirrored_artifact,
 };
@@ -69,12 +72,11 @@ async fn fetch(
 ) -> Result<FetchResult, Error> {
     let upload_files = DashMap::new();
     let mirror_artifacts = DashMap::<String, MirrorArtifact>::new();
-    let modrinth_manifest = fetch_json::<Manifest>(
+    let modrinth_manifest = fetch_optional_json::<Manifest>(
         &format_url(&format!("{mod_loader}/v{format_version}/manifest.json",)),
         &semaphore,
     )
-    .await
-    .ok();
+    .await?;
     let fabric_manifest = fetch_json::<FabricVersions>(
         &format!("{meta_url}/versions"),
         &semaphore,
@@ -151,7 +153,7 @@ async fn fetch(
             })
             .collect();
 
-        let manifest = daedalus::modded::Manifest {
+        let mut manifest = daedalus::modded::Manifest {
             game_versions: all_game_versions
                 .into_iter()
                 .map(|game_version| {
@@ -173,6 +175,8 @@ async fn fetch(
             version_groups,
         };
 
+        retain_manifest_versions(&mut manifest, modrinth_manifest.as_ref());
+
         upload_files.insert(
             format!("{mod_loader}/v{format_version}/manifest.json"),
             UploadFile {
@@ -192,7 +196,7 @@ async fn fetch(
         fetch_fabric_versions,
         fetch_intermediary_versions,
         has_new_game_versions,
-    ) = if let Some(modrinth_manifest) = modrinth_manifest {
+    ) = if let Some(modrinth_manifest) = modrinth_manifest.as_ref() {
         let (mut fetch_versions, mut fetch_intermediary_versions) =
             (Vec::new(), Vec::new());
 
@@ -324,7 +328,7 @@ async fn fetch(
                 .collect(),
         };
 
-        let manifest = daedalus::modded::Manifest {
+        let mut manifest = daedalus::modded::Manifest {
             game_versions: std::iter::once(loader_versions)
                 .chain(all_game_versions.into_iter().map(|x| {
                     daedalus::modded::Version {
@@ -337,6 +341,8 @@ async fn fetch(
                 .collect(),
             version_groups: Vec::new(),
         };
+
+        retain_manifest_versions(&mut manifest, modrinth_manifest.as_ref());
 
         upload_files.insert(
             fabric_manifest_path,

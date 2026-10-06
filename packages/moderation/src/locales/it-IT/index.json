@@ -53,12 +53,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Seleziona i tag pertinenti"
   },
-  "nags.banned-link-usage.description": {
-    "defaultMessage": "Usare \"{url}\" come collegamento esterno è vietato."
-  },
-  "nags.banned-link-usage.title": {
-    "defaultMessage": "Rimuovi i link vietati"
-  },
   "nags.check-disclosures.title": {
     "defaultMessage": "Rivedi le informative"
   },
@@ -86,9 +80,6 @@
   "nags.edit-gallery.title": {
     "defaultMessage": "Modifica la galleria"
   },
-  "nags.edit-license.title": {
-    "defaultMessage": "Modifica la licenza"
-  },
   "nags.edit-summary.title": {
     "defaultMessage": "Modifica la sintesi"
   },
@@ -105,7 +96,7 @@
     "defaultMessage": "Metti un'immagine in evidenza"
   },
   "nags.gallery-text-non-standard.description": {
-    "defaultMessage": "I caratteri non standard, come \"Fancy text\" o \"Zalgo\", nei titoli o nelle descrizioni delle immagini della galleria sono vietati."
+    "defaultMessage": "I caratteri di testo non standard, come “Fancy text” o “Zalgo”, non sono ammessi nei titoli o nelle descrizioni delle immagini della galleria."
   },
   "nags.gallery-text-profanity.description": {
     "defaultMessage": "Le immagini della galleria non possono contenere profanità eccessive. Rilevato: \"{value}\"."
@@ -117,25 +108,13 @@
     "defaultMessage": "Galleria"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "La licenza selezionata richiede la pubblicazione del codice sorgente. Fornisci un link, i file come allegati o cambia licenza."
+    "defaultMessage": "La licenza {type} richiede la pubblicazione del codice sorgente. Fornisci un link, i file come allegati o cambia licenza."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Fornisci il codice sorgente"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Alcuni dei collegamenti esterni sembrano identici. Tipicamente dovrebbero essere inseriti solo una volta e con il tipo appropriato."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Rimuovi i link identici"
-  },
   "nags.invalid-gallery-text.title": {
     "defaultMessage": "Modifica il testo delle immagini della galleria"
-  },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "L'URL della licenza non è valido."
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "L'URL della licenza rimanda a {domain}, che non è adatto. Tipicamente dovrebbe rimandare al corpo della licenza."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "URL non valido. Forniscine uno adatto al testo della licenza."
@@ -151,6 +130,81 @@
   },
   "nags.invalid-project-summary.title": {
     "defaultMessage": "Modifica la sintesi"
+  },
+  "nags.license-url.not-in-allowlist.description": {
+    "defaultMessage": "L'URL della licenza non è stato riconosciuto. Assicurati che punti direttamente al testo della licenza."
+  },
+  "nags.license-url.not-in-allowlist.title": {
+    "defaultMessage": "Rivedi il link della licenza"
+  },
+  "nags.link-validation.discord-invite": {
+    "defaultMessage": "L'invito a Discord non è valido, è scaduto o non invita gli utenti a un server. Sostituiscilo con un link valido."
+  },
+  "nags.link-validation.discord-invite.title": {
+    "defaultMessage": "Sostituisci l'invito a Discord"
+  },
+  "nags.link-validation.download": {
+    "defaultMessage": "I link che iniziano un download sono vietati. Rimuovi tali link dalla descrizione."
+  },
+  "nags.link-validation.download.title": {
+    "defaultMessage": "Rimuovi i link di download"
+  },
+  "nags.link-validation.duplicate": {
+    "defaultMessage": "Il link {linkField, select, issues {all'issue tracker} source {al codice sorgente} wiki {alla wiki} discord {dell'invito a Discord} site {al sito web} store {al negozio} license {della licensa} description {della descrizione} patreon {a Patreon} bmac {a Buy Me a Coffee} paypal {a PayPal} github {a GitHub Sponsors} kofi {a Ko-fi} other {alla donazione}} è anche usato nel link {otherLinkField, select, issues {all'issue tracker} source {al codice sorgente} wiki {alla wiki} discord {dell'invito a Discord} site {al sito web} store {al negozio} license {della licenza} patreon {a Patreon} bmac {a Buy Me a Coffee} paypal {a PayPal} github {a GitHub Sponsors} kofi {a Ko-fi} other {di un altro campo}}. Inserisci un link una sola volta."
+  },
+  "nags.link-validation.duplicate.title": {
+    "defaultMessage": "Rimuovi i link duplicati"
+  },
+  "nags.link-validation.external-blocklist-match": {
+    "defaultMessage": "Il link inserito in \"{linkField}\" non è consentito. Rimuovilo o sostituiscilo con qualcosa di appropriato per il tipo di link."
+  },
+  "nags.link-validation.external-blocklist-match.title": {
+    "defaultMessage": "Sostituisci i link non corretti"
+  },
+  "nags.link-validation.global-blocklist-match": {
+    "defaultMessage": "Il link {linkField, select, issues {all'issue tracker} source {al codice sorgente} wiki {alla wiki} discord {dell'invito a Discord} site {al sito web} store {al negozio} license {della licenza} description {della descrizione} patreon {a Patreon} bmac {a Buy Me a Coffee} paypal {a PayPal} github {a GitHub Sponsors} kofi {a Ko-fi} other {alla donazione}} usa un dominio vietato. Rimuovilo o sostituiscilo."
+  },
+  "nags.link-validation.global-blocklist-match.title": {
+    "defaultMessage": "Rimuovi i link vietati"
+  },
+  "nags.link-validation.ip-address": {
+    "defaultMessage": "Il link {linkField, select, issues {all'issue tracker} source {al codice sorgente} wiki {alla wiki} discord {dell'invito a Discord} site {al sito web} store {al negozio} license {della licenza} description {della descrizione} patreon {a Patreon} bmac {a Buy Me a Coffee} paypal {a PayPal} github {a GitHub Sponsors} kofi {a Ko-fi} other {alla donazione}} usa un indirizzo IP. Usa un URL con un dominio."
+  },
+  "nags.link-validation.ip-address.title": {
+    "defaultMessage": "Rimuovi i link con indirizzi IP"
+  },
+  "nags.link-validation.malformed": {
+    "defaultMessage": "Il link {linkField, select, issues {all'issue tracker} source {al codice sorgente} wiki {alla wiki} discord {dell'invito a Discord} site {al sito web} store {al negozio} license {della licenza} description {della descrizione} patreon {a Patreon} bmac {a Buy Me a Coffee} paypal {a PayPal} github {a GitHub Sponsors} kofi {a Ko-fi} other {alla donazione}} non è valido. Inserisci un URL HTTPS completo."
+  },
+  "nags.link-validation.malformed.title": {
+    "defaultMessage": "Sistema i link non validi"
+  },
+  "nags.link-validation.not-in-allowlist": {
+    "defaultMessage": "Il link {linkField, select, issues {all'issue tracker} source {al codice sorgente} wiki {alla wiki} discord {dell'invito a Discord} site {al sito web} store {al negozio} license {della licenza} description {della descrizione} patreon {a Patreon} bmac {a Buy Me a Coffee} paypal {a PayPal} github {a GitHub Sponsors} kofi {a Ko-fi} other {alla donazione}} potrebbe non essere appropriato per il suo tipo. Assicurati che sia adatto al suo scopo."
+  },
+  "nags.link-validation.not-in-allowlist.title": {
+    "defaultMessage": "Controlla il link"
+  },
+  "nags.link-validation.source-repository": {
+    "defaultMessage": "Il codice sorgente deve portare a una repository su una piattaforma supportata o su un servizio Gitea/Forgejo autogestito."
+  },
+  "nags.link-validation.source-repository.title": {
+    "defaultMessage": "Collega a un codice sorgente"
+  },
+  "nags.link-validation.title": {
+    "defaultMessage": "Rivedi il link"
+  },
+  "nags.link-validation.unverifiable": {
+    "defaultMessage": "Il link {linkField, select, issues {all'issue tracker} source {al codice sorgente} wiki {alla wiki} discord {dell'invito a Discord} site {al sito web} store {al negozio} license {della licenza} description {della descrizione} patreon {a Patreon} bmac {a Buy Me a Coffee} paypal {a PayPal} github {a GitHub Sponsors} kofi {a Ko-fi} other {alla donazione}} non è stato verificato. Controlla che sia corretto e accessibile."
+  },
+  "nags.link-validation.unverifiable.title": {
+    "defaultMessage": "Controlla i link"
+  },
+  "nags.link-validation.wrong-field": {
+    "defaultMessage": "Il link {linkField, select, issues {all'issue tracker} source {al codice sorgente} wiki {alla wiki} discord {dell'invito a Discord} site {al sito web} store {al negozio} license {della licensa} description {della descrizione} patreon {a Patreon} bmac {a Buy Me a Coffee} paypal {a PayPal} github {a GitHub Sponsors} kofi {a Ko-fi} other {alla donazione}} non è corretto per il suo tipo. Rimuovilo o sostituiscilo con il link corretto."
+  },
+  "nags.link-validation.wrong-field.title": {
+    "defaultMessage": "Sistema i link non corretti"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {Una intestazione} other {# intestazioni}} nella descrizione {count, plural, one {è troppo lunga} other {sono troppo lunghe}}. Tipicamente dovrebbero essere brevi e funzionare da titoli, non da frasi complete."
@@ -170,12 +224,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "Aggiungi un testo alternativo alle immagini"
   },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Gli inviti a Discord non possono essere usati con altri link. Inserisci solo il link di Discord nella casella Invito a Discord."
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Sposta l'invito a Discord"
-  },
   "nags.moderation.title": {
     "defaultMessage": "Thread di moderazione"
   },
@@ -191,8 +239,8 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Seleziona la risoluzione corretta"
   },
-  "nags.project-description-banned-link.description": {
-    "defaultMessage": "Usare \"{fullUrl}\" nelle descrizioni dei progetti è vietato."
+  "nags.project-description-content.title": {
+    "defaultMessage": "Rivedi la descrizione"
   },
   "nags.project-description-non-english.description": {
     "defaultMessage": "La descrizione deve essere scritta in inglese o contenere una traduzione."
@@ -216,7 +264,7 @@
     "defaultMessage": "Rimuovi lo spam dalla descrizione"
   },
   "nags.project-name-non-standard-text.description": {
-    "defaultMessage": "I caratteri non standard, come \"Fancy text\" o \"Zalgo\", nel nome sono vietati."
+    "defaultMessage": "I caratteri di testo non standard, come \"Fancy text\" o \"Zalgo\", non sono ammessi nel nome del progetto."
   },
   "nags.project-name-profanity.description": {
     "defaultMessage": "Il nome non può contenere profanità. Rilevato: \"{value}\"."
@@ -243,7 +291,7 @@
     "defaultMessage": "Traduci la sintesi"
   },
   "nags.project-summary-non-standard-text.description": {
-    "defaultMessage": "I caratteri non standard, come \"Fancy text\" o \"Zalgo\", nella sintesi sono vietati."
+    "defaultMessage": "I caratteri di testo non standard, come \"Fancy text\" o \"Zalgo\", non sono ammessi nella sintesi."
   },
   "nags.project-summary-profanity.description": {
     "defaultMessage": "Le sintesi non può contenere profanità. Rilevato: \"{value}\"."
@@ -261,7 +309,7 @@
     "defaultMessage": "Assicurati di aver fornito la prova del permesso di distribuzione dei contenuti esterni del pacchetto di mod."
   },
   "nags.review-permissions.title": {
-    "defaultMessage": "Rivedi i permessi dei contenuti"
+    "defaultMessage": "Controlla i permessi"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "Seleziona le versioni supportate dal server, scegli un pacchetto di mod, o caricane il tuo."
@@ -309,7 +357,7 @@
     "defaultMessage": "Impostazioni dei collegamenti"
   },
   "nags.settings.permissions.title": {
-    "defaultMessage": "Visita le impostazioni sui permessi"
+    "defaultMessage": "Impostazioni dei permessi"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Impostazioni dei tag"
@@ -362,14 +410,11 @@
   "nags.upload-version.title": {
     "defaultMessage": "Carica una versione"
   },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Alcuni dei collegamenti esterni potrebbero portare a domini non appropriati per il tipo di link."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Rivedi i collegamenti esterni"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Impostazioni dei link"
+  },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "La descrizione dovrebbe dare informazioni utili e non ripetere la sintesi del progetto."
   },
   "project.text-validation.summary-matches-title": {
     "defaultMessage": "La sintesi dovrebbe dare informazioni utili e non ripetere il nome del progetto."

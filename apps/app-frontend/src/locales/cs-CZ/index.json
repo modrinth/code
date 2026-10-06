@@ -53,8 +53,8 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Stahování se nepodařilo dokončit"
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "Instance nebyla nalezena"
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Nelze připravit instanci"
   },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Cesta k souboru je neplatná"
@@ -206,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Domovská stránka a kontent"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Zobrazit Modrinth App na popředí po opuštění Minecraftu."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Přenést aplikaci na popředí po opuštění Minecraftu"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Spuštění a navigace"
   },
@@ -281,6 +287,99 @@
   "app.content-install.no-compatible-versions": {
     "message": "Žádné dostupné verze se neshodují s {compatibilityLabel}. Vyberte verzi, kterou chcete přesto nainstalovat. Závislosti nebudou nainstalovány automaticky."
   },
+  "app.content.desync-pack": {
+    "message": "Desynchronizovat"
+  },
+  "app.content.sync-data-packs-disabled": {
+    "message": "Nejdříve zapněte synchronizaci balíčků dat v nastavení aplikace."
+  },
+  "app.content.sync-pack": {
+    "message": "Synchronizovat"
+  },
+  "app.content.sync-packs-override": {
+    "message": "Nejdříve vypněte synchronizaci balíčků dat v nastavení instance."
+  },
+  "app.content.sync-resource-packs-disabled": {
+    "message": "Nejdříve zapněte synchronizaci balíčků textur v nastavení aplikace."
+  },
+  "app.download-manager.active": {
+    "message": "Aktivní"
+  },
+  "app.download-manager.attention": {
+    "message": "Potřebuje pozornost"
+  },
+  "app.download-manager.cancel": {
+    "message": "Zrušit instalaci"
+  },
+  "app.download-manager.canceling": {
+    "message": "Rušení instalace..."
+  },
+  "app.download-manager.clear-all": {
+    "message": "Odstranit vše"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Odstranit všechny hotové úkoly"
+  },
+  "app.download-manager.complete": {
+    "message": "Hotovo"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Duplikovaná instance"
+  },
+  "app.download-manager.empty": {
+    "message": "Žádné instalační úkoly"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Odhadovaná rychlost stahování"
+  },
+  "app.download-manager.eta": {
+    "message": "Odhadovaný zbývající čas"
+  },
+  "app.download-manager.hide": {
+    "message": "Skrýt instalační úkoly"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Importovaná instance"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "Instalace instance"
+  },
+  "app.download-manager.modpack": {
+    "message": "Modpack"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Instalace Modpacku"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Nová instance"
+  },
+  "app.download-manager.pause": {
+    "message": "Pozastavit instalaci"
+  },
+  "app.download-manager.paused": {
+    "message": "Pozastaveno"
+  },
+  "app.download-manager.remove": {
+    "message": "Odebrat z historie"
+  },
+  "app.download-manager.resume": {
+    "message": "Pokračovat v instalaci"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Sdílená instance"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "Aktualizace sdílené instance"
+  },
+  "app.download-manager.show": {
+    "message": "Zobrazit instalační úkoly"
+  },
+  "app.download-manager.tasks": {
+    "message": "Úkoly"
+  },
+  "app.download-manager.verifying": {
+    "message": "Ověřování"
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "Otevřít složku zaloh"
   },
@@ -310,6 +409,12 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.features-settings.instance-pages.title": {
+    "message": "Instance"
+  },
+  "app.features-settings.quick-instances.description": {
+    "message": "Vyberte maximální počet nedávných instancí v levém postranním panelu. Můžete také upravit přetažením oddělovače."
   },
   "app.home.jump-back-in.actions.label": {
     "message": "Akce instance"
@@ -538,15 +643,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Instance"
-  },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "Stahování {current, number}/{total, number} projektů..."
-  },
-  "app.instance.mods.bulk-update.finishing": {
-    "message": "Dokončení aktualizace..."
-  },
-  "app.instance.mods.bulk-update.resolving-versions": {
-    "message": "Vyhodnocování verzí..."
   },
   "app.instance.mods.content-type-project": {
     "message": "projekt"
@@ -1459,6 +1555,39 @@
   },
   "app.settings.downloading": {
     "message": "Stahování v{version}"
+  },
+  "app.settings.game-options.category.chat.description": {
+    "message": "Viditelnost a vzhled chatu"
+  },
+  "app.settings.game-options.category.chat.label": {
+    "message": "Chat"
+  },
+  "app.settings.game-options.category.custom.label": {
+    "message": "Vlastní nastavení"
+  },
+  "app.settings.game-options.category.language.label": {
+    "message": "Jazyk"
+  },
+  "app.settings.game-options.category.music-and-sound.description": {
+    "message": "Nastavení hlasitosti a zvuku"
+  },
+  "app.settings.game-options.category.music-and-sound.label": {
+    "message": "Hudba a zvuk"
+  },
+  "app.settings.game-options.category.online.label": {
+    "message": "Online"
+  },
+  "app.settings.game-options.category.video.description": {
+    "message": "Nastavení kamery a zobrazení"
+  },
+  "app.settings.game-options.choice.all": {
+    "message": "Vše"
+  },
+  "app.settings.game-options.choice.chat": {
+    "message": "Chat"
+  },
+  "app.settings.game-options.choice.commands-only": {
+    "message": "Pouze příkazy"
   },
   "app.settings.java-installations.location.title": {
     "message": "Umístění Javy {version, number}"

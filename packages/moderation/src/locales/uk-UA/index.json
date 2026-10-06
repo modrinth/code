@@ -53,12 +53,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Виберіть відповідні позначки"
   },
-  "nags.banned-link-usage.description": {
-    "defaultMessage": "Посилання «{url}» не допускається як зовнішнє посилання."
-  },
-  "nags.banned-link-usage.title": {
-    "defaultMessage": "Приберіть заборонені посилання"
-  },
   "nags.check-disclosures.description": {
     "defaultMessage": "Переконайтеся, що користувачі знають про всі важливі деталі, заповнивши розкриття інформації про вміст, що стосуються вашого {type}."
   },
@@ -89,9 +83,6 @@
   "nags.edit-gallery.title": {
     "defaultMessage": "Відредагуйте галерею"
   },
-  "nags.edit-license.title": {
-    "defaultMessage": "Відредагуйте ліцензію"
-  },
   "nags.edit-summary.title": {
     "defaultMessage": "Відредагуйте короткий зміст"
   },
@@ -120,25 +111,13 @@
     "defaultMessage": "Відвідайте сторінку галереї"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Ваша ліцензія ({type}) вимагає публікації вихідного коду. Будь ласка, додайте посилання чи файли вихідного коду, або ж змініть тип ліцензії."
+    "defaultMessage": "Ліцензія вимагає опублікований вихідний код. Надайте посилання на вихідний код, додайте вихідні файли або змініть ліцензію."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Надайте вихідний код"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Деякі з ваших зовнішніх посилань однакові. Кожне посилання має зазначатися лиш один раз і з відповідним типом посилання."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Приберіть однакові посилання"
-  },
   "nags.invalid-gallery-text.title": {
     "defaultMessage": "Модифікуйте текст зображення галереї"
-  },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "Посилання на ліцензію неправильне."
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "Ваше посилання відсилає на вебсайт {domain}, який не є прийнятним джерелом ліцензійної інформації. Посилання мають відсилати безпосередньо до тексту ліцензії."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "Посилання на ліцензію, схоже, має неправильний формат. Надайте дійсне посилання на текст вашої ліцензії."
@@ -154,6 +133,81 @@
   },
   "nags.invalid-project-summary.title": {
     "defaultMessage": "Модифікуйте короткий зміст"
+  },
+  "nags.license-url.not-in-allowlist.description": {
+    "defaultMessage": "URL ліцензії не розпізнано як посилання на ліцензію. Переконайтеся, що воно посилається безпосередньо на текст ліцензії."
+  },
+  "nags.license-url.not-in-allowlist.title": {
+    "defaultMessage": "Перевірте посилання на ліцензію"
+  },
+  "nags.link-validation.discord-invite": {
+    "defaultMessage": "Запрошення Discord недійсне, вичерпалося або не запрошує користувачів на сервер. Замініть його активним запрошенням."
+  },
+  "nags.link-validation.discord-invite.title": {
+    "defaultMessage": "Замініть недійсні запрошення Discord"
+  },
+  "nags.link-validation.download": {
+    "defaultMessage": "Посилання, які починають завантаження, неприпустимі. Видаліть такі посилання з опису."
+  },
+  "nags.link-validation.download.title": {
+    "defaultMessage": "Видаліть посилання на завантаження"
+  },
+  "nags.link-validation.duplicate": {
+    "defaultMessage": "Посилання на {linkField, select, issues {систему відстеження проблем} source {вихідний код} wiki {вікі} discord {запрошення Discord} site {вебсайт} store {крамницю} license {ліцензію} description {опис} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} також використовується для {otherLinkField, select, issues {системи відстеження проблем} source {вихідного коду} wiki {вікі} discord {запрошення Discord} site {вебсайту} store {крамниці} license {ліцензії} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {another field}}. Кожне посилання повинне бути вказане лише один раз."
+  },
+  "nags.link-validation.duplicate.title": {
+    "defaultMessage": "Видаліть дубльовані посилання"
+  },
+  "nags.link-validation.external-blocklist-match": {
+    "defaultMessage": "Посилання на {linkField} неприпустиме. Видаліть це посилання або замініть його на припустиме для {linkField}."
+  },
+  "nags.link-validation.external-blocklist-match.title": {
+    "defaultMessage": "Замініть неправильні посилання"
+  },
+  "nags.link-validation.global-blocklist-match": {
+    "defaultMessage": "Посилання на {linkField, select, issues {систему відстеження проблем} source {вихідний код} wiki {вікі} discord {запрошення Discord} site {вебсайт} store {крамницю} license {ліцензію} description {опис} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} використовує заборонений домен. Видаліть або замініть таке посилання."
+  },
+  "nags.link-validation.global-blocklist-match.title": {
+    "defaultMessage": "Видаліть заборонені посилання"
+  },
+  "nags.link-validation.ip-address": {
+    "defaultMessage": "Посилання на {linkField, select, issues {систему відстеження проблем} source {вихідний код} wiki {вікі} discord {запрошення Discord} site {вебсайт} store {крамницю} license {ліцензію} description {опис} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} використовує IP-адресу. Замініть його на доменну назву."
+  },
+  "nags.link-validation.ip-address.title": {
+    "defaultMessage": "Видаліть посилання з IP-адресою"
+  },
+  "nags.link-validation.malformed": {
+    "defaultMessage": "Посилання на {linkField, select, issues {систему відстеження проблем} source {вихідний код} wiki {вікі} discord {запрошення Discord} site {вебсайт} store {крамницю} license {ліцензію} description {опис} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} недійсне. Укажіть повне HTTPS URL."
+  },
+  "nags.link-validation.malformed.title": {
+    "defaultMessage": "Виправте недійсні посилання"
+  },
+  "nags.link-validation.not-in-allowlist": {
+    "defaultMessage": "Посилання на {linkField, select, issues {систему відстеження проблем} source {вихідний код} wiki {вікі} discord {запрошення Discord} site {вебсайт} store {крамницю} license {ліцензію} description {опис} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} може не підходити для цього типу посилання. Переконайтеся, що воно підхоже."
+  },
+  "nags.link-validation.not-in-allowlist.title": {
+    "defaultMessage": "Перевірте правильність посилання"
+  },
+  "nags.link-validation.source-repository": {
+    "defaultMessage": "Посилання на вихідний код повинне вести на репозиторій на підтримуваній платформі або на власний сервер Gitea чи Forgejo."
+  },
+  "nags.link-validation.source-repository.title": {
+    "defaultMessage": "Посилайтеся на репозиторій з вихідним кодом"
+  },
+  "nags.link-validation.title": {
+    "defaultMessage": "Перегляньте це посилання"
+  },
+  "nags.link-validation.unverifiable": {
+    "defaultMessage": "Посилання на {linkField, select, issues {систему відстеження проблем} source {вихідний код} wiki {вікі} discord {запрошення Discord} site {вебсайт} store {крамницю} license {ліцензію} description {опис} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} не вдалося підтвердити. Переконайтеся, що воно робоче й доступне."
+  },
+  "nags.link-validation.unverifiable.title": {
+    "defaultMessage": "Перевірте доступність посилання"
+  },
+  "nags.link-validation.wrong-field": {
+    "defaultMessage": "Посилання на {linkField, select, issues {систему відстеження проблем} source {вихідний код} wiki {вікі} discord {запрошення Discord} site {вебсайт} store {крамницю} license {ліцензію} description {опис} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} не підходить як посилання на {linkField, select, issues {систему відстеження проблем} source {вихідний код} wiki {вікі} discord {запрошення Discord} site {вебсайт} store {крамницю} license {ліцензію} description {опис} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}}. Видаліть або замініть його на підхоже."
+  },
+  "nags.link-validation.wrong-field.title": {
+    "defaultMessage": "Виправте неправильні посилання"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# заголовок} few {# заголовки} other {# заголовків}} у вашому описі {count, plural, one {є задовгим} other {є задовгими}}. Заголовки мають бути стислими та виступати в ролі назв розділів, а не повних речень."
@@ -173,12 +227,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "Додайте альтернативний текст до зображень"
   },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Запрошення до Discord не можуть використовуватися для посилань інших типів. Уставте посилання лише в поле «Посилання на запрошення до Discord»."
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Перемістіть запрошення до Discord"
-  },
   "nags.moderation.title": {
     "defaultMessage": "Відвідайте гілку модерації"
   },
@@ -194,8 +242,8 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Виберіть правильну роздільність"
   },
-  "nags.project-description-banned-link.description": {
-    "defaultMessage": "Опис проєкту не може містити посилання «{fullUrl}»."
+  "nags.project-description-content.title": {
+    "defaultMessage": "Перевірте опис"
   },
   "nags.project-description-non-english.description": {
     "defaultMessage": "Опис проєкту повинний бути англійською або містити переклад англійською."
@@ -371,14 +419,11 @@
   "nags.upload-version.title": {
     "defaultMessage": "Завантажте версію"
   },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Деякі з ваших зовнішніх посилань можуть вести до доменів, які не підходять для цього типу посилань."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Оглянути зовнішні посилання"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Відвідайте налаштування посилань"
+  },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "Опис проєкту повинний надавати унікальну інформацію, а не повторювати короткий зміст."
   },
   "project.text-validation.summary-matches-title": {
     "defaultMessage": "Короткий зміст проєкту повинний надавати унікальну інформацію, а не повторювати назву проєкту."

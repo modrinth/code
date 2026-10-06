@@ -208,7 +208,7 @@ pub async fn all_projects(
     let projects_data =
         crate::database::DBProject::get_many_ids(&project_ids, &**pool, &redis)
             .await
-            .wrap_api_err("fetching user and organization projects")?;
+            .wrap_internal_err("fetching user and organization projects")?;
     let projects = filter_visible_projects(projects_data, &user, &pool, true)
         .await
         .wrap_api_err("filtering visible projects")?;
@@ -369,7 +369,7 @@ pub async fn projects_list(
             &redis,
         )
         .await
-        .wrap_api_err("fetching organization projects")?;
+        .wrap_internal_err("fetching organization projects")?;
         let projects = filter_visible_projects(projects, &user, &pool, true)
             .await
             .wrap_api_err("filtering visible projects")?;
@@ -610,13 +610,16 @@ pub async fn users_get(
         HashMap::new()
     };
 
+    let is_mod = auth_user.as_ref().is_some_and(|x| x.role.is_mod());
+
     let users: Vec<crate::models::users::User> = users_data
         .into_iter()
         .map(|data| {
             let mut user = crate::models::users::User::from(data.clone());
-            if auth_user.as_ref().is_some_and(|x| x.role.is_mod()) {
+            if is_mod {
                 user.moderation_notes =
                     Some(notes.get(&data.id).cloned().map(Into::into));
+                user.lock = data.lock.map(Into::into);
             }
             user
         })
@@ -663,6 +666,7 @@ pub async fn user_get(
         let is_admin = auth_user.as_ref().is_some_and(|x| x.role.is_admin());
         let is_mod = auth_user.as_ref().is_some_and(|x| x.role.is_mod());
         let user_id = data.id;
+        let lock = data.lock.clone();
 
         let mut response: crate::models::users::User = if is_admin {
             let github_id =
@@ -683,6 +687,7 @@ pub async fn user_get(
                 .await
                 .wrap_internal_err("fetching moderation note from database")?;
             response.moderation_notes = Some(note.map(Into::into));
+            response.lock = lock.map(Into::into);
         }
 
         Ok(HttpResponse::Ok().json(response))
@@ -1220,11 +1225,10 @@ pub async fn user_icon_edit(
 
         let bytes = read_limited_from_payload(
             &mut payload,
-            262144,
-            "Icons must be smaller than 256KiB",
+            524288,
+            "Icons must be smaller than 512KiB",
         )
-        .await
-        .wrap_api_err("executing `read_limited_from_payload`")?;
+        .await?;
 
         let user_id: UserId = actual_user.id.into();
         let upload_result = crate::util::img::upload_image_optimized(
@@ -1447,7 +1451,7 @@ pub async fn user_follows(
             &redis,
         )
         .await
-        .wrap_api_err("fetching followed projects")?
+        .wrap_internal_err("fetching followed projects")?
         .into_iter()
         .map(Project::from)
         .collect();

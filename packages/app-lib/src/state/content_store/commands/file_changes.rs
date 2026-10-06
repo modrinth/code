@@ -226,7 +226,7 @@ impl ContentStore {
         &self,
         journal: &FileChangeJournal,
     ) -> crate::Result<()> {
-        let mut tx = self.pool.begin().await?;
+        let mut tx = self.pool.begin_with("BEGIN IMMEDIATE").await?;
         for file_status in
             [&journal.before, &journal.after].into_iter().flatten()
         {

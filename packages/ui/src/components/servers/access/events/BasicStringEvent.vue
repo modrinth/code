@@ -53,6 +53,10 @@ const messages = defineMessages({
 		id: 'servers.audit-log.event.sftp-login',
 		defaultMessage: 'Logged in via SFTP',
 	},
+	sftpCredentialsRolled: {
+		id: 'servers.audit-log.event.sftp-credentials-rolled',
+		defaultMessage: 'Rotated SFTP credentials',
+	},
 	consoleCleared: {
 		id: 'servers.audit-log.event.console-cleared',
 		defaultMessage: 'Cleared console',
@@ -73,6 +77,7 @@ const actionMessages: Record<string, MessageDescriptor> = {
 	server_restarted: messages.serverRestarted,
 	server_killed: messages.serverKilled,
 	sftp_login: messages.sftpLogin,
+	sftp_credentials_rolled: messages.sftpCredentialsRolled,
 	console_cleared: messages.consoleCleared,
 }
 

@@ -11,6 +11,9 @@
   "nags.add-java-address.title": {
     "defaultMessage": "เพิ่มที่อยู่ Java"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "ใส่ลิงก์เว็บที่ใช้งานได้จริง พร้อมกับใส่ชื่อหรือรหัส SPDX ของไลเซนส์"
+  },
   "nags.add-links.title": {
     "defaultMessage": "เพิ่มลิงก์ภายนอก"
   },
@@ -20,9 +23,6 @@
   "nags.edit-description.title": {
     "defaultMessage": "แก้ไขคำอธิบาย"
   },
-  "nags.edit-license.title": {
-    "defaultMessage": "แก้ไขไลเซนส์"
-  },
   "nags.edit-summary.title": {
     "defaultMessage": "แก้ไขสรุป"
   },
@@ -31,9 +31,6 @@
   },
   "nags.gallery.title": {
     "defaultMessage": "ดูหน้าแกลเลอรี่"
-  },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "URL ไลเซนส์ไม่ถูกต้อง"
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "เพิ่มลิงก์ไลเซนส์ที่ถูกต้อง"

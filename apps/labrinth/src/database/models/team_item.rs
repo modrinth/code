@@ -4,6 +4,7 @@ use crate::{
     models::teams::{OrganizationPermissions, ProjectPermissions},
 };
 use dashmap::DashMap;
+use eyre::{Result, WrapErr};
 use futures::TryStreamExt;
 use itertools::Itertools;
 use rust_decimal::Decimal;
@@ -30,8 +31,10 @@ impl TeamBuilder {
     pub async fn insert(
         self,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<DBTeamId, super::DatabaseError> {
-        let team_id = generate_team_id(transaction).await?;
+    ) -> Result<DBTeamId> {
+        let team_id = generate_team_id(transaction)
+            .await
+            .wrap_err("generating team id")?;
 
         let team = DBTeam { id: team_id };
 
@@ -43,11 +46,17 @@ impl TeamBuilder {
             team.id as DBTeamId,
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("inserting team")?;
 
         let mut team_member_ids = Vec::new();
         for _ in &self.members {
-            team_member_ids.push(generate_team_member_id(transaction).await?.0);
+            team_member_ids.push(
+                generate_team_member_id(transaction)
+                    .await
+                    .wrap_err("generating team member id")?
+                    .0,
+            );
         }
         let TeamBuilder { members } = self;
         let (
@@ -103,7 +112,8 @@ impl TeamBuilder {
             &orderings[..],
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("inserting team members")?;
 
         Ok(team_id)
     }
@@ -125,7 +135,7 @@ impl DBTeam {
     pub async fn get_association<'a, 'b, E>(
         id: DBTeamId,
         executor: E,
-    ) -> Result<Option<TeamAssociationId>, super::DatabaseError>
+    ) -> Result<Option<TeamAssociationId>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -144,7 +154,8 @@ impl DBTeam {
             id as DBTeamId
         )
         .fetch_optional(executor)
-        .await?;
+        .await
+        .wrap_err("fetching team association")?;
 
         if let Some(t) = result {
             // Only one of project_id or organization_id will be set
@@ -194,18 +205,20 @@ impl DBTeamMember {
         id: DBTeamId,
         executor: E,
         redis: &RedisPool,
-    ) -> Result<Vec<DBTeamMember>, super::DatabaseError>
+    ) -> Result<Vec<DBTeamMember>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        Self::get_from_team_full_many(&[id], executor, redis).await
+        Self::get_from_team_full_many(&[id], executor, redis)
+            .await
+            .wrap_err("fetching full team members")
     }
 
     pub async fn get_from_team_full_many<'a, E>(
         team_ids: &[DBTeamId],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<DBTeamMember>, super::DatabaseError>
+    ) -> Result<Vec<DBTeamMember>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -217,7 +230,7 @@ impl DBTeamMember {
             TEAMS_NAMESPACE,
             &team_ids.iter().map(|x| x.0).collect::<Vec<_>>(),
             |team_ids| async move {
-                let teams = sqlx::query!(
+                sqlx::query!(
                     "
                     SELECT id, team_id, role AS member_role, is_owner, permissions, organization_permissions,
                     accepted, payouts_split,
@@ -250,24 +263,24 @@ impl DBTeamMember {
                             .or_default()
                             .push(member);
 
-                        async move { Ok(acc) }
+                        async move { Ok::<_, sqlx::Error>(acc) }
                     })
-                    .await?;
-
-                Ok::<_, crate::database::models::DatabaseError>(teams)
+                    .await
             },
-        ).await?;
+        )
+        .await
+        .wrap_err("fetching cached team members")?;
 
         Ok(val.into_iter().flatten().collect())
     }
 
-    pub async fn clear_cache(
-        id: DBTeamId,
-        redis: &RedisPool,
-    ) -> Result<(), super::DatabaseError> {
-        let mut redis = redis.connect().await?;
+    pub async fn clear_cache(id: DBTeamId, redis: &RedisPool) -> Result<()> {
+        let mut redis = redis
+            .connect()
+            .await
+            .wrap_err("connecting to redis to clear team cache")?;
         let key = redis.key().entity(TEAMS_NAMESPACE, id.0);
-        redis.delete(&key).await?;
+        redis.delete(&key).await.wrap_err("clearing team cache")?;
         Ok(())
     }
 
@@ -276,12 +289,13 @@ impl DBTeamMember {
         id: DBTeamId,
         user_id: DBUserId,
         executor: E,
-    ) -> Result<Option<Self>, super::DatabaseError>
+    ) -> Result<Option<Self>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Self::get_from_user_id_many(&[id], user_id, executor)
             .await
+            .wrap_err("fetching team member by user id")
             .map(|x| x.into_iter().next())
     }
 
@@ -290,7 +304,7 @@ impl DBTeamMember {
         team_ids: &[DBTeamId],
         user_id: DBUserId,
         executor: E,
-    ) -> Result<Vec<Self>, super::DatabaseError>
+    ) -> Result<Vec<Self>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -325,7 +339,8 @@ impl DBTeamMember {
             ordering: m.ordering,
         })
         .try_collect::<Vec<DBTeamMember>>()
-        .await?;
+        .await
+        .wrap_err("fetching team members by user id")?;
 
         Ok(team_members)
     }
@@ -335,7 +350,7 @@ impl DBTeamMember {
         id: DBTeamId,
         user_id: DBUserId,
         executor: E,
-    ) -> Result<Option<Self>, super::DatabaseError>
+    ) -> Result<Option<Self>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -353,7 +368,8 @@ impl DBTeamMember {
             user_id as DBUserId
         )
         .fetch_optional(executor)
-        .await?;
+        .await
+        .wrap_err("fetching pending team member by user id")?;
 
         if let Some(m) = result {
             Ok(Some(DBTeamMember {
@@ -382,7 +398,7 @@ impl DBTeamMember {
     pub async fn insert(
         &self,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<(), sqlx::error::Error> {
+    ) -> std::result::Result<(), sqlx::error::Error> {
         sqlx::query!(
             "
             INSERT INTO team_members (
@@ -412,7 +428,7 @@ impl DBTeamMember {
         id: DBTeamId,
         user_id: DBUserId,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<(), super::DatabaseError> {
+    ) -> Result<()> {
         sqlx::query!(
             "
             DELETE FROM team_members
@@ -422,7 +438,8 @@ impl DBTeamMember {
             user_id as DBUserId,
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("deleting team member")?;
 
         Ok(())
     }
@@ -439,7 +456,7 @@ impl DBTeamMember {
         new_ordering: Option<i64>,
         new_is_owner: Option<bool>,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<(), super::DatabaseError> {
+    ) -> Result<()> {
         if let Some(permissions) = new_permissions {
             sqlx::query!(
                 "
@@ -452,7 +469,8 @@ impl DBTeamMember {
                 user_id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("updating team member project permissions")?;
         }
 
         if let Some(organization_permissions) = new_organization_permissions {
@@ -467,7 +485,8 @@ impl DBTeamMember {
                 user_id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("updating team member organization permissions")?;
         }
 
         if let Some(role) = new_role {
@@ -482,7 +501,8 @@ impl DBTeamMember {
                 user_id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("updating team member role")?;
         }
 
         if let Some(accepted) = new_accepted
@@ -498,7 +518,8 @@ impl DBTeamMember {
                 user_id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("accepting team member")?;
         }
 
         if let Some(payouts_split) = new_payouts_split {
@@ -513,7 +534,8 @@ impl DBTeamMember {
                 user_id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("updating team member payout split")?;
         }
 
         if let Some(ordering) = new_ordering {
@@ -528,7 +550,8 @@ impl DBTeamMember {
                 user_id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("updating team member ordering")?;
         }
 
         if let Some(is_owner) = new_is_owner {
@@ -543,7 +566,8 @@ impl DBTeamMember {
                 user_id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("updating team member ownership")?;
         }
 
         Ok(())
@@ -554,7 +578,7 @@ impl DBTeamMember {
         user_id: DBUserId,
         allow_pending: bool,
         executor: E,
-    ) -> Result<Option<Self>, super::DatabaseError>
+    ) -> Result<Option<Self>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -576,7 +600,8 @@ impl DBTeamMember {
             &accepted
         )
             .fetch_optional(executor)
-            .await?;
+            .await
+            .wrap_err("fetching project team member by user id")?;
 
         if let Some(m) = result {
             Ok(Some(DBTeamMember {
@@ -607,7 +632,7 @@ impl DBTeamMember {
         user_id: DBUserId,
         allow_pending: bool,
         executor: E,
-    ) -> Result<Option<Self>, super::DatabaseError>
+    ) -> Result<Option<Self>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -628,7 +653,8 @@ impl DBTeamMember {
             &accepted
         )
             .fetch_optional(executor)
-            .await?;
+            .await
+            .wrap_err("fetching organization team member by user id")?;
 
         if let Some(m) = result {
             Ok(Some(DBTeamMember {
@@ -658,7 +684,7 @@ impl DBTeamMember {
         id: DBVersionId,
         user_id: DBUserId,
         executor: E,
-    ) -> Result<Option<Self>, super::DatabaseError>
+    ) -> Result<Option<Self>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -674,7 +700,8 @@ impl DBTeamMember {
             user_id as DBUserId
         )
             .fetch_optional(executor)
-            .await?;
+            .await
+            .wrap_err("fetching version team member by user id")?;
 
         if let Some(m) = result {
             Ok(Some(DBTeamMember {
@@ -707,23 +734,27 @@ impl DBTeamMember {
         project: &DBProject,
         user_id: DBUserId,
         executor: E,
-    ) -> Result<(Option<Self>, Option<Self>), super::DatabaseError>
+    ) -> Result<(Option<Self>, Option<Self>)>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         let project_team_member =
-            Self::get_from_user_id(project.team_id, user_id, executor).await?;
+            Self::get_from_user_id(project.team_id, user_id, executor)
+                .await
+                .wrap_err("fetching project team member for permissions")?;
 
         let organization =
             DBOrganization::get_associated_organization_project_id(
                 project.id, executor,
             )
-            .await?;
+            .await
+            .wrap_err("fetching project organization for permissions")?;
 
         let organization_team_member = if let Some(organization) = &organization
         {
             Self::get_from_user_id(organization.team_id, user_id, executor)
-                .await?
+                .await
+                .wrap_err("fetching organization team member for permissions")?
         } else {
             None
         };

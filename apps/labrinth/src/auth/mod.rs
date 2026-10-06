@@ -25,8 +25,6 @@ pub enum AuthenticationError {
     Internal(#[from] eyre::Report),
     #[error("An unknown database error occurred: {0}")]
     Sqlx(#[from] sqlx::Error),
-    #[error("Database Error: {0}")]
-    Database(#[from] crate::database::models::DatabaseError),
     #[error("Error while parsing JSON: {0}")]
     SerDe(#[from] serde_json::Error),
     #[error("Error while communicating to external provider")]
@@ -57,6 +55,8 @@ pub enum AuthenticationError {
     SocketError,
     #[error("Invalid callback URL specified")]
     Url,
+    #[error("Your account is locked and cannot perform this action")]
+    AccountLocked,
 }
 
 impl actix_web::ResponseError for AuthenticationError {
@@ -66,9 +66,6 @@ impl actix_web::ResponseError for AuthenticationError {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
             AuthenticationError::Sqlx(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            AuthenticationError::Database(..) => {
-                StatusCode::INTERNAL_SERVER_ERROR
-            }
             AuthenticationError::SerDe(..) => StatusCode::BAD_REQUEST,
             AuthenticationError::Reqwest(..) => {
                 StatusCode::INTERNAL_SERVER_ERROR
@@ -88,6 +85,7 @@ impl actix_web::ResponseError for AuthenticationError {
                 StatusCode::BAD_REQUEST
             }
             AuthenticationError::SocketError => StatusCode::BAD_REQUEST,
+            AuthenticationError::AccountLocked => StatusCode::FORBIDDEN,
         }
     }
 
@@ -105,7 +103,6 @@ impl AuthenticationError {
         match self {
             AuthenticationError::Internal(..) => "internal_error",
             AuthenticationError::Sqlx(..) => "database_error",
-            AuthenticationError::Database(..) => "database_error",
             AuthenticationError::SerDe(..) => "invalid_input",
             AuthenticationError::Reqwest(..) => "network_error",
             AuthenticationError::InvalidCredentials => "invalid_credentials",
@@ -121,6 +118,7 @@ impl AuthenticationError {
                 "provider_already_linked"
             }
             AuthenticationError::SocketError => "socket",
+            AuthenticationError::AccountLocked => "account_locked",
         }
     }
 }

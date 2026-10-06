@@ -93,9 +93,19 @@ fn deserialize_date<'de, D>(deserializer: D) -> Result<DateTime<Utc>, D::Error>
 where
     D: Deserializer<'de>,
 {
-    let s = String::deserialize(deserializer)?;
+    let mut s = String::deserialize(deserializer)?;
 
-    serde_json::from_str::<DateTime<Utc>>(&format!("\"{s}\""))
+    if let Some((_, offset)) = s.rsplit_once(['+', '-'])
+        && matches!(
+            offset.as_bytes(),
+            [b'0'..=b'9', b':', b'0'..=b'9', b'0'..=b'9']
+        )
+    {
+        s.insert(s.len() - offset.len(), '0');
+    }
+
+    DateTime::parse_from_rfc3339(&s)
+        .map(|date| date.with_timezone(&Utc))
         .or_else(|_| {
             NaiveDateTime::parse_from_str(&s, "%Y-%m-%dT%H:%M:%S%.f")
                 .map(|date| date.and_utc())
@@ -290,4 +300,56 @@ pub struct LoaderVersion {
     pub url: String,
     /// Whether the loader is stable or not
     pub stable: bool,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::PartialVersionInfo;
+    use chrono::{DateTime, Utc};
+    use serde_json::json;
+
+    fn deserialize_version(
+        date: &str,
+    ) -> serde_json::Result<PartialVersionInfo> {
+        serde_json::from_value(json!({
+            "id": "1.21.11-forge-61.1.7",
+            "inheritsFrom": "1.21.11",
+            "time": date,
+            "releaseTime": date,
+            "libraries": [],
+            "type": "release"
+        }))
+    }
+
+    #[test]
+    fn deserialize_loader_timestamps() {
+        for (input, expected) in [
+            ("2026-05-27T14:13:59+0:00", "2026-05-27T14:13:59Z"),
+            ("2026-05-27T14:13:59+5:30", "2026-05-27T08:43:59Z"),
+            ("2026-05-27T14:13:59-5:30", "2026-05-27T19:43:59Z"),
+            ("2026-05-27T14:13:59.123+0:00", "2026-05-27T14:13:59.123Z"),
+            ("2026-05-27T14:13:59+00:00", "2026-05-27T14:13:59Z"),
+            ("2026-05-27T14:13:59+05:30", "2026-05-27T08:43:59Z"),
+            ("2026-05-27T14:13:59Z", "2026-05-27T14:13:59Z"),
+            ("2026-05-27T14:13:59", "2026-05-27T14:13:59Z"),
+            ("2026-05-27T14:13:59.123", "2026-05-27T14:13:59.123Z"),
+        ] {
+            let version = deserialize_version(input).unwrap();
+            let expected = expected.parse::<DateTime<Utc>>().unwrap();
+            assert_eq!(version.time, expected, "{input}");
+            assert_eq!(version.release_time, expected, "{input}");
+        }
+    }
+
+    #[test]
+    fn reject_invalid_loader_timestamps() {
+        for input in [
+            "not a date",
+            "2026-05-27T14:13:59+0:60",
+            "2026-05-27T14:13:59+0:00junk",
+            "2026-05-27T14:13:59\"",
+        ] {
+            assert!(deserialize_version(input).is_err(), "{input}");
+        }
+    }
 }

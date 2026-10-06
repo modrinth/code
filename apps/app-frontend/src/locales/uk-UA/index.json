@@ -53,8 +53,8 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Не вдалося завантажити"
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "Примірника не знайдено"
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Не вдалося підготувати примірник"
   },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Недійсний шлях до файлу"
@@ -81,7 +81,7 @@
     "message": "Не вдалося зʼєднатися з Modrinth"
   },
   "app.action-bar.install.summary.no-write-permission": {
-    "message": "Немає прав для запису"
+    "message": "Бракує прав для запису"
   },
   "app.action-bar.install.summary.pack-download-failed": {
     "message": "Не вдалося встановити збірку"
@@ -206,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Головна й уміст"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Виводити Modrinth App на передній план, коли Minecraft закривається."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Повернути фокус при закритті Minecraft"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Запуск і навігація"
   },
@@ -285,16 +291,100 @@
     "message": "Розсинхронізувати"
   },
   "app.content.sync-data-packs-disabled": {
-    "message": "Спочатку ввімкніть синхронізацію пакетів даних в налаштуваннях застосунку."
+    "message": "Спершу ввімкніть синхронізацію пакетів даних в налаштуваннях застосунку."
   },
   "app.content.sync-pack": {
     "message": "Синхронізувати"
   },
   "app.content.sync-packs-override": {
-    "message": "Спочатку вимкніть перевизначення параметру синхронізації пакетів даних у налаштуваннях цього примірника."
+    "message": "Спершу вимкніть перевизначення синхронізації пакетів у налаштуваннях цього примірника."
   },
   "app.content.sync-resource-packs-disabled": {
-    "message": "Спочатку ввімкніть синхронізацію пакетів ресурсів у налаштуваннях застосунку."
+    "message": "Спершу ввімкніть синхронізацію пакетів ресурсів у налаштуваннях застосунку."
+  },
+  "app.download-manager.active": {
+    "message": "Активно"
+  },
+  "app.download-manager.attention": {
+    "message": "Потребує уваги"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "Оновлення {count, plural, one {# елемента} few {# елементів} many {# елементів} other {# елементів}}"
+  },
+  "app.download-manager.cancel": {
+    "message": "Скасувати встановлення"
+  },
+  "app.download-manager.canceling": {
+    "message": "Скасування встановлення…"
+  },
+  "app.download-manager.clear-all": {
+    "message": "Очистити все"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Очистити всі завершені завдання"
+  },
+  "app.download-manager.complete": {
+    "message": "Завершено"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Дубльований примірник"
+  },
+  "app.download-manager.empty": {
+    "message": "Немає завдань установлення"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Приблизна швидкість завантаження"
+  },
+  "app.download-manager.eta": {
+    "message": "Приблизний час, що залишився для цього завантаження"
+  },
+  "app.download-manager.hide": {
+    "message": "Приховати завдання встановлення"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Імпортований примірник"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "Установлення примірника"
+  },
+  "app.download-manager.modpack": {
+    "message": "Збірка"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Установлення збірки"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Новий примірник"
+  },
+  "app.download-manager.pause": {
+    "message": "Призупинити встановлення"
+  },
+  "app.download-manager.paused": {
+    "message": "Призупинено"
+  },
+  "app.download-manager.remove": {
+    "message": "Вилучити з історії"
+  },
+  "app.download-manager.resume": {
+    "message": "Відновити встановлення"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Спільний примірник"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "Оновлення спільного примірника"
+  },
+  "app.download-manager.show": {
+    "message": "Показати завдання встановлення"
+  },
+  "app.download-manager.tasks": {
+    "message": "Завдання"
+  },
+  "app.download-manager.title": {
+    "message": "Менеджер завантажень"
+  },
+  "app.download-manager.verifying": {
+    "message": "Перевірка"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Відкрити теку резервних копій"
@@ -599,15 +689,6 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "Примірник"
   },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "Завантаження проєктів: {current, number}/{total, number}…"
-  },
-  "app.instance.mods.bulk-update.finishing": {
-    "message": "Завершуємо оновлення..."
-  },
-  "app.instance.mods.bulk-update.resolving-versions": {
-    "message": "Знаходимо версії..."
-  },
   "app.instance.mods.content-type-project": {
     "message": "проєкт"
   },
@@ -768,7 +849,7 @@
     "message": "Знімки екрана"
   },
   "app.instance.tab.share": {
-    "message": "Поділитись"
+    "message": "Поділитися"
   },
   "app.instance.tab.worlds": {
     "message": "Світи"
@@ -1290,7 +1371,7 @@
     "message": "Змінити обліковий запис"
   },
   "app.nav.upgrade-to-modrinth-plus": {
-    "message": "Покращитись до Modrinth+"
+    "message": "Покращитися до Modrinth+"
   },
   "app.nav.view-profile": {
     "message": "Переглянути профіль"
@@ -1372,6 +1453,9 @@
   },
   "app.quick-instance-switcher.instance-locked": {
     "message": "Цей примірник заблоковано"
+  },
+  "app.quick-instance-switcher.title": {
+    "message": "Останні примірники"
   },
   "app.quick-instance-switcher.view-instance": {
     "message": "Переглянути примірник"
@@ -1527,10 +1611,10 @@
     "message": "Ім'я"
   },
   "app.screenshots.sort.newest": {
-    "message": "Спочатку нові"
+    "message": "Найновіші"
   },
   "app.screenshots.sort.oldest": {
-    "message": "Спочатку старі"
+    "message": "Найстаріші"
   },
   "app.settings.app-version": {
     "message": "Modrinth App {version}"
@@ -2226,7 +2310,7 @@
     "message": "Куртка"
   },
   "app.settings.game-options.setting.japanese-glyph-variants.label": {
-    "message": "Варіанти японських гліфів"
+    "message": "Різновиди японських гліфів"
   },
   "app.settings.game-options.setting.key-advancements.label": {
     "message": "Досягнення"
@@ -2646,7 +2730,7 @@
     "message": "Реклама підтримує існування Modrinth і фінансує виплати творцям. Наші партнери можуть зберігати й отримувати доступ до cookie в застосунку, щоб персоналізувати рекламу та збирати метрики. Ви можете відмовитися від них або керувати налаштуваннями нижче."
   },
   "app.settings.privacy.discord-rich-presence.description": {
-    "message": "Показувати застосунок Modrinth як вашу поточну активність у Discord. Це не впливає на активність, додану модами. Потребує перезапуску застосунку."
+    "message": "Показувати Modrinth App як вашу поточну активність у Discord. Це не впливає на активність, додану модами. Потребує перезапуску застосунку."
   },
   "app.settings.privacy.discord-rich-presence.title": {
     "message": "Discord Rich Presence"
@@ -2710,6 +2794,78 @@
   },
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Максимум одночасних записів"
+  },
+  "app.settings.resource-management.store.attention": {
+    "message": "Деякі файли потребують уваги"
+  },
+  "app.settings.resource-management.store.cache-limit.description": {
+    "message": "Зберігати такий обсяг невикористовуваного вмісту для майбутніх установлень. Зберігання більшого обсягу може заощадити час на завантаження."
+  },
+  "app.settings.resource-management.store.cache-limit.label": {
+    "message": "Зберігати невикористовувані завантаження"
+  },
+  "app.settings.resource-management.store.cache-limit.unit": {
+    "message": "Гіб"
+  },
+  "app.settings.resource-management.store.calculating": {
+    "message": "Обчислення"
+  },
+  "app.settings.resource-management.store.clear": {
+    "message": "Очистити невикористане"
+  },
+  "app.settings.resource-management.store.clear.description": {
+    "message": "Видалити невикористаний завантажений уміст"
+  },
+  "app.settings.resource-management.store.cleared": {
+    "message": "Звільнено {size} дискового простору."
+  },
+  "app.settings.resource-management.store.clearing": {
+    "message": "Очищення…"
+  },
+  "app.settings.resource-management.store.description": {
+    "message": "Заощаджуйте місце, повторно використовуючи наявні інсталяції ігор, модів та пакетів між вашими примірниками."
+  },
+  "app.settings.resource-management.store.empty": {
+    "message": "Установіть моди чи пакети, щоби побачити тут використання вашого сховища."
+  },
+  "app.settings.resource-management.store.issues": {
+    "message": "Переглянути {count, plural, one {# проблему} few {# проблеми} many {# проблем} other {# проблем}}"
+  },
+  "app.settings.resource-management.store.nothing-to-clear": {
+    "message": "Немає невикористаного вмісту для очищення."
+  },
+  "app.settings.resource-management.store.repair": {
+    "message": "Перевірити й виправити"
+  },
+  "app.settings.resource-management.store.repair.running-description": {
+    "message": "Це закриє всі запущені примірники."
+  },
+  "app.settings.resource-management.store.repair.verify-description": {
+    "message": "Перевірити наявність відсутніх або пошкоджених файлів та відновити їх."
+  },
+  "app.settings.resource-management.store.repairing": {
+    "message": "Перевірка та виправлення…"
+  },
+  "app.settings.resource-management.store.shared.label": {
+    "message": "Спільні"
+  },
+  "app.settings.resource-management.store.title": {
+    "message": "Сховище вмісту"
+  },
+  "app.settings.resource-management.store.total": {
+    "message": "Використано {size}"
+  },
+  "app.settings.resource-management.store.unique.label": {
+    "message": "Унікальний"
+  },
+  "app.settings.resource-management.store.unused.label": {
+    "message": "Залишений"
+  },
+  "app.settings.resource-management.store.verification-result": {
+    "message": "Перевірено {checked, plural, one {# файл} few {# файли} many {# файлів} other {# файлу}} та виконано {repaired, plural, one {# виправлення} few {# виправленя} many {# виправлень} other {# виправлення}}."
+  },
+  "app.settings.resource-management.store.verified": {
+    "message": "Перевірку завершено"
   },
   "app.settings.sidebar.label.instances": {
     "message": "Примірники"
@@ -2775,13 +2931,13 @@
     "message": "Синхронізувати ПШД творчости"
   },
   "app.settings.synced-options.creative-hotbars.description": {
-    "message": "Використати ті ж ПШД режиму творчости між примірниками."
+    "message": "Використовувати однакові збережені панелі швидкого доступу у всіх примірниках."
   },
   "app.settings.synced-options.data-packs": {
     "message": "Синхронізувати пакети даних"
   },
   "app.settings.synced-options.data-packs.description": {
-    "message": "Використати ті ж пакети даних між примірниками"
+    "message": "Використовувати однакові пакети даних у всіх примірниках."
   },
   "app.settings.synced-options.data-packs.none-synced-yet": {
     "message": "Ви ще не синхронізували жодних пакетів даних"
@@ -2802,13 +2958,13 @@
     "message": "Завантажено останні налаштування. Перевірте свої зміни та збережіть знову."
   },
   "app.settings.synced-options.game-settings.conflict-title": {
-    "message": "Ці налаштування змінились десь"
+    "message": "Ці налаштування змінилися десь ще"
   },
   "app.settings.synced-options.game-settings.custom-empty": {
     "message": "Додані модами налаштування з'являться тут після того, як Modrinth знайде їх в одному з ваших примірників."
   },
   "app.settings.synced-options.game-settings.description": {
-    "message": "Використати ті ж налаштування гри між примірниками."
+    "message": "Використовувати однакові налаштування гри у всіх примірниках."
   },
   "app.settings.synced-options.game-settings.disable-all": {
     "message": "Розсинхронізувати все"
@@ -2889,7 +3045,7 @@
     "message": "{count, plural, one {# сервер} few {# сервери} other {# серверів}}"
   },
   "app.settings.synced-options.multiplayer-servers.description": {
-    "message": "Використати ті ж сервери мережевої гри між примірниками."
+    "message": "Використовувати однакові сервери у всіх примірниках."
   },
   "app.settings.synced-options.multiplayer-servers.editor-title": {
     "message": "Редагувати синхронізовані сервери"
@@ -2931,7 +3087,7 @@
     "message": "Синхронізувати пакети ресурсів"
   },
   "app.settings.synced-options.resource-packs.description": {
-    "message": "Використати ті ж пакети ресурсів між примірниками."
+    "message": "Використовувати однакові пакети ресурсів у всіх примірниках."
   },
   "app.settings.synced-options.resource-packs.none-synced-yet": {
     "message": "Ви ще не синхронізували жодних пакетів ресурсів"
@@ -3083,6 +3239,12 @@
   "app.skins.section.default-skins": {
     "message": "Усталені скіни"
   },
+  "app.skins.section.dungeons-hero": {
+    "message": "Герої Dungeons"
+  },
+  "app.skins.section.dungeons-ii-hero": {
+    "message": "Герої Dungeons II"
+  },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
@@ -3112,6 +3274,9 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
+  },
+  "app.skins.section.wilderness-bound": {
+    "message": "Wilderness Bound"
   },
   "app.skins.sign-in.button": {
     "message": "Увійти в Microsoft"
@@ -3318,7 +3483,7 @@
     "message": "Змінили запускач?"
   },
   "app.welcome-screen.quick-create-hint": {
-    "message": "Натисніть <shortcut>N</shortcut> для швидкого створення примірника"
+    "message": "Натисніть <shortcut>N</shortcut> для створення примірника"
   },
   "app.welcome-screen.title": {
     "message": "Вітаємо в Modrinth"
@@ -3547,6 +3712,9 @@
   },
   "instance.files.adding-files": {
     "message": "Додавання файлів ({completed}/{total})"
+  },
+  "instance.files.managed-content-read-only": {
+    "message": "Керуйте встановленим вмістом через сторінку вмісту"
   },
   "instance.files.save-as": {
     "message": "Зберегти як..."

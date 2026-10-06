@@ -183,7 +183,7 @@ pub(crate) async fn edit_instance(
         None => None,
     };
 
-    let mut tx = pool.begin().await?;
+    let mut tx = pool.begin_with("BEGIN IMMEDIATE").await?;
     instance_rows::update_instance(&instance, &mut tx).await?;
 
     if let Some(content_set) = content_set.as_mut() {

@@ -1,5 +1,6 @@
 use actix_http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, ResponseError, put, web};
+use chrono::Utc;
 use eyre::eyre;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -45,6 +46,10 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 pub enum CreateError {
     #[error("project limit reached")]
     LimitReached,
+    #[error("daily project creation limit reached")]
+    DailyProjectLimitReached,
+    #[error("project version limit reached")]
+    ProjectVersionLimitReached,
     #[error("invalid component kinds")]
     ComponentKinds(ComponentRelationError<ProjectComponentKind>),
     #[error("failed to validate request: {0}")]
@@ -58,11 +63,15 @@ pub enum CreateError {
 impl CreateError {
     pub fn as_api_error(&self) -> crate::models::error::ApiError<'_> {
         match self {
-            Self::LimitReached => crate::models::error::ApiError {
-                error: "limit_reached",
-                description: self.to_string(),
-                details: None,
-            },
+            Self::LimitReached
+            | Self::DailyProjectLimitReached
+            | Self::ProjectVersionLimitReached => {
+                crate::models::error::ApiError {
+                    error: "limit_reached",
+                    description: self.to_string(),
+                    details: None,
+                }
+            }
             Self::ComponentKinds(err) => crate::models::error::ApiError {
                 error: "component_kinds",
                 description: format!("{self}: {err}"),
@@ -90,6 +99,8 @@ impl ResponseError for CreateError {
     fn status_code(&self) -> actix_http::StatusCode {
         match self {
             Self::LimitReached
+            | Self::DailyProjectLimitReached
+            | Self::ProjectVersionLimitReached
             | Self::ComponentKinds(_)
             | Self::Validation(_)
             | Self::SlugCollision => StatusCode::BAD_REQUEST,
@@ -148,6 +159,14 @@ pub async fn create(
         .wrap_internal_err("fetching project limits")?;
     if limits.current >= limits.max {
         return Err(CreateError::LimitReached);
+    }
+
+    let daily_limits =
+        UserLimits::get_for_projects_per_day(&user, Utc::now(), &db)
+            .await
+            .wrap_internal_err("fetching daily project limits")?;
+    if daily_limits.current >= daily_limits.max {
+        return Err(CreateError::DailyProjectLimitReached);
     }
 
     // check if the given details are valid
@@ -258,6 +277,17 @@ pub async fn create(
     let mut version_builder = None::<VersionBuilder>;
 
     if components.minecraft_server.is_some() {
+        let version_limits = UserLimits::get_for_versions_per_project(
+            &user,
+            project_id.into(),
+            &db,
+        )
+        .await
+        .wrap_internal_err("fetching project version limits")?;
+        if version_limits.current >= version_limits.max {
+            return Err(CreateError::ProjectVersionLimitReached);
+        }
+
         // servers are not part of the monetization pool;
         // they generate no payouts for their owners
         monetization_status = MonetizationStatus::ForceDemonetized;

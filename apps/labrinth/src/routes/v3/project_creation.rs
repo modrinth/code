@@ -14,6 +14,7 @@ use crate::models::error::ApiError;
 use crate::models::exp;
 use crate::models::ids::{ImageId, OrganizationId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
+use crate::models::link_platform::LinkPlatform;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
     License, Link, MonetizationStatus, Project, ProjectStatus,
@@ -56,10 +57,12 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 
 #[derive(Error, Debug)]
 pub enum CreateError {
+    #[error(transparent)]
+    Request(crate::routes::ApiError),
+    #[error(transparent)]
+    InternalError(#[from] eyre::Report),
     #[error("An unknown database error occurred")]
     SqlxDatabaseError(#[from] sqlx::Error),
-    #[error("Database Error: {0}")]
-    DatabaseError(#[from] models::DatabaseError),
     #[error("Error while parsing multipart payload: {0}")]
     MultipartError(#[from] actix_multipart::MultipartError),
     #[error("Error while parsing JSON: {0}")]
@@ -94,20 +97,32 @@ pub enum CreateError {
     ImageError(#[from] ImageError),
     #[error("Project limit reached")]
     LimitReached,
+    #[error("daily project creation limit reached")]
+    DailyProjectLimitReached,
+    #[error("project version limit reached")]
+    ProjectVersionLimitReached,
+    #[error("daily version upload limit reached")]
+    DailyVersionLimitReached,
 }
 
 impl From<crate::routes::ApiError> for CreateError {
     fn from(value: crate::routes::ApiError) -> Self {
         match value {
+            err if err.is_account_locked() => Self::Request(err),
             crate::routes::ApiError::Auth(err) => {
                 Self::CustomAuthenticationError(format!("{err:#}"))
             }
             crate::routes::ApiError::Request(err) => {
+              if err
+                .downcast_ref::<super::projects::validate::ProjectValidationError>()
+                .is_some()
+              {
+                Self::Request(crate::routes::ApiError::Request(err))
+              } else {
                 Self::InvalidInput(format!("{err:#}"))
+              }
             }
-            err => Self::DatabaseError(models::DatabaseError::SchemaError(
-                format!("{err:#}"),
-            )),
+            err => Self::InternalError(eyre::eyre!("{err:#}")),
         }
     }
 }
@@ -115,10 +130,11 @@ impl From<crate::routes::ApiError> for CreateError {
 impl actix_web::ResponseError for CreateError {
     fn status_code(&self) -> StatusCode {
         match self {
+            CreateError::InternalError(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            CreateError::Request(error) => error.status_code(),
             CreateError::SqlxDatabaseError(..) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
-            CreateError::DatabaseError(..) => StatusCode::INTERNAL_SERVER_ERROR,
             CreateError::FileHostingError(..) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
@@ -131,7 +147,7 @@ impl actix_web::ResponseError for CreateError {
             CreateError::InvalidLoader(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidCategory(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidFileType(..) => StatusCode::BAD_REQUEST,
-            CreateError::Unauthorized(..) => StatusCode::UNAUTHORIZED,
+            CreateError::Unauthorized(err) => err.status_code(),
             CreateError::CustomAuthenticationError(..) => {
                 StatusCode::UNAUTHORIZED
             }
@@ -139,15 +155,22 @@ impl actix_web::ResponseError for CreateError {
             CreateError::ValidationError(..) => StatusCode::BAD_REQUEST,
             CreateError::FileValidationError(..) => StatusCode::BAD_REQUEST,
             CreateError::ImageError(..) => StatusCode::BAD_REQUEST,
-            CreateError::LimitReached => StatusCode::BAD_REQUEST,
+            CreateError::LimitReached
+            | CreateError::DailyProjectLimitReached
+            | CreateError::ProjectVersionLimitReached
+            | CreateError::DailyVersionLimitReached => StatusCode::BAD_REQUEST,
         }
     }
 
     fn error_response(&self) -> HttpResponse {
+        if let Self::Request(error) = self {
+            return error.error_response();
+        }
         HttpResponse::build(self.status_code()).json(ApiError {
             error: match self {
+                CreateError::InternalError(..) => "database_error",
+                CreateError::Request(..) => "request_error",
                 CreateError::SqlxDatabaseError(..) => "database_error",
-                CreateError::DatabaseError(..) => "database_error",
                 CreateError::FileHostingError(..) => "file_hosting_error",
                 CreateError::SerDeError(..) => "invalid_input",
                 CreateError::MultipartError(..) => "invalid_input",
@@ -158,13 +181,16 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::InvalidLoader(..) => "invalid_input",
                 CreateError::InvalidCategory(..) => "invalid_input",
                 CreateError::InvalidFileType(..) => "invalid_input",
-                CreateError::Unauthorized(..) => "unauthorized",
+                CreateError::Unauthorized(err) => err.error_name(),
                 CreateError::CustomAuthenticationError(..) => "unauthorized",
                 CreateError::SlugCollision => "invalid_input",
                 CreateError::ValidationError(..) => "invalid_input",
                 CreateError::FileValidationError(..) => "invalid_input",
                 CreateError::ImageError(..) => "invalid_image",
-                CreateError::LimitReached => "limit_reached",
+                CreateError::LimitReached
+                | CreateError::DailyProjectLimitReached
+                | CreateError::ProjectVersionLimitReached
+                | CreateError::DailyVersionLimitReached => "limit_reached",
             },
             description: self.to_string(),
             details: None,
@@ -219,9 +245,6 @@ pub struct ProjectCreateData {
     /// An optional link to the project's license page
     pub license_url: Option<String>,
     /// An optional list of all donation links the project has
-    #[validate(custom(
-        function = "crate::util::validate::validate_url_hashmap_values"
-    ))]
     #[serde(default)]
     pub link_urls: HashMap<String, String>,
 
@@ -492,6 +515,13 @@ async fn project_create_inner(
         return Err(CreateError::LimitReached);
     }
 
+    let daily_limits =
+        UserLimits::get_for_projects_per_day(&current_user, Utc::now(), pool)
+            .await?;
+    if daily_limits.current >= daily_limits.max {
+        return Err(CreateError::DailyProjectLimitReached);
+    }
+
     let all_loaders =
         models::loader_fields::Loader::list(&mut *transaction, redis).await?;
 
@@ -534,6 +564,47 @@ async fn project_create_inner(
             CreateError::InvalidInput(validation_errors_to_string(err, None))
         })?;
 
+        super::projects::validate::require_valid_project(
+            crate::validate::project::validate_link_input(
+                &create_data.link_urls,
+                &create_data.license_id,
+                create_data.license_url.as_deref(),
+                &create_data.description,
+            ),
+        )?;
+
+        let versions_to_create = create_data.initial_versions.len() as u64;
+        if versions_to_create > 0 {
+            let project_version_limits =
+                UserLimits::get_for_versions_per_project(
+                    &current_user,
+                    project_id.into(),
+                    pool,
+                )
+                .await?;
+            if project_version_limits
+                .current
+                .saturating_add(versions_to_create)
+                > project_version_limits.max
+            {
+                return Err(CreateError::ProjectVersionLimitReached);
+            }
+
+            let daily_version_limits = UserLimits::get_for_versions_per_day(
+                &current_user,
+                Utc::now(),
+                pool,
+            )
+            .await?;
+            if daily_version_limits
+                .current
+                .saturating_add(versions_to_create)
+                > daily_version_limits.max
+            {
+                return Err(CreateError::DailyVersionLimitReached);
+            }
+        }
+
         let slug_project_id_option: Option<ProjectId> = serde_json::from_str(
             &format!("\"{}\"", create_data.slug.to_lowercase()),
         )
@@ -550,7 +621,7 @@ async fn project_create_inner(
             )
             .fetch_one(&mut *transaction)
             .await
-            .map_err(|e| CreateError::DatabaseError(e.into()))?;
+            .map_err(CreateError::SqlxDatabaseError)?;
 
             if results.exists.unwrap_or(false) {
                 return Err(CreateError::SlugCollision);
@@ -571,7 +642,7 @@ async fn project_create_inner(
             )
             .fetch_one(&mut *transaction)
             .await
-            .map_err(|e| CreateError::DatabaseError(e.into()))?;
+            .map_err(CreateError::SqlxDatabaseError)?;
 
             if results.exists.unwrap_or(false) {
                 return Err(CreateError::SlugCollision);
@@ -866,35 +937,15 @@ async fn project_create_inner(
 
         let mut link_urls = vec![];
 
-        let link_platforms =
-            models::categories::LinkPlatform::list(&mut *transaction, redis)
-                .await?;
         for (platform, url) in &project_create_data.link_urls {
-            let platform_id = models::categories::LinkPlatform::get_id(
-                platform,
-                &mut *transaction,
-            )
-            .await?
-            .ok_or_else(|| {
+            let platform = platform.parse::<LinkPlatform>().map_err(|_| {
                 CreateError::InvalidInput(format!(
-                    "Link platform {} does not exist.",
-                    platform.clone()
+                    "Link platform {platform} does not exist."
                 ))
             })?;
-            let link_platform = link_platforms
-                .iter()
-                .find(|x| x.id == platform_id)
-                .ok_or_else(|| {
-                    CreateError::InvalidInput(format!(
-                        "Link platform {} does not exist.",
-                        platform.clone()
-                    ))
-                })?;
             link_urls.push(models::project_item::LinkUrl {
-                platform_id,
-                platform_name: link_platform.name.clone(),
+                platform,
                 url: url.clone(),
-                donation: link_platform.donation,
             })
         }
 
@@ -1049,7 +1100,7 @@ async fn project_create_inner(
                 .link_urls
                 .clone()
                 .into_iter()
-                .map(|x| (x.platform_name.clone(), Link::from(x)))
+                .map(|x| (x.platform.to_string(), Link::from(x)))
                 .collect(),
             gallery: gallery_urls,
             color: project_builder.color,
@@ -1159,8 +1210,8 @@ async fn process_icon_upload(
 ) -> Result<(String, String, Option<u32>), CreateError> {
     let data = read_from_field(
         &mut field,
-        262144,
-        "Icons must be smaller than 256KiB",
+        524288,
+        "Icons must be smaller than 512KiB",
     )
     .await?;
     let upload_result = crate::util::img::upload_image_optimized(

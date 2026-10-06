@@ -375,7 +375,7 @@ pub async fn collection_edit(
                     project_id, &**pool, &redis,
                 )
                 .await
-                .wrap_api_err("fetching project from database")?
+                .wrap_internal_err("fetching project from database")?
                 .wrap_request_err_with(|| {
                     eyre!("the specified project `{project_id}` does not exist")
                 })?;
@@ -483,11 +483,10 @@ pub async fn collection_icon_edit(
 
     let bytes = read_limited_from_payload(
         &mut payload,
-        262144,
-        "Icons must be smaller than 256KiB",
+        524288,
+        "Icons must be smaller than 512KiB",
     )
-    .await
-    .wrap_api_err("executing `read_limited_from_payload`")?;
+    .await?;
 
     let collection_id: CollectionId = collection_item.id.into();
     let upload_result = crate::util::img::upload_image_optimized(

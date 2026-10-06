@@ -432,8 +432,31 @@ fn missing_initial_minecraft_bytes(
         )?)
 }
 
+#[allow(clippy::too_many_arguments)]
+pub fn download_minecraft<'a>(
+    st: &'a State,
+    version: &'a GameVersionInfo,
+    loading_bar: Option<&'a LoadingBarId>,
+    java_arch: &'a str,
+    force: bool,
+    minecraft_updated: bool,
+    reporter: Option<InstallProgressReporter>,
+    phase_details: InstallPhaseDetails,
+) -> impl Future<Output = crate::Result<()>> + Send + 'a {
+    Box::pin(download_minecraft_inner(
+        st,
+        version,
+        loading_bar,
+        java_arch,
+        force,
+        minecraft_updated,
+        reporter,
+        phase_details,
+    ))
+}
+
 #[tracing::instrument(skip(st, version, reporter))]
-pub async fn download_minecraft(
+async fn download_minecraft_inner(
     st: &State,
     version: &GameVersionInfo,
     loading_bar: Option<&LoadingBarId>,
@@ -523,7 +546,19 @@ pub async fn download_version_info(
         .version_dir(&version_id)
         .join(format!("{version_id}.json"));
 
-    let res = if path.exists() && !force.unwrap_or(false) {
+    if let Some(loader) =
+        loader.filter(|loader| super::is_locally_installed_loader(loader))
+        && !path.exists()
+    {
+        return Err(crate::ErrorKind::LauncherError(format!(
+            "Loader version {} for Minecraft {} is no longer available",
+            loader.id, version.id
+        ))
+        .as_error());
+    }
+
+    let removed_loader = loader.is_some_and(super::is_locally_installed_loader);
+    let res = if path.exists() && (!force.unwrap_or(false) || removed_loader) {
         io::read(path)
             .err_into::<crate::Error>()
             .await

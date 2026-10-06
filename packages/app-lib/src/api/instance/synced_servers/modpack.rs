@@ -1,7 +1,6 @@
-use super::super::synced_options::instance_dir;
-use super::SERVERS_FILE;
+use super::super::synced_options::{instance_dir, instance_is_running};
 use super::codec::{read_servers, servers_from_bytes};
-use super::operations::{compose_instance, effective};
+use super::operations::{compose_instance, participating};
 use super::storage::{load_local, write_local_rows};
 use super::types::{LocalServer, ServerSource};
 use crate::state::{CachedEntry, InstanceLink, InstanceMetadata};
@@ -12,29 +11,32 @@ use quartz_nbt::NbtCompound;
 use std::io::Cursor;
 use uuid::Uuid;
 
-pub async fn capture_modpack_servers(instance_id: &str) -> crate::Result<()> {
-    let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
-    let metadata = crate::state::get_instance(instance_id, &state.pool)
-        .await?
-        .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
-    let path = instance_dir(&metadata, &state).join(SERVERS_FILE);
-    let servers = read_servers(&path).await?;
-    replace_modpack_servers(&metadata, servers, &state).await?;
-    if effective(&metadata, &state).await? {
-        compose_instance(&metadata, &state).await?;
-    }
-    Ok(())
-}
+pub(crate) const MODPACK_SERVER_PATHS: [&str; 3] = [
+    "servers.dat",
+    "config/yosbr/servers.dat",
+    "config/defaultoptions/servers.dat",
+];
 
-pub async fn clear_modpack_servers(instance_id: &str) -> crate::Result<()> {
+pub(crate) async fn capture_modpack_server_override(
+    instance_id: &str,
+    source_path: Option<&str>,
+) -> crate::Result<()> {
     let state = State::get().await?;
     let _guard = state.lock_synced_options().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
-    replace_modpack_servers(&metadata, Vec::new(), &state).await?;
-    if effective(&metadata, &state).await? {
+    let servers = if let Some(source_path) = source_path {
+        let path = instance_dir(&metadata, &state).join(source_path);
+        read_servers(&path).await?
+    } else {
+        Vec::new()
+    };
+    replace_modpack_servers(&metadata, servers, &state).await?;
+    // Installation owns these files until the new projection has been written.
+    if participating(&metadata, &state).await?
+        && !instance_is_running(&metadata, &state).await?
+    {
         compose_instance(&metadata, &state).await?;
     }
     Ok(())
@@ -65,7 +67,7 @@ async fn replace_modpack_servers(
         server.position = local.len() as i64;
         local.push(server.clone());
     }
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
     write_local_rows(&mut tx, &metadata.instance.id, &local).await?;
     let version_id = modpack_version_id(&metadata.link);
     sqlx::query!(
@@ -167,26 +169,18 @@ pub(super) async fn reconstruct_modpack_servers(
     )
     .await?;
     let mut archive = ZipFileReader::with_tokio(Cursor::new(&mrpack)).await?;
-    let mut selected = None;
-    for (index, entry) in archive.file().entries().iter().enumerate() {
-        let Ok(filename) = entry.filename().as_str() else {
-            continue;
-        };
-        let priority = if filename == "client-overrides/servers.dat" {
-            2
-        } else if filename == "overrides/servers.dat" {
-            1
-        } else {
-            continue;
-        };
-        if selected
-            .is_none_or(|(selected_priority, _)| priority >= selected_priority)
-        {
-            selected = Some((priority, index));
-        }
-    }
+    let selected = MODPACK_SERVER_PATHS.into_iter().find_map(|path| {
+        ["client-overrides", "overrides"]
+            .into_iter()
+            .find_map(|prefix| {
+                let filename = format!("{prefix}/{path}");
+                archive.file().entries().iter().rposition(|entry| {
+                    entry.filename().as_str().ok() == Some(filename.as_str())
+                })
+            })
+    });
 
-    let servers = if let Some((_, index)) = selected {
+    let servers = if let Some(index) = selected {
         let mut bytes = Vec::new();
         let mut reader = archive.reader_with_entry(index).await?;
         reader.read_to_end_checked(&mut bytes).await?;

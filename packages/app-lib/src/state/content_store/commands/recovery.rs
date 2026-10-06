@@ -49,7 +49,7 @@ impl ContentStore {
         &self,
         journal: &FileChangeJournal,
     ) -> crate::Result<()> {
-        let mut tx = self.pool.begin().await?;
+        let mut tx = self.pool.begin_with("BEGIN IMMEDIATE").await?;
         catalog::finish_file_change(&mut tx, &journal.id).await?;
         tx.commit().await?;
         Ok(())
@@ -212,7 +212,8 @@ impl ContentStore {
                         && let Some(binding) =
                             catalog::file_storage(&self.pool, &file.id).await?
                     {
-                        let mut tx = self.pool.begin().await?;
+                        let mut tx =
+                            self.pool.begin_with("BEGIN IMMEDIATE").await?;
                         catalog::set_file_storage(
                             &mut tx,
                             &file.id,

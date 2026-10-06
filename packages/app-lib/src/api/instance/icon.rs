@@ -134,7 +134,7 @@ pub async fn cache_generated_icon(
             .await?;
 
     if add_to_recents {
-        let mut tx = state.pool.begin().await?;
+        let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
         instance_rows::update_recent_instance_icon_config(&config, &mut tx)
             .await?;
         tx.commit().await?;

@@ -18,7 +18,7 @@
     "defaultMessage": "新增 Java 位址"
   },
   "nags.add-license-details.description": {
-    "defaultMessage": "為你的自訂授權條款新增有效的網址，以及名稱或 SPDX 識別碼。"
+    "defaultMessage": "為你的自訂授權條款新增有效的網址，並填寫名稱或 SPDX 識別碼。"
   },
   "nags.add-license-details.title": {
     "defaultMessage": "新增授權條款詳細資訊"
@@ -53,12 +53,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "選擇精確的標籤"
   },
-  "nags.banned-link-usage.description": {
-    "defaultMessage": "不允許將連結「{url}」做為外部連結。"
-  },
-  "nags.banned-link-usage.title": {
-    "defaultMessage": "移除不被允許的連結"
-  },
   "nags.check-disclosures.description": {
     "defaultMessage": "填寫適用於你的{type}的內容揭露資訊，以確保使用者知悉所有重要資訊。"
   },
@@ -89,9 +83,6 @@
   "nags.edit-gallery.title": {
     "defaultMessage": "編輯圖庫"
   },
-  "nags.edit-license.title": {
-    "defaultMessage": "編輯授權條款"
-  },
   "nags.edit-summary.title": {
     "defaultMessage": "編輯摘要"
   },
@@ -120,25 +111,13 @@
     "defaultMessage": "前往圖庫頁面"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "你的{type}使用的授權條款要求必須公開原始碼。請提供原始碼連結、附加原始碼檔案，或是更換授權條款。"
+    "defaultMessage": "你的{type}使用的授權條款要求必須公開原始碼。請提供原始碼連結、附加原始碼檔案，或是選擇另一個授權條款。"
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "提供原始碼"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "你輸入的部分外部連結似乎完全相同。每個連結僅應列出一次，並選擇正確的連結類型。"
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "移除重複連結"
-  },
   "nags.invalid-gallery-text.title": {
     "defaultMessage": "修改圖庫圖片文字"
-  },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "授權條款網址無效。"
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "你的授權條款網址指向 {domain}，這不適合用來提供授權條款資訊。授權條款網址應直接連結到你的授權條款文字。"
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "你的授權條款網址似乎格式不正確。請提供有效的授權條款網址。"
@@ -155,6 +134,81 @@
   "nags.invalid-project-summary.title": {
     "defaultMessage": "修改摘要"
   },
+  "nags.license-url.not-in-allowlist.description": {
+    "defaultMessage": "你的授權條款網址無效。請確保該連結能直接導向你的授權條款。"
+  },
+  "nags.license-url.not-in-allowlist.title": {
+    "defaultMessage": "檢查授權條款連結"
+  },
+  "nags.link-validation.discord-invite": {
+    "defaultMessage": "你的 Discord 邀請連結無效、已過期，或無法邀請使用者到伺服器。請更換為有效的伺服器邀請連結。"
+  },
+  "nags.link-validation.discord-invite.title": {
+    "defaultMessage": "更換無效的 Discord 邀請"
+  },
+  "nags.link-validation.download": {
+    "defaultMessage": "不允許會觸發下載的連結。請從描述中移除這類連結。"
+  },
+  "nags.link-validation.download.title": {
+    "defaultMessage": "移除下載連結"
+  },
+  "nags.link-validation.duplicate": {
+    "defaultMessage": "你的「{linkField, select, issues {問題追蹤器} source {原始碼} wiki {Wiki} discord {Discord 邀請} site {網站} store {商店} license {授權條款} description {描述} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {贊助}}」連結已經用於{otherLinkField, select, issues {「問題追蹤器」} source {「原始碼」} wiki {「Wiki」} discord {「Discord 邀請」} site {「網站」} store {「商店」} license {「授權條款」} patreon {「Patreon」} bmac {「Buy Me a Coffee」} paypal {「PayPal」} github {「GitHub Sponsors」} kofi {「Ko-fi」} other {其他}}連結欄位。每個連結應僅列出一次。"
+  },
+  "nags.link-validation.duplicate.title": {
+    "defaultMessage": "移除重複連結"
+  },
+  "nags.link-validation.external-blocklist-match": {
+    "defaultMessage": "你的「{linkField}」連結不被允許。請移除連結，或更換為符合「{linkField}」連結類型的連結。"
+  },
+  "nags.link-validation.external-blocklist-match.title": {
+    "defaultMessage": "更換錯誤連結"
+  },
+  "nags.link-validation.global-blocklist-match": {
+    "defaultMessage": "你的「{linkField, select, issues {問題追蹤器} source {原始碼} wiki {Wiki} discord {Discord 邀請} site {網站} store {商店} license {授權條款} description {描述} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {贊助}}」連結使用了被禁止的網域。請移除或更換該連結。"
+  },
+  "nags.link-validation.global-blocklist-match.title": {
+    "defaultMessage": "移除被禁止的連結"
+  },
+  "nags.link-validation.ip-address": {
+    "defaultMessage": "你的「{linkField, select, issues {問題追蹤器} source {原始碼} wiki {Wiki} discord {Discord 邀請} site {網站} store {商店} license {授權條款} description {描述} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {贊助}}」連結使用了 IP 位址。請使用包含網域名稱的 URL。"
+  },
+  "nags.link-validation.ip-address.title": {
+    "defaultMessage": "移除 IP 位址連結"
+  },
+  "nags.link-validation.malformed": {
+    "defaultMessage": "你的「{linkField, select, issues {問題追蹤器} source {原始碼} wiki {Wiki} discord {Discord 邀請} site {網站} store {商店} license {授權條款} description {描述} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {贊助}}」連結無效。請輸入完整的 HTTPS 網址。"
+  },
+  "nags.link-validation.malformed.title": {
+    "defaultMessage": "修正無效連結"
+  },
+  "nags.link-validation.not-in-allowlist": {
+    "defaultMessage": "你的「{linkField, select, issues {問題追蹤器} source {原始碼} wiki {Wiki} discord {Discord 邀請} site {網站} store {商店} license {授權條款} description {描述} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {贊助}}」連結可能不適合該連結類型。請確保該連結符合其預期用途。"
+  },
+  "nags.link-validation.not-in-allowlist.title": {
+    "defaultMessage": "檢查連結是否正確"
+  },
+  "nags.link-validation.source-repository": {
+    "defaultMessage": "你的原始碼連結必須指向位於受支援的託⁠管平臺上的儲存庫，或是指向自行架設的 Gitea/Forgejo 服務。"
+  },
+  "nags.link-validation.source-repository.title": {
+    "defaultMessage": "加入原始碼儲存庫連結"
+  },
+  "nags.link-validation.title": {
+    "defaultMessage": "檢查連結"
+  },
+  "nags.link-validation.unverifiable": {
+    "defaultMessage": "無法驗證你的「{linkField, select, issues {問題追蹤器} source {原始碼} wiki {Wiki} discord {Discord 邀請} site {網站} store {商店} license {授權條款} description {描述} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {贊助}}」連結。請確認連結目標是否已上線且可存取。"
+  },
+  "nags.link-validation.unverifiable.title": {
+    "defaultMessage": "檢查連結是否可用"
+  },
+  "nags.link-validation.wrong-field": {
+    "defaultMessage": "你的「{linkField, select, issues {問題追蹤器} source {原始碼} wiki {Wiki} discord {Discord 邀請} site {網站} store {商店} license {授權條款} description {描述} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {贊助}}」連結不正確。請移除或更換為正確的連結。"
+  },
+  "nags.link-validation.wrong-field.title": {
+    "defaultMessage": "修正錯誤連結"
+  },
   "nags.long-headers.description": {
     "defaultMessage": "你的描述中有 {count, plural, other {# 個標題}}{count, plural, other {}}字數過多。標題的作用是作為章節標題，應保持簡潔，避免使用完整的長句子。"
   },
@@ -168,16 +222,10 @@
     "defaultMessage": "避免品牌侵權"
   },
   "nags.missing-alt-text.description": {
-    "defaultMessage": "您的部分圖片缺少替代文字，這對於無障礙存取至關重要，特別是對視障用戶而言。"
+    "defaultMessage": "你的部分圖片缺少替代文字，替代文字對於無障礙體驗至關重要，是協助視障使用者的重要工具。"
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "新增圖片替代文字"
-  },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Discord 邀請連結不可用於其他連結類型。請只將你的 Discord 連結放至 Discord 邀請連結欄位。"
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "移動 Discord 邀請連結"
   },
   "nags.moderation.title": {
     "defaultMessage": "前往審查討論串"
@@ -194,8 +242,8 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "選擇正確的解析度"
   },
-  "nags.project-description-banned-link.description": {
-    "defaultMessage": "專案描述中不允許使用連結「{fullUrl}」。"
+  "nags.project-description-content.title": {
+    "defaultMessage": "檢查描述"
   },
   "nags.project-description-non-english.description": {
     "defaultMessage": "專案描述必須以英文撰寫或附上英文翻譯。"
@@ -371,14 +419,11 @@
   "nags.upload-version.title": {
     "defaultMessage": "上傳版本"
   },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "你的部分外部連結可能指向了不適合該連結類型的網域。"
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "檢查外部連結"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "前往連結設定"
+  },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "專案描述應提供獨特資訊，避免重複摘要內容。"
   },
   "project.text-validation.summary-matches-title": {
     "defaultMessage": "專案摘要應提供獨特資訊，避免重複專案名稱。"

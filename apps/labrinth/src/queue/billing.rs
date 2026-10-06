@@ -1,4 +1,5 @@
 use crate::database::models::charge_item::DBCharge;
+use crate::database::models::ids::*;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::product_item::DBProduct;
 use crate::database::models::products_tax_identifier_item::DBProductsTaxIdentifier;
@@ -6,7 +7,6 @@ use crate::database::models::user_item::DBUser;
 use crate::database::models::user_subscription_item::DBUserSubscription;
 use crate::database::models::users_redeemals::UserRedeemal;
 use crate::database::models::users_subscriptions_affiliations::DBUsersSubscriptionsAffiliations;
-use crate::database::models::{DatabaseError, ids::*};
 use crate::database::models::{
     product_item, user_subscription_item, users_redeemals,
 };
@@ -90,19 +90,15 @@ async fn update_tax_amounts(
                     )
                     .await
                     .wrap_api_err("fetching price")?
-                    .ok_or_else(|| {
-                        DatabaseError::Database(sqlx::Error::RowNotFound)
-                    })
-                    .wrap_internal_err("querying database for `update_tax_amounts`")?;
+                    .wrap_internal_err(
+                        "finding product tax identifier for price",
+                    )?;
 
                     let product = DBProduct::get_price(charge.price_id, &pg)
                         .await
                         .wrap_internal_err(
                             "fetching product price from database",
                         )?
-                        .ok_or_else(|| {
-                            DatabaseError::Database(sqlx::Error::RowNotFound)
-                        })
                         .wrap_internal_err(
                             "finding product price in database",
                         )?;
@@ -127,28 +123,15 @@ async fn update_tax_amounts(
                                 "parsing user Stripe customer ID",
                             )?;
 
-                        let customer = stripe::Customer::retrieve(
+                        let payment_method = get_default_payment_method(
                             &stripe_client,
                             &stripe_customer_id,
-                            &["invoice_settings.default_payment_method"],
                         )
-                        .await
-                        .wrap_failed_dependency_err(
-                            "communicating with payment provider",
-                        )?;
-
-                        // A customer should have a default payment method if they have an active subscription.
-
-                        let payment_method = customer
-                            .invoice_settings
-                            .and_then(|x| {
-                                x.default_payment_method
-                                    .and_then(|x| x.into_object())
-                            })
-                            .wrap_request_err_with(|| {
-                                "customer has no default payment method!"
-                                    .to_string()
-                            })?;
+                        .await?
+                        .wrap_request_err_with(|| {
+                            "customer has no default payment method"
+                                .to_string()
+                        })?;
 
                         let stripe_address =
                             payment_method.billing_details.address;
@@ -160,6 +143,16 @@ async fn update_tax_amounts(
                                 warn!("PaymentMethod had no address");
                             }
                         };
+
+                        let customer = stripe::Customer::retrieve(
+                            &stripe_client,
+                            &stripe_customer_id,
+                            &[],
+                        )
+                        .await
+                        .wrap_failed_dependency_err(
+                            "communicating with payment provider",
+                        )?;
 
                         customer.address.wrap_request_err_with(|| {
                             "couldn't get an address for the Stripe customer"
@@ -402,10 +395,7 @@ async fn update_anrok_transactions(
         let tax_id = DBProductsTaxIdentifier::get_price(c.price_id, &mut *txn)
             .await
             .wrap_api_err("fetching price")?
-            .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))
-            .wrap_internal_err(
-                "fetching products tax identifier from database",
-            )?;
+            .wrap_internal_err("finding product tax identifier for price")?;
 
         // Note: if the tax amount that was charged to the customer is *different* than
         // what it *should* be NOW, we will take on a loss here.
@@ -778,8 +768,8 @@ pub async fn process_chargeable_charges(
             Currency::from_str(&product_price.currency_code.to_lowercase())
         else {
             warn!(
-                "Could not find currency for {}",
-                product_price.currency_code
+                charge.id = charge.id.0,
+                "Could not find currency for {}", product_price.currency_code
             );
             continue;
         };
@@ -824,6 +814,7 @@ pub async fn process_chargeable_charges(
                     charge.payment_platform = PaymentPlatform::Stripe;
                 } else {
                     error!(
+                        charge.id = charge.id.0,
                         "Payment bootstrap succeeded but no payment intent was created"
                     );
                     failure = true;
@@ -831,7 +822,11 @@ pub async fn process_chargeable_charges(
             }
 
             Err(error) => {
-                error!(%error, "Failed to bootstrap payment for renewal");
+                error!(
+                    ?error,
+                    charge.id = charge.id.0,
+                    "Failed to bootstrap payment for renewal"
+                );
                 failure = true;
             }
         };

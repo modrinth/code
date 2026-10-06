@@ -722,6 +722,12 @@
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Failed to load content"
   },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "Failed to load changelog"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "Failed to load available updates"
+  },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
   },
@@ -1239,7 +1245,7 @@
     "defaultMessage": "Save attribution"
   },
   "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "Select a license..."
+    "defaultMessage": "Search licenses..."
   },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "Permission reason"
@@ -1282,6 +1288,9 @@
   },
   "external-files.permissions-card.last-updated": {
     "defaultMessage": "Last updated on {date} by {user}"
+  },
+  "external-files.permissions-card.license.all-rights": {
+    "defaultMessage": "All Rights Reserved/No License"
   },
   "external-files.permissions-card.license.unknown": {
     "defaultMessage": "Unknown"
@@ -2054,8 +2063,14 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Server reset to onboarding"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Support options"
+  "hosting.save-banner.resolve-errors": {
+    "defaultMessage": "Please resolve the errors in your changes before saving."
+  },
+  "hosting.settings.properties.motd-profanity": {
+    "defaultMessage": "Due to Minecraft Usage Guidelines, your server's MOTD cannot contain profanity. Detected: “{value}”."
+  },
+  "hosting.settings.properties.motd-profanity-save-error": {
+    "defaultMessage": "Due to Minecraft Usage Guidelines, your server's MOTD cannot contain profanity. Detected: “{value}”"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Bursts up to {cpus} CPUs"
@@ -3281,14 +3296,26 @@
   "profile.button.create-project": {
     "defaultMessage": "Create a project"
   },
+  "profile.button.force-password-reset": {
+    "defaultMessage": "Force password reset"
+  },
   "profile.button.info": {
     "defaultMessage": "View user details"
+  },
+  "profile.button.lock": {
+    "defaultMessage": "Lock account"
   },
   "profile.button.manage-projects": {
     "defaultMessage": "Manage projects"
   },
   "profile.button.remove-affiliate": {
     "defaultMessage": "Remove as affiliate"
+  },
+  "profile.button.reset-2fa": {
+    "defaultMessage": "Reset two-factor authentication"
+  },
+  "profile.button.revoke-sessions": {
+    "defaultMessage": "Revoke all sessions"
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "Set as affiliate"
@@ -3298,6 +3325,9 @@
   },
   "profile.button.unblock": {
     "defaultMessage": "Unblock"
+  },
+  "profile.button.unlock": {
+    "defaultMessage": "Unlock account"
   },
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural, one {# project} other {# projects}}"
@@ -3347,6 +3377,36 @@
   "profile.error.not-found": {
     "defaultMessage": "User not found"
   },
+  "profile.force-password-reset.admonition-body": {
+    "defaultMessage": "{username}'s password will be removed immediately, they will be signed out on every device, and a link to set a new one will be sent to the email below. If you change the email, it replaces the one on the account. The link expires after 24 hours and can be used even while the account is locked."
+  },
+  "profile.force-password-reset.admonition-title": {
+    "defaultMessage": "The current password will stop working"
+  },
+  "profile.force-password-reset.button": {
+    "defaultMessage": "Reset password"
+  },
+  "profile.force-password-reset.email-label": {
+    "defaultMessage": "Account email"
+  },
+  "profile.force-password-reset.email-placeholder": {
+    "defaultMessage": "Leave blank to use the account's email"
+  },
+  "profile.force-password-reset.error-description": {
+    "defaultMessage": "An error occurred while resetting the password. Please try again."
+  },
+  "profile.force-password-reset.error-title": {
+    "defaultMessage": "Failed to reset password"
+  },
+  "profile.force-password-reset.success-description": {
+    "defaultMessage": "A password reset link has been sent to {username}."
+  },
+  "profile.force-password-reset.success-title": {
+    "defaultMessage": "Password reset"
+  },
+  "profile.force-password-reset.title": {
+    "defaultMessage": "Force password reset for {username}"
+  },
   "profile.label.affiliate": {
     "defaultMessage": "Affiliate"
   },
@@ -3361,6 +3421,9 @@
   },
   "profile.label.joined": {
     "defaultMessage": "Joined"
+  },
+  "profile.label.locked": {
+    "defaultMessage": "Locked"
   },
   "profile.label.no-collections": {
     "defaultMessage": "This user has no collections!"
@@ -3386,6 +3449,54 @@
   "profile.official-account.bio": {
     "defaultMessage": "The official user account of Modrinth. Get support at <support-link></support-link> or via email at <email></email>"
   },
+  "profile.reset-2fa.admonition-body": {
+    "defaultMessage": "{username}'s authenticator and backup codes will be removed and they will be notified. Only do this after verifying their identity."
+  },
+  "profile.reset-2fa.admonition-title": {
+    "defaultMessage": "Are you sure you want to reset two-factor authentication?"
+  },
+  "profile.reset-2fa.button": {
+    "defaultMessage": "Reset 2FA"
+  },
+  "profile.reset-2fa.error-description": {
+    "defaultMessage": "An error occurred while resetting two-factor authentication. Please try again."
+  },
+  "profile.reset-2fa.error-title": {
+    "defaultMessage": "Failed to reset two-factor authentication"
+  },
+  "profile.reset-2fa.success-description": {
+    "defaultMessage": "{username}'s two-factor authentication has been removed."
+  },
+  "profile.reset-2fa.success-title": {
+    "defaultMessage": "Two-factor authentication reset"
+  },
+  "profile.reset-2fa.title": {
+    "defaultMessage": "Reset two-factor authentication for {username}"
+  },
+  "profile.revoke-sessions.admonition-body": {
+    "defaultMessage": "{username} will be signed out on every device and will need to sign in again. Personal access tokens are not affected."
+  },
+  "profile.revoke-sessions.admonition-title": {
+    "defaultMessage": "Are you sure you want to revoke all sessions?"
+  },
+  "profile.revoke-sessions.button": {
+    "defaultMessage": "Revoke sessions"
+  },
+  "profile.revoke-sessions.error-description": {
+    "defaultMessage": "An error occurred while revoking sessions. Please try again."
+  },
+  "profile.revoke-sessions.error-title": {
+    "defaultMessage": "Failed to revoke sessions"
+  },
+  "profile.revoke-sessions.success-description": {
+    "defaultMessage": "{username} has been signed out everywhere."
+  },
+  "profile.revoke-sessions.success-title": {
+    "defaultMessage": "Sessions revoked"
+  },
+  "profile.revoke-sessions.title": {
+    "defaultMessage": "Revoke sessions for {username}"
+  },
   "profile.unblock-user.error-description": {
     "defaultMessage": "An error occurred while unblocking this user. Please try again."
   },
@@ -3397,6 +3508,18 @@
   },
   "profile.unblock-user.success-title": {
     "defaultMessage": "User unblocked"
+  },
+  "profile.unlock-user.error-description": {
+    "defaultMessage": "An error occurred while unlocking this account. Please try again."
+  },
+  "profile.unlock-user.error-title": {
+    "defaultMessage": "Failed to unlock account"
+  },
+  "profile.unlock-user.success-description": {
+    "defaultMessage": "{username}'s account has been unlocked."
+  },
+  "profile.unlock-user.success-title": {
+    "defaultMessage": "Account unlocked"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Published {date}"
@@ -4619,6 +4742,9 @@
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "Stopped server"
   },
+  "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
+    "defaultMessage": "Rotated SFTP credentials"
+  },
   "servers.access-page.activity-log-filter.action.sftp-login": {
     "defaultMessage": "Logged in via SFTP"
   },
@@ -5000,6 +5126,9 @@
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "Changed server subdomain to <subdomain></subdomain>"
   },
+  "servers.audit-log.event.sftp-credentials-rolled": {
+    "defaultMessage": "Rotated SFTP credentials"
+  },
   "servers.audit-log.event.sftp-login": {
     "defaultMessage": "Logged in via SFTP"
   },
@@ -5206,6 +5335,9 @@
   },
   "servers.download.unavailable.title": {
     "defaultMessage": "Download unavailable"
+  },
+  "servers.files.server-locked": {
+    "defaultMessage": "This server is locked and its files are read-only."
   },
   "servers.files.zip-created": {
     "defaultMessage": "ZIP created"
@@ -5423,6 +5555,36 @@
   "servers.listing.using-project-label": {
     "defaultMessage": "Using {projectTitle}"
   },
+  "servers.lock.modal.error-text": {
+    "defaultMessage": "An error occurred while locking this server. Please try again."
+  },
+  "servers.lock.modal.error-title": {
+    "defaultMessage": "Failed to lock server"
+  },
+  "servers.lock.modal.header": {
+    "defaultMessage": "Lock {name}"
+  },
+  "servers.lock.modal.lock-button": {
+    "defaultMessage": "Lock server"
+  },
+  "servers.lock.modal.reason-label": {
+    "defaultMessage": "Reason"
+  },
+  "servers.lock.modal.reason-placeholder": {
+    "defaultMessage": "Visible to other admins"
+  },
+  "servers.lock.modal.success-text": {
+    "defaultMessage": "{name} has been locked."
+  },
+  "servers.lock.modal.success-title": {
+    "defaultMessage": "Server locked"
+  },
+  "servers.lock.modal.warning-body": {
+    "defaultMessage": "{name} will be read-only for its owner and members until it is unlocked by an admin."
+  },
+  "servers.lock.modal.warning-header": {
+    "defaultMessage": "This server will become read-only"
+  },
   "servers.manage.checking-for-new-servers": {
     "defaultMessage": "Checking for new servers..."
   },
@@ -5458,6 +5620,21 @@
   },
   "servers.manage.handle-error.title": {
     "defaultMessage": "An error occurred"
+  },
+  "servers.manage.lock-server": {
+    "defaultMessage": "Lock server"
+  },
+  "servers.manage.locked.badge": {
+    "defaultMessage": "Locked"
+  },
+  "servers.manage.locked.badge-tooltip": {
+    "defaultMessage": "Locked since {date}"
+  },
+  "servers.manage.locked.body": {
+    "defaultMessage": "Support has temporarily locked this server, so you cannot make any changes. <support-link>Contact support</support-link> if you believe this is a mistake."
+  },
+  "servers.manage.locked.header": {
+    "defaultMessage": "Server locked by support"
   },
   "servers.manage.new-server-button": {
     "defaultMessage": "New server"
@@ -5515,6 +5692,21 @@
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Shared servers"
+  },
+  "servers.manage.unlock-server": {
+    "defaultMessage": "Unlock server"
+  },
+  "servers.manage.unlock.error-text": {
+    "defaultMessage": "An error occurred while unlocking this server. Please try again."
+  },
+  "servers.manage.unlock.error-title": {
+    "defaultMessage": "Failed to unlock server"
+  },
+  "servers.manage.unlock.success-text": {
+    "defaultMessage": "{name} has been unlocked."
+  },
+  "servers.manage.unlock.success-title": {
+    "defaultMessage": "Server unlocked"
   },
   "servers.manage.your-servers-title": {
     "defaultMessage": "Your servers"
@@ -5746,6 +5938,27 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "SFTP credentials rotated"
+  },
+  "servers.settings.support.action-log-title": {
+    "defaultMessage": "Action log"
+  },
+  "servers.settings.support.clear-action-log-button": {
+    "defaultMessage": "Clear action log"
+  },
+  "servers.settings.support.clear-action-log-confirmation": {
+    "defaultMessage": "This permanently deletes all action log entries for this server. Continue?"
+  },
+  "servers.settings.support.clear-action-log-description": {
+    "defaultMessage": "Delete all action log entries for this server."
+  },
+  "servers.settings.support.clear-action-log-error": {
+    "defaultMessage": "Failed to clear action log"
+  },
+  "servers.settings.support.clear-action-log-success": {
+    "defaultMessage": "Action log cleared"
+  },
+  "servers.settings.support.clear-action-log-title": {
+    "defaultMessage": "Clear action log?"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "An unexpected error occurred while installing. Please try again later."
@@ -6796,6 +7009,78 @@
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "Unrecognized files"
+  },
+  "update-all-modal.changelog-for": {
+    "defaultMessage": "Changelog for {project}"
+  },
+  "update-all-modal.changelog-loaded": {
+    "defaultMessage": "Changelog loaded."
+  },
+  "update-all-modal.close-changelog": {
+    "defaultMessage": "Close changelog"
+  },
+  "update-all-modal.current-version": {
+    "defaultMessage": "Current version"
+  },
+  "update-all-modal.empty": {
+    "defaultMessage": "No updates available."
+  },
+  "update-all-modal.header": {
+    "defaultMessage": "Update projects"
+  },
+  "update-all-modal.loading": {
+    "defaultMessage": "Loading updates…"
+  },
+  "update-all-modal.loading-changelog": {
+    "defaultMessage": "Loading changelog…"
+  },
+  "update-all-modal.new-version": {
+    "defaultMessage": "New version"
+  },
+  "update-all-modal.no-changelog": {
+    "defaultMessage": "No changelog provided for this version."
+  },
+  "update-all-modal.no-compatible-updates": {
+    "defaultMessage": "No compatible updates available."
+  },
+  "update-all-modal.no-version": {
+    "defaultMessage": "No compatible updates"
+  },
+  "update-all-modal.project": {
+    "defaultMessage": "Project"
+  },
+  "update-all-modal.project-list": {
+    "defaultMessage": "Project updates"
+  },
+  "update-all-modal.results": {
+    "defaultMessage": "{count, plural, one {# project ready to update} other {# projects ready to update}}"
+  },
+  "update-all-modal.select-all": {
+    "defaultMessage": "Select all projects"
+  },
+  "update-all-modal.select-project": {
+    "defaultMessage": "Select {project} for update"
+  },
+  "update-all-modal.select-version": {
+    "defaultMessage": "New version for {project}"
+  },
+  "update-all-modal.update": {
+    "defaultMessage": "Update {count, plural, one {# project} other {# projects}}"
+  },
+  "update-all-modal.versions": {
+    "defaultMessage": "Current version / New version"
+  },
+  "update-all-modal.view": {
+    "defaultMessage": "View"
+  },
+  "update-all-modal.view-changelog": {
+    "defaultMessage": "View changelog for {project}"
+  },
+  "update-all-modal.warning": {
+    "defaultMessage": "We can’t guarantee updates are safe for your worlds. Review the changelogs and consider a backup."
+  },
+  "update-all-modal.warning-server": {
+    "defaultMessage": "We can’t guarantee updates will be safe for your server. Review the changelogs and consider a backup."
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "This user has been around since Modrinth Alpha, which ended in November 2020."

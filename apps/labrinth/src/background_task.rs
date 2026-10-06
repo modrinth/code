@@ -418,8 +418,8 @@ mod version_updater {
     pub enum VersionIndexingError {
         #[error("Network error while updating game versions list: {0}")]
         NetworkError(#[from] reqwest::Error),
-        #[error("Database error while updating game versions list: {0}")]
-        DatabaseError(#[from] crate::database::models::DatabaseError),
+        #[error("internal error while updating game versions list: {0}")]
+        InternalError(#[from] eyre::Report),
     }
 
     pub async fn update_versions(

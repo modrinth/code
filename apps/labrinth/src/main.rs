@@ -9,7 +9,9 @@ use clap::Parser;
 use labrinth::background_task::BackgroundTask;
 use labrinth::database::redis;
 use labrinth::env::ENV;
-use labrinth::file_hosting::{FileHost, FileHostKind, S3BucketConfig, S3Host};
+use labrinth::file_hosting::{
+    FileHost, FileHostKind, KafkaFileHost, S3BucketConfig, S3Host,
+};
 use labrinth::queue::email::EmailQueue;
 use labrinth::search;
 use labrinth::util::anrok;
@@ -80,7 +82,16 @@ fn main() -> std::io::Result<()> {
         }
     }
 
-    actix_rt::System::new().block_on(app())?;
+    let system = actix_rt::System::new();
+    let app_result = system.block_on(app());
+
+    // actix-rt drops its LocalSet before the Tokio runtime, outside any runtime
+    // context. Tasks still holding a sqlx PoolConnection then panic on drop,
+    // since returning the connection needs to spawn onto a runtime.
+    let tokio_handle = system.runtime().tokio_runtime().handle().clone();
+    let _tokio_context = tokio_handle.enter();
+    drop(system);
+    app_result?;
 
     // Sentry guard must live until the end of the app
     drop(sentry);
@@ -114,6 +125,11 @@ async fn app() -> std::io::Result<()> {
     // Redis connector
     let redis_pool = redis::from_env("").await;
 
+    let kafka_client = actix_web::web::Data::new(
+        labrinth::util::kafka::KafkaClientState::new()
+            .expect("Kafka connection failed"),
+    );
+
     let storage_backend = ENV.STORAGE_BACKEND;
     let file_host: Arc<dyn FileHost> = match storage_backend {
         FileHostKind::S3 => {
@@ -146,6 +162,8 @@ async fn app() -> std::io::Result<()> {
         }
         FileHostKind::Local => Arc::new(file_hosting::MockHost::new()),
     };
+    let file_host: Arc<dyn FileHost> =
+        Arc::new(KafkaFileHost::new(file_host, kafka_client.clone()));
     let file_host = web::Data::<dyn FileHost>::from(file_host);
 
     info!("Initializing clickhouse connection");
@@ -164,10 +182,6 @@ async fn app() -> std::io::Result<()> {
         .expect("Failed to create Gotenberg client");
     let muralpay = labrinth::queue::payouts::create_muralpay_client()
         .expect("Failed to create MuralPay client");
-    let kafka_client = actix_web::web::Data::new(
-        labrinth::util::kafka::KafkaClientState::new()
-            .expect("Kafka connection failed"),
-    );
 
     if let Some(task) = args.run_background_task {
         info!("Running task {task:?} and exiting");
@@ -223,6 +237,11 @@ async fn app() -> std::io::Result<()> {
         kafka_client,
         !args.no_background_tasks,
     );
+
+    labrinth_config
+        .active_sockets
+        .register_and_set_metrics(&prometheus.registry)
+        .expect("Failed to register socket metrics");
 
     info!("Starting Actix HTTP server!");
 

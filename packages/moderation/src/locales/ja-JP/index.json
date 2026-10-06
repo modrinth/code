@@ -1,4 +1,7 @@
 {
+  "nags.add-description.description": {
+    "defaultMessage": "プロジェクトの内容、目的、および魅力を明確に説明した説明文が必要です。"
+  },
   "nags.add-description.title": {
     "defaultMessage": "説明を追加する"
   },
@@ -20,11 +23,23 @@
   "nags.add-license-details.title": {
     "defaultMessage": "ライセンス詳細を追加"
   },
+  "nags.add-links-server.description": {
+    "defaultMessage": "ウェブサイト、ストア、無期限なDiscord招待リンクなど、関連する外部リソースへのリンクを追加してください。"
+  },
   "nags.add-links-server.title": {
     "defaultMessage": "外部リンクを追加する"
   },
+  "nags.add-links.description": {
+    "defaultMessage": "ソースコード、イシュートラッカー、Discordの恒久的な招待リンクなど、関連する外部リソースへのリンクを記載してください。"
+  },
   "nags.add-links.title": {
     "defaultMessage": "外部リンクを追加する"
+  },
+  "nags.adjacent-headers.description": {
+    "defaultMessage": "同じレベルのヘッダーは、隣り合わせに配置してはいけません。"
+  },
+  "nags.adjacent-headers.title": {
+    "defaultMessage": "隣接するヘッダーを削除する"
   },
   "nags.all-languages.description": {
     "defaultMessage": "すべての利用可能な言語オプションを選択しました。サーバーが実際にサポートしている言語のみを一覧表示してください。"
@@ -38,14 +53,32 @@
   "nags.check-disclosures.description": {
     "defaultMessage": "{type} に適用されるコンテンツの開示情報を入力して、ユーザーが重要な情報を認識していることを確認してください。"
   },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "レビューの公開"
+  },
+  "nags.description-ends-with-header.description": {
+    "defaultMessage": "プロジェクトの説明文は、見出しだけで、その後に本文が何も書かれていないような構成にしてはなりません。"
+  },
+  "nags.description-ends-with-header.title": {
+    "defaultMessage": "終了ヘッダーを削除"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "プロジェクトの説明が簡潔すぎます。プロジェクトの内容、目的、魅力が明確に伝わるよう、詳細を追加してください。"
+  },
   "nags.description-too-short.title": {
     "defaultMessage": "説明を展開する"
+  },
+  "nags.disclosures-special-formatting.description": {
+    "defaultMessage": "コンテンツ開示ではHTMLを使用できません。インラインMarkdownとプレーンテキストのみ使用できます。"
+  },
+  "nags.disclosures-special-formatting.title": {
+    "defaultMessage": "開示内容の書式を修正"
   },
   "nags.edit-description.title": {
     "defaultMessage": "説明を編集する"
   },
-  "nags.edit-license.title": {
-    "defaultMessage": "ライセンスを編集する"
+  "nags.edit-gallery.title": {
+    "defaultMessage": "開示設定を開く"
   },
   "nags.edit-summary.title": {
     "defaultMessage": "概要を編集する"
@@ -53,26 +86,68 @@
   "nags.edit-tags.title": {
     "defaultMessage": "タグを編集する"
   },
+  "nags.edit-title.title": {
+    "defaultMessage": "名前を変更"
+  },
   "nags.feature-gallery-image.description": {
     "defaultMessage": "あなたのプロジェクトの第一印象はギャラリーに含まれる画像に大きく左右されます。"
   },
   "nags.feature-gallery-image.title": {
     "defaultMessage": "ギャラリーに画像を追加する"
   },
+  "nags.gallery-text-non-standard.description": {
+    "defaultMessage": "「Fancy text」や「Zalgo」などの特殊な文字は、ギャラリー画像のタイトルや説明では使用できません。"
+  },
+  "nags.gallery-text-profanity.description": {
+    "defaultMessage": "ギャラリー画像のタイトルや説明に、過度に下品な表現を含めることはできません。検出された表現:「{value}」"
+  },
+  "nags.gallery-text-slur.description": {
+    "defaultMessage": "ギャラリー画像のタイトルや説明に、侮辱的または差別的な表現を含めることはできません。検出された表現:「{value}」"
+  },
   "nags.gallery.title": {
     "defaultMessage": "ギャラリーのページを閲覧する"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "選択された{type}のライセンスでは、ソースコードの公開が義務付けられています。ソースコードへのリンクを追加するか、ソースファイルを追加するか、別のライセンスを選択してください。"
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "ソースコードのリンクの追加"
   },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "ライセンスのURLが無効です。"
+  "nags.invalid-gallery-text.title": {
+    "defaultMessage": "ギャラリー画像のテキストを修正"
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "ライセンスのURLの形式が間違っています。ライセンスの本文にアクセスできる有効なURLを追加してください。"
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "有効なライセンスのリンクを追加する"
+  },
+  "nags.invalid-project-description.title": {
+    "defaultMessage": "説明文を修正してください"
+  },
+  "nags.invalid-project-name.title": {
+    "defaultMessage": "プロジェクト名を修正してください"
+  },
+  "nags.invalid-project-summary.title": {
+    "defaultMessage": "プロジェクト概要を修正してください"
+  },
+  "nags.license-url.not-in-allowlist.description": {
+    "defaultMessage": "ライセンスURLが有効なライセンスへのリンクとして認識されていません。ライセンス本文へ直接リンクしていることを確認してください。"
+  },
+  "nags.license-url.not-in-allowlist.title": {
+    "defaultMessage": "ライセンスのリンクを確認してください"
+  },
+  "nags.link-validation.discord-invite": {
+    "defaultMessage": "Discordの招待リンクが無効、期限切れ、またはサーバーへの招待リンクではありません。有効なサーバー招待リンクに置き換えてください。"
+  },
+  "nags.link-validation.discord-invite.title": {
+    "defaultMessage": "無効なDiscord招待リンクを置き換えてください"
+  },
+  "nags.link-validation.download": {
+    "defaultMessage": "ダウンロードを開始するリンクは使用できません。説明から該当するリンクを削除してください。"
+  },
+  "nags.link-validation.download.title": {
+    "defaultMessage": "ダウンロードリンクを削除してください"
   },
   "nags.long-headers.description": {
     "defaultMessage": "説明文にある{count, plural, other {#個のヘッダー}}{count, plural, other{}}はあまりに長すぎます。ヘッダーは簡潔で、セクションの見出しとして機能すべきであり、完全な文として使用すべきではありません。"
@@ -91,9 +166,6 @@
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "画像の代替テキストを追加"
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Discordの招待リンクを移動する"
   },
   "nags.moderation.title": {
     "defaultMessage": "モデレーションスレッドを表示する"

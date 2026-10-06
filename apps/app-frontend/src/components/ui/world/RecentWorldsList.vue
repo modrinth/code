@@ -178,7 +178,7 @@ type WorldJumpBackInItem = BaseJumpBackInItem & {
 
 type JumpBackInItem = InstanceJumpBackInItem | WorldJumpBackInItem
 
-const showWorlds = computed(() => appSettings.getFeatureFlag('worlds_in_home'))
+const showWorlds = computed(() => appSettings.showJumpIn)
 
 const recentWorldsQuery = useQuery({
 	...recentWorldsQueryOptions(MAX_JUMP_BACK_IN),

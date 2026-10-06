@@ -178,7 +178,7 @@ pub async fn get_loader_version_from_profile(
     if let Some(loaders) =
         loader_versions_for_game_version(&versions, game_version)
     {
-        let loader_version =
+        let resolved =
             loaders
                 .iter()
                 .find(|x| filter(x))
@@ -188,10 +188,71 @@ pub async fn get_loader_version_from_profile(
                     None
                 });
 
-        Ok(loader_version.cloned())
-    } else {
-        Ok(None)
+        if let Some(resolved) = resolved {
+            return Ok(Some(resolved.clone()));
+        }
     }
+
+    if concrete_loader_version_id(version).is_none() {
+        return Ok(None);
+    }
+
+    let state = State::get().await?;
+    Ok(installed_loader_version(
+        &state.directories.versions_dir(),
+        game_version,
+        version,
+    ))
+}
+
+fn installed_loader_version(
+    versions_dir: &Path,
+    game_version: &str,
+    loader_version: &str,
+) -> Option<LoaderVersion> {
+    let loader_version = concrete_loader_version_id(loader_version)?;
+    let path = installed_loader_metadata_path(
+        versions_dir,
+        game_version,
+        loader_version,
+    );
+    if !path.is_file() {
+        return None;
+    }
+
+    tracing::info!(
+        game_version,
+        loader_version,
+        "Using an installed loader version that is no longer listed by the meta server"
+    );
+
+    Some(LoaderVersion {
+        id: loader_version.to_string(),
+        url: String::new(),
+        stable: false,
+    })
+}
+
+pub(super) fn is_locally_installed_loader(loader: &LoaderVersion) -> bool {
+    loader.url.is_empty()
+}
+
+fn concrete_loader_version_id(loader_version: &str) -> Option<&str> {
+    match loader_version {
+        "" | "latest" | "stable" => None,
+        id => Some(id),
+    }
+}
+
+fn installed_loader_metadata_path(
+    versions_dir: &Path,
+    game_version: &str,
+    loader_version: &str,
+) -> PathBuf {
+    let version_id = format!("{game_version}-{loader_version}");
+    versions_dir
+        .join(&version_id)
+        .join(format!("{version_id}.json"))
 }
 
 fn loader_versions_for_game_version<'a>(
@@ -511,7 +572,7 @@ async fn install_minecraft_inner(
             )
             .await?;
     }
-	Box::pin(download::download_minecraft(
+	download::download_minecraft(
 		&state,
 		&version_info,
 		loading_bar.as_ref(),
@@ -520,7 +581,7 @@ async fn install_minecraft_inner(
 		minecraft_updated,
 		reporter.clone(),
 		phase_details.clone(),
-	))
+	)
 	.await?;
 
     let client_path = state
@@ -979,7 +1040,15 @@ pub async fn launch_minecraft(
     )? {
         tracing::info!(instance_id = %instance.id, path = %path.display(), "Restoring missing Minecraft runtime files before launch");
         drop(runtime_lease);
-        install_minecraft_with_reporter(context, false, None).await?;
+        let job = crate::install::install_existing_instance(
+            instance.id.clone(),
+            false,
+        )
+        .await?;
+        let job_id = uuid::Uuid::parse_str(&job.job_id).map_err(|error| {
+            crate::ErrorKind::LauncherError(error.to_string())
+        })?;
+        crate::install::runner::wait_for_job(job_id).await?;
         runtime_lease = state.content_store.runtime_cache_lock.read().await;
     }
     let _runtime_lease = runtime_lease;
@@ -1135,10 +1204,28 @@ pub async fn launch_minecraft(
         .await?;
     let _instance_content_lock =
         state.lock_instance_content(&instance.id).await;
+    let current =
+		crate::state::instances::adapters::sqlite::instance_rows::get_instance_by_id(
+			&instance.id, &state.pool,
+		)
+		.await?
+		.ok_or_else(|| crate::state::content_store::input("Unknown instance"))?;
+    if current.install_stage != InstanceInstallStage::Installed {
+        return Err(crate::ErrorKind::LauncherError(
+			"Instance is not ready to launch; finish or recover its installation first".to_string(),
+		)
+		.into());
+    }
+    crate::install::store::ensure_no_pending_recovery(
+        &instance.id,
+        None,
+        &state,
+    )
+    .await?;
     let _store_lock = state.content_store.files_lock.lock().await;
     let _store_lease = state.content_store.lease().await;
     state.content_store.recover(Some(&instance.id)).await?;
-    state.content_store.validate_instance(instance).await?;
+    // state.content_store.validate_instance(instance).await?;
     if crate::state::instance_has_running_process(&instance.id, &state).await? {
         return Err(crate::ErrorKind::LauncherError(format!(
             "Instance {} is already running",

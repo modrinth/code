@@ -4,7 +4,9 @@ use crate::models::users::UserStatus;
 use actix_ws::Session;
 use ariadne::ids::UserId;
 use dashmap::{DashMap, DashSet};
+use prometheus::{IntGauge, Registry};
 use std::sync::atomic::AtomicU32;
+use std::time::Duration;
 use uuid::Uuid;
 
 pub type SocketId = u32;
@@ -33,6 +35,27 @@ impl ActiveSockets {
             .get(&user)
             .and_then(|x| x.iter().next().and_then(|x| self.sockets.get(&*x)))
             .map(|x| x.status.clone())
+    }
+
+    pub fn register_and_set_metrics(
+        self: &std::sync::Arc<Self>,
+        registry: &Registry,
+    ) -> Result<(), prometheus::Error> {
+        let active_sockets = IntGauge::new(
+            "labrinth_active_sockets",
+            "Number of currently connected launcher websockets",
+        )?;
+        registry.register(Box::new(active_sockets.clone()))?;
+
+        let sockets = self.clone();
+        tokio::spawn(async move {
+            loop {
+                active_sockets.set(sockets.sockets.len() as i64);
+                tokio::time::sleep(Duration::from_secs(5)).await;
+            }
+        });
+
+        Ok(())
     }
 }
 

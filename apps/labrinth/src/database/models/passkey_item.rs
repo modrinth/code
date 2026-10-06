@@ -1,7 +1,7 @@
 use super::ids::*;
 use crate::database::PgTransaction;
-use crate::database::models::DatabaseError;
 use chrono::{DateTime, Utc};
+use eyre::{Result, WrapErr};
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 use sqlx::types::Json;
@@ -22,7 +22,7 @@ impl DBPasskey {
     pub async fn insert(
         &self,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<()> {
         sqlx::query!(
             "
             INSERT INTO user_passkeys (
@@ -41,7 +41,8 @@ impl DBPasskey {
             self.last_used,
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("inserting passkey")?;
 
         Ok(())
     }
@@ -49,7 +50,7 @@ impl DBPasskey {
     pub async fn get_by_credential_id<'a, E>(
         credential_id: &[u8],
         exec: E,
-    ) -> Result<Option<DBPasskey>, DatabaseError>
+    ) -> Result<Option<DBPasskey>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -64,7 +65,8 @@ impl DBPasskey {
             credential_id,
         )
         .fetch_optional(exec)
-        .await?
+        .await
+        .wrap_err("fetching passkey by credential id")?
         .map(|x| DBPasskey {
             id: DBPasskeyId(x.id),
             user_id: DBUserId(x.user_id),
@@ -81,7 +83,7 @@ impl DBPasskey {
     pub async fn get_for_user<'a, E>(
         user_id: DBUserId,
         exec: E,
-    ) -> Result<Vec<DBPasskey>, DatabaseError>
+    ) -> Result<Vec<DBPasskey>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -107,7 +109,8 @@ impl DBPasskey {
             last_used: x.last_used,
         })
         .try_collect::<Vec<DBPasskey>>()
-        .await?;
+        .await
+        .wrap_err("fetching passkeys for user")?;
 
         Ok(passkeys)
     }
@@ -117,7 +120,7 @@ impl DBPasskey {
         user_id: DBUserId,
         name: &str,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<bool, DatabaseError> {
+    ) -> Result<bool> {
         let result = sqlx::query!(
             "
             UPDATE user_passkeys SET name = $1
@@ -128,7 +131,8 @@ impl DBPasskey {
             user_id as DBUserId,
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("renaming passkey")?;
 
         Ok(result.rows_affected() > 0)
     }
@@ -137,7 +141,7 @@ impl DBPasskey {
         id: DBPasskeyId,
         passkey: Passkey,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<bool, DatabaseError> {
+    ) -> Result<bool> {
         let result = sqlx::query!(
             "
             UPDATE user_passkeys
@@ -148,7 +152,8 @@ impl DBPasskey {
             id as DBPasskeyId,
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("updating passkey after authentication")?;
 
         Ok(result.rows_affected() > 0)
     }
@@ -156,7 +161,7 @@ impl DBPasskey {
     pub async fn remove(
         id: DBPasskeyId,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<bool, DatabaseError> {
+    ) -> Result<bool> {
         let result = sqlx::query!(
             "
             DELETE FROM user_passkeys
@@ -165,7 +170,8 @@ impl DBPasskey {
             id as DBPasskeyId,
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("removing passkey")?;
 
         Ok(result.rows_affected() > 0)
     }
@@ -174,7 +180,7 @@ impl DBPasskey {
         id: DBPasskeyId,
         user_id: DBUserId,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<bool, DatabaseError> {
+    ) -> Result<bool> {
         let result = sqlx::query!(
             "
             DELETE FROM user_passkeys
@@ -184,7 +190,8 @@ impl DBPasskey {
             user_id as DBUserId,
         )
         .execute(&mut *transaction)
-        .await?;
+        .await
+        .wrap_err("removing passkey for user")?;
 
         Ok(result.rows_affected() > 0)
     }

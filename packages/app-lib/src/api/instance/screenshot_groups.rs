@@ -64,7 +64,7 @@ pub async fn create_screenshot_group(
     let name = validate_group_name(&name)?;
     let state = State::get().await?;
     let id = Uuid::new_v4().to_string();
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
 
     sqlx::query!(
         "UPDATE screenshot_groups SET display_order = display_order + 1",
@@ -156,7 +156,7 @@ pub async fn set_screenshot_group_memberships(
     }
 
     let state = State::get().await?;
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
     let group_ids = updates
         .iter()
         .filter_map(|update| update.group_id.as_deref())
@@ -199,7 +199,7 @@ pub async fn import_screenshot_groups(
     }
 
     let state = State::get().await?;
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
     let base_order = sqlx::query_scalar!(
         "SELECT COALESCE(MAX(display_order) + 1, 0) AS 'display_order!: i64' FROM screenshot_groups",
     )

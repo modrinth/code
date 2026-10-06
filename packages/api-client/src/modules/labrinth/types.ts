@@ -1145,7 +1145,6 @@ export namespace Labrinth {
 				| 'description-too-short'
 				| 'long-headers'
 				| 'missing-alt-text'
-				| 'project-description-banned-link'
 				| 'project-description-matches-summary'
 				| 'project-description-non-english'
 				| 'project-description-non-standard-text'
@@ -1153,15 +1152,11 @@ export namespace Labrinth {
 				| 'project-description-slur'
 				| 'project-description-spam'
 				| 'add-custom-license-details'
-				| 'invalid-license-url'
 				| 'select-license'
 				| 'add-links'
 				| 'add-links-server'
-				| 'banned-link-usage'
+				| 'link-validation'
 				| 'gpl-license-source-required'
-				| 'identical-links'
-				| 'misused-discord-link'
-				| 'verify-external-links'
 				| 'review-permissions'
 				| 'add-java-address'
 				| 'all-languages'
@@ -1769,6 +1764,12 @@ export namespace Labrinth {
 				user_rating: number
 				version: number
 			}
+
+			export type UserLock = {
+				locked_by: string
+				reason: string
+				created: string
+			}
 		}
 
 		export namespace v2 {
@@ -1811,6 +1812,7 @@ export namespace Labrinth {
 
 			export type BehaviorPreferences = {
 				minimize_app: boolean
+				refocus_on_game_close: boolean
 				hide_right_sidebar: boolean
 				show_jump_in: boolean
 				compact_instance_cards: boolean
@@ -1899,6 +1901,7 @@ export namespace Labrinth {
 				stripe_customer_id?: string
 				allow_friend_requests?: boolean
 				moderation_notes?: Common.ModerationNote | null
+				lock?: Common.UserLock
 				github_id?: number
 				discord_id?: string
 				steam_id?: string
@@ -1972,6 +1975,11 @@ export namespace Labrinth {
 			}
 
 			export interface DonationPlatform {
+				short: string
+				name: string
+			}
+
+			export interface License {
 				short: string
 				name: string
 			}
@@ -2540,6 +2548,7 @@ export namespace Labrinth {
 			export type GetRuleAffectedDetailsRequest = {
 				limit?: number
 				page?: number
+				processing_only?: boolean
 			}
 
 			export type GetRuleAffectedDetailsResponse = {

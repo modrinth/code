@@ -105,7 +105,7 @@
     "message": "Налаштування"
   },
   "analytics.chart.controls.dialog-aria": {
-    "message": "Налаштування показу графіку"
+    "message": "Налаштування графіку аналітики"
   },
   "analytics.chart.controls.display": {
     "message": "Перегляд"
@@ -129,7 +129,7 @@
     "message": "Співвідношення"
   },
   "analytics.chart.empty.select-table-items": {
-    "message": "Виберіть елементи з таблиці знизу щоб відобразити ваші дані."
+    "message": "Виберіть елементи з таблиці знизу, щоб відобразити ваші дані."
   },
   "analytics.chart.events.count-aria": {
     "message": "{count, plural, one {# подія аналітики} few {# події аналітики} other {# подій аналітики}}"
@@ -414,7 +414,7 @@
     "message": "Завантаження"
   },
   "analytics.stat.monetization-banner.body": {
-    "message": "Для монетизації зараховуються лише перегляди та завантаження, здійснені через Modrinth, щоб уникнути фальшувань. Завантаження через застосунок Modrinth зараховуються, лише якщо користувач зареєстрований. Оскільки всі проєкти мають схоже відношення монетизованих завантажень, ваш прибуток не зміниться суттєво, якщо враховувати всі завантаження."
+    "message": "Для монетизації зараховуються лише перегляди та завантаження, здійснені через Modrinth, щоб уникнути фальшувань. Завантаження через Modrinth App зараховуються, лише якщо користувач зареєстрований. Оскільки всі проєкти мають схоже відношення монетизованих завантажень, ваш прибуток не зміниться суттєво, якщо враховувати всі завантаження."
   },
   "analytics.stat.monetization-banner.learn-more": {
     "message": "Дізнатися більше"
@@ -1683,7 +1683,7 @@
     "message": "Мережа"
   },
   "dashboard.creator-withdraw-modal.nearing-threshold": {
-    "message": "Ви наближаєтесь до виведення коштів. Ви можете зняти <b>{amountRemaining}</b> зараз, але для отримання більшої суми потрібна податкова форма."
+    "message": "Ви майже вичерпали ліміт на виведення. Ви ще можете вивести <b>{amountRemaining}</b>, але для більшої суми потрібна податкова форма."
   },
   "dashboard.creator-withdraw-modal.paypal-details.account": {
     "message": "Рахунок"
@@ -1725,7 +1725,7 @@
     "message": "Податкова форма"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body": {
-    "message": "Щоб зняти весь <b>{available}</b> доступний баланс, заповніть форму нижче. Це необхідно зробити лише один раз для податкової звітности."
+    "message": "Щоб вивести весь <b>{available}</b> доступний баланс, заповніть форму нижче. Це необхідно зробити лише один раз для податкової звітности."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
     "message": "Ви повинні заповнити форму W-9 або W-8 для податкової звітности Modrinth, щоб ми дотримувалися податкових норм."
@@ -2259,7 +2259,7 @@
     "message": "Перевірте, чи працює Modrinth на нашій <status-link>сторінці статусу</status-link>."
   },
   "error.generic.default.list_item.2": {
-    "message": "Якщо таке продовжує відбуватись, дайте знати команді Modrinth, приєднавшись до нашого <discord-link>сервера в Discord</discord-link>."
+    "message": "Якщо таке продовжує відбуватися, дайте знати команді Modrinth, приєднавшися до нашого <discord-link>Discord-сервера</discord-link>."
   },
   "error.generic.default.list_title": {
     "message": "Спробуйте знову за кілька хвилин."
@@ -2976,13 +2976,16 @@
     "message": "Не вдалося змінити обліковий запис. Спробуйте ще раз."
   },
   "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "Покращитись до Modrinth+"
+    "message": "Покращитися до Modrinth+"
   },
   "layout.publish.email-verification-required.description": {
     "message": "Підтвердьте свою електронну пошту, перш ніж публікувати на Modrinth."
   },
   "layout.publish.email-verification-required.title": {
     "message": "Необхідно підтвердити електронну пошту"
+  },
+  "messages.noResults": {
+    "message": "Не знайдено результатів за вашим запитом!"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "Автоматично встановлювати все, у що вони грають"
@@ -3708,7 +3711,7 @@
     "message": "Необхідно переглянути метадані середовища"
   },
   "project.environment.migration.learn-more": {
-    "message": "Дізнатись більше про цю зміну"
+    "message": "Дізнатися більше про цю зміну"
   },
   "project.environment.migration.message": {
     "message": "Нещодавно ми оновили систему середовищ у Modrinth і вам тепер доступні нові налаштування. Відвідайте налаштування проєкту і підтвердьте чи метадані коректні."
@@ -3771,7 +3774,7 @@
     "message": "Ваш проєкт у черзі — його розгляне команда модераторів Modrinth."
   },
   "project.moderation.admonition.under-review.body.2": {
-    "message": "Ваш проєкт буде просканувати, а потім переглянуто модераторами, щоб переконатися, що він відповідає <rules-link>Правилам умісту</rules-link> та <terms-link>Умовам використання</terms-link>."
+    "message": "Ваш проєкт буде проскановано, а потім переглянуто модераторами, щоб переконатися, що він відповідає <rules-link>Правилам умісту</rules-link> та <terms-link>Умовам використання</terms-link>."
   },
   "project.moderation.admonition.under-review.body.3": {
     "message": "Ви й надалі можете змінювати свій проєкт — це не вплине на ваше місце в черзі."
@@ -3880,6 +3883,18 @@
   },
   "project.settings.delete-project.title": {
     "message": "Видалити проєкт"
+  },
+  "project.settings.description.intro": {
+    "message": "Тут можна вказати розширений опис для проєкту. Опис повинний чітко й чесно описати мету й функцію проєкту. Перегляньте розділ 2.1. <rules>правил щодо вмісту</rules>, щоб дізнатися всі вимоги."
+  },
+  "project.settings.description.title": {
+    "message": "Опис"
+  },
+  "project.settings.description.updated": {
+    "message": "Опис оновлено"
+  },
+  "project.settings.description.updated-text": {
+    "message": "Ваш опис успішно оновлено."
   },
   "project.settings.disclosures.advertising.description.1": {
     "message": "Необхідно ввімкнути, якщо цей проєкт містить рекламу, спонсорства чи просування інших робіт."
@@ -4112,11 +4127,158 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.links.donation.duplicate-type": {
-    "message": "Ви вже маєте ще одне посилання {platform}."
+  "project.settings.license.all-rights": {
+    "message": "Усі права захищено/Без ліцензії"
   },
-  "project.settings.links.donation.no-type": {
-    "message": "Будь ласка, оберіть платформу для цього посилання для пожертви."
+  "project.settings.license.allow-later": {
+    "message": "Дозволити пізніші версії"
+  },
+  "project.settings.license.custom": {
+    "message": "Власна"
+  },
+  "project.settings.license.custom-name-required": {
+    "message": "Уведіть назву власної ліцензії."
+  },
+  "project.settings.license.custom-url-description": {
+    "message": "Розташування повного тексту ліцензії."
+  },
+  "project.settings.license.intro": {
+    "message": "Важливо вказати правильну ліцензію для: {type}. Ви можете вибрати її з нашого списку або вказати власну ліцензію. Також можна вказати URL для вибраної ліцензії, інакше показуватиметься текст ліцензії. Перегляньте наш <guide>посібник із ліцензування</guide>, щоб дізнатися більше."
+  },
+  "project.settings.license.later": {
+    "message": "Пізніші версії"
+  },
+  "project.settings.license.later-description": {
+    "message": "Вибрана вами ліцензія містить положення «або пізнішої версії». Якщо встановити цей прапорець, користувачі зможуть використовувати ваш проєкт відповідно до умов пізніших версій ліцензії.\n"
+  },
+  "project.settings.license.missing-url": {
+    "message": "Уведіть URL або повний текст для власної ліцензії."
+  },
+  "project.settings.license.name": {
+    "message": "Назва ліцензії"
+  },
+  "project.settings.license.name-description": {
+    "message": "Повна назва власної ліцензії."
+  },
+  "project.settings.license.name-placeholder": {
+    "message": "Назва ліцензії"
+  },
+  "project.settings.license.optional-label": {
+    "message": "необов’язково"
+  },
+  "project.settings.license.select": {
+    "message": "Ліцензія"
+  },
+  "project.settings.license.select-placeholder": {
+    "message": "Шукати ліцензії…"
+  },
+  "project.settings.license.title": {
+    "message": "Ліцензія"
+  },
+  "project.settings.license.updated": {
+    "message": "Ліцензію оновлено"
+  },
+  "project.settings.license.updated-text": {
+    "message": "Вашу ліцензію оновлено."
+  },
+  "project.settings.license.url": {
+    "message": "URL ліцензії"
+  },
+  "project.settings.license.url-description": {
+    "message": "Розташування повного тексту ліцензії. Якщо ви не вкажете посилання, показуватиметься текст ліцензії."
+  },
+  "project.settings.license.url-placeholder": {
+    "message": "URL ліцензії"
+  },
+  "project.settings.links.add-link": {
+    "message": "Додати посилання"
+  },
+  "project.settings.links.discord": {
+    "message": "Запрошення Discord"
+  },
+  "project.settings.links.discord-description": {
+    "message": "Посилання запрошення до сервера Discord."
+  },
+  "project.settings.links.donation-link": {
+    "message": "Посилання"
+  },
+  "project.settings.links.donation-platform": {
+    "message": "Платформа"
+  },
+  "project.settings.links.donation-url": {
+    "message": "URL"
+  },
+  "project.settings.links.donation-username": {
+    "message": "Ім’я користувача"
+  },
+  "project.settings.links.donation-username-placeholder": {
+    "message": "Уведіть ім'я користувача {platform}"
+  },
+  "project.settings.links.donations": {
+    "message": "Посилання для підтримки"
+  },
+  "project.settings.links.donations-description": {
+    "message": "Додайте посилання для підтримки, щоб користувачі могли підтримувати вас безпосередньо."
+  },
+  "project.settings.links.issues": {
+    "message": "Система відстеження проблем"
+  },
+  "project.settings.links.issues-description": {
+    "message": "Місце, де користувачі можуть повідомити про помилки, проблеми та зауваження щодо проєкту."
+  },
+  "project.settings.links.link-type": {
+    "message": "Тип посилання"
+  },
+  "project.settings.links.remove-donation-link": {
+    "message": "Видалити посилання для підтримки"
+  },
+  "project.settings.links.server-discord": {
+    "message": "Discord"
+  },
+  "project.settings.links.server-updated": {
+    "message": "Ваші посилання сервера оновлено."
+  },
+  "project.settings.links.server-wiki-description": {
+    "message": "Сторінка з інформацією, документацією та допомогою для сервера."
+  },
+  "project.settings.links.site": {
+    "message": "Вебсайт"
+  },
+  "project.settings.links.site-description": {
+    "message": "Офіційний вебсайт сервера."
+  },
+  "project.settings.links.source": {
+    "message": "Вихідний код"
+  },
+  "project.settings.links.source-description": {
+    "message": "Сторінка чи репозиторій з вихідним кодом проєкту."
+  },
+  "project.settings.links.store": {
+    "message": "Крамниця"
+  },
+  "project.settings.links.store-description": {
+    "message": "Посилання на крамницю сервера."
+  },
+  "project.settings.links.title": {
+    "message": "Посилання"
+  },
+  "project.settings.links.updated": {
+    "message": "Ваші посилання оновлено."
+  },
+  "project.settings.links.updated-title": {
+    "message": "Посилання оновлено"
+  },
+  "project.settings.links.url-placeholder": {
+    "message": "Уведіть дійсну URL-адресу"
+  },
+  "project.settings.links.visit-link": {
+    "message": "Відвідати {url}"
+  },
+  "project.settings.links.wiki": {
+    "message": "Сторінка вікі"
+  },
+  "project.settings.links.wiki-description": {
+    "message": "Сторінка, що містить інформацію, документацію та допомогу для проєкту."
   },
   "project.settings.monetization.description": {
     "message": "Проєкти на Modrinth автоматично реєструються в <rewards-program-link>Програмі винагород</rewards-program-link>. Якщо ви не хочете (або не можете з юридичних причин) отримувати дохід від цього проєкту, ви можете вимкнути його тут."
@@ -4440,7 +4602,7 @@
     "message": "Маркування вмісту – це нова функція, яку ми додали нещодавно. Ми надаємо авторам пільговий період для оновлення своїх маркувань, перш ніж ми почнемо приймати скарги на відсутні або неправильні маркування."
   },
   "report.please-report": {
-    "message": "Можна скаржитись на:"
+    "message": "На що скаржитися:"
   },
   "report.question.content-id": {
     "message": "Який ідентифікатор має {item}?"
@@ -5157,7 +5319,7 @@
     "message": "Авторизації"
   },
   "settings.authorizations.official-tooltip": {
-    "message": "Цей застосунок створено офіційним обліковим записом Modrinth."
+    "message": "Цей застосунок створив офіційний обліковий запис Modrinth."
   },
   "settings.authorizations.revoke.action": {
     "message": "Відкликати"

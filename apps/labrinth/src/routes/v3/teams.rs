@@ -63,7 +63,7 @@ pub async fn team_members_get_project_internal(
     let project_data =
         crate::database::models::DBProject::get(&string, &**pool, &redis)
             .await
-            .wrap_api_err("fetching project from database")?;
+            .wrap_internal_err("fetching project from database")?;
 
     if let Some(project) = project_data {
         let current_user = get_user_from_headers(
@@ -1049,7 +1049,7 @@ pub async fn transfer_ownership(
     if let Some(TeamAssociationId::Project(pid)) = team_association_id {
         let result = DBProject::get_id(pid, &**pool, &redis)
             .await
-            .wrap_api_err("fetching project for ownership transfer")?;
+            .wrap_internal_err("fetching project for ownership transfer")?;
         if let Some(project_item) = result
             && project_item.inner.organization_id.is_some()
         {

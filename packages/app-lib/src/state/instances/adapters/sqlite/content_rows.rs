@@ -780,7 +780,7 @@ pub(crate) async fn restore_instance_content_snapshot(
     entries: &[ContentEntry],
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-    let mut tx = pool.begin().await?;
+    let mut tx = pool.begin_with("BEGIN IMMEDIATE").await?;
     sqlx::query(
         "
 		DELETE FROM instance_content_entries

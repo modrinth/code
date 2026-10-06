@@ -12,7 +12,7 @@ interface ProjectProperties extends InstanceProperties {
 
 type AnalyticsEventMap = {
 	Launched: { version: string; dev: boolean }
-	PageView: { path: string; fromPath: string; failed: unknown }
+	PageView: { path: string; fromPath: string; failed: boolean }
 	InstanceCreate: { source: string }
 	InstanceCreateStart: { source: string }
 	InstanceStart: InstanceProperties & { source: string }
@@ -21,7 +21,6 @@ type AnalyticsEventMap = {
 	InstanceRepair: InstanceProperties
 	InstanceSetIcon: Record<string, never>
 	InstanceRemoveIcon: Record<string, never>
-	InstanceUpdateAll: InstanceProperties & { count: number; selected: boolean }
 	InstanceProjectUpdate: InstanceProperties & { id: string; name: string; project_type: string }
 	InstanceProjectDisable: InstanceProperties & {
 		id: string

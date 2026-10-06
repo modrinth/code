@@ -5,6 +5,15 @@
   "action.continue": {
     "message": "ดำเนินการต่อ"
   },
+  "ads-consent.accept": {
+    "message": "ยอมรับทั้งหมด"
+  },
+  "ads-consent.manage": {
+    "message": "จัดการการตั้งค่า"
+  },
+  "ads-consent.reject": {
+    "message": "ปฏิเสธทั้งหมด"
+  },
   "analytics.action.add": {
     "message": "เพิ่ม"
   },

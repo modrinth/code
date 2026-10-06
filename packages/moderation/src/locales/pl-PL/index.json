@@ -53,12 +53,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Wybierz odpowiednie tagi"
   },
-  "nags.banned-link-usage.description": {
-    "defaultMessage": "Link „{url}” nie jest dozwolony jako link zewnętrzny."
-  },
-  "nags.banned-link-usage.title": {
-    "defaultMessage": "Usuń niedozwolone linki"
-  },
   "nags.check-disclosures.description": {
     "defaultMessage": "Upewnij się, że użytkownicy są świadomi wszelkich ważnych szczegółów, wypełniając informacje o treści, które dotyczą Twojego {type}."
   },
@@ -88,9 +82,6 @@
   },
   "nags.edit-gallery.title": {
     "defaultMessage": "Edytuj galerię"
-  },
-  "nags.edit-license.title": {
-    "defaultMessage": "Edytuj licencję"
   },
   "nags.edit-summary.title": {
     "defaultMessage": "Edytuj podsumowanie"
@@ -125,20 +116,8 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Udostępnij kod źródłowy"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Niektóre linki zewnętrzne wyglądają na identyczne. Każdy link powinien być podany tylko raz, z odpowiednim typem linku."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Usuń identyczne linki"
-  },
   "nags.invalid-gallery-text.title": {
     "defaultMessage": "Zmień tytuł lub opis obrazu w galerii"
-  },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "Adres URL licencji jest nieprawidłowy."
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "Adres URL licencji wskazuje na domenę {domain}, która nie jest odpowiednim miejscem na informacje o licencji. Adres URL licencji powinien prowadzić bezpośrednio do jej treści."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "Twój adres URL licencji wydaje się na źle uformowany. Podaj poprawny adres URL do tekstu twojej licencji."
@@ -154,6 +133,81 @@
   },
   "nags.invalid-project-summary.title": {
     "defaultMessage": "Zmień podsumowanie"
+  },
+  "nags.license-url.not-in-allowlist.description": {
+    "defaultMessage": "Adres URL licencji nie jest rozpoznanym linkiem do licencji. Upewnij się, że prowadzi bezpośrednio do tekstu licencji."
+  },
+  "nags.license-url.not-in-allowlist.title": {
+    "defaultMessage": "Sprawdź link do licencji"
+  },
+  "nags.link-validation.discord-invite": {
+    "defaultMessage": "Twoje zaproszenie do Discorda jest nieprawidłowe, wygasło lub nie zaprasza użytkowników na serwer. Zastąp je aktywnym zaproszeniem do serwera."
+  },
+  "nags.link-validation.discord-invite.title": {
+    "defaultMessage": "Wymień nieprawidłowe zaproszenia do Discorda"
+  },
+  "nags.link-validation.download": {
+    "defaultMessage": "Linki, które rozpoczynają pobieranie, są niedozwolone. Usuń wszystkie tego rodzaju linki z opisu."
+  },
+  "nags.link-validation.download.title": {
+    "defaultMessage": "Usuń linki do pobierania"
+  },
+  "nags.link-validation.duplicate": {
+    "defaultMessage": "Twój link {linkField, select, issues {do śledzenia problemów} source {do kodu źródłowego} wiki {do strony wiki} discord {do Discorda} site {do strony internetowej} store {do sklepu} license {do licencji} description {do opisu} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub} kofi {Ko-fi} other {do dotacji}} jest także używany jako link {otherLinkField, select, issues {do śledzenia problemów} source {do kodu źródłowego} wiki {do strony wiki} discord {do Discorda} site {do strony internetowej} store {do sklepu} license {do licencji} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub} kofi {Ko-fi} other {w innym polu}}. Każdy link powinien pojawić się tylko raz."
+  },
+  "nags.link-validation.duplicate.title": {
+    "defaultMessage": "Usuń identyczne linki"
+  },
+  "nags.link-validation.external-blocklist-match": {
+    "defaultMessage": "Twój link ({linkField}) jest niedozwolony. Proszę usunąć ten link lub zastąpić go czymś odpowiednim dla typu linku ({linkField})."
+  },
+  "nags.link-validation.external-blocklist-match.title": {
+    "defaultMessage": "Zastąp nieprawidłowe linki"
+  },
+  "nags.link-validation.global-blocklist-match": {
+    "defaultMessage": "Twój link {linkField, select, issues {do śledzenia problemów} source {do kodu źródłowego} wiki {do strony wiki} discord {do Discorda} site {do strony internetowej} store {do sklepu} license {do licencji} description {do opisu} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub} kofi {Ko-fi} other {do dotacji}} prowadzi do niedozwolonej domeny. Usuń lub wymień ten link."
+  },
+  "nags.link-validation.global-blocklist-match.title": {
+    "defaultMessage": "Usuń niedozwolone linki"
+  },
+  "nags.link-validation.ip-address": {
+    "defaultMessage": "Twój link {linkField, select, issues {do śledzenia problemów} source {do kodu źródłowego} wiki {do strony wiki} discord {do Discorda} site {do strony internetowej} store {do sklepu} license {do licencji} description {do opisu} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub} kofi {Ko-fi} other {do dotacji}} jest adresem IP. Podaj link z nazwaną domeną."
+  },
+  "nags.link-validation.ip-address.title": {
+    "defaultMessage": "Usuń link do adresu IP"
+  },
+  "nags.link-validation.malformed": {
+    "defaultMessage": "Twój link {linkField, select, issues {do śledzenia problemów} source {do kodu źródłowego} wiki {do strony wiki} discord {do Discorda} site {do strony internetowej} store {do sklepu} license {do licencji} description {do opisu} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub} kofi {Ko-fi} other {do dotacji}} jest nieprawidłowy. Podaj pełny adres URL HTTPS."
+  },
+  "nags.link-validation.malformed.title": {
+    "defaultMessage": "Napraw nieprawidłowe linki"
+  },
+  "nags.link-validation.not-in-allowlist": {
+    "defaultMessage": "Twój link {linkField, select, issues {do śledzenia problemów} source {do kodu źródłowego} wiki {do strony wiki} discord {do Discorda} site {do strony internetowej} store {do sklepu} license {do licencji} description {do opisu} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub} kofi {Ko-fi} other {do dotacji}} może nie być odpowiedni do tego rodzaju treści. Upewnij się, że jest to właściwy link."
+  },
+  "nags.link-validation.not-in-allowlist.title": {
+    "defaultMessage": "Sprawdź, czy link jest poprawny"
+  },
+  "nags.link-validation.source-repository": {
+    "defaultMessage": "Twój link do kodu źródłowego musi prowadzić do repozytorium na obsługiwanej platformie lub do własnej instancji Gitea/Forgejo."
+  },
+  "nags.link-validation.source-repository.title": {
+    "defaultMessage": "Podaj link do repozytorium źródłowego"
+  },
+  "nags.link-validation.title": {
+    "defaultMessage": "Sprawdź ten link"
+  },
+  "nags.link-validation.unverifiable": {
+    "defaultMessage": "Nie udało się zweryfikować Twojego linku {linkField, select, issues {do śledzenia problemów} source {do kodu źródłowego} wiki {do strony wiki} discord {do Discorda} site {do strony internetowej} store {do sklepu} license {do licencji} description {do opisu} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub} kofi {Ko-fi} other {do dotacji}}. Sprawdź, czy jest dostępny."
+  },
+  "nags.link-validation.unverifiable.title": {
+    "defaultMessage": "Sprawdź dostępność linku"
+  },
+  "nags.link-validation.wrong-field": {
+    "defaultMessage": "Twój link {linkField, select, issues {do śledzenia problemów} source {do kodu źródłowego} wiki {do strony wiki} discord {do Discorda} site {do strony internetowej} store {do sklepu} license {do licencji} description {do opisu} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub} kofi {Ko-fi} other {do dotacji}} nie jest poprawnym linkiem {linkField, select, issues {do śledzenia problemów} source {do kodu źródłowego} wiki {do strony wiki} discord {do Discorda} site {do strony internetowej} store {do sklepu} license {do licencji} description {do opisu} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub} kofi {Ko-fi} other {do dotacji}}. Usuń go lub zamień go na prawidłowy link."
+  },
+  "nags.link-validation.wrong-field.title": {
+    "defaultMessage": "Napraw nieprawidłowe linki"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# nagłówek} few {# nagłówki} other {# nagłówków}} w twoim opisie {count, plural, one {jest za długi} few {są za długie} other {jest za długich}}. Nagłówki powinny być zwięzłe i pełnić funkcję tytułów sekcji, a nie pełnych zdań."
@@ -173,12 +227,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "Dodaj alternatywny tekst do obrazka"
   },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Zaproszeń na Discorda nie można używać jako linków innego typu. Umieść link do Discorda wyłącznie w polu zaproszenia na Discorda."
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Przenieś zaproszenie Discord"
-  },
   "nags.moderation.title": {
     "defaultMessage": "Odwiedź wątek moderacji"
   },
@@ -194,8 +242,8 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Wybierz poprawną rozdzielczość"
   },
-  "nags.project-description-banned-link.description": {
-    "defaultMessage": "Link „{fullUrl}” nie jest dozwolony w opisach projektów."
+  "nags.project-description-content.title": {
+    "defaultMessage": "Dokonaj przeglądu opisu"
   },
   "nags.project-description-non-english.description": {
     "defaultMessage": "Opis projektu musi być napisany po angielsku lub zawierać angielskie tłumaczenie."
@@ -371,14 +419,11 @@
   "nags.upload-version.title": {
     "defaultMessage": "Prześlij wersję"
   },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Niektóre linki zewnętrzne mogą prowadzić do domen nieodpowiednich dla danego typu linku."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Sprawdź linki zewnętrzne"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Odwiedź ustawienia linków"
+  },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "Opis twojego projektu powinien zawierać specyficzne informacje, a nie powielać elementy podsumowania."
   },
   "project.text-validation.summary-matches-title": {
     "defaultMessage": "Podsumowanie projektu powinno zawierać nowe informacje, bez powtarzania nazwy projektu."

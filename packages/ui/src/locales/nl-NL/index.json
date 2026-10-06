@@ -1238,9 +1238,6 @@
   "external-files.permissions-card.editor.save": {
     "defaultMessage": "Bronvermelding opslaan"
   },
-  "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "Licentie kiezen..."
-  },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "Reden voor toestemming"
   },
@@ -1399,6 +1396,12 @@
   },
   "external-project-license-status.yes": {
     "defaultMessage": "Ja"
+  },
+  "file-button.file-too-large.description": {
+    "defaultMessage": "Bestand {filename} is te groot. De maximale bestand grootte is: {maxSize}."
+  },
+  "file-button.file-too-large.title": {
+    "defaultMessage": "Bestand te groot"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Samenvatting van uitpakken"
@@ -2044,9 +2047,6 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Server teruggezet naar onboarding"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Ondersteuningsmogelijkheden"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Burst tot {cpus} CPU's"
@@ -3614,6 +3614,9 @@
   "project.disclosure.advertising.title": {
     "defaultMessage": "Bevat advertenties"
   },
+  "project.disclosure.ai-functionality.title": {
+    "defaultMessage": "Generatieve AI-functionaliteit"
+  },
   "project.disclosure.ai-generated-content.title": {
     "defaultMessage": "Bevat door AI gegenereerde {types}"
   },
@@ -4366,6 +4369,9 @@
   },
   "search.filter_type.advanced.disclosure.ai_content.usage": {
     "defaultMessage": "AI {usage}"
+  },
+  "search.filter_type.advanced.disclosure.ai_functionality": {
+    "defaultMessage": "Generatieve AI-functionaliteit"
   },
   "search.filter_type.advanced.disclosure.archived": {
     "defaultMessage": "Gearchiveerd"

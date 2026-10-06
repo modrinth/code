@@ -52,6 +52,7 @@ aws-sdk-s3 = { version = "=1.122.0", default-features = false, features = [
 ] }
 base64 = "0.22.1"
 bitflags = "2.9.4"
+blocklist = { version = "1.0.0" }
 bon = "3.9.3"
 bytemuck = "1.24.0"
 bytes = "1.10.1"
@@ -303,6 +304,9 @@ uninlined_format_args = "warn"
 unnested_or_patterns = "warn"
 wildcard_dependencies = "warn"
 
+[workspace.metadata]
+name = "modrinth-rust"
+
 # Pin the upstream Tao 0.36 upgrade until a Tauri release includes the Windows input deadlock fix.
 # https://github.com/tauri-apps/tauri/pull/15307
 [patch.crates-io]
@@ -324,10 +328,15 @@ strip = true  # Remove debug symbols
 lto = true  # Enables link to optimizations
 panic = "abort"  # Strip expensive panic clean-up logic
 
+[profile.test]
+inherits = "dev"
+debug = "line-tables-only"
+
 # Specific profile for labrinth production builds
 [profile.release-labrinth]
 inherits = "release"
 opt-level = 2
+debug = "line-tables-only"  # Minimal debug info
 strip = false  # Keep debug symbols for Sentry
 lto = "thin"  # Enable LTO but keep compile times reasonable
 panic = "unwind"  # Don't exit the whole app on panic in production

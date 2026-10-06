@@ -39,7 +39,10 @@ export function createModrinthClient(
 		labrinthBaseUrl: config.apiBaseUrl,
 		archonBaseUrl: () =>
 			withStagingArchonBaseUrl(config.archonBaseUrl, flags.value.archonApiStaging),
-		sharedInstancesBaseUrl: config.sharedInstancesBaseUrl,
+		sharedInstancesBaseUrl: () =>
+			flags.value.archonApiStaging
+				? 'https://staging-shared-instances.modrinth.com'
+				: config.sharedInstancesBaseUrl,
 		userAgent: () => (import.meta.server ? getFrontendUserAgent(config.commitHash) : undefined),
 		headers: visitorUserAgent ? { [VISITOR_USER_AGENT_HEADER]: visitorUserAgent } : undefined,
 		archonSentryCapture: () => flags.value.archonSentryCapture,

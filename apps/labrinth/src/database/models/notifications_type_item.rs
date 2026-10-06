@@ -1,5 +1,5 @@
-use crate::database::models::DatabaseError;
 use crate::models::v3::notifications::NotificationType;
+use eyre::{Result, WrapErr};
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
@@ -35,15 +35,21 @@ impl NotificationTypeItem {
     pub async fn list<'a, E>(
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<NotificationTypeItem>, DatabaseError>
+    ) -> Result<Vec<NotificationTypeItem>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         {
-            let mut redis = redis.connect().await?;
+            let mut redis = redis
+                .connect()
+                .await
+                .wrap_err("connecting to Redis for notification types")?;
             let key = redis.key().metadata(NOTIFICATION_TYPES_NAMESPACE, "all");
 
-            let cached_types = redis.get_deserialized(&key).await?;
+            let cached_types = redis
+                .get_deserialized(&key)
+                .await
+                .wrap_err("fetching notification types from cache")?;
 
             if let Some(types) = cached_types {
                 return Ok(types);
@@ -55,14 +61,21 @@ impl NotificationTypeItem {
             "SELECT * FROM notifications_types"
         )
         .fetch_all(exec)
-        .await?;
+        .await
+        .wrap_err("fetching notification types")?;
 
         let types = results.into_iter().map(Into::into).collect();
 
-        let mut redis = redis.connect().await?;
+        let mut redis = redis
+            .connect()
+            .await
+            .wrap_err("connecting to Redis to cache notification types")?;
         let key = redis.key().metadata(NOTIFICATION_TYPES_NAMESPACE, "all");
 
-        redis.set_serialized(&key, &types, None).await?;
+        redis
+            .set_serialized(&key, &types, None)
+            .await
+            .wrap_err("caching notification types")?;
 
         Ok(types)
     }

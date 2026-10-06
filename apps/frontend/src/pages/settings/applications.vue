@@ -29,7 +29,7 @@
 				<div v-if="editingId" class="icon-submission">
 					<Avatar size="md" :src="icon" />
 					<FileButton
-						:max-size="262144"
+						:max-size="524288"
 						class="button-like"
 						:prompt="formatMessage(messages.uploadIcon)"
 						accept="image/png,image/jpeg,image/gif,image/webp"

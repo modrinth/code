@@ -1161,18 +1161,18 @@ pub async fn submit_report(
         )));
     }
 
-    sqlx::query_scalar!(
+    sqlx::query!(
         r#"
         DELETE FROM delphi_tech_review_queue
         WHERE project_id = $1
-        RETURNING project_id AS "project_id: DBProjectId"
         "#,
         project_id as DBProjectId,
     )
-    .fetch_optional(&mut txn)
+    .execute(&mut txn)
     .await
-    .wrap_internal_err("failed to remove project from technical review queue")?
-    .wrap_not_found_err("project not found in technical review queue")?;
+    .wrap_internal_err(
+        "failed to remove project from technical review queue",
+    )?;
 
     let record = sqlx::query!(
         r#"

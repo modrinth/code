@@ -310,7 +310,7 @@ async fn migrate_file_copy(
     filesystem::sync_directory(parent).await?;
     let replace_ms = publishing.elapsed().as_millis() as u64;
     let committing = Instant::now();
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
     catalog::set_file_storage(
         &mut tx,
         &file.id,

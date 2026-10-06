@@ -33,7 +33,7 @@
     "message": "Cancelado devido ao aplicativo ter fechado"
   },
   "app.action-bar.install.summary.bad-modpack-file": {
-    "message": "Não foi possível ler o pacote de mods"
+    "message": "Falha ao ler modpack"
   },
   "app.action-bar.install.summary.canceled": {
     "message": "Cancelado"
@@ -51,19 +51,19 @@
     "message": "Não foi possível salvar os arquivos"
   },
   "app.action-bar.install.summary.download-failed": {
-    "message": "O download não foi concluído"
+    "message": "O download não pôde ser concluído"
   },
-  "app.action-bar.install.summary.instance-not-found": {
-    "message": "A instância não foi encontrada"
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Não foi possível preparar a instância"
   },
   "app.action-bar.install.summary.invalid-file-path": {
-    "message": "O caminho do arquivo é inválido"
+    "message": "Caminho de arquivo inválido"
   },
   "app.action-bar.install.summary.invalid-modpack": {
-    "message": "Os dados do pacote de mods é inválido"
+    "message": "Os dados do pacote de mods são inválidos"
   },
   "app.action-bar.install.summary.invalid-modpack-files": {
-    "message": "Os arquivos do pacote de mods possui metadados inválidos"
+    "message": "Os arquivos do pacote de mods possuem metadados inválidos"
   },
   "app.action-bar.install.summary.java-setup-failed": {
     "message": "Configuração Java não foi finalizada"
@@ -135,7 +135,7 @@
     "message": "Aceitar tudo"
   },
   "app.ads-consent.body": {
-    "message": "Anúncios tornam o Modrinth possível e financiam os pagamentos dos criadores. Nossos parceiros talvez armazenem ou acessem os cookies no aplicativo para personalizar anúncios e medir o desempenho."
+    "message": "Anúncios tornam o Modrinth possível e financiam pagamentos para criadores. Nossos parceiros talvez armazenem ou acessem os “cookies” no aplicativo para personalizar anúncios e medir desempenho."
   },
   "app.ads-consent.manage": {
     "message": "Gerenciar preferências"
@@ -147,7 +147,7 @@
     "message": "Sua privacidade e como anúncios apoiam o Modrinth"
   },
   "app.appearance-settings.compact-mode.description": {
-    "message": "Exibir instâncias da biblioteca em um layout de linhas compacto."
+    "message": "Exibir instâncias da biblioteca em uma disposição de linha compacta."
   },
   "app.appearance-settings.compact-mode.title": {
     "message": "Modo compacto"
@@ -159,7 +159,7 @@
     "message": "Biblioteca"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Oculta o nome acima do jogador na página de seleção de skin."
+    "message": "Oculte seu nome de usuário acima da pré-visualização do jogador na página de Seleção de aparência."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Ocultar nametag"
@@ -171,13 +171,13 @@
     "message": "Minimizar aplicativo"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "Mostre por quanto tempo você jogou cada instância."
+    "message": "Mostra por quanto tempo você jogou cada instância."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Exibir tempo de jogo"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Ignora as confirmações para ações de baixo risco como instalações duplicadas, exclusão de conteúdo normal, atualizações em massa, desvinculação e reparos. Os avisos para ações perigosas sempre são mostrados."
+    "message": "Ignorar confirmações para ações de baixo risco como instalações duplicadas, exclusão de conteúdo normal, atualizações em massa, desvinculação e reparos. Avisos para ações perigosas sempre são mostrados."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Ignorar avisos desnecessários"
@@ -192,7 +192,7 @@
     "message": "Exibe um aviso de segurança ao instalar um Pacote Modrinth (.mrpack) que não seja hospedado no Modrinth."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
-    "message": "Alertar-me antes de instalar pacotes de mods desconhecidos"
+    "message": "Alertar-me antes de instalar modpacks desconhecidos"
   },
   "app.auth-servers.unreachable.body": {
     "message": "Os servidores de autenticação do Minecraft talvez estejam indisponíveis no momento. Verifique sua conexão com a internet e tente novamente mais tarde."
@@ -204,7 +204,13 @@
     "message": "Confirmações"
   },
   "app.behavior-settings.content.title": {
-    "message": "Início e conteúdo"
+    "message": "Página Inicial e conteúdo"
+  },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Traga o Modrinth App para o primeiro plano quando o Minecraft for fechado."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Retornar ao aplicativo quando o Minecraft fechar"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Inicialização e navegação"
@@ -255,7 +261,7 @@
     "message": "Ações do projeto"
   },
   "app.browse.project-type.data-packs": {
-    "message": "Pacote de dados"
+    "message": "Pacotes de Dados"
   },
   "app.browse.project-type.modpacks": {
     "message": "Pacotes de mods"
@@ -264,7 +270,7 @@
     "message": "Mods"
   },
   "app.browse.project-type.resource-packs": {
-    "message": "Pacote de recursos"
+    "message": "Pacotes de Recursos"
   },
   "app.browse.project-type.servers": {
     "message": "Servidores"
@@ -273,7 +279,7 @@
     "message": "Sombreadores"
   },
   "app.browse.server-instance-content-warning": {
-    "message": "Adicionar conteúdo pode impedir que você entre neste servidor. Qualquer conteúdo adicionado será removido quando o conteúdo do servidor gerenciado for atualizado."
+    "message": "Adicionar conteúdo pode impedir que você entre neste servidor. Qualquer conteúdo que você adicionar será removido quando o conteúdo do servidor gerenciado for atualizado."
   },
   "app.browse.server.installing": {
     "message": "Instalando"
@@ -291,10 +297,94 @@
     "message": "Sincronizar"
   },
   "app.content.sync-packs-override": {
-    "message": "Desative a substituição de pacote sincronizada nas configurações desta instância primeiro."
+    "message": "Desative a substituição sincronizada de pacote nas configurações desta instância primeiro."
   },
   "app.content.sync-resource-packs-disabled": {
     "message": "Ative a sincronização de pacote de recursos nas configurações do aplicativo primeiro."
+  },
+  "app.download-manager.active": {
+    "message": "Ativo"
+  },
+  "app.download-manager.attention": {
+    "message": "Requer atenção"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "Atualizando {count, plural, one {# item} other {# itens}}"
+  },
+  "app.download-manager.cancel": {
+    "message": "Cancelar instalação"
+  },
+  "app.download-manager.canceling": {
+    "message": "Cancelando instalação…"
+  },
+  "app.download-manager.clear-all": {
+    "message": "Limpar tudo"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Limpar todas as tarefas concluídas"
+  },
+  "app.download-manager.complete": {
+    "message": "Concluído"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Instância duplicada"
+  },
+  "app.download-manager.empty": {
+    "message": "Sem tarefas de instalação"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Velocidade estimada de transferência"
+  },
+  "app.download-manager.eta": {
+    "message": "Tempo restante estimado para esta transferência"
+  },
+  "app.download-manager.hide": {
+    "message": "Ocultar tarefas de instalação"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Instância importada"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "Instalação da instância"
+  },
+  "app.download-manager.modpack": {
+    "message": "Pacote de mods"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Instalação do pacote de mods"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Nova instância"
+  },
+  "app.download-manager.pause": {
+    "message": "Pausar instalação"
+  },
+  "app.download-manager.paused": {
+    "message": "Pausado"
+  },
+  "app.download-manager.remove": {
+    "message": "Remover do histórico"
+  },
+  "app.download-manager.resume": {
+    "message": "Retomar instalação"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Instância compartilhada"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "Atualização de instância compartilhada"
+  },
+  "app.download-manager.show": {
+    "message": "Mostrar tarefas de instalação"
+  },
+  "app.download-manager.tasks": {
+    "message": "Tarefas"
+  },
+  "app.download-manager.title": {
+    "message": "Gerenciador de Transferências"
+  },
+  "app.download-manager.verifying": {
+    "message": "Verificando"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Abrir pasta das cópias de segurança"
@@ -607,15 +697,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Instância"
-  },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "Instalando {current, number}/{total, number} projeto(s)..."
-  },
-  "app.instance.mods.bulk-update.finishing": {
-    "message": "Finalizando atualização..."
-  },
-  "app.instance.mods.bulk-update.resolving-versions": {
-    "message": "Resolvendo versões..."
   },
   "app.instance.mods.content-type-project": {
     "message": "projeto"
@@ -1662,7 +1743,7 @@
     "message": "Configurações adicionadas por mods"
   },
   "app.settings.game-options.category.custom.label": {
-    "message": "Customizar configurações"
+    "message": "Configurações personalizadas"
   },
   "app.settings.game-options.category.language.description": {
     "message": "Idioma do jogo"
@@ -2723,6 +2804,78 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Máximo de escritas simultâneas"
   },
+  "app.settings.resource-management.store.attention": {
+    "message": "Alguns arquivos ainda precisam de atenção"
+  },
+  "app.settings.resource-management.store.cache-limit.description": {
+    "message": "Mantenha esta quantidade de conteúdo não utilizado para instalações futuras. Manter mais pode poupar tempo de download."
+  },
+  "app.settings.resource-management.store.cache-limit.label": {
+    "message": "Manter downloads não usados"
+  },
+  "app.settings.resource-management.store.cache-limit.unit": {
+    "message": "GiB"
+  },
+  "app.settings.resource-management.store.calculating": {
+    "message": "Calculando"
+  },
+  "app.settings.resource-management.store.clear": {
+    "message": "Limpar não utilizados"
+  },
+  "app.settings.resource-management.store.clear.description": {
+    "message": "Excluir conteúdo baixado não utilizado"
+  },
+  "app.settings.resource-management.store.cleared": {
+    "message": "{size} Foram liberados do armazenamento."
+  },
+  "app.settings.resource-management.store.clearing": {
+    "message": "Limpando..."
+  },
+  "app.settings.resource-management.store.description": {
+    "message": "Salve espaço reutilizando instalações, mods e pacotes das suas instâncias."
+  },
+  "app.settings.resource-management.store.empty": {
+    "message": "Instale mods ou pacotes para ver seu uso do armazenamento aqui."
+  },
+  "app.settings.resource-management.store.issues": {
+    "message": "Ver {count, plural, one {# problema} other {# problemas}}"
+  },
+  "app.settings.resource-management.store.nothing-to-clear": {
+    "message": "Nenhum conteúdo não utilizado para limpar."
+  },
+  "app.settings.resource-management.store.repair": {
+    "message": "Verificar e reparar"
+  },
+  "app.settings.resource-management.store.repair.running-description": {
+    "message": "Isso fechará todas as instâncias em execução."
+  },
+  "app.settings.resource-management.store.repair.verify-description": {
+    "message": "Checar por arquivos ausentes ou danificados e repare-os."
+  },
+  "app.settings.resource-management.store.repairing": {
+    "message": "Verificando e reparando..."
+  },
+  "app.settings.resource-management.store.shared.label": {
+    "message": "Compartilhado"
+  },
+  "app.settings.resource-management.store.title": {
+    "message": "Armazenamento de conteúdo"
+  },
+  "app.settings.resource-management.store.total": {
+    "message": "{size} armazenado"
+  },
+  "app.settings.resource-management.store.unique.label": {
+    "message": "Único"
+  },
+  "app.settings.resource-management.store.unused.label": {
+    "message": "Órfão"
+  },
+  "app.settings.resource-management.store.verification-result": {
+    "message": "{checked, plural,  =0 {Nenhum arquivo checado} one {# arquivo checado} other {# arquivos checados}} e {repaired, plural, =0 {nenhum reparo feito} one {# reparo feito} other {# reparos feitos}}."
+  },
+  "app.settings.resource-management.store.verified": {
+    "message": "Verificação concluída"
+  },
   "app.settings.sidebar.label.instances": {
     "message": "Instâncias"
   },
@@ -3095,6 +3248,12 @@
   "app.skins.section.default-skins": {
     "message": "Skins padrões"
   },
+  "app.skins.section.dungeons-hero": {
+    "message": "Herói do Dungeons"
+  },
+  "app.skins.section.dungeons-ii-hero": {
+    "message": "Herói do Dugeons II"
+  },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
@@ -3124,6 +3283,9 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
+  },
+  "app.skins.section.wilderness-bound": {
+    "message": "Wilderness Bound"
   },
   "app.skins.sign-in.button": {
     "message": "Conecte-se à Microsoft"
@@ -3559,6 +3721,9 @@
   },
   "instance.files.adding-files": {
     "message": "Adicionando arquivos ({completed}/{total})"
+  },
+  "instance.files.managed-content-read-only": {
+    "message": "Gerencie o conteúdo instalado através da aba Conteúdo"
   },
   "instance.files.save-as": {
     "message": "Salvar como..."

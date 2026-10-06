@@ -35,6 +35,12 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "عرض التحليلات"
   },
+  "app.appearance-settings.native-decorations.description": {
+    "defaultMessage": "استخدام شريط العنوان وعناصر التحكم في النافذة الخاصة بنظام التشغيل. يتطلب إعادة تشغيل التطبيق."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "defaultMessage": "إطار نافذة النظام"
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "عذر تحميل خادم الإعدادات"
   },
@@ -170,6 +176,9 @@
   "button.continue": {
     "defaultMessage": "استمر"
   },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "نُسخ إلى الحافظة"
+  },
   "button.copy-filename": {
     "defaultMessage": "انسخ اسم الملف"
   },
@@ -196,6 +205,9 @@
   },
   "button.download": {
     "defaultMessage": "تنزيل"
+  },
+  "button.download-files": {
+    "defaultMessage": "تحميل الملفات"
   },
   "button.downloading": {
     "defaultMessage": "جاري التنزيل"
@@ -356,6 +368,15 @@
   "collections.label.private": {
     "defaultMessage": "خاص"
   },
+  "console.actions.collapse": {
+    "defaultMessage": "انهيار"
+  },
+  "console.actions.expand": {
+    "defaultMessage": "توسيع"
+  },
+  "console.actions.share": {
+    "defaultMessage": "مشاركة"
+  },
   "content-type.content.lowercase": {
     "defaultMessage": "المحتوى"
   },
@@ -515,11 +536,20 @@
   "content.diff-modal.modpack-unlinked": {
     "defaultMessage": "إلغاء ربط المودباك"
   },
+  "content.diff-modal.modpack-updated": {
+    "defaultMessage": "تم تحديث حزمة التعديلات"
+  },
+  "content.diff-modal.no-content-changes": {
+    "defaultMessage": "لا تغيرات محتوي"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} تم إزالته"
   },
   "content.diff-modal.removed-disabled-count": {
     "defaultMessage": "تم إزالة {count} (معطل)"
+  },
+  "content.diff-modal.unknown-files-warning": {
+    "defaultMessage": "تحذير ملف غير معلوم"
   },
   "content.diff-modal.unknown-project": {
     "defaultMessage": "غير معروف"
@@ -538,6 +568,9 @@
   },
   "content.inline-backup.world-label": {
     "defaultMessage": "عالم"
+  },
+  "content.managed-card.modpack-content": {
+    "defaultMessage": "محتوي حزمة المودات"
   },
   "content.managed-card.server-suffix": {
     "defaultMessage": "خادم"
@@ -683,11 +716,20 @@
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "الأقدم أولا"
   },
+  "content.page-layout.sort.label": {
+    "defaultMessage": "رتب حسب {mode} "
+  },
   "content.page-layout.update-all": {
     "defaultMessage": "حدّث الكلّ"
   },
   "content.page-layout.upload-files": {
     "defaultMessage": "تحميل الملفّات"
+  },
+  "content.selection-bar.all-already-disabled": {
+    "defaultMessage": "المحتوي المحدد مغلق"
+  },
+  "content.selection-bar.all-already-enabled": {
+    "defaultMessage": "المحتوب المحدد مفعل"
   },
   "creation-flow.button.create-world": {
     "defaultMessage": "إنشاء عالم"
@@ -739,6 +781,9 @@
   },
   "creation-flow.modal.custom-setup.name.label": {
     "defaultMessage": "الإسم"
+  },
+  "creation-flow.modal.final-config.additional-settings.title": {
+    "defaultMessage": "اعدادات اضافية"
   },
   "creation-flow.modal.final-config.difficulty.easy": {
     "defaultMessage": "سهل"
@@ -949,9 +994,6 @@
   },
   "external-files.permissions-card.editor.save": {
     "defaultMessage": "حفظ الإسناد"
-  },
-  "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "اختر ترخيصًا..."
   },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "سبب طلب الإذن"

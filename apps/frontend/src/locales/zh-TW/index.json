@@ -2763,7 +2763,7 @@
     "message": "這是 Modrinth 網站的預覽部署版本。"
   },
   "layout.banner.staging.description": {
-    "message": "預備環境與 Modrinth 的正式資料庫完全獨立。\n它被用於測試與除錯，因此你執行的 Modrinth 後端或前端，可能是比正式實例還要新的開發中版本。"
+    "message": "預備環境與 Modrinth 的正式資料庫完全獨立。它被用於測試與除錯，因此你執行的 Modrinth 後端或前端，可能是比正式實例還要新的開發中版本。"
   },
   "layout.banner.staging.title": {
     "message": "你正在查看 Modrinth 的預備環境"
@@ -2986,6 +2986,9 @@
   },
   "layout.publish.email-verification-required.title": {
     "message": "需要驗證電子郵件地址"
+  },
+  "messages.noResults": {
+    "message": "找不到符合你查詢的結果！"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "自動安裝好友遊玩的所有內容"
@@ -3843,7 +3846,7 @@
     "message": "專案圖示已更新"
   },
   "project.notification.review-save-failed.description": {
-    "message": "你不能儲存未通過驗證的專案變更。"
+    "message": "你無法儲存未通過驗證的專案變更。"
   },
   "project.notification.review-save-failed.title": {
     "message": "無法儲存審查中的專案"
@@ -3883,6 +3886,18 @@
   },
   "project.settings.delete-project.title": {
     "message": "刪除專案"
+  },
+  "project.settings.description.intro": {
+    "message": "你可以在這裡輸入專案的詳細描述。專案描述必須清楚、誠實地說明專案的目的與功能。完整要求請參閱《<rules>內容規範</rules>》第 2.1 節。"
+  },
+  "project.settings.description.title": {
+    "message": "描述"
+  },
+  "project.settings.description.updated": {
+    "message": "描述已更新"
+  },
+  "project.settings.description.updated-text": {
+    "message": "你的描述已更新。"
   },
   "project.settings.disclosures.advertising.description.1": {
     "message": "如果這個專案包含其他作品的廣告、贊助或宣傳，則必須啟用這個選項。"
@@ -4115,11 +4130,158 @@
   "project.settings.general.url.title": {
     "message": "網址"
   },
-  "project.settings.links.donation.duplicate-type": {
-    "message": "你已經有一個 {platform} 連結了。"
+  "project.settings.license.all-rights": {
+    "message": "版權所有／無授權條款"
   },
-  "project.settings.links.donation.no-type": {
-    "message": "請為這個贊助連結選擇平台。"
+  "project.settings.license.allow-later": {
+    "message": "允許較新版本"
+  },
+  "project.settings.license.custom": {
+    "message": "自訂"
+  },
+  "project.settings.license.custom-name-required": {
+    "message": "請輸入自訂授權條款的名稱。"
+  },
+  "project.settings.license.custom-url-description": {
+    "message": "授權條款全文的網址。"
+  },
+  "project.settings.license.intro": {
+    "message": "為你的{type}選擇適當的授權條款非常重要。你可以從我們的清單中選擇，或提供自訂授權條款。你也可以另外提供所選授權條款的自訂網址；若不提供，將直接顯示授權條款文字。如需更多資訊，請參閱我們的《<guide>授權指南</guide>》。"
+  },
+  "project.settings.license.later": {
+    "message": "較新版本"
+  },
+  "project.settings.license.later-description": {
+    "message": "你選擇的授權條款包含「或較新版本」的條款。若勾選此方塊，使用者即可依據授權條款的較新版本使用你的專案。"
+  },
+  "project.settings.license.missing-url": {
+    "message": "請輸入指向自訂授權條款全文的網址。"
+  },
+  "project.settings.license.name": {
+    "message": "授權條款名稱"
+  },
+  "project.settings.license.name-description": {
+    "message": "自訂授權條款的完整名稱。"
+  },
+  "project.settings.license.name-placeholder": {
+    "message": "授權條款名稱"
+  },
+  "project.settings.license.optional-label": {
+    "message": "可選"
+  },
+  "project.settings.license.select": {
+    "message": "授權條款"
+  },
+  "project.settings.license.select-placeholder": {
+    "message": "搜尋授權條款..."
+  },
+  "project.settings.license.title": {
+    "message": "授權條款"
+  },
+  "project.settings.license.updated": {
+    "message": "授權條款已更新"
+  },
+  "project.settings.license.updated-text": {
+    "message": "你的授權條款已更新。"
+  },
+  "project.settings.license.url": {
+    "message": "授權條款網址"
+  },
+  "project.settings.license.url-description": {
+    "message": "授權條款全文的網址。如果不提供連結，則會直接顯示授權條款文字。"
+  },
+  "project.settings.license.url-placeholder": {
+    "message": "授權條款網址"
+  },
+  "project.settings.links.add-link": {
+    "message": "新增連結"
+  },
+  "project.settings.links.discord": {
+    "message": "Discord 邀請"
+  },
+  "project.settings.links.discord-description": {
+    "message": "你的 Discord 伺服器邀請連結。"
+  },
+  "project.settings.links.donation-link": {
+    "message": "連結"
+  },
+  "project.settings.links.donation-platform": {
+    "message": "平臺"
+  },
+  "project.settings.links.donation-url": {
+    "message": "網址"
+  },
+  "project.settings.links.donation-username": {
+    "message": "使用者名稱"
+  },
+  "project.settings.links.donation-username-placeholder": {
+    "message": "輸入你的 {platform} 使用者名稱"
+  },
+  "project.settings.links.donations": {
+    "message": "贊助連結"
+  },
+  "project.settings.links.donations-description": {
+    "message": "新增贊助連結，讓使用者能直接支持你。"
+  },
+  "project.settings.links.issues": {
+    "message": "問題追蹤器"
+  },
+  "project.settings.links.issues-description": {
+    "message": "供使用者回報關於你專案的錯誤、問題與疑慮之處。"
+  },
+  "project.settings.links.link-type": {
+    "message": "連結類型"
+  },
+  "project.settings.links.remove-donation-link": {
+    "message": "移除贊助連結"
+  },
+  "project.settings.links.server-discord": {
+    "message": "Discord"
+  },
+  "project.settings.links.server-updated": {
+    "message": "你的伺服器連結已更新。"
+  },
+  "project.settings.links.server-wiki-description": {
+    "message": "包含伺服器資訊、文件及說明的頁面。"
+  },
+  "project.settings.links.site": {
+    "message": "網站"
+  },
+  "project.settings.links.site-description": {
+    "message": "你的伺服器的官方網站。"
+  },
+  "project.settings.links.source": {
+    "message": "原始碼"
+  },
+  "project.settings.links.source-description": {
+    "message": "包含你專案原始碼的頁面或儲存庫"
+  },
+  "project.settings.links.store": {
+    "message": "商店"
+  },
+  "project.settings.links.store-description": {
+    "message": "你的伺服器商店的連結。"
+  },
+  "project.settings.links.title": {
+    "message": "連結"
+  },
+  "project.settings.links.updated": {
+    "message": "你的連結已更新。"
+  },
+  "project.settings.links.updated-title": {
+    "message": "連結已更新"
+  },
+  "project.settings.links.url-placeholder": {
+    "message": "輸入有效的網址"
+  },
+  "project.settings.links.visit-link": {
+    "message": "前往 {url}"
+  },
+  "project.settings.links.wiki": {
+    "message": "Wiki 頁面"
+  },
+  "project.settings.links.wiki-description": {
+    "message": "包含專案資訊、文件及說明的頁面。"
   },
   "project.settings.monetization.description": {
     "message": "Modrinth 上的專案會自動加入<rewards-program-link>獎勵計畫</rewards-program-link>。如果你不想（或因法律原因無法）從專案獲取收益，可在這裡關閉營利功能。"

@@ -11,11 +11,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { inject, onBeforeUnmount, onMounted } from 'vue'
 
-import {
-	DEFAULT_FEATURE_FLAGS,
-	type FeatureFlag,
-	useAppSettings,
-} from '@/composables/use-app-settings.ts'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import {
 	type AppSettings,
 	appSettingsKeys,
@@ -32,11 +28,6 @@ const { handleError } = injectNotificationManager()
 const { updatePreferences } = injectUserPreferences()
 const settingsModal = inject(appSettingsModalContextKey, null)
 const queryClient = useQueryClient()
-
-const compactInstanceCardsFlag: FeatureFlag = 'compact_instance_cards'
-const skipNonEssentialWarningsFlag: FeatureFlag = 'skip_non_essential_warnings'
-const skipUnknownPackWarningFlag: FeatureFlag = 'skip_unknown_pack_warning'
-const showPlayTimeFlag: FeatureFlag = 'show_instance_play_time'
 
 const messages = defineMessages({
 	syncAcrossDevicesTitle: {
@@ -71,6 +62,14 @@ const messages = defineMessages({
 	minimizeLauncherDescription: {
 		id: 'app.appearance-settings.minimize-launcher.description',
 		defaultMessage: 'Minimize Modrinth App when Minecraft starts.',
+	},
+	refocusOnGameCloseTitle: {
+		id: 'app.behavior-settings.refocus-on-game-close.title',
+		defaultMessage: 'Refocus app when Minecraft closes',
+	},
+	refocusOnGameCloseDescription: {
+		id: 'app.behavior-settings.refocus-on-game-close.description',
+		defaultMessage: 'Bring Modrinth App to the foreground when Minecraft exits.',
 	},
 	defaultLandingPageHome: {
 		id: 'app.appearance-settings.default-landing-page.home',
@@ -135,6 +134,7 @@ const messages = defineMessages({
 type BehaviorSettingsState = {
 	syncBehaviorAcrossDevices: boolean
 	minimizeApp: boolean
+	refocusOnGameClose: boolean
 	hideRightSidebar: boolean
 	compactInstanceCards: boolean
 	showPlayTime: boolean
@@ -150,20 +150,13 @@ function getBehaviorSettingsState(settings: AppSettings): BehaviorSettingsState 
 	return {
 		syncBehaviorAcrossDevices: settings.sync_behavior_across_devices,
 		minimizeApp: settings.hide_on_process_start,
+		refocusOnGameClose: settings.refocus_on_game_close,
+		compactInstanceCards: settings.compact_instance_cards,
+		showPlayTime: settings.show_play_time,
+		warnOnUnknownModpacks: settings.warn_on_unknown_modpacks,
+		skipNonEssentialWarnings: settings.skip_non_essential_warnings,
 		hideRightSidebar: settings.toggle_sidebar,
-		compactInstanceCards:
-			settings.feature_flags[compactInstanceCardsFlag] ??
-			DEFAULT_FEATURE_FLAGS[compactInstanceCardsFlag],
-		showPlayTime:
-			settings.feature_flags[showPlayTimeFlag] ?? DEFAULT_FEATURE_FLAGS[showPlayTimeFlag],
 		hideNametag: settings.hide_nametag_skins_page,
-		warnOnUnknownModpacks: !(
-			settings.feature_flags[skipUnknownPackWarningFlag] ??
-			DEFAULT_FEATURE_FLAGS[skipUnknownPackWarningFlag]
-		),
-		skipNonEssentialWarnings:
-			settings.feature_flags[skipNonEssentialWarningsFlag] ??
-			DEFAULT_FEATURE_FLAGS[skipNonEssentialWarningsFlag],
 	}
 }
 
@@ -175,6 +168,7 @@ const settingsMutation = useMutation({
 			await updatePreferences({
 				behavior: {
 					minimize_app: value.minimizeApp,
+					refocus_on_game_close: value.refocusOnGameClose,
 					hide_right_sidebar: value.hideRightSidebar,
 					compact_instance_cards: value.compactInstanceCards,
 					show_play_time: value.showPlayTime,
@@ -192,24 +186,23 @@ const settingsMutation = useMutation({
 			hide_on_process_start: value.minimizeApp,
 			toggle_sidebar: value.hideRightSidebar,
 			hide_nametag_skins_page: value.hideNametag,
-			feature_flags: {
-				...latestSettings.feature_flags,
-				[compactInstanceCardsFlag]: value.compactInstanceCards,
-				[showPlayTimeFlag]: value.showPlayTime,
-				[skipUnknownPackWarningFlag]: !value.warnOnUnknownModpacks,
-				[skipNonEssentialWarningsFlag]: value.skipNonEssentialWarnings,
-			},
+			refocus_on_game_close: value.refocusOnGameClose,
+			compact_instance_cards: value.compactInstanceCards,
+			show_play_time: value.showPlayTime,
+			warn_on_unknown_modpacks: value.warnOnUnknownModpacks,
+			skip_non_essential_warnings: value.skipNonEssentialWarnings,
 		}
 
 		await set(nextSettings)
 		queryClient.setQueryData(appSettingsKeys.all, nextSettings)
 		appSettings.setBehaviorSyncAcrossDevices(value.syncBehaviorAcrossDevices)
+		appSettings.refocusOnGameClose = value.refocusOnGameClose
+		appSettings.compactInstanceCards = value.compactInstanceCards
+		appSettings.showPlayTime = value.showPlayTime
+		appSettings.warnOnUnknownModpacks = value.warnOnUnknownModpacks
+		appSettings.skipNonEssentialWarnings = value.skipNonEssentialWarnings
 		appSettings.toggleSidebar = value.hideRightSidebar
 		appSettings.hideNametagSkinsPage = value.hideNametag
-		appSettings.featureFlags[compactInstanceCardsFlag] = value.compactInstanceCards
-		appSettings.featureFlags[showPlayTimeFlag] = value.showPlayTime
-		appSettings.featureFlags[skipUnknownPackWarningFlag] = !value.warnOnUnknownModpacks
-		appSettings.featureFlags[skipNonEssentialWarningsFlag] = value.skipNonEssentialWarnings
 	},
 	onMutate: () => queryClient.cancelQueries({ queryKey: appSettingsKeys.all }),
 	onError: handleError,
@@ -287,6 +280,23 @@ onBeforeUnmount(() => {
 					</p>
 				</div>
 				<Toggle id="minimize-launcher" v-model="current.minimizeApp" />
+			</div>
+
+			<div class="flex items-center justify-between gap-4">
+				<div>
+					<h3 id="refocus-on-game-close-label" class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.refocusOnGameCloseTitle) }}
+					</h3>
+					<p id="refocus-on-game-close-description" class="m-0 mt-1">
+						{{ formatMessage(messages.refocusOnGameCloseDescription) }}
+					</p>
+				</div>
+				<Toggle
+					id="refocus-on-game-close"
+					v-model="current.refocusOnGameClose"
+					aria-labelledby="refocus-on-game-close-label"
+					aria-describedby="refocus-on-game-close-description"
+				/>
 			</div>
 
 			<div class="flex items-center justify-between gap-4">

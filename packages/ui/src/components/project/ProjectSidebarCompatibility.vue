@@ -42,7 +42,7 @@
 				{{ formatMessage(messages.environments) }}
 			</h3>
 			<div class="flex flex-wrap gap-1">
-				<EnvironmentTags :environment="primaryEnvironment" />
+				<EnvironmentTags :environment="environments" />
 			</div>
 		</section>
 		<section
@@ -146,14 +146,12 @@ const noModpackLoader = computed(
 		props.projectV3?.mrpack_loaders?.length === 0,
 )
 
+const environments = computed(() => props.projectV3?.environment ?? [])
+
 const showEnvironments = computed(
 	() =>
-		TYPES_WITH_ENVS.some((x) => props.projectV3?.project_types.includes(x)) &&
-		primaryEnvironment.value,
-)
-
-const primaryEnvironment = computed<Labrinth.Projects.v3.Environment>(
-	() => props.projectV3?.environment?.find((x) => x !== 'unknown') ?? 'unknown',
+		TYPES_WITH_ENVS.some((type) => props.projectV3?.project_types.includes(type)) &&
+		environments.value.some((environment) => environment !== 'unknown'),
 )
 
 const messages = projectCompatibilityMessages

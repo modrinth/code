@@ -1,6 +1,6 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "请描述您的项目。"
+    "defaultMessage": "请描述您的项目，包括项目的主要内容、目的和特色。"
   },
   "nags.add-description.title": {
     "defaultMessage": "添加描述"
@@ -53,14 +53,8 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "选择准确的标签"
   },
-  "nags.banned-link-usage.description": {
-    "defaultMessage": "不允许将 {url} 作为外部链接。"
-  },
-  "nags.banned-link-usage.title": {
-    "defaultMessage": "移除违规链接"
-  },
   "nags.check-disclosures.description": {
-    "defaultMessage": "请通过填写适用于你 {type} 的内容披露信息，确保用户充分了解所有重要信息"
+    "defaultMessage": "请填写适用于你的{type}的内容披露信息，确保用户充分了解所有重要信息。"
   },
   "nags.check-disclosures.title": {
     "defaultMessage": "审查披露"
@@ -88,9 +82,6 @@
   },
   "nags.edit-gallery.title": {
     "defaultMessage": "编辑相册"
-  },
-  "nags.edit-license.title": {
-    "defaultMessage": "编辑许可证"
   },
   "nags.edit-summary.title": {
     "defaultMessage": "编辑简介"
@@ -120,25 +111,13 @@
     "defaultMessage": "前往图库页"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "你的{type}所使用的许可证要求公开源文件，请提供源文件链接、添加源文件或者更换许可证。"
+    "defaultMessage": "你的{type}所使用的许可证要求公开源代码，请提供源代码链接、添加源代码或者更换许可证。"
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "提供源代码"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "你的一些外部链接似乎重复了。每个链接只应输入一次，并设置合适的链接类型。"
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "移除重复链接"
-  },
   "nags.invalid-gallery-text.title": {
     "defaultMessage": "修改相册图片文本"
-  },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "许可证 URL 不可用。"
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "你提供的许可证 URL 指向 {domain}，该地址不适合用于提供许可证信息。许可证 URL 应直接链接至你的许可证文件。"
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "你提供的许可证 URL 格式有误。请提供一个指向许可证文本的有效的 URL 地址。"
@@ -154,6 +133,81 @@
   },
   "nags.invalid-project-summary.title": {
     "defaultMessage": "修改简介"
+  },
+  "nags.license-url.not-in-allowlist.description": {
+    "defaultMessage": "您的许可证URL不是一个被承认的许可证链接。请确保它直接链接到您的许可证文本。"
+  },
+  "nags.license-url.not-in-allowlist.title": {
+    "defaultMessage": "检查您的许可证链接"
+  },
+  "nags.link-validation.discord-invite": {
+    "defaultMessage": "您的 Discord 邀请无效、过期或没有邀请用户到服务器。用有效的服务器邀请替换它。"
+  },
+  "nags.link-validation.discord-invite.title": {
+    "defaultMessage": "替换无效的 Discord 邀请"
+  },
+  "nags.link-validation.download": {
+    "defaultMessage": "不允许直接开始下载的链接。请从简介中删除任何此种链接。"
+  },
+  "nags.link-validation.download.title": {
+    "defaultMessage": "删除下载链接"
+  },
+  "nags.link-validation.duplicate": {
+    "defaultMessage": "你的{linkField, select, issues {问题跟踪器} source {源代码} wiki {维基} discord {Discord 邀请} site {网站} store {商店} license {许可证} description {描述} patreon {Patreon} bmac {购买咖啡} paypal {PayPal} github {GitHub 赞助者} kofi {Ko-Fi} other {捐赠}}链接也用于{otherLinkField, select, issues {问题跟踪器} source {源代码} wiki {维基} discord {Discord 邀请} site {网站} store {存储} license {许可证} patreon {Patreon} bmac {购买咖啡} paypal {PayPal} github {GitHub Sponges} kofi {Ko-fi} other {另一个领域}}链接，每个链接只能列出一次。"
+  },
+  "nags.link-validation.duplicate.title": {
+    "defaultMessage": "删除重复链接"
+  },
+  "nags.link-validation.external-blocklist-match": {
+    "defaultMessage": "您的{linkField}链接不被允许，请移除此链接或替换为适合用于{linkField}的链接。"
+  },
+  "nags.link-validation.external-blocklist-match.title": {
+    "defaultMessage": "替换错误链接"
+  },
+  "nags.link-validation.global-blocklist-match": {
+    "defaultMessage": "你的{linkField, select, issues {问题跟踪器} source {源代码} wiki {维基} discord {Discord 邀请} site {网站} store {商店} license {许可证} description {描述} patreon {Patreon} bmac {打赏} paypal {PayPal} github {GitHub 赞助者} kofi {Ko-fi} other {捐赠}}链接无效。请替换或移除此链接。"
+  },
+  "nags.link-validation.global-blocklist-match.title": {
+    "defaultMessage": "移除违规链接"
+  },
+  "nags.link-validation.ip-address": {
+    "defaultMessage": "你的{linkField, select, issues {问题跟踪器} source {源代码} wiki {维基} discord {Discord 邀请} site {网站} store {商店} license {许可证} description {描述} patreon {Patreon} bmac {打赏} paypal {PayPal} github {GitHub 赞助者} kofi {Ko-fi} other {捐赠}}链接使用了IP地址。请使用包含域名的链接。"
+  },
+  "nags.link-validation.ip-address.title": {
+    "defaultMessage": "移除IP地址链接"
+  },
+  "nags.link-validation.malformed": {
+    "defaultMessage": "你的{linkField, select, issues {问题跟踪器} source {源代码} wiki {维基} discord {Discord 邀请} site {网站} store {商店} license {许可证} description {描述} patreon {Patreon} bmac {购买咖啡} paypal {PayPal} github {GitHub 赞助者} kofi {Ko-fi} other {捐赠}}链接无效。 请输入完整的 HTTPS URL。"
+  },
+  "nags.link-validation.malformed.title": {
+    "defaultMessage": "修复无效链接"
+  },
+  "nags.link-validation.not-in-allowlist": {
+    "defaultMessage": "你的{linkField, select, issues {问题跟踪器} source {源代码} wiki {维基} discord {Discord 邀请} site {网站} store {商店} license {许可证} description {描述} patreon {Patreon} bmac {购买咖啡} paypal {PayPal} github {GitHub 赞助者} kofi {Ko-fi} other {捐赠}}链接可能不适合此种链接类型，请复核链接符合实际用途。"
+  },
+  "nags.link-validation.not-in-allowlist.title": {
+    "defaultMessage": "检查链接准确度"
+  },
+  "nags.link-validation.source-repository": {
+    "defaultMessage": "您的源代码链接必须为支持的托管平台上的仓库，或是自托管的 Gitea/Forgejo 服务。"
+  },
+  "nags.link-validation.source-repository.title": {
+    "defaultMessage": "链接到源仓库"
+  },
+  "nags.link-validation.title": {
+    "defaultMessage": "审核此链接"
+  },
+  "nags.link-validation.unverifiable": {
+    "defaultMessage": "你的{linkField, select, issues {问题追踪器} source {源代码} wiki {Wiki} discord {Discord邀请} site {网站} store {商店} license {许可证} description {描述} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {赞助}}链接无法被校验，请检查其可访问性。"
+  },
+  "nags.link-validation.unverifiable.title": {
+    "defaultMessage": "检查链接可用性"
+  },
+  "nags.link-validation.wrong-field": {
+    "defaultMessage": "你的{linkField, select, issues {问题追踪器} source {源代码} wiki {维基} discord {Discord 邀请} site {网站} store {商店} license {许可证} description {描述} patreon {Patreon} bmac {打赏} paypal {PayPal} github {GitHub 赞助者} kofi {Ko-fi} other {捐赠}}链接对于{linkField, select, issues {问题追踪器} source {源代码} wiki {维基} discord {Discord 邀请} site {网站} store {商店} license {许可证} description {描述} patreon {Patreon} bmac {打赏} paypal {PayPal} github {GitHub 赞助者} kofi {Ko-fi} other {其他}}链接来说是不正确的。请移除或替换为正确的链接。"
+  },
+  "nags.link-validation.wrong-field.title": {
+    "defaultMessage": "修复错误的链接"
   },
   "nags.long-headers.description": {
     "defaultMessage": "描述中有 {count, plural, other {# 个标题}}过长。标题应简洁，用作章节名，不应是完整的句子。"
@@ -173,12 +227,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "添加图片替代文本"
   },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Discord 邀请链接不可用作其他类型的链接。请将你的 Discord 链接仅放置在 “Discord 邀请链接” 输入框中。"
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "移动 Discord 邀请链接位置"
-  },
   "nags.moderation.title": {
     "defaultMessage": "访问审核页面"
   },
@@ -194,8 +242,8 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "选择正确的分辨率"
   },
-  "nags.project-description-banned-link.description": {
-    "defaultMessage": "描述中不允许存在 “{fullUrl}”。"
+  "nags.project-description-content.title": {
+    "defaultMessage": "查看描述"
   },
   "nags.project-description-non-english.description": {
     "defaultMessage": "您的项目描述必须以英语编写或者包含英语翻译。"
@@ -371,14 +419,11 @@
   "nags.upload-version.title": {
     "defaultMessage": "上传一个版本"
   },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "你的部分外部链接可能与其所属类型不适配。"
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "检查外部链接"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "访问链接设置"
+  },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "您的项目描述应该提供独特的信息，且不要重复项目的摘要。"
   },
   "project.text-validation.summary-matches-title": {
     "defaultMessage": "您的项目简介应该提供独特的信息，不要重复项目的名称。"

@@ -22,6 +22,7 @@ use crate::models::disclosures::{
 };
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::images::ImageContext;
+use crate::models::link_platform::LinkPlatform;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
@@ -212,7 +213,7 @@ pub async fn random_projects_get(
     let projects_data =
         db_models::DBProject::get_many_ids(&project_ids, &**pool, &redis)
             .await
-            .wrap_api_err("fetching projects by ID")?
+            .wrap_internal_err("fetching projects by ID")?
             .into_iter()
             .map(Project::from)
             .collect::<Vec<_>>();
@@ -257,7 +258,7 @@ pub async fn projects_get(
         .wrap_request_err("deserializing JSON data")?;
     let projects_data = db_models::DBProject::get_many(&ids, &**pool, &redis)
         .await
-        .wrap_api_err("fetching requested projects")?;
+        .wrap_internal_err("fetching requested projects")?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -352,10 +353,10 @@ pub struct EditProject {
         length(max = 2048)
     )]
     pub license_url: Option<Option<String>>,
+    // <name, url> (leave url empty to delete)
     #[validate(custom(
         function = "crate::util::validate::validate_url_hashmap_optional_values"
     ))]
-    // <name, url> (leave url empty to delete)
     pub link_urls: Option<HashMap<String, Option<String>>>,
     pub license_id: Option<String>,
     #[validate(
@@ -472,7 +473,7 @@ pub async fn project_edit_internal(
     let Some(mut project_item) =
         db_models::DBProject::get(&info.into_inner().0, &**pool, &redis)
             .await
-            .wrap_api_err("fetching project")?
+            .wrap_internal_err("fetching project")?
     else {
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };
@@ -505,9 +506,10 @@ pub async fn project_edit_internal(
         new_project.status,
         Some(ProjectStatus::Draft | ProjectStatus::Rejected)
     );
-    let validate_for_review = submit_for_review
-        || (project_item.inner.status == ProjectStatus::Processing
-            && !leave_review);
+    let validate_for_review = !user.role.is_mod()
+        && (submit_for_review
+            || (project_item.inner.status == ProjectStatus::Processing
+                && !leave_review));
     if submit_for_review {
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
             return Err(ApiError::Auth(eyre!(
@@ -944,7 +946,7 @@ pub async fn project_edit_internal(
             &redis,
         )
         .await
-        .wrap_api_err("checking project slug availability")?;
+        .wrap_internal_err("checking project slug availability")?;
         if existing.is_some() {
             return Err(ApiError::Request(eyre::eyre!(
                 "Slug collides with other project's id!",
@@ -1032,17 +1034,25 @@ pub async fn project_edit_internal(
             )));
         }
 
-        let ids_to_delete = links.keys().cloned().collect::<Vec<String>>();
+        let platforms_to_delete = links
+            .keys()
+            .map(|platform| {
+                platform
+                    .parse::<LinkPlatform>()
+                    .map(|platform| platform.to_string())
+                    .wrap_request_err_with(|| {
+                        format!("platform `{platform}` does not exist")
+                    })
+            })
+            .collect::<Result<Vec<_>, ApiError>>()?;
         // Deletes all links from hashmap- either will be deleted or be replaced
         sqlx::query!(
             "
                 DELETE FROM mods_links
-                WHERE joining_mod_id = $1 AND joining_platform_id IN (
-                    SELECT id FROM link_platforms WHERE name = ANY($2)
-                )
+                WHERE joining_mod_id = $1 AND platform = ANY($2)
                 ",
             id as db_ids::DBProjectId,
-            &ids_to_delete
+            &platforms_to_delete
         )
         .execute(&mut transaction)
         .await
@@ -1050,26 +1060,26 @@ pub async fn project_edit_internal(
 
         for (platform, url) in links {
             if let Some(url) = url {
-                let platform_id = db_models::categories::LinkPlatform::get_id(
-                    platform,
-                    &mut transaction,
-                )
-                .await
-                .wrap_internal_err("fetching link platform from database")?
-                .wrap_request_err_with(|| {
-                    format!("platform `{}` does not exist", platform.clone())
-                })?;
+                let platform = platform
+                    .parse::<LinkPlatform>()
+                    .wrap_request_err_with(|| {
+                        format!("platform `{platform}` does not exist")
+                    })?
+                    .to_string();
                 sqlx::query!(
-                        "
-                        INSERT INTO mods_links (joining_mod_id, joining_platform_id, url)
+                    "
+                        INSERT INTO mods_links (joining_mod_id, platform, url)
                         VALUES ($1, $2, $3)
                         ",
-                        id as db_ids::DBProjectId,
-                        platform_id as db_ids::LinkPlatformId,
-                        url
-                    )
-                    .execute(&mut transaction)
-                    .await.wrap_internal_err("querying database for `project_edit_internal`")?;
+                    id as db_ids::DBProjectId,
+                    platform,
+                    url
+                )
+                .execute(&mut transaction)
+                .await
+                .wrap_internal_err(
+                    "querying database for `project_edit_internal`",
+                )?;
             }
         }
     }
@@ -1344,6 +1354,18 @@ pub async fn project_edit_internal(
     .await
     .wrap_internal_err("failed to update components")?;
 
+    let reloaded_project = if validate_for_review {
+        validate::ensure_project_is_valid_for_review(
+            id,
+            &pool,
+            &mut transaction,
+            &redis,
+        )
+        .await?
+    } else {
+        project_item.clone()
+    };
+
     // check new description and body for links to associated images
     // if they no longer exist in the description or body, delete them
     let checkable_strings: Vec<&str> =
@@ -1365,26 +1387,16 @@ pub async fn project_edit_internal(
     .await
     .wrap_api_err("deleting unused images")?;
 
-    if validate_for_review {
-        let reloaded_project = validate::ensure_project_is_valid_for_review(
-            id,
-            &pool,
+    if submit_for_review {
+        submit_project_for_review(
+            &reloaded_project,
+            &user,
+            team_member.as_ref().is_none_or(|member| !member.accepted),
+            sync_archival_disclosure,
             &mut transaction,
             &redis,
         )
         .await?;
-
-        if submit_for_review {
-            submit_project_for_review(
-                &reloaded_project,
-                &user,
-                team_member.as_ref().is_none_or(|member| !member.accepted),
-                sync_archival_disclosure,
-                &mut transaction,
-                &redis,
-            )
-            .await?;
-        }
     }
 
     transaction
@@ -1695,7 +1707,7 @@ pub async fn project_get_check_internal(
 
     let project_data = db_models::DBProject::get(&slug, &**pool, &redis)
         .await
-        .wrap_api_err("fetching project from database")?;
+        .wrap_internal_err("fetching project from database")?;
 
     if let Some(project) = project_data {
         Ok(HttpResponse::Ok().json(ProjectCheckResponse {
@@ -1742,7 +1754,7 @@ pub async fn dependency_list_internal(
 
     let result = db_models::DBProject::get(&string, &***ro_pool, &redis)
         .await
-        .wrap_api_err("fetching project from database")?;
+        .wrap_internal_err("fetching project from database")?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -1804,11 +1816,11 @@ pub async fn dependency_list_internal(
                     &redis,
                 )
                 .await
-                .wrap_internal_err("failed to fetch dependency versions")
+                .wrap_err("fetching dependency versions")
             },
         )
         .await
-        .wrap_api_err("fetching project dependencies")?;
+        .wrap_internal_err("fetching project dependencies")?;
 
         let mut projects = filter_visible_projects(
             projects_result,
@@ -1928,7 +1940,7 @@ pub async fn projects_edit(
     let projects_data =
         db_models::DBProject::get_many_ids(&project_ids, &**pool, &redis)
             .await
-            .wrap_api_err("fetching projects to edit")?;
+            .wrap_internal_err("fetching projects to edit")?;
 
     if let Some(id) = project_ids
         .iter()
@@ -1978,10 +1990,6 @@ pub async fn projects_edit(
     let categories = db_models::categories::Category::list(&**pool, &redis)
         .await
         .wrap_internal_err("fetching category from Redis")?;
-    let link_platforms =
-        db_models::categories::LinkPlatform::list(&**pool, &redis)
-            .await
-            .wrap_internal_err("fetching link platform from Redis")?;
 
     let mut transaction = pool
         .begin()
@@ -2038,6 +2046,18 @@ pub async fn projects_edit(
             };
         }
 
+        if let Some(links) = &bulk_edit_project.link_urls {
+            let mut candidate = Project::from(project.clone());
+            validate::apply_link_changes(&mut candidate, links);
+            let nags = crate::validate::project::validate_link_fields(
+                &candidate,
+                crate::validate::project::LinkValidationScope {
+                    external: true,
+                    ..Default::default()
+                },
+            );
+            validate::require_valid_project(nags)?;
+        }
         let mut reindex_versions = bulk_edit_project_categories(
             &categories,
             &project.categories,
@@ -2072,17 +2092,25 @@ pub async fn projects_edit(
         .wrap_api_err("executing `bulk_edit_project_categories`")?;
 
         if let Some(links) = &bulk_edit_project.link_urls {
-            let ids_to_delete = links.keys().cloned().collect::<Vec<String>>();
+            let platforms_to_delete = links
+                .keys()
+                .map(|platform| {
+                    platform
+                        .parse::<LinkPlatform>()
+                        .map(|platform| platform.to_string())
+                        .wrap_request_err_with(|| {
+                            format!("platform `{platform}` does not exist")
+                        })
+                })
+                .collect::<Result<Vec<_>, ApiError>>()?;
             // Deletes all links from hashmap- either will be deleted or be replaced
             sqlx::query!(
                 "
                 DELETE FROM mods_links
-                WHERE joining_mod_id = $1 AND joining_platform_id IN (
-                    SELECT id FROM link_platforms WHERE name = ANY($2)
-                )
+                WHERE joining_mod_id = $1 AND platform = ANY($2)
                 ",
                 project.inner.id as db_ids::DBProjectId,
-                &ids_to_delete
+                &platforms_to_delete
             )
             .execute(&mut transaction)
             .await
@@ -2090,29 +2118,38 @@ pub async fn projects_edit(
 
             for (platform, url) in links {
                 if let Some(url) = url {
-                    let platform_id = link_platforms
-                        .iter()
-                        .find(|x| &x.name == platform)
+                    let platform = platform
+                        .parse::<LinkPlatform>()
                         .wrap_request_err_with(|| {
-                            format!(
-                                "platform `{}` does not exist",
-                                platform.clone()
-                            )
+                            format!("platform `{platform}` does not exist")
                         })?
-                        .id;
+                        .to_string();
                     sqlx::query!(
                         "
-                        INSERT INTO mods_links (joining_mod_id, joining_platform_id, url)
+                        INSERT INTO mods_links (joining_mod_id, platform, url)
                         VALUES ($1, $2, $3)
                         ",
                         project.inner.id as db_ids::DBProjectId,
-                        platform_id as db_ids::LinkPlatformId,
+                        platform,
                         url
                     )
                     .execute(&mut transaction)
-                    .await.wrap_internal_err("querying database for `projects_edit`")?;
+                    .await
+                    .wrap_internal_err(
+                        "querying database for `projects_edit`",
+                    )?;
                 }
             }
+        }
+
+        if project.inner.status == ProjectStatus::Processing {
+            validate::ensure_project_is_valid_for_review(
+                project.inner.id,
+                &pool,
+                &mut transaction,
+                &redis,
+            )
+            .await?;
         }
 
         changed_projects.push((
@@ -2293,7 +2330,7 @@ pub async fn project_icon_edit_internal(
 
     let project_item = db_models::DBProject::get(&string, &**pool, &redis)
         .await
-        .wrap_api_err("fetching project from database")?
+        .wrap_internal_err("fetching project from database")?
         .wrap_request_err_with(|| {
             "the specified project does not exist!".to_string()
         })?;
@@ -2340,11 +2377,10 @@ pub async fn project_icon_edit_internal(
 
     let bytes = read_limited_from_payload(
         &mut payload,
-        262144,
-        "Icons must be smaller than 256KiB",
+        524288,
+        "Icons must be smaller than 512KiB",
     )
-    .await
-    .wrap_api_err("executing `read_limited_from_payload`")?;
+    .await?;
 
     let project_id: ProjectId = project_item.inner.id.into();
     let upload_result = upload_image_optimized(
@@ -2446,7 +2482,7 @@ pub async fn delete_project_icon_internal(
 
     let project_item = db_models::DBProject::get(&string, &**pool, &redis)
         .await
-        .wrap_api_err("fetching project from database")?
+        .wrap_internal_err("fetching project from database")?
         .wrap_request_err_with(|| {
             "the specified project does not exist!".to_string()
         })?;
@@ -2609,7 +2645,7 @@ pub async fn add_gallery_item_internal(
 
     let project_item = db_models::DBProject::get(&string, &**pool, &redis)
         .await
-        .wrap_api_err("fetching project from database")?
+        .wrap_internal_err("fetching project from database")?
         .wrap_request_err_with(|| {
             "the specified project does not exist!".to_string()
         })?;
@@ -2656,8 +2692,7 @@ pub async fn add_gallery_item_internal(
         5 * (1 << 20),
         "Gallery image exceeds the maximum of 5MiB.",
     )
-    .await
-    .wrap_api_err("executing `read_limited_from_payload`")?;
+    .await?;
 
     let id: ProjectId = project_item.inner.id.into();
     let upload_result = upload_image_optimized(
@@ -2721,8 +2756,8 @@ pub async fn add_gallery_item_internal(
     .await
     .wrap_internal_err("inserting galleries into database")?;
 
-    let validation_error = match project_item.inner.status {
-        ProjectStatus::Processing => {
+    let validation_error =
+        if project_item.inner.status == ProjectStatus::Processing {
             validate::ensure_project_is_valid_for_review(
                 project_item.inner.id,
                 &pool,
@@ -2731,9 +2766,9 @@ pub async fn add_gallery_item_internal(
             )
             .await
             .err()
-        }
-        _ => None,
-    };
+        } else {
+            None
+        };
     if let Some(error) = validation_error {
         delete_old_images(
             Some(upload_result.url),
@@ -2864,7 +2899,7 @@ pub async fn edit_gallery_item_internal(
         &redis,
     )
     .await
-    .wrap_api_err("fetching project from database")?
+    .wrap_internal_err("fetching project from database")?
     .wrap_request_err_with(|| {
         "the specified project does not exist!".to_string()
     })?;
@@ -3091,7 +3126,7 @@ pub async fn delete_gallery_item_internal(
         &redis,
     )
     .await
-    .wrap_api_err("fetching project from database")?
+    .wrap_internal_err("fetching project from database")?
     .wrap_request_err_with(|| {
         "the specified project does not exist!".to_string()
     })?;
@@ -3532,7 +3567,7 @@ pub async fn project_follow_internal(
 
     let project = db_models::DBProject::get(&string, &**pool, &redis)
         .await
-        .wrap_api_err("fetching project from database")?
+        .wrap_internal_err("fetching project from database")?
         .wrap_request_err_with(|| {
             "the specified project does not exist!".to_string()
         })?;
@@ -3637,7 +3672,7 @@ pub async fn project_unfollow_internal(
 
     let project = db_models::DBProject::get(&string, &**pool, &redis)
         .await
-        .wrap_api_err("fetching project from database")?
+        .wrap_internal_err("fetching project from database")?
         .wrap_request_err_with(|| {
             "the specified project does not exist!".to_string()
         })?;
@@ -3725,7 +3760,7 @@ pub async fn project_get_organization(
     let string = info.into_inner().0;
     let result = db_models::DBProject::get(&string, &**pool, &redis)
         .await
-        .wrap_api_err("fetching project from database")?
+        .wrap_internal_err("fetching project from database")?
         .wrap_request_err_with(|| {
             "the specified project does not exist!".to_string()
         })?;

@@ -1,4 +1,7 @@
 {
+  "nags.add-description.description": {
+    "defaultMessage": "Wajib menyertakan deskripsi yang jelas tentang isi, tujuan, dan daya tarik proyek Anda."
+  },
   "nags.add-description.title": {
     "defaultMessage": "Tambah keterangan"
   },
@@ -20,11 +23,20 @@
   "nags.add-license-details.title": {
     "defaultMessage": "Tambah perincian lisensi"
   },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Tambahkan tautan ke situs web, toko, atau undangan Discord permanen jika ada."
+  },
   "nags.add-links-server.title": {
     "defaultMessage": "Tambah tautan eksternal"
   },
+  "nags.add-links.description": {
+    "defaultMessage": "Tambahkan tautan ke kode sumber, pelacak masalah, atau undangan Discord permanen jika ada."
+  },
   "nags.add-links.title": {
     "defaultMessage": "Tambah tautan eksternal"
+  },
+  "nags.adjacent-headers.description": {
+    "defaultMessage": "Header dengan tingkat yang sama tidak boleh berurutan tanpa isi di antaranya."
   },
   "nags.all-languages.description": {
     "defaultMessage": "Anda telah memilih semua opsi bahasa yang tersedia. Mohon hanya memilih bahasa yang benar-benar didukung oleh server Anda."
@@ -35,20 +47,35 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Pilih tag yang tepat"
   },
+  "nags.description-ends-with-header.description": {
+    "defaultMessage": "Deskripsi proyek Anda sebaiknya tidak diakhiri dengan header yang tidak diikuti teks apa pun."
+  },
+  "nags.description-ends-with-header.title": {
+    "defaultMessage": "Hapus header akhir"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Deskripsi proyek Anda terlalu singkat. Tambahkan lebih banyak detail untuk menjelaskan isi, tujuan, dan daya tarik proyek dengan jelas."
+  },
   "nags.description-too-short.title": {
     "defaultMessage": "Kembangkan keterangan"
+  },
+  "nags.disclosures-special-formatting.description": {
+    "defaultMessage": "Pengungkapan konten sebaiknya tidak memuat HTML, karena hanya dapat menampilkan Markdown sebaris dan teks biasa."
   },
   "nags.edit-description.title": {
     "defaultMessage": "Sunting keterangan"
   },
-  "nags.edit-license.title": {
-    "defaultMessage": "Sunting lisensi"
+  "nags.edit-gallery.title": {
+    "defaultMessage": "Edit gallery"
   },
   "nags.edit-summary.title": {
     "defaultMessage": "Sunting ringkasan"
   },
   "nags.edit-tags.title": {
     "defaultMessage": "Sunting tag"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "Edit nama"
   },
   "nags.feature-gallery-image.description": {
     "defaultMessage": "Gambar galeri tampilan adalah letak impresi pertama dari proyek Anda."
@@ -62,14 +89,68 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Berikan kode sumber"
   },
-  "nags.invalid-license-url.description.default": {
-    "defaultMessage": "URL lisensi tidak sah."
+  "nags.invalid-gallery-text.title": {
+    "defaultMessage": "Ubah teks gambar gallery"
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "URL lisensi Anda tampak cacat. Mohon berikan URL yang sah untuk teks lisensi Anda."
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Tambah tautan lisensi yang sah"
+  },
+  "nags.invalid-project-description.title": {
+    "defaultMessage": "Ubah deskripsi"
+  },
+  "nags.invalid-project-name.title": {
+    "defaultMessage": "Ubah nama proyek"
+  },
+  "nags.invalid-project-summary.title": {
+    "defaultMessage": "Ubah ringkasan"
+  },
+  "nags.license-url.not-in-allowlist.title": {
+    "defaultMessage": "Periksa tautan lisensi Anda"
+  },
+  "nags.link-validation.discord-invite.title": {
+    "defaultMessage": "Ganti undangan Discord tidak valid"
+  },
+  "nags.link-validation.download.title": {
+    "defaultMessage": "Hapus tautan download"
+  },
+  "nags.link-validation.duplicate.title": {
+    "defaultMessage": "Hapus tautan duplikat"
+  },
+  "nags.link-validation.external-blocklist-match": {
+    "defaultMessage": "Tautan {linkField} Anda tidak diizinkan. Hapus tautan ini, atau ganti dengan tautan yang sesuai untuk jenis {linkField}."
+  },
+  "nags.link-validation.external-blocklist-match.title": {
+    "defaultMessage": "Ganti tautan yang salah"
+  },
+  "nags.link-validation.global-blocklist-match.title": {
+    "defaultMessage": "Hapus tautan terlarang"
+  },
+  "nags.link-validation.ip-address.title": {
+    "defaultMessage": "Hapus tautan alamat IP"
+  },
+  "nags.link-validation.malformed.title": {
+    "defaultMessage": "Perbaiki tautan tidak valid"
+  },
+  "nags.link-validation.not-in-allowlist.title": {
+    "defaultMessage": "Periksa keakuratan tautan"
+  },
+  "nags.link-validation.source-repository": {
+    "defaultMessage": "Tautan kode sumber Anda harus mengarah ke repositori di platform hosting yang didukung, atau ke layanan Gitea/Forgejo yang dihosting sendiri."
+  },
+  "nags.link-validation.source-repository.title": {
+    "defaultMessage": "Tautan ke repository"
+  },
+  "nags.link-validation.title": {
+    "defaultMessage": "Tinjau tautan ini"
+  },
+  "nags.link-validation.unverifiable.title": {
+    "defaultMessage": "Cek status tautan"
+  },
+  "nags.link-validation.wrong-field.title": {
+    "defaultMessage": "Perbaiki tautan yang salah"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, other {# tajuk}} dalam keterangan Anda{count, plural, other{}} terlalu panjang. Tajuk seharusnya ringkas dan bertindak sebagai judul suatu bagian, bukan kalimat penuh."
@@ -89,9 +170,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "Tambahkan teks alt gambar"
   },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Pindahkan tautan undangan Discord"
-  },
   "nags.moderation.title": {
     "defaultMessage": "Kunjungi utas moderasi"
   },
@@ -103,6 +181,51 @@
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Pilih resolusi yang benar"
+  },
+  "nags.project-description-content.title": {
+    "defaultMessage": "Tinjau deskripsi"
+  },
+  "nags.project-description-non-english.description": {
+    "defaultMessage": "Deskripsi proyek harus berbahasa Inggris atau disertai terjemahannya."
+  },
+  "nags.project-description-non-english.title": {
+    "defaultMessage": "Terjemahkan deskripsi"
+  },
+  "nags.project-description-non-standard-text.description": {
+    "defaultMessage": "Deskripsi proyek tidak boleh memuat karakter nonstandar secara berlebihan, seperti \"teks hias\" atau Zalgo."
+  },
+  "nags.project-description-profanity.description": {
+    "defaultMessage": "Deskripsi proyek Anda tidak boleh mengandung kata-kata kasar secara berlebihan. Terdeteksi: “{value}”."
+  },
+  "nags.project-description-slur.description": {
+    "defaultMessage": "Deskripsi proyek Anda tidak boleh mengandung istilah yang menyinggung. Terdeteksi: “{value}”."
+  },
+  "nags.project-description-spam.description": {
+    "defaultMessage": "Karakter, kata, atau frasa yang diulang-ulang tidak boleh digunakan untuk memperpanjang deskripsi proyek Anda."
+  },
+  "nags.project-name-non-standard-text.description": {
+    "defaultMessage": "Karakter teks nonstandar, seperti \"teks hias\" atau \"Zalgo\", tidak diperbolehkan dalam nama proyek."
+  },
+  "nags.project-name-version.title": {
+    "defaultMessage": "Ubah nama proyek"
+  },
+  "nags.project-summary-non-english.description": {
+    "defaultMessage": "Ringkasan proyek harus berbahasa Inggris atau disertai terjemahannya."
+  },
+  "nags.project-summary-non-standard-text.description": {
+    "defaultMessage": "Ringkasan tidak boleh memuat karakter nonstandar seperti \"teks hias\" atau Zalgo."
+  },
+  "nags.project-summary-profanity.description": {
+    "defaultMessage": "Ringkasan tidak boleh berisi kata-kata kasar. Terdeteksi: “{value}”."
+  },
+  "nags.project-summary-slur.description": {
+    "defaultMessage": "Ringkasan tidak boleh berisi istilah yang menyinggung. Terdeteksi: “{value}”."
+  },
+  "nags.project-summary-spam.description": {
+    "defaultMessage": "Ringkasan proyek tidak boleh diisi dengan karakter, kata, atau frasa yang diulang-ulang."
+  },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Pastikan Anda telah menyediakan bukti izin pengedaran konten eksternal pada paket mod Anda."
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "Pilih versi apa saja yang didukung oleh server Anda, pilih paket mod, atau unggah milik Anda sendiri."
@@ -149,6 +272,12 @@
   "nags.settings.title": {
     "defaultMessage": "Kunjungi pengaturan umum"
   },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "Ringkasan tidak boleh berisi Markdown atau HTML karena hanya mendukung teks biasa."
+  },
+  "nags.summary-special-formatting.title": {
+    "defaultMessage": "Perbaiki format ringkasan"
+  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Kembangkan ringkasan"
   },
@@ -167,6 +296,12 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Setidaknya satu gambar galeri diperlukan untuk memamerkan konten dari {type} Anda."
   },
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "Minimal satu gambar galeri wajib ada untuk menampilkan isi resource pack Anda, kecuali paket audio atau paket bahasa. Jika ini paket Anda, pilih tag yang sesuai."
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "Minimal tiga gambar galeri wajib ada untuk memperlihatkan shader Anda dalam berbagai kondisi."
+  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Unggah gambar galeri"
   },
@@ -178,6 +313,18 @@
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Kunjungi pengaturan tautan"
+  },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "Deskripsi harus berisi informasi unik, bukan sekadar mengulang ringkasan."
+  },
+  "project.text-validation.summary-matches-title": {
+    "defaultMessage": "Ringkasan harus berisi informasi baru, bukan sekadar mengulang nama proyek."
+  },
+  "project.text-validation.summary-too-short": {
+    "defaultMessage": "Ringkasan terlalu singkat. Tambahkan satu atau dua kalimat tentang proyek Anda."
+  },
+  "project.text-validation.title-version-number": {
+    "defaultMessage": "Nama proyek tidak boleh berisi nomor versi."
   }
 }
 

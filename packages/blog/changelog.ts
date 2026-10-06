@@ -11,6 +11,146 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-10-06T19:48:42+00:00`,
+		product: 'app',
+		version: '0.21.8',
+		body: `## Fixed
+- Fixed an issue when opening the app relating to \`synced_options\``,
+	},
+	{
+		date: `2026-10-06T18:58:20+00:00`,
+		product: 'app',
+		version: '0.21.7',
+		body: `## Added
+- Added a "Export debug info" button to the Resource management page in app settings which support can use to help identify any problems you are currently having.
+- Added the Christina skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Dani skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Fishy skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Hal skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Hedwig skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Hex skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Jellyfish Girl skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Loge skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Paw Prints skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Penguin Onesie skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Pig Onesie skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Tim skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Valorie skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Darian skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Edson skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Eshe skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Esperanza skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Flores skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Gaston skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Greta skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Gubbis skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Javier skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Kellen skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Mats skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Nuru skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Pim skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Qamar skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Raven skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Ren skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Riggs skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Stella skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Tula skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Valorie skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Violet skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Big Foot skin from the Wilderness Bound skin pack to the Skin selector page.
+
+## Changed
+- If you use the "Update all" button and there's only one project, it will use the normal "Update project" modal/flow.
+
+## Fixed
+- Fixed some issues with the download manager where tasks would be stuck "Pending..." or on another specific stage.
+- Fixes issues with some update all actions failing.
+- Fixed project compatibility panel showing only one supported environment when a project might actually support more.
+- Fixes some issues with failed install jobs for an instance that was deleted causing the app to sometimes freeze on launch.
+- Fixed issue where you could only pick a specific version of Java in the "Custom Java installation" override in instance settings.
+- Fixed an issue with Update all where if you already had two files of the same project installed it would fail.
+- Fixed issue with linked modpack instances where the bundled sponsored servers of some modpacks would be automatically synced across all your instances.
+- Fixed issue where disabling content in the content tab would reset it's "Date added" so the sort broke.
+- Fixed "modpack data invalid" when using the Update all flow in the content tab.
+- Fixes issue when pushing an update for a shared instance where if you have two content items installed from the same project but different versions it would error out and break. Now it is handled correctly.
+- Fixes bug when installing a non-modpack when it tries to install the content before the instance has actually been set up yet.
+- Fixed window growing bug on Windows.`,
+	},
+	{
+		date: `2026-10-06T18:58:20+00:00`,
+		product: 'web',
+		body: `## Added
+- Added a "No results found for your query!" on the landing page search example if there are no results.
+
+## Fixed
+- Fixed an issue in project settings where valid SPDX license codes were being rejected.
+- Fixed project compatibility panel showing only one supported environment when a project might actually support more.
+- Fixed an issue with link validation where some repository links would be invalid.
+
+## Security
+- Fixed a security issue relating to our email templating system.`,
+	},
+	{
+		date: `2026-09-27T18:59:10+00:00`,
+		product: 'app',
+		version: '0.21.6',
+		body: `## Added
+- Added a new modal for Update all in the Content tab of your instance. You can now select each version for each project that needs an update, and view the changelogs, all in one place.
+
+## Changed
+- Bulk update operations now go through the download manager, rather than preventing you from leaving the content tab while it installs the updates.
+
+## Fixed
+- Fixed relying on external metadata for already-installed loader verisons.
+- Fixed close button icon in the window controls not turning red on hover.
+- Fixed text overlapping into \`<details>\` in markdown descriptions.`,
+	},
+	{
+		date: `2026-09-27T18:59:10+00:00`,
+		product: 'hosting',
+		body: `## Added
+- Added a new modal for Update all in the Content tab of the server panel. You can now select each version for each project that needs an update, and view the changelogs, all in one place.`,
+	},
+	{
+		date: `2026-09-27T18:59:10+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed text overlapping into \`<details>\` in markdown descriptions.`,
+	},
+	{
+		date: `2026-09-23T09:31:02+00:00`,
+		product: 'app',
+		version: '0.21.5',
+		body: `## Changed
+- Changed how some app settings are stored.
+- Added a setting to refocus Modrinth App when Minecraft closes - this is disabled by default.
+
+## Fixed
+- Fixed some issues where "Database is locked" errors would occur.
+- Fixed an issue where renaming an externally uploaded file in File Explorer or Finder would prevent an instance's linked modpack from being updated.
+- Fixed "Instance not found" issue with super old pre-0.9.0 instances with folder naming that isn't allowed now.
+- Fixed performance issues loading instance pages.
+- Fixed navigation crash issue.
+- Fixed download manager always showing "Needs attention" tooltip when no attention is needed.
+- Fixed issue where if you had any screenshots which were symlinked it would break the app's screenshot pages.
+- Fixed issue with keybind inputs treating Alt Gr as Left Ctrl on Windows.
+- Fixed issue where syncing command history would break instance duplication action.`,
+	},
+	{
+		date: `2026-09-23T09:31:02+00:00`,
+		product: 'web',
+		body: `## Changed
+- Increased icon file size limit from 256KiB to 512KiB`,
+	},
+	{
+		date: `2026-09-16T16:37:03+00:00`,
+		product: 'app',
+		version: '0.21.4',
+		body: `## Fixed
+- Fixes issue for some users not being able to launch the game
+- Fixed some styling and snapping issues with slider inputs.`,
+	},
+	{
 		date: `2026-09-15T17:44:10+00:00`,
 		product: 'app',
 		version: '0.21.3',

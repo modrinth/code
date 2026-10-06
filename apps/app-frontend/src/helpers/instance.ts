@@ -92,6 +92,10 @@ export async function refresh_content_updates(instanceId: string): Promise<void>
 	return await invoke('plugin:instance|instance_refresh_content_updates', { instanceId })
 }
 
+export async function sync_content_files(instanceId: string): Promise<void> {
+	return await invoke('plugin:instance|instance_sync_content_files', { instanceId })
+}
+
 // Linked modpack info returned from backend
 export interface LinkedModpackInfo {
 	project: Labrinth.Projects.v2.Project
@@ -410,10 +414,6 @@ export async function list(): Promise<GameInstance[]> {
 
 export async function check_installed(instanceId: string, projectId: string): Promise<boolean> {
 	return await invoke('plugin:instance|instance_check_installed', { instanceId, projectId })
-}
-
-export async function update_all(instanceId: string): Promise<Record<string, string>> {
-	return await invoke('plugin:instance|instance_update_all', { instanceId })
 }
 
 // Updates a specified project
