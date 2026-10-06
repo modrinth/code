@@ -53,7 +53,7 @@ import { computed, ref } from 'vue'
 
 import ImageViewerActions from '../../image-viewer-actions.vue'
 import { projectReviewMessages as messages } from '../../messages'
-import ProjectStatusStats from './project-status-stats.vue'
+import ProjectStatusStats from '~/components/ProjectStatusStats.vue'
 
 const props = defineProps<{
 	organization: Labrinth.Projects.v3.Organization

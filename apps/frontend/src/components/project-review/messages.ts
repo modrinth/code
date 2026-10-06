@@ -474,50 +474,6 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.queueNavigation',
 		defaultMessage: 'Review queue navigation',
 	},
-	approvedCount: {
-		id: 'moderation.project-review.approvedCount',
-		defaultMessage: '{count} approved',
-	},
-	archivedCount: {
-		id: 'moderation.project-review.archivedCount',
-		defaultMessage: '{count} archived',
-	},
-	unlistedCount: {
-		id: 'moderation.project-review.unlistedCount',
-		defaultMessage: '{count} unlisted',
-	},
-	withheldCount: {
-		id: 'moderation.project-review.withheldCount',
-		defaultMessage: '{count} withheld',
-	},
-	processingCount: {
-		id: 'moderation.project-review.processingCount',
-		defaultMessage: '{count} under review',
-	},
-	draftCount: {
-		id: 'moderation.project-review.draftCount',
-		defaultMessage: '{count} draft',
-	},
-	rejectedCount: {
-		id: 'moderation.project-review.rejectedCount',
-		defaultMessage: '{count} rejected',
-	},
-	techReviewFailedCount: {
-		id: 'moderation.project-review.techReviewFailedCount',
-		defaultMessage: '{count} failed technical review',
-	},
-	privateCount: {
-		id: 'moderation.project-review.privateCount',
-		defaultMessage: '{count} private',
-	},
-	scheduledCount: {
-		id: 'moderation.project-review.scheduledCount',
-		defaultMessage: '{count} scheduled',
-	},
-	unknownCount: {
-		id: 'moderation.project-review.unknownCount',
-		defaultMessage: '{count} unknown',
-	},
 	emptyDescription: {
 		id: 'moderation.project-review.emptyDescription',
 		defaultMessage: 'No description',
@@ -669,6 +625,10 @@ export const projectReviewMessages = defineMessages({
 	required: {
 		id: 'moderation.project-review.required',
 		defaultMessage: 'Required',
+	},
+	sourceAvailabilityRequired: {
+		id: 'moderation.project-review.sourceAvailabilityRequired',
+		defaultMessage: 'License requires source code.',
 	},
 	optional: {
 		id: 'moderation.project-review.optional',

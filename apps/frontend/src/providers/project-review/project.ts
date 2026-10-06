@@ -1,7 +1,8 @@
 import { injectModrinthClient } from '@modrinth/ui'
-import { useQueries, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, type Ref } from 'vue'
 
+import { useCreatorProjectStats } from '~/composables/creator-project-stats'
 import { projectQueryOptions } from '~/composables/queries/project'
 
 export function useReviewProject(selection: Ref<string>) {
@@ -42,29 +43,6 @@ export function useReviewProject(selection: Ref<string>) {
 		projectQuery.data.value?.organization ? (organizationQuery.data.value ?? null) : null,
 	)
 	const organizationId = computed(() => organization.value?.id ?? '')
-	const organizationProjects = useQuery(
-		computed(() => ({
-			queryKey: ['organization', organizationId.value, 'projects'] as const,
-			queryFn: () => client.labrinth.organizations_v3.getProjects(organizationId.value),
-			staleTime: 60_000,
-			enabled: !!organizationId.value,
-		})),
-	)
-	const organizationFlaggedProjects = useQuery(
-		computed(() => ({
-			queryKey: ['tech-reviews', 'flagged-projects', 'organization', organizationId.value] as const,
-			queryFn: () =>
-				client.labrinth.tech_review_internal.getOrganizationFlaggedProjects(organizationId.value),
-			staleTime: 60_000,
-			enabled: !!organizationId.value,
-		})),
-	)
-	const organizationStats = computed(() => [
-		...Object.entries(
-			Object.groupBy(organizationProjects.data.value ?? [], (project) => project.status),
-		).map(([status, projects]) => ({ status, count: projects?.length ?? 0 })),
-		{ status: 'tech_review_failed', count: organizationFlaggedProjects.data.value?.length ?? 0 },
-	])
 	const members = computed(() =>
 		(memberQuery.data.value ?? [])
 			.filter((member) => member.accepted)
@@ -75,47 +53,11 @@ export function useReviewProject(selection: Ref<string>) {
 			.filter((member) => member.accepted)
 			.toSorted((a, b) => Number(b.is_owner) - Number(a.is_owner) || a.ordering - b.ordering),
 	)
-	const membersForStats = computed(() => [
-		...new Map(
-			[...organizationMembers.value, ...members.value].map((member) => [member.user.id, member]),
-		).values(),
-	])
-	const memberIds = computed(() => membersForStats.value.map((member) => member.user.id).toSorted())
-	const memberFlaggedProjects = useQuery(
-		computed(() => ({
-			queryKey: ['tech-reviews', 'flagged-projects', 'users', memberIds.value] as const,
-			queryFn: () => client.labrinth.tech_review_internal.getUsersFlaggedProjects(memberIds.value),
-			staleTime: 60_000,
-			enabled: memberIds.value.length > 0,
-		})),
-	)
-	const memberProjects = useQueries({
-		queries: computed(() =>
-			membersForStats.value.map((member) => ({
-				queryKey: ['user', member.user.id, 'projects', 'v3'],
-				queryFn: () => client.labrinth.users_v3.getProjects(member.user.id),
-				staleTime: 60_000,
-			})),
+	const creatorStats = useCreatorProjectStats(
+		computed(() =>
+			[...organizationMembers.value, ...members.value].map((member) => member.user.id),
 		),
-	})
-	const memberStats = computed(() =>
-		Object.fromEntries(
-			membersForStats.value.map((member, index) => {
-				const projects = memberProjects.value[index]?.data
-				return [
-					member.user.id,
-					[
-						...Object.entries(Object.groupBy(projects ?? [], (project) => project.status)).map(
-							([status, projects]) => ({ status, count: projects?.length ?? 0 }),
-						),
-						{
-							status: 'tech_review_failed',
-							count: memberFlaggedProjects.data.value?.[member.user.id]?.length ?? 0,
-						},
-					],
-				]
-			}),
-		),
+		organizationId,
 	)
 	const threadId = computed(() => projectQuery.data.value?.thread_id ?? '')
 	const threadQuery = useQuery({
@@ -182,8 +124,12 @@ export function useReviewProject(selection: Ref<string>) {
 				queryKey: ['project', 'v2', projectId.value],
 			}),
 			queryClient.invalidateQueries({ queryKey: ['project', projectId.value] }),
-			queryClient.invalidateQueries({ queryKey: ['project-attribution', projectId.value] }),
-			queryClient.invalidateQueries({ queryKey: ['tech-reviews', 'flagged-projects'] }),
+			queryClient.invalidateQueries({
+				queryKey: ['project-attribution', projectId.value],
+			}),
+			queryClient.invalidateQueries({
+				queryKey: ['tech-reviews', 'flagged-projects'],
+			}),
 			identity.refetch(),
 		])
 	}
@@ -196,26 +142,26 @@ export function useReviewProject(selection: Ref<string>) {
 		project: projectQuery.data,
 		projectV2: legacyQuery.data,
 		organization,
-		organizationStats,
+		organizationStats: creatorStats.organizationStats,
 		organizationMembers,
 		threadQuery,
 		wasReviewed,
 		permissions,
 		members,
-		memberStats,
+		memberStats: creatorStats.memberStats,
 		membersLoading: computed(
-			() => memberQuery.isPending.value || memberFlaggedProjects.isLoading.value,
+			() => memberQuery.isPending.value || creatorStats.membersLoading.value,
 		),
-		membersError: computed(() => memberQuery.isError.value || memberFlaggedProjects.isError.value),
+		membersError: computed(() => memberQuery.isError.value || creatorStats.membersError.value),
 		organizationLoading: computed(
 			() =>
 				!!projectQuery.data.value?.organization &&
-				(organizationQuery.isPending.value || organizationFlaggedProjects.isLoading.value),
+				(organizationQuery.isPending.value || creatorStats.organizationLoading.value),
 		),
 		organizationError: computed(
 			() =>
 				!!projectQuery.data.value?.organization &&
-				(organizationQuery.isError.value || organizationFlaggedProjects.isError.value),
+				(organizationQuery.isError.value || creatorStats.organizationError.value),
 		),
 		compatibilityError: legacyQuery.isError,
 		submissionCount,

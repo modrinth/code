@@ -526,7 +526,22 @@
 						:org-link="(slug) => `/organization/${slug}`"
 						:user-link="(username) => `/user/${username}`"
 						class="card flex-card"
-					/>
+					>
+						<template v-if="isStaff(auth.user)" #organization-details>
+							<ProjectStatusStats
+								v-if="
+									!creatorStats.organizationLoading.value && !creatorStats.organizationError.value
+								"
+								:stats="creatorStats.organizationStats.value"
+							/>
+						</template>
+						<template v-if="isStaff(auth.user)" #member-details="{ member }">
+							<ProjectStatusStats
+								v-if="!creatorStats.membersLoading.value && !creatorStats.membersError.value"
+								:stats="creatorStats.memberStats.value[member.user.id] ?? []"
+							/>
+						</template>
+					</ProjectSidebarCreators>
 					<ProjectSidebarDetails
 						:project="project"
 						:link-target="$external()"
@@ -628,6 +643,7 @@ import { useLocalStorage } from '@vueuse/core'
 import { nextTick, onScopeDispose, readonly, ref, useTemplateRef, watch, watchEffect } from 'vue'
 
 import { navigateTo } from '#app'
+import ProjectStatusStats from '~/components/ProjectStatusStats.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
@@ -636,6 +652,7 @@ import ModpackScanModal from '~/components/ui/moderation/ModpackScanModal.vue'
 import ProjectCollectionSaveButton from '~/components/ui/ProjectCollectionSaveButton.vue'
 import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
+import { useCreatorProjectStats } from '~/composables/creator-project-stats'
 import { getSignInRouteObj } from '~/composables/auth.ts'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { useProjectLinkValidation } from '~/composables/link-network-validation'
@@ -1720,6 +1737,12 @@ const members = computed(() => {
 
 	return owner ? [owner, ...rest] : rest
 })
+
+const creatorStats = useCreatorProjectStats(
+	computed(() => members.value.map((member) => member.user.id)),
+	computed(() => organization.value?.id ?? ''),
+	computed(() => isStaff(auth.value.user)),
+)
 
 const isMember = computed(
 	() => auth.value.user && allMembers.value.some((x) => x.user.id === auth.value.user.id),

@@ -29,6 +29,7 @@
 							<span class="text-sm font-normal text-secondary flex items-center gap-1"
 								><OrganizationIcon /> {{ formatMessage(messages.organization) }}</span
 							>
+							<slot name="organization-details" :organization="organization" />
 						</div>
 					</AutoLink>
 					<hr v-if="sortedMembers.length > 0" class="w-full border-button-border my-0.5" />
@@ -52,6 +53,7 @@
 							<ExternalIcon v-if="resolveLinkTarget(userLinkTarget) === '_blank'" />
 						</span>
 						<span class="text-sm font-normal text-secondary">{{ member.role }}</span>
+						<slot name="member-details" :member="member" />
 					</div>
 				</AutoLink>
 			</template>
