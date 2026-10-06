@@ -899,17 +899,11 @@
   "auth.sign-in.launcher.callback.title": {
     "message": "Modrinth App 登入回呼"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "我們正在帶你返回 Modrinth App。如果沒有出現任何反應，請點擊下方的按鈕。"
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "前往 Modrinth.com"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "開啟 Modrinth App"
-  },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "你已登入"
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "如果應用程式沒有開啟，請使用下方按鈕完成登入。"

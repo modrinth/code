@@ -896,17 +896,11 @@
   "auth.sign-in.launcher.callback.title": {
     "message": "Виклик Modrinth App"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Ми повертаємо вас до Modrinth App. Якщо нічого не відбудеться, натисніть на кнопку нижче."
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Перейти на Modrinth.com"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Відкрити Modrinth App"
-  },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Вхід виконано"
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "Якщо застосунок не відкривається, натисніть на кнопку нижче."

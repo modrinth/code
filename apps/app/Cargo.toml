@@ -8,18 +8,23 @@ repository = "https://github.com/modrinth/code/apps/app/"
 license = "GPL-3.0-only"
 
 [dependencies]
+aes-gcm = { workspace = true }
 async_zip = { workspace = true, features = ["deflate", "tokio-fs"] }
+base64 = { workspace = true }
 chrono = { workspace = true }
 daedalus = { workspace = true }
 dashmap = { workspace = true }
 either = { workspace = true }
 enumset = { workspace = true, features = ["serde"] }
+hkdf = { workspace = true }
 hyper = { workspace = true, features = ["server"] }
 hyper-util = { workspace = true }
 image = { workspace = true, features = ["gif", "jpeg", "png", "webp"] }
 native-dialog = { workspace = true }
+p256 = { workspace = true, features = ["ecdh"] }
 paste = { workspace = true }
 path-util = { workspace = true }
+rand = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 serde_with = { workspace = true }
