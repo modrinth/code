@@ -244,7 +244,9 @@
 						native-type="button"
 						class="ml-2"
 						:style="{ '--si': 1 }"
-						@click="() => (constrainWidth = !constrainWidth)"
+						@click="() => {
+							$emit('toggleConstrainWidth', (constrainWidth = !constrainWidth))
+						}"
 					>
 						<ExpandIcon v-if="constrainWidth" />
 						<CollapseIcon v-else />
@@ -447,11 +449,15 @@ const props = withDefaults(
 		navigateToServers: undefined,
 		browseModpacks: undefined,
 		browseContent: undefined,
-		constrainWidth: false,
+		constrainWidth: undefined,
 		centerEntries: true,
 		layoutMode: 'page',
 	},
 )
+
+defineEmits<{
+	toggleConstrainWidth: [value: boolean]
+}>()
 
 const { formatMessage } = useVIntl()
 
@@ -492,9 +498,14 @@ useResizeObserver(serverDataContainer, (entries) => {
 	const entry = entries[0]
 	allowConstrainWidthToggle.value = entry.contentRect.width > 1200
 })
-const constrainWidth = useLocalStorage('server-layout-constrained-width', props.constrainWidth, {
+const constrainWidth = useLocalStorage('server-layout-constrained-width', props.constrainWidth ?? true, {
 	initOnMounted: true,
+	listenToStorageChanges: true,
 })
+if (props.constrainWidth != constrainWidth.value) {
+	constrainWidth.value = props.constrainWidth;
+}
+
 const centerEntries = computed(() => props.centerEntries)
 const containedLayout = computed(() => props.layoutMode === 'contained')
 const isNuxt = computed(() => client instanceof NuxtModrinthClient)

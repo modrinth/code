@@ -27,6 +27,10 @@
 				})
 			}
 		"
+		:constrain-width="constrainWidth"
+		@toggle-constrain-width="(value: boolean) => {
+			constrainWidth = value;
+		}"
 	>
 		<template #default="{ onReinstall, onReinstallFailed, constrainWidth }">
 			<NuxtPage
@@ -90,6 +94,8 @@ async function resolveViewer(): Promise<{ userId: string | null; userRole: strin
 definePageMeta({
 	middleware: 'auth',
 })
+
+const constrainWidth = useCookie('server-layout-constrained-width', { default: () => true, maxAge: 60 * 60 * 24 * 365 })
 
 useHead({
 	script: [
