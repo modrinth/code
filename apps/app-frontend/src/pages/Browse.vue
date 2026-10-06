@@ -754,7 +754,15 @@ const selectableProjectTypes = computed(() => {
 	if (isServerContext.value) {
 		return [
 			{ label: formatMessage(messages.modsProjectType), href: `/browse/mod${suffix}` },
-			{ label: formatMessage(messages.pluginsProjectType), href: `/browse/plugin${suffix}` },
+			{
+				label: formatMessage(messages.pluginsProjectType),
+				href: `/browse/plugin${suffix}`,
+				shown: tags.value.loaders.some(
+					(loader) =>
+						loader.name === serverContextServerData.value?.loader?.toLowerCase() &&
+						loader.supported_project_types.includes('plugin'),
+				),
+			},
 			{
 				label: formatMessage(messages.resourcePacksProjectType),
 				href: `/browse/resourcepack${suffix}`,

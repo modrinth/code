@@ -219,13 +219,14 @@ async function launchInstalledInstance(target: LaunchTarget, instanceId: string)
 function notifyWhenInstalled(target: LaunchTarget, jobId: string, instanceId: string) {
 	void wait_for_install_job(appEvents, jobId)
 		.then(async () => {
+			const instance = await get(instanceId)
 			await assertAccount(target)
 			popupNotificationManager.addPopupNotification({
 				contentType: 'toast',
 				type: 'instance-ready',
 				title: target.name,
 				entityName: target.name,
-				entityIconUrl: target.icon,
+				entityIconUrl: getInstanceIconUrl(instance?.icon_path) ?? target.icon,
 				onLaunch: () => launchInstalledInstance(target, instanceId),
 				onOpenInstance: async () => {
 					await router.push(`/instance/${encodeURIComponent(instanceId)}`)
