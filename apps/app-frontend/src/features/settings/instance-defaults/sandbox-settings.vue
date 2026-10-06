@@ -39,6 +39,10 @@ const messages = defineMessages({
 		id: 'app.settings.sandbox.title',
 		defaultMessage: 'Sandbox instances',
 	},
+	instanceTitle: {
+		id: 'app.settings.sandbox.instance.title',
+		defaultMessage: 'Sandbox instance',
+	},
 	description: {
 		id: 'app.settings.sandbox.description',
 		defaultMessage:
@@ -52,6 +56,10 @@ const messages = defineMessages({
 		id: 'app.settings.sandbox.never.description',
 		defaultMessage: 'Run instances with full access to your computer.',
 	},
+	instanceNeverDescription: {
+		id: 'app.settings.sandbox.instance.never.description',
+		defaultMessage: 'Run this instance with full access to your computer.',
+	},
 	unrecognized: {
 		id: 'app.settings.sandbox.unrecognized',
 		defaultMessage: 'Unrecognized files',
@@ -60,6 +68,10 @@ const messages = defineMessages({
 		id: 'app.settings.sandbox.unrecognized.description',
 		defaultMessage: 'Sandbox instances containing files not from Modrinth.',
 	},
+	instanceUnrecognizedDescription: {
+		id: 'app.settings.sandbox.instance.unrecognized.description',
+		defaultMessage: 'Sandbox this instance if it contains files not from Modrinth.',
+	},
 	always: {
 		id: 'app.settings.sandbox.always',
 		defaultMessage: 'Always',
@@ -67,6 +79,10 @@ const messages = defineMessages({
 	alwaysDescription: {
 		id: 'app.settings.sandbox.always.description',
 		defaultMessage: 'Run instances always in the sandbox.',
+	},
+	instanceAlwaysDescription: {
+		id: 'app.settings.sandbox.instance.always.description',
+		defaultMessage: 'Always run this instance in the sandbox.',
 	},
 	warning: {
 		id: 'app.settings.sandbox.warning',
@@ -120,13 +136,24 @@ const messages = defineMessages({
 })
 
 const modes = [
-	{ value: 'never', label: messages.never, description: messages.neverDescription },
+	{
+		value: 'never',
+		label: messages.never,
+		description: messages.neverDescription,
+		instanceDescription: messages.instanceNeverDescription,
+	},
 	{
 		value: 'unrecognized',
 		label: messages.unrecognized,
 		description: messages.unrecognizedDescription,
+		instanceDescription: messages.instanceUnrecognizedDescription,
 	},
-	{ value: 'always', label: messages.always, description: messages.alwaysDescription },
+	{
+		value: 'always',
+		label: messages.always,
+		description: messages.alwaysDescription,
+		instanceDescription: messages.instanceAlwaysDescription,
+	},
 ]
 const permissionOptions = [
 	{ key: 'network', label: messages.network, description: messages.networkDescription },
@@ -181,7 +208,7 @@ function selectAdjacentMode(event: KeyboardEvent, index: number) {
 				<div class="flex flex-col gap-4">
 					<div class="flex flex-col gap-0.5">
 						<h2 :id="`${id}-title`" class="m-0 text-lg font-semibold text-contrast">
-							{{ formatMessage(messages.title) }}
+							{{ formatMessage(instanceSettings ? messages.instanceTitle : messages.title) }}
 						</h2>
 						<p class="m-0 leading-6">{{ formatMessage(messages.description) }}</p>
 					</div>
@@ -202,7 +229,9 @@ function selectAdjacentMode(event: KeyboardEvent, index: number) {
 							@keydown="selectAdjacentMode($event, index)"
 						>
 							<span class="font-semibold text-contrast">{{ formatMessage(option.label) }}</span>
-							<span class="col-span-2">{{ formatMessage(option.description) }}</span>
+							<span class="col-span-2">{{
+								formatMessage(instanceSettings ? option.instanceDescription : option.description)
+							}}</span>
 						</LargeRadioButton>
 					</div>
 					<div
