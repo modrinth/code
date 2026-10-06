@@ -1,6 +1,7 @@
 import type { ConfirmLeaveModal } from '@modrinth/ui'
 import { createContext } from '@modrinth/ui'
 import { isAdmin, isStaff } from '@modrinth/utils'
+import { useLocalStorage } from '@vueuse/core'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 
@@ -17,6 +18,9 @@ export const [injectProjectReviewPageContext, provideProjectReviewPageContext] =
 	createContext<ProjectReviewPageContext>('ProjectReviewPage')
 
 export function createProjectReviewPageContext() {
+	const pixelated = useLocalStorage('project-review-image-pixelated', false, {
+		initOnMounted: true,
+	})
 	const route = useRoute()
 	const router = useRouter()
 	const queue = useModerationQueue()
@@ -69,6 +73,7 @@ export function createProjectReviewPageContext() {
 	})
 
 	return {
+		pixelated,
 		disclosures,
 		confirmLeaveModal,
 		...data,

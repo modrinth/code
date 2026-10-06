@@ -1,6 +1,40 @@
 <template>
 	<Section :heading="formatMessage(messages.details)">
 		<dl v-if="project" class="m-0 grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 gap-y-2">
+			<dt class="font-medium">{{ formatMessage(messages.project) }}</dt>
+			<dd class="m-0 flex min-w-0 items-center gap-1">
+				<Tooltip class="flex shrink-0">
+					<template #popper>
+						<ProjectStatusBadge
+							:status="project.status"
+							:style="{ color: `var(--color-${getProjectStatusColor(project.status)})` }"
+						/>
+					</template>
+					<component
+						:is="getProjectStatusIcon(project.status)"
+						class="size-4 shrink-0"
+						:style="{ color: `var(--color-${getProjectStatusColor(project.status)})` }"
+						aria-hidden="true"
+					/>
+				</Tooltip>
+				<NuxtLink
+					:to="projectUrl"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="min-w-0 break-words font-semibold text-secondary hover:underline"
+				>
+					{{ project.name }}
+				</NuxtLink>
+			</dd>
+			<template v-if="project.requested_status">
+				<dt class="font-medium">{{ formatMessage(messages.requesting) }}</dt>
+				<dd class="m-0">
+					<ProjectStatusBadge
+						:status="project.requested_status"
+						:style="{ color: `var(--color-${getProjectStatusColor(project.requested_status)})` }"
+					/>
+				</dd>
+			</template>
 			<dt class="font-medium">{{ formatMessage(messages.projectType) }}</dt>
 			<dd class="m-0 flex flex-col gap-1">
 				<div
@@ -43,15 +77,15 @@
 			</template>
 			<dt class="font-medium">{{ formatMessage(messages.downloads) }}</dt>
 			<dd class="m-0">{{ formatNumber(project.downloads) }}</dd>
-			<template v-if="project.requested_status">
-				<dt class="font-medium">{{ formatMessage(messages.requesting) }}</dt>
-				<dd class="m-0">
-					<ProjectStatusBadge
-						:status="project.requested_status"
-						:style="{ color: `var(--color-${getProjectStatusColor(project.requested_status)})` }"
-					/>
-				</dd>
-			</template>
+
+			<dt class="self-center font-medium">{{ formatMessage(messages.actions) }}</dt>
+			<dd class="m-0 flex items-center gap-2">
+				<CopyCode :text="project.id" :display-text="formatMessage(messages.projectId)" />
+				<CopyCode
+					:text="`${config.public.siteUrl}/project/${project.id}`"
+					:display-text="formatMessage(messages.permalink)"
+				/>
+			</dd>
 		</dl>
 	</Section>
 </template>
@@ -60,10 +94,13 @@
 import { ServerIcon } from '@modrinth/assets'
 import {
 	BulletDivider,
+	CopyCode,
 	getProjectStatusColor,
+	getProjectStatusIcon,
 	getProjectTypeIcon,
 	getProjectTypeTitleMessage,
 	ProjectStatusBadge,
+	Tooltip,
 	useFormatNumber,
 	useRelativeTime,
 	useVIntl,
@@ -76,7 +113,12 @@ import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { projectReviewMessages as messages } from '../../messages'
 import Section from '../section.vue'
 
-const { project, submissionCount } = injectProjectReviewPageContext()
+const { project, projectV2, submissionCount } = injectProjectReviewPageContext()
+const config = useRuntimeConfig()
+const projectUrl = computed(
+	() =>
+		`/${projectV2.value?.project_type ?? project.value?.project_types[0]}/${project.value?.slug ?? project.value?.id}`,
+)
 const primaryProjectType = computed(() =>
 	project.value ? getPrimaryProjectType(project.value) : undefined,
 )

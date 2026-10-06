@@ -53,9 +53,11 @@ import { CrownIcon } from '@modrinth/assets'
 import { Avatar, ImageViewerEditor, useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
+import ProjectStatusStats from '~/components/ProjectStatusStats.vue'
+import { injectProjectReviewPageContext } from '~/providers/project-review'
+
 import ImageViewerActions from '../../image-viewer-actions.vue'
 import { projectReviewMessages as messages } from '../../messages'
-import ProjectStatusStats from '~/components/ProjectStatusStats.vue'
 
 const props = defineProps<{
 	member: Labrinth.Projects.v3.TeamMember
@@ -63,7 +65,7 @@ const props = defineProps<{
 }>()
 const { formatMessage } = useVIntl()
 const viewer = ref<InstanceType<typeof ImageViewerEditor>>()
-const pixelated = ref(false)
+const { pixelated } = injectProjectReviewPageContext()
 const avatarUrl = computed(() => props.member.user.raw_avatar_url || props.member.user.avatar_url)
 const viewerItems = computed(() =>
 	avatarUrl.value

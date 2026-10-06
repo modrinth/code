@@ -3059,6 +3059,9 @@
   "moderation.page.technicalReview": {
     "message": "Tech review"
   },
+  "moderation.project-review.actions": {
+    "message": "Actions"
+  },
   "moderation.project-review.approvedCount": {
     "message": "{count} approved"
   },
@@ -3302,6 +3305,9 @@
   "moderation.project-review.mrpack": {
     "message": ".mrpack"
   },
+  "moderation.project-review.name": {
+    "message": "Name"
+  },
   "moderation.project-review.next": {
     "message": "Next"
   },
@@ -3365,6 +3371,9 @@
   "moderation.project-review.pendingFiles": {
     "message": "Pending files ({count})"
   },
+  "moderation.project-review.permalink": {
+    "message": "Perma link"
+  },
   "moderation.project-review.permissions": {
     "message": "Permissions"
   },
@@ -3392,11 +3401,14 @@
   "moderation.project-review.processingCount": {
     "message": "{count} under review"
   },
+  "moderation.project-review.projectId": {
+    "message": "Project ID"
+  },
   "moderation.project-review.projectTitle": {
     "message": "Title"
   },
   "moderation.project-review.projectType": {
-    "message": "Project type"
+    "message": "Type"
   },
   "moderation.project-review.published": {
     "message": "Published"
@@ -3502,6 +3514,9 @@
   },
   "moderation.project-review.source": {
     "message": "Source code"
+  },
+  "moderation.project-review.sourceAvailabilityRequired": {
+    "message": "License requires source code."
   },
   "moderation.project-review.sourceError": {
     "message": "Could not load source code. Try opening the flag again"
@@ -6475,6 +6490,9 @@
   },
   "thread-issues.target.edit-url": {
     "message": "Edit URL"
+  },
+  "thread.message.open-image": {
+    "message": "Open image"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Latest news from Modrinth"

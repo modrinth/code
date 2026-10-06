@@ -37,9 +37,8 @@ import { projectReviewMessages as messages } from '../../messages'
 import Section from '../section.vue'
 
 const { formatMessage } = useVIntl()
-const { project, projectId } = injectProjectReviewPageContext()
+const { project, projectId, pixelated } = injectProjectReviewPageContext()
 const viewer = ref<InstanceType<typeof ImageViewerEditor>>()
-const pixelated = ref(false)
 const iconUrl = computed(() => project.value?.raw_icon_url || project.value?.icon_url)
 const viewerItems = computed(() => {
 	if (!project.value || !iconUrl.value) return []

@@ -83,7 +83,11 @@
 		</template>
 		<div
 			v-if="message.body.type === 'text'"
+			v-image-previews="imagePreviews ? formatMessage(imageMessages.openImage) : null"
 			class="message__body markdown-body"
+			:class="{ 'image-previews': imagePreviews }"
+			@click="openImage"
+			@keydown="handleImageKeydown"
 			v-html="formattedMessage"
 		/>
 		<div v-else class="message__body status-message">
@@ -166,9 +170,11 @@ import {
 	AutoLink,
 	Avatar,
 	Badge,
+	defineMessages,
 	TeleportOverflowMenu,
 	useFormatDateTime,
 	useRelativeTime,
+	useVIntl,
 } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
 
@@ -199,14 +205,58 @@ const props = defineProps({
 		type: Boolean,
 		default: false,
 	},
+	imagePreviews: {
+		type: Boolean,
+		default: false,
+	},
 	auth: {
 		type: Object,
 		required: true,
 	},
 })
 
-const emit = defineEmits(['update-thread'])
+const emit = defineEmits(['update-thread', 'open-image'])
 const settings = useModerationSettings()
+const { formatMessage } = useVIntl()
+const imageMessages = defineMessages({
+	openImage: {
+		id: 'thread.message.open-image',
+		defaultMessage: 'Open image',
+	},
+})
+
+function prepareImagePreviews(element, binding) {
+	if (!binding.value && !binding.oldValue) return
+	for (const image of element.querySelectorAll('img')) {
+		if (binding.value && image.getAttribute('src')) {
+			image.setAttribute('role', 'button')
+			image.setAttribute('tabindex', '0')
+			image.setAttribute('aria-label', image.alt || binding.value)
+		} else {
+			image.removeAttribute('role')
+			image.removeAttribute('tabindex')
+			image.removeAttribute('aria-label')
+		}
+	}
+}
+
+const vImagePreviews = {
+	mounted: prepareImagePreviews,
+	updated: prepareImagePreviews,
+}
+
+function openImage(event) {
+	if (!props.imagePreviews || !(event.target instanceof HTMLImageElement)) return
+	const image = event.target
+	if (!image.getAttribute('src')) return
+	event.preventDefault()
+	event.stopPropagation()
+	emit('open-image', { src: image.currentSrc || image.src, alt: image.alt, element: image })
+}
+
+function handleImageKeydown(event) {
+	if (event.key === 'Enter' || event.key === ' ') openImage(event)
+}
 
 const formattedMessage = computed(() => {
 	const body = renderString(props.message.body.body)
@@ -352,6 +402,15 @@ async function deleteMessage() {
 
 .message__body {
 	grid-area: body;
+}
+
+.image-previews :deep(img[role='button']) {
+	cursor: zoom-in;
+
+	&:focus-visible {
+		outline: 2px solid var(--color-brand);
+		outline-offset: 2px;
+	}
 }
 
 .status-message > span {

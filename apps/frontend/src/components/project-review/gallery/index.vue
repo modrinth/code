@@ -97,10 +97,9 @@ const formatDateTime = useFormatDateTime({
 	dateStyle: 'long',
 	timeStyle: 'short',
 })
-const { selection, projectId, gallery, isLoading, error, refresh } =
+const { selection, projectId, gallery, isLoading, error, refresh, pixelated } =
 	injectProjectReviewPageContext()
 const viewer = ref<InstanceType<typeof ImageViewerEditor>>()
-const pixelated = ref(false)
 const viewerItems = computed(() =>
 	gallery.value.map((item, index) => ({
 		id: item.url,

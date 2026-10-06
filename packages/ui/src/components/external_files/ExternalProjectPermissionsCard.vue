@@ -54,9 +54,11 @@ const props = withDefaults(
 		group: Labrinth.Attribution.Internal.AttributionGroup
 		members?: Labrinth.Projects.v3.TeamMember[]
 		isModerator?: boolean
+		pixelated?: boolean
 	}>(),
 	{
 		isModerator: false,
+		pixelated: undefined,
 	},
 )
 
@@ -655,6 +657,7 @@ const visibleQuickReplies = computed<ButtonMenuOption[]>(() => {
 					:attributor-label="attributorLabel"
 					:attributor-avatar-url="attributorMember?.user.avatar_url"
 					:moderator="isModerator"
+					:pixelated="pixelated"
 				>
 					<template #image-viewer-actions="slotProps">
 						<slot name="image-viewer-actions" v-bind="slotProps" />

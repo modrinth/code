@@ -13,16 +13,13 @@
 				:key="project.id"
 				:project="project"
 				:members="members"
+				:pixelated="pixelated"
 				is-moderator
 				collapse-all-icon-only
 				collapse-attributed-by-default
 			>
-				<template #image-viewer-actions="{ item, pixelated, setPixelated }">
-					<ImageViewerActions
-						:src="item.src"
-						:pixelated="pixelated"
-						@update:pixelated="setPixelated"
-					/>
+				<template #image-viewer-actions="{ item }">
+					<ImageViewerActions v-model:pixelated="pixelated" :src="item.src" />
 				</template>
 			</ProjectPermissions>
 		</div>
@@ -41,5 +38,5 @@ import ReviewPanel from '../review-panel/index.vue'
 
 const panels = injectReviewPanels()
 const interactionScope = useTemplateRef<HTMLElement>('interactionScope')
-const { project, members } = injectProjectReviewPageContext()
+const { project, members, pixelated } = injectProjectReviewPageContext()
 </script>

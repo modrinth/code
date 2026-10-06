@@ -39,14 +39,20 @@ import { setupAttributionModerationProvider } from '~/providers/setup/attributio
 
 setupAttributionModerationProvider()
 
-const props = defineProps<{
-	project: { id: string; status: string }
-	members: Labrinth.Projects.v3.TeamMember[]
-	isModerator: boolean
-	collapseAllIconOnly?: boolean
-	collapseAttributedByDefault?: boolean
-	refreshProjectValidation?: () => Promise<unknown>
-}>()
+const props = withDefaults(
+	defineProps<{
+		project: { id: string; status: string }
+		members: Labrinth.Projects.v3.TeamMember[]
+		isModerator: boolean
+		collapseAllIconOnly?: boolean
+		collapseAttributedByDefault?: boolean
+		pixelated?: boolean
+		refreshProjectValidation?: () => Promise<unknown>
+	}>(),
+	{
+		pixelated: undefined,
+	},
+)
 const flags = useFeatureFlags()
 
 const { formatMessage } = useVIntl()
@@ -688,6 +694,7 @@ function dismissInfoBanner() {
 					:group="group"
 					:members="members"
 					:is-moderator="isModerator"
+					:pixelated="pixelated"
 					@update:collapsed="setCardCollapsed(group.id, $event)"
 				>
 					<template #image-viewer-actions="slotProps">

@@ -14,8 +14,10 @@
 						:members="members"
 						:auth="auth"
 						raised
+						image-previews
 						class="shrink-0 text-xs"
 						@update-thread="() => refetch()"
+						@open-image="openImage"
 					/>
 				</template>
 				<div v-else-if="isError" class="flex flex-col gap-3 p-4">
@@ -32,26 +34,59 @@
 			</div>
 		</div>
 		<MessageBox v-if="thread" ref="messageBox" />
+		<ImageViewerEditor
+			ref="viewer"
+			:items="imageItems"
+			editor="disabled"
+			:pixelated="pixelated"
+			@hide="restoreImageFocus"
+		>
+			<template #actions="{ item }">
+				<ImageViewerActions v-model:pixelated="pixelated" :src="item.src" />
+			</template>
+		</ImageViewerEditor>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { Button, useVIntl } from '@modrinth/ui'
+import { Button, ImageViewerEditor, useVIntl } from '@modrinth/ui'
 import { useResizeObserver } from '@vueuse/core'
 import { computed, nextTick, ref, watch } from 'vue'
 
 import ThreadMessage from '~/components/ui/thread/ThreadMessage.vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
+import ImageViewerActions from '../image-viewer-actions.vue'
 import { injectProjectReviewContext } from '../layout/context'
 import { projectReviewMessages as messages } from '../messages'
 import MessageBox from './message-box.vue'
 
-const { threadQuery } = injectProjectReviewPageContext()
+const { threadQuery, pixelated } = injectProjectReviewPageContext()
 const { rightVisible, toggleSidebar } = injectProjectReviewContext()
 const { data: thread, isError, refetch } = threadQuery
 const auth = useAuthState()
 const { formatMessage } = useVIntl()
+const viewer = ref<InstanceType<typeof ImageViewerEditor>>()
+const imageItems = ref<{ id: string; src: string; alt: string }[]>([])
+let imageTrigger: HTMLImageElement | undefined
+
+async function openImage(image: { src: string; alt: string; element: HTMLImageElement }) {
+	imageTrigger = image.element
+	imageItems.value = [
+		{
+			id: image.src,
+			src: image.src,
+			alt: image.alt || formatMessage(messages.imageNumber, { number: 1 }),
+		},
+	]
+	await nextTick()
+	viewer.value?.show(0)
+}
+
+function restoreImageFocus() {
+	if (imageTrigger?.isConnected) imageTrigger.focus({ preventScroll: true })
+	imageTrigger = undefined
+}
 const sortedMessages = computed(() =>
 	[...(thread.value?.messages ?? [])].sort((a, b) => Date.parse(a.created) - Date.parse(b.created)),
 )
@@ -92,6 +127,8 @@ useResizeObserver([scrollContainer, content], () => {
 watch(
 	() => thread.value?.id,
 	() => {
+		imageTrigger = undefined
+		imageItems.value = []
 		isAtBottom.value = true
 		scrollToBottom()
 	},

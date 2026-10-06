@@ -29,9 +29,11 @@ const props = withDefaults(
 		attributorLabel: string
 		attributorAvatarUrl?: string | null
 		moderator?: boolean
+		pixelated?: boolean
 	}>(),
 	{
 		moderator: false,
+		pixelated: undefined,
 	},
 )
 
@@ -131,7 +133,13 @@ const licenseReadDisplay = computed(() => {
 
 const linkToWork = computed(() => attributionLinkToWork(props.attribution))
 const proofImageViewer = useTemplateRef<InstanceType<typeof ImageViewerEditor>>('proofImageViewer')
-const pixelated = ref(false)
+const localPixelated = ref(false)
+const pixelated = computed({
+	get: () => props.pixelated ?? localPixelated.value,
+	set: (value: boolean) => {
+		localPixelated.value = value
+	},
+})
 const proofImageItems = computed(() =>
 	(props.attribution.image_urls ?? []).map((src, index) => ({
 		id: `${src}-${index}`,

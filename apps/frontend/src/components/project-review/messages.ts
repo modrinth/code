@@ -390,9 +390,25 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.details',
 		defaultMessage: 'Details',
 	},
+	actions: {
+		id: 'moderation.project-review.actions',
+		defaultMessage: 'Actions',
+	},
+	projectId: {
+		id: 'moderation.project-review.projectId',
+		defaultMessage: 'Project ID',
+	},
+	permalink: {
+		id: 'moderation.project-review.permalink',
+		defaultMessage: 'Perma link',
+	},
+	project: {
+		id: 'moderation.project-review.project',
+		defaultMessage: 'Project',
+	},
 	projectType: {
 		id: 'moderation.project-review.projectType',
-		defaultMessage: 'Project type',
+		defaultMessage: 'Type',
 	},
 	created: {
 		id: 'moderation.project-review.created',
