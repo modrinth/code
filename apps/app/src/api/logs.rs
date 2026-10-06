@@ -14,6 +14,7 @@ pub struct Logs {
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("logs")
+		.js_init_script(include_str!("webview-logs.js"))
         .invoke_handler(tauri::generate_handler![
             logs_get_logs,
             logs_get_logs_by_filename,
@@ -23,8 +24,25 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             logs_get_latest_log_cursor,
             logs_get_live_log_buffer,
             logs_clear_live_log_buffer,
+			logs_log_webview,
         ])
         .build()
+}
+
+#[tauri::command]
+pub fn logs_log_webview<R: tauri::Runtime>(
+	webview: tauri::Webview<R>,
+	level: &str,
+	message: &str,
+) {
+	let label = webview.label();
+	match level {
+		"trace" => tracing::trace!(target: "webview", webview = label, "{message}"),
+		"debug" => tracing::debug!(target: "webview", webview = label, "{message}"),
+		"warn" => tracing::warn!(target: "webview", webview = label, "{message}"),
+		"error" => tracing::error!(target: "webview", webview = label, "{message}"),
+		_ => tracing::info!(target: "webview", webview = label, "{message}"),
+	}
 }
 
 /// Get all logs for an instance, sorted by filename.

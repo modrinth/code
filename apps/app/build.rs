@@ -90,6 +90,7 @@ fn main() {
                         "logs_get_latest_log_cursor",
                         "logs_get_live_log_buffer",
                         "logs_clear_live_log_buffer",
+						"logs_log_webview",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
