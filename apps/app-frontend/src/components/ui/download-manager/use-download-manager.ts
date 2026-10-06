@@ -167,7 +167,9 @@ export function useDownloadManager() {
 		const task = storeVerificationTask.value
 		return task ? [buildVerificationRow(task)] : []
 	})
-	const debugExportRows = computed(() => [...debugInfoExports.value.values()].map(buildDebugExportRow))
+	const debugExportRows = computed(() =>
+		[...debugInfoExports.value.values()].map(buildDebugExportRow),
+	)
 	const allRows = computed(() => [
 		...rows.value,
 		...verificationRows.value,
@@ -217,15 +219,17 @@ export function useDownloadManager() {
 			title: formatMessage(debugExportMessages.title),
 			iconUrl: null,
 			taskType: task.filename,
-			text: task.error ?? formatMessage(
-				task.status === 'succeeded'
-					? commonMessages.savedLabel
-					: task.status === 'canceled'
-						? debugExportMessages.canceled
-						: task.canceling
-							? debugExportMessages.canceling
-							: debugExportMessages[task.stage],
-			),
+			text:
+				task.error ??
+				formatMessage(
+					task.status === 'succeeded'
+						? commonMessages.savedLabel
+						: task.status === 'canceled'
+							? debugExportMessages.canceled
+							: task.canceling
+								? debugExportMessages.canceling
+								: debugExportMessages[task.stage],
+				),
 			finishedAt: task.finishedAt,
 			progress,
 			overallProgress: task.status === 'succeeded' ? 1 : progress,

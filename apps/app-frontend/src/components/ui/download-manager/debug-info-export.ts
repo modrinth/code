@@ -61,7 +61,8 @@ export async function exportDebugInfo(title: string) {
 				!task.started ||
 				task.canceling ||
 				task.stage === 'finishing'
-			) return
+			)
+				return
 			task.canceling = true
 			try {
 				await invoke('plugin:utils|cancel_debug_info_export', { id: task.id })

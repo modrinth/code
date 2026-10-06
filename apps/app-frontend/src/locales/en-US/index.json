@@ -302,6 +302,18 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Turn on resource pack syncing in app settings first."
   },
+  "app.debug-export.canceling": {
+    "message": "Canceling export…"
+  },
+  "app.debug-export.exporting": {
+    "message": "Exporting…"
+  },
+  "app.debug-export.finishing": {
+    "message": "Finishing…"
+  },
+  "app.debug-export.preparing": {
+    "message": "Preparing files…"
+  },
   "app.download-manager.active": {
     "message": "Active"
   },
