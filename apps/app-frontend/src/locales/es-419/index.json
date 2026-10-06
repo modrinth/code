@@ -57,7 +57,7 @@
     "message": "No se pudo preparar la instancia"
   },
   "app.action-bar.install.summary.invalid-file-path": {
-    "message": "La ruta del archivo no es válida"
+    "message": "Ruta de archivo no válida"
   },
   "app.action-bar.install.summary.invalid-modpack": {
     "message": "Los datos del modpack no son válidos"
@@ -206,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Página de inicio y contenido"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Pasar la App de Modrinth al primer plano cuando cierres Minecraft."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Reenfocar app cuando se cierra Minecraft"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Inicio y navegación"
   },
@@ -300,10 +306,13 @@
     "message": "Activos"
   },
   "app.download-manager.attention": {
-    "message": "Requiere atención"
+    "message": "Necesita atención"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "Actualizando {count, plural, one {# elemento} other {# elementos}}"
   },
   "app.download-manager.cancel": {
-    "message": "Cancelar la instalación"
+    "message": "Cancelar instalación"
   },
   "app.download-manager.canceling": {
     "message": "Cancelando instalación…"
@@ -480,7 +489,7 @@
     "message": "Arrastrar para redimensionar"
   },
   "app.home.jump-back-in.title": {
-    "message": "Jugar"
+    "message": "Continuar"
   },
   "app.home.jump-back-in.view-instance": {
     "message": "Ver instancia"
@@ -3239,6 +3248,12 @@
   "app.skins.section.default-skins": {
     "message": "Skins predeterminadas"
   },
+  "app.skins.section.dungeons-hero": {
+    "message": "Héroe de mazmorra"
+  },
+  "app.skins.section.dungeons-ii-hero": {
+    "message": "Héroe de mazmorra II"
+  },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
@@ -3268,6 +3283,9 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "Bebés al Poder"
+  },
+  "app.skins.section.wilderness-bound": {
+    "message": "Naturaleza Salvaje"
   },
   "app.skins.sign-in.button": {
     "message": "Inicia sesión en Microsoft"

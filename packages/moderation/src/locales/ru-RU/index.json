@@ -134,23 +134,62 @@
   "nags.invalid-project-summary.title": {
     "defaultMessage": "Измените сводку"
   },
+  "nags.license-url.not-in-allowlist.description": {
+    "defaultMessage": "URL лицензии не распознан как ссылка на лицензию. Убедитесь, что он ведёт на текст лицензии."
+  },
   "nags.license-url.not-in-allowlist.title": {
     "defaultMessage": "Проверьте ссылку на лицензию"
+  },
+  "nags.link-validation.discord-invite": {
+    "defaultMessage": "Ваша пригласительная ссылка Discord недействительна, истекла или не ведёт на сервер. Замените её действующим приглашением."
   },
   "nags.link-validation.discord-invite.title": {
     "defaultMessage": "Замените Discord"
   },
+  "nags.link-validation.download": {
+    "defaultMessage": "Ссылки, начинающие скачивание, запрещены. Уберите их из описания."
+  },
+  "nags.link-validation.download.title": {
+    "defaultMessage": "Удалите ссылки на скачивание"
+  },
+  "nags.link-validation.duplicate": {
+    "defaultMessage": "Ссылка на {linkField, select, issues {трекер проблем} source {исходный код} wiki {вики} discord {Discord} site {сайт} store {магазин} license {лицензию} description {описание} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {поддержку}} также используется в {otherLinkField, select, issues {трекере проблем} source {исходном коде} wiki {вики} discord {Discord} site {сайте} store {магазине} license {лицензии} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {другим полем}}. Ссылки не должны повторяться."
+  },
   "nags.link-validation.duplicate.title": {
     "defaultMessage": "Уберите копии ссылок"
+  },
+  "nags.link-validation.external-blocklist-match": {
+    "defaultMessage": "Ваша ссылка {linkField} недопустима. Пожалуйста, удалите эту ссылку или замените её на подходящую для типа ссылки {linkField}."
   },
   "nags.link-validation.external-blocklist-match.title": {
     "defaultMessage": "Замените ссылки"
   },
+  "nags.link-validation.global-blocklist-match": {
+    "defaultMessage": "Ссылка на {linkField, select, issues {трекер проблем} source {исходный код} wiki {вики} discord {Discord} site {сайт} store {магазин} license {лицензию} description {описание} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {поддержку}} использует неподдерживаемый домен. Уберите или замените ссылку."
+  },
   "nags.link-validation.global-blocklist-match.title": {
     "defaultMessage": "Измените ссылки"
   },
+  "nags.link-validation.ip-address": {
+    "defaultMessage": "Ссылка на {linkField, select, issues {трекер проблем} source {исходный код} wiki {вики} discord {Discord} site {сайт} store {магазин} license {лицензию} description {описание} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {поддержку}} использует IP-адрес. Используйте URL с доменным именем."
+  },
+  "nags.link-validation.ip-address.title": {
+    "defaultMessage": "Уберите IP-ссылку"
+  },
+  "nags.link-validation.malformed": {
+    "defaultMessage": "Ссылка на {linkField, select, issues {трекер проблем} source {исходный код} wiki {вики} discord {Discord} site {сайт} store {магазин} license {лицензию} description {описание} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {поддержку}} недействительна. Введите полный HTTPS-адрес."
+  },
   "nags.link-validation.malformed.title": {
     "defaultMessage": "Исправьте ссылки"
+  },
+  "nags.link-validation.not-in-allowlist": {
+    "defaultMessage": "Ссылка на {linkField, select, issues {трекер проблем} source {исходный код} wiki {вики} discord {Discord} site {сайт} store {магазин} license {лицензию} description {описание} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {поддержку}} не подходит для своего типа. Убедитесь, что она соответствует назначению."
+  },
+  "nags.link-validation.not-in-allowlist.title": {
+    "defaultMessage": "Проверьте ссылки"
+  },
+  "nags.link-validation.source-repository": {
+    "defaultMessage": "Ссылка на исходный код должна вести на репозиторий на поддерживаемой платформе или на собственный сервер Gitea/Forgejo."
   },
   "nags.link-validation.source-repository.title": {
     "defaultMessage": "Ссылка на репозиторий исходного кода"
@@ -163,6 +202,9 @@
   },
   "nags.link-validation.unverifiable.title": {
     "defaultMessage": "Проверьте доступность ссылки"
+  },
+  "nags.link-validation.wrong-field": {
+    "defaultMessage": "Ссылка на {linkField, select, issues {трекер проблем} source {исходный код} wiki {вики} discord {Discord} site {сайт} store {магазин} license {лицензию} description {описание} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {поддержку}} не подходит для {linkField, select, issues {трекера проблем} source {исходного кода} wiki {вики} discord {Discord} site {сайта} store {магазина} license {лицензии}  description {описания} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {поддержки}}. Уберите или замените её."
   },
   "nags.link-validation.wrong-field.title": {
     "defaultMessage": "Исправьте ссылки"

@@ -206,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Startpagina en inhoud"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Breng de Modrinth App naar de voorgrond als Minecraft sluit."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Opnieuw focussen bij sluiten van Minecraft"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Opstarten en navigeren"
   },
@@ -2531,6 +2537,12 @@
   "app.settings.game-options.setting.menu-background-blur.label": {
     "message": "Menu achtergrondblur"
   },
+  "app.settings.game-options.setting.mipmap-levels.description": {
+    "message": "Textuur vloeien op afstand."
+  },
+  "app.settings.game-options.setting.mipmap-levels.label": {
+    "message": "Mipmap levels"
+  },
   "app.settings.game-options.setting.mouse-wheel-sensitivity.label": {
     "message": "Scrollgevoeligheid"
   },
@@ -2564,6 +2576,9 @@
   "app.settings.game-options.setting.notification-time.label": {
     "message": "Meldingstijd"
   },
+  "app.settings.game-options.setting.operator-items-tab.label": {
+    "message": "Operator items tab"
+  },
   "app.settings.game-options.setting.panorama-speed.label": {
     "message": "Panorama snelheid"
   },
@@ -2573,14 +2588,62 @@
   "app.settings.game-options.setting.players-volume.label": {
     "message": "Spelers"
   },
+  "app.settings.game-options.setting.prioritize-chunk-updates.label": {
+    "message": "Prioriteer chunk updates"
+  },
+  "app.settings.game-options.setting.quit-shortcuts.label": {
+    "message": "Sluit snelkoppelingen"
+  },
   "app.settings.game-options.setting.raw-mouse-input.label": {
     "message": "Onbewerkte invoer"
+  },
+  "app.settings.game-options.setting.realms-notifications.label": {
+    "message": "Realms meldingen"
   },
   "app.settings.game-options.setting.record-volume.label": {
     "message": "Platenspeler/nootblokken"
   },
+  "app.settings.game-options.setting.reduced-debug-info.label": {
+    "message": "Verminderde debug informatie"
+  },
+  "app.settings.game-options.setting.render-distance.label": {
+    "message": "Render afstand"
+  },
   "app.settings.game-options.setting.right-pants-leg.label": {
     "message": "Rechter broek been"
+  },
+  "app.settings.game-options.setting.right-sleeve.label": {
+    "message": "Rechtermouw"
+  },
+  "app.settings.game-options.setting.rotate-with-minecart.label": {
+    "message": "Draai met mijnkar"
+  },
+  "app.settings.game-options.setting.save-chat-drafts.label": {
+    "message": "Sla chat concepten op"
+  },
+  "app.settings.game-options.setting.screen-effects.label": {
+    "message": "Scherm effecten"
+  },
+  "app.settings.game-options.setting.secure-chat-only.label": {
+    "message": "Geef alleen beveiligde chat weer"
+  },
+  "app.settings.game-options.setting.sensitivity.label": {
+    "message": "Muis gevoeligheid"
+  },
+  "app.settings.game-options.setting.share-presence.label": {
+    "message": "Deel aanwezigheid"
+  },
+  "app.settings.game-options.setting.simulation-distance.description": {
+    "message": "Hoe veraf entiteiten bijwerken en blokken en vloeistoffen tick."
+  },
+  "app.settings.game-options.setting.simulation-distance.label": {
+    "message": "Simulatie afstand"
+  },
+  "app.settings.game-options.setting.snooper.label": {
+    "message": "Snooper"
+  },
+  "app.settings.game-options.setting.sprint-window.label": {
+    "message": "Ren scherm"
   },
   "app.settings.game-options.setting.subtitles.label": {
     "message": "Ondertiteling"
