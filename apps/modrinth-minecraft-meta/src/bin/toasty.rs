@@ -1,5 +1,3 @@
-use std::path::Path;
-
 use anyhow::Result;
 use toasty_cli::ToastyCli;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};

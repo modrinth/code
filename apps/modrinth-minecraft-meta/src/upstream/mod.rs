@@ -3,7 +3,6 @@
 
 pub mod fabric;
 pub mod forge;
-pub mod forgelike;
 pub mod mojang;
 pub mod neoforge;
 pub mod quilt;

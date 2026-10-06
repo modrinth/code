@@ -27,22 +27,6 @@ impl BlobStore {
         self.imp.get(sha256).await
     }
 
-    pub async fn get_sha1(
-        &self,
-        exec: &mut dyn toasty::Executor,
-        sha1: Sha1,
-    ) -> Result<Vec<u8>> {
-        let sha256 = model::BlobHash::all()
-            .filter(model::BlobHash::fields().sha1().eq(sha1))
-            .select(model::BlobHash::fields().sha256())
-            .one()
-            .exec(exec)
-            .context(info_span!("looking up sha1 by sha256"))
-            .await?;
-        let data = self.imp.get(sha256).await?;
-        Ok(data)
-    }
-
     pub async fn put(
         &self,
         exec: &mut dyn toasty::Executor,

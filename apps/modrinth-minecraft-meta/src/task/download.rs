@@ -12,7 +12,7 @@ use crate::{
     model::{self, DownloadRunId},
     store::BlobStore,
     upstream,
-    util::{ErrorVec, Sha256, from_json_str, from_json_value},
+    util::{ErrorVec, ResponseExt, Sha256, from_json_str, from_json_value},
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -119,10 +119,19 @@ pub async fn download_from_upstreams(
 impl DownloadRunContext<'_> {
     pub async fn download_blob(&mut self, url: impl IntoUrl) -> Result<Sha256> {
         let url = url.into_url().context("converting to URL")?;
-        let bytes =
-            async { self.http.get(url.clone()).send().await?.bytes().await }
-                .context(info_span!("fetching bytes"))
-                .await?;
+        let bytes = async {
+            self.http
+                .get(url.clone())
+                .send()
+                .await?
+                .error_for_status_ext()
+                .await?
+                .bytes()
+                .await
+                .map_err(anyhow::Error::from)
+        }
+        .context(info_span!("fetching bytes"))
+        .await?;
 
         let sha256 = self.insert_blob(url.as_str(), &bytes).await?;
         Ok(sha256)
@@ -133,10 +142,19 @@ impl DownloadRunContext<'_> {
         url: impl IntoUrl,
     ) -> Result<(T, Sha256)> {
         let url = url.into_url().context("converting to URL")?;
-        let text =
-            async { self.http.get(url.clone()).send().await?.text().await }
-                .context(info_span!("fetching text"))
-                .await?;
+        let text = async {
+            self.http
+                .get(url.clone())
+                .send()
+                .await?
+                .error_for_status_ext()
+                .await?
+                .text()
+                .await
+                .map_err(anyhow::Error::from)
+        }
+        .context(info_span!("fetching text"))
+        .await?;
         let json = from_json_str::<serde_json::Value>(&text)
             .context("text is not valid JSON")?;
 

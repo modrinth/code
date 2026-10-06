@@ -4,16 +4,19 @@ use jiff::Timestamp;
 use serde::{Deserialize, Serialize};
 use toasty::Model;
 
-use crate::upstream::mojang::{Argument, ArgumentType, Library, VersionType};
+use crate::{
+    model::{MinecraftLoader, MinecraftVersionName},
+    upstream::mojang::{Argument, ArgumentType, Library, VersionType},
+};
 
 /// Normalized loader profile to be published as a version JSON artifact.
 #[derive(Debug, Clone, Model)]
-#[key(loader, loader_version)]
+#[key(loader, minecraft_version, loader_version)]
 pub struct Profile {
-    pub loader: String,
-    pub loader_version: String,
+    pub loader: MinecraftLoader,
     #[index]
-    pub minecraft_version: String,
+    pub minecraft_version: MinecraftVersionName,
+    pub loader_version: String,
     #[column(type = json)]
     pub metadata: toasty::Json<ProfileMetadata>,
 }

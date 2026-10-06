@@ -5,15 +5,15 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::upstream;
+use crate::upstream::mojang;
 
 /// Minecraft version catalog exported at
 /// `minecraft/v{format_version}/manifest.json`.
-pub type MinecraftCatalog = upstream::mojang::Catalog;
+pub type MinecraftCatalog = mojang::Catalog;
 
 /// Complete Minecraft version manifest exported at
 /// `minecraft/v{format_version}/versions/{game_version}.json`.
-pub type MinecraftVersionManifest = upstream::mojang::VersionManifest;
+pub type MinecraftVersionManifest = mojang::VersionManifest;
 
 /// Mod-loader catalog exported at
 /// `{loader}/v{format_version}/manifest.json`.
@@ -89,17 +89,12 @@ pub struct LoaderVersionManifest {
     pub minecraft_arguments: Option<String>,
     /// Arguments passed to Minecraft or the JVM.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub arguments: Option<
-        HashMap<
-            upstream::mojang::ArgumentType,
-            Vec<upstream::mojang::Argument>,
-        >,
-    >,
+    pub arguments: Option<HashMap<mojang::ArgumentType, Vec<mojang::Argument>>>,
     /// Libraries required by the loader.
-    pub libraries: Vec<upstream::mojang::Library>,
+    pub libraries: Vec<mojang::Library>,
     /// Minecraft release type.
     #[serde(rename = "type")]
-    pub ty: upstream::mojang::VersionType,
+    pub ty: mojang::VersionType,
     /// Forge processor data, keyed by variable name.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub data: Option<HashMap<String, SidedDataEntry>>,

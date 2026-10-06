@@ -11,6 +11,14 @@ pub fn from_json_value<T: DeserializeOwned>(
     })
 }
 
+pub fn from_json_slice<T: DeserializeOwned>(data: &[u8]) -> anyhow::Result<T> {
+    let value = serde_json::from_slice::<serde_json::Value>(data)
+        .with_context(|| {
+            anyhow!("invalid JSON\n\n{}", String::from_utf8_lossy(data))
+        })?;
+    from_json_value(&value)
+}
+
 pub fn from_json_str<T: DeserializeOwned>(str: &str) -> anyhow::Result<T> {
     let value = serde_json::from_str::<serde_json::Value>(str)
         .with_context(|| anyhow!("invalid JSON\n\n{str}"))?;

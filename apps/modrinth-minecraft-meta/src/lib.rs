@@ -45,6 +45,8 @@ enum Command {
         #[arg(long)]
         quilt: bool,
     },
+    /// Extract downloaded installer JARs for their manifests and libraries
+    ExtractInstallers,
 }
 
 #[derive(Debug, Clone, Copy, clap::ValueEnum)]
@@ -96,7 +98,7 @@ pub async fn main() -> Result<()> {
         .context(info_span!("creating blob store"))
         .await?;
 
-    let state = AppState { http, blobs, db };
+    let mut state = AppState { http, blobs, db };
 
     match cli.command {
         Command::Download {
@@ -116,6 +118,9 @@ pub async fn main() -> Result<()> {
                 quilt: all_upstreams || quilt,
             };
             task::download_from_upstreams(&state, upstreams).await
+        }
+        Command::ExtractInstallers => {
+            task::extract_installers(&mut state).await
         }
     }
 }

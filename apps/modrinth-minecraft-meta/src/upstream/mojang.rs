@@ -8,7 +8,11 @@ use tracing::{info, info_span};
 use tracing_anyhow::FutureContext;
 use url::Url;
 
-use crate::{model, task::DownloadRunContext, util::Sha1};
+use crate::{
+    model::{self, MinecraftVersionName},
+    task::DownloadRunContext,
+    util::Sha1,
+};
 
 pub const CATALOG_URL: &str =
     "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
@@ -23,22 +27,17 @@ pub struct Catalog {
     pub versions: Vec<Version>,
 }
 
-#[derive(
-    Debug, Display, Clone, PartialEq, Eq, Hash, Serialize, Deserialize,
-)]
-pub struct VersionName(pub String);
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Latest {
-    pub release: VersionName,
-    pub snapshot: VersionName,
+    pub release: MinecraftVersionName,
+    pub snapshot: MinecraftVersionName,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Version {
-    pub id: VersionName,
+    pub id: MinecraftVersionName,
     #[serde(rename = "type")]
     pub ty: VersionType,
     pub url: Url,
@@ -68,7 +67,7 @@ pub struct VersionManifest {
     pub asset_index: AssetIndex,
     pub assets: String,
     pub downloads: HashMap<DownloadType, Download>,
-    pub id: VersionName,
+    pub id: MinecraftVersionName,
     pub java_version: Option<JavaVersion>,
     pub libraries: Vec<Library>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -232,7 +231,27 @@ pub struct LibraryDownload {
     pub path: Option<String>,
     pub sha1: Sha1,
     pub size: u32,
-    pub url: Url,
+    #[serde(
+        default,
+        deserialize_with = "deserialize_optional_url",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub url: Option<Url>,
+}
+
+fn deserialize_optional_url<'de, D>(
+    deserializer: D,
+) -> Result<Option<Url>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let value = Option::<String>::deserialize(deserializer)?;
+    match value.as_deref() {
+        None | Some("") => Ok(None),
+        Some(value) => Url::parse(value)
+            .map(Some)
+            .map_err(serde::de::Error::custom),
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
