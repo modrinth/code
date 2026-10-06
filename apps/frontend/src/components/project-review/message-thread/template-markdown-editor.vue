@@ -30,9 +30,9 @@
 import { isolateHistory } from '@codemirror/commands'
 import { syntaxTree } from '@codemirror/language'
 import { EditorView } from '@codemirror/view'
+import { MarkdownEditor } from '@modrinth/ui'
 import { nextTick, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
 
-import { MarkdownEditor } from '@modrinth/ui'
 import MarkdownTemplatePicker from './markdown-template-picker.vue'
 import type { MarkdownTemplate, MarkdownTemplateQuery } from './markdown-templates'
 

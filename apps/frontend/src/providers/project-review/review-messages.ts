@@ -28,12 +28,7 @@ export function createReviewMessages(
 		)
 	})
 	function issueMessage(id: string) {
-		return (
-			overrides.get(id) ??
-			issueMessages.value.get(id) ??
-			defaults.get(id) ??
-			''
-		)
+		return overrides.get(id) ?? issueMessages.value.get(id) ?? defaults.get(id) ?? ''
 	}
 	function editIssueMessage(id: string, message: string) {
 		if (message === issueMessage(id)) return

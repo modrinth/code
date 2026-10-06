@@ -266,7 +266,10 @@
 										>
 											<span class="min-w-0 truncate">{{ item.label }}</span>
 											<button
-												v-if="item.showSelectionActions !== false && hasSelectableSectionHeaderOptions(item)"
+												v-if="
+													item.showSelectionActions !== false &&
+													hasSelectableSectionHeaderOptions(item)
+												"
 												type="button"
 												class="shrink-0 border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-all hover:bg-transparent hover:text-contrast"
 												@click.stop="toggleSectionHeaderOptions(item)"

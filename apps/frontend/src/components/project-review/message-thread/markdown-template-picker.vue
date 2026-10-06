@@ -87,11 +87,11 @@
 <script setup lang="ts">
 import { autoUpdate, flip, offset, shift, useFloating } from '@floating-ui/vue'
 import { LibraryIcon } from '@modrinth/assets'
+import { Button, defineMessages, Input, useVIntl } from '@modrinth/ui'
 import { renderHighlightedString } from '@modrinth/utils/highlightjs/index'
 import { onClickOutside } from '@vueuse/core'
 import { computed, nextTick, ref, useId, watch } from 'vue'
 
-import { Button, defineMessages, Input, useVIntl } from '@modrinth/ui'
 import type { MarkdownTemplate, MarkdownTemplateQuery } from './markdown-templates'
 
 const props = defineProps<{

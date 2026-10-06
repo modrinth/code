@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import { CheckIcon } from '@modrinth/assets'
 import { isValidProjectSlug } from '@modrinth/moderation/src/utils'
-import { defineMessages, Input, injectModrinthClient, TagItem, useVIntl } from '@modrinth/ui'
+import { defineMessages, injectModrinthClient, Input, TagItem, useVIntl } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { refDebounced } from '@vueuse/core'
 import { computed, ref, useId, watch } from 'vue'

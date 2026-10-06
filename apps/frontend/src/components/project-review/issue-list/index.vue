@@ -46,11 +46,7 @@
 		>
 			<template #button="{ open }">
 				<span class="flex items-center gap-1 text-primary">
-					<span>
-						{{ formatMessage(messages.resolved) }} ({{
-							resolvedIssues.length
-						}})
-					</span>
+					<span> {{ formatMessage(messages.resolved) }} ({{ resolvedIssues.length }}) </span>
 					<DropdownIcon
 						class="size-5 shrink-0 text-primary transition-transform duration-300 motion-reduce:transition-none"
 						:class="{ 'rotate-180': open }"
@@ -93,7 +89,8 @@ const previousIssues = injectReviewPreviousIssues()
 const { pending } = injectReviewSubmission()
 function priority(issue: ReviewIssue | Labrinth.Threads.v3.ThreadIssue) {
 	return (
-		('controls' in issue ? issue : previousIssues.cardIssue(issue)).priority ?? IssuePriority.Default
+		('controls' in issue ? issue : previousIssues.cardIssue(issue)).priority ??
+		IssuePriority.Default
 	)
 }
 function compareIssues(
@@ -102,13 +99,10 @@ function compareIssues(
 ) {
 	return (
 		Number('moderator_verified' in a && a.moderator_verified) -
-			Number('moderator_verified' in b && b.moderator_verified) ||
-		priority(a) - priority(b)
+			Number('moderator_verified' in b && b.moderator_verified) || priority(a) - priority(b)
 	)
 }
-const resolvedIssues = computed(() =>
-	[...previousIssues.resolvedIssues.value].sort(compareIssues),
-)
+const resolvedIssues = computed(() => [...previousIssues.resolvedIssues.value].sort(compareIssues))
 const issues = computed(() => {
 	if (props.reReview) return [...previousIssues.reReviewIssues.value].sort(compareIssues)
 	const available = new Map(panels.availableIssues.value.map((issue) => [issue.id, issue]))

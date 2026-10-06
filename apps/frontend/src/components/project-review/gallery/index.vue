@@ -24,12 +24,12 @@
 			</p>
 			<div v-else class="gallery-grid">
 				<ReviewPanel
+					v-for="(item, index) in gallery"
+					:key="item.id ?? item.url"
 					mode="anchored"
 					:target="{ kind: 'gallery-image', key: String(item.id) }"
 					:disabled="item.id === undefined"
 					as="article"
-					v-for="(item, index) in gallery"
-					:key="item.id ?? item.url"
 					class="flex min-w-0 flex-col overflow-hidden rounded-xl border border-solid border-surface-4"
 				>
 					<button

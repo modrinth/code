@@ -156,11 +156,7 @@
 						class="mt-2"
 					/>
 					<ValidationMessage :check="saveValidation.forField('java-address')" class="mt-2" />
-					<ProjectIssueCard
-						target="modify_server_address"
-						platform="minecraft_java"
-						class="mt-2"
-					/>
+					<ProjectIssueCard target="modify_server_address" platform="minecraft_java" class="mt-2" />
 				</div>
 
 				<!-- Bedrock Address -->

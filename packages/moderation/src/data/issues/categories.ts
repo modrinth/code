@@ -27,7 +27,9 @@ export const categoriesInaccurateIssue = issue({
 		const tags = removedTags(ctx)
 		return [
 			inaccurateMessage,
-			ctx.selected.toggleIds.includes('tags-optimization-misused') ? optimizationMisusedMessage : '',
+			ctx.selected.toggleIds.includes('tags-optimization-misused')
+				? optimizationMisusedMessage
+				: '',
 			ctx.selected.toggleIds.includes('tags-resolutions-misused') ? resolutionsMisusedMessage : '',
 			tags.length
 				? `Please remove the following tags from your project\n\n${tags.map((tag) => `- ${tag}`).join('\n')}`

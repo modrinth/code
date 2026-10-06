@@ -422,6 +422,18 @@
   "nags.visit-links-settings.title": {
     "defaultMessage": "Visit links settings"
   },
+  "project-review.issue-location.disclosures": {
+    "defaultMessage": "Edit disclosures"
+  },
+  "project-review.issue-location.gallery": {
+    "defaultMessage": "Edit gallery images"
+  },
+  "project-review.issue-location.permissions": {
+    "defaultMessage": "Review permissions"
+  },
+  "project-review.issue-location.versions": {
+    "defaultMessage": "Manage versions"
+  },
   "project-review.issue-target.acknowledge": {
     "defaultMessage": "Acknowledge"
   },

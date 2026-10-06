@@ -4172,6 +4172,15 @@
   "project.settings.disclosures.title": {
     "defaultMessage": "Disclosures"
   },
+  "project.settings.environment.bulk.apply-button": {
+    "defaultMessage": "Apply to all versions"
+  },
+  "project.settings.environment.bulk.description": {
+    "defaultMessage": "This will replace the environment on every version of this project."
+  },
+  "project.settings.environment.bulk.title": {
+    "defaultMessage": "Apply environment to all versions"
+  },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Has some functionality on both the client and server, even if only partially."
   },
@@ -4198,6 +4207,9 @@
   },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Client-side only"
+  },
+  "project.settings.environment.modal.title": {
+    "defaultMessage": "Edit project environment"
   },
   "project.settings.environment.notice.missing-env.description": {
     "defaultMessage": "Your project is missing environment metadata, please select the appropriate option below."
