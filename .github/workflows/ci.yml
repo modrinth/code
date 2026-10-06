@@ -125,8 +125,7 @@ jobs:
         run: cp .env.staging .env
 
       - name: Lint and test
-        # TEMPORARY: `moon run` prints task spawn errors that `moon exec --on-failure continue` swallows
-        run: pnpm moon run :lint :test
+        run: pnpm run ci
         env:
           # "Re-run jobs" with debug logging enabled also turns on moon's debug output
           MOON_LOG: ${{ runner.debug == '1' && 'debug' || 'info' }}

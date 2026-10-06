@@ -25,6 +25,7 @@ fileGroups:
     - '/apps/app/**/*'
     - '/apps/labrinth/**/*'
     - '/packages/app-lib/**/*'
+    - '!/**/node_modules/**'
     - '/packages/app-lib/.env'
     - '$CARGO_*'
     - '$RUST_*'

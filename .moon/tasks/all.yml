@@ -2,6 +2,7 @@ $schema: 'https://moonrepo.dev/schemas/tasks.json'
 
 implicitInputs:
   - '/packages/tooling-config/**/*'
+  - '!/packages/tooling-config/node_modules/**'
   - '/packages/app-lib/.env'
   - '$MODRINTH_URL'
   - '$MODRINTH_API_BASE_URL'

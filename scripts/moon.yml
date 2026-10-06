@@ -25,6 +25,8 @@ tasks:
     command: 'typos'
     inputs:
       - '/**/*'
+      - '!/**/node_modules/**'
+      - '!/.moon/cache/**'
     options:
       runFromWorkspaceRoot: true
 

@@ -16,3 +16,13 @@ vcs:
 
 pipeline:
   installDependencies: false
+
+# Workspace-root input globs (like `/**/*`) aren't filtered by .gitignore, and would
+# otherwise hash all of target/ and node_modules/, running CI runners out of memory
+hasher:
+  ignorePatterns:
+    - '**/node_modules/**'
+    - '**/target/**'
+    - '**/.nuxt/**'
+    - '**/.output/**'
+    - '**/dist/**'
