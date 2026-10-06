@@ -127,9 +127,10 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 	watch(
 		filterOptions,
 		() => {
-			selectedFilters.value = selectedFilters.value.filter((f) =>
+			const validFilters = selectedFilters.value.filter((f) =>
 				filterOptions.value.some((opt) => opt.id === f),
 			)
+			if (validFilters.length !== selectedFilters.value.length) selectedFilters.value = validFilters
 		},
 		{ immediate: true },
 	)
