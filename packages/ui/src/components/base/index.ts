@@ -73,6 +73,7 @@ export { default as HorizontalRule } from './HorizontalRule.vue'
 export { default as I18nDebugPanel } from './I18nDebugPanel.vue'
 export { default as IconSelect } from './IconSelect.vue'
 export { default as InlineEditableText } from './InlineEditableText.vue'
+export { default as InlineValidationMessage } from './InlineValidationMessage.vue'
 export type { InputAppearance, InputSize } from './inputs'
 export {
 	ColorPicker,
