@@ -577,6 +577,17 @@ export namespace Archon {
 			export type Lookup = {
 				id: string
 			}
+
+			export type ServerLock = {
+				server_id: string
+				reason: string
+				locked_by?: string
+				created: string
+			}
+
+			export type LockServerRequest = {
+				reason: string
+			}
 		}
 
 		export namespace v0 {
@@ -645,6 +656,7 @@ export namespace Archon {
 				flows: Flows
 				is_medal: boolean
 				current_user_permissions: UserScope
+				locked_since: string | null
 
 				medal_expires?: string
 			}

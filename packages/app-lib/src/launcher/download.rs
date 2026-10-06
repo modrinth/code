@@ -432,8 +432,31 @@ fn missing_initial_minecraft_bytes(
         )?)
 }
 
+#[allow(clippy::too_many_arguments)]
+pub fn download_minecraft<'a>(
+    st: &'a State,
+    version: &'a GameVersionInfo,
+    loading_bar: Option<&'a LoadingBarId>,
+    java_arch: &'a str,
+    force: bool,
+    minecraft_updated: bool,
+    reporter: Option<InstallProgressReporter>,
+    phase_details: InstallPhaseDetails,
+) -> impl Future<Output = crate::Result<()>> + Send + 'a {
+    Box::pin(download_minecraft_inner(
+        st,
+        version,
+        loading_bar,
+        java_arch,
+        force,
+        minecraft_updated,
+        reporter,
+        phase_details,
+    ))
+}
+
 #[tracing::instrument(skip(st, version, reporter))]
-pub async fn download_minecraft(
+async fn download_minecraft_inner(
     st: &State,
     version: &GameVersionInfo,
     loading_bar: Option<&LoadingBarId>,

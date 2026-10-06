@@ -349,4 +349,20 @@ impl DBSession {
 
         Ok(sessions)
     }
+
+    pub async fn clear_user_sessions_cache(
+        user_id: DBUserId,
+        sessions: Vec<(DBSessionId, String)>,
+        redis: &RedisPool,
+    ) -> Result<()> {
+        Self::clear_cache(
+            sessions
+                .into_iter()
+                .map(|(id, session)| (Some(id), Some(session), None))
+                .chain(std::iter::once((None, None, Some(user_id))))
+                .collect(),
+            redis,
+        )
+        .await
+    }
 }

@@ -522,7 +522,7 @@
     "defaultMessage": "Installera ändå"
   },
   "content.diff-modal.loader-updated": {
-    "defaultMessage": "Läsare"
+    "defaultMessage": "Loader"
   },
   "content.diff-modal.modpack-linked": {
     "defaultMessage": "Länkat modpaket"
@@ -858,7 +858,7 @@
     "defaultMessage": "Stabil"
   },
   "creation-flow.modal.custom-setup.loader-version.label": {
-    "defaultMessage": "Läsarversion"
+    "defaultMessage": "Loaderversion"
   },
   "creation-flow.modal.custom-setup.loader-version.placeholder": {
     "defaultMessage": "Välj läsarversion"
@@ -867,7 +867,7 @@
     "defaultMessage": "Söker läsarversioner..."
   },
   "creation-flow.modal.custom-setup.loader.label": {
-    "defaultMessage": "Läsare"
+    "defaultMessage": "Loader"
   },
   "creation-flow.modal.custom-setup.name.label": {
     "defaultMessage": "Namn"
@@ -1191,7 +1191,7 @@
     "defaultMessage": "Spara tillskrivning"
   },
   "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "Välj en licens..."
+    "defaultMessage": "Sök licenser..."
   },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "Tillståndsanledning"
@@ -1234,6 +1234,9 @@
   },
   "external-files.permissions-card.last-updated": {
     "defaultMessage": "Senast uppdaterad den {date} av {user}"
+  },
+  "external-files.permissions-card.license.all-rights": {
+    "defaultMessage": "Alla rättigheter förbehållna/Ingen licens"
   },
   "external-files.permissions-card.license.unknown": {
     "defaultMessage": "Okänd"
@@ -1946,9 +1949,6 @@
   "hosting.loader.reset-server-description": {
     "defaultMessage": "Tar bort all data på din server, däribland dina världar, moddar och konfigurationsfiler. Säkerhetskopior kommer bevaras och kan återställas."
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Support alternativ"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Ökar upp till {cpus} CPU:er"
   },
@@ -2091,7 +2091,7 @@
     "defaultMessage": "Auto-fix"
   },
   "installation-settings.incompatible-content.change-loader-button": {
-    "defaultMessage": "Byt läsare"
+    "defaultMessage": "Byt loader"
   },
   "installation-settings.incompatible-content.disable-conflicts-button": {
     "defaultMessage": "Inaktivera konflikter"
@@ -2244,7 +2244,7 @@
     "defaultMessage": "Instanstyp"
   },
   "instances.content-install.loader-label": {
-    "defaultMessage": "Läsare"
+    "defaultMessage": "Loader"
   },
   "instances.content-install.name-label": {
     "defaultMessage": "Namn"
@@ -2463,7 +2463,7 @@
     "defaultMessage": "Spelversion"
   },
   "label.hide-installed-content": {
-    "defaultMessage": "Göm redan installerat innehåll"
+    "defaultMessage": "Dölj redan installerat innehåll"
   },
   "label.hide-selected-content": {
     "defaultMessage": "Göm valt innehåll"
@@ -2864,6 +2864,9 @@
   "markdown-editor.video-modal.url-field.placeholder": {
     "defaultMessage": "Ange YouTube video-URL"
   },
+  "markdown-editor.video-modal.url-field.title": {
+    "defaultMessage": "URL för YouTube-video"
+  },
   "modal.add-payment-method.action": {
     "defaultMessage": "Lägg till betalningsmetod"
   },
@@ -3083,6 +3086,9 @@
   "profile.block-user.error-title": {
     "defaultMessage": "Kunde inte blocka användare"
   },
+  "profile.block-user.success-description": {
+    "defaultMessage": "{username} har blockerats."
+  },
   "profile.block-user.success-title": {
     "defaultMessage": "Användare blockerad"
   },
@@ -3107,14 +3113,23 @@
   "profile.button.manage-projects": {
     "defaultMessage": "Hantera projekt"
   },
+  "profile.button.revoke-sessions": {
+    "defaultMessage": "Återkalla alla sessioner"
+  },
   "profile.button.shared-instances": {
     "defaultMessage": "Visa delade instanser"
   },
   "profile.button.unblock": {
     "defaultMessage": "Avblockera"
   },
+  "profile.button.unlock": {
+    "defaultMessage": "Lås upp konto"
+  },
   "profile.collection.projects-count": {
     "defaultMessage": "{count} projekt"
+  },
+  "profile.details.error.github-popup-blocked": {
+    "defaultMessage": "Tillåt popup-fönster på Modrinth, fösök sedan igen."
   },
   "profile.details.error.github-profile-message": {
     "defaultMessage": "GitHub-profilen kunde inte hämtas. Vänligen försök igen."
@@ -3167,6 +3182,9 @@
   "profile.label.joined": {
     "defaultMessage": "Gick med"
   },
+  "profile.label.locked": {
+    "defaultMessage": "Låst"
+  },
   "profile.label.no-collections": {
     "defaultMessage": "Den här användaren har inga samlingar!"
   },
@@ -3191,6 +3209,30 @@
   "profile.official-account.bio": {
     "defaultMessage": "Modrinths officiella användarkonto. Få hjälp på <support-link></support-link> eller via e-post hos <email></email>"
   },
+  "profile.revoke-sessions.admonition-body": {
+    "defaultMessage": "{username} kommer att loggas ut från alla enheter och måste logga in igen. Personliga åtkomsttokens påverkas inte."
+  },
+  "profile.revoke-sessions.admonition-title": {
+    "defaultMessage": "Är du säker på att du vill återkalla alla sessioner?"
+  },
+  "profile.revoke-sessions.button": {
+    "defaultMessage": "Återkalla sessioner"
+  },
+  "profile.revoke-sessions.error-description": {
+    "defaultMessage": "Ett fel inträffade vid återkallelse av sessioner. Vänligen försök igen."
+  },
+  "profile.revoke-sessions.error-title": {
+    "defaultMessage": "Kunde inte återkalla sessioner"
+  },
+  "profile.revoke-sessions.success-description": {
+    "defaultMessage": "{username} har loggats ut överallt."
+  },
+  "profile.revoke-sessions.success-title": {
+    "defaultMessage": "Session återkallad"
+  },
+  "profile.revoke-sessions.title": {
+    "defaultMessage": "Återkalla sessioner för {username}"
+  },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Ett fel inträffade under avblockeringen av den här användaren. Vänligen försök igen."
   },
@@ -3202,6 +3244,18 @@
   },
   "profile.unblock-user.success-title": {
     "defaultMessage": "Användare avblockerad"
+  },
+  "profile.unlock-user.error-description": {
+    "defaultMessage": "Ett fel inträffade vid upplåsning av kontot. Vänligen försök igen."
+  },
+  "profile.unlock-user.error-title": {
+    "defaultMessage": "Kunde inte låsa upp konto"
+  },
+  "profile.unlock-user.success-description": {
+    "defaultMessage": "{username}s konto har låsts upp"
+  },
+  "profile.unlock-user.success-title": {
+    "defaultMessage": "Konto upplåst"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Skapades {date}"
@@ -4712,6 +4766,9 @@
   "servers.audit-log.event.server-properties-modified-label": {
     "defaultMessage": "Modifierade serveregenskaper"
   },
+  "servers.audit-log.event.server-repaired": {
+    "defaultMessage": "Reparerade server"
+  },
   "servers.audit-log.event.server-reset": {
     "defaultMessage": "Återställ server"
   },
@@ -4732,6 +4789,12 @@
   },
   "servers.audit-log.event.unknown": {
     "defaultMessage": "Okänd händelse"
+  },
+  "servers.audit-log.event.unknown-basic": {
+    "defaultMessage": "Dokumenterade serveraktivitet"
+  },
+  "servers.audit-log.event.user-invite-revoked": {
+    "defaultMessage": "Återkallade inbjudan för <target-user></target-user>"
   },
   "servers.audit-log.event.user-invited": {
     "defaultMessage": "Bjöd in <target-user></target-user>"
@@ -5388,7 +5451,7 @@
     "defaultMessage": "Ett oväntat fel inträffade under uppladdningen. Vänligen försök igen senare."
   },
   "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Modpaketsuppladdning misslyckades"
+    "defaultMessage": "Misslyckades att ladda upp modpaket"
   },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Ställ in server"
@@ -5436,7 +5499,7 @@
     "defaultMessage": "Vänligen stäng inte sidan medan uppladdningen pågår."
   },
   "servers.setup.uploading-modpack.header": {
-    "defaultMessage": "Läser in modpaket"
+    "defaultMessage": "Laddar upp modpaket"
   },
   "settings.account.title": {
     "defaultMessage": "Konto och säkerhet"
@@ -5453,11 +5516,14 @@
   "settings.billing.title": {
     "defaultMessage": "Prenumerationer"
   },
+  "settings.display.project-list-layouts.datapack": {
+    "defaultMessage": "Sidan för datapaket"
+  },
   "settings.display.project-list-layouts.description": {
     "defaultMessage": "Välj din föredragna layout för varje sida som visar projektlistor."
   },
   "settings.display.project-list-layouts.mod": {
-    "defaultMessage": "Moddsida"
+    "defaultMessage": "Sidan för moddar"
   },
   "settings.display.project-list-layouts.mode.grid": {
     "defaultMessage": "Rutnät"
@@ -5466,25 +5532,25 @@
     "defaultMessage": "Rader"
   },
   "settings.display.project-list-layouts.modpack": {
-    "defaultMessage": "Modpaketsida"
+    "defaultMessage": "Sidan för modpaket"
   },
   "settings.display.project-list-layouts.plugin": {
-    "defaultMessage": "Plugin-sida"
+    "defaultMessage": "Sidan för plugins"
   },
   "settings.display.project-list-layouts.resourcepack": {
-    "defaultMessage": "Resurspaketssida"
+    "defaultMessage": "Sidan för resurspaket"
   },
   "settings.display.project-list-layouts.server": {
-    "defaultMessage": "Shaderssida"
+    "defaultMessage": "Sidan för servrar"
   },
   "settings.display.project-list-layouts.shader": {
-    "defaultMessage": "Shaderssida"
+    "defaultMessage": "Sidan för shaders"
   },
   "settings.display.project-list-layouts.title": {
     "defaultMessage": "Projektlistors layout"
   },
   "settings.display.project-list-layouts.user": {
-    "defaultMessage": "Användarprofilsidor"
+    "defaultMessage": "Användarprofiler"
   },
   "settings.display.sidebar.external-links-new-tab.title": {
     "defaultMessage": "Öppna externa länkar i en ny flik"
@@ -6356,6 +6422,69 @@
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "Okända filer"
   },
+  "update-all-modal.changelog-for": {
+    "defaultMessage": "Ändringslogg för {project}"
+  },
+  "update-all-modal.changelog-loaded": {
+    "defaultMessage": "Ändringslogg inläst."
+  },
+  "update-all-modal.close-changelog": {
+    "defaultMessage": "Stäng ändringslogg"
+  },
+  "update-all-modal.current-version": {
+    "defaultMessage": "Nuvarande version"
+  },
+  "update-all-modal.empty": {
+    "defaultMessage": "Inga uppdateringar tillgängliga."
+  },
+  "update-all-modal.header": {
+    "defaultMessage": "Uppdatera projekt"
+  },
+  "update-all-modal.loading": {
+    "defaultMessage": "Läser in uppdateringar…"
+  },
+  "update-all-modal.loading-changelog": {
+    "defaultMessage": "Läser in ändringslogg…"
+  },
+  "update-all-modal.new-version": {
+    "defaultMessage": "Ny version"
+  },
+  "update-all-modal.no-compatible-updates": {
+    "defaultMessage": "Inga kompatibla uppdateringar tillgängliga."
+  },
+  "update-all-modal.no-version": {
+    "defaultMessage": "Inga kompatibla uppdateringar"
+  },
+  "update-all-modal.project": {
+    "defaultMessage": "Projekt"
+  },
+  "update-all-modal.project-list": {
+    "defaultMessage": "Projekt uppdateringar"
+  },
+  "update-all-modal.results": {
+    "defaultMessage": "{count, plural, one {# projekt redo att uppdateras} other {# projekt redo att uppdateras}}"
+  },
+  "update-all-modal.select-all": {
+    "defaultMessage": "Markera alla projekt"
+  },
+  "update-all-modal.select-project": {
+    "defaultMessage": "Markera {project} för att uppdateras"
+  },
+  "update-all-modal.select-version": {
+    "defaultMessage": "Ny version för {project}"
+  },
+  "update-all-modal.update": {
+    "defaultMessage": "Uppdatera {count, plural, one {# projekt} other {# projekt}}"
+  },
+  "update-all-modal.versions": {
+    "defaultMessage": "Nuvarande version / Ny version"
+  },
+  "update-all-modal.view": {
+    "defaultMessage": "Visa"
+  },
+  "update-all-modal.view-changelog": {
+    "defaultMessage": "Visa ändringslogg för {project}"
+  },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Den här användaren har varit med sedan Modrinth alfa, som avslutades i november 2020."
   },
@@ -6394,6 +6523,9 @@
   },
   "user.profile.badge.pride.link": {
     "defaultMessage": "Klicka för att besöka vår senaste Pride-insamling."
+  },
+  "user.profile.badge.pride.name": {
+    "defaultMessage": "Stödjer Pride-insamlingen"
   },
   "user.profile.badge.staff.about.1": {
     "defaultMessage": "Den här användaren arbetar för Modrinth."

@@ -579,7 +579,7 @@
     "message": "Windows"
   },
   "app-marketing.features.importing.description": {
-    "message": "Zaimportuj wszystkie swoje instalacje gry ze starego lanchera, skorzystaj z naszego Modrinth App w kilka sekund!"
+    "message": "Importuj wszystkie instancje ze starego launchera i zacznij używać Modrinth App w kilka sekund!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -1932,7 +1932,7 @@
     "message": "Kod źródłowy"
   },
   "dashboard.projects.links.wiki-page.description": {
-    "message": "Strona zawierająca informacje, dokumentację i pomoc projektu"
+    "message": "Strona zawierająca informacje, dokumentację i pomoc dotyczącą projektu"
   },
   "dashboard.projects.links.wiki-page.label": {
     "message": "Strona wiki"
@@ -2121,19 +2121,19 @@
     "message": "Konto nie jest podpięte"
   },
   "dashboard.withdraw.error.email-verification.text": {
-    "message": "Musisz zweryfikować swój adres e-mail przed wpłatą pieniędzy."
+    "message": "Musisz zweryfikować swój adres e-mail przed wypłatą środków."
   },
   "dashboard.withdraw.error.email-verification.title": {
-    "message": "Wymagana weryfikacja e-maila"
+    "message": "Wymagana weryfikacja adresu e-mail"
   },
   "dashboard.withdraw.error.generic.text": {
-    "message": "Nie udało się przesłać prośby o wypłatę, sprawdź podane dane lub skontaktuj się z obsługą"
+    "message": "Nie udało się przesłać prośby o wypłatę, sprawdź swoje dane lub skontaktuj się z obsługą.\n{error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "Wypłata nie powiodła się"
   },
   "dashboard.withdraw.error.insufficient-balance.text": {
-    "message": "Nie masz wystarczających środków, by wykonać tę wpłatę."
+    "message": "Nie masz wystarczających środków, by wykonać tę wypłatę."
   },
   "dashboard.withdraw.error.insufficient-balance.title": {
     "message": "Niewystarczające środki"
@@ -2169,10 +2169,10 @@
     "message": "Metoda wypłaty jest niedostępna"
   },
   "dashboard.withdraw.error.paypal-country-mismatch.text": {
-    "message": "Proszę użyć poprawnej opcji transferu Paypal dla twojego regionu(Stany Zjednoczone lub Międzynarodowe)."
+    "message": "Musisz użyć poprawnej opcji transferu PayPal dla swojego regionu (Stany Zjednoczone lub Międzynarodowe)."
   },
   "dashboard.withdraw.error.paypal-country-mismatch.title": {
-    "message": "Niepasujący region PayPal"
+    "message": "Niezgodny region PayPal"
   },
   "dashboard.withdraw.error.tax-form.text": {
     "message": "Musisz wypełnić formularz podatkowy, by móc złożyć wniosek o wypłatę."
@@ -2397,7 +2397,7 @@
     "message": "Zarządzaj swoimi serwerami"
   },
   "hosting-marketing.hero.button.start-a-new-server": {
-    "message": "Stwórz nowy serwer"
+    "message": "Utwórz nowy serwer"
   },
   "hosting-marketing.hero.button.start-your-server": {
     "message": "Uruchom swój serwer"
@@ -2508,7 +2508,7 @@
     "message": "Nasza infrastruktura nigdy nie jest przeciążona, co oznacza, że każdy serwer hostowany na Modrinth zawsze działa z pełną wydajnością."
   },
   "hosting-marketing.why.description": {
-    "message": "Wybieraj spośród tysięcy paczek modów na Modrinth lub stwórz własny. Zaproś znajomych, gdy będziesz gotowy do gry."
+    "message": "Wybieraj spośród tysięcy paczek modów na Modrinth lub utwórz własną. Zaproś znajomych, gdy będziesz gotowy do gry."
   },
   "hosting-marketing.why.heading": {
     "message": "Znajdź paczkę modów. Teraz to serwer."
@@ -2679,7 +2679,7 @@
     "message": "Zmień motyw"
   },
   "layout.action.create-new": {
-    "message": "Stwórz nowy..."
+    "message": "Utwórz nowy..."
   },
   "layout.action.external-projects": {
     "message": "Zewnętrzne projekty"
@@ -2974,6 +2974,9 @@
   },
   "layout.publish.email-verification-required.title": {
     "message": "Wymagana weryfikacja adresu e-mail"
+  },
+  "messages.noResults": {
+    "message": "Nie znaleziono wyników dla twojego wyszukiwania!"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "Automatycznie instaluj to, w co grają"
@@ -3582,7 +3585,7 @@
     "message": "Ta zależność jest już zainstalowana"
   },
   "project.download.dependency-any-compatible": {
-    "message": "Dowolne Kompatybilne"
+    "message": "Dowolne kompatybilne"
   },
   "project.download.dependency-conflicting": {
     "message": "Ta zależność koliduje z inną zależnością"
@@ -3603,13 +3606,13 @@
     "message": "Nie ma żadnej kompatybilnej wersji dla tej zależności"
   },
   "project.download.dependency-quilt-fabric-api": {
-    "message": "Fabrib API jest pominięte dla loadera Quilt"
+    "message": "Fabric API jest pominięte dla loadera Quilt"
   },
   "project.download.dependency-resource-pack-admonition": {
     "message": "Ten projekt ma zależność zawierającą wymaganą paczkę zasobów. Pobierz ją i wsadź do swojego folderu {folder}."
   },
   "project.download.dependency-unavailable": {
-    "message": "Zależności nie mogą być pobrane"
+    "message": "Nie udało się pobrać tej zależności"
   },
   "project.download.download": {
     "message": "Pobierz"
@@ -3869,6 +3872,18 @@
   "project.settings.delete-project.title": {
     "message": "Usuń projekt"
   },
+  "project.settings.description.intro": {
+    "message": "Tutaj możesz wpisać rozszerzony opis projektu. Opis musi jasno i szczerze opisać cel i funkcję projektu. Pełne wymagania przedstawiono w punkcie 2.1 <rules>Zasad treści</rules>."
+  },
+  "project.settings.description.title": {
+    "message": "Opis"
+  },
+  "project.settings.description.updated": {
+    "message": "Opis zaktualizowany"
+  },
+  "project.settings.description.updated-text": {
+    "message": "Twój opis został zaktualizowany."
+  },
   "project.settings.disclosures.advertising.description.1": {
     "message": "Musi być włączone, jeśli ten projekt zawiera reklamy, sponsorowanie lub promocje innych dzieł."
   },
@@ -3906,7 +3921,7 @@
     "message": "Zawiera treści wygenerowane przez sztuczną inteligencję"
   },
   "project.settings.disclosures.ai.types-description": {
-    "message": "Jakie typy treści zostały wygenerowane przez AI?"
+    "message": "Jakie rodzaje treści zostały wygenerowane przez AI?"
   },
   "project.settings.disclosures.archived.banner-preview": {
     "message": "Podgląd baneru"
@@ -4100,6 +4115,159 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.license.all-rights": {
+    "message": "Wszelkie prawa zastrzeżone/brak licencji"
+  },
+  "project.settings.license.allow-later": {
+    "message": "Zezwalaj na późniejsze edycje"
+  },
+  "project.settings.license.custom": {
+    "message": "Niestandardowa"
+  },
+  "project.settings.license.custom-name-required": {
+    "message": "Podaj nazwę niestandardowej licencji."
+  },
+  "project.settings.license.custom-url-description": {
+    "message": "Lokalizacja strony pełnego tekstu licencji."
+  },
+  "project.settings.license.intro": {
+    "message": "Ważne jest, aby wybrać odpowiednią licencję dla Twojego {type}. Możesz wybrać jedną z naszej listy lub podać niestandardową licencję. Możesz również podać niestandardowy adres URL wybranej licencji; w przeciwnym razie zostanie wyświetlony tekst licencji. Sprawdź <guide>poradnik o licencjach</guide>, by dowiedzieć się więcej."
+  },
+  "project.settings.license.later": {
+    "message": "Późniejsze edycje"
+  },
+  "project.settings.license.later-description": {
+    "message": "Wybrana licencja ma klauzulę \"lub późniejszy\". Jeśli zaznaczysz to pole, użytkownicy mogą korzystać z projektu na prawach dozwolonych przez późniejsze edycje licencji."
+  },
+  "project.settings.license.missing-url": {
+    "message": "Podaj adres URL do pełnego tekstu niestandardowej licencji."
+  },
+  "project.settings.license.name": {
+    "message": "Nazwa licencji"
+  },
+  "project.settings.license.name-description": {
+    "message": "Pełna nazwa niestandardowej licencji."
+  },
+  "project.settings.license.name-placeholder": {
+    "message": "Nazwa licencji"
+  },
+  "project.settings.license.optional-label": {
+    "message": "opcjonalne"
+  },
+  "project.settings.license.select": {
+    "message": "Licencja"
+  },
+  "project.settings.license.select-placeholder": {
+    "message": "Szukaj licencji..."
+  },
+  "project.settings.license.title": {
+    "message": "Licencja"
+  },
+  "project.settings.license.updated": {
+    "message": "Licencja zaktualizowana"
+  },
+  "project.settings.license.updated-text": {
+    "message": "Twoja licencja została zaktualizowana."
+  },
+  "project.settings.license.url": {
+    "message": "Adres URL licencji"
+  },
+  "project.settings.license.url-description": {
+    "message": "Strona zawierająca pełny tekst licencji. Jeśli nie podasz linku, wyświetlony zostanie tekst licencji."
+  },
+  "project.settings.license.url-placeholder": {
+    "message": "Adres URL licencji"
+  },
+  "project.settings.links.add-link": {
+    "message": "Dodaj link"
+  },
+  "project.settings.links.discord": {
+    "message": "Zaproszenie Discord"
+  },
+  "project.settings.links.discord-description": {
+    "message": "Zaproszenie do Twojego serwera Discord."
+  },
+  "project.settings.links.donation-link": {
+    "message": "Link"
+  },
+  "project.settings.links.donation-platform": {
+    "message": "Platforma"
+  },
+  "project.settings.links.donation-url": {
+    "message": "Adres URL"
+  },
+  "project.settings.links.donation-username": {
+    "message": "Nazwa użytkownika"
+  },
+  "project.settings.links.donation-username-placeholder": {
+    "message": "Wprowadź nazwę użytkownika na {platform}"
+  },
+  "project.settings.links.donations": {
+    "message": "Linki do dotacji"
+  },
+  "project.settings.links.donations-description": {
+    "message": "Dodaj linki do dotacji dla użytkowników, aby mogli wesprzeć cię bezpośrednio."
+  },
+  "project.settings.links.issues": {
+    "message": "Śledzenie problemów"
+  },
+  "project.settings.links.issues-description": {
+    "message": "Miejsce, gdzie użytkownicy mogą zgłaszać problemy i uwagi do Twojego projektu."
+  },
+  "project.settings.links.link-type": {
+    "message": "Rodzaj linku"
+  },
+  "project.settings.links.remove-donation-link": {
+    "message": "Usuń link do dotacji"
+  },
+  "project.settings.links.server-discord": {
+    "message": "Discord"
+  },
+  "project.settings.links.server-updated": {
+    "message": "Linki Twojego serwera zostały zaktualizowane."
+  },
+  "project.settings.links.server-wiki-description": {
+    "message": "Strona zawierająca informacje, dokumentację i pomoc dotyczącą serwera."
+  },
+  "project.settings.links.site": {
+    "message": "Strona internetowa"
+  },
+  "project.settings.links.site-description": {
+    "message": "Oficjalna strona Twojego serwera."
+  },
+  "project.settings.links.source": {
+    "message": "Kod źródłowy"
+  },
+  "project.settings.links.source-description": {
+    "message": "Strona/repozytorium zawierające kod źródłowy Twojego projektu"
+  },
+  "project.settings.links.store": {
+    "message": "Sklep"
+  },
+  "project.settings.links.store-description": {
+    "message": "Link do sklepu Twojego serwera."
+  },
+  "project.settings.links.title": {
+    "message": "Linki"
+  },
+  "project.settings.links.updated": {
+    "message": "Twoje linki zostały zaktualizowane."
+  },
+  "project.settings.links.updated-title": {
+    "message": "Linki zaktualizowane"
+  },
+  "project.settings.links.url-placeholder": {
+    "message": "Podaj prawidłowy URL"
+  },
+  "project.settings.links.visit-link": {
+    "message": "Odwiedź {url}"
+  },
+  "project.settings.links.wiki": {
+    "message": "Strona wiki"
+  },
+  "project.settings.links.wiki-description": {
+    "message": "Strona zawierająca informacje, dokumentację i pomoc dotyczącą projektu."
+  },
   "project.settings.monetization.description": {
     "message": "Projekty na Modrinth są automatycznie przyjęte w <rewards-program-link>Programie Nagród</rewards-program-link>. Jeśli ty nie chcesz (lub nie możesz z powodów prawnych) zarabiać z tego projektu, możesz wyłączyć to tutaj."
   },
@@ -4248,7 +4416,7 @@
     "message": "Podany tutaj adres może mieć rekordy DNS SRV _minecraft._tcp.(domena), które wskazują adres i port serwera Minecraft."
   },
   "project.settings.tags.all-tags-selected-warning": {
-    "message": "Wybrałeś wszystkie dostępne {count} tagi . Proszę wybrać tylko tagi, które naprawdę odnoszą się do projektu."
+    "message": "Wybrałeś wszystkie z {count} dostępnych tagów. Proszę wybrać tylko tagi, które naprawdę odnoszą się do projektu."
   },
   "project.settings.tags.categories-description": {
     "message": "Wybierz wszystkie kategorie, które odzwierciedlają motywy lub funkcje Twojego {type}."
@@ -4794,7 +4962,7 @@
     "message": "Pobierz eksport"
   },
   "settings.account.data-export.action.generate": {
-    "message": "Stwórz eksport"
+    "message": "Utwórz eksport"
   },
   "settings.account.data-export.action.generating": {
     "message": "Tworzenie eksportu..."
@@ -5049,7 +5217,7 @@
     "message": "Dodaj URI przekierowywania"
   },
   "settings.applications.button.create": {
-    "message": "Stwórz aplikację"
+    "message": "Utwórz aplikację"
   },
   "settings.applications.button.delete": {
     "message": "Usuń"

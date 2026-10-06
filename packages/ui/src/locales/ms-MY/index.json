@@ -1208,6 +1208,9 @@
   "files.zip-url-modal.zip-header": {
     "defaultMessage": "Memuat naik kandungan .zip daripada URL"
   },
+  "filter-bar.add": {
+    "defaultMessage": "Tambah"
+  },
   "form.label.address-line": {
     "defaultMessage": "Baris alamat"
   },
@@ -1412,9 +1415,6 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Pelayan ditetapkan semula ke proses penetapan awal"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Pilihan sokongan"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Boleh memecut sehingga {cpus} CPU"
   },
@@ -1441,6 +1441,12 @@
   },
   "icon-select.select": {
     "defaultMessage": "Pilih ikon"
+  },
+  "image-viewer.edit": {
+    "defaultMessage": "Sunting"
+  },
+  "image-viewer.editor.tool.pen": {
+    "defaultMessage": "Pen"
   },
   "input.search-version.placeholder": {
     "defaultMessage": "Cari versi..."
@@ -4953,4 +4959,3 @@
     "defaultMessage": "Jenis"
   }
 }
-

@@ -905,6 +905,9 @@
   "auth.sign-in.launcher.opening.description": {
     "message": "アプリが開かない場合は、下のボタンを使用してサインインしてください。"
   },
+  "auth.sign-in.launcher.opening.title": {
+    "message": "Modrinth Appを開いています..."
+  },
   "auth.sign-in.no-account": {
     "message": "アカウントを持っていませんか？"
   },
@@ -3296,6 +3299,9 @@
   "project-type.shader.singular": {
     "message": "シェーダー"
   },
+  "project.actions.checking-modpack-archives": {
+    "message": "確認中…"
+  },
   "project.actions.create-server": {
     "message": "サーバーを作成"
   },
@@ -3326,8 +3332,14 @@
   "project.actions.servers-promo.title": {
     "message": "サーバーを作成"
   },
+  "project.actions.view-dependents": {
+    "message": "依存関係を表示"
+  },
   "project.actions.view-modpacks": {
     "message": "Modパックを見る"
+  },
+  "project.actions.view-project-type-dependents": {
+    "message": "{projectType} の依存関係を表示"
   },
   "project.ai-image-warning-modal.title": {
     "message": "AI生成画像の使用は禁止されています"
@@ -3347,11 +3359,20 @@
   "project.download.download": {
     "message": "ダウンロード"
   },
+  "project.download.download-as-zip": {
+    "message": "ZIPでダウンロード"
+  },
+  "project.download.file-unavailable": {
+    "message": "このファイルはダウンロードできません"
+  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title}は{platform}の{gameVersion}に対応していません"
   },
   "project.download.install-with-app": {
     "message": "Modrinth Appでインストール"
+  },
+  "project.download.manually": {
+    "message": "手動でダウンロード"
   },
   "project.download.no-app": {
     "message": "Modrinth Appをお持ちでないですか？"
@@ -3473,6 +3494,9 @@
   "project.notification.updated.title": {
     "message": "プロジェクトが更新されました"
   },
+  "project.settings.delete-project.title": {
+    "message": "プロジェクトを削除"
+  },
   "project.settings.disclosures.ai.title": {
     "message": "AI生成コンテンツが含まれています"
   },
@@ -3524,6 +3548,24 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.license.name": {
+    "message": "ライセンス名"
+  },
+  "project.settings.license.name-placeholder": {
+    "message": "ライセンス名"
+  },
+  "project.settings.license.title": {
+    "message": "ライセンス"
+  },
+  "project.settings.license.url": {
+    "message": "ライセンスURL"
+  },
+  "project.settings.links.server-discord": {
+    "message": "Discord"
+  },
+  "project.settings.links.wiki": {
+    "message": "ウィキページ"
+  },
   "project.settings.monetization.title": {
     "message": "収益化"
   },
@@ -3535,6 +3577,9 @@
   },
   "project.settings.permissions.sort.status": {
     "message": "ステータス"
+  },
+  "project.settings.server.languages-label": {
+    "message": "言語設定"
   },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types}のカテゴリ} other {カテゴリ}}"
@@ -3556,6 +3601,12 @@
   },
   "project.versions.copy-link-option": {
     "message": "リンクをコピー"
+  },
+  "project.versions.delete-button": {
+    "message": "削除"
+  },
+  "project.versions.open-in-new-tab-option": {
+    "message": "新しいタブで開く"
   },
   "project.versions.title": {
     "message": "バージョン"

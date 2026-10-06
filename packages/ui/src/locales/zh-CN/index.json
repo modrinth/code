@@ -722,6 +722,12 @@
   "content.page-layout.failed-to-load": {
     "defaultMessage": "加载内容失败"
   },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "无法加载更新日志"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "无法加载可用更新"
+  },
   "content.page-layout.filter.add": {
     "defaultMessage": "筛选过滤"
   },
@@ -1239,7 +1245,7 @@
     "defaultMessage": "保存归属信息"
   },
   "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "选择一种许可证…"
+    "defaultMessage": "搜索许可证……"
   },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "权限依据"
@@ -1282,6 +1288,9 @@
   },
   "external-files.permissions-card.last-updated": {
     "defaultMessage": "最后由 {user} 在 {date} 更新"
+  },
+  "external-files.permissions-card.license.all-rights": {
+    "defaultMessage": "保留所有权利/无许可证"
   },
   "external-files.permissions-card.license.unknown": {
     "defaultMessage": "未知"
@@ -2053,9 +2062,6 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "服务器已重置为初始设置"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "支持选项"
   },
   "hosting.specs.burst": {
     "defaultMessage": "爆发时最多 {cpus} CPU"
@@ -3281,14 +3287,26 @@
   "profile.button.create-project": {
     "defaultMessage": "创建项目"
   },
+  "profile.button.force-password-reset": {
+    "defaultMessage": "强制重置密码"
+  },
   "profile.button.info": {
     "defaultMessage": "查看用户详情"
+  },
+  "profile.button.lock": {
+    "defaultMessage": "锁定账户"
   },
   "profile.button.manage-projects": {
     "defaultMessage": "管理项目"
   },
   "profile.button.remove-affiliate": {
     "defaultMessage": "解除作为联盟伙伴"
+  },
+  "profile.button.reset-2fa": {
+    "defaultMessage": "重置双重身份验证"
+  },
+  "profile.button.revoke-sessions": {
+    "defaultMessage": "注销所有会话"
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "设置为联盟伙伴"
@@ -3298,6 +3316,9 @@
   },
   "profile.button.unblock": {
     "defaultMessage": "解除屏蔽"
+  },
+  "profile.button.unlock": {
+    "defaultMessage": "解锁账户"
   },
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural, other {# 个项目}}"
@@ -3347,6 +3368,36 @@
   "profile.error.not-found": {
     "defaultMessage": "未找到用户"
   },
+  "profile.force-password-reset.admonition-body": {
+    "defaultMessage": "{username} 的密码将立即被移除，他们将在所有设备上退出登录，并且设置新密码的链接将发送到以下电子邮件地址。如果您更改电子邮件地址，它将替换账户中现有的地址。该链接在 24 小时后过期，即使账户处于锁定状态也可以使用。"
+  },
+  "profile.force-password-reset.admonition-title": {
+    "defaultMessage": "当前密码将失效"
+  },
+  "profile.force-password-reset.button": {
+    "defaultMessage": "重置密码"
+  },
+  "profile.force-password-reset.email-label": {
+    "defaultMessage": "账户邮箱"
+  },
+  "profile.force-password-reset.email-placeholder": {
+    "defaultMessage": "留空以使用账户的电子邮件"
+  },
+  "profile.force-password-reset.error-description": {
+    "defaultMessage": "重置密码时出现错误，请重试。"
+  },
+  "profile.force-password-reset.error-title": {
+    "defaultMessage": "重置密码失败"
+  },
+  "profile.force-password-reset.success-description": {
+    "defaultMessage": "密码重置链接已发送至 {username}。"
+  },
+  "profile.force-password-reset.success-title": {
+    "defaultMessage": "密码重置"
+  },
+  "profile.force-password-reset.title": {
+    "defaultMessage": "强制重置 {username} 的密码"
+  },
   "profile.label.affiliate": {
     "defaultMessage": "联盟"
   },
@@ -3361,6 +3412,9 @@
   },
   "profile.label.joined": {
     "defaultMessage": "加入于"
+  },
+  "profile.label.locked": {
+    "defaultMessage": "已锁定"
   },
   "profile.label.no-collections": {
     "defaultMessage": "该用户没有收藏夹！"
@@ -3386,6 +3440,54 @@
   "profile.official-account.bio": {
     "defaultMessage": "Modrinth 的官方用户账号。可通过 <support-link></support-link> 或电子邮件 <email></email> 获取支持"
   },
+  "profile.reset-2fa.admonition-body": {
+    "defaultMessage": "{username} 的身份验证器和备用代码将被移除，并会通知该用户。仅在验证其身份后才能执行此操作。"
+  },
+  "profile.reset-2fa.admonition-title": {
+    "defaultMessage": "您确定要重置双重身份验证吗?"
+  },
+  "profile.reset-2fa.button": {
+    "defaultMessage": "重置双重身份验证"
+  },
+  "profile.reset-2fa.error-description": {
+    "defaultMessage": "重置双重身份验证时发生错误，请重试。"
+  },
+  "profile.reset-2fa.error-title": {
+    "defaultMessage": "重置双重身份验证失败"
+  },
+  "profile.reset-2fa.success-description": {
+    "defaultMessage": "{username} 的双因素身份验证已被移除。"
+  },
+  "profile.reset-2fa.success-title": {
+    "defaultMessage": "重置双重身份验证"
+  },
+  "profile.reset-2fa.title": {
+    "defaultMessage": "为 {username} 重置双重身份验证"
+  },
+  "profile.revoke-sessions.admonition-body": {
+    "defaultMessage": "{username} 将在所有设备上退出登录，并需要重新登录。个人访问令牌不受影响。"
+  },
+  "profile.revoke-sessions.admonition-title": {
+    "defaultMessage": "您确定要强制退出所有设备的登录吗？"
+  },
+  "profile.revoke-sessions.button": {
+    "defaultMessage": "撤销会话"
+  },
+  "profile.revoke-sessions.error-description": {
+    "defaultMessage": "撤销会话时发生错误，请重试。"
+  },
+  "profile.revoke-sessions.error-title": {
+    "defaultMessage": "撤销会话失败"
+  },
+  "profile.revoke-sessions.success-description": {
+    "defaultMessage": "{username} 已在所有地方退出登录。"
+  },
+  "profile.revoke-sessions.success-title": {
+    "defaultMessage": "会话已撤销"
+  },
+  "profile.revoke-sessions.title": {
+    "defaultMessage": "强制注销 {username} 的所有登录"
+  },
   "profile.unblock-user.error-description": {
     "defaultMessage": "解除屏蔽该用户时发生了错误。请重试。"
   },
@@ -3397,6 +3499,18 @@
   },
   "profile.unblock-user.success-title": {
     "defaultMessage": "用户已解除屏蔽"
+  },
+  "profile.unlock-user.error-description": {
+    "defaultMessage": "解锁该账户时发生了错误。请重试。"
+  },
+  "profile.unlock-user.error-title": {
+    "defaultMessage": "无法解锁账户"
+  },
+  "profile.unlock-user.success-description": {
+    "defaultMessage": "{username} 的账户已解除锁定。"
+  },
+  "profile.unlock-user.success-title": {
+    "defaultMessage": "账户已解锁"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "发布于 {date}"
@@ -6306,7 +6420,7 @@
     "defaultMessage": "跨平台"
   },
   "tag.category.cursed": {
-    "defaultMessage": "邪门"
+    "defaultMessage": "阴间"
   },
   "tag.category.custom-content": {
     "defaultMessage": "自定义内容"
@@ -6797,6 +6911,78 @@
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "未识别文件"
   },
+  "update-all-modal.changelog-for": {
+    "defaultMessage": "{project}的更新日志"
+  },
+  "update-all-modal.changelog-loaded": {
+    "defaultMessage": "已加载更新日志。"
+  },
+  "update-all-modal.close-changelog": {
+    "defaultMessage": "关闭更新日志"
+  },
+  "update-all-modal.current-version": {
+    "defaultMessage": "当前版本"
+  },
+  "update-all-modal.empty": {
+    "defaultMessage": "无可用版本。"
+  },
+  "update-all-modal.header": {
+    "defaultMessage": "更新项目"
+  },
+  "update-all-modal.loading": {
+    "defaultMessage": "正在加载更新……"
+  },
+  "update-all-modal.loading-changelog": {
+    "defaultMessage": "正在加载更新日志……"
+  },
+  "update-all-modal.new-version": {
+    "defaultMessage": "新版本"
+  },
+  "update-all-modal.no-changelog": {
+    "defaultMessage": "此版本没有更新日志。"
+  },
+  "update-all-modal.no-compatible-updates": {
+    "defaultMessage": "没有可用的兼容更新。"
+  },
+  "update-all-modal.no-version": {
+    "defaultMessage": "没有兼容的更新"
+  },
+  "update-all-modal.project": {
+    "defaultMessage": "项目"
+  },
+  "update-all-modal.project-list": {
+    "defaultMessage": "项目已更新"
+  },
+  "update-all-modal.results": {
+    "defaultMessage": "{count, plural, one {# 个准备更新的项目} other {# 个准备更新的项目}}"
+  },
+  "update-all-modal.select-all": {
+    "defaultMessage": "选择所有项目"
+  },
+  "update-all-modal.select-project": {
+    "defaultMessage": "选择要更新的{project}"
+  },
+  "update-all-modal.select-version": {
+    "defaultMessage": "{project}的新版本"
+  },
+  "update-all-modal.update": {
+    "defaultMessage": "更新{count, plural, other {# 个项目}}"
+  },
+  "update-all-modal.versions": {
+    "defaultMessage": "当前版本/新版本"
+  },
+  "update-all-modal.view": {
+    "defaultMessage": "查看"
+  },
+  "update-all-modal.view-changelog": {
+    "defaultMessage": "查看{project}的更新日志"
+  },
+  "update-all-modal.warning": {
+    "defaultMessage": "我们无法保证更新对你的世界是安全的。请重新查看更新日志并考虑备份。"
+  },
+  "update-all-modal.warning-server": {
+    "defaultMessage": "我们无法保证中心对你的服务器是安全的。请重新查看更新日志并考虑备份。"
+  },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "该用户自 Modrinth 内测时期便已加入平台，该测试版于 2020 年 11 月收官。"
   },
@@ -6990,4 +7176,3 @@
     "defaultMessage": "类型"
   }
 }
-
