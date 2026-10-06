@@ -22,8 +22,9 @@
 					}}
 				</span>
 				<TagItem
+					v-if="licenseRequiresSource(project.license.id)"
 					v-tooltip="formatMessage(messages.sourceAvailabilityRequired)"
-					class="!border-orange !bg-highlight-orange !px-1.5 !py-0.5 !text-secondary"
+					class="!border-orange !bg-surface-4 !px-1.5 !py-0.5 !text-orange"
 				>
 					<TagCategoryScrollTextIcon />
 				</TagItem>
