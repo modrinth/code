@@ -72,7 +72,6 @@ export namespace SharedInstances {
 
 			export type InstanceUsers = {
 				users: InstanceUser[]
-				tokens: number
 			}
 
 			export type FileMetadata = {

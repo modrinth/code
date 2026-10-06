@@ -36,7 +36,7 @@ export function useServerPlayerMembers(instanceId: Ref<string | null>) {
 						method: member.join_type === 'link' ? 'link' : 'direct',
 					}
 				})
-			return { rows, remaining: Math.max(0, 50 - response.users.length - response.tokens) }
+			return { rows, remaining: Math.max(0, 50 - response.users.length) }
 		},
 		refetchInterval: 30_000,
 	})

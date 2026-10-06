@@ -16,7 +16,7 @@ export async function ensureServerInviteLink(
 	let availableSlots = remainingSlots
 	if (availableSlots === undefined) {
 		const players = await client.sharedinstances.instances_v1.getUsers(instanceId)
-		availableSlots = Math.max(0, 50 - players.users.length - players.tokens)
+		availableSlots = Math.max(0, 50 - players.users.length)
 	}
 	if (availableSlots === 0) throw new Error('This shared instance has no available player slots.')
 
