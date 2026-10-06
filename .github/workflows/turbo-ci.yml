@@ -44,7 +44,8 @@ jobs:
         if: env.INTERNAL != 'true'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 2
+          fetch-depth: 0
+          filter: blob:none
 
       - name: Check out code (Namespace)
         if: env.INTERNAL == 'true'
@@ -147,8 +148,19 @@ jobs:
       # `pnpm run ci` excludes the `modrinth-rust` Cargo workspace package so Rust lint and
       # tests run and cache per crate. Otherwise any Rust change would invalidate the single
       # workspace-wide task and rerun the labrinth tests, which need the services above.
+      #
+      # Fork PRs only lint and test packages affected since the base branch, as the merge queue
+      # still runs everything. Turborepo does not attribute the root files below to any crate,
+      # so changing one of them falls back to a full run.
       - name: Lint and test
-        run: pnpm run ci
+        env:
+          TURBO_SCM_BASE: origin/${{ github.base_ref }}
+        run: |
+          if [ "$INTERNAL" = 'true' ] || ! git diff --quiet "$TURBO_SCM_BASE...HEAD" -- Cargo.toml rust-toolchain.toml .cargo docker-compose.yml .github/workflows/turbo-ci.yml; then
+            pnpm run ci
+          else
+            pnpm run ci --affected
+          fi
 
       - name: Check Rust formatting
         run: cargo fmt --all --check
