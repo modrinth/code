@@ -7,16 +7,17 @@ use crate::{
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Embed)]
-pub struct MojangCatalogId(pub Uuid);
+pub struct NeoforgeCatalogId(pub Uuid);
 
 #[derive(Debug, Clone, Model)]
-pub struct MojangCatalog {
+pub struct NeoforgeCatalog {
     #[key]
     #[auto]
-    pub id: MojangCatalogId,
+    pub id: NeoforgeCatalogId,
     #[unique]
     pub download_run_id: DownloadRunId,
     #[belongs_to]
     pub download_run: toasty::Deferred<DownloadRun>,
-    pub sha256: Sha256,
+    pub forge_sha256: Sha256,
+    pub neoforge_sha256: Sha256,
 }

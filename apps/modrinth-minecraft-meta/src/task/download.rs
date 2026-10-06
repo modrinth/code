@@ -1,7 +1,6 @@
 use std::any::type_name;
 
 use anyhow::{Context, Result, anyhow};
-use bon::bon;
 use jiff::Timestamp;
 use reqwest::IntoUrl;
 use serde::de::DeserializeOwned;
@@ -13,7 +12,7 @@ use crate::{
     model::{self, DownloadRunId},
     store::BlobStore,
     upstream,
-    util::{ErrorVec, Sha1, Sha256, from_json_str, from_json_value},
+    util::{ErrorVec, Sha256, from_json_str, from_json_value},
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -78,33 +77,33 @@ pub async fn download_from_upstreams(
         result.inspect_err(|err| cx.errors.push(err)).ok();
     }
 
-    //     if upstreams.fabric {
-    //         let result = upstream::fabric::download(&mut cx)
-    //             .context(info_span!("downloading Fabric upstream"))
-    //             .await;
-    //         result.inspect_err(|err| cx.errors.push(err)).ok();
-    //     }
-    //
-    //     if upstreams.forge {
-    //         let result = upstream::forge::download(&mut cx)
-    //             .context(info_span!("downloading Forge upstream"))
-    //             .await;
-    //         result.inspect_err(|err| cx.errors.push(err)).ok();
-    //     }
-    //
-    //     if upstreams.neoforge {
-    //         let result = upstream::neoforge::download(&mut cx)
-    //             .context(info_span!("downloading NeoForge upstream"))
-    //             .await;
-    //         result.inspect_err(|err| cx.errors.push(err)).ok();
-    //     }
-    //
-    //     if upstreams.quilt {
-    //         let result = upstream::quilt::download(&mut cx)
-    //             .context(info_span!("downloading Quilt upstream"))
-    //             .await;
-    //         result.inspect_err(|err| cx.errors.push(err)).ok();
-    //     }
+    if upstreams.fabric {
+        let result = upstream::fabric::download(&mut cx)
+            .context(info_span!("downloading Fabric upstream"))
+            .await;
+        result.inspect_err(|err| cx.errors.push(err)).ok();
+    }
+
+    if upstreams.forge {
+        let result = upstream::forge::download(&mut cx)
+            .context(info_span!("downloading Forge upstream"))
+            .await;
+        result.inspect_err(|err| cx.errors.push(err)).ok();
+    }
+
+    if upstreams.neoforge {
+        let result = upstream::neoforge::download(&mut cx)
+            .context(info_span!("downloading NeoForge upstream"))
+            .await;
+        result.inspect_err(|err| cx.errors.push(err)).ok();
+    }
+
+    if upstreams.quilt {
+        let result = upstream::quilt::download(&mut cx)
+            .context(info_span!("downloading Quilt upstream"))
+            .await;
+        result.inspect_err(|err| cx.errors.push(err)).ok();
+    }
 
     toasty::update!(download_run {
         completed_at: Timestamp::now(),
@@ -117,32 +116,8 @@ pub async fn download_from_upstreams(
     Ok(())
 }
 
-#[bon]
 impl DownloadRunContext<'_> {
-    #[builder]
-    pub async fn download_blob(
-        &mut self,
-        skip_if_sha256: Option<Sha256>,
-        skip_if_sha1: Option<Sha1>,
-        url: impl IntoUrl,
-    ) -> Result<Sha256> {
-        let mut query = model::BlobHash::all();
-        if let Some(sha256) = skip_if_sha256 {
-            query = query.filter_by_sha256(sha256);
-        }
-        if let Some(sha1) = skip_if_sha1 {
-            query = query.filter_by_sha1(sha1);
-        }
-        let existing = query
-            .exec(self.conn)
-            .context(info_span!("checking if blob already exists"))
-            .await?
-            .into_iter()
-            .next();
-        if let Some(existing) = existing {
-            return Ok(existing.sha256);
-        }
-
+    pub async fn download_blob(&mut self, url: impl IntoUrl) -> Result<Sha256> {
         let url = url.into_url().context("converting to URL")?;
         let bytes =
             async { self.http.get(url.clone()).send().await?.bytes().await }

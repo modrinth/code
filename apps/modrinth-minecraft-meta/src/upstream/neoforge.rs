@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use tracing::{info, info_span};
 use tracing_anyhow::FutureContext;
 
-use crate::{task::DownloadRunContext, util::ErrorVec};
+use crate::{model, task::DownloadRunContext};
 
 pub const FORGE_CATALOG_URL: &str = "https://maven.neoforged.net/api/maven/versions/releases/net/neoforged/forge";
 pub const NEOFORGE_CATALOG_URL: &str = "https://maven.neoforged.net/api/maven/versions/releases/net/neoforged/neoforge";
@@ -22,11 +22,11 @@ pub struct Catalog {
 pub struct VersionName(pub String);
 
 pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
-    let forge_catalog = cx
+    let (forge_catalog, forge_sha256) = cx
         .download_json::<Catalog>(FORGE_CATALOG_URL)
         .context(info_span!("fetching Forge catalog"))
         .await?;
-    let neoforge_catalog = cx
+    let (neoforge_catalog, neoforge_sha256) = cx
         .download_json::<Catalog>(NEOFORGE_CATALOG_URL)
         .context(info_span!("fetching NeoForge catalog"))
         .await?;
@@ -35,6 +35,15 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
         num_neoforge_versions = neoforge_catalog.versions.len(),
         "downloaded NeoForge catalogs"
     );
+
+    toasty::create!(model::NeoforgeCatalog {
+        download_run_id: cx.download_run_id,
+        forge_sha256,
+        neoforge_sha256,
+    })
+    .exec(cx.conn)
+    .context(info_span!("inserting catalog"))
+    .await?;
 
     Ok(())
 }

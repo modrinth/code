@@ -5,10 +5,7 @@ use tracing::{info, info_span};
 use tracing_anyhow::FutureContext;
 use url::Url;
 
-use crate::{
-    task::DownloadRunContext,
-    util::{ErrorVec, MavenCoordinate},
-};
+use crate::{model, task::DownloadRunContext, util::MavenCoordinate};
 
 pub const CATALOG_URL: &str = "https://meta.fabricmc.net/v2/versions";
 
@@ -97,7 +94,7 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
     /// See `README.md` for an explanation of what we're doing here.
     const GAME_VERSION: &str = "1.21";
 
-    let catalog = cx
+    let (catalog, sha256) = cx
         .download_json::<Catalog>(CATALOG_URL)
         .context(info_span!("fetching catalog"))
         .await?;
@@ -107,7 +104,15 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
         "downloaded Fabric catalog"
     );
 
-    let mut num_downloaded = 0usize;
+    toasty::create!(model::FabricCatalog {
+        download_run_id: cx.download_run_id,
+        sha256,
+    })
+    .exec(cx.conn)
+    .context(info_span!("inserting catalog"))
+    .await?;
+
+    let mut num_done = 0usize;
     for loader in catalog.loader {
         let loader_version = &loader.version;
         let url = format!(
@@ -116,12 +121,12 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
 
         cx.download_json::<GameLoaderProfile>(&url)
             .await
-            .inspect_err(|err| errors.push(err))
+            .inspect_err(|err| cx.errors.push(err))
             .ok();
 
-        num_downloaded += 1;
-        if num_downloaded.is_multiple_of(10) {
-            info!("downloaded {num_downloaded} loader profiles");
+        num_done += 1;
+        if num_done.is_multiple_of(10) {
+            info!("downloaded {num_done} loader profiles");
         }
     }
 

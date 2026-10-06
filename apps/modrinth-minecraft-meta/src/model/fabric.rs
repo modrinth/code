@@ -7,13 +7,13 @@ use crate::{
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Embed)]
-pub struct MojangCatalogId(pub Uuid);
+pub struct FabricCatalogId(pub Uuid);
 
 #[derive(Debug, Clone, Model)]
-pub struct MojangCatalog {
+pub struct FabricCatalog {
     #[key]
     #[auto]
-    pub id: MojangCatalogId,
+    pub id: FabricCatalogId,
     #[unique]
     pub download_run_id: DownloadRunId,
     #[belongs_to]

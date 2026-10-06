@@ -9,3 +9,18 @@ snapshot_name = "20261001_185100_snapshot.toml"
 id = 4409440824866775103
 name = "20261002_migration.sql"
 snapshot_name = "20261002_snapshot.toml"
+
+[[migrations]]
+id = 5666922109786933071
+name = "20261003_migration.sql"
+snapshot_name = "20261003_snapshot.toml"
+
+[[migrations]]
+id = 5816699419575113178
+name = "20261004_migration.sql"
+snapshot_name = "20261004_snapshot.toml"
+
+[[migrations]]
+id = 6601671026562834997
+name = "20261005_migration.sql"
+snapshot_name = "20261005_snapshot.toml"

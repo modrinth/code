@@ -14,6 +14,10 @@ This means that:
 - Given the immutability, we can track the provenance of each entity (game version, loader version, etc.)
 - We still have the option to hide information by not including it in the final manifest upload - e.g. if we no longer want to show a version, we can mark it as `unlisted` in our database, and the final manifest creation won't include it, but it'll still exist in the DB.
 
+## Forge and NeoForge
+
+Forge and NeoForge (henceforth Forgelike) store much of their important info in the installer JAR file, rather than as a JSON file served at some HTTP route.
+
 ## Fabric and Quilt
 
 Fabric's and Quilt's manifests contain (among other things) two fields:

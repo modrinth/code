@@ -273,7 +273,7 @@ fn default_true() -> bool {
 }
 
 pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
-    let (catalog, catalog_sha256) = cx
+    let (catalog, sha256) = cx
         .download_json::<Catalog>(CATALOG_URL)
         .context(info_span!("fetching catalog"))
         .await?;
@@ -284,18 +284,38 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
 
     toasty::create!(model::MojangCatalog {
         download_run_id: cx.download_run_id,
-        sha256: catalog_sha256,
+        sha256,
     })
     .exec(cx.conn)
-    .context(info_span!("inserting Mojang catalog"))
+    .context(info_span!("inserting catalog"))
     .await?;
 
+    let cataloged_sha1s = catalog
+        .versions
+        .iter()
+        .map(|version| version.sha1)
+        .collect::<Vec<_>>();
+    let existing_sha1s = model::BlobHash::all()
+        .select(model::BlobHash::fields().sha1())
+        .filter(model::BlobHash::fields().sha1().in_list(cataloged_sha1s))
+        .exec(cx.conn)
+        .context(info_span!("fetching existing sha1s"))
+        .await?;
+    let missing_versions = catalog
+        .versions
+        .iter()
+        .filter(|version| !existing_sha1s.contains(&version.sha1))
+        .collect::<Vec<_>>();
+    info!(
+        "catalog contains {} versions, of which {} are missing; downloading",
+        catalog.versions.len(),
+        missing_versions.len()
+    );
+
     let mut num_done = 0usize;
-    for version in catalog.versions {
-        cx.download_blob()
-            .skip_if_sha1(version.sha1)
-            .url(version.url)
-            .call()
+    for version in missing_versions {
+        cx.download_blob(version.url.clone())
+            .context(info_span!("downloading version", %version.id))
             .await
             .inspect_err(|err| cx.errors.push(err))
             .ok();

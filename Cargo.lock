@@ -8029,6 +8029,7 @@ name = "modrinth-minecraft-meta"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async_zip",
  "bon",
  "clap 4.6.7",
  "derive_more 2.1.1",
