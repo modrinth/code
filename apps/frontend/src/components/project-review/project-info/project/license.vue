@@ -1,16 +1,31 @@
 <template>
 	<Section :heading="formatMessage(messages.license)" :target="{ kind: 'license' }">
+		<template #heading-after>
+			<TagItem v-if="isCustomLicense" class="!border-surface-4 !bg-surface-3 !text-secondary">
+				Custom
+			</TagItem>
+		</template>
 		<template #right>
 			<EditButton :section="formatMessage(messages.license)" @click="editModal?.show()" />
 		</template>
 		<EditModal :key="project?.id" ref="editModal" />
 		<div v-if="project" class="flex flex-col gap-1">
-			<div class="flex items-start gap-1">
-				<span v-tooltip="project.license.id" class="flex min-h-6 min-w-0 items-center">
-					{{ licenseName }}
+			<div class="flex items-center gap-2">
+				<span
+					v-tooltip="project.license.name || projectV2?.license.name"
+					class="flex min-h-6 min-w-0 items-center"
+				>
+					{{
+						project.license.id === 'LicenseRef-All-Rights-Reserved'
+							? 'All-Rights-Reserved'
+							: project.license.id
+					}}
 				</span>
-				<TagItem v-if="isCustomLicense" class="!border-surface-4 !bg-surface-3 !text-secondary">
-					Custom
+				<TagItem
+					v-tooltip="formatMessage(messages.sourceAvailabilityRequired)"
+					class="!border-orange !bg-highlight-orange !px-1.5 !py-0.5 !text-secondary"
+				>
+					<TagCategoryScrollTextIcon />
 				</TagItem>
 			</div>
 			<div>
@@ -31,7 +46,8 @@
 </template>
 
 <script setup lang="ts">
-import { ExternalIcon } from '@modrinth/assets'
+import { ExternalIcon, TagCategoryScrollTextIcon } from '@modrinth/assets'
+import { licenseRequiresSource } from '@modrinth/moderation'
 import { TagItem, useVIntl } from '@modrinth/ui'
 import { computed, useTemplateRef } from 'vue'
 
@@ -46,14 +62,6 @@ import Section from '../section.vue'
 const { project, projectV2 } = injectProjectReviewPageContext()
 const { formatMessage } = useVIntl()
 const editModal = useTemplateRef<InstanceType<typeof EditModal>>('editModal')
-const licenseName = computed(() => {
-	const license = project.value?.license
-	const name = license?.name || projectV2.value?.license.name
-	if (name) return name
-
-	const id = license?.id ?? ''
-	return id.startsWith('LicenseRef-') ? id.replace(/^LicenseRef-/, '').replaceAll('-', ' ') : id
-})
 const isCustomLicense = computed(() => {
 	const id = project.value?.license.id
 	return (
