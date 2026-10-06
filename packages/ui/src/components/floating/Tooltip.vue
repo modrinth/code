@@ -13,13 +13,13 @@ import {
 
 import {
 	bindTooltipSource,
-	preventTooltipClosure,
+	preventHide,
+	type TooltipBaseProps,
 	type TooltipContent,
 	tooltipEnter,
 	tooltipFocusIn,
 	tooltipFocusOut,
 	tooltipLeave,
-	type TooltipPlacement,
 	unbindTooltipSource,
 } from '../../providers/tooltip'
 
@@ -27,10 +27,10 @@ defineOptions({ inheritAttrs: false })
 
 const TooltipSlot = defineComponent({
 	props: {
-		render: { type: Function as PropType<TooltipContent>, required: true },
+		content: { type: Function as PropType<TooltipContent>, required: true },
 	},
 	setup(props) {
-		return () => props.render()
+		return () => props.content()
 	},
 })
 
@@ -41,24 +41,11 @@ const SIDES = {
 	left: { origin: 'right center', arrow: 'right', rotate: 315 },
 } as const
 
-type HoverWaitTimes = { hover?: number; unhover?: number }
-
 const props = withDefaults(
-	defineProps<{
+	defineProps<TooltipBaseProps & {
 		disabled?: boolean
-		open?: boolean
-		theme?: string
-		placement?: TooltipPlacement
-		reference?: HTMLElement | null
-		text?: string | null
-		content?: TooltipContent | null
-		panelClass?: string
-		/**
-		 * Wait time before closing or openning
-		 */
-		actionWait?: number | HoverWaitTimes
 	}>(),
-	{ disabled: false, theme: 'tooltip', placement: 'top' },
+	{ disabled: false, theme: 'tooltip', placement: 'top', allowTransfer: true },
 )
 
 const slots = defineSlots<{ popper?: () => VNode }>()
@@ -137,7 +124,7 @@ watch(
 	[
 		trigger,
 		() => props.disabled,
-		() => props.open,
+		() => props.pinned,
 		() => props.placement,
 		() => props.theme,
 		() => props.text,
@@ -183,12 +170,8 @@ function syncSource() {
 		return
 	}
 	bindTooltipSource(el, {
-		placement: props.placement,
-		theme: props.theme,
-		getText: () => props.text ?? null,
-		render: slots.popper ? () => slots.popper?.() : undefined,
-		pinned: !!props.open,
-		panelClass: props.panelClass,
+		...props,
+		content: slots.popper ? () => slots.popper?.() : undefined
 	})
 }
 
@@ -224,26 +207,28 @@ function onEnter() {
 	if (props.disabled || !trigger.value) {
 		return
 	}
-	const waitTime = props.actionWait
+	const delay = props.delay
 	tooltipEnter(
 		trigger.value,
-		waitTime ? (typeof waitTime === 'number' ? waitTime : waitTime.unhover) : undefined,
+		delay ? (typeof delay === 'number' ? delay : delay.hover) : undefined,
 	)
 }
 
 function onTooltipEnter() {
-	if (props.reference) {
-		preventTooltipClosure(props.reference)
+	console.log("WWWWWWWWWWWWWWWWWWWW")
+	if ((props.hoverable || props.pinned) && props.reference) {
+		console.log("WEEEEEEEE")
+		preventHide(props.reference)
 	}
 }
 
 function onLeave() {
 	const triggerEl = trigger.value ?? props.reference
-	const waitTime = props.actionWait
+	const delay = props.delay
 	if (triggerEl) {
 		tooltipLeave(
 			triggerEl,
-			waitTime ? (typeof waitTime === 'number' ? waitTime : waitTime.unhover) : undefined,
+			delay ? (typeof delay === 'number' ? delay : delay.unhover) : undefined,
 		)
 	}
 }
@@ -285,18 +270,18 @@ function onFocusOut(event: FocusEvent) {
 				v-if="isOpen"
 				:key="jumpKey"
 				ref="floating"
-				class="`v-popper__inner z-[100010] rounded-lg border border-solid border-surface-5 bg-surface-3 px-3 py-1.5 text-sm font-medium text-contrast card-shadow`"
+				class="v-popper__inner z-[100010] rounded-lg border border-solid border-surface-5 bg-surface-3 px-3 py-1.5 text-sm font-medium text-contrast card-shadow"
 				:class="[
 					`v-popper--theme-${theme}`,
 					moving && 'tooltip-moving',
 					panelClass,
-					unhoverWait ? 'pointer-events-none' : '',
+					!!(hoverable || pinned) ? '' : 'pointer-events-none',
 				]"
 				:style="[floatingStyles, { transformOrigin }]"
 				@mouseenter="onTooltipEnter"
 				@mouseleave="onLeave"
 			>
-				<TooltipSlot v-if="content" :render="content" />
+				<TooltipSlot v-if="content" :content="content" />
 				<template v-else>{{ text }}</template>
 				<div
 					ref="arrowEl"

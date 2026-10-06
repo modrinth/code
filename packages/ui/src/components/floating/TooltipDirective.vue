@@ -10,5 +10,8 @@ import Tooltip from './Tooltip.vue'
 		:placement="activeTooltip.placement"
 		:theme="activeTooltip.theme"
 		:panel-class="activeTooltip.panelClass"
+		:hoverable="activeTooltip.hoverable"
+		:delay="activeTooltip.delay"
+		:allowTransfer="activeTooltip.allowTransfer"
 	/>
 </template>

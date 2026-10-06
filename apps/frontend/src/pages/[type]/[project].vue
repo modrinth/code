@@ -268,7 +268,7 @@
 								"
 								theme="dismissable-prompt"
 								class="inline-flex"
-								open
+								pinned
 								placement="bottom-start"
 							>
 								<ButtonLink

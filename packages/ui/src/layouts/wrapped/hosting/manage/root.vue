@@ -174,7 +174,7 @@
 							<PanelServerActionButton />
 							<Tooltip
 								theme="dismissable-prompt"
-								:open="showSettingsHint"
+								:pinned="showSettingsHint"
 								:disabled="!showSettingsHint"
 								placement="bottom-end"
 							>

@@ -1,5 +1,5 @@
 <template>
-	<Tooltip :action-wait="{ hover: 600, unhover: 50 }">
+	<Tooltip :delay="{ hover: 850, unhover: 100 }" :hoverable="true" :allow-transfer="false">
 		<li
 			role="option"
 			:class="[containerClasses, isDragSource ? 'opacity-50' : '', compact ? 'h-8' : 'h-[3.25rem]']"
