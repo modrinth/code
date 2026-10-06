@@ -29,6 +29,10 @@ struct SharedInstanceUpdateRollback {
     entries: Vec<ContentEntry>,
     #[serde(default)]
     bindings: Vec<crate::state::content_store::InstanceFileStorage>,
+    #[serde(default)]
+    missing_file_ids: std::collections::HashSet<String>,
+    #[serde(default)]
+    copied_file_ids: std::collections::HashSet<String>,
 }
 
 pub(super) async fn prepare_instance_update_backup(
@@ -60,7 +64,7 @@ pub(super) async fn prepare_instance_update_backup(
 			state,
 		)
 		.await?;
-        let files = content_rows::get_instance_files(
+        let mut files = content_rows::get_instance_files(
             &metadata.instance.id,
             &state.pool,
         )
@@ -75,9 +79,11 @@ pub(super) async fn prepare_instance_update_backup(
             &metadata.instance.id,
         )
         .await?;
+		let mut missing_file_ids = std::collections::HashSet::new();
+		let mut copied_file_ids = std::collections::HashSet::new();
 		for binding in &bindings {
 			let file = files
-				.iter()
+				.iter_mut()
 				.find(|file| file.id == binding.file_id)
 				.ok_or_else(|| {
 					crate::state::content_store::input(
@@ -86,20 +92,28 @@ pub(super) async fn prepare_instance_update_backup(
 				})?;
 			let file_status = state.content_store
 				.check_instance_file(&metadata.instance, file, binding).await?;
+			file.missing = file_status == crate::state::content_store::InstanceFileStatus::Missing;
+			if file.missing {
+				missing_file_ids.insert(file.id.clone());
+				continue;
+			}
 			let content = state.content_store.file_content(file).await?;
 			if file_status != crate::state::content_store::InstanceFileStatus::Healthy
-				|| !matches!(content, crate::state::content_store::FileContent::Stored { .. })
 			{
 				return Err(crate::state::content_store::input(format!(
 					"Restore or repair {} before updating this instance; its current content cannot be backed up safely",
 					file.relative_path,
 				)));
 			}
+			if !matches!(content, crate::state::content_store::FileContent::Stored { .. }) {
+				copied_file_ids.insert(file.id.clone());
+			}
 		}
         let skipped = files
             .iter()
             .filter(|file| {
                 bindings.iter().any(|binding| binding.file_id == file.id)
+					&& !copied_file_ids.contains(&file.id)
             })
             .map(crate::state::content_store::content_file_path)
             .collect();
@@ -111,6 +125,8 @@ pub(super) async fn prepare_instance_update_backup(
             files,
             entries,
             bindings,
+			missing_file_ids,
+			copied_file_ids,
         };
         let instance_path = state
             .directories
@@ -247,6 +263,30 @@ async fn restore_instance_update(
         ));
     }
     for binding in &snapshot.bindings {
+        if snapshot.missing_file_ids.contains(&binding.file_id) {
+            continue;
+        }
+        if snapshot.copied_file_ids.contains(&binding.file_id) {
+            let file = snapshot
+                .files
+                .iter()
+                .find(|file| file.id == binding.file_id)
+                .ok_or_else(|| {
+                    crate::state::content_store::input(
+                        "Backup content reference has no file record",
+                    )
+                })?;
+            let path = backup_path
+                .join(crate::state::content_store::content_file_path(file));
+            if crate::state::content_store::hash_file(&path).await?.sha512
+                != binding.blob_sha512
+            {
+                return Err(crate::state::content_store::input(
+                    "The instance backup contains changed content",
+                ));
+            }
+            continue;
+        }
         if state
             .content_store
             .lookup(Some(&binding.blob_sha512), None)
@@ -282,6 +322,8 @@ async fn restore_instance_update(
             &rollback.instance.instance,
             &snapshot.files,
             &snapshot.bindings,
+            &snapshot.missing_file_ids,
+            &snapshot.copied_file_ids,
         )
         .await?;
 
