@@ -22,6 +22,7 @@ use crate::util::fetch::{DownloadReason, REQWEST_CLIENT};
 use futures::StreamExt;
 use path_util::SafeRelativeUtf8UnixPathBuf;
 use std::collections::{HashMap, HashSet};
+use std::future::Future;
 use std::path::PathBuf;
 use uuid::Uuid;
 
@@ -226,7 +227,23 @@ impl SharedInstanceApplyPlan {
     }
 }
 
-pub(super) async fn apply_shared_instance_update(
+pub(super) fn apply_shared_instance_update<'a>(
+    job_id: Uuid,
+    job_state: &'a mut InstallJobState,
+    state: &'a State,
+    instance_id: &'a str,
+    data: &'a SharedInstanceInstallData,
+) -> impl Future<Output = crate::Result<()>> + Send + 'a {
+    Box::pin(apply_shared_instance_update_inner(
+        job_id,
+        job_state,
+        state,
+        instance_id,
+        data,
+    ))
+}
+
+async fn apply_shared_instance_update_inner(
     job_id: Uuid,
     job_state: &mut InstallJobState,
     state: &State,
@@ -246,13 +263,13 @@ pub(super) async fn apply_shared_instance_update(
     if plan.configuration_changed {
         crate::api::instance::prepare_instance_update(instance_id).await?;
         remove_existing_shared_instance_content(instance_id, state).await?;
-        Box::pin(apply_shared_instance_content(
+        apply_shared_instance_content(
             job_id,
             job_state,
             state,
             instance_id,
             data,
-        ))
+        )
         .await?;
         if data.modpack.is_none() {
             if let Err(error) =
@@ -266,8 +283,10 @@ pub(super) async fn apply_shared_instance_update(
                     "The shared instance was updated, but its local options.txt could not be restored after removing the previous pack: {error}"
                 );
             }
-            crate::api::instance::reconcile_instance_after_pack_update(
-                instance_id,
+            Box::pin(
+                crate::api::instance::reconcile_instance_after_pack_update(
+                    instance_id,
+                ),
             )
             .await?;
         }
@@ -597,7 +616,23 @@ async fn shared_instance_versions_by_id(
     Ok(versions_by_id)
 }
 
-pub(super) async fn apply_shared_instance_content(
+pub(super) fn apply_shared_instance_content<'a>(
+    job_id: Uuid,
+    job_state: &'a mut InstallJobState,
+    state: &'a State,
+    instance_id: &'a str,
+    data: &'a SharedInstanceInstallData,
+) -> impl Future<Output = crate::Result<()>> + Send + 'a {
+    Box::pin(apply_shared_instance_content_inner(
+        job_id,
+        job_state,
+        state,
+        instance_id,
+        data,
+    ))
+}
+
+async fn apply_shared_instance_content_inner(
     job_id: Uuid,
     job_state: &mut InstallJobState,
     state: &State,
@@ -633,13 +668,13 @@ pub(super) async fn apply_shared_instance_content(
             modpack_details(&location),
         )
         .await?;
-        Box::pin(install_pack(
+        install_pack(
             job_id,
             job_state,
             location,
             instance_id.to_string(),
             DownloadReason::Modpack,
-        ))
+        )
         .await?;
     } else {
         crate::api::instance::edit(
