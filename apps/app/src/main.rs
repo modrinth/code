@@ -197,7 +197,7 @@ fn main() {
 
         // Refresh the hidden window's frame before window-state measures its client area.
         builder = builder.plugin(
-            tauri::plugin::Builder::new("window-frame")
+            tauri::plugin::Builder::<_, ()>::new("window-frame")
                 .on_window_ready(|window| {
                     if window.label() != "main" {
                         return;
