@@ -56,8 +56,8 @@ const dismissServerIntro = useDismissServerIntro()
 const modalRef = useTemplateRef<InstanceType<typeof CreationFlowModal>>('modalRef')
 const serverId = computed(() => flow.request.value?.serverId ?? '')
 const { data: server } = useQuery({
-	queryKey: computed(() => ['servers', 'detail', serverId.value]),
-	queryFn: () => client.archon.servers_v0.get(serverId.value),
+	queryKey: computed(() => ['servers', 'detail', serverId.value] as const),
+	queryFn: ({ queryKey }) => client.archon.servers_v0.get(queryKey[2]),
 	enabled: computed(() => !!serverId.value),
 	staleTime: 30_000,
 })
