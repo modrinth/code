@@ -896,17 +896,11 @@
   "auth.sign-in.launcher.callback.title": {
     "message": "Przekazanie wyniku logowania do aplikacji Modrinth"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Wracamy Cię do aplikacji Modrint. Jeśli nic się nie stanie, użyj przycisku poniżej."
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Przejdź do Modrinth.com"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Otwórz Modrinth App"
-  },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Jesteś zalogowany"
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "Jeśli aplikacja się nie otworzy, użyj poniższego przycisku, aby dokończyć logowanie."

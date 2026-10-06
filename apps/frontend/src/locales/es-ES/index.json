@@ -899,17 +899,11 @@
   "auth.sign-in.launcher.callback.title": {
     "message": "Inicio de sesión de Modrinth App"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Te estamos devolviendo a la aplicación Modrinth. Si nada sucede, usa el botón de abajo."
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Ir a Modrinth.com"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Abrir la aplicación Modrinth"
-  },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Ha iniciado sesión"
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "Si la aplicación no abre, utilice el botón de abajo para terminar de iniciar sesión."

@@ -896,17 +896,11 @@
   "auth.sign-in.launcher.callback.title": {
     "message": "Rappel de connexion de l'application Modrinth"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Nous vous redirigeons vers l'application Modrinth. S'il ne se passe rien, utilisez le bouton ci-dessous."
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Aller sur Modrinth.com"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Ouvrir Modrinth App"
-  },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Vous êtes connectés en tant que"
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "Si l'application ne s'ouvre pas, utilisez le bouton ci-dessous pour terminer la connexion."
