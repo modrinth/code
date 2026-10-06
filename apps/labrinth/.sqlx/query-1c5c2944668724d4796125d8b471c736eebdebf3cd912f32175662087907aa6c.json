@@ -1,0 +1,35 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        WITH problem_groups AS (\n            SELECT pag.id, pag.project_id, pag.flame_project\n            FROM project_attribution_groups pag\n            WHERE pag.project_id = ANY($2)\n              AND (\n                pag.attribution IS NULL\n                OR pag.attribution->>'kind' = 'no_permission'\n                OR COALESCE(\n                  pag.attribution->'moderation_status'->>'kind',\n                  'approved'\n                ) != 'approved'\n              )\n              AND NOT EXISTS (\n                SELECT 1\n                FROM attributions_exemptions ae\n                WHERE ae.project_id = pag.project_id\n              )\n        )\n        SELECT DISTINCT f.version_id AS \"version_id!: DBVersionId\", f.id AS \"file_id!: DBFileId\",\n            pg.flame_project AS \"flame_project?\"\n        FROM problem_groups pg\n        INNER JOIN project_attribution_files paf ON paf.group_id = pg.id\n        INNER JOIN override_file_sources ofs ON ofs.sha1 = paf.sha1\n        INNER JOIN files f ON f.id = ofs.file_id\n        INNER JOIN versions v ON v.id = f.version_id AND v.mod_id = pg.project_id\n        INNER JOIN attribution_enforced_versions aev ON aev.id = f.version_id\n        WHERE EXISTS (SELECT 1 FROM problem_groups)\n          AND f.version_id = ANY($1)\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "version_id!: DBVersionId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "file_id!: DBFileId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "flame_project?",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "1c5c2944668724d4796125d8b471c736eebdebf3cd912f32175662087907aa6c"
+}

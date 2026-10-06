@@ -1430,9 +1430,6 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Đã cài lại máy chủ"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Cài đặt hỗ trợ"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Tăng tốc tối đa lên {cpus} CPU"
   },
@@ -4968,4 +4965,3 @@
     "defaultMessage": "Đội ngũ Modrinth"
   }
 }
-

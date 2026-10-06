@@ -1217,9 +1217,6 @@
   "external-files.permissions-card.editor.save": {
     "defaultMessage": "帰属情報を保存"
   },
-  "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "ライセンスを選んでください…"
-  },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "パーミッションの理由"
   },
@@ -2026,9 +2023,6 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "サーバーがオンボーディングにリセットされました"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "サポートオプション"
   },
   "hosting.specs.burst": {
     "defaultMessage": "{cpus}個のCPUに増加"
@@ -3384,22 +3378,22 @@
     "defaultMessage": "データパック"
   },
   "project-type.mod.capital": {
-    "defaultMessage": "{count, plural, other{#個のMod}}"
+    "defaultMessage": "{count, plural, other {Mod}}"
   },
   "project-type.mod.category": {
     "defaultMessage": "Mod"
   },
   "project-type.mod.lowercase": {
-    "defaultMessage": "{count, plural, other{#個のMod}}"
+    "defaultMessage": "{count, plural, other {mod}}"
   },
   "project-type.modpack.capital": {
-    "defaultMessage": "{count}個のModパック"
+    "defaultMessage": "{count, plural, other {Modパック}}"
   },
   "project-type.modpack.category": {
     "defaultMessage": "Modパック"
   },
   "project-type.modpack.lowercase": {
-    "defaultMessage": "{count}個のModパック"
+    "defaultMessage": "{count, plural, other {modパック}}"
   },
   "project-type.plugin.capital": {
     "defaultMessage": "プラグイン"
@@ -3408,16 +3402,16 @@
     "defaultMessage": "プラグイン"
   },
   "project-type.plugin.lowercase": {
-    "defaultMessage": "{count}個のプラグイン"
+    "defaultMessage": "{count, plural, other {プラグイン}}"
   },
   "project-type.project.capital": {
-    "defaultMessage": "{count}個のプロジェクト"
+    "defaultMessage": "{count, plural, other {プロジェクト}}"
   },
   "project-type.project.category": {
     "defaultMessage": "プロジェクト"
   },
   "project-type.project.lowercase": {
-    "defaultMessage": "{count}個のプロジェクト"
+    "defaultMessage": "{count, plural, other {プロジェクト}}"
   },
   "project-type.resourcepack.capital": {
     "defaultMessage": "リソースパック"
@@ -4211,6 +4205,12 @@
   "search.filter.option.sub_options.expand.tooltip": {
     "defaultMessage": "詳細オプションを表示"
   },
+  "search.filter_type.advanced": {
+    "defaultMessage": "高度な除外設定"
+  },
+  "search.filter_type.advanced.disclosure.advertisements": {
+    "defaultMessage": "広告"
+  },
   "search.filter_type.advanced.disclosure.ai_content": {
     "defaultMessage": "AI生成コンテンツ"
   },
@@ -4220,8 +4220,20 @@
   "search.filter_type.advanced.disclosure.archived": {
     "defaultMessage": "アーカイブ済み"
   },
+  "search.filter_type.advanced.disclosure.derivative_work": {
+    "defaultMessage": "派生コンテンツ"
+  },
+  "search.filter_type.advanced.disclosure.epilepsy_triggers": {
+    "defaultMessage": "光過敏症の誘因"
+  },
   "search.filter_type.advanced.disclosure.paid_features": {
     "defaultMessage": "有料機能"
+  },
+  "search.filter_type.advanced.disclosure.system_interactions": {
+    "defaultMessage": "外部システムの相互作用"
+  },
+  "search.filter_type.advanced.disclosure.telemetry": {
+    "defaultMessage": "データの遠隔収集"
   },
   "search.filter_type.environment": {
     "defaultMessage": "環境"
@@ -5399,11 +5411,35 @@
   "settings.billing.title": {
     "defaultMessage": "請求とサブスクリプション"
   },
+  "settings.display.project-list-layouts.mod": {
+    "defaultMessage": "Modページ"
+  },
   "settings.display.project-list-layouts.mode.grid": {
     "defaultMessage": "グリッド表示"
   },
   "settings.display.project-list-layouts.mode.rows": {
     "defaultMessage": "行表示"
+  },
+  "settings.display.project-list-layouts.modpack": {
+    "defaultMessage": "Modパックページ"
+  },
+  "settings.display.project-list-layouts.plugin": {
+    "defaultMessage": "プラグインページ"
+  },
+  "settings.display.project-list-layouts.resourcepack": {
+    "defaultMessage": "リソースパックページ"
+  },
+  "settings.display.project-list-layouts.server": {
+    "defaultMessage": "サーバーページ"
+  },
+  "settings.display.project-list-layouts.shader": {
+    "defaultMessage": "シェーダーページ"
+  },
+  "settings.display.project-list-layouts.title": {
+    "defaultMessage": "プロジェクトリストのレイアウト"
+  },
+  "settings.display.project-list-layouts.user": {
+    "defaultMessage": "ユーザープロフィールページ"
   },
   "settings.display.theme.dark": {
     "defaultMessage": "ダーク"
@@ -5483,8 +5519,20 @@
   "settings.profile.profile-picture.title": {
     "defaultMessage": "プロファイルアイコン"
   },
+  "settings.profile.save-error": {
+    "defaultMessage": "プロフィールの更新に失敗しました"
+  },
+  "settings.profile.sign-in-required.title": {
+    "defaultMessage": "Modrinthアカウントが必要です"
+  },
   "settings.sessions.title": {
     "defaultMessage": "セッション"
+  },
+  "settings.social.blocked-users.column.user": {
+    "defaultMessage": "ユーザー"
+  },
+  "settings.social.blocked-users.empty": {
+    "defaultMessage": "誰もブロックしていません。"
   },
   "settings.social.blocked-users.unblock": {
     "defaultMessage": "ブロックを解除"

@@ -99,6 +99,7 @@
 										wrapper-class="w-full max-w-[450px]"
 										:disabled="!canUseAdvancedSettings"
 									/>
+									<InlineValidationMessage :message="motdValidationMessage" class="text-sm" />
 								</div>
 
 								<div
@@ -277,15 +278,12 @@
 		</div>
 
 		<SaveBanner
+			:has-errors="motdBlocksSave"
 			:is-visible="hasUnsavedChanges || isUpdating"
 			:server-id="serverId"
 			:is-updating="isUpdating || busyReasons.length > 0"
 			:restart="canUsePowerActions"
-			:save="
-				async () => {
-					await saveProperties()
-				}
-			"
+			:save="saveProperties"
 			:reset="resetProperties"
 		/>
 	</div>
@@ -294,21 +292,48 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import { SearchIcon, SpinnerIcon } from '@modrinth/assets'
+import { isStaff } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import Fuse from 'fuse.js'
 import { computed, ref, watch } from 'vue'
 
-import { Accordion, Admonition, AutoLink, Chips, Input, Toggle } from '#ui/components'
+import {
+	Accordion,
+	Admonition,
+	AutoLink,
+	Chips,
+	InlineValidationMessage,
+	Input,
+	Toggle,
+} from '#ui/components'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import { injectServerSettings } from '#ui/layouts/shared/server-settings'
 import {
+	injectAuth,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
+import { commonMessages } from '#ui/utils/common-messages'
+import { validateProfanity } from '#ui/utils/profanity-check'
 
 const { addNotification } = injectNotificationManager()
+const auth = injectAuth()
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	motdProfanity: {
+		id: 'hosting.settings.properties.motd-profanity',
+		defaultMessage:
+			"Due to Minecraft Usage Guidelines, your server's MOTD cannot contain profanity. Detected: “{value}”.",
+	},
+	motdProfanitySaveError: {
+		id: 'hosting.settings.properties.motd-profanity-save-error',
+		defaultMessage:
+			"Due to Minecraft Usage Guidelines, your server's MOTD cannot contain profanity. Detected: “{value}”",
+	},
+})
 const client = injectModrinthClient()
 const { serverId, worldId, powerState, busyReasons } = injectModrinthServerContext()
 const queryClient = useQueryClient()
@@ -413,6 +438,16 @@ function flattenProperties(data: Archon.Content.v1.PropertiesFields): Record<str
 
 const liveProperties = ref<Record<string, string>>({})
 const originalProperties = ref<Record<string, string>>({})
+const motdValidation = computed(() => validateProfanity(liveProperties.value.motd ?? ''))
+const motdBlocksSave = computed(() => !motdValidation.value.valid && !isStaff(auth.user.value))
+const detectedMotdProfanity = computed(() =>
+	[...new Set(motdValidation.value.matches.map((match) => match.rawText))].join(', '),
+)
+const motdValidationMessage = computed(() =>
+	motdValidation.value.valid
+		? undefined
+		: formatMessage(messages.motdProfanity, { value: detectedMotdProfanity.value }),
+)
 let previousSpawnProtection = '16'
 
 function syncFormFromData() {
@@ -542,6 +577,16 @@ const { mutateAsync: savePropertiesMutation, isPending: isUpdating } = useMutati
 
 async function saveProperties() {
 	if (!canUseAdvancedSettings.value) return
+	if (motdBlocksSave.value) {
+		addNotification({
+			type: 'error',
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: formatMessage(messages.motdProfanitySaveError, {
+				value: detectedMotdProfanity.value,
+			}),
+		})
+		return false
+	}
 	await savePropertiesMutation()
 }
 

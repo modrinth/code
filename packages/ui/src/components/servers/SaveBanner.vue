@@ -6,26 +6,29 @@
 				<Button type="quiet" :disabled="props.isUpdating" @click="props.reset"
 					><HistoryIcon /> Reset</Button
 				>
-				<Button
-					:type="props.restart ? 'base' : 'colored'"
-					:color="props.restart ? undefined : 'brand'"
-					:disabled="props.isUpdating"
-					@click="props.save"
-				>
-					<SpinnerIcon v-if="props.isUpdating" class="animate-spin" />
-					<SaveIcon v-else />
-					{{ props.isUpdating ? 'Saving...' : 'Save' }}
-				</Button>
-				<Button
-					v-if="props.restart"
-					type="colored"
-					color="brand"
-					:disabled="props.isUpdating || isTransitioning"
-					@click="saveAndPower"
-				>
-					<SpinnerIcon v-if="props.isUpdating || isTransitioning" class="animate-spin" />
-					{{ powerButtonLabel }}
-				</Button>
+				<span v-tooltip="saveDisabledTooltip" class="flex">
+					<Button
+						:type="props.restart ? 'base' : 'colored'"
+						:color="props.restart ? undefined : 'brand'"
+						:disabled="props.isUpdating || props.hasErrors"
+						@click="props.save"
+					>
+						<SpinnerIcon v-if="props.isUpdating" class="animate-spin" />
+						<SaveIcon v-else />
+						{{ props.isUpdating ? 'Saving...' : 'Save' }}
+					</Button>
+				</span>
+				<span v-if="props.restart" v-tooltip="saveDisabledTooltip" class="flex">
+					<Button
+						type="colored"
+						color="brand"
+						:disabled="props.isUpdating || isTransitioning || props.hasErrors"
+						@click="saveAndPower"
+					>
+						<SpinnerIcon v-if="props.isUpdating || isTransitioning" class="animate-spin" />
+						{{ powerButtonLabel }}
+					</Button>
+				</span>
 			</div>
 		</FloatingActionBar>
 	</Teleport>
@@ -37,17 +40,28 @@ import { computed, onBeforeUnmount, watch } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
+import { defineMessage, useVIntl } from '#ui/composables/i18n'
 import { injectServerSettings } from '#ui/layouts/shared/server-settings/providers/server-settings'
 import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
 
 const props = defineProps<{
 	isUpdating: boolean
+	hasErrors?: boolean
 	restart?: boolean
-	save: () => void | Promise<void>
+	save: () => void | boolean | Promise<void | boolean>
 	reset: () => void
 	isVisible: boolean
 	serverId: string
 }>()
+
+const { formatMessage } = useVIntl()
+const resolveErrorsMessage = defineMessage({
+	id: 'hosting.save-banner.resolve-errors',
+	defaultMessage: 'Please resolve the errors in your changes before saving.',
+})
+const saveDisabledTooltip = computed(() =>
+	props.hasErrors ? formatMessage(resolveErrorsMessage) : undefined,
+)
 
 const saveBanner = injectServerSettings(null)?.saveBanner
 
@@ -80,8 +94,9 @@ const powerButtonLabel = computed(() => {
 })
 
 const saveAndPower = async () => {
+	if (props.hasErrors) return
 	try {
-		await props.save()
+		if ((await props.save()) === false) return
 	} catch {
 		return
 	}

@@ -315,7 +315,7 @@
     "defaultMessage": "Вийти"
   },
   "button.sign-up": {
-    "defaultMessage": "Зареєструватись"
+    "defaultMessage": "Зареєструватися"
   },
   "button.stop": {
     "defaultMessage": "Зупинити"
@@ -716,6 +716,12 @@
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Не вдалося завантажити вміст"
   },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "Не вдалося завантажити журнал змін"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "Не вдалося завантажити доступні оновлення"
+  },
   "content.page-layout.filter.add": {
     "defaultMessage": "Фільтр"
   },
@@ -753,10 +759,10 @@
     "defaultMessage": "Назва (Я-А)"
   },
   "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Спочатку новіші"
+    "defaultMessage": "Спершу найновіші"
   },
   "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Спочатку старіші"
+    "defaultMessage": "Спершу найстаріші"
   },
   "content.page-layout.sort.label": {
     "defaultMessage": "Сортування: {mode}"
@@ -1191,7 +1197,7 @@
     "defaultMessage": "Зберегти атрибуцію"
   },
   "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "Оберіть ліцензію…"
+    "defaultMessage": "Шукати ліцензії…"
   },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "Тип дозволу"
@@ -1234,6 +1240,9 @@
   },
   "external-files.permissions-card.last-updated": {
     "defaultMessage": "Востаннє оновлено {date} {user}"
+  },
+  "external-files.permissions-card.license.all-rights": {
+    "defaultMessage": "Усі права захищено/Без ліцензії"
   },
   "external-files.permissions-card.license.unknown": {
     "defaultMessage": "Невідомо"
@@ -2006,9 +2015,6 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Сервер скинуто до початкового стану"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Налаштування підтримки"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Короткочасно до {cpus} ЦП"
   },
@@ -2472,10 +2478,10 @@
     "defaultMessage": "Оновити до {version}"
   },
   "instances.updater-modal.warning-app": {
-    "defaultMessage": "Оновлення може зламати ваш примірник. Спочатку ознайомтеся із журналом змін у версії й створіть резервну копію."
+    "defaultMessage": "Оновлення може зламати ваш примірник. Спочатку ознайомтесь із журналом змін у версії та створіть резервну копію."
   },
   "instances.updater-modal.warning-web": {
-    "defaultMessage": "Оновлення може зламати ваш світ. Спочатку ознайомтеся із журналом змін у версії й створіть резервну копію."
+    "defaultMessage": "Оновлення може зламати ваш світ. Спочатку ознайомтесь із журналом змін у версії та створіть резервну копію."
   },
   "label.actions": {
     "defaultMessage": "Дії"
@@ -3198,7 +3204,7 @@
     "defaultMessage": "Користувач Modrinth."
   },
   "profile.block-user.admonition-body": {
-    "defaultMessage": "{username} не зможе надсилати вам запити в друзі, запрошувати до спільних збірок або запрошувати на сервери Modrinth Hosting."
+    "defaultMessage": "{username} не зможе надсилати вам запити в друзі, запрошувати до спільних збірок чи на сервери Modrinth Hosting."
   },
   "profile.block-user.admonition-title": {
     "defaultMessage": "Справді бажаєте заблокувати цього користувача?"
@@ -3233,14 +3239,26 @@
   "profile.button.create-project": {
     "defaultMessage": "Створити проєкт"
   },
+  "profile.button.force-password-reset": {
+    "defaultMessage": "Примусово скинути пароль"
+  },
   "profile.button.info": {
     "defaultMessage": "Деталі про користувача"
+  },
+  "profile.button.lock": {
+    "defaultMessage": "Закрити обліковий запис"
   },
   "profile.button.manage-projects": {
     "defaultMessage": "Керувати проєктами"
   },
   "profile.button.remove-affiliate": {
     "defaultMessage": "Видалити як партнера"
+  },
+  "profile.button.reset-2fa": {
+    "defaultMessage": "Скинути двофакторну автентифікацію"
+  },
+  "profile.button.revoke-sessions": {
+    "defaultMessage": "Завершити всі сеанси"
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "Призначити партнером"
@@ -3250,6 +3268,9 @@
   },
   "profile.button.unblock": {
     "defaultMessage": "Розблокувати"
+  },
+  "profile.button.unlock": {
+    "defaultMessage": "Відкрити обліковий запис"
   },
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural, one {# проєкт} few {# проєкти} many {# проєктів} other {# проєкту}}"
@@ -3299,6 +3320,36 @@
   "profile.error.not-found": {
     "defaultMessage": "Користувача не знайдено"
   },
+  "profile.force-password-reset.admonition-body": {
+    "defaultMessage": "Пароль користувача {username} буде негайно видалено, він вийде з усіх пристроїв, і посилання на новий пароль буде надіслано на електронну пошту нижче. Якщо ви зміните пошту, вона замінить пошту його облікового запису. Посилання діятиме протягом 24 годин і працюватиме, навіть якщо обліковий запис заблокований."
+  },
+  "profile.force-password-reset.admonition-title": {
+    "defaultMessage": "Поточний пароль більше не працюватиме"
+  },
+  "profile.force-password-reset.button": {
+    "defaultMessage": "Скинути пароль"
+  },
+  "profile.force-password-reset.email-label": {
+    "defaultMessage": "Електронна пошта облікового запису"
+  },
+  "profile.force-password-reset.email-placeholder": {
+    "defaultMessage": "Залиште порожнім, щоб використати пошту облікового запису"
+  },
+  "profile.force-password-reset.error-description": {
+    "defaultMessage": "Виникла помилка під час скидання паролю. Спробуйте знову."
+  },
+  "profile.force-password-reset.error-title": {
+    "defaultMessage": "Не вдалося скинути пароль"
+  },
+  "profile.force-password-reset.success-description": {
+    "defaultMessage": "Посилання на скидання паролю надіслано користувачеві {username}."
+  },
+  "profile.force-password-reset.success-title": {
+    "defaultMessage": "Пароль скинуто"
+  },
+  "profile.force-password-reset.title": {
+    "defaultMessage": "Примусове скидання паролю для користувача {username}"
+  },
   "profile.label.affiliate": {
     "defaultMessage": "Партнер"
   },
@@ -3313,6 +3364,9 @@
   },
   "profile.label.joined": {
     "defaultMessage": "Приєднався"
+  },
+  "profile.label.locked": {
+    "defaultMessage": "Закрито"
   },
   "profile.label.no-collections": {
     "defaultMessage": "Цей користувач не має добірок!"
@@ -3338,6 +3392,54 @@
   "profile.official-account.bio": {
     "defaultMessage": "Офіційний обліковий запис Modrinth. Зв'язатися з підтримкою можна за <support-link></support-link> або через електронну пошту за <email></email>"
   },
+  "profile.reset-2fa.admonition-body": {
+    "defaultMessage": "Резервні коди та коди автентифікації користувача {username} буде видалено, і він отримає сповіщення про це. Робіть це, лише якщо підтвердили його особу."
+  },
+  "profile.reset-2fa.admonition-title": {
+    "defaultMessage": "Справді бажаєте скинути двофакторну автентифікацію?"
+  },
+  "profile.reset-2fa.button": {
+    "defaultMessage": "Скинути 2FA"
+  },
+  "profile.reset-2fa.error-description": {
+    "defaultMessage": "Виникла помилка під час скидання двофакторної автентифікації. Спробуйте знову."
+  },
+  "profile.reset-2fa.error-title": {
+    "defaultMessage": "Не вдалося скинути двофакторну автентифікацію"
+  },
+  "profile.reset-2fa.success-description": {
+    "defaultMessage": "Двофакторну автентифікацію користувача {username} скинуто."
+  },
+  "profile.reset-2fa.success-title": {
+    "defaultMessage": "Двофакторну автентифікацію скинуто"
+  },
+  "profile.reset-2fa.title": {
+    "defaultMessage": "Скидання двофакторної автентифікації для користувача {username}"
+  },
+  "profile.revoke-sessions.admonition-body": {
+    "defaultMessage": "Користувач {username} вийде з усіх пристроїв та потребуватиме повторного входу. Це не впливає на особисті токени доступу."
+  },
+  "profile.revoke-sessions.admonition-title": {
+    "defaultMessage": "Справді бажаєте завершити всі сеанси?"
+  },
+  "profile.revoke-sessions.button": {
+    "defaultMessage": "Завершити сеанси"
+  },
+  "profile.revoke-sessions.error-description": {
+    "defaultMessage": "Виникла помилка під час завершення сеансів. Спробуйте знову."
+  },
+  "profile.revoke-sessions.error-title": {
+    "defaultMessage": "Не вдалося завершити сеанси"
+  },
+  "profile.revoke-sessions.success-description": {
+    "defaultMessage": "Користувач {username} вийшов з усіх пристроїв."
+  },
+  "profile.revoke-sessions.success-title": {
+    "defaultMessage": "Сеанси завершено"
+  },
+  "profile.revoke-sessions.title": {
+    "defaultMessage": "Скасування сеансів для користувача {username}"
+  },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Виникла помилка під час розблокування користувача. Спробуйте знову."
   },
@@ -3349,6 +3451,18 @@
   },
   "profile.unblock-user.success-title": {
     "defaultMessage": "Користувача розблоковано"
+  },
+  "profile.unlock-user.error-description": {
+    "defaultMessage": "Виникла помилка під час відкриття облікового запису. Спробуйте пізніше."
+  },
+  "profile.unlock-user.error-title": {
+    "defaultMessage": "Не вдалося відкрити обліковий запис"
+  },
+  "profile.unlock-user.success-description": {
+    "defaultMessage": "Обліковий запис {username} відкрито."
+  },
+  "profile.unlock-user.success-title": {
+    "defaultMessage": "Обліковий запис відкрито"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Опубліковано {date}"
@@ -4032,7 +4146,7 @@
     "defaultMessage": "Лише на стороні клієнта"
   },
   "project.settings.environment.notice.missing-env.description": {
-    "defaultMessage": "У вашого проєкту відсутні метадані середовища, виберіть необхідний варіант нижче."
+    "defaultMessage": "Вашому проєктові бракує метаданих середовища. Виберіть потрібні нижче."
   },
   "project.settings.environment.notice.missing-env.title": {
     "defaultMessage": "Виберіть середовище для вашого проєкту"
@@ -5289,7 +5403,7 @@
     "defaultMessage": "Установлення в одне натискання"
   },
   "servers.list-empty.play-with-friends-description": {
-    "defaultMessage": "Запросіть друзів грати на вашому сервері в один клік через Modrinth App."
+    "defaultMessage": "Запросіть друзів пограти на вашому сервері в один клац з Modrinth App."
   },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Грайте з друзями"
@@ -6748,6 +6862,78 @@
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "Нерозпізнані файли"
+  },
+  "update-all-modal.changelog-for": {
+    "defaultMessage": "Журнал змін для {project}"
+  },
+  "update-all-modal.changelog-loaded": {
+    "defaultMessage": "Журнал змін завантажено."
+  },
+  "update-all-modal.close-changelog": {
+    "defaultMessage": "Закрити журнал змін"
+  },
+  "update-all-modal.current-version": {
+    "defaultMessage": "Поточна версія"
+  },
+  "update-all-modal.empty": {
+    "defaultMessage": "Оновлення недоступні."
+  },
+  "update-all-modal.header": {
+    "defaultMessage": "Оновлення проєктів"
+  },
+  "update-all-modal.loading": {
+    "defaultMessage": "Завантаження оновлень…"
+  },
+  "update-all-modal.loading-changelog": {
+    "defaultMessage": "Завантаження журналів змін…"
+  },
+  "update-all-modal.new-version": {
+    "defaultMessage": "Нова версія"
+  },
+  "update-all-modal.no-changelog": {
+    "defaultMessage": "Журнал змін не надано для цієї версії."
+  },
+  "update-all-modal.no-compatible-updates": {
+    "defaultMessage": "Немає доступних сумісних оновлень."
+  },
+  "update-all-modal.no-version": {
+    "defaultMessage": "Немає сумісних оновлень"
+  },
+  "update-all-modal.project": {
+    "defaultMessage": "Проєкт"
+  },
+  "update-all-modal.project-list": {
+    "defaultMessage": "Оновлення проєкту"
+  },
+  "update-all-modal.results": {
+    "defaultMessage": "{count, plural, one {# проєкт готовий до оновлення} few {# проєкти готові до оновлення} many {# проєктів готові до оновлення} other {# проєктів готові до оновлення}}"
+  },
+  "update-all-modal.select-all": {
+    "defaultMessage": "Вибрати всі проєкти"
+  },
+  "update-all-modal.select-project": {
+    "defaultMessage": "Вибрати {project} для оновлення"
+  },
+  "update-all-modal.select-version": {
+    "defaultMessage": "Нова версія для {project}"
+  },
+  "update-all-modal.update": {
+    "defaultMessage": "Оновити {count, plural, one {# проєкт} few {# проєкти} many {# проєктів} other {# проєктів}}"
+  },
+  "update-all-modal.versions": {
+    "defaultMessage": "Поточна / нова версія"
+  },
+  "update-all-modal.view": {
+    "defaultMessage": "Переглянути"
+  },
+  "update-all-modal.view-changelog": {
+    "defaultMessage": "Переглянути журнал змін для {project}"
+  },
+  "update-all-modal.warning": {
+    "defaultMessage": "Ми не можемо гарантувати, що оновлення будуть безпечними для ваших світів. Ознайомтеся зі списком змін і подумайте про створення резервної копії."
+  },
+  "update-all-modal.warning-server": {
+    "defaultMessage": "Ми не можемо гарантувати, що оновлення будуть безпечними для вашого сервера. Ознайомтеся зі списком змін і подумайте про створення резервної копії."
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Цей користувач з нами ще з альфа-версії Modrinth, яка завершилася в листопаді 2020."

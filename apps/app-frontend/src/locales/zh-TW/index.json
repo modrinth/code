@@ -206,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "首頁與內容"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "當 Minecraft 關閉時，將 Modrinth App 切換至前景。"
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Minecraft 關閉後開啟應用程式"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "啟動與瀏覽"
   },
@@ -301,6 +307,9 @@
   },
   "app.download-manager.attention": {
     "message": "需要注意"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "正在更新 {count, plural, other {# 個項目}}"
   },
   "app.download-manager.cancel": {
     "message": "取消安裝"
@@ -3239,6 +3248,12 @@
   "app.skins.section.default-skins": {
     "message": "預設外觀"
   },
+  "app.skins.section.dungeons-hero": {
+    "message": "Dungeons 英雄"
+  },
+  "app.skins.section.dungeons-ii-hero": {
+    "message": "Dungeons II 英雄"
+  },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
@@ -3268,6 +3283,9 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "小鬼當家"
+  },
+  "app.skins.section.wilderness-bound": {
+    "message": "奔赴荒野"
   },
   "app.skins.sign-in.button": {
     "message": "登入 Microsoft"
