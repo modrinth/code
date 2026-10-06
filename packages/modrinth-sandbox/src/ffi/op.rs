@@ -96,6 +96,39 @@ pub unsafe fn try_return<R>(
     })
 }
 
+/// Runs `f` and writes its optional return value to a Rust-owned opaque pointer.
+///
+/// A successful [`None`] result is represented by a null output pointer.
+///
+/// # Safety
+///
+/// If `out` is non-null, it must be properly aligned and valid for writing a
+/// `*mut R`. It must not currently contain an owned pointer that would be
+/// leaked by overwriting it.
+pub unsafe fn try_return_optional<R>(
+    out: *mut *mut R,
+    f: impl FnOnce() -> eyre::Result<Option<R>>,
+) -> bool {
+    try_do(move || {
+        let out = NonNull::new(out)
+            .wrap_err("out parameter value must not be null")?;
+
+        // SAFETY: The caller guarantees that `out` points to valid, writable
+        // storage for one pointer. Writing null represents both the initial
+        // failure state and a successful `None` result.
+        unsafe { out.write(ptr::null_mut()) };
+
+        if let Some(value) = f()? {
+            // SAFETY: The caller guarantees that `out` points to valid,
+            // writable storage for one pointer. `Box::into_raw` returns a
+            // valid owned pointer for the caller to release through the
+            // corresponding FFI free function.
+            unsafe { out.write(Box::into_raw(Box::new(value))) };
+        }
+        Ok(())
+    })
+}
+
 /// Frees the value behind `ptr` if the pointer is not null.
 ///
 /// # Safety

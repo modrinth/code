@@ -4,6 +4,9 @@ version = "0.1.0"
 edition.workspace = true
 readme = "README.md"
 
+[lib]
+crate-type = ["rlib", "cdylib", "staticlib"]
+
 [dependencies]
 tracing = { workspace = true }
 tokio = { workspace = true, features = ["fs", "process", "rt"] }
