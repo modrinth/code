@@ -24,9 +24,10 @@ export function useFileUndoRedo(
 		if (!lastOperation) return
 
 		try {
+			console.log(lastOperation)
 			switch (lastOperation.type) {
 				case 'move':
-					await moveItem(lastOperation.newFile, parentInfoFrom(lastOperation.prevFile).path)
+					await moveItem(lastOperation.newFile, lastOperation.prevFile.path)
 					break
 				case 'rename':
 					await renameItem(lastOperation.newFile, lastOperation.prevFile.name)
@@ -52,7 +53,7 @@ export function useFileUndoRedo(
 		try {
 			switch (lastOperation.type) {
 				case 'move':
-					await moveItem(lastOperation.prevFile, parentInfoFrom(lastOperation.newFile).path)
+					await moveItem(lastOperation.prevFile, lastOperation.newFile.path)
 					break
 				case 'rename':
 					await renameItem(lastOperation.prevFile, lastOperation.newFile.name)
@@ -72,11 +73,14 @@ export function useFileUndoRedo(
 	}
 
 	function onKeydown(e: KeyboardEvent) {
-		if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'z') {
+		// Note: Using raw key will have capitalization issues due
+		// to how shift works in keyboard event it seems... ): 
+		const key = e.key.toLowerCase();
+		if ((e.ctrlKey || e.metaKey) && !e.shiftKey && key === 'z') {
 			e.preventDefault()
 			undo()
 		}
-		if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z') {
+		if ((e.ctrlKey || e.metaKey) && e.shiftKey && key === 'z') {
 			e.preventDefault()
 			redo()
 		}

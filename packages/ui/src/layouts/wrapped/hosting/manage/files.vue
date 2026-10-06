@@ -181,8 +181,11 @@ function queryFileEntry(file: FileInfo<'file'>): FileResult & FileQueryResult {
 function queryDirectoryEntries(file: FileInfo<'directory'>): DirectoryResult & FileQueryResult {
 	return queryFile(
 		file,
-		(queryData) =>
-			computed<FileItem[]>(() => (queryData.value?.items ?? []).filter(isVisibleFileItem)),
+		(queryData) => {
+			return computed<FileItem[]>(() => (queryData.value?.items ?? [])
+				.filter(isVisibleFileItem)
+				.map((item) => { return {...item, path: normalizeDirectoryPath(item.path)} }))
+		},
 		directoryQueryOptions,
 	)
 }
@@ -310,7 +313,7 @@ const renameMutation = useMutation({
 			type: file.type,
 			name: newName,
 			path: normalizeDirectoryPath(
-				parts.length > 0 ? parts.slice(0, parts.length - 1).join('/') : newName,
+				parts.length > 0 ? [...parts.slice(0, -1), newName].join('/') : newName,
 			),
 		}
 	},
@@ -357,7 +360,7 @@ const moveMutation = useMutation({
 		return {
 			name: source.name,
 			type: source.type,
-			path: normalizeDirectoryPath(destination + '/' + source.name),
+			path: normalizeDirectoryPath(destination),
 		}
 	},
 	onMutate: async ({ source }) => {
