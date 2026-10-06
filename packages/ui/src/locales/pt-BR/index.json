@@ -2063,9 +2063,6 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Servidor redefinido para a integração"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Opções de suporte"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Picos de até {cpus} CPUs"
   },
@@ -7179,4 +7176,3 @@
     "defaultMessage": "Tipo"
   }
 }
-
