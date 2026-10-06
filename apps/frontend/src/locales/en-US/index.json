@@ -1130,6 +1130,9 @@
   "conversation-thread.error.sending-message": {
     "message": "Error sending message"
   },
+  "conversation-thread.image.open-externally": {
+    "message": "Open externally"
+  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Reply to thread..."
   },
@@ -3302,11 +3305,14 @@
   "moderation.project-review.modpackVersion": {
     "message": "Version {version}"
   },
+  "moderation.project-review.monetization": {
+    "message": "Monetization"
+  },
+  "moderation.project-review.monetizationStatus": {
+    "message": "{status, select, monetized {Monetized} demonetized {Demonetized} forceDemonetized {Force demonetized} other {Unknown}}"
+  },
   "moderation.project-review.mrpack": {
     "message": ".mrpack"
-  },
-  "moderation.project-review.name": {
-    "message": "Name"
   },
   "moderation.project-review.next": {
     "message": "Next"
@@ -3400,6 +3406,9 @@
   },
   "moderation.project-review.processingCount": {
     "message": "{count} under review"
+  },
+  "moderation.project-review.project": {
+    "message": "Project"
   },
   "moderation.project-review.projectId": {
     "message": "Project ID"
@@ -3601,6 +3610,12 @@
   },
   "moderation.project-review.viewVersion": {
     "message": "View version"
+  },
+  "moderation.project-review.visibility": {
+    "message": "Visibility"
+  },
+  "moderation.project-review.visibilityOption": {
+    "message": "{status, select, approved {Public} archived {Public} unlisted {Unlisted} private {Private} other {Unknown}}"
   },
   "moderation.project-review.website": {
     "message": "Website"

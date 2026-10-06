@@ -394,6 +394,29 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.actions',
 		defaultMessage: 'Actions',
 	},
+	monetization: {
+		id: 'moderation.project-review.monetization',
+		defaultMessage: 'Monetization',
+	},
+	monetizationStatus: {
+		id: 'moderation.project-review.monetizationStatus',
+		defaultMessage:
+			'{status, select, monetized {Monetized} demonetized {Demonetized} forceDemonetized {Force demonetized} other {Unknown}}',
+	},
+	monetizationValue: {
+		id: 'moderation.project-review.monetizationValue',
+		defaultMessage:
+			'{status, select, monetized {Enabled} demonetized {Disabled} forceDemonetized {Force disabled} other {Unknown}}',
+	},
+	visibility: {
+		id: 'moderation.project-review.visibility',
+		defaultMessage: 'Visibility',
+	},
+	visibilityOption: {
+		id: 'moderation.project-review.visibilityOption',
+		defaultMessage:
+			'{status, select, approved {Public} archived {Public} unlisted {Unlisted} private {Private} other {Unknown}}',
+	},
 	projectId: {
 		id: 'moderation.project-review.projectId',
 		defaultMessage: 'Project ID',

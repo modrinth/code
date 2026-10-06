@@ -1,5 +1,9 @@
 <template>
 	<Section :heading="formatMessage(messages.details)">
+		<template #right>
+			<EditButton :section="formatMessage(messages.details)" @click="editModal?.show()" />
+		</template>
+		<EditModal :key="project?.id" ref="editModal" />
 		<dl v-if="project" class="m-0 grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 gap-y-2">
 			<dt class="font-medium">{{ formatMessage(messages.project) }}</dt>
 			<dd class="m-0 flex min-w-0 items-center gap-1">
@@ -77,6 +81,10 @@
 			</template>
 			<dt class="font-medium">{{ formatMessage(messages.downloads) }}</dt>
 			<dd class="m-0">{{ formatNumber(project.downloads) }}</dd>
+			<dt class="font-medium">{{ formatMessage(messages.monetization) }}</dt>
+			<dd class="m-0">
+				{{ formatMessage(messages.monetizationValue, { status: monetizationStatus }) }}
+			</dd>
 
 			<dt class="self-center font-medium">{{ formatMessage(messages.actions) }}</dt>
 			<dd class="m-0 flex items-center gap-2">
@@ -106,15 +114,23 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { getPrimaryProjectType } from '@modrinth/utils'
-import { computed } from 'vue'
+import { computed, useTemplateRef } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { projectReviewMessages as messages } from '../../messages'
+import EditButton from '../edit/button.vue'
+import EditModal from '../edit/details.vue'
 import Section from '../section.vue'
 
 const { project, projectV2, submissionCount } = injectProjectReviewPageContext()
 const config = useRuntimeConfig()
+const editModal = useTemplateRef<InstanceType<typeof EditModal>>('editModal')
+const monetizationStatus = computed(() =>
+	project.value?.monetization_status === 'force-demonetized'
+		? 'forceDemonetized'
+		: project.value?.monetization_status,
+)
 const projectUrl = computed(
 	() =>
 		`/${projectV2.value?.project_type ?? project.value?.project_types[0]}/${project.value?.slug ?? project.value?.id}`,
