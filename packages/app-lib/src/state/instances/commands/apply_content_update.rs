@@ -28,7 +28,7 @@ use super::apply_content_install::{
 use super::check_content_updates::{ContentUpdate, check_content_updates};
 
 #[derive(Clone, Debug)]
-struct BulkUpdatePlan {
+pub(crate) struct BulkUpdatePlan {
     project_updates: Vec<PlannedProjectUpdate>,
     dependency_additions: Vec<PlannedDependencyInstall>,
 }
@@ -157,24 +157,7 @@ async fn apply_content_update(
     Ok(new_path)
 }
 
-pub(crate) async fn update_selected_projects(
-    instance_id: &str,
-    updates: &[ContentUpdateSelection],
-    reporter: InstallProgressReporter,
-    state: &State,
-) -> crate::Result<()> {
-    reporter
-        .update(
-            InstallPhaseId::ResolvingPack,
-            None,
-            InstallPhaseDetails::Empty,
-        )
-        .await?;
-    let plan = plan_bulk_update(instance_id, updates, state).await?;
-    apply_bulk_update(instance_id, plan, reporter, state).await
-}
-
-async fn apply_bulk_update(
+pub(crate) async fn apply_bulk_update(
     instance_id: &str,
     plan: BulkUpdatePlan,
     reporter: InstallProgressReporter,
@@ -386,7 +369,7 @@ async fn download_planned_projects(
     Ok(output)
 }
 
-async fn plan_bulk_update(
+pub(crate) async fn plan_bulk_update(
     instance_id: &str,
     selections: &[ContentUpdateSelection],
     state: &State,
@@ -681,6 +664,7 @@ async fn installed_projects(
 
     Ok(files
         .into_iter()
+        .filter(|file| !file.missing)
         .filter_map(|file| {
             let entry = entries_by_file_id.get(file.id.as_str()).copied();
             let metadata = file_info_by_hash.get(&file.sha1);
