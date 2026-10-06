@@ -162,7 +162,12 @@ pub async fn install_existing_instance(
 
 pub(crate) async fn wait_for_job(job_id: Uuid) -> crate::Result<()> {
     let state = State::get().await?;
+	let completion = store::completion_notification(job_id);
     loop {
+		// Register before reading so completion during the query cannot be missed.
+		let notified = completion.notified();
+		tokio::pin!(notified);
+		notified.as_mut().enable();
         let job = store::get_required(job_id, &state).await?;
         if job.status == InstallJobStatus::Succeeded {
             return Ok(());
@@ -179,7 +184,7 @@ pub(crate) async fn wait_for_job(job_id: Uuid) -> crate::Result<()> {
             )
             .into());
         }
-        tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+		notified.await;
     }
 }
 
