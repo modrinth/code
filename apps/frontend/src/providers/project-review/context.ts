@@ -65,7 +65,7 @@ export function createProjectReviewPageContext() {
 	})
 	watch(data.projectId, async (id) => {
 		if (!id || navigation.busy.value) return
-		await queue.visitProject(id)
+		await queue.visitProject(id, queue.currentQueue.history.includes(id))
 	})
 
 	return {

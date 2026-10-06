@@ -47,7 +47,7 @@ export function useReviewQueue(
 	}
 
 	async function open(id: string, back = false) {
-		const failure = await router.replace({
+		const failure = await router.push({
 			path: '/moderation/project-review',
 			query: { ...route.query, project: id },
 		})
