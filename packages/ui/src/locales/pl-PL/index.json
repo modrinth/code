@@ -66,16 +66,16 @@
     "defaultMessage": "{sharedCpus} współdzielonych procesorów"
   },
   "billing.resubscribe-modal.description": {
-    "defaultMessage": "Zamierzasz ponownie subskrybować <server-name>{serverName}</server-name>. Twoja subskrybcja zostanie ponownie aktywowana i twój serwer będzie pracował bez przerywania."
+    "defaultMessage": "Zamierzasz ponownie subskrybować <server-name>{serverName}</server-name>. Twoja subskrypcja zostanie ponownie aktywowana i twój serwer będzie pracował bez przerywania."
   },
   "billing.resubscribe-modal.error.text": {
-    "defaultMessage": "Nie można ponownie aktywować subskrypcji, nie udało się załadować szczegółów subskrybcji."
+    "defaultMessage": "Nie można ponownie aktywować subskrypcji, nie udało się załadować szczegółów subskrypcji."
   },
   "billing.resubscribe-modal.error.title": {
     "defaultMessage": "Błąd"
   },
   "billing.resubscribe-modal.failed-load": {
-    "defaultMessage": "Nie udało się załadować detalów subskrypcji."
+    "defaultMessage": "Nie udało się załadować szczegółów subskrypcji."
   },
   "billing.resubscribe-modal.interval": {
     "defaultMessage": "{intervalOption, select, fiveDays {/5 dni} monthly {miesięcznie} quarterly {kwartalnie} yearly {rocznie} other {{interval}}}"
@@ -90,7 +90,7 @@
     "defaultMessage": "{ramGb} GB pamięci RAM"
   },
   "billing.resubscribe-modal.resubscribe": {
-    "defaultMessage": "Zasubskrybuj ponownie"
+    "defaultMessage": "Odnów subskrypcję"
   },
   "billing.resubscribe-modal.storage": {
     "defaultMessage": "{storageGb} GB miejsca na dysku"
@@ -189,7 +189,7 @@
     "defaultMessage": "Kopiuj ID"
   },
   "button.copy-link": {
-    "defaultMessage": "Kopiuj łącze"
+    "defaultMessage": "Kopiuj link"
   },
   "button.copy-permalink": {
     "defaultMessage": "Kopiuj trwałe łącze"
@@ -255,7 +255,7 @@
     "defaultMessage": "Otwórz w folderze"
   },
   "button.open-in-modrinth": {
-    "defaultMessage": "Otwórz na Modrinth"
+    "defaultMessage": "Otwórz w Modrinth"
   },
   "button.play": {
     "defaultMessage": "Graj"
@@ -555,7 +555,7 @@
     "defaultMessage": "Usunięto (wyłączono) {count}"
   },
   "content.diff-modal.reviewed-files": {
-    "defaultMessage": "Pliki nieopublikowane w Modrinth nie są sprawdzane."
+    "defaultMessage": "Pliki nieopublikowane na Modrinth nie są sprawdzane."
   },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Zawartość na Twoim serwerze nie mogła zostać przeanalizowana i może być objęta tą zmianą."
@@ -639,7 +639,7 @@
     "defaultMessage": "Brak dostarczonej treści"
   },
   "content.managed-card.switch-version": {
-    "defaultMessage": "Zmień wersje"
+    "defaultMessage": "Zmień wersję"
   },
   "content.managed-card.synced": {
     "defaultMessage": "Zsynchronizowano {time}"
@@ -721,6 +721,12 @@
   },
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Nie udało się załadować zawartości"
+  },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "Nie udało się załadować dziennika zmian"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "Nie udało się załadować dostępnych aktualizacji"
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtruj"
@@ -1239,7 +1245,7 @@
     "defaultMessage": "Zapisz atrybucję"
   },
   "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "Wybierz licencję..."
+    "defaultMessage": "Szukaj licencji..."
   },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "Przyczyna uprawnień"
@@ -1282,6 +1288,9 @@
   },
   "external-files.permissions-card.last-updated": {
     "defaultMessage": "Ostatnio zaktualizowano dnia {date} przez {user}"
+  },
+  "external-files.permissions-card.license.all-rights": {
+    "defaultMessage": "Wszelkie prawa zastrzeżone/brak licencji"
   },
   "external-files.permissions-card.license.unknown": {
     "defaultMessage": "Nieznana"
@@ -1440,10 +1449,10 @@
     "defaultMessage": "Nie można sprawdzić, czy ten plik już istnieje."
   },
   "files.create-zip-modal.create-button": {
-    "defaultMessage": "Stwórz ZIP"
+    "defaultMessage": "Utwórz ZIP"
   },
   "files.create-zip-modal.header": {
-    "defaultMessage": "Stwórz ZIP"
+    "defaultMessage": "Utwórz ZIP"
   },
   "files.create-zip-modal.invalid": {
     "defaultMessage": "Nazwa archiwum musi być pojedynczą nazwą pliku."
@@ -1566,7 +1575,7 @@
     "defaultMessage": "Operacje na plikach są wyłączone podczas trwania tej operacji."
   },
   "files.layout.create-zip": {
-    "defaultMessage": "Stwórz ZIP"
+    "defaultMessage": "Utwórz ZIP"
   },
   "files.layout.dry-run-failed-text": {
     "defaultMessage": "Wystąpił błąd podczas przebiegu próbnego"
@@ -1614,7 +1623,7 @@
     "defaultMessage": "Nawigacja do stron nadrzędnych"
   },
   "files.navbar.create-new": {
-    "defaultMessage": "Stwórz nowy..."
+    "defaultMessage": "Utwórz nowy..."
   },
   "files.navbar.file-navigation": {
     "defaultMessage": "Nawigacja plików"
@@ -1686,7 +1695,7 @@
     "defaultMessage": "Nowa nazwa"
   },
   "files.row.create-zip": {
-    "defaultMessage": "Stwórz ZIP"
+    "defaultMessage": "Utwórz ZIP"
   },
   "files.row.item-count": {
     "defaultMessage": "{count, plural, one {# przedmiot} few {# przedmioty} other {# przedmiotów}}"
@@ -2490,7 +2499,7 @@
     "defaultMessage": "Ładowanie wersji..."
   },
   "instances.updater-modal.no-changelog": {
-    "defaultMessage": "Nie ma dziennika zmian dla tej wersji."
+    "defaultMessage": "Nie podano dziennika zmian dla tej wersji."
   },
   "instances.updater-modal.no-versions": {
     "defaultMessage": "Nie znaleziono żadnej wersji"
@@ -3272,14 +3281,26 @@
   "profile.button.create-project": {
     "defaultMessage": "Utwórz projekt"
   },
+  "profile.button.force-password-reset": {
+    "defaultMessage": "Wymuś zresetowanie hasła"
+  },
   "profile.button.info": {
     "defaultMessage": "Otwórz szczegóły użytkownika"
+  },
+  "profile.button.lock": {
+    "defaultMessage": "Zablokuj konto"
   },
   "profile.button.manage-projects": {
     "defaultMessage": "Zarządzaj projektami"
   },
   "profile.button.remove-affiliate": {
     "defaultMessage": "Usuń jako partnera"
+  },
+  "profile.button.reset-2fa": {
+    "defaultMessage": "Zresetuj uwierzytelnianie dwuskładnikowe"
+  },
+  "profile.button.revoke-sessions": {
+    "defaultMessage": "Unieważnij wszystkie sesje"
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "Ustaw jako partnera"
@@ -3290,14 +3311,17 @@
   "profile.button.unblock": {
     "defaultMessage": "Odblokuj"
   },
+  "profile.button.unlock": {
+    "defaultMessage": "Odblokuj konto"
+  },
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural, one {# projekt} few {# projekty} other {# projektów}}"
   },
   "profile.details.error.github-popup-blocked": {
-    "defaultMessage": "Zezwalaj na wyskakujące okienka dla Modrinth, a następnie spróbuj ponownie."
+    "defaultMessage": "Zezwól na wyskakujące okienka dla Modrinth i spróbuj ponownie."
   },
   "profile.details.error.github-profile-message": {
-    "defaultMessage": "Profil GitHub nie może zostać odzyskany. Spróbuj ponownie."
+    "defaultMessage": "Nie udało się otworzyć profilu GitHub. Spróbuj ponownie."
   },
   "profile.details.error.github-profile-title": {
     "defaultMessage": "Nie można otworzyć profilu GitHub"
@@ -3338,6 +3362,36 @@
   "profile.error.not-found": {
     "defaultMessage": "Nie znaleziono użytkownika"
   },
+  "profile.force-password-reset.admonition-body": {
+    "defaultMessage": "Hasło użytkownika {username} zostanie natychmiast usunięte, wszystkie konta na każdym z urządzeń zostaną wylogowane, i link do ustawienia nowego hasła zostanie wysłany na poniższy adres e-mail. Po zmianie hasła zastąpi ono obecne na koncie. Link wygasa po 24 godzinach i może być użyty nawet wtedy, gdy konto jest zablokowane."
+  },
+  "profile.force-password-reset.admonition-title": {
+    "defaultMessage": "Obecne hasło przestanie działać"
+  },
+  "profile.force-password-reset.button": {
+    "defaultMessage": "Zresetuj hasło"
+  },
+  "profile.force-password-reset.email-label": {
+    "defaultMessage": "Adres e-mail konta"
+  },
+  "profile.force-password-reset.email-placeholder": {
+    "defaultMessage": "Pozostaw puste, aby użyć adresu e-mail konta"
+  },
+  "profile.force-password-reset.error-description": {
+    "defaultMessage": "Wystąpił błąd podczas resetowania hasła. Spróbuj ponownie później."
+  },
+  "profile.force-password-reset.error-title": {
+    "defaultMessage": "Nie udało się zresetować hasła"
+  },
+  "profile.force-password-reset.success-description": {
+    "defaultMessage": "Link do zresetowania hasła został wysłany do {username}."
+  },
+  "profile.force-password-reset.success-title": {
+    "defaultMessage": "Resetowanie hasła"
+  },
+  "profile.force-password-reset.title": {
+    "defaultMessage": "Wymuś zresetowanie hasła dla {username}"
+  },
   "profile.label.affiliate": {
     "defaultMessage": "Partner"
   },
@@ -3352,6 +3406,9 @@
   },
   "profile.label.joined": {
     "defaultMessage": "Dołączył(-a)"
+  },
+  "profile.label.locked": {
+    "defaultMessage": "Zablokowane"
   },
   "profile.label.no-collections": {
     "defaultMessage": "Ten użytkownik nie ma żadnych kolekcji!"
@@ -3377,6 +3434,54 @@
   "profile.official-account.bio": {
     "defaultMessage": "Oficjalne konto Modrinth. Otrzymaj wsparcie na stronie <support-link></support-link> lub poprzez e-mail <email></email>"
   },
+  "profile.reset-2fa.admonition-body": {
+    "defaultMessage": "Uwierzytelnianie dwuskładnikowe i kody zapasowe {username} zostaną usunięte, a użytkownik zostanie poinformowany. Zrób to tylko po zweryfikowaniu tożsamości."
+  },
+  "profile.reset-2fa.admonition-title": {
+    "defaultMessage": "Czy na pewno chcesz zresetować uwierzytelnianie dwuskładnikowe?"
+  },
+  "profile.reset-2fa.button": {
+    "defaultMessage": "Zresetuj 2FA"
+  },
+  "profile.reset-2fa.error-description": {
+    "defaultMessage": "Wystąpił błąd podczas resetowania uwierzytelniania dwuskładnikowego. Spróbuj ponownie później."
+  },
+  "profile.reset-2fa.error-title": {
+    "defaultMessage": "Błąd podczas resetowania uwierzytelniania dwuskładnikowego"
+  },
+  "profile.reset-2fa.success-description": {
+    "defaultMessage": "Uwierzytelnianie dwuskładnikowe użytkownika {username} zostało usunięte."
+  },
+  "profile.reset-2fa.success-title": {
+    "defaultMessage": "Usuwanie uwierzytelniania dwuskładnikowego"
+  },
+  "profile.reset-2fa.title": {
+    "defaultMessage": "Usuwanie uwierzytelniania dwuskładnikowego {username}"
+  },
+  "profile.revoke-sessions.admonition-body": {
+    "defaultMessage": "Użytkownik {username} zostanie wylogowany na każdym urządzeniu i będzie musiał zalogować się ponownie. Klucze dostępu osobistego nadal będą działać."
+  },
+  "profile.revoke-sessions.admonition-title": {
+    "defaultMessage": "Czy na pewno chcesz unieważnić wszystkie sesje?"
+  },
+  "profile.revoke-sessions.button": {
+    "defaultMessage": "Unieważnij sesje"
+  },
+  "profile.revoke-sessions.error-description": {
+    "defaultMessage": "Wystąpił błąd podczas unieważniania sesji. Spróbuj ponownie później."
+  },
+  "profile.revoke-sessions.error-title": {
+    "defaultMessage": "Nie udało się unieważnić sesji"
+  },
+  "profile.revoke-sessions.success-description": {
+    "defaultMessage": "Użytkownik {username} został wszędzie wylogowany."
+  },
+  "profile.revoke-sessions.success-title": {
+    "defaultMessage": "Unieważniono sesje"
+  },
+  "profile.revoke-sessions.title": {
+    "defaultMessage": "Unieważnij sesje dla {username}"
+  },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Wystąpił błąd podczas odblokowywania tego użytkownika. Spróbuj ponownie później."
   },
@@ -3388,6 +3493,18 @@
   },
   "profile.unblock-user.success-title": {
     "defaultMessage": "Użytkownik odblokowany"
+  },
+  "profile.unlock-user.error-description": {
+    "defaultMessage": "Wystąpił błąd podczas odblokowywania tego konta. Spróbuj ponownie później."
+  },
+  "profile.unlock-user.error-title": {
+    "defaultMessage": "Nie udało się odblokować konta"
+  },
+  "profile.unlock-user.success-description": {
+    "defaultMessage": "Konto użytkownika {username} zostało odblokowane."
+  },
+  "profile.unlock-user.success-title": {
+    "defaultMessage": "Konto odblokowane"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Opublikowany {date}"
@@ -6117,7 +6234,7 @@
     "defaultMessage": "Własny: {date}"
   },
   "sharing.invite-players-modal.edit-invite-link": {
-    "defaultMessage": "dytuj link zaproszenia"
+    "defaultMessage": "Edytuj link zaproszenia."
   },
   "sharing.invite-players-modal.edit-invite-link-title": {
     "defaultMessage": "Edytuj link zaproszenia"
@@ -6159,7 +6276,7 @@
     "defaultMessage": "Lub użyj linku z zaproszeniem"
   },
   "sharing.invite-players-modal.link-copied-text": {
-    "defaultMessage": "Link zaproszenia został skopiowany do schowka"
+    "defaultMessage": "Link zaproszenia został skopiowany do schowka."
   },
   "sharing.invite-players-modal.link-copied-title": {
     "defaultMessage": "Link skopiowany"
@@ -6787,6 +6904,78 @@
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "Nieznane plki"
+  },
+  "update-all-modal.changelog-for": {
+    "defaultMessage": "Dziennik zmian dla {project}"
+  },
+  "update-all-modal.changelog-loaded": {
+    "defaultMessage": "Załadowano dziennik zmian."
+  },
+  "update-all-modal.close-changelog": {
+    "defaultMessage": "Zamknij dziennik zmian"
+  },
+  "update-all-modal.current-version": {
+    "defaultMessage": "Aktualna wersja"
+  },
+  "update-all-modal.empty": {
+    "defaultMessage": "Brak dostępnych aktualizacji."
+  },
+  "update-all-modal.header": {
+    "defaultMessage": "Aktualizuj projekty"
+  },
+  "update-all-modal.loading": {
+    "defaultMessage": "Ładowanie aktualizacji…"
+  },
+  "update-all-modal.loading-changelog": {
+    "defaultMessage": "Ładowanie dziennika zmian…"
+  },
+  "update-all-modal.new-version": {
+    "defaultMessage": "Nowa wersja"
+  },
+  "update-all-modal.no-changelog": {
+    "defaultMessage": "Nie podano dziennika zmian dla tej wersji."
+  },
+  "update-all-modal.no-compatible-updates": {
+    "defaultMessage": "Brak kompatybilnych aktualizacji."
+  },
+  "update-all-modal.no-version": {
+    "defaultMessage": "Brak kompatybilnych aktualizacji"
+  },
+  "update-all-modal.project": {
+    "defaultMessage": "Projekt"
+  },
+  "update-all-modal.project-list": {
+    "defaultMessage": "Aktualizacje projektów"
+  },
+  "update-all-modal.results": {
+    "defaultMessage": "{count, plural, one {# projekt gotowy do aktualizacji} few {# projekty gotowe do aktualizacji} other {# projektów gotowych do aktualizacji}}"
+  },
+  "update-all-modal.select-all": {
+    "defaultMessage": "Wybierz wszystkie projekty"
+  },
+  "update-all-modal.select-project": {
+    "defaultMessage": "Wybierz {project} do aktualizacji"
+  },
+  "update-all-modal.select-version": {
+    "defaultMessage": "Nowa wersja {project}"
+  },
+  "update-all-modal.update": {
+    "defaultMessage": "Aktualizuj {count, plural, one {# projekt} few {# projekty} other {# projektów}}"
+  },
+  "update-all-modal.versions": {
+    "defaultMessage": "Aktualna wersja / Nowa wersja"
+  },
+  "update-all-modal.view": {
+    "defaultMessage": "Pokaż"
+  },
+  "update-all-modal.view-changelog": {
+    "defaultMessage": "Pokaż dziennik zmian dla {project}"
+  },
+  "update-all-modal.warning": {
+    "defaultMessage": "Nie możemy zagwarantować, że aktualizacje są bezpieczna dla Twoich światów. Przejrzyj dzienniki zmian i rozważ zrobienie kopii zapasowej."
+  },
+  "update-all-modal.warning-server": {
+    "defaultMessage": "Nie możemy zagwarantować, że aktualizacje są bezpieczna dla Twojego serwera. Przejrzyj dzienniki zmian i rozważ zrobienie kopii zapasowej."
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Ten użytkownik utworzył konto za czasów wersji alfa Modrinth, trwającej do listopada 2020 r."

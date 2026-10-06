@@ -722,6 +722,12 @@
   "content.page-layout.failed-to-load": {
     "defaultMessage": "無法載入內容"
   },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "無法載入更新日誌"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "無法載入可用更新"
+  },
   "content.page-layout.filter.add": {
     "defaultMessage": "篩選條件"
   },
@@ -1239,7 +1245,7 @@
     "defaultMessage": "儲存引用標註"
   },
   "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "選擇授權條款..."
+    "defaultMessage": "搜尋授權條款..."
   },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "授權類型"
@@ -1282,6 +1288,9 @@
   },
   "external-files.permissions-card.last-updated": {
     "defaultMessage": "最後於{date}由 {user} 更新"
+  },
+  "external-files.permissions-card.license.all-rights": {
+    "defaultMessage": "版權所有／無授權條款"
   },
   "external-files.permissions-card.license.unknown": {
     "defaultMessage": "未知"
@@ -3281,14 +3290,26 @@
   "profile.button.create-project": {
     "defaultMessage": "建立專案"
   },
+  "profile.button.force-password-reset": {
+    "defaultMessage": "強制重設密碼"
+  },
   "profile.button.info": {
     "defaultMessage": "檢視使用者詳細資訊"
+  },
+  "profile.button.lock": {
+    "defaultMessage": "鎖定帳號"
   },
   "profile.button.manage-projects": {
     "defaultMessage": "管理專案"
   },
   "profile.button.remove-affiliate": {
     "defaultMessage": "移除聯盟行銷夥伴資格"
+  },
+  "profile.button.reset-2fa": {
+    "defaultMessage": "重設雙重驗證"
+  },
+  "profile.button.revoke-sessions": {
+    "defaultMessage": "撤銷所有工作階段"
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "設為聯盟行銷夥伴"
@@ -3298,6 +3319,9 @@
   },
   "profile.button.unblock": {
     "defaultMessage": "解除封鎖"
+  },
+  "profile.button.unlock": {
+    "defaultMessage": "解除鎖定帳號"
   },
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural, other {# 個專案}}"
@@ -3347,6 +3371,36 @@
   "profile.error.not-found": {
     "defaultMessage": "找不到使用者"
   },
+  "profile.force-password-reset.admonition-body": {
+    "defaultMessage": "{username} 的密碼將立即被移除，並在其所有裝置上登出。設定新密碼的連結將會傳送到下方的電子郵件地址。若變更電子郵件地址，新地址將取代帳號中的原有地址。連結有效期限為 24 小時，即使帳號處於鎖定狀態時仍可使用。"
+  },
+  "profile.force-password-reset.admonition-title": {
+    "defaultMessage": "目前密碼將失效"
+  },
+  "profile.force-password-reset.button": {
+    "defaultMessage": "重設密碼"
+  },
+  "profile.force-password-reset.email-label": {
+    "defaultMessage": "帳號電子郵件地址"
+  },
+  "profile.force-password-reset.email-placeholder": {
+    "defaultMessage": "若不填則使用帳號的電子郵件地址"
+  },
+  "profile.force-password-reset.error-description": {
+    "defaultMessage": "重設密碼時發生錯誤，請再試一次。"
+  },
+  "profile.force-password-reset.error-title": {
+    "defaultMessage": "無法重設密碼"
+  },
+  "profile.force-password-reset.success-description": {
+    "defaultMessage": "密碼重設連結已傳送給 {username}。"
+  },
+  "profile.force-password-reset.success-title": {
+    "defaultMessage": "重設密碼"
+  },
+  "profile.force-password-reset.title": {
+    "defaultMessage": "強制重設 {username} 的密碼"
+  },
   "profile.label.affiliate": {
     "defaultMessage": "聯盟行銷"
   },
@@ -3361,6 +3415,9 @@
   },
   "profile.label.joined": {
     "defaultMessage": "加入時間："
+  },
+  "profile.label.locked": {
+    "defaultMessage": "已鎖定"
   },
   "profile.label.no-collections": {
     "defaultMessage": "這位使用者沒有任何收藏！"
@@ -3386,6 +3443,54 @@
   "profile.official-account.bio": {
     "defaultMessage": "Modrinth 的官方使用者帳號。請至 <support-link></support-link> 取得支援，或透過電子郵件 <email></email> 聯絡客服團隊"
   },
+  "profile.reset-2fa.admonition-body": {
+    "defaultMessage": "{username} 的驗證器和備用碼將被移除，並會傳送通知給他。請務必在確認其身分後再執行這個動作。"
+  },
+  "profile.reset-2fa.admonition-title": {
+    "defaultMessage": "確定要重設雙重驗證嗎？"
+  },
+  "profile.reset-2fa.button": {
+    "defaultMessage": "重設 2FA"
+  },
+  "profile.reset-2fa.error-description": {
+    "defaultMessage": "重設雙重驗證時發生錯誤，請再試一次。"
+  },
+  "profile.reset-2fa.error-title": {
+    "defaultMessage": "無法重設雙重驗證"
+  },
+  "profile.reset-2fa.success-description": {
+    "defaultMessage": "{username} 的雙重驗證已移除。"
+  },
+  "profile.reset-2fa.success-title": {
+    "defaultMessage": "重設雙重驗證"
+  },
+  "profile.reset-2fa.title": {
+    "defaultMessage": "重設 {username} 的雙重驗證"
+  },
+  "profile.revoke-sessions.admonition-body": {
+    "defaultMessage": "{username} 將在所有裝置上登出，需要重新登入。個人存取權杖不受影響。"
+  },
+  "profile.revoke-sessions.admonition-title": {
+    "defaultMessage": "確定要撤銷所有工作階段嗎？"
+  },
+  "profile.revoke-sessions.button": {
+    "defaultMessage": "撤銷工作階段"
+  },
+  "profile.revoke-sessions.error-description": {
+    "defaultMessage": "撤銷工作階段時發生錯誤，請再試一次。"
+  },
+  "profile.revoke-sessions.error-title": {
+    "defaultMessage": "無法撤銷工作階段"
+  },
+  "profile.revoke-sessions.success-description": {
+    "defaultMessage": "{username} 已在所有裝置上登出。"
+  },
+  "profile.revoke-sessions.success-title": {
+    "defaultMessage": "工作階段已撤銷"
+  },
+  "profile.revoke-sessions.title": {
+    "defaultMessage": "撤銷 {username} 的工作階段"
+  },
   "profile.unblock-user.error-description": {
     "defaultMessage": "解除封鎖使用者時發生錯誤，請再試一次。"
   },
@@ -3397,6 +3502,18 @@
   },
   "profile.unblock-user.success-title": {
     "defaultMessage": "使用者已解除封鎖"
+  },
+  "profile.unlock-user.error-description": {
+    "defaultMessage": "解除鎖定帳號時發生錯誤，請再試一次。"
+  },
+  "profile.unlock-user.error-title": {
+    "defaultMessage": "無法解除鎖定帳號"
+  },
+  "profile.unlock-user.success-description": {
+    "defaultMessage": "{username} 的帳號已解除鎖定。"
+  },
+  "profile.unlock-user.success-title": {
+    "defaultMessage": "帳號已解除鎖定"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "發布時間：{date}"
@@ -4476,7 +4593,7 @@
     "defaultMessage": "不再顯示"
   },
   "search.photosensitivity-warning-modal.title": {
-    "defaultMessage": "搜尋結果不能保證安全"
+    "defaultMessage": "搜尋結果無法保證安全"
   },
   "search.server_content_type.modpack": {
     "defaultMessage": "含模組"
@@ -6796,6 +6913,78 @@
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "無法辨識的檔案"
+  },
+  "update-all-modal.changelog-for": {
+    "defaultMessage": "{project} 的更新日誌"
+  },
+  "update-all-modal.changelog-loaded": {
+    "defaultMessage": "更新日誌已載入。"
+  },
+  "update-all-modal.close-changelog": {
+    "defaultMessage": "關閉更新日誌"
+  },
+  "update-all-modal.current-version": {
+    "defaultMessage": "目前版本"
+  },
+  "update-all-modal.empty": {
+    "defaultMessage": "沒有可用的更新。"
+  },
+  "update-all-modal.header": {
+    "defaultMessage": "更新專案"
+  },
+  "update-all-modal.loading": {
+    "defaultMessage": "正在載入更新…"
+  },
+  "update-all-modal.loading-changelog": {
+    "defaultMessage": "正在載入更新日誌…"
+  },
+  "update-all-modal.new-version": {
+    "defaultMessage": "新版本"
+  },
+  "update-all-modal.no-changelog": {
+    "defaultMessage": "這個版本沒有提供更新日誌。"
+  },
+  "update-all-modal.no-compatible-updates": {
+    "defaultMessage": "沒有可用的相容更新。"
+  },
+  "update-all-modal.no-version": {
+    "defaultMessage": "沒有相容的更新"
+  },
+  "update-all-modal.project": {
+    "defaultMessage": "專案"
+  },
+  "update-all-modal.project-list": {
+    "defaultMessage": "專案更新"
+  },
+  "update-all-modal.results": {
+    "defaultMessage": "{count, plural, other {# 個專案可供更新}}"
+  },
+  "update-all-modal.select-all": {
+    "defaultMessage": "選取所有專案"
+  },
+  "update-all-modal.select-project": {
+    "defaultMessage": "選取 {project} 以更新"
+  },
+  "update-all-modal.select-version": {
+    "defaultMessage": "{project} 的新版本"
+  },
+  "update-all-modal.update": {
+    "defaultMessage": "更新 {count, plural, other {# 個專案}}"
+  },
+  "update-all-modal.versions": {
+    "defaultMessage": "目前版本／新版本"
+  },
+  "update-all-modal.view": {
+    "defaultMessage": "查看"
+  },
+  "update-all-modal.view-changelog": {
+    "defaultMessage": "查看 {project} 的更新日誌"
+  },
+  "update-all-modal.warning": {
+    "defaultMessage": "我們無法保證更新不會影響你的世界。請檢閱更新日誌，並考慮進行備份。"
+  },
+  "update-all-modal.warning-server": {
+    "defaultMessage": "我們無法保證更新不會影響你的伺服器。請檢閱更新日誌，並考慮進行備份。"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "這個使用者自 Modrinth Alpha 時期便已加入，早在該版本於2020年11月結束之前。"

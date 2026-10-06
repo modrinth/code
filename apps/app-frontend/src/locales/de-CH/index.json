@@ -30,16 +30,16 @@
     "message": "Wiederholen"
   },
   "app.action-bar.install.summary.app-closing": {
-    "message": "Abgebrochen, da die App geschlossen wurde"
+    "message": "Aufgrund von Schliessung der App abgebrochen"
   },
   "app.action-bar.install.summary.bad-modpack-file": {
-    "message": "Das Modpack konnte nicht gelesen werden"
+    "message": "Modpack konnte nicht gelesen werden"
   },
   "app.action-bar.install.summary.canceled": {
     "message": "Abgebrochen"
   },
   "app.action-bar.install.summary.cleanup-incomplete": {
-    "message": "Bereinigung nicht beendet"
+    "message": "Bereinigung konnte nicht abgeschlossen werden"
   },
   "app.action-bar.install.summary.content-download-failed": {
     "message": "Einige Dateien konnten nicht heruntergeladen werden"
@@ -60,16 +60,16 @@
     "message": "Dateipfad ist ungültig"
   },
   "app.action-bar.install.summary.invalid-modpack": {
-    "message": "Modpackdaten ungültig"
+    "message": "Daten des Modpacks sind ungültig"
   },
   "app.action-bar.install.summary.invalid-modpack-files": {
-    "message": "Modpackdateien haben ungültige Metadaten"
+    "message": "Dateien des Modpacks enthalten ungültige Metadaten"
   },
   "app.action-bar.install.summary.java-setup-failed": {
     "message": "Die Einrichtung von Java konnte nicht abgeschlossen werden"
   },
   "app.action-bar.install.summary.loader-setup-failed": {
-    "message": "Ladevorgang fehlgeschlagen"
+    "message": "Loader-Einrichtung fehlgeschlagen"
   },
   "app.action-bar.install.summary.local-data-error": {
     "message": "Lokale Daten konnten nicht aktualisiert werden"
@@ -159,7 +159,7 @@
     "message": "Bibliothek"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Verstecke deinen Benutzernamen oberhalb der Spieler-Vorschau auf der Skin-Auswahl-Seite."
+    "message": "Blende deinen Benutzernamen über der Spielervorschau auf der Seite zur Skin-Auswahl aus."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Namensschild ausblenden"
@@ -183,7 +183,7 @@
     "message": "Unwichtige Warnungen überspringen"
   },
   "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Blendet die rechte Seitenleiste standardmäßig aus und fügt einen Button zum Ein- oder Ausblenden hinzu."
+    "message": "Blendet die rechte Seitenleiste standardmässig aus und fügt einen Button zum Ein- oder Ausblenden hinzu."
   },
   "app.appearance-settings.toggle-sidebar.title": {
     "message": "Rechte Seitenleiste ausblenden"
@@ -205,6 +205,12 @@
   },
   "app.behavior-settings.content.title": {
     "message": "Startseite & Inhalte"
+  },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Bringe die Modrinth App in den Vordergrund, wenn Minecraft beendet wird."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "App neu fokussieren, wenn Minecraft geschlossen wird"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Start & Navigation"
@@ -255,7 +261,7 @@
     "message": "Projektaktionen"
   },
   "app.browse.project-type.data-packs": {
-    "message": "Datapacks"
+    "message": "Datenpakete"
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
@@ -300,7 +306,10 @@
     "message": "Aktiv"
   },
   "app.download-manager.attention": {
-    "message": "Erfordert Aufmerksamkeit"
+    "message": "Benötigt Aufmerksamkeit"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "{count, plural, one {# Element} other {# Elemente}}"
   },
   "app.download-manager.cancel": {
     "message": "Installation abbrechen"
@@ -960,7 +969,7 @@
     "message": "Installiere..."
   },
   "app.java-selector.path.placeholder": {
-    "message": "/path/to/java"
+    "message": "/pfad/zu/java"
   },
   "app.java-selector.test-installation": {
     "message": "Java-Installation testen"
@@ -1659,7 +1668,7 @@
     "message": "Start-Hooks"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
-    "message": "Maximal verfügbarer Arbeitsspeicher zu jeder Instanz."
+    "message": "Maximale verfügbarer Arbeitsspeicher für jede Instanz."
   },
   "app.settings.default-instance-options.memory-allocation.title": {
     "message": "Arbeitsspeicherzuweisung"
@@ -2919,7 +2928,7 @@
     "message": "Synchronisieren"
   },
   "app.settings.synced-options.command-history": {
-    "message": "Synchronisiere den Befehlsverlauf"
+    "message": "Befehlsverlauf synchronisieren"
   },
   "app.settings.synced-options.command-history.description": {
     "message": "Verwende denselben Befehlsverlauf für alle deine Instanzen."
@@ -2928,7 +2937,7 @@
     "message": "Befehlsverlauf bearbeiten"
   },
   "app.settings.synced-options.creative-hotbars": {
-    "message": "Synchronisiere gespeicherte Kreativ-Schnellzugriffleisten"
+    "message": "Gespeicherte Kreativ-Schnellzugriffleisten synchronisieren"
   },
   "app.settings.synced-options.creative-hotbars.description": {
     "message": "Verwende dieselben gespeicherten Kreativ-Schnellzugriffleisten in all deinen Instanzen."
@@ -2967,7 +2976,7 @@
     "message": "Verwende dieselben Spieloptionen für alle deine Instanzen."
   },
   "app.settings.synced-options.game-settings.disable-all": {
-    "message": "Alles desynchronisieren"
+    "message": "Alle desynchronisieren"
   },
   "app.settings.synced-options.game-settings.disabled-tooltip": {
     "message": "Aktiviere die Synchronisierung der Spieleinstellungen, bevor du einzelne Einstellungen auswählst."
@@ -3239,6 +3248,12 @@
   "app.skins.section.default-skins": {
     "message": "Standard-Skins"
   },
+  "app.skins.section.dungeons-hero": {
+    "message": "Held aus Dungeons"
+  },
+  "app.skins.section.dungeons-ii-hero": {
+    "message": "Held aus Dungeons II"
+  },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
@@ -3268,6 +3283,9 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
+  },
+  "app.skins.section.wilderness-bound": {
+    "message": "Wilderness Bound"
   },
   "app.skins.sign-in.button": {
     "message": "Bei Microsoft anmelden"
@@ -4209,7 +4227,7 @@
     "message": "Teilen"
   },
   "instance.settings.tabs.synced-options.command-history": {
-    "message": "Desynchronisiere den Befehlsverlauf"
+    "message": "Befehlsverlauf desynchronisieren"
   },
   "instance.settings.tabs.synced-options.command-history.disabled-in-app": {
     "message": "Synchronisierung des Befehlsverlaufs ist in den Einstellungen der App deaktiviert."
@@ -4218,7 +4236,7 @@
     "message": "Den Befehlsverlauf dieser Instanz separat von dem synchronisierten Befehlsverlauf halten."
   },
   "instance.settings.tabs.synced-options.creative-hotbars": {
-    "message": "Desynchronisiere gespeicherte Kreativ-Schnellzugriffleisten"
+    "message": "Gespeicherte Kreativ-Schnellzugriffleisten desynchronisieren"
   },
   "instance.settings.tabs.synced-options.creative-hotbars.disabled-in-app": {
     "message": "Synchronisierung der gespeicherten Kreativ-Schnellzugriffleisten ist in den Einstellungen der App deaktiviert."

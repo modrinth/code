@@ -722,6 +722,12 @@
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Falha ao carregar o conteúdo"
   },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "Falha ao carregar o registro de mudanças"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "Falha ao carregar as atualizações disponíveis"
+  },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtros"
   },
@@ -1239,7 +1245,7 @@
     "defaultMessage": "Salvar atribuição"
   },
   "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "Selecione uma licença..."
+    "defaultMessage": "Buscar licenças..."
   },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "Motivo da permissão"
@@ -1282,6 +1288,9 @@
   },
   "external-files.permissions-card.last-updated": {
     "defaultMessage": "Última atualização em {date} por {user}"
+  },
+  "external-files.permissions-card.license.all-rights": {
+    "defaultMessage": "Todos os direitos reservados/Sem licença"
   },
   "external-files.permissions-card.license.unknown": {
     "defaultMessage": "Desconhecido"
@@ -3281,14 +3290,26 @@
   "profile.button.create-project": {
     "defaultMessage": "Criar projeto"
   },
+  "profile.button.force-password-reset": {
+    "defaultMessage": "Forçar redefinição de senha"
+  },
   "profile.button.info": {
     "defaultMessage": "Ver detalhes do usuário"
+  },
+  "profile.button.lock": {
+    "defaultMessage": "Trancar conta"
   },
   "profile.button.manage-projects": {
     "defaultMessage": "Gerenciar projetos"
   },
   "profile.button.remove-affiliate": {
     "defaultMessage": "Remover como afiliado"
+  },
+  "profile.button.reset-2fa": {
+    "defaultMessage": "Redefinir a autenticação de dois fatores"
+  },
+  "profile.button.revoke-sessions": {
+    "defaultMessage": "Revogar todas as sessões"
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "Definir como afiliado"
@@ -3298,6 +3319,9 @@
   },
   "profile.button.unblock": {
     "defaultMessage": "Desbloquear"
+  },
+  "profile.button.unlock": {
+    "defaultMessage": "Desbloquear conta"
   },
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural, one {# projeto} other {# projetos}}"
@@ -3347,6 +3371,36 @@
   "profile.error.not-found": {
     "defaultMessage": "Usuário não encontrado"
   },
+  "profile.force-password-reset.admonition-body": {
+    "defaultMessage": "A senha de {username} será removida imediatamente, a conta será desconectada de todos os dispositivos e um link para definir uma nova senha será enviado para o e-mail abaixo. Se você alterar o e-mail, ele substituirá o e-mail atual da conta. O link expirará após 24 horas e poderá ser usado mesmo enquanto a conta estiver bloqueada."
+  },
+  "profile.force-password-reset.admonition-title": {
+    "defaultMessage": "A senha atual irá parar de funcionar"
+  },
+  "profile.force-password-reset.button": {
+    "defaultMessage": "Redefinir senha"
+  },
+  "profile.force-password-reset.email-label": {
+    "defaultMessage": "E-mail da conta"
+  },
+  "profile.force-password-reset.email-placeholder": {
+    "defaultMessage": "Deixe em branco para usar o e-mail da conta"
+  },
+  "profile.force-password-reset.error-description": {
+    "defaultMessage": "Ocorreu um erro ao redefinir a senha. Por favor, tente novamente."
+  },
+  "profile.force-password-reset.error-title": {
+    "defaultMessage": "Falha ao redefinir a senha"
+  },
+  "profile.force-password-reset.success-description": {
+    "defaultMessage": "Um link de redefinição de senha foi enviado para {username}."
+  },
+  "profile.force-password-reset.success-title": {
+    "defaultMessage": "Redefinição de senha"
+  },
+  "profile.force-password-reset.title": {
+    "defaultMessage": "Forçar redefinição de senha para {username}"
+  },
   "profile.label.affiliate": {
     "defaultMessage": "Afiliado"
   },
@@ -3361,6 +3415,9 @@
   },
   "profile.label.joined": {
     "defaultMessage": "Entrou"
+  },
+  "profile.label.locked": {
+    "defaultMessage": "Trancado"
   },
   "profile.label.no-collections": {
     "defaultMessage": "Este usuário não tem coleções!"
@@ -3386,6 +3443,54 @@
   "profile.official-account.bio": {
     "defaultMessage": "Conta oficial do Modrinth. Obtenha suporte em<support-link></support-link> ou por e-mail via <email></email>"
   },
+  "profile.reset-2fa.admonition-body": {
+    "defaultMessage": "O autenticador e os códigos de backup de {username} serão removidos e a pessoa será notificada. Faça isso somente após verificar a identidade dela."
+  },
+  "profile.reset-2fa.admonition-title": {
+    "defaultMessage": "Tem certeza de que deseja redefinir a autenticação de dois fatores?"
+  },
+  "profile.reset-2fa.button": {
+    "defaultMessage": "Redefinir 2FA"
+  },
+  "profile.reset-2fa.error-description": {
+    "defaultMessage": "Ocorreu um erro ao redefinir a autenticação de dois fatores. Por favor, tente novamente."
+  },
+  "profile.reset-2fa.error-title": {
+    "defaultMessage": "Falha ao redefinir a autenticação de dois fatores"
+  },
+  "profile.reset-2fa.success-description": {
+    "defaultMessage": "A autenticação de dois fatores de {username} foi removida."
+  },
+  "profile.reset-2fa.success-title": {
+    "defaultMessage": "Redefinir autenticação de dois fatores"
+  },
+  "profile.reset-2fa.title": {
+    "defaultMessage": "Redefinir autenticação de dois fatores para {username}"
+  },
+  "profile.revoke-sessions.admonition-body": {
+    "defaultMessage": "{username} será desconectado em todos os dispositivos e precisará entrar novamente. Tokens de acesso pessoal não são afetados."
+  },
+  "profile.revoke-sessions.admonition-title": {
+    "defaultMessage": "Você tem certeza que quer revogar todas as sessões?"
+  },
+  "profile.revoke-sessions.button": {
+    "defaultMessage": "Revogar sessões"
+  },
+  "profile.revoke-sessions.error-description": {
+    "defaultMessage": "Ocorreu um erro ao revogar as sessões. Por favor, tente novamente."
+  },
+  "profile.revoke-sessions.error-title": {
+    "defaultMessage": "Falha ao revogar sessões"
+  },
+  "profile.revoke-sessions.success-description": {
+    "defaultMessage": "{username} foi desconectado de todos os lugares."
+  },
+  "profile.revoke-sessions.success-title": {
+    "defaultMessage": "Sessões revogadas"
+  },
+  "profile.revoke-sessions.title": {
+    "defaultMessage": "Revogar sessões para {username}"
+  },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Ocorreu um erro ao desbloquear este usuário. Tente novamente."
   },
@@ -3397,6 +3502,18 @@
   },
   "profile.unblock-user.success-title": {
     "defaultMessage": "Usuário desbloqueado"
+  },
+  "profile.unlock-user.error-description": {
+    "defaultMessage": "Ocorreu um erro ao desbloquear esta conta. Tente novamente."
+  },
+  "profile.unlock-user.error-title": {
+    "defaultMessage": "Falha ao desbloquear a conta"
+  },
+  "profile.unlock-user.success-description": {
+    "defaultMessage": "A conta de {username} foi desbloqueada."
+  },
+  "profile.unlock-user.success-title": {
+    "defaultMessage": "Conta desbloqueada"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Publicado {date}"
@@ -6796,6 +6913,78 @@
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "Arquivos não reconhecidos"
+  },
+  "update-all-modal.changelog-for": {
+    "defaultMessage": "Mudanças para {project}"
+  },
+  "update-all-modal.changelog-loaded": {
+    "defaultMessage": "Mudanças carregadas."
+  },
+  "update-all-modal.close-changelog": {
+    "defaultMessage": "Fechar mudanças"
+  },
+  "update-all-modal.current-version": {
+    "defaultMessage": "Versão atual"
+  },
+  "update-all-modal.empty": {
+    "defaultMessage": "Não há atualizações disponíveis."
+  },
+  "update-all-modal.header": {
+    "defaultMessage": "Atualizar projetos"
+  },
+  "update-all-modal.loading": {
+    "defaultMessage": "Carregando atualizações..."
+  },
+  "update-all-modal.loading-changelog": {
+    "defaultMessage": "Carregando mudanças..."
+  },
+  "update-all-modal.new-version": {
+    "defaultMessage": "Nova versão"
+  },
+  "update-all-modal.no-changelog": {
+    "defaultMessage": "Nenhum registro de mudanças fornecido para esta versão."
+  },
+  "update-all-modal.no-compatible-updates": {
+    "defaultMessage": "Não há atualizações compatíveis disponíveis."
+  },
+  "update-all-modal.no-version": {
+    "defaultMessage": "Nenhuma atualização compatível"
+  },
+  "update-all-modal.project": {
+    "defaultMessage": "Projeto"
+  },
+  "update-all-modal.project-list": {
+    "defaultMessage": "Atualizações do projeto"
+  },
+  "update-all-modal.results": {
+    "defaultMessage": "{count, plural, one {# projeto pronto para atualizar} other {# projetos prontos para atualizar}}"
+  },
+  "update-all-modal.select-all": {
+    "defaultMessage": "Selecionar todos os projetos"
+  },
+  "update-all-modal.select-project": {
+    "defaultMessage": "Selecione {project} para atualização"
+  },
+  "update-all-modal.select-version": {
+    "defaultMessage": "Nova versão para {project}"
+  },
+  "update-all-modal.update": {
+    "defaultMessage": "Atualizar {count, plural, one {# projeto} other {# projetos}}"
+  },
+  "update-all-modal.versions": {
+    "defaultMessage": "Versão atual / Nova versão"
+  },
+  "update-all-modal.view": {
+    "defaultMessage": "Ver"
+  },
+  "update-all-modal.view-changelog": {
+    "defaultMessage": "Ver mudanças para {project}"
+  },
+  "update-all-modal.warning": {
+    "defaultMessage": "Não podemos garantir que as atualizações sejam seguras para seus mundos. Consulte os registros de alterações e considere fazer uma cópia de segurança."
+  },
+  "update-all-modal.warning-server": {
+    "defaultMessage": "Não podemos garantir que as atualizações sejam seguras para o seu servidor. Consulte o registro de alterações e considere fazer uma cópia de segurança."
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Este usuário está presente desde a versão alfa do Modrinth, que terminou em novembro de 2020."
