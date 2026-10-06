@@ -4,7 +4,7 @@ use crate::install::{
     InstallProgressSecondary,
 };
 use crate::state::instances::{
-	ContentEntry, ContentSet, ContentSourceKind, InstanceFile,
+    ContentEntry, ContentSet, ContentSourceKind, InstanceFile,
     adapters::sqlite::{content_rows, instance_rows},
 };
 use crate::state::{

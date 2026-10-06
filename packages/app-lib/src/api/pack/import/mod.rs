@@ -1,6 +1,6 @@
 use std::{
     fmt,
-	future::Future,
+    future::Future,
     path::{Path, PathBuf},
 };
 
@@ -130,13 +130,13 @@ pub(crate) fn import_instance_with_reporter(
     instance_folder: String,
     reporter: InstallProgressReporter,
 ) -> impl Future<Output = crate::Result<()>> + Send + '_ {
-	Box::pin(import_instance_inner(
+    Box::pin(import_instance_inner(
         instance_id,
         launcher_type,
         base_path,
         instance_folder,
         reporter,
-	))
+    ))
 }
 
 async fn import_instance_inner(
@@ -366,19 +366,19 @@ pub async fn recache_icon(
 }
 
 pub(crate) fn copy_dotminecraft_with_reporter<'a>(
-	instance_id: &'a str,
-	dotminecraft: PathBuf,
-	io_semaphore: &'a IoSemaphore,
-	reporter: InstallProgressReporter,
-	details: InstallPhaseDetails,
+    instance_id: &'a str,
+    dotminecraft: PathBuf,
+    io_semaphore: &'a IoSemaphore,
+    reporter: InstallProgressReporter,
+    details: InstallPhaseDetails,
 ) -> impl Future<Output = crate::Result<()>> + Send + 'a {
-	Box::pin(copy_dotminecraft_with_reporter_inner(
-		instance_id,
-		dotminecraft,
-		io_semaphore,
-		reporter,
-		details,
-	))
+    Box::pin(copy_dotminecraft_with_reporter_inner(
+        instance_id,
+        dotminecraft,
+        io_semaphore,
+        reporter,
+        details,
+    ))
 }
 
 async fn copy_dotminecraft_with_reporter_inner(

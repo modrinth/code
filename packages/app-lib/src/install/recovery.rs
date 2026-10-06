@@ -502,13 +502,10 @@ async fn recover_orphaned_install_stages(state: &State) -> crate::Result<()> {
 }
 
 fn recover_interrupted_job<'a>(
-	job: store::InstallJobRecord,
-	state: &'a State,
+    job: store::InstallJobRecord,
+    state: &'a State,
 ) -> impl Future<Output = crate::Result<()>> + Send + 'a {
-	Box::pin(recover_interrupted_job_inner(
-		job,
-		state,
-	))
+    Box::pin(recover_interrupted_job_inner(job, state))
 }
 
 async fn recover_interrupted_job_inner(

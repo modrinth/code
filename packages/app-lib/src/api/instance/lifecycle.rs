@@ -10,23 +10,23 @@ use std::future::Future;
 
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn create(
-	name: String,
-	game_version: String,
-	modloader: ModLoader,
-	loader_version: Option<String>,
-	icon_path: Option<String>,
-	icon_config: Option<InstanceIconConfig>,
-	link: InstanceLink,
+    name: String,
+    game_version: String,
+    modloader: ModLoader,
+    loader_version: Option<String>,
+    icon_path: Option<String>,
+    icon_config: Option<InstanceIconConfig>,
+    link: InstanceLink,
 ) -> impl Future<Output = crate::Result<InstanceMetadata>> + Send + 'static {
-	Box::pin(create_inner(
-		name,
-		game_version,
-		modloader,
-		loader_version,
-		icon_path,
-		icon_config,
-		link,
-	))
+    Box::pin(create_inner(
+        name,
+        game_version,
+        modloader,
+        loader_version,
+        icon_path,
+        icon_config,
+        link,
+    ))
 }
 
 #[tracing::instrument]

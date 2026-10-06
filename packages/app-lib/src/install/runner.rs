@@ -163,12 +163,12 @@ pub async fn install_existing_instance(
 
 pub(crate) async fn wait_for_job(job_id: Uuid) -> crate::Result<()> {
     let state = State::get().await?;
-	let completion = store::completion_notification(job_id);
+    let completion = store::completion_notification(job_id);
     loop {
-		// Register before reading so completion during the query cannot be missed.
-		let notified = completion.notified();
-		tokio::pin!(notified);
-		notified.as_mut().enable();
+        // Register before reading so completion during the query cannot be missed.
+        let notified = completion.notified();
+        tokio::pin!(notified);
+        notified.as_mut().enable();
         let job = store::get_required(job_id, &state).await?;
         if job.status == InstallJobStatus::Succeeded {
             return Ok(());
@@ -185,7 +185,7 @@ pub(crate) async fn wait_for_job(job_id: Uuid) -> crate::Result<()> {
             )
             .into());
         }
-		notified.await;
+        notified.await;
     }
 }
 
@@ -225,9 +225,9 @@ pub async fn job_support_details(job_id: Uuid) -> crate::Result<String> {
 }
 
 pub fn retry_job(
-	job_id: Uuid,
+    job_id: Uuid,
 ) -> impl Future<Output = crate::Result<InstallJobSnapshot>> + Send + 'static {
-	Box::pin(retry_job_inner(job_id))
+    Box::pin(retry_job_inner(job_id))
 }
 
 async fn retry_job_inner(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
@@ -300,9 +300,7 @@ async fn retry_job_inner(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     };
     emit_install_job(&record.snapshot()).await?;
 
-    if let Err(error) =
-        prepare_initial_instance(&mut job.state, &state).await
-    {
+    if let Err(error) = prepare_initial_instance(&mut job.state, &state).await {
         let error_view = install_error_view(
             job.state.progress.phase,
             &error,
@@ -464,13 +462,13 @@ pub async fn dismiss_job(job_id: Uuid) -> crate::Result<()> {
 }
 
 fn start(
-	request: InstallRequest,
+    request: InstallRequest,
 ) -> impl Future<Output = crate::Result<InstallJobSnapshot>> + Send + 'static {
-	Box::pin(start_inner(request))
+    Box::pin(start_inner(request))
 }
 
 async fn start_inner(
-	request: InstallRequest,
+    request: InstallRequest,
 ) -> crate::Result<InstallJobSnapshot> {
     let _admission = INSTALL_ADMISSION.lock().await;
     let mut target_guard = reserve_target(&request.target())?;
@@ -485,9 +483,7 @@ async fn start_inner(
         store::insert(id, &job_state, InstallJobStatus::Queued, &state).await?;
     emit_install_job(&record.snapshot()).await?;
 
-    if let Err(error) =
-        prepare_initial_instance(&mut job_state, &state).await
-    {
+    if let Err(error) = prepare_initial_instance(&mut job_state, &state).await {
         let error_view = install_error_view(
             job_state.progress.phase,
             &error,
@@ -545,10 +541,10 @@ async fn start_inner(
 }
 
 fn prepare_initial_instance<'a>(
-	job_state: &'a mut InstallJobState,
-	state: &'a State,
+    job_state: &'a mut InstallJobState,
+    state: &'a State,
 ) -> impl Future<Output = crate::Result<()>> + Send + 'a {
-	Box::pin(prepare_initial_instance_inner(job_state, state))
+    Box::pin(prepare_initial_instance_inner(job_state, state))
 }
 
 async fn prepare_initial_instance_inner(
@@ -744,9 +740,7 @@ fn spawn_job(
 ) {
     tokio::spawn(async move {
         let _target_guard = target_guard;
-        if let Err(error) =
-            run_job(job_id, &registration.control).await
-        {
+        if let Err(error) = run_job(job_id, &registration.control).await {
             let failure = error.to_string();
             tracing::error!("Install job {job_id} terminated: {failure}");
             if let Err(error) = terminalize_stranded_job(job_id, failure).await
@@ -760,10 +754,10 @@ fn spawn_job(
 }
 
 fn run_job<'a>(
-	job_id: Uuid,
-	control: &'a std::sync::Arc<super::control::InstallControl>,
+    job_id: Uuid,
+    control: &'a std::sync::Arc<super::control::InstallControl>,
 ) -> impl Future<Output = crate::Result<()>> + Send + 'a {
-	Box::pin(run_job_inner(job_id, control))
+    Box::pin(run_job_inner(job_id, control))
 }
 
 async fn run_job_inner(
@@ -933,17 +927,14 @@ async fn terminalize_stranded_job(
 }
 
 fn terminalize_failed_job<'a>(
-	job_id: Uuid,
-	job_state: InstallJobState,
-	error_view: InstallErrorView,
-	state: &'a State,
+    job_id: Uuid,
+    job_state: InstallJobState,
+    error_view: InstallErrorView,
+    state: &'a State,
 ) -> impl Future<Output = crate::Result<()>> + Send + 'a {
-	Box::pin(terminalize_failed_job_inner(
-		job_id,
-		job_state,
-		error_view,
-		state,
-	))
+    Box::pin(terminalize_failed_job_inner(
+        job_id, job_state, error_view, state,
+    ))
 }
 
 async fn terminalize_failed_job_inner(
@@ -1020,11 +1011,11 @@ async fn terminalize_failed_job_inner(
 }
 
 fn run_request<'a>(
-	job_id: Uuid,
-	job_state: &'a mut InstallJobState,
-	state: &'a State,
+    job_id: Uuid,
+    job_state: &'a mut InstallJobState,
+    state: &'a State,
 ) -> impl Future<Output = crate::Result<Option<String>>> + Send + 'a {
-	Box::pin(run_request_inner(job_id, job_state, state))
+    Box::pin(run_request_inner(job_id, job_state, state))
 }
 
 async fn run_request_inner(
@@ -1183,14 +1174,15 @@ async fn run_request_inner(
             )
             .await?;
             let state = State::get().await?;
-			crate::api::pack::import::copy_dotminecraft_with_reporter(
-				&instance_id,
-				crate::api::instance::get_full_path(&source_instance_id).await?,
-				&state.io_semaphore,
-				InstallProgressReporter::new(job_id, job_state.clone()),
-				InstallPhaseDetails::Empty,
-			)
-			.await?;
+            crate::api::pack::import::copy_dotminecraft_with_reporter(
+                &instance_id,
+                crate::api::instance::get_full_path(&source_instance_id)
+                    .await?,
+                &state.io_semaphore,
+                InstallProgressReporter::new(job_id, job_state.clone()),
+                InstallPhaseDetails::Empty,
+            )
+            .await?;
             let context =
                 crate::state::instances::commands::get_instance_launch_context(
                     &instance_id,
@@ -1283,12 +1275,13 @@ async fn run_request_inner(
                 InstallPhaseDetails::Empty,
             )
             .await?;
-            let plan = Box::pin(crate::state::instances::commands::plan_bulk_update(
-                &instance_id,
-                &updates,
-                state,
-            ))
-            .await?;
+            let plan =
+                Box::pin(crate::state::instances::commands::plan_bulk_update(
+                    &instance_id,
+                    &updates,
+                    state,
+                ))
+                .await?;
             prepare_update_backup(job_id, job_state, state).await?;
             crate::state::instances::commands::apply_bulk_update(
                 &instance_id,
@@ -1515,19 +1508,19 @@ async fn restore_disabled_projects(
 }
 
 pub(super) fn install_pack<'a>(
-	job_id: Uuid,
-	job_state: &'a mut InstallJobState,
-	location: CreatePackLocation,
-	instance_id: String,
-	reason: DownloadReason,
+    job_id: Uuid,
+    job_state: &'a mut InstallJobState,
+    location: CreatePackLocation,
+    instance_id: String,
+    reason: DownloadReason,
 ) -> impl Future<Output = crate::Result<()>> + Send + 'a {
-	Box::pin(install_pack_inner(
-		job_id,
-		job_state,
-		location,
-		instance_id,
-		reason,
-	))
+    Box::pin(install_pack_inner(
+        job_id,
+        job_state,
+        location,
+        instance_id,
+        reason,
+    ))
 }
 
 async fn install_pack_inner(

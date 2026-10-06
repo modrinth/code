@@ -228,19 +228,19 @@ impl SharedInstanceApplyPlan {
 }
 
 pub(super) fn apply_shared_instance_update<'a>(
-	job_id: Uuid,
-	job_state: &'a mut InstallJobState,
-	state: &'a State,
-	instance_id: &'a str,
-	data: &'a SharedInstanceInstallData,
+    job_id: Uuid,
+    job_state: &'a mut InstallJobState,
+    state: &'a State,
+    instance_id: &'a str,
+    data: &'a SharedInstanceInstallData,
 ) -> impl Future<Output = crate::Result<()>> + Send + 'a {
-	Box::pin(apply_shared_instance_update_inner(
-		job_id,
-		job_state,
-		state,
-		instance_id,
-		data,
-	))
+    Box::pin(apply_shared_instance_update_inner(
+        job_id,
+        job_state,
+        state,
+        instance_id,
+        data,
+    ))
 }
 
 async fn apply_shared_instance_update_inner(
@@ -283,9 +283,11 @@ async fn apply_shared_instance_update_inner(
                     "The shared instance was updated, but its local options.txt could not be restored after removing the previous pack: {error}"
                 );
             }
-            Box::pin(crate::api::instance::reconcile_instance_after_pack_update(
-                instance_id,
-            ))
+            Box::pin(
+                crate::api::instance::reconcile_instance_after_pack_update(
+                    instance_id,
+                ),
+            )
             .await?;
         }
         return Ok(());
@@ -615,19 +617,19 @@ async fn shared_instance_versions_by_id(
 }
 
 pub(super) fn apply_shared_instance_content<'a>(
-	job_id: Uuid,
-	job_state: &'a mut InstallJobState,
-	state: &'a State,
-	instance_id: &'a str,
-	data: &'a SharedInstanceInstallData,
+    job_id: Uuid,
+    job_state: &'a mut InstallJobState,
+    state: &'a State,
+    instance_id: &'a str,
+    data: &'a SharedInstanceInstallData,
 ) -> impl Future<Output = crate::Result<()>> + Send + 'a {
-	Box::pin(apply_shared_instance_content_inner(
-		job_id,
-		job_state,
-		state,
-		instance_id,
-		data,
-	))
+    Box::pin(apply_shared_instance_content_inner(
+        job_id,
+        job_state,
+        state,
+        instance_id,
+        data,
+    ))
 }
 
 async fn apply_shared_instance_content_inner(

@@ -9,28 +9,28 @@ use tokio::sync::Notify;
 use uuid::Uuid;
 
 static COMPLETION_NOTIFICATIONS: LazyLock<Mutex<HashMap<Uuid, Weak<Notify>>>> =
-	LazyLock::new(|| Mutex::new(HashMap::new()));
+    LazyLock::new(|| Mutex::new(HashMap::new()));
 
 pub(super) fn completion_notification(id: Uuid) -> Arc<Notify> {
-	let mut notifications = COMPLETION_NOTIFICATIONS
-		.lock()
-		.unwrap_or_else(|error| error.into_inner());
-	notifications.retain(|_, notification| notification.strong_count() > 0);
-	if let Some(notification) = notifications.get(&id).and_then(Weak::upgrade) {
-		return notification;
-	}
-	let notification = Arc::new(Notify::new());
-	notifications.insert(id, Arc::downgrade(&notification));
-	notification
+    let mut notifications = COMPLETION_NOTIFICATIONS
+        .lock()
+        .unwrap_or_else(|error| error.into_inner());
+    notifications.retain(|_, notification| notification.strong_count() > 0);
+    if let Some(notification) = notifications.get(&id).and_then(Weak::upgrade) {
+        return notification;
+    }
+    let notification = Arc::new(Notify::new());
+    notifications.insert(id, Arc::downgrade(&notification));
+    notification
 }
 
 fn notify_completion(id: Uuid) {
-	let notifications = COMPLETION_NOTIFICATIONS
-		.lock()
-		.unwrap_or_else(|error| error.into_inner());
-	if let Some(notification) = notifications.get(&id).and_then(Weak::upgrade) {
-		notification.notify_waiters();
-	}
+    let notifications = COMPLETION_NOTIFICATIONS
+        .lock()
+        .unwrap_or_else(|error| error.into_inner());
+    if let Some(notification) = notifications.get(&id).and_then(Weak::upgrade) {
+        notification.notify_waiters();
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -354,9 +354,9 @@ pub async fn update_status(
     .execute(&app_state.pool)
     .await?;
 
-	if status.is_finished() {
-		notify_completion(id);
-	}
+    if status.is_finished() {
+        notify_completion(id);
+    }
 
     get_required(id, app_state).await
 }
@@ -398,9 +398,9 @@ pub async fn update_status_if(
         return Ok(None);
     }
 
-	if status.is_finished() {
-		notify_completion(id);
-	}
+    if status.is_finished() {
+        notify_completion(id);
+    }
 
     get_required(id, app_state).await.map(Some)
 }
@@ -444,9 +444,9 @@ pub async fn finish_active(
         return Ok(None);
     }
 
-	if status.is_finished() {
-		notify_completion(id);
-	}
+    if status.is_finished() {
+        notify_completion(id);
+    }
 
     get_required(id, app_state).await.map(Some)
 }
@@ -513,7 +513,7 @@ pub async fn complete_success(
     }
 
     transaction.commit().await?;
-	notify_completion(id);
+    notify_completion(id);
     crate::api::instance::queue_game_locale_index();
     get_required(id, app_state).await.map(Some)
 }
