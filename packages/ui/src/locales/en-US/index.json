@@ -5324,6 +5324,9 @@
   "servers.download.unavailable.title": {
     "defaultMessage": "Download unavailable"
   },
+  "servers.files.server-locked": {
+    "defaultMessage": "This server is locked and its files are read-only."
+  },
   "servers.files.zip-created": {
     "defaultMessage": "ZIP created"
   },
@@ -5540,6 +5543,36 @@
   "servers.listing.using-project-label": {
     "defaultMessage": "Using {projectTitle}"
   },
+  "servers.lock.modal.error-text": {
+    "defaultMessage": "An error occurred while locking this server. Please try again."
+  },
+  "servers.lock.modal.error-title": {
+    "defaultMessage": "Failed to lock server"
+  },
+  "servers.lock.modal.header": {
+    "defaultMessage": "Lock {name}"
+  },
+  "servers.lock.modal.lock-button": {
+    "defaultMessage": "Lock server"
+  },
+  "servers.lock.modal.reason-label": {
+    "defaultMessage": "Reason"
+  },
+  "servers.lock.modal.reason-placeholder": {
+    "defaultMessage": "Visible to other admins"
+  },
+  "servers.lock.modal.success-text": {
+    "defaultMessage": "{name} has been locked."
+  },
+  "servers.lock.modal.success-title": {
+    "defaultMessage": "Server locked"
+  },
+  "servers.lock.modal.warning-body": {
+    "defaultMessage": "{name} will be read-only for its owner and members until it is unlocked by an admin."
+  },
+  "servers.lock.modal.warning-header": {
+    "defaultMessage": "This server will become read-only"
+  },
   "servers.manage.checking-for-new-servers": {
     "defaultMessage": "Checking for new servers..."
   },
@@ -5575,6 +5608,21 @@
   },
   "servers.manage.handle-error.title": {
     "defaultMessage": "An error occurred"
+  },
+  "servers.manage.lock-server": {
+    "defaultMessage": "Lock server"
+  },
+  "servers.manage.locked.badge": {
+    "defaultMessage": "Locked"
+  },
+  "servers.manage.locked.badge-tooltip": {
+    "defaultMessage": "Locked since {date}"
+  },
+  "servers.manage.locked.body": {
+    "defaultMessage": "Support has temporarily locked this server, so you cannot make any changes. <support-link>Contact support</support-link> if you believe this is a mistake."
+  },
+  "servers.manage.locked.header": {
+    "defaultMessage": "Server locked by support"
   },
   "servers.manage.new-server-button": {
     "defaultMessage": "New server"
@@ -5632,6 +5680,21 @@
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Shared servers"
+  },
+  "servers.manage.unlock-server": {
+    "defaultMessage": "Unlock server"
+  },
+  "servers.manage.unlock.error-text": {
+    "defaultMessage": "An error occurred while unlocking this server. Please try again."
+  },
+  "servers.manage.unlock.error-title": {
+    "defaultMessage": "Failed to unlock server"
+  },
+  "servers.manage.unlock.success-text": {
+    "defaultMessage": "{name} has been unlocked."
+  },
+  "servers.manage.unlock.success-title": {
+    "defaultMessage": "Server unlocked"
   },
   "servers.manage.your-servers-title": {
     "defaultMessage": "Your servers"

@@ -206,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Home e contenuti"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Riporta la finestra di Modrinth App quando chiudi Minecraft."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Riapri l'app alla chiusura del gioco"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Avvio e navigazione"
   },
@@ -301,6 +307,9 @@
   },
   "app.download-manager.attention": {
     "message": "Richiede attenzione"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "Aggiornamento di {count, plural, one {# elemento} other {# elementi}}"
   },
   "app.download-manager.cancel": {
     "message": "Annulla installazione"
@@ -897,10 +906,10 @@
     "message": "Rimuovi server"
   },
   "app.instance.worlds.remove-server-modal.remove-everywhere": {
-    "message": "Rimuovi da tutte"
+    "message": "Rimuovi ovunque"
   },
   "app.instance.worlds.remove-server-modal.remove-here": {
-    "message": "Rimuovi da questa"
+    "message": "Rimuovi qui"
   },
   "app.instance.worlds.remove-server-modal.synced-description": {
     "message": "Puoi rimuoverlo da solo questa istanza o da tutte quelle sincronizzate. Rimuovere da solo questa istanza abiliterà le sovrascritture, e non sincronizzerà più i server con le altre istanze."
@@ -1467,7 +1476,7 @@
     "message": "Copia immagine"
   },
   "app.screenshots.delete-description": {
-    "message": "Eliminare {name}? Questa azione è irreversibile."
+    "message": "Eliminare {name} per sempre? Questa azione è irreversibile."
   },
   "app.screenshots.delete-success": {
     "message": "Schermata eliminata"
@@ -2892,10 +2901,10 @@
     "message": "Impossibile caricare le fonti. Riprova più tardi."
   },
   "app.settings.synced-options.choose-sync-source.multiplayer-servers-description": {
-    "message": "Scegli da quale istanza copiare i server multigiocatore. Saranno usati solo per la sincronizzazione iniziale, poi potrai modificarli in qualsiasi istanza."
+    "message": "Seleziona da quale istanza copiare i server multi giocatore. Saranno usati solo per la sincronizzazione iniziale, poi potrai modificarli in qualsiasi istanza."
   },
   "app.settings.synced-options.choose-sync-source.multiplayer-servers-title": {
-    "message": "Scegli la fonte dei server multigiocatore"
+    "message": "Seleziona la fonte dei server multigiocatore"
   },
   "app.settings.synced-options.choose-sync-source.no-instances-found": {
     "message": "Nessuna istanza trovata"
@@ -3225,13 +3234,19 @@
     "message": "Builders & Biomes"
   },
   "app.skins.section.chaos-cubed": {
-    "message": "Chaos Cubed"
+    "message": "Caos al cubo"
   },
   "app.skins.section.chase-the-skies": {
-    "message": "Chase the Skies"
+    "message": "All'inseguimento dei cieli"
   },
   "app.skins.section.default-skins": {
     "message": "Skin predefinite"
+  },
+  "app.skins.section.dungeons-hero": {
+    "message": "Eroi di Dungeons"
+  },
+  "app.skins.section.dungeons-ii-hero": {
+    "message": "Eroi di Dungeons II"
   },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
@@ -3246,7 +3261,7 @@
     "message": "Hai ottenuto queste skin per aver donato alla raccolta fondi per il Pride durante il Pride Month."
   },
   "app.skins.section.mounts-of-mayhem": {
-    "message": "Mounts of Mayhem"
+    "message": "Destrieri del caos"
   },
   "app.skins.section.saved-skins": {
     "message": "Skin salvate"
@@ -3255,13 +3270,16 @@
     "message": "Striding Hero"
   },
   "app.skins.section.the-copper-age": {
-    "message": "The Copper Age"
+    "message": "L'Età del rame"
   },
   "app.skins.section.the-garden-awakens": {
-    "message": "The Garden Awakens"
+    "message": "Il risveglio del giardino"
   },
   "app.skins.section.tiny-takeover": {
-    "message": "Tiny Takeover"
+    "message": "Piccoli al potere"
+  },
+  "app.skins.section.wilderness-bound": {
+    "message": "Tratto selvaggio"
   },
   "app.skins.sign-in.button": {
     "message": "Accedi a Microsoft"
@@ -3294,10 +3312,10 @@
     "message": "Novità"
   },
   "app.sync-instances-update.choose-source.all": {
-    "message": "Scegli da quale istanze copiare le impostazioni di gioco, i pacchetti di risorse, la cronologia comandi, le barre rapide e i server multigiocatore. Saranno usate solo per la sincronizzazione iniziale, poi potrai modificarle in qualsiasi istanza."
+    "message": "Seleziona da quale istanze copiare le impostazioni di gioco, i pacchetti di risorse, la cronologia comandi, le barre rapide e i server multigiocatore. Saranno usate solo per la sincronizzazione iniziale, poi potrai modificarle in qualsiasi istanza."
   },
   "app.sync-instances-update.choose-source.all-title": {
-    "message": "Scegli la fonte"
+    "message": "Seleziona una fonte"
   },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "Scegli da quale istanza copiare i pacchetti di dati. Saranno usati solo per la sincronizzazione iniziale, poi potrai modificarli in qualsiasi istanza."
@@ -3309,10 +3327,10 @@
     "message": "Sincronizza le barre rapide"
   },
   "app.sync-instances-update.description": {
-    "message": "Ora puoi sincronizzare tra le istanze le opzioni come le impostazioni di gioco, i server e i pacchetti di risorse, in modo che tutto rimanga uguale ogni volta che giochi!"
+    "message": "Ora puoi sincronizzare opzioni come le impostazioni di gioco, i server, i pacchetti di risorse e altro ancora tra le istanze, così tutto rimane uguale ogni volta che giochi!"
   },
   "app.sync-instances-update.load-error": {
-    "message": "Impossibile caricare le impostazioni. Riprova più tardi."
+    "message": "Impossibile caricare le impostazioni di sincronizzazione. Riprova più tardi."
   },
   "app.sync-instances-update.manage-later": {
     "message": "Puoi abilitare la sincronizzazione ora e gestirla più tardi nelle impostazioni."
@@ -3342,40 +3360,40 @@
     "message": "Sincronizza le istanze"
   },
   "app.synced-content.change.disable-description": {
-    "message": "Disabilitalo tra le istanze sincronizzate o solo da questa. Disabilitare da solo questa istanza abiliterà le sovrascritture."
+    "message": "Disabilitalo tra tutte le istanze sincronizzate o solo da questa. La seconda scelta abiliterà le sovrascritture."
   },
   "app.synced-content.change.disable-everywhere": {
-    "message": "Disabilita da tutte"
+    "message": "Disabilita ovunque"
   },
   "app.synced-content.change.disable-everywhere-description": {
-    "message": "Disabilita il contenuto tra le istanze sincronizzate."
+    "message": "Disabilita il contenuto tra tutte le istanze sincronizzate."
   },
   "app.synced-content.change.disable-here": {
-    "message": "Disabilita da questa"
+    "message": "Disabilita qui"
   },
   "app.synced-content.change.disable-title": {
     "message": "Disabilitare il contenuto?"
   },
   "app.synced-content.change.enable-description": {
-    "message": "Abilitalo tra le istanze sincronizzate o solo da questa. Abilitare da solo questa istanza abiliterà le sovrascritture."
+    "message": "Abilitalo tra tutte le istanze sincronizzate o solo da questa. La seconda scelta abiliterà le sovrascritture."
   },
   "app.synced-content.change.enable-everywhere": {
-    "message": "Abilita in tutte"
+    "message": "Abilita ovunque"
   },
   "app.synced-content.change.enable-everywhere-description": {
-    "message": "Abilita il contenuto tra le istanze sincronizzate."
+    "message": "Abilita il contenuto tra tutte le istanze sincronizzate."
   },
   "app.synced-content.change.enable-here": {
-    "message": "Abilita in questa"
+    "message": "Abilita qui"
   },
   "app.synced-content.change.enable-title": {
     "message": "Abilitare il contenuto?"
   },
   "app.synced-content.delete.delete-everywhere": {
-    "message": "Elimina da tutte"
+    "message": "Elimina ovunque"
   },
   "app.synced-content.delete.delete-here": {
-    "message": "Elimina da questa"
+    "message": "Elimina qui"
   },
   "app.synced-content.delete.description": {
     "message": "Eliminare il contenuto lo eliminerà per tutte le istanze"

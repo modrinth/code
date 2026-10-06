@@ -53,6 +53,27 @@
   "nags.invalid-license-url.title": {
     "defaultMessage": "Tambahkan pautan lesen yang sah"
   },
+  "nags.link-validation.duplicate": {
+    "defaultMessage": "Pautan {linkField, select, issues {penjejak isu} source {kod sumber} wiki {wiki} discord {jemputan Discord} site {laman sesawang} store {kedai} license {lesen} description {keterangan} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {sumbangan}} anda juga digunakan pada medan {otherLinkField, select, issues {Penjejak isu} source {Kod sumber} wiki {Wiki} discord {Jemputan Discord} site {Laman sesawang} store {Kedai} license {Lesen} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {yang lain}}. Setiap pautan hendaklah disenaraikan sekali sahaja."
+  },
+  "nags.link-validation.global-blocklist-match": {
+    "defaultMessage": "Pautan {linkField, select, issues {penjejak isu} source {kod sumber} wiki {wiki} discord {jemputan Discor} site {laman sesawang} store {kedai} license {lesen} description {keterangan} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {sumbangan}} anda menggunakan domain yang dilarang. Keluarkan atau gantikan pautan ini."
+  },
+  "nags.link-validation.ip-address": {
+    "defaultMessage": "Pautan {linkField, select, issues {penjejak isu} source {kod sumber} wiki {wiki} discord {jemputan Discor} site {laman sesawang} store {kedai} license {lesen} description {keterangan} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {sumbangan}} anda menggunakan alamat IP. Gunakan URL dengan nama domain."
+  },
+  "nags.link-validation.malformed": {
+    "defaultMessage": "Pautan {linkField, select, issues {penjejak isu} source {kod sumber} wiki {wiki} discord {jemputan Discor} site {laman sesawang} store {kedai} license {lesen} description {keterangan} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {sumbangan}} anda tidak sah. Masukkan URL HTTPS yang lengkap."
+  },
+  "nags.link-validation.not-in-allowlist": {
+    "defaultMessage": "Pautan {linkField, select, issues {penjejak isu} source {kod sumber} wiki {wiki} discord {jemputan Discor} site {laman sesawang} store {kedai} license {lesen} description {keterangan} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {sumbangan}} anda mungkin tidak sesuai untuk jenis pautan tersebut. Sila pastikan ia sesuai dengan tujuan penggunaannya."
+  },
+  "nags.link-validation.unverifiable": {
+    "defaultMessage": "Pautan {linkField, select, issues {penjejak isu} source {kod sumber} wiki {wiki} discord {jemputan Discor} site {laman sesawang} store {kedai} license {lesen} description {keterangan} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {sumbangan}} anda tidak dapat disahkan. Pastikan ia berada dalam talian dan boleh diakses."
+  },
+  "nags.link-validation.wrong-field": {
+    "defaultMessage": "Pautan {linkField, select, issues {penjejak isu} source {kod sumber} wiki {wiki} discord {jemputan Discor} site {laman sesawang} store {kedai} license {lesen} description {keterangan} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {sumbangan}} anda ialah tidak betul untuk pautan {linkField, select, issues {penjejak isu} source {kod sumber} wiki {wiki} discord {jemputan Discord} site {laman sesawang} store {kedai} license {lesen} description {keterangan} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {sumbangan}}. Keluarkan atau gantikannya dengan pautan yang betul."
+  },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, other {# tajuk}} di dalam keterangan anda {count, plural, other {adalah}} terlalu panjang. Tajuk hendaklah ringkas dan bertindak sebagai tajuk bahagian, bukan ayat penuh."
   },

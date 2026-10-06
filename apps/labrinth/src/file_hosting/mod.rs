@@ -4,10 +4,12 @@ use std::str::FromStr;
 use async_trait::async_trait;
 use thiserror::Error;
 
+mod kafka_host;
 mod mock;
 mod s3_host;
 
 use bytes::Bytes;
+pub use kafka_host::{FILE_UPLOADED_TOPIC, KafkaFileHost};
 pub use mock::MockHost;
 pub use s3_host::{S3BucketConfig, S3Host};
 
@@ -38,7 +40,8 @@ pub struct DeleteFileData {
     pub file_name: String,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
 pub enum FileHostPublicity {
     Public,
     Private,

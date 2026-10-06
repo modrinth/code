@@ -545,7 +545,7 @@ pub struct ManyFileUpdateData {
 #[post("/update_individual")]
 pub async fn update_individual_files(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
+    pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     update_data: web::Json<ManyFileUpdateData>,
     session_queue: web::Data<AuthQueue>,
