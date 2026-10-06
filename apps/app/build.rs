@@ -380,7 +380,7 @@ fn main() {
                         "show_launcher_logs_folder",
                         "show_app_db_backups_folder",
                         "export_debug_info",
-						"cancel_debug_info_export",
+                        "cancel_debug_info_export",
                         "progress_bars_list",
                         "get_opening_command",
                         "get_image_thumbnail",

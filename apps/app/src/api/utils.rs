@@ -18,24 +18,24 @@ pub struct DebugInfoExports(DashMap<(String, String), CancellationToken>);
 
 pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("utils")
-		.setup(|app, _| {
-			app.manage(DebugInfoExports::default());
-			Ok(())
-		})
-		.on_event(|app, event| {
-			if let tauri::RunEvent::WindowEvent {
-				label,
-				event: tauri::WindowEvent::Destroyed,
-				..
-			} = event
-			{
-				for export in &app.state::<DebugInfoExports>().0 {
-					if &export.key().0 == label {
-						export.value().cancel();
-					}
-				}
-			}
-		})
+        .setup(|app, _| {
+            app.manage(DebugInfoExports::default());
+            Ok(())
+        })
+        .on_event(|app, event| {
+            if let tauri::RunEvent::WindowEvent {
+                label,
+                event: tauri::WindowEvent::Destroyed,
+                ..
+            } = event
+            {
+                for export in &app.state::<DebugInfoExports>().0 {
+                    if &export.key().0 == label {
+                        export.value().cancel();
+                    }
+                }
+            }
+        })
         .invoke_handler(tauri::generate_handler![
             get_os,
             is_network_metered,
@@ -45,7 +45,7 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
             show_launcher_logs_folder,
             show_app_db_backups_folder,
             export_debug_info,
-			cancel_debug_info_export,
+            cancel_debug_info_export,
             progress_bars_list,
             get_opening_command,
             super::thumbnails::get_image_thumbnail,
@@ -157,42 +157,45 @@ pub async fn show_app_db_backups_folder<R: Runtime>(
 
 #[tauri::command]
 pub async fn export_debug_info<R: Runtime>(
-	window: tauri::WebviewWindow<R>,
-	state: tauri::State<'_, DebugInfoExports>,
-	id: String,
-	path: PathBuf,
-	on_progress: tauri::ipc::Channel<theseus::debug_info::DebugInfoExportProgress>,
+    window: tauri::WebviewWindow<R>,
+    state: tauri::State<'_, DebugInfoExports>,
+    id: String,
+    path: PathBuf,
+    on_progress: tauri::ipc::Channel<
+        theseus::debug_info::DebugInfoExportProgress,
+    >,
 ) -> Result<bool> {
-	let key = (window.label().to_string(), id);
-	let cancel = CancellationToken::new();
-	match state.0.entry(key.clone()) {
-		dashmap::mapref::entry::Entry::Vacant(entry) => {
-			entry.insert(cancel.clone());
-		}
-		dashmap::mapref::entry::Entry::Occupied(_) => {
-			return Err(std::io::Error::other("Debug info export is already running").into());
-		}
-	}
-	let result = theseus::debug_info::export_debug_info(
-		path,
-		cancel,
-		move |progress| {
-			let _ = on_progress.send(progress);
-		},
-	).await;
-	state.0.remove(&key);
-	Ok(result?)
+    let key = (window.label().to_string(), id);
+    let cancel = CancellationToken::new();
+    match state.0.entry(key.clone()) {
+        dashmap::mapref::entry::Entry::Vacant(entry) => {
+            entry.insert(cancel.clone());
+        }
+        dashmap::mapref::entry::Entry::Occupied(_) => {
+            return Err(std::io::Error::other(
+                "Debug info export is already running",
+            )
+            .into());
+        }
+    }
+    let result =
+        theseus::debug_info::export_debug_info(path, cancel, move |progress| {
+            let _ = on_progress.send(progress);
+        })
+        .await;
+    state.0.remove(&key);
+    Ok(result?)
 }
 
 #[tauri::command]
 pub fn cancel_debug_info_export<R: Runtime>(
-	window: tauri::WebviewWindow<R>,
-	state: tauri::State<'_, DebugInfoExports>,
-	id: String,
+    window: tauri::WebviewWindow<R>,
+    state: tauri::State<'_, DebugInfoExports>,
+    id: String,
 ) {
-	if let Some(cancel) = state.0.get(&(window.label().to_string(), id)) {
-		cancel.cancel();
-	}
+    if let Some(cancel) = state.0.get(&(window.label().to_string(), id)) {
+        cancel.cancel();
+    }
 }
 
 // Get opening command
