@@ -806,6 +806,9 @@
   "auth.create-account.username.placeholder": {
     "message": "أدخل اسم المستخدم"
   },
+  "auth.reauthenticate.2fa.label": {
+    "message": "المصادقة الثنائية"
+  },
   "auth.reset-password.method-choice.action": {
     "message": "إرسال بريد استعادة الحساب"
   },
@@ -2846,6 +2849,9 @@
   "layout.nav.active-reports": {
     "message": "البلاغات النشطة"
   },
+  "layout.nav.add-account": {
+    "message": "إضافة حساب"
+  },
   "layout.nav.discover": {
     "message": "استكشاف"
   },
@@ -2876,6 +2882,9 @@
   "layout.nav.projects": {
     "message": "المشاريع"
   },
+  "layout.nav.remove-account": {
+    "message": "إزالة الحساب"
+  },
   "layout.nav.revenue": {
     "message": "الإيرادات"
   },
@@ -2884,6 +2893,9 @@
   },
   "layout.nav.search": {
     "message": "البحث"
+  },
+  "layout.nav.switch-account": {
+    "message": "تبديل الحساب"
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "الترقية إلى Modrinth+"

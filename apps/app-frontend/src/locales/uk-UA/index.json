@@ -81,7 +81,7 @@
     "message": "Не вдалося зʼєднатися з Modrinth"
   },
   "app.action-bar.install.summary.no-write-permission": {
-    "message": "Немає прав для запису"
+    "message": "Бракує прав для запису"
   },
   "app.action-bar.install.summary.pack-download-failed": {
     "message": "Не вдалося встановити збірку"
@@ -206,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Головна й уміст"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Виводити Modrinth App на передній план, коли Minecraft закривається."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Повернути фокус при закритті Minecraft"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Запуск і навігація"
   },
@@ -285,22 +291,25 @@
     "message": "Розсинхронізувати"
   },
   "app.content.sync-data-packs-disabled": {
-    "message": "Спочатку ввімкніть синхронізацію пакетів даних в налаштуваннях застосунку."
+    "message": "Спершу ввімкніть синхронізацію пакетів даних в налаштуваннях застосунку."
   },
   "app.content.sync-pack": {
     "message": "Синхронізувати"
   },
   "app.content.sync-packs-override": {
-    "message": "Спочатку вимкніть перевизначення параметру синхронізації пакетів даних у налаштуваннях цього примірника."
+    "message": "Спершу вимкніть перевизначення синхронізації пакетів у налаштуваннях цього примірника."
   },
   "app.content.sync-resource-packs-disabled": {
-    "message": "Спочатку ввімкніть синхронізацію пакетів ресурсів у налаштуваннях застосунку."
+    "message": "Спершу ввімкніть синхронізацію пакетів ресурсів у налаштуваннях застосунку."
   },
   "app.download-manager.active": {
     "message": "Активно"
   },
   "app.download-manager.attention": {
     "message": "Потребує уваги"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "Оновлення {count, plural, one {# елемента} few {# елементів} many {# елементів} other {# елементів}}"
   },
   "app.download-manager.cancel": {
     "message": "Скасувати встановлення"
@@ -840,7 +849,7 @@
     "message": "Знімки екрана"
   },
   "app.instance.tab.share": {
-    "message": "Поділитись"
+    "message": "Поділитися"
   },
   "app.instance.tab.worlds": {
     "message": "Світи"
@@ -1362,7 +1371,7 @@
     "message": "Змінити обліковий запис"
   },
   "app.nav.upgrade-to-modrinth-plus": {
-    "message": "Покращитись до Modrinth+"
+    "message": "Покращитися до Modrinth+"
   },
   "app.nav.view-profile": {
     "message": "Переглянути профіль"
@@ -1602,10 +1611,10 @@
     "message": "Ім'я"
   },
   "app.screenshots.sort.newest": {
-    "message": "Спочатку нові"
+    "message": "Найновіші"
   },
   "app.screenshots.sort.oldest": {
-    "message": "Спочатку старі"
+    "message": "Найстаріші"
   },
   "app.settings.app-version": {
     "message": "Modrinth App {version}"
@@ -2301,7 +2310,7 @@
     "message": "Куртка"
   },
   "app.settings.game-options.setting.japanese-glyph-variants.label": {
-    "message": "Варіанти японських гліфів"
+    "message": "Різновиди японських гліфів"
   },
   "app.settings.game-options.setting.key-advancements.label": {
     "message": "Досягнення"
@@ -2721,7 +2730,7 @@
     "message": "Реклама підтримує існування Modrinth і фінансує виплати творцям. Наші партнери можуть зберігати й отримувати доступ до cookie в застосунку, щоб персоналізувати рекламу та збирати метрики. Ви можете відмовитися від них або керувати налаштуваннями нижче."
   },
   "app.settings.privacy.discord-rich-presence.description": {
-    "message": "Показувати застосунок Modrinth як вашу поточну активність у Discord. Це не впливає на активність, додану модами. Потребує перезапуску застосунку."
+    "message": "Показувати Modrinth App як вашу поточну активність у Discord. Це не впливає на активність, додану модами. Потребує перезапуску застосунку."
   },
   "app.settings.privacy.discord-rich-presence.title": {
     "message": "Discord Rich Presence"
@@ -2922,13 +2931,13 @@
     "message": "Синхронізувати ПШД творчости"
   },
   "app.settings.synced-options.creative-hotbars.description": {
-    "message": "Використати ті ж ПШД режиму творчости між примірниками."
+    "message": "Використовувати однакові збережені панелі швидкого доступу у всіх примірниках."
   },
   "app.settings.synced-options.data-packs": {
     "message": "Синхронізувати пакети даних"
   },
   "app.settings.synced-options.data-packs.description": {
-    "message": "Використати ті ж пакети даних між примірниками"
+    "message": "Використовувати однакові пакети даних у всіх примірниках."
   },
   "app.settings.synced-options.data-packs.none-synced-yet": {
     "message": "Ви ще не синхронізували жодних пакетів даних"
@@ -2949,13 +2958,13 @@
     "message": "Завантажено останні налаштування. Перевірте свої зміни та збережіть знову."
   },
   "app.settings.synced-options.game-settings.conflict-title": {
-    "message": "Ці налаштування змінились десь"
+    "message": "Ці налаштування змінилися десь ще"
   },
   "app.settings.synced-options.game-settings.custom-empty": {
     "message": "Додані модами налаштування з'являться тут після того, як Modrinth знайде їх в одному з ваших примірників."
   },
   "app.settings.synced-options.game-settings.description": {
-    "message": "Використати ті ж налаштування гри між примірниками."
+    "message": "Використовувати однакові налаштування гри у всіх примірниках."
   },
   "app.settings.synced-options.game-settings.disable-all": {
     "message": "Розсинхронізувати все"
@@ -3036,7 +3045,7 @@
     "message": "{count, plural, one {# сервер} few {# сервери} other {# серверів}}"
   },
   "app.settings.synced-options.multiplayer-servers.description": {
-    "message": "Використати ті ж сервери мережевої гри між примірниками."
+    "message": "Використовувати однакові сервери у всіх примірниках."
   },
   "app.settings.synced-options.multiplayer-servers.editor-title": {
     "message": "Редагувати синхронізовані сервери"
@@ -3078,7 +3087,7 @@
     "message": "Синхронізувати пакети ресурсів"
   },
   "app.settings.synced-options.resource-packs.description": {
-    "message": "Використати ті ж пакети ресурсів між примірниками."
+    "message": "Використовувати однакові пакети ресурсів у всіх примірниках."
   },
   "app.settings.synced-options.resource-packs.none-synced-yet": {
     "message": "Ви ще не синхронізували жодних пакетів ресурсів"
@@ -3230,6 +3239,12 @@
   "app.skins.section.default-skins": {
     "message": "Усталені скіни"
   },
+  "app.skins.section.dungeons-hero": {
+    "message": "Герої Dungeons"
+  },
+  "app.skins.section.dungeons-ii-hero": {
+    "message": "Герої Dungeons II"
+  },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
@@ -3259,6 +3274,9 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
+  },
+  "app.skins.section.wilderness-bound": {
+    "message": "Wilderness Bound"
   },
   "app.skins.sign-in.button": {
     "message": "Увійти в Microsoft"
