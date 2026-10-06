@@ -92,6 +92,7 @@ import _CircuitBoardIcon from './icons/circuit-board.svg?component'
 import _ClearIcon from './icons/clear.svg?component'
 import _ClientIcon from './icons/client.svg?component'
 import _ClipboardCopyIcon from './icons/clipboard-copy.svg?component'
+import _ClipboardListIcon from './icons/clipboard-list.svg?component'
 import _ClockIcon from './icons/clock.svg?component'
 import _ClockArrowDownIcon from './icons/clock-arrow-down.svg?component'
 import _ClockArrowUpIcon from './icons/clock-arrow-up.svg?component'
@@ -287,6 +288,7 @@ import _SpinnerIcon from './icons/spinner.svg?component'
 import _SplitIcon from './icons/split.svg?component'
 import _SquareIcon from './icons/square.svg?component'
 import _SquarePlusIcon from './icons/square-plus.svg?component'
+import _SquareTextIcon from './icons/square-text.svg?component'
 import _StarIcon from './icons/star.svg?component'
 import _StickyNotePlusIcon from './icons/sticky-note-plus.svg?component'
 import _StopCircleIcon from './icons/stop-circle.svg?component'
@@ -560,6 +562,7 @@ export const CircuitBoardIcon = _CircuitBoardIcon
 export const ClearIcon = _ClearIcon
 export const ClientIcon = _ClientIcon
 export const ClipboardCopyIcon = _ClipboardCopyIcon
+export const ClipboardListIcon = _ClipboardListIcon
 export const ClockIcon = _ClockIcon
 export const ClockArrowDownIcon = _ClockArrowDownIcon
 export const ClockArrowUpIcon = _ClockArrowUpIcon
@@ -755,6 +758,7 @@ export const SpinnerIcon = _SpinnerIcon
 export const SplitIcon = _SplitIcon
 export const SquareIcon = _SquareIcon
 export const SquarePlusIcon = _SquarePlusIcon
+export const SquareTextIcon = _SquareTextIcon
 export const StarIcon = _StarIcon
 export const StickyNotePlusIcon = _StickyNotePlusIcon
 export const StopCircleIcon = _StopCircleIcon

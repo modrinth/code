@@ -6,6 +6,8 @@ import {
 	GlassesIcon,
 	GlobeIcon,
 	PaintbrushIcon,
+	ImagesIcon,
+	SquareTextIcon, ClipboardListIcon
 } from '@modrinth/assets'
 import type { Component } from 'vue'
 
@@ -22,13 +24,16 @@ export interface FileIconStyle {
 const DEFAULT_DIRECTORY_ICON: FileIconStyle = { icon: FolderOpenIcon, color: 'text-amber-400' }
 
 const DIRECTORY_ICON_STYLES: Record<string, FileIconStyle> = {
-	config: { icon: FolderCogIcon, color: 'text-teal-400' },
+	config: { icon: FolderCogIcon, color: 'text-purple' },
+	'crash-reports': { icon: ClipboardListIcon, color: 'text-red-400' },
+	logs: { icon: SquareTextIcon, color: 'text-red-400'},
 	world: { icon: GlobeIcon, color: 'text-blue' },
 	saves: { icon: GlobeIcon, color: 'text-blue' },
-	datapacks: { icon: BracesIcon, color: 'text-red' },
-	mods: { icon: BoxIcon, color: 'text-purple' },
-	resourcepacks: { icon: PaintbrushIcon, color: 'text-rose' },
-	shaderpacks: { icon: GlassesIcon, color: 'text-green' },
+	datapacks: { icon: BracesIcon, color: 'text-brand' },
+	mods: { icon: BoxIcon, color: 'text-brand' },
+	resourcepacks: { icon: PaintbrushIcon, color: 'text-brand' },
+	shaderpacks: { icon: GlassesIcon, color: 'text-brand' },
+	screenshots: { icon: ImagesIcon, color: 'text-blue' },
 }
 
 /** Icon and color for a file or directory, shared by the listing, sidebar tree and tabs. */
@@ -36,7 +41,7 @@ export function fileIconFor(file: Pick<FileInfo, 'name' | 'type'>): FileIconStyl
 	if (file.type === 'directory') {
 		return DIRECTORY_ICON_STYLES[file.name.toLowerCase()] ?? DEFAULT_DIRECTORY_ICON
 	}
-	return { icon: getFileExtensionIcon(getFileExtension(file.name)), color: 'text-olive-300' }
+	return { icon: getFileExtensionIcon(getFileExtension(file.name)), color: 'text-mist-200' }
 }
 
 export function joinDisplayPath(basePath: string | undefined, itemPath: string) {

@@ -262,10 +262,10 @@ const pageContext = injectPageContext(null)
 const reworkEnabled = computed(() => pageContext?.featureFlags?.filesTabRework?.value ?? false)
 
 const advancedViewSetting = useLocalStorage('files-advanced-view', true, { initOnMounted: true })
-const coloredIconsSetting = useLocalStorage('files-colored-icons', true, { initOnMounted: true })
+const coloredIconsSetting = useLocalStorage('files-colored-icons', reworkEnabled.value, { initOnMounted: true })
 /** The sidebar tree, tabs and column picker; behind the rework flag, then a user preference. */
 const advancedView = computed(() => reworkEnabled.value && advancedViewSetting.value)
-const coloredIcons = computed(() => !reworkEnabled.value || coloredIconsSetting.value)
+const coloredIcons = computed(() => coloredIconsSetting.value)
 
 /** Switching to the simple view drops the extra tabs, so their unsaved changes are confirmed first. */
 async function setAdvancedView(value: boolean) {
