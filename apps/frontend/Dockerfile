@@ -2,7 +2,7 @@
 
 FROM docker.io/tailscale/tailscale:latest AS tailscale
 
-FROM node:24-trixie-slim
+FROM node:26-trixie-slim
 
 LABEL org.opencontainers.image.source=https://github.com/modrinth/code
 LABEL org.opencontainers.image.title=frontend
@@ -77,11 +77,42 @@ EOF
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=3000
+ENV NODE_COMPILE_CACHE=/app/.node-compile-cache
 
 WORKDIR /app
 
 # Nitro bundles every runtime dependency into .output, so no node_modules is needed.
 COPY --chown=node:node .output ./.output
+
+# Boot the server once and render the index page so the compile cache ships warm.
+# Node flushes the cache on graceful exit. Job control (-m) puts the cluster primary
+# and its workers in one process group so SIGTERM reaches all of them.
+RUN bash <<'EOF'
+set -eum
+
+node /app/.output/server/index.mjs &
+server_pid=$!
+
+waited=0
+until (exec 3<>"/dev/tcp/127.0.0.1/$PORT") 2>/dev/null; do
+	if [ "$waited" -ge 300 ]; then
+		echo "prewarm: server never accepted connections" >&2
+		exit 1
+	fi
+	waited=$((waited + 1))
+	sleep 0.1
+done
+
+exec 3<>"/dev/tcp/127.0.0.1/$PORT"
+printf 'GET / HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3
+read -r status_line <&3
+echo "prewarm: $status_line" >&2
+exec 3<&-
+
+kill -TERM -- "-$server_pid"
+wait "$server_pid"
+chown -R node:node "$NODE_COMPILE_CACHE"
+EOF
 
 # Stays root so tailscaled can setgroups/setuid for SSH sessions; the entrypoint
 # drops the server itself to the node user.
