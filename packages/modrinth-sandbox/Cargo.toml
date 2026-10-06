@@ -9,7 +9,7 @@ crate-type = ["rlib", "cdylib", "staticlib"]
 
 [dependencies]
 tracing = { workspace = true }
-tokio = { workspace = true, features = ["fs", "process", "rt"] }
+tokio = { workspace = true, features = ["fs", "process", "rt", "sync"] }
 eyre = { workspace = true }
 async-trait = { workspace = true }
 bitflags = { workspace = true, features = ["serde"] }
