@@ -60,7 +60,9 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(project_search_post)
         .service(projects_get_route)
         .service(projects_edit_route)
-        .service(random_projects_get_route);
+        .service(random_projects_get_route)
+        .service(edit_gallery_item)
+        .service(delete_gallery_item);
 }
 
 pub fn project_config(cfg: &mut actix_web::web::ServiceConfig) {
@@ -71,8 +73,6 @@ pub fn project_config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(project_icon_edit)
         .service(delete_project_icon)
         .service(add_gallery_item)
-        .service(edit_gallery_item)
-        .service(delete_gallery_item)
         .service(project_follow)
         .service(project_unfollow)
         .service(project_get_organization)
@@ -2919,7 +2919,6 @@ pub struct GalleryEditQuery {
 
 /// Update a gallery item.
 #[utoipa::path(
-	context_path = "/project",
 	tag = "projects",
 	params(
 		("url" = String, Query),
@@ -2930,7 +2929,7 @@ pub struct GalleryEditQuery {
 	),
 	responses((status = NO_CONTENT))
 )]
-#[patch("/{id}/gallery")]
+#[patch("/project-gallery")]
 pub async fn edit_gallery_item(
     req: HttpRequest,
     web::Query(item): web::Query<GalleryEditQuery>,
@@ -3151,14 +3150,13 @@ pub struct GalleryDeleteQuery {
 
 /// Delete a gallery item.
 #[utoipa::path(
-	context_path = "/project",
 	tag = "projects",
 	params(
 		("url" = String, Query)
 	),
 	responses((status = NO_CONTENT))
 )]
-#[delete("/{id}/gallery")]
+#[delete("/project-gallery")]
 pub async fn delete_gallery_item(
     req: HttpRequest,
     web::Query(item): web::Query<GalleryDeleteQuery>,
