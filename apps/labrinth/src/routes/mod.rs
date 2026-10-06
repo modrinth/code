@@ -142,6 +142,44 @@ pub async fn resolve_refs(
     Ok(resolved)
 }
 
+/// Rewrites body references without redirecting the HTTP request or changing unresolved values.
+pub async fn resolve_body_refs(
+    mut project_refs: Vec<&mut String>,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<(), ApiError> {
+    let refs = project_refs
+        .iter()
+        .map(|value| (**value).clone())
+        .collect::<Vec<_>>();
+    let targets = resolve_refs(&refs, pool, redis).await?;
+    for (value, target) in project_refs.iter_mut().zip(targets) {
+        if let Some(target) = target {
+            **value = target.to_string();
+        }
+    }
+    Ok(())
+}
+
+/// Resolves redirect aliases accepted by typed project ID fields.
+pub async fn resolve_body_project_ids(
+    project_ids: Vec<&mut ProjectId>,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<(), ApiError> {
+    let refs = project_ids
+        .iter()
+        .map(|id| id.to_string())
+        .collect::<Vec<_>>();
+    let targets = resolve_refs(&refs, pool, redis).await?;
+    for (id, target) in project_ids.into_iter().zip(targets) {
+        if let Some(target) = target {
+            *id = target;
+        }
+    }
+    Ok(())
+}
+
 pub async fn clear_project_redirect_cache(
     project_refs: &[String],
     redis: &RedisPool,

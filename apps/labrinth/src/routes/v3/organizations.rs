@@ -944,6 +944,13 @@ pub async fn organization_projects_add(
                 "the specified organization does not exist!".to_string()
             })?;
 
+    let mut project_info = project_info.into_inner();
+    crate::routes::resolve_body_refs(
+        vec![&mut project_info.project_id],
+        &pool,
+        &redis,
+    )
+    .await?;
     let project_item = database::models::DBProject::get(
         &project_info.project_id,
         &**pool,

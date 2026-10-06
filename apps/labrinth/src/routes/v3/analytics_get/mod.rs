@@ -199,6 +199,12 @@ pub async fn fetch_analytics(
     .await
     .wrap_auth_err("authenticating API request")?;
 
+    let mut req = req.into_inner();
+    let mut ids = req.project_ids.iter_mut().collect::<Vec<_>>();
+    if let Some(metrics) = &mut req.return_metrics.project_downloads {
+        ids.extend(metrics.filter_by.dependent_project_id.iter_mut());
+    }
+    crate::routes::resolve_body_project_ids(ids, &pool, &redis).await?;
     let full_time_range = req.time_range.end - req.time_range.start;
     if full_time_range < TimeDelta::zero() {
         return Err(ApiError::Request(eyre::eyre!(

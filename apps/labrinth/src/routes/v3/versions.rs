@@ -471,7 +471,7 @@ pub async fn version_edit_helper(
     info: (VersionId,),
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    new_version: EditVersion,
+    mut new_version: EditVersion,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
@@ -486,6 +486,13 @@ pub async fn version_edit_helper(
     .wrap_auth_err("authenticating API request")?
     .1;
 
+    if let Some(dependencies) = &mut new_version.dependencies {
+        let ids = dependencies
+            .iter_mut()
+            .filter_map(|dependency| dependency.project_id.as_mut())
+            .collect();
+        crate::routes::resolve_body_project_ids(ids, &pool, &redis).await?;
+    }
     new_version
         .validate()
         .map_err(|err| eyre::eyre!(err))

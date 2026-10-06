@@ -90,7 +90,7 @@ pub async fn report_create(
     .wrap_auth_err("authenticating API request")?
     .1;
 
-    let new_report: CreateReport = read_typed_from_payload(&mut body)
+    let mut new_report: CreateReport = read_typed_from_payload(&mut body)
         .await
         .wrap_api_err("reading request payload")?;
 
@@ -124,6 +124,12 @@ pub async fn report_create(
 
     match new_report.item_type {
         ItemType::Project => {
+            crate::routes::resolve_body_refs(
+                vec![&mut new_report.item_id],
+                &pool,
+                &redis,
+            )
+            .await?;
             let project_id = ProjectId(
                 parse_base62(new_report.item_id.as_str())
                     .wrap_request_err("parsing reported project ID")?,
