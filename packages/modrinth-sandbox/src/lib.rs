@@ -51,7 +51,7 @@ impl SandboxEnv {
     ///
     /// ## macOS
     ///
-    /// TODO
+    /// Uses macOS [Seatbelt] API.
     ///
     /// ## Linux
     ///
@@ -75,6 +75,7 @@ impl SandboxEnv {
     /// Errors if the implementation cannot set up sandboxing.
     ///
     /// [AppContainer]: https://learn.microsoft.com/en-us/windows/win32/secauthz/appcontainer-isolation
+    /// [Seatbelt]: https://theapplewiki.com/wiki/Dev:Seatbelt
     /// [`org.freedesktop.portal.Flatpak`]: https://docs.flatpak.org/en/latest/libflatpak-api-reference.html#gdbus-org.freedesktop.portal.Flatpak
     /// [Bubblewrap]: https://github.com/containers/bubblewrap
     pub async fn new() -> Result<Self> {
@@ -92,6 +93,17 @@ impl SandboxEnv {
         backend::create_env(make_helper).await.map(|imp| Self {
             imp: Arc::from(imp),
         })
+    }
+
+    /// Creates a [`SandboxEnv`] which performs no real sandboxing.
+    ///
+    /// This may be used to retain the safe API surface whether you're creating
+    /// a sandboxed or unsandboxed instance.
+    #[must_use]
+    pub fn noop() -> Self {
+        Self {
+            imp: Arc::new(backend::noop::NoSandbox),
+        }
     }
 
     /// Spawn a sandboxed process and get a [`SandboxChild`] handle to it.

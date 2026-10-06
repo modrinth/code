@@ -42,7 +42,36 @@ pub unsafe extern "C" fn modrinth_sandbox_create_env(
     }
 }
 
-/// Frees a sandbox environment returned by [`modrinth_sandbox_create_env`].
+/// Creates an environment that launches processes without sandboxing.
+///
+/// This applies no filesystem or network isolation. Sandbox-specific options,
+/// including `die_with_parent`, are not enforced. Use [`modrinth_sandbox_spawn`]
+/// to launch processes and [`modrinth_sandbox_env_free`] to release the handle.
+///
+/// # Safety
+///
+/// If `out_env` is non-null, it must be properly aligned and valid for writing
+/// a `*mut ModrinthSandboxEnv`. It must not currently contain an owned handle.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn modrinth_sandbox_create_noop_env(
+    out_env: *mut *mut ModrinthSandboxEnv,
+) -> bool {
+    // SAFETY: The caller guarantees valid, writable pointer storage when non-null.
+    unsafe {
+        try_return(out_env, || {
+            let rt = tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+                .wrap_err("creating tokio runtime")?;
+            Ok(ModrinthSandboxEnv {
+                env: SandboxEnv::noop(),
+                rt: Arc::new(rt),
+            })
+        })
+    }
+}
+
+/// Frees a sandbox or no-op environment.
 ///
 /// Children spawned through the environment remain usable after the environment
 /// is freed because they retain the runtime needed for asynchronous operations.
@@ -50,7 +79,8 @@ pub unsafe extern "C" fn modrinth_sandbox_create_env(
 /// # Safety
 ///
 /// `env` must be null or a pointer returned by
-/// [`modrinth_sandbox_create_env`] that has not already been freed.
+/// [`modrinth_sandbox_create_env`] or [`modrinth_sandbox_create_noop_env`]
+/// that has not already been freed.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn modrinth_sandbox_env_free(
     env: *mut ModrinthSandboxEnv,
@@ -68,7 +98,8 @@ pub unsafe extern "C" fn modrinth_sandbox_env_free(
 /// # Safety
 ///
 /// `env` must point to a live environment returned by
-/// [`modrinth_sandbox_create_env`] and must not be freed for the duration of
+/// [`modrinth_sandbox_create_env`] or [`modrinth_sandbox_create_noop_env`]
+/// and must not be freed for the duration of
 /// this call. `command` must point to valid, writable pointer storage, and a
 /// non-null `*command` must be a uniquely owned handle returned by
 /// [`crate::ffi::modrinth_sandbox_prepare_command`]. If `out_child` is

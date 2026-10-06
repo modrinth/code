@@ -20,6 +20,7 @@ mod flatpak;
 mod linux;
 #[cfg(target_os = "macos")]
 mod macos;
+pub mod noop;
 #[cfg(unix)]
 mod unix;
 #[cfg(windows)]
@@ -141,6 +142,7 @@ pub trait SandboxChildOp {
 #[derive(Debug)]
 #[enum_dispatch(SandboxChildOp)]
 pub enum SandboxChild {
+    Noop(noop::StdChild),
     #[cfg(target_os = "linux")]
     Flatpak(flatpak::FlatpakChild),
     #[cfg(target_os = "linux")]
@@ -160,6 +162,25 @@ pub struct SandboxExitStatus {
     imp: unix::UnixSandboxExitStatus,
     #[cfg(windows)]
     imp: windows::WindowsSandboxExitStatus,
+}
+
+impl From<std::process::ExitStatus> for SandboxExitStatus {
+    fn from(status: std::process::ExitStatus) -> Self {
+        #[cfg(unix)]
+        {
+            use std::os::unix::process::ExitStatusExt;
+            Self {
+                imp: unix::UnixSandboxExitStatus(status.into_raw()),
+            }
+        }
+        #[cfg(windows)]
+        {
+            use std::os::windows::process::ExitStatusExt;
+            Self {
+                imp: windows::WindowsSandboxExitStatus(status.into_raw()),
+            }
+        }
+    }
 }
 
 impl SandboxExitStatus {
@@ -187,7 +208,12 @@ impl std::fmt::Display for SandboxExitStatus {
 
 pub fn run_helper(args: impl IntoIterator<Item = OsString>) -> Result<bool> {
     #[cfg(windows)]
-    return windows::appcontainer::run_helper(args);
+    {
+        windows::appcontainer::run_helper(args)
+    }
     #[cfg(not(windows))]
-    return Ok(false);
+    {
+        drop(args);
+        Ok(false)
+    }
 }

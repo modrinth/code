@@ -120,7 +120,10 @@ pub struct State {
     pub(crate) pool: SqlitePool,
 
     pub(crate) file_watcher: FileWatcher,
+    /// Created from [`SandboxEnv::new`].
     pub sandbox_env: SandboxEnv,
+    /// Created from [`SandboxEnv::noop`].
+    pub sandbox_env_noop: SandboxEnv,
 }
 
 impl State {
@@ -380,6 +383,7 @@ impl State {
         let sandbox_env = SandboxEnv::new()
             .await
             .wrap_err("failed to setup sandboxing")?;
+        let sandbox_env_noop = SandboxEnv::noop();
 
         Ok(Arc::new(Self {
             startup_complete: AtomicBool::new(false),
@@ -404,6 +408,7 @@ impl State {
             pool,
             file_watcher,
             sandbox_env,
+            sandbox_env_noop,
         }))
     }
 }
