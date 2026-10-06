@@ -204,18 +204,6 @@ export const actionLogActionMessages = defineMessages({
 		id: 'servers.access-page.activity-log-filter.action.addon-updated',
 		defaultMessage: 'Updated content',
 	},
-	addon_server_enabled: {
-		id: 'servers.access-page.activity-log-filter.action.addon-server-enabled',
-		defaultMessage: 'Toggled content on server',
-	},
-	addon_player_enabled: {
-		id: 'servers.access-page.activity-log-filter.action.addon-player-enabled',
-		defaultMessage: 'Toggled content for players',
-	},
-	addon_side_toggle_locked: {
-		id: 'servers.access-page.activity-log-filter.action.addon-side-toggle-locked',
-		defaultMessage: 'Locked or unlocked side settings',
-	},
 	modpack_changed: {
 		id: 'servers.access-page.activity-log-filter.action.modpack-changed',
 		defaultMessage: 'Changed modpack',
@@ -231,10 +219,6 @@ export const actionLogActionMessages = defineMessages({
 	server_reset: {
 		id: 'servers.access-page.activity-log-filter.action.server-reset',
 		defaultMessage: 'Reset server',
-	},
-	world_data_reset: {
-		id: 'servers.access-page.activity-log-filter.action.world-data-reset',
-		defaultMessage: 'Reset world data',
 	},
 	server_started: {
 		id: 'servers.access-page.activity-log-filter.action.server-started',

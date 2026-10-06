@@ -4640,15 +4640,6 @@
   "servers.access-page.activity-log-filter.action.addon-enabled": {
     "defaultMessage": "Enabled content"
   },
-  "servers.access-page.activity-log-filter.action.addon-player-enabled": {
-    "defaultMessage": "Toggled content for players"
-  },
-  "servers.access-page.activity-log-filter.action.addon-server-enabled": {
-    "defaultMessage": "Toggled content on server"
-  },
-  "servers.access-page.activity-log-filter.action.addon-side-toggle-locked": {
-    "defaultMessage": "Locked or unlocked side settings"
-  },
   "servers.access-page.activity-log-filter.action.addon-updated": {
     "defaultMessage": "Updated content"
   },
@@ -4765,9 +4756,6 @@
   },
   "servers.access-page.activity-log-filter.action.user-removed": {
     "defaultMessage": "Revoked access"
-  },
-  "servers.access-page.activity-log-filter.action.world-data-reset": {
-    "defaultMessage": "Reset world data"
   },
   "servers.access-page.activity-log-filter.add": {
     "defaultMessage": "Add filter"
@@ -4963,24 +4951,6 @@
   },
   "servers.audit-log.event.addon-enabled": {
     "defaultMessage": "Enabled content <content></content>"
-  },
-  "servers.audit-log.event.addon-player-disabled": {
-    "defaultMessage": "Disabled <files></files> for players"
-  },
-  "servers.audit-log.event.addon-player-enabled": {
-    "defaultMessage": "Enabled <files></files> for players"
-  },
-  "servers.audit-log.event.addon-server-disabled": {
-    "defaultMessage": "Disabled <files></files> on the server"
-  },
-  "servers.audit-log.event.addon-server-enabled": {
-    "defaultMessage": "Enabled <files></files> on the server"
-  },
-  "servers.audit-log.event.addon-side-toggle-locked": {
-    "defaultMessage": "Locked side settings for <files></files>"
-  },
-  "servers.audit-log.event.addon-side-toggle-unlocked": {
-    "defaultMessage": "Unlocked side settings for <files></files>"
   },
   "servers.audit-log.event.addon-updated": {
     "defaultMessage": "Updated content <content></content>"
@@ -5182,9 +5152,6 @@
   },
   "servers.audit-log.event.user-removed": {
     "defaultMessage": "Revoked access for <target-user></target-user>"
-  },
-  "servers.audit-log.event.world-data-reset": {
-    "defaultMessage": "Reset world data"
   },
   "servers.audit-log.scope.server": {
     "defaultMessage": "Server"

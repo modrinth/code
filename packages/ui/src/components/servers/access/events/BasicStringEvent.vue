@@ -33,10 +33,6 @@ const messages = defineMessages({
 		id: 'servers.audit-log.event.server-reset',
 		defaultMessage: 'Reset server',
 	},
-	worldDataReset: {
-		id: 'servers.audit-log.event.world-data-reset',
-		defaultMessage: 'Reset world data',
-	},
 	serverStarted: {
 		id: 'servers.audit-log.event.server-started',
 		defaultMessage: 'Started server',
@@ -76,7 +72,6 @@ const actionMessages: Record<string, MessageDescriptor> = {
 	server_reallocated: messages.serverReallocated,
 	server_repaired: messages.serverRepaired,
 	server_reset: messages.serverReset,
-	world_data_reset: messages.worldDataReset,
 	server_started: messages.serverStarted,
 	server_stopped: messages.serverStopped,
 	server_restarted: messages.serverRestarted,
