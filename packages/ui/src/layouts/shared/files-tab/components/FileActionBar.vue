@@ -11,7 +11,7 @@
 			>
 				<div class="m-0 flex min-w-0 flex-shrink list-none items-center p-0">
 					<div
-						v-if="hasNav ? (smallMode ? true : !sidebarOpen) : true"
+						v-if="sidebarToggleable && (hasNav ? (smallMode ? true : !sidebarOpen) : true)"
 						class="mr-2 flex flex-shrink-0 gap-3"
 					>
 						<IconButton
@@ -204,15 +204,18 @@ export type Properties = {
 	showRefreshButton?: boolean
 	showInstallFromUrl?: boolean
 	disabled?: boolean
-	disabledTooltip: string
+	disabledTooltip?: string
 	hasNav?: boolean
 	smallMode?: boolean
 	isRefreshing?: boolean
+	/** Whether the sidebar toggle is offered. */
+	sidebarToggleable?: boolean
 }
 
 const props = withDefaults(defineProps<Properties>(), {
 	hasNav: false,
 	smallMode: false,
+	sidebarToggleable: true,
 })
 
 const smallMode = computed(() => props.smallMode)

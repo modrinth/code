@@ -6,7 +6,7 @@
 		:style="{
 			'--files-navbar-height': `${navbarHeight}px`,
 			'--files-trailing-space': `${trailingSpace}px`,
-			'--files-table-header-top': `calc(var(--files-sticky-top, 0px) + ${navbarHeight}px + ${TAB_STRIP_HEIGHT}px)`,
+			'--files-table-header-top': `calc(var(--files-sticky-top, 0px) + ${navbarHeight}px + ${tabStripHeight}px)`,
 		}"
 	>
 		<div
@@ -19,13 +19,14 @@
 				:is-editor-find-open="ui.fileEditorApi.value?.isFindOpen.value ?? false"
 				:search-query="ui.searchQuery.value"
 				:show-refresh-button="ui.showRefreshButton.value"
-				:show-install-from-url="ctx.showInstallFromUrl"
+				:show-install-from-url="ui.showInstallFromUrl"
 				:base-id="ui.baseId"
 				:disabled="ui.isBusy.value"
 				:disabled-tooltip="ui.busyTooltip.value"
 				:small-mode="props.smallMode"
 				:can-go-back="ui.fileTabs.canGoBack.value"
 				:can-go-forward="ui.fileTabs.canGoForward.value"
+				:sidebar-toggleable="ui.advancedView.value"
 				@back="ui.fileTabs.back"
 				@forward="ui.fileTabs.forward"
 				@navigate="ui.navigateToSegment"
@@ -36,8 +37,8 @@
 				@upload="ui.initiateFileUpload"
 				@upload-zip="() => {}"
 				@unzip-from-url="ui.showUnzipFromUrlModal"
-				@refresh="ctx.refresh"
-				@share="() => ui.shareToMclogs()"
+				@refresh="ui.refresh"
+				@share="() => ui.shareEditorToMclogs()"
 				@find="() => ui.toggleFind()"
 				@toggle-sidebar="() => ui.setSidebarOpen(!sidebarOpen)"
 			/>
@@ -50,26 +51,28 @@
 				:class="
 					isFileActive
 						? 'h-[calc(var(--files-viewport-height,100dvh)_-_var(--files-sticky-top,0px)_-_var(--files-navbar-height,3rem)_-_18px_-_var(--files-trailing-space,0px))] min-h-[24rem]'
-						: 'sticky top-[calc(var(--files-sticky-top,0px)_+_var(--files-navbar-height,0px))] z-20 h-10'
+						: ui.advancedView.value
+							? 'sticky top-[calc(var(--files-sticky-top,0px)_+_var(--files-navbar-height,0px))] z-20 h-10'
+							: 'h-0'
 				"
 			>
 				<FileTabs />
 			</div>
 			<FileManagerError
-				v-if="!isFileActive && ctx.error.value"
+				v-if="!isFileActive && ui.error.value"
 				class="rounded-b-[20px]"
 				:title="formatMessage(messages.errorTitle)"
 				:message="formatMessage(messages.errorMessage)"
-				@refetch="ctx.refresh"
+				@refetch="ui.refresh"
 				@home="() => ui.navigateToSegment(0)"
 			/>
-			<div v-else-if="!isFileActive">
+			<div v-show="!isFileActive && !ui.error.value">
 				<FileUploadDragAndDrop
 					ref="fileUploadRef"
 					class=""
 					:disabled="ui.isBusy.value"
 					@drop-error="ui.handleDropError"
-					@files-dropped="ui.handleDroppedFiles"
+					@files-dropped="ui.uploadFiles"
 				>
 					<FileTableHeader
 						:sort-field="ui.sortField.value"
@@ -80,10 +83,16 @@
 						:columns="shownColumns"
 						:enabled-columns="enabledColumns"
 						:details-enabled="detailsEnabled"
+						:columns-adjustable="ui.advancedView.value"
+						:view-settings-enabled="ui.reworkEnabled.value"
+						:advanced-view="ui.advancedView.value"
+						:colored-icons="ui.coloredIcons.value"
 						@sort="ui.handleSort"
 						@toggle-all="ui.toggleSelectAll"
 						@toggle-column="toggleColumn"
 						@toggle-details="detailsEnabled = !detailsEnabled"
+						@toggle-advanced-view="ui.setAdvancedView(!ui.advancedView.value)"
+						@toggle-colored-icons="ui.setColoredIcons(!ui.coloredIcons.value)"
 					/>
 					<ReadyTransition :pending="listingPending">
 						<div
@@ -100,33 +109,14 @@
 									:file="item"
 									:index="visibleRange.start + idx"
 									:is-last="visibleRange.start + idx === filteredItems.length - 1"
-									:selected="ui.selectedItems.value.has(item.path)"
-									:write-disabled="ui.isBusy.value || !!ctx.isReadOnly?.(item)"
-									:write-disabled-tooltip="
-										ctx.isReadOnly?.(item) ? ctx.readOnlyReason?.value : ui.busyTooltip.value
-									"
 									:columns="shownColumns"
-									:has-hidden-details="hasHiddenDetails"
-									@extract="() => ui.handleExtractItem(item)"
-									@delete="() => ui.showDeleteModal(item)"
-									@rename="() => ui.showRenameModal(item)"
-									@download="() => ui.handleDownload(item)"
-									@zip="() => ui.handleZip(item)"
-									@move="() => ui.showMoveModal(item)"
-									@move-direct-to="ui.handleDirectMove"
-									@edit="() => ui.handleNavigateTo(item)"
-									@navigate="() => ui.handleNavigateTo(item)"
-									@open-in-new-tab="() => ui.handleOpenInNewTab(item)"
-									@hover="() => ui.handleItemPrefetch(item)"
-									@contextmenu="ui.handleContextMenu"
-									@toggle-select="() => ui.toggleItemSelection(item)"
-									@create="ui.showCreateModal"
-									@upload="ui.initiateFileUpload"
+									@navigate="ui.navigateTo"
+									@hover="ui.handleItemPrefetch"
 								/>
 							</div>
 						</div>
 						<div
-							v-else-if="ui.items.value.length === 0 && !ctx.error.value && !ctx.loading.value"
+							v-else-if="ui.items.value.length === 0 && !ui.error.value && !ui.loading.value"
 							class="flex h-full w-full items-center justify-center rounded-b-[20px] bg-surface-2 p-20"
 						>
 							<div class="flex flex-col items-center gap-4 text-center">
@@ -155,7 +145,6 @@ import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import { defineMessages, useVIntl } from '#ui/composables'
 import { useStickyObserver } from '#ui/composables/sticky-observer'
 import { findScrollableAncestor, useVirtualScroll } from '#ui/composables/virtual-scroll.ts'
-import { injectFileManager } from '#ui/layouts'
 import { injectLoadingState } from '#ui/providers/loading-state'
 
 import { useFileColumns } from '../composables/file-columns'
@@ -188,7 +177,6 @@ const messages = defineMessages({
 	},
 })
 
-const ctx = injectFileManager()
 const ui = injectFileBrowserUI()
 
 const props = withDefaults(
@@ -206,7 +194,7 @@ const isFileActive = computed(() => ui.fileTabs.activeLocation.value.type === 'f
 const filteredItems = computed(() => ui.filteredItems.value)
 
 /** Only the listing fades while a directory loads for the first time; tabs, navbar and sidebar stay put. */
-const listingPending = computed(() => ctx.loading.value && ui.items.value.length === 0)
+const listingPending = computed(() => ui.loading.value && ui.items.value.length === 0)
 
 const loadingState = injectLoadingState(null)
 let refreshToken: symbol | null = null
@@ -217,7 +205,7 @@ function endRefreshLoading() {
 }
 
 watch(
-	() => ctx.isRefreshing.value,
+	() => ui.isRefreshing.value,
 	(refreshing) => {
 		if (!refreshing) return endRefreshLoading()
 		if (loadingState && !refreshToken) refreshToken = loadingState.begin()
@@ -234,16 +222,21 @@ const {
 	visibleRange,
 	visibleTop,
 	visibleItems,
+	syncScrollState,
 } = useVirtualScroll(filteredItems, {
 	itemHeight: 3.25,
 	itemUnit: 'rem',
 	bufferSize: 5,
 })
 
-const { detailsEnabled, enabledColumns, shownColumns, hasHiddenDetails, toggleColumn } =
-	useFileColumns(ui.containerWidth)
+const { detailsEnabled, enabledColumns, shownColumns, toggleColumn } = useFileColumns(
+	ui.containerWidth,
+	ui.advancedView,
+)
 
 const TAB_STRIP_HEIGHT = 40
+/** The tab strip is hidden, along with the tabs feature, while the rework is disabled. */
+const tabStripHeight = computed(() => (ui.advancedView.value ? TAB_STRIP_HEIGHT : 0))
 
 const panelRoot = ref<HTMLElement | null>(null)
 const navbarWrapper = ref<HTMLElement | null>(null)
@@ -254,7 +247,7 @@ const tableHeaderStickyTop = computed(() => {
 	const hostOffset = navbarWrapper.value
 		? parseFloat(getComputedStyle(navbarWrapper.value).top) || 0
 		: 0
-	return hostOffset + navbarHeight.value + TAB_STRIP_HEIGHT
+	return hostOffset + navbarHeight.value + tabStripHeight.value
 })
 
 const fileUploadRef = ref<InstanceType<typeof FileUploadDragAndDrop>>()
@@ -363,6 +356,11 @@ function setViewerSnapping(enabled: boolean) {
 }
 
 watch(isFileActive, setViewerSnapping, { flush: 'post' })
+
+/** The listing stays mounted (hidden) while a file is open, so it has to re-measure when shown again. */
+watch(isFileActive, (active) => {
+	if (!active) nextTick(syncScrollState)
+})
 onMounted(() => {
 	setViewerSnapping(isFileActive.value)
 	if (!isFileActive.value) return

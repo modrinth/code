@@ -1,5 +1,5 @@
 import type { Kyros } from '@modrinth/api-client'
-import type { ComputedRef, Ref } from 'vue'
+import type { ComputedRef, MaybeRefOrGetter, Ref } from 'vue'
 
 import { createContext } from '#ui/providers/create-context'
 
@@ -45,6 +45,12 @@ export interface DirectoryTree {
 }
 
 export interface FileManagerContext {
+	/**
+	 * Identifies the files being browsed (e.g. a server or an instance), so the files layout can
+	 * keep a separate, persisted workspace (open tabs and their history) for each of them.
+	 */
+	workspaceId?: MaybeRefOrGetter<string | null>
+
 	currentFile: ComputedRef<FileInfo>
 	currentDirectory: ComputedRef<FileInfo<'directory'>>
 
@@ -58,7 +64,8 @@ export interface FileManagerContext {
 	createItem: (name: string, type: 'file' | 'directory') => Promise<FileInfo | null>
 	renameItem: (file: FileInfo, newName: string) => Promise<FileInfo | null>
 	moveItem: (file: FileInfo, destination: string) => Promise<FileInfo | null>
-	deleteItem: (file: FileInfo, recursive: boolean) => Promise<void>
+	/** Resolves `true` once the entry has been deleted. */
+	deleteItem: (file: FileInfo, recursive: boolean) => Promise<boolean>
 
 	writeFile: (file: FileInfo, content: ArrayBuffer) => Promise<void>
 	downloadFile: (file: FileInfo) => Promise<void>

@@ -6,7 +6,6 @@ import {
 	type ComputedRef,
 	effectScope,
 	markRaw,
-	onMounted,
 	onScopeDispose,
 	type Ref,
 	ref,
@@ -19,7 +18,7 @@ import { useReadyState } from '#ui/composables'
 import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
-import { normalizeDirectoryPath, parentInfoFrom } from '#ui/layouts'
+import { childPath, normalizeDirectoryPath, parentInfoFrom } from '#ui/layouts'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -111,16 +110,23 @@ const busyWarning = computed(() =>
 )
 
 // Path & navigation
-const currentPath = computed(() => (typeof route.query.path === 'string' ? route.query.path : '/'))
 const currentLocation = ref<FileInfo>(infoFromQuery(route))
+const currentDirectory = computed<FileInfo<'directory'>>(() => {
+	const location = currentLocation.value
+	return location.type != 'file'
+		? (location as FileInfo<'directory'>)
+		: parentInfoFrom(location.path)
+})
 
+/**
+ * The URL holds the location's own path, with `editing` marking it as a file, so that
+ * `infoFromQuery` reads back exactly the location that was navigated to.
+ */
 function navigateTo(file: FileInfo) {
-	if (file.type == 'file') {
-		router.push({ query: { ...route.query, path: currentPath.value, editing: 'true' } })
-	} else {
-		const { editing: _, ...query } = route.query
-		router.push({ query: { ...query, path: file.path } })
-	}
+	const { editing: _, ...query } = route.query
+	router.push({
+		query: file.type == 'file' ? { ...query, path: file.path, editing: 'true' } : { ...query, path: file.path },
+	})
 
 	currentLocation.value = file
 }
@@ -138,11 +144,6 @@ watch(
 	},
 	{ deep: true },
 )
-
-// Initialize editing from URL on mount
-function initializeLocation() {
-	currentLocation.value = infoFromQuery(route)
-}
 
 function isVisibleFileItem(item: Kyros.Files.v0.DirectoryItem) {
 	return !item.path.split('/').includes('.modrinth-staged')
@@ -260,7 +261,7 @@ function prefetchFile<T extends QueryableFileTypes, Q>(
 }
 
 function getQueryKey() {
-	return ['files', serverId, normalizeDirectoryPath(currentPath.value)]
+	return ['files', serverId, normalizeDirectoryPath(currentDirectory.value.path)]
 }
 
 const isRefreshing = ref<boolean>(false)
@@ -550,10 +551,6 @@ watch(
 	},
 )
 
-onMounted(async () => {
-	initializeLocation()
-})
-
 // Restart
 async function restartServer() {
 	if (!canUsePowerActions.value) return
@@ -561,7 +558,7 @@ async function restartServer() {
 }
 
 function getSessionUploadFilename(fileName: string) {
-	const basePath = currentPath.value.split('/').filter(Boolean).join('/')
+	const basePath = currentDirectory.value.path.split('/').filter(Boolean).join('/')
 	return basePath ? `${basePath}/${fileName}` : fileName
 }
 
@@ -590,6 +587,11 @@ function cancelUpload() {
 }
 
 const fileQueries = new Map<string, FileItemResultFrom<'file' | 'directory'> & FileQueryResult>()
+
+/** Files and directories are cached apart, so a lookup can never return the other kind's result. */
+function queryCacheKey(info: FileInfo) {
+	return `${info.type == 'file' ? 'file' : 'directory'}:${normalizeDirectoryPath(info.path)}`
+}
 const expandedDirectories: Ref<string[]> = ref([])
 
 /** Owns the lazily created directory queries so they're disposed with this page, wherever they were first requested from. */
@@ -598,52 +600,41 @@ onScopeDispose(() => fileSystemScope.stop())
 
 const directoryTree = {
 	prefetch: <T extends FileTypes>(info: FileInfo<T>) => {
-		if (info.type == 'directory') {
-			if (!fileQueries.has(info.path)) {
-				prefetchDirectory(info as FileInfo<'directory'>)
-			}
-		} else if (info.type == 'file') {
+		if (fileQueries.has(queryCacheKey(info))) return
+		if (info.type == 'file') {
 			prefetchFileEntry(info as FileInfo<'file'>)
+		} else {
+			prefetchDirectory(info as FileInfo<'directory'>)
 		}
 	},
 	get: <T extends FileTypes>(info: FileInfo<T>): FileItemResultFrom<T> & FileQueryResult => {
-		const type = info.type
-		if (type != 'directory' || type != 'file') {
-			let query = fileQueries.get(info.path)
-			if (query == null) {
-				if (type == 'directory') {
-					query = fileSystemScope.run(() => queryDirectoryEntries(info as FileInfo<'directory'>))!
-				} else {
-					query = fileSystemScope.run(() => queryFileEntry(info as FileInfo<'file'>))!
-				}
-				fileQueries.set(query.path, query)
-			}
-			return query as FileItemResultFrom<T> & FileQueryResult
-		} else {
-			throw new Error(
-				`Unable to handle getting query results for given type '${info.type as unknown}'`,
-			)
+		const key = queryCacheKey(info)
+		let query = fileQueries.get(key)
+		if (query == null) {
+			query = fileSystemScope.run(() =>
+				info.type == 'file'
+					? queryFileEntry(info as FileInfo<'file'>)
+					: queryDirectoryEntries(info as FileInfo<'directory'>),
+			)!
+			fileQueries.set(key, query)
 		}
+		return query as FileItemResultFrom<T> & FileQueryResult
 	},
 	expandedEntries: expandedDirectories,
 } satisfies DirectoryTree
 
 // Provide the file manager context
 provideFileManager({
+	workspaceId: `server:${serverId}`,
 	directoryTree,
-	loading: computed(() => directoryTree.get(currentLocation.value).isLoading.value),
-	error: computed(() => directoryTree.get(currentLocation.value).loadError.value ?? null),
+	loading: computed(() => directoryTree.get(currentDirectory.value).isLoading.value),
+	error: computed(() => directoryTree.get(currentDirectory.value).loadError.value ?? null),
 	currentFile: computed(() => currentLocation.value),
-	currentDirectory: computed(() => {
-		const location = currentLocation.value
-		return location.type != 'file'
-			? (location as FileInfo<'directory'>)
-			: parentInfoFrom(location.path)
-	}),
+	currentDirectory,
 	navigateTo,
 	createItem: async (name, type) => {
 		if (fileWriteDisabled.value) return null
-		const path = `${currentPath.value}/${name}`.replace('//', '/')
+		const path = childPath(currentDirectory.value.path, name)
 		await createMutation.mutateAsync({ path, type })
 		return {
 			name: name,
@@ -653,15 +644,18 @@ provideFileManager({
 	},
 	renameItem: async (file, newName) => {
 		if (fileWriteDisabled.value) return null
-		return await renameMutation.mutateAsync({ file, newName })
+		return await renameMutation.mutateAsync({ file, newName }).catch(() => null)
 	},
 	moveItem: async (source, destination) => {
 		if (fileWriteDisabled.value) return null
-		return await moveMutation.mutateAsync({ source, destination })
+		return await moveMutation.mutateAsync({ source, destination }).catch(() => null)
 	},
 	deleteItem: async (file, recursive) => {
-		if (fileWriteDisabled.value) return
-		await deleteMutation.mutateAsync({ file, recursive })
+		if (fileWriteDisabled.value) return false
+		return await deleteMutation
+			.mutateAsync({ file, recursive })
+			.then(() => true)
+			.catch(() => false)
 	},
 	writeFile,
 	downloadFile,
@@ -689,7 +683,7 @@ provideFileManager({
  */
 const initialLoadPending = ref(true)
 watch(
-	() => directoryTree.get(currentLocation.value).filesReadyPending.value,
+	() => directoryTree.get(currentDirectory.value).filesReadyPending.value,
 	(pending) => {
 		if (!pending) initialLoadPending.value = false
 	},

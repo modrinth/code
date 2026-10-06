@@ -24,7 +24,6 @@ export function useFileUndoRedo(
 		if (!lastOperation) return
 
 		try {
-			console.log(lastOperation)
 			switch (lastOperation.type) {
 				case 'move':
 					await moveItem(lastOperation.newFile, lastOperation.prevFile.path)

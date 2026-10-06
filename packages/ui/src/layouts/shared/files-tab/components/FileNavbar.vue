@@ -153,6 +153,7 @@ const props = withDefaults(
 	>(),
 	{
 		hasNav: true,
+		sidebarToggleable: true,
 	},
 )
 

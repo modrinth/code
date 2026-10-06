@@ -1,11 +1,11 @@
 import type { Component, ComputedRef, Ref, ShallowRef } from 'vue'
 
 import type { ButtonMenuOption } from '#ui/components'
-import type { FileInfo } from '#ui/layouts/shared/files-tab/providers/file-manager.ts'
 import { createContext } from '#ui/providers/create-context'
 
 import type { FileTabs } from '../composables/file-tabs'
 import type { FileItem, FileSortField } from '../types'
+import type { FileInfo, FileManagerContext } from './file-manager'
 
 /**
  * API exposed by each tab's file editor, registered on `FileTabs` on mount
@@ -20,14 +20,29 @@ export interface FileEditorBridge {
 	toggleFind: () => void
 }
 
-export interface FileBrowserUIContext {
+/**
+ * The file manager context as seen by the files layout's components. Members shared with
+ * {@link FileManagerContext} are passed through from the host, except for the ones overridden
+ * here, which additionally respect the busy/read-only state, record undo history and keep the
+ * open tabs following moved, renamed and deleted entries.
+ */
+export interface FileBrowserUIContext extends FileManagerContext {
 	baseId: string
 	showDebugInfo: ComputedRef<boolean>
 	showRefreshButton: ComputedRef<boolean>
+	/** Whether the files tab rework feature flag is on, which offers the view settings. */
+	reworkEnabled: ComputedRef<boolean>
+	/** Whether the advanced view (sidebar tree, tabs and column picker) is in use. */
+	advancedView: ComputedRef<boolean>
+	setAdvancedView: (value: boolean) => Promise<void>
+	/** Whether file and folder icons are tinted by type. */
+	coloredIcons: ComputedRef<boolean>
+	setColoredIcons: (value: boolean) => void
 
 	items: ComputedRef<FileItem[]>
 	filteredItems: ComputedRef<FileItem[]>
 	isEditing: ComputedRef<boolean>
+	/** Busy, or the active location is read-only. */
 	isBusy: ComputedRef<boolean>
 	busyTooltip: ComputedRef<string | undefined>
 	activeLocation: ComputedRef<FileInfo>
@@ -56,11 +71,13 @@ export interface FileBrowserUIContext {
 	hasUnsavedChanges: ComputedRef<boolean>
 	saveFileContent: (exit?: boolean) => Promise<void>
 	revertChanges: () => void
-	shareToMclogs: () => Promise<void>
+	/** Shares the active tab's file to mclo.gs. */
+	shareEditorToMclogs: () => Promise<void>
 	toggleFind: () => void
 
+	/** Navigates the active tab, rather than the host directly. */
+	navigateTo: (file: FileInfo) => Promise<void>
 	navigateToSegment: (index: number) => void
-	handleNavigateTo: (item: FileInfo) => void
 	handleOpenInNewTab: (item: FileInfo) => void
 	handleEditorClose: () => Promise<void>
 	handleHomePrefetch: () => void
@@ -73,12 +90,12 @@ export interface FileBrowserUIContext {
 	showBulkDeleteModal: () => void
 	showUnzipFromUrlModal: (cf: boolean) => void
 
-	handleDownload: (item: FileItem) => Promise<void>
-	handleZip: (item: FileItem) => Promise<void>
-	handleDirectMove: (moveData: FileInfo, destination: string) => Promise<void>
+	downloadFile: (file: FileInfo) => Promise<void>
+	zipFolder?: (file: FileInfo) => Promise<void>
 	handleExtractItem: (item: FileInfo) => Promise<void>
 
-	handleDroppedFiles: (files: File[]) => void
+	/** Uploads into the current directory, unless busy or a file is open. */
+	uploadFiles: (files: File[]) => void
 	handleDropError: (error: unknown) => void
 	initiateFileUpload: () => Promise<void>
 

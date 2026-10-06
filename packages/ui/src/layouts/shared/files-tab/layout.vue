@@ -65,14 +65,10 @@
 				<FileBrowserPanel :small-mode="smallMode" />
 			</div>
 		</div>
-		<template v-if="smallMode">
+		<template v-if="smallMode && advancedView">
 			<NewModal
 				ref="sidebarModal"
-				:on-hide="
-					() => {
-						if (smallMode) sidebarOpen = false
-					}
-				"
+				:on-hide="() => (sidebarModalOpen = false)"
 				:noblur="true"
 				:no-padding="true"
 				:hide-header="true"
@@ -159,15 +155,23 @@
 import { FolderArchiveIcon, HistoryIcon, SaveIcon, TrashIcon } from '@modrinth/assets'
 import { type MaybeElement, useLocalStorage, useResizeObserver } from '@vueuse/core'
 import type { Component } from 'vue'
-import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, shallowRef, toValue, watch } from 'vue'
 
 import { type ButtonMenuOption, NewModal } from '#ui/components'
 import { Button, ContextMenu } from '#ui/components/base/buttons'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useFileTabs } from '#ui/layouts/shared/files-tab/composables/file-tabs.ts'
-import { parentDirectory, parentInfoFrom } from '#ui/layouts/shared/files-tab/utils.ts'
+import {
+	childPath,
+	infoFrom,
+	isWithinPath,
+	parentDirectory,
+	parentInfoFrom,
+	relocateInfo,
+} from '#ui/layouts/shared/files-tab/utils.ts'
 import { injectFilePicker } from '#ui/providers/file-picker'
+import { injectPageContext } from '#ui/providers/page-context'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { commonMessages } from '#ui/utils/common-messages'
 import { canOpenInFileEditor } from '#ui/utils/file-extensions'
@@ -253,6 +257,21 @@ const props = defineProps<{
 const { addNotification } = injectNotificationManager()
 const ctx = injectFileManager()
 const filePicker = injectFilePicker(null)
+const pageContext = injectPageContext(null)
+
+const reworkEnabled = computed(() => pageContext?.featureFlags?.filesTabRework?.value ?? false)
+
+const advancedViewSetting = useLocalStorage('files-advanced-view', true, { initOnMounted: true })
+const coloredIconsSetting = useLocalStorage('files-colored-icons', true, { initOnMounted: true })
+/** The sidebar tree, tabs and column picker; behind the rework flag, then a user preference. */
+const advancedView = computed(() => reworkEnabled.value && advancedViewSetting.value)
+const coloredIcons = computed(() => !reworkEnabled.value || coloredIconsSetting.value)
+
+/** Switching to the simple view drops the extra tabs, so their unsaved changes are confirmed first. */
+async function setAdvancedView(value: boolean) {
+	if (!value && !(await confirmDiscardEditors(fileTabs.editors.values()))) return
+	advancedViewSetting.value = value
+}
 
 const editorComponent = shallowRef<Component | null>(null)
 import('vue3-ace-editor').then(async (mod) => {
@@ -326,8 +345,8 @@ const selectionParent = computed(() => {
 })
 
 const { recordOperation, onKeydown } = useFileUndoRedo(
-	(file, newName) => ctx.renameItem(file, newName),
-	(source, dest) => ctx.moveItem(source, dest),
+	renameEntry,
+	moveEntry,
 	() => ctx.refresh(),
 	(title, text, type) => addNotification({ title, text, type }),
 )
@@ -335,6 +354,8 @@ const { recordOperation, onKeydown } = useFileUndoRedo(
 const fileTabs = useFileTabs({
 	ctx,
 	confirmDiscard: confirmDiscardEditors,
+	workspaceId: () => (advancedView.value ? (toValue(ctx.workspaceId) ?? null) : null),
+	enabled: advancedView,
 })
 
 const fileEditorApi = fileTabs.activeEditor
@@ -352,7 +373,7 @@ function revertChanges() {
 	for (const editor of dirtyEditors()) editor.revertChanges()
 }
 
-async function shareToMclogs() {
+async function shareEditorToMclogs() {
 	await fileEditorApi.value?.shareToMclogs()
 }
 
@@ -384,16 +405,29 @@ const SIDEBAR_DEFAULT_WIDTH = 300
 
 const browserMinSize = computed(() => (props.constrainWidth ? 700 : 1200))
 
+/** Whether the docked sidebar is open, remembered across visits. */
 const sidebarOpenSetting = useLocalStorage('file-layout-sidebar-open', false, {
 	initOnMounted: true,
 })
-const sidebarOpen = ref(sidebarOpenSetting.value)
 const sidebarWidthSetting = useLocalStorage('file-layout-sidebar-width', SIDEBAR_DEFAULT_WIDTH, {
 	initOnMounted: true,
 })
+/** The pullout sidebar used in small mode is transient, so it doesn't touch the saved setting. */
+const sidebarModalOpen = ref(false)
 
-watch(sidebarOpen, (value) => {
-	if (!smallMode.value) return
+const sidebarOpen = computed(() =>
+	smallMode.value ? sidebarModalOpen.value : sidebarOpenSetting.value,
+)
+
+function setSidebarOpen(value: boolean) {
+	if (smallMode.value) {
+		sidebarModalOpen.value = value
+	} else {
+		sidebarOpenSetting.value = value
+	}
+}
+
+watch(sidebarModalOpen, (value) => {
 	if (value) {
 		sidebarModal.value?.show()
 	} else {
@@ -416,7 +450,9 @@ useResizeObserver(mainColumn, (entries) => {
 
 const smallMode = computed(() => shellWidth.value == null || shellWidth.value < 1100)
 const fullWidthSidebar = computed(() => shellWidth.value == null || shellWidth.value < 400)
-const showDockedSidebar = computed(() => !smallMode.value && sidebarOpen.value)
+const showDockedSidebar = computed(
+	() => advancedView.value && !smallMode.value && sidebarOpenSetting.value,
+)
 
 const maxSidebarWidth = computed(() =>
 	Math.max(SIDEBAR_MIN_WIDTH, (shellWidth.value ?? 0) - browserMinSize.value),
@@ -464,14 +500,8 @@ function resetSidebarWidth() {
 	sidebarWidthSetting.value = SIDEBAR_DEFAULT_WIDTH
 }
 
-let pastInitialSetup = false
-
 watch(smallMode, (value) => {
-	if (pastInitialSetup) {
-		sidebarOpen.value = !value
-	} else {
-		pastInitialSetup = true
-	}
+	if (!value) sidebarModalOpen.value = false
 })
 
 /**
@@ -495,8 +525,8 @@ async function navigateToSegment(index: number) {
 	await fileTabs.navigate(parentInfoFrom(activeLocation.value, index))
 }
 
-async function handleNavigateTo(item: FileInfo) {
-	await fileTabs.navigate(item)
+async function navigateTo(file: FileInfo) {
+	await fileTabs.navigate(file)
 }
 
 function handleOpenInNewTab(item: FileInfo) {
@@ -510,77 +540,96 @@ async function handleEditorClose() {
 	await fileTabs.navigate(parentInfoFrom(location))
 }
 
-// CRUD handlers
+/** Keeps the open tabs and the sidebar tree's expanded folders following a moved or renamed entry. */
+function followRelocation(from: FileInfo, to: FileInfo) {
+	fileTabs.relocate(from, to)
+	const expanded = ctx.directoryTree.expandedEntries
+	expanded.value = expanded.value.map(
+		(path) => relocateInfo(infoFrom(path), from.path, to.path).path,
+	)
+}
+
+/** Sends tabs within a deleted entry to its parent, and drops it from the tree's expanded folders. */
+function followDeletion(file: FileInfo) {
+	fileTabs.forget(file)
+	const expanded = ctx.directoryTree.expandedEntries
+	expanded.value = expanded.value.filter((path) => !isWithinPath(path, file.path))
+}
+
+/** Renames through the host without recording undo history, as undo/redo itself does. */
+async function renameEntry(file: FileInfo, newName: string) {
+	if (!(await fileTabs.confirmDiscardWithin([file.path]))) return null
+	const renamed = await ctx.renameItem(file, newName)
+	if (renamed) followRelocation(file, renamed)
+	return renamed
+}
+
+/** Moves through the host without recording undo history, as undo/redo itself does. */
+async function moveEntry(file: FileInfo, destination: string) {
+	if (!(await fileTabs.confirmDiscardWithin([file.path]))) return null
+	const moved = await ctx.moveItem(file, destination)
+	if (moved) followRelocation(file, moved)
+	return moved
+}
+
+async function createItem(name: string, type: 'file' | 'directory') {
+	if (isBusy.value) return null
+	return ctx.createItem(name, type)
+}
+
+async function renameItem(file: FileInfo, newName: string) {
+	if (isBusy.value) return null
+	const renamed = await renameEntry(file, newName)
+	if (renamed) recordOperation({ type: 'rename', prevFile: file, newFile: renamed })
+	return renamed
+}
+
+async function moveItem(file: FileInfo, destination: string) {
+	if (isBusy.value) return null
+	const moved = await moveEntry(file, destination)
+	if (moved) recordOperation({ type: 'move', prevFile: file, newFile: moved })
+	return moved
+}
+
+async function deleteItem(file: FileInfo, recursive: boolean) {
+	if (isBusy.value) return false
+	if (!(await fileTabs.confirmDiscardWithin([file.path]))) return false
+	const deleted = await ctx.deleteItem(file, recursive)
+	if (deleted) followDeletion(file)
+	return deleted
+}
+
 async function handleCreateNewItem(name: string) {
-	if (isBusy.value) return
-	await ctx.createItem(name, newItemType.value)
+	await createItem(name, newItemType.value)
 }
 
 async function handleRenameItem(newName: string) {
-	if (isBusy.value) return
 	const item = selectedItem.value
 	if (!item) return
-
-	const newFile = await ctx.renameItem(item, newName)
-	if (newFile != null) {
-		recordOperation({
-			type: 'rename',
-			prevFile: item,
-			newFile: newFile,
-		})
-	}
+	await renameItem(item, newName)
 }
 
 async function handleMoveItem(destination: string) {
-	if (isBusy.value) return
 	const item = selectedItem.value
 	if (!item) return
-
-	const dest = `${destination}/${item.name}`.replace('//', '/')
-
-	const newFile = await ctx.moveItem(item, dest)
-	if (newFile != null) {
-		recordOperation({
-			type: 'move',
-			prevFile: item,
-			newFile: newFile,
-		})
-	}
+	await moveItem(item, childPath(destination, item.name))
 }
 
-function handleDeleteItem() {
-	if (isBusy.value) return
+async function handleDeleteItem() {
 	const item = selectedItem.value
 	if (!item) return
-
-	ctx.deleteItem(item, item.type === 'directory')
+	await deleteItem(item, item.type === 'directory')
 }
 
-async function handleDirectMove(file: FileInfo, destination: string) {
-	if (isBusy.value) return
-	const dest = `${destination}/${file.name}`.replace('//', '/')
-
-	const newFile = await ctx.moveItem(file, dest)
-
-	if (newFile != null) {
-		recordOperation({
-			type: 'move',
-			prevFile: file,
-			newFile: newFile,
-		})
+async function downloadFile(file: FileInfo) {
+	if (file.type === 'file') {
+		await ctx.downloadFile(file)
 	}
 }
 
-// Download
-async function handleDownload(item: FileInfo) {
-	if (item.type === 'file') {
-		await ctx.downloadFile(item)
-	}
-}
-
-async function handleZip(item: FileInfo) {
-	if (isBusy.value || item.type !== 'directory' || !ctx.zipFolder) return
-	await ctx.zipFolder(item as FileInfo<'directory'>)
+async function zipFolder(file: FileInfo) {
+	if (isBusy.value || file.type !== 'directory' || !ctx.zipFolder) return
+	await ctx.zipFolder(file as FileInfo<'directory'>)
 }
 
 async function handleZipSelection(target: string) {
@@ -663,18 +712,22 @@ function showDeleteModal(item: FileItem) {
 	deleteItemModal.value?.show()
 }
 
-function showBulkDeleteModal() {
+async function showBulkDeleteModal() {
 	if (isBusy.value || selectionReadOnly.value) return
 	if (selectedItems.value.size === 0) return
 
-	for (const item of selectedItems.value.values()) {
-		ctx.deleteItem(item, item.type === 'directory')
-	}
+	const files = [...selectedItems.value.values()]
+	if (!(await fileTabs.confirmDiscardWithin(files.map((file) => file.path)))) return
 	deselectAll()
+
+	await Promise.all(
+		files.map(async (file) => {
+			if (await ctx.deleteItem(file, file.type === 'directory')) followDeletion(file)
+		}),
+	)
 }
 
-// Upload
-function handleDroppedFiles(files: File[]) {
+function uploadFiles(files: File[]) {
 	if (isEditing.value || isBusy.value) return
 	ctx.uploadFiles(files)
 }
@@ -744,9 +797,16 @@ function handleContextMenu(event: MouseEvent, options: ButtonMenuOption[]) {
 // tabs. Dockview mounts tab panels itself (teleported, so still Vue descendants), which means
 // prop/emit/ref bindings can't reach them but provide/inject does. See providers/file-browser-ui.ts.
 provideFileBrowserUI({
+	...ctx,
+
 	baseId,
 	showDebugInfo: computed(() => props.showDebugInfo ?? false),
 	showRefreshButton: computed(() => props.showRefreshButton ?? false),
+	reworkEnabled,
+	advancedView,
+	setAdvancedView,
+	coloredIcons,
+	setColoredIcons: (value) => (coloredIconsSetting.value = value),
 
 	items,
 	filteredItems,
@@ -754,11 +814,8 @@ provideFileBrowserUI({
 	isBusy,
 	busyTooltip,
 	activeLocation,
-	sidebarOpen: computed(() => sidebarOpen.value),
-	setSidebarOpen: (value) => {
-		sidebarOpen.value = value
-		sidebarOpenSetting.value = value
-	},
+	sidebarOpen: computed(() => advancedView.value && sidebarOpen.value),
+	setSidebarOpen,
 	containerWidth,
 
 	searchQuery,
@@ -779,11 +836,11 @@ provideFileBrowserUI({
 	hasUnsavedChanges,
 	saveFileContent,
 	revertChanges,
-	shareToMclogs,
+	shareEditorToMclogs,
 	toggleFind,
 
+	navigateTo,
 	navigateToSegment,
-	handleNavigateTo,
 	handleOpenInNewTab,
 	handleEditorClose,
 	handleHomePrefetch,
@@ -796,12 +853,15 @@ provideFileBrowserUI({
 	showBulkDeleteModal,
 	showUnzipFromUrlModal,
 
-	handleDownload,
-	handleZip,
-	handleDirectMove,
+	createItem,
+	renameItem,
+	moveItem,
+	deleteItem,
+	downloadFile,
+	zipFolder: ctx.zipFolder ? zipFolder : undefined,
 	handleExtractItem,
 
-	handleDroppedFiles,
+	uploadFiles,
 	handleDropError,
 	initiateFileUpload,
 

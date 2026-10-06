@@ -1,6 +1,6 @@
 import { useLocalStorage } from '@vueuse/core'
-import type { Ref } from 'vue'
-import { computed } from 'vue'
+import type { MaybeRefOrGetter, Ref } from 'vue'
+import { computed, toValue } from 'vue'
 
 import type { FileSortField } from '../types'
 
@@ -39,19 +39,31 @@ function columnsWidth(columns: FileColumn[]) {
 	)
 }
 
+const DEFAULT_ENABLED_COLUMNS: FileColumn[] = ['size', 'items', 'modified', 'created']
+
 /**
- * Which detail columns the file listing shows. Users pick the columns (persisted to local
- * storage) and can switch details off entirely; enabled columns are then dropped, least
- * important first, whenever they would squeeze file names below a readable width.
+ * Which detail columns the file listing shows. When `adjustable`, users pick the columns
+ * (persisted to local storage) and can switch details off entirely; otherwise every column is
+ * enabled. Enabled columns are then dropped, least important first, whenever they would
+ * squeeze file names below a readable width.
  */
-export function useFileColumns(containerWidth: Ref<number | undefined>) {
-	const detailsEnabled = useLocalStorage('files-details-enabled', true)
-	const enabledColumns = useLocalStorage<FileColumn[]>('files-visible-columns', [
-		'size',
-		'items',
-		'modified',
-		'created',
-	])
+export function useFileColumns(
+	containerWidth: Ref<number | undefined>,
+	adjustable: MaybeRefOrGetter<boolean>,
+) {
+	const storedDetailsEnabled = useLocalStorage('files-details-enabled', true)
+	const storedEnabledColumns = useLocalStorage<FileColumn[]>(
+		'files-visible-columns',
+		DEFAULT_ENABLED_COLUMNS,
+	)
+
+	const detailsEnabled = computed({
+		get: () => !toValue(adjustable) || storedDetailsEnabled.value,
+		set: (value) => (storedDetailsEnabled.value = value),
+	})
+	const enabledColumns = computed(() =>
+		toValue(adjustable) ? storedEnabledColumns.value : DEFAULT_ENABLED_COLUMNS,
+	)
 
 	const shownColumns = computed<FileColumn[]>(() => {
 		if (!detailsEnabled.value || containerWidth.value == null) return []
@@ -68,20 +80,16 @@ export function useFileColumns(containerWidth: Ref<number | undefined>) {
 		return columns
 	})
 
-	/** Whether some details aren't visible as columns, so rows should offer them in a tooltip. */
-	const hasHiddenDetails = computed(() => shownColumns.value.length < FILE_COLUMNS.length)
-
 	function toggleColumn(id: FileColumn) {
-		enabledColumns.value = enabledColumns.value.includes(id)
-			? enabledColumns.value.filter((column) => column !== id)
-			: [...enabledColumns.value, id]
+		storedEnabledColumns.value = storedEnabledColumns.value.includes(id)
+			? storedEnabledColumns.value.filter((column) => column !== id)
+			: [...storedEnabledColumns.value, id]
 	}
 
 	return {
 		detailsEnabled,
 		enabledColumns,
 		shownColumns,
-		hasHiddenDetails,
 		toggleColumn,
 	}
 }

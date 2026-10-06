@@ -57,5 +57,5 @@ export function infoFromQuery(
 		(value as Partial<RouteLocationNormalizedLoadedGeneric>).name != null
 			? (value.query as LocationQuery)
 			: (value as LocationQuery)
-	return infoFrom(query.path === 'string' ? query.path : '/', query.editing === 'true')
+	return infoFrom(typeof query.path === 'string' ? query.path : '/', query.editing === 'true')
 }

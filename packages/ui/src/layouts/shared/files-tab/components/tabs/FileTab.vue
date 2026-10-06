@@ -5,7 +5,7 @@
 		:title="location?.path"
 		@auxclick.prevent="(event) => event.button === 1 && close()"
 	>
-		<component :is="icon" class="size-4 shrink-0 text-secondary" />
+		<component :is="iconStyle.icon" class="size-4 shrink-0" :class="iconStyle.color" />
 		<span class="truncate" :class="isActive ? 'font-semibold text-contrast' : 'text-secondary'">
 			{{ label }}
 		</span>
@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { FileIcon, FolderOpenIcon, XIcon } from '@modrinth/assets'
+import { HomeIcon, XIcon } from '@modrinth/assets'
 import type { DockviewPanelApi } from 'dockview-vue'
 import { computed } from 'vue'
 
@@ -42,6 +42,7 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 import { currentLocation, type FileTabPanelParams } from '../../composables/file-tabs'
 import { injectFileBrowserUI } from '../../providers/file-browser-ui'
+import { fileIconFor } from '../../utils'
 
 const props = defineProps<{
 	params: {
@@ -79,7 +80,12 @@ const label = computed(() => {
 	const path = location.value?.path ?? '/'
 	return path.split('/').filter(Boolean).pop() ?? formatMessage(messages.home)
 })
-const icon = computed(() => (location.value?.kind === 'file' ? FileIcon : FolderOpenIcon))
+const iconStyle = computed(() => {
+	const current = location.value
+	if (!current || current.path === '/') return { icon: HomeIcon, color: 'text-secondary' }
+	const style = fileIconFor(current)
+	return ui.coloredIcons.value ? style : { ...style, color: 'text-secondary' }
+})
 const isActive = computed(() => ui.fileTabs.activeTabId.value === tabId)
 const canClose = computed(() => ui.fileTabs.tabs.value.length > 1)
 const isDirty = computed(() => ui.fileTabs.editors.get(tabId)?.hasUnsavedChanges.value ?? false)

@@ -11,17 +11,17 @@
 			:active-location="ui.activeLocation.value"
 			:search-query="ui.searchQuery.value"
 			:show-refresh-button="ui.showRefreshButton.value"
-			:show-install-from-url="ctx.showInstallFromUrl"
+			:show-install-from-url="ui.showInstallFromUrl"
 			:disabled="ui.isBusy.value"
 			:disabled-tooltip="ui.busyTooltip.value"
-			:is-refreshing="ctx.isRefreshing.value"
+			:is-refreshing="ui.isRefreshing.value"
 			@update:search-query="(value) => (ui.searchQuery.value = value)"
 			@create="ui.showCreateModal"
 			@upload="ui.initiateFileUpload"
 			@upload-zip="() => {}"
 			@unzip-from-url="ui.showUnzipFromUrlModal"
-			@refresh="() => ctx.refresh()"
-			@share="() => ui.shareToMclogs()"
+			@refresh="() => ui.refresh()"
+			@share="() => ui.shareEditorToMclogs()"
 			@find="() => ui.toggleFind()"
 			@toggle-sidebar="() => ui.setSidebarOpen(!ui.sidebarOpen.value)"
 		/>
@@ -38,13 +38,10 @@
 </template>
 
 <script setup lang="ts">
-import { injectFileManager } from '#ui/layouts/index.ts'
-
 import { injectFileBrowserUI } from '../providers/file-browser-ui'
 import FileActionBar from './FileActionBar.vue'
 import FileTree from './FileTree.vue'
 
-const ctx = injectFileManager()
 const ui = injectFileBrowserUI()
 
 withDefaults(

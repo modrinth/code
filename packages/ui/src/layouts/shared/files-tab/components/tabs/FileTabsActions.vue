@@ -18,6 +18,7 @@ import { PlusIcon } from '@modrinth/assets'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 import { injectFileBrowserUI } from '../../providers/file-browser-ui'
+import { infoFrom } from '../../utils'
 
 defineProps<{
 	params?: unknown
@@ -35,6 +36,6 @@ const messages = defineMessages({
 const ui = injectFileBrowserUI()
 
 function openNewTab() {
-	ui.fileTabs.openTab({ kind: 'directory', path: '/' })
+	ui.fileTabs.openTab(infoFrom('/'))
 }
 </script>

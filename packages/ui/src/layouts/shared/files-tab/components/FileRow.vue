@@ -1,5 +1,10 @@
 <template>
-	<Tooltip :delay="{ hover: 850, unhover: 100 }" :hoverable="true" :allow-transfer="false">
+	<Tooltip
+		:delay="{ hover: 850, unhover: 100 }"
+		:hoverable="true"
+		:allow-transfer="false"
+		:disabled="hiddenDetails.length === 0"
+	>
 		<li
 			role="option"
 			:class="[containerClasses, isDragSource ? 'opacity-50' : '', compact ? 'h-8' : 'h-[3.25rem]']"
@@ -39,7 +44,7 @@
 					tabindex="-1"
 					class="pointer-events-auto -mr-1 flex size-5 shrink-0 items-center justify-center rounded border-none bg-transparent p-0 text-secondary hover:bg-surface-5 hover:text-contrast h-full"
 					:aria-label="formatMessage(expanded ? messages.collapseFolder : messages.expandFolder)"
-					@click.stop="emit('toggle-expand')"
+					@click.stop="emit('toggle-expand', file)"
 					@pointerdown.stop
 				>
 					<ChevronRightIcon
@@ -53,13 +58,17 @@
 					class="pointer-events-auto"
 					:model-value="selected"
 					@click.stop
-					@update:model-value="emit('toggle-select')"
+					@update:model-value="ui.toggleItemSelection(file)"
 				/>
 				<div class="pointer-events-none flex size-5 shrink-0 items-center justify-center">
 					<component
-						:is="iconComponent"
-						class="group-hover:text-contrast group-focus:text-contrast"
-						:class="compact ? 'size-4' : 'size-5'"
+						:is="iconStyle.icon"
+						:class="[
+							ui.coloredIcons.value
+								? iconStyle.color
+								: 'group-hover:text-contrast group-focus:text-contrast',
+							compact ? 'size-4' : 'size-5',
+						]"
 					/>
 				</div>
 				<div class="pointer-events-none flex flex-col truncate">
@@ -116,15 +125,13 @@
 				>
 					{{ formatMessage(messages.details) }}
 				</h3>
-				<div v-for="key in FILE_COLUMNS_ORDER" :key="key" class="gap-1 grid grid-cols-2">
-					<template v-if="columnValues[key] != null">
-						<span class="text-nowrap text-sm text-secondary">
-							{{ formatMessage(messages[key]) }}
-						</span>
-						<span class="text-nowrap text-sm text-secondary">
-							{{ columnValues[key] ?? ' - ' }}
-						</span>
-					</template>
+				<div v-for="key in hiddenDetails" :key="key" class="gap-1 grid grid-cols-2">
+					<span class="text-nowrap text-sm text-secondary">
+						{{ formatMessage(messages[key]) }}
+					</span>
+					<span class="text-nowrap text-sm text-secondary">
+						{{ columnValues[key] }}
+					</span>
 				</div>
 			</div>
 		</template>
@@ -133,26 +140,20 @@
 
 <script setup lang="ts">
 import {
-	BoxIcon,
-	BracesIcon,
 	ChevronRightIcon,
 	ClipboardCopyIcon,
 	DownloadIcon,
 	EditIcon,
 	FileIcon,
 	FolderArchiveIcon,
-	FolderCogIcon,
 	FolderOpenIcon,
-	GlassesIcon,
-	GlobeIcon,
 	MoreHorizontalIcon,
 	PackageOpenIcon,
-	PaintbrushIcon,
 	PlusIcon,
 	RightArrowIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { computed, ref } from 'vue'
+import { computed, ref, toValue } from 'vue'
 
 import { Tooltip } from '#ui/components'
 import type { ButtonMenuLeafOption, ButtonMenuOption } from '#ui/components/base/buttons'
@@ -161,10 +162,8 @@ import Checkbox from '#ui/components/base/Checkbox.vue'
 import { useFormatBytes } from '#ui/composables'
 import { useFormatDateTime } from '#ui/composables/format-date-time'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { infoFrom, injectFileManager } from '#ui/layouts'
 import { useFileActions } from '#ui/layouts/shared/files-tab/composables/folder-actions.ts'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
-import { getFileExtensionIcon } from '#ui/utils/auto-icons'
 import { commonMessages } from '#ui/utils/common-messages'
 import { canOpenInFileEditor, getFileExtension } from '#ui/utils/file-extensions'
 
@@ -176,12 +175,13 @@ import {
 	startFileDrag,
 	wasRecentDrag,
 } from '../composables/file-drag-state'
+import { injectFileBrowserUI } from '../providers/file-browser-ui'
 import type { FileItem } from '../types'
-import { joinDisplayPath } from '../utils'
+import { childPath, fileIconFor, infoFrom, joinDisplayPath } from '../utils'
 
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
-const ctx = injectFileManager()
+const ui = injectFileBrowserUI()
 
 const basePaddingFactor = 0.75
 
@@ -236,13 +236,8 @@ const props = defineProps<{
 	index: number
 	file: FileItem
 	isLast: boolean
-	selected: boolean
-	writeDisabled?: boolean
-	writeDisabledTooltip?: string
-	/** Detail columns to render, in order. */
+	/** Detail columns to render, in order. Details not shown as columns are offered in a tooltip. */
 	columns?: FileColumn[]
-	/** Whether some details aren't shown as columns, so hovering offers them in a tooltip. */
-	hasHiddenDetails?: boolean
 	selectionWithinActionMenu?: boolean
 	/** Smaller row, used by the sidebar tree. */
 	compact?: boolean
@@ -260,27 +255,23 @@ const props = defineProps<{
 	activeGuideLevel?: number
 }>()
 
+/**
+ * Row actions go straight to the browser UI context. Only what differs between the listing and
+ * the sidebar tree is emitted, with the row's file as payload, so parents can bind handlers by
+ * reference; inline handlers would re-render every row whenever the parent renders.
+ */
 const emit = defineEmits<{
-	(
-		e:
-			| 'rename'
-			| 'move'
-			| 'download'
-			| 'zip'
-			| 'delete'
-			| 'edit'
-			| 'extract'
-			| 'hover'
-			| 'navigate'
-			| 'open-in-new-tab',
-		item: Pick<FileItem, 'name' | 'type' | 'path'>,
-	): void
-	(e: 'create', type: 'file' | 'directory'): void
-	(e: 'upload', type: 'file' | 'zip'): void
-	(e: 'moveDirectTo', item: Pick<FileItem, 'name' | 'type' | 'path'>, destination: string): void
-	(e: 'contextmenu', event: MouseEvent, options: ButtonMenuOption[]): void
-	(e: 'toggle-select' | 'toggle-expand'): void
+	navigate: [file: FileItem]
+	hover: [file: FileItem]
+	'toggle-expand': [file: FileItem]
 }>()
+
+const selected = computed(() => ui.selectedItems.value.has(props.file.path))
+const readOnly = computed(() => !!ui.isReadOnly?.(props.file))
+const writeDisabled = computed(() => ui.isBusy.value || readOnly.value)
+const writeDisabledTooltip = computed(() =>
+	readOnly.value ? toValue(ui.readOnlyReason) : ui.busyTooltip.value,
+)
 
 const canExpand = computed(
 	() => !!props.isTreeRow && props.file.type === 'directory' && props.expandable !== false,
@@ -289,7 +280,9 @@ const canExpand = computed(
 const shownColumnDefinitions = computed(() =>
 	(props.columns ?? []).flatMap((id) => FILE_COLUMNS.filter((column) => column.id === id)),
 )
-const canOpenInTab = computed(() => props.file.type === 'directory' || isEditableFile.value)
+const canOpenInTab = computed(
+	() => ui.advancedView.value && (props.file.type === 'directory' || isEditableFile.value),
+)
 
 const isDropTarget = computed(
 	() =>
@@ -320,7 +313,7 @@ const containerClasses = computed(() => {
 			? '!bg-brand-highlight'
 			: props.active
 				? 'bg-brand-highlight'
-				: props.selected
+				: selected.value
 					? 'bg-surface-2.5'
 					: props.compact
 						? 'bg-transparent'
@@ -337,21 +330,21 @@ const containerClasses = computed(() => {
 
 const fileExtension = computed(() => getFileExtension(props.file.name))
 
-const canExtract = computed(() => fileExtension.value === 'zip' && !!ctx.extractFile)
+const canExtract = computed(() => fileExtension.value === 'zip' && !!ui.extractFile)
 
 function getFullPath() {
-	return joinDisplayPath(ctx.basePath?.value, props.file.path)
+	return joinDisplayPath(toValue(ui.basePath), props.file.path)
 }
 
 const { options } = useFileActions(
-	(type) => emit('create', type),
-	(type) => emit('upload', type),
+	(type) => ui.showCreateModal(type),
+	() => ui.initiateFileUpload(),
 )
 
 const menuOptions = computed<ButtonMenuOption[]>(() => {
 	const item = infoFrom(props.file)
-	const wd = props.writeDisabled
-	const wdTooltip = props.writeDisabledTooltip
+	const wd = writeDisabled.value
+	const wdTooltip = writeDisabledTooltip.value
 	return [
 		{
 			type: 'submenu',
@@ -363,10 +356,8 @@ const menuOptions = computed<ButtonMenuOption[]>(() => {
 		{
 			id: 'select-entry',
 			label: formatMessage(commonMessages.selectEntryLabel),
-			icon: iconComponent.value,
-			action: () => {
-				emit('toggle-select')
-			},
+			icon: iconStyle.value.icon,
+			action: () => ui.toggleItemSelection(props.file),
 			shown: props.selectionWithinActionMenu,
 		},
 		{
@@ -374,7 +365,7 @@ const menuOptions = computed<ButtonMenuOption[]>(() => {
 			label: formatMessage(messages.openInNewTab),
 			icon: PlusIcon,
 			shown: canOpenInTab.value,
-			action: () => emit('open-in-new-tab', item),
+			action: () => ui.handleOpenInNewTab(item),
 		},
 		{ type: 'divider' },
 		{
@@ -402,8 +393,8 @@ const menuOptions = computed<ButtonMenuOption[]>(() => {
 			id: 'open-in-folder',
 			label: formatMessage(commonMessages.openInFolderButton),
 			icon: FolderOpenIcon,
-			shown: !!ctx.openInFolder,
-			action: () => ctx.openInFolder?.(getFullPath()),
+			shown: !!ui.openInFolder,
+			action: () => ui.openInFolder?.(getFullPath()),
 		},
 		{ type: 'divider' },
 		{
@@ -413,26 +404,26 @@ const menuOptions = computed<ButtonMenuOption[]>(() => {
 			shown: canExtract.value,
 			disabled: wd,
 			tooltip: wd ? wdTooltip : undefined,
-			action: () => emit('extract', item),
+			action: () => ui.handleExtractItem(item),
 		},
 		{ type: 'divider', shown: canExtract.value },
 		{
 			id: 'zip',
 			label: formatMessage(messages.createZip),
 			icon: FolderArchiveIcon,
-			shown: props.file.type === 'directory' && !!ctx.zipFolder,
+			shown: props.file.type === 'directory' && !!ui.zipFolder,
 			disabled: wd,
 			tooltip: wd ? wdTooltip : undefined,
-			action: () => emit('zip', item),
+			action: () => ui.zipFolder?.(item),
 		},
-		{ type: 'divider', shown: props.file.type === 'directory' && !!ctx.zipFolder },
+		{ type: 'divider', shown: props.file.type === 'directory' && !!ui.zipFolder },
 		{
 			id: 'rename',
 			label: formatMessage(commonMessages.renameButton),
 			icon: EditIcon,
 			disabled: wd,
 			tooltip: wd ? wdTooltip : undefined,
-			action: () => emit('rename', item),
+			action: () => ui.showRenameModal(props.file),
 		},
 		{
 			id: 'move',
@@ -440,13 +431,13 @@ const menuOptions = computed<ButtonMenuOption[]>(() => {
 			icon: RightArrowIcon,
 			disabled: wd,
 			tooltip: wd ? wdTooltip : undefined,
-			action: () => emit('move', item),
+			action: () => ui.showMoveModal(props.file),
 		},
 		{
 			id: 'download',
-			label: ctx.downloadButtonLabel ?? formatMessage(commonMessages.downloadButton),
+			label: ui.downloadButtonLabel ?? formatMessage(commonMessages.downloadButton),
 			icon: DownloadIcon,
-			action: () => emit('download', item),
+			action: () => ui.downloadFile(item),
 			shown: props.file.type !== 'directory',
 		},
 		{
@@ -455,25 +446,13 @@ const menuOptions = computed<ButtonMenuOption[]>(() => {
 			icon: TrashIcon,
 			disabled: wd,
 			tooltip: wd ? wdTooltip : undefined,
-			action: () => emit('delete', item),
+			action: () => ui.showDeleteModal(props.file),
 			tone: 'red',
 		},
 	]
 })
 
-const iconComponent = computed(() => {
-	if (props.file.type === 'directory') {
-		if (props.file.name === 'config') return FolderCogIcon
-		if (props.file.name === 'world' || props.file.name === 'saves') return GlobeIcon
-		if (props.file.name === 'mods') return BoxIcon
-		if (props.file.name === 'resourcepacks') return PaintbrushIcon
-		if (props.file.name === 'shaderpacks') return GlassesIcon
-		if (props.file.name === 'datapacks') return BracesIcon
-		return FolderOpenIcon
-	}
-
-	return getFileExtensionIcon(fileExtension.value)
-})
+const iconStyle = computed(() => fileIconFor(props.file))
 
 const formattedModifiedDate = computed(() => {
 	const date = new Date(props.file.modified * 1000)
@@ -502,14 +481,28 @@ const columnValues = computed<Record<FileColumn, string | null>>(() => ({
 	modified: formattedModifiedDate.value,
 }))
 
+/**
+ * Details this row has a value for that aren't visible as columns. Checked against the raw
+ * entry, so the formatted values are only computed once the tooltip actually shows.
+ */
+const hiddenDetails = computed(() => {
+	const shown = props.columns ?? []
+	return FILE_COLUMNS_ORDER.filter((key) => {
+		if (shown.includes(key)) return false
+		if (key === 'size') return props.file.size != null
+		if (key === 'items') return props.file.type === 'directory'
+		return true
+	})
+})
+
 function openContextMenu(event: MouseEvent) {
 	event.preventDefault()
-	emit('contextmenu', event, menuOptions.value)
+	ui.handleContextMenu(event, menuOptions.value)
 }
 
 function handleMouseEnter() {
 	hoveringToEdit.value = true
-	emit('hover', { name: props.file.name, type: props.file.type, path: props.file.path })
+	emit('hover', props.file)
 }
 
 function handleMouseLeave() {
@@ -521,17 +514,14 @@ const isNavigating = ref(false)
 function selectItem(event?: MouseEvent) {
 	if (wasRecentDrag()) return
 	if (event?.ctrlKey || event?.metaKey) {
-		emit('toggle-select')
+		ui.toggleItemSelection(props.file)
 		return
 	}
 	if (isNavigating.value) return
 	isNavigating.value = true
 
-	const item = { name: props.file.name, type: props.file.type, path: props.file.path }
-	if (props.file.type === 'directory') {
-		emit('navigate', item)
-	} else if (props.file.type === 'file' && isEditableFile.value) {
-		emit('edit', item)
+	if (props.file.type === 'directory' || isEditableFile.value) {
+		emit('navigate', props.file)
 	}
 
 	setTimeout(() => {
@@ -542,15 +532,15 @@ function selectItem(event?: MouseEvent) {
 function handleAuxClick(event: MouseEvent) {
 	if (event.button !== 1 || !canOpenInTab.value) return
 	event.preventDefault()
-	emit('open-in-new-tab', { name: props.file.name, type: props.file.type, path: props.file.path })
+	ui.handleOpenInNewTab(props.file)
 }
 
 function handleKeydown(event: KeyboardEvent) {
 	if (event.key === 'Enter') {
 		selectItem()
 	} else if (canExpand.value) {
-		if (event.key === 'ArrowRight' && !props.expanded) emit('toggle-expand')
-		if (event.key === 'ArrowLeft' && props.expanded) emit('toggle-expand')
+		if (event.key === 'ArrowRight' && !props.expanded) emit('toggle-expand', props.file)
+		if (event.key === 'ArrowLeft' && props.expanded) emit('toggle-expand', props.file)
 	}
 }
 
@@ -560,7 +550,7 @@ function handlePointerDown(e: PointerEvent) {
 		{ name: props.file.name, type: props.file.type, path: props.file.path },
 		e,
 		(source, destination) => {
-			emit('moveDirectTo', source, destination)
+			ui.moveItem(source, childPath(destination, source.name))
 		},
 	)
 }

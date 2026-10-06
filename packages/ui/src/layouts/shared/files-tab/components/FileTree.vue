@@ -21,12 +21,6 @@
 				:file="row.item"
 				:index="index"
 				:is-last="index + 1 == rows.length"
-				:selected="ui.selectedItems.value.has(row.item.path)"
-				:write-disabled="ui.isBusy.value || !!ctx.isReadOnly?.(row.item)"
-				:write-disabled-tooltip="
-					ctx.isReadOnly?.(row.item) ? ctx.readOnlyReason?.value : ui.busyTooltip.value
-				"
-				has-hidden-details
 				:selection-within-action-menu="true"
 				compact
 				:depth="row.depth"
@@ -35,22 +29,9 @@
 				is-tree-row
 				:active="row.path === activePath"
 				:active-guide-level="activeGuideLevel(row.path)"
-				@extract="() => ui.handleExtractItem(row.item)"
-				@delete="() => ui.showDeleteModal(row.item)"
-				@rename="() => ui.showRenameModal(row.item)"
-				@download="() => ui.handleDownload(row.item)"
-				@zip="() => ui.handleZip(row.item)"
-				@move="() => ui.showMoveModal(row.item)"
-				@move-direct-to="ui.handleDirectMove"
-				@edit="() => ui.handleNavigateTo(row.item)"
-				@navigate="() => openDirectory(row.path, row.item)"
-				@open-in-new-tab="() => ui.handleOpenInNewTab(row.item)"
-				@toggle-expand="() => toggleExpanded(row.path)"
-				@hover="() => prefetch(row)"
-				@contextmenu="ui.handleContextMenu"
-				@toggle-select="() => ui.toggleItemSelection(row.item)"
-				@create="ui.showCreateModal"
-				@upload="ui.initiateFileUpload"
+				@navigate="openDirectory"
+				@toggle-expand="toggleExpanded"
+				@hover="prefetch"
 			/>
 		</template>
 	</div>
@@ -65,7 +46,6 @@ import { infoFrom, parentInfoFrom } from '#ui/layouts/shared/files-tab/utils.ts'
 import { canOpenInFileEditor } from '#ui/utils/file-extensions'
 
 import { injectFileBrowserUI } from '../providers/file-browser-ui'
-import { injectFileManager } from '../providers/file-manager'
 import type { FileItem } from '../types'
 import FileRow from './FileRow.vue'
 
@@ -104,9 +84,8 @@ const messages = defineMessages({
 	},
 })
 
-const ctx = injectFileManager()
 const ui = injectFileBrowserUI()
-const tree = ctx.directoryTree
+const tree = ui.directoryTree
 
 const activePath = computed(() => ui.fileTabs.activeLocation.value.path)
 const activeDirectory = computed(() => parentInfoFrom(ui.fileTabs.activeLocation.value))
@@ -116,7 +95,7 @@ const activeDirectoryDepth = computed(
 
 function activeGuideLevel(path: string) {
 	if (activeDirectoryDepth.value === 0) return undefined
-	return path.startsWith(`${activeDirectory.value}/`) ? activeDirectoryDepth.value : undefined
+	return path.startsWith(`${activeDirectory.value.path}/`) ? activeDirectoryDepth.value : undefined
 }
 const expandedPaths = computed(() => new Set(tree.expandedEntries.value))
 const query = computed(() => ui.searchQuery.value.trim().toLowerCase())
@@ -126,9 +105,11 @@ function isExpandable(item: FileItem) {
 	return item.type === 'directory' && item.count !== 0
 }
 
+const nameCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
+
 function compareEntries(a: FileItem, b: FileItem) {
 	if (a.type !== b.type) return a.type === 'directory' ? -1 : 1
-	return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+	return nameCollator.compare(a.name, b.name)
 }
 
 function collectRows(path: string, depth: number): TreeRow[] {
@@ -170,17 +151,16 @@ function setExpanded(path: string, expanded: boolean) {
 		: current.filter((entry) => entry !== path)
 }
 
-function toggleExpanded(path: string) {
-	setExpanded(path, !expandedPaths.value.has(path))
+function toggleExpanded(item: FileItem) {
+	setExpanded(item.path, !expandedPaths.value.has(item.path))
 }
 
-function openDirectory(path: string, item: FileItem) {
-	if (isExpandable(item)) setExpanded(path, true)
-	ui.handleNavigateTo(item)
+function openDirectory(item: FileItem) {
+	if (isExpandable(item)) setExpanded(item.path, true)
+	ui.navigateTo(item)
 }
 
-function prefetch(row: Extract<TreeRow, { type: 'item' }>) {
-	const { item } = row
+function prefetch(item: FileItem) {
 	if (item.type === 'directory' || canOpenInFileEditor(item.name)) {
 		tree.prefetch(item)
 	}
