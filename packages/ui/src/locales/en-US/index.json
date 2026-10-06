@@ -4733,6 +4733,9 @@
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "Stopped server"
   },
+  "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
+    "defaultMessage": "Rotated SFTP credentials"
+  },
   "servers.access-page.activity-log-filter.action.sftp-login": {
     "defaultMessage": "Logged in via SFTP"
   },
@@ -5113,6 +5116,9 @@
   },
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "Changed server subdomain to <subdomain></subdomain>"
+  },
+  "servers.audit-log.event.sftp-credentials-rolled": {
+    "defaultMessage": "Rotated SFTP credentials"
   },
   "servers.audit-log.event.sftp-login": {
     "defaultMessage": "Logged in via SFTP"

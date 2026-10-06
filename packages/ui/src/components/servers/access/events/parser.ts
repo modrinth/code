@@ -34,6 +34,7 @@ const basicEvents = new Set([
 	'server_restarted',
 	'server_killed',
 	'sftp_login',
+	'sftp_credentials_rolled',
 	'console_cleared',
 ])
 
