@@ -143,7 +143,7 @@ export function createReviewSubmission(
 				pendingDecision.value = { id, status, issues, issueUpdates }
 			}
 			assertCurrent(id)
-			if (!status && body) {
+			if (body?.trim()) {
 				await client.labrinth.threads_v3.sendMessage(threadId, {
 					body: {
 						type: 'text',
@@ -254,6 +254,8 @@ export function createReviewSubmission(
 				id: current.id,
 				threadId: current.thread_id,
 				status,
+				body: draft.value,
+				images: [...uploadedImages.value],
 				statusAlreadyApplied,
 				issues: statusAlreadyApplied ? currentPendingDecision.issues : selectedIssues(),
 				issueUpdates: statusAlreadyApplied
