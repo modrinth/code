@@ -2054,9 +2054,6 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Server auf Onboarding zurückgesetzt"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Supportoptionen"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Spitzenauslastungen von bis zu {cpus} CPUs"
   },
@@ -6990,4 +6987,3 @@
     "defaultMessage": "Typ"
   }
 }
-

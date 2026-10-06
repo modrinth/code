@@ -1412,9 +1412,6 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Pelayan ditetapkan semula ke proses penetapan awal"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Pilihan sokongan"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Boleh memecut sehingga {cpus} CPU"
   },
@@ -4953,4 +4950,3 @@
     "defaultMessage": "Jenis"
   }
 }
-

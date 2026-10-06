@@ -2033,9 +2033,6 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Szerver visszaállítva a kezdeti beállításokra"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Támogatási lehetőségek"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Akár {cpus} processzormagig terjedő ideiglenes többlethasználat"
   },

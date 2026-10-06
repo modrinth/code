@@ -2027,9 +2027,6 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "サーバーがオンボーディングにリセットされました"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "サポートオプション"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "{cpus}個のCPUに増加"
   },

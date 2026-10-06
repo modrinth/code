@@ -1946,9 +1946,6 @@
   "hosting.loader.reset-server-description": {
     "defaultMessage": "Tar bort all data på din server, däribland dina världar, moddar och konfigurationsfiler. Säkerhetskopior kommer bevaras och kan återställas."
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Support alternativ"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Ökar upp till {cpus} CPU:er"
   },

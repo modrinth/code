@@ -2000,9 +2000,6 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Server reinizializzato"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Opzioni di assistenza"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Fino a {cpus} CPU in supercarica"
   },
