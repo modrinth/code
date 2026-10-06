@@ -63,6 +63,20 @@ pub async fn images_add(
 ) -> Result<HttpResponse, ApiError> {
     let mut context = ImageContext::from_str(&data.context, None);
 
+    if matches!(&context, ImageContext::Project { .. })
+        && let Some(project_ref) = data.project_id.as_deref()
+        && let Some(response) = crate::routes::redirect_query_ref(
+            &req,
+            "project_id",
+            project_ref,
+            pool.as_ref(),
+            redis.as_ref(),
+        )
+        .await?
+    {
+        return Ok(response);
+    }
+
     let user = get_user_from_headers(
         &req,
         &**pool,

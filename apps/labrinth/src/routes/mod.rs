@@ -62,7 +62,9 @@ pub async fn resolve_refs(
     let keys = project_refs
         .iter()
         .map(|project_ref| {
-            redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, project_ref)
+            redis
+                .key()
+                .entity(PROJECT_REDIRECTS_NAMESPACE, project_ref.to_lowercase())
         })
         .collect::<Vec<_>>();
     let cached_targets = redis
@@ -140,6 +142,34 @@ pub async fn resolve_refs(
     Ok(resolved)
 }
 
+pub async fn clear_project_redirect_cache(
+    project_refs: &[String],
+    redis: &RedisPool,
+) -> Result<(), ApiError> {
+    if project_refs.is_empty() {
+        return Ok(());
+    }
+
+    let mut redis = redis
+        .connect()
+        .await
+        .wrap_internal_err("connecting to Redis to clear project redirects")?;
+    let keys = project_refs
+        .iter()
+        .map(|project_ref| {
+            redis
+                .key()
+                .entity(PROJECT_REDIRECTS_NAMESPACE, project_ref.to_lowercase())
+        })
+        .collect::<Vec<_>>();
+    redis
+        .delete_many(&keys)
+        .await
+        .wrap_internal_err("clearing cached project redirects")?;
+
+    Ok(())
+}
+
 pub async fn redirect_query_refs(
     req: &HttpRequest,
     parameter_name: &str,
@@ -170,6 +200,38 @@ pub async fn redirect_query_refs(
     {
         if name == parameter_name {
             query.append_pair(&name, &canonical_refs);
+        } else {
+            query.append_pair(&name, &value);
+        }
+    }
+    let location = format!("{}?{}", req.path(), query.finish());
+
+    Ok(Some(
+        HttpResponse::PermanentRedirect()
+            .append_header((header::LOCATION, location))
+            .finish(),
+    ))
+}
+
+pub async fn redirect_query_ref(
+    req: &HttpRequest,
+    parameter_name: &str,
+    project_ref: &str,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<Option<HttpResponse>, ApiError> {
+    let Some(target_project_id) = resolve_ref(project_ref, pool, redis).await?
+    else {
+        return Ok(None);
+    };
+
+    let target_project_id = target_project_id.to_string();
+    let mut query = url::form_urlencoded::Serializer::new(String::new());
+    for (name, value) in
+        url::form_urlencoded::parse(req.query_string().as_bytes())
+    {
+        if name == parameter_name {
+            query.append_pair(&name, &target_project_id);
         } else {
             query.append_pair(&name, &value);
         }
