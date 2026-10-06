@@ -85,6 +85,7 @@ pub async fn version_list(
         "project_id",
         pool.as_ref(),
         redis.as_ref(),
+        session_queue.as_ref(),
     )
     .await?
     {
@@ -200,6 +201,7 @@ pub async fn version_project_get(
         "project_id",
         pool.as_ref(),
         redis.as_ref(),
+        session_queue.as_ref(),
     )
     .await?
     {

@@ -114,6 +114,121 @@ async fn test_get_project() {
 }
 
 #[actix_rt::test]
+async fn project_redirect_cache_respects_visibility() {
+    with_test_environment_all(None, |env| async move {
+        let public_id = &env.dummy.project_alpha.project_id;
+        let private_id = &env.dummy.project_beta.project_id;
+        let public_alias = "redirect-public-alias";
+        let private_alias = "redirect-private-alias";
+        let mut redis = env.db.redis_pool.connect().await.unwrap();
+        for (alias, target) in
+            [(public_alias, public_id), (private_alias, private_id)]
+        {
+            let key = redis.key().entity("project_redirects:v1", alias);
+            redis
+                .set_serialized(
+                    &key,
+                    &Some(parse_base62(target).unwrap() as i64),
+                    Some(300),
+                )
+                .await
+                .unwrap();
+        }
+
+        for pat in [USER_USER_PAT, MOD_USER_PAT, ADMIN_USER_PAT] {
+            let response = env.api.get_project(private_alias, pat).await;
+            assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+            assert!(
+                response
+                    .headers()
+                    .get("location")
+                    .unwrap()
+                    .to_str()
+                    .unwrap()
+                    .ends_with(private_id)
+            );
+            assert_eq!(
+                response.headers().get("cache-control").unwrap(),
+                "private, no-store"
+            );
+        }
+
+        for pat in [None, ENEMY_USER_PAT, FRIEND_USER_PAT] {
+            let response = env.api.get_project(private_alias, pat).await;
+            assert_status!(&response, StatusCode::NOT_FOUND);
+            assert!(!response.headers().contains_key("location"));
+            let response = env.api.get_projects(&[private_alias], pat).await;
+            assert_status!(&response, StatusCode::OK);
+            assert!(!response.headers().contains_key("location"));
+            let projects: Vec<CommonProject> =
+                test::read_body_json(response).await;
+            assert!(projects.is_empty());
+        }
+
+        let response = env.api.get_project(public_alias, None).await;
+        assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+        assert!(
+            response
+                .headers()
+                .get("location")
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .ends_with(public_id)
+        );
+
+        for pat in [None, ENEMY_USER_PAT, USER_USER_PAT] {
+            let response = env
+                .api
+                .get_projects(
+                    &[
+                        public_alias,
+                        private_alias,
+                        public_id,
+                        "missing",
+                        private_alias,
+                    ],
+                    pat,
+                )
+                .await;
+            assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+            let location = response
+                .headers()
+                .get("location")
+                .unwrap()
+                .to_str()
+                .unwrap();
+            let (_, query) = location.split_once('?').unwrap();
+            let ids = url::form_urlencoded::parse(query.as_bytes())
+                .find(|(name, _)| name == "ids")
+                .unwrap()
+                .1;
+            let ids: Vec<String> = serde_json::from_str(&ids).unwrap();
+            let expected_private = if pat == USER_USER_PAT {
+                private_id.as_str()
+            } else {
+                private_alias
+            };
+            assert_eq!(
+                ids,
+                [
+                    public_id.as_str(),
+                    expected_private,
+                    public_id.as_str(),
+                    "missing",
+                    expected_private
+                ]
+            );
+            assert_eq!(
+                response.headers().get("cache-control").unwrap(),
+                "private, no-store"
+            );
+        }
+    })
+    .await;
+}
+
+#[actix_rt::test]
 async fn test_add_remove_project() {
     // Test setup and dummy data
     with_test_environment(

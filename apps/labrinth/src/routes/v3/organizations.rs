@@ -1118,6 +1118,7 @@ pub async fn organization_projects_remove(
         "project_id",
         pool.as_ref(),
         redis.as_ref(),
+        session_queue.as_ref(),
     )
     .await?
     {

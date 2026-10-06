@@ -56,9 +56,14 @@ pub async fn team_members_get_project(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    if let Some(response) =
-        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
-            .await?
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+    )
+    .await?
     {
         return Ok(response);
     }

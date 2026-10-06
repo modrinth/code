@@ -53,6 +53,7 @@ pub async fn team_members_get_project(
         "project_id",
         pool.as_ref(),
         redis.as_ref(),
+        session_queue.as_ref(),
     )
     .await?
     {

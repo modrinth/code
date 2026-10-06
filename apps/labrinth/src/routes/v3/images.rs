@@ -71,6 +71,7 @@ pub async fn images_add(
             project_ref,
             pool.as_ref(),
             redis.as_ref(),
+            session_queue.as_ref(),
         )
         .await?
     {

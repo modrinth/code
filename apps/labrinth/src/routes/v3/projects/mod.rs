@@ -258,6 +258,7 @@ pub async fn projects_get_route(
         &project_refs,
         pool.as_ref(),
         redis.as_ref(),
+        session_queue.as_ref(),
     )
     .await?
     {
@@ -312,9 +313,14 @@ pub async fn project_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    if let Some(response) =
-        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
-            .await?
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+    )
+    .await?
     {
         return Ok(response);
     }
@@ -458,9 +464,14 @@ pub async fn project_edit(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
-    if let Some(response) =
-        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
-            .await?
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+    )
+    .await?
     {
         return Ok(response);
     }
@@ -1738,10 +1749,16 @@ pub async fn project_get_check(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    if let Some(response) =
-        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
-            .await?
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+    )
+    .await?
     {
         return Ok(response);
     }
@@ -1794,6 +1811,7 @@ pub async fn dependency_list(
         "project_id",
         pool.as_ref(),
         redis.as_ref(),
+        session_queue.as_ref(),
     )
     .await?
     {
@@ -1963,6 +1981,7 @@ pub async fn projects_edit_route(
         &project_refs,
         pool.as_ref(),
         redis.as_ref(),
+        session_queue.as_ref(),
     )
     .await?
     {
@@ -2367,9 +2386,14 @@ pub async fn project_icon_edit(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
-    if let Some(response) =
-        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
-            .await?
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+    )
+    .await?
     {
         return Ok(response);
     }
@@ -2530,9 +2554,14 @@ pub async fn delete_project_icon(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
-    if let Some(response) =
-        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
-            .await?
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+    )
+    .await?
     {
         return Ok(response);
     }
@@ -2690,9 +2719,14 @@ pub async fn add_gallery_item(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
-    if let Some(response) =
-        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
-            .await?
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+    )
+    .await?
     {
         return Ok(response);
     }
@@ -3326,9 +3360,14 @@ pub async fn project_delete(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
-    if let Some(response) =
-        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
-            .await?
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+    )
+    .await?
     {
         return Ok(response);
     }
@@ -3653,9 +3692,14 @@ pub async fn project_follow(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    if let Some(response) =
-        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
-            .await?
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+    )
+    .await?
     {
         return Ok(response);
     }
@@ -3765,9 +3809,14 @@ pub async fn project_unfollow(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    if let Some(response) =
-        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
-            .await?
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+    )
+    .await?
     {
         return Ok(response);
     }
@@ -3869,9 +3918,14 @@ pub async fn project_get_organization(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    if let Some(response) =
-        crate::routes::redirect_ref(&req, "id", pool.as_ref(), redis.as_ref())
-            .await?
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+    )
+    .await?
     {
         return Ok(response);
     }
