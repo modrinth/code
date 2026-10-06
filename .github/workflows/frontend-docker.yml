@@ -29,6 +29,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: namespacelabs/nscloud-checkout-action@66f2dc6f6c42a8ac6c4e53473c4840006822831e # v9.0.1
+        timeout-minutes: 2
         with:
           fetch-depth: 0
 

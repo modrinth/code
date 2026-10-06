@@ -21,6 +21,10 @@ runs:
       shell: bash
       run: corepack enable
 
+    - name: Force colored moon output
+      shell: bash
+      run: echo "MOON_COLOR=3" >> "$GITHUB_ENV"
+
     - name: Set up caches
       if: inputs.namespace == 'true'
       uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1

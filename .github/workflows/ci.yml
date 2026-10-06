@@ -44,6 +44,7 @@ jobs:
       - name: Check out code
         if: env.INTERNAL != 'true'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        timeout-minutes: 2
         with:
           # moon compares against main in CI, which needs full history.
           # Skipping blobs keeps the clone small on GitHub-hosted runners
@@ -53,6 +54,7 @@ jobs:
       - name: Check out code (Namespace)
         if: env.INTERNAL == 'true'
         uses: namespacelabs/nscloud-checkout-action@66f2dc6f6c42a8ac6c4e53473c4840006822831e # v9.0.1
+        timeout-minutes: 2
         with:
           fetch-depth: 0
 
@@ -124,6 +126,9 @@ jobs:
 
       - name: Lint and test
         run: pnpm run ci
+        env:
+          # "Re-run jobs" with debug logging enabled also turns on moon's debug output
+          MOON_LOG: ${{ runner.debug == '1' && 'debug' || 'info' }}
 
       - name: Verify intl:extract has been run
         run: |
