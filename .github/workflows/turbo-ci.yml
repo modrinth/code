@@ -121,6 +121,7 @@ jobs:
       # The following command can be used to debug what is taking up space:
       # sudo du -xh --max-depth=4 / | sort -rh | curl -X POST --data-urlencode content@/dev/fd/0 https://api.mclo.gs/1/log
       - name: Free disk space for labrinth tests
+        if: env.INTERNAL != 'true'
         run: sudo rm -rf /usr/local/lib/android /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/share/swift
 
       - name: Wait for services
