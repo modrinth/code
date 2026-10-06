@@ -40,7 +40,7 @@ use stripe::{
     CreateSetupIntentAutomaticPaymentMethodsAllowRedirects,
     CustomerInvoiceSettings, CustomerPaymentMethodRetrieval, EventObject,
     EventType, PaymentIntentId, PaymentMethodId, SetupIntent, UpdateCustomer,
-    Webhook,
+    Webhook, WebhookError,
 };
 use tracing::warn;
 use xredis::RedisPool;
@@ -1814,11 +1814,13 @@ pub async fn stripe_webhook(
         .and_then(|x| x.to_str().ok())
         .unwrap_or_default();
 
-    if let Ok(event) = Webhook::construct_event(
+    let result = Webhook::construct_event(
         &payload,
         stripe_signature,
         &ENV.STRIPE_WEBHOOK_SECRET,
-    ) {
+    );
+
+    if let Ok(event) = result {
         struct PaymentIntentMetadata {
             pub user_item: crate::database::models::user_item::DBUser,
             pub product_price_item: product_item::DBProductPrice,
@@ -1958,9 +1960,9 @@ pub async fn stripe_webhook(
                                     subscription.price_id = charge.price_id;
                                 }
                                 ChargeType::Refund => {
-                                    return Err(ApiError::Request(
+                                    return Err(ApiError::Internal(
                                         eyre::eyre!(
-                                            "Invalid charge type: Refund",
+                                            "invalid charge type `Refund` for payment intent",
                                         ),
                                     ));
                                 }
@@ -2121,9 +2123,25 @@ pub async fn stripe_webhook(
                 });
             }
 
-            Err(ApiError::Request(eyre::eyre!(
-                "Webhook missing required webhook metadata!",
+            Err(ApiError::Internal(eyre::eyre!(
+                "payment intent is missing required metadata",
             )))
+        }
+
+        // Labrinth always attaches `modrinth_*` metadata when creating a payment
+        // intent, so one without any was created elsewhere on the Stripe account.
+        if let EventObject::PaymentIntent(payment_intent) = &event.data.object
+            && !payment_intent
+                .metadata
+                .keys()
+                .any(|key| key.starts_with("modrinth_"))
+        {
+            warn!(
+                payment_intent_id = %payment_intent.id,
+                event_type = %event.type_,
+                "Ignoring webhook for a payment intent not created by Labrinth"
+            );
+            return Ok(HttpResponse::Ok().finish());
         }
 
         match event.type_ {
@@ -2225,7 +2243,7 @@ pub async fn stripe_webhook(
                                             let region = metadata.new_region.clone();
 
                                             if region.is_none() {
-                                                return Err(ApiError::Request(eyre::eyre!(
+                                                return Err(ApiError::Internal(eyre::eyre!(
                                                     "We attempted to promote a subscription with type=medal, which requires specifying \
                                                     a new region to move the server to. However, no new region was present in the payment \
                                                     intent metadata.".to_owned()
@@ -2390,7 +2408,7 @@ pub async fn stripe_webhook(
                         let new_price = match metadata.product_price_item.prices {
                             Price::OneTime { price } => price,
                             Price::Recurring { intervals } => {
-                                *intervals.get(&subscription.interval).wrap_request_err_with(|| "could not find a valid price for the user's country"
+                                *intervals.get(&subscription.interval).wrap_internal_err_with(|| "could not find a valid price for the user's country"
                                             .to_string())?
                             }
                         };
@@ -2661,6 +2679,10 @@ pub async fn stripe_webhook(
             }
             _ => {}
         }
+    } else if let Err(WebhookError::BadParse(err)) = result {
+        return Err(ApiError::Internal(
+            eyre::Report::new(err).wrap_err("parsing webhook event"),
+        ));
     } else {
         return Err(ApiError::Request(eyre::eyre!(
             "Webhook signature validation failed!",
