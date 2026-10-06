@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use tauri::Runtime;
 use tauri_plugin_opener::OpenerExt;
 use theseus::{
-    handler,
+    emit_warning, handler,
     prelude::{CommandPayload, DirectoryInfo, app_db_backup_dir},
 };
 
@@ -174,7 +174,7 @@ pub async fn get_opening_command() -> Result<Option<CommandPayload>> {
 // We hijack the deep link library (which also contains functionality for instance-checking)
 pub async fn handle_command(command: String) -> Result<()> {
     let command = normalize_deep_link_command(&command);
-    if accept_auth_deeplink(&command) {
+    if accept_auth_deeplink(&command).await {
         return Ok(());
     }
 
@@ -184,7 +184,7 @@ pub async fn handle_command(command: String) -> Result<()> {
 
 async fn opening_command(command: &str) -> Result<Option<CommandPayload>> {
     let command = normalize_deep_link_command(command);
-    if accept_auth_deeplink(&command) {
+    if accept_auth_deeplink(&command).await {
         return Ok(None);
     }
 
@@ -192,13 +192,18 @@ async fn opening_command(command: &str) -> Result<Option<CommandPayload>> {
     Ok(Some(handler::parse_command(&command).await?))
 }
 
-fn accept_auth_deeplink(command: &str) -> bool {
+async fn accept_auth_deeplink(command: &str) -> bool {
     let Some((code, nonce)) = parse_auth_deeplink(command) else {
         return false;
     };
 
     tracing::info!("Handling Modrinth auth deep link");
-    submit_deeplink(code, &nonce);
+    if !submit_deeplink(code, &nonce) {
+        const MESSAGE: &str = "Couldn't finish signing in. Please try again.";
+        if let Err(error) = emit_warning(MESSAGE).await {
+            tracing::error!("{MESSAGE} ({error})");
+        }
+    }
     true
 }
 
