@@ -43,44 +43,13 @@
 		"if-ci": "^3.0.0",
 		"keep-a-changelog": "^3.0.2",
 		"prettier": "^3.3.2",
-		"turbo": "^2.5.4",
+		"turbo": "^2.11.5",
 		"vue": "^3.5.13",
 		"yaml": "^2.8.2"
 	},
-	"packageManager": "pnpm@10.33.2",
+	"packageManager": "pnpm@12.8.1",
 	"engines": {
 		"node": ">=24.15.0"
-	},
-	"pnpm": {
-		"patchedDependencies": {
-			"readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch",
-			"@vue-email/markdown@0.0.7": "patches/@vue-email__markdown@0.0.7.patch",
-			"@vue-email/tailwind@0.2.0": "patches/@vue-email__tailwind@0.2.0.patch"
-		},
-		"packageExtensions": {
-			"@vue-email/markdown@0.0.7": {
-				"dependencies": {
-					"xss": "^1.0.14"
-				}
-			}
-		},
-		"peerDependencyRules": {
-			"allowedVersions": {
-				"vite": "8",
-				"esbuild": "0"
-			}
-		},
-		"onlyBuiltDependencies": [
-			"@parcel/watcher",
-			"@sentry/cli",
-			"core-js",
-			"esbuild",
-			"protobufjs",
-			"sharp",
-			"unrs-resolver",
-			"vue-demi",
-			"workerd"
-		]
 	},
 	"prettier": "@modrinth/tooling-config/prettier.config.cjs"
 }
