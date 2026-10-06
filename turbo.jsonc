@@ -9,7 +9,8 @@
 		"packages/tooling-config/**",
 		"!packages/tooling-config/.turbo/**",
 		"!packages/tooling-config/node_modules/**",
-		"packages/app-lib/.env"
+		"packages/app-lib/.env",
+		"clippy.toml"
 	],
 	"globalEnv": [
 		"MODRINTH_URL",
@@ -48,9 +49,7 @@
 				"RUST_*",
 				"RUSTFLAGS",
 				"FORCE_COLOR",
-				"NEXTEST_*",
-				"BUILD_ENV",
-				"PREVIEW"
+				"NEXTEST_*"
 			],
 			"passThroughEnv": ["SCCACHE_*", "RUSTC_WRAPPER", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
 		},

@@ -13,6 +13,8 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod' }}
 
 env:
+  TURBO_TELEMETRY_DISABLED: 1
+  pnpm_config_color: always
   INTERNAL: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
 
 jobs:
@@ -21,7 +23,7 @@ jobs:
     runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && 'namespace-profile-modrinth-turbo' || 'ubuntu-latest' }}
 
     env:
-      # Ensure pnpm output is colored in GitHub Actions logs
+      # Color the output of Node tools run by Turborepo tasks in GitHub Actions logs
       FORCE_COLOR: 3
       # Make cargo nextest successfully ignore projects without tests
       NEXTEST_NO_TESTS: pass
@@ -49,6 +51,11 @@ jobs:
         uses: namespacelabs/nscloud-checkout-action@66f2dc6f6c42a8ac6c4e53473c4840006822831e # v9.0.1
         with:
           fetch-depth: 2
+
+      - name: Start services
+        id: services
+        background: true
+        run: docker compose --profile clustered-redis up --wait
 
       - name: Setup Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -109,32 +116,17 @@ jobs:
         working-directory: packages/app-lib
         run: cp .env.staging .env
 
-      # check if labrinth tests will actually run (cache miss)
-      - name: Check if labrinth tests need to run
-        id: check-labrinth
-        run: |
-          LABRINTH_TEST_STATUS=$(pnpm turbo run test --filter=labrinth --dry-run=json | jq -r '.tasks[] | select(.task == "test") | .cache.status')
-          echo "Labrinth test cache status: $LABRINTH_TEST_STATUS"
-          if [ "$LABRINTH_TEST_STATUS" = "HIT" ]; then
-            echo "needs_services=false" >> $GITHUB_OUTPUT
-          else
-            echo "needs_services=true" >> $GITHUB_OUTPUT
-          fi
-
       # labrinth integration tests require a lot of disk space, so in the standard GitHub Actions
       # runners we must remove useless development tools from the base image, which frees up ~20 GiB.
       # The following command can be used to debug what is taking up space:
       # sudo du -xh --max-depth=4 / | sort -rh | curl -X POST --data-urlencode content@/dev/fd/0 https://api.mclo.gs/1/log
       - name: Free disk space for labrinth tests
-        if: steps.check-labrinth.outputs.needs_services == 'true'
         run: sudo rm -rf /usr/local/lib/android /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/share/swift
 
-      - name: Start services
-        if: steps.check-labrinth.outputs.needs_services == 'true'
-        run: docker compose --profile clustered-redis up --wait
+      - name: Wait for services
+        wait: [services]
 
       - name: Setup labrinth environment and database
-        if: steps.check-labrinth.outputs.needs_services == 'true'
         working-directory: apps/labrinth
         run: |
           cp .env.local .env

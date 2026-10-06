@@ -39,6 +39,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod' }}
 
+env:
+  TURBO_TELEMETRY_DISABLED: 1
+  pnpm_config_color: always
+
 jobs:
   build:
     name: Build
