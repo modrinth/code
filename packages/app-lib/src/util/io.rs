@@ -6,7 +6,7 @@ use std::{
     io::{ErrorKind, Write},
     path::Path,
 };
-use tempfile::NamedTempFile;
+use tempfile::{NamedTempFile, TempDir};
 use tokio::task::spawn_blocking;
 
 #[derive(Debug, thiserror::Error)]
@@ -163,6 +163,23 @@ pub async fn write(
     .map_err(|_| std::io::Error::other("background task failed"))??;
 
     Ok(())
+}
+
+pub async fn temporary_file_in(
+    directory: impl AsRef<Path>,
+    file_name: impl AsRef<Path>,
+    data: impl AsRef<[u8]>,
+) -> Result<(TempDir, std::path::PathBuf), IOError> {
+    let directory = directory.as_ref();
+    create_dir_all(directory).await?;
+
+    let temp_dir = tempfile::tempdir_in(directory)
+        .map_err(|error| IOError::with_path(error, directory))?;
+    let path = temp_dir.path().join(file_name);
+    write(&path, data).await?;
+    let path = canonicalize(path)?;
+
+    Ok((temp_dir, path))
 }
 
 fn sync_write(
