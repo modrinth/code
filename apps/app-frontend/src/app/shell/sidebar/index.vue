@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { defineMessages, useVIntl } from '@modrinth/ui'
-import { computed, ref } from 'vue'
+import { defineMessages, useScrollIndicator, useVIntl } from '@modrinth/ui'
+import { OverlayScrollbars } from 'overlayscrollbars'
+import { computed, onMounted, onScopeDispose, ref } from 'vue'
 
 import { useTheme } from '@/composables/use-theme'
 import PrideFundraiserBanner from '@/features/campaigns/pride-fundraiser-banner.vue'
@@ -33,6 +34,22 @@ const { hasLoggedIntoMinecraft, hasLoggedIntoModrinth, showChecklist } = injectO
 const showFriendsList = computed(() => !showChecklist.value || hasLoggedIntoModrinth.value)
 const accounts = ref<InstanceType<typeof AccountsCard> | null>(null)
 const friends = ref<InstanceType<typeof FriendsList> | null>(null)
+const scrollContainer = ref<HTMLElement | null>(null)
+const scrollViewport = ref<HTMLElement | null>(null)
+const upgradeHeight = ref(0)
+const { showTopFade, showBottomFade, checkScrollState } = useScrollIndicator(scrollViewport)
+
+let removeScrollbarListener: (() => void) | undefined
+
+onMounted(() => {
+	if (!scrollContainer.value) return
+	const scrollbars = OverlayScrollbars(scrollContainer.value)
+	if (!scrollbars) return
+	scrollViewport.value = scrollbars.elements().viewport
+	removeScrollbarListener = scrollbars.on('updated', checkScrollState)
+})
+
+onScopeDispose(() => removeScrollbarListener?.())
 
 const minecraftAccounts = computed<MinecraftAccountsActions | null>(() => {
 	const card = accounts.value
@@ -69,51 +86,68 @@ const messages = defineMessages({
 
 <template>
 	<div
-		class="app-sidebar mt-px relative flex h-[calc(100vh-var(--top-bar-height))] w-[300px] shrink-0 flex-col overflow-visible border-0 border-l-[1px] border-solid border-[--brand-gradient-border] before:pointer-events-none before:absolute before:inset-y-0 before:-left-8 before:w-8 before:content-[''] after:pointer-events-none after:absolute after:inset-x-0 after:bottom-[250px] after:h-20 after:content-['']"
+		class="app-sidebar mt-px relative flex h-[calc(100vh-var(--top-bar-height))] w-[300px] shrink-0 flex-col overflow-visible border-0 border-l-[1px] border-solid border-[--brand-gradient-border] before:pointer-events-none before:absolute before:inset-y-0 before:-left-8 before:w-8 before:content-['']"
 		:class="{
-			'after:hidden': hasPlus,
 			'before:shadow-[-15px_0_15px_-15px_rgba(0,0,0,0.1)_inset]': appTheme.advancedRendering,
 		}"
 	>
-		<div
-			v-overlay-scrollbars="scrollbarOptions"
-			class="app-sidebar-scrollable relative grow shrink"
-			:class="{ 'pb-12': !hasPlus }"
-			data-overlayscrollbars-initialize
-		>
-			<OnboardingChecklist
-				@create-instance="emit('create-instance')"
-				@login-minecraft="accounts?.login()"
-				@login-modrinth="emit('login-modrinth')"
-			/>
-			<div id="sidebar-teleport-target" class="sidebar-teleport-content contents"></div>
-			<div class="sidebar-default-content hidden" :class="{ 'sidebar-enabled': visible }">
-				<div
-					v-show="hasLoggedIntoMinecraft"
-					class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
-				>
-					<h3 class="text-base text-primary font-medium m-0">
-						{{ formatMessage(messages.playingAs) }}
-					</h3>
-					<Suspense>
-						<AccountsCard ref="accounts" />
-					</Suspense>
-				</div>
-				<div
-					v-show="showFriendsList"
-					class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
-				>
-					<Suspense>
-						<FriendsList ref="friends" :credentials="credentials ?? null" :sign-in="requestSignIn" />
-					</Suspense>
-				</div>
-				<PrideFundraiserBanner
-					class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
+		<div class="relative flex min-h-0 grow shrink flex-col">
+			<div
+				ref="scrollContainer"
+				v-overlay-scrollbars="scrollbarOptions"
+				class="app-sidebar-scrollable relative min-h-0 grow shrink"
+				data-overlayscrollbars-initialize
+			>
+				<OnboardingChecklist
+					@create-instance="emit('create-instance')"
+					@login-minecraft="accounts?.login()"
+					@login-modrinth="emit('login-modrinth')"
 				/>
-				<NewsSidebar />
+				<div id="sidebar-teleport-target" class="sidebar-teleport-content contents"></div>
+				<div class="sidebar-default-content hidden" :class="{ 'sidebar-enabled': visible }">
+					<div
+						v-show="hasLoggedIntoMinecraft"
+						class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
+					>
+						<h3 class="text-base text-primary font-medium m-0">
+							{{ formatMessage(messages.playingAs) }}
+						</h3>
+						<Suspense>
+							<AccountsCard ref="accounts" />
+						</Suspense>
+					</div>
+					<div
+						v-show="showFriendsList"
+						class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
+					>
+						<Suspense>
+							<FriendsList
+								ref="friends"
+								:credentials="credentials ?? null"
+								:sign-in="requestSignIn"
+							/>
+						</Suspense>
+					</div>
+					<PrideFundraiserBanner
+						class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
+					/>
+					<NewsSidebar
+						:style="showAd ? { paddingBottom: `calc(1rem + ${upgradeHeight}px)` } : undefined"
+					/>
+				</div>
 			</div>
+			<div
+				class="pointer-events-none absolute inset-x-0 top-0 z-10 h-8 bg-gradient-to-b from-[#19211F] to-transparent transition-opacity duration-200 motion-reduce:transition-none"
+				:class="showTopFade ? 'opacity-100' : 'opacity-0'"
+				aria-hidden="true"
+			/>
+			<div
+				class="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-8 bg-gradient-to-t from-[#151A1B] to-transparent transition-opacity duration-200 motion-reduce:transition-none"
+				:class="showAd || showBottomFade ? 'opacity-100' : 'opacity-0'"
+				aria-hidden="true"
+			/>
 		</div>
-		<Promotion v-if="showAd" />
+		<Promotion v-if="showAd" @upgrade-height="upgradeHeight = $event" />
 	</div>
 </template>
 
@@ -126,10 +160,6 @@ const messages = defineMessages({
 	--surface-5: var(--brand-gradient-border);
 	--color-divider: var(--brand-gradient-border);
 	--color-divider-dark: var(--brand-gradient-border);
-}
-
-.app-sidebar::after {
-	background: var(--brand-gradient-fade-out-color);
 }
 
 .sidebar-teleport-content:empty + .sidebar-default-content.sidebar-enabled {
