@@ -1135,6 +1135,7 @@ pub struct AuthorizationInit {
     pub token: Option<String>,
     /// If the user is already logged in, and is linking a PayPal account,
     /// this will be set to the user's auth token from the frontend.
+    /// Only first-party session tokens may authorize linking.
     pub auth_token: Option<String>,
 }
 #[derive(Serialize, Deserialize, utoipa::ToSchema)]
@@ -1170,7 +1171,11 @@ pub async fn init(
     // This can happen when linking to a PayPal account (logging in) when already
     // logged in.
     let existing_user_id = if let Some(auth_token) = &info.auth_token {
-        get_user_record_from_bearer_token(
+        if !auth_token.starts_with("mra_") {
+            return Err(AuthenticationError::InvalidCredentials);
+        }
+
+        let (scopes, user) = get_user_record_from_bearer_token(
             &req,
             Some(auth_token),
             &**client,
@@ -1178,10 +1183,14 @@ pub async fn init(
             &session_queue,
             false,
         )
-        .await
-        .ok()
-        .flatten()
-        .map(|(_scopes, user)| user.id)
+        .await?
+        .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+
+        if !scopes.contains(Scopes::USER_AUTH_WRITE) {
+            return Err(AuthenticationError::InvalidCredentials);
+        }
+
+        Some(user.id)
     } else {
         None
     };
