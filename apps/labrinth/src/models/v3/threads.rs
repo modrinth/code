@@ -48,6 +48,10 @@ pub enum MessageBody {
         new_status: ProjectStatus,
         old_status: ProjectStatus,
     },
+    AutoApproval {
+        new_status: ProjectStatus,
+        old_status: ProjectStatus,
+    },
     TechReview {
         verdict: DelphiVerdict,
     },
@@ -71,6 +75,7 @@ impl MessageBody {
             | Self::TechReviewExited
             | Self::TechReviewExitFileDeleted => true,
             Self::StatusChange { .. }
+            | Self::AutoApproval { .. }
             | Self::ThreadClosure
             | Self::ThreadReopen => false,
         }

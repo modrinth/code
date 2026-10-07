@@ -32,6 +32,29 @@ pub(crate) struct SyncedProjectState {
 }
 
 impl SyncedProjectState {
+    pub(crate) fn auto_approval_status(&self) -> Option<ProjectStatus> {
+        if !matches!(
+            self.project.status,
+            ProjectStatus::Rejected | ProjectStatus::Withheld
+        ) || self.thread_issues.is_empty()
+            || self
+                .thread_issues
+                .iter()
+                .any(|issue| issue.verdict != ThreadIssueVerdict::Resolved)
+        {
+            return None;
+        }
+
+        Some(
+            self.project
+                .requested_status
+                .filter(|status| {
+                    status.is_approved() && status.can_be_requested()
+                })
+                .unwrap_or(ProjectStatus::Approved),
+        )
+    }
+
     pub(crate) fn can_address_facet(
         &self,
         facet_id: DBThreadIssueFacetId,
